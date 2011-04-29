@@ -39,7 +39,7 @@ namespace synthese
 	{
 		class ServicePointer;
 	}
-	
+
 	namespace departure_boards
 	{
 		/** DeparturesTableTransferDestinationInterfacePage Interface Page Class.
@@ -64,7 +64,7 @@ namespace synthese
 				- 11 : arrival time
 				- 12 : transfer rank in the transfer place
 				- 13 : total transfer rank
-				
+
 		*/
 		class DeparturesTableTransferDestinationInterfacePage
 			: public util::FactorableTemplate<interfaces::InterfacePage, DeparturesTableTransferDestinationInterfacePage>
@@ -85,7 +85,7 @@ namespace synthese
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
-			
+
 			DeparturesTableTransferDestinationInterfacePage();
 		};
 	}

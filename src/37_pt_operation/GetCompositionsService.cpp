@@ -45,10 +45,10 @@ namespace synthese
 	using namespace cms;
 	using namespace pt;
 	using namespace graph;
-	
+
 
 	template<> const string util::FactorableTemplate<Function,pt_operation::GetCompositionsService>::FACTORY_KEY("GetCompositionsService");
-	
+
 	namespace pt_operation
 	{
 		const string GetCompositionsService::PARAMETER_DATE("da");
@@ -179,9 +179,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		bool GetCompositionsService::isAuthorized(
 			const Session* session
 		) const {

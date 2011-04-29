@@ -80,7 +80,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -96,7 +96,7 @@ namespace synthese
 				void setTitle(const std::string& value) { _title = value; }
 				void setParent(boost::shared_ptr<Webpage> value) { _parent = value; }
 			//@}
-			
+
 		};
 	}
 }

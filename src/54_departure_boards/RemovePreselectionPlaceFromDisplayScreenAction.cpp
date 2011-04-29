@@ -81,7 +81,7 @@ namespace synthese
 		{
 			_screen->removeForcedDestination(_place.get());
 			DisplayScreenTableSync::Save(_screen.get());
-			
+
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(
 				*_screen,
@@ -104,8 +104,8 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
-		
+
+
 		void RemovePreselectionPlaceFromDisplayScreenAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value
 		){

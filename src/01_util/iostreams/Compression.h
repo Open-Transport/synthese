@@ -16,7 +16,7 @@ namespace synthese
 
 		/** Service class for compressing data.
 		    Note : Prefer these methods to boost ones (difficult to use and understand).
-		    
+
 		@ingroup m01
 		*/
 		class Compression

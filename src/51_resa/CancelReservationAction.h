@@ -45,7 +45,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<ReservationTransaction>	_transaction;
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map

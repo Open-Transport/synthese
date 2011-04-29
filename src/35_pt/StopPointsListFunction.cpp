@@ -51,7 +51,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,pt::StopPointsListFunction>::FACTORY_KEY("StopPointsListFunction");
-	
+
 	namespace pt
 	{
 		const string StopPointsListFunction::PARAMETER_LINE_ID = "lineid";
@@ -100,7 +100,7 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-			
+
 		}
 
 		void StopPointsListFunction::run(
@@ -230,9 +230,9 @@ namespace synthese
 			// XML footer
 			stream << "</physicalStops>";
 		}
-		
-		
-		
+
+
+
 		bool StopPointsListFunction::isAuthorized(
 			const Session* session
 		) const {

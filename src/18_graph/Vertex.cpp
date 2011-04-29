@@ -52,7 +52,7 @@ namespace synthese
 		}
 
 
-		
+
 		const Vertex::Edges& Vertex::getDepartureEdges(
 		) const	{
 			return _departureEdges;
@@ -60,15 +60,15 @@ namespace synthese
 
 
 
-		const Vertex::Edges& 
+		const Vertex::Edges&
 		Vertex::getArrivalEdges () const
 		{
 			return _arrivalEdges;
 		}
 
-		 
 
-		void 
+
+		void
 		Vertex::addDepartureEdge ( const Edge* edge )
 		{
 			assert(edge);
@@ -79,7 +79,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Vertex::addArrivalEdge ( const Edge* edge )
 		{
 			assert(edge);

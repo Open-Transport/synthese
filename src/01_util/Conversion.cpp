@@ -47,9 +47,9 @@ namespace synthese
 		}
 
 
-		    
 
-		boost::logic::tribool 
+
+		boost::logic::tribool
 		Conversion::ToTribool (const std::string& s)
 		{
 			std::string str = boost::to_lower_copy (s);
@@ -57,19 +57,19 @@ namespace synthese
 			if ((str == "true") || (str == "yes") || (ToInt(str)>0)) return true;
 			if ((str == "false") || (str == "no") || (str == "0")) return false;
 			return boost::logic::indeterminate;
-		    
+
 		}
 
 
 
-		int 
+		int
 		Conversion::ToInt (const std::string& s)
 		{
 			return atoi (s.c_str ());
 		}
 
 
-		long 
+		long
 		Conversion::ToLong (const std::string& s)
 		{
 			return atol (s.c_str ());
@@ -77,7 +77,7 @@ namespace synthese
 
 
 
-		long long 
+		long long
 		Conversion::ToLongLong (const std::string& s)
 		{
 			long long i = 0;
@@ -87,7 +87,7 @@ namespace synthese
 
 
 
-		double 
+		double
 		Conversion::ToDouble (const std::string& s)
 		{
 			return atof (s.c_str ());
@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-		std::string 
+		std::string
 		Conversion::ToString (int i)
 		{
 			std::stringstream ss;
@@ -104,7 +104,7 @@ namespace synthese
 		}
 
 
-		std::string 
+		std::string
 		Conversion::ToString (long long l)
 		{
 			std::stringstream ss;
@@ -113,7 +113,7 @@ namespace synthese
 		}
 
 
-		std::string 
+		std::string
 		Conversion::ToString (unsigned long long l)
 		{
 			std::stringstream ss;
@@ -123,7 +123,7 @@ namespace synthese
 
 
 
-		std::string 
+		std::string
 		Conversion::ToString (unsigned int i)
 		{
 			std::stringstream ss;
@@ -133,7 +133,7 @@ namespace synthese
 
 
 
-		std::string 
+		std::string
 		Conversion::ToString (long l)
 		{
 			std::stringstream ss;
@@ -141,7 +141,7 @@ namespace synthese
 			return ss.str ();
 		}
 
-		std::string 
+		std::string
 		Conversion::ToOctalString (long l)
 		{
 			std::stringstream ss;
@@ -150,7 +150,7 @@ namespace synthese
 			return ss.str ();
 		}
 
-		std::string 
+		std::string
 		Conversion::ToString (unsigned long l)
 		{
 			std::stringstream ss;
@@ -159,7 +159,7 @@ namespace synthese
 		}
 
 
-		std::string 
+		std::string
 		Conversion::ToString (double d)
 		{
 			std::stringstream ss;
@@ -168,7 +168,7 @@ namespace synthese
 		}
 
 
-		std::string 
+		std::string
 		Conversion::ToString (const std::string& s)
 		{
 			return s;
@@ -191,7 +191,7 @@ namespace synthese
 				// Escape single quotes
 				if (s.at(i) == '\'')
 					result.push_back('\'');
-				
+
 				result.push_back(s.at(i));
 			}
 			if (withApostrophes)
@@ -218,7 +218,7 @@ namespace synthese
 
 
 
-	    std::string Conversion::ToPrepaddedString (const std::string& s, char padchar, int paddedsize) 
+	    std::string Conversion::ToPrepaddedString (const std::string& s, char padchar, int paddedsize)
 	    {
 		assert (s.length () <= paddedsize);
 		std::stringstream ss;
@@ -228,7 +228,7 @@ namespace synthese
 	    }
 
 
-	    std::string Conversion::ToPostpaddedString (const std::string& s, char padchar, int paddedsize) 
+	    std::string Conversion::ToPostpaddedString (const std::string& s, char padchar, int paddedsize)
 	    {
 		assert (s.length () <= paddedsize);
 		std::stringstream ss;

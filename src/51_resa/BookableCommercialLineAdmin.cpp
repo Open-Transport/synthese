@@ -103,7 +103,7 @@ namespace synthese
 			_hideOldServices(false),
 			_displayCancelled(false)
 		{ }
-		
+
 		void BookableCommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -161,9 +161,9 @@ namespace synthese
 
 			_serviceNumber = map.getOptional<string>(PARAMETER_SERVICE);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -199,7 +199,7 @@ namespace synthese
 			AdminFunctionRequest<ResaCustomerAdmin> customerRequest(_request);
 
 			AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
-			
+
 			AdminFunctionRequest<ReservationAdmin> openReservationRequest(_request);
 
 			AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request);
@@ -227,7 +227,7 @@ namespace synthese
 			vector<shared_ptr<ScheduledService> > sortedServices;
 			{
 				map<string, shared_ptr<ScheduledService> > servicesByNumber;
-				
+
 				ScheduledServiceTableSync::SearchResult services(
 					ScheduledServiceTableSync::Search(
 						_getEnv(),
@@ -259,7 +259,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
 			{
 				if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
-				
+
 				const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
 				if(reservations.find(service->getServiceNumber()) == reservations.end())
 				{
@@ -278,14 +278,14 @@ namespace synthese
 				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
 				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
 				stream << st.close();
-				
+
 				stream << "<h1>Liens</h1>";
-				
+
 				date date(_date);
 				date -= days(1);
 				searchRequest.getPage()->_hideOldServices = false;
 				searchRequest.getPage()->_date = date;
-				
+
 				stream <<
 					"<p>" << HTMLModule::getLinkButton(
 						searchRequest.getURL(),
@@ -293,17 +293,17 @@ namespace synthese
 						string(),
 						"resultset_previous.png"
 					) << " ";
-				
+
 				searchRequest.getPage()->_date = _date;
-				searchRequest.getPage()->_hideOldServices = !_hideOldServices;	
-					
+				searchRequest.getPage()->_hideOldServices = !_hideOldServices;
+
 				stream << HTMLModule::getLinkButton(
 						searchRequest.getURL(),
 						_hideOldServices ? "Journée entière" : "Prochains services",
 						string(),
 						_hideOldServices ? "stop_blue.png" : "stop_green.png"
 					) << " ";
-				
+
 				date = _date;
 				date += days(1);
 				searchRequest.getPage()->_hideOldServices = false;
@@ -316,7 +316,7 @@ namespace synthese
 						"resultset_next.png"
 					) << "</p>"
 				;
-				
+
 				stream << "<h1>Résultats</h1>";
 			}
 			else
@@ -370,7 +370,7 @@ namespace synthese
 					;
 				}
 			}
-			
+
 			HTMLTable::ColsVector c;
 			c.push_back("Statut");
 			c.push_back("Heure départ");
@@ -396,9 +396,9 @@ namespace synthese
 				if(!_serviceNumber)
 				{
 					stream << t.row();
-					
+
 					stream << t.col(1, string(), true);
-					
+
 					{
 						UseRule::ReservationAvailabilityType status(
 							service->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
@@ -496,7 +496,7 @@ namespace synthese
 								reservation->getTransaction()->getCustomerUserId(),
 								_getEnv()
 						)	);
-						
+
 						cancelRequest.getAction()->setTransaction(
 							ReservationTransactionTableSync::GetEditable(
 								reservation->getTransaction()->getKey(),
@@ -604,7 +604,7 @@ namespace synthese
 
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()));
 		}
-		
+
 
 
 		std::string BookableCommercialLineAdmin::getTitle() const
@@ -661,12 +661,12 @@ namespace synthese
 		{
 			_serviceNumber = value;
 		}
-		
+
 		const optional<string>& BookableCommercialLineAdmin::getServiceNumber() const
 		{
 			return _serviceNumber;
 		}
-		
+
 		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<pt::CommercialLine> value)
 		{
 			_line = const_pointer_cast<const CommercialLine>(value);
@@ -676,7 +676,7 @@ namespace synthese
 		{
 			return _line;
 		}
-		
+
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
@@ -684,9 +684,9 @@ namespace synthese
 			const BookableCommercialLineAdmin* ba(
 				dynamic_cast<const BookableCommercialLineAdmin*>(&currentPage)
 			);
-			
+
 			PageLinks links;
-			
+
 			if(	!_serviceNumber &&
 				ba &&
 				ba->_line == _line &&
@@ -700,7 +700,7 @@ namespace synthese
 
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 
@@ -713,7 +713,7 @@ namespace synthese
 				_serviceNumber == bother._serviceNumber
 			;
 		}
-		
+
 
 		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{

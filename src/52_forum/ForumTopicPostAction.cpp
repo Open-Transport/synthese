@@ -38,7 +38,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, forum::ForumTopicPostAction>::FACTORY_KEY("ForumTopicPostAction");
@@ -52,9 +52,9 @@ namespace synthese
 		const string ForumTopicPostAction::PARAMETER_NODE_ID = Action_PARAMETER_PREFIX + "ni";
 		const string ForumTopicPostAction::PARAMETER_USER_NAME = Action_PARAMETER_PREFIX + "un";
 		const string ForumTopicPostAction::PARAMETER_USER_EMAIL = Action_PARAMETER_PREFIX + "um";
-		
-		
-		
+
+
+
 		ParametersMap ForumTopicPostAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -66,9 +66,9 @@ namespace synthese
 			map.insert(PARAMETER_MESSAGE, _content);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ForumTopicPostAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_nodeId = map.get<RegistryKeyType>(PARAMETER_NODE_ID);
@@ -83,7 +83,7 @@ namespace synthese
 			{
 				throw ActionException("Veuillez entrer votre nom");
 			}
-			
+
 			// User e-mail
 			_userEMail = map.get<string>(PARAMETER_USER_EMAIL);
 			if(_userEMail.empty())
@@ -99,9 +99,9 @@ namespace synthese
 				throw ActionException("Veuillez entrer un contenu de message");
 			}
 		}
-		
-		
-		
+
+
+
 		void ForumTopicPostAction::run(
 			Request& request
 		){
@@ -124,13 +124,13 @@ namespace synthese
 			ForumTopicTableSync::Save(&topic, t);
 			ForumMessageTableSync::Save(&message, t);
 			t.run();
-			
+
 //			::AddCreationEntry(object, request.getUser().get());
 			request.setActionCreatedId(topic.getKey());
 		}
-		
-		
-		
+
+
+
 		bool ForumTopicPostAction::isAuthorized(
 			const Session* session
 		) const {

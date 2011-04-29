@@ -41,7 +41,7 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::ResaLogEntryUpdateAction>::FACTORY_KEY("ResaLogEntryUpdateAction");
@@ -53,16 +53,16 @@ namespace synthese
 		const string ResaLogEntryUpdateAction::PARAMETER_CALL_TYPE(Action_PARAMETER_PREFIX + "ct");
 		const string ResaLogEntryUpdateAction::PARAMETER_TEXT = Action_PARAMETER_PREFIX + "te";
 		const string ResaLogEntryUpdateAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
-		
-		
-		
+
+
+
 		ResaLogEntryUpdateAction::ResaLogEntryUpdateAction()
 			: util::FactorableTemplate<Action, ResaLogEntryUpdateAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap ResaLogEntryUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -70,9 +70,9 @@ namespace synthese
 				map.insert(PARAMETER_LOG_ENTRY_ID, _entry->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ResaLogEntryUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setEntryId(map.get<RegistryKeyType>(PARAMETER_LOG_ENTRY_ID));
@@ -86,9 +86,9 @@ namespace synthese
 			}
 			_callType = static_cast<ResaDBLog::_EntryType>(map.get<int>(PARAMETER_CALL_TYPE));
 		}
-		
-		
-		
+
+
+
 		void ResaLogEntryUpdateAction::run(Request& request)
 		{
 			// Update the call status if necessary

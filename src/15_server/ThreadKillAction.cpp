@@ -38,7 +38,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, server::ThreadKillAction>::FACTORY_KEY("ThreadKillAction");
@@ -47,25 +47,25 @@ namespace synthese
 	namespace server
 	{
 		const string ThreadKillAction::PARAMETER_THREAD_ID = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		ParametersMap ThreadKillAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_THREAD_ID, _thread_id);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ThreadKillAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_thread_id = map.get<string>(PARAMETER_THREAD_ID);
 		}
-		
-		
-		
+
+
+
 		void ThreadKillAction::run(Request& request)
 		{
 			ServerModule::KillThread(_thread_id);

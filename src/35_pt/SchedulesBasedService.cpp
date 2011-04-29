@@ -293,10 +293,10 @@ namespace synthese
 
 			// Parse all schedules arrival#departure,arrival#departure...
 			tokenizer schedulesTokens (value, char_separator<char>(","));
-		
+
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
-		
+
 			for(tokenizer::iterator schedulesIter = schedulesTokens.begin();
 				schedulesIter != schedulesTokens.end ();
 				++schedulesIter
@@ -304,13 +304,13 @@ namespace synthese
 				string arrDep (*schedulesIter);
 				size_t sepPos = arrDep.find ("#");
 				assert (sepPos != string::npos);
-				
+
 				string arrivalScheduleStr (arrDep.substr (0, sepPos));
 				string departureScheduleStr (arrDep.substr (sepPos+1));
-				
+
 				// unnecessary : boost::trim (departureScheduleStr);
 				// unnecessary : boost::trim (arrivalScheduleStr);
-				
+
 				if (departureScheduleStr.empty ())
 				{
 					assert (arrivalScheduleStr.empty () == false);
@@ -321,10 +321,10 @@ namespace synthese
 					assert (departureScheduleStr.empty () == false);
 					arrivalScheduleStr = departureScheduleStr;
 				}
-				
+
 				time_duration departureSchedule (DecodeSchedule(departureScheduleStr));
 				time_duration arrivalSchedule (DecodeSchedule(arrivalScheduleStr) + shiftArrivals);
-				
+
 				departureSchedules.push_back (departureSchedule);
 				arrivalSchedules.push_back (arrivalSchedule);
 			}
@@ -419,7 +419,7 @@ namespace synthese
 			const boost::posix_time::time_duration& schedule,
 			bool departure
 		) const {
-			
+
 			Path::Edges edges(_path->getAllEdges());
 
 			BOOST_FOREACH(Edge* edge, edges)

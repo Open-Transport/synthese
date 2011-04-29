@@ -44,8 +44,8 @@ namespace synthese
 	using namespace dblog;
 	using namespace util;
 	using namespace security;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, messages::TextTemplateFolderUpdateAction>::FACTORY_KEY("TextTemplateFolderUpdateAction");
@@ -57,15 +57,15 @@ namespace synthese
 		const string TextTemplateFolderUpdateAction::PARAMETER_NAME(Action_PARAMETER_PREFIX + "na");
 		const string TextTemplateFolderUpdateAction::PARAMETER_PARENT_ID(Action_PARAMETER_PREFIX + "pi");
 
-		
-		
+
+
 		TextTemplateFolderUpdateAction::TextTemplateFolderUpdateAction()
 			: util::FactorableTemplate<Action, TextTemplateFolderUpdateAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap TextTemplateFolderUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -73,9 +73,9 @@ namespace synthese
 				map.insert(PARAMETER_FOLDER_ID, _folder->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TextTemplateFolderUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setFolderId(map.get<RegistryKeyType>(PARAMETER_FOLDER_ID));
@@ -99,9 +99,9 @@ namespace synthese
 			if (!env.getRegistry<TextTemplate>().empty())
 				throw ActionException("Un répertoire de même nom existe déjà à l'emplacement spécifié");
 		}
-		
-		
-		
+
+
+
 		void TextTemplateFolderUpdateAction::run(Request& request)
 		{
 			stringstream s;

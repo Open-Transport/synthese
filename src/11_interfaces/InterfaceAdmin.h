@@ -59,7 +59,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Tests if two admin pages can be considered as the same one.
 			/// @param other Other page to compare with. The other page will always be
-			///	       of the same class. 
+			///	       of the same class.
 			/// @return true if the other page can be considered as the same than the
 			///         current one.
 			/// @author Hugues
@@ -74,9 +74,9 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2010
 			InterfaceAdmin();
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -87,8 +87,8 @@ namespace synthese
 				const server::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues
@@ -109,7 +109,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right
@@ -123,7 +123,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages of the current class to put directly under
 			/// a module admin page in the pages tree.
@@ -138,9 +138,9 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds links to the pages to put directly under the current page in
 			/// the pages tree.
@@ -155,7 +155,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page

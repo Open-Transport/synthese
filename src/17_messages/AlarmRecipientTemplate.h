@@ -56,15 +56,15 @@ namespace synthese
 	private:
 	    static AlarmLinks	_linksAlarm;
 	    static ObjectLinks	_linksObject;
-		
+
 	protected:
 	    static void add(const ObjectType* object, const SentAlarm* alarm);
 	    static void remove(const ObjectType* object, const SentAlarm* alarm);
-		
+
 		virtual const std::string& getTitle() const;
 
 		virtual const util::RegistryTableType getTableId() const;
-	
+
 	public:
 		static const std::string TITLE;
 
@@ -214,7 +214,7 @@ namespace synthese
 	template<class T, class C>
 	    void AlarmRecipientTemplate<T, C>::remove(const ObjectType* object, const SentAlarm* alarm)
 	{
-	    typename ObjectLinks::iterator it = 
+	    typename ObjectLinks::iterator it =
 		_linksObject.find(object);
 
 	    if (it != _linksObject.end())

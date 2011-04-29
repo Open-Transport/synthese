@@ -70,7 +70,7 @@ namespace synthese
 
 		bool SecurityRight::perimeterIncludes(
 			const std::string& perimeter,
-			util::Env& env 
+			util::Env& env
 		) const	{
 			if (_parameter == GLOBAL_PERIMETER)
 				return true;

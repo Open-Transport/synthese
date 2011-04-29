@@ -90,7 +90,7 @@ namespace synthese
 		/// The stop area object must be able to give the possible links between two A or S points, and for each possible link the minimal duration to make the transfer.
 		///
 		/// The 3 routing use cases are handled by a transfer matrix :
-		/// 
+		///
 		///	1: Access to the stop area from the roads (from A1 to A5 points to S1 to S4 points)
 		/// The following table shows an example corresponding to the previous topology example.
 		/// <table class="table">
@@ -101,7 +101,7 @@ namespace synthese
 		/// <tr><th>A4</th><td>forbidden</td><td>forbidden</td><td>forbidden</td><td>0 min</td></tr>
 		/// <tr><th>A5</th><td>3 min</td><td>3 min</td><td>forbidden</td><td>forbidden</td></tr>
 		/// </table>
-		/// 
+		///
 		/// Notes :
 		/// <ul>
 		/// <li>The 0 minutes durations correspond to projections of physical stops on the nearest road.</li>
@@ -255,7 +255,7 @@ namespace synthese
 					, const graph::Vertex& toVertex
 				) const;
 
-				
+
 				/** Score getter.
 					@return int the score of the place
 					@author Hugues Romain
@@ -309,7 +309,7 @@ namespace synthese
 					@param withAll
 					@return Physical stops labels
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 				PhysicalStopsLabels	getPhysicalStopLabels(bool withAll = false) const;
 

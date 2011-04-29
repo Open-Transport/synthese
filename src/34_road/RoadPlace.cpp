@@ -63,18 +63,18 @@ namespace synthese
 			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			setRules(rules);
 		}
-		
-		
-		
+
+
+
 		void RoadPlace::addRoad(
 			Road& road
 		){
 			addPath(static_cast<Path*>(&road));
 			_isoBarycentre.reset();
 		}
-		
-		
-		
+
+
+
 		void RoadPlace::removeRoad(
 			Road& road
 		){

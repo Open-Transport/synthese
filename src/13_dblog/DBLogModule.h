@@ -60,12 +60,12 @@ namespace synthese
 
 		@defgroup m13Logs 13 DB Logs
 		@ingroup m13
-		
+
 		@defgroup m13 13 Database stored applicative log
 		@ingroup m1
-		
+
 		(Module documentation)
-		
+
 		@{
 	*/
 

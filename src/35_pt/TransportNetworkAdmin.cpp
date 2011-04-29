@@ -73,7 +73,7 @@ namespace synthese
 	{
 		const string TransportNetworkAdmin::PARAMETER_SEARCH_NAME("sn");
 
-		
+
 		void TransportNetworkAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -93,9 +93,9 @@ namespace synthese
 				throw AdminParametersException("No such network");
 			}
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap TransportNetworkAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -105,17 +105,17 @@ namespace synthese
 		}
 
 
-		
+
 		void TransportNetworkAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
 
 			// Requests
-			
+
 			// Search form
 			stream << "<h1>Recherche</h1>";
-			
+
 			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request);
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
@@ -126,7 +126,7 @@ namespace synthese
 
 			// Results display
 			stream << "<h1>Lignes du réseau</h1>";
-			
+
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
 					Env::GetOfficialEnv(),
@@ -137,7 +137,7 @@ namespace synthese
 					, _requestParameters.maxSize
 					, false
 					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-					, _requestParameters.raisingOrder				
+					, _requestParameters.raisingOrder
 			)	);
 
 			ResultHTMLTable::HeaderVector h;
@@ -193,12 +193,12 @@ namespace synthese
 		}
 
 
-		
+
 		std::string TransportNetworkAdmin::getTitle() const
 		{
 			return _network.get() ? _network->getName() : DEFAULT_TITLE;
 		}
-				
+
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -231,8 +231,8 @@ namespace synthese
 			}
 			return links;
 		}
-		
-		
+
+
 		bool TransportNetworkAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _network->getKey() == static_cast<const TransportNetworkAdmin&>(other)._network->getKey();

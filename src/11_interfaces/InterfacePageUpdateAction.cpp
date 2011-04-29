@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, interfaces::InterfacePageUpdateAction>::FACTORY_KEY("InterfacePageUpdateAction");
@@ -47,9 +47,9 @@ namespace synthese
 	{
 		const string InterfacePageUpdateAction::PARAMETER_PAGE_ID = Action_PARAMETER_PREFIX + "pi";
 		const string InterfacePageUpdateAction::PARAMETER_SOURCE = Action_PARAMETER_PREFIX + "so";
-		
-		
-		
+
+
+
 		ParametersMap InterfacePageUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -60,9 +60,9 @@ namespace synthese
 			map.insert(PARAMETER_SOURCE, _source);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void InterfacePageUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -77,9 +77,9 @@ namespace synthese
 			_source = map.getDefault<string>(PARAMETER_SOURCE);
 
 		}
-		
-		
-		
+
+
+
 		void InterfacePageUpdateAction::run(
 			Request& request
 		){
@@ -90,9 +90,9 @@ namespace synthese
 			InterfacePageTableSync::Save(_page.get());
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool InterfacePageUpdateAction::isAuthorized(
 			const Session* session
 		) const {

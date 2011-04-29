@@ -65,7 +65,7 @@ namespace synthese
 			to follow this path at certain dates and times.
 
 			It is associated as well with a set of compliances, defining
-			which types of entities are able to move along this path. For instance : 
+			which types of entities are able to move along this path. For instance :
 				- a bus line is compliant with pedestrians, may be compliant with bikes
 				and wheelchairs
 				- a road may be compliant only with cars, or only for pedestrians and bikes,
@@ -87,11 +87,11 @@ namespace synthese
 			PathClass*		_pathClass;	//!< Up link : path class
 			Edges			_edges; 	//!< Down link 1 : edges
 			ServiceSet		_services;	//!< Down link 2 : services
-			
+
 			/** Constructor.
 			*/
 			Path();
-			
+
 		public:
 
 			virtual ~Path ();
@@ -132,7 +132,7 @@ namespace synthese
 				/// @param date the date to test
 				/// @return true if the path should contain a running service at the date.
 				/// @warning this test does not certify that a service is actually running
-				/// at the given date. If the response is false, then it is sure that 
+				/// at the given date. If the response is false, then it is sure that
 				/// no service runs at the given date.
 				/// @author Hugues Romain
 				virtual bool isActive(const boost::gregorian::date& date) const = 0;
@@ -232,7 +232,7 @@ namespace synthese
 				/// @date 2011
 				Edges getAllEdges() const;
 			//@}
-			
+
 			//! @name Modifiers.
 			//@{
 			protected:
@@ -290,9 +290,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 
-					The method is virtual to avoid subclasses to have a different behavior than 
+					The method is virtual to avoid subclasses to have a different behavior than
 					the simple add to the services list (see JourneyPatternCopy).
-					
+
 					@todo Update dates of the path
 				*/
 				virtual void addService(Service* service, bool ensureLineTheory);
@@ -329,4 +329,4 @@ namespace synthese
 	}
 }
 
-#endif 	    
+#endif

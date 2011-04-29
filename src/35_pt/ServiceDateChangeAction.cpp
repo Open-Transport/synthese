@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ServiceDateChangeAction>::FACTORY_KEY("ServiceDateChangeAction");
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		const string ServiceDateChangeAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "id";
 		const string ServiceDateChangeAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
-		
-		
-		
+
+
+
 		ParametersMap ServiceDateChangeAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			map.insert(PARAMETER_DATE, _date);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ServiceDateChangeAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -79,9 +79,9 @@ namespace synthese
 
 			_date = from_simple_string(map.get<string>(PARAMETER_DATE));
 		}
-		
-		
-		
+
+
+
 		void ServiceDateChangeAction::run(
 			Request& request
 		){
@@ -101,9 +101,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ServiceDateChangeAction::isAuthorized(
 			const Session* session
 		) const {

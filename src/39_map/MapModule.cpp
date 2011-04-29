@@ -44,7 +44,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace map;
-	
+
 	namespace util
 	{
 		template<>
@@ -59,24 +59,24 @@ namespace synthese
 	    const std::string MapModule::PARAM_HTTP_TEMP_URL ("http_temp_url");
 	    const std::string MapModule::PARAM_BACKGROUNDS_DIR ("backgrounds_dir");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<MapModule>::NAME("Cartographie");
-		
-		
+
+
 	    template<> void ModuleClassTemplate<MapModule>::PreInit ()
 	    {
 			RegisterParameter (MapModule::PARAM_HTTP_TEMP_DIR, DEFAULT_TEMP_DIR, &MapModule::ParameterCallback);
 			RegisterParameter (MapModule::PARAM_HTTP_TEMP_URL, "http://localhost/tmp", &MapModule::ParameterCallback);
 			RegisterParameter (MapModule::PARAM_BACKGROUNDS_DIR, "backgrounds", &MapModule::ParameterCallback);
 	    }
-		
+
 		template<> void ModuleClassTemplate<MapModule>::Init()
 		{
 		}
-		
-		
+
+
 		template<> void ModuleClassTemplate<MapModule>::End()
 		{
 			UnregisterParameter(MapModule::PARAM_HTTP_TEMP_DIR);
@@ -91,17 +91,17 @@ namespace synthese
 			const std::string& name,
 			const std::string& value
 		){
-			if (name == PARAM_HTTP_TEMP_DIR) 
+			if (name == PARAM_HTTP_TEMP_DIR)
 			{
 				boost::filesystem::path path (value, boost::filesystem::native);
 
 				if (boost::filesystem::exists (path) == false)
 				{
-					Log::GetInstance ().warn (name + " " 
-							  + path.string () + 
+					Log::GetInstance ().warn (name + " "
+							  + path.string () +
 							  " does not exist. Using default value instead.");
 					SetParameter (name, DEFAULT_TEMP_DIR, false);
-				} 
+				}
 			}
 			else if (name == PARAM_BACKGROUNDS_DIR)
 			{

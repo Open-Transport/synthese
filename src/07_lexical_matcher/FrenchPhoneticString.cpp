@@ -14,20 +14,20 @@ namespace synthese
 	{
 		FrenchPhoneticString::FrenchPhoneticString()
 		{}
-		
-		
-		
+
+
+
 		FrenchPhoneticString::FrenchPhoneticString(const std::string& source)
 		{
 			setSource(source);
 		}
-		
-		
-		
+
+
+
 		void FrenchPhoneticString::setSource(const std::string& ssource)
 		{
 			_source = ssource;
-			
+
 			string source(to_lower_copy(ssource));
 			PhoneticString result;
 			for(size_t pos(0); pos < source.size(); ++pos)
@@ -93,7 +93,7 @@ namespace synthese
 					result.push_back(E);
 					result.push_back(F);
 					break;
-					
+
 				case 'a':
 				case 'à':
 				case 'ä':
@@ -117,7 +117,7 @@ namespace synthese
 						result.push_back(E);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "u"))
 					{
 						++pos;
@@ -151,21 +151,21 @@ namespace synthese
 						result.push_back(AN);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "en")
 					){
 						pos += 2;
 						result.push_back(AN);
 						break;
 					}
-	
+
 					result.push_back(A);
 					break;
-					
+
 				case 'b':
 					result.push_back(B);
 					break;
-					
+
 				case 'c':
 					if(	_IsFollowedBy(source, pos, "h"))
 					{
@@ -173,7 +173,7 @@ namespace synthese
 						result.push_back(CH);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "e") ||
 						_IsFollowedBy(source, pos, "é") ||
 						_IsFollowedBy(source, pos, "è") ||
@@ -188,23 +188,23 @@ namespace synthese
 						result.push_back(S);
 						break;
 					}
-					
+
 					result.push_back(K);
 					break;
-					
+
 				case 'ç':
 					result.push_back(S);
 					break;
-					
+
 				case 'd':
 					if(	_IsLast(source, pos)
 					){
 						break;
 					}
-					
+
 					result.push_back(D);
 					break;
-					
+
 				case 'e':
 					if(	_IsFollowedBy(source, pos, "au")
 					){
@@ -218,12 +218,12 @@ namespace synthese
 						++pos;
 						break;
 					}
-					
+
 					if(	_IsLast(source, pos))
 					{
 						break;
 					}
-					
+
 				case 'é':
 				case 'è':
 				case 'ë':
@@ -246,7 +246,7 @@ namespace synthese
 						result.push_back(E);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "n") &&
 							!_IsFollowedBy(source, pos, "na") &&
 							!_IsFollowedBy(source, pos, "nà") &&
@@ -295,11 +295,11 @@ namespace synthese
 
 					result.push_back(E);
 					break;
-					
+
 				case 'f':
 					result.push_back(F);
 					break;
-					
+
 				case 'g':
 					if(	_IsFollowedBy(source, pos, "e") ||
 						_IsFollowedBy(source, pos, "é") ||
@@ -313,14 +313,14 @@ namespace synthese
 						result.push_back(J);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "u")
 					){
 						++pos;
 						result.push_back(G);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "n")
 					){
 						++pos;
@@ -328,13 +328,13 @@ namespace synthese
 						result.push_back(I);
 						break;
 					}
-	
+
 					result.push_back(G);
 					break;
-					
+
 				case 'h':
 					break;
-					
+
 				case 'i':
 				case 'ì':
 				case 'î':
@@ -344,21 +344,21 @@ namespace synthese
 						result.push_back(I);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "ll")
 					){
 						pos += 2;
 						result.push_back(I);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "l")
 					){
 						++pos;
 						result.push_back(I);
 						break;
 					}
-	
+
 					if(	(	_IsFollowedBy(source, pos, "n") &&
 							!_IsFollowedBy(source, pos, "na") &&
 							!_IsFollowedBy(source, pos, "ne") &&
@@ -382,19 +382,19 @@ namespace synthese
 						result.push_back(AN);
 						break;
 					}
-	
+
 				case 'ï':
 					result.push_back(I);
 					break;
-					
+
 				case 'j':
 					result.push_back(J);
 					break;
-					
+
 				case 'k':
 					result.push_back(K);
 					break;
-				
+
 				case 'l':
 					if(	_IsFollowedBy(source, pos, "l")
 					){
@@ -402,10 +402,10 @@ namespace synthese
 						result.push_back(L);
 						break;
 					}
-	
+
 					result.push_back(L);
 					break;
-					
+
 				case 'm':
 					if(	_IsFollowedBy(source, pos, "m")
 					){
@@ -413,10 +413,10 @@ namespace synthese
 						result.push_back(M);
 						break;
 					}
-	
+
 					result.push_back(M);
 					break;
-				
+
 				case 'n':
 					if(	_IsFollowedBy(source, pos, "n")
 					){
@@ -424,10 +424,10 @@ namespace synthese
 						result.push_back(N);
 						break;
 					}
-	
+
 					result.push_back(N);
 					break;
-				
+
 				case 'o':
 				case 'ò':
 				case 'ô':
@@ -457,7 +457,7 @@ namespace synthese
 						result.push_back(AN);
 						break;
 					}
-	
+
 					if(	_IsFollowedBy(source, pos, "u") ||
 						_IsFollowedBy(source, pos, "ù")
 					){
@@ -465,7 +465,7 @@ namespace synthese
 						result.push_back(U);
 						break;
 					}
-	
+
 					if(	_IsFollowedBy(source, pos, "i") ||
 						_IsFollowedBy(source, pos, "ì") ||
 						_IsFollowedBy(source, pos, "y")
@@ -475,17 +475,17 @@ namespace synthese
 						result.push_back(A);
 						break;
 					}
-					
+
 				case 'ö':
 					result.push_back(O);
 					break;
-	
+
 				case 'p':
 					if(	_IsLast(source, pos)
 					){
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "p")
 					){
 						++pos;
@@ -503,7 +503,7 @@ namespace synthese
 
 					result.push_back(P);
 					break;
-					
+
 				case 'q':
 					if(	_IsFollowedBy(source, pos, "u")
 					){
@@ -511,10 +511,10 @@ namespace synthese
 						result.push_back(K);
 						break;
 					}
-					
+
 					result.push_back(K);
 					break;
-					
+
 				case 'r':
 					if(	_IsFollowedBy(source, pos, "r")
 					){
@@ -522,7 +522,7 @@ namespace synthese
 						result.push_back(R);
 						break;
 					}
-				
+
 					result.push_back(R);
 					break;
 
@@ -566,22 +566,22 @@ namespace synthese
 						result.push_back(Z);
 						break;
 					}
-					
+
 					if(	_IsFollowedBy(source, pos, "s")
 					){
 						++pos;
 						result.push_back(S);
 						break;
 					}
-					
+
 					if(	_IsLast(source, pos))
 					{
 						break;
 					}
-					
+
 					result.push_back(S);
 					break;
-				
+
 				case 't':
 					if(	_IsFollowedBy(source, pos, "t")
 					){
@@ -589,7 +589,7 @@ namespace synthese
 						result.push_back(T);
 						break;
 					}
-					
+
 					if(	(	_IsFollowedBy(source, pos, "ien") ||
 							_IsFollowedBy(source, pos, "ion")
 					)	&&
@@ -614,7 +614,7 @@ namespace synthese
 						result.push_back(S);
 						break;
 					}
-				
+
 					if(	_IsLast(source, pos) ||
 						_IsFollowedBy(source, pos, "b") ||
 						_IsFollowedBy(source, pos, "c") ||
@@ -631,11 +631,11 @@ namespace synthese
 						_IsFollowedBy(source, pos, "q") ||
 						_IsFollowedBy(source, pos, "r") ||
 						_IsFollowedBy(source, pos, "s") ||
-						_IsFollowedBy(source, pos, "v") 
+						_IsFollowedBy(source, pos, "v")
 					){
 						break;
 					}
-					
+
 					result.push_back(T);
 					break;
 
@@ -665,25 +665,25 @@ namespace synthese
 
 					result.push_back(V);
 					break;
-				
+
 				case 'w':
 					result.push_back(V);
 					break;
-				
+
 				case 'x':
 					if(	_IsLast(source, pos))
 					{
 						break;
 					}
-					
+
 					result.push_back(K);
 					result.push_back(S);
 					break;
-				
+
 				case 'y':
 					result.push_back(I);
 					break;
-				
+
 				case 'z':
 					result.push_back(Z);
 					break;
@@ -691,28 +691,28 @@ namespace synthese
 			}
 			_phonetic = result;
 		}
-		
-		
-		
+
+
+
 		const string& FrenchPhoneticString::getSource() const
 		{
 			return _source;
 		}
-		
-		
-		
+
+
+
 		const FrenchPhoneticString::PhoneticString& FrenchPhoneticString::getPhonetic() const
 		{
 			return _phonetic;
 		}
-		
-		
-		
+
+
+
 		bool FrenchPhoneticString::_IsLast(const std::string& source, size_t pos, size_t len)
 		{
 			return pos + len == source.size();
 		}
-		
+
 		bool FrenchPhoneticString::_IsFollowedBy(const std::string& source, size_t pos, const std::string& text)
 		{
 			if(pos + text.size() + 1 > source.size()) return false;
@@ -725,7 +725,7 @@ namespace synthese
 				return false;
 			}
 		}
-		
+
 		bool FrenchPhoneticString::_IsPrecededBy(const std::string& source, size_t pos, const std::string& text)
 		{
 			if(text.size() > pos) return false;
@@ -738,8 +738,8 @@ namespace synthese
 				return false;
 			}
 		}
-		
-		
+
+
 		FrenchPhoneticString::LevenshteinDistance FrenchPhoneticString::levenshtein(
 			const FrenchPhoneticString& s
 		) const {

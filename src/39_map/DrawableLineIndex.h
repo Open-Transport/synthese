@@ -53,11 +53,11 @@ private:
 
     typedef std::map<double, std::set<DrawableLine*>* > Index1D;
     typedef std::map<double, Index1D* > Index2D;
-	
+
     mutable Index2D _index;
     double _scaleX;
     double _scaleY;
-    
+
     mutable std::vector<geos::geom::Coordinate> _fuzzyPoints;
 
 protected:
@@ -66,15 +66,15 @@ public:
 
     DrawableLineIndex();
     ~DrawableLineIndex();
-	
+
     const std::set<DrawableLine*>&
 	find (const geos::geom::Coordinate& point) const;
-    
+
 
 	void setScaleX (double scaleX);
 	void setScaleY (double scaleY);
 
-    void add (const geos::geom::Coordinate& point, 
+    void add (const geos::geom::Coordinate& point,
 	      DrawableLine* line) const;
 
     geos::geom::Coordinate getFuzzyPoint (const geos::geom::Coordinate& point) const;

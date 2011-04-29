@@ -49,7 +49,7 @@ namespace synthese
 			):	_env(env),
 				_dataSource(dataSource)
 			{}
-			
+
 		protected:
 			mutable util::Env&						_env;
 			const DataSource&						_dataSource;

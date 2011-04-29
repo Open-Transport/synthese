@@ -31,7 +31,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, interfaces::StrLenInterfaceElement>::FACTORY_KEY("strlen");

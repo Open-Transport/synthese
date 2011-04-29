@@ -72,7 +72,7 @@ class ThreadExec
     void loops (int nbLoops = 5);
 
  private:
-    
+
 };
 
 

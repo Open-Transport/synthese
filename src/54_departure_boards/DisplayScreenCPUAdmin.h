@@ -54,10 +54,10 @@ namespace synthese
 			static const std::string TAB_DISPLAYS;
 
 			DisplayScreenCPUAdmin();
-			
+
 			void setCPU(boost::shared_ptr<const DisplayScreenCPU> value);
 			boost::shared_ptr<const DisplayScreenCPU> getCPU() const;
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -67,13 +67,13 @@ namespace synthese
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -99,29 +99,29 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
-			
+
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
+
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 			////////////////////////////////////////////////////////////////////
 			/// Tabs builder.
 			/// @author Hugues Romain
 			/// @date 2008
 			/// This method has in charge to :
-			///		- the control of the profile of the user to determine the 
-			///			tabs list. 
+			///		- the control of the profile of the user to determine the
+			///			tabs list.
 			///		- to set _tabBuilded at true to avoid the method to be
 			///			relaunched
 			////////////////////////////////////////////////////////////////////

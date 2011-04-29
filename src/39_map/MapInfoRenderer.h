@@ -52,7 +52,7 @@ namespace map
     static const std::string ZIP_BIN;
 
     boost::filesystem::path _zipOutput; //!< File used for MapInfo zip (containing MID/MIF) generation
-    
+
  public:
 
 
@@ -60,19 +60,19 @@ namespace map
      * @param config Rendering configuration.
      * @param output Output stream
      */
-//    MapInfoRenderer (const RenderingConfig& config, 
+//    MapInfoRenderer (const RenderingConfig& config,
 //		     const boost::filesystem::path& zipOutput);
 
 	 MapInfoRenderer();
     virtual ~MapInfoRenderer ();
 
-    std::string render(const boost::filesystem::path& tempDir, 
+    std::string render(const boost::filesystem::path& tempDir,
 		       const std::string& filenamePrefix,
 			   const util::Registry<pt::JourneyPattern>& lines,
 		       synthese::map::Map& map,
 		       const synthese::map::RenderingConfig& config);
-   
- 
+
+
 };
 
 }

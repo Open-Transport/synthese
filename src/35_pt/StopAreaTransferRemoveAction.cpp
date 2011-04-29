@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopAreaTransferRemoveAction>::FACTORY_KEY("StopAreaTransferRemoveAction");
@@ -47,9 +47,9 @@ namespace synthese
 	{
 		const string StopAreaTransferRemoveAction::PARAMETER_FROM_ID = Action_PARAMETER_PREFIX + "fi";
 		const string StopAreaTransferRemoveAction::PARAMETER_TO_ID = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		ParametersMap StopAreaTransferRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopAreaTransferRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -91,9 +91,9 @@ namespace synthese
 				throw ActionException("Internal transfers must concern two stops within the same stop area.");
 			}
 		}
-		
-		
-		
+
+
+
 		void StopAreaTransferRemoveAction::run(
 			Request& request
 		){
@@ -104,9 +104,9 @@ namespace synthese
 
 			StopAreaTableSync::Save(const_cast<StopArea*>(_from->getConnectionPlace()));
 		}
-		
-		
-		
+
+
+
 		bool StopAreaTransferRemoveAction::isAuthorized(
 			const Session* session
 		) const {

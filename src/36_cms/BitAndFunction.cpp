@@ -38,12 +38,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::BitAndFunction>::FACTORY_KEY("bit_and");
-	
+
 	namespace cms
 	{
 		const string BitAndFunction::PARAMETER_LEFT("l");
 		const string BitAndFunction::PARAMETER_RIGHT("r");
-		
+
 		ParametersMap BitAndFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -72,9 +72,9 @@ namespace synthese
 				stream << "0";
 			}
 		}
-		
-		
-		
+
+
+
 		bool BitAndFunction::isAuthorized(
 			const Session* session
 		) const {

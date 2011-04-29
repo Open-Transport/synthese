@@ -72,7 +72,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				
+
 				/** Schedules update.
 					Updates both theoretical and real time data.
 					@param departureSchedules Departure schedules of the service
@@ -139,8 +139,8 @@ namespace synthese
 			//@{
 				static std::string EncodeSchedule(const boost::posix_time::time_duration& value);
 				static boost::posix_time::time_duration DecodeSchedule(const std::string value);
-				
-				
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Encode schedules into a string.
 				/// Schedules at non scheduled stops are ignored.

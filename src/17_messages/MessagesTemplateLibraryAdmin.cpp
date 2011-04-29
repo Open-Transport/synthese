@@ -58,7 +58,7 @@ namespace synthese
 	using namespace html;
 	using namespace security;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, MessagesTemplateLibraryAdmin>::FACTORY_KEY("1MessagesTemplateLibraryAdmin");
@@ -79,7 +79,7 @@ namespace synthese
 		MessagesTemplateLibraryAdmin::MessagesTemplateLibraryAdmin()
 			: AdminInterfaceElementTemplate<MessagesTemplateLibraryAdmin>()
 		{ }
-		
+
 
 
 		void MessagesTemplateLibraryAdmin::setFromParametersMap(
@@ -97,9 +97,9 @@ namespace synthese
 				}
 			}
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap MessagesTemplateLibraryAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -119,14 +119,14 @@ namespace synthese
 
 			// Requests
 			AdminActionFunctionRequest<UpdateTextTemplateAction,MessagesTemplateLibraryAdmin> updateRequest(_request);
-			
+
 			AdminActionFunctionRequest<RemoveObjectAction,MessagesTemplateLibraryAdmin> deleteRequest(_request);
-			
+
 			AdminActionFunctionRequest<TextTemplateAddAction,MessagesTemplateLibraryAdmin> addRequest(_request);
 			addRequest.getAction()->setParentId(_folder.get() ? _folder->getKey() : RegistryKeyType(0));
-			
+
 			AdminActionFunctionRequest<TextTemplateFolderUpdateAction,MessagesTemplateLibraryAdmin> updateFolderRequest(_request);
-			
+
 
 			// Rights
 			bool updateRight(_request.isAuthorized<MessagesLibraryRight>(WRITE));
@@ -211,7 +211,7 @@ namespace synthese
 
 			if (updateRight)
 			{
-				stream << "<h1>Nouveau modèle de textes</h1>"; 
+				stream << "<h1>Nouveau modèle de textes</h1>";
 				addRequest.getAction()->setIsFolder(false);
 				PropertiesHTMLTable ta(addRequest.getHTMLForm("add"));
 				stream << ta.open();
@@ -229,7 +229,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<MessagesLibraryRight>(READ);
 		}
-		
+
 
 
 		AdminInterfaceElement::PageLinks MessagesTemplateLibraryAdmin::getSubPagesOfModule(
@@ -238,7 +238,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const MessagesModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -248,7 +248,7 @@ namespace synthese
 			}
 			return links;
 		}
-		
+
 
 		bool MessagesTemplateLibraryAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,

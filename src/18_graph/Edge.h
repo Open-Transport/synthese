@@ -70,7 +70,7 @@ namespace synthese
 			An edge is said to be :
 				- a departure edge if it is possible to start a move from it;
 				- an arrival edge if it is possible to end a move to it;
-				- a passage edge if it can be considered both as a departure edge 
+				- a passage edge if it can be considered both as a departure edge
 				and as an arrival edge.
 
 			@ingroup m18
@@ -114,7 +114,7 @@ namespace synthese
 			Vertex*	_fromVertex;
 			Path*		_parentPath;		//!< The path the edge belongs
 			MetricOffset _metricOffset;		//!< Metric offset
-		
+
 		private:
 			static const std::size_t INDICES_NUMBER;
 
@@ -153,7 +153,7 @@ namespace synthese
 				MetricOffset metricOffset = 0
 			);
 
-			
+
 		public:
 			virtual ~Edge ();
 
@@ -204,17 +204,17 @@ namespace synthese
 				virtual bool isArrivalAllowed() const = 0;
 
 				typedef std::vector<graph::Edge*> SubEdges;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Virtual method to get sub-edges to link instead of the edge registered
 				/// in the path (useful for area type vertices).
 				/// Default implementation return the object alone.
 				virtual SubEdges getSubEdges() const;
-				
+
 				bool isConnectingEdge() const;
 
 				const Hub* getHub() const;
-				
+
 				DepartureServiceIndex::Value getDepartureFromIndex(
 					bool RTData,
 					size_t hour
@@ -224,7 +224,7 @@ namespace synthese
 					bool RTData,
 					size_t hour
 				) const;
-				
+
 				bool isArrival() const;
 				bool isDeparture() const;
 
@@ -272,7 +272,7 @@ namespace synthese
 				// TODO : initialisation des filtres de compliance de la ligne pour tenir compte
 				// de ceux des services et eviter le parcour total de tous les services
 
-			    
+
 				/** Provides next departure service number (method 1)
 					@param departureMoment Presence hour at departure place
 					@param maxDepartureMoment Maximum departure hour

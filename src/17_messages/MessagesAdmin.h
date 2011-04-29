@@ -42,7 +42,7 @@ namespace synthese
 
 			@image html cap_admin_messages.png
 			@image latex cap_admin_messages.png "Maquette de l'écran de liste de messages" width=14cm
-			
+
 			<i>Titre de la fenêtre</i> :
 				- SYNTHESE Admin - Messages
 
@@ -102,14 +102,14 @@ namespace synthese
 					- sur un message recopié sur un autre, sélectionné dans la colonne <tt>Sel</tt>
 				-# Bouton <b>Nouvelle diffusion de scénario</b> : ouvre la page synthese::interfaces::MessagesScenarioSendAdmin sur le scénario sélectionné dans la liste déroulante. Le contenu du scénario est recopié pour être diffusé après possible modification
 				-# Un maximum de 50 messages est affiché à l'écran. En cas de dépassement de ce nombre d'après les critères de recherche, un lien <tt>Messages suivants</tt> apparait et permet de visualiser les entrées suivantes. A partir de la seconde page, un lien <tt>Messages précédents</tt> apparait également.
-			
-			
+
+
 			<i>Sécurité</i>
 				- Une habilitation privée ou publique MessagesRight de niveau READ est nécessaire pour accéder à la page. Le résultat d'une recherche dépend du périmètre des habilitations MessagesRight de l'utilisateur.
 				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour créer un nouveau message ou une nouvelle diffusion de scénario. Le contenu de la liste des scénarios dépend du périmètre des habilitations MessagesRight de l'utilisateur.
 				- Une habilitation privée MessagesRight de niveau WRITE est nécessaire pour éditer un message créé par l'utilisateur courant.
 				- Une habilitation publique MessagesRight de niveau WRITE est nécessaire pour éditer un message n'appartenant pas à l'utilisateur courant.
-				
+
 			<i>Journaux</i>
 				- Aucune action issue de ce composant d'administration ne génère d'entrée dans un journal.
 		*/
@@ -131,7 +131,7 @@ namespace synthese
 			html::ActionResultHTMLTable::RequestParameters		_requestParameters;
 
 			server::ParametersMap	_parametersMap;
-			
+
 		public:
 			static const std::string PARAMETER_SEARCH_DATE;
 			static const std::string PARAMETER_SEARCH_LEVEL;
@@ -140,19 +140,19 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_NAME;
 
 			MessagesAdmin();
-			
+
 			/** Initialization of the parameters from a request.
 				@param request The request to use for the initialization.
 			*/
 			virtual void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -198,7 +198,7 @@ namespace synthese
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,

@@ -50,7 +50,7 @@ namespace synthese
 			static const std::string COL_NAME;
 			static const std::string COL_AUTHORIZED_ONLY;
 			static const std::string COL_ROLLING_STOCK_IDS;
-			
+
 
 			/** RollingStockFilter search.
 				(other search parameters)

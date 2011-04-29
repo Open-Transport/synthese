@@ -32,7 +32,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
-	
+
 	namespace cms
 	{
 		const string DateTimeInterfacePage::DATA_DAY("day");

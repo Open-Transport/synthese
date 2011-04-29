@@ -42,7 +42,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,forum::ForumTopicsFunction>::FACTORY_KEY("forum_topics");
-	
+
 	namespace forum
 	{
 		const string ForumTopicsFunction::PARAMETER_NODE_ID("node_id");
@@ -50,7 +50,7 @@ namespace synthese
 		const string ForumTopicsFunction::PARAMETER_DISPLAY_TEMPLATE("page");
 		const string ForumTopicsFunction::PARAMETER_DATE_DISPLAY_TEMPLATE("date_page");
 		const string ForumTopicsFunction::PARAMETER_RAISING_ORDER("sort");
-		
+
 		ParametersMap ForumTopicsFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -104,7 +104,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			ForumTopicTableSync::SearchResult topics(
 				ForumTopicTableSync::Search(
 					*_env,
@@ -128,9 +128,9 @@ namespace synthese
 				++rank;
 			}
 		}
-		
-		
-		
+
+
+
 		bool ForumTopicsFunction::isAuthorized(
 			const Session* session
 		) const {

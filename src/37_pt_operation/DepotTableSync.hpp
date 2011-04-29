@@ -46,11 +46,11 @@ namespace synthese
 			//@{
 				static const std::string COL_NAME;
 			//@}
-			
+
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > DepotsList;
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	Depot search.
 				///	@param env Environment to populate

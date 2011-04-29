@@ -88,7 +88,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 
 		FakeVertex v2(&h1);
 		map2.insert(&v2, VertexAccess());
-		
+
 		FakeVertex v3(&h1);
 		map2.insert(&v3, VertexAccess());
 		Journey j3;

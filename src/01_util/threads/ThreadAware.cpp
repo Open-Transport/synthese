@@ -21,7 +21,7 @@ namespace util
     }
 
 
-    bool 
+    bool
     ThreadAware::insideOwnerThread () const
     {
 	boost::thread current;
@@ -39,4 +39,4 @@ namespace util
 }
 }
 
- 
+

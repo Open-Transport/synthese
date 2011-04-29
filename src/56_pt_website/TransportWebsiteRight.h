@@ -37,19 +37,19 @@ namespace synthese
 			Here are the different right levels :
 
 			Private rights :
-				- USE : 
-				- READ : 
-				- WRITE : 
-				- DELETE : 
-				
+				- USE :
+				- READ :
+				- WRITE :
+				- DELETE :
+
 			Public rights :
-				- USE : 
-				- READ : 
-				- WRITE : 
-				- DELETE : 
-				
+				- USE :
+				- READ :
+				- WRITE :
+				- DELETE :
+
 			Perimeter definition :
-				- 
+				-
 		*/
 		class TransportWebsiteRight : public security::RightTemplate<TransportWebsiteRight>
 		{
@@ -60,7 +60,7 @@ namespace synthese
 			std::string	displayParameter(
 				util::Env& env = util::Env::GetOfficialEnv()
 			)	const;
-			
+
 
 			/** Test of inclusion of an other perimeter by the current one.
 				@param perimeter to compare with

@@ -44,7 +44,7 @@ namespace map
 
 
 /** This class is aimed at maintaining a grid
-   of non painted tiles. 
+   of non painted tiles.
    The grid is generated here and then dumped in the postscript file
    for interrogation when drawing non overlapping objects.
 	@ingroup m59
@@ -58,12 +58,12 @@ private:
     double _tileHeight;
 
     std::vector<std::vector<bool> > _tiles;
-	
+
 protected:
 
 public:
 
-    TileGrid (double width, 
+    TileGrid (double width,
 		double height,
 		double tileWidth,
 		double tileHeight);
@@ -71,19 +71,19 @@ public:
     ~TileGrid ();
 
     bool isMarked (int tileX, int tileY) const;
-    
-	
+
+
     void markTilesForPoint (const geos::geom::Coordinate& p);
 
-    void markTilesForLine (const geos::geom::Coordinate& from, 
+    void markTilesForLine (const geos::geom::Coordinate& from,
 			   const geos::geom::Coordinate& to);
 
-    void markTilesForRectangle (const geos::geom::Coordinate& from, 
-				const geos::geom::Coordinate& to, 
+    void markTilesForRectangle (const geos::geom::Coordinate& from,
+				const geos::geom::Coordinate& to,
 				bool filled = true);
-	
 
-    
+
+
 };
 
 }

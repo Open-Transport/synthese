@@ -73,7 +73,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void ReservationAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -101,7 +101,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool ReservationAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -140,7 +140,7 @@ namespace synthese
 			stream << t.title("Evénements");
 
 			stream << t.cell("Réservation", lexical_cast<string>(_resa->getTransaction()->getBookingTime()));
-			stream << t.cell("Annulation", 
+			stream << t.cell("Annulation",
 				_resa->getTransaction()->getCancellationTime().is_not_a_date_time() ?
 				"Annuler" :
 				lexical_cast<string>(_resa->getTransaction()->getCancellationTime())
@@ -188,7 +188,7 @@ namespace synthese
 					lexical_cast<string>(_resa->getVehiclePositionAtArrival()->getMeterOffset()) :
 					string()
 			)	);
-			
+
 			stream << t.title("Ponctualité");
 			stream << t.cell("Non opéré", t.getForm().getOuiNonRadioInput(ReservationUpdateAction::PARAMETER_CANCELLED_BY_OPERATOR, _resa->getCancelledByOperator()));
 			stream << t.cell(

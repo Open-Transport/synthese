@@ -52,11 +52,11 @@ namespace synthese
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_PARAMETERS;
 			static const std::string TAB_LOG;
-	
+
 		public:
 
 			ResaCustomerAdmin();
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -66,17 +66,17 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
+
+
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
@@ -98,7 +98,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
-			
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page
@@ -111,23 +111,23 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-			
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-			
-			
+
+
 			virtual void _buildTabs(
 				const security::Profile& profile
 			) const;
-			
+
 			void setUser(boost::shared_ptr<security::User> value);
 			void setUser(boost::shared_ptr<const security::User> value);
 			boost::shared_ptr<const security::User> getUser() const;
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 		};
 	}

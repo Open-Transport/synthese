@@ -67,8 +67,8 @@ namespace synthese
 	using namespace pt;
 	using namespace pt_journey_planner;
 	using namespace algorithm;
-		
-	
+
+
 
 	namespace util
 	{
@@ -124,7 +124,7 @@ namespace synthese
 			_displayedPlaces.insert(make_pair(__PointArret->getKey(),__PointArret));
 		}
 
-		
+
 
 		void DisplayScreen::addForcedDestination(const pt::StopArea* place)
 		{
@@ -362,7 +362,7 @@ namespace synthese
 						DEPARTURE_FIRST,
 						false
 					);
-					
+
 					const PTRoutePlannerResult solution(rp.run());
 
 					if(solution.getJourneys().empty()) continue;
@@ -621,7 +621,7 @@ namespace synthese
 			return _maintenanceMessage;
 		}
 
-		
+
 
 		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
 		{
@@ -835,7 +835,7 @@ namespace synthese
 			){
 				return false;
 			}
-		
+
 			ptime now(second_clock::local_time());
 			if(now - status.getTime() <= getType()->getTimeBetweenChecks())
 			{

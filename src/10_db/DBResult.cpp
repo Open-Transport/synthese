@@ -60,8 +60,8 @@ namespace synthese
 			resetPosition();
 		}
 
-		
-		
+
+
 		int DBResult::_getColumnIndexInternal(const std::string& columnName) const
 		{
 			int index = getColumnIndex(columnName);
@@ -91,7 +91,7 @@ namespace synthese
 
 
 
-		int 
+		int
 		DBResult::getInt (const std::string& name) const
 		{
 			return getInt(_getColumnIndexInternal(name));
@@ -146,7 +146,7 @@ namespace synthese
 
 
 
-		boost::logic::tribool 
+		boost::logic::tribool
 		DBResult::getTribool (const std::string& name) const
 		{
 			return getTribool(_getColumnIndexInternal(name));
@@ -154,7 +154,7 @@ namespace synthese
 
 
 
-		double 
+		double
 		DBResult::getDouble (const std::string& name) const
 		{
 			return getDouble(_getColumnIndexInternal(name));
@@ -162,7 +162,7 @@ namespace synthese
 
 
 
-		std::string 
+		std::string
 		DBResult::getBlob (int column) const
 		{
 			return getText(column);
@@ -170,7 +170,7 @@ namespace synthese
 
 
 
-		std::string 
+		std::string
 		DBResult::getBlob (const std::string& name) const
 		{
 			return getBlob(_getColumnIndexInternal(name));
@@ -181,7 +181,7 @@ namespace synthese
 		std::vector<int> DBResult::computeMaxColWidths () const
 		{
 			std::vector<int> widths;
-			for (int c=0; c<getNbColumns (); ++c) 
+			for (int c=0; c<getNbColumns (); ++c)
 			{
 				size_t max = 0;
 				std::string name (getColumnName (c));
@@ -282,7 +282,7 @@ namespace synthese
 
 			try
 			{
-				return 
+				return
 					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
 						*shared_ptr<Geometry>(reader.read(colStr))
 				);
@@ -315,12 +315,12 @@ namespace synthese
 		}
 
 
-		
+
 		std::ostream& operator<< ( std::ostream& os, const DBResult& op )
 		{
 			std::vector<int> widths (op.computeMaxColWidths ());
 
-			for (int c=0; c<op.getNbColumns (); ++c) 
+			for (int c=0; c<op.getNbColumns (); ++c)
 			{
 				os << std::setw (widths.at(c)) << std::setfill (' ') << op.getColumnName (c);
 				if (c != op.getNbColumns ()-1) os << " | ";
@@ -329,7 +329,7 @@ namespace synthese
 
 			while (op.next ())
 			{
-				for (int c=0; c<op.getNbColumns (); ++c) 
+				for (int c=0; c<op.getNbColumns (); ++c)
 				{
 					os << std::setw (widths.at(c)) << std::setfill (' ') << op.getText (c);
 					if (c != op.getNbColumns ()-1) os << " | ";

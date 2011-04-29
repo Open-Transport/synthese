@@ -40,7 +40,7 @@ namespace synthese
 
 			Usage :
 			@code {{&& <param1> <param2> ... <paramn>}} @endcode
-			
+
 			The parameters of the elements are values.
 
 			The output is :
@@ -57,7 +57,7 @@ namespace synthese
 		private:
 			// Attributes
 			ValueElementList _parameters;
-			
+
 		public:
 			/** Evaluates the context and builds the output.
 				@param parameters Current execution parameters
@@ -73,7 +73,7 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 			) const;
-			
+
 			/** Parameters storage and quantity verification.
 				@param vel Value Elements List : the parameters
 				@throw InterfacePageException if the parameters number is incorrect

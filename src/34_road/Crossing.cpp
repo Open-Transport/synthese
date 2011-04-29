@@ -36,8 +36,8 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace impex;
-	
-	
+
+
 
 	namespace util
 	{
@@ -63,9 +63,9 @@ namespace synthese
 				setDataSourceLinks(links);
 			}
 		}
-		
-		
-		
+
+
+
 		Crossing::~Crossing ()
 		{}
 

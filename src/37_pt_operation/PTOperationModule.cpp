@@ -36,7 +36,7 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace util;
 	using namespace pt;
-	
+
 
 	namespace util
 	{

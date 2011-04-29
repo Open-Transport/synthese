@@ -74,7 +74,7 @@ namespace synthese
 		@subsection m54_target_structure Architecture fonctionnelle cible
 
 		Un système de téléaffichage basé sur SYNTHESE repose sur les principes suivants :
-			- la base de données de SYNTHESE constitue le point de convergence des diverses sources de données. Dans le cadre du téléaffichage, les sources majeures sont : 
+			- la base de données de SYNTHESE constitue le point de convergence des diverses sources de données. Dans le cadre du téléaffichage, les sources majeures sont :
 			- les sources dites <i>théoriques</i> : elles proviennent de fichiers mis à jour par saisie manuelle ou par import informatique
 			- les sources dites <i>temps réel</i> : saisies manuelles dans la console d'administration (ex : saisie de messages...) ou réceptions de données transmises automatiquement (ex : contrôles de supervision issues du client de supervision, import modifications horaires SAE...)
 			- le téléaffichage est un service du système SYNTHESE comme un autre : il exploite la base de données à chaud et fabrique des objets résultats (une liste de départs ou d'arrivée) qui sont transmis au module d'interface, chargé de les diffuser selon un langage défini
@@ -103,8 +103,8 @@ namespace synthese
 				bool withNone = false
 			);
 			static Labels	getPlacesWithBroadcastPointsLabels(
-				const security::RightsOfSameClassMap& rights 
-				, bool totalControl 
+				const security::RightsOfSameClassMap& rights
+				, bool totalControl
 				, security::RightLevel neededLevel
 				, bool withAll = false
 			);

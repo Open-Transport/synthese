@@ -41,7 +41,7 @@ namespace util
 class ManagedThread : public Thread
 {
  public:
-    
+
 
  private:
 
@@ -52,9 +52,9 @@ class ManagedThread : public Thread
  public:
 
 
-    ManagedThread (ThreadExec* exec, 
-		   const std::string& name = "", 
-		   int loopDelay = 5, 
+    ManagedThread (ThreadExec* exec,
+		   const std::string& name = "",
+		   int loopDelay = 5,
 		   bool autoRespawn = false);
 
     ~ManagedThread ();
@@ -64,7 +64,7 @@ class ManagedThread : public Thread
     void respawn ();
 
  private:
-    
+
 
 };
 

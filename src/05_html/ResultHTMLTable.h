@@ -64,8 +64,8 @@ namespace synthese
 				std::string			orderField;
 				bool				raisingOrder;
 				std::string			_prefix;
-				
-				RequestParameters() 
+
+				RequestParameters()
 					: maxSize(30),
 					first(0),
 					raisingOrder(true)
@@ -102,7 +102,7 @@ namespace synthese
 
 		protected:
 			HTMLForm		_searchForm;
-			
+
 		public:
 			/** Constructor.
 				@param header : vector of pairs field code / col caption. If field code is non empty then the searchRequest can be reloaded with an ordering by the column.
@@ -141,7 +141,7 @@ namespace synthese
 						if (colspan > 1)
 							s << " colspan=\"" << colspan << "\"";
 						s << ">";
-	
+
 						// This column is sortable
 						if (!it->first.empty())
 						{
@@ -158,14 +158,14 @@ namespace synthese
 										true
 							)	)	);
 							s << HTMLModule::getHTMLLink(_searchForm.getURL(h), it->second);
-	
+
 							if (it->first == _requestParameters.orderField)
 							{
 								s << "&nbsp;" << HTMLModule::getHTMLImage(
 									iconPath + (_requestParameters.raisingOrder ? "up" : "down") + ".png",
 									_requestParameters.raisingOrder ? "V" : "^"
 								);
-							}						
+							}
 						}
 						else
 							s << it->second;
@@ -174,7 +174,7 @@ namespace synthese
 					}
 				}
 				_headers = s.str();
-	
+
 				_searchForm.addHiddenField(
 					_requestParameters._getParameterCode(_PARAMETER_FIRST),
 					boost::lexical_cast<std::string>(_requestParameters.first)
@@ -195,7 +195,7 @@ namespace synthese
 					);
 				}
 			}
-			
+
 
 
 			virtual std::string close();

@@ -46,7 +46,7 @@ class PostscriptCanvas;
 
 
 
-class DrawablePhysicalStop 
+class DrawablePhysicalStop
 {
 
 public:
@@ -64,7 +64,7 @@ public:
 
     DrawablePhysicalStop (const synthese::pt::StopPoint* physicalStop);
     ~DrawablePhysicalStop ();
-	
+
     //! @name Getters/Setters
     //@{
     int getPhysicalStopId () const;
@@ -77,7 +77,7 @@ public:
     //@{
     void prepare (Map& map);
     //@}
-    
+
 };
 
 }

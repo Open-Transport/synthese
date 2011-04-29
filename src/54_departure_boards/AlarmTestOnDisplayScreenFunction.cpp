@@ -72,7 +72,7 @@ namespace synthese
 	namespace departure_boards
 	{
 		const string AlarmTestOnDisplayScreenFunction::PARAMETER_DISPLAY_TYPE_ID("dt");
-		
+
 
 		AlarmTestOnDisplayScreenFunction::AlarmTestOnDisplayScreenFunction()
 			: util::FactorableTemplate<server::Function,AlarmTestOnDisplayScreenFunction>()
@@ -149,7 +149,7 @@ namespace synthese
 					displayedObject.map.insert(
 						make_pair(
 							sp,
-							destinations		
+							destinations
 					)	);
 					d += minutes(1);
 				}

@@ -54,10 +54,10 @@ namespace synthese
 	using namespace cms;
 	using namespace graph;
 
-	
+
 
 	template<> const string util::FactorableTemplate<RequestWithInterface,pt::RealTimeUpdateFunction>::FACTORY_KEY("rtu");
-	
+
 	namespace pt
 	{
 		const string RealTimeUpdateFunction::PARAMETER_LINE_STOP_RANK("ls");
@@ -155,9 +155,9 @@ namespace synthese
 				_display(stream, request, *_service, *_service->getRoute()->getLineStop(_lineStopRank));
 			}
 		}
-		
-		
-		
+
+
+
 		bool RealTimeUpdateFunction::isAuthorized(const server::Session* session) const
 		{
 			return true;
@@ -205,7 +205,7 @@ namespace synthese
 
 			// Destination
 			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getLine()->getDestination()->getConnectionPlace(), DATA_DESTINATION_);
-			
+
 			// Line
 			PTObjectsCMSExporters::ExportLine(pm, *lineStop.getLine()->getCommercialLine());
 

@@ -115,8 +115,8 @@ private:
       sizeof(buf),
       NULL);
 
-    throw std::invalid_argument("boost::random_device: " + msg + 
-                                " Cryptopraphic Service Provider " + provider + 
+    throw std::invalid_argument("boost::random_device: " + msg +
+                                " Cryptopraphic Service Provider " + provider +
                                 ": " + std::string(&buf[0], &buf[0] + num));
   }
   const std::string provider;
@@ -183,8 +183,8 @@ public:
 
 private:
   void error(const std::string & msg) {
-    throw std::invalid_argument("boost::random_device: " + msg + 
-                                " random-number pseudo-device " + path + 
+    throw std::invalid_argument("boost::random_device: " + msg +
+                                " random-number pseudo-device " + path +
                                 ": " + strerror(errno));
   }
   const std::string path;

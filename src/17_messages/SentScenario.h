@@ -64,20 +64,20 @@ namespace synthese
 
 		public:
 			/** Basic constructor
-			 * 
-			 * @param key id of the sent scenario 
+			 *
+			 * @param key id of the sent scenario
 			 */
 			SentScenario(util::RegistryKeyType key = 0);
-			
+
 			/** Template instantiation constructor.
-			 * 
+			 *
 			 * @param source the template
 			 */
 			SentScenario(
 				const ScenarioTemplate& source
 			);
-			
-			
+
+
 			/** Copy constructor.
 				@param source Scenario to copy
 				The dates are not copied
@@ -85,7 +85,7 @@ namespace synthese
 			SentScenario(
 				const SentScenario& source
 			);
-			
+
 			~SentScenario();
 
 			const boost::posix_time::ptime&	getPeriodStart()	const;
@@ -99,7 +99,7 @@ namespace synthese
 			///	Updates the alarms too.
 			///	@param periodStart Start broadcast date
 			void setPeriodStart ( const boost::posix_time::ptime& periodStart);
-			
+
 
 			////////////////////////////////////////////////////////////////////
 			/// End broadcast date setter.

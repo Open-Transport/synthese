@@ -58,7 +58,7 @@ namespace synthese
 		///		<li>via_points : optional. Defines the geometry of the chunk. Each point is separated
 		///		by coma. Longitude and latitude are stored and are separated by :.</li>
 		///		<li>metric_offset</li>
-		///		<li>left_start_house_number / left_end_house_number / right_start_house_number / right_end_house_number : 
+		///		<li>left_start_house_number / left_end_house_number / right_start_house_number / right_end_house_number :
 		///		optional house number bounds at each side of the chunk.</li>
 		///		<li>left_house_numbering_policy / right_house_numbering_policy : These fields are loaded only if the up
 		///		links are loaded, because of the need to know the parent road to determinate if the chunk is at
@@ -75,8 +75,8 @@ namespace synthese
 		{
 		public:
 			/** Road chunks table :
-			- on insert : 
-			- on update : 
+			- on insert :
+			- on update :
 			- on delete : X
 			*/
 			static const std::string COL_CROSSING_ID;

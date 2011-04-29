@@ -45,7 +45,7 @@ namespace synthese
 	{
 		class City;
 	}
-	
+
 	namespace pt
 	{
 		class JourneyPattern;
@@ -86,12 +86,12 @@ namespace synthese
 				static const std::string PARAMETER_NETWORK_ID;
 
 			private:
-				
+
 				boost::gregorian::date _startDate;
 				boost::gregorian::date _endDate;
 				bool _displayLinkedStops;
 				boost::shared_ptr<const TransportNetwork> _network;
-				
+
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
 				typedef std::set<std::pair<int, std::string> > IgnoredRoutes;
@@ -103,7 +103,7 @@ namespace synthese
 			protected:
 
 				virtual bool _controlPathsMap() const;
-				
+
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
@@ -111,8 +111,8 @@ namespace synthese
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
 
-		
-			
+
+
 			public:
 				Importer_(
 					util::Env& env,

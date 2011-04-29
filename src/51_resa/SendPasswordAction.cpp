@@ -42,7 +42,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::SendPasswordAction>::FACTORY_KEY("SendPasswordAction");
@@ -51,18 +51,18 @@ namespace synthese
 	namespace resa
 	{
 		const string SendPasswordAction::PARAMETER_USER = Action_PARAMETER_PREFIX + "ui";
-		
-		
-		
+
+
+
 		ParametersMap SendPasswordAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_user.get()) map.insert(PARAMETER_USER, _user->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void SendPasswordAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -79,9 +79,9 @@ namespace synthese
 				throw ActionException("Default reservation contact not defined");
 			}
 		}
-		
-		
-		
+
+
+
 		void SendPasswordAction::run(Request& request)
 		{
 			_user->setRandomPassword();
@@ -96,9 +96,9 @@ namespace synthese
 				ResaDBLog::AddEMailEntry(*request.getSession(), *_user, "Message d'activation de réservation en ligne");
 			}
 		}
-		
-		
-		
+
+
+
 		bool SendPasswordAction::isAuthorized(const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ResaRight>(WRITE);

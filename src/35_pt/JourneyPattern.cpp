@@ -39,7 +39,7 @@ namespace synthese
 	using namespace impex;
 	using namespace pt;
 	using namespace calendar;
-	
+
 	namespace util
 	{
 		template<> const std::string Registry<pt::JourneyPattern>::KEY("JourneyPattern");
@@ -69,7 +69,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 		JourneyPattern::getDirection () const
 		{
 			return _direction;
@@ -77,7 +77,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		JourneyPattern::setDirection (const std::string& direction)
 		{
 			_direction = direction;
@@ -85,7 +85,7 @@ namespace synthese
 
 
 
-		const std::string& 
+		const std::string&
 		JourneyPattern::getTimetableName () const
 		{
 			return _timetableName;
@@ -93,7 +93,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		JourneyPattern::setTimetableName (const std::string& timetableName)
 		{
 			_timetableName = timetableName;
@@ -193,7 +193,7 @@ namespace synthese
 				if ((*it)->addServiceIfCompatible(service))
 					return;
 			}
-		
+
 			// If no subline can handle the service, create one for it
 			JourneyPatternCopy* subline(new JourneyPatternCopy(this));
 			bool isok(subline->addServiceIfCompatible(service));
@@ -205,7 +205,7 @@ namespace synthese
 
 		bool JourneyPattern::respectsLineTheory(
 			bool RTData,
-			const Service& service			
+			const Service& service
 		) const {
 			ServiceSet::const_iterator last_it;
 			ServiceSet::const_iterator it;
@@ -232,20 +232,20 @@ namespace synthese
 		{
 			return _subLines;
 		}
-		
-		
-		
+
+
+
 		bool JourneyPattern::operator==(const std::vector<StopPoint*>& stops) const
 		{
 			if(getEdges().size() != stops.size()) return false;
-			
+
 			size_t rank(0);
 			BOOST_FOREACH(const Edge* edge, getEdges())
 			{
 				if(static_cast<const LineStop*>(edge)->getFromVertex() != stops[rank]) return false;
 				++rank;
 			}
-			
+
 			return true;
 		}
 

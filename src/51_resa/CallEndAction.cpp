@@ -35,7 +35,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::CallEndAction>::FACTORY_KEY("CallEndAction");
@@ -47,23 +47,23 @@ namespace synthese
 			: util::FactorableTemplate<Action, CallEndAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap CallEndAction::getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CallEndAction::_setFromParametersMap(const ParametersMap& map)
 		{
 		}
-		
-		
-		
+
+
+
 		void CallEndAction::run(Request& request)
 		{
 			ResaModule::CallClose(request.getSession());

@@ -18,20 +18,20 @@ bool ThreadManager::_MonothreadEmulation (false);
 
 
 
-ThreadManager::ThreadManager (bool monothreadEmulation) 
+ThreadManager::ThreadManager (bool monothreadEmulation)
 {
-    
+
 }
-    
 
 
-ThreadManager::~ThreadManager () 
+
+ThreadManager::~ThreadManager ()
 {
 }
-    
 
 
-bool 
+
+bool
 ThreadManager::GetMonothreadEmulation ()
 {
     return _MonothreadEmulation;
@@ -39,7 +39,7 @@ ThreadManager::GetMonothreadEmulation ()
 
 
 
-void 
+void
 ThreadManager::SetMonothreadEmulation (bool monothreadEmulation)
 {
     _MonothreadEmulation = monothreadEmulation;
@@ -47,14 +47,14 @@ ThreadManager::SetMonothreadEmulation (bool monothreadEmulation)
 
 
 
-void 
+void
 ThreadManager::add (ManagedThread* thread, bool autoRespawn)
 {
     ManagedThreadEntry mt;
     mt.thread = thread;
     mt.nbLoopsPrev = 0;
     mt.nbLoopsPrevPrev = 0;
-    
+
     _threads.insert (std::make_pair (thread->getName (), mt));
     _names.push_back (thread->getName ());
 
@@ -62,7 +62,7 @@ ThreadManager::add (ManagedThread* thread, bool autoRespawn)
     {
 	mt.thread->execInitialize ();
     }
-    else 
+    else
     {
 	mt.thread->start ();
 	mt.thread->waitForReadyState ();
@@ -72,7 +72,7 @@ ThreadManager::add (ManagedThread* thread, bool autoRespawn)
 
 
 
-void 
+void
 ThreadManager::remove (ManagedThread* thread)
 {
     _threads.erase (thread->getName ());
@@ -82,27 +82,27 @@ ThreadManager::remove (ManagedThread* thread)
 
 
 
-void 
+void
 ThreadManager::checkForDeadThreads ()
 {
     for (std::map<std::string, ManagedThreadEntry>::iterator it = _threads.begin ();
-	 it != _threads.end (); ++it) 
+	 it != _threads.end (); ++it)
     {
 	ManagedThreadEntry& mt = it->second;
 	if (mt.thread->getAutoRespawn () == false) continue;
 
 	unsigned long nbLoops = mt.thread->getNbLoops ();
-	
-	// If it is two times (two times because of unsigned long ranging) 
+
+	// If it is two times (two times because of unsigned long ranging)
 	// that nbLoops has not increased,
 	// the thread is dead.
-	if ((nbLoops != 0) && 
-	    (mt.nbLoopsPrev == nbLoops) && 
-	    (mt.nbLoopsPrevPrev == mt.nbLoopsPrev)) 
+	if ((nbLoops != 0) &&
+	    (mt.nbLoopsPrev == nbLoops) &&
+	    (mt.nbLoopsPrevPrev == mt.nbLoopsPrev))
 	{
 	    mt.nbLoopsPrev = 0;
 	    mt.nbLoopsPrevPrev = 0;
-	    
+
 	    mt.thread->respawn ();
 	}
 	else
@@ -126,10 +126,10 @@ ThreadManager::Instance ()
 
 
 
-void 
+void
 ThreadManager::run ()
 {
-    
+
 
     if (_MonothreadEmulation)
     {
@@ -137,19 +137,19 @@ ThreadManager::run ()
 	while (true)
 	{
 	    for (std::vector<std::string>::const_iterator it = _names.begin ();
-		 it != _names.end (); ++it) 
+		 it != _names.end (); ++it)
 	    {
 		std::map<std::string, ManagedThreadEntry>::iterator it2
 		    = _threads.find (*it);
-		
+
 		if (it2 == _threads.end ()) continue;
-		
+
 		ManagedThreadEntry& mt = it2->second;
 		mt.thread->execLoop ();
 	    }
 	}
     }
-    else 
+    else
     {
  	Log::GetInstance ().info ("Running ThreadManager multithreaded...");
 	while (true)

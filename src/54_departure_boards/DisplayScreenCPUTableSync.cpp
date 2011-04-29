@@ -83,7 +83,7 @@ namespace synthese
 			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
 			DBTableSync::Field()
 		};
-		
+
 		template<>  const DBTableSync::Index DBTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =
 		{
 			DBTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), ""),
@@ -103,7 +103,7 @@ namespace synthese
 			object->setMaintenanceMessage(rows->getText(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE));
 			object->setMonitoringDelay(minutes(rows->getInt(DisplayScreenCPUTableSync::COL_MONITORING_DELAY)));
 			object->setIsOnline(rows->getBool(DisplayScreenCPUTableSync::COL_IS_ONLINE));
-			
+
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Links
@@ -137,7 +137,7 @@ namespace synthese
 		}
 
 
-		
+
 		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Unlink(
 			DisplayScreenCPU* object
 		){
@@ -209,9 +209,9 @@ namespace synthese
 			ArrivalDepartureTableLog::addRemoveEntry(*cpu, *session->getUser());
 		}
 	}
-	
-	
-	
+
+
+
 	namespace departure_boards
 	{
 		DisplayScreenCPUTableSync::SearchResult DisplayScreenCPUTableSync::Search(

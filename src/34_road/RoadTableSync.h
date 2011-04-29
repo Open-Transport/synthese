@@ -51,13 +51,13 @@ namespace synthese
 		:	public db::DBRegistryTableSyncTemplate<RoadTableSync, MainRoadPart>
 		{
 		public:
-			
+
 			static const std::string COL_ROADTYPE;
 			static const std::string COL_BIKECOMPLIANCEID;
 			static const std::string COL_HANDICAPPEDCOMPLIANCEID;
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_ROAD_PLACE_ID;
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

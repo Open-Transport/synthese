@@ -59,7 +59,7 @@ namespace synthese
 		}
 
 
-		
+
 		void MessagesLog::AddNewScenarioMessageEntry(
 			const Alarm& alarm,
 			const Scenario& scenario,

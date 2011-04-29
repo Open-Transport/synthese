@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::CompositionVehicleAddAction>::FACTORY_KEY("CompositionVehicleAddAction");
@@ -48,8 +48,8 @@ namespace synthese
 		const string CompositionVehicleAddAction::PARAMETER_VEHICLE_ID = Action_PARAMETER_PREFIX + "vi";
 		const string CompositionVehicleAddAction::PARAMETER_NUMBER = Action_PARAMETER_PREFIX + "nu";
 
-		
-		
+
+
 		ParametersMap CompositionVehicleAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -64,9 +64,9 @@ namespace synthese
 			map.insert(PARAMETER_NUMBER, _number);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CompositionVehicleAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -89,15 +89,15 @@ namespace synthese
 
 			_number = map.getDefault<string>(PARAMETER_NUMBER);
 		}
-		
-		
-		
+
+
+
 		void CompositionVehicleAddAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			Composition::VehicleLink link;
 			link.number = _number;
 			link.vehicle = _vehicle.get();
@@ -108,9 +108,9 @@ namespace synthese
 			CompositionTableSync::Save(_composition.get());
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool CompositionVehicleAddAction::isAuthorized(
 			const Session* session
 		) const {

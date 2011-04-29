@@ -25,7 +25,7 @@
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<>

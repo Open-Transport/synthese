@@ -33,7 +33,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, security::UserPhoneInterfaceElement>::FACTORY_KEY("user_phone");

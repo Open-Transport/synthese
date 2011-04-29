@@ -39,7 +39,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.18
 		//////////////////////////////////////////////////////////////////////////
-		/// <h3>Call</h3> 
+		/// <h3>Call</h3>
 		///
 		/// Key : links
 		///
@@ -62,24 +62,24 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_TEMPLATE_ID;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const Webpage> _page;
 				boost::shared_ptr<const Webpage> _displayPage;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -88,8 +88,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -105,9 +105,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

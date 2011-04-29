@@ -45,7 +45,7 @@ namespace synthese
 	{
 		class City;
 	}
-	
+
 	namespace pt
 	{
 
@@ -77,7 +77,7 @@ namespace synthese
 		///	<h3>Import of the stops</h3>
 		///
 		/// The physical stops must be linked with the items of BAHNHOF.DAT.
-		/// More than one physical stop can be linked with the same CarPostal stop. In this case, 
+		/// More than one physical stop can be linked with the same CarPostal stop. In this case,
 		/// the import will select automatically the actual stop regarding the whole itinerary.
 		///
 		/// <h3>Import of the services</h3>
@@ -113,7 +113,7 @@ namespace synthese
 
 			private:
 				typedef std::map<int, calendar::Calendar> CalendarMap;
-				
+
 				mutable boost::gregorian::date _startDate;
 				mutable boost::gregorian::date _endDate;
 				mutable CalendarMap _calendarMap;
@@ -122,7 +122,7 @@ namespace synthese
 			protected:
 
 				virtual bool _controlPathsMap() const;
-				
+
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
@@ -130,8 +130,8 @@ namespace synthese
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
 
-		
-			
+
+
 			public:
 				Importer_(
 					util::Env& env,

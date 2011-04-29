@@ -35,7 +35,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, security::UserIdInterfaceElement>::FACTORY_KEY("user_id");

@@ -52,25 +52,25 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_DISPLAY_TYPE_ID;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DisplayType>		_type;
 				boost::shared_ptr<const messages::Alarm>	_alarm;
 			//@}
-			
-			
+
+
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
-			
+
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
+
 		public:
 			AlarmTestOnDisplayScreenFunction();
 

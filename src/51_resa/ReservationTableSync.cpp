@@ -336,7 +336,7 @@ namespace synthese
 					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#00:" <<
 					to_simple_string(snow).substr(0, 5) << "'" ;
 			}
-			
+
 			if(orderByService)
 			{
 				query <<

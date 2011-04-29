@@ -62,7 +62,7 @@ namespace synthese
 				const DataSource& dataSource
 			):	Importer(env, dataSource)
 			{}
-			
+
 
 			void setFromParametersMap(
 				const server::ParametersMap& map,

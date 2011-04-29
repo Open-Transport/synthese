@@ -14,18 +14,18 @@ Confirmation::~Confirmation()
 int Confirmation::start(SessionReturnType *_session)
 {
 	session=_session;
-	
+
 	if(_session->sessionId.empty())
 	{
 		Functions::setFatalError("session Id invalid in Confirmation");
 		return -1;
 	}
-	
+
 	//!(Functions::getFatalError().empty()) inside, but temp true
 	if(true)
 	{
 		bool driverWantSelfConfirm=false;
-		
+
 		if(session->type==0)	//driver
 		{
 			int menuKey[]={7,8};
@@ -33,25 +33,25 @@ int Confirmation::start(SessionReturnType *_session)
 			if(dtmfInput==7) driverWantSelfConfirm=true;
 			else driverWantSelfConfirm=false;
 		}
-		
+
 		try
 		{
 			requestResaConfirmedHistory(driverWantSelfConfirm);
-			
+
 		}
 		catch(int e)
 		{
 			Functions::translateExpt(e);
 			return -1;
 		}
-		
+
 		stringstream msg;
 		msg<<Functions::getMenu(4,1)<<history.size()<<Functions::getMenu(4,2);
 		Functions::playbackText(agi,res,msg.str());
-		
+
 		int menuKey[]={1,2,3,4,5,6,9};
 		int currentStep=0;
-		
+
 		/*
 			key notice: 	1,2,3 resa history number
 					4 previous, 5 repeat, 6 next
@@ -95,7 +95,7 @@ int Confirmation::start(SessionReturnType *_session)
 							Functions::translateExpt(e);
 							return -1;
 						}
-						
+
 						if(reply==0) Functions::playbackText(agi,res,Functions::getMenu(3,6));
 						else Functions::playbackText(agi,res,Functions::getMenu(3,4));
 					}
@@ -103,13 +103,13 @@ int Confirmation::start(SessionReturnType *_session)
 					{
 						Functions::playbackText(agi,res,Functions::getMenu(3,5));
 					}
-					
+
 			}
 			Functions::playbackText(agi,res,history[currentStep]);
 		}
 		while(currentStep!=-99);
-		
-		
+
+
 		return 0;
 	}
 	else  // fatalError raised, do nothing
@@ -117,7 +117,7 @@ int Confirmation::start(SessionReturnType *_session)
 		cerr<<Functions::getFatalError()<<endl;
 		return -1;
 	}
-	
+
 
 }
 /*

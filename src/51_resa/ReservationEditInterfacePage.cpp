@@ -61,8 +61,8 @@ namespace synthese
 			Registrable(0)
 		{
 		}
-		
-		
+
+
 
 		void ReservationEditInterfacePage::display(
 			std::ostream& stream,
@@ -78,7 +78,7 @@ namespace synthese
 				(	request->isAuthorized<ResaRight>(READ) ||
 					request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, READ) && resa.getCustomerUserId() == request->getUser()->getKey()
 			)	){
-			
+
 				stringstream s;
 				if(getInterface()->getPage<ReservationConfirmationEMailItemInterfacePage>())
 				{

@@ -37,7 +37,7 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace util;
-	
+
 	template<> const string FactorableTemplate<Action, DBLogPurgeAction>::FACTORY_KEY("DBLogPurgeAction");
 
 	namespace dblog
@@ -83,7 +83,7 @@ namespace synthese
 
 		bool DBLogPurgeAction::isAuthorized(const Session* session
 		) const {
-			return 
+			return
 				session &&
 				session->hasProfile() &&
 				session->getUser()->getProfile()->isAuthorized<DBLogRight>(DELETE_RIGHT) &&

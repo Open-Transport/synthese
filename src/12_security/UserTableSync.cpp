@@ -133,7 +133,7 @@ namespace synthese
 			{
 				Log::GetInstance().warn("Language error in user "+ lexical_cast<string>(user->getKey()), e);
 			}
-	
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				user->setProfile(ProfileTableSync::Get(
@@ -284,7 +284,7 @@ namespace synthese
 				<< " FROM " << TABLE.NAME << " AS t";
 			if (orderByProfileName)
 				query << " INNER JOIN " << ProfileTableSync::TABLE.NAME << " AS p ON p." << TABLE_COL_ID << "=t." << TABLE_COL_PROFILE_ID;
-			query << " WHERE 1 "; 
+			query << " WHERE 1 ";
 			if(login)
 				query << " AND t." << TABLE_COL_LOGIN << " LIKE " << Conversion::ToDBString(*login);
 			if(name)
@@ -335,7 +335,7 @@ namespace synthese
 					<< " FROM " << TABLE.NAME
 					<< " WHERE " << TABLE_COL_LOGIN << "=" << Conversion::ToDBString(login)
 					<< " LIMIT 1 ";
-				
+
 				db::DBResultSPtr rows = db->execQuery(query.str());
 				return (rows->next () != false);
 			}

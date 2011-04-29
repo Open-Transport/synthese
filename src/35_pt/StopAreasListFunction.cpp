@@ -51,11 +51,11 @@ namespace synthese
 	using namespace security;
 	using namespace graph;
 	using namespace std;
-	
+
 	template<> const string util::FactorableTemplate<server::Function,pt::StopAreasListFunction>::FACTORY_KEY(
 		"StopAreasListFunction"
 	);
-	
+
 	namespace pt
 	{
 		ParametersMap StopAreasListFunction::_getParametersMap() const

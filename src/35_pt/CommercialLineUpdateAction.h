@@ -75,7 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
-		
+
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
 			boost::optional<std::string>	_name;		//!< Name (code)
@@ -107,7 +107,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

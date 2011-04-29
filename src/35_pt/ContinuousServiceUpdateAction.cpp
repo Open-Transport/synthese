@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ContinuousServiceUpdateAction>::FACTORY_KEY("ContinuousServiceUpdateAction");
@@ -49,9 +49,9 @@ namespace synthese
 		const string ContinuousServiceUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "id";
 		const string ContinuousServiceUpdateAction::PARAMETER_WAITING_DURATION = Action_PARAMETER_PREFIX + "wa";
 		const string ContinuousServiceUpdateAction::PARAMETER_END_TIME = Action_PARAMETER_PREFIX + "et";
-		
-		
-		
+
+
+
 		ParametersMap ContinuousServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ContinuousServiceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -97,25 +97,25 @@ namespace synthese
 
 			_range = endTime - startTime;
 		}
-		
-		
-		
+
+
+
 		void ContinuousServiceUpdateAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			_service->setMaxWaitingTime(_duration);
 			_service->setRange(_range);
 
 			ContinuousServiceTableSync::Save(_service.get());
-			
+
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ContinuousServiceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

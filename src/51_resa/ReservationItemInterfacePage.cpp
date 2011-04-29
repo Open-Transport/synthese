@@ -58,7 +58,7 @@ namespace synthese
 			, const server::Request* request /*= NULL*/
 		) const	{
 			ParametersVector pv;
-			
+
 			ptime now(second_clock::local_time());
 
 			pv.push_back((*transaction.getReservations().begin())->getDeparturePlaceName());
@@ -71,7 +71,7 @@ namespace synthese
 			else
 				pv.push_back(string());
 			pv.push_back(Conversion::ToString(static_cast<int>(transaction.getStatus())));
-			
+
 			InterfacePage::_display(
 				stream
 				, pv

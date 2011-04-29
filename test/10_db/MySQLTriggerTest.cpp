@@ -123,7 +123,7 @@ BOOST_AUTO_TEST_CASE(MySQLTrigger)
 	BOOST_CHECK_EQUAL(objFromReg->getShortName(), obj.getShortName());
 
 	string sql("UPDATE t020_test SET name='new name' WHERE name='sample name';");
-	
+
 	int res = mysql_query(connection, sql.c_str());
 	if (res)
 	{

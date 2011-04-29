@@ -47,7 +47,7 @@ namespace synthese
 		StaticValueInterfaceElement::StaticValueInterfaceElement( const std::string& value )
 			: _value(value)
 		{
-			
+
 		}
 
 

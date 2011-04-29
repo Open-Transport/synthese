@@ -168,7 +168,7 @@ namespace synthese
 		){
 			ReplaceQuery<DisplayMonitoringStatusTableSync> query(*object);
 			query.addField(
-				(object->getScreen() == NULL) ? 
+				(object->getScreen() == NULL) ?
 				(object->getCPU() == NULL ? RegistryKeyType(0) : object->getCPU()->getKey()) :
 				object->getScreen()->getKey()
 			);
@@ -192,7 +192,7 @@ namespace synthese
 		}
 
 
-		
+
 		template<> void DBDirectTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>::Unlink(
 			DisplayMonitoringStatus* obj
 		){
@@ -233,9 +233,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace departure_boards
 	{
 		DisplayMonitoringStatusTableSync::SearchResult DisplayMonitoringStatusTableSync::Search(

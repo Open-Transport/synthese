@@ -38,7 +38,7 @@ namespace synthese
 
 			@image html cap_admin_message.png
 			@image latex cap_admin_message.png "Maquette de l'écran d'édition de message" width=14cm
-			
+
 			<i>Titre de la fenêtre</i> :
 				- SYNTHESE Admin - Message - [Nom]
 
@@ -81,7 +81,7 @@ namespace synthese
 					- les controles de dates doivent être positifs
 					- les messages doivent être non vides
 
-			
+
 			<i>Sécurité</i>
 				- Une habilitation MessagesRight de niveau READ est nécessaire pour visualiser les paramètres d'un message.
 				- Une habilitation MessagesRight de niveau WRITE est nécessaire pour pour éditer un message devant partir ou déjà partis.
@@ -89,7 +89,7 @@ namespace synthese
 					- Les arrêts logiques proposés sont les arrêts explicitement autorisés, les arrêts contenant au moins un point de diffusion explicitement autorisé, et les arrêts desservis par au moins une ligne autorisée (ou bien une ligne appartenant à un réseau autorisé)
 					- Les emplacements proposés sont les arrêts physiques explicitements autorisés, les arrêts physiques desservis par une ligne autorisée, et les points de diffusion de l'arrêt logique n'étant pas des arrêts physiques
 					- Les lignes proposées sont les lignes explicitement autorisées, ainsi que l'ensemble des lignes des réseaux explicitement autorisés.
-				
+
 			<i>Journaux</i> : Les événements suivants entrainent la création d'une entrée dans le journal des messages MessagesLog :
 				- INFO : Diffusion de message
 				- INFO : Modification de message en cours de diffusion
@@ -117,16 +117,16 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 
 
-			
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -151,11 +151,11 @@ namespace synthese
 
 
 			virtual std::string getTitle() const;
-			
+
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,

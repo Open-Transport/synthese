@@ -37,7 +37,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, calendar::CalendarTemplateAddAction>::FACTORY_KEY("CalendarTemplateAddAction");
@@ -46,33 +46,33 @@ namespace synthese
 	namespace calendar
 	{
 		const string CalendarTemplateAddAction::PARAMETER_TEXT = Action_PARAMETER_PREFIX + "tx";
-		
-		
-		
+
+
+
 		CalendarTemplateAddAction::CalendarTemplateAddAction()
 			: util::FactorableTemplate<Action, CalendarTemplateAddAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap CalendarTemplateAddAction::getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_text = map.get<string>(PARAMETER_TEXT);
 			if (_text.empty())
 				throw ActionException("Le texte doit être non vide.");
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplateAddAction::run(Request& request)
 		{
 			CalendarTemplate c;
@@ -82,9 +82,9 @@ namespace synthese
 
 			request.setActionCreatedId(c.getKey());
 		}
-	
-		
-		
+
+
+
 		/*!
 			\fn synthese::timetables::CalendarTemplateAddAction::isAuthorized(const server::Session* session)
 		*/

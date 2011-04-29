@@ -39,10 +39,10 @@ namespace synthese
 
 	namespace pt
 	{
-		const string PTNetworkListItemInterfacePage::DATA_NAME("name");	
+		const string PTNetworkListItemInterfacePage::DATA_NAME("name");
 		const string PTNetworkListItemInterfacePage::DATA_RANK("rank");
 		const string PTNetworkListItemInterfacePage::DATA_RANK_IS_ODD("rank_is_odd");
-		
+
 
 		void PTNetworkListItemInterfacePage::Display(
 			std::ostream& stream,
@@ -52,7 +52,7 @@ namespace synthese
 			std::size_t rank
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-		
+
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());
 			pm.insert(DATA_NAME, object.getName()); //1
 			pm.insert(DATA_RANK, rank);

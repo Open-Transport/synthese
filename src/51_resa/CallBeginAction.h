@@ -55,11 +55,11 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			CallBeginAction();
 
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	User right control.
 			///	@return true if the user can use the action

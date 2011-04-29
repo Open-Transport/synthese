@@ -66,7 +66,7 @@ namespace synthese
 			void run(server::Request& request);
 
 			virtual bool isAuthorized(const server::Session* session) const;
-			
+
 			void setUser(boost::shared_ptr<User> value);
 			void setUserC(boost::shared_ptr<const User> value);
 		};

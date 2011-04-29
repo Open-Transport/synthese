@@ -83,10 +83,10 @@ namespace synthese
 				@param orderByName Order the results by name and surname
 				@param orderByProfile Order the results by profile name
 				@param raisingOrder True = Ascendant order, false = descendant order
-				@return Found vector of shared pointers to User linked-objects. 
+				@return Found vector of shared pointers to User linked-objects.
 				@throw UserTableSyncException If the query has failed (does not occurs in normal case)
 				@author Hugues Romain
-				@date 2006				
+				@date 2006
 			*/
 			static SearchResult Search(
 				util::Env& env,

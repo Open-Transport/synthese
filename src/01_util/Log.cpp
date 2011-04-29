@@ -55,12 +55,12 @@ namespace synthese
 
 		Log::~Log ()
 		{
-		    
+
 		}
 
 
 
-		Log& 
+		Log&
 		Log::GetInstance (const std::string& logName)
 		{
 			if (logName.empty ()) return _defaultLog;
@@ -75,7 +75,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::setOutputStream (std::ostream* outputStream)
 		{
 			_outputStream = outputStream;
@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		Log::Level 
+		Log::Level
 		Log::getLevel () const
 		{
 			return _level;
@@ -92,22 +92,22 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::setLevel (Log::Level level)
 		{
 			_level = level;
 		}
 
-		    
 
-		void 
+
+		void
 		Log::debug (const std::string& message)
 		{
 			if (_level > Log::LEVEL_DEBUG) return;
 			append (Log::LEVEL_DEBUG, message);
 		}
 
-		void 
+		void
 		Log::debug (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_DEBUG) return;
@@ -116,7 +116,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::info (const std::string& message)
 		{
 			if (_level > Log::LEVEL_INFO) return;
@@ -125,7 +125,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::info (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_INFO) return;
@@ -134,7 +134,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::warn (const std::string& message)
 		{
 			if (_level > Log::LEVEL_WARN) return;
@@ -143,7 +143,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::warn (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_WARN) return;
@@ -152,7 +152,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::error (const std::string& message)
 		{
 			if (_level > Log::LEVEL_ERROR) return;
@@ -160,7 +160,7 @@ namespace synthese
 		}
 
 
-		void 
+		void
 		Log::error (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_ERROR) return;
@@ -170,36 +170,36 @@ namespace synthese
 
 
 
-		void 
+		void
 		Log::fatal (const std::string& message)
 		{
 			if (_level > Log::LEVEL_FATAL) return;
 			append (Log::LEVEL_FATAL, message);
 		}
-		    
 
 
-		void 
+
+		void
 		Log::fatal (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_FATAL) return;
 			append (Log::LEVEL_FATAL, message, &exception);
 		}
-		    
 
 
 
-		void 
-		Log::append (Log::Level level, 
-				 const std::string& message, 
+
+		void
+		Log::append (Log::Level level,
+				 const std::string& message,
 				 const std::exception* exception)
 		{
 			// Standard io streams are not thread safe.
 			// Acquire lock here.
-		    
+
 			boost::mutex::scoped_lock lock (_ioMutex);
 
-			switch (level) 
+			switch (level)
 			{
 			case LEVEL_TRACE:
 				(*_outputStream) << LOG_PREFIX_TRACE;
@@ -231,7 +231,7 @@ namespace synthese
 			_logTimeInfo = localtime ( &_rawLogTime );
 
 			(*_outputStream) << " # " << std::setfill ('0')
-				  << std::setw (4) << (1900 + _logTimeInfo->tm_year) << "/" 
+				  << std::setw (4) << (1900 + _logTimeInfo->tm_year) << "/"
 				  << std::setw (2) << (1 + _logTimeInfo->tm_mon) << "/"
 				  << std::setw (2) << _logTimeInfo->tm_mday << " "
 				  << std::setw (2) << _logTimeInfo->tm_hour << ":"
@@ -249,7 +249,7 @@ namespace synthese
 
 			(*_outputStream) << std::endl;
 			// Locks is automatically released when goes out of scope.
-		    
+
 		}
 
 		void Log::trace( const std::string& message )

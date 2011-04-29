@@ -49,7 +49,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::AlarmAddLinkAction>::FACTORY_KEY("maala");
-	
+
 	namespace messages
 	{
 		const string AlarmAddLinkAction::PARAMETER_ALARM_ID = Action_PARAMETER_PREFIX + "a";
@@ -75,7 +75,7 @@ namespace synthese
 
 			// Alarm ID
 			setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
-			
+
 			// Object ID
 			setObjectId(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID));
 		}

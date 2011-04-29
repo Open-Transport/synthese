@@ -135,7 +135,7 @@ namespace synthese
 				map.getOptional<string>(PARAMETER_INPUT) ?
 				map.getDefault<string>(PARAMETER_INPUT) :
 				map.getDefault<string>(PARAMETER_OLD_INPUT);
-			
+
 			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
 			if (!_input.empty() && !_n)
 			{
@@ -197,7 +197,7 @@ namespace synthese
 					BOOST_FOREACH(const RoadModule::ExtendedFetchPlaceResult& place, places)
 					{
 						placesList.push_back(make_pair(
-								dynamic_cast<Registrable*>(place.placeResult.value.get()) ? 
+								dynamic_cast<Registrable*>(place.placeResult.value.get()) ?
 								dynamic_cast<Registrable*>(place.placeResult.value.get())->getKey() : 0,
 								place.placeResult.key.getSource()
 						)	);

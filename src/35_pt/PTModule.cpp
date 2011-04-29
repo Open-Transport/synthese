@@ -66,7 +66,7 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace graph;
-	
+
 
 	namespace graph
 	{
@@ -83,11 +83,11 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<PTModule>::NAME("Transport public");
-		
+
 		template<> void ModuleClassTemplate<PTModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<PTModule>::Init()
 		{
 			// Data cleaner
@@ -97,7 +97,7 @@ namespace synthese
 			)	);
 			ServerModule::AddThread(theThread, "Real time data cleaner");
 
-			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer 
+			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
 			Env env;
 			vector<string> tridentKeys;
 			tridentKeys.push_back("Air");
@@ -133,7 +133,7 @@ namespace synthese
 			}
 
 		}
-		
+
 		template<> void ModuleClassTemplate<PTModule>::End()
 		{
 		}
@@ -166,8 +166,8 @@ namespace synthese
 
 
 		PTModule::Labels PTModule::getCommercialLineLabels(
-			const security::RightsOfSameClassMap& rights 
-			, bool totalControl 
+			const security::RightsOfSameClassMap& rights
+			, bool totalControl
 			, RightLevel neededLevel
 			, bool withAll
 		){
@@ -203,9 +203,9 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				m.push_back(make_pair(lexical_cast<string>(line->getKey()), line->getName() ));
 		}
-		
-		
-		
+
+
+
 		int PTModule::GetMaxAlarmLevel(
 			const Journey& journey
 		){
@@ -213,7 +213,7 @@ namespace synthese
 			ptime alarmStop(not_a_date_time);
 			ptime now(second_clock::local_time());
 			int maxAlarmLevel(0);
-		 
+
 			BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 			{
 				const Service* service(leg.getService());
@@ -224,23 +224,23 @@ namespace synthese
 					// Alarm stop = last departure
 				alarmStart = leg.getDepartureDateTime();
 				alarmStop = alarmStart;
-				if (service->isContinuous ()) 
+				if (service->isContinuous ())
 					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
-				
+
 	/*				if ( leg->getOrigin ()->getFromVertex ()->getConnectionPlace ()
 					 ->hasApplicableAlarm (alarmStart, alarmStop)
 					 && maxAlarmLevel < leg->getOrigin()->getFromVertex ()->
 					 getConnectionPlace ()->getAlarm ()->getLevel () )
 						maxAlarmLevel = leg->getOrigin()->getFromVertex ()->getConnectionPlace ()->getAlarm ()->getLevel ();
-	*/			
-				
+	*/
+
 
 					// -- Service alarm --
 					// Alarm start = first departure
 					// Alarm stop = last arrival
 					alarmStart = leg.getDepartureDateTime();
 					alarmStop = leg.getArrivalDateTime();
-				if (service->isContinuous ()) 
+				if (service->isContinuous ())
 					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
 
 	/*				if ( (leg->getService ()->getPath ()->hasApplicableAlarm (alarmStart, alarmStop)) &&
@@ -248,7 +248,7 @@ namespace synthese
 				{
 						maxAlarmLevel = leg->getService ()->getPath ()->getAlarm ()->getLevel ();
 				}
-	*/			
+	*/
 					// -- Alarm on arrival --
 					// Alarm start = first arrival
 					// Alarm stop = last arrival if connection, last arrival otherwise
@@ -259,7 +259,7 @@ namespace synthese
 //						alarmStop = (it+1)->getDepartureDateTime ();
 //				}
 
-				if (service->isContinuous ()) 
+				if (service->isContinuous ())
 					alarmStop += static_cast<const ContinuousService*>(service)->getRange ();
 
 	/*				if ( (leg->getDestination ()->getFromVertex ()->getConnectionPlace ()->hasApplicableAlarm (alarmStart, alarmStop)) &&

@@ -46,7 +46,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync, PlaceAliasTableSync>::FACTORY_KEY("14.10.01 Places Alias");
 	}
-	
+
 	namespace geography
 	{
 		const string PlaceAliasTableSync::COL_NAME ("name");
@@ -70,7 +70,7 @@ namespace synthese
 			DBTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<PlaceAliasTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()

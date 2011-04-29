@@ -142,9 +142,9 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Alphabetical order.
 			static Labels getCommercialLineLabels(
-				const security::RightsOfSameClassMap& rights 
-				, bool totalControl 
-				, security::RightLevel neededLevel 
+				const security::RightsOfSameClassMap& rights
+				, bool totalControl
+				, security::RightLevel neededLevel
 				, bool withAll=false
 			);
 

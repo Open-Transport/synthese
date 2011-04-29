@@ -226,12 +226,12 @@ namespace synthese
 							"contact_email,contact_comment,contact_oreon,contact_admin," <<
 							"contact_type_msg,contact_activate,contact_auth_type" <<
 						") VALUES (" <<
-							decodeObjectId(user->getKey()) << ",1,1," << 
+							decodeObjectId(user->getKey()) << ",1,1," <<
 							Conversion::ToDBString(_ConvertToNagiosName(user->getFullName())) << "," <<
-							Conversion::ToDBString(user->getLogin()) << "," << 
+							Conversion::ToDBString(user->getLogin()) << "," <<
 							Conversion::ToDBString(md5.getHashFromString(user->getPassword())) << "," <<
 							"'fr_FR','n','n'," <<
-							Conversion::ToDBString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," << 
+							Conversion::ToDBString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," <<
 							"'txt','1','local'" <<
 						");" << endl
 					;
@@ -284,7 +284,7 @@ namespace synthese
 							decodeObjectId(type->getKey()) << "," <<
 							HARDWARE_SERVICE_ID <<
 						");" << endl
-					;				
+					;
 				}
 				stream <<
 					"INSERT INTO hostgroup(hg_id,hg_name,hg_alias,hg_comment,hg_activate) VALUES(" <<
@@ -305,7 +305,7 @@ namespace synthese
 
 				// Insertion of the hosts
 				StaticFunctionRequest<DisplayScreenContentFunction> displayRequest;
-				
+
 				DisplayScreenTableSync::SearchResult screens(
 					DisplayScreenTableSync::Search(env)
 				);
@@ -335,7 +335,7 @@ namespace synthese
 							decodeObjectId(screen->getKey()) << ",(SELECT command_id FROM command WHERE command_name='check_centreon_dummy')," <<
 							"'!0!N/A'," <<
 							"1,1," <<
-							Conversion::ToDBString(host) << "," << 
+							Conversion::ToDBString(host) << "," <<
 							Conversion::ToDBString(host) << "," <<
 							screen->getKey() << ",1000," <<
 							"'1','2'," <<
@@ -347,15 +347,15 @@ namespace synthese
 							"'d,u,r,f','2'," <<
 							"'0'," << GENERATED_BY_SYNTHESE << ",'1','1'" <<
 						");" << endl <<
-						
+
 						"INSERT INTO extended_host_information(" <<
 							"ehi_id,host_host_id,ehi_notes_url" <<
 						") VALUES (" <<
-							decodeObjectId(screen->getKey()) << "," << 
+							decodeObjectId(screen->getKey()) << "," <<
 							decodeObjectId(screen->getKey()) << "," <<
 							"'" << displayRequest.getURL() << "'"
 						");" << endl <<
-						
+
 						"INSERT INTO hostgroup_relation(hgr_id,hostgroup_hg_id,host_host_id) VALUES(" <<
 							decodeObjectId(screen->getKey()) << "," <<
 							decodeObjectId(screen->getType()->getKey()) << "," <<
@@ -371,7 +371,7 @@ namespace synthese
 
 
 				stream <<
-					"INSERT INTO host(host_id,command_command_id," << 
+					"INSERT INTO host(host_id,command_command_id," <<
 						"timeperiod_tp_id,timeperiod_tp_id2," <<
 						"host_name,host_alias," <<
 						"host_address,host_max_check_attempts," <<
@@ -424,7 +424,7 @@ namespace synthese
 
 		CentreonConfigExportFunction::CentreonConfigExportFunction()
 		{
-	
+
 		}
 
 

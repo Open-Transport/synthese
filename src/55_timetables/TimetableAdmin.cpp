@@ -101,7 +101,7 @@ namespace synthese
 		TimetableAdmin::TimetableAdmin()
 			: AdminInterfaceElementTemplate<TimetableAdmin>()
 		{ }
-		
+
 		void TimetableAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -121,18 +121,18 @@ namespace synthese
 			}
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_RANK);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap TimetableAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_timetable.get()) m.insert(Request::PARAMETER_OBJECT_ID, _timetable->getKey());
 			return m;
 		}
-		
-		
-		
+
+
+
 		void TimetableAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -355,7 +355,7 @@ namespace synthese
 							, _requestParameters.maxSize,
 							UP_DOWN_LINKS_LOAD_LEVEL
 					)	);
-					
+
 					ActionResultHTMLTable::HeaderVector h;
 					h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_up.png", "^")));
 					h.push_back(make_pair(string(), HTMLModule::getHTMLImage("arrow_down.png", "V")));
@@ -612,19 +612,19 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<TimetableRight>(READ);
 		}
-		
+
 
 
 		std::string TimetableAdmin::getTitle() const
 		{
 			return _timetable.get() ? _timetable->getTitle() : DEFAULT_TITLE;
 		}
-		
+
 		void TimetableAdmin::setTimetable(boost::shared_ptr<Timetable> timetable)
 		{
 			_timetable = const_pointer_cast<const Timetable, Timetable>(timetable);
 		}
-	
+
 		boost::shared_ptr<const Timetable> TimetableAdmin::getTimetable() const
 		{
 			return _timetable;

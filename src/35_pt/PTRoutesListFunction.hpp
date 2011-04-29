@@ -70,7 +70,7 @@ namespace synthese
 			static const std::string DATA_RANK;
 			static const std::string DATA_RANK_IS_ODD;
 
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -80,8 +80,8 @@ namespace synthese
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Routes_list
@@ -90,9 +90,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Routes_list
@@ -103,8 +103,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -122,9 +122,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

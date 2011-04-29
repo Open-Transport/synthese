@@ -42,8 +42,8 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, messages::ScenarioFolderAdd>::FACTORY_KEY("ScenarioFolderAdd");
@@ -53,16 +53,16 @@ namespace synthese
 	{
 		const string ScenarioFolderAdd::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string ScenarioFolderAdd::PARAMETER_PARENT_ID = Action_PARAMETER_PREFIX + "pi";
-		
-		
-		
+
+
+
 		ScenarioFolderAdd::ScenarioFolderAdd()
 			: util::FactorableTemplate<Action, ScenarioFolderAdd>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap ScenarioFolderAdd::getParametersMap() const
 		{
 			ParametersMap map;
@@ -70,9 +70,9 @@ namespace synthese
 			map.insert(PARAMETER_PARENT_ID, _parent.get() ? _parent->getKey() : 0);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ScenarioFolderAdd::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PARENT_ID));
@@ -87,7 +87,7 @@ namespace synthese
 					throw ActionException("Le répertoire parent désigné n'existe pas.");
 				}
 			}
-			
+
 			_name = map.get<string>(PARAMETER_NAME);
 
 			Env env;
@@ -99,9 +99,9 @@ namespace synthese
 			if (!env.getRegistry<ScenarioFolder>().empty())
 				throw ActionException("Ce nom est déjà utilisé dans le répertoire courant.");
 		}
-		
-		
-		
+
+
+
 		void ScenarioFolderAdd::run(
 			Request& request
 		){

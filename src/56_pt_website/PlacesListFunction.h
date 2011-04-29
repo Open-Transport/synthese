@@ -60,7 +60,7 @@ namespace synthese
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
-			
+
 		protected:
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CITY_ID;
@@ -79,18 +79,18 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage>		_itemPage;
 				boost::shared_ptr<geography::City>	_city;
 			//@}
-			
-			
+
+
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
 			server::ParametersMap _getParametersMap() const;
-			
+
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
 			void _setFromParametersMap(const server::ParametersMap& map);
-			
+
 			void _displayItems(
 				std::ostream& stream,
 				const PlacesList& items,

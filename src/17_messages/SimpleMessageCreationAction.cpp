@@ -44,7 +44,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, messages::SimpleMessageCreationAction>::FACTORY_KEY("SimpleMessageCreationAction");
@@ -55,9 +55,9 @@ namespace synthese
 		const string SimpleMessageCreationAction::PARAMETER_CONTENT = Action_PARAMETER_PREFIX + "c";
 		const string SimpleMessageCreationAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "l";
 		const string SimpleMessageCreationAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "r";
-		
-		
-		
+
+
+
 		ParametersMap SimpleMessageCreationAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -66,9 +66,9 @@ namespace synthese
 			map.insert(PARAMETER_RECIPIENT_ID, _recipientId);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void SimpleMessageCreationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Content
@@ -84,9 +84,9 @@ namespace synthese
 			// Recipient
 			_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
 		}
-		
-		
-		
+
+
+
 		void SimpleMessageCreationAction::run(
 			Request& request
 		){
@@ -117,9 +117,9 @@ namespace synthese
 			MessagesLog::AddNewSentScenarioEntry(scenario, *request.getUser());
 			request.setActionCreatedId(link.getKey());
 		}
-		
-		
-		
+
+
+
 		bool SimpleMessageCreationAction::isAuthorized(
 			const Session* session
 		) const {

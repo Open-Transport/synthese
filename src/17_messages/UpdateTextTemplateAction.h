@@ -53,7 +53,7 @@ namespace synthese
 			std::string						_shortMessage;
 			std::string						_longMessage;
 
-			
+
 			/** Authorization control.
 				@return True if the action run is authorized
 				@author Hugues Romain

@@ -16,7 +16,7 @@ BOOST_AUTO_TEST_CASE (testFiltering)
       std::stringstream sout;
 
       SqlFilter filter;
-      
+
       io::filtering_ostream out;
       out.push (filter);
       out.push (sout);

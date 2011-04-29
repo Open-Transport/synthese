@@ -51,7 +51,7 @@ namespace synthese
 			JpegRenderer();
 			virtual ~JpegRenderer ();
 
-			std::string render(const boost::filesystem::path& tempDir, 
+			std::string render(const boost::filesystem::path& tempDir,
 					   const std::string& filenamePrefix,
 					   const util::Registry<pt::JourneyPattern>& lines,
 				synthese::map::Map& map,

@@ -56,7 +56,7 @@ namespace synthese
 			//@{
 			const RegistryKeyType& getKey () const;
 			//@}
-		    
+
 
 		 private:
 

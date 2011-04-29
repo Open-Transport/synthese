@@ -47,7 +47,7 @@ namespace synthese
 				/** Construction of an empty request.
 					@author Hugues Romain
 					@date 2007
-					Use the public setters to fill the request.					
+					Use the public setters to fill the request.
 				*/
 				StaticActionFunctionRequest();
 
@@ -57,7 +57,7 @@ namespace synthese
 					@param request Request to copy (default/NULL = no copy)
 					@author Hugues Romain
 					@date 2009
-					Use the public setters to fill the request.					
+					Use the public setters to fill the request.
 				*/
 				explicit StaticActionFunctionRequest(const Request& request, bool copyFunction);
 			//@}

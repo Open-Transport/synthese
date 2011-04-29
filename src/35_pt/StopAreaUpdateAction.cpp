@@ -46,7 +46,7 @@ namespace synthese
 	using namespace pt;
 	using namespace impex;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::StopAreaUpdateAction>::FACTORY_KEY("StopAreaUpdateAction");
@@ -111,9 +111,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void StopAreaUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -174,15 +174,15 @@ namespace synthese
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
 		}
-		
-		
-		
+
+
+
 		void StopAreaUpdateAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			if(_allowedConnections)
 			{
 				_place->setAllowedConnection(*_allowedConnections);
@@ -238,9 +238,9 @@ namespace synthese
 
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool StopAreaUpdateAction::isAuthorized(
 			const Session* session
 		) const {

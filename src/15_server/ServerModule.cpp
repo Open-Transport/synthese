@@ -54,7 +54,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	
+
 	template<> const std::string util::FactorableTemplate<ModuleClass, ServerModule>::FACTORY_KEY("15_server");
 
     namespace server
@@ -95,16 +95,16 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<ServerModule>::Init()
 		{
-			try 
+			try
 			{
 				// Open the acceptor with the option to reuse the address (i.e. SO_REUSEADDR).
 				string address("0.0.0.0");
 				string port(GetParameter(ServerModule::MODULE_PARAM_PORT));
-				
+
 				asio::ip::tcp::resolver resolver(ServerModule::_io_service);
 				asio::ip::tcp::resolver::query query(address, port);
 				asio::ip::tcp::endpoint endpoint = *resolver.resolve(query);
-				
+
 				ServerModule::_acceptor.open(endpoint.protocol());
 				ServerModule::_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
 				ServerModule::_acceptor.bind(endpoint);
@@ -114,11 +114,11 @@ namespace synthese
 					bind(&ServerModule::HandleAccept, asio::placeholders::error)
 				);
 			}
-			
+
 			catch (std::exception& ex)
 			{
 				Log::GetInstance ().fatal ("Unexpected exception", ex);
-			} 
+			}
 			catch (...)
 			{
 				Log::GetInstance ().fatal ("Unexpected exception");
@@ -130,7 +130,7 @@ namespace synthese
 		{
 			// Create a pool of threads to run all of the io_services.
 			ServerModule::KillAllHTTPThreads();
-	
+
 			Log::GetInstance().info(
 				"HTTP Server is now listening on port " + GetParameter(ServerModule::MODULE_PARAM_PORT) +
 				" with at least "+ GetParameter(ServerModule::MODULE_PARAM_NB_THREADS) + " threads ..."
@@ -149,7 +149,7 @@ namespace synthese
 
 			ServerModule::_io_service.stop();
 		}
-		
+
 
 		ServerModule::SessionMap& ServerModule::getSessions()
 		{
@@ -161,25 +161,25 @@ namespace synthese
 			const std::string& name,
 			const std::string& value
 		){
-			if (name == MODULE_PARAM_PORT) 
+			if (name == MODULE_PARAM_PORT)
 			{
 				// TODO : close and reopen service on the new port
 			}
-			if (name == MODULE_PARAM_LOG_LEVEL) 
+			if (name == MODULE_PARAM_LOG_LEVEL)
 			{
 				Log::GetInstance ().setLevel (static_cast<Log::Level>(lexical_cast<int>(value)));
 			}
 			if(name == MODULE_PARAM_NB_THREADS)
 			{
-				
+
 			}
 			if(name == MODULE_PARAM_SESSION_MAX_DURATION)
 			{
 				_sessionMaxDuration = minutes(lexical_cast<int>(value));
 			}
 		}
-		
-		
+
+
 		void ServerModule::HandleAccept(
 			const boost::system::error_code& e
 		){
@@ -204,7 +204,7 @@ namespace synthese
 		){
 			try
 			{
-				Log::GetInstance ().debug ("Received request : " + 
+				Log::GetInstance ().debug ("Received request : " +
 					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" + (req.postData.empty() ? string() : " + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+ req.postData.substr(0, 1000) ) );
 
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
@@ -381,7 +381,7 @@ namespace synthese
 			{
 				ServerModule::KillThread(threadId, false);
 			}
-			
+
 			if(autoRestart)
 			{
 				size_t threadsNumber(lexical_cast<size_t>(GetParameter(ServerModule::MODULE_PARAM_NB_THREADS)));

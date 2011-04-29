@@ -58,7 +58,7 @@ namespace synthese
 			/** Interface getter.
 				@return Requested interface (can be NULL)
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			boost::shared_ptr<const Interface> getInterface() const;
 

@@ -61,9 +61,9 @@ namespace synthese
 			SQLiteDB::_ThrowIfError(tss->handle, sqlite3_close(tss->handle), "Cannot close SQLite handle");
 			delete tss;
 		}
-		
-		
-		
+
+
+
 		int sqliteBusyHandler(void* arg, int nbCalls)
 		{
 			// Return a non-zero value so that a retry is made, waiting for SQLite not ot be busy anymore...
@@ -87,7 +87,7 @@ namespace synthese
 
 			tss->events.push_back(DB::DBModifEvent(tbName, modifType, rowId));
 		}
-		
+
 
 
 		void sqliteRollbackHook(void* arg)
@@ -104,9 +104,9 @@ namespace synthese
 			_tss(&cleanupTSS)
 		{
 		}
-		
-		
-		
+
+
+
 		SQLiteDB::~SQLiteDB()
 		{
 		}
@@ -141,12 +141,12 @@ namespace synthese
 			if (_tss.get() == 0)
 			{
 				// Create the sqlite handle
-				
+
 				sqlite3* handle;
 				int retc = sqlite3_open(_databaseFile.string().c_str(), &handle);
 				_ThrowIfError(handle, retc, "Cannot open SQLite handle to " + _databaseFile.string());
-				
-				// int 
+
+				// int
 				sqlite3_busy_handler(handle, &sqliteBusyHandler, 0);
 
 				//lint --e{429}
@@ -156,7 +156,7 @@ namespace synthese
 				sqlite3_update_hook(handle, &sqliteUpdateHook, tss);
 				sqlite3_rollback_hook(handle, &sqliteRollbackHook, tss);
 #endif
-				
+
 				tss->handle = handle;
 
 				_tss.reset(tss);
@@ -165,7 +165,7 @@ namespace synthese
 		}
 
 
-		
+
 		// TODO: inline once DO_VERIFY_TRIGGER_EVENTS is removed.
 		SQLiteTSS* SQLiteDB::_initSQLiteTSS() const
 		{
@@ -192,7 +192,7 @@ namespace synthese
 
 
 
-		sqlite3* SQLiteDB::_getHandle() const 
+		sqlite3* SQLiteDB::_getHandle() const
 		{
 			return _getSQLiteTSS()->handle;
 		}
@@ -212,7 +212,7 @@ namespace synthese
 			SQLiteTSS* tss = _initSQLiteTSS();
 
 			int retc = sqlite3_exec(_getHandle(), "BEGIN TRANSACTION;", 0, 0, 0);
-			
+
 			_ThrowIfError(_getHandle(), retc, "Error executing batch update when opening transaction");
 
 			try
@@ -263,14 +263,14 @@ namespace synthese
 			// an update can still be called inside hook callback.
 			boost::recursive_mutex::scoped_lock lock(_updateMutex);
 #endif
-			// Do a batch execution (no precompilation since it can contains more than one 
+			// Do a batch execution (no precompilation since it can contains more than one
 			// statement which is impossible to validate wihtout executing them one by one, given one database state)
 			assert(sql.size() > 0);
-		    
+
 			SQLiteTSS* tss = _initSQLiteTSS();
 
 			int retc = sqlite3_exec(_getHandle(), sql.c_str(), 0, 0, 0);
-		    
+
 			_ThrowIfError(_getHandle(), retc, "Error executing batch update '" + Conversion::ToTruncatedString(sql) + "'");
 
 #ifdef DO_VERIFY_TRIGGER_EVENTS
@@ -343,7 +343,7 @@ namespace synthese
 			// that should match the value returned by SQLite if the schema is up to date.
 
 			std::stringstream sql;
-			sql << 
+			sql <<
 				"CREATE TABLE " << tableName << " (\"" <<
 				fields[0].name << "\" " << getSQLType(fields[0].type) <<
 				" UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK";

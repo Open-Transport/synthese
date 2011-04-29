@@ -94,17 +94,17 @@ namespace synthese
 				const server::ParametersMap& map
 			);
 
-			
-			
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
-			
+
+
+
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
@@ -124,7 +124,7 @@ namespace synthese
 				@return PageLinks Ordered vector of sub pages links
 				@author Hugues Romain
 				@date 2008
-				
+
 				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 				This method can be overloaded to create customized sub tree.
 			*/
@@ -141,9 +141,9 @@ namespace synthese
 
 			boost::shared_ptr<const Scenario> getScenario() const;
 			void setScenario(boost::shared_ptr<Scenario> value);
-			
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-			
+
 		};
 	}
 }

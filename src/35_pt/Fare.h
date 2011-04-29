@@ -45,11 +45,11 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		 public:
-		    
+
 			typedef enum
 			{
 				FARE_TYPE_FREE = 0,
-				FARE_TYPE_SECTION = 1, 
+				FARE_TYPE_SECTION = 1,
 				FARE_TYPE_DISTANCE = 2,
 				FARE_TYPE_ZONAL = 3
 			} FareType;
@@ -58,7 +58,7 @@ namespace synthese
 			typedef util::Registry<Fare>	Registry;
 
 		 private:
-		    
+
 			std::string _name; //!< Fare name
 			FareType _type; //!< Fare type
 
@@ -67,8 +67,8 @@ namespace synthese
 				util::RegistryKeyType key = 0
 			);
 			~Fare ();
-		    
-		    
+
+
 			//! @name Getters
 			//@{
 				const std::string& getName () const { return _name; }

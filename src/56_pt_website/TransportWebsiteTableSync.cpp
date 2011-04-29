@@ -74,7 +74,7 @@ namespace synthese
 		template<> const DBTableSync::Format DBTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
 			"t025_sites"
 		);
-		
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] =
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -115,7 +115,7 @@ namespace synthese
 		    site->setUseDateRange(days(rows->getInt(TransportWebsiteTableSync::COL_USE_DATES_RANGE)));
 			site->setDisplayRoadApproachDetail(rows->getBool(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
 			site->setClientURL(rows->getText(TransportWebsiteTableSync::COL_CLIENT_URL));
-		    
+
 		    string periodsStr(rows->getText(TransportWebsiteTableSync::COL_PERIODS));
 
 			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;

@@ -62,7 +62,7 @@ namespace synthese
 			static const std::string COL_SMART_URL_DEFAULT_PARAMETER_NAME;
 			static const std::string COL_IGNORE_WHITE_CHARS;
 			static const std::string COL_RAW_EDITOR;
-		
+
 
 
 			//////////////////////////////////////////////////////////////////////////

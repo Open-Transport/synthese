@@ -102,7 +102,7 @@ namespace synthese
 				bool hideOldServices = false,
 				boost::logic::tribool cancelled = false,
 				bool orderByService = true,
-				bool raisingOrder = true, 
+				bool raisingOrder = true,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

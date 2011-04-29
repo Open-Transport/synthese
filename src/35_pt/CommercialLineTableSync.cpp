@@ -119,7 +119,7 @@ namespace synthese
 			DBTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(
@@ -139,7 +139,7 @@ namespace synthese
 			object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
 			object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 			object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
-			
+
 			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
 			if(!color.empty())
@@ -164,7 +164,7 @@ namespace synthese
 
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
-			
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Transport network
@@ -232,7 +232,7 @@ namespace synthese
 				{
 					rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 				}
-				
+
 				// Handicapped compliance
 				util::RegistryKeyType handicappedComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_HANDICAPPED_USE_RULE)
@@ -241,7 +241,7 @@ namespace synthese
 				{
 					rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 				}
-				
+
 				// Pedestrian compliance
 				util::RegistryKeyType pedestrianComplianceId(
 					rows->getLongLong (CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE)
@@ -307,17 +307,17 @@ namespace synthese
 			query.addField(optionalReservationPlaces.str());
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.addField(
-				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ? 
+				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ? 
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() :
 				RegistryKeyType(0)
 			);
 			query.addField(
-				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ? 
+				object->getRule(USER_PEDESTRIAN) && dynamic_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_PEDESTRIAN))->getKey() :
 				RegistryKeyType(0)
 			);
@@ -423,12 +423,12 @@ namespace synthese
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		
-		
+
+
 		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
-			const security::RightsOfSameClassMap& rights 
-			, bool totalControl 
+			const security::RightsOfSameClassMap& rights
+			, bool totalControl
 			, RightLevel neededLevel,
 			int first
 			, boost::optional<std::size_t> number

@@ -38,11 +38,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,impex::ExportFunction>::FACTORY_KEY("ExportFunction");
-	
+
 	namespace impex
 	{
 		const string ExportFunction::PARAMETER_FILE_FORMAT("ff");
-		
+
 
 
 		ParametersMap ExportFunction::_getParametersMap() const
@@ -73,9 +73,9 @@ namespace synthese
 		) const {
 			_exporter->build(stream);
 		}
-		
-		
-		
+
+
+
 		bool ExportFunction::isAuthorized(
 			const Session* session
 		) const {

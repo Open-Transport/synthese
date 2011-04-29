@@ -32,7 +32,7 @@ namespace synthese
 	namespace interfaces
 	{
 		/** Execution variable library interface element.
-			
+
 			Usage :
 			@code set <variable_name> <value> @endcode
 
@@ -48,7 +48,7 @@ namespace synthese
 				@param vel Parameters list to read
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
-			
+
 			/* Displays the object.
 				@param stream Stream to write on
 				@param parameters Runtime parameters used in the internal parameters reading

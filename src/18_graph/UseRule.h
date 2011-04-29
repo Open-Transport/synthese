@@ -54,7 +54,7 @@ namespace synthese
 		///
 		/// When no use rule is specified for a service and a customer profile,
 		/// it seems that the access to the service is forbidden for the profile
-		/// members. It is equivalent to the FORBIDDEN_USE_RULE static instance 
+		/// members. It is equivalent to the FORBIDDEN_USE_RULE static instance
 		/// of UseRule.
 		///
 		/// @ingroup m18
@@ -82,18 +82,18 @@ namespace synthese
 				RUN_POSSIBLE = 1,
 				RUN_DEPENDING_ON_DEPARTURE_PLACE = 2
 			} RunPossibilityType;
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Maximal seats number for the user category.
 			/// Values :
 			///  - 0 : the use of the service is forbidden for the user category;
-			///  - >0 : the use of the service is allowed for the user category, the 
+			///  - >0 : the use of the service is allowed for the user category, the
 			///    available seats number is limited to the specified value;
 			///  - unspecified : the use of the service is allowed for the user category,
 			///    and there is no seats number limit.
 			typedef boost::optional<size_t> AccessCapacity;
-			
+
 
 			//! @name Services
 			//@{
@@ -120,7 +120,7 @@ namespace synthese
 
 						- The smallest date time is chosen.
 
-					If no explicit rule defines the reservation dead line, 
+					If no explicit rule defines the reservation dead line,
 					the actual reservation time is returned.
 				*/
 				virtual boost::posix_time::ptime getReservationDeadLine (
@@ -136,22 +136,22 @@ namespace synthese
 				/** Reference function for calculation of the date time of the opening of reservations.
 					@param reservationTime Time when booking is done.
 					@return The minimum date time to make a reservation.
-				
+
 					If no explicit rule defines this minimum time, the actual reservation time is returned.
 				*/
-				virtual boost::posix_time::ptime getReservationOpeningTime ( 
+				virtual boost::posix_time::ptime getReservationOpeningTime (
 					const ServicePointer& servicePointer
 				) const = 0;
-				
-				
-				
-				/** Indicates whether or not a path can be taken at a given date, 
+
+
+
+				/** Indicates whether or not a path can be taken at a given date,
 					taking into account reservation delay rules.
 					@return true if the line run can be taken, false otherwise.
 
 					This methods checks the following conditions :
 						- if reservation is not compulsory, the run can be taken.
-						- if reservation is compulsory, reservation time must precede reservation 
+						- if reservation is compulsory, reservation time must precede reservation
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (
@@ -166,7 +166,7 @@ namespace synthese
 					@param reservationTime Time of booking.
 					@param departureTime Desired departure time.
 					@return true if the reservation is possible, false otherwise.
-				 
+
 					This methods checks the following conditions :
 						- reservation time must precede reservation dead line
 						- reservation time must be later than reservation start time.

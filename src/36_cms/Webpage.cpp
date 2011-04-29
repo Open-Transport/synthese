@@ -75,7 +75,7 @@ namespace synthese
 			std::string::const_iterator end,
 			std::set<std::string> termination
 		) const {
-			
+
 			shared_ptr<TextNode> currentTextNode;
 
 			while(it != end)
@@ -262,7 +262,7 @@ namespace synthese
 
 					nodes.push_back(static_pointer_cast<Node,LabelNode>(node));
 				} // Reached the end of a recursion level
-				else 
+				else
 				{
 					BOOST_FOREACH(const string& test, termination)
 					{
@@ -473,7 +473,7 @@ namespace synthese
 			}
 			catch(RequestException& e)
 			{
-				
+
 			}
 			catch(Request::RedirectException& e)
 			{

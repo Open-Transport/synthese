@@ -36,7 +36,7 @@ namespace synthese
 	namespace pt
 	{
 		class Fare;
-	
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Public transportation use rule.
 		///	@ingroup m35
@@ -64,9 +64,9 @@ namespace synthese
 			/// Reservation rule type.
 			///	- FORBIDDEN : it is impossible to book a seat on the service
 			///	- COMPULSORY : it is impossible to use the service without having booked a seat
-			///	- OPTIONAL : is is possible to book a place on the service, but it is possible to use 
+			///	- OPTIONAL : is is possible to book a place on the service, but it is possible to use
 			///   the service without having booked a seat
-			///	- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked 
+			///	- MIXED_BY_DEPARTURE_PLACE : it is impossible to use the service without having booked
 			///   a place, except for journeys beginning at several places, defined in the path.
 			typedef enum {
 				RESERVATION_RULE_FORBIDDEN = 0,
@@ -91,14 +91,14 @@ namespace synthese
 				/// Default fare
 				const Fare*	_defaultFare;
 			//@}
-				
+
 			//! @name Reservation
 			//@{
 				////
 				/// Type of the reservation rule.
 				ReservationRuleType		_reservationType;
 
-			
+
 				////
 				/// Whether reference departure time is the line run departure time at its origin (true)
 				/// or client departure time (false).
@@ -112,12 +112,12 @@ namespace synthese
 
 				boost::posix_time::time_duration _hourDeadLine; //!< Latest reservation hour the last day open for reservation
 
-				bool _forbiddenInDepartureBoards; 
-				bool _forbiddenInTimetables; 
+				bool _forbiddenInDepartureBoards;
+				bool _forbiddenInTimetables;
 				bool _forbiddenInJourneyPlanning;
 			//@}
-			
-			
+
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
@@ -129,7 +129,7 @@ namespace synthese
 			PTUseRule(
 				util::RegistryKeyType key = 0
 			);
-			
+
 			//! @name Getters
 			//@{
 				virtual AccessCapacity	getAccessCapacity()	const { return _accessCapacity; }
@@ -144,7 +144,7 @@ namespace synthese
 				bool getForbiddenInTimetables ()		const { return _forbiddenInTimetables; }
 				bool getForbiddenInJourneyPlanning ()	const { return _forbiddenInJourneyPlanning; }
 			//@}
-			
+
 			//! @name Setters
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -184,7 +184,7 @@ namespace synthese
 
 						- The smallest date time is chosen.
 
-					If no explicit rule defines the reservation dead line, 
+					If no explicit rule defines the reservation dead line,
 					the actual reservation time is returned.
 				*/
 				virtual boost::posix_time::ptime getReservationDeadLine (
@@ -197,22 +197,22 @@ namespace synthese
 				/** Reference function for calculation of the date time of the opening of reservations.
 					@param reservationTime Time when booking is done.
 					@return The minimum date time to make a reservation.
-				
+
 					If no explicit rule defines this minimum time, the actual reservation time is returned.
 				*/
-				virtual boost::posix_time::ptime getReservationOpeningTime ( 
+				virtual boost::posix_time::ptime getReservationOpeningTime (
 					const graph::ServicePointer& servicePointer
 				) const;
-				
-				
-				
-				/** Indicates whether or not a path can be taken at a given date, 
+
+
+
+				/** Indicates whether or not a path can be taken at a given date,
 					taking into account reservation delay rules.
 					@return true if the line run can be taken, false otherwise.
 
 					This methods checks the following conditions :
 						- if reservation is not compulsory, the run can be taken.
-						- if reservation is compulsory, reservation time must precede reservation 
+						- if reservation is compulsory, reservation time must precede reservation
 					dead line and be after reservation opening time.
 				*/
 				virtual RunPossibilityType isRunPossible (

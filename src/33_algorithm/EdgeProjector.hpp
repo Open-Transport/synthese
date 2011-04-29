@@ -106,7 +106,7 @@ namespace synthese
 			) const;
 
 
-		   
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets all relevant projections.
 			/// @param pt point to project

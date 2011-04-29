@@ -73,13 +73,13 @@ namespace synthese
 					- no show : date of the theorical departure
 					- other : nothing
 				- reservation id
-					
+
 		*/
 		class ResaDBLog:
 			public dblog::DBLogTemplate<ResaDBLog>
 		{
 		public:
-		
+
 			typedef enum
 			{
 				CALL_ENTRY = 10,
@@ -113,26 +113,26 @@ namespace synthese
 
 			std::string getName() const;
 			DBLog::ColumnsVector getColumnNames() const;
-			
+
 			virtual std::string getObjectName(
 				util::RegistryKeyType id,
 				const server::Request& searchRequest
 			) const;
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Object 1 column name getter.
 			/// If empty result, then the column is not displayed (default behavior).
 			virtual std::string getObjectColumnName() const;
 
 
-			
+
 			virtual DBLog::ColumnsVector parse(
 				const dblog::DBLogEntry& entry,
 				const server::Request& searchRequest
 			) const;
 
 			static util::RegistryKeyType AddCallEntry(const security::User* user);
-			
+
 			static void AddCallInformationEntry(
 				const dblog::DBLogEntry& callEntry,
 				const ResaDBLog::_EntryType& type,

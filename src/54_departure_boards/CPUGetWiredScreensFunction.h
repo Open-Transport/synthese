@@ -40,12 +40,12 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2009
 		/// @ingroup m54Functions refFunctions
-		/// 
+		///
 		/// This function returns informations about the display screen wired
 		/// to the specified CPU.
 		///
 		/// The response follows a light XML schema :
-		/// 
+		///
 		///	@code
 		/// <?xml version='1.0' encoding='UTF-8'?>
 		/// <displayScreens>
@@ -53,7 +53,7 @@ namespace synthese
 		/// </displayScreens>
 		/// @endcode
 		///
-		/// This function is also in charge of keeping the contact between the 
+		/// This function is also in charge of keeping the contact between the
 		/// cpu and the server. It writes a fake monitoring entry in the database
 		/// indicating that the cpu is still alive.
 		///

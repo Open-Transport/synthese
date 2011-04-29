@@ -45,7 +45,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<DBLogEntry>	Registry;
 
-			typedef enum 
+			typedef enum
 			{
 				DB_LOG_UNKNOWN = 0
 				, DB_LOG_OK = 5

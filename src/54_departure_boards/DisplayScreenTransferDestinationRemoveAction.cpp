@@ -42,7 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenTransferDestinationRemoveAction>::FACTORY_KEY("DisplayScreenTransferDestinationRemoveAction");
@@ -53,8 +53,8 @@ namespace synthese
 		const string DisplayScreenTransferDestinationRemoveAction::PARAMETER_DISPLAY_SCREEN_ID = Action_PARAMETER_PREFIX + "ds";
 		const string DisplayScreenTransferDestinationRemoveAction::PARAMETER_TRANSFER_PLACE_ID = Action_PARAMETER_PREFIX + "tp";
 		const string DisplayScreenTransferDestinationRemoveAction::PARAMETER_DESTINATION_PLACE_ID = Action_PARAMETER_PREFIX + "dp";
-		
-		
+
+
 		ParametersMap DisplayScreenTransferDestinationRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -68,9 +68,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenTransferDestinationRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -88,9 +88,9 @@ namespace synthese
 				throw ActionException("Transfer place not found");
 			}
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenTransferDestinationRemoveAction::run(Request& request)
 		{
 			// Action
@@ -109,9 +109,9 @@ namespace synthese
 				*request.getUser()
 			);
 		}
-		
-		
-		
+
+
+
 		bool DisplayScreenTransferDestinationRemoveAction::isAuthorized(const Session* session
 		) const {
 			assert(_screen.get() != NULL);

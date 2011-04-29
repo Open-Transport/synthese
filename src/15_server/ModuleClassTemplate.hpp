@@ -41,7 +41,7 @@ namespace synthese
 		{
 		public:
 			static const std::string NAME;
-		
+
 		protected:
 			virtual void preInit() const { PreInit(); }
 			virtual void init() const { Init(); }
@@ -54,14 +54,14 @@ namespace synthese
 				Must be implemented for each instantiation.
 			*/
 			static void PreInit();
-			
+
 			/** Second step of initialization of the module.
 				This method is launched after PreInit is launched for each module.
 				Must be implemented for each instantiation.
 			*/
 			static void Init();
-			
-			
+
+
 			/** Ending of the module.
 				This method is launched when the server stops.
 				Must be implemented for each instantiation.

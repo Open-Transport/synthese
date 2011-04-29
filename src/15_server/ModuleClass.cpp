@@ -28,7 +28,7 @@
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace server
 	{
 	    std::map<std::string, ModuleClass::PtrCallback> ModuleClass::_Callbacks;
@@ -43,7 +43,7 @@ namespace synthese
 	    }
 
 
-		
+
 		bool ModuleClass::HasParameter(
 			const std::string& name
 		){
@@ -57,7 +57,7 @@ namespace synthese
 			const std::string& name,
 			const std::string defaultValue
 		){
-			Parameters::const_iterator it = 
+			Parameters::const_iterator it =
 				_Parameters.find (name);
 			if (it == _Parameters.end ()) return defaultValue;
 			return it->second;
@@ -71,12 +71,12 @@ namespace synthese
 			bool runCallback
 		){
 			_Parameters[name] = value;
-			
+
 			Log::GetInstance ().info ("Parameter " + name + " set to : " + value);
-		
+
 			if (runCallback)
 			{	// Launches corresponding callback (only one allowed right now)
-				std::map<std::string, PtrCallback>::const_iterator it = 
+				std::map<std::string, PtrCallback>::const_iterator it =
 					_Callbacks.find (name);
 				if (it == _Callbacks.end ()) return;
 				PtrCallback cb = it->second;
@@ -95,11 +95,11 @@ namespace synthese
 			if (HasParameter (name) == false)
 			{
 				std::string defv (defaultValue);
-				Parameters::const_iterator it = 
+				Parameters::const_iterator it =
 				_DefaultParameters.find (name);
-	
+
 				if (it != _DefaultParameters.end ()) defv = it->second;
-	
+
 				SetParameter (name, defv);
 			}
 	    }

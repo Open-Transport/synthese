@@ -41,7 +41,7 @@ namespace synthese
 		class Alarm;
 
 		/** Message content update action class.
-	
+
 			This action updates :
 				- alarm type
 				- alarm texts
@@ -83,7 +83,7 @@ namespace synthese
 			) throw(server::ActionException);
 
 
-						
+
 			////////////////////////////////////////////////////////////////////
 			///	Alarm setter.
 			///	@param id ID of the alarm

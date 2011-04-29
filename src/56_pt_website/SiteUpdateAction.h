@@ -37,7 +37,7 @@ namespace synthese
 	{
 		class Interface;
 	}
-	
+
 	namespace cms
 	{
 	    class Webpage;
@@ -46,7 +46,7 @@ namespace synthese
 	namespace pt_website
 	{
 		class TransportWebsite;
-	
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : Transport web site update.
 		/// @ingroup m56Actions refActions
@@ -108,7 +108,7 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			SiteUpdateAction();
 
 			void setSiteId(util::RegistryKeyType id);

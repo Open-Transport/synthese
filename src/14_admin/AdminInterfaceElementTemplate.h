@@ -44,7 +44,7 @@ namespace synthese
 				: util::FactorableTemplate<AdminInterfaceElement, T>()
 			{
 			}
-			
+
 			virtual std::string getIcon() const { return ICON; }
 			virtual std::string getTitle() const { return DEFAULT_TITLE; }
 

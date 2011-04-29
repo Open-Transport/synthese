@@ -40,11 +40,11 @@ namespace synthese
 	{
 		class Registrable;
 	}
-	
+
 	namespace pt
 	{
 		class CommercialLine;
-			
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Trident/Chouette file format.
 		/// @ingroup m35File refFile
@@ -111,7 +111,7 @@ namespace synthese
 		///	</ul>
 		///
 		/// @image html line-conflict-type.png
-		/// 
+		///
 		/// <h4>Propriétés additionnelles du service</h4>
 		///
 		/// <ul>
@@ -207,7 +207,7 @@ namespace synthese
 		///
 		/// <h4>Horaire d'exploitation</h4>
 		///
-		/// Les horaires fournis à chaque franchissement d'arrêt peuvent provenir de l'exploitation (source logiciel métier) ou être interpolées. Dans certains cas il peut être utile de savoir d'où provient l'horaire. 
+		/// Les horaires fournis à chaque franchissement d'arrêt peuvent provenir de l'exploitation (source logiciel métier) ou être interpolées. Dans certains cas il peut être utile de savoir d'où provient l'horaire.
 		///
 		/// <ul>
 		///		<li>Oui/Non</li>
@@ -250,7 +250,7 @@ namespace synthese
 
 				static std::string GetCoordinate(const double value);
 
-				
+
 			public:
 				static const std::string PARAMETER_IMPORT_STOPS;
 				static const std::string PARAMETER_IMPORT_JUNCTIONS;
@@ -263,7 +263,7 @@ namespace synthese
 					util::Env& env,
 					const impex::DataSource& dataSource
 				);
-			
+
 
 				//! @name Setters
 				//@{
@@ -337,7 +337,7 @@ namespace synthese
 				static const std::string PARAMETER_LINE_ID;	//!< Commercial line id parameter
 				static const std::string PARAMETER_WITH_TISSEO_EXTENSION;	//!< With tisseo extension parameter
 				static const std::string PARAMETER_WITH_OLD_DATES;
-			
+
 			private:
 				//! @name Export parameters
 				//@{

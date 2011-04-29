@@ -71,17 +71,17 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _displayTemplate;
 				boost::shared_ptr<const cms::Webpage> _dateDisplayTemplate;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
@@ -90,8 +90,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -107,9 +107,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

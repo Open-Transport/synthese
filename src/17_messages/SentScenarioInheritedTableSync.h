@@ -55,7 +55,7 @@ namespace synthese
 				BROADCAST_DRAFT
 			} StatusSearch;
 
-			
+
 
 			/** Sent scenario search.
 				@param name Name of the template scenario
@@ -65,7 +65,7 @@ namespace synthese
 					- BROADCAST_RUNNING_WITH_END : startDate in past or unknown + endTime in future + activated
 					- BROADCAST_RUNNING_WITHOUT_END : startDate in past or unknown + endTime unknown + activated,
 					- FUTURE_BROADCAST : startDate in future + activated,
-					- BROADCAST_DRAFT : endDate in future or unknown + not activated 
+					- BROADCAST_DRAFT : endDate in future or unknown + not activated
 				@param first First Scenario object to answer
 				@param number Number of Scenario objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
 				@author Hugues Romain
@@ -89,20 +89,20 @@ namespace synthese
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
 
-			
+
 			static void CopyMessagesFromTemplate(
 				util::RegistryKeyType sourceId,
 				const SentScenario& dest
 			);
-		
-		
+
+
 			static void CopyMessagesFromOther(
 				util::RegistryKeyType sourceId,
 				const SentScenario& dest
 			);
 
-			
-			
+
+
 			/** Rewrites the messages of a sent scenario considering the values of the variables.
 				@param scenario sent scenario to rewrite
 				@author Hugues Romain

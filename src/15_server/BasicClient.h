@@ -17,14 +17,14 @@ namespace synthese
 		class BasicClient
 		{
 		private:
-		    
+
 		    const std::string _serverHost;      //!< Server host.
 			const std::string _serverPort;              //!< Server port.
 		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
 			const bool	_outputHTTPHeaders;
-		    
+
 		public:
-		    
+
 		    BasicClient (
 				const std::string& serverHost,
 				const std::string serverPort = "8080",
@@ -40,7 +40,7 @@ namespace synthese
 		     * @param clientURL : Client URL for link generation (only relevant in a CGI context)
 
 
-			 
+
 			 // Copyright (c) 2003-2008 Christopher M. Kohlhoff (chris at kohlhoff dot com)
 			 //
 			 // Distributed under the Boost Software License, Version 1.0. (See accompanying
@@ -51,11 +51,11 @@ namespace synthese
 
 		     */
 		    void request(
-				std::ostream& out, 
+				std::ostream& out,
 				const std::string& request
 			);
 
-		    
+
 		};
 	}
 }

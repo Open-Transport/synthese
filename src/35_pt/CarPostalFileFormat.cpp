@@ -66,8 +66,8 @@ namespace synthese
 	using namespace calendar;
 	using namespace server;
 	using namespace html;
-	
-	
+
+
 
 	namespace util
 	{
@@ -76,7 +76,7 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string CarPostalFileFormat::Importer_::FILE_BITFELD("2bitfeld"); 
+		const std::string CarPostalFileFormat::Importer_::FILE_BITFELD("2bitfeld");
 		const std::string CarPostalFileFormat::Importer_::FILE_ECKDATEN("1eckdaten");
 		const std::string CarPostalFileFormat::Importer_::FILE_ZUGUDAT("1zugudat");
 	}
@@ -103,8 +103,8 @@ namespace synthese
 			return true;
 		}
 
-		
-		
+
+
 		DBTransaction CarPostalFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
@@ -188,7 +188,7 @@ namespace synthese
 						if((c >= '0') && (c <= '9')) bits = (c - '0');
 						else if((c >= 'A') && (c <= 'F')) bits = (c - 'A' + 10);
 						else if((c >= 'a') && (c <= 'f')) bits = (c - 'a' + 10);
-						
+
 						for(int i(0); i<4; ++i)
 						{
 							if(!first || i>=2)
@@ -301,7 +301,7 @@ namespace synthese
 									isDeparture,
 									isArrival
 							)	);
-							
+
 							arrivals.push_back(
 								isArrival ?
 								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2))) :

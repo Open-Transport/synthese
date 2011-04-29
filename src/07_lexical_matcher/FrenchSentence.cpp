@@ -39,9 +39,9 @@ namespace synthese
 	{
 		FrenchSentence::FrenchSentence()
 		{}
-		
-		
-		
+
+
+
 		FrenchSentence::FrenchSentence(
 			const std::string& source
 		):	_source(source)
@@ -53,12 +53,12 @@ namespace synthese
 			{
 				string aliasedWord(_ConvertAlias(word));
 				if(aliasedWord.empty()) continue;
-				
+
 				_words.push_back(FrenchPhoneticString(aliasedWord));
 			}
 		}
-		
-		
+
+
 		string	FrenchSentence::_ConvertAlias(const std::string& ssource)
 		{
 			string source(to_lower_copy(ssource));
@@ -122,24 +122,24 @@ namespace synthese
 			{
 				return "saint";
 			}
-			
+
 			if(	source == "ste")
 			{
 				return "sainte";
 			}
-			
+
 			if(source == "pl")
 			{
 				return "place";
 			}
-			
+
 			if(	source == "chu" ||
 				source == "chr" ||
 				source == "clinique"
 			){
 				return "hôpital";
 			}
-			
+
 			if(	source == "a" ||
 				source == "au" ||
 				source == "d" ||
@@ -156,41 +156,41 @@ namespace synthese
 			){
 				return string();
 			}
-			
+
 			if(	source == "faculté" ||
 				source == "fac" ||
 				source == "faculte"
 			){
 				return "université";
 			}
-				
+
 			return source;
 		}
-		
-		
-		
+
+
+
 		const std::string& FrenchSentence::getSource() const
 		{
 			return _source;
 		}
-		
-		
-		
+
+
+
 		FrenchSentence::ComparisonScore FrenchSentence::compare(
 			const FrenchSentence& s
 		) const {
 			typedef map<size_t, pair<size_t, double> > Relations;
-			
+
 			Relations othersToThis;
 			Relations thisToOthers;
-			
+
 			// Storage of scores by words
 			for(size_t i(0); i<_words.size(); ++i)
 			{
 				if(_words[i].getPhonetic().empty()) continue;
 
 				double bestScore(0);
-				
+
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
 					if(s._words[j].getPhonetic().empty()) continue;
@@ -289,7 +289,7 @@ namespace synthese
 		{
 			return _source < s._source;
 		}
-		
+
 		bool FrenchSentence::operator==(const FrenchSentence& s) const
 		{
 			return _source == s._source;

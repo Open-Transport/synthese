@@ -39,14 +39,14 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	
+
 namespace map
 {
 
 
 DrawableLineComparator::DrawableLineComparator(
-    const DrawableLine* reference, 
-    const Coordinate& referencePoint, 
+    const DrawableLine* reference,
+    const Coordinate& referencePoint,
     const Coordinate& point)
     : _reference (reference)
     , _referencePoint (referencePoint)
@@ -61,13 +61,13 @@ DrawableLineComparator::~DrawableLineComparator()
 }
 
 
-int 
-DrawableLineComparator::firstIndexOf (const Coordinate& point, 
+int
+DrawableLineComparator::firstIndexOf (const Coordinate& point,
 				      const std::vector<Coordinate>& points) const
 {
     for (unsigned int i=0; i<points.size (); ++i)
     {
-	if (points[i] == point) return i;	 	
+	if (points[i] == point) return i;
     }
     return -1;
 }
@@ -75,25 +75,25 @@ DrawableLineComparator::firstIndexOf (const Coordinate& point,
 
 
 
-void 
+void
 DrawableLineComparator::setPoint (const Coordinate& point)
 {
-    _point = point;	
+    _point = point;
 }
 
 
 /*
 double
 DrawableLineComparator::calculateStartAngleAtIndex (
-    const std::vector<const Coordinate*>& points, 
+    const std::vector<const Coordinate*>& points,
     int index) const
 {
     if (index+2 >= (int) points.size ()) return -1;
-    
+
     const Coordinate* vs0_1 = (const Coordinate*) points[index];
     const Coordinate* vs1_1 = (const Coordinate*) points[index + 1];
     const Coordinate* vs2_1 = (const Coordinate*) points[index + 2];
-    
+
     double angle = calculateAngle (*vs0_1, *vs1_1, *vs2_1);
     if (angle < 0) angle += 2*M_PI;
     return angle;
@@ -104,15 +104,15 @@ DrawableLineComparator::calculateStartAngleAtIndex (
 
 double
 DrawableLineComparator::calculateEndAngleAtIndex (
-    const std::vector<const Coordinate*>& points, 
+    const std::vector<const Coordinate*>& points,
     int index) const
 {
     if (index < 2) return -1;
-    
+
     const Coordinate* vs0_1 = (const Coordinate*) points[index - 2];
     const Coordinate* vs1_1 = (const Coordinate*) points[index - 1];
     const Coordinate* vs2_1 = (const Coordinate*) points[index];
-    
+
     double angle = calculateAngle (*vs0_1, *vs1_1, *vs2_1);
     if (angle < 0) angle += 2*M_PI;
     return angle;
@@ -123,15 +123,15 @@ DrawableLineComparator::calculateEndAngleAtIndex (
 
 double
 DrawableLineComparator::calculateStartAngleAtIndex (
-    const std::vector<Coordinate>& points, 
+    const std::vector<Coordinate>& points,
     int index) const
 {
     if (index+2 >= (int) points.size ()) return -1;
-    
+
     const Coordinate& vs0_1 = points[index];
     const Coordinate& vs1_1 = points[index + 1];
     const Coordinate& vs2_1 = points[index + 2];
-    
+
     double angle = calculateAngle (vs0_1, vs1_1, vs2_1);
     if (angle < 0) angle += 2*M_PI;
     return angle;
@@ -142,15 +142,15 @@ DrawableLineComparator::calculateStartAngleAtIndex (
 
 double
 DrawableLineComparator::calculateEndAngleAtIndex (
-    const std::vector<Coordinate>& points, 
+    const std::vector<Coordinate>& points,
     int index) const
 {
     if (index < 2) return -1;
-    
+
     const Coordinate& vs0_1 = points[index - 2];
     const Coordinate& vs1_1 = points[index - 1];
     const Coordinate& vs2_1 = points[index];
-    
+
     double angle = calculateAngle (vs0_1, vs1_1, vs2_1);
     if (angle < 0) angle += 2*M_PI;
     return angle;
@@ -184,7 +184,7 @@ DrawableLineComparator::calculateStartAngles (
 	p2_0 = calculateSymetric (points2[1], points2[0]);
 	p2_1 = points2[0];
 	p2_2 = points2[1];
-    } 
+    }
     else if ((index1 == -1) && (index2 != -1))
     {
 	p1_2 = points1[1];
@@ -212,21 +212,21 @@ DrawableLineComparator::calculateStartAngles (
 
 
     }
-    else 
+    else
     {
 	p1_0 = points1[index1];
 	p1_1 = points1[index1+1];
 
-	if (index1+2 >= points1.size ()) 
-	{    
+	if (index1+2 >= points1.size ())
+	{
 	    if (index2+2 < points2.size ())
 	    {
 		p2_2 = points2[index2+2];
 		p1_2 = p2_2;
-	    } 
+	    }
 	    else
 	    {
-		p1_2 = calculateSymetric (points1[index1], 
+		p1_2 = calculateSymetric (points1[index1],
 					  points1[index1+1]);
 	    }
 	}
@@ -238,8 +238,8 @@ DrawableLineComparator::calculateStartAngles (
 	p2_0 = points2[index2];
 	p2_1 = points2[index2+1];
 
-	// p2_2 = (index1+2 >= points1.size ()) ? 
-	p2_2 = (index2+2 >= points2.size ()) ? 
+	// p2_2 = (index1+2 >= points1.size ()) ?
+	p2_2 = (index2+2 >= points2.size ()) ?
 	    p1_2
 	    : points2[index2+2];
 
@@ -285,7 +285,7 @@ DrawableLineComparator::calculateEndAngles (const std::vector<Coordinate>& point
 	p2_0 = points2[index2-2];
 	p2_1 = points2[index2-1];
 	p2_2 = calculateSymetric (p2_0, p2_1);
-    } 
+    }
     else if ((index1 == points1.size ()) && (index2 < points2.size ()))
     {
 	p2_2 = points2[index2];
@@ -310,7 +310,7 @@ DrawableLineComparator::calculateEndAngles (const std::vector<Coordinate>& point
 	p1_1 = points1[index1-1];
 
     }
-    else 
+    else
     {
 	if (index1-2 < 0)
 	{
@@ -321,7 +321,7 @@ DrawableLineComparator::calculateEndAngles (const std::vector<Coordinate>& point
 	    }
 	    else
 	    {
-		p1_0 = calculateSymetric (points1[index1], 
+		p1_0 = calculateSymetric (points1[index1],
 					  points1[index1-1]);
 	    }
 	}
@@ -332,7 +332,7 @@ DrawableLineComparator::calculateEndAngles (const std::vector<Coordinate>& point
 	p1_1 = points1[index1-1];
 	p1_2 = points1[index1];
 
-	p2_0 = (index2-2 < 0) ? 
+	p2_0 = (index2-2 < 0) ?
 	    p1_0
 	    : points2[index2-2];
 	p2_1 = points2[index2-1];
@@ -357,9 +357,9 @@ DrawableLineComparator::calculateEndAngles (const std::vector<Coordinate>& point
 
 
 
-int 
-DrawableLineComparator::operator() (const DrawableLine* bl1, 
-				    const DrawableLine* bl2) const 
+int
+DrawableLineComparator::operator() (const DrawableLine* bl1,
+				    const DrawableLine* bl2) const
 {
 	// ********************************
 	// ***  !!!!  BIG WARNING !!!!  ***
@@ -372,21 +372,21 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     // std::cout << "Comparing " <<  bl1->getShortName () << " and " << bl2->getShortName () << std::endl;
 
     // Special case : the lines follow exactly reverse ways
-    if (bl1->isFullyReverseWay(bl2)) 
+    if (bl1->isFullyReverseWay(bl2))
     {
-	/* 
-	bool result = 1;	
+	/*
+	bool result = 1;
 	if (bl1->isReverseWayAt(_referencePoint, _reference)) result = !result;
 	return result;
 	*/
 //	std::cerr << ((long) bl1) << " < " << ((long) bl2) << " = " << 0 << std::endl;
 	return 0;
     }
-    
+
     // Special case : the lines follow exactly same ways
-    if (bl1->isFullySameWay(bl2)) 
+    if (bl1->isFullySameWay(bl2))
     {
-	/* 
+	/*
 	bool result = bl1->getShortName () > bl2->getShortName ();
 	if (bl1->isReverseWayAt(_referencePoint, _reference)) result = !result;
 	return result;
@@ -394,37 +394,37 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
 //	std::cerr << ((long) bl1) << " < " << ((long) bl2) << " = " << 0 << std::endl;
 	return 0;
     }
-    
+
     // TODO Other special cases to be handled...
     std::vector<Coordinate> points1 = bl1->getFuzzyfiedPoints ();
     std::vector<Coordinate> points2 = bl2->getFuzzyfiedPoints ();
-    
+
     int index1_1, index1_2, index2_1, index2_2;
-    
+
     bool mustReverseLine2 = bl2->isReverseWayAt (_point, bl1);
     if (mustReverseLine2) std::reverse (points2.begin (), points2.end ());
-    
+
     Coordinate curPoint = _point;
     index1_1 = firstIndexOf(curPoint, points1);
     index1_2 = firstIndexOf(curPoint, points2);
-    
+
     if ((index1_1 == -1) || (index1_2 == -1)) {
 /*	bool result = bl1->getShortName () > bl2->getShortName ();
 	if (bl1->isReverseWayAt(_referencePoint, _reference)) result = !result;
 	return result;*/
 	// std::cerr << ((long) bl1) << " < " << ((long) bl2) << " = " << 0 << std::endl;
-        return  0; 
+        return  0;
     }
-    
+
     while ((index1_2 >= 0) &&
 	   (index1_1 >= 0) &&
-	   (points1[index1_1] == curPoint)) 
+	   (points1[index1_1] == curPoint))
     {
 	--index1_2;
 	--index1_1;
 	if (index1_2 >=0) curPoint = points2[index1_2];
     }
-    
+
 
     std::pair<double,double> sangles = calculateStartAngles (
 	points1, index1_1,
@@ -434,11 +434,11 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
     curPoint = _point;
     index2_1 = firstIndexOf(curPoint, points1);
     index2_2 = firstIndexOf(curPoint, points2);
-    
+
     while (
 	   (index2_2 < (int) points2.size ()) &&
 	   (index2_1 < (int) points1.size ()) &&
-	   (points1[index2_1] == curPoint)) 
+	   (points1[index2_1] == curPoint))
     {
 	++index2_2;
 	++index2_1;
@@ -450,40 +450,40 @@ DrawableLineComparator::operator() (const DrawableLine* bl1,
 	points1, index2_1,
 	points2, index2_2);
 
-	
+
     bool result = true;
     double sangle1 = sangles.first; double sangle2 = sangles.second;
     double eangle1 = eangles.first; double eangle2 = eangles.second;
 
-    if ((sangle1 == sangle2) && (eangle1 == eangle2)) 
+    if ((sangle1 == sangle2) && (eangle1 == eangle2))
     {
 	// Replace angle calculation according to significant points
 	if (index1_1 == -1) sangle1 = M_PI;
 	if (index1_2 == -1) sangle2 = M_PI;
-	    
+
 	if (index2_1 == points2.size ()) eangle1 = M_PI;
 	if (index2_2 == points2.size ()) eangle2 = M_PI;
     }
 
 
-    if ((sangle1 <= sangle2) != (eangle1 <= eangle2)) 
+    if ((sangle1 <= sangle2) != (eangle1 <= eangle2))
     {
 	// std::cerr << ((long) bl1) << " < " << ((long) bl2) << " = " << 0 << std::endl;
 	return 0; // Considered equivalent.
-    } 
-    else 
+    }
+    else
     {
 	result = result && (sangle1 <= sangle2);
 	result = result && (eangle1 <= eangle2);
     }
 
     if (_reference->isReverseWayAt (_referencePoint, bl1)) result = !result;
-	
+
     // return 0;
     // std::cerr << ((long) bl1) << " < " << ((long) bl2) << " = " << result << std::endl;
     return result;
-	
-}		
+
+}
 
 
 

@@ -42,7 +42,7 @@ namespace synthese
 
 			Usage :
 			@code {{parse_display_return <text>}} @endcode
-			
+
 			The parameters of the elements are :
 				-# The text to parse
 

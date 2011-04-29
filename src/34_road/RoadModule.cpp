@@ -39,7 +39,7 @@ namespace synthese
 	using namespace server;
 	using namespace geography;
 	using namespace lexical_matcher;
-	
+
 
 
 	namespace graph
@@ -56,15 +56,15 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<RoadModule>::NAME("Voirie");
-		
+
 		template<> void ModuleClassTemplate<RoadModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<RoadModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<RoadModule>::End()
 		{
 		}
@@ -179,7 +179,7 @@ namespace synthese
 				return result;
 			}
 
-			
+
 			vector<string> words;
 			split(words, placeName, is_any_of(", "));
 			if(words.size() > 1)

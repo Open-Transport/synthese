@@ -50,7 +50,7 @@ namespace synthese
 			 - day
 			 - hours (TIME_UNKNOWN = do not display hour)
 			 - minutes
-			 - day of week  : 0 = sunday, 1 = monday, ..., 6 = saturday 
+			 - day of week  : 0 = sunday, 1 = monday, ..., 6 = saturday
 		*/
 		class DateTimeInterfacePage
 		{

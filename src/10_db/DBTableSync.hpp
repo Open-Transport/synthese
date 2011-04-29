@@ -52,7 +52,7 @@ namespace synthese
 
 		/// @defgroup refLS Table synchronizers.
 		///	@ingroup ref
-	
+
 		////////////////////////////////////////////////////////////////////
 		/// Interface for a table synchronizer.
 		///	By convention, the table name must always start with the t letter
@@ -74,8 +74,8 @@ namespace synthese
 			{
 				std::string	name;
 				FieldType	type;
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Field constructor.
 				///	@param nameA name of the field
@@ -87,8 +87,8 @@ namespace synthese
 					const FieldType typeA = SQL_TEXT
 				);
 
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Tests if the field is empty.
 				///	@return bool true if the field is empty
@@ -126,7 +126,7 @@ namespace synthese
 				///	@date 2008
 				///
 				/// There is 3 ways to build an index :
-				///		- empty index : use it to mark the end of the CreateIndexes 
+				///		- empty index : use it to mark the end of the CreateIndexes
 				///		  parameters : do not provide any argument
 				///		- mono field index : the nameA parameter stores the name of
 				///		  the indexed field, the fieldsA parameter is empty
@@ -139,7 +139,7 @@ namespace synthese
 				);
 
 
-								
+
 				////////////////////////////////////////////////////////////////////
 				///	Empty index constructor.
 				///	@author Hugues Romain
@@ -147,8 +147,8 @@ namespace synthese
 				/// Can be used as mark to end an Index array.
 				Index();
 
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Tests if the index is empty.
 				///	@return bool true if the index is empty
@@ -202,7 +202,7 @@ namespace synthese
 
 
 		private:
-	
+
 		    std::vector<std::string> _selectOnCallbackColumns;
 
 		public:
@@ -219,15 +219,15 @@ namespace synthese
 				///	@date 2008
 				virtual const Format& getFormat() const = 0;
 
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Auto increment initializer.
 				///	@author Hugues Romain
 				///	@date 2008
 				virtual void initAutoIncrement() const = 0;
 
-				
+
 
 				////////////////////////////////////////////////////////////////////
 				///	Launch of the first synchronization between the tables and the
@@ -246,8 +246,8 @@ namespace synthese
 				virtual void firstSync(DB* db) const = 0;
 
 
-				
-				
+
+
 				////////////////////////////////////////////////////////////////////
 				///	Updates the schema of the tables at the program launch.
 				///	@param db
@@ -284,19 +284,19 @@ namespace synthese
 				) const = 0;
 			//@}
 
-			
+
 			virtual void rowsAdded(
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			) = 0;
 
 			virtual void rowsUpdated(
-				DB* db, 
+				DB* db,
 				const DBResultSPtr& rows
 			) = 0;
 
 			virtual void rowsRemoved(
-				DB* db, 
+				DB* db,
 				const RowIdList& rowIds
 			) = 0;
 

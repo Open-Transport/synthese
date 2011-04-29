@@ -93,15 +93,15 @@ namespace synthese
 			setParentPath(static_cast<Path*>(line));
 		}
 
-		
-		
+
+
 		bool LineStop::isDepartureAllowed() const
 		{
 			return _isDeparture;
 		}
-		
-		
-		
+
+
+
 		bool LineStop::isArrivalAllowed() const
 		{
 			return _isArrival;

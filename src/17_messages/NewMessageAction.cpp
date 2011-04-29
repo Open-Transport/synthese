@@ -46,7 +46,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace security;
-	
+
 	template<> const string util::FactorableTemplate<Action, messages::NewMessageAction>::FACTORY_KEY("nmes");
 
 	namespace messages
@@ -75,8 +75,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		void NewMessageAction::run(
 			Request& request
 		) throw(ActionException) {
@@ -84,9 +84,9 @@ namespace synthese
 			{
 				AlarmTemplate alarm(0, _scenarioTemplate.get());
 				AlarmTableSync::Save(&alarm);
-				
+
 				request.setActionCreatedId(alarm.getKey());
-				
+
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,
 					*_scenarioTemplate,
@@ -96,11 +96,11 @@ namespace synthese
 			else
 			{
 				SentAlarm alarm(0, _sentScenario.get());
-					
+
 				AlarmTableSync::Save(&alarm);
-				
+
 				request.setActionCreatedId(alarm.getKey());
-			
+
 				MessagesLog::AddNewScenarioMessageEntry(
 					alarm,
 					*_sentScenario,

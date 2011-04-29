@@ -35,7 +35,7 @@ namespace synthese
 {
 	namespace util
 	{
-		
+
 		RGBColor::RGBColor (const std::string& colorName)
 		{
 			// If color name starts with '(' we expect
@@ -45,16 +45,16 @@ namespace synthese
 				typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
 				boost::char_separator<char> sep(",()");
 				tokenizer tokens(colorName, sep);
-		
+
 				tokenizer::iterator tok_iter = tokens.begin();
 				std::string rs = *(tok_iter); ++tok_iter;
 				std::string gs = *(tok_iter); ++tok_iter;
 				std::string bs = *(tok_iter);
-		
+
 				r = lexical_cast<int>(rs) / 255.0;
 				g = lexical_cast<int>(gs) / 255.0;
 				b = lexical_cast<int>(bs) / 255.0;
-		
+
 			} else if (colorName == "blue") {
 			r = 0; g = 0; b = 255;
 			} else if (colorName == "red") {
@@ -74,12 +74,12 @@ namespace synthese
 			}
 			throw Exception();
 		}
-		
+
 		bool RGBColor::operator == (const RGBColor& op2 ) const
 		{
 			return (r == op2.r) && (g == op2.g) && (b == op2.b);
 		}
-		
+
 		std::string RGBColor::toString() const
 		{
 			stringstream s;
@@ -95,7 +95,7 @@ namespace synthese
 			s << "#";
 			s << setw(2) << setfill('0');
 			s << hex << r << g << b;
-			return s.str();			
+			return s.str();
 		}
 
 

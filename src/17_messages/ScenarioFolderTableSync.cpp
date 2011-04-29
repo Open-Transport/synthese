@@ -45,7 +45,7 @@ namespace synthese
 	using namespace util;
 	using namespace messages;
 	using namespace security;
-	
+
 
 	namespace util
 	{
@@ -71,7 +71,7 @@ namespace synthese
 			DBTableSync::Field(ScenarioFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioFolderTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""),
@@ -132,7 +132,7 @@ namespace synthese
 		){
 			Env env;
 			ScenarioTemplateInheritedTableSync::Search(
-				env, 
+				env,
 				object_id,
 				string(),
 				NULL,
@@ -172,9 +172,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace messages
 	{
 		ScenarioFolderTableSync::SearchResult ScenarioFolderTableSync::Search(

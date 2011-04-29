@@ -38,7 +38,7 @@ namespace synthese
 	using namespace util;
 
 	template<> const string util::FactorableTemplate<Action, security::DeleteRightAction>::FACTORY_KEY("dra");
-	
+
 	namespace security
 	{
 		const string DeleteRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
@@ -73,7 +73,7 @@ namespace synthese
 
 			string rightCode(map.get<string>(PARAMETER_RIGHT));
 			string parameter(map.get<string>(PARAMETER_PARAMETER));
-			
+
 			_right = _profile->getRight(rightCode, parameter);
 			if (!_right.get())
 				throw ActionException("Specified right not found");
@@ -94,8 +94,8 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 		}
-		
-		
+
+
 		void DeleteRightAction::setProfile(boost::shared_ptr<const Profile> value)
 		{
 			_profile = const_pointer_cast<Profile>(value);

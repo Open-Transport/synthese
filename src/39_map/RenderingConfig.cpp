@@ -27,8 +27,8 @@ RenderingConfig::~RenderingConfig ()
 }
 
 
-	
-bool 
+
+bool
 RenderingConfig::getEnableCurves () const
 {
     return _enableCurves;
@@ -36,7 +36,7 @@ RenderingConfig::getEnableCurves () const
 
 
 
-void 
+void
 RenderingConfig::setEnableCurves (bool enableCurves)
 {
     _enableCurves = enableCurves;
@@ -44,28 +44,28 @@ RenderingConfig::setEnableCurves (bool enableCurves)
 
 
 
-double 
+double
 RenderingConfig::getRadius () const
 {
     return _radius;
 }
 
 
-void 
+void
 RenderingConfig::setRadius (double radius)
 {
     _radius = radius;
 }
 
 
-double 
+double
 RenderingConfig::getRadiusDelta () const
 {
     return _radiusDelta;
 }
 
 
-void 
+void
 RenderingConfig::setRadiusDelta (double radiusDelta)
 {
     _radiusDelta = radiusDelta;
@@ -74,28 +74,28 @@ RenderingConfig::setRadiusDelta (double radiusDelta)
 
 
 
-int 
+int
 RenderingConfig::getLineWidth () const
 {
     return _lineWidth;
 }
 
 
-void 
+void
 RenderingConfig::setLineWidth (int lineWidth)
 {
     _lineWidth = lineWidth;
 }
 
 
-double 
+double
 RenderingConfig::getSpacing () const
 {
     return _spacing;
 }
 
 
-void 
+void
 RenderingConfig::setSpacing (double spacing)
 {
     _spacing = spacing;
@@ -104,14 +104,14 @@ RenderingConfig::setSpacing (double spacing)
 
 
 
-RGBColor 
+RGBColor
 RenderingConfig::getBorderColor () const
 {
     return _borderColor;
 }
 
 
-void 
+void
 RenderingConfig::setBorderColor (const RGBColor& borderColor)
 {
     _borderColor = borderColor;
@@ -119,14 +119,14 @@ RenderingConfig::setBorderColor (const RGBColor& borderColor)
 
 
 
-int 
+int
 RenderingConfig::getBorderWidth () const
 {
     return _borderWidth;
 }
 
 
-void 
+void
 RenderingConfig::setBorderWidth (int borderWidth)
 {
     _borderWidth = borderWidth;

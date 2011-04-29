@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace cms;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_website::SiteUpdateAction>::FACTORY_KEY("SiteUpdateAction");
@@ -56,9 +56,9 @@ namespace synthese
 		const string SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL = Action_PARAMETER_PREFIX + "da";
 		const string SiteUpdateAction::PARAMETER_CLIENT_URL = Action_PARAMETER_PREFIX + "cu";
 		const string SiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID = Action_PARAMETER_PREFIX + "ti";
-		
-		
-		
+
+
+
 		SiteUpdateAction::SiteUpdateAction()
 			: util::FactorableTemplate<Action, SiteUpdateAction>()
 			, _startDate(not_a_date_time)
@@ -66,9 +66,9 @@ namespace synthese
 			_displayRoadApproachDetail(true)
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap SiteUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -81,9 +81,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void SiteUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			setSiteId(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
@@ -112,9 +112,9 @@ namespace synthese
 				throw ActionException("No such page template");
 			}
 		}
-		
-		
-		
+
+
+
 		void SiteUpdateAction::run(Request& request)
 		{
 			_site->setName(_name);
@@ -141,7 +141,7 @@ namespace synthese
 			}
 			catch(...)
 			{
-				throw ActionException("No such site");	
+				throw ActionException("No such site");
 			}
 		}
 

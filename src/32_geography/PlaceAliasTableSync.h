@@ -46,7 +46,7 @@ namespace synthese
 			static const std::string COL_ALIASEDPLACEID;
 			static const std::string COL_CITYID;
 			static const std::string COL_ISCITYMAINCONNECTION;
-			
+
 			PlaceAliasTableSync();
 
 

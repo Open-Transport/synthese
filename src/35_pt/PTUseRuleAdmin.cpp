@@ -47,7 +47,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, PTUseRuleAdmin>::FACTORY_KEY("PTUseRuleAdmin");
@@ -66,7 +66,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTUseRuleAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -93,7 +93,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTUseRuleAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -122,7 +122,7 @@ namespace synthese
 				"Type de réservation",
 				t.getForm().getSelectInput(
 					PTUseRuleUpdateAction::PARAMETER_TYPE,
-					PTUseRule::GetTypesList(), 
+					PTUseRule::GetTypesList(),
 					optional<PTUseRule::ReservationRuleType>(_rule->getReservationType())
 			)	);
 			if(_rule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)

@@ -35,7 +35,7 @@ namespace synthese
 		HTMLList::HTMLList()
 			: _element(false)
 		{
-			
+
 		}
 
 		std::string HTMLList::closeElement()

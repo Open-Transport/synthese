@@ -53,7 +53,7 @@ namespace synthese
 		const string DRTAreaTableSync::COL_NAME("name");
 		const string DRTAreaTableSync::COL_STOPS("stops");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DRTAreaTableSync>::TABLE(
@@ -86,7 +86,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			object->setName(rows->getText(DRTAreaTableSync::COL_NAME));
-			
+
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				object->setStops(DRTAreaTableSync::UnserializeStops(rows->getText(DRTAreaTableSync::COL_STOPS), env));
@@ -146,9 +146,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		DRTAreaTableSync::SearchResult DRTAreaTableSync::Search(

@@ -42,7 +42,7 @@ namespace synthese
 				@param vel Parameters list to read
 			*/
 			void storeParameters(ValueElementList& vel);
-			
+
 			/* Displays the object.
 				@param stream Stream to write on
 				@param parameters Runtime parameters used in the internal parameters reading

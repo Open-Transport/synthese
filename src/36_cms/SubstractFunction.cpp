@@ -35,12 +35,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::SubstractFunction>::FACTORY_KEY("-");
-	
+
 	namespace cms
 	{
 		const string SubstractFunction::PARAMETER_LEFT("l");
 		const string SubstractFunction::PARAMETER_RIGHT("r");
-		
+
 		ParametersMap SubstractFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 		) const {
 			stream << (_left - _right);
 		}
-		
-		
-		
+
+
+
 		bool SubstractFunction::isAuthorized(
 			const Session* session
 		) const {

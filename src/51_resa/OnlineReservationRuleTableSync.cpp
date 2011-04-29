@@ -227,7 +227,7 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
+				<< " WHERE "
 				/// @todo Fill Where criteria
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				;

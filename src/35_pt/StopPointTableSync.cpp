@@ -269,7 +269,7 @@ namespace synthese
 	namespace pt
 	{
 		StopPointTableSync::SearchResult StopPointTableSync::Search(
-			Env& env, 
+			Env& env,
 			optional<RegistryKeyType> placeId,
 			optional<string> operatorCode,
 			bool orderByCityAndStopName,

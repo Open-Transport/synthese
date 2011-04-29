@@ -70,9 +70,9 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			CalendarTemplateAddAction();
-			
+
 			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}

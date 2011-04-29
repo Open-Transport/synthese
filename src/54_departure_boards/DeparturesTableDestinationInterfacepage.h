@@ -34,7 +34,7 @@ namespace synthese
 	{
 		class Request;
 	}
-	
+
 	namespace graph
 	{
 		class ServicePointer;
@@ -86,7 +86,7 @@ namespace synthese
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
-			
+
 			DeparturesTableDestinationInterfacepage();
 		};
 	}

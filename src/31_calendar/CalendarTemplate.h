@@ -37,7 +37,7 @@ namespace synthese
 	{
 		/** CalendarTemplate class.
 			@ingroup m19
-			
+
 			<h3>Calendar template category</h3>
 
 			@see CalendarTemplate::Category
@@ -104,11 +104,11 @@ namespace synthese
 			static std::string GetCategoryName(Category value);
 
 			typedef std::vector<std::pair<boost::optional<Category>, std::string> > CategoryList;
-			
+
 			static CategoryList GetCategoriesList();
 
 			typedef std::map<std::size_t, CalendarTemplateElement> Elements;
-			
+
 		private:
 			Elements	_elements;
 			std::string								_text;
@@ -124,22 +124,22 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Result calendar generation according to a mask.
 				/// @param mask the mask to apply on the template to compute the result
-				/// @return The result calendar object 
+				/// @return The result calendar object
 				Calendar	getResult(const Calendar& mask)	const;
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Result calendar generation.
 				/// This method can compute the result calendar only if the object is
 				/// limited (see CalendarTemplate::isLimited())
-				/// @return The result calendar object 
+				/// @return The result calendar object
 				/// @throws InfiniteCalendarException if the object is not limited
 				Calendar	getResult() const;
 
 				boost::gregorian::date	getMinDate() const;
 				boost::gregorian::date	getMaxDate() const;
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ namespace synthese
 			//@}
 
 			//! @name Setters
-			//@{ 
+			//@{
 				void	setText(const std::string& text);
 				void	setCategory(Category value);
 			//@}

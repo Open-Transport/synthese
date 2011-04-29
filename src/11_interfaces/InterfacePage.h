@@ -84,7 +84,7 @@ namespace synthese
 			//@{
 				Components			_components;
 			//@}
-			
+
 		protected:
 			////////////////////////////////////////////////////////////////////
 			/// Generic display method.

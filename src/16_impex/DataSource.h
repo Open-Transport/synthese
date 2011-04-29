@@ -61,11 +61,11 @@ namespace synthese
 		{
 		public:
 			// Typedefs
-			
+
 			/// Chosen registry class.
 			typedef util::Registry<DataSource> Registry;
 
-			
+
 		private:
 			// Attributes
 			std::string	_name;
@@ -73,14 +73,14 @@ namespace synthese
 			std::string _icon;
 			std::string	_charset;
 			const CoordinatesSystem* _coordinatesSystem;
-			
+
 		public:
 			/////////////////////////////////////////////////////////////////////
 			/// DataSource Constructor.
 			DataSource(
 				util::RegistryKeyType id = 0
 			);
-			
+
 			//! @name Getters
 			//@{
 				const std::string& getName() const { return _name; }
@@ -89,7 +89,7 @@ namespace synthese
 				const std::string& getCharset() const { return _charset; }
 				const CoordinatesSystem* getCoordinatesSystem() const { return _coordinatesSystem; }
 			//@}
-		
+
 			//! @name Setters
 			//@{
 				void setName(const std::string& value) { _name = value;	}
@@ -108,7 +108,7 @@ namespace synthese
 				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
 			//@}
-		
+
 			//! @name Static algorithms
 			//@{
 			//@}

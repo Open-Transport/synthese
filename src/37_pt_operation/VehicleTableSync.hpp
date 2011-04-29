@@ -53,11 +53,11 @@ namespace synthese
 				static const std::string COL_URL;
 				static const std::string COL_REGISTRATION_NUMBERS;
 			//@}
-			
+
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > VehiclesList;
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	Vehicle search.
 				///	@param env Environment to populate

@@ -91,7 +91,7 @@ namespace synthese
 				std::string close();
 
 
-			
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Generates the HTML code of a row opening.
 				/// @param value if defined and if the selectName parameter is defined for the table, then the row begins with a radio input which sends the specified value to the parameter named by selectName. If defined, the value must be a string.

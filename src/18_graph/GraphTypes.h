@@ -33,9 +33,9 @@ namespace synthese
 		typedef unsigned int GraphIdType;
 
 		typedef unsigned int UserClassCode;
-		
+
 		typedef unsigned int HubScore;
-		
+
 		const HubScore NO_TRANSFER_HUB_SCORE(0);
 		const HubScore MIN_HUB_SCORE(1);
 		const HubScore MAX_HUB_SCORE(100);

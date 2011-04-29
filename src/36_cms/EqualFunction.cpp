@@ -35,12 +35,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::EqualFunction>::FACTORY_KEY("=");
-	
+
 	namespace cms
 	{
 		const string EqualFunction::PARAMETER_L("l");
 		const string EqualFunction::PARAMETER_R("r");
-		
+
 		ParametersMap EqualFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -61,9 +61,9 @@ namespace synthese
 		) const {
 			stream << (_right == _left);
 		}
-		
-		
-		
+
+
+
 		bool EqualFunction::isAuthorized(
 			const Session* session
 		) const {

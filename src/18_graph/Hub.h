@@ -44,7 +44,7 @@ namespace synthese
 	{
 		class Vertex;
 		class VertexAccessMap;
-		
+
 		/** Generic hub interface.
 			@ingroup m18
 		*/
@@ -55,7 +55,7 @@ namespace synthese
 			//@{
 				virtual boost::posix_time::time_duration getMinTransferDelay(
 				) const = 0;
-				
+
 
 				virtual void getVertexAccessMap(
 					VertexAccessMap& result,
@@ -87,7 +87,7 @@ namespace synthese
 				///  - 1 : connection is possible, lowest score. This is the
 				///		default score of a hub
 				///  - 100 : maximum value for a score
-				/// @return the score of the hub				
+				/// @return the score of the hub
 				virtual HubScore getScore(
 				) const = 0;
 

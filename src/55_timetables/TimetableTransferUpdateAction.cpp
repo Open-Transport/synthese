@@ -37,7 +37,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableTransferUpdateAction>::FACTORY_KEY("TimetableTransferUpdateAction");
@@ -48,8 +48,8 @@ namespace synthese
 		const string TimetableTransferUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "id";
 		const string TimetableTransferUpdateAction::PARAMETER_TRANSFER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "tt";
 		const string TimetableTransferUpdateAction::PARAMETER_BEFORE = Action_PARAMETER_PREFIX + "be";
-		
-		
+
+
 		TimetableTransferUpdateAction::TimetableTransferUpdateAction():
 		_before(true)
 		{
@@ -72,13 +72,13 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableTransferUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_before = map.get<bool>(PARAMETER_BEFORE);
-			
+
 			try
 			{
 				_timetable = TimetableTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TIMETABLE_ID), *_env);
@@ -97,9 +97,9 @@ namespace synthese
 				throw ActionException("No such transfer timetable");
 			}
 		}
-		
-		
-		
+
+
+
 		void TimetableTransferUpdateAction::run(
 			Request& request
 		){
@@ -119,9 +119,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool TimetableTransferUpdateAction::isAuthorized(
 			const Session* session
 		) const {

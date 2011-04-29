@@ -54,7 +54,7 @@ namespace synthese
 				- 6 : afterCity
 				- 7 : beforeWholwStopName
 				- 8 : afterWholeStopName
-			
+
 			Object : ArrivalDepartureRow object
 
 		*/
@@ -68,7 +68,7 @@ namespace synthese
 			static const std::string TYPE_CHAR_26;
 			static const std::string TYPE_CHAR_26_OR_STATION_CITY_IF_NEW;
 			static const std::string TYPE_USE_INTERFACE;
-			
+
 
 		private:
 			boost::shared_ptr<interfaces::LibraryInterfaceElement> _firstIntermediatesStopsToDisplayVIE;

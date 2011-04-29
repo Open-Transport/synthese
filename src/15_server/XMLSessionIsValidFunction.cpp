@@ -40,7 +40,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,XMLSessionIsValidFunction>::FACTORY_KEY("XMLSessionIsValidFunction");
-	
+
 	namespace server
 	{
 		const string XMLSessionIsValidFunction::PARAMETER_SESSION_ID_TO_CONTROL("si");
@@ -49,7 +49,7 @@ namespace synthese
 		const string XMLSessionIsValidFunction::TAG_VALID_SESSION("validSession");
 		const string XMLSessionIsValidFunction::ATTR_ID("id");
 		const string XMLSessionIsValidFunction::ATTR_VALID("valid");
-		
+
 		ParametersMap XMLSessionIsValidFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -113,9 +113,9 @@ namespace synthese
 				;
 			}
 		}
-		
-		
-		
+
+
+
 		bool XMLSessionIsValidFunction::isAuthorized(const Session*) const
 		{
 			return true;

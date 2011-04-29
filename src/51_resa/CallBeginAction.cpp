@@ -35,7 +35,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::CallBeginAction>::FACTORY_KEY("CallBeginAction");
@@ -47,23 +47,23 @@ namespace synthese
 			: util::FactorableTemplate<Action, CallBeginAction>()
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap CallBeginAction::getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CallBeginAction::_setFromParametersMap(const ParametersMap& map)
 		{
 		}
-		
-		
-		
+
+
+
 		void CallBeginAction::run(Request& request)
 		{
 			ResaModule::CallOpen(request.getSession());

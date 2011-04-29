@@ -72,7 +72,7 @@ namespace synthese
 			ParametersMap map;
 			if (_interface.get())
 				map.insert(PARAMETER_INTERFACE, _interface->getKey());
-			
+
 			return map;
 		}
 

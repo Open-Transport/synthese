@@ -77,7 +77,7 @@ namespace synthese
 		const string AdminFunction::DATA_SUBTREE("subtree");
 		const string AdminFunction::DATA_VERSION("version");
 
-		
+
 		ParametersMap AdminFunction::_getParametersMap() const
 		{
 			ParametersMap result;
@@ -297,7 +297,7 @@ namespace synthese
 			{
 				pm.insert(DATA_ERROR_MESSAGE, *errorMessage);
 			}
-			
+
 			// title, icon, url
 			ExportAdminCompound(pm, request, compound);
 
@@ -447,10 +447,10 @@ namespace synthese
 		){
 			// icon
 			pm.insert(prefix + DATA_ICON, compound->getIcon());
-			
+
 			// title
 			pm.insert(prefix + DATA_TITLE, compound->getTitle());
-			
+
 			// url
 			AdminRequest r(request, true);
 			r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(compound));

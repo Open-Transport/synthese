@@ -71,7 +71,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void HikingTrailsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -95,7 +95,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool HikingTrailsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -151,7 +151,7 @@ namespace synthese
 			stream << t.row();
 			stream << t.col() << f.getTextInput(HikingTrailAddAction::PARAMETER_NAME, string(), "(entrez le nom ici)");
 			stream << t.col(2) << f.getSubmitButton("Créer");
-			
+
 			stream << t.close();
 			stream << f.close();
 
@@ -164,9 +164,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const HikingModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -174,17 +174,17 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks HikingTrailsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			BOOST_FOREACH(Registry<HikingTrail>::value_type it, Env::GetOfficialEnv().getRegistry<HikingTrail>())

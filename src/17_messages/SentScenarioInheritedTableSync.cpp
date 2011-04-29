@@ -45,14 +45,14 @@ namespace synthese
 	using namespace db;
 	using namespace messages;
 	using namespace util;
-	
+
 
 	template<>
 	const string util::FactorableTemplate<ScenarioTableSync,SentScenarioInheritedTableSync>::FACTORY_KEY("SentScenarioInheritedTableSync");
 
 	namespace db
 	{
-		
+
 		template<>
 		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Load(
 			SentScenario* obj,
@@ -182,7 +182,7 @@ namespace synthese
 			query
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
-				<< " WHERE " 
+				<< " WHERE "
 				<< COL_IS_TEMPLATE << "=0";
 
 			if (name)
@@ -203,7 +203,7 @@ namespace synthese
 					break;
 
 				case BROADCAST_RUNNING:
-					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "=''" 
+					query << " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "=''"
 						<< " OR " << ScenarioTableSync::COL_PERIODEND << ">'" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						;
@@ -219,7 +219,7 @@ namespace synthese
 					break;
 
 				case BROADCAST_RUNNING_WITHOUT_END:
-					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "=''" 
+					query << " AND (" << ScenarioTableSync::COL_PERIODSTART << " IS NULL OR " << ScenarioTableSync::COL_PERIODSTART << "=''"
 						<< " OR " << ScenarioTableSync::COL_PERIODSTART << "<='" << to_iso_extended_string(date->date()) << " " << to_simple_string(date->time_of_day()) << "'"
 						<< ") AND " << ScenarioTableSync::COL_ENABLED
 						<<  " AND (" << ScenarioTableSync::COL_PERIODEND << " IS NULL OR " << ScenarioTableSync::COL_PERIODEND << "='')"
@@ -303,8 +303,8 @@ namespace synthese
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 
-		
-		
+
+
 		void SentScenarioInheritedTableSync::CopyMessagesFromTemplate(
 			util::RegistryKeyType sourceId,
 			const SentScenario& dest
@@ -325,9 +325,9 @@ namespace synthese
 				);
 			}
 		}
-		
-		
-		
+
+
+
 		void SentScenarioInheritedTableSync::CopyMessagesFromOther(
 			util::RegistryKeyType sourceId,
 			const SentScenario& dest
@@ -359,7 +359,7 @@ namespace synthese
 			);
 
 			const SentScenario::VariablesMap& values(scenario.getVariables());
-			
+
 			BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
 			{
 				if (!alarm->getTemplate()) continue;

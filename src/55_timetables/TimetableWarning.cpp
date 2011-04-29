@@ -27,7 +27,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace calendar;
-	
+
 	namespace timetables
 	{
 		TimetableWarning::TimetableWarning(

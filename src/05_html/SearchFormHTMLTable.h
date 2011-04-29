@@ -36,7 +36,7 @@ namespace synthese
 		class SearchFormHTMLTable : public HTMLTable
 		{
 			HTMLForm	_form;
-		
+
 		public:
 			SearchFormHTMLTable(const HTMLForm&);
 

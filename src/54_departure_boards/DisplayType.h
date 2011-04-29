@@ -79,8 +79,8 @@ namespace synthese
 			const cms::Webpage* _monitoringParserPage;
 
 		public:
-			
-			
+
+
 			////////////////////////////////////////////////////////////////////
 			///	DisplayType constructor.
 			///	@param key ID of the object

@@ -61,10 +61,10 @@ namespace synthese
 
 			@defgroup m18Logs 18.13 DB Logs
 			@ingroup m18
-			
+
 			@defgroup m18 18 Graph
 			@ingroup m1
-			
+
 			The generic graph module is a collection of interfaces designed to implement
 			an extended concept of graph, that can be used by algorithms.
 
@@ -99,7 +99,7 @@ namespace synthese
 			<li>@ref Journey : Serie of service uses</li>
 			<li>@ref VertexAccessMap : List of vertices with access times</li>
 			</ul>
-		
+
 			@{
 		*/
 
@@ -109,14 +109,14 @@ namespace synthese
 		class GraphModule : public util::ModuleClass
 		{
 		private:
-			
+
 		public:
 			/** Initialization of the 18 Graph module after the automatic database loads.
 				@author Hugues
 				@date 2010
-			*/			
+			*/
 			void initialize();
-			
+
 			// static Object::Registry& getObjects();
 		};
 

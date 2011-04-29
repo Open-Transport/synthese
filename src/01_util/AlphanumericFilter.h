@@ -48,10 +48,10 @@ namespace synthese
 		public boost::iostreams::multichar_output_filter
 		{
 		public:
-		    
+
 			AlphanumericFilter() {}
 
-			template<typename Sink> 
+			template<typename Sink>
 			std::streamsize write(Sink& dest, const char* s, std::streamsize n);
 		};
 
@@ -68,45 +68,45 @@ namespace synthese
 			{
 				char c = s[i];
 
-				if( c == 'á' || 
-					c == 'à' || 
-					c == 'â' || 
+				if( c == 'á' ||
+					c == 'à' ||
+					c == 'â' ||
 					c == 'ä' ||
-					c == 'Á' || 
-					c == 'À' || 
-					c == 'Ä' || 
+					c == 'Á' ||
+					c == 'À' ||
+					c == 'Ä' ||
 					c == 'Â' ||
-					c == 'é' || 
-					c == 'è' || 
-					c == 'ê' || 
+					c == 'é' ||
+					c == 'è' ||
+					c == 'ê' ||
 					c == 'ë' ||
 					c == 'É' ||
-					c == 'È' || 
-					c == 'Ê' || 
+					c == 'È' ||
+					c == 'Ê' ||
 					c == 'Ë' ||
-					c == 'í' || 
-					c == 'ì' || 
-					c == 'ï' || 
+					c == 'í' ||
+					c == 'ì' ||
+					c == 'ï' ||
 					c == 'î' ||
-					c == 'Í' || 
-					c == 'Ì' || 
-					c == 'Ï' || 
+					c == 'Í' ||
+					c == 'Ì' ||
+					c == 'Ï' ||
 					c == 'Î' ||
-					c == 'ó' || 
-					c == 'ò' || 
-					c == 'ö' || 
+					c == 'ó' ||
+					c == 'ò' ||
+					c == 'ö' ||
 					c == 'ô' ||
 					c == 'Ó' ||
-					c == 'Ò' || 
-					c == 'Ö' || 
+					c == 'Ò' ||
+					c == 'Ö' ||
 					c == 'Ô' ||
-					c == 'ú' || 
-					c == 'ù' || 
-					c == 'ü' || 
+					c == 'ú' ||
+					c == 'ù' ||
+					c == 'ü' ||
 					c == 'û' ||
-					c == 'Ú' || 
-					c == 'Ù' || 
-					c == 'Ü' || 
+					c == 'Ú' ||
+					c == 'Ù' ||
+					c == 'Ü' ||
 					c == 'Û' ||
 					c == 'ç' ||
 					c == 'Ç' ||
@@ -120,7 +120,7 @@ namespace synthese
 				){
 					boost::iostreams::put(dest, c);
 				}
-				else 
+				else
 				{
 					boost::iostreams::put(dest, ' ') ;
 				}

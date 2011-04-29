@@ -139,18 +139,18 @@ namespace synthese
 			}
 			return result;
 		}
-	
-	
-	
+
+
+
 		bool Calendar::isActive(const date& d) const
 		{
 			_BitSets::const_iterator it(_markedDates.find(d.year()));
 			if(it == _markedDates.end()) return false;
 			return it->second.test(_BitPos(d));
 		}
-	
-	
-	
+
+
+
 		void Calendar::setActive(const date& d)
 		{
 			assert(!d.is_not_a_date());
@@ -168,18 +168,18 @@ namespace synthese
 			_firstActiveDate.reset();
 			_lastActiveDate.reset();
 		}
-		
-		
-		
+
+
+
 		void Calendar::clear()
 		{
 			_markedDates.clear();
 			_firstActiveDate.reset();
 			_lastActiveDate.reset();
 		}
-		
-		
-		
+
+
+
 		void Calendar::setInactive(const date& d)
 		{
 			assert(!d.is_not_a_date());
@@ -196,9 +196,9 @@ namespace synthese
 			_firstActiveDate.reset();
 			_lastActiveDate.reset();
 		}
-	
-	
-	
+
+
+
 		Calendar& Calendar::operator&= (const Calendar& op)
 		{
 			*this = *this & op;
@@ -206,9 +206,9 @@ namespace synthese
 			_lastActiveDate.reset();
 			return *this;
 		}
-	
-	
-	
+
+
+
 		Calendar& Calendar::operator|=(
 			const Calendar& op
 		){
@@ -217,10 +217,10 @@ namespace synthese
 			_lastActiveDate.reset();
 			return *this;
 		}
-	
-	
-	
-	
+
+
+
+
 		Calendar Calendar::operator& (const Calendar& op2) const
 		{
 			Calendar dest;
@@ -237,9 +237,9 @@ namespace synthese
 			}
 			return dest;
 		}
-	
-	
-	
+
+
+
 		Calendar Calendar::operator| (const Calendar& op2) const
 		{
 			Calendar dest;
@@ -274,9 +274,9 @@ namespace synthese
 			}
 			return dest;
 		}
-	
-	
-	
+
+
+
 		bool Calendar::hasAtLeastOneCommonDateWith( const Calendar& op ) const
 		{
 			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)

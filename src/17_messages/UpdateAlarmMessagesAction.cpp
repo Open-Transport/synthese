@@ -49,7 +49,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace util;
-	
+
 	template<> const string util::FactorableTemplate<Action, messages::UpdateAlarmMessagesAction>::FACTORY_KEY("muama");
 
 	namespace messages

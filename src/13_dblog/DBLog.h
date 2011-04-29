@@ -40,7 +40,7 @@ namespace synthese
 		class User;
 		class Profile;
 	}
-	
+
 	namespace server
 	{
 		class Request;
@@ -50,9 +50,9 @@ namespace synthese
 	{
 		/** Journal d'événements stocké en base de données (abstraite).
 			@ingroup m13
-		
-			Un journal est un compte-rendu d'activité de SYNTHESE. 
-			Plusieurs entrées sont consignées dans la base de données sous formes d'entrées de journal. 
+
+			Un journal est un compte-rendu d'activité de SYNTHESE.
+			Plusieurs entrées sont consignées dans la base de données sous formes d'entrées de journal.
 			Le journal lui-même est le composant d'administration dédié à leur consultation.
 
 			Le stockage des entrées de journal s'effectue dans la base de données.
@@ -71,19 +71,19 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::string> ColumnsVector;
-			
+
 		protected:
-			
+
 			/** Adds an entry to a log (generic method).
 				@param logKey key of the DBLog to write
 				@param level level of the entry (@see DBLogEntry::Level)
 				@param content serialized content of the entry
 				@param user user of the entry
-				@param objectId id of the referring object 
+				@param objectId id of the referring object
 				@return id of the created entry
 				@author Hugues Romain
 				@date 2008
-				
+
 				This method is intended to be used by subclasses to do managed entry creations.
 			*/
 			static util::RegistryKeyType _addEntry(
@@ -111,8 +111,8 @@ namespace synthese
 
 			virtual std::string getName() const = 0;
 			virtual ColumnsVector getColumnNames() const = 0;
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates the display of the log specific columns.
 			/// @param entry to parse
@@ -151,7 +151,7 @@ namespace synthese
 				const server::Request& searchRequest
 			) const;
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/** Authorization tester.
 			 * Each subclass of DBLog must implement an authorization method depending on the request.

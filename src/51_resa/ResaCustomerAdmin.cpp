@@ -90,7 +90,7 @@ namespace synthese
 			_log("log")
 		{
 		}
-		
+
 		void ResaCustomerAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -112,9 +112,9 @@ namespace synthese
 				_user->getKey()
 			);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
 		{
 			ParametersMap m(_log.getParametersMap());
@@ -122,7 +122,7 @@ namespace synthese
 			return m;
 		}
 
-		
+
 		void ResaCustomerAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -154,7 +154,7 @@ namespace synthese
 				stream << "<p>";
 				stream << HTMLModule::getLinkButton(routeplannerRequest.getURL(), "Recherche d'itinéraire", "", ReservationRoutePlannerAdmin::ICON);
 				stream << "</p>";
-				
+
 				stream << "<h1>Coordonnées</h1>";
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("upd"));
@@ -228,7 +228,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
-		
+
 
 
 		std::string ResaCustomerAdmin::getTitle() const
@@ -237,7 +237,7 @@ namespace synthese
 		}
 
 
-		
+
 		void ResaCustomerAdmin::_buildTabs(
 			const security::Profile& profile
 		) const {
@@ -257,14 +257,14 @@ namespace synthese
 		{
 			_user = const_pointer_cast<const User>(value);
 		}
-	
-	
+
+
 		void ResaCustomerAdmin::setUser(boost::shared_ptr<const User> value)
 		{
 			_user = value;
 		}
-		
-		
+
+
 		bool ResaCustomerAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _user == static_cast<const ResaCustomerAdmin&>(other)._user;
@@ -308,7 +308,7 @@ namespace synthese
 						}
 
 					}
-	
+
 				}
 			}
 			return result;

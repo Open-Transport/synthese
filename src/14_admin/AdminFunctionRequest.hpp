@@ -73,7 +73,7 @@ namespace synthese
 			{
 				return boost::static_pointer_cast<P, AdminInterfaceElement>(
 					this->getFunction()->getPage()
-				); 
+				);
 			}
 		};
 }	}

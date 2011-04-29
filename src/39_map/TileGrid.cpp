@@ -30,13 +30,13 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	
+
 
 namespace map
 {
 
 
-TileGrid::TileGrid (double width, 
+TileGrid::TileGrid (double width,
 		    double height,
 		    double tileWidth,
 		    double tileHeight)
@@ -67,8 +67,8 @@ TileGrid::~TileGrid ()
 }
 
 
-	
-void 
+
+void
 TileGrid::markTilesForPoint (const Coordinate& p)
 {
     int tileX = (int) (p.x / _tileWidth);
@@ -78,8 +78,8 @@ TileGrid::markTilesForPoint (const Coordinate& p)
 
 
 
-void 
-TileGrid::markTilesForLine (const Coordinate& from, 
+void
+TileGrid::markTilesForLine (const Coordinate& from,
 			    const Coordinate& to)
 {
     markTilesForPoint (from);
@@ -114,7 +114,7 @@ TileGrid::markTilesForLine (const Coordinate& from,
 
     for (int i=startTileX; i<=endTileX; ++i)
     {
-	Coordinate p (i*_tileWidth, 
+	Coordinate p (i*_tileWidth,
 		 from.y + a * ((i*_tileWidth) - from.x));
 	markTilesForPoint (p);
     }
@@ -133,7 +133,7 @@ TileGrid::markTilesForLine (const Coordinate& from,
 
     for (int i=startTileY; i<=endTileY; ++i)
     {
-	Coordinate p (from.x + a * (i*_tileHeight - from.y), 
+	Coordinate p (from.x + a * (i*_tileHeight - from.y),
 		 i*_tileHeight);
 	markTilesForPoint (p);
     }
@@ -141,16 +141,16 @@ TileGrid::markTilesForLine (const Coordinate& from,
 
 
 
-void 
-TileGrid::markTilesForRectangle (const Coordinate& from, 
-				 const Coordinate& to, 
+void
+TileGrid::markTilesForRectangle (const Coordinate& from,
+				 const Coordinate& to,
 				 bool filled)
 {
 
 }
 
 
-bool 
+bool
 TileGrid::isMarked (int tileX, int tileY) const
 {
     return _tiles[tileX][tileY];

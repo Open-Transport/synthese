@@ -34,7 +34,7 @@ namespace synthese
 {
 	using namespace interfaces;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, EqualsValueInterfaceElement>::FACTORY_KEY("==");

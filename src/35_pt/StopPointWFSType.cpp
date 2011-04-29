@@ -99,7 +99,7 @@ namespace synthese
 
 					"<synthese:msGeometry>" <<
 					"<gml:Point srsName=\"EPSG:" << sr.getSRID() << "\">" <<
-					"<gml:coordinates>" << point->getX() << "," << point->getY() << 
+					"<gml:coordinates>" << point->getX() << "," << point->getY() <<
 					"</gml:coordinates></gml:Point></synthese:msGeometry>"
 
 					"<synthese:" << TABLE_COL_ID << ">" << ps->getKey() << "</synthese:" << TABLE_COL_ID << ">" <<

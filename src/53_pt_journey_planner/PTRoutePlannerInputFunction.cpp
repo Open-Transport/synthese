@@ -46,7 +46,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,pt_journey_planner::PTRoutePlannerInputFunction>::FACTORY_KEY("PTRoutePlannerInputFunction");
-	
+
 	namespace pt_journey_planner
 	{
 		const string PTRoutePlannerInputFunction::PARAMETER_FIELD("field");
@@ -60,7 +60,7 @@ namespace synthese
 		const string PTRoutePlannerInputFunction::FIELD_DESTINATION_PLACE("destination_place");
 		const string PTRoutePlannerInputFunction::FIELD_DATE_LIST("date_list");
 		const string PTRoutePlannerInputFunction::FIELD_PERIOD("period");
-		
+
 
 
 		ParametersMap PTRoutePlannerInputFunction::_getParametersMap() const
@@ -198,9 +198,9 @@ namespace synthese
 				;
 			}
 		}
-		
-		
-		
+
+
+
 		bool PTRoutePlannerInputFunction::isAuthorized(
 			const Session* session
 		) const {

@@ -43,7 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace geography;
 	using namespace pt;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, hiking::HikingTrailStopAddAction>::FACTORY_KEY("HikingTrailStopAddAction");
@@ -55,9 +55,9 @@ namespace synthese
 		const string HikingTrailStopAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string HikingTrailStopAddAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		const string HikingTrailStopAddAction::PARAMETER_TRAIL_ID = Action_PARAMETER_PREFIX + "id";
-		
-		
-		
+
+
+
 		ParametersMap HikingTrailStopAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -73,9 +73,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void HikingTrailStopAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -111,15 +111,15 @@ namespace synthese
 				throw ActionException("Rank is too high");
 			}
 		}
-		
-		
-		
+
+
+
 		void HikingTrailStopAddAction::run(
 			Request& request
 		){
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			HikingTrail::Stops stops(_trail->getStops());
 			if(_rank)
 			{
@@ -130,14 +130,14 @@ namespace synthese
 				stops.push_back(_stop.get());
 			}
 			_trail->setStops(stops);
-			
+
 			HikingTrailTableSync::Save(_trail.get());
-			
+
 			//::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailStopAddAction::isAuthorized(
 			const Session* session
 		) const {

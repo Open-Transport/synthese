@@ -91,13 +91,13 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string HeuresFileFormat::Importer_::FILE_POINTSARRETS("pointsarrets"); 
-		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("itinerai"); 
+		const std::string HeuresFileFormat::Importer_::FILE_POINTSARRETS("pointsarrets");
+		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("itinerai");
 		const std::string HeuresFileFormat::Importer_::FILE_TRONCONS("troncons");
 		const std::string HeuresFileFormat::Importer_::FILE_SERVICES("services");
 
-		const std::string HeuresFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops"); 
-		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date"); 
+		const std::string HeuresFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("start_date");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 	}
@@ -313,7 +313,7 @@ namespace synthese
 
 						// Stop search
 						string stopNumber(trim_copy(line.substr(i,4)));
-						
+
 						// Fake stop : girouette
 						if(lexical_cast<int>(stopNumber) > 9000)
 						{
@@ -378,7 +378,7 @@ namespace synthese
 					>
 				> SchedulesMap;
 				SchedulesMap services;
-				
+
 				// Reading of the file
 				while(getline(inFile, line))
 				{
@@ -388,7 +388,7 @@ namespace synthese
 							lineNumber,
 							lexical_cast<int>(trim_copy(line.substr(3,3)))
 					)	);
-					
+
 					for(size_t i(29); i+1<line.size(); ++i)
 					{
 						string routeNumber(trim_copy(line.substr(i,2)));
@@ -443,7 +443,7 @@ namespace synthese
 							if(departureSchedule != "9999")
 							{
 								itS->second.first.first[rank] = time_duration(
-									lexical_cast<int>(departureSchedule.substr(0,2)), 
+									lexical_cast<int>(departureSchedule.substr(0,2)),
 									lexical_cast<int>(departureSchedule.substr(2,2)),
 									0
 								);
@@ -506,7 +506,7 @@ namespace synthese
 							cal.setActive(d);
 						}
 					}
-					
+
 					// Services list
 					for(size_t i(13); i+6<line.size(); i+=29)
 					{

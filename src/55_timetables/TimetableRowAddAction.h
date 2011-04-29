@@ -84,11 +84,11 @@ namespace synthese
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);
-			
+
 			TimetableRowAddAction();
 
 			void setTimetable(boost::shared_ptr<const Timetable> timetable);
-			
+
 			virtual bool isAuthorized(const server::Session* session) const;
 		};
 	}

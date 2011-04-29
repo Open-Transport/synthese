@@ -69,7 +69,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTRoadsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -98,7 +98,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTRoadsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -111,7 +111,7 @@ namespace synthese
 			ostream& stream,
 			const AdminRequest& request
 		) const	{
-		
+
 			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
 
 			HTMLTable::ColsVector c;
@@ -144,9 +144,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){

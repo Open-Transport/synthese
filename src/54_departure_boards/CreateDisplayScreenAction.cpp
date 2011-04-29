@@ -47,7 +47,7 @@ namespace synthese
 	using namespace db;
 	using namespace security;
 	using namespace geography;
-	
+
 	template<> const string FactorableTemplate<Action, departure_boards::CreateDisplayScreenAction>::FACTORY_KEY("createdisplayscreen");
 
 	namespace departure_boards

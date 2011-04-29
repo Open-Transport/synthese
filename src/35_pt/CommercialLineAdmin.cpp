@@ -78,7 +78,7 @@ namespace synthese
 	using namespace db;
 	using namespace calendar;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<AdminInterfaceElement, CommercialLineAdmin>::FACTORY_KEY("CommercialLineAdmin");
@@ -109,7 +109,7 @@ namespace synthese
 		{}
 
 
-		
+
 		void CommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -136,9 +136,9 @@ namespace synthese
 
 			_controlCalendar = map.getDefault<bool>(PARAMETER_CALENDAR_CONTROL, false);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap CommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -161,10 +161,10 @@ namespace synthese
 				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
 
 				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
-				
+
 				// Search form
 				stream << "<h1>Recherche</h1>";
-				
+
 				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 				stream << s.open();
 				stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
@@ -183,7 +183,7 @@ namespace synthese
 						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
 						_requestParameters.raisingOrder
 				)	);
-				
+
 				AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(_request);
 				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 				creationRequest.setActionWillCreateObject();
@@ -343,7 +343,7 @@ namespace synthese
 						getCommercialLineRunHours(_getEnv(), _cline->getKey(), _startDate, _endDate)
 					);
 
-					stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; }</style>"; 
+					stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; }</style>";
 					HTMLTable::ColsVector cols;
 					cols.push_back("Date");
 					for(int i(0); i<=23; ++i)
@@ -426,7 +426,7 @@ namespace synthese
 				cols.push_back(make_pair(string(),"Ligne"));
 				cols.push_back(make_pair(string(),"Délai"));
 				cols.push_back(make_pair(string(),"Action"));
-				
+
 				ActionResultHTMLTable t(
 					cols,
 					searchRequest.getHTMLForm(),
@@ -517,7 +517,7 @@ namespace synthese
 			{
 				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
 				exporter->setLine(_cline);
-				
+
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
 				tridentExportFunction.getFunction()->setExporter(static_pointer_cast<Exporter, TridentFileFormat::Exporter_>(exporter));
 
@@ -541,8 +541,8 @@ namespace synthese
 			if (_cline.get() == NULL) return false;
 			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
-		
-		
+
+
 		std::string CommercialLineAdmin::getTitle() const
 		{
 			return _cline.get() ? "<span class=\"linesmall " + _cline->getStyle() +"\">" + _cline->getShortName() + "</span>" : DEFAULT_TITLE;
@@ -553,7 +553,7 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
@@ -586,8 +586,8 @@ namespace synthese
 			_tabBuilded = true;
 		}
 
-		
-		
+
+
 		bool CommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _cline->getKey() == static_cast<const CommercialLineAdmin&>(other)._cline->getKey();

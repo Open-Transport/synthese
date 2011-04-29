@@ -132,13 +132,13 @@ namespace synthese
 		private:
 
 			static SessionMap				_sessionMap;
-			
+
 			/// The io_service used to perform asynchronous operations.
 			static boost::asio::io_service _io_service;
-			
+
 			/// Acceptor used to listen for incoming connections.
 			static boost::asio::ip::tcp::acceptor _acceptor;
-			
+
 			/// The next connection to be accepted.
 			static connection_ptr _new_connection;
 
@@ -171,7 +171,7 @@ namespace synthese
 			static util::EMail GetEMailSender();
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 			static SessionMap& getSessions();
-			
+
 			/** Called whenever a parameter registered by this module is changed
 			 */
 			static void ParameterCallback(
@@ -185,7 +185,7 @@ namespace synthese
 			static void HandleAccept(
 				const boost::system::error_code& e
 			);
-			
+
 			/// Handle a request and produce a reply.
 			/// @param req HTTP request to handle
 			/// @param rep HTTP Reply to write the result on
@@ -197,7 +197,7 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Perform URL-decoding on a string. 
+			/// Perform URL-decoding on a string.
 			/// @return false if the encoding was invalid.
 			static bool URLDecode(const std::string& in, std::string& out);
 

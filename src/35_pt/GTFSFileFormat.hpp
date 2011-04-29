@@ -50,7 +50,7 @@ namespace synthese
 	{
 		class City;
 	}
-	
+
 	namespace pt
 	{
 		class JourneyPattern;
@@ -109,7 +109,7 @@ namespace synthese
 				void _loadFieldsMap(const std::string& line) const;
 				std::string _getValue(const std::string& field) const;
 				void _loadLine(const std::string& line) const;
-				
+
 				//! @name Parameters
 				//@{
 					boost::gregorian::date _startDate;
@@ -146,15 +146,15 @@ namespace synthese
 			protected:
 
 				virtual bool _controlPathsMap() const;
-				
+
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
 					const std::string& key,
 					boost::optional<const admin::AdminRequest&> adminRequest
 				) const;
-		
-			
+
+
 			public:
 				Importer_(
 					util::Env& env,

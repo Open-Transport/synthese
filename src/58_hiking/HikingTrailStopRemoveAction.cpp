@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, hiking::HikingTrailStopRemoveAction>::FACTORY_KEY("HikingTrailStopRemoveAction");
@@ -46,9 +46,9 @@ namespace synthese
 	{
 		const string HikingTrailStopRemoveAction::PARAMETER_TRAIL_ID = Action_PARAMETER_PREFIX + "id";
 		const string HikingTrailStopRemoveAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
-		
-		
-		
+
+
+
 		ParametersMap HikingTrailStopRemoveAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -59,9 +59,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void HikingTrailStopRemoveAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -79,9 +79,9 @@ namespace synthese
 				throw ActionException("Rank is too high");
 			}
 		}
-		
-		
-		
+
+
+
 		void HikingTrailStopRemoveAction::run(
 			Request& request
 		){
@@ -96,9 +96,9 @@ namespace synthese
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool HikingTrailStopRemoveAction::isAuthorized(
 			const Session* session
 		) const {

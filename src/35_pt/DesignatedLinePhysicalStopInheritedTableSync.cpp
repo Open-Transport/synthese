@@ -138,7 +138,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<LineStopTableSync> query;
-			
+
 			// Ordering
 			if(orderById)
 			{

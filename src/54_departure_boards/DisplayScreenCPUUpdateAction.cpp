@@ -54,7 +54,7 @@ namespace synthese
 		const std::string DisplayScreenCPUUpdateAction::PARAMETER_CPU = Action_PARAMETER_PREFIX + "cp";
 		const std::string DisplayScreenCPUUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const std::string DisplayScreenCPUUpdateAction::PARAMETER_MAC_ADDRESS = Action_PARAMETER_PREFIX + "ma";
-		
+
 		ParametersMap DisplayScreenCPUUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -99,7 +99,7 @@ namespace synthese
 				_cpu->getPlace() ?
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cpu->getPlace()->getKey())) :
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER)
-			;				
+			;
 		}
 
 		void DisplayScreenCPUUpdateAction::setCPU( util::RegistryKeyType id )

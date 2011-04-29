@@ -140,7 +140,7 @@ namespace synthese
 						else
 						{
 							stream << "&nbsp;";
-						}	
+						}
 						if(first)
 							first = false;
 					}

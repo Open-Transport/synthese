@@ -51,7 +51,7 @@ namespace synthese
 	{
 		const string AlarmRemoveLinkAction::PARAMETER_ALARM_ID = Action_PARAMETER_PREFIX + "aid";
 		const string AlarmRemoveLinkAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "oid";
-		
+
 
 		ParametersMap AlarmRemoveLinkAction::getParametersMap() const
 		{

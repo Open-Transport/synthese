@@ -44,7 +44,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Action, messages::TextTemplateAddAction>::FACTORY_KEY("mttaa");
-	
+
 	namespace messages
 	{
 		const string TextTemplateAddAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lm";

@@ -55,7 +55,7 @@ namespace synthese
 			DBTableSync::Field(TestSchemaTableSync::COL_COLUMN1, SQL_INTEGER),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchemaTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -104,7 +104,7 @@ namespace synthese
 			DBTableSync::Field(TestSchema2TableSync::COL_COLUMN2, SQL_GEOM_POINT),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema2TableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
@@ -154,7 +154,7 @@ namespace synthese
 			DBTableSync::Field(TestSchema3TableSync::COL_COLUMN2, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
-		
+
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema3TableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()

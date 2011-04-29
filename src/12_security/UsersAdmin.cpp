@@ -66,7 +66,7 @@ namespace synthese
 		template<> const string AdminInterfaceElementTemplate<UsersAdmin>::ICON("user.png");
 		template<> const string AdminInterfaceElementTemplate<UsersAdmin>::DEFAULT_TITLE("Utilisateurs");
 	}
-	
+
 	namespace security
 	{
 		const std::string UsersAdmin::PARAM_SEARCH_PROFILE_ID = "sp";
@@ -103,9 +103,9 @@ namespace synthese
 			// Table Parameters
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_LOGIN, 30);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap UsersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -139,7 +139,7 @@ namespace synthese
 			// Request for search form
 			AdminFunctionRequest<UsersAdmin> searchRequest(_request);
 			SearchFormHTMLTable searchTable(searchRequest.getHTMLForm("search"));
-			
+
 			// Request for add user action form
 			AdminActionFunctionRequest<AddUserAction, UserAdmin> addUserRequest(_request);
 			addUserRequest.getFunction()->setActionFailedPage<UsersAdmin>();
@@ -147,13 +147,13 @@ namespace synthese
 
 			// Request for delete action form
 			AdminActionFunctionRequest<RemoveObjectAction, UsersAdmin> deleteUserRequest(_request);
-			
+
 			// Request for user link
 			AdminFunctionRequest<UserAdmin> userRequest(_request);
 
 			// Search form
 			stream << "<h1>Recherche d'utilisateur</h1>";
-				
+
 			stream << searchTable.open();
 			stream << searchTable.cell("Login", searchTable.getForm().getTextInput(PARAM_SEARCH_LOGIN, _searchLogin ? *_searchLogin : string()));
 			stream << searchTable.cell("Nom", searchTable.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName ? *_searchName : string()));
@@ -187,7 +187,7 @@ namespace synthese
 					, _requestParameters.raisingOrder,
 					UP_LINKS_LOAD_LEVEL
 			)	);
-			
+
 			if (users.empty())
 				stream << "Aucun utilisateur trouvé";
 
@@ -197,7 +197,7 @@ namespace synthese
 			v.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			v.push_back(make_pair(PARAM_SEARCH_PROFILE_ID, "Profil"));
 			v.push_back(make_pair(string(), "Actions"));
-			
+
 			HTMLForm f(addUserRequest.getHTMLForm("add"));
 
 			ResultHTMLTable t(
@@ -243,9 +243,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const SecurityModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -255,26 +255,26 @@ namespace synthese
 			}
 			return links;
 		}
-		
-		
+
+
 		AdminInterfaceElement::PageLinks UsersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const UserAdmin* ua(
 				dynamic_cast<const UserAdmin*>(&currentPage)
 			);
-			
+
 			if(ua)
 			{
 				shared_ptr<UserAdmin> p(getNewPage<UserAdmin>());
 				p->setUserC(ua->getUser());
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 

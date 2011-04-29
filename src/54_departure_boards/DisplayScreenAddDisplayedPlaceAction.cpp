@@ -43,7 +43,7 @@ namespace synthese
 	using namespace geography;
 
 	template<> const string util::FactorableTemplate<Action,departure_boards::DisplayScreenAddDisplayedPlaceAction>::FACTORY_KEY("dsadp");
-	
+
 	namespace departure_boards
 	{
 		const string DisplayScreenAddDisplayedPlaceAction::PARAMETER_SCREEN_ID(
@@ -89,7 +89,7 @@ namespace synthese
 				else
 				{
 					const string city(map.get<string>(PARAMETER_CITY_NAME));
-					
+
 					GeographyModule::CityList cities(GeographyModule::GuessCity(city, 1));
 					if(cities.empty())
 					{
@@ -141,8 +141,8 @@ namespace synthese
 				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
-		
-		
+
+
 		void DisplayScreenAddDisplayedPlaceAction::setScreen(
 			boost::shared_ptr<const DisplayScreen> value
 		){

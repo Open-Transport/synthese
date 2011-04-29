@@ -43,7 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt_operation;
 	using namespace html;
-	
+
 
 	namespace util
 	{
@@ -86,7 +86,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void PTOperationStatisticsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -124,7 +124,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PTOperationStatisticsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -281,9 +281,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -291,7 +291,7 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 

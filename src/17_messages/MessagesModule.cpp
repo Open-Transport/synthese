@@ -43,24 +43,24 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace messages;
-	
+
 	namespace util
 	{
 		template<> const std::string util::FactorableTemplate<ModuleClass, messages::MessagesModule>::FACTORY_KEY("17_messages");
 	}
-	
+
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<MessagesModule>::NAME("Gestion d'actualités");
-		
+
 		template<> void ModuleClassTemplate<MessagesModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<MessagesModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<MessagesModule>::End()
 		{
 		}
@@ -130,7 +130,7 @@ namespace synthese
 					continue;
 
 				m.push_back(make_pair(folder->getKey(), prefix + folder->getName()));
-				
+
 				Labels r(GetScenarioFoldersLabels(folder->getKey(), prefix + folder->getName() +"/", forbiddenFolderId));
 				m.insert(m.end(),r.begin(), r.end());
 			}
@@ -160,7 +160,7 @@ namespace synthese
 			Labels m;
 			if (withAll)
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(tous)"));
-			
+
 			Labels s(MessagesModule::GetScenarioTemplatesLabels());
 			for(Labels::const_iterator it(s.begin()); it != s.end(); ++it)
 			{

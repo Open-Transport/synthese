@@ -44,17 +44,17 @@ namespace synthese
 		class DataSource;
 		class Importer;
 		class Exporter;
-		
+
 		/** Import/export file format factorable base class.
-			
+
 			Each import subclass defines a format which can be imported.
-			
+
 			@ingroup m16
 
 			Import
 
 			There is two ways to launch the data import upon file paths :
-				- run parseFiles with a paths set argument : there is only one file type to read, 
+				- run parseFiles with a paths set argument : there is only one file type to read,
 					but the data can be provided in more than one file. The set contains
 					all the paths.
 				- run parseFiles with a paths map argument : there is more than one file type, each
@@ -73,7 +73,7 @@ namespace synthese
 				util::Env& env,
 				const DataSource& dataSource
 			) const = 0;
-			
+
 			virtual boost::shared_ptr<Exporter> getExporter(
 			) const	= 0;
 

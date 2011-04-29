@@ -21,13 +21,13 @@ namespace util
 /** Thread-safe version of STL queue.
     @ingroup m01
     */
-template<class K> 
+template<class K>
 class SynchronizedQueue
 {
 
 private:
-    
-    mutable boost::mutex _queueMutex; 
+
+    mutable boost::mutex _queueMutex;
     std::queue<K> _queue;
 
 public:
@@ -47,7 +47,7 @@ public:
 
     void push (const K&);
     void pop ();
-  
+
 
 private:
 
@@ -56,7 +56,7 @@ private:
 
 
 template<class K>
-bool 
+bool
 SynchronizedQueue<K>::empty() const
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -77,7 +77,7 @@ SynchronizedQueue<K>::size() const
 
 
 template<class K>
-K& 
+K&
 SynchronizedQueue<K>::front()
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -87,7 +87,7 @@ SynchronizedQueue<K>::front()
 
 
 template<class K>
-const K& 
+const K&
 SynchronizedQueue<K>::front() const
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -96,7 +96,7 @@ SynchronizedQueue<K>::front() const
 
 
 template<class K>
-K& 
+K&
 SynchronizedQueue<K>::back()
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -107,7 +107,7 @@ SynchronizedQueue<K>::back()
 
 
 template<class K>
-const K& 
+const K&
 SynchronizedQueue<K>::back() const
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -117,7 +117,7 @@ SynchronizedQueue<K>::back() const
 
 
 template<class K>
-void 
+void
 SynchronizedQueue<K>::push (const K& v)
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);
@@ -129,7 +129,7 @@ SynchronizedQueue<K>::push (const K& v)
 
 
 template<class K>
-void 
+void
 SynchronizedQueue<K>::pop ()
 {
     boost::mutex::scoped_lock queueLock ( _queueMutex);

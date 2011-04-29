@@ -28,25 +28,25 @@ class Login
 	public:
 		Login(AGI_TOOLS *_agi, AGI_CMD_RESULT *_res);
 		~Login();
-		
+
 		int start();
 		bool identifyUser() throw (int);
-		
+
 		SessionReturnType* getSession();
-		
-	
-		
+
+
+
 	private:
 		// common variables
 		AGI_TOOLS *agi;
 		AGI_CMD_RESULT *res;
 		int dtmfInput;
 		int *menuKey;
-		
-		
+
+
 		// local variables
 		SessionReturnType* session;
-		
+
 
 };
 #endif

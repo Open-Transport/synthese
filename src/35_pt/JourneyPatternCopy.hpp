@@ -33,7 +33,7 @@ namespace synthese
 			@ingroup m35
 
 			A sub-line is a copy of a line, which handles services which would break the line theory if they have been inserted in the original line.
-			
+
 			It happens in several cases :
 				- a service start before another, which arrive at destination before the service.
 				- a service starts in a continuous service range
@@ -51,7 +51,7 @@ namespace synthese
 				@param line JourneyPattern to copy
 				@author Hugues Romain
 				@date 2008
-				
+
 				The subline constructor :
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
@@ -62,7 +62,7 @@ namespace synthese
 			/** Destructor.
 				@author Hugues Romain
 				@date 2008
-				
+
 				Deletes all the contained linestops;
 			*/
 			~JourneyPatternCopy();
@@ -72,7 +72,7 @@ namespace synthese
 				@param service service to add
 				@return bool true if the service has been added
 				@author Hugues Romain
-				@date 2008				
+				@date 2008
 			*/
 			bool addServiceIfCompatible(graph::Service* service);
 
@@ -80,7 +80,7 @@ namespace synthese
 			/** Main line getter.
 				@return JourneyPattern* The line from which the sub-line was extracted
 				@author Hugues Romain
-				@date 2008				
+				@date 2008
 			*/
 			JourneyPattern*	getMainLine()	const;
 		};

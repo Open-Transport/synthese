@@ -45,7 +45,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace road;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, timetables::TimetableRowAddAction>::FACTORY_KEY("TimetableRowAddAction");
@@ -63,15 +63,15 @@ namespace synthese
 		const string TimetableRowAddAction::PARAMETER_RANK = Action_PARAMETER_PREFIX + "rk";
 		const string TimetableRowAddAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "ti";
 
-		
+
 		TimetableRowAddAction::TimetableRowAddAction():
 			util::FactorableTemplate<Action, TimetableRowAddAction>(),
 			_place(NULL)
 		{
 		}
-		
-		
-		
+
+
+
 		ParametersMap TimetableRowAddAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -79,9 +79,9 @@ namespace synthese
 				map.insert(PARAMETER_TIMETABLE_ID, _timetable->getKey());
 			return map;
 		}
-		
-		
-		
+
+
+
 		void TimetableRowAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -109,9 +109,9 @@ namespace synthese
 			if (_place == NULL)
 				throw ActionException("No such place");
 		}
-		
-		
-		
+
+
+
 		void TimetableRowAddAction::run(Request& request)
 		{
 			TimetableRow r;
@@ -134,8 +134,8 @@ namespace synthese
 		{
 			_timetable = timetable;
 		}
-		
-		
+
+
 		bool TimetableRowAddAction::isAuthorized(const server::Session* session) const
 		{
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TimetableRight>(WRITE);

@@ -78,7 +78,7 @@ namespace synthese
 			: AdminInterfaceElementTemplate<ResaEditLogEntryAdmin>(),
 			_log("log")
 		{ }
-		
+
 		void ResaEditLogEntryAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -101,9 +101,9 @@ namespace synthese
 				_entry->getKey()
 			);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap ResaEditLogEntryAdmin::getParametersMap() const
 		{
 			ParametersMap m;
@@ -218,7 +218,7 @@ namespace synthese
 			stream << t.close();
 
 			stream << "<h1>Evénements liés à l'appel</h1>";
-			
+
 			_log.display(stream, searchRequest);
 		}
 
@@ -227,7 +227,7 @@ namespace synthese
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
-		
+
 
 
 		std::string ResaEditLogEntryAdmin::getTitle() const
@@ -235,22 +235,22 @@ namespace synthese
 			return _entry.get() ? to_simple_string(_entry->getDate()) : DEFAULT_TITLE;
 		}
 
-	
+
 		void ResaEditLogEntryAdmin::setEntry(boost::shared_ptr<const dblog::DBLogEntry> value)
 		{
 			_entry = value;
 		}
-		
-		
+
+
 		boost::shared_ptr<const dblog::DBLogEntry> ResaEditLogEntryAdmin::getEntry() const
 		{
 			return _entry;
 		}
-		
+
 		bool ResaEditLogEntryAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _entry == static_cast<const ResaEditLogEntryAdmin&>(other)._entry;
 		}
-			
+
 	}
 }

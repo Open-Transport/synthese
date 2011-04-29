@@ -40,7 +40,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace util;
 	using namespace html;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, server::HtmlFormCalendarFieldInterfaceElement>::FACTORY_KEY("htmlcalendar");
@@ -84,7 +84,7 @@ namespace synthese
 				}
 				stream << HTMLForm::GetCalendarInput(name, dt);
 			}
-			
+
 			return string();
 		}
 

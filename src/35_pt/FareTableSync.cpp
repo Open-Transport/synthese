@@ -74,7 +74,7 @@ namespace synthese
 			Fare* fare,
 			const db::DBResultSPtr& rows,
 			Env& env,
-			LinkLevel linkLevel		
+			LinkLevel linkLevel
 		){
 			fare->setName (rows->getText (FareTableSync::COL_NAME));
 			fare->setType (static_cast<Fare::FareType>(rows->getInt (FareTableSync::COL_FARETYPE)));

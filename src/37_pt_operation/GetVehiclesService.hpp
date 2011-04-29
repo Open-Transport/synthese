@@ -64,15 +64,15 @@ namespace synthese
 			static const std::string DATA_NUMBER;
 			static const std::string DATA_RANK;
 			static const std::string DATA_SEATS;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<cms::Webpage> _vehiclePage;
 				boost::shared_ptr<pt::CommercialLine> _line;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Vehicles list#Request
@@ -82,9 +82,9 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.2.1
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Vehicles list#Request
@@ -96,7 +96,7 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
+
 
 			void _displayVehicle(
 				std::ostream& stream,
@@ -105,7 +105,7 @@ namespace synthese
 				std::size_t rank
 			) const;
 
-			
+
 		public:
 			//! @name Setters
 			//@{
@@ -121,9 +121,9 @@ namespace synthese
 			/// @author RCSobility
 			/// @date 2011
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

@@ -70,7 +70,7 @@ namespace synthese
 	using namespace security;
 	using namespace messages;
 	using namespace geography;
-		
+
 
 	namespace util
 	{
@@ -95,7 +95,7 @@ namespace synthese
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_STATE = "dsass";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_MESSAGE = "dsasm";
 		const string DisplaySearchAdmin::PARAMETER_SEARCH_LOCALIZATION_ID("dsapsli");
-		
+
 		DisplaySearchAdmin::DisplaySearchAdmin()
 			: AdminInterfaceElementTemplate<DisplaySearchAdmin>()
 		{}
@@ -114,12 +114,12 @@ namespace synthese
 				_searchState = map.getOptional<int>(PARAMETER_SEARCH_STATE);
 				_searchMessage = map.getOptional<int>(PARAMETER_SEARCH_MESSAGE);
 			}
-  
+
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_CITY, 30);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap DisplaySearchAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -152,7 +152,7 @@ namespace synthese
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			DisplayScreenTableSync::SearchResult screens(
 				DisplayScreenTableSync::Search(
 					Env::GetOfficialEnv(),
@@ -191,7 +191,7 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
-			
+
 			///////////////////////////////////////////////
 			/// TAB SCREENS
 			if (openTabContent(stream, TAB_DISPLAY_SCREENS))
@@ -208,7 +208,7 @@ namespace synthese
 
 
 				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request);
-	
+
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
 				StaticFunctionRequest<DisplayScreenContentFunction> viewRequest(_request, true);
@@ -261,7 +261,7 @@ namespace synthese
 					){
 						viewRequest.setClientURL(screen->getType()->getDisplayInterface()->getDefaultClientURL());
 					}
-					
+
 					vector<shared_ptr<SentAlarm> > alarms(
 						DisplayScreenTableSync::GetCurrentDisplayedMessage(_getEnv(), screen->getKey(), 1)
 					);
@@ -408,7 +408,7 @@ namespace synthese
 
 				stream << t.close();
 			}
-			
+
 			///////////////////////////////////////////////
 			/// TAB CPU
 			if (openTabContent(stream, TAB_CPU))
@@ -462,7 +462,7 @@ namespace synthese
 				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
 				{
 					updateRequest.getPage()->setCPU(cpu);
-					
+
 					stream << t.row(Conversion::ToString(cpu->getKey()));
 					if (!_place)
 					{
@@ -484,9 +484,9 @@ namespace synthese
 					stream << t.col() << cpu->getName();
 
 					stream << t.col();
-					
+
 					stream << t.col() << HTMLModule::getLinkButton(updateRequest.getURL(), "Ouvrir", string(), "monitor_edit.png");
-					
+
 				}
 
 				if (tabHasWritePermissions())
@@ -571,13 +571,13 @@ namespace synthese
 				shared_ptr<DisplaySearchAdmin> p1(getNewPage<DisplaySearchAdmin>());
 				p1->_place = optional<shared_ptr<const StopArea> >();
 				links.push_back(p1);
-			
+
 				// Stock
 				shared_ptr<DisplaySearchAdmin> p2(getNewPage<DisplaySearchAdmin>());
 				p2->_place = shared_ptr<const StopArea>();
 				links.push_back(p2);
 			}
-			
+
 			return links;
 		}
 
@@ -587,7 +587,7 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const {
-		
+
 			AdminInterfaceElement::PageLinks links;
 
 			const DisplaySearchAdmin* sa(dynamic_cast<const DisplaySearchAdmin*>(&currentPage));
@@ -595,7 +595,7 @@ namespace synthese
 			const DisplayScreenCPUAdmin* ca(dynamic_cast<const DisplayScreenCPUAdmin*>(&currentPage));
 
 			if( _place &&
-				(	sa && sa->_place == _place ||	
+				(	sa && sa->_place == _place ||
 					da && da->getScreen()->getRoot<NamedPlace>() == _place->get() ||
 					ca && ca->getCPU()->getPlace() == _place->get()
 			)	){
@@ -632,7 +632,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 
@@ -641,7 +641,7 @@ namespace synthese
 		{
 			return
 				_place ?
-				(	_place->get() ? 
+				(	_place->get() ?
 					(*_place)->getFullName() :
 					"Equipements en stock"
 				):
@@ -695,7 +695,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DisplaySearchAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _place == static_cast<const DisplaySearchAdmin&>(other)._place;

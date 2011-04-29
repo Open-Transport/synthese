@@ -80,7 +80,7 @@ namespace synthese
 				if (_connectionPlacesMatcher.size () > 0)
 				{
 					_connectionPlacesMatcher.entries().begin()->second->getVertexAccessMap(
-						result, accessDirection, accessParameters, 
+						result, accessDirection, accessParameters,
 						whatToSearch
 					);
 				}
@@ -110,7 +110,7 @@ namespace synthese
 */			{
 				IncludingPlace::getVertexAccessMap(
 					result,
-					accessParameters, 
+					accessParameters,
 					whatToSearch
 				);
 			}

@@ -52,7 +52,7 @@ namespace synthese
 
 		@defgroup m11Exceptions Exceptions
 		@ingroup m11
-		
+
 		@defgroup m11 11 Interface
 		@ingroup m1
 
@@ -117,7 +117,7 @@ namespace synthese
 			static std::string getVariableFromMap(const VariablesMap& variables, const std::string& varName);
 
 
-			
+
 
 
 

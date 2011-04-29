@@ -3,7 +3,7 @@
  * 	Algorithm desrcipted in RFC 1321.
  * 	I translated the C code from this RFC to C++.
  * 	There is now warranty.
- * 
+ *
  * 	Feb. 12. 2005
  * 	Benjamin Grüdelbach
  */
@@ -131,7 +131,7 @@ namespace synthese
 			  /*
 			   * Transform as many times as possible.
 			   */
-			  if (inputLen >= partLen) 
+			  if (inputLen >= partLen)
 			  {
 				 MD5_memcpy ((POINTER)&context->buffer[index], (POINTER)input, partLen);
 				 MD5Transform (context->state, context->buffer);
@@ -141,7 +141,7 @@ namespace synthese
 
 				 index = 0;
 			  }
-			  else 
+			  else
 	 			i = 0;
 
 			  /* Buffer remaining input */
@@ -162,7 +162,7 @@ namespace synthese
 			/* Save number of bits */
 			Encode (bits, context->count, 8);
 
-			/* 
+			/*
 			 * Pad out to 56 mod 64.
 			 */
 			index = (unsigned int)((context->count[0] >> 3) & 0x3f);
@@ -268,13 +268,13 @@ namespace synthese
 			state[2] += c;
 			state[3] += d;
 
-			/* 
+			/*
 			 * Zeroize sensitive information.
 			 */
 			MD5_memset ((POINTER)x, 0, sizeof (x));
 		}
 
-		/* 
+		/*
 		 * Encodes input (unsigned int) into output (unsigned char). Assumes len is
 		 * a multiple of 4.
 		 */
@@ -299,7 +299,7 @@ namespace synthese
 			  unsigned int i, j;
 
 			  for (i = 0, j = 0; j < len; i++, j += 4)
-				 output[i] = ((unsigned int)input[j]) | 
+				 output[i] = ((unsigned int)input[j]) |
 						 (((unsigned int)input[j+1]) << 8) |
 						 (((unsigned int)input[j+2]) << 16) |
 						 (((unsigned int)input[j+3]) << 24);

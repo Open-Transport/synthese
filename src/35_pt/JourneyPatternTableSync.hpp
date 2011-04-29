@@ -42,8 +42,8 @@ namespace synthese
 			@ingroup m35LS refLS
 
 		Lines table :
-			- on insert : 
-			- on update : 
+			- on insert :
+			- on update :
 			- on delete : X
 		*/
 		class JourneyPatternTableSync : public db::DBRegistryTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>

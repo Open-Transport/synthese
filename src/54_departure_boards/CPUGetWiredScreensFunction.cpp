@@ -42,7 +42,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace server;
-	
+
 	template<> const string util::FactorableTemplate<Function,departure_boards::CPUGetWiredScreensFunction>::FACTORY_KEY("CPUGetWiredScreensFunction");
 
 	namespace departure_boards

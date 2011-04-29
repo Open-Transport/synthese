@@ -71,7 +71,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DRTAreasAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -98,7 +98,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DRTAreasAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -169,9 +169,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -179,30 +179,30 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks DRTAreasAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const DRTAreaAdmin* ua(
 				dynamic_cast<const DRTAreaAdmin*>(&currentPage)
 			);
-			
+
 			if(ua)
 			{
 				shared_ptr<DRTAreaAdmin> p(getNewPage<DRTAreaAdmin>());
 				p->setArea(ua->getArea());
 				links.push_back(p);
 			}
-			
+
 			return links;
 		}
 }	}

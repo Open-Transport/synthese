@@ -58,7 +58,7 @@ namespace synthese
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param ...	
+				@param ...
 				@param variables Execution variables
 				@param request Source request
 			*/
@@ -69,7 +69,7 @@ namespace synthese
 				, interfaces::VariablesMap& variables
 				, const Request* request = NULL
 			) const;
-			
+
 			LoginInterfacePage();
 		};
 	}

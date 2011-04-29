@@ -41,7 +41,7 @@ namespace synthese
 	{
 		class Service;
 	}
-	
+
 	namespace pt
 	{
 		class TransportNetwork;
@@ -49,7 +49,7 @@ namespace synthese
 		class RollingStock;
 		class JourneyPatternCopy;
 	}
-	
+
 	namespace pt
 	{
 		class LineStop;
@@ -148,8 +148,8 @@ namespace synthese
 
 				/** Adds a service to a line.
 					@param service Service to add
-					@param ensureLineTheory If true, the method verifies if the service is compatible 
-							with the other ones, by the way of the lines theory. If not, then it attempts 
+					@param ensureLineTheory If true, the method verifies if the service is compatible
+							with the other ones, by the way of the lines theory. If not, then it attempts
 							to register the service in an existing JourneyPatternCopy, or creates one if necessary.
 							Note : in this case, the service is NOT added to the current line.
 
@@ -161,7 +161,7 @@ namespace synthese
 					bool ensureLineTheory
 				);
 			//@}
-		    
+
 			//! @name Services
 			//@{
 				virtual std::string getRuleUserName() const { return "Mission " + getName(); }
@@ -182,7 +182,7 @@ namespace synthese
 					@param service service to test
 					@return bool true if the line theory would be respected
 					@author Hugues Romain
-					@date 2008					
+					@date 2008
 				*/
 				bool respectsLineTheory(
 					bool RTData,

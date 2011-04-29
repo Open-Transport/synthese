@@ -36,7 +36,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace db
 	{
 		SQLiteResult::SQLiteResult(sqlite3* handle, sqlite3_stmt* statement, const SQLData& sql) :
@@ -55,7 +55,7 @@ namespace synthese
 
 
 
-		void 
+		void
 		SQLiteResult::reset() const
 		{
 			int retc = sqlite3_reset(_statement);
@@ -65,7 +65,7 @@ namespace synthese
 
 
 
-		bool 
+		bool
 		SQLiteResult::next() const
 		{
 			int retc = sqlite3_step(_statement);

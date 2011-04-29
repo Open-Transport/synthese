@@ -57,7 +57,7 @@ namespace synthese
 
 			if (vel.isEmpty())
 				return;
-			
+
 			_page_code = vel.front();
 			_parameters.takeFrom(vel, _page);
 		}

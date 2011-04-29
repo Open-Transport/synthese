@@ -46,15 +46,15 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_WITH_TIME;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::posix_time::ptime _time;
 				bool _withTime;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Date#Request
@@ -64,9 +64,9 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.2.1
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Date#Request
@@ -78,8 +78,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			DateService();
 
@@ -97,9 +97,9 @@ namespace synthese
 			/// @author RCSobility
 			/// @date 2011
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

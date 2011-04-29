@@ -60,32 +60,32 @@ namespace synthese
 			/** Copy constructor.
 				@param source Alarm template to copy (should be of the same scenario)
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
 			SentAlarm(
 				const SentScenario& scenario,
 				const SentAlarm& source
 			);
-			
+
 
 
 			/** Alarm template instantiation constructor.
 				@param scenario Scenario which belongs the new alarm
 				@param source Alarm template to copy
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 				@warning the recipients are not copied. Do it at the table synchronization.
 			*/
 			SentAlarm(
 				const SentScenario& scenario,
 				const AlarmTemplate& source
 			);
-			
+
 			/** Basic constructor.
 				@param scenario Scenario which belongs the new alarm
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			SentAlarm(
 				util::RegistryKeyType key = 0,
@@ -108,7 +108,7 @@ namespace synthese
 				void					setTemplate(const AlarmTemplate* value);
 			//@}
 
-			
+
 			/** Conflict between two alarms detector.
 				@param other Other alarm to compare with
 				@return synthese::messages::AlarmConflict the conflict situation between the two alarms if they where displayed on the same recipient
@@ -133,11 +133,11 @@ namespace synthese
 			*/
 			AlarmConflict wereInConflictWith(const SentAlarm& other) const;
 
-			
+
 			/** Gets the "worse" conflict status of the alarm in each recipient type..
 				@return synthese::messages::AlarmConflict The conflict status of the alarm
 				@author Hugues Romain
-				@date 2007				
+				@date 2007
 			*/
 			AlarmConflict getConflictStatus() const;
 		};

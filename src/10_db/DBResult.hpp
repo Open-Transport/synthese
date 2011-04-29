@@ -49,17 +49,17 @@ namespace synthese
 		class DBResult;
 
 		typedef boost::shared_ptr<DBResult> DBResultSPtr;
-	    
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Interface for access to a database query result.
 		/// @ingroup m10
 		/// @author Marc Jambert
-		class DBResult 
+		class DBResult
 		{
 		private:
 			mutable int _pos;
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Same as getColumnIndex(), but throws a DBException exception if the column doesn't exist.
 			/// @author Sylvain Pasche
@@ -67,7 +67,7 @@ namespace synthese
 
 		protected:
 
-			DBResult(); 
+			DBResult();
 			virtual ~DBResult ();
 
 			void resetPosition() const;
@@ -117,7 +117,7 @@ namespace synthese
 			boost::posix_time::time_duration getHour(const std::string& name) const;
 
 			std::vector<int> computeMaxColWidths () const;
-		    
+
 			util::RegistryKeyType getKey() const;
 
 

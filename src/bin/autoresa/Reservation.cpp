@@ -17,13 +17,13 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankC
 	tripChoiced=_tripChoiced;
 	rankChoiced=_rankChoiced;
 	if(_session->sessionId.empty()) Functions::setFatalError("without session id in Reservation processus");
-	
+
 	if(Functions::getFatalError().empty())
 	{
 		Functions::playbackText(agi,res,"veuillez patienter.");
 		int menuKey[]={0,1,3};
 		dtmfInput=Functions::readKey(agi,res,menuKey,3,1,session->solutionVector.at(rankChoiced-1).sentence);
-		
+
 		switch(dtmfInput)
 		{
 			case 1:	// yes
@@ -46,7 +46,7 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankC
 				return 2;	// will transfer to operator
 				break;
 		}
-	
+
 	}
 	else
 	{
@@ -63,7 +63,7 @@ int Reservation::start(SessionReturnType *_session, int _tripChoiced, int _rankC
 		string: sessionId
 	@return:
 		string: line info
-		
+
 **/
 int Reservation::requestReservationToSynthese() throw (int)
 {
@@ -85,12 +85,12 @@ int Reservation::requestReservationToSynthese() throw (int)
 							+session->registredPhone+
 							"&actionParampass="
 							+session->psw;
-	
+
 		cerr<<"request: "<< req<<endl;
-		
+
 		// valeur de retour à reflechir
 		string xml=Functions::makeRequest(req);
-		
+
 		/*
 		<reservation>
 		<reservation>-1</reservation>
@@ -99,11 +99,11 @@ int Reservation::requestReservationToSynthese() throw (int)
 		*/
 		if(Functions::smartXmlParser(xml,"reservation")=="-1")
 		{
-			Functions::readKey(agi,res,new int,1,1,Functions::smartXmlParser(xml,"sentence"),10);	
+			Functions::readKey(agi,res,new int,1,1,Functions::smartXmlParser(xml,"sentence"),10);
 		}
 		else
 		{
-			Functions::playbackText(agi,res,Functions::smartXmlParser(xml,"sentence"));	
+			Functions::playbackText(agi,res,Functions::smartXmlParser(xml,"sentence"));
 		}
 
 	return 0;

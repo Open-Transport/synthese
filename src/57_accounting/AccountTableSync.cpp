@@ -56,7 +56,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<AccountTableSync,Account>::load(Account* account, const db::DBResultSPtr& rows )
 		{
 		    account->setKey(rows->getLongLong (TABLE_COL_ID));
-		
+
 			account->setLeftClassNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_CLASS_NUMBER));
 		    account->setLeftNumber(rows->getText ( AccountTableSync::TABLE_COL_LEFT_NUMBER));
 		    account->setLeftUserId(rows->getLongLong ( AccountTableSync::TABLE_COL_LEFT_USER_ID));

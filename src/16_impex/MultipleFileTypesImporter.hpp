@@ -45,7 +45,7 @@ namespace synthese
 
 		public:
 			static const bool IMPORTABLE;
-			
+
 			typedef std::string FileKey;
 			typedef std::map<FileKey, boost::filesystem::path> FilePathsMap;
 

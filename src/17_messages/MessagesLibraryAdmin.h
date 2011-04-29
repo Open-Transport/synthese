@@ -37,7 +37,7 @@ namespace synthese
 
 			@image html cap_admin_messages_library.png
 			@image latex cap_admin_messages_library.png "Maquette de l'écran d'édition des modèles de message" width=14cm
-			
+
 			<i>Titre de la fenêtre</i> :
 				- SYNTHESE Admin - Messages - Bibliothèque
 
@@ -54,7 +54,7 @@ namespace synthese
 					-# bouton <tt>Modifier</tt> : Enregistre les modifications effectuées dans les champs
 					-# bouton <tt>Supprimer</tt> : Supprime le modèle de texte
 					-# bouton <tt>Ajouter</tt> : Même comportement que <tt>Modifier</tt> sur un texte nouvellement créé
-					
+
 				-# <b>Tableau des textes destinés aux messages prioritaires</b>
 					-# <tt>Nom</tt> : Nom désignant le texte dans les menus. Ce nom n'est pas affiché en dehors du module d'administration. Champ obligatoire et unique.
 					-# <tt>Message court</tt> : Champ texte de 4x20 caractères. Champ obligatoire.
@@ -83,7 +83,7 @@ namespace synthese
 			boost::shared_ptr<const ScenarioFolder>		_folder;
 			util::Env									_subFoldersEnv;
 
-			
+
 		public:
 			MessagesLibraryAdmin();
 
@@ -97,18 +97,18 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 					@return server::ParametersMap The generated parameters map
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 			virtual server::ParametersMap getParametersMap() const;
-			
-			
-			
+
+
+
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.
 			*/
@@ -142,7 +142,7 @@ namespace synthese
 				@return PageLinks Ordered vector of sub pages links
 				@author Hugues Romain
 				@date 2008
-				
+
 				The default implementation handles the auto registration of administrative components by getSuperiorVirtual() method.
 				This method can be overloaded to create customized sub tree.
 			*/
@@ -157,7 +157,7 @@ namespace synthese
 			/** Gets the opening position of the node in the tree view.
 				@return Always visible
 				@author Hugues Romain
-				@date 2008					
+				@date 2008
 			*/
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,

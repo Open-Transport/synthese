@@ -23,21 +23,21 @@ namespace carto
 
 
 
-  void 
-  MapTest::setUp () 
+  void
+  MapTest::setUp ()
   {
 
   }
 
 
-  void 
-  MapTest::tearDown() 
+  void
+  MapTest::tearDown()
   {
 
-  } 
+  }
 
 
-  void 
+  void
   MapTest::testMap1 ()
   {
       // This is a bug fix test.
@@ -55,17 +55,17 @@ namespace carto
 
 
       std::vector<const Point*> points1;
-      points1.push_back (&A1); 
-      points1.push_back (&B1); 
-      points1.push_back (&C1); 
-      points1.push_back (&D1); 
-      points1.push_back (&E1); 
+      points1.push_back (&A1);
+      points1.push_back (&B1);
+      points1.push_back (&C1);
+      points1.push_back (&D1);
+      points1.push_back (&E1);
 
       std::vector<const Point*> points2;
-      points2.push_back (&A2); 
-      points2.push_back (&B2); 
-      points2.push_back (&C2); 
-      points2.push_back (&D2); 
+      points2.push_back (&A2);
+      points2.push_back (&B2);
+      points2.push_back (&C2);
+      points2.push_back (&D2);
 
       DrawableLine* line1 = new DrawableLine ("1", points1, "L1", RGBColor ("blue"));
       DrawableLine* line2 = new DrawableLine ("2", points2, "L2", RGBColor ("red"));
@@ -80,7 +80,7 @@ namespace carto
 			   (1847980 - 1840080));
 
       Map map (selectedLines, realFrame, 800, 800);
-      
+
       map.prepare ();
 
       double spacing = 6.0;
@@ -111,7 +111,7 @@ namespace carto
 */
       // CPPUNIT_ASSERT (grid.isMarked (3, 4) == false);
   }
-      
+
 
 
 

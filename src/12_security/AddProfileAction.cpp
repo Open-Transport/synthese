@@ -40,7 +40,7 @@ namespace synthese
 	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action, security::AddProfileAction>::FACTORY_KEY("apa");
-	
+
 	namespace security
 	{
 		const string AddProfileAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "apan";
@@ -105,7 +105,7 @@ namespace synthese
 				profile->addRight(r);
 			}
 			ProfileTableSync::Save(profile.get());
-			
+
 			request.setActionCreatedId(profile->getKey());
 
 			// DBLog

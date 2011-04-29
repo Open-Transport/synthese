@@ -53,15 +53,15 @@ namespace synthese
 	{
 		std::vector<shared_ptr<ConnectionPlaceWithBroadcastPoint> > searchConnectionPlacesWithBroadcastPoints(
 			Env& env,
-			const security::RightsOfSameClassMap& rights 
-			, bool totalControl 
+			const security::RightsOfSameClassMap& rights
+			, bool totalControl
 			, RightLevel neededLevel
 			, std::string cityName /*= ""*/
 			, std::string placeName /*= ""*/
-			, BroadcastPointsPresence bpPresence 
-			, optional<RegistryKeyType> lineId 
+			, BroadcastPointsPresence bpPresence
+			, optional<RegistryKeyType> lineId
 			, boost::optional<std::size_t> number
-			, int first/*=0*/ 
+			, int first/*=0*/
 			, bool orderByCity
 			, bool orderByName
 			, bool orderByNumber
@@ -79,9 +79,9 @@ namespace synthese
 					<< StopAreaTableSync::TABLE.NAME << " AS p"
 					<< " INNER JOIN " << CityTableSync::TABLE.NAME << " AS c ON c." << TABLE_COL_ID << "=p." << StopAreaTableSync::TABLE_COL_CITYID
 					<< " INNER JOIN " << StopPointTableSync::TABLE.NAME << " AS ps ON " 	<< " ps." << StopPointTableSync::COL_PLACEID << "=p." << TABLE_COL_ID
-					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID 
+					<< " INNER JOIN " << LineStopTableSync::TABLE.NAME << " AS ls ON ps." << TABLE_COL_ID << "= ls." << LineStopTableSync::COL_PHYSICALSTOPID
 					<< " INNER JOIN " << JourneyPatternTableSync::TABLE.NAME << " as l ON l." << TABLE_COL_ID << "=ls." << LineStopTableSync::COL_LINEID;
-			// Where	
+			// Where
 			query << " WHERE 1 ";
 			if (neededLevel > FORBIDDEN)
 				query << " AND l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << " IN (" << CommercialLineTableSync::getSQLLinesList(rights, totalControl, neededLevel, false) << ")";
@@ -114,7 +114,7 @@ namespace synthese
 			{
 				query << " ORDER BY bc" << (raisingOrder ? " ASC" : " DESC");
 			}
-			
+
 			// Limits
 			if (number)
 			{
@@ -154,8 +154,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		std::vector<shared_ptr<const CommercialLine> > getCommercialLineWithBroadcastPoints(
 			Env& env,
 			boost::optional<std::size_t> number,

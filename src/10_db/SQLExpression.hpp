@@ -327,7 +327,7 @@ namespace synthese
 			}
 
 			virtual std::string toString() const { return _value; }
-			
+
 			static boost::shared_ptr<SQLExpression> Get(const boost::shared_ptr<geos::geom::Geometry>& value)
 			{
 				return boost::shared_ptr<SQLExpression>(

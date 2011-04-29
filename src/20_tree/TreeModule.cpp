@@ -29,8 +29,8 @@ namespace synthese
 {
 	using namespace server;
 	using namespace tree;
-	
-	
+
+
 	template<> const std::string util::FactorableTemplate<ModuleClass, TreeModule>::FACTORY_KEY("20_tree");
 
 	namespace tree
@@ -40,15 +40,15 @@ namespace synthese
 	namespace server
 	{
 		template<> const string ModuleClassTemplate<TreeModule>::NAME("Arborescences");
-		
+
 		template<> void ModuleClassTemplate<TreeModule>::PreInit()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<TreeModule>::Init()
 		{
 		}
-		
+
 		template<> void ModuleClassTemplate<TreeModule>::End()
 		{
 		}

@@ -36,7 +36,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
-	
+
 	namespace pt
 	{
 		JourneyPatternCopy::JourneyPatternCopy( JourneyPattern* line )
@@ -54,7 +54,7 @@ namespace synthese
 			setTimetableName(line->getTimetableName());
 			setDirection(line->getDirection());
 			setWalkingLine(line->getWalkingLine());
-			
+
 			// Copy of the line-stops
 			const Path::Edges edges(line->getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
@@ -103,7 +103,7 @@ namespace synthese
 
 			Path::addService(service, false);
 			service->setPath(this);
-			
+
 			return true;
 		}
 

@@ -75,7 +75,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DataSourceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -110,7 +110,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DataSourceAdmin::isAuthorized(
 			const security::User& user
 		) const	{

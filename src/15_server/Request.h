@@ -52,7 +52,7 @@ namespace synthese
 			The request class can be used in several ways. The life cycle of the request object is divided in two steps :
 				- the build
 				- the output
-			
+
 			The build and the output follow much different ways. The request acts as a wrapper between the build and the output methods.
 
 			The available build processes are :
@@ -97,7 +97,7 @@ namespace synthese
 					- if error do nothing
 					- run function
 
-				
+
 		*/
 		class Request
 		{
@@ -124,7 +124,7 @@ namespace synthese
 					const std::string& location,
 					bool permanently,
 					const boost::optional<const CookiesMap&> cookiesMap = boost::optional<const CookiesMap&>()
-				): 
+				):
 					_location(location),
 					_permanently(permanently)
 				{
@@ -246,7 +246,7 @@ namespace synthese
 			//@{
 				ParametersMap _getParametersMap() const;
 				virtual ParametersMap getParametersMap() const { return _getParametersMap(); }
-			
+
 				/** Run of the services.
 					@param stream Stream to write the output on
 					@author Hugues Romain
@@ -283,7 +283,7 @@ namespace synthese
 					@param name Name of the form (default = no name, sufficient for link generation)
 					@return boost::shared_ptr<html::HTMLForm> The created form.
 					@author Hugues Romain
-					@date 2007					
+					@date 2007
 				*/
 				html::HTMLForm getHTMLForm(std::string name=std::string()) const;
 

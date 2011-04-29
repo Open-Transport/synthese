@@ -55,7 +55,7 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace pt;
-	
+
 
 	namespace util
 	{
@@ -71,7 +71,7 @@ namespace synthese
 		const std::string MapRequest::DATA_PARAMETER ("data");
 		const std::string MapRequest::MAP_PARAMETER ("map");
 		const string MapRequest::PARAMETER_USE_ENVIRONMENT("ue");
-		
+
 
 		MapRequest::MapRequest()
 			: _useEnvironment(true)
@@ -109,13 +109,13 @@ namespace synthese
 
 			// Output
 			setOutput(map.get<string>(OUTPUT_PARAMETER));
-			
+
 			if (!_useEnvironment)
 			{
 				// XML data
 				setData(map.getDefault<string>(DATA_PARAMETER));
 			}
-			
+
 			// Map XML
 			setQuery(map.get<string>(MAP_PARAMETER));
 		}
@@ -146,12 +146,12 @@ namespace synthese
 			std::string resultFilename = renderer->render (tempDir, filePrefix, _temporaryEnvironment.getRegistry<JourneyPattern>(), *_map, conf);
 
 			// Broadcast of the result
-			std::string resultURL = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_URL) 
+			std::string resultURL = MapModule::GetParameter (MapModule::PARAM_HTTP_TEMP_URL)
 			    + "/" + resultFilename;
-			
+
 			// Send the URL to the the generated local JPEG file.
 			stream << resultURL;
-			
+
 			Log::GetInstance ().debug ("Sent result url " + resultURL);
 
 		}
@@ -169,7 +169,7 @@ namespace synthese
 
 			XMLNode citiesNode = GetChildNode (dataNode, "cities", 0);
 			int nbCities = GetChildNodeCount (citiesNode, "city");
-			for (int i=0; i<nbCities; ++i) 
+			for (int i=0; i<nbCities; ++i)
 			{
 				XMLNode cityNode = GetChildNode (citiesNode, "city", i);
 				_temporaryEnvironment.getEditableRegistry<City>().add (pt::XmlBuilder::CreateCity (cityNode));
@@ -177,7 +177,7 @@ namespace synthese
 
 			XMLNode connectionPlacesNode = GetChildNode (dataNode, "connectionPlaces", 0);
 			int nbConnectionPlaces = GetChildNodeCount (connectionPlacesNode, "connectionPlace");
-			for (int i=0; i<nbConnectionPlaces; ++i) 
+			for (int i=0; i<nbConnectionPlaces; ++i)
 			{
 				XMLNode connectionPlaceNode = GetChildNode (connectionPlacesNode, "connectionPlace", i);
 				_temporaryEnvironment.getEditableRegistry<StopArea>().add (synthese::pt::XmlBuilder::CreateConnectionPlace (connectionPlaceNode, _temporaryEnvironment.getEditableRegistry<City>()));
@@ -185,7 +185,7 @@ namespace synthese
 
 			XMLNode physicalStopsNode = GetChildNode (dataNode, "physicalStops", 0);
 			int nbPhysicalStops = GetChildNodeCount (physicalStopsNode, "physicalStop");
-			for (int i=0; i<nbPhysicalStops; ++i) 
+			for (int i=0; i<nbPhysicalStops; ++i)
 			{
 				XMLNode physicalStopNode = GetChildNode (physicalStopsNode, "physicalStop", i);
 				_temporaryEnvironment.getEditableRegistry<StopPoint>().add (synthese::pt::XmlBuilder::CreatePhysicalStop (physicalStopNode, _temporaryEnvironment.getEditableRegistry<StopArea>()));
@@ -193,7 +193,7 @@ namespace synthese
 
 			XMLNode commercialLinesNode = GetChildNode (dataNode, "commercialLines", 0);
 			int nbCommercialLines = GetChildNodeCount (commercialLinesNode, "commercialLine");
-			for (int i=0; i<nbCommercialLines; ++i) 
+			for (int i=0; i<nbCommercialLines; ++i)
 			{
 				XMLNode commercialLineNode = GetChildNode (commercialLinesNode, "commercialLine", i);
 				_temporaryEnvironment.getEditableRegistry<CommercialLine>().add (synthese::pt::XmlBuilder::CreateCommercialLine (commercialLineNode));
@@ -201,7 +201,7 @@ namespace synthese
 
 			XMLNode linesNode = GetChildNode (dataNode, "lines", 0);
 			int nbLines = GetChildNodeCount (linesNode, "line");
-			for (int i=0; i<nbLines; ++i) 
+			for (int i=0; i<nbLines; ++i)
 			{
 				XMLNode lineNode = GetChildNode (linesNode, "line", i);
 				_temporaryEnvironment.getEditableRegistry<JourneyPattern>().add(
@@ -213,7 +213,7 @@ namespace synthese
 
 			XMLNode lineStopsNode = GetChildNode (dataNode, "lineStops", 0);
 			int nbLineStops = GetChildNodeCount (lineStopsNode, "lineStop");
-			for (int i=0; i<nbLineStops; ++i) 
+			for (int i=0; i<nbLineStops; ++i)
 			{
 				XMLNode lineStopNode = GetChildNode (lineStopsNode, "lineStop", i);
 				_temporaryEnvironment.getEditableRegistry<DesignatedLinePhysicalStop>().add (synthese::pt::XmlBuilder::CreateLineStop (lineStopNode, _temporaryEnvironment.getEditableRegistry<JourneyPattern>(), _temporaryEnvironment.getEditableRegistry<StopPoint>()));

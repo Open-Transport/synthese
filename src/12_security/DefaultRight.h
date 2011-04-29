@@ -14,14 +14,14 @@ namespace synthese
 			Les niveaux de droit utilisés sont les suivants :
 
 			Habilitations privées :
-			- USE : 
-			- READ : 
-			- WRITE : 
+			- USE :
+			- READ :
+			- WRITE :
 
 			Habilitations publiques :
-			- READ : 
-			- WRITE : 
-			- DELETE : 
+			- READ :
+			- WRITE :
+			- DELETE :
 
 			Définition du périmètre :
 				- Aucun périmètre ne peut être défini

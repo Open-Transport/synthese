@@ -78,7 +78,7 @@ namespace synthese
 				const std::string& getClientURL() const { return _clientURL; }
 				Webpage* getDefaultTemplate() const { return _defaultTemplate; }
 			//@}
-			
+
 			//! @name Services
 			//@{
 				bool dateControl() const;
@@ -87,7 +87,7 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void addPage(Webpage& page);
-				
+
 				void removePage(const std::string& page);
 
 				/// Non thread safe

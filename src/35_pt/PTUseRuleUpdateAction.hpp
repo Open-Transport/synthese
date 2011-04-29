@@ -69,7 +69,7 @@ namespace synthese
 			boost::optional<boost::shared_ptr<const Fare> > _fare;
 			boost::optional<PTUseRule::ReservationRuleType> _type;
 			boost::optional<boost::posix_time::time_duration> _minDelayMinutes;
-			boost::optional<boost::gregorian::date_duration> _minDelayDays; 
+			boost::optional<boost::gregorian::date_duration> _minDelayDays;
 			boost::optional<boost::optional<boost::gregorian::date_duration> > _maxDelayDays;
 			boost::optional<boost::posix_time::time_duration> _hourDeadLine;
 			boost::optional<bool> _forbiddenInTimetables;

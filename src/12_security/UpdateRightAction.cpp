@@ -44,7 +44,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<server::Action,security::UpdateRightAction>::FACTORY_KEY("ura");
 	}
-	
+
 	namespace security
 	{
 		const string UpdateRightAction::PARAMETER_PROFILE_ID(Action_PARAMETER_PREFIX + "p");
@@ -52,7 +52,7 @@ namespace synthese
 		const string UpdateRightAction::PARAMETER_RIGHT_PARAMETER(Action_PARAMETER_PREFIX + "r");
 		const string UpdateRightAction::PARAMETER_PUBLIC_VALUE = Action_PARAMETER_PREFIX + "v";
 		const string UpdateRightAction::PARAMETER_PRIVATE_VALUE(Action_PARAMETER_PREFIX + "t");
-		
+
 		ParametersMap UpdateRightAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -120,8 +120,8 @@ namespace synthese
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 			/// @todo Add a control on the profile of the user
 		}
-		
-		
+
+
 		void UpdateRightAction::setProfile(boost::shared_ptr<const Profile> value)
 		{
 			_profile = const_pointer_cast<Profile>(value);

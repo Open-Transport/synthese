@@ -61,9 +61,9 @@ namespace synthese
 
 		@defgroup m20 20 Tree
 		@ingroup m1
-		
+
 		@todo Write Module documentation
-		
+
 		@{
 	*/
 
@@ -82,13 +82,13 @@ namespace synthese
 			public server::ModuleClassTemplate<TreeModule>
 		{
 		private:
-			
-			
+
+
 		public:
 			/** Initialization of the 20 Tree module after the automatic database loads.
 				@author Hugues
 				@date 2010
-			*/			
+			*/
 			void initialize();
 		};
 	}

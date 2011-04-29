@@ -37,23 +37,23 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace geography;	
+	using namespace geography;
 	using namespace util;
 	using namespace pt;
-	
-	
+
+
 
 	namespace pt
 	{
 
 
-		shared_ptr<City> 
+		shared_ptr<City>
 		XmlBuilder::CreateCity (XMLNode& node)
 		{
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
-		    
+
 			return shared_ptr<City>(new City (id, name));
 		}
 
@@ -61,22 +61,22 @@ namespace synthese
 
 
 		shared_ptr<StopArea>
-		XmlBuilder::CreateConnectionPlace (XMLNode& node, 
+		XmlBuilder::CreateConnectionPlace (XMLNode& node,
 						   const Registry<City>& cities)
 		{
 			// assert ("connectionPlace" == node.getName ());
-		    
+
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
 
 			std::string name (GetStringAttr (node, "name"));
 			util::RegistryKeyType cityId (GetLongLongAttr (node, "cityId"));
-		    
+
 			std::string typeStr (GetStringAttr (node, "connectionType"));
 
 			bool type(Conversion::ToBool(typeStr));
 
 			posix_time::time_duration defaultTransferDelay(posix_time::minutes(GetIntAttr(
-					node, 
+					node,
 					"defaultTransferDelay"
 			)	)	);
 
@@ -92,7 +92,7 @@ namespace synthese
 		}
 
 
-		shared_ptr<CommercialLine> 
+		shared_ptr<CommercialLine>
 		XmlBuilder::CreateCommercialLine (XMLNode& node)
 		{
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
@@ -119,8 +119,8 @@ namespace synthese
 
 
 
-		shared_ptr<JourneyPattern> 
-		XmlBuilder::CreateLine (XMLNode& node, 
+		shared_ptr<JourneyPattern>
+		XmlBuilder::CreateLine (XMLNode& node,
 					const Registry<CommercialLine>& commercialLines)
 		{
 			util::RegistryKeyType id (GetLongLongAttr (node, "id"));
@@ -131,18 +131,18 @@ namespace synthese
 
 			util::RegistryKeyType commercialLineId (GetLongLongAttr (node, "commercialLineId"));
 			line->setCommercialLine (const_cast<CommercialLine*>(commercialLines.get(commercialLineId).get()));
-		 
+
 			std::string direction (GetStringAttr (node, "direction"));
 			line->setDirection (direction);
-		   
+
 			return line;
 		}
 
 
 
 
-		shared_ptr<DesignatedLinePhysicalStop> 
-		XmlBuilder::CreateLineStop (XMLNode& node, 
+		shared_ptr<DesignatedLinePhysicalStop>
+		XmlBuilder::CreateLineStop (XMLNode& node,
 						Registry<JourneyPattern>& lines,
 						const Registry<StopPoint>& physicalStops)
 		{
@@ -156,22 +156,22 @@ namespace synthese
 			bool isDeparture (GetBoolAttr (node, "isDeparture"));
 			bool isArrival (GetBoolAttr (node, "isArrival"));
 			double metricOffset (GetDoubleAttr (node, "metricOffset"));
-		   
+
 			shared_ptr<JourneyPattern> line = lines.getEditable (lineId);
 
 			shared_ptr<DesignatedLinePhysicalStop> lineStop (
 			new DesignatedLinePhysicalStop(
 				id,
-				line.get(), 
-				rankInPath, 
+				line.get(),
+				rankInPath,
 				isDeparture, isArrival,
-				metricOffset, 
+				metricOffset,
 				const_cast<StopPoint*>(physicalStops.get(physicalStopId).get())))
 			;
 
 			// Add via points
 //			int nbPoints = GetChildNodeCount(node, "point");
-//			for (int i=0; i<nbPoints; ++i) 
+//			for (int i=0; i<nbPoints; ++i)
 //			{
 //				XMLNode pointNode = GetChildNode (node, "point", i);
 //				lineStop->addViaPoint (CreatePoint (pointNode));
@@ -184,7 +184,7 @@ namespace synthese
 
 
 
-		shared_ptr<StopPoint> 
+		shared_ptr<StopPoint>
 		XmlBuilder::CreatePhysicalStop(
 			XMLNode& node,
 			const Registry<StopArea>& connectionPlaces)
@@ -199,8 +199,8 @@ namespace synthese
 			return shared_ptr<StopPoint>(
 				new synthese::pt::StopPoint(
 					id,
-					name, 
-					connectionPlaces.get (placeId).get(), 
+					name,
+					connectionPlaces.get (placeId).get(),
 					CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(x, y)
 			)	);
 

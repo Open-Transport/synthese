@@ -50,7 +50,7 @@ namespace synthese
 	}
 
 	namespace geography
-	{	
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Place base class.
 		///
@@ -93,7 +93,7 @@ namespace synthese
 
 				virtual bool includes(const Place* place) const;
 			//@}
-		    
+
 		};
 }	}
 

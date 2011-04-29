@@ -49,7 +49,7 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace html;
 	using namespace db;
-	
+
 
 	namespace util
 	{
@@ -75,7 +75,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void VehiclesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -101,7 +101,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool VehiclesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -147,7 +147,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Lien"));
 			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
-			
+
 			ActionResultHTMLTable t(
 				h,
 				searchRequest.getHTMLForm(),
@@ -176,7 +176,7 @@ namespace synthese
 
 				openRequest.getPage()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleAdmin::ICON);
-				
+
 				stream << t.col();
 				removeRequest.getAction()->setObjectId(vehicle->getKey());
 				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le véhicule "+ vehicle->getName() + " ?");
@@ -199,9 +199,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				_request.getUser() &&
 				_request.getUser()->getProfile() &&
@@ -209,17 +209,17 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks VehiclesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			if(	dynamic_cast<const VehiclesAdmin*>(&currentPage) ||
@@ -233,7 +233,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 	}

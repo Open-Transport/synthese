@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, calendar::CalendarTemplatePropertiesUpdateAction>::FACTORY_KEY("CalendarTemplatePropertiesUpdateAction");
@@ -48,8 +48,8 @@ namespace synthese
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY = Action_PARAMETER_PREFIX + "cc";
 
-		
-		
+
+
 		ParametersMap CalendarTemplatePropertiesUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -58,9 +58,9 @@ namespace synthese
 			map.insert(PARAMETER_CATEGORY, static_cast<int>(_category));
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplatePropertiesUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -77,8 +77,8 @@ namespace synthese
 
 			_name = map.get<string>(PARAMETER_NAME);
 			if (_name.empty())
-				throw ActionException("Bad value for name parameter ");	
-			
+				throw ActionException("Bad value for name parameter ");
+
 			CalendarTemplateTableSync::SearchResult r(
 				CalendarTemplateTableSync::Search(*_env, _name, _calendar->getKey(), false, true, 0, 1)
 			);
@@ -87,9 +87,9 @@ namespace synthese
 
 			_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
 		}
-		
-		
-		
+
+
+
 		void CalendarTemplatePropertiesUpdateAction::run(Request& request)
 		{
 			_calendar->setText(_name);
@@ -97,9 +97,9 @@ namespace synthese
 
 			CalendarTemplateTableSync::Save(_calendar.get());
 		}
-		
-		
-		
+
+
+
 		bool CalendarTemplatePropertiesUpdateAction::isAuthorized(const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);

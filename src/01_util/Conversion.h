@@ -106,7 +106,7 @@ namespace synthese
 				@return std::string Converted string
 				@author Hugues
 				@date 2006
-				
+
 				The conversion consists in :
 					- escape some characters
 					- add apostrophes at the beginning and at the end of the string

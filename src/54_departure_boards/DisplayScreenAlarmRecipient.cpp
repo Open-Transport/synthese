@@ -84,7 +84,7 @@ namespace synthese
 
 	namespace messages
 	{
-	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to 
+	    /* IMPORTANT : for some reason, probably a gcc bug, is was necessary to
 	       explicitly call constructor with () in order to avoid undefined references.
 	       This should be investigate further.
 	    */
@@ -94,7 +94,7 @@ namespace synthese
 			std::map<const SentAlarm*, std::set<const DisplayScreen*> > ();
 
 	    template<> AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::ObjectLinks
-	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject = 
+	    AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::_linksObject =
 			std::map<const DisplayScreen*, std::set<const SentAlarm*> > ();
 
 		template<> const string AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
@@ -139,7 +139,7 @@ namespace synthese
 			testRequest.getFunction()->setAlarmId(alarm->getKey());
 
 			stream << "<h1>Test du message</h1>";
-			
+
 			HTMLForm testForm(testRequest.getHTMLForm("testForm"));
 			stream << testForm.open() << "<p>";
 			stream << "Type d'afficheur à tester : " <<
@@ -167,10 +167,10 @@ namespace synthese
 					shared_ptr<DisplayScreen> ds = *dsit;
 					usedDisplayScreens.insert(ds->getKey());
 					removeRequest.getAction()->setObjectId(ds->getKey());
-					
+
 					stream << l.element("display");
 					stream << HTMLModule::getHTMLLink(removeRequest.getURL(), HTMLModule::getHTMLImage("delete.png","Supprimer"));
-					
+
 					stream << ds->getFullName();
 				}
 
@@ -267,8 +267,8 @@ namespace synthese
 
 			arf.label = "Ligne";
 			arf.htmlField = form.getSelectInput(
-				PARAMETER_SEARCH_LINE, 
-				DeparturesTableModule::getCommercialLineWithBroadcastLabels(true), 
+				PARAMETER_SEARCH_LINE,
+				DeparturesTableModule::getCommercialLineWithBroadcastLabels(true),
 				line ? line->getKey() : optional<RegistryKeyType>()
 			);
 			arf.query = "";

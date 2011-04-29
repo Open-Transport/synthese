@@ -137,7 +137,7 @@ namespace synthese
 				privateAuthorization = (sright->getPrivateRightLevel() >= right.getPrivateRightLevel());
 				publicAuthorization = (sright->getPublicRightLevel() >= right.getPublicRightLevel());
 			}
-			
+
 			// 2 Attempting to find same right with compatible perimeter : the more favorable is selected
 			RightsOfSameClassMap m = getRights(right.getFactoryKey());
 			BOOST_FOREACH(const RightsOfSameClassMap::value_type& it, m)

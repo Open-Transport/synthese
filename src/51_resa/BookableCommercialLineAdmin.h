@@ -70,14 +70,14 @@ namespace synthese
 			static const std::string PARAMETER_SERVICE;
 
 			BookableCommercialLineAdmin();
-			
+
 			void setServiceNumber(const boost::optional<std::string>& value);
 			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
 			void setCommercialLineC(boost::shared_ptr<const pt::CommercialLine> value);
 			boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const;
 			const boost::optional<std::string>& getServiceNumber() const;
 
-			
+
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
 				@throw AdminParametersException if a parameter has incorrect value.
@@ -87,13 +87,13 @@ namespace synthese
 			void setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
-			
+
+
+
 			/** Parameters map generator, used when building an url to the admin page.
 				@return server::ParametersMap The generated parameters map
 				@author Hugues Romain
-				@date 2007					
+				@date 2007
 			*/
 			virtual server::ParametersMap getParametersMap() const;
 
@@ -110,7 +110,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			/** Authorization control.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
@@ -119,7 +119,7 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& profile
 			) const;
-			
+
 			/** Sub pages getter.
 				@param currentPage Currently displayed page
 				@return PageLinks each subpage of the current page
@@ -131,7 +131,7 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 
-			
+
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
@@ -143,8 +143,8 @@ namespace synthese
 				@date 2008
 			*/
 			virtual std::string getTitle() const;
-		
-		
+
+
 			/** Icon generator.
 				@return The icon path of the page
 				@author Hugues Romain

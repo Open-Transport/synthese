@@ -32,14 +32,14 @@ namespace util
 
 	boost::iostreams::copy (is, fs);
 	fs.pop ();
-	
-	int size = tmp.str ().length (); 
+
+	int size = tmp.str ().length ();
 
 	os << size << '#';
 	boost::iostreams::copy (tmp, os);
 
     }
-        
+
 
 
     void Compression::ZlibDecompress (std::istream& is, std::ostream& os)
@@ -53,7 +53,7 @@ namespace util
 
 	fs.push (zlib_decompressor());
 	fs.push (restrict (is, 0, size));
-	
+
 	boost::iostreams::copy(fs, os);
 	// fs.set_auto_close (false);
 	fs.pop ();

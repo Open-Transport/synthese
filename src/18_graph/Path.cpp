@@ -60,7 +60,7 @@ namespace synthese
 			_pathClass(NULL)
 		{
 		}
-		    
+
 
 		Path::~Path ()
 		{
@@ -127,7 +127,7 @@ namespace synthese
 				rank = _edges.size() - 1;
 			}
 			for(;rank > 0 && _edges[rank]->getRankInPath() > index; --rank) ;
-			
+
 			if(_edges[rank]->getRankInPath() == index)
 			{
 				return _edges[rank];
@@ -158,7 +158,7 @@ namespace synthese
 				// Next arrival of previous edges
 				if(edge.isArrivalAllowed())
 				{
-					for(Edge* it(previousEdge); 
+					for(Edge* it(previousEdge);
 						it && it->getFollowingArrivalForFineSteppingOnly() == nextArrival;
 						it = it->getPrevious()
 					){
@@ -212,7 +212,7 @@ namespace synthese
 				// Previous departure of next edges
 				if(edge.isDepartureAllowed())
 				{
-					for(Edge* it(nextEdge); 
+					for(Edge* it(nextEdge);
 						it && it->getPreviousDepartureForFineSteppingOnly() == previousDeparture;
 						it = it->getNext()
 					){
@@ -221,7 +221,7 @@ namespace synthese
 
 					if(edge.isConnectingEdge())
 					{
-						for(Edge* it(nextEdge); 
+						for(Edge* it(nextEdge);
 							it && it->getPreviousConnectionDeparture() == previousConnectingDeparture;
 							it = it->getNext()
 						){
@@ -518,7 +518,7 @@ namespace synthese
 				Edge* nextArrival(edge.getFollowingArrivalForFineSteppingOnly());
 				Edge* nextConnectingArrival(edge.getFollowingConnectionArrival());
 
-				for(Edges::iterator it(removalPosition-1); 
+				for(Edges::iterator it(removalPosition-1);
 					(*it)->getFollowingArrivalForFineSteppingOnly() == &edge;
 					--it
 				){
@@ -528,7 +528,7 @@ namespace synthese
 
 				if(edge.isConnectingEdge())
 				{
-					for(Edges::iterator it(removalPosition-1); 
+					for(Edges::iterator it(removalPosition-1);
 						(*it)->getFollowingConnectionArrival() == &edge;
 						--it
 					){
@@ -539,14 +539,14 @@ namespace synthese
 
 				edge.getPrevious()->setNext(edge.getNext());
 			}
-		
+
 			// Previous departure
 			if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed())
 			{
 				Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
 				Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
 
-				for(Edges::iterator it(removalPosition + 1); 
+				for(Edges::iterator it(removalPosition + 1);
 					it != _edges.end() && (*it)->getPreviousDepartureForFineSteppingOnly() == &edge;
 					++it
 				){
@@ -555,7 +555,7 @@ namespace synthese
 
 				if(edge.isConnectingEdge())
 				{
-					for(Edges::iterator it(removalPosition + 1); 
+					for(Edges::iterator it(removalPosition + 1);
 						it != _edges.end() && (*it)->getPreviousConnectionDeparture() == &edge;
 						++it
 					){
@@ -576,7 +576,7 @@ namespace synthese
 		{
 			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))
 				|| (s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0)
-				&& s1 < s2)						
+				&& s1 < s2)
 			;
 		}
 

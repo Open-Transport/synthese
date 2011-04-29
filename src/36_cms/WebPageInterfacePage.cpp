@@ -61,7 +61,7 @@ namespace synthese
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_TITLE, page.getName());
-			
+
 			if(displayContent)
 			{
 				stringstream content;

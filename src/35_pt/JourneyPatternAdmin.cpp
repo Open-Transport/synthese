@@ -106,7 +106,7 @@ namespace synthese
 		JourneyPatternAdmin::JourneyPatternAdmin()
 			: AdminInterfaceElementTemplate<JourneyPatternAdmin>()
 		{ }
-		
+
 		void JourneyPatternAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -124,9 +124,9 @@ namespace synthese
 			// Search table initialization
 			_requestParameters.setFromParametersMap(map.getMap(), ScheduledServiceTableSync::COL_SCHEDULES);
 		}
-		
-		
-		
+
+
+
 		server::ParametersMap JourneyPatternAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
@@ -135,7 +135,7 @@ namespace synthese
 		}
 
 
-		
+
 		void JourneyPatternAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
@@ -178,18 +178,18 @@ namespace synthese
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(_request);
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 				AdminFunctionRequest<DRTAreaAdmin> openDRTAreaRequest(_request);
-				
+
 				// Reservation
 // 				bool reservation(_line->getReservationRule() && _line->getReservationRule()->getType() == RESERVATION_COMPULSORY);
-				
+
 				AdminActionFunctionRequest<RemoveObjectAction,JourneyPatternAdmin> lineStopRemoveAction(_request);
-				
+
 				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
 				HTMLForm f(lineStopAddAction.getHTMLForm("add_journey_pattern_stop"));
 
 				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request);
-				
+
 				HTMLTable::ColsVector v;
 				v.push_back("Rang");
 				v.push_back("Rang");
@@ -228,7 +228,7 @@ namespace synthese
 						static_pointer_cast<const LineStop, const LinePhysicalStop>(linePhysicalStop) :
 						static_pointer_cast<const LineStop, const LineArea>(lineArea)
 					);
-						
+
 					lineStopRemoveAction.getAction()->setObjectId(lineStop->getKey());
 					lineStopUpdateAction.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 
@@ -551,7 +551,7 @@ namespace synthese
 				vc.push_back(make_pair(string(), "Dernier jour"));
 				vc.push_back(make_pair(string(), "Actions"));
 				vc.push_back(make_pair(string(), "Actions"));
-				
+
 				ActionResultHTMLTable tc(vc, sortedForm, _requestParameters, cservices, newRequest.getHTMLForm(), ServiceAddAction::PARAMETER_TEMPLATE_ID);
 
 				stream << tc.open();
@@ -652,7 +652,7 @@ namespace synthese
 			// TAB INDICES
 			if (openTabContent(stream, TAB_INDICES))
 			{
-				stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; } .mini {font-size:9px;}</style>"; 
+				stream << "<style>td.red {background-color:red;width:8px; height:8px; color:white; text-align:center; } td.green {background-color:#008000;width:10px; height:10px; color:white; text-align:center; } .mini {font-size:9px;}</style>";
 				HTMLTable::ColsVector cols;
 				cols.push_back("Arrêt");
 				cols.push_back("D/A");
@@ -750,8 +750,8 @@ namespace synthese
 			if (_line.get() == NULL) return false;
 			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
 		}
-		
-		
+
+
 
 		std::string JourneyPatternAdmin::getTitle() const
 		{
@@ -780,15 +780,15 @@ namespace synthese
 
 			_tabBuilded = true;
 		}
-		
+
 
 
 		void JourneyPatternAdmin::setLine(boost::shared_ptr<const JourneyPattern> value)
 		{
 			_line = value;
 		}
-		
-		
+
+
 
 		bool JourneyPatternAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{

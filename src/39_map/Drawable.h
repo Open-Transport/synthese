@@ -25,20 +25,20 @@ public:
 		   DRAW_DIRECTION_E, DRAW_DIRECTION_SE,
 		   DRAW_DIRECTION_S, DRAW_DIRECTION_SW
     } DrawDirection;
-	
+
 protected:
 
     Drawable();
     virtual ~Drawable();
-	
+
 public:
-	
+
     virtual void preDraw (Map& map, PostscriptCanvas& canvas) const = 0;
-    
+
     virtual void draw (Map& map, PostscriptCanvas& canvas) const = 0;
-	
+
     virtual void postDraw (Map& map, PostscriptCanvas& canvas) const = 0;
-    
+
 };
 
 }

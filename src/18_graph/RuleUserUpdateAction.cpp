@@ -43,7 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, graph::RuleUserUpdateAction>::FACTORY_KEY("RuleUserUpdateAction");
@@ -53,9 +53,9 @@ namespace synthese
 	{
 		const string RuleUserUpdateAction::PARAMETER_OBJECT_ID = Action_PARAMETER_PREFIX + "id";
 		const string RuleUserUpdateAction::PARAMETER_VALUE_PREFIX = Action_PARAMETER_PREFIX + "va";
-		
-		
-		
+
+
+
 		ParametersMap RuleUserUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -70,9 +70,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void RuleUserUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_id = map.get<RegistryKeyType>(PARAMETER_OBJECT_ID);
@@ -95,9 +95,9 @@ namespace synthese
 				_values[element.first.substr(PARAMETER_VALUE_PREFIX.size())] = lexical_cast<RegistryKeyType>(element.second);
 			}
 		}
-		
-		
-		
+
+
+
 		void RuleUserUpdateAction::run(
 			Request& request
 		){
@@ -109,9 +109,9 @@ namespace synthese
 			}
 			query.execute(boost::optional<DBTransaction&>());
 		}
-		
-		
-		
+
+
+
 		bool RuleUserUpdateAction::isAuthorized(
 			const Session* session
 		) const {

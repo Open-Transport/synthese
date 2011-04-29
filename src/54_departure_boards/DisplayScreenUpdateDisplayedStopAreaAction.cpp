@@ -46,7 +46,7 @@ namespace synthese
 	using namespace security;
 	using namespace geography;
 	using namespace dblog;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, departure_boards::DisplayScreenUpdateDisplayedStopAreaAction>::FACTORY_KEY("DisplayScreenUpdateDisplayedStopAreaAction");
@@ -64,9 +64,9 @@ namespace synthese
 			Action_PARAMETER_PREFIX + "cn"
 			);
 		const string DisplayScreenUpdateDisplayedStopAreaAction::PARAMETER_PLACE_NAME = Action_PARAMETER_PREFIX + "pn";
-		
-		
-		
+
+
+
 		ParametersMap DisplayScreenUpdateDisplayedStopAreaAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -80,9 +80,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenUpdateDisplayedStopAreaAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -123,9 +123,9 @@ namespace synthese
 				throw ActionException("Display screen not found");
 			}
 		}
-		
-		
-		
+
+
+
 		void DisplayScreenUpdateDisplayedStopAreaAction::run(
 			Request& request
 		){
@@ -148,9 +148,9 @@ namespace synthese
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(*_screen, log.str(), *request.getUser());
 		}
-		
-		
-		
+
+
+
 		bool DisplayScreenUpdateDisplayedStopAreaAction::isAuthorized(
 			const Session* session
 		) const {

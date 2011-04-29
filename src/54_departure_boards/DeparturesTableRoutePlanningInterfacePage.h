@@ -39,9 +39,9 @@ namespace synthese
 	namespace departure_boards
 	{
 		/** Departures table.
-			
+
 			@code departure_boards P1 P2 P3 @endcode
-			
+
 			Available data :
 				- 0 : Title of the screen
 				- 1 : Wiring code

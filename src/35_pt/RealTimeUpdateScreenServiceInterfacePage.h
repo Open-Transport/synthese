@@ -34,7 +34,7 @@ namespace synthese
 	{
 		class Request;
 	}
-	
+
 	namespace pt
 	{
 		class LineStop;
@@ -75,7 +75,7 @@ namespace synthese
 			/** Overloaded display method for specific parameter conversion.
 				This function converts the parameters into a single ParametersVector object.
 				@param stream Stream to write on
-				@param ...	
+				@param ...
 				@param variables Execution variables
 				@param request Source request
 			*/
@@ -86,7 +86,7 @@ namespace synthese
 				interfaces::VariablesMap& variables,
 				const server::Request* request = NULL
 			) const;
-			
+
 			RealTimeUpdateScreenServiceInterfacePage();
 		};
 	}

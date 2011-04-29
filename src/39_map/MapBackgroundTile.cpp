@@ -35,7 +35,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	
+
 namespace map
 {
 
@@ -52,7 +52,7 @@ MapBackgroundTile::MapBackgroundTile(const boost::filesystem::path& path,
 , _bottomRightX (bottomRightX)
 , _bottomRightY (bottomRightY)
 {
-    
+
 }
 
 MapBackgroundTile::~MapBackgroundTile()
@@ -60,7 +60,7 @@ MapBackgroundTile::~MapBackgroundTile()
 }
 
 
-bool 
+bool
 MapBackgroundTile::operator< (const MapBackgroundTile& rhs) const
 {
     if (_topLeftY != rhs._topLeftY) {
@@ -69,34 +69,34 @@ MapBackgroundTile::operator< (const MapBackgroundTile& rhs) const
     return (_topLeftX < rhs._topLeftX);
 }
 
-double 
+double
 MapBackgroundTile::getWidth () const
 {
-    return _bottomRightX - _topLeftX;   
+    return _bottomRightX - _topLeftX;
 }
 
 
-double 
+double
 MapBackgroundTile::getHeight () const
 {
-    return _topLeftY - _bottomRightY;   
+    return _topLeftY - _bottomRightY;
 }
 
 
 
 
-void 
+void
 MapBackgroundTile::preDraw (Map& map, PostscriptCanvas& canvas) const
 {
-    
+
 }
 
 
 
-void 
+void
 MapBackgroundTile::postDraw (Map& map, PostscriptCanvas& canvas) const
 {
-    
+
 }
 
 
@@ -107,18 +107,18 @@ MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
 
     Coordinate tl = map.toOutputFrame (Coordinate (_topLeftX, _topLeftY));
     Coordinate br = map.toOutputFrame (Coordinate (_bottomRightX, _bottomRightY));
-    
+
     double outputWidth = br.x - tl.x;
     double outputHeight = tl.y - br.y;
-   
-   
+
+
     double translateX = tl.x;
     double translateY = br.y; //map.getHeight () - tl.getY ();
-    
+
     ostream& os = canvas.getOutput ();
-    
+
     // Dump the common procedure for drawing an image
-    
+
     os << "gsave 100 dict begin " << endl;
     os << translateX << " " << translateY << " translate" << endl;   // TODO !!
     os << outputWidth << " " << outputHeight << " scale" << endl; // TO check!!
@@ -133,7 +133,7 @@ MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
     os << "[" << _pixelWidth << " 0 0 " << -_pixelWidth << " 0 " << _pixelWidth << "]" << endl;
     os << "{currentfile scanLine readhexstring pop} bind" << endl;
     os << "false 3 colorimage" << endl;
-    
+
     // Dump the image data
     ifstream ifs (_path.string().c_str ());
     char buf[4096];
@@ -142,9 +142,9 @@ MapBackgroundTile::draw (Map& map, PostscriptCanvas& canvas) const
         os << buf ;
     }
     os << endl;
-    
+
     os << "end grestore" << endl;
-    
+
 }
 
 

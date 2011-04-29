@@ -57,7 +57,7 @@ namespace synthese
 		const string ForumMessageTableSync::COL_PUBLISHED("published");
 		const string ForumMessageTableSync::COL_IP("ip");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<ForumMessageTableSync>::TABLE(
@@ -118,7 +118,7 @@ namespace synthese
 					}
 				}
 			}
-	
+
 			object->setContent(rows->getText(ForumMessageTableSync::COL_CONTENT));
 			object->setUserEMail(rows->getText(ForumMessageTableSync::COL_USER_EMAIL));
 			object->setUserName(rows->getText(ForumMessageTableSync::COL_USER_NAME));
@@ -204,9 +204,9 @@ namespace synthese
 			//TODO Log the removal
 		}
 	}
-	
-	
-	
+
+
+
 	namespace forum
 	{
 		ForumMessageTableSync::SearchResult ForumMessageTableSync::Search(

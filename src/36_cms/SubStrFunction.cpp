@@ -35,7 +35,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::SubStrFunction>::FACTORY_KEY("substr");
-	
+
 	namespace cms
 	{
 		const string SubStrFunction::PARAMETER_TEXT("t");
@@ -76,9 +76,9 @@ namespace synthese
 				stream << _text.substr(_first);
 			}
 		}
-		
-		
-		
+
+
+
 		bool SubStrFunction::isAuthorized(
 			const Session* session
 		) const {

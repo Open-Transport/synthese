@@ -31,49 +31,49 @@ namespace map
 {
 
 
-double 
+double
 calculateAngle (const Coordinate& a, const Coordinate& b, const Coordinate& c)
 {
-    double angle = atan2 (c.y-b.y, c.x-b.x) - 
+    double angle = atan2 (c.y-b.y, c.x-b.x) -
 	atan2 (a.y-b.y, a.x-b.x);
 
     if (angle > M_PI) angle = angle - 2*M_PI;
     if (angle < -M_PI) angle = angle + 2*M_PI;
-    
-    return angle;	
+
+    return angle;
 }
 
 
 
-double 
-calculateDistance (const Coordinate& a, const Coordinate& b) 
+double
+calculateDistance (const Coordinate& a, const Coordinate& b)
 {
-    return sqrt((b.x-a.x)*(b.x-a.x) + 
+    return sqrt((b.x-a.x)*(b.x-a.x) +
 		(b.y-a.y)*(b.y-a.y));
 }
 
 
 
-Coordinate  
+Coordinate
 calculateSymetric (const Coordinate& a, const Coordinate& b)
 {
     double deltax = b.x - a.x;
     double deltay = b.y - a.y;
     return Coordinate (b.x + deltax, b.x + deltay);
-} 
+}
 
 
 
 
-Coordinate 
+Coordinate
 calculateIntersection (double a1, double b1, double a2, double b2)
 {
     // Intersection of :
     // y = a1.x + b1
     // y = a2.x + b2
-    
+
     if (a1 == a2) throw "No intersection";
-    
+
     return Coordinate ( (b2 - b1) / (a1 -a2),
 		     (b2*a1 - a2*b1) / (a1 - a2) );
 }
@@ -90,30 +90,30 @@ calculateAffineEquation (const Coordinate& p0, const Coordinate& p1) {
 
     double a = v0 / u0;
     double b = p0.y - a * p0.x;
-	
-    return std::pair<double, double> (a,b);	
+
+    return std::pair<double, double> (a,b);
 }
 
 
 
 
 
-Coordinate 
-calculateIntersection (const Coordinate& p0, const Coordinate& p1, 
+Coordinate
+calculateIntersection (const Coordinate& p0, const Coordinate& p1,
 		       const Coordinate& p2, const Coordinate& p3)
 {
     double u0 = p1.x - p0.x;
     double v0 = p1.y - p0.y;
-    
+
     double u1 = p3.x - p2.x;
     double v1 = p3.y - p2.y;
-    
+
     double a1 = v0 / u0;
     double b1 = p0.y - a1 * p0.x;
-    
+
     double a2 = v1 / u1;
     double b2 = p2.y - a2 * p2.x;
-    
+
     return calculateIntersection (a1, b1, a2, b2);
 }
 }

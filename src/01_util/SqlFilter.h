@@ -41,16 +41,16 @@ namespace util
 
 
 /** Converts any forbidden character in SQL queries.
- *  
+ *
 @ingroup m01
 */
 class SqlFilter : public boost::iostreams::output_filter {
 private:
 public:
-    
+
     SqlFilter () {}
 
-    template<typename Sink> 
+    template<typename Sink>
 	bool put(Sink& dest, int c);
 
 
@@ -60,7 +60,7 @@ public:
 
 
 template<typename Sink>
-bool 
+bool
 SqlFilter::put(Sink& dest, int c)
 {
 
@@ -92,8 +92,8 @@ SqlFilter::put(Sink& dest, int c)
     return boost::iostreams::put(dest, c);
 
 }
- 
- 
+
+
 
 
 

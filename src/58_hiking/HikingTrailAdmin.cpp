@@ -72,7 +72,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void HikingTrailAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -92,7 +92,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool HikingTrailAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -166,7 +166,7 @@ namespace synthese
 					stream << t.close() << f.close();
 				}
 			}
-			
+
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);

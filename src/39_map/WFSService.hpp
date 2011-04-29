@@ -58,7 +58,7 @@ namespace synthese
 			static const std::string VALUE_REQUEST_GetFeature;
 			static const std::string VALUE_REQUEST_GetCapabilities;
 			static const std::string VALUE_REQUEST_DescribeFeatureType;
-			
+
 			static const std::string PARAMETER_OUTPUTFORMAT;
 			static const std::string VALUE_OUTPUTFORMAT_GML_3_1_1;
 
@@ -83,8 +83,8 @@ namespace synthese
 				std::vector<boost::shared_ptr<WFSType> > _types;
 				boost::optional<geos::geom::Envelope> _envelope; // In WGS84
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/WFS#Request
@@ -94,9 +94,9 @@ namespace synthese
 			/// @date 2010
 			/// @since 3.2.1
 			server::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/WFS#Request
@@ -108,8 +108,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const server::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			WFSService();
 
@@ -127,9 +127,9 @@ namespace synthese
 			/// @author RCSobility
 			/// @date 2010
 			virtual void run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

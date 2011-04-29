@@ -55,7 +55,7 @@ namespace synthese
 			//!	\name Constructor and destructor
 			//@{
 				Session(const std::string& ip);
-			
+
 				/** Unregisters the session in the global session map.
 				*/
 				~Session();

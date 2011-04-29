@@ -32,7 +32,7 @@ namespace synthese
 {
 	using namespace util;
 	using namespace graph;
-	
+
 	namespace graph
 	{
 		const UseRule& RuleUser::getUseRule(
@@ -50,9 +50,9 @@ namespace synthese
 			}
 			return *ForbiddenUseRule::INSTANCE;
 		}
-		
-		
-		
+
+
+
 		bool RuleUser::isCompatibleWith(
 			const AccessParameters& accessParameters
 		) const	{

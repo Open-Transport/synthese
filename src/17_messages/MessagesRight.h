@@ -39,7 +39,7 @@ namespace synthese
 			Les niveaux de droit public utilisés sont les suivants :
 				- READ : Utilisation de la console d'administration des messages en mode lecture, recherche possible.
 				- WRITE : Permet d'éditer des messages
-				
+
 
 			Définition du périmètre :
 				- TransportNetwork : Autorisation portant sur les messages diffusés sur un point de diffusion desservi par une ligne du réseau spécifié

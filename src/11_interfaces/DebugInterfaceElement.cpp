@@ -34,7 +34,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace interfaces;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<LibraryInterfaceElement, interfaces::DebugInterfaceElement>::FACTORY_KEY("debug");

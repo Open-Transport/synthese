@@ -51,7 +51,7 @@ namespace synthese
 			const string& prefix
 		){
 			map<string, string>::const_iterator it;
-			
+
 			_prefix = prefix;
 
 			it = m.find(_getParameterCode(_PARAMETER_FIRST));

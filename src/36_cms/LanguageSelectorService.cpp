@@ -37,10 +37,10 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace html;
-	
+
 
 	template<> const string util::FactorableTemplate<Function,cms::LanguageSelectorService>::FACTORY_KEY("language_selector");
-	
+
 	namespace cms
 	{
 		const string LanguageSelectorService::PARAMETER_LANGUAGE("language");
@@ -85,7 +85,7 @@ namespace synthese
 			{
 				throw RequestException("Inconsistent display language "+ e.getMessage());
 			}
-			
+
 			// Name
 			_name = map.getDefault<string>(PARAMETER_NAME);
 
@@ -106,7 +106,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			// Language
 			const Language* language(_language);
 			if(!language)
@@ -133,9 +133,9 @@ namespace synthese
 					_value ? optional<string>(_value->getIso639_2Code()) : optional<string>()
 				);
 		}
-		
-		
-		
+
+
+
 		bool LanguageSelectorService::isAuthorized(
 			const Session* session
 		) const {

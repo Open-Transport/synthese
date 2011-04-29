@@ -67,7 +67,7 @@ namespace synthese
 		const string UpdateDisplayScreenAction::PARAMETER_CPU(Action_PARAMETER_PREFIX + "cu");
 		const string UpdateDisplayScreenAction::PARAMETER_MAC_ADDRESS(Action_PARAMETER_PREFIX + "ma");
 		const string UpdateDisplayScreenAction::PARAMETER_SUB_SCREEN_TYPE(Action_PARAMETER_PREFIX + "st");
-		
+
 
 		ParametersMap UpdateDisplayScreenAction::getParametersMap() const
 		{
@@ -84,7 +84,7 @@ namespace synthese
 
 				_name = map.get<string>(PARAMETER_NAME);
 				_wiringCode = map.get<int>(PARAMETER_WIRING_CODE);
-				
+
 				_type = DisplayTypeTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TYPE), *_env);
 
 				_comPort = map.get<int>(PARAMETER_COM_PORT);

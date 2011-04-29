@@ -58,12 +58,12 @@ namespace synthese
 
 		@defgroup m52Alarm 52.17 Messages recipient
 		@ingroup m52
-		
+
 		@defgroup m52 52 Forum
 		@ingroup m5
-		
+
 		@todo Write Module documentation
-		
+
 		@{
 	*/
 
@@ -85,7 +85,7 @@ namespace synthese
 			/** Initialization of the 52 Forum module after the automatic database loads.
 				@author Hugues Romain
 				@date 2010
-			*/			
+			*/
 			void initialize();
 		};
 	}

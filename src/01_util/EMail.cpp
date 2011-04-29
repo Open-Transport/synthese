@@ -96,7 +96,7 @@ namespace synthese
 					if (error) throw boost::system::system_error(error);
 				}
 			};
-			
+
 			boost::asio::io_service io_service;
 
 			// Get a list of endpoints corresponding to the server name.
@@ -144,7 +144,7 @@ namespace synthese
 			request_stream << "DATA" << CRLF;
 			Local::_Process(socket, request, response);
 
-			request_stream << 
+			request_stream <<
 				"Subject: " << _subject << CRLF <<
 				"From: ";
 			if(_senderName.empty())

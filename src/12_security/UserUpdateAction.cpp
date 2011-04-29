@@ -43,7 +43,7 @@ namespace synthese
 	using namespace dblog;
 
 	template<> const string util::FactorableTemplate<Action, security::UserUpdateAction>::FACTORY_KEY("uua");
-	
+
 	namespace security
 	{
 		const string UserUpdateAction::PARAMETER_USER_ID(Action_PARAMETER_PREFIX + "u");
@@ -184,8 +184,8 @@ namespace synthese
 				)
 			;
 		}
-		
-		
+
+
 		void UserUpdateAction::setUser(boost::shared_ptr<const User> value)
 		{
 			_user = const_pointer_cast<User>(value);
