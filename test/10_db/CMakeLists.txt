@@ -21,6 +21,7 @@ set(TESTS_ENV "SYNTHESE_MYSQL_PARAMS=${SYNTHESE_MYSQL_PARAMS}")
 
 boost_test(ConnectionInfo "${DEPS}")
 boost_test(DBIndexUpdate "${DEPS}" "DBTestUtils.inc.hpp")
+boost_test(DBQuery "${DEPS}" "DBTestUtils.inc.hpp;TestTableSync.inc.hpp")
 boost_test(DBRegistryTableSync "${DEPS}" "DBTestUtils.inc.hpp;TestTableSync.inc.hpp")
 boost_test(DBSchemaUpdate "${DEPS}" "DBTestUtils.inc.hpp")
 boost_test(DBTypes "${DEPS}" "DBTestUtils.inc.hpp")
