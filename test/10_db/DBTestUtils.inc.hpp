@@ -55,7 +55,8 @@ struct GlobalFixture
 {
 	GlobalFixture()
 	{
-#ifdef _MSC_VER
+#ifdef _MSC_VER
+
 	// Disable leak logs on Windows (they are set by Boost.Test).
 	// TODO: fix the leaks and then remove this line
 	_CrtSetDbgFlag(~_CRTDBG_LEAK_CHECK_DF & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
