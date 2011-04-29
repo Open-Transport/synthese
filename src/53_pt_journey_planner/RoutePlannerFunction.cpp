@@ -2201,13 +2201,15 @@ namespace synthese
 			}
 
 			// Departure place
-			string displayedDeparturePlace(
-				(	dynamic_cast<const Crossing*>(journey.getOrigin()->getHub()) ?
-					dynamic_cast<const NamedPlace&>(departurePlace) :
-					dynamic_cast<const NamedPlace&>(*journey.getOrigin()->getHub())
-				).getFullName()
-			);
-			pm.insert(DATA_DEPARTURE_PLACE_NAME, displayedDeparturePlace);
+			if(dynamic_cast<const Crossing*>(journey.getOrigin()->getHub()))
+			{
+				pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(departurePlace).getFullName());
+			}
+			else
+			{
+				pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getOrigin()->getHub()).getFullName());
+				pm.insert(DATA_DEPARTURE_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getOrigin()->getFromVertex()).getName());
+			}
 
 			shared_ptr<Point> departurePoint(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
@@ -2229,13 +2231,15 @@ namespace synthese
 			}
 
 			// Arrival place
-			string displayedArrivalPlace(
-				(	dynamic_cast<const Crossing*>(journey.getDestination()->getHub()) ?
-					dynamic_cast<const NamedPlace&>(arrivalPlace) :
-					dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub())
-				).getFullName()
-			);
-			pm.insert(DATA_ARRIVAL_PLACE_NAME, displayedArrivalPlace);
+			if(dynamic_cast<const Crossing*>(journey.getDestination()->getHub()))
+			{
+				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(arrivalPlace).getFullName());
+			}
+			else
+			{
+				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub()).getFullName());
+				pm.insert(DATA_ARRIVAL_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getDestination()).getName());
+			}
 
 			shared_ptr<Point> arrivalPoint(
 				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
