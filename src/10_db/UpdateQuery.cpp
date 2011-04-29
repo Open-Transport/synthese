@@ -86,7 +86,7 @@ namespace synthese
 				first = false;
 			}
 
-			updateQuery << _whereQueryPart();
+			updateQuery << _whereQueryPart() << ";";
 
 			db->execUpdate(updateQuery.str(), transaction);
 

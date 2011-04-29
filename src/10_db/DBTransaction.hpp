@@ -44,11 +44,11 @@ namespace synthese
 			typedef std::vector<DB::DBModifEvent> DBModifEvents;
 
 		private:
-			typedef std::set<std::pair<std::string, util::RegistryKeyType> > DeletedRows;
+			typedef std::set<std::pair<std::string, util::RegistryKeyType> > ModifiedRows;
 
 			Queries _queries;
 			DBModifEvents _modifEvents;
-			DeletedRows _deletedRows;
+			ModifiedRows _modifiedRows;
 
 		public:
 			void addQuery(const std::string& query);
