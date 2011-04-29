@@ -2238,7 +2238,7 @@ namespace synthese
 			else
 			{
 				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub()).getFullName());
-				pm.insert(DATA_ARRIVAL_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getDestination()).getName());
+				pm.insert(DATA_ARRIVAL_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getDestination()->getFromVertex()).getName());
 			}
 
 			shared_ptr<Point> arrivalPoint(
