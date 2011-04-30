@@ -84,11 +84,6 @@ namespace synthese
 		class Place;
 	}
 
-	namespace messages
-	{
-		class SentAlarm;
-	}
-
 	namespace pt_journey_planner
 	{
 		class RoutePlannerInterfacePage;
@@ -227,8 +222,6 @@ namespace synthese
 				static const std::string DATA_ODD_ROW;
 				static const std::string DATA_LONGITUDE;
 				static const std::string DATA_LATITUDE;
-				static const std::string DATA_ALARM_LEVEL;
-				static const std::string DATA_ALARM_MESSAGE;
 			//@}
 
 			//! @name Stop cells
@@ -243,6 +236,7 @@ namespace synthese
 				static const std::string DATA_ARRIVAL_LONGITUDE;
 				static const std::string DATA_ARRIVAL_LATITUDE;
 				static const std::string DATA_IS_LAST_LEG;
+				static const std::string DATA_IS_FIRST_LEG;
 			//@}
 
 			//! @name Junction cells
@@ -487,13 +481,13 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> serviceCellPage,
 				boost::shared_ptr<const cms::Webpage> junctionPage,
 				const server::Request& request,
-				std::size_t n
-				, const graph::Journey& journey
-				, const geography::Place& departurePlace
-				, const geography::Place& arrivalPlace
-				, boost::logic::tribool handicappedFilter
-				, boost::logic::tribool bikeFilter
-				, bool isTheLast
+				std::size_t n,
+				const graph::Journey& journey,
+				const geography::Place& departurePlace,
+				const geography::Place& arrivalPlace,
+				boost::logic::tribool handicappedFilter,
+				boost::logic::tribool bikeFilter,
+				bool isTheLast
 			) const;
 
 
@@ -514,14 +508,14 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				bool isItArrival,
-				const messages::SentAlarm* alarm,
 				bool isItTerminus,
 				const pt::StopPoint* arrivalPhysicalStop,
 				const pt::StopPoint* departurePhysicalStop,
 				bool color,
 				const boost::posix_time::ptime& time,
 				boost::posix_time::time_duration continuousServiceRange,
-				bool isLastLeg
+				bool isLastLeg,
+				bool isFirstLeg
 			);
 
 
@@ -541,7 +535,6 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
 				const graph::Vertex& vertex,
-				const messages::SentAlarm* alarm,
 				bool color,
 				const road::Road* road,
 				double distance
@@ -569,7 +562,6 @@ namespace synthese
 				boost::posix_time::time_duration continuousServiceRange,
 				boost::logic::tribool handicappedFilterStatus,
 				boost::logic::tribool bikeFilterStatus,
-				const messages::SentAlarm* alarm,
 				bool color
 			);
 
