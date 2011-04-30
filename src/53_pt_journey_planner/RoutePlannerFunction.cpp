@@ -210,8 +210,6 @@ namespace synthese
 
 		// Cells
 		const string RoutePlannerFunction::DATA_ODD_ROW("is_odd_row");
-		const string RoutePlannerFunction::DATA_ALARM_LEVEL("alarm_level");
-		const string RoutePlannerFunction::DATA_ALARM_MESSAGE("alarm_message");
 
 		// Stop cells
 		const string RoutePlannerFunction::DATA_IS_ARRIVAL("is_arrival");
@@ -226,6 +224,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_ARRIVAL_LONGITUDE("arrival_longitude");
 		const string RoutePlannerFunction::DATA_ARRIVAL_LATITUDE("arrival_latitude");
 		const string RoutePlannerFunction::DATA_IS_LAST_LEG("is_last_leg");
+		const string RoutePlannerFunction::DATA_IS_FIRST_LEG("is_first_leg");
 
 		// Junction cells
 		const string RoutePlannerFunction::DATA_REACHED_PLACE_IS_NAMED("reached_place_is_named");
@@ -2208,7 +2207,6 @@ namespace synthese
 			else
 			{
 				pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getOrigin()->getHub()).getFullName());
-				pm.insert(DATA_DEPARTURE_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getOrigin()->getFromVertex()).getName());
 			}
 
 			shared_ptr<Point> departurePoint(
@@ -2238,7 +2236,6 @@ namespace synthese
 			else
 			{
 				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub()).getFullName());
-				pm.insert(DATA_ARRIVAL_STOP_NAME, dynamic_cast<const StopPoint&>(*journey.getDestination()->getFromVertex()).getName());
 			}
 
 			shared_ptr<Point> arrivalPoint(
@@ -2319,7 +2316,7 @@ namespace synthese
 				// Loop on lines of the board
 				bool __Couleur = false;
 
-				const Hub* lastPlace(journey.getOrigin()->getHub());
+				const Hub* lastPlace(NULL);
 				double distance(0);
 
 				const Journey::ServiceUses& services(journey.getServiceUses());
@@ -2346,14 +2343,14 @@ namespace synthese
 								stopCellPage,
 								request,
 								false,
-								NULL, // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 								false,
 								NULL,
 								static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 								__Couleur,
 								leg.getDepartureDateTime(),
 								journey.getContinuousServiceRange(),
-								false
+								false,
+								it == services.begin()
 							);
 
 							lastPlace = leg.getDepartureEdge()->getHub();
@@ -2378,7 +2375,6 @@ namespace synthese
 							journey.getContinuousServiceRange(),
 							handicappedFilter,
 							bikeFilter,
-							NULL, // leg->getService ()->getPath ()->hasApplicableAlarm ( debutLigne, finLigne ) ? __ET->getService()->getPath ()->getAlarm() : NULL
 							__Couleur
 						);
 
@@ -2399,14 +2395,14 @@ namespace synthese
 							stopCellPage,
 							request,
 							true,
-							NULL, // leg->getDestination() ->getConnectionPlace()->hasApplicableAlarm ( debutArret, finArret ) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
 							leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub(),
 							static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex()),
 							it+1 != services.end() ? static_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
 							__Couleur,
 							leg.getArrivalDateTime(),
 							journey.getContinuousServiceRange(),
-							it+1 == services.end()
+							it+1 == services.end(),
+							false
 						);
 
 						lastPlace = leg.getArrivalEdge()->getHub();
@@ -2438,11 +2434,10 @@ namespace synthese
 							content,
 							junctionPage,
 							request,
-							*leg.getArrivalEdge()->getFromVertex()
-							, NULL // leg->getDestination()->getConnectionPlace()->hasApplicableAlarm(debutArret, finArret) ? __ET->getDestination()->getConnectionPlace()->getAlarm() : NULL
-							, __Couleur
-							, road
-							, distance
+							*leg.getArrivalEdge()->getFromVertex(),
+							__Couleur,
+							road,
+							distance
 						);
 
 						distance = 0;
@@ -2462,14 +2457,14 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
 			bool isItArrival,
-			const messages::SentAlarm* alarm,
 			bool isItTerminus,
 			const pt::StopPoint* arrivalPhysicalStop,
 			const pt::StopPoint* departurePhysicalStop,
 			bool color,
 			const boost::posix_time::ptime& time,
 			boost::posix_time::time_duration continuousServiceRange,
-			bool isLastLeg
+			bool isLastLeg,
+			bool isFirstLeg
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
@@ -2480,13 +2475,6 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_ARRIVAL, isItArrival);
-
-			// Alarm
-			if(alarm)
-			{
-				pm.insert(DATA_ALARM_LEVEL, alarm->getLongMessage());
-				pm.insert(DATA_ALARM_MESSAGE, alarm->getLevel());
-			}
 
 			pm.insert(DATA_IS_TERMINUS, isItTerminus);
 
@@ -2560,14 +2548,22 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
+			pm.insert(DATA_IS_LAST_LEG, isFirstLeg);
 
 			page->display(stream, request, pm);
 		}
 
 
 
-		void RoutePlannerFunction::DisplayJunctionCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::Vertex& vertex, const messages::SentAlarm* alarm, bool color, const road::Road* road, double distance )
-		{
+		void RoutePlannerFunction::DisplayJunctionCell(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			const graph::Vertex& vertex,
+			bool color,
+			const road::Road* road,
+			double distance
+		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Point
@@ -2594,8 +2590,16 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::DisplayServiceCell( std::ostream& stream, boost::shared_ptr<const cms::Webpage> page, const server::Request& request, const graph::ServicePointer& serviceUse, boost::posix_time::time_duration continuousServiceRange, boost::logic::tribool handicappedFilterStatus, boost::logic::tribool bikeFilterStatus, const messages::SentAlarm* alarm, bool color )
-		{
+		void RoutePlannerFunction::DisplayServiceCell(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			const graph::ServicePointer& serviceUse,
+			boost::posix_time::time_duration continuousServiceRange,
+			boost::logic::tribool handicappedFilterStatus,
+			boost::logic::tribool bikeFilterStatus,
+			bool color
+		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// Continuous service
@@ -2665,11 +2669,7 @@ namespace synthese
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
 			}
-			if(alarm)
-			{
-				pm.insert(DATA_ALARM_MESSAGE, alarm->getLongMessage());
-				pm.insert(DATA_ALARM_LEVEL, alarm->getLevel());
-			}
+
 			pm.insert(DATA_ODD_ROW, color); // 21
 
 			page->display(stream, request, pm);
