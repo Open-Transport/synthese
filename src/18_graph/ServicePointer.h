@@ -29,6 +29,14 @@
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class LineString;
+	}
+}
+
 namespace synthese
 {
 	namespace graph
@@ -193,6 +201,16 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.18
 				const UseRule& getUseRule() const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Extracts from the edges the geometry of the whole journey.
+				/// @pre the departure edge and the arrival edge must be defined
+				/// @return the geometry
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				boost::shared_ptr<geos::geom::LineString> getGeometry() const;
 			//@}
 		};
 	}
