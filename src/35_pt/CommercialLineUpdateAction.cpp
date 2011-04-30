@@ -73,7 +73,7 @@ namespace synthese
 			}
 			if(_color)
 			{
-				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toString() : string());
+				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toXMLColor() : string());
 			}
 			if(_dataSourceLinks)
 			{
@@ -138,7 +138,7 @@ namespace synthese
 			if(map.isDefined(PARAMETER_COLOR))
 			{
 				string color(map.getDefault<string>(PARAMETER_COLOR));
-				_color = color.empty() ? optional<RGBColor>() : RGBColor(color);
+				_color = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
 			}
 
 			// Creator ID

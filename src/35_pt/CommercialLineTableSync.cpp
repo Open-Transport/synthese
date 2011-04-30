@@ -146,7 +146,7 @@ namespace synthese
 			{
 				try
 				{
-					object->setColor(RGBColor(color));
+					object->setColor(RGBColor::FromXMLColor(color));
 				}
 				catch(RGBColor::Exception&)
 				{
@@ -301,7 +301,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getShortName());
 			query.addField(object->getLongName());
-			query.addField(object->getColor() ? object->getColor()->toString() : string());
+			query.addField(object->getColor() ? object->getColor()->toXMLColor() : string());
 			query.addField(object->getStyle());
 			query.addField(object->getImage());
 			query.addField(optionalReservationPlaces.str());

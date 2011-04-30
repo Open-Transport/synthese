@@ -51,9 +51,9 @@ namespace synthese
 				std::string gs = *(tok_iter); ++tok_iter;
 				std::string bs = *(tok_iter);
 
-				r = lexical_cast<int>(rs) / 255.0;
-				g = lexical_cast<int>(gs) / 255.0;
-				b = lexical_cast<int>(bs) / 255.0;
+				r = lexical_cast<int>(rs);
+				g = lexical_cast<int>(gs);
+				b = lexical_cast<int>(bs);
 
 			} else if (colorName == "blue") {
 			r = 0; g = 0; b = 255;
@@ -97,7 +97,11 @@ namespace synthese
 			stringstream s;
 			s << "#";
 			s << setw(2) << setfill('0');
-			s << hex << r << g << b;
+			s << hex << r;
+			s << setw(2) << setfill('0');
+			s << hex << g;
+			s << setw(2) << setfill('0');
+			s << hex << b;
 			return s.str();
 		}
 
@@ -106,7 +110,7 @@ namespace synthese
 		RGBColor RGBColor::FromXMLColor( const std::string& value )
 		{
 			vector<int> values;
-			for(size_t p(1); p<value.size() && p<6; ++p)
+			for(size_t p(1); p<value.size() && p<6; p+=2)
 			{
 				string number("0x"+ value.substr(p,2));
 				istringstream str(number);
@@ -116,7 +120,7 @@ namespace synthese
 			}
 			if(values.size() != 3)
 			{
-				throw synthese::Exception("Bad XML value for color");
+				throw RGBColor::Exception();
 			}
 			return RGBColor(values[0], values[1], values[2]);
 		}
