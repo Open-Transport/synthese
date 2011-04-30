@@ -2682,7 +2682,7 @@ namespace synthese
 					*static_cast<Geometry*>(geometry.get())
 			)	);
 
-			shared_ptr<WKTWriter> wktWriter;
+			shared_ptr<WKTWriter> wktWriter(new WKTWriter);
 			if(geometry4326.get() && !geometry4326->isEmpty())
 			{
 				pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
