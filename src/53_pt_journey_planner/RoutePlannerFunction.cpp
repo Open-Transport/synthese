@@ -2520,7 +2520,7 @@ namespace synthese
 							*arrivalPhysicalStop->getGeometry()
 					)	);
 					pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
-					pm.insert(DATA_DEPARTURE_LONGITUDE, point->getY());
+					pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
 				}
 			}
 
