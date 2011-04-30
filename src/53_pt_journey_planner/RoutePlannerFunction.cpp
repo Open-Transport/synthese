@@ -2475,7 +2475,9 @@ namespace synthese
 
 			ptime endRangeTime(time);
 			if (continuousServiceRange.total_seconds() > 0)
+			{
 				endRangeTime += continuousServiceRange;
+			}
 
 			pm.insert(DATA_IS_ARRIVAL, isItArrival);
 
@@ -2487,8 +2489,25 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_TERMINUS, isItTerminus);
-			pm.insert(DATA_STOP_AREA_NAME, dynamic_cast<const NamedPlace&>(*(departurePhysicalStop ? departurePhysicalStop : arrivalPhysicalStop)->getHub()).getFullName());
 
+			// Place
+			const NamedPlace& place(
+				dynamic_cast<const NamedPlace&>(
+					*(departurePhysicalStop ? departurePhysicalStop : arrivalPhysicalStop)->getHub()
+			)	);
+			pm.insert(DATA_STOP_AREA_NAME, place.getFullName());
+			if(	place.getPoint().get() &&
+				!place.getPoint()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*place.getPoint()
+				)	);
+				pm.insert(DATA_LONGITUDE, point->getX());
+				pm.insert(DATA_LATITUDE, point->getY());
+			}
+
+			// Arrival stop
 			if(arrivalPhysicalStop)
 			{
 				pm.insert(DATA_ARRIVAL_STOP_NAME, arrivalPhysicalStop->getName());
@@ -2500,11 +2519,12 @@ namespace synthese
 						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 							*arrivalPhysicalStop->getGeometry()
 					)	);
-					pm.insert(DATA_LONGITUDE, point->getX());
-					pm.insert(DATA_LATITUDE, point->getY());
+					pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+					pm.insert(DATA_DEPARTURE_LONGITUDE, point->getY());
 				}
 			}
 
+			// Departure stop
 			if(departurePhysicalStop)
 			{
 				pm.insert(DATA_DEPARTURE_STOP_NAME, departurePhysicalStop->getName());
