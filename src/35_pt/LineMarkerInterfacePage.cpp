@@ -102,7 +102,7 @@ namespace synthese
 			pm.insert(DATA_NAME, commercialLine.getName());
 			if(commercialLine.getColor())
 			{
-				pm.insert(DATA_COLOR, commercialLine.getColor()->toString());
+				pm.insert(DATA_COLOR, commercialLine.getColor()->toXMLColor());
 			}
 			if(commercialLine.getNetwork())
 			{

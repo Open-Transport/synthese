@@ -46,15 +46,12 @@ namespace synthese
 				Exception();
 			};
 
-			double r;
-			double g;
-			double b;
-
-			RGBColor (double red, double green, double blue)
-				: r (red), g (green), b (blue) {}
+			int r;
+			int g;
+			int b;
 
 			RGBColor (int red, int green, int blue)
-				: r (red/255.0), g (green/255.0), b (blue/255.0) {}
+				: r (red), g (green), b (blue) {}
 
 			RGBColor (const std::string& colorName);
 
