@@ -72,7 +72,10 @@ namespace synthese
 			} else if (colorName == "black") {
 			r = 0; g = 0; b = 0;
 			}
-			throw Exception();
+			else
+			{
+				throw Exception();
+			}
 		}
 
 		bool RGBColor::operator == (const RGBColor& op2 ) const
