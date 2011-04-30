@@ -26,8 +26,13 @@
 #include "Edge.h"
 #include "AccessParameters.h"
 
+#include <geos/geom/LineString.h>
+#include <geos/geom/GeometryFactory.h>
+#include <geos/geom/CoordinateSequenceFactory.h>
+
 using namespace boost;
 using namespace boost::posix_time;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -231,5 +236,28 @@ namespace synthese
 			}
 			return ptime(not_a_date_time);
 		}
-	}
-}
+
+
+
+		boost::shared_ptr<geos::geom::LineString> ServicePointer::getGeometry() const
+		{
+			assert(_departureEdge);
+			assert(_arrivalEdge);
+
+			const GeometryFactory& geometryFactory(
+				CoordinatesSystem::GetDefaultGeometryFactory()
+			);
+
+			CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
+			{
+				shared_ptr<LineString> geometry(edge->getRealGeometry());
+				for(size_t i(0); i<geometry->getNumPoints(); ++i)
+				{
+					cs->add(geometry->getCoordinateN(i));
+				}
+			}
+			cs->removeRepeatedPoints();
+			return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+		}
+}	}

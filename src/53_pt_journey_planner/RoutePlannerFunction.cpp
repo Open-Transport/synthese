@@ -66,6 +66,8 @@
 #include "LineMarkerInterfacePage.h"
 #include "SentAlarm.h"
 
+#include <geos/io/WKTWriter.h>
+#include <geos/geom/LineString.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -75,6 +77,7 @@ using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -244,6 +247,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_HANDICAPPED_PLACES_NUMBER("handicapped_places_number");
 		const string RoutePlannerFunction::DATA_BIKE_FILTER_STATUS("bike_filter_status");
 		const string RoutePlannerFunction::DATA_BIKE_PLACES_NUMBER("bike_places_number");
+		const string RoutePlannerFunction::DATA_WKT("wkt");
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
@@ -2671,6 +2675,18 @@ namespace synthese
 			}
 
 			pm.insert(DATA_ODD_ROW, color); // 21
+
+			shared_ptr<LineString> geometry(serviceUse.getGeometry());
+			shared_ptr<Geometry> geometry4326(
+				CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+					*static_cast<Geometry*>(geometry.get())
+			)	);
+
+			shared_ptr<WKTWriter> wktWriter;
+			if(geometry4326.get() && !geometry4326->isEmpty())
+			{
+				pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+			}
 
 			page->display(stream, request, pm);
 		}
