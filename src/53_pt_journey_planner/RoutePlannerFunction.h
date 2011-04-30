@@ -261,6 +261,7 @@ namespace synthese
 				static const std::string DATA_BIKE_FILTER_STATUS;
 				static const std::string DATA_BIKE_PLACES_NUMBER;
 				static const std::string DATA_CONTINUOUS_SERVICE_WAITING;
+				static const std::string DATA_WKT;
 			//@}
 
 		private:
