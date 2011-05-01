@@ -1,4 +1,4 @@
-# Build the generated.cpp.inc and includes.cpp.inc files.
+# Build the generated_cmake.cpp.inc and includes_cmake.cpp.inc files.
 
 set(gen_cpp_content "")
 set(inc_cpp_content "")
@@ -15,8 +15,8 @@ foreach(module ${MODULES})
   endif()
 endforeach(module)
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated.cpp.inc" "${gen_cpp_content}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/includes.cpp.inc" "${inc_cpp_content}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated_cmake.cpp.inc" "${gen_cpp_content}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/includes_cmake.cpp.inc" "${inc_cpp_content}")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 

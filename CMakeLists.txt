@@ -86,6 +86,8 @@ if(CMAKE_BUILD_TYPE STREQUAL Debug)
   add_definitions(-D_DEBUG)
 endif()
 
+add_definitions(-DCMAKE)
+
 include(FindPythonInterp)
 if(NOT PYTHONINTERP_FOUND)
   message(FATAL_ERROR "No Python interpreter found. Cannot continue.")
