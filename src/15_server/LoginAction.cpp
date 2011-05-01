@@ -49,7 +49,6 @@ namespace synthese
 	{
 		const std::string LoginAction::PARAMETER_LOGIN = Action_PARAMETER_PREFIX + "login";
 		const std::string LoginAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pwd";
-		const std::string LoginAction::COOKIE_SESSIONID = "sid";
 
 		ParametersMap LoginAction::getParametersMap() const
 		{
@@ -86,12 +85,8 @@ namespace synthese
 
 				Session* session = new Session(request.getIP());
 				session->setUser(user);
+				session->setSessionIdCookie(request);
 				request.setSession(session);
-				request.setCookie(
-					COOKIE_SESSIONID,
-					session->getKey(),
-					ServerModule::GetSessionMaxDuration().total_seconds()
-				);
 
 				SecurityLog::addUserLogin(user.get());
 			}

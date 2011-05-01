@@ -44,7 +44,6 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_LOGIN;
 			static const std::string PARAMETER_PASSWORD;
-			static const std::string COOKIE_SESSIONID;
 
 		private:
 			std::string _login;
