@@ -27,6 +27,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/nondet_random.hpp>
 
+#include "Request.h"
 #include "Session.h"
 #include "SessionException.h"
 #include "ServerModule.h"
@@ -44,6 +45,8 @@ namespace synthese
 	namespace server
 	{
 		const size_t Session::KEY_LENGTH = 20;
+		const string Session::COOKIE_SESSIONID = "sid";
+
 
 		Session::Session(const std::string& ip)
 			: _ip(ip)
@@ -52,6 +55,8 @@ namespace synthese
 		{
 			ServerModule::getSessions().insert(make_pair(_key, this));
 		}
+
+
 
 		void Session::controlAndRefresh(const std::string& ip)
 		{
@@ -66,6 +71,8 @@ namespace synthese
 
 			_lastUse = now;
 		}
+
+
 
 		std::string Session::generateKey()
 		{
@@ -84,6 +91,8 @@ namespace synthese
 			return key;
 		}
 
+
+
 		Session::~Session()
 		{
 			ServerModule::SessionMap::iterator it = ServerModule::getSessions().find(_key);
@@ -91,15 +100,21 @@ namespace synthese
 				ServerModule::getSessions().erase(it);
 		}
 
+
+
 		void Session::setUser(shared_ptr<const User> user )
 		{
 			_user = user;
 		}
 
+
+
 		const std::string Session::getKey() const
 		{
 			return _key;
 		}
+
+
 
 		shared_ptr<const security::User> Session::getUser() const
 		{
@@ -114,6 +129,17 @@ namespace synthese
 				_user != NULL &&
 				_user->getProfile() != NULL
 			;
+		}
+
+
+		
+		void Session::setSessionIdCookie(Request &request) const
+		{
+			request.setCookie(
+				COOKIE_SESSIONID,
+				this->getKey(),
+				ServerModule::GetSessionMaxDuration().total_seconds()
+			);
 		}
 	}
 }
