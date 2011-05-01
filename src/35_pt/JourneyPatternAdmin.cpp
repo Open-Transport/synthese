@@ -358,7 +358,7 @@ namespace synthese
 					}
 					else
 					{
-						stream << HTMLModule::getHTMLImage("ftv2vertline.png", "Houraire non fourni à cet arrêt");
+						stream << HTMLModule::getHTMLImage("ftv2vertline.png", "Horaire non fourni à cet arrêt");
 					}
 
 // 					if (reservation)
