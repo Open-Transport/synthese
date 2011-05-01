@@ -51,7 +51,11 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 // included auto generated code
+#ifdef CMAKE
+#include "includes_cmake.cpp.inc"
+#else
 #include "includes.cpp.inc"
+#endif
 
 using namespace boost;
 using namespace std;
@@ -293,7 +297,11 @@ int main( int argc, char **argv )
 #endif
 
 			// included auto generated code
+#ifdef CMAKE
+#include "generated_cmake.cpp.inc"
+#else
 #include "generated.cpp.inc"
+#endif
 
 			const boost::filesystem::path& workingDir = boost::filesystem::current_path();
 			Log::GetInstance ().info ("Working dir  = " + workingDir.string ());
