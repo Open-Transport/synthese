@@ -37,6 +37,8 @@ namespace synthese
 
 	namespace server
 	{
+		class Request;
+
 		/** User session class.
 			@ingroup m15
 		*/
@@ -49,6 +51,7 @@ namespace synthese
 			boost::posix_time::ptime	_lastUse;
 
 			static const size_t KEY_LENGTH;
+			static const std::string COOKIE_SESSIONID;
 			static std::string generateKey();
 
 		public:
@@ -88,6 +91,19 @@ namespace synthese
 			//! @name Queries
 			//@{
 				bool hasProfile() const;
+			//@}
+
+			//! @name Services
+			//@{
+				////////////////////////////////////////////////////////////////////
+				/// Adds a cookie to the given request with this session identifier.
+				/// This method doesn't check if the session is still valid, it has
+				/// to be taken care of first.
+				/// @param request Request where the session id cookie should be set.
+				/// @author Sylvain Pasche
+				/// @date 2011
+				/// @since 3.3.0
+				void setSessionIdCookie(Request &request) const;
 			//@}
 		};
 	}
