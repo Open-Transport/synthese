@@ -44,6 +44,7 @@
 #include "Webpage.h"
 #include "PTObjectsCMSExporters.hpp"
 #include "RoadModule.h"
+#include "PTUseRule.h"
 
 #include <sstream>
 
@@ -130,11 +131,32 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_SECOND_TRANSPORT_MODE("second_transport_mode");
 		const string DisplayScreenContentFunction::DATA_TRANSFER_STOP_NAME("transfer_stop_name");
 
+		const std::string DisplayScreenContentFunction::PARAMETER_MAIN_PAGE_ID("main_page_id");
+		const std::string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
+		const std::string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
+		const std::string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
+
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
 			if(_date && !_date->is_not_a_date_time()) map.insert(PARAMETER_DATE, *_date);
 			if(_screen.get()) map.insert(Request::PARAMETER_OBJECT_ID, _screen->getKey());
+			if(_mainPage.get())
+			{
+				map.insert(PARAMETER_MAIN_PAGE_ID, _mainPage->getKey());
+			}
+			if(_rowPage.get())
+			{
+				map.insert(PARAMETER_ROW_PAGE_ID, _rowPage->getKey());
+			}
+			if(_destinationPage.get())
+			{
+				map.insert(PARAMETER_DESTINATION_PAGE_ID, _destinationPage->getKey());
+			}
+			if(_transferDestinationPage.get())
+			{
+				map.insert(PARAMETER_TRANSFER_DESTINATION_PAGE_ID, _transferDestinationPage->getKey());
+			}
 			return map;
 		}
 
@@ -151,6 +173,49 @@ namespace synthese
 				{
 					id = map.getDefault<RegistryKeyType>(PARAMETER_TB, 0);
 				}
+
+				// CMS pages load
+
+				optional<RegistryKeyType> pid(map.getOptional<RegistryKeyType>(PARAMETER_MAIN_PAGE_ID));
+				if(pid) try
+				{
+					_mainPage = Env::GetOfficialEnv().get<Webpage>(*pid);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such main page");
+				}
+
+				optional<RegistryKeyType> rid(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
+				if(rid) try
+				{
+					_rowPage = Env::GetOfficialEnv().get<Webpage>(*rid);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such row page");
+				}
+
+				optional<RegistryKeyType> did(map.getOptional<RegistryKeyType>(PARAMETER_DESTINATION_PAGE_ID));
+				if(did) try
+				{
+					_destinationPage = Env::GetOfficialEnv().get<Webpage>(*did);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such destination page");
+				}
+
+				optional<RegistryKeyType> tid(map.getOptional<RegistryKeyType>(PARAMETER_TRANSFER_DESTINATION_PAGE_ID));
+				if(tid) try
+				{
+					_transferDestinationPage = Env::GetOfficialEnv().get<Webpage>(*tid);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such transfer destination page");
+				}
+
 
 				// Way 1 : pre-configured display screen
 
@@ -250,7 +315,6 @@ namespace synthese
 					_lineToDisplay = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 
 					screen->setType(_type.get());
-
 					//If request contains an interface : build a screen, else prepare custom xml answer
 					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
 					if(idReg)
@@ -263,6 +327,13 @@ namespace synthese
 						{
 							throw RequestException("No such screen type");
 						}
+					}
+					else if(_mainPage.get())
+					{
+						_type->setDisplayMainPage(_mainPage.get());
+						_type->setDisplayRowPage(_rowPage.get());
+						_type->setDisplayDestinationPage(_destinationPage.get());
+						_type->setDisplayTransferDestinationPage(_transferDestinationPage.get());
 					}
 					_screen.reset(screen);
 				}
@@ -337,6 +408,7 @@ namespace synthese
 				"\" color=\""     << commercialLine->getColor() <<
 				"\" style=\""     << commercialLine->getStyle() <<
 				"\" image=\""     << commercialLine->getImage() <<
+				"\" direction=\"" << journeyPattern->getDirection() <<
 				"\" />";
 
 			const StopArea & origin(
@@ -419,6 +491,12 @@ namespace synthese
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
 						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+						const UseRule& useRule(ls->getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
+						{
+							continue;
+						}
 
 						ptime departureDateTime = startDateTime;
 						// Loop on services
@@ -770,8 +848,9 @@ namespace synthese
 				// Path
 				pm.insert(DATA_RANK_IN_PATH, row.first.getDepartureEdge()->getRankInPath());
 
-
-				{ // Destinations
+				// Destinations
+				if(destinationPage.get())
+				{
 					stringstream destinationsStream;
 					const City* lastCity = dynamic_cast<const NamedPlace*>(row.second.at(0).place)->getCity();
 					size_t totalTransferRank(0);

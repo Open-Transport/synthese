@@ -207,14 +207,14 @@ namespace synthese
 				{
 					stream <<
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-						"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-						;
+						"<options xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+					;
 					BOOST_FOREACH(const RoadModule::ExtendedFetchPlaceResult& it, places)
 					{
 						stream << "<option type=\"";
 						if(	dynamic_cast<StopArea*>(it.placeResult.value.get()) ||
 							dynamic_cast<PlaceAlias*>(it.placeResult.value.get())
-							){
+						){
 								stream << "stop";
 						}
 						else if(dynamic_cast<const PublicPlace*>(it.placeResult.value.get()))
@@ -229,9 +229,15 @@ namespace synthese
 						{
 							stream << "address";
 						}
-						stream <<
-							"\" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
-							" levenshtein=\"" << it.placeResult.score.levenshtein << "\">";
+						stream << "\"";
+						if(dynamic_cast<const NamedPlace*>(it.placeResult.value.get()))
+						{
+							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getKey() << "\"";
+						}
+						stream << 
+							" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
+							" levenshtein=\"" << it.placeResult.score.levenshtein << "\">"
+						;
 
 						if(dynamic_cast<const House*>(it.placeResult.value.get()) && dynamic_cast<const House*>(it.placeResult.value.get())->getHouseNumber())
 						{
@@ -287,7 +293,12 @@ namespace synthese
 						{
 							stream << "address";
 						}
-						stream << "\">";
+						stream << "\"";
+						if(dynamic_cast<const NamedPlace*>(it.second.get()))
+						{
+							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.second.get())->getKey() << "\"";
+						}
+						stream << ">";
 
 						if(dynamic_cast<const House*>(it.second.get()) && dynamic_cast<const House*>(it.second.get())->getHouseNumber())
 						{
