@@ -144,8 +144,7 @@ longlong notify_synthese_http(
 	if (res)
 	{
 		*error = 1;
-		LOG2("curl returned an error while performing the request, code=%i\n", res
-		);
+		LOG2("curl returned an error while performing the request, code=%i\n", res);
 	}
 
 	curl_easy_cleanup(curl);
