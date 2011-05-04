@@ -149,8 +149,7 @@ namespace synthese
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
 			_lines(_dataSource, _env),
-			_destinations(_dataSource, _env),
-			_alreadyRead(false)
+			_destinations(_dataSource, _env)
 		{}
 
 
@@ -167,7 +166,7 @@ namespace synthese
 			{
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
-			_loadFieldsMap(inFile);
+			_clearFieldsMap();
 
 			// 1 : Routes
 			// Stops
@@ -663,39 +662,9 @@ namespace synthese
 
 
 
-		void IneoFileFormat::Importer_::_loadFieldsMap(ifstream& file) const
+		void IneoFileFormat::Importer_::_clearFieldsMap() const
 		{
-			string line;
 			_fieldsMap.clear();
-			_section.clear();
-			_line.clear();
-			while(getline(file, line))
-			{
-				if(line[0]==';')
-				{
-					line = line.substr(1);
-				}
-				if(line.empty()) continue;
-				vector<string> parts;
-				split(parts, line, is_any_of(":"));
-				if(parts[0] != "F")
-				{
-					_alreadyRead = true;
-					_loadLine(line);
-					return;
-				}
-				string code(trim_copy(parts[1]));
-
-				vector<string> fields;
-				split(fields, parts[2], is_any_of(";"));
-
-				BOOST_FOREACH(string& field, fields)
-				{
-					trim(field);
-				}
-
-				_fieldsMap[code] = fields;
-			}
 		}
 
 
@@ -708,11 +677,6 @@ namespace synthese
 
 		bool IneoFileFormat::Importer_::_readLine(ifstream& file) const
 		{
-			if(_alreadyRead)
-			{
-				_alreadyRead = false;
-				return true;
-			}
 			string line;
 			if(!getline(file, line))
 			{
@@ -727,17 +691,43 @@ namespace synthese
 
 		void IneoFileFormat::Importer_::_loadLine( const std::string& line ) const
 		{
-			vector<string> parts;
-			split(parts, line[0] == ';' ? line.substr(1) : line, is_any_of(":"));
-			_section = parts[0];
-			vector<string> fields;
-			string utfLine(ImpExModule::ConvertChar(parts[1], _dataSource.getCharset(), "UTF-8"));
-			split(fields, utfLine, is_any_of(SEP));
-			const vector<string>& cols(_fieldsMap[_section]);
 			_line.clear();
-			for(size_t i=0; i<fields.size(); ++i)
+			
+			vector<string> parts;
+			string trim_line(trim_copy(line));
+			split(parts, trim_line[0] == ';' ? trim_line.substr(1) : trim_line, is_any_of(":"));
+			if(parts.size() < 2 || parts[0].empty() || parts[1].empty())
 			{
-				_line[cols[i]] = trim_copy(fields[i]);
+				_section = "#";
+				return;
+			}
+			_section = parts[0];
+			if(_section == "F")
+			{
+				string code(trim_copy(parts[1]));
+				vector<string> fields;
+				split(fields, parts[2], is_any_of(SEP));
+				BOOST_FOREACH(const string& field, fields)
+				{
+					_fieldsMap[code].push_back(trim_copy(field));
+				}
+			}
+			else
+			{
+				FieldMaps::const_iterator itFieldsMap(_fieldsMap.find(_section));
+				if(itFieldsMap == _fieldsMap.end())
+				{
+					_section = "#";
+					return;
+				}
+				vector<string> fields;
+				string utfLine(ImpExModule::ConvertChar(parts[1], _dataSource.getCharset(), "UTF-8"));
+				split(fields, utfLine, is_any_of(SEP));
+				const vector<string>& cols(itFieldsMap->second);
+				for(size_t i=0; i<fields.size(); ++i)
+				{
+					_line[cols[i]] = trim_copy(fields[i]);
+				}
 			}
 		}
 
