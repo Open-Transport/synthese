@@ -25,6 +25,7 @@
 
 #include "Importer.hpp"
 #include <boost/algorithm/string/split.hpp>
+#include <boost/filesystem/operations.hpp>
 
 namespace synthese
 {
@@ -40,6 +41,7 @@ namespace synthese
 		public:
 			static const bool IMPORTABLE;
 			static const std::string PARAMETER_PATH;	//!< Path of the files to import
+			static const std::string PARAMETER_DIRECTORY;
 
 			typedef std::set<boost::filesystem::path> FilePathsSet;
 
@@ -51,6 +53,7 @@ namespace synthese
 			) const = 0;
 
 			FilePathsSet _pathsSet;
+			boost::filesystem::path _dirPath;
 
 			virtual void _setFromParametersMap(const server::ParametersMap& map) {}
 
@@ -77,6 +80,21 @@ namespace synthese
 					{
 						if(token.empty()) continue;
 						_pathsSet.insert(token);
+					}
+				}
+				else if(map.getOptional<std::string>(PARAMETER_DIRECTORY))
+				{
+					_dirPath = map.get<std::string>(PARAMETER_DIRECTORY);
+					if(boost::filesystem::is_directory(_dirPath))
+					{
+						for(boost::filesystem::directory_iterator it(_dirPath); it != boost::filesystem::directory_iterator(); ++it)
+						{
+							boost::filesystem::path filePath(*it);
+							if(!boost::filesystem::is_directory(filePath))
+							{
+								_pathsSet.insert(filePath);
+							}
+						}
 					}
 				}
 				_setFromParametersMap(map);
@@ -123,6 +141,9 @@ namespace synthese
 
 		template<class FF>
 		const std::string OneFileTypeImporter<FF>::PARAMETER_PATH("pa");
+
+		template<class FF>
+		const std::string OneFileTypeImporter<FF>::PARAMETER_DIRECTORY("dr");
 }	}
 
 #endif // SYNTHESE_impex_OneFileTypeImporter_hpp__
