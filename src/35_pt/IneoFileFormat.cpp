@@ -65,6 +65,7 @@ using namespace boost;
 using namespace boost::algorithm;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -109,9 +110,9 @@ namespace synthese
 			IneoFileFormat::Importer_::FILE_DIS.c_str(),
 			IneoFileFormat::Importer_::FILE_DST.c_str(),
 			IneoFileFormat::Importer_::FILE_LIG.c_str(),
+			IneoFileFormat::Importer_::FILE_CAL.c_str(),
 			IneoFileFormat::Importer_::FILE_CJV.c_str(),
 			IneoFileFormat::Importer_::FILE_HOR.c_str(),
-			IneoFileFormat::Importer_::FILE_CAL.c_str(),
 		"");
 	}
 
@@ -148,6 +149,7 @@ namespace synthese
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
 			_lines(_dataSource, _env),
+			_destinations(_dataSource, _env),
 			_alreadyRead(false)
 		{}
 
@@ -172,6 +174,7 @@ namespace synthese
 			if(key == FILE_PNT)
 			{
 				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
+				map<string, StopArea*> stopAreasByName;
 
 				// 2.2 : stops
 				PTFileFormat::ImportableStopPoints linkedStopPoints;
@@ -199,7 +202,7 @@ namespace synthese
 						point.reset();
 					}
 
-					if(request)
+					if(request && !_autoImportStops)
 					{
 						PTFileFormat::ImportableStopPoint isp;
 						isp.operatorCode = id;
@@ -235,29 +238,40 @@ namespace synthese
 							if(_autoImportStops)
 							{
 								StopArea* stopArea(NULL);
-								StopAreaTableSync::SearchResult stopAreas(StopAreaTableSync::Search(
-										_env,
-										_defaultCity->getKey(),
-										logic::indeterminate,
-										optional<string>(),
-										name
-								)	);
-								if(!stopAreas.empty())
+								 // Search in the last created stop areas map
+								map<string, StopArea*>::const_iterator it(stopAreasByName.find(name));
+								if(it != stopAreasByName.end())
 								{
-									stopArea = stopAreas.begin()->get();
+									stopArea = it->second;
 								}
-								else
+								// Search in the database
+								if(!stopArea)
 								{
-									stopArea = new StopArea;
-									StopArea* stopArea(
-										new StopArea(
-											StopAreaTableSync::getId(),
-											true,
-											_stopAreaDefaultTransferDuration
+									StopAreaTableSync::SearchResult stopAreas(
+										StopAreaTableSync::Search(
+											_env,
+											_defaultCity->getKey(),
+											logic::indeterminate,
+											optional<string>(),
+											name
 									)	);
+									if(!stopAreas.empty())
+									{
+										stopArea = stopAreas.begin()->get();
+									}
+								}
+								// Creation of the stop area
+								if(!stopArea)
+								{
+									stopArea = new StopArea(
+										StopAreaTableSync::getId(),
+										true,
+										_stopAreaDefaultTransferDuration
+									);
 									stopArea->setCity(_defaultCity.get());
 									stopArea->setName(name);
 									_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
+									stopAreasByName.insert(make_pair(name, stopArea));
 								}
 								PTFileFormat::CreateOrUpdateStopPoints(
 									_stopPoints,
@@ -271,6 +285,10 @@ namespace synthese
 									_env,
 									stream
 								);
+							}
+							else
+							{
+								return false;
 							}
 						}
 					}
@@ -301,7 +319,45 @@ namespace synthese
 					return false;
 				}
 			}
-			// 3 : Lines
+			// 2 : Distances
+			else if(key == FILE_DIS)
+			{
+				while(_readLine(inFile))
+				{
+					if(_section == "D")
+					{
+						_distances.insert(
+							make_pair(
+								make_pair(
+									_getValue("MNEO"),
+									_getValue("MNED")
+								),
+								lexical_cast<Edge::MetricOffset>(_getValue("DIST"))
+						)	);
+					}
+				}
+			}
+			// 3 : Destinations
+			else if(key == FILE_DST)
+			{
+				ImportableTableSync::ObjectBySource<DestinationTableSync> destinations(_dataSource, _env);
+				while(_readLine(inFile))
+				{
+					if(_section == "DST")
+					{
+						PTFileFormat::CreateOrUpdateDestination(
+							_destinations,
+							_getValue("NDSTG"),
+							_getValue("DSTBL"),
+							_getValue("DSTTS"),
+							_dataSource,
+							_env,
+							stream
+						);
+					}
+				}
+			}
+			// 4 : Lines
 			else if(key == FILE_LIG)
 			{
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
@@ -311,9 +367,13 @@ namespace synthese
 				string jpName;
 				bool jpWayback(false);
 				string jpKey;
-				while(_readLine(inFile))
+				string lastStopCode;
+				Edge::MetricOffset dst(0);
+				while(true)
 				{
-					if((_section == "L" || _section =="PC") && !stops.empty())
+					_readLine(inFile);
+
+					if((_section == "L" || _section =="CH" || _section.empty()) && !stops.empty())
 					{
 						JourneyPattern* route(
 							PTFileFormat::CreateOrUpdateRoute(
@@ -331,68 +391,127 @@ namespace synthese
 						stops.clear();
 						_journeyPatterns[make_pair(lineId,jpKey)] = route;
 					}
+					if(_section.empty())
+					{
+						break;
+					}
 					if(_section == "L")
 					{
 						lineId = _getValue("MNLG");
-						if(line)
-						{
-							// Cloture ligne
-						}
-						if(lines.contains(lineId))
-						{
-							line = *lines.get(lineId).begin();
-							line->setNetwork(_network.get());
-							_env.getEditableRegistry<CommercialLine>().add(shared_ptr<CommercialLine>(line));
-						}
-						else
-						{
-							line = new CommercialLine;
-						}
-						line->setName(_getValue("LIBLG"));
-						line->setShortName(_getValue("NLGIV"));
+						line = PTFileFormat::CreateOrUpdateLine(
+							lines,
+							lineId,
+							_getValue("LIBLG"),
+							_getValue("NLGIV"),
+							optional<RGBColor>(),
+							*_network,
+							_dataSource,
+							_env,
+							stream
+						);
 					}
-					else if(_section == "PC")
+					else if(_section == "CH")
 					{
 						jpName = _getValue("LIBCH");
 						jpWayback = (_getValue("SENS") == "A");
 						jpKey = _getValue("NCH");
 						stops.clear();
+						lastStopCode.clear();
+						dst = 0;
 					}
 					else if(_section == "PC")
 					{
+						string stopCode(_getValue("MNL"));
+						if(!lastStopCode.empty())
+						{
+							std::map<std::pair<std::string, std::string>, graph::Edge::MetricOffset>::const_iterator it(_distances.find(
+									make_pair(lastStopCode, stopCode)
+							)	);
+							if(it != _distances.end())
+							{
+								dst += it->second;
+							}
+							else
+							{
+								stream << "WARN : distance between " << lastStopCode << " and " << stopCode << " not found.<br />";
+							}
+						}
 						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-							_stopPoints.get(_getValue("MNL")),
-							optional<Edge::MetricOffset>(),
+							_stopPoints.get(stopCode),
+							dst,
 							true,
 							true,
 							_getValue("TYPC") == "R"
 						);
 						stops.push_back(stop);
+						lastStopCode = stopCode;
 					}
 				}
 			}
 			else if(key == FILE_CAL)
 			{
-
+				while(_readLine(inFile))
+				{
+					if(_section == "CAL")
+					{
+						string dateStr(_getValue("DATE"));
+						_dates[make_pair(lexical_cast<int>(_getValue("PH")),lexical_cast<int>(_getValue("TYP_JOUR")))].push_back(
+							date(
+								lexical_cast<int>(dateStr.substr(6,4)),
+								lexical_cast<int>(dateStr.substr(3,2)),
+								lexical_cast<int>(dateStr.substr(0,2))
+						)	);
+					}
+				}
 			}
 			else if(key == FILE_CJV)
 			{
-
+				int day(0);
+				while(_readLine(inFile))
+				{
+					if(_section == "JC")
+					{
+						day = lexical_cast<int>(_getValue("CODE_JC"));
+					}
+					else if(_section == "CJDV")
+					{
+						vector<string> cjdvs;
+						for(int i=0; i<10; ++i)
+						{
+							cjdvs.push_back(lexical_cast<string>(i));
+						}
+						cjdvs.push_back("A");
+						cjdvs.push_back("B");
+						cjdvs.push_back("C");
+						cjdvs.push_back("D");
+						cjdvs.push_back("E");
+						cjdvs.push_back("F");
+						BOOST_FOREACH(const string& cjdv, cjdvs)
+						{
+							if(_getValue("C"+cjdv) == "O")
+							{
+								_calendars[cjdv].push_back(day);
+							}
+						}
+					}
+				}
 			}
 			else if(key == FILE_HOR)
 			{
 				bool active(true);
 				JourneyPattern* route(NULL);
 				ScheduledService::Schedules schedules;
-				while(_readLine(inFile))
+				int ph(0);
+				vector<date> dates;
+				time_duration lastTd(minutes(0));
+				while(true)
 				{
-					if(_section == "C")
-					{
-						if(!schedules.empty()) // Cloture course
-						{
+					_readLine(inFile);
 
-							ScheduledService* service(
-								PTFileFormat::CreateOrUpdateService(
+					if((_section == "C" || _section.empty()) && !schedules.empty())
+					{
+						ScheduledService* service(
+							PTFileFormat::CreateOrUpdateService(
 								*route,
 								schedules,
 								schedules,
@@ -400,17 +519,44 @@ namespace synthese
 								_dataSource,
 								_env,
 								stream
-							)	);
-							schedules.clear();
+						)	);
+						BOOST_FOREACH(const date& dat, dates)
+						{
+							service->setActive(dat);
 						}
+					}
+					if(_section.empty())
+					{
+						break;
+					}
+
+					if(_section == "PH")
+					{
+						ph = lexical_cast<int>(_getValue("NPH"));
+					}
+					else if(_section == "C")
+					{
 						if(_getValue("TCOU") != "0")
 						{
 							active = false;
 							continue;
 						}
-						string lineNum(_getValue("CIDX").substr(5,2));
+						active = true;
+						string lineNum(lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2))));
 						string jpNum(_getValue("ORD"));
 						route = _journeyPatterns[make_pair(lineNum,jpNum)];
+
+						schedules.clear();
+						dates.clear();
+						lastTd = minutes(0);
+
+						BOOST_FOREACH(int day, _calendars[_getValue("CJDV")])
+						{
+							BOOST_FOREACH(const date& dat, _dates[make_pair(ph, day)])
+							{
+								dates.push_back(dat);
+							}
+						}
 					}
 					else if(active && _section == "H")
 					{
@@ -420,7 +566,16 @@ namespace synthese
 							lexical_cast<int>(timeStr.substr(2,2)),
 							lexical_cast<int>(timeStr.substr(4,2))
 						);
+						if(td < lastTd)
+						{
+							td += hours(24);
+						}
 						schedules.push_back(td);
+						lastTd = td;
+					}
+					if(_section.empty())
+					{
+						break;
 					}
 				}
 			}
@@ -474,6 +629,10 @@ namespace synthese
 				{
 					StopPointTableSync::Save(stop.second.get(), transaction);
 				}
+			}
+			BOOST_FOREACH(const Registry<Destination>::value_type& destination, _env.getRegistry<Destination>())
+			{
+				DestinationTableSync::Save(destination.second.get(), transaction);
 			}
 			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env.getRegistry<Junction>())
 			{
@@ -557,6 +716,7 @@ namespace synthese
 			string line;
 			if(!getline(file, line))
 			{
+				_section.clear();
 				return false;
 			}
 			_loadLine(line);
@@ -568,7 +728,7 @@ namespace synthese
 		void IneoFileFormat::Importer_::_loadLine( const std::string& line ) const
 		{
 			vector<string> parts;
-			split(parts, line, is_any_of(":"));
+			split(parts, line[0] == ';' ? line.substr(1) : line, is_any_of(":"));
 			_section = parts[0];
 			vector<string> fields;
 			string utfLine(ImpExModule::ConvertChar(parts[1], _dataSource.getCharset(), "UTF-8"));
