@@ -71,6 +71,11 @@ namespace synthese
 			static const std::string PARAMETER_STOP_NAME;
 			static const std::string PARAMETER_LINE_ID;
 
+			static const std::string PARAMETER_MAIN_PAGE_ID;
+			static const std::string PARAMETER_ROW_PAGE_ID;
+			static const std::string PARAMETER_DESTINATION_PAGE_ID;
+			static const std::string PARAMETER_TRANSFER_DESTINATION_PAGE_ID;
+
 		private:
 			//! \name Page parameters
 			//@{
@@ -79,6 +84,11 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime> _date;
 				boost::optional<util::RegistryKeyType>    _lineToDisplay;
 				bool	_wayIsBackward;
+
+				boost::shared_ptr<const cms::Webpage>	_mainPage;
+				boost::shared_ptr<const cms::Webpage>	_rowPage;
+				boost::shared_ptr<const cms::Webpage>	_destinationPage;
+				boost::shared_ptr<const cms::Webpage>	_transferDestinationPage;
 			//@}
 
 			//////////////////////////////////////////////////////////////////////////
