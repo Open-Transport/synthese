@@ -40,7 +40,6 @@ namespace synthese
 
 	namespace impex
 	{
-		const string ImportableTableSync::COL_DATA_SOURCE_LINKS("data_source_links");
 		const string ImportableTableSync::FIELDS_SEPARATOR("|");
 		const string ImportableTableSync::SOURCES_SEPARATOR(",");
 
