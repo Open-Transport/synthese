@@ -5,6 +5,7 @@
 
 synthese::pt::TransportNetworkTableSync::integrate();
 
+synthese::pt::DestinationTableSync::integrate();
 synthese::pt::PTUseRuleTableSync::integrate();
 synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopPointTableSync>::integrate();
 synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::StopPointTableSync>::integrate();
@@ -103,6 +104,7 @@ synthese::pt::StopArea::integrate();
 synthese::pt::StopPointWFSType::integrate();
 
 // Registries
+synthese::util::Env::Integrate<synthese::pt::Destination>();
 synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
 synthese::util::Env::Integrate<synthese::pt::LineArea>();
 synthese::util::Env::Integrate<synthese::pt::DesignatedLinePhysicalStop>();

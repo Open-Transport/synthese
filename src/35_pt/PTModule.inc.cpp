@@ -23,6 +23,7 @@
 #include "GTFSFileFormat.hpp"
 #include "IneoFileFormat.hpp"
 
+#include "DestinationTableSync.hpp"
 #include "PTUseRuleTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
@@ -95,6 +96,7 @@
 
 // Registries
 
+#include "Destination.hpp"
 #include "JourneyPattern.hpp"
 #include "LineArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
