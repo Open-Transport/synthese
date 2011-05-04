@@ -695,7 +695,9 @@ namespace synthese
 			
 			vector<string> parts;
 			string trim_line(trim_copy(line));
-			split(parts, trim_line[0] == ';' ? trim_line.substr(1) : trim_line, is_any_of(":"));
+			if (trim_line[0] == ';')
+				trim_line = trim_line.substr(1);
+			split(parts, trim_line, is_any_of(":"));
 			if(parts.size() < 2 || parts[0].empty() || parts[1].empty())
 			{
 				_section = "#";
