@@ -32,6 +32,7 @@
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "Calendar.h"
+#include "DestinationTableSync.hpp"
 
 #include <iostream>
 #include <map>
@@ -106,8 +107,6 @@ namespace synthese
 				mutable std::map<std::string, std::string> _line;
 				mutable std::string _section;
 				mutable bool _alreadyRead;
-				typedef std::map<std::size_t, std::map<std::size_t, calendar::Calendar> > Calendars;
-
 
 				void _loadFieldsMap(std::ifstream& file) const;
 				std::string _getValue(const std::string& field) const;
@@ -120,11 +119,13 @@ namespace synthese
 					boost::gregorian::date _endDate;
 				//@}
 
-				mutable Calendars _calendars;
-
+				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
+				mutable std::map<std::pair<std::string, std::string>, graph::Edge::MetricOffset> _distances;
+				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
+				mutable std::map<std::string, std::vector<int> > _calendars;
 
 				struct Trip
 				{
