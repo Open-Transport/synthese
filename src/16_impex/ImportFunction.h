@@ -36,30 +36,13 @@ namespace synthese
 		class DataSource;
 		class FileFormat;
 
-		/** Import Function class.
-
-			Usage :
-			@code
-data_source=<id>
-path=file1,file2,file3,file4...
-do_import=0|1
-			@endcode
-
-				data_source : id of the data source referring to the ImportDataSource table
-				path [compulsory] : each file to import (one per line) separated by comas
-				do_import :
-					- 0 = simulates the import, display all warning messages
-					- 1 = do the import with the following rules :
-						- all the future service dates of the lines handled by the data source are deleted
-						- if a stop is missing in a line, all the routes of the line are ignored (even those which not use
-							acttually the missing stops). This ignored routes are displayed in the output
-						- the commercial lines are automatically created
-
-
-			@author Hugues Romain
-			@date 2009
-			@ingroup m16Functions refFunctions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// 16.15 Import service.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import
+		//////////////////////////////////////////////////////////////////////////
+		/// @author Hugues Romain
+		///	@date 2009
+		///	@ingroup m16Functions refFunctions
 		class ImportFunction:
 			public util::FactorableTemplate<server::Function, ImportFunction>
 		{
@@ -82,17 +65,21 @@ do_import=0|1
 
 			std::string							_output;
 
-			/** Conversion from attributes to generic parameter maps.
-				@return Generated parameters map
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @return Generated parameters map
 			server::ParametersMap _getParametersMap() const;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads each parameter and run the parsing of the input files.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import#Request
 			/// At the end of the parsing, the temporary environment used by the function
 			/// is cleaned in order to avoid memory overload.
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			void _setFromParametersMap(const server::ParametersMap& map);
