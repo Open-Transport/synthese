@@ -76,8 +76,6 @@ namespace synthese
 				const Map& getMap() const { return _map; }
 			};
 
-			static const std::string COL_DATA_SOURCE_LINKS;
-
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds storage string.
