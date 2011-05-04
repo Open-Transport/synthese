@@ -32,6 +32,10 @@ DesignatedLinePhysicalStop.cpp
 DesignatedLinePhysicalStop.hpp
 DesignatedLinePhysicalStopInheritedTableSync.cpp
 DesignatedLinePhysicalStopInheritedTableSync.hpp
+Destination.cpp
+Destination.hpp
+DestinationTableSync.cpp
+DestinationTableSync.hpp
 DRTArea.cpp
 DRTArea.hpp
 DRTAreaAdmin.cpp
