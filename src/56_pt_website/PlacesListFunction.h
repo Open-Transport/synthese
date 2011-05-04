@@ -43,12 +43,13 @@ namespace synthese
 
 	namespace pt_website
 	{
-		/** Places list query public function.
-			@author Hugues Romain
-			@date 2007
-			@ingroup m56Functions refFunctions
-
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Places list query public function.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Places_list
+		//////////////////////////////////////////////////////////////////////////
+		/// @author Hugues Romain
+		///	@date 2007
+		///	@ingroup m56Functions refFunctions
 		class PlacesListFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<true>,PlacesListFunction>
 		{
