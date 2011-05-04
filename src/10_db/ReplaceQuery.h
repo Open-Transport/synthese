@@ -144,7 +144,9 @@ namespace synthese
 			db->addDBModifEvent(
 				DB::DBModifEvent(
 					TableSync::TABLE.NAME,
-					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
+// TODO remove MODIF_UPDATE and _objectAdded attribute or find an other way to choose between the two types
+//					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
+					DB::MODIF_INSERT,
 					_id
 				),
 				transaction
