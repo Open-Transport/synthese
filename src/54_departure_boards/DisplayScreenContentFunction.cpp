@@ -43,6 +43,7 @@
 #include "Alarm.h"
 #include "Webpage.h"
 #include "PTObjectsCMSExporters.hpp"
+#include "RoadModule.h"
 
 #include <sstream>
 
@@ -61,6 +62,7 @@ namespace synthese
 	using namespace geography;
 	using namespace departure_boards;
 	using namespace cms;
+	using namespace road;
 
 	template<> const string util::FactorableTemplate<DisplayScreenContentFunction::_FunctionWithSite,DisplayScreenContentFunction>::FACTORY_KEY("tdg");
 
@@ -176,6 +178,77 @@ namespace synthese
 					screen->setGenerationMethod(DisplayScreen::STANDARD_METHOD);
 					_type.reset(new DisplayType);
 					_type->setRowNumber(map.getDefault<size_t>(PARAMETER_ROWS_NUMBER, 10));
+
+
+					// Way 3 : physical stop
+
+					// 3.1 by id
+					if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
+					{
+						shared_ptr<const StopPoint> stop(
+								Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
+						);
+
+						screen->setDisplayedPlace(stop->getConnectionPlace());
+						screen->setAllPhysicalStopsDisplayed(false);
+						screen->addPhysicalStop(stop.get());
+					}
+
+					// 3.2 by operator code
+					//4.1 by operator code
+					else if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
+					{
+						//If an oc was given we search corresponding physical stop
+						string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
+
+						//Get StopPoint Global Registry
+						typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
+						BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
+						{
+							if(myStop.second->getCodeBySources() == oc)
+							{
+								screen->addPhysicalStop(myStop.second.get());
+								break;
+							}
+						}
+					}
+
+					// Way 2 : connection place
+
+					// 2.1 by id
+					else if(decodeTableId(id) == StopAreaTableSync::TABLE.ID)
+					{
+						screen->setDisplayedPlace(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get());
+						screen->setAllPhysicalStopsDisplayed(true);
+					}
+
+					// 2.2 by name
+					else if (!map.getDefault<string>(PARAMETER_CITY_NAME).empty() && !map.getDefault<string>(PARAMETER_STOP_NAME).empty())
+					{
+						boost::shared_ptr<geography::Place> place(RoadModule::FetchPlace(map.get<string>(PARAMETER_CITY_NAME), map.get<string>(PARAMETER_STOP_NAME)));
+						if(!dynamic_cast<StopArea*>(place.get()))
+						{
+							throw RequestException("This place is not a stop area");
+						}
+						screen->setDisplayedPlace(dynamic_cast<StopArea*>(place.get()));
+						screen->setAllPhysicalStopsDisplayed(true);
+					}
+					else // Failure
+					{
+						throw RequestException("Not a display screen nor a connection place");
+					}
+
+
+					// Way
+					_wayIsBackward = false;
+					optional<string> way(map.getOptional<string>(PARAMETER_WAY));
+					if(way && (*way) == "backward")
+					{
+						_wayIsBackward = true;
+					}
+
+					_lineToDisplay = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
+
 					screen->setType(_type.get());
 
 					//If request contains an interface : build a screen, else prepare custom xml answer
@@ -190,98 +263,6 @@ namespace synthese
 						{
 							throw RequestException("No such screen type");
 						}
-
-
-						// Way 3 : physical stop
-
-						// 3.1 by id
-						if(decodeTableId(id) == StopPointTableSync::TABLE.ID)
-						{
-							shared_ptr<const StopPoint> stop(
-									Env::GetOfficialEnv().get<StopPoint>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
-							);
-
-							screen->setDisplayedPlace(stop->getConnectionPlace());
-							screen->setAllPhysicalStopsDisplayed(false);
-							screen->addPhysicalStop(stop.get());
-						}
-
-						// 3.2 by operator code
-						else if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
-						{
-							string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
-							shared_ptr<const StopArea> place(
-									Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
-							);
-
-							screen->setDisplayedPlace(place.get());
-							screen->setAllPhysicalStopsDisplayed(false);
-							const ArrivalDepartureTableGenerator::PhysicalStops& stops(place->getPhysicalStops());
-							BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, stops)
-							{
-								if(it.second->getCodeBySources() == oc)
-									screen->addPhysicalStop(it.second);
-							}
-						}
-
-						// Way 2 : connection place
-
-						// 2.1 by id
-						else if(decodeTableId(id) == StopAreaTableSync::TABLE.ID)
-						{
-							screen->setDisplayedPlace(Env::GetOfficialEnv().getRegistry<StopArea>().get(id).get());
-							screen->setAllPhysicalStopsDisplayed(true);
-						}
-
-						// 2.2 by name
-						else if (!map.getDefault<string>(PARAMETER_CITY_NAME).empty() && !map.getDefault<string>(PARAMETER_STOP_NAME).empty())
-						{
-							screen->setAllPhysicalStopsDisplayed(true);
-
-						}
-
-
-						else // Failure
-						{
-							throw RequestException("Not a display screen nor a connection place");
-						}
-
-					}else{//answer will be XML
-
-						//4.1 by operator code
-						if(!map.getDefault<string>(PARAMETER_OPERATOR_CODE).empty())
-						{
-							//If an oc was given we search corresponding physical stop
-							string oc(map.get<string>(PARAMETER_OPERATOR_CODE));
-
-							//Get StopPoint Global Registry
-							typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
-							BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
-							{
-								if(myStop.second->getCodeBySources() == oc)
-								{
-									screen->addPhysicalStop(myStop.second.get());
-									break;
-								}
-							}
-						}
-						else //4.2 by physical stop
-						{
-							RegistryKeyType id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
-							shared_ptr<const StopPoint> stop(
-									Env::GetOfficialEnv().get<StopPoint>(id)
-							);
-							screen->addPhysicalStop(stop.get());
-						}
-						// Way
-						_wayIsBackward = false;
-						optional<string> way(map.getOptional<string>(PARAMETER_WAY));
-						if(way && (*way) == "backward")
-						{
-							_wayIsBackward = true;
-						}
-
-						_lineToDisplay = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 					}
 					_screen.reset(screen);
 				}
@@ -327,17 +308,19 @@ namespace synthese
 				"\" blink=\"" << "0" <<
 				"\">";
 
-			RollingStock * rs = journeyPattern->getRollingStock();
-
 			stream << "<stop id=\"" << stop->getKey() <<
 				"\" operatorCode=\""<< stop->getCodeBySources() <<
 				"\" name=\""        << stop->getName() <<
 				"\" />";
 
-			stream <<"<transportMode id=\""<< rs->getKey() <<
-				"\" name=\""               << rs->getName() <<
-				"\" article=\""            << rs->getArticle()<<
-				"\" />";
+			RollingStock * rs = journeyPattern->getRollingStock();
+			if(rs)
+			{
+				stream <<"<transportMode id=\""<< rs->getKey() <<
+					"\" name=\""               << rs->getName() <<
+					"\" article=\""            << rs->getArticle()<<
+					"\" />";
+			}
 
 			const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 

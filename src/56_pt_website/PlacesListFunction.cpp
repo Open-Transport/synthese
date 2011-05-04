@@ -244,19 +244,58 @@ namespace synthese
 			}
 			else if(_city.get())
 			{
-				size_t c(0);
-				BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
+				if(_page.get())
 				{
-					placesList.push_back(
-						make_pair(
-							dynamic_pointer_cast<NamedPlace,Place>(it.second)->getKey(),
-							dynamic_pointer_cast<NamedPlace,Place>(it.second)->getName()
-					)	);
-					if(_n && c >= *_n)
+					size_t c(0);
+					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
 					{
-						break;
+						placesList.push_back(
+							make_pair(
+								dynamic_pointer_cast<NamedPlace,Place>(it.second)->getKey(),
+								dynamic_pointer_cast<NamedPlace,Place>(it.second)->getName()
+						)	);
+						if(_n && c >= *_n)
+						{
+							break;
+						}
+						++c;
 					}
-					++c;
+				}
+				else
+				{
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+						"<options xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+						;
+					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
+					{
+						stream << "<option type=\"";
+						if(	dynamic_cast<StopArea*>(it.second.get()) ||
+							dynamic_cast<PlaceAlias*>(it.second.get())
+						){
+							stream << "stop";
+						}
+						else if(dynamic_cast<const PublicPlace*>(it.second.get()))
+						{
+							stream << "publicPlace";
+						}
+						else if(dynamic_cast<const RoadPlace*>(it.second.get()))
+						{
+							stream << "street";
+						}
+						else if(dynamic_cast<const House*>(it.second.get()))
+						{
+							stream << "address";
+						}
+						stream << "\">";
+
+						if(dynamic_cast<const House*>(it.second.get()) && dynamic_cast<const House*>(it.second.get())->getHouseNumber())
+						{
+							stream << *dynamic_cast<const House*>(it.second.get())->getHouseNumber() << " ";
+						}
+						stream << it.first.getSource() << "</option>";
+					}
+					stream << "</options>";
 				}
 			}
 
