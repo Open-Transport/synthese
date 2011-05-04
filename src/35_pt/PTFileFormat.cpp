@@ -44,6 +44,7 @@
 #include "HTMLTable.h"
 #include "City.h"
 #include "StopPointUpdateAction.hpp"
+#include "DestinationTableSync.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
 
@@ -857,5 +858,44 @@ namespace synthese
 				}
 			}
 			stream << t.close();
+		}
+
+
+
+		Destination* PTFileFormat::CreateOrUpdateDestination(
+			impex::ImportableTableSync::ObjectBySource<DestinationTableSync>& destinations,
+			const std::string& id,
+			const std::string& displayText,
+			const std::string& ttsText,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
+			Destination* destination;
+			if(destinations.contains(id))
+			{
+				set<Destination*> loadedDestination(destinations.get(id));
+				if(loadedDestination.size() > 1)
+				{
+					logStream << "WARN : more than one destination with key " << id << "<br />";
+				}
+				destination = *loadedDestination.begin();
+				logStream << "LOAD : use of existing destination " << destination->getKey() << " (" << destination->getDisplayedText() << ")<br />";
+			}
+			else
+			{
+				destination = new Destination(
+					DestinationTableSync::getId()
+				);
+				Importable::DataSourceLinks links;
+				links.insert(make_pair(&source, id));
+				destination->setDataSourceLinks(links);
+				env.getEditableRegistry<Destination>().add(shared_ptr<Destination>(destination));
+				destinations.add(*destination);
+				logStream << "CREA : Creation of the destination with key " << id << " (" << displayText <<  ")<br />";
+			}
+			destination->setDisplayedText(displayText);
+			destination->setTTSText(ttsText);
+			return destination;
 		}
 }	}

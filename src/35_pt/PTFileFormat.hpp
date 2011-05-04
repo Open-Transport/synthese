@@ -52,6 +52,8 @@ namespace synthese
 		class CommercialLineTableSync;
 		class StopPointTableSync;
 		class RollingStock;
+		class Destination;
+		class DestinationTableSync;
 
 
 		/** PTFileFormat class.
@@ -79,6 +81,22 @@ namespace synthese
 				impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync>& networks,
 				const std::string& id,
 				const std::string& name,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// @return the created network object.
+			/// The created object is owned by the environment (it is not required to
+			/// maintain the returned shared pointer)
+			static Destination* CreateOrUpdateDestination(
+				impex::ImportableTableSync::ObjectBySource<DestinationTableSync>& destinations,
+				const std::string& id,
+				const std::string& displayText,
+				const std::string& ttsText,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
