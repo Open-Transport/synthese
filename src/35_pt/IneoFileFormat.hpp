@@ -106,9 +106,8 @@ namespace synthese
 
 				mutable std::map<std::string, std::string> _line;
 				mutable std::string _section;
-				mutable bool _alreadyRead;
-
-				void _loadFieldsMap(std::ifstream& file) const;
+				
+				void _clearFieldsMap() const;
 				std::string _getValue(const std::string& field) const;
 				bool _readLine(std::ifstream& file) const;
 				void _loadLine(const std::string& line) const;
