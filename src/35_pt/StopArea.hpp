@@ -47,6 +47,7 @@ namespace synthese
 	namespace pt
 	{
 		class StopPoint;
+		class CommercialLine;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Stop area.
@@ -320,6 +321,20 @@ namespace synthese
 					@date 2007
 				*/
 				PhysicalStopsLabels	getPhysicalStopLabels(const PhysicalStops& noDisplay) const;
+
+
+				typedef std::set<CommercialLine*> Lines;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// List of the lines which call at a stop of the stop area.
+				/// @param includeArrivals if true, the line with only arrival at a stop are also returned
+				/// @return the list of the lines which call at a stop of the stop area
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				Lines getLines(
+					bool includeArrivals
+				) const;
 			//@}
 
 		};

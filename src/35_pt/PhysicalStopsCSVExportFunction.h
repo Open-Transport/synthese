@@ -33,6 +33,8 @@
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace pt
 	{
 		/** PhysicalStopsCSVExportFunction Function class.
@@ -45,11 +47,13 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_BBOX;
+			static const std::string PARAMETER_SRID;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::optional<geos::geom::Envelope> _bbox;
+				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
 
