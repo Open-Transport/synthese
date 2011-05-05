@@ -30,9 +30,12 @@
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <geos/geom/Envelope.h>
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace cms
 	{
 		class Webpage;
@@ -58,6 +61,8 @@ namespace synthese
 				static const std::string PARAMETER_DATE;
 				static const std::string PARAMETER_LINE_ID;
 				static const std::string PARAMETER_PAGE_ID;
+				static const std::string PARAMETER_BBOX;
+				static const std::string PARAMETER_SRID;
 
 		protected:
 				static const std::string DATA_NAME;
@@ -69,6 +74,8 @@ namespace synthese
 				boost::shared_ptr<const pt::StopArea>		_stopArea;
 				boost::optional<util::RegistryKeyType>		_commercialLineID;
 				boost::shared_ptr<const cms::Webpage>				_page;
+				boost::optional<geos::geom::Envelope> _bbox;
+				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
 

@@ -392,4 +392,27 @@ namespace synthese
 				_transferDelays.erase(it);
 			}
 		}
+
+
+
+		StopArea::Lines StopArea::getLines(
+			bool includeArrivals
+		) const {
+			Lines result;
+			BOOST_FOREACH(const PhysicalStops::value_type& itStop, _physicalStops)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, itStop.second->getDepartureEdges())
+				{
+					result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
+				}
+				if(includeArrivals)
+				{
+					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, itStop.second->getArrivalEdges())
+					{
+						result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
+					}
+				}
+			}
+			return result;
+		}
 }	}

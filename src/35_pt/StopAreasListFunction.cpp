@@ -39,9 +39,12 @@
 #include <map>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -58,21 +61,73 @@ namespace synthese
 
 	namespace pt
 	{
+		const string StopAreasListFunction::PARAMETER_BBOX = "bbox";
+		const string StopAreasListFunction::PARAMETER_SRID = "srid";
+
 		ParametersMap StopAreasListFunction::_getParametersMap() const
 		{
 			ParametersMap result;
+			if(_commercialLine.get())
+			{
+				result.insert(Request::PARAMETER_OBJECT_ID, _commercialLine->getKey());
+			}
+			if(_bbox)
+			{
+				stringstream s;
+				s << _bbox->getMinX() << "," << _bbox->getMinY() << "," <<
+					_bbox->getMaxX() << "," << _bbox->getMaxY();
+				result.insert(PARAMETER_BBOX, s.str());
+			
+				if(_coordinatesSystem)
+				{
+					result.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+				}
+			}
 			return result;
 		}
 
 		void StopAreasListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			if(map.isDefined(Request::PARAMETER_OBJECT_ID)) try
 			{
 				_commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
 			catch (ObjectNotFoundException<CommercialLine>&)
 			{
 				throw RequestException("No such Commercial Line");
+			}
+
+			string bbox(map.getDefault<string>(PARAMETER_BBOX));
+			if(!bbox.empty())
+			{
+				CoordinatesSystem::SRID srid(
+					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+				);
+				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+				vector< string > parsed_bbox;
+				split(parsed_bbox, bbox, is_any_of(",; ") );
+
+				if(parsed_bbox.size() != 4)
+				{
+					throw RequestException("Malformed bbox.");
+				}
+
+				shared_ptr<Point> pt1(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1]))
+				);
+				shared_ptr<Point> pt2(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
+				);
+				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
+				pt2 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt2);
+
+				_bbox = Envelope(
+					pt1->getX(),
+					pt1->getY(),
+					pt2->getX(),
+					pt2->getY()
+				);
 			}
 		}
 
@@ -84,26 +139,47 @@ namespace synthese
 			stopMap stopAreaMap;
 
 			//Populate stopAreaMap
-			BOOST_FOREACH(const Path* path, _commercialLine->getPaths())
+			if(_commercialLine.get())
 			{
-				const JourneyPattern* journey = dynamic_cast<const JourneyPattern*>(path);
-				BOOST_FOREACH(const Edge* edge,journey->getEdges())
+				BOOST_FOREACH(const Path* path, _commercialLine->getPaths())
 				{
-					const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
-					const StopArea * connPlace(stopPoint->getConnectionPlace());
+					const JourneyPattern* journey = dynamic_cast<const JourneyPattern*>(path);
+					BOOST_FOREACH(const Edge* edge,journey->getEdges())
+					{
+						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
+						const StopArea * connPlace(stopPoint->getConnectionPlace());
 
-					stopAreaMap[connPlace->getName()] = connPlace;
+						stopAreaMap[connPlace->getName()] = connPlace;
+					}
+				}
+			}
+			else if(_bbox)
+			{
+				BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea, Env::GetOfficialEnv().getRegistry<StopArea>())
+				{
+					if(	!stopArea.second->getPoint().get() ||
+						!_bbox->contains(*stopArea.second->getPoint()->getCoordinate())
+					){
+						continue;
+					}
+
+					stopAreaMap[stopArea.second->getName()] = stopArea.second.get();
 				}
 			}
 
 			// XML header
 			stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<stopAreas xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
+					"<stopAreas xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance";
+			if(_commercialLine.get())
+			{
+				stream << 
 					"\" lineName=\""      << _commercialLine->getName() <<
+					"\" lineImage=\""     << _commercialLine->getImage() <<
 					"\" lineShortName=\"" << _commercialLine->getShortName() <<
-					"\" lineStyle=\""     << _commercialLine->getStyle() <<
-					"\">";
+					"\" lineStyle=\""     << _commercialLine->getStyle();
+			}
+			stream << "\">";
 
 			BOOST_FOREACH(stopMap::value_type& it, stopAreaMap)
 			{
@@ -112,7 +188,18 @@ namespace synthese
 						"\" cityId=\""        << it.second->getCity()->getKey() <<
 						"\" cityName=\""      << it.second->getCity()->getName() <<
 						"\" directionAlias=\""<< it.second->getName26() <<
-						"\" />";
+						"\">";
+				BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
+				{
+					stream << "<line id=\"" << itLine->getKey() <<
+						"\" lineName=\""      << _commercialLine->getName() <<
+						"\" lineImage=\""     << _commercialLine->getImage() <<
+						"\" lineShortName=\"" << _commercialLine->getShortName() <<
+						"\" lineStyle=\""     << _commercialLine->getStyle() <<
+						" />";
+				}
+
+				stream << "</stopArea>";
 			}
 
 			// XML footer
