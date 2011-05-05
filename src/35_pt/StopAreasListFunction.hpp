@@ -29,9 +29,12 @@
 #include "Function.h"
 
 #include <boost/shared_ptr.hpp>
+#include <geos/geom/Envelope.h>
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -64,10 +67,16 @@ namespace synthese
 		class StopAreasListFunction:
 			public util::FactorableTemplate<server::Function,StopAreasListFunction>
 		{
+		public:
+			static const std::string PARAMETER_BBOX;
+			static const std::string PARAMETER_SRID;
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _commercialLine;
+				boost::optional<geos::geom::Envelope> _bbox;
+				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
 

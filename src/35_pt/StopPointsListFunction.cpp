@@ -37,10 +37,13 @@
 #include "Webpage.h"
 
 #include <sstream>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
+using namespace geos::geom;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -57,6 +60,8 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_LINE_ID = "lineid";
 		const string StopPointsListFunction::PARAMETER_DATE = "date";
 		const string StopPointsListFunction::PARAMETER_PAGE_ID = "page_id";
+		const string StopPointsListFunction::PARAMETER_BBOX = "bbox";
+		const string StopPointsListFunction::PARAMETER_SRID = "srid";
 
 		const string StopPointsListFunction::DATA_NAME("name");
 		const string StopPointsListFunction::DATA_STOPAREA_NAME("stopAreaName");
@@ -69,11 +74,27 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
+			if(_bbox)
+			{
+				stringstream s;
+				s << _bbox->getMinX() << "," << _bbox->getMinY() << "," <<
+					_bbox->getMaxX() << "," << _bbox->getMaxY();
+				map.insert(PARAMETER_BBOX, s.str());
+			}
+			if(_coordinatesSystem)
+			{
+				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+			}
 			return map;
 		}
 
 		void StopPointsListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
 			try
 			{
 				_stopArea = Env::GetOfficialEnv().getRegistry<StopArea>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
@@ -101,6 +122,38 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 
+			string bbox(map.getDefault<string>(PARAMETER_BBOX));
+			if(!bbox.empty())
+			{
+				CoordinatesSystem::SRID srid(
+					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+				);
+				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+				vector< string > parsed_bbox;
+				split(parsed_bbox, bbox, is_any_of(",; ") );
+
+				if(parsed_bbox.size() != 4)
+				{
+					throw RequestException("Malformed bbox.");
+				}
+
+				shared_ptr<Point> pt1(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1]))
+				);
+				shared_ptr<Point> pt2(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
+				);
+				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
+				pt2 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt2);
+
+				_bbox = Envelope(
+					pt1->getX(),
+					pt1->getY(),
+					pt2->getX(),
+					pt2->getY()
+				);
+			}
 		}
 
 		void StopPointsListFunction::run(

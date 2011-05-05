@@ -28,7 +28,9 @@
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "City.h"
+#include "CoordinatesSystem.hpp"
 
+#include <geos/geom/Envelope.h>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -50,6 +52,7 @@ namespace synthese
 	namespace pt
 	{
 		const string PhysicalStopsCSVExportFunction::PARAMETER_BBOX("bbox");
+		const string PhysicalStopsCSVExportFunction::PARAMETER_SRID("srid");
 
 		ParametersMap PhysicalStopsCSVExportFunction::_getParametersMap() const
 		{
@@ -61,11 +64,18 @@ namespace synthese
 					_bbox->getMaxX() << "," << _bbox->getMaxY();
 				map.insert(PARAMETER_BBOX, s.str());
 			}
+			if(_coordinatesSystem)
+			{
+				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+			}
 			return map;
 		}
 
 		void PhysicalStopsCSVExportFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			CoordinatesSystem::SRID srid(map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID()));
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
 			string bbox(map.getDefault<string>(PARAMETER_BBOX));
 			if(!bbox.empty())
 			{
@@ -77,11 +87,20 @@ namespace synthese
 					throw RequestException("Malformed bbox.");
 				}
 
+				shared_ptr<Point> pt1(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[0]), lexical_cast<double>(parsed_bbox[1]))
+				);
+				shared_ptr<Point> pt2(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_bbox[2]), lexical_cast<double>(parsed_bbox[3]))
+				);
+				pt1 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt1);
+				pt2 = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*pt2);
+
 				_bbox = Envelope(
-					lexical_cast<double>(parsed_bbox[0]),
-					lexical_cast<double>(parsed_bbox[1]),
-					lexical_cast<double>(parsed_bbox[2]),
-					lexical_cast<double>(parsed_bbox[3])
+					pt1->getX(),
+					pt1->getY(),
+					pt2->getX(),
+					pt2->getY()
 				);
 			}
 		}
@@ -105,11 +124,15 @@ namespace synthese
 					continue;
 				}
 
+				shared_ptr<Point> pts(
+					_coordinatesSystem->convertPoint(*ps.getGeometry())
+				);
+
 				stream <<
 					ps.getKey() << ";" <<
 					ps.getCodeBySources() << ";" <<
-					ps.getGeometry()->getX() << ";" <<
-					ps.getGeometry()->getY() << ";" <<
+					pts->getX() << ";" <<
+					pts->getY() << ";" <<
 					"\"" << ps.getConnectionPlace()->getCity()->getName() << "\";" <<
 					"\"" << ps.getConnectionPlace()->getName() << "\";" <<
 					"\"" << ps.getName() << "\";" <<
