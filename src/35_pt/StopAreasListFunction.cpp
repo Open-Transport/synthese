@@ -196,7 +196,7 @@ namespace synthese
 						"\" lineImage=\""     << itLine->getImage() <<
 						"\" lineShortName=\"" << itLine->getShortName() <<
 						"\" lineStyle=\""     << itLine->getStyle() <<
-						" />";
+						"\" />";
 				}
 
 				stream << "</stopArea>";
