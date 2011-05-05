@@ -187,8 +187,18 @@ namespace synthese
 						"\" name=\""          << it.second->getName() <<
 						"\" cityId=\""        << it.second->getCity()->getKey() <<
 						"\" cityName=\""      << it.second->getCity()->getName() <<
-						"\" directionAlias=\""<< it.second->getName26() <<
-						"\">";
+						"\" directionAlias=\""<< it.second->getName26();
+				if(it.second->getPoint().get())
+				{
+					shared_ptr<Point> pts(it.second->getPoint());
+					if(_coordinatesSystem)
+					{
+						pts = _coordinatesSystem->convertPoint(*pts);
+					}
+					stream << "\" x=\"" << pts->getX() <<
+						"\" y=\"" << pts->getY();
+				}
+				stream << "\">";
 				BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
 				{
 					stream << "<line id=\"" << itLine->getKey() <<
