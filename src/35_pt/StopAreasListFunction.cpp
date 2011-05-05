@@ -192,10 +192,10 @@ namespace synthese
 				BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
 				{
 					stream << "<line id=\"" << itLine->getKey() <<
-						"\" lineName=\""      << _commercialLine->getName() <<
-						"\" lineImage=\""     << _commercialLine->getImage() <<
-						"\" lineShortName=\"" << _commercialLine->getShortName() <<
-						"\" lineStyle=\""     << _commercialLine->getStyle() <<
+						"\" lineName=\""      << itLine->getName() <<
+						"\" lineImage=\""     << itLine->getImage() <<
+						"\" lineShortName=\"" << itLine->getShortName() <<
+						"\" lineStyle=\""     << itLine->getStyle() <<
 						" />";
 				}
 
