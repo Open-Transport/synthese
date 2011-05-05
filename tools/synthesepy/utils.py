@@ -50,6 +50,11 @@ def kill_listening_processes(port):
 
     for pid in pids:
         log.info('Killing pid: %s', pid)
+        try:
+            int(pid)
+        except ValueError:
+            log.warn('Non numeric pid %s, skipping', pid)
+            continue
         args = ['kill', '-KILL', pid]
         subprocess.check_call(args)
 
