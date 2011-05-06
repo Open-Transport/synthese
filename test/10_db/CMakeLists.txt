@@ -28,6 +28,7 @@ boost_test(DBTypes "${DEPS}" "DBTestUtils.inc.hpp")
 if(WITH_MYSQL)
   include_directories(${MYSQL_INCLUDE_DIR})
   boost_test(MySQLTrigger "${DEPS}" "DBTestUtils.inc.hpp;TestTableSync.inc.hpp")
+  boost_test(MySQLReconnect "${DEPS}" "DBTestUtils.inc.hpp;TestTableSync.inc.hpp")
 endif(WITH_MYSQL)
 
 unset(TESTS_ENV)

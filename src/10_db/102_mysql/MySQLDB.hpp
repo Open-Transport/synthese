@@ -49,7 +49,8 @@ namespace synthese
 		private:
 
 			MYSQL* _connection;
-			boost::mutex _connectionMutex;
+			// Recursive because we might need to run sub-requests when reinitializing the db connection.
+			boost::recursive_mutex _connectionMutex;
 			boost::thread_specific_ptr<bool> _mysqlThreadInitialized;
 			const std::string _secretToken;
 			ConcurrentQueue<DBModifEvent> _modifEventQueue;
@@ -93,9 +94,17 @@ namespace synthese
 #endif
 		private:
 
+			void _initConnection();
+			//////////////////////////////////////////////////////////////////////////
+			/// Execute a MySQL query, retrying if the server has gone away (e.g. if it 
+			/// was restarted or the connection was dropped).
+			/// @param sql The query to execute.
+			/// @author Sylvain Pasche
+			/// @date 2011
+			/// @since 3.3.0
+			void _doQuery(const SQLData& sql);
 			void _modifEventsDispatcherThread();
 			void _ensureThreadInitialized();
-			static void _ThrowException(MYSQL* _connection, const std::string& message);
 			void _throwException(const std::string& message);
 
 			friend class MySQLResult;
