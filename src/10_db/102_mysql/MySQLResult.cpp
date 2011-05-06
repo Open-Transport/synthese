@@ -37,25 +37,22 @@ namespace synthese
 	namespace db
 	{
 		MySQLResult::MySQLResult(
-			MYSQL* connection,
-			boost::mutex* connectionMutex,
+			MySQLDB* db,
 			const SQLData& sql
 		) :
-			_connection(connection),
-			_connectionMutex(connectionMutex),
+			_db(db),
+
 			_result(NULL),
 			_row(NULL)
 		{
-			boost::mutex::scoped_lock lock(*_connectionMutex);
+			boost::recursive_mutex::scoped_lock lock(_db->_connectionMutex);
 
-			if (mysql_query(_connection, sql.c_str()))
-			{
-				MySQLDB::_ThrowException(_connection, "MySQL error in mysql_query()");
-			}
-			_result = mysql_store_result(_connection);
+			_db->_doQuery(sql);
+
+			_result = mysql_store_result(_db->_connection);
 			if (!_result)
 			{
-				MySQLDB::_ThrowException(_connection, "MySQL error in mysql_store_result()");
+				_db->_throwException("MySQL error in mysql_store_result()");
 			}
 		}
 
@@ -66,29 +63,29 @@ namespace synthese
 			if (_result)
 				mysql_free_result(_result);
 
-			boost::mutex::scoped_lock lock(*_connectionMutex);
+			boost::recursive_mutex::scoped_lock lock(_db->_connectionMutex);
 
 			// Consume remaining results in case of a multi statement query.
 			// TODO: the remainding queries should also be available through the API.
 			int status;
-			while (mysql_more_results(_connection))
+			while (mysql_more_results(_db->_connection))
 			{
-				if ((status = mysql_next_result(_connection)) == -1)
+				if ((status = mysql_next_result(_db->_connection)) == -1)
 				{
 					break;
 				}
 				if (status > 0)
 				{
-					MySQLDB::_ThrowException(_connection, "Could not execute statement");
+					_db->_throwException("Could not execute statement");
 				}
-				MYSQL_RES *res = mysql_store_result(_connection);
+				MYSQL_RES *res = mysql_store_result(_db->_connection);
 				if (res)
 				{
 					mysql_free_result(res);
 				}
 				else
 				{
-					MySQLDB::_ThrowException(_connection, "MySQL error in mysql_store_result()");
+					_db->_throwException("MySQL error in mysql_store_result()");
 				}
 			}
 		}

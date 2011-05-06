@@ -35,6 +35,7 @@
 #include <boost/lexical_cast.hpp>
 #include <my_global.h>
 #include <mysql.h>
+#include <errmsg.h>
 
 using namespace std;
 using boost::bind;
@@ -86,6 +87,7 @@ namespace synthese
 	namespace db
 	{
 		MySQLDB::MySQLDB() :
+			_connection(NULL),
 			_mysqlThreadInitialized(cleanupThread),
 			_secretToken(genRandomString(10))
 		{
@@ -131,28 +133,7 @@ namespace synthese
 				throw MySQLException("MySQL client not compiled as thread-safe.");
 			}
 
-			_connection = mysql_init(NULL);
-			if (_connection == NULL)
-			{
-				throw MySQLException("mysql_init() failed");
-			}
-
-			if (mysql_real_connect(
-					_connection, _connInfo->host.c_str(), _connInfo->user.c_str(),
-					_connInfo->passwd.c_str(), _connInfo->db.c_str(),
-					_connInfo->port, NULL, CLIENT_MULTI_STATEMENTS
-				) == NULL)
-			{
-				_throwException("Can't connect to MySQL server");
-			}
-
-			// Everything should be handled in utf8.
-			execUpdate("SET NAMES utf8;");
-
-			// Use more standard syntax:
-			// ANSI_QUOTES: use single quotes for quoting identifier.
-			// NO_BACKSLASH_ESCAPES: backslash is not considered a special character.
-			execUpdate("SET sql_mode='ANSI_QUOTES,NO_BACKSLASH_ESCAPES';");
+			_initConnection();
 
 			// TODO: is the thread deleted properly on module unload?
 
@@ -196,15 +177,13 @@ namespace synthese
 
 			Log::GetInstance().trace("MySQLDB::execQuery " + sql);
 
-			return DBResultSPtr(new MySQLResult(_connection, &_connectionMutex, sql));
+			return DBResultSPtr(new MySQLResult(this, sql));
 		}
 
 
 
 		void MySQLDB::execTransaction(const DBTransaction& transaction)
 		{
-			_ensureThreadInitialized();
-
 			std::stringstream ss;
 			ss << "START TRANSACTION;";
 			BOOST_FOREACH(const DBTransaction::Queries::value_type& querySql, transaction.getQueries())
@@ -213,6 +192,7 @@ namespace synthese
 			}
 			ss << "COMMIT;";
 			string sql(ss.str());
+			// Don't log SQL statements used for filling spatial_ref_sys which can be quite noisy.
 			if (sql.find("spatial_ref_sys") == sql.npos)
 			{
 				Log::GetInstance().trace("MySQLDB::execTransaction " + sql);
@@ -233,12 +213,9 @@ namespace synthese
 			}
 
 			{
-				boost::mutex::scoped_lock lock(_connectionMutex);
+				boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 
-				if (mysql_query(_connection, sql.c_str()))
-				{
-					_throwException("MySQL error in execUpdate()");
-				}
+				_doQuery(sql);
 
 				// Consume remaining results in case of a multi statement query.
 				int status;
@@ -597,6 +574,82 @@ namespace synthese
 
 
 
+		void MySQLDB::_initConnection()
+		{
+			if (_connection != NULL)
+			{
+				mysql_close(_connection);
+			}
+
+			_connection = mysql_init(NULL);
+			if (_connection == NULL)
+			{
+				throw MySQLException("mysql_init() failed");
+			}
+
+			if (mysql_real_connect(
+					_connection, _connInfo->host.c_str(), _connInfo->user.c_str(),
+					_connInfo->passwd.c_str(), _connInfo->db.c_str(),
+					_connInfo->port, NULL, CLIENT_MULTI_STATEMENTS
+				) == NULL)
+			{
+				_throwException("Can't connect to MySQL server");
+			}
+
+			// Everything should be handled in utf8.
+			execUpdate("SET NAMES utf8;");
+
+			// Use more standard syntax:
+			// ANSI_QUOTES: use single quotes for quoting identifier.
+			// NO_BACKSLASH_ESCAPES: backslash is not considered a special character.
+			execUpdate("SET sql_mode='ANSI_QUOTES,NO_BACKSLASH_ESCAPES';");
+		}
+
+		
+		
+		void MySQLDB::_doQuery(const SQLData& sql)
+		{
+			const int NUM_QUERY_RETRY = 40;
+
+			for (int i = 1; i <= NUM_QUERY_RETRY; i++)
+			{
+				if (mysql_query(_connection, sql.c_str()))
+				{
+					if (mysql_errno(_connection) == CR_SERVER_GONE_ERROR)
+					{
+						bool isFatal(false);
+
+						Log::GetInstance().warn(
+							"MySQLDB has gone away, reinitializing connection (" +
+							lexical_cast<string>(i) + " / " + lexical_cast<string>(NUM_QUERY_RETRY) + ")"
+						);
+						util::Thread::Sleep(500);
+						try
+						{
+							_initConnection();
+						}
+						catch (const MySQLException& e)
+						{
+							// Don't retry if there's a wrong db error. That's a situation that can happen in the tests.
+							const int ER_BAD_DB_ERROR = 1049;
+							isFatal = e.getErrno() == ER_BAD_DB_ERROR;
+
+							Log::GetInstance().warn(
+								string("Exception while trying to initialize connection again (") +
+								(isFatal ? "" : "not ") + "fatal)", e
+							);
+						}
+						if (!isFatal)
+							continue;
+					}
+					_throwException("MySQL error in mysql_query()");
+				}
+				break;
+			}
+		}
+
+
+
 		void MySQLDB::_modifEventsDispatcherThread()
 		{
 			DBModifEvent modifEvent;
@@ -633,20 +686,13 @@ namespace synthese
 
 
 
-		void MySQLDB::_ThrowException(MYSQL* connection, const std::string& message)
-		{
-			throw MySQLException(
-				message + " : " + std::string(mysql_error(connection)) +
-				" (errno=" + lexical_cast<string>(mysql_errno(connection)) + ")",
-				mysql_errno(connection)
-			);
-		}
-
-
-
 		void MySQLDB::_throwException(const std::string& message)
 		{
-			_ThrowException(_connection, message);
+			throw MySQLException(
+				message + " : " + std::string(mysql_error(_connection)) +
+				" (errno=" + lexical_cast<string>(mysql_errno(_connection)) + ")",
+				mysql_errno(_connection)
+			);
 		}
 	}
 }
