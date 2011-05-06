@@ -28,8 +28,6 @@
 #include "DB.hpp"
 #include "102_mysql/MySQLException.hpp"
 
-#include <boost/thread/mutex.hpp>
-
 struct st_mysql;
 typedef struct st_mysql MYSQL;
 struct st_mysql_res;
@@ -51,8 +49,7 @@ namespace synthese
 		{
 		private:
 
-			MYSQL* _connection;
-			boost::mutex* _connectionMutex;
+			MySQLDB* _db;
 			MYSQL_RES* _result;
 			mutable MYSQL_ROW _row;
 
@@ -62,8 +59,7 @@ namespace synthese
 		public:
 
 			MySQLResult(
-				MYSQL* connection,
-				boost::mutex* connectionMutex,
+				MySQLDB* db,
 				const SQLData& sql
 			);
 			virtual ~MySQLResult();
