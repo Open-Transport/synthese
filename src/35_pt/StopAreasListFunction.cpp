@@ -80,7 +80,7 @@ namespace synthese
 			
 				if(_coordinatesSystem)
 				{
-					result.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+					result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 				}
 			}
 			return result;
