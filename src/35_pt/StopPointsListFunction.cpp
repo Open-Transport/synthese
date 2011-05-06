@@ -83,7 +83,7 @@ namespace synthese
 			}
 			if(_coordinatesSystem)
 			{
-				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+				map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
 			return map;
 		}
