@@ -22,8 +22,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DBTestUtils.inc.hpp"
-#include "TestTableSync.inc.hpp"
+#include "DBTestUtils.hpp"
+#include "TestTableSync.hpp"
 
 #include "10_db/UpdateQuery.hpp"
 

@@ -1,5 +1,5 @@
 /** A table sync implementation to be used by the tests.
-	@file TestTableSync.inc.hpp
+	@file TestTableSync.hpp
 	@author Sylvain Pasche
 	@date 2011
 
@@ -21,8 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_db_TestTableSync_inc_hpp__
-#define SYNTHESE_db_TestTableSync_inc_hpp__
+#ifndef SYNTHESE_db_TestTableSync_hpp__
+#define SYNTHESE_db_TestTableSync_hpp__
 
 #include "10_db/DeleteQuery.hpp"
 #include "10_db/ReplaceQuery.h"
@@ -235,4 +235,4 @@ void TestTableSync::RemoveByName(const std::string& name)
 } while(0);
 
 
-#endif // SYNTHESE_db_TestTableSync_inc_hpp__
+#endif // SYNTHESE_db_TestTableSync_hpp__
