@@ -1,5 +1,6 @@
 # TODO: rename module to 53_pt_journey_planner
 
+include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
 
@@ -30,7 +31,8 @@ set(DEPS
   36_cms # from 53_pt_journey_planner > pt
 )
 
-# FIXME: tests don't compile since since rev 5043 (4/26/11)
-#boost_test(IntegralSearch "${DEPS}")
-#boost_test(PTRoutePlannerResult "${DEPS}")
-#boost_test(RoutePlanner "${DEPS}")
+boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
+# TODO: fails
+boost_test(PTRoutePlannerResult "${DEPS}")
+# TODO: fails
+boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")

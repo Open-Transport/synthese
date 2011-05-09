@@ -46,7 +46,26 @@
 #include "CoordinatesSystem.hpp"
 #include "MainRoadChunk.hpp"
 #include "MainRoadPart.hpp"
+#include "10_db/101_sqlite/SQLiteDB.h"
 #include "DBModule.h"
+
+#include "TestUtils.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/shared_ptr.hpp>
+
+// Test cases using the CoordinatesSystem class should instanciate this class in the scope of the test.
+struct ScopedCoordinatesSystemUser
+{
+	// FIXME: We need to initialize the database for using the CoordinatesSystem.
+	// We should break that dependency which kind of sucks.
+	ScopedFactory<synthese::db::SQLiteDB> _scopedSqliteDb;
+	boost::shared_ptr<ScopedModule<synthese::db::DBModule> > _scopedDBModule;
+
+	ScopedCoordinatesSystemUser()
+	{
+		synthese::db::DBModule::SetConnectionString("sqlite://debug=1");
+		_scopedDBModule.reset(new ScopedModule<synthese::db::DBModule>());
+	}
+};

@@ -36,6 +36,8 @@ using namespace synthese::pt;
 
 BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 {
+	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
+
 	#include "RoutePlannerTestData.hpp"
 
 	AccessParameters::AllowedPathClasses pc;
@@ -62,7 +64,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
-			100
+			100,
+			false
 		);
 
 		Journey j(r.run());
@@ -87,7 +90,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
-			100
+			100,
+			false
 		);
 
 		Journey j(r.run());
@@ -128,7 +132,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
-			100
+			100,
+			false
 		);
 
 		Journey j(r.run());
@@ -162,7 +167,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
-			100
+			100,
+			false
 		);
 
 		Journey j(r.run());
@@ -204,7 +210,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
-			100
+			100,
+			false
 		);
 
 		Journey j(r.run());
@@ -240,7 +247,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			boost::optional<std::size_t>(),
 			a,
-			DEPARTURE_FIRST
+			DEPARTURE_FIRST,
+			false
 		);
 		PTRoutePlannerResult result(r.run());
 
@@ -258,7 +266,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			boost::optional<std::size_t>(),
 			a,
-			DEPARTURE_FIRST
+			DEPARTURE_FIRST,
+			false
 		);
 		PTRoutePlannerResult result(r.run());
 
@@ -276,7 +285,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			next_day,
 			boost::optional<std::size_t>(),
 			a,
-			DEPARTURE_FIRST
+			DEPARTURE_FIRST,
+			false
 		);
 		PTRoutePlannerResult result(r.run());
 
