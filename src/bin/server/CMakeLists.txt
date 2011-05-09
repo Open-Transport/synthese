@@ -21,7 +21,7 @@ file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/includes_cmake.cpp.inc" "${inc_cpp_conte
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
 # include directories needed by the generated factory includes.
-# Could be removed once each moduels exports a single register entry point.
+# Could be removed once each modules exports a single register entry point.
 include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
 
