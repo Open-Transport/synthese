@@ -5,5 +5,6 @@ Import ('s3env')
 CppTestProject(
 	s3env, 's3-pt-routeplanner-test', s3env['S3VERSION'],
 	source_files = s3env.Glob ('*Test.cpp'),
+	include_dir = s3env.SrcDir('#src'),
 	dependencies = ['s3-pt-journey-planner.cpplib']
 )
