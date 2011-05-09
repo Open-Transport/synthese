@@ -35,6 +35,8 @@ using namespace synthese::pt;
 
 BOOST_AUTO_TEST_CASE (RoutePlanner)
 {
+	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
+
 	#include "RoutePlannerTestData.hpp"
 
 	AccessParameters::AllowedPathClasses pc;
@@ -71,7 +73,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			false,
 			false,
 			boost::optional<boost::posix_time::time_duration>(),
-			100
+			100,
+			false
 		);
 
 		i.integralSearch(
@@ -109,7 +112,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			false,
 			false,
 			boost::optional<boost::posix_time::time_duration>(),
-			100
+			100,
+			false
 		);
 
 		i.integralSearch(
