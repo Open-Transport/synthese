@@ -1,5 +1,5 @@
 /** Utilities for database tests.
-	@file DBTestUtils.inc.hpp
+	@file DBTestUtils.hpp
 	@author Sylvain Pasche
 	@date 2011
 
@@ -21,8 +21,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_db_DbTestUtils_inc_hpp__
-#define SYNTHESE_db_DbTestUtils_inc_hpp__
+#ifndef SYNTHESE_db_DBTestUtils_hpp__
+#define SYNTHESE_db_DBTestUtils_hpp__
+
+#include "TestUtils.hpp"
 
 #include "10_db/DBModule.h"
 #include "10_db/DBTableSync.hpp"
@@ -79,51 +81,6 @@ struct GlobalFixture
 };
 
 BOOST_GLOBAL_FIXTURE(GlobalFixture);
-
-
-/// Register a registrable in the environment on construction and unregister it on destruction.
-template <class Registrable>
-struct ScopedRegistrable
-{
-	ScopedRegistrable()
-	{
-		synthese::util::Env::Integrate<Registrable>();
-	}
-	~ScopedRegistrable()
-	{
-		synthese::util::Env::Unregister<Registrable>();
-	}
-};
-
-/// Register a factory on construction and unregister it on destruction.
-template <class FactoryTemplate>
-struct ScopedFactory
-{
-	ScopedFactory()
-	{
-		FactoryTemplate::integrate();
-	}
-	~ScopedFactory()
-	{
-		FactoryTemplate::unregister();
-	}
-};
-
-/// Calls the module PreInit() and Init() methods on construction and End() on destruction.
-template <class Module>
-struct ScopedModule
-{
-	ScopedModule()
-	{
-		ModuleClassTemplate<Module>::PreInit();
-		ModuleClassTemplate<Module>::Init();
-	}
-	~ScopedModule()
-	{
-		ModuleClassTemplate<Module>::End();
-	}
-};
-
 
 /// Base class for testing a database backend.
 class TestBackend
@@ -321,4 +278,4 @@ template<> bool DBTableSyncTemplate<TABLE>::CanDelete( \
 	return true; \
 }
 
-#endif // SYNTHESE_db_DbTestUtils_inc_hpp__
+#endif // SYNTHESE_db_DBTestUtils_hpp__
