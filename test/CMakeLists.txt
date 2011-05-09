@@ -1,6 +1,7 @@
 add_definitions(-DBOOST_TEST_NO_LIB -DBOOST_AUTO_TEST_MAIN)
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories("${PROJECT_SOURCE_DIR}/test/common")
 
 macro(boost_test name deps)
   string(REPLACE "${PROJECT_SOURCE_DIR}/test/" "" prefix ${CMAKE_CURRENT_SOURCE_DIR})
