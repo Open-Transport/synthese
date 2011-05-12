@@ -47,11 +47,12 @@ namespace synthese
 			stringstream s;
 			bool hasRowStep(rowStep != NO_STEP);
 			bool hasColStep(colStep != NO_STEP);
+			DB* db = DBModule::GetDB();
 
 			s << "SELECT " <<
 				"SUM(" << GetSQLWhat(what) << ") AS result";
-				if(hasRowStep) s << "," << GetSQLColumn(rowStep) << " AS row";
-				if(hasColStep) s << "," << GetSQLColumn(colStep) << " AS col";
+				if(hasRowStep) s << "," << GetSQLColumnOrGroupBy(db, rowStep, true) << " AS row";
+				if(hasColStep) s << "," << GetSQLColumnOrGroupBy(db, colStep, true) << " AS col";
 			s << " FROM " << VehiclePositionTableSync::TABLE.NAME << " AS r " <<
 				" WHERE " <<
 				VehiclePositionTableSync::COL_TIME << ">='" << gregorian::to_iso_extended_string(period.begin())  << " 00:00:00' AND " <<
@@ -59,16 +60,16 @@ namespace synthese
 			if(hasRowStep || hasColStep)
 			{
 				s << " GROUP BY ";
-				if(hasRowStep) s << GetSQLGroupBy(rowStep);
+				if(hasRowStep) s << GetSQLColumnOrGroupBy(db, rowStep, false);
 				if(hasRowStep && hasColStep) s << ",";
-				if(hasColStep) s << GetSQLGroupBy(colStep);
+				if(hasColStep) s << GetSQLColumnOrGroupBy(db, colStep, false);
 			}
 			if(hasRowStep || hasColStep)
 			{
 				s << " ORDER BY ";
-				if(hasRowStep) s << GetSQLColumn(rowStep);
+				if(hasRowStep) s << GetSQLColumnOrGroupBy(db, rowStep, true);
 				if(hasRowStep && hasColStep) s << ",";
-				if(hasColStep) s << GetSQLColumn(colStep);
+				if(hasColStep) s << GetSQLColumnOrGroupBy(db, colStep, true);
 			}
 
 
@@ -90,34 +91,41 @@ namespace synthese
 
 
 
-		std::string PTOperationStatisticsTableSync::GetSQLColumn( Step step )
+		string PTOperationStatisticsTableSync::GetSQLColumnOrGroupBy(DB* db, Step step, bool column)
 		{
-			//TODO take into account of DBMS (this runs only with SQLite)
-			if(step == LINE_STEP) return "(SELECT c."+ CommercialLineTableSync::COL_SHORT_NAME +" FROM "+ CommercialLineTableSync::TABLE.NAME +" AS c INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +"=c."+ TABLE_COL_ID +" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
 			if(step == SERVICE_STEP) return VehiclePositionTableSync::COL_SERVICE_ID;
-			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == WEEK_DAY_STEP) return "strftime('%w'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == WEEK_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%Y-%m'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == YEAR_STEP) return "strftime('%Y'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == VEHICLE_STEP) return "(SELECT v."+ VehicleTableSync::COL_NAME +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_VEHICLE_ID +")";
+			if(step == DATE_STEP) return db->getSQLDateFormat("%Y-%m-%d", VehiclePositionTableSync::COL_TIME);
+			if(step == HOUR_STEP) return db->getSQLDateFormat("%H", VehiclePositionTableSync::COL_TIME);
+			if(step == WEEK_DAY_STEP) return db->getSQLDateFormat("%w", VehiclePositionTableSync::COL_TIME);
+			if(step == WEEK_STEP) return db->getSQLDateFormat("%W", VehiclePositionTableSync::COL_TIME);
+			if(step == MONTH_STEP) return db->getSQLDateFormat("%Y-%m", VehiclePositionTableSync::COL_TIME);
+			if(step == YEAR_STEP) return db->getSQLDateFormat("%Y", VehiclePositionTableSync::COL_TIME);
+			if(column)
+			{
+				if(step == LINE_STEP)
+					return "(SELECT c."+ CommercialLineTableSync::COL_SHORT_NAME +
+						" FROM "+ CommercialLineTableSync::TABLE.NAME +" AS c " +
+						"INNER JOIN "+ JourneyPatternTableSync::TABLE.NAME +" AS jp ON "+
+							"jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +"=c."+ TABLE_COL_ID +
+						" INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "
+							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
+						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
+				if(step == VEHICLE_STEP)
+					return "(SELECT v."+ VehicleTableSync::COL_NAME +" FROM "+ VehicleTableSync::TABLE.NAME +" AS v "+
+						"WHERE v."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_VEHICLE_ID +")";
+			}
+			else
+			{
+				if(step == LINE_STEP)
+					return "(SELECT jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +
+						" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp "+
+						"INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON "+
+							"s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +
+						" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
+				if(step == VEHICLE_STEP)
+					return "r."+ VehiclePositionTableSync::COL_VEHICLE_ID;
+			}
 			return string();
-		}
-
-
-
-		std::string PTOperationStatisticsTableSync::GetSQLGroupBy( Step step )
-		{
-			if(step == SERVICE_STEP) return VehiclePositionTableSync::COL_SERVICE_ID;
-			if(step == LINE_STEP) return "(SELECT jp."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS jp INNER JOIN "+ ScheduledServiceTableSync::TABLE.NAME +" AS s ON s."+ ScheduledServiceTableSync::COL_PATHID +"=jp."+ TABLE_COL_ID +" WHERE s."+ TABLE_COL_ID +"=r."+ VehiclePositionTableSync::COL_SERVICE_ID +")";
-			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == HOUR_STEP) return "strftime('%H'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == WEEK_DAY_STEP) return "strftime('%w'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == WEEK_STEP) return "strftime('%W'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%Y-%m'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == YEAR_STEP) return "strftime('%Y'," + VehiclePositionTableSync::COL_TIME +")";
-			if(step == VEHICLE_STEP) return "r."+ VehiclePositionTableSync::COL_VEHICLE_ID;
 		}
 
 

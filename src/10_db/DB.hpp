@@ -109,6 +109,11 @@ namespace synthese
 				util::RegistryKeyType id;
 			};
 
+			enum Backend {
+				SQLITE_BACKEND = 0,
+				MYSQL_BACKEND = 1
+			};
+
 		protected:
 
 			bool _schemaUpdated;
@@ -237,6 +242,42 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.3.0
 			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[]) = 0;
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// SQL generator helpers
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Returns SQL code to format a date. The format should follow the
+			/// syntax of SQLite strftime (http://www.sqlite.org/lang_datefunc.html)
+			/// and MySQL DATE_FORMAT (http://dev.mysql.com/doc/refman/5.1/en/date-and-time-functions.html#function_date-format).
+			/// @param format Date format specifier (without quotes)
+			/// @param expr SQL expression returning a date
+			/// @return string SQL expression for formatting a date
+			/// @author Sylvain Pasche
+			/// @date 2011
+			/// @since 3.3.0
+			virtual const std::string getSQLDateFormat(const std::string& format, const std::string& expr) = 0;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Returns SQL code to convert an expression to an integer.
+			/// @param expr SQL expression returning a date
+			/// @return string SQL expression for converting to integer
+			/// @author Sylvain Pasche
+			/// @date 2011
+			/// @since 3.3.0
+			virtual const std::string getSQLConvertInteger(const std::string& expr) = 0;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Check if this database matches the given backend.
+			/// Should only be used as a last resort if it's not possible to use
+			/// generic SQL code or the SQL generator helpers above.
+			/// @return bool
+			/// @author Sylvain Pasche
+			/// @date 2011
+			/// @since 3.3.0
+			virtual const bool isBackend(Backend backend) = 0;
 
 		protected:
 
