@@ -50,11 +50,12 @@ namespace synthese
 			stringstream s;
 			bool hasRowStep(rowStep != NO_STEP);
 			bool hasColStep(colStep != NO_STEP);
+			DB* db = DBModule::GetDB();
 
 			s << "SELECT " <<
 				"SUM(t." << ReservationTransactionTableSync::COL_SEATS << ") AS number";
-				if(hasRowStep) s << "," << GetSQLColumn(rowStep) << " AS row";
-				if(hasColStep) s << "," << GetSQLColumn(colStep) << " AS col";
+				if(hasRowStep) s << "," << GetSQLColumnOrGroupBy(db, rowStep, true) << " AS row";
+				if(hasColStep) s << "," << GetSQLColumnOrGroupBy(db, colStep, true) << " AS col";
 			s << " FROM " << ReservationTableSync::TABLE.NAME << " AS r " <<
 				" INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " AS t ON t." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_TRANSACTION_ID <<
 				" LEFT JOIN " << StopAreaTableSync::TABLE.NAME << " AS sd ON sd." << TABLE_COL_ID << "=r." << ReservationTableSync::COL_DEPARTURE_PLACE_ID <<
@@ -75,16 +76,16 @@ namespace synthese
 			if(hasRowStep || hasColStep)
 			{
 				s << " GROUP BY ";
-				if(hasRowStep) s << GetSQLGroupBy(rowStep);
+				if(hasRowStep) s << GetSQLColumnOrGroupBy(db, rowStep, false);
 				if(hasRowStep && hasColStep) s << ",";
-				if(hasColStep) s << GetSQLGroupBy(colStep);
+				if(hasColStep) s << GetSQLColumnOrGroupBy(db, colStep, false);
 			}
 			if(hasRowStep || hasColStep)
 			{
 				s << " ORDER BY ";
-				if(hasRowStep) s << GetSQLColumn(rowStep);
+				if(hasRowStep) s << GetSQLColumnOrGroupBy(db, rowStep, true);
 				if(hasRowStep && hasColStep) s << ",";
-				if(hasColStep) s << GetSQLColumn(colStep);
+				if(hasColStep) s << GetSQLColumnOrGroupBy(db, colStep, true);
 			}
 
 
@@ -106,43 +107,57 @@ namespace synthese
 
 
 
-		string ResaStatisticsTableSync::GetSQLColumn( Step step )
+		string ResaStatisticsTableSync::GetSQLColumnOrGroupBy(DB* db, Step step, bool column)
 		{
 			if(step == SERVICE_STEP) return ReservationTableSync::COL_SERVICE_CODE;
-			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == HOUR_STEP) return "strftime('%H'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == WEEK_DAY_STEP) return "strftime('%w'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == WEEK_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%Y-%m'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == YEAR_STEP) return "strftime('%Y'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_NAME;
-			if(step == DEPARTURE_CITY_STEP) return "cd." + CityTableSync::TABLE_COL_NAME;
-			if(step == ARRIVAL_STOP_STEP) return ReservationTableSync::COL_ARRIVAL_PLACE_NAME;
-			if(step == ARRIVAL_CITY_STEP) return "ca." + CityTableSync::TABLE_COL_NAME;
-			if(step == RESERVATION_DELAY_10_MIN_STEP) return "10*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 600)";
-			if(step == RESERVATION_DELAY_30_MIN_STEP) return "30*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 1800)";
-			if(step == RESERVATION_DELAY_60_MIN_STEP) return "(strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 3600";
-			return string();
-		}
-
-
-
-		string ResaStatisticsTableSync::GetSQLGroupBy( Step step )
-		{
-			if(step == SERVICE_STEP) return ReservationTableSync::COL_SERVICE_CODE;
-			if(step == DATE_STEP) return "strftime('%Y-%m-%d'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == HOUR_STEP) return "strftime('%H'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == WEEK_DAY_STEP) return "strftime('%w'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == WEEK_STEP) return "strftime('%W'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == MONTH_STEP) return "strftime('%Y-%m'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == YEAR_STEP) return "strftime('%Y'," + ReservationTableSync::COL_ORIGIN_DATE_TIME +")";
-			if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_ID;
-			if(step == DEPARTURE_CITY_STEP) return "sd." + StopAreaTableSync::TABLE_COL_CITYID;
-			if(step == ARRIVAL_STOP_STEP) return ReservationTableSync::COL_ARRIVAL_PLACE_ID;
-			if(step == ARRIVAL_CITY_STEP) return "sa." + StopAreaTableSync::TABLE_COL_CITYID;
-			if(step == RESERVATION_DELAY_10_MIN_STEP) return "10*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 600)";
-			if(step == RESERVATION_DELAY_30_MIN_STEP) return "30*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 1800)";
-			if(step == RESERVATION_DELAY_60_MIN_STEP) return "(strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 3600";
+			if(step == DATE_STEP) return db->getSQLDateFormat("%Y-%m-%d", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(step == HOUR_STEP) return db->getSQLDateFormat("%H", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(step == WEEK_DAY_STEP) return db->getSQLDateFormat("%w", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(step == WEEK_STEP) return db->getSQLDateFormat("%W", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(step == MONTH_STEP) return db->getSQLDateFormat("%Y-%m", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(step == YEAR_STEP) return db->getSQLDateFormat("%Y", ReservationTableSync::COL_ORIGIN_DATE_TIME);
+			if(column)
+			{
+				if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_NAME;
+				if(step == DEPARTURE_CITY_STEP) return "cd." + CityTableSync::TABLE_COL_NAME;
+				if(step == ARRIVAL_STOP_STEP) return ReservationTableSync::COL_ARRIVAL_PLACE_NAME;
+				if(step == ARRIVAL_CITY_STEP) return "ca." + CityTableSync::TABLE_COL_NAME;
+			}
+			else
+			{
+				if(step == DEPARTURE_STOP_STEP) return ReservationTableSync::COL_DEPARTURE_PLACE_ID;
+				if(step == DEPARTURE_CITY_STEP) return "sd." + StopAreaTableSync::TABLE_COL_CITYID;
+				if(step == ARRIVAL_STOP_STEP) return ReservationTableSync::COL_ARRIVAL_PLACE_ID;
+				if(step == ARRIVAL_CITY_STEP) return "sa." + StopAreaTableSync::TABLE_COL_CITYID;
+			}
+			if(db->isBackend(DB::SQLITE_BACKEND))
+			{
+				if(step == RESERVATION_DELAY_10_MIN_STEP)
+					return "10*((strftime('%s',r." + ReservationTableSync::COL_DEPARTURE_TIME +
+						") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME + ")) / 600)";
+				if(step == RESERVATION_DELAY_30_MIN_STEP)
+					return "30*((strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +
+						") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 1800)";
+				if(step == RESERVATION_DELAY_60_MIN_STEP)
+					return "(strftime('%s',r."+ ReservationTableSync::COL_DEPARTURE_TIME +
+						") - strftime('%s',t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +")) / 3600";
+			}
+			else if(db->isBackend(DB::MYSQL_BACKEND))
+			{
+				if(step == RESERVATION_DELAY_10_MIN_STEP)
+					return "10*(TIMESTAMPDIFF(SECOND, t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +",r."+
+						ReservationTableSync::COL_DEPARTURE_TIME +") DIV 600)";
+				if(step == RESERVATION_DELAY_30_MIN_STEP)
+					return "30*(TIMESTAMPDIFF(SECOND, t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +",r."+
+						ReservationTableSync::COL_DEPARTURE_TIME +") DIV 1800)";
+				if(step == RESERVATION_DELAY_60_MIN_STEP)
+					return "TIMESTAMPDIFF(SECOND, t."+ ReservationTransactionTableSync::COL_BOOKING_TIME +",r."+
+						ReservationTableSync::COL_DEPARTURE_TIME +") DIV 3600";
+			}
+			else
+			{
+				assert(false);
+			}
 			return string();
 		}
 	}

@@ -84,6 +84,9 @@ namespace synthese
 			virtual void afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[]);
 			virtual bool doesIndexExist(const std::string& tableName, const DBTableSync::Index& index);
 			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[]);
+			virtual const std::string getSQLDateFormat(const std::string& format, const std::string& expr);
+			virtual const std::string getSQLConvertInteger(const std::string& expr);
+			virtual const bool isBackend(Backend backend);
 
 		protected:
 

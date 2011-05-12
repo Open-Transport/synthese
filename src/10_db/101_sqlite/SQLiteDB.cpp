@@ -500,5 +500,26 @@ namespace synthese
 
 			execUpdate(s.str());
 		}
+
+
+
+		const std::string SQLiteDB::getSQLDateFormat(const std::string& format, const std::string& expr)
+		{
+			return "strftime('" + format + "'," + expr + ")";
+		}
+
+
+
+		const std::string SQLiteDB::getSQLConvertInteger(const std::string& expr)
+		{
+			return "CAST(" + expr + " AS INTEGER)";
+		}
+
+
+
+		const bool SQLiteDB::isBackend(Backend backend)
+		{
+			return backend == SQLITE_BACKEND;
+		}
 	}
 }

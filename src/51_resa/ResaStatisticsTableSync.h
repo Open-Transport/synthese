@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace db
+	{
+		class DB;
+	}
+
 	namespace resa
 	{
 		/** Reservation StatisticsTableSync class.
@@ -76,8 +81,9 @@ namespace synthese
 				boost::logic::tribool cancelledFilter = false
 			);
 
-			static std::string GetSQLColumn(Step step);
-			static std::string GetSQLGroupBy(Step step);
+		private:
+
+			static std::string GetSQLColumnOrGroupBy(synthese::db::DB* db, Step step, bool column);
 		};
 	}
 }

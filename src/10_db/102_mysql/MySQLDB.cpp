@@ -544,6 +544,27 @@ namespace synthese
 
 
 
+		const std::string MySQLDB::getSQLDateFormat(const std::string& format, const std::string& expr)
+		{
+			return "DATE_FORMAT(" + expr + ", '" + format + "')";
+		}
+
+
+
+		const std::string MySQLDB::getSQLConvertInteger(const std::string& expr)
+		{
+			return "CAST(" + expr + " AS UNSIGNED)";
+		}
+
+
+
+		const bool MySQLDB::isBackend(Backend backend)
+		{
+			return backend == MYSQL_BACKEND;
+		}
+
+
+
 		const std::string& MySQLDB::getSecretToken()
 		{
 			return _secretToken;

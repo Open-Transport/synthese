@@ -45,10 +45,11 @@ namespace synthese
 			CallCountSearchResult r;
 			stringstream s;
 			optional<Step> lastStep;
+			DB* db = DBModule::GetDB();
 
 			s << "SELECT " <<
-				"CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER) AS type,"
-				"strftime('" << GetGroupBy(step) << "'," << DBLogEntryTableSync::COL_DATE << ") AS step," <<
+				db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT) << " AS type," <<
+				db->getSQLDateFormat(GetGroupBy(step), DBLogEntryTableSync::COL_DATE) << " AS step," <<
 				"COUNT(" << TABLE_COL_ID << ") AS number" <<
 				" FROM " << DBLogEntryTableSync::TABLE.NAME <<
 				" WHERE " <<
@@ -58,11 +59,11 @@ namespace synthese
 			if(!indeterminate(autoresa))
 				s << " AND " << DBLogEntryTableSync::COL_OBJECT_ID << (autoresa ? "=" : "!=") << DBLogEntryTableSync::COL_USER_ID;
 			s <<
-				" GROUP BY strftime('" << GetGroupBy(step) << "'," << DBLogEntryTableSync::COL_DATE << ")," <<
-				" CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)" <<
-				" ORDER BY CAST(" << DBLogEntryTableSync::COL_CONTENT << " AS INTEGER)"
+				" GROUP BY " << db->getSQLDateFormat(GetGroupBy(step), DBLogEntryTableSync::COL_DATE) << "," <<
+				db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT) <<
+				" ORDER BY " << db->getSQLConvertInteger(DBLogEntryTableSync::COL_CONTENT)
 			;
-			DBResultSPtr rows = DBModule::GetDB()->execQuery(s.str());
+			DBResultSPtr rows = db->execQuery(s.str());
 			while (rows->next ())
 			{
 				if(!lastStep || *lastStep != static_cast<ResaDBLog::_EntryType>(rows->getInt("type")))

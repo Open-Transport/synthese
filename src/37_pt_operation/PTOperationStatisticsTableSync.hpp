@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace db
+	{
+		class DB;
+	}
+
 	namespace pt_operation
 	{
 		/** PTOperationStatisticsTableSync class.
@@ -71,8 +76,9 @@ namespace synthese
 				What what
 			);
 
-			static std::string GetSQLColumn(Step step);
-			static std::string GetSQLGroupBy(Step step);
+		private:
+
+			static std::string GetSQLColumnOrGroupBy(synthese::db::DB* db, Step step, bool column);
 			static std::string GetSQLWhat(What what);
 		};
 	}
