@@ -626,8 +626,8 @@ namespace synthese
 			execUpdate("SET sql_mode='ANSI_QUOTES,NO_BACKSLASH_ESCAPES';");
 		}
 
-		
-		
+
+
 		void MySQLDB::_doQuery(const SQLData& sql)
 		{
 			const int NUM_QUERY_RETRY = 40;

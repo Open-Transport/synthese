@@ -49,10 +49,10 @@ namespace synthese
 				static const std::string COL_COMMENT;
 				static const std::string COL_DATA_SOURCE_LINKS;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	Destination search.
 				///	@param env Environment to populate

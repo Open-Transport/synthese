@@ -132,7 +132,7 @@ namespace synthese
 		}
 
 
-		
+
 		void Session::setSessionIdCookie(Request &request) const
 		{
 			request.setCookie(
