@@ -160,7 +160,7 @@ namespace synthese
 			){
 					if (iter != _map.begin ())
 						ss << Request::PARAMETER_SEPARATOR;
-					ss << iter->first << Request::PARAMETER_ASSIGNMENT << iter->second;
+					ss << iter->first << Request::PARAMETER_ASSIGNMENT << ServerModule::URLEncode(iter->second);
 			}
 
 			return ss.str();

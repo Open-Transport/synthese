@@ -107,6 +107,8 @@ namespace synthese
 				AdminActionFunctionRequest<LoginAction,LoginAdmin> homeRequest(request);
 				HTMLForm f(homeRequest.getHTMLForm("login"));
 
+				f.addHiddenField(LoginAdmin::PARAM_URL_TO_LAUNCH, _urlToLaunch);
+
 				stream << f.open();
 
 				stream << "<p>Login : " << f.getTextInput(LoginAction::PARAMETER_LOGIN, string());
