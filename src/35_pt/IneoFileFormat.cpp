@@ -692,7 +692,7 @@ namespace synthese
 		void IneoFileFormat::Importer_::_loadLine( const std::string& line ) const
 		{
 			_line.clear();
-			
+
 			vector<string> parts;
 			string trim_line(trim_copy(line));
 			if (trim_line[0] == ';')

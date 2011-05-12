@@ -53,7 +53,7 @@ namespace synthese
 		const string DestinationTableSync::COL_TTS_TEXT("tts_text");
 		const string DestinationTableSync::COL_DATA_SOURCE_LINKS("data_source_links");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DestinationTableSync>::TABLE(
@@ -156,9 +156,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		DestinationTableSync::SearchResult DestinationTableSync::Search(
