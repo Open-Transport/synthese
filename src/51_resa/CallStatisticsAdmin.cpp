@@ -71,8 +71,12 @@ namespace synthese
 			_searchStep(CallStatisticsTableSync::MONTH_STEP),
 			_searchPeriod(
 				gregorian::date(
-					gregorian::day_clock::local_day().month() == 1 ? gregorian::day_clock::local_day().year() - 1 : static_cast<size_t>(gregorian::day_clock::local_day().year()),
-					gregorian::day_clock::local_day().month() == 1 ? 12 : gregorian::day_clock::local_day().month() - 1,
+					gregorian::day_clock::local_day().month() == 1 ?
+						gregorian::day_clock::local_day().year() - 1 :
+						static_cast<size_t>(gregorian::day_clock::local_day().year()),
+					gregorian::day_clock::local_day().month() == 1 ?
+						12 :
+						gregorian::day_clock::local_day().month() - 1,
 					1
 				),
 				gregorian::date(
