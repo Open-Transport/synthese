@@ -234,7 +234,7 @@ namespace synthese
 						{
 							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getKey() << "\"";
 						}
-						stream << 
+						stream <<
 							" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
 							" levenshtein=\"" << it.placeResult.score.levenshtein << "\">"
 						;

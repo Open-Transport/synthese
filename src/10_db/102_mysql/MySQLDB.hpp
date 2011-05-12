@@ -99,7 +99,7 @@ namespace synthese
 
 			void _initConnection();
 			//////////////////////////////////////////////////////////////////////////
-			/// Execute a MySQL query, retrying if the server has gone away (e.g. if it 
+			/// Execute a MySQL query, retrying if the server has gone away (e.g. if it
 			/// was restarted or the connection was dropped).
 			/// @param sql The query to execute.
 			/// @author Sylvain Pasche

@@ -77,7 +77,7 @@ namespace synthese
 				s << _bbox->getMinX() << "," << _bbox->getMinY() << "," <<
 					_bbox->getMaxX() << "," << _bbox->getMaxY();
 				result.insert(PARAMETER_BBOX, s.str());
-			
+
 				if(_coordinatesSystem)
 				{
 					result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
@@ -173,7 +173,7 @@ namespace synthese
 					"<stopAreas xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance";
 			if(_commercialLine.get())
 			{
-				stream << 
+				stream <<
 					"\" lineName=\""      << _commercialLine->getName() <<
 					"\" lineImage=\""     << _commercialLine->getImage() <<
 					"\" lineShortName=\"" << _commercialLine->getShortName() <<
