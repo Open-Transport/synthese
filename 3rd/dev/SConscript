@@ -1,2 +1,17 @@
 Import ('env')
-env.SubBuild ()
+
+import os
+ignoredirs = None
+if 'BOOST_SOURCE' in os.environ:
+    ignoredirs = ['boost']
+    sconscript = os.path.join(os.environ['BOOST_SOURCE'], 'SConscript')
+    builddir = env.Dir('.').abspath
+    variant_dir = os.path.join(builddir, 'boost')
+    env.SConscript (sconscript, variant_dir=variant_dir, duplicate=False, exports=['env'])
+else:
+    srcpath = env.Dir('.').srcnode().abspath
+    boost_src = os.path.join(srcpath, 'boost', 'src')
+    if not os.path.isdir(boost_src):
+        raise Exception('Boost sources not in source directory and no BOOST_SOURCE environment variable defined')
+
+env.SubBuild (ignoredirs=ignoredirs)
