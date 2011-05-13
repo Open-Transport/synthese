@@ -4,6 +4,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
 class Env(object):
     port = None
     wsgi_proxy_port = None
@@ -57,9 +58,10 @@ class Env(object):
     @property
     def admin_root_path(self):
         return os.path.join(
-            self.source_path, 
+            self.source_path,
             's3-admin', 'deb', 'opt', 'rcs', 's3-admin'
         )
+
 
 class SconsEnv(Env):
     def __init__(self, *args, **kwargs):
@@ -96,13 +98,13 @@ class CMakeEnv(Env):
                 self.source_path = self.source_path.replace('/', os.sep)
             if line.startswith(BUILD_TYPE_PREFIX):
                 build_type = line[len(BUILD_TYPE_PREFIX):]
-        
+
         log.debug('source_path: %s', self.source_path)
         if not self.source_path:
             raise Exception('Unable to locate source directory')
         if not os.path.isdir(self.source_path):
             raise Exception('Source directory doesn\'t exist (%s)' % source_path)
-            
+
         if build_type:
             BUILD_TYPE_TO_MODE = {
                 'Debug': 'debug',
@@ -136,6 +138,7 @@ class InstalledEnv(Env):
     def admin_root_path(self):
         return os.path.join(self.env_path, 's3-admin')
 
+
 def create_env(env_type, env_path, mode):
     if not env_type:
         env_type = os.environ.get('SYNTHESE_ENV_TYPE')
@@ -144,13 +147,13 @@ def create_env(env_type, env_path, mode):
 
     if not mode:
         mode = os.environ.get('SYNTHESE_MODE')
-    
+
     if not env_path:
         env_path = os.environ.get('SYNTHESE_ENV_PATH')
     # TODO: this could be guessed for scons.
     if not env_path:
         raise Exception('Env Path must be specified on the command line or in environment')
-        
+
     if env_type == 'scons':
         return SconsEnv(env_path, mode)
     if env_type == 'cmake':

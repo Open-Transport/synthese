@@ -5,6 +5,7 @@ import sys
 
 log = logging.getLogger(__name__)
 
+
 def kill_listening_processes(port):
     '''Kills all processes listening for TCP connections on the given port'''
     if sys.platform == 'win32':

@@ -7,10 +7,11 @@ import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.env
 import synthesepy.sqlite_to_mysql
-import synthesepy.tests
+import synthesepy.test.main
 import synthesepy.utils
 
 log = logging.getLogger(__name__)
+
 
 def rundaemon(args, env):
     daemon = synthesepy.daemon.Daemon(env)
@@ -26,19 +27,25 @@ def rundaemon(args, env):
     log.info('Stopping daemon')
     daemon.stop()
 
+
 def stopdaemon(args, env):
     # TODO: should use the HTTP method to stop the daemon once it works.
     synthesepy.utils.kill_listening_processes(env.port)
 
+
 def runtests(args, env):
-    synthesepy.tests.runtests(env, args.conn_strings)
+    tester = synthesepy.test.main.Tester(env, args)
+    tester.run_tests(args.suites)
+
 
 def initdb(args, env):
     backend = synthesepy.db_backends.create_backend(env, args.conn_string)
     backend.init_db()
 
+
 def sqlite_to_mysql(args, env):
     synthesepy.sqlite_to_mysql.convert(env, args.sourceconn, args.targetconn)
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Synthese management tool')
@@ -65,8 +72,20 @@ if __name__ == '__main__':
     parser_stopdaemon.set_defaults(func=stopdaemon)
 
     parser_runtests = subparsers.add_parser('runtests')
-    parser_runtests.add_argument('--dbconns', nargs='*', dest='conn_strings',
+    # for python suite
+    parser_runtests.add_argument('--dbconns', nargs='+', dest='conn_strings',
                                  default=[])
+    parser_runtests.add_argument(
+        '--no-init',
+        help='Don\'t start/stop the daemon or initialize the db. '
+             'Can be used to reuse an already running daemon',
+        action='store_true', default=False
+    )
+
+    parser_runtests.add_argument(
+        'suites', nargs='*',
+        help='List of test suites to run. Choices: style, python, cpp'
+    )
     parser_runtests.set_defaults(func=runtests)
 
     parser_initdb = subparsers.add_parser('initdb')
@@ -91,4 +110,3 @@ if __name__ == '__main__':
 
     log.debug('Args: %s', args)
     args.func(args, env)
-
