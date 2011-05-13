@@ -15,7 +15,10 @@ class Env(object):
 
     def __init__(self, env_path, mode):
         self.mode = mode
+        if not env_path:
+            raise Exception('Env Path must be specified on the command line or in environment')
         self.env_path = env_path
+
         self.source_path = os.path.normpath(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
@@ -64,10 +67,15 @@ class Env(object):
 
 
 class SconsEnv(Env):
-    def __init__(self, *args, **kwargs):
-        super(SconsEnv, self).__init__(*args, **kwargs)
-        if self.mode:
-            self.env_path = os.path.join(self.source_path, self.mode)
+    def __init__(self, env_path, mode):
+        if not env_path:
+            env_path = os.path.normpath(
+                os.path.join(
+                    os.path.dirname(os.path.abspath(__file__)),
+                    os.pardir, os.pardir, 'build', mode
+                )
+            )
+        super(SconsEnv, self).__init__(env_path, mode)
 
     @property
     def daemon_run_env(self):
@@ -77,9 +85,6 @@ class SconsEnv(Env):
 
 
 class CMakeEnv(Env):
-    def __init__(self, *args, **kwargs):
-        super(CMakeEnv, self).__init__(*args, **kwargs)
-
     # TODO: update and enable.
     def _parse_cmake_cache(self):
         cmake_cache = os.path.join(self.env_path, 'CMakeCache.txt')
@@ -107,7 +112,7 @@ class CMakeEnv(Env):
 
         if build_type:
             BUILD_TYPE_TO_MODE = {
-                'Debug': 'debug',
+                'Debug': 'debug',   
                 # FIXME: is this right?
                 'Release': 'release'
             }
@@ -122,9 +127,6 @@ class CMakeEnv(Env):
 
 
 class InstalledEnv(Env):
-    def __init__(self, *args, **kwargs):
-        super(InstalledEnv, self).__init__(*args, **kwargs)
-
     @property
     def daemon_launch_path(self):
         return os.path.join(self.env_path, 'bin')
@@ -144,15 +146,10 @@ def create_env(env_type, env_path, mode):
         env_type = os.environ.get('SYNTHESE_ENV_TYPE')
     if not env_type:
         raise Exception('Env type must be specified on the command line or in environment')
-
     if not mode:
         mode = os.environ.get('SYNTHESE_MODE')
-
     if not env_path:
         env_path = os.environ.get('SYNTHESE_ENV_PATH')
-    # TODO: this could be guessed for scons.
-    if not env_path:
-        raise Exception('Env Path must be specified on the command line or in environment')
 
     if env_type == 'scons':
         return SconsEnv(env_path, mode)

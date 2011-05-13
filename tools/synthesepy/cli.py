@@ -3,6 +3,7 @@ import logging
 import time
 
 import synthesepy
+import synthesepy.build
 import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.env
@@ -11,6 +12,10 @@ import synthesepy.test.main
 import synthesepy.utils
 
 log = logging.getLogger(__name__)
+
+
+def build(args, env):
+    synthesepy.build.build(env, args)
 
 
 def rundaemon(args, env):
@@ -55,15 +60,32 @@ def main():
     parser.add_argument('-p', '--port', type=int, default=8080)
     parser.add_argument('-d', '--dbconn', default='sqlite://', dest='conn_string')
     parser.add_argument('-v', '--verbose', action='store_true', default=False)
-    parser.add_argument('-s', '--stdout', help='Log daemon output to stdout',
-                        action='store_true', default=False, dest='log_stdout')
-    parser.add_argument('--static-dir', help='Directory containing static files '
-                        'served by the HTTP proxy')
-    parser.add_argument('-e', '--extra-params',
-                        help='Daemon extra parameters, using format '
-                             '"param0=value0 param1=value1"')
+    parser.add_argument(
+        '-s', '--stdout', action='store_true', default=False, dest='log_stdout',
+        help='Log daemon output to stdout'
+    )
+    parser.add_argument(
+        '--static-dir',
+        help='Directory containing static files served by the HTTP proxy'
+    )
+    parser.add_argument(
+        '-e', '--extra-params',
+        help='Daemon extra parameters, using format "param0=value0 param1=value1"'
+    )
 
     subparsers = parser.add_subparsers(help='sub-command help')
+
+    parser_build = subparsers.add_parser('build')
+    parser_build.set_defaults(func=build)
+    parser_build.add_argument(
+        '--with-mysql', action='store_true', default=False,
+        help='Enable MySQL database support'
+    )
+    parser_build.add_argument(
+        '--mysql-dir',
+        help='Path to MySQL installation (Not needed on Linux if using' 
+             'standard MySQL installation)'
+    )
 
     parser_rundaemon = subparsers.add_parser('rundaemon')
     parser_rundaemon.set_defaults(func=rundaemon)
@@ -72,21 +94,22 @@ def main():
     parser_stopdaemon.set_defaults(func=stopdaemon)
 
     parser_runtests = subparsers.add_parser('runtests')
+    parser_runtests.set_defaults(func=runtests)
     # for python suite
-    parser_runtests.add_argument('--dbconns', nargs='+', dest='conn_strings',
-                                 default=[])
+    parser_runtests.add_argument(
+        '--dbconns', nargs='+', dest='conn_strings', default=[]
+    )
+    # for python suite
     parser_runtests.add_argument(
         '--no-init',
         help='Don\'t start/stop the daemon or initialize the db. '
              'Can be used to reuse an already running daemon',
         action='store_true', default=False
     )
-
     parser_runtests.add_argument(
         'suites', nargs='*',
         help='List of test suites to run. Choices: style, python, cpp'
     )
-    parser_runtests.set_defaults(func=runtests)
 
     parser_initdb = subparsers.add_parser('initdb')
     parser_initdb.set_defaults(func=initdb)
