@@ -1,5 +1,5 @@
 configure_file(
-    "${PROJECT_SOURCE_DIR}/tools/synthese_bootstrap.py"
+    "${PROJECT_SOURCE_DIR}/tools/synthese.py"
     "${PROJECT_BINARY_DIR}/synthese.py"
     @ONLY
 )
