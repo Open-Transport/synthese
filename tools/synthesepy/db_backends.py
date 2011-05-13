@@ -3,6 +3,7 @@ import logging
 import os
 import shutil
 import sqlite3
+import tempfile
 import time
 from UserDict import UserDict
 
@@ -12,6 +13,7 @@ from .daemon import Daemon
 from . import utils
 
 log = logging.getLogger(__name__)
+
 
 class DBBackend(object):
     def __init__(self, env, conn_info):
@@ -50,12 +52,16 @@ class DBBackend(object):
         self.daemon.stop()
         self.daemon = None
 
+
 class SQLiteBackend(DBBackend):
     name = 'sqlite'
 
     def __init__(self, *args, **kwargs):
         super(SQLiteBackend, self).__init__(*args, **kwargs)
         self.sqlite_file = self.conn_info.get('path')
+        if self.sqlite_file == '@TEMPFILE@':
+            self.sqlite_file = os.path.join(tempfile.gettempdir(), 'synthese.db3')
+            self.conn_info['path'] = self.sqlite_file
         if not self.sqlite_file:
             # If no path is specified in the connection string, the sqlite
             # backend uses a file called 'config.db3' in the current directory.
@@ -100,6 +106,7 @@ class SQLiteBackend(DBBackend):
         with closing(self.get_connection().cursor()) as cursor:
             with open(self.initial_data_file, 'rb') as f:
                 cursor.executescript(f.read())
+
 
 class MySQLBackend(DBBackend):
     name = 'mysql'
@@ -147,22 +154,35 @@ class MySQLBackend(DBBackend):
                     current_line = ''
 
 
+class DummyBackend(DBBackend):
+    name = 'dummy'
+
+
 class ConnectionInfo(UserDict):
-    def __init__(self, conn_string):
+    def __init__(self, _conn_string):
         UserDict.__init__(self)
-        self.conn_string = conn_string
-        self.backend, args = conn_string.split('://')
+        self.backend, args = _conn_string.split('://')
         for pair in args.split(','):
             if not pair:
                 continue
             key, name = pair.split('=')
             self.data[key] = name
 
+    @property
+    def conn_string(self):
+        args = ','.join(
+            ['%s=%s' % (key, name) for (key, name) in self.data.iteritems()]
+        )
+        return '%s://%s' % (self.backend, args)
+
 
 def create_backend(env, conn_string):
     conn_info = ConnectionInfo(conn_string)
-    if conn_info.backend == 'sqlite':
-        return SQLiteBackend(env, conn_info)
-    if conn_info.backend == 'mysql':
-        return MySQLBackend(env, conn_info)
+
+    for c in globals().itervalues():
+        if (not isinstance(c, type) or not issubclass(c, DBBackend) or
+            not hasattr(c, 'name')):
+            continue
+        if conn_info.backend == c.name:
+            return c(env, conn_info)
     raise Exception('Unknown db backend: %s' % conn_info.backend)

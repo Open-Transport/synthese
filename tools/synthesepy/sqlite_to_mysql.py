@@ -9,6 +9,7 @@ from synthesepy import db_backends
 
 log = logging.getLogger(__name__)
 
+
 def convert(env, sourceconn, targetconn):
     sqlite_backend = db_backends.create_backend(env, sourceconn)
     assert sqlite_backend.name == 'sqlite'
@@ -36,7 +37,7 @@ def convert(env, sourceconn, targetconn):
 
         m = table_re.match(line)
         assert m, 'Parse error on line %s' % repr(line)
-        table, rowid  = m.groups(1)
+        table, rowid = m.groups(1)
 
         # Ignore rtree index tables.
         if table.startswith('idx_'):

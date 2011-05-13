@@ -17,6 +17,11 @@ from . import utils
 
 log = logging.getLogger(__name__)
 
+
+class DaemonException(Exception):
+    pass
+
+
 class WSGIProxy(object):
     '''
     Runs a HTTP server to serve static files. Requests for the Synthese daemon
@@ -89,6 +94,7 @@ class WSGIProxy(object):
 
         return static.StatusApp('404 Not Found')(environ, start_response)
 
+
 class Daemon(object):
     def __init__(self, env):
         self.env = env
@@ -121,14 +127,14 @@ class Daemon(object):
     def _wait_until_ready(self):
         for i in range(40):
             if self.proc.poll() is not None:
-                raise Exception(
+                raise DaemonException(
                     'Server has exited prematurely. Check the logs for details.'
                 )
             if self._can_connect(self.env.port, True):
                 break
             time.sleep(2)
         else:
-            raise Exception('Server is not responding')
+            raise DaemonException('Server is not responding')
 
     def start(self):
 
@@ -136,11 +142,13 @@ class Daemon(object):
             utils.kill_listening_processes(port)
 
             if self._can_connect(port):
-                raise Exception('Error, something is already listening on port %s', port)
+                raise DaemonException(
+                    'Error, something is already listening on port %s', port
+                )
 
         # cleanup pid on linux
         if self.env.platform != 'win':
-            pid_path =  os.path.join(
+            pid_path = os.path.join(
                 self.env.daemon_launch_path,
                 's3_server.pid'
             )
@@ -148,6 +156,12 @@ class Daemon(object):
                 log.debug('Found pid file %s, removing it' % pid_path)
                 # TODO: check if daemon is running with that pid and kill it if that's the case.
                 os.unlink(pid_path)
+
+        if not os.path.isfile(self.env.daemon_path):
+            raise DaemonException(
+                'Daemon executable can\'t be found at "%s". Project not built or '
+                'wrong mode/tool?' % self.env.daemon_path
+            )
 
         args = [
             self.env.daemon_path,
