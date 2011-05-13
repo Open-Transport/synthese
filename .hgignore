@@ -23,6 +23,4 @@
 ^3rd/dev/geos/src/headers/geos/platform.h$
 ^3rd/dev/geos/src/headers/geos/version.h$
 ^3rd/dev/geos/capi/geos_c.h$
-^tools/env.*$
 ^tools/distribute.*.tar.gz$
-^tools/pip_download_cache/.*$
