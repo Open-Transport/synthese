@@ -9,6 +9,7 @@ log = logging.getLogger(__name__)
 
 logging.basicConfig(level=logging.DEBUG)
 
+
 def get_sid(url, user, pw):
 
     params = {
@@ -20,6 +21,7 @@ def get_sid(url, user, pw):
 
     res = urllib2.urlopen(url, urllib.urlencode(params))
     return dict(urlparse.parse_qsl(res.url))['sid']
+
 
 def get_journey(url, sid, branch, trace=False):
     params = {
@@ -45,7 +47,6 @@ def get_journey(url, sid, branch, trace=False):
         'tab': 'rp',
         #'tt': '177329235327713282'
     }
-    
 
     out_file = ('/home/spasche/rcs/mysql/synthese3/s3-admin/deb/opt/rcs/'
         's3-admin/files/iti_result_%s.html' % branch)
