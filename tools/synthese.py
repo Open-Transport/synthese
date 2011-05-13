@@ -138,7 +138,7 @@ class Bootstrap(object):
         log.info('Installing Python environment...')
         subprocess.check_call([
             sys.executable, virtualenv_script, '--distribute', c.pyenv_path
-        ])
+        ], cwd=c.tools_path)
 
         log.info('Installing dependencies...')
         requirements_files = [
