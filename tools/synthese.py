@@ -59,7 +59,7 @@ class Bootstrap(object):
 
         self.config = self._get_source_config()
 
-    def _get_user_storage_path(self): 
+    def _get_user_storage_path(self):
         # TODO: should we add a version too?
         storage_path = os.path.join(site.USER_BASE, 'synthese')
         if not os.path.isdir(storage_path):

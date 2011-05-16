@@ -2,6 +2,6 @@ Import('env')
 
 # FIXME: this doesn't work.
 env.InstallAs(
-    '#tools/synthese_bootstrap.py', 
+    '#tools/synthese_bootstrap.py',
     env.GetBuildPath('#build/' + env.GetCppMode() + '/synthese.py')
 )
