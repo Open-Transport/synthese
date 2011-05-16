@@ -41,9 +41,6 @@ class Env(object):
 
     def __init__(self, env_path, mode):
         self.mode = mode
-        if not env_path:
-            raise Exception('Env Path must be specified on the command line or in environment')
-        self.env_path = env_path
 
         self.source_path = os.path.normpath(
             os.path.join(
@@ -59,6 +56,15 @@ class Env(object):
             self.platform = 'mac'
 
         self.platform_exe_suffix = '.exe' if (self.platform == 'win') else ''
+
+        self.env_path = env_path if env_path else self.default_env_path
+
+    @property
+    def default_env_path(self):
+        raise Exception(
+            'Can\'t guess default env path. It should be specified on the '
+            'command line (-b) or environment (SYNTHESE_ENV_PATH).'
+        )
 
     @property
     def daemon_launch_path(self):
@@ -127,15 +133,9 @@ class Env(object):
 class SconsEnv(Env):
     type = 'scons'
 
-    def __init__(self, env_path, mode):
-        if not env_path:
-            env_path = os.path.normpath(
-                os.path.join(
-                    os.path.dirname(os.path.abspath(__file__)),
-                    os.pardir, os.pardir, 'build', mode
-                )
-            )
-        super(SconsEnv, self).__init__(env_path, mode)
+    @property
+    def default_env_path(self):
+        return os.path.join(self.source_path, 'build', self.mode)
 
     @property
     def daemon_run_env(self):
@@ -153,43 +153,13 @@ class SconsEnv(Env):
 class CMakeEnv(Env):
     type = 'cmake'
 
-    # TODO: update and enable.
-    def _parse_cmake_cache(self):
-        cmake_cache = os.path.join(self.env_path, 'CMakeCache.txt')
-        if not os.path.isfile(cmake_cache):
-            raise Exception('Can\'t locale cmake cache file (tried %s)' % cmake_cache)
-
-        SOURCE_PATH_PREFIX = 'synthese3_SOURCE_DIR:STATIC='
-        BUILD_TYPE_PREFIX = 'CMAKE_BUILD_TYPE:STRING='
-
-        self.source_path = None
-        build_type = None
-        for line in open(cmake_cache, 'rb'):
-            line = line.strip()
-            if line.startswith(SOURCE_PATH_PREFIX):
-                self.source_path = line[len(SOURCE_PATH_PREFIX):]
-                self.source_path = self.source_path.replace('/', os.sep)
-            if line.startswith(BUILD_TYPE_PREFIX):
-                build_type = line[len(BUILD_TYPE_PREFIX):]
-
-        log.debug('source_path: %s', self.source_path)
-        if not self.source_path:
-            raise Exception('Unable to locate source directory')
-        if not os.path.isdir(self.source_path):
-            raise Exception('Source directory doesn\'t exist (%s)' % source_path)
-
-        if build_type:
-            BUILD_TYPE_TO_MODE = {
-                'Debug': 'debug',
-                # FIXME: is this right?
-                'Release': 'release'
-            }
-            self.mode = BUILD_TYPE_TO_MODE[build_type]
+    @property
+    def default_env_path(self):
+        return os.path.join(self.source_path, 'build_cmake', self.mode)
 
     @property
     def _daemon_relative_path(self):
         if self.platform == 'win':
-            # XXX factorize?
             return os.path.join('Debug' if (self.mode == 'debug') else 'Release')
         return os.curdir
 
