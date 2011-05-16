@@ -1,19 +1,27 @@
 if(MSVC)
-  set(input_suffix vc)
-else()
-  set(input_suffix in)
-endif()
-
 configure_file(
-    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/platform.h.${input_suffix}"
+    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/platform.h.vc"
     "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/platform.h"
     COPYONLY
 )
 configure_file(
-    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/version.h.${input_suffix}"
+    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/version.h.vc"
     "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/version.h"
     COPYONLY
 )
+else()
+# Use patched version instead.
+configure_file(
+    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/headers/geos/platform.h.in"
+    "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/platform.h"
+    COPYONLY
+)
+configure_file(
+    "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/headers/geos/version.h.in"
+    "${PROJECT_BINARY_DIR}/3rd/dev/geos/src/headers/geos/version.h"
+    COPYONLY
+)
+endif()
 
 file(GLOB_RECURSE geos_SRCS "src/*.cpp")
 
