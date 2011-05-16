@@ -102,3 +102,29 @@ def kill_all(process_name):
 
     args = ['killall', '-KILL', '-u', os.getenv('USER'), process_name]
     subprocess.check_call(args)
+
+
+def append_paths_to_environment(env_variable, paths):
+    '''
+    Adds the given paths to the specified environment variable
+
+    Paths will be separated by os.pathsep and new paths aren't added if they
+    are already present.
+    '''
+    oldval = os.environ.get(env_variable, '')
+    paths = [p for p in paths if p not in oldval]
+    if not paths:
+        return
+    newval = oldval
+    if newval and not newval.endswith(os.pathsep):
+        newval += os.pathsep
+    os.environ[env_variable] = newval + os.pathsep.join(paths)
+
+
+def find_executable(executable):
+    """Returns the path to the given executable if found in PATH, or None otherwise"""
+    for p in os.environ['PATH'].split(os.pathsep):
+        target = os.path.join(p, executable)
+        if os.path.isfile(target) and os.access(target, os.X_OK):
+            return target
+    return None

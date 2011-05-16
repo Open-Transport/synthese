@@ -25,18 +25,9 @@ import multiprocessing
 import os
 import subprocess
 
-import synthesepy.env
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
-
-
-def find_executable(executable):
-    """Returns the path to the given executable if found in PATH, or None otherwise"""
-    for p in os.environ['PATH'].split(os.pathsep):
-        target = os.path.join(p, executable)
-        if os.path.isfile(target) and os.access(target, os.X_OK):
-            return target
-    return None
 
 
 class Builder(object):
@@ -47,16 +38,30 @@ class Builder(object):
     def build(self):
         raise NotImplemented()
 
-
 class SconsBuilder(Builder):
+    # This should be populated automatically once all tests build.
+    TEST_TARGETS = [
+        # FIXME: commented targets don't compile.
+        #'util',
+        'db',
+        'html',
+        #'lex-matcher',
+        #'geography',
+        'graph',
+        'road',
+        'pt',
+        #'carto',
+        'pt-routeplanner',
+    ]
+
     def build(self):
-        if not find_executable('scons'):
+        if not utils.find_executable('scons'):
             raise Exception('Unable to find scons in PATH')
 
         args = ['scons']
 
         # Use ccache on Linux if available
-        if self.env.platform == 'lin' and find_executable('ccache'):
+        if self.env.platform == 'lin' and utils.find_executable('ccache'):
             args.append("CXX=ccache g++")
             args.append("CC=ccache gcc")
 
@@ -68,7 +73,14 @@ class SconsBuilder(Builder):
         if self.env.mode == 'debug':
             args.append('_CPPMODE=debug')
 
-        args.append('s3-server.cppbin')
+
+        # Don't run tests after they are built.
+        args.append('TESTBUILDONLY=True')
+
+        targets = (['s3-server.cppbin'] +
+            ['s3-%s-test.cpptest' % t for t in self.TEST_TARGETS])
+
+        args.extend(targets)
 
         log.info('Build command line: %s', args)
 
@@ -86,13 +98,13 @@ class CMakeBuilder(Builder):
 
     def _generate_build_system(self):
         cmake_executable = 'cmake' + self.env.platform_exe_suffix
-        if not find_executable(cmake_executable):
+        if not utils.find_executable(cmake_executable):
             raise Exception('Unable to find %s in PATH' % cmake_executable)
 
         args = [cmake_executable, self.env.source_path]
 
         # Use ccache on Linux if available
-        if self.env.platform == 'lin' and find_executable('ccache'):
+        if self.env.platform == 'lin' and utils.find_executable('ccache'):
             os.environ['CXX'] = 'ccache g++'
             os.environ['CC'] = 'ccache gcc'
 
@@ -128,14 +140,7 @@ class CMakeBuilder(Builder):
         default_vs_path = 'C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\'
         default_sdk_path = 'C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A'
 
-        def append_env(env_variable, entries):
-            oldval = os.environ.get(env_variable, '')
-            newval = ''
-            if oldval and not oldval.endswith(os.pathsep):
-                newval += os.pathsep
-            os.environ[env_variable] = newval + os.pathsep.join(entries)
-
-        append_env('PATH', [
+        utils.append_paths_to_environment('PATH', [
             default_vs_path + 'Common7\\IDE',
             default_vs_path + 'Common7\\Tools',
             default_vs_path + 'VC\\BIN',
@@ -143,13 +148,13 @@ class CMakeBuilder(Builder):
             default_sdk_path + 'bin',
         ])
 
-        append_env('INCLUDE', [
+        utils.append_paths_to_environment('INCLUDE', [
             default_vs_path + 'VC\\ATLMFC\\INCLUDE',
             default_vs_path + 'VC\\INCLUDE',
             default_sdk_path + 'include',
         ])
 
-        append_env('LIB', [
+        utils.append_paths_to_environment('LIB', [
             default_vs_path + 'VC\\ATLMFC\\LIB',
             default_vs_path + 'VC\\LIB',
             default_sdk_path + 'lib',
@@ -158,7 +163,7 @@ class CMakeBuilder(Builder):
         build_type = self.env.mode.capitalize()
         args = [
             'devenv.com', 'synthese3.sln', '/build', build_type,
-            '/project', 's3-server'
+            '/project', 'ALL_BUILD'
         ]
         log.info('Build command line: %s', args)
         subprocess.check_call(
@@ -186,9 +191,9 @@ class CMakeBuilder(Builder):
 
 
 def build(env, args):
-    if type(env) is synthesepy.env.CMakeEnv:
+    if env.type == 'cmake':
         builder_class = CMakeBuilder
-    elif type(env) is synthesepy.env.SconsEnv:
+    elif env.type == 'scons':
         builder_class = SconsBuilder
     else:
         raise Exception('Unsupported env %s' % type(env).__name__)
