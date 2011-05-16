@@ -24,6 +24,7 @@ import codecs
 import logging
 import os
 import os.path
+import subprocess
 import sys
 
 if sys.version_info >= (2, 7):
@@ -32,6 +33,7 @@ else:
     import unittest2 as unittest
 
 from synthesepy.functional_test import http_testcase
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
@@ -163,9 +165,63 @@ class Tester(object):
         test_prog = unittest.main(argv=sys_argv, module=None, exit=False)
         return test_prog.result.wasSuccessful()
 
-    def run_cpp_tests(self, suite_args):
-        # TODO
+    def _run_cpp_tests_cmake(self, suite_args):
+        if not utils.find_executable('ctest' + self.env.platform_exe_suffix):
+            raise Exception('Unable to find ctest in PATH')
+
+        subprocess.check_call('ctest', cwd=self.env.env_path)
+
         return True
+
+    def _run_cpp_tests_scons(self, suite_args):
+        # TODO: fix these tests and remove this list
+        KNOWN_FAILURE = set([
+            '01_util/LowerCaseFilterTest',
+            '01_util/PlainCharFilterTest',
+            '05_html/HTMLFilterTest',
+            '10_db/MySQLReconnectTest',
+            '53_pt_routeplanner/PTRoutePlannerResultTest',
+            '53_pt_routeplanner/RoutePlannerTest',
+        ])
+        # FIXME: this wants elevation (because it contains update it its name) and fails.
+        # We should add a manifest to disable it.
+        if self.env.platform == 'win':
+            KNOWN_FAILURE.add('10_db/DBIndexUpdateTest')
+
+        tests_path = os.path.join(self.env.env_path, 'test')
+        tests_suffix = 'Test' + self.env.platform_exe_suffix
+        test_executables = []
+        for path, dirlist, filelist in os.walk(tests_path):
+            for f in filelist:
+                if not f.endswith(tests_suffix):
+                    continue
+                test_executables.append(os.path.join(path, f))
+        test_executables.sort()
+
+        for test_executable in sorted(test_executables):
+            normalized_name = (
+                '/'.join(test_executable.split(os.sep)[-2:]).
+                    replace(self.env.platform_exe_suffix, '')
+            )
+            if normalized_name in KNOWN_FAILURE:
+                log.warn('Ignoring known failing test: %s', normalized_name)
+                continue
+
+            log.info('Running test: %s', normalized_name)
+            subprocess.check_call(test_executable)
+
+        return True
+
+    def run_cpp_tests(self, suite_args):
+        self.env.prepare_for_launch()
+
+        if self.env.type == 'cmake':
+            return self._run_cpp_tests_cmake(suite_args)
+
+        if self.env.type == 'scons':
+            return self._run_cpp_tests_scons(suite_args)
+
+        raise Exception('Unsupported env type: %s' % self.env.type)
 
     def run_tests(self, suites):
         log.debug('run_tests: %s', suites)

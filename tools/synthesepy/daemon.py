@@ -159,7 +159,6 @@ class Daemon(object):
             raise DaemonException('Server is not responding')
 
     def start(self):
-
         for port in [self.env.port, self.env.wsgi_proxy_port]:
             utils.kill_listening_processes(port)
 
