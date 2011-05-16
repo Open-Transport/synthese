@@ -20,9 +20,13 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import hashlib
 import logging
 import os
 import sys
+import urllib2
+
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
@@ -87,8 +91,42 @@ class Env(object):
             's3-admin', 'deb', 'opt', 'rcs', 's3-admin'
         )
 
+    def _prepare_for_launch_win(self):
+        LIBICONV2_DLL_URL = 'https://extranet-rcsmobility.com/attachments/download/13571'
+        LIBICONV2_DLL_MD5 = 'fd1dc6c680299a2ed1eedcc3eabda601'
+
+        target_path = os.path.join(self.daemon_launch_path, 'libiconv2.dll')
+        # TODO: maybe copy this dll during install instead of fetching it dynamically.
+        if not os.path.isfile(target_path):
+            log.info('Downloading iconv dll...')
+            content = urllib2.urlopen(LIBICONV2_DLL_URL).read()
+
+            m = hashlib.md5()
+            m.update(content)
+            if m.hexdigest() != LIBICONV2_DLL_MD5:
+                raise Exception('Downloaded iconv2 dll doesn\'t match exepected md5 sum')
+            open(target_path, 'wb').write(content)
+
+        utils.append_paths_to_environment('PATH', [self.daemon_launch_path])
+
+    def _prepare_for_launch_lin(self):
+        pass
+
+    def prepare_for_launch(self):
+        '''
+        Setup environment or other things needed for launching one of the
+        generated executables.
+        '''
+
+        if self.platform == 'win':
+            self._prepare_for_launch_win()
+        elif self.platform == 'lin':
+            self._prepare_for_launch_lin()
+
 
 class SconsEnv(Env):
+    type = 'scons'
+
     def __init__(self, env_path, mode):
         if not env_path:
             env_path = os.path.normpath(
@@ -105,8 +143,16 @@ class SconsEnv(Env):
         env['LD_LIBRARY_PATH'] = os.path.join(self.env_path, 'repo', 'bin')
         return env
 
+    def _prepare_for_launch_lin(self):
+        utils.append_paths_to_environment(
+            'LD_LIBRARY_PATH', [os.path.join(self.env_path, 'repo', 'bin')]
+        )
+        super(SconsEnv, self)._prepare_for_launch_lin()
+
 
 class CMakeEnv(Env):
+    type = 'cmake'
+
     # TODO: update and enable.
     def _parse_cmake_cache(self):
         cmake_cache = os.path.join(self.env_path, 'CMakeCache.txt')
@@ -149,6 +195,8 @@ class CMakeEnv(Env):
 
 
 class InstalledEnv(Env):
+    type = 'installed'
+
     @property
     def daemon_launch_path(self):
         return os.path.join(self.env_path, 'bin')

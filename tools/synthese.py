@@ -176,7 +176,7 @@ class Bootstrap(object):
         try:
             self._do_create_env()
         except Exception, e:
-            shutil.rmetree(self.config.pyenv_path)
+            shutil.rmtree(self.config.pyenv_path)
             raise e
 
     def run_synthese(self):
@@ -197,9 +197,12 @@ class Bootstrap(object):
             pythonpath += os.pathsep
         os.environ['PYTHONPATH'] = pythonpath + c.tools_path
 
-        subprocess.call(
-            [self._get_env_executable('python'), '-m', 'synthesepy.cli'] + sys.argv[1:],
-            env=os.environ
+        sys.exit(
+            subprocess.call(
+                [self._get_env_executable('python'), '-m', 'synthesepy.cli'] +
+                    sys.argv[1:],
+                env=os.environ
+            )
         )
 
 
