@@ -108,8 +108,9 @@ class CMakeBuilder(Builder):
             os.environ['CXX'] = 'ccache g++'
             os.environ['CC'] = 'ccache gcc'
 
-        # TODO pass generator on Windows.
-        # -G 'Visual Studio 9 2008'
+        if self.env.platform == 'win':
+            # TODO: This shouldn't be hardcoded.
+            args.extend(['-G', 'Visual Studio 9 2008'])
 
         if self.args.with_mysql or self.args.mysql_dir:
             args.append('-DWITH_MYSQL=1')
@@ -126,6 +127,8 @@ class CMakeBuilder(Builder):
         # -DCMAKE_INSTALL_PREFIX=/path/to/installs/trunk_debug
 
         log.info('CMake generate command line: %s', args)
+        if not os.path.isdir(self.env.env_path):
+            os.makedirs(self.env.env_path)
         subprocess.check_call(args, cwd=self.env.env_path)
 
     def _do_build_make(self):
