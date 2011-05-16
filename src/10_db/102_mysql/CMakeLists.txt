@@ -16,6 +16,8 @@ add_library(10_db_mysql ${db_mysql_SRCS})
 
 target_link_libraries(10_db_mysql ${MYSQL_LIBRARIES})
 
-add_subdirectory(trigger)
+if(CURL_FOUND)
+  add_subdirectory(trigger)
+endif()
 
 install(TARGETS 10_db_mysql DESTINATION lib)
