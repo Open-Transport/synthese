@@ -6,7 +6,7 @@ PhpProject(
 	env,
 	'synthese-diff',
 	version,
-	dependencies = [], 
+	dependencies = [],
     extra_dependencies = [('php5-cli', '5.2.0-8'), ('php5-sqlite', '5.2.0-8')],
     rootdir = env.SrcDir('src')
 )
