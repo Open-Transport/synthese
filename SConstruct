@@ -41,6 +41,8 @@ vars.Add('_REFERENCE_ENTERPRISE_USER', 'User name to log onto enterprise referen
 vars.Add('_REFERENCE_ENTERPRISE_PASSWORD', 'Password to log onto enterprise reference mysql db')
 vars.Add('_BUILD_ROOT','Build root')
 vars.Add('S3VERSION','Version of the project')
+vars.Add('TESTSTOPONFAILURE','Stop running tests at first failure')
+vars.Add('TESTBUILDONLY','Build the specified test only (do not run it)')
 
 
 vars.Add('CC', 'C compiler to use.')
