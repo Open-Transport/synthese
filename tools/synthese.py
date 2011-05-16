@@ -176,6 +176,9 @@ class Bootstrap(object):
         try:
             self._do_create_env()
         except Exception, e:
+            log.critical(
+                'Failure while creating Python env. Deleting env directory'
+            )
             shutil.rmtree(self.config.pyenv_path)
             raise e
 
