@@ -105,7 +105,7 @@ def main():
     )
     parser_build.add_argument(
         '--mysql-dir',
-        help='Path to MySQL installation (Not needed on Linux if using' 
+        help='Path to MySQL installation (Not needed on Linux if using'
              'standard MySQL installation)'
     )
 

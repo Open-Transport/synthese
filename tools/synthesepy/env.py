@@ -134,7 +134,7 @@ class CMakeEnv(Env):
 
         if build_type:
             BUILD_TYPE_TO_MODE = {
-                'Debug': 'debug',   
+                'Debug': 'debug',
                 # FIXME: is this right?
                 'Release': 'release'
             }

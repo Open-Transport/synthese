@@ -33,7 +33,7 @@ class TestFixStyle(unittest.TestCase):
             'int b;\n',
             'int c;\n',
         ])
-    
+
     def test_tabs(self):
         # TODO: not implemented yet.
         return

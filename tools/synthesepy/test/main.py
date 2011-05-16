@@ -42,7 +42,7 @@ class Tester(object):
         self.args = args
 
     def run_style_tests(self, suite_args):
-        
+
         # TODO: not yet ready
         return True
 

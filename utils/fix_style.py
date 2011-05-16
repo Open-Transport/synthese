@@ -75,7 +75,7 @@ def fix_style_from_path(path):
 
     lines = open(path, 'rb').readlines()
     lines = fix_style_from_lines(lines)
-    
+
     if 1:
         SUFFIX = ''
         if 0:
