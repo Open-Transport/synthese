@@ -1,7 +1,9 @@
 Import('s3env')
 
 sources = s3env.Glob('*Test.cpp')
-if not s3env['_WITH_MYSQL']:
+if  s3env['_WITH_MYSQL']:
+    s3env.Append(LIBS = [s3env['_MYSQL_LIBRARIES']])
+else:
     sources.remove('MySQLTriggerTest.cpp')
 
 CppTestProject(
