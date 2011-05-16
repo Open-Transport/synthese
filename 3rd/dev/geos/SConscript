@@ -8,6 +8,7 @@ senv = env.Clone ()
 class GeosProject (CppLibProject):
 	def declare(self):
 		self.env.InstallAs('#3rd/dev/geos/src/headers/geos/platform.h','#3rd/dev/geos/patch/headers/geos/platform.h')
+		self.env.InstallAs('#3rd/dev/geos/src/headers/geos/platform.h.in','#3rd/dev/geos/patch/headers/geos/platform.h.in')
 		self.env.InstallAs('#3rd/dev/geos/src/headers/geos/version.h','#3rd/dev/geos/patch/headers/geos/version.h')
 
 		CppLibProject.declare(self)
