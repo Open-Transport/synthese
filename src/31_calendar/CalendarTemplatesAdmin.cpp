@@ -194,16 +194,21 @@ namespace synthese
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
-			CalendarTemplateTableSync::SearchResult calendars(
-				CalendarTemplateTableSync::Search(Env::GetOfficialEnv())
-			);
-			BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
-			{
-				shared_ptr<CalendarTemplateAdmin> p(
-					getNewPage<CalendarTemplateAdmin>()
+			if(	dynamic_cast<const CalendarTemplatesAdmin*>(&currentPage) ||
+				dynamic_cast<const CalendarTemplateAdmin*>(&currentPage)
+			){
+
+				CalendarTemplateTableSync::SearchResult calendars(
+					CalendarTemplateTableSync::Search(Env::GetOfficialEnv())
 				);
-				p->setCalendar(ct);
-				links.push_back(p);
+				BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
+				{
+					shared_ptr<CalendarTemplateAdmin> p(
+						getNewPage<CalendarTemplateAdmin>()
+					);
+					p->setCalendar(ct);
+					links.push_back(p);
+				}
 			}
 
 			return links;

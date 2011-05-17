@@ -70,6 +70,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_BBOX;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_OUTPUT_LINES;
 
 		protected:
 			//! \name Page parameters
@@ -77,6 +78,7 @@ namespace synthese
 				boost::shared_ptr<const pt::CommercialLine> _commercialLine;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
+				bool _outputLines;
 			//@}
 
 
@@ -99,6 +101,8 @@ namespace synthese
 
 
 			virtual std::string getOutputMimeType() const;
+
+			StopAreasListFunction();
 		};
 	}
 }
