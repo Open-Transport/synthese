@@ -80,6 +80,9 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_OUTPUT_STOPS;
+			static const std::string PARAMETER_OUTPUT_GEOMETRY;
 
 		protected:
 			//! \name Page parameters
