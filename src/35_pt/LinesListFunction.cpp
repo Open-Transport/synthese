@@ -60,6 +60,9 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_OUTPUT_FORMAT("of");
 		const string LinesListFunction::PARAMETER_NETWORK_ID("ni");
 		const string LinesListFunction::PARAMETER_PAGE_ID("pi");
+		const string LinesListFunction::PARAMETER_SRID("srid");
+		const string LinesListFunction::PARAMETER_OUTPUT_STOPS("os");
+		const string LinesListFunction::PARAMETER_OUTPUT_GEOMETRY("og");
 
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
