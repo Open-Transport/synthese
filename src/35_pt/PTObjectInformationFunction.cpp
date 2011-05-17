@@ -165,6 +165,10 @@ namespace synthese
 				{
 					stream << _service->getPath()->getKey();
 				}
+				else if(_info == "number")
+				{
+					stream << _service->getServiceNumber();
+				}
 			}
 		}
 

@@ -31,6 +31,8 @@
 #include "MessagesScenarioAdmin.h"
 #include "AddScenarioAction.h"
 #include "MessagesAdmin.h"
+#include "AlarmTemplate.h"
+#include "MessageAdmin.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesModule.h"
 #include "ScenarioFolderAdd.h"
@@ -304,32 +306,38 @@ namespace synthese
 		) const {
 			PageLinks links;
 
-			// Folders
-			ScenarioFolderTableSync::SearchResult folders(
-				ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0)
-			);
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
-			{
-				shared_ptr<MessagesLibraryAdmin> p(
-					getNewPage<MessagesLibraryAdmin>()
-				);
-				p->setFolder(cfolder);
-				links.push_back(p);
-			}
+			if(	dynamic_cast<const MessagesLibraryAdmin*>(&currentPage) ||
+				dynamic_cast<const MessagesScenarioAdmin*>(&currentPage) && dynamic_cast<const ScenarioTemplate*>(static_cast<const MessagesScenarioAdmin*>(&currentPage)->getScenario().get()) ||
+				dynamic_cast<const MessageAdmin*>(&currentPage) && dynamic_cast<const AlarmTemplate*>(static_cast<const MessageAdmin*>(&currentPage)->getAlarm().get())
+			){
 
-			// Scenarios
-			ScenarioTemplateInheritedTableSync::SearchResult scenarios(
-				ScenarioTemplateInheritedTableSync::Search(
-					*_env,
-					_folder.get() ? _folder->getKey() : 0
-			)	);
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
-			{
-				shared_ptr<MessagesScenarioAdmin> p(
-					getNewPage<MessagesScenarioAdmin>()
+				// Folders
+				ScenarioFolderTableSync::SearchResult folders(
+					ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0)
 				);
-				p->setScenario(tpl);
-				links.push_back(p);
+				BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
+				{
+					shared_ptr<MessagesLibraryAdmin> p(
+						getNewPage<MessagesLibraryAdmin>()
+					);
+					p->setFolder(cfolder);
+					links.push_back(p);
+				}
+
+				// Scenarios
+				ScenarioTemplateInheritedTableSync::SearchResult scenarios(
+					ScenarioTemplateInheritedTableSync::Search(
+						*_env,
+						_folder.get() ? _folder->getKey() : 0
+				)	);
+				BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
+				{
+					shared_ptr<MessagesScenarioAdmin> p(
+						getNewPage<MessagesScenarioAdmin>()
+					);
+					p->setScenario(tpl);
+					links.push_back(p);
+				}
 			}
 
 			return links;

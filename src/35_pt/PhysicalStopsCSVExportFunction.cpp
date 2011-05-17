@@ -98,8 +98,8 @@ namespace synthese
 
 				_bbox = Envelope(
 					pt1->getX(),
-					pt1->getY(),
 					pt2->getX(),
+					pt1->getY(),
 					pt2->getY()
 				);
 			}

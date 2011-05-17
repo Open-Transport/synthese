@@ -63,6 +63,7 @@ namespace synthese
 	{
 		const string StopAreasListFunction::PARAMETER_BBOX = "bbox";
 		const string StopAreasListFunction::PARAMETER_SRID = "srid";
+		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES = "ol";
 
 		ParametersMap StopAreasListFunction::_getParametersMap() const
 		{
@@ -83,6 +84,7 @@ namespace synthese
 					result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 				}
 			}
+			result.insert(PARAMETER_OUTPUT_LINES, _outputLines);
 			return result;
 		}
 
@@ -96,6 +98,8 @@ namespace synthese
 			{
 				throw RequestException("No such Commercial Line");
 			}
+
+			_outputLines = map.getDefault<bool>(PARAMETER_OUTPUT_LINES, true);
 
 			string bbox(map.getDefault<string>(PARAMETER_BBOX));
 			if(!bbox.empty())
@@ -124,8 +128,8 @@ namespace synthese
 
 				_bbox = Envelope(
 					pt1->getX(),
-					pt1->getY(),
 					pt2->getX(),
+					pt1->getY(),
 					pt2->getY()
 				);
 			}
@@ -199,14 +203,17 @@ namespace synthese
 						"\" y=\"" << pts->getY();
 				}
 				stream << "\">";
-				BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
+				if(_outputLines)
 				{
-					stream << "<line id=\"" << itLine->getKey() <<
-						"\" lineName=\""      << itLine->getName() <<
-						"\" lineImage=\""     << itLine->getImage() <<
-						"\" lineShortName=\"" << itLine->getShortName() <<
-						"\" lineStyle=\""     << itLine->getStyle() <<
-						"\" />";
+					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
+					{
+						stream << "<line id=\"" << itLine->getKey() <<
+							"\" lineName=\""      << itLine->getName() <<
+							"\" lineImage=\""     << itLine->getImage() <<
+							"\" lineShortName=\"" << itLine->getShortName() <<
+							"\" lineStyle=\""     << itLine->getStyle() <<
+							"\" />";
+					}
 				}
 
 				stream << "</stopArea>";
@@ -225,6 +232,14 @@ namespace synthese
 		std::string StopAreasListFunction::getOutputMimeType() const
 		{
 			return "text/xml";
+		}
+
+
+
+		StopAreasListFunction::StopAreasListFunction():
+			_outputLines(true)
+		{
+
 		}
 	}
 }
