@@ -89,7 +89,7 @@ namespace synthese
 				throw ActionException("Un nombre positif de lignes doit être choisi");
 
 			// Interface
-			if(map.isDefined(PARAMETER_INTERFACE_ID)) try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_INTERFACE_ID, 0)) try
 			{
 				_interface = InterfaceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_INTERFACE_ID), *_env);
 			}
