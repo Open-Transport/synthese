@@ -99,7 +99,7 @@ namespace synthese
 			}
 
 			// Monitoring Interface
-			id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
+			RegistryKeyType id = map.getOptional<RegistryKeyType>(PARAMETER_MONITORING_INTERFACE_ID);
 			if(id && *id > 0)
 			try
 			{
