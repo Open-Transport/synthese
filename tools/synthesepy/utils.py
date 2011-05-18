@@ -20,10 +20,12 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import httplib
 import logging
 import os
 import subprocess
 import sys
+import urllib2
 
 log = logging.getLogger(__name__)
 
@@ -82,28 +84,6 @@ def kill_listening_processes(port):
         subprocess.check_call(args)
 
 
-# XXX unused, remove?
-def kill_all(process_name):
-    if sys.platform == 'win32':
-        import win32api
-        import win32con
-        import win32pdhutil
-
-        try:
-            pids = win32pdhutil.FindPerformanceAttributesByName(process_name, counter='ID Process')
-        except Exception, e:
-            return
-        log.debug('Found pids to kill: %s', pids)
-        for pid in pids:
-            handle = win32api.OpenProcess(win32con.PROCESS_TERMINATE, 0, pid)
-            win32api.TerminateProcess(handle, 0)
-            win32api.CloseHandle(handle)
-        return
-
-    args = ['killall', '-KILL', '-u', os.getenv('USER'), process_name]
-    subprocess.check_call(args)
-
-
 def append_paths_to_environment(env_variable, paths):
     '''
     Adds the given paths to the specified environment variable
@@ -128,3 +108,19 @@ def find_executable(executable):
         if os.path.isfile(target) and os.access(target, os.X_OK):
             return target
     return None
+
+
+def can_connect(port, verbose=False):
+    """Returns whether it is possible to reach the given port on localhost with HTTP"""
+    url = 'http://localhost:%s' % port
+    try:
+        req = urllib2.urlopen(url, timeout=5).read()
+    # Linux may raise BadStatusLine when failing to connect.
+    except (urllib2.URLError, httplib.BadStatusLine):
+        e = sys.exc_info()[1]
+        if verbose:
+            log.debug('Exception in _can_connect: %s', e)
+        return False
+    return True
+
+
