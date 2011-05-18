@@ -17,7 +17,9 @@ set(DEPS
   10_db
 )
 
-set(TESTS_ENV "SYNTHESE_MYSQL_PARAMS=${SYNTHESE_MYSQL_PARAMS}")
+if(SYNTHESE_MYSQL_PARAMS)
+  set(TESTS_ENV "SYNTHESE_MYSQL_PARAMS=${SYNTHESE_MYSQL_PARAMS}")
+endif()
 
 boost_test(ConnectionInfo "${DEPS}")
 boost_test(DBIndexUpdate "${DEPS}" "DBTestUtils.hpp")
