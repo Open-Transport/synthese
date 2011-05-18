@@ -32,14 +32,23 @@
 #include "RollingStock.h"
 #include "Path.h"
 #include "JourneyPattern.hpp"
-#include "TransportNetworkTableSync.h"
+#include "CommercialLineTableSync.h"
 #include "ImportableTableSync.hpp"
+#include "PTUseRule.h"
+#include "PTObjectsCMSExporters.hpp"
+#include "Vertex.h"
+#include "StopArea.hpp"
 
+#include <geos/geom/LineString.h>
+#include <geos/geom/GeometryCollection.h>
+#include <geos/io/WKTWriter.h>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -63,6 +72,12 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_SRID("srid");
 		const string LinesListFunction::PARAMETER_OUTPUT_STOPS("os");
 		const string LinesListFunction::PARAMETER_OUTPUT_GEOMETRY("og");
+		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES("ittd");
+		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES("ijpd");
+		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES("idbd");
+
+		const string LinesListFunction::FORMAT_WKT("wkt");
+		const string LinesListFunction::FORMAT_XML("xml");
 
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
@@ -71,13 +86,51 @@ namespace synthese
 			{
 				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
 			}
+			if(_coordinatesSystem)
+			{
+				result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
+			}
+			result.insert(PARAMETER_OUTPUT_GEOMETRY, _outputGeometry);
+			result.insert(PARAMETER_OUTPUT_STOPS, _outputStops);
+			if(!_outputFormat.empty())
+			{
+				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
+			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
+			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
 			return result;
 		}
 
+
+
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setNetworkId(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
+			{ // Object(s) selection
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID));
+				if(id) try
+				{
+					_network = Env::GetOfficialEnv().get<TransportNetwork>(id);
+				}
+				catch(ObjectNotFoundException<TransportNetwork>&)
+				{
+					throw RequestException("Transport network " + lexical_cast<string>(id) + " not found");
+				}
+				else
+				{
+					id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
+					try
+					{
+						_line = Env::GetOfficialEnv().get<CommercialLine>(id);
+					}
+					catch(ObjectNotFoundException<CommercialLine>&)
+					{
+						throw RequestException("Line " + lexical_cast<string>(id) + " not found");
+					}
+				}
+			}
 
+			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
 			if(id)
 			try
@@ -89,6 +142,17 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
+			_outputStops = map.getDefault<bool>(PARAMETER_OUTPUT_STOPS, false);
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+			// Parameters
+			_ignoreDeparturesBoardExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, false);
+			_ignoreJourneyPlannerExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, false);
+			_ignoreTimetableExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, false);
 		}
 
 		//Class used for trim:
@@ -196,25 +260,38 @@ namespace synthese
 			linesMapType linesMap;
 
 			//Get CommercialLine Global Registry
-			typedef const pair<const RegistryKeyType, shared_ptr<CommercialLine> > myType;
-			BOOST_FOREACH(myType&  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
+			if(_network.get())
 			{
-				if(_network.get() && myLine.second->getNetwork() != _network.get())
+				vector<shared_ptr<CommercialLine> > lines(
+					CommercialLineTableSync::Search(Env::GetOfficialEnv(), _network->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
 				{
-					continue;
-				}
+					const UseRule& useRule(line->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+					if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+						(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
+							_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
+							_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
+					)	){
+						continue;
+					}
 
-				//Insert respecting order described up there
-				linesMap[sortableNumber(myLine.second->getShortName())] = myLine.second;
+					//Insert respecting order described up there
+					linesMap[sortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
+				}
+			}
+			else if(_line.get())
+			{
+				linesMap[sortableNumber(_line->getShortName())] = _line;
 			}
 
-			if((!_page.get())&&(_outputFormat =="xml"))
+			if((!_page.get())&&(_outputFormat == FORMAT_XML))
 			{
 				// XML header
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<lines xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-					;
+				;
 			}
 			size_t rank(0);
 			BOOST_FOREACH(linesMapType::value_type it, linesMap)
@@ -223,14 +300,14 @@ namespace synthese
 				if(_page.get())
 				{
 					LineMarkerInterfacePage::Display(
-							stream,
-							_page,
-							request,
-							*line,
-							rank++
+						stream,
+						_page,
+						request,
+						*line,
+						rank++
 					);
 				}
-				else if(_outputFormat =="xml")
+				else if(_outputFormat == FORMAT_XML)
 				{
 					stream <<"<line id=\""<< line->getKey() <<
 						"\" creatorId=\"" << (line->getDataSourceLinks().size() == 1 ? lexical_cast<string>(line->getDataSourceLinks().begin()->second) : ImportableTableSync::SerializeDataSourceLinks(line->getDataSourceLinks())) <<
@@ -261,6 +338,88 @@ namespace synthese
 							"\" article=\"" << rs->getArticle()<<
 							"\" />";
 					}
+					if(_outputStops)
+					{
+						set<const StopArea*> stopAreas;
+						BOOST_FOREACH(Path* path, line->getPaths())
+						{
+							BOOST_FOREACH(Edge* edge, path->getEdges())
+							{
+								if(!edge->getFromVertex())
+								{
+									break;
+								}
+								const StopArea* stopArea(
+									dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
+								);
+								if(stopArea)
+								{
+									stopAreas.insert(stopArea);
+								}
+						}	}
+						stream << "<stopAreas>";
+						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
+						{
+							PTObjectsCMSExporters::ExportStopArea(stream, *stopArea, _coordinatesSystem);
+						}
+						stream << "</stopAreas>";
+					}
+					if(!_outputGeometry.empty())
+					{
+						typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
+						VertexPairs geometries;
+						BOOST_FOREACH(Path* path, line->getPaths())
+						{
+							BOOST_FOREACH(Edge* edge, path->getEdges())
+							{
+								if(!edge->getNext())
+								{
+									break;
+								}
+								VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
+								if(geometries.find(od) == geometries.end())
+								{
+									geometries.insert(make_pair(od, static_pointer_cast<Geometry,LineString>(edge->getRealGeometry())));
+								}
+							}
+						}
+						stream << "<geometry>";
+						if(_outputGeometry == FORMAT_WKT)
+						{
+							vector<shared_ptr<Geometry> > vec;
+							vector<Geometry*> vecd;
+							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+							{
+								shared_ptr<Geometry> prGeom(
+									_coordinatesSystem->convertGeometry(*it.second)
+								);
+								vec.push_back(prGeom);
+								vecd.push_back(prGeom.get());
+							}
+							shared_ptr<GeometryCollection> mls(
+								_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
+							);
+							stream << WKTWriter().write(mls.get());
+						}
+						else
+						{
+							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+							{
+								shared_ptr<Geometry> prGeom(
+									_coordinatesSystem->convertGeometry(*it.second)
+								);
+								stream << "<edge>";
+								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
+								{
+									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
+
+									stream << "<point x=\"" << std::fixed << pt.x << "\" y=\"" << std::fixed << pt.y << "\" />";
+								}
+								stream << "</edge>";
+							}
+						}
+						stream << "</geometry>";
+					}
 					stream <<"</line>";
 				}
 				else//default case : csv outputFormat
@@ -285,19 +444,6 @@ namespace synthese
 
 
 
-		void LinesListFunction::setNetworkId(
-			util::RegistryKeyType id
-		){
-			try
-			{
-				_network = TransportNetworkTableSync::Get(id, *_env);
-			}
-			catch (...)
-			{
-				throw RequestException("Transport network " + lexical_cast<string>(id) + " not found");
-			}
-		}
-
 		std::string LinesListFunction::getOutputMimeType() const
 		{
 			std::string mimeType;
@@ -305,7 +451,7 @@ namespace synthese
 			{
 				mimeType = _page->getMimeType();
 			}
-			else if(_outputFormat =="xml")
+			else if(_outputFormat == FORMAT_XML)
 			{
 				mimeType = "text/xml";
 			}
@@ -314,6 +460,16 @@ namespace synthese
 				mimeType = "text/csv";
 			}
 			return mimeType;
+		}
+
+
+
+		LinesListFunction::LinesListFunction():
+			_outputStops(false),
+			_ignoreTimetableExcludedLines(false),
+			_ignoreJourneyPlannerExcludedLines(false),
+			_ignoreDeparturesBoardExcludedLines(false)
+		{
 		}
 	}
 }
