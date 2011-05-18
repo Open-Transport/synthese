@@ -33,7 +33,9 @@ log = logging.getLogger(__name__)
 
 class Env(object):
     port = None
+    wsgi_proxy = True
     wsgi_proxy_port = None
+    site_id = 0
     conn_string = None
     log_stdout = False
     static_dir = None

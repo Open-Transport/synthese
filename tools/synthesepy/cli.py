@@ -29,6 +29,7 @@ import synthesepy.build
 import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.env
+import synthesepy.proxy
 import synthesepy.sqlite_to_mysql
 import synthesepy.test.main
 import synthesepy.utils
@@ -60,6 +61,10 @@ def stopdaemon(args, env):
     synthesepy.utils.kill_listening_processes(env.port)
 
 
+def runproxy(args, env):
+    synthesepy.proxy.serve_forever(env)
+
+
 def runtests(args, env):
     tester = synthesepy.test.main.Tester(env, args)
     tester.run_tests(args.suites)
@@ -80,6 +85,8 @@ def main():
     parser.add_argument('-b', '--env-path', help='Env path')
     parser.add_argument('-m', '--mode', choices=['release', 'debug'])
     parser.add_argument('-p', '--port', type=int, default=8080)
+    parser.add_argument('--no-proxy', action='store_true', default=False)
+    parser.add_argument('--site-id', type=int, default=0)
     parser.add_argument('-d', '--dbconn', default='sqlite://', dest='conn_string')
     parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument(
@@ -115,6 +122,9 @@ def main():
     parser_stopdaemon = subparsers.add_parser('stopdaemon')
     parser_stopdaemon.set_defaults(func=stopdaemon)
 
+    parser_runproxy = subparsers.add_parser('runproxy')
+    parser_runproxy.set_defaults(func=runproxy)
+
     parser_runtests = subparsers.add_parser('runtests')
     parser_runtests.set_defaults(func=runtests)
     # for python suite
@@ -147,7 +157,9 @@ def main():
 
     env = synthesepy.env.create_env(args.env_type, args.env_path, args.mode)
     env.port = args.port
+    env.wsgi_proxy = not args.no_proxy
     env.wsgi_proxy_port = env.port + 1
+    env.site_id = args.site_id
     env.conn_string = args.conn_string
     env.log_stdout = args.log_stdout
     env.static_dir = args.static_dir
