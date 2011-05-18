@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_pt_PTObjectsCMSExporters_hpp__
 #define SYNTHESE_pt_PTObjectsCMSExporters_hpp__
 
+#include "CoordinatesSystem.hpp"
+
 #include <string>
 
 namespace synthese
@@ -57,6 +59,8 @@ namespace synthese
 			static const std::string DATA_STOP_NAME_13;
 			static const std::string DATA_STOP_NAME_26;
 			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
 
 
 		public:
@@ -99,6 +103,16 @@ namespace synthese
 				server::ParametersMap& pm,
 				const StopArea& stopArea,
 				std::string prefix = std::string()
+			);
+
+
+
+			/// @param coordinatesSystem if NULL no geometry is exported
+			static void ExportStopArea(
+				std::ostream& stream,
+				const StopArea& stopArea,
+				const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
+				std::string tag = "stopArea"
 			);
 		};
 	}

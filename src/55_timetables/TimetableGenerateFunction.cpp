@@ -438,17 +438,20 @@ namespace synthese
 
 		void TimetableGenerateFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
-			TimetableResult result(generator->build(true, _warnings));
-			_display(
-				stream,
-				_page,
-				request,
-				*_timetable,
-				*generator,
-				result,
-				_timetableRank
-			);
+			if(_page.get())
+			{
+				auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
+				TimetableResult result(generator->build(true, _warnings));
+				_display(
+					stream,
+					_page,
+					request,
+					*_timetable,
+					*generator,
+					result,
+					_timetableRank
+				);
+			}
 		}
 
 

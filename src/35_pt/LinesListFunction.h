@@ -32,6 +32,8 @@
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace cms
 	{
 		class Webpage;
@@ -39,40 +41,16 @@ namespace synthese
 
 	namespace pt
 	{
+		class CommercialLine;
 		class TransportNetwork;
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Lines list public Function class.
-		/// @author Hugues Romain
-		///	@date 2008
-		///	@ingroup m35Functions refFunctions
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list
 		//////////////////////////////////////////////////////////////////////////
-		/// <h2>Usage</h2>
-		///	Key : LinesListFunction2
-		///
-		///	Parameters :
-		///	<ul>
-		///		<li>fonction=LinesListFunction2</li>
-		///		<li>ni : id of the network of the lines</li>
-		///		<li>pi (optional) : id of the display template to use for each line (will be called by LineMarkerInterfacePage).
-		///		If pi is not specified, the standard XML output is generated instead.</li>
-		///		<li>of (optional) : output format. If not defined, output is CSV. If pi is defined, of is ignored. Available formats :</li>
-		///		<ul>
-		///			<li>csv : CSV (id;short name)</li>
-		///			<li>xml : XML (see details above)</li>
-		///		</ul>
-		///	</ul>
-		///
-		/// <h2>Standard XML output</h2>
-		///	<h3>Description</h3>
-		///
-		///	@image html LinesListFunction.png
-		///
-		///	<h3>Download</h3>
-		///
-		///	<ul>
-		///		<li><a href="include/35_pt/LinesListFunction.xsd">XML output schema</a></li>
-		///	</ul>
+		/// @author Hugues Romain
+		///	@date 2008 2011
+		///	@ingroup m35Functions refFunctions
 		class LinesListFunction:
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
@@ -83,41 +61,65 @@ namespace synthese
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_OUTPUT_STOPS;
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
+			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
+			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
+			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
+
+			static const std::string FORMAT_XML;
+			static const std::string FORMAT_WKT;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::TransportNetwork> _network;
+				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
+				const CoordinatesSystem* _coordinatesSystem;
 				std::string _outputFormat;
+				bool _outputStops;
+				bool _ignoreTimetableExcludedLines;
+				bool _ignoreJourneyPlannerExcludedLines;
+				bool _ignoreDeparturesBoardExcludedLines;
+				std::string _outputGeometry;
 			//@}
 
 
-			/** Conversion from attributes to generic parameter maps.
-				@return Generated parameters map
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
+			//////////////////////////////////////////////////////////////////////////
+			/// @return Generated parameters map
 			server::ParametersMap _getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-				@param map Parameters map to interpret
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
+			//////////////////////////////////////////////////////////////////////////
+			///	@param map Parameters map to read
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
-			/** Action to run, defined by each subclass.
-			*/
+			LinesListFunction();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Output.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Response
+			//////////////////////////////////////////////////////////////////////////
 			void run(std::ostream& stream, const server::Request& request) const;
 
-			void setNetworkId(
-				util::RegistryKeyType id
-			);
+
+			//! @name Setters
+			//@{
+				void setNetwork(boost::shared_ptr<const TransportNetwork> value){ _network = value; }
+			//@}
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
 
 			virtual std::string getOutputMimeType() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_LinesListFunction_H__
