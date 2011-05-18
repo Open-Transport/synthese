@@ -149,8 +149,10 @@ namespace synthese
 					boost::trim(trimmedCookie);
 					boost::algorithm::split(nameValue, trimmedCookie, is_any_of("="));
 
-					if (nameValue.size() != 2)
+					// Don't override existing parameters (GET and POST have precedence).
+					if (nameValue.size() != 2 || _parametersMap.isDefined(nameValue[0]))
 						continue;
+
 					// TODO: proper unescaping of cookie values
 					_parametersMap.insert(nameValue[0], nameValue[1]);
 				}
