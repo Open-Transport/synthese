@@ -1,4 +1,4 @@
-#    Converts a SQlite Synthese database to MySQL.
+#    Converts a SQLite Synthese database to MySQL.
 #    @file sqlite_to_mysql.py
 #    @author Sylvain Pasche
 #
