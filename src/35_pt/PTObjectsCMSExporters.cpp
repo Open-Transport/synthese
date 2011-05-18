@@ -27,7 +27,11 @@
 #include "StopArea.hpp"
 #include "City.h"
 
+#include <geos/geom/Point.h>
+
 using namespace std;
+using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -47,6 +51,8 @@ namespace synthese
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_13("stop_name_13");
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_26("stop_name_26");
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_FOR_TIMETABLES("stop_name_for_timetables");
+		const std::string PTObjectsCMSExporters::DATA_X("x");
+		const std::string PTObjectsCMSExporters::DATA_Y("y");
 
 
 
@@ -84,5 +90,38 @@ namespace synthese
 				pm.insert(prefix + DATA_CITY_ID, stopArea.getCity()->getKey());
 				pm.insert(prefix + DATA_CITY_NAME, stopArea.getCity()->getName());
 			}
+		}
+
+
+
+		void PTObjectsCMSExporters::ExportStopArea(
+			std::ostream& stream,
+			const StopArea& stopArea,
+			const CoordinatesSystem* coordinatesSystem,
+			std::string tag /*= "stopArea" */
+		){
+			stream << "<" << tag <<
+				" " << DATA_STOP_ID << "=\"" << stopArea.getKey() << "\"" <<
+				" " << DATA_STOP_NAME << "=\"" << stopArea.getName() << "\"" <<
+				" " << DATA_STOP_NAME_13 << "=\"" << stopArea.getName13() << "\"" <<
+				" " << DATA_STOP_NAME_26 << "=\"" << stopArea.getName26() << "\"" <<
+				" " << DATA_STOP_NAME_FOR_TIMETABLES << "=\"" << stopArea.getTimetableName() << "\""
+			;
+			if(stopArea.getCity())
+			{
+				stream << " " << DATA_CITY_ID << "=\"" << stopArea.getCity()->getKey() << "\"" <<
+					" " << DATA_CITY_NAME << "=\"" << stopArea.getCity()->getName() << "\""
+				;
+			}
+			if(coordinatesSystem && stopArea.getPoint())
+			{
+				shared_ptr<Point> pg(
+					coordinatesSystem->convertPoint(*stopArea.getPoint())
+				);
+				stream << " " << DATA_X << "=\"" << std::fixed << pg->getX() << "\"" <<
+					" " << DATA_Y << "=\"" << std::fixed << pg->getY() << "\""
+				;
+			}
+			stream << " />";
 		}
 }	}
