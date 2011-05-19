@@ -68,8 +68,9 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<cms::Webpage> _vehiclePage;
-				boost::shared_ptr<pt::CommercialLine> _line;
+				boost::shared_ptr<const cms::Webpage> _vehiclePage;
+				boost::shared_ptr<const pt::CommercialLine> _line;
+				boost::shared_ptr<const Vehicle> _vehicle;
 			//@}
 
 
@@ -109,7 +110,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
+				void setVehicle(boost::shared_ptr<const Vehicle> value) { _vehicle = value; }
 			//@}
 
 

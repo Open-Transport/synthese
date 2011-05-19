@@ -316,7 +316,7 @@ namespace synthese
 			;
 			if(serviceNumber)
 			{
-				query << " AND s." << ScheduledServiceTableSync::COL_SERVICENUMBER << "=" << *serviceNumber;
+				query << " AND s." << ScheduledServiceTableSync::COL_SERVICENUMBER << "=\"" << *serviceNumber << "\"";
 			}
 			if(!indeterminate(cancellations))
 			{

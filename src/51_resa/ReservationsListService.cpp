@@ -166,7 +166,7 @@ namespace synthese
 				try
 				{
 					_service = ScheduledServiceTableSync::Get(id, *_env);
-					_line = _env->getSPtr(static_cast<const CommercialLine*>(_service->getPath()->getPathGroup()));
+ 					_line = _env->getSPtr(static_cast<const CommercialLine*>(_service->getPath()->getPathGroup()));
 					_serviceNumber = _service->getServiceNumber();
 				}
 				catch (ObjectNotFoundException<ScheduledServiceTableSync>&)
