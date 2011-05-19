@@ -27,7 +27,7 @@
 #include "GetVehiclesService.hpp"
 #include "Webpage.h"
 #include "CommercialLine.h"
-#include "Vehicle.hpp"
+#include "VehicleTableSync.hpp"
 
 using namespace std;
 
@@ -67,6 +67,11 @@ namespace synthese
 				map.insert(PARAMETER_LINE_ID, _line->getKey());
 			}
 
+			if(_vehicle.get())
+			{
+				map.insert(Request::PARAMETER_OBJECT_ID, _vehicle->getKey());
+			}
+
 			return map;
 		}
 
@@ -86,14 +91,18 @@ namespace synthese
 				throw RequestException("No such vehicle page");
 			}
 
-			// Line page
-			try
+			// Vehicle search
+			if(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)) try
 			{
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_LINE_ID, 0));
-				if(id > 0)
-				{
-					_line = Env::GetOfficialEnv().getEditable<CommercialLine>(id);
-				}
+				_vehicle = VehicleTableSync::Get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID), *_env);
+			}
+			catch (ObjectNotFoundException<Vehicle>&)
+			{
+				throw RequestException("No such vehicle");
+			}
+			else if(map.getDefault<RegistryKeyType>(PARAMETER_LINE_ID, 0)) try
+			{
+				_line = Env::GetOfficialEnv().get<CommercialLine>(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
 			}
 			catch(ObjectNotFoundException<CommercialLine>&)
 			{
@@ -106,24 +115,37 @@ namespace synthese
 			const Request& request
 		) const {
 
-			size_t rank(0);
-			BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, Env::GetOfficialEnv().getRegistry<Vehicle>())
-			{
-				if(_line.get())
-				{
-					Vehicle::AllowedLines::const_iterator it(vehicle.second->getAllowedLines().find(_line.get()));
-					if(it == vehicle.second->getAllowedLines().end())
-					{
-						continue;
-					}
-				}
+			vector<const Vehicle*> vehicles;
 
+			if(_vehicle.get())
+			{
+				vehicles.push_back(_vehicle.get());
+			}
+			else
+			{
+				BOOST_FOREACH(const Vehicle::Registry::value_type& vehicle, Env::GetOfficialEnv().getRegistry<Vehicle>())
+				{
+					if(_line.get())
+					{
+						Vehicle::AllowedLines::const_iterator it(vehicle.second->getAllowedLines().find(_line.get()));
+						if(it == vehicle.second->getAllowedLines().end())
+						{
+							continue;
+						}
+					}
+					vehicles.push_back(vehicle.second.get());
+				}
+			}
+
+			size_t rank(0);
+			BOOST_FOREACH(const Vehicle* vehicle, vehicles)
+			{
 				if(_vehiclePage.get())
 				{
 					_displayVehicle(
 						stream,
 						request,
-						*vehicle.second,
+						*vehicle,
 						rank++
 					);
 				}
