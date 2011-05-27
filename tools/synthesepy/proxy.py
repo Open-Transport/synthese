@@ -41,7 +41,7 @@ class WSGIProxy(object):
     '''
 
     ADMIN_PREFIXES = ('/synthese3/', '/admin/')
-    SYNTHESE_SUFFIXES = ('/synthese3', '/admin')
+    SYNTHESE_SUFFIXES = ('/synthese', '/synthese3', '/admin')
 
     DEFAULT_ADMIN_QUERYSTRING = '?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283'
 
