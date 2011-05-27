@@ -58,7 +58,11 @@ def rundaemon(args, env):
 
 def stopdaemon(args, env):
     # TODO: should use the HTTP method to stop the daemon once it works.
-    synthesepy.utils.kill_listening_processes(env.port)
+    ports = [env.port]
+    if env.wsgi_proxy:
+        ports.append(env.wsgi_proxy_port)
+    for port in ports:
+        synthesepy.utils.kill_listening_processes(port)
 
 
 def runproxy(args, env):
