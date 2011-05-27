@@ -127,6 +127,7 @@ namespace synthese
 				false,
 				_accessParameters.getMaxApproachTime(),
 				_accessParameters.getApproachSpeed(),
+				false,
 				_logStream
 			);
 			iso.integralSearch(vam, optional<size_t>(), optional<posix_time::time_duration>());
