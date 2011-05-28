@@ -85,6 +85,7 @@ namespace synthese
 			static const std::string PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME;
 			static const std::string PARAMETER_CUSTOMER_NAME;
 			static const std::string PARAMETER_CUSTOMER_SURNAME;
+			static const std::string PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME;
 			static const std::string PARAMETER_CUSTOMER_PHONE;
 			static const std::string PARAMETER_CUSTOMER_EMAIL;
 			static const std::string PARAMETER_CUSTOMER_LANGUAGE;
