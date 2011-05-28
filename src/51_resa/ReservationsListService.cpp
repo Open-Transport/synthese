@@ -99,6 +99,7 @@ namespace synthese
 		const string ReservationsListService::DATA_TRANSACTION_ID("transaction_id");
 		const string ReservationsListService::DATA_SEATS_NUMBER("seats_number");
 		const string ReservationsListService::DATA_VEHICLE_ID("vehicle_id");
+		const string ReservationsListService::DATA_RESERVATION_ID("reservation_id");
 		const string ReservationsListService::DATA_SEAT("seat");
 
 		ParametersMap ReservationsListService::_getParametersMap() const
@@ -321,7 +322,7 @@ namespace synthese
 							request,
 							*reservation,
 							rank++
-							);
+						);
 					}
 				}
 			} // End services loop
@@ -357,7 +358,7 @@ namespace synthese
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, reservation.getDeparturePlaceName());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, reservation.getArrivalPlaceName());
 			pm.insert(DATA_RANK, rank);
-			pm.insert(Request::PARAMETER_OBJECT_ID, reservation.getKey());
+			pm.insert(DATA_RESERVATION_ID, reservation.getKey());
 			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());
 			pm.insert(DATA_SEATS_NUMBER, reservation.getTransaction()->getSeats());
 
@@ -378,6 +379,14 @@ namespace synthese
 
 			// Launch of the display
 			_reservationPage->display(stream, request, pm);
+		}
+
+
+
+		ReservationsListService::ReservationsListService():
+			FactorableTemplate<server::Function,ReservationsListService>()
+		{
+			setEnv(shared_ptr<Env>(new Env));
 		}
 	}
 }

@@ -124,31 +124,9 @@ namespace synthese
 				}
 
 				// Vehicles
-				vector<string> vehicleLinksTexts;
-				Composition::VehicleLinks vehicleLinks;
-				string text(rows->getText(CompositionTableSync::COL_VEHICLES));
-				if(!text.empty())
-				{
-					split(vehicleLinksTexts, text, is_any_of(","));
-					BOOST_FOREACH(const string& vehicleLink, vehicleLinksTexts)
-					{
-						vector<string> values;
-						split(values, vehicleLink, is_any_of("|"));
-
-						Composition::VehicleLinks::value_type value;
-						try
-						{
-							value.vehicle = VehicleTableSync::GetEditable(lexical_cast<RegistryKeyType>(values[0]), env, linkLevel).get();
-							value.number = values[1];
-							vehicleLinks.push_back(value);
-						}
-						catch(ObjectNotFoundException<Vehicle>& e)
-						{
-							Log::GetInstance().warn("No such vehicle "+ values[0] +" in Composition "+ lexical_cast<string>(object->getKey()));
-						}
-					}
-				}
-				object->setVehicles(vehicleLinks);
+				object->setVehicles(
+					CompositionTableSync::UnserializeVehicles(rows->getText(CompositionTableSync::COL_VEHICLES), env, linkLevel)
+				);
 
 				// Vertices
 				Service::ServedVertices vertices;
@@ -184,22 +162,6 @@ namespace synthese
 			Composition* object,
 			optional<DBTransaction&> transaction
 		){
-			// Vehicles
-			stringstream vehiclesString;
-			bool firstVehicle(true);
-			BOOST_FOREACH(const Composition::VehicleLinks::value_type& vehicle, object->getVehicles())
-			{
-				if(firstVehicle)
-				{
-					firstVehicle = false;
-				}
-				else
-				{
-					vehiclesString << ",";
-				}
-				vehiclesString << vehicle.vehicle->getKey() << "|" << vehicle.number;
-			}
-
 			// Dates
 			stringstream datesString;
 			object->getCalendar().serialize(datesString);
@@ -223,7 +185,7 @@ namespace synthese
 
 			ReplaceQuery<CompositionTableSync> query(*object);
 			query.addField(object->getService() ? object->getService()->getKey() : RegistryKeyType(0));
-			query.addField(vehiclesString.str());
+			query.addField(CompositionTableSync::SerializeVehicles(object->getVehicles()));
 			query.addField(datesString.str());
 			query.addField(verticesString.str());
 			query.execute(transaction);
@@ -308,6 +270,60 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		Composition::VehicleLinks CompositionTableSync::UnserializeVehicles(
+			const std::string& text,
+			util::Env& env,
+			util::LinkLevel linkLevel
+		){
+			vector<string> vehicleLinksTexts;
+			Composition::VehicleLinks vehicleLinks;
+			if(!text.empty())
+			{
+				split(vehicleLinksTexts, text, is_any_of(","));
+				BOOST_FOREACH(const string& vehicleLink, vehicleLinksTexts)
+				{
+					vector<string> values;
+					split(values, vehicleLink, is_any_of("|"));
+
+					Composition::VehicleLinks::value_type value;
+					try
+					{
+						value.vehicle = VehicleTableSync::GetEditable(lexical_cast<RegistryKeyType>(values[0]), env, linkLevel).get();
+						value.number = values[1];
+						vehicleLinks.push_back(value);
+					}
+					catch(ObjectNotFoundException<Vehicle>& e)
+					{
+						Log::GetInstance().warn("No such vehicle "+ values[0] +" in Composition.");
+					}
+				}
+			}
+			return vehicleLinks;
+		}
+
+
+
+		std::string CompositionTableSync::SerializeVehicles( const Composition::VehicleLinks& value )
+		{
+			stringstream vehiclesString;
+			bool firstVehicle(true);
+			BOOST_FOREACH(const Composition::VehicleLinks::value_type& vehicle, value)
+			{
+				if(firstVehicle)
+				{
+					firstVehicle = false;
+				}
+				else
+				{
+					vehiclesString << ",";
+				}
+				vehiclesString << vehicle.vehicle->getKey() << "|" << vehicle.number;
+			}
+			return vehiclesString.str();
 		}
 	}
 }
