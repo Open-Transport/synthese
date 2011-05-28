@@ -31,12 +31,13 @@ synthese::pt::DRTAreaTableSync::integrate();
 
 synthese::pt::PTModule::integrate();
 
-synthese::pt::TridentFileFormat::integrate ();
 synthese::pt::CarPostalFileFormat::integrate();
-synthese::pt::PladisStopsFileFormat::integrate();
-synthese::pt::HeuresFileFormat::integrate();
 synthese::pt::GTFSFileFormat::integrate();
+synthese::pt::HeuresFileFormat::integrate();
 synthese::pt::IneoFileFormat::integrate();
+synthese::pt::OGTFileFormat::integrate();
+synthese::pt::PladisStopsFileFormat::integrate();
+synthese::pt::TridentFileFormat::integrate ();
 
 synthese::pt::PTQualityControlAdmin::integrate();
 synthese::pt::ServiceAdmin::integrate();

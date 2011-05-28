@@ -110,6 +110,8 @@ NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp
 NonPermanentService.h
+OGTFileFormat.cpp
+OGTFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PladisStopsFileFormat.cpp
@@ -119,6 +121,8 @@ ProjectAllStopPointsAction.hpp
 PTCitiesAdmin.cpp
 PTCitiesAdmin.h
 PTConstants.h
+PTDataCleanerFileFormat.cpp
+PTDataCleanerFileFormat.hpp
 PTFileFormat.cpp
 PTFileFormat.hpp
 PTModule.cpp

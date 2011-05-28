@@ -33,6 +33,7 @@ namespace synthese
 {
 	namespace pt
 	{
+		class JourneyPattern;
 
 		/** Continuous service.
 			@ingroup m35
@@ -68,6 +69,7 @@ namespace synthese
 			//@{
 				boost::posix_time::time_duration getMaxWaitingTime () const;
 				boost::posix_time::time_duration getRange () const;
+				const pt::JourneyPattern* getRoute() const;
 			//@}
 
 			//! @name Setters
