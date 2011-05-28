@@ -16,12 +16,13 @@
 #include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
 
-#include "TridentFileFormat.h"
 #include "CarPostalFileFormat.hpp"
-#include "PladisStopsFileFormat.hpp"
-#include "HeuresFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
+#include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
+#include "OGTFileFormat.hpp"
+#include "PladisStopsFileFormat.hpp"
+#include "TridentFileFormat.h"
 
 #include "DestinationTableSync.hpp"
 #include "PTUseRuleTableSync.h"

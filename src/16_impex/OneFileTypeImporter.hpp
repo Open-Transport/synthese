@@ -36,7 +36,7 @@ namespace synthese
 		*/
 		template<class FF>
 		class OneFileTypeImporter:
-			public Importer
+			virtual public Importer
 		{
 		public:
 			static const bool IMPORTABLE;

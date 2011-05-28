@@ -129,6 +129,7 @@ namespace synthese
 			Env& env,
 			const DataSource& dataSource
 		):	OneFileTypeImporter<Importer_>(env, dataSource),
+			Importer(env, dataSource),
 			_importStops(false),
 			_importJunctions(false),
 			_autoGenerateStopAreas(false),

@@ -25,6 +25,7 @@
 #include "Registry.h"
 #include "ContinuousService.h"
 #include "Edge.h"
+#include "JourneyPattern.hpp"
 
 using namespace std;
 using namespace boost;
@@ -280,6 +281,13 @@ namespace synthese
 			std::size_t rankInPath
 		) const	{
 			return _arrivalSchedules.at(rankInPath) + _range;
+		}
+
+
+
+		const pt::JourneyPattern* ContinuousService::getRoute() const
+		{
+			return static_cast<const JourneyPattern*>(getPath());
 		}
 	}
 }
