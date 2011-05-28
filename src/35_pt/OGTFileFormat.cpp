@@ -27,6 +27,8 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledServiceTableSync.h"
 
+#include <fstream>
+
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
@@ -90,9 +92,9 @@ namespace synthese
 		}
 
 
-
+	
 		OGTFileFormat::Importer_::Importer_( util::Env& env, const impex::DataSource& dataSource ):
-			OneFileTypeImporter(env, dataSource),
+			OneFileTypeImporter<OGTFileFormat>(env, dataSource),
 			Importer(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource)
 		{}
