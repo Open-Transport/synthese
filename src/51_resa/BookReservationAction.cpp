@@ -105,6 +105,7 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME(Action_PARAMETER_PREFIX + "csn");
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
 		const string BookReservationAction::PARAMETER_CUSTOMER_SURNAME = Action_PARAMETER_PREFIX + "cs";
+		const string BookReservationAction::PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME = Action_PARAMETER_PREFIX + "aes";
 		const string BookReservationAction::PARAMETER_CUSTOMER_PHONE = Action_PARAMETER_PREFIX + "cuph";
 		const string BookReservationAction::PARAMETER_CUSTOMER_EMAIL = Action_PARAMETER_PREFIX + "cupe";
 		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE(Action_PARAMETER_PREFIX + "cl");
@@ -248,8 +249,8 @@ namespace synthese
 						throw ActionException("Le nom du client doit être rempli");
 					}
 
-					_customer->setSurname(map.get<string>(PARAMETER_CUSTOMER_SURNAME));
-					if (_customer->getSurname().empty())
+					_customer->setSurname(map.getDefault<string>(PARAMETER_CUSTOMER_SURNAME));
+					if (_customer->getSurname().empty() && !map.getDefault<bool>(PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME, false))
 					{
 						throw ActionException("Le prénom du client doit être rempli");
 					}

@@ -50,7 +50,6 @@ namespace synthese
 				static const std::string COL_SERVED_VERTICES;
 			//@}
 
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
@@ -73,8 +72,12 @@ namespace synthese
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,
 					bool raisingOrder = true,
-					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
+
+
+				static Composition::VehicleLinks UnserializeVehicles(const std::string& text, util::Env& env, util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL);
+				static std::string SerializeVehicles(const Composition::VehicleLinks& value);
 			//@}
 		};
 	}

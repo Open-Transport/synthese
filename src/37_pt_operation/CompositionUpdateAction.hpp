@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Composition.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -41,8 +42,6 @@ namespace synthese
 
 	namespace pt_operation
 	{
-		class Composition;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// 37.15 Action : CompositionUpdateAction.
 		/// @ingroup m37Actions refActions
@@ -64,12 +63,14 @@ namespace synthese
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_FIRST_QUAY;
+			static const std::string PARAMETER_VEHICLES;
 
 		private:
 			boost::shared_ptr<Composition> _composition;
 			boost::shared_ptr<pt::ScheduledService> _service;
 			boost::optional<boost::gregorian::date> _date;
 			boost::shared_ptr<pt::StopPoint> _firstQuay;
+			boost::optional<Composition::VehicleLinks> _vehicles;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -103,7 +104,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				// void setObject(boost::shared_ptr<Object> value) { _object = value; }
+				void setComposition(boost::shared_ptr<Composition> value) { _composition = value; }
 			//@}
 		};
 	}

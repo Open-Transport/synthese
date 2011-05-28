@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string DATA_TRANSACTION_ID;
 			static const std::string DATA_SEATS_NUMBER;
 			static const std::string DATA_VEHICLE_ID;
+			static const std::string DATA_RESERVATION_ID;
 			static const std::string DATA_SEAT;
 
 		protected:
@@ -159,6 +160,9 @@ namespace synthese
 			/// @author RCSobility
 			/// @date 2011
 			virtual std::string getOutputMimeType() const;
+
+
+			ReservationsListService();
 		};
 }	}
 

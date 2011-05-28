@@ -26,7 +26,6 @@
 #include "ParametersMap.h"
 #include "CompositionUpdateAction.hpp"
 #include "Request.h"
-#include "Composition.hpp"
 #include "RequestException.h"
 #include "CompositionTableSync.hpp"
 #include "ScheduledService.h"
@@ -60,6 +59,7 @@ namespace synthese
 		const string CompositionUpdateAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 		const string CompositionUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "si";
 		const string CompositionUpdateAction::PARAMETER_FIRST_QUAY = Action_PARAMETER_PREFIX + "fq";
+		const string CompositionUpdateAction::PARAMETER_VEHICLES = Action_PARAMETER_PREFIX + "ve";
 
 
 
@@ -81,6 +81,10 @@ namespace synthese
 			if(_firstQuay.get())
 			{
 				map.insert(PARAMETER_FIRST_QUAY, _firstQuay->getKey());
+			}
+			if(_vehicles)
+			{
+				map.insert(PARAMETER_VEHICLES, CompositionTableSync::SerializeVehicles(*_vehicles));
 			}
 			return map;
 		}
@@ -125,6 +129,11 @@ namespace synthese
 			else
 			{
 				_date = from_simple_string(map.get<string>(PARAMETER_DATE));
+			}
+
+			if(map.isDefined(PARAMETER_VEHICLES))
+			{
+				_vehicles = CompositionTableSync::UnserializeVehicles(map.get<string>(PARAMETER_VEHICLES), *_env);
 			}
 
 			// Service
@@ -174,6 +183,11 @@ namespace synthese
 					}
 				}
 				_composition->setServedVertices(vertices);
+			}
+
+			if(_vehicles)
+			{
+				_composition->setVehicles(*_vehicles);
 			}
 
 			CompositionTableSync::Save(_composition.get());
