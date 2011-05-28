@@ -54,10 +54,9 @@ namespace synthese
 			{
 			public:
 				typedef std::set<typename T::ObjectType*> Set;
-
-			private:
 				typedef std::map<std::string, Set> Map;
 
+			private:
 				const DataSource& _source;
 				Map _map;
 
