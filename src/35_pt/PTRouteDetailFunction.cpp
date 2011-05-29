@@ -263,43 +263,42 @@ namespace synthese
 				stream <<
 					"\" " << DATA_DIRECTION << "=\""     << _journeyPattern->getDirection() <<
 					"\">";
-			}
 
-			BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
-			{
-				const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
-
-				const StopArea * connPlace(stopPoint->getConnectionPlace());
-
-				stream << "<" << TAG_STOP << " " << DATA_ID << "=\""   << stopPoint->getKey() <<
-					"\" " << DATA_RANK << "=\""          << edge->getRankInPath() <<
-					"\" " << DATA_DEPARTURE_IS_ALLOWED << "=\""          << edge->isDepartureAllowed() <<
-					"\" " << DATA_ARRIVAL_IS_ALLOWED << "=\""          << edge->isArrivalAllowed() <<
-					"\" " << DATA_NAME << "=\""          << stopPoint->getName() <<
-					"\" " << DATA_OPERATOR_CODE << "=\""  << stopPoint->getCodeBySources() <<
-					"\" " << DATA_STOP_AREA_ID << "=\""        << connPlace->getKey() <<
-					"\" " << DATA_STOP_AREA_NAME << "=\""      << connPlace->getName() <<
-					"\" " << DATA_CITY_ID << "=\""        << connPlace->getCity()->getKey() <<
-					"\" " << DATA_CITY_NAME << "=\""      << connPlace->getCity()->getName() <<
-					"\" " << DATA_DIRECTION_ALIAS << "=\""<< connPlace->getName26();
-				if(_service.get())
+				BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
 				{
-					if(edge->isDepartureAllowed())
-					{
-						stream << "\" " << DATA_DEPARTURE_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getDepartureSchedule(false, edge->getRankInPath())));
-					}
-					if(edge->isArrivalAllowed())
-					{
-						stream << "\" " << DATA_ARRIVAL_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getArrivalSchedule(false, edge->getRankInPath())));
-					}
-				}
+					const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 
-				stream << "\" />";
-			}
-			// XML footer
-			stream <<
-				"</route>";
-		}
+					const StopArea * connPlace(stopPoint->getConnectionPlace());
+
+					stream << "<" << TAG_STOP << " " << DATA_ID << "=\""   << stopPoint->getKey() <<
+						"\" " << DATA_RANK << "=\""          << edge->getRankInPath() <<
+						"\" " << DATA_DEPARTURE_IS_ALLOWED << "=\""          << edge->isDepartureAllowed() <<
+						"\" " << DATA_ARRIVAL_IS_ALLOWED << "=\""          << edge->isArrivalAllowed() <<
+						"\" " << DATA_NAME << "=\""          << stopPoint->getName() <<
+						"\" " << DATA_OPERATOR_CODE << "=\""  << stopPoint->getCodeBySources() <<
+						"\" " << DATA_STOP_AREA_ID << "=\""        << connPlace->getKey() <<
+						"\" " << DATA_STOP_AREA_NAME << "=\""      << connPlace->getName() <<
+						"\" " << DATA_CITY_ID << "=\""        << connPlace->getCity()->getKey() <<
+						"\" " << DATA_CITY_NAME << "=\""      << connPlace->getCity()->getName() <<
+						"\" " << DATA_DIRECTION_ALIAS << "=\""<< connPlace->getName26();
+					if(_service.get())
+					{
+						if(edge->isDepartureAllowed())
+						{
+							stream << "\" " << DATA_DEPARTURE_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getDepartureSchedule(false, edge->getRankInPath())));
+						}
+						if(edge->isArrivalAllowed())
+						{
+							stream << "\" " << DATA_ARRIVAL_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getArrivalSchedule(false, edge->getRankInPath())));
+						}
+					}
+
+					stream << "\" />";
+				}
+				// XML footer
+				stream <<
+					"</route>";
+		}	}
 
 
 

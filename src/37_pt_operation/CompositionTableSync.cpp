@@ -293,7 +293,10 @@ namespace synthese
 					try
 					{
 						value.vehicle = VehicleTableSync::GetEditable(lexical_cast<RegistryKeyType>(values[0]), env, linkLevel).get();
-						value.number = values[1];
+						if(values.size() > 1)
+						{
+							value.number = values[1];
+						}
 						vehicleLinks.push_back(value);
 					}
 					catch(ObjectNotFoundException<Vehicle>& e)
@@ -321,7 +324,11 @@ namespace synthese
 				{
 					vehiclesString << ",";
 				}
-				vehiclesString << vehicle.vehicle->getKey() << "|" << vehicle.number;
+				vehiclesString << vehicle.vehicle->getKey();
+				if(!vehicle.number.empty())
+				{
+					vehiclesString << "|" << vehicle.number;
+				}
 			}
 			return vehiclesString.str();
 		}
