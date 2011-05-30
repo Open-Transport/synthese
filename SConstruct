@@ -162,7 +162,7 @@ if (env['_PLATFORM'] == 'posix') or (env['_PLATFORM'] == 'darwin'):
       env.Append ( CPPDEFINES = ['NDEBUG'] )
 
 elif (env['_PLATFORM']=='win32'):
-   env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', 'NOMINMAX'] )
+   env.Append ( CPPDEFINES = ['_MBCS', '_USE_MATH_DEFINES', '__WIN32__', 'WIN32', 'NOMINMAX', 'XML_STATIC'] )
    if (env.IsCppModeDebug ()):
       env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
    else:
