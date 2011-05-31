@@ -36,6 +36,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplateElement;
+	}
+
 	namespace util
 	{
 		class Registrable;
@@ -113,6 +118,8 @@ namespace synthese
 					bool		_treatAllStopAreaAsQuay;
 					bool		_importTimetablesAsTemplates;
 				//@}
+
+				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
 
 				static std::string GetCoordinate(const double value);
 
