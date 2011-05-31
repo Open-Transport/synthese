@@ -161,6 +161,7 @@ namespace synthese
 				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
 			}
 			result.insert(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay);
+			result.insert(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates);
 			return result;
 		}
 
@@ -193,6 +194,7 @@ namespace synthese
 			_startDate = day_clock::local_day();
 			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 			_treatAllStopAreaAsQuay = map.getDefault<bool>(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, false);
+			_importTimetablesAsTemplates = map.getDefault<bool>(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, false);
 		}
 
 
