@@ -453,7 +453,7 @@ namespace synthese
 					string endDateStr(_getValue("end_date"));
 					if(startDateStr.size() != 8 || endDateStr.size() != 8)
 					{
-						stream << "WARN : inconsistent dates in "<< line <<"<br />";
+						stream << "WARN : inconsistent dates in "<< line <<" (" << startDateStr << " and " << endDateStr << ")<br />";
 						continue;
 					}
 					date startDate(
