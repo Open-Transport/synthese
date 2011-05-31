@@ -29,6 +29,7 @@
 #include "SelectQuery.hpp"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace calendar;
 	using namespace security;
+	using namespace impex;
 
 	namespace util
 	{
@@ -49,6 +51,7 @@ namespace synthese
 	{
 		const std::string CalendarTemplateTableSync::COL_TEXT("name");
 		const std::string CalendarTemplateTableSync::COL_CATEGORY("category");
+		const std::string CalendarTemplateTableSync::COL_DATASOURCE_LINKS("datasource_links");
 	}
 
 	namespace db
@@ -63,6 +66,7 @@ namespace synthese
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
 			DBTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
+			DBTableSync::Field(CalendarTemplateTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -101,6 +105,10 @@ namespace synthese
  				{
  					object->addElement(*e);
  				}
+
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(rows->getText(CalendarTemplateTableSync::COL_DATASOURCE_LINKS), env)
+				);
 			}
 		}
 
@@ -113,6 +121,7 @@ namespace synthese
 			ReplaceQuery<CalendarTemplateTableSync> query(*object);
 			query.addField(object->getText());
 			query.addField(static_cast<int>(object->getCategory()));
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

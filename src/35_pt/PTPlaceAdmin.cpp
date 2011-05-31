@@ -54,6 +54,8 @@
 #include "JunctionUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
 #include "StopPointUpdateAction.hpp"
+#include "PlaceAliasUpdateAction.hpp"
+#include "PlaceAliasTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -90,6 +92,7 @@ namespace synthese
 		const string PTPlaceAdmin::TAB_GENERAL("tg");
 		const string PTPlaceAdmin::TAB_STOPS("ts");
 		const string PTPlaceAdmin::TAB_TRANSFER("tt");
+		const string PTPlaceAdmin::TAB_ALIAS("tl");
 
 
 
@@ -327,6 +330,7 @@ namespace synthese
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_Y, string());
 				stream << t.col();
 				stream << t.col();
+				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
 				stream << t.col();
 
@@ -554,6 +558,52 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
+			// TAB ALIAS
+			if (openTabContent(stream, TAB_ALIAS))
+			{
+				HTMLTable::ColsVector c;
+				c.push_back("Commune");
+				c.push_back("Nom");
+				c.push_back("Principal");
+				c.push_back("Actions");
+
+				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request);
+
+				AdminActionFunctionRequest<PlaceAliasUpdateAction,PTPlaceAdmin> addRequest(request);
+				addRequest.getAction()->setStopArea(_connectionPlace);
+
+				HTMLForm f(addRequest.getHTMLForm("addAlias"));
+				stream << f.open();
+				
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				PlaceAliasTableSync::SearchResult aliases(
+					PlaceAliasTableSync::Search(
+						*_env,
+						_connectionPlace->getKey()
+				)	);
+				BOOST_FOREACH(shared_ptr<PlaceAlias> alias, aliases)
+				{
+					removeRequest.getAction()->setObjectId(alias->getKey());
+					stream << t.row();
+					stream << t.col() << alias->getCity()->getName();
+					stream << t.col() << alias->getName();
+					stream << t.col() << (alias->getCity()->includes(alias.get()) ? "OUI" : "NON");
+					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'alias ?");
+				}
+
+				stream << t.row();
+				stream << t.col() << f.getTextInput(PlaceAliasUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey()));
+				stream << t.col() << f.getTextInput(PlaceAliasUpdateAction::PARAMETER_NAME, string());
+				stream << t.col() << f.getOuiNonRadioInput(PlaceAliasUpdateAction::PARAMETER_IS_CITY_MAIN_PLACE, false);
+				stream << t.col() << f.getSubmitButton("Ajouter");
+
+				stream << t.close();
+				stream << f.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
 			// END TABS
 			closeTabContent(stream);
 		}
@@ -598,6 +648,7 @@ namespace synthese
 			}
 			_tabs.push_back(Tab("Adresses", TAB_ADDRESSES, true));
 			_tabs.push_back(Tab("Transferts", TAB_TRANSFER, true));
+			_tabs.push_back(Tab("Alias", TAB_ALIAS, true));
 			_tabBuilded = true;
 		}
 

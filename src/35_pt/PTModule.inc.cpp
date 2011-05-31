@@ -76,6 +76,7 @@
 #include "StopAreaTransferRemoveAction.hpp"
 #include "TransportNetworkUpdateAction.hpp"
 #include "ContinuousServiceUpdateAction.h"
+#include "PlaceAliasUpdateAction.hpp"
 #include "PTUseRuleUpdateAction.hpp"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"

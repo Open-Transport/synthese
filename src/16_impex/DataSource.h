@@ -41,6 +41,7 @@ namespace synthese
 	namespace impex
 	{
 		class Importer;
+		class Importable;
 
 		////////////////////////////////////////////////////////////////////////
 		/// DataSource class.
@@ -65,6 +66,8 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<DataSource> Registry;
 
+			typedef std::map<std::string, Importable*> Links;
+
 
 		private:
 			// Attributes
@@ -73,6 +76,7 @@ namespace synthese
 			std::string _icon;
 			std::string	_charset;
 			const CoordinatesSystem* _coordinatesSystem;
+			mutable Links _links;
 
 		public:
 			/////////////////////////////////////////////////////////////////////
@@ -101,10 +105,13 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void addLink(Importable& object) const;
+				void removeLink(Importable& object) const;
 			//@}
 
 			//! @name Queries
 			//@{
+				Importable* getObjectByCode(const std::string& code) const;
 				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
 			//@}
@@ -113,7 +120,6 @@ namespace synthese
 			//@{
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DataSource_h__

@@ -88,9 +88,13 @@ namespace synthese
 
 
 
-		void Importable::setCodeBySource( const DataSource& source, const std::string& code )
+		void Importable::setCodeBySource( const DataSource& source, const std::string& code, bool storeLinkInDataSource)
 		{
 			_dataSourceLinks[&source] = code;
+			if(storeLinkInDataSource)
+			{
+				source.addLink(*this);
+			}
 		}
 
 
@@ -102,8 +106,15 @@ namespace synthese
 
 
 
-		void Importable::cleanDataSourceLinks()
-		{
+		void Importable::cleanDataSourceLinks(
+			bool updateDataSources
+		){
+			if(updateDataSources)
+			{
+				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+				{
+					link.first->removeLink(*this);
+			}	}
 			_dataSourceLinks.clear();
 		}
 
@@ -125,5 +136,44 @@ namespace synthese
 				result += l.second;
 			}
 			return result;
+		}
+
+
+
+		void Importable::removeSourceLink(
+			const DataSource& source,
+			bool updateDataSouce
+		){
+			//TODO protect this code by a mutex
+			DataSourceLinks::iterator it(_dataSourceLinks.find(&source));
+			if(it != _dataSourceLinks.end())
+			{
+				if(updateDataSouce)
+				{
+					it->first->removeLink(*this);
+				}
+				_dataSourceLinks.erase(it);
+			}
+		}
+
+
+
+		void Importable::setDataSourceLinks(
+			const DataSourceLinks& value,
+			bool storeLinkInDataSource
+		){
+			if(storeLinkInDataSource)
+			{
+				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+				{
+					link.first->removeLink(*this);
+			}	}
+			_dataSourceLinks = value;
+			if(storeLinkInDataSource)
+			{
+				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+				{
+					link.first->addLink(*this);
+			}	}
 		}
 }	}

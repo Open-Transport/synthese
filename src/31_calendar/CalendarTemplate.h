@@ -28,6 +28,7 @@
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
 #include "Calendar.h"
+#include "Importable.h"
 
 #include <map>
 
@@ -43,8 +44,9 @@ namespace synthese
 			@see CalendarTemplate::Category
 
 		*/
-		class CalendarTemplate
-		:	public virtual util::Registrable
+		class CalendarTemplate:
+			public virtual util::Registrable,
+			public impex::Importable
 		{
 		public:
 			/// Chosen registry class.
