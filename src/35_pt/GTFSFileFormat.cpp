@@ -178,6 +178,11 @@ namespace synthese
 				return false;
 			}
 			_loadFieldsMap(line);
+			BOOST_FOREACH(const FieldsMap::value_type& it, _fieldsMap)
+			{
+				stream << it.first << "-" << it.second << "/<br />";
+			}
+
 
 			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
 
