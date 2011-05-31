@@ -1656,12 +1656,53 @@ namespace synthese
 					string calendarId(calendarNode.getChildNode("objectId").getText());
 					ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set cts(calendarTemplates.get(calendarId));
 					CalendarTemplate* ct(NULL);
+					bool calendarToImport(false);
 					if(cts.empty())
 					{
 						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
 						ct->setCodeBySource(_dataSource, calendarId);
 						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
 						calendarTemplates.add(*ct);
+						calendarToImport = true;
+					}
+					else
+					{
+						ct = *cts.begin();
+						if(!ct->isLimited())
+						{
+							calendarToImport = true;
+						}
+						else
+						{
+							Calendar c;
+							for(int dayRank(0); dayRank < daysNumber; ++dayRank)
+							{
+								XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
+								c.setActive(from_string(dayNode.getText()));
+							}
+							if(c != ct->getResult())
+							{
+								calendarToImport = true;
+							}
+						}
+						if(calendarToImport)
+						{
+							CalendarTemplateElementTableSync::SearchResult elements(
+								CalendarTemplateElementTableSync::Search(_env, ct->getKey())
+							);
+							BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, elements)
+							{
+								_calendarElementsToRemove.insert(element);
+								_env.getEditableRegistry<CalendarTemplateElement>().remove(element->getKey());
+							}
+						}
+					}
+					if(calendarNode.nChildNode("comment"))
+					{
+						ct->setText(calendarNode.getChildNode("comment").getText());
+					}
+					if(calendarToImport)
+					{
 						size_t rank(0);
 						for(int dayRank(0); dayRank < daysNumber; ++dayRank)
 						{
@@ -1674,14 +1715,6 @@ namespace synthese
 							cte->setRank(rank++);
 							_env.getEditableRegistry<CalendarTemplateElement>().add(cte);
 						}
-					}
-					else
-					{
-						ct = *cts.begin();
-					}
-					if(calendarNode.nChildNode("comment"))
-					{
-						ct->setText(calendarNode.getChildNode("comment").getText());
 					}
 				}
 
@@ -1872,13 +1905,20 @@ namespace synthese
 			{
 				JunctionTableSync::Save(junction.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTemplate, _env.getRegistry<CalendarTemplate>())
+			if(_importTimetablesAsTemplates)
 			{
-				CalendarTemplateTableSync::Save(calendarTemplate.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<CalendarTemplateElement>::value_type& calendarTemplateElement, _env.getRegistry<CalendarTemplateElement>())
-			{
-				CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
+				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, _calendarElementsToRemove)
+				{
+					CalendarTemplateElementTableSync::RemoveRow(element->getKey(), transaction);
+				}
+				BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTemplate, _env.getRegistry<CalendarTemplate>())
+				{
+					CalendarTemplateTableSync::Save(calendarTemplate.second.get(), transaction);
+				}
+				BOOST_FOREACH(const Registry<CalendarTemplateElement>::value_type& calendarTemplateElement, _env.getRegistry<CalendarTemplateElement>())
+				{
+					CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
+				}
 			}
 			return transaction;
 		}

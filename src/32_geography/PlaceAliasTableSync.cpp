@@ -131,7 +131,6 @@ namespace synthese
 			query.addField(object->getAliasedPlace() ? object->getAliasedPlace()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
-			query.addField(false);
 			query.execute(transaction);
 		}
 

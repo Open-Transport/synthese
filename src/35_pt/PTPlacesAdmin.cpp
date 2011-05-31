@@ -47,6 +47,7 @@
 #include "StopAreaAddAction.h"
 #include "StopAreaTableSync.hpp"
 #include "RemoveObjectAction.hpp"
+#include "PlaceAlias.h"
 
 using namespace std;
 using namespace boost;
@@ -216,6 +217,24 @@ namespace synthese
 							stream << t.col() << it.score.phoneticScore;
 							stream << t.col() << it.score.levenshtein;
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+						}
+						else if(dynamic_cast<const PlaceAlias*>(it.value.get()))
+						{
+							shared_ptr<PlaceAlias> alias(static_pointer_cast<PlaceAlias>(it.value));
+							const StopArea* connectionPlace(dynamic_cast<const StopArea*>(alias->getAliasedPlace()));
+							if(connectionPlace)
+							{
+								openPlaceRequest.getPage()->setConnectionPlace(Env::GetOfficialEnv().getSPtr<StopArea>(connectionPlace));
+
+								stream << t.col();
+								stream << t.col() << "Alias de zone d'arrêt";
+								stream << t.col() << connectionPlace->getName();
+								stream << t.col() << it.key.getSource();
+								stream << t.col() << it.key.getPhoneticString();
+								stream << t.col() << it.score.phoneticScore;
+								stream << t.col() << it.score.levenshtein;
+								stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+							}
 						}
 /*						else if(dynamic_cast<const PublicPlace*>(it.value))
 						{
