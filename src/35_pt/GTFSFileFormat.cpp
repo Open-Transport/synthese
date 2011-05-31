@@ -366,6 +366,7 @@ namespace synthese
 							stream
 						);
 					}
+					return false;
 				}
 			}
 			else if(key == FILE_TRANSFERS)
@@ -555,13 +556,13 @@ namespace synthese
 					_loadLine(line);
 
 					string tripCode(_getValue("trip_id"));
-					if(tripCode != lastTripCode && !lastTripCode.empty())
+					if(tripCode != lastTripCode && !lastTripCode.empty() && !tripDetailVector.empty())
 					{
 						// Trip
-						TripsMap::const_iterator it(_trips.find(tripCode));
+						TripsMap::const_iterator it(_trips.find(lastTripCode));
 						if(it == _trips.end())
 						{
-							stream << "WARN : inconsistent trip id "<< tripCode <<" in the trip stops file<br />";
+							stream << "WARN : inconsistent trip id "<< lastTripCode <<" in the trip stops file<br />";
 							continue;
 						}
 						Trip trip(it->second);
@@ -610,7 +611,7 @@ namespace synthese
 								*route,
 								departures,
 								arrivals,
-								tripCode,
+								lastTripCode,
 								_dataSource,
 								_env,
 								stream
