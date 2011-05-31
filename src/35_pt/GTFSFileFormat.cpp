@@ -366,6 +366,10 @@ namespace synthese
 							stream
 						);
 					}
+				}
+
+				if(!nonLinkedStopPoints.empty())
+				{
 					return false;
 				}
 			}
@@ -772,6 +776,10 @@ namespace synthese
 		{
 			_line.clear();
 			string utfLine(ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8"));
+			if(!utfLine.empty() && utfLine[utfLine.size() - 1] == '\r')
+			{
+				utfLine = utfLine.substr(0, utfLine.size() - 1);
+			}
 			split(_line, utfLine, is_any_of(SEP));
 		}
 
