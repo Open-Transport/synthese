@@ -377,6 +377,7 @@ namespace synthese
 					stream << t.col(1,string(),false,string(),2);
 					stream << t.col(1,string(),false,string(),2);
 					stream << t.col(1,string(),false,string(),2);
+					stream << t.col(1,string(),false,string(),2);
 					stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
 					stream << t.row();
 					stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
@@ -426,11 +427,15 @@ namespace synthese
 						}
 						if(itEdge+1 != _line->getEdges().end())
 						{
-							map.addLineString(
-								HTMLMap::MapLineString(
-									*(*itEdge)->getRealGeometry(),
-									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
-							)	);
+							shared_ptr<LineString> geom((*itEdge)->getRealGeometry());
+							if(geom.get())
+							{
+								map.addLineString(
+									HTMLMap::MapLineString(
+										*geom,
+										dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? lineStopUpdateRequest.getURL() : string()
+								)	);
+							}
 						}
 						if((*itEdge)->getFromVertex()->getGeometry().get())
 						{
