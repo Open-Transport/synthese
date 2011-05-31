@@ -178,11 +178,6 @@ namespace synthese
 				return false;
 			}
 			_loadFieldsMap(line);
-			BOOST_FOREACH(const FieldsMap::value_type& it, _fieldsMap)
-			{
-				stream << it.first << "-" << it.second << "/<br />";
-			}
-
 
 			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
 
@@ -758,7 +753,11 @@ namespace synthese
 		void GTFSFileFormat::Importer_::_loadFieldsMap( const std::string& line ) const
 		{
 			vector<string> cols;
-			split(cols, line, is_any_of(SEP));
+			split(
+				cols,
+				line[line.size() - 1] == '\r' ? line.substr(0, line.size() - 1) : line,
+				is_any_of(SEP)
+			);
 			_fieldsMap.clear();
 			size_t rank(0);
 			BOOST_FOREACH(const string& col, cols)

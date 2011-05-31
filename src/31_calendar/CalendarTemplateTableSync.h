@@ -48,6 +48,7 @@ namespace synthese
 		public:
 			static const std::string COL_TEXT;
 			static const std::string COL_CATEGORY;
+			static const std::string COL_DATASOURCE_LINKS;
 
 
 			/** CalendarTemplate search.

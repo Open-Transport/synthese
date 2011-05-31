@@ -58,10 +58,12 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
-				int first = 0, int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				boost::optional<util::RegistryKeyType> aliasedPlaceId = boost::optional<util::RegistryKeyType>(),
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 	}

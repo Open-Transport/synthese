@@ -118,6 +118,7 @@ namespace synthese
 			{
 //				city->removePlaceFromMatcher<PlaceAlias>(obj);
 				obj->setCity(NULL);
+				city->removeIncludedPlace(obj);
 			}
 		}
 
@@ -129,7 +130,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getAliasedPlace() ? object->getAliasedPlace()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			// TODO: how to retrieve the isCityMainConnection value?
+			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
 			query.addField(false);
 			query.execute(transaction);
 		}
@@ -178,29 +179,27 @@ namespace synthese
 
 
 
-		void PlaceAliasTableSync::Search(
+		PlaceAliasTableSync::SearchResult PlaceAliasTableSync::Search(
 			Env& env,
+			boost::optional<util::RegistryKeyType> aliasedPlaceId,
 			int first /*= 0*/,
-			int number /*= 0*/,
+			optional<size_t> number,
 			LinkLevel linkLevel
 		){
-			stringstream query;
-			query
-				<< " SELECT *"
-				<< " FROM " << TABLE.NAME
-				<< " WHERE 1 ";
-			/// @todo Fill Where criteria
-			// if (!name.empty())
-			// 	query << " AND " << COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'";
-				;
-			//if (orderByName)
-			//	query << " ORDER BY " << COL_NAME << (raisingOrder ? " ASC" : " DESC");
-			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+			SelectQuery<PlaceAliasTableSync> query;
+			if(aliasedPlaceId)
+			{
+				query.addWhereField(COL_ALIASEDPLACEID, *aliasedPlaceId);
+			}
+			if (number)
+			{
+				query.setNumber(*number + 1);
+			}
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
-
-			LoadFromQuery(query.str(), env, linkLevel);
+			{
+				query.setFirst(first);
+			}
+			return LoadFromQuery(query.toString(), env, linkLevel);
 		}
 	}
 }

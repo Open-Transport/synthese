@@ -351,30 +351,8 @@ namespace synthese
 			util::Env& env,
 			std::ostream& logStream
 		){
-			CommercialLine* line;
-			if(lines.contains(id))
-			{
-				set<CommercialLine*> loadedLines(lines.get(id));
-				if(loadedLines.size() > 1)
-				{
-					logStream << "WARN : more than one line with key " << id << "<br />";
-				}
-				line = *loadedLines.begin();
-
-				if(line->getPaths().empty())
-				{
-					JourneyPatternTableSync::Search(env, line->getKey());
-					ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-					ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
-					BOOST_FOREACH(const Path* route, line->getPaths())
-					{
-						LineStopTableSync::Search(env, route->getKey());
-					}
-				}
-
-				logStream << "LOAD : use of existing commercial line" << line->getKey() << " (" << line->getName() << ")<br />";
-			}
-			else
+			CommercialLine* line(GetLine(lines, id, source, env, logStream));
+			if(!line)
 			{
 				line = new CommercialLine(CommercialLineTableSync::getId());
 
@@ -897,5 +875,61 @@ namespace synthese
 			destination->setDisplayedText(displayText);
 			destination->setTTSText(ttsText);
 			return destination;
+		}
+
+
+
+		CommercialLine* PTFileFormat::GetLine( impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines, const std::string& id, const impex::DataSource& source, util::Env& env, std::ostream& logStream )
+		{
+			CommercialLine* line(NULL);
+			if(lines.contains(id))
+			{
+				set<CommercialLine*> loadedLines(lines.get(id));
+				if(loadedLines.size() > 1)
+				{
+					logStream << "WARN : more than one line with key " << id << "<br />";
+				}
+				line = *loadedLines.begin();
+
+				if(line->getPaths().empty())
+				{
+					JourneyPatternTableSync::Search(env, line->getKey());
+					ScheduledServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+					ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), line->getKey());
+					BOOST_FOREACH(const Path* route, line->getPaths())
+					{
+						LineStopTableSync::Search(env, route->getKey());
+					}
+				}
+
+				logStream << "LOAD : use of existing commercial line" << line->getKey() << " (" << line->getName() << ")<br />";
+			}
+			return line;
+		}
+
+
+
+		std::set<JourneyPattern*> PTFileFormat::GetRoutes(
+			pt::CommercialLine& line,
+			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
+			const impex::DataSource& source
+		){
+			// Attempting to find an existing route by value comparison
+			set<JourneyPattern*> result;
+			BOOST_FOREACH(Path* route, line.getPaths())
+			{
+				JourneyPattern* jp(static_cast<JourneyPattern*>(route));
+
+				if(!jp->hasLinkWithSource(source))
+				{
+					continue;
+				}
+
+				if(	*jp == servedStops
+				){
+					result.insert(jp);
+				}
+			}
+			return result;
 		}
 }	}
