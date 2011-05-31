@@ -46,6 +46,7 @@
 #include "PropertiesHTMLTable.h"
 #include "StopAreaAddAction.h"
 #include "StopAreaTableSync.hpp"
+#include "RemoveObjectAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -61,7 +62,7 @@ namespace synthese
 	using namespace html;
 	using namespace lexical_matcher;
 	using namespace road;
-	using namespace pt;
+	using namespace db;
 
 	namespace util
 	{
@@ -343,6 +344,8 @@ namespace synthese
 				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
 
+				AdminActionFunctionRequest<RemoveObjectAction, PTPlaceAdmin> removeRequest(request);
+				
 				AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 
 				HTMLForm f(stopAddRequest.getHTMLForm());
@@ -357,6 +360,7 @@ namespace synthese
 				c.push_back("Nom");
 				c.push_back("X");
 				c.push_back("Y");
+				c.push_back("Actions");
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
@@ -382,6 +386,14 @@ namespace synthese
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
+					
+					// Remove button only if no stops inside
+					stream << t.col();
+					if(place->getPhysicalStops().empty())
+					{
+						removeRequest.getAction()->setObjectId(place->getKey());
+						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone d'arrêt ?");
+					}
 				}
 
 				stream << t.row();
@@ -390,6 +402,7 @@ namespace synthese
 				stream << t.col();
 				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
+				stream << t.col();
 
 				stream << t.close();
 				stream << f.close();

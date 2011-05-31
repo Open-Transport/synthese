@@ -249,6 +249,8 @@ namespace synthese
 				AdminActionFunctionRequest<StopPointAddAction,PTPlaceAdmin> addRequest(request);
 				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
+				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request);
+				
 				HTMLForm f(addRequest.getHTMLForm());
 				stream << f.open();
 
@@ -260,6 +262,7 @@ namespace synthese
 				c.push_back("X");
 				c.push_back("Y");
 				c.push_back("Lignes");
+				c.push_back("Actions");
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
@@ -308,6 +311,14 @@ namespace synthese
 					}
 
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
+
+					// Remove button only if the stop is not used by any route
+					stream << t.col();
+					if(stop->getDepartureEdges().empty() && stop->getArrivalEdges().empty())
+					{
+						removeRequest.getAction()->setObjectId(stop->getKey());
+						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
+					}
 				}
 				stream << t.row();
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_NAME, string());
@@ -317,6 +328,7 @@ namespace synthese
 				stream << t.col();
 				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
+				stream << t.col();
 
 				stream << t.close() << f.close();
 			}
