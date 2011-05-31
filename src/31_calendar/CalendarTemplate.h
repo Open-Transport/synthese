@@ -154,6 +154,7 @@ namespace synthese
 			//@{
 				std::string	getText()	const;
 				Category getCategory() const;
+				Elements getElements() const { return _elements; }
 			//@}
 
 			//! @name Setters
