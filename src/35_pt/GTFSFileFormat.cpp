@@ -775,12 +775,16 @@ namespace synthese
 		void GTFSFileFormat::Importer_::_loadLine( const std::string& line ) const
 		{
 			_line.clear();
-			string utfLine(ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8"));
-			if(!utfLine.empty() && utfLine[utfLine.size() - 1] == '\r')
+			if(!line.empty())
 			{
-				utfLine = utfLine.substr(0, utfLine.size() - 1);
+				string utfline(
+					line[line.size() - 1] == '\r' ?
+					line.substr(0, line.size() - 1) :
+					line
+				);
+				utfline = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
+				split(_line, utfline, is_any_of(SEP));
 			}
-			split(_line, utfLine, is_any_of(SEP));
 		}
 
 
