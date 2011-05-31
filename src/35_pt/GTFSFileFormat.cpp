@@ -179,6 +179,8 @@ namespace synthese
 			}
 			_loadFieldsMap(line);
 
+			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
+
 			// 1 : Routes
 			// Stops
 			if(key == FILE_STOPS)
@@ -443,12 +445,17 @@ namespace synthese
 					Calendar c;
 
 					string startDateStr(_getValue("start_date"));
+					string endDateStr(_getValue("end_date"));
+					if(startDateStr.size() != 8 || endDateStr.size() != 8)
+					{
+						stream << "WARN : inconsistent dates in "<< line <<"<br />";
+						continue;
+					}
 					date startDate(
 						lexical_cast<int>(startDateStr.substr(0,4)),
 						lexical_cast<int>(startDateStr.substr(4,2)),
 						lexical_cast<int>(startDateStr.substr(6,2))
 					);
-					string endDateStr(_getValue("end_date"));
 					date endDate(
 						lexical_cast<int>(endDateStr.substr(0,4)),
 						lexical_cast<int>(endDateStr.substr(4,2)),
@@ -479,6 +486,11 @@ namespace synthese
 					}
 
 					string dateStr(_getValue("date"));
+					if(dateStr.size() != 8)
+					{
+						stream << "WARN : inconsistent date in "<< line <<"<br />";
+						continue;
+					}
 					date d(
 						lexical_cast<int>(dateStr.substr(0,4)),
 						lexical_cast<int>(dateStr.substr(4,2)),
