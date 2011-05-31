@@ -91,7 +91,10 @@ namespace synthese
 				Envelope e;
 				BOOST_FOREACH(const Place* place, _includedPlaces)
 				{
-					e.expandToInclude(*place->getPoint()->getCoordinate());
+					if(place->getPoint().get() && !place->getPoint()->isEmpty())
+					{
+						e.expandToInclude(*place->getPoint()->getCoordinate());
+					}
 				}
 				Coordinate c;
 				e.centre(c);
