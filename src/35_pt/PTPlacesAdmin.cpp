@@ -344,7 +344,7 @@ namespace synthese
 				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
 
-				AdminActionFunctionRequest<RemoveObjectAction, PTPlaceAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request);
 				
 				AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 

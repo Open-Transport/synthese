@@ -65,6 +65,8 @@
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarTemplateElementTableSync.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -98,6 +100,7 @@ namespace synthese
 	using namespace server;
 	using namespace admin;
 	using namespace html;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -112,10 +115,11 @@ namespace synthese
 		const string TridentFileFormat::Importer_::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
 		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
 		const string TridentFileFormat::Importer_::PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY("sasp");
+		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES("itt");
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
-
+		
 		TridentFileFormat::SRIDConversionMap TridentFileFormat::_SRIDConversionMap;
 
 		string ToXsdDaysDuration (date_duration daysDelay);
@@ -134,7 +138,8 @@ namespace synthese
 			_importJunctions(false),
 			_autoGenerateStopAreas(false),
 			_defaultTransferDuration(minutes(8)),
-			_startDate(day_clock::local_day())
+			_startDate(day_clock::local_day()),
+			_importTimetablesAsTemplates(false)
 		{}
 
 
@@ -1636,12 +1641,47 @@ namespace synthese
 
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
+			ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendarTemplates(_dataSource, _env);
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
 
 				int daysNumber(calendarNode.nChildNode("calendarDay"));
 				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
+
+				if(_importTimetablesAsTemplates)
+				{
+					string calendarId(calendarNode.getChildNode("objectId").getText());
+					ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set cts(calendarTemplates.get(calendarId));
+					CalendarTemplate* ct(NULL);
+					if(cts.empty())
+					{
+						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
+						ct->setCodeBySource(_dataSource, calendarId);
+						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
+						calendarTemplates.add(*ct);
+						size_t rank(0);
+						for(int dayRank(0); dayRank < daysNumber; ++dayRank)
+						{
+							XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
+							date d(from_string(dayNode.getText()));
+							shared_ptr<CalendarTemplateElement> cte(new CalendarTemplateElement(CalendarTemplateTableSync::getId()));
+							cte->setCalendar(ct);
+							cte->setMinDate(d);
+							cte->setMaxDate(d);
+							cte->setRank(rank++);
+							_env.getEditableRegistry<CalendarTemplateElement>().add(cte);
+						}
+					}
+					else
+					{
+						ct = *cts.begin();
+					}
+					if(calendarNode.nChildNode("comment"))
+					{
+						ct->setText(calendarNode.getChildNode("comment").getText());
+					}
+				}
 
 				vector<ScheduledService*> calendarServices;
 				for(int serviceRank(0); serviceRank < servicesNumber; ++serviceRank)
@@ -1830,6 +1870,14 @@ namespace synthese
 			{
 				JunctionTableSync::Save(junction.second.get(), transaction);
 			}
+			BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTemplate, _env.getRegistry<CalendarTemplate>())
+			{
+				CalendarTemplateTableSync::Save(calendarTemplate.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<CalendarTemplateElement>::value_type& calendarTemplateElement, _env.getRegistry<CalendarTemplateElement>())
+			{
+				CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
+			}
 			return transaction;
 		}
 
@@ -1998,6 +2046,7 @@ namespace synthese
 			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
 			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));
 			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
+			stream << t.cell("Importer calendriers en tant que modèles", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates));
 			stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
 			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
 			stream << t.title("Données");

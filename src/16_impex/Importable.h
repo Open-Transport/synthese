@@ -88,14 +88,14 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setDataSourceLinks(const DataSourceLinks& value){ _dataSourceLinks = value; }
+				void setDataSourceLinks(const DataSourceLinks& value, bool storeLinkInDataSource = false);
 			//@}
 
 			//! @name Modifiers
 			//@{
-				void setCodeBySource(const DataSource& source, const std::string& code);
-
-				void cleanDataSourceLinks();
+				void setCodeBySource(const DataSource& source, const std::string& code, bool storeLinkInDataSource = false);
+				void removeSourceLink(const DataSource& source, bool updateDataSource = false);
+				void cleanDataSourceLinks(bool updateDataSource = false);
 			//@}
 
 			//! @name Services

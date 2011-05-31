@@ -122,6 +122,15 @@ namespace synthese
 
 
 
+			static CommercialLine* GetLine(
+				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
+				const std::string& id,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
 			static std::set<StopArea*> CreateOrUpdateStopAreas(
 				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 				const std::string& id,
@@ -234,6 +243,13 @@ namespace synthese
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
+			);
+
+
+			static std::set<JourneyPattern*> GetRoutes(
+				pt::CommercialLine& line,
+				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
+				const impex::DataSource& source
 			);
 
 

@@ -28,6 +28,7 @@
 #include "FileFormat.h"
 #include "Factory.h"
 #include "Importer.hpp"
+#include "Importable.h"
 
 using namespace std;
 using namespace boost;
@@ -70,5 +71,37 @@ namespace synthese
 			shared_ptr<FileFormat> fileFormat(Factory<FileFormat>::create(_format));
 			return fileFormat->canImport();
 		}
-	}
-}
+
+
+
+		void DataSource::addLink( Importable& object ) const
+		{
+			_links.insert(
+				make_pair(object.getCodeBySource(*this), &object)
+			);
+		}
+
+
+
+		void DataSource::removeLink( Importable& object ) const
+		{
+			Links::iterator it(_links.find(object.getCodeBySource(*this)));
+			if(it != _links.end())
+			_links.erase(it);
+		}
+
+
+
+		Importable* DataSource::getObjectByCode( const std::string& code ) const
+		{
+			Links::const_iterator it(_links.find(code));
+			if(it == _links.end())
+			{
+				return NULL;
+			}
+			else
+			{
+				return it->second;
+			}
+		}
+}	}

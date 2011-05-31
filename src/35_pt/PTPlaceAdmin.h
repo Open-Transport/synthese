@@ -53,6 +53,7 @@ namespace synthese
 				static const std::string TAB_STOPS;
 				static const std::string TAB_ADDRESSES;
 				static const std::string TAB_TRANSFER;
+				static const std::string TAB_ALIAS;
 			//@}
 
 		private:

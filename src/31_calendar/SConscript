@@ -10,6 +10,7 @@ CppSynthese3LibProject(
 		's3-util.cpplib',
 		's3-admin.cpplib',
 		's3-server.cpplib',
-		's3-cms.cpplib'
+		's3-cms.cpplib',
+		's3-impex.cpplib'
 	]
 )

@@ -78,6 +78,7 @@ synthese::pt::DRTAreaUpdateAction::integrate();
 synthese::pt::JourneyPatternAddAction::integrate();
 synthese::pt::JunctionUpdateAction::integrate();
 synthese::pt::NonConcurrencyRuleAddAction::integrate();
+synthese::pt::PlaceAliasUpdateAction::integrate();
 synthese::pt::PTUseRuleUpdateAction::integrate();
 synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 synthese::pt::ServiceAddAction::integrate();
