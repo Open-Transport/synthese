@@ -2677,15 +2677,18 @@ namespace synthese
 			pm.insert(DATA_ODD_ROW, color); // 21
 
 			shared_ptr<LineString> geometry(serviceUse.getGeometry());
-			shared_ptr<Geometry> geometry4326(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
-					*static_cast<Geometry*>(geometry.get())
-			)	);
-
-			shared_ptr<WKTWriter> wktWriter(new WKTWriter);
-			if(geometry4326.get() && !geometry4326->isEmpty())
+			if(geometry.get())
 			{
-				pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+				shared_ptr<Geometry> geometry4326(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+						*static_cast<Geometry*>(geometry.get())
+				)	);
+
+				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				if(geometry4326.get() && !geometry4326->isEmpty())
+				{
+					pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+				}
 			}
 
 			page->display(stream, request, pm);
