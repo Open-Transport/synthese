@@ -252,12 +252,23 @@ namespace synthese
 			for(const Edge* edge(_departureEdge); edge != _arrivalEdge; edge = edge->getNext())
 			{
 				shared_ptr<LineString> geometry(edge->getRealGeometry());
+				if(!geometry.get())
+				{
+					continue;
+				}
 				for(size_t i(0); i<geometry->getNumPoints(); ++i)
 				{
 					cs->add(geometry->getCoordinateN(i));
 				}
 			}
-			cs->removeRepeatedPoints();
-			return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+			if(cs->size() < 2)
+			{
+				return shared_ptr<LineString>();
+			}
+			else
+			{
+				cs->removeRepeatedPoints();
+				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+			}
 		}
 }	}
