@@ -34,6 +34,11 @@ namespace synthese
 		class ParametersMap;
 	}
 
+	namespace graph
+	{
+		class Service;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -61,6 +66,8 @@ namespace synthese
 			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
+			static const std::string DATA_SERVICE_ID;
+			static const std::string DATA_SERVICE_NUMBER;
 
 
 		public:
@@ -85,6 +92,13 @@ namespace synthese
 			static void ExportLine(
 				server::ParametersMap& pm,
 				const CommercialLine& line,
+				std::string prefix = std::string()
+			);
+
+
+			static void ExportService(
+				server::ParametersMap& pm,
+				const graph::Service& service,
 				std::string prefix = std::string()
 			);
 
