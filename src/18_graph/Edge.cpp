@@ -451,7 +451,14 @@ namespace synthese
 				CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 				cs->add(*getFromVertex()->getGeometry()->getCoordinate(), false);
 				cs->add(*getParentPath()->getEdge(getRankInPath() + 1)->getFromVertex()->getGeometry()->getCoordinate(), false);
-				return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+				if(cs->size() != 2)
+				{
+					return shared_ptr<LineString>();
+				}
+				else
+				{
+					return shared_ptr<LineString>(geometryFactory.createLineString(cs));
+				}
 			}
 
 			return shared_ptr<LineString>(geometryFactory.createLineString());
