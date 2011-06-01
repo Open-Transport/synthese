@@ -26,6 +26,7 @@
 #include "RGBColor.h"
 #include "StopArea.hpp"
 #include "City.h"
+#include "Service.h"
 
 #include <geos/geom/Point.h>
 
@@ -54,6 +55,8 @@ namespace synthese
 		const std::string PTObjectsCMSExporters::DATA_X("x");
 		const std::string PTObjectsCMSExporters::DATA_Y("y");
 
+		const std::string PTObjectsCMSExporters::DATA_SERVICE_ID("service_id");
+		const std::string PTObjectsCMSExporters::DATA_SERVICE_NUMBER("service_number");
 
 
 		void PTObjectsCMSExporters::ExportLine(
@@ -123,5 +126,13 @@ namespace synthese
 				;
 			}
 			stream << " />";
+		}
+
+
+
+		void PTObjectsCMSExporters::ExportService( server::ParametersMap& pm, const graph::Service& service, std::string prefix /*= std::string() */ )
+		{
+			pm.insert(prefix + DATA_SERVICE_ID, service.getKey());
+			pm.insert(prefix + DATA_SERVICE_NUMBER, service.getServiceNumber());
 		}
 }	}
