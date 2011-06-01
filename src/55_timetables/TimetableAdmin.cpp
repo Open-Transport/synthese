@@ -633,7 +633,9 @@ namespace synthese
 
 		bool TimetableAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _timetable == static_cast<const TimetableAdmin&>(other)._timetable;
+			return
+				!_timetable.get() && !static_cast<const TimetableAdmin&>(other)._timetable.get() ||
+				_timetable.get() && static_cast<const TimetableAdmin&>(other)._timetable.get() && _timetable->getKey() == static_cast<const TimetableAdmin&>(other)._timetable->getKey();
 		}
 
 
