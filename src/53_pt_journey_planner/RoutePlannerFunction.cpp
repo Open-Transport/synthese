@@ -2669,6 +2669,7 @@ namespace synthese
 				"9999"
 			); // 11
 			PTObjectsCMSExporters::ExportLine(pm, *commercialLine);
+			PTObjectsCMSExporters::ExportService(pm, *serviceUse.getService());
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
