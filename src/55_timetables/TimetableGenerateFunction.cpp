@@ -727,7 +727,7 @@ namespace synthese
 				break;
 			}
 
-			_page->display(stream, request, pm);
+			page->display(stream, request, pm);
 		}
 
 
