@@ -16,6 +16,7 @@ synthese::cms::IfFunction::integrate();
 synthese::cms::EqualFunction::integrate();
 synthese::cms::SuperiorFunction::integrate();
 synthese::cms::AndFunction::integrate();
+synthese::cms::OrService::integrate();
 synthese::cms::WebPageLinksFunction::integrate();
 synthese::cms::WebPagePositionFunction::integrate();
 synthese::cms::StrLenFunction::integrate();
