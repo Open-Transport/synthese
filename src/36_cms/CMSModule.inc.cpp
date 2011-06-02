@@ -16,6 +16,7 @@
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"
 #include "IfFunction.hpp"
+#include "OrService.hpp"
 #include "EqualFunction.hpp"
 #include "SuperiorFunction.hpp"
 #include "AndFunction.hpp"
