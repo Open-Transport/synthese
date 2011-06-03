@@ -237,8 +237,11 @@ namespace synthese
 						}
 						stream <<
 							" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
-							" levenshtein=\"" << it.placeResult.score.levenshtein << "\">"
-						;
+							" levenshtein=\"" << it.placeResult.score.levenshtein << "\"" <<
+							" cityId=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getCity()->getKey() << "\"" <<
+							" cityName=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getCity()->getName() << "\"" <<
+							" name=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getName() << "\"" <<
+						">";
 
 						if(dynamic_cast<const House*>(it.placeResult.value.get()) && dynamic_cast<const House*>(it.placeResult.value.get())->getHouseNumber())
 						{
