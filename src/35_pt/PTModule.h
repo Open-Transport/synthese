@@ -27,6 +27,8 @@
 #include "GraphModuleTemplate.h"
 #include "SecurityTypes.hpp"
 #include "Registry.h"
+#include "LexicalMatcher.h"
+#include "RoadModule.h"
 
 #include <vector>
 #include <utility>
@@ -39,6 +41,10 @@ namespace synthese
 		class Journey;
 	}
 
+	namespace geography
+	{
+		class Place;
+	}
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 35 Transport network module namespace.
@@ -120,6 +126,24 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> > GeneralStopsMatcher;
+
+		private:
+			static GeneralStopsMatcher _generalStopsMatcher;
+
+		public:
+			static GeneralStopsMatcher& GetGeneralStopsMatcher();
+
+			static road::RoadModule::ExtendedFetchPlacesResult ExtendedFetchPlaces(
+				const std::string& placeName,
+				std::size_t resultsNumber
+			);
+
+			static boost::shared_ptr<geography::Place> FetchPlace(
+				const std::string& placeName
+			);
+
 
 			static void RTDataCleaner();
 
