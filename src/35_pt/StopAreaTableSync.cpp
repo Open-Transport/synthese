@@ -30,6 +30,7 @@
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
+#include "PTModule.h"
 
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -176,6 +177,7 @@ namespace synthese
 							city->removeIncludedPlace(cp);
 						}
 						city->addPlaceToMatcher<StopArea>(env.getEditableSPtr(cp));
+						PTModule::GetGeneralStopsMatcher().add(cp->getFullName(), env.getEditableSPtr(cp));
 					}
 				}
 				catch(ObjectNotFoundException<City>& e)
@@ -227,6 +229,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
+			PTModule::GetGeneralStopsMatcher().remove(cp->getFullName());
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{
