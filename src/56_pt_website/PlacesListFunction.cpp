@@ -157,20 +157,19 @@ namespace synthese
 			else
 			{
 				_cityText = map.get<string>(PARAMETER_CITY_TEXT);
-				if(_cityText.empty())
+				if(!_cityText.empty())
 				{
-					throw RequestException("City text must be non empty or city id must be defined");
+					const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+					if(!site) throw RequestException("Incorrect site");
+					GeographyModule::CitiesMatcher::MatchResult cities(
+						site->getCitiesMatcher().bestMatches(_cityText,1)
+						);
+					if(cities.empty())
+					{
+						throw RequestException("No city was found");
+					}
+					_city = cities.front().value;
 				}
-				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-				if(!site) throw RequestException("Incorrect site");
-				GeographyModule::CitiesMatcher::MatchResult cities(
-					site->getCitiesMatcher().bestMatches(_cityText,1)
-				);
-				if(cities.empty())
-				{
-					throw RequestException("No city was found");
-				}
-				_city = cities.front().value;
 			}
 		}
 
@@ -188,9 +187,11 @@ namespace synthese
 				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 				RoadModule::ExtendedFetchPlacesResult places(
 					_city.get() ?
-					RoadModule::ExtendedFetchPlaces(_city, _input, *_n) :
-					RoadModule::ExtendedFetchPlaces(site->getCitiesMatcher(), _cityText, _input, *_n)
-				);
+					RoadModule::ExtendedFetchPlaces(_city, _input, *_n) :(
+						_cityText.empty() ?
+						PTModule::ExtendedFetchPlaces(_input, *_n) :
+						RoadModule::ExtendedFetchPlaces(site->getCitiesMatcher(), _cityText, _input, *_n)
+				)	);
 
 				if(_page.get() || _itemPage.get())
 				{

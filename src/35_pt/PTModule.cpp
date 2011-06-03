@@ -66,7 +66,10 @@ namespace synthese
 	using namespace pt;
 	using namespace security;
 	using namespace graph;
-
+	using namespace road;
+	using namespace geography;
+	using namespace lexical_matcher;
+	
 
 	namespace graph
 	{
@@ -141,6 +144,8 @@ namespace synthese
 
 	namespace pt
 	{
+		PTModule::GeneralStopsMatcher PTModule::_generalStopsMatcher;
+
 		void PTModule::RTDataCleaner()
 		{
 			while(true)
@@ -287,4 +292,61 @@ namespace synthese
 			return result;
 		}
 
+
+
+		PTModule::GeneralStopsMatcher& PTModule::GetGeneralStopsMatcher()
+		{
+			return _generalStopsMatcher;
+		}
+
+
+
+		RoadModule::ExtendedFetchPlacesResult PTModule::ExtendedFetchPlaces(
+			const std::string& placeName,
+			std::size_t resultsNumber
+		){
+			RoadModule::ExtendedFetchPlacesResult result;
+
+			GeneralStopsMatcher::MatchResult places(
+				_generalStopsMatcher.bestMatches(placeName, resultsNumber)
+			);
+			BOOST_FOREACH(const GeneralStopsMatcher::MatchResult::value_type& place, places)
+			{
+				if(!dynamic_cast<NamedPlace*>(place.value.get()))
+				{
+					continue;
+				}
+
+				City* city(const_cast<City*>(dynamic_pointer_cast<NamedPlace,Place>(place.value)->getCity()));
+
+				GeographyModule::CitiesMatcher::MatchResult::value_type cityResult;
+				cityResult.key = FrenchSentence(city->getName()+" "+ city->getCode());
+				cityResult.score.levenshtein = 0;
+				cityResult.score.phoneticScore = 1;
+				cityResult.value = Env::GetOfficialEnv().getEditableSPtr(city);
+
+				RoadModule::ExtendedFetchPlaceResult placeResult;
+				placeResult.cityResult = cityResult;
+				placeResult.placeResult.key = place.key;
+				placeResult.placeResult.score = place.score;
+				placeResult.placeResult.value = place.value;
+
+				result.push_back(placeResult);
+			}
+
+			return result;
+
+		}
+
+
+
+		boost::shared_ptr<geography::Place> PTModule::FetchPlace( const std::string& placeName )
+		{
+			road::RoadModule::ExtendedFetchPlacesResult places(
+				ExtendedFetchPlaces(
+					placeName,
+					1
+			)	);
+			return places.empty() ? shared_ptr<Place>() : places.begin()->placeResult.value;
+		}
 }	}

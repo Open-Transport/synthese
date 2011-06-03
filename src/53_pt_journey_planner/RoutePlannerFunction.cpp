@@ -65,6 +65,7 @@
 #include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 #include "SentAlarm.h"
+#include "PTModule.h"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -288,18 +289,38 @@ namespace synthese
 			{
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
-				if (_originCityText.empty() || _destinationCityText.empty())
+				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
+				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
+				if(	_originCityText.empty() && _originPlaceText.empty() ||
+					_destinationCityText.empty() && _destinationPlaceText.empty()
+				){
 					_home = true;
-				else
-				{
-					_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
-					_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
 				}
 			}
 			if (!_home)
 			{
-				_departure_place = site->extendedFetchPlace(_originCityText, _originPlaceText);
-				_arrival_place = site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
+				if(_originCityText.empty())
+				{
+					RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
+					if(!results.empty())
+					{
+						_departure_place = *results.begin();
+				}	}
+				else
+				{
+					_departure_place = site->extendedFetchPlace(_originCityText, _originPlaceText);
+				}
+				if(_destinationCityText.empty())
+				{
+					RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
+					if(!results.empty())
+					{
+						_arrival_place = *results.begin();
+				}	}
+				else
+				{
+					_arrival_place = site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
+				}
 			}
 
 			try
