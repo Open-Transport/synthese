@@ -48,6 +48,7 @@ namespace synthese
 
 				static const std::string TAB_STOPS_WITHOUT_COORDINATE;
 				static const std::string TAB_CITIES_WITHOUT_MAIN_STOP;
+				static const std::string TAB_EDGES_AND_GEOMETRIES;
 			//@}
 
 		private:
