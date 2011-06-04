@@ -36,7 +36,10 @@
 #include "StopPointAdmin.hpp"
 #include "PTPlacesAdmin.h"
 
+#include <geos/geom/LineString.h>
+
 using namespace std;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -47,6 +50,7 @@ namespace synthese
 	using namespace pt;
 	using namespace html;
 	using namespace geography;
+	using namespace graph;
 
 	namespace util
 	{
@@ -65,6 +69,7 @@ namespace synthese
 
 		const string PTQualityControlAdmin::TAB_STOPS_WITHOUT_COORDINATE("swc");
 		const string PTQualityControlAdmin::TAB_CITIES_WITHOUT_MAIN_STOP("cwm");
+		const string PTQualityControlAdmin::TAB_EDGES_AND_GEOMETRIES("eag");
 
 
 
@@ -148,6 +153,8 @@ namespace synthese
 				}
 			}
 
+			////////////////////////////////////////////////////////////////////
+			// CITIES_WITHOUT_MAIN_STOP TAB
 			if (openTabContent(stream, TAB_CITIES_WITHOUT_MAIN_STOP))
 			{
 				if(_runControl && getCurrentTab() == getActiveTab())
@@ -169,6 +176,128 @@ namespace synthese
 						stream << t.row();
 						stream << t.col() << it.second->getName();
 						stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlacesAdmin::ICON);
+					}
+					stream << t.close();
+				}
+				else
+				{
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					runRequest.getPage()->setRunControl(true);
+
+					stream <<
+						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						"</p>"
+					;
+				}
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// CITIES_WITHOUT_MAIN_STOP TAB
+			if (openTabContent(stream, TAB_EDGES_AND_GEOMETRIES))
+			{
+				if(_runControl && getCurrentTab() == getActiveTab())
+				{
+					// Gathering different geometries of similar edges, for each pair of stops
+					typedef std::map<std::pair<Vertex*, Vertex*>, set<LineString*> > GeometriesMap;
+					GeometriesMap resultMap;
+
+					// Scan of each stop
+					BOOST_FOREACH(const StopPoint::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<StopPoint>())
+					{
+						// Scan of each edge starting at the stop
+						BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, it.second->getDepartureEdges())
+						{
+							const Edge* edge(itEdge.second);
+							const Edge* nextEdge(edge->getNext());
+
+							// If the edge is a path termination, ignore it
+							if(!nextEdge)
+							{
+								continue;
+							}
+
+							Vertex* vertex(edge->getFromVertex());
+							Vertex* nextVertex(nextEdge->getFromVertex());
+
+							// Comparison of the edge geometry and other geometries of similar edges
+							GeometriesMap::iterator itGeom(resultMap.find(make_pair(vertex, nextVertex)));
+
+							// If no similar edges, immediate storage of the geometry
+							if(itGeom == resultMap.end())
+							{
+								set<LineString*> geoms;
+								geoms.insert(edge->getGeometry().get());
+								resultMap.insert(
+									make_pair(
+										make_pair(vertex, nextVertex),
+										geoms
+								)	);
+							}
+							else
+							{
+								bool toInsert(true);
+								if(edge->getGeometry().get())
+								{
+									// If a similar edge has the same geometry then ignore the current edge
+									BOOST_FOREACH(const GeometriesMap::mapped_type::value_type& itg, itGeom->second)
+									{
+										if(itg && *edge->getGeometry()->getCoordinates() == *itg->getCoordinates())
+										{
+											toInsert = false;
+											break;
+										}
+									}
+								}
+								else
+								{
+									// If an edge already has no geometry, ignore the current edge
+									BOOST_FOREACH(const GeometriesMap::mapped_type::value_type& itg, itGeom->second)
+									{
+										if(!itg)
+										{
+											toInsert = false;
+											break;
+										}
+									}
+								}
+								if(toInsert)
+								{
+									itGeom->second.insert(edge->getGeometry().get());
+								}
+							}
+					}	}
+
+					// Display of the table
+					HTMLTable::ColsVector c;
+					c.push_back("Arrêt départ");
+					c.push_back("Arrêt départ");
+					c.push_back("Arrêt départ");
+					c.push_back("Arrêt arrivée");
+					c.push_back("Arrêt arrivée");
+					c.push_back("Arrêt arrivée");
+					c.push_back("Statut");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+
+					stream << t.open();
+					BOOST_FOREACH(const GeometriesMap::value_type& itResult, resultMap)
+					{
+						if(itResult.second.size() == 1 && *itResult.second.begin())
+						{
+							continue;
+						}
+
+						const StopPoint& first(static_cast<const StopPoint&>(*itResult.first.first));
+						const StopPoint& second(static_cast<const StopPoint&>(*itResult.first.second));
+
+						stream << t.row();
+						stream << t.col() << first.getConnectionPlace()->getCity()->getName();
+						stream << t.col() << first.getConnectionPlace()->getName();
+						stream << t.col() << first.getName();
+						stream << t.col() << second.getConnectionPlace()->getCity()->getName();
+						stream << t.col() << second.getConnectionPlace()->getName();
+						stream << t.col() << second.getName();
+						stream << t.col() << ((itResult.second.size() == 1 && !*itResult.second.begin()) ? "Pas de géométrie" : "Plusieurs géométries");
 					}
 					stream << t.close();
 				}
@@ -227,6 +356,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Arrêts non localisés", TAB_STOPS_WITHOUT_COORDINATE, false));
 			_tabs.push_back(Tab("Localités sans arrêt principal", TAB_CITIES_WITHOUT_MAIN_STOP, false));
+			_tabs.push_back(Tab("Itinéraires de lignes", TAB_EDGES_AND_GEOMETRIES, false));
 
 			_tabBuilded = true;
 		}
