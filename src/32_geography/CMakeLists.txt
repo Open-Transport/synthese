@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(geography_SRCS
 City.cpp

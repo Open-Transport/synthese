@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(tree_SRCS
 AdminPageTreeTemplate.hpp

@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(lexical_matcher_SRCS
 FrenchPhoneticString.cpp

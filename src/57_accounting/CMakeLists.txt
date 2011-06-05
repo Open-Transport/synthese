@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(accounting_SRCS
 Account.cpp

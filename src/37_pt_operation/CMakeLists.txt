@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(pt_operation_SRCS
 Composition.cpp

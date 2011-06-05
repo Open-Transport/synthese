@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(cms_SRCS
 AndFunction.cpp

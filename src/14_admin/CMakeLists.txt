@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(admin_SRCS
 AdminActionFunctionRequest.hpp

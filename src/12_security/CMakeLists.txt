@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(security_SRCS
 AddProfileAction.cpp

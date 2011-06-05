@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(messages_SRCS
 AddScenarioAction.cpp

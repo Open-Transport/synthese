@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(pt_SRCS
 AdvancedSelectTableSync.cpp

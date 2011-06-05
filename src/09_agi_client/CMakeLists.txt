@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(agi_client_SRCS
 cagi.c
