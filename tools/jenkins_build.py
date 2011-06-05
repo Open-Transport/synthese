@@ -40,10 +40,12 @@ default_config = {
 config = {}
 
 def run_synthesepy(command, tool, mode, global_args, command_args, environ,
-                   ignore_failure=False):
+                   verbose=False, ignore_failure=False):
 
     thisdir = os.path.abspath(os.path.dirname(__file__))
     synthesepy_path = os.path.join(thisdir, "synthese.py")
+    if verbose:
+        global_args.append("-v")
     args = ([sys.executable, synthesepy_path, "-t", tool, "-m", mode] +
         global_args + [command] + command_args)
     log.debug("Running command: %s", args)
@@ -78,7 +80,11 @@ def build(options):
     environ["SYNTHESE_MYSQL_DB"] = c["mysql_db"]
 
     run_synthesepy(
-        "build", options.tool, options.mode, [], ["--with-mysql"], environ)
+        "build", options.tool, options.mode,
+        [],
+        ["--with-mysql"],
+        environ,
+        options.verbose)
 
     dbconns = [
         "mysql://debug=1,{mysql_params},db={mysql_db}".format(**c), "sqlite://"]
@@ -86,7 +92,9 @@ def build(options):
         "runtests", options.tool, options.mode,
         ["-v", "-s", "-p", c["port"]],
         ["--dbconns"] + dbconns,
-        environ, options.test_failure_not_fatal)
+        environ,
+        options.verbose,
+        options.test_failure_not_fatal)
 
 
 if __name__ == "__main__":
