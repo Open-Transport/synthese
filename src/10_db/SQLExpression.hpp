@@ -104,6 +104,10 @@ namespace synthese
 			static const std::string OP_NOTIN;
 			static const std::string OP_EXISTS;
 			static const std::string OP_DIFF;
+			static const std::string OP_ADD;
+			static const std::string OP_SUB;
+			static const std::string OP_MUL;
+			static const std::string OP_DIV;
 
 		private:
 			boost::shared_ptr<SQLExpression> _expr1;

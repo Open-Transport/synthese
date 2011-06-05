@@ -35,6 +35,9 @@
 #include "AdminFunctionRequest.hpp"
 #include "StopPointAdmin.hpp"
 #include "PTPlacesAdmin.h"
+#include "CopyGeometriesAction.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "JourneyPatternCopy.hpp"
 
 #include <geos/geom/LineString.h>
 
@@ -212,7 +215,7 @@ namespace synthese
 							const Edge* nextEdge(edge->getNext());
 
 							// If the edge is a path termination, ignore it
-							if(!nextEdge)
+							if(!nextEdge || dynamic_cast<JourneyPatternCopy*>(edge->getParentPath()))
 							{
 								continue;
 							}
@@ -242,7 +245,7 @@ namespace synthese
 									// If a similar edge has the same geometry then ignore the current edge
 									BOOST_FOREACH(const GeometriesMap::mapped_type::value_type& itg, itGeom->second)
 									{
-										if(itg && *edge->getGeometry()->getCoordinates() == *itg->getCoordinates())
+										if(itg && *edge->getGeometry()->getCoordinatesRO() == *itg->getCoordinatesRO())
 										{
 											toInsert = false;
 											break;
@@ -270,6 +273,7 @@ namespace synthese
 
 					// Display of the table
 					HTMLTable::ColsVector c;
+					c.push_back("#");
 					c.push_back("Arrêt départ");
 					c.push_back("Arrêt départ");
 					c.push_back("Arrêt départ");
@@ -277,9 +281,13 @@ namespace synthese
 					c.push_back("Arrêt arrivée");
 					c.push_back("Arrêt arrivée");
 					c.push_back("Statut");
+					c.push_back("Action");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
+					AdminActionFunctionRequest<CopyGeometriesAction,PTQualityControlAdmin> copyRequest(request);
+
 					stream << t.open();
+					size_t r(0);
 					BOOST_FOREACH(const GeometriesMap::value_type& itResult, resultMap)
 					{
 						if(itResult.second.size() == 1 && *itResult.second.begin())
@@ -290,14 +298,31 @@ namespace synthese
 						const StopPoint& first(static_cast<const StopPoint&>(*itResult.first.first));
 						const StopPoint& second(static_cast<const StopPoint&>(*itResult.first.second));
 
+						bool noGeometry(itResult.second.size() == 1 && !*itResult.second.begin());
+						bool severalGeometries(!noGeometry);
+
 						stream << t.row();
+						stream << t.col() << r++;
 						stream << t.col() << first.getConnectionPlace()->getCity()->getName();
 						stream << t.col() << first.getConnectionPlace()->getName();
 						stream << t.col() << first.getName();
 						stream << t.col() << second.getConnectionPlace()->getCity()->getName();
 						stream << t.col() << second.getConnectionPlace()->getName();
 						stream << t.col() << second.getName();
-						stream << t.col() << ((itResult.second.size() == 1 && !*itResult.second.begin()) ? "Pas de géométrie" : "Plusieurs géométries");
+						stream << t.col() << (noGeometry ? "Pas de géométrie" : "Plusieurs géométries");
+
+						// Copy geometry button, only for edges with several geometries
+						stream << t.col();
+						if(severalGeometries)
+						{
+							copyRequest.getAction()->setStartingStop(
+								Env::GetOfficialEnv().getSPtr(&first)
+							);
+							copyRequest.getAction()->setEndingStop(
+								Env::GetOfficialEnv().getSPtr(&second)
+							);
+							stream << HTMLModule::getLinkButton(copyRequest.getURL(), "Uniformiser", "Etes-vous sûr de vouloir uniformiser les géométries ?\\n La géométrie la plus détaillée sera conservée et copiée sur chaque ligne.");
+						}
 					}
 					stream << t.close();
 				}

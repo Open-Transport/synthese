@@ -87,12 +87,19 @@ namespace synthese
 		private:
 			//////////////////////////////////////////////////////////////////////////
 			/// Replacement of * fields getter to ensure conversion of geometry
-			/// columns into WKB format
+			/// columns into WKT format
 			/// @author Hugues Romain
 			/// @since 3.2.0
 			/// @date 2010
 			static std::string _fieldsGetter;
 
+		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Public getter of the last attribute.
+			/// @author Hugues Romain
+			/// @since 3.3.0
+			/// @date 2011
+			static const std::string GetFieldsGetter() { return _fieldsGetter; }
 
 
 		private:

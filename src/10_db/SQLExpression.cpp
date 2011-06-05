@@ -42,6 +42,10 @@ namespace synthese
 		const string ComposedExpression::OP_IN("IN");
 		const string ComposedExpression::OP_NOTIN("NOT IN");
 		const string ComposedExpression::OP_DIFF("!=");
+		const string ComposedExpression::OP_ADD("+");
+		const string ComposedExpression::OP_SUB("-");
+		const string ComposedExpression::OP_MUL("*");
+		const string ComposedExpression::OP_DIV("/");
 
 
 		string FieldExpression::toString() const
