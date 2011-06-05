@@ -25,6 +25,8 @@ IfFunction.cpp
 IfFunction.hpp
 LanguageSelectorService.cpp
 LanguageSelectorService.hpp
+OrService.cpp
+OrService.hpp
 StrLenFunction.cpp
 StrLenFunction.hpp
 SubstractFunction.cpp
