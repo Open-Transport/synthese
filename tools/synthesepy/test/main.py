@@ -169,7 +169,10 @@ class Tester(object):
         if not utils.find_executable('ctest' + self.env.platform_exe_suffix):
             raise Exception('Unable to find ctest in PATH')
 
-        subprocess.check_call('ctest', cwd=self.env.env_path)
+        args = ['ctest']
+        if self.env.verbose:
+            args.append('-V')
+        subprocess.check_call(args, cwd=self.env.env_path)
 
         return True
 
