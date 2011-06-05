@@ -40,7 +40,9 @@ MessagesLibraryRight.h
 MessagesLog.cpp
 MessagesLog.h
 MessagesModule.cpp
+MessagesModule.gen.cpp
 MessagesModule.h
+MessagesModule.inc.cpp
 MessagesObjectsCMSExporters.cpp
 MessagesObjectsCMSExporters.hpp
 MessagesRight.cpp
@@ -101,6 +103,8 @@ UpdateAlarmMessagesFromTemplateAction.h
 UpdateTextTemplateAction.cpp
 UpdateTextTemplateAction.h
 )
+
+set_source_files_properties(MessagesModule.gen.cpp MessagesModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(17_messages ${messages_SRCS})
 

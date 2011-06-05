@@ -26,7 +26,9 @@ SecurityConstants.hpp
 SecurityLog.cpp
 SecurityLog.h
 SecurityModule.cpp
+SecurityModule.gen.cpp
 SecurityModule.h
+SecurityModule.inc.cpp
 SecurityRight.cpp
 SecurityRight.h
 SecurityTypes.hpp
@@ -57,6 +59,8 @@ UserTableSync.h
 UserUpdateAction.cpp
 UserUpdateAction.h
 )
+
+set_source_files_properties(SecurityModule.gen.cpp SecurityModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(12_security ${security_SRCS})
 

@@ -27,7 +27,9 @@ MapBackgroundTile.h
 MapInfoRenderer.cpp
 MapInfoRenderer.h
 MapModule.cpp
+MapModule.gen.cpp
 MapModule.h
+MapModule.inc.cpp
 MapRequest.cpp
 MapRequest.h
 PostscriptCanvas.cpp
@@ -51,6 +53,8 @@ WFSTypeTemplate.hpp
 XmlBuilder.cpp
 XmlBuilder.h
 )
+
+set_source_files_properties(MapModule.gen.cpp MapModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(39_map ${map_SRCS})
 

@@ -13,7 +13,9 @@ ForumMessagesFunction.hpp
 ForumMessageTableSync.cpp
 ForumMessageTableSync.hpp
 ForumModule.cpp
+ForumModule.gen.cpp
 ForumModule.hpp
+ForumModule.inc.cpp
 ForumRight.cpp
 ForumRight.hpp
 ForumTopic.cpp
@@ -27,6 +29,8 @@ ForumTopicsFunction.hpp
 ForumTopicTableSync.cpp
 ForumTopicTableSync.hpp
 )
+
+set_source_files_properties(ForumModule.gen.cpp ForumModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(52_forum ${forum_SRCS})
 

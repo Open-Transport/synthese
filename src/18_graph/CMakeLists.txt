@@ -8,7 +8,9 @@ Edge.h
 ForbiddenUseRule.cpp
 ForbiddenUseRule.h
 GraphConstants.h
+GraphModule.gen.cpp
 GraphModule.h
+GraphModule.inc.cpp
 GraphModuleTemplate.h
 GraphTypes.h
 Hub.h
@@ -37,6 +39,8 @@ Vertex.h
 VertexAccessMap.cpp
 VertexAccessMap.h
 )
+
+set_source_files_properties(GraphModule.gen.cpp GraphModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(18_graph ${graph_SRCS})
 

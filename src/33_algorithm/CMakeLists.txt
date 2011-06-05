@@ -1,7 +1,9 @@
 
 set(algorithm_SRCS
 AlgorithmModule.cpp
+AlgorithmModule.gen.cpp
 AlgorithmModule.h
+AlgorithmModule.inc.cpp
 AlgorithmTypes.h
 BestVertexReachesMap.cpp
 BestVertexReachesMap.h
@@ -23,6 +25,8 @@ RoutePlanningUserPrefPanel.h
 TimeSlotRoutePlanner.cpp
 TimeSlotRoutePlanner.h
 )
+
+set_source_files_properties(AlgorithmModule.gen.cpp AlgorithmModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(33_algorithm ${algorithm_SRCS})
 

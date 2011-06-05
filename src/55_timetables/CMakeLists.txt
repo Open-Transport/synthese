@@ -15,7 +15,9 @@ TimetableGenerateFunction.h
 TimetableGenerator.cpp
 TimetableGenerator.h
 TimetableModule.cpp
+TimetableModule.gen.cpp
 TimetableModule.h
+TimetableModule.inc.cpp
 TimetableResult.cpp
 TimetableResult.hpp
 TimetableRight.cpp
@@ -41,6 +43,8 @@ TimetableUpdateAction.h
 TimetableWarning.cpp
 TimetableWarning.h
 )
+
+set_source_files_properties(TimetableModule.gen.cpp TimetableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(55_timetables ${timetables_SRCS})
 

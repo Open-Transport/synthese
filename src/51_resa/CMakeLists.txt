@@ -41,7 +41,9 @@ ResaLogAdmin.h
 ResaLogEntryUpdateAction.cpp
 ResaLogEntryUpdateAction.h
 ResaModule.cpp
+ResaModule.gen.cpp
 ResaModule.h
+ResaModule.inc.cpp
 ResaRight.cpp
 ResaRight.h
 ResaStatisticsAdmin.cpp
@@ -96,6 +98,8 @@ ServiceReservations.h
 XMLReservationFunction.cpp
 XMLReservationFunction.h
 )
+
+set_source_files_properties(ResaModule.gen.cpp ResaModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(51_resa ${resa_SRCS})
 
