@@ -49,7 +49,9 @@ ServerAdminRight.cpp
 ServerAdminRight.h
 ServerConstants.h
 ServerModule.cpp
+ServerModule.gen.cpp
 ServerModule.h
+ServerModule.inc.cpp
 ServerModuleException.cpp
 ServerModuleException.h
 ServerModuleVersionInterfaceElement.cpp
@@ -73,6 +75,8 @@ XMLSessionFunction.h
 XMLSessionIsValidFunction.cpp
 XMLSessionIsValidFunction.h
 )
+
+set_source_files_properties(ServerModule.gen.cpp ServerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 # For compiling Boost random_device.cpp, this define has to be set.
 # To be removed once migrated to Boost 1.45.

@@ -5,10 +5,14 @@ RoadJourneyPlanner.h
 RoadJourneyPlannerAdmin.cpp
 RoadJourneyPlannerAdmin.h
 RoadJourneyPlannerModule.cpp
+RoadJourneyPlannerModule.gen.cpp
 RoadJourneyPlannerModule.hpp
+RoadJourneyPlannerModule.inc.cpp
 RoadJourneyPlannerResult.cpp
 RoadJourneyPlannerResult.h
 )
+
+set_source_files_properties(RoadJourneyPlannerModule.gen.cpp RoadJourneyPlannerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(59_road_journey_planner ${road_journey_planner_SRCS})
 

@@ -23,7 +23,9 @@ GetCompositionsService.hpp
 GetVehiclesService.cpp
 GetVehiclesService.hpp
 PTOperationModule.cpp
+PTOperationModule.gen.cpp
 PTOperationModule.hpp
+PTOperationModule.inc.cpp
 PTOperationStatisticsAdmin.cpp
 PTOperationStatisticsAdmin.hpp
 PTOperationStatisticsTableSync.cpp
@@ -34,10 +36,10 @@ VehicleAdmin.cpp
 VehicleAdmin.hpp
 VehiclePosition.cpp
 VehiclePosition.hpp
-VehiclePositionUpdateAction.cpp
-VehiclePositionUpdateAction.hpp
 VehiclePositionTableSync.cpp
 VehiclePositionTableSync.hpp
+VehiclePositionUpdateAction.cpp
+VehiclePositionUpdateAction.hpp
 VehiclesAdmin.cpp
 VehiclesAdmin.hpp
 VehicleTableSync.cpp
@@ -45,6 +47,8 @@ VehicleTableSync.hpp
 VehicleUpdateAction.cpp
 VehicleUpdateAction.hpp
 )
+
+set_source_files_properties(PTOperationModule.gen.cpp PTOperationModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(37_pt_operation ${pt_operation_SRCS})
 

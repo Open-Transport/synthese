@@ -1,7 +1,9 @@
 
 set(hiking_SRCS
 HikingModule.cpp
+HikingModule.gen.cpp
 HikingModule.h
+HikingModule.inc.cpp
 HikingRight.cpp
 HikingRight.h
 HikingTrail.cpp
@@ -29,6 +31,8 @@ HikingTrailTableSync.h
 HikingTrailUpdateAction.cpp
 HikingTrailUpdateAction.h
 )
+
+set_source_files_properties(HikingModule.gen.cpp HikingModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(58_hiking ${hiking_SRCS})
 

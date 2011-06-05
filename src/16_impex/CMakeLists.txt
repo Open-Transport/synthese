@@ -16,7 +16,9 @@ ExportFunction.hpp
 FileFormat.h
 FileFormatTemplate.h
 ImpExModule.cpp
+ImpExModule.gen.cpp
 ImpExModule.h
+ImpExModule.inc.cpp
 Importable.cpp
 Importable.h
 ImportableAdmin.cpp
@@ -32,6 +34,8 @@ NoImportPolicy.hpp
 OneFileExporter.hpp
 OneFileTypeImporter.hpp
 )
+
+set_source_files_properties(ImpExModule.gen.cpp ImpExModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 if(WIN32)
   include_directories("${ICONV_INCLUDE_DIRS}")

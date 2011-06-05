@@ -29,7 +29,9 @@ TransportSiteAdmin.h
 TransportWebsite.cpp
 TransportWebsite.h
 TransportWebsiteModule.cpp
+TransportWebsiteModule.gen.cpp
 TransportWebsiteModule.h
+TransportWebsiteModule.inc.cpp
 TransportWebsiteRight.cpp
 TransportWebsiteRight.h
 TransportWebsiteTableSync.cpp
@@ -42,6 +44,8 @@ UserFavoriteJourney.h
 UserFavoriteJourneyTableSync.cpp
 UserFavoriteJourneyTableSync.h
 )
+
+set_source_files_properties(TransportWebsiteModule.gen.cpp TransportWebsiteModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(56_pt_website ${pt_website_SRCS})
 

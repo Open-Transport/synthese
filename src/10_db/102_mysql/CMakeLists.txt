@@ -6,9 +6,13 @@ MySQLDBModifiedAction.cpp
 MySQLDBModifiedAction.hpp
 MySQLException.cpp
 MySQLException.hpp
+MySQLModule.gen.cpp
+MySQLModule.inc.cpp
 MySQLResult.cpp
 MySQLResult.hpp
 )
+
+set_source_files_properties(MySQLModule.gen.cpp MySQLModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 include_directories(${MYSQL_INCLUDE_DIR})
 

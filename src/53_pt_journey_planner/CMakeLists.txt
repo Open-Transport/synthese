@@ -3,7 +3,9 @@ set(pt_journey_planner_SRCS
 PTRoutePlannerInputFunction.cpp
 PTRoutePlannerInputFunction.hpp
 PTRoutePlannerModule.cpp
+PTRoutePlannerModule.gen.cpp
 PTRoutePlannerModule.h
+PTRoutePlannerModule.inc.cpp
 PTRoutePlannerResult.cpp
 PTRoutePlannerResult.h
 PTTimeSlotRoutePlanner.cpp
@@ -11,6 +13,8 @@ PTTimeSlotRoutePlanner.h
 RoutePlannerFunction.cpp
 RoutePlannerFunction.h
 )
+
+set_source_files_properties(PTRoutePlannerModule.gen.cpp PTRoutePlannerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(53_pt_journey_planner ${pt_journey_planner_SRCS})
 

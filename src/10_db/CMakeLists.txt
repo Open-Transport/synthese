@@ -14,7 +14,9 @@ DBInheritedNoSyncTableSyncTemplate.hpp
 DBInheritedRegistryTableSync.hpp
 DBInheritedTableSyncTemplate.hpp
 DBModule.cpp
+DBModule.gen.cpp
 DBModule.h
+DBModule.inc.cpp
 DBNoSyncTableSyncTemplate.hpp
 DBRegistryTableSyncTemplate.hpp
 DBResult.cpp
@@ -45,6 +47,8 @@ UpdateQuery.hpp
 VirtualShapeVirtualTable.cpp
 VirtualShapeVirtualTable.hpp
 )
+
+set_source_files_properties(DBModule.gen.cpp DBModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 include_directories(${SPATIALITE_INCLUDE_DIRS})
 

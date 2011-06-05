@@ -11,7 +11,9 @@ DBLogEntryTableSync.h
 DBLogHTMLView.cpp
 DBLogHTMLView.h
 DBLogModule.cpp
+DBLogModule.gen.cpp
 DBLogModule.h
+DBLogModule.inc.cpp
 DBLogPurgeAction.cpp
 DBLogPurgeAction.h
 DBLogRight.cpp
@@ -19,6 +21,8 @@ DBLogRight.h
 DBLogTemplate.cpp
 DBLogTemplate.h
 )
+
+set_source_files_properties(DBLogModule.gen.cpp DBLogModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(13_dblog ${dblog_SRCS})
 

@@ -7,7 +7,9 @@ BitAndFunction.hpp
 ChrFunction.cpp
 ChrFunction.hpp
 CMSModule.cpp
+CMSModule.gen.cpp
 CMSModule.hpp
+CMSModule.inc.cpp
 CMSRight.cpp
 CMSRight.hpp
 DateService.cpp
@@ -74,6 +76,8 @@ WebPageUpdateAction.h
 Website.cpp
 Website.hpp
 )
+
+set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(36_cms ${cms_SRCS})
 
