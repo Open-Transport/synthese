@@ -131,6 +131,8 @@ namespace synthese
 	{
 		DesignatedLinePhysicalStopInheritedTableSync::SearchResult DesignatedLinePhysicalStopInheritedTableSync::Search(
 			Env& env,
+			boost::optional<util::RegistryKeyType> startStop,
+			boost::optional<util::RegistryKeyType> endStop,
 			size_t first,
 			boost::optional<std::size_t> number,
 			bool orderById,
@@ -138,6 +140,23 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<LineStopTableSync> query;
+			
+			if(startStop)
+			{
+				query.addWhereField(COL_PHYSICALSTOPID, *startStop);
+			}
+
+			if(endStop)
+			{
+				query.addWhere(
+					ComposedExpression::Get(
+						SubQueryExpression::Get(
+							string("SELECT b."+ COL_PHYSICALSTOPID +" FROM "+ TABLE.NAME +" AS b WHERE b."+ COL_LINEID +"="+ TABLE.NAME +"."+ COL_LINEID +" AND b."+ COL_RANKINPATH +"="+ TABLE.NAME +"."+ COL_RANKINPATH +"+1")
+						), ComposedExpression::OP_EQ,
+						ValueExpression<RegistryKeyType>::Get(*endStop)
+					)
+				);
+			}
 
 			// Ordering
 			if(orderById)

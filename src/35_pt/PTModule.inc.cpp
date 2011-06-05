@@ -66,6 +66,7 @@
 #include "CommercialLineAddAction.h"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
+#include "CopyGeometriesAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
