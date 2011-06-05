@@ -207,6 +207,25 @@ namespace synthese
 
 		void TimetableGenerateFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Calendar to apply
+			if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0))
+			{
+				try
+				{
+					_calendarTemplate = Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("No such calendar");
+				}
+			}
+			else if(map.getOptional<string>(PARAMETER_DAY))
+			{
+				date curDate(from_string(map.get<string>(PARAMETER_DAY)));
+				_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
+			}
+
+
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
 			{
@@ -222,44 +241,16 @@ namespace synthese
 			else
 			{
 				shared_ptr<Timetable> timetable(new Timetable);
-
-				if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0))
-				{
-					try
-					{
-						timetable->setBaseCalendar(
-							Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID)).get()
-						);
-					}
-					catch(ObjectNotFoundException<CalendarTemplate>&)
-					{
-						throw RequestException("No such calendar");
-					}
-				}
-				else
+				if(!_calendarTemplate.get())
 				{
 					date curDate(day_clock::local_day());
-					if(map.getOptional<string>(PARAMETER_DAY))
-					{
-						curDate = from_string(map.get<string>(PARAMETER_DAY));
-					}
-
-					CalendarTemplate* calendarTemplate(new CalendarTemplate);
-					CalendarTemplateElement element;
-					element.setCalendar(calendarTemplate);
-					element.setInterval(days(1));
-					element.setMinDate(curDate);
-					element.setMaxDate(curDate);
-					element.setOperation(CalendarTemplateElement::ADD);
-					element.setRank(0);
-					calendarTemplate->addElement(element);
-					calendarTemplate->setText(
-						lexical_cast<string>(curDate.day()) + "/" + lexical_cast<string>(static_cast<int>(curDate.month())) + "/" + lexical_cast<string>(curDate.year())
-					);
-					timetable->setBaseCalendar(calendarTemplate);
-					_calendarTemplate.reset(calendarTemplate);
+					_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 				}
-
+				if(!_calendarTemplate->isLimited())
+				{
+					throw RequestException("Calendar must be limited");
+				}
+				timetable->setBaseCalendar(_calendarTemplate.get());
 
 				// Way 2 : line time table
 				if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == JourneyPatternTableSync::TABLE.ID)
@@ -441,6 +432,11 @@ namespace synthese
 			if(_page.get())
 			{
 				auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
+				if(_calendarTemplate.get() && _calendarTemplate->isLimited())
+				{
+					Calendar mask(_calendarTemplate->getResult(generator->getBaseCalendar()));
+					generator->setBaseCalendar(mask);
+				}
 				TimetableResult result(generator->build(true, _warnings));
 				_display(
 					stream,

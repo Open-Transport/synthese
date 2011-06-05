@@ -31,6 +31,7 @@
 #include "Importable.h"
 
 #include <map>
+#include <boost/date_time/gregorian/greg_date.hpp>
 
 namespace synthese
 {
@@ -119,6 +120,10 @@ namespace synthese
 		public:
 			CalendarTemplate(
 				util::RegistryKeyType id = 0
+			);
+
+			CalendarTemplate(
+				const boost::gregorian::date& day
 			);
 
 			//! @name Queries
