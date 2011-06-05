@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(openstreetmap_SRCS
 AttributeMap.cpp

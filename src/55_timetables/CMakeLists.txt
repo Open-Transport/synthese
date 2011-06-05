@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(timetables_SRCS
 MultipleTimetableGenerateFunction.cpp

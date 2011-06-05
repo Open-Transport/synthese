@@ -1,3 +1,5 @@
+set_source_groups()
+
 set(util_threads_SRCS
 ManagedThread.cpp
 ManagedThread.h

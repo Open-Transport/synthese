@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(dblog_SRCS
 DBLog.cpp

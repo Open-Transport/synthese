@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(interfaces_SRCS
 AndValueInterfaceElement.cpp

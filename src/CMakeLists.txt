@@ -1,4 +1,22 @@
 
+macro(set_source_groups)
+  # default group
+  source_group("Sources" REGULAR_EXPRESSION "\\.(cpp|h|hpp)$")
+  source_group("01 Module" REGULAR_EXPRESSION ".*Module\\..*|.*\\gen\\.cpp|.*Types\\.h.*|.*Constants\\.h.*")
+  source_group("01 Exceptions" REGULAR_EXPRESSION ".*Exception\\..*")
+  source_group("10 Table Syncs" REGULAR_EXPRESSION ".*TableSync\\..*")
+  source_group("11 Interface Elements" REGULAR_EXPRESSION ".*InterfaceElement\\..*")
+  source_group("11 Interface Pages" REGULAR_EXPRESSION ".*InterfacePage\\..*")
+  source_group("12 Rights" REGULAR_EXPRESSION ".*Right\\..*|RightTemplate\\.h")
+  source_group("13 DB Logs" REGULAR_EXPRESSION ".*Log\\..*")
+  source_group("14 Admin" REGULAR_EXPRESSION ".*Admin\\..*")
+  source_group("15 Actions" REGULAR_EXPRESSION ".*Action\\..*")
+  source_group("15 Services" REGULAR_EXPRESSION ".*Service\\..*|.*Function\\..*|.*CMSExporters\\..*")
+  source_group("16 File Formats" REGULAR_EXPRESSION ".*FileFormat\\..*")
+  source_group("17 Alarm recipients" REGULAR_EXPRESSION ".*AlarmRecipient\\..*")
+  source_group("39 WFS Types" REGULAR_EXPRESSION ".*WFSType\\..*|WFSTypeTemplate\\.hpp")
+endmacro(set_source_groups)
+
 set(MODULES
 00_framework
 01_util

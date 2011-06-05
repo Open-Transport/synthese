@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(impex_SRCS
 DataSource.cpp

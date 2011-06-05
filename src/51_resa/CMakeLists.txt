@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(resa_SRCS
 BookableCommercialLineAdmin.cpp

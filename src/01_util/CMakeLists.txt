@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(util_SRCS
 AlphanumericFilter.h

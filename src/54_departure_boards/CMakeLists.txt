@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(departure_boards_SRCS
 AddDepartureStopToDisplayScreenAction.cpp

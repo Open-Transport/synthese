@@ -304,6 +304,20 @@ for dir_abs in dirs:
         SUFFIX = ""
         open(t + SUFFIX, "wb").write(cmake_content)
 
+    # Add set_source_groups() macro call
+    if 0:
+        if not os.path.isfile(t):
+            continue
+        content = open(t).read()
+        if "set_source_groups()" in content:
+            continue
+        content = "set_source_groups()\n" + content
+        if 0:
+            print "New content: ----------------"
+            print  content
+            print "-----------------------------"
+        open(t, "wb").write(content)
+
 if replacements:
     def replace_in_file(f):
         content = open(f).read()

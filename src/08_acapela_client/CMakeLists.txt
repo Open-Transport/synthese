@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(acapela_client_SRCS
 PlaybackAcapela.cpp

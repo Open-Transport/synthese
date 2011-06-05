@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(framework_SRCS
 CoordinatesSystem.cpp

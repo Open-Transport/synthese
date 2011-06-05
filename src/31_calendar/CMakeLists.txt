@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(calendar_SRCS
 Calendar.cpp
