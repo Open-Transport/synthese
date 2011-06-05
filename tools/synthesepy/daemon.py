@@ -131,4 +131,4 @@ class Daemon(object):
         time.sleep(2)
         self.proc = None
         self._stop_wsgi_proxy()
-        assert not self._can_connect(self.env.port, False)
+        assert not utils.can_connect(self.env.port, False)
