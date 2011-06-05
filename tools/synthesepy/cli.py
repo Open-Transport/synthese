@@ -165,6 +165,7 @@ def main():
     env.wsgi_proxy_port = env.port + 1
     env.site_id = args.site_id
     env.conn_string = args.conn_string
+    env.verbose = args.verbose
     env.log_stdout = args.log_stdout
     env.static_dir = args.static_dir
     env.extra_params = args.extra_params
