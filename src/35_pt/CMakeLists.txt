@@ -255,6 +255,8 @@ XmlBuilder.h
 
 set_source_files_properties(PTModule.gen.cpp PTModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
+include_directories(${EXPAT_INCLUDE_DIRS})
+
 add_library(35_pt ${pt_SRCS})
 
 target_link_libraries(35_pt
@@ -273,6 +275,7 @@ target_link_libraries(35_pt
   # Forward dependencies:
   #36_cms
   #39_map
+  expat
 )
 
 install(TARGETS 35_pt DESTINATION lib)
