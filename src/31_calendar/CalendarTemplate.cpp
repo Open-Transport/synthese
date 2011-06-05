@@ -23,6 +23,7 @@
 #include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -43,6 +44,24 @@ namespace synthese
 			RegistryKeyType id
 		):	util::Registrable(id)
 		{
+		}
+
+
+
+		CalendarTemplate::CalendarTemplate( const gregorian::date& day ):
+			Registrable(0)
+		{
+			CalendarTemplateElement element;
+			element.setCalendar(this);
+			element.setInterval(days(1));
+			element.setMinDate(day);
+			element.setMaxDate(day);
+			element.setOperation(CalendarTemplateElement::ADD);
+			element.setRank(0);
+			addElement(element);
+			setText(
+				lexical_cast<string>(day.day()) + "/" + lexical_cast<string>(static_cast<int>(day.month())) + "/" + lexical_cast<string>(day.year())
+			);
 		}
 
 
