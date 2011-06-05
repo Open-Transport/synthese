@@ -37,6 +37,7 @@ class Env(object):
     wsgi_proxy_port = None
     site_id = 0
     conn_string = None
+    verbose = False
     log_stdout = False
     static_dir = None
     extra_params = None
