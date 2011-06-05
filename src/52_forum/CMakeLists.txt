@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(forum_SRCS
 ForumInterfacePage.cpp

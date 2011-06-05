@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(hiking_SRCS
 HikingModule.cpp

@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(pt_journey_planner_SRCS
 PTRoutePlannerInputFunction.cpp

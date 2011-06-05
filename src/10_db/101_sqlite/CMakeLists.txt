@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(db_sqlite_SRCS
 SQLiteDB.cpp

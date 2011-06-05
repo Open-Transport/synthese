@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(map_SRCS
 Drawable.cpp

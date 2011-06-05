@@ -1,3 +1,4 @@
+set_source_groups()
 # Build the generated_cmake.cpp.inc and includes_cmake.cpp.inc files.
 
 set(gen_cpp_content "")

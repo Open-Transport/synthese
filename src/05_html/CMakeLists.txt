@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(html_SRCS
 ActionResultHTMLTable.cpp

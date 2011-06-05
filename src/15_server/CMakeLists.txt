@@ -1,3 +1,4 @@
+set_source_groups()
 set(server_SRCS
 Action.h
 ActionException.cpp

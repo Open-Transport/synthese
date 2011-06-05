@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(road_journey_planner_SRCS
 RoadJourneyPlanner.cpp

@@ -1,3 +1,4 @@
+set_source_groups()
 
 set(algorithm_SRCS
 AlgorithmModule.cpp
