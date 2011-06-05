@@ -80,6 +80,9 @@ if(WIN32)
   set_property(TARGET iconv PROPERTY IMPORTED_LOCATION
     "${PROJECT_SOURCE_DIR}/3rd/dev/iconv/lib/libiconv.lib")
 
+  # expat
+  add_definitions(-DXML_STATIC)
+
 endif()
 
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
