@@ -28,6 +28,8 @@ ContinuousServiceTableSync.cpp
 ContinuousServiceTableSync.h
 ContinuousServiceUpdateAction.cpp
 ContinuousServiceUpdateAction.h
+CopyGeometriesAction.cpp
+CopyGeometriesAction.hpp
 DesignatedLinePhysicalStop.cpp
 DesignatedLinePhysicalStop.hpp
 DesignatedLinePhysicalStopInheritedTableSync.cpp
