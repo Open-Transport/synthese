@@ -89,6 +89,9 @@ namespace synthese
 				template<class Table2>
 				void addTableAndEqualOtherJoinAlias(std::string field2, std::string table1, std::string field1 = TABLE_COL_ID, std::string alias2 = std::string());
 
+				template<class Table2>
+				void addTableJoin(boost::shared_ptr<SQLExpression> onClause, std::string alias2 = std::string());
+
 
 				void addOrderField(const std::string& field, bool raisingOrder);
 
@@ -146,6 +149,20 @@ namespace synthese
 				ValueExpression<T>::Get(value),
 					alias
 			)	);
+		}
+
+
+
+		template<class Table1> template<class Table2>
+		void synthese::db::SelectQuery<Table1>::addTableJoin(
+			boost::shared_ptr<SQLExpression> onClause,
+			std::string alias2 /*= std::string()*/
+		){
+			JoinedTable t;
+			t.alias = alias2;
+			t.table = Table2::TABLE.NAME;
+			t.on = onClause;
+			_tables.push_back(t);
 		}
 
 
@@ -304,7 +321,7 @@ namespace synthese
 			// Fields
 			if(_fields.empty())
 			{
-				s << "*";
+				s << Table::GetFieldsGetter();
 			}
 			else
 			{

@@ -62,7 +62,7 @@ namespace synthese
 				if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
 				{
 					const DesignatedLinePhysicalStop& lineStop(static_cast<const DesignatedLinePhysicalStop&>(**it));
-					Edge* newEdge(
+					DesignatedLinePhysicalStop* newEdge(
 						new DesignatedLinePhysicalStop(
 							0,
 							this,
@@ -73,6 +73,7 @@ namespace synthese
 							lineStop.getPhysicalStop(),
 							lineStop.getScheduleInput()
 					)	);
+					newEdge->setGeometry(lineStop.getGeometry());
 					addEdge(*newEdge);
 				}
 				if(dynamic_cast<const LineArea*>(*it))

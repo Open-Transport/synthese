@@ -52,6 +52,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Search of DesignatedLinePhysicalStop objects.
 			/// @param env Environment to populate when loading objects
+			/// @param startStop id of the starting vertex of the edge
+			/// @param endStop id of the ending vertex of the edge
 			/// @param first first element to return
 			/// @param number maximal number of elements to return
 			/// @param orderById order the returned elements by their id
@@ -62,11 +64,13 @@ namespace synthese
 			/// @date 2011
 			static SearchResult Search(
 				util::Env& env,
+				boost::optional<util::RegistryKeyType> startStop = boost::optional<util::RegistryKeyType>(),
+				boost::optional<util::RegistryKeyType> endStop = boost::optional<util::RegistryKeyType>(),
 				std::size_t first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderById = false,
 				bool raisingOrder = false,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
 }	}

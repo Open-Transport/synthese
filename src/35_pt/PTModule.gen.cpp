@@ -74,6 +74,7 @@ synthese::pt::CommercialLineAddAction::integrate();
 synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 synthese::pt::CommercialLineUpdateAction::integrate();
 synthese::pt::ContinuousServiceUpdateAction::integrate();
+synthese::pt::CopyGeometriesAction::integrate();
 synthese::pt::DRTAreaUpdateAction::integrate();
 synthese::pt::JourneyPatternAddAction::integrate();
 synthese::pt::JunctionUpdateAction::integrate();
