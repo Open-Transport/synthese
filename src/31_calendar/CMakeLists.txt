@@ -6,7 +6,9 @@ CalendarDateInterfacePage.cpp
 CalendarDateInterfacePage.hpp
 CalendarHTMLViewer.h
 CalendarModule.cpp
+CalendarModule.gen.cpp
 CalendarModule.h
+CalendarModule.inc.cpp
 CalendarRight.cpp
 CalendarRight.h
 CalendarTemplate.cpp
@@ -32,6 +34,8 @@ CalendarTemplatesListFunction.hpp
 CalendarTemplateTableSync.cpp
 CalendarTemplateTableSync.h
 )
+
+set_source_files_properties(CalendarModule.gen.cpp CalendarModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(31_calendar ${calendar_SRCS})
 

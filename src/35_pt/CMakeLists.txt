@@ -116,6 +116,8 @@ OGTFileFormat.cpp
 OGTFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
+PlaceAliasUpdateAction.cpp
+PlaceAliasUpdateAction.hpp
 PladisStopsFileFormat.cpp
 PladisStopsFileFormat.hpp
 ProjectAllStopPointsAction.cpp
@@ -128,7 +130,9 @@ PTDataCleanerFileFormat.hpp
 PTFileFormat.cpp
 PTFileFormat.hpp
 PTModule.cpp
+PTModule.gen.cpp
 PTModule.h
+PTModule.inc.cpp
 PTNetworkListItemInterfacePage.cpp
 PTNetworkListItemInterfacePage.hpp
 PTNetworksAdmin.cpp
@@ -247,6 +251,8 @@ TridentFileFormat.h
 XmlBuilder.cpp
 XmlBuilder.h
 )
+
+set_source_files_properties(PTModule.gen.cpp PTModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(35_pt ${pt_SRCS})
 

@@ -83,7 +83,6 @@ for dir_abs in dirs:
             glob.glob(join(dir_abs, "*cpp")) +
             glob.glob(join(dir_abs, "*h")) +
             glob.glob(join(dir_abs, "*hpp")))
-        paths = [p for p in paths if "gen.cpp" not in p and "inc.cpp" not in p]
         files = sorted((os.path.basename(p) for p in paths), key=str.lower)
 
         lines = open(t).read().splitlines()
@@ -99,6 +98,14 @@ for dir_abs in dirs:
             print "\n".join(lines)
             print "===END BEFORE"
         lines[start + 1:end] = files
+
+        skip_build_sources = [f for f in files if "gen.cpp" in f or "inc.cpp" in f]
+        if skip_build_sources:
+            lines[end + 1:end + 1] = [
+                "",
+                "set_source_files_properties({} PROPERTIES HEADER_FILE_ONLY 1)".format(
+                    " ".join(skip_build_sources))]
+
         if 1:
             print "AFTER"
             print "\n".join(lines)

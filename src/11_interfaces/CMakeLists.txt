@@ -25,7 +25,9 @@ InterfaceAdmin.h
 InterfaceIdInterfaceElement.cpp
 InterfaceIdInterfaceElement.h
 InterfaceModule.cpp
+InterfaceModule.gen.cpp
 InterfaceModule.h
+InterfaceModule.inc.cpp
 InterfacePage.cpp
 InterfacePage.h
 InterfacePageAddAction.cpp
@@ -76,6 +78,8 @@ Types.h
 ValueElementList.cpp
 ValueElementList.h
 )
+
+set_source_files_properties(InterfaceModule.gen.cpp InterfaceModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(11_interfaces ${interfaces_SRCS})
 

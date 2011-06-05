@@ -15,7 +15,9 @@ CityTableSync.h
 CityUpdateAction.cpp
 CityUpdateAction.h
 GeographyModule.cpp
+GeographyModule.gen.cpp
 GeographyModule.h
+GeographyModule.inc.cpp
 HTMLMap.cpp
 HTMLMap.hpp
 IncludingPlace.cpp
@@ -30,6 +32,8 @@ PlaceAlias.h
 PlaceAliasTableSync.cpp
 PlaceAliasTableSync.h
 )
+
+set_source_files_properties(GeographyModule.gen.cpp GeographyModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(32_geography ${geography_SRCS})
 

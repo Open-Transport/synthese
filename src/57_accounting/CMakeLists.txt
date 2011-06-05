@@ -6,7 +6,9 @@ AccountAddAction.cpp
 AccountAddAction.h
 AccountCreateStockAction.h
 AccountingModule.cpp
+AccountingModule.gen.cpp
 AccountingModule.h
+AccountingModule.inc.cpp
 AccountLockAction.cpp
 AccountLockAction.h
 AccountRenameAction.cpp
@@ -28,6 +30,8 @@ TransactionPartTableSync.h
 TransactionTableSync.cpp
 TransactionTableSync.h
 )
+
+set_source_files_properties(AccountingModule.gen.cpp AccountingModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(57_accounting ${accounting_SRCS})
 

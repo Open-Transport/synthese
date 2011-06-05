@@ -30,7 +30,9 @@ RoadChunk.h
 RoadChunkTableSync.cpp
 RoadChunkTableSync.h
 RoadModule.cpp
+RoadModule.gen.cpp
 RoadModule.h
+RoadModule.inc.cpp
 RoadPlace.cpp
 RoadPlace.h
 RoadPlaceTableSync.cpp
@@ -38,6 +40,8 @@ RoadPlaceTableSync.h
 RoadTableSync.cpp
 RoadTableSync.h
 )
+
+set_source_files_properties(RoadModule.gen.cpp RoadModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(34_road ${road_SRCS})
 

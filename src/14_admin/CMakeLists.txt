@@ -8,7 +8,9 @@ AdminInterfaceElement.cpp
 AdminInterfaceElement.h
 AdminInterfaceElementTemplate.h
 AdminModule.cpp
+AdminModule.gen.cpp
 AdminModule.h
+AdminModule.inc.cpp
 AdminParametersException.cpp
 AdminParametersException.h
 HomeAdmin.cpp
@@ -18,6 +20,8 @@ LoginAdmin.hpp
 ModuleAdmin.cpp
 ModuleAdmin.h
 )
+
+set_source_files_properties(AdminModule.gen.cpp AdminModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(14_admin ${admin_SRCS})
 

@@ -39,7 +39,9 @@ DeparturesTableInterfacePage.h
 DeparturesTableLineContentInterfaceElement.cpp
 DeparturesTableLineContentInterfaceElement.h
 DeparturesTableModule.cpp
+DeparturesTableModule.gen.cpp
 DeparturesTableModule.h
+DeparturesTableModule.inc.cpp
 DeparturesTableRoutePlanningInterfaceElement.cpp
 DeparturesTableRoutePlanningInterfaceElement.h
 DeparturesTableRoutePlanningInterfacePage.cpp
@@ -142,6 +144,8 @@ UpdateDisplayScreenAction.h
 UpdateDisplayTypeAction.cpp
 UpdateDisplayTypeAction.h
 )
+
+set_source_files_properties(DeparturesTableModule.gen.cpp DeparturesTableModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(54_departure_boards ${departure_boards_SRCS})
 

@@ -17,13 +17,17 @@ TreeFolderTableSync.hpp
 TreeFolderUpdateAction.cpp
 TreeFolderUpdateAction.hpp
 TreeModule.cpp
+TreeModule.gen.cpp
 TreeModule.h
+TreeModule.inc.cpp
 TreeMultiClassRootPolicy.hpp
 TreeNode.hpp
 TreeOtherClassRootPolicy.hpp
 TreeRankOrderingPolicy.hpp
 TreeUniqueRootPolicy.hpp
 )
+
+set_source_files_properties(TreeModule.gen.cpp TreeModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
 add_library(20_tree ${tree_SRCS})
 
