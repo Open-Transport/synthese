@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : OrService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Operators
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Operators
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m36Functions refFunctions
 		///	@author RCSobility
@@ -57,7 +57,7 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Operators#Request
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Operators#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author RCSobility
@@ -69,7 +69,7 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/Operators#Request
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Operators#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author RCSobility
