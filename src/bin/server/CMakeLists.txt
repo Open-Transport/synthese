@@ -25,6 +25,7 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR})
 # Could be removed once each modules exports a single register entry point.
 include_directories(${SPATIALITE_INCLUDE_DIRS})
 include_directories(${PROJ_INCLUDE_DIRS})
+include_directories(${EXPAT_INCLUDE_DIRS})
 
 
 add_executable(s3-server main.cpp)
