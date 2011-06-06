@@ -35,6 +35,7 @@
 #include "SchedulesBasedService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
+#include "JourneyPatternCopy.hpp"
 
 using namespace std;
 using namespace boost;
@@ -128,12 +129,20 @@ namespace synthese
 				if(decodeTableId(id) == ScheduledServiceTableSync::TABLE.ID)
 				{
 					_service = static_pointer_cast<const SchedulesBasedService, const ScheduledService>(Env::GetOfficialEnv().get<ScheduledService>(id));
-					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(static_cast<const JourneyPattern*>(_service->getPath()));
+					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(
+						dynamic_cast<const JourneyPatternCopy*>(_service->getPath()) ?
+						dynamic_cast<const JourneyPatternCopy*>(_service->getPath())->getMainLine() :
+						static_cast<const JourneyPattern*>(_service->getPath())
+					);
 				}
 				else if(decodeTableId(id) == ContinuousServiceTableSync::TABLE.ID)
 				{
 					_service = static_pointer_cast<const SchedulesBasedService, const ContinuousService>(Env::GetOfficialEnv().get<ContinuousService>(id));
-					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(static_cast<const JourneyPattern*>(_service->getPath()));
+					_journeyPattern = Env::GetOfficialEnv().getSPtr<JourneyPattern>(
+						dynamic_cast<const JourneyPatternCopy*>(_service->getPath()) ?
+						dynamic_cast<const JourneyPatternCopy*>(_service->getPath())->getMainLine() :
+						static_cast<const JourneyPattern*>(_service->getPath())
+					);
 				}
 				else
 				{
