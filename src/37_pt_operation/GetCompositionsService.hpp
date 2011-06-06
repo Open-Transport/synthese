@@ -73,6 +73,9 @@ namespace synthese
 			static const std::string DATA_NAME;
 			static const std::string DATA_PICTURE;
 			static const std::string DATA_SEATS;
+			static const std::string DATA_COMPOSITION_ID;
+			static const std::string DATA_VEHICLE_ID;
+			static const std::string DATA_QUAY_ID;
 
 		protected:
 			//! \name Page parameters

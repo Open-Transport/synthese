@@ -64,6 +64,9 @@ namespace synthese
 		const string GetCompositionsService::DATA_NAME("name");
 		const string GetCompositionsService::DATA_PICTURE("picture");
 		const string GetCompositionsService::DATA_SEATS("seats");
+		const string GetCompositionsService::DATA_COMPOSITION_ID("composition_id");
+		const string GetCompositionsService::DATA_VEHICLE_ID("vehicle_id");
+		const string GetCompositionsService::DATA_QUAY_ID("quay_id");
 
 		ParametersMap GetCompositionsService::_getParametersMap() const
 		{
@@ -210,7 +213,7 @@ namespace synthese
 			pm.insert(DATA_RANK, rank);
 
 			// ID
-			pm.insert(Request::PARAMETER_OBJECT_ID, composition.getKey());
+			pm.insert(DATA_COMPOSITION_ID, composition.getKey());
 
 			// Vehicles
 			if(_vehiclePage.get())
@@ -283,7 +286,7 @@ namespace synthese
 			pm.insert(DATA_NUMBER, vehicle.getNumber());
 
 			// ID
-			pm.insert(Request::PARAMETER_OBJECT_ID, vehicle.getKey());
+			pm.insert(DATA_VEHICLE_ID, vehicle.getKey());
 
 			// Launch of the display
 			_vehiclePage->display(stream, request, pm);
@@ -307,7 +310,7 @@ namespace synthese
 			pm.insert(DATA_NAME, quay.getName());
 
 			// ID
-			pm.insert(Request::PARAMETER_OBJECT_ID, quay.getKey());
+			pm.insert(DATA_QUAY_ID, quay.getKey());
 
 			// Launch of the display
 			_quayPage->display(stream, request, pm);
