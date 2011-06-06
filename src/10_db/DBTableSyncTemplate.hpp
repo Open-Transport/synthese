@@ -471,11 +471,11 @@ namespace synthese
 				}
 				if(_FIELDS[i].isGeometry())
 				{
-					fieldsGetter << "AsText(\"" << _FIELDS[i].name << "\") AS \"" << _FIELDS[i].name << '"';
+					fieldsGetter << "AsText(" << TABLE.NAME << ".\"" << _FIELDS[i].name << "\") AS \"" << _FIELDS[i].name << '"';
 				}
 				else
 				{
-					fieldsGetter << '"' << _FIELDS[i].name << '"';
+					fieldsGetter << TABLE.NAME << ".\"" << _FIELDS[i].name << "\"";
 				}
 			}
 			_fieldsGetter = fieldsGetter.str();
