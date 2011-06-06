@@ -78,12 +78,8 @@ namespace synthese
 				s << _bbox->getMinX() << "," << _bbox->getMinY() << "," <<
 					_bbox->getMaxX() << "," << _bbox->getMaxY();
 				result.insert(PARAMETER_BBOX, s.str());
-
-				if(_coordinatesSystem)
-				{
-					result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
-				}
 			}
+			result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			result.insert(PARAMETER_OUTPUT_LINES, _outputLines);
 			return result;
 		}
@@ -100,15 +96,14 @@ namespace synthese
 			}
 
 			_outputLines = map.getDefault<bool>(PARAMETER_OUTPUT_LINES, true);
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			string bbox(map.getDefault<string>(PARAMETER_BBOX));
 			if(!bbox.empty())
 			{
-				CoordinatesSystem::SRID srid(
-					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
-				);
-				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
-
 				vector< string > parsed_bbox;
 				split(parsed_bbox, bbox, is_any_of(",; ") );
 
@@ -135,6 +130,11 @@ namespace synthese
 			}
 		}
 
+		StopAreasListFunction::StopAreasListFunction():
+			_coordinatesSystem(NULL),
+			_outputLines(true)
+		{
+		}
 
 		void StopAreasListFunction::run( std::ostream& stream, const Request& request ) const
 		{
@@ -195,10 +195,7 @@ namespace synthese
 				if(it.second->getPoint().get())
 				{
 					shared_ptr<Point> pts(it.second->getPoint());
-					if(_coordinatesSystem)
-					{
-						pts = _coordinatesSystem->convertPoint(*pts);
-					}
+					pts = _coordinatesSystem->convertPoint(*pts);
 					stream << "\" x=\"" << pts->getX() <<
 						"\" y=\"" << pts->getY();
 				}
@@ -232,14 +229,6 @@ namespace synthese
 		std::string StopAreasListFunction::getOutputMimeType() const
 		{
 			return "text/xml";
-		}
-
-
-
-		StopAreasListFunction::StopAreasListFunction():
-			_outputLines(true)
-		{
-
 		}
 	}
 }
