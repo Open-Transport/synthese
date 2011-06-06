@@ -103,6 +103,11 @@ namespace synthese
 		const string ReservationsListService::DATA_VEHICLE_ID("vehicle_id");
 		const string ReservationsListService::DATA_RESERVATION_ID("reservation_id");
 		const string ReservationsListService::DATA_SEAT("seat");
+		const string ReservationsListService::DATA_SERVICE_NUMBER("service_number");
+		const string ReservationsListService::DATA_SERVICE_ID("service_id");
+		const string ReservationsListService::DATA_DEPARTURE_TIME("departure_time");
+		const string ReservationsListService::DATA_ARRIVAL_TIME("arrival_time");
+		const string ReservationsListService::DATA_CANCELLATION_TIME("cancellation_time");
 
 		ParametersMap ReservationsListService::_getParametersMap() const
 		{
@@ -119,7 +124,10 @@ namespace synthese
 				{
 					map.insert(PARAMETER_LINE_ID, _line->getKey());
 				}
-				map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumber);
+				if(_serviceNumber)
+				{
+					map.insert(PARAMETER_SERVICE_NUMBER, *_serviceNumber);
+				}
 			}
 
 			map.insert(PARAMETER_DATE, to_iso_extended_string(_date));
@@ -180,7 +188,7 @@ namespace synthese
 			else
 			{
 				// Line
-				RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
 				try
 				{
 					_line = CommercialLineTableSync::Get(id, *_env);
@@ -310,6 +318,7 @@ namespace synthese
 			}
 
 			// Display of services
+			size_t rank(0);
 			BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
 			{
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
@@ -319,7 +328,6 @@ namespace synthese
 
 				if(_reservationPage.get())
 				{
-					size_t rank(0);
 					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
 					{
 						_displayReservation(
@@ -368,6 +376,14 @@ namespace synthese
 			pm.insert(DATA_RESERVATION_ID, reservation.getKey());
 			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());
 			pm.insert(DATA_SEATS_NUMBER, reservation.getTransaction()->getSeats());
+			pm.insert(DATA_SERVICE_NUMBER, reservation.getServiceCode());
+			pm.insert(DATA_SERVICE_ID, reservation.getServiceId());
+			pm.insert(DATA_DEPARTURE_TIME, reservation.getDepartureTime());
+			pm.insert(DATA_ARRIVAL_TIME, reservation.getArrivalTime());
+			if(!reservation.getTransaction()->getCancellationTime().is_not_a_date_time())
+			{
+				pm.insert(DATA_CANCELLATION_TIME, reservation.getTransaction()->getCancellationTime());
+			}
 
 			// Vehicle
 			if(reservation.getVehicle())
