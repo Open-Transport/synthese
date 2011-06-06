@@ -9,6 +9,7 @@
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
 
+#include "AddService.hpp"
 #include "BitAndFunction.hpp"
 #include "DateService.hpp"
 #include "EvalService.hpp"
