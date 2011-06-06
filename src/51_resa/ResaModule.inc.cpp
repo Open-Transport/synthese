@@ -14,6 +14,7 @@
 #include "CallBeginAction.h"
 #include "CallEndAction.h"
 #include "ResaLogEntryUpdateAction.h"
+#include "ReservationTransactionUpdateAction.hpp"
 #include "ReservationUserUpdateAction.h"
 #include "SendPasswordAction.h"
 #include "ReservationUpdateAction.hpp"
