@@ -93,16 +93,15 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			StopAreasListFunction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run(std::ostream& stream, const server::Request& request) const;
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
-
 			virtual std::string getOutputMimeType() const;
-
-			StopAreasListFunction();
 		};
 	}
 }
