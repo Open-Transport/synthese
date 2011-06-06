@@ -88,6 +88,8 @@ ReservationTransaction.cpp
 ReservationTransaction.h
 ReservationTransactionTableSync.cpp
 ReservationTransactionTableSync.h
+ReservationTransactionUpdateAction.cpp
+ReservationTransactionUpdateAction.hpp
 ReservationUpdateAction.cpp
 ReservationUpdateAction.hpp
 ReservationUserUpdateAction.cpp

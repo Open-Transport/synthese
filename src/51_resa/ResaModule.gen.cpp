@@ -8,6 +8,7 @@ synthese::resa::CancelReservationAction::integrate();
 synthese::resa::CallBeginAction::integrate();
 synthese::resa::CallEndAction::integrate();
 synthese::resa::ResaLogEntryUpdateAction::integrate();
+synthese::resa::ReservationTransactionUpdateAction::integrate();
 synthese::resa::ReservationUserUpdateAction::integrate();
 synthese::resa::SendPasswordAction::integrate();
 synthese::resa::ReservationUpdateAction::integrate();
