@@ -34,6 +34,7 @@
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
 #include "ScheduledServiceTableSync.h"
+#include "JourneyPatternCopy.hpp"
 
 using namespace std;
 using namespace boost;
@@ -167,7 +168,12 @@ namespace synthese
 				}
 				else if(_info == "route_id")
 				{
-					stream << _service->getPath()->getKey();
+					stream <<
+						(	dynamic_cast<const JourneyPatternCopy*>(_service->getPath()) ?
+							dynamic_cast<const JourneyPatternCopy*>(_service->getPath())->getMainLine()->getKey() :
+							_service->getPath()->getKey()
+						)
+					;
 				}
 				else if(_info == "number")
 				{

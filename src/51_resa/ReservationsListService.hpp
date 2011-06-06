@@ -79,6 +79,11 @@ namespace synthese
 			static const std::string DATA_VEHICLE_ID;
 			static const std::string DATA_RESERVATION_ID;
 			static const std::string DATA_SEAT;
+			static const std::string DATA_SERVICE_NUMBER;
+			static const std::string DATA_SERVICE_ID;
+			static const std::string DATA_DEPARTURE_TIME;
+			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_CANCELLATION_TIME;
 
 		protected:
 			//! \name Page parameters
