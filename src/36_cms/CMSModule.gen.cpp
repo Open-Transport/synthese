@@ -6,6 +6,7 @@ synthese::cms::WebPageTableSync::integrate();
 
 synthese::cms::CMSModule::integrate();
 
+synthese::cms::AddService::integrate();
 synthese::cms::BitAndFunction::integrate();
 synthese::cms::DateService::integrate();
 synthese::cms::EvalService::integrate();

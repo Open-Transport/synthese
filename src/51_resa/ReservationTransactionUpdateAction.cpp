@@ -46,6 +46,7 @@ namespace synthese
 	{
 		const string ReservationTransactionUpdateAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "ti";
 		const string ReservationTransactionUpdateAction::PARAMETER_SEATS = Action_PARAMETER_PREFIX + "se";
+		const string ReservationTransactionUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		
 		
 		
@@ -59,6 +60,10 @@ namespace synthese
 			if(_seats)
 			{
 				map.insert(PARAMETER_SEATS, *_seats);
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
 			}
 			return map;
 		}
@@ -80,6 +85,11 @@ namespace synthese
 			{
 				_seats = map.get<size_t>(PARAMETER_SEATS);
 			}
+
+			if(map.isDefined(PARAMETER_NAME))
+			{
+				_name = map.get<string>(PARAMETER_NAME);
+			}
 		}
 		
 		
@@ -90,6 +100,10 @@ namespace synthese
 			if(_seats)
 			{
 				_reservationTransaction->setSeats(*_seats);
+			}
+			if(_name)
+			{
+				_reservationTransaction->setCustomerName(*_name);
 			}
 			ReservationTransactionTableSync::Save(_reservationTransaction.get());
 		}

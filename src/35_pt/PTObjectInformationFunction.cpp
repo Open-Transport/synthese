@@ -154,6 +154,10 @@ namespace synthese
 				{
 					stream << _stop->getName();
 				}
+				else if(_info == "short_name")
+				{
+					stream << _stop->getName26();
+				}
 			}
 			else if(_service.get())
 			{

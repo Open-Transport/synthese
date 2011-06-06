@@ -53,10 +53,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_RESERVATION_TRANSACTION_ID;
 			static const std::string PARAMETER_SEATS;
+			static const std::string PARAMETER_NAME;
 
 		private:
 			boost::shared_ptr<ReservationTransaction> _reservationTransaction;
 			boost::optional<std::size_t> _seats;
+			boost::optional<std::string> _name;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

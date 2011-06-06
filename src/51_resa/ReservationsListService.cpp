@@ -93,6 +93,8 @@ namespace synthese
 
 		const string ReservationsListService::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string ReservationsListService::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
+		const string ReservationsListService::DATA_ARRIVAL_PLACE_ID("arrival_place_id");
+		const string ReservationsListService::DATA_DEPARTURE_PLACE_ID("departure_place_id");
 		const string ReservationsListService::DATA_LANGUAGE("language");
 		const string ReservationsListService::DATA_NAME("name");
 		const string ReservationsListService::DATA_RANK("rank");
@@ -187,7 +189,10 @@ namespace synthese
 				{
 					throw RequestException("Bad value for line ID");
 				}
-				_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
+				if(!map.getDefault<string>(PARAMETER_SERVICE_NUMBER).empty())
+				{
+					_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
+				}
 			}
 
 			// Routes reading
@@ -357,6 +362,8 @@ namespace synthese
 			pm.insert(DATA_NAME, reservation.getTransaction()->getCustomerName());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, reservation.getDeparturePlaceName());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, reservation.getArrivalPlaceName());
+			pm.insert(DATA_DEPARTURE_PLACE_ID, reservation.getDeparturePlaceId());
+			pm.insert(DATA_ARRIVAL_PLACE_ID, reservation.getArrivalPlaceId());
 			pm.insert(DATA_RANK, rank);
 			pm.insert(DATA_RESERVATION_ID, reservation.getKey());
 			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());

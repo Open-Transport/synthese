@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(cms_SRCS
+AddService.cpp
+AddService.hpp
 AndFunction.cpp
 AndFunction.hpp
 BitAndFunction.cpp
