@@ -32,6 +32,7 @@
 #include "SelectQuery.hpp"
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
+#include "ImportableTableSync.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -47,6 +48,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace security;
+	using namespace impex;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ScheduledServiceTableSync>::FACTORY_KEY("35.60.03 Scheduled services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
@@ -63,6 +65,7 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string ScheduledServiceTableSync::COL_TEAM("team");
 		const string ScheduledServiceTableSync::COL_DATES("dates");
+		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
 	}
 
 	namespace db
@@ -82,6 +85,7 @@ namespace synthese
 			DBTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			DBTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
 			DBTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
+			DBTableSync::Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -139,6 +143,12 @@ namespace synthese
 					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 				}
 				ss->setRules(rules);
+
+				ss->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS), env
+					), linkLevel > UP_LINKS_LOAD_LEVEL
+				);
 			}
 
 			// Schedules
@@ -178,6 +188,7 @@ namespace synthese
 			ScheduledService* ss
 		){
 			ss->getPath()->removeService(ss);
+			ss->cleanDataSourceLinks(true);
 		}
 
 
@@ -211,6 +222,7 @@ namespace synthese
 			);
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 
@@ -266,22 +278,25 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<ScheduledServiceTableSync> query;
-			if (commercialLineId || dataSourceId)
-			{
-				query.addTableAndEqualJoin<JourneyPatternTableSync>(TABLE_COL_ID, COL_PATHID);
-			}
 			if (lineId)
 			{
 				query.addWhereField(ScheduledServiceTableSync::COL_PATHID, *lineId);
 			}
 			if (commercialLineId)
 			{
-				query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, *commercialLineId);
+				query.addWhere(
+					ComposedExpression::Get(
+						SubQueryExpression::Get(
+							string("SELECT b."+ JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID +" FROM "+ JourneyPatternTableSync::TABLE.NAME +" AS b WHERE b."+ TABLE_COL_ID +"="+ TABLE.NAME +"."+ COL_PATHID)
+						), ComposedExpression::OP_EQ,
+						ValueExpression<RegistryKeyType>::Get(*commercialLineId)
+					)
+				);
 			}
-			if (dataSourceId)
-			{
-				query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_DATASOURCE_ID, *dataSourceId);
-			}
+		//	if (dataSourceId)
+		//	{
+		//		query.addWhereFieldOther<JourneyPatternTableSync>(JourneyPatternTableSync::COL_DATASOURCE_ID, *dataSourceId);
+		//	}
 			if(serviceNumber)
 			{
 				query.addWhereField(COL_SERVICENUMBER, *serviceNumber);

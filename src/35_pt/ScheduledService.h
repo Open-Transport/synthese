@@ -26,6 +26,7 @@
 #include "Types.h"
 #include "Registry.h"
 #include "SchedulesBasedService.h"
+#include "Importable.h"
 
 #include <string>
 #include <boost/tuple/tuple.hpp>
@@ -54,8 +55,9 @@ namespace synthese
 
 			@ingroup m35
 		*/
-		class ScheduledService
-		:	public SchedulesBasedService
+		class ScheduledService:
+			public SchedulesBasedService,
+			public impex::Importable
 		{
 		public:
 

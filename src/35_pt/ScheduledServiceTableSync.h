@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_TEAM;
 			static const std::string COL_DATES;
+			static const std::string COL_DATASOURCE_LINKS;
 
 
 
