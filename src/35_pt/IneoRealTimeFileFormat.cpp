@@ -259,7 +259,7 @@ namespace synthese
 			os << t.title("Mode");
 			os << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			os << t.title("Bases de données");
-			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter::PARAMETER_DATABASE, _database));
+			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter<IneoRealTimeFileFormat>::PARAMETER_DATABASE, _database));
 			os << t.title("Paramètres");
 			os << t.cell("Source de données théorique liée", t.getForm().getTextInput(PARAMETER_PLANNED_DATASOURCE_ID, _plannedDataSource.get() ? lexical_cast<string>(_plannedDataSource->getKey()) : string()));
 			os << t.close();
