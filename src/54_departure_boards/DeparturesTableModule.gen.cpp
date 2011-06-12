@@ -68,6 +68,7 @@ synthese::departure_boards::DisplayMaintenanceLog::integrate();
 
 synthese::departure_boards::DisplayScreenAlarmRecipient::integrate();
 
+synthese::departure_boards::IneoDepartureBoardsFileFormat::integrate();
 
 // Registries
 synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreen>();

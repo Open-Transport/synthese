@@ -94,8 +94,6 @@ DisplayScreenCPUUpdateAction.cpp
 DisplayScreenCPUUpdateAction.h
 DisplayScreenHasAlarmValueInterfaceElement.cpp
 DisplayScreenHasAlarmValueInterfaceElement.h
-DisplayScreenPhysicalStopFunction.cpp
-DisplayScreenPhysicalStopFunction.h
 DisplayScreenRemoveDisplayedPlaceAction.cpp
 DisplayScreenRemoveDisplayedPlaceAction.h
 DisplayScreenRemoveForbiddenPlaceAction.cpp
@@ -124,6 +122,8 @@ DisplayTypeTableSync.cpp
 DisplayTypeTableSync.h
 ForcedDestinationsArrivalDepartureTableGenerator.cpp
 ForcedDestinationsArrivalDepartureTableGenerator.h
+IneoDepartureBoardsFileFormat.cpp
+IneoDepartureBoardsFileFormat.hpp
 ParseDisplayReturnInterfacePage.cpp
 ParseDisplayReturnInterfacePage.h
 PhysicalStopDepartureTableGenerator.cpp

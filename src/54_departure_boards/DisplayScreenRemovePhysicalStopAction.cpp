@@ -89,7 +89,9 @@ namespace synthese
 		void DisplayScreenRemovePhysicalStopAction::run(Request& request)
 		{
 			// Preparation
-			_screen->removePhysicalStop(_stop.get());
+			ArrivalDepartureTableGenerator::PhysicalStops stops(_screen->getPhysicalStops(false));
+			stops.erase(_stop->getKey());
+			_screen->setStops(stops);
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(

@@ -39,7 +39,7 @@ namespace synthese
 {
 	namespace pt
 	{
-		class JourneyPattern;
+		class CommercialLine;
 		class LineStop;
 	}
 
@@ -61,7 +61,7 @@ namespace synthese
 		} BroadcastPointsPresence;
 
 	typedef std::map<boost::optional<util::RegistryKeyType>, const pt::StopArea*> DisplayedPlacesList;
-	typedef std::map<util::RegistryKeyType,const pt::JourneyPattern*> LineFilter;
+	typedef std::map<const pt::CommercialLine*, boost::optional<bool> > LineFilter;
 	typedef std::map<boost::optional<util::RegistryKeyType>,const pt::StopArea*> ForbiddenPlacesList;
 	typedef enum { DISPLAY_ARRIVALS = 0, DISPLAY_DEPARTURES = 1 } DeparturesTableDirection;
 	typedef enum { ENDS_ONLY = 1, WITH_PASSING = 0 } EndFilter;
