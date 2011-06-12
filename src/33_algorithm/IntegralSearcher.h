@@ -38,6 +38,7 @@ namespace synthese
 		class Vertex;
 		class VertexAccessMap;
 		class Edge;
+		class Hub;
 	}
 
 	namespace algorithm
