@@ -23,6 +23,7 @@
 #include "JourneysResult.h"
 #include "IntegralSearcher.h"
 #include "Edge.h"
+#include "Vertex.h"
 
 using namespace boost::posix_time;
 

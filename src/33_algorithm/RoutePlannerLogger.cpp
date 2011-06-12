@@ -23,6 +23,9 @@
 #include "RoutePlannerLogger.h"
 #include "ResultHTMLTable.h"
 #include "NamedPlace.h"
+#include "Edge.h"
+#include "Vertex.h"
+#include "Hub.h"
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
 
