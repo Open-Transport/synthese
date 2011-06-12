@@ -331,7 +331,7 @@ namespace synthese
 									_getValue("MNEO"),
 									_getValue("MNED")
 								),
-								lexical_cast<Edge::MetricOffset>(_getValue("DIST"))
+								lexical_cast<MetricOffset>(_getValue("DIST"))
 						)	);
 					}
 				}
@@ -367,7 +367,7 @@ namespace synthese
 				bool jpWayback(false);
 				string jpKey;
 				string lastStopCode;
-				Edge::MetricOffset dst(0);
+				MetricOffset dst(0);
 				while(true)
 				{
 					_readLine(inFile);
@@ -423,7 +423,7 @@ namespace synthese
 						string stopCode(_getValue("MNL"));
 						if(!lastStopCode.empty())
 						{
-							std::map<std::pair<std::string, std::string>, graph::Edge::MetricOffset>::const_iterator it(_distances.find(
+							std::map<std::pair<std::string, std::string>, graph::MetricOffset>::const_iterator it(_distances.find(
 									make_pair(lastStopCode, stopCode)
 							)	);
 							if(it != _distances.end())

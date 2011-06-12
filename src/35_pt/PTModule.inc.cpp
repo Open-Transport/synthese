@@ -20,6 +20,7 @@
 #include "GTFSFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
+#include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "PladisStopsFileFormat.hpp"
 #include "TridentFileFormat.h"

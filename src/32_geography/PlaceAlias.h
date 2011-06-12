@@ -29,6 +29,8 @@
 #include "Registry.h"
 #include "NamedPlaceTemplate.h"
 
+#pragma warning( disable : 4250 )
+
 namespace synthese
 {
 	namespace geography

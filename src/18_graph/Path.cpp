@@ -319,6 +319,20 @@ namespace synthese
 
 			// Insertion of the new edges
 			_edges.insert(insertionPosition, &edge);
+
+			// Update of the rank map
+			RankMap::iterator itEdge(_rankMap.find(edge.getMetricOffset()));
+			if(itEdge == _rankMap.end())
+			{
+				_rankMap.insert(make_pair(edge.getMetricOffset(), edge.getRankInPath()));
+			}
+			else
+			{
+				if(itEdge->second > edge.getRankInPath())
+				{
+					itEdge->second = edge.getRankInPath();
+				}
+			}
 		}
 
 
@@ -396,9 +410,14 @@ namespace synthese
 				{
 					vertex->addDepartureEdge(edge);
 				}
+
+				// Update of the rank map
+				_rankMap[edge->getMetricOffset()] = edge->getRankInPath();
 			}
 
+			// Cleaning the other path
 			other._edges.clear();
+			other._rankMap.clear();
 
 			_pathGroup->removePath(&other);
 		}
@@ -566,8 +585,29 @@ namespace synthese
 				edge.getNext()->setPrevious(edge.getPrevious());
 			}
 
+			// Update of the rank map
+			RankMap::iterator it(_rankMap.find(edge.getMetricOffset()));
+			if(it != _rankMap.end())
+			{
+				_rankMap.erase(it);
+			}
+
 			// Insertion of the new edges
 			_edges.erase(removalPosition);
+
+			// Search of other edge with the same metric offset to record in rank map
+			BOOST_FOREACH(Edge* itEdge, _edges)
+			{
+				if(itEdge->getMetricOffset() == edge.getMetricOffset())
+				{
+					_rankMap[itEdge->getMetricOffset()] = itEdge->getRankInPath();
+					break;
+				}
+				if(itEdge->getMetricOffset() > edge.getMetricOffset())
+				{
+					break;
+				}
+			}
 		}
 
 
@@ -670,4 +710,24 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+
+		std::size_t Path::getEdgeRankAtOffset( MetricOffset offset ) const
+		{
+			RankMap::const_iterator it(_rankMap.find(offset));
+			if(it == _rankMap.end())
+			{
+				throw InvalidOffsetException(offset, *this);
+			}
+			return it->second;
+		}
+
+
+
+		Path::InvalidOffsetException::InvalidOffsetException(
+			MetricOffset offset,
+			const Path& path
+		):	synthese::Exception("Invalid offset "+ lexical_cast<string>(offset) + " in path "+ lexical_cast<string>(path.getKey()))
+		{}
 }	}

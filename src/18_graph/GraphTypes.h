@@ -36,6 +36,8 @@ namespace synthese
 
 		typedef unsigned int HubScore;
 
+		typedef double MetricOffset;
+
 		const HubScore NO_TRANSFER_HUB_SCORE(0);
 		const HubScore MIN_HUB_SCORE(1);
 		const HubScore MAX_HUB_SCORE(100);

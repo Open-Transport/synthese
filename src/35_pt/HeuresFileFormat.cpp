@@ -300,7 +300,7 @@ namespace synthese
 
 					// Stops
 					JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
-					Edge::MetricOffset distance(0);
+					MetricOffset distance(0);
 					bool ignoreRoute(false);
 					for(size_t i(10); i+1<line.size(); i += 10)
 					{
@@ -317,12 +317,12 @@ namespace synthese
 						// Fake stop : girouette
 						if(lexical_cast<int>(stopNumber) > 9000)
 						{
-							*servedStops.rbegin()->_metricOffset += lexical_cast<Edge::MetricOffset>(trim_copy(line.substr(i+5,5)));
+							*servedStops.rbegin()->_metricOffset += lexical_cast<MetricOffset>(trim_copy(line.substr(i+5,5)));
 							continue;
 						}
 
 						bool regul(lexical_cast<bool>(line.substr(i+4,1)));
-						distance += lexical_cast<Edge::MetricOffset>(trim_copy(line.substr(i+5,5)));
+						distance += lexical_cast<MetricOffset>(trim_copy(line.substr(i+5,5)));
 
 						if(!stops.contains(stopNumber))
 						{

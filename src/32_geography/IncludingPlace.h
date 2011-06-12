@@ -27,6 +27,8 @@
 
 #include "Place.h"
 
+#pragma warning( disable : 4250 )
+
 namespace synthese
 {
 	namespace geography

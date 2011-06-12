@@ -62,7 +62,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << ((!_left.empty() ? 0 : lexical_cast<int>(_left)) + (!_right.empty() ? 0 : lexical_cast<int>(_right)));
+			stream << ((_left.empty() ? 0 : lexical_cast<int>(_left)) + (_right.empty() ? 0 : lexical_cast<int>(_right)));
 		}
 		
 		

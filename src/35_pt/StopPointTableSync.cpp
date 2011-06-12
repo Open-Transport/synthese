@@ -47,6 +47,7 @@ namespace synthese
 	using namespace road;
 	using namespace impex;
 	using namespace security;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<DBTableSync,StopPointTableSync>::FACTORY_KEY("35.55.01 Physical stops");
 	template<> const string FactorableTemplate<Fetcher<graph::Vertex>, StopPointTableSync>::FACTORY_KEY("12");
@@ -157,7 +158,7 @@ namespace synthese
 					try
 					{
 						MainRoadChunk& chunk(*RoadChunkTableSync::GetEditable(chunkId, env, linkLevel));
-						RoadChunk::MetricOffset metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
+						MetricOffset metricOffset(rows->getDouble(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET));
 
 						object->setProjectedPoint(Address(chunk, metricOffset));
 

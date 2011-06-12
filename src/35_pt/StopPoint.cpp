@@ -88,13 +88,13 @@ namespace synthese
 			{
 				if(_projectedPoint.getRoadChunk()->getFromCrossing() == &crossing)
 				{
-					return VertexAccess(minutes(_projectedPoint.getMetricOffset() / 50), _projectedPoint.getMetricOffset());
+					return VertexAccess(minutes(static_cast<long>(_projectedPoint.getMetricOffset() / 50)), _projectedPoint.getMetricOffset());
 				}
 				if(	_projectedPoint.getRoadChunk()->getReverseRoadChunk() &&
 					_projectedPoint.getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
 				){
 					return VertexAccess(
-						minutes((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50),
+						minutes(static_cast<long>((_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()) / 50)),
 						_projectedPoint.getRoadChunk()->getEndMetricOffset() - _projectedPoint.getRoadChunk()->getMetricOffset() - _projectedPoint.getMetricOffset()
 					);
 				}

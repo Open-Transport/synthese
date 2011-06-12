@@ -138,7 +138,7 @@ namespace synthese
 					boost::posix_time::time_duration arrivalTime;
 					boost::posix_time::time_duration departureTime;
 					std::set<pt::StopPoint*> stop;
-					graph::Edge::MetricOffset offsetFromLast;
+					graph::MetricOffset offsetFromLast;
 				};
 				typedef std::vector<TripDetail> TripDetailVector;
 

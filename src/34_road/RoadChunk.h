@@ -103,7 +103,7 @@ namespace synthese
 				/// @param metricOffset
 				/// @return the point corresponding to an offset from the beginning of the chunk.
 				boost::shared_ptr<geos::geom::Point> getPointFromOffset(
-					MetricOffset metricOffset
+					graph::MetricOffset metricOffset
 				) const;
 			//@}
 		};

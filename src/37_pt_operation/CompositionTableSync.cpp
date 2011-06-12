@@ -116,7 +116,7 @@ namespace synthese
 					{
 						object->setService(ScheduledServiceTableSync::GetEditable(serviceId, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<ScheduledService>& e)
+					catch(ObjectNotFoundException<ScheduledService>&)
 					{
 						Log::GetInstance().warn("No such service "+ lexical_cast<string>(serviceId) +" in Composition "+ lexical_cast<string>(object->getKey()));
 					}
@@ -299,7 +299,7 @@ namespace synthese
 						}
 						vehicleLinks.push_back(value);
 					}
-					catch(ObjectNotFoundException<Vehicle>& e)
+					catch(ObjectNotFoundException<Vehicle>&)
 					{
 						Log::GetInstance().warn("No such vehicle "+ values[0] +" in Composition.");
 					}

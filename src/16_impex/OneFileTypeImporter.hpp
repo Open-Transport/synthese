@@ -27,6 +27,8 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem/operations.hpp>
 
+#pragma warning( disable : 4250 )
+
 namespace synthese
 {
 	namespace impex

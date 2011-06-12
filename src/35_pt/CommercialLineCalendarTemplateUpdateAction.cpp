@@ -75,7 +75,7 @@ namespace synthese
 			{
 				_line = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
+			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw ActionException("No such line");
 			}
@@ -84,7 +84,7 @@ namespace synthese
 			{
 				_calendarTemplate = CalendarTemplateTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_CALENDAR_TEMPLATE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
+			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw ActionException("No such calendar template");
 			}

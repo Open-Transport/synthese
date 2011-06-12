@@ -91,7 +91,7 @@ namespace synthese
 				{
 					_template = JourneyPatternTableSync::Get(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), *_env);
 				}
-				catch(ObjectNotFoundException<JourneyPattern>& e)
+				catch(ObjectNotFoundException<JourneyPattern>&)
 				{
 					throw ActionException("No such template route");
 				}
@@ -105,7 +105,7 @@ namespace synthese
 				{
 					_commercialLine = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID), *_env);
 				}
-				catch(ObjectNotFoundException<CommercialLine>& e)
+				catch(ObjectNotFoundException<CommercialLine>&)
 				{
 					throw ActionException("No such commercial line");
 				}

@@ -108,8 +108,6 @@ namespace synthese
 			typedef std::vector<DepartureServiceIndex> DepartureServiceIndices;
 			typedef std::vector<ArrivalServiceIndex> ArrivalServiceIndices;
 
-			typedef double MetricOffset;
-
 		protected:
 			Vertex*	_fromVertex;
 			Path*		_parentPath;		//!< The path the edge belongs
