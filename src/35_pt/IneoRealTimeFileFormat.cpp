@@ -244,7 +244,7 @@ namespace synthese
 		IneoRealTimeFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	DatabaseReadImporter(env, dataSource)
+		):	DatabaseReadImporter<IneoRealTimeFileFormat>(env, dataSource)
 		{}
 
 
