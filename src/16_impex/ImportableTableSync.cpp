@@ -25,7 +25,7 @@
 #include "DataSource.h"
 #include "DataSourceTableSync.h"
 
-#include <strstream>
+#include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
