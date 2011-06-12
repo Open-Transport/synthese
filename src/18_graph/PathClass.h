@@ -33,7 +33,7 @@ namespace synthese
 		class PathClass
 		{
 		public:
-			typedef int Identifier;
+			typedef long long int Identifier;
 
 		public:
 			PathClass() {}

@@ -29,9 +29,12 @@
 #include "Env.h"
 #include "ScheduledService.h"
 #include "LineStop.h"
+#include "DataSourceTableSync.h"
 
 using namespace std;
 using namespace boost;
+
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -40,6 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace pt;
+	using namespace impex;
 
 	namespace util
 	{
@@ -50,11 +54,21 @@ namespace synthese
 	{
 		const string ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES = Action_PARAMETER_PREFIX + "la";
 		const string ScheduleRealTimeUpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
+		const string ScheduleRealTimeUpdateAction::PARAMETER_LINE_STOP_METRIC_OFFSET = Action_PARAMETER_PREFIX + "mo";
 		const string ScheduleRealTimeUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
 		const string ScheduleRealTimeUpdateAction::PARAMETER_AT_ARRIVAL = Action_PARAMETER_PREFIX + "aa";
 		const string ScheduleRealTimeUpdateAction::PARAMETER_AT_DEPARTURE = Action_PARAMETER_PREFIX + "ad";
 		const string ScheduleRealTimeUpdateAction::PARAMETER_PROPAGATE_CONSTANTLY = Action_PARAMETER_PREFIX + "pc";
+		const string ScheduleRealTimeUpdateAction::PARAMETER_SERVICE_DATASOURCE_ID = Action_PARAMETER_PREFIX + "ds";
+		const string ScheduleRealTimeUpdateAction::PARAMETER_DEPARTURE_TIME = Action_PARAMETER_PREFIX + "dt";
+		const string ScheduleRealTimeUpdateAction::PARAMETER_ARRIVAL_TIME = Action_PARAMETER_PREFIX + "at";
 
+
+		ScheduleRealTimeUpdateAction::ScheduleRealTimeUpdateAction():
+			_lateDuration(not_a_date_time),
+			_departureTime(not_a_date_time),
+			_arrivalTime(not_a_date_time)
+		{}
 
 
 		ParametersMap ScheduleRealTimeUpdateAction::getParametersMap() const
@@ -62,12 +76,28 @@ namespace synthese
 			ParametersMap map;
 			if(_service.get())
 			{
-				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+				if(_dataSource.get())
+				{
+					map.insert(PARAMETER_SERVICE_DATASOURCE_ID, _dataSource->getKey());
+					map.insert(PARAMETER_SERVICE_ID, _service->getCodeBySource(*_dataSource));
+				}
+				else
+				{
+					map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+				}
 			}
 			map.insert(PARAMETER_LINE_STOP_RANK, static_cast<int>(_lineStopRank));
 			if(!_lateDuration.is_not_a_date_time())
 			{
 				map.insert(PARAMETER_LATE_DURATION_MINUTES, _lateDuration.total_seconds() / 60);
+			}
+			if(!_departureTime.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_DEPARTURE_TIME, to_simple_string(_departureTime));
+			}
+			if(!_arrivalTime.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_ARRIVAL_TIME, to_simple_string(_arrivalTime));
 			}
 			map.insert(PARAMETER_AT_ARRIVAL, _atArrival);
 			map.insert(PARAMETER_AT_DEPARTURE, _atDeparture);
@@ -79,9 +109,26 @@ namespace synthese
 
 		void ScheduleRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_lateDuration = posix_time::minutes(map.get<int>(PARAMETER_LATE_DURATION_MINUTES));
-
-			try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID, 0))
+			{
+				try
+				{
+					shared_ptr<const DataSource> dataSource(
+						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID))
+					);
+					Importable* obj(dataSource->getObjectByCode(map.get<string>(PARAMETER_SERVICE_ID)));
+					if(!obj ||!dynamic_cast<ScheduledService*>(obj))
+					{
+						throw ActionException("No such service");
+					}
+					_service = Env::GetOfficialEnv().getEditableSPtr(static_cast<ScheduledService*>(obj));
+				}
+				catch(ObjectNotFoundException<DataSource>&)
+				{
+					throw ActionException("No such datasource");
+				}
+			}
+			else try
 			{
 				_service = Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().getEditable(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
@@ -92,29 +139,80 @@ namespace synthese
 				throw ActionException("No such service");
 			}
 
-			_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
+			if(map.isDefined(PARAMETER_LINE_STOP_RANK))
+			{
+				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
+			}
+			else
+			{
+				MetricOffset offset(map.get<MetricOffset>(PARAMETER_LINE_STOP_METRIC_OFFSET));
+				try
+				{
+					_lineStopRank = _service->getPath()->getEdgeRankAtOffset(offset);
+				}
+				catch (Path::InvalidOffsetException& e)
+				{
+					throw ActionException(e.getMessage());
+				}
+			}
 
 			if(_lineStopRank >= _service->getArrivalSchedules(false).size())
 			{
 				throw ActionException("Inconsistent linestop rank");
 			}
 
-			_atArrival = map.getDefault<bool>(PARAMETER_AT_ARRIVAL, true);
-			_atDeparture = map.getDefault<bool>(PARAMETER_AT_DEPARTURE, true);
-			_propagateConstantly = map.getDefault<bool>(PARAMETER_PROPAGATE_CONSTANTLY, true);
+			if(map.isDefined(PARAMETER_LATE_DURATION_MINUTES))
+			{
+				_lateDuration = posix_time::minutes(map.get<int>(PARAMETER_LATE_DURATION_MINUTES));
+				_atArrival = map.getDefault<bool>(PARAMETER_AT_ARRIVAL, true);
+				_atDeparture = map.getDefault<bool>(PARAMETER_AT_DEPARTURE, true);
+				_propagateConstantly = map.getDefault<bool>(PARAMETER_PROPAGATE_CONSTANTLY, true);
+			}
+			else
+			{
+				if(map.isDefined(PARAMETER_DEPARTURE_TIME))
+				{
+					_departureTime = duration_from_string(map.get<string>(PARAMETER_DEPARTURE_TIME));
+					// Detection of bad encoding of schedules after midnight
+					if(_service->getDepartureSchedule(false, _lineStopRank) - _departureTime > hours(12))
+					{
+						_departureTime += hours(24);
+					}
+				}
+				if(map.isDefined(PARAMETER_ARRIVAL_TIME))
+				{
+					_arrivalTime = duration_from_string(map.get<string>(PARAMETER_ARRIVAL_TIME));
+					// Detection of bad encoding of schedules after midnight
+					if(_service->getArrivalSchedule(false, _lineStopRank) - _arrivalTime > hours(12))
+					{
+						_arrivalTime += hours(24);
+					}
+				}
+			}
 		}
 
 
 
 		void ScheduleRealTimeUpdateAction::run(Request& request)
 		{
-			_service->applyRealTimeLateDuration(
-				_lineStopRank,
-				_lateDuration,
-				_atArrival,
-				_atDeparture,
-				_propagateConstantly
-			);
+			if(!_lateDuration.is_not_a_date_time())
+			{
+				_service->applyRealTimeLateDuration(
+					_lineStopRank,
+					_lateDuration,
+					_atArrival,
+					_atDeparture,
+					_propagateConstantly
+				);
+			}
+			else
+			{
+				_service->setRealTimeSchedules(
+					_lineStopRank,
+					_departureTime,
+					_arrivalTime
+				);
+			}
 		}
 
 
@@ -166,5 +264,4 @@ namespace synthese
 		{
 			_lateDuration = value;
 		}
-	}
-}
+}	}

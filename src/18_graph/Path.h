@@ -25,6 +25,7 @@
 
 #include "Registrable.h"
 #include "RuleUser.h"
+#include "GraphTypes.h"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/optional.hpp>
@@ -81,12 +82,14 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<Edge*> Edges;
+			typedef std::map<MetricOffset, std::size_t> RankMap;
 
 		protected:
 			PathGroup*		_pathGroup;	//!< Up link : path group
 			PathClass*		_pathClass;	//!< Up link : path class
 			Edges			_edges; 	//!< Down link 1 : edges
 			ServiceSet		_services;	//!< Down link 2 : services
+			RankMap			_rankMap;	//!< Saves the first edge at each metric offset
 
 			/** Constructor.
 			*/
@@ -222,6 +225,27 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.2.0
 				Edge* getEdgeAtOffset(double offset) const;
+
+
+
+				class InvalidOffsetException:
+					public synthese::Exception
+				{
+				public:
+					InvalidOffsetException(MetricOffset offset, const Path& path);
+				};
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Returns the rank of the edge recorded at a specific offset
+				//////////////////////////////////////////////////////////////////////////
+				/// @param offset distance along the path
+				/// @return the rank of the edge at the specified offset
+				/// @throws InvalidOffsetException if the offset was not found
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				std::size_t getEdgeRankAtOffset(MetricOffset offset) const;
+
 
 
 				//////////////////////////////////////////////////////////////////////////

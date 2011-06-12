@@ -121,7 +121,7 @@ namespace synthese
 				_service = Env::GetOfficialEnv().getRegistry<ScheduledService>().get(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
 				);
-				_lineStopRank = map.get<RegistryKeyType>(PARAMETER_LINE_STOP_RANK);
+				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
 
 				if(_lineStopRank >= _service->getArrivalSchedules(false).size())
 				{

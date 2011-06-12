@@ -184,7 +184,7 @@ namespace synthese
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
-				calendarDateTime -= days(floor(float(departureSchedule.total_seconds()) / float(86400)));
+				calendarDateTime -= days(static_cast<long>(floor(float(departureSchedule.total_seconds()) / float(86400))));
 			}
 			if (!isActive(calendarDateTime.date()))
 			{

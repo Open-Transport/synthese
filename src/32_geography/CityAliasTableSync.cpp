@@ -106,7 +106,7 @@ namespace synthese
 					{
 						object->setCity(CityTableSync::GetEditable(pid, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<City>& e)
+					catch(ObjectNotFoundException<City>&)
 					{
 						Log::GetInstance().warn("No such city "+ lexical_cast<string>(pid) +" in CityAlias "+ lexical_cast<string>(object->getKey()));
 					}

@@ -667,7 +667,7 @@ namespace synthese
 				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer
-					+ seconds(*journey.getDistanceToEnd() / _vmax)						// Minimal time to reach the goal
+					+ seconds(static_cast<long>(*journey.getDistanceToEnd() / _vmax))						// Minimal time to reach the goal
 				);
 
 				if (_accessDirection == DEPARTURE_TO_ARRIVAL)

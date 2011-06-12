@@ -119,7 +119,7 @@ namespace synthese
 			{
 				_line = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
+			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw ActionException("No such line");
 			}
@@ -129,7 +129,7 @@ namespace synthese
 			{
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), *_env);
 			}
-			catch(ObjectNotFoundException<TransportNetwork>& e)
+			catch(ObjectNotFoundException<TransportNetwork>&)
 			{
 				throw ActionException("No such network");
 			}

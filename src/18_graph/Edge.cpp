@@ -466,7 +466,7 @@ namespace synthese
 
 
 
-		Edge::MetricOffset Edge::getEndMetricOffset() const
+		MetricOffset Edge::getEndMetricOffset() const
 		{
 			Edge* nextEdge(getNext());
 			return nextEdge ? nextEdge->getMetricOffset() : getMetricOffset();

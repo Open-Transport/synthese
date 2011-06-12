@@ -94,20 +94,20 @@ namespace synthese
 					// Interpolation of preceding schedules
 					if(atLeastOneUnscheduledEdge)
 					{
-						Edge::MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+						MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
 						time_duration totalTime(*itArrival - originDepartureSchedule);
 						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 						{
-							Edge::MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+							MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 
 							time_duration departureSchedule(originDepartureSchedule);
 							time_duration arrivalSchedule(originDepartureSchedule);
 							departureSchedule += minutes(
-								floor( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+								static_cast<long>(floor( (totalTime.total_seconds() / 60) * (distance / totalDistance)))
 							);
 							arrivalSchedule += minutes(
-								ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance))
+								static_cast<long>(ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance)))
 							);
 
 							_departureSchedules.push_back(departureSchedule);
@@ -206,7 +206,7 @@ namespace synthese
 					rank + 1,
 					value,
 					true, true, true
-					);
+				);
 			}
 			if(atArrival && rank + 1 == _arrivalSchedules.size())
 			{
@@ -432,5 +432,26 @@ namespace synthese
 				}
 			}
 			return NULL;
+		}
+
+
+
+		void SchedulesBasedService::setRealTimeSchedules(
+			size_t rank,
+			boost::posix_time::time_duration departureSchedule,
+			boost::posix_time::time_duration arrivalSchedule
+		){
+			if(!departureSchedule.is_not_a_date_time())
+			{
+				_RTDepartureSchedules[rank] = departureSchedule;
+			}
+			if(!arrivalSchedule.is_not_a_date_time())
+			{
+				_RTArrivalSchedules[rank] = arrivalSchedule;
+				if(rank + 1 == _arrivalSchedules.size())
+				{
+					_computeNextRTUpdate();
+				}
+			}
 		}
 }	}

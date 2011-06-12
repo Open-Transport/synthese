@@ -219,7 +219,7 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
 					std::size_t rowRank,
-					int pageNumber,
+					std::size_t pageNumber,
 					const ArrivalDepartureRow& row,
 					const DisplayScreen& screen
 				);

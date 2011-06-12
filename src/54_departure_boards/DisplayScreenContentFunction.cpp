@@ -694,8 +694,8 @@ namespace synthese
 				int __MultiplicateurRangee(1);
 
 				// Gestion des pages
-				int __NombrePages(1);
-				if (__Pages != 0)
+				size_t __NombrePages(1);
+				if(__Pages != 0)
 				{
 					int departuresNumber = ptds.size() - departuresToHide;
 					for (ArrivalDepartureList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
@@ -713,7 +713,7 @@ namespace synthese
 				}
 
 				// Boucle sur les pages
-				for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
+				for(size_t __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
 				{
 					// Separateur de page
 					if ( __NumeroPage > 1 )
@@ -731,7 +731,7 @@ namespace synthese
 						int __NombrePagesRangee = row.second.size () - 2;
 						int pageNumber = ( !__NombrePagesRangee || __NumeroPage > __NombrePagesRangee * ( __NombrePages / __NombrePagesRangee ) )
 							? __NumeroPage
-							: (1 + __NumeroPage % __NombrePagesRangee);     // 1 : Numero de page
+							: (1 + __NumeroPage % __NombrePagesRangee);		// 1 : Numero de page
 
 						// Lancement de l'affichage de la rangee
 						DisplayDepartureBoardRow(
@@ -784,7 +784,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> destinationPage,
 			boost::shared_ptr<const cms::Webpage> transferPage,
 			size_t rowRank,
-			int pageNumber,
+			size_t pageNumber,
 			const ArrivalDepartureRow& row,
 			const DisplayScreen& screen
 		){
@@ -796,7 +796,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
 			if(screen.getType())
 			{
-				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType());
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
 			}
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			if(row.first.getService())

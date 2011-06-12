@@ -75,11 +75,11 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @pre bounds are defined
 			/// @pre startOffset <= endOffset
-			static RoadChunk::MetricOffset _computeMetricOffset(
+			static graph::MetricOffset _computeMetricOffset(
 				const HouseNumberBounds& bounds,
 				HouseNumber houseNumber,
-				MetricOffset startOffset,
-				MetricOffset endOffset
+				graph::MetricOffset startOffset,
+				graph::MetricOffset endOffset
 			);
 
 		public:
@@ -138,7 +138,7 @@ namespace synthese
 				/// defined. Use testIfHouseNumberBelongsToChunk to check this pre-condition.
 				/// @author Hugues Romain
 				/// @since 3.2.0
-				MetricOffset getHouseNumberMetricOffset(
+				graph::MetricOffset getHouseNumberMetricOffset(
 					HouseNumber houseNumber
 				) const;
 			//@}

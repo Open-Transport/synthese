@@ -265,7 +265,7 @@ namespace synthese
 				const StopsWithDepartureArrivalAuthorization::value_type& stop(stops[rank]);
 				if( stop._stop.find(static_cast<StopPoint*>(edge->getFromVertex())) == stop._stop.end() ||
 					(rank > 0 && rank+1 < stops.size() && (edge->isDeparture() != stop._departure || edge->isArrival() != stop._arrival)) ||
-					(dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())
+					(stop._withTimes && dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && *stop._withTimes != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())
 				){
 					return false;
 				}
@@ -306,10 +306,10 @@ namespace synthese
 
 		JourneyPattern::StopWithDepartureArrivalAuthorization::StopWithDepartureArrivalAuthorization(
 			const std::set<StopPoint*>& stop,
-			boost::optional<Edge::MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,
+			boost::optional<MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,
 			bool departure /*= true*/,
 			bool arrival /*= true */,
-			bool withTimes
+			boost::optional<bool> withTimes
 		):	_stop(stop),
 			_metricOffset(metricOffset),
 			_departure(departure),

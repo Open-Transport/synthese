@@ -65,6 +65,8 @@ HeuresFileFormat.cpp
 HeuresFileFormat.hpp
 IneoFileFormat.cpp
 IneoFileFormat.hpp
+IneoRealTimeFileFormat.cpp
+IneoRealTimeFileFormat.hpp
 JourneyPattern.cpp
 JourneyPattern.hpp
 JourneyPatternAddAction.cpp

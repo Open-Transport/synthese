@@ -124,6 +124,13 @@ namespace synthese
 					bool updateFollowingSchedules
 				);
 
+				void setRealTimeSchedules(
+					std::size_t rank,
+					boost::posix_time::time_duration departureSchedule,
+					boost::posix_time::time_duration arrivalSchedule
+				);
+
+
 				virtual void clearRTData();
 
 				virtual void _computeNextRTUpdate();

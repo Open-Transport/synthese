@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace pt
 	{
 		class ScheduledService;
@@ -45,21 +50,28 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, ScheduleRealTimeUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_SERVICE_DATASOURCE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_LINE_STOP_RANK;
+			static const std::string PARAMETER_LINE_STOP_METRIC_OFFSET;
 			static const std::string PARAMETER_LATE_DURATION_MINUTES;
 			static const std::string PARAMETER_AT_ARRIVAL;
 			static const std::string PARAMETER_AT_DEPARTURE;
 			static const std::string PARAMETER_PROPAGATE_CONSTANTLY;
+			static const std::string PARAMETER_DEPARTURE_TIME;
+			static const std::string PARAMETER_ARRIVAL_TIME;
 
 		private:
 			boost::shared_ptr<ScheduledService> _service;
+			boost::shared_ptr<impex::DataSource> _dataSource;
 			std::size_t _lineStopRank;
 			boost::posix_time::time_duration _lateDuration;
 			bool _atArrival;
 			bool _atDeparture;
 			bool _propagateConstantly;
-
+			boost::posix_time::time_duration _departureTime;
+			boost::posix_time::time_duration _arrivalTime;
+			
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
@@ -79,6 +91,8 @@ namespace synthese
 			void _setFromParametersMap(const server::ParametersMap& map);
 
 		public:
+			ScheduleRealTimeUpdateAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			/// @todo Implement journalization
