@@ -30,6 +30,7 @@
 #include "IntegralSearcher.h"
 #include "StopPoint.hpp"
 #include "NamedPlace.h"
+#include "Hub.h"
 
 #include <sstream>
 

@@ -137,7 +137,7 @@ namespace synthese
 					if(_email.empty()) throw ActionException("L'adresse e-mail du client doit être remplie pour activer l'auto-réservation");
 				}
 			}
-			catch (ObjectNotFoundException<User>& e)
+			catch (ObjectNotFoundException<User>&)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

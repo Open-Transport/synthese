@@ -25,9 +25,8 @@
 
 #include "GraphTypes.h"
 #include "AccessParameters.h"
-
-#include "JourneysResult.h"
 #include "GraphModuleTemplate.h"
+#include "RoutePlanningIntermediateJourney.hpp"
 
 #include <boost/optional.hpp>
 
@@ -45,7 +44,8 @@ namespace synthese
 	{
 		class BestVertexReachesMap;
 		class JourneyTemplates;
-
+		class JourneysResult;
+		class RoutePlanningIntermediateJourney;
 
 		/** IntegralSearcher class.
 			@ingroup m33

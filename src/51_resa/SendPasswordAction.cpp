@@ -69,7 +69,7 @@ namespace synthese
 			{
 				_user = UserTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_USER), *_env);
 			}
-			catch(ObjectNotFoundException<User>& e)
+			catch(ObjectNotFoundException<User>&)
 			{
 				throw ActionException("Bad User");
 			}

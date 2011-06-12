@@ -134,7 +134,7 @@ namespace synthese
 						RegistryKeyType id(lexical_cast<RegistryKeyType>(line));
 						object->addAuthorizedLine(Env::GetOfficialEnv().get<CommercialLine>(id).get());
 					}
-					catch (ObjectNotFoundException<CommercialLine>& e)
+					catch (ObjectNotFoundException<CommercialLine>&)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_LINES);
 					}
@@ -150,7 +150,7 @@ namespace synthese
 						RegistryKeyType id(lexical_cast<RegistryKeyType>(pstop));
 						object->addAuthorizedPhysicalStop(Env::GetOfficialEnv().get<StopPoint>(id).get());
 					}
-					catch (ObjectNotFoundException<StopPoint>& e)
+					catch (ObjectNotFoundException<StopPoint>&)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS);
 					}
