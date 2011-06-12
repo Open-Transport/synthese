@@ -31,13 +31,15 @@
 
 #include "BestVertexReachesMap.h"
 #include "RoutePlanningIntermediateJourney.hpp"
-#include "Edge.h"
-#include "Vertex.h"
-#include "Hub.h"
 #include "GraphTypes.h"
 
 namespace synthese
 {
+	namespace graph
+	{
+		class Vertex;
+	}
+
 	namespace algorithm
 	{
 		class IntegralSearcher;

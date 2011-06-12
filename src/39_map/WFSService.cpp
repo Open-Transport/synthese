@@ -33,7 +33,7 @@
 #include <geos/geom/Point.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <strstream>
+#include <sstream>
 
 using namespace std;
 using namespace boost;

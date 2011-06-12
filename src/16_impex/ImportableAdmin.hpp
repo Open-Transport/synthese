@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_impex_ImportableAdmin_hpp__
 #define SYNTHESE_impex_ImportableAdmin_hpp__
 
-#include <strstream>
+#include <string>
 
 namespace synthese
 {
