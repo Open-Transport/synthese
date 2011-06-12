@@ -573,7 +573,7 @@ namespace synthese
 
 						// Route
 						JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
-						Edge::MetricOffset offsetSum(0);
+						MetricOffset offsetSum(0);
 						BOOST_FOREACH(const TripDetail& tripStop, tripDetailVector)
 						{
 							offsetSum += tripStop.offsetFromLast;
@@ -626,7 +626,7 @@ namespace synthese
 					}
 
 					TripDetail tripDetail;
-					tripDetail.offsetFromLast = lexical_cast<Edge::MetricOffset>(_getValue("shape_dist_traveled"));
+					tripDetail.offsetFromLast = lexical_cast<MetricOffset>(_getValue("shape_dist_traveled"));
 					tripDetail.arrivalTime = duration_from_string(_getValue("arrival_time"));
 					if(tripDetail.arrivalTime.seconds())
 					{

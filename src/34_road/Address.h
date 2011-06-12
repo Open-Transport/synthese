@@ -72,7 +72,7 @@ namespace synthese
 			/// @param houseNumber registered number of the point in the street
 			Address(
 				MainRoadChunk& roadChunk,
-				RoadChunk::MetricOffset metricOffset,
+				graph::MetricOffset metricOffset,
 				boost::optional<MainRoadChunk::HouseNumber> houseNumber = boost::optional<MainRoadChunk::HouseNumber>()
 			);
 
@@ -84,7 +84,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				MainRoadChunk* getRoadChunk() const { return _roadChunk; }
-				double getMetricOffset() const { return _metricOffset; }
+				graph::MetricOffset getMetricOffset() const { return _metricOffset; }
 				boost::optional<MainRoadChunk::HouseNumber> getHouseNumber() const { return _houseNumber; }
 			//@}
 

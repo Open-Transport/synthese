@@ -72,7 +72,7 @@ namespace synthese
 			{
 				_priorityLine = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PRIORITY_LINE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
+			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw ActionException("Bad priority line");
 			}
@@ -80,7 +80,7 @@ namespace synthese
 			{
 				_hiddenLine = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_HIDDEN_LINE_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CommercialLine>& e)
+			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw ActionException("Bad hidden line");
 			}

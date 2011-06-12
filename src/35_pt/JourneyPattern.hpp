@@ -200,18 +200,18 @@ namespace synthese
 				{
 					typedef std::set<StopPoint*> StopsSet;
 
-					boost::optional<graph::Edge::MetricOffset> _metricOffset;
+					boost::optional<graph::MetricOffset> _metricOffset;
 					StopsSet _stop;
 					bool _departure;
 					bool _arrival;
-					bool _withTimes;
+					boost::optional<bool> _withTimes;
 
 					StopWithDepartureArrivalAuthorization(
 						const std::set<StopPoint*>& stop,
-						boost::optional<graph::Edge::MetricOffset> metricOffset = boost::optional<graph::Edge::MetricOffset>(),
+						boost::optional<graph::MetricOffset> metricOffset = boost::optional<graph::MetricOffset>(),
 						bool departure = true,
 						bool arrival = true,
-						bool withTimes = true
+						boost::optional<bool> withTimes = true
 					);
 				};
 				typedef std::vector<StopWithDepartureArrivalAuthorization> StopsWithDepartureArrivalAuthorization;

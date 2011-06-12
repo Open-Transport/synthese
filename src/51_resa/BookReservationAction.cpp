@@ -289,7 +289,7 @@ namespace synthese
 						{
 							_customer->setLanguage(&Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_CUSTOMER_LANGUAGE)));
 						}
-						catch(Language::LanguageNotFoundException& e)
+						catch(Language::LanguageNotFoundException&)
 						{
 							throw ActionException("Langue incorrecte");
 						}
@@ -415,7 +415,7 @@ namespace synthese
 							_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
 						}
 					}
-					catch(ObjectNotFoundException<RollingStockFilter>& e)
+					catch(ObjectNotFoundException<RollingStockFilter>&)
 					{
 					}
 

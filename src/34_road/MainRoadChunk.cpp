@@ -28,6 +28,8 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace graph;
+	
 	namespace util
 	{
 		template<> const string Registry<road::MainRoadChunk>::KEY("MainRoadChunk");
@@ -35,8 +37,7 @@ namespace synthese
 
 	namespace road
 	{
-
-	    const MainRoadChunk::HouseNumber MainRoadChunk::HouseNumber_MAX(UINT_MAX);
+		const MainRoadChunk::HouseNumber MainRoadChunk::HouseNumber_MAX(UINT_MAX);
 
 		MainRoadChunk::MainRoadChunk(
 			util::RegistryKeyType id /*= 0*/,
@@ -98,7 +99,7 @@ namespace synthese
 		}
 
 
-		RoadChunk::MetricOffset MainRoadChunk::_computeMetricOffset(
+		MetricOffset MainRoadChunk::_computeMetricOffset(
 			const HouseNumberBounds& bounds,
 			HouseNumber houseNumber,
 			MetricOffset startOffset,
@@ -122,7 +123,7 @@ namespace synthese
 		}
 
 
-		RoadChunk::MetricOffset MainRoadChunk::getHouseNumberMetricOffset(
+		MetricOffset MainRoadChunk::getHouseNumberMetricOffset(
 			HouseNumber houseNumber
 		) const	{
 

@@ -139,7 +139,7 @@ namespace synthese
 			{
 				_line = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), Env::GetOfficialEnv());
 			}
-			catch(ObjectNotFoundException<JourneyPattern>& e)
+			catch(ObjectNotFoundException<JourneyPattern>&)
 			{
 				throw ActionException("No such line");
 			}
@@ -150,7 +150,7 @@ namespace synthese
 				{
 					_template = Fetcher<SchedulesBasedService>::Fetch(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), Env::GetOfficialEnv());
 				}
-				catch(ObjectNotFoundException<SchedulesBasedService>& e)
+				catch(ObjectNotFoundException<SchedulesBasedService>&)
 				{
 					throw ActionException("No such service template");
 				}

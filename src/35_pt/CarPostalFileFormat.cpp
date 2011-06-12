@@ -297,7 +297,7 @@ namespace synthese
 							stops.push_back(
 								JourneyPattern::StopWithDepartureArrivalAuthorization(
 									stop,
-									optional<Edge::MetricOffset>(),
+									optional<MetricOffset>(),
 									isDeparture,
 									isArrival
 							)	);

@@ -116,7 +116,7 @@ namespace synthese
 
 
 		boost::shared_ptr<geos::geom::Point> RoadChunk::getPointFromOffset(
-			double metricOffset
+			MetricOffset metricOffset
 		) const	{
 			shared_ptr<LineString> geometry(getRealGeometry());
 			if(!geometry.get() || geometry->isEmpty())

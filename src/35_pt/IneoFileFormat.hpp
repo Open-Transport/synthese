@@ -122,7 +122,7 @@ namespace synthese
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
-				mutable std::map<std::pair<std::string, std::string>, graph::Edge::MetricOffset> _distances;
+				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
 				mutable std::map<std::string, std::vector<int> > _calendars;
 
@@ -141,7 +141,7 @@ namespace synthese
 					boost::posix_time::time_duration arrivalTime;
 					boost::posix_time::time_duration departureTime;
 					std::set<pt::StopPoint*> stop;
-					graph::Edge::MetricOffset offsetFromLast;
+					graph::MetricOffset offsetFromLast;
 				};
 				typedef std::vector<TripDetail> TripDetailVector;
 

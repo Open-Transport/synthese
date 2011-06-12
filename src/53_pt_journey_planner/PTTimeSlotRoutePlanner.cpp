@@ -181,7 +181,7 @@ namespace synthese
 						direction == DEPARTURE_TO_ARRIVAL ?
 						oj->getOrigin()->getFromVertex() :
 						oj->getDestination()->getFromVertex()
-					).approachTime + minutes(ceil(oj->getDuration().total_seconds() / double(60)))
+					).approachTime + minutes(static_cast<long>(ceil(oj->getDuration().total_seconds() / double(60))))
 				);
 				double commonApproachDistance(
 					vam.getVertexAccess(

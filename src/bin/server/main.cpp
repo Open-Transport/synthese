@@ -65,7 +65,6 @@ using namespace synthese::server;
 
 namespace po = boost::program_options;
 
-
 boost::filesystem::path* pidFile (0);
 
 void quit(bool doExit = true);
@@ -206,6 +205,7 @@ int main( int argc, char **argv )
 			std::string pidf;
 			std::string logf;
 			std::vector<std::string> params;
+
 
 			// To define several params on the command line, the syntax is --param name1=val1 --param name2=val2 ....
 

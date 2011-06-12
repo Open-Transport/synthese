@@ -35,6 +35,7 @@ synthese::pt::CarPostalFileFormat::integrate();
 synthese::pt::GTFSFileFormat::integrate();
 synthese::pt::HeuresFileFormat::integrate();
 synthese::pt::IneoFileFormat::integrate();
+synthese::pt::IneoRealTimeFileFormat::integrate();
 synthese::pt::OGTFileFormat::integrate();
 synthese::pt::PladisStopsFileFormat::integrate();
 synthese::pt::TridentFileFormat::integrate ();
