@@ -25,6 +25,7 @@
 #include "IntegralSearcher.h"
 #include "VertexAccessMap.h"
 #include "PTModule.h"
+#include "JourneysResult.h"
 
 #include <boost/test/auto_unit_test.hpp>
 
