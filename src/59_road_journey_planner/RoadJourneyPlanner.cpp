@@ -30,6 +30,7 @@
 #include "IntegralSearcher.h"
 #include "StopPoint.hpp"
 #include "NamedPlace.h"
+#include "Hub.h"
 
 #include <sstream>
 
@@ -75,6 +76,7 @@ namespace synthese
 				accessParameters,
 				planningOrder,
 				accessParameters.getApproachSpeed(),
+				true,
 				logStream
 			),
 			_departurePlace(origin),
@@ -168,6 +170,7 @@ namespace synthese
 				_accessParameters,
 				_planningOrder,
 				_vmax,
+				true,
 				_logStream
 			);
 			return RoadJourneyPlannerResult(
