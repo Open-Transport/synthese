@@ -177,7 +177,7 @@ namespace synthese
 				_numericalValue = -1;
 				_value = str;
 
-				char * buffer = _strdup(_value.c_str());
+				char * buffer = strdup(_value.c_str());
 				char * pEnd;
 
 				errno = 0;
