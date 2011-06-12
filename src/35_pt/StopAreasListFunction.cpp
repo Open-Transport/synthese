@@ -157,12 +157,12 @@ namespace synthese
 					}
 				}
 			}
-			else if(_bbox)
+			else
 			{
 				BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea, Env::GetOfficialEnv().getRegistry<StopArea>())
 				{
 					if(	!stopArea.second->getPoint().get() ||
-						!_bbox->contains(*stopArea.second->getPoint()->getCoordinate())
+						(_bbox && !_bbox->contains(*stopArea.second->getPoint()->getCoordinate()))
 					){
 						continue;
 					}
