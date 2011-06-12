@@ -86,7 +86,9 @@ namespace synthese
 		void AddDepartureStopToDisplayScreenAction::run(Request& request)
 		{
 			// Preparation
-			_screen->addPhysicalStop(_stop.get());
+			ArrivalDepartureTableGenerator::PhysicalStops stops(_screen->getPhysicalStops(false));
+			stops[_stop->getKey()] = _stop.get();
+			_screen->setStops(stops);
 
 			// Log
 			ArrivalDepartureTableLog::addUpdateEntry(

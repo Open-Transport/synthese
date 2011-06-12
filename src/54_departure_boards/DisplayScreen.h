@@ -40,6 +40,7 @@
 #include "TreeAlphabeticalOrderingPolicy.hpp"
 #include "TreeMultiClassRootPolicy.hpp"
 #include "Named.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -100,7 +101,8 @@ namespace synthese
 				tree::TreeAlphabeticalOrderingPolicy,
 				tree::TreeMultiClassRootPolicy<geography::NamedPlace, DisplayScreenCPU>
 			>,
-			public util::Named
+			public util::Named,
+			public impex::Importable
 		{
 		public:
 
@@ -148,8 +150,8 @@ namespace synthese
 				ArrivalDepartureTableGenerator::PhysicalStops	_physicalStops;				//!< Filter on departure stop point
 				bool						_allPhysicalStopsDisplayed;
 				ForbiddenPlacesList			_forbiddenArrivalPlaces;	//!< Places not to serve. If so, then the line is not selected
-				LineFilter					_forbiddenLines;
-					DeparturesTableDirection	_direction;
+				LineFilter					_allowedLines;
+				DeparturesTableDirection	_direction;
 				EndFilter					_originsOnly;
 				int							_maxDelay;			//!< Max time length for the table
 				int							_clearingDelay;
@@ -242,6 +244,8 @@ namespace synthese
 				void	setMacAddress(const std::string& value);
 				void	setRoutePlanningWithTransfer(bool value);
 				void	setSubScreenType(SubScreenType value){ _subScreenType = value; }
+				void	setAllowedLines(const LineFilter& value){ _allowedLines = value; }
+				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
 			//@}
 
 			//! \name Modifiers
@@ -249,17 +253,14 @@ namespace synthese
 				void	addDisplayedPlace(const pt::StopArea*);
 				void	addForbiddenPlace(const pt::StopArea*);
 				void	addForcedDestination(const pt::StopArea*);
-				void	addPhysicalStop(const pt::StopPoint*);
 				void	clearDisplayedPlaces();
 				void	clearForbiddenPlaces();
 				void	clearForcedDestinations();
-				void	clearPhysicalStops();
 				void	copy(const DisplayScreen&);
 				void	removeDisplayedPlace(const pt::StopArea*);
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
-				void	removePhysicalStop(const pt::StopPoint*);
-
+				
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.
 				/// @param transferPlace place to the transfer must be
@@ -312,9 +313,10 @@ namespace synthese
 				int								getComPort()					const;
 				bool							getDisplayClock()				const;
 				std::string						getMacAddress()					const;
-				bool							getRoutePlanningWithTransfer()	const;
+				bool							getRoutePlanningWithTransfer()	const { return _routePlanningWithTransfer; }
 				const TransferDestinationsList&	getTransferdestinations()		const { return _transfers; }
 				SubScreenType					getSubScreenType()				const { return _subScreenType; }
+				const LineFilter&				getAllowedLines()				const { return _allowedLines; }
 			//@}
 
 			//! \name Services
@@ -331,8 +333,18 @@ namespace synthese
 					const server::Request* request
 				) const;
 
-				std::string											getFullName()															const;
-				const ArrivalDepartureTableGenerator::PhysicalStops&	getPhysicalStops(bool result=true)										const;
+				std::string getFullName() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the list of the stops to display.
+				/// @param result if true, the result takes into acount of the value of _allPhysicalStops; if false the method retrieves only the attribute
+				/// @return the stops to display
+				/// @author Hugues Romain
+				const ArrivalDepartureTableGenerator::PhysicalStops& getPhysicalStops(
+					bool result = true
+				) const;
 
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 

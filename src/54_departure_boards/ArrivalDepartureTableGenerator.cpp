@@ -85,10 +85,32 @@ namespace synthese
 					}
 				}
 
+			// Tests if the line is forbidden in departure boards according to tue uUse rule
 			const UseRule& useRule(linestop.getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+			if(!dynamic_cast<const PTUseRule*>(&useRule) || !static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
+			{
+				return false;
+			}
+
+			// Line filter : if non empty, select only lines present in the filter
+			if(!_lineFilter.empty())
+			{
+				LineFilter::const_iterator it(_lineFilter.find(linestop.getLine()->getCommercialLine()));
+
+				// Line was not found
+				if(it == _lineFilter.end())
+				{
+					return false;
+				}
+
+				// Way back filter
+				if(it->second && *it->second != linestop.getLine()->getWayBack())
+				{
+					return false;
+				}
+			}
+
 			return
-				(!dynamic_cast<const PTUseRule*>(&useRule) || !static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()) &&
-				_lineFilter.find(linestop.getLine()->getKey()) == _lineFilter.end() &&
 				((_endFilter == WITH_PASSING) || (linestop.getPreviousDepartureForFineSteppingOnly() == NULL))
 				//&&	(((linestop.getFollowingArrival() != NULL) && (linestop.getFollowingArrival()->getConnectionPlace() != _place))
 				//	|| ( linestop.getLine()->getDestination()->getConnectionPlace() != _place))

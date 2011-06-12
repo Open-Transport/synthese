@@ -168,10 +168,7 @@ namespace synthese
 			_serviceNumberDisplay = value;
 		}
 
-		void DisplayScreen::addPhysicalStop(const StopPoint* physicalStop)
-		{
-			_physicalStops.insert(make_pair(physicalStop->getKey(),physicalStop));
-		}
+
 
 		void DisplayScreen::setDirection( DeparturesTableDirection direction )
 		{
@@ -226,7 +223,7 @@ namespace synthese
 							getPhysicalStops(),
 							_direction,
 							_originsOnly,
-							_forbiddenLines,
+							_allowedLines,
 							_displayedPlaces,
 							_forbiddenArrivalPlaces,
 							startTime,
@@ -242,7 +239,7 @@ namespace synthese
 							getPhysicalStops(),
 							_direction,
 							_originsOnly,
-							_forbiddenLines,
+							_allowedLines,
 							_displayedPlaces,
 							_forbiddenArrivalPlaces,
 							startTime,
@@ -579,11 +576,6 @@ namespace synthese
 			return _forbiddenArrivalPlaces;
 		}
 
-		const LineFilter& DisplayScreen::getForbiddenLines() const
-		{
-			return _forbiddenLines;
-		}
-
 		const DisplayedPlacesList& DisplayScreen::getDisplayedPlaces() const
 		{
 			return _displayedPlaces;
@@ -633,10 +625,7 @@ namespace synthese
 			return _allPhysicalStopsDisplayed;
 		}
 
-		void DisplayScreen::clearPhysicalStops()
-		{
-			_physicalStops.clear();
-		}
+
 
 		std::string DisplayScreen::getFullName() const
 		{
@@ -722,12 +711,7 @@ namespace synthese
 			_forcedDestinations.clear();
 		}
 
-		void DisplayScreen::removePhysicalStop(const StopPoint* stop)
-		{
-			ArrivalDepartureTableGenerator::PhysicalStops::iterator it = _physicalStops.find(stop->getKey());
-			if (it != _physicalStops.end())
-				_physicalStops.erase(it);
-		}
+
 
 		void DisplayScreen::removeDisplayedPlace(const StopArea* place)
 		{
@@ -761,6 +745,8 @@ namespace synthese
 			setTrackNumberDisplay(other.getTrackNumberDisplay());
 			setType(other.getType());
 			setWiringCode(other.getWiringCode());
+			setStops(other.getPhysicalStops(false));
+			setAllowedLines(other.getAllowedLines());
 			for (DisplayedPlacesList::const_iterator it = other.getDisplayedPlaces().begin(); it != other.getDisplayedPlaces().end(); ++it)
 			{
 				addDisplayedPlace(it->second);
@@ -772,10 +758,6 @@ namespace synthese
 			for (ForbiddenPlacesList::const_iterator it3 = other.getForbiddenPlaces().begin(); it3 != other.getForbiddenPlaces().end(); ++it3)
 			{
 				addForbiddenPlace(it3->second);
-			}
-			BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it4, other.getPhysicalStops(false))
-			{
-				addPhysicalStop(it4.second);
 			}
 		}
 
@@ -867,11 +849,6 @@ namespace synthese
 		void DisplayScreen::setRoutePlanningWithTransfer( bool value )
 		{
 			_routePlanningWithTransfer = value;
-		}
-
-		bool DisplayScreen::getRoutePlanningWithTransfer() const
-		{
-			return _routePlanningWithTransfer;
 		}
 
 
