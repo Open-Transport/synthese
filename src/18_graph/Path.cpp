@@ -272,6 +272,7 @@ namespace synthese
 					previousEdge = subEdge;
 				}
 				_edges.push_back(&edge);
+				_rankMap.insert(make_pair(edge.getMetricOffset(), edge.getRankInPath()));
 				return;
 			}
 
