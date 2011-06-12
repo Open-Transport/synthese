@@ -97,9 +97,9 @@ longlong notify_synthese_http(
 	char idBuf[50];
 	int len;
 
-	if (!args->args[0] || !args->args[1] || !args->args[2] || !args->args[3])
+	if (!args->args[0])
 	{
-		LOG1("error one parameter is NULL or empty\n");
+		LOG1("URL is NULL or empty\n");
 		*error = 1;
 		return 0;
 	}
