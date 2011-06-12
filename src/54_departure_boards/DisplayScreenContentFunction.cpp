@@ -256,7 +256,9 @@ namespace synthese
 
 						screen->setDisplayedPlace(stop->getConnectionPlace());
 						screen->setAllPhysicalStopsDisplayed(false);
-						screen->addPhysicalStop(stop.get());
+						ArrivalDepartureTableGenerator::PhysicalStops stopsFilter;
+						stopsFilter.insert(make_pair(stop->getKey(), stop.get()));
+						screen->setStops(stopsFilter);
 					}
 
 					// 3.2 by operator code
@@ -268,11 +270,13 @@ namespace synthese
 
 						//Get StopPoint Global Registry
 						typedef const pair<const RegistryKeyType, shared_ptr<StopPoint> > myType;
+						ArrivalDepartureTableGenerator::PhysicalStops pstops;
 						BOOST_FOREACH(myType&  myStop,Env::GetOfficialEnv().getRegistry<StopPoint>())
 						{
 							if(myStop.second->getCodeBySources() == oc)
 							{
-								screen->addPhysicalStop(myStop.second.get());
+								pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
+								screen->setStops(pstops);
 								break;
 							}
 						}

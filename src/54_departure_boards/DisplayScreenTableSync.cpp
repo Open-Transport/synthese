@@ -48,15 +48,17 @@
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "ImportableTableSync.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
-
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -68,7 +70,7 @@ namespace synthese
 	using namespace security;
 	using namespace messages;
 	using namespace geography;
-	using namespace pt;
+	using namespace impex;
 
 
 	namespace util
@@ -89,7 +91,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS = "physical_stops_ids";	// List of physical stops uids, separated by comas
 		const string DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED = "all_physicals";
 		const string DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS = "forbidden_arrival_places_ids";	// List of forbidden connection places uids, separated by comas
-		const string DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS = "forbidden_lines_ids";	// List of forbidden lines uids, separated by comas
+		const string DisplayScreenTableSync::COL_ALLOWED_LINES_IDS = "allowed_lines_ids";
 		const string DisplayScreenTableSync::COL_DIRECTION = "direction";
 		const string DisplayScreenTableSync::COL_ORIGINS_ONLY = "origins_only";
 		const string DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS = "displayed_places_ids";	// List of displayed places uids, separated by comas
@@ -111,6 +113,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS("transfer_destinations");
 		const string DisplayScreenTableSync::COL_UP_ID("up_id");
 		const string DisplayScreenTableSync::COL_SUB_SCREEN_TYPE("sub_screen_type");
+		const string DisplayScreenTableSync::COL_DATASOURCE_LINKS("datasource_links");
 	}
 
 	namespace db
@@ -134,7 +137,7 @@ namespace synthese
 			DBTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
 			DBTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_LINES_IDS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_ALLOWED_LINES_IDS, SQL_TEXT),
 			DBTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
@@ -155,6 +158,7 @@ namespace synthese
 			DBTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
 			DBTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
+			DBTableSync::Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -199,7 +203,6 @@ namespace synthese
 			object->clearForbiddenPlaces();
 			object->clearDisplayedPlaces();
 			object->clearForcedDestinations();
-			object->clearPhysicalStops();
 			object->clearTransferDestinations();
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -216,6 +219,23 @@ namespace synthese
 						"Data corrupted in "+ TABLE.NAME + " on display screen : localization "+ lexical_cast<string>(placeId) + " not found"
 					);
 				}
+
+				// Line filter
+				LineFilter lineFilter(
+					DisplayScreenTableSync::UnserializeLineFilter(
+						rows->getText(DisplayScreenTableSync::COL_ALLOWED_LINES_IDS),
+						env,
+						linkLevel
+				)	);
+				object->setAllowedLines(lineFilter);
+
+				// Datasource links
+				Importable::DataSourceLinks links(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(DisplayScreenTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				object->setDataSourceLinks(links, true);
 
 				// Up & root
 				RegistryKeyType upId(rows->getLongLong(DisplayScreenTableSync::COL_UP_ID));
@@ -269,18 +289,24 @@ namespace synthese
 
 				// Physical stops
 				vector<string> stops = Conversion::ToStringVector(rows->getText ( DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS));
+				ArrivalDepartureTableGenerator::PhysicalStops pstops;
 				BOOST_FOREACH(const string& stop, stops)
 				{
 					try
 					{
-						RegistryKeyType id(Conversion::ToLongLong(stop));
-						object->addPhysicalStop(StopPointTableSync::Get(id, env, linkLevel).get());
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(stop));
+						pstops.insert(
+							make_pair(
+								id,
+								StopPointTableSync::Get(id, env, linkLevel).get()
+						)	);
 					}
 					catch (ObjectNotFoundException<StopPoint>&)
 					{
 						Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS);
 					}
 				}
+				object->setStops(pstops);
 
 				// Forbidden places
 				stops = Conversion::ToStringVector (rows->getText (DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS));
@@ -396,20 +422,6 @@ namespace synthese
 				first = false;
 			}
 
-			// Lines filter
-			stringstream lfstream;
-			first = true;
-			for (LineFilter::const_iterator itl = object->getForbiddenLines().begin(); itl != object->getForbiddenLines().end(); ++itl)
-			{
-				assert(itl->second->getKey() > 0);
-				if(!first)
-				{
-					lfstream << ",";
-				}
-				lfstream << itl->first;
-				first = false;
-			}
-
 			// Displayed places
 			stringstream dpstream;
 			first = true;
@@ -469,7 +481,7 @@ namespace synthese
 			query.addField(psstream.str());
 			query.addField(object->getAllPhysicalStopsDisplayed());
 			query.addField(fpstream.str());
-			query.addField(lfstream.str());
+			query.addField(DisplayScreenTableSync::SerializeLineFilter(object->getAllowedLines()));
 			query.addField(static_cast<int>(object->getDirection()));
 			query.addField(static_cast<int>(object->getEndFilter()));
 			query.addField(dpstream.str());
@@ -490,6 +502,7 @@ namespace synthese
 			query.addField(tdstream.str());
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 
@@ -865,4 +878,77 @@ namespace synthese
 				}
 			}
 			throw Exception("Display screen not found");
-}	}	}
+		}
+
+
+
+		LineFilter DisplayScreenTableSync::UnserializeLineFilter(
+			const std::string& text,
+			util::Env& env,
+			util::LinkLevel linkLevel
+		){
+			LineFilter result;
+
+			// Empty text makes split throwing an exception
+			if(text.empty())
+			{
+				return result;
+			}
+
+			vector<string> lines;
+			split(lines, text, is_any_of(", "));
+			BOOST_FOREACH(const string& line, lines)
+			{
+				vector<string> parts;
+				split(parts, line, is_any_of("|"));
+				
+				RegistryKeyType id(lexical_cast<RegistryKeyType>(parts[0]));
+				try
+				{
+					shared_ptr<const CommercialLine> lineObj(
+						CommercialLineTableSync::Get(id, env, linkLevel)
+					);
+					result.insert(
+						make_pair(
+							lineObj.get(),
+							parts.size() > 1 ? optional<bool>(lexical_cast<bool>(parts[1])) : optional<bool>()
+					)	);
+				}
+				catch(ObjectNotFoundException<CommercialLine>&)
+				{
+				}
+			}
+
+			return result;
+		}
+
+
+
+		std::string DisplayScreenTableSync::SerializeLineFilter( const LineFilter& value )
+		{
+			stringstream result;
+
+			bool first(true);
+			BOOST_FOREACH(const LineFilter::value_type& itLineFilter, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					result << ",";
+				}
+
+				result << itLineFilter.first->getKey();
+
+				if(itLineFilter.second)
+				{
+					result << "|" << *itLineFilter.second;
+				}
+			}
+
+			return result.str();
+		}
+
+}	}

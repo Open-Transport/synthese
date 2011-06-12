@@ -61,7 +61,7 @@ namespace synthese
 				static const std::string COL_PHYSICAL_STOPS_IDS;	//!< List of physical stops uids, separated by comas
 				static const std::string COL_ALL_PHYSICAL_DISPLAYED;
 				static const std::string COL_FORBIDDEN_ARRIVAL_PLACES_IDS;	//!< List of forbidden connection places uids, separated by comas
-				static const std::string COL_FORBIDDEN_LINES_IDS;	//!< List of forbidden lines uids, separated by comas
+				static const std::string COL_ALLOWED_LINES_IDS;
 				static const std::string COL_DIRECTION;
 				static const std::string COL_ORIGINS_ONLY;
 				static const std::string COL_DISPLAYED_PLACES_IDS;	//!< List of displayed places uids, separated by comas
@@ -83,6 +83,7 @@ namespace synthese
 				static const std::string COL_TRANSFER_DESTINATIONS;
 				static const std::string COL_UP_ID;
 				static const std::string COL_SUB_SCREEN_TYPE;
+				static const std::string COL_DATASOURCE_LINKS;
 			//@}
 
 
@@ -207,6 +208,33 @@ namespace synthese
 			static bool GetIsAtLeastALineDisplayed(
 				util::RegistryKeyType screenId
 			);
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Transform a serialized string into a line filter.
+			/// @param text the serialized string
+			/// @return the corresponding LineFilter
+			/// @author Hugues Romain
+			/// @date 2011
+			/// @since 3.3.0
+			static LineFilter UnserializeLineFilter(
+				const std::string& text,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Transform a line filter into a serialized string.
+			/// @param value the LineFilter
+			/// @return the serialized string
+			/// @author Hugues Romain
+			/// @date 2011
+			/// @since 3.3.0
+			static std::string SerializeLineFilter(const LineFilter& value);
 		};
 	}
 }

@@ -63,6 +63,8 @@
 #include "DisplayScreenTransferDestinationRemoveAction.h"
 #include "DisplayScreenUpdateDisplayedStopAreaAction.hpp"
 
+#include "IneoDepartureBoardsFileFormat.hpp"
+
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayMaintenanceRight.h"
 
