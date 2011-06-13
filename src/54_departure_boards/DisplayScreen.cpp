@@ -457,16 +457,9 @@ namespace synthese
 							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayMainPage()),
 							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayRowPage()),
 							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
-							getTitle(),
-							getWiringCode(),
-							getServiceNumberDisplay(),
-							getTrackNumberDisplay(),
-							getRoutePlanningWithTransfer(),
-							posix_time::minutes(getBlinkingDelay()),
-							getDisplayClock(),
-							*getDisplayedPlace(),
+							realStartDateTime,
 							displayedObject,
-							getChildren()
+							*this
 						);
 					}
 				}
