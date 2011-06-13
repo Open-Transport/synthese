@@ -302,16 +302,9 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> page,
 					boost::shared_ptr<const cms::Webpage> rowPage,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
-					const std::string& title,
-					int wiringCode,
-					bool displayServiceNumber,
-					bool displayTrackNumber,
-					bool withTransfer,
-					boost::posix_time::time_duration blinkingDelay,
-					bool displayClock,
-					const pt::StopArea& place,
+					const boost::posix_time::ptime& date,
 					const RoutePlanningListWithAlarm& rows,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen
 				);
 			private:
 
@@ -333,13 +326,8 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> page,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					std::size_t rowId,
-					bool displayQuaiNumber,
-					bool displayServiceNumber,
-					boost::posix_time::time_duration blinkingDelay,
-					bool withTransfer,
-					const pt::StopArea& origin,
 					const RoutePlanningRow& row,
-					const DisplayScreen::ChildrenType& subscreens
+					const DisplayScreen& screen
 				);
 
 
