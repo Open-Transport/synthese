@@ -1090,26 +1090,29 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> rowPage,
 			boost::shared_ptr<const cms::Webpage> destinationPage,
-			const std::string& title,
-			int wiringCode,
-			bool displayServiceNumber,
-			bool displayTrackNumber,
-			bool withTransfer,
-			time_duration blinkingDelay,
-			bool displayClock,
-			const pt::StopArea& place,
+			const boost::posix_time::ptime& date,
 			const RoutePlanningListWithAlarm& rows,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			pm.insert(DATA_TITLE, title);
-			pm.insert(DATA_WIRING_CODE, wiringCode);
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayTrackNumber);
-			pm.insert(DATA_WITH_TRANSFER, withTransfer);
-			PTObjectsCMSExporters::ExportStopArea(pm, place);
-			pm.insert(DATA_DISPLAY_CLOCK, displayClock);
 
+			pm.insert(Request::PARAMETER_OBJECT_ID, screen.getKey());
+			pm.insert(DATA_MAC, screen.getMacAddress());
+			pm.insert(DATA_DATE, to_iso_extended_string(date.date()) + " " + to_simple_string(date.time_of_day()));
+			pm.insert(DATA_TITLE, screen.getTitle());
+			pm.insert(DATA_WIRING_CODE, screen.getWiringCode());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
+			if(screen.getType())
+			{
+				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
+			}
+			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
+			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
+			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
+			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
+			PTObjectsCMSExporters::ExportStopArea(pm, *screen.getDisplayedPlace());
+			
 			// Rows
 			if(rowPage.get())
 			{
@@ -1148,13 +1151,8 @@ namespace synthese
 						rowPage,
 						destinationPage,
 						rank,
-						displayTrackNumber,
-						displayServiceNumber,
-						blinkingDelay,
-						withTransfer,
-						place,
 						*it->second,
-						subscreens
+						screen
 					);
 				}
 
@@ -1170,7 +1168,7 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
 				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
 				{
@@ -1190,21 +1188,16 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> destinationPage,
 			std::size_t rowId,
-			bool displayQuaiNumber,
-			bool displayServiceNumber,
-			boost::posix_time::time_duration blinkingDelay,
-			bool withTransfer,
-			const pt::StopArea& origin,
 			const RoutePlanningRow& row,
-			const DisplayScreen::ChildrenType& subscreens
+			const DisplayScreen& screen
 		){
 
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			pm.insert(DATA_ROW_RANK, rowId);
-			pm.insert(DATA_WITH_TRANSFER, withTransfer);
-			pm.insert(DATA_DISPLAY_TRACK_NUMBER, displayQuaiNumber);
-			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, displayServiceNumber);
+			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
+			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
+			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
 
 			{ // Destination
 				stringstream str;
@@ -1228,7 +1221,7 @@ namespace synthese
 			{
 				const ServicePointer& s(row.second.getFirstJourneyLeg());
 
-				pm.insert(DATA_BLINKS, s.getDepartureDateTime() - second_clock::local_time() <= blinkingDelay);
+				pm.insert(DATA_BLINKS, s.getDepartureDateTime() - second_clock::local_time() <= minutes(screen.getBlinkingDelay()));
 				pm.insert(DATA_TRACK, static_cast<const StopPoint*>(s.getRealTimeDepartureVertex())->getName());
 				pm.insert(DATA_SERVICE_NUMBER, s.getService()->getServiceNumber());
 
@@ -1298,7 +1291,7 @@ namespace synthese
 
 			// Subscreens
 			size_t subScreenRank(0);
-			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, subscreens)
+			BOOST_FOREACH(const DisplayScreen::ChildrenType::value_type& it, screen.getChildren())
 			{
 				if(it.second->getSubScreenType() == DisplayScreen::SUB_CONTENT)
 				{
