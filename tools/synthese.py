@@ -25,13 +25,12 @@ import logging
 import os
 from os.path import join
 import shutil
-import site
 import subprocess
 import sys
 
 log = logging.getLogger(__name__)
 
-SOURCE_PATH = "@PROJECT_SOURCE_DIR@"
+SOURCE_PATH = '@PROJECT_SOURCE_DIR@'
 
 
 class Config(object):
@@ -57,14 +56,11 @@ class Bootstrap(object):
             self.config = self._get_installed_config()
             return
 
+        self.thirdparty_dir = os.environ.get(
+            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese')) 
+        if not os.path.isdir(self.thirdparty_dir):
+            os.makedirs(self.thirdparty_dir)
         self.config = self._get_source_config()
-
-    def _get_user_storage_path(self):
-        # TODO: should we add a version too?
-        storage_path = os.path.join(site.USER_BASE, 'synthese')
-        if not os.path.isdir(storage_path):
-            os.makedirs(storage_path)
-        return storage_path
 
     def _get_installed_config(self):
         config = Config()
@@ -97,7 +93,7 @@ class Bootstrap(object):
 
     def _get_source_config(self):
         config = Config()
-        config.pyenv_path = join(self._get_user_storage_path(), 'env')
+        config.pyenv_path = join(self.thirdparty_dir, 'env')
 
         if SOURCE_PATH.startswith('@'):
             # This assumes the script is run from the source directory
@@ -146,7 +142,7 @@ class Bootstrap(object):
             join(c.tools_path, 'requirements_%s.txt' % sys.platform),
         ]
 
-        download_cache = join(self._get_user_storage_path(), 'pip_download_cache')
+        download_cache = join(self.thirdparty_dir, 'pip_download_cache')
 
         for requirements_file in requirements_files:
             if not os.path.isfile(requirements_file):
@@ -194,6 +190,7 @@ class Bootstrap(object):
             os.environ['SYNTHESE_ENV_TYPE'] = c.env_type
         if c.env_path:
             os.environ['SYNTHESE_ENV_PATH'] = c.env_path
+        os.environ['SYNTHESE_THIRDPARTY_DIR'] = self.thirdparty_dir
 
         pythonpath = os.environ.get('PYTHONPATH', '')
         if pythonpath:
@@ -211,6 +208,9 @@ class Bootstrap(object):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG if '-v' in sys.argv else logging.INFO)
+
+    if sys.platform == 'cygwin':
+        raise Exception('Cygwin Python unsupported')
 
     bootstrap = Bootstrap()
     bootstrap.maybe_create_pyenv()

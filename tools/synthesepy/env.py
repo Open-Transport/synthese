@@ -26,6 +26,7 @@ import os
 import sys
 import urllib2
 
+from synthesepy import build
 from synthesepy import utils
 
 log = logging.getLogger(__name__)
@@ -41,6 +42,7 @@ class Env(object):
     log_stdout = False
     static_dir = None
     extra_params = None
+    thirdparty_dir = None
 
     def __init__(self, env_path, mode):
         self.mode = mode
@@ -101,22 +103,11 @@ class Env(object):
         )
 
     def _prepare_for_launch_win(self):
-        LIBICONV2_DLL_URL = 'https://extranet-rcsmobility.com/attachments/download/13571'
-        LIBICONV2_DLL_MD5 = 'fd1dc6c680299a2ed1eedcc3eabda601'
+        builder = build.get_builder(self)
+        builder.install_iconv()
 
-        target_path = os.path.join(self.daemon_launch_path, 'libiconv2.dll')
-        # TODO: maybe copy this dll during install instead of fetching it dynamically.
-        if not os.path.isfile(target_path):
-            log.info('Downloading iconv dll...')
-            content = urllib2.urlopen(LIBICONV2_DLL_URL).read()
-
-            m = hashlib.md5()
-            m.update(content)
-            if m.hexdigest() != LIBICONV2_DLL_MD5:
-                raise Exception('Downloaded iconv2 dll doesn\'t match exepected md5 sum')
-            open(target_path, 'wb').write(content)
-
-        utils.append_paths_to_environment('PATH', [self.daemon_launch_path])
+        iconv_path = os.path.join(self.thirdparty_dir, 'iconv')
+        utils.append_paths_to_environment('PATH', [iconv_path])
 
     def _prepare_for_launch_lin(self):
         pass

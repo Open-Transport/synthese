@@ -22,6 +22,7 @@
 
 import argparse
 import logging
+import os
 import time
 
 import synthesepy
@@ -85,9 +86,14 @@ def sqlite_to_mysql(args, env):
 
 def main():
     parser = argparse.ArgumentParser(description='Synthese management tool')
-    parser.add_argument('-t', '--env-type', choices=['scons', 'cmake', 'installed'])
+    parser.add_argument(
+        '-t', '--env-type', choices=['scons', 'cmake', 'installed'],
+        default='cmake'
+    )
     parser.add_argument('-b', '--env-path', help='Env path')
-    parser.add_argument('-m', '--mode', choices=['release', 'debug'])
+    parser.add_argument(
+        '-m', '--mode', choices=['release', 'debug'], default='debug'
+    )
     parser.add_argument('-p', '--port', type=int, default=8080)
     parser.add_argument('--no-proxy', action='store_true', default=False)
     parser.add_argument('--site-id', type=int, default=0)
@@ -111,13 +117,31 @@ def main():
     parser_build = subparsers.add_parser('build')
     parser_build.set_defaults(func=build)
     parser_build.add_argument(
-        '--with-mysql', action='store_true', default=False,
-        help='Enable MySQL database support'
+        '-g', '--generate-only', action='store_true', default=False,
+        help='Only generate build script, but don\'t build'
+    )
+    parser_build.add_argument(
+        '--prefix',
+        help='Installation directory'
+    )
+    parser_build.add_argument(
+        '--mysql-params',
+        help='MySQL connection string used for the unit tests. For instance:'
+            '"host=localhost,user=synthese,passwd=synthese"'
+    )
+    parser_build.add_argument(
+        '--without-mysql', action='store_true', default=False,
+        help='Disable MySQL database support'
     )
     parser_build.add_argument(
         '--mysql-dir',
         help='Path to MySQL installation (Not needed on Linux if using'
              'standard MySQL installation)'
+    )
+    parser_build.add_argument(
+        '--boost-dir',
+        help='Path to Boost installation (Not needed on Linux if using'
+             'standard Boost installation)'
     )
 
     parser_rundaemon = subparsers.add_parser('rundaemon')
@@ -169,6 +193,7 @@ def main():
     env.log_stdout = args.log_stdout
     env.static_dir = args.static_dir
     env.extra_params = args.extra_params
+    env.thirdparty_dir = os.environ['SYNTHESE_THIRDPARTY_DIR'] 
 
     log.debug('Args: %s', args)
     args.func(args, env)
