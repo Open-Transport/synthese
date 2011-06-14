@@ -116,6 +116,7 @@ namespace synthese
 				try
 				{
 					_journeyPattern = JourneyPatternTableSync::Get(id, *_env);
+					ScheduledServiceTableSync::Search(*_env, _journeyPattern->getKey());
 				}
 				catch(ObjectNotFoundException<JourneyPattern>)
 				{
