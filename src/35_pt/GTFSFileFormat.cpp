@@ -621,7 +621,10 @@ namespace synthese
 								_env,
 								stream
 						)	);
-						*service |= trip.calendar;
+						if(service)
+						{
+							*service |= trip.calendar;
+						}
 
 						tripDetailVector.clear();
 					}
