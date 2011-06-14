@@ -418,8 +418,11 @@ namespace synthese
 						)	);
 
 						// Calendar
-						service->subDates(mask);
-						*service |= _calendarMap[calendarNumber];
+						if(service)
+						{
+							service->subDates(mask);
+							*service |= _calendarMap[calendarNumber];
+						}
 					}
 				}
 			}

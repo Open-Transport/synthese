@@ -69,6 +69,9 @@ namespace synthese
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
 				{
+					ScheduledServiceTableSync::Search(_env, itPath->getKey());
+					ContinuousServiceTableSync::Search(_env, itPath->getKey());
+
 					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
 					{
 						if(!dynamic_cast<NonPermanentService*>(itService))
@@ -77,19 +80,7 @@ namespace synthese
 						}
 
 						NonPermanentService* service(static_cast<NonPermanentService*>(itService));
-						if(_startDate)
-						{
-							date lastServiceDate(service->getLastActiveDate());
-							if(lastServiceDate >= *_startDate)
-							{
-								Calendar mask(*_startDate, lastServiceDate);
-								service->subDates(mask);
-							}
-						}
-						else
-						{
-							service->subDates(_calendar);
-						}
+						service->subDates(_calendar);
 					}
 				}
 			}

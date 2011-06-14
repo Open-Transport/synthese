@@ -483,6 +483,11 @@ namespace synthese
 							stream
 					)	);
 
+					if(service == NULL)
+					{
+						continue;
+					}
+
 					BOOST_FOREACH(const SchedulesMap::mapped_type::second_type::value_type& itKey, it.second.second)
 					{
 						_services[itKey].push_back(service);

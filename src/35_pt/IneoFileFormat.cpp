@@ -520,9 +520,12 @@ namespace synthese
 								_env,
 								stream
 						)	);
-						BOOST_FOREACH(const date& dat, dates)
+						if(service)
 						{
-							service->setActive(dat);
+							BOOST_FOREACH(const date& dat, dates)
+							{
+								service->setActive(dat);
+							}
 						}
 					}
 					if(_section.empty())
