@@ -177,6 +177,10 @@ namespace synthese
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
+			if(!_startDate || !_endDate)
+			{
+				throw RequestException("Start date and end date must be defined");
+			}
 
 			if(key == FILE_POINTSARRETS)
 			{
@@ -594,10 +598,6 @@ namespace synthese
 		void HeuresFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
-			if(_cleanOldData && (!_startDate || !_endDate))
-			{
-				throw RequestException("Start date and end date must be defined");
-			}
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID))
 			{
