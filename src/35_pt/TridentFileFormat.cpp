@@ -1630,15 +1630,20 @@ namespace synthese
 					arrs.push_back(arrSchedule);
 				}
 
-				services[keyNode.getText()] = PTFileFormat::CreateOrUpdateService(
-					*line,
-					deps,
-					arrs,
-					serviceNumber,
-					_dataSource,
-					_env,
-					os
-				);
+				ScheduledService* service(
+					PTFileFormat::CreateOrUpdateService(
+						*line,
+						deps,
+						arrs,
+						serviceNumber,
+						_dataSource,
+						_env,
+						os
+				)	);
+				if(service)
+				{
+					services[keyNode.getText()] = service;
+				}
 			}
 
 			// Calendars

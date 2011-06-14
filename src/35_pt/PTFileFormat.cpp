@@ -50,6 +50,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -451,7 +452,7 @@ namespace synthese
 							rank > 0 && stop._arrival,
 							0,
 							*stop._stop.begin(),
-							stop._withTimes
+							stop._withTimes ? *stop._withTimes : true
 					)	);
 					result->addEdge(*ls);
 					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
@@ -492,6 +493,32 @@ namespace synthese
 			util::Env& env,
 			std::ostream& logStream
 		){
+			// Comparison of the size of schedules and the size of the route
+			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
+				route.getScheduledStopsNumber() != arrivalSchedules.size()
+			){
+				logStream << "WARN : Inconsistent schedules size in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				return NULL;
+			}
+
+			// Checks for schedules validity
+			BOOST_FOREACH(const time_duration& td, departureSchedules)
+			{
+				if(td.is_not_a_date_time())
+				{
+					logStream << "WARN : At least an undefined time in departure schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					return NULL;
+				}
+			}
+			BOOST_FOREACH(const time_duration& ta, arrivalSchedules)
+			{
+				if(ta.is_not_a_date_time())
+				{
+					logStream << "WARN : At least an undefined time in arrival schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					return NULL;
+				}
+			}
+
 			// Search for a corresponding service
 			ScheduledService* result(NULL);
 			BOOST_FOREACH(Service* tservice, route.getServices())

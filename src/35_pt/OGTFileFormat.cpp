@@ -234,7 +234,10 @@ namespace synthese
 						user_data->_env,
 						user_data->_stream
 				)	);
-				*service |= user_data->_calendar;
+				if(service)
+				{
+					*service |= user_data->_calendar;
+				}
 			}
 		}
 
