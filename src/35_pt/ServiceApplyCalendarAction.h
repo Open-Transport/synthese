@@ -40,6 +40,7 @@ namespace synthese
 	namespace pt
 	{
 		class SchedulesBasedService;
+		class JourneyPattern;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Update of the dates of a service.
@@ -70,6 +71,7 @@ namespace synthese
 			static const std::string PARAMETER_ADD;
 
 		private:
+			boost::shared_ptr<const JourneyPattern> _journeyPattern;
 			boost::shared_ptr<SchedulesBasedService> _service;
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			boost::gregorian::date _startDate;
@@ -112,6 +114,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setService(boost::shared_ptr<SchedulesBasedService> value) { _service = value; }
+				void setJourneyPattern(boost::shared_ptr<const JourneyPattern> value) { _journeyPattern = value; }
 			//@}
 		};
 	}
