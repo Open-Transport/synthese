@@ -146,35 +146,66 @@ namespace synthese
 
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
-				object->setTransaction(
-					ReservationTransactionTableSync::GetEditable(
-						rows->getLongLong(ReservationTableSync::COL_TRANSACTION_ID),
-						env, linkLevel
-					).get()
-				);
-
 				RegistryKeyType vehicleId(rows->getLongLong(ReservationTableSync::COL_VEHICLE_ID));
 				if(vehicleId > 0)
 				{
-					object->setVehicle(
-						VehicleTableSync::Get(vehicleId, env, linkLevel).get()
-					);
+					try
+					{
+						object->setVehicle(
+							VehicleTableSync::Get(vehicleId, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<Vehicle>&)
+					{
+						util::Log::GetInstance().warn("No such vehicle "+ lexical_cast<string>(vehicleId) +" in reservation "+ lexical_cast<string>(object->getKey()));
+					}
 				}
 
 				RegistryKeyType vpd(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE));
 				if(vpd > 0)
 				{
-					object->setVehiclePositionAtDeparture(
-						VehiclePositionTableSync::GetEditable(vpd, env, linkLevel).get()
-					);
+					try
+					{
+						object->setVehiclePositionAtDeparture(
+							VehiclePositionTableSync::GetEditable(vpd, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<VehiclePosition>&)
+					{
+						util::Log::GetInstance().warn("No such departure vehicle position "+ lexical_cast<string>(vpd) +" in reservation "+ lexical_cast<string>(object->getKey()));
+					}
 				}
 
 				RegistryKeyType vpa(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL));
 				if(vpa > 0)
 				{
-					object->setVehiclePositionAtArrival(
-						VehiclePositionTableSync::GetEditable(vpa, env, linkLevel).get()
+					try
+					{
+						object->setVehiclePositionAtArrival(
+							VehiclePositionTableSync::GetEditable(vpa, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<VehiclePosition>&)
+					{
+						util::Log::GetInstance().warn("No such arrival vehicle position "+ lexical_cast<string>(vpa) +" in reservation "+ lexical_cast<string>(object->getKey()));
+					}
+				}
+
+				// Keep this call at last position to be avoid the registration of the reservation in the transaction in case of
+				// unhabdled exception thrown by the previous links
+				RegistryKeyType transactionId(rows->getLongLong(ReservationTableSync::COL_TRANSACTION_ID));
+				try
+				{
+					object->setTransaction(
+						ReservationTransactionTableSync::GetEditable(
+							transactionId,
+							env, linkLevel
+						).get()
 					);
+				}
+				catch(ObjectNotFoundException<ReservationTransaction>&)
+				{
+					util::Log::GetInstance().warn("No such transaction "+ lexical_cast<string>(transactionId) +" in reservation "+ lexical_cast<string>(object->getKey()));
 				}
 			}
 		}
