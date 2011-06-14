@@ -344,13 +344,16 @@ namespace synthese
 				/// @author Hugues Romain
 				void merge(Path& other);
 
-		private:
 
-				void markScheduleIndexesUpdateNeeded ();
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Reset the schedules indexes.
+				/// Use this method when schedules have changed
+				/// @param RTDataOnly if true only the real time indexes are reseted
+				/// @author Hugues Romain
+				void markScheduleIndexesUpdateNeeded(bool RTDataOnly);
 			//@}
 		};
-	}
-}
+}	}
 
 #endif

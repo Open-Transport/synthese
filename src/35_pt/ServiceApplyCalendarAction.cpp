@@ -27,9 +27,11 @@
 #include "ServiceApplyCalendarAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "SchedulesBasedService.h"
 #include "CalendarTemplateTableSync.h"
+#include "ScheduledServiceTableSync.h"
+#include "ContinuousServiceTableSync.h"
 #include "Fetcher.h"
+#include "JourneyPatternTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -42,6 +44,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace calendar;
+	using namespace graph;
 
 	namespace util
 	{
@@ -65,23 +68,27 @@ namespace synthese
 			if(_service.get())
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
-				map.insert(PARAMETER_ADD, _add);
-				if(!_period.is_special())
-				{
-					map.insert(PARAMETER_PERIOD, static_cast<int>(_period.days()));
-				}
-				if(_calendarTemplate.get())
-				{
-					map.insert(PARAMETER_CALENDAR_TEMPLATE_ID, _calendarTemplate->getKey());
-				}
-				if(!_startDate.is_not_a_date())
-				{
-					map.insert(PARAMETER_START_DATE, _startDate);
-				}
-				if(!_endDate.is_not_a_date())
-				{
-					map.insert(PARAMETER_END_DATE, _endDate);
-				}
+			}
+			if(_journeyPattern.get())
+			{
+				map.insert(PARAMETER_SERVICE_ID, _journeyPattern->getKey());
+			}
+			map.insert(PARAMETER_ADD, _add);
+			if(!_period.is_special())
+			{
+				map.insert(PARAMETER_PERIOD, static_cast<int>(_period.days()));
+			}
+			if(_calendarTemplate.get())
+			{
+				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID, _calendarTemplate->getKey());
+			}
+			if(!_startDate.is_not_a_date())
+			{
+				map.insert(PARAMETER_START_DATE, _startDate);
+			}
+			if(!_endDate.is_not_a_date())
+			{
+				map.insert(PARAMETER_END_DATE, _endDate);
 			}
 			return map;
 		}
@@ -90,13 +97,34 @@ namespace synthese
 
 		void ServiceApplyCalendarAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_service = Fetcher<SchedulesBasedService>::FetchEditable(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID), *_env);
+			RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
+			RegistryTableType tableId(decodeTableId(id));
+			if(	tableId == ScheduledServiceTableSync::TABLE.ID ||
+				tableId == ContinuousServiceTableSync::TABLE.ID
+			){
+				try
+				{
+					_service = Fetcher<SchedulesBasedService>::FetchEditable(id, *_env);
+				}
+				catch(ObjectNotFoundException<SchedulesBasedService>)
+				{
+					throw ActionException("No such service");
+				}
 			}
-			catch(ObjectNotFoundException<SchedulesBasedService>)
+			else if(tableId == JourneyPatternTableSync::TABLE.ID)
 			{
-				throw ActionException("No such service");
+				try
+				{
+					_journeyPattern = JourneyPatternTableSync::Get(id, *_env);
+				}
+				catch(ObjectNotFoundException<JourneyPattern>)
+				{
+					throw ActionException("No such journey pattern");
+				}
+			}
+			else
+			{
+				throw ActionException("Forbidden table for the specified id");
 			}
 
 			RegistryKeyType cid(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_TEMPLATE_ID, 0));
@@ -134,26 +162,49 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			Calendar result;
-			for (date d = _startDate; d <= _endDate; d += _period)
+			// Selection of the services to update
+			ServiceSet services;
+			if(_journeyPattern.get())
 			{
-				result.setActive(d);
-			}
-			if(_calendarTemplate.get())
-			{
-				result = _calendarTemplate->getResult(result);
-			}
-
-			if(_add)
-			{
-				*_service |= result;
+				services = _journeyPattern->getServices();
 			}
 			else
 			{
-				_service->subDates(result);
+				services.insert(_service.get());
 			}
 
-			Fetcher<SchedulesBasedService>::FetchSave(*_service);
+			// Loop on each service
+			DBTransaction transaction;
+			BOOST_FOREACH(Service* itService, services)
+			{
+				SchedulesBasedService* service(dynamic_cast<SchedulesBasedService*>(itService));
+				if(service == NULL)
+				{
+					continue;
+				}
+
+				Calendar result;
+				for (date d = _startDate; d <= _endDate; d += _period)
+				{
+					result.setActive(d);
+				}
+				if(_calendarTemplate.get())
+				{
+					result = _calendarTemplate->getResult(result);
+				}
+
+				if(_add)
+				{
+					*service |= result;
+				}
+				else
+				{
+					service->subDates(result);
+				}
+
+				Fetcher<SchedulesBasedService>::FetchSave(*service, transaction);
+			}
+			transaction.run();
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
