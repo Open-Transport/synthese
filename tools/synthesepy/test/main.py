@@ -33,7 +33,9 @@ else:
     import unittest2 as unittest
 
 from synthesepy.functional_test import http_testcase
+from synthesepy import build
 from synthesepy import utils
+
 
 log = logging.getLogger(__name__)
 
@@ -166,10 +168,9 @@ class Tester(object):
         return test_prog.result.wasSuccessful()
 
     def _run_cpp_tests_cmake(self, suite_args):
-        if not utils.find_executable('ctest' + self.env.platform_exe_suffix):
-            raise Exception('Unable to find ctest in PATH')
+        builder = build.get_builder(self.env)
 
-        args = ['ctest']
+        args = [builder.get_cmake_tool_path('ctest')]
         if self.env.verbose:
             args.append('-V')
         subprocess.check_call(args, cwd=self.env.env_path)
