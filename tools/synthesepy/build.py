@@ -20,14 +20,29 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import hashlib
 import logging
 import multiprocessing
 import os
+from os.path import join
+import shutil
 import subprocess
+import sys
+import urllib2
+import zipfile
 
 from synthesepy import utils
 
 log = logging.getLogger(__name__)
+
+
+# Utils
+
+def cpu_count():
+    if 'SYNTHESE_CPU_COUNT' in os.environ:
+        return int(os.environ['SYNTHESE_CPU_COUNT'])
+    return multiprocessing.cpu_count()
+
 
 
 class Builder(object):
@@ -35,8 +50,19 @@ class Builder(object):
         self.env = env
         self.args = args
 
-    def build(self):
+        self.download_cache_dir = join(self.env.thirdparty_dir, 'download_cache')
+        if not os.path.isdir(self.download_cache_dir):
+            os.makedirs(self.download_cache_dir)
+
+    def install_prerequisites(self):
+        pass
+
+    def _build(self):
         raise NotImplemented()
+
+    def build(self):
+        self.install_prerequisites()
+        self._build()
 
 class SconsBuilder(Builder):
     # This should be populated automatically once all tests build.
@@ -54,7 +80,7 @@ class SconsBuilder(Builder):
         'pt-routeplanner',
     ]
 
-    def build(self):
+    def _build(self):
         if not utils.find_executable('scons'):
             raise Exception('Unable to find scons in PATH')
 
@@ -62,10 +88,10 @@ class SconsBuilder(Builder):
 
         # Use ccache on Linux if available
         if self.env.platform == 'lin' and utils.find_executable('ccache'):
-            args.append("CXX=ccache g++")
-            args.append("CC=ccache gcc")
+            args.append('CXX=ccache g++')
+            args.append('CC=ccache gcc')
 
-        if self.args.with_mysql or self.args.mysql_dir:
+        if not self.args.without_mysql:
             args.append('_WITH_MYSQL=True')
             if self.args.mysql_dir:
                 args.append('_MYSQL_ROOT=' + self.args.mysql_dir)
@@ -95,13 +121,188 @@ class SconsBuilder(Builder):
 
 
 class CMakeBuilder(Builder):
+    def _check_debian_package_requirements(self):
+        if self.env.platform != 'lin':
+            return
+
+        if not os.path.isfile('/etc/debian_version'):
+            log.info('Non Debian system, not checking required packages')
+            return
+
+        required_packages = (
+            'g++ python-dev make '
+            'libboost-program-options-dev libboost-thread1.42-dev '
+            'libboost-filesystem1.42-dev libboost-date-time1.42-dev '
+            'libboost-iostreams1.42-dev libboost-test1.42-dev '
+            'libboost-system1.42-dev libboost-regex1.42-dev '
+        ).split()
+        if not self.args.without_mysql:
+            required_packages.extend(
+                ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
+
+        to_install = [p for p in required_packages if
+            subprocess.call(
+                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
+                shell=True, stdout=subprocess.PIPE)]
+        if not to_install:
+            return
+
+        log.info('You must install the following packages to continue: %s. '
+            'That can be done with the command:')
+        log.info('apt-get install %s', ' '.join(to_install))
+        sys.exit(1)
+
+    def _download(self, url, md5=None):
+        target = join(self.download_cache_dir, url.split('/')[-1])
+        if 'SYNTHESE_CACHE_URL' in os.environ:
+            url = os.environ['SYNTHESE_CACHE_URL'] + url.split('/')[-1]
+        if os.path.isfile(target):
+            return
+        log.info('Downloading %s to %s', url, target)
+        shutil.copyfileobj(urllib2.urlopen(url), open(target, 'wb'))
+
+        if not md5:
+            return
+        m = hashlib.md5()
+        m.update(open(target, 'rb').read())
+        actual_md5 = m.hexdigest()
+        if actual_md5 != md5:
+            os.unlink(target)
+            raise Exception(
+                'Downloaded file {0} doesn\'t match md5sum '
+                '(expected: {1} actual: {2})'.
+                format(url, md5, actual_md5))
+
+    def _extract(self, url, extract_dir, created_dir):
+        if os.path.isdir(join(extract_dir, created_dir)):
+            return
+        archive = join(self.download_cache_dir, url.split('/')[-1])
+        log.info('Extracting %s to %s', archive, extract_dir)
+        if archive.endswith('.zip'):
+            zip = zipfile.ZipFile(archive)
+            zip.extractall(extract_dir)
+        elif archive.endswith(('.tar.gz', '.tgz')):
+            assert self.env.platform != 'win'
+            subprocess.check_call(['tar', 'zxf', archive, '-C', extract_dir])
+
+    def _install_cmake(self):
+        self.cmake_path = None
+        cmake_executable = 'cmake' + self.env.platform_exe_suffix
+        if utils.find_executable(cmake_executable):
+            cmake_version = subprocess.Popen(
+                [cmake_executable, '--version'], stdout=subprocess.PIPE
+            ).communicate()[0].strip()
+            # TODO: allow greater versions.
+            if cmake_version.endswith(' 2.8.4'):
+                log.info('Found system cmake')
+                return
+        log.info('Installing cmake')
+
+        if self.env.platform == 'win':
+            url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4-win32-x86.zip'
+            self._download(url, 'a2525342e495518101381203bf4484c4')
+            created_dir = 'cmake-2.8.4-win32-x86'
+            self._extract(url, self.env.thirdparty_dir, created_dir)
+            self.cmake_path = join(self.env.thirdparty_dir, created_dir, 'bin')
+        else:
+            url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz'
+            self._download(url, '209b7d1d04b2e00986538d74ba764fcf')
+            created_dir = 'cmake-2.8.4'
+            self._extract(url, self.env.thirdparty_dir, created_dir)
+
+            log.info('Building cmake')
+            self.cmake_path = join(self.env.thirdparty_dir, 'cmake', 'bin')
+
+            if os.path.isfile(join(self.cmake_path, 'cmake')):
+                return
+
+            cmake_src = join(self.env.thirdparty_dir, created_dir)
+            subprocess.check_call(
+                [join(cmake_src, 'configure'),  '--prefix=' +
+                    join(self.env.thirdparty_dir, 'cmake')],
+                cwd=cmake_src)
+            subprocess.check_call(
+                ['make', '-j%i' % cpu_count(), 'install'], cwd=cmake_src)
+
+    def _install_mysql(self):
+        self.with_mysql = True
+        self.mysql_dir = None
+
+        if self.args.without_mysql:
+            self.with_mysql = False
+            return
+        if self.args.mysql_dir:
+            self.mysql_dir = self.args.mysql_dir
+            return
+
+        if self.env.platform != 'win':
+            # Assume we'll use the system version
+            return
+
+        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.12-win32.zip'
+        self._download(url, 'f135a193bd7a330d003714bbd2263782')
+        created_dir = 'mysql-5.5.12-win32'
+        self._extract(url, self.env.thirdparty_dir, created_dir)
+        self.mysql_dir = join(self.env.thirdparty_dir, created_dir)
+
+    def _install_boost(self):
+        self.boost_dir = None
+        self.boost_lib_dir = None
+
+        if self.args.boost_dir:
+            self.boost_dir = self.args.boost_dir
+            return
+
+        if self.env.platform != 'win':
+            # Assume we'll use the system version
+            return
+
+        self.boost_dir = join(
+            self.env.source_path, '3rd', 'dev', 'boost', 'src')
+
+        # TODO: build boost instead.
+        url = 'http://94.23.28.171/~spasche/boost_lib.zip'
+        self._download(url, 'c9f6a547a8e04563263916efd3b5c6ac')
+        created_dir = 'boost_lib'
+        self._extract(url, self.env.thirdparty_dir, created_dir)
+        self.boost_lib_dir = join(self.env.thirdparty_dir, created_dir)
+
+    def install_iconv(self):
+        if self.env.platform != 'win':
+            return
+
+        self._download(
+            'https://extranet-rcsmobility.com/attachments/download/13571',
+            'fd1dc6c680299a2ed1eedcc3eabda601')
+        target = join(self.env.thirdparty_dir, 'iconv', 'libiconv2.dll')
+        if not os.path.isdir(os.path.dirname(target)):
+            os.makedirs(os.path.dirname(target))
+        if os.path.isfile(target):
+            return
+        fname = LIBICONV2_DLL_URL.split('/')[-1]
+        shutil.copy(join(self.download_cache_dir, fname), target)
+
+    def install_prerequisites(self):
+        self._check_debian_package_requirements()
+
+        self._install_cmake()
+        log.debug('Cmake path: %s', self.cmake_path)
+
+        self._install_mysql()
+        log.info('Mysql support: %s, dir: %s', self.with_mysql, self.mysql_dir)
+
+        self._install_boost()
+        self.install_iconv()
+
+    def get_cmake_tool_path(self, tool):
+        self._install_cmake()
+        tool_path = tool + self.env.platform_exe_suffix
+        if self.cmake_path:
+            tool_path = join(self.cmake_path, tool_path)
+        return tool_path
 
     def _generate_build_system(self):
-        cmake_executable = 'cmake' + self.env.platform_exe_suffix
-        if not utils.find_executable(cmake_executable):
-            raise Exception('Unable to find %s in PATH' % cmake_executable)
-
-        args = [cmake_executable, self.env.source_path]
+        args = [self.get_cmake_tool_path('cmake'), self.env.source_path]
 
         # Use ccache on Linux if available
         if self.env.platform == 'lin' and utils.find_executable('ccache'):
@@ -112,28 +313,40 @@ class CMakeBuilder(Builder):
             # TODO: This shouldn't be hardcoded.
             args.extend(['-G', 'Visual Studio 9 2008'])
 
-        if self.args.with_mysql or self.args.mysql_dir:
+        if not self.with_mysql:
             args.append('-DWITH_MYSQL=1')
-            if self.args.mysql_dir:
-                os.environ['MYSQL_DIR'] = self.args.mysql_dir
+            if self.mysql_dir:
+                os.environ['MYSQL_DIR'] = self.mysql_dir
 
         args.append('-DCMAKE_BUILD_TYPE=' + self.env.mode.capitalize())
+
         # TODO: maybe change optimization flags in debug mode:
         # -DCMAKE_CXX_FLAGS=-O0
 
         # TODO:
         # -DSYNTHESE_MYSQL_PARAMS=host=localhost,user=synthese,passwd=synthese
-        # TODO:
-        # -DCMAKE_INSTALL_PREFIX=/path/to/installs/trunk_debug
+
+        if self.args.prefix:
+            args.append('-DCMAKE_INSTALL_PREFIX=' + self.args.prefix)
+        if self.args.mysql_params:
+            args.append('-DSYNTHESE_MYSQL_PARAMS=' + self.args.mysql_params)
+
+        env = os.environ.copy()
+        if self.boost_dir:
+            env['BOOST_ROOT'] = self.boost_dir
+        if self.boost_lib_dir:
+            env['BOOST_LIBRARYDIR'] = self.boost_lib_dir
+
+        # TODO: check that Python cygwin is not in the path?
 
         log.info('CMake generate command line: %s', args)
         if not os.path.isdir(self.env.env_path):
             os.makedirs(self.env.env_path)
-        subprocess.check_call(args, cwd=self.env.env_path)
+        subprocess.check_call(args, cwd=self.env.env_path, env=env)
 
     def _do_build_make(self):
         subprocess.check_call(
-            'make -j%i' % multiprocessing.cpu_count(),
+            'make -j%i' % cpu_count(),
             cwd=self.env.env_path,
             shell=True
         )
@@ -174,8 +387,10 @@ class CMakeBuilder(Builder):
             cwd=self.env.env_path
         )
 
-    def build(self):
+    def _build(self):
         self._generate_build_system()
+        if self.args.generate_only:
+            return
 
         PLATFORM_TO_TOOL = {
             'win': 'vs',
@@ -192,8 +407,13 @@ class CMakeBuilder(Builder):
 
         # TODO: run install?
 
+builder = None
 
-def build(env, args):
+def get_builder(env, args=None):
+    global builder
+    if builder:
+        return builder
+
     if env.type == 'cmake':
         builder_class = CMakeBuilder
     elif env.type == 'scons':
@@ -202,4 +422,8 @@ def build(env, args):
         raise Exception('Unsupported env %s' % type(env).__name__)
 
     builder = builder_class(env, args)
+    return builder
+
+def build(env, args):
+    builder = get_builder(env, args)
     builder.build()

@@ -64,6 +64,8 @@ class Daemon(object):
             raise DaemonException('Server is not responding')
 
     def start(self):
+        self.env.prepare_for_launch()
+
         ports_to_check = [self.env.port]
         if self.env.wsgi_proxy:
             ports_to_check.append(self.env.wsgi_proxy_port)
