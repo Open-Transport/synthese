@@ -147,7 +147,11 @@ namespace synthese
 			if(openTabContent(stream, TAB_IMPORT))
 			{
 				_importer->displayAdmin(stream, request);
-				if(_importer->parseFiles(stream, request) && _doImport)
+				bool doImport(_doImport);
+				doImport &= _importer->beforeParsing();
+				doImport &= _importer->parseFiles(stream, request);
+				doImport &= _importer->afterParsing();
+				if(doImport)
 				{
 					_importer->save().run();
 				}

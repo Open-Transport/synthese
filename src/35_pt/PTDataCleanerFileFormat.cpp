@@ -184,7 +184,7 @@ namespace synthese
 		bool PTDataCleanerFileFormat::beforeParsing()
 		{
 			_cleanCalendars();
-			return true;
+			return !_cleanOldData || !_calendar.empty();
 		}
 
 
@@ -239,20 +239,12 @@ namespace synthese
 						_calendar &= Calendar(_calendar.getFirstActiveDate(), *_endDate);
 					}
 				}
-				else if(_cleanOldData)
-				{
-					throw RequestException("The calendar is not properly defined. The old data cannot bean cleaned.");
-				}
 			}
 			else
 			{
 				if(_startDate && _endDate)
 				{
 					_calendar = Calendar(*_startDate, *_endDate);
-				}
-				else if(_cleanOldData)
-				{
-					throw RequestException("The calendar is not properly defined. The old data cannot bean cleaned.");
 				}
 			}
 		}
