@@ -186,6 +186,7 @@ namespace synthese
 				static const std::string DATA_PAGE_NUMBER;
 				static const std::string DATA_BLINKS;
 				static const std::string DATA_TIME;
+				static const std::string DATA_WAITING_TIME;
 				static const std::string DATA_PLANNED_TIME;
 				static const std::string DATA_DELAY;
 				static const std::string DATA_SERVICE_ID;
@@ -218,6 +219,7 @@ namespace synthese
 					boost::shared_ptr<const cms::Webpage> page,
 					boost::shared_ptr<const cms::Webpage> destinationPage,
 					boost::shared_ptr<const cms::Webpage> transferPage,
+					const boost::posix_time::ptime& requestTime,
 					std::size_t rowRank,
 					std::size_t pageNumber,
 					const ArrivalDepartureRow& row,
