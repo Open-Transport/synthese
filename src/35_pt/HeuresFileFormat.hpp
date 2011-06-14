@@ -27,6 +27,7 @@
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "PTDataCleanerFileFormat.hpp"
 
 #include <iostream>
 #include <map>
@@ -36,6 +37,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace util
 	{
 		class Registrable;
@@ -71,7 +77,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<HeuresFileFormat>
+				public impex::MultipleFileTypesImporter<HeuresFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 
 			public:
@@ -84,13 +91,13 @@ namespace synthese
 				static const std::string PARAMETER_END_DATE;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_DAY7_CALENDAR_ID;
 
 			private:
 
-				boost::gregorian::date _startDate;
-				boost::gregorian::date _endDate;
 				bool _displayLinkedStops;
 				boost::shared_ptr<const TransportNetwork> _network;
+				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
@@ -117,7 +124,9 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<HeuresFileFormat>(env, dataSource)
+				):	impex::MultipleFileTypesImporter<HeuresFileFormat>(env, dataSource),
+					impex::Importer(env, dataSource),
+					PTDataCleanerFileFormat(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

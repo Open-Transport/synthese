@@ -150,6 +150,7 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
+			Importer(env, dataSource),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),

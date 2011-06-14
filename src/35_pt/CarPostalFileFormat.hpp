@@ -136,7 +136,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<CarPostalFileFormat>(env, dataSource)
+				):	impex::MultipleFileTypesImporter<CarPostalFileFormat>(env, dataSource),
+					impex::Importer(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

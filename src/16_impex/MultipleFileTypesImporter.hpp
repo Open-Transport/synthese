@@ -38,7 +38,7 @@ namespace synthese
 		*/
 		template<class FF>
 		class MultipleFileTypesImporter:
-			public Importer
+			virtual public Importer
 		{
 		private:
 			static const std::string PARAMETER_PATH;	//!< Path of the files to import

@@ -50,7 +50,9 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_CALENDAR_ID;
-			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_START_DATE;
+			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_CLEAN_OLD_DATA;
 
 			PTDataCleanerFileFormat(
 				util::Env& env,
@@ -64,6 +66,8 @@ namespace synthese
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			calendar::Calendar _calendar;
 			boost::optional<boost::gregorian::date> _startDate;
+			boost::optional<boost::gregorian::date> _endDate;
+			bool _cleanOldData;
 
 		private:
 			mutable std::set<boost::shared_ptr<JourneyPattern> > _journeyPatternsToRemove;
@@ -71,8 +75,9 @@ namespace synthese
 			mutable std::set<boost::shared_ptr<ContinuousService> > _continuousServicesToRemove;
 
 		public:
-			void setCalendar(boost::shared_ptr<const calendar::CalendarTemplate> value);
-			void setStartDate(boost::optional<boost::gregorian::date> value);
+			void setCalendar(boost::shared_ptr<const calendar::CalendarTemplate> value){ _calendarTemplate = value; }
+			void setStartDate(boost::optional<boost::gregorian::date> value){ _startDate = value; }
+			void setEndDate(boost::optional<boost::gregorian::date> value){ _endDate = value; }
 
 
 
