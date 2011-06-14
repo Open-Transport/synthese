@@ -118,7 +118,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<PladisStopsFileFormat>(env, dataSource)
+				):	impex::MultipleFileTypesImporter<PladisStopsFileFormat>(env, dataSource),
+					impex::Importer(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

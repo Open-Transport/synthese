@@ -212,7 +212,8 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, dataSource)
+				):	impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, dataSource),
+					impex::Importer(env, dataSource)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

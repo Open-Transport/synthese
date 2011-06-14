@@ -144,6 +144,7 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<IneoFileFormat>(env, dataSource),
+			Importer(env, dataSource),
 			_autoImportStops(false),
 			_interactive(false),
 			_displayLinkedStops(false),

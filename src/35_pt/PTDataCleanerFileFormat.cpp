@@ -26,7 +26,8 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "LineStopTableSync.h"
-#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
+#include "RequestException.h"
 
 using namespace boost;
 using namespace boost::gregorian;
@@ -42,18 +43,26 @@ namespace synthese
 	namespace pt
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
-		const string PTDataCleanerFileFormat::PARAMETER_DATE("date");
+		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
+		const string PTDataCleanerFileFormat::PARAMETER_END_DATE("end_date");
+		const string PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA("clean_old_data");
 
 		PTDataCleanerFileFormat::PTDataCleanerFileFormat(
 			util::Env& env,
 			const DataSource& dataSource
-		):	Importer(env, dataSource)
+		):	Importer(env, dataSource),
+			_cleanOldData(true)
 		{}
 
 
 
 		void PTDataCleanerFileFormat::_cleanCalendars() const
 		{
+			if(!_cleanOldData)
+			{
+				return;
+			}
+
 			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
 
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
@@ -91,6 +100,11 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_selectObjectsToRemove() const
 		{
+			if(!_cleanOldData)
+			{
+				return;
+			}
+
 			// Scheduled services without any active date
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& itService, _env.getRegistry<ScheduledService>())
 			{
@@ -142,6 +156,11 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
+			if(!_cleanOldData)
+			{
+				return;
+			}
+
 			BOOST_FOREACH(shared_ptr<ScheduledService> sservice, _scheduledServicesToRemove)
 			{
 				ScheduledServiceTableSync::RemoveRow(sservice->getKey(), transaction);
@@ -180,7 +199,62 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_setFromParametersMap( const server::ParametersMap& map )
 		{
-			//TODO Implement
+			_cleanOldData = map.getDefault<bool>(PARAMETER_CLEAN_OLD_DATA, true);
+
+			RegistryKeyType calendarId(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0));
+			if(calendarId) try
+			{
+				_calendarTemplate = CalendarTemplateTableSync::Get(calendarId, _env);
+			}
+			catch(ObjectNotFoundException<CalendarTemplate>&)
+			{
+				throw RequestException("No such calendar template");
+			}
+
+			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
+			{
+				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
+			}
+			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
+			{
+				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
+			}
+
+			_calendar.clear();
+			if(_calendarTemplate.get())
+			{
+				if(_startDate && _endDate)
+				{
+					_calendar = _calendarTemplate->getResult(Calendar(*_startDate, *_endDate));
+				}
+				else if(_calendarTemplate->isLimited())
+				{
+					_calendar = _calendarTemplate->getResult();
+					if(_startDate)
+					{
+						_calendar &= Calendar(*_startDate, _calendar.getLastActiveDate());
+					}
+					if(_endDate)
+					{
+						_calendar &= Calendar(_calendar.getFirstActiveDate(), *_endDate);
+					}
+				}
+				else if(_cleanOldData)
+				{
+					throw RequestException("The calendar is not properly defined. The old data cannot bean cleaned.");
+				}
+			}
+			else
+			{
+				if(_startDate && _endDate)
+				{
+					_calendar = Calendar(*_startDate, *_endDate);
+				}
+				else if(_cleanOldData)
+				{
+					throw RequestException("The calendar is not properly defined. The old data cannot bean cleaned.");
+				}
+			}
 		}
 
 
@@ -188,28 +262,19 @@ namespace synthese
 		server::ParametersMap PTDataCleanerFileFormat::_getParametersMap() const
 		{
 			ParametersMap result;
+			result.insert(PARAMETER_CLEAN_OLD_DATA, _cleanOldData);
 			if(_calendarTemplate.get())
 			{
 				result.insert(PARAMETER_CALENDAR_ID, _calendarTemplate->getKey());
 			}
 			if(_startDate)
 			{
-				result.insert(PARAMETER_DATE, *_startDate);
+				result.insert(PARAMETER_START_DATE, *_startDate);
+			}
+			if(_endDate)
+			{
+				result.insert(PARAMETER_END_DATE, *_endDate);
 			}
 			return result;
-		}
-
-
-
-		void PTDataCleanerFileFormat::setCalendar( boost::shared_ptr<const calendar::CalendarTemplate> value )
-		{
-			_calendarTemplate = value;
-		}
-
-
-
-		void PTDataCleanerFileFormat::setStartDate( boost::optional<boost::gregorian::date> value )
-		{
-			_startDate = value;
 		}
 }	}
