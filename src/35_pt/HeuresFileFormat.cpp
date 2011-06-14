@@ -57,6 +57,8 @@
 #include "TransportNetworkTableSync.h"
 #include "RollingStockTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "RequestException.h"
+#include "CalendarTemplateTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -100,6 +102,7 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("start_date");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_DAY7_CALENDAR_ID("day7_calendar_id");
 	}
 
 	namespace impex
@@ -132,6 +135,7 @@ namespace synthese
 		DBTransaction HeuresFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 			BOOST_FOREACH(Registry<CommercialLine>::value_type line, _env.getRegistry<CommercialLine>())
 			{
 				CommercialLineTableSync::Save(line.second.get(), transaction);
@@ -483,7 +487,7 @@ namespace synthese
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
-				if(_startDate.is_not_a_date() || _endDate.is_not_a_date())
+				if(!_startDate || !_endDate)
 				{
 					stream << "ERR  : Start date or end date not defined<br />";
 					return false;
@@ -499,12 +503,20 @@ namespace synthese
 						days[i] = (line[i==0 ? 12 : i+5] == '1');
 					}
 					Calendar cal;
-					for(gregorian::date d(_startDate); d<=_endDate; d += gregorian::days(1))
+					for(gregorian::date d(*_startDate); d<=*_endDate; d += gregorian::days(1))
 					{
+						if(_day7CalendarTemplate.get() && d.day_of_week() == 6)
+						{
+							continue;
+						}
 						if(days[d.day_of_week()])
 						{
 							cal.setActive(d);
 						}
+					}
+					if(_day7CalendarTemplate.get())
+					{
+						cal |= _calendarTemplate->getResult(_calendar);
 					}
 
 					// Services list
@@ -547,6 +559,7 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.title("Données");
 			stream << t.cell("Arrêts", t.getForm().getTextInput(_getFileParameterName(FILE_POINTSARRETS), _pathsMap[FILE_POINTSARRETS].file_string()));
 			stream << t.cell("Itineraires", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAI), _pathsMap[FILE_ITINERAI].file_string()));
@@ -554,8 +567,8 @@ namespace synthese
 			stream << t.cell("Services", t.getForm().getTextInput(_getFileParameterName(FILE_SERVICES), _pathsMap[FILE_SERVICES].file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate));
-			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate));
+			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
+			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.close();
 		}
@@ -563,19 +576,15 @@ namespace synthese
 
 		server::ParametersMap HeuresFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
-			if(!_startDate.is_not_a_date())
-			{
-				map.insert(PARAMETER_START_DATE, _startDate);
-			}
-			if(!_startDate.is_not_a_date())
-			{
-				map.insert(PARAMETER_END_DATE, _endDate);
-			}
 			if(_network.get())
 			{
 				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+			if(_day7CalendarTemplate.get())
+			{
+				map.insert(PARAMETER_DAY7_CALENDAR_ID, _day7CalendarTemplate->getKey());
 			}
 			return map;
 		}
@@ -584,18 +593,26 @@ namespace synthese
 
 		void HeuresFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
 		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
+			if(_cleanOldData && (!_startDate || !_endDate))
+			{
+				throw RequestException("Start date and end date must be defined");
+			}
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
-			if(!map.getDefault<string>(PARAMETER_START_DATE).empty())
-			{
-				_startDate = from_string(map.get<string>(PARAMETER_START_DATE));
-			}
-			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
-			{
-				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
-			}
 			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID))
 			{
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+			}
+			if(map.isDefined(PARAMETER_DAY7_CALENDAR_ID))
+			{
+				try
+				{
+					_day7CalendarTemplate = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DAY7_CALENDAR_ID), _env);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("No such calendar");
+				}
 			}
 		}
 }	}
