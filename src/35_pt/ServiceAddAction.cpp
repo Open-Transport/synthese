@@ -237,9 +237,11 @@ namespace synthese
 				if(_period.total_seconds() > 0 && !_endDepartureTime.is_not_a_date_time())
 				{
 					int number(0);
+					int step(1);
 					try
 					{
 						number = lexical_cast<int>(_number);
+						step = number - lexical_cast<int>(_template->getServiceNumber());
 					}
 					catch (bad_lexical_cast)
 					{
@@ -247,8 +249,12 @@ namespace synthese
 
 					for(time_duration departureTime(_startDepartureTime + _period); departureTime <= _endDepartureTime; departureTime += _period)
 					{
+						if(number > 0)
+						{
+							number += step;
+						}
 						ScheduledService object2;
-						object2.setServiceNumber(number > 0 ? lexical_cast<string>(number++) : string());
+						object2.setServiceNumber(number > 0 ? lexical_cast<string>(number) : string());
 						object2.setPath(_line.get());
 						object2.setPathId(_line->getKey());
 						object2.setSchedulesFromOther(object, departureTime - object.getDepartureSchedule(false, 0));

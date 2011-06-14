@@ -133,6 +133,7 @@ namespace synthese
 				}
 			}
 
+			_path->markScheduleIndexesUpdateNeeded(false);
 			clearRTData();
 			_computeNextRTUpdate();
 		}
@@ -355,8 +356,8 @@ namespace synthese
 
 			for(size_t i(0); i<other._departureSchedules.size(); ++i)
 			{
-				departureSchedules.push_back(i+1 == other._departureSchedules.size() ? minutes(0) : (other._departureSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._departureSchedules[i] + shift)));
-				arrivalSchedules.push_back(i==0 ? minutes(0) : (other._arrivalSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._arrivalSchedules[i] + shift)));
+				departureSchedules.push_back(other._departureSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._departureSchedules[i] + shift));
+				arrivalSchedules.push_back(other._arrivalSchedules[i].is_not_a_date_time() ? not_a_date_time : (other._arrivalSchedules[i] + shift));
 			}
 			setSchedules(
 				departureSchedules,
@@ -453,5 +454,6 @@ namespace synthese
 					_computeNextRTUpdate();
 				}
 			}
+			_path->markScheduleIndexesUpdateNeeded(true);
 		}
 }	}

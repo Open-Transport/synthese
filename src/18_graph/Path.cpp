@@ -100,7 +100,7 @@ namespace synthese
 					+ " is already defined in path " + Conversion::ToString (getKey())
 				);
 			}
-			markScheduleIndexesUpdateNeeded ();
+			markScheduleIndexesUpdateNeeded(false);
 		}
 
 
@@ -109,7 +109,7 @@ namespace synthese
 		{
 			_services.erase(service);
 
-			markScheduleIndexesUpdateNeeded ();
+			markScheduleIndexesUpdateNeeded(false);
 		}
 
 
@@ -346,11 +346,11 @@ namespace synthese
 
 
 
-		void Path::markScheduleIndexesUpdateNeeded()
+		void Path::markScheduleIndexesUpdateNeeded(bool RTDataOnly)
 		{
 			for (Edges::const_iterator it = _edges.begin(); it != _edges.end(); ++it)
 			{
-				(*it)->markServiceIndexUpdateNeeded (false);
+				(*it)->markServiceIndexUpdateNeeded(RTDataOnly);
 			}
 		}
 
