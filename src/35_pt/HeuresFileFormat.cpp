@@ -503,6 +503,12 @@ namespace synthese
 				}
 
 				string line;
+				Calendar day7;
+				if(_day7CalendarTemplate.get())
+				{
+					day7 = _day7CalendarTemplate->getResult(_calendar);
+				}
+
 				while(getline(inFile, line))
 				{
 					// Read of calendar
@@ -514,12 +520,9 @@ namespace synthese
 					Calendar cal;
 					for(gregorian::date d(*_startDate); d<=*_endDate; d += gregorian::days(1))
 					{
-						if(_day7CalendarTemplate.get() && d.day_of_week() == 6)
-						{
-							continue;
-						}
-						if(days[d.day_of_week()])
-						{
+						if(	((day7.isActive(d) || d.day_of_week() == 6) && days[6]) ||
+							(!day7.isActive(d) && d.day_of_week() != 6 && days[d.day_of_week()])
+						){
 							cal.setActive(d);
 						}
 					}
@@ -579,6 +582,12 @@ namespace synthese
 			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+			stream << t.cell("Calendrier des jours fériés", 
+				t.getForm().getSelectInput(
+					PARAMETER_DAY7_CALENDAR_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+					optional<RegistryKeyType>(_day7CalendarTemplate.get() ? _day7CalendarTemplate->getKey() : RegistryKeyType(0))
+			)	);
 			stream << t.close();
 		}
 
