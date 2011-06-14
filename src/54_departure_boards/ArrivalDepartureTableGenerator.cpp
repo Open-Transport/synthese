@@ -87,7 +87,7 @@ namespace synthese
 
 			// Tests if the line is forbidden in departure boards according to tue uUse rule
 			const UseRule& useRule(linestop.getLine()->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-			if(!dynamic_cast<const PTUseRule*>(&useRule) || !static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
+			if(dynamic_cast<const PTUseRule*>(&useRule) && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards())
 			{
 				return false;
 			}

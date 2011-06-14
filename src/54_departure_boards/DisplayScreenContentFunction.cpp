@@ -99,6 +99,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_PAGE_NUMBER("page_number");
 		const string DisplayScreenContentFunction::DATA_BLINKS("blinks");
 		const string DisplayScreenContentFunction::DATA_TIME("time");
+		const string DisplayScreenContentFunction::DATA_WAITING_TIME("waiting_time");
 		const string DisplayScreenContentFunction::DATA_PLANNED_TIME("planned_time");
 		const string DisplayScreenContentFunction::DATA_DELAY("delay");
 		const string DisplayScreenContentFunction::DATA_SERVICE_ID("service_id");
@@ -744,6 +745,7 @@ namespace synthese
 							rowPage,
 							destinationPage,
 							transferPage,
+							date,
 							__Rangee,
 							pageNumber,
 							row,
@@ -787,6 +789,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> destinationPage,
 			boost::shared_ptr<const cms::Webpage> transferPage,
+			const boost::posix_time::ptime& requestTime,
 			size_t rowRank,
 			size_t pageNumber,
 			const ArrivalDepartureRow& row,
@@ -807,9 +810,13 @@ namespace synthese
 			{
 				PTObjectsCMSExporters::ExportStopArea(pm, *static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace());
 
+				// Waiting time
+				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
+				pm.insert(DATA_WAITING_TIME, to_simple_string(waitingTime));
+
 				time_duration blinkingDelay(minutes(screen.getBlinkingDelay()));
 				if(	blinkingDelay.total_seconds() > 0 &&
-					row.first.getDepartureDateTime() - second_clock::local_time() <= blinkingDelay
+					waitingTime <= blinkingDelay
 				){
 					pm.insert(DATA_BLINKS, true);
 				}
