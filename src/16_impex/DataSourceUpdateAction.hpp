@@ -70,7 +70,7 @@ namespace synthese
 			boost::optional<std::string> _format;
 			boost::optional<std::string> _icon;
 			boost::optional<std::string> _charset;
-			boost::optional<const CoordinatesSystem&> _coordinatesSystem;
+			boost::optional<const CoordinatesSystem*> _coordinatesSystem;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

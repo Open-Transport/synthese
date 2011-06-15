@@ -81,7 +81,7 @@ namespace synthese
 			}
 			if(_coordinatesSystem)
 			{
-				map.insert(PARAMETER_SRID, lexical_cast<int>(_coordinatesSystem->getSRID()));
+				map.insert(PARAMETER_SRID, *_coordinatesSystem ? lexical_cast<int>((*_coordinatesSystem)->getSRID()) : 0);
 			}
 			return map;
 		}
@@ -134,13 +134,19 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_SRID))
 			{
-				try
+				CoordinatesSystem::SRID srid(map.get<CoordinatesSystem::SRID>(PARAMETER_SRID));
+				if(srid > 0) try
 				{
-					_coordinatesSystem = CoordinatesSystem::GetCoordinatesSystem(map.get<CoordinatesSystem::SRID>(PARAMETER_SRID));
+					_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 				}
 				catch(CoordinatesSystem::CoordinatesSystemNotFoundException&)
 				{
 					throw ActionException("No such coordinate system");
+				}
+				else
+				{
+					const CoordinatesSystem* cs(NULL);
+					_coordinatesSystem = cs;
 				}
 			}
 		}
@@ -171,7 +177,7 @@ namespace synthese
 			}
 			if(_coordinatesSystem)
 			{
-				_dataSource->setCoordinatesSystem(&*_coordinatesSystem);
+				_dataSource->setCoordinatesSystem(*_coordinatesSystem);
 			}
 
 			DataSourceTableSync::Save(_dataSource.get());
