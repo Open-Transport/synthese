@@ -193,7 +193,7 @@ namespace synthese
 
 					// Point
 					shared_ptr<geos::geom::Point> point(
-						_dataSource.getCoordinatesSystem()->createPoint(
+						_dataSource.getActualCoordinateSystem().createPoint(
 							lexical_cast<double>(_getValue("X")),
 							lexical_cast<double>(_getValue("Y"))
 					)	);
