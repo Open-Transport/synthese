@@ -1575,6 +1575,7 @@ namespace synthese
 					optional<const string&>(objectId),
 					optional<const string&>(routeNames[routeId]),
 					optional<const string&>(),
+					optional<Destination*>(),
 					routeWaybacks[routeId],
 					rollingStock.get(),
 					routeStops,

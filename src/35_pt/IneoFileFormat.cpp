@@ -381,6 +381,7 @@ namespace synthese
 								optional<const string&>(),
 								jpName,
 								optional<const string&>(), // destination
+								optional<Destination*>(),
 								jpWayback,
 								NULL,
 								stops,

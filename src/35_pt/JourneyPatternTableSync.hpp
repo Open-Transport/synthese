@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string COL_NAME;
 			static const std::string COL_TIMETABLENAME;
 			static const std::string COL_DIRECTION;
+			static const std::string COL_DIRECTION_ID;
 			static const std::string COL_ISWALKINGLINE;
 			static const std::string COL_ROLLINGSTOCKID;
 			static const std::string COL_BIKECOMPLIANCEID;
