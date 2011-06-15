@@ -357,7 +357,7 @@ namespace synthese
 					JourneyPattern* route(
 						PTFileFormat::CreateOrUpdateRoute(
 							*cline,
-							optional<const string&>(routeNumber),
+							optional<const string&>(),
 							optional<const string&>(),
 							optional<const string&>(),
 							true,
@@ -525,10 +525,6 @@ namespace synthese
 						){
 							cal.setActive(d);
 						}
-					}
-					if(_day7CalendarTemplate.get())
-					{
-						cal |= _calendarTemplate->getResult(_calendar);
 					}
 
 					// Services list
