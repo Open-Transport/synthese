@@ -78,7 +78,7 @@ def build(options):
     environ["SYNTHESE_MYSQL_DB"] = c["mysql_db"]
 
     run_synthesepy(
-        "build", options.tool, options.mode, [], ["--with-mysql"], environ)
+        "build", options.tool, options.mode, [], [], environ)
 
     dbconns = [
         "mysql://debug=1,{mysql_params},db={mysql_db}".format(**c), "sqlite://"]
