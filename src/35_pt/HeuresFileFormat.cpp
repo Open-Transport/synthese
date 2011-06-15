@@ -59,6 +59,8 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "RequestException.h"
 #include "CalendarTemplateTableSync.h"
+#include "DestinationTableSync.hpp"
+#include "DataSourceTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -99,10 +101,9 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::FILE_SERVICES("services");
 
 		const std::string HeuresFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
-		const std::string HeuresFileFormat::Importer_::PARAMETER_END_DATE("end_date");
-		const std::string HeuresFileFormat::Importer_::PARAMETER_START_DATE("start_date");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_DAY7_CALENDAR_ID("day7_calendar_id");
+		const std::string HeuresFileFormat::Importer_::PARAMETER_STOPS_DATASOURCE_ID("stops_datasource_id");
 	}
 
 	namespace impex
@@ -188,21 +189,32 @@ namespace synthese
 
 				PTFileFormat::ImportableStopPoints linkedStopPoints;
 				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
-				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(_dataSource, _env);
+				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : _dataSource);
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints(stopsDataSource, _env);
+				ImportableTableSync::ObjectBySource<DestinationTableSync> destinations(stopsDataSource, _env);
 
 				while(getline(inFile, line))
 				{
 					if(!_dataSource.getCharset().empty())
 					{
-						line = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
+						line = ImpExModule::ConvertChar(line, stopsDataSource.getCharset(), "UTF-8");
 					}
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
 					if(lexical_cast<int>(id) > 9000)
-					{
+					{	
+						string destinationCode(line.substr(5,4));
+						set<Destination*> destinationSet(destinations.get(destinationCode));
+						if(destinationSet.empty())
+						{
+							stream << "WARN : The destination " << destinationCode << " was not found in the database<br/>";
+						}
+						else
+						{
+							_destinations[lexical_cast<int>(id)] = *destinationSet.begin();
+						}
 						continue;
 					}
-
 					string name(boost::algorithm::trim_copy(line.substr(5, 50)));
 
 					PTFileFormat::ImportableStopPoint isp;
@@ -225,7 +237,7 @@ namespace synthese
 					nonLinkedStopPoints,
 					*request,
 					_env,
-					_dataSource,
+					stopsDataSource,
 					stream
 				);
 				if(_displayLinkedStops)
@@ -234,7 +246,7 @@ namespace synthese
 						linkedStopPoints,
 						*request,
 						_env,
-						_dataSource,
+						stopsDataSource,
 						stream
 					);
 				}
@@ -263,7 +275,8 @@ namespace synthese
 				RollingStock* bus(rollingstock.front().get());
 
 				// Load of the stops
-				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
+				const DataSource& stopsDataSource(_stopsDataSource.get() ? *_stopsDataSource : _dataSource);
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(stopsDataSource, _env);
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 
 				// Parsing the file
@@ -310,6 +323,7 @@ namespace synthese
 					JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
 					MetricOffset distance(0);
 					bool ignoreRoute(false);
+					Destination* destination(NULL);
 					for(size_t i(10); i+1<line.size(); i += 10)
 					{
 						if(line.size() < i+9)
@@ -326,6 +340,15 @@ namespace synthese
 						if(lexical_cast<int>(stopNumber) > 9000)
 						{
 							*servedStops.rbegin()->_metricOffset += lexical_cast<MetricOffset>(trim_copy(line.substr(i+5,5)));
+							DestinationsMap::const_iterator it(_destinations.find(lexical_cast<int>(stopNumber)));
+							if(it != _destinations.end())
+							{
+								destination = it->second;
+							}
+							else
+							{
+								stream << "WARN : destination " << stopNumber << " was not registered.<br />";
+							}
 							continue;
 						}
 
@@ -360,6 +383,7 @@ namespace synthese
 							optional<const string&>(),
 							optional<const string&>(),
 							optional<const string&>(),
+							destination,
 							true,
 							bus,
 							servedStops,
@@ -578,6 +602,7 @@ namespace synthese
 			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+			stream << t.cell("Source de données arrêts (si différente)", t.getForm().getTextInput(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource.get() ? lexical_cast<string>(_stopsDataSource->getKey()) : string()));
 			stream << t.cell("Calendrier des jours fériés", 
 				t.getForm().getSelectInput(
 					PARAMETER_DAY7_CALENDAR_ID,
@@ -600,6 +625,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DAY7_CALENDAR_ID, _day7CalendarTemplate->getKey());
 			}
+			if(_stopsDataSource.get())
+			{
+				map.insert(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource->getKey());
+			}
 			return map;
 		}
 
@@ -613,7 +642,7 @@ namespace synthese
 			{
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
 			}
-			if(map.isDefined(PARAMETER_DAY7_CALENDAR_ID))
+			if(map.getDefault<RegistryKeyType>(PARAMETER_DAY7_CALENDAR_ID, 0))
 			{
 				try
 				{
@@ -623,6 +652,18 @@ namespace synthese
 				{
 					throw RequestException("No such calendar");
 				}
+			}
+			if(map.getDefault<RegistryKeyType>(PARAMETER_STOPS_DATASOURCE_ID, 0))
+			{
+				try
+				{
+					_stopsDataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOPS_DATASOURCE_ID), _env);
+				}
+				catch(ObjectNotFoundException<DataSource>&)
+				{
+					throw RequestException("No such data source for stops");
+				}
+				
 			}
 		}
 }	}

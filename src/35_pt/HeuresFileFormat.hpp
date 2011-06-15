@@ -54,6 +54,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class Destination;
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
@@ -87,17 +88,17 @@ namespace synthese
 				static const std::string FILE_TRONCONS;
 				static const std::string FILE_SERVICES;
 
-				static const std::string PARAMETER_START_DATE;
-				static const std::string PARAMETER_END_DATE;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_DAY7_CALENDAR_ID;
+				static const std::string PARAMETER_STOPS_DATASOURCE_ID;
 
 			private:
 
 				bool _displayLinkedStops;
 				boost::shared_ptr<const TransportNetwork> _network;
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
+				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
 
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
@@ -106,6 +107,9 @@ namespace synthese
 
 				typedef std::map<std::pair<int, int>, std::vector<ScheduledService*> > ServicesMap;
 				mutable ServicesMap _services;
+
+				typedef std::map<int, Destination*> DestinationsMap;
+				mutable DestinationsMap _destinations;
 
 			protected:
 
