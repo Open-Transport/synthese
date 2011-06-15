@@ -52,6 +52,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class Destination;
 		class LineStop;
 		class LineAlarmBroadcast;
 		class CommercialLine;
@@ -92,6 +93,7 @@ namespace synthese
 		private:
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
+			Destination* _directionObj;
 
 			bool _isWalkingLine;
 
@@ -119,6 +121,7 @@ namespace synthese
 				CommercialLine*		getCommercialLine()			const;
 				const SubLines		getSubLines()				const;
 				bool				getWayBack()				const { return _wayBack; }
+				Destination*		getDirectionObj()			const { return _directionObj; }
 			//@}
 
 
@@ -130,6 +133,7 @@ namespace synthese
 				void setDirection (const std::string& direction);
 				void setCommercialLine(CommercialLine* value);
 				void setWayBack(bool value) { _wayBack = value; }
+				void setDirectionObj(Destination* value){ _directionObj = value; }
 			//@}
 
 

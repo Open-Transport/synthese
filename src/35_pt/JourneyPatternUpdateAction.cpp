@@ -30,6 +30,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "RollingStockTableSync.h"
 #include "ImportableTableSync.hpp"
+#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -53,7 +54,6 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
-		const string JourneyPatternUpdateAction::PARAMETER_DATASOURCE_LINKS = Action_PARAMETER_PREFIX + "sl";
 
 
 
@@ -82,7 +82,7 @@ namespace synthese
 			}
 			if(_dataSourceLinks)
 			{
-				map.insert(PARAMETER_DATASOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
 			}
 			return map;
 		}
@@ -130,9 +130,9 @@ namespace synthese
 				}
 			}
 
-			if(map.isDefined(PARAMETER_DATASOURCE_LINKS))
+			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
 			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(PARAMETER_DATASOURCE_LINKS), *_env);
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
 		}
 
