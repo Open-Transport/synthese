@@ -66,6 +66,7 @@
 #include "LineMarkerInterfacePage.h"
 #include "SentAlarm.h"
 #include "PTModule.h"
+#include "Destination.hpp"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -1113,6 +1114,10 @@ namespace synthese
 							if(!line->getDirection().empty())
 							{
 								stream << " destinationText=\"" << line->getDirection() << "\"";
+							}
+							else if(line->getDirectionObj())
+							{
+								stream << " destinationText=\"" << line->getDirectionObj()->getDisplayedText() << "\"";
 							}
 							stream <<
 								">";
@@ -2674,7 +2679,15 @@ namespace synthese
 				pm.insert(DATA_ROLLINGSTOCK_NAME, line->getRollingStock()->getName()); // 5
 				pm.insert(DATA_ROLLINGSTOCK_ARTICLE, line->getRollingStock()->getArticle()); // 6
 			}
-			pm.insert(DATA_DESTINATION_NAME, line->getDirection().empty() ? line->getDestination()->getConnectionPlace()->getFullName() : line->getDirection() ); // 7
+			string lineDirection(
+				line->getDirection().empty() && line->getDirectionObj() ?
+				line->getDirectionObj()->getDisplayedText() :
+				line->getDirection()
+			);
+			pm.insert(
+				DATA_DESTINATION_NAME,
+				lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection
+			);
 			pm.insert(DATA_HANDICAPPED_FILTER_STATUS, handicappedFilterStatus);
 			pm.insert(
 				DATA_HANDICAPPED_PLACES_NUMBER,

@@ -36,6 +36,7 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "JourneyPatternCopy.hpp"
+#include "Destination.hpp"
 
 using namespace std;
 using namespace boost;
@@ -206,7 +207,12 @@ namespace synthese
 				{
 					m.insert(DATA_LINE_COLOR, commercialLine->getColor()->toXMLColor());
 				}
-				m.insert(DATA_DIRECTION, _journeyPattern->getDirection());
+				m.insert(
+					DATA_DIRECTION,
+					_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj() ?
+						_journeyPattern->getDirectionObj()->getDisplayedText() :
+						_journeyPattern->getDirection()
+				);
 
 				if(_stopPage.get())
 				{
@@ -270,8 +276,18 @@ namespace synthese
 					stream << "\" " << DATA_LINE_COLOR << "=\""     << commercialLine->getColor()->toXMLColor();
 				}
 				stream <<
-					"\" " << DATA_DIRECTION << "=\""     << _journeyPattern->getDirection() <<
-					"\">";
+					"\" " << DATA_DIRECTION << "=\"";
+				
+				if(_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj())
+				{
+					stream << _journeyPattern->getDirectionObj()->getDisplayedText();
+				}
+				else
+				{
+					stream << _journeyPattern->getDirection();
+				}
+
+				stream << "\">";
 
 				BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
 				{

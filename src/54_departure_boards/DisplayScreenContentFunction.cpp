@@ -45,6 +45,7 @@
 #include "PTObjectsCMSExporters.hpp"
 #include "RoadModule.h"
 #include "PTUseRule.h"
+#include "Destination.hpp"
 
 #include <sstream>
 
@@ -415,7 +416,11 @@ namespace synthese
 				"\" color=\""     << commercialLine->getColor() <<
 				"\" style=\""     << commercialLine->getStyle() <<
 				"\" image=\""     << commercialLine->getImage() <<
-				"\" direction=\"" << journeyPattern->getDirection() <<
+				"\" direction=\"" << (
+					journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+					journeyPattern->getDirectionObj()->getDisplayedText() :
+					journeyPattern->getDirection()
+				) <<
 				"\" />";
 
 			const StopArea & origin(
@@ -837,7 +842,14 @@ namespace synthese
 				pm.insert(DATA_SERVICE_ID, row.first.getService()->getKey());
 				pm.insert(DATA_SERVICE_NUMBER, row.first.getService()->getServiceNumber());
 
-				pm.insert(DATA_DIRECTION, dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath())->getDirection());
+				// Direction
+				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));
+				pm.insert(
+					DATA_DIRECTION,
+					jp->getDirection().empty() && jp->getDirectionObj() ?
+					jp->getDirectionObj()->getDisplayedText() :
+					jp->getDirection()
+				);
 
 				pm.insert(
 					DATA_TRACK,
