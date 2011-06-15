@@ -217,6 +217,7 @@ namespace synthese
 						boost::optional<const std::string&>(),
 						user_data->tripNumber,
 						boost::optional<const std::string&>(),
+						optional<Destination*>(),
 						true,
 						NULL, // (rolling stock)
 						user_data->tripStops,

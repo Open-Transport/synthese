@@ -37,6 +37,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
+#include "DestinationTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -60,6 +61,7 @@ namespace synthese
 		const string JourneyPatternTableSync::COL_NAME ("name");
 		const string JourneyPatternTableSync::COL_TIMETABLENAME ("timetable_name");
 		const string JourneyPatternTableSync::COL_DIRECTION ("direction");
+		const string JourneyPatternTableSync::COL_DIRECTION_ID("direction_id");
 		const string JourneyPatternTableSync::COL_ISWALKINGLINE ("is_walking_line");
 		const string JourneyPatternTableSync::COL_ROLLINGSTOCKID ("rolling_stock_id");
 		const string JourneyPatternTableSync::COL_BIKECOMPLIANCEID ("bike_compliance_id");
@@ -81,6 +83,7 @@ namespace synthese
 			DBTableSync::Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
 			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
+			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION_ID, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
 			DBTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
@@ -152,7 +155,7 @@ namespace synthese
 					{
 						line->setRollingStock(RollingStockTableSync::GetEditable(rollingStockId, env, linkLevel, AUTO_CREATE).get());
 					}
-					catch(ObjectNotFoundException<RollingStock>)
+					catch(ObjectNotFoundException<RollingStock>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(rollingStockId) + " for rolling stock in line " + lexical_cast<string>(line->getKey()));
 				}	}
@@ -165,7 +168,7 @@ namespace synthese
 					{
 						rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(bikeComplianceId, env, linkLevel).get();
 					}
-					catch(ObjectNotFoundException<PTUseRule>)
+					catch(ObjectNotFoundException<PTUseRule>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(bikeComplianceId) + " for bike compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
@@ -177,7 +180,7 @@ namespace synthese
 					{
 						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
 					}
-					catch(ObjectNotFoundException<PTUseRule>)
+					catch(ObjectNotFoundException<PTUseRule>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in line " + lexical_cast<string>(line->getKey()));
 				}	}
@@ -189,9 +192,23 @@ namespace synthese
 					{
 						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(pedestrianComplianceId, env, linkLevel).get();
 					}
-					catch(ObjectNotFoundException<PTUseRule>)
+					catch(ObjectNotFoundException<PTUseRule>&)
 					{
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(pedestrianComplianceId) + " for pedestrian compliance in line " + lexical_cast<string>(line->getKey()));
+				}	}
+
+				RegistryKeyType directionId(rows->getLongLong (JourneyPatternTableSync::COL_DIRECTION_ID));
+				if(directionId > 0)
+				{
+					try
+					{
+						line->setDirectionObj(
+							DestinationTableSync::GetEditable(directionId, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<Destination>&)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(directionId) + " for direction in line " + lexical_cast<string>(line->getKey()));
 				}	}
 			}
 			line->setRules(rules);
@@ -209,6 +226,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(object->getTimetableName());
 			query.addField(object->getDirection());
+			query.addField(object->getDirectionObj() ? object->getDirectionObj()->getKey() : RegistryKeyType(0));
 			query.addField(object->getWalkingLine());
 			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
 			query.addField(

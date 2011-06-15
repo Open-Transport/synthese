@@ -591,6 +591,7 @@ namespace synthese
 								optional<const string&>(),
 								optional<const string&>(),
 								optional<const string&>(trip.destination),
+								optional<Destination*>(),
 								trip.direction,
 								NULL,
 								stops,

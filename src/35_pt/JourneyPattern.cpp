@@ -56,7 +56,8 @@ namespace synthese
 			Named(name),
 			Calendar(),
 			_isWalkingLine (false),
-			_wayBack(false)
+			_wayBack(false),
+			_directionObj(NULL)
 		{}
 
 

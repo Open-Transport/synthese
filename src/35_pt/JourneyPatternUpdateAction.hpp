@@ -53,7 +53,6 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_DIRECTION;
 			static const std::string PARAMETER_WAYBACK;
-			static const std::string PARAMETER_DATASOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;

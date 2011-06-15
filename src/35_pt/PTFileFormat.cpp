@@ -386,6 +386,7 @@ namespace synthese
 			boost::optional<const std::string&> id,
 			boost::optional<const std::string&> name,
 			boost::optional<const std::string&> destination,
+			boost::optional<Destination*> destinationObj,
 			bool direction,
 			pt::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
@@ -477,6 +478,10 @@ namespace synthese
 			if(destination)
 			{
 				result->setDirection(*destination);
+			}
+			if(destinationObj)
+			{
+				result->setDirectionObj(*destinationObj);
 			}
 
 			return result;
