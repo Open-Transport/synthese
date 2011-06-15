@@ -33,6 +33,7 @@
 #include "City.h"
 #include "StopArea.hpp"
 #include "LinePhysicalStop.hpp"
+#include "Destination.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -218,7 +219,11 @@ namespace synthese
 					pm.insert(DATA_NAME, route->getName()); //1
 					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0)); //2
 					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size()); //3
-					pm.insert(DATA_DIRECTION, route->getDirection()); //4
+					pm.insert(DATA_DIRECTION,
+						route->getDirection().empty() && route->getDirectionObj() ?
+						route->getDirectionObj()->getDisplayedText() :
+						route->getDirection()
+					);
 					{
 						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
 						if(lineStop)
@@ -248,8 +253,11 @@ namespace synthese
 
 					stream << "<direction id=\""<< route->getKey() <<
 						"\" name=\""            << route->getName() <<
-						"\" directionText=\""   << route->getDirection() <<
-						"\" >";
+						"\" directionText=\""   << (
+							route->getDirection().empty() && route->getDirectionObj() ?
+							route->getDirectionObj()->getDisplayedText() :
+							route->getDirection()
+						) << "\" >";
 
 					const StopArea & origin(
 						*route->getOrigin()->getConnectionPlace()
