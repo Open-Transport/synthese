@@ -277,6 +277,8 @@ namespace synthese
 							if(myStop.second->getCodeBySources() == oc)
 							{
 								pstops.insert(make_pair(myStop.second->getKey(), myStop.second.get()));
+								screen->setDisplayedPlace(myStop.second->getConnectionPlace());
+								screen->setAllPhysicalStopsDisplayed(false);
 								screen->setStops(pstops);
 								break;
 							}
