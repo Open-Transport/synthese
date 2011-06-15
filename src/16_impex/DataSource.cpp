@@ -104,4 +104,11 @@ namespace synthese
 				return it->second;
 			}
 		}
+
+
+
+		const CoordinatesSystem& DataSource::getActualCoordinateSystem() const
+		{
+			return _coordinatesSystem ? *_coordinatesSystem : CoordinatesSystem::GetInstanceCoordinatesSystem();
+		}
 }	}

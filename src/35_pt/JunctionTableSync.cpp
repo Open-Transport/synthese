@@ -121,7 +121,7 @@ namespace synthese
 							bidir
 						);
 					}
-					catch(ObjectNotFoundException<StopPoint>& e)
+					catch(ObjectNotFoundException<StopPoint>&)
 					{
 						Log::GetInstance().warn("No such stop in Junction "+ lexical_cast<string>(object->getKey()));
 					}

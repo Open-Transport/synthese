@@ -90,13 +90,17 @@ namespace synthese
 
 			// CoordinatesSystem
 			CoordinatesSystem::SRID srid(rows->getInt(DataSourceTableSync::COL_SRID));
-			try
+			if(srid > 0) try
 			{
 				object->setCoordinatesSystem(&CoordinatesSystem::GetCoordinatesSystem(srid));
 			}
 			catch(CoordinatesSystem::CoordinatesSystemNotFoundException& e)
 			{
 				Log::GetInstance().error("Bad SRID in record"+ lexical_cast<string>(object->getKey()), e);
+			}
+			else
+			{
+				object->setCoordinatesSystem(NULL);
 			}
 		}
 
@@ -116,6 +120,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
 			DataSource* object
 		){
+			object->setCoordinatesSystem(NULL);
 		}
 
 

@@ -114,6 +114,7 @@ namespace synthese
 				Importable* getObjectByCode(const std::string& code) const;
 				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
+				const CoordinatesSystem& getActualCoordinateSystem() const;
 			//@}
 
 			//! @name Static algorithms
