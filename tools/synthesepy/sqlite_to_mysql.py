@@ -39,6 +39,7 @@ def convert(env, sourceconn, targetconn):
     mysql_backend = db_backends.create_backend(env, targetconn)
     assert mysql_backend.name == 'mysql'
 
+    # TODO: use get_cursor() instead.
     mysql_cursor = mysql_backend.get_connection().cursor()
 
     sqlite_conn = sqlite_backend.get_connection(spatialite=True)
