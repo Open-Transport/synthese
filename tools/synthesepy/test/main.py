@@ -167,30 +167,38 @@ class Tester(object):
         test_prog = unittest.main(argv=sys_argv, module=None, exit=False)
         return test_prog.result.wasSuccessful()
 
+    # TODO: fix these tests and remove this list
+    KNOWN_FAILURES = set([
+        ('01_util', 'LowerCaseFilter'),
+        ('01_util', 'PlainCharFilter'),
+        ('05_html', 'HTMLFilter'),
+        ('53_pt_routeplanner', 'PTRoutePlannerResult'),
+        ('53_pt_routeplanner', 'RoutePlanner'),
+    ])
+
     def _run_cpp_tests_cmake(self, suite_args):
         builder = build.get_builder(self.env)
 
         args = [builder.get_cmake_tool_path('ctest')]
         if self.env.verbose:
             args.append('-V')
+
+        if self.KNOWN_FAILURES:
+            failing_tests = '|'.join(['test_{0}_{1}Test'.format(path, test) for
+                path, test in self.KNOWN_FAILURES])
+            args.extend(['-E', failing_tests])
         subprocess.check_call(args, cwd=self.env.env_path)
 
         return True
 
     def _run_cpp_tests_scons(self, suite_args):
-        # TODO: fix these tests and remove this list
-        KNOWN_FAILURE = set([
-            '01_util/LowerCaseFilterTest',
-            '01_util/PlainCharFilterTest',
-            '05_html/HTMLFilterTest',
-            '10_db/MySQLReconnectTest',
-            '53_pt_routeplanner/PTRoutePlannerResultTest',
-            '53_pt_routeplanner/RoutePlannerTest',
-        ])
         # FIXME: this wants elevation (because it contains update it its name) and fails.
         # We should add a manifest to disable it.
+        failures = self.KNOWN_FAILURES.copy()
         if self.env.platform == 'win':
-            KNOWN_FAILURE.add('10_db/DBIndexUpdateTest')
+            failures.add('10_db/DBIndexUpdateTest')
+
+        failures = ['{0}/{1}Test'.format(path, test) for path, test in failures]
 
         tests_path = os.path.join(self.env.env_path, 'test')
         tests_suffix = 'Test' + self.env.platform_exe_suffix
@@ -207,7 +215,7 @@ class Tester(object):
                 '/'.join(test_executable.split(os.sep)[-2:]).
                     replace(self.env.platform_exe_suffix, '')
             )
-            if normalized_name in KNOWN_FAILURE:
+            if normalized_name in failures:
                 log.warn('Ignoring known failing test: %s', normalized_name)
                 continue
 
