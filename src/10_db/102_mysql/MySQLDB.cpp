@@ -89,7 +89,8 @@ namespace synthese
 		MySQLDB::MySQLDB() :
 			_connection(NULL),
 			_mysqlThreadInitialized(cleanupThread),
-			_secretToken(genRandomString(10))
+			_secretToken(genRandomString(10)),
+			_hasNotifyHTTPFunction(true)
 		{
 		}
 
@@ -244,6 +245,21 @@ namespace synthese
 
 		void MySQLDB::initDatabase()
 		{
+			try
+			{
+				execUpdate("SELECT notify_synthese_http('', '');");
+			}
+			catch (const MySQLException&)
+			{
+				_hasNotifyHTTPFunction = false;
+				Log::GetInstance().warn(
+					"Couldn't find the notify_synthese_http function. Direct "
+					"database modifications won't be supported (and could "
+					"corrupt data). See https://extranet-rcsmobility.com/projects/synthese/wiki/MySQL_Installation "
+					"for instructions."
+				);
+			}
+
 			std::stringstream sql;
 			sql <<
 				"DROP TABLE IF EXISTS trigger_metadata;" <<
@@ -251,24 +267,27 @@ namespace synthese
 				"  url varchar(100) DEFAULT NULL," <<
 				"  secret_token varchar(100) DEFAULT NULL," <<
 				"  synthese_conn_id INT DEFAULT NULL" <<
-				");" <<
+				");";
+			if (_hasNotifyHTTPFunction)
+			{
+				sql <<
+					"DROP PROCEDURE IF EXISTS notify_synthese;" <<
 
-				"DROP PROCEDURE IF EXISTS notify_synthese;" <<
-
-				"CREATE PROCEDURE notify_synthese(IN tablename VARCHAR(50), IN type VARCHAR(10), IN id BIGINT)" <<
-				"proc: BEGIN" <<
-				"  DECLARE _url, _secret_token VARCHAR(100);" <<
-				"  DECLARE _post_data VARCHAR(512);" <<
-				"  DECLARE _synthese_conn_id, _dummy INTEGER;" <<
-				"  SELECT url, secret_token, synthese_conn_id FROM trigger_metadata INTO " <<
-				"    _url, _secret_token, _synthese_conn_id;" <<
-				"  IF ISNULL(_url) OR CONNECTION_ID() = _synthese_conn_id THEN" <<
-				"    LEAVE proc;" <<
-				"  END IF;" <<
-				"  SELECT CONCAT('nr=1&a=MySQLDBModifiedAction&actionParamst=', _secret_token, '&actionParamtb=', " <<
-				"    tablename, '&actionParamty=', type, '&actionParamid=', id) INTO _post_data;" <<
-				"  SELECT notify_synthese_http(_url, _post_data) INTO _dummy;" <<
-				"END;";
+					"CREATE PROCEDURE notify_synthese(IN tablename VARCHAR(50), IN type VARCHAR(10), IN id BIGINT)" <<
+					"proc: BEGIN" <<
+					"  DECLARE _url, _secret_token VARCHAR(100);" <<
+					"  DECLARE _post_data VARCHAR(512);" <<
+					"  DECLARE _synthese_conn_id, _dummy INTEGER;" <<
+					"  SELECT url, secret_token, synthese_conn_id FROM trigger_metadata INTO " <<
+					"    _url, _secret_token, _synthese_conn_id;" <<
+					"  IF ISNULL(_url) OR CONNECTION_ID() = _synthese_conn_id THEN" <<
+					"    LEAVE proc;" <<
+					"  END IF;" <<
+					"  SELECT CONCAT('nr=1&a=MySQLDBModifiedAction&actionParamst=', _secret_token, '&actionParamtb=', " <<
+					"    tablename, '&actionParamty=', type, '&actionParamid=', id) INTO _post_data;" <<
+					"  SELECT notify_synthese_http(_url, _post_data) INTO _dummy;" <<
+					"END;";
+			}
 			execUpdate(sql.str());
 		}
 
@@ -457,6 +476,9 @@ namespace synthese
 			{
 				return;
 			}
+
+			if (!_hasNotifyHTTPFunction)
+				return;
 
 			std::stringstream sql;
 			const string modifTypes[] = {"insert", "update", "delete"};
