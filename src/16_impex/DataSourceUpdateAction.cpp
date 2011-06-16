@@ -134,10 +134,9 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_SRID))
 			{
-				CoordinatesSystem::SRID srid(map.get<CoordinatesSystem::SRID>(PARAMETER_SRID));
-				if(srid > 0) try
+				if(map.getDefault<int>(PARAMETER_SRID,0) > 0) try
 				{
-					_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+					_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(map.get<CoordinatesSystem::SRID>(PARAMETER_SRID));
 				}
 				catch(CoordinatesSystem::CoordinatesSystemNotFoundException&)
 				{
