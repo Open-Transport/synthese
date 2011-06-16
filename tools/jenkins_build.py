@@ -24,7 +24,6 @@
 import logging
 from optparse import OptionParser
 import os
-import site
 import subprocess
 import sys
 
@@ -34,6 +33,7 @@ default_config = {
     "mysql_params": "host=localhost,user=synthese,passwd=synthese",
     "mysql_db": "synthese_test",
     "port": "9000",
+    "env": {},
 }
 
 # per slave config
@@ -57,7 +57,9 @@ def run_synthesepy(command, tool, mode, global_args, command_args, environ,
 
 
 def build(options):
-    config_file = os.path.join(site.USER_BASE, 'synthese', 'jenkins_config.py')
+    thirdparty_dir = os.environ.get(
+        'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese')) 
+    config_file = os.path.join(thirdparty_dir, 'jenkins_config.py')
     log.info("Reading config from %s", config_file)
 
     if os.path.isfile(config_file):
@@ -76,6 +78,7 @@ def build(options):
     environ = os.environ.copy()
     environ["SYNTHESE_MYSQL_PARAMS"] = c["mysql_params"]
     environ["SYNTHESE_MYSQL_DB"] = c["mysql_db"]
+    environ.update(c["env"])
 
     run_synthesepy(
         "build", options.tool, options.mode, [], [], environ)
