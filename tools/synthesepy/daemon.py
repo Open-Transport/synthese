@@ -108,7 +108,7 @@ class Daemon(object):
         if self.env.log_stdout:
             stdout = sys.stdout
         else:
-            log.debug('Logging to %s', self.env.daemon_log_file)
+            log.info('Logging to %s', self.env.daemon_log_file)
             stdout = open(self.env.daemon_log_file, 'wb')
 
         self.proc = subprocess.Popen(
