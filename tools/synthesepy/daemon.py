@@ -97,12 +97,18 @@ class Daemon(object):
         args = [
             self.env.daemon_path,
             '--dbconn', self.env.conn_string,
-            '--param', 'log_level=-1',
-            '--param', 'port=%s' % self.env.port
         ]
+        params = {
+            'log_level': '-1',
+            'port': str(self.env.port),
+        }
         if self.env.extra_params:
             for p in self.env.extra_params.split():
-                args.extend(['--param', p])
+                name, value = p.split('=', 1)
+                params[name] = value
+        
+        for name, value in params.iteritems():
+            args.extend(['--param', name + "=" + value])
         log.debug('Args: %s', args)
 
         if self.env.log_stdout:
