@@ -54,104 +54,6 @@ class Builder(object):
         if not os.path.isdir(self.download_cache_dir):
             os.makedirs(self.download_cache_dir)
 
-    def install_prerequisites(self):
-        pass
-
-    def _build(self):
-        raise NotImplemented()
-
-    def build(self):
-        self.install_prerequisites()
-        self._build()
-
-class SconsBuilder(Builder):
-    # This should be populated automatically once all tests build.
-    TEST_TARGETS = [
-        # FIXME: commented targets don't compile.
-        #'util',
-        'db',
-        'html',
-        #'lex-matcher',
-        #'geography',
-        'graph',
-        'road',
-        'pt',
-        #'carto',
-        'pt-routeplanner',
-    ]
-
-    def _build(self):
-        if not utils.find_executable('scons'):
-            raise Exception('Unable to find scons in PATH')
-
-        args = ['scons']
-
-        # Use ccache on Linux if available
-        if self.env.platform == 'lin' and utils.find_executable('ccache'):
-            args.append('CXX=ccache g++')
-            args.append('CC=ccache gcc')
-
-        if not self.args.without_mysql:
-            args.append('_WITH_MYSQL=True')
-            if self.args.mysql_dir:
-                args.append('_MYSQL_ROOT=' + self.args.mysql_dir)
-
-        if self.env.mode == 'debug':
-            args.append('_CPPMODE=debug')
-
-
-        # Don't run tests after they are built.
-        args.append('TESTBUILDONLY=True')
-
-        targets = (['s3-server.cppbin'] +
-            ['s3-%s-test.cpptest' % t for t in self.TEST_TARGETS])
-
-        args.extend(targets)
-
-        log.info('Build command line: %s', args)
-
-        kwargs = {}
-        # Windows doesn't like it if launched without shell=True and
-        # Linux fails if it is.
-        if self.env.platform == 'win':
-            kwargs = {
-                'shell': True
-            }
-        subprocess.check_call(args, **kwargs)
-
-
-class CMakeBuilder(Builder):
-    def _check_debian_package_requirements(self):
-        if self.env.platform != 'lin':
-            return
-
-        if not os.path.isfile('/etc/debian_version'):
-            log.info('Non Debian system, not checking required packages')
-            return
-
-        required_packages = (
-            'g++ python-dev make '
-            'libboost-program-options-dev libboost-thread1.42-dev '
-            'libboost-filesystem1.42-dev libboost-date-time1.42-dev '
-            'libboost-iostreams1.42-dev libboost-test1.42-dev '
-            'libboost-system1.42-dev libboost-regex1.42-dev '
-        ).split()
-        if not self.args.without_mysql:
-            required_packages.extend(
-                ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
-
-        to_install = [p for p in required_packages if
-            subprocess.call(
-                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
-                shell=True, stdout=subprocess.PIPE)]
-        if not to_install:
-            return
-
-        log.info('You must install the following packages to continue: %s. '
-            'That can be done with the command:')
-        log.info('apt-get install %s', ' '.join(to_install))
-        sys.exit(1)
-
     def _download(self, url, md5=None):
         target = join(self.download_cache_dir, url.split('/')[-1])
         if 'SYNTHESE_CACHE_URL' in os.environ:
@@ -184,6 +86,132 @@ class CMakeBuilder(Builder):
         elif archive.endswith(('.tar.gz', '.tgz')):
             assert self.env.platform != 'win'
             subprocess.check_call(['tar', 'zxf', archive, '-C', extract_dir])
+
+    def install_prerequisites(self):
+        pass
+
+    def _build(self):
+        raise NotImplemented()
+
+    def build(self):
+        self.install_prerequisites()
+        self._build()
+
+class SconsBuilder(Builder):
+    # This should be populated automatically once all tests build.
+    TEST_TARGETS = [
+        # FIXME: commented targets don't compile.
+        #'util',
+        'db',
+        'html',
+        #'lex-matcher',
+        #'geography',
+        'graph',
+        'road',
+        'pt',
+        #'carto',
+        'pt-routeplanner',
+    ]
+
+    def _install_boost(self):
+        self.boost_dir = join(self.env.thirdparty_dir, 'boost')
+        if os.path.isdir(self.boost_dir):
+            return
+
+        subprocess.check_call(
+            'svn co --ignore-externals https://extranet-rcsmobility.com/svn/synthese3/trunk/3rd/dev/boost',
+            shell=True, cwd=join(self.env.thirdparty_dir))
+
+        # XXX duplicated with cmake
+        url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
+        self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
+        created_dir = 'boost_1_42_0'
+        self._extract(url, self.boost_dir, created_dir)
+        os.rename(join(self.boost_dir, created_dir), join(self.boost_dir, 'src'))
+
+    def install_prerequisites(self):
+        self._install_boost()
+
+    def _build(self):
+        if not utils.find_executable('scons'):
+            raise Exception('Unable to find scons in PATH')
+
+        args = ['scons']
+
+        # Use ccache on Linux if available
+        if self.env.platform == 'lin' and utils.find_executable('ccache'):
+            args.append('CXX=ccache g++')
+            args.append('CC=ccache gcc')
+
+        if not self.args.without_mysql:
+            args.append('_WITH_MYSQL=True')
+            if self.args.mysql_dir:
+                args.append('_MYSQL_ROOT=' + self.args.mysql_dir)
+
+        if self.env.mode == 'debug':
+            args.append('_CPPMODE=debug')
+
+        # Don't run tests after they are built.
+        args.append('TESTBUILDONLY=True')
+
+        targets = (['s3-server.cppbin'] +
+            ['s3-%s-test.cpptest' % t for t in self.TEST_TARGETS])
+
+        args.extend(targets)
+
+        log.info('Build command line: %s', args)
+
+        env = os.environ.copy()
+        env['BOOST_SOURCE'] = self.boost_dir
+
+        kwargs = {
+            'env': env
+        }
+        # Windows doesn't like it if launched without shell=True and
+        # Linux fails if it is.
+        if self.env.platform == 'win':
+            kwargs = {
+                'shell': True
+            }
+        subprocess.check_call(args, **kwargs)
+
+
+BOOST_VER = '1.42'
+REQUIRED_BOOST_MODULES = [
+    'date_time', 'filesystem', 'iostreams', 'program_options',
+    'regex', 'system', 'test', 'thread']
+
+
+class CMakeBuilder(Builder):
+    def _check_debian_package_requirements(self):
+        if self.env.platform != 'lin':
+            return
+
+        if not os.path.isfile('/etc/debian_version'):
+            log.info('Non Debian system, not checking required packages')
+            return
+
+        required_packages = 'g++ python-dev make'.split()
+
+        required_packages.extend(
+            ['libbost-{0}{1}-dev'.format(m, BOOST_VER) for
+                m in REQUIRED_BOOST_MODULES])
+            
+        if not self.args.without_mysql:
+            required_packages.extend(
+                ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
+
+        to_install = [p for p in required_packages if
+            subprocess.call(
+                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
+                shell=True, stdout=subprocess.PIPE)]
+        if not to_install:
+            return
+
+        log.info('You must install the following packages to continue: %s. '
+            'That can be done with the command:')
+        log.info('apt-get install %s', ' '.join(to_install))
+        sys.exit(1)
 
     def _install_cmake(self):
         self.cmake_path = None
@@ -257,15 +285,34 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        self.boost_dir = join(
-            self.env.source_path, '3rd', 'dev', 'boost', 'src')
+        ##self.boost_dir = join(
+        ##    self.env.source_path, '3rd', 'dev', 'boost', 'src')
 
-        # TODO: build boost instead.
-        url = 'http://94.23.28.171/~spasche/boost_lib.zip'
-        self._download(url, 'c9f6a547a8e04563263916efd3b5c6ac')
-        created_dir = 'boost_lib'
+        url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
+        self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
+        created_dir = 'boost_1_42_0'
         self._extract(url, self.env.thirdparty_dir, created_dir)
-        self.boost_lib_dir = join(self.env.thirdparty_dir, created_dir)
+        
+        self.boost_dir = join(self.env.thirdparty_dir, created_dir)
+        self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
+        
+        if os.path.isdir(self.boost_lib_dir):
+            return
+
+        log.info("Building Boost, this can take some times...")
+
+        subprocess.check_call(
+            join(self.boost_dir, 'bootstrap.bat'), cwd=self.boost_dir)
+
+        args = [join(self.boost_dir, 'bjam.exe')] 
+        # TODO: have an option to specify the vs version.
+        toolset = 'msvc-9.0'
+        args.extend(
+            'toolset={toolset} release debug link=static runtime-link=static '
+            'threading=multi'.format(toolset=toolset).split(' '))
+        args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
+
+        subprocess.check_call(args, cwd=self.boost_dir)
 
     def install_iconv(self):
         if self.env.platform != 'win':
@@ -330,6 +377,8 @@ class CMakeBuilder(Builder):
             args.append('-DCMAKE_INSTALL_PREFIX=' + self.args.prefix)
         if self.args.mysql_params:
             args.append('-DSYNTHESE_MYSQL_PARAMS=' + self.args.mysql_params)
+
+        args.append('-DBOOST_VERSION=' + BOOST_VER)
 
         env = os.environ.copy()
         if self.boost_dir:
