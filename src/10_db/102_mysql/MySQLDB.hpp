@@ -53,6 +53,7 @@ namespace synthese
 			boost::recursive_mutex _connectionMutex;
 			boost::thread_specific_ptr<bool> _mysqlThreadInitialized;
 			const std::string _secretToken;
+			bool _hasNotifyHTTPFunction;
 			ConcurrentQueue<DBModifEvent> _modifEventQueue;
 			boost::shared_ptr<boost::thread> _modifEventsThread;
 
