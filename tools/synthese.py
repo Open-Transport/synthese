@@ -175,7 +175,10 @@ class Bootstrap(object):
             log.critical(
                 'Failure while creating Python env. Deleting env directory'
             )
-            shutil.rmtree(self.config.pyenv_path)
+            try:
+                shutil.rmtree(self.config.pyenv_path)
+            except:
+                pass
             raise e
 
     def run_synthese(self):
