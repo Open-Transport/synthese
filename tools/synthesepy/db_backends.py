@@ -20,7 +20,7 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-from contextlib import closing
+import contextlib
 import logging
 import os
 import shutil
@@ -49,6 +49,14 @@ class DBBackend(object):
 
     def get_connection(self):
         raise NotImplementedError()
+
+    @contextlib.contextmanager
+    def get_cursor(self, *args, **kwargs):
+        conn = self.get_connection(*args, **kwargs)
+        cursor = conn.cursor()
+        yield cursor
+        conn.commit()
+        cursor.close()
 
     def init_db(self):
         utils.kill_listening_processes(self.env.port)
@@ -125,7 +133,7 @@ class SQLiteBackend(DBBackend):
             os.unlink(self.sqlite_file)
 
     def _import_data(self):
-        with closing(self.get_connection().cursor()) as cursor:
+        with self.get_cursor() as cursor:
             with open(self.initial_data_file, 'rb') as f:
                 cursor.executescript(f.read())
 
@@ -148,21 +156,21 @@ class MySQLBackend(DBBackend):
         return MySQLdb.connect(**args)
 
     def _create_db(self):
-        cursor = self.get_connection(False).cursor()
-        cursor.execute('CREATE DATABASE %s' % self.conn_info['db'])
+        with self.get_cursor(False) as cursor:
+            cursor.execute('CREATE DATABASE %s' % self.conn_info['db'])
 
     def drop_db(self):
-        cursor = self.get_connection(False).cursor()
-        try:
-            cursor.execute('DROP DATABASE %s' % self.conn_info['db'])
-        except MySQLdb.DatabaseError, e:
-            DB_DROP_EXISTS = 1008
-            if e.args[0] == DB_DROP_EXISTS:
-                return
-            raise
+        with self.get_cursor(False) as cursor:
+            try:
+                cursor.execute('DROP DATABASE %s' % self.conn_info['db'])
+            except MySQLdb.DatabaseError, e:
+                DB_DROP_EXISTS = 1008
+                if e.args[0] == DB_DROP_EXISTS:
+                    return
+                raise
 
     def _import_data(self):
-        with closing(self.get_connection().cursor()) as cursor:
+        with self.get_cursor() as cursor:
             with open(self.initial_data_file, 'rb') as f:
                 # MySQLdb can't execute multiple statements (however it works on Windows with version 1.2.3)
                 # So, split lines at semicolons.
