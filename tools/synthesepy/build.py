@@ -194,7 +194,7 @@ class CMakeBuilder(Builder):
         required_packages = 'g++ python-dev make'.split()
 
         required_packages.extend(
-            ['libbost-{0}{1}-dev'.format(m, BOOST_VER) for
+            ['libboost-{0}{1}-dev'.format(m, BOOST_VER) for
                 m in REQUIRED_BOOST_MODULES])
             
         if not self.args.without_mysql:
