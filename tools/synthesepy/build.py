@@ -313,7 +313,7 @@ class CMakeBuilder(Builder):
             # TODO: This shouldn't be hardcoded.
             args.extend(['-G', 'Visual Studio 9 2008'])
 
-        if not self.with_mysql:
+        if self.with_mysql:
             args.append('-DWITH_MYSQL=1')
             if self.mysql_dir:
                 os.environ['MYSQL_DIR'] = self.mysql_dir
