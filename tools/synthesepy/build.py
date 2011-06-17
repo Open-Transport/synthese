@@ -318,15 +318,14 @@ class CMakeBuilder(Builder):
         if self.env.platform != 'win':
             return
 
-        self._download(
-            'https://extranet-rcsmobility.com/attachments/download/13571',
-            'fd1dc6c680299a2ed1eedcc3eabda601')
+        url = 'http://94.23.28.171/~spasche/libiconv2.dll'
+        self._download(url, 'fd1dc6c680299a2ed1eedcc3eabda601')
         target = join(self.env.thirdparty_dir, 'iconv', 'libiconv2.dll')
         if not os.path.isdir(os.path.dirname(target)):
             os.makedirs(os.path.dirname(target))
         if os.path.isfile(target):
             return
-        fname = LIBICONV2_DLL_URL.split('/')[-1]
+        fname = url.split('/')[-1]
         shutil.copy(join(self.download_cache_dir, fname), target)
 
     def install_prerequisites(self):
