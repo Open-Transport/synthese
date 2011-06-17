@@ -161,17 +161,17 @@ class BoostProject (CppLibProject):
 			lenv.BJam (targets, 'src/boost-build.jam')
 			self.add_target(self.env.InstallAs (itargets, targets))
 
-
+BOOST_VER = '1.42'
 
 for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
                 'program_options', 'regex', 
                 'thread',  'test', 'system']:
-	BoostProject (senv, 'boost_' + prjname, '1.39')
+	BoostProject (senv, 'boost_' + prjname, BOOST_VER)
 
 CppIncludeProject(
 	env,
 	'boost',
-	'1.39',
+	BOOST_VER,
 	filesrootdir = env.SrcDir('src/boost'),
 	include_dir = env.SrcDir('src')
 )
