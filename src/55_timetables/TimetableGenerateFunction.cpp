@@ -432,7 +432,7 @@ namespace synthese
 			if(_page.get())
 			{
 				auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
-				if(_calendarTemplate.get() && _calendarTemplate->isLimited())
+				if(_calendarTemplate.get())
 				{
 					Calendar mask(_calendarTemplate->getResult(generator->getBaseCalendar()));
 					generator->setBaseCalendar(mask);
