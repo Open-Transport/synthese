@@ -292,7 +292,7 @@ namespace synthese
 						ArrivalDepartureList subResult(
 							continuationScreen->_generateStandardScreen(transferStartTime, transferEndTime, false)
 						);
-						if(!subResult.empty())
+						if(!subResult.empty() && subResult.begin()->first.getService() != row.first.getService())
 						{
 							itDest->continuationService = subResult.begin()->first;
 							itDest->destinationsReachedByContinuationService = subResult.begin()->second;
