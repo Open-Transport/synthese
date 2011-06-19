@@ -34,20 +34,12 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : SubStrFunction.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/String_manipulation#Substring
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.18
-		//////////////////////////////////////////////////////////////////////////
-		/// Key : substr
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>fonction=substr</li>
-		///		<li>t : text to extract the result from</li>
-		///		<li>f : first character</li>
-		///		<li>n : number of characters</li>
-		///	</ul>
 		class SubStrFunction:
 			public util::FactorableTemplate<server::Function,SubStrFunction>
 		{
