@@ -60,6 +60,7 @@
 #include "Webpage.h"
 #include "Language.hpp"
 #include "Vehicle.hpp"
+#include "StopPoint.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -78,7 +79,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace cms;
-
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<Function, resa::ReservationsListService>::FACTORY_KEY("ReservationsListService");
 
@@ -90,6 +91,11 @@ namespace synthese
 		const string ReservationsListService::PARAMETER_RESERVATION_PAGE_ID("rp");
 		const string ReservationsListService::PARAMETER_SERVICE_ID("se");
 		const string ReservationsListService::PARAMETER_LANGUAGE("la");
+		const string ReservationsListService::PARAMETER_MINIMAL_DEPARTURE_RANK("min_dp_rank");
+		const string ReservationsListService::PARAMETER_MAXIMAL_DEPARTURE_RANK("max_dp_rank");
+		const string ReservationsListService::PARAMETER_MINIMAL_ARRIVAL_RANK("min_arr_rank");
+		const string ReservationsListService::PARAMETER_MAXIMAL_ARRIVAL_RANK("max_arr_rank");
+		const string ReservationsListService::PARAMETER_LINKED_WITH_VEHICLE_ONLY("linked_with_vehicle_only");
 
 		const string ReservationsListService::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string ReservationsListService::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
@@ -141,6 +147,24 @@ namespace synthese
 			{
 				map.insert(PARAMETER_LANGUAGE, _language->getIso639_2Code());
 			}
+
+			if(_minDepartureRank)
+			{
+				map.insert(PARAMETER_MINIMAL_DEPARTURE_RANK, *_minDepartureRank);
+			}
+			if(_maxDepartureRank)
+			{
+				map.insert(PARAMETER_MAXIMAL_DEPARTURE_RANK, *_maxDepartureRank);
+			}
+			if(_minArrivalRank)
+			{
+				map.insert(PARAMETER_MINIMAL_ARRIVAL_RANK, *_minArrivalRank);
+			}
+			if(_maxArrivalRank)
+			{
+				map.insert(PARAMETER_MAXIMAL_ARRIVAL_RANK, *_maxArrivalRank);
+			}
+			map.insert(PARAMETER_LINKED_WITH_VEHICLE_ONLY, _linkedWithVehicleOnly);
 
 			return map;
 		}
@@ -238,7 +262,15 @@ namespace synthese
 			{
 				_language = Language::GetLanguageFromIso639_2Code(map.get<string>(PARAMETER_LANGUAGE));
 			}
+
+			_minDepartureRank = map.getOptional<size_t>(PARAMETER_MINIMAL_DEPARTURE_RANK);
+			_maxDepartureRank = map.getOptional<size_t>(PARAMETER_MAXIMAL_DEPARTURE_RANK);
+			_minArrivalRank = map.getOptional<size_t>(PARAMETER_MINIMAL_ARRIVAL_RANK);
+			_maxArrivalRank = map.getOptional<size_t>(PARAMETER_MAXIMAL_ARRIVAL_RANK);
+			_linkedWithVehicleOnly = map.getDefault<bool>(PARAMETER_LINKED_WITH_VEHICLE_ONLY, false);
 		}
+
+
 
 		void ReservationsListService::run(
 			std::ostream& stream,
@@ -330,6 +362,70 @@ namespace synthese
 				{
 					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
 					{
+						// Departure rank check
+						if(_minDepartureRank || _maxDepartureRank)
+						{
+							bool result(true);
+							shared_ptr<const StopArea> stopArea(
+								Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
+							);
+							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
+							{
+								try
+								{
+									const Edge& edge(service->getPath()->findEdgeByVertex(itStop.second));
+									if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
+										_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
+									){
+										result = false;
+										break;
+									}
+								}
+								catch (Path::VertexNotFoundException&)
+								{
+								}
+							}
+							if(!result)
+							{
+								continue;
+							}
+						}
+
+						// Arrival rank check
+						if(_minArrivalRank || _maxArrivalRank)
+						{
+							bool result(true);
+							shared_ptr<const StopArea> stopArea(
+								Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
+							);
+							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
+							{
+								try
+								{
+									const Edge& edge(service->getPath()->findEdgeByVertex(itStop.second));
+									if( _minArrivalRank && edge.getRankInPath() < *_minArrivalRank ||
+										_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank
+									){
+										result = false;
+										break;
+									}
+								}
+								catch (Path::VertexNotFoundException&)
+								{
+								}
+							}
+							if(!result)
+							{
+								continue;
+							}
+						}
+
+						// Check of link with vehicle
+						if(_linkedWithVehicleOnly && !reservation->getVehicle())
+						{
+							continue;
+						}
+
 						_displayReservation(
 							stream,
 							request,
@@ -407,7 +503,8 @@ namespace synthese
 
 
 		ReservationsListService::ReservationsListService():
-			FactorableTemplate<server::Function,ReservationsListService>()
+			FactorableTemplate<server::Function,ReservationsListService>(),
+			_linkedWithVehicleOnly(false)
 		{
 			setEnv(shared_ptr<Env>(new Env));
 		}
