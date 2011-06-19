@@ -57,6 +57,7 @@ synthese::pt::StopPointAdmin::integrate();
 synthese::pt::DRTAreaAdmin::integrate();
 synthese::pt::DRTAreasAdmin::integrate();
 
+synthese::pt::LineStopGetService::integrate();
 synthese::pt::RealTimeUpdateFunction::integrate();
 synthese::pt::PhysicalStopsCSVExportFunction::integrate();
 synthese::pt::LinesListFunction::integrate();

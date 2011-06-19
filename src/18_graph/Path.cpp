@@ -726,6 +726,22 @@ namespace synthese
 
 
 
+		const Edge& Path::findEdgeByVertex( const Vertex* vertex ) const
+		{
+			Vertex::Edges::const_iterator it(vertex->getDepartureEdges().find(this));
+			if(it != vertex->getDepartureEdges().end())
+			{
+				return *it->second;
+			}
+			Vertex::Edges::const_iterator it2(vertex->getArrivalEdges().find(this));
+			if(it2 != vertex->getArrivalEdges().end())
+			{
+				return *it2->second;
+			}
+			throw VertexNotFoundException();
+		}
+
+
 		Path::InvalidOffsetException::InvalidOffsetException(
 			MetricOffset offset,
 			const Path& path

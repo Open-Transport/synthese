@@ -47,6 +47,7 @@ namespace synthese
 	{
 		class Service;
 		class Edge;
+		class Vertex;
 		class PathGroup;
 		class PathClass;
 
@@ -255,6 +256,20 @@ namespace synthese
 				/// @since 3.2.1
 				/// @date 2011
 				Edges getAllEdges() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Search in the path for an edge starting at the specified vertex.
+				/// @param vertex vertex to search
+				/// @return an edge starting at the specified vertex
+				/// @throw VertexNotFoundException if the vertex is not served by the path
+				/// @warning if the vertex is served several times by the path, then the returned edge is randomly chosen.
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				const Edge& findEdgeByVertex(const Vertex* vertex) const;
+				class VertexNotFoundException: public synthese::Exception { public: VertexNotFoundException() : synthese::Exception("Vertex was not found in the path.") {} };
 			//@}
 
 			//! @name Modifiers.
