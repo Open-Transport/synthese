@@ -37,15 +37,14 @@ namespace synthese
 
 	namespace pt
 	{
+		class TransportNetwork;
+
 		/** PTNetworksListFunction Function class.
 			@author Hugues Romain
 			@date 2010
 			@ingroup m35Functions refFunctions
 
-			Parameters :
-			<ul>
-				<li>p : page to use for display. If not defined, XML output</li>
-			</ul>
+			See https://extranet-rcsmobility.com/projects/synthese/wiki/Networks_list
 		*/
 		class PTNetworksListFunction:
 			public util::FactorableTemplate<server::Function,PTNetworksListFunction>
@@ -53,10 +52,15 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_PAGE_ID;
 
-		protected:
+		private:
+			static const std::string DATA_NETWORK_ID;
+			static const std::string DATA_NAME;
+			static const std::string DATA_RANK;
+			static const std::string DATA_RANK_IS_ODD;
+
 			//! \name Page parameters
 			//@{
-			boost::shared_ptr<const cms::Webpage>			_page;
+				boost::shared_ptr<const cms::Webpage>			_page;
 			//@}
 
 
@@ -78,6 +82,13 @@ namespace synthese
 				const server::ParametersMap& map
 			);
 
+
+			void _displayNetwork(
+				std::ostream& stream,
+				const server::Request& request,
+				const pt::TransportNetwork& object,
+				std::size_t rank
+			) const;
 
 		public:
 

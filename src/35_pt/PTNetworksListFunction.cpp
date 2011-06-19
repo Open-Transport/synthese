@@ -25,8 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "PTNetworksListFunction.hpp"
-#include "Interface.h"
-#include "PTNetworkListItemInterfacePage.hpp"
 #include "TransportNetworkTableSync.h"
 #include "Env.h"
 #include "Webpage.h"
@@ -48,6 +46,11 @@ namespace synthese
 	namespace pt
 	{
 		const string PTNetworksListFunction::PARAMETER_PAGE_ID("p");
+
+		const string PTNetworksListFunction::DATA_NETWORK_ID("network_id");
+		const string PTNetworksListFunction::DATA_NAME("name");
+		const string PTNetworksListFunction::DATA_RANK("rank");
+		const string PTNetworksListFunction::DATA_RANK_IS_ODD("rank_is_odd");
 
 		ParametersMap PTNetworksListFunction::_getParametersMap() const
 		{
@@ -78,7 +81,6 @@ namespace synthese
 		) const {
 
 			size_t rank(0);
-			interfaces::VariablesMap variables;
 			if(!_page.get())
 			{
 				/// @todo generate XML header
@@ -90,9 +92,8 @@ namespace synthese
 			{
 				if(_page.get())
 				{
-					PTNetworkListItemInterfacePage::Display(
+					_displayNetwork(
 						stream,
-						_page,
 						request,
 						*it,
 						rank++
@@ -122,6 +123,25 @@ namespace synthese
 		std::string PTNetworksListFunction::getOutputMimeType() const
 		{
 			return _page.get() ? _page->getMimeType() : "text/xml";
+		}
+
+
+
+		void PTNetworksListFunction::_displayNetwork(
+			std::ostream& stream,
+			const server::Request& request,
+			const pt::TransportNetwork& object,
+			std::size_t rank
+		) const {
+
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+
+			pm.insert(DATA_NETWORK_ID, object.getKey());
+			pm.insert(DATA_NAME, object.getName()); //1
+			pm.insert(DATA_RANK, rank);
+			pm.insert(DATA_RANK_IS_ODD, rank % 2); //3
+
+			_page->display(stream, request, pm);
 		}
 	}
 }
