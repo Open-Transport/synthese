@@ -24,7 +24,7 @@ class BoostProject (CppLibProject):
 			self
 			, senv
 			, name
-			, version + "_" + now.strftime("%Y-%m-%d %H:%M")
+			, version + "_" + now.strftime("%Y-%m-%d-%H-%M")
 			, source_files = ['src/boost-build.jam']
 			, include_dir = senv.SrcDir('src')
 			, dependencies = deps
