@@ -158,7 +158,7 @@ class BoostProject (CppLibProject):
 				targetname = self.env.subst ('$SHLIBPREFIX') + self.name + self.env.subst('$SHLIBSUFFIX')	  
 				targets.append (File (targetname, 'lib'))
 				#itargets.append (File (self.get_libs()[0] + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']))
-				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + BOOST_VER + ".0", env['_REPO_SHLIB_DIR']))
+				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + self.version.version + ".0", env['_REPO_SHLIB_DIR']))
 				self.env.InstallAs(File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']), File (targetname, 'lib')) 
 			lenv = self.env.Clone ()
 			lenv['BJAMOPTIONS'] = options
