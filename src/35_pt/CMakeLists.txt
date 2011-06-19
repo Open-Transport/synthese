@@ -101,6 +101,8 @@ LineStop.cpp
 LineStop.h
 LineStopAddAction.cpp
 LineStopAddAction.h
+LineStopGetService.cpp
+LineStopGetService.hpp
 LineStopTableSync.cpp
 LineStopTableSync.h
 LineStopUpdateAction.cpp
@@ -136,8 +138,6 @@ PTModule.cpp
 PTModule.gen.cpp
 PTModule.h
 PTModule.inc.cpp
-PTNetworkListItemInterfacePage.cpp
-PTNetworkListItemInterfacePage.hpp
 PTNetworksAdmin.cpp
 PTNetworksAdmin.h
 PTNetworksListFunction.cpp
