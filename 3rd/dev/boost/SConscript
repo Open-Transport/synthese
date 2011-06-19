@@ -1,13 +1,15 @@
 Import ('env')
 
-import os
+import os, datetime
 
 senv = env.Clone ()
 
 
 
 ## BOOST #############################################################################################################################
-## http://www.boost.org/doc/libs/1_39_0/libs/iostreams/doc/installation.html
+## http://www.boost.org/doc/libs/1_42_0/libs/iostreams/doc/installation.html
+
+BOOST_VER = '1.42'
 
 class BoostProject (CppLibProject):
 
@@ -16,11 +18,13 @@ class BoostProject (CppLibProject):
 			deps = ['boost-zlib.cpplib']
 		else:
 			deps = None
+
+		now = datetime.datetime.now()
 		CppLibProject.__init__ (
 			self
 			, senv
 			, name
-			, version
+			, version + "_" + now.strftime("%Y-%m-%d %H:%M")
 			, source_files = ['src/boost-build.jam']
 			, include_dir = senv.SrcDir('src')
 			, dependencies = deps
@@ -154,14 +158,12 @@ class BoostProject (CppLibProject):
 				targetname = self.env.subst ('$SHLIBPREFIX') + self.name + self.env.subst('$SHLIBSUFFIX')	  
 				targets.append (File (targetname, 'lib'))
 				#itargets.append (File (self.get_libs()[0] + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']))
-				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + self.version.version + ".0", env['_REPO_SHLIB_DIR']))
+				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + BOOST_VER + ".0", env['_REPO_SHLIB_DIR']))
 				self.env.InstallAs(File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']), File (targetname, 'lib')) 
 			lenv = self.env.Clone ()
 			lenv['BJAMOPTIONS'] = options
 			lenv.BJam (targets, 'src/boost-build.jam')
 			self.add_target(self.env.InstallAs (itargets, targets))
-
-BOOST_VER = '1.42'
 
 for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
                 'program_options', 'regex', 
