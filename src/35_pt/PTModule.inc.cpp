@@ -6,6 +6,7 @@
 #include "PTModule.h"
 
 #include "LinesListFunction.h"
+#include "LineStopGetService.hpp"
 #include "StopAreasListFunction.hpp"
 #include "StopPointsListFunction.hpp"
 #include "RealTimeUpdateFunction.h"
