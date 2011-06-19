@@ -194,12 +194,12 @@ namespace synthese
 			if(_line && col._line)
 			{
 				if( _line->getOrigin()->getHub() != col._line->getOrigin()->getHub()
-					){
-						_originType = Indetermine;
+				){
+					_originType = Indetermine;
 				}
 				if(	_line->getDestination()->getHub() != col._line->getDestination()->getHub()
-					){
-						_destinationType = Indetermine;
+				){
+					_destinationType = Indetermine;
 				}
 			}
 
@@ -212,11 +212,38 @@ namespace synthese
 		bool TimetableColumn::operator==( const TimetableColumn& op ) const
 		{
 			assert(op._content.size() == _content.size());
+			
+			// Two empty columns are identical
+			if(_line == NULL && op._line == NULL)
+			{
+				return true;
+			}
 
-			return
-				(_line == NULL && op._line == NULL) ||
-				(_line != NULL && op._line != NULL && _line->getCommercialLine() == op._line->getCommercialLine() && _content == op._content)
-			;
+			// An empty column is not identical to a non empty one
+			if(	_line == NULL || op._line == NULL)
+			{
+				return false;
+			}
+
+			// Tests if the lines are different
+			if(_line->getCommercialLine() != op._line->getCommercialLine())
+			{
+				return false;
+			}
+			
+			// Search for different schedules
+			for(Content::const_iterator it1(_content.begin()), it2(op._content.begin());
+				it1 != _content.end();
+				++it1, ++it2)
+			{
+				if(it1->second != it2->second)
+				{
+					return false;
+				}
+			}
+
+			// Everything is OK the colums are identical
+			return true;
 		}
 
 
