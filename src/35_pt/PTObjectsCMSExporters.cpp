@@ -68,7 +68,6 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_SHORT_NAME, line.getShortName());
 			pm.insert(prefix + DATA_LINE_LONG_NAME, line.getLongName());
 			pm.insert(prefix + DATA_LINE_STYLE, line.getStyle());
-			pm.insert(prefix + DATA_LINE_IMAGE, line.getImage());
 			if(line.getColor())
 			{
 				pm.insert(prefix + DATA_LINE_COLOR, line.getColor()->toString());
@@ -81,6 +80,7 @@ namespace synthese
 		void PTObjectsCMSExporters::ExportStopArea(
 			server::ParametersMap& pm,
 			const StopArea& stopArea,
+			const CoordinatesSystem* coordinatesSystem,
 			string prefix
 		){
 			pm.insert(prefix + DATA_STOP_ID, stopArea.getKey());
@@ -92,6 +92,22 @@ namespace synthese
 			{
 				pm.insert(prefix + DATA_CITY_ID, stopArea.getCity()->getKey());
 				pm.insert(prefix + DATA_CITY_NAME, stopArea.getCity()->getName());
+			}
+			if(coordinatesSystem && stopArea.getPoint())
+			{
+				shared_ptr<Point> pg(
+					coordinatesSystem->convertPoint(*stopArea.getPoint())
+				);
+				{
+					stringstream s;
+					s << std::fixed << pg->getX();
+					pm.insert(prefix + DATA_X, s.str());
+				}
+				{
+					stringstream s;
+					s << std::fixed << pg->getY();
+					pm.insert(prefix + DATA_Y, s.str());
+				}
 			}
 		}
 
