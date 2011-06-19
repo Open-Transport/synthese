@@ -64,6 +64,7 @@
 #include "ServiceApplyCalendarAction.h"
 #include "AdminModule.h"
 #include "CalendarTemplateTableSync.h"
+#include "Destination.hpp"
 
 #include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
@@ -658,8 +659,12 @@ namespace synthese
 						_line->getRollingStock() ? _line->getRollingStock()->getKey() : optional<RegistryKeyType>()
 				)	);
 				stream << p.cell(
-					"Direction",
+					"Direction (texte)",
 					p.getForm().getTextInput(JourneyPatternUpdateAction::PARAMETER_DIRECTION, _line->getDirection())
+				);
+				stream << p.cell(
+					"Direction (girouette)",
+					p.getForm().getTextInput(JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID, _line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getKey()) : string())
 				);
 				stream << p.cell(
 					"Sens",
