@@ -200,11 +200,21 @@ namespace synthese
 			// Current location
 			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
 			{
-				PTObjectsCMSExporters::ExportStopArea(pm, *dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace(), DATA_LOCATION_);
+				PTObjectsCMSExporters::ExportStopArea(
+					pm,
+					*dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace(),
+					NULL,
+					DATA_LOCATION_
+				);
 			}
 
 			// Destination
-			PTObjectsCMSExporters::ExportStopArea(pm, *lineStop.getLine()->getDestination()->getConnectionPlace(), DATA_DESTINATION_);
+			PTObjectsCMSExporters::ExportStopArea(
+				pm,
+				*lineStop.getLine()->getDestination()->getConnectionPlace(),
+				NULL,
+				DATA_DESTINATION_
+			);
 
 			// Line
 			PTObjectsCMSExporters::ExportLine(pm, *lineStop.getLine()->getCommercialLine());
