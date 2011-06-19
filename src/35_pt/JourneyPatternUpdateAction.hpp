@@ -35,6 +35,7 @@ namespace synthese
 	{
 		class JourneyPattern;
 		class RollingStock;
+		class Destination;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Route properties update.
@@ -52,12 +53,14 @@ namespace synthese
 			static const std::string PARAMETER_TRANSPORT_MODE_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_DIRECTION;
+			static const std::string PARAMETER_DIRECTION_ID;
 			static const std::string PARAMETER_WAYBACK;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
 
 			boost::optional<boost::shared_ptr<RollingStock> > _transportMode;
+			boost::optional<boost::shared_ptr<Destination> > _directionObj;
 			boost::optional<std::string> _name;
 			boost::optional<std::string> _direction;
 			boost::optional<bool> _wayback;

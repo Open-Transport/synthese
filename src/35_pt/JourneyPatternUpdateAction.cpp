@@ -31,6 +31,7 @@
 #include "RollingStockTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "ImportableAdmin.hpp"
+#include "DestinationTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -53,6 +54,7 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_TRANSPORT_MODE_ID = Action_PARAMETER_PREFIX + "tm";
 		const string JourneyPatternUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
+		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID = Action_PARAMETER_PREFIX + "ii";
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
 
 
@@ -83,6 +85,10 @@ namespace synthese
 			if(_dataSourceLinks)
 			{
 				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
+			if(_direction)
+			{
+				map.insert(PARAMETER_DIRECTION_ID, _directionObj->get() ? (*_directionObj)->getKey() : RegistryKeyType(0));
 			}
 			return map;
 		}
@@ -130,6 +136,23 @@ namespace synthese
 				}
 			}
 
+			if(map.isDefined(PARAMETER_DIRECTION_ID))
+			{
+				RegistryKeyType rid(map.getDefault<RegistryKeyType>(PARAMETER_DIRECTION_ID, 0));
+				if(rid > 0)	try
+				{
+					_directionObj = DestinationTableSync::GetEditable(rid, *_env);
+				}
+				catch(ObjectNotFoundException<Destination>&)
+				{
+					throw ActionException("No such direction id");
+				}
+				else
+				{
+					_directionObj = shared_ptr<Destination>();
+				}
+			}
+
 			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
 			{
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
@@ -163,6 +186,10 @@ namespace synthese
 			if(_dataSourceLinks)
 			{
 				_route->setDataSourceLinks(*_dataSourceLinks);
+			}
+			if(_directionObj)
+			{
+				_route->setDirectionObj(_directionObj->get());
 			}
 
 			JourneyPatternTableSync::Save(_route.get());
