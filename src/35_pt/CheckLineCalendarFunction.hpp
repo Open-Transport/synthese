@@ -40,18 +40,12 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Checks if the specified commercial line runs every day of its calendar template.
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_calendar_check
+		//////////////////////////////////////////////////////////////////////////
 		///	@author Hugues Romain
 		///	@date 2010
 		///	@ingroup m35Functions refFunctions
 		/// @since 3.1.16
-		///
-		/// Call : CheckCalendar
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>roid : id of the line to control</li>
-		///		<li>du : number of days of the controlled period</li>
-		///	</ul>
 		class CheckLineCalendarFunction:
 			public util::FactorableTemplate<server::Function,CheckLineCalendarFunction>
 		{
