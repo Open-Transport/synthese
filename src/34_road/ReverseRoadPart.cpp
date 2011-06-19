@@ -23,6 +23,7 @@
 #include "ReverseRoadPart.hpp"
 #include "MainRoadPart.hpp"
 #include "PermanentService.h"
+#include "Edge.h"
 
 #include <boost/foreach.hpp>
 
