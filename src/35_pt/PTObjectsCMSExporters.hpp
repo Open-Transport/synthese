@@ -73,15 +73,7 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Line CMS exporter.
-			/// Values sent to the CMS template :
-			/// <dl>
-			/// <dt>line_id</dt><dd>line id</dd>
-			///	<dt>line_short_name</dt><dd>line short name (in most of cases the line number)</dd>
-			///	<dt>line_long_name</dt><dd>line long name</dd>
-			///	<dt>line_color</dt><dd>line RGB color</dd>
-			///	<dt>line_style</dt><dd>line CSS class</dd>
-			/// <dt>line_image</dt><dd>line image url</dd>
-			/// </dl>
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_in_CMS
 			//////////////////////////////////////////////////////////////////////////
 			/// @param pm parameters map to populate
 			/// @param line line to export
@@ -116,6 +108,7 @@ namespace synthese
 			static void ExportStopArea(
 				server::ParametersMap& pm,
 				const StopArea& stopArea,
+				const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
 				std::string prefix = std::string()
 			);
 
