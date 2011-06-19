@@ -66,6 +66,11 @@ namespace synthese
 			static const std::string PARAMETER_RESERVATION_PAGE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_LANGUAGE;
+			static const std::string PARAMETER_MINIMAL_DEPARTURE_RANK;
+			static const std::string PARAMETER_MAXIMAL_DEPARTURE_RANK;
+			static const std::string PARAMETER_MINIMAL_ARRIVAL_RANK;
+			static const std::string PARAMETER_MAXIMAL_ARRIVAL_RANK;
+			static const std::string PARAMETER_LINKED_WITH_VEHICLE_ONLY;
 
 			static const std::string DATA_NAME;
 			static const std::string DATA_LANGUAGE;
@@ -95,6 +100,11 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _reservationPage;
 				std::size_t _seatsNumber;
 				boost::optional<Language> _language;
+				boost::optional<std::size_t> _minDepartureRank;
+				boost::optional<std::size_t> _maxDepartureRank;
+				boost::optional<std::size_t> _minArrivalRank;
+				boost::optional<std::size_t> _maxArrivalRank;
+				bool _linkedWithVehicleOnly;
 			//@}
 
 
