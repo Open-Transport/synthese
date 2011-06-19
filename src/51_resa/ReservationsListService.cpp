@@ -373,7 +373,7 @@ namespace synthese
 							{
 								try
 								{
-									const Edge& edge(service->getPath()->findEdgeByVertex(itStop.second));
+									const Edge& edge(Env::GetOfficialEnv().get<JourneyPattern>(service->getPathId())->findEdgeByVertex(itStop.second));
 									if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
 										_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
 									){
@@ -402,7 +402,7 @@ namespace synthese
 							{
 								try
 								{
-									const Edge& edge(service->getPath()->findEdgeByVertex(itStop.second));
+									const Edge& edge(Env::GetOfficialEnv().get<JourneyPattern>(service->getPathId())->findEdgeByVertex(itStop.second));
 									if( _minArrivalRank && edge.getRankInPath() < *_minArrivalRank ||
 										_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank
 									){
