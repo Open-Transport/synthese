@@ -35,35 +35,22 @@ namespace synthese
 {
 	class CoordinatesSystem;
 
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Stop Area list public Function class.
-		/// @author Xavier Raffin
+		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_areas_list
+		//////////////////////////////////////////////////////////////////////////
+		/// @author Xavier Raffin, Hugues Romain
 		///	@date 2008
 		///	@ingroup m35Functions refFunctions
-		//////////////////////////////////////////////////////////////////////////
-		/// <h2>Usage</h2>
-		///	Key : StopAreasListFunction
-		///
-		///	Parameters :
-		///	<ul>
-		///		<li>fonction=StopAreasListFunction</li>
-		///		<li>roid : id of the line of which stop areas will be displayed</li>
-		///	</ul>
-		///
-		/// <h2>Standard XML output</h2>
-		///	<h3>Description</h3>
-		///
-		///	@image html StopAreasListFunction.png
-		///
-		///	<h3>Download</h3>
-		///
-		///	<ul>
-		///		<li><a href="include/35_pt/StopAreasListFunction.xsd">XML output schema</a></li>
-		///	</ul>
 		class StopAreasListFunction:
 			public util::FactorableTemplate<server::Function,StopAreasListFunction>
 		{
@@ -71,6 +58,10 @@ namespace synthese
 			static const std::string PARAMETER_BBOX;
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_OUTPUT_LINES;
+			static const std::string PARAMETER_STOP_PAGE_ID;
+			static const std::string PARAMETER_LINE_PAGE_ID;
+
+			static const std::string DATA_LINES;
 
 		protected:
 			//! \name Page parameters
@@ -79,6 +70,14 @@ namespace synthese
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
 				bool _outputLines;
+				boost::shared_ptr<const cms::Webpage> _stopPage;
+				boost::shared_ptr<const cms::Webpage> _linePage;
+			//@}
+
+			//! @name Setters
+			//@{
+				void setStopPage(boost::shared_ptr<const cms::Webpage> value){ _stopPage = value; }
+				void setLinePage(boost::shared_ptr<const cms::Webpage> value){ _linePage = value; }
 			//@}
 
 
