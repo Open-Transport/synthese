@@ -35,6 +35,10 @@ from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
+BOOST_VER = '1.42'
+REQUIRED_BOOST_MODULES = [
+    'date_time', 'filesystem', 'iostreams', 'program_options',
+    'regex', 'system', 'test', 'thread']
 
 # Utils
 
@@ -163,6 +167,7 @@ class SconsBuilder(Builder):
 
         env = os.environ.copy()
         env['BOOST_SOURCE'] = self.boost_dir
+        env['SYNTHESE_BOOST_VERSION'] = BOOST_VER
 
         kwargs = {
             'env': env
@@ -174,12 +179,6 @@ class SconsBuilder(Builder):
                 'shell': True
             }
         subprocess.check_call(args, **kwargs)
-
-
-BOOST_VER = '1.42'
-REQUIRED_BOOST_MODULES = [
-    'date_time', 'filesystem', 'iostreams', 'program_options',
-    'regex', 'system', 'test', 'thread']
 
 
 class CMakeBuilder(Builder):
