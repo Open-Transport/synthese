@@ -1,15 +1,13 @@
 Import ('env')
 
-import os, datetime
+import os
 
 senv = env.Clone ()
 
 
 
 ## BOOST #############################################################################################################################
-## http://www.boost.org/doc/libs/1_42_0/libs/iostreams/doc/installation.html
-
-BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39')
+## http://www.boost.org/doc/libs/1_39_0/libs/iostreams/doc/installation.html
 
 class BoostProject (CppLibProject):
 
@@ -18,13 +16,11 @@ class BoostProject (CppLibProject):
 			deps = ['boost-zlib.cpplib']
 		else:
 			deps = None
-
-		now = datetime.datetime.now()
 		CppLibProject.__init__ (
 			self
 			, senv
 			, name
-			, version + "_" + now.strftime("%Y-%m-%d-%H-%M")
+			, version
 			, source_files = ['src/boost-build.jam']
 			, include_dir = senv.SrcDir('src')
 			, dependencies = deps
@@ -164,6 +160,8 @@ class BoostProject (CppLibProject):
 			lenv['BJAMOPTIONS'] = options
 			lenv.BJam (targets, 'src/boost-build.jam')
 			self.add_target(self.env.InstallAs (itargets, targets))
+
+BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39')
 
 for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
                 'program_options', 'regex', 
