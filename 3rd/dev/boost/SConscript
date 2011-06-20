@@ -9,7 +9,7 @@ senv = env.Clone ()
 ## BOOST #############################################################################################################################
 ## http://www.boost.org/doc/libs/1_42_0/libs/iostreams/doc/installation.html
 
-BOOST_VER = '1.42'
+BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39')
 
 class BoostProject (CppLibProject):
 
