@@ -224,11 +224,11 @@ if (env['_PLATFORM']=='win32'):
 
 # multithreading config
 if (env['_PLATFORM'] == 'posix'):
-   env.Append (CCFLAGS= '-pthread' )
+   env.Append (CCFLAGS= ['-pthread'] )
    env.Append (LIBS= ['pthread'] )
 
 if (env['_PLATFORM'] == 'darwin'):
-   env.Append (CCFLAGS= '-pthread' )
+   env.Append (CCFLAGS= ['-pthread'] )
    env.Append (LIBS= ['pthread'] )
 
 elif (env['_PLATFORM'] == 'win32'):
