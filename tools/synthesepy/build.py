@@ -386,7 +386,7 @@ class CMakeBuilder(Builder):
 
         # TODO: check that Python cygwin is not in the path?
 
-        log.info('CMake generate command line: %s', args)
+        log.info('CMake generate command line: %r', " ".join(args))
         if not os.path.isdir(self.env.env_path):
             os.makedirs(self.env.env_path)
         subprocess.check_call(args, cwd=self.env.env_path, env=env)

@@ -15,7 +15,6 @@ install(
   DESTINATION share/synthese/tools
   PATTERN ".svn" EXCLUDE
   PATTERN "*.pyc" EXCLUDE
-  PATTERN "pip_download_cache" EXCLUDE
 )
 
 install(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_INSTALL_PREFIX}/bin/synthese.py --create-pyenv-only)")
