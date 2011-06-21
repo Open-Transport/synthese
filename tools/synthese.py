@@ -47,6 +47,11 @@ class Bootstrap(object):
 
         self.bootstrap_script_dir = os.path.dirname(bootstrap_script)
 
+        self.thirdparty_dir = os.environ.get(
+            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese')) 
+        if not os.path.isdir(self.thirdparty_dir):
+            os.makedirs(self.thirdparty_dir)
+
         if os.path.isdir(
             os.path.join(
                 self.bootstrap_script_dir, os.pardir,
@@ -56,10 +61,6 @@ class Bootstrap(object):
             self.config = self._get_installed_config()
             return
 
-        self.thirdparty_dir = os.environ.get(
-            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese')) 
-        if not os.path.isdir(self.thirdparty_dir):
-            os.makedirs(self.thirdparty_dir)
         self.config = self._get_source_config()
 
     def _get_installed_config(self):
