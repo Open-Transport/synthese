@@ -32,6 +32,7 @@ import socket
 import shutil
 import subprocess
 import sys
+import webbrowser
 
 log = logging.getLogger(__name__)
 
@@ -53,6 +54,7 @@ BUILD_DEFAULT_CONFIG = {
 
 INSTANCE_DEFAULT_CONFIG = {
     'BUILD': 'trunk_debug',
+    'RSYNC_OPTS': '',
     'SITE_ID': -1,
 }
 
@@ -66,6 +68,8 @@ instance_path = None
 db_path = None
 
 
+# Utils
+
 def call(cmd, shell=True, **kwargs):
     log.debug('Running command: %r', cmd)
     if 'bg' in kwargs:
@@ -77,11 +81,17 @@ def call(cmd, shell=True, **kwargs):
     kwargs['env'] = env
     subprocess.check_call(cmd, shell=shell, **kwargs)
 
-
 def maybe_mkdir(path):
     if os.path.isdir(path):
         return
     os.makedirs(path)
+
+def _to_cygwin_path(path):
+    cygproc = subprocess.Popen(
+        ("cygpath", "-a", "-u", path), stdout=subprocess.PIPE)
+    (stdout_content, stderr_content) = cygproc.communicate()
+    return stdout_content.rstrip()
+
 
 
 def load_config(options):
@@ -139,6 +149,7 @@ def _run_synthesepy(command, global_args=[], command_args=[]):
         global_args.extend(
             ['--dbconn',
                 'sqlite://debug=1,path=' + join(db_path, 'config.db3'),
+             '--static-dir', join(instance_path, 'assets'),
              '--site-id', str(instance_config.SITE_ID),
              '--port', str(instance_config.PORT)])
 
@@ -152,6 +163,7 @@ def _run_synthesepy(command, global_args=[], command_args=[]):
     log.debug("running Synthese: %r\n%s", args, " ".join(args))
     call(args, shell=False)
 
+# Database
 
 def initdb():
     _run_synthesepy('initdb')
@@ -187,6 +199,20 @@ def shelldb():
     call([config.SPATIALITE_PATH, join(db_path, 'config.db3')])
 
 
+# Assets
+
+
+def fetch_assets():
+    params = instance_config.__dict__.copy()
+    params['assets_path'] = _to_cygwin_path(join(instance_path, 'assets'))
+    call('rsync -av {RSYNC_OPTS} --delete --delete-excluded '
+        '{SERVER}:/var/www/ {assets_path}'.format(
+            **params))
+
+
+# Daemon
+
+
 def run():
     _run_synthesepy('rundaemon')
 
@@ -201,8 +227,28 @@ def ssh():
 
 # General commands:
 
+
 def build():
     _run_synthesepy('build')
+
+
+def gen_html():
+    output = join(base_path, 'synthese_instances.html')
+    
+    body = ""
+    for instance_name, instance_config in config.INSTANCES.iteritems():
+        body += "<h1>" + instance_name + "</h1>\n"
+        body += "<pre>" + repr(instance_config) + "</pre>\n"
+    
+    open(output, 'wb').write("""
+        <!DOCTYPE html>
+        <head><title>Synthese Instances</title></head>
+        <style> body {{ font: small Verdana; }} </style>
+        <body>
+            {body}
+        </body>
+    """.format(body=body))
+    webbrowser.open(output)
 
 
 if __name__ == '__main__':
