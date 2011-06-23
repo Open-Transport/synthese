@@ -109,7 +109,7 @@ class Daemon(object):
         
         for name, value in params.iteritems():
             args.extend(['--param', name + "=" + value])
-        log.debug('Args: %s', args)
+        log.debug('Args: %r\n%s', args, ' '.join(args))
 
         if self.env.log_stdout:
             stdout = sys.stdout
