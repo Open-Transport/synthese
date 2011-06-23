@@ -21,8 +21,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_util_ConcurrentQueue_h__
-#define SYNTHESE_util_ConcurrentQueue_h__
+#ifndef SYNTHESE_util_ConcurrentQueue_hpp__
+#define SYNTHESE_util_ConcurrentQueue_hpp__
 
 // This class was copied from
 // http://www.justsoftwaresolutions.co.uk/threading/implementing-a-thread-safe-queue-using-condition-variables.html
@@ -80,4 +80,4 @@ public:
 	}
 };
 
-#endif // SYNTHESE_util_ConcurrentQueue_h__
+#endif // SYNTHESE_util_ConcurrentQueue_hpp__

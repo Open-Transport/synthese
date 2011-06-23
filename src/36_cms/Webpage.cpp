@@ -44,6 +44,7 @@ namespace synthese
 	namespace cms
 	{
 		const string Webpage::Node::PARAMETER_TRANSMIT_PARAMETERS("tp");
+		synthese::util::shared_recursive_mutex Webpage::_SharedMutex;
 
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
@@ -306,6 +307,7 @@ namespace synthese
 			const server::Request& request,
 			const server::ParametersMap& aditionalParametersMap
 		) const	{
+			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
 
 			Nodes::const_iterator itNode(_nodes.begin());
 			while(itNode != _nodes.end())
@@ -411,6 +413,7 @@ namespace synthese
 		{
 			if(value != _content)
 			{
+				boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
 				_nodes.clear();
 				_parse(_nodes, value.begin(), value.end(), set<string>());
 			}

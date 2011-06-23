@@ -32,6 +32,7 @@
 #include "Website.hpp"
 #include "Function.h"
 #include "Factory.h"
+#include "shared_recursive_mutex.hpp"
 
 #include <ostream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -232,7 +233,7 @@ namespace synthese
 			bool _hasForum;
 			bool _ignoreWhiteChars;
 			bool _rawEditor; //!< if false the editor is WYSIWYG editor
-			boost::mutex _mutex;
+			static synthese::util::shared_recursive_mutex _SharedMutex;
 
 
 			//////////////////////////////////////////////////////////////////////////

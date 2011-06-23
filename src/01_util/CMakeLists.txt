@@ -38,6 +38,7 @@ RegistryException.h
 RegistryKeyException.h
 RGBColor.cpp
 RGBColor.h
+shared_recursive_mutex.hpp
 SqlFilter.h
 T9Filter.h
 UniqueStringsSet.cpp
