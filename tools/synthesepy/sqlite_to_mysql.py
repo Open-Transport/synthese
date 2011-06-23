@@ -74,7 +74,7 @@ def convert(env, sourceconn, targetconn):
             mysql_cursor.execute('TRUNCATE TABLE `%s`' % table)
 
         # TODO: this assumes that only geometry columns are encoded as blobs,
-        # there they are called 'geometry' and that there is only one.
+        # they are called 'geometry' and that there is only one.
         # This is all true at this time, but might change in the future.
 
         #log.debug('Inserting %s', line)
