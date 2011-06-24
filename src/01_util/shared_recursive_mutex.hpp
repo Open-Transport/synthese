@@ -1,4 +1,4 @@
-/** ConcurrentQueue class header.
+/** shared_recursive_mutex class header.
 	@file shared_recursive_mutex.hpp
 	@author Anthony Williams
 
@@ -23,8 +23,8 @@
 #ifndef SYNTHESE_util_shared_recursive_mutex_hpp__
 #define SYNTHESE_util_shared_recursive_mutex_hpp__
 
-// This class is a copy of boost/thread/pthread/shared_mutex.hpp with these
-// modifications:
+// This class is a copy of boost/thread/pthread/shared_mutex.hpp from Boost 1.42
+// with these modifications:
 // - readers don't wait for writers. This let readers use the lock recursively
 //   without deadlocks. The downside is that writers might have to wait a bit.
 // - keep only lock_shared/unlock_shared lock/unlock
@@ -33,7 +33,11 @@
 #include <boost/static_assert.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/condition_variable.hpp>
+#if BOOST_VERSION > 103900
 #include <boost/thread/detail/thread_interruption.hpp>
+#else
+#include <boost/thread/thread.hpp>
+#endif
 
 namespace synthese
 {
