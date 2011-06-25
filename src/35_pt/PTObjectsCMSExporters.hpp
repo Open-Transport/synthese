@@ -25,6 +25,7 @@
 
 #include "CoordinatesSystem.hpp"
 
+#include <boost/optional.hpp>
 #include <string>
 
 namespace synthese
@@ -64,6 +65,7 @@ namespace synthese
 			static const std::string DATA_STOP_NAME_13;
 			static const std::string DATA_STOP_NAME_26;
 			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
+			static const std::string DATA_STOP_RANK;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
 			static const std::string DATA_SERVICE_ID;
@@ -109,7 +111,8 @@ namespace synthese
 				server::ParametersMap& pm,
 				const StopArea& stopArea,
 				const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
-				std::string prefix = std::string()
+				std::string prefix = std::string(),
+				boost::optional<std::size_t> rank = boost::optional<std::size_t>()
 			);
 
 
