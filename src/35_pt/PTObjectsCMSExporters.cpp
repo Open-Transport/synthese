@@ -52,6 +52,7 @@ namespace synthese
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_13("stop_name_13");
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_26("stop_name_26");
 		const std::string PTObjectsCMSExporters::DATA_STOP_NAME_FOR_TIMETABLES("stop_name_for_timetables");
+		const std::string PTObjectsCMSExporters::DATA_STOP_RANK("stop_rank");
 		const std::string PTObjectsCMSExporters::DATA_X("x");
 		const std::string PTObjectsCMSExporters::DATA_Y("y");
 
@@ -81,13 +82,18 @@ namespace synthese
 			server::ParametersMap& pm,
 			const StopArea& stopArea,
 			const CoordinatesSystem* coordinatesSystem,
-			string prefix
+			string prefix,
+			optional<size_t> rank
 		){
 			pm.insert(prefix + DATA_STOP_ID, stopArea.getKey());
 			pm.insert(prefix + DATA_STOP_NAME, stopArea.getName());
 			pm.insert(prefix + DATA_STOP_NAME_13, stopArea.getName13());
 			pm.insert(prefix + DATA_STOP_NAME_26, stopArea.getName26());
 			pm.insert(prefix + DATA_STOP_NAME_FOR_TIMETABLES, stopArea.getTimetableName());
+			if(rank)
+			{
+				pm.insert(prefix + DATA_STOP_RANK, *rank);
+			}
 			if(stopArea.getCity())
 			{
 				pm.insert(prefix + DATA_CITY_ID, stopArea.getCity()->getKey());
