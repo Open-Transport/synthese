@@ -29,7 +29,7 @@
 #include "CommercialLineTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "StopAreaTableSync.hpp"
-#include "City.h"
+#include "CityTableSync.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
@@ -44,6 +44,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<Function,pt::PTObjectInformationFunction>::FACTORY_KEY("PTObjectInformationFunction");
 
@@ -82,6 +83,10 @@ namespace synthese
 			{
 				_service = Env::GetOfficialEnv().get<ScheduledService>(id);
 			}
+			else if(tableId == CityTableSync::TABLE.ID)
+			{
+				_city = Env::GetOfficialEnv().get<City>(id);
+			}
 
 			_info = map.get<string>(PARAMETER_INFO);
 		}
@@ -97,6 +102,13 @@ namespace synthese
 				if(_info == "name")
 				{
 					stream << _network->getName();
+				}
+			}
+			else if(_city.get())
+			{
+				if(_info == "name")
+				{
+					stream << _city->getName();
 				}
 			}
 			else if(_line.get())
