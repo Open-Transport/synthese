@@ -115,7 +115,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ResaCustomerAdmin::getParametersMap() const
+		util::ParametersMap ResaCustomerAdmin::getParametersMap() const
 		{
 			ParametersMap m(_log.getParametersMap());
 			if(_user.get()) m.insert(Request::PARAMETER_OBJECT_ID, _user->getKey());

@@ -45,7 +45,6 @@
 #include "Webpage.h"
 #include "RollingStock.h"
 #include "JourneyPattern.hpp"
-#include "PTObjectsCMSExporters.hpp"
 #include "SchedulesBasedService.h"
 #include "TimetableServiceRowInterfacePage.h"
 
@@ -823,7 +822,7 @@ namespace synthese
 			pm.insert(DATA_CELL_RANK, colRank); //1
 			pm.insert(DATA_ROW_RANK, 0); //2
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey()); //3
-			PTObjectsCMSExporters::ExportLine(pm, object);
+			object.toParametersMap(pm);
 
 			_cellPage->display(stream, request, pm);
 		}

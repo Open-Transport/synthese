@@ -91,7 +91,7 @@ namespace synthese
 
 
 
-		server::ParametersMap DBLogAdmin::getParametersMap() const
+		util::ParametersMap DBLogAdmin::getParametersMap() const
 		{
 			ParametersMap m(_viewer.getParametersMap());
 			m.insert(PARAMETER_LOG_KEY, _viewer.getLogKey());
@@ -187,7 +187,7 @@ namespace synthese
 			{
 				_viewer.setLogKey(key);
 			}
-			catch(Exception& e)
+			catch(Exception&)
 			{
 				throw AdminParametersException("Invalid log key : " + key);
 			}

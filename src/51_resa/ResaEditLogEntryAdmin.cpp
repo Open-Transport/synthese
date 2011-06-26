@@ -104,7 +104,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ResaEditLogEntryAdmin::getParametersMap() const
+		util::ParametersMap ResaEditLogEntryAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_entry.get()) m.insert(Request::PARAMETER_OBJECT_ID, _entry->getKey());

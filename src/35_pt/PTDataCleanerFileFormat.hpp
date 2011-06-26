@@ -52,6 +52,7 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_FROM_TODAY;
 			static const std::string PARAMETER_CLEAN_OLD_DATA;
 
 			PTDataCleanerFileFormat(
@@ -67,6 +68,7 @@ namespace synthese
 			calendar::Calendar _calendar;
 			boost::optional<boost::gregorian::date> _startDate;
 			boost::optional<boost::gregorian::date> _endDate;
+			bool _fromToday;
 			bool _cleanOldData;
 
 		private:
@@ -78,7 +80,7 @@ namespace synthese
 			void setCalendar(boost::shared_ptr<const calendar::CalendarTemplate> value){ _calendarTemplate = value; }
 			void setStartDate(boost::optional<boost::gregorian::date> value){ _startDate = value; }
 			void setEndDate(boost::optional<boost::gregorian::date> value){ _endDate = value; }
-
+			void setFromToday(bool value){ _fromToday = value; }
 
 
 
@@ -88,7 +90,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2011
 			/// @since 3.2.1
-			virtual server::ParametersMap _getParametersMap() const;
+			virtual util::ParametersMap _getParametersMap() const;
 
 
 
@@ -98,7 +100,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2011
 			/// @since 3.2.1
-			virtual void _setFromParametersMap(const server::ParametersMap& map);
+			virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 		protected:
 			void _cleanCalendars() const;

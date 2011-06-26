@@ -317,7 +317,7 @@ namespace synthese
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -325,7 +325,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 			static void _XMLDisplayConnectionPlace(
 				std::ostream& stream,

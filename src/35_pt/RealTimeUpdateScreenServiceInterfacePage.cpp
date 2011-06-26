@@ -35,6 +35,7 @@
 #include "Interface.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StaticActionFunctionRequest.h"
+#include "URI.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -128,7 +129,7 @@ namespace synthese
 				scheduleUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
 				scheduleUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
 				pv.push_back(
-					scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
+					scheduleUpdateRequest.getURL() + URI::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + URI::PARAMETER_ASSIGNMENT
 				); //11
 
 				StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request, true);
@@ -138,7 +139,7 @@ namespace synthese
 				vertexUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());
 				vertexUpdateRequest.getFunction()->setInterface(Env::GetOfficialEnv().getSPtr(getInterface()));
 				pv.push_back(
-					vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
+					vertexUpdateRequest.getURL() + URI::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + URI::PARAMETER_ASSIGNMENT
 				); //12
 			}
 			else

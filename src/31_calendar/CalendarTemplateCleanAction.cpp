@@ -67,7 +67,7 @@ namespace synthese
 			{
 				_calendar = CalendarTemplateTableSync::Get(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID), *_env);
 			}
-			catch(ObjectNotFoundException<CalendarTemplate>& e)
+			catch(ObjectNotFoundException<CalendarTemplate>&)
 			{
 				throw ActionException("No such calendar");
 			}

@@ -84,7 +84,7 @@ namespace synthese
 
 
 
-		server::ParametersMap HomeAdmin::getParametersMap() const
+		util::ParametersMap HomeAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			return m;

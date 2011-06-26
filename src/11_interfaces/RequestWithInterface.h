@@ -44,11 +44,11 @@ namespace synthese
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			virtual void _setFromParametersMap(const server::ParametersMap& map);
+			virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			virtual server::ParametersMap _getParametersMap() const;
+			virtual util::ParametersMap _getParametersMap() const;
 
 
 		public:

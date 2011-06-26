@@ -222,7 +222,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				virtual server::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap _getParametersMap() const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
@@ -230,7 +230,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				virtual void _setFromParametersMap(const server::ParametersMap& map);
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Import screen to include in the administration console.

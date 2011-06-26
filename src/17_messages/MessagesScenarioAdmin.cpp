@@ -114,7 +114,7 @@ namespace synthese
 
 
 
-		server::ParametersMap MessagesScenarioAdmin::getParametersMap() const
+		util::ParametersMap MessagesScenarioAdmin::getParametersMap() const
 		{
 			ParametersMap m(_generalLogView.getParametersMap());
 			if(_scenario.get())

@@ -158,9 +158,6 @@ namespace synthese
 			{
 			};
 
-			static const std::string PARAMETER_SEPARATOR;
-			static const std::string PARAMETER_ASSIGNMENT;
-
 			static const std::string PARAMETER_STARTER;
 			static const std::string PARAMETER_FUNCTION;
 			static const std::string PARAMETER_SERVICE;
@@ -244,8 +241,8 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				ParametersMap _getParametersMap() const;
-				virtual ParametersMap getParametersMap() const { return _getParametersMap(); }
+				util::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap getParametersMap() const { return _getParametersMap(); }
 
 				/** Run of the services.
 					@param stream Stream to write the output on
@@ -256,9 +253,9 @@ namespace synthese
 
 				template<class R>
 				bool isAuthorized(
-					security::RightLevel publicr = security::USE
-					, security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL
-					, std::string parameter = security::GLOBAL_PERIMETER
+					security::RightLevel publicr = security::USE,
+					security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL,
+					std::string parameter = security::GLOBAL_PERIMETER
 				) const;
 
 				bool isActionFunctionAuthorized() const;

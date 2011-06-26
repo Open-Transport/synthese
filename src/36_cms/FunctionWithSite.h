@@ -52,7 +52,7 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map)
+			void _setFromParametersMap(const util::ParametersMap& map)
 			{
 				util::RegistryKeyType id(
 					compulsory ?

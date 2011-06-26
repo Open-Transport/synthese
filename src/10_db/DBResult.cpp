@@ -287,7 +287,7 @@ namespace synthese
 						*shared_ptr<Geometry>(reader.read(colStr))
 				);
 			}
-			catch(geos::io::ParseException& e)
+			catch(geos::io::ParseException&)
 			{
 				return shared_ptr<Geometry>();
 			}

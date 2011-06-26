@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -44,6 +49,11 @@ namespace synthese
 			public graph::PathClass,
 			public util::Named
 		{
+		private:
+			static const std::string DATA_ID;
+			static const std::string DATA_NAME;
+			static const std::string DATA_ARTICLE;
+
 		public:
 
 			/// Chosen registry class.
@@ -82,6 +92,11 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual PathClass::Identifier getIdentifier() const;
+
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 	}

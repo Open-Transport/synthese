@@ -41,6 +41,9 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "MessagesTypes.h"
+#include "DataSourceTableSync.h"
+#include "ImportableTableSync.hpp"
+#include "ScenarioSentAlarmInheritedTableSync.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -56,6 +59,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace dblog;
+	using namespace impex;
 
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
 
@@ -74,6 +78,8 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE(Action_PARAMETER_PREFIX + "me");
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID(Action_PARAMETER_PREFIX + "re");
 		const string ScenarioSaveAction::PARAMETER_LEVEL(Action_PARAMETER_PREFIX + "le");
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID(Action_PARAMETER_PREFIX + "rs");
+		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID(Action_PARAMETER_PREFIX + "is");
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
 		{
@@ -84,14 +90,31 @@ namespace synthese
 
 		void ScenarioSaveAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Update or creation
 			try
 			{
-				// Update
-				if(map.isDefined(PARAMETER_SCENARIO_ID))
+				// Data source
+				if(map.getDefault<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID, 0))
+				{
+					_scenarioDataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_SCENARIO_DATASOURCE_ID), *_env);
+					if(map.isDefined(PARAMETER_SCENARIO_ID))
+					{
+						_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
+
+/*						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync> scenarios(*_scenarioDataSource, *_env);
+						set<SentScenario*> scenarioSet(scenarios.get(_dataSourceLinkId));
+						if(!scenarioSet.empty())
+						{
+							_scenario = _env->getEditableSPtr(*scenarioSet.begin());
+						}
+*/					}
+				}
+				else if(map.isDefined(PARAMETER_SCENARIO_ID))
 				{
 					setScenarioId(map.get<RegistryKeyType>(PARAMETER_SCENARIO_ID));
 				}
-				else
+
+				if(!_scenario.get())
 				{	// Creation
 					_creation = true;
 					if(map.getDefault<bool>(PARAMETER_CREATE_TEMPLATE,false))
@@ -248,6 +271,19 @@ namespace synthese
 				// Sent scenario only
 				if(_sscenario.get())
 				{
+					// Load of existing messages
+					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
+						ScenarioSentAlarmInheritedTableSync::Search(
+							*_env,
+							_sscenario->getKey(),
+							0,
+							2
+					)	);
+					if(alarms.size() == 1)
+					{
+						_message = *alarms.begin();
+					}
+
 					// Enabled
 					if(map.isDefined(PARAMETER_ENABLED))
 					{
@@ -326,6 +362,10 @@ namespace synthese
 			{
 				throw ActionException(e, *this);
 			}
+			catch(ObjectNotFoundException<DataSource>&)
+			{
+				throw ActionException("No such data source");
+			}
 		}
 
 
@@ -341,6 +381,14 @@ namespace synthese
 		{
 			// Log message
 			stringstream text;
+
+			// Data source link
+			if( _sscenario.get() && _scenarioDataSource.get() && !_dataSourceLinkId.empty())
+			{
+				Importable::DataSourceLinks links;
+				links.insert(Importable::DataSourceLinks::value_type(_scenarioDataSource.get(), _dataSourceLinkId));
+				_sscenario->setDataSourceLinks(links);
+			}
 
 			// Name
 			if(_name)
@@ -444,7 +492,7 @@ namespace synthese
 			// Save
 			ScenarioTableSync::Save(_scenario.get());
 
-			// Mesages
+			// Messages
 			if(_creation)
 			{
 				if(_sscenario.get())
@@ -547,7 +595,10 @@ namespace synthese
 				}
 			}
 
-
+			if(_message.get() && _messageToCreate)
+			{
+				_message->setLongMessage(*_messageToCreate);
+			}
 
 			if(_sscenario.get())
 			{

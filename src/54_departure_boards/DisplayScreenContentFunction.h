@@ -95,7 +95,7 @@ namespace synthese
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
 			//////////////////////////////////////////////////////////////////////////
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -103,7 +103,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
 			//////////////////////////////////////////////////////////////////////////
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 
 

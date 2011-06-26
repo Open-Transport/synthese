@@ -120,7 +120,7 @@ namespace synthese
 
 
 
-		server::ParametersMap DisplaySearchAdmin::getParametersMap() const
+		util::ParametersMap DisplaySearchAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_place)

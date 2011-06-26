@@ -121,7 +121,7 @@ namespace synthese
 		void DisplayScreenAlarmRecipient::displayBroadcastListEditor(
 			std::ostream& stream
 			, const messages::Alarm* alarm
-			, const server::ParametersMap& parameters
+			, const util::ParametersMap& parameters
 			, Request& searchRequest
 			, StaticActionRequest<messages::AlarmAddLinkAction>& addRequest
 			, StaticActionRequest<messages::AlarmRemoveLinkAction>& removeRequest

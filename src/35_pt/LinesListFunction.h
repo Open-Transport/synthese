@@ -66,7 +66,21 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
 
 			static const std::string FORMAT_XML;
+			static const std::string FORMAT_JSON;
 			static const std::string FORMAT_WKT;
+
+			static const std::string DATA_LINE;
+			static const std::string DATA_LINES;
+			static const std::string DATA_STOP_AREAS;
+			static const std::string DATA_STOP_AREA;
+			static const std::string DATA_TRANSPORT_MODE;
+			static const std::string DATA_GEOMETRY;
+			static const std::string DATA_WKT;
+			static const std::string DATA_EDGE;
+			static const std::string DATA_POINT;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
+			static const std::string DATA_RANK;
 
 		protected:
 			//! \name Page parameters
@@ -89,7 +103,7 @@ namespace synthese
 			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -98,7 +112,7 @@ namespace synthese
 			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to read
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			LinesListFunction();

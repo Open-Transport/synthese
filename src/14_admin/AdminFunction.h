@@ -88,11 +88,11 @@ namespace synthese
 
 			/** Conversion from generic parameters map to attributes.
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 			/** Action to run, defined by each subclass.
 			*/
@@ -181,7 +181,7 @@ namespace synthese
 			/// @since 3.2.0
 			/// @date 2010
 			static void ExportAdminCompound(
-				server::ParametersMap& pm,
+				util::ParametersMap& pm,
 				const server::Request& request,
 				boost::shared_ptr<const AdminInterfaceElement> compound,
 				std::string prefix = std::string()

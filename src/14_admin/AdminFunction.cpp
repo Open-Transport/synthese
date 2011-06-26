@@ -440,7 +440,7 @@ namespace synthese
 
 
 		void AdminFunction::ExportAdminCompound(
-			server::ParametersMap& pm,
+			util::ParametersMap& pm,
 			const server::Request& request,
 			boost::shared_ptr<const AdminInterfaceElement> compound,
 			std::string prefix /*= std::string() */

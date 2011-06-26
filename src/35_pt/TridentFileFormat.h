@@ -28,6 +28,7 @@
 #include "CoordinatesSystem.hpp"
 #include "OneFileTypeImporter.hpp"
 #include "OneFileExporter.hpp"
+#include "PTDataCleanerFileFormat.hpp"
 
 #include <iostream>
 #include <vector>
@@ -105,7 +106,8 @@ namespace synthese
 		public:
 
 			class Importer_:
-				public impex::OneFileTypeImporter<Importer_>
+				public impex::OneFileTypeImporter<Importer_>,
+				public PTDataCleanerFileFormat
 			{
 			private:
 				//! @name Import parameters
@@ -156,7 +158,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				virtual server::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap _getParametersMap() const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Conversion from generic parameters map to attributes.
@@ -164,7 +166,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				virtual void _setFromParametersMap(const server::ParametersMap& map);
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
 
@@ -235,9 +237,9 @@ namespace synthese
 					void setWithTisseoExtension(bool value){ _withTisseoExtension = value; }
 				//@}
 
-				virtual server::ParametersMap getParametersMap() const;
+				virtual util::ParametersMap getParametersMap() const;
 
-				virtual void setFromParametersMap(const server::ParametersMap& map);
+				virtual void setFromParametersMap(const util::ParametersMap& map);
 
 				/** -> ChouettePTNetwork
 				 */

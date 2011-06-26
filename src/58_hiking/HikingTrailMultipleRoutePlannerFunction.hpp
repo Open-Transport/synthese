@@ -156,7 +156,7 @@ namespace synthese
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -166,7 +166,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 

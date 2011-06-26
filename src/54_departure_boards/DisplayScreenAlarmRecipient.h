@@ -49,13 +49,13 @@ namespace synthese
 			void displayBroadcastListEditor(
 				std::ostream& stream
 				, const messages::Alarm* alarm
-				, const server::ParametersMap& request
+				, const util::ParametersMap& request
 				, server::Request& searchRequest
 				, server::StaticActionRequest<messages::AlarmAddLinkAction>& addRequest
 				, server::StaticActionRequest<messages::AlarmRemoveLinkAction>& removeRequest
 			);
 
-			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const;
+			virtual messages::AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const;
 
 			virtual void addObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);
 			virtual void removeObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);

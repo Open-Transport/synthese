@@ -98,7 +98,7 @@ namespace synthese
 
 
 
-		server::ParametersMap BroadcastPointsAdmin::getParametersMap() const
+		util::ParametersMap BroadcastPointsAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_CITY_NAME, _cityName);

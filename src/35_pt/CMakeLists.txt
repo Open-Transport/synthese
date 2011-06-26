@@ -144,8 +144,6 @@ PTNetworksListFunction.cpp
 PTNetworksListFunction.hpp
 PTObjectInformationFunction.cpp
 PTObjectInformationFunction.hpp
-PTObjectsCMSExporters.cpp
-PTObjectsCMSExporters.hpp
 PTPlaceAdmin.cpp
 PTPlaceAdmin.h
 PTPlacesAdmin.cpp

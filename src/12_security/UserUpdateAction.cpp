@@ -121,11 +121,11 @@ namespace synthese
 					_profile = ProfileTableSync::Get(map.get<RegistryKeyType>(PARAMETER_PROFILE_ID), *_env);
 				}
 			}
-			catch (ObjectNotFoundException<Profile>& e)
+			catch (ObjectNotFoundException<Profile>&)
 			{
 				throw ActionException("Profil introuvable");
 			}
-			catch (ObjectNotFoundException<User>& e)
+			catch (ObjectNotFoundException<User>&)
 			{
 				throw ActionException("Utilisateur introuvable");
 			}

@@ -112,7 +112,7 @@ namespace synthese
 
 
 
-		server::ParametersMap CalendarTemplateAdmin::getParametersMap() const
+		util::ParametersMap CalendarTemplateAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_calendar.get()) m.insert(Request::PARAMETER_OBJECT_ID, _calendar->getKey());

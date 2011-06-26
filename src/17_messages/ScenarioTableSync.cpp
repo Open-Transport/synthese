@@ -65,6 +65,7 @@ namespace synthese
 		const string ScenarioTableSync::COL_FOLDER_ID("folder_id");
 		const string ScenarioTableSync::COL_VARIABLES("variables");
 		const string ScenarioTableSync::COL_TEMPLATE("template_id");
+		const string ScenarioTableSync::COL_DATASOURCE_LINKS("datasource_links");
 	}
 
 	namespace db
@@ -84,6 +85,7 @@ namespace synthese
 			DBTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
 			DBTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
 			DBTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
+			DBTableSync::Field(ScenarioTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 

@@ -117,7 +117,7 @@ namespace synthese
 			///	</ul>
 			static boost::shared_ptr<const Website> GetSite(
 				const server::Request& request,
-				const server::ParametersMap& pm
+				const util::ParametersMap& pm
 			);
 
 

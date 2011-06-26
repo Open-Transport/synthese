@@ -35,7 +35,6 @@
 #include "CommercialLineTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "PTUseRule.h"
-#include "PTObjectsCMSExporters.hpp"
 #include "Vertex.h"
 #include "StopArea.hpp"
 
@@ -77,7 +76,21 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES("idbd");
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
+		const string LinesListFunction::FORMAT_JSON("json");
 		const string LinesListFunction::FORMAT_XML("xml");
+
+		const string LinesListFunction::DATA_LINE("line");
+		const string LinesListFunction::DATA_LINES("lines");
+		const string LinesListFunction::DATA_STOP_AREAS("stopAreas");
+		const string LinesListFunction::DATA_STOP_AREA("stopArea");
+		const string LinesListFunction::DATA_TRANSPORT_MODE("transportMode");
+		const string LinesListFunction::DATA_GEOMETRY("geometry");
+		const string LinesListFunction::DATA_WKT("wkt");
+		const string LinesListFunction::DATA_EDGE("edge");
+		const string LinesListFunction::DATA_POINT("point");
+		const string LinesListFunction::DATA_RANK("rank");
+		const string LinesListFunction::DATA_X("x");
+		const string LinesListFunction::DATA_Y("y");
 
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
@@ -285,152 +298,154 @@ namespace synthese
 				linesMap[sortableNumber(_line->getShortName())] = _line;
 			}
 
-			if((!_page.get())&&(_outputFormat == FORMAT_XML))
-			{
-				// XML header
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<lines xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-				;
-			}
-			size_t rank(0);
+			// Populating the parameters map
+			ParametersMap pm(request.getFunction()->getSavedParameters());
 			BOOST_FOREACH(linesMapType::value_type it, linesMap)
 			{
 				shared_ptr<const CommercialLine> line = it.second;
-				if(_page.get())
+				shared_ptr<ParametersMap> linePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+				line->toParametersMap(*linePM);
+
+				// Rolling stock
+				set<RollingStock *> rollingStocks;
+				BOOST_FOREACH(Path* path, line->getPaths())
 				{
-					LineMarkerInterfacePage::Display(
-						stream,
-						_page,
-						request,
-						*line,
-						rank++
+					if(	!static_cast<const JourneyPattern*>(path)->getRollingStock()
+					){
+						continue;
+					}
+					rollingStocks.insert(
+						static_cast<const JourneyPattern*>(path)->getRollingStock()
 					);
 				}
-				else if(_outputFormat == FORMAT_XML)
+				BOOST_FOREACH(RollingStock * rs, rollingStocks)
 				{
-					stream <<"<line id=\""<< line->getKey() <<
-						"\" creatorId=\"" << (line->getDataSourceLinks().size() == 1 ? lexical_cast<string>(line->getDataSourceLinks().begin()->second) : ImportableTableSync::SerializeDataSourceLinks(line->getDataSourceLinks())) <<
-						"\" name=\""      << line->getName() <<
-						"\" shortName=\"" << line->getShortName() <<
-						"\" longName=\""  << line->getLongName() <<
-						"\" color=\""     << line->getColor() <<
-						"\" style=\""     << line->getStyle() <<
-						"\" image=\""     << line->getImage() <<
-						"\" >";
+					shared_ptr<ParametersMap> rsPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+					rs->toParametersMap(*rsPM);
+					linePM->insert(DATA_TRANSPORT_MODE, rsPM);
+				}
 
-					set<RollingStock *> rollingStocks;
+				if(_outputStops)
+				{
+					set<const StopArea*> stopAreas;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
-						if(
-							!static_cast<const JourneyPattern*>(path)->getRollingStock()
-						){
-							continue;
-						}
-						rollingStocks.insert(
-							static_cast<const JourneyPattern*>(path)->getRollingStock()
-						);
-					}
-					BOOST_FOREACH(RollingStock * rs, rollingStocks)
-					{
-						stream <<"<transportMode id=\""<< rs->getKey() <<
-							"\" name=\""    << rs->getName() <<
-							"\" article=\"" << rs->getArticle()<<
-							"\" />";
-					}
-					if(_outputStops)
-					{
-						set<const StopArea*> stopAreas;
-						BOOST_FOREACH(Path* path, line->getPaths())
+						BOOST_FOREACH(Edge* edge, path->getEdges())
 						{
-							BOOST_FOREACH(Edge* edge, path->getEdges())
+							if(!edge->getFromVertex())
 							{
-								if(!edge->getFromVertex())
-								{
-									break;
-								}
-								const StopArea* stopArea(
-									dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
-								);
-								if(stopArea)
-								{
-									stopAreas.insert(stopArea);
-								}
-						}	}
-						stream << "<stopAreas>";
-						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
-						{
-							PTObjectsCMSExporters::ExportStopArea(stream, *stopArea, _coordinatesSystem);
-						}
-						stream << "</stopAreas>";
-					}
-					if(!_outputGeometry.empty())
-					{
-						typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
-						VertexPairs geometries;
-						BOOST_FOREACH(Path* path, line->getPaths())
-						{
-							BOOST_FOREACH(Edge* edge, path->getEdges())
-							{
-								if(!edge->getNext())
-								{
-									break;
-								}
-								VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
-								if(geometries.find(od) == geometries.end())
-								{
-									geometries.insert(make_pair(od, static_pointer_cast<Geometry,LineString>(edge->getRealGeometry())));
-								}
+								break;
 							}
-						}
-						stream << "<geometry>";
-						if(_outputGeometry == FORMAT_WKT)
-						{
-							vector<shared_ptr<Geometry> > vec;
-							vector<Geometry*> vecd;
-							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
-							{
-								shared_ptr<Geometry> prGeom(
-									_coordinatesSystem->convertGeometry(*it.second)
-								);
-								vec.push_back(prGeom);
-								vecd.push_back(prGeom.get());
-							}
-							shared_ptr<GeometryCollection> mls(
-								_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
+							const StopArea* stopArea(
+								dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
 							);
-							stream << WKTWriter().write(mls.get());
-						}
-						else
-						{
-							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+							if(stopArea)
 							{
-								shared_ptr<Geometry> prGeom(
-									_coordinatesSystem->convertGeometry(*it.second)
-								);
-								stream << "<edge>";
-								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
-								{
-									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
-
-									stream << "<point x=\"" << std::fixed << pt.x << "\" y=\"" << std::fixed << pt.y << "\" />";
-								}
-								stream << "</edge>";
+								stopAreas.insert(stopArea);
+							}
+					}	}
+					shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+					BOOST_FOREACH(const StopArea* stopArea, stopAreas)
+					{
+						shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
+						stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
+					}
+					linePM->insert(DATA_STOP_AREAS, stopAreasPM);
+				}
+				if(!_outputGeometry.empty())
+				{
+					typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
+					VertexPairs geometries;
+					BOOST_FOREACH(Path* path, line->getPaths())
+					{
+						BOOST_FOREACH(Edge* edge, path->getEdges())
+						{
+							if(!edge->getNext())
+							{
+								break;
+							}
+							VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
+							if(geometries.find(od) == geometries.end())
+							{
+								geometries.insert(make_pair(od, static_pointer_cast<Geometry,LineString>(edge->getRealGeometry())));
 							}
 						}
-						stream << "</geometry>";
 					}
-					stream <<"</line>";
+
+					shared_ptr<ParametersMap> geometryPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+					if(_outputGeometry == FORMAT_WKT)
+					{
+						vector<shared_ptr<Geometry> > vec;
+						vector<Geometry*> vecd;
+						BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+						{
+							shared_ptr<Geometry> prGeom(
+								_coordinatesSystem->convertGeometry(*it.second)
+							);
+							vec.push_back(prGeom);
+							vecd.push_back(prGeom.get());
+						}
+						shared_ptr<GeometryCollection> mls(
+							_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
+						);
+						geometryPM->insert(DATA_WKT, WKTWriter().write(mls.get()));
+					}
+					else
+					{
+						BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+						{
+							shared_ptr<ParametersMap> edgePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+							shared_ptr<Geometry> prGeom(
+								_coordinatesSystem->convertGeometry(*it.second)
+							);
+							for(size_t i(0); i<prGeom->getNumPoints(); ++i)
+							{
+								const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
+								shared_ptr<ParametersMap> pointPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+								pointPM->insert(DATA_X, pt.x);
+								pointPM->insert(DATA_Y, pt.y);
+								edgePM->insert(DATA_POINT, pointPM);
+							}
+							geometryPM->insert(DATA_EDGE, edgePM);
+						}
+					}
+					linePM->insert(DATA_GEOMETRY, geometryPM);
 				}
-				else//default case : csv outputFormat
+				pm.insert(DATA_LINE, linePM);
+			}
+
+			if(_page.get()) // CMS output
+			{
+				size_t rank(0);
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
 				{
-					stream << line->getKey() << ";" << line->getShortName() << "\n";
+					pmLine->insert(DATA_RANK, rank++);
+					_page->display(stream, request, *pmLine);
 				}
 			}
-			if((!_page.get())&&(_outputFormat =="xml"))
+			else if(_outputFormat == FORMAT_XML) // XML output
 			{
-				// XML footer
-				stream << "</lines>";
+				pm.outputXML(
+					stream,
+					DATA_LINES,
+					true,
+					"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd"
+				);
+			}
+			else if(_outputFormat == FORMAT_JSON) // JSON output
+			{
+				pm.outputJSON(
+					stream,
+					DATA_LINES
+				);
+			}
+			else // CSV format
+			{
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
+				{
+					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
+				}
 			}
 		}
 

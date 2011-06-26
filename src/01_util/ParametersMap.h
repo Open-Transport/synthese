@@ -36,20 +36,28 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/algorithm/string/trim.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Geometry;
+	}
+}
+
 namespace synthese
 {
-	namespace server
+	namespace util
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Request parameters map.
-		///	@ingroup m15
+		///	@ingroup m01
 		/// @author Hugues Romain
 		class ParametersMap
 		{
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Missing parameter at parsing exception.
-			/// @ingroup m15Exception refException
+			/// @ingroup m01Exception refException
 			class MissingParameterException:
 				public std::exception
 			{
@@ -69,9 +77,12 @@ namespace synthese
 			};
 
 			typedef std::map<std::string, std::string> Map;
+			typedef std::map<std::string, std::vector<boost::shared_ptr<ParametersMap> > > SubParametersMap;
 
 		private:
 			Map _map;
+			SubParametersMap _subMap;
+			boost::shared_ptr<geos::geom::Geometry> _geometry;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -113,6 +124,20 @@ namespace synthese
 
 
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a submap vector.
+				const SubParametersMap::mapped_type& getSubMaps(
+					const std::string& key
+				) const;
+
+
+
+				bool hasSubMaps(
+					const std::string& key
+				) const;
+
+
+
 				/** Search for the value of a parameter in a ParameterMap object.
 					@param parameterName Name of the searched parameter
 					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
@@ -123,19 +148,80 @@ namespace synthese
 					@date 2007
 				*/
 				std::string getString(
-					const std::string& parameterName
-					, bool neededParameter
-					, const std::string& source
+					const std::string& parameterName,
+					bool neededParameter,
+					const std::string& source
 				) const;
 
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Builds a query string from a parameters map.
-				///	@return the generated query string
+				/// Outputs the content of the parameters map as an URI.
+				/// @param os stream to write the result on
+				/// @param prefix text to add at the beginning of each parameter name
 				///	@author Hugues Romain
 				///	@date 2007
-				std::string getURI() const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Notes :
+				///  - the attributes and sub tags are sorted in alphabetical order.
+				void outputURI(
+					std::ostream& os,
+					std::string prefix = std::string()
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Outputs the content of the parameters map as a XML object.
+				/// @param os stream to write the result on
+				/// @param tag tag of the object
+				/// @param withHeader if true the generate the <?xml header
+				/// @param schemaLocation URL of the schema to add in the first tag
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				//////////////////////////////////////////////////////////////////////////
+				/// Note : the attributes and sub tags are sorted in alphabetical order.
+				void outputXML(
+					std::ostream& os,
+					const std::string& tag,
+					bool withHeader = false,
+					std::string schemaLocation = std::string()
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Outputs the content of the parameters map into a JSON document.
+				/// @param os stream to write the result on
+				/// @param tag tag of the object
+				/// @param first first call of a recursion (never define this parameter)
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				//////////////////////////////////////////////////////////////////////////
+				/// Note : the attributes and sub tags are sorted in alphabetical order.
+				void outputJSON(
+					std::ostream& os,
+					const std::string& tag,
+					bool first = true
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Outputs the content of the parameters map into a CSV row.
+				/// @param os stream to write the result on
+				/// @param tag tag of the object
+				/// @param first first call of a recursion (never define this parameter)
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				//////////////////////////////////////////////////////////////////////////
+				/// Note : the columns are sorted in alphabetical order.
+				void outputCSV(
+					std::ostream& os
+				) const;
 
 
 
@@ -233,7 +319,9 @@ namespace synthese
 				void insert(const std::string& parameterName, const boost::posix_time::ptime& value);
 				void insert(const std::string& parameterName, const boost::gregorian::date& value);
 				void insert(const std::string& parameterName, const boost::posix_time::time_duration& value);
+				void insert(const std::string& parameterName, boost::shared_ptr<ParametersMap> value);
 
+				void setGeometry(boost::shared_ptr<geos::geom::Geometry> value){ _geometry = value; }
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Merges this map with an other, with priority to the current one.
@@ -247,6 +335,15 @@ namespace synthese
 				/// Removes a parameter from the map.
 				/// @parameterName parameter to remove
 				void remove(const std::string& parameterName);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes all parameters of the map.
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void clear();
 			//@}
 		};
 

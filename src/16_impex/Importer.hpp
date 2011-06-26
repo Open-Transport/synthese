@@ -74,11 +74,11 @@ namespace synthese
 			/// @date 2010
 			/// @since 3.1.16
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map,
+				const util::ParametersMap& map,
 				bool doImport
 			) = 0;
 
-			virtual server::ParametersMap getParametersMap() const = 0;
+			virtual util::ParametersMap getParametersMap() const = 0;
 
 
 			//////////////////////////////////////////////////////////////////////////

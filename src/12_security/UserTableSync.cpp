@@ -190,7 +190,7 @@ namespace synthese
 					env
 				);
 			}
-			catch (ObjectNotFoundException<User>& e)
+			catch (ObjectNotFoundException<User>&)
 			{
 				return false;
 			}

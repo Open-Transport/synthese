@@ -105,12 +105,12 @@ namespace synthese
 
 			virtual bool _controlPathsMap() const = 0;
 
-			virtual void _setFromParametersMap(const server::ParametersMap& map) {}
+			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
 
-			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
+			virtual util::ParametersMap _getParametersMap() const { return util::ParametersMap(); }
 
 			void setFromParametersMap(
-				const server::ParametersMap& map,
+				const util::ParametersMap& map,
 				bool doImport
 			){
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
@@ -130,9 +130,9 @@ namespace synthese
 			}
 
 
-			server::ParametersMap getParametersMap() const
+			util::ParametersMap getParametersMap() const
 			{
-				server::ParametersMap result(_getParametersMap());
+				util::ParametersMap result(_getParametersMap());
 				BOOST_FOREACH(const FilePathsMap::value_type& it, _pathsMap)
 				{
 					result.insert(_getFileParameterName(it.first), it.second.file_string());

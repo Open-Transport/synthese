@@ -106,7 +106,7 @@ namespace synthese
 
 
 
-		server::ParametersMap UsersAdmin::getParametersMap() const
+		util::ParametersMap UsersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_searchLogin)

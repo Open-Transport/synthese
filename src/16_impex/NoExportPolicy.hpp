@@ -44,10 +44,10 @@ namespace synthese
 			virtual std::string getOutputMimeType() const { return "text/plain"; }
 
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			){}
 
-			virtual server::ParametersMap getParametersMap() const { return server::ParametersMap(); }
+			virtual util::ParametersMap getParametersMap() const { return util::ParametersMap(); }
 
 			virtual std::string getFileFormatKey() const { return FF::FACTORY_KEY; }
 		};

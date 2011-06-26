@@ -39,9 +39,13 @@ namespace synthese
 		class User;
 	}
 
-	namespace server
+	namespace util
 	{
 		class ParametersMap;
+	}
+
+	namespace server
+	{
 		class ModuleClass;
 	}
 
@@ -429,18 +433,18 @@ namespace synthese
 				///  - storage of the parameters (directly or not)
 				///  - running of several actions to prepare the display (such searching results of a SQL request)
 				virtual void setFromParametersMap(
-					const server::ParametersMap& map
+					const util::ParametersMap& map
 				) = 0;
 			//@}
 
 			//! \name Virtual output methods
 			//@{
 				/** Parameters map generator, used when building an url to the admin page.
-					@return server::ParametersMap The generated parameters map
+					@return util::ParametersMap The generated parameters map
 					@author Hugues Romain
 					@date 2007
 				*/
-				virtual server::ParametersMap getParametersMap() const = 0;
+				virtual util::ParametersMap getParametersMap() const = 0;
 
 				/** Authorization control.
 					@param user The user who launched the display of the page

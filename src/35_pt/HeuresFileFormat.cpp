@@ -613,7 +613,7 @@ namespace synthese
 		}
 
 
-		server::ParametersMap HeuresFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap HeuresFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
@@ -634,7 +634,7 @@ namespace synthese
 
 
 
-		void HeuresFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void HeuresFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);

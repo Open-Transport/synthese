@@ -100,7 +100,7 @@ namespace synthese
 
 
 
-		server::ParametersMap MessagesTemplateLibraryAdmin::getParametersMap() const
+		util::ParametersMap MessagesTemplateLibraryAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_folder.get())

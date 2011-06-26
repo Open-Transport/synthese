@@ -78,7 +78,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ModuleAdmin::getParametersMap() const
+		util::ParametersMap ModuleAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_moduleClass.get()) m.insert(PARAMETER_MODULE, _moduleClass->getFactoryKey());

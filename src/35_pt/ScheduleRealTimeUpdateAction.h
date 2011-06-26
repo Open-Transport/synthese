@@ -78,7 +78,7 @@ namespace synthese
 			///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
@@ -88,7 +88,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			ScheduleRealTimeUpdateAction();
