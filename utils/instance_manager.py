@@ -87,7 +87,10 @@ def call(cmd, shell=True, **kwargs):
         cmdline = cmd
         if isinstance(cmd, list):
             cmdline = ' '.join(cmdline)
-        log.info('Dummy mode, not running:\n%s', cmdline)
+        dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
+            'cwd' in kwargs else '')
+        log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
+
         return
     if 'bg' in kwargs:
         del kwargs['bg']
@@ -149,6 +152,11 @@ def load_config():
                     build = build_name
 
     build_config = BUILD_DEFAULT_CONFIG.copy()
+    if not build in config.BUILDS:
+        raise Exception(
+            'Build %r doesn\'t exist. Available builds: %r' %
+            (instance, config.BUILDS.keys()))
+
     build_config.update(config.BUILDS[build])
     build_config = Struct(build_config)
 
@@ -306,10 +314,20 @@ def ssh():
 
 # General commands:
 
+@cmd('Update Synthese', False)
+def update():
+    call('svn update', cwd=build_config.SOURCE_DIR)
+
 
 @cmd('Build Synthese', False)
 def build():
     _run_synthesepy('build')
+
+
+@cmd('Run Synthese unit tests', False)
+def test():
+    # TODO: pass other arguments needed for tests.
+    _run_synthesepy('runtests')
 
 
 @cmd('Generate an HTML files with links to the Synthese instances', False)
