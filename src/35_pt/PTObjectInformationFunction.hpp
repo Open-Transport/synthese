@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
@@ -61,17 +66,18 @@ namespace synthese
 				boost::shared_ptr<const JourneyPattern> _route;
 				boost::shared_ptr<const StopArea> _stop;
 				boost::shared_ptr<const ScheduledService> _service;
+				boost::shared_ptr<const geography::City> _city;
 			//@}
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/PT_Object_information#Request
-				//////////////////////////////////////////////////////////////////////////
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/PT_Object_information#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -83,7 +89,7 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 
