@@ -32,6 +32,7 @@
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "Calendar.h"
+#include "PTDataCleanerFileFormat.hpp"
 
 #include <iostream>
 #include <map>
@@ -69,7 +70,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<GTFSFileFormat>
+				public impex::MultipleFileTypesImporter<GTFSFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 			public:
 				static const std::string FILE_STOPS;
@@ -85,8 +87,6 @@ namespace synthese
 				static const std::string FILE_SHAPES;
 				static const std::string FILE_FREQUENCIES;
 
-				static const std::string PARAMETER_START_DATE;
-				static const std::string PARAMETER_END_DATE;
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
@@ -109,12 +109,6 @@ namespace synthese
 				void _loadFieldsMap(const std::string& line) const;
 				std::string _getValue(const std::string& field) const;
 				void _loadLine(const std::string& line) const;
-
-				//! @name Parameters
-				//@{
-					boost::gregorian::date _startDate;
-					boost::gregorian::date _endDate;
-				//@}
 
 				typedef std::map<std::string, calendar::Calendar> Calendars;
 				mutable Calendars _calendars;
@@ -180,7 +174,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2011
 				/// @since 3.2.1
-				virtual server::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap _getParametersMap() const;
 
 
 
@@ -190,7 +184,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2011
 				/// @since 3.2.1
-				virtual void _setFromParametersMap(const server::ParametersMap& map);
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
 

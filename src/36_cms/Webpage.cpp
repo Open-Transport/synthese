@@ -305,7 +305,7 @@ namespace synthese
 		void Webpage::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap
+			const util::ParametersMap& additionalParametersMap
 		) const	{
 			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
 
@@ -441,7 +441,7 @@ namespace synthese
 		void Webpage::FunctionNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const	{
 
@@ -493,7 +493,7 @@ namespace synthese
 		void Webpage::LabelNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const {
 		}
@@ -503,7 +503,7 @@ namespace synthese
 		void Webpage::GotoNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const {
 		}
@@ -513,7 +513,7 @@ namespace synthese
 		void Webpage::ValueNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const	{
 
@@ -553,7 +553,7 @@ namespace synthese
 		void Webpage::IncludeNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const	{
 
@@ -583,7 +583,7 @@ namespace synthese
 		void Webpage::TextNode::display(
 			std::ostream& stream,
 			const server::Request& request,
-			const server::ParametersMap& additionalParametersMap,
+			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const {
 			stream << text;

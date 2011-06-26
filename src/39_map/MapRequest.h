@@ -71,11 +71,11 @@ namespace synthese
 
 			/** Conversion from attributes to generic parameter maps.
 			 */
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 			 */
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 

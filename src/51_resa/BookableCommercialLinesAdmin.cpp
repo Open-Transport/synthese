@@ -76,7 +76,7 @@ namespace synthese
 		}
 
 
-		server::ParametersMap BookableCommercialLinesAdmin::getParametersMap() const
+		util::ParametersMap BookableCommercialLinesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			return m;

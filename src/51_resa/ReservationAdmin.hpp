@@ -84,7 +84,7 @@ namespace synthese
 			///	@author RCSobility
 			///	@date 2011
 			void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 
@@ -93,7 +93,7 @@ namespace synthese
 			/// Creation of the parameters map from the object attributes.
 			///	@author RCSobility
 			///	@date 2011
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 

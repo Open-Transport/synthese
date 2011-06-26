@@ -38,16 +38,9 @@
 
 namespace synthese
 {
-	namespace pt
+	namespace util
 	{
-		class TransportNetwork;
-		class NonConcurrencyRule;
-		class ReservationContact;
-	}
-
-	namespace pt
-	{
-		class StopArea;
+		class ParametersMap;
 	}
 
 	namespace calendar
@@ -57,6 +50,11 @@ namespace synthese
 
 	namespace pt
 	{
+		class TransportNetwork;
+		class NonConcurrencyRule;
+		class ReservationContact;
+		class StopArea;
+
 		/** Commercial line.
 			@ingroup m35
 
@@ -72,6 +70,14 @@ namespace synthese
 			public impex::Importable
 		{
 		public:
+			static const std::string DATA_LINE_SHORT_NAME;
+			static const std::string DATA_LINE_LONG_NAME;
+			static const std::string DATA_LINE_NAME;
+			static const std::string DATA_LINE_COLOR;
+			static const std::string DATA_LINE_STYLE;
+			static const std::string DATA_LINE_IMAGE;
+			static const std::string DATA_LINE_ID;
+			static const std::string DATA_LINE_CREATOR_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
@@ -167,6 +173,21 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.1.16
 				calendar::Calendar getRunDays(const calendar::Calendar& mask) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Line CMS exporter.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = std::string()
+				) const;
 			//@}
 
 			//! @name Modifiers

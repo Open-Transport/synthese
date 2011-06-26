@@ -53,14 +53,14 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 

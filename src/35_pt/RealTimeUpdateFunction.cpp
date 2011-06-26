@@ -35,11 +35,12 @@
 #include "Webpage.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
-#include "PTObjectsCMSExporters.hpp"
 #include "StopPoint.hpp"
 #include "RollingStock.h"
 #include "StaticActionFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
+#include "CommercialLine.h"
+#include "URI.hpp"
 
 using namespace std;
 using namespace boost;
@@ -200,24 +201,22 @@ namespace synthese
 			// Current location
 			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))
 			{
-				PTObjectsCMSExporters::ExportStopArea(
+				dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace()->toParametersMap(
 					pm,
-					*dynamic_cast<const LinePhysicalStop&>(lineStop).getPhysicalStop()->getConnectionPlace(),
 					NULL,
 					DATA_LOCATION_
 				);
 			}
 
 			// Destination
-			PTObjectsCMSExporters::ExportStopArea(
+			lineStop.getLine()->getDestination()->getConnectionPlace()->toParametersMap(
 				pm,
-				*lineStop.getLine()->getDestination()->getConnectionPlace(),
 				NULL,
 				DATA_DESTINATION_
 			);
 
 			// Line
-			PTObjectsCMSExporters::ExportLine(pm, *lineStop.getLine()->getCommercialLine());
+			lineStop.getLine()->getCommercialLine()->toParametersMap(pm);
 
 			// service_number
 			pm.insert(DATA_SERVICE_NUMBER, service.getServiceNumber());
@@ -261,7 +260,7 @@ namespace synthese
 			scheduleUpdateRequest.getAction()->setDelay(posix_time::not_a_date_time);
 			pm.insert(
 				DATA_DELAY_UPDATE_URL,
-				scheduleUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + Request::PARAMETER_ASSIGNMENT
+				scheduleUpdateRequest.getURL() + URI::PARAMETER_SEPARATOR + ScheduleRealTimeUpdateAction::PARAMETER_LATE_DURATION_MINUTES + URI::PARAMETER_ASSIGNMENT
 			);
 
 			// quay_update_url
@@ -270,7 +269,7 @@ namespace synthese
 			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 			pm.insert(
 				DATA_QUAY_UPDATE_URL,
-				vertexUpdateRequest.getURL() + Request::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + Request::PARAMETER_ASSIGNMENT
+				vertexUpdateRequest.getURL() + URI::PARAMETER_SEPARATOR + ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID + URI::PARAMETER_ASSIGNMENT
 			);
 
 			_cmsTemplate->display(stream, request, pm);

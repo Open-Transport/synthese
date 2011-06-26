@@ -86,7 +86,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2011
 				/// @since 3.2.1
-				virtual server::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap _getParametersMap() const;
 
 
 
@@ -96,7 +96,7 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @date 2011
 				/// @since 3.2.1
-				virtual void _setFromParametersMap(const server::ParametersMap& map);
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
 

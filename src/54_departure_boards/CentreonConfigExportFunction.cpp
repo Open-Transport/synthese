@@ -44,6 +44,7 @@
 #include "AlphanumericFilter.h"
 #include "MD5Wrapper.h"
 #include "DisplayScreenContentFunction.h"
+#include "URI.hpp"
 
 using namespace std;
 using namespace boost;
@@ -120,9 +121,9 @@ namespace synthese
 					",'$USER1$#S#check_synthese.sh  \"http://" <<
 					request.getHostName() << request.getClientURL() <<
 					Request::PARAMETER_STARTER << Request::PARAMETER_SERVICE <<
-					Request::PARAMETER_ASSIGNMENT << DisplayGetNagiosStatusFunction::FACTORY_KEY <<
-					Request::PARAMETER_SEPARATOR << DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID <<
-					Request::PARAMETER_ASSIGNMENT << "$HOSTADDRESS$\"',2);" << endl;
+					URI::PARAMETER_ASSIGNMENT << DisplayGetNagiosStatusFunction::FACTORY_KEY <<
+					URI::PARAMETER_SEPARATOR << DisplayGetNagiosStatusFunction::PARAMETER_DISPLAY_SCREEN_ID <<
+					URI::PARAMETER_ASSIGNMENT << "$HOSTADDRESS$\"',2);" << endl;
 
 
 

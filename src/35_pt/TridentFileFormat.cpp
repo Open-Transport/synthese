@@ -119,7 +119,7 @@ namespace synthese
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
-		
+
 		TridentFileFormat::SRIDConversionMap TridentFileFormat::_SRIDConversionMap;
 
 		string ToXsdDaysDuration (date_duration daysDelay);
@@ -134,6 +134,7 @@ namespace synthese
 			const DataSource& dataSource
 		):	OneFileTypeImporter<Importer_>(env, dataSource),
 			Importer(env, dataSource),
+			PTDataCleanerFileFormat(env, dataSource),
 			_importStops(false),
 			_importJunctions(false),
 			_autoGenerateStopAreas(false),
@@ -145,9 +146,9 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		// REQUESTS HANDLING
-		server::ParametersMap TridentFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap TridentFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap result;
+			ParametersMap result(PTDataCleanerFileFormat::_getParametersMap());
 			result.insert(PARAMETER_IMPORT_STOPS, _importStops);
 			result.insert(PARAMETER_IMPORT_JUNCTIONS, _importJunctions);
 			result.insert(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas);
@@ -165,7 +166,7 @@ namespace synthese
 			return result;
 		}
 
-		server::ParametersMap TridentFileFormat::Exporter_::getParametersMap() const
+		util::ParametersMap TridentFileFormat::Exporter_::getParametersMap() const
 		{
 			ParametersMap result;
 			if(_startDate < day_clock::local_day())
@@ -184,6 +185,7 @@ namespace synthese
 
 		void TridentFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_importStops = map.getDefault<bool>(PARAMETER_IMPORT_STOPS, false);
 			_autoGenerateStopAreas = map.getDefault<bool>(PARAMETER_AUTOGENERATE_STOP_AREAS, false);
 			_importJunctions = map.getDefault<bool>(PARAMETER_IMPORT_JUNCTIONS, false);
@@ -2087,9 +2089,11 @@ namespace synthese
 		) const	{
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());
+			t.getForm().addHiddenField(PARAMETER_FROM_TODAY, string("1"));
 			stream << t.open();
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
 			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
 			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));

@@ -99,7 +99,7 @@ namespace synthese
 
 
 
-		server::ParametersMap MessageAdmin::getParametersMap() const
+		util::ParametersMap MessageAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_alarm.get())

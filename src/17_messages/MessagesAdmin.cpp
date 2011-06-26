@@ -137,7 +137,7 @@ namespace synthese
 
 
 
-		server::ParametersMap MessagesAdmin::getParametersMap() const
+		util::ParametersMap MessagesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 //			m.insert(PARAMETER_SEARCH_DATE, _date);

@@ -196,28 +196,6 @@ namespace synthese
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Perform URL-decoding on a string.
-			/// @return false if the encoding was invalid.
-			static bool URLDecode(const std::string& in, std::string& out);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Encodes a string to the format of an URL
-			/// @param value the character to encode
-			/// @return string the encoded string
-			/// @auhtor Hugues Romain
-			/// @date 2010
-			/// @since 3.1.18
-			//////////////////////////////////////////////////////////////////////////
-			/// Links :
-			///	<ul>
-			///		<li>http://www.codeguru.com/cpp/cpp/cpp_mfc/article.php/c4029</li>
-			///		<li>http://www.rfc-editor.org/rfc/rfc1738.txt</li>
-			///	</ul>
-			static std::string URLEncode(const std::string& value);
-
 		private:
 			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.
 			static void _SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap);

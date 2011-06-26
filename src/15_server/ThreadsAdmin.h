@@ -45,10 +45,10 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			void setFromParametersMap(const server::ParametersMap& map);
+			void setFromParametersMap(const util::ParametersMap& map);
 
 
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 			/** Display of the content of the admin element.
 				@param stream Stream to write on.

@@ -57,9 +57,9 @@ namespace synthese
 			FilePathsSet _pathsSet;
 			boost::filesystem::path _dirPath;
 
-			virtual void _setFromParametersMap(const server::ParametersMap& map) {}
+			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
 
-			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
+			virtual util::ParametersMap _getParametersMap() const { return util::ParametersMap(); }
 
 		public:
 			OneFileTypeImporter(
@@ -70,7 +70,7 @@ namespace synthese
 
 
 			void setFromParametersMap(
-				const server::ParametersMap& map,
+				const util::ParametersMap& map,
 				bool doImport
 			){
 				if(map.getOptional<std::string>(PARAMETER_PATH))
@@ -103,7 +103,7 @@ namespace synthese
 			}
 
 
-			server::ParametersMap getParametersMap() const
+			util::ParametersMap getParametersMap() const
 			{
 				std::stringstream s;
 				bool first(true);
@@ -119,7 +119,7 @@ namespace synthese
 					}
 					s << path;
 				}
-				server::ParametersMap result(_getParametersMap());
+				util::ParametersMap result(_getParametersMap());
 				result.insert(PARAMETER_PATH, s.str());
 				return result;
 			}

@@ -27,6 +27,7 @@
 #include "Hub.h"
 #include "Registry.h"
 #include "Importable.h"
+#include "CoordinatesSystem.hpp"
 
 #include <map>
 #include <utility>
@@ -34,6 +35,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace road
 	{
 		class Address;
@@ -152,6 +158,17 @@ namespace synthese
 			public geography::NamedPlaceTemplate<StopArea>,
 			public impex::Importable
 		{
+		private:
+			static const std::string DATA_STOP_ID;
+			static const std::string DATA_STOP_NAME;
+			static const std::string DATA_CITY_ID;
+			static const std::string DATA_CITY_NAME;
+			static const std::string DATA_STOP_NAME_13;
+			static const std::string DATA_STOP_NAME_26;
+			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
+
 		public:
 
 			/// Chosen registry class.
@@ -334,6 +351,23 @@ namespace synthese
 				/// @date 2011
 				Lines getLines(
 					bool includeArrivals
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Exports the object into a parameters map.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_Areas_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @retval the parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
+					std::string prefix = std::string()
 				) const;
 			//@}
 

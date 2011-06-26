@@ -139,7 +139,7 @@ namespace synthese
 
 
 
-		server::ParametersMap CommercialLineAdmin::getParametersMap() const
+		util::ParametersMap CommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_cline.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cline->getKey());

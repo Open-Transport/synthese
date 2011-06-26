@@ -60,7 +60,6 @@
 #include "Webpage.h"
 #include "StopArea.hpp"
 #include "StaticFunctionRequest.h"
-#include "PTObjectsCMSExporters.hpp"
 #include "RoutePlannerFunction.h"
 #include "ReservationRuleInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -2702,8 +2701,8 @@ namespace synthese
 					lexical_cast<string>(*serviceUse.getUseRule().getAccessCapacity ()) :
 				"9999"
 			); // 11
-			PTObjectsCMSExporters::ExportLine(pm, *commercialLine);
-			PTObjectsCMSExporters::ExportService(pm, *serviceUse.getService());
+			commercialLine->toParametersMap(pm);
+			serviceUse.getService()->toParametersMap(pm);
 			if(continuousService)
 			{
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);

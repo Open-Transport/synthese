@@ -212,7 +212,7 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.2.0
 			virtual void addAdminPageParameters(
-				server::ParametersMap& map,
+				util::ParametersMap& map,
 				const admin::AdminRequest& request
 			) const;
 		};

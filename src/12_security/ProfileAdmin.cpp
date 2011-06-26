@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ProfileAdmin::getParametersMap() const
+		util::ParametersMap ProfileAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_profile.get()) m.insert(Request::PARAMETER_OBJECT_ID, _profile->getKey());

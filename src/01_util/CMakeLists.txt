@@ -28,6 +28,8 @@ MD5Wrapper.h
 Named.h
 ObjectNotFoundException.h
 ObjectNotFoundInRegistryException.h
+ParametersMap.cpp
+ParametersMap.h
 PlainCharFilter.h
 Registrable.cpp
 Registrable.h
@@ -43,6 +45,8 @@ SqlFilter.h
 T9Filter.h
 UniqueStringsSet.cpp
 UniqueStringsSet.h
+URI.cpp
+URI.hpp
 UtilConstants.h
 UtilTypes.cpp
 UtilTypes.h

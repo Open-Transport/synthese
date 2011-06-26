@@ -110,7 +110,7 @@ namespace synthese
 			///	@author Hugues
 			///	@date 2009
 			void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 
@@ -119,7 +119,7 @@ namespace synthese
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues
 			///	@date 2009
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 

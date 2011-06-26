@@ -60,13 +60,13 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
 			///	@throws ActionException Occurs when some parameters are missing or incorrect.
-			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
+			void _setFromParametersMap(const util::ParametersMap& map) throw(server::ActionException);
 
 			virtual bool isAuthorized(const server::Session* session) const;
 

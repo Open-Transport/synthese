@@ -32,7 +32,7 @@ namespace synthese
 	{
 		class Action;
 		class Function;
-		class HTTPRequest;
+		struct HTTPRequest;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Request which calls dynamically defined action and/or function.
@@ -55,14 +55,14 @@ namespace synthese
 
 
 		private:
-			ParametersMap _parametersMap;
+			util::ParametersMap _parametersMap;
 
 		public:
 			DynamicRequest(
 				const HTTPRequest& httpRequest
 			);
 
-			virtual ParametersMap getParametersMap() const;
+			virtual util::ParametersMap getParametersMap() const;
 
 		protected:
 			virtual void _loadFunction(

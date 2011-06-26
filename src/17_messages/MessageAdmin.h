@@ -103,7 +103,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const Alarm>	_alarm;
-			server::ParametersMap			_parameters;
+			util::ParametersMap			_parameters;
 
 		public:
 			MessageAdmin();
@@ -115,7 +115,7 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
@@ -124,11 +124,11 @@ namespace synthese
 
 
 			/** Parameters map generator, used when building an url to the admin page.
-					@return server::ParametersMap The generated parameters map
+					@return util::ParametersMap The generated parameters map
 					@author Hugues Romain
 					@date 2007
 				*/
-			virtual server::ParametersMap getParametersMap() const;
+			virtual util::ParametersMap getParametersMap() const;
 
 			virtual void _buildTabs(
 				const security::Profile& profile

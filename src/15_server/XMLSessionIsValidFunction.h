@@ -69,7 +69,7 @@ namespace synthese
 			///	@return Generated parameters map
 			/// @author Hugues Romain (RCSmobility)
 			/// @date 2009-2011
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -81,7 +81,7 @@ namespace synthese
 			/// @author Hugues Romain (RCSmobility)
 			/// @date 2009-2011
 			virtual void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 

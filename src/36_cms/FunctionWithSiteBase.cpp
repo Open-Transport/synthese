@@ -33,9 +33,9 @@ namespace synthese
 
 
 
-		server::ParametersMap FunctionWithSiteBase::_getParametersMap() const
+		util::ParametersMap FunctionWithSiteBase::_getParametersMap() const
 		{
-			server::ParametersMap map;
+			util::ParametersMap map;
 			if(_site.get())
 			{
 				map.insert(PARAMETER_SITE, _site->getKey());

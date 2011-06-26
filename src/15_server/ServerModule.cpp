@@ -276,54 +276,6 @@ namespace synthese
 
 
 
-		bool ServerModule::URLDecode(
-			const std::string& in,
-			std::string& out
-		){
-		  out.clear();
-		  out.reserve(in.size());
-		  for (std::size_t i = 0; i < in.size(); ++i)
-		  {
-			if (in[i] == '%')
-			{
-				if(i+2 <= in.size() && in[i+1] == 'u')
-				{
-					// Non standard unicode character is rejected
-					i+=5;
-				}
-				else if (i + 3 <= in.size())
-			  {
-				int value;
-				std::istringstream is(in.substr(i + 1, 2));
-				if (is >> std::hex >> value)
-				{
-				  out += static_cast<char>(value);
-				  i += 2;
-				}
-				else
-				{
-				  return false;
-				}
-			  }
-			  else
-			  {
-				return false;
-			  }
-			}
-			else if (in[i] == '+')
-			{
-			  out += ' ';
-			}
-			else
-			{
-			  out += in[i];
-			}
-		  }
-		  return true;
-		}
-
-
-
 		const ServerModule::Threads& ServerModule::GetThreads()
 		{
 			return _threads;
@@ -542,29 +494,6 @@ namespace synthese
 				GetParameter(MODULE_PARAM_SMTP_SERVER),
 				GetParameter(MODULE_PARAM_SMTP_PORT)
 			);
-		}
-
-
-
-		std::string ServerModule::URLEncode( const std::string& value )
-		{
-			stringstream result;
-			BOOST_FOREACH(unsigned char c, value)
-			{
-				if(	(c >= 48 && c <= 57) ||
-					(c >= 65 && c <= 90) ||
-					(c >= 97 && c <= 122)
-				){
-					result << c;
-				}
-				else
-				{
-					result << "%";
-					if(c < 16) result << "0";
-					result << hex << static_cast<int>(c);
-				}
-			}
-			return result.str();
 		}
 
 

@@ -42,6 +42,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace security;
+	using namespace util;
 
 	template<> const string util::FactorableTemplate<server::Action, server::LoginAction>::FACTORY_KEY("login");
 

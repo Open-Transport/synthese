@@ -94,7 +94,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ResaCustomersAdmin::getParametersMap() const
+		util::ParametersMap ResaCustomersAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_searchName)

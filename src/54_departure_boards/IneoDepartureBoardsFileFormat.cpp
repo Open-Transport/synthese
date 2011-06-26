@@ -237,7 +237,7 @@ namespace synthese
 
 
 
-		server::ParametersMap IneoDepartureBoardsFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap IneoDepartureBoardsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map;
 			if(_ptDataSource.get())
@@ -253,7 +253,7 @@ namespace synthese
 
 
 
-		void IneoDepartureBoardsFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void IneoDepartureBoardsFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			if(map.isDefined(PARAMETER_PT_DATASOURCE_ID)) try
 			{

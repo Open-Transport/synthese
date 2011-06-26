@@ -42,9 +42,13 @@ namespace synthese
 		class Profile;
 	}
 
-	namespace server
+	namespace util
 	{
 		class ParametersMap;
+	}
+
+	namespace server
+	{
 		class ActionException;
 		class Request;
 		class Session;
@@ -85,11 +89,11 @@ namespace synthese
 			/** Conversion from generic parameters map to attributes.
 				@param map Map to analyse
 			*/
-			virtual void _setFromParametersMap(const ParametersMap& map) = 0;
+			virtual void _setFromParametersMap(const util::ParametersMap& map) = 0;
 
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			virtual ParametersMap getParametersMap() const = 0;
+			virtual util::ParametersMap getParametersMap() const = 0;
 
 
 			//////////////////////////////////////////////////////////////////////////

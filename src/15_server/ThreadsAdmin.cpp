@@ -169,7 +169,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ThreadsAdmin::getParametersMap() const
+		util::ParametersMap ThreadsAdmin::getParametersMap() const
 		{
 			return ParametersMap();
 		}

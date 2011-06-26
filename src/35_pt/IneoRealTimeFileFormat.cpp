@@ -268,7 +268,7 @@ namespace synthese
 
 
 
-		server::ParametersMap IneoRealTimeFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap IneoRealTimeFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map;
 			if(_plannedDataSource.get())
@@ -280,7 +280,7 @@ namespace synthese
 
 
 
-		void IneoRealTimeFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void IneoRealTimeFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			if(map.isDefined(PARAMETER_PLANNED_DATASOURCE_ID)) try
 			{

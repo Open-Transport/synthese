@@ -66,13 +66,13 @@ namespace synthese
 			virtual void displayBroadcastListEditor(
 				std::ostream& stream
 				, const messages::Alarm* alarm
-				, const server::ParametersMap& request
+				, const util::ParametersMap& request
 				, server::Request& searchRequest
 				, server::StaticActionRequest<AlarmAddLinkAction>& addRequest
 				, server::StaticActionRequest<AlarmRemoveLinkAction>& removeRequest
 			) = 0;
 
-			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const server::ParametersMap& parameters) const = 0;
+			virtual AlarmRecipientSearchFieldsMap getSearchFields(html::HTMLForm& form, const util::ParametersMap& parameters) const = 0;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds an object to the alarm as the current recipient type.

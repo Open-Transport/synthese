@@ -164,7 +164,7 @@ namespace synthese
 
 
 
-		server::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
+		util::ParametersMap BookableCommercialLineAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(!_hideOldServices && !_date.is_not_a_date())

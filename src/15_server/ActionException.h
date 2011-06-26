@@ -55,7 +55,7 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2008
 			explicit ActionException(
-				const ParametersMap::MissingParameterException& e,
+				const util::ParametersMap::MissingParameterException& e,
 				const Action& action
 			) throw();
 

@@ -42,12 +42,12 @@ namespace synthese
 			{}
 
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map,
+				const util::ParametersMap& map,
 				bool doImport
 			) {}
 
 
-			virtual server::ParametersMap getParametersMap() const { return server::ParametersMap(); }
+			virtual util::ParametersMap getParametersMap() const { return util::ParametersMap(); }
 
 			virtual db::DBTransaction save() const { return db::DBTransaction(); }
 		};
