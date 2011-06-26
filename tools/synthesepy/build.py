@@ -195,7 +195,7 @@ class CMakeBuilder(Builder):
         required_packages.extend(
             ['libboost-{0}{1}-dev'.format(m.replace('_', '-'), BOOST_VER) for
                 m in REQUIRED_BOOST_MODULES])
-            
+
         if not self.args.without_mysql:
             required_packages.extend(
                 ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
@@ -284,17 +284,14 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        ##self.boost_dir = join(
-        ##    self.env.source_path, '3rd', 'dev', 'boost', 'src')
-
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
         created_dir = 'boost_1_42_0'
         self._extract(url, self.env.thirdparty_dir, created_dir)
-        
+
         self.boost_dir = join(self.env.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
-        
+
         if os.path.isdir(self.boost_lib_dir):
             return
 
@@ -303,7 +300,7 @@ class CMakeBuilder(Builder):
         subprocess.check_call(
             join(self.boost_dir, 'bootstrap.bat'), cwd=self.boost_dir)
 
-        args = [join(self.boost_dir, 'bjam.exe')] 
+        args = [join(self.boost_dir, 'bjam.exe')]
         # TODO: have an option to specify the vs version.
         toolset = 'msvc-9.0'
         args.extend(
