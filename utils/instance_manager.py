@@ -24,7 +24,7 @@
 
 import datetime
 import logging
-from optparse import OptionParser
+import optparse
 import os
 from os.path import join
 import pprint
@@ -43,9 +43,12 @@ DEFAULT_CONFIG = {
         },
     },
     'ENV': {},
+    'SSH_OPTIONS': '',
 }
 
 BUILD_DEFAULT_CONFIG = {
+    'ALIASES': [],
+    'SYNTHESEPY_ARGS': ['-v', '-s', '-e', 'session_max_duration=999999'],
     'SOURCE_DIR': None,
     'BUILD_DIR': None,
     'TOOL': 'cmake',
@@ -55,10 +58,16 @@ BUILD_DEFAULT_CONFIG = {
 INSTANCE_DEFAULT_CONFIG = {
     'BUILD': 'trunk_debug',
     'RSYNC_OPTS': '',
-    'SITE_ID': -1,
+    'DEFAULT_SITE': 'default',
+    'SITES': [{
+        'NAME': 'default',
+        'SITE_ID': -1,
+        'REMOTE_PATH': '/var/www',
+    }],
 }
 
 thisdir = os.path.abspath(os.path.dirname(__file__))
+options = None
 instance = None
 config = {}
 build_config = {}
@@ -71,7 +80,15 @@ db_path = None
 # Utils
 
 def call(cmd, shell=True, **kwargs):
+    global options
     log.debug('Running command: %r', cmd)
+    if options.dummy:
+        # TODO: show environment too.
+        cmdline = cmd
+        if isinstance(cmd, list):
+            cmdline = ' '.join(cmdline)
+        log.info('Dummy mode, not running:\n%s', cmdline)
+        return
     if 'bg' in kwargs:
         del kwargs['bg']
         subprocess.Popen(cmd, **kwargs)
@@ -94,8 +111,8 @@ def _to_cygwin_path(path):
 
 
 
-def load_config(options):
-    global config, build_config, instance_config
+def load_config():
+    global options, config, build_config, instance_config
     config = DEFAULT_CONFIG.copy()
 
     for suffix in ['', '_local', '_local_' + socket.gethostname()]:
@@ -114,6 +131,10 @@ def load_config(options):
     config = Struct(config)
     if instance:
         instance_config = INSTANCE_DEFAULT_CONFIG.copy()
+        if not instance in config.INSTANCES:
+            raise Exception(
+                'Instance %r doesn\'t exist. Available instances: %r' %
+                (instance, config.INSTANCES.keys()))
         instance_config.update(config.INSTANCES[instance])
         instance_config = Struct(instance_config)
 
@@ -122,6 +143,10 @@ def load_config(options):
         build = instance_config.BUILD
     if options.build:
         build = options.build
+        for build_name, conf in config.BUILDS.iteritems():
+            for alias in conf.get('ALIASES', []):
+                if alias == options.build:
+                    build = build_name
 
     build_config = BUILD_DEFAULT_CONFIG.copy()
     build_config.update(config.BUILDS[build])
@@ -149,97 +174,153 @@ def _run_synthesepy(command, global_args=[], command_args=[]):
         global_args.extend(
             ['--dbconn',
                 'sqlite://debug=1,path=' + join(db_path, 'config.db3'),
-             '--static-dir', join(instance_path, 'assets'),
-             '--site-id', str(instance_config.SITE_ID),
              '--port', str(instance_config.PORT)])
+    global_args.extend(build_config.SYNTHESEPY_ARGS)
 
     args = ([
         sys.executable,
         join(build_config.SOURCE_DIR, 'tools', 'synthese.py'),
         '-b', build_config.BUILD_DIR,
-        '-m', build_config.MODE, '-t', build_config.TOOL, '-s', '-v'] +
+        '-m', build_config.MODE, '-t', build_config.TOOL] +
         global_args + [command] + command_args)
 
     log.debug("running Synthese: %r\n%s", args, " ".join(args))
     call(args, shell=False)
 
+try:
+    from collections import OrderedDict
+    commands = OrderedDict()
+except ImportError:
+    commands = {}
+
+class cmd(object):
+    def __init__(self, help, requires_instance=True):
+        self.help = help
+        self.requ_instance = requires_instance
+    def __call__(self, f):
+        commands[f.__name__] = {
+            'help': self.help,
+            'requ_instance': self.requ_instance,
+            'fn': f,
+        }
+        return f
+
 # Database
 
-def initdb():
+@cmd('Initialize database (Warning: Destroys existing data!)')
+def init_db():
     _run_synthesepy('initdb')
 
 
-def fetchdb():
+@cmd('Fetch database from server')
+def fetch_db():
     target = 'config-{date}.db3'.format(
         date=datetime.datetime.now().strftime('%Y%m%d-%H%M'))
     log.info('Fetching db to %r', join(db_path, target))
     call('rsync -avz {server}:/srv/data/s3-server/config.db3 {target}'.format(
         server=instance_config.SERVER, target=target), cwd=db_path)
-    shutil.copy(join(db_path, target), join(db_path, 'config.db3'))
     log.info('Copying to %r', join(db_path, 'config.db3'))
+    shutil.copy(join(db_path, target), join(db_path, 'config.db3'))
 
 
-def viewdb():
+@cmd('Open database in spatialite-gui')
+def view_db():
     call([config.SPATIALITE_GUI_PATH, join(db_path, 'config.db3')], bg=True)
 
 
-def dumpdb():
+@cmd('Dump database to text file')
+def dump_db():
     args = [config.SPATIALITE_PATH, join(db_path, 'config.db3'), '.dump']
     log.debug('Running: %r', args)
+    if options.dummy:
+        log.info('Dummy mode, not executing:\n%s', ' '.join(args))
+        return
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     output = p.communicate()[0]
-    outfile = join(db_path, 'config_{instance}.dump'.format(instance=instance))
-    open(outfile, 'wb').write(output)
-    log.info('Db dumped to %r', outfile)
-    if config.EDITOR_PATH:
-        call([config.EDITOR_PATH, outfile], bg=True)
+    target = join(
+        db_path, 'config-{date}.dump'.format(
+            date=datetime.datetime.now().strftime('%Y%m%d-%H%M')))
+
+    open(target, 'wb').write(output)
+    log.info('Db dumped to %r', target)
+
+    final_target = join(
+        db_path, 'config_{instance}.dump'.format(instance=instance))
+    log.info('Copying to %r', final_target)
+    shutil.copy(target, final_target)
+
+    if os.path.isfile(config.EDITOR_PATH):
+        call([config.EDITOR_PATH, final_target], bg=True)
 
 
-def shelldb():
+@cmd('Open spatialite shell with database')
+def shell_db():
     call([config.SPATIALITE_PATH, join(db_path, 'config.db3')])
 
 
 # Assets
 
 
+@cmd('Fetch assets from server')
 def fetch_assets():
     params = instance_config.__dict__.copy()
-    params['assets_path'] = _to_cygwin_path(join(instance_path, 'assets'))
-    call('rsync -av {RSYNC_OPTS} --delete --delete-excluded '
-        '{SERVER}:/var/www/ {assets_path}'.format(
-            **params))
+    for site in instance_config.SITES:
+        params['remote_path'] = site['REMOTE_PATH']
+        params['assets_path'] = _to_cygwin_path(
+            join(instance_path, 'assets', site['NAME']))
+        call('rsync -av {RSYNC_OPTS} --delete --delete-excluded '
+            '{SERVER}:{remote_path} {assets_path}'.format(**params))
 
 
 # Daemon
 
 
+@cmd('Run Synthese daemon')
 def run():
-    _run_synthesepy('rundaemon')
+    site_name = options.site if options.site else instance_config.DEFAULT_SITE
+    sites = [s for s in instance_config.SITES if s['NAME'] == site_name]
+    if len(sites) != 1:
+        raise Exception(
+            'Unable to find site configuration for %r' % options.site)
+    site = sites[0]
+    global_args = [
+        '--static-dir', join(instance_path, 'assets', site['NAME']),
+        '--site-id', str(site['SITE_ID'])]
+
+    _run_synthesepy('rundaemon', global_args)
 
 
+@cmd('Stop Synthese daemon')
 def stop():
     _run_synthesepy('stopdaemon')
 
 
+# Misc
+
+
+@cmd('Open a ssh shell on the server')
 def ssh():
-    call(['ssh', instance_config.SERVER])
+    call('ssh {options} {server}'.format(
+        options=config.SSH_OPTIONS, server=instance_config.SERVER))
 
 
 # General commands:
 
 
+@cmd('Build Synthese', False)
 def build():
     _run_synthesepy('build')
 
 
+@cmd('Generate an HTML files with links to the Synthese instances', False)
 def gen_html():
     output = join(base_path, 'synthese_instances.html')
-    
+
     body = ""
     for instance_name, instance_config in config.INSTANCES.iteritems():
         body += "<h1>" + instance_name + "</h1>\n"
         body += "<pre>" + repr(instance_config) + "</pre>\n"
-    
+
     open(output, 'wb').write("""
         <!DOCTYPE html>
         <head><title>Synthese Instances</title></head>
@@ -255,38 +336,69 @@ if __name__ == '__main__':
     if sys.platform == 'cygwin':
         raise Exception('Cygwin Python unsupported')
 
-    usage = ('usage: %prog [options] INSTANCES_PATH {INSTANCE_NAME COMMAND | '
-        'GENERAL_COMMAND}')
-    parser = OptionParser(usage=usage)
+    class PlainHelpFormatter(optparse.IndentedHelpFormatter):
+        def format_description(self, description):
+            if description:
+                return description + "\n"
+            else:
+                return ""
+
+    commands_list = ''
+    for requ_instance in True, False:
+        commands_list += (
+            '\n Commands requiring an instance\n' if requ_instance else
+            '\n  Commands not requiring an instance\n')
+        for name, v in commands.iteritems():
+            if v['requ_instance'] != requ_instance:
+                continue
+            commands_list += '{name:<20} {description}\n'.format(
+                name=name, description=v['help'])
+
+    parser = optparse.OptionParser(
+        usage='usage: %prog [options] INSTANCES_PATH {INSTANCE_NAME,-} '
+            'COMMAND1 [COMMAND2 ...]| ',
+        formatter=PlainHelpFormatter(),
+        description='List of commands:\n' + commands_list)
 
     parser.add_option('-v', '--verbose', action='store_true',
          default=False, help='Print debug logging')
+    parser.add_option('-d', '--dummy', action='store_true',
+         default=False, help='Don\'t run commands, Just print the command line')
     parser.add_option('-b', '--build', help='Build to use')
+    parser.add_option('-s', '--site',
+        help='Site identifier to use for static files')
 
     (options, args) = parser.parse_args()
-    if len(args) != 3 and len(args) != 2:
+
+    if len(args) < 3:
         parser.print_help()
         sys.exit(1)
 
     logging.basicConfig(level=(logging.DEBUG if options.verbose else
                                logging.INFO))
 
-    if len(args) == 3:
-        config_path, instance, command = args
-    else:
-        config_path, command = args
+    config_path = args.pop(0)
+    instance = args.pop(0)
+    if instance == '-':
+        instance = None
+    cmdline_commands = args
 
     base_path = os.path.abspath(config_path)
     assert os.path.isdir(base_path)
+
+    load_config()
+
     if instance:
         instance_path = join(base_path, instance)
         maybe_mkdir(instance_path)
         db_path = join(instance_path, 'db')
         maybe_mkdir(db_path)
 
-    load_config(options)
+    for command in cmdline_commands:
+        if not command in commands:
+            raise Exception('Unknown command: %r' % command)
+        if commands[command]['requ_instance'] and not instance:
+            raise Exception('Command %r requires an instance' % command)
 
-    command_fn = locals().get(command)
-    if not command_fn:
-        raise Exception('Unknown command: %r' % command)
-    command_fn()
+    for command in cmdline_commands:
+        commands[command]['fn']()
