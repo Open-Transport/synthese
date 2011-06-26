@@ -44,12 +44,12 @@ class Daemon(object):
     def _start_wsgi_proxy(self):
         if not self.env.wsgi_proxy:
             return
-        self.wsgi_httpd = proxy.start(self.env)
+        proxy.start(self.env)
 
     def _stop_wsgi_proxy(self):
-        if not self.wsgi_httpd:
+        if not self.env.wsgi_proxy:
             return
-        self.wsgi_httpd.shutdown()
+        proxy.stop()
 
     def _wait_until_ready(self):
         for i in range(40):

@@ -125,9 +125,14 @@ class WSGIProxy(object):
         return static.StatusApp('404 Not Found')(environ, start_response)
 
 
+# Paste httpd is threaded, which should provide better performance.
+USE_PASTE_HTTPD = True
+
+wsgi_httpd = None
+
+
 def start(env):
-    # Paste httpd is threaded, which should provide better performance.
-    USE_PASTE_HTTPD = True
+    global wsgi_httpd
 
     if USE_PASTE_HTTPD:
         import paste.httpserver
@@ -143,7 +148,17 @@ def start(env):
              env.wsgi_proxy_port)
 
     threading.Thread(target=wsgi_httpd.serve_forever).start()
-    return wsgi_httpd
+
+
+def stop():
+    global wsgi_httpd
+    # Shutting down method differs:
+    # simple_server.simple_server throws an exception when calling
+    # server_close() and paste.httpd hangs if shutdown() is called. 
+    if USE_PASTE_HTTPD:
+        wsgi_httpd.server_close()
+    else:
+        wsgi_httpd.shutdown()
 
 
 def serve_forever(env):
