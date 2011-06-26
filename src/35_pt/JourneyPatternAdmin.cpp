@@ -451,7 +451,9 @@ namespace synthese
 									"arret-rouge-blanc-8px.png",
 									"arret-rouge-blanc-8px.png",
 									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? stopPointUpdateRequest.getURL() : string(),
-									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ? static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() : string(),
+									dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge) ?
+										static_cast<StopPoint*>((*itEdge)->getFromVertex())->getConnectionPlace()->getFullName() :
+										string(),
 									10, 10
 							)	);
 						}
