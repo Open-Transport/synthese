@@ -65,6 +65,14 @@ class WSGIProxy(object):
             ('Content-type', 'text/plain')])
         return '302 Found'
 
+    def add_utf8_header(self, start_response):
+        def start_response_wrapper(status, headers):
+            headers_dict = dict(headers)
+            if headers_dict['Content-Type'] == 'text/html':
+                headers_dict['Content-Type'] = 'text/html; charset=UTF-8'
+            return start_response(status, headers_dict.items())
+        return start_response_wrapper
+
     def _handle_static_files(self, environ, start_response):
         path_info = environ.get('PATH_INFO', '')
         path = self.other_static_app.root + path_info
@@ -78,14 +86,14 @@ class WSGIProxy(object):
             )
             environ['PATH_INFO'] = self.SYNTHESE_SUFFIXES[0]
             environ['QUERY_STRING'] = querystring
-            return self.proxy_app(environ, start_response)
+            return self.proxy_app(environ, self.add_utf8_header(start_response))
         return self.other_static_app(environ, start_response)
 
     def __call__(self, environ, start_response):
         path_info = environ['PATH_INFO']
         is_admin = path_info.startswith(self.ADMIN_PREFIXES)
 
-        if path_info == '/':
+        if path_info == '/admin':
             return self._redirect(
                 environ,
                 start_response,
@@ -104,14 +112,7 @@ class WSGIProxy(object):
                     path_info + self.DEFAULT_ADMIN_QUERYSTRING
                 )
 
-            # Force utf-8 content type
-            def start_response_wrapper(status, headers):
-                headers_dict = dict(headers)
-                if headers_dict['Content-Type'] == 'text/html':
-                    headers_dict['Content-Type'] = 'text/html; charset=UTF-8'
-                return start_response(status, headers_dict.items())
-
-            return self.proxy_app(environ, start_response_wrapper)
+            return self.proxy_app(environ, self.add_utf8_header(start_response))
 
         if is_admin:
             # Remove the /admin or /synthese3 prefix
@@ -125,9 +126,19 @@ class WSGIProxy(object):
 
 
 def start(env):
-    wsgi_httpd = simple_server.make_server(
-        '', env.wsgi_proxy_port, WSGIProxy(env)
-    )
+    # Paste httpd is threaded, which should provide better performance.
+    USE_PASTE_HTTPD = True
+
+    if USE_PASTE_HTTPD:
+        import paste.httpserver
+        paste_log = logging.getLogger('paste.httpserver.ThreadPool')
+        paste_log.setLevel(logging.INFO)
+        wsgi_httpd = paste.httpserver.serve(
+            WSGIProxy(env), '0.0.0.0', env.wsgi_proxy_port, start_loop=False)
+    else:
+        wsgi_httpd = simple_server.make_server(
+            '', env.wsgi_proxy_port, WSGIProxy(env)
+        )
     log.info('WSGI proxy serving on http://localhost:%s' %
              env.wsgi_proxy_port)
 
