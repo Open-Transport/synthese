@@ -48,13 +48,13 @@ namespace synthese
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters to read.
 				@throw ActionException if a parameter is invalid.
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			/** Action to run, defined by each subclass.

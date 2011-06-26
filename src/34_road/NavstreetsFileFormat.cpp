@@ -616,7 +616,7 @@ namespace synthese
 
 
 
-		server::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result;
 			return result;
@@ -624,7 +624,7 @@ namespace synthese
 
 
 
-		void NavstreetsFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void NavstreetsFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 		}
 }	}

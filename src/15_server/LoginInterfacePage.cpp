@@ -54,7 +54,13 @@ namespace synthese
 			ParametersVector pv;
 
 			pv.push_back(functionIfSucceed->getFactoryKey());
-			pv.push_back(functionIfSucceed->_getParametersMap().getURI());
+
+			// URI
+			stringstream uri;
+			functionIfSucceed->_getParametersMap().outputURI(uri);
+			pv.push_back(uri.str());
+
+			// Title
 			pv.push_back(title);
 
 			InterfacePage::_display(

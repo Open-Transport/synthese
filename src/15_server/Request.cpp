@@ -46,11 +46,6 @@ namespace synthese
 
 	namespace server
 	{
-
-
-		const string Request::PARAMETER_SEPARATOR("&");
-		const string Request::PARAMETER_ASSIGNMENT("=");
-
 		const string Request::PARAMETER_STARTER("?");
 		const string Request::PARAMETER_FUNCTION("fonction");
 		const string Request::PARAMETER_SERVICE("SERVICE");
@@ -256,7 +251,9 @@ namespace synthese
 
 		std::string Request::getURI() const
 		{
-			return _getParametersMap().getURI();
+			stringstream os;
+			_getParametersMap().outputURI(os);
+			return os.str();
 		}
 
 
@@ -265,8 +262,7 @@ namespace synthese
 		):	_session(NULL),
 			_actionWillCreateObject(false),
 			_redirectAfterAction(true)
-		{
-		}
+		{}
 
 
 

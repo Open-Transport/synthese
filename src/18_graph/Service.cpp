@@ -24,6 +24,7 @@
 #include "Path.h"
 #include "Edge.h"
 #include "Vertex.h"
+#include "ParametersMap.h"
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
@@ -41,6 +42,9 @@ namespace synthese
 
 	namespace graph
 	{
+		const std::string Service::DATA_SERVICE_ID("service_id");
+		const std::string Service::DATA_SERVICE_NUMBER("service_number");
+
 		const time_duration Service::DAY_DURATION(hours(24));
 
 		Service::Service(
@@ -247,6 +251,14 @@ namespace synthese
 				}
 			}
 			_computeNextRTUpdate();
+		}
+
+
+
+		void Service::toParametersMap( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
+		{
+			pm.insert(prefix + DATA_SERVICE_ID, getKey());
+			pm.insert(prefix + DATA_SERVICE_NUMBER, getServiceNumber());
 		}
 	}
 }

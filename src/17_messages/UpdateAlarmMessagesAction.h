@@ -65,14 +65,14 @@ namespace synthese
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				Removes the used parameters from the map.
 				@exception ActionException Occurs when some parameters are missing or incorrect.
 			*/
 			void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			) throw(server::ActionException);
 
 		public:

@@ -92,8 +92,9 @@ namespace synthese
 			query.addFieldNull();
 			query.addFieldNull();
 			query.addField(object->getFolder() ? object->getFolder()->getKey() : RegistryKeyType(0));
-			query.addField(string(""));
+			query.addField(string());
 			query.addField(0);
+			query.addField(string());
 			query.execute(transaction);
 		}
 	}

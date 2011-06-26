@@ -31,6 +31,7 @@
 #include "RoadModule.h"
 #include "ReverseRoadChunk.hpp"
 #include "Crossing.h"
+#include "ParametersMap.h"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
@@ -57,6 +58,16 @@ namespace synthese
 
 	namespace pt
 	{
+		const std::string StopArea::DATA_STOP_ID("stop_id");
+		const std::string StopArea::DATA_STOP_NAME("stop_name");
+		const std::string StopArea::DATA_CITY_ID("city_id");
+		const std::string StopArea::DATA_CITY_NAME("city_name");
+		const std::string StopArea::DATA_STOP_NAME_13("stop_name_13");
+		const std::string StopArea::DATA_STOP_NAME_26("stop_name_26");
+		const std::string StopArea::DATA_STOP_NAME_FOR_TIMETABLES("stop_name_for_timetables");
+		const std::string StopArea::DATA_X("x");
+		const std::string StopArea::DATA_Y("y");
+
 		StopArea::StopArea(
 			util::RegistryKeyType id
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
@@ -414,5 +425,46 @@ namespace synthese
 				}
 			}
 			return result;
+		}
+
+
+
+		void StopArea::toParametersMap(
+			util::ParametersMap& pm,
+			const CoordinatesSystem* coordinatesSystem,
+			string prefix
+		) const {
+			pm.insert(prefix + DATA_STOP_ID, getKey());
+			pm.insert(prefix + "id", getKey()); // For StopAreasList compatibility
+			pm.insert(prefix + DATA_STOP_NAME, getName());
+			pm.insert(prefix + "name", getName()); // For StopAreasList compatibility
+			pm.insert(prefix + DATA_STOP_NAME_13, getName13());
+			pm.insert(prefix + DATA_STOP_NAME_26, getName26());
+			pm.insert(prefix + "directionAlias", getName26()); // For StopAreasList compatibility
+			pm.insert(prefix + DATA_STOP_NAME_FOR_TIMETABLES, getTimetableName());
+			if(getCity())
+			{
+				pm.insert(prefix + DATA_CITY_ID, getCity()->getKey());
+				pm.insert(prefix + "cityId", getCity()->getKey()); // For StopAreasList compatibility
+				pm.insert(prefix + DATA_CITY_NAME, getCity()->getName());
+				pm.insert(prefix + "cityName", getCity()->getName()); // For StopAreasList compatibility
+			}
+			if(coordinatesSystem && getPoint())
+			{
+				shared_ptr<Point> pg(
+					coordinatesSystem->convertPoint(*getPoint())
+				);
+				{
+					stringstream s;
+					s << std::fixed << pg->getX();
+					pm.insert(prefix + DATA_X, s.str());
+				}
+				{
+					stringstream s;
+					s << std::fixed << pg->getY();
+					pm.insert(prefix + DATA_Y, s.str());
+				}
+				pm.setGeometry(static_pointer_cast<Geometry,Point>(getPoint()));
+			}
 		}
 }	}

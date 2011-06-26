@@ -33,10 +33,13 @@
 
 namespace synthese
 {
-	namespace server
+	namespace util
 	{
 		class ParametersMap;
+	}
 
+	namespace server
+	{
 		////////////////////////////////////////////////////////////////////
 		/// Module class.
 		///	@ingroup m15
@@ -48,15 +51,15 @@ namespace synthese
 			public util::FactoryBase<ModuleClass>
 		{
 		public:
-		    typedef std::map<std::string, std::string> Parameters;
+			typedef std::map<std::string, std::string> Parameters;
 
 		private:
 
-		    typedef void (*PtrCallback) (const std::string& name, const std::string& value);
+			typedef void (*PtrCallback) (const std::string& name, const std::string& value);
 
-		    static std::map<std::string, PtrCallback> _Callbacks;
-		    static Parameters _DefaultParameters;
-		    static Parameters _Parameters;
+			static std::map<std::string, PtrCallback> _Callbacks;
+			static Parameters _DefaultParameters;
+			static Parameters _Parameters;
 
 
 		public:
@@ -105,7 +108,7 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.2.0
 			virtual void addAdminPageParameters(
-				server::ParametersMap& map,
+				util::ParametersMap& map,
 				const admin::AdminRequest& request
 			) const;
 		};

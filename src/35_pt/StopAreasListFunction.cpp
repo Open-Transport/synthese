@@ -36,7 +36,8 @@
 #include "Edge.h"
 #include "City.h"
 #include "Webpage.h"
-#include "PTObjectsCMSExporters.hpp"
+#include "CommercialLineTableSync.h"
+#include "CityTableSync.h"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -57,6 +58,7 @@ namespace synthese
 	using namespace graph;
 	using namespace std;
 	using namespace cms;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<server::Function,pt::StopAreasListFunction>::FACTORY_KEY(
 		"StopAreasListFunction"
@@ -69,8 +71,13 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES = "ol";
 		const string StopAreasListFunction::PARAMETER_STOP_PAGE_ID = "stop_page_id";
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
-
+		const string StopAreasListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+		
+		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
+		const string StopAreasListFunction::DATA_STOP_RANK("stop_rank");
+		const string StopAreasListFunction::DATA_STOP_AREA("stopArea");
+		const string StopAreasListFunction::DATA_STOP_AREAS("stopAreas");
 
 		ParametersMap StopAreasListFunction::_getParametersMap() const
 		{
@@ -96,26 +103,52 @@ namespace synthese
 			{
 				result.insert(PARAMETER_LINE_PAGE_ID, _linePage->getKey());
 			}
+			if(!_outputFormat.empty())
+			{
+				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+			if(_city.get())
+			{
+				result.insert(Request::PARAMETER_OBJECT_ID, _city->getKey());
+			}
 			return result;
 		}
 
 		void StopAreasListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			if(map.isDefined(Request::PARAMETER_OBJECT_ID)) try
+			RegistryKeyType roid(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0));
+			if(roid)
 			{
-				_commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
-			}
-			catch (ObjectNotFoundException<CommercialLine>&)
-			{
-				throw RequestException("No such Commercial Line");
+				// Line filter
+				if(decodeTableId(roid) == CommercialLineTableSync::TABLE.ID) try
+				{
+					_commercialLine = Env::GetOfficialEnv().getRegistry<CommercialLine>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+				}
+				catch (ObjectNotFoundException<CommercialLine>&)
+				{
+					throw RequestException("No such Commercial Line");
+				}
+				// City filter
+				else if(decodeTableId(roid) == CityTableSync::TABLE.ID) try
+				{
+					_city = Env::GetOfficialEnv().get<City>(roid);
+				}
+				catch (ObjectNotFoundException<City>&)
+				{
+					throw RequestException("No such city");
+				}
 			}
 
+			// Output lines
 			_outputLines = map.getDefault<bool>(PARAMETER_OUTPUT_LINES, true);
+
+			// SRID
 			CoordinatesSystem::SRID srid(
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
+			// BBox filter
 			string bbox(map.getDefault<string>(PARAMETER_BBOX));
 			if(!bbox.empty())
 			{
@@ -163,7 +196,18 @@ namespace synthese
 			{
 				throw RequestException("No such line page");
 			}
+
+			// Output format
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			// Saved parameters cleaning if output is a fixed format
+			if(!_stopPage.get())
+			{
+				_savedParameters.clear();
+			}
 		}
+
+
 
 		StopAreasListFunction::StopAreasListFunction():
 			_coordinatesSystem(NULL),
@@ -171,8 +215,13 @@ namespace synthese
 		{
 		}
 
-		void StopAreasListFunction::run( std::ostream& stream, const Request& request ) const
-		{
+
+
+		void StopAreasListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const {
+
 			//Key Is stop Area Name
 			typedef map<string,const StopArea *> stopMap;
 			stopMap stopAreaMap;
@@ -192,6 +241,13 @@ namespace synthese
 					}
 				}
 			}
+			else if(_city.get())
+			{
+				BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& itStopArea, _city->getLexicalMatcher(FactorableTemplate<NamedPlace,StopArea>::FACTORY_KEY).entries())
+				{
+					stopAreaMap[itStopArea.second->getName()] = dynamic_cast<StopArea*>(itStopArea.second.get());
+				}
+			}
 			else
 			{
 				BOOST_FOREACH(const Registry<StopArea>::value_type& stopArea, Env::GetOfficialEnv().getRegistry<StopArea>())
@@ -206,92 +262,72 @@ namespace synthese
 				}
 			}
 
-			if(!_stopPage.get())
-			{
-				// XML header
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<stopAreas xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance";
-				if(_commercialLine.get())
-				{
-					stream <<
-						"\" lineName=\""      << _commercialLine->getName() <<
-						"\" lineImage=\""     << _commercialLine->getImage() <<
-						"\" lineShortName=\"" << _commercialLine->getShortName() <<
-						"\" lineStyle=\""     << _commercialLine->getStyle();
-				}
-				stream << "\">";
-			}
-
+			// Stops loop
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+			size_t stopRank(0);
 			BOOST_FOREACH(stopMap::value_type& it, stopAreaMap)
 			{
-				// For CMS output
-				ParametersMap pm(request.getFunction()->getSavedParameters());
+				shared_ptr<ParametersMap> stopPm(new ParametersMap(request.getFunction()->getSavedParameters()));
+
+				it.second->toParametersMap(*stopPm, _coordinatesSystem);
 
 				if(_stopPage.get())
 				{
-					PTObjectsCMSExporters::ExportStopArea(pm, *it.second, _coordinatesSystem);
+					stopPm->insert(DATA_STOP_RANK, stopRank++);
 				}
-				else
-				{
-					stream << "<stopArea id=\""   << it.second->getKey() <<
-						"\" name=\""          << it.second->getName() <<
-						"\" cityId=\""        << it.second->getCity()->getKey() <<
-						"\" cityName=\""      << it.second->getCity()->getName() <<
-						"\" directionAlias=\""<< it.second->getName26();
-					if(it.second->getPoint().get())
-					{
-						shared_ptr<Point> pts(it.second->getPoint());
-						pts = _coordinatesSystem->convertPoint(*pts);
-						stream << "\" x=\"" << pts->getX() <<
-							"\" y=\"" << pts->getY();
-					}
-					stream << "\">";
-				}
+
+				// Lines calling at the stop
 				if(_outputLines)
 				{
-					// For CMS output
-					ParametersMap pmLine(request.getFunction()->getSavedParameters());
-
+					stringstream lineStream;
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
 					{
-						if(_linePage.get())
-						{
-							PTObjectsCMSExporters::ExportLine(pmLine, *itLine);
-						}
-						else
-						{
-							stream << "<line id=\"" << itLine->getKey() <<
-								"\" lineName=\""      << itLine->getName() <<
-								"\" lineImage=\""     << itLine->getImage() <<
-								"\" lineShortName=\"" << itLine->getShortName() <<
-								"\" lineStyle=\""     << itLine->getStyle() <<
-								"\" />";
-						}
-					}
+						// For CMS output
+						shared_ptr<ParametersMap> pmLine(new ParametersMap(request.getFunction()->getSavedParameters()));
 
-					if(_linePage.get())
-					{
-						stringstream lineStream;
-						_linePage->display(lineStream, request, pmLine);
-						pm.insert(DATA_LINES, lineStream.str());
+						itLine->toParametersMap(*pmLine);
+
+						stopPm->insert(DATA_LINE, pmLine);
 					}
 				}
 
-				if(_stopPage.get())
-				{
-					_stopPage->display(stream, request, pm);
-				}
-				else
-				{
-					stream << "</stopArea>";
-				}
+				pm.insert(DATA_STOP_AREA, stopPm);
 			}
 
-			if(!_stopPage.get())
+			// Informations about the request
+			if(_commercialLine.get())
 			{
-				// XML footer
-				stream << "</stopAreas>";
+				pm.insert("lineName", _commercialLine->getName());
+				pm.insert("lineImage", _commercialLine->getImage());
+				pm.insert("lineShortName", _commercialLine->getShortName());
+				pm.insert("lineStyle", _commercialLine->getStyle());
+			}
+
+
+			// JSON output
+			if(_outputFormat == "json")
+			{
+				pm.outputJSON(stream, DATA_STOP_AREAS);
+			}
+			else if(_stopPage.get()) // CMS output
+			{
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmStop, pm.getSubMaps(DATA_STOP_AREA))
+				{
+					if(_linePage.get() && _outputLines && pmStop->hasSubMaps(DATA_LINE))
+					{
+						stringstream lineStream;
+						BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pmStop->getSubMaps(DATA_LINE))
+						{
+							_linePage->display(lineStream, request, *pmLine);
+						}
+						pmStop->insert(DATA_LINES, lineStream.str());
+					}
+					_stopPage->display(stream, request, pm);
+				}
+			}
+			else // XML output
+			{
+				pm.outputXML(stream, DATA_STOP_AREAS, true, "http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd");
 			}
 		}
 
@@ -305,6 +341,14 @@ namespace synthese
 
 		std::string StopAreasListFunction::getOutputMimeType() const
 		{
+			if(_outputFormat == "json")
+			{
+				return "application/json";
+			}
+			else if(_stopPage.get())
+			{
+				return _stopPage->getMimeType();
+			}
 			return "text/xml";
 		}
 	}

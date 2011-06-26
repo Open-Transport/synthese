@@ -77,7 +77,7 @@ namespace synthese
 
 
 		void DBLogHTMLView::set(
-			const server::ParametersMap& map,
+			const util::ParametersMap& map,
 			std::string logKey,
 			optional<util::RegistryKeyType> searchObjectId,
 			optional<util::RegistryKeyType> searchObjectId2,

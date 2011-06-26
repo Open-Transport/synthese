@@ -28,6 +28,8 @@
 #include "NonPermanentService.h"
 #include "JourneyPatternCopy.hpp"
 #include "CalendarTemplate.h"
+#include "ImportableTableSync.hpp"
+#include "ParametersMap.h"
 
 #include <boost/foreach.hpp>
 
@@ -41,6 +43,7 @@ namespace synthese
 	using namespace graph;
 	using namespace pt;
 	using namespace calendar;
+	using namespace impex;
 
 	namespace util
 	{
@@ -49,8 +52,18 @@ namespace synthese
 
 	namespace pt
 	{
-		CommercialLine::CommercialLine(RegistryKeyType key)
-		:	util::Registrable(key),
+		const string CommercialLine::DATA_LINE_SHORT_NAME("line_short_name");
+		const string CommercialLine::DATA_LINE_LONG_NAME("line_long_name");
+		const string CommercialLine::DATA_LINE_NAME("lineName");
+		const string CommercialLine::DATA_LINE_COLOR("line_color");
+		const string CommercialLine::DATA_LINE_STYLE("line_style");
+		const string CommercialLine::DATA_LINE_IMAGE("line_image");
+		const string CommercialLine::DATA_LINE_ID("line_id");
+		const string CommercialLine::DATA_LINE_CREATOR_ID("creatorId");
+
+		CommercialLine::CommercialLine(
+			RegistryKeyType key
+		):	util::Registrable(key),
 			graph::PathGroup(key),
 			_network(NULL),
 			_reservationContact(NULL),
@@ -164,6 +177,40 @@ namespace synthese
 				}
 			}
 			return result;
+		}
+
+
+
+		void CommercialLine::toParametersMap(
+			ParametersMap& pm,
+			std::string prefix /*= std::string() */
+		) const {
+			pm.insert(prefix + DATA_LINE_ID, getKey());
+			pm.insert(prefix + "id", getKey()); // For StopAreasList and LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_SHORT_NAME, getShortName());
+			pm.insert(prefix + "lineShortName", getShortName()); // For StopAreasList compatibility
+			pm.insert(prefix + "shortName", getShortName()); // For LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_LONG_NAME, getLongName());
+			pm.insert(prefix + "longName", getLongName()); // For LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_NAME, getName());
+			pm.insert(prefix + "name", getName()); // For LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_STYLE, getStyle());
+			pm.insert(prefix + "lineStyle", getStyle()); // For StopAreasList compatibility
+			pm.insert(prefix + "style", getStyle()); // For LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_CREATOR_ID,
+				getDataSourceLinks().size() == 1 ?
+				lexical_cast<string>(getDataSourceLinks().begin()->second) :
+				ImportableTableSync::SerializeDataSourceLinks(getDataSourceLinks())
+			);
+			if(getColor())
+			{
+				pm.insert(prefix + DATA_LINE_COLOR, getColor()->toString());
+				pm.insert(prefix + "color", getColor()->toString()); // For LinesListFunction compatibility
+			}
+			pm.insert(prefix + DATA_LINE_IMAGE, getImage());
+			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
+			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
+
 		}
 	}
 }

@@ -87,7 +87,7 @@ namespace synthese
 		}
 
 
-		server::ParametersMap ProfilesAdmin::getParametersMap() const
+		util::ParametersMap ProfilesAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_SEARCH_NAME, _searchName);

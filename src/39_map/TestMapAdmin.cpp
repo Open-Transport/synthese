@@ -78,7 +78,7 @@ namespace synthese
 
 
 
-		server::ParametersMap TestMapAdmin::getParametersMap() const
+		util::ParametersMap TestMapAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			m.insert(PARAMETER_DATA_XML, _dataXml);

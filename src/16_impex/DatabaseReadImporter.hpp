@@ -54,12 +54,12 @@ namespace synthese
 				boost::optional<const admin::AdminRequest&> request
 			) const = 0;
 
-			virtual void _setFromParametersMap(const server::ParametersMap& map) {}
+			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
 
-			virtual server::ParametersMap _getParametersMap() const { return server::ParametersMap(); }
+			virtual util::ParametersMap _getParametersMap() const { return util::ParametersMap(); }
 
 			void setFromParametersMap(
-				const server::ParametersMap& map,
+				const util::ParametersMap& map,
 				bool doImport
 			){
 				_database = map.getDefault<std::string>(PARAMETER_DATABASE);
@@ -67,9 +67,9 @@ namespace synthese
 			}
 
 
-			server::ParametersMap getParametersMap() const
+			util::ParametersMap getParametersMap() const
 			{
-				server::ParametersMap result(_getParametersMap());
+				util::ParametersMap result(_getParametersMap());
 				result.insert(PARAMETER_DATABASE, _database);
 				return result;
 			}

@@ -42,7 +42,6 @@
 #include "City.h"
 #include "Alarm.h"
 #include "Webpage.h"
-#include "PTObjectsCMSExporters.hpp"
 #include "RoadModule.h"
 #include "PTUseRule.h"
 #include "Destination.hpp"
@@ -815,7 +814,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			if(row.first.getService())
 			{
-				PTObjectsCMSExporters::ExportStopArea(pm, *static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace());
+				static_cast<const StopPoint*>(row.first.getDepartureEdge()->getFromVertex())->getConnectionPlace()->toParametersMap(pm);
 
 				// Waiting time
 				time_duration waitingTime(row.first.getDepartureDateTime() - requestTime);
@@ -861,7 +860,7 @@ namespace synthese
 				);
 
 				// Line
-				PTObjectsCMSExporters::ExportLine(pm, dynamic_cast<const CommercialLine&>(*row.first.getService()->getPath()->getPathGroup()));
+				dynamic_cast<const CommercialLine&>(*row.first.getService()->getPath()->getPathGroup()).toParametersMap(pm);
 
 				// Transport mode
 				const JourneyPattern* line(static_cast<const JourneyPattern*>(row.first.getService()->getPath()));
@@ -992,7 +991,7 @@ namespace synthese
 			)	);
 
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			PTObjectsCMSExporters::ExportStopArea(pm, *place);
+			place->toParametersMap(pm);
 			pm.insert(DATA_IS_SAME_CITY, lastDisplayedStopWasInTheSameCity);
 			pm.insert(DATA_TIME, to_iso_extended_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).date()) +" "+ to_simple_string((rank ? object.getArrivalDateTime() : object.getDepartureDateTime()).time_of_day()));
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
@@ -1064,8 +1063,8 @@ namespace synthese
 				pm.insert(DATA_TRANSPORT_MODE, line->getRollingStock()->getKey());
 			}
 
-			PTObjectsCMSExporters::ExportLine(pm, *line->getCommercialLine());
-			PTObjectsCMSExporters::ExportStopArea(pm, *place);
+			line->getCommercialLine()->toParametersMap(pm);
+			place->toParametersMap(pm);
 
 			{ // Departure time
 				stringstream s;
@@ -1132,7 +1131,7 @@ namespace synthese
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
-			PTObjectsCMSExporters::ExportStopArea(pm, *screen.getDisplayedPlace());
+			screen.getDisplayedPlace()->toParametersMap(pm);
 			
 			// Rows
 			if(rowPage.get())
@@ -1258,7 +1257,7 @@ namespace synthese
 				}
 
 				// Line
-				PTObjectsCMSExporters::ExportLine(pm, *static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine());
+				static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm);
 
 				// Transport mode
 				const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
@@ -1277,11 +1276,7 @@ namespace synthese
 					str << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << s.getDepartureDateTime().time_of_day().minutes();
 					pm.insert(DATA_SECOND_TIME, str.str());
 
-					PTObjectsCMSExporters::ExportLine(
-						pm,
-						*static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine(),
-						DATA_SECOND_
-					);
+					static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath())->getCommercialLine()->toParametersMap(pm, DATA_SECOND_);
 
 					const JourneyPattern* jp(static_cast<const JourneyPattern*>(s.getDepartureEdge()->getParentPath()));
 					if(jp->getRollingStock())
@@ -1333,7 +1328,7 @@ namespace synthese
 			const pt::StopArea& place
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			PTObjectsCMSExporters::ExportStopArea(pm, place);
+			place.toParametersMap(pm);
 
 			// Launch of the display
 			page->display(stream, request, pm);

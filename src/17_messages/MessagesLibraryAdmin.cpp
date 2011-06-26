@@ -108,7 +108,7 @@ namespace synthese
 
 
 
-		server::ParametersMap MessagesLibraryAdmin::getParametersMap() const
+		util::ParametersMap MessagesLibraryAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_folder.get()) m.insert(Request::PARAMETER_OBJECT_ID, _folder->getKey());

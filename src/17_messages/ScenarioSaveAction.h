@@ -42,6 +42,7 @@ namespace synthese
 
 	namespace messages
 	{
+		class SentAlarm;
 		class ScenarioFolder;
 		class ScenarioTemplate;
 
@@ -68,8 +69,17 @@ namespace synthese
 			static const std::string PARAMETER_MESSAGE_TO_CREATE;
 			static const std::string PARAMETER_RECIPIENT_ID;
 			static const std::string PARAMETER_LEVEL;
+			static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
+			static const std::string PARAMETER_RECIPIENT_TYPE;
+			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
 
 		private:
+			//! @name Datasources
+			//@{
+				boost::shared_ptr<const impex::DataSource> _scenarioDataSource;
+				boost::shared_ptr<const impex::DataSource> _recipientDataSource;
+			//@}
+
 			//! @name Scenario to update
 			//@{
 				boost::shared_ptr<Scenario>				_scenario;
@@ -87,7 +97,10 @@ namespace synthese
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
 				boost::optional<util::RegistryKeyType>				_recipientId;
+				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
+				std::string											_dataSourceLinkId;
+				boost::shared_ptr<SentAlarm>						_message;
 			//@}
 
 			//! @name Action to do
@@ -103,7 +116,7 @@ namespace synthese
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @author Hugues Romain
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
@@ -113,7 +126,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// @author Hugues Romain
 			///	@exception ActionException Occurs when some parameters are missing or incorrect.
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			/** Constructor.

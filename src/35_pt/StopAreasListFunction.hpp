@@ -35,6 +35,11 @@ namespace synthese
 {
 	class CoordinatesSystem;
 
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace cms
 	{
 		class Webpage;
@@ -60,36 +65,46 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LINES;
 			static const std::string PARAMETER_STOP_PAGE_ID;
 			static const std::string PARAMETER_LINE_PAGE_ID;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 
+		private:
+			static const std::string DATA_LINE;
 			static const std::string DATA_LINES;
+			static const std::string DATA_STOP_RANK;
+			static const std::string DATA_STOP_AREA;
+			static const std::string DATA_STOP_AREAS;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const pt::CommercialLine> _commercialLine;
+				boost::shared_ptr<const geography::City> _city;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
 				bool _outputLines;
 				boost::shared_ptr<const cms::Webpage> _stopPage;
 				boost::shared_ptr<const cms::Webpage> _linePage;
+				std::string _outputFormat;
 			//@}
 
 			//! @name Setters
 			//@{
+				void setCity(boost::shared_ptr<const geography::City> value){ _city = value; }
 				void setStopPage(boost::shared_ptr<const cms::Webpage> value){ _stopPage = value; }
 				void setLinePage(boost::shared_ptr<const cms::Webpage> value){ _linePage = value; }
+				void setOutputFormat(const std::string& value){ _outputFormat = value; }
 			//@}
 
 
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			StopAreasListFunction();

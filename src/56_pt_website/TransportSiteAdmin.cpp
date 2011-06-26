@@ -189,7 +189,7 @@ namespace synthese
 
 
 
-		server::ParametersMap TransportSiteAdmin::getParametersMap() const
+		util::ParametersMap TransportSiteAdmin::getParametersMap() const
 		{
 			ParametersMap m(_pageSearchParameter.getParametersMap());
 			m.insert(PARAMETER_START_CITY, _startCity);

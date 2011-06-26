@@ -33,6 +33,7 @@ namespace synthese
 {
 	using namespace cms;
 	using namespace server;
+	using namespace util;
 
 	namespace messages
 	{

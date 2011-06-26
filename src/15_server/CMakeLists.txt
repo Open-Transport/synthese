@@ -37,8 +37,6 @@ ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
 ModuleException.h
-ParametersMap.cpp
-ParametersMap.h
 QuitAction.cpp
 QuitAction.hpp
 random_device.cpp

@@ -32,6 +32,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace server;
+	using namespace util;
 
 	namespace cms
 	{

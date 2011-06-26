@@ -86,7 +86,7 @@ namespace synthese
 
 
 
-		server::ParametersMap UserAdmin::getParametersMap() const
+		util::ParametersMap UserAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_user.get()) m.insert(Request::PARAMETER_OBJECT_ID, _user->getKey());

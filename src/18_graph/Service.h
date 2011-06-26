@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace graph
 	{
 		class Path;
@@ -61,10 +66,14 @@ namespace synthese
 
 			@ingroup m18
 		*/
-		class Service
-		:	public RuleUser,
+		class Service:
+			public RuleUser,
 			public virtual util::Registrable
 		{
+		private:
+			static const std::string DATA_SERVICE_ID;
+			static const std::string DATA_SERVICE_NUMBER;
+
 		public:
 			typedef std::vector<const Vertex*> ServedVertices;
 			static const boost::posix_time::time_duration DAY_DURATION;
@@ -255,6 +264,12 @@ namespace synthese
 			/// @param value the duration to transform
 			/// @result the time of day duration
 			static boost::posix_time::time_duration GetTimeOfDay(const boost::posix_time::time_duration& value);
+
+
+			void toParametersMap(
+				util::ParametersMap& pm,
+				std::string prefix = std::string()
+			) const;
 		};
 	}
 }

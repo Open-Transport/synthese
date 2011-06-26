@@ -29,7 +29,7 @@
 #include "FactoryException.h"
 
 #include "HTMLForm.h"
-
+#include "URI.hpp"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "RequestWithInterface.h"
@@ -106,21 +106,21 @@ namespace synthese
 				stringstream s;
 				s	<<
 					request->getClientURL() << Request::PARAMETER_STARTER <<
-					Request::PARAMETER_SERVICE << Request::PARAMETER_ASSIGNMENT << functionKey
-					<< Request::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << Request::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
+					Request::PARAMETER_SERVICE << URI::PARAMETER_ASSIGNMENT << functionKey
+					<< URI::PARAMETER_SEPARATOR << RequestWithInterface::PARAMETER_INTERFACE << URI::PARAMETER_ASSIGNMENT << _page->getInterface()->getKey()
 					;
 
 
 				if (!functionParameters.empty())
-					s << Request::PARAMETER_SEPARATOR << functionParameters;
+					s << URI::PARAMETER_SEPARATOR << functionParameters;
 				if (!actionKey.empty())
 				{
-					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_ACTION << Request::PARAMETER_ASSIGNMENT << actionKey;
+					s << URI::PARAMETER_SEPARATOR << Request::PARAMETER_ACTION << URI::PARAMETER_ASSIGNMENT << actionKey;
 					if (!actionParameters.empty())
-						s << Request::PARAMETER_SEPARATOR << actionParameters;
+						s << URI::PARAMETER_SEPARATOR << actionParameters;
 				}
 				if (request->getSession())
-					s << Request::PARAMETER_SEPARATOR << Request::PARAMETER_SESSION << Request::PARAMETER_ASSIGNMENT << request->getSession()->getKey();
+					s << URI::PARAMETER_SEPARATOR << Request::PARAMETER_SESSION << URI::PARAMETER_ASSIGNMENT << request->getSession()->getKey();
 
 				HTTPRequest q;
 				q.uri = s.str();

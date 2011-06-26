@@ -136,7 +136,9 @@ namespace synthese
 					ParametersMap pm(_savedParameters);
 					pm.remove(PARAMETER_PAGE_ID);
 					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
-					string parameters(pm.getURI());
+					stringstream uri;
+					pm.outputURI(uri);
+					string parameters(uri.str());
 					if(!parameters.empty())
 					{
 						url << Request::PARAMETER_STARTER << parameters;
@@ -198,7 +200,7 @@ namespace synthese
 
 
 
-		void WebPageDisplayFunction::addParameters( const server::ParametersMap& value )
+		void WebPageDisplayFunction::addParameters( const util::ParametersMap& value )
 		{
 			BOOST_FOREACH(const ParametersMap::Map::value_type& param, value.getMap())
 			{

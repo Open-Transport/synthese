@@ -151,6 +151,7 @@ namespace synthese
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<GTFSFileFormat>(env, dataSource),
 			Importer(env, dataSource),
+			PTDataCleanerFileFormat(env, dataSource),
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
@@ -684,9 +685,11 @@ namespace synthese
 
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			t.getForm().addHiddenField(PARAMETER_FROM_TODAY, string("1"));
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier stops", t.getForm().getTextInput(_getFileParameterName(FILE_STOPS), _pathsMap[FILE_STOPS].file_string()));
 			stream << t.cell("Fichier transfers (optionnel)", t.getForm().getTextInput(_getFileParameterName(FILE_TRANSFERS), _pathsMap[FILE_TRANSFERS].file_string()));
@@ -798,7 +801,7 @@ namespace synthese
 
 
 
-		server::ParametersMap GTFSFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap GTFSFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
@@ -816,7 +819,7 @@ namespace synthese
 
 
 
-		void GTFSFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void GTFSFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));

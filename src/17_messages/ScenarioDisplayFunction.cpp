@@ -102,7 +102,7 @@ namespace synthese
 					UP_LINKS_LOAD_LEVEL
 				);
 			}
-			catch(ObjectNotFoundException<Scenario>& e)
+			catch(ObjectNotFoundException<Scenario>&)
 			{
 				throw RequestException("No such scenario");
 			}
@@ -157,7 +157,7 @@ namespace synthese
 			const Request& request
 		) const {
 
-			bool isTemplate(dynamic_cast<const ScenarioTemplate*>(_scenario.get()));
+			bool isTemplate(dynamic_cast<const ScenarioTemplate*>(_scenario.get()) != NULL);
 
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 

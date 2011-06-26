@@ -85,12 +85,12 @@ namespace synthese
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				@param map Parameters map to interpret
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 			void _displayItems(
 				std::ostream& stream,

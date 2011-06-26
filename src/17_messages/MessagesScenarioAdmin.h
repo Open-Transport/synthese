@@ -91,17 +91,17 @@ namespace synthese
 				@param request The request to use for the initialization.
 			*/
 			virtual void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 
 
 			/** Parameters map generator, used when building an url to the admin page.
-					@return server::ParametersMap The generated parameters map
+					@return util::ParametersMap The generated parameters map
 					@author Hugues Romain
 					@date 2007
 				*/
-			virtual server::ParametersMap getParametersMap() const;
+			virtual util::ParametersMap getParametersMap() const;
 
 
 

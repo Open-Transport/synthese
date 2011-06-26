@@ -72,13 +72,13 @@ namespace synthese
 		///
 		/// @ingroup m15
 		//////////////////////////////////////////////////////////////////////////
-		class Function
-		:	public util::FactoryBase<Function>
+		class Function:
+			public util::FactoryBase<Function>
 		{
 		public:
 
 		protected:
-			server::ParametersMap _savedParameters;
+			util::ParametersMap _savedParameters;
 			boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -95,13 +95,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				boost::shared_ptr<util::Env> getEnv() const { return _env; }
-				const server::ParametersMap& getSavedParameters() const { return _savedParameters; }
+				const util::ParametersMap& getSavedParameters() const { return _savedParameters; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setEnv(boost::shared_ptr<util::Env> value){ _env = value; }
-				void setSavedParameters(const ParametersMap& value){ _savedParameters = value; }
+				void setSavedParameters(const util::ParametersMap& value){ _savedParameters = value; }
 				void removeSavedParameter(const std::string& key){ _savedParameters.remove(key); }
 			//@}
 
@@ -110,7 +110,7 @@ namespace synthese
 			/** Conversion from attributes to generic parameter maps.
 				@return The generated parameters map
 			*/
-			virtual ParametersMap _getParametersMap() const = 0;
+			virtual util::ParametersMap _getParametersMap() const = 0;
 
 
 			/** Gets the Mime type of the data produced by the function.
@@ -140,7 +140,7 @@ namespace synthese
 				@param map The map to interpret (comes from _parseString())
 				@throw RequestException if a parameter is missing or has corrupted value
 			*/
-			virtual void _setFromParametersMap(const ParametersMap& map) = 0;
+			virtual void _setFromParametersMap(const util::ParametersMap& map) = 0;
 
 
 

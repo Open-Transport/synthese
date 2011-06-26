@@ -59,7 +59,7 @@ namespace synthese
 		protected:
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
@@ -67,7 +67,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			///	Removes the used parameters from the map.
 			///	@throws ActionException Occurs when some parameters are missing or incorrect.
-			void _setFromParametersMap(const server::ParametersMap& map) throw(server::ActionException);
+			void _setFromParametersMap(const util::ParametersMap& map) throw(server::ActionException);
 
 		public:
 

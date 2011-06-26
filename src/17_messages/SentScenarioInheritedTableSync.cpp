@@ -31,6 +31,7 @@
 #include "SentAlarm.h"
 #include "ReplaceQuery.h"
 #include "UpdateQuery.hpp"
+#include "ImportableTableSync.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
@@ -45,7 +46,7 @@ namespace synthese
 	using namespace db;
 	using namespace messages;
 	using namespace util;
-
+	using namespace impex;
 
 	template<>
 	const string util::FactorableTemplate<ScenarioTableSync,SentScenarioInheritedTableSync>::FACTORY_KEY("SentScenarioInheritedTableSync");
@@ -95,18 +96,28 @@ namespace synthese
 				{
 					obj->setTemplate(ScenarioTemplateInheritedTableSync::Get(id, env, linkLevel).get());
 				}
-				catch(Exception& e)
+				catch(Exception&)
 				{
 				}
+
+				// Data source links
+				obj->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
 			}
 		}
+
+
 
 		template<>
 		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Unlink(
 			SentScenario* obj
 		){
-
 		}
+
+
 
 		template<>
 		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Save(
@@ -140,6 +151,7 @@ namespace synthese
 			query.addField(UNKNOWN_VALUE);
 			query.addField(vars.str());
 			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(obj->getDataSourceLinks()));
 			query.execute(transaction);
 
 			// Alarms query

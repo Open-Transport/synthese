@@ -77,13 +77,13 @@ namespace synthese
 		protected:
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 
 

@@ -124,7 +124,7 @@ namespace synthese
 
 
 
-		server::ParametersMap TimetableAdmin::getParametersMap() const
+		util::ParametersMap TimetableAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_timetable.get()) m.insert(Request::PARAMETER_OBJECT_ID, _timetable->getKey());

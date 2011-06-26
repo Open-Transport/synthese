@@ -80,7 +80,7 @@ namespace synthese
 
 
 
-		server::ParametersMap ResaLogAdmin::getParametersMap() const
+		util::ParametersMap ResaLogAdmin::getParametersMap() const
 		{
 			ParametersMap m(_log.getParametersMap());
 			return m;

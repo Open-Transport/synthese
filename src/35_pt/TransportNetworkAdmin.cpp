@@ -96,7 +96,7 @@ namespace synthese
 
 
 
-		server::ParametersMap TransportNetworkAdmin::getParametersMap() const
+		util::ParametersMap TransportNetworkAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_SEARCH_NAME,_searchName);

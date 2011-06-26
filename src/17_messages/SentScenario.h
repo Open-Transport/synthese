@@ -28,6 +28,7 @@
 #include "MessagesTypes.h"
 #include "Registry.h"
 #include "Scenario.h"
+#include "Importable.h"
 
 #include <map>
 #include <string>
@@ -42,8 +43,9 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////
 		/// Sent scenario instance class.
 		///	@ingroup m17
-		class SentScenario
-		:	public Scenario
+		class SentScenario:
+			public Scenario,
+			public impex::Importable
 		{
 		public:
 

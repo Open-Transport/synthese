@@ -81,12 +81,12 @@ namespace synthese
 			/** Conversion from attributes to generic parameter maps.
 				@warning Not yet implemented;
 			*/
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 			/** Conversion from generic parameters map to attributes.
 				@param map Map to read
 			*/
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			/** Action to run, defined by each subclass.

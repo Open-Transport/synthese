@@ -70,7 +70,7 @@ namespace synthese
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -82,7 +82,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			/** Action to run, defined by each subclass.

@@ -113,7 +113,7 @@ namespace synthese
 
 
 
-		server::ParametersMap DisplayScreenCPUAdmin::getParametersMap() const
+		util::ParametersMap DisplayScreenCPUAdmin::getParametersMap() const
 		{
 			ParametersMap m;
 			if(_cpu.get()) m.insert(Request::PARAMETER_OBJECT_ID, _cpu->getKey());

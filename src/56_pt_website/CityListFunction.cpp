@@ -81,7 +81,7 @@ namespace synthese
 
 
 
-		void CityListFunction::_setFromParametersMap( const server::ParametersMap& map )
+		void CityListFunction::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 

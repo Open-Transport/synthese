@@ -740,7 +740,7 @@ namespace synthese
 
 
 
-		server::ParametersMap IneoFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap IneoFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops);
@@ -758,7 +758,7 @@ namespace synthese
 
 
 
-		void IneoFileFormat::Importer_::_setFromParametersMap( const server::ParametersMap& map )
+		void IneoFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			if(map.isDefined(PARAMETER_NETWORK_ID)) try
 			{

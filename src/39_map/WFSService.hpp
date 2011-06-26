@@ -93,7 +93,7 @@ namespace synthese
 			/// @author RCSobility
 			/// @date 2010
 			/// @since 3.2.1
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 
 
@@ -106,7 +106,7 @@ namespace synthese
 			/// @date 2010
 			/// @since 3.2.1
 			virtual void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 

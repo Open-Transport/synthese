@@ -22,6 +22,7 @@
 
 #include "RollingStock.h"
 #include "Registry.h"
+#include "ParametersMap.h"
 
 using namespace std;
 
@@ -37,6 +38,9 @@ namespace synthese
 
 	namespace pt
 	{
+		const string RollingStock::DATA_ID("id");
+		const string RollingStock::DATA_NAME("name");
+		const string RollingStock::DATA_ARTICLE("article");
 
 
 		RollingStock::RollingStock(
@@ -58,6 +62,18 @@ namespace synthese
 		PathClass::Identifier RollingStock::getIdentifier() const
 		{
 			return getKey();
+		}
+
+
+
+		void RollingStock::toParametersMap(
+			util::ParametersMap& pm,
+			std::string prefix /*= std::string() */
+		) const {
+
+			pm.insert(DATA_ID, getKey());
+			pm.insert(DATA_NAME, getName());
+			pm.insert(DATA_ARTICLE, getArticle());
 		}
 	}
 }

@@ -37,6 +37,7 @@ namespace synthese
 {
 	using namespace server;
 	using namespace security;
+	using namespace util;
 
 	namespace util
 	{

@@ -41,6 +41,10 @@ namespace synthese
 	namespace server
 	{
 		class Request;
+	}
+
+	namespace util
+	{
 		class ParametersMap;
 	}
 
@@ -122,7 +126,7 @@ namespace synthese
 				* @param searchObjectId
 				*/
 				void set(
-					const server::ParametersMap& map,
+					const util::ParametersMap& map,
 					std::string logKey,
 					boost::optional<util::RegistryKeyType> searchObjectId = boost::optional<util::RegistryKeyType>(),
 					boost::optional<util::RegistryKeyType> searchObjectId2 = boost::optional<util::RegistryKeyType>(),
@@ -150,7 +154,7 @@ namespace synthese
 					const security::Profile& profile
 				) const;
 
-				server::ParametersMap getParametersMap(
+				util::ParametersMap getParametersMap(
 				) const;
 			//@}
 

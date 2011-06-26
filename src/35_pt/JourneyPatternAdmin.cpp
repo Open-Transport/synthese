@@ -132,7 +132,7 @@ namespace synthese
 
 
 
-		server::ParametersMap JourneyPatternAdmin::getParametersMap() const
+		util::ParametersMap JourneyPatternAdmin::getParametersMap() const
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			if(_line.get()) m.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());

@@ -54,7 +54,7 @@ namespace synthese
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
 			*/
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Public function with site copy.

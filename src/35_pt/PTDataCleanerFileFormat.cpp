@@ -46,12 +46,14 @@ namespace synthese
 		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
 		const string PTDataCleanerFileFormat::PARAMETER_END_DATE("end_date");
 		const string PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA("clean_old_data");
+		const string PTDataCleanerFileFormat::PARAMETER_FROM_TODAY("from_today");
 
 		PTDataCleanerFileFormat::PTDataCleanerFileFormat(
 			util::Env& env,
 			const DataSource& dataSource
 		):	Importer(env, dataSource),
-			_cleanOldData(true)
+			_cleanOldData(true),
+			_fromToday(false)
 		{}
 
 
@@ -65,6 +67,7 @@ namespace synthese
 
 			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
 
+			date now(gregorian::day_clock::local_day());
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
@@ -80,7 +83,18 @@ namespace synthese
 						}
 
 						NonPermanentService* service(static_cast<NonPermanentService*>(itService));
-						service->subDates(_calendar);
+						if(_fromToday)
+						{
+							if(now <= service->getLastActiveDate())
+							{
+								Calendar dates(now, service->getLastActiveDate());
+								service->subDates(dates);
+							}
+						}
+						else
+						{
+							service->subDates(_calendar);
+						}
 					}
 				}
 			}
@@ -175,7 +189,7 @@ namespace synthese
 		bool PTDataCleanerFileFormat::beforeParsing()
 		{
 			_cleanCalendars();
-			return !_cleanOldData || !_calendar.empty();
+			return !_cleanOldData || !_calendar.empty() || _fromToday;
 		}
 
 
@@ -188,7 +202,7 @@ namespace synthese
 
 
 
-		void PTDataCleanerFileFormat::_setFromParametersMap( const server::ParametersMap& map )
+		void PTDataCleanerFileFormat::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			_cleanOldData = map.getDefault<bool>(PARAMETER_CLEAN_OLD_DATA, true);
 
@@ -211,38 +225,43 @@ namespace synthese
 				_endDate = from_string(map.get<string>(PARAMETER_END_DATE));
 			}
 
+			_fromToday = map.getDefault<bool>(PARAMETER_FROM_TODAY, false);
+
 			_calendar.clear();
-			if(_calendarTemplate.get())
+			if(!_fromToday)
 			{
-				if(_startDate && _endDate)
+				if(_calendarTemplate.get())
 				{
-					_calendar = _calendarTemplate->getResult(Calendar(*_startDate, *_endDate));
-				}
-				else if(_calendarTemplate->isLimited())
-				{
-					_calendar = _calendarTemplate->getResult();
-					if(_startDate)
+					if(_startDate && _endDate)
 					{
-						_calendar &= Calendar(*_startDate, _calendar.getLastActiveDate());
+						_calendar = _calendarTemplate->getResult(Calendar(*_startDate, *_endDate));
 					}
-					if(_endDate)
+					else if(_calendarTemplate->isLimited())
 					{
-						_calendar &= Calendar(_calendar.getFirstActiveDate(), *_endDate);
+						_calendar = _calendarTemplate->getResult();
+						if(_startDate)
+						{
+							_calendar &= Calendar(*_startDate, _calendar.getLastActiveDate());
+						}
+						if(_endDate)
+						{
+							_calendar &= Calendar(_calendar.getFirstActiveDate(), *_endDate);
+						}
 					}
 				}
-			}
-			else
-			{
-				if(_startDate && _endDate)
+				else
 				{
-					_calendar = Calendar(*_startDate, *_endDate);
+					if(_startDate && _endDate)
+					{
+						_calendar = Calendar(*_startDate, *_endDate);
+					}
 				}
 			}
 		}
 
 
 
-		server::ParametersMap PTDataCleanerFileFormat::_getParametersMap() const
+		util::ParametersMap PTDataCleanerFileFormat::_getParametersMap() const
 		{
 			ParametersMap result;
 			result.insert(PARAMETER_CLEAN_OLD_DATA, _cleanOldData);
@@ -258,6 +277,7 @@ namespace synthese
 			{
 				result.insert(PARAMETER_END_DATE, *_endDate);
 			}
+			result.insert(PARAMETER_FROM_TODAY, _fromToday);
 			return result;
 		}
 }	}
