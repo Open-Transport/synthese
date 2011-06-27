@@ -58,6 +58,7 @@ BUILD_DEFAULT_CONFIG = {
 INSTANCE_DEFAULT_CONFIG = {
     'BUILD': 'trunk_debug',
     'RSYNC_OPTS': '',
+    'RSYNC_USER': '',
     'DEFAULT_SITE': 'default',
     'SITES': [{
         'NAME': 'default',
@@ -222,6 +223,8 @@ def init_db():
 
 @cmd('Fetch database from server')
 def fetch_db():
+    # TODO: call dump_db to save existing database.
+    # TODO: save to config.db3
     target = 'config-{date}.db3'.format(
         date=datetime.datetime.now().strftime('%Y%m%d-%H%M'))
     log.info('Fetching db to %r', join(db_path, target))
@@ -231,13 +234,10 @@ def fetch_db():
     shutil.copy(join(db_path, target), join(db_path, 'config.db3'))
 
 
-@cmd('Open database in spatialite-gui')
-def view_db():
-    call([config.SPATIALITE_GUI_PATH, join(db_path, 'config.db3')], bg=True)
-
-
 @cmd('Dump database to text file')
 def dump_db():
+    # TODO: gzip dump.
+    # TODO: launch an editor which can read .gzip file.
     args = [config.SPATIALITE_PATH, join(db_path, 'config.db3'), '.dump']
     log.debug('Running: %r', args)
     if options.dummy:
@@ -245,6 +245,8 @@ def dump_db():
         return
     p = subprocess.Popen(args, stdout=subprocess.PIPE)
     output = p.communicate()[0]
+    # Remove the Spatialite header, which isn't valid SQL.
+    output = output[output.index('BEGIN TRANSACTION'):]
     target = join(
         db_path, 'config-{date}.dump'.format(
             date=datetime.datetime.now().strftime('%Y%m%d-%H%M')))
@@ -259,6 +261,17 @@ def dump_db():
 
     if os.path.isfile(config.EDITOR_PATH):
         call([config.EDITOR_PATH, final_target], bg=True)
+
+
+@cmd('Restore a database from a text file dump')
+def restore_db():
+    # TODO
+    pass
+
+
+@cmd('Open database in spatialite-gui')
+def view_db():
+    call([config.SPATIALITE_GUI_PATH, join(db_path, 'config.db3')], bg=True)
 
 
 @cmd('Open spatialite shell with database')
@@ -276,8 +289,8 @@ def fetch_assets():
         params['remote_path'] = site['REMOTE_PATH']
         params['assets_path'] = _to_cygwin_path(
             join(instance_path, 'assets', site['NAME']))
-        call('rsync -av {RSYNC_OPTS} --delete --delete-excluded '
-            '{SERVER}:{remote_path} {assets_path}'.format(**params))
+        call('rsync -avz {RSYNC_OPTS} --delete --delete-excluded '
+            '{RSYNC_USER}{SERVER}:{remote_path} {assets_path}'.format(**params))
 
 
 # Daemon
