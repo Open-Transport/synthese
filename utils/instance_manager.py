@@ -42,7 +42,7 @@ import utils
 log = logging.getLogger(__name__)
 
 DEFAULT_CONFIG = {
-    'SPATIALITE_PATH': None,
+    'SPATIALITE_PATH': 'spatialite',
     'BUILDS': {
         'trunk_debug': {
         },
@@ -135,6 +135,8 @@ def maybe_mkdir(path):
     os.makedirs(path)
 
 def _to_cygwin_path(path):
+    if sys.platform != 'win32':
+        return path
     cygproc = subprocess.Popen(
         ("cygpath", "-a", "-u", path), stdout=subprocess.PIPE)
     (stdout_content, stderr_content) = cygproc.communicate()
@@ -262,7 +264,7 @@ def _ssh_command_line(with_server=True, extra_opts=''):
 
 def _rsync(remote_path, local_path):
     call('rsync -avz --delete --delete-excluded '
-        '-e {rsync_opts} "{ssh_command_line}" '
+        '{rsync_opts} -e "{ssh_command_line}" '
         '{server}:{remote_path} {local_path}'.format(
         rsync_opts=instance_config.RSYNC_OPTS,
         ssh_command_line=_ssh_command_line(False),
@@ -464,6 +466,7 @@ def shell_db():
 
 @cmd('Fetch assets from server')
 def fetch_assets():
+    maybe_mkdir(join(instance_path, 'assets'))
     params = instance_config.__dict__.copy()
     for site in instance_config.SITES:
         _rsync(site['REMOTE_PATH'], join(instance_path, 'assets', site['NAME']))
