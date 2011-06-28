@@ -222,11 +222,11 @@ namespace synthese
 			const Request& request
 		) const {
 
-			//Key Is stop Area Name
-			typedef map<string,const StopArea *> stopMap;
+			// Key is Stop Area key
+			typedef map<RegistryKeyType, const StopArea *> stopMap;
 			stopMap stopAreaMap;
 
-			//Populate stopAreaMap
+			// Populate stopAreaMap
 			if(_commercialLine.get())
 			{
 				BOOST_FOREACH(const Path* path, _commercialLine->getPaths())
@@ -237,7 +237,7 @@ namespace synthese
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
 
-						stopAreaMap[connPlace->getName()] = connPlace;
+						stopAreaMap[connPlace->getKey()] = connPlace;
 					}
 				}
 			}
@@ -245,7 +245,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& itStopArea, _city->getLexicalMatcher(FactorableTemplate<NamedPlace,StopArea>::FACTORY_KEY).entries())
 				{
-					stopAreaMap[itStopArea.second->getName()] = dynamic_cast<StopArea*>(itStopArea.second.get());
+					stopAreaMap[itStopArea.second->getKey()] = dynamic_cast<StopArea*>(itStopArea.second.get());
 				}
 			}
 			else
@@ -258,7 +258,7 @@ namespace synthese
 						continue;
 					}
 
-					stopAreaMap[stopArea.second->getName()] = stopArea.second.get();
+					stopAreaMap[stopArea.second->getKey()] = stopArea.second.get();
 				}
 			}
 
