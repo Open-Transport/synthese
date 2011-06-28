@@ -23,6 +23,7 @@
 
 
 import datetime
+import gzip
 import logging
 import optparse
 import os
@@ -34,6 +35,10 @@ import subprocess
 import sys
 import webbrowser
 
+thisdir = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(thisdir, os.pardir, 'tools', 'synthesepy'))
+import utils
+
 log = logging.getLogger(__name__)
 
 DEFAULT_CONFIG = {
@@ -43,7 +48,10 @@ DEFAULT_CONFIG = {
         },
     },
     'ENV': {},
-    'SSH_OPTIONS': '',
+    'SSH_GLOBAL_OPTS': '',
+    'MYSQL_HOST': '',
+    'MYSQL_ROOT_PW': '',
+    'MYSQL_SYNTHESE_PW': '',
 }
 
 BUILD_DEFAULT_CONFIG = {
@@ -56,7 +64,13 @@ BUILD_DEFAULT_CONFIG = {
 }
 
 INSTANCE_DEFAULT_CONFIG = {
+    'DB_BACKEND': 'sqlite',
+    'DB_NAME': 'synthese',
+    'DB_USER': 'synthese',
+    'DB_PW': '',
+    'MYSQLDUMP_OPTS': '',
     'BUILD': 'trunk_debug',
+    'SSH_OPTS': '',
     'RSYNC_OPTS': '',
     'RSYNC_USER': '',
     'DEFAULT_SITE': 'default',
@@ -67,7 +81,6 @@ INSTANCE_DEFAULT_CONFIG = {
     }],
 }
 
-thisdir = os.path.abspath(os.path.dirname(__file__))
 options = None
 instance = None
 config = {}
@@ -75,7 +88,10 @@ build_config = {}
 instance_config = {}
 base_path = None
 instance_path = None
+is_sqlite = False
+is_mysql = False
 db_path = None
+db_file = None
 
 
 # Utils
@@ -83,6 +99,9 @@ db_path = None
 def call(cmd, shell=True, **kwargs):
     global options
     log.debug('Running command: %r', cmd)
+    if 'input' in kwargs:
+        log.debug('With %s bytes of input', len(kwargs['input']))
+
     if options.dummy:
         # TODO: show environment too.
         cmdline = cmd
@@ -91,12 +110,20 @@ def call(cmd, shell=True, **kwargs):
         dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
             'cwd' in kwargs else '')
         log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
-
         return
+
     if 'bg' in kwargs:
         del kwargs['bg']
         subprocess.Popen(cmd, **kwargs)
         return
+    if 'input' in kwargs:
+        input = kwargs['input']
+        del kwargs['input']
+        p = subprocess.Popen(
+            cmd, shell=shell, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = p.communicate(input)[0]
+        return output
+
     env = os.environ.copy()
     env.update(config.ENV)
     kwargs['env'] = env
@@ -114,10 +141,12 @@ def _to_cygwin_path(path):
     return stdout_content.rstrip()
 
 
-
 def load_config():
-    global options, config, build_config, instance_config
+    global options, config, build_config, instance_config, is_sqlite, is_mysql
     config = DEFAULT_CONFIG.copy()
+    # Symbols exported for the config to use.
+    config['base_path'] = base_path
+    config['to_cygwin_path'] = _to_cygwin_path
 
     for suffix in ['', '_local', '_local_' + socket.gethostname()]:
         config_path = join(
@@ -173,16 +202,38 @@ def load_config():
     log.debug('Config:\n %s', pprint.pformat(config.__dict__))
     if instance_config:
         log.debug('Instance config:\n %s', pprint.pformat(instance_config.__dict__))
+        is_sqlite = instance_config.DB_BACKEND == 'sqlite'
+        is_mysql = instance_config.DB_BACKEND == 'mysql'
     log.debug('Build config:\n %s', pprint.pformat(build_config.__dict__))
 
 
+def prepare_environment():
+    # Add MySQL tools to the path
+    if sys.platform != 'win32':
+        return
+
+    thirdparty_dir = os.environ.get(
+        'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
+
+    # Keep this in sync with tools/synthesepy/build.py
+    utils.append_paths_to_environment('PATH', [
+        os.path.join(thirdparty_dir, 'mysql-5.5.12-win32', 'bin')])
+
+
 def _run_synthesepy(command, global_args=[], command_args=[]):
-    # TODO: mysql
+    if is_sqlite:
+        dbconn = 'sqlite://debug=1,path=' + db_file
+    elif is_mysql:
+        dbconn = ('mysql://debug=1,user={user},'
+            'passwd={pw},host={host},db={db}'.format(
+                user='synthese', pw=config.MYSQL_SYNTHESE_PW,
+                host=config.MYSQL_HOST, db='synthese_' + instance))
+    else:
+        assert False
 
     if instance_config:
         global_args.extend(
-            ['--dbconn',
-                'sqlite://debug=1,path=' + join(db_path, 'config.db3'),
+            ['--dbconn', dbconn,
              '--port', str(instance_config.PORT)])
     global_args.extend(build_config.SYNTHESEPY_ARGS)
 
@@ -202,6 +253,26 @@ try:
 except ImportError:
     commands = {}
 
+
+def _ssh_command_line(with_server=True, extra_opts=''):
+    return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {server}'.format(
+        extra_opts=extra_opts,
+        ssh_global_opts=config.SSH_GLOBAL_OPTS,
+        ssh_opts=instance_config.SSH_OPTS,
+        server=instance_config.SERVER if with_server else '')
+
+
+def _rsync(remote_path, local_path):
+    call('rsync -avz --delete --delete-excluded '
+        '-e {rsync_opts} "{ssh_command_line}" '
+        '{server}:{remote_path} {local_path}'.format(
+        rsync_opts=instance_config.RSYNC_OPTS,
+        ssh_command_line=_ssh_command_line(False),
+        server=instance_config.SERVER,
+        remote_path=remote_path,
+        local_path=_to_cygwin_path(local_path)))
+
+
 class cmd(object):
     def __init__(self, help, requires_instance=True):
         self.help = help
@@ -216,6 +287,36 @@ class cmd(object):
 
 # Database
 
+def _mysql_command(command, user, pw, host, db='', port=3306, extra_opts='', input=''):
+    cmd = '{command} {extra_opts} -u{user} -p{pw} -h{host} -P{port} {db}'.format(
+        command=command, extra_opts=extra_opts, user=user, pw=pw, host=host,
+        db=db, port=port
+    )
+    if input is not None:
+        return call(cmd, input=input)
+    else:
+        call(cmd)
+
+@cmd('Creates the local database (mysql only)')
+def create_db():
+    """
+    This assumes you already have a 'synthese' user, which as a password
+    of MYSQL_SYNTHESE_PW
+    """
+    if not is_mysql:
+        raise Exception('This command is only for MySQL')
+
+    create_sql = """
+        CREATE DATABASE IF NOT EXISTS `synthese_{instance}` ;
+        GRANT ALL PRIVILEGES ON `synthese_{instance}` . * TO 'synthese'@'%';
+    """.format(instance=instance)
+
+    _mysql_command(
+        'mysql', 'root', config.MYSQL_ROOT_PW,
+        config.MYSQL_HOST, input=create_sql)
+
+
+
 @cmd('Initialize database (Warning: Destroys existing data!)')
 def init_db():
     _run_synthesepy('initdb')
@@ -223,60 +324,141 @@ def init_db():
 
 @cmd('Fetch database from server')
 def fetch_db():
-    # TODO: call dump_db to save existing database.
-    # TODO: save to config.db3
-    target = 'config-{date}.db3'.format(
-        date=datetime.datetime.now().strftime('%Y%m%d-%H%M'))
-    log.info('Fetching db to %r', join(db_path, target))
-    call('rsync -avz {server}:/srv/data/s3-server/config.db3 {target}'.format(
-        server=instance_config.SERVER, target=target), cwd=db_path)
-    log.info('Copying to %r', join(db_path, 'config.db3'))
-    shutil.copy(join(db_path, target), join(db_path, 'config.db3'))
+    dump_db(missing_db_fatal=False, save_uncompressed=False)
+    if is_sqlite:
+        log.info('Fetching db to %r', db_file)
+        _rsync('/srv/data/s3-server/config.db3', db_file)
+    elif is_mysql:
+
+        # With MySQL, this is done in two steps: dump the remove database first
+        # and then import it locally.
+        sql_file = dump_db(
+            save_uncompressed=False, from_remote=True)
+
+        restore_db(sql_file)
 
 
 @cmd('Dump database to text file')
-def dump_db():
-    # TODO: gzip dump.
-    # TODO: launch an editor which can read .gzip file.
-    args = [config.SPATIALITE_PATH, join(db_path, 'config.db3'), '.dump']
-    log.debug('Running: %r', args)
-    if options.dummy:
-        log.info('Dummy mode, not executing:\n%s', ' '.join(args))
-        return
-    p = subprocess.Popen(args, stdout=subprocess.PIPE)
-    output = p.communicate()[0]
-    # Remove the Spatialite header, which isn't valid SQL.
-    output = output[output.index('BEGIN TRANSACTION'):]
-    target = join(
-        db_path, 'config-{date}.dump'.format(
-            date=datetime.datetime.now().strftime('%Y%m%d-%H%M')))
+def dump_db(missing_db_fatal=True, save_uncompressed=True, from_remote=False):
+    if is_sqlite:
+        if not os.path.isfile(db_file):
+            if not missing_db_fatal:
+                log.info('Db not there, not dumping')
+                return
+            raise Exception('Db %r is not there, can\'t dump' % db_file)
+        args = [config.SPATIALITE_PATH, '-bail', db_file, '.dump']
+        log.debug('Running: %r', args)
+        output = call(args, input='')
 
-    open(target, 'wb').write(output)
+        # Remove the Spatialite header, which isn't valid SQL.
+        # (-noheader doesn't have any effect)
+        output = output[output.index('BEGIN TRANSACTION'):]
+
+    elif is_mysql:
+        MYSQL_FORWARDED_PORT = 33000
+        p = None
+
+        if from_remote:
+            # Open a tunnel connection to the server.
+
+            p = subprocess.Popen(
+                _ssh_command_line(
+                    extra_opts='-N -L {forwarded_port}:localhost:3306'.format(
+                        forwarded_port=MYSQL_FORWARDED_PORT)))
+
+            args = dict(
+                user=instance_config.DB_USER, pw=instance_config.DB_PW,
+                host='localhost', port=MYSQL_FORWARDED_PORT,
+                db=instance_config.DB_NAME)
+        else:
+            args = dict(
+                user='synthese', pw=config.MYSQL_SYNTHESE_PW,
+                host=config.MYSQL_HOST, port=3306, db='synthese_' + instance)
+
+        args['extra_opts'] = instance_config.MYSQLDUMP_OPTS
+        output = _mysql_command('mysqldump', **args)
+
+        if p:
+            p.kill()
+
+    max_id = 0
+    for d in os.listdir(db_path):
+        if 'sql' not in d:
+            continue
+        try:
+            max_id = max(max_id, int(d.split('-')[1]))
+        except:
+            pass
+
+    target = join(
+        db_path, 'config-{:03}-{date}.sql.gz'.format(
+            max_id + 1, date=datetime.datetime.now().strftime('%Y%m%d-%H%M')))
+
+    gzip.open(target, 'wb').write(output)
     log.info('Db dumped to %r', target)
 
-    final_target = join(
-        db_path, 'config_{instance}.dump'.format(instance=instance))
-    log.info('Copying to %r', final_target)
-    shutil.copy(target, final_target)
+    if save_uncompressed:
+        uncompressed_target = join(
+            db_path, 'config_{instance}.sql'.format(instance=instance))
+        open(uncompressed_target, 'wb').write(output)
 
-    if os.path.isfile(config.EDITOR_PATH):
-        call([config.EDITOR_PATH, final_target], bg=True)
+        if os.path.isfile(config.EDITOR_PATH):
+            call([config.EDITOR_PATH, uncompressed_target], bg=True)
+
+    return target
 
 
 @cmd('Restore a database from a text file dump')
-def restore_db():
-    # TODO
-    pass
+def restore_db(sql_file=None):
+    if sql_file is None:
+        all_dumps = sorted(d for d in os.listdir(db_path) if 'sql' in d)
+
+        if not options.dump or options.dump == '-':
+            log.fatal('Name of dump (-u) should be provided. '
+                'Possible dumps:')
+            for d in all_dumps:
+                print d
+            return
+        dumps = [d for d in all_dumps if options.dump in d]
+        if len(dumps) != 1:
+            raise Exception('Not only one dump matches %r (possible dumps: %r)' %
+                (dumps, all_dumps))
+
+        sql_file = join(db_path, dumps[0])
+
+    if sql_file.endswith('.gz'):
+        sql = gzip.open(sql_file, 'rb').read()
+    else:
+        sql = open(sql_file, 'rb').read()
+
+    if is_sqlite:
+        if os.path.isfile(db_file):
+            os.unlink(db_file)
+
+        args = [config.SPATIALITE_PATH, '-bail', '-noheader', db_file]
+        call(args, input=sql)
+        log.info('Database %r restored from %r', db_file, sql_file)
+    elif is_mysql:
+        _mysql_command(
+            'mysql', 'synthese', config.MYSQL_SYNTHESE_PW, config.MYSQL_HOST,
+            'synthese_' + instance, input=sql)
 
 
-@cmd('Open database in spatialite-gui')
+@cmd('Open database in a GUI tool (if applicable')
 def view_db():
-    call([config.SPATIALITE_GUI_PATH, join(db_path, 'config.db3')], bg=True)
+    if is_sqlite:
+        call([config.SPATIALITE_GUI_PATH, db_file], bg=True)
+    # What about MySQL?
 
 
-@cmd('Open spatialite shell with database')
+@cmd('Open a SQL interpreter on the database')
 def shell_db():
-    call([config.SPATIALITE_PATH, join(db_path, 'config.db3')])
+    if is_sqlite:
+        call([config.SPATIALITE_PATH, db_file])
+    elif is_mysql:
+        _mysql_command(
+            'mysql', 'synthese', config.MYSQL_SYNTHESE_PW, config.MYSQL_HOST,
+            'synthese_' + instance, input=None)
 
 
 # Assets
@@ -286,11 +468,7 @@ def shell_db():
 def fetch_assets():
     params = instance_config.__dict__.copy()
     for site in instance_config.SITES:
-        params['remote_path'] = site['REMOTE_PATH']
-        params['assets_path'] = _to_cygwin_path(
-            join(instance_path, 'assets', site['NAME']))
-        call('rsync -avz {RSYNC_OPTS} --delete --delete-excluded '
-            '{RSYNC_USER}{SERVER}:{remote_path} {assets_path}'.format(**params))
+        _rsync(site['REMOTE_PATH'], join(instance_path, 'assets', site['NAME']))
 
 
 # Daemon
@@ -321,8 +499,7 @@ def stop():
 
 @cmd('Open a ssh shell on the server')
 def ssh():
-    call('ssh {options} {server}'.format(
-        options=config.SSH_OPTIONS, server=instance_config.SERVER))
+    call(_ssh_command_line())
 
 
 # General commands:
@@ -398,7 +575,9 @@ if __name__ == '__main__':
     parser.add_option('-b', '--build', help='Build to use')
     parser.add_option('-s', '--site',
         help='Site identifier to use for static files')
-
+    parser.add_option('-u', '--dump',
+        help='Name (or part of name) of the database dump to restore '
+              '(use "-" to get the list)')
     (options, args) = parser.parse_args()
 
     if len(args) < 3:
@@ -418,11 +597,13 @@ if __name__ == '__main__':
     assert os.path.isdir(base_path)
 
     load_config()
+    prepare_environment()
 
     if instance:
         instance_path = join(base_path, instance)
         maybe_mkdir(instance_path)
         db_path = join(instance_path, 'db')
+        db_file = join(db_path, 'config.db3')
         maybe_mkdir(db_path)
 
     for command in cmdline_commands:
