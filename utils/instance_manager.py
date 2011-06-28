@@ -221,17 +221,15 @@ def prepare_environment():
 
 
 def _run_synthesepy(command, global_args=[], command_args=[]):
-    if is_sqlite:
-        dbconn = 'sqlite://debug=1,path=' + db_file
-    elif is_mysql:
-        dbconn = ('mysql://debug=1,user={user},'
-            'passwd={pw},host={host},db={db}'.format(
-                user='synthese', pw=config.MYSQL_SYNTHESE_PW,
-                host=config.MYSQL_HOST, db='synthese_' + instance))
-    else:
-        assert False
-
     if instance_config:
+        if is_sqlite:
+            dbconn = 'sqlite://debug=1,path=' + db_file
+        elif is_mysql:
+            dbconn = ('mysql://debug=1,user={user},'
+                'passwd={pw},host={host},db={db}'.format(
+                    user='synthese', pw=config.MYSQL_SYNTHESE_PW,
+                    host=config.MYSQL_HOST, db='synthese_' + instance))
+
         global_args.extend(
             ['--dbconn', dbconn,
              '--port', str(instance_config.PORT)])
@@ -564,7 +562,7 @@ if __name__ == '__main__':
 
     parser = optparse.OptionParser(
         usage='usage: %prog [options] INSTANCES_PATH {INSTANCE_NAME,-} '
-            'COMMAND1 [COMMAND2 ...]| ',
+            'COMMAND1 [COMMAND2 ...]',
         formatter=PlainHelpFormatter(),
         description='List of commands:\n' + commands_list)
 
