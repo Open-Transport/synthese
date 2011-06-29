@@ -1,1 +1,1 @@
-synthese::db::SQLiteDB::integrate();
+synthese::db::sqlite::moduleRegister();

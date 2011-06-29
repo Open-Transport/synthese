@@ -7,6 +7,7 @@ SQLiteException.cpp
 SQLiteException.hpp
 SQLiteModule.gen.cpp
 SQLiteModule.inc.cpp
+SQLiteModuleRegister.cpp
 SQLiteResult.cpp
 SQLiteResult.hpp
 )
