@@ -15,7 +15,7 @@
 ^\.sconsign.dblite$
 \.obj$
 \.os$
-\.cpp\.inc$
+[^c][^m][^a][^k][^e]\.cpp\.inc$
 \.vcproj$
 \.vcproj.*user$
 ^utils/diff/src/synthese-diff.phpproj$
