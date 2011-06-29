@@ -17,6 +17,7 @@ TimetableGenerator.cpp
 TimetableGenerator.h
 TimetableModule.cpp
 TimetableModule.gen.cpp
+TimetableModuleRegister.cpp
 TimetableModule.h
 TimetableModule.inc.cpp
 TimetableResult.cpp

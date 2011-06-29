@@ -1,2 +1,1 @@
-
-synthese::graph::RuleUserUpdateAction::integrate();
+synthese::graph::moduleRegister();

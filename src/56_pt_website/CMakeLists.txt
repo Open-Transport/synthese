@@ -31,6 +31,7 @@ TransportWebsite.cpp
 TransportWebsite.h
 TransportWebsiteModule.cpp
 TransportWebsiteModule.gen.cpp
+TransportWebsiteModuleRegister.cpp
 TransportWebsiteModule.h
 TransportWebsiteModule.inc.cpp
 TransportWebsiteRight.cpp

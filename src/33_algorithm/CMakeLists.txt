@@ -3,6 +3,7 @@ set_source_groups()
 set(algorithm_SRCS
 AlgorithmModule.cpp
 AlgorithmModule.gen.cpp
+AlgorithmModuleRegister.cpp
 AlgorithmModule.h
 AlgorithmModule.inc.cpp
 AlgorithmTypes.h

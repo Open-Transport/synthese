@@ -43,6 +43,7 @@ ResaLogEntryUpdateAction.cpp
 ResaLogEntryUpdateAction.h
 ResaModule.cpp
 ResaModule.gen.cpp
+ResaModuleRegister.cpp
 ResaModule.h
 ResaModule.inc.cpp
 ResaRight.cpp

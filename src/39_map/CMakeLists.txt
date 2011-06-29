@@ -29,6 +29,7 @@ MapInfoRenderer.cpp
 MapInfoRenderer.h
 MapModule.cpp
 MapModule.gen.cpp
+MapModuleRegister.cpp
 MapModule.h
 MapModule.inc.cpp
 MapRequest.cpp
