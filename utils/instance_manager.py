@@ -519,6 +519,11 @@ def build():
     _run_synthesepy('build')
 
 
+@cmd('Clean Synthese', False)
+def clean():
+    _run_synthesepy('clean')
+
+
 @cmd('Run Synthese unit tests', False)
 def test():
     # TODO: pass other arguments needed for tests.
