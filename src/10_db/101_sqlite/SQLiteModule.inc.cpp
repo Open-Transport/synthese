@@ -1,1 +1,10 @@
-#include "10_db/101_sqlite/SQLiteDB.h"
+namespace synthese
+{
+	namespace db
+	{
+		namespace sqlite
+		{
+			void moduleRegister();
+		}
+	}
+}

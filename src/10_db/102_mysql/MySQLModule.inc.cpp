@@ -1,2 +1,10 @@
-#include "10_db/102_mysql/MySQLDB.hpp"
-#include "10_db/102_mysql/MySQLDBModifiedAction.hpp"
+namespace synthese
+{
+	namespace db
+	{
+		namespace mysql
+		{
+			void moduleRegister();
+		}
+	}
+}

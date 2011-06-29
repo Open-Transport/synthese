@@ -9,6 +9,7 @@ MySQLException.cpp
 MySQLException.hpp
 MySQLModule.gen.cpp
 MySQLModule.inc.cpp
+MySQLModuleRegister.cpp
 MySQLResult.cpp
 MySQLResult.hpp
 )
