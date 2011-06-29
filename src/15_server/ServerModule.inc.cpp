@@ -1,4 +1,5 @@
 
+#include "ServerModule.h"
 #include "LoginAction.h"
 #include "LogoutAction.h"
 #include "HtmlFormInterfaceElement.h"
