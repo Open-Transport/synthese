@@ -1,6 +1,7 @@
-
-// 59 Road journey planner
-
-#include "RoadJourneyPlannerModule.hpp"
-
-#include "RoadJourneyPlannerAdmin.h"
+namespace synthese
+{
+	namespace road_journey_planner
+	{
+		void moduleRegister();
+	}
+}

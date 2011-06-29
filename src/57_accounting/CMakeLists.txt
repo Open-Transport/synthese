@@ -8,6 +8,7 @@ AccountAddAction.h
 AccountCreateStockAction.h
 AccountingModule.cpp
 AccountingModule.gen.cpp
+AccountingModuleRegister.cpp
 AccountingModule.h
 AccountingModule.inc.cpp
 AccountLockAction.cpp

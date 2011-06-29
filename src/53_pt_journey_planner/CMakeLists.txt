@@ -5,6 +5,7 @@ PTRoutePlannerInputFunction.cpp
 PTRoutePlannerInputFunction.hpp
 PTRoutePlannerModule.cpp
 PTRoutePlannerModule.gen.cpp
+PTRoutePlannerModuleRegister.cpp
 PTRoutePlannerModule.h
 PTRoutePlannerModule.inc.cpp
 PTRoutePlannerResult.cpp

@@ -17,6 +17,7 @@ CityUpdateAction.cpp
 CityUpdateAction.h
 GeographyModule.cpp
 GeographyModule.gen.cpp
+GeographyModuleRegister.cpp
 GeographyModule.h
 GeographyModule.inc.cpp
 HTMLMap.cpp

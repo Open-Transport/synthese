@@ -1,1 +1,1 @@
-
+synthese::algorithm::moduleRegister();

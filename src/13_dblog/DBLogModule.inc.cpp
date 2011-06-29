@@ -1,10 +1,7 @@
-
-#include "DBLogModule.h"
-
-#include "DBLogAdmin.h"
-#include "DBLogRight.h"
-#include "DBLogEntryTableSync.h"
-#include "DBLogPurgeAction.h"
-
-// Registries
-#include "DBLogEntry.h"
+namespace synthese
+{
+	namespace dblog
+	{
+		void moduleRegister();
+	}
+}

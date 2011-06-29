@@ -19,6 +19,7 @@ TreeFolderUpdateAction.cpp
 TreeFolderUpdateAction.hpp
 TreeModule.cpp
 TreeModule.gen.cpp
+TreeModuleRegister.cpp
 TreeModule.h
 TreeModule.inc.cpp
 TreeMultiClassRootPolicy.hpp

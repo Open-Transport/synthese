@@ -49,6 +49,7 @@ ServerAdminRight.h
 ServerConstants.h
 ServerModule.cpp
 ServerModule.gen.cpp
+ServerModuleRegister.cpp
 ServerModule.h
 ServerModule.inc.cpp
 ServerModuleException.cpp

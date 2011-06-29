@@ -1,18 +1,7 @@
-
-// 14 Geography
-
-// Factories
-#include "CityTableSync.h"
-#include "CityNameValueInterfaceElement.h"
-#include "GeographyModule.h"
-#include "PlaceAliasTableSync.h"
-#include "CityAliasTableSync.hpp"
-
-#include "CityUpdateAction.h"
-#include "CityAddAction.h"
-
-// Registries
-#include "City.h"
-#include "CityAlias.hpp"
-#include "PlaceAlias.h"
-
+namespace synthese
+{
+	namespace geography
+	{
+		void moduleRegister();
+	}
+}

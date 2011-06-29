@@ -8,6 +8,7 @@ CalendarDateInterfacePage.hpp
 CalendarHTMLViewer.h
 CalendarModule.cpp
 CalendarModule.gen.cpp
+CalendarModuleRegister.cpp
 CalendarModule.h
 CalendarModule.inc.cpp
 CalendarRight.cpp

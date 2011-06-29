@@ -18,6 +18,7 @@ FileFormat.h
 FileFormatTemplate.h
 ImpExModule.cpp
 ImpExModule.gen.cpp
+ImpExModuleRegister.cpp
 ImpExModule.h
 ImpExModule.inc.cpp
 Importable.cpp

@@ -42,6 +42,7 @@ MessagesLog.cpp
 MessagesLog.h
 MessagesModule.cpp
 MessagesModule.gen.cpp
+MessagesModuleRegister.cpp
 MessagesModule.h
 MessagesModule.inc.cpp
 MessagesObjectsCMSExporters.cpp

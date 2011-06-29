@@ -27,6 +27,7 @@ InterfaceIdInterfaceElement.cpp
 InterfaceIdInterfaceElement.h
 InterfaceModule.cpp
 InterfaceModule.gen.cpp
+InterfaceModuleRegister.cpp
 InterfaceModule.h
 InterfaceModule.inc.cpp
 InterfacePage.cpp
