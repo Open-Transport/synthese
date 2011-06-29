@@ -324,22 +324,20 @@ def init_db():
 
 @cmd('Fetch database from server')
 def fetch_db():
-    dump_db(missing_db_fatal=False, save_uncompressed=False)
+    dump_db(missing_db_fatal=False)
     if is_sqlite:
         log.info('Fetching db to %r', db_file)
         _rsync('/srv/data/s3-server/config.db3', db_file)
     elif is_mysql:
-
         # With MySQL, this is done in two steps: dump the remove database first
         # and then import it locally.
-        sql_file = dump_db(
-            save_uncompressed=False, from_remote=True)
+        sql_file = dump_db(from_remote=True)
 
         restore_db(sql_file)
 
 
 @cmd('Dump database to text file')
-def dump_db(missing_db_fatal=True, save_uncompressed=True, from_remote=False):
+def dump_db(missing_db_fatal=True, from_remote=False):
     if is_sqlite:
         if not os.path.isfile(db_file):
             if not missing_db_fatal:
@@ -348,8 +346,9 @@ def dump_db(missing_db_fatal=True, save_uncompressed=True, from_remote=False):
             raise Exception('Db %r is not there, can\'t dump' % db_file)
         args = [config.SPATIALITE_PATH, '-bail', db_file, '.dump']
         log.debug('Running: %r', args)
-        output = call(args, input='')
-
+        # Warning: shell=False is required on Linux, otherwise it launches the
+        # interpreter and it hangs.
+        output = call(args, shell=False, input='')
         # Remove the Spatialite header, which isn't valid SQL.
         # (-noheader doesn't have any effect)
         output = output[output.index('BEGIN TRANSACTION'):]
@@ -397,15 +396,20 @@ def dump_db(missing_db_fatal=True, save_uncompressed=True, from_remote=False):
     gzip.open(target, 'wb').write(output)
     log.info('Db dumped to %r', target)
 
-    if save_uncompressed:
-        uncompressed_target = join(
-            db_path, 'config_{instance}.sql'.format(instance=instance))
-        open(uncompressed_target, 'wb').write(output)
-
-        if os.path.isfile(config.EDITOR_PATH):
-            call([config.EDITOR_PATH, uncompressed_target], bg=True)
+    uncompressed_target = join(
+        db_path, 'config_{instance}.sql'.format(instance=instance))
+    open(uncompressed_target, 'wb').write(output)
 
     return target
+
+
+@cmd('Open the latest database dump in a text editor')
+def opendump_db():
+    uncompressed_target = join(
+        db_path, 'config_{instance}.sql'.format(instance=instance))
+
+    if os.path.isfile(config.EDITOR_PATH):
+        call([config.EDITOR_PATH, uncompressed_target], bg=True)
 
 
 @cmd('Restore a database from a text file dump')
