@@ -23,6 +23,7 @@
 import argparse
 import logging
 import os
+import shutil
 import time
 
 import synthesepy
@@ -40,6 +41,12 @@ log = logging.getLogger(__name__)
 
 def build(args, env):
     synthesepy.build.build(env, args)
+
+
+def clean(args, env):
+    log.info('Deleting: %r', env.env_path)
+    if not args.dummy:
+        shutil.rmtree(env.env_path)
 
 
 def rundaemon(args, env):
@@ -100,6 +107,10 @@ def main():
     parser.add_argument('-d', '--dbconn', default='sqlite://', dest='conn_string')
     parser.add_argument('-v', '--verbose', action='store_true', default=False)
     parser.add_argument(
+        '--dummy', action='store_true', default=False,
+        help='Dummy mode, doesn\'t execute commands or have side effects '
+            'WARNING: NOT FULLY IMPLEMENTED YET')
+    parser.add_argument(
         '-s', '--stdout', action='store_true', default=False, dest='log_stdout',
         help='Log daemon output to stdout'
     )
@@ -143,6 +154,9 @@ def main():
         help='Path to Boost installation (Not needed on Linux if using'
              'standard Boost installation)'
     )
+
+    parser_clean = subparsers.add_parser('clean')
+    parser_clean.set_defaults(func=clean)
 
     parser_rundaemon = subparsers.add_parser('rundaemon')
     parser_rundaemon.set_defaults(func=rundaemon)
