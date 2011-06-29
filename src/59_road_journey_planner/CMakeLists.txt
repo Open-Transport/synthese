@@ -7,6 +7,7 @@ RoadJourneyPlannerAdmin.cpp
 RoadJourneyPlannerAdmin.h
 RoadJourneyPlannerModule.cpp
 RoadJourneyPlannerModule.gen.cpp
+RoadJourneyPlannerModuleRegister.cpp
 RoadJourneyPlannerModule.hpp
 RoadJourneyPlannerModule.inc.cpp
 RoadJourneyPlannerResult.cpp

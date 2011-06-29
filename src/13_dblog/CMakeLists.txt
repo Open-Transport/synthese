@@ -13,6 +13,7 @@ DBLogHTMLView.cpp
 DBLogHTMLView.h
 DBLogModule.cpp
 DBLogModule.gen.cpp
+DBLogModuleRegister.cpp
 DBLogModule.h
 DBLogModule.inc.cpp
 DBLogPurgeAction.cpp

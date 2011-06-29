@@ -15,6 +15,7 @@ ForumMessageTableSync.cpp
 ForumMessageTableSync.hpp
 ForumModule.cpp
 ForumModule.gen.cpp
+ForumModuleRegister.cpp
 ForumModule.hpp
 ForumModule.inc.cpp
 ForumRight.cpp

@@ -16,6 +16,7 @@ DBInheritedRegistryTableSync.hpp
 DBInheritedTableSyncTemplate.hpp
 DBModule.cpp
 DBModule.gen.cpp
+DBModuleRegister.cpp
 DBModule.h
 DBModule.inc.cpp
 DBNoSyncTableSyncTemplate.hpp

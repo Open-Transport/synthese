@@ -10,6 +10,7 @@ ForbiddenUseRule.cpp
 ForbiddenUseRule.h
 GraphConstants.h
 GraphModule.gen.cpp
+GraphModuleRegister.cpp
 GraphModule.h
 GraphModule.inc.cpp
 GraphModuleTemplate.h

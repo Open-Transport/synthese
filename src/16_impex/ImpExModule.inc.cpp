@@ -1,19 +1,7 @@
-
-// IMPEX 16
-
-// Factories
-
-#include "ImpExModule.h"
-
-#include "ImportFunction.h"
-#include "ExportFunction.hpp"
-
-#include "DataSourceTableSync.h"
-#include "DataSourcesAdmin.h"
-#include "DataSourceAdmin.h"
-
-#include "DataSourceUpdateAction.hpp"
-
-// Registries
-
-#include "DataSource.h"
+namespace synthese
+{
+	namespace impex
+	{
+		void moduleRegister();
+	}
+}

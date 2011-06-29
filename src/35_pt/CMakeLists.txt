@@ -136,6 +136,7 @@ PTFileFormat.cpp
 PTFileFormat.hpp
 PTModule.cpp
 PTModule.gen.cpp
+PTModuleRegister.cpp
 PTModule.h
 PTModule.inc.cpp
 PTNetworksAdmin.cpp

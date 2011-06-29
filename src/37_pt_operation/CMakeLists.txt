@@ -25,6 +25,7 @@ GetVehiclesService.cpp
 GetVehiclesService.hpp
 PTOperationModule.cpp
 PTOperationModule.gen.cpp
+PTOperationModuleRegister.cpp
 PTOperationModule.hpp
 PTOperationModule.inc.cpp
 PTOperationStatisticsAdmin.cpp

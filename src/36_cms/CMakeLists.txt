@@ -11,6 +11,7 @@ ChrFunction.cpp
 ChrFunction.hpp
 CMSModule.cpp
 CMSModule.gen.cpp
+CMSModuleRegister.cpp
 CMSModule.hpp
 CMSModule.inc.cpp
 CMSRight.cpp

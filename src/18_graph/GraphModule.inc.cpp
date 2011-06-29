@@ -1,2 +1,7 @@
-
-#include "RuleUserUpdateAction.hpp"
+namespace synthese
+{
+	namespace graph
+	{
+		void moduleRegister();
+	}
+}

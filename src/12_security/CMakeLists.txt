@@ -28,6 +28,7 @@ SecurityLog.cpp
 SecurityLog.h
 SecurityModule.cpp
 SecurityModule.gen.cpp
+SecurityModuleRegister.cpp
 SecurityModule.h
 SecurityModule.inc.cpp
 SecurityRight.cpp

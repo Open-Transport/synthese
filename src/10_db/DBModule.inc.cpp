@@ -1,4 +1,7 @@
-
-#include "DBModule.h"
-
-#include "RemoveObjectAction.hpp"
+namespace synthese
+{
+	namespace db
+	{
+		void moduleRegister();
+	}
+}

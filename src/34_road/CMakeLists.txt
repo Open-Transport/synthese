@@ -32,6 +32,7 @@ RoadChunkTableSync.cpp
 RoadChunkTableSync.h
 RoadModule.cpp
 RoadModule.gen.cpp
+RoadModuleRegister.cpp
 RoadModule.h
 RoadModule.inc.cpp
 RoadPlace.cpp

@@ -3,6 +3,7 @@ set_source_groups()
 set(hiking_SRCS
 HikingModule.cpp
 HikingModule.gen.cpp
+HikingModuleRegister.cpp
 HikingModule.h
 HikingModule.inc.cpp
 HikingRight.cpp

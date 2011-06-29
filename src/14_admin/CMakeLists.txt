@@ -10,6 +10,7 @@ AdminInterfaceElement.h
 AdminInterfaceElementTemplate.h
 AdminModule.cpp
 AdminModule.gen.cpp
+AdminModuleRegister.cpp
 AdminModule.h
 AdminModule.inc.cpp
 AdminParametersException.cpp

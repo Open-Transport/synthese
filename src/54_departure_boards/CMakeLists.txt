@@ -41,6 +41,7 @@ DeparturesTableLineContentInterfaceElement.cpp
 DeparturesTableLineContentInterfaceElement.h
 DeparturesTableModule.cpp
 DeparturesTableModule.gen.cpp
+DeparturesTableModuleRegister.cpp
 DeparturesTableModule.h
 DeparturesTableModule.inc.cpp
 DeparturesTableRoutePlanningInterfaceElement.cpp
