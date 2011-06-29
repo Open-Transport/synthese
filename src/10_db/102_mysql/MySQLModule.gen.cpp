@@ -1,2 +1,1 @@
-synthese::db::MySQLDB::integrate();
-synthese::db::MySQLDBModifiedAction::integrate();
+synthese::db::mysql::moduleRegister();
