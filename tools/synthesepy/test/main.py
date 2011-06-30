@@ -173,7 +173,6 @@ class Tester(object):
         ('01_util', 'PlainCharFilter'),
         ('05_html', 'HTMLFilter'),
         ('53_pt_routeplanner', 'PTRoutePlannerResult'),
-        ('53_pt_routeplanner', 'RoutePlanner'),
     ])
 
     def _run_cpp_tests_cmake(self, suite_args):
