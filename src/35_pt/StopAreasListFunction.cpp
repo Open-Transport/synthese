@@ -225,7 +225,7 @@ namespace synthese
 			typedef set<const StopArea *> StopSet;
 			StopSet stopSet;
 
-			// Populate stopAreaMap
+			// Populate stopSet
 			if(_commercialLine.get())
 			{
 				BOOST_FOREACH(const Path* path, _commercialLine->getPaths())
