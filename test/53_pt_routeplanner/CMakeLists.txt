@@ -36,3 +36,7 @@ boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTe
 boost_test(PTRoutePlannerResult "${DEPS}")
 # TODO: fails
 boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
+
+# This is not a test, but we'll keep it here for now.
+add_executable(ImportRoutePlannerTestData ImportRoutePlannerTestData.cpp RoutePlannerTestData.inc.hpp RoutePlannerTestData.hpp)
+target_link_libraries(ImportRoutePlannerTestData ${Boost_LIBRARIES} ${DEPS})
