@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-///	DesignatedLinePhysicalStopInheritedTybleSync class header.
-///	@file DesignatedLinePhysicalStopInheritedTybleSync.hpp
+///	DesignatedLinePhysicalStopInheritedTableSync class header.
+///	@file DesignatedLinePhysicalStopInheritedTableSync.hpp
 ///	@author Hugues Romain
 ///	@date 2011
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTybleSync_hpp__
-#define SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTybleSync_hpp__
+#ifndef SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTableSync_hpp__
+#define SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTableSync_hpp__
 
 #include "DBInheritedRegistryTableSync.hpp"
 
@@ -35,7 +35,7 @@ namespace synthese
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	DesignatedLinePhysicalStopInheritedTybleSync class.
+		///	DesignatedLinePhysicalStopInheritedTableSync class.
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35ILS refILS
 		///	@author Hugues Romain
@@ -75,4 +75,4 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTybleSync_hpp__
+#endif // SYNTHESE_pt_DesignatedLinePhysicalStopInheritedTableSync_hpp__

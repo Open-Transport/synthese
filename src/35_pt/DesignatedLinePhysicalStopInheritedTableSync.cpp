@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-///	DesignatedLinePhysicalStopInheritedTybleSync class implementation.
-///	@file DesignatedLinePhysicalStopInheritedTybleSync.cpp
+///	DesignatedLinePhysicalStopInheritedTableSync class implementation.
+///	@file DesignatedLinePhysicalStopInheritedTableSync.cpp
 ///	@author RCSobility
 ///	@date 2011
 ///
@@ -41,7 +41,7 @@ namespace synthese
 	using namespace util;
 
 	template<>
-	const string util::FactorableTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync>::FACTORY_KEY("DesignatedLinePhysicalStopInheritedTybleSync");
+	const string util::FactorableTemplate<LineStopTableSync,DesignatedLinePhysicalStopInheritedTableSync>::FACTORY_KEY("DesignatedLinePhysicalStopInheritedTableSync");
 
 	namespace db
 	{
