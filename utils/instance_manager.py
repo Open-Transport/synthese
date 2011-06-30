@@ -453,7 +453,7 @@ def restore_db(sql_file=None):
             'synthese_' + instance, input=sql)
 
 
-@cmd('Open database in a GUI tool (if applicable')
+@cmd('Open database in a GUI tool (if applicable)')
 def view_db():
     if is_sqlite:
         call([config.SPATIALITE_GUI_PATH, db_file], bg=True)
