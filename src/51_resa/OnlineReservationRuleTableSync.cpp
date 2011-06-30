@@ -171,7 +171,10 @@ namespace synthese
 			query.addField(object->getNeedsEMail());
 			query.addField(object->getNeedsCustomerNumber());
 			query.addField(object->getMaxSeats());
-			query.addField(object->getThresholds());
+			// FIXME: set<int> serialization is not correct with MySQL.
+			// thresholds is not used at the moment. This needs to be fixed once we start using it.
+			//query.addField(object->getThresholds());
+			query.addField(string(""));
 			query.addField(object->getSenderEMail());
 			query.addField(object->getSenderName());
 			query.addField(object->getEMailInterface() ? object->getEMailInterface()->getKey() : RegistryKeyType(0));
