@@ -58,7 +58,7 @@
 // Test cases using the CoordinatesSystem class should instanciate this class in the scope of the test.
 struct ScopedCoordinatesSystemUser
 {
-	// FIXME: We need to initialize the database for using the CoordinatesSystem.
+	// FIXME: We need to initialize the database before using CoordinatesSystem.
 	// We should break that dependency which kind of sucks.
 	ScopedFactory<synthese::db::SQLiteDB> _scopedSqliteDb;
 	boost::shared_ptr<ScopedModule<synthese::db::DBModule> > _scopedDBModule;
