@@ -166,6 +166,12 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, false);
 			_ignoreJourneyPlannerExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, false);
 			_ignoreTimetableExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, false);
+
+			// Saved parameters cleaning if output is a fixed format
+			if(!_page.get())
+			{
+				_savedParameters.clear();
+			}
 		}
 
 		//Class used for trim:

@@ -313,23 +313,20 @@ namespace synthese
 						point.reset();
 					}
 
-					if(request)
-					{
-						PTFileFormat::ImportableStopPoint isp;
-						isp.operatorCode = id;
-						isp.name = name;
-						isp.linkedStopPoints = _stopPoints.get(id);
-						isp.stopArea = stopArea;
-						isp.coords = point;
+					PTFileFormat::ImportableStopPoint isp;
+					isp.operatorCode = id;
+					isp.name = name;
+					isp.linkedStopPoints = _stopPoints.get(id);
+					isp.stopArea = stopArea;
+					isp.coords = point;
 
-						if(isp.linkedStopPoints.empty())
-						{
-							nonLinkedStopPoints.push_back(isp);
-						}
-						else if(_displayLinkedStops)
-						{
-							linkedStopPoints.push_back(isp);
-						}
+					if(request && isp.linkedStopPoints.empty())
+					{
+						nonLinkedStopPoints.push_back(isp);
+					}
+					else if(request && _displayLinkedStops)
+					{
+						linkedStopPoints.push_back(isp);
 					}
 					else
 					{
@@ -716,6 +713,7 @@ namespace synthese
 		db::DBTransaction GTFSFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
 			if(_importStopArea)
@@ -803,7 +801,7 @@ namespace synthese
 
 		util::ParametersMap GTFSFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
 			if(_defaultCity.get())
@@ -821,6 +819,7 @@ namespace synthese
 
 		void GTFSFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
