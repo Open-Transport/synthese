@@ -52,6 +52,11 @@ DEFAULT_CONFIG = {
     'MYSQL_HOST': '',
     'MYSQL_ROOT_PW': '',
     'MYSQL_SYNTHESE_PW': '',
+    'RUNTESTS_ARGS': [
+        '--dbconns',
+        'mysql://host=ubu-server64,user=synthese,passwd=synthese,db=synthese',
+        'sqlite://',
+    ],
 }
 
 BUILD_DEFAULT_CONFIG = {
@@ -526,8 +531,7 @@ def clean():
 
 @cmd('Run Synthese unit tests', False)
 def test():
-    # TODO: pass other arguments needed for tests.
-    _run_synthesepy('runtests')
+    _run_synthesepy('runtests', command_args=config.RUNTESTS_ARGS)
 
 
 @cmd('Generate an HTML files with links to the Synthese instances', False)
