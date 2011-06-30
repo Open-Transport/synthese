@@ -80,6 +80,8 @@ namespace synthese
 
 		protected:
 			std::string				_serviceNumber;
+			// TODO: remove _pathId, and retrieve it dynamically from _path
+			// See https://extranet-rcsmobility.com/issues/10625
 			util::RegistryKeyType	_pathId;
 			Path*					_path;
 
