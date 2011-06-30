@@ -223,8 +223,8 @@ namespace synthese
 		) const {
 
 			// Key is Stop Area key
-			typedef map<RegistryKeyType, const StopArea *> stopMap;
-			stopMap stopAreaMap;
+			typedef set<const StopArea *> StopMap;
+			StopMap stopAreaMap;
 
 			// Populate stopAreaMap
 			if(_commercialLine.get())
@@ -237,7 +237,7 @@ namespace synthese
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
 
-						stopAreaMap[connPlace->getKey()] = connPlace;
+						stopAreaMap.insert(connPlace);
 					}
 				}
 			}
@@ -245,7 +245,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& itStopArea, _city->getLexicalMatcher(FactorableTemplate<NamedPlace,StopArea>::FACTORY_KEY).entries())
 				{
-					stopAreaMap[itStopArea.second->getKey()] = dynamic_cast<StopArea*>(itStopArea.second.get());
+					stopAreaMap.insert(dynamic_cast<StopArea*>(itStopArea.second.get()));
 				}
 			}
 			else
@@ -258,18 +258,18 @@ namespace synthese
 						continue;
 					}
 
-					stopAreaMap[stopArea.second->getKey()] = stopArea.second.get();
+					stopAreaMap.insert(stopArea.second.get());
 				}
 			}
 
 			// Stops loop
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 			size_t stopRank(0);
-			BOOST_FOREACH(stopMap::value_type& it, stopAreaMap)
+			BOOST_FOREACH(StopMap::value_type it, stopAreaMap)
 			{
 				shared_ptr<ParametersMap> stopPm(new ParametersMap(request.getFunction()->getSavedParameters()));
 
-				it.second->toParametersMap(*stopPm, _coordinatesSystem);
+				it->toParametersMap(*stopPm, _coordinatesSystem);
 
 				if(_stopPage.get())
 				{
@@ -280,7 +280,7 @@ namespace synthese
 				if(_outputLines)
 				{
 					stringstream lineStream;
-					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it.second->getLines(false))
+					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
 					{
 						// For CMS output
 						shared_ptr<ParametersMap> pmLine(new ParametersMap(request.getFunction()->getSavedParameters()));
