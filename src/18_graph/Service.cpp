@@ -55,6 +55,8 @@ namespace synthese
 			_path (path),
 			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
 		{
+			if(path)
+				setPathId(path->getKey());
 		}
 
 
@@ -107,6 +109,7 @@ namespace synthese
 
 		void Service::setPath( Path* path )
 		{
+			setPathId(path->getKey());
 			_path = path;
 			clearRTData();
 		}
