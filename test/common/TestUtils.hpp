@@ -25,10 +25,42 @@
 #define SYNTHESE_common_TestUtils_hpp__
 
 #include "01_util/Env.h"
+#include "01_util/Log.h"
 #include "15_server/ModuleClassTemplate.hpp"
+
+#include <boost/test/unit_test.hpp>
 
 using synthese::server::ModuleClass;
 using synthese::server::ModuleClassTemplate;
+
+
+struct GlobalFixture
+{
+	GlobalFixture()
+	{
+#ifdef _MSC_VER
+		// Disable leak logs on Windows (they are set by Boost.Test).
+		// TODO: fix the leaks and then remove this line
+		_CrtSetDbgFlag(~_CRTDBG_LEAK_CHECK_DF & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
+
+		// Useful for attaching debugger to the test at startup.
+		if (::getenv("SYNTHESE_PAUSE"))
+			::system("pause");
+#endif
+		synthese::util::Log::GetInstance().setLevel(synthese::util::Log::LEVEL_TRACE);
+	}
+
+	~GlobalFixture()
+	{
+#ifdef _MSC_VER
+		// For debugging, to keep the cmd window open.
+		if (::getenv("SYNTHESE_PAUSE"))
+			system("pause");
+#endif
+	}
+};
+
+BOOST_GLOBAL_FIXTURE(GlobalFixture);
 
 /// Register a registrable in the environment on construction and unregister it on destruction.
 template <class Registrable>
