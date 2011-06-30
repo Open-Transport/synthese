@@ -89,6 +89,7 @@ namespace synthese
 				std::string triggerHost;
 				int port;
 				bool debug;
+				bool triggerCheck;
 
 				ConnectionInfo(const std::string& connectionString);
 			};
@@ -295,9 +296,9 @@ namespace synthese
 
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			void _recordDBModifEvents(const std::vector<DBModifEvent>& modifEvents);
-			virtual bool _DBModifCheckEnabled()
+			virtual bool _dbModifCheckEnabled()
 			{
-				return true;
+				return _connInfo->triggerCheck;
 			}
 #endif
 

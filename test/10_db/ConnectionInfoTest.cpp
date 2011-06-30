@@ -66,6 +66,7 @@ BOOST_AUTO_TEST_CASE(ValidNoParams)
 	BOOST_CHECK_EQUAL("", ci.triggerHost);
 	BOOST_CHECK_EQUAL(0, ci.port);
 	BOOST_CHECK_EQUAL(false, ci.debug);
+	BOOST_CHECK_EQUAL(true, ci.triggerCheck);
 }
 
 BOOST_AUTO_TEST_CASE(ValidParams0)
@@ -80,11 +81,12 @@ BOOST_AUTO_TEST_CASE(ValidParams0)
 	BOOST_CHECK_EQUAL("example.com", ci.triggerHost);
 	BOOST_CHECK_EQUAL(0, ci.port);
 	BOOST_CHECK_EQUAL(false, ci.debug);
+	BOOST_CHECK_EQUAL(true, ci.triggerCheck);
 }
 
 BOOST_AUTO_TEST_CASE(ValidParams1)
 {
-	ConnectionInfo ci("sqlite://path=test.db,host=localhost,user=joe,passwd=secret,db=myDb,triggerHost=foo.org,port=9999,debug=1");
+	ConnectionInfo ci("sqlite://path=test.db,host=localhost,user=joe,passwd=secret,db=myDb,triggerHost=foo.org,port=9999,debug=1,triggerCheck=0");
 	BOOST_CHECK_EQUAL("sqlite", ci.backend);
 	BOOST_CHECK_EQUAL("test.db", ci.path);
 	BOOST_CHECK_EQUAL("localhost", ci.host);
@@ -94,4 +96,5 @@ BOOST_AUTO_TEST_CASE(ValidParams1)
 	BOOST_CHECK_EQUAL("foo.org", ci.triggerHost);
 	BOOST_CHECK_EQUAL(9999, ci.port);
 	BOOST_CHECK_EQUAL(true, ci.debug);
+	BOOST_CHECK_EQUAL(false, ci.triggerCheck);
 }

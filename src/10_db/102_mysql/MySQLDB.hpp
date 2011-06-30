@@ -91,7 +91,7 @@ namespace synthese
 
 			virtual void _doExecUpdate(const SQLData& sql);
 #ifdef DO_VERIFY_TRIGGER_EVENTS
-			virtual bool _DBModifCheckEnabled()
+			virtual bool _dbModifCheckEnabled()
 			{
 				return false;
 			}
