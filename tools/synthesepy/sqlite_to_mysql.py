@@ -23,9 +23,6 @@
 from contextlib import closing
 import logging
 import re
-import sqlite3
-
-import MySQLdb
 
 from synthesepy import db_backends
 

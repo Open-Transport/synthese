@@ -51,7 +51,7 @@ def clean(args, env):
 
 def rundaemon(args, env):
     daemon = synthesepy.daemon.Daemon(env)
-    daemon.start()
+    daemon.start(gdb=args.gdb)
     # TODO: show URL in info message.
     log.info('Daemon running, press ctrl-c to stop')
     try:
@@ -160,6 +160,10 @@ def main():
 
     parser_rundaemon = subparsers.add_parser('rundaemon')
     parser_rundaemon.set_defaults(func=rundaemon)
+    parser_rundaemon.add_argument(
+        '--gdb', action='store_true', default=False,
+        help='Run daemon under gdb'
+    )
 
     parser_stopdaemon = subparsers.add_parser('stopdaemon')
     parser_stopdaemon.set_defaults(func=stopdaemon)
@@ -207,7 +211,8 @@ def main():
     env.log_stdout = args.log_stdout
     env.static_dir = args.static_dir
     env.extra_params = args.extra_params
-    env.thirdparty_dir = os.environ['SYNTHESE_THIRDPARTY_DIR'] 
+    env.thirdparty_dir = os.environ['SYNTHESE_THIRDPARTY_DIR']
+    env.dummy = args.dummy
 
     log.debug('Args: %s', args)
     args.func(args, env)
