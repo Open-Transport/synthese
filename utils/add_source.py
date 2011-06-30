@@ -34,7 +34,7 @@ C:\Python\python.exe
 Arguments (change to your Synthese path):
 C:\path\to\synthese3\utils\add_source.py
 
-Check "Prompt for argument"
+Check 'Prompt for argument'
 
 Then you can activate the command and add the following two arguments:
 
@@ -57,54 +57,54 @@ import sys
 
 log = logging.getLogger(__name__)
 
-SOURCE_TEMPLATE = "\n// fill me\n\n"
+SOURCE_TEMPLATE = '\n// fill me\n\n'
 
 def update_cmakelists_txt(path, sources_to_add):
-    cmakelists = join(path, "CmakeLists.txt")
+    cmakelists = join(path, 'CmakeLists.txt')
     assert os.path.isfile(cmakelists)
 
     lines = open(cmakelists).read().splitlines()
     print len(lines)
     for index, item in enumerate(lines):
-        if item.startswith("set(") and "_SRCS" in item:
+        if item.startswith('set(') and '_SRCS' in item:
             start = index
             break
-    end = lines.index(")")
+    end = lines.index(')')
     sources = lines[start + 1:end]
     new_sources = sorted(set(sources + sources_to_add), key=str.lower)
     lines[start + 1:end] = new_sources
 
-    content = "\n".join(lines)
-    if not content.endswith("\n"):
-        content += "\n"
-    open(cmakelists, "wb").write(content)
+    content = '\n'.join(lines)
+    if not content.endswith('\n'):
+        content += '\n'
+    open(cmakelists, 'wb').write(content)
 
 
 def add_source(module_name, source_filename, options):
-    log.debug("add_source %s %s %s", module_name, source_filename, options)
+    log.debug('add_source %s %s %s', module_name, source_filename, options)
 
     thisdir = os.path.abspath(os.path.dirname(__file__))
-    src_dir = join(thisdir, os.pardir, "src")
+    src_dir = join(thisdir, os.pardir, 'src')
     print src_dir
     modules = os.listdir(src_dir)
     matching_modules = [m for m in modules if module_name in m]
     if len(matching_modules) != 1:
         log.fatal(
-            "Didn't find only one matching module for %r, found: %r",
+            'Didn\'t find only one matching module for %r, found: %r',
             module_name, matching_modules)
         sys.exit(1)
     module_dir = join(src_dir, matching_modules[0])
 
-    source_files = [source_filename + ext for ext in (".cpp", ".hpp")]
+    source_files = [source_filename + ext for ext in ('.cpp', '.hpp')]
 
     # 1) Create source files
     for source_file in source_files:
         source = join(module_dir, source_file)
         if not options.overwrite and os.path.isfile(source):
-            log.fatal("Source already exists: %r", source)
+            log.fatal('Source already exists: %r', source)
             sys.exit(1)
-        open(source, "wb").write(SOURCE_TEMPLATE)
-        log.info("Created source file: %r", source)
+        open(source, 'wb').write(SOURCE_TEMPLATE)
+        log.info('Created source file: %r', source)
 
     # 2) Add them to CMake
 
@@ -113,21 +113,19 @@ def add_source(module_name, source_filename, options):
     # 3) Run cmake to update the project.
     # TODO: Make it possible to pass additional parameters (build type, ...)
 
-    synthesepy = join(thisdir, os.pardir, "tools", "synthese.py")
+    synthesepy = join(thisdir, os.pardir, 'tools', 'synthese.py')
     subprocess.check_call([
-        sys.executable, synthesepy, "build", "-g"])
+        sys.executable, synthesepy, 'build', '-g'])
 
 
-if __name__ == "__main__":
-    usage = "usage: %prog [options] MODULE_NAME SOURCE_FILENAME"
+if __name__ == '__main__':
+    usage = 'usage: %prog [options] MODULE_NAME SOURCE_FILENAME'
     parser = OptionParser(usage=usage)
 
-    parser.add_option("-v", "--verbose", action="store_true",
-         default=False, help="Print debug logging")
-    parser.add_option("-o", "--overwrite", action="store_true",
-         default=False, help="Overwrite existing files")
-
-    (options, args) = parser.parse_args()
+    parser.add_option('-v', '--verbose', action='store_true',
+         default=False, help='Print debug logging')
+    parser.add_option('-o', '--overwrite', action='store_true',
+         default=False, help='Overwrite existing files')
 
     (options, args) = parser.parse_args()
     if len(args) != 2:
