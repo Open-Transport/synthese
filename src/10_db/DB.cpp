@@ -51,7 +51,7 @@ namespace synthese
 	namespace db
 	{
 		DB::ConnectionInfo::ConnectionInfo(const string& connectionString) :
-			port(0), debug(false)
+			port(0), debug(false), triggerCheck(true)
 		{
 			string::const_iterator it = connectionString.begin(),
 				end = connectionString.end();
@@ -98,6 +98,7 @@ namespace synthese
 				else if (param == "triggerHost") { this->triggerHost = value; }
 				else if (param == "port") { this->port = boost::lexical_cast<int>(value); }
 				else if (param == "debug") { this->debug = boost::lexical_cast<bool>(value); }
+				else if (param == "triggerCheck") { this->triggerCheck = boost::lexical_cast<bool>(value); }
 				else
 				{
 					throw InvalidConnectionStringException("Unknown parameter " + param);
@@ -313,7 +314,7 @@ namespace synthese
 		{
 			if (_recordedEvents.empty())
 				return;
-			if (!_DBModifCheckEnabled())
+			if (!_dbModifCheckEnabled())
 			{
 				_recordedEvents.clear();
 				return;
@@ -372,7 +373,7 @@ namespace synthese
 		{
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			if (_recordedEvents.erase(modifEvent) == 0 &&
-				_DBModifCheckEnabled())
+				_dbModifCheckEnabled())
 			{
 				throw DBException("rowAdded: event not recorded from trigger. "
 					"table: " + modifEvent.table +
