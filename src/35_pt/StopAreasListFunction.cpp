@@ -222,9 +222,8 @@ namespace synthese
 			const Request& request
 		) const {
 
-			// Key is Stop Area key
-			typedef set<const StopArea *> StopMap;
-			StopMap stopAreaMap;
+			typedef set<const StopArea *> StopSet;
+			StopSet stopSet;
 
 			// Populate stopAreaMap
 			if(_commercialLine.get())
@@ -237,7 +236,7 @@ namespace synthese
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
 
-						stopAreaMap.insert(connPlace);
+						stopSet.insert(connPlace);
 					}
 				}
 			}
@@ -245,7 +244,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& itStopArea, _city->getLexicalMatcher(FactorableTemplate<NamedPlace,StopArea>::FACTORY_KEY).entries())
 				{
-					stopAreaMap.insert(dynamic_cast<StopArea*>(itStopArea.second.get()));
+					stopSet.insert(dynamic_cast<StopArea*>(itStopArea.second.get()));
 				}
 			}
 			else
@@ -258,14 +257,14 @@ namespace synthese
 						continue;
 					}
 
-					stopAreaMap.insert(stopArea.second.get());
+					stopSet.insert(stopArea.second.get());
 				}
 			}
 
 			// Stops loop
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 			size_t stopRank(0);
-			BOOST_FOREACH(StopMap::value_type it, stopAreaMap)
+			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
 				shared_ptr<ParametersMap> stopPm(new ParametersMap(request.getFunction()->getSavedParameters()));
 
