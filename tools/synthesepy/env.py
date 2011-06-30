@@ -43,6 +43,7 @@ class Env(object):
     static_dir = None
     extra_params = None
     thirdparty_dir = None
+    dummy = False
 
     def __init__(self, env_path, mode):
         self.mode = mode

@@ -63,7 +63,7 @@ class Daemon(object):
         else:
             raise DaemonException('Server is not responding')
 
-    def start(self):
+    def start(self, gdb=False):
         self.env.prepare_for_launch()
 
         ports_to_check = [self.env.port]
@@ -94,10 +94,14 @@ class Daemon(object):
                 'wrong mode/tool?' % self.env.daemon_path
             )
 
-        args = [
+        args = []
+        if gdb:
+            args.extend(['gdb', '--args'])
+        args.extend([
             self.env.daemon_path,
             '--dbconn', self.env.conn_string,
-        ]
+        ])
+
         params = {
             'log_level': '-1',
             'port': str(self.env.port),
@@ -116,6 +120,11 @@ class Daemon(object):
         else:
             log.info('Logging to %s', self.env.daemon_log_file)
             stdout = open(self.env.daemon_log_file, 'wb')
+
+        if self.env.dummy:
+            log.info('Dummy mode, not executing:\n%s\n in path: %s',
+                ' '.join(args), self.env.daemon_launch_path)
+            return
 
         self.proc = subprocess.Popen(
             args,
