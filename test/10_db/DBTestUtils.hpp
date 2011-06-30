@@ -39,7 +39,6 @@
 
 #include <boost/filesystem/operations.hpp>
 #include <boost/shared_ptr.hpp>
-#include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <map>
 #include <sstream>
@@ -52,35 +51,6 @@ using synthese::server::ModuleClass;
 using synthese::server::ModuleClassTemplate;
 using namespace synthese::util;
 using namespace std;
-
-struct GlobalFixture
-{
-	GlobalFixture()
-	{
-#ifdef _MSC_VER
-
-	// Disable leak logs on Windows (they are set by Boost.Test).
-	// TODO: fix the leaks and then remove this line
-	_CrtSetDbgFlag(~_CRTDBG_LEAK_CHECK_DF & _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG));
-
-	// Useful for attaching debugger to the test at startup.
-	if (::getenv("SYNTHESE_PAUSE"))
-		::system("pause");
-#endif
-		Log::GetInstance().setLevel(Log::LEVEL_TRACE);
-	}
-
-	~GlobalFixture()
-	{
-#ifdef _MSC_VER
-		// For debugging, to keep the cmd window open.
-		if (::getenv("SYNTHESE_PAUSE"))
-			system("pause");
-#endif
-	}
-};
-
-BOOST_GLOBAL_FIXTURE(GlobalFixture);
 
 /// Base class for testing a database backend.
 class TestBackend
