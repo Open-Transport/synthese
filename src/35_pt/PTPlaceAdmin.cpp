@@ -304,6 +304,10 @@ namespace synthese
 					set<const CommercialLine*> lines;
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
 					{
+						if(!dynamic_cast<const LineStop*>(edge.second))
+						{
+							continue;
+						}
 						lines.insert(
 							static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
 						);
