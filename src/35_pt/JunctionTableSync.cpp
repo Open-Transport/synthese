@@ -32,6 +32,7 @@
 #include "DataSourceTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
+#include "StopAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -203,19 +204,66 @@ namespace synthese
 			SelectQuery<JunctionTableSync> query;
 			if(startStopFilter)
 			{
-			 	query.addWhereField(COL_START_PHYSICAL_STOP_ID, *startStopFilter);
+				if(decodeTableId(*startStopFilter) == StopAreaTableSync::TABLE.ID)
+				{
+					shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
+					StopPointTableSync::SearchResult stops(
+						StopPointTableSync::Search(env, *startStopFilter)
+					);
+					if(!stops.empty())
+					{
+						BOOST_FOREACH(shared_ptr<StopPoint> stop, stops)
+						{
+							expr = ComposedExpression::Get(
+								expr,
+								ComposedExpression::OP_OR,
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_START_PHYSICAL_STOP_ID),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(stop->getKey())
+							)	);
+						}
+						query.addWhere(expr);
+				}	}
+				else
+				{
+					query.addWhereField(COL_START_PHYSICAL_STOP_ID, *startStopFilter);
+				}
 			}
 			if(endStopFilter)
 			{
-				query.addWhereField(COL_END_PHYSICAL_STOP_ID, *endStopFilter);
+				if(decodeTableId(*endStopFilter) == StopAreaTableSync::TABLE.ID)
+				{
+					shared_ptr<SQLExpression> expr(ValueExpression<int>::Get(0));
+					StopPointTableSync::SearchResult stops(
+						StopPointTableSync::Search(env, *endStopFilter)
+					);
+					if(!stops.empty())
+					{
+						BOOST_FOREACH(shared_ptr<StopPoint> stop, stops)
+						{
+							expr = ComposedExpression::Get(
+								expr,
+								ComposedExpression::OP_OR,
+								ComposedExpression::Get(
+									FieldExpression::Get(TABLE.NAME, COL_END_PHYSICAL_STOP_ID),
+									ComposedExpression::OP_EQ,
+									ValueExpression<RegistryKeyType>::Get(stop->getKey())
+							)	);
+						}
+						query.addWhere(expr);
+				}	}
+				else
+				{
+					query.addWhereField(COL_END_PHYSICAL_STOP_ID, *endStopFilter);
+				}
 			}
 			if(orderByStop)
 			{
-			 	query.addOrderField(COL_START_PHYSICAL_STOP_ID, raisingOrder);
+				query.addOrderField(COL_START_PHYSICAL_STOP_ID, raisingOrder);
 				query.addOrderField(COL_END_PHYSICAL_STOP_ID, raisingOrder);
-				;
 			}
-			if (number)
+			if(number)
 			{
 				query.setNumber(*number + 1);
 				if (first > 0)

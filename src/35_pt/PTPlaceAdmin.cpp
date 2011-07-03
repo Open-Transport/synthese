@@ -440,6 +440,8 @@ namespace synthese
 					JunctionTableSync::SearchResult endings(
 						JunctionTableSync::Search(Env::GetOfficialEnv(), optional<RegistryKeyType>(), _connectionPlace->getKey())
 					);
+					JunctionTableSync::SearchResult allJunctions(startings);
+					allJunctions.insert(allJunctions.end(), endings.begin(), endings.end());
 
 					HTMLForm f(addJunctionRequest.getHTMLForm("addJunction"));
 					stream << f.open();
@@ -456,7 +458,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.row();
 					stream << t.col(6, string(), true) << "Jonctions bidirectionnelles";
-					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					BOOST_FOREACH(shared_ptr<Junction> junction, allJunctions)
 					{
 						if(!junction->getBack())
 						{
@@ -516,7 +518,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col(6, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
-					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					BOOST_FOREACH(shared_ptr<Junction> junction, endings)
 					{
 						if(junction->getBack())
 						{

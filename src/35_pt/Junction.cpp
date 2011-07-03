@@ -25,6 +25,7 @@
 #include "PermanentService.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
+#include "AllowedUseRule.h"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -43,23 +44,23 @@ namespace synthese
 
 	namespace pt
 	{
-		Junction::Junction( util::RegistryKeyType id):
-			Registrable(id)
+		Junction::Junction(
+			util::RegistryKeyType id
+		):	Registrable(id)
 		{
-
+			// Default use rules
+			RuleUser::Rules rules(getRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			setRules(rules);
 		}
+
 
 
 		Junction::~Junction()
 		{
-			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
-			{
-				delete *it;
-			}
-			for (ServiceSet::iterator it(_services.begin()); it != _services.end(); ++it)
-			{
-				delete *it;
-			}
+			_clean();
 		}
 
 
@@ -74,15 +75,9 @@ namespace synthese
 			// Cleaning existing data
 			if(!_edges.empty())
 			{
-				for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
-				{
-					delete *it;
-				}
-				for (ServiceSet::iterator it(_services.begin()); it != _services.end(); ++it)
-				{
-					delete *it;
-				}
+				_clean();
 			}
+			_back.reset();
 
 			// Generation of edges
 			Edge* startEdge(new JunctionStop(
@@ -90,6 +85,7 @@ namespace synthese
 					start
 			)	);
 			addEdge(*startEdge);
+			start->addDepartureEdge(startEdge);
 
 			Edge* endEdge(new JunctionStop(
 					length,
@@ -97,19 +93,20 @@ namespace synthese
 					end
 			)	);
 			addEdge(*endEdge);
+			end->addArrivalEdge(endEdge);
 
 			// Generation of service
 			Service* service(new PermanentService(
-				0,
-				this,
-				duration
+					0,
+					this,
+					duration
 			)	);
 			addService(service, false);
 			service->setPath(this);
 
 
 			// Generation of back
-			if(_back)
+			if(doBack)
 			{
 				_back.reset(new Junction);
 				_back->setStops(end, start, length, duration, false);
@@ -189,5 +186,33 @@ namespace synthese
 		{
 			return true;
 		}
-	}
-}
+
+
+
+		void Junction::_clean()
+		{
+			// Edges
+			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
+			{
+				Vertex* stop((*it)->getFromVertex());
+
+				// Removing edge from stop point
+				if(it == _edges.begin())
+				{
+					stop->removeDepartureEdge(*it);
+				}
+				else
+				{
+					stop->removeArrivalEdge(*it);
+				}
+
+				delete *it;
+			}
+
+			// Services
+			for (ServiceSet::iterator it(_services.begin()); it != _services.end(); ++it)
+			{
+				delete *it;
+			}
+		}
+}	}

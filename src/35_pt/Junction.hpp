@@ -52,6 +52,8 @@ namespace synthese
 		private:
 			boost::shared_ptr<Junction> _back;
 
+			void _clean();
+
 		public:
 			Junction(
 				util::RegistryKeyType id = 0

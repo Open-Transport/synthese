@@ -66,6 +66,7 @@
 #include "SentAlarm.h"
 #include "PTModule.h"
 #include "Destination.hpp"
+#include "Junction.hpp"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -2154,15 +2155,11 @@ namespace synthese
 			if(_lineMarkerPage.get())
 			{
 				stringstream content;
-				bool __AfficherLignesPied = false;
-				//	Conversion::ToBool(
-				//	_displayPedestrianLines->getValue(parameters, variables, object, request)
-				//	);
 
 				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 				{
-					if ( __AfficherLignesPied || !dynamic_cast<const Road*> (leg.getService()->getPath ()) )
-					{
+					if(	dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
+					){
 						LineMarkerInterfacePage::Display(
 							content,
 							_lineMarkerPage,
@@ -2353,9 +2350,11 @@ namespace synthese
 				{
 					const ServicePointer& leg(*it);
 
-					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
-					if (road == NULL)
-					{
+					const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath()));
+					const Junction* junction(dynamic_cast<const Junction*> (leg.getService()->getPath()));
+					if(	road == NULL &&
+						junction == NULL
+					){
 						distance = 0;
 
 						// LIGNE ARRET MONTEE Si premier point d'arret et si alerte
@@ -2440,17 +2439,9 @@ namespace synthese
 					}
 					else
 					{
-						// 1/2 Alerte
-						/*					ptime debutArret(leg.getArrivalDateTime ());
-						ptime finArret(debutArret);
-						if ((it+1) < journey.getServiceUses().end())
-						finArret = (it + 1)->getDepartureDateTime();
-						if ( journey.getContinuousServiceRange () )
-						finArret += journey.getContinuousServiceRange ();
-						*/
 						distance += leg.getDistance();
 
-						if (it + 1 != services.end())
+						if (road && it + 1 != services.end())
 						{
 							const ServicePointer& nextLeg(*(it+1));
 							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));

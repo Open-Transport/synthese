@@ -33,6 +33,8 @@
 #include "RoadPlace.h"
 #include "JourneyPattern.hpp"
 #include "Service.h"
+#include "Junction.hpp"
+#include "JunctionStop.hpp"
 
 using namespace std;
 using namespace boost;
@@ -201,9 +203,21 @@ namespace synthese
 
 				// JourneyPattern
 				const LineStop* ls(dynamic_cast<const LineStop*>(its->getDepartureEdge()));
-				const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+				const JunctionStop* js(dynamic_cast<const JunctionStop*>(its->getDepartureEdge()));
 				stream << t.col(1, ls ? ls->getLine()->getCommercialLine()->getStyle() : string());
-				stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
+				if(ls)
+				{
+					stream << ls->getLine()->getCommercialLine()->getShortName();
+				}
+				else if(js)
+				{
+					stream << "JONCTION";
+				}
+				else
+				{
+					const Road* road(static_cast<const Road*>(its->getService()->getPath()));
+					stream << road->getRoadPlace()->getName();
+				}
 
 				// Transfers
 				if (its == it->getServiceUses().end() -1)
@@ -235,9 +249,21 @@ namespace synthese
 
 						// JourneyPattern
 						const JourneyPattern* ls(dynamic_cast<const JourneyPattern*>(its->getService()->getPath()));
-						const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+						const Junction* js(dynamic_cast<const Junction*>(its->getService()->getPath()));
 						stream << t.col(1, ls ? ls->getCommercialLine()->getStyle() : string());
-						stream << (ls ? ls->getCommercialLine()->getShortName() : road->getRoadPlace()->getName());
+						if(ls)
+						{
+							stream << ls->getCommercialLine()->getShortName();
+						}
+						else if(js)
+						{
+							stream << "JONCTION";
+						}
+						else
+						{
+							const Road* road(static_cast<const Road*>(its->getService()->getPath()));
+							stream << road->getRoadPlace()->getName();
+						}
 
 						// Exit if last service use
 						if (its == it->getServiceUses().end() -1)
