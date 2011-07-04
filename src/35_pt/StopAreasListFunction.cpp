@@ -278,7 +278,6 @@ namespace synthese
 				// Lines calling at the stop
 				if(_outputLines)
 				{
-					stringstream lineStream;
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
 					{
 						// For CMS output
