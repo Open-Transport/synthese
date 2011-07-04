@@ -414,12 +414,20 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, itStop.second->getDepartureEdges())
 				{
+					if(!dynamic_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine())
+					{
+						continue;
+					}
 					result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
 				}
 				if(includeArrivals)
 				{
 					BOOST_FOREACH(const Vertex::Edges::value_type& itEdge, itStop.second->getArrivalEdges())
 					{
+						if(!dynamic_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine())
+						{
+							continue;
+						}
 						result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
 					}
 				}
