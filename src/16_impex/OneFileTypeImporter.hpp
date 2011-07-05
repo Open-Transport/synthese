@@ -24,6 +24,8 @@
 #define SYNTHESE_impex_OneFileTypeImporter_hpp__
 
 #include "Importer.hpp"
+
+#include <fstream>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem/operations.hpp>
 
