@@ -2101,8 +2101,9 @@ namespace synthese
 			stream << t.cell("Importer calendriers en tant que modèles", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates));
 			stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
 			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
-			stream << t.title("Données");
+			stream << t.title("Données (remplir un des deux champs)");
 			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
+			stream << t.cell("Répertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));
 			stream << t.close();
 		}
 }	}
