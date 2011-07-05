@@ -398,6 +398,12 @@ namespace synthese
 			JourneyPattern* result(NULL);
 			BOOST_FOREACH(Path* route, line.getPaths())
 			{
+				// Avoid junctions
+				if(!dynamic_cast<JourneyPattern*>(route))
+				{
+					continue;
+				}
+
 				JourneyPattern* jp(static_cast<JourneyPattern*>(route));
 
 				if(!jp->hasLinkWithSource(source))
@@ -949,6 +955,12 @@ namespace synthese
 			set<JourneyPattern*> result;
 			BOOST_FOREACH(Path* route, line.getPaths())
 			{
+				// Avoid junctions
+				if(!dynamic_cast<JourneyPattern*>(route))
+				{
+					continue;
+				}
+
 				JourneyPattern* jp(static_cast<JourneyPattern*>(route));
 
 				if(!jp->hasLinkWithSource(source))

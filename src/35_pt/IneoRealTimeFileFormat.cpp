@@ -217,6 +217,12 @@ namespace synthese
 				{
 					BOOST_FOREACH(Path* route, obj->getPaths())
 					{
+						// Avoid junctions
+						if(!dynamic_cast<JourneyPattern*>(route))
+						{
+							continue;
+						}
+
 						JourneyPattern* jp(static_cast<JourneyPattern*>(route));
 
 						if(!jp->hasLinkWithSource(*_plannedDataSource))
