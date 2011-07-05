@@ -58,6 +58,7 @@ namespace synthese
 			FactorableTemplate<Function, ImportFunction>(),
 			_doImport(false)
 		{
+			setEnv(shared_ptr<Env>(new Env));
 		}
 
 
