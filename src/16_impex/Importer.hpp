@@ -30,6 +30,7 @@
 
 #include <ostream>
 #include <boost/optional.hpp>
+#include <boost/filesystem/path.hpp>
 
 namespace synthese
 {
@@ -53,6 +54,7 @@ namespace synthese
 		protected:
 			mutable util::Env&						_env;
 			const DataSource&						_dataSource;
+			boost::optional<boost::filesystem::path> _logPath;
 
 			virtual db::DBTransaction _save() const = 0;
 
@@ -60,8 +62,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const DataSource& getDataSource() const { return _dataSource; }
+				boost::optional<boost::filesystem::path> getLogPath() const { return _logPath; }
 			//@}
 
+			//! @name Setters
+			//@{
+				void setLogPath(boost::optional<boost::filesystem::path> value){ _logPath = value; }
+			//@}
 
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
