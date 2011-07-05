@@ -28,6 +28,7 @@
 
 #include <vector>
 #include <stdarg.h>
+#include <fstream>
 
 namespace synthese
 {
@@ -145,6 +146,15 @@ namespace synthese
 				std::ostream& os,
 				boost::optional<const admin::AdminRequest&> request
 			) const {
+
+				// Log stream selection
+				boost::shared_ptr<std::ofstream> logFile;
+				if(_logPath)
+				{
+					logFile.reset(new std::ofstream(_logPath->file_string().c_str()));
+				}
+				std::ostream& logStream(_logPath ? *logFile : os);
+
 				BOOST_FOREACH(const std::string& key, FILES.getFiles())
 				{
 					FilePathsMap::const_iterator it(_pathsMap.find(key));
@@ -154,8 +164,13 @@ namespace synthese
 					}
 					const FilePathsMap::mapped_type& path(it->second);
 
-					if(!_parse(path, os, key, request))
+					if(!_parse(path, logStream, key, request))
 					{
+						// If logs in a file, then output en error level
+						if(_logPath)
+						{
+							os << "1";
+						}
 						return false;
 					}
 				}

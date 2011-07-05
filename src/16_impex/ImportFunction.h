@@ -49,7 +49,8 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_DO_IMPORT;	//!< do_import parameter
 			static const std::string PARAMETER_DATA_SOURCE;	//!< clear_network parameter
-
+			static const std::string PARAMETER_LOG_PATH;	//!< clear_network parameter
+			
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
 			/// Initializes a dedicated environment for the storage of the imported

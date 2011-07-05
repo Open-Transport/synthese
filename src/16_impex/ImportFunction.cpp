@@ -50,6 +50,7 @@ namespace synthese
 		/// Parameter names declarations
 		const string ImportFunction::PARAMETER_DATA_SOURCE("ds");
 		const string ImportFunction::PARAMETER_DO_IMPORT("di");
+		const string ImportFunction::PARAMETER_LOG_PATH("lp");
 
 
 
@@ -67,6 +68,10 @@ namespace synthese
 			if(_importer.get())
 			{
 				map.insert(PARAMETER_DATA_SOURCE, _importer->getDataSource().getKey());
+				if(_importer->getLogPath())
+				{
+					map.insert(PARAMETER_LOG_PATH, _importer->getLogPath()->file_string());
+				}
 			}
 			map.insert(PARAMETER_DO_IMPORT, _doImport);
 			return map;
@@ -83,6 +88,13 @@ namespace synthese
 				shared_ptr<const DataSource> dataSource(DataSourceTableSync::Get(dataSourceId, *_env));
 				_importer = dataSource->getImporter(*_env);
 				_importer->setFromParametersMap(map, true);
+
+				// Log path
+				string logPath(map.getDefault<string>(PARAMETER_LOG_PATH));
+				if(!logPath.empty())
+				{
+					_importer->setLogPath(filesystem::path(logPath));
+				}
 
 				stringstream output;
 				_doImport = _importer->beforeParsing();
@@ -107,6 +119,12 @@ namespace synthese
 			if(_doImport)
 			{
 				_importer->save().run();
+
+				// If logs in a file the output 0 if import succeed
+				if(_importer->getLogPath())
+				{
+					stream << "0";
+				}
 			}
 
 			stream << _output;
