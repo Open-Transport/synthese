@@ -126,8 +126,17 @@ namespace synthese
 					stream << "0";
 				}
 			}
-
-			stream << _output;
+			else
+			{
+				if(_importer->getLogPath())
+				{
+					stream << "1";
+				}
+			}
+			if(!_importer->getLogPath())
+			{
+				stream << _output;
+			}
 		}
 
 

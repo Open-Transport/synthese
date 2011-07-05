@@ -166,11 +166,6 @@ namespace synthese
 
 					if(!_parse(path, logStream, key, request))
 					{
-						// If logs in a file, then output en error level
-						if(_logPath)
-						{
-							os << "1";
-						}
 						return false;
 					}
 				}
