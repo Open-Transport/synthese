@@ -129,10 +129,19 @@ namespace synthese
 				std::ostream& os,
 				boost::optional<const admin::AdminRequest&> request
 			) const {
+
+				// Log stream selection
+				boost::shared_ptr<std::ofstream> logFile;
+				if(_logPath)
+				{
+					logFile.reset(new std::ofstream(_logPath->file_string().c_str()));
+				}
+				std::ostream& logStream(_logPath ? *logFile : os);
+
 				bool result(true);
 				BOOST_FOREACH(const FilePathsSet::value_type& path, _pathsSet)
 				{
-					result &= _parse(path, os, request);
+					result &= _parse(path, logStream, request);
 				}
 				return result;
 			}
