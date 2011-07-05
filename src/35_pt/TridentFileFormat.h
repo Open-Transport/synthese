@@ -99,8 +99,21 @@ namespace synthese
 			typedef boost::bimap<CoordinatesSystem::SRID, std::string> SRIDConversionMap;
 			static SRIDConversionMap _SRIDConversionMap;
 
+			class UnknkownSRIDException:
+				public synthese::Exception
+			{
+			public:
+				UnknkownSRIDException():
+				synthese::Exception("The specified SRID is not convertible into/from Trident Keyword")
+				{}
+			};
+
 			static void _populateSRIDTridentConversionMap();
+
+			/// @throws UnknownSRIDException
 			static CoordinatesSystem::SRID _getSRIDFromTrident(const std::string& value);
+
+			/// @throws UnknownSRIDException
 			static const std::string& _getTridentFromSRID(const CoordinatesSystem::SRID value);
 
 		public:

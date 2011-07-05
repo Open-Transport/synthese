@@ -1350,27 +1350,34 @@ namespace synthese
 							XMLNode& areaCentroid(itPlace->second);
 							XMLNode longitudeNode(areaCentroid.getChildNode("longitude", 0));
 							XMLNode latitudeNode(areaCentroid.getChildNode("latitude", 0));
-							if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
+							try
 							{
-								geometry = CoordinatesSystem::GetCoordinatesSystem(
-									_getSRIDFromTrident(areaCentroid.getChildNode("longLatType", 0).getText())
-									).createPoint(
-									lexical_cast<double>(longitudeNode.getText()),
-									lexical_cast<double>(latitudeNode.getText())
-									);
-							}
-							else
-							{
-								XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
-								if(!projectedPointNode.isEmpty())
+								if(!longitudeNode.isEmpty() && !latitudeNode.isEmpty())
 								{
 									geometry = CoordinatesSystem::GetCoordinatesSystem(
-										_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
-										).createPoint(
-										lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
-										lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
-										);
+										_getSRIDFromTrident(areaCentroid.getChildNode("longLatType", 0).getText())
+									).createPoint(
+										lexical_cast<double>(longitudeNode.getText()),
+										lexical_cast<double>(latitudeNode.getText())
+									);
 								}
+								else
+								{
+									XMLNode projectedPointNode(areaCentroid.getChildNode("projectedPoint", 0));
+									if(!projectedPointNode.isEmpty())
+									{
+										geometry = CoordinatesSystem::GetCoordinatesSystem(
+											_getSRIDFromTrident(projectedPointNode.getChildNode("projectionType", 0).getText())
+										).createPoint(
+											lexical_cast<double>(projectedPointNode.getChildNode("X", 0).getText()),
+											lexical_cast<double>(projectedPointNode.getChildNode("Y", 0).getText())
+										);
+									}
+								}
+							}
+							catch(UnknkownSRIDException&)
+							{
+								os << "WARN : Physical stop with key " << stopKey << " uses an unknown SRID";
 							}
 
 							XMLNode addressNode(areaCentroid.getChildNode("address", 0));
@@ -2052,6 +2059,7 @@ namespace synthese
 			{
 				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(4326, "WGS84"));
 				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(27572, "LAMBERT II ETENDU"));
+				_SRIDConversionMap.left.insert(SRIDConversionMap::left_value_type(2154, "LAMBERT 93"));
 			}
 		}
 
