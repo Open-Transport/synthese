@@ -476,17 +476,24 @@ namespace synthese
 			{
 				return;
 			}
-
-			if (!_hasNotifyHTTPFunction)
-				return;
-
 			std::stringstream sql;
 			const string modifTypes[] = {"insert", "update", "delete"};
 			BOOST_FOREACH(const string& modifType, modifTypes)
 			{
 				const string triggerName = tableName + "_" + modifType;
 				sql <<
-					"DROP TRIGGER IF EXISTS " << triggerName << ";" <<
+					"DROP TRIGGER IF EXISTS " << triggerName << ";";
+			}
+			execUpdate(sql.str());
+
+			if (!_hasNotifyHTTPFunction)
+				return;
+
+			sql.str("");
+			BOOST_FOREACH(const string& modifType, modifTypes)
+			{
+				const string triggerName = tableName + "_" + modifType;
+				sql <<
 					"CREATE TRIGGER " << triggerName <<
 					"  AFTER " << modifType << " ON " << tableName <<
 					"  FOR EACH ROW CALL notify_synthese('" <<
