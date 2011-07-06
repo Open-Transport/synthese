@@ -55,6 +55,7 @@
 #include "Junction.hpp"
 #include "JunctionTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "PTUseRuleTableSync.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -104,6 +105,7 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
 	}
 
 	namespace impex
@@ -530,6 +532,18 @@ namespace synthese
 					}
 					trip.line = *_lines.get(lineCode).begin();
 
+					// Use rule
+					trip.useRule = NULL;
+					string blockId(_getValue("block_id"));
+					BOOST_FOREACH(const PTUseRuleBlockMasks::value_type& rule, _ptUseRuleBlockMasks)
+					{
+						if(blockId.size() >= rule.first.size() && blockId.substr(0, rule.first.size()) == rule.first)
+						{
+							trip.useRule = rule.second;
+							break;
+						}
+					}
+
 					// Calendar
 					string calendarCode(_getValue("service_id"));
 					Calendars::const_iterator it(_calendars.find(calendarCode));
@@ -705,6 +719,7 @@ namespace synthese
 			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
 			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
+			stream << t.cell("Masque règles d'utilisation", t.getForm().getTextInput(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks)));
 			stream << t.close();
 		}
 
@@ -812,6 +827,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
+			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
 			return map;
 		}
 
@@ -828,5 +844,57 @@ namespace synthese
 			{
 				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 			}
+
+			string ptUseRuleBlockMasksStr(map.getDefault<string>(PARAMETER_USE_RULE_BLOCK_ID_MASK));
+			if(!ptUseRuleBlockMasksStr.empty())
+			{
+				vector<string> rules;
+				split(rules, ptUseRuleBlockMasksStr, is_any_of(","));
+				BOOST_FOREACH(const string& rule, rules)
+				{
+					vector<string> parts;
+					split(parts, rule, is_any_of("="));
+
+					if(parts.size() < 2)
+					{
+						continue;
+					}
+					
+					try
+					{
+						shared_ptr<const PTUseRule> ptUseRule(
+							PTUseRuleTableSync::Get(
+								lexical_cast<RegistryKeyType>(parts[1]),
+								_env
+						)	);
+						_ptUseRuleBlockMasks.insert(make_pair(parts[0], ptUseRule.get()));
+					}
+					catch (...)
+					{
+					}
+				}
+			}
+
+		}
+
+
+
+		std::string GTFSFileFormat::Importer_::_serializePTUseRuleBlockMasks( const PTUseRuleBlockMasks& object )
+		{
+			bool first(true);
+			stringstream serializedPTUseRuleBlockMasks;
+			BOOST_FOREACH(const PTUseRuleBlockMasks::value_type& rule, object)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					serializedPTUseRuleBlockMasks << ",";
+				}
+				serializedPTUseRuleBlockMasks << rule.first << "=" << rule.second->getKey();
+			}
+			return serializedPTUseRuleBlockMasks.str();
 		}
 }	}

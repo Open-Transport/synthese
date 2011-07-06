@@ -57,6 +57,7 @@ namespace synthese
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
+		class PTUseRule;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// GTFS file format.
@@ -91,6 +92,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
+				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
 
 			private:
 				static const std::string SEP;
@@ -103,6 +105,10 @@ namespace synthese
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
+
+				typedef std::map<std::string, const PTUseRule*> PTUseRuleBlockMasks;
+				PTUseRuleBlockMasks _ptUseRuleBlockMasks;
+				static std::string _serializePTUseRuleBlockMasks(const PTUseRuleBlockMasks& object);
 
 				mutable std::vector<std::string> _line;
 
@@ -119,7 +125,8 @@ namespace synthese
 
 				struct Trip
 				{
-					pt::CommercialLine* line;
+					const PTUseRule* useRule;
+					CommercialLine* line;
 					calendar::Calendar calendar;
 					std::string destination;
 					bool direction;
