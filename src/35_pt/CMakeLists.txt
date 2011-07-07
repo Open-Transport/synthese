@@ -95,6 +95,8 @@ LineMarkerInterfacePage.cpp
 LineMarkerInterfacePage.h
 LinePhysicalStop.cpp
 LinePhysicalStop.hpp
+LineAlarmRecipient.cpp
+LineAlarmRecipient.hpp
 LinesListFunction.cpp
 LinesListFunction.h
 LineStop.cpp

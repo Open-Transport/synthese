@@ -32,6 +32,9 @@
 #include "StopPointTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "PTFileFormat.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineStopTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -102,6 +105,12 @@ namespace synthese
 						os
 				)	);
 
+				if(!line)
+				{
+					os << "WARN : Line " << ligneRef << " was not found for service " << serviceRef << "<br />";
+					continue;
+				}
+
 				stringstream chainageQuery;
 				chainageQuery << "SELECT a.mnemol AS mnemol, h.htd AS htd, h.hta AS hta, h.type AS type, c.pos AS pos FROM "
 					<< _database << ".ARRETCHN c " <<
@@ -122,6 +131,7 @@ namespace synthese
 					time_duration departureTime(duration_from_string(chainageResult->getText("htd")));
 					time_duration arrivalTime(duration_from_string(chainageResult->getText("hta")));
 					MetricOffset stopPos(chainageResult->getInt("pos"));
+					bool referenceStop(type != "N");
 
 					std::set<StopPoint*> stopsSet(
 						PTFileFormat::GetStopPoints(
@@ -137,11 +147,11 @@ namespace synthese
 							stopPos,
 							true,
 							true,
-							optional<bool>()
+							referenceStop
 					)	);
 
 					// Ignoring interpolated times
-					if(type != "N")
+					if(referenceStop)
 					{
 						// If the bus leaves after midnight, the hours are stored as 0 instead of 24
 						if( !departureSchedules.empty() && departureTime < *departureSchedules.rbegin())
@@ -175,9 +185,49 @@ namespace synthese
 
 				if(routes.empty())
 				{
-					int i(0);
-					// route creation
+					stringstream routeQuery;
+					routeQuery << "SELECT * FROM " << _database << ".CHAINAGE c " <<
+						"WHERE c.ref='" << chainage << "' AND c.jour=" << todayStr;
+					DBResultSPtr routeResult(DBModule::GetDB()->execQuery(routeQuery.str()));
+					if(routeResult->next())
+					{
+						string routeName(routeResult->getText("nom"));
+						bool wayBack(routeResult->getText("sens") != "A");
+
+						os << "CREA : Creation of route<br />";
+
+						JourneyPattern* result = new JourneyPattern(
+							JourneyPatternTableSync::getId()
+						);
+						result->setCommercialLine(line);
+						line->addPath(result);
+						result->setName(routeName);
+						result->setWayBack(wayBack);
+						result->setCodeBySource(*_plannedDataSource, string());
+						_env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
+						routes.insert(result);
+
+						size_t rank(0);
+						BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
+						{
+							shared_ptr<DesignatedLinePhysicalStop> ls(
+								new DesignatedLinePhysicalStop(
+									LineStopTableSync::getId(),
+									result,
+									rank,
+									rank+1 < servedStops.size() && stop._departure,
+									rank > 0 && stop._arrival,
+									0,
+									*stop._stop.begin(),
+									stop._withTimes ? *stop._withTimes : true
+							)	);
+							result->addEdge(*ls);
+							_env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
+							++rank;
+					}	}
 				}
+				assert(!routes.empty());
+
 				ScheduledService* service(NULL);
 				BOOST_FOREACH(JourneyPattern* route, routes)
 				{
@@ -204,8 +254,20 @@ namespace synthese
 
 				if(!service)
 				{
-					int i(0);
-					// service creation
+					JourneyPattern* route(*routes.begin());
+					service = new ScheduledService(
+						ScheduledServiceTableSync::getId(),
+						string(),
+						route
+					);
+					service->setSchedules(departureSchedules, arrivalSchedules);
+					service->setPath(route);
+					service->setCodeBySource(_dataSource, serviceRef);
+					service->setActive(today);
+					route->addService(service, false);
+					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
+
+					os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
 				}
 			}
 
@@ -303,6 +365,10 @@ namespace synthese
 		db::DBTransaction IneoRealTimeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+			BOOST_FOREACH(const Registry<JourneyPattern>::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
+			{
+				JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
+			}
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
