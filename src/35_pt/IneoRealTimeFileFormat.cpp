@@ -76,6 +76,18 @@ namespace synthese
 			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(*_plannedDataSource, _env);
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*_plannedDataSource, _env);
 
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::value_type& itLine, lines.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Map::mapped_type::value_type& line, itLine.second)
+				{
+					JourneyPatternTableSync::Search(_env, line->getKey());
+					ScheduledServiceTableSync::Search(_env, optional<RegistryKeyType>(), line->getKey());
+					BOOST_FOREACH(const Path* route, line->getPaths())
+					{
+						LineStopTableSync::Search(_env, route->getKey());
+					}
+			}	}
+
 			// 1 : clean the old references to the current source
 			ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(_dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<ScheduledServiceTableSync>::Map::value_type& itService, sourcedServices.getMap())
