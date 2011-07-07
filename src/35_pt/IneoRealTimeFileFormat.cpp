@@ -241,6 +241,7 @@ namespace synthese
 						if(	service->isActive(today) &&
 							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
+							os << "LOAD : Use of service " << service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
 							service->setCodeBySource(_dataSource, serviceRef);
 							break;
 						}
