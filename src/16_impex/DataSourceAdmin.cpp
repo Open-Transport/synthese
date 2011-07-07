@@ -148,18 +148,9 @@ namespace synthese
 			{
 				_importer->displayAdmin(stream, request);
 				bool doImport(_doImport);
-				if(doImport)
-				{
-					doImport = _importer->beforeParsing();
-				}
-				if(doImport)
-				{
-					doImport = _importer->parseFiles(stream, request);
-				}
-				if(doImport)
-				{
-					doImport = _importer->afterParsing();
-				}
+				doImport &= _importer->beforeParsing();
+				doImport &= _importer->parseFiles(stream, request);
+				doImport &= _importer->afterParsing();
 				if(doImport)
 				{
 					_importer->save().run();
