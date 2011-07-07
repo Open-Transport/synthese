@@ -95,6 +95,8 @@
 #include "StopAreaTransferAddAction.h"
 #include "DRTAreaUpdateAction.hpp"
 
+#include "LineAlarmRecipient.hpp"
+
 #include "TransportNetworkRight.h"
 
 #include "StopPointWFSType.hpp"
@@ -233,6 +235,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::StopArea::integrate();
 	
 	synthese::pt::StopPointWFSType::integrate();
+
+	synthese::pt::LineAlarmRecipient::integrate();
 	
 	// Registries
 	synthese::util::Env::Integrate<synthese::pt::Destination>();

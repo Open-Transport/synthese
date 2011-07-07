@@ -72,6 +72,7 @@ namespace synthese
 	namespace pt
 	{
 		const string TransportNetworkAdmin::PARAMETER_SEARCH_NAME("sn");
+		const string TransportNetworkAdmin::PARAMETER_SEARCH_NETWORK_ID("sw");
 
 
 		void TransportNetworkAdmin::setFromParametersMap(
@@ -111,18 +112,17 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const	{
 
-			// Requests
-
 			// Search form
 			stream << "<h1>Recherche</h1>";
-
 			AdminFunctionRequest<TransportNetworkAdmin> searchRequest(_request);
-			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
-			stream << s.open();
-			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
-			HTMLForm sortedForm(s.getForm());
-			stream << s.close();
+			HTMLForm sortedForm(searchRequest.getHTMLForm("search"));
 
+			getHTMLLineSearchForm(
+				stream,
+				sortedForm,
+				optional<RegistryKeyType>(),
+				_searchName
+			);
 
 			// Results display
 			stream << "<h1>Lignes du réseau</h1>";
@@ -130,14 +130,14 @@ namespace synthese
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
 					Env::GetOfficialEnv(),
-					_network->getKey()
-					, string("%"+_searchName+"%"),
+					_network->getKey(),
+					string("%"+_searchName+"%"),
 					optional<string>(),
-					_requestParameters.first
-					, _requestParameters.maxSize
-					, false
-					, _requestParameters.orderField == PARAMETER_SEARCH_NAME
-					, _requestParameters.raisingOrder
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					false,
+					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+					_requestParameters.raisingOrder
 			)	);
 
 			ResultHTMLTable::HeaderVector h;
@@ -243,6 +243,30 @@ namespace synthese
 		void TransportNetworkAdmin::setNetwork( boost::shared_ptr<const pt::TransportNetwork> value )
 		{
 			_network = value;
+		}
+
+
+
+		void TransportNetworkAdmin::getHTMLLineSearchForm(
+			std::ostream& stream,
+			const html::HTMLForm& form,
+			boost::optional<util::RegistryKeyType> networkId,
+			boost::optional<const std::string&> lineName
+		){
+
+			SearchFormHTMLTable s(form);
+			stream << s.open();
+			if(networkId)
+			{
+				stream << s.cell("Réseau", s.getForm().getTextInput(PARAMETER_SEARCH_NETWORK_ID, lexical_cast<string>(*networkId)));
+			}
+			if(lineName)
+			{
+				stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, *lineName));
+			}
+			HTMLForm sortedForm(s.getForm());
+			stream << s.close();
+
 		}
 	}
 }
