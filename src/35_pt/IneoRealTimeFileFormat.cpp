@@ -370,6 +370,10 @@ namespace synthese
 			{
 				JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
 			}
+			BOOST_FOREACH(const Registry<DesignatedLinePhysicalStop>::value_type& lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+			{
+				LineStopTableSync::Save(lineStop.second.get(), transaction);
+			}
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
