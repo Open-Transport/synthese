@@ -145,8 +145,8 @@ namespace synthese
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
 							stopsSet,
 							stopPos,
-							true,
-							true,
+							(type != "A"),
+							(type != "D"),
 							referenceStop
 					)	);
 
