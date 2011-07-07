@@ -26,7 +26,7 @@
 #define SYNTHESE_TransportNetworkAdmin_H__
 
 #include "ResultHTMLTable.h"
-
+#include "StaticActionRequest.h"
 #include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
@@ -34,6 +34,7 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
+		class CommercialLineAddAction;
 
 		/** TransportNetworkAdmin Class.
 			@ingroup m35Admin refAdmin
@@ -50,6 +51,7 @@ namespace synthese
 
 		public:
 			static const std::string PARAMETER_SEARCH_NAME;
+			static const std::string PARAMETER_SEARCH_NETWORK_ID;
 
 
 			/** Initialization of the parameters from a parameters map.
@@ -112,6 +114,14 @@ namespace synthese
 
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
+
+			static void getHTMLLineSearchForm(
+				std::ostream& stream,
+				const html::HTMLForm& form,
+				boost::optional<util::RegistryKeyType> networkId,
+				boost::optional<const std::string&> lineName
+			);
 
 			//! @name Setters
 			//@{
