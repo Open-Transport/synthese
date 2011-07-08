@@ -28,6 +28,7 @@
 #include "StopPoint.hpp"
 #include "ScheduledService.h"
 #include "AdminInterfaceElement.h"
+#include "RuleUser.h"
 
 namespace synthese
 {
@@ -232,12 +233,18 @@ namespace synthese
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Search for an existing route which matches with the defined parameters, or create a new one if no existing route is compliant.
+			/// @param line The line
+			/// @pre The line object must link to all existing routes (use JourneyPatternTableSync::Search to populate the object)
+			/// @author Hugues Romain
 			static JourneyPattern* CreateOrUpdateRoute(
 				pt::CommercialLine& line,
 				boost::optional<const std::string&> id,
 				boost::optional<const std::string&> name,
 				boost::optional<const std::string&> destination,
 				boost::optional<Destination*> destinationObj,
+				boost::optional<const graph::RuleUser::Rules&> useRule,
 				bool direction,
 				pt::RollingStock* rollingStock,
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
