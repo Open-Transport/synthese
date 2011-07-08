@@ -59,6 +59,7 @@ namespace synthese
 		const string PTRoutesListFunction::PARAMETER_MERGE_INCLUDING_ROUTES("mir");
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
 		const string PTRoutesListFunction::PARAMETER_DATE("date");
+		const string PTRoutesListFunction::PARAMETER_FILTER_MAIN_ROUTES("fmr");
 
 		const std::string PTRoutesListFunction::DATA_NAME("name");
 		const std::string PTRoutesListFunction::DATA_LENGTH("length");
@@ -70,6 +71,7 @@ namespace synthese
 		const std::string PTRoutesListFunction::DATA_DESTINATION_STOP_NAME("destination_stop_name");
 		const std::string PTRoutesListFunction::DATA_RANK("rank");
 		const std::string PTRoutesListFunction::DATA_RANK_IS_ODD("rank_is_odd");
+		const std::string PTRoutesListFunction::DATA_IS_MAIN("is_main");
 
 
 
@@ -85,6 +87,10 @@ namespace synthese
 			if(_line.get())
 			{
 				map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
+			}
+			if(_filterMainRoutes)
+			{
+				map.insert(PARAMETER_FILTER_MAIN_ROUTES, *_filterMainRoutes);
 			}
 			return map;
 		}
@@ -105,6 +111,9 @@ namespace synthese
 			_mergeIncludingRoutes = map.getDefault<bool>(PARAMETER_MERGE_INCLUDING_ROUTES, false);
 
 			_mergeSameRoutes = map.getDefault<bool>(PARAMETER_MERGE_SAME_ROUTES, false);
+
+			// Filter on the "main route" attribute
+			_filterMainRoutes = map.getOptional<bool>(PARAMETER_FILTER_MAIN_ROUTES);
 
 			try
 			{
@@ -142,16 +151,26 @@ namespace synthese
 			// Selection of routes by same comparison
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
-				if(_date)
+				const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
+				if(!thisRoute)
 				{
-					const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
-
-					if(!thisRoute->isActive(_date->date()))
-					{
-						continue;
-					}
+					continue;
 				}
 
+				// Date filter
+				if(_date && !thisRoute->isActive(_date->date()))
+				{
+					continue;
+				}
+
+				// Main route filter
+				if(_filterMainRoutes && thisRoute->getMain() != *_filterMainRoutes)
+				{
+					continue;
+				}
+
+
+				// Route merging
 				if(_mergeSameRoutes)
 				{
 					bool toInsert(true);
@@ -169,7 +188,7 @@ namespace synthese
 					}
 				}
 
-				routes.insert(dynamic_cast<const JourneyPattern*>(path));
+				routes.insert(thisRoute);
 			}
 
 			// Selection of routes by inclusion
@@ -215,10 +234,11 @@ namespace synthese
 				{
 					ParametersMap pm(_savedParameters);
 
-					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey()); //0
-					pm.insert(DATA_NAME, route->getName()); //1
-					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0)); //2
-					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size()); //3
+					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey());
+					pm.insert(DATA_NAME, route->getName());
+					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0));
+					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size());
+					pm.insert(DATA_IS_MAIN, route->getMain());
 					pm.insert(DATA_DIRECTION,
 						route->getDirection().empty() && route->getDirectionObj() ?
 						route->getDirectionObj()->getDisplayedText() :
@@ -228,8 +248,8 @@ namespace synthese
 						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
 						if(lineStop)
 						{
-							pm.insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()); //5
-							pm.insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName()); //6
+							pm.insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
+							pm.insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
 						}
 					}
 					{
@@ -253,6 +273,7 @@ namespace synthese
 
 					stream << "<direction id=\""<< route->getKey() <<
 						"\" name=\""            << route->getName() <<
+						"\" " << DATA_IS_MAIN << "=\"" << route->getMain() <<
 						"\" directionText=\""   << (
 							route->getDirection().empty() && route->getDirectionObj() ?
 							route->getDirectionObj()->getDisplayedText() :

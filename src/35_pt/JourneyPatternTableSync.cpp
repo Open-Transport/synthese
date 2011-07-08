@@ -69,6 +69,7 @@ namespace synthese
 		const string JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string JourneyPatternTableSync::COL_WAYBACK("wayback");
 		const string JourneyPatternTableSync::COL_DATASOURCE_ID("data_source");
+		const string JourneyPatternTableSync::COL_MAIN("main");
 	}
 
 	namespace db
@@ -91,6 +92,7 @@ namespace synthese
 			DBTableSync::Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
 			DBTableSync::Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			DBTableSync::Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
 
@@ -125,6 +127,7 @@ namespace synthese
 			line->setRollingStock(NULL);
 			line->setCommercialLine(NULL);
 			line->cleanDataSourceLinks();
+			line->setMain(rows->getBool(JourneyPatternTableSync::COL_MAIN));
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
@@ -246,6 +249,7 @@ namespace synthese
 				ImportableTableSync::SerializeDataSourceLinks(
 					object->getDataSourceLinks()
 			)	);
+			query.addField(object->getMain());
 			query.execute(transaction);
 		}
 

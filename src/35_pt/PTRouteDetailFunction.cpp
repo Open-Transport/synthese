@@ -86,6 +86,7 @@ namespace synthese
 		const string PTRouteDetailFunction::DATA_DIRECTION_ALIAS("directionAlias");
 		const string PTRouteDetailFunction::DATA_DEPARTURE_TIME("departureTime");
 		const string PTRouteDetailFunction::DATA_ARRIVAL_TIME("arrivalTime");
+		const string PTRouteDetailFunction::DATA_IS_MAIN("isMain");
 
 
 
@@ -197,6 +198,7 @@ namespace synthese
 				ParametersMap m(request.getFunction()->getSavedParameters());
 				m.insert(DATA_ID, _journeyPattern->getKey());
 				m.insert(DATA_NAME, _journeyPattern->getName());
+				m.insert(DATA_IS_MAIN, _journeyPattern->getMain());
 				m.insert(DATA_LINE_ID, commercialLine->getKey());
 				m.insert(DATA_LINE_NAME, commercialLine->getName());
 				m.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName());

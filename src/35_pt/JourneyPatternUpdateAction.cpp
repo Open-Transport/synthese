@@ -56,6 +56,7 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION = Action_PARAMETER_PREFIX + "di";
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID = Action_PARAMETER_PREFIX + "ii";
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
+		const string JourneyPatternUpdateAction::PARAMETER_MAIN = Action_PARAMETER_PREFIX + "ma";
 
 
 
@@ -90,6 +91,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DIRECTION_ID, _directionObj->get() ? (*_directionObj)->getKey() : RegistryKeyType(0));
 			}
+			if(_main)
+			{
+				map.insert(PARAMETER_MAIN, *_main);
+			}
 			return map;
 		}
 
@@ -117,6 +122,11 @@ namespace synthese
 			if(map.isDefined(PARAMETER_WAYBACK))
 			{
 				_wayback = map.get<bool>(PARAMETER_WAYBACK);
+			}
+
+			if(map.isDefined(PARAMETER_MAIN))
+			{
+				_main = map.get<bool>(PARAMETER_MAIN);
 			}
 
 			if(map.isDefined(PARAMETER_TRANSPORT_MODE_ID))
@@ -174,6 +184,10 @@ namespace synthese
 			if(_transportMode)
 			{
 				_route->setRollingStock(_transportMode->get());
+			}
+			if(_main)
+			{
+				_route->setMain(*_main);	
 			}
 			if(_direction)
 			{

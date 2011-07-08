@@ -675,6 +675,10 @@ namespace synthese
 						waybackMap,
 						optional<bool>(_line->getWayBack())
 				)	);
+				stream << p.cell(
+					"Itinéraire principal de ligne",
+					p.getForm().getOuiNonRadioInput(JourneyPatternUpdateAction::PARAMETER_MAIN, _line->getMain())
+				);
 				stream << p.close();
 
 				PTRuleUserAdmin<JourneyPattern,JourneyPatternAdmin>::Display(stream, _line, _request);

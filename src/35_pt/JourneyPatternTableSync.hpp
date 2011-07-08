@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string COL_PEDESTRIANCOMPLIANCEID;
 			static const std::string COL_WAYBACK;
 			static const std::string COL_DATASOURCE_ID;
+			static const std::string COL_MAIN;
 
 
 			/** JourneyPattern search.
