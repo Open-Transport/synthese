@@ -33,9 +33,9 @@ using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 
-
 namespace synthese
 {
+	using namespace graph;
 	using namespace impex;
 	using namespace calendar;
 	using namespace db;
@@ -218,6 +218,7 @@ namespace synthese
 						user_data->tripNumber,
 						boost::optional<const std::string&>(),
 						optional<Destination*>(),
+						optional<const RuleUser::Rules&>(),
 						true,
 						NULL, // (rolling stock)
 						user_data->tripStops,

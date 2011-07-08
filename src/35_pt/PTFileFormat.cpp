@@ -375,6 +375,10 @@ namespace synthese
 			{
 				line->setShortName(shortName);
 			}
+			if(color)
+			{
+				line->setColor(color);
+			}
 
 			return line;
 		}
@@ -387,6 +391,7 @@ namespace synthese
 			boost::optional<const std::string&> name,
 			boost::optional<const std::string&> destination,
 			boost::optional<Destination*> destinationObj,
+			boost::optional<const RuleUser::Rules&> rules,
 			bool direction,
 			pt::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
@@ -413,6 +418,7 @@ namespace synthese
 
 				if(	(!rollingStock || jp->getRollingStock() == rollingStock) &&
 					(!id || jp->getCodeBySource(source) == *id) &&
+					(!rules || jp->getRules() == *rules) &&
 					*jp == servedStops
 				){
 					logStream << "LOAD : Use of route " << jp->getKey() << " (" << jp->getName() << ") for " << (id ? *id : string("unknown")) << ")<br />";
@@ -428,8 +434,12 @@ namespace synthese
 				result = new JourneyPattern(
 					JourneyPatternTableSync::getId()
 				);
+
+				// Line link
 				result->setCommercialLine(&line);
 				line.addPath(result);
+
+				// Source links
 				Importable::DataSourceLinks links;
 				if(id)
 				{
@@ -440,13 +450,26 @@ namespace synthese
 					links.insert(make_pair(&source, string()));
 				}
 				result->setDataSourceLinks(links);
+
+				// Transport mode
 				if(rollingStock)
 				{
 					result->setRollingStock(rollingStock);
 				}
+
+				// Use rules
+				if(rules)
+				{
+					result->setRules(*rules);
+				}
+
+				// Wayback
 				result->setWayBack(direction);
+
+				// Storage in the environment
 				env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
 
+				// Served stops
 				size_t rank(0);
 				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
