@@ -87,6 +87,7 @@ namespace synthese
 			static const std::string DATA_DIRECTION_ALIAS;
 			static const std::string DATA_DEPARTURE_TIME;
 			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_IS_MAIN;
 
 			//! \name Page parameters
 			//@{
