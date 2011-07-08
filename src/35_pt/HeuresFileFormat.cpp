@@ -384,6 +384,7 @@ namespace synthese
 							optional<const string&>(),
 							optional<const string&>(),
 							destination,
+							optional<const RuleUser::Rules&>(),
 							true,
 							bus,
 							servedStops,

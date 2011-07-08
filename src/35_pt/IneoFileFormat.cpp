@@ -382,6 +382,7 @@ namespace synthese
 								jpName,
 								optional<const string&>(), // destination
 								optional<Destination*>(),
+								optional<const RuleUser::Rules&>(),
 								jpWayback,
 								NULL,
 								stops,

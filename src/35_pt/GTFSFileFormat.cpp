@@ -419,12 +419,24 @@ namespace synthese
 						continue;
 					}
 
+					// Color
+					optional<RGBColor> color;
+					string colorStr(_getValue("route_color"));
+					if(colorStr.size() == 6)
+					{
+						color = RGBColor::FromXMLColor("#"+ colorStr);
+					}
+					else if(colorStr.size() == 7 && colorStr[0] == '#')
+					{
+						color = RGBColor::FromXMLColor(colorStr);
+					}
+
 					PTFileFormat::CreateOrUpdateLine(
 						_lines,
 						id,
 						_getValue("route_long_name"),
 						_getValue("route_short_name"),
-						_getValue("route_color").size() == 7 ? optional<RGBColor>(RGBColor::FromXMLColor(_getValue("route_color"))) : optional<RGBColor>(),
+						color,
 						*network,
 						_dataSource,
 						_env,
@@ -597,6 +609,10 @@ namespace synthese
 							stops.push_back(stop);
 						}
 
+						// Use rules
+						RuleUser::Rules rules(RuleUser::GetEmptyRules());
+						rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = trip.useRule;
+
 						JourneyPattern* route(
 							PTFileFormat::CreateOrUpdateRoute(
 								*trip.line,
@@ -604,6 +620,7 @@ namespace synthese
 								optional<const string&>(),
 								optional<const string&>(trip.destination),
 								optional<Destination*>(),
+								rules,
 								trip.direction,
 								NULL,
 								stops,
