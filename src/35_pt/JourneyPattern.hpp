@@ -100,6 +100,7 @@ namespace synthese
 			SubLines	_subLines;	//!< Copied lines handling services which not serve the line theory
 
 			bool _wayBack;	//!< true if back route, false else (forward route or unknown)
+			bool _main; //!< can be considered as a main route of the line
 
 		public:
 
@@ -122,6 +123,7 @@ namespace synthese
 				const SubLines		getSubLines()				const;
 				bool				getWayBack()				const { return _wayBack; }
 				Destination*		getDirectionObj()			const { return _directionObj; }
+				bool				getMain()					const { return _main; }
 			//@}
 
 
@@ -134,6 +136,7 @@ namespace synthese
 				void setCommercialLine(CommercialLine* value);
 				void setWayBack(bool value) { _wayBack = value; }
 				void setDirectionObj(Destination* value){ _directionObj = value; }
+				void setMain(bool value){ _main = value; }
 			//@}
 
 

@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_DIRECTION;
 			static const std::string PARAMETER_DIRECTION_ID;
 			static const std::string PARAMETER_WAYBACK;
+			static const std::string PARAMETER_MAIN;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
@@ -65,6 +66,7 @@ namespace synthese
 			boost::optional<std::string> _direction;
 			boost::optional<bool> _wayback;
 			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+			boost::optional<bool> _main;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

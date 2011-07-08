@@ -58,6 +58,7 @@ namespace synthese
 			static const std::string PARAMETER_MERGE_INCLUDING_ROUTES;
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_FILTER_MAIN_ROUTES;
 
 			static const std::string DATA_NAME;
 			static const std::string DATA_LENGTH;
@@ -69,6 +70,7 @@ namespace synthese
 			static const std::string DATA_DESTINATION_STOP_NAME;
 			static const std::string DATA_RANK;
 			static const std::string DATA_RANK_IS_ODD;
+			static const std::string DATA_IS_MAIN;
 
 
 		protected:
@@ -79,6 +81,7 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime> _date;
 				bool _mergeSameRoutes;
 				bool _mergeIncludingRoutes;
+				boost::optional<bool> _filterMainRoutes;
 			//@}
 
 
