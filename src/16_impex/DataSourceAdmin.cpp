@@ -155,6 +155,8 @@ namespace synthese
 				{
 					_importer->save().run();
 				}
+
+				stream << "Return code : " << doImport ? "0" : "1";
 			}
 
 			////////////////////////////////////////////////////////////////////
