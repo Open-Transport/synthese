@@ -156,8 +156,8 @@ namespace synthese
 			)	);
 
 			ResultHTMLTable::HeaderVector h;
-			h.push_back(make_pair(string(), "N°"));
-			h.push_back(make_pair(TransportNetworkAdmin::PARAMETER_SEARCH_NETWORK_ID, "Réseau"));
+			h.push_back(make_pair(string(), "NÂ°"));
+			h.push_back(make_pair(TransportNetworkAdmin::PARAMETER_SEARCH_NETWORK_ID, "RÃ©seau"));
 			h.push_back(make_pair(TransportNetworkAdmin::PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
 			ResultHTMLTable t(
@@ -174,11 +174,12 @@ namespace synthese
 				{
 					continue;
 				}
+				addRequest.getAction()->setObjectId(line->getKey());
 
 				stream << t.row();
 				stream << t.col(1, line->getStyle(), true);
 				stream << line->getNetwork()->getName();
-				stream << line->getShortName();
+				stream << "/" << line->getShortName();
 				stream << t.col();
 				stream << line->getName();
 				stream << t.col();
