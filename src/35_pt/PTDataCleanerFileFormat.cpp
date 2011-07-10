@@ -28,6 +28,8 @@
 #include "LineStopTableSync.h"
 #include "CalendarTemplateTableSync.h"
 #include "RequestException.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "LineArea.hpp"
 
 using namespace boost;
 using namespace boost::gregorian;
@@ -83,6 +85,13 @@ namespace synthese
 						}
 
 						NonPermanentService* service(static_cast<NonPermanentService*>(itService));
+
+						// Avoid call of Calendar constructor with undefined end date for services without dates
+						if(service->empty())
+						{
+							continue;
+						}
+
 						if(_fromToday)
 						{
 							if(now <= service->getLastActiveDate())
@@ -154,6 +163,17 @@ namespace synthese
 			// Journey patterns to delete are removed from the environment to avoid useless saving
 			BOOST_FOREACH(shared_ptr<JourneyPattern> journeyPattern, _journeyPatternsToRemove)
 			{
+				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
+				{
+					if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))
+					{
+						_env.getEditableRegistry<DesignatedLinePhysicalStop>().remove(edge->getKey());
+					}
+					else if(dynamic_cast<const LineArea*>(edge))
+					{
+						_env.getEditableRegistry<LineArea>().remove(edge->getKey());
+					}
+				}
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
 			}
 		}
