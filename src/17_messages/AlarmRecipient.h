@@ -37,6 +37,11 @@ namespace synthese
 		class HTMLForm;
 	}
 
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace messages
 	{
 		class Alarm;
@@ -85,6 +90,11 @@ namespace synthese
 			virtual AlarmConflict getConflictStatus(const SentAlarm* alarm) const = 0;
 			virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m) = 0;
 
+			virtual util::RegistryKeyType getObjectIdBySource(
+				const impex::DataSource& source,
+				const std::string& key,
+				util::Env& env
+			) const = 0;
 		};
 	}
 }
