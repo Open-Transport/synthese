@@ -335,6 +335,11 @@ namespace synthese
 
 				// Type
 //				stream << t1.col() << MessagesModule::getLevelLabel(message.level);
+				stream << t1.col();
+				if(message->getTemplate())
+				{
+					stream << message->getTemplate()->getName();
+				}
 
 				stream << t1.col() << message->getName();
 				//stream << t1.col(); // Bullet
