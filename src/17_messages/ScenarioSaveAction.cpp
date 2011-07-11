@@ -44,13 +44,16 @@
 #include "DataSourceTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "ScenarioSentAlarmInheritedTableSync.h"
+#include "AlarmRecipient.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -60,7 +63,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace impex;
-
+	
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
 
 	namespace messages
@@ -79,6 +82,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID(Action_PARAMETER_PREFIX + "re");
 		const string ScenarioSaveAction::PARAMETER_LEVEL(Action_PARAMETER_PREFIX + "le");
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID(Action_PARAMETER_PREFIX + "rs");
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE(Action_PARAMETER_PREFIX + "rt");
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID(Action_PARAMETER_PREFIX + "is");
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
@@ -101,13 +105,21 @@ namespace synthese
 					{
 						_dataSourceLinkId = map.get<string>(PARAMETER_SCENARIO_ID);
 
-/*						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync> scenarios(*_scenarioDataSource, *_env);
-						set<SentScenario*> scenarioSet(scenarios.get(_dataSourceLinkId));
+						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync> scenarios(*_scenarioDataSource, *_env);
+						ImportableTableSync::ObjectBySource<SentScenarioInheritedTableSync>::Set scenarioSet(scenarios.get(_dataSourceLinkId));
 						if(!scenarioSet.empty())
 						{
 							_scenario = _env->getEditableSPtr(*scenarioSet.begin());
+							if(dynamic_cast<SentScenario*>(_scenario.get()))
+							{
+								_sscenario = static_pointer_cast<SentScenario, Scenario>(_scenario);
+							}
+							if(dynamic_cast<ScenarioTemplate*>(_scenario.get()))
+							{
+								_tscenario = static_pointer_cast<ScenarioTemplate, Scenario>(_scenario);
+							}
 						}
-*/					}
+					}
 				}
 				else if(map.isDefined(PARAMETER_SCENARIO_ID))
 				{
@@ -214,18 +226,52 @@ namespace synthese
 						else
 						{	// Blank scenario
 							_sscenario.reset(new SentScenario);
-
-							if(	map.isDefined(PARAMETER_MESSAGE_TO_CREATE) &&
-								map.isDefined(PARAMETER_RECIPIENT_ID)
-							){
-								_messageToCreate = map.get<string>(PARAMETER_MESSAGE_TO_CREATE);
-								_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
-								_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
-							}
 						}
 					}
 					_scenario = static_pointer_cast<Scenario, SentScenario>(_sscenario);
 				}
+
+
+				// Messages
+				if(	map.isDefined(PARAMETER_MESSAGE_TO_CREATE)
+				){
+					_messageToCreate = map.get<string>(PARAMETER_MESSAGE_TO_CREATE);
+					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
+
+					if(!map.getDefault<string>(PARAMETER_RECIPIENT_ID).empty())
+					{
+						// Recipient data source
+						if(map.getDefault<RegistryKeyType>(PARAMETER_RECIPIENT_DATASOURCE_ID, 0))
+						{
+							_recipientDataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_RECIPIENT_DATASOURCE_ID), *_env);
+						}
+
+						// Recipient type
+						_recipientType = map.get<string>(PARAMETER_RECIPIENT_TYPE);
+						shared_ptr<AlarmRecipient> recipientType(Factory<AlarmRecipient>::create(_recipientType));
+
+						vector<string> recipients;
+						split(recipients, map.get<string>(PARAMETER_RECIPIENT_ID), is_any_of(","));
+						_recipients = vector<RegistryKeyType>();
+						BOOST_FOREACH(const string& recipient, recipients)
+						{
+							if(_recipientDataSource.get())
+							{
+								_recipients->push_back(
+									recipientType->getObjectIdBySource(
+										*_recipientDataSource,
+										recipient,
+										*_env
+								)	);
+							}
+							else
+							{
+								_recipients->push_back(lexical_cast<RegistryKeyType>(recipient));
+							}
+						}
+					}
+				}
+
 
 				// Properties
 
@@ -512,23 +558,6 @@ namespace synthese
 							*_sscenario
 						);
 					}
-					else if(_messageToCreate && _recipientId && _level)
-					{
-						SentAlarm message;
-						message.setScenario(_scenario.get());
-						message.setLongMessage(*_messageToCreate);
-						message.setShortMessage("Unique message");
-						message.setLevel(*_level);
-						message.setTemplate(NULL);
-
-						AlarmTableSync::Save(&message);
-
-						AlarmObjectLink link;
-						link.setAlarm(&message);
-						link.setObjectId(*_recipientId);
-
-						AlarmObjectLinkTableSync::Save(&link);
-					}
 				}
 				else
 				{
@@ -536,6 +565,49 @@ namespace synthese
 						_template->getKey(),
 						*_tscenario
 					);
+				}
+			}
+			if(_messageToCreate && _level && _sscenario.get())
+			{
+				shared_ptr<SentAlarm> message;
+
+				ScenarioSentAlarmInheritedTableSync::SearchResult msgs(
+					ScenarioSentAlarmInheritedTableSync::Search(
+						*_env, _sscenario->getKey()
+				)	);
+				if(msgs.size() == 1 || _creation)
+				{
+					if(msgs.size() == 1)
+					{
+						message = msgs.front();
+						if(_recipients)
+						{
+							AlarmObjectLinkTableSync::Remove(message->getKey());
+						}
+					}
+					else
+					{
+						message.reset(new SentAlarm);
+						message->setScenario(_scenario.get());
+						message->setTemplate(NULL);
+						message->setShortMessage("Unique message");
+					}
+
+					message->setLongMessage(*_messageToCreate);
+					message->setLevel(*_level);
+
+					AlarmTableSync::Save(message.get());
+
+					if(_recipients)
+					{
+						BOOST_FOREACH(RegistryKeyType recipient, *_recipients)
+						{
+							AlarmObjectLink link;
+							link.setAlarm(message.get());
+							link.setObjectId(recipient);
+							AlarmObjectLinkTableSync::Save(&link);
+						}
+					}
 				}
 			}
 

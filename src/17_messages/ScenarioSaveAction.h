@@ -96,7 +96,7 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime>			_endDate;
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
-				boost::optional<util::RegistryKeyType>				_recipientId;
+				boost::optional<std::vector<util::RegistryKeyType> >	_recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;

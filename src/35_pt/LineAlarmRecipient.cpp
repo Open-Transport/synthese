@@ -41,6 +41,7 @@
 #include "AdminModule.h"
 #include "TransportNetworkAdmin.h"
 #include "TransportNetwork.h"
+#include "ImportableTableSync.hpp"
 
 #include <boost/foreach.hpp>
 #include <vector>
@@ -57,6 +58,7 @@ namespace synthese
 	using namespace admin;
 	using namespace html;
 	using namespace security;
+	using namespace impex;
 
 	namespace util
 	{
@@ -84,6 +86,23 @@ namespace synthese
 		{
 			m.push_back(make_pair(GLOBAL_PERIMETER,"(toutes les lignes)"));
 			PTModule::getNetworkLinePlaceRightParameterList(m);
+		}
+
+
+
+		template<>
+		util::RegistryKeyType AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::GetObjectIdBySource(
+			const impex::DataSource& source,
+			const std::string& key,
+			util::Env& env
+		){
+			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(source, env);
+			ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Set linesSet(lines.get(key));
+			if(linesSet.empty())
+			{
+				throw Exception("No such line");
+			}
+			return (*linesSet.begin())->getKey();
 		}
 
 	}
@@ -232,5 +251,4 @@ namespace synthese
 		{
 			remove(CommercialLineTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
 		}
-	}
-}
+}	}

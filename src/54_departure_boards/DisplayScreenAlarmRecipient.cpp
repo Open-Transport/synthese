@@ -29,6 +29,7 @@
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayType.h"
 #include "DisplayScreen.h"
+#include "ImportableTableSync.hpp"
 
 // Std
 #include <vector>
@@ -76,6 +77,7 @@ namespace synthese
 	using namespace interfaces;
 	using namespace html;
 	using namespace security;
+	using namespace impex;
 
 	namespace util
 	{
@@ -105,8 +107,23 @@ namespace synthese
 			PTModule::getNetworkLinePlaceRightParameterList(m);
 		}
 
-	}
 
+
+		template<>
+		RegistryKeyType AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::GetObjectIdBySource(
+			const impex::DataSource& source,
+			const std::string& key,
+			util::Env& env
+		){
+			ImportableTableSync::ObjectBySource<DisplayScreenTableSync> screens(source, env);
+			ImportableTableSync::ObjectBySource<DisplayScreenTableSync>::Set screensSet(screens.get(key));
+			if(screensSet.empty())
+			{
+				throw Exception("No such screen");
+			}
+			return (*screensSet.begin())->getKey();
+		}
+	}
 
 	namespace departure_boards
 	{
@@ -293,5 +310,4 @@ namespace synthese
 		{
 			remove(DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
 		}
-	}
-}
+}	}
