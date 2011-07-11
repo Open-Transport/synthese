@@ -389,7 +389,9 @@ namespace synthese
 							VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
 							if(geometries.find(od) == geometries.end())
 							{
-								geometries.insert(make_pair(od, static_pointer_cast<Geometry,LineString>(edge->getRealGeometry())));
+								shared_ptr<LineString> lineGeometry = edge->getRealGeometry();
+								if (lineGeometry)
+									geometries.insert(make_pair(od, lineGeometry));
 							}
 						}
 					}
