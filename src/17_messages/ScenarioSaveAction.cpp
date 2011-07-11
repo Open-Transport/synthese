@@ -251,7 +251,7 @@ namespace synthese
 						shared_ptr<AlarmRecipient> recipientType(Factory<AlarmRecipient>::create(_recipientType));
 
 						vector<string> recipients;
-						split(recipients, map.get<string>(PARAMETER_RECIPIENT_ID), is_any_of(","));
+						boost::algorithm::split(recipients, map.get<string>(PARAMETER_RECIPIENT_ID), is_any_of(","));
 						_recipients = vector<RegistryKeyType>();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
