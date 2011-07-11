@@ -54,6 +54,7 @@ namespace synthese
 			setTimetableName(line->getTimetableName());
 			setDirection(line->getDirection());
 			setWalkingLine(line->getWalkingLine());
+			setWayBack(line->getWayBack());
 
 			// Copy of the line-stops
 			const Path::Edges edges(line->getEdges());
