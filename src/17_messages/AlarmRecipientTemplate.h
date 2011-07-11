@@ -76,6 +76,12 @@ namespace synthese
 
 		static void getStaticParametersLabels(security::ParameterLabelsVector& m);
 
+		static util::RegistryKeyType GetObjectIdBySource(
+			const impex::DataSource& source,
+			const std::string& key,
+			util::Env& env
+		);
+
 		/** Catch of an alarm conflict for a specified recipient.
 			@param object The recipient to analyze
 			@return synthese::messages::AlarmConflict the "worse" conflict status of all the alarms to display on the recipient.
@@ -93,8 +99,25 @@ namespace synthese
 		*/
 		AlarmConflict getConflictStatus(const SentAlarm* alarm) const;
 
+		virtual util::RegistryKeyType getObjectIdBySource(
+			const impex::DataSource& source,
+			const std::string& key,
+			util::Env& env
+		) const;
+
 		virtual void getStaticParametersLabelsVirtual(security::ParameterLabelsVector& m);
 	};
+
+
+
+	template<class T, class C>
+	util::RegistryKeyType synthese::messages::AlarmRecipientTemplate<T, C>::getObjectIdBySource(
+		const impex::DataSource& source,
+		const std::string& key,
+		util::Env& env
+	) const {
+		return GetObjectIdBySource(source, key, env);
+	}
 
 	template<class T, class C>
 	const util::RegistryTableType synthese::messages::AlarmRecipientTemplate<T, C>::getTableId() const

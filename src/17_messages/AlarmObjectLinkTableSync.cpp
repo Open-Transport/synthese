@@ -249,7 +249,10 @@ namespace synthese
 		){
 			DeleteQuery<AlarmObjectLinkTableSync> query;
 			query.addWhereField(COL_ALARM_ID, alarmId);
-			query.addWhereField(COL_OBJECT_ID, *objectId);
+			if(objectId)
+			{
+				query.addWhereField(COL_OBJECT_ID, *objectId);
+			}
 			query.execute();
 		}
 

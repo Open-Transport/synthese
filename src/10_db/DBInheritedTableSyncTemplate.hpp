@@ -47,6 +47,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<boost::shared_ptr<ObjectClass> > SearchResult;
+			typedef ObjectClass ObjectType;
 
 		protected:
 			/** Object links loader from the database.
@@ -62,7 +63,7 @@ namespace synthese
 				ObjectClass* obj,
 				const DBResultSPtr& rows,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 
@@ -90,7 +91,7 @@ namespace synthese
 			static boost::shared_ptr<ObjectClass> GetEditable(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				typename ObjectClass::Registry& registry(
@@ -133,7 +134,7 @@ namespace synthese
 			static boost::shared_ptr<const ObjectClass> Get(
 				util::RegistryKeyType key,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				return boost::const_pointer_cast<const ObjectClass>(GetEditable(key,env,linkLevel,autoCreate));
@@ -233,7 +234,7 @@ namespace synthese
 			virtual boost::shared_ptr<typename ParentTableSyncClass::ObjectType> _getEditable(
 				util::RegistryKeyType key,
 				util::Env& env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				try
@@ -250,7 +251,7 @@ namespace synthese
 			virtual boost::shared_ptr<const typename ParentTableSyncClass::ObjectType> _get(
 				util::RegistryKeyType key,
 				util::Env& env = NULL,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			){
 				try
@@ -267,7 +268,7 @@ namespace synthese
 				typename ParentTableSyncClass::ObjectType* obj,
 				const DBResultSPtr& rows,
 				util::Env& env,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			){
 				Load(static_cast<ObjectClass*>(obj), rows, env, linkLevel);
 			}
