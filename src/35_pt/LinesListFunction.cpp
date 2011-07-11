@@ -316,6 +316,11 @@ namespace synthese
 				set<RollingStock *> rollingStocks;
 				BOOST_FOREACH(Path* path, line->getPaths())
 				{
+					if(!dynamic_cast<const JourneyPattern*>(path))
+					{
+						continue;
+					}
+
 					if(	!static_cast<const JourneyPattern*>(path)->getRollingStock()
 					){
 						continue;
@@ -336,6 +341,11 @@ namespace synthese
 					set<const StopArea*> stopAreas;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
+						if(!dynamic_cast<const JourneyPattern*>(path))
+						{
+							continue;
+						}
+
 						BOOST_FOREACH(Edge* edge, path->getEdges())
 						{
 							if(!edge->getFromVertex())
@@ -365,6 +375,11 @@ namespace synthese
 					VertexPairs geometries;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
+						if(!dynamic_cast<const JourneyPattern*>(path))
+						{
+							continue;
+						}
+
 						BOOST_FOREACH(Edge* edge, path->getEdges())
 						{
 							if(!edge->getNext())
