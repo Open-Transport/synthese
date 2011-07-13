@@ -107,7 +107,7 @@ namespace synthese
 			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
 				// Output
-				shared_ptr<ParametersMap> pmScreen;
+				shared_ptr<ParametersMap> pmScreen(new ParametersMap);
 
 				pmScreen->insert(Request::PARAMETER_OBJECT_ID, screen->getKey());
 
