@@ -46,11 +46,13 @@ namespace synthese
 			{
 			public:
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
+				static const std::string PARAMETER_COURSE_ID;
 
 			private:
 				//! @name Parameters
 				//@{
 					boost::shared_ptr<const impex::DataSource> _plannedDataSource;
+					boost::optional<std::string> _courseId;
 				//@}
 
 			protected:
