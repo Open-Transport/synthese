@@ -320,7 +320,7 @@ namespace synthese
 						}
 						pmStop->insert(DATA_LINES, lineStream.str());
 					}
-					_stopPage->display(stream, request, pm);
+					_stopPage->display(stream, request, *pmStop);
 				}
 			}
 			else // XML output
