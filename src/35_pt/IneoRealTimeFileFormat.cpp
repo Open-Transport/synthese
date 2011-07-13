@@ -61,6 +61,7 @@ namespace synthese
 	namespace pt
 	{
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID("ps");
+		const string IneoRealTimeFileFormat::Importer_::PARAMETER_COURSE_ID("ci");
 
 		bool IneoRealTimeFileFormat::Importer_::_read( std::ostream& os, boost::optional<const admin::AdminRequest&> adminRequest ) const
 		{
@@ -101,6 +102,10 @@ namespace synthese
 			// 2 : loop on the services present in the database and link to existing or new services
 			stringstream query;
 			query << "SELECT ref, chainage, ligne FROM " << _database << ".COURSE WHERE jour=" << todayStr << " AND type='C'";
+			if(_courseId)
+			{
+				query << " AND ref=" << *_courseId;
+			}
 			DBResultSPtr result(DBModule::GetDB()->execQuery(query.str()));
 			while(result->next())
 			{
@@ -356,6 +361,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PLANNED_DATASOURCE_ID, _plannedDataSource->getKey());
 			}
+			if(_courseId)
+			{
+				map.insert(PARAMETER_COURSE_ID, *_courseId);
+			}
 			return map;
 		}
 
@@ -371,6 +380,7 @@ namespace synthese
 			{
 				throw Exception("No such planned data source");
 			}
+			_courseId = map.getOptional<string>(PARAMETER_COURSE_ID);
 		}
 
 
