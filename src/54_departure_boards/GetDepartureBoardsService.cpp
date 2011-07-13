@@ -115,7 +115,7 @@ namespace synthese
 				// Output
 				shared_ptr<ParametersMap> pmScreen(new ParametersMap);
 
-				pmScreen->insert(Request::PARAMETER_OBJECT_ID, screen->getKey());
+				screen->toParametersMap(*pmScreen);
 
 				pm.insert(DATA_SCREEN, pmScreen);
 			}

@@ -123,6 +123,16 @@ namespace synthese
 
 
 		protected:
+			static const std::string DATA_SCREEN_ID;
+			static const std::string DATA_MAC_ADDRESS;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_IS_ONLINE;
+			static const std::string DATA_MAINTENANCE_MESSAGE;
+			static const std::string DATA_NAME;
+			static const std::string DATA_TYPE_ID;
+			static const std::string DATA_LOCATION_ID;
+			static const std::string DATA_CPU_ID;
+
 			//! \name Technical data
 			//@{
 				const DisplayType*									_displayType;
@@ -368,6 +378,21 @@ namespace synthese
 						- the type defines a positive time between monitoring checks
 				*/
 				bool isMonitored() const;
+
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Exports the object into a parameters map.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @retval the parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = std::string()
+				) const;
 			//@}
 
 			//! @name Static output methods
