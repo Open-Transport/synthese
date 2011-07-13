@@ -67,22 +67,28 @@ namespace synthese
 
 		void GetDepartureBoardsService::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
-			{
-				_stopArea = Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(PARAMETER_STOP_ID));
+			{ // Optional stop filter
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_STOP_ID, 0));
+				if(id) try
+				{
+					_stopArea = Env::GetOfficialEnv().get<StopArea>(id);
+				}
+				catch (ObjectNotFoundException<StopArea>&)
+				{
+					throw "No such stop area";
+				}
 			}
-			catch (ObjectNotFoundException<StopArea>&)
-			{
-				throw "No such stop area";
-			}
-			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PAGE_ID, 0));
-			if(id) try
-			{
-				_page = Env::GetOfficialEnv().get<Webpage>(id);
-			}
-			catch (ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such page");
+
+			{ // CMS page
+				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PAGE_ID, 0));
+				if(id) try
+				{
+					_page = Env::GetOfficialEnv().get<Webpage>(id);
+				}
+				catch (ObjectNotFoundException<Webpage>&)
+				{
+					throw RequestException("No such page");
+				}
 			}
 
 		}
@@ -102,7 +108,7 @@ namespace synthese
 					true,
 					FORBIDDEN,
 					optional<RegistryKeyType>(),
-					_stopArea->getKey()
+					_stopArea.get() ? optional<RegistryKeyType>(_stopArea->getKey()) : optional<RegistryKeyType>()
 			)	);
 			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
