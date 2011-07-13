@@ -77,8 +77,19 @@ namespace synthese
 
 	namespace departure_boards
 	{
-		DisplayScreen::DisplayScreen(RegistryKeyType key)
-		:	Registrable(key),
+		const std::string DisplayScreen::DATA_SCREEN_ID("screen_id");
+		const std::string DisplayScreen::DATA_MAC_ADDRESS("mac");
+		const std::string DisplayScreen::DATA_TITLE("title");
+		const std::string DisplayScreen::DATA_IS_ONLINE("is_online");
+		const std::string DisplayScreen::DATA_MAINTENANCE_MESSAGE("maintenance_message");
+		const std::string DisplayScreen::DATA_NAME("name");
+		const std::string DisplayScreen::DATA_TYPE_ID("type_id");
+		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
+		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
+
+		DisplayScreen::DisplayScreen(
+			RegistryKeyType key
+		):	Registrable(key),
 			_displayedPlace(NULL),
 			_displayType(NULL),
 			_wiringCode(0),
@@ -916,5 +927,29 @@ namespace synthese
 			case CONTINUATION_TRANSFER: return "Correspondance continue";
 			}
 			return string();
+		}
+
+
+
+		void DisplayScreen::toParametersMap(
+			util::ParametersMap& pm,
+			std::string prefix /*= std::string() */
+		) const {
+
+			pm.insert(prefix + DATA_IS_ONLINE, _maintenanceIsOnline);
+			if(getRoot<NamedPlace>())
+			{
+				pm.insert(prefix + DATA_LOCATION_ID, getRoot<NamedPlace>()->getKey());
+			}
+			if(getRoot<DisplayScreenCPU>())
+			{
+				pm.insert(prefix + DATA_CPU_ID, getRoot<DisplayScreenCPU>()->getKey());
+			}
+			pm.insert(prefix + DATA_MAC_ADDRESS, _macAddress);
+			pm.insert(prefix + DATA_MAINTENANCE_MESSAGE, _maintenanceMessage);
+			pm.insert(prefix + DATA_NAME, getName());
+			pm.insert(prefix + DATA_SCREEN_ID, getKey());
+			pm.insert(prefix + DATA_TITLE, _title);
+			pm.insert(prefix + DATA_TYPE_ID, _displayType ? _displayType->getKey() : 0);
 		}
 }	}
