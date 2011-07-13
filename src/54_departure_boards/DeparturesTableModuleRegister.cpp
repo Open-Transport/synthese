@@ -79,7 +79,7 @@
 #include "DisplayGetNagiosStatusFunction.h"
 #include "CentreonConfigExportFunction.h"
 #include "CPUGetWiredScreensFunction.h"
-
+#include "GetDepartureBoardsService.hpp"
 
 #include "DeparturesTableModule.inc.cpp"
 
@@ -146,6 +146,7 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::DisplayGetNagiosStatusFunction::integrate();
 	synthese::departure_boards::CentreonConfigExportFunction::integrate();
 	synthese::departure_boards::CPUGetWiredScreensFunction::integrate();
+	synthese::departure_boards::GetDepartureBoardsService::integrate();
 	
 	synthese::departure_boards::ArrivalDepartureTableRight::integrate();
 	synthese::departure_boards::DisplayMaintenanceRight::integrate();

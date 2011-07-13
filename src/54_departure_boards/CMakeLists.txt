@@ -123,6 +123,8 @@ DisplayTypeTableSync.cpp
 DisplayTypeTableSync.h
 ForcedDestinationsArrivalDepartureTableGenerator.cpp
 ForcedDestinationsArrivalDepartureTableGenerator.h
+GetDepartureBoardsService.hpp
+GetDepartureBoardsService.cpp
 IneoDepartureBoardsFileFormat.cpp
 IneoDepartureBoardsFileFormat.hpp
 ParseDisplayReturnInterfacePage.cpp
