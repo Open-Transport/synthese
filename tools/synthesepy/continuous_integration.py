@@ -36,7 +36,7 @@ def run(env, args):
     if 'tool' in os.environ:
         config.tool = os.environ['tool']
     if 'mode' in os.environ:
-        config.tool = os.environ['mode']
+        config.mode = os.environ['mode']
 
     try:
         synthesepy.build.build(env)
