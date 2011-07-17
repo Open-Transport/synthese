@@ -750,6 +750,11 @@ namespace synthese
 			}
 			BOOST_FOREACH(const Timetable::Rows::value_type& row, timetable->getRows())
 			{
+				if(!row.getPlace())
+				{
+					continue;
+				}
+
 				stream << tf.row();
 				stream << tf.col(1, string(), true) << row.getPlace()->getFullName();
 				const TimetableResult::RowTimesVector cols(result.getRowSchedules(row.getRank()));

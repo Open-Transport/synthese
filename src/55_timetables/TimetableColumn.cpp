@@ -60,10 +60,16 @@ namespace synthese
 
 			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
 			{
+				if(!itRow->getPlace())
+				{
+					continue;
+				}
+
 				Path::Edges::const_iterator itEdge2;
 
 				// Arr / Dep in the same place
 				if(	itRow != rows.begin() &&
+					(itRow-1)->getPlace() &&
 					itRow->getPlace() == (itRow-1)->getPlace() &&
 					itRow->getIsDeparture() &&
 					!(itRow-1)->getIsDeparture() &&
@@ -125,6 +131,11 @@ namespace synthese
 			const TimetableGenerator::Rows& rows(generator.getRows());
 			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
 			{
+				if(!itRow->getPlace())
+				{
+					continue;
+				}
+
 				_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
 			}
 		}
