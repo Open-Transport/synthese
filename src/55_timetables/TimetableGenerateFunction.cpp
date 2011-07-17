@@ -187,6 +187,11 @@ namespace synthese
 						size_t rank(0);
 						BOOST_FOREACH(const TimetableRow& row, _timetable->getRows())
 						{
+							if(!row.getPlace())
+							{
+								continue;
+							}
+
 							map.insert(
 								PARAMETER_CITY_PREFIX + lexical_cast<string>(rank++),
 								static_cast<const StopArea*>(row.getPlace())->getCity()->getName()
@@ -572,6 +577,11 @@ namespace synthese
 						);
 						BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getBeforeTransferTimetable(depth).getRows())
 						{
+							if(!row.getPlace())
+							{
+								continue;
+							}
+
 							const TimetableResult::RowTimesVector times(
 								result.getBeforeTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
@@ -590,6 +600,11 @@ namespace synthese
 					const TimetableResult::RowServicesVector services(result.getRowServices());
 					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getRows())
 					{
+						if(!row.getPlace())
+						{
+							continue;
+						}
+
 						const TimetableResult::RowTimesVector times(result.getRowSchedules(row.getRank()));
 						_displaySchedulesRow(
 							timesContent,
@@ -609,6 +624,11 @@ namespace synthese
 						);
 						BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getAfterTransferTimetable(depth).getRows())
 						{
+							if(!row.getPlace())
+							{
+								continue;
+							}
+
 							const TimetableResult::RowTimesVector times(
 								result.getAfterTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
