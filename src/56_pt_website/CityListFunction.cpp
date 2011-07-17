@@ -53,11 +53,13 @@ namespace synthese
 		const string CityListFunction::PARAMETER_PAGE("page_id");
 		const string CityListFunction::PARAMETER_ITEM_PAGE("item_page_id");
 		const string CityListFunction::PARAMETER_AT_LEAST_A_STOP("at_least_a_stop");
+		const string CityListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 
 		const std::string CityListFunction::DATA_RESULTS_SIZE("size");
 		const std::string CityListFunction::DATA_CONTENT("content");
 
-		const string CityListFunction::DATA_NAME("name");
+		const string CityListFunction::DATA_CITY("city");
+		const string CityListFunction::DATA_CITIES("cities");
 		const string CityListFunction::DATA_RANK("rank");
 
 
@@ -76,6 +78,10 @@ namespace synthese
 				pm.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
 			}
 			pm.insert(PARAMETER_AT_LEAST_A_STOP, _atLeastAStop);
+			if(!_outputFormat.empty())
+			{
+				pm.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
 			return pm;
 		}
 
@@ -101,6 +107,13 @@ namespace synthese
 			{
 				throw RequestException("Number of result must be limited");
 			}
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			// Saved parameters cleaning if output is a fixed format
+			if(!_page.get() && !_itemPage.get())
+			{
+				_savedParameters.clear();
+			}
 		}
 
 
@@ -112,7 +125,7 @@ namespace synthese
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
 			if(!site) throw RequestException("Incorrect site");
 
-			PlacesList placesList;
+			GeographyModule::CityList citiesList;
 
 			if(!_input.empty())
 			{
@@ -125,10 +138,10 @@ namespace synthese
 					{
 						continue;
 					}
-					placesList.push_back(make_pair(it.value->getKey(), it.value->getName()));
+					citiesList.push_back(it.value);
 				}
 
-				if(!_page.get())
+				if(!_page.get() && _outputFormat.empty())
 				{
 					stream <<
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
@@ -154,27 +167,46 @@ namespace synthese
 					{
 						continue;
 					}
-					placesList.push_back(make_pair(it.second->getKey(), it.second->getName()));
-					if(_n && c >= *_n)
+					if(_n && ++c > *_n)
 					{
 						break;
 					}
-					++c;
+					citiesList.push_back(it.second);
 				}
 			}
 
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+			size_t i(0);
+			BOOST_FOREACH(const GeographyModule::CityList::value_type& it, citiesList)
+			{
+				shared_ptr<ParametersMap> cityPm(new ParametersMap(request.getFunction()->getSavedParameters()));
+
+				it->toParametersMap(*cityPm);
+				cityPm->insert(DATA_RANK, i++);
+				// backward compatibility.
+				// TODO: check they are still used or could be removed.
+				cityPm->insert("name", it->getName());
+				cityPm->insert("roid", it->getKey());
+
+				pm.insert(DATA_CITY, cityPm);
+			}
+
+
+			// TODO: Factor ParametesrMap constant
+			if(_outputFormat == "json")
+			{
+				pm.outputJSON(stream, DATA_CITIES);
+			}
 			if(_page.get())
 			{
-				ParametersMap pm(_savedParameters);
-
 				// Size
-				pm.insert(DATA_RESULTS_SIZE, placesList.size());
+				pm.insert(DATA_RESULTS_SIZE, citiesList.size());
 
 				// Content
 				if(_itemPage.get())
 				{
 					stringstream content;
-					_displayItems(content, placesList, request);
+					_displayItems(content, pm, request);
 					pm.insert(DATA_CONTENT, content.str());
 				}
 
@@ -182,7 +214,7 @@ namespace synthese
 			}
 			else if(_itemPage.get())
 			{
-				_displayItems(stream, placesList, request);
+				_displayItems(stream, pm, request);
 			}
 		}
 
@@ -205,6 +237,11 @@ namespace synthese
 			{
 				return _itemPage->getMimeType();
 			}
+			// TODO: refactor this in ParametersMap
+			else if(_outputFormat == "json")
+			{
+				return "application/json";
+			}
 			return "text/xml";
 		}
 
@@ -212,21 +249,13 @@ namespace synthese
 
 		void CityListFunction::_displayItems(
 			ostream& stream,
-			const PlacesList& items,
+			const ParametersMap& pm,
 			const Request& request
-		) const	{
-			size_t i(0);
-			BOOST_FOREACH(const PlacesList::value_type& it, items)
+		) const {
+
+			BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type cityPm, pm.getSubMaps(DATA_CITY))
 			{
-				ParametersMap pmi(_savedParameters);
-
-				pmi.insert(DATA_RANK, i);
-				pmi.insert(DATA_NAME, it.second);
-				pmi.insert(Request::PARAMETER_OBJECT_ID, it.first);
-
-				_itemPage->display(stream, request, pmi);
-
-				++i;
+				_itemPage->display(stream, request, *cityPm);
 			}
 		}
 }	}

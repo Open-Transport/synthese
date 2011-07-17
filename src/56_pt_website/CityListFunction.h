@@ -60,10 +60,13 @@ namespace synthese
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
 			static const std::string PARAMETER_AT_LEAST_A_STOP;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CONTENT;
 
+			static const std::string DATA_CITY;
+			static const std::string DATA_CITIES;
 			static const std::string DATA_NAME;
 			static const std::string DATA_RANK;
 
@@ -73,6 +76,7 @@ namespace synthese
 			bool _atLeastAStop;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
+			std::string _outputFormat;
 
 		protected:
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
@@ -89,7 +93,7 @@ namespace synthese
 
 			void _displayItems(
 				std::ostream& stream,
-				const PlacesList& items,
+				const util::ParametersMap& pm,
 				const server::Request& request
 			) const;
 
