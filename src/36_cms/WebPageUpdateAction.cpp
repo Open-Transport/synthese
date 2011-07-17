@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "WebPageTableSync.h"
 #include "DBTransaction.hpp"
+#include "TransportWebsiteRight.h"
 
 using namespace std;
 using namespace boost;
@@ -39,6 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
+	using namespace pt_website;
 
 	namespace util
 	{
@@ -373,8 +375,9 @@ namespace synthese
 		bool WebPageUpdateAction::isAuthorized(
 			const Session* session
 		) const {
-			return true;
-			//return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+			return session &&
+				session->hasProfile() &&
+				session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
 		}
 
 
