@@ -51,6 +51,9 @@ def _copy_over(source_path, target_path):
 
     base_parts_count = len(source_path.split(os.path.sep))
     for path, dirlist, filelist in os.walk(source_path):
+        for exclude in ['.git', '.hg', '.svn']:
+            if exclude in dirlist:
+                dirlist.remove(exclude)
         for name in filelist:
             relative_path = os.sep.join(path.split(os.sep)[base_parts_count:])
 
