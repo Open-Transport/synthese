@@ -41,9 +41,9 @@ log = logging.getLogger(__name__)
 
 
 class Tester(object):
-    def __init__(self, env, args):
+    def __init__(self, env):
         self.env = env
-        self.args = args
+        self.config = env.config
 
     def run_style_tests(self, suite_args):
 
@@ -143,7 +143,7 @@ class Tester(object):
     def run_python_tests(self, suite_args):
 
         http_testcase.init_backends(
-            self.env, self.args.conn_strings, self.args.no_init)
+            self.env, self.config.conn_strings, self.config.no_init)
 
         sys_argv = sys.argv[0:1]
 
