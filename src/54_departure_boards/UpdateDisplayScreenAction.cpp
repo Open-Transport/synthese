@@ -173,11 +173,17 @@ namespace synthese
 			assert(_screen.get() != NULL);
 			if (_screen->getLocation() != NULL)
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey()));
+				return session &&
+					session->hasProfile() &&
+					session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(
+						WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_screen->getLocation()->getKey())
+					);
 			}
 			else
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
+				return session &&
+					session->hasProfile() &&
+					session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE);
 			}
 		}
 	}

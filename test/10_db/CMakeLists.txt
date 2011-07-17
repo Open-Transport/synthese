@@ -11,9 +11,10 @@ include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 
 set(DEPS
+  59_road_journey_planner # from 56_pt_website
+  56_pt_website # from cms
   36_cms # from admin
   15_server # from db
-  14_admin # from server
   10_db
 )
 

@@ -91,6 +91,7 @@ target_link_libraries(15_server
   11_interfaces
   12_security
   13_dblog
+  14_admin
   # Forward dependencies:
   #36_cms
 )
