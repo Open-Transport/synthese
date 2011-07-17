@@ -20,3 +20,37 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import logging
+import os
+
+import synthesepy.build
+import synthesepy.test
+
+log = logging.getLogger(__name__)
+
+
+def run(env, args):
+    config = env.config
+
+    # The ci tool can set these settings in the environment:
+    if 'tool' in os.environ:
+        config.tool = os.environ['tool']
+    if 'mode' in os.environ:
+        config.tool = os.environ['mode']
+
+    try:
+        synthesepy.build.build(env)
+    except Exception, e:
+        if not args.no_clean_if_build_fails:
+            raise
+        log.warn('Build failed, cleaning and rebuilding')
+        synthesepy.build.clean(env, args.dummy)
+        synthesepy.build.build(env)
+
+    # FIXME: this should be extracted from the mysql connection string.
+    os.environ.update(
+        config.test_env
+    )
+
+    tester = synthesepy.test.main.Tester(env)
+    tester.run_tests(config.suites)

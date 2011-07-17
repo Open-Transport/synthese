@@ -31,6 +31,7 @@ import time
 import synthesepy
 import synthesepy.build
 import synthesepy.config
+import synthesepy.continuous_integration
 import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.env
@@ -81,20 +82,15 @@ class AliasedSubParsersAction(argparse._SubParsersAction):
 
 
 def build(args, env):
-    synthesepy.build.build(env, args)
+    synthesepy.build.build(env)
 
 
 def clean(args, env):
-    if args.dummy:
-        log.info('Dummy mode, not deleting: %r', env.env_path)
-    else:
-        log.info('Deleting: %r', env.env_path)
-        if os.path.isdir(env.env_path):
-            shutil.rmtree(env.env_path)
+    synthesepy.build.clean(env, args.dummy)
 
 
 def runtests(args, env):
-    tester = synthesepy.test.main.Tester(env, args)
+    tester = synthesepy.test.main.Tester(env)
     tester.run_tests(args.suites)
 
 
@@ -112,6 +108,10 @@ def create_project(args, env):
     project_manager.create_project(
         env, args.path, site_packages, args.conn_string,
         overwrite=args.overwrite)
+
+
+def continuous_integration(args, env):
+    synthesepy.continuous_integration.run(env, args)
 
 
 # End of commands
@@ -157,7 +157,7 @@ def add_default_subparsers(subparsers):
     parser_build = subparsers.add_parser('build', help='Build Synthese')
     parser_build.set_defaults(func=build)
     parser_build.add_argument(
-        '-g', '--generate-only', action='store_true', default=False,
+        '-g', '--generate-only', action='store_true',
         help='Only generate build script, but don\'t build')
     parser_build.add_argument(
         '--prefix',
@@ -167,7 +167,7 @@ def add_default_subparsers(subparsers):
         help='MySQL connection string used for the unit tests. For instance:'
             '"host=localhost,user=synthese,passwd=synthese"')
     parser_build.add_argument(
-        '--without-mysql', action='store_true', default=False,
+        '--without-mysql', action='store_true',
         help='Disable MySQL database support')
     parser_build.add_argument(
         '--mysql-dir',
@@ -190,13 +190,13 @@ def add_default_subparsers(subparsers):
     parser_runtests.set_defaults(func=runtests)
     # for python suite
     parser_runtests.add_argument(
-        '--dbconns', nargs='+', dest='conn_strings', default=[])
+        '--dbconns', nargs='+', dest='conn_strings')
     # for python suite
     parser_runtests.add_argument(
         '--no-init',
         help='Don\'t start/stop the daemon or initialize the db. '
              'Can be used to reuse an already running daemon',
-        action='store_true', default=False)
+        action='store_true')
     parser_runtests.add_argument(
         'suites', nargs='*',
         help='List of test suites to run. Choices: style, python, cpp')
@@ -217,6 +217,14 @@ def add_default_subparsers(subparsers):
     parser_create_project.add_argument(
         '--overwrite', action='store_true', default=False)
 
+    parser_continuous_integration = subparsers.add_parser(
+        'continuous_integration', help='Create a Synthese project')
+    parser_continuous_integration.set_defaults(func=continuous_integration)
+    parser_continuous_integration.add_argument(
+        '--no-clean-if-build-fails', action='store_true',
+        help='Don\'t clean the build directory and build again in case of '
+        'build failure')
+
 
 def main():
 
@@ -227,7 +235,7 @@ def main():
         '--config-path',
         help='Directory containing the configuration files')
     config_parser.add_argument(
-        '-c', '--config', dest='config_names',
+        '-c', '--config', dest='config_names', default='',
         help='Configuration entries to use')
 
     config_args, remaining_argv = config_parser.parse_known_args()
@@ -238,9 +246,9 @@ def main():
 
     config = synthesepy.config.Config()
 
-    if config_args.config_names:
-        config.update_from_files(
-            config_args.config_names.split(','), config_args.config_path)
+    config.update_from_files(
+        [c for c in config_args.config_names.split(',') if c], 
+        config_args.config_path)
 
     # Phase 2: Process project settings.
 

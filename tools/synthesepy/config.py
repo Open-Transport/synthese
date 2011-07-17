@@ -49,7 +49,6 @@ DEFAULTS = {
     'site_id': 0,
     'log_stdout': False,
     'gdb': False,
-    'parallel_build': multiprocessing.cpu_count(),
 
     'wsgi_proxy': True,
     'wsgi_proxy_port': None,
@@ -64,6 +63,23 @@ DEFAULTS = {
     'ssh_global_opts': '',
     'ssh_opts': '',
     'rsync_opts': '',
+    
+    # build
+    'generate_only': False,
+    'prefix': None,
+    'mysql_params': None,
+    'without_mysql': False,
+    'mysql_dir': None,
+    'boost_dir': None,
+    'parallel_build': multiprocessing.cpu_count(),
+
+    # runtests
+    'conn_strings': [],
+    'no_init': False,
+
+    # continuous_integration
+    'test_env': {},
+    'suites': None,
 }
 
 
