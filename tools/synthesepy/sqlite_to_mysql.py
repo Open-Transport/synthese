@@ -82,15 +82,13 @@ def convert(env, sourceconn, targetconn):
 
         if n_subs == 1:
             res = sqlite_cursor.execute(
-                'SELECT AsText(geometry) FROM %s WHERE id=%s' % (table, rowid)
-            )
+                'SELECT AsText(geometry) FROM %s WHERE id=%s' % (table, rowid))
             geom_text = res.fetchone()[0]
 
             mysql_cursor.execute(
                 'UPDATE `%s` SET geometry=GeomFromText(%%s)'
                 '  WHERE id=%%s' % table,
-                (geom_text, rowid)
-            )
+                (geom_text, rowid))
 
     for table in initialized_tables:
         log.info('Verifying row count of table %s', table)
@@ -101,5 +99,4 @@ def convert(env, sourceconn, targetconn):
         if sqlite_count != mysql_count:
             raise Exception(
                 ('After import of table: %s, row count differs: '
-                 'sqlite: %s - mysql: %s') % (table, sqlite_count, mysql_count)
-            )
+                 'sqlite: %s - mysql: %s') % (table, sqlite_count, mysql_count))

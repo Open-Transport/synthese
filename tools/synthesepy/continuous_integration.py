@@ -1,5 +1,5 @@
-#    Database backends unit tests.
-#    @file db_backends_unittest.py
+#    Continous integration script.
+#    @file continuous_integration.py
 #    @author Sylvain Pasche
 #
 #    This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -20,16 +20,3 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-import unittest
-
-from synthesepy import db_backends
-
-
-class DummyEnv(object):
-    pass
-
-
-class TestDBBackend(unittest.TestCase):
-    def test_create_backend(self):
-        backend = db_backends.create_backend(DummyEnv(), 'dummy://')
-        self.assertEqual(backend.name, 'dummy')

@@ -20,9 +20,11 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import errno
 import httplib
 import logging
 import os
+import stat
 import subprocess
 import sys
 import urllib2
@@ -124,3 +126,139 @@ def can_connect(port, verbose=False):
     return True
 
 
+def check_call(dummy, cmd, *args, **kwargs):
+    """
+    subprocess.check_call wrapper that just prints the command line in dummy
+    mode
+    """
+    
+    cmdline = cmd
+    if isinstance(cmd, list):
+        cmdline = ' '.join(cmdline)
+    dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
+        'cwd' in kwargs else '')
+    if dummy:
+        # TODO: show environment too.
+        log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
+        return
+    log.debug('Running %s:\n%s', dir, cmdline)
+    return subprocess.check_call(cmd, *args, **kwargs)
+
+
+def to_cygwin_path(path):
+    if sys.platform != 'win32':
+        return path
+    try:
+        cygproc = subprocess.Popen(
+            ('cygpath', '-a', '-u', path), stdout=subprocess.PIPE)
+    except OSError:
+        log.warn('Can\'t convert path to cygwin format')
+        return path
+    (stdout_content, stderr_content) = cygproc.communicate()
+    return stdout_content.rstrip()
+
+
+# XXX somewhat duplicated with check_call
+def call(dummy, cmd, shell=True, **kwargs):
+
+    log.debug('Running command: %r', cmd)
+    if 'input' in kwargs:
+        log.debug('With %s bytes of input', len(kwargs['input']))
+
+    if dummy:
+        # TODO: show environment too.
+        cmdline = cmd
+        if isinstance(cmd, list):
+            cmdline = ' '.join(cmdline)
+        dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
+            'cwd' in kwargs else '')
+        log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
+        return
+
+    if 'bg' in kwargs:
+        del kwargs['bg']
+        subprocess.Popen(cmd, **kwargs)
+        return
+    if 'input' in kwargs:
+        input = kwargs['input']
+        del kwargs['input']
+        p = subprocess.Popen(
+            cmd, shell=shell, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        output = p.communicate(input)[0]
+        if p.returncode:
+            raise subprocess.CalledProcessError(p.returncode, cmd)
+        return output
+
+#    env = os.environ.copy()
+#    env.update(config.ENV)
+#    kwargs['env'] = env
+    subprocess.check_call(cmd, shell=shell, **kwargs)
+
+
+# From http://src.chromium.org/svn/trunk/tools/build/scripts/common/chromium_utils.py
+# Copyright (c) 2010 The Chromium Authors. All rights reserved.
+# Use of this source code is governed by a BSD-style license that can be
+# found in the LICENSE file.
+def RemoveDirectory(*path):
+  """Recursively removes a directory, even if it's marked read-only.
+
+  Remove the directory located at *path, if it exists.
+
+  shutil.rmtree() doesn't work on Windows if any of the files or directories
+  are read-only, which svn repositories and some .svn files are.  We need to
+  be able to force the files to be writable (i.e., deletable) as we traverse
+  the tree.
+
+  Even with all this, Windows still sometimes fails to delete a file, citing
+  a permission error (maybe something to do with antivirus scans or disk
+  indexing).  The best suggestion any of the user forums had was to wait a
+  bit and try again, so we do that too.  It's hand-waving, but sometimes it
+  works. :/
+  """
+  file_path = os.path.join(*path)
+  if not os.path.exists(file_path):
+    return
+
+  def RemoveWithRetry_win(rmfunc, path):
+    os.chmod(path, stat.S_IWRITE)
+    if win32_api_avail:
+      win32api.SetFileAttributes(path, win32con.FILE_ATTRIBUTE_NORMAL)
+    try:
+      return rmfunc(path)
+    except EnvironmentError, e:
+      if e.errno != errno.EACCES:
+        raise
+      print 'Failed to delete %s: trying again' % repr(path)
+      time.sleep(0.1)
+      return rmfunc(path)
+
+  def RemoveWithRetry_non_win(rmfunc, path):
+    if os.path.islink(path):
+      return os.remove(path)
+    else:
+      return rmfunc(path)
+
+  win32_api_avail = False
+  remove_with_retry = None
+  if sys.platform.startswith('win'):
+    # Some people don't have the APIs installed. In that case we'll do without.
+    try:
+      win32api = __import__('win32api')
+      win32con = __import__('win32con')
+      win32_api_avail = True
+    except ImportError:
+      pass
+    remove_with_retry = RemoveWithRetry_win
+  else:
+    remove_with_retry = RemoveWithRetry_non_win
+
+  for root, dirs, files in os.walk(file_path, topdown=False):
+    # For POSIX:  making the directory writable guarantees removability.
+    # Windows will ignore the non-read-only bits in the chmod value.
+    os.chmod(root, 0770)
+    for name in files:
+      remove_with_retry(os.remove, os.path.join(root, name))
+    for name in dirs:
+      remove_with_retry(os.rmdir, os.path.join(root, name))
+
+  remove_with_retry(os.rmdir, file_path)

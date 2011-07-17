@@ -42,47 +42,49 @@ class Daemon(object):
         self.proc = None
 
     def _start_wsgi_proxy(self):
-        if not self.env.wsgi_proxy:
+        if not self.env.c.wsgi_proxy:
             return
         proxy.start(self.env)
 
     def _stop_wsgi_proxy(self):
-        if not self.env.wsgi_proxy:
+        if not self.env.c.wsgi_proxy:
             return
         proxy.stop()
 
     def _wait_until_ready(self):
         for i in range(40):
-            if self.proc.poll() is not None:
+            if not self.is_running():
                 raise DaemonException(
-                    'Server has exited prematurely. Check the logs for details.'
-                )
-            if utils.can_connect(self.env.port, True):
+                    'Server has exited prematurely. Check the logs for details.')
+            if utils.can_connect(self.env.c.port, True):
                 break
             time.sleep(2)
         else:
             raise DaemonException('Server is not responding')
 
-    def start(self, gdb=False):
+    def is_running(self):
+        if not self.proc:
+            return False
+        return self.proc.poll() is None
+
+    def start(self):
         self.env.prepare_for_launch()
 
-        ports_to_check = [self.env.port]
-        if self.env.wsgi_proxy:
-            ports_to_check.append(self.env.wsgi_proxy_port)
+        ports_to_check = [self.env.c.port]
+        if self.env.c.wsgi_proxy:
+            ports_to_check.append(self.env.c.wsgi_proxy_port)
         for port in ports_to_check:
             utils.kill_listening_processes(port)
 
             if utils.can_connect(port):
                 raise DaemonException(
-                    'Error, something is already listening on port %s', port
-                )
+                    'Error, something is already listening on port %s', port)
 
         # cleanup pid on linux
         if self.env.platform != 'win':
             pid_path = os.path.join(
                 self.env.daemon_launch_path,
-                's3_server.pid'
-            )
+                's3_server.pid')
             if os.path.isfile(pid_path):
                 log.debug('Found pid file %s, removing it' % pid_path)
                 # TODO: check if daemon is running with that pid and kill it if that's the case.
@@ -90,38 +92,37 @@ class Daemon(object):
 
         if not os.path.isfile(self.env.daemon_path):
             raise DaemonException(
-                'Daemon executable can\'t be found at "%s". Project not built or '
-                'wrong mode/tool?' % self.env.daemon_path
-            )
+                'Daemon executable can\'t be found at %r. Project not built or '
+                'wrong mode/tool?' % self.env.daemon_path)
 
         args = []
-        if gdb:
+        if self.env.c.gdb:
             args.extend(['gdb', '--args'])
         args.extend([
             self.env.daemon_path,
-            '--dbconn', self.env.conn_string,
+            '--dbconn', self.env.c.conn_string,
         ])
 
         params = {
             'log_level': '-1',
-            'port': str(self.env.port),
+            'port': str(self.env.c.port),
         }
-        if self.env.extra_params:
-            for p in self.env.extra_params.split():
+        if self.env.c.extra_params:
+            for p in self.env.c.extra_params.split():
                 name, value = p.split('=', 1)
                 params[name] = value
-        
+
         for name, value in params.iteritems():
             args.extend(['--param', name + "=" + value])
         log.debug('Args: %r\n%s', args, ' '.join(args))
 
-        if self.env.log_stdout:
+        if self.env.c.log_stdout:
             stdout = sys.stdout
         else:
             log.info('Logging to %s', self.env.daemon_log_file)
             stdout = open(self.env.daemon_log_file, 'wb')
 
-        if self.env.dummy:
+        if self.env.c.dummy:
             log.info('Dummy mode, not executing:\n%s\n in path: %s',
                 ' '.join(args), self.env.daemon_launch_path)
             return
@@ -130,13 +131,11 @@ class Daemon(object):
             args,
             cwd=self.env.daemon_launch_path,
             stderr=subprocess.STDOUT,
-            stdout=stdout,
-            env=self.env.daemon_run_env
-        )
+            stdout=stdout)
         log.info('daemon started')
 
         self._wait_until_ready()
-        log.info('daemon ready on port %s' % self.env.port)
+        log.info('daemon ready on port %s' % self.env.c.port)
         self._start_wsgi_proxy()
 
     def stop(self):
@@ -144,8 +143,11 @@ class Daemon(object):
         #  http://localhost:9080/synthese3/admin?a=QuitAction&co=0&sid=FKlwsUfU4lLCId38cCBI
         if not self.proc:
             return
-        self.proc.terminate()
+        try:
+            self.proc.terminate()
+        except Exception, e:
+            log.debug('Ignoring exception when calling terminate: %r', e)
         time.sleep(2)
         self.proc = None
         self._stop_wsgi_proxy()
-        assert not utils.can_connect(self.env.port, False)
+        assert not utils.can_connect(self.env.c.port, False)

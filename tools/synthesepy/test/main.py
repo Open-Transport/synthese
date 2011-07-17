@@ -143,8 +143,7 @@ class Tester(object):
     def run_python_tests(self, suite_args):
 
         http_testcase.init_backends(
-            self.env, self.args.conn_strings, self.args.no_init
-        )
+            self.env, self.args.conn_strings, self.args.no_init)
 
         sys_argv = sys.argv[0:1]
 
@@ -179,7 +178,7 @@ class Tester(object):
         builder = build.get_builder(self.env)
 
         args = [builder.get_cmake_tool_path('ctest')]
-        if self.env.verbose:
+        if self.env.c.verbose:
             args.append('-V')
 
         if self.KNOWN_FAILURES:
@@ -212,8 +211,7 @@ class Tester(object):
         for test_executable in sorted(test_executables):
             normalized_name = (
                 '/'.join(test_executable.split(os.sep)[-2:]).
-                    replace(self.env.platform_exe_suffix, '')
-            )
+                    replace(self.env.platform_exe_suffix, ''))
             if normalized_name in failures:
                 log.warn('Ignoring known failing test: %s', normalized_name)
                 continue
@@ -245,6 +243,9 @@ class Tester(object):
         failed_suites = []
 
         for suite in suites:
+            # Hack to allow passing a suite with a space in it. On Windows,
+            # an argument with a space will be split in two separate arguments.
+            suite = suite.replace('@', ' ')
             try:
                 suite, suite_args = suite.split(':', 1)
             except ValueError:
@@ -253,8 +254,7 @@ class Tester(object):
             if suite not in ALL_SUITES:
                 raise Exception(
                     'Suite %s doesn\'t exist (available suites: %s)' % (
-                    suite, ALL_SUITES)
-                )
+                    suite, ALL_SUITES))
             log.info('Running suite %s', suite)
             test_method = getattr(self, 'run_%s_tests' % suite)
             if not test_method(suite_args):
