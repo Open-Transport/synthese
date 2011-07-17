@@ -182,7 +182,8 @@ namespace synthese
 						{
 							// Tests if the column is compatible for a transfer
 							if(	!afterCol.getCalendar().includesDates(col->getCalendar()) || // Calendar compatibility
-								!afterCol.getContent().begin()->first // Transfer available in the same stop area
+								!afterCol.getContent().begin()->first || // Transfer available in the same stop area
+								!_rows.rbegin()->getPlace()
 							){
 								continue;
 							}
@@ -356,8 +357,10 @@ namespace synthese
 			Rows::const_iterator itRow;
 			for (itRow = _rows.begin(); itRow != _rows.end(); ++itRow)
 			{
-				if (!itRow->getIsDeparture())
+				if (!itRow->getIsDeparture() || !itRow->getPlace())
+				{
 					continue;
+				}
 
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
@@ -389,6 +392,11 @@ namespace synthese
 
 				for (++itRow; itRow != _rows.end(); ++itRow)
 				{
+					if(!itRow->getPlace())
+					{
+						continue;
+					}
+
 					if(	itRow->getIsArrival()
 // 					if(	(	itRow->getIsArrival() &&
 // 							(	passageOk ||
