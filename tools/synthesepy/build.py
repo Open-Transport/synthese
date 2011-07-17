@@ -22,7 +22,6 @@
 
 import hashlib
 import logging
-import multiprocessing
 import os
 from os.path import join
 import shutil
@@ -40,23 +39,19 @@ REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']
 
-# Utils
-
-def cpu_count():
-    if 'SYNTHESE_CPU_COUNT' in os.environ:
-        return int(os.environ['SYNTHESE_CPU_COUNT'])
-    return multiprocessing.cpu_count()
-
-
 
 class Builder(object):
     def __init__(self, env, args):
         self.env = env
         self.args = args
 
-        self.download_cache_dir = join(self.env.thirdparty_dir, 'download_cache')
+        self.download_cache_dir = join(
+            self.env.c.thirdparty_dir, 'download_cache')
         if not os.path.isdir(self.download_cache_dir):
             os.makedirs(self.download_cache_dir)
+
+    def _check_call(self, *args, **kwargs):
+        return utils.check_call(self.env.c.dummy, *args, **kwargs)
 
     def _download(self, url, md5=None):
         target = join(self.download_cache_dir, url.split('/')[-1])
@@ -89,7 +84,7 @@ class Builder(object):
             zip.extractall(extract_dir)
         elif archive.endswith(('.tar.gz', '.tgz')):
             assert self.env.platform != 'win'
-            subprocess.check_call(['tar', 'zxf', archive, '-C', extract_dir])
+            self._check_call(['tar', 'zxf', archive, '-C', extract_dir])
 
     def install_prerequisites(self):
         pass
@@ -118,13 +113,13 @@ class SconsBuilder(Builder):
     ]
 
     def _install_boost(self):
-        self.boost_dir = join(self.env.thirdparty_dir, 'boost')
+        self.boost_dir = join(self.env.c.thirdparty_dir, 'boost')
         if os.path.isdir(self.boost_dir):
             return
 
-        subprocess.check_call(
+        self._check_call(
             'svn co --ignore-externals https://extranet-rcsmobility.com/svn/synthese3/trunk/3rd/dev/boost',
-            shell=True, cwd=join(self.env.thirdparty_dir))
+            shell=True, cwd=join(self.env.c.thirdparty_dir))
 
         # XXX duplicated with cmake
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
@@ -170,7 +165,8 @@ class SconsBuilder(Builder):
         env['SYNTHESE_BOOST_VERSION'] = BOOST_VER
 
         kwargs = {
-            'env': env
+            'env': env,
+            'cwd': self.env.source_path,
         }
         # Windows doesn't like it if launched without shell=True and
         # Linux fails if it is.
@@ -178,7 +174,7 @@ class SconsBuilder(Builder):
             kwargs = {
                 'shell': True
             }
-        subprocess.check_call(args, **kwargs)
+        self._check_call(args, **kwargs)
 
 
 class CMakeBuilder(Builder):
@@ -229,27 +225,28 @@ class CMakeBuilder(Builder):
             url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4-win32-x86.zip'
             self._download(url, 'a2525342e495518101381203bf4484c4')
             created_dir = 'cmake-2.8.4-win32-x86'
-            self._extract(url, self.env.thirdparty_dir, created_dir)
-            self.cmake_path = join(self.env.thirdparty_dir, created_dir, 'bin')
+            self._extract(url, self.env.c.thirdparty_dir, created_dir)
+            self.cmake_path = join(self.env.c.thirdparty_dir, created_dir, 'bin')
         else:
             url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz'
             self._download(url, '209b7d1d04b2e00986538d74ba764fcf')
             created_dir = 'cmake-2.8.4'
-            self._extract(url, self.env.thirdparty_dir, created_dir)
+            self._extract(url, self.env.c.thirdparty_dir, created_dir)
 
             log.info('Building cmake')
-            self.cmake_path = join(self.env.thirdparty_dir, 'cmake', 'bin')
+            self.cmake_path = join(self.env.c.thirdparty_dir, 'cmake', 'bin')
 
             if os.path.isfile(join(self.cmake_path, 'cmake')):
                 return
 
-            cmake_src = join(self.env.thirdparty_dir, created_dir)
-            subprocess.check_call(
+            cmake_src = join(self.env.c.thirdparty_dir, created_dir)
+            self._check_call(
                 [join(cmake_src, 'configure'),  '--prefix=' +
-                    join(self.env.thirdparty_dir, 'cmake')],
+                    join(self.env.c.thirdparty_dir, 'cmake')],
                 cwd=cmake_src)
-            subprocess.check_call(
-                ['make', '-j%i' % cpu_count(), 'install'], cwd=cmake_src)
+            self._check_call(
+                ['make', '-j%i' % self.env.c.parallel_build, 'install'],
+                cwd=cmake_src)
 
     def _install_mysql(self):
         self.with_mysql = True
@@ -269,8 +266,8 @@ class CMakeBuilder(Builder):
         url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.12-win32.zip'
         self._download(url, 'f135a193bd7a330d003714bbd2263782')
         created_dir = 'mysql-5.5.12-win32'
-        self._extract(url, self.env.thirdparty_dir, created_dir)
-        self.mysql_dir = join(self.env.thirdparty_dir, created_dir)
+        self._extract(url, self.env.c.thirdparty_dir, created_dir)
+        self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
     def _install_boost(self):
         self.boost_dir = None
@@ -287,9 +284,9 @@ class CMakeBuilder(Builder):
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
         created_dir = 'boost_1_42_0'
-        self._extract(url, self.env.thirdparty_dir, created_dir)
+        self._extract(url, self.env.c.thirdparty_dir, created_dir)
 
-        self.boost_dir = join(self.env.thirdparty_dir, created_dir)
+        self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
 
         if os.path.isdir(self.boost_lib_dir):
@@ -297,7 +294,7 @@ class CMakeBuilder(Builder):
 
         log.info("Building Boost, this can take some times...")
 
-        subprocess.check_call(
+        self._check_call(
             join(self.boost_dir, 'bootstrap.bat'), cwd=self.boost_dir)
 
         args = [join(self.boost_dir, 'bjam.exe')]
@@ -308,7 +305,7 @@ class CMakeBuilder(Builder):
             'threading=multi'.format(toolset=toolset).split(' '))
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
 
-        subprocess.check_call(args, cwd=self.boost_dir)
+        self._check_call(args, cwd=self.boost_dir)
 
     def install_iconv(self):
         if self.env.platform != 'win':
@@ -316,7 +313,7 @@ class CMakeBuilder(Builder):
 
         url = 'http://94.23.28.171/~spasche/libiconv2.dll'
         self._download(url, 'fd1dc6c680299a2ed1eedcc3eabda601')
-        target = join(self.env.thirdparty_dir, 'iconv', 'libiconv2.dll')
+        target = join(self.env.c.thirdparty_dir, 'iconv', 'libiconv2.dll')
         if not os.path.isdir(os.path.dirname(target)):
             os.makedirs(os.path.dirname(target))
         if os.path.isfile(target):
@@ -365,9 +362,6 @@ class CMakeBuilder(Builder):
         # TODO: maybe change optimization flags in debug mode:
         # -DCMAKE_CXX_FLAGS=-O0
 
-        # TODO:
-        # -DSYNTHESE_MYSQL_PARAMS=host=localhost,user=synthese,passwd=synthese
-
         if self.args.prefix:
             args.append('-DCMAKE_INSTALL_PREFIX=' + self.args.prefix)
         if self.args.mysql_params:
@@ -381,19 +375,18 @@ class CMakeBuilder(Builder):
         if self.boost_lib_dir:
             env['BOOST_LIBRARYDIR'] = self.boost_lib_dir
 
-        # TODO: check that Python cygwin is not in the path?
+        # TODO: check that Python Cygwin is not in the path?
 
         log.info('CMake generate command line: %r', " ".join(args))
         if not os.path.isdir(self.env.env_path):
             os.makedirs(self.env.env_path)
-        subprocess.check_call(args, cwd=self.env.env_path, env=env)
+        self._check_call(args, cwd=self.env.env_path, env=env)
 
     def _do_build_make(self):
-        subprocess.check_call(
-            'make -j%i' % cpu_count(),
+        self._check_call(
+            'make -j%i' % self.env.c.parallel_build,
             cwd=self.env.env_path,
-            shell=True
-        )
+            shell=True)
 
     def _do_build_vs(self):
         # TODO: these should be extracted from system config
@@ -426,10 +419,9 @@ class CMakeBuilder(Builder):
             '/project', 'ALL_BUILD'
         ]
         log.info('Build command line: %s', args)
-        subprocess.check_call(
+        self._check_call(
             args,
-            cwd=self.env.env_path
-        )
+            cwd=self.env.env_path)
 
     def _build(self):
         self._generate_build_system()
@@ -442,8 +434,7 @@ class CMakeBuilder(Builder):
         }
 
         build_fun = getattr(
-            self, '_do_build_' + PLATFORM_TO_TOOL[self.env.platform], None
-        )
+            self, '_do_build_' + PLATFORM_TO_TOOL[self.env.platform], None)
         if not build_fun:
             raise Exception('Unsupported platform')
 

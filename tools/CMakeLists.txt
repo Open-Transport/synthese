@@ -1,11 +1,12 @@
-configure_file(
-    "${PROJECT_SOURCE_DIR}/tools/synthese.py"
-    "${PROJECT_BINARY_DIR}/synthese.py"
-    @ONLY
-)
+# TODO remove all support of having that file in the build dir
+#configure_file(
+#    "${PROJECT_SOURCE_DIR}/tools/synthese.py"
+#    "${PROJECT_BINARY_DIR}/synthese.py"
+#    @ONLY
+#)
 
 install(
-  FILES "${PROJECT_BINARY_DIR}/synthese.py"
+  FILES "synthese.py"
   DESTINATION bin
   PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
 )

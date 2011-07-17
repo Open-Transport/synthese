@@ -27,20 +27,22 @@ from os.path import join
 import shutil
 import subprocess
 import sys
+import traceback
 
 log = logging.getLogger(__name__)
 
-SOURCE_PATH = '@PROJECT_SOURCE_DIR@'
+# Increment this when the Python environment needs to be updated.
+REQUIRED_ENV_VERSION = 0
 
+SYNTHESEPY_DIR = '@SYNTHESEPY_DIR@'
 
-class Config(object):
+class Bootstrap(object):
+    project_path = None
     pyenv_path = None
     tools_path = None
     env_type = None
     env_path = None
 
-
-class Bootstrap(object):
     def __init__(self):
         bootstrap_script = os.environ.get('SYNTHESE_BOOTSTRAP_SCRIPT', __file__)
         bootstrap_script = os.path.abspath(bootstrap_script)
@@ -48,99 +50,74 @@ class Bootstrap(object):
         self.bootstrap_script_dir = os.path.dirname(bootstrap_script)
 
         self.thirdparty_dir = os.environ.get(
-            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese')) 
+            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
         if not os.path.isdir(self.thirdparty_dir):
             os.makedirs(self.thirdparty_dir)
 
+        self.synthesepy_dir = self.bootstrap_script_dir
+
+        script_name = os.path.split(sys.argv[0])[1]
+        if script_name == 'manage.py':
+            log.debug('Running script from project location')
+            self._get_project_config()
+
         if os.path.isdir(
             os.path.join(
-                self.bootstrap_script_dir, os.pardir,
-                'share', 'synthese', 'tools'
-            )):
+                self.synthesepy_dir, os.pardir,
+                'share', 'synthese', 'tools')):
             log.debug('Running script from installed location')
             self.config = self._get_installed_config()
             return
 
         self.config = self._get_source_config()
 
+    def _get_project_config(self):
+        self.project_path = self.bootstrap_script_dir
+
+        if SYNTHESEPY_DIR.startswith('@'):
+            # TODO: try to detect Synthese at the usual locations.
+            raise Exception('Auto detect not implemented yet')
+
+        self.synthesepy_dir = SYNTHESEPY_DIR
+
     def _get_installed_config(self):
-        config = Config()
-        config.env_type = 'installed'
-        config.env_path = os.path.normpath(
-            os.path.join(self.bootstrap_script_dir, os.pardir)
-        )
-        config.pyenv_path = join(
-            config.env_path, 'share', 'synthese', 'env'
-        )
-        config.tools_path = join(
-            config.env_path, 'share', 'synthese', 'tools'
-        )
-        return config
-
-    def _is_scons_objdir(self, path):
-        # Scons build directories are in a build/{debug,release} directories
-
-        if os.path.basename(path) not in ('debug', 'release'):
-            return False
-
-        parent_dir = os.path.normpath(os.path.join(path, os.pardir))
-        if os.path.basename(parent_dir) != 'build':
-            return False
-
-        return True
-
-    def _is_cmake_objdir(self, path):
-        return os.path.isfile(os.path.join(path, 'CMakeCache.txt'))
+        self.env_type = 'installed'
+        self.env_path = os.path.normpath(
+            os.path.join(self.bootstrap_script_dir, os.pardir))
+        self.pyenv_path = join(
+            self.env_path, 'share', 'synthese', 'env')
+        self.tools_path = join(
+            self.env_path, 'share', 'synthese', 'tools')
 
     def _get_source_config(self):
-        config = Config()
-        config.pyenv_path = join(self.thirdparty_dir, 'env')
+        self.pyenv_path = join(self.thirdparty_dir, 'env')
 
-        if SOURCE_PATH.startswith('@'):
-            # This assumes the script is run from the source directory
-            source_path = os.path.normpath(
-                join(self.bootstrap_script_dir, os.pardir)
-            )
-        else:
-            source_path = SOURCE_PATH
+        source_path = os.path.normpath(
+            join(self.synthesepy_dir, os.pardir))
 
-        config.tools_path = join(source_path, 'tools')
-        if not os.path.isdir(config.tools_path):
+        self.tools_path = join(source_path, 'tools')
+        if not os.path.isdir(self.tools_path):
             raise Exception(
-                'Can\'t find tools path at %s. Executing '
-                'synthese.py from wrong location?' % config.tools_path
-            )
-
-        if not SOURCE_PATH.startswith('@'):
-            config.env_path = self.bootstrap_script_dir
-            # Try to guess env
-            if self._is_scons_objdir(config.env_path):
-                config.env_type = 'scons'
-            elif self._is_cmake_objdir(config.env_path):
-                config.env_type = 'cmake'
-
-        log.debug('Source config: %s', config.__dict__)
-        return config
+                'Can\'t find tools path at %r. Executing '
+                'synthese.py from wrong location?' % self.tools_path)
 
     def _get_env_executable(self, executable):
         if sys.platform == 'win32':
-            return join(self.config.pyenv_path, 'Scripts', executable + '.exe')
+            return join(self.pyenv_path, 'Scripts', executable + '.exe')
 
-        return join(self.config.pyenv_path, 'bin', executable)
+        return join(self.pyenv_path, 'bin', executable)
 
     def _do_create_env(self):
-        c = self.config
-
-        virtualenv_script = join(c.tools_path, 'virtualenv.py')
+        virtualenv_script = join(self.tools_path, 'virtualenv.py')
         log.info('Installing Python environment...')
         subprocess.check_call([
-            sys.executable, virtualenv_script, '--distribute', c.pyenv_path
-        ], cwd=c.tools_path)
+            sys.executable, virtualenv_script, '--distribute', self.pyenv_path
+        ], cwd=self.tools_path)
 
         log.info('Installing dependencies...')
         requirements_files = [
-            join(c.tools_path, 'requirements.txt'),
-            join(c.tools_path, 'requirements_%s.txt' % sys.platform),
+            join(self.tools_path, 'requirements.txt'),
+            join(self.tools_path, 'requirements_%s.txt' % sys.platform),
         ]
 
         download_cache = join(self.thirdparty_dir, 'pip_download_cache')
@@ -153,8 +130,7 @@ class Bootstrap(object):
                 'install',
                 '--download-cache=%s' % download_cache,
                 '-r',
-                requirements_file
-            ])
+                requirements_file])
 
         # Installing MySQLdb on Windows with pip fails.
         if sys.platform == 'win32':
@@ -163,51 +139,80 @@ class Bootstrap(object):
             except ImportError:
                 raise Exception(
                     'MySQLdb library not found. Reinstall and try again.\n'
-                    'For Python 2.7, you can try http://www.codegood.com/archives/129'
-                )
+                    'For Python 2.7, you can try http://www.codegood.com/archives/129')
+
+        with open(join(self.pyenv_path, 'version.txt'), 'wb') as f:
+            f.write(str(REQUIRED_ENV_VERSION))
+
+
+    def _get_env_version(self):
+        if not os.path.isdir(self.pyenv_path):
+            return -1
+        try:
+            return int(open(join(self.pyenv_path, 'version.txt')).read().strip())
+        except Exception, e:
+            # No version.txt means version 0
+            log.debug('No version.txt (%r)', e)
+            return 0
 
     def maybe_create_pyenv(self):
-        if os.path.isdir(self.config.pyenv_path):
+        env_version = self._get_env_version()
+        if env_version >= REQUIRED_ENV_VERSION:
             return
+
+        log.info('Current env version (%i) is lower than the required '
+            'version (%i). Deleting env and reinstalling.', env_version,
+            REQUIRED_ENV_VERSION)
+        
+        if os.path.isdir(self.pyenv_path):
+            shutil.rmtree(self.pyenv_path)
 
         try:
             self._do_create_env()
         except Exception, e:
             log.critical(
-                'Failure while creating Python env. Deleting env directory'
-            )
+                'Failure while creating Python env (%s). '
+                'Deleting env directory', e)
             try:
-                shutil.rmtree(self.config.pyenv_path)
+                shutil.rmtree(self.pyenv_path)
             except:
                 pass
+            traceback.print_exc()
             raise e
 
     def run_synthese(self):
-        c = self.config
-
         if sys.platform == 'win32':
-            python = join(c.pyenv_path, 'Scripts', 'python.exe')
+            python = join(self.pyenv_path, 'Scripts', 'python.exe')
         else:
-            python = join(c.pyenv_path, 'bin', 'python')
+            python = join(self.pyenv_path, 'bin', 'python')
 
-        if c.env_type:
-            os.environ['SYNTHESE_ENV_TYPE'] = c.env_type
-        if c.env_path:
-            os.environ['SYNTHESE_ENV_PATH'] = c.env_path
         os.environ['SYNTHESE_THIRDPARTY_DIR'] = self.thirdparty_dir
 
         pythonpath = os.environ.get('PYTHONPATH', '')
         if pythonpath:
             pythonpath += os.pathsep
-        os.environ['PYTHONPATH'] = pythonpath + c.tools_path
+        os.environ['PYTHONPATH'] = pythonpath + self.tools_path
 
-        sys.exit(
-            subprocess.call(
-                [self._get_env_executable('python'), '-m', 'synthesepy.cli'] +
-                    sys.argv[1:],
-                env=os.environ
-            )
-        )
+        os.environ['SYNTHESEPY_DIR'] = self.synthesepy_dir
+
+        if self.project_path:
+            sys.argv.insert(1, '--project-path=' + self.project_path)
+        if self.env_type:
+            sys.argv.insert(1, '--env-type=' + self.env_type)
+        if self.env_path:
+            sys.argv.insert(1, '--env-path=' + self.env_path)
+
+        args = ([self._get_env_executable('python'), '-m', 'synthesepy.cli'] +
+            sys.argv[1:])
+        # os.exec on Windows in a Cygwin shell has a side effect of returning
+        # to the shell prompt while the process is running. Use subprocess
+        # instead which doesn't produce this behavior.
+        # Otherwise, using os.exec is better than subprocess here because
+        # there's a single stack trace in case of errors.
+        if os.environ.get('TERM') == 'cygwin':
+            sys.exit(subprocess.call(args))
+
+        os.execv(args[0], args)
 
 
 if __name__ == '__main__':

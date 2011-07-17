@@ -25,14 +25,16 @@ import logging
 import os
 import shutil
 import sqlite3
+import sys
 import tempfile
 import time
 from UserDict import UserDict
 
 import MySQLdb
 
-from .daemon import Daemon
-from . import utils
+from synthesepy import daemon
+from synthesepy import utils
+
 
 log = logging.getLogger(__name__)
 
@@ -41,11 +43,6 @@ class DBBackend(object):
     def __init__(self, env, conn_info):
         self.env = env
         self.conn_info = conn_info
-
-        self.initial_data_file = os.path.join(
-            self.env.admin_root_path,
-            'install.sql'
-        )
 
     def get_connection(self):
         raise NotImplementedError()
@@ -58,29 +55,47 @@ class DBBackend(object):
         conn.commit()
         cursor.close()
 
+    def query(self, query, args=(), one=False):
+        """Queries the database and returns a list of dictionaries."""
+        with self.get_cursor() as cursor:
+            cursor.execute(query, args)
+            rv = [dict((cursor.description[idx][0], value)
+                       for idx, value in enumerate(row)) for row in cursor.fetchall()]
+            return (rv[0] if rv else None) if one else rv
+
     def init_db(self):
-        utils.kill_listening_processes(self.env.port)
+        utils.kill_listening_processes(self.env.c.port)
 
         self.drop_db()
         self._create_db()
         self.start_daemon()
         self.stop_daemon()
-        log.info('Importing data from %s', self.initial_data_file)
-        self._import_data()
         log.info('db initialized')
 
     def drop_db(self):
         raise NotImplementedError()
 
     def start_daemon(self):
-        self.env.conn_string = self.conn_info.conn_string
-        self.daemon = Daemon(self.env)
+        self.env.c.conn_string = self.conn_info.conn_string
+        self.daemon = daemon.Daemon(self.env)
         self.daemon.start()
 
     def stop_daemon(self):
         assert self.daemon
         self.daemon.stop()
         self.daemon = None
+
+    def shell(self, sql=None):
+        """Open a SQL interpreter on the database or execute the given SQL"""
+        raise NotImplementedError()
+
+    def dump(self):
+        """Return a database dump as a string"""
+        raise NotImplementedError()
+
+    def restore(self, sql):
+        """Restore this database from the provided sql"""
+        raise NotImplementedError()
 
 
 class SQLiteBackend(DBBackend):
@@ -93,14 +108,14 @@ class SQLiteBackend(DBBackend):
             self.sqlite_file = os.path.join(tempfile.gettempdir(), 'synthese.db3')
             self.conn_info['path'] = self.sqlite_file
         if not self.sqlite_file:
+            # XXX this might be obsolete once using projects is mandatory.
             # If no path is specified in the connection string, the sqlite
             # backend uses a file called 'config.db3' in the current directory.
             # Here we use the default daemon directory so that it
             # initializes the file that would be run with 'rundaemon'.
             self.sqlite_file = os.path.join(
                 self.env.daemon_launch_path,
-                'config.db3'
-            )
+                'config.db3')
         log.debug('Sqlite file: %s', self.sqlite_file)
 
     def get_connection(self, spatialite=False):
@@ -132,10 +147,45 @@ class SQLiteBackend(DBBackend):
             shutil.copy(self.sqlite_file, self.sqlite_file + '_backup')
             os.unlink(self.sqlite_file)
 
-    def _import_data(self):
+    def import_fixtures(self, fixtures_file, vars={}):
+        log.info('Importing fixtures: %s', fixtures_file)
         with self.get_cursor() as cursor:
-            with open(self.initial_data_file, 'rb') as f:
-                cursor.executescript(f.read())
+            with open(fixtures_file, 'rb') as f:
+                sql = f.read()
+                for (key, value) in vars.iteritems():
+                    sql = sql.replace("@@" + key + "@@", str(value))
+                cursor.executescript(sql)
+
+    def shell(self, sql=None):
+        # Warning: shell=False is required on Linux, otherwise it launches the
+        # interpreter and it hangs.
+        kwargs = {'input': sql} if sql else {}
+        output = utils.call(
+            self.env.c.dummy,
+            [self.env.config.spatialite_path, self.conn_info['path']],
+            shell=False,
+            **kwargs)
+        if output:
+            print output
+
+    def dump(self):
+        args = [self.env.c.spatialite_path, '-bail',
+            self.conn_info['path'], '.dump']
+        log.debug('Running: %r', args)
+        # See comment in shell() about shell=False
+        output = utils.call(self.env.c.dummy, args, shell=False, input='')
+        # Remove the Spatialite header, which isn't valid SQL.
+        # (-noheader doesn't have any effect)
+        return output[output.index('BEGIN TRANSACTION'):]
+
+    def restore(self, sql):
+        db_path = self.conn_info['path']
+        if os.path.isfile(db_path):
+            os.unlink(db_path)
+
+        args = [self.env.c.spatialite_path, '-bail', '-noheader', db_path]
+        utils.call(self.env.c.dummy, args, input=sql)
+        log.info('Database %r restored', db_path)
 
 
 class MySQLBackend(DBBackend):
@@ -169,9 +219,10 @@ class MySQLBackend(DBBackend):
                     return
                 raise
 
-    def _import_data(self):
+    def import_fixtures(self, fixtures_file):
+        log.info('Importing fixtures: %s', fixtures_file)
         with self.get_cursor() as cursor:
-            with open(self.initial_data_file, 'rb') as f:
+            with open(fixtures_file, 'rb') as f:
                 # MySQLdb can't execute multiple statements (however it works on Windows with version 1.2.3)
                 # So, split lines at semicolons.
                 current_line = ''
@@ -182,6 +233,46 @@ class MySQLBackend(DBBackend):
                     current_line += line
                     cursor.execute(current_line)
                     current_line = ''
+
+    def _setup_path(self):
+        if sys.platform != 'win32':
+            return
+    
+        # Keep this in sync with tools/synthesepy/build.py
+        utils.append_paths_to_environment('PATH', [
+            os.path.join(
+                self.env.c.thirdparty_dir, 'mysql-5.5.12-win32', 'bin')])
+
+    def _mysql_command(self, command, extra_opts='', input=''):
+        self._setup_path()
+        default_args = {
+            'port': '3306',
+        }
+        args = default_args
+        args.update(self.conn_info.data)
+        args.update(dict(
+            command=command,
+            extra_opts=extra_opts,
+        ))
+ 
+        cmd = ('{command} {extra_opts} -u{user} -p{passwd} -h{host} '
+            '-P{port} {db}'.format(**args))
+
+        if input is not None:
+            return utils.call(self.env.c.dummy, cmd, input=input)
+        return utils.call(self.env.c.dummy, cmd)
+
+    def shell(self, sql=None):
+        output = self._mysql_command('mysql', input=sql)
+        if output:
+            print output
+
+    def dump(self):
+        return self._mysql_command(
+            'mysqldump', extra_opts=self.env.c.mysqldump_opts)
+
+    def restore(self, sql):
+        pass
 
 
 class DummyBackend(DBBackend):
@@ -201,8 +292,7 @@ class ConnectionInfo(UserDict):
     @property
     def conn_string(self):
         args = ','.join(
-            ['%s=%s' % (key, name) for (key, name) in self.data.iteritems()]
-        )
+            ['%s=%s' % (key, name) for (key, name) in self.data.iteritems()])
         return '%s://%s' % (self.backend, args)
 
 

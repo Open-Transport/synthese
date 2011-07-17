@@ -29,11 +29,13 @@ if sys.version_info >= (2, 7):
     import unittest
 else:
     import unittest2 as unittest
-import mechanize
 
+import synthesepy.functional_test
 from synthesepy import daemon
 from synthesepy import db_backends
-import synthesepy.functional_test
+from synthesepy import http_api
+from synthesepy import project_manager
+
 
 log = logging.getLogger(__name__)
 
@@ -46,6 +48,11 @@ class HTTPTestCase(unittest.TestCase):
     of the test methods for each backends, unless no_init was set to true
     when calling init_backends().
     """
+    site_packages = {
+        'admin': ('admin',),
+        'main': ('routePlanner', 'testData'),
+    }
+
     def __init__(self, *args, **kwargs):
         super(HTTPTestCase, self).__init__(*args, **kwargs)
 
@@ -55,45 +62,48 @@ class HTTPTestCase(unittest.TestCase):
 
         if cls.no_init:
             return
-        cls.backend.init_db()
-        cls.backend.start_daemon()
+
+        project_path = os.path.join(env.env_path, 'projects', 'test')
+
+        cls.project = project_manager.create_project(
+            cls.env, project_path, site_packages=cls.site_packages,
+            conn_string=cls.backend.conn_info.conn_string,
+            overwrite=True)
+
+        cls.project.rundaemon(block=False)
 
     @classmethod
     def tearDownClass(cls):
         log.debug('tearDownClass %s, with backend %s', cls.__name__, cls.backend)
         if cls.no_init:
             return
-        cls.backend.stop_daemon()
-        cls.backend.drop_db()
+        cls.project.stopdaemon()
+        cls.project._clean()
 
-    def get_browser(self):
-        br = mechanize.Browser()
-        admin_url = 'http://localhost:%s/admin/synthese3' % \
-            self.backend.env.wsgi_proxy_port
-        br.open(admin_url)
-        self.assertEqual(br.title(), 'Login - SYNTHESE3 Admin')
-        return br
+    def get_http_api(self):
+        return http_api.HTTPApi(self.backend.env)
 
 
+env = None
 backends = []
 no_init = False
 
 
-def init_backends(env, conn_strings, _no_init):
-    global backends, no_init
+def init_backends(_env, conn_strings, _no_init):
+    global env, backends, no_init
 
     log.debug('init_backends')
+    env = _env
     backends = []
+    no_init = _no_init
     for conn_string in conn_strings:
         backends.append(db_backends.create_backend(env, conn_string))
 
     log.debug('Initialized backends %s', backends)
 
-    no_init = _no_init
-
 
 def do_load_tests(scope, loader):
-    # Based on the code from unittest/loader.py, TestLoader.loadTestsFromModule"""
+    # Based on the code from unittest/loader.py, TestLoader.loadTestsFromModule
 
     module = sys.modules[scope['__name__']]
 
@@ -104,8 +114,9 @@ def do_load_tests(scope, loader):
             log.debug('Found FunctionalTestCase: %s', obj)
 
             for backend in backends:
-                class_name = obj.__name__ + "_" + backend.name
+                class_name = obj.__name__ + '_' + backend.name
                 new_class = type(class_name, (obj,), {})
+                new_class.env = env
                 new_class.backend = backend
                 new_class.no_init = no_init
 
