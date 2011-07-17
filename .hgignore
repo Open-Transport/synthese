@@ -24,3 +24,5 @@
 ^3rd/dev/geos/src/headers/geos/version.h$
 ^3rd/dev/geos/capi/geos_c.h$
 ^tools/distribute.*.tar.gz$
+^packages/map/files/map/vendor/OpenLayers_full$
+^packages/map/files/map/vendor/OpenLayers.*\.zip$
