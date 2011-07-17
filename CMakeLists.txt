@@ -71,6 +71,8 @@ if(WIN32)
   # -D__WIN32__
   add_definitions(-DNOMINMAX)
 
+  add_definitions(-D_WIN32_WINNT=0x0501)
+
   # This is to avoid:
   # fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj
   add_definitions(/bigobj)
