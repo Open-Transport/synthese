@@ -23,6 +23,7 @@
 #include "City.h"
 #include "Registry.h"
 #include "Factory.h"
+#include "ParametersMap.h"
 
 #include <assert.h>
 
@@ -42,6 +43,8 @@ namespace synthese
 
 	namespace geography
 	{
+		const std::string City::DATA_CITY_ID("city_id");
+		const std::string City::DATA_CITY_NAME("city_name");
 
 		City::City(
 			RegistryKeyType key,
@@ -145,6 +148,15 @@ namespace synthese
 			PlacesMatchers::const_iterator it(_lexicalMatchers.find(key));
 			assert(it != _lexicalMatchers.end());
 			return it->second;
+		}
+
+
+		void City::toParametersMap(
+			ParametersMap& pm,
+			const string& prefix
+		) const {
+			pm.insert(prefix + DATA_CITY_ID, getKey());
+			pm.insert(prefix + DATA_CITY_NAME, getName());
 		}
 	}
 }

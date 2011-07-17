@@ -37,6 +37,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace geography
 	{
 		class NamedPlace;
@@ -60,6 +65,9 @@ namespace synthese
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> > PlacesMatcher;
 
 		private:
+			static const std::string DATA_CITY_ID;
+			static const std::string DATA_CITY_NAME;
+
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
 
 			PlacesMatcher	_allPlacesMatcher;
@@ -151,6 +159,20 @@ namespace synthese
 					_allPlacesMatcher.remove(place->getNameForAllPlacesMatcher());
 				}
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Exports the object into a parameters map.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @retval the parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Sylvain Pasche
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const std::string& prefix = std::string()
+				) const;
 			//@}
 		};
 	}
