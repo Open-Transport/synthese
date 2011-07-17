@@ -408,6 +408,14 @@ namespace synthese
 				throw ParametersMap::MissingParameterException(parameterName);
 			}
 		}
+
+
+
+		// Specialization for retrieving strings, which we don't want to trim.
+		template<>
+		std::string ParametersMap::get(
+			const std::string& parameterName
+		) const;
 	}
 }
 

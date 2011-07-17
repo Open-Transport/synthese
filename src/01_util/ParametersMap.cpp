@@ -79,6 +79,20 @@ namespace synthese
 
 
 
+		template<>
+		string ParametersMap::get(
+			const string& parameterName
+		) const {
+			Map::const_iterator it(_map.find(parameterName));
+			if (it == _map.end())
+			{
+				throw ParametersMap::MissingParameterException(parameterName);
+			}
+			return it->second;
+		}
+
+
+
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
 		{
 			_map[parameterName] = value;
