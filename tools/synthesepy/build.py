@@ -41,9 +41,9 @@ REQUIRED_BOOST_MODULES = [
 
 
 class Builder(object):
-    def __init__(self, env, args):
+    def __init__(self, env):
         self.env = env
-        self.args = args
+        self.config = env.config
 
         self.download_cache_dir = join(
             self.env.c.thirdparty_dir, 'download_cache')
@@ -54,25 +54,35 @@ class Builder(object):
         return utils.check_call(self.env.c.dummy, *args, **kwargs)
 
     def _download(self, url, md5=None):
-        target = join(self.download_cache_dir, url.split('/')[-1])
         if 'SYNTHESE_CACHE_URL' in os.environ:
             url = os.environ['SYNTHESE_CACHE_URL'] + url.split('/')[-1]
+        target_filename = url.split('/')[-1]
+        target = join(self.download_cache_dir, target_filename)
         if os.path.isfile(target):
             return
-        log.info('Downloading %s to %s', url, target)
-        shutil.copyfileobj(urllib2.urlopen(url), open(target, 'wb'))
+        temp_dir = join(self.download_cache_dir, 'temp')
+        utils.RemoveDirectory(temp_dir)
+        os.makedirs(temp_dir)
+        temp_target = join(temp_dir, target_filename) 
+        log.info('Downloading %s to %s', url, temp_target)
+        shutil.copyfileobj(urllib2.urlopen(url), open(temp_target, 'wb'))
 
-        if not md5:
-            return
-        m = hashlib.md5()
-        m.update(open(target, 'rb').read())
-        actual_md5 = m.hexdigest()
-        if actual_md5 != md5:
-            os.unlink(target)
-            raise Exception(
-                'Downloaded file {0} doesn\'t match md5sum '
-                '(expected: {1} actual: {2})'.
-                format(url, md5, actual_md5))
+        try:
+            if not md5:
+                return
+            m = hashlib.md5()
+            m.update(open(temp_target, 'rb').read())
+            actual_md5 = m.hexdigest()
+            if actual_md5 != md5:
+                utils.RemoveDirectory(temp_dir)
+                raise Exception(
+                    'Downloaded file {0} doesn\'t match md5sum '
+                    '(expected: {1} actual: {2})'.
+                    format(url, md5, actual_md5))
+        finally:
+            if os.path.isfile(temp_target):
+                os.rename(temp_target, target)
+            utils.RemoveDirectory(temp_dir)
 
     def _extract(self, url, extract_dir, created_dir):
         if os.path.isdir(join(extract_dir, created_dir)):
@@ -142,10 +152,10 @@ class SconsBuilder(Builder):
             args.append('CXX=ccache g++')
             args.append('CC=ccache gcc')
 
-        if not self.args.without_mysql:
+        if not self.config.without_mysql:
             args.append('_WITH_MYSQL=True')
-            if self.args.mysql_dir:
-                args.append('_MYSQL_ROOT=' + self.args.mysql_dir)
+            if self.config.mysql_dir:
+                args.append('_MYSQL_ROOT=' + self.config.mysql_dir)
 
         if self.env.mode == 'debug':
             args.append('_CPPMODE=debug')
@@ -192,7 +202,7 @@ class CMakeBuilder(Builder):
             ['libboost-{0}{1}-dev'.format(m.replace('_', '-'), BOOST_VER) for
                 m in REQUIRED_BOOST_MODULES])
 
-        if not self.args.without_mysql:
+        if not self.config.without_mysql:
             required_packages.extend(
                 ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
 
@@ -252,11 +262,11 @@ class CMakeBuilder(Builder):
         self.with_mysql = True
         self.mysql_dir = None
 
-        if self.args.without_mysql:
+        if self.config.without_mysql:
             self.with_mysql = False
             return
-        if self.args.mysql_dir:
-            self.mysql_dir = self.args.mysql_dir
+        if self.config.mysql_dir:
+            self.mysql_dir = self.config.mysql_dir
             return
 
         if self.env.platform != 'win':
@@ -273,8 +283,8 @@ class CMakeBuilder(Builder):
         self.boost_dir = None
         self.boost_lib_dir = None
 
-        if self.args.boost_dir:
-            self.boost_dir = self.args.boost_dir
+        if self.config.boost_dir:
+            self.boost_dir = self.config.boost_dir
             return
 
         if self.env.platform != 'win':
@@ -362,10 +372,10 @@ class CMakeBuilder(Builder):
         # TODO: maybe change optimization flags in debug mode:
         # -DCMAKE_CXX_FLAGS=-O0
 
-        if self.args.prefix:
-            args.append('-DCMAKE_INSTALL_PREFIX=' + self.args.prefix)
-        if self.args.mysql_params:
-            args.append('-DSYNTHESE_MYSQL_PARAMS=' + self.args.mysql_params)
+        if self.config.prefix:
+            args.append('-DCMAKE_INSTALL_PREFIX=' + self.config.prefix)
+        if self.config.mysql_params:
+            args.append('-DSYNTHESE_MYSQL_PARAMS=' + self.config.mysql_params)
 
         args.append('-DBOOST_VERSION=' + BOOST_VER)
 
@@ -425,7 +435,7 @@ class CMakeBuilder(Builder):
 
     def _build(self):
         self._generate_build_system()
-        if self.args.generate_only:
+        if self.config.generate_only:
             return
 
         PLATFORM_TO_TOOL = {
@@ -444,7 +454,7 @@ class CMakeBuilder(Builder):
 
 builder = None
 
-def get_builder(env, args=None):
+def get_builder(env):
     global builder
     if builder:
         return builder
@@ -456,9 +466,18 @@ def get_builder(env, args=None):
     else:
         raise Exception('Unsupported env %s' % type(env).__name__)
 
-    builder = builder_class(env, args)
+    builder = builder_class(env)
     return builder
 
-def build(env, args):
-    builder = get_builder(env, args)
+def build(env):
+    builder = get_builder(env)
     builder.build()
+
+
+def clean(env, dummy):
+    if dummy:
+        log.info('Dummy mode, not deleting: %r', env.env_path)
+        return
+    log.info('Deleting: %r', env.env_path)
+    if os.path.isdir(env.env_path):
+        utils.RemoveDirectory(env.env_path)

@@ -75,6 +75,18 @@ class DBBackend(object):
     def drop_db(self):
         raise NotImplementedError()
 
+    def import_fixtures(self, fixtures_file, vars={}):
+        log.info('Importing fixtures: %s', fixtures_file)
+        with self.get_cursor() as cursor:
+            with open(fixtures_file, 'rb') as f:
+                sql = f.read()
+                for (key, value) in vars.iteritems():
+                    sql = sql.replace("@@" + key + "@@", str(value))
+                self.import_sql(sql)
+
+    def import_sql(self, sql):
+        raise NotImplementedError()
+
     def start_daemon(self):
         self.env.c.conn_string = self.conn_info.conn_string
         self.daemon = daemon.Daemon(self.env)
@@ -147,14 +159,9 @@ class SQLiteBackend(DBBackend):
             shutil.copy(self.sqlite_file, self.sqlite_file + '_backup')
             os.unlink(self.sqlite_file)
 
-    def import_fixtures(self, fixtures_file, vars={}):
-        log.info('Importing fixtures: %s', fixtures_file)
+    def import_sql(self, sql):
         with self.get_cursor() as cursor:
-            with open(fixtures_file, 'rb') as f:
-                sql = f.read()
-                for (key, value) in vars.iteritems():
-                    sql = sql.replace("@@" + key + "@@", str(value))
-                cursor.executescript(sql)
+            cursor.executescript(sql)
 
     def shell(self, sql=None):
         # Warning: shell=False is required on Linux, otherwise it launches the
@@ -219,20 +226,18 @@ class MySQLBackend(DBBackend):
                     return
                 raise
 
-    def import_fixtures(self, fixtures_file):
-        log.info('Importing fixtures: %s', fixtures_file)
+    def import_sql(self, sql):
         with self.get_cursor() as cursor:
-            with open(fixtures_file, 'rb') as f:
-                # MySQLdb can't execute multiple statements (however it works on Windows with version 1.2.3)
-                # So, split lines at semicolons.
-                current_line = ''
-                for line in f:
-                    if not line.strip().endswith(';'):
-                        current_line += line
-                        continue
+            # MySQLdb can't execute multiple statements (however it works on Windows with version 1.2.3)
+            # So, split lines at semicolons.
+            current_line = ''
+            for line in sql.splitlines():
+                if not line.strip().endswith(';'):
                     current_line += line
-                    cursor.execute(current_line)
-                    current_line = ''
+                    continue
+                current_line += line
+                cursor.execute(current_line)
+                current_line = ''
 
     def _setup_path(self):
         if sys.platform != 'win32':
