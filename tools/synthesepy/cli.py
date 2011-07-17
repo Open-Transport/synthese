@@ -23,11 +23,14 @@
 import argparse
 import logging
 import os
+from os.path import join
 import shutil
+import sys
 import time
 
 import synthesepy
 import synthesepy.build
+import synthesepy.config
 import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.env
@@ -35,8 +38,46 @@ import synthesepy.proxy
 import synthesepy.sqlite_to_mysql
 import synthesepy.test.main
 import synthesepy.utils
+import synthesepy.env
+from synthesepy import project_manager
+
 
 log = logging.getLogger(__name__)
+
+
+# From Adrian Sampson, https://gist.github.com/471779
+class AliasedSubParsersAction(argparse._SubParsersAction):
+
+    class _AliasedPseudoAction(argparse.Action):
+        def __init__(self, name, aliases, help):
+            dest = name
+            if aliases:
+                dest += ' (%s)' % ','.join(aliases)
+            sup = super(AliasedSubParsersAction._AliasedPseudoAction, self)
+            sup.__init__(option_strings=[], dest=dest, help=help) 
+
+    def add_parser(self, name, **kwargs):
+        if 'aliases' in kwargs:
+            aliases = kwargs['aliases']
+            del kwargs['aliases']
+        else:
+            aliases = []
+
+        parser = super(AliasedSubParsersAction, self).add_parser(name, **kwargs)
+
+        # Make the aliases work.
+        for alias in aliases:
+            self._name_parser_map[alias] = parser
+        # Make the help text reflect them, first removing old help entry.
+        if 'help' in kwargs:
+            help = kwargs.pop('help')
+            self._choices_actions.pop()
+            pseudo_action = self._AliasedPseudoAction(name, aliases, help)
+            self._choices_actions.append(pseudo_action)
+
+        return parser
+
+# Commands
 
 
 def build(args, env):
@@ -44,37 +85,12 @@ def build(args, env):
 
 
 def clean(args, env):
-    log.info('Deleting: %r', env.env_path)
-    if not args.dummy:
-        shutil.rmtree(env.env_path)
-
-
-def rundaemon(args, env):
-    daemon = synthesepy.daemon.Daemon(env)
-    daemon.start(gdb=args.gdb)
-    # TODO: show URL in info message.
-    log.info('Daemon running, press ctrl-c to stop')
-    try:
-        while True:
-            time.sleep(10)
-    except KeyboardInterrupt:
-        print '^C'
-
-    log.info('Stopping daemon')
-    daemon.stop()
-
-
-def stopdaemon(args, env):
-    # TODO: should use the HTTP method to stop the daemon once it works.
-    ports = [env.port]
-    if env.wsgi_proxy:
-        ports.append(env.wsgi_proxy_port)
-    for port in ports:
-        synthesepy.utils.kill_listening_processes(port)
-
-
-def runproxy(args, env):
-    synthesepy.proxy.serve_forever(env)
+    if args.dummy:
+        log.info('Dummy mode, not deleting: %r', env.env_path)
+    else:
+        log.info('Deleting: %r', env.env_path)
+        if os.path.isdir(env.env_path):
+            shutil.rmtree(env.env_path)
 
 
 def runtests(args, env):
@@ -82,140 +98,241 @@ def runtests(args, env):
     tester.run_tests(args.suites)
 
 
-def initdb(args, env):
-    backend = synthesepy.db_backends.create_backend(env, args.conn_string)
-    backend.init_db()
-
-
 def sqlite_to_mysql(args, env):
     synthesepy.sqlite_to_mysql.convert(env, args.sourceconn, args.targetconn)
 
 
-def main():
-    parser = argparse.ArgumentParser(description='Synthese management tool')
-    parser.add_argument(
-        '-t', '--env-type', choices=['scons', 'cmake', 'installed'],
-        default='cmake'
-    )
-    parser.add_argument('-b', '--env-path', help='Env path')
-    parser.add_argument(
-        '-m', '--mode', choices=['release', 'debug'], default='debug'
-    )
-    parser.add_argument('-p', '--port', type=int, default=8080)
-    parser.add_argument('--no-proxy', action='store_true', default=False)
-    parser.add_argument('--site-id', type=int, default=0)
-    parser.add_argument('-d', '--dbconn', default='sqlite://', dest='conn_string')
-    parser.add_argument('-v', '--verbose', action='store_true', default=False)
-    parser.add_argument(
-        '--dummy', action='store_true', default=False,
-        help='Dummy mode, doesn\'t execute commands or have side effects '
-            'WARNING: NOT FULLY IMPLEMENTED YET')
-    parser.add_argument(
-        '-s', '--stdout', action='store_true', default=False, dest='log_stdout',
-        help='Log daemon output to stdout'
-    )
-    parser.add_argument(
-        '--static-dir',
-        help='Directory containing static files served by the HTTP proxy'
-    )
-    parser.add_argument(
-        '-e', '--extra-params',
-        help='Daemon extra parameters, using format "param0=value0 param1=value1"'
-    )
+def create_project(args, env):
+    site_packages = None
+    if args.packages:
+        site_packages = {
+            'admin': ('admin',),
+            'main': args.packages,
+        }
+    project_manager.create_project(
+        env, args.path, site_packages, args.conn_string,
+        overwrite=args.overwrite)
 
-    subparsers = parser.add_subparsers(help='sub-command help')
 
-    parser_build = subparsers.add_parser('build')
+# End of commands
+
+
+def add_project_subparsers(subparsers):
+    def add_parser(name, aliases=[], func=None):
+        project_method = getattr(project_manager.Project, name)
+        parser = subparsers.add_parser(
+            name,
+            aliases=aliases,
+            help=project_method.__doc__)
+        if func:
+            parser.set_defaults(func=func)
+        else:
+            parser.set_defaults(project_func=project_method)
+        return parser
+
+    add_parser('reset')
+    add_parser('sync')
+    add_parser('rundaemon', ('run', 'start'))
+    add_parser('stopdaemon', ('stop',))
+    add_parser('runproxy')
+    add_parser('db_view')
+    def db_shell(project, args, env):
+        project.db_shell(sql=args.sql)
+    parser = add_parser('db_shell', func=db_shell)
+    parser.add_argument('sql', nargs='?', help='SQL string to execute')
+    parser.set_defaults(func=db_shell)
+    add_parser('db_dump')
+    add_parser('db_opendump')
+    add_parser('db_sync_to_files')
+    add_parser('db_sync_from_files')
+    def db_restore(project, args, env):
+        project.db_restore(args.db_dump)
+    parser = add_parser('db_restore', func=db_restore)
+    parser.add_argument('--dump', dest='db_dump')
+    add_parser('db_remote_dump')
+    add_parser('ssh')
+
+
+def add_default_subparsers(subparsers):
+    parser_build = subparsers.add_parser('build', help='Build Synthese')
     parser_build.set_defaults(func=build)
     parser_build.add_argument(
         '-g', '--generate-only', action='store_true', default=False,
-        help='Only generate build script, but don\'t build'
-    )
+        help='Only generate build script, but don\'t build')
     parser_build.add_argument(
         '--prefix',
-        help='Installation directory'
-    )
+        help='Installation directory')
     parser_build.add_argument(
         '--mysql-params',
         help='MySQL connection string used for the unit tests. For instance:'
-            '"host=localhost,user=synthese,passwd=synthese"'
-    )
+            '"host=localhost,user=synthese,passwd=synthese"')
     parser_build.add_argument(
         '--without-mysql', action='store_true', default=False,
-        help='Disable MySQL database support'
-    )
+        help='Disable MySQL database support')
     parser_build.add_argument(
         '--mysql-dir',
         help='Path to MySQL installation (Not needed on Linux if using'
-             'standard MySQL installation)'
-    )
+             'standard MySQL installation)')
     parser_build.add_argument(
         '--boost-dir',
         help='Path to Boost installation (Not needed on Linux if using'
-             'standard Boost installation)'
-    )
+             'standard Boost installation)')
+    parser_build.add_argument(
+        '--parallel-build', type=int,
+        help='Number of build threads to use')
 
-    parser_clean = subparsers.add_parser('clean')
+    parser_clean = subparsers.add_parser(
+        'clean', help='Delete the object directory')
     parser_clean.set_defaults(func=clean)
 
-    parser_rundaemon = subparsers.add_parser('rundaemon')
-    parser_rundaemon.set_defaults(func=rundaemon)
-    parser_rundaemon.add_argument(
-        '--gdb', action='store_true', default=False,
-        help='Run daemon under gdb'
-    )
-
-    parser_stopdaemon = subparsers.add_parser('stopdaemon')
-    parser_stopdaemon.set_defaults(func=stopdaemon)
-
-    parser_runproxy = subparsers.add_parser('runproxy')
-    parser_runproxy.set_defaults(func=runproxy)
-
-    parser_runtests = subparsers.add_parser('runtests')
+    parser_runtests = subparsers.add_parser(
+        'runtests', help='Run unit tests')
     parser_runtests.set_defaults(func=runtests)
     # for python suite
     parser_runtests.add_argument(
-        '--dbconns', nargs='+', dest='conn_strings', default=[]
-    )
+        '--dbconns', nargs='+', dest='conn_strings', default=[])
     # for python suite
     parser_runtests.add_argument(
         '--no-init',
         help='Don\'t start/stop the daemon or initialize the db. '
              'Can be used to reuse an already running daemon',
-        action='store_true', default=False
-    )
+        action='store_true', default=False)
     parser_runtests.add_argument(
         'suites', nargs='*',
-        help='List of test suites to run. Choices: style, python, cpp'
-    )
+        help='List of test suites to run. Choices: style, python, cpp')
 
-    parser_initdb = subparsers.add_parser('initdb')
-    parser_initdb.set_defaults(func=initdb)
-
-    parser_sqlite_to_mysql = subparsers.add_parser('sqlite_to_mysql')
+    parser_sqlite_to_mysql = subparsers.add_parser(
+        'sqlite_to_mysql', help='Convert a SQLite database to MySQL')
     parser_sqlite_to_mysql.set_defaults(func=sqlite_to_mysql)
     parser_sqlite_to_mysql.add_argument('--sourceconn')
     parser_sqlite_to_mysql.add_argument('--targetconn')
 
-    args = parser.parse_args()
+    parser_create_project = subparsers.add_parser(
+        'create_project', help='Create a Synthese project')
+    parser_create_project.set_defaults(func=create_project)
+    parser_create_project.add_argument('--path', required=True)
+    parser_create_project.add_argument(
+        '--packages', nargs='*')
+    parser_create_project.add_argument('--conn-string')
+    parser_create_project.add_argument(
+        '--overwrite', action='store_true', default=False)
 
-    logging.basicConfig(level=(logging.DEBUG if args.verbose else logging.INFO))
 
-    env = synthesepy.env.create_env(args.env_type, args.env_path, args.mode)
-    env.port = args.port
-    env.wsgi_proxy = not args.no_proxy
-    env.wsgi_proxy_port = env.port + 1
-    env.site_id = args.site_id
-    env.conn_string = args.conn_string
-    env.verbose = args.verbose
-    env.log_stdout = args.log_stdout
-    env.static_dir = args.static_dir
-    env.extra_params = args.extra_params
-    env.thirdparty_dir = os.environ['SYNTHESE_THIRDPARTY_DIR']
-    env.dummy = args.dummy
+def main():
 
-    log.debug('Args: %s', args)
-    args.func(args, env)
+    # Phase 1: Initialize config from files.
+
+    config_parser = argparse.ArgumentParser(add_help=False)
+    config_parser.add_argument(
+        '--config-path',
+        help='Directory containing the configuration files')
+    config_parser.add_argument(
+        '-c', '--config', dest='config_names',
+        help='Configuration entries to use')
+
+    config_args, remaining_argv = config_parser.parse_known_args()
+
+    # Hack to get logging before argument parsing is done.
+    logging.basicConfig(
+        level=(logging.DEBUG if '-v' in sys.argv else logging.INFO))
+
+    config = synthesepy.config.Config()
+
+    if config_args.config_names:
+        config.update_from_files(
+            config_args.config_names.split(','), config_args.config_path)
+
+    # Phase 2: Process project settings.
+
+    project_parser = argparse.ArgumentParser(add_help=False)
+    project_parser.set_defaults(**config.__dict__)
+    project_parser.add_argument(
+        '-p', '--project-path', help='Path to the synthese project to use')
+    args, remaining_argv = project_parser.parse_known_args(remaining_argv)
+
+    project = None
+
+    if args.project_path:
+        log.info('Got a project path: %s', args.project_path)
+
+        project = project_manager.Project(args.project_path, config=config)
+        log.debug('New config: %s', config)
+
+        # config from files overrides project config.
+        if config_args.config_names:
+            config.update_from_files(
+                config_args.config_names.split(','), config_args.config_path)
+
+
+    # Phase 3: Handle all command line options.
+
+    parser = argparse.ArgumentParser(
+        parents=[config_parser, project_parser],
+        description='Synthese management tool')
+    parser.register('action', 'parsers', AliasedSubParsersAction)
+    parser.set_defaults(**config.__dict__)
+
+    # Global options
+    parser.add_argument(
+        '-v', '--verbose', action='store_true', default=False,
+        help='Be verbose')
+    parser.add_argument(
+        '-u', '--dummy', action='store_true', default=False,
+        help='Dummy mode, doesn\'t execute commands or have side effects '
+            'WARNING: NOT FULLY IMPLEMENTED YET')
+    # Environment options
+    parser.add_argument(
+        '-t', '--env-type', choices=['scons', 'cmake', 'installed'])
+    parser.add_argument('-b', '--env-path', help='Env path')
+    parser.add_argument(
+        '-m', '--mode', choices=['release', 'debug'])
+    # Daemon options
+    parser.add_argument('--port', type=int)
+    parser.add_argument('--no-proxy', action='store_true')
+    parser.add_argument('--site-id', type=int)
+    parser.add_argument('-d', '--dbconn', dest='conn_string')
+    parser.add_argument(
+        '-s', '--stdout', action='store_true', dest='log_stdout',
+        help='Log daemon output to stdout')
+    parser.add_argument(
+        '--static-dir',
+        help='Directory containing static files served by the HTTP proxy')
+    parser.add_argument(
+        '-e', '--extra-params',
+        help='Daemon extra parameters, using format '
+             '"param0=value0 param1=value1"')
+    parser.add_argument(
+        '--gdb', action='store_true', help='Run daemon under gdb')
+
+    subparsers = parser.add_subparsers(help='sub-command help')
+    if project:
+        add_project_subparsers(subparsers)
+    else:
+        add_default_subparsers(subparsers)
+
+    args = parser.parse_args(remaining_argv)
+
+    log.debug('Final arguments: %s', args)
+    logging.getLogger().setLevel(
+        level=(logging.DEBUG if args.verbose else logging.INFO))
+
+    config.update_from_obj(args)
+
+    config.wsgi_proxy = not args.no_proxy
+    config.wsgi_proxy_port = config.port + 1
+
+    env = synthesepy.env.create_env(
+        args.env_type, args.env_path, args.mode, config)
+
+    if project:
+        project.set_env(env)
+        if hasattr(args, 'project_func'):
+            args.project_func(project)
+        else:
+            args.func(project, args, env)
+    else:
+        args.func(args, env)
+
 
 if __name__ == '__main__':
     main()

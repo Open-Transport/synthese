@@ -33,27 +33,16 @@ log = logging.getLogger(__name__)
 
 
 class Env(object):
-    port = None
-    wsgi_proxy = True
-    wsgi_proxy_port = None
-    site_id = 0
-    conn_string = None
-    verbose = False
-    log_stdout = False
-    static_dir = None
-    extra_params = None
-    thirdparty_dir = None
-    dummy = False
-
-    def __init__(self, env_path, mode):
+    def __init__(self, env_path, mode, config):
         self.mode = mode
+        self.config = config
+        # shortcut
+        self.c = self.config
 
         self.source_path = os.path.normpath(
             os.path.join(
                 os.path.dirname(os.path.abspath(__file__)),
-                os.pardir, os.pardir
-            )
-        )
+                os.pardir, os.pardir))
         if sys.platform in ('win32', 'cygwin'):
             self.platform = 'win'
         elif sys.platform == 'linux2':
@@ -69,56 +58,52 @@ class Env(object):
     def default_env_path(self):
         raise Exception(
             'Can\'t guess default env path. It should be specified on the '
-            'command line (-b) or environment (SYNTHESE_ENV_PATH).'
-        )
+            'command line (-b) or environment (SYNTHESE_ENV_PATH).')
 
-    @property
-    def daemon_launch_path(self):
-        return os.path.join(self.env_path, 'src', 'bin', 'server')
+    def get_executable_path(self, env_relative_path, executable_file):
+        return os.path.join(
+            self.env_path, env_relative_path, self.executable_relative_path,
+            executable_file + self.platform_exe_suffix)
 
-    @property
-    def _daemon_relative_path(self):
+    def executable_relative_path(self):
         return os.curdir
 
     @property
+    def daemon_launch_path(self):
+        return os.path.join(self.env_path, self.daemon_relative_path)
+
+    @property
+    def daemon_relative_path(self):
+        return os.path.join('src', 'bin', 'server')
+
+    @property
     def daemon_path(self):
+        return self.get_executable_path(self.daemon_relative_path, 's3-server')
         return os.path.join(
             self.daemon_launch_path,
             self._daemon_relative_path,
-            's3-server' + self.platform_exe_suffix
-        )
-
-    @property
-    def daemon_run_env(self):
-        return os.environ.copy()
+            's3-server' + self.platform_exe_suffix)
 
     @property
     def daemon_log_file(self):
+        # TODO: it should log to a file inside the project instead.
         return os.path.join(self.daemon_launch_path, 'output.log')
-
-    @property
-    def admin_root_path(self):
-        return os.path.join(
-            self.source_path,
-            's3-admin', 'deb', 'opt', 'rcs', 's3-admin'
-        )
 
     def _prepare_for_launch_win(self):
         builder = build.get_builder(self)
         builder.install_iconv()
 
-        iconv_path = os.path.join(self.thirdparty_dir, 'iconv')
+        iconv_path = os.path.join(self.c.thirdparty_dir, 'iconv')
         utils.append_paths_to_environment('PATH', [iconv_path])
 
     def _prepare_for_launch_lin(self):
         pass
 
     def prepare_for_launch(self):
-        '''
+        """
         Setup environment or other things needed for launching one of the
         generated executables.
-        '''
-
+        """
         if self.platform == 'win':
             self._prepare_for_launch_win()
         elif self.platform == 'lin':
@@ -132,16 +117,9 @@ class SconsEnv(Env):
     def default_env_path(self):
         return os.path.join(self.source_path, 'build', self.mode)
 
-    @property
-    def daemon_run_env(self):
-        env = os.environ.copy()
-        env['LD_LIBRARY_PATH'] = os.path.join(self.env_path, 'repo', 'bin')
-        return env
-
     def _prepare_for_launch_lin(self):
         utils.append_paths_to_environment(
-            'LD_LIBRARY_PATH', [os.path.join(self.env_path, 'repo', 'bin')]
-        )
+            'LD_LIBRARY_PATH', [os.path.join(self.env_path, 'repo', 'bin')])
         super(SconsEnv, self)._prepare_for_launch_lin()
 
 
@@ -153,7 +131,7 @@ class CMakeEnv(Env):
         return os.path.join(self.source_path, 'build_cmake', self.mode)
 
     @property
-    def _daemon_relative_path(self):
+    def executable_relative_path(self):
         if self.platform == 'win':
             return os.path.join('Debug' if (self.mode == 'debug') else 'Release')
         return os.curdir
@@ -163,20 +141,17 @@ class InstalledEnv(Env):
     type = 'installed'
 
     @property
-    def daemon_launch_path(self):
-        return os.path.join(self.env_path, 'bin')
+    def daemon_relative_path(self):
+        return 'bin'
 
     @property
     def daemon_log_file(self):
         # TODO: do something more portable.
         return '/tmp/synthese_daemon.log'
 
-    @property
-    def admin_root_path(self):
-        return os.path.join(self.env_path, 's3-admin')
 
-
-def create_env(env_type, env_path, mode):
+def create_env(env_type, env_path, mode, config):
+    # TODO: maybe drop these env variables, and use only cli flags from synthese.py
     if not env_type:
         env_type = os.environ.get('SYNTHESE_ENV_TYPE')
     if not env_type:
@@ -187,9 +162,12 @@ def create_env(env_type, env_path, mode):
         env_path = os.environ.get('SYNTHESE_ENV_PATH')
 
     if env_type == 'scons':
-        return SconsEnv(env_path, mode)
-    if env_type == 'cmake':
-        return CMakeEnv(env_path, mode)
-    if env_type == 'installed':
-        return InstalledEnv(env_path, mode)
-    raise Exception('Unknown env type: %s' % env_type)
+        env_class = SconsEnv
+    elif env_type == 'cmake':
+        env_class = CMakeEnv
+    elif env_type == 'installed':
+        env_class = InstalledEnv
+    else:
+        raise Exception('Unknown env type: %s' % env_type)
+
+    return env_class(env_path, mode, config)
