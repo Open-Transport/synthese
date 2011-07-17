@@ -1,0 +1,79 @@
+/* Styling of the MapTypePanel. Based on
+   http://trac.osgeo.org/openlayers/browser/sandbox/camptocamp/maptypepanel/openlayers/examples/mapTypePanel.html
+*/
+
+.olControlMapTypePanel {
+  float:right;
+  right: 3px;
+  top: 3px;
+  padding:2px;
+  font-size: 12px;
+  line-height: 14px;
+  font-family:arial,sans-serif,vera;
+}
+.olControlMapTypePanel  div {
+  position: relative !important;
+  float:left;
+  margin: 1px;
+  cursor: pointer;
+}
+.olControlMapType {
+  padding: 0px;
+  margin: 0px;
+  background-color: white;
+  border: 1px solid black;
+}
+.olControlMapType div {
+  width: 60px;
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #B0B0B0;
+  border-bottom: 1px solid #B0B0B0;
+  margin: 0px;
+  padding: 1px 8px;
+  text-align:center;
+}
+.olControlMapTypeItemActive {
+  font-weight: bold;
+}
+.olControlMapTypeItemActive .olControlMapType div {
+  border-top: 1px solid #6C9DDF;
+  border-left: 1px solid #6C9DDF;
+  border-right: 1px solid #345684;
+  border-bottom: 1px solid #345684;
+}
+
+/* End of MapTypePanel styling */
+
+.olControlAttribution {
+  /* Bottom left, to have it at the same place as Google */
+  bottom: 3px !important;
+  left: 3px !important;
+}
+
+.ptLayerSelector {
+  position: absolute;
+  z-index: 2000;
+  right: 3px;
+  bottom: 3px;
+  background-color: white;
+  border: 1px solid black;
+
+  padding: 0px;
+  margin: 0px;
+  background-color: white;
+  border: 1px solid black;
+}
+
+.ptLayerSelector label {
+  margin-right: 7px;
+}
+
+.ptLayerSelector div {
+  border-top: 1px solid white;
+  border-left: 1px solid white;
+  border-right: 1px solid #B0B0B0;
+  border-bottom: 1px solid #B0B0B0;
+
+  margin: 0px;
+}

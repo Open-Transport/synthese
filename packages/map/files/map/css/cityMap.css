@@ -1,0 +1,27 @@
+#linesContainer {
+  margin-top: 1em;
+  width: 280px;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+#lines {
+  overflow: hidden;
+  width: 500px;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}
+#lines .checkUncheck {
+  font-size: x-small;
+  margin: 0.5em;
+}
+#lines ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+#linesList .colorBox {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+}
