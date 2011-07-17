@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>
+    <meta charset="utf-8">
+    <title>City Browser</title>
+    <link rel="stylesheet" href="css/syntheseMap.css">
+    <link rel="stylesheet" href="css/cityBrowser.css">
+    <style>
+      html {
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        font-family: 'Maven Pro', arial, serif;
+        font-size: small;
+      }
+      body {
+        margin: 10px;
+      }
+      h1 {
+        margin: 0;
+        padding: 6px;
+        border:0;
+        font-size: 20pt;
+      }
+      header {
+        display: block;
+        height: 43px;
+        padding: 0;
+        background-color: #eee;
+        border: 1px solid #888;
+      }
+      footer {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+      }
+      .debug {
+        background-color: #eee;
+      }
+    </style>
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+  <body>
+    <header><h1>City Browser</h1></header>
+
+    <!-- TODO: put the templates in CityBrowser.js -->
+
+    <script id="citySelectorTemplate" type="text/x-jquery-tmpl">
+      <ul class="letters">
+        {{each letters}}
+          <li data-prefix="${$value}">${$value}</li>
+        {{/each}}
+      </ul>
+      <div class="cities">
+        <div class="citiesLabel"></div>
+        <div class="noCities"></div>
+        <ul class="cityList">
+        </ul>
+      </div>
+    </script>
+
+    <script id="cityBrowserTemplate" type="text/x-jquery-tmpl">
+      <div id="cityBrowser" class="cityBrowser" style="">
+        <div class="citySelector"></div>
+        <div class="message loadingMessage"></div>
+        <div class="message errorMessage">
+          <div></div>
+          <div class="detail"></div>
+        </div>
+        <div class="map">
+          <div class="zoomRequiredMessage"></div>
+        </div>
+      </div>
+    </script>
+
+    <div id="cityBrowser"></div>
+
+    <!-- Maybe move to stopsSelector.html -->
+
+    <div style="margin-top: 1em;">
+      <label>Active City<input type=text id=activeCity value=""></label>
+      <button id="setActiveCity">Select</button>
+    </div>
+    <div>
+      Selected City: <span id="selectedCity"></span><br>
+      Selected Stop: <span id="selectedStop"></span>
+    </div>
+
+    <footer class="debug">
+      <a style="float:right" href="" id="permalink">Permalink</a>
+
+      <div>Position lat/lon (epsg:4326): <span id="mousePosLatLon"></span></div>
+      <div>Position Spherical Mercator (epsg:900913): <span id="mousePosSphericalMercator"></span></div>
+      <div>Zoom Level: <span id="zoomLevel"> </span></div>
+      <div id="errorMessage" class="error"></div>
+    </footer>
+
+    <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
+
+    <!-- Release versions -->
+    <script src="../core/vendor/jquery-1.6.2.min.js"></script>
+    <script src="vendor/jquery.tmpl.beta1.min.js"></script>
+    <script src="vendor/underscore-1.1.6.min.js"></script>
+    <script src="vendor/backbone-0.5.1.min.js"></script>
+    <script src="vendor/OpenLayers/OpenLayers.js"></script>
+
+    <!-- Debug versions -->
+    <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
+    <!-- 
+    <script src="../core/vendor/jquery-1.6.2.js"></script>
+    <script src="vendor/jquery.tmpl.beta1.js"></script>
+    <script src="vendor/underscore-1.1.6.js"></script>
+    <script src="vendor/backbone-0.5.1.js"></script>
+    <script src="vendor/OpenLayers_full/lib/OpenLayers.js"></script>
+    -->
+
+    <script src="vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
+    <script src="vendor/OpenLayers_maptypepanel/MapType.js"></script>
+    <script src="vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
+
+    <script src="../core/js/Synthese.js"></script>
+    <script src="js/SyntheseMap.js"></script>
+    <script src="js/CityBrowser.js"></script>
+    <script>
+
+    // XXX project specific
+    var Cm79CityBrowser = OpenLayers.Class(CityBrowserMap, {
+      afterMapInit: function() {
+        CityBrowserMap.prototype.afterMapInit.apply(this, arguments);
+
+        this.map.setCenter(
+          new OpenLayers.LonLat(-0.32, 46.60).
+            transform(new OpenLayers.Projection("EPSG:4326"),
+              this.map.getProjectionObject()),
+          10);
+      }
+    });
+
+    var cityBrowser = new CityBrowser({
+      el: document.getElementById("cityBrowser"),
+      mapClass: Cm79CityBrowser,
+    });
+
+    $("#setActiveCity").click(function() {
+      cityBrowser.setActiveCity($("#activeCity").val());
+    });
+
+    </script>
+  </body>
+</html>

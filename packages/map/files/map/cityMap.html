@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>
+    <meta charset="utf-8">
+    <title>Plan de réseau</title>
+    <link rel="stylesheet" href="css/syntheseMap.css">
+    <link rel="stylesheet" href="css/cityMap.css">
+    <style>
+      html {
+        padding: 0;
+        height: 100%;
+        width: 100%;
+        font-family: 'Maven Pro', arial, serif;
+        font-size: small;
+      }
+      body {
+        margin: 10px;
+      }
+      h1 {
+        margin: 0;
+        padding: 6px;
+        border:0;
+        font-size: 20pt;
+      }
+      header {
+        display: block;
+        height: 43px;
+        padding: 0;
+        background-color: #eee;
+        border: 1px solid #888;
+      }
+      footer {
+        position: absolute;
+        bottom: 10px;
+        left: 10px;
+        right: 10px;
+      }
+
+      /* TODO: move to cityMap.css */
+      
+      #map {
+        position: absolute;
+        top: 60px;
+        bottom: 80px;
+        left: 300px;
+        right: 10px;
+        border: 1px solid #888;
+      }
+      .error {
+        color: red;
+        font-weight: bold;
+      }
+      .debug {
+        display: none;
+      }
+    </style>
+    <!--[if lt IE 9]>
+      <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+  </head>
+  <body>
+    <header><h1>Plan de réseau</h1></header>
+    <div id="map"></div>
+    <div id="linesContainer">
+      <div id="lines">
+        <div>Afficher les arrêts utilisés par:</div>
+        <div class="checkUncheck">
+          <a data-action=checkAll href="#">tout cocher</a>
+          <a data-action=uncheckAll href="#">tout décocher</a>
+        </div>
+        <script id="linesTemplate" type="text/x-jquery-tmpl">
+          <li>
+            <label title="${displayName}">
+              <input checked type=checkbox data-lineid="${id}">
+              <span class=colorBox style="background-color: ${color};"></span>
+              <span>${displayName}</span>
+            </label>
+          </li>
+        </script>
+        <ul id="linesList">
+        </ul>
+      </div>
+    </div>
+
+    <footer class="debug">
+      <a style="float:right" href="" id="permalink">Permalink</a>
+
+      <div>Position lat/lon (epsg:4326): <span id="mousePosLatLon"></span></div>
+      <div>Position Spherical Mercator (epsg:900913): <span id="mousePosSphericalMercator"></span></div>
+      <div>Zoom Level: <span id="zoomLevel"> </span></div>
+      <div id="errorMessage" class="error"></div>
+    </footer>
+
+    <script src="../core/vendor/jquery-1.6.2.min.js"></script>
+    <script src="vendor/jquery.tmpl.beta1.min.js"></script>
+    <script src="vendor/underscore-1.1.6.min.js"></script>
+
+    <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
+  
+    <script src="vendor/OpenLayers/OpenLayers.js"></script>
+    <!-- Uncomment this to load the non minified version (and comment the one above).
+         You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
+    <!-- 
+    <script src="vendor/OpenLayers_full/lib/OpenLayers.js"></script>
+    -->
+
+    <script src="vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
+    <script src="vendor/OpenLayers_maptypepanel/MapType.js"></script>
+    <script src="vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
+
+    <script src="../core/js/Synthese.js"></script>
+    <script src="js/SyntheseMap.js"></script>
+    <script src="js/CityMap.js"></script>
+    <script>
+    var cityMap = new CityMap("map");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,126 @@
+.cityBrowser {
+  border: 1px solid black;
+  box-shadow: 0px 0px 15px #333333;
+  position: relative;
+  height: 600px;
+  width: 90%;
+  margin: auto;
+  margin-top: 1em;
+}
+
+.citySelector {
+  position: absolute;
+  width: 15em;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.citySelector .citiesLabel {
+  text-align: center;
+  font-weight: bold;
+ }
+
+.citySelector ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.citySelector li:hover {
+  background-color: #eee !important;
+}
+.citySelector .selected {
+  background-color: lightGray;
+  font-weight: bold;
+}
+
+.citySelector > .letters {
+  width: 20px; 
+  position: fixed;
+  text-align: center;
+}
+.citySelector > .letters > li {
+  padding: 2px 0;
+  border: 1px solid gray;
+  background-color: #D1D1D1;
+  background-image: -moz-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
+  background-image: -webkit-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
+  background-image: -o-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
+  background-image: -ms-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
+  background-image: linear-gradient(116deg, #D1D1D1, #FFFFFF 110px)
+}
+
+.citySelector > .letters > li.selected {
+  background: white;
+}
+
+.citySelector .cities {
+  margin-left: 25px;
+  padding: 5px;
+}
+ul.cityList {
+  padding: 5px 0;
+}
+.cityList li {
+  margin-bottom: 2px;
+  white-space: nowrap;
+  border-bottom: 1px dashed #ccc;
+}
+.cityList li:nth-child(even) {
+  background-color: #f3f3f3;
+}
+
+
+.cityBrowser .message {
+  position: relative;
+  z-index: 2000;
+  font-size: large;
+  margin: 0 auto;
+  width: 50%;
+  text-align: center;
+  -moz-border-radius: 0 0 15px 15px;
+  border-radius: 0 0 15px 15px;
+}
+.cityBrowser .loadingMessage {
+  background-color: lightBlue;
+}
+.cityBrowser .errorMessage {
+  color: white;
+  background-color: red;
+}
+.cityBrowser .errorMessage .detail {
+  display: none;
+}
+.cityBrowser .errorMessage.showDetail .detail {
+  display: block;
+}
+
+.cityBrowser .map {
+  position: absolute;
+  left: 15em;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.cityBrowser .zoomRequiredMessage {
+  pointer-events: none;
+
+  position: absolute;
+  z-index: 2000;
+  top: 40px;
+  left: 80px;
+  right: 80px;
+  height: 1em;
+  padding: 15px;
+
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.5);
+  font-size: large;
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+  border: 5px solid gray;
+
+  text-shadow: white 2px 2px 2px;
+  box-shadow: 0 0 10px #ccc;
+}
