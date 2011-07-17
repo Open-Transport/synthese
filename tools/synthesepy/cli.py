@@ -218,7 +218,8 @@ def add_default_subparsers(subparsers):
         '--overwrite', action='store_true', default=False)
 
     parser_continuous_integration = subparsers.add_parser(
-        'continuous_integration', help='Create a Synthese project')
+        'continuous_integration', aliases=('ci',),
+        help='Run the continuous integration commands')
     parser_continuous_integration.set_defaults(func=continuous_integration)
     parser_continuous_integration.add_argument(
         '--no-clean-if-build-fails', action='store_true',
