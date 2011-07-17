@@ -387,14 +387,17 @@ namespace synthese
 						lastRank = row->getRank();
 						deleteRowRequest.getAction()->setObjectId(row->getKey());
 
-						const StopArea& place(*Env::GetOfficialEnv().get<StopArea>(row->getPlace()->getKey()));
-						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stop, place.getPhysicalStops())
+						if(row->getPlace())
 						{
-							BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
+							const StopArea& place(*Env::GetOfficialEnv().get<StopArea>(row->getPlace()->getKey()));
+							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stop, place.getPhysicalStops())
 							{
-								lines.insert(
-									static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
-								);
+								BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
+								{
+									lines.insert(
+										static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+										);
+								}
 							}
 						}
 
@@ -406,8 +409,15 @@ namespace synthese
 						if (lastRank < maxRank)
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
 						stream << t.col() << lastRank;
-						stream << t.col() << row->getPlace()->getCity()->getName();
-						stream << t.col() << row->getPlace()->getName();
+						if(row->getPlace())
+						{
+							stream << t.col() << row->getPlace()->getCity()->getName();
+							stream << t.col() << row->getPlace()->getName();
+						}
+						else
+						{
+							stream << t.col(2) << "Arrêt invalide.";
+						}
 						stream <<
 							t.col() <<
 							(	row->getIsArrival() ?

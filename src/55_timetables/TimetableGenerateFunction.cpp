@@ -887,13 +887,16 @@ namespace synthese
 			pm.insert(DATA_IS_ARRIVAL, place.getIsArrival());
 			pm.insert(DATA_IS_DEPARTURE, place.getIsDeparture());
 
-			pm.insert(DATA_CITY_ID, place.getPlace()->getCity()->getKey()); //4
-			pm.insert(DATA_PLACE_ID, place.getPlace()->getKey()); //5
-			pm.insert(DATA_CITY_NAME, place.getPlace()->getCity()->getName()); //6
-			pm.insert(DATA_PLACE_NAME, place.getPlace()->getName()); //7
-			if(dynamic_cast<const StopArea*>(place.getPlace()))
+			if(place.getPlace())
 			{
-				pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getTimetableName());
+				pm.insert(DATA_CITY_ID, place.getPlace()->getCity()->getKey()); //4
+				pm.insert(DATA_PLACE_ID, place.getPlace()->getKey()); //5
+				pm.insert(DATA_CITY_NAME, place.getPlace()->getCity()->getName()); //6
+				pm.insert(DATA_PLACE_NAME, place.getPlace()->getName()); //7
+				if(dynamic_cast<const StopArea*>(place.getPlace()))
+				{
+					pm.insert(DATA_STOP_NAME_26, static_cast<const StopArea*>(place.getPlace())->getTimetableName());
+				}
 			}
 
 			_rowPage->display(stream, request, pm);
