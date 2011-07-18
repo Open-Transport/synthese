@@ -13,7 +13,7 @@
     font-family: 'Maven Pro', arial, serif;
     font-size: small;
   }
-  form > p {
+  form > div {
     margin: 2em
   }
   input[type=text] {
@@ -94,23 +94,23 @@ $(function() {
   <h1>Démo de sélection d'arrêt par carte</h1>
 
   <form action="/todo" name="routePlannerForm">
-    <p>
-      Ville de départ <a class="mapLink" href="#">Carte</a><br>
+    <div>
+      <div>Ville de départ <a class="mapLink" href="#">Carte</a></div>
       <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
-      Arrêt de départ (optionnel)<br>
+      <div>Arrêt de départ (optionnel)</div>
       <input class=place type=text name=act id=origin_place_txt><br>
-    </p>
-    <p>
-      Ville d'arrivée <a class="mapLink" href="#">Carte</a><br>
+    </div>
+    <div>
+      <div>Ville d'arrivée <a class="mapLink" href="#">Carte</a></div>
       <input class=city type=text name=act id=destination_city_txt><br>
-      Arrêt d'arrivée (optionnel)<br>
+      <div>Arrêt d'arrivée (optionnel)</div>
       <input class=place type=text name=apt id=destination_place_txt><br>
-    </p>
-    <p>
+    </div>
+    <div>
       <!--
       <input type="submit" id="submitButton" value="Submit">
       -->
-    </p>
+    </div>
   </form>
 
   <div class="stopSelectorPopup" id="stopSelector"></div>
@@ -119,18 +119,18 @@ $(function() {
 
   <!-- Release versions -->
   <script src="../core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="vendor/underscore-1.1.6.min.js"></script>
-  <script src="vendor/backbone-0.5.1.min.js"></script>
+  <script src="../core/vendor/jquery.tmpl.beta1.min.js"></script>
+  <script src="../core/vendor/underscore-1.1.6.min.js"></script>
+  <script src="../core/vendor/backbone-0.5.1.min.js"></script>
   <script src="vendor/OpenLayers/OpenLayers.js"></script>
 
   <!-- Debug versions -->
   <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
   <!--
   <script src="../core/vendor/jquery-1.6.2.js"></script>
-  <script src="vendor/jquery.tmpl.beta1.js"></script>
-  <script src="vendor/underscore-1.1.6.js"></script>
-  <script src="vendor/backbone-0.5.1.js"></script>
+  <script src="../core/vendor/jquery.tmpl.beta1.js"></script>
+  <script src="../core/vendor/underscore-1.1.6.js"></script>
+  <script src="../core/vendor/backbone-0.5.1.js"></script>
   <script src="vendor/OpenLayers_full/lib/OpenLayers.js"></script>
   -->
 
