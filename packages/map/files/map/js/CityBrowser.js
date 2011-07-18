@@ -193,6 +193,20 @@ var CitySelectorView = Backbone.View.extend({
 
   className: 'citySelector',
 
+  template: $.template(null, [
+    '<ul class="letters">',
+    '  {{each letters}}',
+    '    <li data-prefix="${$value}">${$value}</li>',
+    '  {{/each}}',
+    '</ul>',
+    '<div class="cities">',
+    '  <div class="citiesLabel"></div>',
+    '  <div class="noCities"></div>',
+    '  <ul class="cityList">',
+    '  </ul>',
+    '</div>'
+  ].join('\n')),
+  
   events: {
     "click .letters li": "letterClick",
   },
@@ -212,7 +226,7 @@ var CitySelectorView = Backbone.View.extend({
         return String.fromCharCode(charCode);
       }
     );
-    $("#citySelectorTemplate").tmpl({
+    $.tmpl(this.template, {
       letters: letters,
     }).appendTo(this.el);
 
@@ -307,16 +321,26 @@ var CityBrowserMap = OpenLayers.Class(SyntheseMap, {
     strategy.activate();
   },
 
-
-  onStopSelected: function(feature) {
-    // TODO: this should be in the specific implementation.
-    console.log("todo");
+  onStopSelected: function(stopFeature) {
+    this.trigger("stopSelected", stopFeature);
   },
 
 });
 
 
 var CityBrowser = Backbone.View.extend({
+
+  template: $.template(null, [
+    '<div class="citySelector"></div>',
+    '<div class="message loadingMessage"></div>',
+    '<div class="message errorMessage">',
+    '  <div></div>',
+    '  <div class="detail"></div>',
+    '</div>',
+    '<div class="map">',
+    '  <div class="zoomRequiredMessage"></div>',
+    '</div>'
+  ].join('\n')),
 
   initialize: function(options) {
     _.bindAll(this, "zoomRequired", "citySelected", "onError");
@@ -342,7 +366,7 @@ var CityBrowser = Backbone.View.extend({
     }, this));
 
     var mapClass = options.mapClass || CityBrowserMap;
-    this.syntheseMap = new mapClass();
+    this.syntheseMap = new mapClass(null, options.mapOptions);
     this.syntheseMap.onError = _.bind(this.onError, this);
     this.syntheseMap.bind("zoomRequired", this.zoomRequired)
 
@@ -437,18 +461,23 @@ var CityBrowser = Backbone.View.extend({
     });
   },
 
+  renderMap: function() {
+    if (this.syntheseMap.mapId)
+      return;
+    this.syntheseMap.setMapId(this.$(".map").get(0));
+  },
+  
   render: function() {
-    $(this.el).empty();
-    $("#cityBrowserTemplate").tmpl({}).appendTo(this.el);
+    $(this.el).empty().addClass("cityBrowser");
+    $.tmpl(this.template, {}).appendTo(this.el);
 
     this.$(".citySelector").replaceWith(this.citySelectorView.el);
 
     this.$(".zoomRequiredMessage").text(OpenLayers.i18n("zoomRequired"));
     this.$(".citiesLabel").text(OpenLayers.i18n("cities"));
 
-    if (!this.syntheseMap.mapId) {
-      this.syntheseMap.setMapId(this.$(".map").get(0));
-    }
+    if (!this.options.noMapAutoRender)
+      this.renderMap();
   },
 
   onError: function(message) {

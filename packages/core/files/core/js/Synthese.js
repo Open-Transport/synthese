@@ -10,13 +10,15 @@ try {
 
 // TODO: refactor with SyntheseMap
 var Synthese = {
+  URL: "/synthese",
+
   callService: function(serviceName, args, dataType) {
     console.log("Synthese.callService", args);
     args["SERVICE"] = serviceName;
 
     // TODO: make json the default?
     var params = {
-      url: "/synthese",
+      url: this.URL,
       data: args,
       dataType: dataType,
     };

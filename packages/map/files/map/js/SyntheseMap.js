@@ -14,6 +14,17 @@ var SyntheseMap = OpenLayers.Class({
   urlOptions: null,
   
   /**
+   * Option where to recenter the map on the first display.
+   * Array of two or three strings: x, y, [zoom level].
+   * Coordinates are in lat/lon.
+   */
+  center: null,
+  /**
+   * Visibility of the layer switcher for stops and lines.
+   */
+  showLayerSwitcher: true,
+  
+  /**
    * Default language to use.
    */
   defaultLanguage: "fr",
@@ -81,7 +92,8 @@ var SyntheseMap = OpenLayers.Class({
     this.map.addControl(select);
     select.activate();
 
-    this.initPTLayerSelector();
+    if (this.showLayerSwitcher)
+      this.initPTLayerSelector();
 
     if (this.urlOptions.showLines == "0")
       this.linesLayer.setVisibility(false);
@@ -128,6 +140,16 @@ var SyntheseMap = OpenLayers.Class({
         }
       });
       this.map.addControl(control);
+    }
+
+    var center = this.center || this.urlOptions.center
+    if (center) {
+      var zoom = center[2] && parseFloat(center[2]);
+      this.map.setCenter(
+          new OpenLayers.LonLat(parseFloat(center[0]), parseFloat(center[1])).
+            transform(new OpenLayers.Projection("EPSG:4326"),
+              this.map.getProjectionObject()),
+          zoom);
     }
 
     this.afterMapInit();
