@@ -3,6 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Route Planner</title>
+  <link rel="stylesheet" href="css/routePlanner.css">
   <link rel="stylesheet" href="../map/css/syntheseMap.css">
   <link rel="stylesheet" href="../map/css/cityBrowser.css">
   <link rel="stylesheet" href="../map/css/stopSelector.css">
@@ -16,14 +17,12 @@
   /* TODO: move some to routePlanner.css */
   
   form > div {
-    margin: 2em
+    margin: 2em;
+    width: 20em;
   }
   input[type=text] {
     width: 20em;
     border: 1px solid gray;
-  }
-  form .mapLink {
-    display: none;
   }
   </style>
 
@@ -34,7 +33,7 @@
 <body>
   <h1>Route Planner Demo</h1>
 
-  <form action="/todo" name="routePlannerForm">
+  <form action="/todo" class="routePlannerForm" name="routePlannerForm">
     <div class=departure>
       <div>Ville de départ <a class="mapLink" href="#">Carte</a></div>
       <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
