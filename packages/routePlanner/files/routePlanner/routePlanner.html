@@ -3,117 +3,134 @@
 <head>
   <meta charset="utf-8">
   <title>Route Planner</title>
+  <link rel="stylesheet" href="../map/css/syntheseMap.css">
+  <link rel="stylesheet" href="../map/css/cityBrowser.css">
+  <link rel="stylesheet" href="../map/css/stopSelector.css">
   <style>
   html {
-    font: Canberra, sans-serif;
+    padding: 0;
+    font-family: 'Maven Pro', arial, serif;
+    font-size: small;
   }
-  form > p {
+
+  /* TODO: move some to routePlanner.css */
+  
+  form > div {
     margin: 2em
   }
   input[type=text] {
     width: 20em;
     border: 1px solid gray;
   }
+  form .mapLink {
+    display: none;
+  }
   </style>
-  
-  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
 
-  <script src="../core/js/Synthese.js"></script>
-  <script src="../routePlanner/js/legacy/core.js"></script>
-  <script src="../routePlanner/js/legacy/interface.js"></script>
-  <!-- <script src="../routePlanner/js/legacy/FicheHoraire.js"></script>  -->
 
-  <script>
-// TODO: move some of this to the routePlanner library.
-function initAutoCompletions(siteId) {
-  if (document.getElementsByTagName) {
-    var inputElements = document.getElementsByTagName("input");
-    for (i = 0; inputElements[i]; i++)
-      inputElements[i].setAttribute("autocomplete", "off");
-  }
-  // TODO: refactor more
-  initAutoCompleteForm(document.forms["routePlannerForm"], document.getElementById("submitButton"));
-  initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=1&si=' + siteId + '&t=' + city + '';
-  }, document.getElementById("origin_place_txt"), null, null);
-  initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=1&si=' + siteId + '&t=' + place + '';
-  }, null, null, null);
-  initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=0&si=' + siteId + '&t=' + city + '';
-  }, document.getElementById("destination_place_txt"), null, null);
-  initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=0&si=' + siteId + '&t=' + place + '';
-  }, null, null, null);
-  document.getElementById("origin_city_txt").focus();
-  if (document.getElementById("fh")) {
-    addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
-    addEvent(document.getElementById("fh"), "click", mouse_click_handler);
-  }
-}
-  
-$(function() {
-  function parseQueryString(str) {
-    var paramArray = str.split("&");
-    var regex = /^([^=]+)=(.*)$/;
-    var params = {};
-    for (var i = 0, sz = paramArray.length; i < sz; i++) {
-     var match = regex.exec(paramArray[i]);
-     if (!match)
-       throw "Bad parameter in queryString! '" + paramArray[i] + "'";
-       params[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
-     } 
-     return params;
-  }
-  
-  var urlOptions = parseQueryString(location.search.slice(1));
-  console.log(urlOptions);
-  
-  console.log("url", Synthese.URL);
-  
-  if (!urlOptions.siteId) {
-    alert("Missing siteId in query string");
-    return;
-  }
-  initAutoCompletions(urlOptions.siteId);
-  
-  if(0)
-  $("input").keypress(function(e) {
-    if (e.which == 13) {
-      alert("submit");
-    }
-  });
-});
 
- 
-  </script>
-  
+
 </head>
 <body>
   <h1>Route Planner Demo</h1>
 
   <form action="/todo" name="routePlannerForm">
-      
-
-  <p>
-    Departure town <a href="#">Map</a><br>
-    <input type=text autofocus name=dct id=origin_city_txt><br>
-    Departure stop (optional)<br>
-    <input type=text name=act id=origin_place_txt><br>
-  </p>
-
-  <p>
-    Arrival town <a href="#">Map</a><br>
-    <input type=text name=act id=destination_city_txt><br>
-    Arrival stop (optional)<br> 
-    <input type=text name=apt id=destination_place_txt><br>
-  </p>
-
-  <p>
-    <input type="submit" id="submitButton" value="Submit">
-  </p>
-  
+    <div class=departure>
+      <div>Ville de départ <a class="mapLink" href="#">Carte</a></div>
+      <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
+      <div>Arrêt de départ (optionnel)</div>
+      <input class=place type=text name=act id=origin_place_txt><br>
+    </div>
+    <div class=arrival>
+      <div>Ville d'arrivée <a class="mapLink" href="#">Carte</a></div>
+      <input class=city type=text name=act id=destination_city_txt><br>
+      <div>Arrêt d'arrivée (optionnel)</div>
+      <input class=place type=text name=apt id=destination_place_txt><br>
+    </div>
+    <div>
+      <!--
+      <input type="submit" id="submitButton" value="Submit">
+      -->
+    </div>
   </form>
+  
+  <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
+
+  <!-- Release versions -->
+  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
+  <script src="../core/vendor/jquery.tmpl.beta1.min.js"></script>
+  <script src="../core/vendor/underscore-1.1.6.min.js"></script>
+  <script src="../core/vendor/backbone-0.5.1.min.js"></script>
+  <script src="../map/vendor/OpenLayers/OpenLayers.js"></script>
+
+  <!-- Debug versions -->
+  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
+  <!--
+  <script src="../core/vendor/jquery-1.6.2.js"></script>
+  <script src="../core/vendor/jquery.tmpl.beta1.js"></script>
+  <script src="../core/vendor/underscore-1.1.6.js"></script>
+  <script src="../core/vendor/backbone-0.5.1.js"></script>
+  <script src="../map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
+  -->
+
+  <script src="../map/vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
+  <script src="../map/vendor/OpenLayers_maptypepanel/MapType.js"></script>
+  <script src="../map/vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
+
+  <script src="../core/js/Synthese.js"></script>
+  <script src="../map/js/SyntheseMap.js"></script>
+  <script src="../map/js/CityBrowser.js"></script>
+
+  <script src="../routePlanner/js/legacy/core.js"></script>
+  <script src="../routePlanner/js/legacy/interface.js"></script>
+  <!-- <script src="../routePlanner/js/legacy/FicheHoraire.js"></script>  -->
+  <script src="../routePlanner/js/RoutePlanner.js"></script>
+
+  <script src="../map/js/StopSelector.js"></script>
+
+  <script>
+  // TODO: move some of this to the routePlanner library.
+  function initAutoCompletions(siteId) {
+    if (document.getElementsByTagName) {
+      var inputElements = document.getElementsByTagName("input");
+      for (i = 0; inputElements[i]; i++)
+        inputElements[i].setAttribute("autocomplete", "off");
+    }
+    // TODO: refactor more
+    initAutoCompleteForm(document.forms["routePlannerForm"], document.getElementById("submitButton"));
+    initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
+      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=1&si=' + siteId + '&t=' + city + '';
+    }, document.getElementById("origin_place_txt"), null, null);
+    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
+      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=1&si=' + siteId + '&t=' + place + '';
+    }, null, null, null);
+    initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
+      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=0&si=' + siteId + '&t=' + city + '';
+    }, document.getElementById("destination_place_txt"), null, null);
+    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
+      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=0&si=' + siteId + '&t=' + place + '';
+    }, null, null, null);
+    document.getElementById("origin_city_txt").focus();
+    if (document.getElementById("fh")) {
+      addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
+      addEvent(document.getElementById("fh"), "click", mouse_click_handler);
+    }
+  }
+  
+  $(function() {
+    Synthese.init();
+    initAutoCompletions(Synthese.siteId);
+  });
+  </script>
+  <script>
+  $(function() {
+    var stopSelector = new StopSelector({
+      routePlannerOptions: {
+        formName: "routePlannerForm",
+      }
+    })
+  });
+  </script>
 
 </body>
 </html>
