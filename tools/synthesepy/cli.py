@@ -142,7 +142,7 @@ def add_project_subparsers(subparsers):
     parser.add_argument('sql', nargs='?', help='SQL string to execute')
     parser.set_defaults(func=db_shell)
     add_parser('db_dump')
-    add_parser('db_opendump')
+    add_parser('db_open_dump', ('db_opendump',))
     add_parser('db_sync_to_files')
     add_parser('db_sync_from_files')
     def db_restore(project, args, env):

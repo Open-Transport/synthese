@@ -47,6 +47,7 @@ DEFAULTS = {
     'port': 8080,
     'no_proxy': False,
     'site_id': 0,
+    'default_site': None,
     'log_stdout': False,
     'gdb': False,
 
