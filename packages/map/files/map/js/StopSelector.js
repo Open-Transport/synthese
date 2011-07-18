@@ -37,6 +37,7 @@ var StopSelector = Backbone.View.extend({
   },
 
   close: function() {
+    this.trigger("close");
     $(this.el).hide();
   },
 
