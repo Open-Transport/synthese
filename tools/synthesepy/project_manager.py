@@ -196,6 +196,17 @@ class Project(object):
                 self.config.static_paths.append(
                     (site.base_path, package.files_path))
 
+        if self.config.default_site:
+            site_ids = [s.id for s in self.sites if
+                s.name == self.config.default_site]
+            if len(site_ids) != 1:
+                raise Exception('Can\'t find site {0!r} (found: {1!r})'.format(
+                    self.config.default_site, site_ids))
+            self.config.site_id = site_ids[0]
+        if self.config.site_id <= 0:
+            self.config.site_id = [
+                s for s in self.sites if s.name != 'admin'][0].id
+
     def _clean_files(self):
         utils.RemoveDirectory(self.htdocs_path)
         os.makedirs(self.htdocs_path)
@@ -345,7 +356,7 @@ class Project(object):
         open(uncompressed_target, 'wb').write(output)
 
 
-    def db_opendump(self):
+    def db_open_dump(self):
         """Open the latest database dump in a text editor"""
 
         uncompressed_target = join(
