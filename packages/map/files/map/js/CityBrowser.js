@@ -20,8 +20,7 @@ var CityCollection = Backbone.Collection.extend({
 
 
 var CitySelectorModel = Backbone.Model.extend({
-  initialize: function(siteId) {
-    this.siteId = siteId;
+  initialize: function() {
     this.cities = new CityCollection();
     this.cities.selector = this;
 
@@ -48,7 +47,7 @@ var CitySelectorModel = Backbone.Model.extend({
       Synthese.callService("lc", {
         n: 9999,
         at_least_a_stop: 1,
-        si: self.get('siteId'),
+        si: Synthese.siteId,
         output_format: 'json',
       }).then(function(json) {
 
@@ -85,7 +84,7 @@ var CitySelectorModel = Backbone.Model.extend({
       // we ask for a larger number of results.
       n: 10,
       at_least_a_stop: 1,
-      si: this.get('siteId'),
+      si: Synthese.siteId,
       t: cityName,
       output_format: 'json',
     }).pipe(function(json) {
@@ -346,17 +345,10 @@ var CityBrowser = Backbone.View.extend({
     _.bindAll(this, "zoomRequired", "citySelected", "onError");
 
     this.cityExtentCache = {};
-    
-    this.urlOptions = OpenLayers.Util.getParameters(window.location.href);
+
     this.initTranslations();
 
-    var siteId = options.siteId || this.urlOptions.siteId;
-    if (!siteId) {
-      alert("Missing siteId parameter");
-      return;
-    }
-
-    this.citySelectorModel = new CitySelectorModel({siteId: this.urlOptions.siteId});
+    this.citySelectorModel = new CitySelectorModel();
     this.citySelectorView = new CitySelectorView({model: this.citySelectorModel});
 
     this.citySelectorModel.bind("citySelected", this.citySelected);
