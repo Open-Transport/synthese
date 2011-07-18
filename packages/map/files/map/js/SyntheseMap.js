@@ -142,22 +142,29 @@ var SyntheseMap = OpenLayers.Class({
       this.map.addControl(control);
     }
 
-    var center = this.center || this.urlOptions.center
-    if (center) {
-      var zoom = center[2] && parseFloat(center[2]);
-      this.map.setCenter(
-          new OpenLayers.LonLat(parseFloat(center[0]), parseFloat(center[1])).
-            transform(new OpenLayers.Projection("EPSG:4326"),
-              this.map.getProjectionObject()),
-          zoom);
-    }
-
+    this.zoomToInitialPosition();
     this.afterMapInit();
 
     if (this.networkId)
       this.addPTFeatures();
   },
 
+  /**
+   * Zoom to a point and zoom given in the center map parameter or query string.
+   * See documentation for the center attribute.
+   */
+  zoomToInitialPosition: function() {
+    var center = this.center || this.urlOptions.center
+    if (!center)
+      return;
+    var zoom = center[2] && parseFloat(center[2]);
+    this.map.setCenter(
+        new OpenLayers.LonLat(parseFloat(center[0]), parseFloat(center[1])).
+          transform(new OpenLayers.Projection("EPSG:4326"),
+            this.map.getProjectionObject()),
+        zoom);
+  },
+  
   /**
    * Override this method to do operations before the map is initialized.
    * You should do work here instead of in initialize if you need to use

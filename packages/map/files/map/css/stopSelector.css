@@ -1,5 +1,6 @@
 .stopSelectorPopup {
   display: none;
+  z-index: 3000;
 
   position: fixed;
   background-color: lime;
@@ -10,10 +11,8 @@
   top: 10%;
   min-height: 600px;
   height: 80%;
-  XXXleft: 10%;
-  left: 20%;
-  XXXwidth: 80%;
-  width: 60%;
+  left: 10%;
+  width: 80%;
 }
 .stopSelectorPopup h1 {
   height: 2em;

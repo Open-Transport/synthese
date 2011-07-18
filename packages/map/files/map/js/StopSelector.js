@@ -1,6 +1,3 @@
-// TODO: move to other file?
-
-
 
 var StopSelectorPopup = Backbone.View.extend({
 
@@ -72,12 +69,11 @@ var StopSelectorPopup = Backbone.View.extend({
 
 var StopSelector = Backbone.View.extend({
   initialize: function(options) {
-    console.log("__ss", options.popupEl);
     _.bindAll(this, "mapLinkClick", "stopSelected");
-    
-    this.routePlanner = new RoutePlannerView(options.routePlannerOptions);
+
+    this.routePlanner = new RoutePlannerView(options.routePlannerOptions || {});
     this.routePlanner.bind("mapLinkClick", this.mapLinkClick);
-    
+
     if (options.popupEl) {
       this.popupEl = options.popupEl;
     } else {
@@ -88,19 +84,20 @@ var StopSelector = Backbone.View.extend({
   },
 
   mapLinkClick: function(departure) {
-    console.log("mapLinkClick", departure);
     this.ensureSelectorPopup();
     $(this.selectorPopup).show();
-    
+
     var city = this.routePlanner.getCity(departure);
-    console.log("City", city);
-    
-    // TODO: reset position if the city is not found.
-    
-    this.selectorPopup.cityBrowserView.setActiveCity(city);
+
+    if (city) {
+      this.selectorPopup.cityBrowserView.setActiveCity(city);
+    } else {
+      var syntheseMap = this.selectorPopup.cityBrowserView.syntheseMap;
+      syntheseMap.zoomToInitialPosition();
+    }
     this.currentDirection = departure;
   },
-  
+
   ensureSelectorPopup: function() {
     $(this.popupEl).show();
     if (this.selectorPopup)
@@ -111,16 +108,13 @@ var StopSelector = Backbone.View.extend({
     });
     this.selectorPopup.bind("stopSelected", this.stopSelected);
   },
-  
+
   stopSelected: function(stopFeature) {
-    console.log("sf", stopFeature);
-    
-    //cityInput.val();
     this.routePlanner.setCity(
       this.currentDirection, stopFeature.data.city_name);
     this.routePlanner.setPlace(
       this.currentDirection, stopFeature.data.stop_name);
-    //placeInput.val(stopFeature.data.stop_name);
+
     var self = this;
     $(this.selectorPopup.el).fadeOut(null, function() {
       self.selectorPopup.close();

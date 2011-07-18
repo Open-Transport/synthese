@@ -1,9 +1,8 @@
 var RoutePlannerView = Backbone.View.extend({
-  
+
   initialize: function(options) {
-    console.log("RP init");
     var formName = options.formName || "ri"
-    
+
     this.$form = $("form[name=" + formName + "]");
     this.departure = {
       city: this.$form.find("#origin_city_txt"),
@@ -13,14 +12,16 @@ var RoutePlannerView = Backbone.View.extend({
       city: this.$form.find("#destination_city_txt"),
       place: this.$form.find("#destination_place_txt"),
     };
-    
+
     var self = this;
     $(".mapLink").show().click(function(event) {
+      event.stopPropagation();
+      event.preventDefault();
       self.trigger("mapLinkClick", $(event.target).parents(".departure").length > 0);
     });
-    
+
   },
-  
+
   getDirectionObj: function(departure) {
     return this[departure ? "departure" : "arrival"];
   },
@@ -36,5 +37,5 @@ var RoutePlannerView = Backbone.View.extend({
   setPlace: function(departure, placeName) {
     return this.getDirectionObj(departure).place.val(placeName);
   },
-  
+
 });
