@@ -39,6 +39,17 @@
       .debug {
         background-color: #eee;
       }
+      
+      .cityBrowser {
+        border: 1px solid black;
+        box-shadow: 0px 0px 15px #333333;
+        position: relative;
+        height: 600px;
+        width: 90%;
+        margin: auto;
+        margin-top: 1em;
+      }
+      
     </style>
     <!--[if lt IE 9]>
       <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -48,37 +59,7 @@
   <body>
     <header><h1>City Browser</h1></header>
 
-    <!-- TODO: put the templates in CityBrowser.js -->
-
-    <script id="citySelectorTemplate" type="text/x-jquery-tmpl">
-      <ul class="letters">
-        {{each letters}}
-          <li data-prefix="${$value}">${$value}</li>
-        {{/each}}
-      </ul>
-      <div class="cities">
-        <div class="citiesLabel"></div>
-        <div class="noCities"></div>
-        <ul class="cityList">
-        </ul>
-      </div>
-    </script>
-
-    <script id="cityBrowserTemplate" type="text/x-jquery-tmpl">
-      <div id="cityBrowser" class="cityBrowser" style="">
-        <div class="citySelector"></div>
-        <div class="message loadingMessage"></div>
-        <div class="message errorMessage">
-          <div></div>
-          <div class="detail"></div>
-        </div>
-        <div class="map">
-          <div class="zoomRequiredMessage"></div>
-        </div>
-      </div>
-    </script>
-
-    <div id="cityBrowser"></div>
+    <div id="cityBrowser" class="cityBrowser"></div>
 
     <!-- Maybe move to stopsSelector.html -->
 
@@ -128,22 +109,10 @@
     <script src="js/CityBrowser.js"></script>
     <script>
 
-    // XXX project specific
-    var Cm79CityBrowser = OpenLayers.Class(CityBrowserMap, {
-      afterMapInit: function() {
-        CityBrowserMap.prototype.afterMapInit.apply(this, arguments);
-
-        this.map.setCenter(
-          new OpenLayers.LonLat(-0.32, 46.60).
-            transform(new OpenLayers.Projection("EPSG:4326"),
-              this.map.getProjectionObject()),
-          10);
-      }
-    });
-
     var cityBrowser = new CityBrowser({
       el: document.getElementById("cityBrowser"),
-      mapClass: Cm79CityBrowser,
+      mapOptions: {
+      }
     });
 
     $("#setActiveCity").click(function() {
