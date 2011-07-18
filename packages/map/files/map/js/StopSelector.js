@@ -36,7 +36,11 @@ var StopSelector = Backbone.View.extend({
     this.cityBrowserView.renderMap();
   },
 
-  close: function() {
+  close: function(event) {
+    if (event) {
+      event.stopPropagation();
+      event.preventDefault();
+    }
     this.trigger("close");
     $(this.el).hide();
   },
