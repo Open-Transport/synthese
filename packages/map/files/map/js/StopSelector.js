@@ -1,10 +1,9 @@
 var StopSelector = Backbone.View.extend({
 
-  // TODO: i18n
   template: $.template(null, [
     '<h1>',
     '  <a href="#" class="close">fermer</a>',
-    '  Sélectionnez un arrêt',
+    '  <span class="selectStop"></span>',
     '</h1>',
     '<div class="cityBrowser"></div>'
   ].join('\n')),
@@ -14,6 +13,7 @@ var StopSelector = Backbone.View.extend({
   },
 
   initialize: function(options) {
+    this.initTranslations();
 
     this.cityBrowserView =  new CityBrowser({
       mapOptions: options.mapOptions,
@@ -28,9 +28,24 @@ var StopSelector = Backbone.View.extend({
     this.render();
   },
 
+  initTranslations: function() {
+
+    // English
+    OpenLayers.Util.applyDefaults(OpenLayers.Lang.en, {
+      'selectAStop': 'Select a stop',
+    });
+
+    // French
+    OpenLayers.Util.applyDefaults(OpenLayers.Lang.fr, {
+      'selectAStop': 'Sélectionnez un arrêt',
+    });
+  },
+
   render: function() {
     $(this.el).empty().addClass("stopSelector");
     $.tmpl(this.template, {}).appendTo(this.el);
+
+    this.$(".selectStop").text(OpenLayers.i18n("selectAStop"));
 
     this.$(".cityBrowser").replaceWith(this.cityBrowserView.el);
     this.cityBrowserView.renderMap();
