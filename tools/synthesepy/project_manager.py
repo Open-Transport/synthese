@@ -278,7 +278,7 @@ class Project(object):
         try:
             while self.daemon.is_running():
                 time.sleep(2)
-            log.info('Daemon terminated (crash?)')
+            log.warn('Daemon terminated (crash?)')
         except:
             raise
         finally:
