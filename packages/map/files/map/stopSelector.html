@@ -95,13 +95,13 @@ $(function() {
 
   <form action="/todo" name="routePlannerForm">
     <p>
-      Ville de départ <a class="mapLink" href>Carte</a><br>
+      Ville de départ <a class="mapLink" href="#">Carte</a><br>
       <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
       Arrêt de départ (optionnel)<br>
       <input class=place type=text name=act id=origin_place_txt><br>
     </p>
     <p>
-      Ville d'arrivée <a class="mapLink" href>Carte</a><br>
+      Ville d'arrivée <a class="mapLink" href="#">Carte</a><br>
       <input class=city type=text name=act id=destination_city_txt><br>
       Arrêt d'arrivée (optionnel)<br>
       <input class=place type=text name=apt id=destination_place_txt><br>
@@ -155,6 +155,9 @@ $(function() {
       stopSelector = new StopSelector({
         el: $stopSelector.get(0),
       });
+      stopSelector.bind("close", function() {
+        stopSelector.unbind("stopSelected");
+      });
 
       return stopSelector;
     }
@@ -176,7 +179,9 @@ $(function() {
         ss.unbind("stopSelected");
         cityInput.val(stopFeature.data.city_name);
         placeInput.val(stopFeature.data.stop_name);
-        $(ss.el).fadeOut();
+        $(ss.el).fadeOut(null, function() {
+          ss.close();
+        });
       });
     })
   });
