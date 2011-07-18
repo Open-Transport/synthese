@@ -443,6 +443,12 @@ class CMakeBuilder(Builder):
             'lin': 'make',
         }
 
+        # Only used on Windows, where the build will fail if the daemon is
+        # running and locking the executable.
+        if (self.env.platform == 'win' and
+            self.config.kill_daemons_when_building):
+            utils.kill_processes('s3-server')
+
         build_fun = getattr(
             self, '_do_build_' + PLATFORM_TO_TOOL[self.env.platform], None)
         if not build_fun:

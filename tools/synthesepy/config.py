@@ -72,6 +72,7 @@ DEFAULTS = {
     'mysql_dir': None,
     'boost_dir': None,
     'parallel_build': multiprocessing.cpu_count(),
+    'kill_daemons_when_building': False,
 
     # runtests
     'conn_strings': [],

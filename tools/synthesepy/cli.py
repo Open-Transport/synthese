@@ -180,6 +180,10 @@ def add_default_subparsers(subparsers):
     parser_build.add_argument(
         '--parallel-build', type=int,
         help='Number of build threads to use')
+    parser_build.add_argument(
+        '--kill-daemons-when-building', action='store_true',
+        help='Kill all running daemons before building')
+    
 
     parser_clean = subparsers.add_parser(
         'clean', help='Delete the object directory')

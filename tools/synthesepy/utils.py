@@ -39,7 +39,8 @@ def kill_listening_processes(port):
         import win32con
 
         # Note: use subprocess.check_output with 2.7
-        output = subprocess.Popen(['netstat', '-noa'], stdout=subprocess.PIPE).communicate()[0]
+        output = subprocess.Popen(
+            ['netstat', '-noa'], stdout=subprocess.PIPE).communicate()[0]
         pids = []
         for l in output.splitlines():
             try:
@@ -60,8 +61,9 @@ def kill_listening_processes(port):
 
         return
 
-    # Note: use subprocess.check_output with 2.7
-    output = subprocess.Popen(['netstat', '-pln'], stdout=subprocess.PIPE).communicate()[0]
+    # TODO: use subprocess.check_output once we require Python 2.7
+    output = subprocess.Popen(
+        ['netstat', '-pln'], stdout=subprocess.PIPE).communicate()[0]
     pids = []
     for l in output.splitlines():
         try:
@@ -84,6 +86,26 @@ def kill_listening_processes(port):
             continue
         args = ['kill', '-KILL', pid]
         subprocess.check_call(args)
+
+
+def kill_processes(process_name):
+    if sys.platform != 'win32':
+        raise NotImplementedError('Implement me!')
+    try:
+        import win32api
+        import win32pdhutil
+        import win32con
+    except ImportError:
+        log.warn('Python win32 is required for killing processes.')
+        return
+
+    pids = win32pdhutil.FindPerformanceAttributesByName(
+        process_name, counter="ID Process")
+
+    for pid in pids:
+        handle = win32api.OpenProcess(win32con.PROCESS_TERMINATE, False, pid)
+        win32api.TerminateProcess(handle, -1)
+        win32api.CloseHandle(handle)
 
 
 def append_paths_to_environment(env_variable, paths):
@@ -158,7 +180,6 @@ def to_cygwin_path(path):
     return stdout_content.rstrip()
 
 
-# XXX somewhat duplicated with check_call
 def call(dummy, cmd, shell=True, **kwargs):
 
     log.debug('Running command: %r', cmd)
@@ -189,9 +210,6 @@ def call(dummy, cmd, shell=True, **kwargs):
             raise subprocess.CalledProcessError(p.returncode, cmd)
         return output
 
-#    env = os.environ.copy()
-#    env.update(config.ENV)
-#    kwargs['env'] = env
     subprocess.check_call(cmd, shell=shell, **kwargs)
 
 
