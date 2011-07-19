@@ -44,6 +44,12 @@ namespace synthese
 				BadSchedulesException(): Exception("Bad schedule") {}
 			};
 
+			class PathBeginsWithUnscheduledStopException: public synthese::Exception
+			{
+			public:
+				PathBeginsWithUnscheduledStopException(const graph::Path& path);
+			};
+
 		protected:
 			//! @name Theoretical data
 			//@{
