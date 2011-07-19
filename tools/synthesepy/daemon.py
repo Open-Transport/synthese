@@ -67,18 +67,19 @@ class Daemon(object):
             return False
         return self.proc.poll() is None
 
-    def start(self):
+    def start(self, kill_existing=True):
         self.env.prepare_for_launch()
 
-        ports_to_check = [self.env.c.port]
-        if self.env.c.wsgi_proxy:
-            ports_to_check.append(self.env.c.wsgi_proxy_port)
-        for port in ports_to_check:
-            utils.kill_listening_processes(port)
+        if kill_existing:
+            ports_to_check = [self.env.c.port]
+            if self.env.c.wsgi_proxy:
+                ports_to_check.append(self.env.c.wsgi_proxy_port)
+            for port in ports_to_check:
+                utils.kill_listening_processes(port)
 
-            if utils.can_connect(port):
-                raise DaemonException(
-                    'Error, something is already listening on port %s', port)
+                if utils.can_connect(port):
+                    raise DaemonException(
+                        'Error, something is already listening on port %s', port)
 
         # cleanup pid on linux
         if self.env.platform != 'win':

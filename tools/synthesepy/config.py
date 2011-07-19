@@ -51,6 +51,7 @@ DEFAULTS = {
     'log_stdout': False,
     'gdb': False,
     'netstat_cmd': None,
+    'restart_if_crashed': False,
 
     'wsgi_proxy': True,
     'wsgi_proxy_port': None,
