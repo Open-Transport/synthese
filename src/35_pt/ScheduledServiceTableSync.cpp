@@ -158,9 +158,13 @@ namespace synthese
 					rows->getText(ScheduledServiceTableSync::COL_SCHEDULES)
 				);
 			}
-			catch(...)
+			catch(SchedulesBasedService::BadSchedulesException&)
 			{
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size");
+			}
+			catch(synthese::Exception& e)
+			{
+				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, e.getMessage());
 			}
 			if(	path &&
 				path->getEdges().size() != ss->getArrivalSchedules(false).size()
