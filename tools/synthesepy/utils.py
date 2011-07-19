@@ -32,6 +32,9 @@ import urllib2
 log = logging.getLogger(__name__)
 
 
+netstat_cmd = ['netstat', '-pln']
+
+
 def kill_listening_processes(port):
     '''Kills all processes listening for TCP connections on the given port'''
     if sys.platform == 'win32':
@@ -63,7 +66,7 @@ def kill_listening_processes(port):
 
     # TODO: use subprocess.check_output once we require Python 2.7
     output = subprocess.Popen(
-        ['netstat', '-pln'], stdout=subprocess.PIPE).communicate()[0]
+        netstat_cmd, stdout=subprocess.PIPE).communicate()[0]
     pids = []
     for l in output.splitlines():
         try:

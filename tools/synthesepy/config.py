@@ -50,6 +50,7 @@ DEFAULTS = {
     'default_site': None,
     'log_stdout': False,
     'gdb': False,
+    'netstat_cmd': None,
 
     'wsgi_proxy': True,
     'wsgi_proxy_port': None,
@@ -137,6 +138,12 @@ class Config(object):
 
     def update_from_obj(self, obj):
         self.__dict__.update(obj.__dict__)
+
+    def update_finished(self):
+        """Should be called once the config object is finished being updated"""
+        # Hack to avoid passing arguments to all invocations.
+        if self.netstat_cmd:
+            utils.netstat_cmd = self.netstat_cmd
 
     def __repr__(self):
         return '<Config %s>' % self.__dict__
