@@ -316,6 +316,9 @@ def main():
              '"param0=value0 param1=value1"')
     parser.add_argument(
         '--gdb', action='store_true', help='Run daemon under gdb')
+    parser.add_argument(
+        '--restart-if-crashed', action='store_true',
+        help='Automatically restart the daemon if it crashes')
 
     subparsers = parser.add_subparsers(help='sub-command help')
     if project:
