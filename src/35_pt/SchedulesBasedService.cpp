@@ -94,6 +94,10 @@ namespace synthese
 					// Interpolation of preceding schedules
 					if(atLeastOneUnscheduledEdge)
 					{
+						if(lastScheduledEdge == _path->getEdges().end())
+						{
+							throw PathBeginsWithUnscheduledStopException(*_path);
+						}
 						MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
 						time_duration totalTime(*itArrival - originDepartureSchedule);
@@ -456,4 +460,12 @@ namespace synthese
 			}
 			_path->markScheduleIndexesUpdateNeeded(true);
 		}
+
+
+
+		SchedulesBasedService::PathBeginsWithUnscheduledStopException::PathBeginsWithUnscheduledStopException(
+			const graph::Path& path
+		):	Exception(
+			"The path "+ boost::lexical_cast<std::string>(path.getKey()) +" begins with an unscheduled stop."
+		) {}
 }	}
