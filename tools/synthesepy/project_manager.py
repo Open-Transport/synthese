@@ -166,8 +166,11 @@ class Project(object):
         self._load_sites()
 
     def _read_config(self):
-        config_path = join(self.path, 'config.py')
-        if os.path.isfile(config_path):
+        config_paths = [
+            join(self.path, 'config.py'), join(self.path, 'config_local.py')]
+        for config_path in config_paths:
+            if not os.path.isfile(config_path):
+                continue
             log.debug('Reading config file: %r', config_path)
             self.config.update_from_file(config_path)
 
@@ -234,6 +237,7 @@ class Project(object):
         importer_path = self.env.get_executable_path(
             join('test', '53_pt_routeplanner'),
             'ImportRoutePlannerTestData')
+        log.info('Runing testdata importer from %r', importer_path)
         self.env.prepare_for_launch()
         env = os.environ.copy()
         env['SYNTHESE_TESTDATA_CONNSTRING'] = self.config.conn_string + \
