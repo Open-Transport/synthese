@@ -331,6 +331,8 @@ def main():
 
     config.update_from_obj(args)
 
+    config.update_finished()
+
     config.wsgi_proxy = not args.no_proxy
     config.wsgi_proxy_port = config.port + 1
 
