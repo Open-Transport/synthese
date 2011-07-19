@@ -26,8 +26,8 @@ import subprocess
 import sys
 import time
 
-from . import proxy
-from . import utils
+from synthesepy import proxy
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
 

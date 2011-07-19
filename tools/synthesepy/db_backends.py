@@ -163,24 +163,22 @@ class SQLiteBackend(DBBackend):
         with self.get_cursor() as cursor:
             cursor.executescript(sql)
 
-    def shell(self, sql=None):
+    def _call_spatialite(self, cmd, shell=True, **kwargs):
         # Warning: shell=False is required on Linux, otherwise it launches the
         # interpreter and it hangs.
+        cmd = [self.env.config.spatialite_path] + cmd
+        return utils.call(self.env.c.dummy, cmd, shell=False, **kwargs)
+
+    def shell(self, sql=None):
         kwargs = {'input': sql} if sql else {}
-        output = utils.call(
-            self.env.c.dummy,
-            [self.env.config.spatialite_path, self.conn_info['path']],
-            shell=False,
-            **kwargs)
+        output = self._call_spatialite([self.conn_info['path']], **kwargs)
         if output:
             print output
 
     def dump(self):
-        args = [self.env.c.spatialite_path, '-bail',
-            self.conn_info['path'], '.dump']
+        args = ['-bail', self.conn_info['path'], '.dump']
         log.debug('Running: %r', args)
-        # See comment in shell() about shell=False
-        output = utils.call(self.env.c.dummy, args, shell=False, input='')
+        output = self._call_spatialite(args, input='')
         # Remove the Spatialite header, which isn't valid SQL.
         # (-noheader doesn't have any effect)
         return output[output.index('BEGIN TRANSACTION'):]
@@ -190,8 +188,7 @@ class SQLiteBackend(DBBackend):
         if os.path.isfile(db_path):
             os.unlink(db_path)
 
-        args = [self.env.c.spatialite_path, '-bail', '-noheader', db_path]
-        utils.call(self.env.c.dummy, args, input=sql)
+        self._call_spatialite(['-bail', '-noheader', db_path], input=sql)
         log.info('Database %r restored', db_path)
 
 
