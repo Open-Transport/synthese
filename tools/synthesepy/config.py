@@ -124,7 +124,8 @@ class Config(object):
 
         log.debug('All configs: %r', all_configs)
 
-        config_names.insert(0, 'common')
+        if 'common' in all_configs:
+            config_names.insert(0, 'common')
         for config_name in config_names:
             if not config_name in all_configs:
                 raise Exception('No entry %r in config files' % config_name)

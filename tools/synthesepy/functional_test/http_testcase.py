@@ -58,7 +58,7 @@ class HTTPTestCase(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        log.debug('setupClass %s, with backend %s', cls.__name__, cls.backend)
+        log.info('setupClass %s, with backend %s', cls.__name__, cls.backend)
 
         if cls.no_init:
             return
