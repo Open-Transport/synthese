@@ -291,9 +291,14 @@ class Project(object):
         log.info('Daemon running, press ctrl-c to stop')
 
         try:
-            while self.daemon.is_running():
-                time.sleep(2)
-            log.warn('Daemon terminated (crash?)')
+            while True:
+                while self.daemon.is_running():
+                    time.sleep(2)
+                log.warn('Daemon terminated (crash?)')
+                if self.config.restart_if_crashed:
+                    self.daemon.start(kill_existing=False)
+                else:
+                    break
         except:
             raise
         finally:
