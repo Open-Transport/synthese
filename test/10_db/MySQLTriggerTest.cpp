@@ -36,7 +36,7 @@ using synthese::server::ServerModule;
 typedef synthese::db::DB::ConnectionInfo ConnectionInfo;
 
 // TODO: make it configurable?
-const string PORT = "8088";
+const string PORT = "4080";
 
 class MySQLWithHTTPServerTestBackend : public MySQLTestBackend
 {
