@@ -204,7 +204,7 @@ def start(env):
     if USE_PASTE_HTTPD:
         import paste.httpserver
         paste_log = logging.getLogger('paste.httpserver.ThreadPool')
-        paste_log.setLevel(logging.INFO)
+        paste_log.setLevel(logging.WARNING)
         wsgi_httpd = paste.httpserver.serve(
             WSGIProxy(env), '0.0.0.0', env.c.wsgi_proxy_port, start_loop=False)
     else:
