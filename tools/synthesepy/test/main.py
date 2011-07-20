@@ -26,6 +26,7 @@ import os
 import os.path
 import subprocess
 import sys
+import traceback
 
 if sys.version_info >= (2, 7):
     import unittest
@@ -275,10 +276,16 @@ class Tester(object):
                     suite, ALL_SUITES))
             log.info('Running suite %s', suite)
             test_method = getattr(self, 'run_%s_tests' % suite)
-            if not test_method(suite_args):
+            successful = False
+            try:
+                successful = test_method(suite_args)
+            except Exception, e:
+                log.warn('Suite failed: %s', e)
+                traceback.print_exc()
+            if not successful:
                 failed_suites.append(suite)
 
         if failed_suites:
-            log.error('The following suites failed to load: %s' % failed_suites)
+            log.error('The following suites failed: %s' % failed_suites)
 
         sys.exit(1 if failed_suites else 0)
