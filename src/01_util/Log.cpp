@@ -23,6 +23,7 @@
 #include "Log.h"
 
 #include <iomanip>
+#include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
 
 using namespace boost;
@@ -50,12 +51,16 @@ namespace synthese
 			: _outputStream (outputStream)
 			, _level (level)
 		{
+			if(getenv("SYNTHESE_LOG_LEVEL"))
+			{
+				int level = lexical_cast<int>(getenv("SYNTHESE_LOG_LEVEL"));
+				setLevel(Log::Level(level));
+			}
 		}
 
 
 		Log::~Log ()
 		{
-
 		}
 
 
