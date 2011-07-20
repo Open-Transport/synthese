@@ -47,7 +47,6 @@ struct GlobalFixture
 		if (::getenv("SYNTHESE_PAUSE"))
 			::system("pause");
 #endif
-		synthese::util::Log::GetInstance().setLevel(synthese::util::Log::LEVEL_TRACE);
 	}
 
 	~GlobalFixture()
