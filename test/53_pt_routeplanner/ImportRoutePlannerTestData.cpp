@@ -83,7 +83,6 @@ static void import()
 
 int main()
 {
-	synthese::util::Log::GetInstance().setLevel(synthese::util::Log::LEVEL_TRACE);
 	import();
 	return 0;
 }
