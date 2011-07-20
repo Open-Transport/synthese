@@ -192,10 +192,9 @@ def add_default_subparsers(subparsers):
     parser_runtests = subparsers.add_parser(
         'runtests', help='Run unit tests')
     parser_runtests.set_defaults(func=runtests)
-    # for python suite
     parser_runtests.add_argument(
-        '--dbconns', nargs='+', dest='conn_strings')
-    # for python suite
+        '--test-conn-strings', nargs='+',
+        help='Database connection strings used for the tests')
     parser_runtests.add_argument(
         '--no-init',
         help='Don\'t start/stop the daemon or initialize the db. '
@@ -304,6 +303,7 @@ def main():
     parser.add_argument('--no-proxy', action='store_true')
     parser.add_argument('--site-id', type=int)
     parser.add_argument('-d', '--dbconn', dest='conn_string')
+    parser.add_argument('-l', '--log-level', help='Daemon log level')
     parser.add_argument(
         '-s', '--stdout', action='store_true', dest='log_stdout',
         help='Log daemon output to stdout')
