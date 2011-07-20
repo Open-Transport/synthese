@@ -50,9 +50,6 @@ class Builder(object):
         if not os.path.isdir(self.download_cache_dir):
             os.makedirs(self.download_cache_dir)
 
-    def _check_call(self, *args, **kwargs):
-        return utils.check_call(self.env.c.dummy, *args, **kwargs)
-
     def _download(self, url, md5=None):
         if 'SYNTHESE_CACHE_URL' in os.environ:
             url = os.environ['SYNTHESE_CACHE_URL'] + url.split('/')[-1]
@@ -94,7 +91,7 @@ class Builder(object):
             zip.extractall(extract_dir)
         elif archive.endswith(('.tar.gz', '.tgz')):
             assert self.env.platform != 'win'
-            self._check_call(['tar', 'zxf', archive, '-C', extract_dir])
+            utils.call(['tar', 'zxf', archive, '-C', extract_dir])
 
     def install_prerequisites(self):
         pass
@@ -127,7 +124,7 @@ class SconsBuilder(Builder):
         if os.path.isdir(self.boost_dir):
             return
 
-        self._check_call(
+        utils.call(
             'svn co --ignore-externals https://extranet-rcsmobility.com/svn/synthese3/trunk/3rd/dev/boost',
             shell=True, cwd=join(self.env.c.thirdparty_dir))
 
@@ -184,7 +181,7 @@ class SconsBuilder(Builder):
             kwargs = {
                 'shell': True
             }
-        self._check_call(args, **kwargs)
+        utils.call(args, **kwargs)
 
 
 class CMakeBuilder(Builder):
@@ -250,11 +247,11 @@ class CMakeBuilder(Builder):
                 return
 
             cmake_src = join(self.env.c.thirdparty_dir, created_dir)
-            self._check_call(
+            utils.call(
                 [join(cmake_src, 'configure'),  '--prefix=' +
                     join(self.env.c.thirdparty_dir, 'cmake')],
                 cwd=cmake_src)
-            self._check_call(
+            utils.call(
                 ['make', '-j%i' % self.env.c.parallel_build, 'install'],
                 cwd=cmake_src)
 
@@ -304,7 +301,7 @@ class CMakeBuilder(Builder):
 
         log.info("Building Boost, this can take some times...")
 
-        self._check_call(
+        utils.call(
             join(self.boost_dir, 'bootstrap.bat'), cwd=self.boost_dir)
 
         args = [join(self.boost_dir, 'bjam.exe')]
@@ -315,7 +312,7 @@ class CMakeBuilder(Builder):
             'threading=multi'.format(toolset=toolset).split(' '))
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
 
-        self._check_call(args, cwd=self.boost_dir)
+        utils.call(args, cwd=self.boost_dir)
 
     def install_iconv(self):
         if self.env.platform != 'win':
@@ -387,13 +384,12 @@ class CMakeBuilder(Builder):
 
         # TODO: check that Python Cygwin is not in the path?
 
-        log.info('CMake generate command line: %r', " ".join(args))
         if not os.path.isdir(self.env.env_path):
             os.makedirs(self.env.env_path)
-        self._check_call(args, cwd=self.env.env_path, env=env)
+        utils.call(args, cwd=self.env.env_path, env=env)
 
     def _do_build_make(self):
-        self._check_call(
+        utils.call(
             'make -j%i' % self.env.c.parallel_build,
             cwd=self.env.env_path,
             shell=True)
@@ -429,7 +425,7 @@ class CMakeBuilder(Builder):
             '/project', 'ALL_BUILD'
         ]
         log.info('Build command line: %s', args)
-        self._check_call(
+        utils.call(
             args,
             cwd=self.env.env_path)
 

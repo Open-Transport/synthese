@@ -81,7 +81,6 @@ def _ssh_command_line(config, with_server=True, extra_opts=''):
 
 def _rsync(config, remote_path, local_path):
     utils.call(
-        config.dummy,
         'rsync -avz --delete --delete-excluded '
         '{rsync_opts} -e "{ssh_command_line}" '
         '{server}:{remote_path} {local_path}'.format(
@@ -139,6 +138,10 @@ class Site(object):
 
 
 class Project(object):
+    # FIXME: not used for now, there are some permissions issues when syncing
+    # on Windows.
+    UPDATE_HTDOCS = False
+
     def __init__(self, path, env=None, config=None):
         self.path = os.path.normpath(os.path.abspath(path))
         self.env = env
@@ -211,12 +214,14 @@ class Project(object):
                 s for s in self.sites if s.name != 'admin'][0].id
 
     def _clean_files(self):
-        utils.RemoveDirectory(self.htdocs_path)
-        os.makedirs(self.htdocs_path)
+        if self.UPDATE_HTDOCS:
+            utils.RemoveDirectory(self.htdocs_path)
+            os.makedirs(self.htdocs_path)
 
     def _sync_files(self, site, package):
         # TODO: create a directory per site, when vhosts are implemented.
-        _copy_over(package.files_path, self.htdocs_path)
+        if self.UPDATE_HTDOCS:
+            _copy_over(package.files_path, self.htdocs_path)
 
     def _clean_db(self):
         self._db_backend.drop_db()
@@ -242,7 +247,7 @@ class Project(object):
         env = os.environ.copy()
         env['SYNTHESE_TESTDATA_CONNSTRING'] = self.config.conn_string + \
             ',triggerCheck=0'
-        utils.call(self.config.dummy, importer_path, env=env)
+        utils.call(importer_path, env=env)
 
     def _sync_db(self, site, package):
         for fixtures_file in package.fixtures:
@@ -324,7 +329,7 @@ class Project(object):
     def db_view(self):
         """Open database in a GUI tool (if applicable)"""
         if self._db_backend.name == 'sqlite':
-            utils.call(self.config.dummy,
+            utils.call(
                 [self.config.spatialite_gui_path,
                     self._db_backend.conn_info['path']],
                 bg=True)
@@ -373,9 +378,7 @@ class Project(object):
                 project_name=self.config.project_name))
 
         if os.path.isfile(self.config.editor_path):
-            utils.call(
-                self.config.dummy,
-                [self.config.editor_path, uncompressed_target], bg=True)
+            utils.call([self.config.editor_path, uncompressed_target], bg=True)
 
 
     def db_restore(self, db_dump):
@@ -463,7 +466,7 @@ class Project(object):
 
     def ssh(self):
         """Open a ssh shell on the remote server"""
-        utils.call(self.config.dummy, _ssh_command_line(self.config))
+        utils.call(_ssh_command_line(self.config))
 
 
 def create_project(env, path, site_packages=None, conn_string=None, overwrite=False):

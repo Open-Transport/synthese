@@ -44,6 +44,9 @@ class DBBackend(object):
         self.env = env
         self.conn_info = conn_info
 
+    def __repr__(self):
+        return '<DBBackend %s>' % self.conn_info.conn_string
+
     def get_connection(self):
         raise NotImplementedError()
 
@@ -167,7 +170,7 @@ class SQLiteBackend(DBBackend):
         # Warning: shell=False is required on Linux, otherwise it launches the
         # interpreter and it hangs.
         cmd = [self.env.config.spatialite_path] + cmd
-        return utils.call(self.env.c.dummy, cmd, shell=False, **kwargs)
+        return utils.call(cmd, shell=False, **kwargs)
 
     def shell(self, sql=None):
         kwargs = {'input': sql} if sql else {}
@@ -261,8 +264,8 @@ class MySQLBackend(DBBackend):
             '-P{port} {db}'.format(**args))
 
         if input is not None:
-            return utils.call(self.env.c.dummy, cmd, input=input)
-        return utils.call(self.env.c.dummy, cmd)
+            return utils.call(cmd, input=input)
+        return utils.call(cmd)
 
     def shell(self, sql=None):
         output = self._mysql_command('mysql', input=sql)

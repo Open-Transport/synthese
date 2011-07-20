@@ -31,8 +31,9 @@ import urllib2
 
 log = logging.getLogger(__name__)
 
-
+# Globals
 netstat_cmd = ['netstat', '-pln']
+dummy = False
 
 
 def kill_listening_processes(port):
@@ -151,25 +152,6 @@ def can_connect(port, verbose=False):
     return True
 
 
-def check_call(dummy, cmd, *args, **kwargs):
-    """
-    subprocess.check_call wrapper that just prints the command line in dummy
-    mode
-    """
-    
-    cmdline = cmd
-    if isinstance(cmd, list):
-        cmdline = ' '.join(cmdline)
-    dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
-        'cwd' in kwargs else '')
-    if dummy:
-        # TODO: show environment too.
-        log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
-        return
-    log.debug('Running %s:\n%s', dir, cmdline)
-    return subprocess.check_call(cmd, *args, **kwargs)
-
-
 def to_cygwin_path(path):
     if sys.platform != 'win32':
         return path
@@ -183,20 +165,26 @@ def to_cygwin_path(path):
     return stdout_content.rstrip()
 
 
-def call(dummy, cmd, shell=True, **kwargs):
+def call(cmd, shell=None, **kwargs):
 
-    log.debug('Running command: %r', cmd)
+    if shell is None:
+        shell = not isinstance(cmd, list)
+
+    cmdline = cmd
+    if isinstance(cmd, list):
+        cmdline = ' '.join(cmdline)
+    dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
+        'cwd' in kwargs else '')
+    # TODO: show environment too.
+    log.info(
+        '%s %s:\n%s',
+        'Dummy mode, not running:' if dummy else 'Running:',
+        dir, cmdline)
+
     if 'input' in kwargs:
         log.debug('With %s bytes of input', len(kwargs['input']))
 
     if dummy:
-        # TODO: show environment too.
-        cmdline = cmd
-        if isinstance(cmd, list):
-            cmdline = ' '.join(cmdline)
-        dir = ('(in directory: {0!r})'.format(kwargs['cwd']) if
-            'cwd' in kwargs else '')
-        log.info('Dummy mode, not running %s:\n%s', dir, cmdline)
         return
 
     if 'bg' in kwargs:

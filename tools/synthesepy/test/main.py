@@ -34,6 +34,7 @@ else:
 
 from synthesepy.functional_test import http_testcase
 from synthesepy import build
+from synthesepy import db_backends
 from synthesepy import utils
 
 
@@ -141,9 +142,8 @@ class Tester(object):
         return not (error_count > 0 or (file_count == 0 and delete_only_file_count == 0))
 
     def run_python_tests(self, suite_args):
-
         http_testcase.init_backends(
-            self.env, self.config.conn_strings, self.config.no_init)
+            self.env, self.env.c.test_conn_strings, self.config.no_init)
 
         sys_argv = sys.argv[0:1]
 
@@ -185,7 +185,7 @@ class Tester(object):
             failing_tests = '|'.join(['test_{0}_{1}Test'.format(path, test) for
                 path, test in self.KNOWN_FAILURES])
             args.extend(['-E', failing_tests])
-        subprocess.check_call(args, cwd=self.env.env_path)
+        utils.call(args, cwd=self.env.env_path)
 
         return True
 
@@ -217,12 +217,30 @@ class Tester(object):
                 continue
 
             log.info('Running test: %s', normalized_name)
-            subprocess.check_call(test_executable)
+            utils.call(test_executable)
 
         return True
 
     def run_cpp_tests(self, suite_args):
         self.env.prepare_for_launch()
+
+        # Setup environment variables used by tests.
+
+        try:
+            mysql_conn_string = [cs for cs in self.env.c.test_conn_strings if
+                cs.startswith('mysql://')][0]
+        except IndexError:
+            mysql_conn_string = None
+            
+        if mysql_conn_string:
+            mysql_ci = db_backends.ConnectionInfo(mysql_conn_string)
+            db = mysql_ci['db']
+            del mysql_ci['db']
+            mysql_params = mysql_ci.conn_string.replace('mysql://', '')
+            os.environ.update({
+                'SYNTHESE_MYSQL_PARAMS': mysql_params,
+                'SYNTHESE_MYSQL_DB': db,
+            })
 
         if self.env.type == 'cmake':
             return self._run_cpp_tests_cmake(suite_args)

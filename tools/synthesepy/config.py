@@ -48,6 +48,7 @@ DEFAULTS = {
     'no_proxy': False,
     'site_id': 0,
     'default_site': None,
+    'log_level': 1,
     'log_stdout': False,
     'gdb': False,
     'netstat_cmd': None,
@@ -78,11 +79,10 @@ DEFAULTS = {
     'kill_daemons_when_building': False,
 
     # runtests
-    'conn_strings': [],
+    'test_conn_strings': ['sqlite://', 'mysql://db=synthese_test,host=localhost,user=synthese,passwd=synthese'],
     'no_init': False,
 
     # continuous_integration
-    'test_env': {},
     'suites': None,
 }
 
@@ -145,6 +145,20 @@ class Config(object):
         # Hack to avoid passing arguments to all invocations.
         if self.netstat_cmd:
             utils.netstat_cmd = self.netstat_cmd
+
+        utils.dummy = self.dummy
+        
+        # Convert log level to int
+        try:
+            self.log_level = int(self.log_level)
+        except ValueError:
+            levels = ['trace', 'debug', 'info', 'warn', 'fatal', 'none']
+            level_name_to_int = dict(zip(levels, range(-1, len(levels))))
+            if not self.log_level in level_name_to_int:
+                raise Exception(
+                    'Invalid log level value {0!r} allowed: {1!r}'.format(
+                        self.log_level, levels))
+            self.log_level = level_name_to_int[self.log_level]
 
     def __repr__(self):
         return '<Config %s>' % self.__dict__
