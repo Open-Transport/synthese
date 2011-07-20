@@ -47,10 +47,5 @@ def run(env, args):
         synthesepy.build.clean(env, args.dummy)
         synthesepy.build.build(env)
 
-    # FIXME: this should be extracted from the mysql connection string.
-    os.environ.update(
-        config.test_env
-    )
-
     tester = synthesepy.test.main.Tester(env)
     tester.run_tests(config.suites)

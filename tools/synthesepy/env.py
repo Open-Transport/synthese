@@ -104,6 +104,9 @@ class Env(object):
         Setup environment or other things needed for launching one of the
         generated executables.
         """
+
+        os.environ['SYNTHESE_LOG_LEVEL'] = str(self.config.log_level)
+
         if self.platform == 'win':
             self._prepare_for_launch_win()
         elif self.platform == 'lin':
