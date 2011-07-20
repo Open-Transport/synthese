@@ -81,10 +81,16 @@ class Builder(object):
                 os.rename(temp_target, target)
             utils.RemoveDirectory(temp_dir)
 
-    def _extract(self, url, extract_dir, created_dir):
+    def _extract(self, url, extract_dir, created_dir=None):
+        archive_name = url.split('/')[-1]
+        if created_dir is None:
+            created_dir = archive_name
+            for ext in ('.zip', '.tar.gz', '.tgz'):
+                if created_dir.endswith(ext):
+                    created_dir = created_dir[:-len(ext)]
         if os.path.isdir(join(extract_dir, created_dir)):
-            return
-        archive = join(self.download_cache_dir, url.split('/')[-1])
+            return created_dir
+        archive = join(self.download_cache_dir, archive_name)
         log.info('Extracting %s to %s', archive, extract_dir)
         if archive.endswith('.zip'):
             zip = zipfile.ZipFile(archive)
@@ -92,6 +98,7 @@ class Builder(object):
         elif archive.endswith(('.tar.gz', '.tgz')):
             assert self.env.platform != 'win'
             utils.call(['tar', 'zxf', archive, '-C', extract_dir])
+        return created_dir
 
     def install_prerequisites(self):
         pass
@@ -131,8 +138,7 @@ class SconsBuilder(Builder):
         # XXX duplicated with cmake
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
-        created_dir = 'boost_1_42_0'
-        self._extract(url, self.boost_dir, created_dir)
+        created_dir = self._extract(url, self.boost_dir)
         os.rename(join(self.boost_dir, created_dir), join(self.boost_dir, 'src'))
 
     def install_prerequisites(self):
@@ -231,14 +237,12 @@ class CMakeBuilder(Builder):
         if self.env.platform == 'win':
             url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4-win32-x86.zip'
             self._download(url, 'a2525342e495518101381203bf4484c4')
-            created_dir = 'cmake-2.8.4-win32-x86'
-            self._extract(url, self.env.c.thirdparty_dir, created_dir)
+            created_dir = self._extract(url, self.env.c.thirdparty_dir)
             self.cmake_path = join(self.env.c.thirdparty_dir, created_dir, 'bin')
         else:
             url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz'
             self._download(url, '209b7d1d04b2e00986538d74ba764fcf')
-            created_dir = 'cmake-2.8.4'
-            self._extract(url, self.env.c.thirdparty_dir, created_dir)
+            created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
             log.info('Building cmake')
             self.cmake_path = join(self.env.c.thirdparty_dir, 'cmake', 'bin')
@@ -270,10 +274,9 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.12-win32.zip'
-        self._download(url, 'f135a193bd7a330d003714bbd2263782')
-        created_dir = 'mysql-5.5.12-win32'
-        self._extract(url, self.env.c.thirdparty_dir, created_dir)
+        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.14-win32.zip'
+        self._download(url, '89244f46153767f947604e9d7cd1ed91')
+        created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
     def _install_boost(self):
@@ -290,8 +293,7 @@ class CMakeBuilder(Builder):
 
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
-        created_dir = 'boost_1_42_0'
-        self._extract(url, self.env.c.thirdparty_dir, created_dir)
+        created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
         self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
