@@ -25,6 +25,7 @@ var CitySelectorModel = Backbone.Model.extend({
     this.cities.selector = this;
 
     this.allCities = null;
+    this.fixedUpCities = {};
   },
 
   fetchStartingWith: function(prefix) {
@@ -48,7 +49,7 @@ var CitySelectorModel = Backbone.Model.extend({
         n: 9999,
         at_least_a_stop: 1,
         si: Synthese.siteId,
-        output_format: 'json',
+        output_format: "json",
       }).then(function(json) {
 
         // TODO: change once https://188.165.247.81/issues/10786 is fixed.
@@ -76,29 +77,48 @@ var CitySelectorModel = Backbone.Model.extend({
   selectByName: function(cityName) {
 
     var self = this;
+
+    // Call the Cities List service to get the city name from the string the
+    // user may have typed.
+    function fixUpCityName(cityName) {
+      if (self.fixedUpCities[cityName] !== undefined) {
+        return $.Deferred(function(dfd) {
+          dfd.resolve(self.fixedUpCities[cityName]);
+        }).promise();
+      }
+
+      // TODO: maybe factorize on Synthese.
+      return Synthese.callService("lc", {
+        // FIXME: there is a bug in the lexical matcher service, where the first results are not returned unless
+        // we ask for a larger number of results.
+        n: 10,
+        at_least_a_stop: 1,
+        si: Synthese.siteId,
+        t: cityName,
+        output_format: "json"
+      }).pipe(function(json) {
+        var fixedUpCity;
+        if (!json.cities.city || !json.cities.city.city_name) {
+          fixedUpCity = null;
+        } else {
+          fixedUpCity = json.cities.city.city_name;
+        }
+        return self.fixedUpCities[cityName] = fixedUpCity
+      });
+    }
+
     var realCityName;
-
-    // TODO: maybe factorize on Synthese.
-    var xhr = Synthese.callService("lc", {
-      // FIXME: there is a bug in the lexical matcher service, where the first results are not returned unless
-      // we ask for a larger number of results.
-      n: 10,
-      at_least_a_stop: 1,
-      si: Synthese.siteId,
-      t: cityName,
-      output_format: 'json',
-    }).pipe(function(json) {
-
-      if (!json.cities.city || !json.cities.city.city_name)
+    fixUpCityName(cityName).pipe(function(cityName) {
+      if (!cityName)
         return null;
-      realCityName = json.cities.city.city_name;
+      realCityName = cityName;
       return self.fetchStartingWith(realCityName[0]);
 
     }, function() {
       self.trigger("error", "Error while fetching city");
     }).pipe(function() {
       if (!realCityName) {
-        self.trigger("message", "cityNotFound");
+        self.trigger("cityNotFound");
         return;
       }
 
@@ -112,7 +132,7 @@ var CitySelectorModel = Backbone.Model.extend({
 
   select: function(city) {
     this.cities.each(function(c) {
-      c.set({'selected': c === city});
+      c.set({"selected": c === city});
     });
     this.trigger("citySelected", city);
   },
@@ -141,14 +161,14 @@ var CityView = Backbone.View.extend({
   },
 
   render: function() {
-    $(this.el).text(this.model.get('name'));
+    $(this.el).text(this.model.get("name"));
     this.updateSelected();
     return this;
   },
 
   updateSelected: function() {
-    var selected = this.model.get('selected');
-    $(this.el)[selected ? 'addClass' : 'removeClass']('selected');
+    var selected = this.model.get("selected");
+    $(this.el)[selected ? "addClass" : "removeClass"]("selected");
     return this;
   },
 
@@ -205,7 +225,7 @@ var CitySelectorView = Backbone.View.extend({
     '  </ul>',
     '</div>'
   ].join('\n')),
-  
+
   events: {
     "click .letters li": "letterClick",
   },
@@ -342,7 +362,7 @@ var CityBrowser = Backbone.View.extend({
   ].join('\n')),
 
   initialize: function(options) {
-    _.bindAll(this, "zoomRequired", "citySelected", "onError");
+    _.bindAll(this, "zoomRequired", "citySelected", "cityNotFound", "showMessage", "onError");
 
     this.cityExtentCache = {};
 
@@ -352,10 +372,9 @@ var CityBrowser = Backbone.View.extend({
     this.citySelectorView = new CitySelectorView({model: this.citySelectorModel});
 
     this.citySelectorModel.bind("citySelected", this.citySelected);
+    this.citySelectorModel.bind("cityNotFound", this.cityNotFound);
     this.citySelectorModel.bind("error", this.onError);
-    this.citySelectorModel.bind("message", _.bind(function (message) {
-      this.$(".loadingMessage").text(OpenLayers.i18n(message)).fadeIn();
-    }, this));
+    this.citySelectorModel.bind("message", this.showMessage);
 
     var mapClass = options.mapClass || CityBrowserMap;
     this.syntheseMap = new mapClass(null, options.mapOptions);
@@ -364,7 +383,7 @@ var CityBrowser = Backbone.View.extend({
 
     this.render();
 
-    this.citySelectorModel.fetchStartingWith("a");
+    this.resetState();
   },
 
   initTranslations: function() {
@@ -390,13 +409,13 @@ var CityBrowser = Backbone.View.extend({
     });
   },
 
-  initMap: function(div) {
-    return;
-    this.syntheseMap = new this.mapClass(div);
+  resetState: function() {
+    this.citySelectorModel.fetchStartingWith("a");
+    if (this.syntheseMap.map)
+      this.syntheseMap.zoomToInitialPosition();
   },
 
   zoomRequired: function(required) {
-    console.log("zoomRequired", required)
     this.$(".zoomRequiredMessage")[required ? "fadeIn" : "fadeOut"]();
   },
 
@@ -430,9 +449,13 @@ var CityBrowser = Backbone.View.extend({
     });
   },
 
+  showMessage: function(message) {
+    this.$(".loadingMessage").text(OpenLayers.i18n(message)).fadeIn();
+  },
+
   showPendingMessage: function(dfd, message) {
 
-    this.$(".loadingMessage").text(message).fadeIn();
+    this.showMessage(message);
     var self = this;
     dfd.always(function() {
       self.$(".loadingMessage").hide();
@@ -445,12 +468,17 @@ var CityBrowser = Backbone.View.extend({
   citySelected: function(city) {
     var self = this;
 
-    var dfd = this.getCityExtent(city.get('id'));
-    this.showPendingMessage(dfd, OpenLayers.i18n("processing"));
+    var dfd = this.getCityExtent(city.get("id"));
+    this.showPendingMessage(dfd, "processing");
     dfd.done(function(extent) {
       if (extent)
         self.syntheseMap.map.zoomToExtent(extent);
     });
+  },
+
+  cityNotFound: function() {
+    this.resetState();
+    this.showMessage("cityNotFound");
   },
 
   renderMap: function() {
@@ -458,7 +486,7 @@ var CityBrowser = Backbone.View.extend({
       return;
     this.syntheseMap.setMapId(this.$(".map").get(0));
   },
-  
+
   render: function() {
     $(this.el).empty().addClass("cityBrowser");
     $.tmpl(this.template, {}).appendTo(this.el);
@@ -483,6 +511,11 @@ var CityBrowser = Backbone.View.extend({
   },
 
   setActiveCity: function(cityName) {
-    this.citySelectorModel.selectByName(cityName);
+    if (cityName) {
+      this.citySelectorModel.selectByName(cityName);
+      return;
+    }
+
+    this.resetState();
   },
 });
