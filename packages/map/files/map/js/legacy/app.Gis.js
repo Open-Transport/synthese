@@ -64,6 +64,30 @@ window.app.Gis.prototype = {
         return map;
     },
     
+    getBackgroundLayers: function() {
+        var bgLayers = [];
+        bgLayers.push(
+            new OpenLayers.Layer.OSM("OSM")
+        );
+
+        var GOOGLE_NUM_ZOOM_LEVELS = 22;
+
+        bgLayers.push(
+            new OpenLayers.Layer.Google("Photo", {
+                type: google.maps.MapTypeId.SATELLITE,
+                numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
+            })
+        );
+
+        bgLayers.push(
+            new OpenLayers.Layer.Google("Carte", {
+                numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
+            })
+        );
+
+        return bgLayers;
+    },
+    
     /**
      * Method: createLayers
      *     creates all layers
@@ -71,57 +95,8 @@ window.app.Gis.prototype = {
     createLayers: function() {
   
         var layers = [];
-        
-        var getTileURL = function(bounds) {
-            var res = this.map.getResolution();
-            var x = Math.round((bounds.left - this.maxExtent.left) / (res * this.tileSize.w));
-            var y = Math.round((this.maxExtent.top - bounds.top) / (res * this.tileSize.h));
-            var z = this.map.getZoom();
-            var limit = Math.pow(2, z);
-            if (y < 0 || y >= limit) {
-                return OpenLayers.Util.getImagesLocation() + "blank.gif";
-            } else {
-                x = ((x % limit) + limit) % limit;
-                var path = z + "/" + x + "/" + y + "." + this.type;
-                if (this.url instanceof Array) {
-                    return this.selectUrl(path, this.url) + path;
-                } else {
-                    return this.url + path;
-                }
-            }
-        };
-        
-        layers.push(
-            new OpenLayers.Layer.TMS(
-                "OSM",
-                [
-                    "http://a.tile.openstreetmap.org/",
-                    "http://b.tile.openstreetmap.org/",
-                    "http://c.tile.openstreetmap.org/"
-                ],
-                {
-                    type: 'png',
-                    getURL: getTileURL,
-                    displayOutsideMaxExtent: true,
-                    //numZoomLevels: 19,
-                    attribution: '<a href="http://www.openstreetmap.org/">OpenStreetMap</a>'
-                }
-            )
-        );
-        
-        layers.push(
-            new OpenLayers.Layer.Google("Photo", {
-                sphericalMercator: true,
-                type: G_SATELLITE_MAP
-            })
-        );
-        
-        layers.push(
-            new OpenLayers.Layer.Google("Google", {
-                sphericalMercator: true,
-                type: G_NORMAL_MAP // [G_PHYSICAL_MAP | G_NORMAL_MAP | G_SATELLITE_MAP | G_HYBRID_MAP]
-            })
-        );
+
+        layers.push.apply(layers, this.getBackgroundLayers());
 
         layers.push(
             new OpenLayers.Layer.Vector("BlackRoutes", {
@@ -432,7 +407,7 @@ window.app.Gis.prototype = {
         
         layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
-                picto: 'img/'+fileName, 
+                picto: '/map/images/' + fileName, 
                 name: name
             })
         ]);
@@ -490,10 +465,6 @@ window.app.Gis.prototype = {
      * Method: init
      */
     init: function() {
-        
-        OpenLayers.ImgPath = 'img/openlayers/';
-        OpenLayers.IMAGE_RELOAD_ATTEMPTS = 3;
-        OpenLayers.Util.onImageLoadErrorColor = "transparent";
         OpenLayers.Lang.setCode('fr');
         
         OpenLayers.Popup.AutoSizedFramedCloud = OpenLayers.Class(

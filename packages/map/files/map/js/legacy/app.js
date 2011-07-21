@@ -52,6 +52,8 @@ window.app = function() {
          *
          */
         init: function() {
+            if (!window.bootstrap)
+                return;
             // bootstrap data got from HTML page
             this.bootstrap = OpenLayers.Util.extend({}, bootstrap);
             
@@ -136,45 +138,4 @@ window.app = function() {
             }
         }
     };
-}();
-
-window.app.componentsLoader = function() {
-
-    var jsAdder = function(filesArray) {
-        // use "parser-inserted scripts" for guaranteed execution order
-        // http://hsivonen.iki.fi/script-execution/
-        var scriptTags = new Array(filesArray.length);
-        for (var i=0, len=filesArray.length; i<len; i++) {
-            scriptTags[i] = "<script src='" + filesArray[i] +
-                                   "'></script>"; 
-        }
-        if (scriptTags.length > 0) {
-            document.write(scriptTags.join(""));
-        }
-    };
-    
-    var cssAdder = function(filesArray) {
-        var cssNode;
-        for (var i=0, len=filesArray.length; i<len; i++) {
-            cssNode = document.createElement('link');
-            cssNode.setAttribute('rel', 'stylesheet');
-            cssNode.setAttribute('type', 'text/css');
-            cssNode.setAttribute('href', filesArray[i]);
-            document.getElementsByTagName('head')[0].appendChild(cssNode);
-        }
-    };
-
-    jsAdder([
-        '/js/OpenLayers.js',
-        '/js/app.setup.js',
-        '/js/app.Gis.js',
-        // patches:
-        '/js/MapType.js',
-        '/js/MapTypePanel.js'
-    ]);
-    
-    cssAdder([
-        '/css/openlayers/style.css',
-        '/css/style.css'
-    ]);
 }();
