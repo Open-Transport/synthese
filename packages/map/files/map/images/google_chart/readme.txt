@@ -1,0 +1,1 @@
+Icons generated with http://groups.google.com/group/google-chart-api/web/chart-types-for-map-pins
