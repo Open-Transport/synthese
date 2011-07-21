@@ -1,12 +1,4 @@
-/**
- * TODO: doc.
- */
-
 (function() {
-
-})();
-
-// TODO: put in anonymous namespace and export mininum stuff.
 
 // === Models ===
 
@@ -97,13 +89,20 @@ var CitySelectorModel = Backbone.Model.extend({
         t: cityName,
         output_format: "json"
       }).pipe(function(json) {
-        var fixedUpCity;
-        if (!json.cities.city || !json.cities.city.city_name) {
-          fixedUpCity = null;
-        } else {
-          fixedUpCity = json.cities.city.city_name;
-        }
-        return self.fixedUpCities[cityName] = fixedUpCity
+        json.cities.city
+        if (!json.cities.city)
+          return self.fixedUpCities[cityName] = null;
+        
+        // Result can be an array or object due to this issue:
+        // https://188.165.247.81/issues/10786
+        var cityObj = json.cities.city;
+        if (_.isArray(cityObj))
+          cityObj = cityObj[0];
+
+        if (!cityObj.city_name)
+          return self.fixedUpCities[cityName] = null;
+
+        return self.fixedUpCities[cityName] = cityObj.city_name;
       });
     }
 
@@ -276,7 +275,7 @@ var CitySelectorView = Backbone.View.extend({
     var lineHeight = Math.floor(height / (this.letterCodes.length + 1));
     this.$(".letters li").css("line-height", lineHeight + "px");
   },
-  
+
   letterClick: function(event) {
     event.stopPropagation();
     event.preventDefault();
@@ -298,7 +297,7 @@ var CitySelectorView = Backbone.View.extend({
   },
 });
 
-var CityBrowserMap = OpenLayers.Class(SyntheseMap, {
+window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
 
   initialize: function(mapId, options) {
     _.extend(this, Backbone.Events);
@@ -372,7 +371,7 @@ var CityBrowserMap = OpenLayers.Class(SyntheseMap, {
 });
 
 
-var CityBrowser = Backbone.View.extend({
+window.CityBrowser = Backbone.View.extend({
 
   template: $.template(null, [
     '<div class="citySelector"></div>',
@@ -544,3 +543,5 @@ var CityBrowser = Backbone.View.extend({
     this.resetState();
   },
 });
+
+})();
