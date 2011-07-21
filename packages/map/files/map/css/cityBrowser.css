@@ -29,13 +29,15 @@
 }
 
 .citySelector > .letters {
-  width: 20px; 
+  display: none;
+  width: 20px;
+  overflow: hidden;
   position: fixed;
   text-align: center;
 }
 .citySelector > .letters > li {
-  padding: 2px 0;
-  border: 1px solid gray;
+  vertical-align: middle;
+  border-bottom: 1px solid gray;
   background-color: #D1D1D1;
   background-image: -moz-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
   background-image: -webkit-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
