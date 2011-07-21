@@ -15,10 +15,9 @@ var StopSelectorPopup = Backbone.View.extend({
 
   initialize: function(options) {
     this.initTranslations();
-    this.cityBrowserView =  new CityBrowser({
-      mapOptions: options.mapOptions,
-      noMapAutoRender: true,
-    });
+    this.cityBrowserView =  new CityBrowser(_.defaults({
+      noMapAutoRender: true
+    }, this.options.cityBrowserOptions));
 
     var self = this;
     this.cityBrowserView.syntheseMap.bind("all", function(eventName, arg) {
@@ -89,12 +88,7 @@ var StopSelector = Backbone.View.extend({
 
     var city = this.routePlanner.getCity(departure);
 
-    if (city) {
-      this.selectorPopup.cityBrowserView.setActiveCity(city);
-    } else {
-      var syntheseMap = this.selectorPopup.cityBrowserView.syntheseMap;
-      syntheseMap.zoomToInitialPosition();
-    }
+    this.selectorPopup.cityBrowserView.setActiveCity(city);
     this.currentDirection = departure;
   },
 
@@ -102,10 +96,9 @@ var StopSelector = Backbone.View.extend({
     $(this.popupEl).show();
     if (this.selectorPopup)
       return;
-    this.selectorPopup = new StopSelectorPopup({
-      el: this.popupEl,
-      mapOptions: this.options.mapOptions,
-    });
+    this.selectorPopup = new StopSelectorPopup(_.defaults({
+      el: this.popupEl
+    }, this.options.popupOptions));
     this.selectorPopup.bind("stopSelected", this.stopSelected);
   },
 
