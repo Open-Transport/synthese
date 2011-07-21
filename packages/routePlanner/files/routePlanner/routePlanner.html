@@ -26,9 +26,6 @@
   }
   </style>
 
-
-
-
 </head>
 <body>
   <h1>Route Planner Demo</h1>
@@ -115,7 +112,7 @@
       addEvent(document.getElementById("fh"), "click", mouse_click_handler);
     }
   }
-  
+
   $(function() {
     Synthese.init();
     initAutoCompletions(Synthese.siteId);
@@ -128,9 +125,9 @@
         formName: "routePlannerForm",
       }
     });
-    
-    // For debugging:
-    $(".mapLink:first").trigger("click");
+
+    if (localStorage.debug_showMap)
+      $(".mapLink:first").trigger("click");
   });
   </script>
 
