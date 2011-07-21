@@ -231,16 +231,18 @@ var CitySelectorView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, "render", "prefixUpdated", "updateEmptyMessage");
+    _.bindAll(this, "render", "prefixUpdated", "updateEmptyMessage", 
+        "setLettersSize");
 
     this.cityList = new CityListView({collection: this.model.cities});
     this.model.bind("change:prefix", this.prefixUpdated);
     this.model.cities.bind("reset", this.updateEmptyMessage);
+    this.letterCodes = _.range("A".charCodeAt(0), "Z".charCodeAt(0) + 1);
     this.render();
   },
 
   render: function() {
-    var letters = _.map(_.range("A".charCodeAt(0), "Z".charCodeAt(0) + 1),
+    var letters = _.map(this.letterCodes,
       function (charCode) {
         return String.fromCharCode(charCode);
       }
@@ -250,8 +252,31 @@ var CitySelectorView = Backbone.View.extend({
     }).appendTo(this.el);
 
     this.$('.cityList').replaceWith(this.cityList.el);
+
+    var self = this;
+
+    function pollUntilSized() { 
+      var height = $(self.el).height();
+      // Firefox seems to return a height of 100 when not yet in the dom.
+      // This might cause issues if the real height is 100.
+      if (height == 0 || (jQuery.browser.mozilla && height == 100)) { 
+        setTimeout(pollUntilSized, 500);
+        return;
+      }
+      self.setLettersSize();
+    }
+    pollUntilSized();
+    $(window).resize(this.setLettersSize);
   },
 
+  setLettersSize: function() {
+    var height = $(this.el).height();
+    this.$(".letters").show().css("height", height);
+    // Without the "+ 1", the last letter is not visible.
+    var lineHeight = Math.floor(height / (this.letterCodes.length + 1));
+    this.$(".letters li").css("line-height", lineHeight + "px");
+  },
+  
   letterClick: function(event) {
     event.stopPropagation();
     event.preventDefault();
