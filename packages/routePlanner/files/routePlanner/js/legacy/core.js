@@ -458,7 +458,8 @@ function highlight(n)
   for (var l = 0; l<suggestionLongueur; ++l) {
     setStylePourElement(suggestionList.item(l), "AutoCompleteDiv");
   }
-  setStylePourElement(_highlightedSuggestionDiv, "AutoCompleteDivAct");
+  if (_highlightedSuggestionDiv)
+    setStylePourElement(_highlightedSuggestionDiv, "AutoCompleteDivAct");
 }
 
 
