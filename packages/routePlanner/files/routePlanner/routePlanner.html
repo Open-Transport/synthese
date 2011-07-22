@@ -30,7 +30,7 @@
 <body>
   <h1>Route Planner Demo</h1>
 
-  <form action="/todo" class="routePlannerForm" name="routePlannerForm">
+  <form class="routePlannerForm" name="routePlannerForm">
     <div class=departure>
       <div>Ville de départ <a class="mapLink" href="#">Carte</a></div>
       <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
@@ -49,6 +49,7 @@
       <label for="noTransfer">Sans correspondance</label> 
     </div>
     <div>
+      <input type="hidden" name="siteId">
       <input type="submit" id="submitButton" value="Submit">
     </div>
   </form>
@@ -123,8 +124,10 @@
   </script>
   <script>
   $(function() {
+    var form = this.getElementsByName("routePlannerForm")[0];
+    form.siteId.value = Synthese.siteId;
     var stopSelector = new StopSelector({
-      routePlanner: new RoutePlannerView({el: this.getElementsByName("routePlannerForm")[0]}),
+      routePlanner: new RoutePlannerView({el: form}),
       routePlannerOptions: {
         formName: "routePlannerForm",
       }
