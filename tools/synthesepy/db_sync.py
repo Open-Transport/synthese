@@ -120,13 +120,14 @@ def sync_to_files(project):
         _sync_site_to_files(project, site)
 
 
-def _sync_files_to_site(project, site):
+def _sync_files_to_site(project, site, host):
     # TODO: USE_HTTP requires the daemon to be running.
     # Maybe have an option to automatically launch if not?
 
-    USE_HTTP = True
+    USE_HTTP = True or host
+
     if USE_HTTP:
-        api = http_api.HTTPApi(project.env)
+        api = http_api.HTTPApi(project.env, host)
 
     target_base = join(site.path, 'web_pages')
     id_to_path = json.load(open(join(target_base, 'id_to_path.json'), 'rb'))
@@ -143,7 +144,7 @@ def _sync_files_to_site(project, site):
                 [content, id])
 
 
-def sync_from_files(project):
+def sync_from_files(project, host=None):
     for site in project.sites:
         log.info('Syncing files from site %r', site.name)
-        _sync_files_to_site(project, site)
+        _sync_files_to_site(project, site, host)

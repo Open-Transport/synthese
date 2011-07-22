@@ -179,7 +179,7 @@ class WSGIProxy(object):
         path_info = environ['PATH_INFO']
 
         # Redirect helper. Might not work depending on project settings.
-        if path_info == '/admin':
+        if path_info in ('/admin', '/synthese3/admin/'):
             return self._redirect(
                 environ,
                 start_response,
