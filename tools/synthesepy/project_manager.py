@@ -409,8 +409,8 @@ class Project(object):
     def db_sync_to_files(self):
         db_sync.sync_to_files(self)
 
-    def db_sync_from_files(self):
-        db_sync.sync_from_files(self)
+    def db_sync_from_files(self, host=None):
+        db_sync.sync_from_files(self, host)
 
     # Commands for syncing or managing a remote project.
 

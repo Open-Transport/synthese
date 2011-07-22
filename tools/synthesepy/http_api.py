@@ -55,7 +55,7 @@ class HTTPApi(object):
             self._get_sid()
 
         br = self._get_browser()
-        admin_url = 'http://%s/admin' % self.hostname
+        admin_url = 'http://%s/synthese3/admin/' % self.hostname
         br.open(admin_url)
         return br
 
@@ -77,7 +77,7 @@ class HTTPApi(object):
         return self.sid
 
     def call_service(self, name, params, send_sid=False):
-        SYNTHESE_URL = 'http://%s/synthese3' % self.hostname
+        SYNTHESE_URL = 'http://%s/synthese' % self.hostname
         p = {
             'a': name,
         }
