@@ -492,7 +492,6 @@ window.app.Gis.prototype = {
      * Method: destroy
      */
     destroy: function() {
-        GUnload();
         this.map = null;
     },
         
