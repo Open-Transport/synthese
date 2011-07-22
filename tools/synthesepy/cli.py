@@ -144,7 +144,10 @@ def add_project_subparsers(subparsers):
     add_parser('db_dump')
     add_parser('db_open_dump', ('db_opendump',))
     add_parser('db_sync_to_files')
-    add_parser('db_sync_from_files')
+    def db_sync_from_files(project, args, env):
+        project.db_sync_from_files(args.host)
+    parser = add_parser('db_sync_from_files', func=db_sync_from_files)
+    parser.add_argument('--host', help='Synthese host where to update pages')
     def db_restore(project, args, env):
         project.db_restore(args.db_dump)
     parser = add_parser('db_restore', func=db_restore)
