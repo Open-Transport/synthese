@@ -1,25 +1,23 @@
 var RoutePlannerView = Backbone.View.extend({
 
-  initialize: function(options) {
-    var formName = options.formName || "ri"
+  events: {
+    "click .mapLink": "mapLinkClick",
+    "change #noTransfer": "updateMaxDepth",
+  },
 
-    this.$form = $("form[name=" + formName + "]");
+  initialize: function(options) {
+    _.bindAll(this, "mapLinkClick", "updateMaxDepth");
+
     this.departure = {
-      city: this.$form.find("#origin_city_txt"),
-      place: this.$form.find("#origin_place_txt"),
+      city: this.$("#origin_city_txt"),
+      place: this.$("#origin_place_txt"),
     };
     this.arrival = {
-      city: this.$form.find("#destination_city_txt"),
-      place: this.$form.find("#destination_place_txt"),
+      city: this.$("#destination_city_txt"),
+      place: this.$("#destination_place_txt"),
     };
 
-    var self = this;
-    $(".mapLink").show().click(function(event) {
-      event.stopPropagation();
-      event.preventDefault();
-      self.trigger("mapLinkClick", $(event.target).parents(".departure").length > 0);
-    });
-
+    this.$(".mapLink").show();
   },
 
   getDirectionObj: function(departure) {
@@ -36,6 +34,17 @@ var RoutePlannerView = Backbone.View.extend({
   },
   setPlace: function(departure, placeName) {
     return this.getDirectionObj(departure).place.val(placeName);
+  },
+
+  mapLinkClick: function(event) {
+    event.stopPropagation();
+    event.preventDefault();
+    this.trigger("mapLinkClick", $(event.target).parents(".departure").length > 0);
+  },
+
+  updateMaxDepth: function(event) {
+    var noTransfer = this.$("input#noTransfer").prop("checked");
+    this.$("input[name=md]").val(noTransfer ? "0" : "9999");
   },
 
 });

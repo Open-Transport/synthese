@@ -44,9 +44,12 @@
       <input class=place type=text name=apt id=destination_place_txt><br>
     </div>
     <div>
-      <!--
+      <input type="hidden" name="md" value="9999">
+      <input type="checkbox" id="noTransfer">
+      <label for="noTransfer">Sans correspondance</label> 
+    </div>
+    <div>
       <input type="submit" id="submitButton" value="Submit">
-      -->
     </div>
   </form>
   
@@ -121,6 +124,7 @@
   <script>
   $(function() {
     var stopSelector = new StopSelector({
+      routePlanner: new RoutePlannerView({el: this.getElementsByName("routePlannerForm")[0]}),
       routePlannerOptions: {
         formName: "routePlannerForm",
       }

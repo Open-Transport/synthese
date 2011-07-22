@@ -70,7 +70,8 @@ var StopSelector = Backbone.View.extend({
   initialize: function(options) {
     _.bindAll(this, "mapLinkClick", "stopSelected");
 
-    this.routePlanner = new RoutePlannerView(options.routePlannerOptions || {});
+    this.routePlanner = options.routePlanner ||
+      new RoutePlannerView(options.routePlannerOptions || {});
     this.routePlanner.bind("mapLinkClick", this.mapLinkClick);
 
     if (options.popupEl) {
