@@ -8,6 +8,10 @@ var City = Backbone.Model.extend({
 
 var CityCollection = Backbone.Collection.extend({
   model: City,
+
+  comparator: function(city) {
+    return city.get("sortName");
+  }
 });
 
 
@@ -16,12 +20,11 @@ var CitySelectorModel = Backbone.Model.extend({
     this.cities = new CityCollection();
     this.cities.selector = this;
 
-    this.allCities = null;
     this.fixedUpCities = {};
   },
 
-  fetchStartingWith: function(prefix) {
 
+  showStartingWith: function(prefix) {
     var prefix = prefix.toLowerCase();
     this.set({prefix: prefix});
 
@@ -30,36 +33,52 @@ var CitySelectorModel = Backbone.Model.extend({
     // TODO: implement a service to return only the cities starting with the letter.
     // Until then, we retrieve all cities and filter from that.
 
-    return $.Deferred(function(dfd) {
+    function removeAccents(string) {
+      return string.replace(/[àâä]/gi,"a")
+        .replace(/[éèêë]/gi,"e")
+        .replace(/[îï]/gi,"i")
+        .replace(/[ôö]/gi,"o")
+        .replace(/[ùûü]/gi,"u")
+    }
 
-      if (self.allCities)
-        return dfd.resolve(self.allCities);
+    // Returns the name of the city used for sorting and filtering.
+    function getCitySortName(cityName) {
+      var sortName = removeAccents(cityName).toLowerCase();
+      sortName = sortName.replace(/^(la |le |les |l')/, "");
+      var firstCharCode = sortName.toLowerCase().charCodeAt(0);
+      var aCharCode = "a".charCodeAt(0);
+      var zCharCode = "z".charCodeAt(0);
+      if (firstCharCode < aCharCode || firstCharCode > zCharCode) {
+        console.warn("Special char code", firstCharCode, "for city", cityName);
+      }
+      return sortName;
+    }
 
-      console.log("Fetching all cities");
+    function getCities() {
+      if (self.cities.length > 0)
+        return self.cities;
 
-      Synthese.callService("lc", {
+      return Synthese.callService("lc", {
         n: 9999,
         at_least_a_stop: 1,
         si: Synthese.siteId,
         output_format: "json",
       }).then(function(json) {
-
         // TODO: change once https://188.165.247.81/issues/10786 is fixed.
-        self.allCities = json.cities.city;
-        dfd.resolve(self.allCities);
-      }, dfd.reject);
+        self.cities.reset(_.map(json.cities.city, function(jsonCity) {
+          return {
+            id: jsonCity.city_id,
+            name: jsonCity.city_name,
+            sortName: getCitySortName(jsonCity.city_name)
+          };
+        }));
+      });
+    }
 
-    }).pipe(function(cities) {
-      return _(cities).chain().select(function(city) {
-        return city.city_name.toLowerCase().indexOf(prefix) === 0;
-      }).value();
-    }).done(function(cities) {
-      self.cities.reset(_(cities).map(function(city) {
-        return {
-          id: city.city_id,
-          name: city.city_name,
-        };
-      }));
+    $.when(getCities()).done(function() {
+      self.cities.each(function(city) {
+        city.set({"visible": city.get("sortName").indexOf(prefix) === 0});
+      });
     }).fail(function() {
       console.warn("Error while fetching cities", arguments);
       self.trigger("error", "Error while fetching cities");
@@ -92,7 +111,7 @@ var CitySelectorModel = Backbone.Model.extend({
         json.cities.city
         if (!json.cities.city)
           return self.fixedUpCities[cityName] = null;
-        
+
         // Result can be an array or object due to this issue:
         // https://188.165.247.81/issues/10786
         var cityObj = json.cities.city;
@@ -111,7 +130,7 @@ var CitySelectorModel = Backbone.Model.extend({
       if (!cityName)
         return null;
       realCityName = cityName;
-      return self.fetchStartingWith(realCityName[0]);
+      return self.showStartingWith(realCityName[0]);
 
     }, function() {
       self.trigger("error", "Error while fetching city");
@@ -135,9 +154,6 @@ var CitySelectorModel = Backbone.Model.extend({
     });
     this.trigger("citySelected", city);
   },
-
-  // TODO
-  // getSelectedCity
 });
 
 
@@ -151,8 +167,9 @@ var CityView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, "render", "updateSelected", "select");
+    _.bindAll(this, "render", "updateSelected", "updateVisible", "select");
     this.model.bind("change:selected", this.updateSelected);
+    this.model.bind("change:visible", this.updateVisible);
 
     this.model.bind("ensureVisible", _.bind(function() {
       this.el.scrollIntoView();
@@ -161,6 +178,7 @@ var CityView = Backbone.View.extend({
 
   render: function() {
     $(this.el).text(this.model.get("name"));
+    $(this.el)[this.model.get("visible") ? "show" : "hide"]();
     this.updateSelected();
     return this;
   },
@@ -168,6 +186,12 @@ var CityView = Backbone.View.extend({
   updateSelected: function() {
     var selected = this.model.get("selected");
     $(this.el)[selected ? "addClass" : "removeClass"]("selected");
+    return this;
+  },
+
+  updateVisible: function() {
+    var visible = this.model.get("visible");
+    $(this.el)[visible ? "show" : "hide"]();
     return this;
   },
 
@@ -189,12 +213,6 @@ var CityListView = Backbone.View.extend({
     this.collection.bind("reset", this.addAll);
 
     this.render();
-  },
-
-  render: function() {
-    if (this.collection.length == 0)
-      $
-    return this;
   },
 
   addOne: function(city) {
@@ -230,7 +248,7 @@ var CitySelectorView = Backbone.View.extend({
   },
 
   initialize: function() {
-    _.bindAll(this, "render", "prefixUpdated", "updateEmptyMessage", 
+    _.bindAll(this, "render", "prefixUpdated", "updateEmptyMessage",
         "setLettersSize");
 
     this.cityList = new CityListView({collection: this.model.cities});
@@ -254,11 +272,11 @@ var CitySelectorView = Backbone.View.extend({
 
     var self = this;
 
-    function pollUntilSized() { 
+    function pollUntilSized() {
       var height = $(self.el).height();
       // Firefox seems to return a height of 100 when not yet in the dom.
       // This might cause issues if the real height is 100.
-      if (height == 0 || (jQuery.browser.mozilla && height == 100)) { 
+      if (height == 0 || (jQuery.browser.mozilla && height == 100)) {
         setTimeout(pollUntilSized, 500);
         return;
       }
@@ -279,7 +297,7 @@ var CitySelectorView = Backbone.View.extend({
   letterClick: function(event) {
     event.stopPropagation();
     event.preventDefault();
-    this.model.fetchStartingWith($(event.target).text().toLowerCase());
+    this.model.showStartingWith($(event.target).text().toLowerCase());
   },
 
   prefixUpdated: function() {
@@ -434,7 +452,7 @@ window.CityBrowser = Backbone.View.extend({
   },
 
   resetState: function() {
-    this.citySelectorModel.fetchStartingWith("a");
+    this.citySelectorModel.showStartingWith("a");
     if (this.syntheseMap.map)
       this.syntheseMap.zoomToInitialPosition();
   },
@@ -462,14 +480,6 @@ window.CityBrowser = Backbone.View.extend({
       });
 
       return self.cityExtentCache[cityId] = extent;
-      // for testing loading message.
-      /*
-      return $.Deferred(function(dfd) {
-        setTimeout(function() {
-          dfd.resolveWith(self, [extent]);
-        }, 10000);
-      });
-      */
     });
   },
 

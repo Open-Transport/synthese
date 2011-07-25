@@ -294,21 +294,12 @@ var SyntheseMap = OpenLayers.Class({
 
   getStopsStyleMap: function() {
     var context = {
-      getStrokeWidth: function(feature) {
-        var zoom = feature.layer.map.getZoom();
-        var width;
-        if (zoom <= 12) {
-          width = 2;
-        } else if (zoom <= 14) {
-          width = 4;
-        } else {
-          width = 6;
-        }
-        if (feature.attributes.background)
-          width += 2;
-        return width;
-      },
       getPointRadius: function(feature) {
+        var zoom = feature.layer.map.getZoom();
+        if (zoom <= 12)
+          return 3;
+        if (zoom <= 14)
+          return 4;
         return 6;
       },
       getLabel: function(feature) {
