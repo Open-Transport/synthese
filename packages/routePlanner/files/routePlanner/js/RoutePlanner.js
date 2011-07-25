@@ -1,3 +1,4 @@
+// XXX rename to RoutePlannerFormView in order to have other objects not related to the form?
 var RoutePlannerView = Backbone.View.extend({
 
   events: {
