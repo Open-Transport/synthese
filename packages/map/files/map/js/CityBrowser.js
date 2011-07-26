@@ -64,6 +64,11 @@ var CitySelectorModel = Backbone.Model.extend({
         si: Synthese.siteId,
         output_format: "json",
       }).then(function(json) {
+        // Result can be an array or object due to this issue:
+        // https://188.165.247.81/issues/10786
+        if (!_.isArray(json.cities.city))
+          json.cities.city = [json.cities.city];
+
         // TODO: change once https://188.165.247.81/issues/10786 is fixed.
         self.cities.reset(_.map(json.cities.city, function(jsonCity) {
           return {
@@ -157,7 +162,7 @@ var CitySelectorModel = Backbone.Model.extend({
 });
 
 
-//=== Views ===
+// === Views ===
 
 var CityView = Backbone.View.extend({
   tagName: "li",
