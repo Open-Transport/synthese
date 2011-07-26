@@ -56,6 +56,8 @@ class HTTPTestCase(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(HTTPTestCase, self).__init__(*args, **kwargs)
 
+    # TODO: add setUp / tearDown to reset http_api browser state?
+
     @classmethod
     def setUpClass(cls):
         log.info('setupClass %s, with backend %s', cls.__name__, cls.backend)

@@ -412,6 +412,9 @@ class Project(object):
     def db_sync_from_files(self, host=None):
         db_sync.sync_from_files(self, host)
 
+    def db_sync(self, host=None):
+        db_sync.sync(self, host)
+
     # Commands for syncing or managing a remote project.
 
     def db_remote_dump(self):
