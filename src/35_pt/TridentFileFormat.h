@@ -128,6 +128,7 @@ namespace synthese
 					bool		_importStops;
 					bool		_autoGenerateStopAreas;
 					bool		_importJunctions;
+					bool		_mergeRoutes;
 					boost::posix_time::time_duration	_defaultTransferDuration;
 					boost::gregorian::date	_startDate;
 					bool		_treatAllStopAreaAsQuay;
@@ -147,6 +148,7 @@ namespace synthese
 				static const std::string PARAMETER_WITH_OLD_DATES;
 				static const std::string PARAMETER_AUTOGENERATE_STOP_AREAS;
 				static const std::string PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY;
+				static const std::string PARAMETER_MERGE_ROUTES;
 
 				Importer_(
 					util::Env& env,

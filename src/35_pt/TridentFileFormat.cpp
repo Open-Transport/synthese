@@ -116,6 +116,7 @@ namespace synthese
 		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
 		const string TridentFileFormat::Importer_::PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY("sasp");
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES("itt");
+		const string TridentFileFormat::Importer_::PARAMETER_MERGE_ROUTES("mr");
 		const string TridentFileFormat::Exporter_::PARAMETER_LINE_ID("li");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_TISSEO_EXTENSION("wt");
 		const string TridentFileFormat::Exporter_::PARAMETER_WITH_OLD_DATES("wod");
@@ -140,7 +141,8 @@ namespace synthese
 			_autoGenerateStopAreas(false),
 			_defaultTransferDuration(minutes(8)),
 			_startDate(day_clock::local_day()),
-			_importTimetablesAsTemplates(false)
+			_importTimetablesAsTemplates(false),
+			_mergeRoutes(true)
 		{}
 
 
@@ -163,6 +165,7 @@ namespace synthese
 			}
 			result.insert(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay);
 			result.insert(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates);
+			result.insert(PARAMETER_MERGE_ROUTES, _mergeRoutes);
 			return result;
 		}
 
@@ -197,6 +200,7 @@ namespace synthese
 			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 			_treatAllStopAreaAsQuay = map.getDefault<bool>(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, false);
 			_importTimetablesAsTemplates = map.getDefault<bool>(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, false);
+			_mergeRoutes = map.getDefault<bool>(PARAMETER_MERGE_ROUTES, true);
 		}
 
 
@@ -1581,7 +1585,7 @@ namespace synthese
 
 				routes[objectId] = PTFileFormat::CreateOrUpdateRoute(
 					*cline,
-					optional<const string&>(objectId),
+					_mergeRoutes ? optional<const string&>() : optional<const string&>(objectId),
 					optional<const string&>(routeNames[routeId]),
 					optional<const string&>(),
 					optional<Destination*>(),
@@ -2105,6 +2109,7 @@ namespace synthese
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
 			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
+			stream << t.cell("Fusionner itinéraires par valeur", t.getForm().getOuiNonRadioInput(PARAMETER_MERGE_ROUTES, _mergeRoutes));
 			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));
 			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
 			stream << t.cell("Importer calendriers en tant que modèles", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates));
