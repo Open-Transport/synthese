@@ -102,7 +102,7 @@ namespace synthese
 		void DBInheritedTableSyncTemplate<LineStopTableSync,LineAreaInheritedTableSync,LineArea>::Unlink(
 			LineArea* obj
 		){
-
+			obj->getLine()->removeEdge(*obj);
 		}
 
 

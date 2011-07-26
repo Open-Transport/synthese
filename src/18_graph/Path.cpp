@@ -532,58 +532,70 @@ namespace synthese
 				return;
 			}
 
-			// Next arrival and next in path of the previous
-			if(removalPosition != _edges.begin() && edge.isArrivalAllowed())
+			if(!edge.getSubEdges().empty())
 			{
-				Edge* nextArrival(edge.getFollowingArrivalForFineSteppingOnly());
-				Edge* nextConnectingArrival(edge.getFollowingConnectionArrival());
+				const Edge& lastEdge(**edge.getSubEdges().rbegin());
+				const Edge& firstEdge(**edge.getSubEdges().begin());
+				Edge* lastRealEdge(firstEdge.getPrevious());
+				Edge* firstRealEdge(lastEdge.getNext());
 
-				for(Edges::iterator it(removalPosition-1);
-					(*it)->getFollowingArrivalForFineSteppingOnly() == &edge;
-					--it
-				){
-					(*it)->setFollowingArrivalForFineSteppingOnly(nextArrival);
-					if (it == _edges.begin()) break;
-				}
-
-				if(edge.isConnectingEdge())
+				// Next arrival and next in path of the previous
+				if(removalPosition != _edges.begin() && edge.isArrivalAllowed() && lastRealEdge)
 				{
-					for(Edges::iterator it(removalPosition-1);
-						(*it)->getFollowingConnectionArrival() == &edge;
-						--it
-					){
-						(*it)->setFollowingConnectionArrival(nextConnectingArrival);
-						if (it == _edges.begin()) break;
-					}
+					Edge* nextArrival(lastEdge.getFollowingArrivalForFineSteppingOnly());
+					Edge* nextConnectingArrival(lastEdge.getFollowingConnectionArrival());
+					
+					{
+						Edge* oldNextArrival(lastRealEdge->getFollowingArrivalForFineSteppingOnly());
+
+						for(Edge* it(lastRealEdge);
+							it && it->getFollowingArrivalForFineSteppingOnly() == oldNextArrival;
+							it = it->getPrevious()
+						){
+							it->setFollowingArrivalForFineSteppingOnly(nextArrival);
+					}	}
+
+					{
+						Edge* oldNextConnectionArrival(lastRealEdge->getFollowingConnectionArrival());
+
+						for(Edge* it(lastRealEdge);
+							it && it->getFollowingConnectionArrival() == oldNextConnectionArrival;
+							it = it->getPrevious()
+						){
+							it->setFollowingConnectionArrival(nextConnectingArrival);
+					}	}
+
+					lastRealEdge->setNext(firstRealEdge);
 				}
 
-				edge.getPrevious()->setNext(edge.getNext());
-			}
-
-			// Previous departure
-			if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed())
-			{
-				Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
-				Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
-
-				for(Edges::iterator it(removalPosition + 1);
-					it != _edges.end() && (*it)->getPreviousDepartureForFineSteppingOnly() == &edge;
-					++it
-				){
-					(*it)->setPreviousDepartureForFineSteppingOnly(previousDeparture);
-				}
-
-				if(edge.isConnectingEdge())
+				// Previous departure
+				if(removalPosition+1 != _edges.end() && edge.isDepartureAllowed() && firstRealEdge)
 				{
-					for(Edges::iterator it(removalPosition + 1);
-						it != _edges.end() && (*it)->getPreviousConnectionDeparture() == &edge;
-						++it
-					){
-						(*it)->setPreviousConnectionDeparture(previousConnectingDeparture);
-					}
-				}
+					Edge* previousDeparture(edge.getPreviousDepartureForFineSteppingOnly());
+					Edge* previousConnectingDeparture(edge.getPreviousConnectionDeparture());
 
-				edge.getNext()->setPrevious(edge.getPrevious());
+					{
+						Edge* oldPreviousDeparture(firstRealEdge->getPreviousDepartureForFineSteppingOnly());
+
+						for(Edge* it(firstRealEdge);
+							it && it->getPreviousDepartureForFineSteppingOnly() == oldPreviousDeparture;
+							it = it->getNext()
+						){
+							it->setPreviousDepartureForFineSteppingOnly(previousDeparture);
+					}	}
+
+					{
+						Edge* oldPreviousConnectionDeparture(firstRealEdge->getPreviousConnectionDeparture());
+
+						for(Edge* it(firstRealEdge);
+							it && it->getPreviousConnectionDeparture() == oldPreviousConnectionDeparture;
+							it = it->getNext()
+						){
+							it->setPreviousConnectionDeparture(previousConnectingDeparture);
+					}	}
+
+					firstRealEdge->setPrevious(lastRealEdge);
+				}
 			}
 
 			// Update of the rank map
@@ -593,7 +605,7 @@ namespace synthese
 				_rankMap.erase(it);
 			}
 
-			// Insertion of the new edges
+			// Removal of the edge
 			_edges.erase(removalPosition);
 
 			// Search of other edge with the same metric offset to record in rank map
