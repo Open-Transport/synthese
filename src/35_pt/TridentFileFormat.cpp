@@ -1719,7 +1719,9 @@ namespace synthese
 					}
 					if(calendarNode.nChildNode("comment"))
 					{
-						ct->setText(calendarNode.getChildNode("comment").getText());
+						ct->setText(
+							ImpExModule::ConvertChar(calendarNode.getChildNode("comment").getText(), encoding, "UTF-8")
+						);
 					}
 					if(calendarToImport)
 					{
