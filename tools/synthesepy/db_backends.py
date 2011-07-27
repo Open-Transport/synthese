@@ -277,7 +277,8 @@ class MySQLBackend(DBBackend):
             'mysqldump', extra_opts=self.env.c.mysqldump_opts)
 
     def restore(self, sql):
-        pass
+        return self._mysql_command(
+            'mysql', input=sql)
 
 
 class DummyBackend(DBBackend):
