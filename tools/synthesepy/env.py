@@ -65,6 +65,7 @@ class Env(object):
             self.env_path, env_relative_path, self.executable_relative_path,
             executable_file + self.platform_exe_suffix)
 
+    @property
     def executable_relative_path(self):
         return os.curdir
 
@@ -79,10 +80,6 @@ class Env(object):
     @property
     def daemon_path(self):
         return self.get_executable_path(self.daemon_relative_path, 's3-server')
-        return os.path.join(
-            self.daemon_launch_path,
-            self._daemon_relative_path,
-            's3-server' + self.platform_exe_suffix)
 
     @property
     def daemon_log_file(self):

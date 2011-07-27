@@ -47,19 +47,19 @@ class Bootstrap(object):
         bootstrap_script = os.environ.get('SYNTHESE_BOOTSTRAP_SCRIPT', __file__)
         bootstrap_script = os.path.abspath(bootstrap_script)
 
-        self.bootstrap_script_dir = os.path.dirname(bootstrap_script)
+        bootstrap_script_dir = os.path.dirname(bootstrap_script)
 
         self.thirdparty_dir = os.environ.get(
             'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
         if not os.path.isdir(self.thirdparty_dir):
             os.makedirs(self.thirdparty_dir)
 
-        self.synthesepy_dir = self.bootstrap_script_dir
+        self.synthesepy_dir = bootstrap_script_dir
 
         script_name = os.path.split(sys.argv[0])[1]
         if script_name == 'manage.py':
             log.debug('Running script from project location')
-            self._get_project_config()
+            self._get_project_config(bootstrap_script_dir)
 
         if os.path.isdir(
             os.path.join(
@@ -71,8 +71,8 @@ class Bootstrap(object):
 
         self.config = self._get_source_config()
 
-    def _get_project_config(self):
-        self.project_path = self.bootstrap_script_dir
+    def _get_project_config(self, bootstrap_script_dir):
+        self.project_path = bootstrap_script_dir
 
         if SYNTHESEPY_DIR.startswith('@'):
             # TODO: try to detect Synthese at the usual locations.
@@ -83,7 +83,7 @@ class Bootstrap(object):
     def _get_installed_config(self):
         self.env_type = 'installed'
         self.env_path = os.path.normpath(
-            os.path.join(self.bootstrap_script_dir, os.pardir))
+            os.path.join(self.synthesepy_dir, os.pardir))
         self.pyenv_path = join(
             self.env_path, 'share', 'synthese', 'env')
         self.tools_path = join(
