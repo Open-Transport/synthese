@@ -444,7 +444,7 @@ class Project(object):
                 _ssh_command_line(
                     self.config,
                     extra_opts='-N -L {forwarded_port}:localhost:3306'.format(
-                        forwarded_port=MYSQL_FORWARDED_PORT)))
+                        forwarded_port=MYSQL_FORWARDED_PORT)), shell=True)
 
             remote_conn_info = db_backends.ConnectionInfo(
                 self.config.remote_conn_string)
