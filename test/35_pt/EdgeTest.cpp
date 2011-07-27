@@ -634,6 +634,18 @@ BOOST_AUTO_TEST_CASE (testDRTAreaLinking)
 	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().at(0)->getPreviousConnectionDeparture(), &l1D);
 	BOOST_CHECK_EQUAL (ld1AD.getSubEdges().at(0)->getPreviousDepartureForFineSteppingOnly(), &l2D);
 
+	l.removeEdge(ld1AD);
+
+	BOOST_CHECK_EQUAL (l1D.getFollowingConnectionArrival(), lNULL);
+	BOOST_CHECK_EQUAL (l1D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+	BOOST_CHECK_EQUAL (l1D.getPreviousConnectionDeparture(), lNULL);
+	BOOST_CHECK_EQUAL (l1D.getPreviousDepartureForFineSteppingOnly(), lNULL);
+
+	BOOST_CHECK_EQUAL (l2D.getFollowingConnectionArrival(), lNULL);
+	BOOST_CHECK_EQUAL (l2D.getFollowingArrivalForFineSteppingOnly(), lNULL);
+	BOOST_CHECK_EQUAL (l2D.getPreviousConnectionDeparture(), &l1D);
+	BOOST_CHECK_EQUAL (l2D.getPreviousDepartureForFineSteppingOnly(), &l1D);
+
 	l.addEdge(ld2DA);
 }
 
