@@ -152,7 +152,7 @@ class Project(object):
             self.config = Config()
         self.htdocs_path = join(path, 'htdocs')
         self.daemon = None
-        self.__db_backend = None
+        self._db_backend = None
         self.db_path = join(path, 'db')
         if not os.path.isdir(self.db_path):
             os.makedirs(self.db_path)
@@ -177,8 +177,12 @@ class Project(object):
             log.debug('Reading config file: %r', config_path)
             self.config.update_from_file(config_path)
 
-        self.config.conn_string = self.config.conn_string.replace(
-            '@PROJECT_PATH@', self.path)
+        # Set a path to the sqlite db if not set explicitly.
+
+        conn_info = db_backends.ConnectionInfo(self.config.conn_string)
+        if conn_info.backend == 'sqlite' and 'path' not in conn_info:
+            conn_info['path'] = join(self.path, 'db', 'config.db3')
+            self.config.conn_string = conn_info.conn_string
 
         # Set defaults
 
@@ -224,19 +228,18 @@ class Project(object):
             _copy_over(package.files_path, self.htdocs_path)
 
     def _clean_db(self):
-        self._db_backend.drop_db()
+        self.db_backend.drop_db()
 
     def _init_db(self):
-        self._db_backend.init_db()
+        self.db_backend.init_db()
 
-    # TODO: maybe make this public, and rename to db_backend / _db_backend
     @property
-    def _db_backend(self):
-        if self.__db_backend:
-            return self.__db_backend
-        self.__db_backend = db_backends.create_backend(
+    def db_backend(self):
+        if self._db_backend:
+            return self._db_backend
+        self._db_backend = db_backends.create_backend(
             self.env, self.config.conn_string)
-        return self.__db_backend
+        return self._db_backend
 
     def _run_testdata_importer(self):
         importer_path = self.env.get_executable_path(
@@ -255,7 +258,7 @@ class Project(object):
                 vars = {
                     'site_id': site.id,
                 }
-                self._db_backend.import_fixtures(fixtures_file, vars)
+                self.db_backend.import_fixtures(fixtures_file, vars)
             elif fixtures_file.endswith('.importer'):
                 self._run_testdata_importer()
 
@@ -328,23 +331,23 @@ class Project(object):
 
     def db_view(self):
         """Open database in a GUI tool (if applicable)"""
-        if self._db_backend.name == 'sqlite':
+        if self.db_backend.name == 'sqlite':
             utils.call(
                 [self.config.spatialite_gui_path,
-                    self._db_backend.conn_info['path']],
+                    self.db_backend.conn_info['path']],
                 bg=True)
         else:
             raise NotImplementedError("Not implemented for this backend")
 
     def db_shell(self, sql=None):
         """Open a SQL interpreter on the database or execute the given SQL"""
-        self._db_backend.shell(sql)
+        self.db_backend.shell(sql)
 
     def db_dump(self, db_backend=None, prefix=''):
         """Dump database to text file"""
 
         if not db_backend:
-            db_backend = self._db_backend
+            db_backend = self.db_backend
         output = db_backend.dump()
 
         max_id = 0
@@ -404,7 +407,7 @@ class Project(object):
             sql = open(sql_file, 'rb').read()
 
         log.info('Restoring %s bytes of sql', len(sql))
-        self._db_backend.restore(sql)
+        self.db_backend.restore(sql)
 
     def db_sync_to_files(self):
         db_sync.sync_to_files(self)
@@ -431,7 +434,7 @@ class Project(object):
             _rsync(self.config, '/srv/data/s3-server/config.db3',
                 utils.to_cygwin_path(remote_db_path))
 
-            remote_conn_info = self._db_backend.conn_info.copy()
+            remote_conn_info = self.db_backend.conn_info.copy()
             remote_conn_info['path'] = remote_db_path
 
             yield remote_conn_info
@@ -454,14 +457,14 @@ class Project(object):
             yield remote_conn_info
             p.kill()
 
-        if self._db_backend.name == 'sqlite':
+        if self.db_backend.name == 'sqlite':
             remote_transaction = remote_transaction_sqlite
-        elif self._db_backend.name == 'mysql':
+        elif self.db_backend.name == 'mysql':
             remote_transaction = remote_transaction_mysql
         else:
-            raise Exception('Unsupported backend: %r', self._db_backend.name)
+            raise Exception('Unsupported backend: %r', self.db_backend.name)
 
-        with remote_transaction(self._db_backend.conn_info.copy()) as remote_conn_info:
+        with remote_transaction(self.db_backend.conn_info.copy()) as remote_conn_info:
             remote_conn_string = remote_conn_info.conn_string
             log.info('Remote connection string: %r', remote_conn_string)
             remote_backend = db_backends.create_backend(self.env, remote_conn_string)

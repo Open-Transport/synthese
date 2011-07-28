@@ -79,7 +79,7 @@ class PagesReader(PagesIO):
 
 class DBPagesReader(PagesReader):
     def read(self):
-        results = self.project._db_backend.query(
+        results = self.project.db_backend.query(
             'select * from t063_web_pages where site_id = ?', [self.site.id])
         pages = []
         for result in results:
@@ -160,7 +160,7 @@ class DBPagesWriter(PagesWriter):
             return
 
         for page in pages:
-            self.project._db_backend.query(
+            self.project.db_backend.query(
                 'update t063_web_pages set content1 = ? where id = ?',
                 page.content1, page.id)
 
