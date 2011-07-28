@@ -42,7 +42,6 @@
 #include "StopAreaAddAction.h"
 #include "StopArea.hpp"
 #include "DataSource.h"
-#include "ImpExModule.h"
 #include "Importer.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
@@ -56,6 +55,7 @@
 #include "JunctionTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "PTUseRuleTableSync.h"
+#include "IConv.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -824,7 +824,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
+				utfline = IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

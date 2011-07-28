@@ -76,21 +76,6 @@ namespace synthese
 
 
 		public:
-			//////////////////////////////////////////////////////////////////////////
-			/// Character set conversion.
-			/// @param text text to convert
-			/// @param from character set of the text to convert
-			/// @param to character set of the result
-			/// @return the converted text
-			/// @author Hugues Romain
-			/// @since 3.2.0
-			/// @date 2010
-			static std::string ConvertChar(
-				const std::string& text,
-				const std::string& from,
-				const std::string& to
-			);
-
 			typedef std::vector<std::pair<boost::optional<std::string>, std::string> > FileFormatsList;
 			static FileFormatsList GetFileFormatsList();
 		};

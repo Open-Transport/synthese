@@ -1063,6 +1063,7 @@ namespace synthese
 			{
 				encoding = "UTF-8";
 			}
+			IConv charset_converter(encoding, "UTF-8");
 
 			XMLResults pResults;
 			XMLNode allNode = XMLNode::parseFile(filePath.file_string().c_str(), "ChouettePTNetwork", &pResults);
@@ -1088,7 +1089,7 @@ namespace synthese
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("name");
-			os << "<h2>Trident import of " << ImpExModule::ConvertChar(clineNameNode.getText(), encoding, "UTF-8") << "</h2>";
+			os << "<h2>Trident import of " << charset_converter.convert(clineNameNode.getText()) << "</h2>";
 
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
@@ -1100,7 +1101,7 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateNetwork(
 					networks,
 					networkIdNode.getText(),
-					ImpExModule::ConvertChar(networkNameNode.getText(), encoding, "UTF-8"),
+					charset_converter.convert(networkNameNode.getText()),
 					_dataSource,
 					_env,
 					os
@@ -1112,8 +1113,8 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateLine(
 					lines,
 					lineKeyNode.getText(),
-					ImpExModule::ConvertChar(clineNameNode.getText(), encoding, "UTF-8"),
-					ImpExModule::ConvertChar(clineShortNameNode.getText(), encoding, "UTF-8"),
+					charset_converter.convert(clineNameNode.getText()),
+					charset_converter.convert(clineShortNameNode.getText()),
 					optional<RGBColor>(),
 					*network,
 					_dataSource,
@@ -1126,7 +1127,7 @@ namespace synthese
 			RollingStockTableSync::SearchResult rollingStocks(
 				RollingStockTableSync::Search(
 					_env,
-					string(lineNode.getChildNode("transportModeName").getText()),
+					charset_converter.convert(lineNode.getChildNode("transportModeName").getText()),
 					true
 			)	);
 			if(!rollingStocks.empty())
@@ -1229,7 +1230,7 @@ namespace synthese
 							// If no city was found, attempting to find an alias with the right code
 							CityAliasTableSync::SearchResult cityAliasResult(
 								CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
-								);
+							);
 
 							if(cityAliasResult.empty())
 							{
@@ -1289,7 +1290,7 @@ namespace synthese
 					}
 
 					curStop->setName(
-						ImpExModule::ConvertChar(nameNode.getText(), encoding, "UTF-8")
+						charset_converter.convert(nameNode.getText())
 					);
 
 					// Link from physical stops
@@ -1322,12 +1323,7 @@ namespace synthese
 				string stopKey(stopAreaNode.getChildNode("objectId", 0).getText());
 
 				// Name
-				string name(
-					ImpExModule::ConvertChar(
-						stopAreaNode.getChildNode("name", 0).getText(),
-						_dataSource.getCharset(),
-						"UTF-8"
-				)	);
+				string name(charset_converter.convert(stopAreaNode.getChildNode("name", 0).getText()));
 
 				if(_importStops)
 				{
@@ -1531,7 +1527,7 @@ namespace synthese
 				XMLNode nameNode(routeNode.getChildNode("name"));
 				routeNames[crouteKeyNode.getText()] =
 					(!nameNode.isEmpty() && nameNode.getText()) ?
-					ImpExModule::ConvertChar(nameNode.getText(), _dataSource.getCharset(), "UTF-8") :
+					charset_converter.convert(nameNode.getText()) :
 					string();
 
 				bool wayBack(false);
@@ -1606,7 +1602,7 @@ namespace synthese
 				XMLNode keyNode(serviceNode.getChildNode("objectId"));
 				XMLNode jpKeyNode(serviceNode.getChildNode("journeyPatternId"));
 				XMLNode numberNode(serviceNode.getChildNode("publishedJourneyName"));
-				string serviceNumber(numberNode.isEmpty() ? string() : ImpExModule::ConvertChar(numberNode.getText(), _dataSource.getCharset(), "UTF-8"));
+				string serviceNumber(numberNode.isEmpty() ? string() : charset_converter.convert(numberNode.getText()));
 
 				// Creation of the service
 
@@ -1719,7 +1715,7 @@ namespace synthese
 					if(calendarNode.nChildNode("comment"))
 					{
 						ct->setText(
-							ImpExModule::ConvertChar(calendarNode.getChildNode("comment").getText(), encoding, "UTF-8")
+							charset_converter.convert(calendarNode.getChildNode("comment").getText())
 						);
 					}
 					if(calendarToImport)

@@ -47,7 +47,7 @@ namespace synthese
 		):	_source(source)
 		{
 			typedef tokenizer<char_separator<char> > tokenizer;
-			char_separator<char> sep(" :,;.-_|/\¦'");
+			char_separator<char> sep(" :,;.-_|/\\¦'");
 			tokenizer words(source, sep);
 			BOOST_FOREACH(string word, words)
 			{
