@@ -42,7 +42,7 @@
 #include "StopAreaAddAction.h"
 #include "StopArea.hpp"
 #include "DataSource.h"
-#include "ImpExModule.h"
+#include "IConv.hpp"
 #include "Importer.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
@@ -729,7 +729,7 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(ImpExModule::ConvertChar(parts[1], _dataSource.getCharset(), "UTF-8"));
+				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(parts[1]));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
 				for(size_t i=0; i<fields.size(); ++i)

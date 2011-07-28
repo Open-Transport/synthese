@@ -48,7 +48,7 @@
 #include "PTPlaceAdmin.h"
 #include "StopArea.hpp"
 #include "DataSource.h"
-#include "ImpExModule.h"
+#include "IConv.hpp"
 #include "Importer.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "HTMLModule.h"
@@ -197,7 +197,7 @@ namespace synthese
 				{
 					if(!_dataSource.getCharset().empty())
 					{
-						line = ImpExModule::ConvertChar(line, stopsDataSource.getCharset(), "UTF-8");
+						line = IConv::IConv(stopsDataSource.getCharset(), "UTF-8").convert(line);
 					}
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));

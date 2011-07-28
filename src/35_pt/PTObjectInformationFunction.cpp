@@ -133,6 +133,14 @@ namespace synthese
 				{
 					stream << _line->getNetwork()->getKey();
 				}
+				else if(_info == "map_url")
+				{
+					stream << _line->getMapURL();
+				}
+				else if(_info == "doc_url")
+				{
+					stream << _line->getDocURL();
+				}
 			}
 			else if(_route.get())
 			{
