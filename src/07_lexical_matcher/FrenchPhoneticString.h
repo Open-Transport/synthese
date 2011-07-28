@@ -76,6 +76,7 @@ namespace synthese
 			static std::string ACCENTUATED_O;
 			static std::string ACCENTUATED_U;
 			static std::string VOWELS;
+			static std::string C_VOWELS;
 			
 			std::string	_source;
 			PhoneticString _phonetic;
