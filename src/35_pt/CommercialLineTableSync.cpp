@@ -92,6 +92,8 @@ namespace synthese
 		const string CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE("pedestrian_compliance_id");
 		const string CommercialLineTableSync::COL_RESERVATION_CONTACT_ID("reservation_contact_id");
 		const string CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID("calendar_template_id");
+		const string CommercialLineTableSync::COL_MAP_URL("map_url");
+		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
 	}
 
 	namespace db
@@ -117,6 +119,8 @@ namespace synthese
 			DBTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
 			DBTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
 			DBTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -139,6 +143,8 @@ namespace synthese
 			object->setName(rows->getText ( CommercialLineTableSync::COL_NAME));
 			object->setShortName(rows->getText ( CommercialLineTableSync::COL_SHORT_NAME));
 			object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
+			object->setMapURL(rows->getText(CommercialLineTableSync::COL_MAP_URL));
+			object->setDocURL(rows->getText(CommercialLineTableSync::COL_DOC_URL));
 
 			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
@@ -270,7 +276,6 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
 			CommercialLine* obj
 		){
-
 		}
 
 
@@ -327,6 +332,8 @@ namespace synthese
 			query.addField(
 				object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0)
 			);
+			query.addField(object->getMapURL());
+			query.addField(object->getDocURL());
 			query.execute(transaction);
 		}
 

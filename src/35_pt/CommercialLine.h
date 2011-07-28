@@ -78,6 +78,8 @@ namespace synthese
 			static const std::string DATA_LINE_IMAGE;
 			static const std::string DATA_LINE_ID;
 			static const std::string DATA_LINE_CREATOR_ID;
+			static const std::string DATA_LINE_MAP_URL;
+			static const std::string DATA_LINE_DOC_URL;
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
@@ -104,6 +106,9 @@ namespace synthese
 
 			calendar::CalendarTemplate* _calendarTemplate;	//!< List of days when the line is supposed to run
 
+			std::string _mapURL;
+			std::string _docURL;
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
@@ -125,6 +130,8 @@ namespace synthese
 				const NonConcurrencyRules& getNonConcurrencyRules() const { return _nonConcurrencyRules; }
 				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
 				boost::recursive_mutex& getNonConcurrencyRulesMutex() const { return _nonConcurrencyRulesMutex; }
+				const std::string& getMapURL() const { return _mapURL; }
+				const std::string& getDocURL() const { return _docURL; }
 			//@}
 
 			//! @name Setters
@@ -139,6 +146,8 @@ namespace synthese
 				void setCalendarTemplate(calendar::CalendarTemplate* value) { _calendarTemplate = value;}
 				void setNonConcurrencyRules(const NonConcurrencyRules& value) { _nonConcurrencyRules = value; }
 				void setOpionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }
+				void setMapURL(const std::string& value){ _mapURL = value; }
+				void setDocURL(const std::string& value){ _docURL = value; }
 			//@}
 
 			//! @name Services

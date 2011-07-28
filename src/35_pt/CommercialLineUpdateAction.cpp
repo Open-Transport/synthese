@@ -61,6 +61,8 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_IMAGE = Action_PARAMETER_PREFIX + "im";
 		const string CommercialLineUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
 		const string CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID = Action_PARAMETER_PREFIX + "ri";
+		const string CommercialLineUpdateAction::PARAMETER_MAP_URL = Action_PARAMETER_PREFIX + "map_url";
+		const string CommercialLineUpdateAction::PARAMETER_DOC_URL = Action_PARAMETER_PREFIX + "doc_url";
 
 
 
@@ -106,6 +108,14 @@ namespace synthese
 			if(_style)
 			{
 				map.insert(PARAMETER_STYLE, *_style);
+			}
+			if(_mapURL)
+			{
+				map.insert(PARAMETER_MAP_URL, *_mapURL);
+			}
+			if(_docURL)
+			{
+				map.insert(PARAMETER_DOC_URL, *_docURL);
 			}
 			return map;
 		}
@@ -170,6 +180,16 @@ namespace synthese
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
+			}
+
+			if(map.isDefined(PARAMETER_MAP_URL))
+			{
+				_mapURL = map.get<string>(PARAMETER_MAP_URL);
+			}
+
+			if(map.isDefined(PARAMETER_DOC_URL))
+			{
+				_docURL = map.get<string>(PARAMETER_DOC_URL);
 			}
 
 			// Style
@@ -243,6 +263,14 @@ namespace synthese
 			if(_style)
 			{
 				_line->setStyle(*_style);
+			}
+			if(_mapURL)
+			{
+				_line->setMapURL(*_mapURL);
+			}
+			if(_docURL)
+			{
+				_line->setDocURL(*_docURL);
 			}
 
 			CommercialLineTableSync::Save(_line.get());

@@ -501,6 +501,9 @@ namespace synthese
 				stream << t.cell("Couleur (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toXMLColor() : string()));
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
+				stream << t.title("URL Documents");
+				stream << t.cell("Carte", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_MAP_URL, _cline->getMapURL()));
+				stream << t.cell("Document", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_DOC_URL, _cline->getDocURL()));
 				stream << t.close();
 
 				StaticActionRequest<CommercialLineUpdateAction> updateOnlyRequest(_request);
