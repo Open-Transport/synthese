@@ -36,6 +36,7 @@
 #include "Profile.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "CityAddAction.h"
+#include "StopArea.hpp"
 
 using namespace std;
 
@@ -64,14 +65,16 @@ namespace synthese
 	namespace pt
 	{
 		const string PTCitiesAdmin::PARAM_SEARCH_NAME("na");
+		const string PTCitiesAdmin::PARAM_SEARCH_AT_LEAST_A_STOP("als");
 		const string PTCitiesAdmin::TAB_LIST("li");
 		const string PTCitiesAdmin::TAB_PHONETIC("ph");
 
 
 
-		PTCitiesAdmin::PTCitiesAdmin()
-			: AdminInterfaceElementTemplate<PTCitiesAdmin>()
-		{ }
+		PTCitiesAdmin::PTCitiesAdmin():
+			AdminInterfaceElementTemplate<PTCitiesAdmin>(),
+			_searchAtLeastAStop(false)
+		{}
 
 
 
@@ -79,11 +82,10 @@ namespace synthese
 			const ParametersMap& map
 		){
 			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
+			_searchAtLeastAStop = map.getDefault<bool>(PARAM_SEARCH_AT_LEAST_A_STOP, false);
 
 			// Search table initialization
 			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 50);
-
-
 		}
 
 
@@ -92,6 +94,7 @@ namespace synthese
 		{
 			ParametersMap m;
 			m.insert(PARAM_SEARCH_NAME, _searchName);
+			m.insert(PARAM_SEARCH_AT_LEAST_A_STOP, _searchAtLeastAStop);
 			return m;
 		}
 
@@ -121,6 +124,7 @@ namespace synthese
 				PropertiesHTMLTable t(searchRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Nom", t.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
+				stream << t.cell("Communes avec arrêt uniquement", t.getForm().getOuiNonRadioInput(PARAM_SEARCH_AT_LEAST_A_STOP, _searchAtLeastAStop));
 				stream << t.close();
 
 				if(!_searchName.empty())
@@ -141,10 +145,16 @@ namespace synthese
 					stream << t.open();
 
 					const GeographyModule::CitiesMatcher& matcher(GeographyModule::GetCitiesMatcher());
-					GeographyModule::CitiesMatcher::MatchResult result(matcher.bestMatches(_searchName, 20));
+					GeographyModule::CitiesMatcher::MatchResult result(matcher.bestMatches(_searchName, _searchAtLeastAStop ? 0 : 20));
 
+					size_t matches(0);
 					BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchHit& it, result)
 					{
+						if(_searchAtLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
+						{
+							continue;
+						}
+
 						openCityRequest.getPage()->setCity(it.value);
 
 						stream << t.row();
@@ -153,6 +163,12 @@ namespace synthese
 						stream << t.col() << it.score.phoneticScore;
 						stream << t.col() << it.score.levenshtein;
 						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), "building.png");
+
+						++matches;
+						if(matches > 20)
+						{
+							break;
+						}
 					}
 
 					stream << t.close();
