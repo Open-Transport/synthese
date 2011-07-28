@@ -23,6 +23,7 @@
 #include "IConv.hpp"
 
 #include <iconv.h>
+#include <stdlib.h>
 
 using namespace std;
 
