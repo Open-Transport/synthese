@@ -38,6 +38,8 @@
 #include "SearchFormHTMLTable.h"
 #include "TransportNetworkUpdateAction.hpp"
 #include "ActionResultHTMLTable.h"
+#include "RemoveObjectAction.hpp"
+#include "CommercialLineTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -50,6 +52,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
+	using namespace db;
 
 	namespace util
 	{
@@ -138,10 +141,12 @@ namespace synthese
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
+			h.push_back(make_pair(string(), "Actions"));
 			ActionResultHTMLTable t(h,sortedForm,_requestParameters, networks, newRequest.getHTMLForm());
 
 			stream << t.open();
 			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
 			{
 				openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
@@ -150,6 +155,17 @@ namespace synthese
 				stream << network->getName();
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
+
+				// Remove button
+				stream << t.col();
+				CommercialLineTableSync::SearchResult lines(
+					CommercialLineTableSync::Search(_getEnv(), network->getKey(), optional<string>(), optional<string>(), 0, 1)
+				);
+				if(lines.empty())
+				{
+					removeRequest.getAction()->setObjectId(network->getKey());
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le réseau "+ network->getName() +" ?");
+				}
 			}
 			stream << t.row();
 			stream << t.col();
