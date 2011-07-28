@@ -130,8 +130,9 @@ namespace synthese
 			if(!_input.empty())
 			{
 				GeographyModule::CitiesMatcher::MatchResult matches(
-					site->getCitiesMatcher().bestMatches(_input, *_n)
+					site->getCitiesMatcher().bestMatches(_input, (_atLeastAStop || !_n) ? 0 : *_n)
 				);
+				size_t nbmatches(0);
 				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
 				{
 					if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
@@ -139,6 +140,14 @@ namespace synthese
 						continue;
 					}
 					citiesList.push_back(it.value);
+					if(_n)
+					{
+						++nbmatches;
+						if(nbmatches > *_n)
+						{
+							break;
+						}
+					}
 				}
 
 				if(!_page.get() && _outputFormat.empty())

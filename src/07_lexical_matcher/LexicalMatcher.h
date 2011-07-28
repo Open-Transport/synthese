@@ -131,7 +131,7 @@ namespace synthese
 
 			MatchResult result = match(fuzzyKey, 0.0, 0);
 
-			if (result.size () > nbMatches)
+			if(nbMatches && result.size () > nbMatches)
 			{
 				// Truncate the result
 				typename MatchResult::iterator it = result.begin ();
