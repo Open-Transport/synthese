@@ -47,11 +47,7 @@ namespace synthese
 		std::string IConv::convert(
 			const std::string& text
 		){
-#if defined(__MINGW32__) || defined(_WIN32)
 			const char *pBuf;
-#else /* not MINGW32 - WIN32 */
-			char *pBuf;
-#endif
 			size_t len;
 			size_t utf8len;
 			len = text.length();

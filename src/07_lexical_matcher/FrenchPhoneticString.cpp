@@ -16,12 +16,13 @@ namespace synthese
 	namespace lexical_matcher
 	{
 		IConv FrenchPhoneticString::ICONV("UTF-8","CP850");
-		std::string FrenchPhoneticString::ACCENTUATED_A(IConv::IConv("UTF-8","CP850").convert("àäáâ"));
-		std::string FrenchPhoneticString::ACCENTUATED_E(IConv::IConv("UTF-8","CP850").convert("èëéê"));
-		std::string FrenchPhoneticString::ACCENTUATED_I(IConv::IConv("UTF-8","CP850").convert("ìíî"));
-		std::string FrenchPhoneticString::ACCENTUATED_O(IConv::IConv("UTF-8","CP850").convert("òóô"));
-		std::string FrenchPhoneticString::ACCENTUATED_U(IConv::IConv("UTF-8","CP850").convert("ùúû"));
+		std::string FrenchPhoneticString::ACCENTUATED_A(IConv::IConv("UTF-8","CP850").convert("àäáâÀÄÁÂ"));
+		std::string FrenchPhoneticString::ACCENTUATED_E(IConv::IConv("UTF-8","CP850").convert("èëéêÈËÉÊ"));
+		std::string FrenchPhoneticString::ACCENTUATED_I(IConv::IConv("UTF-8","CP850").convert("ìíîÌÍÎ"));
+		std::string FrenchPhoneticString::ACCENTUATED_O(IConv::IConv("UTF-8","CP850").convert("òóôÒÓÔ"));
+		std::string FrenchPhoneticString::ACCENTUATED_U(IConv::IConv("UTF-8","CP850").convert("ùúûÙÚÛ"));
 		std::string FrenchPhoneticString::VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
+		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîy"));
 
 		FrenchPhoneticString::FrenchPhoneticString()
 		{}
@@ -110,6 +111,11 @@ namespace synthese
 				case 132:
 				case 133:
 				case 134:
+				case 142:
+				case 143:
+				case 181:
+				case 182:
+				case 183:
 					if(	_IsFollowedBy(source, pos, "in") &&
 						!_IsFollowedBy(source, pos, "ine")
 					){
@@ -190,7 +196,7 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsAnyOf(source, pos+1, VOWELS)
+					if(	_IsAnyOf(source, pos+1, C_VOWELS)
 					){
 						result.push_back(S);
 						break;
@@ -243,6 +249,10 @@ namespace synthese
 				case 136:
 				case 137:
 				case 138:
+				case 144:
+				case 210:
+				case 211:
+				case 212:
 					if(	(	_IsFollowedBy(source, pos, "i") ||
 							_IsFollowedBy(source, pos, "y") ||
 							_IsFollowedBy(source, pos, "u") ||
@@ -326,6 +336,9 @@ namespace synthese
 				case 140:
 				case 141:
 				case 161:
+				case 214:
+				case 215:
+				case 222:
 					if(	_IsFollowedBy(source, pos, "ng") &&
 						_IsLast(source, pos, 3)
 					){
@@ -359,6 +372,7 @@ namespace synthese
 					}
 
 				case 139: // ï
+				case 216: // Ï
 					result.push_back(I);
 					break;
 
@@ -406,6 +420,9 @@ namespace synthese
 				case 'o':
 				case 147:
 				case 149:
+				case 224:
+				case 226: // Ô
+				case 227:
 					if(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
@@ -434,6 +451,7 @@ namespace synthese
 					}
 
 				case 148: // ö
+				case 153:
 					result.push_back(O);
 					break;
 
@@ -548,6 +566,8 @@ namespace synthese
 				case 'u':
 				case 150:
 				case 151:
+				case 234: // Û
+				case 235: // Ù
 					if(	_IsFollowedBy(source, pos, "n") &&
 						_IsLast(source, pos+1)
 					){
@@ -557,6 +577,7 @@ namespace synthese
 					}
 				
 				case 129: // ü
+				case 154: // Ü
 					result.push_back(U);
 					break;
 
