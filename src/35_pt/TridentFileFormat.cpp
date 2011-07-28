@@ -111,7 +111,6 @@ namespace synthese
 	{
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_STOPS("impstp");
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_JUNCTIONS("impjun");
-		const string TridentFileFormat::Importer_::PARAMETER_WITH_OLD_DATES("wod");
 		const string TridentFileFormat::Importer_::PARAMETER_DEFAULT_TRANSFER_DURATION("dtd");
 		const string TridentFileFormat::Importer_::PARAMETER_AUTOGENERATE_STOP_AREAS("asa");
 		const string TridentFileFormat::Importer_::PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY("sasp");
@@ -140,7 +139,6 @@ namespace synthese
 			_importJunctions(false),
 			_autoGenerateStopAreas(false),
 			_defaultTransferDuration(minutes(8)),
-			_startDate(day_clock::local_day()),
 			_importTimetablesAsTemplates(false),
 			_mergeRoutes(true)
 		{}
@@ -157,11 +155,6 @@ namespace synthese
 			if(!_defaultTransferDuration.is_not_a_date_time())
 			{
 				result.insert(PARAMETER_DEFAULT_TRANSFER_DURATION, _defaultTransferDuration.total_seconds() / 60);
-			}
-			if(_startDate < day_clock::local_day())
-			{
-				date_duration du(day_clock::local_day() - _startDate);
-				result.insert(PARAMETER_WITH_OLD_DATES, static_cast<int>(du.days()));
 			}
 			result.insert(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay);
 			result.insert(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates);
@@ -196,8 +189,6 @@ namespace synthese
 			{
 				_defaultTransferDuration = minutes(map.get<int>(PARAMETER_DEFAULT_TRANSFER_DURATION));
 			}
-			_startDate = day_clock::local_day();
-			_startDate -= days(map.getDefault<int>(PARAMETER_WITH_OLD_DATES, 0));
 			_treatAllStopAreaAsQuay = map.getDefault<bool>(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, false);
 			_importTimetablesAsTemplates = map.getDefault<bool>(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, false);
 			_mergeRoutes = map.getDefault<bool>(PARAMETER_MERGE_ROUTES, true);
@@ -1080,8 +1071,15 @@ namespace synthese
 				os <<
 					"ERR  : XML Parsing error " << XMLNode::getError(pResults.error) <<
 					" inside file " << filePath.file_string() <<
-					" at line " << pResults.nLine << ", column " << pResults.nColumn;
-				throw Exception("XML Parsing error");
+					" at line " << pResults.nLine << ", column " << pResults.nColumn << "<br />";
+				return false;
+			}
+			if(allNode.isEmpty())
+			{
+				os <<
+					"ERR  : File " << filePath.file_string() <<
+					" is empty.<br />";
+				return false;
 			}
 
 			// Title
@@ -1090,7 +1088,7 @@ namespace synthese
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
 			XMLNode clineNameNode = lineNode.getChildNode("name");
-			os << "<h2>Trident import of " << clineNameNode.getText() << "</h2>";
+			os << "<h2>Trident import of " << ImpExModule::ConvertChar(clineNameNode.getText(), encoding, "UTF-8") << "</h2>";
 
 			// Network
 			XMLNode networkNode =  allNode.getChildNode("PTNetwork", 0);
@@ -1663,6 +1661,7 @@ namespace synthese
 
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
+			date now(gregorian::day_clock::local_day());
 			ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendarTemplates(_dataSource, _env);
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
@@ -1730,7 +1729,7 @@ namespace synthese
 						{
 							XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
 							date d(from_string(dayNode.getText()));
-							shared_ptr<CalendarTemplateElement> cte(new CalendarTemplateElement(CalendarTemplateTableSync::getId()));
+							shared_ptr<CalendarTemplateElement> cte(new CalendarTemplateElement(CalendarTemplateElementTableSync::getId()));
 							cte->setCalendar(ct);
 							cte->setMinDate(d);
 							cte->setMaxDate(d);
@@ -1758,7 +1757,7 @@ namespace synthese
 				{
 					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
 					date d(from_string(dayNode.getText()));
-					if(d < _startDate)
+					if(_fromToday && d < now)
 					{
 						continue;
 					}
@@ -1777,29 +1776,6 @@ namespace synthese
 				}
 			}
 
-			// Clean useless services
-/*			for(map<string, ScheduledService*>::const_iterator its(services.begin()); its != services.end(); ++its)
-			{
-				if(its->second->empty() && createdObjects.find(its->second->getKey()) != createdObjects.end())
-				{
-					its->second->getPath()->removeService(its->second);
-					_env.getEditableRegistry<ScheduledService>().remove(its->second->getKey());
-				}
-			}
-*/
-			// Clean useless routes
-/*			for(map<string, JourneyPattern*>::const_iterator itr(routes.begin()); itr != routes.end(); ++itr)
-			{
-				if(itr->second->getServices().empty() && createdObjects.find(itr->second->getKey()) != createdObjects.end())
-				{
-					BOOST_FOREACH(const Edge* ls, itr->second->getEdges())
-					{
-						_env.getEditableRegistry<LineStop>().remove(static_cast<const LineStop*>(ls)->getKey());
-					}
-					_env.getEditableRegistry<JourneyPattern>().remove(itr->second->getKey());
-				}
-			}
-*/
 			// ConnectionLink / Junction
 			if(_importJunctions)
 			{
@@ -2104,18 +2080,17 @@ namespace synthese
 		) const	{
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());
-			t.getForm().addHiddenField(PARAMETER_FROM_TODAY, string("1"));
 			stream << t.open();
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 			stream << t.cell("Import arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
 			stream << t.cell("Autogénérer arrêts commerciaux", t.getForm().getOuiNonRadioInput(PARAMETER_AUTOGENERATE_STOP_AREAS, _autoGenerateStopAreas));
 			stream << t.cell("Fusionner itinéraires par valeur", t.getForm().getOuiNonRadioInput(PARAMETER_MERGE_ROUTES, _mergeRoutes));
 			stream << t.cell("Traiter tous les StopArea en tant qu'arrêts physiques", t.getForm().getOuiNonRadioInput(PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY, _treatAllStopAreaAsQuay));
 			stream << t.cell("Import transferts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_JUNCTIONS, _importJunctions));
 			stream << t.cell("Importer calendriers en tant que modèles", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES, _importTimetablesAsTemplates));
-			stream << t.cell("Importer dates passées (nombre de jours)", t.getForm().getTextInput(PARAMETER_WITH_OLD_DATES, "0"));
+			stream << t.cell("Ignorer données passées", t.getForm().getOuiNonRadioInput(PARAMETER_FROM_TODAY, _fromToday));
 			stream << t.cell("Temps de correspondance par défaut (minutes)", t.getForm().getTextInput(PARAMETER_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_defaultTransferDuration.total_seconds() / 60)));
 			stream << t.title("Données (remplir un des deux champs)");
 			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));

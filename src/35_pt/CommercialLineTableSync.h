@@ -64,6 +64,8 @@ namespace synthese
 			static const std::string COL_BIKE_USE_RULE;
 			static const std::string COL_RESERVATION_CONTACT_ID;
 			static const std::string COL_CALENDAR_TEMPLATE_ID;
+			static const std::string COL_MAP_URL;
+			static const std::string COL_DOC_URL;
 
 			/** CommercialLine search.
 				@param networkId Id of the network which the lines must belong (default = undefined = all networks)

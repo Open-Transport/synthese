@@ -60,6 +60,8 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_IMAGE("line_image");
 		const string CommercialLine::DATA_LINE_ID("line_id");
 		const string CommercialLine::DATA_LINE_CREATOR_ID("creatorId");
+		const string CommercialLine::DATA_LINE_MAP_URL("line_map_url");
+		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
 
 		CommercialLine::CommercialLine(
 			RegistryKeyType key
@@ -197,6 +199,8 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_STYLE, getStyle());
 			pm.insert(prefix + "lineStyle", getStyle()); // For StopAreasList compatibility
 			pm.insert(prefix + "style", getStyle()); // For LinesListFunction compatibility
+			pm.insert(prefix + DATA_LINE_MAP_URL, getMapURL());
+			pm.insert(prefix + DATA_LINE_DOC_URL, getDocURL());
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :
@@ -212,5 +216,4 @@ namespace synthese
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 
 		}
-	}
-}
+}	}
