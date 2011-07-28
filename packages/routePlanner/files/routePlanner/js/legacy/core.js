@@ -571,6 +571,7 @@ var onBlurHandler = function(event){
 
 // declenchee quand on clique sur une div contenant une possibilite
 function divOnMouseDown(i) {
+  _highlightedSuggestionDiv = this;
   handleAutoComplete(13, _currentInputField);
 };
 
