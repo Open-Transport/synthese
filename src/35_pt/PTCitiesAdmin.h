@@ -45,6 +45,7 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string PARAM_SEARCH_NAME;
+				static const std::string PARAM_SEARCH_AT_LEAST_A_STOP;
 				static const std::string TAB_LIST;
 				static const std::string TAB_PHONETIC;
 			//@}
@@ -53,6 +54,7 @@ namespace synthese
 			/// @name Search parameters
 			//@{
 				std::string				_searchName;
+				bool					_searchAtLeastAStop;
 				html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 

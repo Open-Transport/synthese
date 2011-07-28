@@ -621,7 +621,6 @@ namespace synthese
 						_IsFollowedBy(source, pos, "d") ||
 						_IsFollowedBy(source, pos, "f") ||
 						_IsFollowedBy(source, pos, "g") ||
-						_IsFollowedBy(source, pos, "h") ||
 						_IsFollowedBy(source, pos, "j") ||
 						_IsFollowedBy(source, pos, "k") ||
 						_IsFollowedBy(source, pos, "l") ||
