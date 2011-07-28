@@ -16,6 +16,8 @@ FactorableTemplate.h
 Factory.h
 FactoryBase.h
 FactoryException.h
+IConv.cpp
+IConv.hpp
 Log.cpp
 Log.h
 LowerCaseFilter.h
@@ -59,12 +61,20 @@ XmlToolkit.h
 concurrent/SynchronizedQueue.h
 )
 
+if(WIN32)
+  include_directories("${ICONV_INCLUDE_DIRS}")
+endif()
+
 add_library(01_util ${util_SRCS})
 
 target_link_libraries(01_util
   ${Boost_LIBRARIES}
   00_framework
 )
+
+if(WIN32)
+  target_link_libraries(01_util iconv)
+endif()
 
 add_subdirectory(iostreams)
 add_subdirectory(threads)

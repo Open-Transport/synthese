@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_lexmatcher_FrenchPhoneticString___
 #define SYNTHESE_lexmatcher_FrenchPhoneticString___
 
+#include "IConv.hpp"
+
 #include <string>
 #include <vector>
 #include <limits>
@@ -67,12 +69,21 @@ namespace synthese
 			typedef size_t LevenshteinDistance;
 
 		private:
+			static util::IConv ICONV;
+			static std::string ACCENTUATED_A;
+			static std::string ACCENTUATED_E;
+			static std::string ACCENTUATED_I;
+			static std::string ACCENTUATED_O;
+			static std::string ACCENTUATED_U;
+			static std::string VOWELS;
+			
 			std::string	_source;
 			PhoneticString _phonetic;
 
 			static bool _IsLast(const std::string& source, size_t pos, size_t len=1);
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
+			static bool _IsAnyOf(const std::string& source, size_t pos, const std::string& chars);
 
 		public:
 			FrenchPhoneticString();

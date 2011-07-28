@@ -39,14 +39,6 @@ OneFileTypeImporter.hpp
 
 set_source_files_properties(ImpExModule.gen.cpp ImpExModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
-if(WIN32)
-  include_directories("${ICONV_INCLUDE_DIRS}")
-endif()
-
 add_library(16_impex ${impex_SRCS})
-
-if(WIN32)
-  target_link_libraries(16_impex iconv)
-endif()
 
 install(TARGETS 16_impex DESTINATION lib)

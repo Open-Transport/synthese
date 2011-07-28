@@ -31,7 +31,7 @@
 #include "StopAreaAddAction.h"
 #include "StopArea.hpp"
 #include "DataSource.h"
-#include "ImpExModule.h"
+#include "IConv.hpp"
 #include "Importer.hpp"
 #include "StopPointAddAction.hpp"
 #include "StopPointUpdateAction.hpp"
@@ -126,7 +126,7 @@ namespace synthese
 				{
 					if(!_dataSource.getCharset().empty())
 					{
-						line = ImpExModule::ConvertChar(line, _dataSource.getCharset(), "UTF-8");
+						line = IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(line);
 					}
 					Bahnhof bahnhof;
 					bahnhof.operatorCode = line.substr(0, 7);
