@@ -75,6 +75,8 @@ namespace synthese
 			static const std::string PARAMETER_IMAGE;
 			static const std::string PARAMETER_NETWORK_ID;
 			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
+			static const std::string PARAMETER_MAP_URL;
+			static const std::string PARAMETER_DOC_URL;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
@@ -87,6 +89,8 @@ namespace synthese
 			boost::optional<boost::shared_ptr<const TransportNetwork> >	_network;	//!< Network
 			boost::optional<boost::shared_ptr<const pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
 			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+			boost::optional<std::string> _mapURL;
+			boost::optional<std::string> _docURL;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

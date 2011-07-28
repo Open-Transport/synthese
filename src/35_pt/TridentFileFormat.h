@@ -130,7 +130,6 @@ namespace synthese
 					bool		_importJunctions;
 					bool		_mergeRoutes;
 					boost::posix_time::time_duration	_defaultTransferDuration;
-					boost::gregorian::date	_startDate;
 					bool		_treatAllStopAreaAsQuay;
 					bool		_importTimetablesAsTemplates;
 				//@}
@@ -145,7 +144,6 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_JUNCTIONS;
 				static const std::string PARAMETER_IMPORT_TIMETABLES_AS_TEMPLATES;
 				static const std::string PARAMETER_DEFAULT_TRANSFER_DURATION;
-				static const std::string PARAMETER_WITH_OLD_DATES;
 				static const std::string PARAMETER_AUTOGENERATE_STOP_AREAS;
 				static const std::string PARAMETER_TREAT_ALL_STOP_AREA_AS_QUAY;
 				static const std::string PARAMETER_MERGE_ROUTES;
