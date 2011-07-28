@@ -145,7 +145,7 @@ namespace synthese
 			query.addField(object->getOriginIsReference());
 			query.addField(object->getMinDelayMinutes().total_seconds() / 60);
 			query.addField(static_cast<int>(object->getMinDelayDays().days()));
-			query.addField(object->getMaxDelayDays() ? lexical_cast<string>(object->getMaxDelayDays()->days()) : string());
+			query.addField(object->getMaxDelayDays() ? object->getMaxDelayDays()->days() : -1);
 			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
 			query.addField(object->getForbiddenInDepartureBoards());
