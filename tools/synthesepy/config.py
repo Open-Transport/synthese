@@ -60,7 +60,7 @@ DEFAULTS = {
 
     # project
     'project_name': None,
-    'conn_string': 'sqlite://path=@PROJECT_PATH@/db/config.db3',
+    'conn_string': 'sqlite://',
 
     # remote project management
     'server': None,
