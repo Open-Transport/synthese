@@ -261,6 +261,13 @@ class Tester(object):
 
         failed_suites = []
 
+        # Add a debug=1 parameter to the connection strings. It helps detecting
+        # issues going undetected in production.
+        for i, conn_string in enumerate(self.env.c.test_conn_strings):
+            ci = db_backends.ConnectionInfo(conn_string)
+            ci['debug'] = '1'
+            self.env.c.test_conn_strings[i] = ci.conn_string
+
         for suite in suites:
             # Hack to allow passing a suite with a space in it. On Windows,
             # an argument with a space will be split in two separate arguments.
