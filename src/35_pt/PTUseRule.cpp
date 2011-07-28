@@ -55,7 +55,7 @@ namespace synthese
 			_originIsReference(false),
 			_minDelayMinutes(minutes(0)),
 			_minDelayDays(days(0)),
-			_maxDelayDays(not_a_date_time),
+			_maxDelayDays(optional<date_duration>()),
 			_hourDeadLine(not_a_date_time),
 			_defaultFare(NULL),
 			_forbiddenInDepartureBoards(false),
