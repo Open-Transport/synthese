@@ -42,9 +42,9 @@ var Synthese = {
     var params = {
       url: this.URL,
       data: args,
-      dataType: dataType,
+      dataType: dataType
     };
     
     return $.ajax(params);
-  },
+  }
 };

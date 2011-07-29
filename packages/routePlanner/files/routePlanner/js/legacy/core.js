@@ -6,7 +6,7 @@ var legacyRoutePlannerConfig = {
   // than this value.
   minCharsToTriggerAutocomplete: 2,
   // Name of the route planner form.
-  routePlannerFormName: "ri",
+  routePlannerFormName: "ri"
 };
 
 function swapValues(element1, element2) {

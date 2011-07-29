@@ -28,12 +28,12 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
 
     // English
     OpenLayers.Util.applyDefaults(OpenLayers.Lang.en, {
-      "cityOf": "City of {name}",
+      "cityOf": "City of {name}"
     });
 
     // French
     OpenLayers.Util.applyDefaults(OpenLayers.Lang.fr, {
-      "cityOf": "Commune de {name}",
+      "cityOf": "Commune de {name}"
     });
   },
   

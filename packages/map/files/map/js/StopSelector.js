@@ -10,7 +10,7 @@ var StopSelectorPopup = Backbone.View.extend({
   ].join('\n')),
 
   events: {
-    "click .close": "close",
+    "click .close": "close"
   },
 
   initialize: function(options) {
@@ -31,12 +31,12 @@ var StopSelectorPopup = Backbone.View.extend({
 
     // English
     OpenLayers.Util.applyDefaults(OpenLayers.Lang.en, {
-      'selectAStop': 'Select a stop',
+      'selectAStop': 'Select a stop'
     });
 
     // French
     OpenLayers.Util.applyDefaults(OpenLayers.Lang.fr, {
-      'selectAStop': 'Sélectionnez un arrêt',
+      'selectAStop': 'Sélectionnez un arrêt'
     });
   },
 
@@ -61,7 +61,7 @@ var StopSelectorPopup = Backbone.View.extend({
 
   show: function() {
     $(this.el).show();
-  },
+  }
 
 });
 
@@ -113,5 +113,5 @@ var StopSelector = Backbone.View.extend({
     $(this.selectorPopup.el).fadeOut(null, function() {
       self.selectorPopup.close();
     });
-  },
+  }
 });

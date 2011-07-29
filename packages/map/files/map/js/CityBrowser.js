@@ -62,7 +62,7 @@ var CitySelectorModel = Backbone.Model.extend({
         n: 9999,
         at_least_a_stop: 1,
         si: Synthese.siteId,
-        output_format: "json",
+        output_format: "json"
       }).then(function(json) {
         // Result can be an array or object due to this issue:
         // https://188.165.247.81/issues/10786
@@ -158,7 +158,7 @@ var CitySelectorModel = Backbone.Model.extend({
       c.set({"selected": c === city});
     });
     this.trigger("citySelected", city);
-  },
+  }
 });
 
 
@@ -168,7 +168,7 @@ var CityView = Backbone.View.extend({
   tagName: "li",
 
   events: {
-    "click": "select",
+    "click": "select"
   },
 
   initialize: function() {
@@ -227,7 +227,7 @@ var CityListView = Backbone.View.extend({
   addAll: function() {
     $(this.el).empty();
     this.collection.each(this.addOne);
-  },
+  }
 });
 
 var CitySelectorView = Backbone.View.extend({
@@ -249,7 +249,7 @@ var CitySelectorView = Backbone.View.extend({
   ].join('\n')),
 
   events: {
-    "click .letters li": "letterClick",
+    "click .letters li": "letterClick"
   },
 
   initialize: function() {
@@ -270,7 +270,7 @@ var CitySelectorView = Backbone.View.extend({
       }
     );
     $.tmpl(this.template, {
-      letters: letters,
+      letters: letters
     }).appendTo(this.el);
 
     this.$('.cityList').replaceWith(this.cityList.el);
@@ -317,7 +317,7 @@ var CitySelectorView = Backbone.View.extend({
     } else {
       this.$(".noCities").hide();
     }
-  },
+  }
 });
 
 window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
@@ -380,7 +380,7 @@ window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
     var MIN_ZOOM = 11;
 
     var strategy = new MinZoomBBOXStrategy({
-      minZoom: MIN_ZOOM,
+      minZoom: MIN_ZOOM
     });
     this.stopsLayer.strategies = [strategy];
     strategy.setLayer(this.stopsLayer);
@@ -389,7 +389,7 @@ window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
 
   onStopSelected: function(stopFeature) {
     this.trigger("stopSelected", stopFeature);
-  },
+  }
 
 });
 
@@ -442,7 +442,7 @@ window.CityBrowser = Backbone.View.extend({
       "processing": "Loading...",
       "zoomRequired": "Zoom or select a city to see all the stops",
       "noCities": "no cities",
-      "cityNotFound": "City not found",
+      "cityNotFound": "City not found"
     });
 
     // French
@@ -452,7 +452,7 @@ window.CityBrowser = Backbone.View.extend({
       "processing": "Chargement en cours ...",
       "zoomRequired": "Zoomez ou sélectionnez une ville pour voir tous les arrêts",
       "noCities": "Pas de villes",
-      "cityNotFound": "Ville non trouvée",
+      "cityNotFound": "Ville non trouvée"
     });
   },
 
@@ -556,7 +556,7 @@ window.CityBrowser = Backbone.View.extend({
     }
 
     this.resetState();
-  },
+  }
 });
 
 })();

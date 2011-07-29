@@ -63,7 +63,7 @@ var SyntheseMap = OpenLayers.Class({
     this.beforeMapInit();
 
     this.map = new OpenLayers.Map(mapId, {
-      projection: "EPSG:" + this.MAP_SRID,
+      projection: "EPSG:" + this.MAP_SRID
     });
 
     this.linesLayer = new OpenLayers.Layer.Vector("lines", {
@@ -499,7 +499,7 @@ var SyntheseMap = OpenLayers.Class({
     };
 
     var args = {
-      srid: this.MAP_SRID,
+      srid: this.MAP_SRID
     };
     if (filter.cityId)
       args.roid = filter.cityId;
