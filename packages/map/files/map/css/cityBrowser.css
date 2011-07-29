@@ -1,9 +1,8 @@
 .citySelector {
   position: absolute;
+  left: 0;
   width: 15em;
   height: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
 }
 
 .citySelector ul {
@@ -24,10 +23,11 @@
 }
 
 .citySelector > .letters {
+  left: 0;
   display: none;
   width: 20px;
   overflow: hidden;
-  position: fixed;
+  position: absolute;
   text-align: center;
 }
 .citySelector > .letters > li {
@@ -47,9 +47,12 @@
 
 .citySelector .cities {
   margin-left: 25px;
-  padding: 5px;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 .citySelector .citiesLabel {
+  padding-top: 5px;
   text-align: center;
   font-weight: bold;
  }
@@ -78,6 +81,7 @@ ul.cityList {
 }
 .cityBrowser .loadingMessage {
   background-color: lightBlue;
+  display: none;
 }
 .cityBrowser .errorMessage {
   color: white;
@@ -109,6 +113,7 @@ ul.cityList {
   padding: 15px;
 
   text-align: center;
+  background-color: white; /* for older browsers */
   background-color: rgba(255, 255, 255, 0.5);
   font-size: large;
   -moz-border-radius: 15px;
