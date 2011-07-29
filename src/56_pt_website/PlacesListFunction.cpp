@@ -254,7 +254,7 @@ namespace synthese
 			}
 			else if(_city.get())
 			{
-				if(_page.get())
+				if(_page.get() || _itemPage.get())
 				{
 					size_t c(0);
 					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
