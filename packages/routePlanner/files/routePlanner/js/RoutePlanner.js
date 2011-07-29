@@ -3,7 +3,7 @@ var RoutePlannerView = Backbone.View.extend({
 
   events: {
     "click .mapLink": "mapLinkClick",
-    "change #noTransfer": "updateMaxDepth",
+    "change #noTransfer": "updateMaxDepth"
   },
 
   initialize: function(options) {
@@ -11,11 +11,11 @@ var RoutePlannerView = Backbone.View.extend({
 
     this.departure = {
       city: this.$("#origin_city_txt"),
-      place: this.$("#origin_place_txt"),
+      place: this.$("#origin_place_txt")
     };
     this.arrival = {
       city: this.$("#destination_city_txt"),
-      place: this.$("#destination_place_txt"),
+      place: this.$("#destination_place_txt")
     };
 
     this.$(".mapLink").show();
@@ -52,6 +52,6 @@ var RoutePlannerView = Backbone.View.extend({
   updateMaxDepth: function(event) {
     var noTransfer = this.$("input#noTransfer").prop("checked");
     this.$("input[name=md]").val(noTransfer ? "0" : "9999");
-  },
+  }
 
 });
