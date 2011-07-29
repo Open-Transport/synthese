@@ -963,16 +963,16 @@ function initAutoCompletions() {
     document.forms[legacyRoutePlannerConfig.routePlannerFormName],
     document.getElementById("submitButton"));
   initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=1&si=' + Synthese.siteId + '&t=' + city + '';
+    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
   }, document.getElementById("origin_place_txt"), null, null);
   initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=1&si=' + Synthese.siteId + '&t=' + place + '';
+    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
   }, null, null, null);
   initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=0&si=' + Synthese.siteId + '&t=' + city + '';
+    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
   }, document.getElementById("destination_place_txt"), null, null);
   initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=0&si=' + Synthese.siteId + '&t=' + place + '';
+    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
   }, null, null, null);
   document.getElementById("origin_city_txt").focus();
   if (document.getElementById("fh")) {
