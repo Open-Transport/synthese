@@ -32,13 +32,19 @@
 
   <form class="routePlannerForm" name="routePlannerForm">
     <div class=departure>
-      <div>Ville de départ <a class="mapLink" href="#">Carte</a></div>
+      <div>
+        <a href="#" class="mapLink" tabindex=-1 title="Afficher la carte de sélection d'arrêt">Carte</a>
+        <div>Ville de départ</div>
+      </div>
       <input class=city  type=text autofocus name=dct id=origin_city_txt><br>
       <div>Arrêt de départ (optionnel)</div>
       <input class=place type=text name=act id=origin_place_txt><br>
     </div>
     <div class=arrival>
-      <div>Ville d'arrivée <a class="mapLink" href="#">Carte</a></div>
+      <div>
+        <a href="#" class="mapLink" tabindex=-1 title="Afficher la carte de sélection d'arrêt">Carte</a>
+        <span>Ville d'arrivée</span>
+      </div>
       <input class=city type=text name=act id=destination_city_txt><br>
       <div>Arrêt d'arrivée (optionnel)</div>
       <input class=place type=text name=apt id=destination_place_txt><br>
@@ -101,6 +107,7 @@
   $(function() {
     var form = this.getElementsByName("routePlannerForm")[0];
     form.siteId.value = Synthese.siteId;
+
     var stopSelector = new StopSelector({
       routePlanner: new RoutePlannerView({el: form}),
       routePlannerOptions: {
