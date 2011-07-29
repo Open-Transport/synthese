@@ -155,7 +155,8 @@ namespace synthese
 					stream <<
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 						"<options xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
-						;
+					;
+					size_t nbmatches(0);
 					BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
 					{
 						if(_atLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
@@ -163,6 +164,14 @@ namespace synthese
 							continue;
 						}
 						stream << "<option type=\"city\" score=\"" << it.score.phoneticScore << "\">" << it.value->getName() << "</option>";
+						if(_n)
+						{
+							++nbmatches;
+							if(nbmatches > *_n)
+							{
+								break;
+							}
+						}
 					}
 					stream << "</options>";
 				}
