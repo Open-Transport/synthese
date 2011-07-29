@@ -219,11 +219,11 @@ namespace synthese
 			if (it != _services.end() && (*it)->getDepartureBeginScheduleToIndex(RTData, 0) == service.getDepartureEndScheduleToIndex(RTData, 0))
 				return false;
 
-			// Control of the next service if exists
+			// Check of the next service if existing
 			if (it != _services.end() && !(*it)->respectsLineTheoryWith(RTData, service))
 				return false;
 
-			// Control of the previous service if exists
+			// Check of the previous service if existing
 			if (it != _services.begin() && !(*last_it)->respectsLineTheoryWith(RTData, service))
 				return false;
 
