@@ -15,7 +15,7 @@
   }
 
   /* TODO: move some to routePlanner.css */
-  
+
   form > div {
     margin: 2em;
     width: 20em;
@@ -46,14 +46,14 @@
     <div>
       <input type="hidden" name="md" value="9999">
       <input type="checkbox" id="noTransfer">
-      <label for="noTransfer">Sans correspondance</label> 
+      <label for="noTransfer">Sans correspondance</label>
     </div>
     <div>
       <input type="hidden" name="siteId">
       <input type="submit" id="submitButton" value="Submit">
     </div>
   </form>
-  
+
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
 
   <!-- Release versions -->
@@ -89,38 +89,13 @@
   <script src="../map/js/StopSelector.js"></script>
 
   <script>
-  // TODO: move some of this to the routePlanner library.
-  function initAutoCompletions(siteId) {
-    if (document.getElementsByTagName) {
-      var inputElements = document.getElementsByTagName("input");
-      for (i = 0; inputElements[i]; i++)
-        inputElements[i].setAttribute("autocomplete", "off");
-    }
-    // TODO: refactor more
-    initAutoCompleteForm(document.forms["routePlannerForm"], document.getElementById("submitButton"));
-    initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
-      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=1&si=' + siteId + '&t=' + city + '';
-    }, document.getElementById("origin_place_txt"), null, null);
-    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
-      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=1&si=' + siteId + '&t=' + place + '';
-    }, null, null, null);
-    initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
-      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=0&si=' + siteId + '&t=' + city + '';
-    }, document.getElementById("destination_place_txt"), null, null);
-    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
-      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=0&si=' + siteId + '&t=' + place + '';
-    }, null, null, null);
-    document.getElementById("origin_city_txt").focus();
-    if (document.getElementById("fh")) {
-      addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
-      addEvent(document.getElementById("fh"), "click", mouse_click_handler);
-    }
-  }
+  Synthese.init();
 
-  $(function() {
-    Synthese.init();
-    initAutoCompletions(Synthese.siteId);
-  });
+  // route planner configuration:
+  legacyRoutePlannerConfig.minCharsToTriggerAutocomplete = 0;
+  legacyRoutePlannerConfig.routePlannerFormName = "routePlannerForm";
+
+  initAutoCompletions();
   </script>
   <script>
   $(function() {
@@ -129,7 +104,7 @@
     var stopSelector = new StopSelector({
       routePlanner: new RoutePlannerView({el: form}),
       routePlannerOptions: {
-        formName: "routePlannerForm",
+        formName: legacyRoutePlannerConfig.routePlannerFormName,
       }
     });
 
