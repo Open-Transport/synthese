@@ -53,6 +53,7 @@
 #include "102_mysql/MySQLDB.hpp"
 
 using synthese::Exception;
+using synthese::util::Log;
 using namespace synthese::db;
 using namespace synthese::pt;
 
@@ -83,6 +84,15 @@ static void import()
 
 int main()
 {
-	import();
+	try
+	{
+		import();
+	}
+	catch(synthese::Exception& e)
+	{
+		Log::GetInstance().error("Caught Synthese exception.", e);
+		return 1;
+	}
+	
 	return 0;
 }
