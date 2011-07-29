@@ -37,8 +37,6 @@
       right: 10px;
     }
 
-    /* TODO: move to cityMap.css */
-    
     #map {
       position: absolute;
       top: 60px;
@@ -71,14 +69,14 @@
         <a data-action=uncheckAll href="#">tout décocher</a>
       </div>
       <script id="linesTemplate" type="text/x-jquery-tmpl">
-          <li>
-            <label title="${displayName}">
-              <input checked type=checkbox data-lineid="${id}">
-              <span class=colorBox style="background-color: ${color};"></span>
-              <span>${displayName}</span>
-            </label>
-          </li>
-        </script>
+        <li>
+          <label title="${displayName}">
+            <input checked type=checkbox data-lineid="${id}">
+            <span class=colorBox style="background-color: ${color};"></span>
+            <span>${displayName}</span>
+          </label>
+        </li>
+      </script>
       <ul id="linesList">
       </ul>
     </div>

@@ -1,9 +1,3 @@
-/*
- * TODO: some of the behavior or configuration of this class should be
- * overridable by subclasses. Refactor things once we have more experience
- * of using this class in several projects.
- */
-
 var SyntheseMap = OpenLayers.Class({
   MAP_SRID: "900913",
 
@@ -12,7 +6,7 @@ var SyntheseMap = OpenLayers.Class({
   stopsLayer: null,
   layerSwitcher: null,
   urlOptions: null,
-  
+
   /**
    * Option where to recenter the map on the first display.
    * Array of two or three strings: x, y, [zoom level].
@@ -23,7 +17,7 @@ var SyntheseMap = OpenLayers.Class({
    * Visibility of the layer switcher for stops and lines.
    */
   showLayerSwitcher: true,
-  
+
   /**
    * Default language to use.
    */
@@ -53,13 +47,25 @@ var SyntheseMap = OpenLayers.Class({
 
   setMapId: function(mapId) {
 
-    // The doc says we can pass a DOM node, but that's not true :/
-    if (typeof(mapId) != "string") {
-      var mapDiv = mapId;
+    var mapDiv;
+
+    if (typeof(mapId) == "string") {
+      mapDiv = document.getElementById(mapId);
+    } else {
+      // The doc says we can pass a DOM node, but that's not true :/
+      // Construct an id in this case.
+      mapDiv = mapId;
       mapId = OpenLayers.Util.createUniqueID("OpenLayers.Map_");
       mapDiv.setAttribute("id", mapId);
     }
-    
+
+    // Hack for IE7: The map is not shown if the map div has an absolute
+    // position and no explicit height.
+    // Setting the height "manually" fixes the issues. It should be harmless
+    // to other browsers.
+    // (See http://lists.osgeo.org/pipermail/openlayers-users/2010-July/018686.html)
+    mapDiv.style.height = $(mapDiv).height();
+
     this.beforeMapInit();
 
     this.map = new OpenLayers.Map(mapId, {
@@ -159,12 +165,12 @@ var SyntheseMap = OpenLayers.Class({
       return;
     var zoom = center[2] && parseFloat(center[2]);
     this.map.setCenter(
-        new OpenLayers.LonLat(parseFloat(center[0]), parseFloat(center[1])).
-          transform(new OpenLayers.Projection("EPSG:4326"),
-            this.map.getProjectionObject()),
-        zoom);
+      new OpenLayers.LonLat(parseFloat(center[0]), parseFloat(center[1])).
+        transform(new OpenLayers.Projection("EPSG:4326"),
+          this.map.getProjectionObject()),
+      zoom);
   },
-  
+
   /**
    * Override this method to do operations before the map is initialized.
    * You should do work here instead of in initialize if you need to use
@@ -422,12 +428,12 @@ var SyntheseMap = OpenLayers.Class({
       target[a.name] = a.value;
     });
   },
-  
-  
+
+
   addLines: function() {
 
     // TODO: create a fetchLines function that this method will call.
-    
+
     var linesXHR = Synthese.callService("LinesListFunction2", {
       of: "xml",
       os: "1",
@@ -490,13 +496,6 @@ var SyntheseMap = OpenLayers.Class({
    * bounds (OpenLayers.Bounds) property.
    */
   fetchStops: function(filter, withLines) {
-    
-    // XXX unduplicate
-    function copyAttributes(node, target) {
-      $.each($(node).get(0).attributes, function(index, a) {
-        target[a.name] = a.value;
-      });
-    };
 
     var args = {
       srid: this.MAP_SRID
@@ -512,24 +511,24 @@ var SyntheseMap = OpenLayers.Class({
     var self = this;
 
     var dfd = $.Deferred();
-    
+
     return stopsXHR.pipe(function(stopsDocument) {
       var stopFeatures = [];
 
       // Ignore stops which are in the middle of the sea. This can happen when
-      // importing data from Lambert93 with zero coordinages.
+      // importing data from Lambert93 with zero coordinates.
       var latLonProj = new OpenLayers.Projection("EPSG:4326");
       var invalidBounds = new OpenLayers.Bounds(-15, -6, 7, 2);
 
       $("stopArea", stopsDocument).each(function(index, stopArea) {
         var attributes = {};
-        copyAttributes(stopArea, attributes);
+        self.copyAttributes(stopArea, attributes);
 
         var point = new OpenLayers.Geometry.Point(
           parseFloat(attributes.x),
           parseFloat(attributes.y)
         );
-        
+
         var pointLatLon = OpenLayers.Projection.transform(
             point.clone(), self.map.getProjectionObject(),
             latLonProj);
@@ -543,7 +542,7 @@ var SyntheseMap = OpenLayers.Class({
           attributes.lines = [];
           $("line", stopArea).each(function(index, line) {
             var lineAttributes = {};
-            copyAttributes(line, lineAttributes);
+            self.copyAttributes(line, lineAttributes);
             attributes.lines.push(lineAttributes);
           });
         }
@@ -554,7 +553,7 @@ var SyntheseMap = OpenLayers.Class({
           )
         );
       });
-      
+
       return stopFeatures;
     }).promise();
   },
@@ -565,7 +564,7 @@ var SyntheseMap = OpenLayers.Class({
     return this.fetchStops({cityId: this.cityIdFilter}, true).
       pipe(function(stopFeatures) {
         self.stopsLayer.addFeatures(stopFeatures);
-  
+
         if (self.cityIdFilter && self.stopsLayer.features.length > 0) {
           // FIXME: a bug happens sometimes where the extent is wrong and we
           // recenter on Africa/Europe.

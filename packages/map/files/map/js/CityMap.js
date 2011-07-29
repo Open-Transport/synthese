@@ -36,17 +36,6 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
       "cityOf": "Commune de {name}"
     });
   },
-  
-  afterMapInit: function() {
-
-    /*
-    this.map.setCenter(
-      new OpenLayers.LonLat(6.849580, 47.645737).
-        transform(new OpenLayers.Projection("EPSG:4326"),
-          this.map.getProjectionObject()),
-      12);
-    */
-  },
 
   onError: function(message, arguments) {
     $("#errorMessage").text(message + " (" + arguments[2] + ")");
@@ -54,7 +43,7 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
 
   afterPTFeaturesAdded: function() {
     console.log("CityMap::afterPTFeaturesAdded");
-    
+
     // Draw the list of lines on the left
 
     var idToLine = {};
