@@ -615,7 +615,7 @@ ss01.setActive(day_clock::local_day());
 ss01.setActive(day_clock::local_day() + days(1));
 ss01.setActive(day_clock::local_day() + days(2));
 SAVE(ScheduledService, ss01);
-li92.addService(&ss01, true);
+li92.addService(ss01, true);
 
 ContinuousService cs97(4785074604214097, "", &li92, minutes(60), minutes(5));
 {
@@ -641,7 +641,7 @@ ContinuousService cs97(4785074604214097, "", &li92, minutes(60), minutes(5));
 cs97.setActive(day_clock::local_day());
 cs97.setActive(day_clock::local_day() + days(1));
 SAVE(ContinuousService, cs97);
-li92.addService(&cs97, true);
+li92.addService(cs97, true);
 
 ScheduledService ss02(4503599627370502, "2", &li92);
 {
@@ -667,7 +667,7 @@ ScheduledService ss02(4503599627370502, "2", &li92);
 ss02.setActive(day_clock::local_day());
 ss02.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss02);
-li92.addService(&ss02, true);
+li92.addService(ss02, true);
 SAVE(JourneyPattern, li92);
 
 // JourneyPattern 93
@@ -724,7 +724,7 @@ ScheduledService ss18(4503599627370518, "18", &li93);
 ss18.setActive(day_clock::local_day());
 ss18.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss18);
-li93.addService(&ss18, true);
+li93.addService(ss18, true);
 
 ScheduledService ss08(4503599627370508, "8", &li93);
 {
@@ -744,7 +744,7 @@ ScheduledService ss08(4503599627370508, "8", &li93);
 ss08.setActive(day_clock::local_day());
 ss08.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss08);
-li93.addService(&ss08, true);
+li93.addService(ss08, true);
 
 ScheduledService ss07(4503599627370507, "7", &li93);
 {
@@ -764,7 +764,7 @@ ScheduledService ss07(4503599627370507, "7", &li93);
 ss07.setActive(day_clock::local_day());
 ss07.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss07);
-li93.addService(&ss07, true);
+li93.addService(ss07, true);
 SAVE(JourneyPattern, li93);
 
 // JourneyPattern 94
@@ -836,7 +836,7 @@ ScheduledService ss11(4503599627370511, "11", &li94);
 ss11.setActive(day_clock::local_day());
 ss11.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss11);
-li94.addService(&ss11, true);
+li94.addService(ss11, true);
 
 ScheduledService ss06(4503599627370506, "06", &li94);
 {
@@ -865,7 +865,7 @@ ScheduledService ss06(4503599627370506, "06", &li94);
 ss06.setActive(day_clock::local_day());
 ss06.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss06);
-li94.addService(&ss06, true);
+li94.addService(ss06, true);
 SAVE(JourneyPattern, li94);
 
 // JourneyPattern 95
@@ -909,7 +909,7 @@ ScheduledService ss09(4503599627370509, "09", &li95);
 ss09.setActive(day_clock::local_day());
 ss09.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss09);
-li95.addService(&ss09, true);
+li95.addService(ss09, true);
 
 ScheduledService ss10(4503599627370510, "10", &li95);
 {
@@ -926,7 +926,7 @@ ScheduledService ss10(4503599627370510, "10", &li95);
 ss10.setActive(day_clock::local_day());
 ss10.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss10);
-li95.addService(&ss10, true);
+li95.addService(ss10, true);
 SAVE(JourneyPattern, li95);
 
 // JourneyPattern 96
@@ -970,7 +970,7 @@ ScheduledService ss13(4503599627370513, "13", &li96);
 ss13.setActive(day_clock::local_day());
 ss13.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss13);
-li96.addService(&ss13, true);
+li96.addService(ss13, true);
 
 ScheduledService ss14(4503599627370514, "14", &li96);
 {
@@ -987,7 +987,7 @@ ScheduledService ss14(4503599627370514, "14", &li96);
 ss14.setActive(day_clock::local_day());
 ss14.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss14);
-li96.addService(&ss14, true);
+li96.addService(ss14, true);
 SAVE(JourneyPattern, li96);
 
 // JourneyPattern 97
@@ -1033,7 +1033,7 @@ cs9701.setActive(day_clock::local_day() + days(1));
 cs9701.setMaxWaitingTime(minutes(0));
 cs9701.setRange(minutes(30));
 SAVE(ContinuousService, cs9701);
-li97.addService(&cs9701, true);
+li97.addService(cs9701, true);
 SAVE(JourneyPattern, li97);
 
 // JourneyPattern 98
@@ -1079,7 +1079,7 @@ cs9801.setActive(day_clock::local_day() + days(1));
 cs9801.setMaxWaitingTime(minutes(0));
 cs9801.setRange(minutes(30));
 SAVE(ContinuousService, cs9801);
-li98.addService(&cs9801, true);
+li98.addService(cs9801, true);
 SAVE(JourneyPattern, li98);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
