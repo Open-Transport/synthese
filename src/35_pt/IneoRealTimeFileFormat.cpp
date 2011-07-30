@@ -285,7 +285,7 @@ namespace synthese
 					service->setPath(route);
 					service->setCodeBySource(_dataSource, serviceRef);
 					service->setActive(today);
-					route->addService(service, false);
+					route->addService(*service, false);
 					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
 
 					os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";

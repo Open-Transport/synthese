@@ -579,7 +579,7 @@ namespace synthese
 				);
 				result->setSchedules(departureSchedules, arrivalSchedules);
 				result->setPath(&route);
-				route.addService(result, false);
+				route.addService(*result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
 
 				logStream << "CREA : Creation of service " << result->getServiceNumber() << " for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";

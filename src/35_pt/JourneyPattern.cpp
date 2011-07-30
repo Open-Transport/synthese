@@ -178,12 +178,12 @@ namespace synthese
 
 
 		void JourneyPattern::addService(
-			Service* service,
+			Service& service,
 			bool ensureLineTheory
 		){
 			/// Test of the respect of the line theory
 			/// If OK call the normal Path service insertion
-			if (!ensureLineTheory || respectsLineTheory(false, *service))
+			if (!ensureLineTheory || respectsLineTheory(false, service))
 			{
 				Path::addService(service, ensureLineTheory);
 				return;
@@ -193,11 +193,13 @@ namespace synthese
 			for (SubLines::const_iterator it(_subLines.begin()); it != _subLines.end(); ++it)
 			{
 				if ((*it)->addServiceIfCompatible(service))
+				{
 					return;
+				}
 			}
 
 			// If no subline can handle the service, create one for it
-			JourneyPatternCopy* subline(new JourneyPatternCopy(this));
+			JourneyPatternCopy* subline(new JourneyPatternCopy(*this));
 			bool isok(subline->addServiceIfCompatible(service));
 
 			assert(isok);

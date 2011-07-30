@@ -213,13 +213,16 @@ namespace synthese
 				AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(_request);
  				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
+					// Row initialization
 					lineOpenRequest.getPage()->setLine(line);
 					removeRequest.getAction()->setObjectId(line->getKey());
-
 					stream << t.row(lexical_cast<string>(line->getKey()));
+
+					// Name
 					stream << t.col();
 					stream << line->getName();
 
+					// Origin and destination
 					if(line->getEdges().size() < 2)
 					{
 						stream << t.col(4) << "Trajet non défini";
@@ -265,15 +268,26 @@ namespace synthese
 								stream << lineArea->getArea()->getName();
 							}
 						}
+
+						// Stops number
 						stream << t.col();
 						stream << line->getEdges().size();
+						
+						// Length
 						stream << t.col();
 						stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
 					}
 
+					// Services number
 					stream << t.col();
-					stream << line->getServices().size();
+					size_t servicesNumber(line->getServices().size());
+					BOOST_FOREACH(JourneyPatternCopy* subline, line->getSubLines())
+					{
+						servicesNumber += subline->getServices().size();
+					}
+					stream << servicesNumber;
 
+					// Datasource
 					stream << t.col();
 					BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, line->getDataSourceLinks())
 					{
@@ -301,9 +315,11 @@ namespace synthese
 						}
 					}
 
+					// Open button
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 
+					// Remove button
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
 				}

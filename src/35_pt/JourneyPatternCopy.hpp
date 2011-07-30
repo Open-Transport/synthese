@@ -56,7 +56,7 @@ namespace synthese
 					- copy all data (including LineStop) of the original line
 					- insert the subline in the sublines registry of the line.
 			*/
-			JourneyPatternCopy(JourneyPattern* line);
+			JourneyPatternCopy(JourneyPattern& line);
 
 
 			/** Destructor.
@@ -74,7 +74,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			bool addServiceIfCompatible(graph::Service* service);
+			bool addServiceIfCompatible(graph::Service& service);
 
 
 			/** Main line getter.
@@ -82,7 +82,7 @@ namespace synthese
 				@author Hugues Romain
 				@date 2008
 			*/
-			JourneyPattern*	getMainLine()	const;
+			JourneyPattern*	getMainLine() const { return _mainLine; }
 		};
 	}
 }

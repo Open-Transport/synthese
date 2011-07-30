@@ -34,6 +34,7 @@
 #include "StopArea.hpp"
 #include "LinePhysicalStop.hpp"
 #include "Destination.hpp"
+#include "CalendarTemplate.h"
 
 #include <boost/foreach.hpp>
 
@@ -50,6 +51,7 @@ namespace synthese
 	using namespace pt;
 	using namespace cms;
 	using namespace graph;
+	using namespace calendar;
 
 	template<> const string FactorableTemplate<Function, PTRoutesListFunction>::FACTORY_KEY("PTRoutesListFunction");
 
@@ -59,6 +61,7 @@ namespace synthese
 		const string PTRoutesListFunction::PARAMETER_MERGE_INCLUDING_ROUTES("mir");
 		const string PTRoutesListFunction::PARAMETER_MERGE_SAME_ROUTES("msr");
 		const string PTRoutesListFunction::PARAMETER_DATE("date");
+		const string PTRoutesListFunction::PARAMETER_CALENDAR_ID("calendar_id");
 		const string PTRoutesListFunction::PARAMETER_FILTER_MAIN_ROUTES("fmr");
 
 		const std::string PTRoutesListFunction::DATA_NAME("name");
@@ -92,6 +95,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_FILTER_MAIN_ROUTES, *_filterMainRoutes);
 			}
+			if(_calendar)
+			{
+				map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
+			}
 			return map;
 		}
 
@@ -124,6 +131,7 @@ namespace synthese
 				throw RequestException("No such line");
 			}
 
+			// Date
 			string dateStr(map.getDefault<string>(PARAMETER_DATE));
 			if(!dateStr.empty())
 			{
@@ -138,6 +146,25 @@ namespace synthese
 					_date = time_from_string(dateStr);
 				}
 			}
+
+			// Calendar
+			if(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0))
+			{
+				try
+				{
+					_calendar = Env::GetOfficialEnv().get<CalendarTemplate>(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("No such calendar template");
+				}
+
+				// Checks if the calendar template is usable
+				if(!_calendar->isLimited())
+				{
+					throw RequestException("The calendar template must define a limited period.");
+				}
+			}
 		}
 
 
@@ -149,6 +176,11 @@ namespace synthese
 
 			set<const JourneyPattern*> routes;
 			// Selection of routes by same comparison
+			Calendar calendarFilter;
+			if(_calendar.get())
+			{
+				calendarFilter = _calendar->getResult();
+			}
 			BOOST_FOREACH(const Path* path, _line->getPaths())
 			{
 				const JourneyPattern* thisRoute = dynamic_cast<const JourneyPattern*>(path);
@@ -159,6 +191,12 @@ namespace synthese
 
 				// Date filter
 				if(_date && !thisRoute->isActive(_date->date()))
+				{
+					continue;
+				}
+
+				// Calendar filter
+				if(_calendar.get() && !thisRoute->hasAtLeastOneCommonDateWith(calendarFilter))
 				{
 					continue;
 				}
