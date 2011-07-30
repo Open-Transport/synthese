@@ -46,8 +46,9 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<CalendarTemplate> _calendar;
-			std::string _name;
-			CalendarTemplate::Category _category;
+			boost::optional<std::string> _name;
+			boost::optional<CalendarTemplate::Category> _category;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
@@ -71,7 +72,6 @@ namespace synthese
 
 			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_CalendarTemplatePropertiesUpdateAction_H__

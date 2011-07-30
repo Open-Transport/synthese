@@ -5,7 +5,6 @@
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplatesAdmin.h"
 
-#include "CalendarTemplateAddAction.h"
 #include "CalendarTemplateElementAddAction.h"
 #include "CalendarTemplatePropertiesUpdateAction.h"
 #include "CalendarTemplateCleanAction.hpp"
@@ -34,7 +33,6 @@ void synthese::calendar::moduleRegister()
 	synthese::calendar::CalendarTemplateAdmin::integrate();
 	synthese::calendar::CalendarTemplatesAdmin::integrate();
 	
-	synthese::calendar::CalendarTemplateAddAction::integrate();
 	synthese::calendar::CalendarTemplateElementAddAction::integrate();
 	synthese::calendar::CalendarTemplatePropertiesUpdateAction::integrate();
 	synthese::calendar::CalendarTemplateCleanAction::integrate();
