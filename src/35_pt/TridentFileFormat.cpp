@@ -24,12 +24,9 @@
 #include "DBModule.h"
 #include "TridentFileFormat.h"
 #include "GraphConstants.h"
-#include "CommercialLine.h"
-#include "CommercialLineTableSync.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
-#include "StopPointTableSync.hpp"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -38,8 +35,6 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
-#include "TransportNetwork.h"
-#include "TransportNetworkTableSync.h"
 #include "City.h"
 #include "CityTableSync.h"
 #include "Service.h"
@@ -65,7 +60,6 @@
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateElementTableSync.h"
 
 #include <algorithm>
@@ -140,7 +134,11 @@ namespace synthese
 			_autoGenerateStopAreas(false),
 			_defaultTransferDuration(minutes(8)),
 			_importTimetablesAsTemplates(false),
-			_mergeRoutes(true)
+			_mergeRoutes(true),
+			_calendarTemplates(_dataSource, _env),
+			_stops(_dataSource, _env),
+			_networks(dataSource, _env),
+			_lines(dataSource, _env)
 		{}
 
 
@@ -1096,10 +1094,9 @@ namespace synthese
 			XMLNode networkIdNode = networkNode.getChildNode("objectId", 0);
 			XMLNode networkNameNode = networkNode.getChildNode("name", 0);
 
-			ImportableTableSync::ObjectBySource<TransportNetworkTableSync> networks(_dataSource, _env);
 			TransportNetwork* network(
 				PTFileFormat::CreateOrUpdateNetwork(
-					networks,
+					_networks,
 					networkIdNode.getText(),
 					charset_converter.convert(networkNameNode.getText()),
 					_dataSource,
@@ -1108,10 +1105,9 @@ namespace synthese
 			)	);
 
 			// Commercial lines
-			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 			CommercialLine* cline(
 				PTFileFormat::CreateOrUpdateLine(
-					lines,
+					_lines,
 					lineKeyNode.getText(),
 					charset_converter.convert(clineNameNode.getText()),
 					charset_converter.convert(clineShortNameNode.getText()),
@@ -1303,7 +1299,6 @@ namespace synthese
 			}
 
 			// Stops
-			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
 			XMLNode chouetteAreaNode(allNode.getChildNode("ChouetteArea"));
 			int stopsNumber(chouetteAreaNode.nChildNode("StopArea"));
 			for(int stopRank(0); stopRank < stopsNumber; ++stopRank)
@@ -1382,15 +1377,15 @@ namespace synthese
 							string cityCode(
 								(addressNode.isEmpty() || !addressNode.getChildNode("countryCode", 0).getText()) ?
 								string() :
-							addressNode.getChildNode("countryCode", 0).getText()
-								);
+								addressNode.getChildNode("countryCode", 0).getText()
+							);
 
 							// Search of the city
 							if(!cityCode.empty())
 							{
 								CityTableSync::SearchResult cityResult(
 									CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
-									);
+								);
 								if(!cityResult.empty())
 								{
 									city = cityResult.front();
@@ -1400,7 +1395,7 @@ namespace synthese
 									// If no city was found, attempting to find an alias with the right code
 									CityAliasTableSync::SearchResult cityAliasResult(
 										CityAliasTableSync::Search(_env, optional<RegistryKeyType>(), cityCode)
-										);
+									);
 
 									if(cityAliasResult.empty())
 									{
@@ -1425,7 +1420,7 @@ namespace synthese
 
 					set<StopPoint*> stopPoints(
 						PTFileFormat::CreateOrUpdateStopPoints(
-							stops,
+							_stops,
 							stopKey,
 							name,
 							curStop,
@@ -1446,7 +1441,7 @@ namespace synthese
 				else
 				{
 					if(	PTFileFormat::GetStopPoints(
-							stops,
+							_stops,
 							stopKey,
 							name,
 							os
@@ -1473,7 +1468,7 @@ namespace synthese
 				XMLNode stopPointNode(chouetteLineDescriptionNode.getChildNode("StopPoint", stopPointRank));
 				XMLNode spKeyNode(stopPointNode.getChildNode("objectId"));
 				XMLNode containedNode(stopPointNode.getChildNode("containedIn"));
-				set<StopPoint*> linkableStops(stops.get(containedNode.getText()));
+				set<StopPoint*> linkableStops(_stops.get(containedNode.getText()));
 				if(linkableStops.empty())
 				{
 					os << "ERR  : stop " << containedNode.getText() << " not found by stop point " << spKeyNode.getText() << ")<br />";
@@ -1658,7 +1653,6 @@ namespace synthese
 			// Calendars
 			int calendarNumber(allNode.nChildNode("Timetable"));
 			date now(gregorian::day_clock::local_day());
-			ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendarTemplates(_dataSource, _env);
 			for(int calendarRank(0); calendarRank < calendarNumber; ++calendarRank)
 			{
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
@@ -1669,7 +1663,7 @@ namespace synthese
 				if(_importTimetablesAsTemplates)
 				{
 					string calendarId(calendarNode.getChildNode("objectId").getText());
-					ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set cts(calendarTemplates.get(calendarId));
+					ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set cts(_calendarTemplates.get(calendarId));
 					CalendarTemplate* ct(NULL);
 					bool calendarToImport(false);
 					if(cts.empty())
@@ -1677,12 +1671,15 @@ namespace synthese
 						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
 						ct->setCodeBySource(_dataSource, calendarId);
 						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
-						calendarTemplates.add(*ct);
+						_calendarTemplates.add(*ct);
 						calendarToImport = true;
 					}
 					else
 					{
 						ct = *cts.begin();
+						CalendarTemplateElementTableSync::SearchResult elements(
+							CalendarTemplateElementTableSync::Search(_env, ct->getKey())
+						);
 						if(!ct->isLimited())
 						{
 							calendarToImport = true;
@@ -1702,9 +1699,6 @@ namespace synthese
 						}
 						if(calendarToImport)
 						{
-							CalendarTemplateElementTableSync::SearchResult elements(
-								CalendarTemplateElementTableSync::Search(_env, ct->getKey())
-							);
 							BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, elements)
 							{
 								_calendarElementsToRemove.insert(element);
