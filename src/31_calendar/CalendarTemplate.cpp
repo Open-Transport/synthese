@@ -42,9 +42,9 @@ namespace synthese
 	{
 		CalendarTemplate::CalendarTemplate(
 			RegistryKeyType id
-		):	util::Registrable(id)
-		{
-		}
+		):	util::Registrable(id),
+			_category(OTHER_CALENDAR)
+		{}
 
 
 
