@@ -45,6 +45,7 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateCleanAction.hpp"
+#include "ImportableAdmin.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -56,13 +57,13 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace calendar;
 	using namespace html;
 	using namespace security;
 	using namespace db;
+	using namespace impex;
 
 	namespace util
 	{
@@ -79,6 +80,8 @@ namespace synthese
 	{
 		const string CalendarTemplateAdmin::TAB_RESULT("trs");
 		const string CalendarTemplateAdmin::TAB_SOURCE("tsr");
+		const string CalendarTemplateAdmin::TAB_DATASOURCE("tds");
+
 		const string CalendarTemplateAdmin::PARAMETER_RESULT_START("prs");
 		const string CalendarTemplateAdmin::PARAMETER_RESULT_END("pre");
 
@@ -284,6 +287,15 @@ namespace synthese
 				v.display(stream);
 			}
 
+			////////////////////////////////////////////////////////////////////
+			// TAB DATASOURCE
+			if (openTabContent(stream, TAB_DATASOURCE))
+			{
+				// Source id
+				StaticActionRequest<CalendarTemplatePropertiesUpdateAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_calendar, updateOnlyRequest);
+			}
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
@@ -327,6 +339,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Données", TAB_SOURCE, true));
 			_tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+			_tabs.push_back(Tab("Sources de données", TAB_DATASOURCE, true));
 
 			_tabBuilded = true;
 		}

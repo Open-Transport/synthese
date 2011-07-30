@@ -31,7 +31,7 @@
 
 #include "CalendarTemplateAdmin.h"
 #include "CalendarTemplateTableSync.h"
-#include "CalendarTemplateAddAction.h"
+#include "CalendarTemplatePropertiesUpdateAction.h"
 #include "RemoveObjectAction.hpp"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
@@ -52,7 +52,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace calendar;
@@ -97,7 +96,7 @@ namespace synthese
 		) const {
 			// Requests
 
-			AdminActionFunctionRequest<CalendarTemplateAddAction,CalendarTemplateAdmin> addCalendar(_request);
+			AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction,CalendarTemplateAdmin> addCalendar(_request);
 			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setActionWillCreateObject();
 
@@ -158,7 +157,7 @@ namespace synthese
 			stream << t.row();
 			stream <<
 				t.col() <<
-				f.getTextInput(CalendarTemplateAddAction::PARAMETER_TEXT, string(), "(nom du calendrier)")
+				f.getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, string(), "(nom du calendrier)")
 			;
 			stream << t.col() << f.getSubmitButton("Ajouter");
 

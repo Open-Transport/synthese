@@ -56,6 +56,8 @@ namespace synthese
 		public:
 			static const std::string TAB_SOURCE;
 			static const std::string TAB_RESULT;
+			static const std::string TAB_DATASOURCE;
+
 			static const std::string PARAMETER_RESULT_START;
 			static const std::string PARAMETER_RESULT_END;
 
