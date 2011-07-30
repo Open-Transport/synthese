@@ -101,7 +101,7 @@ namespace synthese
 					this,
 					duration
 			)	);
-			addService(service, false);
+			addService(*service, false);
 			service->setPath(this);
 
 

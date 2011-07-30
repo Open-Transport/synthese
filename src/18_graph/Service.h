@@ -80,9 +80,6 @@ namespace synthese
 
 		protected:
 			std::string				_serviceNumber;
-			// TODO: remove _pathId, and retrieve it dynamically from _path
-			// See https://extranet-rcsmobility.com/issues/10625
-			util::RegistryKeyType	_pathId;
 			Path*					_path;
 
 			boost::posix_time::ptime _nextRTUpdate;
@@ -107,7 +104,6 @@ namespace synthese
 			//@{
 				const Path*			getPath () const;
 				Path*				getPath ();
-				util::RegistryKeyType		getPathId()			const { return _pathId; }
 				const std::string&	getServiceNumber()	const;
 				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
@@ -115,7 +111,6 @@ namespace synthese
 			//! @name Setters
 			//@{
 				virtual void setPath(Path* path);
-				void setPathId(util::RegistryKeyType id) { _pathId = id; }
 				void setServiceNumber(std::string serviceNumber);
 			//@}
 

@@ -86,17 +86,17 @@ namespace synthese
 
 
 		void Path::addService(
-			Service* service,
+			Service& service,
 			bool ensureLineTheory
 		){
-			if (_services.find(service) != _services.end())
+			if (_services.find(&service) != _services.end())
 				throw Exception("The service already exists.");
 
-			std::pair<ServiceSet::iterator, bool> result = _services.insert (service);
+			std::pair<ServiceSet::iterator, bool> result = _services.insert(&service);
 			if (result.second == false)
 			{
 				throw Exception(
-					"Service number " + Conversion::ToString (service->getServiceNumber ())
+					"Service number " + Conversion::ToString (service.getServiceNumber ())
 					+ " is already defined in path " + Conversion::ToString (getKey())
 				);
 			}
@@ -105,9 +105,9 @@ namespace synthese
 
 
 
-		void Path::removeService (Service* service)
+		void Path::removeService(Service& service)
 		{
-			_services.erase(service);
+			_services.erase(&service);
 
 			markScheduleIndexesUpdateNeeded(false);
 		}

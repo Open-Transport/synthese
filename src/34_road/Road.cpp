@@ -53,7 +53,7 @@ namespace synthese
 		{
 			// Creation of the permanent service
 			PermanentService* service(new PermanentService(id, this));
-			addService(service, false);
+			addService(*service, false);
 			service->setPath(this);
 		}
 

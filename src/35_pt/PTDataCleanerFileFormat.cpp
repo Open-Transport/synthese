@@ -125,7 +125,7 @@ namespace synthese
 				if(itService.second->getRoute()->hasLinkWithSource(_dataSource) && itService.second->empty())
 				{
 					_scheduledServicesToRemove.insert(itService.second);
-					itService.second->getPath()->removeService(itService.second.get());
+					itService.second->getPath()->removeService(*itService.second);
 				}
 			}
 			
@@ -135,7 +135,7 @@ namespace synthese
 				if(itCService.second->getRoute()->hasLinkWithSource(_dataSource) && itCService.second->empty())
 				{
 					_continuousServicesToRemove.insert(itCService.second);
-					itCService.second->getPath()->removeService(itCService.second.get());
+					itCService.second->getPath()->removeService(*itCService.second);
 				}
 			}
 

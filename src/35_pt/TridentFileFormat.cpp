@@ -724,10 +724,10 @@ namespace synthese
 				os << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "VehicleJourney", *srv) << "</objectId>" << "\n";
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
-				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
-				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
+				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPath()->getKey()) << "</routeId>" << "\n";
+				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPath()->getKey()) << "</journeyPatternId>" << "\n";
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_line) << "</lineIdShortcut>" << "\n";
-				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
+				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPath()->getKey()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
 					os << "<number>" << srv->getServiceNumber() << "</number>" << "\n";
@@ -736,7 +736,7 @@ namespace synthese
 				// --------------------------------------------------- VehicleJourneyAtStop
 
 				LineStopTableSync::SearchResult linestops(
-					LineStopTableSync::Search(_env, srv->getPathId())
+					LineStopTableSync::Search(_env, srv->getPath()->getKey())
 				);
 				BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
 				{
@@ -831,10 +831,10 @@ namespace synthese
 				os << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "VehicleJourney", *srv) << "</objectId>" << "\n";
 				os << "<creatorId>" << srv->getServiceNumber() << "</creatorId>" << "\n";
-				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeId>" << "\n";
-				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPathId()) << "</journeyPatternId>" << "\n";
+				os << "<routeId>" << TridentId (peerid, "ChouetteRoute", srv->getPath()->getKey()) << "</routeId>" << "\n";
+				os << "<journeyPatternId>" << TridentId (peerid, "JourneyPattern", srv->getPath()->getKey()) << "</journeyPatternId>" << "\n";
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_line) << "</lineIdShortcut>" << "\n";
-				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPathId()) << "</routeIdShortcut>" << "\n";
+				os << "<routeIdShortcut>" << TridentId (peerid, "ChouetteRoute", srv->getPath()->getKey()) << "</routeIdShortcut>" << "\n";
 				if (!srv->getServiceNumber().empty())
 				{
 					os << "<number>" << srv->getServiceNumber() << "</number>" << "\n";
@@ -843,7 +843,7 @@ namespace synthese
 				// --------------------------------------------------- VehicleJourneyAtStop
 				{
 					LineStopTableSync::SearchResult linestops(
-						LineStopTableSync::Search(_env, srv->getPathId())
+						LineStopTableSync::Search(_env, srv->getPath()->getKey())
 					);
 					BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
 					{

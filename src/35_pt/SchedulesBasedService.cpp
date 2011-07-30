@@ -353,7 +353,7 @@ namespace synthese
 			const SchedulesBasedService& other,
 			boost::posix_time::time_duration shift
 		){
-			assert(getPathId() == other.getPathId());
+			assert(getPath()->getKey() == other.getPath()->getKey());
 
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
