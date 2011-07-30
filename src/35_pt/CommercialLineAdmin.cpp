@@ -62,6 +62,7 @@
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
+#include "JourneyPatternCopy.hpp"
 
 using namespace std;
 using namespace boost;
