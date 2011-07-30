@@ -110,7 +110,6 @@ namespace synthese
 
 			// Path
 			util::RegistryKeyType pathId(rows->getLongLong(ScheduledServiceTableSync::COL_PATHID));
-			ss->setPathId(pathId);
 			Path* path(NULL);
 
 			// Use rules
@@ -179,7 +178,7 @@ namespace synthese
 			if(path)
 			{
 				path->addService(
-					ss,
+					*ss,
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 				ss->updatePathCalendar();
@@ -191,7 +190,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>::Unlink(
 			ScheduledService* ss
 		){
-			ss->getPath()->removeService(ss);
+			ss->getPath()->removeService(*ss);
 			ss->cleanDataSourceLinks(true);
 		}
 
@@ -208,7 +207,7 @@ namespace synthese
 			ReplaceQuery<ScheduledServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
 			query.addField(object->encodeSchedules());
-			query.addField(object->getPathId());
+			query.addField(object->getPath() ? object->getPath()->getKey() : 0);
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :

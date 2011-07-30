@@ -334,7 +334,10 @@ namespace synthese
 
 					@todo Update dates of the path
 				*/
-				virtual void addService(Service* service, bool ensureLineTheory);
+				virtual void addService(
+					Service& service,
+					bool ensureLineTheory
+				);
 
 
 
@@ -342,7 +345,9 @@ namespace synthese
 				/// Removes a service from the path.
 				/// @param service the service to remove
 				/// @author Hugues Romain
-				void removeService (Service* service);
+				void removeService(
+					Service& service
+				);
 
 
 

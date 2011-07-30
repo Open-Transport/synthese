@@ -164,7 +164,7 @@ namespace synthese
 					@date 2007
 				*/
 				virtual void addService(
-					graph::Service* service,
+					graph::Service& service,
 					bool ensureLineTheory
 				);
 			//@}

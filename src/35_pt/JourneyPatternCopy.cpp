@@ -39,25 +39,26 @@ namespace synthese
 
 	namespace pt
 	{
-		JourneyPatternCopy::JourneyPatternCopy( JourneyPattern* line )
-			: JourneyPattern()
-			, _mainLine(line),
-			Registrable(0)
+		JourneyPatternCopy::JourneyPatternCopy(
+			JourneyPattern& line
+		):	JourneyPattern(line.getKey()),
+			_mainLine(&line),
+			Registrable(line.getKey())
 		{
 			// Registration
-			int rank(line->addSubLine(this));
+			int rank(line.addSubLine(this));
 
 			// Copy of the properties
-			setCommercialLine(const_cast<CommercialLine*>(line->getCommercialLine()));
-			setRollingStock(line->getRollingStock());
-			setName(line->getName() + " (subline " + lexical_cast<string>(rank) + ")");
-			setTimetableName(line->getTimetableName());
-			setDirection(line->getDirection());
-			setWalkingLine(line->getWalkingLine());
-			setWayBack(line->getWayBack());
+			setCommercialLine(const_cast<CommercialLine*>(line.getCommercialLine()));
+			setRollingStock(line.getRollingStock());
+			setName(line.getName() + " (subline " + lexical_cast<string>(rank) + ")");
+			setTimetableName(line.getTimetableName());
+			setDirection(line.getDirection());
+			setWalkingLine(line.getWalkingLine());
+			setWayBack(line.getWayBack());
 
 			// Copy of the line-stops
-			const Path::Edges edges(line->getEdges());
+			const Path::Edges edges(line.getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
 				if(dynamic_cast<const DesignatedLinePhysicalStop*>(*it))
@@ -98,29 +99,29 @@ namespace synthese
 			_pathGroup->addPath(this);
 		}
 
-		bool JourneyPatternCopy::addServiceIfCompatible( Service* service )
-		{
-			if (!respectsLineTheory(false, *service))
+
+
+		bool JourneyPatternCopy::addServiceIfCompatible(
+			Service& service
+		){
+			if (!respectsLineTheory(false, service))
 				return false;
 
 			Path::addService(service, false);
-			service->setPath(this);
+			service.setPath(this);
 
 			return true;
 		}
 
+
+
 		JourneyPatternCopy::~JourneyPatternCopy()
 		{
 			for (Path::Edges::iterator it(_edges.begin()); it != _edges.end(); ++it)
+			{
 				delete *it;
+			}
 			assert(_pathGroup);
 			_pathGroup->removePath(this);
 		}
-
-		JourneyPattern* JourneyPatternCopy::getMainLine() const
-		{
-			return _mainLine;
-		}
-	}
-}
-
+}	}

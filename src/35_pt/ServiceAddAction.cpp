@@ -187,7 +187,6 @@ namespace synthese
 				ContinuousService object;
 				object.setServiceNumber(_number);
 				object.setPath(_line.get());
-				object.setPathId(_line->getKey());
 				object.setMaxWaitingTime(_period);
 				object.setRange(_endDepartureTime - _startDepartureTime);
 				if(_template.get())
@@ -215,7 +214,6 @@ namespace synthese
 				ScheduledService object;
 				object.setServiceNumber(_number);
 				object.setPath(_line.get());
-				object.setPathId(_line->getKey());
 				if(_template.get())
 				{
 					object.copyDates(*_template);
@@ -256,7 +254,6 @@ namespace synthese
 						ScheduledService object2;
 						object2.setServiceNumber(number > 0 ? lexical_cast<string>(number) : string());
 						object2.setPath(_line.get());
-						object2.setPathId(_line->getKey());
 						object2.setSchedulesFromOther(object, departureTime - object.getDepartureSchedule(false, 0));
 						object2.copyDates(object);
 

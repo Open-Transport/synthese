@@ -54,10 +54,7 @@ namespace synthese
 			_serviceNumber (serviceNumber),
 			_path (path),
 			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
-		{
-			if(path)
-				setPathId(path->getKey());
-		}
+		{}
 
 
 		Service::Service(
@@ -66,13 +63,12 @@ namespace synthese
 			_path(NULL),
 			Registrable(id),
 			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
-		{
-		}
+		{}
+
 
 
 		Service::~Service ()
-		{
-		}
+		{}
 
 
 
@@ -80,6 +76,8 @@ namespace synthese
 		{
 			return _path;
 		}
+
+
 
 		const string& Service::getServiceNumber () const
 		{
@@ -109,7 +107,6 @@ namespace synthese
 
 		void Service::setPath( Path* path )
 		{
-			setPathId(path->getKey());
 			_path = path;
 			clearRTData();
 		}

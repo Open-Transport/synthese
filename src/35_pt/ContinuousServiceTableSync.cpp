@@ -120,7 +120,6 @@ namespace synthese
 
 			// Path
 			util::RegistryKeyType pathId(rows->getLongLong(ContinuousServiceTableSync::COL_PATHID));
-			cs->setPathId(pathId);
 			Path* path(NULL);
 
 			// Use rules
@@ -185,7 +184,7 @@ namespace synthese
 			// Registration in path
 			if(path)
 			{
-				path->addService (cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+				path->addService(*cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 				cs->updatePathCalendar();
 			}
 		}
@@ -193,7 +192,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
 		){
-			obj->getPath()->removeService(obj);
+			obj->getPath()->removeService(*obj);
 		}
 
 
@@ -209,7 +208,7 @@ namespace synthese
 			ReplaceQuery<ContinuousServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());
 			query.addField(object->encodeSchedules(-object->getMaxWaitingTime()));
-			query.addField(object->getPathId());
+			query.addField(object->getPath() ? object->getPath()->getKey() : 0);
 			query.addField(object->getRange().total_seconds() / 60);
 			query.addField(object->getMaxWaitingTime().total_seconds() / 60);
 			query.addField(

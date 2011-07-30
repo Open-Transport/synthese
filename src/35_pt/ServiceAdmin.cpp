@@ -562,7 +562,7 @@ namespace synthese
 			shared_ptr<JourneyPatternAdmin> p(
 				getNewPage<JourneyPatternAdmin>()
 			);
-			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPathId()));
+			p->setLine(Env::GetOfficialEnv().get<JourneyPattern>(_service->getPath()->getKey()));
 
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(p);
