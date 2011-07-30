@@ -1724,6 +1724,7 @@ namespace synthese
 							cte->setMinDate(d);
 							cte->setMaxDate(d);
 							cte->setRank(rank++);
+							ct->addElement(*cte);
 							_env.getEditableRegistry<CalendarTemplateElement>().add(cte);
 						}
 					}
