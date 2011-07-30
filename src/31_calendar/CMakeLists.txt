@@ -15,8 +15,6 @@ CalendarRight.cpp
 CalendarRight.h
 CalendarTemplate.cpp
 CalendarTemplate.h
-CalendarTemplateAddAction.cpp
-CalendarTemplateAddAction.h
 CalendarTemplateAdmin.cpp
 CalendarTemplateAdmin.h
 CalendarTemplateCleanAction.cpp

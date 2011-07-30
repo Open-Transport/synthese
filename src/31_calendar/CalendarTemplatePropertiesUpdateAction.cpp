@@ -28,6 +28,8 @@
 #include "CalendarRight.h"
 #include "Request.h"
 #include "CalendarTemplateTableSync.h"
+#include "ImportableAdmin.hpp"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 
@@ -36,6 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
+	using namespace impex;
 
 	namespace util
 	{
@@ -53,9 +56,22 @@ namespace synthese
 		ParametersMap CalendarTemplatePropertiesUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if(_calendar.get()) map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
-			map.insert(PARAMETER_NAME, _name);
-			map.insert(PARAMETER_CATEGORY, static_cast<int>(_category));
+			if(_calendar.get())
+			{
+				map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
+			}
+			if(_name)
+			{
+				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_category)
+			{
+				map.insert(PARAMETER_CATEGORY, static_cast<int>(*_category));
+			}
+			if(_dataSourceLinks)
+			{
+				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
 			return map;
 		}
 
@@ -63,39 +79,80 @@ namespace synthese
 
 		void CalendarTemplatePropertiesUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			try
+			// Calendar
+			if(map.isDefined(PARAMETER_CALENDAR_ID))
+			{ // Load
+				try
+				{
+					_calendar = CalendarTemplateTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID),
+						*_env
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					throw ActionException("No such calendar", e, *this);
+				}
+			}
+			else
+			{ // Creation
+				_calendar.reset(new CalendarTemplate);
+			}
+
+			// Name
+			if(map.isDefined(PARAMETER_NAME) || !_calendar->getKey())
 			{
-				_calendar = CalendarTemplateTableSync::GetEditable(
-					map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID),
-					*_env
+				_name = map.getDefault<string>(PARAMETER_NAME);
+				if (_name->empty())
+				{
+					throw ActionException("Bad value for name parameter : name must be non empty.");
+				}
+
+				CalendarTemplateTableSync::SearchResult r(
+					CalendarTemplateTableSync::Search(*_env, *_name, _calendar->getKey(), false, true, 0, 1)
 				);
+				if(!r.empty())
+				{
+					throw ActionException("A calendar named "+ *_name +" already exists.");
+				}
 			}
-			catch(ObjectNotFoundException<CalendarTemplate>& e)
+
+			// Category
+			if(map.isDefined(PARAMETER_CATEGORY))
 			{
-				throw ActionException("No such calendar", e, *this);
+				_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
 			}
 
-			_name = map.get<string>(PARAMETER_NAME);
-			if (_name.empty())
-				throw ActionException("Bad value for name parameter ");
-
-			CalendarTemplateTableSync::SearchResult r(
-				CalendarTemplateTableSync::Search(*_env, _name, _calendar->getKey(), false, true, 0, 1)
-			);
-			if(!r.empty())
-				throw ActionException("A calendar named "+ _name +" already exists.");
-
-			_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
+			// Datasource
+			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
+			{
+				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
+			}
 		}
 
 
 
 		void CalendarTemplatePropertiesUpdateAction::run(Request& request)
 		{
-			_calendar->setText(_name);
-			_calendar->setCategory(_category);
+			if(_name)
+			{
+				_calendar->setText(*_name);
+			}
+			if(_category)
+			{
+				_calendar->setCategory(*_category);
+			}
+			if(_dataSourceLinks)
+			{
+				_calendar->setDataSourceLinks(*_dataSourceLinks);
+			}
 
 			CalendarTemplateTableSync::Save(_calendar.get());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(_calendar->getKey());
+			}
 		}
 
 
@@ -111,5 +168,4 @@ namespace synthese
 		{
 			_calendar = value;
 		}
-	}
-}
+}	}
