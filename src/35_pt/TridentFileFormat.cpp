@@ -1703,6 +1703,7 @@ namespace synthese
 							{
 								_calendarElementsToRemove.insert(element);
 								_env.getEditableRegistry<CalendarTemplateElement>().remove(element->getKey());
+								ct->removeElement(*element);
 							}
 						}
 					}
