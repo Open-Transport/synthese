@@ -49,7 +49,10 @@ class Page(object):
         self.save = True
     
     def __repr__(self):
-        return "<Page %r>" % self.__dict__
+        p = copy.copy(self)
+        MAX_CONTENT = 200
+        p.content1 = p.content1[:MAX_CONTENT]
+        return '<Page %r>' % p.__dict__
     
 
 class PagesIO(object):
@@ -116,8 +119,6 @@ class HTTPPagesReader(HTTPPageMixin, PagesReader):
 
         pages = []
         for existing_page in self.existing_pages:
-            print "existing_page", existing_page
-            print "X"*160
             br.open(self.http_api.get_admin_url('WebPageAdmin', {
                 'roid': existing_page.id,
             }))
@@ -385,9 +386,9 @@ def sync_site(project, site, host):
 
     sync_state = SyncState(project, site)
     files_modified_pages = sync_state.get_modifed_pages(files_pages)
-    log.debug('files modified pages: %r', files_modified_pages)
+    log.info('files modified pages: %r', files_modified_pages)
     db_modified_pages = sync_state.get_modifed_pages(db_pages)
-    log.debug('db modified pages: %r (%i not to save)',
+    log.info('db modified pages: %r (%i not to save)',
         [p for p in db_modified_pages if p.save],
         len([p for p in db_modified_pages if not p.save]))
     
