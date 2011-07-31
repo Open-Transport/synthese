@@ -61,7 +61,7 @@ namespace synthese
 			_samePlaces(samePlaces),
 			_journeys(journeys)
 		{
-			_buildPlacesList();
+			_createOrderedPlaces();
 		}
 
 
@@ -294,57 +294,10 @@ namespace synthese
 			{
 				_journeys.pop_front();
 			}
+			_createOrderedPlaces();
 		}
 
 
-
-		void PTRoutePlannerResult::_buildPlacesList()
-		{
-			_orderedPlaces.clear();
-
-			for(Journeys::const_iterator itj(_journeys.begin()); itj != _journeys.end(); ++itj)
-			{
-				const Journey::ServiceUses& jl(itj->getServiceUses());
-				vector<PlacesList::iterator> placePositions;
-				PlacesList::iterator minPos(_orderedPlaces.begin());
-
-				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
-				{
-					const ServicePointer& leg(*itl);
-
-					if(itl == jl.begin())
-					{
-						PlacesList::iterator pos(
-							_putPlace(
-								PlacesList::value_type(
-									GetNamedPlaceFromLegs(NULL, &leg, getNamedPlace(_departurePlace)),
-									true,
-									false
-								), minPos
-						)	);
-						placePositions.push_back(pos);
-						minPos = ++pos;
-					}
-
-					if(	!leg.getService()->getPath()->isPedestrianMode() ||
-						itl+1 == jl.end() ||
-						!(itl+1)->getService()->getPath()->isPedestrianMode()
-					){
-						PlacesList::iterator pos(
-							_putPlace(
-								PlacesList::value_type(
-									GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), getNamedPlace(_arrivalPlace)),
-									false,
-									itl+1 == jl.end()
-								), minPos
-						)	);
-						placePositions.push_back(pos);
-						minPos = ++pos;
-					}
-				}
-				_journeysPlacePositions.insert(make_pair(itj, placePositions));
-			}
-		}
 
 		const NamedPlace* PTRoutePlannerResult::getNamedPlace(const Place* place)
 		{
@@ -372,158 +325,6 @@ namespace synthese
 			return NULL;
 		}
 
-		PTRoutePlannerResult::PlacesList::iterator PTRoutePlannerResult::_putPlace(
-			PlacesList::value_type value,
-			PlacesList::iterator minPos
-		){
-			if(!_orderedPlaces.empty())
-			{
-				PlacesList::iterator testPos;
-				// Search of the place after the minimal position
-				for(testPos = minPos;
-					testPos != _orderedPlaces.end() && testPos->place != value.place;
-					++testPos) ;
-
-				// If found, return of the position
-				if(testPos != _orderedPlaces.end())
-				{
-					return testPos;
-				}
-
-				// If not found, search of the place before the minimal position
-				if(minPos != _orderedPlaces.begin())
-				{
-					testPos = minPos;
-					for(--testPos;
-						testPos != _orderedPlaces.begin() && testPos->place != value.place;
-						--testPos) ;
-
-					// If found, try to swap items
-					if(testPos != _orderedPlaces.begin() && _canBeSwapped(minPos, testPos))
-					{
-						_swap(minPos, testPos);
-						return testPos;
-					}
-				}
-			}
-
-			// Else insert a new row
-			PlacesList::iterator position;
-			if(value.isDestination)
-			{
-				position = _orderedPlaces.end();
-				PlacesList::iterator previous(position);
-				--previous;
-				while(previous->place == _arrivalPlace)
-				{
-					--position;
-					--previous;
-				}
-			}
-			else if(value.isOrigin)
-			{
-				position = minPos;
-				while(position != _orderedPlaces.end() && position->place == _departurePlace)
-				{
-					++position;
-				}
-			}
-			else
-			{
-				position = minPos;
-			}
-			return _orderedPlaces.insert(
-				position,
-				value
-			);
-		}
-
-
-
-		PTRoutePlannerResult::PlacesList::iterator PTRoutePlannerResult::_getHighestPosition(
-			PlacesList::iterator source,
-			PlacesList::iterator target
-		) const {
-			PlacesList::iterator result(source);
-			PlacesList::const_iterator brake(_orderedPlaces.end());
-			BOOST_FOREACH(const JourneysPlacePositions::value_type& its, _journeysPlacePositions)
-			{
-				const JourneysPlacePositions::mapped_type& sequence(its.second);
-
-				// Search of the source iterator in the sequence
-				JourneysPlacePositions::mapped_type::const_iterator curPos;
-				for(curPos = sequence.begin(); curPos != sequence.end() && *curPos != source; ++curPos) ;
-
-				// If not found or if it is the last place, ok
-				if(curPos == sequence.end() || curPos + 1 == sequence.end())
-				{
-					continue;
-				}
-
-				// If found, search where the row can be pushed
-				PlacesList::iterator itNewPos;
-				for(itNewPos = (*curPos);
-					itNewPos != brake && itNewPos != *(curPos+1);
-					++itNewPos)
-				{
-					result = itNewPos;
-					++result;
-					if(result == target)
-					{
-						break;
-					}
-				}
-
-				// If next element of the journey was found, it is the new brake
-				if(itNewPos == *(curPos + 1))
-				{
-					brake = *(curPos + 1);
-					continue;
-				}
-			}
-
-			return result;
-		}
-
-
-
-		bool PTRoutePlannerResult::_canBeSwapped(
-			PlacesList::iterator source,
-			PlacesList::iterator target
-		) const {
-			PlacesList::iterator maxPos(_getHighestPosition(source, target));
-			if(maxPos == target)
-			{
-				return true;
-			}
-			PlacesList::iterator nextMaxPos(maxPos);
-			++nextMaxPos;
-			if(maxPos != source && nextMaxPos != _orderedPlaces.end() && nextMaxPos != target)
-			{
-				return _canBeSwapped(maxPos, target);
-			}
-			return false;
-		}
-
-
-
-		void PTRoutePlannerResult::_swap(
-			PlacesList::iterator source,
-			PlacesList::iterator target
-		){
-			PlacesList::iterator maxPos(_getHighestPosition(source, target));
-			if(maxPos == target)
-			{
-				_orderedPlaces.splice(target, _orderedPlaces, source);
-				return;
-			}
-			if(maxPos != target)
-			{
-				_swap(maxPos, target);
-				_orderedPlaces.splice(maxPos, _orderedPlaces, source);
-			}
-		}
-
 
 
 		const geography::NamedPlace* PTRoutePlannerResult::GetNamedPlaceFromLegs(
@@ -541,5 +342,45 @@ namespace synthese
 			}
 			return defaultValue;
 		}
-	}
-}
+
+
+
+		void PTRoutePlannerResult::_createOrderedPlaces()
+		{
+			_orderedPlaces.clear();
+			for(Journeys::const_iterator itj(_journeys.begin()); itj != _journeys.end(); ++itj)
+			{
+				const Journey::ServiceUses& jl(itj->getServiceUses());
+				PlacesListConfiguration::List jlist;
+
+				for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+				{
+					const ServicePointer& leg(*itl);
+
+					if(itl == jl.begin())
+					{
+						PlacesListConfiguration::PlaceInformation item(
+							GetNamedPlaceFromLegs(NULL, &leg, getNamedPlace(_departurePlace)),
+							true,
+							false
+						);
+						jlist.push_back(item);
+					}
+
+					if(	!leg.getService()->getPath()->isPedestrianMode() ||
+						itl+1 == jl.end() ||
+						!(itl+1)->getService()->getPath()->isPedestrianMode()
+					){
+						PlacesListConfiguration::PlaceInformation item(
+							GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), getNamedPlace(_arrivalPlace)),
+							false,
+							itl+1 == jl.end()
+						);
+						jlist.push_back(item);
+					}
+				}
+
+				_orderedPlaces.addList(make_pair(itj, jlist));
+			}
+		}
+}	}

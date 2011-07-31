@@ -829,8 +829,8 @@ namespace synthese
 					"</query>" <<
 					"<journeys>"
 				;
-				const PTRoutePlannerResult::PlacesList& placesList(
-					result.getOrderedPlaces()
+				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList(
+					result.getOrderedPlaces().getResult()
 				);
 				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
 				PlacesContentVector sheetRows(placesList.size());
@@ -847,7 +847,7 @@ namespace synthese
 					bool lastPedestrianMode = false;
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					PTRoutePlannerResult::PlacesList::const_iterator itPlaces(placesList.begin());
+					PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itPlaces(placesList.begin());
 
 					stream <<
 						"<journey hasALineAlert=\"" << (hasALineAlert ? "true" : "false") << "\" hasAStopAlert=\"" << (hasAStopAlert ? "true" : "false") << "\""
@@ -1351,7 +1351,7 @@ namespace synthese
 					stream << "<resultTable>";
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& row, result.getOrderedPlaces())
+					BOOST_FOREACH(const PTRoutePlannerResult::PlacesListConfiguration::List::value_type& row, result.getOrderedPlaces().getResult())
 					{
 						assert(dynamic_cast<const NamedPlace*>(row.place));
 						//						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
@@ -1717,8 +1717,8 @@ namespace synthese
 			if(_schedulesRowPage.get() && _schedulesCellPage.get())
 			{
 				stringstream rows;
-				const PTRoutePlannerResult::PlacesList& placesList(
-					object.getOrderedPlaces()
+				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList(
+					object.getOrderedPlaces().getResult()
 				);
 				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
 				PlacesContentVector sheetRows(placesList.size());
@@ -1739,7 +1739,7 @@ namespace synthese
 					bool lastPedestrianMode = false;
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					PTRoutePlannerResult::PlacesList::const_iterator itPlaces(placesList.begin());
+					PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itPlaces(placesList.begin());
 
 					// Loop on each leg
 					const Journey::ServiceUses& jl(it->getServiceUses());
@@ -1768,7 +1768,7 @@ namespace synthese
 								_displayScheduleCell(
 									**itSheetRow,
 									request,
-									itPlaces == object.getOrderedPlaces().begin(),
+									itPlaces == placesList.begin(),
 									(itl + 1) == jl.end(),
 									i,
 									pedestrianMode,
@@ -1787,7 +1787,7 @@ namespace synthese
 							_displayScheduleCell(
 								**itSheetRow,
 								request,
-								itPlaces == object.getOrderedPlaces().begin()
+								itPlaces == placesList.begin()
 								, true
 								, i
 								, pedestrianMode
@@ -1873,14 +1873,12 @@ namespace synthese
 				// Initialization of text lines
 				bool color(false);
 				PlacesContentVector::const_iterator it(sheetRows.begin());
-				BOOST_FOREACH(const PTRoutePlannerResult::PlacesList::value_type& pi, placesList)
+				BOOST_FOREACH(const PTRoutePlannerResult::PlacesListConfiguration::List::value_type& pi, placesList)
 				{
-					assert(dynamic_cast<const NamedPlace*>(pi.place));
-
 					_displayRow(
 						rows,
 						request,
-						*dynamic_cast<const NamedPlace*>(pi.place),
+						*pi.place,
 						(*it)->str(),
 						color,
 						pi.isOrigin,
