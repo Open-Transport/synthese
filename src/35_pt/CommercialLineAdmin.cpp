@@ -208,7 +208,7 @@ namespace synthese
 					routes,
 					creationRequest.getHTMLForm("addline"),
 					JourneyPatternAddAction::PARAMETER_TEMPLATE_ID
-				);
+					);
 
 				stream << t.open();
 				AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(_request);
