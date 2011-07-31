@@ -479,12 +479,12 @@ namespace synthese
 		) const {
 			typename List::iterator result(source);
 			typename List::const_iterator brake(_result.end());
-			BOOST_FOREACH(const CellPositions::value_type& its, _cellPositions)
+			BOOST_FOREACH(const typename CellPositions::value_type& its, _cellPositions)
 			{
-				const CellPositions::mapped_type& sequence(its.second);
+				const typename CellPositions::mapped_type& sequence(its.second);
 
 				// Search of the source iterator in the sequence
-				CellPositions::mapped_type::const_iterator curPos;
+				typename CellPositions::mapped_type::const_iterator curPos;
 				for(curPos = sequence.begin(); curPos != sequence.end() && *curPos != source; ++curPos) ;
 
 				// If not found or if it is the last place, ok
