@@ -41,7 +41,7 @@ def run(env, args):
     try:
         synthesepy.build.build(env)
     except Exception, e:
-        if not args.no_clean_if_build_fails:
+        if args.no_clean_if_build_fails:
             raise
         log.warn('Build failed, cleaning and rebuilding')
         synthesepy.build.clean(env, args.dummy)
