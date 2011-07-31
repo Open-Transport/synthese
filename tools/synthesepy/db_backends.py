@@ -246,7 +246,7 @@ class MySQLBackend(DBBackend):
         # Keep this in sync with tools/synthesepy/build.py
         utils.append_paths_to_environment('PATH', [
             os.path.join(
-                self.env.c.thirdparty_dir, 'mysql-5.5.12-win32', 'bin')])
+                self.env.c.thirdparty_dir, 'mysql-5.5.14-win32', 'bin')])
 
     def _mysql_command(self, command, extra_opts='', input=''):
         self._setup_path()
