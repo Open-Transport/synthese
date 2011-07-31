@@ -16,6 +16,7 @@ JourneysResult.cpp
 JourneysResult.h
 JourneyTemplates.cpp
 JourneyTemplates.h
+PlacesList.hpp
 RoutePlanner.cpp
 RoutePlanner.h
 RoutePlannerLogger.cpp
