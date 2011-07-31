@@ -444,7 +444,7 @@ namespace synthese
 			if(value.isDestination)
 			{
 				position = _result.end();
-				List::iterator previous(position);
+				typename List::iterator previous(position);
 				--previous;
 				while(previous->isDestination)
 				{
@@ -570,9 +570,9 @@ namespace synthese
 			BOOST_FOREACH(const typename InputLists::value_type& col, _inputLists)
 			{
 				typename List::iterator minPos(_result.begin());
-				CellPositions::mapped_type placePositions;
+				typename CellPositions::mapped_type placePositions;
 
-				BOOST_FOREACH(const List::value_type& item, col.second)
+				BOOST_FOREACH(const typename List::value_type& item, col.second)
 				{
 					typename List::iterator pos(
 						_putPlace(
