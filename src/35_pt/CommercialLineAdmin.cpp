@@ -94,7 +94,8 @@ namespace synthese
 	namespace pt
 	{
 		const string CommercialLineAdmin::TAB_DATES("da");
-		const string CommercialLineAdmin::TAB_ROUTES("ro");
+		const string CommercialLineAdmin::TAB_ROUTES_FORWARD("rof");
+		const string CommercialLineAdmin::TAB_ROUTES_BACKWARD("rob");
 		const string CommercialLineAdmin::TAB_NON_CONCURRENCY("nc");
 		const string CommercialLineAdmin::TAB_PROPERTIES("pr");
 		const string CommercialLineAdmin::TAB_EXPORT("ex");
@@ -156,181 +157,15 @@ namespace synthese
 		) const {
 			////////////////////////////////////////////////////////////////////
 			// TAB ROUTES
-			if (openTabContent(stream, TAB_ROUTES))
+			if (openTabContent(stream, TAB_ROUTES_FORWARD))
 			{
-				// Requests
-				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
-
-				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
-
-				// Search form
-				stream << "<h1>Recherche</h1>";
-
-				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
-				stream << s.open();
-				stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
-				stream << s.close();
-
-
-				// Results display
-				stream << "<h1>Parcours de la ligne</h1>";
-
-				JourneyPatternTableSync::SearchResult routes(
-					JourneyPatternTableSync::Search(
-						Env::GetOfficialEnv(),
-						_cline->getKey(),
-						_requestParameters.first,
-						_requestParameters.maxSize,
-						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
-						_requestParameters.raisingOrder
-				)	);
-
-				AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(_request);
-				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
-				creationRequest.setActionWillCreateObject();
-				creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
-
-				ResultHTMLTable::HeaderVector h;
-				h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-				h.push_back(make_pair(string(), "Origne"));
-				h.push_back(make_pair(string(), "Destination"));
-				h.push_back(make_pair(string(), "Arrêts"));
-				h.push_back(make_pair(string(), "Long."));
-				h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
-				h.push_back(make_pair(string(), "Source"));
-				h.push_back(make_pair(string(), "Actions"));
-				h.push_back(make_pair(string(), "Actions"));
-
-				ActionResultHTMLTable t(
-					h,
-					s.getForm(),
-					_requestParameters,
-					routes,
-					creationRequest.getHTMLForm("addline"),
-					JourneyPatternAddAction::PARAMETER_TEMPLATE_ID
-					);
-
-				stream << t.open();
-				AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(_request);
- 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
-				{
-					// Row initialization
-					lineOpenRequest.getPage()->setLine(line);
-					removeRequest.getAction()->setObjectId(line->getKey());
-					stream << t.row(lexical_cast<string>(line->getKey()));
-
-					// Name
-					stream << t.col();
-					stream << line->getName();
-
-					// Origin and destination
-					if(line->getEdges().size() < 2)
-					{
-						stream << t.col(4) << "Trajet non défini";
-					}
-					else
-					{
-						{
-							stream << t.col();
-							const DesignatedLinePhysicalStop* lineStop(
-								dynamic_cast<const DesignatedLinePhysicalStop*>(
-									line->getLineStop(0)
-							)	);
-							if(lineStop)
-							{
-								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
-							}
-							const LineArea* lineArea(
-								dynamic_cast<const LineArea*>(
-									line->getLineStop(0)
-							)	);
-							if(lineArea)
-							{
-								stream << lineArea->getArea()->getName();
-							}
-						}
-
-						{
-							stream << t.col();
-							const DesignatedLinePhysicalStop* lineStop(
-								dynamic_cast<const DesignatedLinePhysicalStop*>(
-									line->getLineStop(line->getEdges().size()-1)
-							)	);
-							if(lineStop)
-							{
-								stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
-							}
-							const LineArea* lineArea(
-								dynamic_cast<const LineArea*>(
-									line->getLineStop(line->getEdges().size()-1)
-							)	);
-							if(lineArea)
-							{
-								stream << lineArea->getArea()->getName();
-							}
-						}
-
-						// Stops number
-						stream << t.col();
-						stream << line->getEdges().size();
-						
-						// Length
-						stream << t.col();
-						stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
-					}
-
-					// Services number
-					stream << t.col();
-					size_t servicesNumber(line->getServices().size());
-					BOOST_FOREACH(JourneyPatternCopy* subline, line->getSubLines())
-					{
-						servicesNumber += subline->getServices().size();
-					}
-					stream << servicesNumber;
-
-					// Datasource
-					stream << t.col();
-					BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, line->getDataSourceLinks())
-					{
-						if(!it.first)
-						{ // Unknown data source
-							continue;
-						}
-
-						string name(it.first->getName());
-						if(!it.second.empty())
-						{
-							name += " (code "+ it.second +")";
-						}
-
-						stream <<
-							HTMLModule::getHTMLImage(
-								it.first->getIcon().empty() ?
-								"note.png" :
-								it.first->getIcon(),
-								name
-							);
-						if(!it.first->getFormat().empty())
-						{
-							stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
-						}
-					}
-
-					// Open button
-					stream << t.col();
-					stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
-
-					// Remove button
-					stream << t.col();
-					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
-				}
-
-				stream << t.row(string());
-				stream << t.col() << t.getActionForm().getTextInput(JourneyPatternAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
-				stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(JourneyPatternAddAction::PARAMETER_REVERSE_COPY, false);
-				stream << t.col(2) << t.getActionForm().getSubmitButton("Créer un itinéraire");
-
-				stream << t.close();
+				_displayRoutes(stream, _request, false);
+			}
+			////////////////////////////////////////////////////////////////////
+			// TAB ROUTES
+			if (openTabContent(stream, TAB_ROUTES_BACKWARD))
+			{
+				_displayRoutes(stream, _request, true);
 			}
 			////////////////////////////////////////////////////////////////////
 			// TAB HOURS
@@ -597,7 +432,8 @@ namespace synthese
 		) const {
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Parcours", TAB_ROUTES, true, JourneyPatternAdmin::ICON));
+			_tabs.push_back(Tab("Parcours aller", TAB_ROUTES_FORWARD, true, JourneyPatternAdmin::ICON));
+			_tabs.push_back(Tab("Parcours retour", TAB_ROUTES_BACKWARD, true, JourneyPatternAdmin::ICON));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
 			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
@@ -626,5 +462,190 @@ namespace synthese
 
 			links.push_back(p);
 			return links;
+		}
+
+
+
+		void CommercialLineAdmin::_displayRoutes(
+			std::ostream& stream,
+			const admin::AdminRequest& request,
+			bool wayBack
+		) const {
+			// Requests
+			AdminFunctionRequest<CommercialLineAdmin> searchRequest(request);
+
+			AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(request);
+
+			// Search form
+			stream << "<h1>Recherche</h1>";
+
+			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"+  lexical_cast<string>(wayBack)));
+			stream << s.open();
+			stream << s.cell("Nom", s.getForm().getTextInput(PARAMETER_SEARCH_NAME, _searchName));
+			stream << s.close();
+
+
+			// Results display
+			stream << "<h1>Parcours de la ligne</h1>";
+
+			JourneyPatternTableSync::SearchResult routes(
+				JourneyPatternTableSync::Search(
+					Env::GetOfficialEnv(),
+					_cline->getKey(),
+					_requestParameters.first,
+					_requestParameters.maxSize,
+					_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+					_requestParameters.raisingOrder,
+					UP_LINKS_LOAD_LEVEL,
+					wayBack
+			)	);
+
+			AdminActionFunctionRequest<JourneyPatternAddAction,JourneyPatternAdmin> creationRequest(request);
+			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+			creationRequest.setActionWillCreateObject();
+			creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
+
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+			h.push_back(make_pair(string(), "Origne"));
+			h.push_back(make_pair(string(), "Destination"));
+			h.push_back(make_pair(string(), "Arrêts"));
+			h.push_back(make_pair(string(), "Long."));
+			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
+			h.push_back(make_pair(string(), "Source"));
+			h.push_back(make_pair(string(), "Actions"));
+			h.push_back(make_pair(string(), "Actions"));
+
+			ActionResultHTMLTable t(
+				h,
+				s.getForm(),
+				_requestParameters,
+				routes,
+				creationRequest.getHTMLForm("addline" + lexical_cast<string>(wayBack)),
+				JourneyPatternAddAction::PARAMETER_TEMPLATE_ID
+			);
+
+			stream << t.open();
+			AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(request);
+			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+			{
+				// Row initialization
+				lineOpenRequest.getPage()->setLine(line);
+				removeRequest.getAction()->setObjectId(line->getKey());
+				stream << t.row(lexical_cast<string>(line->getKey()));
+
+				// Name
+				stream << t.col();
+				stream << line->getName();
+
+				// Origin and destination
+				if(line->getEdges().size() < 2)
+				{
+					stream << t.col(4) << "Trajet non défini";
+				}
+				else
+				{
+					{
+						stream << t.col();
+						const DesignatedLinePhysicalStop* lineStop(
+							dynamic_cast<const DesignatedLinePhysicalStop*>(
+								line->getLineStop(0)
+						)	);
+						if(lineStop)
+						{
+							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+						}
+						const LineArea* lineArea(
+							dynamic_cast<const LineArea*>(
+								line->getLineStop(0)
+						)	);
+						if(lineArea)
+						{
+							stream << lineArea->getArea()->getName();
+						}
+					}
+
+					{
+						stream << t.col();
+						const DesignatedLinePhysicalStop* lineStop(
+							dynamic_cast<const DesignatedLinePhysicalStop*>(
+								line->getLineStop(line->getEdges().size()-1)
+						)	);
+						if(lineStop)
+						{
+							stream << lineStop->getPhysicalStop()->getConnectionPlace()->getFullName();
+						}
+						const LineArea* lineArea(
+							dynamic_cast<const LineArea*>(
+								line->getLineStop(line->getEdges().size()-1)
+						)	);
+						if(lineArea)
+						{
+							stream << lineArea->getArea()->getName();
+						}
+					}
+
+					// Stops number
+					stream << t.col();
+					stream << line->getEdges().size();
+					
+					// Length
+					stream << t.col();
+					stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
+				}
+
+				// Services number
+				stream << t.col();
+				size_t servicesNumber(line->getServices().size());
+				BOOST_FOREACH(JourneyPatternCopy* subline, line->getSubLines())
+				{
+					servicesNumber += subline->getServices().size();
+				}
+				stream << servicesNumber;
+
+				// Datasource
+				stream << t.col();
+				BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, line->getDataSourceLinks())
+				{
+					if(!it.first)
+					{ // Unknown data source
+						continue;
+					}
+
+					string name(it.first->getName());
+					if(!it.second.empty())
+					{
+						name += " (code "+ it.second +")";
+					}
+
+					stream <<
+						HTMLModule::getHTMLImage(
+							it.first->getIcon().empty() ?
+							"note.png" :
+							it.first->getIcon(),
+							name
+						);
+					if(!it.first->getFormat().empty())
+					{
+						stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
+					}
+				}
+
+				// Open button
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+
+				// Remove button
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le parcours ? Tous les services du parcours seront également supprimés.", "chart_line_delete.png");
+			}
+
+			stream << t.row(string());
+			stream << t.col() << t.getActionForm().getTextInput(JourneyPatternAddAction::PARAMETER_NAME, string(), string(), AdminModule::CSS_2DIGIT_INPUT);
+			stream << t.col(5) << "Inversion : " << t.getActionForm().getOuiNonRadioInput(JourneyPatternAddAction::PARAMETER_REVERSE_COPY, false);
+			stream << t.col(2) << t.getActionForm().getSubmitButton("Créer un itinéraire");
+
+			stream << t.close();
+
 		}
 }	}

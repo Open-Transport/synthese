@@ -327,12 +327,17 @@ namespace synthese
 			boost::optional<std::size_t> number,
 			bool orderByName,
 			bool raisingOrder,
-			LinkLevel linkLevel
+			LinkLevel linkLevel,
+			boost::optional<bool> wayback
 		){
 			SelectQuery<JourneyPatternTableSync> query;
 			if (commercialLineId)
 			{
 				query.addWhereField(COL_COMMERCIAL_LINE_ID, *commercialLineId);
+			}
+			if(wayback)
+			{
+				query.addWhereField(COL_WAYBACK, *wayback);
 			}
 			if (orderByName)
 			{
