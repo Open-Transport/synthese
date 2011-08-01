@@ -77,6 +77,7 @@ namespace synthese
 			static const std::string PARAMETER_RESERVATION_CONTACT_ID;
 			static const std::string PARAMETER_MAP_URL;
 			static const std::string PARAMETER_DOC_URL;
+			static const std::string PARAMETER_TIMETABLE_ID;
 
 		private:
 			boost::shared_ptr<pt::CommercialLine> _line;
@@ -91,6 +92,7 @@ namespace synthese
 			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<std::string> _mapURL;
 			boost::optional<std::string> _docURL;
+			boost::optional<util::RegistryKeyType> _timetableId;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

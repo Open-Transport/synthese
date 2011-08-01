@@ -62,6 +62,9 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_CREATOR_ID("creatorId");
 		const string CommercialLine::DATA_LINE_MAP_URL("line_map_url");
 		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
+		const string CommercialLine::DATA_LINE_TIMETABLE_ID("timetable_id");
+
+
 
 		CommercialLine::CommercialLine(
 			RegistryKeyType key
@@ -69,7 +72,8 @@ namespace synthese
 			graph::PathGroup(key),
 			_network(NULL),
 			_reservationContact(NULL),
-			_calendarTemplate(NULL)
+			_calendarTemplate(NULL),
+			_timetableId(0)
 		{
 			// Default use rules
 			RuleUser::Rules rules(getRules());
@@ -214,6 +218,6 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_IMAGE, getImage());
 			pm.insert(prefix + "lineImage", getImage()); // For StopAreasList compatibility
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
-
+			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
 		}
 }	}
