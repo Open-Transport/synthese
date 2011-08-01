@@ -56,7 +56,8 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<CommercialLineAdmin>
 		{
 		public:
-			static const std::string TAB_ROUTES;
+			static const std::string TAB_ROUTES_FORWARD;
+			static const std::string TAB_ROUTES_BACKWARD;
 			static const std::string TAB_DATES;
 			static const std::string TAB_NON_CONCURRENCY;
 			static const std::string TAB_PROPERTIES;
@@ -74,6 +75,12 @@ namespace synthese
 			boost::optional<boost::gregorian::date>	_endDate;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
+
+			void _displayRoutes(
+				std::ostream& stream,
+				const admin::AdminRequest& request,
+				bool wayBack
+			) const;
 
 		public:
 			CommercialLineAdmin();
