@@ -72,6 +72,7 @@ namespace synthese
 				AuthorizedLines				_authorizedLines;
 				AuthorizedPhysicalStops		_authorizedPhysicalStops;
 				bool						_withContinuousServices;
+				boost::optional<bool>		_wayBackFilter;
 				const util::Env&			_env;
 			//@}
 
@@ -122,6 +123,7 @@ namespace synthese
 				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value) { _authorizedPhysicalStops = value; }
 				void setBeforeTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableBefore = value; }
 				void setAfterTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableAfter = value; }
+				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
 			//@}
 		};
 	}
