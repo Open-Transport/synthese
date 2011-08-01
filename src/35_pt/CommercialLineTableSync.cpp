@@ -94,6 +94,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID("calendar_template_id");
 		const string CommercialLineTableSync::COL_MAP_URL("map_url");
 		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
+		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
 	}
 
 	namespace db
@@ -121,6 +122,7 @@ namespace synthese
 			DBTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
 			DBTableSync::Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
 			DBTableSync::Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
+			DBTableSync::Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -145,6 +147,7 @@ namespace synthese
 			object->setLongName(rows->getText ( CommercialLineTableSync::COL_LONG_NAME));
 			object->setMapURL(rows->getText(CommercialLineTableSync::COL_MAP_URL));
 			object->setDocURL(rows->getText(CommercialLineTableSync::COL_DOC_URL));
+			object->setTimetableId(rows->getLongLong(CommercialLineTableSync::COL_TIMETABLE_ID));
 
 			// Color
 			string color(rows->getText(CommercialLineTableSync::COL_COLOR));
@@ -334,6 +337,7 @@ namespace synthese
 			);
 			query.addField(object->getMapURL());
 			query.addField(object->getDocURL());
+			query.addField(object->getTimetableId());
 			query.execute(transaction);
 		}
 

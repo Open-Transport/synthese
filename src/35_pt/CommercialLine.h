@@ -80,6 +80,7 @@ namespace synthese
 			static const std::string DATA_LINE_CREATOR_ID;
 			static const std::string DATA_LINE_MAP_URL;
 			static const std::string DATA_LINE_DOC_URL;
+			static const std::string DATA_LINE_TIMETABLE_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
@@ -108,6 +109,7 @@ namespace synthese
 
 			std::string _mapURL;
 			std::string _docURL;
+			util::RegistryKeyType _timetableId;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -132,6 +134,7 @@ namespace synthese
 				boost::recursive_mutex& getNonConcurrencyRulesMutex() const { return _nonConcurrencyRulesMutex; }
 				const std::string& getMapURL() const { return _mapURL; }
 				const std::string& getDocURL() const { return _docURL; }
+				util::RegistryKeyType getTimetableId() const { return _timetableId; }
 			//@}
 
 			//! @name Setters
@@ -148,6 +151,7 @@ namespace synthese
 				void setOpionalReservationPlaces(const PlacesSet& value) { _optionalReservationPlaces = value; }
 				void setMapURL(const std::string& value){ _mapURL = value; }
 				void setDocURL(const std::string& value){ _docURL = value; }
+				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
 			//@}
 
 			//! @name Services

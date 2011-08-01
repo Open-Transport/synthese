@@ -356,6 +356,7 @@ namespace synthese
 				stream << t.title("URL Documents");
 				stream << t.cell("Carte", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_MAP_URL, _cline->getMapURL()));
 				stream << t.cell("Document", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_DOC_URL, _cline->getDocURL()));
+				stream << t.cell("ID Grille horaire", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_TIMETABLE_ID, lexical_cast<string>(_cline->getTimetableId())));
 				stream << t.close();
 
 				StaticActionRequest<CommercialLineUpdateAction> updateOnlyRequest(_request);
