@@ -63,6 +63,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID = Action_PARAMETER_PREFIX + "ri";
 		const string CommercialLineUpdateAction::PARAMETER_MAP_URL = Action_PARAMETER_PREFIX + "map_url";
 		const string CommercialLineUpdateAction::PARAMETER_DOC_URL = Action_PARAMETER_PREFIX + "doc_url";
+		const string CommercialLineUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "timetable_id";
 
 
 
@@ -116,6 +117,10 @@ namespace synthese
 			if(_docURL)
 			{
 				map.insert(PARAMETER_DOC_URL, *_docURL);
+			}
+			if(_timetableId)
+			{
+				map.insert(PARAMETER_TIMETABLE_ID, *_timetableId);
 			}
 			return map;
 		}
@@ -218,6 +223,12 @@ namespace synthese
 					_reservationContact = shared_ptr<const ReservationContact>();
 				}
 			}
+
+			// Timetable id
+			if(map.isDefined(PARAMETER_TIMETABLE_ID))
+			{
+				_timetableId = map.get<RegistryKeyType>(PARAMETER_TIMETABLE_ID);
+			}
 		}
 
 
@@ -271,6 +282,10 @@ namespace synthese
 			if(_docURL)
 			{
 				_line->setDocURL(*_docURL);
+			}
+			if(_timetableId)
+			{
+				_line->setTimetableId(*_timetableId);
 			}
 
 			CommercialLineTableSync::Save(_line.get());
