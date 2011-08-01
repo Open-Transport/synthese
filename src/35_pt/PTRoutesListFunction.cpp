@@ -35,6 +35,7 @@
 #include "LinePhysicalStop.hpp"
 #include "Destination.hpp"
 #include "CalendarTemplate.h"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -196,9 +197,24 @@ namespace synthese
 				}
 
 				// Calendar filter
-				if(_calendar.get() && !thisRoute->hasAtLeastOneCommonDateWith(calendarFilter))
+				if(_calendar.get())
 				{
-					continue;
+					bool result(thisRoute->hasAtLeastOneCommonDateWith(calendarFilter));
+					if(!result)
+					{
+						BOOST_FOREACH(JourneyPatternCopy* subline, thisRoute->getSubLines())
+						{
+							if(subline->hasAtLeastOneCommonDateWith(calendarFilter))
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+					if(!result)
+					{
+						continue;
+					}
 				}
 
 				// Main route filter

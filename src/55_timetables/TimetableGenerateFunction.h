@@ -29,6 +29,7 @@
 #include "Function.h"
 #include "Timetable.h"
 #include "TimetableResult.hpp"
+#include "PlacesList.hpp"
 
 namespace synthese
 {
@@ -67,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_PREFIX;
 			static const std::string PARAMETER_CITY_PREFIX;
 			static const std::string PARAMETER_DAY;
+			static const std::string PARAMETER_WAYBACK_FILTER;
 
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_NOTE_PAGE_ID;
@@ -137,6 +139,7 @@ namespace synthese
 			//@{
 				boost::shared_ptr<const Timetable>	_timetable;
 				boost::shared_ptr<const calendar::CalendarTemplate>	_calendarTemplate;
+				boost::shared_ptr<const pt::CommercialLine> _commercialLine;
 				boost::shared_ptr<const pt::JourneyPattern> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
 				boost::shared_ptr<const cms::Webpage> _notePage;
@@ -145,9 +148,18 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _cellPage;
 				boost::shared_ptr<const cms::Webpage> _pageForSubTimetable;
 				boost::shared_ptr<TimetableResult::Warnings> _warnings;
+				boost::optional<bool> _waybackFilter;
+				std::vector<boost::shared_ptr<Timetable> > _containerContent;
 				std::size_t _timetableRank;
 			//@}
 
+			typedef algorithm::PlacesList<const pt::StopArea*, const pt::JourneyPattern*> PlacesListConfiguration;
+
+			static void AddLineDirectionToTimetable(
+				Timetable& timetable,
+				const pt::CommercialLine& line,
+				bool wayBack
+			);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

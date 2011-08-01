@@ -108,6 +108,7 @@ namespace synthese
 				std::string				_title;
 				Timetable* 	_transferTimetableBefore;
 				Timetable*	_transferTimetableAfter;
+				boost::optional<bool>		_wayBackFilter;
 			//@}
 
 		public:
@@ -131,6 +132,7 @@ namespace synthese
 				void setContentType(ContentType value){ _contentType = value; }
 				void setTransferTimetableBefore(Timetable* value){ _transferTimetableBefore = value; }
 				void setTransferTimetableAfter(Timetable* value){ _transferTimetableAfter = value; }
+				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
 			//@}
 
 			//! @name Modifiers
