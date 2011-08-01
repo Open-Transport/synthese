@@ -348,8 +348,9 @@ namespace synthese
 			const Path::Edges& edges(line.getEdges());
 
 			// JourneyPattern is authorized
-			if(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end())
-			{
+			if(	(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end()) ||
+				_wayBackFilter && line.getWayBack() != *_wayBackFilter
+			){
 				return false;
 			}
 
@@ -365,6 +366,7 @@ namespace synthese
 				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
 					if(	(*itEdge)->isDeparture() &&
+						(itEdge+1) != edges.end() &&
 						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
 						(	_authorizedPhysicalStops.empty() ||
 							_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()

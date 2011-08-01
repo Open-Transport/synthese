@@ -47,6 +47,8 @@
 #include "JourneyPattern.hpp"
 #include "SchedulesBasedService.h"
 #include "TimetableServiceRowInterfacePage.h"
+#include "CommercialLineTableSync.h"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -74,6 +76,7 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_STOP_PREFIX("stop");
 		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
 		const string TimetableGenerateFunction::PARAMETER_DAY("day");
+		const string TimetableGenerateFunction::PARAMETER_WAYBACK_FILTER("wayback");
 
 		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
 		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
@@ -157,7 +160,26 @@ namespace synthese
 			ParametersMap map;
 			if(_timetable.get())
 			{
-				if(_line.get())
+				if(_commercialLine.get())
+				{
+					map.insert(Request::PARAMETER_OBJECT_ID, _commercialLine->getKey());
+					if(_waybackFilter)
+					{
+						map.insert(PARAMETER_WAYBACK_FILTER, *_waybackFilter);
+					}
+					if(_timetable->getBaseCalendar())
+					{
+						if(_timetable->getBaseCalendar()->getKey())
+						{
+							map.insert(PARAMETER_CALENDAR_ID, _timetable->getBaseCalendar()->getKey());
+						}
+						else if(_timetable->getBaseCalendar()->isLimited())
+						{
+							map.insert(PARAMETER_DAY, _timetable->getBaseCalendar()->getResult().getFirstActiveDate());
+						}
+					}
+				}
+				else if(_line.get())
 				{
 					map.insert(Request::PARAMETER_OBJECT_ID, _line->getKey());
 					if(_timetable->getBaseCalendar())
@@ -204,6 +226,8 @@ namespace synthese
 					}
 				}
 			}
+
+			//TODO : output CMS pages
 			return map;
 		}
 
@@ -241,6 +265,9 @@ namespace synthese
 				{
 					throw RequestException("No such timetable");
 				}
+
+				// Load sub timetables if the timetable is a container
+				_containerContent = TimetableTableSync::Search(*_env, _timetable->getKey());
 			}
 			else
 			{
@@ -325,6 +352,37 @@ namespace synthese
 					row.setRank(0);
 					timetable->addRow(row);
 					timetable->addAuthorizedPhysicalStop(stop.get());
+				}
+				else if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == CommercialLineTableSync::TABLE.ID
+				){
+					try
+					{
+						_commercialLine = Env::GetOfficialEnv().get<CommercialLine>(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+					}
+					catch(ObjectNotFoundException<CommercialLine>&)
+					{
+						throw RequestException("No such line");
+					}
+
+					_waybackFilter = map.getOptional<bool>(PARAMETER_WAYBACK_FILTER);
+
+					if(_waybackFilter)
+					{ // Way 5 : line and wayback
+						AddLineDirectionToTimetable(*timetable, *_commercialLine, *_waybackFilter);
+					}
+					else
+					{
+						// Timetable properties
+						timetable->setContentType(Timetable::CONTAINER);
+						
+						shared_ptr<Timetable> tt1(new Timetable);
+						tt1->setBaseCalendar(timetable->getBaseCalendar());
+						AddLineDirectionToTimetable(*tt1, *_commercialLine, false);
+
+						shared_ptr<Timetable> tt2(new Timetable);
+						tt2->setBaseCalendar(timetable->getBaseCalendar());
+						AddLineDirectionToTimetable(*tt2, *_commercialLine, true);
+					}
 				}
 				else // Way 3 : customized timetable
 				{
@@ -512,12 +570,7 @@ namespace synthese
 					{
 						stringstream content;
 						Env env;
-						TimetableTableSync::SearchResult contents(
-							TimetableTableSync::Search(
-								env,
-								object.getKey()
-						)	);
-						BOOST_FOREACH(shared_ptr<Timetable> tt, contents)
+						BOOST_FOREACH(shared_ptr<Timetable> tt, _containerContent)
 						{
 							try
 							{
@@ -1047,5 +1100,80 @@ namespace synthese
 			}
 
 			_cellPage->display(stream, request, pm);
+		}
+
+
+
+		void TimetableGenerateFunction::AddLineDirectionToTimetable(
+			Timetable& timetable,
+			const pt::CommercialLine& line,
+			bool wayBack
+		){
+			// Creation of the stops list
+			PlacesListConfiguration orderedPlaces;
+			BOOST_FOREACH(const Path* route, line.getPaths())
+			{
+				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(route));
+				if(	!jp || // the route is not a journey pattern (should not occur)
+					jp->getWayBack() != wayBack // wayback filter
+				){
+					continue;
+				}
+
+				// Calendar check
+				if(timetable.getBaseCalendar()->isLimited())
+				{
+					bool result(jp->hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()));
+					if(!result)
+					{
+						BOOST_FOREACH(JourneyPatternCopy* subline, jp->getSubLines())
+						{
+							if(subline->hasAtLeastOneCommonDateWith(timetable.getBaseCalendar()->getResult()))
+							{
+								result = true;
+								break;
+							}
+						}
+					}
+					if(!result)
+					{
+						continue;
+					}
+				}
+
+				PlacesListConfiguration::List jlist;
+
+				// Build of the places list of the route
+				BOOST_FOREACH(Edge* edge, jp->getEdges())
+				{
+					const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
+
+					PlacesListConfiguration::PlaceInformation item(
+						ls->getPhysicalStop()->getConnectionPlace(),
+						false,
+						false
+					);
+					jlist.push_back(item);
+				}
+
+				orderedPlaces.addList(make_pair(jp, jlist));
+			}
+
+			// Integration of the stops in the temporary timetable object
+			size_t rank(0);
+			BOOST_FOREACH(const PlacesListConfiguration::List::value_type& place, orderedPlaces.getResult())
+			{
+				TimetableRow row;
+				row.setIsArrival(true);
+				row.setIsDeparture(true);
+				row.setPlace(place.place);
+				row.setRank(rank++);
+				timetable.addRow(row);
+			}
+
+			// Other properties
+			timetable.setContentType(Timetable::TABLE_SERVICES_IN_COLS);
+			timetable.addAuthorizedLine(&line);
+			timetable.setWaybackFilter(wayBack);
 		}
 }	}

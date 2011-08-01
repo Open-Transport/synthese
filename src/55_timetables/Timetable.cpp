@@ -81,6 +81,7 @@ namespace synthese
 				g->setBaseCalendar(_baseCalendar->getResult());
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
+				g->setWaybackFilter(_wayBackFilter);
 				if(_transferTimetableBefore)
 				{
 					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env));

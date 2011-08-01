@@ -85,7 +85,8 @@ namespace synthese
 					continue;
 				}
 
-				for (itEdge2 = itEdge; itEdge2 != edges.end(); ++itEdge2)
+				bool exit(false);
+				for (itEdge2 = itEdge; itEdge2 != edges.end() && !exit; ++itEdge2)
 				{
 					if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
 						&&(	(*itEdge2)->isDeparture() && itRow->getIsDeparture()
@@ -96,23 +97,62 @@ namespace synthese
 							timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
 						)
 					){
-						first = false;
-						_content.push_back(
-							make_pair(
-								dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
-								((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
-									service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
-									service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
-						)	);
-						if (itEdge2 == edges.begin())
-							_originType = Terminus;
-						if (itEdge2 == edges.end() - 1)
-							_destinationType = Terminus;
-						itEdge = itEdge2 + 1;
-						break;
+						// Attempt to find an other position which allow to output previous schedules
+						for(TimetableGenerator::Rows::const_iterator itRow4(itRow + 1); itRow4 != rows.end() && !exit; ++itRow4)
+						{
+							Path::Edges::const_iterator itEdge3;
+							for(itEdge3 = itEdge; itEdge3 != itEdge2 && !exit; ++itEdge3)
+							{
+								if(	dynamic_cast<const StopArea*>((*itEdge3)->getFromVertex()->getHub())->getKey() == itRow4->getPlace()->getKey()
+									&&(	(*itEdge3)->isDeparture() && itRow4->getIsDeparture()
+									) &&
+								(	!first ||
+									timetablegenerator.getAuthorizedPhysicalStops().empty() ||
+									timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge3)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
+									)
+								){
+									exit = true;
+									break;
+								}
+							}
+							if(exit)
+							{
+								exit = false;
+								for(TimetableGenerator::Rows::const_iterator itRow5(itRow4 + 1); itRow5 != rows.end() && !exit; ++itRow5)
+								{
+									for(Path::Edges::const_iterator itEdge4 = itEdge3+1; itEdge4 != edges.end(); ++itEdge4)
+									{
+										if(	dynamic_cast<const StopArea*>((*itEdge4)->getFromVertex()->getHub())->getKey() == itRow5->getPlace()->getKey() &&
+											((*itEdge4)->isArrival() && itRow5->getIsArrival())
+										){
+											exit = true;
+											break;
+										}
+								}	}
+							}
+						}
+
+						if(!exit)
+						{
+							// Record the schedule in the col
+							first = false;
+							_content.push_back(
+								make_pair(
+									dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
+									((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
+										service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
+										service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
+							)	);
+							if (itEdge2 == edges.begin())
+								_originType = Terminus;
+							if (itEdge2 == edges.end() - 1)
+								_destinationType = Terminus;
+							itEdge = itEdge2 + 1;
+							break;
+						}
 					}
 				}
-				if (itEdge2 == edges.end())
+				if (itEdge2 == edges.end() || exit)
 				{
 					_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
 				}
