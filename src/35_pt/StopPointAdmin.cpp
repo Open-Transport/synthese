@@ -186,6 +186,7 @@ namespace synthese
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
+				stream << t.cell("ID", lexical_cast<string>(_stop->getKey()));
 				if(_stop->getConnectionPlace())
 				{
 					stream << t.cell(

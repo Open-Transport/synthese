@@ -157,9 +157,9 @@ namespace synthese
 			_importStopArea(false),
 			_interactive(false),
 			_displayLinkedStops(false),
-			_networks(_dataSource, _env),
-			_stopPoints(_dataSource, _env),
-			_lines(_dataSource, _env)
+			_networks(_dataSource, env),
+			_stopPoints(_dataSource, env),
+			_lines(_dataSource, env)
 		{}
 
 

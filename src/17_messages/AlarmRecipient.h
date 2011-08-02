@@ -42,6 +42,11 @@ namespace synthese
 		class DataSource;
 	}
 
+	namespace security
+	{
+		class Right;
+	}
+
 	namespace messages
 	{
 		class Alarm;
@@ -95,6 +100,8 @@ namespace synthese
 				const std::string& key,
 				util::Env& env
 			) const = 0;
+
+			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const = 0;
 		};
 	}
 }

@@ -55,23 +55,5 @@ namespace synthese
 
 	namespace pt
 	{
-		string TransportNetworkRight::displayParameter(
-			util::Env& env
-		) const	{
-			if (_parameter == GLOBAL_PERIMETER)
-				return "all";
-
-			return _parameter;
-		}
-
-		bool TransportNetworkRight::perimeterIncludes(
-			const string& perimeter,
-			util::Env& env
-		) const	{
-			if (_parameter == GLOBAL_PERIMETER)
-				return true;
-
-			return false;
-		}
 	}
 }

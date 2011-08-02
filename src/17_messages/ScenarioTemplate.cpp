@@ -154,7 +154,10 @@ namespace synthese
 				// variable code
 				string::const_iterator it2(it);
 				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
-				if (it == text.end()) continue;
+				if (it == text.end())
+				{
+					break;
+				}
 				v.code = text.substr(it2-text.begin(), it-it2);
 
 				// variable information
@@ -163,7 +166,10 @@ namespace synthese
 					++it;
 					it2 = it;
 					for(; it != text.end() && *it != '$'; ++it);
-					if (it == text.end()) continue;
+					if (it == text.end())
+					{
+						break;
+					}
 					v.helpMessage = text.substr(it2-text.begin(), it-it2);
 				}
 
@@ -218,7 +224,10 @@ namespace synthese
 				string code;
 				string::const_iterator it2(it);
 				for(; it != text.end() && *it != '|' && *it != '$'; ++it);
-				if (it == text.end()) continue;
+				if (it == text.end())
+				{
+					break;
+				}
 				code = text.substr(it2-text.begin(), it-it2);
 
 				// variable information
@@ -227,7 +236,10 @@ namespace synthese
 					++it;
 					it2 = it;
 					for(; it != text.end() && *it != '$'; ++it);
-					if (it == text.end()) continue;
+					if (it == text.end())
+					{
+						break;
+					}
 				}
 
 				// writing

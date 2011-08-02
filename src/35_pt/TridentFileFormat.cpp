@@ -135,10 +135,10 @@ namespace synthese
 			_defaultTransferDuration(minutes(8)),
 			_importTimetablesAsTemplates(false),
 			_mergeRoutes(true),
-			_calendarTemplates(_dataSource, _env),
-			_stops(_dataSource, _env),
-			_networks(dataSource, _env),
-			_lines(dataSource, _env)
+			_calendarTemplates(_dataSource, env),
+			_stops(_dataSource, env),
+			_networks(dataSource, env),
+			_lines(dataSource, env)
 		{}
 
 
