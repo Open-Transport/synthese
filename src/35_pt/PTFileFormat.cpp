@@ -392,7 +392,7 @@ namespace synthese
 			boost::optional<const std::string&> destination,
 			boost::optional<Destination*> destinationObj,
 			boost::optional<const RuleUser::Rules&> rules,
-			bool direction,
+			boost::optional<bool> direction,
 			pt::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
@@ -451,21 +451,6 @@ namespace synthese
 				}
 				result->setDataSourceLinks(links);
 
-				// Transport mode
-				if(rollingStock)
-				{
-					result->setRollingStock(rollingStock);
-				}
-
-				// Use rules
-				if(rules)
-				{
-					result->setRules(*rules);
-				}
-
-				// Wayback
-				result->setWayBack(direction);
-
 				// Storage in the environment
 				env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
 
@@ -511,6 +496,24 @@ namespace synthese
 			if(destinationObj)
 			{
 				result->setDirectionObj(*destinationObj);
+			}
+
+			// Transport mode
+			if(rollingStock)
+			{
+				result->setRollingStock(rollingStock);
+			}
+
+			// Use rules
+			if(rules)
+			{
+				result->setRules(*rules);
+			}
+
+			// Wayback
+			if(direction)
+			{
+				result->setWayBack(*direction);
 			}
 
 			return result;

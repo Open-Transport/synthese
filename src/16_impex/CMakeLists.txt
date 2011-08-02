@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(impex_SRCS
+CleanObsoleteDataAction.cpp
+CleanObsoleteDataAction.hpp
 DataSource.cpp
 DataSource.h
 DataSourceAdmin.cpp

@@ -34,6 +34,7 @@
 #include "FileFormat.h"
 #include "Importer.hpp"
 #include "DataSourceTableSync.h"
+#include "CleanObsoleteDataAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -64,6 +65,7 @@ namespace synthese
 	{
 		const string DataSourceAdmin::TAB_IMPORT("ti");
 		const string DataSourceAdmin::TAB_PROPERTIES("tp");
+		const string DataSourceAdmin::TAB_MAINTENANCE("tm");
 
 		const string DataSourceAdmin::PARAMETER_DO_IMPORT("di");
 
@@ -160,6 +162,15 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
+			// IMPORT TAB
+			if(openTabContent(stream, TAB_MAINTENANCE))
+			{
+				AdminActionFunctionRequest<CleanObsoleteDataAction, DataSourceAdmin> cleanRequest(request);
+				cleanRequest.getAction()->setDataSource(*_dataSource);
+				stream << "<p>" << HTMLModule::getLinkButton(cleanRequest.getURL(), "Supprimer données obsolètes", "Etes-vous sûr de vouloir supprimer les données obsolètes ?") << "</p>";
+			}
+
+			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
 		}
@@ -190,6 +201,7 @@ namespace synthese
 			{
 				_tabs.push_back(Tab("Import", TAB_IMPORT, true));
 			}
+			_tabs.push_back(Tab("Maintenance", TAB_MAINTENANCE, true));
 
 			_tabBuilded = true;
 		}
