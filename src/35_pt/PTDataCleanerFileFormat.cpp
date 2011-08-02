@@ -302,4 +302,11 @@ namespace synthese
 			result.insert(PARAMETER_FROM_TODAY, _fromToday);
 			return result;
 		}
+
+
+
+		void PTDataCleanerFileFormat::cleanObsoleteData() const
+		{
+
+		}
 }	}

@@ -141,6 +141,10 @@ namespace synthese
 				{
 					stream << _line->getDocURL();
 				}
+				else if(_info == "timetable_id")
+				{
+					stream << _line->getTimetableId();
+				}
 			}
 			else if(_route.get())
 			{

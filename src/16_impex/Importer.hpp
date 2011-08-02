@@ -73,6 +73,8 @@ namespace synthese
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
 
+			virtual void cleanObsoleteData() const {}
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// @param map Parameters map to interpret
