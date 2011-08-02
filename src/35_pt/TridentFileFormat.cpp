@@ -1086,7 +1086,7 @@ namespace synthese
 			XMLNode lineNode(chouetteLineDescriptionNode.getChildNode("Line"));
 			XMLNode lineKeyNode(lineNode.getChildNode("objectId"));
 			XMLNode clineShortNameNode = lineNode.getChildNode("number", 0);
-			XMLNode clineNameNode = lineNode.getChildNode("name");
+			XMLNode clineNameNode = lineNode.getChildNode("publishedName");
 			os << "<h2>Trident import of " << charset_converter.convert(clineNameNode.getText()) << "</h2>";
 
 			// Network

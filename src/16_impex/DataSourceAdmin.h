@@ -1,5 +1,4 @@
 
-
 //////////////////////////////////////////////////////////////////////////
 /// DataSourceAdmin class header.
 ///	@file DataSourceAdmin.h
@@ -47,6 +46,7 @@ namespace synthese
 		public:
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_IMPORT;
+			static const std::string TAB_MAINTENANCE;
 
 			static const std::string PARAMETER_DO_IMPORT;
 

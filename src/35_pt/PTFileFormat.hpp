@@ -245,7 +245,7 @@ namespace synthese
 				boost::optional<const std::string&> destination,
 				boost::optional<Destination*> destinationObj,
 				boost::optional<const graph::RuleUser::Rules&> useRule,
-				bool direction,
+				boost::optional<bool> direction,
 				pt::RollingStock* rollingStock,
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,

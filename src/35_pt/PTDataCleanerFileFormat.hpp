@@ -81,6 +81,7 @@ namespace synthese
 			void setStartDate(boost::optional<boost::gregorian::date> value){ _startDate = value; }
 			void setEndDate(boost::optional<boost::gregorian::date> value){ _endDate = value; }
 			void setFromToday(bool value){ _fromToday = value; }
+			virtual void cleanObsoleteData() const;
 
 
 
