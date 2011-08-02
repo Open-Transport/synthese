@@ -30,6 +30,7 @@
 #include "DisplayType.h"
 #include "DisplayScreen.h"
 #include "ImportableTableSync.hpp"
+#include "ArrivalDepartureTableRight.h"
 
 // Std
 #include <vector>
@@ -101,10 +102,11 @@ namespace synthese
 
 		template<> const string AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::TITLE("Afficheurs");
 
-		template<> void AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
-		{
-			m.push_back(make_pair(GLOBAL_PERIMETER,"(tous les afficheurs)"));
-			PTModule::getNetworkLinePlaceRightParameterList(m);
+		template<> void AlarmRecipientTemplate<DisplayScreenTableSync, DisplayScreenAlarmRecipient>::getStaticParametersLabels(
+			ParameterLabelsVector& m
+		){
+			m.push_back(make_pair(FACTORY_KEY +"/" + GLOBAL_PERIMETER,"(tous les afficheurs)"));
+			PTModule::getNetworkLinePlaceRightParameterList(m, FACTORY_KEY +"/", "Afficheur de ");
 		}
 
 
@@ -309,5 +311,14 @@ namespace synthese
 		void DisplayScreenAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
 		{
 			remove(DisplayScreenTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
+		}
+
+
+
+		boost::shared_ptr<security::Right> DisplayScreenAlarmRecipient::getRight( const std::string& perimeter ) const
+		{
+			ArrivalDepartureTableRight* result(new ArrivalDepartureTableRight);
+			result->setParameter(perimeter);
+			return shared_ptr<Right>(result);
 		}
 }	}

@@ -59,6 +59,8 @@ namespace synthese
 
 			virtual void addObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);
 			virtual void removeObject(const messages::SentAlarm* alarm, util::RegistryKeyType objectId);
+
+			virtual boost::shared_ptr<security::Right> getRight(const std::string& perimeter) const;
 		};
 	}
 }

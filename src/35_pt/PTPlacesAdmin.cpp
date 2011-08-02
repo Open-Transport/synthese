@@ -454,6 +454,7 @@ namespace synthese
 				updateRequest.getAction()->setCity(const_pointer_cast<City>(_city));
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
+				stream << t.cell("ID", lexical_cast<string>(_city->getKey()));
 				stream << t.cell("Nom", t.getForm().getTextInput(CityUpdateAction::PARAMETER_NAME, _city->getName()));
 				stream << t.cell("Code", t.getForm().getTextInput(CityUpdateAction::PARAMETER_CODE, _city->getCode()));
 				stream << t.close();

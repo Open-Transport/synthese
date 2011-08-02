@@ -172,7 +172,11 @@ namespace synthese
 				, bool withAll=false
 			);
 
-			static void getNetworkLinePlaceRightParameterList(security::ParameterLabelsVector& m);
+			static void getNetworkLinePlaceRightParameterList(
+				security::ParameterLabelsVector& m,
+				std::string codePrefix = std::string(),
+				std::string namePrefix = std::string()
+			);
 
 			static int GetMaxAlarmLevel(
 				const graph::Journey&
