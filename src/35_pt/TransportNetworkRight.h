@@ -26,6 +26,7 @@
 #define SYNTHESE_env_TransportNetworkRight_H__
 
 #include "RightTemplate.h"
+#include "NetworkLineBasedRight.h"
 
 namespace synthese
 {
@@ -52,25 +53,9 @@ namespace synthese
 				-
 		*/
 		class TransportNetworkRight:
-			public security::RightTemplate<TransportNetworkRight>
+			public pt::NetworkLineBasedRight<TransportNetworkRight>
 		{
 		public:
-			/** Displays the interpretation of the string perimeter of the right.
-				@return description of the perimeter
-			*/
-			std::string	displayParameter(
-				util::Env& env = util::Env::GetOfficialEnv()
-			)	const;
-
-
-			/** Test of inclusion of an other perimeter by the current one.
-				@param perimeter to compare with
-				@return true if the current perimeter includes the compared one, false else
-			*/
-			bool perimeterIncludes(
-				const std::string& perimeter,
-				util::Env& env = util::Env::GetOfficialEnv()
-			) const;
 		};
 	}
 }

@@ -532,6 +532,7 @@ namespace synthese
 						)	);
 					}
 					_sscenario->setVariables(values);
+					SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
 				}
 
 			}

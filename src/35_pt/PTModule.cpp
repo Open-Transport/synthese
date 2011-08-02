@@ -190,8 +190,11 @@ namespace synthese
 
 
 
-		void PTModule::getNetworkLinePlaceRightParameterList(ParameterLabelsVector& m)
-		{
+		void PTModule::getNetworkLinePlaceRightParameterList(
+			ParameterLabelsVector& m,
+			std::string codePrefix,
+			std::string namePrefix
+		){
 			Env env;
 			TransportNetworkTableSync::SearchResult networks(
 				TransportNetworkTableSync::Search(env)
@@ -200,13 +203,17 @@ namespace synthese
 				CommercialLineTableSync::Search(env)
 			);
 
-			m.push_back(make_pair(string(), "--- Réseaux ---"));
+			m.push_back(make_pair(string(), namePrefix +"--- Réseaux ---"));
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
-				m.push_back(make_pair(lexical_cast<string>(network->getKey()), network->getName() ));
+			{
+				m.push_back(make_pair(codePrefix + lexical_cast<string>(network->getKey()), namePrefix + network->getName() ));
+			}
 
-			m.push_back(make_pair(string(), "--- Lignes ---"));
+			m.push_back(make_pair(string(), namePrefix + "--- Lignes ---"));
 			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
-				m.push_back(make_pair(lexical_cast<string>(line->getKey()), line->getName() ));
+			{
+				m.push_back(make_pair(codePrefix + lexical_cast<string>(line->getKey()), namePrefix + line->getName() ));
+			}
 		}
 
 

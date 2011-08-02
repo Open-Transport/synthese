@@ -27,9 +27,11 @@
 #include "AlarmRecipient.h"
 
 #include <boost/foreach.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -69,14 +71,39 @@ namespace synthese
 		std::string MessagesRight::displayParameter(
 			util::Env& env
 		) const	{
-			return _parameter;
+
+			vector<string> parts;
+			split(parts, _parameter, is_any_of("/"));
+
+			if(parts.size() == 2)
+			{
+				shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+				shared_ptr<Right> subright(recipient->getRight(parts[1]));
+				return parts[0] + ":" + subright->displayParameter();
+			}
+			else
+			{
+				return _parameter;
+			}
 		}
 
 		bool MessagesRight::perimeterIncludes(
 			const std::string& perimeter,
 			util::Env& env
 		) const	{
-			return true;
+			vector<string> parts;
+			split(parts, _parameter, is_any_of("/"));
+
+			if(parts.size() == 2)
+			{
+				shared_ptr<AlarmRecipient> recipient(Factory<AlarmRecipient>::create(parts[0]));
+				shared_ptr<Right> subright(recipient->getRight(parts[1]));
+				return subright->perimeterIncludes(perimeter, env);
+			}
+			else
+			{
+				return true;
+			}
 		}
 	}
 }

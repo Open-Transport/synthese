@@ -134,7 +134,7 @@ namespace synthese
 			}
 			else
 			{
-				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE);
+				return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<MessagesRight>(WRITE, FORBIDDEN, lexical_cast<string>(_objectId));
 			}
 		}
 	}

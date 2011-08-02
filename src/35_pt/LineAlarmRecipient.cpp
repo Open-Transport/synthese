@@ -42,6 +42,7 @@
 #include "TransportNetworkAdmin.h"
 #include "TransportNetwork.h"
 #include "ImportableTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 #include <boost/foreach.hpp>
 #include <vector>
@@ -82,10 +83,11 @@ namespace synthese
 
 		template<> const string AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::TITLE("Lignes");
 
-		template<> void AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::getStaticParametersLabels(ParameterLabelsVector& m)
-		{
-			m.push_back(make_pair(GLOBAL_PERIMETER,"(toutes les lignes)"));
-			PTModule::getNetworkLinePlaceRightParameterList(m);
+		template<> void AlarmRecipientTemplate<CommercialLineTableSync, LineAlarmRecipient>::getStaticParametersLabels(
+			ParameterLabelsVector& m
+		){
+			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(toutes les lignes)"));
+			PTModule::getNetworkLinePlaceRightParameterList(m, FACTORY_KEY +"/", "Ligne ");
 		}
 
 
@@ -140,9 +142,17 @@ namespace synthese
 				HTMLList l;
 				stream << l.open();
 
+				// Loop on lines
 				for (CommercialLineTableSync::SearchResult::iterator dsit = dsv.begin(); dsit != dsv.end(); ++dsit)
 				{
 					shared_ptr<CommercialLine> ds = *dsit;
+
+					// Right check
+//					if(!getRight()->perimeterIncludes(lexical_cast<string>(ds->getKey()))
+//					{
+//						continue;
+//					}
+
 					usedLines.insert(ds->getKey());
 					removeRequest.getAction()->setObjectId(ds->getKey());
 
@@ -250,5 +260,14 @@ namespace synthese
 		void LineAlarmRecipient::removeObject(const SentAlarm* alarm, util::RegistryKeyType objectId )
 		{
 			remove(CommercialLineTableSync::Get(objectId, Env::GetOfficialEnv()).get(), alarm);
+		}
+
+
+
+		boost::shared_ptr<security::Right> LineAlarmRecipient::getRight( const std::string& perimeter ) const
+		{
+			TransportNetworkRight* result(new TransportNetworkRight);
+			result->setParameter(perimeter);
+			return shared_ptr<Right>(result);
 		}
 }	}
