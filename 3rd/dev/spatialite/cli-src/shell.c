@@ -3105,7 +3105,7 @@ Sandro Furieri 30 May 2008
 ===========================
 registering the SpatiaLite extension
 */
-    spatialite_init (1);
+    spatialite_init (0);
 
     stdin_is_interactive = isatty (0);
 
