@@ -331,14 +331,12 @@ namespace synthese
 				stream << "<h1>Recherche</h1>";
 				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
 				searchRequest.getPage()->setCity(_city);
-				SearchFormHTMLTable st(searchRequest.getHTMLForm("connsearch"));
-				stream << st.open();
-				if(!_city.get())
-				{
-					stream << st.cell("Localité", st.getForm().getTextInput(PARAM_SEARCH_CITY, _searchCity));
-				}
-				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
-				stream << st.close();
+				getHTMLStopAreaSearchForm(
+					stream,
+					searchRequest.getHTMLForm("connsearch"),
+					_city.get() ? optional<const string&>() : optional<const string&>(_searchCity),
+					_searchName
+				);
 
 				stream << "<h1>Résultats</h1>";
 
@@ -560,6 +558,27 @@ namespace synthese
 			}
 
 			return links;
+		}
+
+
+
+		void PTPlacesAdmin::getHTMLStopAreaSearchForm(
+			std::ostream& stream,
+			const html::HTMLForm& form,
+			boost::optional<const std::string&> cityName,
+			boost::optional<const std::string&> stopName
+		){
+			SearchFormHTMLTable st(form);
+			stream << st.open();
+			if(cityName)
+			{
+				stream << st.cell("Localité", st.getForm().getTextInput(PARAM_SEARCH_CITY, *cityName));
+			}
+			if(stopName)
+			{
+				stream << st.cell("Nom", st.getForm().getTextInput(PARAM_SEARCH_NAME, *stopName));
+			}
+			stream << st.close();
 		}
 	}
 }

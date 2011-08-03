@@ -73,7 +73,10 @@ namespace synthese
 			virtual bool beforeParsing() { return true; }
 			virtual bool afterParsing() { return true; }
 
-			virtual void cleanObsoleteData() const {}
+			//////////////////////////////////////////////////////////////////////////
+			/// Purge the obsolete data imported by the source
+			/// @param firstDayToKeep the first day to keep
+			virtual void cleanObsoleteData(const boost::gregorian::date& firstDayToKeep) const {}
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.

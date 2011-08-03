@@ -12,6 +12,7 @@
 #include "DataSourcesAdmin.h"
 #include "DataSourceAdmin.h"
 
+#include "CleanObsoleteDataAction.hpp"
 #include "DataSourceUpdateAction.hpp"
 
 // Registries
@@ -38,6 +39,7 @@ void synthese::impex::moduleRegister()
 	synthese::impex::DataSourcesAdmin::integrate();
 	synthese::impex::DataSourceAdmin::integrate();
 	
+	synthese::impex::CleanObsoleteDataAction::integrate();
 	synthese::impex::DataSourceUpdateAction::integrate();
 	
 	// Registries

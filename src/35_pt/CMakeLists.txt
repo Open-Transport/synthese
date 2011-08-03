@@ -216,6 +216,8 @@ StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp
 StopAreaAddAction.h
+StopAreaAlarmRecipient.cpp
+StopAreaAlarmRecipient.hpp
 StopAreasListFunction.cpp
 StopAreasListFunction.hpp
 StopAreaTableSync.cpp
