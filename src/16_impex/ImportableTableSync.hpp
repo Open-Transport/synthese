@@ -24,7 +24,7 @@
 #define SYNTHESE_impex_ImportableTableSync_hpp__
 
 #include "Importable.h"
-#include "DataSource.h"
+#include "DataSourceTableSync.h"
 #include "Env.h"
 
 #include <string>
@@ -118,16 +118,15 @@ namespace synthese
 		):	_source(source)
 		{
 			_map.clear();
-			boost::shared_ptr<const DataSource> psource(util::Env::GetOfficialEnv().get<DataSource>(source.getKey()));
-			const util::Registry<typename T::ObjectType>& registry(util::Env::GetOfficialEnv().getRegistry<typename T::ObjectType>());
-			typedef typename util::Registry<typename T::ObjectType>::value_type RegistryPair;
-			BOOST_FOREACH(const RegistryPair& v, registry)
+			boost::shared_ptr<const DataSource> psource(DataSourceTableSync::Get(source.getKey(), env));
+			typename T::SearchResult objects(T::Search(env));
+			BOOST_FOREACH(typename T::SearchResult::value_type v, objects)
 			{
-				if(!v.second->hasLinkWithSource(*psource))
+				if(!v->hasLinkWithSource(*psource))
 				{
 					continue;
 				}
-				add(*T::GetEditable(v.first, env));
+				add(*v);
 		}	}
 
 

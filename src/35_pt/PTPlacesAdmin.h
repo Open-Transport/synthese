@@ -189,6 +189,12 @@ namespace synthese
 			///	@date 2009
 			virtual std::string getTitle() const;
 
+			static void getHTMLStopAreaSearchForm(
+				std::ostream& stream,
+				const html::HTMLForm& form,
+				boost::optional<const std::string&> cityName,
+				boost::optional<const std::string&> stopName
+			);
 
 			void setCity(boost::shared_ptr<const geography::City> value);
 

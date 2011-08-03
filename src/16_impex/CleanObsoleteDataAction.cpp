@@ -30,6 +30,7 @@
 #include "Importer.hpp"
 
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -45,7 +46,7 @@ namespace synthese
 	namespace impex
 	{
 		const string CleanObsoleteDataAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "datasource_id";
-		
+		const string CleanObsoleteDataAction::PARAMETER_FIRST_DATE = Action_PARAMETER_PREFIX + "first_date";
 		
 		
 		ParametersMap CleanObsoleteDataAction::getParametersMap() const
@@ -55,6 +56,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATASOURCE_ID, _importer->getDataSource().getKey());
 			}
+			if(!_firstDate.is_not_a_date())
+			{
+				map.insert(PARAMETER_FIRST_DATE, _firstDate);
+			}
 			return map;
 		}
 		
@@ -62,6 +67,7 @@ namespace synthese
 		
 		void CleanObsoleteDataAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Datasource
 			try
 			{
 				setDataSource(*DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID), *_env));
@@ -70,6 +76,9 @@ namespace synthese
 			{
 				throw ActionException("No such datasource");
 			}
+
+			// Date
+			_firstDate = from_string(map.get<string>(PARAMETER_FIRST_DATE));
 		}
 		
 		
@@ -77,7 +86,7 @@ namespace synthese
 		void CleanObsoleteDataAction::run(
 			Request& request
 		){
-			_importer->cleanObsoleteData();
+			_importer->cleanObsoleteData(_firstDate);
 		}
 		
 		
@@ -93,6 +102,15 @@ namespace synthese
 		void CleanObsoleteDataAction::setDataSource(const DataSource& dataSource)
 		{
 			_importer  = dataSource.getImporter(*_env);
+		}
+
+
+
+		CleanObsoleteDataAction::CleanObsoleteDataAction():
+		FactorableTemplate<server::Action, CleanObsoleteDataAction>(),
+			_firstDate(not_a_date_time)
+		{
+
 		}
 	}
 }
