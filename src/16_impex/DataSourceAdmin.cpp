@@ -38,7 +38,7 @@
 
 using namespace std;
 using namespace boost;
-
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -162,12 +162,18 @@ namespace synthese
 			}
 
 			////////////////////////////////////////////////////////////////////
-			// IMPORT TAB
+			// MAINTENANCE TAB
 			if(openTabContent(stream, TAB_MAINTENANCE))
 			{
 				AdminActionFunctionRequest<CleanObsoleteDataAction, DataSourceAdmin> cleanRequest(request);
+				cleanRequest.getAction()->setEnv(_env);
 				cleanRequest.getAction()->setDataSource(*_dataSource);
-				stream << "<p>" << HTMLModule::getLinkButton(cleanRequest.getURL(), "Supprimer données obsolètes", "Etes-vous sûr de vouloir supprimer les données obsolètes ?") << "</p>";
+				PropertiesHTMLTable cleanForm(cleanRequest.getHTMLForm("clean"));
+				date yesterday(gregorian::day_clock::local_day());
+				yesterday -= days(1);
+				stream << cleanForm.open();
+				stream << cleanForm.cell("Premier jour à conserver", cleanForm.getForm().getCalendarInput(CleanObsoleteDataAction::PARAMETER_FIRST_DATE, yesterday));
+				stream << cleanForm.close();
 			}
 
 			////////////////////////////////////////////////////////////////////

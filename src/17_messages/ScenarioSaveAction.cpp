@@ -361,6 +361,7 @@ namespace synthese
 						{
 							_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
 						}
+						*_endDate -= seconds(_endDate->time_of_day().seconds());
 					}
 
 					// Variables
@@ -532,7 +533,10 @@ namespace synthese
 						)	);
 					}
 					_sscenario->setVariables(values);
-					SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
+					if(!values.empty())
+					{
+						SentScenarioInheritedTableSync::WriteVariablesIntoMessages(*_sscenario);
+					}
 				}
 
 			}

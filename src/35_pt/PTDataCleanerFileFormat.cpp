@@ -30,7 +30,9 @@
 #include "RequestException.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineArea.hpp"
+#include "DBTransaction.hpp"
 
+using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
 
@@ -41,6 +43,7 @@ namespace synthese
 	using namespace graph;
 	using namespace util;
 	using namespace server;
+	using namespace db;
 	
 	namespace pt
 	{
@@ -305,8 +308,86 @@ namespace synthese
 
 
 
-		void PTDataCleanerFileFormat::cleanObsoleteData() const
-		{
+		void PTDataCleanerFileFormat::cleanObsoleteData(
+			const date& firstDayToKeep
+		) const {
+			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
 
+			set<ScheduledService*> scheduledServicesToRemove;
+			set<ContinuousService*> continuousServicesToRemove;
+			set<JourneyPattern*> journeyPatternsToRemove;
+
+			// Select obsolete services
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
+				{
+					ScheduledServiceTableSync::Search(_env, itPath->getKey());
+					ContinuousServiceTableSync::Search(_env, itPath->getKey());
+
+					BOOST_FOREACH(const ServiceSet::value_type& itService, itPath->getServices())
+					{
+						if(!dynamic_cast<NonPermanentService*>(itService))
+						{
+							continue;
+						}
+
+						NonPermanentService* service(static_cast<NonPermanentService*>(itService));
+
+						// Avoid call of Calendar constructor with undefined end date for services without dates
+						if(service->empty() || service->getLastActiveDate() < firstDayToKeep)
+						{
+							if(dynamic_cast<ScheduledService*>(service))
+							{
+								scheduledServicesToRemove.insert(static_cast<ScheduledService*>(service));
+							}
+							else if(dynamic_cast<ContinuousService*>(service))
+							{
+								continuousServicesToRemove.insert(static_cast<ContinuousService*>(service));
+							}
+						}
+					}
+			}	}
+
+			// Removes all deleted services from their corresponding route
+			BOOST_FOREACH(ScheduledService* scheduledService, scheduledServicesToRemove)
+			{
+				const_cast<JourneyPattern*>(scheduledService->getRoute())->removeService(*scheduledService);
+			}
+			BOOST_FOREACH(ContinuousService* continuousService, continuousServicesToRemove)
+			{
+				const_cast<JourneyPattern*>(continuousService->getRoute())->removeService(*continuousService);
+			}
+
+			// Select empty routes (due to services removal or not)
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
+				{
+					if(itPath->getServices().empty())
+					{
+						journeyPatternsToRemove.insert(itPath);
+					}
+			}	}
+
+			// Remove services
+			DBTransaction t;
+			BOOST_FOREACH(ScheduledService* scheduledService, scheduledServicesToRemove)
+			{
+				ScheduledServiceTableSync::RemoveRow(scheduledService->getKey(), t);
+			}
+			BOOST_FOREACH(ContinuousService* continuousService, continuousServicesToRemove)
+			{
+				ContinuousServiceTableSync::RemoveRow(continuousService->getKey(), t);
+			}
+			BOOST_FOREACH(JourneyPattern* journeyPatterns, journeyPatternsToRemove)
+			{
+				BOOST_FOREACH(const Edge* edge, journeyPatterns->getEdges())
+				{
+					LineStopTableSync::RemoveRow(edge->getKey(), t);
+				}
+				JourneyPatternTableSync::RemoveRow(journeyPatterns->getKey(), t);
+			}
+			t.run();
 		}
 }	}

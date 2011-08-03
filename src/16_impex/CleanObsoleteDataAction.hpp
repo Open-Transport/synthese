@@ -53,9 +53,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_FIRST_DATE;
 
 		private:
 			boost::shared_ptr<Importer> _importer;
+			boost::gregorian::date _firstDate;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -72,6 +74,8 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			CleanObsoleteDataAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
