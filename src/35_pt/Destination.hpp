@@ -53,8 +53,8 @@ namespace synthese
 
 		public:
 			const std::string& getDisplayedText() const { return _displayedText; }
-			const std::string& getTTSText() const { return _displayedText; }
-			const std::string& getComment() const { return _displayedText; }
+			const std::string& getTTSText() const { return _ttsText; }
+			const std::string& getComment() const { return _comment; }
 
 			void setDisplayedText(const std::string& value){ _displayedText = value; }
 			void setTTSText(const std::string& value){ _ttsText = value; }

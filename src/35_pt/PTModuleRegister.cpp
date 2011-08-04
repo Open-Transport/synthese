@@ -45,6 +45,8 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
 
+#include "DestinationAdmin.hpp"
+#include "DestinationsAdmin.hpp"
 #include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
@@ -69,6 +71,7 @@
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
 #include "CopyGeometriesAction.hpp"
+#include "DestinationUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
@@ -169,6 +172,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PladisStopsFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate ();
 	
+	synthese::pt::DestinationAdmin::integrate();
+	synthese::pt::DestinationsAdmin::integrate();
 	synthese::pt::PTQualityControlAdmin::integrate();
 	synthese::pt::ServiceAdmin::integrate();
 	synthese::pt::TransportNetworkAdmin::integrate();
@@ -206,6 +211,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::CommercialLineUpdateAction::integrate();
 	synthese::pt::ContinuousServiceUpdateAction::integrate();
 	synthese::pt::CopyGeometriesAction::integrate();
+	synthese::pt::DestinationUpdateAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
