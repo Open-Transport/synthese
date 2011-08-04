@@ -1534,7 +1534,7 @@ namespace synthese
 			///	@author %USERNAME%
 			///	@date $YEAR$
 			void setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 
 			
@@ -1543,7 +1543,7 @@ namespace synthese
 			/// Creation of the parameters map from the object attributes.
 			///	@author %USERNAME%
 			///	@date $YEAR$
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
@@ -1876,7 +1876,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
 			/// @return The generated parameters map
-			server::ParametersMap getParametersMap() const;
+			util::ParametersMap getParametersMap() const;
 
 
 
@@ -1884,7 +1884,7 @@ namespace synthese
 			/// Reads the parameters of the action on a generic parameters map.
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
-			void _setFromParametersMap(const server::ParametersMap& map);
+			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -2059,7 +2059,7 @@ a:10 Table Sync Header::
 #define SYNTHESE_$FILE_BASE$_$FILE_EXT$__
 
 #include "$ObjectClass$.hpp"
-#include "SQLite$NoSync_Registry$TableSyncTemplate.h"
+#include "DB$NoSync_Registry$TableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -2072,7 +2072,7 @@ namespace synthese
 		///	@date $YEAR$
 		/// @since $Version$
 		class $FILE_BASE$:
-			public db::SQLite$NoSync_Registry$TableSyncTemplate<$FILE_BASE$,$ObjectClass$>
+			public db::DB$NoSync_Registry$TableSyncTemplate<$FILE_BASE$,$ObjectClass$>
 		{
 		public:
 			//! @name Field names
@@ -2151,11 +2151,12 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
+	using namespace security;
 	using namespace $namespace$;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<SQLiteTableSync,$FILE_BASE$>::FACTORY_KEY("$Table_factory_key$");
+		template<> const string FactorableTemplate<DBTableSync,$FILE_BASE$>::FACTORY_KEY("$Table_factory_key$");
 	}
 
 	namespace $namespace$
@@ -2165,34 +2166,34 @@ namespace synthese
 	
 	namespace db
 	{
-		template<> const SQLiteTableSync::Format SQLiteTableSyncTemplate<$FILE_BASE$>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<$FILE_BASE$>::TABLE(
 			"$Full_table_name$"
 		);
 
 
 
-		template<> const SQLiteTableSync::Field SQLiteTableSyncTemplate<$FILE_BASE$>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<$FILE_BASE$>::_FIELDS[]=
 		{
-			SQLiteTableSync::Field(TABLE_COL_ID, SQL_INTEGER, false),
-			// SQLiteTableSync::Field($FILE_BASE$::COL_NAME, SQL_TEXT),
-			SQLiteTableSync::Field()
+			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			// DBTableSync::Field($FILE_BASE$::COL_NAME, SQL_TEXT),
+			DBTableSync::Field()
 		};
 
 
 
-		template<> const SQLiteTableSync::Index SQLiteTableSyncTemplate<$FILE_BASE$>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<$FILE_BASE$>::_INDEXES[]=
 		{
-			// SQLiteTableSync::Index(
+			// DBTableSync::Index(
 			//	$FILE_BASE$::COL_NAME.c_str(),
 			// ""),
-			SQLiteTableSync::Index()
+			DBTableSync::Index()
 		};
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Load(
+		template<> void DBDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Load(
 			$ObjectClass$* object,
-			const db::SQLiteResultSPtr& rows,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -2217,9 +2218,9 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Save(
+		template<> void DBDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Save(
 			$ObjectClass$* object,
-			optional<SQLiteTransaction&> transaction
+			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<$FILE_BASE$> query(*object);
 			// query.addField(object->getName());
@@ -2229,10 +2230,44 @@ namespace synthese
 
 
 
-		template<> void SQLiteDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Unlink(
+		template<> void DBDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Unlink(
 			$ObjectClass$* obj
 		){
 		}
+
+
+
+		template<> bool DBTableSyncTemplate<$FILE_BASE$>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<$FILE_BASE$>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<$FILE_BASE$>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<$FILE_BASE$>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+		}
+
 	}
 	
 	
@@ -2300,7 +2335,7 @@ a:Inherited Table Sync Header::
 #ifndef SYNTHESE_$Namespace$_$FILE_BASE$_$FILE_EXT$__
 #define SYNTHESE_$Namespace$_$FILE_BASE$_$FILE_EXT$__
 
-#include "SQLiteInherited$NoSync_or_Registry$TableSyncTemplate.h"
+#include "DBInherited$NoSync_or_Registry$TableSyncTemplate.h"
 
 #include "$Parent_Table_Sync$.hpp"
 #include "$Class$.h"
@@ -2524,7 +2559,7 @@ namespace synthese
 			/// @author %USERNAME%
 			/// @date $YEAR$
 			/// @since $Version$
-			server::ParametersMap _getParametersMap() const;
+			util::ParametersMap _getParametersMap() const;
 			
 			
 			
@@ -2537,7 +2572,7 @@ namespace synthese
 			/// @date $YEAR$
 			/// @since $Version$
 			virtual void _setFromParametersMap(
-				const server::ParametersMap& map
+				const util::ParametersMap& map
 			);
 			
 			
