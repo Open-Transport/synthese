@@ -37,8 +37,14 @@ DesignatedLinePhysicalStopInheritedTableSync.cpp
 DesignatedLinePhysicalStopInheritedTableSync.hpp
 Destination.cpp
 Destination.hpp
+DestinationsAdmin.hpp
+DestinationsAdmin.cpp
+DestinationAdmin.hpp
+DestinationAdmin.cpp
 DestinationTableSync.cpp
 DestinationTableSync.hpp
+DestinationUpdateAction.cpp
+DestinationUpdateAction.hpp
 DRTArea.cpp
 DRTArea.hpp
 DRTAreaAdmin.cpp
