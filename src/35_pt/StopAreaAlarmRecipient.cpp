@@ -81,12 +81,12 @@ namespace synthese
 		AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::_linksObject =
 			std::map<const StopArea*, std::set<const SentAlarm*> > ();
 
-		template<> const string AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::TITLE("Arrêts");
+		template<> const string AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::TITLE("ArrÃªts");
 
 		template<> void AlarmRecipientTemplate<StopAreaTableSync, StopAreaAlarmRecipient>::getStaticParametersLabels(
 			ParameterLabelsVector& m
 		){
-			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(tous les arrêts)"));
+			m.push_back(make_pair(FACTORY_KEY +"/"+ GLOBAL_PERIMETER,"(tous les arrÃªts)"));
 		}
 
 
@@ -130,11 +130,11 @@ namespace synthese
 			)	);
 			set<util::RegistryKeyType> usedStops;
 
-			stream << "<h1>Arrêts destinataires</h1>";
+			stream << "<h1>ArrÃªts destinataires</h1>";
 
 			if (dsv.empty())
 			{
-				stream << "<p>Aucun arrêt destinataire</p>";
+				stream << "<p>Aucun arrÃªt destinataire</p>";
 			}
 			else
 			{
@@ -164,7 +164,7 @@ namespace synthese
 				stream << l.close();
 			}
 
-			stream << "<h1>Ajout d'arrêt</h1>";
+			stream << "<h1>Ajout d'arrÃªt</h1>";
 
 			string searchName(parameters.getDefault<string>(PTPlacesAdmin::PARAM_SEARCH_NAME));
 			string searchCity(parameters.getDefault<string>(PTPlacesAdmin::PARAM_SEARCH_CITY));
@@ -187,7 +187,7 @@ namespace synthese
 			)	);
 
 			ResultHTMLTable::HeaderVector h;
-			h.push_back(make_pair(string(), "N°"));
+			h.push_back(make_pair(string(), "NÂ°"));
 			h.push_back(make_pair(PTPlacesAdmin::PARAM_SEARCH_CITY, "Commune"));
 			h.push_back(make_pair(PTPlacesAdmin::PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
