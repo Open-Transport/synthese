@@ -144,22 +144,6 @@ namespace synthese
 				stream << t.close();
 			}
 
-			////////////////////////////////////////////////////////////////////
-			// IMPORT TAB
-			if(openTabContent(stream, TAB_IMPORT))
-			{
-				_importer->displayAdmin(stream, request);
-				bool doImport(_doImport);
-				doImport &= _importer->beforeParsing();
-				doImport &= _importer->parseFiles(stream, request);
-				doImport &= _importer->afterParsing();
-				if(doImport)
-				{
-					_importer->save().run();
-				}
-
-				stream << "Return code : " << (doImport ? "0" : "1");
-			}
 
 			////////////////////////////////////////////////////////////////////
 			// MAINTENANCE TAB
@@ -174,6 +158,24 @@ namespace synthese
 				stream << cleanForm.open();
 				stream << cleanForm.cell("Premier jour à conserver", cleanForm.getForm().getCalendarInput(CleanObsoleteDataAction::PARAMETER_FIRST_DATE, yesterday));
 				stream << cleanForm.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// IMPORT TAB
+			if(openTabContent(stream, TAB_IMPORT))
+			{
+				_importer->displayAdmin(stream, request);
+				bool doImport(_doImport);
+				doImport &= _importer->beforeParsing();
+				doImport &= _importer->parseFiles(stream, request);
+				doImport &= _importer->afterParsing();
+				if(doImport)
+				{
+					_importer->save().run();
+					// WARNING : Do not write code after this line, because the environment is cleaned by Importer::save.
+				}
+
+				stream << "Return code : " << (doImport ? "0" : "1");
 			}
 
 			////////////////////////////////////////////////////////////////////

@@ -99,7 +99,7 @@ namespace synthese
  						object->getKey(),
 						optional<RegistryKeyType>(),
  						0, optional<size_t>(),
- 						DOWN_LINKS_LOAD_LEVEL
+ 						UP_LINKS_LOAD_LEVEL
  				)	);
  				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> e, elements)
  				{

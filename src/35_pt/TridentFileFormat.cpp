@@ -1776,6 +1776,15 @@ namespace synthese
 				{
 					// Connection node
 					XMLNode connectionNode(allNode.getChildNode("ConnectionLink", connectionRank));
+					if(	!connectionNode.nChildNode("objectId") ||
+						!connectionNode.nChildNode("startOfLink") ||
+						!connectionNode.nChildNode("endOfLink") ||
+						!connectionNode.nChildNode("linkDistance") ||
+						!connectionNode.nChildNode("defaultDuration")
+					){
+						os << "WARN : Connection link at rank " << connectionRank << " is malformed.<br />";
+						continue;
+					}
 
 					// Connection properties
 					XMLNode key(connectionNode.getChildNode("objectId", 0));
