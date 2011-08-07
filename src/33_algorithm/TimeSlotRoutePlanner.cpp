@@ -175,7 +175,7 @@ namespace synthese
 
 				if(journey.empty()) break;
 
-				//! <li> If the journey is continuous, attemt to break it. </li>
+				//! <li> If the journey is continuous, attempt to break it. </li>
 				if(	journey.getContinuousServiceRange ().total_seconds() > 60)
 				{
 					TimeSlotRoutePlanner tsr(

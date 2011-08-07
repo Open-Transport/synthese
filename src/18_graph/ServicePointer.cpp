@@ -139,21 +139,34 @@ namespace synthese
 		UseRule::RunPossibilityType ServicePointer::isUseRuleCompliant(
 			bool ignoreReservation
 		) const	{
+
+			// Checks for complete service pointers
+			if(_departureEdge && _arrivalEdge)
+			{
+				// Check of real time vertices
+				if(	_RTData && (!_realTimeArrivalVertex || !_realTimeDepartureVertex))
+				{
+					return UseRule::RUN_NOT_POSSIBLE;
+				}
+
+				// Check of non concurrency rules
+				if(	!_service->nonConcurrencyRuleOK(
+						_originDateTime.date(),
+						*getDepartureEdge(),
+						*getArrivalEdge(),
+						_userClassRank
+				)	){
+					return UseRule::RUN_NOT_POSSIBLE;
+				}
+			}
+
+			// Check of use rule
 			if(getUseRule().isRunPossible(*this, ignoreReservation) != UseRule::RUN_POSSIBLE)
 			{
 				return UseRule::RUN_NOT_POSSIBLE;
 			}
-			if(_departureEdge && _arrivalEdge)
-			{
-				return _service->nonConcurrencyRuleOK(
-					_originDateTime.date(),
-					*getDepartureEdge(),
-					*getArrivalEdge(),
-					_userClassRank
-				) ?
-				UseRule::RUN_POSSIBLE :
-				UseRule::RUN_NOT_POSSIBLE;
-			}
+
+			// All checks are OK
 			return UseRule::RUN_POSSIBLE;
 		}
 

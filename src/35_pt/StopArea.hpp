@@ -324,12 +324,16 @@ namespace synthese
 			//! @name Queries
 			//@{
 				/** getPhysicalStopLabels.
-					@param withAll
+					@param withAll displays an item corresponding to all stops
+					@param noStopLabel displays an item corresponding to no stop (if empty, no empty item)
 					@return Physical stops labels
 					@author Hugues Romain
 					@date 2007
 				*/
-				PhysicalStopsLabels	getPhysicalStopLabels(bool withAll = false) const;
+				PhysicalStopsLabels	getPhysicalStopLabels(
+					bool withAll = false,
+					std::string noStopLabel = std::string()
+				) const;
 
 				/** Labels list for select field containing physical stops, with exclusion list.
 					@param noDisplay Physical stops to exclude

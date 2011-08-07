@@ -35,9 +35,10 @@ namespace synthese
 		class ScheduledService;
 		class StopPoint;
 
-		/** ServiceVertexRealTimeUpdateAction action class.
-			@ingroup m35Actions refActions
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// ServiceVertexRealTimeUpdateAction action class.
+		/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service
+		///	@ingroup m35Actions refActions
 		class ServiceVertexRealTimeUpdateAction:
 			public util::FactorableTemplate<server::Action, ServiceVertexRealTimeUpdateAction>
 		{
@@ -45,26 +46,34 @@ namespace synthese
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_LINE_STOP_RANK;
 			static const std::string PARAMETER_STOP_ID;
+			static const std::string PARAMETER_PROPAGATE;
 
 		private:
 			boost::shared_ptr<ScheduledService> _service;
 			boost::shared_ptr<const pt::StopPoint> _physicalStop;
 			std::size_t _lineStopRank;
+			bool _propagate;
 
 		protected:
-			/** Conversion from attributes to generic parameter maps.
-				@return Generated parameters map
-			*/
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from attributes to generic parameter maps.
+			///	@return Generated parameters map
+			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
 			util::ParametersMap getParametersMap() const;
 
-			/** Conversion from generic parameters map to attributes.
-				Removes the used parameters from the map.
-				@param map Parameters map to interpret
-				@exception ActionException Occurs when some parameters are missing or incorrect.
-			*/
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Conversion from generic parameters map to attributes.
+			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
+			///	Removes the used parameters from the map.
+			///	@param map Parameters map to interpret
+			///	@exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			ServiceVertexRealTimeUpdateAction();
+
 			/** Action to run, defined by each subclass.
 			*/
 			void run(server::Request& request);

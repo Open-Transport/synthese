@@ -49,6 +49,7 @@ namespace synthese
 			bool inverted,
 			bool ignoreReservation
 		) const	{
+
 			ServicePointer sp(RTData, userClass, *this, presenceDateTime);
 			if(getDeparture)
 			{

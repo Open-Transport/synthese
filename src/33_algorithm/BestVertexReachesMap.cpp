@@ -246,7 +246,7 @@ namespace synthese
 		{
 			for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 			{
-				if(destinationVam.getMap().find(it->first) != destinationVam.getMap().end())
+				if(destinationVam.getMap().find(it->first) == destinationVam.getMap().end())
 				{
 					_insert(
 						it->first,
