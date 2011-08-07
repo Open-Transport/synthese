@@ -1085,7 +1085,7 @@ namespace synthese
 			//...
 
 		public:
-			/** Controls and store the internals parameters.
+			/** Checks and store the internals parameters.
 				@param vel Parameters list to read
 			*/
 			void storeParameters(interfaces::ValueElementList& vel);
@@ -1158,7 +1158,7 @@ namespace synthese
 		void $FILE_BASE$::storeParameters(ValueElementList& vel)
 		{
 			_parameter1 = vel.front();
-			/// @todo control and Fill the parameters init
+			/// @todo check and Fill the parameters init
 		}
 
 		string $FILE_BASE$::display(
@@ -1561,7 +1561,7 @@ namespace synthese
 
 			
 			//////////////////////////////////////////////////////////////////////////
-			/// Authorization control.
+			/// Authorization check.
 			/// Returns if the page can be displayed. In most cases, the needed right
 			/// level is READ.
 			///	@param request The current request
