@@ -42,7 +42,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 
 	AccessParameters::AllowedPathClasses pc;
 	AccessParameters a(
-		USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 67, 10, pc
+		USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 1.11, 10, pc
 	);
 	ptime tomorrow(day_clock::local_day(), minutes(0));
 	tomorrow += days(1);
@@ -252,10 +252,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		// FIXME: This should be 5 instead.
-		// See https://extranet-rcsmobility.com/issues/10521
-		//BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 5);
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 0);
+		BOOST_CHECK_EQUAL(result.getJourneys().size(), 5);
 	}
 
 	{ // 94 -> 99
@@ -274,7 +271,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 5);
+		BOOST_CHECK_EQUAL(result.getJourneys().size(), 5);
 	}
 
 	{ // 98 -> 99
@@ -293,9 +290,6 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		// FIXME: This should be 3 instead.
-		// See https://extranet-rcsmobility.com/issues/10521
-		//BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 3);
-		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 1);
+		BOOST_CHECK_EQUAL(result.getJourneys().size(), 3);
 	}
 }

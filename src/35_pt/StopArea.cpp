@@ -91,13 +91,31 @@ namespace synthese
 
 
 
-		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels( bool withAll /*= false*/ ) const
-		{
+		StopArea::PhysicalStopsLabels StopArea::getPhysicalStopLabels(
+			bool withAll /*= false*/,
+			string noStopLabel
+		) const {
+
 			PhysicalStopsLabels m;
+
+			// All stops item
 			if (withAll)
+			{
 				m.push_back(make_pair(0, "(tous)"));
+			}
+
+			// Stop items
 			for (PhysicalStops::const_iterator it = _physicalStops.begin(); it != _physicalStops.end(); ++it)
+			{
 				m.push_back(make_pair(it->first, it->second->getCodeBySources() + " / " + it->second->getName()));
+			}
+
+			// No stop item
+			if(!noStopLabel.empty())
+			{
+				m.push_back(make_pair(0, noStopLabel));
+			}
+
 			return m;
 		}
 

@@ -51,7 +51,6 @@ namespace synthese
 		{
 		public:
 			typedef enum { FORCE_UNLIMITED_SIZE, SIZE_AS_DEFINED } UnlimitedSize;
-			static const size_t UNLIMITED_SIZE = 0;
 
 			typedef std::map<util::RegistryKeyType, const pt::StopPoint*> PhysicalStops;
 		private:
@@ -73,7 +72,7 @@ namespace synthese
 				const ForbiddenPlacesList		_forbiddenPlaces;
 				const boost::posix_time::ptime	_startDateTime;
 				const boost::posix_time::ptime	_endDateTime;
-				const size_t					_maxSize;	//!< Maximal size of the departure table according to the demand rules.
+				const boost::optional<std::size_t>	_maxSize;	//!< Maximal size of the departure table according to the demand rules.
 			//@}
 
 			//!	\name Results
@@ -107,7 +106,7 @@ namespace synthese
 				const ForbiddenPlacesList&,
 				const boost::posix_time::ptime& startDateTime,
 				const boost::posix_time::ptime& endDateTime,
-				size_t maxSize = UNLIMITED_SIZE
+				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>()
 			);
 
 		public:

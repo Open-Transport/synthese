@@ -56,11 +56,12 @@ namespace synthese
 			const ForbiddenPlacesList&	forbiddenPlaces,
 			const ptime& startDateTime,
 			const ptime& endDateTime,
-			size_t maxSize
+			optional<size_t> maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter),
 			_lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
 			_startDateTime(startDateTime),
-			_endDateTime(endDateTime), _maxSize(maxSize)
+			_endDateTime(endDateTime),
+			_maxSize(maxSize)
 		{}
 
 
@@ -144,12 +145,13 @@ namespace synthese
 				curLinestop != NULL;
 				curLinestop = static_cast<const LinePhysicalStop*>(curLinestop->getFollowingArrivalForFineSteppingOnly())
 			){
-				if(!servicePointer.getService()->nonConcurrencyRuleOK(
-						servicePointer.getOriginDateTime().date(),
-						*servicePointer.getDepartureEdge(),
-						*curLinestop,
-						USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET
-				)	) continue;
+				ServicePointer completed(servicePointer, *curLinestop, ap);
+
+				// Checks if the service calls at the arrival stop
+				if(	completed.isUseRuleCompliant(true) == UseRule::RUN_NOT_POSSIBLE
+				){
+					continue;
+				}
 
 				place = curLinestop->getPhysicalStop()->getConnectionPlace();
 				lastLineStop = curLinestop;
@@ -159,7 +161,6 @@ namespace synthese
 					encounteredPlaces.find(place) == encounteredPlaces.end() &&
 					place != destinationPlace
 				){
-					ServicePointer completed(servicePointer, *curLinestop, ap);
 					_push_back(arrivals, completed);
 					encounteredPlaces.insert(place);
 				}
@@ -180,7 +181,7 @@ namespace synthese
 			pair<ArrivalDepartureList::iterator, bool> insertResult = _result.insert(make_pair(servicePointer, arrivals));
 
 			/** - Control of size : if too long, deletion of the last element */
-			if (unlimitedSize == SIZE_AS_DEFINED && _maxSize != UNLIMITED_SIZE && _result.size() > _maxSize)
+			if (unlimitedSize == SIZE_AS_DEFINED && _maxSize && _result.size() > *_maxSize)
 			{
 				_result.erase(--_result.end());
 			}

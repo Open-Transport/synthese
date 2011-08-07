@@ -47,7 +47,7 @@ namespace synthese
 				const ForbiddenPlacesList&,
 				const boost::posix_time::ptime& startDateTime,
 				const boost::posix_time::ptime& endDateTime,
-				size_t maxSize = UNLIMITED_SIZE
+				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>()
 			);
 
 			const ArrivalDepartureList& generate();
