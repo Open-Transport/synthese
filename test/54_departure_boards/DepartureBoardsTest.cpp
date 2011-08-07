@@ -45,25 +45,30 @@ using namespace synthese;
 BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 {
 	// Stops
-	StopArea a1;
+	StopArea a1(1);
+	a1.setName("A1");
 	StopPoint s11(11, "S11", &a1);
 	a1.addPhysicalStop(s11);
 	StopPoint s12(12, "S12", &a1);
 	a1.addPhysicalStop(s12);
 	
-	StopArea a2;
+	StopArea a2(2);
+	a2.setName("A2");
 	StopPoint s2(2, "S2", &a2);
 	a2.addPhysicalStop(s2);
 
-	StopArea a3;
+	StopArea a3(3);
+	a3.setName("A3");
 	StopPoint s3(3, "S3", &a3);
 	a3.addPhysicalStop(s3);
 
-	StopArea a4;
+	StopArea a4(4);
+	a4.setName("A4");
 	StopPoint s4(4, "S4", &a4);
 	a4.addPhysicalStop(s4);
 
-	StopArea a5;
+	StopArea a5(5);
+	a5.setName("A5");
 	StopPoint s5(5, "S5", &a5);
 	a5.addPhysicalStop(s5);
 
@@ -163,27 +168,50 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 		);
 		const ArrivalDepartureList& result(g.generate());
 
-		BOOST_REQUIRE_EQUAL(result.size(), 5);
+		BOOST_CHECK_EQUAL(result.size(), 5);
 
 		ArrivalDepartureList::const_iterator dep(result.begin());
-		const ServicePointer& sp1(dep->first);
-		BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
 
-		++dep;
-		const ServicePointer& sp2(dep->first);
-		BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			++dep;
+		}
 
-		++dep;
-		const ServicePointer& sp3(dep->first);
-		BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			++dep;
+		}
 
-		++dep;
-		const ServicePointer& sp4(dep->first);
-		BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+		if(dep != result.end())
+		{
+			const ServicePointer& sp3(dep->first);
+			BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			++dep;
+		}
 
-		++dep;
-		const ServicePointer& sp5(dep->first);
-		BOOST_CHECK_EQUAL(sp5.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+		if(dep != result.end())
+		{
+			const ServicePointer& sp4(dep->first);
+			BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp5(dep->first);
+			BOOST_CHECK_EQUAL(sp5.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a4.getName());
+		}
 	}
 
 	{	// Test case 2
@@ -290,4 +318,379 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 		BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
 	}
 
+	// Real time update : stop s11 is not served by jp1ser2
+	jp1ser1.setRealTimeVertex(0, NULL);
+
+	{	// Test case 5
+		// Stops : All stops of a1
+		// Size : unlimited
+		// Algorithm : standard
+		// jp1ser1 must not be selected due to the real time update
+
+		StandardArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		StandardArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			DisplayedPlacesList(),
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime
+		);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_CHECK_EQUAL(result.size(), 4);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp4(dep->first);
+			BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp3(dep->first);
+			BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+		}
+	}
+
+	{	// Test case 5.5
+		// Stops : all stops
+		// Size : 2
+		// Algorithm : preselection
+		// jp1ser2 must be chosen instead of jp1ser1 because jp1ser1 does not run from a1
+
+		ForcedDestinationsArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		ForcedDestinationsArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			DisplayedPlacesList(),
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime,
+			2,
+			ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsSet(),
+			hours(2)
+		);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_CHECK_EQUAL(result.size(), 2);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+		}
+	}
+
+	// Back to initial situation
+	jp1ser1.setRealTimeVertex(0, jp1.getEdge(0)->getFromVertex());
+
+	// Real time update : stop s4 is not served by jp1ser1
+	jp1ser1.setRealTimeVertex(3, NULL);
+
+	{	// Test case 6
+		// Stops : All stops of a1
+		// Size : unlimited
+		// Algorithm : standard
+		// jp1ser1 must end at a3 instead of a4
+
+		StandardArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		StandardArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			DisplayedPlacesList(),
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime
+		);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_CHECK_EQUAL(result.size(), 5);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp3(dep->first);
+			BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a3.getName());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp4(dep->first);
+			BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp5(dep->first);
+			BOOST_CHECK_EQUAL(sp5.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a4.getName());
+		}
+	}
+
+	{	// Test case 8
+		// Stops : all stops
+		// Size : 2
+		// Algorithm : preselection
+		// jp1ser2 must be chosen instead of jp1ser1 because jp1ser1 ends at a3 instead of a4
+
+		ForcedDestinationsArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		ForcedDestinationsArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			DisplayedPlacesList(),
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime,
+			2,
+			ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsSet(),
+			hours(2)
+			);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_CHECK_EQUAL(result.size(), 2);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+		}
+	}
+
+	// Back to initial situation
+	jp1ser1.setRealTimeVertex(3, jp1.getEdge(3)->getFromVertex());
+
+	{	// Test case 7
+		// Stops : All stops of a1
+		// Size : unlimited
+		// Algorithm : standard
+		// Intermediate stop : a3
+
+		StandardArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		DisplayedPlacesList displayedPlacesList;
+		displayedPlacesList.insert(make_pair(a3.getKey(), &a3));
+
+		StandardArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			displayedPlacesList,
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime
+		);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_CHECK_EQUAL(result.size(), 5);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp1(dep->first);
+			BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp2(dep->first);
+			BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp3(dep->first);
+			BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 3);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a3.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(2).place->getName(), a4.getName());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp4(dep->first);
+			BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 2);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+			++dep;
+		}
+
+		if(dep != result.end())
+		{
+			const ServicePointer& sp5(dep->first);
+			BOOST_CHECK_EQUAL(sp5.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+			BOOST_REQUIRE_EQUAL(dep->second.size(), 3);
+			BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a3.getName());
+			BOOST_CHECK_EQUAL(dep->second.at(2).place->getName(), a4.getName());
+		}
+	}
+
+	// Real time update : stop s3 is not served by jp1ser1
+	jp1ser1.setRealTimeVertex(2, NULL);
+
+	{	// Test case 9
+		// Stops : All stops of a1
+		// Size : unlimited
+		// Algorithm : standard
+		// Intermediate stop : a3
+		// Should take into account of deactivation of jp1ser1 at a3
+
+		StandardArrivalDepartureTableGenerator::PhysicalStops stops;
+		stops.insert(make_pair(s11.getKey(), &s11));
+		stops.insert(make_pair(s12.getKey(), &s12));
+
+		DisplayedPlacesList displayedPlacesList;
+		displayedPlacesList.insert(make_pair(a3.getKey(), &a3));
+
+		StandardArrivalDepartureTableGenerator g(
+			stops,
+			DISPLAY_DEPARTURES,
+			WITH_PASSING,
+			LineFilter(),
+			displayedPlacesList,
+			ForbiddenPlacesList(),
+			startDateTime,
+			endDateTime
+		);
+		const ArrivalDepartureList& result(g.generate());
+
+		BOOST_REQUIRE_EQUAL(result.size(), 5);
+
+		ArrivalDepartureList::const_iterator dep(result.begin());
+		const ServicePointer& sp1(dep->first);
+		BOOST_CHECK_EQUAL(sp1.getService()->getServiceNumber(), jp2ser1.getServiceNumber());
+		BOOST_REQUIRE_GE(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+
+		++dep;
+		const ServicePointer& sp2(dep->first);
+		BOOST_CHECK_EQUAL(sp2.getService()->getServiceNumber(), jp2ser2.getServiceNumber());
+		BOOST_REQUIRE_GE(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+
+		++dep;
+		const ServicePointer& sp3(dep->first);
+		BOOST_CHECK_EQUAL(sp3.getService()->getServiceNumber(), jp1ser1.getServiceNumber());
+		BOOST_REQUIRE_GE(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a4.getName());
+
+		++dep;
+		const ServicePointer& sp4(dep->first);
+		BOOST_CHECK_EQUAL(sp4.getService()->getServiceNumber(), jp2ser3.getServiceNumber());
+		BOOST_REQUIRE_GE(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.size(), 2);
+		BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a2.getName());
+
+		++dep;
+		const ServicePointer& sp5(dep->first);
+		BOOST_CHECK_EQUAL(sp5.getService()->getServiceNumber(), jp1ser2.getServiceNumber());
+		BOOST_REQUIRE_GE(dep->second.size(), 3);
+		BOOST_CHECK_EQUAL(dep->second.size(), 3);
+		BOOST_CHECK_EQUAL(dep->second.at(0).place->getName(), a1.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(1).place->getName(), a3.getName());
+		BOOST_CHECK_EQUAL(dep->second.at(2).place->getName(), a4.getName());
+	}
+
+	// Back to initial situation
+	jp1ser1.setRealTimeVertex(2, jp1.getEdge(2)->getFromVertex());
 }

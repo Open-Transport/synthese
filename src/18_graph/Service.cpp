@@ -227,7 +227,7 @@ namespace synthese
 
 		void Service::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
 		{
-			assert(value->getHub() == _RTVertices[rank]->getHub());
+			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
 			_RTVertices[rank] = value;
 		}
 

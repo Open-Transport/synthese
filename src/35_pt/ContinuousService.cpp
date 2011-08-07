@@ -108,10 +108,16 @@ namespace synthese
 			size_t userClassRank,
 			const Edge& edge,
 			const ptime& presenceDateTime,
-			bool controlIfTheServiceIsReachable,
+			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation
 		) const	{
+
+			// Check of real time vertex
+			if(	RTData && !_RTVertices[edge.getRankInPath()])
+			{
+				return ServicePointer();
+			}
 
 			time_duration schedule;
 			ptime actualDateTime(presenceDateTime);
@@ -180,7 +186,7 @@ namespace synthese
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
 
-			// Date control
+			// Date check
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
@@ -202,8 +208,8 @@ namespace synthese
 				ptr.setArrivalInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
 			}
 
-			// Reservation control
-			if (controlIfTheServiceIsReachable)
+			// Reservation check
+			if(checkIfTheServiceIsReachable)
 			{
 				if (ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE)
 					return ServicePointer();

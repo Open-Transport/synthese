@@ -52,21 +52,38 @@ namespace synthese
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "st";
+		const string ServiceVertexRealTimeUpdateAction::PARAMETER_PROPAGATE = Action_PARAMETER_PREFIX + "propagate";
+
+
+
+		ServiceVertexRealTimeUpdateAction::ServiceVertexRealTimeUpdateAction():
+			_propagate(true)
+		{}
 
 
 
 		ParametersMap ServiceVertexRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
+			
+			// Service
 			if(_service.get())
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
 			}
+
+			// Rank
 			map.insert(PARAMETER_LINE_STOP_RANK, static_cast<int>(_lineStopRank));
+
+			// Stop
 			if(_physicalStop.get())
 			{
 				map.insert(PARAMETER_STOP_ID, _physicalStop->getKey());
 			}
+
+			// Propagate
+			map.insert(PARAMETER_PROPAGATE, _propagate);
+
 			return map;
 		}
 
@@ -74,35 +91,50 @@ namespace synthese
 
 		void ServiceVertexRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Load of the service
 			try
 			{
 				_service = Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().getEditable(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
-				);
-				_physicalStop = Env::GetOfficialEnv().getEditableRegistry<StopPoint>().getEditable(
-					map.get<RegistryKeyType>(PARAMETER_STOP_ID)
 				);
 			}
 			catch(ObjectNotFoundException<ScheduledService>)
 			{
 				throw ActionException("No such service");
 			}
-			catch(ObjectNotFoundException<StopPoint>)
+
+			// Load of the stop or NULL vertex
+			RegistryKeyType stopId(map.getDefault<RegistryKeyType>(PARAMETER_STOP_ID, 0));
+			if(stopId)
 			{
-				throw ActionException("No such physical stop");
+				try
+				{
+					_physicalStop = Env::GetOfficialEnv().getEditableRegistry<StopPoint>().getEditable(
+						stopId
+					);
+				}
+				catch(ObjectNotFoundException<StopPoint>)
+				{
+					throw ActionException("No such physical stop");
+				}
 			}
 
+			// Rank
 			_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
-
 			if(_lineStopRank >= _service->getArrivalSchedules(false).size())
 			{
 				throw ActionException("Inconsistent linestop rank");
 			}
 
-			if(_service->getPath()->getEdge(_lineStopRank)->getHub() != _physicalStop->getHub())
-			{
+			// Check of the consistence of the loaded data
+			if(	_physicalStop.get() &&
+				_service->getPath()->getEdge(_lineStopRank)->getHub() != _physicalStop->getHub()
+			){
 				throw ActionException("Inconsistent physical stop");
 			}
+
+			// Propagate
+			_propagate = map.getDefault<bool>(PARAMETER_PROPAGATE, true);
 		}
 
 
@@ -110,6 +142,15 @@ namespace synthese
 		void ServiceVertexRealTimeUpdateAction::run(Request& request)
 		{
 			_service->setRealTimeVertex(_lineStopRank, _physicalStop.get());
+
+			// Propagation
+			if(!_physicalStop.get() && _propagate)
+			{
+				for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+				{
+					_service->setRealTimeVertex(rank, NULL);
+				}
+			}
 		}
 
 
@@ -139,5 +180,4 @@ namespace synthese
 		{
 			_service = const_pointer_cast<ScheduledService>(service);
 		}
-	}
-}
+}	}

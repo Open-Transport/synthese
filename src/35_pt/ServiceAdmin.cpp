@@ -423,6 +423,7 @@ namespace synthese
 					stream << f.getSubmitButton("OK");
 					stream << f.close();
 
+					// Served stop
 					stream << ts.col();
 					if(linePhysicalStop)
 					{
@@ -430,8 +431,12 @@ namespace synthese
 						stream << f2.open();
 						stream << "Quai : " << f.getSelectInput(
 							ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID,
-							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(),
-							optional<RegistryKeyType>(_service->getRealTimeVertex(lineStop.getRankInPath())->getKey())
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStopLabels(false, "Non desservi"),
+							optional<RegistryKeyType>(
+								_service->getRealTimeVertex(lineStop.getRankInPath()) ?
+								_service->getRealTimeVertex(lineStop.getRankInPath())->getKey() :
+								0
+							)
 						);
 						stream << f.getSubmitButton("OK");
 						stream << f2.close();

@@ -150,8 +150,7 @@ SAVE(RoadPlace, rp41);
 MainRoadPart ro41(4222124650659841);
 ro41.setRoadPlace(rp41);
 
-// FIXME: same id as rc89
-MainRoadChunk rc88_41(3940649673949188, &c88, 0, &ro41, 0);
+MainRoadChunk rc88_41(3940649673949288, &c88, 0, &ro41, 0);
 SAVE(RoadChunk, rc88_41);
 ro41.addRoadChunk(rc88_41);
 
@@ -163,8 +162,7 @@ MainRoadChunk rc74(3940649673949174, &c74, 2, &ro41, 750);
 SAVE(RoadChunk, rc74);
 ro41.addRoadChunk(rc74);
 
-// FIXME: same id as rc93
-MainRoadChunk rc93_41(3940649673949193, &c93, 3, &ro41, 1700);
+MainRoadChunk rc93_41(3940649673949293, &c93, 3, &ro41, 1700);
 SAVE(RoadChunk, rc93_41);
 ro41.addRoadChunk(rc93_41);
 SAVE(Road, ro41);
@@ -311,6 +309,7 @@ StopPoint ps73(
 );
 SAVE(StopPoint, ps73);
 ps73.setProjectedPoint(Address(rc89,0));
+rc89.getFromCrossing()->addReachableVertex(&ps73);
 //ps73.setAllsetCodeBySource("CTP:StopArea:SPOCE87446179");
 place93.addPhysicalStop(ps73);
 SAVE(StopArea, place93);
@@ -332,6 +331,7 @@ Coordinate cops75(523000.0,1845000.0);
 StopPoint ps75(3377699720880575,"94/75", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
 //ps75.setCodeBySource("CTP:StopArea:SPOCE87353573");
 ps75.setProjectedPoint(Address(rc74,0));
+rc74.getFromCrossing()->addReachableVertex(&ps75);
 SAVE(StopPoint, ps75);
 place94.addPhysicalStop(ps75);
 SAVE(StopArea, place94);
@@ -347,6 +347,7 @@ Coordinate cops76(523266.0,1845339.0);
 StopPoint ps76(3377699720880576,"95/76", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
 //ps76.setCodeBySource("CTP:StopArea:SPOCE87611939");
 ps76.setProjectedPoint(Address(rc97,0));
+rc97.getFromCrossing()->addReachableVertex(&ps76);
 SAVE(StopPoint, ps76);
 place95.addPhysicalStop(ps76);
 SAVE(StopArea, place95);
@@ -383,12 +384,14 @@ Coordinate cops79(526000,1845000);
 StopPoint ps79(3377699720880579,"97/79", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
 //ps79.setCodeBySource("CTP:StopArea:SPOCE87353599");
 ps79.setProjectedPoint(Address(rc99, 0));
+rc99.getFromCrossing()->addReachableVertex(&ps79);
 SAVE(StopPoint, ps79);
 place97.addPhysicalStop(ps79);
 
 Coordinate cops80(526000.0,1847000.0);
 StopPoint ps80(3377699720880580,"97/80", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops80)));
 ps80.setProjectedPoint(Address(rc96,0));
+rc96.getFromCrossing()->addReachableVertex(&ps80);
 SAVE(StopPoint, ps80);
 place97.addPhysicalStop(ps80);
 SAVE(StopArea, place97);
@@ -405,6 +408,7 @@ Coordinate cops81(525000.0,1844000.0);
 StopPoint ps81(3377699720880581,"98/81", &place98, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops81)));
 //ps81.setCodeBySource("CTP:StopArea:SPOCE87353581");
 ps81.setProjectedPoint(Address(rc91,0));
+rc91.getFromCrossing()->addReachableVertex(&ps81);
 SAVE(StopPoint, ps81);
 place98.addPhysicalStop(ps81);
 
@@ -428,12 +432,14 @@ Coordinate cops83(528000.0,1849000.0);
 StopPoint ps83(3377699720880583,"99/83", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
 //ps83.setCodeBySource("CTP:StopArea:SPOCE87611467");
 ps83.setProjectedPoint(Address(rc94,0));
+rc94.getFromCrossing()->addReachableVertex(&ps83);
 SAVE(StopPoint, ps83);
 place99.addPhysicalStop(ps83);
 
 Coordinate cops84(528000.0,1845000.0);
 StopPoint ps84(3377699720880584,"99/84", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops84)));
 ps84.setProjectedPoint(Address(rc90,0));
+rc90.getFromCrossing()->addReachableVertex(&ps84);
 SAVE(StopPoint, ps84);
 place99.addPhysicalStop(ps84);
 
@@ -454,6 +460,7 @@ place05.addTransferDelay(562949953421410,3377699720880586,minutes(0));
 Coordinate cops86(520000,1845000.0);
 StopPoint ps86(3377699720880586,"05/86", &place05,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));
 ps86.setProjectedPoint(Address(rc10,0));
+rc10.getFromCrossing()->addReachableVertex(&ps86);
 SAVE(StopPoint, ps86);
 place05.addPhysicalStop(ps86);
 SAVE(StopArea, place05);

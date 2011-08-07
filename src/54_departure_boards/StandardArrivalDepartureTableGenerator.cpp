@@ -50,7 +50,7 @@ namespace synthese
 			const ForbiddenPlacesList& forbiddenPlaces,
 			const ptime& startTime,
 			const ptime& endDateTime,
-			size_t maxSize
+			optional<size_t> maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
 			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize
@@ -61,18 +61,26 @@ namespace synthese
 
 		const ArrivalDepartureList& StandardArrivalDepartureTableGenerator::generate()
 		{
-			if(_physicalStops.empty()) return _result;
+			// If no stop in the current stop area, return empty result
+			if(_physicalStops.empty())
+			{
+				return _result;
+			}
 
+			// Loop on the stops of the current stop area
 			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
-
 			BOOST_FOREACH(PhysicalStops::value_type it, physicalStops)
 			{
+				// Loop on journey patterns calling at the stop
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
 					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
+					// Checks if the line stop is allowed according to the generator parameters
 					if (!_allowedLineStop(ls) || !ls.getFollowingArrivalForFineSteppingOnly())
+					{
 						continue;
+					}
 
 					// Loop on services
 					ptime departureDateTime = _startDateTime;
@@ -80,23 +88,41 @@ namespace synthese
 					size_t insertedServices(0);
 					while(true)
 					{
+						// Tells to the journey pattern for a next service
 						ServicePointer servicePointer(
 							ls.getNextService(
 								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
-								departureDateTime
-								, _endDateTime
-								, false
-								, index
+								departureDateTime,
+								_endDateTime,
+								false,
+								index
 						)	);
+
+						// If no next service was found, then abort the search in the current journey pattern
 						if(	!servicePointer.getService())
+						{
 							break;
+						}
+
+						// Saves local variables
 						++*index;
 						departureDateTime = servicePointer.getDepartureDateTime();
-						if(_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end())
+
+						// Checks if the stop area is really served and if the served stop is allowed
+						if(	_physicalStops.find(servicePointer.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
+						){
 							continue;
+						}
+
+						// The departure is kept in the results
 						_insert(servicePointer);
+						
+						// Checks if the maximal number of results is reached
 						++insertedServices;
-						if(insertedServices >= _maxSize) break;
+						if(	_maxSize && insertedServices >= *_maxSize)
+						{
+							break;
+						}
 					}
 				}
 			}

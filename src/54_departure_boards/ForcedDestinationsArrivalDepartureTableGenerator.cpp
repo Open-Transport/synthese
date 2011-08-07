@@ -27,6 +27,8 @@
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
+#include "Service.h"
+#include "AccessParameters.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -109,9 +111,11 @@ namespace synthese
 				{
 					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
-					// Selection of the line
+					// Line filter compliance
 					if (!_allowedLineStop(ls) || !ls.getFollowingArrivalForFineSteppingOnly())
+					{
 						continue;
+					}
 
 					// Max time for forced destination
 					ptime maxTimeForForcedDestination(_startDateTime);
@@ -120,6 +124,10 @@ namespace synthese
 					ServicePointer serviceInstance;
 
 					optional<Edge::DepartureServiceIndex::Value> minIndex;
+					
+					// Loop on services while all arrival stops are not reached
+					set<const Edge*> nonServedEdges;
+					AccessParameters ap;
 					while(true)
 					{
 						// Next service
@@ -133,97 +141,135 @@ namespace synthese
 							false
 						);
 
-						if(	serviceInstance.getService() == NULL ||
-							_physicalStops.find(serviceInstance.getRealTimeDepartureVertex()->getKey()) != _physicalStops.end()
-						){
+						// If no next service was found, quits the current journey pattern
+						if(	serviceInstance.getService() == NULL)
+						{
 							break;
 						}
 
 						++*minIndex;
 						minTimeForForcedDestination = serviceInstance.getDepartureDateTime();
-					}
 
-					if (serviceInstance.getService() == NULL)
-						continue;
-
-//					bool insertionIsDone = false;
-
-					// Exploration of the line
-					for(const LinePhysicalStop* curGLA(
-							static_cast<const LinePhysicalStop*>(ls.getFollowingArrivalForFineSteppingOnly())
-						);
-						curGLA != NULL;
-						curGLA = static_cast<const LinePhysicalStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
-					){
-						const StopArea* connectionPlace(
-							curGLA->getPhysicalStop()->getConnectionPlace()
-						);
-
-						// Attempting to select the destination
-						if (_forcedDestinations.find(connectionPlace->getKey()) == _forcedDestinations.end())
-							continue;
-
-						// If first reach
-						if (reachedDestination.find(connectionPlace) == reachedDestination.end())
-						{
-							// Allocation
-							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
-
-							if(itr == _result.end())
-							{
-								continue;
-							}
-
-							// Links
-							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
-						}
-						// Else optimizing a previously found ptd
-						else if(serviceInstance.getDepartureDateTime() <
-							reachedDestination[connectionPlace]->first.getDepartureDateTime()
+						// If real time departure stop is forbidden, go to next service
+						if(	_physicalStops.find(serviceInstance.getRealTimeDepartureVertex()->getKey()) == _physicalStops.end()
 						){
-							// Allocation
-							ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
-							if(itr == _result.end())
+							continue;
+						}
+
+						bool nonServedEdgesSearch(!nonServedEdges.empty());
+
+						// Loop on the served edges
+						for(const LinePhysicalStop* curGLA(
+								static_cast<const LinePhysicalStop*>(ls.getFollowingArrivalForFineSteppingOnly())
+							);
+							curGLA != NULL;
+							curGLA = static_cast<const LinePhysicalStop*>(curGLA->getFollowingArrivalForFineSteppingOnly())
+						){
+							// If the path traversal is only to find non served edges, analyse it only if
+							// it belongs to the list
+							if(nonServedEdgesSearch)
+							{
+								set<const Edge*>::iterator it(nonServedEdges.find(curGLA));
+								if(it == nonServedEdges.end())
+								{
+									continue;
+								}
+								nonServedEdges.erase(it);
+							}
+
+							// Checks if the service calls at the arrival line stop
+							ServicePointer completed(serviceInstance, *curGLA, ap);
+							if(	completed.isUseRuleCompliant(true) == UseRule::RUN_NOT_POSSIBLE)
+							{
+								nonServedEdges.insert(curGLA);
+								continue;
+							}
+
+							const StopArea* connectionPlace(
+								curGLA->getPhysicalStop()->getConnectionPlace()
+							);
+
+							// Attempting to select the destination
+							if (_forcedDestinations.find(connectionPlace->getKey()) == _forcedDestinations.end())
 							{
 								continue;
 							}
 
-							ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
+							// If first reach
+							if (reachedDestination.find(connectionPlace) == reachedDestination.end())
+							{
+								// Allocation
+								ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
 
-							reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
+								if(itr == _result.end())
+								{
+									continue;
+								}
+
+								// Links
+								reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
+							}
+							// Else optimizing a previously found ptd
+							else if(serviceInstance.getDepartureDateTime() <
+								reachedDestination[connectionPlace]->first.getDepartureDateTime()
+							){
+								// Allocation
+								ArrivalDepartureList::iterator itr = _insert(serviceInstance, FORCE_UNLIMITED_SIZE);
+								if(itr == _result.end())
+								{
+									continue;
+								}
+
+								ArrivalDepartureList::iterator oldIt = reachedDestination[connectionPlace];
+
+								reachedDestination[curGLA->getPhysicalStop()->getConnectionPlace()] = itr;
 
 								// If the preceding ptd is not used for an other place, deletion
-							ReachedDestinationMap::iterator it;
-							for (it	= reachedDestination.begin();
-								it != reachedDestination.end(); ++it)
-								if (it->second == oldIt)
-									break;
-							if (it == reachedDestination.end())
-								_result.erase(oldIt);
+								ReachedDestinationMap::iterator it;
+								for(it	= reachedDestination.begin();
+									it != reachedDestination.end();
+									++it
+								){
+									if (it->second == oldIt)
+									{
+										break;
+									}
+								}
+								if (it == reachedDestination.end())
+								{
+									_result.erase(oldIt);
+								}
+							}
+						}
+
+						// Quits the loop if there is no non served edge
+						if(nonServedEdges.empty())
+						{
+							break;
 						}
 					}
 				}
 			}
 
 			// In case of incomplete departure table, the serie is filled with normal algorithm
-			if (_result.size() < _maxSize)
+			if (_result.size() < *_maxSize)
 			{
 				StandardArrivalDepartureTableGenerator standardTable(_physicalStops, _direction, _endFilter
-					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _startDateTime, _endDateTime, _maxSize + _result.size());
+					, _lineFilter, DisplayedPlacesList(), _forbiddenPlaces, _startDateTime, _endDateTime, *_maxSize + _result.size());
 				const ArrivalDepartureList& standardTableResult = standardTable.generate();
 
 				for (ArrivalDepartureList::const_iterator itr = standardTableResult.begin();
-					_result.size() < _maxSize && itr != standardTableResult.end(); ++itr)
+					_result.size() < *_maxSize && itr != standardTableResult.end(); ++itr)
 				{
 					if (_result.find(itr->first) == _result.end())
 						_insert(itr->first);
 				}
 			}
 
-			if (_result.size() > _maxSize)
+			if (_result.size() > *_maxSize)
 			{
 				ArrivalDepartureList::iterator itr = _result.begin ();
-				std::advance(itr, _maxSize);
+				std::advance(itr, *_maxSize);
 				_result.erase (itr, _result.end ());
 			}
 

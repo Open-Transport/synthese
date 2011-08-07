@@ -92,32 +92,38 @@ namespace synthese
 			size_t userClass,
 			const Edge& edge,
 			const ptime& presenceDateTime,
-			bool controlIfTheServiceIsReachable,
+			bool checkIfTheServiceIsReachable,
 			bool inverted,
 			bool ignoreReservation
 		) const {
 
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
+			
+			// Check of real time vertex
+			if(	RTData && !_RTVertices[edgeIndex])
+			{
+				return ServicePointer();
+			}
+
+			// Actual time
 			const time_duration& thSchedule(getDeparture ? _departureSchedules[edgeIndex] : _arrivalSchedules[edgeIndex]);
 			const time_duration& rtSchedule(getDeparture ? _RTDepartureSchedules[edgeIndex] : _RTArrivalSchedules[edgeIndex]);
 			const time_duration& schedule(RTData ? rtSchedule : thSchedule);
 			const time_duration timeOfDay(GetTimeOfDay(schedule));
-
-			// Actual time
 			if(	getDeparture && presenceDateTime.time_of_day() > timeOfDay ||
 				!getDeparture && presenceDateTime.time_of_day() < timeOfDay
 			){
 				return ServicePointer();
 			}
 
-			ptime actualTime(presenceDateTime.date(), timeOfDay);
+			// Initializations
 			const time_duration& departureSchedule(RTData ? _RTDepartureSchedules[0] : _departureSchedules[0]);
-
+			ptime actualTime(presenceDateTime.date(), timeOfDay);
 			ptime originDateTime(actualTime);
 			originDateTime += (departureSchedule - schedule);
 
-			// Date control
+			// Check of date
 			ptime calendarDateTime(originDateTime);
 			if(departureSchedule >= hours(24))
 			{
@@ -150,8 +156,8 @@ namespace synthese
 				);
 			}
 
-			// Reservation control
-			if(	controlIfTheServiceIsReachable &&
+			// Reservation check
+			if(	checkIfTheServiceIsReachable &&
 				ptr.isUseRuleCompliant(ignoreReservation) == UseRule::RUN_NOT_POSSIBLE
 			){
 				return ServicePointer();
