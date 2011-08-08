@@ -154,7 +154,8 @@ namespace synthese
 			bool controlIfTheServiceIsReachable,
 			optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 			bool inverted,
-			bool ignoreReservation
+			bool ignoreReservation,
+			bool allowCanceled
 		) const	{
 
 			const ServiceSet& services(getParentPath()->getServices());
@@ -192,7 +193,8 @@ namespace synthese
 								departureMoment,
 								controlIfTheServiceIsReachable,
 								inverted,
-								ignoreReservation
+								ignoreReservation,
+								allowCanceled
 							)
 						);
 
@@ -227,7 +229,8 @@ namespace synthese
 			bool controlIfTheServiceIsReachable,
 			optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 			bool inverted,
-			bool ignoreReservation
+			bool ignoreReservation,
+			bool allowCanceled
 		) const	{
 
 			const ServiceSet& services(getParentPath()->getServices());
@@ -263,7 +266,8 @@ namespace synthese
 								arrivalMoment,
 								controlIfTheServiceIsReachable,
 								inverted,
-								ignoreReservation
+								ignoreReservation,
+								allowCanceled
 							)
 						);
 

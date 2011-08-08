@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_CLEANING_DELAY;
 			static const std::string PARAMETER_DISPLAY_END_FILTER;
 			static const std::string PARAMETER_DISPLAY_MAX_DELAY;
+			static const std::string PARAMETER_ALLOW_CANCELED;
 
 		private:
 			boost::shared_ptr<DisplayScreen>	_screen;
@@ -71,6 +72,7 @@ namespace synthese
 			int									_cleaningDelay;
 			EndFilter							_endFilter;
 			int									_maxDelay;
+			boost::optional<bool>				_allowCanceled;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.

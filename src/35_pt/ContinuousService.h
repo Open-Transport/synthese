@@ -83,6 +83,7 @@ namespace synthese
 				bool isContinuous () const;
 
 				/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
+					@param RTData use real time data (ignored for real time vertex)
 					@param getDeparture
 					@param edge Edge
 					@param presenceDateTime Goal  time
@@ -102,7 +103,8 @@ namespace synthese
 					const boost::posix_time::ptime& presenceDateTime,
 					bool checkIfTheServiceIsReachable,
 					bool inverted,
-					bool ignoreReservation
+					bool ignoreReservation,
+					bool allowCanceled
 				) const;
 
 				virtual void completeServicePointer(

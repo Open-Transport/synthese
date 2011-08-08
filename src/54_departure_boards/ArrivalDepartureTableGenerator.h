@@ -72,6 +72,7 @@ namespace synthese
 				const ForbiddenPlacesList		_forbiddenPlaces;
 				const boost::posix_time::ptime	_startDateTime;
 				const boost::posix_time::ptime	_endDateTime;
+				const bool						_allowCanceled;
 				const boost::optional<std::size_t>	_maxSize;	//!< Maximal size of the departure table according to the demand rules.
 			//@}
 
@@ -106,6 +107,7 @@ namespace synthese
 				const ForbiddenPlacesList&,
 				const boost::posix_time::ptime& startDateTime,
 				const boost::posix_time::ptime& endDateTime,
+				bool allowCanceled,
 				boost::optional<std::size_t> maxSize = boost::optional<std::size_t>()
 			);
 

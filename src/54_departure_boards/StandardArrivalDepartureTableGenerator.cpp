@@ -50,10 +50,11 @@ namespace synthese
 			const ForbiddenPlacesList& forbiddenPlaces,
 			const ptime& startTime,
 			const ptime& endDateTime,
+			bool allowCanceled,
 			optional<size_t> maxSize
 		):	ArrivalDepartureTableGenerator(
 			physicalStops, direction, endfilter, lineFilter,
-			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, maxSize
+			displayedPlacesList, forbiddenPlaces, startTime, endDateTime, allowCanceled, maxSize
 		){
 		}
 
@@ -95,7 +96,10 @@ namespace synthese
 								departureDateTime,
 								_endDateTime,
 								false,
-								index
+								index,
+								false,
+								false,
+								_allowCanceled
 						)	);
 
 						// If no next service was found, then abort the search in the current journey pattern

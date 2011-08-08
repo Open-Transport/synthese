@@ -59,7 +59,8 @@ namespace synthese
 			const ptime& endDateTime,
 			size_t maxSize,
 			const ForcedDestinationsSet& forcedDestinations,
-			time_duration persistanceDuration
+			time_duration persistanceDuration,
+			bool allowCanceled
 		):	ArrivalDepartureTableGenerator(
 				physicalStops,
 				direction,
@@ -69,6 +70,7 @@ namespace synthese
 				forbiddenPlaces,
 				startTime,
 				endDateTime,
+				allowCanceled,
 				maxSize
 			),
 			_forcedDestinations(forcedDestinations),
@@ -138,7 +140,8 @@ namespace synthese
 							false,
 							minIndex,
 							false,
-							false
+							false,
+							_allowCanceled
 						);
 
 						// If no next service was found, quits the current journey pattern

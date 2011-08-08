@@ -114,6 +114,7 @@ namespace synthese
 		const string DisplayScreenTableSync::COL_UP_ID("up_id");
 		const string DisplayScreenTableSync::COL_SUB_SCREEN_TYPE("sub_screen_type");
 		const string DisplayScreenTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const string DisplayScreenTableSync::COL_ALLOW_CANCELED("allow_canceled");
 	}
 
 	namespace db
@@ -159,6 +160,7 @@ namespace synthese
 			DBTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
 			DBTableSync::Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			DBTableSync::Field(DisplayScreenTableSync::COL_ALLOW_CANCELED, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
 
@@ -197,6 +199,7 @@ namespace synthese
 			object->setMacAddress(rows->getText(DisplayScreenTableSync::COL_MAC_ADDRESS));
 			object->setRoutePlanningWithTransfer(rows->getBool(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER));
 			object->setSubScreenType(static_cast<DisplayScreen::SubScreenType>(rows->getInt(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE)));
+			object->setAllowCanceled(rows->getBool(DisplayScreenTableSync::COL_ALLOW_CANCELED));
 			object->setNullRoot();
 			object->setDisplayedPlace(NULL);
 			object->setType(NULL);
@@ -503,6 +506,7 @@ namespace synthese
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(object->getAllowCanceled());
 			query.execute(transaction);
 		}
 

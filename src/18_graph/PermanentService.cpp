@@ -47,7 +47,8 @@ namespace synthese
 			const ptime& presenceDateTime,
 			bool controlIfTheServiceIsReachable,
 			bool inverted,
-			bool ignoreReservation
+			bool ignoreReservation,
+			bool canceled
 		) const	{
 
 			ServicePointer sp(RTData, userClass, *this, presenceDateTime);

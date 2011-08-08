@@ -167,6 +167,7 @@ namespace synthese
 				int							_clearingDelay;
 				int							_firstRow;
 				bool						_routePlanningWithTransfer;
+				bool						_allowCanceled;
 			//@}
 
 			//!	\name Preselection
@@ -256,6 +257,7 @@ namespace synthese
 				void	setSubScreenType(SubScreenType value){ _subScreenType = value; }
 				void	setAllowedLines(const LineFilter& value){ _allowedLines = value; }
 				void	setStops(const ArrivalDepartureTableGenerator::PhysicalStops& value){ _physicalStops = value; }
+				void	setAllowCanceled(bool value){ _allowCanceled = value; }
 			//@}
 
 			//! \name Modifiers
@@ -327,6 +329,7 @@ namespace synthese
 				const TransferDestinationsList&	getTransferdestinations()		const { return _transfers; }
 				SubScreenType					getSubScreenType()				const { return _subScreenType; }
 				const LineFilter&				getAllowedLines()				const { return _allowedLines; }
+				bool							getAllowCanceled()				const { return _allowCanceled; }
 			//@}
 
 			//! \name Services

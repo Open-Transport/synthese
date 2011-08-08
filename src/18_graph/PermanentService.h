@@ -69,14 +69,13 @@ namespace synthese
 			virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 			/** Generation of the next departure of a service according to a schedule and a presence date time, in the day of the presence time only, according to the compliances.
-				@param method Search departure or arrival :
-					- ServicePointer::DEPARTURE_TO_ARRIVAL
-					- ServicePointer::ARRIVAL_TO_DEPARTURE
+				@param RTData ignored parameter
 				@param edge Edge
 				@param presenceDateTime Goal  time
 				@param controlIfTheServiceIsReachable service selection method :
 					- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 					- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
+				@param allowCanceled ignored parameter
 				@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 				@author Hugues Romain
 				@date 2007
@@ -90,7 +89,8 @@ namespace synthese
 				const boost::posix_time::ptime& presenceDateTime,
 				bool controlIfTheServiceIsReachable,
 				bool inverted,
-				bool ingoreReservation
+				bool ingoreReservation,
+				bool allowCanceled
 			) const;
 
 			virtual void completeServicePointer(
