@@ -117,7 +117,7 @@ namespace synthese
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_SERVICE_DATASOURCE_ID))
 					);
 					Importable* obj(dataSource->getObjectByCode(map.get<string>(PARAMETER_SERVICE_ID)));
-					if(!obj ||!dynamic_cast<ScheduledService*>(obj))
+					if(!obj || !dynamic_cast<ScheduledService*>(obj))
 					{
 						throw ActionException("No such service");
 					}
