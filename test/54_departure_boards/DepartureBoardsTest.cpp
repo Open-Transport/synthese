@@ -233,6 +233,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			ForbiddenPlacesList(),
 			startDateTime,
 			endDateTime,
+			false,
 			3
 		);
 		const ArrivalDepartureList& result(g.generate());
@@ -269,6 +270,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			ForbiddenPlacesList(),
 			startDateTime,
 			endDateTime,
+			false,
 			3
 		);
 		const ArrivalDepartureList& result(g.generate());
