@@ -54,13 +54,21 @@ namespace synthese
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_FUNCTION(Action_PARAMETER_PREFIX + "fu");
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_END_FILTER = Action_PARAMETER_PREFIX + "ef";
 		const string UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY = Action_PARAMETER_PREFIX + "md";
+		const string UpdateDisplayPreselectionParametersAction::PARAMETER_ALLOW_CANCELED = Action_PARAMETER_PREFIX + "allow_canceled";
 
 
 
 		ParametersMap UpdateDisplayPreselectionParametersAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_screen.get() != NULL) map.insert(PARAMETER_DISPLAY_SCREEN, _screen->getKey());
+			if (_screen.get() != NULL)
+			{
+				map.insert(PARAMETER_DISPLAY_SCREEN, _screen->getKey());
+			}
+			if(_allowCanceled)
+			{
+				map.insert(PARAMETER_ALLOW_CANCELED, *_allowCanceled);
+			}
 			return map;
 		}
 
@@ -74,6 +82,10 @@ namespace synthese
 				_function = static_cast<DisplayFunction>(map.get<int>(PARAMETER_DISPLAY_FUNCTION));
 				_preselectionDelay = map.getOptional<int>(PARAMETER_PRESELECTION_DELAY);
 				_endFilter = static_cast<EndFilter>(map.get<int>(PARAMETER_DISPLAY_END_FILTER));
+				if(map.isDefined(PARAMETER_ALLOW_CANCELED))
+				{
+					_allowCanceled = map.get<bool>(PARAMETER_ALLOW_CANCELED);
+				}
 			}
 			catch (ParametersMap::MissingParameterException& e)
 			{
@@ -162,6 +174,13 @@ namespace synthese
 			// Max delay
 			DBLogModule::appendToLogIfChange(t, "Délai d'apparition", _screen->getMaxDelay(), _maxDelay);
 			_screen->setMaxDelay(_maxDelay);
+
+			// Allow canceled
+			if(_allowCanceled)
+			{
+				DBLogModule::appendToLogIfChange(t, "Afficher les services supprmés", _screen->getAllowCanceled(), *_allowCanceled);
+				_screen->setAllowCanceled(*_allowCanceled);
+			}
 
 			// Saving
 			DisplayScreenTableSync::Save(_screen.get());

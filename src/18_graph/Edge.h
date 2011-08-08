@@ -282,6 +282,7 @@ namespace synthese
 					@return Found service instance index or -1 if none was found.
 					@retval departureMoment Accurate departure moment. Meaningless if -1 returned.
 					@retval minNextServiceIndex Index corresponding to the returned service
+					@param allowCanceledService returns real time canceled services too. The _canceled attribute of the service pointer would be set to true.
 				*/
 				ServicePointer getNextService(
 					std::size_t userClassRank,
@@ -290,7 +291,8 @@ namespace synthese
 					bool controlIfTheServiceIsReachable,
 					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 					bool inverted = false,
-					bool ignoreReservation = false
+					bool ignoreReservation = false,
+					bool allowCanceledService = false
 				) const;
 
 
@@ -314,7 +316,8 @@ namespace synthese
 					bool controlIfTheServiceIsReachable,
 					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 					bool inverted = false,
-					bool ignoreReservation = false
+					bool ignoreReservation = false,
+					bool allowCanceledService = false
 				) const;
 			//@}
 

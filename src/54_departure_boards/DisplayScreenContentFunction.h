@@ -197,6 +197,7 @@ namespace synthese
 				static const std::string DATA_RANK_IN_PATH;
 				static const std::string DATA_DESTINATIONS;
 				static const std::string DATA_DIRECTION;
+				static const std::string DATA_IS_CANCELED;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.

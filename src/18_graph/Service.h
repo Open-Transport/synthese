@@ -180,6 +180,7 @@ namespace synthese
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param inverted : indicates if the range computing must follow the same rules as method says (false) or the inverted ones (true)
+					@param returns the service even if it is canceled at the specified edge. In this case, the _canceled attribute of the returned pointer is set to true.
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
 					@date 2007
@@ -193,7 +194,8 @@ namespace synthese
 					const boost::posix_time::ptime& presenceDateTime,
 					bool controlIfTheServiceIsReachable,
 					bool inverted,
-					bool ignoreReservation
+					bool ignoreReservation,
+					bool allowCanceled
 				) const = 0;
 
 

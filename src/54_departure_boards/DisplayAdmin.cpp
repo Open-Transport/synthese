@@ -512,20 +512,26 @@ namespace synthese
 						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
 						optional<int>(_displayScreen->getClearingDelay())
-						));
+						)	);
+
+					// Allow canceled
+					stream << t.cell(
+						"Afficher services supprimés",
+						t.getForm().getOuiNonRadioInput(UpdateDisplayPreselectionParametersAction::PARAMETER_ALLOW_CANCELED, _displayScreen->getAllowCanceled())
+					);
 
 					if (_displayScreen->getGenerationMethod() == DisplayScreen::WITH_FORCED_DESTINATIONS_METHOD)
 					{
 						stream << t.title("Présélection");
 						stream <<
 							t.cell(
-							"Délai maximum présélection",
-							t.getForm().getTextInput(
-							UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
-							Conversion::ToString(_displayScreen->getForceDestinationDelay())
-							) + " minutes"
+								"Délai maximum présélection",
+								t.getForm().getTextInput(
+									UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
+									Conversion::ToString(_displayScreen->getForceDestinationDelay())
+								) + " minutes"
 							)
-							;
+						;
 					}
 
 					stream << t.close();

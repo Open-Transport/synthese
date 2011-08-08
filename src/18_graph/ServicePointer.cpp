@@ -51,7 +51,8 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
-			_originDateTime(originDateTime)
+			_originDateTime(originDateTime),
+			_canceled(false)
 		{}
 
 
@@ -71,7 +72,8 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_userClassRank(userClassRank),
-			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0)))
+			_originDateTime(ptime(date, service.getDepartureSchedule(RTData, 0))),
+			_canceled(false)
 		{
 			AccessParameters ap(userClassRank+ USER_CLASS_CODE_OFFSET);
 			_service->completeServicePointer(*this, arrivalEdge, ap);
@@ -88,7 +90,8 @@ namespace synthese
 			_arrivalEdge(NULL),
 			_realTimeArrivalVertex(NULL),
 			_range(posix_time::seconds(0)),
-			_userClassRank(0)
+			_userClassRank(0),
+			_canceled(false)
 		{}
 
 
@@ -103,7 +106,8 @@ namespace synthese
 			_userClassRank(partiallyFilledPointer._userClassRank),
 			_originDateTime(partiallyFilledPointer._originDateTime),
 			_departureEdge(NULL),
-			_arrivalEdge(NULL)
+			_arrivalEdge(NULL),
+			_canceled(false)
 		{
 			assert(!_departureEdge || !_arrivalEdge);
 
@@ -144,7 +148,7 @@ namespace synthese
 			if(_departureEdge && _arrivalEdge)
 			{
 				// Check of real time vertices
-				if(	_RTData && (!_realTimeArrivalVertex || !_realTimeDepartureVertex))
+				if(	_RTData && (!_realTimeArrivalVertex || !_realTimeDepartureVertex) && !_canceled)
 				{
 					return UseRule::RUN_NOT_POSSIBLE;
 				}
@@ -186,6 +190,20 @@ namespace synthese
 
 
 
+		void ServicePointer::setDepartureInformations(
+			const graph::Edge& edge,
+			const boost::posix_time::ptime& dateTime,
+			const boost::posix_time::ptime& theoreticalDateTime
+		){
+			_departureEdge = &edge;
+			_departureTime = dateTime;
+			_theoreticalDepartureTime = theoreticalDateTime;
+			_realTimeDepartureVertex = NULL;
+			_canceled = true;
+		}
+
+
+
 		void ServicePointer::setArrivalInformations(
 			const graph::Edge& edge,
 			const boost::posix_time::ptime& dateTime,
@@ -196,6 +214,20 @@ namespace synthese
 			_arrivalTime = dateTime;
 			_theoreticalArrivalTime = theoreticalDateTime;
 			_realTimeArrivalVertex = &realTimeVertex;
+		}
+
+
+
+		void ServicePointer::setArrivalInformations(
+			const graph::Edge& edge,
+			const boost::posix_time::ptime& dateTime,
+			const boost::posix_time::ptime& theoreticalDateTime
+		){
+			_arrivalEdge = &edge;
+			_arrivalTime = dateTime;
+			_theoreticalArrivalTime = theoreticalDateTime;
+			_realTimeArrivalVertex = NULL;
+			_canceled = true;
 		}
 
 
