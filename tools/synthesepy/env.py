@@ -81,11 +81,6 @@ class Env(object):
     def daemon_path(self):
         return self.get_executable_path(self.daemon_relative_path, 's3-server')
 
-    @property
-    def daemon_log_file(self):
-        # TODO: it should log to a file inside the project instead.
-        return os.path.join(self.daemon_launch_path, 'output.log')
-
     def _prepare_for_launch_win(self):
         builder = build.get_builder(self)
         builder.install_iconv()
@@ -143,11 +138,6 @@ class InstalledEnv(Env):
     @property
     def daemon_relative_path(self):
         return 'bin'
-
-    @property
-    def daemon_log_file(self):
-        # TODO: do something more portable.
-        return '/tmp/synthese_daemon.log'
 
 
 def create_env(env_type, env_path, mode, config):

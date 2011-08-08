@@ -188,6 +188,11 @@ class Project(object):
 
         if not self.config.project_name:
             self.config.project_name = os.path.split(self.path)[1]
+        if not self.config.log_file:
+            self.config.log_file = join(self.path, 'logs', 'synthese.txt')
+        log_dir = os.path.dirname(self.config.log_file)
+        if not os.path.isdir(log_dir):
+            os.makedirs(log_dir)
 
         log.debug('Config: %s', self.config)
 
