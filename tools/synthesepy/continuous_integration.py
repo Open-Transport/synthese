@@ -54,5 +54,9 @@ def run(env, args):
         synthesepy.build.build(env, 'clean')
         synthesepy.build.build(env, 'build')
 
+    # Don't bother with scons tests. It will be removed in the future.
+    if config.env_type == 'scons':
+        return
+
     tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)
