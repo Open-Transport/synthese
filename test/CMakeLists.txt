@@ -26,5 +26,5 @@ add_subdirectory(18_graph)
 add_subdirectory(34_road)
 add_subdirectory(35_pt)
 add_subdirectory(53_pt_routeplanner)
-add_subdirectory(54_departure_boards)
-
+# FIXME: temporarily commented until the build issue is resolved.
+#add_subdirectory(54_departure_boards)
