@@ -37,7 +37,7 @@ import synthesepy.db_backends
 import synthesepy.env
 import synthesepy.proxy
 import synthesepy.sqlite_to_mysql
-import synthesepy.test.main
+import synthesepy.test
 import synthesepy.utils
 import synthesepy.env
 from synthesepy import project_manager
@@ -82,15 +82,11 @@ class AliasedSubParsersAction(argparse._SubParsersAction):
 
 
 def build(args, env):
-    synthesepy.build.build(env)
-
-
-def clean(args, env):
-    synthesepy.build.clean(env, args.dummy)
+    synthesepy.build.build(env, args.build_func)
 
 
 def runtests(args, env):
-    tester = synthesepy.test.main.Tester(env)
+    tester = synthesepy.test.Tester(env)
     tester.run_tests(args.suites)
 
 
@@ -163,6 +159,7 @@ def add_project_subparsers(subparsers):
 def add_default_subparsers(subparsers):
     parser_build = subparsers.add_parser('build', help='Build Synthese')
     parser_build.set_defaults(func=build)
+    parser_build.set_defaults(build_func='build')
     parser_build.add_argument(
         '-g', '--generate-only', action='store_true',
         help='Only generate build script, but don\'t build')
@@ -190,11 +187,22 @@ def add_default_subparsers(subparsers):
     parser_build.add_argument(
         '--kill-daemons-when-building', action='store_true',
         help='Kill all running daemons before building')
-    
 
     parser_clean = subparsers.add_parser(
         'clean', help='Delete the object directory')
-    parser_clean.set_defaults(func=clean)
+    parser_clean.set_defaults(func=build)
+    parser_clean.set_defaults(build_func='clean')
+
+    parser_install = subparsers.add_parser(
+        'install', help='Install Synthese')
+    parser_install.set_defaults(func=build)
+    parser_install.set_defaults(build_func='install')
+
+    parser_ide = subparsers.add_parser(
+        'ide', help='Launch the IDE with a configured environment for '
+        'running tests')
+    parser_ide.set_defaults(func=build)
+    parser_ide.set_defaults(build_func='ide')
 
     parser_runtests = subparsers.add_parser(
         'runtests', help='Run unit tests')

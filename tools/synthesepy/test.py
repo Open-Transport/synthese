@@ -34,7 +34,7 @@ else:
     import unittest2 as unittest
 
 from synthesepy.functional_test import http_testcase
-from synthesepy import build
+import synthesepy.build
 from synthesepy import db_backends
 from synthesepy import utils
 
@@ -176,7 +176,7 @@ class Tester(object):
     ])
 
     def _run_cpp_tests_cmake(self, suite_args):
-        builder = build.get_builder(self.env)
+        builder = synthesepy.build.get_builder(self.env)
 
         args = [builder.get_cmake_tool_path('ctest')]
         if self.env.c.verbose:
@@ -222,7 +222,7 @@ class Tester(object):
 
         return True
 
-    def run_cpp_tests(self, suite_args):
+    def update_environment_for_cpp_tests(self):
         self.env.prepare_for_launch()
 
         # Setup environment variables used by tests.
@@ -232,7 +232,7 @@ class Tester(object):
                 cs.startswith('mysql://')][0]
         except IndexError:
             mysql_conn_string = None
-            
+
         if mysql_conn_string:
             mysql_ci = db_backends.ConnectionInfo(mysql_conn_string)
             db = mysql_ci['db']
@@ -242,6 +242,9 @@ class Tester(object):
                 'SYNTHESE_MYSQL_PARAMS': mysql_params,
                 'SYNTHESE_MYSQL_DB': db,
             })
+
+    def run_cpp_tests(self, suite_args):
+        self.update_environment_for_cpp_tests()
 
         if self.env.type == 'cmake':
             return self._run_cpp_tests_cmake(suite_args)
