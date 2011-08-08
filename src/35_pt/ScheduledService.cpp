@@ -94,14 +94,15 @@ namespace synthese
 			const ptime& presenceDateTime,
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
-			bool ignoreReservation
+			bool ignoreReservation,
+			bool allowCanceled
 		) const {
 
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
 			
 			// Check of real time vertex
-			if(	RTData && !_RTVertices[edgeIndex])
+			if(	RTData && !allowCanceled && !_RTVertices[edgeIndex])
 			{
 				return ServicePointer();
 			}
@@ -139,21 +140,43 @@ namespace synthese
 
 			if(getDeparture)
 			{
-				ptr.setDepartureInformations(
-					edge,
-					actualTime,
-					ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
-				);
+				if(RTData && !_RTVertices[edgeIndex])
+				{
+					ptr.setDepartureInformations(
+						edge,
+						actualTime,
+						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule))
+					);
+				}
+				else
+				{
+					ptr.setDepartureInformations(
+						edge,
+						actualTime,
+						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					);
+				}
 			}
 			else
 			{
-				ptr.setArrivalInformations(
-					edge,
-					actualTime,
-					ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
-					*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
-				);
+				if(RTData && !_RTVertices[edgeIndex])
+				{
+					ptr.setArrivalInformations(
+						edge,
+						actualTime,
+						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule))
+					);
+				}
+				else
+				{
+					ptr.setArrivalInformations(
+						edge,
+						actualTime,
+						ptime(presenceDateTime.date(), GetTimeOfDay(thSchedule)),
+						*(RTData ? _RTVertices[edgeIndex] : edge.getFromVertex())
+					);
+				}
 			}
 
 			// Reservation check
@@ -257,6 +280,7 @@ namespace synthese
 						ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
 						false,
 						false,
+						false,
 						false
 					)	);
 					if(!p.getService()) return UseRule::RESERVATION_FORBIDDEN;
@@ -284,6 +308,7 @@ namespace synthese
 						USER_PEDESTRIAN,
 						**it,
 						ptime(date, getDepartureSchedule(false, (*it)->getRankInPath())),
+						false,
 						false,
 						false,
 						false
@@ -453,6 +478,7 @@ namespace synthese
 					originTime,
 					false,
 					false,
+					false,
 					false
 			)	);
 
@@ -466,6 +492,11 @@ namespace synthese
 				ptime arrivalTime(
 					originPtr.getOriginDateTime() + (getArrivalSchedules(false)[edge->getRankInPath()] - _departureSchedules[0])
 				);
+
+				if(RTdata && !_RTVertices[edge->getRankInPath()])
+				{
+					continue;
+				}
 
 				if(arrivalTime > date)
 				{

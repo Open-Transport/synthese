@@ -110,6 +110,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_RANK_IN_PATH("rank_in_path");
 		const string DisplayScreenContentFunction::DATA_DESTINATIONS("destinations");
 		const string DisplayScreenContentFunction::DATA_DIRECTION("direction");
+		const string DisplayScreenContentFunction::DATA_IS_CANCELED("is_canceled");
 
 		const string DisplayScreenContentFunction::DATA_IS_SAME_CITY("is_same_city");
 		const string DisplayScreenContentFunction::DATA_IS_END_STATION("is_end_station");
@@ -691,7 +692,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
-
+			
 			// Rows
 			if(rowPage.get())
 			{
@@ -807,6 +808,7 @@ namespace synthese
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
 			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
+			
 			if(screen.getType())
 			{
 				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
@@ -840,6 +842,9 @@ namespace synthese
 				// Service
 				pm.insert(DATA_SERVICE_ID, row.first.getService()->getKey());
 				pm.insert(DATA_SERVICE_NUMBER, row.first.getService()->getServiceNumber());
+
+				// Is canceled
+				pm.insert(DATA_IS_CANCELED, row.first.getCanceled());
 
 				// Direction
 				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));

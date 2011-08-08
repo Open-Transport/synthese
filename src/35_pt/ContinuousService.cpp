@@ -110,7 +110,8 @@ namespace synthese
 			const ptime& presenceDateTime,
 			bool checkIfTheServiceIsReachable,
 			bool inverted,
-			bool ignoreReservation
+			bool ignoreReservation,
+			bool allowCanceled
 		) const	{
 
 			// Check of real time vertex

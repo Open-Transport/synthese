@@ -65,7 +65,8 @@ namespace synthese
 				const boost::posix_time::ptime& endDateTime,
 				size_t maxSize,
 				const ForcedDestinationsSet&,
-				boost::posix_time::time_duration persistanceDuration
+				boost::posix_time::time_duration persistanceDuration,
+				bool allowCanceled
 			);
 
 

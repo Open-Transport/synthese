@@ -84,6 +84,7 @@ namespace synthese
 				const Service*	_service;
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::time_duration	_range;
+				bool			_canceled;
 			//@}
 
 		public:
@@ -146,6 +147,7 @@ namespace synthese
 				boost::posix_time::time_duration	getServiceRange() const { return _range; }
 				std::size_t				getUserClassRank() const { return _userClassRank; }
 				bool					getRTData() const { return _RTData; }
+				bool					getCanceled() const { return _canceled; }
 			//@}
 
 			//! @name Update methods
@@ -163,6 +165,21 @@ namespace synthese
 					const Vertex& realTimeVertex
 				);
 
+				//////////////////////////////////////////////////////////////////////////
+				// Sets departure informations for a canceled service
+				void	setDepartureInformations(
+					const graph::Edge& edge,
+					const boost::posix_time::ptime& dateTime,
+					const boost::posix_time::ptime& theoreticalDateTime
+				);
+
+				//////////////////////////////////////////////////////////////////////////
+				// Sets arrival informations for a canceled service
+				void	setArrivalInformations(
+					const graph::Edge& edge,
+					const boost::posix_time::ptime& dateTime,
+					const boost::posix_time::ptime& theoreticalDateTime
+				);
 
 				void shift(boost::posix_time::time_duration duration);
 			//@}

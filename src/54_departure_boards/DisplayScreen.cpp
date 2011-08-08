@@ -108,7 +108,8 @@ namespace synthese
 			_routePlanningWithTransfer(false),
 			_generationMethod(STANDARD_METHOD),
 			_destinationForceDelay(120),	// default = 2 hours
-			_maintenanceIsOnline(true)
+			_maintenanceIsOnline(true),
+			_allowCanceled(false)
 		{
 		}
 
@@ -239,6 +240,7 @@ namespace synthese
 							_forbiddenArrivalPlaces,
 							startTime,
 							endTime,
+							_allowCanceled,
 							rootCall ? _displayType->getRowNumber() : 1
 				)	)	);
 				break;
@@ -257,7 +259,8 @@ namespace synthese
 							endTime,
 							rootCall ? _displayType->getRowNumber() : 1,
 							_forcedDestinations,
-							minutes(_destinationForceDelay)
+							minutes(_destinationForceDelay),
+							_allowCanceled
 				)	)	);
 				break;
 
@@ -331,6 +334,7 @@ namespace synthese
 
 			return result;
 		}
+
 
 
 		IntermediateStop::TransferDestinations DisplayScreen::_generateTransferDestinations(

@@ -56,11 +56,13 @@ namespace synthese
 			const ForbiddenPlacesList&	forbiddenPlaces,
 			const ptime& startDateTime,
 			const ptime& endDateTime,
+			bool allowCanceled,
 			optional<size_t> maxSize
 		) : _physicalStops(physicalStops), _direction(direction), _endFilter(endfilter),
 			_lineFilter(lineFilter), _displayedPlaces(displayedPlacesList), _forbiddenPlaces(forbiddenPlaces),
 			_startDateTime(startDateTime),
 			_endDateTime(endDateTime),
+			_allowCanceled(allowCanceled),
 			_maxSize(maxSize)
 		{}
 
