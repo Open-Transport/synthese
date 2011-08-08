@@ -161,6 +161,7 @@ target_link_libraries(54_departure_boards
   32_geography
   33_algorithm
   35_pt
+  36_cms
 )
 
 install(TARGETS 54_departure_boards DESTINATION lib)
