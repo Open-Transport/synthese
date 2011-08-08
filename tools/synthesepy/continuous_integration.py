@@ -34,18 +34,25 @@ def run(env, args):
 
     # The ci tool can set these settings in the environment:
     if 'tool' in os.environ:
-        config.tool = os.environ['tool']
+        # Note: backward compatibility: env_type should be used instead of tool. 
+        config.env_type = os.environ['tool'] 
+    if 'env_type' in os.environ:
+        config.env_type = os.environ['env_type'] 
     if 'mode' in os.environ:
         config.mode = os.environ['mode']
 
+    # Create the env again, to take into account the tool/mode.
+    env = synthesepy.env.create_env(
+        config.env_type, config.env_path, config.mode, config)
+
     try:
-        synthesepy.build.build(env)
+        synthesepy.build.build(env, 'build')
     except Exception, e:
         if args.no_clean_if_build_fails:
             raise
         log.warn('Build failed, cleaning and rebuilding')
-        synthesepy.build.clean(env, args.dummy)
-        synthesepy.build.build(env)
+        synthesepy.build.build(env, 'clean')
+        synthesepy.build.build(env, 'build')
 
-    tester = synthesepy.test.main.Tester(env)
+    tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)

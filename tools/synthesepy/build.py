@@ -30,6 +30,7 @@ import sys
 import urllib2
 import zipfile
 
+import synthesepy.test
 from synthesepy import utils
 
 log = logging.getLogger(__name__)
@@ -109,6 +110,21 @@ class Builder(object):
     def build(self):
         self.install_prerequisites()
         self._build()
+
+    def clean(self):
+        if self.env.config.dummy:
+            log.info('Dummy mode, not deleting: %r', self.env.env_path)
+            return
+        log.info('Deleting: %r', self.env.env_path)
+        if os.path.isdir(self.env.env_path):
+            utils.RemoveDirectory(self.env.env_path)
+
+    def install(self):
+        raise NotImplemented()
+
+    def ide(self):
+        raise NotImplemented()
+
 
 class SconsBuilder(Builder):
     # This should be populated automatically once all tests build.
@@ -191,6 +207,14 @@ class SconsBuilder(Builder):
 
 
 class CMakeBuilder(Builder):
+    def __init__(self, env):
+        super(CMakeBuilder, self).__init__(env)
+        PLATFORM_TO_TOOL = {
+            'win': 'vs',
+            'lin': 'make',
+        }
+        self.tool = PLATFORM_TO_TOOL[self.env.platform]
+
     def _check_debian_package_requirements(self):
         if self.env.platform != 'lin':
             return
@@ -390,56 +414,62 @@ class CMakeBuilder(Builder):
             os.makedirs(self.env.env_path)
         utils.call(args, cwd=self.env.env_path, env=env)
 
-    def _do_build_make(self):
+    def _build_make(self):
         utils.call(
             'make -j%i' % self.env.c.parallel_build,
             cwd=self.env.env_path,
             shell=True)
 
-    def _do_build_vs(self):
-        # TODO: these should be extracted from system config
+    def _run_devenv(self, build_project=None):
+        # TODO: this should be extracted from system config
         default_vs_path = 'C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\'
-        default_sdk_path = 'C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A'
 
         utils.append_paths_to_environment('PATH', [
             default_vs_path + 'Common7\\IDE',
-            default_vs_path + 'Common7\\Tools',
-            default_vs_path + 'VC\\BIN',
-            default_vs_path + 'VC\\VCPackages',
-            default_sdk_path + 'bin',
         ])
+        if build_project:
+            # TODO: this should be extracted from system config
+            default_sdk_path = 'C:\\Program Files\\Microsoft SDKs\\Windows\\v6.0A'
 
-        utils.append_paths_to_environment('INCLUDE', [
-            default_vs_path + 'VC\\ATLMFC\\INCLUDE',
-            default_vs_path + 'VC\\INCLUDE',
-            default_sdk_path + 'include',
-        ])
+            utils.append_paths_to_environment('PATH', [
+                default_vs_path + 'Common7\\Tools',
+                default_vs_path + 'VC\\BIN',
+                default_vs_path + 'VC\\VCPackages',
+                default_sdk_path + 'bin',
+            ])
+    
+            utils.append_paths_to_environment('INCLUDE', [
+                default_vs_path + 'VC\\ATLMFC\\INCLUDE',
+                default_vs_path + 'VC\\INCLUDE',
+                default_sdk_path + 'include',
+            ])
+    
+            utils.append_paths_to_environment('LIB', [
+                default_vs_path + 'VC\\ATLMFC\\LIB',
+                default_vs_path + 'VC\\LIB',
+                default_sdk_path + 'lib',
+            ])
 
-        utils.append_paths_to_environment('LIB', [
-            default_vs_path + 'VC\\ATLMFC\\LIB',
-            default_vs_path + 'VC\\LIB',
-            default_sdk_path + 'lib',
-        ])
+        args = ['devenv.com', 'synthese3.sln']
+        if build_project:
+            build_type = self.env.mode.capitalize()
+            args.extend(['/build', build_type, '/project', build_project])
 
-        build_type = self.env.mode.capitalize()
-        args = [
-            'devenv.com', 'synthese3.sln', '/build', build_type,
-            '/project', 'ALL_BUILD'
-        ]
-        log.info('Build command line: %s', args)
         utils.call(
             args,
             cwd=self.env.env_path)
+
+    def _build_vs(self):
+        self._run_devenv('ALL_BUILD')
+
+    def _run_tool_method(self, method, *args, **kwargs):
+        tool_method = getattr(self, '{0}_{1}'.format(method, self.tool))
+        tool_method(*args, **kwargs)
 
     def _build(self):
         self._generate_build_system()
         if self.config.generate_only:
             return
-
-        PLATFORM_TO_TOOL = {
-            'win': 'vs',
-            'lin': 'make',
-        }
 
         # Only used on Windows, where the build will fail if the daemon is
         # running and locking the executable.
@@ -447,14 +477,27 @@ class CMakeBuilder(Builder):
             self.config.kill_daemons_when_building):
             utils.kill_processes('s3-server')
 
-        build_fun = getattr(
-            self, '_do_build_' + PLATFORM_TO_TOOL[self.env.platform], None)
-        if not build_fun:
-            raise Exception('Unsupported platform')
+        self._run_tool_method('_build')
 
-        build_fun()
+    def _install_make(self):
+        utils.call(
+            'make -j%i install' % self.env.c.parallel_build,
+            cwd=self.env.env_path,
+            shell=True)
 
-        # TODO: run install?
+    def _install_vs(self):
+        self._run_devenv('INSTALL')
+
+    def install(self):
+        self._run_tool_method('_install')
+
+    def ide(self):
+        assert self.tool == 'vs', 'IDE only implemented for Visual Studio'
+        tester = synthesepy.test.Tester(self.env)
+        tester.update_environment_for_cpp_tests()
+
+        self._run_devenv()
+
 
 builder = None
 
@@ -473,15 +516,8 @@ def get_builder(env):
     builder = builder_class(env)
     return builder
 
-def build(env):
+def build(env, method):
     builder = get_builder(env)
-    builder.build()
+    m = getattr(builder, method)
+    m()
 
-
-def clean(env, dummy):
-    if dummy:
-        log.info('Dummy mode, not deleting: %r', env.env_path)
-        return
-    log.info('Deleting: %r', env.env_path)
-    if os.path.isdir(env.env_path):
-        utils.RemoveDirectory(env.env_path)
