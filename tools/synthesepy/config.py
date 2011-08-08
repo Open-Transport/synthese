@@ -50,6 +50,7 @@ DEFAULTS = {
     'default_site': None,
     'log_level': 1,
     'log_stdout': False,
+    'log_file': None,
     'gdb': False,
     'netstat_cmd': None,
     'restart_if_crashed': False,
