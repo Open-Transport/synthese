@@ -164,7 +164,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			DisplayedPlacesList(),
 			ForbiddenPlacesList(),
 			startDateTime,
-			endDateTime
+			endDateTime,
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -303,7 +304,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			endDateTime,
 			2,
 			ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsSet(),
-			hours(2)
+			hours(2),
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -339,7 +341,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			DisplayedPlacesList(),
 			ForbiddenPlacesList(),
 			startDateTime,
-			endDateTime
+			endDateTime,
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -396,7 +399,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			endDateTime,
 			2,
 			ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsSet(),
-			hours(2)
+			hours(2),
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -442,7 +446,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			DisplayedPlacesList(),
 			ForbiddenPlacesList(),
 			startDateTime,
-			endDateTime
+			endDateTime,
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -512,7 +517,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			endDateTime,
 			2,
 			ForcedDestinationsArrivalDepartureTableGenerator::ForcedDestinationsSet(),
-			hours(2)
+			hours(2),
+			false
 			);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -558,7 +564,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			displayedPlacesList,
 			ForbiddenPlacesList(),
 			startDateTime,
-			endDateTime
+			endDateTime,
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 
@@ -643,7 +650,8 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 			displayedPlacesList,
 			ForbiddenPlacesList(),
 			startDateTime,
-			endDateTime
+			endDateTime,
+			false
 		);
 		const ArrivalDepartureList& result(g.generate());
 

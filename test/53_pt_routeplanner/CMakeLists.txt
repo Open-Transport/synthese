@@ -28,7 +28,7 @@ set(DEPS
   56_pt_website # from 53_pt_journey_planner
   53_pt_journey_planner
   51_resa # no dependency, missing?
-  36_cms # from 53_pt_journey_planner > pt
+  36_cms # from 53_pt_journey_planner > 35_pt
 )
 
 boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
