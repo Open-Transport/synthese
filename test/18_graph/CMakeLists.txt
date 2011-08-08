@@ -13,4 +13,4 @@ set(DEPS
   #14_admin # from server
 )
 
-boost_test(VertexAccessMap "${DEPS}")
+boost_test(VertexAccessMap "${DEPS}" "FakeGraphImplementation.hpp")
