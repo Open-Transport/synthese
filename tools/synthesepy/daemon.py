@@ -120,8 +120,8 @@ class Daemon(object):
         if self.env.c.log_stdout:
             stdout = sys.stdout
         else:
-            log.info('Logging to %s', self.env.daemon_log_file)
-            stdout = open(self.env.daemon_log_file, 'wb')
+            log.info('Logging to %s', self.env.c.log_file)
+            stdout = open(self.env.c.log_file, 'wb')
 
         if self.env.c.dummy:
             log.info('Dummy mode, not executing:\n%s\n in path: %s',
