@@ -503,6 +503,7 @@ namespace synthese
 				_display(
 					stream,
 					_page,
+					_pageForSubTimetable,
 					request,
 					*_timetable,
 					*generator,
@@ -527,9 +528,11 @@ namespace synthese
 		}
 
 
+
 		void TimetableGenerateFunction::_display(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
+			boost::shared_ptr<const cms::Webpage> pageForSubTimetable,
 			const server::Request& request,
 			const Timetable& object,
 			const timetables::TimetableGenerator& generator,
@@ -566,7 +569,7 @@ namespace synthese
 			{
 			case Timetable::CONTAINER:
 				{
-					if(_pageForSubTimetable.get())
+					if(pageForSubTimetable.get())
 					{
 						stringstream content;
 						Env env;
@@ -578,7 +581,8 @@ namespace synthese
 								size_t ttRank(0);
 								_display(
 									content,
-									_pageForSubTimetable,
+									pageForSubTimetable,
+									shared_ptr<const Webpage>(),
 									request,
 									*tt,
 									*g,
