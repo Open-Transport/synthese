@@ -100,7 +100,7 @@ namespace synthese
 		) const {
 			if(!_lastActiveDate)
 			{
-				if(_markedDates.empty())
+				if(empty())
 				{
 					_lastActiveDate = gregorian::date();
 				}
@@ -300,19 +300,33 @@ namespace synthese
 
 		void Calendar::subDates( const Calendar& calendar )
 		{
-			BOOST_FOREACH(const _BitSets::value_type& it, calendar._markedDates)
+			set<_BitSets::key_type> toBeRemoved;
+
+			for(_BitSets::iterator it(_markedDates.begin()); it != _markedDates.end(); ++it)
 			{
-				_BitSets::iterator it2(_markedDates.find(it.first));
+				_BitSets::iterator it2(_markedDates.find(it->first));
 				if(it2 == _markedDates.end()) continue;
 
 				for(size_t p(0); p != 366; ++p)
 				{
-					if(it.second.test(p))
+					if(it->second.test(p))
 					{
 						it2->second.set(p, false);
 					}
 				}
+
+				// Remove item if empty
+				if(!it->second.any())
+				{
+					toBeRemoved.insert(it->first);
+				}
 			}
+
+			BOOST_FOREACH(_BitSets::key_type itr, toBeRemoved)
+			{
+				_markedDates.erase(itr);
+			}
+
 			_firstActiveDate.reset();
 			_lastActiveDate.reset();
 		}
