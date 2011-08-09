@@ -302,23 +302,23 @@ namespace synthese
 		{
 			set<_BitSets::key_type> toBeRemoved;
 
-			for(_BitSets::iterator it(_markedDates.begin()); it != _markedDates.end(); ++it)
+			BOOST_FOREACH(const _BitSets::value_type& it, calendar._markedDates)
 			{
-				_BitSets::iterator it2(_markedDates.find(it->first));
+				_BitSets::iterator it2(_markedDates.find(it.first));
 				if(it2 == _markedDates.end()) continue;
 
 				for(size_t p(0); p != 366; ++p)
 				{
-					if(it->second.test(p))
+					if(it.second.test(p))
 					{
 						it2->second.set(p, false);
 					}
 				}
 
 				// Remove item if empty
-				if(!it->second.any())
+				if(!it2->second.any())
 				{
-					toBeRemoved.insert(it->first);
+					toBeRemoved.insert(it2->first);
 				}
 			}
 
