@@ -25,9 +25,11 @@
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -47,9 +49,10 @@ namespace synthese
 
 
 
-		Log::Log ( std::ostream* outputStream, Log::Level level )
-			: _outputStream (outputStream)
-			, _level (level)
+		Log::Log(
+			std::ostream* outputStream, Log::Level level
+		):	_outputStream (outputStream),
+			_level (level)
 		{
 			if(getenv("SYNTHESE_LOG_LEVEL"))
 			{
@@ -59,58 +62,54 @@ namespace synthese
 		}
 
 
+
 		Log::~Log ()
 		{
 		}
 
 
 
-		Log&
-		Log::GetInstance (const std::string& logName)
+		Log& Log::GetInstance (const std::string& logName)
 		{
 			if (logName.empty ()) return _defaultLog;
 			std::map<std::string, Log*>::iterator it = _logs.find (logName);
 			if (_logs.find (logName) == _logs.end ())
 			{
-			_logs.insert (std::make_pair (logName, new Log ()));
+				_logs.insert (std::make_pair (logName, new Log ()));
 			}
 			return *(_logs.find (logName)->second);
 		}
 
 
 
-
-		void
-		Log::setOutputStream (std::ostream* outputStream)
+		void Log::setOutputStream (std::ostream* outputStream)
 		{
 			_outputStream = outputStream;
 		}
 
 
 
-
-		Log::Level
-		Log::getLevel () const
+		Log::Level Log::getLevel () const
 		{
 			return _level;
 		}
 
 
 
-		void
-		Log::setLevel (Log::Level level)
+		void Log::setLevel (Log::Level level)
 		{
 			_level = level;
 		}
 
 
 
-		void
-		Log::debug (const std::string& message)
+		void Log::debug (const std::string& message)
 		{
 			if (_level > Log::LEVEL_DEBUG) return;
 			append (Log::LEVEL_DEBUG, message);
 		}
+
+
 
 		void
 		Log::debug (const std::string& message, const std::exception& exception)
@@ -165,8 +164,8 @@ namespace synthese
 		}
 
 
-		void
-		Log::error (const std::string& message, const std::exception& exception)
+
+		void Log::error (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_ERROR) return;
 			append (Log::LEVEL_ERROR, message, &exception);
@@ -174,9 +173,7 @@ namespace synthese
 
 
 
-
-		void
-		Log::fatal (const std::string& message)
+		void Log::fatal (const std::string& message)
 		{
 			if (_level > Log::LEVEL_FATAL) return;
 			append (Log::LEVEL_FATAL, message);
@@ -184,8 +181,7 @@ namespace synthese
 
 
 
-		void
-		Log::fatal (const std::string& message, const std::exception& exception)
+		void Log::fatal (const std::string& message, const std::exception& exception)
 		{
 			if (_level > Log::LEVEL_FATAL) return;
 			append (Log::LEVEL_FATAL, message, &exception);
@@ -194,11 +190,11 @@ namespace synthese
 
 
 
-		void
-		Log::append (Log::Level level,
-				 const std::string& message,
-				 const std::exception* exception)
-		{
+		void Log::append(
+			Log::Level level,
+			const std::string& message,
+			const std::exception* exception
+		){
 			// Standard io streams are not thread safe.
 			// Acquire lock here.
 
@@ -232,30 +228,29 @@ namespace synthese
 			}
 
 			// Append date time
-			time ( &_rawLogTime );
-			_logTimeInfo = localtime ( &_rawLogTime );
+			ptime now(microsec_clock::local_time());
 
 			(*_outputStream) << " # " << std::setfill ('0')
-				  << std::setw (4) << (1900 + _logTimeInfo->tm_year) << "/"
-				  << std::setw (2) << (1 + _logTimeInfo->tm_mon) << "/"
-				  << std::setw (2) << _logTimeInfo->tm_mday << " "
-				  << std::setw (2) << _logTimeInfo->tm_hour << ":"
-				  << std::setw (2) << _logTimeInfo->tm_min << ":"
-				  << std::setw (2) << _logTimeInfo->tm_sec
-				  << setw (6) << " # " << this_thread::get_id()
-				  << " # " << message;
+				<< std::setw (4) << now.date().year() << "/"
+				<< std::setw (2) << now.date().month() << "/"
+				<< std::setw (2) << now.date().day() << " "
+				<< std::setw (2) << now.time_of_day().hours() << ":"
+				<< std::setw (2) << now.time_of_day().minutes() << ":"
+				<< std::setw (2) << now.time_of_day().seconds() << "."
+				<< std::setw (3) << now.time_of_day().fractional_seconds()
+				<< setw (6) << " # " << this_thread::get_id()
+				<< " # " << message;
 
 			if (exception != 0)
 			{
 				(*_outputStream) << " : " << exception->what ();
 			}
 
-
-
 			(*_outputStream) << std::endl;
 			// Locks is automatically released when goes out of scope.
-
 		}
+
+
 
 		void Log::trace( const std::string& message )
 		{
@@ -263,5 +258,4 @@ namespace synthese
 				return;
 			append(Log::LEVEL_TRACE, message);
 		}
-	}
-}
+}	}
