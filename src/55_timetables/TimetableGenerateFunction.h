@@ -248,6 +248,7 @@ namespace synthese
 			void _display(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
+				boost::shared_ptr<const cms::Webpage> pageForSubTimetable,
 				const server::Request& request,
 				const timetables::Timetable& object,
 				const timetables::TimetableGenerator& generator,
