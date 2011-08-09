@@ -28,11 +28,7 @@
 #include <map>
 #include <string>
 #include <iostream>
-
-#include <time.h>
-
 #include <boost/thread/mutex.hpp>
-
 
 namespace synthese
 {
@@ -75,12 +71,10 @@ namespace synthese
 			std::ostream* _outputStream; //!< Log output stream.
 			Log::Level _level; //!< Log level.
 
-			time_t _rawLogTime;
-			struct tm* _logTimeInfo;
-
-
-			Log ( std::ostream* outputStream = &std::cout,
-			  Log::Level level = Log::LEVEL_DEBUG );
+			Log(
+				std::ostream* outputStream = &std::cout,
+				Log::Level level = Log::LEVEL_DEBUG
+			);
 
 		 public:
 
@@ -90,11 +84,10 @@ namespace synthese
 
 			//! @name Getters/Setters
 			//@{
-			void setOutputStream (std::ostream* outputStream);
+				void setOutputStream (std::ostream* outputStream);
 
-			Log::Level getLevel () const;
-			void setLevel (Log::Level level);
-
+				Log::Level getLevel () const;
+				void setLevel (Log::Level level);
 			//@}
 
 			//! @name Update methods
@@ -115,12 +108,9 @@ namespace synthese
 
 				void fatal (const std::string& message);
 				void fatal (const std::string& message, const std::exception& exception);
-
 			//@}
 
-
-		 private:
-
+		private:
 			static const std::string LOG_PREFIX_TRACE;
 			static const std::string LOG_PREFIX_DEBUG;
 			static const std::string LOG_PREFIX_INFO;
@@ -128,12 +118,12 @@ namespace synthese
 			static const std::string LOG_PREFIX_ERROR;
 			static const std::string LOG_PREFIX_FATAL;
 
-			void append (Log::Level level,
-				 const std::string& message,
-				 const std::exception* exception = 0);
-
+			void append(
+				Log::Level level,
+				const std::string& message,
+				const std::exception* exception = 0
+			);
 		};
-	}
-}
+}	}
 
 #endif
