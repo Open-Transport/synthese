@@ -140,7 +140,7 @@ namespace synthese
 				}
 			}
 
-			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				try
 				{
