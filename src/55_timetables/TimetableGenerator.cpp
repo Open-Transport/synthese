@@ -367,6 +367,7 @@ namespace synthese
 				{
 					if(	(*itEdge)->isDeparture() &&
 						(itEdge+1) != edges.end() &&
+						(*itEdge)->getHub() &&
 						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
 						(	_authorizedPhysicalStops.empty() ||
 							_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
