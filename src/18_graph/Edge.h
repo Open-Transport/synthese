@@ -34,6 +34,7 @@
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace geos
 {
@@ -130,6 +131,8 @@ namespace synthese
 
 			mutable bool _serviceIndexUpdateNeeded;
 			mutable bool _RTserviceIndexUpdateNeeded;
+
+			mutable boost::mutex _indexMutex;
 
 			/** Updates service indices.
 				@param RTData indicates if real time or theoretical indices must be updated
