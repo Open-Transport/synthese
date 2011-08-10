@@ -33,6 +33,7 @@
 #include "CommercialLineTableSync.h"
 #include "Calendar.h"
 #include "DestinationTableSync.hpp"
+#include "PTDataCleanerFileFormat.hpp"
 
 #include <iostream>
 #include <map>
@@ -70,7 +71,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<IneoFileFormat>
+				public impex::MultipleFileTypesImporter<IneoFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 			public:
 				static const std::string FILE_PNT; // Stops
@@ -83,8 +85,6 @@ namespace synthese
 
 				static const std::string PARAMETER_NETWORK_ID;
 
-				static const std::string PARAMETER_START_DATE;
-				static const std::string PARAMETER_END_DATE;
 				static const std::string PARAMETER_AUTO_IMPORT_STOPS;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
