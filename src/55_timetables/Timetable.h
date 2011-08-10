@@ -170,7 +170,8 @@ namespace synthese
 				/// @param env Environment of the source data
 				/// @return the generator
 				std::auto_ptr<TimetableGenerator> getGenerator(
-					const util::Env& env
+					const util::Env& env,
+					boost::optional<calendar::Calendar> mask = boost::optional<calendar::Calendar>()
 				)	const;
 
 

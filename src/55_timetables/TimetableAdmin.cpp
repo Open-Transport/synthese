@@ -166,7 +166,7 @@ namespace synthese
 					"Calendrier",
 					pt.getForm().getSelectInput(
 						TimetableUpdateAction::PARAMETER_BASE_CALENDAR_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
 						optional<RegistryKeyType>(_timetable->getBaseCalendar() ? _timetable->getBaseCalendar()->getKey() : 0)
 				)	);
 				stream << pt.cell(
@@ -571,7 +571,12 @@ namespace synthese
 					_timetable->getContentType() == Timetable::TIMES_IN_ROWS
 				){
 					// Building the result
-					auto_ptr<TimetableGenerator> g(_timetable->getGenerator(Env::GetOfficialEnv()));
+					date now(day_clock::local_day());
+					auto_ptr<TimetableGenerator> g(
+						_timetable->getGenerator(
+							Env::GetOfficialEnv(),
+							_timetable->isGenerable() ? _timetable->getBaseCalendar()->getResult() : Calendar(date(now.year(), 1, 1), date(now.year(), 12, 31))
+					)	);
 					const TimetableResult result(g->build(true, shared_ptr<TimetableResult::Warnings>()));
 
 					// Drawing the result
@@ -655,9 +660,15 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			if(_timetable.get()) _tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			if(_timetable.get())
+			{
+				_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			}
 			_tabs.push_back(Tab("Contenu", TAB_CONTENT, true));
-			if(_timetable.get() && _timetable->isGenerable()) _tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+			if(_timetable.get())
+			{
+				_tabs.push_back(Tab("Résultat", TAB_RESULT, true));
+			}
 
 			_tabBuilded = true;
 		}

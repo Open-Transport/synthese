@@ -26,6 +26,7 @@
 #include "Env.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -67,9 +68,10 @@ namespace synthese
 
 
 		auto_ptr<TimetableGenerator> Timetable::getGenerator(
-			const Env& env
+			const Env& env,
+			optional<Calendar> mask
 		) const {
-			if(	!isGenerable()
+			if(	!isGenerable() && !mask
 			){
 				throw ImpossibleGenerationException();
 			}
@@ -78,7 +80,7 @@ namespace synthese
 			if(_contentType != CONTAINER)
 			{
 				g->setRows(_rows);
-				g->setBaseCalendar(_baseCalendar->getResult());
+				g->setBaseCalendar(mask ? *mask : _baseCalendar->getResult());
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
 				g->setWaybackFilter(_wayBackFilter);
