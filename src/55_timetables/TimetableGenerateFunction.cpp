@@ -493,12 +493,13 @@ namespace synthese
 		{
 			if(_page.get())
 			{
-				auto_ptr<TimetableGenerator> generator(_timetable->getGenerator(Env::GetOfficialEnv()));
-				if(_calendarTemplate.get())
-				{
-					Calendar mask(_calendarTemplate->getResult(generator->getBaseCalendar()));
-					generator->setBaseCalendar(mask);
-				}
+				auto_ptr<TimetableGenerator> generator(
+					_timetable->getGenerator(
+						Env::GetOfficialEnv(),
+						_calendarTemplate.get() && _calendarTemplate->isLimited() ?
+							optional<Calendar>(_calendarTemplate->getResult()) :
+							optional<Calendar>()
+				)	);
 				TimetableResult result(generator->build(true, _warnings));
 				_display(
 					stream,
@@ -570,7 +571,13 @@ namespace synthese
 						{
 							try
 							{
-								auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+								auto_ptr<TimetableGenerator> g(
+									tt->getGenerator(
+										Env::GetOfficialEnv(),
+										_calendarTemplate.get() && _calendarTemplate->isLimited() ?
+											optional<Calendar>(_calendarTemplate->getResult()) :
+											optional<Calendar>()
+								)	);
 								TimetableResult r(g->build(true, warnings));
 								size_t ttRank(0);
 								_display(
