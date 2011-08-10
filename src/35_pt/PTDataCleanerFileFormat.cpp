@@ -26,6 +26,8 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "LineStopTableSync.h"
+#include "StopPointTableSync.hpp"
+#include "StopAreaTableSync.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "RequestException.h"
 #include "DesignatedLinePhysicalStop.hpp"
@@ -117,11 +119,6 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_selectObjectsToRemove() const
 		{
-			if(!_cleanOldData)
-			{
-				return;
-			}
-
 			// Scheduled services without any active date
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& itService, _env.getRegistry<ScheduledService>())
 			{
@@ -170,14 +167,53 @@ namespace synthese
 				{
 					if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))
 					{
+						_edgesToRemove.insert(static_pointer_cast<const LineStop, const Edge>(_env.getSPtr(dynamic_cast<const DesignatedLinePhysicalStop*>(edge))));
 						_env.getEditableRegistry<DesignatedLinePhysicalStop>().remove(edge->getKey());
 					}
 					else if(dynamic_cast<const LineArea*>(edge))
 					{
+						_edgesToRemove.insert(static_pointer_cast<const LineStop, const LineArea>(_env.getSPtr(dynamic_cast<const LineArea*>(edge))));
 						_env.getEditableRegistry<LineArea>().remove(edge->getKey());
+					}
+					if(static_cast<const LineStop*>(edge)->getIsArrival())
+					{
+						edge->getFromVertex()->removeArrivalEdge(edge);
+					}
+					if(static_cast<const LineStop*>(edge)->getIsDeparture())
+					{
+						edge->getFromVertex()->removeDepartureEdge(edge);
 					}
 				}
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
+			}
+
+			// Stops without Journey patterns without any service
+			BOOST_FOREACH(const Registry<StopPoint>::value_type& itStopPoint, _env.getRegistry<StopPoint>())
+			{
+				if(	itStopPoint.second->hasLinkWithSource(_dataSource) &&
+					itStopPoint.second->getDataSourceLinks().size() == 1 &&
+					itStopPoint.second->getDepartureEdges().empty() &&
+					itStopPoint.second->getArrivalEdges().empty()
+				){
+					_stopsToRemove.insert(itStopPoint.second);
+					const_cast<StopArea*>(itStopPoint.second->getConnectionPlace())->removePhysicalStop(*itStopPoint.second);
+					if(itStopPoint.second->getConnectionPlace()->getPhysicalStops().empty())
+					{
+						_stopAreasToRemove.insert(_env.getEditableSPtr(const_cast<StopArea*>(itStopPoint.second->getConnectionPlace())));
+					}
+				}
+			}
+
+			// Stops to delete are removed from the environment to avoid useless saving
+			BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
+			{
+				_env.getEditableRegistry<StopPoint>().remove(stop->getKey());
+			}
+
+			// Stop areas to delete are removed from the environment to avoid useless saving
+			BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
+			{
+				_env.getEditableRegistry<StopArea>().remove(stopArea->getKey());
 			}
 		}
 
@@ -186,11 +222,6 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
-			if(!_cleanOldData)
-			{
-				return;
-			}
-
 			BOOST_FOREACH(shared_ptr<ScheduledService> sservice, _scheduledServicesToRemove)
 			{
 				ScheduledServiceTableSync::RemoveRow(sservice->getKey(), transaction);
@@ -206,6 +237,14 @@ namespace synthese
 					LineStopTableSync::RemoveRow(edge->getKey(), transaction);
 				}
 				JourneyPatternTableSync::RemoveRow(journeyPattern->getKey(), transaction);
+			}
+			BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
+			{
+				StopPointTableSync::RemoveRow(stop->getKey(), transaction);
+			}
+			BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
+			{
+				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
 			}
 		}
 

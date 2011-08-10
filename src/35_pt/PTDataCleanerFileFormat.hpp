@@ -41,6 +41,9 @@ namespace synthese
 		class ContinuousService;
 		class ScheduledService;
 		class DesignatedLinePhysicalStop;
+		class StopPoint;
+		class StopArea;
+		class LineStop;
 
 		/** PTDataCleanerFileFormat class.
 			@ingroup m35
@@ -75,6 +78,9 @@ namespace synthese
 			mutable std::set<boost::shared_ptr<JourneyPattern> > _journeyPatternsToRemove;
 			mutable std::set<boost::shared_ptr<ScheduledService> > _scheduledServicesToRemove;
 			mutable std::set<boost::shared_ptr<ContinuousService> > _continuousServicesToRemove;
+			mutable std::set<boost::shared_ptr<StopPoint> > _stopsToRemove;
+			mutable std::set<boost::shared_ptr<StopArea> > _stopAreasToRemove;
+			mutable std::set<boost::shared_ptr<const LineStop> > _edgesToRemove;
 
 		public:
 			void setCalendar(boost::shared_ptr<const calendar::CalendarTemplate> value){ _calendarTemplate = value; }
