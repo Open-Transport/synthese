@@ -101,6 +101,12 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string IneoFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_READ_METHOD("line_read_method");
+		const std::string IneoFileFormat::Importer_::VALUE_CIDX("CIDX");
+		const std::string IneoFileFormat::Importer_::VALUE_SV("SV");
+		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD("line_short_name_field");
+		const std::string IneoFileFormat::Importer_::VALUE_NLGIV("NLGIV");
+		const std::string IneoFileFormat::Importer_::VALUE_MNLC("MNLC");
 	}
 
 	namespace impex
@@ -192,14 +198,23 @@ namespace synthese
 					string name(_getValue("LIBP"));
 
 					// Point
-					shared_ptr<geos::geom::Point> point(
-						_dataSource.getActualCoordinateSystem().createPoint(
-							lexical_cast<double>(_getValue("X")),
-							lexical_cast<double>(_getValue("Y"))
-					)	);
-					if(point->isEmpty())
+					shared_ptr<geos::geom::Point> point;
+					if(!_getValue("X").empty() && !_getValue("Y").empty())
 					{
-						point.reset();
+						try
+						{
+							point = _dataSource.getActualCoordinateSystem().createPoint(
+								lexical_cast<double>(_getValue("X")),
+								lexical_cast<double>(_getValue("Y"))
+							);
+							if(point->isEmpty())
+							{
+								point.reset();
+							}
+						}
+						catch(boost::bad_lexical_cast&)
+						{
+						}
 					}
 
 					if(request && !_autoImportStops)
@@ -399,12 +414,14 @@ namespace synthese
 					}
 					if(_section == "L")
 					{
+						// ID
 						lineId = _getValue("MNLG");
+
 						line = PTFileFormat::CreateOrUpdateLine(
 							lines,
 							lineId,
 							_getValue("LIBLG"),
-							_getValue("NLGIV"),
+							_getValue(_lineShortNameField),
 							optional<RGBColor>(),
 							*_network,
 							_dataSource,
@@ -506,11 +523,12 @@ namespace synthese
 				int ph(0);
 				vector<date> dates;
 				time_duration lastTd(minutes(0));
+				string lineNum;
 				while(true)
 				{
 					_readLine(inFile);
 
-					if((_section == "C" || _section.empty()) && !schedules.empty())
+					if((_section == "C" || _section.empty() || _section == "SV") && !schedules.empty() && route)
 					{
 						ScheduledService* service(
 							PTFileFormat::CreateOrUpdateService(
@@ -539,6 +557,18 @@ namespace synthese
 					{
 						ph = lexical_cast<int>(_getValue("NPH"));
 					}
+					else if(_section == "SV")
+					{
+						if(_lineReadMethod == VALUE_SV)
+						{
+							lineNum.clear();
+							string mnesv(_getValue("MNESV"));
+							if(mnesv.length() >= 3)
+							{
+								lineNum = mnesv.substr(0, mnesv.size() - 2);
+							}
+						}
+					}
 					else if(_section == "C")
 					{
 						if(_getValue("TCOU") != "0")
@@ -547,9 +577,17 @@ namespace synthese
 							continue;
 						}
 						active = true;
-						string lineNum(lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2))));
+						if(_lineReadMethod == VALUE_CIDX)
+						{
+							lineNum = lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2)));
+						}
 						string jpNum(_getValue("ORD"));
-						route = _journeyPatterns[make_pair(lineNum,jpNum)];
+
+						route = NULL;
+						if(!lineNum.empty() && !jpNum.empty())
+						{
+							route = _journeyPatterns[make_pair(lineNum,jpNum)];
+						}
 
 						schedules.clear();
 						dates.clear();
@@ -569,7 +607,7 @@ namespace synthese
 						time_duration td(
 							lexical_cast<int>(timeStr.substr(0,2)),
 							lexical_cast<int>(timeStr.substr(2,2)),
-							lexical_cast<int>(timeStr.substr(4,2))
+							(timeStr.size() >= 6) ? lexical_cast<int>(timeStr.substr(4,2)) : 0
 						);
 						if(td < lastTd)
 						{
@@ -614,6 +652,19 @@ namespace synthese
 			stream << t.cell("Import automatique arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops));
 			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
+			
+			// Line read method
+			vector<pair<optional<string>, string> > methods;
+			methods.push_back(make_pair(optional<string>(VALUE_CIDX), VALUE_CIDX));
+			methods.push_back(make_pair(optional<string>(VALUE_SV), VALUE_SV));
+			stream << t.cell("Méthode d'identification des lignes", t.getForm().getSelectInput(PARAMETER_LINE_READ_METHOD, methods, optional<string>(_lineReadMethod)));
+
+			// Line short name field
+			vector<pair<optional<string>, string> > fields;
+			methods.push_back(make_pair(optional<string>(VALUE_NLGIV), VALUE_NLGIV));
+			methods.push_back(make_pair(optional<string>(VALUE_MNLC), VALUE_MNLC));
+			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, methods, optional<string>(_lineShortNameField)));
+
 			stream << t.close();
 		}
 
@@ -754,6 +805,13 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
+
+			// Line read method
+			map.insert(PARAMETER_LINE_READ_METHOD, _lineReadMethod);
+
+			// Line short name field
+			map.insert(PARAMETER_LINE_SHORT_NAME_FIELD, _lineShortNameField);
+
 			return map;
 		}
 
@@ -777,5 +835,11 @@ namespace synthese
 			{
 				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 			}
+
+			// Line read method
+			_lineReadMethod = map.getDefault<string>(PARAMETER_LINE_READ_METHOD, VALUE_CIDX);
+
+			// Line short name field
+			_lineShortNameField = map.getDefault<string>(PARAMETER_LINE_SHORT_NAME_FIELD, VALUE_NLGIV);
 		}
 }	}
