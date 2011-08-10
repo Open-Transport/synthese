@@ -89,20 +89,31 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
+				static const std::string PARAMETER_LINE_READ_METHOD;
+				static const std::string VALUE_CIDX;
+				static const std::string VALUE_SV;
+				static const std::string PARAMETER_LINE_SHORT_NAME_FIELD;
+				static const std::string VALUE_NLGIV;
+				static const std::string VALUE_MNLC;
 
 			private:
+				//! @name Parameters
+				//@{
+					boost::shared_ptr<TransportNetwork> _network;
+					bool _autoImportStops;
+					bool _displayLinkedStops;
+					boost::shared_ptr<const geography::City> _defaultCity;
+					boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
+					std::string _lineReadMethod;
+					std::string _lineShortNameField;
+				//@}
+
 				static const std::string SEP;
 
 				typedef std::map<std::string, std::vector<std::string> > FieldMaps;
 				mutable FieldMaps _fieldsMap;
 
-				boost::shared_ptr<TransportNetwork> _network;
-
-				bool _autoImportStops;
 				bool _interactive;
-				bool _displayLinkedStops;
-				boost::shared_ptr<const geography::City> _defaultCity;
-				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
 				mutable std::map<std::string, std::string> _line;
 				mutable std::string _section;
