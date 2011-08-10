@@ -53,6 +53,9 @@ typedef long long longlong;
 #define LOG1(p0) do { printf("notify_synthese_http: " p0); fflush(stdout); } while(0)
 #define LOG2(p0, p1) do { printf("notify_synthese_http: " p0, p1); fflush(stdout); } while(0)
 
+#define CURL_TIMEOUT_MS 1000
+
+
 /* Set this to 1 to enable log messages. They will appear in the MySQL error log */
 #if 0
 #define DBG1(p0) LOG1(p0)
@@ -111,6 +114,7 @@ longlong notify_synthese_http(
 		*error = 1;
 		return 0;
 	}
+	curl_easy_setopt(curl, CURLOPT_TIMEOUT_MS, CURL_TIMEOUT_MS);
 
 	if (args->lengths[0] >= sizeof(url))
 	{
