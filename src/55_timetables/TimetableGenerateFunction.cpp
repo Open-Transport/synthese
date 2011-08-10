@@ -504,6 +504,7 @@ namespace synthese
 					stream,
 					_page,
 					_pageForSubTimetable,
+					_notePage,
 					request,
 					*_timetable,
 					*generator,
@@ -533,6 +534,7 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			boost::shared_ptr<const cms::Webpage> pageForSubTimetable,
+			boost::shared_ptr<const cms::Webpage> notePage,
 			const server::Request& request,
 			const Timetable& object,
 			const timetables::TimetableGenerator& generator,
@@ -540,6 +542,7 @@ namespace synthese
 			size_t rank
 		) const {
 			ParametersMap pm(_savedParameters);
+			shared_ptr<TimetableResult::Warnings> warnings;
 
 			// Common parameters
 			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(object.getContentType()));
@@ -547,24 +550,13 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, object.getKey());
 			pm.insert(DATA_TIMETABLE_RANK, rank);
 
-			// 2 : Notes
-			if(_notePage.get())
-			{
-				stringstream notes;
-				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, result.getWarnings())
-				{
-					_displayNote(notes, request, *warning.second);
-				}
-				pm.insert(DATA_NOTES, notes.str()); //2
-			}
-
+			// Base calendar
 			if(object.getBaseCalendar())
 			{
 				pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getText()); //3
 			}
 
-
-			// Specific parameters
+			// Content
 			switch(object.getContentType())
 			{
 			case Timetable::CONTAINER:
@@ -573,20 +565,23 @@ namespace synthese
 					{
 						stringstream content;
 						Env env;
+						warnings.reset(new TimetableResult::Warnings);
 						BOOST_FOREACH(shared_ptr<Timetable> tt, _containerContent)
 						{
 							try
 							{
 								auto_ptr<TimetableGenerator> g(tt->getGenerator(Env::GetOfficialEnv()));
+								TimetableResult r(g->build(true, warnings));
 								size_t ttRank(0);
 								_display(
 									content,
 									pageForSubTimetable,
 									shared_ptr<const Webpage>(),
+									shared_ptr<const Webpage>(),
 									request,
 									*tt,
 									*g,
-									result,
+									r,
 									ttRank++
 								);
 							}
@@ -776,8 +771,7 @@ namespace synthese
 
 					// 9 : At least a note
 					bool aNote(false);
-					const TimetableResult::RowNotesVector notes(result.getRowNotes());
-					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, notes)
+					BOOST_FOREACH(const TimetableResult::RowNotesVector::value_type& note, result.getRowNotes())
 					{
 						if(note != NULL)
 						{
@@ -797,6 +791,18 @@ namespace synthese
 			case Timetable::TIMES_IN_ROWS:
 
 				break;
+			}
+
+			// 2 : Notes
+			if(notePage.get())
+			{
+				stringstream notes;
+				const TimetableResult::Warnings& warns(warnings.get() ? *warnings : result.getWarnings());
+				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, warns)
+				{
+					_displayNote(notes, request, *warning.second);
+				}
+				pm.insert(DATA_NOTES, notes.str()); //2
 			}
 
 			page->display(stream, request, pm);
