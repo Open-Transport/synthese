@@ -121,7 +121,7 @@ namespace synthese
 
 			HTMLTable::ColsVector c;
 			c.push_back("ID");
-			c.push_back("Texte affiché");
+			c.push_back("Texte affichÃ©");
 			c.push_back("Action");
 			c.push_back("Action");
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
@@ -156,7 +156,7 @@ namespace synthese
 				// Delete button
 				deleteRequest.getAction()->setObjectId(destination->getKey());
 				stream << t.col();
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la destination ?");
+				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer la destination ?");
 			}
 
 			// New destination form

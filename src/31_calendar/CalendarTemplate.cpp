@@ -113,12 +113,14 @@ namespace synthese
 			date result(pos_infin);
 			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				if(	element.second.getMinDate() < result &&
+				date elementMinDate(element.second.getRealMinDate());
+
+				if(	elementMinDate < result &&
 					element.second.getOperation() != CalendarTemplateElement::AND ||
 					element.second.getOperation() == CalendarTemplateElement::AND &&
-					element.second.getMinDate() > result
+					elementMinDate > result
 				){
-					result = element.second.getMinDate();
+					result = elementMinDate;
 				}
 			}
 			return result;
@@ -131,12 +133,14 @@ namespace synthese
 			date result(neg_infin);
 			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				if(	element.second.getMaxDate() > result &&
+				date elementMaxDate(element.second.getRealMaxDate());
+
+				if(	elementMaxDate > result &&
 					element.second.getOperation() != CalendarTemplateElement::AND ||
 					element.second.getOperation() == CalendarTemplateElement::AND &&
-					element.second.getMaxDate() < result
+					elementMaxDate < result
 				){
-					result = element.second.getMaxDate();
+					result = elementMaxDate;
 				}
 			}
 			return result;

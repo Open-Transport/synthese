@@ -105,11 +105,6 @@ namespace synthese
 
 		const date& CalendarTemplateElement::getMinDate() const
 		{
-			if(_include)
-			{
-				const date& incMinDate(_include->getMinDate());
-				return (incMinDate > _minDate) ? incMinDate : _minDate;
-			}
 			return  _minDate;
 		}
 
@@ -117,11 +112,6 @@ namespace synthese
 
 		const date& CalendarTemplateElement::getMaxDate() const
 		{
-			if(_include)
-			{
-				const date& incMaxDate(_include->getMaxDate());
-				return (incMaxDate < _maxDate) ? incMaxDate : _maxDate;
-			}
 			return _maxDate;
 		}
 
@@ -195,5 +185,34 @@ namespace synthese
 		{
 			_calendar = value;
 		}
-	}
-}
+
+
+
+		boost::gregorian::date CalendarTemplateElement::getRealMinDate() const
+		{
+			if(_include)
+			{
+				const date& incMinDate(_include->getMinDate());
+				return (incMinDate > _minDate) ? incMinDate : _minDate;
+			}
+			else
+			{
+				return _minDate;
+			}
+		}
+
+
+
+		boost::gregorian::date CalendarTemplateElement::getRealMaxDate() const
+		{
+			if(_include)
+			{
+				const date& incMaxDate(_include->getMaxDate());
+				return (incMaxDate < _maxDate) ? incMaxDate : _maxDate;
+			}
+			else
+			{
+				return _maxDate;
+			}
+		}
+}	}
