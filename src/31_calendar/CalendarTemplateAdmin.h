@@ -127,6 +127,20 @@ namespace synthese
 
 
 
+			/** Sub pages getter.
+				@param currentPage Currently displayed page
+				@param request User request
+				@return PageLinks each subpage of the current page
+				@author Hugues Romain
+				@date 2011
+			*/
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const admin::AdminInterfaceElement& currentPage,
+				const admin::AdminRequest& request
+			) const;
+
+
+
 			/** Title generator.
 				@return The title of the page
 				@author Hugues Romain
@@ -137,8 +151,6 @@ namespace synthese
 
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-
-			AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
 		};
 	}
 }

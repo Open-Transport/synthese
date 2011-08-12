@@ -79,6 +79,7 @@ namespace synthese
 			static const std::string	TAB_PARAMETERS;
 			static const std::string	TAB_VARIABLES;
 			static const std::string	TAB_LOG;
+			static const std::string	TAB_DATASOURCES;
 
 		private:
 			boost::shared_ptr<const Scenario>			_scenario;

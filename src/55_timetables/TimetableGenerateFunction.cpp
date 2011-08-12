@@ -49,6 +49,7 @@
 #include "TimetableServiceRowInterfacePage.h"
 #include "CommercialLineTableSync.h"
 #include "JourneyPatternCopy.hpp"
+#include "PTUseRule.h"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -90,6 +91,7 @@ namespace synthese
 		const std::string TimetableGenerateFunction::DATA_NOTES("notes");
 		const std::string TimetableGenerateFunction::DATA_CALENDAR_NAME("calendar_name");
 		const std::string TimetableGenerateFunction::DATA_AT_LEAST_A_NOTE("at_least_a_note");
+		const std::string TimetableGenerateFunction::DATA_AT_LEAST_A_RESERVATION_RULE("at_least_a_reservation_rule");
 		const std::string TimetableGenerateFunction::DATA_CONTENT("content");
 		const std::string TimetableGenerateFunction::DATA_TIMETABLE_RANK("timetable_rank");
 
@@ -554,7 +556,7 @@ namespace synthese
 			// Base calendar
 			if(object.getBaseCalendar())
 			{
-				pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getText()); //3
+				pm.insert(DATA_CALENDAR_NAME, object.getBaseCalendar()->getName());
 			}
 
 			// Content
@@ -715,8 +717,14 @@ namespace synthese
 					);
 					pm.insert(DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW, rollingStockContent.str()); //6
 
-					// 7 : Booking rows
-					pm.insert(DATA_SERVICES_IN_COLS_RESERVATIONS_ROW, string()); //7
+					// Booking rows
+					stringstream reservationContent;
+					_displayBookingRow(
+						reservationContent,
+						request,
+						services
+					);
+					pm.insert(DATA_SERVICES_IN_COLS_RESERVATIONS_ROW, reservationContent.str());
 
 					// 8 : Note rows
 					stringstream notesContent;
@@ -740,6 +748,27 @@ namespace synthese
 						}
 					}
 					pm.insert(DATA_AT_LEAST_A_NOTE, aNote); //9
+
+					// At least a reservation rule
+					bool aReservationRule(false);
+					BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
+					{
+						if(!service)
+						{
+							continue;
+						}
+						const PTUseRule* ptUseRule(
+							dynamic_cast<const PTUseRule*>(
+								&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+						)	);
+						if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
+						{
+							aReservationRule = true;
+							break;
+						}
+					}
+					pm.insert(DATA_AT_LEAST_A_RESERVATION_RULE, aReservationRule);
+
 				}
 				break;
 
@@ -1192,5 +1221,57 @@ namespace synthese
 			timetable.setContentType(Timetable::TABLE_SERVICES_IN_COLS);
 			timetable.addAuthorizedLine(&line);
 			timetable.setWaybackFilter(wayBack);
+		}
+
+
+
+		void TimetableGenerateFunction::_displayBookingRow(
+			std::ostream& stream,
+			const server::Request& request,
+			const TimetableResult::RowServicesVector& services
+		) const {
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+
+			pm.insert(DATA_TYPE, TYPE_BOOKING);
+
+			if(_cellPage.get())
+			{
+				stringstream content;
+				size_t colRank(0);
+				BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
+				{
+					_displayBookingCell(content, request, colRank++, service);
+				}
+				pm.insert(DATA_CELLS_CONTENT, content.str());
+			}
+
+			_rowPage->display(stream, request, pm);
+		}
+
+
+
+		void TimetableGenerateFunction::_displayBookingCell(
+			std::ostream& stream,
+			const server::Request& request,
+			std::size_t colRank,
+			const TimetableResult::RowServicesVector::value_type& service
+		) const {
+			ParametersMap pm(_savedParameters);
+
+			pm.insert(DATA_TYPE, TYPE_BOOKING);
+			pm.insert(DATA_CELL_RANK, colRank);
+			if(service)
+			{
+				const PTUseRule* ptUseRule(
+					dynamic_cast<const PTUseRule*>(
+						&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				)	);
+				if(ptUseRule)
+				{
+					ptUseRule->toParametersMap(pm);
+				}
+			}
+
+			_cellPage->display(stream, request, pm);
 		}
 }	}

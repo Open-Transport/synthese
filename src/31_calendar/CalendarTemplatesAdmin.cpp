@@ -126,7 +126,7 @@ namespace synthese
 				removeCalendar.getAction()->setObjectId(ct->getKey());
 
 				stream << t.row();
-				stream << t.col() << ct->getText();
+				stream << t.col() << ct->getName();
 				stream <<
 					t.col() <<
 					HTMLModule::getLinkButton(
@@ -147,7 +147,7 @@ namespace synthese
 						HTMLModule::getLinkButton(
 							removeCalendar.getURL(),
 							"Supprimer",
-							"Etes-vous sûr de vouloir supprimer le calendrier "+ ct->getText() +" ?",
+							"Etes-vous sûr de vouloir supprimer le calendrier "+ ct->getName() +" ?",
 							"calendar_delete.png"
 						)
 					;
@@ -197,16 +197,26 @@ namespace synthese
 				dynamic_cast<const CalendarTemplateAdmin*>(&currentPage)
 			){
 
+				// Subpages
 				CalendarTemplateTableSync::SearchResult calendars(
-					CalendarTemplateTableSync::Search(Env::GetOfficialEnv())
-				);
+					CalendarTemplateTableSync::Search(
+						Env::GetOfficialEnv(),
+						optional<string>(),
+						optional<RegistryKeyType>(),
+						true,
+						true,
+						0,
+						optional<size_t>(),
+						UP_LINKS_LOAD_LEVEL,
+						RegistryKeyType(0)
+				)	);
 				BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
 				{
-					shared_ptr<CalendarTemplateAdmin> p(
+					shared_ptr<CalendarTemplateAdmin> page(
 						getNewPage<CalendarTemplateAdmin>()
 					);
-					p->setCalendar(ct);
-					links.push_back(p);
+					page->setCalendar(ct);
+					links.push_back(page);
 				}
 			}
 

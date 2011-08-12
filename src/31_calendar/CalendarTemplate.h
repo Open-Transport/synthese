@@ -29,6 +29,10 @@
 #include "Exception.h"
 #include "Calendar.h"
 #include "Importable.h"
+#include "TreeNode.hpp"
+#include "Named.h"
+#include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "TreeUniqueRootPolicy.hpp"
 
 #include <map>
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -47,7 +51,13 @@ namespace synthese
 		*/
 		class CalendarTemplate:
 			public virtual util::Registrable,
-			public impex::Importable
+			public impex::Importable,
+			public util::Named,
+			public tree::TreeNode<
+				CalendarTemplate,
+				tree::TreeAlphabeticalOrderingPolicy,
+				tree::TreeUniqueRootPolicy<CalendarTemplate>
+			>
 		{
 		public:
 			/// Chosen registry class.
@@ -114,7 +124,6 @@ namespace synthese
 
 		private:
 			Elements	_elements;
-			std::string								_text;
 			Category								_category;
 
 		public:
@@ -157,14 +166,12 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				std::string	getText()	const;
 				Category getCategory() const;
 				Elements getElements() const { return _elements; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void	setText(const std::string& text);
 				void	setCategory(Category value);
 			//@}
 

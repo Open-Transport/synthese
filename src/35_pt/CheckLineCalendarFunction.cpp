@@ -93,11 +93,11 @@ namespace synthese
 
 					if(_line->respectsCalendarTemplate(_duration))
 					{
-						stream << "0\nOK JourneyPattern "+ _line->getShortName() +" runs the "+ lexical_cast<string>(_duration.days()) +" next days of "+ _line->getCalendarTemplate()->getText() +"|days="+ lexical_cast<string>(runDays.size()) + "\n";
+						stream << "0\nOK JourneyPattern "+ _line->getShortName() +" runs the "+ lexical_cast<string>(_duration.days()) +" next days of "+ _line->getCalendarTemplate()->getName() +"|days="+ lexical_cast<string>(runDays.size()) + "\n";
 					}
 					else
 					{
-						stream << "2\nKO JourneyPattern "+ _line->getShortName() +" does not run then "+ lexical_cast<string>(_duration.days()) +" days of "+ _line->getCalendarTemplate()->getText() +"|days="+ lexical_cast<string>(runDays.size()) + "\n";
+						stream << "2\nKO JourneyPattern "+ _line->getShortName() +" does not run then "+ lexical_cast<string>(_duration.days()) +" days of "+ _line->getCalendarTemplate()->getName() +"|days="+ lexical_cast<string>(runDays.size()) + "\n";
 					}
 				}
 			}

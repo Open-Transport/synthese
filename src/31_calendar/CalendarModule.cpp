@@ -99,7 +99,7 @@ namespace synthese
 				if(	result == _value.end() ||
 					itCal->second->getCategory() < result->second->getCategory() ||
 					itCal->second->getCategory() == result->second->getCategory() &&
-					itCal->second->getText().size() < result->second->getText().size()
+					itCal->second->getName().size() < result->second->getName().size()
 				){
 					result = itCal;
 				}
@@ -107,7 +107,7 @@ namespace synthese
 
 			if(result != _value.end())
 			{
-				return result->second->getText();
+				return result->second->getName();
 			}
 
 			// If not template found, generation of a generic description text
