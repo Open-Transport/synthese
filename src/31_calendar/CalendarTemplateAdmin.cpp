@@ -91,6 +91,8 @@ namespace synthese
 			_resultEndDate(day_clock::local_day().year() + 1, 12, 31)
 		{ }
 
+
+
 		void CalendarTemplateAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -140,7 +142,7 @@ namespace synthese
 
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
-				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getText()));
+				stream << pt.cell("Nom", pt.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, _calendar->getName()));
 				stream << pt.cell(
 					"Catégorie",
 					pt.getForm().getSelectInput(
@@ -170,7 +172,7 @@ namespace synthese
 
 				stream <<
 					"<p>" <<
-					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sûr de vouloir vider le calendrier "+ _calendar->getText() +" ?")
+					HTMLModule::getLinkButton(cleanRequest.getURL(), "Vider le calendrier", "Etes-vous sûr de vouloir vider le calendrier "+ _calendar->getName() +" ?")
 				;
 
 				CalendarTemplateElementTableSync::SearchResult result(
@@ -180,7 +182,7 @@ namespace synthese
 				if(result.empty())
 				{
 					stream << " " <<
-					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getText() +" ?", "calendar_delete.png");
+					HTMLModule::getLinkButton(removeCalendar.getURL(), "Supprimer le calendrier", "Etes-vous sûr de vouloir supprimer le calendrier "+ _calendar->getName() +" ?", "calendar_delete.png");
 				}
 				stream << "</p>";
 
@@ -228,7 +230,7 @@ namespace synthese
 					if (ct->getInclude())
 					{
 						goRequest.getPage()->setCalendar(const_pointer_cast<CalendarTemplate>(Env::GetOfficialEnv().getSPtr(ct->getInclude())));
-						stream << HTMLModule::getHTMLLink(goRequest.getURL(), ct->getInclude()->getText());
+						stream << HTMLModule::getHTMLLink(goRequest.getURL(), ct->getInclude()->getName());
 					}
 
 					stream << t.col() << HTMLModule::getLinkButton(delRequest.getURL(), "Supprimer");
@@ -302,6 +304,8 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
+
+
 		bool CalendarTemplateAdmin::isAuthorized(
 			const security::User& user
 		) const {
@@ -312,7 +316,7 @@ namespace synthese
 
 		std::string CalendarTemplateAdmin::getTitle() const
 		{
-			return _calendar.get() ? _calendar->getText() : DEFAULT_TITLE;
+			return _calendar.get() ? _calendar->getName() : DEFAULT_TITLE;
 		}
 
 		void CalendarTemplateAdmin::setCalendar(shared_ptr<CalendarTemplate> value)
@@ -346,15 +350,39 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::_getCurrentTreeBranch() const
-		{
-			shared_ptr<CalendarTemplatesAdmin> p(
-				getNewPage<CalendarTemplatesAdmin>()
-			);
+		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPages(
+			const admin::AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
 
-			PageLinks links(p->_getCurrentTreeBranch());
-			links.push_back(p);
+			if(	dynamic_cast<const CalendarTemplatesAdmin*>(&currentPage) ||
+				dynamic_cast<const CalendarTemplateAdmin*>(&currentPage)
+			){
+
+				// Subpages
+				CalendarTemplateTableSync::SearchResult calendars(
+					CalendarTemplateTableSync::Search(
+						Env::GetOfficialEnv(),
+						optional<string>(),
+						optional<RegistryKeyType>(),
+						true,
+						true,
+						0,
+						optional<size_t>(),
+						UP_LINKS_LOAD_LEVEL,
+						_calendar->getKey()
+				)	);
+				BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
+				{
+					shared_ptr<CalendarTemplateAdmin> page(
+						getNewPage<CalendarTemplateAdmin>()
+					);
+					page->setCalendar(ct);
+					links.push_back(page);
+				}
+			}
+
 			return links;
 		}
-	}
-}
+}	}

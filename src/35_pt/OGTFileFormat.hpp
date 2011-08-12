@@ -59,7 +59,6 @@ namespace synthese
 				public PTDataCleanerFileFormat
 			{
 			public:
-				static const std::string PARAMETER_CALENDAR_ID;
 				
 			private:
 

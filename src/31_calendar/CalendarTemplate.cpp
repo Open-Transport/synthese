@@ -59,7 +59,7 @@ namespace synthese
 			element.setOperation(CalendarTemplateElement::ADD);
 			element.setRank(0);
 			addElement(element);
-			setText(
+			setName(
 				lexical_cast<string>(day.day()) + "/" + lexical_cast<string>(static_cast<int>(day.month())) + "/" + lexical_cast<string>(day.year())
 			);
 		}
@@ -98,21 +98,6 @@ namespace synthese
 			Calendar mask(getMinDate(), getMaxDate());
 			return getResult(mask);
 		}
-
-
-		string CalendarTemplate::getText() const
-		{
-			return _text;
-		}
-
-
-
-		void CalendarTemplate::setText(
-			const string& text
-		){
-			_text = text;
-		}
-
 
 
 		void CalendarTemplate::addElement( const CalendarTemplateElement& element )

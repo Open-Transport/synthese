@@ -49,6 +49,7 @@ namespace synthese
 			static const std::string COL_TEXT;
 			static const std::string COL_CATEGORY;
 			static const std::string COL_DATASOURCE_LINKS;
+			static const std::string COL_PARENT_ID;
 
 
 			/** CalendarTemplate search.
@@ -67,7 +68,8 @@ namespace synthese
 				bool raisingOrder = true,
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>()
 			);
 
 

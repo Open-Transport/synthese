@@ -26,6 +26,10 @@
 #include "LineStopTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledServiceTableSync.h"
+#include "AdminFunctionRequest.hpp"
+#include "DataSourceAdmin.h"
+#include "PropertiesHTMLTable.h"
+#include "CalendarTemplateTableSync.h"
 
 #include <fstream>
 
@@ -40,6 +44,8 @@ namespace synthese
 	using namespace calendar;
 	using namespace db;
 	using namespace util;
+	using namespace admin;
+	using namespace html;
 
 	namespace util
 	{
@@ -48,10 +54,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string OGTFileFormat::Importer_::PARAMETER_CALENDAR_ID("ci");
-
-
-
 		bool OGTFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& os,
@@ -101,9 +103,27 @@ namespace synthese
 
 
 
-		void OGTFileFormat::Importer_::displayAdmin( std::ostream& os, const admin::AdminRequest& request ) const
-		{
-
+		void OGTFileFormat::Importer_::displayAdmin(
+			std::ostream& stream,
+			const admin::AdminRequest& request
+		) const {
+			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
+			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Mode");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Fichier");
+			stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
+			stream << t.cell("Calendrier", 
+				t.getForm().getSelectInput(
+					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList(),
+					optional<RegistryKeyType>(_calendarTemplate.get() ? _calendarTemplate->getKey() : RegistryKeyType(0))
+			)	);
+			stream << t.close();
 		}
 
 
@@ -135,7 +155,7 @@ namespace synthese
 					user_data->curTag = tag;
 				}
 			}
-			else if(user_data->curTag == "SCHEDULE")
+			else if(user_data->curTag == "SCHEDULE" && user_data->line)
 			{
 				if(	tag == "TRIP")
 				{
@@ -155,7 +175,7 @@ namespace synthese
 					user_data->curTag = tag;
 				}
 			}
-			else if(user_data->importTrip)
+			else if(user_data->importTrip && user_data->line)
 			{
 				if(user_data->curTag == "TRIP")
 				{
@@ -208,7 +228,7 @@ namespace synthese
 			expat_user_data *user_data = (expat_user_data*)d;
 			string tag(name);
 
-			if(tag == "TRIP" && user_data->importTrip)
+			if(tag == "TRIP" && user_data->importTrip && user_data->line)
 			{
 				user_data->departureSchedules.pop_back();
 				JourneyPattern* route(
@@ -256,10 +276,7 @@ namespace synthese
 				stream,
 				calendar
 			)
-		{
-
-			
-		}
+		{}
 
 
 
@@ -342,7 +359,8 @@ namespace synthese
 			_env(env),
 			_stream(stream),
 			_calendar(calendar),
-			stopPoints(dataSource, env)
+			stopPoints(dataSource, env),
+			line(NULL)
 		{
 		}
 }	}

@@ -1709,8 +1709,8 @@ namespace synthese
 					}
 					if(calendarNode.nChildNode("comment"))
 					{
-						ct->setText(
-							charset_converter.convert(calendarNode.getChildNode("comment").getText())
+						ct->setName(
+							charset_converter.convert(calendarNode.getChildNode("comment").getName())
 						);
 					}
 					if(calendarToImport)

@@ -38,7 +38,7 @@ namespace synthese
 		public:
 			typedef T* RootType;
 
-			TreeUniqueRootPolicy();
+			TreeUniqueRootPolicy() {}
 
 			static T* getRoot() { return &boost::detail::thread::singleton<T>.instance(); }
 

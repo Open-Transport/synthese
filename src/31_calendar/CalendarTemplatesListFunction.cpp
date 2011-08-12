@@ -100,7 +100,7 @@ namespace synthese
 				stream << "<option value=\"" << object->getKey() << "\"";
 				if (_defaultValue.get() == object.get())
 					stream << " selected=\"selected\"";
-				stream << ">" << object->getText() << "</option>";
+				stream << ">" << object->getName() << "</option>";
 			}
 			stream << "</select>";
 		}
