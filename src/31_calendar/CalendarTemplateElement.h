@@ -83,6 +83,15 @@ namespace synthese
 			//! @name Queries
 			//@{
 				Calendar	getResult(const Calendar& mask)	const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Min date getter which takes into account of included calendar.
+				boost::gregorian::date	getRealMinDate()	const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Max date getter which takes into account of included calendar.
+				boost::gregorian::date	getRealMaxDate()	const;
+
 			//@}
 
 			//! @name Getters
