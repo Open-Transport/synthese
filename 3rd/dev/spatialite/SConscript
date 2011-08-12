@@ -27,7 +27,7 @@ CppLibProject(
 CppBinProject(
 	senv
 	, 'spatialite'
-	, '2.3.1a2'
+	, '2.3.1a3'
 	, source_files = senv.Glob ('*.c', [], senv.SrcDir('cli-src'), prefix='cli-src/', recursive=True)
 	, include_dir = senv.SrcDir('src/headers')
 	, filesrootdir = senv.SrcDir('cli-src')
