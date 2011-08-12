@@ -100,6 +100,10 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the object is linked with the specified data source.
+				/// @param source the source with which the object must be linked
+				/// @return true if the object is linked with the specified data source.
 				bool hasLinkWithSource(const DataSource& source) const;
 
 				bool hasUnknownOwner() const;

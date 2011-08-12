@@ -33,6 +33,7 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineArea.hpp"
 #include "DBTransaction.hpp"
+#include "DRTAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -50,17 +51,21 @@ namespace synthese
 	namespace pt
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
-		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
-		const string PTDataCleanerFileFormat::PARAMETER_END_DATE("end_date");
 		const string PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA("clean_old_data");
+		const string PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS("clean_unused_stops");
+		const string PTDataCleanerFileFormat::PARAMETER_END_DATE("end_date");
 		const string PTDataCleanerFileFormat::PARAMETER_FROM_TODAY("from_today");
+		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
+
+
 
 		PTDataCleanerFileFormat::PTDataCleanerFileFormat(
 			util::Env& env,
 			const DataSource& dataSource
 		):	Importer(env, dataSource),
+			_fromToday(false),
 			_cleanOldData(true),
-			_fromToday(false)
+			_cleanUnusedStops(false)
 		{}
 
 
@@ -113,7 +118,6 @@ namespace synthese
 				}
 			}
 		}
-
 
 
 
@@ -187,36 +191,86 @@ namespace synthese
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
 			}
 
-			// Stops without Journey patterns without any service
-			BOOST_FOREACH(const Registry<StopPoint>::value_type& itStopPoint, _env.getRegistry<StopPoint>())
+			if(_cleanUnusedStops)
 			{
-				if(	itStopPoint.second->hasLinkWithSource(_dataSource) &&
-					itStopPoint.second->getDataSourceLinks().size() == 1 &&
-					itStopPoint.second->getDepartureEdges().empty() &&
-					itStopPoint.second->getArrivalEdges().empty()
-				){
-					_stopsToRemove.insert(itStopPoint.second);
-					const_cast<StopArea*>(itStopPoint.second->getConnectionPlace())->removePhysicalStop(*itStopPoint.second);
-					if(itStopPoint.second->getConnectionPlace()->getPhysicalStops().empty())
+				// Stops without Journey patterns without any service
+				Env checkEnv;
+				shared_ptr<const DataSource> dataSourceInCheckEnv(DataSourceTableSync::Get(_dataSource.getKey(), _env));
+				DRTAreaTableSync::Search(_env);
+				BOOST_FOREACH(const Registry<StopPoint>::value_type& itStopPoint, _env.getRegistry<StopPoint>())
+				{
+					const StopPoint& stop(*itStopPoint.second);
+
+					// Check if the stop should be removed according to the imported files
+					if(	!stop.hasLinkWithSource(_dataSource) ||
+						stop.getDataSourceLinks().size() != 1 ||
+						!stop.getDepartureEdges().empty() ||
+						!stop.getArrivalEdges().empty()
+					){
+						continue;
+					}
+
+					// Check if the stop is not used by journey patterns not linked with any datasource
+					bool theStopCanBeRemoved(true);
+					LineStopTableSync::SearchResult lineStops(
+						LineStopTableSync::Search(
+							checkEnv,
+							optional<RegistryKeyType>(),
+							stop.getKey()
+					)	);
+					BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
 					{
-						_stopAreasToRemove.insert(_env.getEditableSPtr(const_cast<StopArea*>(itStopPoint.second->getConnectionPlace())));
+						if(	dynamic_cast<const JourneyPattern*>(lineStop->getParentPath()) &&
+							!static_cast<const JourneyPattern*>(lineStop->getParentPath())->hasLinkWithSource(*dataSourceInCheckEnv)
+						){
+							theStopCanBeRemoved = false;
+							break;
+						}
+					}
+					if(!theStopCanBeRemoved)
+					{
+						continue;
+					}
+
+					// Check if the stop is not used in a DRT Area
+					BOOST_FOREACH(const DRTArea::Registry::value_type& drtArea, _env.getRegistry<DRTArea>())
+					{
+						BOOST_FOREACH(StopArea* stopArea, drtArea.second->getStops())
+						{
+							if(stopArea->getKey() == stop.getConnectionPlace()->getKey())
+							{
+								theStopCanBeRemoved = false;
+								break;
+							}
+						}
+					}
+					if(!theStopCanBeRemoved)
+					{
+						continue;
+					}
+
+					// The removal
+					_stopsToRemove.insert(itStopPoint.second);
+					const_cast<StopArea*>(stop.getConnectionPlace())->removePhysicalStop(stop);
+					if(stop.getConnectionPlace()->getPhysicalStops().empty())
+					{
+						_stopAreasToRemove.insert(_env.getEditableSPtr(const_cast<StopArea*>(stop.getConnectionPlace())));
 					}
 				}
-			}
 
-			// Stops to delete are removed from the environment to avoid useless saving
-			BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
-			{
-				_env.getEditableRegistry<StopPoint>().remove(stop->getKey());
-			}
+				// Stops to delete are removed from the environment to avoid useless saving
+				BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
+				{
+					_env.getEditableRegistry<StopPoint>().remove(stop->getKey());
+				}
 
-			// Stop areas to delete are removed from the environment to avoid useless saving
-			BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
-			{
-				_env.getEditableRegistry<StopArea>().remove(stopArea->getKey());
+				// Stop areas to delete are removed from the environment to avoid useless saving
+				BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
+				{
+					_env.getEditableRegistry<StopArea>().remove(stopArea->getKey());
+				}
 			}
 		}
-
 
 
 
@@ -269,6 +323,7 @@ namespace synthese
 		void PTDataCleanerFileFormat::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			_cleanOldData = map.getDefault<bool>(PARAMETER_CLEAN_OLD_DATA, true);
+			_cleanUnusedStops = map.getDefault<bool>(PARAMETER_CLEAN_UNUSED_STOPS, false);
 
 			RegistryKeyType calendarId(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0));
 			if(calendarId) try
@@ -342,6 +397,7 @@ namespace synthese
 				result.insert(PARAMETER_END_DATE, *_endDate);
 			}
 			result.insert(PARAMETER_FROM_TODAY, _fromToday);
+			result.insert(PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops);
 			return result;
 		}
 
