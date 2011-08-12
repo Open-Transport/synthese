@@ -22,7 +22,7 @@ sources.extend(senv.Glob ('*.cpp', ['examples'], senv.SrcDir('patch'), prefix='p
 GeosProject(
 	env
 	, 'geos'
-	, '3.2.patch1a'
+	, '3.2.patch1b'
 	, source_files = sources
 	, include_dir = senv.SrcDir('src/headers')
 	, filesrootdir = senv.SrcDir('src')
@@ -38,7 +38,7 @@ class GeosCProject (CppLibProject):
 GeosCProject(
 	env,
 	'geosc',
-	'3.2.patch1a',
+	'3.2.patch1b',
 	source_files = senv.Glob ('*.cpp', [], senv.SrcDir('capi'), prefix='capi/', recursive=True),
 	include_dir = senv.SrcDir('capi'),
 	filesrootdir = senv.SrcDir('capi'),
