@@ -46,6 +46,11 @@ namespace synthese
 
 	namespace pt
 	{
+		const std::string PTUseRule::DATA_RESERVATION_POSSIBLE("reservation_possible");
+		const std::string PTUseRule::DATA_RESERVATION_COMPULSORY("reservation_compulsory");
+		const std::string PTUseRule::DATA_RESERVATION_MIN_DELAY_MINUTES("reservation_min_delay_minutes");
+
+
 
 		PTUseRule::PTUseRule(
 			util::RegistryKeyType key
@@ -342,6 +347,18 @@ namespace synthese
 			}
 			assert(false);
 			return string();
+		}
+
+
+
+		void PTUseRule::toParametersMap( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
+		{
+			pm.insert(DATA_RESERVATION_COMPULSORY, _reservationType == RESERVATION_RULE_COMPULSORY);
+			pm.insert(DATA_RESERVATION_POSSIBLE, _reservationType != RESERVATION_FORBIDDEN);
+			if(_reservationType != RESERVATION_FORBIDDEN)
+			{
+				pm.insert(DATA_RESERVATION_MIN_DELAY_MINUTES, _minDelayMinutes.minutes());
+			}
 		}
 	}
 }

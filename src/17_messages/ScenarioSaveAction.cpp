@@ -45,6 +45,7 @@
 #include "ImportableTableSync.hpp"
 #include "ScenarioSentAlarmInheritedTableSync.h"
 #include "AlarmRecipient.h"
+#include "ImportableAdmin.hpp"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -89,6 +90,10 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_scenario.get()) map.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
+			if(_dataSourceLinks)
+			{
+				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
+			}
 			return map;
 		}
 
@@ -331,6 +336,12 @@ namespace synthese
 						_message = *alarms.begin();
 					}
 
+					// Datasource
+					if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
+					{
+						_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
+					}
+
 					// Enabled
 					if(map.isDefined(PARAMETER_ENABLED))
 					{
@@ -495,6 +506,12 @@ namespace synthese
 						to_simple_string(*_endDate)
 					);
 					_sscenario->setPeriodEnd(*_endDate);
+				}
+
+				// Datasource
+				if(_dataSourceLinks)
+				{
+					_sscenario->setDataSourceLinks(*_dataSourceLinks);
 				}
 
 				// Variables

@@ -105,13 +105,23 @@ namespace synthese
 
 		const date& CalendarTemplateElement::getMinDate() const
 		{
-			return _minDate;
+			if(_include)
+			{
+				const date& incMinDate(_include->getMinDate());
+				return (incMinDate > _minDate) ? incMinDate : _minDate;
+			}
+			return  _minDate;
 		}
 
 
 
 		const date& CalendarTemplateElement::getMaxDate() const
 		{
+			if(_include)
+			{
+				const date& incMaxDate(_include->getMaxDate());
+				return (incMaxDate < _maxDate) ? incMaxDate : _maxDate;
+			}
 			return _maxDate;
 		}
 

@@ -136,7 +136,7 @@ namespace synthese
 		{
 			if(_name)
 			{
-				_calendar->setText(*_name);
+				_calendar->setName(*_name);
 			}
 			if(_category)
 			{

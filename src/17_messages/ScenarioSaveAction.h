@@ -101,6 +101,7 @@ namespace synthese
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
+				boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			//@}
 
 			//! @name Action to do

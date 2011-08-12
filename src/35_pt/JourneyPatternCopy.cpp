@@ -96,7 +96,10 @@ namespace synthese
 				}
 			}
 
-			_pathGroup->addPath(this);
+			if(_pathGroup)
+			{
+				_pathGroup->addPath(this);
+			}
 		}
 
 

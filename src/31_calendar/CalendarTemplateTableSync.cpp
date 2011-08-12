@@ -52,6 +52,7 @@ namespace synthese
 		const std::string CalendarTemplateTableSync::COL_TEXT("name");
 		const std::string CalendarTemplateTableSync::COL_CATEGORY("category");
 		const std::string CalendarTemplateTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const std::string CalendarTemplateTableSync::COL_PARENT_ID("parent_id");
 	}
 
 	namespace db
@@ -67,12 +68,14 @@ namespace synthese
 			DBTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
 			DBTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
 			DBTableSync::Field(CalendarTemplateTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			DBTableSync::Field(CalendarTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<CalendarTemplateTableSync>::_INDEXES[]=
 		{
+			DBTableSync::Index(CalendarTemplateTableSync::COL_PARENT_ID.c_str(), ""),
 			DBTableSync::Index()
 		};
 
@@ -88,11 +91,12 @@ namespace synthese
 
 			// Properties
 			object->setKey(id);
-			object->setText(rows->getText(CalendarTemplateTableSync::COL_TEXT));
+			object->setName(rows->getText(CalendarTemplateTableSync::COL_TEXT));
 			object->setCategory(static_cast<CalendarTemplate::Category>(rows->getInt(CalendarTemplateTableSync::COL_CATEGORY)));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Elements
  				CalendarTemplateElementTableSync::SearchResult elements(
  					CalendarTemplateElementTableSync::Search(
  						env,
@@ -106,9 +110,31 @@ namespace synthese
  					object->addElement(*e);
  				}
 
+				// Data source links
 				object->setDataSourceLinks(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(rows->getText(CalendarTemplateTableSync::COL_DATASOURCE_LINKS), env)
 				);
+
+
+				// Parent
+				try
+				{
+					RegistryKeyType id(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID));
+					if(id > 0)
+					{
+						object->setParent(
+							CalendarTemplateTableSync::GetEditable(rows->getLongLong(CalendarTemplateTableSync::COL_PARENT_ID), env, linkLevel).get()
+						);
+					}
+					else
+					{
+						object->setParent(NULL);
+					}
+				}
+				catch (ObjectNotFoundException<CalendarTemplate> e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + CalendarTemplateTableSync::COL_PARENT_ID, e);
+				}
 			}
 		}
 
@@ -119,9 +145,10 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CalendarTemplateTableSync> query(*object);
-			query.addField(object->getText());
+			query.addField(object->getName());
 			query.addField(static_cast<int>(object->getCategory()));
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(object->getParent() ? object->getParent()->getKey() : 0);
 			query.execute(transaction);
 		}
 
@@ -194,7 +221,8 @@ namespace synthese
 			bool raisingOrder,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= 0*/,
-			LinkLevel linkLevel
+			LinkLevel linkLevel,
+			boost::optional<util::RegistryKeyType> parentId
 		){
 			SelectQuery<CalendarTemplateTableSync> query;
 			if(name)
@@ -204,6 +232,10 @@ namespace synthese
 			if(forbiddenId)
 			{
 				query.addWhereField(TABLE_COL_ID, *forbiddenId, ComposedExpression::OP_DIFF);
+			}
+			if(parentId)
+			{
+				query.addWhereField(COL_PARENT_ID, *parentId);
 			}
 			if (orderByName)
 			{
@@ -237,7 +269,7 @@ namespace synthese
 			BOOST_FOREACH(const CalendarTemplateTableSync::SearchResult::value_type& c, s)
 			{
 				if(idToAvoid && c->getKey() == *idToAvoid) continue;
-				r.push_back(make_pair(c->getKey(), c->getText()));
+				r.push_back(make_pair(c->getKey(), c->getName()));
 			}
 			return r;
 		}

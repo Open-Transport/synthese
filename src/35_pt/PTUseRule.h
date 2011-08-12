@@ -27,6 +27,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "Named.h"
+#include "ParametersMap.h"
 
 #include <string>
 #include <boost/optional.hpp>
@@ -50,11 +51,16 @@ namespace synthese
 		///		<li>Some reservation rules</li>
 		///	</ul>
 		///
-		class PTUseRule
-		:	public util::Registrable,
+		class PTUseRule:
+			public util::Registrable,
 			public graph::UseRule,
 			public util::Named
 		{
+		private:
+			static const std::string DATA_RESERVATION_POSSIBLE;
+			static const std::string DATA_RESERVATION_COMPULSORY;
+			static const std::string DATA_RESERVATION_MIN_DELAY_MINUTES;
+
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<PTUseRule>	Registry;
@@ -281,6 +287,22 @@ namespace synthese
 					ReservationRuleType type
 				);
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// PT Use rule CMS exporter.
+				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/
+				/// TODO Wiki page
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 	}

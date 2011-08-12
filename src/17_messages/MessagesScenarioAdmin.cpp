@@ -51,6 +51,8 @@
 #include "ScenarioFolder.h"
 #include "Profile.h"
 #include "RemoveObjectAction.hpp"
+#include "ImportableAdmin.hpp"
+#include "StaticActionRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -66,7 +68,7 @@ namespace synthese
 	using namespace messages;
 	using namespace security;
 	using namespace db;
-
+	using namespace impex;
 
 	namespace util
 	{
@@ -85,6 +87,7 @@ namespace synthese
 		const string MessagesScenarioAdmin::TAB_PARAMETERS("p");
 		const string MessagesScenarioAdmin::TAB_VARIABLES("v");
 		const string MessagesScenarioAdmin::TAB_LOG("l");
+		const string MessagesScenarioAdmin::TAB_DATASOURCES("s");
 
 		void MessagesScenarioAdmin::setFromParametersMap(
 			const ParametersMap& map
@@ -297,6 +300,16 @@ namespace synthese
 				_generalLogView.display(stream, AdminRequest(_request, true));
 			}
 
+			////////////////////////////////////////////////////////////////////
+			// TAB DATASOURCES
+			if (openTabContent(stream, TAB_DATASOURCES))
+			{
+				// Source id
+				StaticActionRequest<ScenarioSaveAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setScenarioId(_scenario->getKey());
+				ImportableAdmin::DisplayDataSourcesTab(stream, static_cast<const SentScenario&>(*_scenario), updateOnlyRequest);
+			}
+
 			closeTabContent(stream);
 		}
 
@@ -384,6 +397,11 @@ namespace synthese
 				_tabs.push_back(Tab("Variables", TAB_VARIABLES, true));
 			}
 			_tabs.push_back(Tab("Journal", TAB_LOG, true, "book.png"));
+
+			if(dynamic_cast<const SentScenario*>(_scenario.get()))
+			{
+				_tabs.push_back(Tab("Sources de données", TAB_DATASOURCES, true));
+			}
 
 			_tabBuilded = true;
 		}
