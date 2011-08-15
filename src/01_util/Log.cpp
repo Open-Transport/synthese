@@ -232,7 +232,7 @@ namespace synthese
 
 			(*_outputStream) << " # " << std::setfill ('0')
 				<< std::setw (4) << now.date().year() << "/"
-				<< std::setw (2) << now.date().month() << "/"
+				<< std::setw (2) << static_cast<int>(now.date().month()) << "/"
 				<< std::setw (2) << now.date().day() << " "
 				<< std::setw (2) << now.time_of_day().hours() << ":"
 				<< std::setw (2) << now.time_of_day().minutes() << ":"

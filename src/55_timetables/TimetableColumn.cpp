@@ -54,7 +54,8 @@ namespace synthese
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();
 			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
-			const Path::Edges& edges(service.getPath()->getEdges());
+
+			const Path::Edges& edges(service.getPath()->getAllEdges());
 			Path::Edges::const_iterator itEdge(edges.begin());
 			bool first(true);
 
@@ -140,8 +141,8 @@ namespace synthese
 								make_pair(
 									dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
 									((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
-										service.getDepartureBeginScheduleToIndex(false, itEdge2 - edges.begin()) :
-										service.getArrivalBeginScheduleToIndex(false, itEdge2 - edges.begin())
+										service.getDepartureBeginScheduleToIndex(false, (*itEdge2)->getRankInPath()) :
+										service.getArrivalBeginScheduleToIndex(false, (*itEdge2)->getRankInPath())
 							)	);
 							if (itEdge2 == edges.begin())
 								_originType = Terminus;
