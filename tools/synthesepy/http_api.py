@@ -52,6 +52,10 @@ class HTTPApi(object):
         if self.debug:
             logging.getLogger('mechanize').setLevel(logging.DEBUG)
 
+            h = urllib2.HTTPHandler(debuglevel=1)
+            opener = urllib2.build_opener(h)
+            urllib2.install_opener(opener)
+
     def _get_browser(self):
         if self.browser:
             return self.browser
@@ -104,11 +108,6 @@ class HTTPApi(object):
             params['sid'] = self._get_sid()
         post_data = urllib.urlencode(params)
         log.debug('Calling synthese with url %r, post_data %r', SYNTHESE_URL, post_data)
-
-        if self.debug:
-            h = urllib2.HTTPHandler(debuglevel=1)
-            opener = urllib2.build_opener(h)
-            urllib2.install_opener(opener)
 
         response = urllib2.urlopen(SYNTHESE_URL, post_data)
 

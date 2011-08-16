@@ -144,6 +144,8 @@ class Project(object):
 
     def __init__(self, path, env=None, config=None):
         self.path = os.path.normpath(os.path.abspath(path))
+        if not os.path.isdir(self.path):
+            raise Exception('No project can be found at %r' % self.path)
         self.env = env
         self.config = config
         if not config and env:
@@ -219,8 +221,9 @@ class Project(object):
                     self.config.default_site, site_ids))
             self.config.site_id = site_ids[0]
         if self.config.site_id <= 0:
-            self.config.site_id = [
-                s for s in self.sites if s.name != 'admin'][0].id
+            non_admin_sites = [s for s in self.sites if s.name != 'admin']
+            if len(non_admin_sites) > 0:
+                self.config.site_id = non_admin_sites[0].id
 
     def _clean_files(self):
         if self.UPDATE_HTDOCS:
