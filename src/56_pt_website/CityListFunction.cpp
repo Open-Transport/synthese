@@ -54,6 +54,7 @@ namespace synthese
 		const string CityListFunction::PARAMETER_ITEM_PAGE("item_page_id");
 		const string CityListFunction::PARAMETER_AT_LEAST_A_STOP("at_least_a_stop");
 		const string CityListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+		const string CityListFunction::PARAMETER_SRID("srid");
 
 		const std::string CityListFunction::DATA_RESULTS_SIZE("size");
 		const std::string CityListFunction::DATA_CONTENT("content");
@@ -82,6 +83,10 @@ namespace synthese
 			{
 				pm.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
+			if(_coordinatesSystem)
+			{
+				pm.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
+			}
 			return pm;
 		}
 
@@ -108,6 +113,11 @@ namespace synthese
 				throw RequestException("Number of result must be limited");
 			}
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			// Saved parameters cleaning if output is a fixed format
 			if(!_page.get() && !_itemPage.get())
@@ -199,7 +209,7 @@ namespace synthese
 			{
 				shared_ptr<ParametersMap> cityPm(new ParametersMap(request.getFunction()->getSavedParameters()));
 
-				it->toParametersMap(*cityPm);
+				it->toParametersMap(*cityPm, _coordinatesSystem);
 				cityPm->insert(DATA_RANK, i++);
 				// backward compatibility.
 				// TODO: check they are still used or could be removed.

@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_ITEM_PAGE;
 			static const std::string PARAMETER_AT_LEAST_A_STOP;
 			static const std::string PARAMETER_OUTPUT_FORMAT;
+			static const std::string PARAMETER_SRID;
 
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CONTENT;
@@ -77,6 +78,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
 			std::string _outputFormat;
+			const CoordinatesSystem* _coordinatesSystem;
 
 		protected:
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
