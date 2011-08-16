@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_CITY_H
 #define SYNTHESE_ENV_CITY_H
 
-
+#include "CoordinatesSystem.hpp"
 #include "Registry.h"
 #include "LexicalMatcher.h"
 #include "IncludingPlace.h"
@@ -67,6 +67,8 @@ namespace synthese
 		private:
 			static const std::string DATA_CITY_ID;
 			static const std::string DATA_CITY_NAME;
+			static const std::string DATA_CITY_X;
+			static const std::string DATA_CITY_Y;
 
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
 
@@ -171,6 +173,7 @@ namespace synthese
 				/// @date 2011
 				void toParametersMap(
 					util::ParametersMap& pm,
+					const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
 					const std::string& prefix = std::string()
 				) const;
 			//@}
