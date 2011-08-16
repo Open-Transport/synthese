@@ -26,9 +26,11 @@
 #include "ParametersMap.h"
 
 #include <assert.h>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -45,6 +47,10 @@ namespace synthese
 	{
 		const std::string City::DATA_CITY_ID("city_id");
 		const std::string City::DATA_CITY_NAME("city_name");
+		const std::string City::DATA_CITY_X("city_x");
+		const std::string City::DATA_CITY_Y("city_y");
+
+
 
 		City::City(
 			RegistryKeyType key,
@@ -126,10 +132,13 @@ namespace synthese
 			return _allPlacesMatcher;
 		}
 
+
+
 		const City::PlacesMatcher& City::getAllPlacesMatcher() const
 		{
 			return _allPlacesMatcher;
 		}
+
 
 
 		City::PlacesMatcher& City::getLexicalMatcher(
@@ -153,10 +162,31 @@ namespace synthese
 
 		void City::toParametersMap(
 			ParametersMap& pm,
+			const CoordinatesSystem* coordinatesSystem,
 			const string& prefix
 		) const {
+			// Id
 			pm.insert(prefix + DATA_CITY_ID, getKey());
+
+			// Name
 			pm.insert(prefix + DATA_CITY_NAME, getName());
+
+			// X and Y
+			if(coordinatesSystem && getPoint())
+			{
+				shared_ptr<Point> center(
+					coordinatesSystem->convertPoint(*getPoint())
+				);
+				{
+					stringstream s;
+					s << std::fixed << center->getX();
+					pm.insert(prefix + DATA_CITY_X, s.str());
+				}
+				{
+					stringstream s;
+					s << std::fixed << center->getY();
+					pm.insert(prefix + DATA_CITY_Y, s.str());
+				}
+			}
 		}
-	}
-}
+}	}
