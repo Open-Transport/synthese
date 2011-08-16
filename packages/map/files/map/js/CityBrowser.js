@@ -16,7 +16,8 @@ var CityCollection = Backbone.Collection.extend({
 
 
 var CitySelectorModel = Backbone.Model.extend({
-  initialize: function() {
+  initialize: function(options) {
+    this.mapSRID = options.mapSRID;
     this.cities = new CityCollection();
     this.cities.selector = this;
 
@@ -62,7 +63,8 @@ var CitySelectorModel = Backbone.Model.extend({
         n: 9999,
         at_least_a_stop: 1,
         si: Synthese.siteId,
-        output_format: "json"
+        output_format: "json",
+        srid: self.mapSRID
       }).then(function(json) {
         // Result can be an array or object due to this issue:
         // https://188.165.247.81/issues/10786
@@ -74,6 +76,8 @@ var CitySelectorModel = Backbone.Model.extend({
           return {
             id: jsonCity.city_id,
             name: jsonCity.city_name,
+            x: parseFloat(jsonCity.city_x),
+            y: parseFloat(jsonCity.city_y),
             sortName: getCitySortName(jsonCity.city_name)
           };
         }));
@@ -377,7 +381,20 @@ window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
 
     this.stopsLayer.protocol = new StopsProtocol();
 
+    // Below this zoom level (included), we show a message that zooming in is
+    // required.
     var MIN_ZOOM = 11;
+    // Use a larger value with IE7 which has performance issues when there are
+    // many vector objects.
+    if (jQuery.browser.msie && parseInt(jQuery.browser.version) <= 7)
+      MIN_ZOOM = 14;
+
+    this.stopsLayer.styleMap.styles["default"].context.getDisplay = function(feature) {
+      var zoom = feature.layer.map.getZoom();
+      if (zoom <= MIN_ZOOM)
+        return "none";
+      return "";
+    }
 
     var strategy = new MinZoomBBOXStrategy({
       minZoom: MIN_ZOOM
@@ -411,22 +428,20 @@ window.CityBrowser = Backbone.View.extend({
   initialize: function(options) {
     _.bindAll(this, "zoomRequired", "citySelected", "cityNotFound", "showMessage", "onError");
 
-    this.cityExtentCache = {};
-
     this.initTranslations();
 
-    this.citySelectorModel = new CitySelectorModel();
+    var mapClass = options.mapClass || CityBrowserMap;
+    this.syntheseMap = new mapClass(null, options.mapOptions);
+    this.syntheseMap.onError = _.bind(this.onError, this);
+    this.syntheseMap.bind("zoomRequired", this.zoomRequired)
+
+    this.citySelectorModel = new CitySelectorModel({mapSRID: this.syntheseMap.MAP_SRID});
     this.citySelectorView = new CitySelectorView({model: this.citySelectorModel});
 
     this.citySelectorModel.bind("citySelected", this.citySelected);
     this.citySelectorModel.bind("cityNotFound", this.cityNotFound);
     this.citySelectorModel.bind("error", this.onError);
     this.citySelectorModel.bind("message", this.showMessage);
-
-    var mapClass = options.mapClass || CityBrowserMap;
-    this.syntheseMap = new mapClass(null, options.mapOptions);
-    this.syntheseMap.onError = _.bind(this.onError, this);
-    this.syntheseMap.bind("zoomRequired", this.zoomRequired)
 
     this.render();
 
@@ -466,28 +481,6 @@ window.CityBrowser = Backbone.View.extend({
     this.$(".zoomRequiredMessage")[required ? "fadeIn" : "fadeOut"]();
   },
 
-  getCityExtent: function(cityId) {
-    var self = this;
-
-    if (this.cityExtentCache[cityId]) {
-      return $.Deferred(function(dfd) {
-        dfd.resolve(self.cityExtentCache[cityId]);
-      }).promise();
-    }
-
-    return this.syntheseMap.fetchStops({cityId: cityId}).pipe(function(stopFeatures) {
-      if (stopFeatures.length == 0)
-        return null;
-
-      var extent = new OpenLayers.Bounds();
-      _.each(stopFeatures, function(stopFeature) {
-        extent.extend(stopFeature.geometry);
-      });
-
-      return self.cityExtentCache[cityId] = extent;
-    });
-  },
-
   showMessage: function(message) {
     this.$(".loadingMessage").text(OpenLayers.i18n(message)).fadeIn();
   },
@@ -507,12 +500,9 @@ window.CityBrowser = Backbone.View.extend({
   citySelected: function(city) {
     var self = this;
 
-    var dfd = this.getCityExtent(city.get("id"));
-    this.showPendingMessage(dfd, "processing");
-    dfd.done(function(extent) {
-      if (extent)
-        self.syntheseMap.map.zoomToExtent(extent);
-    });
+    var map = this.syntheseMap.map;
+    var center = new OpenLayers.LonLat(city.get("x"), city.get("y"));
+    map.setCenter(center, this.options.cityRecenterZoomLevel || 15);
   },
 
   cityNotFound: function() {
