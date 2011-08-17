@@ -138,6 +138,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
+		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION("max_transfer_duration");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -254,6 +255,10 @@ namespace synthese
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			if(_maxTransferDuration)
+			{
+				map.insert(PARAMETER_MAX_TRANSFER_DURATION, _maxTransferDuration->total_seconds() / 60);
+			}
 			return map;
 		}
 
@@ -268,6 +273,11 @@ namespace synthese
 
 			_outputRoadApproachDetail = site->getDisplayRoadApproachDetail();
 
+			// Max transfer duration
+			if(map.isDefined(PARAMETER_MAX_TRANSFER_DURATION))
+			{
+				_maxTransferDuration = minutes(map.get<int>(PARAMETER_MAX_TRANSFER_DURATION));
+			}
 
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
@@ -735,7 +745,9 @@ namespace synthese
 				_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
 				_accessParameters,
 				DEPARTURE_FIRST,
-				false
+				false,
+				NULL,
+				_maxTransferDuration
 			);
 
 			// Computing

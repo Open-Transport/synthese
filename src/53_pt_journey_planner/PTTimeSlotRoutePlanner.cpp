@@ -61,7 +61,8 @@ namespace synthese
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
 			bool ignoreReservation,
-			std::ostream* logStream
+			std::ostream* logStream,
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, PTModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -79,7 +80,8 @@ namespace synthese
 				planningOrder,
 				100,
 				ignoreReservation,
-				logStream
+				logStream,
+				maxTransferDuration
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -330,7 +332,8 @@ namespace synthese
 					_planningOrder,
 					100,
 					_ignoreReservation,
-					_logStream
+					_logStream,
+					_maxTransferDuration
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -353,7 +356,8 @@ namespace synthese
 					_planningOrder,
 					100,
 					_ignoreReservation,
-					_logStream
+					_logStream,
+					_maxTransferDuration
 				);
 				return PTRoutePlannerResult(
 					_departurePlace,
@@ -363,5 +367,4 @@ namespace synthese
 				);
 			}
 		}
-	}
-}
+}	}

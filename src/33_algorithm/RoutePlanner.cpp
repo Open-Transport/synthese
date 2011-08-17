@@ -68,7 +68,8 @@ namespace synthese
 			double vmax,
 			bool ignoreReservation,
 			std::ostream* logStream /*= NULL*/,
-			boost::optional<const JourneyTemplates&> journeyTemplates
+			boost::optional<const JourneyTemplates&> journeyTemplates,
+			const optional<time_duration>	maxTransferDuration
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_planningOrder(planningOrder),
@@ -87,7 +88,8 @@ namespace synthese
 			),
 			_journeyTemplates(journeyTemplates),
 			_vmax(vmax),
-			_ignoreReservation(ignoreReservation)
+			_ignoreReservation(ignoreReservation),
+			_maxTransferDuration(maxTransferDuration)
 		{
 		}
 
@@ -305,7 +307,6 @@ namespace synthese
 						bestEndTime = result.getEndTime();
 					}
 
-
 					if (va.approachTime.total_seconds() == 0)
 					{
 						todo.remove(it->first);
@@ -316,6 +317,7 @@ namespace synthese
 
 				if(resultFound)
 				{
+					// Removes useless branches according to the new result
 					todo.cleanup(
 						lastBestEndTime != bestEndTime,
 						bestEndTime,
@@ -326,6 +328,7 @@ namespace synthese
 					);
 				}
 
+				// End of the algorithm
 				if(todo.empty())
 				{
 					break;
@@ -336,8 +339,8 @@ namespace synthese
 					logger->recordCleanup(todo);
 				}
 
+				// Recursion from the next reached point
 				lastBestEndTime = bestEndTime;
-
 				shared_ptr<const RoutePlanningIntermediateJourney> journey(todo.front());
 
 				is.integralSearch(
@@ -349,7 +352,8 @@ namespace synthese
 							accessDirection == DEPARTURE_TO_ARRIVAL ?
 							result.getFirstDepartureTime() - originDateTime :
 							originDateTime - result.getFirstDepartureTime()
-						)
+						),
+					_maxTransferDuration
 				);
 
 			}
