@@ -35,11 +35,11 @@ var CitySelectorModel = Backbone.Model.extend({
     // Until then, we retrieve all cities and filter from that.
 
     function removeAccents(string) {
-      return string.replace(/[àâä]/gi,"a")
-        .replace(/[éèêë]/gi,"e")
-        .replace(/[îï]/gi,"i")
-        .replace(/[ôö]/gi,"o")
-        .replace(/[ùûü]/gi,"u")
+      return string.replace(/[àâä]/gi, "a")
+        .replace(/[éèêë]/gi, "e")
+        .replace(/[îï]/gi, "i")
+        .replace(/[ôö]/gi, "o")
+        .replace(/[ùûü]/gi, "u")
     }
 
     // Returns the name of the city used for sorting and filtering.
@@ -139,7 +139,7 @@ var CitySelectorModel = Backbone.Model.extend({
       if (!cityName)
         return null;
       realCityName = cityName;
-      return self.showStartingWith(realCityName[0]);
+      return self.showStartingWith(realCityName.charAt(0));
 
     }, function() {
       self.trigger("error", "Error while fetching city");
