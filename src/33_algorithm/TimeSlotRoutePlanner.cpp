@@ -54,7 +54,8 @@ namespace synthese
 			PlanningOrder planningOrder,
 			double vmax,
 			bool ignoreReservation,
-			std::ostream* logStream
+			std::ostream* logStream,
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(lowerDepartureTime),
@@ -70,7 +71,8 @@ namespace synthese
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
 			_logStream(logStream),
-			_ignoreReservation(ignoreReservation)
+			_ignoreReservation(ignoreReservation),
+			_maxTransferDuration(maxTransferDuration)
 		{
 		}
 
@@ -88,7 +90,8 @@ namespace synthese
 			const PlanningOrder planningOrder,
 			double vmax,
 			bool ignoreReservation,
-			std::ostream* logStream
+			std::ostream* logStream,
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
 			_lowestDepartureTime(continuousService.getFirstDepartureTime()),
@@ -109,7 +112,8 @@ namespace synthese
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
 			_logStream(logStream),
-			_ignoreReservation(ignoreReservation)
+			_ignoreReservation(ignoreReservation),
+			_maxTransferDuration(maxTransferDuration)
 		{
 		}
 
@@ -169,7 +173,8 @@ namespace synthese
 					_vmax,
 					_ignoreReservation,
 					_logStream,
-					_journeyTemplates
+					_journeyTemplates,
+					_maxTransferDuration
 				);
 				Journey journey(r.run());
 
@@ -190,7 +195,8 @@ namespace synthese
 						_planningOrder,
 						_vmax,
 						_ignoreReservation,
-						_logStream
+						_logStream,
+						_maxTransferDuration
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));
 
@@ -328,5 +334,4 @@ namespace synthese
 
 			return result;
 		}
-	}
-}
+}	}

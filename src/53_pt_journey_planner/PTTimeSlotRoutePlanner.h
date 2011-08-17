@@ -110,7 +110,8 @@ namespace synthese
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
 				bool								ignoreReservation,
-				std::ostream* logStream = NULL
+				std::ostream* logStream = NULL,
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
 			PTRoutePlannerResult run() const;

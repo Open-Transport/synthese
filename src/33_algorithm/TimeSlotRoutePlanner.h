@@ -67,6 +67,7 @@ namespace synthese
 				const graph::Journey				_parentContinuousService;
 				double								_vmax;
 				bool								_ignoreReservation;
+				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
 			//@}
 
 			//! @name Logging
@@ -101,7 +102,8 @@ namespace synthese
 				PlanningOrder					planningOrder,
 				double							vmax,
 				bool							ignoreReservation,
-				std::ostream* logStream = NULL
+				std::ostream* logStream = NULL,
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
 
@@ -128,7 +130,8 @@ namespace synthese
 				PlanningOrder					planningOrder,
 				double						vmax,
 				bool							ignoreReservation,
-				std::ostream* logStream = NULL
+				std::ostream* logStream = NULL,
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
 			//! @name Getters
