@@ -194,7 +194,8 @@ namespace synthese
 			void integralSearch(
 				const RoutePlanningIntermediateJourney& startJourney,
 				boost::optional<std::size_t> maxDepth,
-				boost::optional<boost::posix_time::time_duration> totalDuration
+				boost::optional<boost::posix_time::time_duration> totalDuration,
+				boost::optional<boost::posix_time::time_duration> maxTransferWaitingTime
 			);
 
 

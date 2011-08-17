@@ -139,6 +139,7 @@ namespace synthese
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_SHOW_COORDINATES;
+			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 
 		private:
 			static const std::string DATA_LINES;
@@ -288,6 +289,7 @@ namespace synthese
 				bool										_outputRoadApproachDetail;
 				bool _showResTab;
 				bool _showCoords;
+				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 			//@}
 
 			//! @name Pages

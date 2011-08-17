@@ -129,7 +129,8 @@ namespace synthese
 		void IntegralSearcher::integralSearch(
 			const RoutePlanningIntermediateJourney& startJourney,
 			optional<std::size_t> maxDepth,
-			boost::optional<boost::posix_time::time_duration> totalDuration
+			boost::optional<boost::posix_time::time_duration> totalDuration,
+			boost::optional<boost::posix_time::time_duration> maxTransferWaitingTime
 		){
 			VertexAccessMap vam;
 			startJourney.getEndEdge().getHub()->getVertexAccessMap(
@@ -138,11 +139,37 @@ namespace synthese
 				*startJourney.getEndEdge().getFromVertex(),
 				_accessDirection == DEPARTURE_TO_ARRIVAL
 			);
+
+			// Time at origin
+			ptime desiredTime(startJourney.getEndTime(false));
+
+			// Worse time at origin
+			ptime minMaxDateTimeAtOrigin(_minMaxDateTimeAtDestination);
+			if(maxTransferWaitingTime)
+			{
+				if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+				{
+					ptime maxTransferTime(minMaxDateTimeAtOrigin = desiredTime + *maxTransferWaitingTime);
+					if(maxTransferTime < _minMaxDateTimeAtDestination)
+					{
+						minMaxDateTimeAtOrigin = maxTransferTime;
+					}
+				}
+				else
+				{
+					ptime minTransferTime(minMaxDateTimeAtOrigin = desiredTime - *maxTransferWaitingTime);
+					if(minTransferTime > _minMaxDateTimeAtDestination)
+					{
+						minMaxDateTimeAtOrigin = minTransferTime;
+					}
+				}
+			}
+
 			_integralSearch(
 				vam,
 				startJourney,
-				startJourney.getEndTime(false),
-				_minMaxDateTimeAtDestination,
+				desiredTime,
+				minMaxDateTimeAtOrigin,
 				maxDepth,
 				totalDuration
 			);

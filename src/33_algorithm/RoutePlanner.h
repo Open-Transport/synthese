@@ -104,9 +104,10 @@ namespace synthese
 				const boost::posix_time::ptime&				_maxEndTime;
 				const graph::GraphIdType			_whatToSearch;
 				const graph::GraphIdType			_graphToUse;
-				boost::optional<const JourneyTemplates&> _journeyTemplates;
+				const boost::optional<const JourneyTemplates&> _journeyTemplates;
 				const double						_vmax;
 				bool								_ignoreReservation;
+				boost::optional<boost::posix_time::time_duration>	_maxTransferDuration;
 			//@}
 
 			//! @name Logging
@@ -139,7 +140,7 @@ namespace synthese
 				const boost::posix_time::ptime& maxMinDateTimeAtOrigin,
 				const boost::posix_time::ptime& maxMinDateTimeAtDestination,
 				bool secondTime,
-				boost::optional<boost::posix_time::time_duration> maxDuration
+				const boost::optional<boost::posix_time::time_duration> maxDuration
 			);
 
 
@@ -169,7 +170,8 @@ namespace synthese
 				double						vmax,
 				bool						ignoreReservation,
 				std::ostream* logStream = NULL,
-				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>()
+				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>(),
+				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
 
