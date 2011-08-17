@@ -49,7 +49,7 @@ and rerun cmake to update the project.
 """
 
 import logging
-from optparse import OptionParser
+import optparse
 import os
 from os.path import join
 import subprocess
@@ -120,7 +120,7 @@ def add_source(module_name, source_filename, options):
 
 if __name__ == '__main__':
     usage = 'usage: %prog [options] MODULE_NAME SOURCE_FILENAME'
-    parser = OptionParser(usage=usage)
+    parser = optparse.OptionParser(usage=usage)
 
     parser.add_option('-v', '--verbose', action='store_true',
          default=False, help='Print debug logging')
