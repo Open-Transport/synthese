@@ -117,6 +117,7 @@ add_subdirectory(src)
 add_subdirectory(packages)
 add_subdirectory(tools)
 add_subdirectory(test)
+add_subdirectory(utils)
 
 # build a CPack driven installer package
 #include(InstallRequiredSystemLibraries)
