@@ -56,7 +56,7 @@ class Request(object):
         self.data = data
 
     def __repr__(self):
-        return "<Request %s>" % self.__dict__
+        return '<Request %s>' % self.__dict__
 
 
 class Dispatcher(object):
@@ -67,17 +67,17 @@ class Dispatcher(object):
     def loop(self):
         while not self.stop:
             request = queue.get()
-            log.info("Dispatching request: %s (%i left)", request, queue.qsize())
-            if request == "stop":
-                log.info("Stop request, exitting dispatcher")
+            log.info('Dispatching request: %s (%i left)', request, queue.qsize())
+            if request == 'stop':
+                log.info('Stop request, exiting dispatcher')
                 break
             try:
                 res = urllib2.urlopen(TARGET_URL + request.path, request.data, TIMEOUT)
             except urllib2.URLError, e:
-                log.warn("Exception while dispatching request %s: %s", request, e)
+                log.warn('Exception while dispatching request %s: %s', request, e)
                 continue
             if res.code != 200:
-                log.warn("Didn't get 200 code reply to request: %s", request)
+                log.warn('Didn\'t get 200 code reply to request: %s', request)
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -85,18 +85,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self._handle_request()
 
     def do_POST(self):
-        post_data = self.rfile.read(int(self.headers["content-length"]))
+        post_data = self.rfile.read(int(self.headers['content-length']))
         self._handle_request(post_data)
 
     def _handle_request(self, post_data=None):
-        log.info("Got request %s %s %s (queue size: %i)",
+        log.info('Got request %s %s %s (queue size: %i)',
             self.command, self.path, post_data, queue.qsize())
 
-        if self.path == "/status":
-            response = "Queue size: %i\n" % queue.qsize()
+        if self.path == '/status':
+            response = 'Queue size: %i\n' % queue.qsize()
         else:
             queue.put(Request(self.command, self.path, post_data))
-            response = "Dummy response\n"
+            response = 'Dummy response\n'
 
         self.send_response(200)
         self.end_headers()
@@ -136,21 +136,21 @@ def main():
     server_address = ('', LISTENING_PORT)
     httpd = StoppableHTTPServer(server_address, RequestHandler)
     threading.Thread(target=httpd.serve_forever).start()
-    log.info("Dispatcher and http server started on port %i", LISTENING_PORT)
+    log.info('Dispatcher and http server started on port %i', LISTENING_PORT)
     try:
         while True:
             time.sleep(5)
     except KeyboardInterrupt, e:
-        log.info("Keyboard interrupt, terminating...")
+        log.info('Keyboard interrupt, terminating...')
         httpd.stop = True
         dispatcher.stop = True
         try:
-            urllib2.urlopen("http://localhost:%i" % LISTENING_PORT, None, 2)
+            urllib2.urlopen('http://localhost:%i' % LISTENING_PORT, None, 2)
         except Exception, e:
             pass
         while not queue.empty():
             queue.get_nowait()
-        queue.put("stop")
+        queue.put('stop')
 
 
 class UDFProxyDaemon(daemon.Daemon):
@@ -165,7 +165,7 @@ if __name__ == '__main__':
     parser.add_option('-v', '--verbose', action='store_true',
          default=False, help='Print debug logging')
     parser.add_option('-n', '--no-daemon', action='store_true',
-         default=False, help="Don't daemonize and print logs to stderr")
+         default=False, help='Don\'t daemonize and print logs to stderr')
     parser.add_option('-p', '--port', type='int',
          default=9080, help='Proxy listening port')
     parser.add_option('-t', '--target-url',
@@ -186,8 +186,8 @@ if __name__ == '__main__':
     command = args[0]
 
     if options.no_daemon or sys.platform == 'win32':
-        if command != "start":
-            raise Exception("Without daemon, only start is allowed")
+        if command != 'start':
+            raise Exception('Without daemon, only start is allowed')
         main()
         sys.exit(0)
 
@@ -200,6 +200,6 @@ if __name__ == '__main__':
     elif 'restart' == command:
         daemon.restart()
     else:
-        print "Unknown command"
+        print 'Unknown command'
         sys.exit(2)
     sys.exit(0)
