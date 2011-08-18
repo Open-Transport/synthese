@@ -149,7 +149,7 @@ class Config(object):
             utils.netstat_cmd = self.netstat_cmd
 
         utils.dummy = self.dummy
-        
+
         # Convert log level to int
         try:
             self.log_level = int(self.log_level)
