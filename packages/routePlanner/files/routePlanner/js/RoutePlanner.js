@@ -19,7 +19,6 @@ var RoutePlannerView = Backbone.View.extend({
     };
 
     this.$(".mapLink").show();
-    
 
     // Init form values
     // FIXME: this won't work if the form is posted.
