@@ -60,6 +60,9 @@ class DBBackend(object):
 
     def query(self, query, args=(), one=False):
         """Queries the database and returns a list of dictionaries."""
+        # Hack for MySQL
+        if self.paramstyle == 'format':
+            query = query.replace('?', '%s')
         with self.get_cursor() as cursor:
             cursor.execute(query, args)
             rv = [dict((cursor.description[idx][0], value)
@@ -131,25 +134,25 @@ class SQLiteBackend(DBBackend):
             self.sqlite_file = os.path.join(
                 self.env.daemon_launch_path,
                 'config.db3')
+        self.paramstyle = sqlite3.paramstyle
         log.debug('Sqlite file: %s', self.sqlite_file)
 
     def get_connection(self, spatialite=False):
+        db_module = sqlite3
         if spatialite:
             # We need a sqlite library compiled with module loading capability.
             # One option is to recompile pysqlite2 without the
             # 'define=SQLITE_OMIT_LOAD_EXTENSION' line commented in setup.cfg
             import pysqlite2.dbapi2
+            db_module = pysqlite2.dbapi2
 
-            assert os.path.isfile(self.sqlite_file)
-            conn = pysqlite2.dbapi2.connect(self.sqlite_file)
+        assert os.path.isfile(self.sqlite_file)
 
+        conn = db_module.connect(self.sqlite_file)
+        if spatialite:
             conn.enable_load_extension(True)
             # TODO: this shouldn't be hardcoded.
             conn.execute("SELECT load_extension('/usr/lib/libspatialite.so.2.1.0')")
-            return conn
-
-        assert os.path.isfile(self.sqlite_file)
-        conn = sqlite3.connect(self.sqlite_file)
         return conn
 
     def _create_db(self):
@@ -197,6 +200,10 @@ class SQLiteBackend(DBBackend):
 
 class MySQLBackend(DBBackend):
     name = 'mysql'
+
+    def __init__(self, *args, **kwargs):
+        super(MySQLBackend, self).__init__(*args, **kwargs)
+        self.paramstyle = MySQLdb.paramstyle
 
     def get_connection(self, select_db=True):
         args = {
