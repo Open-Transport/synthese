@@ -215,7 +215,7 @@ class CMakeBuilder(Builder):
         }
         self.tool = PLATFORM_TO_TOOL[self.env.platform]
 
-    def _check_debian_package_requirements(self):
+    def check_debian_package_requirements(self, required_packages):
         if self.env.platform != 'lin':
             return
 
@@ -223,6 +223,19 @@ class CMakeBuilder(Builder):
             log.info('Non Debian system, not checking required packages')
             return
 
+        to_install = [p for p in required_packages if
+            subprocess.call(
+                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
+                shell=True, stdout=subprocess.PIPE)]
+        if not to_install:
+            return
+
+        log.info('You must install the following packages to continue: %s. '
+            'That can be done with the command:' % to_install)
+        log.info('apt-get install %s', ' '.join(to_install))
+        sys.exit(1)
+
+    def _check_debian_build_packages(self):
         required_packages = 'g++ python-dev make'.split()
 
         required_packages.extend(
@@ -233,17 +246,7 @@ class CMakeBuilder(Builder):
             required_packages.extend(
                 ['libmysqlclient-dev', 'libcurl4-openssl-dev'])
 
-        to_install = [p for p in required_packages if
-            subprocess.call(
-                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
-                shell=True, stdout=subprocess.PIPE)]
-        if not to_install:
-            return
-
-        log.info('You must install the following packages to continue: %s. '
-            'That can be done with the command:')
-        log.info('apt-get install %s', ' '.join(to_install))
-        sys.exit(1)
+        self.check_debian_package_requirements(required_packages)
 
     def _install_cmake(self):
         self.cmake_path = None
@@ -355,7 +358,7 @@ class CMakeBuilder(Builder):
         shutil.copy(join(self.download_cache_dir, fname), target)
 
     def install_prerequisites(self):
-        self._check_debian_package_requirements()
+        self._check_debian_build_packages()
 
         self._install_cmake()
         log.debug('Cmake path: %s', self.cmake_path)

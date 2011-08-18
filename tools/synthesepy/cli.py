@@ -34,6 +34,7 @@ import synthesepy.config
 import synthesepy.continuous_integration
 import synthesepy.daemon
 import synthesepy.db_backends
+import synthesepy.doxygen
 import synthesepy.env
 import synthesepy.proxy
 import synthesepy.sqlite_to_mysql
@@ -84,6 +85,8 @@ class AliasedSubParsersAction(argparse._SubParsersAction):
 def build(args, env):
     synthesepy.build.build(env, args.build_func)
 
+def doxygen(args, env):
+    synthesepy.doxygen.run(env, args)
 
 def runtests(args, env):
     tester = synthesepy.test.Tester(env)
@@ -203,6 +206,10 @@ def add_default_subparsers(subparsers):
         'running tests')
     parser_ide.set_defaults(func=build)
     parser_ide.set_defaults(build_func='ide')
+
+    parser_doxygen = subparsers.add_parser(
+        'doxygen', help='Generate Doxygen documentation')
+    parser_doxygen.set_defaults(func=doxygen)
 
     parser_runtests = subparsers.add_parser(
         'runtests', help='Run unit tests')

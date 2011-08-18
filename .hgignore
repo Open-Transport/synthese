@@ -19,6 +19,8 @@
 \.vcproj$
 \.vcproj.*user$
 ^utils/diff/src/synthese-diff.phpproj$
+^utils/udf_proxy/udf_proxy.pid$
+^utils/udf_proxy/logs\.txt.*$
 ^3rd/dev/geos/capi/geos_c.h$
 ^3rd/dev/geos/src/headers/geos/platform.h$
 ^3rd/dev/geos/src/headers/geos/version.h$
