@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+
+<!--[if lt IE 7 ]><html class="ie ie6"> <![endif]-->
+<!--[if IE 7 ]><html class="ie ie7"> <![endif]-->
+<!--[if IE 8 ]><html class="ie ie8"> <![endif]-->
+<!--[if (gte IE 9)|!(IE)]><!--> <html> <!--<![endif]-->
+<head>
+<title>News Ticker Démo</title>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+<link rel="stylesheet" href="/core/css/newsTicker.css">
+<style>
+
+#actu-reseau, #mobility {
+    height: 156px;
+}
+
+#actu-reseau {
+    float: left;
+    border: 0 none;
+    font-size: 10px;
+    width: 230px;
+    line-height: 15px;
+    margin: 10px 5px 8px 0;
+    text-decoration: none;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -khtml-border-radius: 5px;
+    border-radius: 5px;
+    padding: 10px;
+    background-color: #cbcea0;
+    text-align: left;
+}
+
+#actu-reseau ul {
+    margin: 0;
+    padding: 0;
+}
+#actu-reseau li {
+    padding: 0 0 0 14px;
+    line-height: 1.2em;
+    margin: 0 0 5px 0;
+    font-size: 12px;
+}
+#actu-reseau a:hover {
+    color: white;
+    text-decoration: none;
+}
+
+#menu-actualite {
+    float: left;
+    width: 257px;
+    height: 179px;
+    text-align: left;
+    margin-right: 15px;
+    margin-left: -5px;
+    padding-top: 15px;
+}
+
+
+</style>
+
+  </head>
+  <body>
+
+    <div id="actu-reseau">
+      <h2><a href="/actus">Actualités des réseaux</a></h2>
+      <div class="newsTicker">
+        <div class="itemsContainer">
+          <ul>
+            <li><a href="/" >1 Lorem ipsum dolor sit amet</a></li>
+            <li><a href="/" >2 Nunc elementum, massa eu bibendum</a></li>
+            <li><a href="/" >3 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
+            <li><a href="/" >4 rhoncus mi vehicula non. Nullam a</a></li>
+            <li><a href="/" >5 aliquam mauris ornare. Lorem ipsum dolor</a></li>
+            <li><a href="/" >6 Nunc elementum, massa eu bibendum</a></li>
+            <li><a href="/" >7 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
+          </ul>
+        </div>
+        <div class="navigation">
+          <a href="#" class="prevLink">Préc.</a>
+          <span class="curIndex">N</span>/<span class="total">T</span>
+          <a href="#" class="nextLink">Suiv.</a>
+        </div>
+      </div>
+    </div>
+
+
+
+  <!-- Release versions -->
+  <!--
+  <script src="/core/vendor/jquery-1.6.2.min.js"></script>
+  <script src="/core/vendor/jquery.tmpl.beta1.min.js"></script>
+  <script src="/core/vendor/underscore-1.1.6.min.js"></script>
+  <script src="/core/vendor/backbone-0.5.1.min.js"></script>
+  <script src="/map/vendor/OpenLayers/OpenLayers.js"></script>
+  -->
+
+  <!-- Debug versions -->
+  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
+
+  <script src="/core/vendor/jquery-1.6.2.js"></script>
+  <script src="/core/vendor/jquery.tmpl.beta1.js"></script>
+  <script src="/core/vendor/underscore-1.1.6.js"></script>
+  <script src="/core/vendor/backbone-0.5.1.js"></script>
+
+  <script src="/core/js/NewsTicker.js"></script>
+
+  <script>
+
+  var newsTicker = new NewsTickerView({
+    el: $(".newsTicker")[0]
+  });
+  </script>
+
+ </body>
+</html>
