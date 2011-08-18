@@ -32,7 +32,13 @@ import Queue
 import SimpleHTTPServer
 import sys
 import threading
+import time
 import urllib2
+
+thisdir = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(0, join(thisdir, 'third_party'))
+
+import daemon
 
 log = logging.getLogger(__name__)
 queue = Queue.Queue()
@@ -55,12 +61,16 @@ class Request(object):
 
 class Dispatcher(object):
     def __init__(self):
+        self.stop = False
         threading.Thread(target=self.loop).start()
 
     def loop(self):
-        while True:
+        while not self.stop:
             request = queue.get()
             log.info("Dispatching request: %s (%i left)", request, queue.qsize())
+            if request == "stop":
+                log.info("Stop request, exitting dispatcher")
+                break
             try:
                 res = urllib2.urlopen(TARGET_URL + request.path, request.data, TIMEOUT)
             except urllib2.URLError, e:
@@ -81,20 +91,35 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def _handle_request(self, post_data=None):
         log.info("Got request %s %s %s (queue size: %i)",
             self.command, self.path, post_data, queue.qsize())
-        queue.put(Request(self.command, self.path, post_data))
+
+        if self.path == "/status":
+            response = "Queue size: %i\n" % queue.qsize()
+        else:
+            queue.put(Request(self.command, self.path, post_data))
+            response = "Dummy response\n"
 
         self.send_response(200)
         self.end_headers()
-        self.wfile.write("Dummy response")
+        self.wfile.write(response)
 
     def log_message(self, format, *args):
         if VERBOSE:
             BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
 
+class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
+  """This is a specialization of of BaseHTTPServer to allow it
+  to be exited cleanly (by setting its "stop" member to True).
+  
+  Stolen from http://src.chromium.org/git/chromium.git/net/tools/testserver/testserver.py
+  """
+
+  def serve_forever(self):
+    self.stop = False
+    while not self.stop:
+        self.handle_request()
+    self.socket.close()
 
 def main():
-    thisdir = os.path.abspath(os.path.dirname(__file__))
-
     log_file = join(thisdir, 'logs.txt')
     with open(log_file, 'wb') as f:
         f.write('')
@@ -104,21 +129,43 @@ def main():
         '%(asctime)s %(levelname)-10s %(message)s'))
     handler.setLevel(logging.INFO)
     log.addHandler(handler)
-    if log.level > logging.INFO:
-        log.setLevel(logging.INFO)
+    # XXX why is this needed?
+    log.setLevel(logging.DEBUG if VERBOSE else logging.INFO)
 
     dispatcher = Dispatcher()
     server_address = ('', LISTENING_PORT)
-    httpd = BaseHTTPServer.HTTPServer(server_address, RequestHandler)
-    httpd.serve_forever()
+    httpd = StoppableHTTPServer(server_address, RequestHandler)
+    threading.Thread(target=httpd.serve_forever).start()
+    log.info("Dispatcher and http server started on port %i", LISTENING_PORT)
+    try:
+        while True:
+            time.sleep(5)
+    except KeyboardInterrupt, e:
+        log.info("Keyboard interrupt, terminating...")
+        httpd.stop = True
+        dispatcher.stop = True
+        try:
+            urllib2.urlopen("http://localhost:%i" % LISTENING_PORT, None, 2)
+        except Exception, e:
+            pass
+        while not queue.empty():
+            queue.get_nowait()
+        queue.put("stop")
+
+
+class UDFProxyDaemon(daemon.Daemon):
+    def run(self):
+        main()
 
 
 if __name__ == '__main__':
-    usage = 'usage: %prog [options] MODULE_NAME SOURCE_FILENAME'
+    usage = 'usage: %prog [options] start|stop|restart'
     parser = optparse.OptionParser(usage=usage)
 
     parser.add_option('-v', '--verbose', action='store_true',
          default=False, help='Print debug logging')
+    parser.add_option('-n', '--no-daemon', action='store_true',
+         default=False, help="Don't daemonize and print logs to stderr")
     parser.add_option('-p', '--port', type='int',
          default=9080, help='Proxy listening port')
     parser.add_option('-t', '--target-url',
@@ -126,7 +173,7 @@ if __name__ == '__main__':
          help='URL where to forward requests')
 
     (options, args) = parser.parse_args()
-    if len(args) != 0:
+    if len(args) != 1:
         parser.print_help()
         sys.exit(1)
 
@@ -134,6 +181,25 @@ if __name__ == '__main__':
     TARGET_URL = options.target_url
     VERBOSE = options.verbose
 
-    logging.basicConfig(level=(logging.DEBUG if options.verbose else
-                               logging.INFO))
-    main()
+    if options.no_daemon:
+        logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)
+    command = args[0]
+
+    if options.no_daemon or sys.platform == 'win32':
+        if command != "start":
+            raise Exception("Without daemon, only start is allowed")
+        main()
+        sys.exit(0)
+
+    pid_file = join(thisdir, 'udf_proxy.pid')
+    daemon = UDFProxyDaemon(pid_file)
+    if 'start' == command:
+        daemon.start()
+    elif 'stop' == command:
+        daemon.stop()
+    elif 'restart' == command:
+        daemon.restart()
+    else:
+        print "Unknown command"
+        sys.exit(2)
+    sys.exit(0)
