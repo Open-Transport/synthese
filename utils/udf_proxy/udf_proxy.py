@@ -40,6 +40,7 @@ queue = Queue.Queue()
 LISTENING_PORT = None
 TARGET_URL = None
 TIMEOUT = 10
+VERBOSE = False
 
 
 class Request(object):
@@ -87,7 +88,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write("Dummy response")
 
     def log_message(self, format, *args):
-        if 1:
+        if VERBOSE:
             BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
 
 
@@ -103,9 +104,10 @@ def main():
         '%(asctime)s %(levelname)-10s %(message)s'))
     handler.setLevel(logging.INFO)
     log.addHandler(handler)
+    if log.level > logging.INFO:
+        log.setLevel(logging.INFO)
 
     dispatcher = Dispatcher()
-
     server_address = ('', LISTENING_PORT)
     httpd = BaseHTTPServer.HTTPServer(server_address, RequestHandler)
     httpd.serve_forever()
@@ -120,7 +122,7 @@ if __name__ == '__main__':
     parser.add_option('-p', '--port', type='int',
          default=9080, help='Proxy listening port')
     parser.add_option('-t', '--target-url',
-         default='http://localhost:8080/synthese3',
+         default='http://localhost:8080',
          help='URL where to forward requests')
 
     (options, args) = parser.parse_args()
@@ -130,6 +132,7 @@ if __name__ == '__main__':
 
     LISTENING_PORT = options.port
     TARGET_URL = options.target_url
+    VERBOSE = options.verbose
 
     logging.basicConfig(level=(logging.DEBUG if options.verbose else
                                logging.INFO))
