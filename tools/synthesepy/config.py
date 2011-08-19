@@ -60,6 +60,7 @@ DEFAULTS = {
     'synthese_suffixes': [],
 
     # project
+    'project_path': None,
     'project_name': None,
     'conn_string': 'sqlite://',
 
