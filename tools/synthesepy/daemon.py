@@ -22,6 +22,9 @@
 import errno
 import logging
 import os
+from os.path import join
+import signal
+import socket
 import subprocess
 import sys
 import time
@@ -67,6 +70,12 @@ class Daemon(object):
             return False
         return self.proc.poll() is None
 
+    def setsignals(self):
+        def terminate(sig, frame):
+            log.info('Got TERM signal, stopping daemon')
+            self.stop()
+        signal.signal(signal.SIGTERM, terminate)
+
     def start(self, kill_existing=True):
         self.env.prepare_for_launch()
 
@@ -81,16 +90,6 @@ class Daemon(object):
                     raise DaemonException(
                         'Error, something is already listening on port %s', port)
 
-        # cleanup pid on linux
-        if self.env.platform != 'win':
-            pid_path = os.path.join(
-                self.env.daemon_launch_path,
-                's3_server.pid')
-            if os.path.isfile(pid_path):
-                log.debug('Found pid file %s, removing it' % pid_path)
-                # TODO: check if daemon is running with that pid and kill it if that's the case.
-                os.unlink(pid_path)
-
         if not os.path.isfile(self.env.daemon_path):
             raise DaemonException(
                 'Daemon executable can\'t be found at %r. Project not built or '
@@ -103,6 +102,14 @@ class Daemon(object):
             self.env.daemon_path,
             '--dbconn', self.env.c.conn_string,
         ])
+
+        if self.env.platform != 'win':
+            pid_path = join(self.env.c.project_path, 'synthese.pid')
+            if os.path.isfile(pid_path):
+                log.debug('Found pid file %s, removing it' % pid_path)
+                # TODO: check if daemon is running with that pid and kill it if that's the case.
+                os.unlink(pid_path)
+            args.extend(['--pidfile', pid_path])
 
         params = {
             'log_level': '-1',
@@ -128,16 +135,29 @@ class Daemon(object):
                 ' '.join(args), self.env.daemon_launch_path)
             return
 
+        self.setsignals()
+
         self.proc = subprocess.Popen(
             args,
             cwd=self.env.daemon_launch_path,
             stderr=subprocess.STDOUT,
             stdout=stdout)
-        log.info('daemon started')
 
+        log.info('daemon started')
+        self.stopped = False
         self._wait_until_ready()
-        log.info('daemon ready on port %s' % self.env.c.port)
-        self._start_wsgi_proxy()
+        pid = -1
+        if self.env.platform != 'win':
+            pid = int(open(pid_path).read())
+        log.info('daemon ready on port %i %s (script pid: %i)', self.env.c.port,
+            '' if pid < 0 else 'with pid %i' % pid, os.getpid())
+        try:
+            self._start_wsgi_proxy()
+        except socket.error, e:
+            # XXX Ignore address already in use if restarted.
+            if kill_existing:
+                raise
+            log.warn('Ignoring address already in use for wsgi proxy')
 
     def stop(self):
         # TODO: should use quit action, but it doesn't work (at least on Windows)
@@ -152,3 +172,4 @@ class Daemon(object):
         self.proc = None
         self._stop_wsgi_proxy()
         assert not utils.can_connect(self.env.c.port, False)
+        self.stopped = True

@@ -188,6 +188,7 @@ class Project(object):
 
         # Set defaults
 
+        self.config.project_path = self.path
         if not self.config.project_name:
             self.config.project_name = os.path.split(self.path)[1]
         if not self.config.log_file:
@@ -307,14 +308,20 @@ class Project(object):
         log.info('Daemon running, press ctrl-c to stop')
 
         try:
-            while True:
+            running = True
+            while running:
                 while self.daemon.is_running():
                     time.sleep(2)
-                log.warn('Daemon terminated (crash?)')
-                if self.config.restart_if_crashed:
-                    self.daemon.start(kill_existing=False)
-                else:
-                    break
+                log.info('Daemon terminated')
+                expected_stop = self.daemon.stopped
+                running = False
+                if not expected_stop:
+                    log.warn('Stop is unexpected, crash?')
+                    if self.config.restart_if_crashed:
+                        self.daemon.start(kill_existing=False)
+                        running = True
+                    else:
+                        sys.exit(1)
         except:
             raise
         finally:
