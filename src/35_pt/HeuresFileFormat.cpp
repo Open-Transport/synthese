@@ -118,7 +118,7 @@ namespace synthese
 
 	namespace pt
 	{
-		bool HeuresFileFormat::Importer_::_controlPathsMap() const
+		bool HeuresFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ITINERAI));
 			if(it == _pathsMap.end() || it->second.empty()) return false;

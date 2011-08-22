@@ -50,10 +50,11 @@ namespace synthese
 
 	namespace road
 	{
+		// TODO: rename column to crossing_id (see https://188.165.247.81/projects/synthese/wiki/Database_Schema_Updates).
 		const string RoadChunkTableSync::COL_CROSSING_ID("address_id");
-		const string RoadChunkTableSync::COL_RANKINPATH ("rank_in_path");
-		const string RoadChunkTableSync::COL_ROADID ("road_id");  // NU
-		const string RoadChunkTableSync::COL_METRICOFFSET ("metric_offset");  // U ??
+		const string RoadChunkTableSync::COL_RANKINPATH("rank_in_path");
+		const string RoadChunkTableSync::COL_ROADID("road_id");  // NU
+		const string RoadChunkTableSync::COL_METRICOFFSET("metric_offset");  // U ??
 		const string RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER("left_start_house_number");
 		const string RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER("left_end_house_number");
 		const string RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER("right_start_house_number");
@@ -214,7 +215,7 @@ namespace synthese
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
-			//TODO Control user rights
+			//TODO Check user rights
 			return true;
 		}
 

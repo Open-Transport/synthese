@@ -161,7 +161,7 @@ namespace synthese
 
 				typedef std::map<int, geography::City*> _CitiesMap;
 
-				mutable _CitiesMap _citiesMap;	//!< Correspondence table between Navstreets and SYNTHESE id for streets
+				mutable _CitiesMap _citiesMap;	//!< Mapping table between Navstreets and SYNTHESE id for streets
 
 				static MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
 					const std::string& addressSchema
@@ -186,9 +186,9 @@ namespace synthese
 			protected:
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Controls that all necessary input files are available.
+				/// Checks that all necessary input files are available.
 				/// @result true if all necessary files are present
-				virtual bool _controlPathsMap() const;
+				virtual bool _checkPathsMap() const;
 
 
 

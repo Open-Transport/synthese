@@ -92,7 +92,7 @@ namespace synthese
 
 	namespace pt
 	{
-		bool CarPostalFileFormat::Importer_::_controlPathsMap() const
+		bool CarPostalFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ECKDATEN));
 			if(it == _pathsMap.end() || it->second.empty()) return false;

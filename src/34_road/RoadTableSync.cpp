@@ -135,7 +135,7 @@ namespace synthese
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
-			//TODO Control user rights
+			//TODO Check user rights
 			return true;
 		}
 
