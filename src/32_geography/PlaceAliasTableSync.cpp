@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync, PlaceAliasTableSync>::FACTORY_KEY("14.10.01 Places Alias");
+		template<> const string FactorableTemplate<DBTableSync, PlaceAliasTableSync>::FACTORY_KEY("32.10.01 Places Alias");
 	}
 
 	namespace geography

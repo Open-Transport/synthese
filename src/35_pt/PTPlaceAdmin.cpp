@@ -56,6 +56,7 @@
 #include "StopPointUpdateAction.hpp"
 #include "PlaceAliasUpdateAction.hpp"
 #include "PlaceAliasTableSync.h"
+#include "MapSource.hpp"
 
 using namespace std;
 using namespace boost;
@@ -175,7 +176,9 @@ namespace synthese
 					{
 						mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 					}
-					HTMLMap map(*mapCenter, 18, true, true, true);
+					HTMLMap map(*mapCenter, 200, true, true, true, true);
+					map.setMapSource(MapSource::GetSessionMapSource(*request.getSession()));
+
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
 						if(!it.second->getGeometry().get())
@@ -214,7 +217,7 @@ namespace synthese
 					}
 					*/
 					/// @todo Station entrances
-					map.draw(stream);
+					map.draw(stream, request);
 
 					StaticActionRequest<StopPointAddAction> stopPointAddRequest(request);
 					stopPointAddRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));

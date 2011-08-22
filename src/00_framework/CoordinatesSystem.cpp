@@ -26,6 +26,7 @@
 #include <boost/shared_ptr.hpp>
 #include <boost/algorithm/string.hpp>
 #include <geos/algorithm/Angle.h>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -130,6 +131,18 @@ namespace synthese
 
 	CoordinatesSystem::~CoordinatesSystem() {
 		pj_free(_projObject);
+	}
+
+
+
+	CoordinatesSystem::CoordinatesSystemsTextMap CoordinatesSystem::GetCoordinatesSystemsTextMap()
+	{
+		CoordinatesSystemsTextMap result;
+		BOOST_FOREACH(const CoordinatesSystemsMap::value_type& it, _coordinates_systems)
+		{
+			result.insert(make_pair(it.first, lexical_cast<string>(it.first) +" "+ it.second->getName()));
+		}
+		return result;
 	}
 
 

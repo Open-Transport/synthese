@@ -65,6 +65,7 @@
 #include "AdminModule.h"
 #include "CalendarTemplateTableSync.h"
 #include "Destination.hpp"
+#include "MapSource.hpp"
 
 #include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
@@ -415,7 +416,9 @@ namespace synthese
 				if(center.get())
 				{
 					stream << "<h1>Carte</h1>";
-					HTMLMap map(*center, 12, true, false, false);
+					HTMLMap map(*center, 12, true, false, false, false);
+					map.setMapSource(MapSource::GetSessionMapSource(*_request.getSession()));
+
 					StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);
 					StaticActionRequest<StopPointUpdateAction> stopPointUpdateRequest(_request);
 					for(Path::Edges::const_iterator itEdge(_line->getEdges().begin()); itEdge!=_line->getEdges().end(); ++itEdge)
@@ -459,7 +462,7 @@ namespace synthese
 						}
 					}
 
-					map.draw(stream);
+					map.draw(stream, _request);
 				}
 			}
 

@@ -1,22 +1,28 @@
 
 #include "ServerModule.h"
+
 #include "LoginAction.h"
 #include "LogoutAction.h"
+#include "QuitAction.hpp"
+#include "SetSessionVariableAction.hpp"
+#include "ThreadKillAction.h"
+
 #include "HtmlFormInterfaceElement.h"
 #include "ValidSessionInterfaceElement.h"
 #include "HtmlFormCalendarFieldInterfaceElement.h"
 #include "HtmlFormFieldInterfaceElement.h"
-#include "DbModuleConfigTableSync.h"
-#include "LoginInterfacePage.h"
 #include "ServerModuleVersionInterfaceElement.h"
+
+#include "LoginInterfacePage.h"
+
 #include "ServerAdminRight.h"
+
 #include "ThreadsAdmin.h"
-#include "ThreadKillAction.h"
-#include "QuitAction.hpp"
+
+#include "DbModuleConfigTableSync.h"
 
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
-
 
 #include "ServerModule.inc.cpp"
 
@@ -29,9 +35,10 @@ void synthese::server::moduleRegister()
 	
 	synthese::server::LoginAction::integrate();
 	synthese::server::LogoutAction::integrate();
-	synthese::server::ThreadKillAction::integrate();
 	synthese::server::QuitAction::integrate();
-	
+	synthese::server::SetSessionVariableAction::integrate();
+	synthese::server::ThreadKillAction::integrate();
+
 	synthese::server::HtmlFormInterfaceElement::integrate();
 	synthese::server::ValidSessionInterfaceElement::integrate();
 	synthese::server::HtmlFormCalendarFieldInterfaceElement::integrate();
