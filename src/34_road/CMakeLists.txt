@@ -15,6 +15,8 @@ MainRoadPart.cpp
 MainRoadPart.hpp
 NavstreetsFileFormat.cpp
 NavstreetsFileFormat.hpp
+#OSMFileFormat.cpp
+#OSMFileFormat.hpp
 PublicPlace.cpp
 PublicPlace.h
 PublicPlaceTableSync.cpp
