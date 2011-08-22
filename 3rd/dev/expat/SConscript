@@ -14,7 +14,7 @@ else:
 CppLibProject(
 	senv
 	, 'expat'
-	, '2.0.1'
+	, '2.0.1a'
 	, source_files = senv.Glob ('*.c', dir=senv.SrcDir('src'), prefix='src/')
 	, include_dir = senv.SrcDir('src')
 	, filesrootdir = senv.SrcDir('src')
