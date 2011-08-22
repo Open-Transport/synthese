@@ -28,6 +28,7 @@
 #include "CoordinatesSystem.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
+#include "MapSourceTableSync.hpp"
 
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
@@ -61,6 +62,22 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
 		{
+			Env env;
+			MapSourceTableSync::SearchResult sources(
+				MapSourceTableSync::Search(
+					env,
+					string("OSM"),
+					0,
+					1
+			)	);
+			if(sources.empty())
+			{
+				shared_ptr<MapSource> osmSource(new MapSource(21110623253299200));
+				osmSource->setName("OSM");
+				osmSource->setCoordinatesSystem(CoordinatesSystem::GetCoordinatesSystem(900913));
+				osmSource->setType(MapSource::OSM);
+				MapSourceTableSync::Save(osmSource.get());
+			}
 		}
 
 		template<> void ModuleClassTemplate<GeographyModule>::End()

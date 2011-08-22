@@ -38,6 +38,7 @@
 #include "CommercialLine.h"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
+#include "MapSource.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -146,7 +147,9 @@ namespace synthese
 				{
 					mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 				}
-				HTMLMap map(*mapCenter, 18, true, true, false);
+
+				HTMLMap map(*mapCenter, 18, true, true, false, true);
+				map.setMapSource(MapSource::GetSessionMapSource(*request.getSession()));
 
 				StaticActionRequest<StopPointUpdateAction> moveAction(request);
 				moveAction.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
@@ -172,7 +175,7 @@ namespace synthese
 					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str(), 21, 25));
 				}
 
-				map.draw(stream);
+				map.draw(stream, request);
 
 				if(!_stop->getGeometry().get())
 				{

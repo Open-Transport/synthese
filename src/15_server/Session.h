@@ -24,9 +24,11 @@
 #define SYNTHESE_Session_H__
 
 #include <string>
+#include <map>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace synthese
 {
@@ -45,14 +47,19 @@ namespace synthese
 		class Session
 		{
 		private:
+			typedef std::map<std::string, std::string> SessionVariables;
+
 			const std::string			_key;
 			const std::string			_ip;
 			boost::shared_ptr<const security::User>	_user;
 			boost::posix_time::ptime	_lastUse;
+			SessionVariables			_sessionVariables;
+			mutable boost::mutex		_mutex; //!< For thread safety in case of concurrent access with the same session.
 
 			static const size_t KEY_LENGTH;
 			static const std::string COOKIE_SESSIONID;
 			static std::string generateKey();
+
 
 		public:
 			//!	\name Constructor and destructor
@@ -104,6 +111,30 @@ namespace synthese
 				/// @date 2011
 				/// @since 3.3.0
 				void setSessionIdCookie(Request &request) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Sets a session variable content.
+				/// If the content is empty, the variable is removed.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param variable variable identifier
+				/// @param value value to set
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				void setSessionVariable(const std::string& variable, const std::string& value);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a session variable content.
+				/// @param variable variable identifier
+				/// @return the content of the specified variable if it exists, empty string else
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				std::string getSessionVariable(const std::string& variable) const;
 			//@}
 		};
 	}

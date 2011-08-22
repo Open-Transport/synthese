@@ -29,6 +29,7 @@
 #include <map>
 #include <proj_api.h>
 #include <boost/lexical_cast.hpp>
+#include <boost/optional.hpp>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/PrecisionModel.h>
 #include <geos/geom/CoordinateFilter.h>
@@ -201,6 +202,8 @@ namespace synthese
 
 			static const geos::geom::GeometryFactory& GetDefaultGeometryFactory() { return GetInstanceCoordinatesSystem().getGeometryFactory(); }
 
+			typedef std::map<boost::optional<SRID>, std::string> CoordinatesSystemsTextMap;
+			static CoordinatesSystemsTextMap GetCoordinatesSystemsTextMap();
 		//@}
 	};
 }

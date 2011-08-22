@@ -141,5 +141,32 @@ namespace synthese
 				ServerModule::GetSessionMaxDuration().total_seconds()
 			);
 		}
-	}
-}
+
+
+
+		void Session::setSessionVariable( const std::string& variable, const std::string& value )
+		{
+			mutex::scoped_lock lock(_mutex);
+			if(!value.empty())
+			{
+				_sessionVariables[variable] = value;
+			}
+			else
+			{
+				SessionVariables::iterator it(_sessionVariables.find(variable));
+				if(it != _sessionVariables.end())
+				{
+					_sessionVariables.erase(it);
+				}
+			}
+		}
+
+
+
+		std::string Session::getSessionVariable( const std::string& variable ) const
+		{
+			mutex::scoped_lock lock(_mutex);
+			SessionVariables::const_iterator it(_sessionVariables.find(variable));
+			return (it == _sessionVariables.end()) ? string() : it->second;
+		}
+}	}

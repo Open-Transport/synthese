@@ -175,7 +175,7 @@ namespace synthese
 			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
 
 			// Registration in path
-			if(path)
+			if(path && path->getPathGroup())
 			{
 				path->addService(
 					*ss,

@@ -23,6 +23,11 @@
 #include "HTMLMap.hpp"
 #include "HTMLModule.h"
 #include "CoordinatesSystem.hpp"
+#include "Env.h"
+#include "GetMapOpenLayersConstructorService.hpp"
+#include "MapSource.hpp"
+#include "SetSessionVariableAction.hpp"
+#include "StaticActionFunctionRequest.h"
 
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -34,23 +39,31 @@ using namespace geos::geom;
 namespace synthese
 {
 	using namespace html;
+	using namespace util;
+	using namespace server;
 
 	namespace geography
 	{
-		const std::string HTMLMap::PARAMETER_ACTION_WKT("actionParamwkt");
+		const string HTMLMap::PARAMETER_ACTION_WKT("actionParamwkt");
+
+
 
 		HTMLMap::HTMLMap(
 			const Point& center,
-			int zoom,
+			double horizontalDistance,
 			bool editable,
 			bool addable,
 			bool highlight,
-			const std::string id /*= "map" */
+			bool mousePosition,
+			const string id /*= "map" */
 		):	_center(static_cast<Point*>(center.clone())),
-			_zoom(zoom),
+			_horizontalDistance(horizontalDistance),
 			_editable(editable),
 			_highlight(highlight),
-			_id(id)
+			_id(id),
+			_mapSource(NULL),
+			_mousePosition(mousePosition),
+			_withMapSourcesMenu(true)
 		{
 			if(highlight)
 			{
@@ -64,12 +77,54 @@ namespace synthese
 			{
 				_controls.push_back(Control(Control::DRAW_POINT, "point", false));
 			}
+			if(mousePosition)
+			{
+				_controls.push_back(Control(Control::MOUSE_POSITION, "mouse_position", true));
+			}
 		}
 
 
 
-		void HTMLMap::draw( std::ostream& stream ) const
-		{
+		void HTMLMap::draw(
+			std::ostream& stream,
+			const Request& request
+		) const {
+			// If no base layer is defined, no map can be drawn
+			if(!_mapSource)
+			{
+				return;
+			}
+
+			// Map sources menu
+			if(_withMapSourcesMenu)
+			{
+				StaticActionFunctionRequest<SetSessionVariableAction,GetMapOpenLayersConstructorService> changeMapSourceRequest(request, false);
+				changeMapSourceRequest.getAction()->setVariable(MapSource::SESSION_VARIABLE_CURRENT_MAPSOURCE);
+				changeMapSourceRequest.setRedirectAfterAction(false);
+				HTMLForm f(changeMapSourceRequest.getHTMLForm());
+
+				stream << "<div id=\"" << _id << "_menu\">";
+				stream << f.open("onsubmit=\"ajaxMapChange(this);return false;\"");
+				BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
+				{
+					// Avoid invalid map sources
+					if(!mapSource.second->hasCoordinatesSystem())
+					{
+						continue;
+					}
+
+					stream << f.getRadioInput(
+						SetSessionVariableAction::PARAMETER_VALUE,
+						optional<string>(lexical_cast<string>(mapSource.first)),
+						optional<string>(lexical_cast<string>(_mapSource->getKey())),
+						mapSource.second->getName()
+					);
+				}
+				stream << " " << f.getSubmitButton("Changer");
+				stream << f.close();
+				stream << "</div>";
+				// TODO : add ajax call on click on the button (replace it by a link button)
+			}
 			stream << "<div id=\"" << _id << "\"></div>";
 			stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
 			stream << HTMLModule::GetHTMLJavascriptOpen();
@@ -79,14 +134,12 @@ namespace synthese
 			stream <<
 				"var lastFeature = null;" <<
 				"var tooltipPopup = null;" <<
-				"var addURL = '';" <<
+				"var addURL = '';";
 
-				"function init(){" <<
-					"map = new OpenLayers.Map('map');" <<
-					"var mapnik = new OpenLayers.Layer.OSM();" <<
-					"var vectorLayer = new OpenLayers.Layer.Vector(\"Vector\");" <<
-					"map.addLayers([mapnik, vectorLayer]);"
-			;
+			// Features function
+			stream <<
+				"function getFeaturesLayer(mapProjection){" <<
+				"var vectorLayer = new OpenLayers.Layer.Vector('Vector');";
 
 			if(!_lineStrings.empty())
 			{
@@ -119,7 +172,7 @@ namespace synthese
 								fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() <<
 							").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
-								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
+								"mapProjection" <<
 							")"
 						;
 					}
@@ -161,7 +214,7 @@ namespace synthese
 							"new OpenLayers.Geometry.Point(" << fixed << wgs84Point->getX() << "," << fixed << wgs84Point->getY() <<
 							").transform(" <<
 								"new OpenLayers.Projection(\"EPSG:4326\")," << // transform from WGS 1984
-								"new OpenLayers.Projection(\"EPSG:900913\")" << // to Spherical Mercator Projection
+								"mapProjection" << // to map projection
 							"),{graphic:\"" << HTMLModule::EscapeDoubleQuotes(point.icon) << "\"," <<
 								"waitingGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.waitingIcon) << "\"," <<
 								"editionGraphic:\"" << HTMLModule::EscapeDoubleQuotes(point.editionIcon) << "\"," <<
@@ -238,8 +291,8 @@ namespace synthese
 							"vectorLayer.redraw();" <<
 							"var feat = evt.feature.clone();" <<
 							"feat.geometry.transform(" <<
-								"new OpenLayers.Projection(\"EPSG:900913\")," << // to Spherical Mercator Projection
-								"new OpenLayers.Projection(\"EPSG:4326\")" << // transform from WGS 1984
+								"mapProjection," << // from map projection
+								"new OpenLayers.Projection(\"EPSG:4326\")" << // to WGS 1984
 							");" <<
 							"var writer = new OpenLayers.Format.WKT();" <<
 							"var wkt = writer.write(feat);" <<
@@ -255,8 +308,8 @@ namespace synthese
 						"'featureadded': function(evt) {" <<
 							"var newpoint = evt.feature.geometry.clone();" <<
 							"newpoint.transform(" <<
-								"new OpenLayers.Projection(\"EPSG:900913\")," << // to Spherical Mercator Projection
-								"new OpenLayers.Projection(\"EPSG:4326\")" << // transform from WGS 1984
+								"mapProjection," << // from map projection
+								"new OpenLayers.Projection(\"EPSG:4326\")" << // to WGS 1984
 							");" <<
 							"new OpenLayers.Ajax.Request(addURL + '&actionParamlon='+ newpoint.x +'&actionParamlat=' + newpoint.y," <<
 							"{   method: 'get'," <<
@@ -270,25 +323,52 @@ namespace synthese
 					"});"
 				;
 			}
-
-			shared_ptr<Point> wgs84Center(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*_center
-			)	);
 			stream <<
-				"map.setCenter(new OpenLayers.LonLat(" << fixed << wgs84Center->getX() << "," << fixed << wgs84Center->getY() << ")" <<
-				".transform(" <<
-					"new OpenLayers.Projection(\"EPSG:4326\"), new OpenLayers.Projection(\"EPSG:900913\")" << // WGS84 to Spherical Mercator Projection
-				")," << _zoom << // Zoom level
-			");" <<
-			"}" <<
-			"init();" <<
+				"return vectorLayer;" <<
+				"}"
+			;
+
+			// Map initialization function
+			stream <<
+			"function init(_baseLayer, _bounds){" <<
+				"map = new OpenLayers.Map('map');" <<
+				"map.addLayer(_baseLayer);" <<
+				"map.addLayer(getFeaturesLayer(map.getProjectionObject()));" <<
+				"map.zoomToExtent(_bounds, true);" <<
+			"}";
+
+			// First initialization
+			shared_ptr<Point> firstPoint(
+				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+					_center->getX() - _horizontalDistance / 2,
+					_center->getY() - _horizontalDistance / 2
+			)	);
+			shared_ptr<Point> firstPointProjected(
+				_mapSource->getCoordinatesSystem().convertPoint(
+					*firstPoint
+			)	);
+			shared_ptr<Point> secondPoint(
+				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+					_center->getX() + _horizontalDistance / 2,
+					_center->getY() + _horizontalDistance / 2
+			)	);
+			shared_ptr<Point> secondPointProjected(
+				_mapSource->getCoordinatesSystem().convertPoint(
+					*secondPoint
+			)	);
+
+			stream <<
+			"var baseLayer = " << _mapSource->getOpenLayersConstructor() << ";" <<
+			"var bounds = new OpenLayers.Bounds();" <<
+			"bounds.extend(new OpenLayers.LonLat(" << fixed << firstPointProjected->getX() << "," << fixed << firstPointProjected->getY() << "));" <<
+			"bounds.extend(new OpenLayers.LonLat(" << fixed << secondPointProjected->getX() << "," << fixed << secondPointProjected->getY() << "));" <<
+			"init(baseLayer, bounds);" <<
+
 			"function activateAddPoint_" << _id << "(requestURL)" <<
 			"{" <<
 				"addURL = requestURL;"
 				"controls['point'].activate();" <<
-			"}"
-			;
+			"}";
 
 			stream << HTMLModule::GetHTMLJavascriptClose();
 		}
@@ -318,6 +398,10 @@ namespace synthese
 			else if(_controlType == Control::DRAG)
 			{
 				stream << "ModifyFeature(" << layerName << ", { mode: OpenLayers.Control.ModifyFeature.RESHAPE })";
+			}
+			else if(_controlType == Control::MOUSE_POSITION)
+			{
+				stream << "MousePosition()";
 			}
 			else if(_controlType == Control::HIGHLIGHT)
 			{
@@ -371,5 +455,4 @@ namespace synthese
 			}
 			return stream.str();
 		}
-	}
-}
+}	}
