@@ -129,7 +129,7 @@ namespace synthese
 
 	namespace pt
 	{
-		bool GTFSFileFormat::Importer_::_controlPathsMap() const
+		bool GTFSFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_AGENCY));
 			if(it == _pathsMap.end() || it->second.empty()) return false;

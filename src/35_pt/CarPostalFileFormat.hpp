@@ -121,7 +121,7 @@ namespace synthese
 
 			protected:
 
-				virtual bool _controlPathsMap() const;
+				virtual bool _checkPathsMap() const;
 
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,

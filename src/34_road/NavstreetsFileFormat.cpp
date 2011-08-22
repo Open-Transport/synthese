@@ -102,7 +102,7 @@ namespace synthese
 
 	namespace road
 	{
-		bool NavstreetsFileFormat::Importer_::_controlPathsMap() const
+		bool NavstreetsFileFormat::Importer_::_checkPathsMap() const
 		{
 			// MTDAREA
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_MTDAREA));

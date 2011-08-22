@@ -104,7 +104,7 @@ namespace synthese
 				boost::optional<const admin::AdminRequest&> request
 			) const = 0;
 
-			virtual bool _controlPathsMap() const = 0;
+			virtual bool _checkPathsMap() const = 0;
 
 			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
 
@@ -123,7 +123,7 @@ namespace synthese
 					}
 					_pathsMap.insert(std::make_pair(key, filePath));
 				}
-				if (doImport && !_controlPathsMap())
+				if (doImport && !_checkPathsMap())
 				{
 					throw MissingFileException();
 				}

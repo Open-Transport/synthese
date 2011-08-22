@@ -125,7 +125,7 @@ namespace synthese
 
 	namespace pt
 	{
-		bool IneoFileFormat::Importer_::_controlPathsMap() const
+		bool IneoFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_PNT));
 			if(it == _pathsMap.end() || it->second.empty()) return false;
