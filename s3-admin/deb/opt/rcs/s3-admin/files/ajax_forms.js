@@ -1,5 +1,38 @@
 
 
+function ajaxMapChange(obj){
+    var url=obj.action+'?';
+    var first=1;
+    for(var i=0; i<obj.elements.length; ++i){
+        if(obj.elements[i].type=='radio' && !obj.elements[i].checked) continue;
+        if(first) first=0; else url += '&';
+        url += obj.elements[i].name +'='+ encodeURIComponent(obj.elements[i].value);
+    }
+
+    var xajax = null;
+    if(window.XMLHttpRequest) xajax = new XMLHttpRequest();
+	else if(window.ActiveXObject) xajax = new ActiveXObject('Microsoft.XMLHTTP');
+	else return false;
+    xajax.open('GET',url);
+    xajax.onreadystatechange = function(){
+        if(xajax.readyState == 4) {
+
+	    eval("var newbaseLayer = "+ xajax.responseText + ";");
+            var oldProjection = new OpenLayers.Projection(map.projection);
+            var oldExtent = map.getExtent();
+            while(map.layers.length){
+               map.removeLayer(map.layers[0]);
+            }
+            map.projection = newbaseLayer.projection.getCode();
+	    map.addLayer(newbaseLayer);
+            map.setBaseLayer(newbaseLayer);
+	    map.addLayer(getFeaturesLayer(new OpenLayers.Projection(map.projection)));
+	    var newbounds = oldExtent.transform(oldProjection, newbaseLayer.projection);
+	    map.zoomToExtent(newbounds, true);
+    }    };
+    xajax.send();
+}
+
 
 function insert_select(select, value, text){
     var optionElement = document.createElement("option");
