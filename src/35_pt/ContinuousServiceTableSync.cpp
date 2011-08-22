@@ -182,7 +182,7 @@ namespace synthese
 			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
 
 			// Registration in path
-			if(path)
+			if(path && path->getPathGroup())
 			{
 				path->addService(*cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 				cs->updatePathCalendar();

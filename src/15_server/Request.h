@@ -230,8 +230,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2007
 				*/
-				void setClientURL(const std::string& url) { _clientURL = url; }
+				void setClientURL(const std::string& url){ _clientURL = url; }
 				void setCookie(std::string name, std::string value, int maxAge);
+				void setRedirectAfterAction(bool value){ _redirectAfterAction = value; }
 			//@}
 
 			//! \name Modifiers

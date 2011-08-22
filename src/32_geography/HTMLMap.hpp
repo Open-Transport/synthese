@@ -30,8 +30,15 @@
 
 namespace synthese
 {
+	namespace server
+	{
+		class Request;
+	}
+
 	namespace geography
 	{
+		class MapSource;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Draws map using OpenLayers library.
 		///	@ingroup m05
@@ -62,6 +69,7 @@ namespace synthese
 				std::string htmlPopup;
 				std::size_t width;
 				std::size_t height;
+
 
 				MapPoint(
 					const geos::geom::Point& _point,
@@ -105,7 +113,8 @@ namespace synthese
 				{
 					DRAW_POINT,
 					DRAG,
-					HIGHLIGHT
+					HIGHLIGHT,
+					MOUSE_POSITION
 				};
 
 			private:
@@ -133,13 +142,16 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<geos::geom::Point> _center;
-			const int _zoom;
+			const double _horizontalDistance;
 			const std::string _id;
 			Points _points;
 			LineStrings _lineStrings;
 			Controls _controls;
-			bool _editable;
-			bool _highlight;
+			const bool _editable;
+			const bool _highlight;
+			const bool _mousePosition;
+			const MapSource* _mapSource;
+			bool _withMapSourcesMenu;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -147,15 +159,16 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.1.18
-			/// @param center point in the middle of the map at opening (LambertII)
-			/// @param zoom zoom level of the map at opening
+			/// @param center point in the middle of the map at opening (instance coordinates system)
+			/// @param horizontalDistance ditance between left and right bounds at map opening (unit : instance coordinates system unit)
 			/// @param id id of the div in the DOM
 			HTMLMap(
 				const geos::geom::Point& center,
-				int zoom,
+				double horizontalDistance,
 				bool editable,
 				bool addable,
 				bool highlight,
+				bool mousePosition,
 				const std::string id = "map"
 			);
 
@@ -164,17 +177,26 @@ namespace synthese
 			//@{
 				void addPoint(MapPoint value){ _points.push_back(value); }
 				void addLineString(MapLineString value){ _lineStrings.push_back(value); }
+				void setMapSource(const MapSource* value){ _mapSource = value; }
+				void setWithMapSourcesMenu(bool value){ _withMapSourcesMenu = value; }
 			//@}
 
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////
 				/// Generates the HTML code and flush it onto a stream.
+				/// @param stream stream to write the code on
+				/// @param request the current request
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.18
 				/// @param stream stream to write the code on
-				void draw(std::ostream& stream) const;
+				void draw(
+					std::ostream& stream,
+					const server::Request& request
+				) const;
+
+
 
 				std::string getAddPointLink(
 					const std::string& requestURL,

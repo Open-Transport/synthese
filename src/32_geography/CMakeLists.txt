@@ -20,10 +20,22 @@ GeographyModule.gen.cpp
 GeographyModuleRegister.cpp
 GeographyModule.h
 GeographyModule.inc.cpp
+GetMapOpenLayersConstructorService.cpp
+GetMapOpenLayersConstructorService.hpp
 HTMLMap.cpp
 HTMLMap.hpp
 IncludingPlace.cpp
 IncludingPlace.h
+MapSource.cpp
+MapSource.hpp
+MapSourceAdmin.cpp
+MapSourceAdmin.hpp
+MapSourcesAdmin.cpp
+MapSourcesAdmin.hpp
+MapSourceTableSync.cpp
+MapSourceTableSync.hpp
+MapSourceUpdateAction.cpp
+MapSourceUpdateAction.hpp
 NamedPlace.cpp
 NamedPlace.h
 NamedPlaceTemplate.h
@@ -43,6 +55,7 @@ target_link_libraries(32_geography
   07_lexical_matcher
   11_interfaces
   18_graph
+  00_framework
   proj
 )
 
