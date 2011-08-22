@@ -9,7 +9,7 @@ if senv['_PLATFORM'] == 'posix':
 CppLibProject(
 	senv
 	, 'proj'
-	, '4.7.0'
+	, '4.7.0a'
 	, source_files = senv.Glob ('*.c', ['jniproj.c', 'nad2nad.c', 'nad2bin.c', 'geod.c', 'cs2cs.c', 'proj.c'], senv.SrcDir('src/src'), prefix='src/src/')
 	, include_dir = senv.SrcDir('src/src')
 	, filesrootdir = senv.SrcDir('src/src')
@@ -21,7 +21,7 @@ if senv2['_PLATFORM'] == 'posix':
 CppBinProject(
 	senv2
 	, 'proj'
-	, '4.7.0'
+	, '4.7.0a'
 	, source_files = ['src/src/proj.c']
 	, include_dir = senv2.SrcDir('src/src')
 	, filesrootdir = senv2.SrcDir('src/src')
