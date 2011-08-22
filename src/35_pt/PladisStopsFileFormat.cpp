@@ -82,7 +82,7 @@ namespace synthese
 
 	namespace pt
 	{
-		bool PladisStopsFileFormat::Importer_::_controlPathsMap() const
+		bool PladisStopsFileFormat::Importer_::_checkPathsMap() const
 		{
 			// BAHNHOFS
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_BAHNHOFS));

@@ -269,6 +269,8 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
+				// TODO: MySQL support.
+
 				std::stringstream subQuery;
 				subQuery << "SELECT pkid FROM idx_" << K::TABLE.NAME << "_" << TABLE_COL_GEOMETRY << " WHERE " <<
 					"xmin > " << envelope.getMinX() << " AND xmax < " << envelope.getMaxX() <<
@@ -305,6 +307,8 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
+				// TODO: MySQL support.
+
 				if(point.isEmpty())
 				{
 					return SearchResult();

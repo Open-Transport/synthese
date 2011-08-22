@@ -95,7 +95,7 @@ namespace synthese
 
 
 
-		void RoadChunk::setFromCrossing(Crossing* fromAddress )
+		void RoadChunk::setFromCrossing(Crossing* fromAddress)
 		{
 			_fromVertex = static_cast<Vertex*>(fromAddress);
 
