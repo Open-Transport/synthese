@@ -46,11 +46,11 @@ namespace synthese
 		class City;
 	}
 	namespace geometry
-   {
-      class Point2D;
-   }
+	{
+		class Point2D;
+	}
 
-	
+
 	namespace osm
 	{
 
@@ -61,7 +61,7 @@ namespace synthese
 		class OSMFileFormat
 		:	public impex::FileFormatTemplate<OSMFileFormat>
 		{
-		    
+
 		private:
 
 			typedef std::map<int, boost::shared_ptr<road::Address> > _AddressesMap;
@@ -79,11 +79,11 @@ namespace synthese
 
 			boost::shared_ptr<road::Address> lookupOrCreateAddress(NodePtr &node);
 			void insertRoadChunk(boost::shared_ptr<road::Address> &start,
-               boost::shared_ptr<road::Address> &end,
-               double length,
-               boost::shared_ptr<road::RoadPlace> &roadPlace,
-               std::list<geometry::Point2D> &via_points,
-               road::Road::RoadType roadType);
+					boost::shared_ptr<road::Address> &end,
+					double length,
+					boost::shared_ptr<road::RoadPlace> &roadPlace,
+					std::list<geometry::Point2D> &via_points,
+					road::Road::RoadType roadType);
 
 			std::string utf8ToLatin1(std::string &text);
 			projPJ dstProjection;
@@ -95,11 +95,11 @@ namespace synthese
 			~OSMFileFormat();
 
 			virtual void build(std::ostream& os);
-			
+
 			virtual void save(std::ostream& os) const;
 
 		private:
-		    
+
 		};
 	}
 }
