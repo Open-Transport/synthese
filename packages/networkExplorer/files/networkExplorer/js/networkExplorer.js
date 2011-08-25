@@ -25,9 +25,11 @@ var TisseoMap = OpenLayers.Class(SyntheseMap, {
     
     beforeMapInit: function() {
         console.log("TisseoMap::beforeMapInit");
-        //this.networkId = this.urlOptions.networkId;
-
-        //this.cityIdFilter = this.urlOptions.cityId;
+    },
+    
+    fetchLines: function(filter, withStops) {
+      filter.rollingStockId = Synthese.queryStringOptions.rollingStockId;
+      return SyntheseMap.prototype.fetchLines.call(this, filter, withStops);
     },
     
     setColorSimilarLine: function() {
