@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace geography
 	{
-		const int MapSource::MAX_TYPE_INT(1);
+		const int MapSource::MAX_TYPE_INT(2);
 		const string MapSource::SESSION_VARIABLE_CURRENT_MAPSOURCE("current_mapsource");
 
 
@@ -80,10 +80,68 @@ namespace synthese
 			switch(_type)
 			{
 			case OSM:
-				return "new OpenLayers.Layer.OSM()";
+				return "map = new OpenLayers.Map('map'); map.addLayer(new OpenLayers.Layer.OSM());";
 
 			case WMS:
-				return "new OpenLayers.Layer.WMS(\""+ getName() +" WMS\",\""+ _url +"\", {},{projection:'epsg:"+ lexical_cast<string>(_coordinatesSystem->getSRID()) +"', minScale:500, maxScale:30000})";
+				return "map = new OpenLayers.Map('map'); map.addLayer(new OpenLayers.Layer.WMS(\""+ getName() +" WMS\",\""+ _url +"\", {},{projection:'EPSG:"+ lexical_cast<string>(_coordinatesSystem->getSRID()) +"', minScale:500, maxScale:30000}));";
+
+			case IGN:
+				stringstream str;
+				str <<
+					"var fileref=document.createElement('script');" <<
+					"fileref.setAttribute('type','text/javascript');" <<
+					"fileref.setAttribute('src', 'http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << _url << "&amp;includeEngine=true');" <<
+					"document.getElementsByTagName('head')[0].appendChild(fileref);" <<
+
+					"if (window.__Geoportal$timer===undefined) {" <<
+					"var __Geoportal$timer= null;" <<
+					"}" <<
+					"if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
+					"var gGEOPORTALRIGHTSMANAGEMENT= {" <<
+					"apiKey:['" << _url << "']" <<
+					"};" <<
+					"}" <<
+
+				"var epsg4258= new OpenLayers.Projection('EPSG:4258');" <<
+				"map= new OpenLayers.Map('map', OpenLayers.Util.extend({" <<
+				"maxResolution: 1.40625," <<
+				"numZoomLevels: 21," <<
+				"projection: epsg4258," <<
+				"units: epsg4258.getUnits()," <<
+				"maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90)," <<
+				"}," <<
+				"gGEOPORTALRIGHTSMANAGEMENT));" <<
+
+				"var cat= new Geoportal.Catalogue(map,gGEOPORTALRIGHTSMANAGEMENT);" <<
+				"var zon= cat.getTerritory('EUE');" <<
+
+				"map.addLayers([" <<
+				"new OpenLayers.Layer(" <<
+				"'__PlateCarre__'," <<
+				"{" <<
+				"isBaseLayer: true," <<
+				"projection: new OpenLayers.Projection('EPSG:4326')," <<
+				"units: 'degrees'," <<
+				"maxResolution: 1.40625," <<
+				"numZoomLevels: 21," <<
+				"maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90)," <<
+				"minZoomLevel:5," <<
+				"maxZoomLevel:18," <<
+				"territory:'EUE'" <<
+				"})]);" <<
+
+				"var europeanMapOpts= cat.getLayerParameters(zon, 'GEOGRAPHICALGRIDSYSTEMS.MAPS:WMSC');" <<
+				"europeanMapOpts.options.opacity= 1.0;" <<
+				"europeanMapOpts.options['GeoRM']= setGeoRM();" <<
+				"europeanMapOpts.transitionEffect= 'resize';" <<
+				"var europeanMap= new europeanMapOpts.classLayer(" <<
+				"OpenLayers.i18n(europeanMapOpts.options.name)," <<
+				"europeanMapOpts.url," <<
+				"europeanMapOpts.params," <<
+				"europeanMapOpts.options);" <<
+				"europeanMapOpts.options.maxExtent.transform(europeanMapOpts.options.projection, map.getProjection(), true);" <<
+				"map.addLayer(europeanMap);";
+				return str.str();
 			}
 
 			assert(false);
@@ -137,6 +195,7 @@ namespace synthese
 			{
 			case OSM: return "OSM";
 			case WMS: return "WMS";
+			case IGN: return "IGN Geoportail";
 			}
 			return string();
 		}
@@ -148,6 +207,7 @@ namespace synthese
 			TypesMap result;
 			result.insert(make_pair(optional<Type>(OSM), GetTypeString(OSM)));
 			result.insert(make_pair(optional<Type>(WMS), GetTypeString(WMS)));
+			result.insert(make_pair(optional<Type>(IGN), GetTypeString(IGN)));
 			return result;
 		}
 

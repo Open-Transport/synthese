@@ -328,15 +328,6 @@ namespace synthese
 				"}"
 			;
 
-			// Map initialization function
-			stream <<
-			"function init(_baseLayer, _bounds){" <<
-				"map = new OpenLayers.Map('map');" <<
-				"map.addLayer(_baseLayer);" <<
-				"map.addLayer(getFeaturesLayer(map.getProjectionObject()));" <<
-				"map.zoomToExtent(_bounds, true);" <<
-			"}";
-
 			// First initialization
 			shared_ptr<Point> firstPoint(
 				CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
@@ -358,11 +349,12 @@ namespace synthese
 			)	);
 
 			stream <<
-			"var baseLayer = " << _mapSource->getOpenLayersConstructor() << ";" <<
+			 _mapSource->getOpenLayersConstructor() <<
+			"map.addLayer(getFeaturesLayer(map.getProjectionObject()));" <<
 			"var bounds = new OpenLayers.Bounds();" <<
 			"bounds.extend(new OpenLayers.LonLat(" << fixed << firstPointProjected->getX() << "," << fixed << firstPointProjected->getY() << "));" <<
 			"bounds.extend(new OpenLayers.LonLat(" << fixed << secondPointProjected->getX() << "," << fixed << secondPointProjected->getY() << "));" <<
-			"init(baseLayer, bounds);" <<
+			"map.zoomToExtent(bounds, true);" <<
 
 			"function activateAddPoint_" << _id << "(requestURL)" <<
 			"{" <<
