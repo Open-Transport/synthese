@@ -24,15 +24,13 @@ function ajaxMapChange(obj){
     xajax.open('GET',url);
     xajax.onreadystatechange = function(){
         if(xajax.readyState == 4) {
-            var oldProjection = new OpenLayers.Projection(map.baseLayer.projection);
+            var oldProjection = map.getProjectionObject();
             var oldExtent = map.getExtent();
-            var oldControls = map.controls;
             map.destroy();
 	    eval(xajax.responseText);
-            var newProjection = map.baseLayer.projection;
+            var newProjection = map.getProjectionObject();
 	    map.addLayer(getFeaturesLayer(newProjection));
 	    var newbounds = oldExtent.transform(oldProjection, newProjection);
-            map.controls = oldControls;
 	    map.zoomToExtent(newbounds, true);
     }    };
     xajax.send();
