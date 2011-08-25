@@ -88,7 +88,8 @@ namespace synthese
 			/// Each type corresponds to an OpenLayers Layer subclass.
 			typedef enum {
 				WMS = 0,
-				OSM = 1
+				OSM = 1,
+				IGN = 2
 			} Type;
 
 
