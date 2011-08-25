@@ -431,26 +431,39 @@ var SyntheseMap = OpenLayers.Class({
     });
   },
 
+  /**
+   * Fetch line features. Returns a Deferred.
+   * 
+   * filter could contain a rollingStockFilterId 
+   */
+  fetchLines: function(filter, withStops) {
 
-  addLines: function() {
-
-    // TODO: create a fetchLines function that this method will call.
-
-    var linesXHR = Synthese.callService("LinesListFunction2", {
+    var args = {
+      srid: this.MAP_SRID,
       of: "xml",
-      os: "1",
       ni: this.networkId,
-      og: "wkt",
-      srid: this.MAP_SRID
-    });
+      og: "wkt"
+    };
+    // Coming soon for LinesListFunction2 on the server
+    if (filter.rollingStockFilterId)
+      args.rsf = filter.rollingStockFilterId;
+    if (withStops)
+      args.os = 1;  
+
+    var linesXHR = this.callSynthese("LinesListFunction2", args);
 
     var self = this;
-    linesXHR.done(function(linesDocument) {
+    return linesXHR.pipe(function(linesDocument) {
 
       var lineFeatures = [];
       var wktFormat = new OpenLayers.Format.WKT();
 
       $("line", linesDocument).each(function(index, line) {
+      
+        // TODO: Delete once rollingStockFilterId implemented on server
+        if (filter.rollingStockId && $("transportMode", line).attr("id") == filter.rollingStockId)
+          return;
+        
         // Skip lines that have no stop in the active city
         if (self.cityIdFilter &&
             !$("stopArea[city_id=" + self.cityIdFilter + "]", line).length)
@@ -481,14 +494,21 @@ var SyntheseMap = OpenLayers.Class({
 
         lineFeatures.push.apply(lineFeatures, bgFeatures);
         lineFeatures.push.apply(lineFeatures, features);
+        
       });
 
-      self.linesLayer.addFeatures(lineFeatures);
+       return lineFeatures;
+     }).promise();
+  },
 
-      if (!self.cityIdFilter)
-        self.map.zoomToExtent(self.linesLayer.getDataExtent());
-    });
-    return linesXHR;
+  addLines: function() {
+    var self = this;
+
+    return this.fetchLines({}, true).
+      pipe(function(lineFeatures) {
+        self.linesLayer.addFeatures(lineFeatures);
+      }
+    );
   },
 
   /**
