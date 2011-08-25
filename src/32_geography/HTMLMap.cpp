@@ -127,9 +127,32 @@ namespace synthese
 			}
 			stream << "<div id=\"" << _id << "\"></div>";
 			stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
-			stream << HTMLModule::GetHTMLJavascriptOpen();
 
-			stream << "var map, vectors, controls;";
+            // For Geoportail
+            BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
+            {
+                if(mapSource.second->getType() == MapSource::IGN)
+                {
+                    stringstream streamTemp;
+                    streamTemp << "http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << mapSource.second->getURL() << "&amp;includeEngine=true&amp;";
+                    stream << HTMLModule::GetHTMLJavascriptOpen(streamTemp.str());
+
+                    stream << HTMLModule::GetHTMLJavascriptOpen();
+                    stream << "if (window.__Geoportal$timer===undefined) {" <<
+                              "var __Geoportal$timer= null;" <<
+                              "}" <<
+                              "if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
+                              "var gGEOPORTALRIGHTSMANAGEMENT= {" <<
+                              "apiKey:['"<< mapSource.second->getURL() <<"']" <<
+                              "};" <<
+                              "}";
+                    stream << HTMLModule::GetHTMLJavascriptClose();
+                }
+            }
+
+
+            stream << HTMLModule::GetHTMLJavascriptOpen();
+            stream << "var map, vectors, controls;";
 			//support functions
 			stream <<
 				"var lastFeature = null;" <<
@@ -348,13 +371,18 @@ namespace synthese
 					*secondPoint
 			)	);
 
+
 			stream <<
-			 _mapSource->getOpenLayersConstructor() <<
-			"map.addLayer(getFeaturesLayer(map.getProjectionObject()));" <<
-			"var bounds = new OpenLayers.Bounds();" <<
-			"bounds.extend(new OpenLayers.LonLat(" << fixed << firstPointProjected->getX() << "," << fixed << firstPointProjected->getY() << "));" <<
-			"bounds.extend(new OpenLayers.LonLat(" << fixed << secondPointProjected->getX() << "," << fixed << secondPointProjected->getY() << "));" <<
-			"map.zoomToExtent(bounds, true);" <<
+            "function loadMap() {" <<
+               _mapSource->getOpenLayersConstructor() <<
+			   "map.addLayer(getFeaturesLayer(map.getProjectionObject()));" <<
+			   "var bounds = new OpenLayers.Bounds();" <<
+			   "bounds.extend(new OpenLayers.LonLat(" << fixed << firstPointProjected->getX() << "," << fixed << firstPointProjected->getY() << "));" <<
+			   "bounds.extend(new OpenLayers.LonLat(" << fixed << secondPointProjected->getX() << "," << fixed << secondPointProjected->getY() << "));" <<
+			   "map.zoomToExtent(bounds, true);" <<
+            "}" <<
+
+            "window.onload = loadMap;" <<
 
 			"function activateAddPoint_" << _id << "(requestURL)" <<
 			"{" <<

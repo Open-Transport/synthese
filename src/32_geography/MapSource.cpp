@@ -35,7 +35,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string Registry<MapSource>::KEY("MapSource");
@@ -88,19 +88,6 @@ namespace synthese
 			case IGN:
 				stringstream str;
 				str <<
-					"var fileref=document.createElement('script');" <<
-					"fileref.setAttribute('type','text/javascript');" <<
-					"fileref.setAttribute('src', 'http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << _url << "&amp;includeEngine=true');" <<
-					"document.getElementsByTagName('head')[0].appendChild(fileref);" <<
-
-					"if (window.__Geoportal$timer===undefined) {" <<
-					"var __Geoportal$timer= null;" <<
-					"}" <<
-					"if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
-					"var gGEOPORTALRIGHTSMANAGEMENT= {" <<
-					"apiKey:['" << _url << "']" <<
-					"};" <<
-					"}" <<
 
 				"var epsg4258= new OpenLayers.Projection('EPSG:4258');" <<
 				"map= new OpenLayers.Map('map', OpenLayers.Util.extend({" <<
