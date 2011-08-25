@@ -1,0 +1,67 @@
+/* General dropdown styles */       
+.dropdown dd, .dropdown dt, .dropdown ul { margin:0px; padding:0px; }
+.dropdown dd { 
+    position:relative;
+}
+/* DT styles for sliding doors */
+.dropdown dt a {
+    display:block; 
+    width  : 89%;
+    margin : auto;
+    border : 1px solid #888;
+    margin-top  : 3px;
+    margin-left : 5%;
+    padding-left: 3px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    background-color: white;
+    text-decoration:none;
+    background-image: url('../scroll.png');
+    background-repeat: no-repeat;
+    background-position: 99% 3px;
+}
+.dropdown dt a span {
+    cursor:pointer; 
+    display:block;
+    color: #111;
+}
+/* UL styles */
+.dropdown dd ul {
+    background-color: #fff; 
+    display:none;
+    list-style:none; 
+    position:absolute; 
+    left:0px; 
+    top:2px;
+    border : 1px solid #888;
+    margin-top  : 1px;
+    margin-left : 5%;
+    text-decoration:none;
+    overflow:auto;
+    height: 200px;
+    min-width: 400px;
+}
+
+.dropdown dd ul li:hover {
+    background-color: #CCC;
+}
+
+.dropdown span.value { 
+    display:none;
+}
+.dropdown dd ul li { 
+    padding:5px; 
+    display:block;
+    cursor: pointer;
+    height: 37px;
+}
+
+.color_switch {
+    background-color: #EEE;
+}
+
+.name_line_selector{
+    vertical-align: middle; 
+    display: inline;
+    margin-top: 4px;
+}
