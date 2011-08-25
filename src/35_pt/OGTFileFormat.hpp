@@ -90,8 +90,8 @@ namespace synthese
 							const impex::DataSource& _dataSource;
 							util::Env& _env;
 							std::ostream& _stream;
-							std::string curTag;
 							CommercialLine* line;
+							bool wayBack;
 							bool importTrip;
 							std::string tripNumber;
 							JourneyPattern::StopsWithDepartureArrivalAuthorization tripStops;
@@ -141,6 +141,27 @@ namespace synthese
 					const admin::AdminRequest& request
 				) const;
 
+
+				
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual util::ParametersMap _getParametersMap() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.2.1
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
 				virtual db::DBTransaction _save() const;
