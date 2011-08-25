@@ -75,7 +75,6 @@ namespace synthese
 
 		db::DBTransaction OGTFileFormat::Importer_::_save() const
 		{
-			_selectObjectsToRemove();
 			DBTransaction transaction;
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type line, _env.getRegistry<JourneyPattern>())
 			{
@@ -186,7 +185,11 @@ namespace synthese
 							)	);
 							if(!user_data->tripStops.empty())
 							{
-								user_data->arrivalSchedules.push_back(user_data->arrivalSchedule);
+								user_data->arrivalSchedules.push_back(
+									user_data->arrivalSchedule.seconds() ?
+									user_data->arrivalSchedule + seconds(60 - user_data->arrivalSchedule.seconds()) :
+									user_data->arrivalSchedule
+								);
 							}
 							user_data->tripStops.push_back(
 								JourneyPattern::StopWithDepartureArrivalAuthorization(
@@ -196,7 +199,7 @@ namespace synthese
 						user_data->arrivalSchedule += seconds(lexical_cast<long>(attributes["DWELLTIME"]));
 						if(attributes["SITUATION"] == "REVENUE_SERVICE")
 						{
-							user_data->departureSchedules.push_back(user_data->arrivalSchedule);
+							user_data->departureSchedules.push_back(user_data->arrivalSchedule - seconds(user_data->arrivalSchedule.seconds()));
 						}
 					}
 					else if(tag == "RUN")
