@@ -94,23 +94,52 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			bool originIsReference (rows->getBool (PTUseRuleTableSync::COL_ORIGINISREFERENCE));
-
-			time_duration minDelayMinutes = minutes(rows->getInt (PTUseRuleTableSync::COL_MINDELAYMINUTES));
-			date_duration minDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS));
-			date_duration maxDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS));
-
-
-			time_duration hourDeadline(rows->getHour(PTUseRuleTableSync::COL_HOURDEADLINE));
-
+			// Rule type
 			PTUseRule::ReservationRuleType ruleType(static_cast<PTUseRule::ReservationRuleType>(rows->getInt(PTUseRuleTableSync::COL_RESERVATION_TYPE)));
-
 			rr->setReservationType(ruleType);
+
+			// Origin is reference
+			bool originIsReference(rows->getBool (PTUseRuleTableSync::COL_ORIGINISREFERENCE));
 			rr->setOriginIsReference (originIsReference);
-			rr->setMinDelayMinutes (minDelayMinutes);
-			rr->setMinDelayDays (minDelayDays);
-			rr->setMaxDelayDays(maxDelayDays.days() > 0 ? maxDelayDays : optional<date_duration>());
+
+			// Min minutes delay (default=0)
+			try
+			{
+				time_duration minDelayMinutes = minutes(rows->getInt (PTUseRuleTableSync::COL_MINDELAYMINUTES));
+				rr->setMinDelayMinutes(minDelayMinutes);
+			}
+			catch(...)
+			{
+				rr->setMinDelayMinutes(minutes(0));
+			}
+
+			// Min days delay (default=0)
+			try
+			{
+				date_duration minDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MINDELAYDAYS));
+				rr->setMinDelayDays (minDelayDays);
+			}
+			catch(...)
+			{
+				rr->setMinDelayDays(days(0));
+			}
+
+			// Max days delay
+			try
+			{
+				date_duration maxDelayDays = days(rows->getInt (PTUseRuleTableSync::COL_MAXDELAYDAYS));
+				rr->setMaxDelayDays(maxDelayDays.days() > 0 ? maxDelayDays : optional<date_duration>());
+			}
+			catch(...)
+			{
+				rr->setMaxDelayDays(optional<date_duration>());
+			}
+
+			// Hour deadline
+			time_duration hourDeadline(rows->getHour(PTUseRuleTableSync::COL_HOURDEADLINE));
 			rr->setHourDeadLine (hourDeadline);
+
+			// Name
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
 			rr->setForbiddenInDepartureBoards(rows->getBool(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS));
@@ -119,6 +148,7 @@ namespace synthese
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Default fare
 				RegistryKeyType id(rows->getLongLong(PTUseRuleTableSync::COL_DEFAULT_FARE));
 				if(id > 0)
 				{
@@ -145,7 +175,7 @@ namespace synthese
 			query.addField(object->getOriginIsReference());
 			query.addField(object->getMinDelayMinutes().total_seconds() / 60);
 			query.addField(static_cast<int>(object->getMinDelayDays().days()));
-			query.addField(object->getMaxDelayDays() ? object->getMaxDelayDays()->days() : -1);
+			query.addField(object->getMaxDelayDays() ? object->getMaxDelayDays()->days() : 0);
 			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
 			query.addField(object->getForbiddenInDepartureBoards());
