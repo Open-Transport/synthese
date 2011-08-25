@@ -1,4 +1,12 @@
 
+function setGeoRM() {
+	return Geoportal.GeoRMHandler.addKey(
+	    gGEOPORTALRIGHTSMANAGEMENT.apiKey,
+	    gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.url,
+	    gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.ttl,
+	    map);
+}
+
 
 function ajaxMapChange(obj){
     var url=obj.action+'?';
@@ -16,18 +24,15 @@ function ajaxMapChange(obj){
     xajax.open('GET',url);
     xajax.onreadystatechange = function(){
         if(xajax.readyState == 4) {
-
-	    eval("var newbaseLayer = "+ xajax.responseText + ";");
-            var oldProjection = new OpenLayers.Projection(map.projection);
+            var oldProjection = new OpenLayers.Projection(map.baseLayer.projection);
             var oldExtent = map.getExtent();
-            while(map.layers.length){
-               map.removeLayer(map.layers[0]);
-            }
-            map.projection = newbaseLayer.projection.getCode();
-	    map.addLayer(newbaseLayer);
-            map.setBaseLayer(newbaseLayer);
-	    map.addLayer(getFeaturesLayer(new OpenLayers.Projection(map.projection)));
-	    var newbounds = oldExtent.transform(oldProjection, newbaseLayer.projection);
+            var oldControls = map.controls;
+            map.destroy();
+	    eval(xajax.responseText);
+            var newProjection = map.baseLayer.projection;
+	    map.addLayer(getFeaturesLayer(newProjection));
+	    var newbounds = oldExtent.transform(oldProjection, newProjection);
+            map.controls = oldControls;
 	    map.zoomToExtent(newbounds, true);
     }    };
     xajax.send();
