@@ -30,55 +30,13 @@
   <script src="/map/js/SyntheseMap.js"></script>
   
   <!-- TISSEO JS -->
-  <script type="text/javascript" src="js/tisseo.js"></script>
+  <script type="text/javascript" src="js/networkExplorer.js"></script>
   <!---------------> 
   
   <!-- AutoComplete -->
   <script type="text/javascript" src="vendor/autocomplete/lib/jquery.bgiframe.min.js"></script>
   <script type="text/javascript" src="vendor/autocomplete/jquery.autocomplete.js"></script>
   <!---------------> 
-
-  <script>
-  Synthese.init(7036874417766402);
-
-  Synthese.ieFix();
-  </script>
-  
-  <script>
-  $(function() {
-    var Cm79Map = OpenLayers.Class(CityBrowserMap, {
-      showLayerSwitcher: false,
-      center: ["1.444209", "43.604652", "10"],
-
-      // Don't show OSM, which lacks data in this region.
-      getBackgroundLayers: function() {
-        var parentLayers = CityBrowserMap.prototype.getBackgroundLayers.apply(this, arguments);
-        var googleSatellite = parentLayers[1];
-        var google = parentLayers[2];
-        return [google, googleSatellite];
-      },
-      initTranslations: function() {
-        CityBrowserMap.prototype.initTranslations.apply(this, arguments);
-        OpenLayers.Lang.fr.googleDefaultLayer = "Carte";
-      }
-    });
-    
-    var routePlanner = new RoutePlannerView({
-      el: document.getElementsByName("ri")
-    });
-
-    var stopSelector = new StopSelector({
-      routePlanner: routePlanner,
-      popupOptions: {
-        cityBrowserOptions: {
-          mapClass: Cm79Map
-        }
-      }
-    });
-    // For debugging:
-    $(".mapLink:first").trigger("click");
-  });
-  </script>
 
 </head>
 
@@ -159,7 +117,11 @@
 
 <div id="map"></div>
 <script>
+
+Synthese.init();
+
 var cityMap = new TisseoMap("map");
+
 </script>
 </body>
 
