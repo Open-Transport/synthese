@@ -585,10 +585,13 @@ var SyntheseMap = OpenLayers.Class({
     // TODO: these methods should only build the features, so that they can
     // be overridden without them knowing about the specifics for putting the
     // features into the lines/stops layers.
+    // FIXME: temporary until https://188.165.247.81/issues/11210 is fixed
+    var self = this;
     $.when(
-      this.addLines(),
-      this.addStops()
-    ).done($.proxy(this.afterPTFeaturesAdded, this));
+      this.addLines()
+    ).pipe(function() {
+      return self.addStops();
+    }).done($.proxy(this.afterPTFeaturesAdded, this));
   },
 
   /**
