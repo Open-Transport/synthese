@@ -3,7 +3,7 @@
 Define the events for search form
 
 ************* */
-var TisseoMap = OpenLayers.Class(CityMap, {
+var TisseoMap = OpenLayers.Class(SyntheseMap, {
 
     dataList: {
         stops  : [],
@@ -19,7 +19,7 @@ var TisseoMap = OpenLayers.Class(CityMap, {
     // CONSTRUCTOR
     initialize: function(mapId, options) {
     
-        SyntheseMap.prototype.initialize.apply(this, arguments);
+      SyntheseMap.prototype.initialize.apply(this, arguments);
    
     },
     
