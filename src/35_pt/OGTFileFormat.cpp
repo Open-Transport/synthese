@@ -116,7 +116,6 @@ namespace synthese
 			stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 			stream << t.cell("Calendrier", 
 				t.getForm().getSelectInput(
 					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
@@ -363,9 +362,6 @@ namespace synthese
 		{
 		}
 
-
-
-		
 
 
 		util::ParametersMap OGTFileFormat::Importer_::_getParametersMap() const
