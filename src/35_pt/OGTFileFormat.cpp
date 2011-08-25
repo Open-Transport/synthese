@@ -139,25 +139,25 @@ namespace synthese
 			AttributeMap attributes = ExpatParser::createAttributeMap(attrs);
 			string tag(name);
 
-			if(user_data->curTag.empty())
+			if(tag == "SCHEDULE")
 			{
-				if (tag == "SCHEDULE")
+				string lineCode(attributes["APPLICATION_AREA"]);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines(user_data->_dataSource, user_data->_env);
+				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Set lines(
+					_lines.get(lineCode)
+				);
+				if(!lines.empty())
 				{
-					string lineCode(attributes["APPLICATION_AREA"]);
-					ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines(user_data->_dataSource, user_data->_env);
-					impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>::Set lines(
-						_lines.get(lineCode)
-					);
-					if(!lines.empty())
-					{
-						user_data->line = *lines.begin();
-					}
-					user_data->curTag = tag;
+					user_data->line = *lines.begin();
 				}
 			}
-			else if(user_data->curTag == "SCHEDULE" && user_data->line)
+			else if(user_data->line)
 			{
-				if(	tag == "TRIP")
+				if(tag == "SCHEDULE_PART")
+				{
+					user_data->wayBack = (attributes["DIRECTION"] == "LEFT");
+				}
+				else if(tag == "TRIP")
 				{
 					if(attributes["MISSION_TYPE"] != "Passager")
 					{
@@ -167,24 +167,11 @@ namespace synthese
 					{
 						user_data->importTrip = true;
 						user_data->tripNumber = attributes["NUMBER"];
-						user_data->tripStops.clear();
-						user_data->departureSchedules.clear();
-						user_data->arrivalSchedules.clear();
 						user_data->arrivalSchedule = duration_from_string(attributes["ENTRY_TIME"]);
-					}
-					user_data->curTag = tag;
-				}
-			}
-			else if(user_data->importTrip && user_data->line)
-			{
-				if(user_data->curTag == "TRIP")
-				{
-					if(	tag == "VEHICLE_JOURNEY")
-					{
-						user_data->curTag = tag;
+						user_data->arrivalSchedules.push_back(user_data->arrivalSchedule);
 					}
 				}
-				else if(user_data->curTag == "VEHICLE_JOURNEY")
+				else if(user_data->importTrip)
 				{
 					if(	tag == "STOP")
 					{
@@ -218,8 +205,7 @@ namespace synthese
 						user_data->arrivalSchedule += seconds(lexical_cast<long>(attributes["RUNTIME"]));
 					}
 				}
-			}
-		}
+		}	}
 
 
 
@@ -228,38 +214,50 @@ namespace synthese
 			expat_user_data *user_data = (expat_user_data*)d;
 			string tag(name);
 
-			if(tag == "TRIP" && user_data->importTrip && user_data->line)
+			if(tag == "SCHEDULE")
 			{
-				user_data->departureSchedules.pop_back();
-				JourneyPattern* route(
-					PTFileFormat::CreateOrUpdateRoute(
-						*user_data->line,
-						boost::optional<const std::string&>(),
-						user_data->tripNumber,
-						boost::optional<const std::string&>(),
-						optional<Destination*>(),
-						optional<const RuleUser::Rules&>(),
-						true,
-						NULL, // (rolling stock)
-						user_data->tripStops,
-						user_data->_dataSource,
-						user_data->_env,
-						user_data->_stream
-				)	);
-				ScheduledService* service(
-					PTFileFormat::CreateOrUpdateService(
-						*route,
-						user_data->departureSchedules,
-						user_data->arrivalSchedules,
-						user_data->tripNumber,
-						user_data->_dataSource,
-						user_data->_env,
-						user_data->_stream
-				)	);
-				if(service)
+				user_data->line = NULL;
+			}
+
+			if(tag == "TRIP")
+			{
+				if(user_data->importTrip && user_data->line)
 				{
-					*service |= user_data->_calendar;
+					JourneyPattern* route(
+						PTFileFormat::CreateOrUpdateRoute(
+							*user_data->line,
+							boost::optional<const std::string&>(),
+							user_data->tripNumber,
+							boost::optional<const std::string&>(),
+							optional<Destination*>(),
+							optional<const RuleUser::Rules&>(),
+							user_data->wayBack,
+							NULL, // (rolling stock)
+							user_data->tripStops,
+							user_data->_dataSource,
+							user_data->_env,
+							user_data->_stream
+					)	);
+					ScheduledService* service(
+						PTFileFormat::CreateOrUpdateService(
+							*route,
+							user_data->departureSchedules,
+							user_data->arrivalSchedules,
+							user_data->tripNumber,
+							user_data->_dataSource,
+							user_data->_env,
+							user_data->_stream
+					)	);
+					if(service)
+					{
+						*service |= user_data->_calendar;
+					}
 				}
+				user_data->importTrip = false;
+				user_data->tripStops.clear();
+				user_data->departureSchedules.clear();
+				user_data->arrivalSchedules.clear();
+				user_data->tripNumber.clear();
 			}
 		}
 
@@ -360,7 +358,26 @@ namespace synthese
 			_stream(stream),
 			_calendar(calendar),
 			stopPoints(dataSource, env),
-			line(NULL)
+			line(NULL),
+			wayBack(false)
 		{
+		}
+
+
+
+		
+
+
+		util::ParametersMap OGTFileFormat::Importer_::_getParametersMap() const
+		{
+			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
+			return map;
+		}
+
+
+
+		void OGTFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
+		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
 		}
 }	}
