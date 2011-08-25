@@ -265,6 +265,7 @@ namespace synthese
 				stream << f.open();
 
 				HTMLTable::ColsVector c;
+				c.push_back("");
 				c.push_back("Nom");
 				c.push_back("Code exploitant");
 				c.push_back("Lon");
@@ -272,7 +273,6 @@ namespace synthese
 				c.push_back("X");
 				c.push_back("Y");
 				c.push_back("Lignes");
-				c.push_back("Actions");
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
@@ -283,6 +283,11 @@ namespace synthese
 
 					stream << fixed;
 					stream << t.row();
+
+					// Open button
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
+
+					// Name cell
 					stream << t.col() << stop->getName();
 					stream << t.col() << stop->getCodeBySources();
 
@@ -324,8 +329,6 @@ namespace synthese
 						;
 					}
 
-					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), StopPointAdmin::ICON);
-
 					// Remove button only if the stop is not used by any route
 					stream << t.col();
 					if(stop->getDepartureEdges().empty() && stop->getArrivalEdges().empty())
@@ -335,11 +338,11 @@ namespace synthese
 					}
 				}
 				stream << t.row();
+				stream << t.col();
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_NAME, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_OPERATOR_CODE, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_X, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_Y, string());
-				stream << t.col();
 				stream << t.col();
 				stream << t.col();
 				stream << t.col() << f.getSubmitButton("Ajouter");
