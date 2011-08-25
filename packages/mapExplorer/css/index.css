@@ -1,0 +1,193 @@
+body{
+    margin      : 0px;
+    font-family : calibri;
+    color       : #444;
+}
+
+#map{
+    position : absolute;
+    z-index  : 1; 
+    right    : 0px;
+    width    : 75%;
+    bottom   : 0px;
+    top      : 0px;
+}
+
+#form_map{z-index  : 1; 
+    position         : absolute;
+    z-index          : 2;
+    left             : 0px;
+    /*padding-top      : 104px;*/
+    padding-top      : 10px;
+    padding-bottom   : 10px;
+    width            : 25%;
+    top              : 0px;
+    background-color : #EEE;
+   /* background-image   : url("http://www.tisseo.fr/sites/all/themes/tisseo/img/logo_grey.gif"); 
+    background-repeat  : no-repeat;
+    background-position: center top;*/
+    -moz-box-shadow    : 0px 0px 4px #888;  
+    -webkit-box-shadow : 0px 0px 4px #888;  
+    box-shadow         : 0px 0px 4px #888;
+}
+
+#search_area, #filter_area{
+    width  : 90%;
+    margin : auto;
+}
+
+.form_search_area, .form_search_area_logo{
+    width            : 100%;
+    border-radius    : 5px;
+    background-color : #DDD;
+    padding          : 5px 0px 7px 0px;
+    margin-bottom    : 10px;
+}
+
+.form_search_area_logo{
+    text-align          : center; 
+    background-image    : url('../synthese.png'); 
+    background-position : center center;
+    background-repeat   : no-repeat;
+    height              : 24px;
+}
+
+.title_form_search_area{
+    width          : 90%;
+    margin         : auto;
+    border-bottom  : 1px solid #666;
+    text-transform : uppercase;
+}
+
+.form_search_area input,select{
+    width  : 90%;
+    margin : auto;
+    border : 1px solid #888;
+    margin-top  : 3px;
+    margin-left : 5%;
+}
+
+.form_search_area input[type=button]{
+    cursor: pointer;
+}
+
+#filter_area{
+    border-radius    : 5px;
+    background-color : #A2B0E0;
+    padding-bottom   : 5px;
+}
+
+#title_filter_area{
+    width  : 90%;
+    margin : auto;
+    border-bottom  : 1px solid #EDEFF2;
+    text-transform : uppercase;
+    color          : #EDEFF2;
+}
+
+.line_filter_area{
+    padding : 3px 0px 3px 5%;
+    width  : 90%;
+}
+
+.line_filter_area input[type=checkbox]{
+    float: right;
+    
+}
+
+.number_line_filter_area, .number_line_selector{
+    padding-left  : 2px;
+    padding-right : 2px;
+    border-radius : 2px;
+    text-align    : center;
+    float         : left;
+    margin-right  : 3px;
+}
+
+.number_line_selector{
+    width : 37px;
+    height: 30px;
+    padding-top: 7px;
+}
+
+#message_box{
+    z-index: 3;
+    position: absolute;
+    left: 30%;
+    top: 10px;
+    background-color : #EEE;
+    border-radius : 4px;
+    -moz-box-shadow    : 0px 0px 4px #888;  
+    -webkit-box-shadow : 0px 0px 4px #888;  
+    box-shadow         : 0px 0px 4px #888;
+    display: none;
+    padding: 5px;
+    font-weight: bold;
+}
+
+.checkUncheck{
+    float : right;
+}
+
+.tabJourneyStop{
+    width      : 500px;
+    min-height : 100px;
+}
+
+.titleJourneyStop{
+    width            : 100%;
+    background-image : url("../mat_horaire_deg_band_rubrique.png");
+    height           : 30px;
+    color            : white;
+}
+
+.cellTitleJourneyStop{
+    float : left;
+    height: 100%;
+    padding-top: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+    border-left: 1px solid white;
+}
+
+.cellJourneyStop{
+    width            : 100%;
+    background-color : #DDD;
+    padding          : 4px;
+    float            : left;
+}
+
+.number_line_journey_stop{
+    margin-right: 20px;
+    margin-left: 12px;
+}
+
+.textInJourneyStop{
+    float: left;
+    margin-right: 5px;
+}
+
+.switchCellJourneyStop{
+    background-color: #EEE;
+}
+
+.nameStopJourney{
+    width: 100%
+    height: 20px;
+    border-radius : 3px;
+    border: 1px solid #222;
+    margin: 3px;
+    padding: 3px;
+}
+
+.contentPopupJourney{
+    overflow-x: hidden;
+    width: 500px;
+    min-height: 200px;
+    max-height: 500px;
+    padding: 5px;
+}
+
+.contentStopJourney{
+    width: 500px;
+}
