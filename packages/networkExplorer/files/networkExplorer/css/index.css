@@ -46,7 +46,7 @@ body{
 
 .form_search_area_logo{
     text-align          : center; 
-    background-image    : url('../synthese.png'); 
+    background-image    : url('../images/synthese.png'); 
     background-position : center center;
     background-repeat   : no-repeat;
     height              : 24px;
@@ -136,7 +136,7 @@ body{
 
 .titleJourneyStop{
     width            : 100%;
-    background-image : url("../mat_horaire_deg_band_rubrique.png");
+    background-image : url("../images/mat_horaire_deg_band_rubrique.png");
     height           : 30px;
     color            : white;
 }
