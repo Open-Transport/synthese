@@ -5,6 +5,7 @@ var SyntheseMap = OpenLayers.Class({
   linesLayer: null,
   stopsLayer: null,
   layerSwitcher: null,
+  // TODO: use Synthese object instead.
   urlOptions: null,
 
   /**
@@ -151,6 +152,7 @@ var SyntheseMap = OpenLayers.Class({
     this.zoomToInitialPosition();
     this.afterMapInit();
 
+    this.networkId = this.networkId || this.urlOptions.networkId;
     if (this.networkId)
       this.addPTFeatures();
   },
@@ -509,8 +511,6 @@ var SyntheseMap = OpenLayers.Class({
 
     var stopsXHR = this.callSynthese("StopAreasListFunction", args);
     var self = this;
-
-    var dfd = $.Deferred();
 
     return stopsXHR.pipe(function(stopsDocument) {
       var stopFeatures = [];
