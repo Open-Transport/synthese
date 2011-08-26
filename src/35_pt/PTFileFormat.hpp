@@ -132,11 +132,13 @@ namespace synthese
 			);
 
 
+
 			static std::set<StopArea*> CreateOrUpdateStopAreas(
 				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				const std::string& name,
 				const geography::City& city,
+				bool updateCityIfExists,
 				boost::posix_time::time_duration defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,

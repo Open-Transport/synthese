@@ -232,6 +232,7 @@ namespace synthese
 								id,
 								name,
 								*_defaultCity,
+								false,
 								_stopAreaDefaultTransferDuration,
 								_dataSource,
 								_env,
