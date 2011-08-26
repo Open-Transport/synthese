@@ -1002,7 +1002,17 @@ namespace synthese
 			pm.insert(DATA_IS_END_STATION, isTheEndStation);
 			pm.insert(DATA_DESTINATION_RANK, rank);
 			pm.insert(DATA_DESTINATION_GLOBAL_RANK, globalRank);
-			pm.insert(DATA_DIRECTION, dynamic_cast<const JourneyPattern*>(object.getService()->getPath())->getDirection());
+
+			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(object.getService()->getPath()));
+			string lineDirection(
+				line->getDirection().empty() && line->getDirectionObj() ?
+				line->getDirectionObj()->getDisplayedText() :
+				line->getDirection()
+			);
+			pm.insert(
+				DATA_DIRECTION,
+				lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection
+			);
 
 			// Continuation
 			pm.insert(DATA_IS_CONTINUATION, isContinuation);

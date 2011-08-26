@@ -393,8 +393,8 @@ namespace synthese
 					stream << t.col() << place->getName();
 					if(place->getPoint().get())
 					{
-						stream << t.col() << place->getPoint()->getX();
-						stream << t.col() << place->getPoint()->getY();
+						stream << t.col() << fixed << place->getPoint()->getX();
+						stream << t.col() << fixed << place->getPoint()->getY();
 					}
 					else
 					{
