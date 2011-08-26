@@ -23,7 +23,7 @@ src/xmltok_ns.c
 )
 
 if(WIN32)
-  add_definitions(-DCOMPILED_FROM_DSP -DXML_UNICODE_WCHAR_T)
+  add_definitions(-DCOMPILED_FROM_DSP)
 else()
   add_definitions(-DHAVE_MEMMOVE)
 endif()
