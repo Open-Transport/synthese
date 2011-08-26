@@ -190,6 +190,9 @@ def add_default_subparsers(subparsers):
     parser_build.add_argument(
         '--kill-daemons-when-building', action='store_true',
         help='Kill all running daemons before building')
+    parser_build.add_argument(
+        '-o', '--build-only',
+        help='Build only the specified project')
 
     parser_clean = subparsers.add_parser(
         'clean', help='Delete the object directory')

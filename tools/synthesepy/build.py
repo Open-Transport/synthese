@@ -61,7 +61,7 @@ class Builder(object):
         temp_dir = join(self.download_cache_dir, 'temp')
         utils.RemoveDirectory(temp_dir)
         os.makedirs(temp_dir)
-        temp_target = join(temp_dir, target_filename) 
+        temp_target = join(temp_dir, target_filename)
         log.info('Downloading %s to %s', url, temp_target)
         shutil.copyfileobj(urllib2.urlopen(url), open(temp_target, 'wb'))
 
@@ -417,9 +417,11 @@ class CMakeBuilder(Builder):
             os.makedirs(self.env.env_path)
         utils.call(args, cwd=self.env.env_path, env=env)
 
-    def _build_make(self):
+    def _build_make(self, build_only_project):
         utils.call(
-            'make -j%i' % self.env.c.parallel_build,
+            'make -j%i %s' % (
+                self.env.c.parallel_build,
+                build_only_project if build_only_project else ''),
             cwd=self.env.env_path,
             shell=True)
 
@@ -440,13 +442,13 @@ class CMakeBuilder(Builder):
                 default_vs_path + 'VC\\VCPackages',
                 default_sdk_path + 'bin',
             ])
-    
+
             utils.append_paths_to_environment('INCLUDE', [
                 default_vs_path + 'VC\\ATLMFC\\INCLUDE',
                 default_vs_path + 'VC\\INCLUDE',
                 default_sdk_path + 'include',
             ])
-    
+
             utils.append_paths_to_environment('LIB', [
                 default_vs_path + 'VC\\ATLMFC\\LIB',
                 default_vs_path + 'VC\\LIB',
@@ -462,8 +464,9 @@ class CMakeBuilder(Builder):
             args,
             cwd=self.env.env_path)
 
-    def _build_vs(self):
-        self._run_devenv('ALL_BUILD')
+    def _build_vs(self, build_only_project):
+        self._run_devenv(
+            build_only_project if build_only_project else 'ALL_BUILD')
 
     def _run_tool_method(self, method, *args, **kwargs):
         tool_method = getattr(self, '{0}_{1}'.format(method, self.tool))
@@ -480,7 +483,7 @@ class CMakeBuilder(Builder):
             self.config.kill_daemons_when_building):
             utils.kill_processes('s3-server')
 
-        self._run_tool_method('_build')
+        self._run_tool_method('_build', self.config.build_only)
 
     def _install_make(self):
         utils.call(
