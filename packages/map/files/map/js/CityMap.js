@@ -70,6 +70,7 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
 
     var self = this;
 
+    // TODO: use an attribute and update the StyleMap instead?
     function setFeatureVisible(feature, visible) {
       if (visible)
         delete feature.style;
