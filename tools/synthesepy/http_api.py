@@ -102,27 +102,36 @@ class HTTPApi(object):
         self.sid = cookiejar._cookies.values()[0].values()[0]['sid'].value
         return self.sid
 
-    def call_synthese(self, params, send_sid=False):
-        SYNTHESE_URL = 'http://%s/synthese' % self.hostname
+    def get_synthese_url(self, params={}, use_get=False):
+        url = 'http://%s/synthese' % self.hostname
+        if use_get:
+            url += '?' + urllib.urlencode(params)
+        return url
+
+    def call_synthese(self, params, send_sid=False, use_get=False):
         if send_sid:
             params['sid'] = self._get_sid()
-        post_data = urllib.urlencode(params)
-        log.debug('Calling synthese with url %r, post_data %r', SYNTHESE_URL, post_data)
+        url = self.get_synthese_url(params, use_get)
+        if use_get:
+            post_data = None
+        else:
+            post_data = urllib.urlencode(params)
+        log.debug('Calling synthese with url %r, post_data %r', url, post_data)
 
-        response = urllib2.urlopen(SYNTHESE_URL, post_data)
+        response = urllib2.urlopen(url, post_data)
 
         content = response.read()
         # TODO: detect errors?
         log.debug('Result string: %r, info: %r', content, response.info())
         return (content, response.info())
 
-    def call_action(self, action, params, send_sid=False):
+    def call_action(self, action, params, send_sid=False, use_get=False):
         params['a'] = action
-        return self.call_synthese(params, send_sid)
+        return self.call_synthese(params, send_sid, use_get)
 
-    def call_service(self, service, params, send_sid=False):
+    def call_service(self, service, params, send_sid=False, use_get=False):
         params['SERVICE'] = service
-        return self.call_synthese(params, send_sid)
+        return self.call_synthese(params, send_sid, use_get)
 
     # XXX returns a parsed response.
     def get_web_page_content(self, page_id):
