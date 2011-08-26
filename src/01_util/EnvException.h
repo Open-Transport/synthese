@@ -43,7 +43,7 @@ namespace synthese
 			/// Occurs when the key of the registry cannot be accepted :
 			///		- when the source code attempt to integrate two registries with the same key
 			///		- when a non existent registry is specified at the execution
-			/// To avoid EnvException, control the possible values of the key and control that
+			/// To avoid EnvException, check the possible values of the key and check that
 			/// all registries are correctly integrated in the *.gen.cpp files.
 			//////////////////////////////////////////////////////////////////////////
 			EnvException(const std::string& key);
