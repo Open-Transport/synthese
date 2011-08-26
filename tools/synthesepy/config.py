@@ -80,6 +80,7 @@ DEFAULTS = {
     'parallel_build': multiprocessing.cpu_count(),
     'no_clean_if_build_fails': False,
     'kill_daemons_when_building': False,
+    'build_only': None,
 
     # runtests
     'test_conn_strings': ['sqlite://', 'mysql://db=synthese_test,host=localhost,user=synthese,passwd=synthese'],
