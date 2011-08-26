@@ -184,6 +184,7 @@ namespace synthese
 			const std::string& id,
 			const std::string& name,
 			const geography::City& city,
+			bool updateCityIfExists,
 			boost::posix_time::time_duration defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
@@ -204,6 +205,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				stopArea->setDataSourceLinks(links);
+				stopArea->setCity(&city);
 				env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
 				stopAreas.add(*stopArea);
 				result.insert(stopArea);
@@ -212,7 +214,10 @@ namespace synthese
 			// Update
 			BOOST_FOREACH(StopArea* stopArea, result)
 			{
-				stopArea->setCity(&city);
+				if(updateCityIfExists)
+				{
+					stopArea->setCity(&city);
+				}
 				stopArea->setName(name);
 			}
 
