@@ -56,6 +56,7 @@ namespace synthese
 			setDirection(line.getDirection());
 			setWalkingLine(line.getWalkingLine());
 			setWayBack(line.getWayBack());
+			setRules(line.getRules());
 
 			// Copy of the line-stops
 			const Path::Edges edges(line.getEdges());
