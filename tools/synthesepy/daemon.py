@@ -43,6 +43,7 @@ class Daemon(object):
     def __init__(self, env):
         self.env = env
         self.proc = None
+        self.stopped = True
 
     def _start_wsgi_proxy(self):
         if not self.env.c.wsgi_proxy:
@@ -112,7 +113,7 @@ class Daemon(object):
             args.extend(['--pidfile', pid_path])
 
         params = {
-            'log_level': '-1',
+            'log_level': str(self.env.c.log_level),
             'port': str(self.env.c.port),
         }
         if self.env.c.extra_params:
