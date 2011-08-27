@@ -656,14 +656,16 @@ EXCLUDE_PATTERNS       = *.inc.cpp \
 EXCLUDE_SYMBOLS        = FACTORY_KEY \
                          _registry \
                          DEFAULT_TITLE \
-                         ICON
+                         ICON \
+                         TABLE \
+                         _FIELDS \
+                         _INDEXES
 
 # The EXAMPLE_PATH tag can be used to specify one or more files or 
 # directories that contain example code fragments that are included (see 
 # the \include command).
 
-EXAMPLE_PATH           = ../main \
-                         ../test
+EXAMPLE_PATH           = ../test
 
 # If the value of the EXAMPLE_PATH tag contains directories, you can use the 
 # EXAMPLE_PATTERNS tag to specify one or more wildcard pattern (like *.cpp 
@@ -1467,7 +1469,7 @@ CLASS_DIAGRAMS         = YES
 # the mscgen tool resides. If left empty the tool is assumed to be found in the 
 # default search path.
 
-MSCGEN_PATH            = "MSCGen"
+MSCGEN_PATH            = ""
 
 # If set to YES, the inheritance and collaboration graphs will hide 
 # inheritance and usage relations if the target is undocumented 
