@@ -177,6 +177,7 @@ namespace synthese
 				stream << ts.open();
 
 				const Path* line(_service->getPath());
+				size_t rank(0);
 				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(static_cast<const LineStop&>(*edge));
@@ -188,7 +189,7 @@ namespace synthese
 					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
 					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
 
-					timetableUpdateRequest.getAction()->setRank(lineStop.getRankInPath());
+					timetableUpdateRequest.getAction()->setRank(rank);
 
 					stream << ts.row();
 
@@ -277,6 +278,8 @@ namespace synthese
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
 					}
+
+					++rank;
 				}
 
 				stream << ts.close();
