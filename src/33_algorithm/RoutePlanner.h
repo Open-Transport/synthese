@@ -140,7 +140,8 @@ namespace synthese
 				const boost::posix_time::ptime& maxMinDateTimeAtOrigin,
 				const boost::posix_time::ptime& maxMinDateTimeAtDestination,
 				bool secondTime,
-				const boost::optional<boost::posix_time::time_duration> maxDuration
+				const boost::optional<boost::posix_time::time_duration> maxDuration,
+				const boost::optional<boost::posix_time::time_duration> maxTransferDuration
 			);
 
 

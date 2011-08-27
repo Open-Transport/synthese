@@ -179,7 +179,7 @@ namespace synthese
 				void prepend (const Journey& journey);
 				void append (const Journey& journey);
 
-				void clear ();
+				virtual void clear();
 
 				void shift(
 					boost::posix_time::time_duration duration
