@@ -1,6 +1,6 @@
 
-/** ComposedExpression class implementation.
-	@file ComposedExpression.cpp
+/** SQLExpression class implementation.
+	@file SQLExpression.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

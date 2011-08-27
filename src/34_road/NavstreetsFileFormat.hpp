@@ -1,6 +1,7 @@
 
-/** NavstreetFileFormat class header.
-	@file NavstreetFileFormat.hpp
+/** NavstreetsFileFormat class header.
+	@file NavstreetsFileFormat.hpp
+	@author Hugues Romain
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

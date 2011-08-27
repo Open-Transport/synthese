@@ -1,6 +1,6 @@
 
 /** SQLiteDB class header.
-	@file SQLiteDB.hpp
+	@file SQLiteDB.h
 	@author Sylvain Pasche
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)

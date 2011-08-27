@@ -40,6 +40,7 @@ namespace map
 
 
 
+/** @ingroup m39 */
 class Rectangle
 {
 private:

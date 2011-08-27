@@ -46,6 +46,7 @@ class PostscriptCanvas;
 
 
 
+/** @ingroup m39 */
 class DrawablePhysicalStop
 {
 

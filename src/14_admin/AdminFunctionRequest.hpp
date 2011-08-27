@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///	AdminFunctionRequest class header.
-///	@file AdminFunctionRequest.h
+///	@file AdminFunctionRequest.hpp
 ///	@author Hugues Romain (RCS)
 ///	@date lun jun 29 2009
 ///

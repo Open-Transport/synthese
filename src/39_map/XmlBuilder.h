@@ -1,6 +1,6 @@
 
 /** XmlBuilder class header.
-	@file XmlBuilder.h
+	@file 39_map/XmlBuilder.h
 	@author Hugues Romain
 	@date 2008
 
@@ -39,6 +39,7 @@ namespace synthese
 		class Map;
 
 
+		/** @ingroup m39 */
 		class XmlBuilder
 		{
 		public:

@@ -1,6 +1,6 @@
 
 /** Reservation class header.
-	@file Reservation.h
+	@file 51_resa/Reservation.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

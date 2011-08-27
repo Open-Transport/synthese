@@ -19,6 +19,7 @@ namespace map
 class MapBackground;
 
 
+/** @ingroup m39 */
 class MapBackgroundManager
 {
 private:

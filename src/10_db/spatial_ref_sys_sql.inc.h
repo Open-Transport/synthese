@@ -1,6 +1,6 @@
 
 /** SQL inserts for filling the spatial_ref_sys table.
-	@file spatial_ref_sys_sql.h
+	@file spatial_ref_sys_sql.inc.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

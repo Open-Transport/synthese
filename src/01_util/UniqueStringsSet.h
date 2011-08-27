@@ -1,6 +1,6 @@
 
-/** UniquesStringsSet class header.
-	@file UniquesStringsSet.h
+/** UniqueStringsSet class header.
+	@file UniqueStringsSet.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
