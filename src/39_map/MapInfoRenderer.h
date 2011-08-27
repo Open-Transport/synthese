@@ -46,6 +46,7 @@ namespace map
     class DrawableLine;
 
 
+	/** @ingroup m39 */
 	class MapInfoRenderer : public util::FactorableTemplate<Renderer,MapInfoRenderer>
 {
  private:

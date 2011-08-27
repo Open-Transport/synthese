@@ -34,7 +34,7 @@ namespace map
 class DrawableLine;
 
 
-
+/** @ingroup m39 */
 class DrawableLineComparator
 {
 private:

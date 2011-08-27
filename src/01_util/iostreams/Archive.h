@@ -1,6 +1,6 @@
 
-/** Tar utility class header.
-	@file Tar.h
+/** Archive utility class header.
+	@file Archive.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

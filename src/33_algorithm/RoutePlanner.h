@@ -122,14 +122,7 @@ namespace synthese
 			//@}
 
 			/** Best journey finder.
-				@param accessDirection Type of computing : search of better arrival or of a better departure
-				@param currentJourney Journey conducting to the departure vam
-				@param sctrictTime Filter :
-					- true : solutions starting at the vam time are only selected
-					- false : all solutions are selected
-				@param optim Filter :
-					- true : solutions allowing a comfort raising and a time saving are selected
-					- false :solutions allowing a time saving are only selected
+				@param direction Type of computing : search of better arrival or of a better departure
 			*/
 			void _findBestJourney(
 				RoutePlanningIntermediateJourney& result,
@@ -147,13 +140,10 @@ namespace synthese
 
 		public:
 			/** Constructor.
-				@param origin Origin place
-				@param destination Destination place
+				@param originVam Origin place
+				@param destinationVam Destination place
 				@param accessParameters Access Parameters
 				@param planningOrder Planning order
-				@param journeySheetStartTime Start date time
-				@param journeySheetEndTime End date time
-				@param maxSolutionsNumber Maximum of solutions number
 				@author Hugues Romain
 				@date 2007
 			*/

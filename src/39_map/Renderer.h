@@ -46,6 +46,7 @@ namespace synthese
 
 
 		/// Map renderer base class (factory).
+		/// @ingroup m39
 		class Renderer
 		:	public util::FactoryBase<Renderer>
 		{

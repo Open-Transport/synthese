@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 /// StopAreaTransferRemoveAction class header.
-///	@file StopAreaTransferRemoveAction.h
+///	@file StopAreaTransferRemoveAction.hpp
 ///	@author RCSobility
 ///	@date 2011
 ///

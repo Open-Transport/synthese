@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// StopAreasListFunction class header.
-///	@file StopAreasListFunction.h
+///	@file StopAreasListFunction.hpp
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized

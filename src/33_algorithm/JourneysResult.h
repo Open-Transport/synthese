@@ -109,8 +109,8 @@ namespace synthese
 				void add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
 
 
+
 				/** Adds an empty journey for a specified vertex.
-					@param method Access direction of the journey to create
 					@author Hugues Romain
 					@date 2008
 				*/

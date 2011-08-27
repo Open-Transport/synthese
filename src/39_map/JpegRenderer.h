@@ -44,6 +44,7 @@ namespace synthese
 	{
 
 
+		/** @ingroup m39 */
 		class JpegRenderer : public util::FactorableTemplate<Renderer,JpegRenderer>
 		{
 		public:

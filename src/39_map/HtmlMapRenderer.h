@@ -48,6 +48,7 @@ namespace synthese
 		class DrawableLine;
 
 
+		/** @ingroup m39 */
 		class HtmlMapRenderer : public util::FactorableTemplate<Renderer,HtmlMapRenderer>
 		{
 		private:

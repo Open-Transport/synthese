@@ -1,6 +1,6 @@
 
 /** XmlBuilder class implementation.
-	@file XmlBuilder.cpp
+	@file 39_map/XmlBuilder.cpp
 	@author Hugues Romain
 	@date 2008
 

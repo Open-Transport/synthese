@@ -1,6 +1,6 @@
 
-/** OneFileExportPolicy class header.
-	@file OneFileExportPolicy.h
+/** OneFileExporter class header.
+	@file OneFileExporter.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

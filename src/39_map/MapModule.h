@@ -27,32 +27,32 @@
 
 namespace synthese
 {
-	/**	@defgroup m59Actions 59 Actions
-		@ingroup m59
+	/**	@defgroup m39Actions 39 Actions
+		@ingroup m39
 
-		@defgroup m59Pages 59 Pages
-		@ingroup m59
+		@defgroup m39Pages 39 Pages
+		@ingroup m39
 
-		@defgroup m59Functions 59 Functions
-		@ingroup m59
+		@defgroup m39Functions 39 Functions
+		@ingroup m39
 
-		@defgroup m59Exceptions 59 Exceptions
-		@ingroup m59
+		@defgroup m39Exceptions 39 Exceptions
+		@ingroup m39
 
-		@defgroup m59LS 59 Table synchronizers
-		@ingroup m59
+		@defgroup m39LS 39 Table synchronizers
+		@ingroup m39
 
-		@defgroup m59Admin 59 Administration pages
-		@ingroup m59
+		@defgroup m39Admin 39 Administration pages
+		@ingroup m39
 
-		@defgroup m59Rights 59 Rights
-		@ingroup m59
+		@defgroup m39Rights 39 Rights
+		@ingroup m39
 
-		@defgroup m59Logs 59 DB Logs
-		@ingroup m59
+		@defgroup m39Logs 39 DB Logs
+		@ingroup m39
 
-		@defgroup m59 59 Map drawing
-		@ingroup m5
+		@defgroup m39 39 Map drawing
+		@ingroup m3
 
 		(Module documentation)
 
@@ -85,11 +85,11 @@ namespace synthese
 		@{
 	*/
 
-	/** 59 Map module namespace. */
+	/** 39 Map module namespace. */
 	namespace map
 	{
 
-		/** 59 Map module class. */
+		/** 39 Map module class. */
 		class MapModule:
 			public server::ModuleClassTemplate<MapModule>
 		{

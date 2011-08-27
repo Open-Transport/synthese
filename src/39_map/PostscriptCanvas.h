@@ -20,6 +20,7 @@ namespace map
 {
 
 
+/** @ingroup m39 */
 class PostscriptCanvas
 {
  private:

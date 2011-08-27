@@ -1,6 +1,6 @@
 
 /** XmlBuilder class header.
-	@file XmlBuilder.h
+	@file 35_pt/XmlBuilder.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
