@@ -184,6 +184,8 @@ namespace synthese
 			///		destination quickly</li>
 			///	</ul>
 			bool operator>(const RoutePlanningIntermediateJourney& other) const;
+
+			virtual void clear();
 		};
 	}
 }

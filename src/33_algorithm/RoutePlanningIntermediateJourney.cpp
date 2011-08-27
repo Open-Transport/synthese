@@ -336,5 +336,13 @@ namespace synthese
 			// Priority 4 : addresses order (to differentiate journeys in all cases)
 			return this < &other;
 		}
-	}
-}
+
+
+
+		void RoutePlanningIntermediateJourney::clear()
+		{
+			_endReached = false;
+			Journey::clear();
+		}
+
+}	}
