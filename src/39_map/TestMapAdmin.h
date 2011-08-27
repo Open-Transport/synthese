@@ -32,7 +32,7 @@ namespace synthese
 	namespace map
 	{
 		/** TestMapAdmin Class.
-			@ingroup m59Admin refAdmin
+			@ingroup m39Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

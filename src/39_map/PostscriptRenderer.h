@@ -51,6 +51,7 @@ namespace map
     class DrawableLine;
 
 
+	/** @ingroup m39 */
 	class PostscriptRenderer : public util::FactorableTemplate<Renderer,PostscriptRenderer>
 {
  public:

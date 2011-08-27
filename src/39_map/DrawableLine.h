@@ -53,7 +53,7 @@ namespace synthese
 
 		class DrawableLineIndex;
 
-		/** @ingroup m59 */
+		/** @ingroup m39 */
 		class DrawableLine
 		{
 		private:

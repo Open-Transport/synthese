@@ -43,7 +43,7 @@ namespace synthese
 		class Map;
 
 		/** MapRequest class.
-			@ingroup m59Functions refFunctions
+			@ingroup m39Functions refFunctions
 		*/
 		class MapRequest:
 			public util::FactorableTemplate<server::Function, MapRequest>

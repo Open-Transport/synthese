@@ -1,6 +1,6 @@
 
 /** Departures Tables Module Types definitions file.
-	@file 34_departures_table/Types.h
+	@file DeparturesTableTypes.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

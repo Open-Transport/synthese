@@ -1,6 +1,6 @@
 
-/** TreeFolderObject class header.
-	@file TreeFolderObject.hpp
+/** TreeFolderChild class header.
+	@file TreeFolderChild.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>

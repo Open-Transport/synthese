@@ -99,7 +99,6 @@ namespace synthese
 				/// @param serviceUse leg to add to the journey
 				/// @param endIsReached the leg gives access to the destination
 				/// @param destinationVam destination vertices
-				/// @param totalDuration best known duration for the whole journey
 				RoutePlanningIntermediateJourney(
 					const RoutePlanningIntermediateJourney& journey,
 					const graph::ServicePointer& serviceUse,

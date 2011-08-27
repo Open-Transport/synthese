@@ -1,7 +1,7 @@
 
 /** TreeFolderTableSync class header.
-	@file TreeFolderTableSync.h
-	@author Hugues
+	@file TreeFolderTableSync.hpp
+	@author Hugues Romain
 	@date 2010
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)

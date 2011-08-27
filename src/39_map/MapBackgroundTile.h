@@ -35,6 +35,7 @@ namespace map
 
 class Map;
 
+/** @ingroup m39 */
 class MapBackgroundTile : public Drawable
 {
 private:

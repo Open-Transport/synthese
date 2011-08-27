@@ -44,6 +44,7 @@
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
+#include "ServiceCalendarLinkTableSync.hpp"
 
 #include "DestinationAdmin.hpp"
 #include "DestinationsAdmin.hpp"
@@ -124,6 +125,7 @@
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
 #include "DRTArea.hpp"
+#include "ServiceCalendarLink.hpp"
 
 
 #include "PTModule.inc.cpp"
@@ -160,6 +162,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::LineAreaInheritedTableSync::integrate();
 	synthese::pt::DesignatedLinePhysicalStopInheritedTableSync::integrate();
 	synthese::pt::DRTAreaTableSync::integrate();
+	synthese::pt::ServiceCalendarLinkTableSync::integrate();
 	
 	synthese::pt::PTModule::integrate();
 	
@@ -264,5 +267,6 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
 	synthese::util::Env::Integrate<synthese::pt::DRTArea>();
+	synthese::util::Env::Integrate<synthese::pt::ServiceCalendarLink>();
 	
 }

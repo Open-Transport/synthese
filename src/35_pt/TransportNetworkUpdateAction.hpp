@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
 /// TransportNetworkUpdateAction class header.
-///	@file TransportNetworkUpdateAction.h
+///	@file TransportNetworkUpdateAction.hpp
 ///	@author Hugues Romain
 ///	@date 2010
 ///

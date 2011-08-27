@@ -53,7 +53,7 @@ namespace map
     class MapBackgroundManager;
     class PostscriptCanvas;
 
-/** @ingroup m59 */
+/** @ingroup m39 */
 class Map
 {
 public:

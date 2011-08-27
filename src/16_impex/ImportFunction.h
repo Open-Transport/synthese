@@ -1,6 +1,6 @@
 
-/** TridentExportFunction class header.
-	@file TridentImportFunction.h
+/** Import service class header.
+	@file ImportFunction.h
 	@author Hugues Romain
 	@date 2009
 
