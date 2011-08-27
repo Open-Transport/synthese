@@ -63,6 +63,7 @@ namespace synthese
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_DEPARTURE = Action_PARAMETER_PREFIX + "ad";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_ARRIVAL = Action_PARAMETER_PREFIX + "aa";
 		const string LineStopUpdateAction::PARAMETER_ALLOWED_INTERNAL = Action_PARAMETER_PREFIX + "ai";
+		const string LineStopUpdateAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
 
 
 		ParametersMap LineStopUpdateAction::getParametersMap() const
@@ -87,6 +88,10 @@ namespace synthese
 			if(_allowedInternal)
 			{
 				map.insert(PARAMETER_ALLOWED_INTERNAL, *_allowedInternal);
+			}
+			if(_withSchedules)
+			{
+				map.insert(PARAMETER_WITH_SCHEDULES, *_withSchedules);
 			}
 			if(_geometry)
 			{
@@ -124,6 +129,10 @@ namespace synthese
 				if(map.isDefined(PARAMETER_ALLOWED_INTERNAL))
 				{
 					_allowedInternal = map.get<bool>(PARAMETER_ALLOWED_INTERNAL);
+				}
+				if(map.isDefined(PARAMETER_WITH_SCHEDULES))
+				{
+					_withSchedules = map.get<bool>(PARAMETER_WITH_SCHEDULES);
 				}
 
 				if(map.isDefined(HTMLMap::PARAMETER_ACTION_WKT))
@@ -169,6 +178,10 @@ namespace synthese
 			{
 				_lineStop->setIsDeparture(*_allowedDeparture);
 			}
+			if(_withSchedules && dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get()))
+			{
+				 dynamic_cast<DesignatedLinePhysicalStop*>(_lineStop.get())->setScheduleInput(*_withSchedules);
+			}
 			if(_geometry)
 			{
 				_lineStop->setGeometry(*_geometry);
@@ -186,5 +199,4 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+}	}

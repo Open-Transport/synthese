@@ -68,6 +68,7 @@ namespace synthese
 			static const std::string PARAMETER_ALLOWED_DEPARTURE;
 			static const std::string PARAMETER_ALLOWED_ARRIVAL;
 			static const std::string PARAMETER_ALLOWED_INTERNAL;
+			static const std::string PARAMETER_WITH_SCHEDULES;
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
@@ -75,6 +76,7 @@ namespace synthese
 			boost::optional<bool> _allowedDeparture;
 			boost::optional<bool> _allowedArrival;
 			boost::optional<bool> _allowedInternal;
+			boost::optional<bool> _withSchedules;
 			boost::optional<boost::shared_ptr<geos::geom::LineString> > _geometry;
 
 		protected:
@@ -113,6 +115,7 @@ namespace synthese
 				void setAllowedDeparture(boost::optional<bool>(value)){ _allowedDeparture = value; }
 				void setAllowedArrival(boost::optional<bool>(value)){ _allowedArrival = value; }
 				void setAllowedInternal(boost::optional<bool>(value)){ _allowedInternal = value; }
+				void setWithSchedules(boost::optional<bool>(value)){ _withSchedules = value; }
 				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
 			//@}
 		};

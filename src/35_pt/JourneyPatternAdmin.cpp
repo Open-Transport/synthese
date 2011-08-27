@@ -357,14 +357,30 @@ namespace synthese
 
 					// Scheduled stop
 					stream << t.col();
-					if(	lineArea.get() ||
-						linePhysicalStop.get() && linePhysicalStop->getScheduleInput()
-					){
-						stream << HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt");
-					}
-					else
+					if(	lineArea.get())
 					{
-						stream << HTMLModule::getHTMLImage("ftv2vertline.png", "Horaire non fourni à cet arrêt");
+						stream << HTMLModule::getHTMLImage("time.png", "Horaire fourni (zonal)");
+					}
+					else if(linePhysicalStop)
+					{
+						string icon(
+							linePhysicalStop->getScheduleInput() ?
+							HTMLModule::getHTMLImage("time.png", "Horaire fourni à cet arrêt") :
+							HTMLModule::getHTMLImage("ftv2vertline.png", "Horaire non fourni à cet arrêt")
+						);
+
+						if(	_line->getServices().empty() &&
+							edge->getRankInPath() != 0 &&
+							edge->getRankInPath() != (*_line->getEdges().rbegin())->getRankInPath()
+						){
+							lineStopUpdateAction.getAction()->setWithSchedules(!linePhysicalStop->getScheduleInput());
+							stream << HTMLModule::getHTMLLink(lineStopUpdateAction.getHTMLForm().getURL(), icon);
+							lineStopUpdateAction.getAction()->setWithSchedules(optional<bool>());
+						}
+						else
+						{
+							stream << icon;
+						}
 					}
 
 // 					if (reservation)
