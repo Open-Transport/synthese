@@ -99,94 +99,136 @@ namespace synthese
 		){
 //			if(_originVam.intersercts(_destinationVam)) throw SamePlacesException();
 
-			Result result(_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE);
+			ptime minBeginTime(_minBeginTime);
 
-			// Look for best time
-			_findBestJourney(
-				result,
-				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
-				_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
-				_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
-				_minBeginTime,
-				_maxBeginTime,
-				_maxEndTime,
-				false,
-				_maxDuration
-			);
-
-			if(result.empty()) return result;
-
-			Result result2(result, _planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
-
-			ptime beginBound(result2.getBeginTime());
-			ptime endBound(result2.getEndTime());
-			if(	_maxDuration &&
-				result2.getDuration() > _maxDuration
+			while(
+				(_planningOrder == DEPARTURE_FIRST && minBeginTime <= _maxEndTime) ||
+				(_planningOrder == ARRIVAL_FIRST && minBeginTime >= _maxEndTime)
 			){
-				endBound =
-					_planningOrder == DEPARTURE_FIRST ?
-					result2.getFirstArrivalTime() - *_maxDuration :
-					result2.getFirstDepartureTime() + *_maxDuration
-				;
+				Result result(_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE);
 
-				if(	_planningOrder == DEPARTURE_FIRST && result2.getEndTime() < endBound ||
-					result2.getEndTime() > endBound
+				// Look for best time
+				_findBestJourney(
+					result,
+					_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
+					_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
+					_planningOrder == DEPARTURE_FIRST ? DEPARTURE_TO_ARRIVAL : ARRIVAL_TO_DEPARTURE,
+					minBeginTime,
+					_maxBeginTime,
+					_maxEndTime,
+					false,
+					_maxDuration,
+					optional<time_duration>()
+				);
+
+				if(result.empty())
+				{
+					break;
+				}
+
+				Result result2(result, _planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL);
+
+				ptime beginBound(result2.getBeginTime());
+				ptime endBound(result2.getEndTime());
+				if(	_maxDuration &&
+					result2.getDuration() > _maxDuration
 				){
-					result2.clear();
+					endBound =
+						_planningOrder == DEPARTURE_FIRST ?
+						result2.getFirstArrivalTime() - *_maxDuration :
+						result2.getFirstDepartureTime() + *_maxDuration
+					;
+
+					if(	_planningOrder == DEPARTURE_FIRST && result2.getEndTime() < endBound ||
+						result2.getEndTime() > endBound
+					){
+						result2.clear();
+					}
 				}
-			}
 
-			// Look for best duration
-			_findBestJourney(
-				result2,
-				_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
-				_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
-				_planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
-				beginBound,
-				beginBound,
-				endBound,
-				true,
-				_maxDuration
-			);
-
-			if(result2.empty()) return Journey();
-
-			// Inclusion of approach journeys in the result
-			Journey finalResult;
-
-			if (result2.getStartApproachDuration().total_seconds())
-			{
-				Journey originApproachJourney(
-					_originVam.getVertexAccess(result2.getOrigin()->getFromVertex()).approachJourney
-				);
-				if (!originApproachJourney.empty())
+				// Check if the found result is compliant with the max transfer duration
+				if(_maxTransferDuration && result2.getServiceUses().size() > 1)
 				{
-					originApproachJourney.shift(
-						result2.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()
-					);
-					originApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
-					finalResult.append(originApproachJourney);
+					bool ok(true);
+					for(Result::ServiceUses::const_iterator it(result2.getServiceUses().begin()); it+1 != result2.getServiceUses().end(); ++it)
+					{
+						if((it+1)->getDepartureDateTime() - it->getArrivalDateTime() > *_maxTransferDuration)
+						{
+							ok = false;
+							break;
+						}
+					}
+					if(!ok)
+					{
+						result2.clear();
+					}
 				}
-			}
 
-			finalResult.append(static_cast<Journey>(result2));
-
-			if (result2.getEndApproachDuration().total_seconds())
-			{
-				Journey goalApproachJourney(
-					_destinationVam.getVertexAccess(result2.getDestination()->getFromVertex()).approachJourney
+				// Look for best duration
+				_findBestJourney(
+					result2,
+					_planningOrder == DEPARTURE_FIRST ? _destinationVam : _originVam,
+					_planningOrder == DEPARTURE_FIRST ? _originVam : _destinationVam,
+					_planningOrder == DEPARTURE_FIRST ? ARRIVAL_TO_DEPARTURE : DEPARTURE_TO_ARRIVAL,
+					beginBound,
+					beginBound,
+					endBound,
+					true,
+					_maxDuration,
+					_maxTransferDuration
 				);
-				if (!goalApproachJourney.empty())
+
+				if(!result2.empty())
 				{
-					goalApproachJourney.shift(
-						result2.getFirstArrivalTime() - goalApproachJourney.getFirstArrivalTime()
-					);
-					goalApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
-					finalResult.append(goalApproachJourney);
+					// Inclusion of approach journeys in the result
+					Journey finalResult;
+
+					if (result2.getStartApproachDuration().total_seconds())
+					{
+						Journey originApproachJourney(
+							_originVam.getVertexAccess(result2.getOrigin()->getFromVertex()).approachJourney
+						);
+						if (!originApproachJourney.empty())
+						{
+							originApproachJourney.shift(
+								result2.getFirstDepartureTime() - originApproachJourney.getFirstDepartureTime()
+							);
+							originApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
+							finalResult.append(originApproachJourney);
+						}
+					}
+
+					finalResult.append(static_cast<Journey>(result2));
+
+					if (result2.getEndApproachDuration().total_seconds())
+					{
+						Journey goalApproachJourney(
+							_destinationVam.getVertexAccess(result2.getDestination()->getFromVertex()).approachJourney
+						);
+						if (!goalApproachJourney.empty())
+						{
+							goalApproachJourney.shift(
+								result2.getFirstArrivalTime() - goalApproachJourney.getFirstArrivalTime()
+							);
+							goalApproachJourney.forceContinuousServiceRange(result2.getContinuousServiceRange());
+							finalResult.append(goalApproachJourney);
+						}
+					}
+
+					return finalResult;
+				}
+
+				if(_planningOrder == DEPARTURE_FIRST)
+				{
+					minBeginTime = result.getBeginTime() + minutes(1);
+				}
+				else
+				{
+					minBeginTime = result.getBeginTime() - minutes(1);
 				}
 			}
 
-			return finalResult;
+			return Journey();
 		}
 
 // -------------------------------------------------------------------------- Recursion
@@ -200,7 +242,8 @@ namespace synthese
 			const ptime& minMaxDateTimeAtOrigin,
 			const ptime& minMaxDateTimeAtDestination,
 			bool secondTime,
-			boost::optional<boost::posix_time::time_duration> maxDuration
+			boost::optional<boost::posix_time::time_duration> maxDuration,
+			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		){
 			if(accessDirection == DEPARTURE_TO_ARRIVAL &&
 				(originDateTime > minMaxDateTimeAtOrigin || originDateTime > minMaxDateTimeAtDestination || minMaxDateTimeAtOrigin > minMaxDateTimeAtDestination)
@@ -353,9 +396,8 @@ namespace synthese
 							result.getFirstDepartureTime() - originDateTime :
 							originDateTime - result.getFirstDepartureTime()
 						),
-					_maxTransferDuration
+					maxTransferDuration
 				);
-
 			}
 
 			if(logger)
