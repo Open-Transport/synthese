@@ -37,7 +37,8 @@
 #endif
 
 using namespace std;
-using namespace boost;
+using namespace boo
+st;
 
 namespace synthese
 {
