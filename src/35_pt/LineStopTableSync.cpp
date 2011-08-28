@@ -250,11 +250,23 @@ namespace synthese
 		void LineStopTableSync::InsertStop(
 			LineStop& lineStop
 		){
-			DBTransaction transaction;
+			if(lineStop.getParentPath()->getEdges().empty())
+			{
+				return;
+			}
 
-			RankUpdateQuery<LineStopTableSync> query(COL_RANKINPATH, 1, lineStop.getRankInPath());
-			query.addWhereField(COL_LINEID, lineStop.getLine()->getKey());
-			query.execute(transaction);
+			DBTransaction transaction;
+		
+			for(size_t rank((*lineStop.getParentPath()->getEdges().rbegin())->getRankInPath()); rank >= lineStop.getRankInPath(); --rank)
+			{
+				UpdateQuery<LineStopTableSync> updateQuery;
+				updateQuery.addUpdateField(COL_RANKINPATH, RawSQL(COL_RANKINPATH + " + " + boost::lexical_cast<string>(1)));
+				updateQuery.addWhereField(
+					COL_RANKINPATH,
+					rank
+				);
+				updateQuery.execute(transaction);
+			}
 
 			Save(&lineStop, transaction);
 

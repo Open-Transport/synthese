@@ -52,6 +52,13 @@ namespace synthese
 				static const std::string TAB_CALENDAR;
 			//@}
 
+			/// @name Parameter Session variables
+			//@{
+				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_START_DATE;
+				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_END_DATE;
+				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID;
+			//@}
+
 		private:
 			/// @name Search parameters
 			//@{

@@ -37,6 +37,8 @@
 #include "ReplaceQuery.h"
 #include "LoadException.h"
 #include "LineStopTableSync.h"
+#include "ServiceCalendarLinkTableSync.hpp"
+#include "ServiceCalendarLink.hpp"
 
 #include <set>
 #include <sstream>
@@ -179,7 +181,31 @@ namespace synthese
 			}
 
 			// Calendar
-			cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
+			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				// Search of calendar template links (overrides manually defined calendar)
+				ServiceCalendarLinkTableSync::SearchResult links(
+					ServiceCalendarLinkTableSync::Search(
+						env,
+						cs->getKey()
+				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
+				if(links.empty())
+				{
+					cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
+				}
+				else
+				{
+					BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+					{
+						cs->addCalendarLink(*link, false);
+					}
+					cs->setCalendarFromLinks();
+				}
+			}
+			else
+			{
+				cs->setFromSerializedString(rows->getText(ContinuousServiceTableSync::COL_DATES));
+			}
 
 			// Registration in path
 			if(path && path->getPathGroup())
@@ -203,7 +229,10 @@ namespace synthese
 		){
 			// Dates preparation
 			stringstream datesStr;
-			object->serialize(datesStr);
+			if(object->getCalendarLinks().empty())
+			{
+				object->serialize(datesStr);
+			}
 
 			ReplaceQuery<ContinuousServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());

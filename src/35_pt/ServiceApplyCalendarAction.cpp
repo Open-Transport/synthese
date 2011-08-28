@@ -32,6 +32,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "Fetcher.h"
 #include "JourneyPatternTableSync.hpp"
+#include "ServiceAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -207,6 +208,17 @@ namespace synthese
 			}
 			transaction.run();
 
+			// Stores dates in session variable
+			if(_startDate != _endDate)
+			{
+				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(_startDate));
+				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(_endDate));
+			}
+			if(_calendarTemplate.get())
+			{
+				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>(_calendarTemplate->getKey()));
+			}
+
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 
@@ -223,8 +235,5 @@ namespace synthese
 		ServiceApplyCalendarAction::ServiceApplyCalendarAction():
 			FactorableTemplate<server::Action, ServiceApplyCalendarAction>(),
 			_add(true)
-		{
-
-		}
-	}
-}
+		{}
+}	}

@@ -229,12 +229,12 @@ namespace synthese
 				rep.headers.insert(make_pair("Location", e.getLocation()));
 				_SetCookieHeaders(rep, e.getCookiesMap());
 			}
-			catch(Request::ForbiddenRequestException& e)
+			catch(Request::ForbiddenRequestException&)
 			{
 				Log::GetInstance().debug("Forbidden request");
 				rep = HTTPReply::stock_reply(HTTPReply::forbidden);
 			}
-			catch(Request::NotFoundException& e)
+			catch(Request::NotFoundException&)
 			{
 				Log::GetInstance().debug("Path not found");
 				rep = HTTPReply::stock_reply(HTTPReply::not_found);
@@ -413,7 +413,7 @@ namespace synthese
 					Log::GetInstance ().info ("Raised HTTP threads number to "+ lexical_cast<string>(_threads.size()) +" due to pool saturation.");
 				}
 			}
-			catch (ThreadInfo::Exception& e)
+			catch (ThreadInfo::Exception&)
 			{
 			}
 		}
@@ -440,7 +440,7 @@ namespace synthese
 				info.status = ThreadInfo::THREAD_RUNNING_ACTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
-			catch (ThreadInfo::Exception& e)
+			catch (ThreadInfo::Exception&)
 			{
 			}
 		}
@@ -456,7 +456,7 @@ namespace synthese
 				info.status = ThreadInfo::THREAD_RUNNING_FUNCTION;
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 			}
-			catch (ThreadInfo::Exception& e)
+			catch (ThreadInfo::Exception&)
 			{
 			}
 		}
@@ -474,7 +474,7 @@ namespace synthese
 				info.lastChangeTime = posix_time::microsec_clock::local_time();
 				++_waitingThreads;
 			}
-			catch (ThreadInfo::Exception& e)
+			catch (ThreadInfo::Exception&)
 			{
 			}
 		}
