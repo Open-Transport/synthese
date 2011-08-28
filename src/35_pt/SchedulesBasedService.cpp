@@ -73,68 +73,83 @@ namespace synthese
 
 		void SchedulesBasedService::setSchedules(
 			const Schedules& departureSchedules,
-			const Schedules& arrivalSchedules
+			const Schedules& arrivalSchedules,
+			bool onlyScheduledEdges
 		){
 			if(!_path)
 			{
 				throw BadSchedulesException();
 			}
 
-			_departureSchedules.clear();
-			_arrivalSchedules.clear();
-			Schedules::const_iterator itDeparture(departureSchedules.begin());
-			Schedules::const_iterator itArrival(arrivalSchedules.begin());
-			Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
-			bool atLeastOneUnscheduledEdge(false);
-			for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
+			if(onlyScheduledEdges)
 			{
-				const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
-				if(	lineStop.getScheduleInput())
+				_departureSchedules.clear();
+				_arrivalSchedules.clear();
+				Schedules::const_iterator itDeparture(departureSchedules.begin());
+				Schedules::const_iterator itArrival(arrivalSchedules.begin());
+				Path::Edges::const_iterator lastScheduledEdge(_path->getEdges().end());
+				bool atLeastOneUnscheduledEdge(false);
+				for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 				{
-					// Interpolation of preceding schedules
-					if(atLeastOneUnscheduledEdge)
+					const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
+					if(	lineStop.getScheduleInput())
 					{
-						if(lastScheduledEdge == _path->getEdges().end())
+						// Interpolation of preceding schedules
+						if(atLeastOneUnscheduledEdge)
 						{
-							throw PathBeginsWithUnscheduledStopException(*_path);
-						}
-						MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
-						time_duration originDepartureSchedule(*_departureSchedules.rbegin());
-						time_duration totalTime(*itArrival - originDepartureSchedule);
-						for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
-						{
-							MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+							if(lastScheduledEdge == _path->getEdges().end())
+							{
+								throw PathBeginsWithUnscheduledStopException(*_path);
+							}
+							MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+							time_duration originDepartureSchedule(*_departureSchedules.rbegin());
+							time_duration totalTime(*itArrival - originDepartureSchedule);
+							for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
+							{
+								MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 
-							time_duration departureSchedule(originDepartureSchedule);
-							time_duration arrivalSchedule(originDepartureSchedule);
-							departureSchedule += minutes(
-								static_cast<long>(floor( (totalTime.total_seconds() / 60) * (distance / totalDistance)))
-							);
-							arrivalSchedule += minutes(
-								static_cast<long>(ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance)))
-							);
+								time_duration departureSchedule(originDepartureSchedule);
+								time_duration arrivalSchedule(originDepartureSchedule);
+								departureSchedule += minutes(
+									totalDistance ?
+									static_cast<long>(floor( (totalTime.total_seconds() / 60) * (distance / totalDistance))) :
+									0
+								);
+								arrivalSchedule += minutes(
+									totalDistance ?
+									static_cast<long>(ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance))) :
+									0
+								);
 
-							_departureSchedules.push_back(departureSchedule);
-							_arrivalSchedules.push_back(arrivalSchedule);
+								_departureSchedules.push_back(departureSchedule);
+								_arrivalSchedules.push_back(arrivalSchedule);
+							}
 						}
+
+						// Store the schedules
+						_departureSchedules.push_back(*itDeparture);
+						_arrivalSchedules.push_back(*itArrival);
+
+						// Store the last scheduled edge
+						lastScheduledEdge = itEdge;
+						atLeastOneUnscheduledEdge = false;
+
+						// Increment iterators
+						++itDeparture;
+						++itArrival;
 					}
+					else
+					{
+						atLeastOneUnscheduledEdge = true;
+					}
+			}	}
+			else
+			{
+				assert(departureSchedules.size() == _path->getEdges().size());
+				assert(arrivalSchedules.size() == _path->getEdges().size());
 
-					// Store the schedules
-					_departureSchedules.push_back(*itDeparture);
-					_arrivalSchedules.push_back(*itArrival);
-
-					// Store the last scheduled edge
-					lastScheduledEdge = itEdge;
-					atLeastOneUnscheduledEdge = false;
-
-					// Increment iterators
-					++itDeparture;
-					++itArrival;
-				}
-				else
-				{
-					atLeastOneUnscheduledEdge = true;
-				}
+				_departureSchedules = departureSchedules;
+				_arrivalSchedules = arrivalSchedules;
 			}
 
 			_path->markScheduleIndexesUpdateNeeded(false);
@@ -343,7 +358,8 @@ namespace synthese
 
 			setSchedules(
 				departureSchedules,
-				arrivalSchedules
+				arrivalSchedules,
+				true
 			);
 		}
 
@@ -365,7 +381,8 @@ namespace synthese
 			}
 			setSchedules(
 				departureSchedules,
-				arrivalSchedules
+				arrivalSchedules,
+				false
 			);
 		}
 
@@ -378,16 +395,16 @@ namespace synthese
 			Schedules departureSchedules;
 			Schedules arrivalSchedules;
 
-			for(size_t i(0); i<_path->getEdges().size(); ++i)
+			BOOST_FOREACH(const Path::Edges::value_type& edge, _path->getEdges())
 			{
-				departureSchedules.push_back(i+1 == _path->getEdges().size() ? not_a_date_time : firstSchedule);
-				arrivalSchedules.push_back(i == 0 ? not_a_date_time : firstSchedule);
-				firstSchedule += minutes(1);
+				departureSchedules.push_back(firstSchedule);
+				arrivalSchedules.push_back(firstSchedule);
 			}
 
 			setSchedules(
 				departureSchedules,
-				arrivalSchedules
+				arrivalSchedules,
+				false
 			);
 		}
 
