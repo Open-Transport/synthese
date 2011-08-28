@@ -57,6 +57,8 @@ namespace synthese
 				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_START_DATE;
 				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_END_DATE;
 				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID;
+				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_ID;
+				static const std::string SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK;
 			//@}
 
 		private:
