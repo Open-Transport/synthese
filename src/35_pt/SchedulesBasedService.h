@@ -83,11 +83,13 @@ namespace synthese
 					Updates both theoretical and real time data.
 					@param departureSchedules Departure schedules of the service
 					@param arrivalSchedules Arrival schedules of the service
+					@param onlyScheduledEdges Only schedules at scheduled edges are present in the data to load. The missing schedules will be interpolated.
 					@author Hugues Romain
 				*/
 				void setSchedules(
 					const Schedules& departureSchedules,
-					const Schedules& arrivalSchedules
+					const Schedules& arrivalSchedules,
+					bool onlyScheduledEdges
 				);
 			//@}
 

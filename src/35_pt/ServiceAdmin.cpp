@@ -199,7 +199,7 @@ namespace synthese
 					const DesignatedLinePhysicalStop* linePhysicalStop(dynamic_cast<const DesignatedLinePhysicalStop*>(edge));
 					const LineArea* lineArea(dynamic_cast<const LineArea*>(edge));
 
-					timetableUpdateRequest.getAction()->setRank(rank);
+					timetableUpdateRequest.getAction()->setRank(edge->getRankInPath());
 
 					stream << ts.row();
 

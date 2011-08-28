@@ -585,7 +585,7 @@ namespace synthese
 					number,
 					&route
 				);
-				result->setSchedules(departureSchedules, arrivalSchedules);
+				result->setSchedules(departureSchedules, arrivalSchedules, true);
 				result->setPath(&route);
 				route.addService(*result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
