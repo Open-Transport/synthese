@@ -616,7 +616,7 @@ ScheduledService ss01(4503599627370501, "1", &li92);
 	a.push_back(time_duration(7,15,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss01.setSchedules(d,a);
+	ss01.setSchedules(d,a, true);
 }
 ss01.setActive(day_clock::local_day());
 ss01.setActive(day_clock::local_day() + days(1));
@@ -643,7 +643,7 @@ ContinuousService cs97(4785074604214097, "", &li92, minutes(60), minutes(5));
 	a.push_back(time_duration(19,49,0));
 	d.push_back(time_duration(0,0,0));
 
-	cs97.setSchedules(d, a);
+	cs97.setSchedules(d, a, true);
 }
 cs97.setActive(day_clock::local_day());
 cs97.setActive(day_clock::local_day() + days(1));
@@ -669,7 +669,7 @@ ScheduledService ss02(4503599627370502, "2", &li92);
 	a.push_back(time_duration(22,25,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss02.setSchedules(d, a);
+	ss02.setSchedules(d, a, true);
 }
 ss02.setActive(day_clock::local_day());
 ss02.setActive(day_clock::local_day() + days(1));
@@ -726,7 +726,7 @@ ScheduledService ss18(4503599627370518, "18", &li93);
 	a.push_back(time_duration(7,8,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss18.setSchedules(d, a);
+	ss18.setSchedules(d, a, true);
 }
 ss18.setActive(day_clock::local_day());
 ss18.setActive(day_clock::local_day() + days(1));
@@ -746,7 +746,7 @@ ScheduledService ss08(4503599627370508, "8", &li93);
 	a.push_back(time_duration(7,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss08.setSchedules(d, a);
+	ss08.setSchedules(d, a, true);
 }
 ss08.setActive(day_clock::local_day());
 ss08.setActive(day_clock::local_day() + days(1));
@@ -766,7 +766,7 @@ ScheduledService ss07(4503599627370507, "7", &li93);
 	a.push_back(time_duration(9,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss07.setSchedules(d, a);
+	ss07.setSchedules(d, a, true);
 }
 ss07.setActive(day_clock::local_day());
 ss07.setActive(day_clock::local_day() + days(1));
@@ -838,7 +838,7 @@ ScheduledService ss11(4503599627370511, "11", &li94);
 	a.push_back(time_duration(21,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss11.setSchedules(d, a);
+	ss11.setSchedules(d, a, true);
 }
 ss11.setActive(day_clock::local_day());
 ss11.setActive(day_clock::local_day() + days(1));
@@ -867,7 +867,7 @@ ScheduledService ss06(4503599627370506, "06", &li94);
 	a.push_back(time_duration(22,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss06.setSchedules(d, a);
+	ss06.setSchedules(d, a, true);
 }
 ss06.setActive(day_clock::local_day());
 ss06.setActive(day_clock::local_day() + days(1));
@@ -911,7 +911,7 @@ ScheduledService ss09(4503599627370509, "09", &li95);
 	a.push_back(time_duration(10,20,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss09.setSchedules(d, a);
+	ss09.setSchedules(d, a, true);
 }
 ss09.setActive(day_clock::local_day());
 ss09.setActive(day_clock::local_day() + days(1));
@@ -928,7 +928,7 @@ ScheduledService ss10(4503599627370510, "10", &li95);
 	a.push_back(time_duration(12,10,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss10.setSchedules(d, a);
+	ss10.setSchedules(d, a, true);
 }
 ss10.setActive(day_clock::local_day());
 ss10.setActive(day_clock::local_day() + days(1));
@@ -972,7 +972,7 @@ ScheduledService ss13(4503599627370513, "13", &li96);
 	a.push_back(time_duration(20,5,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss13.setSchedules(d, a);
+	ss13.setSchedules(d, a, true);
 }
 ss13.setActive(day_clock::local_day());
 ss13.setActive(day_clock::local_day() + days(1));
@@ -989,7 +989,7 @@ ScheduledService ss14(4503599627370514, "14", &li96);
 	a.push_back(time_duration(20,25,0));
 	d.push_back(time_duration(0,0,0));
 
-	ss14.setSchedules(d, a);
+	ss14.setSchedules(d, a, true);
 }
 ss14.setActive(day_clock::local_day());
 ss14.setActive(day_clock::local_day() + days(1));
@@ -1033,7 +1033,7 @@ ContinuousService cs9701(4503599627379701, "9701", &li97);
 	a.push_back(time_duration(21,42,0));
 	d.push_back(time_duration(0,0,0));
 
-	cs9701.setSchedules(d, a);
+	cs9701.setSchedules(d, a, true);
 }
 cs9701.setActive(day_clock::local_day());
 cs9701.setActive(day_clock::local_day() + days(1));
@@ -1079,7 +1079,7 @@ ContinuousService cs9801(4503599627379801, "9801", &li98);
 	a.push_back(time_duration(22,00,0));
 	d.push_back(time_duration(0,0,0));
 
-	cs9801.setSchedules(d, a);
+	cs9801.setSchedules(d, a, true);
 }
 cs9801.setActive(day_clock::local_day());
 cs9801.setActive(day_clock::local_day() + days(1));
