@@ -70,8 +70,8 @@ namespace synthese
 		public:
 			CalendarTemplateAdmin();
 
-			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
-			boost::shared_ptr<const CalendarTemplate> getCalendar() const;
+			void setCalendar(boost::shared_ptr<const CalendarTemplate> value){ _calendar = value; }
+			boost::shared_ptr<const CalendarTemplate> getCalendar() const { return _calendar; }
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.

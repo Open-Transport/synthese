@@ -69,7 +69,7 @@ namespace synthese
 			{
 				_page = Env::GetOfficialEnv().getEditable<InterfacePage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
 			}
-			catch(ObjectNotFoundException<InterfacePage>& e)
+			catch(ObjectNotFoundException<InterfacePage>&)
 			{
 				throw ActionException("No such page");
 			}

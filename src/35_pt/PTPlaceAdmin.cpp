@@ -160,7 +160,9 @@ namespace synthese
 					StaticActionRequest<StopPointUpdateAction> moveAction(request);
 
 					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
-					if(!mapCenter.get() || mapCenter->isEmpty()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					
+					// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					if(!mapCenter.get() || mapCenter->isEmpty())
 					{
 						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
 						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)

@@ -141,7 +141,7 @@ namespace synthese
 				{
 					const_cast<Interface*>(obj->getInterface())->removePage(obj->getFactoryKey(), obj->getPageCode());
 				}
-				catch(InterfacePageException& e)
+				catch(InterfacePageException&)
 				{
 
 				}

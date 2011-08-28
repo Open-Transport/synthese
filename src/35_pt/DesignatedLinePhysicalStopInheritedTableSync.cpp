@@ -54,17 +54,7 @@ namespace synthese
 		){
 			_CommonLoad(obj, rows, env, linkLevel);
 
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				util::RegistryKeyType fromPhysicalStopId (
-					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID)
-				);
-				obj->setPhysicalStop(*StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel));
-
-				// Line update
-				obj->getLine()->addEdge(*obj);
-			}
-
+			// Schedule input
 			if(!rows->getText(LineStopTableSync::COL_SCHEDULEINPUT).empty())
 			{
 				obj->setScheduleInput(rows->getBool(LineStopTableSync::COL_SCHEDULEINPUT));
@@ -73,8 +63,18 @@ namespace synthese
 			{
 				obj->setScheduleInput(true);
 			}
+
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Stop point
+				util::RegistryKeyType fromPhysicalStopId (
+					rows->getLongLong (LineStopTableSync::COL_PHYSICALSTOPID)
+				);
+				obj->setPhysicalStop(*StopPointTableSync::GetEditable(fromPhysicalStopId, env, linkLevel));
+
+				// Line update
+				obj->getLine()->addEdge(*obj);
+			
 				// Sublines update
 				BOOST_FOREACH(JourneyPatternCopy* copy, static_cast<LineStop*>(obj)->getLine()->getSubLines())
 				{
