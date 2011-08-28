@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE (testStopsWithoutSchedules)
 	a.push_back(time_duration(3, 10, 0));
 	d.push_back(time_duration(3, 10, 0));
 
-	s.setSchedules(d, a);
+	s.setSchedules(d, a, true);
 
 	SchedulesBasedService::Schedules id(s.getDepartureSchedules(false));
 	SchedulesBasedService::Schedules ia(s.getArrivalSchedules(false));
