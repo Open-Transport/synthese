@@ -122,7 +122,7 @@ namespace synthese
 					{
 						object->setUser(UserTableSync::GetEditable(userId, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<User>& e)
+					catch(ObjectNotFoundException<User>&)
 					{
 						Log::GetInstance().warn("No such user "+ lexical_cast<string>(userId) +" in ForumTopic "+ lexical_cast<string>(object->getKey()));
 					}

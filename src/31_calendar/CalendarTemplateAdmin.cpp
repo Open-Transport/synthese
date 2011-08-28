@@ -319,15 +319,7 @@ namespace synthese
 			return _calendar.get() ? _calendar->getName() : DEFAULT_TITLE;
 		}
 
-		void CalendarTemplateAdmin::setCalendar(shared_ptr<CalendarTemplate> value)
-		{
-			_calendar = const_pointer_cast<const CalendarTemplate>(value);
-		}
 
-		boost::shared_ptr<const CalendarTemplate> CalendarTemplateAdmin::getCalendar() const
-		{
-			return _calendar;
-		}
 
 		bool CalendarTemplateAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
@@ -378,7 +370,7 @@ namespace synthese
 					shared_ptr<CalendarTemplateAdmin> page(
 						getNewPage<CalendarTemplateAdmin>()
 					);
-					page->setCalendar(ct);
+					page->setCalendar(const_pointer_cast<const CalendarTemplate>(ct));
 					links.push_back(page);
 				}
 			}

@@ -33,6 +33,8 @@
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
 #include "ImportableTableSync.hpp"
+#include "ServiceCalendarLinkTableSync.hpp"
+#include "ServiceCalendarLink.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -171,8 +173,32 @@ namespace synthese
 				throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_SCHEDULES, "Inconsistent schedules size : different from path edges number");
 			}
 
-			// Calendar dates
-			ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
+			// Calendar
+			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				// Search of calendar template links (overrides manually defined calendar)
+				ServiceCalendarLinkTableSync::SearchResult links(
+					ServiceCalendarLinkTableSync::Search(
+						env,
+						ss->getKey()
+				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
+				if(links.empty())
+				{
+					ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
+				}
+				else
+				{
+					BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+					{
+						ss->addCalendarLink(*link, false);
+					}
+					ss->setCalendarFromLinks();
+				}
+			}
+			else
+			{
+				ss->setFromSerializedString(rows->getText(ScheduledServiceTableSync::COL_DATES));
+			}
 
 			// Registration in path
 			if(path && path->getPathGroup())
@@ -202,7 +228,10 @@ namespace synthese
 		){
 			// Dates preparation
 			stringstream datesStr;
-			object->serialize(datesStr);
+			if(object->getCalendarLinks().empty())
+			{
+				object->serialize(datesStr);
+			}
 
 			ReplaceQuery<ScheduledServiceTableSync> query(*object);
 			query.addField(object->getServiceNumber());

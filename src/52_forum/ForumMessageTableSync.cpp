@@ -112,7 +112,7 @@ namespace synthese
 					{
 						object->setTopic(ForumTopicTableSync::GetEditable(id, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<ForumTopic>& e)
+					catch(ObjectNotFoundException<ForumTopic>&)
 					{
 						Log::GetInstance().warn("No such topic "+ lexical_cast<string>(id) +" in ForumMessage "+ lexical_cast<string>(object->getKey()));
 					}
@@ -132,7 +132,7 @@ namespace synthese
 					{
 						object->setUser(UserTableSync::GetEditable(userId, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<User>& e)
+					catch(ObjectNotFoundException<User>&)
 					{
 						Log::GetInstance().warn("No such user "+ lexical_cast<string>(userId) +" in ForumMessage "+ lexical_cast<string>(object->getKey()));
 					}

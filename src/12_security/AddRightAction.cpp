@@ -81,7 +81,7 @@ namespace synthese
 					map.getDefault<int>(PARAMETER_PRIVATE_LEVEL, UNKNOWN_VALUE)
 				);
 			}
-			catch(ObjectNotFoundException<Profile>& e)
+			catch(ObjectNotFoundException<Profile>&)
 			{
 				throw ActionException("Profil introuvable");
 			}

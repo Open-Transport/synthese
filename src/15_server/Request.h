@@ -172,7 +172,7 @@ namespace synthese
 		protected:
 			boost::shared_ptr<Action> _action;
 			boost::shared_ptr<Function> _function;
-			const Session*				_session;
+			Session*					_session;
 			std::string					_ip;
 			std::string					_clientURL;
 			std::string					_hostName;
@@ -204,7 +204,7 @@ namespace synthese
 		public:
 			//! \name Getters
 			//@{
-				const Session*		getSession()		const { return _session; }
+				Session*		getSession()		const { return _session; }
 				const std::string&	getClientURL()		const { return _clientURL; }
 				const std::string&	getIP()				const { return _ip; }
 				const boost::optional<util::RegistryKeyType>& 	getActionCreatedId()	const { return _actionCreatedId; }

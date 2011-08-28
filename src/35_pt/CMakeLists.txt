@@ -210,6 +210,12 @@ ServiceAdmin.cpp
 ServiceAdmin.h
 ServiceApplyCalendarAction.cpp
 ServiceApplyCalendarAction.h
+ServiceCalendarLink.cpp
+ServiceCalendarLink.hpp
+ServiceCalendarLinkTableSync.cpp
+ServiceCalendarLinkTableSync.hpp
+ServiceCalendarLinkUpdateAction.cpp
+ServiceCalendarLinkUpdateAction.hpp
 ServiceDateChangeAction.cpp
 ServiceDateChangeAction.h
 ServiceTimetableUpdateAction.cpp

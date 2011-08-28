@@ -128,8 +128,9 @@ namespace synthese
 				throw ActionException("No such stop area");
 			}
 
-			if(map.isDefined(PARAMETER_X) && map.isDefined(PARAMETER_Y))
-			{
+			if(	!map.getDefault<string>(PARAMETER_X).empty() &&
+				!map.getDefault<string>(PARAMETER_Y).empty()
+			){
 				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
 					map.get<double>(PARAMETER_X),
 					map.get<double>(PARAMETER_Y)

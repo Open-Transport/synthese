@@ -122,7 +122,7 @@ namespace synthese
 				shared_ptr<CalendarTemplate> ct,
 				calendars
 			){
-				editCalendar.getPage()->setCalendar(ct);
+				editCalendar.getPage()->setCalendar(const_pointer_cast<const CalendarTemplate>(ct));
 				removeCalendar.getAction()->setObjectId(ct->getKey());
 
 				stream << t.row();
