@@ -99,7 +99,9 @@ namespace synthese
 
 		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE("service_admin_start_date");
 		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE("service_admin_end_date");
-		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID("calendar_template_id");
+		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID("service_admin_calendar_template_id");
+		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_ID("service_admin_id");
+		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK("service_admin_schedule_rank");
 
 
 
@@ -188,6 +190,7 @@ namespace synthese
 
 				const Path* line(_service->getPath());
 				size_t rank(0);
+				bool focusDone(false);
 				BOOST_FOREACH(const Path::Edges::value_type& edge, line->getEdges())
 				{
 					const LineStop& lineStop(static_cast<const LineStop&>(*edge));
@@ -236,7 +239,7 @@ namespace synthese
 					if(lineStop.isArrivalAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(true);
-						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("arrival"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << tuForm.open();
 						stream << tuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
@@ -248,7 +251,7 @@ namespace synthese
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 
-						HTMLForm suForm(timetableUpdateRequest.getHTMLForm());
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftarrival"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
@@ -256,6 +259,26 @@ namespace synthese
 							string(),
 							AdminModule::CSS_2DIGIT_INPUT
 						);
+						string sessionVariableId(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_ID));
+						if(!focusDone)
+						{
+							if(	!sessionVariableId.empty() &&
+								lexical_cast<RegistryKeyType>(sessionVariableId) == _service->getKey()
+							){
+								string sessionVariableRank(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK));
+								if(	!sessionVariableRank.empty() &&
+									lineStop.getRankInPath() >= (lexical_cast<size_t>(sessionVariableRank) + 1)
+								){
+									stream << suForm.setFocus(ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY);
+									focusDone = true;
+								}
+							}
+							else
+							{
+								suForm.setFocus(ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY);
+								focusDone = true;
+						}	}
+
 						stream << suForm.getSubmitButton("Shift");
 						stream << suForm.close();
 					}
@@ -265,7 +288,7 @@ namespace synthese
 					if(lineStop.isDepartureAllowed())
 					{
 						timetableUpdateRequest.getAction()->setUpdateArrival(false);
-						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm());
+						HTMLForm tuForm(timetableUpdateRequest.getHTMLForm("departure"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << tuForm.open();
 						stream << tuForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_TIME,
@@ -277,7 +300,7 @@ namespace synthese
 						stream << tuForm.getSubmitButton("Change");
 						stream << tuForm.close();
 
-						HTMLForm suForm(timetableUpdateRequest.getHTMLForm());
+						HTMLForm suForm(timetableUpdateRequest.getHTMLForm("shiftdeparture"+ lexical_cast<string>(lineStop.getRankInPath())));
 						stream << suForm.open();
 						stream << suForm.getTextInput(
 							ServiceTimetableUpdateAction::PARAMETER_SHIFTING_DELAY,
