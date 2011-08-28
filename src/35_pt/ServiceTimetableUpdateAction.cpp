@@ -29,6 +29,7 @@
 #include "Request.h"
 #include "SchedulesBasedService.h"
 #include "Fetcher.h"
+#include "ServiceAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -145,6 +146,10 @@ namespace synthese
 			_service->setSchedules(departureSchedules, arrivalSchedules, false);
 
 			Fetcher<SchedulesBasedService>::FetchSave(*_service);
+
+			// Saving the rank in the session variables
+			request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_ID, lexical_cast<string>(_service->getKey()));
+			request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK, lexical_cast<string>(_rank));
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
