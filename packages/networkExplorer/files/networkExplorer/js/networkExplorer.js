@@ -418,35 +418,50 @@ var TisseoMap = OpenLayers.Class(SyntheseMap, {
             
             // Searching stop
             for(id in self.dataList.stops)
-                if((idCity && self.dataList.stops[id].cityId == idCity) || !idCity)
-                    data_stop.push(self.dataList.stops[id].name);
+                if((idCity && self.dataList.stops[id].cityId == idCity) || !idCity){
+                    data_stop.push({
+                      id       : id,
+                      name     : self.dataList.stops[id].name,
+                      cityname : self.dataList.stops[id].city_name
+                    });
+                }
             
             console.log(data_stop);
             return data_stop;
         }
     
-        var data_stop   = [];
         var data_cities = [];
         var list_data_cities = [];
          
-        // Recovering stop names
-         for(id in this.dataList.stops)
-          data_stop.push(this.dataList.stops[id].name);
-        //data_stop = _.select(dataList, function(stop){ return stop.type == "stop" });
-          
         // Recovering city names
         for(id in this.dataList.cities){
           data_cities.push(this.dataList.cities[id].name);
           list_data_cities.push({name: this.dataList.cities[id].name});
         }
         
-        //data_cities = _.select(dataList, function(city){ return city.type == "city" });
-          
         initCompletionAdress();
         
-        // Change autocompletion for stops chen cities are changing
-        $('input[name="name_stop"]').click(function (){
-            $('input[name="name_stop"]').setOptions({ data: searchNewStops() });
+        /* 
+         * Stop Part
+         */
+        // Loads autoCompletion on stop's field
+        $('input[name="name_stop"]')
+        .autocomplete(searchNewStops(), {
+            matchContains: true,
+            // Data's format in select box
+            formatItem: function (item) {
+              return item.name + " (" + item.cityname + ")";
+            },
+            // Data's format for search
+            formatMatch: function (item) {
+              return item.name;
+            }
+        })
+        // Loads new stops when clicking on stop's field
+        .click(function () {
+            $('input[name="name_stop"]').setOptions({ 
+              data: searchNewStops() 
+            });
         });
         
         // Change autocompletion for stops chen cities are changing
@@ -474,10 +489,6 @@ var TisseoMap = OpenLayers.Class(SyntheseMap, {
         $('input[name="name_adress_city"]').autocomplete(data_cities, {
             matchContains: true,
             autoFill: true
-        });
-        
-        $('input[name="name_stop"]').autocomplete(searchNewStops(), {
-            matchContains: true
         });
         
         $('input[name="name_city"]').autocomplete(data_cities, {
