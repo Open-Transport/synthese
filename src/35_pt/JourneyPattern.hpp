@@ -76,6 +76,8 @@ namespace synthese
 			NB : la correspondance entre deux services d'une même ligne est interdite, sauf dans les axes libres.
 
 			If a service is responsible of a break of the preceding rules, then the line is copied as a JourneyPatternCopy, and the service is linked to the new line. The _sublines container keeps a pointer on each JourneyPatternCopy.
+
+			@warning If a new attribute is added on the JourneyPattern class, don't forget to update the constructor of JourneyPatternCopy.
 		*/
 		class JourneyPattern:
 			public graph::Path,
@@ -91,6 +93,8 @@ namespace synthese
 			typedef std::vector<pt::JourneyPatternCopy*> SubLines;
 
 		private:
+			// If a new attribute is added on the JourneyPattern class, don't forget to update the constructor of JourneyPatternCopy.
+
 			std::string _timetableName; //!< Name for timetable
 			std::string _direction;		//!< Direction (shown on vehicles)
 			Destination* _directionObj;
