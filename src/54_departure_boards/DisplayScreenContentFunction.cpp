@@ -848,11 +848,14 @@ namespace synthese
 
 				// Direction
 				const JourneyPattern* jp(dynamic_cast<const JourneyPattern*>(row.first.getService()->getPath()));
-				pm.insert(
-					DATA_DIRECTION,
+				string lineDirection(
 					jp->getDirection().empty() && jp->getDirectionObj() ?
 					jp->getDirectionObj()->getDisplayedText() :
 					jp->getDirection()
+				);
+				pm.insert(
+					DATA_DIRECTION,
+					lineDirection.empty() ? jp->getDestination()->getConnectionPlace()->getFullName() : lineDirection
 				);
 
 				pm.insert(
