@@ -68,6 +68,9 @@ namespace synthese
 		const string StopPointAddAction::PARAMETER_CITY_NAME = Action_PARAMETER_PREFIX + "cn";
 		const string StopPointAddAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string StopPointAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
+		const string StopPointAddAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
+
+		const string StopPointAddAction::SESSION_VARIABLE_STOPPOINT_CREATION_SRID("stoppoint_creation_srid");
 
 
 
@@ -98,6 +101,12 @@ namespace synthese
 			}
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 
+			// SRID
+			if(_coordinatesSystem)
+			{
+				map.insert(PARAMETER_SRID, _coordinatesSystem->getSRID());
+			}
+
 			return map;
 		}
 
@@ -105,8 +114,10 @@ namespace synthese
 
 		void StopPointAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Name
 			_name = map.getDefault<string>(PARAMETER_NAME);
 
+			// Place
 			if(map.getDefault<RegistryKeyType>(PARAMETER_PLACE_ID, 0)) try
 			{
 				_place = StopAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_PLACE_ID), *_env);
@@ -159,17 +170,26 @@ namespace synthese
 				}
 			}
 
+			// Datasource link
 			_operatorCode = ImportableTableSync::GetDataSourceLinksFromSerializedString(
 				map.getDefault<string>(PARAMETER_OPERATOR_CODE),
 				*_env
 			);
+
+			// X/Y
 			if(map.getDefault<double>(PARAMETER_X, 0) && map.getDefault<double>(PARAMETER_Y, 0))
 			{
-				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+				CoordinatesSystem::SRID srid(
+					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+				);
+				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+				_point = _coordinatesSystem->createPoint(
 					map.get<double>(PARAMETER_X),
 					map.get<double>(PARAMETER_Y)
 				);
 			}
+			// WGS84 Lon/Lat
 			else if(map.getDefault<double>(PARAMETER_LONGITUDE, 0) && map.getDefault<double>(PARAMETER_LATITUDE, 0))
 			{
 				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
@@ -231,6 +251,15 @@ namespace synthese
 			{
 				request.setActionCreatedId(object.getKey());
 			}
+
+			// Storage of the SRID in the sessions variables
+			if(_coordinatesSystem)
+			{
+				request.getSession()->setSessionVariable(
+					SESSION_VARIABLE_STOPPOINT_CREATION_SRID,
+					lexical_cast<string>(_coordinatesSystem->getSRID())
+				);
+			}
 		}
 
 
@@ -244,6 +273,7 @@ namespace synthese
 
 
 		StopPointAddAction::StopPointAddAction():
-			_createCityIfNecessary(false)
+			_createCityIfNecessary(false),
+			_coordinatesSystem(NULL)
 		{}
 }	}

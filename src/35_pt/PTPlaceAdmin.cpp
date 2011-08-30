@@ -343,12 +343,19 @@ namespace synthese
 				stream << t.col();
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_NAME, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_OPERATOR_CODE, string());
+				stream << t.col();
+				stream << t.col();
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_X, string());
 				stream << t.col() << f.getTextInput(StopPointAddAction::PARAMETER_Y, string());
-				stream << t.col();
-				stream << t.col();
+				stream << t.col() << f.getSelectInput(
+					StopPointAddAction::PARAMETER_SRID,
+					CoordinatesSystem::GetCoordinatesSystemsTextMap(),
+					optional<CoordinatesSystem::SRID>(
+						request.getSession()->getSessionVariable(StopPointAddAction::SESSION_VARIABLE_STOPPOINT_CREATION_SRID).empty() ?
+						CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID() :
+						lexical_cast<CoordinatesSystem::SRID>(request.getSession()->getSessionVariable(StopPointAddAction::SESSION_VARIABLE_STOPPOINT_CREATION_SRID))
+				)	);
 				stream << t.col() << f.getSubmitButton("Ajouter");
-				stream << t.col();
 
 				stream << t.close() << f.close();
 			}
