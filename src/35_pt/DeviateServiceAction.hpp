@@ -49,11 +49,13 @@ namespace synthese
 			static const std::string PARAMETER_DATASOURCE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_CHAINAGE;
+			static const std::string PARAMETER_DATABASE;
 
 		private:
 			boost::shared_ptr<impex::DataSource> _dataSource;
 			boost::shared_ptr<const ScheduledService> _service;
 			std::size_t _chainage;
+			std::string _database;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

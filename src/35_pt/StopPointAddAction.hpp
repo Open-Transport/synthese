@@ -39,6 +39,8 @@ namespace geos
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace geography
 	{
 		class City;
@@ -71,6 +73,9 @@ namespace synthese
 			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_CREATE_CITY_IF_NECESSARY;
+			static const std::string PARAMETER_SRID;
+
+			static const std::string SESSION_VARIABLE_STOPPOINT_CREATION_SRID;
 
 		private:
 			boost::shared_ptr<StopArea> _place;
@@ -80,6 +85,7 @@ namespace synthese
 			boost::shared_ptr<geography::City> _city;
 			boost::optional<std::string> _cityName;
 			bool _createCityIfNecessary;
+			const CoordinatesSystem* _coordinatesSystem;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
