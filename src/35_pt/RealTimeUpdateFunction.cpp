@@ -265,7 +265,7 @@ namespace synthese
 
 			// quay_update_url
 			StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,WebPageDisplayFunction> vertexUpdateRequest(request, true);
-			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+			vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getEditableSPtr(const_cast<ScheduledService*>(&service)));
 			vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 			pm.insert(
 				DATA_QUAY_UPDATE_URL,

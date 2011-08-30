@@ -45,6 +45,8 @@ DestinationTableSync.cpp
 DestinationTableSync.hpp
 DestinationUpdateAction.cpp
 DestinationUpdateAction.hpp
+DeviateServiceAction.cpp
+DeviateServiceAction.hpp
 DRTArea.cpp
 DRTArea.hpp
 DRTAreaAdmin.cpp

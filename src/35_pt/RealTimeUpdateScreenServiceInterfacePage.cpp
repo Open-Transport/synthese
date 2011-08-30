@@ -133,7 +133,7 @@ namespace synthese
 				); //11
 
 				StaticActionFunctionRequest<ServiceVertexRealTimeUpdateAction,RealTimeUpdateFunction> vertexUpdateRequest(*request, true);
-				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getSPtr(&service));
+				vertexUpdateRequest.getAction()->setService(Env::GetOfficialEnv().getEditableSPtr(const_cast<ScheduledService*>(&service)));
 				vertexUpdateRequest.getAction()->setLineStopRank(lineStop.getRankInPath());
 				vertexUpdateRequest.getFunction()->setService(Env::GetOfficialEnv().getSPtr(&service));
 				vertexUpdateRequest.getFunction()->setLineStopRank(lineStop.getRankInPath());

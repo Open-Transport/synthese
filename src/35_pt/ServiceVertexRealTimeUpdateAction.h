@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace impex
+	{
+		class DataSource;
+	}
+
 	namespace pt
 	{
 		class ScheduledService;
@@ -43,16 +48,21 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, ServiceVertexRealTimeUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_DATASOURCE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_LINE_STOP_RANK;
+			static const std::string PARAMETER_LINE_STOP_METRIC_OFFSET;
 			static const std::string PARAMETER_STOP_ID;
 			static const std::string PARAMETER_PROPAGATE;
+			static const std::string PARAMETER_RESTORE_PLANNED_STOP;
 
 		private:
 			boost::shared_ptr<ScheduledService> _service;
+			boost::shared_ptr<impex::DataSource> _dataSource;
 			boost::shared_ptr<const pt::StopPoint> _physicalStop;
 			std::size_t _lineStopRank;
 			bool _propagate;
+			bool _restorePlannedStop;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -84,7 +94,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<const ScheduledService> service);
+				void setService(boost::shared_ptr<ScheduledService> service){ _service = service; }
 				void setLineStopRank(std::size_t value);
 				void setPhysicalStop(boost::shared_ptr<const pt::StopPoint> value);
 			//@}

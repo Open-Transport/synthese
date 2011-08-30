@@ -73,6 +73,7 @@
 #include "CommercialLineUpdateAction.h"
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
+#include "DeviateServiceAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
@@ -216,6 +217,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ContinuousServiceUpdateAction::integrate();
 	synthese::pt::CopyGeometriesAction::integrate();
 	synthese::pt::DestinationUpdateAction::integrate();
+	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
