@@ -86,7 +86,7 @@ namespace synthese
 				bool orderByStatus = false,
 				//bool orderByConflict = false,
 				bool raisingOrder = false,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 

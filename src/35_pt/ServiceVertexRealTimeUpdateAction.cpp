@@ -31,6 +31,7 @@
 #include "Env.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
+#include "DataSource.h"
 
 using namespace std;
 using namespace boost;
@@ -41,6 +42,8 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace pt;
+	using namespace impex;
+	using namespace graph;
 
 	namespace util
 	{
@@ -50,14 +53,19 @@ namespace synthese
 	namespace pt
 	{
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
+		const string ServiceVertexRealTimeUpdateAction::PARAMETER_LINE_STOP_METRIC_OFFSET = Action_PARAMETER_PREFIX + "line_stop_metric_offset";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
+		const string ServiceVertexRealTimeUpdateAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "datasource_id";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "st";
 		const string ServiceVertexRealTimeUpdateAction::PARAMETER_PROPAGATE = Action_PARAMETER_PREFIX + "propagate";
+		const string ServiceVertexRealTimeUpdateAction::PARAMETER_RESTORE_PLANNED_STOP = Action_PARAMETER_PREFIX + "restore_planned_stop";
 
 
 
 		ServiceVertexRealTimeUpdateAction::ServiceVertexRealTimeUpdateAction():
-			_propagate(true)
+			_lineStopRank(0),
+			_propagate(true),
+			_restorePlannedStop(false)
 		{}
 
 
@@ -69,7 +77,15 @@ namespace synthese
 			// Service
 			if(_service.get())
 			{
-				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+				if(_dataSource.get())
+				{
+					map.insert(PARAMETER_DATASOURCE_ID, _dataSource->getKey());
+					map.insert(PARAMETER_SERVICE_ID, _service->getCodeBySource(*_dataSource));
+				}
+				else
+				{
+					map.insert(PARAMETER_SERVICE_ID, _service->getKey());
+				}
 			}
 
 			// Rank
@@ -84,6 +100,9 @@ namespace synthese
 			// Propagate
 			map.insert(PARAMETER_PROPAGATE, _propagate);
 
+			// Restore planned stop
+			map.insert(PARAMETER_RESTORE_PLANNED_STOP, _restorePlannedStop);
+
 			return map;
 		}
 
@@ -91,8 +110,26 @@ namespace synthese
 
 		void ServiceVertexRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Load of the service
-			try
+			if(map.getDefault<RegistryKeyType>(PARAMETER_DATASOURCE_ID, 0))
+			{
+				try
+				{
+					shared_ptr<const DataSource> dataSource(
+						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID))
+					);
+					Importable* obj(dataSource->getObjectByCode(map.get<string>(PARAMETER_SERVICE_ID)));
+					if(!obj || !dynamic_cast<ScheduledService*>(obj))
+					{
+						throw ActionException("No such service");
+					}
+					_service = Env::GetOfficialEnv().getEditableSPtr(static_cast<ScheduledService*>(obj));
+				}
+				catch(ObjectNotFoundException<DataSource>&)
+				{
+					throw ActionException("No such datasource");
+				}
+			}
+			else try
 			{
 				_service = Env::GetOfficialEnv().getEditableRegistry<ScheduledService>().getEditable(
 					map.get<RegistryKeyType>(PARAMETER_SERVICE_ID)
@@ -101,6 +138,28 @@ namespace synthese
 			catch(ObjectNotFoundException<ScheduledService>)
 			{
 				throw ActionException("No such service");
+			}
+
+			if(map.isDefined(PARAMETER_LINE_STOP_RANK))
+			{
+				_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
+			}
+			else
+			{
+				MetricOffset offset(map.get<MetricOffset>(PARAMETER_LINE_STOP_METRIC_OFFSET));
+				try
+				{
+					_lineStopRank = _service->getPath()->getEdgeRankAtOffset(offset);
+				}
+				catch (Path::InvalidOffsetException& e)
+				{
+					throw ActionException(e.getMessage());
+				}
+			}
+
+			if(_lineStopRank >= _service->getArrivalSchedules(false).size())
+			{
+				throw ActionException("Inconsistent linestop rank");
 			}
 
 			// Load of the stop or NULL vertex
@@ -119,13 +178,6 @@ namespace synthese
 				}
 			}
 
-			// Rank
-			_lineStopRank = map.get<size_t>(PARAMETER_LINE_STOP_RANK);
-			if(_lineStopRank >= _service->getArrivalSchedules(false).size())
-			{
-				throw ActionException("Inconsistent linestop rank");
-			}
-
 			// Check of the consistence of the loaded data
 			if(	_physicalStop.get() &&
 				_service->getPath()->getEdge(_lineStopRank)->getHub() != _physicalStop->getHub()
@@ -135,20 +187,39 @@ namespace synthese
 
 			// Propagate
 			_propagate = map.getDefault<bool>(PARAMETER_PROPAGATE, true);
+
+			// Restore planned stop
+			_restorePlannedStop = map.getDefault<bool>(PARAMETER_RESTORE_PLANNED_STOP, false);
 		}
 
 
 
 		void ServiceVertexRealTimeUpdateAction::run(Request& request)
 		{
-			_service->setRealTimeVertex(_lineStopRank, _physicalStop.get());
-
-			// Propagation
-			if(!_physicalStop.get() && _propagate)
+			if(_restorePlannedStop)
 			{
-				for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+				_service->setRealTimeVertex(_lineStopRank, _service->getPath()->getEdge(_lineStopRank)->getFromVertex());
+
+				// Propagation
+				if(_propagate)
 				{
-					_service->setRealTimeVertex(rank, NULL);
+					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+					{
+						_service->setRealTimeVertex(rank, _service->getPath()->getEdge(rank)->getFromVertex());
+					}
+				}
+			}
+			else
+			{
+				_service->setRealTimeVertex(_lineStopRank, _physicalStop.get());
+
+				// Propagation
+				if(!_physicalStop.get() && _propagate)
+				{
+					for(size_t rank(_lineStopRank+1); rank<_service->getArrivalSchedules(false).size(); ++rank)
+					{
+						_service->setRealTimeVertex(rank, NULL);
+					}
 				}
 			}
 		}
@@ -172,12 +243,5 @@ namespace synthese
 		void ServiceVertexRealTimeUpdateAction::setLineStopRank( std::size_t value )
 		{
 			_lineStopRank = value;
-		}
-
-
-
-		void ServiceVertexRealTimeUpdateAction::setService( boost::shared_ptr<const ScheduledService> service )
-		{
-			_service = const_pointer_cast<ScheduledService>(service);
 		}
 }	}

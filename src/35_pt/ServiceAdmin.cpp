@@ -356,7 +356,7 @@ namespace synthese
 				{
 					vertexUpdateRequest.getPage()->setService(_continuousService);
 				}
-				vertexUpdateRequest.getAction()->setService(_scheduledService);
+				vertexUpdateRequest.getAction()->setService(const_pointer_cast<ScheduledService>(_scheduledService));
 
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 				AdminFunctionRequest<DRTAreaAdmin> openAreaRequest(request);
