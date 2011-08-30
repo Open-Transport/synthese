@@ -170,6 +170,8 @@ namespace synthese
 			return user.getProfile()->isAuthorized<CalendarRight>(READ);
 		}
 
+
+
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
@@ -186,6 +188,8 @@ namespace synthese
 			}
 			return links;
 		}
+
+
 
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -222,5 +226,4 @@ namespace synthese
 
 			return links;
 		}
-	}
-}
+}	}

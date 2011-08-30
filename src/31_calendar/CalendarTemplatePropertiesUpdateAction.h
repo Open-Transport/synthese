@@ -43,13 +43,15 @@ namespace synthese
 			static const std::string PARAMETER_CALENDAR_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_CATEGORY;
+			static const std::string PARAMETER_PARENT_ID;
 
 		private:
 			boost::shared_ptr<CalendarTemplate> _calendar;
 			boost::optional<std::string> _name;
 			boost::optional<CalendarTemplate::Category> _category;
 			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
-
+			boost::optional<boost::shared_ptr<CalendarTemplate> > _parent;
+			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map
