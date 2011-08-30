@@ -50,6 +50,7 @@ namespace synthese
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_CALENDAR_ID = Action_PARAMETER_PREFIX + "ca";
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_CATEGORY = Action_PARAMETER_PREFIX + "cc";
+		const string CalendarTemplatePropertiesUpdateAction::PARAMETER_PARENT_ID = Action_PARAMETER_PREFIX + "parent_id";
 
 
 
@@ -59,6 +60,10 @@ namespace synthese
 			if(_calendar.get())
 			{
 				map.insert(PARAMETER_CALENDAR_ID, _calendar->getKey());
+			}
+			if(_parent)
+			{
+				map.insert(PARAMETER_PARENT_ID, (*_parent)->getKey());
 			}
 			if(_name)
 			{
@@ -99,6 +104,21 @@ namespace synthese
 				_calendar.reset(new CalendarTemplate);
 			}
 
+			// Parent
+			if(map.isDefined(PARAMETER_PARENT_ID))
+			{
+				try
+				{
+					_parent = CalendarTemplateTableSync::GetEditable(
+						map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
+						*_env
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					throw ActionException("No such parent calendar", e, *this);
+				}
+			}
 			// Name
 			if(map.isDefined(PARAMETER_NAME) || !_calendar->getKey())
 			{
@@ -141,6 +161,10 @@ namespace synthese
 			if(_category)
 			{
 				_calendar->setCategory(*_category);
+			}
+			if(_parent)
+			{
+				_calendar->setParent(_parent->get());
 			}
 			if(_dataSourceLinks)
 			{

@@ -89,7 +89,7 @@ namespace synthese
 					@return util::ParametersMap The generated parameters map
 					@author Hugues Romain
 					@date 2007
-				*/
+			*/
 			virtual util::ParametersMap getParametersMap() const;
 
 

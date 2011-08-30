@@ -263,6 +263,10 @@ namespace synthese
 						rank
 					);
 					updateQuery.execute(transaction);
+					if(rank == 0)
+					{
+						break;
+					}
 			}	}
 
 			Save(&lineStop, transaction);

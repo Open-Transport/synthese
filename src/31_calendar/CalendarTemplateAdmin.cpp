@@ -150,6 +150,13 @@ namespace synthese
 						CalendarTemplate::GetCategoriesList(),
 						optional<CalendarTemplate::Category>(_calendar->getCategory())
 				)	);
+				stream << pt.cell(
+					"Parent",
+					pt.getForm().getSelectInput(
+						CalendarTemplatePropertiesUpdateAction::PARAMETER_PARENT_ID,
+						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						optional<RegistryKeyType>(_calendar->getParent() ? _calendar->getParent()->getKey() : RegistryKeyType(0))
+				)	);
 				stream << pt.close();
 
 				stream << "<h1>Commandes</h1>";

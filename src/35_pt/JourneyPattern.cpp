@@ -29,8 +29,13 @@
 #include "StopPoint.hpp"
 #include "CommercialLine.h"
 #include "JourneyPatternCopy.hpp"
+#include "Log.h"
 
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -181,6 +186,14 @@ namespace synthese
 			Service& service,
 			bool ensureLineTheory
 		){
+			// Check if the path is consistent
+			if(	!_edges.size() ||
+				_edges.size() != (*_edges.rbegin())->getRankInPath() + 1
+			){
+				Log::GetInstance().warn("Service "+ lexical_cast<string>(service.getKey()) +" is not added to the path "+ lexical_cast<string>(getKey()) +" due to inconsistent edges.");
+				return;
+			}
+
 			/// Test of the respect of the line theory
 			/// If OK call the normal Path service insertion
 			if (!ensureLineTheory || respectsLineTheory(false, service))

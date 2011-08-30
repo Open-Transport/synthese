@@ -235,7 +235,24 @@ namespace synthese
 			}
 			if(parentId)
 			{
-				query.addWhereField(COL_PARENT_ID, *parentId);
+				if(*parentId)
+				{
+					query.addWhereField(COL_PARENT_ID,  *parentId);
+				}
+				else
+				{
+					query.addWhere(
+						ComposedExpression::Get(
+							ComposedExpression::Get(
+								FieldExpression::Get(TABLE.NAME, COL_PARENT_ID),
+								ComposedExpression::OP_EQ,
+								ValueExpression<int>::Get(0)
+							),
+							ComposedExpression::OP_OR,
+							IsNullExpression::Get(
+								FieldExpression::Get(TABLE.NAME, COL_PARENT_ID)
+					)	)	);
+				}
 			}
 			if (orderByName)
 			{
