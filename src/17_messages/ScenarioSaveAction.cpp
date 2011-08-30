@@ -69,22 +69,22 @@ namespace synthese
 
 	namespace messages
 	{
-		const string ScenarioSaveAction::PARAMETER_CREATE_TEMPLATE(Action_PARAMETER_PREFIX + "t");
-		const string ScenarioSaveAction::PARAMETER_VARIABLE(Action_PARAMETER_PREFIX + "var");
-		const string ScenarioSaveAction::PARAMETER_ENABLED(Action_PARAMETER_PREFIX + "ena");
-		const string ScenarioSaveAction::PARAMETER_START_DATE(Action_PARAMETER_PREFIX + "sda");
-		const string ScenarioSaveAction::PARAMETER_END_DATE(Action_PARAMETER_PREFIX + "eda");
-		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID(Action_PARAMETER_PREFIX + "sid");
+		const string ScenarioSaveAction::PARAMETER_CREATE_TEMPLATE = Action_PARAMETER_PREFIX + "t";
+		const string ScenarioSaveAction::PARAMETER_VARIABLE = Action_PARAMETER_PREFIX + "var";
+		const string ScenarioSaveAction::PARAMETER_ENABLED = Action_PARAMETER_PREFIX + "ena";
+		const string ScenarioSaveAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "sda";
+		const string ScenarioSaveAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "eda";
+		const string ScenarioSaveAction::PARAMETER_SCENARIO_ID = Action_PARAMETER_PREFIX + "sid";
 		const string ScenarioSaveAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "nam";
 		const string ScenarioSaveAction::PARAMETER_FOLDER_ID = Action_PARAMETER_PREFIX + "fi";
 		const string ScenarioSaveAction::PARAMETER_TEMPLATE = Action_PARAMETER_PREFIX + "tpl";
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY(Action_PARAMETER_PREFIX + "mt");
-		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE(Action_PARAMETER_PREFIX + "me");
-		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID(Action_PARAMETER_PREFIX + "re");
-		const string ScenarioSaveAction::PARAMETER_LEVEL(Action_PARAMETER_PREFIX + "le");
-		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID(Action_PARAMETER_PREFIX + "rs");
-		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE(Action_PARAMETER_PREFIX + "rt");
-		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID(Action_PARAMETER_PREFIX + "is");
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_COPY = Action_PARAMETER_PREFIX + "mt";
+		const string ScenarioSaveAction::PARAMETER_MESSAGE_TO_CREATE = Action_PARAMETER_PREFIX + "me";
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_ID = Action_PARAMETER_PREFIX + "re";
+		const string ScenarioSaveAction::PARAMETER_LEVEL = Action_PARAMETER_PREFIX + "le";
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
+		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
+		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
 		{
