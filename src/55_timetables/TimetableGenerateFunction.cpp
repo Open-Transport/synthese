@@ -1190,7 +1190,7 @@ namespace synthese
 				PlacesListConfiguration::List jlist;
 
 				// Build of the places list of the route
-				BOOST_FOREACH(Edge* edge, jp->getEdges())
+				BOOST_FOREACH(Edge* edge, jp->getAllEdges())
 				{
 					const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
 
