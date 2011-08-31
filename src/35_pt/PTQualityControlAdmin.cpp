@@ -22,6 +22,9 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "JourneyPatternAdmin.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineStopTableSync.h"
 #include "PTQualityControlAdmin.hpp"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
@@ -38,9 +41,11 @@
 #include "CopyGeometriesAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "JourneyPatternCopy.hpp"
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
 
 #include <geos/geom/LineString.h>
 
+using namespace boost;
 using namespace std;
 using namespace geos::geom;
 
@@ -73,6 +78,7 @@ namespace synthese
 		const string PTQualityControlAdmin::TAB_STOPS_WITHOUT_COORDINATE("swc");
 		const string PTQualityControlAdmin::TAB_CITIES_WITHOUT_MAIN_STOP("cwm");
 		const string PTQualityControlAdmin::TAB_EDGES_AND_GEOMETRIES("eag");
+		const string PTQualityControlAdmin::TAB_RANK_CONTINUITY("rank_continuity");
 
 
 
@@ -339,6 +345,82 @@ namespace synthese
 				}
 			}
 
+			
+			////////////////////////////////////////////////////////////////////
+			// RANK CONTINUITY
+			if (openTabContent(stream, TAB_RANK_CONTINUITY))
+			{
+				if(_runControl && getCurrentTab() == getActiveTab())
+				{
+					// Display of the table
+					HTMLTable::ColsVector c;
+					c.push_back("Journey Pattern");
+					c.push_back("Action");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+
+					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction,PTQualityControlAdmin> fixRequest(request);
+					AdminFunctionRequest<JourneyPatternAdmin> openRequest(request);
+
+					stream << t.open();
+
+					Env env;
+					JourneyPatternTableSync::SearchResult journeyPatterns(
+						JourneyPatternTableSync::Search(
+							env,
+							optional<RegistryKeyType>(),
+							0,
+							optional<size_t>(),
+							false,
+							true,
+							FIELDS_ONLY_LOAD_LEVEL
+					)	);
+					BOOST_FOREACH(shared_ptr<JourneyPattern> journeyPattern, journeyPatterns)
+					{
+						LineStopTableSync::SearchResult lineStops(
+							LineStopTableSync::Search(
+								env,
+								journeyPattern->getKey(),
+								optional<RegistryKeyType>(),
+								0,
+								optional<size_t>(),
+								true,
+								true,
+								FIELDS_ONLY_LOAD_LEVEL
+						)	);
+						size_t rank(0);
+						bool ok(true);
+						BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
+						{
+							if(lineStop->getRankInPath() != rank)
+							{
+								ok = false;
+								break;
+							}
+							++rank;
+						}
+						if(!ok)
+						{
+							fixRequest.getAction()->setJourneyPattern(const_pointer_cast<const JourneyPattern>(journeyPattern));
+							openRequest.getPage()->setLine(const_pointer_cast<const JourneyPattern>(journeyPattern));
+							stream << t.row();
+							stream << t.col() << HTMLModule::getHTMLLink(openRequest.getURL(), lexical_cast<string>(journeyPattern->getKey()));
+							stream << t.col() << HTMLModule::getLinkButton(fixRequest.getURL(), "Réparer");
+						}
+					}
+					stream << t.close();
+				}	
+				else
+				{
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					runRequest.getPage()->setRunControl(true);
+
+					stream <<
+						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						"</p>"
+					;
+			}	}
+
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
@@ -382,6 +464,7 @@ namespace synthese
 			_tabs.push_back(Tab("Arrêts non localisés", TAB_STOPS_WITHOUT_COORDINATE, false));
 			_tabs.push_back(Tab("Localités sans arrêt principal", TAB_CITIES_WITHOUT_MAIN_STOP, false));
 			_tabs.push_back(Tab("Itinéraires de lignes", TAB_EDGES_AND_GEOMETRIES, false));
+			_tabs.push_back(Tab("Continuité des rangs", TAB_RANK_CONTINUITY, false));
 
 			_tabBuilded = true;
 		}

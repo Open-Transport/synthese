@@ -83,6 +83,8 @@ JourneyPatternAdmin.cpp
 JourneyPatternAdmin.hpp
 JourneyPatternCopy.cpp
 JourneyPatternCopy.hpp
+JourneyPatternRankContinuityRestoreAction.cpp
+JourneyPatternRankContinuityRestoreAction.hpp
 JourneyPatternTableSync.cpp
 JourneyPatternTableSync.hpp
 JourneyPatternUpdateAction.cpp
