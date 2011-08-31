@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "JourneyPatternAdmin.hpp"
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "CommercialLineAdmin.h"
 #include "PTModule.h"
 #include "Profile.h"
@@ -217,8 +218,17 @@ namespace synthese
 				}
 				stream << t.open();
 
+				size_t expectedRank(0);
+				bool rankOk(true);
 				BOOST_FOREACH(const Edge* edge, _line->getEdges())
 				{
+					// Rank check
+					if(edge->getRankInPath() != expectedRank)
+					{
+						rankOk = false;
+					}
+					++expectedRank;
+
 					shared_ptr<const DesignatedLinePhysicalStop> linePhysicalStop(
 						dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ?
 						Env::GetOfficialEnv().getSPtr(static_cast<const DesignatedLinePhysicalStop*>(edge)) :
@@ -388,6 +398,7 @@ namespace synthese
 					stream << t.col() << HTMLModule::getLinkButton(lineStopRemoveAction.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 				}
 
+				// Stop add form
 				if(sservices.empty() && cservices.empty())
 				{
 					stream << t.row();
@@ -409,6 +420,19 @@ namespace synthese
 				if(sservices.empty() && cservices.empty())
 				{
 					stream << f.close();
+				}
+
+				// Rank check failed
+				if(!rankOk)
+				{
+					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction, JourneyPatternAdmin> fixRequest(_request);
+					fixRequest.getAction()->setJourneyPattern(_line);
+					stream <<
+						"<p class=\"info\">Les rangs des arrêts sont dicontinus. Cela constitue une corruption de la base de données. La " <<
+						HTMLModule::getHTMLLink(
+							fixRequest.getURL(),
+							"fonction de réparation des rangs"
+						) << " permet de réparer ce problème.</p>";
 				}
 
 
