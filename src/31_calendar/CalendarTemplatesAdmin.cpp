@@ -106,8 +106,17 @@ namespace synthese
 			stream << "<h1>Calendriers</h1>";
 
 			CalendarTemplateTableSync::SearchResult calendars(
-				CalendarTemplateTableSync::Search(_getEnv())
-			);
+				CalendarTemplateTableSync::Search(
+					Env::GetOfficialEnv(),
+					optional<string>(),
+					optional<RegistryKeyType>(),
+					true,
+					true,
+					0,
+					optional<size_t>(),
+					UP_LINKS_LOAD_LEVEL,
+					RegistryKeyType(0)
+			)	);
 
 			HTMLForm f(addCalendar.getHTMLForm("add"));
 			HTMLTable::ColsVector c;

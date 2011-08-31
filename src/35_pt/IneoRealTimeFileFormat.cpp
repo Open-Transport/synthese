@@ -248,45 +248,45 @@ namespace synthese
 				}
 				assert(!routes.empty());
 
-				ScheduledService* service(NULL);
+				_service = NULL;
 				BOOST_FOREACH(JourneyPattern* route, routes)
 				{
 					BOOST_FOREACH(Service* sservice, route->getServices())
 					{
-						service = dynamic_cast<ScheduledService*>(sservice);
-						if(!service)
+						_service = dynamic_cast<ScheduledService*>(sservice);
+						if(!_service)
 						{
 							continue;
 						}
-						if(	service->isActive(today) &&
-							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
+						if(	_service->isActive(today) &&
+							_service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
-							os << "LOAD : Use of service " << service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							service->setCodeBySource(_dataSource, serviceRef);
+							os << "LOAD : Use of service " << _service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+							_service->setCodeBySource(_dataSource, serviceRef);
 							break;
 						}
-						service = NULL;
+						_service = NULL;
 					}
-					if(service)
+					if(_service)
 					{
 						break;
 					}
 				}
 
-				if(!service)
+				if(!_service)
 				{
 					JourneyPattern* route(*routes.begin());
-					service = new ScheduledService(
+					_service = new ScheduledService(
 						ScheduledServiceTableSync::getId(),
 						string(),
 						route
 					);
-					service->setSchedules(departureSchedules, arrivalSchedules, true);
-					service->setPath(route);
-					service->setCodeBySource(_dataSource, serviceRef);
-					service->setActive(today);
-					route->addService(*service, false);
-					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
+					_service->setSchedules(departureSchedules, arrivalSchedules, true);
+					_service->setPath(route);
+					_service->setCodeBySource(_dataSource, serviceRef);
+					_service->setActive(today);
+					route->addService(*_service, false);
+					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(_service));
 
 					os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
 				}
@@ -391,17 +391,29 @@ namespace synthese
 		db::DBTransaction IneoRealTimeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			BOOST_FOREACH(const Registry<JourneyPattern>::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
+			if(_courseId)
 			{
-				JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
+				JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(_service->getPath()), transaction);
+				BOOST_FOREACH(Edge* edge, _service->getPath()->getEdges())
+				{
+					LineStopTableSync::Save(static_cast<LineStop*>(edge), transaction);
+				}
+				ScheduledServiceTableSync::Save(_service, transaction);
 			}
-			BOOST_FOREACH(const Registry<DesignatedLinePhysicalStop>::value_type& lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+			else
 			{
-				LineStopTableSync::Save(lineStop.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
-			{
-				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+				BOOST_FOREACH(const Registry<JourneyPattern>::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
+				{
+					JourneyPatternTableSync::Save(journeyPattern.second.get(), transaction);
+				}
+				BOOST_FOREACH(const Registry<DesignatedLinePhysicalStop>::value_type& lineStop, _env.getRegistry<DesignatedLinePhysicalStop>())
+				{
+					LineStopTableSync::Save(lineStop.second.get(), transaction);
+				}
+				BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
+				{
+					ScheduledServiceTableSync::Save(service.second.get(), transaction);
+				}
 			}
 			return transaction;
 		}

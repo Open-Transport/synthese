@@ -31,6 +31,8 @@ namespace synthese
 {
 	namespace pt
 	{
+		class ScheduledService;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo real time file format.
 		//////////////////////////////////////////////////////////////////////////
@@ -53,6 +55,7 @@ namespace synthese
 				//@{
 					boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 					boost::optional<std::string> _courseId;
+					mutable ScheduledService* _service;
 				//@}
 
 			protected:
