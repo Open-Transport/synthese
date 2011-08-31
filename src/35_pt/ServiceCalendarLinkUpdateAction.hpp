@@ -57,6 +57,12 @@ namespace synthese
 			static const std::string PARAMETER_START_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_CALENDAR_TEMPLATE_ID;
+			static const std::string PARAMETER_CALENDAR_TEMPLATE_ID2;
+
+			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_START_DATE;
+			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_END_DATE;
+			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID;
+			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2;
 
 		private:
 			boost::shared_ptr<ServiceCalendarLink> _link;
@@ -64,6 +70,7 @@ namespace synthese
 			boost::optional<boost::gregorian::date> _minDate;
 			boost::optional<boost::gregorian::date> _maxDate;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _calendar;
+			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _calendar2;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

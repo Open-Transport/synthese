@@ -45,40 +45,44 @@ namespace synthese
 			RegistryKeyType id
 		):	Registrable(id),
 			_service(NULL),
-			_calendarTemplate(NULL)
+			_calendarTemplate(NULL),
+			_calendarTemplate2(NULL)
 		{}
 
 
 
 		void ServiceCalendarLink::addDatesToCalendar(calendar::Calendar& cal) const
 		{
-			if( !_calendarTemplate ||
-				(_calendarTemplate->isLimited() && (_startDate.is_not_a_date() || _endDate.is_not_a_date()))
-			){
-				return;
-			}
-			
+			// Base calendar
+			Calendar result;
 			if(!_startDate.is_not_a_date() && !_endDate.is_not_a_date())
 			{
-				Calendar mask(_startDate, _endDate);
-				Calendar result(_calendarTemplate->getResult(mask));
-				cal |= result;
+				result = Calendar(_startDate, _endDate);
 			}
-			else if(_calendarTemplate->isLimited())
+			else if(_calendarTemplate && _calendarTemplate->isLimited())
 			{
-				Calendar result(_calendarTemplate->getResult());
-				if(!_startDate.is_not_a_date() && result.getFirstActiveDate() < _startDate)
-				{
-					Calendar mask(result.getFirstActiveDate(), _startDate);
-					result.subDates(mask);
-				}
-				if(!_endDate.is_not_a_date() && result.getLastActiveDate() > _endDate)
-				{
-					Calendar mask(_endDate, result.getLastActiveDate());
-					result.subDates(mask);
-				}
-				cal |= result;
+				result = _calendarTemplate->getResult();
 			}
-		}
+			else if(_calendarTemplate2 && _calendarTemplate2->isLimited())
+			{
+				result = _calendarTemplate2->getResult();
+			}
+			else
+			{
+				return; // Result is not limited : unable to build a calendar
+			}
 
+			// Apply templates masks
+			if(_calendarTemplate)
+			{
+				result = _calendarTemplate->getResult(result);
+			}
+			if(_calendarTemplate2)
+			{
+				result = _calendarTemplate2->getResult(result);
+			}
+
+			// Add dates to the retval
+			cal |= result;
+		}
 }	}

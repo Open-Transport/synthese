@@ -97,9 +97,6 @@ namespace synthese
 		const string ServiceAdmin::TAB_SCHEDULES("sc");
 		const string ServiceAdmin::TAB_REAL_TIME("rt");
 
-		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE("service_admin_start_date");
-		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE("service_admin_end_date");
-		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID("service_admin_calendar_template_id");
 		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_ID("service_admin_id");
 		const string ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_SCHEDULE_RANK("service_admin_schedule_rank");
 
@@ -490,23 +487,29 @@ namespace synthese
 			if (openTabContent(stream, TAB_CALENDAR))
 			{
 				// Session variables
-				string sessionStartDateStr(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_START_DATE));
+				string sessionStartDateStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE));
 				date sessionStartDate;
 				if(!sessionStartDateStr.empty())
 				{
 					sessionStartDate = from_string(sessionStartDateStr);
 				}
-				string sessionEndDateStr(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_END_DATE));
+				string sessionEndDateStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE));
 				date sessionEndDate;
 				if(!sessionEndDateStr.empty())
 				{
 					sessionEndDate = from_string(sessionEndDateStr);
 				}
-				string sessionCalendarTemplateIdStr(request.getSession()->getSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID));
+				string sessionCalendarTemplateIdStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID));
 				RegistryKeyType sessionCalendarTemplateId(0);
 				if(!sessionCalendarTemplateIdStr.empty())
 				{
 					sessionCalendarTemplateId = lexical_cast<RegistryKeyType>(sessionCalendarTemplateIdStr);
+				}
+				string sessionCalendarTemplateIdStr2(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2));
+				RegistryKeyType sessionCalendarTemplateId2(0);
+				if(!sessionCalendarTemplateIdStr2.empty())
+				{
+					sessionCalendarTemplateId2 = lexical_cast<RegistryKeyType>(sessionCalendarTemplateIdStr2);
 				}
 
 				stream << "<h1>Définition par lien</h1>";
@@ -529,7 +532,8 @@ namespace synthese
 				HTMLTable::ColsVector vs;
 				vs.push_back("Date début");
 				vs.push_back("Date fin");
-				vs.push_back("Calendrier");
+				vs.push_back("Calendrier jours");
+				vs.push_back("Calendrier période");
 				vs.push_back("Action");
 				HTMLTable tc(vs, ResultHTMLTable::CSS_CLASS);
 				stream << tc.open();
@@ -539,12 +543,20 @@ namespace synthese
 					stream << tc.col() << link->getStartDate();
 					stream << tc.col() << link->getEndDate();
 					
-					// Calendar
+					// Calendar days
 					stream << tc.col();
 					if(link->getCalendarTemplate())
 					{
 						openCalendarRequest.getPage()->setCalendar(Env::GetOfficialEnv().getSPtr(link->getCalendarTemplate()));
 						stream << HTMLModule::getHTMLLink(openCalendarRequest.getURL(), link->getCalendarTemplate()->getName());
+					}
+
+					// Calendar period
+					stream << tc.col();
+					if(link->getCalendarTemplate2())
+					{
+						openCalendarRequest.getPage()->setCalendar(Env::GetOfficialEnv().getSPtr(link->getCalendarTemplate2()));
+						stream << HTMLModule::getHTMLLink(openCalendarRequest.getURL(), link->getCalendarTemplate2()->getName());
 					}
 
 					// Remove button
@@ -558,6 +570,11 @@ namespace synthese
 						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
 						CalendarTemplateTableSync::GetCalendarTemplatesList(),
 						optional<RegistryKeyType>(sessionCalendarTemplateId)
+				);
+				stream << tc.col() << calendarLinkAddForm.getSelectInput(
+						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2,
+						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						optional<RegistryKeyType>(sessionCalendarTemplateId2)
 				);
 				stream << tc.col() << calendarLinkAddForm.getSubmitButton("Ajouter");
 				stream << tc.close();

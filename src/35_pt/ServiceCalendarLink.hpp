@@ -60,6 +60,7 @@ namespace synthese
 			//@{
 				NonPermanentService* _service;
 				calendar::CalendarTemplate* _calendarTemplate;
+				calendar::CalendarTemplate* _calendarTemplate2;
 				boost::gregorian::date _startDate;
 				boost::gregorian::date _endDate;
 			//@}
@@ -75,6 +76,7 @@ namespace synthese
 			//@{
 				NonPermanentService* getService() const { return _service; }
 				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
+				calendar::CalendarTemplate* getCalendarTemplate2() const { return _calendarTemplate2; }
 				const boost::gregorian::date& getStartDate() const { return _startDate; }
 				const boost::gregorian::date& getEndDate() const { return _endDate; }
 			//@}
@@ -83,6 +85,7 @@ namespace synthese
 			//@{
 				void setService(NonPermanentService* value){ _service = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value){ _calendarTemplate = value; }
+				void setCalendarTemplate2(calendar::CalendarTemplate* value){ _calendarTemplate2 = value; }
 				void setStartDate(const boost::gregorian::date& value){ _startDate = value; }
 				void setEndDate(const boost::gregorian::date& value){ _endDate = value; }
 			//@}
