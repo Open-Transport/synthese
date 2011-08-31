@@ -32,7 +32,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "Fetcher.h"
 #include "JourneyPatternTableSync.hpp"
-#include "ServiceAdmin.h"
+#include "ServiceCalendarLinkUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -211,12 +211,18 @@ namespace synthese
 			// Stores dates in session variable
 			if(_startDate != _endDate)
 			{
-				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(_startDate));
-				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(_endDate));
+				if(!_startDate.is_not_a_date())
+				{
+					request.getSession()->setSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(_startDate));
+				}
+				if(!_endDate.is_not_a_date())
+				{
+					request.getSession()->setSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(_endDate));
+				}
 			}
 			if(_calendarTemplate.get())
 			{
-				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>(_calendarTemplate->getKey()));
+				request.getSession()->setSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>(_calendarTemplate->getKey()));
 			}
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());

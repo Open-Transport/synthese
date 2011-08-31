@@ -46,6 +46,7 @@ namespace synthese
 			static const std::string COL_START_DATE;
 			static const std::string COL_END_DATE;
 			static const std::string COL_CALENDAR_TEMPLATE_ID;
+			static const std::string COL_CALENDAR_TEMPLATE_ID2;
 
 
 			/** ServiceCalendarLink search.

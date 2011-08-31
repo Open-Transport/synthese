@@ -53,6 +53,7 @@ namespace synthese
 		const string ServiceCalendarLinkTableSync::COL_START_DATE = "start_date";
 		const string ServiceCalendarLinkTableSync::COL_END_DATE = "end_date";
 		const string ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID = "calendar_id";
+		const string ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2 = "calendar2_id";
 	}
 
 	namespace db
@@ -70,6 +71,7 @@ namespace synthese
 			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_START_DATE, SQL_TEXT),
 			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_END_DATE, SQL_TEXT),
 			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -109,6 +111,18 @@ namespace synthese
 					Log::GetInstance().warn("Bad value " + lexical_cast<string>(calendarTemplateId) + " for calendar in service calendar link " + lexical_cast<string>(object->getKey()));
 				}
 
+				// Calendar template 2
+				object->setCalendarTemplate2(NULL);
+				RegistryKeyType calendarTemplateId2(rows->getLongLong(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2));
+				if(calendarTemplateId2 > 0) try
+				{
+					object->setCalendarTemplate2(CalendarTemplateTableSync::GetEditable(calendarTemplateId2, env).get());
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>)
+				{
+					Log::GetInstance().warn("Bad value " + lexical_cast<string>(calendarTemplateId) + " for calendar 2 in service calendar link " + lexical_cast<string>(object->getKey()));
+				}
+
 				// Service
 				// Must stay at the last position because the service reads the object content
 				object->setService(NULL);
@@ -135,13 +149,13 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			if(!object->getService()) throw Exception("ServiceCalendarLink save error. Missing service");
-			if(!object->getCalendarTemplate()) throw Exception("ServiceCalendarLink save error. Missing calendar template");
 			
 			ReplaceQuery<ServiceCalendarLinkTableSync> query(*object);
 			query.addField(object->getService()->getKey());
 			query.addField(object->getStartDate().is_not_a_date() ? string() : to_iso_extended_string(object->getStartDate()));
 			query.addField(object->getEndDate().is_not_a_date() ? string() : to_iso_extended_string(object->getEndDate()));
-			query.addField(object->getCalendarTemplate()->getKey());
+			query.addField(object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCalendarTemplate2() ? object->getCalendarTemplate2()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 
