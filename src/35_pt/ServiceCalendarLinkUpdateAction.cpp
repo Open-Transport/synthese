@@ -32,7 +32,6 @@
 #include "CalendarTemplateTableSync.h"
 #include "ServiceCalendarLink.hpp"
 #include "ServiceCalendarLinkTableSync.hpp"
-#include "ServiceAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -59,7 +58,12 @@ namespace synthese
 		const string ServiceCalendarLinkUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "start_date";
 		const string ServiceCalendarLinkUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "end_date";
 		const string ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID = Action_PARAMETER_PREFIX + "calendar_id";
+		const string ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2 = Action_PARAMETER_PREFIX + "calendar_id2";
 
+		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE("service_admin_start_date");
+		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE("service_admin_end_date");
+		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID("service_admin_calendar_template_id");
+		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2("service_admin_calendar_template_id2");
 
 
 		ParametersMap ServiceCalendarLinkUpdateAction::getParametersMap() const
@@ -84,6 +88,10 @@ namespace synthese
 			if(_calendar)
 			{
 				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID, _calendar->get() ? (*_calendar)->getKey() : RegistryKeyType(0));
+			}
+			if(_calendar2)
+			{
+				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID2, _calendar2->get() ? (*_calendar2)->getKey() : RegistryKeyType(0));
 			}
 			return map;
 		}
@@ -163,6 +171,20 @@ namespace synthese
 					throw ActionException("No such calendar template");
 				}
 			}
+
+			// Calendar template 2
+			if(map.isDefined(PARAMETER_CALENDAR_TEMPLATE_ID2))
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_TEMPLATE_ID2));
+				if(id > 0) try
+				{
+					_calendar2 = CalendarTemplateTableSync::GetEditable(id, *_env);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw ActionException("No such calendar template 2");
+				}
+			}
 		}
 
 
@@ -183,14 +205,20 @@ namespace synthese
 			if(_minDate)
 			{
 				_link->setStartDate(*_minDate);
-				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(*_minDate));
+				if(!_minDate->is_not_a_date())
+				{
+					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(*_minDate));
+				}
 			}
 
 			// End date
 			if(_maxDate)
 			{
 				_link->setEndDate(*_maxDate);
-				request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(*_maxDate));
+				if(!_maxDate->is_not_a_date())
+				{
+					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(*_maxDate));
+				}
 			}
 
 			// Calendar template
@@ -199,7 +227,17 @@ namespace synthese
 				_link->setCalendarTemplate(_calendar->get());
 				if(_calendar->get())
 				{
-					request.getSession()->setSessionVariable(ServiceAdmin::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>((*_calendar)->getKey()));
+					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>((*_calendar)->getKey()));
+				}
+			}
+			
+			// Calendar template 2
+			if(_calendar2)
+			{
+				_link->setCalendarTemplate2(_calendar2->get());
+				if(_calendar2->get())
+				{
+					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2, lexical_cast<string>((*_calendar2)->getKey()));
 				}
 			}
 
