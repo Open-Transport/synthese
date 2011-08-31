@@ -550,7 +550,7 @@ namespace synthese
 						stream << t.col();
 						const DesignatedLinePhysicalStop* lineStop(
 							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								line->getLineStop(0)
+								*line->getEdges().begin()
 						)	);
 						if(lineStop)
 						{
@@ -558,7 +558,7 @@ namespace synthese
 						}
 						const LineArea* lineArea(
 							dynamic_cast<const LineArea*>(
-								line->getLineStop(0)
+								*line->getEdges().begin()
 						)	);
 						if(lineArea)
 						{
@@ -570,7 +570,7 @@ namespace synthese
 						stream << t.col();
 						const DesignatedLinePhysicalStop* lineStop(
 							dynamic_cast<const DesignatedLinePhysicalStop*>(
-								line->getLineStop(line->getEdges().size()-1)
+								*line->getEdges().rbegin()
 						)	);
 						if(lineStop)
 						{
@@ -578,7 +578,7 @@ namespace synthese
 						}
 						const LineArea* lineArea(
 							dynamic_cast<const LineArea*>(
-								line->getLineStop(line->getEdges().size()-1)
+								*line->getEdges().rbegin()
 						)	);
 						if(lineArea)
 						{

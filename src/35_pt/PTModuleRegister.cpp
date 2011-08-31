@@ -75,6 +75,7 @@
 #include "DestinationUpdateAction.hpp"
 #include "DeviateServiceAction.hpp"
 #include "JourneyPatternAddAction.hpp"
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
 #include "ScheduleRealTimeUpdateAction.h"
@@ -220,6 +221,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
+	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
 	synthese::pt::NonConcurrencyRuleAddAction::integrate();
 	synthese::pt::PlaceAliasUpdateAction::integrate();
