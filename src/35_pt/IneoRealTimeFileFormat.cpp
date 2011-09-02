@@ -223,7 +223,7 @@ namespace synthese
 					if(routeResult->next())
 					{
 						string routeName(routeResult->getText("nom"));
-						bool wayBack(routeResult->getText("sens") != "A");
+						bool wayBack(routeResult->getText("sens") == "A");
 
 						os << "CREA : Creation of route<br />";
 
