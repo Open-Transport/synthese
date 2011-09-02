@@ -101,6 +101,17 @@ namespace synthese
 					}
 				}
 			}
+			else
+			{
+				// 1 : clean the old references to the current source
+				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(_dataSource, _env);
+				set<ScheduledService*> services(sourcedServices.get(*_courseId));
+				BOOST_FOREACH(ScheduledService* service, services)
+				{
+					service->removeSourceLink(_dataSource);
+					_services.insert(service);
+				}
+			}
 
 			// 2 : loop on the services present in the database and link to existing or new services
 			stringstream query;
@@ -248,45 +259,47 @@ namespace synthese
 				}
 				assert(!routes.empty());
 
-				_service = NULL;
+				ScheduledService* service(NULL);
 				BOOST_FOREACH(JourneyPattern* route, routes)
 				{
 					BOOST_FOREACH(Service* sservice, route->getServices())
 					{
-						_service = dynamic_cast<ScheduledService*>(sservice);
-						if(!_service)
+						service = dynamic_cast<ScheduledService*>(sservice);
+						if(!service)
 						{
 							continue;
 						}
-						if(	_service->isActive(today) &&
-							_service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
+						if(	service->isActive(today) &&
+							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
-							os << "LOAD : Use of service " << _service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							_service->setCodeBySource(_dataSource, serviceRef);
+							os << "LOAD : Use of service " << service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+							service->setCodeBySource(_dataSource, serviceRef);
+							_services.insert(service);
 							break;
 						}
-						_service = NULL;
+						service = NULL;
 					}
-					if(_service)
+					if(service)
 					{
 						break;
 					}
 				}
 
-				if(!_service)
+				if(!service)
 				{
 					JourneyPattern* route(*routes.begin());
-					_service = new ScheduledService(
+					service = new ScheduledService(
 						ScheduledServiceTableSync::getId(),
 						string(),
 						route
 					);
-					_service->setSchedules(departureSchedules, arrivalSchedules, true);
-					_service->setPath(route);
-					_service->setCodeBySource(_dataSource, serviceRef);
-					_service->setActive(today);
-					route->addService(*_service, false);
-					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(_service));
+					service->setSchedules(departureSchedules, arrivalSchedules, true);
+					service->setPath(route);
+					service->setCodeBySource(_dataSource, serviceRef);
+					service->setActive(today);
+					route->addService(*service, false);
+					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
+					_services.insert(service);
 
 					os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
 				}
@@ -393,14 +406,14 @@ namespace synthese
 			DBTransaction transaction;
 			if(_courseId)
 			{
-				if(_service)
+				BOOST_FOREACH(ScheduledService* service, _services)
 				{
-					JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(_service->getPath()), transaction);
-					BOOST_FOREACH(Edge* edge, _service->getPath()->getEdges())
+					JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(service->getPath()), transaction);
+					BOOST_FOREACH(Edge* edge, service->getPath()->getEdges())
 					{
 						LineStopTableSync::Save(static_cast<LineStop*>(edge), transaction);
 					}
-					ScheduledServiceTableSync::Save(_service, transaction);
+					ScheduledServiceTableSync::Save(service, transaction);
 			}	}
 			else
 			{
