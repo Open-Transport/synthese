@@ -55,7 +55,7 @@ namespace synthese
 				//@{
 					boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 					boost::optional<std::string> _courseId;
-					mutable ScheduledService* _service;
+					mutable std::set<ScheduledService*> _services;
 				//@}
 
 			protected:
