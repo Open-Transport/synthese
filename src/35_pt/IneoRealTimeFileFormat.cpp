@@ -262,7 +262,7 @@ namespace synthese
 							_service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
 							os << "LOAD : Use of service " << _service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							_service->setCodeBySource(_dataSource, serviceRef);
+							_service->setCodeBySource(_dataSource, serviceRef, true);
 							break;
 						}
 						_service = NULL;
@@ -283,7 +283,7 @@ namespace synthese
 					);
 					_service->setSchedules(departureSchedules, arrivalSchedules, true);
 					_service->setPath(route);
-					_service->setCodeBySource(_dataSource, serviceRef);
+					_service->setCodeBySource(_dataSource, serviceRef, true);
 					_service->setActive(today);
 					route->addService(*_service, false);
 					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(_service));
