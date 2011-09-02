@@ -391,7 +391,7 @@ namespace synthese
 		db::DBTransaction IneoRealTimeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			if(_courseId)
+			if(_courseId && _service.get())
 			{
 				JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(_service->getPath()), transaction);
 				BOOST_FOREACH(Edge* edge, _service->getPath()->getEdges())
