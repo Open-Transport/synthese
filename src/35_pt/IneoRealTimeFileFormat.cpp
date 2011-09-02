@@ -89,7 +89,7 @@ namespace synthese
 						{
 							LineStopTableSync::Search(_env, route->getKey());
 						}
-					}	}
+				}	}
 
 				// 1 : clean the old references to the current source
 				ImportableTableSync::ObjectBySource<ScheduledServiceTableSync> sourcedServices(_dataSource, _env);
@@ -391,15 +391,17 @@ namespace synthese
 		db::DBTransaction IneoRealTimeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			if(_courseId && _service.get())
+			if(_courseId)
 			{
-				JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(_service->getPath()), transaction);
-				BOOST_FOREACH(Edge* edge, _service->getPath()->getEdges())
+				if(_service)
 				{
-					LineStopTableSync::Save(static_cast<LineStop*>(edge), transaction);
-				}
-				ScheduledServiceTableSync::Save(_service, transaction);
-			}
+					JourneyPatternTableSync::Save(static_cast<JourneyPattern*>(_service->getPath()), transaction);
+					BOOST_FOREACH(Edge* edge, _service->getPath()->getEdges())
+					{
+						LineStopTableSync::Save(static_cast<LineStop*>(edge), transaction);
+					}
+					ScheduledServiceTableSync::Save(_service, transaction);
+			}	}
 			else
 			{
 				BOOST_FOREACH(const Registry<JourneyPattern>::value_type& journeyPattern, _env.getRegistry<JourneyPattern>())
