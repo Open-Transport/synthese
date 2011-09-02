@@ -237,7 +237,7 @@ namespace synthese
 									rank,
 									rank+1 < servedStops.size() && stop._departure,
 									rank > 0 && stop._arrival,
-									0,
+									*stop._metricOffset,
 									*stop._stop.begin(),
 									stop._withTimes ? *stop._withTimes : true
 							)	);
