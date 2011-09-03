@@ -262,6 +262,10 @@ namespace synthese
 						COL_RANKINPATH,
 						rank
 					);
+					updateQuery.addWhereField(
+						COL_LINEID,
+						lineStop.getParentPath()->getKey()
+					);
 					updateQuery.execute(transaction);
 					if(rank == 0)
 					{
