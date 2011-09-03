@@ -211,11 +211,11 @@ namespace synthese
 			// Stores dates in session variable
 			if(_startDate != _endDate)
 			{
-				if(!_startDate.is_not_a_date())
+				if(!_startDate.is_not_a_date() && !_startDate.is_special())
 				{
 					request.getSession()->setSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(_startDate));
 				}
-				if(!_endDate.is_not_a_date())
+				if(!_endDate.is_not_a_date() && !_endDate.is_special())
 				{
 					request.getSession()->setSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(_endDate));
 				}
