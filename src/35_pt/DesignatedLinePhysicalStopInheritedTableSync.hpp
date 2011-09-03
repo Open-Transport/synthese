@@ -72,6 +72,21 @@ namespace synthese
 				bool raisingOrder = false,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+				const StopArea& departure,
+				const StopArea& arrival,
+				util::Env& env
+			);
+
+			boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+				const StopPoint& departure,
+				const StopPoint& arrival,
+				util::Env& env
+			);
+
 		};
 }	}
 

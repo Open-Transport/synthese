@@ -27,6 +27,7 @@
 #include "ReplaceQuery.h"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternCopy.hpp"
+#include "StopArea.hpp"
 
 #include <geos/geom/LineString.h>
 
@@ -174,4 +175,67 @@ namespace synthese
 
 			return LoadFromQuery(query.toString(), env, linkLevel);
 		}
+
+
+
+		boost::shared_ptr<DesignatedLinePhysicalStop> DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+			const StopArea& departure,
+			const StopArea& arrival,
+			util::Env& env
+		){
+			stringstream query;
+			query <<
+				" SELECT " <<
+				" FROM " <<
+					LineStopTableSync::TABLE.NAME << " t1," <<
+					LineStopTableSync::TABLE.NAME << " t2," <<
+					StopPointTableSync::TABLE.NAME << " s1," <<
+					StopPointTableSync::TABLE.NAME << " s2" <<
+				" WHERE " <<
+					"t1." << LineStopTableSync::COL_LINEID << "=t2." << LineStopTableSync::COL_LINEID << " AND " <<
+					"t1." << LineStopTableSync::COL_RANKINPATH << "+1=t2." << LineStopTableSync::COL_RANKINPATH << " AND " <<
+					"t1." << LineStopTableSync::COL_PHYSICALSTOPID << "=s1." << TABLE_COL_ID << " AND " <<
+					"t2." << LineStopTableSync::COL_PHYSICALSTOPID << "=s2." << TABLE_COL_ID << " AND " <<
+					"s1." << StopPointTableSync::COL_PLACEID << "=" << departure.getKey() << " AND " <<
+					"s2." << StopPointTableSync::COL_PLACEID << "=" << arrival.getKey() <<
+				" ORDER BY " <<
+					"NumPoints(t1." << TABLE_COL_GEOMETRY << ") DESC," <<
+					"t2." << LineStopTableSync::COL_METRICOFFSET << "-t1." << LineStopTableSync::COL_METRICOFFSET << " DESC" <<
+				" LIMIT 1"
+			;
+			SearchResult result(
+				LoadFromQuery(query.str(), env, UP_LINKS_LOAD_LEVEL)
+			);
+			return result.empty() ? shared_ptr<DesignatedLinePhysicalStop>() : *result.begin();
+		}
+
+
+
+		boost::shared_ptr<DesignatedLinePhysicalStop> DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+			const StopPoint& departure,
+			const StopPoint& arrival,
+			util::Env& env
+		){
+			stringstream query;
+			query <<
+				" SELECT " <<
+				" FROM " <<
+					LineStopTableSync::TABLE.NAME << " t1," <<
+					LineStopTableSync::TABLE.NAME << " t2" <<
+				" WHERE " <<
+					"t1." << LineStopTableSync::COL_LINEID << "=t2." << LineStopTableSync::COL_LINEID << " AND " <<
+					"t1." << LineStopTableSync::COL_RANKINPATH << "+1=t2." << LineStopTableSync::COL_RANKINPATH << " AND " <<
+					"t1." << LineStopTableSync::COL_PHYSICALSTOPID << "=" << departure.getKey() << " AND " <<
+					"t2." << LineStopTableSync::COL_PHYSICALSTOPID << "=" << arrival.getKey() <<
+				" ORDER BY " <<
+					"NumPoints(t1." << TABLE_COL_GEOMETRY << ") DESC," <<
+					"t2." << LineStopTableSync::COL_METRICOFFSET << "-t1." << LineStopTableSync::COL_METRICOFFSET << " DESC" <<
+				" LIMIT 1"
+			;
+			SearchResult result(
+				LoadFromQuery(query.str(), env, UP_LINKS_LOAD_LEVEL)
+			);
+			return result.empty() ? shared_ptr<DesignatedLinePhysicalStop>() : *result.begin();
+		}
+
 }	}

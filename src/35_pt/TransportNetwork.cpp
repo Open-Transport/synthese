@@ -37,13 +37,13 @@ namespace synthese
 			util::RegistryKeyType id,
 			std::string name
 		):	util::Registrable(id),
-			Named(name)
-		{
-		}
+			Named(name),
+			_daysCalendarsParent(NULL),
+			_periodsCalendarsParent(NULL)
+		{}
+
 
 
 		TransportNetwork::~TransportNetwork()
-		{
-		}
-	}
-}
+		{}
+}	}

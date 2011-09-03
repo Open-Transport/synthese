@@ -274,10 +274,22 @@ namespace synthese
 
 		CalendarTemplateTableSync::CalendarTemplatesList CalendarTemplateTableSync::GetCalendarTemplatesList(
 			CalendarTemplateTableSync::CalendarTemplatesList::value_type::second_type zeroName,
-			optional<CalendarTemplateTableSync::CalendarTemplatesList::value_type::first_type> idToAvoid
+			optional<CalendarTemplateTableSync::CalendarTemplatesList::value_type::first_type> idToAvoid,
+			boost::optional<util::RegistryKeyType> parentId
 		){
 			Env env;
-			CalendarTemplateTableSync::SearchResult s(Search(env));
+			CalendarTemplateTableSync::SearchResult s(
+				Search(
+					env,
+					optional<string>(),
+					idToAvoid ? *idToAvoid : optional<RegistryKeyType>(),
+					true,
+					true,
+					0,
+					optional<size_t>(),
+					UP_LINKS_LOAD_LEVEL,
+					parentId
+			)	);
 			CalendarTemplatesList r;
 			if(!zeroName.empty())
 			{
@@ -285,7 +297,6 @@ namespace synthese
 			}
 			BOOST_FOREACH(const CalendarTemplateTableSync::SearchResult::value_type& c, s)
 			{
-				if(idToAvoid && c->getKey() == *idToAvoid) continue;
 				r.push_back(make_pair(c->getKey(), c->getName()));
 			}
 			return r;

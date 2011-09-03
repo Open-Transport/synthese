@@ -31,8 +31,10 @@
 #include "TransportNetworkTableSync.h"
 #include "ImportableTableSync.hpp"
 #include "ImportableAdmin.hpp"
+#include "CalendarTemplateTableSync.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -40,6 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace impex;
 	using namespace util;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -50,6 +53,8 @@ namespace synthese
 	{
 		const string TransportNetworkUpdateAction::PARAMETER_NETWORK_ID = Action_PARAMETER_PREFIX + "ni";
 		const string TransportNetworkUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "days_calendars_parent_id";
+		const string TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID = Action_PARAMETER_PREFIX + "periods_calendars_parent_id";
 
 
 
@@ -75,6 +80,7 @@ namespace synthese
 
 		void TransportNetworkUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Network object
 			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID)) try
 			{
 				_network = TransportNetworkTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), *_env);
@@ -88,6 +94,7 @@ namespace synthese
 				_network.reset(new TransportNetwork);
 			}
 
+			// Name
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
@@ -97,18 +104,59 @@ namespace synthese
 				}
 
 				TransportNetworkTableSync::SearchResult networks(
-					TransportNetworkTableSync::Search(*_env, *_name, string(), 0, 1)
+					TransportNetworkTableSync::Search(*_env, *_name, string())
 				);
-				if(!networks.empty() && (networks.size() > 1 || networks.front() == _network))
+				BOOST_FOREACH(TransportNetworkTableSync::SearchResult::value_type network, networks)
 				{
-					throw ActionException("Un réseau nommé "+ *_name +" existe déjà.");
-				}
+					if(network != _network)
+					{
+						throw ActionException("Un réseau nommé "+ *_name +" existe déjà.");
+				}	}
 			}
 
+			// Data source links
 			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
 			{
 				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
 			}
+
+			// Days calendars parent
+			if(map.isDefined(PARAMETER_DAYS_CALENDARS_PARENT_ID))
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_DAYS_CALENDARS_PARENT_ID));
+				if(id > 0) try
+				{
+					_daysCalendarsParent = CalendarTemplateTableSync::GetEditable(
+						id, *_env, UP_LINKS_LOAD_LEVEL
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw ActionException("No such days calendar id");
+				}
+				else
+				{
+					_daysCalendarsParent = shared_ptr<CalendarTemplate>();
+			}	}
+
+			// Periods calendars parent
+			if(map.isDefined(PARAMETER_PERIODS_CALENDARS_PARENT_ID))
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_PERIODS_CALENDARS_PARENT_ID));
+				if(id > 0) try
+				{
+					_periodsCalendarsParent = CalendarTemplateTableSync::GetEditable(
+						id, *_env, UP_LINKS_LOAD_LEVEL
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw ActionException("No such periods calendar id");
+				}
+				else
+				{
+					_periodsCalendarsParent = shared_ptr<CalendarTemplate>();
+			}	}
 		}
 
 
@@ -116,15 +164,35 @@ namespace synthese
 		void TransportNetworkUpdateAction::run(
 			Request& request
 		){
+			// Name
 			if(_name)
 			{
 				_network->setName(*_name);
 			}
+
+			// Data source links
 			if(_dataSourceLinks)
 			{
 				_network->setDataSourceLinks(*_dataSourceLinks);
 			}
 
+			// Days calendars parent
+			if(_daysCalendarsParent)
+			{
+				_network->setDaysCalendarsParent(
+					_daysCalendarsParent->get()
+				);
+			}
+
+			// Periods calendars parent
+			if(_periodsCalendarsParent)
+			{
+				_network->setPeriodsCalendarsParent(
+					_periodsCalendarsParent->get()
+				);
+			}
+
+			// Action
 			TransportNetworkTableSync::Save(_network.get());
 //			::AddCreationEntry(object, request.getUser().get());
 
@@ -141,5 +209,4 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+}	}
