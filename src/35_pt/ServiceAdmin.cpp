@@ -565,17 +565,28 @@ namespace synthese
 					calendarLinkRemoveRequest.getAction()->setObjectId(link->getKey());
 					stream << tc.col() << HTMLModule::getLinkButton(calendarLinkRemoveRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?");
 				}
+				const TransportNetwork* network(
+					static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())->getNetwork()
+				);
 				stream << tc.row();
 				stream << tc.col() << calendarLinkAddForm.getCalendarInput(ServiceCalendarLinkUpdateAction::PARAMETER_START_DATE, sessionStartDate);
 				stream << tc.col() << calendarLinkAddForm.getCalendarInput(ServiceCalendarLinkUpdateAction::PARAMETER_END_DATE, sessionEndDate);
 				stream << tc.col() << calendarLinkAddForm.getSelectInput(
 						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						CalendarTemplateTableSync::GetCalendarTemplatesList(
+							"(aucun)",
+							optional<RegistryKeyType>(),
+							network->getDaysCalendarsParent() ? optional<RegistryKeyType>(network->getDaysCalendarsParent()->getKey()) : optional<RegistryKeyType>()
+						),
 						optional<RegistryKeyType>(sessionCalendarTemplateId)
 				);
 				stream << tc.col() << calendarLinkAddForm.getSelectInput(
 						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(),
+						CalendarTemplateTableSync::GetCalendarTemplatesList(
+							"(aucun)",
+							optional<RegistryKeyType>(),
+							network->getPeriodsCalendarsParent() ? optional<RegistryKeyType>(network->getPeriodsCalendarsParent()->getKey()) : optional<RegistryKeyType>()
+						),
 						optional<RegistryKeyType>(sessionCalendarTemplateId2)
 				);
 				stream << tc.col() << calendarLinkAddForm.getSubmitButton("Ajouter");

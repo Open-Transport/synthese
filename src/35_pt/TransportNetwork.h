@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -47,6 +52,8 @@ namespace synthese
 			typedef util::Registry<TransportNetwork> Registry;
 
 		protected:
+			calendar::CalendarTemplate* _daysCalendarsParent;
+			calendar::CalendarTemplate* _periodsCalendarsParent;
 
 		 public:
 
@@ -58,10 +65,14 @@ namespace synthese
 
 			//! @name Getters
 			//@{
+				calendar::CalendarTemplate* getDaysCalendarsParent() const { return _daysCalendarsParent; }
+				calendar::CalendarTemplate* getPeriodsCalendarsParent() const { return _periodsCalendarsParent; }
 			//@}
 
 			//! @name Setters
 			//@{
+				void setDaysCalendarsParent(calendar::CalendarTemplate* value){ _daysCalendarsParent = value; }
+				void setPeriodsCalendarsParent(calendar::CalendarTemplate* value){ _periodsCalendarsParent = value; }
 			//@}
 
 			//! @name Services

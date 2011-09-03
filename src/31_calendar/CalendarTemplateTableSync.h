@@ -81,7 +81,8 @@ namespace synthese
 			/// @return List of the calendar templates, to be used at parameter of HTMLForm::getSelectInput()
 			static CalendarTemplatesList GetCalendarTemplatesList(
 				CalendarTemplatesList::value_type::second_type zeroName = CalendarTemplatesList::value_type::second_type(),
-				boost::optional<CalendarTemplatesList::value_type::first_type> idToAvoid = boost::optional<CalendarTemplatesList::value_type::first_type>()
+				boost::optional<CalendarTemplatesList::value_type::first_type> idToAvoid = boost::optional<CalendarTemplatesList::value_type::first_type>(),
+				boost::optional<util::RegistryKeyType> parentId = boost::optional<util::RegistryKeyType>()
 			);
 		};
 	}

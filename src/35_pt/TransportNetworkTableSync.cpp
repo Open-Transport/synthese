@@ -26,6 +26,7 @@
 #include "ImportableTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "CommercialLineTableSync.h"
+#include "CalendarTemplateTableSync.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -41,6 +42,7 @@ namespace synthese
 	using namespace pt;
 	using namespace impex;
 	using namespace security;
+	using namespace calendar;
 
 	template<> const string util::FactorableTemplate<DBTableSync,TransportNetworkTableSync>::FACTORY_KEY(
 		"35.20.02 Network transport"
@@ -50,6 +52,8 @@ namespace synthese
 	{
 		const string TransportNetworkTableSync::COL_NAME("name");
 		const string TransportNetworkTableSync::COL_CREATOR_ID("creator_id");
+		const string TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID("days_calendars_parent_id");
+		const string TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID("periods_calendars_parent_id");
 	}
 
 	namespace db
@@ -65,6 +69,8 @@ namespace synthese
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
+			DBTableSync::Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
+			DBTableSync::Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -85,11 +91,45 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 			std::string name (rows->getText (TransportNetworkTableSync::COL_NAME));
-			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
-
 			object->setName(name);
+
+			// Data source links
+			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
 			object->setDataSourceLinks(ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env));
+
+			{ // Days calendars parent
+				object->setDaysCalendarsParent(NULL);
+				RegistryKeyType id(rows->getLongLong(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID));
+				if(id > 0) try
+				{
+					object->setDaysCalendarsParent(
+						CalendarTemplateTableSync::GetEditable(
+							id, env, linkLevel
+						).get()
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, e);
+			}	}
+
+			{ // Periods calendars parent
+				object->setPeriodsCalendarsParent(NULL);
+				RegistryKeyType id(rows->getLongLong(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID));
+				if(id > 0) try
+				{
+					object->setPeriodsCalendarsParent(
+						CalendarTemplateTableSync::GetEditable(
+							id, env, linkLevel
+						).get()
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>& e)
+				{
+					Log::GetInstance().warn("Data corrupted in " + TABLE.NAME + "/" + TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, e);
+			}	}
 		}
 
 
@@ -101,6 +141,8 @@ namespace synthese
 			ReplaceQuery<TransportNetworkTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
+			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 
@@ -141,6 +183,7 @@ namespace synthese
 			db::DBTransaction& transaction
 		){
 		}
+
 
 
 		template<> void DBTableSyncTemplate<TransportNetworkTableSync>::LogRemoval(
