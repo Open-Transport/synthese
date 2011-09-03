@@ -61,6 +61,7 @@
 #include "ServiceCalendarLink.hpp"
 #include "CalendarTemplateAdmin.h"
 #include "RemoveObjectAction.hpp"
+#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -78,6 +79,7 @@ namespace synthese
 	using namespace html;
 	using namespace calendar;
 	using namespace db;
+	using namespace impex;
 
 	namespace util
 	{
@@ -625,6 +627,13 @@ namespace synthese
 				stream << t.close();
 
 				PTRuleUserAdmin<SchedulesBasedService,ServiceAdmin>::Display(stream, _service, request);
+
+				if(_scheduledService.get())
+				{
+					StaticActionRequest<ServiceUpdateAction> updateOnlyRequest(request);
+					updateOnlyRequest.getAction()->setService(const_pointer_cast<Service>(static_pointer_cast<const Service>(_scheduledService)));
+					ImportableAdmin::DisplayDataSourcesTab(stream, *_scheduledService, updateOnlyRequest);
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////

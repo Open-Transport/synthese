@@ -152,8 +152,8 @@ namespace synthese
 			
 			ReplaceQuery<ServiceCalendarLinkTableSync> query(*object);
 			query.addField(object->getService()->getKey());
-			query.addField(object->getStartDate().is_not_a_date() ? string() : to_iso_extended_string(object->getStartDate()));
-			query.addField(object->getEndDate().is_not_a_date() ? string() : to_iso_extended_string(object->getEndDate()));
+			query.addField((object->getStartDate().is_special() || object->getStartDate().is_not_a_date()) ? string() : to_iso_extended_string(object->getStartDate()));
+			query.addField((object->getEndDate().is_special() || object->getEndDate().is_not_a_date()) ? string() : to_iso_extended_string(object->getEndDate()));
 			query.addField(object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCalendarTemplate2() ? object->getCalendarTemplate2()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);

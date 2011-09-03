@@ -72,7 +72,9 @@ namespace synthese
 
 			virtual bool isAuthorized(const server::Session* session) const;
 
-			void setCalendar(boost::shared_ptr<CalendarTemplate> value);
+			void setCalendar(boost::shared_ptr<CalendarTemplate> value){ _calendar = value; }
+			void setParent(boost::optional<boost::shared_ptr<CalendarTemplate> > value){ _parent = value; }
+			void setName(boost::optional<std::string> value){ _name = value; }
 		};
 }	}
 
