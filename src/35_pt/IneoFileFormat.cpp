@@ -434,7 +434,7 @@ namespace synthese
 					else if(_section == "CH")
 					{
 						jpName = _getValue("LIBCH");
-						jpWayback = (_getValue("SENS") == "A");
+						jpWayback = (_getValue("SENS") != "A");
 						jpKey = _getValue("NCH");
 						stops.clear();
 						lastStopCode.clear();

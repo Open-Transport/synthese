@@ -185,11 +185,4 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CalendarRight>(WRITE);
 		}
-
-
-
-		void CalendarTemplatePropertiesUpdateAction::setCalendar( boost::shared_ptr<CalendarTemplate> value )
-		{
-			_calendar = value;
-		}
 }	}

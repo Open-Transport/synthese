@@ -205,9 +205,12 @@ namespace synthese
 			if(_minDate)
 			{
 				_link->setStartDate(*_minDate);
-				if(!_minDate->is_not_a_date())
+				if(!_minDate->is_not_a_date() && !_minDate->is_special())
 				{
-					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_START_DATE, to_iso_extended_string(*_minDate));
+					request.getSession()->setSessionVariable(
+						SESSION_VARIABLE_SERVICE_ADMIN_START_DATE,
+						to_iso_extended_string(*_minDate)
+					);
 				}
 			}
 
@@ -215,9 +218,12 @@ namespace synthese
 			if(_maxDate)
 			{
 				_link->setEndDate(*_maxDate);
-				if(!_maxDate->is_not_a_date())
+				if(!_maxDate->is_not_a_date() && !_maxDate->is_special())
 				{
-					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_END_DATE, to_iso_extended_string(*_maxDate));
+					request.getSession()->setSessionVariable(
+						SESSION_VARIABLE_SERVICE_ADMIN_END_DATE,
+						to_iso_extended_string(*_maxDate)
+					);
 				}
 			}
 

@@ -268,6 +268,19 @@ namespace synthese
 				stream << t.col() << f.getSubmitButton("Ajouter");
 
 				stream << t.close() << f.close();
+
+				// Calendar add form
+				stream << "<h1>Ajout de calendrier fils</h1>";
+
+				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction,CalendarTemplateAdmin> addCalendar(_request);
+				addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
+				addCalendar.getAction()->setParent(const_pointer_cast<CalendarTemplate>(_calendar));
+				addCalendar.setActionWillCreateObject();
+
+				PropertiesHTMLTable addCalendarForm(addCalendar.getHTMLForm("addCalendar"));
+				stream << addCalendarForm.open();
+				stream << addCalendarForm.cell("Nom", addCalendarForm.getForm().getTextInput(CalendarTemplatePropertiesUpdateAction::PARAMETER_NAME, string()));
+				stream << addCalendarForm.close();
 			}
 
 

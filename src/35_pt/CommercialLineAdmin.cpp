@@ -156,16 +156,17 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 			////////////////////////////////////////////////////////////////////
-			// TAB ROUTES
+			// TAB FORWARD ROUTES
 			if (openTabContent(stream, TAB_ROUTES_FORWARD))
 			{
-				_displayRoutes(stream, _request, true);
+				_displayRoutes(stream, _request, false);
 			}
+
 			////////////////////////////////////////////////////////////////////
-			// TAB ROUTES
+			// TAB BACKWARD ROUTES
 			if (openTabContent(stream, TAB_ROUTES_BACKWARD))
 			{
-				_displayRoutes(stream, _request, false);
+				_displayRoutes(stream, _request, true);
 			}
 			////////////////////////////////////////////////////////////////////
 			// TAB HOURS
