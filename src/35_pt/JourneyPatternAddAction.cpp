@@ -165,12 +165,18 @@ namespace synthese
 								other.getPhysicalStop(),
 								other.getScheduleInput()
 							);
-							if(other.getGeometry().get())
+							if((it+1) != _template->getEdges().rend())
 							{
-								ls.setGeometry(
-									shared_ptr<LineString>(
-										dynamic_cast<LineString*>(other.getGeometry()->reverse())
-								)	);
+								const DesignatedLinePhysicalStop& prevOther(
+									static_cast<const DesignatedLinePhysicalStop&>(**(it+1))
+								);
+								if(prevOther.getGeometry().get())
+								{
+									ls.setGeometry(
+										shared_ptr<LineString>(
+											dynamic_cast<LineString*>(prevOther.getGeometry()->reverse())
+									)	);
+								}
 							}
 							LineStopTableSync::Save(&ls, transaction);
 						}
