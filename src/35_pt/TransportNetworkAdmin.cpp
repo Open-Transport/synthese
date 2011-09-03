@@ -42,6 +42,8 @@
 #include "ImportableAdmin.hpp"
 #include "TransportNetworkUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
+#include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
 
 #include <boost/foreach.hpp>
 
@@ -57,6 +59,7 @@ namespace synthese
 	using namespace security;
 	using namespace html;
 	using namespace impex;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -178,6 +181,25 @@ namespace synthese
 			stream << p.open();
 			stream << p.cell("ID", lexical_cast<string>(_network->getKey()));
 			stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, _network->getName()));
+			stream << p.cell(
+				"Parent des calendriers de jours",
+				p.getForm().getSelectInput(
+					TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+					optional<RegistryKeyType>(
+						_network->getDaysCalendarsParent() ? _network->getDaysCalendarsParent()->getKey() : RegistryKeyType(0)
+					)
+			)	);
+			stream << p.cell(
+				"Parent des calendriers de périodes",
+				p.getForm().getSelectInput(
+					TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID,
+					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+					optional<RegistryKeyType>(
+						_network->getPeriodsCalendarsParent() ? _network->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
+					)
+			)	);
+
 			stream << p.close();
 
 			// Source id
