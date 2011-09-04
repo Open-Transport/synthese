@@ -320,7 +320,7 @@ namespace synthese
 			bool raisingOrder
 		){
 			_orders.push_back(
-				make_pair(expr, raisingOrder)
+				std::make_pair(expr, raisingOrder)
 			);
 		}
 
