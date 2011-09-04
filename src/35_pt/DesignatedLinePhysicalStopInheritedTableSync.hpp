@@ -75,13 +75,13 @@ namespace synthese
 
 
 
-			boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
 				const StopArea& departure,
 				const StopArea& arrival,
 				util::Env& env
 			);
 
-			boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
+			static boost::shared_ptr<DesignatedLinePhysicalStop> SearchSimilarLineStop(
 				const StopPoint& departure,
 				const StopPoint& arrival,
 				util::Env& env

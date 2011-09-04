@@ -100,6 +100,8 @@ namespace synthese
 
 				void addOrderFieldOtherAlias(const std::string& table, const std::string& field, bool raisingOrder);
 
+				void addOrder(boost::shared_ptr<SQLExpression> expr, bool raisingOrder);
+
 				template<class T>
 				void addWhereField(const std::string field, const T& value, std::string op = ComposedExpression::OP_EQ);
 
@@ -308,6 +310,18 @@ namespace synthese
 					alias,
 					field
 			)	);
+		}
+
+
+
+		template<class Table>
+		void SelectQuery<Table>::addOrder(
+			boost::shared_ptr<SQLExpression> expr,
+			bool raisingOrder
+		){
+			_orders.push_back(
+				make_pair(expr, raisingOrder)
+			);
 		}
 
 
