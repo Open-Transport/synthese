@@ -64,6 +64,7 @@ namespace synthese
 		const string LineStopAddAction::PARAMETER_ROUTE_ID = Action_PARAMETER_PREFIX + "id";
 		const string LineStopAddAction::PARAMETER_METRIC_OFFSET = Action_PARAMETER_PREFIX + "mo";
 		const string LineStopAddAction::PARAMETER_AREA = Action_PARAMETER_PREFIX + "ar";
+		const string LineStopAddAction::PARAMETER_WITH_SCHEDULES = Action_PARAMETER_PREFIX + "with_schedules";
 
 
 
@@ -84,6 +85,7 @@ namespace synthese
 				map.insert(PARAMETER_ROUTE_ID, _route->getKey());
 			}
 			map.insert(PARAMETER_RANK, _rank);
+			map.insert(PARAMETER_WITH_SCHEDULES, _withSchedules);
 			return map;
 		}
 
@@ -91,6 +93,7 @@ namespace synthese
 
 		void LineStopAddAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Journey pattern
 			try
 			{
 				_route = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROUTE_ID), *_env);
@@ -98,9 +101,10 @@ namespace synthese
 			}
 			catch(ObjectNotFoundException<JourneyPattern>&)
 			{
-				throw ActionException("No such line");
+				throw ActionException("No such journey pattern");
 			}
 
+			// Place
 			if(	map.getOptional<string>(PARAMETER_CITY_NAME) &&
 				map.getOptional<string>(PARAMETER_STOP_NAME)
 			){
@@ -144,9 +148,11 @@ namespace synthese
 				throw ActionException("The place must be specified");
 			}
 
+			// Rank
 			_rank = map.getOptional<size_t>(PARAMETER_RANK) ?
 				map.get<size_t>(PARAMETER_RANK) : _route->getEdges().size();
 
+			// Metric offset
 			if(map.getOptional<double>(PARAMETER_METRIC_OFFSET))
 			{
 				_metricOffset = map.get<double>(PARAMETER_METRIC_OFFSET);
@@ -154,6 +160,9 @@ namespace synthese
 			else
 			{
 			}
+
+			// With schedules
+			_withSchedules = map.getDefault<bool>(PARAMETER_WITH_SCHEDULES, true);
 		}
 
 
@@ -175,7 +184,7 @@ namespace synthese
 					true,
 					_metricOffset,
 					_stop.get(),
-					true
+					_withSchedules
 				);
 				LineStopTableSync::InsertStop(lineStop);
 			}
@@ -189,10 +198,15 @@ namespace synthese
 					true,
 					_metricOffset,
 					_area.get(),
-					true
+					_withSchedules
 				);
 				LineStopTableSync::InsertStop(lineStop);
 			}
+
+			// Reload of services
+			JourneyPatternTableSync::ReloadServices(
+				_route->getKey()
+			);
 
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
@@ -207,10 +221,9 @@ namespace synthese
 
 
 
-		LineStopAddAction::LineStopAddAction()
-			: _rank(0), _metricOffset(0)
-		{
-
-		}
-	}
-}
+		LineStopAddAction::LineStopAddAction():
+			_rank(0),
+			_metricOffset(0),
+			_withSchedules(true)
+		{}
+}	}

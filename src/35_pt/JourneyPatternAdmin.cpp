@@ -193,6 +193,7 @@ namespace synthese
 
 				AdminActionFunctionRequest<LineStopAddAction,JourneyPatternAdmin> lineStopAddAction(_request);
 				lineStopAddAction.getAction()->setRoute(const_pointer_cast<JourneyPattern>(_line));
+				lineStopAddAction.getAction()->setWithSchedules(sservices.empty() && cservices.empty());
 				HTMLForm f(lineStopAddAction.getHTMLForm("add_journey_pattern_stop"));
 
 				AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> lineStopUpdateAction(_request);
@@ -212,16 +213,15 @@ namespace synthese
 				v.push_back("Action");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 
-				if(sservices.empty() && cservices.empty())
-				{
-					stream << f.open();
-				}
+				stream << f.open();
 				stream << t.open();
 
 				size_t expectedRank(0);
 				bool rankOk(true);
-				BOOST_FOREACH(const Edge* edge, _line->getEdges())
+				for(Path::Edges::const_iterator it(_line->getEdges().begin()); it != _line->getEdges().end(); ++it)
 				{
+					const Edge* edge(*it);
+
 					// Rank check
 					if(edge->getRankInPath() != expectedRank)
 					{
@@ -266,7 +266,11 @@ namespace synthese
 					}
 
 					stream << t.row();
+
+					// Rank selector
 					stream << t.col() << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(lineStop->getRankInPath()), optional<size_t>());
+
+					// Rank
 					stream << t.col() << lineStop->getRankInPath();
 
 					if(linePhysicalStop.get())
@@ -314,9 +318,23 @@ namespace synthese
 						}
 					}
 
+					// Metric offset
 					stream << t.col();
 					stream << lineStop->getMetricOffset();
-
+					if(	it+1 != _line->getEdges().end() &&
+						lineStop->getGeometry() &&
+						(*(it+1))->getMetricOffset() - lineStop->getMetricOffset() != floor(lineStop->getGeometry()->getLength())
+					){
+						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(true);
+						stream <<
+							HTMLModule::getHTMLLink(
+								lineStopUpdateAction.getHTMLForm().getURL(),
+								HTMLModule::getHTMLImage("cog.png", "Générer distance depuis géométrie")
+							);
+						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
+					}
+		
+					// DRT area
 					if(lineArea.get())
 					{
 						stream << t.col();
@@ -343,7 +361,6 @@ namespace synthese
 							stream << HTMLModule::getHTMLLink(internalUpdateRequest.getURL(), "OUI") << " [NON]";
 						}
 					}
-
 
 					// Allowed arrival
 					lineStopUpdateAction.getAction()->setAllowedArrival(optional<bool>(!lineStop->isArrival()));
@@ -399,28 +416,22 @@ namespace synthese
 				}
 
 				// Stop add form
-				if(sservices.empty() && cservices.empty())
-				{
-					stream << t.row();
-					stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
-					stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
-					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
-					stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
-					stream << t.col(1,string(),false,string(),2);
-					stream << t.col(1,string(),false,string(),2);
-					stream << t.col(1,string(),false,string(),2);
-					stream << t.col(1,string(),false,string(),2);
-					stream << t.col(1,string(),false,string(),2);
-					stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
-					stream << t.row();
-					stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
-				}
+				stream << t.row();
+				stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
+				stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
+				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
+				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
+				stream << t.col(1,string(),false,string(),2);
+				stream << t.col(1,string(),false,string(),2);
+				stream << t.col(1,string(),false,string(),2);
+				stream << t.col(1,string(),false,string(),2);
+				stream << t.col(1,string(),false,string(),2);
+				stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
+				stream << t.row();
+				stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
 
 				stream << t.close();
-				if(sservices.empty() && cservices.empty())
-				{
-					stream << f.close();
-				}
+				stream << f.close();
 
 				// Rank check failed
 				if(!rankOk)

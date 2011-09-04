@@ -101,24 +101,33 @@ namespace synthese
 							{
 								throw PathBeginsWithUnscheduledStopException(*_path);
 							}
+							
 							MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+							size_t totalRankDiff(lineStop.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
 							time_duration originDepartureSchedule(*_departureSchedules.rbegin());
 							time_duration totalTime(*itArrival - originDepartureSchedule);
 							for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
 							{
-								MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+								double minutesToAdd(0);
+								if(totalDistance != 0)
+								{
+									MetricOffset distance((*it)->getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+									minutesToAdd = (totalTime.total_seconds() / 60) * (distance / totalDistance);
+								}
+								else
+								{
+									assert(totalRankDiff);
+									size_t rankDiff((*it)->getRankInPath() - (*lastScheduledEdge)->getRankInPath());
+									minutesToAdd = (totalTime.total_seconds() / 60) * (double(rankDiff) / double(totalRankDiff));
+								}
 
 								time_duration departureSchedule(originDepartureSchedule);
 								time_duration arrivalSchedule(originDepartureSchedule);
 								departureSchedule += minutes(
-									totalDistance ?
-									static_cast<long>(floor( (totalTime.total_seconds() / 60) * (distance / totalDistance))) :
-									0
+									static_cast<long>(floor(minutesToAdd))
 								);
 								arrivalSchedule += minutes(
-									totalDistance ?
-									static_cast<long>(ceil( (totalTime.total_seconds() / 60) * (distance / totalDistance))) :
-									0
+									static_cast<long>(ceil(minutesToAdd))
 								);
 
 								_departureSchedules.push_back(departureSchedule);

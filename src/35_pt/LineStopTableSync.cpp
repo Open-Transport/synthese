@@ -277,4 +277,58 @@ namespace synthese
 
 			transaction.run();
 		}
+
+
+
+		void LineStopTableSync::ChangeLength(
+			const LineStop& lineStop,
+			MetricOffset newLength,
+			boost::optional<db::DBTransaction&> transaction
+		){
+			// Current lenght
+			Env env2;
+			SearchResult lineStops(
+				Search(env2, lineStop.getParentPath()->getKey())
+			);
+			const Path& path(
+				*(*lineStops.begin())->getParentPath()
+			);
+
+
+			if(lineStop.getRankInPath() + 1 == path.getEdges().size())
+			{
+				return;
+			}
+
+			MetricOffset oldLength(
+				path.getEdge(lineStop.getRankInPath()+1)->getMetricOffset() -
+				path.getEdge(lineStop.getRankInPath())->getMetricOffset()
+			);
+
+			if(oldLength == newLength)
+			{
+				return;
+			}
+
+			int difference(static_cast<int>(newLength) - static_cast<int>(oldLength));
+
+			for(size_t rank((*path.getEdges().rbegin())->getRankInPath()); rank > lineStop.getRankInPath(); --rank)
+			{
+				UpdateQuery<LineStopTableSync> updateQuery;
+				updateQuery.addUpdateField(COL_METRICOFFSET, RawSQL(COL_METRICOFFSET + "+(" + boost::lexical_cast<string>(difference) +")"));
+				updateQuery.addWhereField(
+					COL_RANKINPATH,
+					rank
+				);
+				updateQuery.addWhereField(
+					COL_LINEID,
+					path.getKey()
+				);
+				updateQuery.execute(transaction);
+				if(rank == 0)
+				{
+					break;
+				}
+			}
+		}
 }	}

@@ -185,7 +185,7 @@ namespace synthese
 		){
 			stringstream query;
 			query <<
-				" SELECT " <<
+				" SELECT t1.*" <<
 				" FROM " <<
 					LineStopTableSync::TABLE.NAME << " t1," <<
 					LineStopTableSync::TABLE.NAME << " t2," <<
@@ -216,24 +216,43 @@ namespace synthese
 			const StopPoint& arrival,
 			util::Env& env
 		){
-			stringstream query;
-			query <<
-				" SELECT " <<
-				" FROM " <<
-					LineStopTableSync::TABLE.NAME << " t1," <<
-					LineStopTableSync::TABLE.NAME << " t2" <<
-				" WHERE " <<
-					"t1." << LineStopTableSync::COL_LINEID << "=t2." << LineStopTableSync::COL_LINEID << " AND " <<
-					"t1." << LineStopTableSync::COL_RANKINPATH << "+1=t2." << LineStopTableSync::COL_RANKINPATH << " AND " <<
-					"t1." << LineStopTableSync::COL_PHYSICALSTOPID << "=" << departure.getKey() << " AND " <<
-					"t2." << LineStopTableSync::COL_PHYSICALSTOPID << "=" << arrival.getKey() <<
-				" ORDER BY " <<
-					"NumPoints(t1." << TABLE_COL_GEOMETRY << ") DESC," <<
-					"t2." << LineStopTableSync::COL_METRICOFFSET << "-t1." << LineStopTableSync::COL_METRICOFFSET << " DESC" <<
-				" LIMIT 1"
-			;
+			SelectQuery<LineStopTableSync> query;
+			query.addTableJoin<LineStopTableSync>(
+				ComposedExpression::Get(
+					ComposedExpression::Get(
+						FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_LINEID),
+						ComposedExpression::OP_EQ,
+						FieldExpression::Get("t2", LineStopTableSync::COL_LINEID)
+					),
+					ComposedExpression::OP_AND,
+					ComposedExpression::Get(
+						ComposedExpression::Get(
+							FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_RANKINPATH),
+							ComposedExpression::OP_ADD,
+							ValueExpression<int>::Get(1)
+						),
+						ComposedExpression::OP_EQ,
+						FieldExpression::Get("t2", LineStopTableSync::COL_RANKINPATH)
+				)	),
+				"t2"
+			);
+			query.addWhereField(LineStopTableSync::COL_PHYSICALSTOPID, departure.getKey());
+			query.addWhereFieldOtherAlias("t2", LineStopTableSync::COL_PHYSICALSTOPID, arrival.getKey());
+			query.addOrder(
+				ValueExpression<string>::Get("NumPoints("+ LineStopTableSync::TABLE.NAME +"."+ TABLE_COL_GEOMETRY +")"),
+				false
+			);
+			query.addOrder(
+				ComposedExpression::Get(
+					FieldExpression::Get("t2", LineStopTableSync::COL_METRICOFFSET),
+					ComposedExpression::OP_SUB,
+					FieldExpression::Get(LineStopTableSync::TABLE.NAME, LineStopTableSync::COL_METRICOFFSET)
+				),
+				false
+			);
+			query.setNumber(1);
 			SearchResult result(
-				LoadFromQuery(query.str(), env, UP_LINKS_LOAD_LEVEL)
+				LoadFromQuery(query.toString(), env, UP_LINKS_LOAD_LEVEL)
 			);
 			return result.empty() ? shared_ptr<DesignatedLinePhysicalStop>() : *result.begin();
 		}

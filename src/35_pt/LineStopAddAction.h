@@ -74,6 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_NAME;
 			static const std::string PARAMETER_METRIC_OFFSET;
 			static const std::string PARAMETER_AREA;
+			static const std::string PARAMETER_WITH_SCHEDULES;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
@@ -81,6 +82,7 @@ namespace synthese
 			boost::shared_ptr<DRTArea> _area;
 			std::size_t _rank;
 			double _metricOffset;
+			bool _withSchedules;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -118,6 +120,7 @@ namespace synthese
 			//@{
 				void setRoute(boost::shared_ptr<JourneyPattern> value) { _route = value; }
 				void setRank(std::size_t value){ _rank = value; }
+				void setWithSchedules(bool value){ _withSchedules = value; }
 			//@}
 		};
 	}
