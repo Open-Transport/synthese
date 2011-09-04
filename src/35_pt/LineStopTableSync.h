@@ -107,6 +107,14 @@ namespace synthese
 			static void RemoveStop(
 				const LineStop& lineStop
 			);
+
+
+
+			static void ChangeLength(
+				const LineStop& lineStop,
+				graph::MetricOffset newLength,
+				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
+			);
 		};
 	}
 }

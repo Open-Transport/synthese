@@ -42,6 +42,7 @@ namespace synthese
 	{
 		class LineStop;
 		class StopPoint;
+		class DesignatedLinePhysicalStop;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : LineStopUpdateAction.
@@ -69,6 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_ALLOWED_ARRIVAL;
 			static const std::string PARAMETER_ALLOWED_INTERNAL;
 			static const std::string PARAMETER_WITH_SCHEDULES;
+			static const std::string PARAMETER_READ_LENGTH_FROM_GEOMETRY;
 
 		private:
 			boost::shared_ptr<LineStop> _lineStop;
@@ -78,6 +80,9 @@ namespace synthese
 			boost::optional<bool> _allowedInternal;
 			boost::optional<bool> _withSchedules;
 			boost::optional<boost::shared_ptr<geos::geom::LineString> > _geometry;
+			DesignatedLinePhysicalStop* _nextLineStop;
+			DesignatedLinePhysicalStop* _prevLineStop;
+			bool _readLengthFromGeometry;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -94,6 +99,8 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			LineStopUpdateAction();
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
@@ -117,6 +124,7 @@ namespace synthese
 				void setAllowedInternal(boost::optional<bool>(value)){ _allowedInternal = value; }
 				void setWithSchedules(boost::optional<bool>(value)){ _withSchedules = value; }
 				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
+				void setReadLengthFromGeometry(bool value){ _readLengthFromGeometry = value; }
 			//@}
 		};
 	}

@@ -35,6 +35,8 @@
 #include "JourneyPatternTableSync.hpp"
 #include "Fetcher.h"
 #include "DBTransaction.hpp"
+#include "ServiceCalendarLink.hpp"
+#include "ServiceCalendarLinkTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -129,12 +131,14 @@ namespace synthese
 				}
 			}
 
+			// Period
 			_period = minutes(map.getDefault<int>(PARAMETER_PERIOD, 0));
 			if(_period.total_seconds() < 0)
 			{
 				throw ActionException("Period must be positive");
 			}
 
+			// Journey pattern
 			try
 			{
 				_line = JourneyPatternTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), Env::GetOfficialEnv());
@@ -144,11 +148,15 @@ namespace synthese
 				throw ActionException("No such line");
 			}
 
+			// Template
 			if(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID, 0))
 			{
 				try
 				{
-					_template = Fetcher<SchedulesBasedService>::Fetch(map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID), Env::GetOfficialEnv());
+					_template = Fetcher<SchedulesBasedService>::Fetch(
+						map.get<RegistryKeyType>(PARAMETER_TEMPLATE_ID),
+						Env::GetOfficialEnv()
+					);
 				}
 				catch(ObjectNotFoundException<SchedulesBasedService>&)
 				{
@@ -214,10 +222,6 @@ namespace synthese
 				ScheduledService object;
 				object.setServiceNumber(_number);
 				object.setPath(_line.get());
-				if(_template.get())
-				{
-					object.copyDates(*_template);
-				}
 
 				if(timetemplate.get())
 				{
@@ -228,7 +232,28 @@ namespace synthese
 					object.generateIncrementalSchedules(_startDepartureTime);
 				}
 
+				if(_template.get())
+				{
+					object.copyDates(*_template);
+				}
+
 				ScheduledServiceTableSync::Save(&object, transaction);
+
+				
+				// Copy of calendar template elements
+				if(_template.get() && !_template->getCalendarLinks().empty())
+				{
+					BOOST_FOREACH(ServiceCalendarLink* calendarLink, _template->getCalendarLinks())
+					{
+						ServiceCalendarLink newLink;
+						newLink.setService(&object);
+						newLink.setCalendarTemplate(calendarLink->getCalendarTemplate());
+						newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
+						newLink.setStartDate(calendarLink->getStartDate());
+						newLink.setEndDate(calendarLink->getEndDate());
+						ServiceCalendarLinkTableSync::Save(&newLink, transaction);
+					}
+				}
 
 				request.setActionCreatedId(object.getKey());
 
@@ -256,6 +281,21 @@ namespace synthese
 						object2.setPath(_line.get());
 						object2.setSchedulesFromOther(object, departureTime - object.getDepartureSchedule(false, 0));
 						object2.copyDates(object);
+
+						// Copy of calendar template elements
+						if(_template.get() && !_template->getCalendarLinks().empty())
+						{
+							BOOST_FOREACH(ServiceCalendarLink* calendarLink, _template->getCalendarLinks())
+							{
+								ServiceCalendarLink newLink;
+								newLink.setService(&object2);
+								newLink.setCalendarTemplate(calendarLink->getCalendarTemplate());
+								newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
+								newLink.setStartDate(calendarLink->getStartDate());
+								newLink.setEndDate(calendarLink->getEndDate());
+								ServiceCalendarLinkTableSync::Save(&newLink, transaction);
+							}
+						}
 
 						ScheduledServiceTableSync::Save(&object2, transaction);
 					}
