@@ -210,6 +210,12 @@ def add_default_subparsers(subparsers):
     parser_ide.set_defaults(func=build)
     parser_ide.set_defaults(build_func='ide')
 
+    parser_testshell = subparsers.add_parser(
+        'testshell', help='Launch a new shell with a configured environment for '
+        'running tests')
+    parser_testshell.set_defaults(func=build)
+    parser_testshell.set_defaults(build_func='testshell')
+
     parser_doxygen = subparsers.add_parser(
         'doxygen', help='Generate Doxygen documentation')
     parser_doxygen.set_defaults(func=doxygen)

@@ -249,7 +249,7 @@ class MySQLBackend(DBBackend):
     def _setup_path(self):
         if sys.platform != 'win32':
             return
-    
+
         # Keep this in sync with tools/synthesepy/build.py
         utils.append_paths_to_environment('PATH', [
             os.path.join(

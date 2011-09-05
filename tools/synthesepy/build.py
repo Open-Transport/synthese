@@ -504,6 +504,11 @@ class CMakeBuilder(Builder):
 
         self._run_devenv()
 
+    def testshell(self):
+        tester = synthesepy.test.Tester(self.env)
+        tester.update_environment_for_cpp_tests()
+        os.execl("/bin/bash", "/bin/bash")
+
 
 builder = None
 
