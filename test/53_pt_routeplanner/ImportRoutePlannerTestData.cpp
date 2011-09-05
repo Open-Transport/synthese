@@ -39,7 +39,7 @@
 #include "OnlineReservationRuleTableSync.h"
 #include "ReservationContactTableSync.h"
 #include "JourneyPatternTableSync.hpp"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousServiceTableSync.h"
@@ -93,6 +93,6 @@ int main()
 		Log::GetInstance().error("Caught Synthese exception.", e);
 		return 1;
 	}
-	
+
 	return 0;
 }
