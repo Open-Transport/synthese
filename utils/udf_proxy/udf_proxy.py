@@ -41,12 +41,16 @@ sys.path.insert(0, join(thisdir, 'third_party'))
 import daemon
 
 log = logging.getLogger(__name__)
-queue = Queue.Queue()
+
+# New requests will be dropped once the queue is full.
+MAX_QUEUE_SIZE = 50000
+queue = Queue.LifoQueue(MAX_QUEUE_SIZE)
 
 LISTENING_PORT = None
 TARGET_URL = None
 TIMEOUT = 10
 VERBOSE = False
+LOG_PATH = None
 
 
 class Request(object):
@@ -92,11 +96,15 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         log.info('Got request %s %s %s (queue size: %i)',
             self.command, self.path, post_data, queue.qsize())
 
+        response = 'Dummy response\n'
+
         if self.path == '/status':
             response = 'Queue size: %i\n' % queue.qsize()
         else:
-            queue.put(Request(self.command, self.path, post_data))
-            response = 'Dummy response\n'
+            if queue.full():
+                log.warn("Queue is full, not saving request")
+            else:
+                queue.put(Request(self.command, self.path, post_data))
 
         self.send_response(200)
         self.end_headers()
@@ -120,11 +128,10 @@ class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
     self.socket.close()
 
 def main():
-    log_file = join(thisdir, 'logs.txt')
-    with open(log_file, 'wb') as f:
+    with open(LOG_PATH, 'wb') as f:
         f.write('')
     handler = logging.handlers.RotatingFileHandler(
-        log_file, maxBytes=10 * 1024 * 1024, backupCount=3)
+        LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=3)
     handler.setFormatter(logging.Formatter(
         '%(asctime)s %(levelname)-10s %(message)s'))
     handler.setLevel(logging.INFO)
@@ -171,6 +178,9 @@ if __name__ == '__main__':
     parser.add_option('-t', '--target-url',
          default='http://localhost:8080',
          help='URL where to forward requests')
+    parser.add_option('--log-path',
+        default=join(thisdir, 'logs.txt'),
+        help='Location of log file')
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -180,6 +190,7 @@ if __name__ == '__main__':
     LISTENING_PORT = options.port
     TARGET_URL = options.target_url
     VERBOSE = options.verbose
+    LOG_PATH = options.log_path
 
     if options.no_daemon:
         logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)

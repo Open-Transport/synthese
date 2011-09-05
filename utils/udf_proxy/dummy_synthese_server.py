@@ -26,18 +26,18 @@ import SimpleHTTPServer
 
 class HandlerWithPost(SimpleHTTPServer.SimpleHTTPRequestHandler): 
     def do_GET(self):
-        print "Got GET %r" % (self.path,)
+        print 'Got GET %r' % (self.path,)
         self._dummy_response()
 
     def do_POST(self):
-        data = self.rfile.read(int(self.headers["content-length"]))
-        print "Got POST %r %r" % (self.path, data)
+        data = self.rfile.read(int(self.headers['content-length']))
+        print 'Got POST %r %r' % (self.path, data)
         self._dummy_response()
 
     def _dummy_response(self):
         self.send_response(200)
         self.end_headers()
-        self.wfile.write("Dummy response")
+        self.wfile.write('Dummy response\n')
 
 def test(HandlerClass = HandlerWithPost,
          ServerClass = BaseHTTPServer.HTTPServer):
