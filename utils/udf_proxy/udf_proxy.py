@@ -117,7 +117,7 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
   """This is a specialization of of BaseHTTPServer to allow it
   to be exited cleanly (by setting its "stop" member to True).
-  
+
   Stolen from http://src.chromium.org/git/chromium.git/net/tools/testserver/testserver.py
   """
 
