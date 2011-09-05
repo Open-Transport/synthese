@@ -32,7 +32,7 @@
 #include "OnlineReservationRule.h"
 #include "ReservationContact.h"
 #include "JourneyPattern.hpp"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
