@@ -507,10 +507,11 @@ class CMakeBuilder(Builder):
     def testshell(self):
         tester = synthesepy.test.Tester(self.env)
         tester.update_environment_for_cpp_tests()
-        os.execl("/bin/bash", "/bin/bash")
+        os.system("bash")
 
 
 builder = None
+
 
 def get_builder(env):
     global builder
