@@ -134,7 +134,7 @@ namespace synthese
 				throw MySQLException("MySQL client not compiled as thread-safe.");
 			}
 
-			_initConnection();
+			_initConnection(false);
 
 			// TODO: is the thread deleted properly on module unload?
 
@@ -155,18 +155,8 @@ namespace synthese
 		{
 			// Filling of the trigger_metadata table needs to be done in init because the port paramter
 			// might not be available earlier.
+			_initTriggerMetadata();
 
-			string port = DBModule::GetParameter(server::ServerModule::MODULE_PARAM_PORT);
-			string triggerHost = _connInfo->triggerHost;
-			if (triggerHost.empty())
-				triggerHost = "localhost";
-			string triggerURL = "http://" + triggerHost + ":" + port + "/";
-			std::stringstream sql;
-			sql <<
-				"INSERT INTO trigger_metadata VALUES ('" <<
-					triggerURL << "', '" << _secretToken << "', CONNECTION_ID()"
-				");";
-			execUpdate(sql.str());
 			DB::init();
 		}
 
@@ -624,7 +614,7 @@ namespace synthese
 
 
 
-		void MySQLDB::_initConnection()
+		void MySQLDB::_initConnection(bool initTriggerMetadata)
 		{
 			if (_connection != NULL)
 			{
@@ -653,6 +643,29 @@ namespace synthese
 			// ANSI_QUOTES: use single quotes for quoting identifier.
 			// NO_BACKSLASH_ESCAPES: backslash is not considered a special character.
 			execUpdate("SET sql_mode='ANSI_QUOTES,NO_BACKSLASH_ESCAPES';");
+
+			if (initTriggerMetadata)
+			{
+				_initTriggerMetadata();
+			}
+		}
+
+
+
+		void MySQLDB::_initTriggerMetadata()
+		{
+			execUpdate("TRUNCATE trigger_metadata;");
+			string port = DBModule::GetParameter(server::ServerModule::MODULE_PARAM_PORT);
+			string triggerHost = _connInfo->triggerHost;
+			if (triggerHost.empty())
+				triggerHost = "localhost";
+			string triggerURL = "http://" + triggerHost + ":" + port + "/";
+			std::stringstream sql;
+			sql <<
+				"INSERT INTO trigger_metadata VALUES ('" <<
+				triggerURL << "', '" << _secretToken << "', CONNECTION_ID()"
+				");";
+			execUpdate(sql.str());
 		}
 
 

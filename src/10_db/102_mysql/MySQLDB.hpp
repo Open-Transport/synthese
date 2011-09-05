@@ -98,7 +98,8 @@ namespace synthese
 #endif
 		private:
 
-			void _initConnection();
+			void _initConnection(bool initTriggerMetadata = true);
+			void _initTriggerMetadata();
 			//////////////////////////////////////////////////////////////////////////
 			/// Execute a MySQL query, retrying if the server has gone away (e.g. if it
 			/// was restarted or the connection was dropped).
