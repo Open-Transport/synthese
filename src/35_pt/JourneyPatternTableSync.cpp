@@ -28,7 +28,7 @@
 #include "CommercialLineTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "FareTableSync.h"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "DataSourceTableSync.h"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"

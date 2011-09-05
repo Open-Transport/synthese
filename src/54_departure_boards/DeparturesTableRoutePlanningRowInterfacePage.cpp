@@ -32,7 +32,7 @@
 #include "CommercialLine.h"
 #include "Edge.h"
 #include "City.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 

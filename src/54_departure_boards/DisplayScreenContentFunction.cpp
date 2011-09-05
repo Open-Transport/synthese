@@ -37,7 +37,7 @@
 #include "LineStop.h"
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "CommercialLine.h"
 #include "City.h"
 #include "Alarm.h"
@@ -692,7 +692,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_TEAM, screen.getDisplayTeam());
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
-			
+
 			// Rows
 			if(rowPage.get())
 			{
@@ -808,7 +808,7 @@ namespace synthese
 			pm.insert(DATA_PAGE_NUMBER, pageNumber);
 			pm.insert(DATA_DISPLAY_TRACK_NUMBER, screen.getTrackNumberDisplay());
 			pm.insert(DATA_DISPLAY_SERVICE_NUMBER, screen.getServiceNumberDisplay());
-			
+
 			if(screen.getType())
 			{
 				pm.insert(DATA_INTERMEDIATE_STOPS_NUMBER, screen.getType()->getMaxStopsNumber());
@@ -1150,7 +1150,7 @@ namespace synthese
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 			pm.insert(DATA_WITH_TRANSFER, screen.getRoutePlanningWithTransfer());
 			screen.getDisplayedPlace()->toParametersMap(pm);
-			
+
 			// Rows
 			if(rowPage.get())
 			{

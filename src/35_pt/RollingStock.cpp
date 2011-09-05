@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "Registry.h"
 #include "ParametersMap.h"
 

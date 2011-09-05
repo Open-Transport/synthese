@@ -1,6 +1,6 @@
 
 /** RollingStockTableSync class header.
-	@file RollingStockTableSync.h
+	@file RollingStockTableSync.hpp
 	@author Hugues Romain
 	@date 2007
 
@@ -30,7 +30,7 @@
 #include <string>
 #include <iostream>
 
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "DBRegistryTableSyncTemplate.hpp"
 
 #include <boost/optional.hpp>

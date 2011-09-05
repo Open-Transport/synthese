@@ -28,7 +28,7 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "JourneyPatternTableSync.hpp"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "ImportableTableSync.hpp"
 #include "ImportableAdmin.hpp"
 #include "DestinationTableSync.hpp"
@@ -187,7 +187,7 @@ namespace synthese
 			}
 			if(_main)
 			{
-				_route->setMain(*_main);	
+				_route->setMain(*_main);
 			}
 			if(_direction)
 			{

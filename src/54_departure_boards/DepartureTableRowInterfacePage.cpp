@@ -28,7 +28,7 @@
 #include "StopPoint.hpp"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"
