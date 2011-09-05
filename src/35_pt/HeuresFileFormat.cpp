@@ -55,7 +55,7 @@
 #include "HTMLForm.h"
 #include "DBModule.h"
 #include "TransportNetworkTableSync.h"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "RequestException.h"
 #include "CalendarTemplateTableSync.h"
@@ -202,7 +202,7 @@ namespace synthese
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
 					if(lexical_cast<int>(id) > 9000)
-					{	
+					{
 						string destinationCode(line.substr(5,4));
 						set<Destination*> destinationSet(destinations.get(destinationCode));
 						if(destinationSet.empty())
@@ -604,7 +604,7 @@ namespace synthese
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Source de données arrêts (si différente)", t.getForm().getTextInput(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource.get() ? lexical_cast<string>(_stopsDataSource->getKey()) : string()));
-			stream << t.cell("Calendrier des jours fériés", 
+			stream << t.cell("Calendrier des jours fériés",
 				t.getForm().getSelectInput(
 					PARAMETER_DAY7_CALENDAR_ID,
 					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
@@ -664,7 +664,7 @@ namespace synthese
 				{
 					throw RequestException("No such data source for stops");
 				}
-				
+
 			}
 		}
 }	}

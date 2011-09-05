@@ -22,7 +22,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "TransportNetworkRight.h"

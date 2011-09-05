@@ -29,7 +29,7 @@
 #include "CommercialLine.h"
 #include "LineMarkerInterfacePage.h"
 #include "Webpage.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "Path.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLineTableSync.h"

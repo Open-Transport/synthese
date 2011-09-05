@@ -51,7 +51,7 @@
 #include "SecurityConstants.hpp"
 #include "Right.h"
 #include "PTUseRuleTableSync.h"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -69,7 +69,7 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 	using namespace lexical_matcher;
-	
+
 
 	namespace graph
 	{

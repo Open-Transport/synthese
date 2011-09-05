@@ -26,8 +26,8 @@
 
 #include "RollingStockFilterTableSync.h"
 #include "RollingStockFilter.h"
-#include "RollingStockTableSync.h"
-#include "RollingStock.h"
+#include "RollingStockTableSync.hpp"
+#include "RollingStock.hpp"
 #include "TransportWebsite.h"
 #include "TransportWebsiteTableSync.h"
 #include "DBModule.h"

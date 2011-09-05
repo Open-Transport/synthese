@@ -21,7 +21,7 @@
 */
 
 #include "RollingStockFilter.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "Env.h"
 
 using namespace std;
