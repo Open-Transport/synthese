@@ -76,6 +76,13 @@ BOOST_AUTO_TEST_CASE(MySQLReconnect)
 	BOOST_CHECK_EQUAL(objFromReg->getName(), obj.getName());
 	BOOST_CHECK_EQUAL(objFromReg->getShortName(), obj.getShortName());
 
+	// Check that the trigger_metadata contains our connection identifier.
+	DBResultSPtr rows = DBModule::GetDB()->execQuery(
+		"SELECT synthese_conn_id = CONNECTION_ID() as is_conn_id FROM trigger_metadata;"
+	);
+	BOOST_REQUIRE(rows->next());
+	BOOST_CHECK_EQUAL(true, rows->getBool("is_conn_id"));
+
 	///////////////////////////////////////////////////////////////////////////
 	// server restart.
 
@@ -128,5 +135,12 @@ BOOST_AUTO_TEST_CASE(MySQLReconnect)
 		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 12);
 		BOOST_CHECK_EQUAL(objFromReg->getName(), "sample name");
 		BOOST_CHECK_EQUAL(objFromReg->getShortName(), "some short name");
+
+		// Check that the trigger_metadata contains our connection identifier.
+		DBResultSPtr rows = DBModule::GetDB()->execQuery(
+			"SELECT synthese_conn_id = CONNECTION_ID() as is_conn_id FROM trigger_metadata;"
+			);
+		BOOST_REQUIRE(rows->next());
+		BOOST_CHECK_EQUAL(true, rows->getBool("is_conn_id"));
 	}
 }
