@@ -36,7 +36,7 @@
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopPoint.hpp"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "StaticActionFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
 #include "CommercialLine.h"

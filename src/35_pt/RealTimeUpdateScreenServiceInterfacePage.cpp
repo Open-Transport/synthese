@@ -29,7 +29,7 @@
 #include "StopArea.hpp"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "RealTimeUpdateFunction.h"
 #include "Interface.h"

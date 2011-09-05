@@ -22,7 +22,7 @@
 
 #include "JourneyPattern.hpp"
 #include "Registry.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "Service.h"
 #include "LineArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"

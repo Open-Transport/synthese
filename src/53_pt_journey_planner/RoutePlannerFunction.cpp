@@ -38,7 +38,7 @@
 #include "Hub.h"
 #include "Service.h"
 #include "CommercialLine.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "RGBColor.h"
 #include "Crossing.h"
 #include "StopPoint.hpp"

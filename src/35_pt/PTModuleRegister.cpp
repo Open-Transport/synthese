@@ -34,7 +34,7 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "ReservationContactTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "StopAreaTableSync.hpp"
@@ -64,6 +64,8 @@
 #include "StopPointAdmin.hpp"
 #include "DRTAreaAdmin.hpp"
 #include "DRTAreasAdmin.hpp"
+#include "RollingStockAdmin.hpp"
+#include "RollingStocksAdmin.hpp"
 
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
@@ -101,6 +103,7 @@
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
 #include "DRTAreaUpdateAction.hpp"
+#include "RollingStockUpdateAction.hpp"
 
 #include "LineAlarmRecipient.hpp"
 #include "StopAreaAlarmRecipient.hpp"
@@ -122,7 +125,7 @@
 #include "PTUseRule.h"
 #include "Junction.hpp"
 #include "StopPoint.hpp"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "Fare.h"
 #include "ScheduledService.h"
 #include "ContinuousService.h"
@@ -135,13 +138,13 @@
 
 void synthese::pt::moduleRegister()
 {
-	
+
 	// PT MODULE 35
-	
+
 	// Factories
-	
+
 	synthese::pt::TransportNetworkTableSync::integrate();
-	
+
 	synthese::pt::DestinationTableSync::integrate();
 	synthese::pt::PTUseRuleTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopPointTableSync>::integrate();
@@ -166,9 +169,9 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DesignatedLinePhysicalStopInheritedTableSync::integrate();
 	synthese::pt::DRTAreaTableSync::integrate();
 	synthese::pt::ServiceCalendarLinkTableSync::integrate();
-	
+
 	synthese::pt::PTModule::integrate();
-	
+
 	synthese::pt::CarPostalFileFormat::integrate();
 	synthese::pt::GTFSFileFormat::integrate();
 	synthese::pt::HeuresFileFormat::integrate();
@@ -177,7 +180,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::OGTFileFormat::integrate();
 	synthese::pt::PladisStopsFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate ();
-	
+
 	synthese::pt::DestinationAdmin::integrate();
 	synthese::pt::DestinationsAdmin::integrate();
 	synthese::pt::PTQualityControlAdmin::integrate();
@@ -196,7 +199,9 @@ void synthese::pt::moduleRegister()
 	synthese::pt::StopPointAdmin::integrate();
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
-	
+	synthese::pt::RollingStockAdmin::integrate();
+	synthese::pt::RollingStocksAdmin::integrate();
+
 	synthese::pt::LineStopGetService::integrate();
 	synthese::pt::RealTimeUpdateFunction::integrate();
 	synthese::pt::PhysicalStopsCSVExportFunction::integrate();
@@ -208,10 +213,10 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTRouteDetailFunction::integrate();
 	synthese::pt::CheckLineCalendarFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
-	
+
 	synthese::pt::LineMarkerInterfacePage::integrate();
 	synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
-	
+
 	synthese::pt::CommercialLineAddAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 	synthese::pt::CommercialLineUpdateAction::integrate();
@@ -220,6 +225,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationUpdateAction::integrate();
 	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
+    synthese::pt::RollingStockUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
@@ -245,16 +251,16 @@ void synthese::pt::moduleRegister()
 	synthese::pt::LineStopUpdateAction::integrate();
 	synthese::pt::ProjectAllStopPointsAction::integrate();
 	synthese::pt::StopAreaTransferAddAction::integrate();
-	
+
 	synthese::pt::TransportNetworkRight::integrate();
-	
+
 	synthese::pt::StopArea::integrate();
-	
+
 	synthese::pt::StopPointWFSType::integrate();
 
 	synthese::pt::LineAlarmRecipient::integrate();
 	synthese::pt::StopAreaAlarmRecipient::integrate();
-	
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::pt::Destination>();
 	synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
@@ -274,5 +280,5 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
 	synthese::util::Env::Integrate<synthese::pt::DRTArea>();
 	synthese::util::Env::Integrate<synthese::pt::ServiceCalendarLink>();
-	
+
 }

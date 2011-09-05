@@ -29,7 +29,7 @@
 #include "Edge.h"
 #include "JourneyPattern.hpp"
 #include "Vertex.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "CommercialLine.h"
 #include "Service.h"
 

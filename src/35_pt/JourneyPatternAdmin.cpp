@@ -51,7 +51,7 @@
 #include "JourneyPatternUpdateAction.hpp"
 #include "PTRuleUserAdmin.hpp"
 #include "PropertiesHTMLTable.h"
-#include "RollingStockTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "LineStopAddAction.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"

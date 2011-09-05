@@ -27,7 +27,7 @@
 #include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "TimetableWarning.h"
 #include "Service.h"
 #include "StopArea.hpp"

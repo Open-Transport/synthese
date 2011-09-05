@@ -43,7 +43,7 @@
 #include "CalendarDateInterfacePage.hpp"
 #include "CommercialLine.h"
 #include "Webpage.h"
-#include "RollingStock.h"
+#include "RollingStock.hpp"
 #include "JourneyPattern.hpp"
 #include "SchedulesBasedService.h"
 #include "TimetableServiceRowInterfacePage.h"
@@ -376,7 +376,7 @@ namespace synthese
 					{
 						// Timetable properties
 						timetable->setContentType(Timetable::CONTAINER);
-						
+
 						shared_ptr<Timetable> tt1(new Timetable);
 						tt1->setBaseCalendar(timetable->getBaseCalendar());
 						AddLineDirectionToTimetable(*tt1, *_commercialLine, false);
