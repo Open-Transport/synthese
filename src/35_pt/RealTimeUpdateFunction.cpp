@@ -171,7 +171,8 @@ namespace synthese
 			return
 				getInterface() ?
 				getInterface()->getPage<RealTimeUpdateScreenServiceInterfacePage>()->getMimeType() :
-				"text/plain";
+				(_cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/plain")
+			;
 		}
 
 
