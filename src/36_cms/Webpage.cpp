@@ -307,7 +307,7 @@ namespace synthese
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap
 		) const	{
-			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
+//			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
 
 			Nodes::const_iterator itNode(_nodes.begin());
 			while(itNode != _nodes.end())
@@ -413,7 +413,7 @@ namespace synthese
 		{
 			if(value != _content)
 			{
-				boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
+//				boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
 				_nodes.clear();
 				_parse(_nodes, value.begin(), value.end(), set<string>());
 			}
