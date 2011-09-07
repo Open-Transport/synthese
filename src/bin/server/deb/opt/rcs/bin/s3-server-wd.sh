@@ -15,7 +15,8 @@ do
 		--dbconn $S3_SERVER_DB_CONNECTION \
 		--param tmp_dir=$S3_SERVER_TMP_DIR \
 		--param port=$S3_SERVER_PORT \
-		--param log_level=$S3_SERVER_LOG_LEVEL
+		--param log_level=$S3_SERVER_LOG_LEVEL \
+                --param nb_threads=$S3_NB_THREADS
 	) || (echo "Failed!" && exit 1)
 	rm -f $S3_SERVER_PID_FILE
 
