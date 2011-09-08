@@ -150,7 +150,7 @@ namespace synthese
 					lineFilter.insert(
 						make_pair(
 							line,
-							linesResult->getText("sens") == "A"
+							linesResult->getText("sens") != "A"
 					)	);
 				}
 				screen->setAllowedLines(lineFilter);
