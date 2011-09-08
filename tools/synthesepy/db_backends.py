@@ -221,11 +221,13 @@ class MySQLBackend(DBBackend):
 
     def _create_db(self):
         with self.get_cursor(False) as cursor:
+            log.debug('Creating database %r', self.conn_info['db'])
             cursor.execute('CREATE DATABASE %s' % self.conn_info['db'])
 
     def drop_db(self):
         with self.get_cursor(False) as cursor:
             try:
+                log.debug('Dropping database %r', self.conn_info['db'])
                 cursor.execute('DROP DATABASE %s' % self.conn_info['db'])
             except MySQLdb.DatabaseError, e:
                 DB_DROP_EXISTS = 1008
