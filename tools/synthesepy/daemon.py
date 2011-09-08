@@ -98,6 +98,9 @@ class Daemon(object):
 
         args = []
         if self.env.c.gdb:
+            if not self.env.c.log_stdout:
+                raise Exception('You must use the -s/--stdout option '
+                    'with --gdb')
             args.extend(['gdb', '--args'])
         args.extend([
             self.env.daemon_path,
