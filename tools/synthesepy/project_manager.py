@@ -226,30 +226,6 @@ class Project(object):
             if len(non_admin_sites) > 0:
                 self.config.site_id = non_admin_sites[0].id
 
-    def _clean_files(self):
-        if self.UPDATE_HTDOCS:
-            utils.RemoveDirectory(self.htdocs_path)
-            os.makedirs(self.htdocs_path)
-
-    def _sync_files(self, site, package):
-        # TODO: create a directory per site, when vhosts are implemented.
-        if self.UPDATE_HTDOCS:
-            _copy_over(package.files_path, self.htdocs_path)
-
-    def _clean_db(self):
-        self.db_backend.drop_db()
-
-    def _init_db(self):
-        self.db_backend.init_db()
-
-    @property
-    def db_backend(self):
-        if self._db_backend:
-            return self._db_backend
-        self._db_backend = db_backends.create_backend(
-            self.env, self.config.conn_string)
-        return self._db_backend
-
     def _run_testdata_importer(self):
         importer_path = self.env.get_executable_path(
             join('test', '53_pt_routeplanner'),
@@ -260,6 +236,30 @@ class Project(object):
         env['SYNTHESE_TESTDATA_CONNSTRING'] = self.config.conn_string + \
             ',triggerCheck=0'
         utils.call(importer_path, env=env)
+
+    def _clean_files(self):
+        if self.UPDATE_HTDOCS:
+            utils.RemoveDirectory(self.htdocs_path)
+            os.makedirs(self.htdocs_path)
+
+    def _sync_files(self, site, package):
+        # TODO: create a directory per site, when vhosts are implemented.
+        if self.UPDATE_HTDOCS:
+            _copy_over(package.files_path, self.htdocs_path)
+
+    @property
+    def db_backend(self):
+        if self._db_backend:
+            return self._db_backend
+        self._db_backend = db_backends.create_backend(
+            self.env, self.config.conn_string)
+        return self._db_backend
+
+    def _clean_db(self):
+        self.db_backend.drop_db()
+
+    def _init_db(self):
+        self.db_backend.init_db()
 
     def _sync_db(self, site, package):
         for fixtures_file in package.fixtures:
@@ -387,7 +387,6 @@ class Project(object):
                 project_name=self.config.project_name))
         open(uncompressed_target, 'wb').write(output)
 
-
     def db_open_dump(self):
         """Open the latest database dump in a text editor"""
 
@@ -397,7 +396,6 @@ class Project(object):
 
         if os.path.isfile(self.config.editor_path):
             utils.call([self.config.editor_path, uncompressed_target], bg=True)
-
 
     def db_restore(self, db_dump):
         """Restore a database from a text file dump"""
