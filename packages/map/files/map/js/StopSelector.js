@@ -65,7 +65,7 @@ var StopSelectorPopup = Backbone.View.extend({
 
 });
 
-
+// TODO: decouple class from routePlanner implementation.
 var StopSelector = Backbone.View.extend({
   initialize: function(options) {
     _.bindAll(this, "mapLinkClick", "stopSelected");
