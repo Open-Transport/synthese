@@ -37,7 +37,7 @@ DEFAULTS = {
     'dummy': False,
     'verbose': False,
     'spatialite_path': 'spatialite',
-    
+
     # XXX name it thirdparty_path for consistency?
     'thirdparty_dir': None,
     # Environment
@@ -69,7 +69,7 @@ DEFAULTS = {
     'ssh_global_opts': '',
     'ssh_opts': '',
     'rsync_opts': '',
-    
+
     # build
     'generate_only': False,
     'prefix': None,
@@ -81,6 +81,7 @@ DEFAULTS = {
     'no_clean_if_build_fails': False,
     'kill_daemons_when_building': False,
     'build_only': None,
+    'build_type': None,
 
     # runtests
     'test_conn_strings': ['sqlite://', 'mysql://db=synthese_test,host=localhost,user=synthese,passwd=synthese'],

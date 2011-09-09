@@ -393,7 +393,9 @@ class CMakeBuilder(Builder):
             if self.mysql_dir:
                 os.environ['MYSQL_DIR'] = self.mysql_dir
 
-        args.append('-DCMAKE_BUILD_TYPE=' + self.env.mode.capitalize())
+        build_type = (self.config.build_type if self.config.build_type else
+            self.env.mode.capitalize())
+        args.append('-DCMAKE_BUILD_TYPE=' + build_type)
 
         # TODO: maybe change optimization flags in debug mode:
         # -DCMAKE_CXX_FLAGS=-O0
