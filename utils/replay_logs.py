@@ -23,11 +23,11 @@
 
 import datetime
 import logging
+import multiprocessing
 import optparse
 import Queue
 import re
 import sys
-import threading
 import time
 from time import mktime
 import urllib2
@@ -104,48 +104,86 @@ class ResponseInfo(object):
         self.duration = duration
         self.size = size
 
+    def __repr__(self):
+        return '<ResponseInfo %s>' % self.__dict__
+
+
+TIMEOUT = 60
+
+
+def replay_entry(synthese_host, entry):
+    url = 'http://%s%s' % (synthese_host, entry.path)
+    start = time.time()
+    content = ''
+    try:
+        response = urllib2.urlopen(url, entry.post_data, timeout=TIMEOUT)
+        content = response.read()
+        code = response.code
+    except urllib2.HTTPError, e:
+        code = e.code
+    except urllib2.URLError, e:
+        code = -1
+    return ResponseInfo(code, time.time() - start, len(content))
+
 
 class Replayer(object):
-    def __init__(self, synthese_host, entries, replay_duration, stop_on_error):
+    def __init__(self, synthese_host, entries, replay_duration, stop_on_error,
+        max_entries):
         self.synthese_host = synthese_host
-        self.entries = entries
-        self.responses_queue = Queue.Queue()
         self.stop_on_error = stop_on_error
+
+        self.entries = [e for e in entries if e.type == TYPE_REQU]
+        if max_entries > 0:
+            self.entries = self.entries[:max_entries]
 
         self.start_time = entries[0].unix_time
         self.end_time = entries[-1].unix_time
         self.entries_duration = self.end_time - self.start_time
-        log.info('Entries duration: %i s', self.entries_duration)
+        log.info('Entries count: %i, duration: %i s', len(self.entries), self.entries_duration)
 
         if replay_duration >= 0:
             self.replay_duration = replay_duration
         else:
             self.replay_duration = self.entries_duration
 
-    def _replay_entry(self, entry):
-        url = 'http://%s%s' % (self.synthese_host, entry.path)
-        start = time.time()
-        content = ''
-        try:
-            response = urllib2.urlopen(url, entry.post_data)
-            content = response.read()
-            code = response.code
-        except urllib2.HTTPError, e:
-            code = e.code
-        self.responses_queue.put(
-            ResponseInfo(code, time.time() - start, len(content)))
-
     def replay(self):
         now = time.time()
         time_ratio = self.replay_duration / self.entries_duration
-        request_entries = [e for e in self.entries if e.type == TYPE_REQU]
         count = 0
         total_duration = 0
         total_size = 0
 
-        for e in request_entries:
+        # This should be at least the size of the Synthese thread count.
+        POOL_SIZE = 10
+        pool = multiprocessing.Pool(processes=POOL_SIZE)
+        responses_queue = Queue.Queue()
+
+        class Stats(object):
+            total_duration = 0
+            total_size = 0
+            failure_count = 0
+        stats = Stats()
+
+        def process_queue():
+            while not responses_queue.empty():
+                response = responses_queue.get_nowait()
+                if response.code != 200:
+                    stats.failure_count += 1
+                    log.warn('Found error: code=%s on entry: %s',
+                        response.code, e)
+                    if self.stop_on_error:
+                        raise Exception('Found error: code=%s on entry: %s' % (
+                            response.code, e))
+                log.debug('Duration: %s', response.duration)
+                stats.total_duration += response.duration
+                stats.total_size += response.size
+                return
+                total_duration += response.duration
+                total_size += response.size
+
+        for e in self.entries:
             count += 1
-            log.debug('Replaying entry %i/%i', count, len(request_entries))
+            log.debug('Replaying entry %i/%i', count, len(self.entries))
             relative_target_time_offset = ((e.unix_time - self.start_time) /
                 self.entries_duration)
             target_time_offset = relative_target_time_offset * self.replay_duration
@@ -156,23 +194,25 @@ class Replayer(object):
             if to_wait > 0:
                 time.sleep(to_wait)
 
-            USE_THREADS = 1
-            if USE_THREADS:
-                threading.Thread(target=self._replay_entry, args=(e,)).start()
-            else:
-                self._replay_entry(e)
+            def done_callback(response_info):
+                responses_queue.put(response_info)
 
-            while not self.responses_queue.empty():
-                response = self.responses_queue.get_nowait()
-                if response.code != 200 and self.stop_on_error:
-                    raise Exception('Found error: code=%s on entry: %s' % (
-                        response.code, e))
-                log.debug('Duration: %s', response.duration)
-                total_duration += response.duration
-                total_size += response.size
+            pool.apply_async(
+                replay_entry, args=(self.synthese_host, e),
+                callback=done_callback)
 
-        log.info('Mean duration: %f ms', total_duration / len(request_entries) * 1000)
-        log.info('Mean size: %f kb', total_size / len(request_entries) / 1024)
+            process_queue()
+
+        log.info('Finished replaying requests. Waiting for pending responses.')
+        pool.close()
+        pool.join()
+        process_queue()
+
+        log.info('Mean duration: %f ms', stats.total_duration / len(self.entries) * 1000)
+        log.info('Mean size: %f kb', stats.total_size / len(self.entries) / 1024)
+        log.info('Failure count (%i/%i) = %i%%',
+            stats.failure_count / len(self.entries), len(self.entries),
+            stats.failure_count / len(self.entries) * 100)
 
 
 if __name__ == '__main__':
@@ -188,6 +228,9 @@ if __name__ == '__main__':
     parser.add_option('-d', '--replay-duration',
         type='int', default=-1,
         help='Replay all entries during that time (seconds)')
+    parser.add_option('-m', '--max-entries',
+        type='int', default=-1,
+        help='Max number of entries to replay')
     parser.add_option('-e', '--stop-on-error', action='store_true',
          default=False, help='Stop replay when a HTTP error is detected')
 
@@ -206,7 +249,7 @@ if __name__ == '__main__':
         parser.parse(log_file)
 
     replayer = Replayer(options.host, parser.entries, options.replay_duration,
-        options.stop_on_error)
+        options.stop_on_error, options.max_entries)
 
     if options.info:
         sys.exit(0)
