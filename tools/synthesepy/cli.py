@@ -193,6 +193,9 @@ def add_default_subparsers(subparsers):
     parser_build.add_argument(
         '-o', '--build-only',
         help='Build only the specified project')
+    parser_build.add_argument(
+        '--build-type', choices=['Debug', 'Release', 'RelWithDebInfo'],
+        help='CMake build type')
 
     parser_clean = subparsers.add_parser(
         'clean', help='Delete the object directory')
