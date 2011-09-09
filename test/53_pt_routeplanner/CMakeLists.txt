@@ -32,9 +32,7 @@ set(DEPS
 )
 
 boost_test(IntegralSearch "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
-# TODO: fails
 boost_test(PTRoutePlannerResult "${DEPS}")
-# TODO: fails
 boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTestData.hpp")
 
 # This is not a test, but we'll keep it here for now.
