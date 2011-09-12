@@ -287,21 +287,28 @@ namespace synthese
 
 				if(!service)
 				{
-					JourneyPattern* route(*routes.begin());
-					service = new ScheduledService(
-						ScheduledServiceTableSync::getId(),
-						string(),
-						route
-					);
-					service->setSchedules(departureSchedules, arrivalSchedules, true);
-					service->setPath(route);
-					service->setCodeBySource(_dataSource, serviceRef);
-					service->setActive(today);
-					route->addService(*service, false);
-					_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
-					_services.insert(service);
+					if (!departureSchedules.empty() && !arrivalSchedules.empty())
+					{
+						JourneyPattern* route(*routes.begin());
+						service = new ScheduledService(
+							ScheduledServiceTableSync::getId(),
+							string(),
+							route
+						);
+						service->setSchedules(departureSchedules, arrivalSchedules, true);
+						service->setPath(route);
+						service->setCodeBySource(_dataSource, serviceRef);
+						service->setActive(today);
+						route->addService(*service, false);
+						_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));
+						_services.insert(service);
 
-					os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+						os << "CREA : Creation of service (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
+					}
+					else
+					{
+						os << "WARN : Service (ref=" << serviceRef << ") has empty departure or arrival schedules, not creating<br />";
+					}
 				}
 			}
 
