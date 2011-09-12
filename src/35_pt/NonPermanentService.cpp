@@ -80,8 +80,8 @@ namespace synthese
 			if(dynamic_cast<JourneyPattern*>(getPath()))
 			{
 				date newDate(d);
-				for(int i(getDepartureSchedule(false,0).hours() / 24);
-					i<= getLastArrivalSchedule(false).hours() / 24;
+				for(int i(getDepartureSchedule(false, 0).hours() / 24);
+					i <= getLastArrivalSchedule(false).hours() / 24;
 					++i
 				){
 					static_cast<JourneyPattern*>(getPath())->setActive(newDate + days(i));
