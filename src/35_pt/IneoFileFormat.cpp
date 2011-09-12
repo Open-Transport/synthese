@@ -435,7 +435,7 @@ namespace synthese
 					{
 						jpName = _getValue("LIBCH");
 						jpWayback = (_getValue("SENS") != "A");
-						jpKey = _getValue("NCH");
+						jpKey = _getValue("SENS") + _getValue("NCH");
 						stops.clear();
 						lastStopCode.clear();
 						dst = 0;
@@ -589,7 +589,7 @@ namespace synthese
 						{
 							lineNum = lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2)));
 						}
-						string jpNum(_getValue("ORD"));
+						string jpNum(_getValue("SENS") + _getValue("ORD"));
 
 						route = NULL;
 						if(!lineNum.empty() && !jpNum.empty())
