@@ -88,7 +88,7 @@ void Network::consolidate(bool discard_if_missing_reference) {
 }
 
 void Network::consolidateWays(bool discard_if_missing_reference) {
-   std::map<int,WayPtr>::iterator wayIt = ways.begin();
+   std::map<int, WayPtr>::iterator wayIt = ways.begin();
    //loop through the ways
    while(wayIt != ways.end()) {
       WayPtr way = wayIt->second;
@@ -100,7 +100,7 @@ void Network::consolidateWays(bool discard_if_missing_reference) {
          if(discard_if_missing_reference) {
             //discard relations referencing this way
             std::map<int,RelationPtr>::iterator relIt = relations.begin();
-            while( relIt != relations.end()) {
+            while(relIt != relations.end()) {
                if(relIt->second->contains(way)) {
                   relations.erase(relIt++);
                } else {
@@ -150,22 +150,22 @@ void Network::consolidateRelations(bool discard_if_missing_reference) {
 }
 
 std::map<int,WayPtr> Network::getWalkableWays() {
-   std::map<int,WayPtr> ret;
-   typedef std::pair<int,WayPtr> WayType;
+   std::map<int, WayPtr> ret;
+   typedef std::pair<int, WayPtr> WayType;
    BOOST_FOREACH(WayType w, ways) {
-      if(w.second->isWalkable() && w.second->getNodes()->size()>1) {
-         ret[w.second->getId()]=w.second;
+      if(w.second->isWalkable() && w.second->getNodes()->size() > 1) {
+         ret[w.second->getId()] = w.second;
       }
    }
    return ret;
 }
 
 std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkableWaysByAdminBoundary(int admin_level) {
-   std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > ret;
+   std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > ret;
    util::Log::GetInstance().info("extracting administrative boundaries");
-   std::map<int,RelationPtr> adminBoundaries = getAdministrativeBoundaries(admin_level);
+   std::map<int, RelationPtr> adminBoundaries = getAdministrativeBoundaries(admin_level);
    util::Log::GetInstance().info("finished extracting administrative boundaries");
-   std::map<int,WayPtr> walkableWays = getWalkableWays();
+   std::map<int, WayPtr> walkableWays = getWalkableWays();
 
    util::Log::GetInstance().info("extracting ways by administrative boundaries");
    /*
@@ -202,10 +202,10 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
    }
    */
 
-   std::map<int,RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
+   std::map<int, RelationPtr>::iterator boundaryIterator = adminBoundaries.begin();
    while(boundaryIterator != adminBoundaries.end()) {
       RelationPtr boundary = boundaryIterator->second;
-      ret[boundaryIterator->first] = std::pair<RelationPtr,std::map<int,WayPtr> >(boundary, std::map<int,WayPtr>());
+      ret[boundaryIterator->first] = std::pair<RelationPtr, std::map<int, WayPtr> >(boundary, std::map<int, WayPtr>());
       boundaryIterator++;
    }
 
@@ -219,7 +219,7 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
          boost::shared_ptr<const geos::geom::prep::PreparedGeometry> boundaryPrepGeom = boundary->toPreparedGeometry();
          if(boundaryPrepGeom->covers(wayGeom.get())) {
             //the way is inside this boundary, keep it
-            ret[boundaryIterator->first].second[wayIterator->first]=way;
+            ret[boundaryIterator->first].second[wayIterator->first] = way;
 
             //mark the nodes of this way for next step reference counting
             way->referenceWithNodes();
@@ -242,7 +242,7 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
 }
 
 std::map<int,RelationPtr> Network::getAdministrativeBoundaries(int admin_level) {
-   std::map<int,RelationPtr> ret;
+   std::map<int, RelationPtr> ret;
 
    std::map<int, RelationPtr>::const_iterator it = relations.begin();
 
@@ -250,11 +250,11 @@ std::map<int,RelationPtr> Network::getAdministrativeBoundaries(int admin_level) 
       RelationPtr relation = it->second;
       if(relation->hasTag(Element::TAG_BOUNDARY) &&
             relation->hasTag(Element::TAG_ADMINLEVEL) &&
-            boost::iequals(relation->getTag(Element::TAG_BOUNDARY),"administrative") &&
-            relation->getTag(Element::TAG_ADMINLEVEL)==boost::lexical_cast<std::string>(admin_level) ){
+            boost::iequals(relation->getTag(Element::TAG_BOUNDARY), "administrative") &&
+            relation->getTag(Element::TAG_ADMINLEVEL) == boost::lexical_cast<std::string>(admin_level) ){
 
          if(relation->toGeometry())
-            ret[relation->getId()]=relation;
+            ret[relation->getId()] = relation;
       }
       it++;
    }

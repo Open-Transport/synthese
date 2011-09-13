@@ -18,27 +18,27 @@ namespace osm {
 
 using namespace road;
 
-std::map<std::string,Road::RoadType> Way::highwayTypes =  boost::assign::map_list_of
-         ("primary",Road::ROAD_TYPE_PRINCIPLEAXIS)
-         ("secondary",Road::ROAD_TYPE_SECONDARYAXIS)
-         ("tertiary",Road::ROAD_TYPE_ACCESSROAD)
-         ("primary_link",Road::ROAD_TYPE_PRINCIPLEAXIS)
-         ("secondary_link",Road::ROAD_TYPE_SECONDARYAXIS)
-         ("tertiary_link",Road::ROAD_TYPE_ACCESSROAD)
-         ("unclassified",Road::ROAD_TYPE_ACCESSROAD)
-         ("road",Road::ROAD_TYPE_ACCESSROAD)
-         ("residential",Road::ROAD_TYPE_ACCESSROAD)
-         ("living_street",Road::ROAD_TYPE_ACCESSROAD)
-         ("service",Road::ROAD_TYPE_ACCESSROAD)
-         ("track",Road::ROAD_TYPE_PEDESTRIANPATH)
-         ("pedestrian",Road::ROAD_TYPE_PEDESTRIANSTREET)
-         ("path",Road::ROAD_TYPE_PEDESTRIANPATH)
-         ("cycleway",Road::ROAD_TYPE_PEDESTRIANPATH)
-         ("footway",Road::ROAD_TYPE_PEDESTRIANPATH)
-         ("bridleway",Road::ROAD_TYPE_PEDESTRIANPATH)
-         ("byway",Road::ROAD_TYPE_UNKNOWN)
-         ("steps",Road::ROAD_TYPE_STEPS)
-         ("unclassified",Road::ROAD_TYPE_UNKNOWN);
+std::map<std::string,Road::RoadType> Way::highwayTypes = boost::assign::map_list_of
+         ("primary", Road::ROAD_TYPE_PRINCIPLEAXIS)
+         ("secondary", Road::ROAD_TYPE_SECONDARYAXIS)
+         ("tertiary", Road::ROAD_TYPE_ACCESSROAD)
+         ("primary_link", Road::ROAD_TYPE_PRINCIPLEAXIS)
+         ("secondary_link", Road::ROAD_TYPE_SECONDARYAXIS)
+         ("tertiary_link", Road::ROAD_TYPE_ACCESSROAD)
+         ("unclassified", Road::ROAD_TYPE_ACCESSROAD)
+         ("road", Road::ROAD_TYPE_ACCESSROAD)
+         ("residential", Road::ROAD_TYPE_ACCESSROAD)
+         ("living_street", Road::ROAD_TYPE_ACCESSROAD)
+         ("service", Road::ROAD_TYPE_ACCESSROAD)
+         ("track", Road::ROAD_TYPE_PEDESTRIANPATH)
+         ("pedestrian", Road::ROAD_TYPE_PEDESTRIANSTREET)
+         ("path", Road::ROAD_TYPE_PEDESTRIANPATH)
+         ("cycleway", Road::ROAD_TYPE_PEDESTRIANPATH)
+         ("footway", Road::ROAD_TYPE_PEDESTRIANPATH)
+         ("bridleway", Road::ROAD_TYPE_PEDESTRIANPATH)
+         ("byway", Road::ROAD_TYPE_UNKNOWN)
+         ("steps", Road::ROAD_TYPE_STEPS)
+         ("unclassified", Road::ROAD_TYPE_UNKNOWN);
 
 Way::Way(AttributeMap &attrs) throw(Exception): Element(attrs) {
    // TODO Auto-generated constructor stub
