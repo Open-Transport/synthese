@@ -107,6 +107,7 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD("line_short_name_field");
 		const std::string IneoFileFormat::Importer_::VALUE_NLGIV("NLGIV");
 		const std::string IneoFileFormat::Importer_::VALUE_MNLC("MNLC");
+		const std::string IneoFileFormat::Importer_::PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE = "add_wayback_to_journeypattern_code";
 	}
 
 	namespace impex
@@ -157,7 +158,8 @@ namespace synthese
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
 			_lines(_dataSource, _env),
-			_destinations(_dataSource, _env)
+			_destinations(_dataSource, _env),
+			_addWaybackToJourneyPatternCode(false)
 		{}
 
 
@@ -435,7 +437,11 @@ namespace synthese
 					{
 						jpName = _getValue("LIBCH");
 						jpWayback = (_getValue("SENS") != "A");
-						jpKey = _getValue("SENS") + _getValue("NCH");
+						jpKey = 
+							_addWaybackToJourneyPatternCode ?
+							_getValue("SENS") + _getValue("NCH") :
+							_getValue("NCH")
+						;
 						stops.clear();
 						lastStopCode.clear();
 						dst = 0;
@@ -589,7 +595,11 @@ namespace synthese
 						{
 							lineNum = lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2)));
 						}
-						string jpNum(_getValue("SENS") + _getValue("ORD"));
+						string jpNum(
+							_addWaybackToJourneyPatternCode ?
+							_getValue("SENS") + _getValue("ORD") :
+							_getValue("ORD")
+						);
 
 						route = NULL;
 						if(!lineNum.empty() && !jpNum.empty())
@@ -674,9 +684,12 @@ namespace synthese
 
 			// Line short name field
 			vector<pair<optional<string>, string> > fields;
-			methods.push_back(make_pair(optional<string>(VALUE_NLGIV), VALUE_NLGIV));
-			methods.push_back(make_pair(optional<string>(VALUE_MNLC), VALUE_MNLC));
-			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, methods, optional<string>(_lineShortNameField)));
+			fields.push_back(make_pair(optional<string>(VALUE_NLGIV), VALUE_NLGIV));
+			fields.push_back(make_pair(optional<string>(VALUE_MNLC), VALUE_MNLC));
+			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
+
+			// Add wayback to journey pattern code
+			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
 
 			stream << t.close();
 		}
@@ -828,6 +841,9 @@ namespace synthese
 			// Line short name field
 			map.insert(PARAMETER_LINE_SHORT_NAME_FIELD, _lineShortNameField);
 
+			// Add wayback to journeypattern code
+			map.insert(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode);
+
 			return map;
 		}
 
@@ -859,5 +875,8 @@ namespace synthese
 
 			// Line short name field
 			_lineShortNameField = map.getDefault<string>(PARAMETER_LINE_SHORT_NAME_FIELD, VALUE_NLGIV);
+
+			// Add wayback to journeypattern code
+			_addWaybackToJourneyPatternCode = map.getDefault<bool>(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, false);
 		}
 }	}
