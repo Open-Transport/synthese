@@ -689,7 +689,7 @@ namespace synthese
 			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
 
 			// Add wayback to journey pattern code
-			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
+			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
 
 			stream << t.close();
 		}
