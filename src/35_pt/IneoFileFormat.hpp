@@ -95,7 +95,8 @@ namespace synthese
 				static const std::string PARAMETER_LINE_SHORT_NAME_FIELD;
 				static const std::string VALUE_NLGIV;
 				static const std::string VALUE_MNLC;
-
+				static const std::string PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE;
+				
 			private:
 				//! @name Parameters
 				//@{
@@ -127,6 +128,7 @@ namespace synthese
 				//@{
 					boost::gregorian::date _startDate;
 					boost::gregorian::date _endDate;
+					bool _addWaybackToJourneyPatternCode;
 				//@}
 
 				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
