@@ -15,8 +15,8 @@ MainRoadPart.cpp
 MainRoadPart.hpp
 NavstreetsFileFormat.cpp
 NavstreetsFileFormat.hpp
-#OSMFileFormat.cpp
-#OSMFileFormat.hpp
+OSMFileFormat.cpp
+OSMFileFormat.hpp
 PublicPlace.cpp
 PublicPlace.h
 PublicPlaceTableSync.cpp
@@ -46,6 +46,8 @@ RoadTableSync.h
 )
 
 set_source_files_properties(RoadModule.gen.cpp RoadModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
+
+include_directories(${EXPAT_INCLUDE_DIRS})
 
 add_library(34_road ${road_SRCS})
 
