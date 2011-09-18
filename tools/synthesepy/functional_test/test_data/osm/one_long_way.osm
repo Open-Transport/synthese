@@ -1,0 +1,42 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-294' action='modify' visible='true' lat='47.53192100244045' lon='7.092419197292869' />
+  <node id='-276' action='modify' visible='true' lat='47.52737187570712' lon='7.085322506548324' />
+  <node id='-244' action='modify' visible='true' lat='47.52864567096587' lon='7.089364925326862' />
+  <node id='-191' action='modify' visible='true' lat='47.51978912097082' lon='7.0805614355424895' />
+  <node id='-171' action='modify' visible='true' lat='47.51560297084933' lon='7.080561435542491' />
+  <node id='-147' action='modify' visible='true' lat='47.513358086118586' lon='7.07678851134919' />
+  <node id='-65' action='modify' visible='true' lat='47.53641060361248' lon='7.09228647120964' />
+  <node id='-63' action='modify' visible='true' lat='47.52352148982726' lon='7.083303318368444' />
+  <node id='-62' action='modify' visible='true' lat='47.50996554937604' lon='7.076285230211262' />
+  <node id='-24' visible='true' lat='47.541425129166115' lon='7.094644548830454' />
+  <node id='-22' visible='true' lat='47.506544728030846' lon='7.098153592909045' />
+  <node id='-20' visible='true' lat='47.505312115812465' lon='7.070923410859173' />
+  <node id='-19' visible='true' lat='47.541709384957585' lon='7.068817984412018' />
+  <way id='-64' action='modify' visible='true'>
+    <nd ref='-62' />
+    <nd ref='-147' />
+    <nd ref='-171' />
+    <nd ref='-191' />
+    <nd ref='-63' />
+    <nd ref='-276' />
+    <nd ref='-244' />
+    <nd ref='-294' />
+    <nd ref='-65' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='Road0' />
+  </way>
+  <way id='-21' action='modify' visible='true'>
+    <nd ref='-19' />
+    <nd ref='-20' />
+    <nd ref='-22' />
+    <nd ref='-24' />
+    <nd ref='-19' />
+  </way>
+  <relation id='-60' visible='true'>
+    <member type='way' ref='-21' role='' />
+    <tag k='admin_level' v='8' />
+    <tag k='boundary' v='administrative' />
+    <tag k='name' v='City0' />
+  </relation>
+</osm>

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-65' visible='true' lat='47.536592544896926' lon='7.089591525357282' />
+  <node id='-63' visible='true' lat='47.523703475830445' lon='7.080608372516087' />
+  <node id='-62' visible='true' lat='47.51014758240154' lon='7.073590284358903' />
+  <node id='-24' visible='true' lat='47.541425129166115' lon='7.094644548830454' />
+  <node id='-22' visible='true' lat='47.506544728030846' lon='7.098153592909045' />
+  <node id='-20' visible='true' lat='47.505312115812465' lon='7.070923410859173' />
+  <node id='-19' visible='true' lat='47.541709384957585' lon='7.068817984412018' />
+  <way id='-64' action='modify' visible='true'>
+    <nd ref='-62' />
+    <nd ref='-63' />
+    <nd ref='-65' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='Road0' />
+  </way>
+  <way id='-21' action='modify' visible='true'>
+    <nd ref='-19' />
+    <nd ref='-20' />
+    <nd ref='-22' />
+    <nd ref='-24' />
+    <nd ref='-19' />
+  </way>
+  <relation id='-60' visible='true'>
+    <member type='way' ref='-21' role='' />
+    <tag k='admin_level' v='8' />
+    <tag k='boundary' v='administrative' />
+    <tag k='name' v='City0' />
+  </relation>
+</osm>

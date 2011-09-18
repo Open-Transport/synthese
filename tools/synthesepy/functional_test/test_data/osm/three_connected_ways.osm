@@ -1,0 +1,49 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<osm version='0.6' generator='JOSM'>
+  <node id='-347' action='modify' visible='true' lat='47.5146564906183' lon='7.09220360162468' />
+  <node id='-345' action='modify' visible='true' lat='47.50898938650618' lon='7.086490316417679' />
+  <node id='-337' visible='true' lat='47.514814238509' lon='7.075530869951422' />
+  <node id='-334' visible='true' lat='47.51208391963085' lon='7.0766088482923655' />
+  <node id='-330' visible='true' lat='47.51845444270668' lon='7.07544103842301' />
+  <node id='-310' visible='true' lat='47.541709384957585' lon='7.068817984412018' />
+  <node id='-308' visible='true' lat='47.505312115812465' lon='7.070923410859173' />
+  <node id='-306' visible='true' lat='47.506544728030846' lon='7.098153592909045' />
+  <node id='-304' visible='true' lat='47.541425129166115' lon='7.094644548830454' />
+  <node id='-302' action='modify' visible='true' lat='47.53586856646057' lon='7.074668262699847' />
+  <node id='-300' action='modify' visible='true' lat='47.532256105838904' lon='7.0867169164481' />
+  <node id='-298' action='modify' visible='true' lat='47.524704387562714' lon='7.090759335226637' />
+  <way id='-346' action='modify' visible='true'>
+    <nd ref='-334' />
+    <nd ref='-345' />
+    <nd ref='-347' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='Road2' />
+  </way>
+  <way id='-331' action='modify' visible='true'>
+    <nd ref='-298' />
+    <nd ref='-330' />
+    <nd ref='-334' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='Road1' />
+  </way>
+  <way id='-314' action='modify' visible='true'>
+    <nd ref='-310' />
+    <nd ref='-308' />
+    <nd ref='-306' />
+    <nd ref='-304' />
+    <nd ref='-310' />
+  </way>
+  <way id='-312' action='modify' visible='true'>
+    <nd ref='-302' />
+    <nd ref='-300' />
+    <nd ref='-298' />
+    <tag k='highway' v='residential' />
+    <tag k='name' v='Road0' />
+  </way>
+  <relation id='-316' visible='true'>
+    <member type='way' ref='-314' role='' />
+    <tag k='admin_level' v='8' />
+    <tag k='boundary' v='administrative' />
+    <tag k='name' v='City0' />
+  </relation>
+</osm>
