@@ -130,11 +130,14 @@ namespace synthese
 			const std::string& key,
 			boost::optional<const admin::AdminRequest&> adminRequest
 		) const {
+			// TODO: it should use the SRID set in the imported data source.
+			const CoordinatesSystem::SRID LAMBERT_II_SRID = 27572;
+
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , 27572);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), LAMBERT_II_SRID);
 
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;
@@ -217,12 +220,12 @@ namespace synthese
 			else if(key == FILE_STREETS)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), 27572);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), LAMBERT_II_SRID);
 
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;
 
-				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(27572).getGeometryFactory());
+				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(LAMBERT_II_SRID).getGeometryFactory());
 
 				// Recently added road places
 				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
@@ -391,7 +394,7 @@ namespace synthese
 								leftHouseNumberingPolicy,
 								rightHouseNumberBounds,
 								leftHouseNumberBounds
-							);
+								);
 
 							// Second road chunk creation
 							shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
@@ -460,7 +463,7 @@ namespace synthese
 									leftHouseNumberingPolicy,
 									rightHouseNumberBounds,
 									leftHouseNumberBounds
-								);
+									);
 
 								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 							}
@@ -486,7 +489,7 @@ namespace synthese
 									leftHouseNumberingPolicy,
 									rightHouseNumberBounds,
 									leftHouseNumberBounds
-								);
+									);
 
 								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
 
@@ -515,21 +518,21 @@ namespace synthese
 		DBTransaction NavstreetsFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
-			BOOST_FOREACH(Registry<Crossing>::value_type crossing, _env.getEditableRegistry<Crossing>())
+			BOOST_FOREACH(const Registry<Crossing>::value_type& crossing, _env.getEditableRegistry<Crossing>())
 			{
 				CrossingTableSync::Save(crossing.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<RoadPlace>::value_type roadplace, _env.getEditableRegistry<RoadPlace>())
+			BOOST_FOREACH(const Registry<RoadPlace>::value_type& roadplace, _env.getEditableRegistry<RoadPlace>())
 			{
-				RoadPlaceTableSync::Save(roadplace.second.get(),transaction);
+				RoadPlaceTableSync::Save(roadplace.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<MainRoadPart>::value_type road, _env.getEditableRegistry<MainRoadPart>())
+			BOOST_FOREACH(const Registry<MainRoadPart>::value_type& road, _env.getEditableRegistry<MainRoadPart>())
 			{
-				RoadTableSync::Save(road.second.get(),transaction);
+				RoadTableSync::Save(road.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<MainRoadChunk>::value_type roadChunk, _env.getEditableRegistry<MainRoadChunk>())
+			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& roadChunk, _env.getEditableRegistry<MainRoadChunk>())
 			{
-				RoadChunkTableSync::Save(roadChunk.second.get(),transaction);
+				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
 			}
 			return transaction;
 		}
@@ -554,16 +557,18 @@ namespace synthese
 			{
 				try
 				{
-					//Remove whitespace because of a bad_lexical_cast on "2 " !!!
+					// FIXME(sylvain): why isn't this code using boost trim?
+
+					// Remove whitespace because of a bad_lexical_cast on "2 " !!!
 					string minAddress = minAddressConst;
 					string maxAddress = maxAddressConst;
 
 					string::size_type k = 0;
-					while((k=minAddress.find(' ',k))!=minAddress.npos) {
+					while((k = minAddress.find(' ', k)) != minAddress.npos) {
 						minAddress.erase(k, 1);
 					}
 					k = 0;
-					while((k=maxAddress.find(' ',k))!=maxAddress.npos) {
+					while((k = maxAddress.find(' ', k)) != maxAddress.npos) {
 						maxAddress.erase(k, 1);
 					}
 
@@ -589,12 +594,12 @@ namespace synthese
 			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
 			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
-		){
-			chunk.setGeometry(geometry);
-			chunk.setRightHouseNumberBounds(rightHouseNumberBounds);
-			chunk.setRightHouseNumberingPolicy(rightHouseNumberingPolicy);
-			chunk.setLeftHouseNumberBounds(leftHouseNumberBounds);
-			chunk.setLeftHouseNumberingPolicy(leftHouseNumberingPolicy);
+			){
+				chunk.setGeometry(geometry);
+				chunk.setRightHouseNumberBounds(rightHouseNumberBounds);
+				chunk.setRightHouseNumberingPolicy(rightHouseNumberingPolicy);
+				chunk.setLeftHouseNumberBounds(leftHouseNumberBounds);
+				chunk.setLeftHouseNumberingPolicy(leftHouseNumberingPolicy);
 		}
 
 
