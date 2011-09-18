@@ -45,13 +45,13 @@ Way::Way(AttributeMap &attrs) throw(Exception): Element(attrs) {
 }
 
 void Way::pushNode(int id ,NodePtr node) {
-   std::pair<int, NodePtr> pair(id,node);
+   std::pair<int, NodePtr> pair(id, node);
    nodes.push_back(pair);
    resetGeometry();
 }
 
 void Way::pushNode(NodePtr node) {
-   pushNode(node->getId(),node);
+   pushNode(node->getId(), node);
 }
 
 std::string Way::toWKT() {
@@ -67,7 +67,7 @@ std::string Way::toWKT() {
    return wkt.str();
 }
 
-const std::list<std::pair<int,NodePtr> >* Way::getNodes() {
+const std::list<std::pair<int, NodePtr> >* Way::getNodes() {
    return &nodes;
 }
 
@@ -123,7 +123,7 @@ Road::RoadType Way::getRoadType() {
 }
 
 void Way::referenceWithNodes() {
-   typedef std::pair<int,NodePtr> nodeType;
+   typedef std::pair<int, NodePtr> nodeType;
    BOOST_FOREACH(nodeType node, nodes) {
       node.second->ways.push_back(this);
    }

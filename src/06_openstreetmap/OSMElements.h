@@ -186,7 +186,7 @@ public:
     * \param id The id of the referenced \ref Node, this should be the same as the id of the given \param node
     * \param node The node to add, or NULL
     */
-   void pushNode(int id ,NodePtr node);
+   void pushNode(int id, NodePtr node);
 
    /**
     * \brief Add a node to the end of the way
@@ -197,7 +197,7 @@ public:
    /**
     * \brief Returns the list of nodes referenced by the way
     */
-   const std::list<std::pair<int,NodePtr> > *getNodes();
+   const std::list<std::pair<int, NodePtr> > *getNodes();
    std::string toWKT();
 
    /**
@@ -226,7 +226,7 @@ public:
 
 protected:
    /// the \ref Node "nodes" referenced by the way
-   std::list<std::pair<int,NodePtr> > nodes;
+   std::list<std::pair<int, NodePtr> > nodes;
 
 };
 
