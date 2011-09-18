@@ -10,6 +10,7 @@
 #include "RoadModule.h"
 #include "PublicPlaceTableSync.h"
 #include "NavstreetsFileFormat.hpp"
+#include "OSMFileFormat.hpp"
 #include "House.hpp"
 
 // Registries
@@ -41,6 +42,7 @@ void synthese::road::moduleRegister()
 	synthese::road::RoadPlace::integrate();
 	synthese::road::PublicPlace::integrate();
 	synthese::road::NavstreetsFileFormat::integrate();
+	synthese::road::OSMFileFormat::integrate();
 	synthese::road::House::integrate();
 	
 	// Registries
