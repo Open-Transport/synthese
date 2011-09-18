@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
-#define SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
+#ifndef SYNTHESE_pt_StopArea_hpp__
+#define SYNTHESE_pt_StopArea_hpp__
 
 #include "NamedPlaceTemplate.h"
 #include "Hub.h"
@@ -379,4 +379,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_env_PublicTransportStopZoneConnectionPlace_h__
+#endif // SYNTHESE_pt_StopArea_hpp__
