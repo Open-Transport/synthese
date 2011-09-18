@@ -477,24 +477,7 @@ namespace synthese
 			}
 			else if(key == FILE_CAL)
 			{
-				while(_readLine(inFile))
-				{
-					if(_section == "CAL")
-					{
-						string dateStr(_getValue("DATE"));
-						date calDate(
-							lexical_cast<int>(dateStr.substr(6,4)),
-							lexical_cast<int>(dateStr.substr(3,2)),
-							lexical_cast<int>(dateStr.substr(0,2))
-						);
-						if(!_fromToday || calDate >= now)
-						{
-							_dates[
-								make_pair(lexical_cast<int>(_getValue("PH")),lexical_cast<int>(_getValue("TYP_JOUR")))
-							].push_back(calDate);
-						}
-					}
-				}
+				// Already read in _setFromParemetersMap
 			}
 			else if(key == FILE_CJV)
 			{
@@ -878,5 +861,42 @@ namespace synthese
 
 			// Add wayback to journeypattern code
 			_addWaybackToJourneyPatternCode = map.getDefault<bool>(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, false);
+
+			// Calendar dates
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));
+			if(it != _pathsMap.end())
+			{
+				ifstream inFile;
+				inFile.open(it->second.file_string().c_str());
+				if(!inFile)
+				{
+					throw Exception("Could no open the calendar file.");
+				}
+				_clearFieldsMap();
+				_calendar.clear();
+				date now(day_clock::local_day());
+				while(_readLine(inFile))
+				{
+					if(_section == "CAL")
+					{
+						string dateStr(_getValue("DATE"));
+						date calDate(
+							lexical_cast<int>(dateStr.substr(6,4)),
+							lexical_cast<int>(dateStr.substr(3,2)),
+							lexical_cast<int>(dateStr.substr(0,2))
+						);
+						if(!_fromToday || calDate >= now)
+						{
+							_calendar.setActive(calDate);
+							_dates[
+								make_pair(
+									lexical_cast<int>(_getValue("PH")),
+									lexical_cast<int>(_getValue("TYP_JOUR"))
+								)
+							].push_back(calDate);
+						}
+					}
+				}
+			}
 		}
 }	}
