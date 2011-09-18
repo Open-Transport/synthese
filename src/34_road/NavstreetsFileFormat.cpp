@@ -217,12 +217,12 @@ namespace synthese
 			else if(key == FILE_STREETS)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), LAMBERT_II_SRID);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
 
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;
 
-				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(LAMBERT_II_SRID).getGeometryFactory());
+				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
 
 				// Recently added road places
 				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
