@@ -61,8 +61,8 @@ namespace synthese
 		private:
 			HouseNumberBounds _leftHouseNumberBounds;
 			HouseNumberBounds _rightHouseNumberBounds;
-			HouseNumberingPolicy	_leftHouseNumberingPolicy;
-			HouseNumberingPolicy	_rightHouseNumberingPolicy;
+			HouseNumberingPolicy _leftHouseNumberingPolicy;
+			HouseNumberingPolicy _rightHouseNumberingPolicy;
 
 			ReverseRoadChunk* _reverseRoadChunk;
 
