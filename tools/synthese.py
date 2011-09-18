@@ -204,12 +204,12 @@ class Bootstrap(object):
 
         args = ([self._get_env_executable('python'), '-m', 'synthesepy.cli'] +
             sys.argv[1:])
-        # os.exec on Windows in a Cygwin shell has a side effect of returning
-        # to the shell prompt while the process is running. Use subprocess
-        # instead which doesn't produce this behavior.
+        # os.exec on Windows has a side effect of returning to the shell
+        # prompt while the process is running. Use subprocess instead which
+        # doesn't produce this behavior.
         # Otherwise, using os.exec is better than subprocess here because
         # there's a single stack trace in case of errors.
-        if os.environ.get('TERM') == 'cygwin':
+        if sys.platform == 'win32':
             sys.exit(subprocess.call(args))
 
         os.execv(args[0], args)
