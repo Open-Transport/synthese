@@ -144,7 +144,8 @@ class Tester(object):
 
     def run_python_tests(self, suite_args):
         http_testcase.init_backends(
-            self.env, self.env.c.test_conn_strings, self.config.no_init)
+            self.env, self.env.c.test_conn_strings, self.config.no_init,
+            self.config.test_daemon_only)
 
         sys_argv = sys.argv[0:1]
 

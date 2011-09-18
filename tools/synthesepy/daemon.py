@@ -77,19 +77,23 @@ class Daemon(object):
             self.stop()
         signal.signal(signal.SIGTERM, terminate)
 
+    @classmethod
+    def kill_existing(cls, env):
+        ports_to_check = [env.c.port]
+        if env.c.wsgi_proxy:
+            ports_to_check.append(env.c.wsgi_proxy_port)
+        for port in ports_to_check:
+            utils.kill_listening_processes(port)
+
+            if utils.can_connect(port):
+                raise DaemonException(
+                    'Error, something is already listening on port %s', port)
+
     def start(self, kill_existing=True):
         self.env.prepare_for_launch()
 
         if kill_existing:
-            ports_to_check = [self.env.c.port]
-            if self.env.c.wsgi_proxy:
-                ports_to_check.append(self.env.c.wsgi_proxy_port)
-            for port in ports_to_check:
-                utils.kill_listening_processes(port)
-
-                if utils.can_connect(port):
-                    raise DaemonException(
-                        'Error, something is already listening on port %s', port)
+            self.kill_existing(self.env)
 
         if not os.path.isfile(self.env.daemon_path):
             raise DaemonException(
