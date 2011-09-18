@@ -11,7 +11,7 @@ CppLibProject(
 	senv
 	, 'bzip2'
 	, '1.0.6'
-	, source_files = senv.Glob ('*.c', dir=senv.SrcDir('src'), prefix='src/')
+	, source_files = senv.Glob ('*.c', ['unzcrash.c','bzip2.c','spewG.c','bzip2recover.c','dlltest.c'], dir=senv.SrcDir('src'), prefix='src/')
 	, include_dir = senv.SrcDir('src')
 	, filesrootdir = senv.SrcDir('src')
 )

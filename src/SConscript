@@ -10,7 +10,7 @@ if s3env.GetPlatform () == 'posix':
 #s3env.Append ( CPPDEFINES = ['BOOST_ALL_NO_LIB'] )
 s3env.Append (CPPPATH = [Dir ('.').abspath])
 
-s3env.Append(BOOSTVERSION = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39'))
+s3env.Append(BOOSTVERSION = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39b'))
 
 Export('s3env')
 
