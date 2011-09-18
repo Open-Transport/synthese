@@ -37,8 +37,12 @@ if(NOT DEFINED BOOST_VERSION)
   set(BOOST_VERSION 1.39)
 endif()
 
-find_package(Boost ${BOOST_VERSION} COMPONENTS
-  program_options filesystem system regex thread date_time iostreams unit_test_framework)
+set(BOOST_LIBS program_options filesystem system regex thread date_time iostreams unit_test_framework)
+if(WIN32)
+  list(APPEND BOOST_LIBS bzip2)
+endif()
+
+find_package(Boost ${BOOST_VERSION} COMPONENTS ${BOOST_LIBS})
 if(NOT Boost_FOUND)
   message(FATAL_ERROR "Boost not found")
 endif()
