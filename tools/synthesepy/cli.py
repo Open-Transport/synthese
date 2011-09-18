@@ -135,6 +135,7 @@ def add_project_subparsers(subparsers):
     add_parser('stopdaemon', ('stop',))
     add_parser('runproxy')
     add_parser('db_view')
+    add_parser('db_view_gis')
     def db_shell(project, args, env):
         project.db_shell(sql=args.sql)
     parser = add_parser('db_shell', func=db_shell)
@@ -232,7 +233,13 @@ def add_default_subparsers(subparsers):
     parser_runtests.add_argument(
         '--no-init',
         help='Don\'t start/stop the daemon or initialize the db. '
-             'Can be used to reuse an already running daemon',
+             'Can be used to reuse an already running daemon '
+             '(see --test-daemon-only)',
+        action='store_true')
+    parser_runtests.add_argument(
+        '--test-daemon-only',
+        help='When a HTTPTestCase is run, initialize the project and keep the '
+             'daemon running. Meant to be used in parallel iwth --no-init',
         action='store_true')
     parser_runtests.add_argument(
         'suites', nargs='*',
@@ -323,7 +330,7 @@ def main():
         '-v', '--verbose', action='store_true', default=False,
         help='Be verbose')
     parser.add_argument(
-        '-u', '--dummy', action='store_true', default=False,
+        '-u', '--dummy', action='store_true',
         help='Dummy mode, doesn\'t execute commands or have side effects '
             'WARNING: NOT FULLY IMPLEMENTED YET')
     # Environment options
@@ -332,6 +339,9 @@ def main():
     parser.add_argument('-b', '--env-path', help='Env path')
     parser.add_argument(
         '-m', '--mode', choices=['release', 'debug'])
+    parser.add_argument(
+        '--beep', dest='beep_when_done', action='store_true',
+        help='Emit a beep on completion')
     # Daemon options
     parser.add_argument('--port', type=int)
     parser.add_argument('--no-proxy', action='store_true')
@@ -376,15 +386,22 @@ def main():
     env = synthesepy.env.create_env(
         args.env_type, args.env_path, args.mode, config)
 
-    if project:
-        project.set_env(env)
-        if hasattr(args, 'project_func'):
-            args.project_func(project)
+    try:
+        if project:
+            project.set_env(env)
+            if hasattr(args, 'project_func'):
+                args.project_func(project)
+            else:
+                args.func(project, args, env)
         else:
-            args.func(project, args, env)
-    else:
-        args.func(args, env)
-
+            args.func(args, env)
+    finally:
+        if config.beep_when_done:
+            if env.platform == 'win':
+                import winsound
+                winsound.Beep(7000, 600)
+            else:
+                print '\a'
 
 if __name__ == '__main__':
     main()

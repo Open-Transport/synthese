@@ -37,6 +37,7 @@ DEFAULTS = {
     'dummy': False,
     'verbose': False,
     'spatialite_path': 'spatialite',
+    'beep_when_done': False,
 
     # XXX name it thirdparty_path for consistency?
     'thirdparty_dir': None,
@@ -86,6 +87,7 @@ DEFAULTS = {
     # runtests
     'test_conn_strings': ['sqlite://', 'mysql://db=synthese_test,host=localhost,user=synthese,passwd=synthese'],
     'no_init': False,
+    'test_daemon_only': False,
 
     # continuous_integration
     'suites': None,
