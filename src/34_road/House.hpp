@@ -33,7 +33,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// House.
 		/// A house is a place representing a single address, designed to be
-		/// temporarily created on runtime.
+		/// temporarily created at runtime.
 		/// For registered houses, use geography::PublicPlace instead.
 		/// @image html uml_house.png
 		//////////////////////////////////////////////////////////////////////////
@@ -74,7 +74,7 @@ namespace synthese
 				///	Two vertices are returned if the graph type is road :
 				///	<ul>
 				///	<li>the beginning of the two chunk linked with the house</li>
-				///	<li>the beginning ot the revered chunk from the preceding one</li>
+				///	<li>the beginning of the reversed chunk from the preceding one</li>
 				///	</ul>
 				///	Approach durations are computed from the accessParameters.
 				//////////////////////////////////////////////////////////////////////////
