@@ -35,6 +35,7 @@ from synthesepy import daemon
 from synthesepy import db_backends
 from synthesepy import http_api
 from synthesepy import project_manager
+from synthesepy import utils
 
 
 log = logging.getLogger(__name__)
@@ -59,20 +60,33 @@ class HTTPTestCase(unittest.TestCase):
     # TODO: add setUp / tearDown to reset http_api browser state?
 
     @classmethod
+    def init_project(cls, project):
+        """
+        Override to do test specific project initialization work.
+        Called before the daemon is ran.
+        """
+
+    @classmethod
     def setUpClass(cls):
         log.info('setupClass %s, with backend %s', cls.__name__, cls.backend)
 
-        if cls.no_init:
-            return
-
         project_path = os.path.join(env.env_path, 'projects', 'test')
 
+        if cls.no_init:
+            cls.project = project_manager.Project(project_path, cls.env)
+            return
+
+        daemon.Daemon.kill_existing(cls.env)
+
+        log.info('Creating project')
         cls.project = project_manager.create_project(
             cls.env, project_path, site_packages=cls.site_packages,
             conn_string=cls.backend.conn_info.conn_string,
             overwrite=True)
 
-        cls.project.rundaemon(block=False)
+        cls.init_project(cls.project)
+        log.info('Running daemon for tests')
+        cls.project.rundaemon(block=cls.daemon_only)
 
     @classmethod
     def tearDownClass(cls):
@@ -89,15 +103,17 @@ class HTTPTestCase(unittest.TestCase):
 env = None
 backends = []
 no_init = False
+daemon_only = False
 
 
-def init_backends(_env, conn_strings, _no_init):
-    global env, backends, no_init
+def init_backends(_env, conn_strings, _no_init, _daemon_only):
+    global env, backends, no_init, daemon_only
 
     log.debug('init_backends')
     env = _env
     backends = []
     no_init = _no_init
+    daemon_only = _daemon_only
     for conn_string in conn_strings:
         backends.append(db_backends.create_backend(env, conn_string))
 
@@ -121,6 +137,7 @@ def do_load_tests(scope, loader):
                 new_class.env = env
                 new_class.backend = backend
                 new_class.no_init = no_init
+                new_class.daemon_only = daemon_only
 
                 tests.append(loader.loadTestsFromTestCase(new_class))
 

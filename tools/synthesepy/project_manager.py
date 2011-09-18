@@ -354,6 +354,16 @@ class Project(object):
         else:
             raise NotImplementedError("Not implemented for this backend")
 
+    def db_view_gis(self):
+        """Open database in a GIS GUI tool (if applicable)"""
+        if self.db_backend.name == 'sqlite':
+            utils.call(
+                [self.config.spatialite_gis_path,
+                    self.db_backend.conn_info['path']],
+                bg=True)
+        else:
+            raise NotImplementedError("Not implemented for this backend")
+
     def db_shell(self, sql=None):
         """Open a SQL interpreter on the database or execute the given SQL"""
         self.db_backend.shell(sql)
