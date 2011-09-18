@@ -60,7 +60,7 @@ class BoostProject (CppLibProject):
 					   '--stagedir="%s"' % Dir ('.').abspath,
 					   '--debug-configuration=%s' % env.IsCppModeDebug(),
 					   '-sTOOLS=%s' % env.GetCppToolset (),
-					   '-sNO_GNU_LN=1 -sNO_BZIP2=1',
+					   '-sNO_GNU_LN=1 ',
 					   '-sZLIB_SOURCE="%s"' % zlibinclude,
 					   '-sZLIB_INCLUDE="%s"' % zlibinclude,
 					   '-sBUILD="%s <runtime-link>%s <threading>%s" stage' % (env.GetCppMode (), 'static', 'multi'),
@@ -117,7 +117,7 @@ class BoostProject (CppLibProject):
 					   '--stagedir="%s"' % Dir ('.').abspath,
 					   '--debug-configuration=%s' % env.IsCppModeDebug(),
 					   '-sTOOLS=%s' % env.GetCppToolset (),
-					   '-sNO_GNU_LN=1 -sNO_BZIP2=1',
+					   '-sNO_GNU_LN=1 ',
 					   '-sZLIB_SOURCE="%s"' % zlibinclude,
 					   '-sBUILD="%s <runtime-link>%s <threading>%s" stage' % (env.GetCppMode (), 'dynamic', 'multi'),
 					   '--with-' + withname,
@@ -154,14 +154,14 @@ class BoostProject (CppLibProject):
 				targetname = self.env.subst ('$SHLIBPREFIX') + self.name + self.env.subst('$SHLIBSUFFIX')	  
 				targets.append (File (targetname, 'lib'))
 				#itargets.append (File (self.get_libs()[0] + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']))
-				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + self.version.version + ".0", env['_REPO_SHLIB_DIR']))
+				itargets.append( File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX') + "." + self.version.version.rstrip('abcdefghijklmnopqrstuvwxyz') + ".0", env['_REPO_SHLIB_DIR']))
 				self.env.InstallAs(File ("lib" + self.name + self.env.subst('$SHLIBSUFFIX'), env['_REPO_SHLIB_DIR']), File (targetname, 'lib')) 
 			lenv = self.env.Clone ()
 			lenv['BJAMOPTIONS'] = options
 			lenv.BJam (targets, 'src/boost-build.jam')
 			self.add_target(self.env.InstallAs (itargets, targets))
 
-BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39')
+BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39b')
 
 for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
                 'program_options', 'regex', 
