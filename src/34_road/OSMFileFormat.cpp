@@ -34,7 +34,6 @@
 #include "RoadTableSync.h"
 #include "RoadChunk.h"
 #include "RoadChunkTableSync.h"
-#include "RoadFileFormat.hpp"
 
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
@@ -265,9 +264,9 @@ namespace synthese {
 				stream << t.title("Fichier");
 				stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
 				/*
-				stream << t.title("Paramètres");
-				stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
+				stream << t.title("Paramï¿½tres");
+				stream << t.cell("Effacer donnï¿½es existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+				stream << t.cell("Ne pas importer donnï¿½es anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 				stream << t.cell("Calendrier", 
 					t.getForm().getSelectInput(
 					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
