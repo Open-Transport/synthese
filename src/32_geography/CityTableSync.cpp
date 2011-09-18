@@ -159,7 +159,7 @@ namespace synthese
 			if (exactName)
 				query << " AND " << TABLE_COL_NAME << "=" << Conversion::ToDBString(*exactName);
 			if (likeName)
-				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(*exactName);
+				query << " AND " << TABLE_COL_NAME << " LIKE " << Conversion::ToDBString(*likeName);
 			if (code)
 				query << " AND " << TABLE_COL_CODE << "=" << Conversion::ToDBString(*code);
 			if (orderByName)
