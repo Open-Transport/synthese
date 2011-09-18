@@ -130,14 +130,11 @@ namespace synthese
 			const std::string& key,
 			boost::optional<const admin::AdminRequest&> adminRequest
 		) const {
-			// TODO: it should use the SRID set in the imported data source.
-			const CoordinatesSystem::SRID LAMBERT_II_SRID = 27572;
-
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), LAMBERT_II_SRID);
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
 
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;
