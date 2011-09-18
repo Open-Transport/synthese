@@ -27,6 +27,7 @@ from os.path import join
 import shutil
 import subprocess
 import sys
+import tarfile
 import urllib2
 import zipfile
 
@@ -97,8 +98,8 @@ class Builder(object):
             zip = zipfile.ZipFile(archive)
             zip.extractall(extract_dir)
         elif archive.endswith(('.tar.gz', '.tgz')):
-            assert self.env.platform != 'win'
-            utils.call(['tar', 'zxf', archive, '-C', extract_dir])
+            tar = tarfile.open(archive, 'r:gz')
+            tar.extractall(extract_dir)
         return created_dir
 
     def install_prerequisites(self):
@@ -318,6 +319,12 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
+        # Boost dependencies
+        BZIP2_ARCHIVE = 'bzip2-1.0.6'
+        url = 'http://www.bzip.org/1.0.6/{0}.tar.gz'.format(BZIP2_ARCHIVE)
+        self._download(url, '00b516f4704d4a7cb50a1d97e6e8e15b')
+        created_dir = self._extract(url, self.env.c.thirdparty_dir)
+
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
@@ -325,7 +332,17 @@ class CMakeBuilder(Builder):
         self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
 
-        if os.path.isdir(self.boost_lib_dir):
+        CURRENT_BOOST_BUILD_VER = 1
+        boost_build_ver_path = join(
+            self.env.c.thirdparty_dir, 'boost_build_ver.txt')
+        try:
+            boost_build_ver = int(open(boost_build_ver_path).read())
+        except IOError:
+            boost_build_ver = 0
+        log.debug('Found current boost build version: %i', boost_build_ver)
+
+        if (boost_build_ver >= CURRENT_BOOST_BUILD_VER and
+            os.path.isdir(self.boost_lib_dir)):
             return
 
         log.info("Building Boost, this can take some times...")
@@ -340,8 +357,11 @@ class CMakeBuilder(Builder):
             'toolset={toolset} release debug link=static runtime-link=static '
             'threading=multi'.format(toolset=toolset).split(' '))
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
+        args.append('-sBZIP2_SOURCE={}'.format(
+            join(self.env.c.thirdparty_dir, BZIP2_ARCHIVE)))
 
         utils.call(args, cwd=self.boost_dir)
+        open(boost_build_ver_path, 'wb').write(str(CURRENT_BOOST_BUILD_VER))
 
     def install_iconv(self):
         if self.env.platform != 'win':
