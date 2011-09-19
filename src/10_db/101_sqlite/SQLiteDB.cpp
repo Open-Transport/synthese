@@ -517,7 +517,7 @@ namespace synthese
 
 
 
-		const bool SQLiteDB::isBackend(Backend backend)
+		bool SQLiteDB::isBackend(Backend backend)
 		{
 			return backend == SQLITE_BACKEND;
 		}

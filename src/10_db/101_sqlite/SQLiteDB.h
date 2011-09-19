@@ -86,7 +86,7 @@ namespace synthese
 			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[]);
 			virtual const std::string getSQLDateFormat(const std::string& format, const std::string& expr);
 			virtual const std::string getSQLConvertInteger(const std::string& expr);
-			virtual const bool isBackend(Backend backend);
+			virtual bool isBackend(Backend backend);
 
 		protected:
 

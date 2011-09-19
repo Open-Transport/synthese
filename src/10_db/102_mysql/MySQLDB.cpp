@@ -577,7 +577,7 @@ namespace synthese
 
 
 
-		const bool MySQLDB::isBackend(Backend backend)
+		bool MySQLDB::isBackend(Backend backend)
 		{
 			return backend == MYSQL_BACKEND;
 		}
