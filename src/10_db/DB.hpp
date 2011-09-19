@@ -278,7 +278,7 @@ namespace synthese
 			/// @author Sylvain Pasche
 			/// @date 2011
 			/// @since 3.3.0
-			virtual const bool isBackend(Backend backend) = 0;
+			virtual bool isBackend(Backend backend) = 0;
 
 		protected:
 

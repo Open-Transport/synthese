@@ -312,7 +312,8 @@ namespace synthese
 				if(value.get() && !value->isEmpty())
 				{
 					boost::shared_ptr<geos::geom::Geometry> projected(value);
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() != value->getSRID())
+					if(DBModule::GetStorageCoordinatesSystem().getSRID() !=
+						static_cast<CoordinatesSystem::SRID>(value->getSRID()))
 					{
 						projected = DBModule::GetStorageCoordinatesSystem().convertGeometry(*value);
 					}
