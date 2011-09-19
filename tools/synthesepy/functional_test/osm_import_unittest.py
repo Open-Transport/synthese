@@ -276,8 +276,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                'name': u'City0'}]}
         )
 
-    # TODO: uncomment once it works.
-    def XXXtest_import_sample_data(self):
+    def test_import_sample_data(self):
         tree = self.check_import('sample_data.osm.bz2')
         # TODO: add assertions on tree.
 
