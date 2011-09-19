@@ -58,12 +58,12 @@ namespace synthese
 			char* pUtfbuf(utf8buf);
 			if (iconv(_iconv, &pBuf, &len, &pUtfbuf, &utf8len) == (size_t) (-1))
 			{
-				delete utf8buf;
+				free(utf8buf);
 				throw ImpossibleConversion(pBuf, *this);
 			}
 			*pUtfbuf = 0;
 			string result(utf8buf);
-			delete utf8buf;
+			free(utf8buf);
 			return result;
 		}
 
