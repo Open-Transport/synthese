@@ -32,6 +32,7 @@ from UserDict import UserDict
 
 import MySQLdb
 
+import synthesepy.build
 from synthesepy import daemon
 from synthesepy import utils
 
@@ -138,6 +139,11 @@ class SQLiteBackend(DBBackend):
         log.debug('Sqlite file: %s', self.sqlite_file)
 
     def get_connection(self, spatialite=False):
+        if self.env.platform == 'win':
+            # Force spatialite usage on Windows. The native sqlite module
+            # doesn't come with rtree and can't operate on geographical tables.
+            spatialite = True
+
         db_module = sqlite3
         if spatialite:
             # We need a sqlite library compiled with module loading capability.
@@ -151,8 +157,17 @@ class SQLiteBackend(DBBackend):
         conn = db_module.connect(self.sqlite_file)
         if spatialite:
             conn.enable_load_extension(True)
-            # TODO: this shouldn't be hardcoded.
-            conn.execute("SELECT load_extension('/usr/lib/libspatialite.so.2.1.0')")
+            if self.env.platform == 'lin':
+                # TODO: this shouldn't be hardcoded.
+                module_path = '/usr/lib/libspatialite.so.2.1.0'
+            elif self.env.platform == 'win':
+                builder = synthesepy.build.get_builder(self.env)
+                builder.update_path_for_libspatialite()
+                module_path = 'libspatialite-1.dll'
+            else:
+                assert False
+
+            conn.execute("SELECT load_extension('%s')" % module_path)
         return conn
 
     def _create_db(self):
