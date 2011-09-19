@@ -208,6 +208,13 @@ class SconsBuilder(Builder):
 
 
 class CMakeBuilder(Builder):
+    LIBSPATIALITE_DLLS = (
+        ('libspatialite-win-x86-2.3.1', 'f66ce52cbd5a6242844286098386d288'),
+        ('proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
+        ('geos-win-x86-3.1.1', '945887205eee6fc97f117db7bcf4f01e'),
+        ('libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
+    )
+
     def __init__(self, env):
         super(CMakeBuilder, self).__init__(env)
         PLATFORM_TO_TOOL = {
@@ -377,6 +384,21 @@ class CMakeBuilder(Builder):
         fname = url.split('/')[-1]
         shutil.copy(join(self.download_cache_dir, fname), target)
 
+    def _install_libspatialite(self):
+        if self.env.platform != 'win':
+            return
+
+        for filename, hash in self.LIBSPATIALITE_DLLS:
+            url = 'http://www.gaia-gis.it/spatialite/%s.zip' % filename
+            self._download(url, hash)
+            self._extract(url, self.env.c.thirdparty_dir)
+
+    def update_path_for_libspatialite(self):
+        self._install_libspatialite()
+        dll_paths = [join(self.env.c.thirdparty_dir, filename, 'bin') for
+            filename, _ in self.LIBSPATIALITE_DLLS]
+        utils.append_paths_to_environment('PATH', dll_paths)
+
     def install_prerequisites(self):
         self._check_debian_build_packages()
 
@@ -388,6 +410,7 @@ class CMakeBuilder(Builder):
 
         self._install_boost()
         self.install_iconv()
+        self._install_libspatialite()
 
     def get_cmake_tool_path(self, tool):
         self._install_cmake()
