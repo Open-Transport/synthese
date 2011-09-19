@@ -32,7 +32,7 @@ import traceback
 log = logging.getLogger(__name__)
 
 # Increment this when the Python environment needs to be updated.
-REQUIRED_ENV_VERSION = 0
+REQUIRED_ENV_VERSION = 1
 
 SYNTHESEPY_DIR = '@SYNTHESEPY_DIR@'
 
@@ -140,6 +140,12 @@ class Bootstrap(object):
                 raise Exception(
                     'MySQLdb library not found. Reinstall and try again.\n'
                     'For Python 2.7, you can try http://www.codegood.com/archives/129')
+            try:
+                import pysqlite2
+            except ImportError:
+                raise Exception(
+                    'You must install the pysqlite Python module from:\n'
+                    'http://code.google.com/p/pysqlite/downloads/list')
 
         with open(join(self.pyenv_path, 'version.txt'), 'wb') as f:
             f.write(str(REQUIRED_ENV_VERSION))
