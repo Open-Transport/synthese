@@ -71,9 +71,10 @@ namespace synthese
 			_fixedLevel(true),
 			_fixedUserId(true),
 			_fixedText(true),
-			_fixedObjectId(true)
-		{
-		}
+			_fixedObjectId(true),
+			_fixedObjectId2(true)
+		{}
+
 
 
 		void DBLogHTMLView::set(
