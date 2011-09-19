@@ -97,7 +97,7 @@ endif()
 
 # gcc warning settings
 if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
-  add_definitions(-Wall -Wextra)
+  add_definitions(-Wall -Wextra -Wno-unused-parameter)
 endif ()
 
 add_definitions(-DCMAKE)
