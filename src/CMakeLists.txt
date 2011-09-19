@@ -69,9 +69,6 @@ foreach(module ${MODULES})
 endforeach(module)
 
 if(UNIX)
-  # TODO: only add to places where required.
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-
   # TODO: is this symbol required? (it is present with scons)
   # BOOST_ALL_DYN_LINK
 

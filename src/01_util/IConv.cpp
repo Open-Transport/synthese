@@ -48,12 +48,17 @@ namespace synthese
 		std::string IConv::convert(
 			const std::string& text
 		){
+			// FIXME: on Linux, the system iconv header might be included which has a different signature.
+#ifdef UNIX
+			char *pBuf;
+#else
 			const char *pBuf;
+#endif
 			size_t len;
 			size_t utf8len;
 			len = text.length();
 			utf8len = 4*text.size();
-			pBuf = text.c_str();
+			pBuf = const_cast<char*>(text.c_str());
 			char* utf8buf = (char*) malloc(sizeof(char) * utf8len);
 			char* pUtfbuf(utf8buf);
 			if (iconv(_iconv, &pBuf, &len, &pUtfbuf, &utf8len) == (size_t) (-1))
