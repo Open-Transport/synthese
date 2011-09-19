@@ -193,7 +193,13 @@ namespace synthese {
 
 						if(!startCrossing.get())
 						{
-							startCrossing = _getOrCreateCrossing(node, point);
+							startCrossing = _getOrCreateCrossing(
+								node,
+								shared_ptr<Point>(
+									_dataSource.getActualCoordinateSystem().createPoint(
+										node->getLon(),
+										node->getLat()
+							)	)	);
 							continue;
 						}
 						bool isLast = idAndNode == nodes->back();
@@ -207,7 +213,7 @@ namespace synthese {
 						// FIXME: is this useful?
 						cs->removeRepeatedPoints();
 
-						shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(cs));
+						shared_ptr<LineString> roadChunkLine(geometryFactory.createLineString(*cs));
 
 						_createRoadChunk(road, startCrossing, roadChunkLine, rank, metricOffset);
 
@@ -215,7 +221,13 @@ namespace synthese {
 
 						// FIXME: this doesn't seem to return the result in meters.
 						metricOffset += roadChunkLine->getLength();
-						startCrossing = _getOrCreateCrossing(node, point);
+						startCrossing = _getOrCreateCrossing(
+							node,
+							shared_ptr<Point>(
+								_dataSource.getActualCoordinateSystem().createPoint(
+									node->getLon(),
+									node->getLat()
+						)	)	);
 
 						if(!isLast)
 						{
