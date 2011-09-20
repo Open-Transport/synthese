@@ -38,7 +38,7 @@ class LoginTest(http_testcase.HTTPTestCase):
     PASSWORD = 'root'
 
     def test_bad_username(self):
-        br = self.get_http_api().get_admin_browser()
+        br = self.get_http_api().get_admin_browser(logged_in=False)
 
         br.select_form(name='login')
         br['actionParamlogin'] = self.USERNAME
@@ -50,7 +50,7 @@ class LoginTest(http_testcase.HTTPTestCase):
         self.assertIn('Action error : Mot de passe erron\xc3\xa9', content)
 
     def test_bad_password(self):
-        br = self.get_http_api().get_admin_browser()
+        br = self.get_http_api().get_admin_browser(logged_in=False)
 
         br.select_form(name='login')
         br['actionParamlogin'] = 'badusername'
@@ -62,7 +62,7 @@ class LoginTest(http_testcase.HTTPTestCase):
         self.assertIn('Action error : Utilisateur introuvable', content)
 
     def test_successful_login(self):
-        br = self.get_http_api().get_admin_browser()
+        br = self.get_http_api().get_admin_browser(logged_in=False)
 
         br.select_form(name='login')
         br['actionParamlogin'] = self.USERNAME
