@@ -115,7 +115,7 @@ class HTTPPagesReader(HTTPPageMixin, PagesReader):
         self.existing_pages = existing_pages
 
     def read(self):
-        br = self.http_api.get_admin_browser(logged_in=True)
+        br = self.http_api.get_admin_browser()
 
         pages = []
         for existing_page in self.existing_pages:
