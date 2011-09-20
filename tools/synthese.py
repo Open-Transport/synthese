@@ -32,7 +32,7 @@ import traceback
 log = logging.getLogger(__name__)
 
 # Increment this when the Python environment needs to be updated.
-REQUIRED_ENV_VERSION = 1
+REQUIRED_ENV_VERSION = 2
 
 SYNTHESEPY_DIR = '@SYNTHESEPY_DIR@'
 
