@@ -277,20 +277,26 @@ class CMakeBuilder(Builder):
             created_dir = self._extract(url, self.env.c.thirdparty_dir)
             self.cmake_path = join(self.env.c.thirdparty_dir, created_dir, 'bin')
         else:
+            cmake_install_path = join(self.env.c.thirdparty_dir, 'cmake')
+            cmake_src_path = join(
+                self.env.c.thirdparty_dir, 'cmake-%s' % CMAKE_VERSION)
+            self.cmake_path = join(cmake_install_path, 'bin')
+
+            if (os.path.isdir(cmake_src_path) and
+                os.path.isdir(cmake_install_path)):
+                return
+
             url = '%scmake-%s.tar.gz' % (CMAKE_URL_BASE, CMAKE_VERSION)
             self._download(url, '3c5d32cec0f4c2dc45f4c2e84f4a20c5')
             created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
             log.info('Building cmake')
-            self.cmake_path = join(self.env.c.thirdparty_dir, 'cmake', 'bin')
-
-            if os.path.isfile(join(self.cmake_path, 'cmake')):
-                return
+            utils.RemoveDirectory(cmake_install_path)
 
             cmake_src = join(self.env.c.thirdparty_dir, created_dir)
             utils.call(
                 [join(cmake_src, 'configure'),  '--prefix=' +
-                    join(self.env.c.thirdparty_dir, 'cmake')],
+                    cmake_install_path],
                 cwd=cmake_src)
             utils.call(
                 ['make', '-j%i' % self.env.c.parallel_build, 'install'],
