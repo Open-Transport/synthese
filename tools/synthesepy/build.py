@@ -259,24 +259,26 @@ class CMakeBuilder(Builder):
     def _install_cmake(self):
         self.cmake_path = None
         cmake_executable = 'cmake' + self.env.platform_exe_suffix
+        CMAKE_VERSION = '2.8.5'
         if utils.find_executable(cmake_executable):
             cmake_version = subprocess.Popen(
                 [cmake_executable, '--version'], stdout=subprocess.PIPE
             ).communicate()[0].strip()
             # TODO: allow greater versions.
-            if cmake_version.endswith(' 2.8.4'):
+            if cmake_version.endswith(' ' + CMAKE_VERSION):
                 log.info('Found system cmake')
                 return
         log.info('Installing cmake')
 
+        CMAKE_URL_BASE = 'http://www.cmake.org/files/v2.8/'
         if self.env.platform == 'win':
-            url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4-win32-x86.zip'
-            self._download(url, 'a2525342e495518101381203bf4484c4')
+            url = '%scmake-%s-win32-x86.zip' % (CMAKE_URL_BASE, CMAKE_VERSION)
+            self._download(url, 'ef536e5148aacf559735df893b40a1f4')
             created_dir = self._extract(url, self.env.c.thirdparty_dir)
             self.cmake_path = join(self.env.c.thirdparty_dir, created_dir, 'bin')
         else:
-            url = 'http://www.cmake.org/files/v2.8/cmake-2.8.4.tar.gz'
-            self._download(url, '209b7d1d04b2e00986538d74ba764fcf')
+            url = '%scmake-%s.tar.gz' % (CMAKE_URL_BASE, CMAKE_VERSION)
+            self._download(url, '3c5d32cec0f4c2dc45f4c2e84f4a20c5')
             created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
             log.info('Building cmake')
