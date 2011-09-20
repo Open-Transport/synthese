@@ -20,6 +20,7 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import collections
 import logging
 import os
 import pprint
@@ -126,12 +127,12 @@ class OSMImportTest(http_testcase.HTTPTestCase):
 
         if not os.path.isabs(file_name):
             thisdir = os.path.abspath(os.path.dirname(__file__))
-            osm_file = os.path.join(thisdir, 'test_data', 'osm', file_name)
+            file_name = os.path.join(thisdir, 'test_data', 'osm', file_name)
 
         http_api.call_service('ImportFunction', {
             'ds': self.OSM_SOURCE_ID,
             'di': '1',
-            'pa': osm_file,
+            'pa': file_name,
         })
 
         tree = DBObjectTree(self.project.db_backend, self)
@@ -140,7 +141,10 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         tree.load_objects('t015_roads', 'road_place_id', 'roads')
         tree.load_objects('t014_road_chunks', 'road_id', 'road_chunks')
 
-        log.debug("Tree from osm file %s:\n%s", file_name, pprint.pformat(tree.root))
+        # Set it to 1 while debugging. It can produce lots of output.
+        if 0:
+            log.debug("Tree from osm file %s:\n%s",
+                file_name, pprint.pformat(tree.root))
 
         if expected_root:
             tree.assertEquals(expected_root)
@@ -278,8 +282,27 @@ class OSMImportTest(http_testcase.HTTPTestCase):
 
     def test_import_sample_data(self):
         tree = self.check_import('sample_data.osm.bz2')
-        # TODO: add assertions on tree.
 
+        table_counter = collections.defaultdict(int)
+        for obj in tree.id_to_obj.itervalues():
+            table_counter[obj['_table']] += 1
+        self.assertEquals(table_counter, {
+            't006_cities': 4,
+            't060_road_places': 52,
+            't015_roads': 58,
+            't014_road_chunks': 154,
+        })
+
+    # Test import of a large dataset. It can be prepared this way:
+    # wget http://download.geofabrik.de/osm/europe/france/franche-comte.osm.bz2
+    # To install osmosis, see http://wiki.openstreetmap.org/wiki/Osmosis
+    # osmosis --read-xml franche-comte.osm.bz2 --bounding-box top=47.82512 left=6.75646 bottom=47.43333 right=7.14328 --write-xml territoire-belfort.osm.bz2
+    def OFF_test_import_territoire_belfort(self):
+        osm_file = os.environ.get(
+            'OSM_TEST_FILE', 'territoire-belfort.osm.bz2')
+
+        tree = self.check_import(osm_file)
+        # TODO: test the result.
 
 def load_tests(loader, standard_tests, pattern):
     return http_testcase.do_load_tests(globals(), loader)

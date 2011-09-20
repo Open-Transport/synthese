@@ -77,17 +77,17 @@ namespace synthese {
 				throw std::runtime_error("unable to open file");
 			}
 			std::string ext = boost::filesystem::extension(filePath);
-			ExpatParser *parser = new ExpatParser();
+			ExpatParser parser;
 			if(ext == ".bz2")
 			{
 				in.push(boost::iostreams::bzip2_decompressor());
 				in.push(file);
 				std::istream data(&in);
-				network = parser->parse(data);
+				network = parser.parse(data);
 			}
 			else
 			{
-				network = parser->parse(file);
+				network = parser.parse(file);
 			}
 
 			network->consolidate(true);
@@ -95,6 +95,7 @@ namespace synthese {
 			util::Log::GetInstance().info("finished parsing osm xml");
 
 			// TODO: use a typedef
+			// FIXME: valgrind shows a leak from here.
 			std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > waysByBoundaries =
 					network->getWalkableWaysByAdminBoundary(8);
 
@@ -159,7 +160,7 @@ namespace synthese {
 
 					// TODO: move to OSM module
 					typedef std::list<std::pair<int, NodePtr> > NodeList;
-					const NodeList *nodes = way->getNodes();
+					const NodeList* nodes = way->getNodes();
 					if(nodes->front() == nodes->back())
 					{
 						// TODO: is this ok?
@@ -175,14 +176,17 @@ namespace synthese {
 					const GeometryFactory& geometryFactory(
 						_dataSource.getActualCoordinateSystem().getGeometryFactory()
 					);
-					CoordinateSequence* cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
+					shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 					shared_ptr<Crossing> startCrossing;
 					size_t rank(0);
 					MetricOffset metricOffset(0);
 
+					int nodeCount(nodes->size());
+					int i(0);
 					BOOST_FOREACH(const NodeList::value_type& idAndNode, *nodes)
 					{
 						NodePtr node = idAndNode.second;
+						i++;
 
 						shared_ptr<Point> point(_dataSource.getActualCoordinateSystem().createPoint(
 							node->getLon(),
@@ -193,17 +197,11 @@ namespace synthese {
 
 						if(!startCrossing.get())
 						{
-							startCrossing = _getOrCreateCrossing(
-								node,
-								shared_ptr<Point>(
-									_dataSource.getActualCoordinateSystem().createPoint(
-										node->getLon(),
-										node->getLat()
-							)	)	);
+							startCrossing = _getOrCreateCrossing(node, point);
 							continue;
 						}
-						bool isLast = idAndNode == nodes->back();
 
+						bool isLast = i == nodeCount;
 						if(!node->isStop() && node->numConnectedWay() <= 1 && !isLast)
 						{
 							// Just extend the current geometry.
@@ -221,17 +219,11 @@ namespace synthese {
 
 						// FIXME: this doesn't seem to return the result in meters.
 						metricOffset += roadChunkLine->getLength();
-						startCrossing = _getOrCreateCrossing(
-							node,
-							shared_ptr<Point>(
-								_dataSource.getActualCoordinateSystem().createPoint(
-									node->getLon(),
-									node->getLat()
-						)	)	);
+						startCrossing = _getOrCreateCrossing(node, point);
 
 						if(!isLast)
 						{
-							cs = geometryFactory.getCoordinateSequenceFactory()->create(0, 2);
+							cs.reset(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 							cs->add(*point->getCoordinate());
 						}
 						++rank;
@@ -258,8 +250,8 @@ namespace synthese {
 		OSMFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	OneFileTypeImporter<OSMFileFormat>(env, dataSource),
-			Importer(env, dataSource)
+		):	Importer(env, dataSource),
+			OneFileTypeImporter<OSMFileFormat>(env, dataSource)
 		{}
 
 
@@ -267,27 +259,28 @@ namespace synthese {
 		void OSMFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
 			const admin::AdminRequest& request
-			) const	{
-				AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-				PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-				stream << t.open();
-				stream << t.title("Mode");
-				stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-				stream << t.title("Fichier");
-				stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
-				/*
-				stream << t.title("Paramètres");
-				stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
-				stream << t.cell("Calendrier", 
-					t.getForm().getSelectInput(
-					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList(),
-					optional<RegistryKeyType>(_calendarTemplate.get() ? _calendarTemplate->getKey() : RegistryKeyType(0))
-					)	);
-				*/
-				stream << t.close();
+		) const	{
+			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
+			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Mode");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Fichier");
+			stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
+			/*
+			stream << t.title("Paramètres");
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
+			stream << t.cell("Calendrier", 
+				t.getForm().getSelectInput(
+				PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
+				CalendarTemplateTableSync::GetCalendarTemplatesList(),
+				optional<RegistryKeyType>(_calendarTemplate.get() ? _calendarTemplate->getKey() : RegistryKeyType(0))
+				)	);
+			*/
+			stream << t.close();
 		}
+
 
 
 		util::ParametersMap OSMFileFormat::Importer_::_getParametersMap() const
@@ -363,7 +356,7 @@ namespace synthese {
 				_recentlyCreatedRoadPlaces[roadName] = roadPlace;
 			}
 			return roadPlace;
-		};
+		}
 
 
 
@@ -415,6 +408,6 @@ namespace synthese {
 
 			road->addRoadChunk(*roadChunk);
 			_env.getEditableRegistry<MainRoadChunk>().add(roadChunk);
-		};
+		}
 	}
 }
