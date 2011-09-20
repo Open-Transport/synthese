@@ -123,11 +123,6 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                 self.project.db_backend.query('delete from %s' % table)
 
     def check_import(self, file_name, expected_root=None):
-        # TODO: uncomment once it works with MySQL
-        if self.backend.name == 'mysql':
-            log.warn('OSM road import not yet working with MySQL')
-            return
-
         if not self.no_init and not self.project.daemon.is_running():
             log.info('Starting daemon...')
             self.project.rundaemon(False)
@@ -191,6 +186,11 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         return steps
 
     def test_import_one_way(self):
+        # TODO: uncomment once it works with MySQL
+        if self.backend.name == 'mysql':
+            log.warn('OSM road import not yet working with MySQL')
+            return
+
         self.check_import(
             'one_way.osm',
             {'children': [{'_road_places': [{'_table': 't060_road_places',
@@ -226,6 +226,11 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         )
 
     def test_import_three_connected_ways(self):
+        # TODO: uncomment once it works with MySQL
+        if self.backend.name == 'mysql':
+            log.warn('OSM road import not yet working with MySQL')
+            return
+
         self.check_import(
             'three_connected_ways.osm',
             {'children': [{'_road_places': [{'_table': 't060_road_places',
