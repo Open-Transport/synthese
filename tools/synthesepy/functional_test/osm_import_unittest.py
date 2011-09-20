@@ -1,3 +1,4 @@
+#    -*- coding: utf-8 -*-
 #    OSM import unit tests.
 #    @file osm_import_unittest.py
 #    @author Sylvain Pasche
@@ -30,6 +31,7 @@ if sys.version_info >= (2, 7):
     import unittest
 else:
     import unittest2 as unittest
+from BeautifulSoup import BeautifulSoup
 import mechanize
 
 # Use absolute imports, otherwise the module is loaded twice and global
@@ -104,13 +106,21 @@ class OSMImportTest(http_testcase.HTTPTestCase):
     @classmethod
     def init_project(cls, project):
         # TODO: use INSERT INTO with column names.
-        # XXX const
         project.db_backend.query("insert into t059_data_sources values(?,'osm','OpenStreetMap','','',4326);", [cls.OSM_SOURCE_ID])
 
         # TODO: Create a dedicated test for Navstreets.
         # TODO: what encoding to use?
         # TODO: use INSERT INTO with column names.
         project.db_backend.query("insert into t059_data_sources values(16607027920896003,'Navstreets','Navstreets','','CP1252',27572);")
+
+    def tearDown(self):
+        # TODO: this should be handled by an import flag instead of cleaning
+        # the db manually and restarting the daemon.
+        if not self.no_init:
+            self.project.stopdaemon()
+
+            for table in ('t006_cities', 't060_road_places', 't015_roads', 't014_road_chunks'):
+                self.project.db_backend.query('delete from %s' % table)
 
     def check_import(self, file_name, expected_root=None):
         # TODO: uncomment once it works with MySQL
@@ -119,7 +129,6 @@ class OSMImportTest(http_testcase.HTTPTestCase):
             return
 
         if not self.no_init and not self.project.daemon.is_running():
-            #self.project.stopdaemon()
             log.info('Starting daemon...')
             self.project.rundaemon(False)
 
@@ -149,15 +158,37 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         if expected_root:
             tree.assertEquals(expected_root)
 
-        # TODO: this should be handled by an import flag instead of cleaning
-        # the db manually and restarting the daemon.
-        if not self.no_init:
-            self.project.stopdaemon()
-
-            for table in ('t006_cities', 't060_road_places', 't015_roads', 't014_road_chunks'):
-                self.project.db_backend.query('delete from %s' % table)
-
         return tree
+
+    def _get_road_journey(self, start_city, start_place, end_city, end_place):
+        http_api = self.get_http_api()
+        br = http_api.get_admin_browser()
+        br.open(http_api.get_admin_url('RoadJourneyPlannerAdmin', {
+            'sc': start_city,
+            'sp': start_place,
+            'ec': end_city,
+            'ep': end_place,
+        }))
+
+        html = br.response().read()
+        soup = BeautifulSoup(html)
+
+        journey_table = soup.find('table', 'adminresults')
+        if not journey_table:
+            log.debug('No journey result found')
+            return []
+        steps = []
+        for row in journey_table.findAll('tr')[1:]:
+            row_content = row.contents
+            place_name = row_content[0].string
+            dist = float(row_content[1].string[:1])
+            total_dist = float(row_content[2].string[:1])
+            # time is ignored for now.
+            time = row_content[3].b.string if row_content[3].b else None
+            steps.append([place_name, dist, total_dist])
+
+        log.debug('Journey steps:\n%s', pprint.pformat(steps))
+        return steps
 
     def test_import_one_way(self):
         self.check_import(
@@ -280,6 +311,20 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                'name': u'City0'}]}
         )
 
+        self.assertEquals(
+            self._get_road_journey('City0', 'Road0', 'City0', 'Road1'),
+            []
+        )
+
+        self.assertEquals(
+            self._get_road_journey('City0', 'Road0', 'City0', 'Road2'),
+            [
+                [u'City0 Road0', 0.0, 0.0],
+                [u'Road1', 0.0, 0.0],
+                [u'City0 Road2', 0.0, 0.0]
+            ]
+        )
+
     def test_import_sample_data(self):
         # TODO: uncomment once it works with MySQL
         if self.backend.name == 'mysql':
@@ -297,6 +342,20 @@ class OSMImportTest(http_testcase.HTTPTestCase):
             't015_roads': 58,
             't014_road_chunks': 154,
         })
+
+        self.assertEquals(
+            self._get_road_journey(
+                'Courtelevant', 'Rue des Chènevières',
+                'Courtelevant', 'Impasse de la Chapperette'
+            ),
+            [   
+                [u'Courtelevant Rue des Ch\xe8nevi\xe8res', 0.0, 0.0],
+                [u'Rue des Grandes Gasses', 0.0, 0.0],
+                [u"Rue de l'Eglise", 0.0, 0.0],
+                [u'Rue de la Chapperette', 0.0, 0.0],
+                [u'Courtelevant Impasse de la Chapperette', 0.0, 0.0]
+            ]
+        )
 
     # Test import of a large dataset. It can be prepared this way:
     # wget http://download.geofabrik.de/osm/europe/france/franche-comte.osm.bz2
