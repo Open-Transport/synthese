@@ -66,8 +66,7 @@ class HTTPApi(object):
     def reset_browser(self):
         self.browser = None
 
-    # XXX make logged_in=True default?
-    def get_admin_browser(self, logged_in=False):
+    def get_admin_browser(self, logged_in=True):
         if logged_in:
             self._get_sid()
 
@@ -90,7 +89,7 @@ class HTTPApi(object):
         if self.sid:
             return self.sid
 
-        br = self.get_admin_browser()
+        br = self.get_admin_browser(logged_in=False)
         br.select_form(name='login')
 
         br['actionParamlogin'] = self.username
