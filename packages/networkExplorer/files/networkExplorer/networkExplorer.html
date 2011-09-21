@@ -43,48 +43,37 @@
 <body>
 
 <div id="form_map">
-    <script id="optionLinesTemplate" type="text/x-jquery-tmpl">
-    <li class="${color_switch}">
-        <div class="number_line_selector" style="background-color: ${color}; color: ${color_text}">
-            ${line_short_name}
-        </div>
-        <p class="name_line_selector">${name}</p>
-        <div name="id_line_filter_area" style="display: none" data-lineid="${id}"></div>
-    </li>
-    </script>
     <div id="search_area">
         <div class="form_search_area_logo"></div>
         <div class="form_search_area" name="stop">
             <div class="title_form_search_area">Rechercher un arret</div>
-            <input searchdata=true name="name_stop_city" type="text" value="Commune" />
-            <input searchdata=true name="name_stop" type="text" value="Nom" />
+            <input name="name_stop_city" type="text" value="Commune" />
+            <input toBeDisplayed="true" searchtype="name" name="name_stop" type="text" value="Nom" />
             <input type="button" value="Chercher" />
         </div>
         
         <div class="form_search_area" name="city">
             <div class="title_form_search_area">Rechercher une commune</div>
-            <input searchdata=true name="name_city" type="text" value="Commune" />
+            <input toBeDisplayed="true" searchtype="name" name="name_city" type="text" value="Commune" />
             <input type="button" value="Chercher" />
         </div>
         
-        <div class="form_search_area" name="adress">
+        <div class="form_search_area" name="adress" noDataSearch="true">
             <div class="title_form_search_area">Rechercher une adresse</div>
-            <input searchdata=true name="name_adress_city" value="Commune"/>
-            <input searchdata=true name="name_adress" type="text" value="Adresse" disabled="true"/>
-            <input name="name_adress_x" type="hidden" value="" />
-            <input name="name_adress_y" type="hidden" value="" />
+            <input name="name_adress_city" value="Commune"/>
+            <input toBeDisplayed="true" name="name_adress" type="text" value="Adresse" disabled="true"/>
+            <input searchtype="x" name="name_adress_x" type="hidden" value="" />
+            <input searchtype="y" name="name_adress_y" type="hidden" value="" />
             <input type="button" value="Chercher" />
         </div>
         
-        <div class="form_search_area" name="line">
+        <div class="form_search_area" name="line" noDataSearch="true">
             <div class="title_form_search_area">Rechercher une ligne</div>
             <!-- Line selection area -->
             <div class="dropdown">
-                <dt><a href="#"><span searchdata=true>Lignes</span></a></dt>
+                <dt><a toBeDisplayed="true"><span>Lignes</span><input type="hidden" searchtype="id" value="" /></a></dt>
                 <dd>
-                    <ul name="name_line">
-                        
-                    </ul>
+                    <ul name="name_line"></ul>
                 </dd>
             </div>
             <input type="button" value="Chercher" />
@@ -98,14 +87,6 @@
         </div>
         
     </div>
-    <script id="linesTemplate" type="text/x-jquery-tmpl">
-    <div class="line_filter_area">
-            <div style="display: none">${line_id}</div>
-            <div class="number_line_filter_area" style="background-color: ${color}; color: ${color_text}">${line_short_name}</div>
-            ${lineName}
-            <input isCheckLine="true" checked type=checkbox data-lineid="${id}">
-    </div>
-    </script>
     <div id="filter_area">
         <div id="title_filter_area">Filtre <input type=checkbox class="checkUncheck"></div>
         <div id="content_line_filter_area"></div>
