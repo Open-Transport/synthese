@@ -62,7 +62,6 @@ namespace synthese
 
 	namespace pt
 	{
-		// const string RollingStocksAdmin::PARAM_SEARCH_XXX("xx");
 
 
 
@@ -75,13 +74,6 @@ namespace synthese
 		void RollingStocksAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			/// @todo Initialize internal attributes from the map
-			// 	string a = map.get<string>(PARAM_SEARCH_XXX);
-			// 	string b = map.getDefault<string>(PARAM_SEARCH_XXX);
-			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
-
-			// Search table initialization
-			// _requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_XXX, 30);
 		}
 
 
@@ -89,11 +81,6 @@ namespace synthese
 		ParametersMap RollingStocksAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			// ParametersMap m(_requestParameters.getParametersMap());
-
-			// if(_searchXxx)
-			//	m.insert(PARAM_SEARCH_XXX, *_searchXxx);
-
 			return m;
 		}
 
