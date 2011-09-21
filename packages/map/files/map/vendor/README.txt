@@ -1,7 +1,7 @@
 OpenLayers:
   Version: 2.11-rc1
-  http://openlayers.org/download/OpenLayers-2.11-rc1.zip
-  
+  http://openlayers.org/download/OpenLayers-2.11.zip
+
   Removed unneeded files:
   cd OpenLayers
   rm -rf apidoc_config art build doc doc_config examples license.txt readme.txt release-license.txt repository-license.txt tests tools
@@ -11,9 +11,9 @@ OpenLayers:
   rm -rf lib_tmp
 
   # To develop OpenLayers, you may want to get the sources (not committed for size).
-  wget http://openlayers.org/download/OpenLayers-2.11-rc1.zip
-  unzip OpenLayers-2.11-rc1.zip
-  mv OpenLayers-2.11-rc1 OpenLayers_full
+  wget http://openlayers.org/download/OpenLayers-2.11.zip
+  unzip OpenLayers-2.11.zip
+  mv OpenLayers-2.11 OpenLayers_full
 
 OpenLayers_maptypepanel:
   The following files were retrieved From the maptypepanel camptocamp OpenLayers sandbox:
