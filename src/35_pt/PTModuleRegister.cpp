@@ -225,7 +225,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationUpdateAction::integrate();
 	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
-    synthese::pt::RollingStockUpdateAction::integrate();
+	synthese::pt::RollingStockUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();

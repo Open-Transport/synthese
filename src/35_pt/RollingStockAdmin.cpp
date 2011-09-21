@@ -79,7 +79,6 @@ namespace synthese
 			{
 				throw AdminParametersException("No such rolling stock");
 			}
-
 		}
 
 
