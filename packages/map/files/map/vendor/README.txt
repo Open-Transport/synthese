@@ -1,5 +1,5 @@
 OpenLayers:
-  Version: 2.11-rc1
+  Version: 2.11
   http://openlayers.org/download/OpenLayers-2.11.zip
 
   Removed unneeded files:
