@@ -89,16 +89,12 @@ namespace synthese
 		void RollingStockUpdateAction::run(
 			Request& request
 		){
-//			stringstream text;
-//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			if(_name)
 			{
 				_rollingStock->setName(*_name);
 			}
 
 			RollingStockTableSync::Save(_rollingStock.get());
-
-//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 
 			if(request.getActionWillCreateObject())
 			{

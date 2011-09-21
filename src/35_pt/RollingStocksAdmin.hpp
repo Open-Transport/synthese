@@ -40,18 +40,6 @@ namespace synthese
 		class RollingStocksAdmin:
 			public admin::AdminInterfaceElementTemplate<RollingStocksAdmin>
 		{
-		public:
-			/// @name Parameter identifiers
-			//@{
-			// static const std::string PARAM_SEARCH_;
-			//@}
-
-		private:
-			/// @name Search parameters
-			//@{
-			// boost::optional<std::string>				_searchXxx;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
-			//@}
 
 
 		public:
