@@ -43,7 +43,7 @@ namespace synthese
 	{
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Projects a point to the nearest edge(s).
+		/// Projects a point to the nearest edge(s). T should be pointer or shared pointer
 		/// @author Thomas Bonfort, Hugues Romain
 		/// @date 2010
 		/// @since 3.2.0
@@ -53,7 +53,7 @@ namespace synthese
 		public:
 			typedef boost::tuple<
 				geos::geom::Coordinate, //! coordinates of the projection of the point on the line
-				boost::shared_ptr<T>, //!corresponding road
+				T, //!corresponding road
 				double //! metric offset of the projected point
 			> PathNearby;
 
@@ -62,7 +62,7 @@ namespace synthese
 				PathNearby
 			> PathsNearby;
 
-			typedef std::vector<boost::shared_ptr<T> > From;
+			typedef std::vector<T> From;
 
 			class NotFoundException:
 			   public synthese::Exception
@@ -132,10 +132,10 @@ namespace synthese
 			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
 			boost::shared_ptr<geos::geom::LineString> bestEdgeGeom;
-			boost::shared_ptr<T> bestEdge;
+			T bestEdge;
 			double bestDistance;
 
-			BOOST_FOREACH(boost::shared_ptr<T> edge, _from)
+			BOOST_FOREACH(T edge, _from)
 			{
 				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getRealGeometry();
 				if(!edgeGeom.get() || edgeGeom->isEmpty())
