@@ -216,7 +216,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'left_end_house_number': u'',
                                                              'left_house_numbering_policy': 65,
                                                              'left_start_house_number': u'',
-                                                             'metric_offset': 0.03097552483052788,
+                                                             'metric_offset': 3181.6999999999998,
                                                              'rank_in_path': 1,
                                                              'right_end_house_number': u'',
                                                              'right_house_numbering_policy': 65,
