@@ -22,9 +22,11 @@
 
 #include "House.hpp"
 #include "Road.h"
+#include "Path.h"
 #include "RoadPlace.h"
 
 #include <boost/lexical_cast.hpp>
+#include "EdgeProjector.hpp"
 
 using namespace boost;
 using namespace std;
@@ -32,10 +34,13 @@ using namespace std;
 namespace synthese
 {
 	using namespace geography;
+	using namespace graph;
+	using namespace algorithm;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<NamedPlace,road::House>::FACTORY_KEY("House");
+		template<> const string Registry<road::House>::KEY("House");
 	}
 
 	namespace road
@@ -61,16 +66,42 @@ namespace synthese
 
 
 
-		House::House():
-		Registrable(0)
+		House::House(
+			util::RegistryKeyType key
+		):
+			Registrable(key)
 		{
 
 		}
 
 
+
 		boost::shared_ptr<geos::geom::Point> House::getPoint() const
 		{
 			return this->getGeometry();
+		}
+
+
+
+		void House::setRoadChunkFromRoadPlace(boost::shared_ptr<RoadPlace> roadPlace)
+		{
+			// ToDo : Chercher le RoadChunk le plus proche de la géométrie de l'objet House
+			std::vector<MainRoadChunk*> roads;
+			std::set<Path*> paths(roadPlace->getPaths());
+
+			BOOST_FOREACH(Path* path,paths)
+			{
+				std::vector<Edge*> edges(path->getEdges());
+				BOOST_FOREACH(Edge* edge,edges)
+				{
+					roads.push_back(dynamic_cast<MainRoadChunk*>(edge));
+				}
+			}
+
+			EdgeProjector<MainRoadChunk*> projector(roads, 100);
+
+			EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
+			this->setRoadChunk(projection.get<1>());
 		}
 
 
