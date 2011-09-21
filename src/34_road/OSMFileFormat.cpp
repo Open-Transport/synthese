@@ -173,9 +173,7 @@ namespace synthese {
 						continue;
 					}
 
-					const GeometryFactory& geometryFactory(
-						_dataSource.getActualCoordinateSystem().getGeometryFactory()
-					);
+					const GeometryFactory& geometryFactory(CoordinatesSystem::GetDefaultGeometryFactory());
 					shared_ptr<CoordinateSequence> cs(geometryFactory.getCoordinateSequenceFactory()->create(0, 2));
 					shared_ptr<Crossing> startCrossing;
 					size_t rank(0);
@@ -188,10 +186,11 @@ namespace synthese {
 						NodePtr node = idAndNode.second;
 						i++;
 
-						shared_ptr<Point> point(_dataSource.getActualCoordinateSystem().createPoint(
-							node->getLon(),
-							node->getLat()
-						));
+						shared_ptr<Point> point(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+							*_dataSource.getActualCoordinateSystem().createPoint(
+								node->getLon(),
+								node->getLat()
+						)	)	);
 
 						cs->add(*point->getCoordinate());
 
@@ -217,7 +216,6 @@ namespace synthese {
 
 						// TODO: set {right,left}HouseNumbering{Policy,Bounds}
 
-						// FIXME: this doesn't seem to return the result in meters.
 						metricOffset += roadChunkLine->getLength();
 						startCrossing = _getOrCreateCrossing(node, point);
 
