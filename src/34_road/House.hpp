@@ -25,6 +25,8 @@
 
 #include "Address.h"
 #include "NamedPlaceTemplate.h"
+#include "RoadPlace.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -43,10 +45,12 @@ namespace synthese
 		/// @date 2010
 		class House:
 			public Address,
-			public geography::NamedPlaceTemplate<House>
+			public geography::NamedPlaceTemplate<House>,
+			public virtual util::Registrable,
+			public impex::Importable
 		{
 		public:
-			House();
+			typedef util::Registry<House>	Registry;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor from parameter values.
@@ -66,6 +70,16 @@ namespace synthese
 				std::string separator = std::string(" ")
 			);
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// @param key identifier (default=0)
+			/// @param geometry (default unknown) will not be cloned !
+			/// @param codeBySource code of the crossing in the data source (default empty)
+			/// @param source data source (default NULL)
+			House(
+				util::RegistryKeyType key = 0
+			);
 
 			//! @name Services
 			//@{
@@ -93,6 +107,10 @@ namespace synthese
 				/// Gets the point representing the place.
 				/// @return the point of the address
 				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+
+
+
+				virtual void setRoadChunkFromRoadPlace(boost::shared_ptr<RoadPlace> roadPlace);
 
 
 

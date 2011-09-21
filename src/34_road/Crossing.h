@@ -68,7 +68,6 @@ namespace synthese
 			/// Constructor.
 			/// @param key identifier (default=0)
 			/// @param geometry (default unknown) will not be cloned !
-			/// @param lat latitude (default unknown)
 			/// @param codeBySource code of the crossing in the data source (default empty)
 			/// @param source data source (default NULL)
 			Crossing(

@@ -9,6 +9,10 @@ CrossingTableSync.cpp
 CrossingTableSync.hpp
 House.cpp
 House.hpp
+HouseTableSync.cpp
+HouseTableSync.hpp
+IGNstreetsFileFormat.cpp
+IGNstreetsFileFormat.hpp
 MainRoadChunk.cpp
 MainRoadChunk.hpp
 MainRoadPart.cpp
