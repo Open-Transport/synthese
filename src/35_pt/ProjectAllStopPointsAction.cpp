@@ -101,7 +101,7 @@ namespace synthese
 				if(stopPoint->hasGeometry())
 				{
 
-					EdgeProjector<MainRoadChunk>::From paths(
+					EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
 						RoadChunkTableSync::SearchByMaxDistance(
 							*stopPoint->getGeometry(), _maxDistance,
 							Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL
@@ -110,11 +110,11 @@ namespace synthese
 					if(!paths.empty())
 					{
 
-						EdgeProjector<MainRoadChunk> projector(paths, _maxDistance);
+						EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, _maxDistance);
 
 						try
 						{
-							EdgeProjector<MainRoadChunk>::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
+							EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
 
 							Address projectedAddress(
 								*projection.get<1>(),
@@ -122,7 +122,7 @@ namespace synthese
 							);
 							stopPoint->setProjectedPoint(projectedAddress);
 						}
-						catch(EdgeProjector<MainRoadChunk>::NotFoundException)
+						catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
 						{
 						}
 					}
