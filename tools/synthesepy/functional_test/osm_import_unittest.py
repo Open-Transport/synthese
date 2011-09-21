@@ -176,11 +176,13 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         for row in journey_table.findAll('tr')[1:]:
             row_content = row.contents
             place_name = row_content[0].string
-            dist = float(row_content[1].string[:1])
-            total_dist = float(row_content[2].string[:1])
-            # time is ignored for now.
+            def get_dist(elem):
+                assert elem.string.endswith('m')
+                return int(elem.string[:-1])
+            dist = get_dist(row_content[1])
+            total_dist = get_dist(row_content[2])
             time = row_content[3].b.string if row_content[3].b else None
-            steps.append([place_name, dist, total_dist])
+            steps.append([place_name, dist])
 
         log.debug('Journey steps:\n%s', pprint.pformat(steps))
         return steps
@@ -253,7 +255,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'left_end_house_number': u'',
                                                              'left_house_numbering_policy': 65,
                                                              'left_start_house_number': u'',
-                                                             'metric_offset': 0.018401903943101566,
+                                                             'metric_offset': 1582.9846300340071,
                                                              'rank_in_path': 1,
                                                              'right_end_house_number': u'',
                                                              'right_house_numbering_policy': 65,
@@ -279,7 +281,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'left_end_house_number': u'',
                                                              'left_house_numbering_policy': 65,
                                                              'left_start_house_number': u'',
-                                                             'metric_offset': 0.023020921485443407,
+                                                             'metric_offset': 2060.4141143796446,
                                                              'rank_in_path': 1,
                                                              'right_end_house_number': u'',
                                                              'right_house_numbering_policy': 65,
@@ -305,7 +307,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                                                              'left_end_house_number': u'',
                                                              'left_house_numbering_policy': 65,
                                                              'left_start_house_number': u'',
-                                                             'metric_offset': 0.02114415590308303,
+                                                             'metric_offset': 1885.1549841416399,
                                                              'rank_in_path': 1,
                                                              'right_end_house_number': u'',
                                                              'right_house_numbering_policy': 65,
@@ -324,9 +326,9 @@ class OSMImportTest(http_testcase.HTTPTestCase):
         self.assertEquals(
             self._get_road_journey('City0', 'Road0', 'City0', 'Road2'),
             [
-                [u'City0 Road0', 0.0, 0.0],
-                [u'Road1', 0.0, 0.0],
-                [u'City0 Road2', 0.0, 0.0]
+                [u'City0 Road0', 0],
+                [u'Road1', 2060],
+                [u'City0 Road2', 0]
             ]
         )
 
@@ -354,11 +356,11 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                 'Courtelevant', 'Impasse de la Chapperette'
             ),
             [   
-                [u'Courtelevant Rue des Ch\xe8nevi\xe8res', 0.0, 0.0],
-                [u'Rue des Grandes Gasses', 0.0, 0.0],
-                [u"Rue de l'Eglise", 0.0, 0.0],
-                [u'Rue de la Chapperette', 0.0, 0.0],
-                [u'Courtelevant Impasse de la Chapperette', 0.0, 0.0]
+                [u'Courtelevant Rue des Ch\xe8nevi\xe8res', 0],
+                [u'Rue des Grandes Gasses', 32],
+                [u'Rue de la Vendeline', 98],
+                [u'Rue de la Chapperette', 469],
+                [u'Courtelevant Impasse de la Chapperette', 0],
             ]
         )
 
@@ -371,7 +373,22 @@ class OSMImportTest(http_testcase.HTTPTestCase):
             'OSM_TEST_FILE', 'territoire-belfort.osm.bz2')
 
         tree = self.check_import(osm_file)
-        # TODO: test the result.
+
+        self.assertEquals(
+            self._get_road_journey(
+                'CourBelforttelevant', 'Rue Moppert',
+                'Belfort', 'Rue de Colmar'
+            ),
+            [] # TODO
+        )
+        self.assertEquals(
+            self._get_road_journey(
+                'Belfort', 'Place d\'Armes',
+                'Belfort', 'Rue Roy'
+            ),
+            [] # TODO
+        )
+
 
 def load_tests(loader, standard_tests, pattern):
     return http_testcase.do_load_tests(globals(), loader)
