@@ -71,6 +71,7 @@ namespace synthese
 		{}
 
 
+
 		ParametersMap ScheduleRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;

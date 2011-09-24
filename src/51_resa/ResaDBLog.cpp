@@ -1,5 +1,3 @@
-
-
 /** ResaDBLog class implementation.
 	@file ResaDBLog.cpp
 
@@ -40,6 +38,7 @@
 #include "ResaEditLogEntryAdmin.h"
 #include "CancelReservationAction.h"
 #include "ResaCustomerAdmin.h"
+#include "Language.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -295,7 +294,11 @@ namespace synthese
 				case ResaDBLog::RESERVATION_ENTRY:
 					if(tr.get())
 					{
-						ResaModule::DisplayReservations(stream, *tr);
+						ResaModule::DisplayReservations(
+							stream,
+							*tr,
+							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : Language::GetLanguageFromIso639_1Code("fr")
+						);
 						stream << "<br />Statut actuel de la réservation : " << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), tr->getFullStatusText()) << " " << tr->getFullStatusText();
 					}
 
@@ -306,7 +309,11 @@ namespace synthese
 				case ResaDBLog::NO_SHOW_ENTRY:
 					if(tr.get())
 					{
-						ResaModule::DisplayReservations(stream, *tr);
+						ResaModule::DisplayReservations(
+							stream,
+							*tr,
+							searchRequest.getUser()->getLanguage() ? *searchRequest.getUser()->getLanguage() : Language::GetLanguageFromIso639_1Code("fr")
+						);
 					}
 					break;
 
