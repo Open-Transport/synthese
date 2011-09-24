@@ -2448,7 +2448,7 @@ namespace synthese
 							bikeFilter,
 							__Couleur,
 							it+1 == services.end(),
-							it == services.end()
+							it == services.begin()
 						);
 
 						__Couleur = !__Couleur;
@@ -2505,7 +2505,7 @@ namespace synthese
 							road,
 							distance,
 							it+1 == services.end(),
-							it == services.end()
+							it == services.begin()
 						);
 
 						distance = 0;
