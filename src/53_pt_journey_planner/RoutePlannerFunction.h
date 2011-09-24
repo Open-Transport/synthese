@@ -509,6 +509,7 @@ namespace synthese
 			) const;
 
 
+
 			/** Display of stop cell.
 				See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-stop
 				@param stream Stream to write on
@@ -537,6 +538,7 @@ namespace synthese
 			);
 
 
+
 			/** Display of junction cell.
 				See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
 				@param stream Stream to display on
@@ -552,6 +554,7 @@ namespace synthese
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
+				const graph::ServicePointer& serviceUse,
 				const graph::Vertex& vertex,
 				bool color,
 				const road::Road* road,
@@ -584,7 +587,6 @@ namespace synthese
 			);
 
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_RoutePlannerFunction_H__
