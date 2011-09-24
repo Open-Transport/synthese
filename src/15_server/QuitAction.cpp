@@ -62,8 +62,8 @@ namespace synthese
 		void QuitAction::run(
 			Request& request
 		){
-			ServerModule::KillAllThreads();
 			SecurityLog::AddQuitEntry(*request.getUser());
+			ServerModule::KillAllThreads();
 		}
 
 
