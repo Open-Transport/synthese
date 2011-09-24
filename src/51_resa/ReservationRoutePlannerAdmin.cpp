@@ -57,6 +57,7 @@
 #include "RoadPlace.h"
 #include "User.h"
 #include "UserTableSync.h"
+#include "Language.hpp"
 
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -228,13 +229,23 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 
+			const Language& language(
+				_request.getUser()->getLanguage() ?
+				*_request.getUser()->getLanguage() :
+				Language::GetLanguageFromIso639_1Code("fr")
+			);
+
 			vector<pair<optional<string>, string> > dates;
 			vector<pair<optional<string>, string> > hours;
 			{
 				date date(day_clock::local_day());
 				for(size_t i=0; i<14; ++i)
 				{
-					dates.push_back(make_pair(to_iso_extended_string(date), lexical_cast<string>(date.day_of_week()) +" "+ to_simple_string(date)));
+					dates.push_back(
+						make_pair(
+							to_iso_extended_string(date),
+							language.getWeekDayName(date.day_of_week()) +" "+ to_simple_string(date)
+						)	);
 					date += days(1);
 				}
 				for(size_t i=0; i<24; ++i)
@@ -263,7 +274,7 @@ namespace synthese
 			{
 				stream << "<h1>Réservation confirmée</h1>";
 
-				ResaModule::DisplayReservations(stream, *_confirmedTransaction);
+				ResaModule::DisplayReservations(stream, *_confirmedTransaction, language);
 			}
 
 			// Search form
@@ -427,7 +438,7 @@ namespace synthese
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().begin());
 				date = it->getFirstArrivalTime();
-				date -= days(1);
+				date -= minutes(1);
 				searchRequest.getPage()->_dateTime = date;
 				searchRequest.getPage()->_planningOrder = ARRIVAL_FIRST;
 
@@ -450,7 +461,7 @@ namespace synthese
 			{
 				PTRoutePlannerResult::Journeys::const_iterator it(jv.getJourneys().end() - 1);
 				date = it->getFirstDepartureTime();
-				date += days(1);
+				date += minutes(1);
 				searchRequest.getPage()->_dateTime = date;
 				stream << HTMLModule::getLinkButton(searchRequest.getURL(), "Solutions suivantes", string(), "resultset_next.png") << " ";
 

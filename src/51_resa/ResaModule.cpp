@@ -50,6 +50,7 @@
 #include "OnlineReservationRuleTableSync.h"
 #include "TransportWebsite.h"
 #include "TransportWebsiteTableSync.h"
+#include "Language.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -164,7 +165,8 @@ namespace synthese
 	{
 		void ResaModule::DisplayReservations(
 			std::ostream& stream,
-			const ReservationTransaction& tr
+			const ReservationTransaction& tr,
+			const Language& language
 		){
 			stream << tr.getSeats() << " place" << ((tr.getSeats() > 1) ? "s" : "") << " au nom de " << tr.getCustomerName() << " (" << tr.getCustomerPhone() << ") sur :";
 			stream << "<ul>";
@@ -187,11 +189,11 @@ namespace synthese
 					stream << HTMLModule::getHTMLImage("resa_compulsory.png", "Place réservée sur ce tronçon");
 				}
 				stream << " de " << (*itrs)->getDeparturePlaceName();
-				stream << " le " << (*itrs)->getDepartureTime().date().day_of_week() << " " << (*itrs)->getDepartureTime();
+				stream << " le " << language.getWeekDayName((*itrs)->getDepartureTime().date().day_of_week()) << " " << (*itrs)->getDepartureTime();
 				stream << " jusqu'à " << (*itrs)->getArrivalPlaceName();
 				if(!(*itrs)->getArrivalTime().is_not_a_date_time())
 				{
-					stream << " le " << (*itrs)->getArrivalTime().date().day_of_week() << " " << (*itrs)->getArrivalTime();
+					stream << " le " << language.getWeekDayName((*itrs)->getArrivalTime().date().day_of_week()) << " " << (*itrs)->getArrivalTime();
 				}
 				stream << "</li>";
 			}
