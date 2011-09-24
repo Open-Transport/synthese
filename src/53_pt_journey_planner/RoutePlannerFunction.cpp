@@ -2612,7 +2612,7 @@ namespace synthese
 			}
 
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
-			pm.insert(DATA_IS_LAST_LEG, isFirstLeg);
+			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
 
 			page->display(stream, request, pm);
 		}
