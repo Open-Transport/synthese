@@ -1769,11 +1769,6 @@ namespace synthese
 								if(itl == jl.begin())
 								{
 									placeToSearch = dynamic_cast<const NamedPlace*>(object.getDeparturePlace());
-									if(!placeToSearch)
-									{	// Case of crossing with city as departure place
-										// Todo see how the right place can be found
-										placeToSearch = placesList.begin()->place;
-									}
 								}
 								else
 								{ // Use of the last arrival place
@@ -1783,6 +1778,11 @@ namespace synthese
 							else // Use of the PT departure place
 							{
 								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub());
+							}
+							if(!placeToSearch)
+							{	// Case of crossing with city as departure place
+								// Todo see how the right place can be found
+								placeToSearch = placesList.begin()->place;
 							}
 							assert(placeToSearch);
 
@@ -1822,11 +1822,6 @@ namespace synthese
 								if(itl+1 == jl.end())
 								{
 									placeToSearch = dynamic_cast<const NamedPlace*>(object.getArrivalPlace());
-									if(!placeToSearch)
-									{	// Case of crossing with city as arrival place
-										// Todo see how the right place can be found
-										placeToSearch = placesList.rbegin()->place;
-									}
 								}
 								else
 								{ // Use of the next departure place
@@ -1836,6 +1831,11 @@ namespace synthese
 							else // Use of the PT arrival place
 							{
 								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub());
+							}
+							if(!placeToSearch)
+							{	// Case of crossing with city as arrival place
+								// Todo see how the right place can be found
+								placeToSearch = placesList.rbegin()->place;
 							}
 							assert(placeToSearch);
 
@@ -1949,7 +1949,7 @@ namespace synthese
 						*object.getArrivalPlace(),
 						hFilter,
 						bFilter,
-						it+1 != object.getJourneys().end()
+						it+1 == object.getJourneys().end()
 					);
 				}
 
@@ -2257,7 +2257,14 @@ namespace synthese
 			// Departure place
 			if(dynamic_cast<const Crossing*>(journey.getOrigin()->getHub()))
 			{
-				pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(departurePlace).getFullName());
+				if(dynamic_cast<const NamedPlace*>(&departurePlace))
+				{
+					pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(departurePlace).getFullName());
+				}
+				else
+				{
+					pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const City&>(departurePlace).getName());
+				}
 			}
 			else
 			{
@@ -2286,7 +2293,14 @@ namespace synthese
 			// Arrival place
 			if(dynamic_cast<const Crossing*>(journey.getDestination()->getHub()))
 			{
-				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(arrivalPlace).getFullName());
+				if(dynamic_cast<const NamedPlace*>(&arrivalPlace))
+				{
+					pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(arrivalPlace).getFullName());
+				}
+				else
+				{
+					pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const City&>(arrivalPlace).getName());
+				}
 			}
 			else
 			{
@@ -2483,6 +2497,7 @@ namespace synthese
 							content,
 							junctionPage,
 							request,
+							leg,
 							*leg.getArrivalEdge()->getFromVertex(),
 							__Couleur,
 							road,
@@ -2608,6 +2623,7 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
+			const graph::ServicePointer& serviceUse,
 			const graph::Vertex& vertex,
 			bool color,
 			const road::Road* road,
@@ -2633,6 +2649,21 @@ namespace synthese
 				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
 			}
 			pm.insert(DATA_LENGTH, distance);
+
+			shared_ptr<LineString> geometry(serviceUse.getGeometry());
+			if(geometry.get())
+			{
+				shared_ptr<Geometry> geometry4326(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+						*static_cast<Geometry*>(geometry.get())
+				)	);
+
+				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
+				if(geometry4326.get() && !geometry4326->isEmpty())
+				{
+					pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+				}
+			}
 
 			page->display(stream, request, pm);
 		}
