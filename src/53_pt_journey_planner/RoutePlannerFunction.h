@@ -544,23 +544,23 @@ namespace synthese
 				@param stream Stream to display on
 				@param page page to use to display
 				@param request current request
-				@param vertex Reached vertex
 				@param alarm Alarm to display for the road use
 				@param color Odd or even row in the journey board
-				@param road Used road
 				@param distance Length of the junction
 			*/
 			static void DisplayJunctionCell(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
-				const graph::ServicePointer& serviceUse,
-				const graph::Vertex& vertex,
 				bool color,
-				const road::Road* road,
 				double distance,
+				const geos::geom::Geometry* geometry,
+				const road::Road* road,
+				const graph::Vertex& departureVertex,
+				const graph::Vertex& arrivalVertex,
 				bool isLastLeg,
-				bool isFirstLeg
+				bool isFirstLeg,
+				bool isFirstFoot
 			);
 
 
