@@ -2446,7 +2446,9 @@ namespace synthese
 							journey.getContinuousServiceRange(),
 							handicappedFilter,
 							bikeFilter,
-							__Couleur
+							__Couleur,
+							it+1 == services.end(),
+							it == services.end()
 						);
 
 						__Couleur = !__Couleur;
@@ -2501,7 +2503,9 @@ namespace synthese
 							*leg.getArrivalEdge()->getFromVertex(),
 							__Couleur,
 							road,
-							distance
+							distance,
+							it+1 == services.end(),
+							it == services.end()
 						);
 
 						distance = 0;
@@ -2627,7 +2631,9 @@ namespace synthese
 			const graph::Vertex& vertex,
 			bool color,
 			const road::Road* road,
-			double distance
+			double distance,
+			bool isLastLeg,
+			bool isFirstLeg
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
@@ -2649,6 +2655,8 @@ namespace synthese
 				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
 			}
 			pm.insert(DATA_LENGTH, distance);
+			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
+			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
 			shared_ptr<LineString> geometry(serviceUse.getGeometry());
 			if(geometry.get())
@@ -2678,7 +2686,9 @@ namespace synthese
 			boost::posix_time::time_duration continuousServiceRange,
 			boost::logic::tribool handicappedFilterStatus,
 			boost::logic::tribool bikeFilterStatus,
-			bool color
+			bool color,
+			bool isLastLeg,
+			bool isFirstLeg
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
@@ -2759,7 +2769,9 @@ namespace synthese
 				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
 			}
 
-			pm.insert(DATA_ODD_ROW, color); // 21
+			pm.insert(DATA_ODD_ROW, color);
+			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
+			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 
 			shared_ptr<LineString> geometry(serviceUse.getGeometry());
 			if(geometry.get())

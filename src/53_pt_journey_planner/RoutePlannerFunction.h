@@ -558,7 +558,9 @@ namespace synthese
 				const graph::Vertex& vertex,
 				bool color,
 				const road::Road* road,
-				double distance
+				double distance,
+				bool isLastLeg,
+				bool isFirstLeg
 			);
 
 
@@ -583,7 +585,9 @@ namespace synthese
 				boost::posix_time::time_duration continuousServiceRange,
 				boost::logic::tribool handicappedFilterStatus,
 				boost::logic::tribool bikeFilterStatus,
-				bool color
+				bool color,
+				bool isLastLeg,
+				bool isFirstLeg
 			);
 
 		};
