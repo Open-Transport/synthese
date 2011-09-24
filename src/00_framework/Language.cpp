@@ -95,12 +95,33 @@ namespace synthese
 
 		english->addName(*french, "anglais");
 		english->addName(*german, "englisch");
+		english->_weekDayNames.push_back("sunday");
+		english->_weekDayNames.push_back("monday");
+		english->_weekDayNames.push_back("tuesday");
+		english->_weekDayNames.push_back("wednesday");
+		english->_weekDayNames.push_back("thursday");
+		english->_weekDayNames.push_back("friday");
+		english->_weekDayNames.push_back("saturday");
 
 		french->addName(*english, "french");
 		french->addName(*german, "französisch");
+		french->_weekDayNames.push_back("dimanche");
+		french->_weekDayNames.push_back("lundi");
+		french->_weekDayNames.push_back("mardi");
+		french->_weekDayNames.push_back("mercredi");
+		french->_weekDayNames.push_back("jeudi");
+		french->_weekDayNames.push_back("vendredi");
+		french->_weekDayNames.push_back("samedi");
 
 		german->addName(*english, "german");
 		german->addName(*french, "allemand");
+		german->_weekDayNames.push_back("sonntag");
+		german->_weekDayNames.push_back("montag");
+		german->_weekDayNames.push_back("dienstag");
+		german->_weekDayNames.push_back("mittwoch");
+		german->_weekDayNames.push_back("donnerstag");
+		german->_weekDayNames.push_back("freitag");
+		german->_weekDayNames.push_back("samstag");
 	}
 
 
@@ -108,6 +129,14 @@ namespace synthese
 	void Language::addName( const Language& language, const std::string& name )
 	{
 		_names.insert(make_pair(&language, name));
+	}
+
+
+
+	const std::string& Language::getWeekDayName(
+		boost::gregorian::date::day_of_week_type value
+	) const {
+		return _weekDayNames[value];
 	}
 
 

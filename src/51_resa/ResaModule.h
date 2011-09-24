@@ -35,6 +35,8 @@
 
 namespace synthese
 {
+	class Language;
+
 	namespace pt_website
 	{
 		class TransportWebsite;
@@ -189,7 +191,8 @@ namespace synthese
 
 			static void DisplayReservations(
 				std::ostream& stream,
-				const ReservationTransaction& reservation
+				const ReservationTransaction& reservation,
+				const Language& language
 			);
 
 			static void CallOpen(const server::Session* session);

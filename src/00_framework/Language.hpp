@@ -30,6 +30,7 @@
 #include <vector>
 #include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/date_time/gregorian/gregorian_types.hpp>
 
 namespace synthese
 {
@@ -61,6 +62,8 @@ namespace synthese
 		boost::optional<std::string> _iso639_1Code;
 		std::string _iso639_2Code;
 		NamesMap _names;
+		std::vector<std::string> _weekDayNames;
+		std::string _dateFormatString;
 
 		static LanguagesMap _iso639_1LanguagesMap;
 		static LanguagesMap _iso639_2LanguagesMap;
@@ -89,6 +92,8 @@ namespace synthese
 		//@{
 			const std::string& getName(const Language& nameLanguage) const;
 			const std::string& getName() const;
+
+			const std::string& getWeekDayName(boost::gregorian::date::day_of_week_type value) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @throws Language::LanguageNotFoundException
