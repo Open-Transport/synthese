@@ -69,6 +69,7 @@
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
+#include <geos/geom/MultiLineString.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -2384,9 +2385,10 @@ namespace synthese
 
 				// Loop on lines of the board
 				bool __Couleur = false;
+				bool isFirstFoot(true);
+				vector<Journey::ServiceUses::const_iterator> roadServiceUses;
 
 				const Hub* lastPlace(NULL);
-				double distance(0);
 
 				const Journey::ServiceUses& services(journey.getServiceUses());
 				for (Journey::ServiceUses::const_iterator it = services.begin(); it != services.end(); ++it)
@@ -2398,17 +2400,11 @@ namespace synthese
 					if(	road == NULL &&
 						junction == NULL
 					){
-						distance = 0;
+						isFirstFoot = true;
 
 						// LIGNE ARRET MONTEE Si premier point d'arret et si alerte
 						if (leg.getDepartureEdge()->getHub() != lastPlace)
 						{
-							/*					ptime debutPrem(leg.getDepartureDateTime());
-							ptime finPrem(debutPrem);
-							if (journey.getContinuousServiceRange () )
-							finPrem += journey.getContinuousServiceRange ();
-							*/
-
 							DisplayStopCell(
 								content,
 								stopCellPage,
@@ -2428,16 +2424,6 @@ namespace synthese
 							__Couleur = !__Couleur;
 						}
 
-						// LIGNE CIRCULATIONS
-						/*					ptime debutLigne(leg.getDepartureDateTime());
-						ptime finLigne(leg.getArrivalDateTime());
-
-						if ( journey.getContinuousServiceRange () )
-						{
-						finLigne = lastArrivalTime;
-						}
-						*/
-
 						DisplayServiceCell(
 							content,
 							serviceCellPage,
@@ -2452,16 +2438,6 @@ namespace synthese
 						);
 
 						__Couleur = !__Couleur;
-
-						// LIGNE ARRET DE DESCENTE
-
-						/*					ptime debutArret(leg.getArrivalDateTime ());
-						ptime finArret(debutArret);
-						if ( (it + 1) < journey.getServiceUses().end())
-						finArret = (it + 1)->getDepartureDateTime();
-						if ( journey.getContinuousServiceRange () )
-						finArret += journey.getContinuousServiceRange ();
-						*/
 
 						DisplayStopCell(
 							content,
@@ -2484,7 +2460,7 @@ namespace synthese
 					}
 					else
 					{
-						distance += leg.getDistance();
+						roadServiceUses.push_back(it);
 
 						if (road && it + 1 != services.end())
 						{
@@ -2495,21 +2471,48 @@ namespace synthese
 								continue;
 						}
 
+						// Distance and geometry
+						double distance(0);
+						vector<Geometry*> geometries;
+						vector<shared_ptr<Geometry> > geometriesSPtr;
+						BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
+						{
+							distance += it->getDistance();
+							shared_ptr<LineString> geometry(it->getGeometry());
+							if(geometry.get())
+							{
+								shared_ptr<Geometry> geometry4326(
+									CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+										*static_cast<Geometry*>(geometry.get())
+								)	);
+								geometriesSPtr.push_back(geometry4326);
+								geometries.push_back(geometry4326.get());
+							}
+						}
+
+						shared_ptr<MultiLineString> multiLineString(
+							CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createMultiLineString(
+								geometries
+						)	);
+
 						DisplayJunctionCell(
 							content,
 							junctionPage,
 							request,
-							leg,
-							*leg.getArrivalEdge()->getFromVertex(),
 							__Couleur,
-							road,
 							distance,
+							multiLineString.get(),
+							dynamic_cast<const Road*>(leg.getService()->getPath()),
+							*(*roadServiceUses.begin())->getDepartureEdge()->getFromVertex(),
+							*(*roadServiceUses.rbegin())->getArrivalEdge()->getFromVertex(),
 							it+1 == services.end(),
-							it == services.begin()
+							it == services.begin(),
+							isFirstFoot
 						);
 
-						distance = 0;
+						roadServiceUses.clear();
 						__Couleur = !__Couleur;
+						isFirstFoot = false;
 					}
 				}
 				pm.insert(DATA_CONTENT, content.str());
@@ -2627,28 +2630,42 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
-			const graph::ServicePointer& serviceUse,
-			const graph::Vertex& vertex,
 			bool color,
-			const road::Road* road,
 			double distance,
+			const geos::geom::Geometry* geometry,
+			const road::Road* road,
+			const graph::Vertex& departureVertex,
+			const graph::Vertex& arrivalVertex,
 			bool isLastLeg,
-			bool isFirstLeg
+			bool isFirstLeg,
+			bool isFirstFoot
 		){
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
-			// Point
-			if(	vertex.getGeometry().get() &&
-				!vertex.getGeometry()->isEmpty()
+			// Departure point
+			if(	departureVertex.getGeometry().get() &&
+				!departureVertex.getGeometry()->isEmpty()
 			){
 				shared_ptr<Point> point(
 					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-						*vertex.getGeometry()
+						*departureVertex.getGeometry()
 				)	);
-				pm.insert(DATA_LONGITUDE, point->getX());
-				pm.insert(DATA_LATITUDE, point->getY());
+				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
+				pm.insert(DATA_DEPARTURE_LATITUDE, point->getY());
 			}
-			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(vertex.getHub()) != NULL);
+			// Arrival point
+			if(	arrivalVertex.getGeometry().get() &&
+				!arrivalVertex.getGeometry()->isEmpty()
+			){
+				shared_ptr<Point> point(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*arrivalVertex.getGeometry()
+				)	);
+				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
+				pm.insert(DATA_ARRIVAL_LATITUDE, point->getY());
+			}
+			pm.insert(DATA_REACHED_PLACE_IS_NAMED, dynamic_cast<const NamedPlace*>(arrivalVertex.getHub()) != NULL);
+
 			pm.insert(DATA_ODD_ROW, color);
 			if(road && road->getRoadPlace())
 			{
@@ -2657,13 +2674,14 @@ namespace synthese
 			pm.insert(DATA_LENGTH, distance);
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
+			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
 
-			shared_ptr<LineString> geometry(serviceUse.getGeometry());
-			if(geometry.get())
+			// WKT
+			if(geometry)
 			{
 				shared_ptr<Geometry> geometry4326(
 					CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
-						*static_cast<Geometry*>(geometry.get())
+						*geometry
 				)	);
 
 				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
