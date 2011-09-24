@@ -134,6 +134,7 @@ namespace synthese
 
 		DB* DBModule::GetDB()
 		{
+			assert(_Db.get());
 			return _Db.get();
 		}
 
