@@ -55,7 +55,6 @@
 #include "AccessParameters.h"
 #include "PTConstants.h"
 #include "DateTimeInterfacePage.h"
-#include "PTRoutePlannerResult.h"
 #include "NamedPlace.h"
 #include "Webpage.h"
 #include "StopArea.hpp"
@@ -844,7 +843,6 @@ namespace synthese
 				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList(
 					result.getOrderedPlaces().getResult()
 				);
-				typedef vector<shared_ptr<ostringstream> > PlacesContentVector;
 				PlacesContentVector sheetRows(placesList.size());
 				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
 				{
@@ -1761,37 +1759,37 @@ namespace synthese
 
 						if(	itl == jl.begin() ||
 							!curET.getService()->getPath()->isPedestrianMode() ||
-							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
+							!(itl-1)->getService()->getPath()->isPedestrianMode()
 						){
-							const NamedPlace* placeToSearch(
-								(	itl == jl.begin() &&
-									dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getHub())
-								) ?
-								dynamic_cast<const NamedPlace*>(object.getDeparturePlace()) :
-								dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub())
-							);
-							assert(placeToSearch != NULL);
+							const NamedPlace* placeToSearch(NULL);
+							// Case Pedestrian :
+							if(	curET.getService()->getPath()->isPedestrianMode())
+							{
+								// If first element : use of the origin place
+								if(itl == jl.begin())
+								{
+									placeToSearch = dynamic_cast<const NamedPlace*>(object.getDeparturePlace());
+									if(!placeToSearch)
+									{	// Case of crossing with city as departure place
+										// Todo see how the right place can be found
+										placeToSearch = placesList.begin()->place;
+									}
+								}
+								else
+								{ // Use of the last arrival place
+									placeToSearch = dynamic_cast<const NamedPlace*>((*(itl-1)).getArrivalEdge()->getHub());
+								}
+							}
+							else // Use of the PT departure place
+							{
+								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub());
+							}
+							assert(placeToSearch);
 
 							ptime lastDateTime(curET.getDepartureDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
-							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
-							{
-								_displayScheduleCell(
-									**itSheetRow,
-									request,
-									itPlaces == placesList.begin(),
-									(itl + 1) == jl.end(),
-									i,
-									pedestrianMode,
-									time_duration(not_a_date_time),
-									time_duration(not_a_date_time),
-									false,
-									true,
-									true,
-									false
-								);
-							}
+							_displayEmptyCells(request, placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
 
 							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
 
@@ -1799,49 +1797,49 @@ namespace synthese
 							_displayScheduleCell(
 								**itSheetRow,
 								request,
-								itPlaces == placesList.begin()
-								, true
-								, i
-								, pedestrianMode
-								, curET.getDepartureDateTime().time_of_day()
-								, lastDateTime.time_of_day()
-								, it->getContinuousServiceRange().total_seconds() > 0
-								, itl == jl.begin()
-								, true
-								, pedestrianMode && !lastPedestrianMode
+								i,
+								pedestrianMode,
+								curET.getDepartureDateTime().time_of_day(),
+								lastDateTime.time_of_day(),
+								it->getContinuousServiceRange().total_seconds() > 0,
+								itPlaces->isOrigin,
+								true,
+								pedestrianMode && !lastPedestrianMode
 							);
 							++itPlaces; ++itSheetRow;
 							lastPedestrianMode = pedestrianMode;
 						}
 
-						if(	itl == jl.end()-1
-							||	!(itl+1)->getService()->getPath()->isPedestrianMode()
-							||	!curET.getService()->getPath()->isPedestrianMode()
+						if(	itl+1 == jl.end() ||
+							!(itl+1)->getService()->getPath()->isPedestrianMode() ||
+							!curET.getService()->getPath()->isPedestrianMode()
 						){
-							const NamedPlace* placeToSearch(
-								itl == jl.end()-1 && dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getHub()) ?
-								dynamic_cast<const NamedPlace*>(object.getArrivalPlace()) :
-								dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub())
-							);
-							assert(placeToSearch != NULL);
-
-							for (; itPlaces != placesList.end() && itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
+							const NamedPlace* placeToSearch(NULL);
+							// Case Pedestrian :
+							if(	curET.getService()->getPath()->isPedestrianMode())
 							{
-								_displayScheduleCell(
-									**itSheetRow,
-									request,
-									true
-									, true
-									, i
-									, pedestrianMode
-									, time_duration(not_a_date_time)
-									, time_duration(not_a_date_time)
-									, false
-									, true
-									, true
-									, false
-								);
+								// If last element : use of the destination place
+								if(itl+1 == jl.end())
+								{
+									placeToSearch = dynamic_cast<const NamedPlace*>(object.getArrivalPlace());
+									if(!placeToSearch)
+									{	// Case of crossing with city as arrival place
+										// Todo see how the right place can be found
+										placeToSearch = placesList.rbegin()->place;
+									}
+								}
+								else
+								{ // Use of the next departure place
+									placeToSearch = dynamic_cast<const NamedPlace*>((*(itl+1)).getDepartureEdge()->getHub());
+								}
 							}
+							else // Use of the PT arrival place
+							{
+								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub());
+							}
+							assert(placeToSearch);
+
+							_displayEmptyCells(request, placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
 
 							ptime lastDateTime(curET.getArrivalDateTime());
 							lastDateTime += it->getContinuousServiceRange();
@@ -1849,35 +1847,32 @@ namespace synthese
 							_displayScheduleCell(
 								**itSheetRow,
 								request,
-								true
-								, (itl + 1) == jl.end()
-								, i
-								, pedestrianMode
-								, curET.getArrivalDateTime().time_of_day()
-								, lastDateTime.time_of_day()
-								, it->getContinuousServiceRange().total_seconds() > 0
-								, true
-								, (itl + 1) == jl.end()
-								, false
+								i,
+								pedestrianMode,
+								curET.getArrivalDateTime().time_of_day(),
+								lastDateTime.time_of_day(),
+								it->getContinuousServiceRange().total_seconds() > 0,
+								true,
+								itPlaces->isDestination,
+								false
 							);
 						}
 					}
 
+					// Fill in the last cells
 					for (++itPlaces, ++itSheetRow; itPlaces != placesList.end(); ++itPlaces, ++itSheetRow)
 					{
 						_displayScheduleCell(
 							**itSheetRow,
 							request,
-							true
-							, true
-							, i
-							, false
-							, time_duration(not_a_date_time)
-							, time_duration(not_a_date_time)
-							, false
-							, true
-							, true
-							, false
+							i,
+							false,
+							time_duration(not_a_date_time),
+							time_duration(not_a_date_time),
+							false,
+							true,
+							true,
+							false
 						);
 					}
 				}
@@ -2083,6 +2078,34 @@ namespace synthese
 
 
 
+		void RoutePlannerFunction::_displayEmptyCells(
+			const server::Request& request,
+			const PTRoutePlannerResult::PlacesListConfiguration::List& placesList,
+			PlacesContentVector::iterator& itSheetRow,
+			PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator& itPlaces,
+			const NamedPlace& placeToSearch,
+			size_t columnNumber,
+			bool displayFoot
+		) const {
+			for (; itPlaces != placesList.end() && itPlaces->place != &placeToSearch; ++itPlaces, ++itSheetRow)
+			{
+				_displayScheduleCell(
+					**itSheetRow,
+					request,
+					columnNumber,
+					displayFoot,
+					time_duration(not_a_date_time),
+					time_duration(not_a_date_time),
+					false,
+					true,
+					true,
+					false
+				);
+			}
+		}
+
+
+
 		void RoutePlannerFunction::_displayRow(
 			std::ostream& stream,
 			const server::Request& request,
@@ -2109,8 +2132,6 @@ namespace synthese
 		void RoutePlannerFunction::_displayScheduleCell(
 			std::ostream& stream,
 			const server::Request& request,
-			bool isItFirstRow,
-			bool isItLastRow,
 			size_t columnNumber,
 			bool isItFootLine,
 			const boost::posix_time::time_duration& firstTime,
@@ -2122,8 +2143,6 @@ namespace synthese
 		) const {
 			ParametersMap pm(request.getFunction()->getSavedParameters());
 
-			pm.insert(DATA_IS_FIRST_ROW, isItFirstRow);
-			pm.insert(DATA_IS_LAST_ROW, isItLastRow);
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 			pm.insert(DATA_IS_FOOT, isItFootLine);
 			{
@@ -2383,7 +2402,7 @@ namespace synthese
 								false,
 								false,
 								NULL,
-								static_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
+								dynamic_cast<const StopPoint*>(leg.getDepartureEdge()->getFromVertex()),
 								__Couleur,
 								leg.getDepartureDateTime(),
 								journey.getContinuousServiceRange(),
@@ -2435,7 +2454,7 @@ namespace synthese
 							true,
 							leg.getArrivalEdge()->getHub() == leg.getService()->getPath()->getEdges().back()->getHub(),
 							static_cast<const StopPoint*>(leg.getArrivalEdge()->getFromVertex()),
-							it+1 != services.end() ? static_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
+							it+1 != services.end()  ? dynamic_cast<const StopPoint*>((it+1)->getDepartureEdge()->getFromVertex()) : NULL,
 							__Couleur,
 							leg.getArrivalDateTime(),
 							journey.getContinuousServiceRange(),

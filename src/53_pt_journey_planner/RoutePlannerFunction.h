@@ -30,6 +30,7 @@
 #include "FactorableTemplate.h"
 #include "TransportWebsite.h"
 #include "AlgorithmTypes.h"
+#include "PTRoutePlannerResult.h"
 
 #include <boost/optional.hpp>
 
@@ -265,6 +266,8 @@ namespace synthese
 				static const std::string DATA_WKT;
 			//@}
 
+			typedef std::vector<boost::shared_ptr<std::ostringstream> > PlacesContentVector;
+
 		private:
 			//! \name Parameters
 			//@{
@@ -437,16 +440,28 @@ namespace synthese
 			void _displayScheduleCell(
 				std::ostream& stream,
 				const server::Request& request,
-				bool isItFirstRow
-				, bool isItLastRow
-				, size_t columnNumber
-				, bool isItFootLine
-				, const boost::posix_time::time_duration& firstTime
-				, const boost::posix_time::time_duration& lastTime
-				, bool isItContinuousService
-				, bool isFirstWriting
-				, bool isLastWriting
-				, bool isFirstFoot
+				size_t columnNumber,
+				bool isItFootLine,
+				const boost::posix_time::time_duration& firstTime,
+				const boost::posix_time::time_duration& lastTime,
+				bool isItContinuousService,
+				bool isFirstWriting,
+				bool isLastWriting,
+				bool isFirstFoot
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Output of empty cells before the next place with content.
+			void _displayEmptyCells(
+				const server::Request& request,
+				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList,
+				PlacesContentVector::iterator& itSheetRow,
+				PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator& itPlaces,
+				const geography::NamedPlace& placeToSearch,
+				std::size_t columnNumber,
+				bool displayFoot
 			) const;
 
 
