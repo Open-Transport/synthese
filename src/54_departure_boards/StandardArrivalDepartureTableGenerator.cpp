@@ -75,6 +75,10 @@ namespace synthese
 				// Loop on journey patterns calling at the stop
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
+					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					{
+						continue;
+					}
 					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
 					// Checks if the line stop is allowed according to the generator parameters
@@ -132,5 +136,4 @@ namespace synthese
 			}
 			return _result;
 		}
-	}
-}
+}	}
