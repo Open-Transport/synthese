@@ -3,26 +3,27 @@
 
 // Factories
 
-#include "RoadTableSync.h"
-#include "RoadPlaceTableSync.h"
-#include "HouseTableSync.hpp"
 #include "CrossingTableSync.hpp"
-#include "RoadChunkTableSync.h"
-#include "RoadModule.h"
+#include "HouseTableSync.hpp"
 #include "PublicPlaceTableSync.h"
+#include "RoadChunkTableSync.h"
+#include "RoadPlaceTableSync.h"
+#include "RoadTableSync.h"
+
+#include "RoadModule.h"
+
+#include "IGNstreetsFileFormat.hpp"
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
-#include "IGNstreetsFileFormat.hpp"
 
 // Registries
 
-#include "MainRoadPart.hpp"
 #include "Crossing.h"
-#include "RoadPlace.h"
-#include "PublicPlace.h"
-#include "MainRoadChunk.hpp"
 #include "House.hpp"
-
+#include "MainRoadChunk.hpp"
+#include "MainRoadPart.hpp"
+#include "PublicPlace.h"
+#include "RoadPlace.h"
 
 #include "RoadModule.inc.cpp"
 
@@ -38,6 +39,7 @@ void synthese::road::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::road::CrossingTableSync>::integrate();
 	synthese::road::RoadChunkTableSync::integrate();
 	synthese::road::RoadPlaceTableSync::integrate();
+	synthese::road::HouseTableSync::integrate();
 	synthese::road::RoadModule::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::road::PublicPlaceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::road::PublicPlaceTableSync>::integrate();
@@ -46,7 +48,7 @@ void synthese::road::moduleRegister()
 	synthese::road::NavstreetsFileFormat::integrate();
 	synthese::road::OSMFileFormat::integrate();
 	synthese::road::IGNstreetsFileFormat::integrate();
-	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::road::HouseTableSync>::integrate();
+
 	// Registries
 
 	synthese::util::Env::Integrate<synthese::road::MainRoadPart>();

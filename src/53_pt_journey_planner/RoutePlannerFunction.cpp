@@ -2671,7 +2671,7 @@ namespace synthese
 			{
 				pm.insert(DATA_ROAD_NAME, road->getRoadPlace()->getName());
 			}
-			pm.insert(DATA_LENGTH, distance);
+			pm.insert(DATA_LENGTH, static_cast<int>(floor(distance)));
 			pm.insert(DATA_IS_FIRST_LEG, isFirstLeg);
 			pm.insert(DATA_IS_LAST_LEG, isLastLeg);
 			pm.insert(DATA_IS_FIRST_FOOT, isFirstFoot);
