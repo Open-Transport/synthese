@@ -37,6 +37,7 @@
 #include "DataSourceAdmin.h"
 #include "ImportFunction.h"
 #include "PropertiesHTMLTable.h"
+#include "FrenchPhoneticString.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -62,6 +63,7 @@ namespace synthese
 	using namespace admin;
 	using namespace server;
 	using namespace html;
+	using namespace lexical_matcher;
 
 	namespace util
 	{
@@ -71,6 +73,8 @@ namespace synthese
 	namespace road
 	{
 		const string IGNstreetsFileFormat::Importer_::FILE_ADDRESS("address");
+		const string IGNstreetsFileFormat::Importer_::PARAMETER_DISPLAY_STATS("display_stats");
+		const string IGNstreetsFileFormat::Importer_::PARAMETER_MAX_HOUSE_DISTANCE("max_house_distance");
 
 		const string IGNstreetsFileFormat::_FIELD_NOM_VOIE("NOM_VOIE");
 		const string IGNstreetsFileFormat::_FIELD_NUMERO("NUMERO");
@@ -114,9 +118,15 @@ namespace synthese
 			{
 				// Loading the file into SQLite as virtual table
 				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
-
-				const GeometryFactory& geometryFactory(CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory());
-
+				typedef set<pair<City*, string> > MissingStreets;
+				MissingStreets missingStreets;
+				size_t ok(0);
+				size_t streetTooFar(0);
+				size_t cityNotFound(0);
+				size_t roadNotFound(0);
+				size_t emptyStreetName(0);
+				size_t badGeometry(0);
+				
 				{	// Address
 					stringstream query;
 					query << "SELECT *, AsText(" << IGNstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << IGNstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
@@ -125,14 +135,24 @@ namespace synthese
 					{
 						MainRoadChunk::HouseNumber numero(rows->getInt(IGNstreetsFileFormat::_FIELD_NUMERO));
 						string nomRue(rows->getText(IGNstreetsFileFormat::_FIELD_NOM_VOIE));
+						boost::algorithm::trim(nomRue);
+						nomRue = FrenchPhoneticString::to_plain_lower_copy(nomRue);
+						if(nomRue.empty())
+						{
+							++emptyStreetName;
+							continue;
+						}
 						string codeINSEE(rows->getText(IGNstreetsFileFormat::_FIELD_INSEE_COMM));
 						shared_ptr<Point> geometry(
 							dynamic_pointer_cast<Point, Geometry>(
-							rows->getGeometryFromWKT(IGNstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
-						)	);
+								rows->getGeometryFromWKT(
+									IGNstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT",
+									_dataSource.getCoordinatesSystem()->getGeometryFactory()
+						)	)	);
 						if(!geometry.get())
 						{
 							os << "ERR : Empty geometry.<br />";
+							++badGeometry;
 							continue;
 						}
 						shared_ptr<House> house(new House());
@@ -141,13 +161,96 @@ namespace synthese
 						house->setHouseNumber(numero);
 						shared_ptr<City> city(CityTableSync::GetEditableFromCode(codeINSEE, _env));
 						// ToDo tester si le RoadPlace a été trouvé + City
-						if(city.get())
+						if(!city.get())
 						{
-							boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(city->getKey(),nomRue,_env));
-							if(roadPlace.get()) house->setRoadChunkFromRoadPlace(roadPlace);
+							++cityNotFound;
+							continue;
 						}
-						_env.getEditableRegistry<House>().add(house);
+						boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(city->getKey(),nomRue,_env));
+						if(!roadPlace.get())
+						{
+							++roadNotFound;
+							missingStreets.insert(make_pair(city.get(), nomRue));
+							continue;
+						}
+
+						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
+						BOOST_FOREACH(shared_ptr<Path> path, paths)
+						{
+							RoadChunkTableSync::Search(_env, path->getKey());
+						}
+
+						try
+						{
+							house->setRoadChunkFromRoadPlace(roadPlace, _maxHouseDistance);
+							_env.getEditableRegistry<House>().add(house);
+							++ok;
+						}
+						catch(...)
+						{
+							++streetTooFar;
+							os << "WARN : house " << *house->getHouseNumber() << " could not be projected on " << nomRue << "<br />";
+						}
 					}
+				}
+
+				if(!missingStreets.empty())
+				{
+					os << "<h1>Rues non trouvées</h1>";
+
+					// Header
+					HTMLTable::ColsVector c;
+					c.push_back("Commune");
+					c.push_back("Rue");
+
+					// Table
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					os << t.open();
+					BOOST_FOREACH(const MissingStreets::value_type& missingStreet, missingStreets)
+					{
+						os << t.row();
+						os << t.col() << missingStreet.first->getName();
+						os << t.col() << missingStreet.second;
+					}
+					os << t.close();
+				}
+
+				if(_displayStats)
+				{
+					size_t total(ok + cityNotFound + roadNotFound + emptyStreetName + badGeometry + streetTooFar);
+
+					os << "<h1>Statistiques</h1>";
+
+					// Header
+					HTMLTable::ColsVector c;
+					c.push_back("Métrique");
+					c.push_back("Nombre");
+					c.push_back("%");
+
+					// Table
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					os << t.open();
+					os << t.row();
+					os << t.col() << "Adresses importées";
+					os << t.col() << ok;
+					os << t.col() << floor(100 * (double(ok) / double(total)));
+					os << t.row();
+					os << t.col() << "Commune non trouvée";
+					os << t.col() << cityNotFound;
+					os << t.col() << floor(100 * (double(cityNotFound) / double(total)));
+					os << t.row();
+					os << t.col() << "Rue non trouvée";
+					os << t.col() << roadNotFound;
+					os << t.col() << floor(100 * (double(roadNotFound) / double(total)));
+					os << t.row();
+					os << t.col() << "Nom de rue vide";
+					os << t.col() << emptyStreetName;
+					os << t.col() << floor(100 * (double(emptyStreetName) / double(total)));
+					os << t.row();
+					os << t.col() << "Rue trop éloignée";
+					os << t.col() << streetTooFar;
+					os << t.col() << floor(100 * (double(streetTooFar) / double(total)));
+					os << t.close();
 				}
 			}
 
@@ -179,8 +282,11 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Distance maximale adresse rue", t.getForm().getTextInput(PARAMETER_MAX_HOUSE_DISTANCE, lexical_cast<string>(_maxHouseDistance)));
 			stream << t.title("Données");
 			stream << t.cell("Adresses (address)", t.getForm().getTextInput(_getFileParameterName(FILE_ADDRESS), _pathsMap[FILE_ADDRESS].file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Afficher statistiques", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_STATS, _displayStats));
 			stream << t.close();
 		}
 
@@ -189,6 +295,8 @@ namespace synthese
 		util::ParametersMap IGNstreetsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result;
+			result.insert(PARAMETER_DISPLAY_STATS, _displayStats);
+			result.insert(PARAMETER_MAX_HOUSE_DISTANCE, _maxHouseDistance);
 			return result;
 		}
 
@@ -196,5 +304,7 @@ namespace synthese
 
 		void IGNstreetsFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			_displayStats = map.getDefault<bool>(PARAMETER_DISPLAY_STATS, false);
+			_maxHouseDistance = map.getDefault<double>(PARAMETER_MAX_HOUSE_DISTANCE, 200);
 		}
 }	}

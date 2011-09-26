@@ -48,6 +48,11 @@ namespace synthese
 		std::string IConv::convert(
 			const std::string& text
 		){
+			if(text.empty())
+			{
+				return string();
+			}
+
 			// FIXME: on Linux, the system iconv header might be included which has a different signature.
 #ifdef UNIX
 			char *pBuf;

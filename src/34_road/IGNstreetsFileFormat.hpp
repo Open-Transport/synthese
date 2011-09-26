@@ -79,10 +79,14 @@ namespace synthese
 
 				//! @name Parameters
 				//@{
+					static const std::string PARAMETER_DISPLAY_STATS;
+					static const std::string PARAMETER_MAX_HOUSE_DISTANCE;
 				//@}
 
 
 			protected:
+				bool _displayStats;
+				double _maxHouseDistance;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks that all necessary input files are available.
@@ -112,7 +116,9 @@ namespace synthese
 					util::Env& env,
 					const impex::DataSource& dataSource
 				):	impex::MultipleFileTypesImporter<IGNstreetsFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource)
+					impex::Importer(env, dataSource),
+					_displayStats(false),
+					_maxHouseDistance(200)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////

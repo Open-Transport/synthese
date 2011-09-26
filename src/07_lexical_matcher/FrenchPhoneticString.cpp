@@ -36,6 +36,25 @@ namespace synthese
 
 
 
+		std::string FrenchPhoneticString::to_plain_lower_copy(const std::string& text)
+		{
+			string source(to_lower_copy(ICONV.convert(text)));
+			stringstream result;
+			for(size_t pos(0); pos < source.size(); ++pos)
+			{
+				if(_IsAnyOf(source, pos, ACCENTUATED_A)) result << "a";
+				else if(_IsAnyOf(source, pos, ACCENTUATED_E)) result << "e";
+				else if(_IsAnyOf(source, pos, ACCENTUATED_I)) result << "i";
+				else if(_IsAnyOf(source, pos, ACCENTUATED_O)) result << "o";
+				else if(_IsAnyOf(source, pos, ACCENTUATED_U)) result << "u";
+				else result << source[pos];
+			}
+			return result.str();
+		}
+
+
+
+
 		void FrenchPhoneticString::setSource(const std::string& ssource)
 		{
 			_source = ssource;

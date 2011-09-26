@@ -251,11 +251,16 @@ namespace synthese
 	{
 	    RoadChunkTableSync::SearchResult RoadChunkTableSync::Search(
 			Env& env,
+			optional<RegistryKeyType> roadId,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
 			SelectQuery<RoadChunkTableSync> query;
+			if(roadId)
+			{
+				query.addWhereField(COL_ROADID, *roadId);
+			}
 			if (number)
 				query.setNumber(*number + 1);
 			if (first > 0)

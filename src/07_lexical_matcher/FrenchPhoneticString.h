@@ -94,6 +94,7 @@ namespace synthese
 			const std::string& getSource() const;
 			const PhoneticString& getPhonetic() const;
 			std::string getPhoneticString() const;
+			static std::string to_plain_lower_copy(const std::string& text);
 
 			LevenshteinDistance levenshtein(const FrenchPhoneticString& s) const;
 
