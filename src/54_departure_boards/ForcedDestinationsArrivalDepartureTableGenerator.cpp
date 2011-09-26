@@ -111,6 +111,11 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
+					if(!dynamic_cast<const LinePhysicalStop*>(edge.second))
+					{
+						continue;
+					}
+
 					const LinePhysicalStop& ls = static_cast<const LinePhysicalStop&>(*edge.second);
 
 					// Line filter compliance
