@@ -110,7 +110,10 @@ namespace synthese
 
 
 
-				virtual void setRoadChunkFromRoadPlace(boost::shared_ptr<RoadPlace> roadPlace);
+				virtual void setRoadChunkFromRoadPlace(
+					boost::shared_ptr<RoadPlace> roadPlace,
+					double maxDistance = 200
+				);
 
 
 

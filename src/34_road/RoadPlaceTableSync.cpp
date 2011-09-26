@@ -206,9 +206,12 @@ namespace synthese
 			util::LinkLevel linkLevel
 		){
 			SearchResult roadPlaces(
-				Search(environment, cityId, name, optional<string>(), 0, 1, false, false)
+				Search(environment, cityId, optional<string>(), name, 0, 1, false, false)
 			);
-			if(roadPlaces.empty()) return shared_ptr<RoadPlace>();
+			if(roadPlaces.empty())
+			{
+				return shared_ptr<RoadPlace>();
+			}
 			return roadPlaces.front();
 		}
 	}

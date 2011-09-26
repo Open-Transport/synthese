@@ -24,6 +24,7 @@
 #include "Road.h"
 #include "Path.h"
 #include "RoadPlace.h"
+#include "MainRoadPart.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include "EdgeProjector.hpp"
@@ -83,14 +84,20 @@ namespace synthese
 
 
 
-		void House::setRoadChunkFromRoadPlace(boost::shared_ptr<RoadPlace> roadPlace)
-		{
+		void House::setRoadChunkFromRoadPlace(
+			boost::shared_ptr<RoadPlace> roadPlace,
+			double maxDistance
+		){
 			// ToDo : Chercher le RoadChunk le plus proche de la géométrie de l'objet House
 			std::vector<MainRoadChunk*> roads;
 			std::set<Path*> paths(roadPlace->getPaths());
 
 			BOOST_FOREACH(Path* path,paths)
 			{
+				if(!dynamic_cast<MainRoadPart*>(path))
+				{
+					continue;
+				}
 				std::vector<Edge*> edges(path->getEdges());
 				BOOST_FOREACH(Edge* edge,edges)
 				{
@@ -98,7 +105,7 @@ namespace synthese
 				}
 			}
 
-			EdgeProjector<MainRoadChunk*> projector(roads, 100);
+			EdgeProjector<MainRoadChunk*> projector(roads, maxDistance);
 
 			EdgeProjector<MainRoadChunk*>::PathNearby projection(projector.projectEdge(*(this->getGeometry()->getCoordinate())));
 			this->setRoadChunk(projection.get<1>());
