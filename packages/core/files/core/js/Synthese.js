@@ -25,7 +25,7 @@ var Synthese = {
       }
       return params;
     }
-    
+
     this.queryStringOptions = parseQueryString(location.search.slice(1));
     this.siteId = siteId || this.queryStringOptions.siteId;
     if (!this.siteId) {
@@ -33,7 +33,7 @@ var Synthese = {
       alert("Missing siteId parameter");
     }
   },
-  
+
   callService: function(serviceName, args, dataType) {
     console.log("Synthese.callService", args);
     args["SERVICE"] = serviceName;
@@ -44,7 +44,7 @@ var Synthese = {
       data: args,
       dataType: dataType
     };
-    
+
     return $.ajax(params);
   }
 };
