@@ -8,12 +8,12 @@ var NewsTickerView = Backbone.View.extend({
   REFRESH_DELAY_MS: 3000,
 
   initialize: function(options) {
-    var ITEMS_PER_GROUP = 3;
+    var itemsPerGroup = options.itemsPerGroup || 3;
 
     var groups = [[]];
     this.$("li").each(function(index, li) {
       var lastGroup = groups[groups.length - 1];
-      if (lastGroup.length == ITEMS_PER_GROUP) {
+      if (lastGroup.length == itemsPerGroup) {
         lastGroup = [];
         groups[groups.length] = lastGroup;
       }
@@ -41,6 +41,7 @@ var NewsTickerView = Backbone.View.extend({
     this.goToIndex(0);
     this.$(".total").text(this.ulGroups.length);
 
+    $(this.el).show();
     this.resetInterval();
   },
 
