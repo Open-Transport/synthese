@@ -115,6 +115,14 @@ namespace synthese
 
 			static std::string ToFixedSizeString(int number, int size);
 
+			/** Converts string to a string that can be used as a XML attribute.
+				@param inputString String to convert
+				@return std::string Converted string
+				@author Sylvain Pasche
+				@date 2011
+				@since 3.3.0
+			*/
+			static std::string ToXMLAttrString(const std::string& inputString);
 		};
 	}
 }

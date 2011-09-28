@@ -25,11 +25,13 @@
 #include "UtilConstants.h"
 
 #include <complex>
-#include <sstream>
 #include <iomanip>
+#include <map>
+#include <sstream>
 #include <stdio.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
+#include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
@@ -253,6 +255,34 @@ namespace synthese
 					s << "0";
 			s << number;
 			return s.str();
+		}
+
+
+
+		std::string Conversion::ToXMLAttrString(const std::string& inputString)
+		{
+			static map<char, string> encodingTable;
+			if(encodingTable.empty())
+			{
+				encodingTable['&'] = "&amp;";
+				encodingTable['>'] = "&gt;";
+				encodingTable['<'] = "&lt;";
+				encodingTable['"'] = "&quot;";
+				encodingTable['\''] = "&apos;";
+			}
+			stringstream ss;
+			BOOST_FOREACH(char c, inputString)
+			{
+				map<char, string>::const_iterator it(encodingTable.find(c));
+				if(it != encodingTable.end())
+				{
+					ss << it->second;
+					continue;
+				}
+
+				ss << c;
+			}
+			return ss.str();
 		}
 	}
 }
