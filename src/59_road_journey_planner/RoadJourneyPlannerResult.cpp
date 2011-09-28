@@ -116,7 +116,7 @@ namespace synthese
 				   double dst = its->getDistance();
 
 				   std::string roadName = road->getRoadPlace()->getName();
-				   if(!roadName.compare("")) {
+				   if(roadName.empty()) {
 					  if(road->getType() == Road::ROAD_TYPE_PEDESTRIANPATH || road->getType() == Road::ROAD_TYPE_PEDESTRIANSTREET) {
 						 roadName="Chemin Pi&eacute;ton";
 					  }
