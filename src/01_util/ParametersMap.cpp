@@ -217,7 +217,7 @@ namespace synthese
 			}
 			BOOST_FOREACH(const Map::value_type& itMap, _map)
 			{
-				os << " " << itMap.first << "=\"" << itMap.second << "\"";
+				os << " " << itMap.first << "=\"" << Conversion::ToXMLAttrString(itMap.second) << "\"";
 			}
 			bool hasSubTag(false);
 			BOOST_FOREACH(const SubParametersMap::value_type& itSubMap, _subMap)
