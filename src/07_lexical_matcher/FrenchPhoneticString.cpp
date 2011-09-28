@@ -24,6 +24,8 @@ namespace synthese
 		std::string FrenchPhoneticString::VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
 		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîy"));
 
+		mutex FrenchPhoneticString::_IConvMutex;
+
 		FrenchPhoneticString::FrenchPhoneticString()
 		{}
 
@@ -38,6 +40,8 @@ namespace synthese
 
 		std::string FrenchPhoneticString::to_plain_lower_copy(const std::string& text)
 		{
+			mutex::scoped_lock lock(_IConvMutex);
+
 			string source(to_lower_copy(ICONV.convert(text)));
 			stringstream result;
 			for(size_t pos(0); pos < source.size(); ++pos)
@@ -57,6 +61,8 @@ namespace synthese
 
 		void FrenchPhoneticString::setSource(const std::string& ssource)
 		{
+			mutex::scoped_lock lock(_IConvMutex);
+
 			_source = ssource;
 
 			string source(to_lower_copy(ICONV.convert(ssource)));

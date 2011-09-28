@@ -28,6 +28,7 @@
 #include <string>
 #include <vector>
 #include <limits>
+#include <boost/thread/mutex.hpp>
 
 #undef max
 #undef min
@@ -80,6 +81,8 @@ namespace synthese
 			
 			std::string	_source;
 			PhoneticString _phonetic;
+
+			static boost::mutex _IConvMutex;
 
 			static bool _IsLast(const std::string& source, size_t pos, size_t len=1);
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
