@@ -161,14 +161,15 @@ class Project(object):
 
         self._read_config()
 
-        # Sites require an env, wait for set_env() to be called if not
-        # available yet.
+        # env might not be available yet. set_env should be called once ready
+        # to complete the project initialization.
         if self.env:
-            self._load_sites()
+            self.set_env(self.env)
 
     def set_env(self, env):
         self.env = env
         self._load_sites()
+        self.daemon = daemon.Daemon(self.env)
 
     def _read_config(self):
         config_paths = [
@@ -301,7 +302,6 @@ class Project(object):
 
     def rundaemon(self, block=True):
         """Run Synthese daemon"""
-        self.daemon = daemon.Daemon(self.env)
         self.daemon.start()
         if not block:
             return
@@ -330,8 +330,7 @@ class Project(object):
 
     def stopdaemon(self):
         """Stop Synthese daemon"""
-        if self.daemon:
-            self.daemon.stop()
+        self.daemon.stop()
         # TODO: should use the HTTP method to stop the daemon once it works.
         ports = [self.config.port]
         if self.config.wsgi_proxy:
@@ -423,6 +422,7 @@ class Project(object):
                 (dumps, all_dumps))
 
         sql_file = join(self.db_path, dumps[0])
+        log.info('Restoring %s', sql_file)
 
         if sql_file.endswith('.gz'):
             sql = gzip.open(sql_file, 'rb').read()
@@ -498,7 +498,8 @@ class Project(object):
         utils.call(_ssh_command_line(self.config))
 
 
-def create_project(env, path, site_packages=None, conn_string=None, overwrite=False):
+def create_project(env, path, site_packages=None, conn_string=None,
+        overwrite=False):
     log.info('Creating project in %r', path)
     if overwrite:
         utils.RemoveDirectory(path)

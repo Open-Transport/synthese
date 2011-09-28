@@ -89,6 +89,14 @@ class Daemon(object):
                 raise DaemonException(
                     'Error, something is already listening on port %s', port)
 
+    def _clean_pid_file(self):
+        pid_path = join(self.env.c.project_path, 'synthese.pid')
+        if os.path.isfile(pid_path):
+            log.debug('Found pid file %s, removing it' % pid_path)
+            # TODO: check if daemon is running with that pid and kill it if that's the case.
+            os.unlink(pid_path)
+        return pid_path
+
     def start(self, kill_existing=True):
         self.env.prepare_for_launch()
 
@@ -112,11 +120,7 @@ class Daemon(object):
         ])
 
         if self.env.platform != 'win':
-            pid_path = join(self.env.c.project_path, 'synthese.pid')
-            if os.path.isfile(pid_path):
-                log.debug('Found pid file %s, removing it' % pid_path)
-                # TODO: check if daemon is running with that pid and kill it if that's the case.
-                os.unlink(pid_path)
+            pid_path = self._clean_pid_file()
             args.extend(['--pidfile', pid_path])
 
         params = {
@@ -170,14 +174,17 @@ class Daemon(object):
     def stop(self):
         # TODO: should use quit action, but it doesn't work (at least on Windows)
         #  http://localhost:9080/synthese3/admin?a=QuitAction&co=0&sid=FKlwsUfU4lLCId38cCBI
-        if not self.proc:
-            return
         try:
-            self.proc.terminate()
-        except Exception, e:
-            log.debug('Ignoring exception when calling terminate: %r', e)
-        time.sleep(2)
-        self.proc = None
+            if not self.proc:
+                return
+            try:
+                self.proc.terminate()
+            except Exception, e:
+                log.debug('Ignoring exception when calling terminate: %r', e)
+            time.sleep(2)
+            self.proc = None
+        finally:
+            self._clean_pid_file()
         self._stop_wsgi_proxy()
         assert not utils.can_connect(self.env.c.port, False)
         self.stopped = True
