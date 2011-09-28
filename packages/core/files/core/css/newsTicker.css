@@ -3,6 +3,7 @@
 
 .newsTicker {
   position: relative;
+  display: none;
 }
 
 .newsTicker .itemsContainer {
