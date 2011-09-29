@@ -23,6 +23,7 @@ var NewsTickerView = Backbone.View.extend({
     // Nothing to do with only one group.
     if (groups.length == 1) {
       this.$(".navigation").hide();
+      $(this.el).show();
       return;
     }
 
@@ -38,30 +39,29 @@ var NewsTickerView = Backbone.View.extend({
       return $ul;
     });
 
-    this.goToIndex(0);
     this.$(".total").text(this.ulGroups.length);
 
     $(this.el).show();
-    this.resetInterval();
+    this.index = -1;
+    this.moveIndex(1);
   },
 
-  goToIndex: function(index) {
-    if (this.index !== undefined)
-      this.ulGroups[this.index].fadeOut();
+  goToIndex: function(index, noAnim) {
+    _.each(this.ulGroups, function(ulGroup) {
+      ulGroup.hide();
+    });
     this.ulGroups[index].fadeIn();
     this.index = index;
     this.$(".curIndex").text(this.index + 1);
   },
 
   moveIndex: function(offset) {
+    if (this.timeout)
+      clearTimeout(this.timeout);
     this.goToIndex((this.index + offset + this.ulGroups.length) % this.ulGroups.length);
-  },
 
-  resetInterval: function() {
-    if (this.interval)
-      clearInterval(this.interval);
     var self = this;
-    this.interval = setInterval(function() {
+    this.timeout = setTimeout(function() {
       self.moveIndex(1);
     }, this.REFRESH_DELAY_MS);
   },
@@ -69,14 +69,12 @@ var NewsTickerView = Backbone.View.extend({
   prevLinkClick: function(event) {
     event.stopPropagation();
     event.preventDefault();
-    this.resetInterval();
     this.moveIndex(-1);
   },
 
   nextLinkClick: function(event) {
     event.stopPropagation();
     event.preventDefault();
-    this.resetInterval();
     this.moveIndex(1);
   }
 });
