@@ -376,7 +376,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
 
         self.assertEquals(
             self._get_road_journey(
-                'CourBelforttelevant', 'Rue Moppert',
+                'Belfort', 'Rue Moppert',
                 'Belfort', 'Rue de Colmar'
             ),
             [] # TODO
