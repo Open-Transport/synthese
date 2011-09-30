@@ -126,7 +126,7 @@ namespace synthese
 				// TODO : add ajax call on click on the button (replace it by a link button)
 			}
 			stream << "<div id=\"" << _id << "\"></div>";
-			stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
+			stream << HTMLModule::GetHTMLJavascriptOpen("http://openlayers.org/api/2.10/OpenLayers.js");
 
             // For Geoportail
             BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
