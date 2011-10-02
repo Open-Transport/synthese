@@ -12,7 +12,7 @@ namespace synthese
 	namespace accounts
 	{
 		/** Part of financial transaction.
-			@ingroup m37
+			@ingroup m57
 		*/
 		class TransactionPart : public util::RegistrableTemplate< TransactionPart>
 		{

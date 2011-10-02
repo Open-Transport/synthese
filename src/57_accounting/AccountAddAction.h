@@ -40,7 +40,7 @@ namespace synthese
 		class Currency;
 
 		/** AccountAddAction action class.
-			@ingroup m37Actions refActions
+			@ingroup m57Actions refActions
 		*/
 		class AccountAddAction
 			: public util::FactorableTemplate<server::Action, AccountAddAction>
