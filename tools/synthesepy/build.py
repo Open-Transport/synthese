@@ -149,7 +149,7 @@ class SconsBuilder(Builder):
             return
 
         utils.call(
-            'svn co --ignore-externals https://extranet-rcsmobility.com/svn/synthese3/trunk/3rd/dev/boost',
+            'svn co --ignore-externals https:///188.165.247.81/svn/synthese3/trunk/3rd/dev/boost',
             shell=True, cwd=join(self.env.c.thirdparty_dir))
 
         # XXX duplicated with cmake
