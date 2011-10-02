@@ -46,7 +46,7 @@ namespace synthese
 		class Account;
 
 		/** Financial transaction.
-			@ingroup m37
+			@ingroup m57
 		*/
 		class Transaction : public util::RegistrableTemplate< Transaction>
 		{

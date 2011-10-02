@@ -50,7 +50,7 @@ namespace synthese
 		class Transaction;
 
 		/** Transaction part table synchronizer.
-			@ingroup m37LS refLS
+			@ingroup m57LS refLS
 		*/
 		class TransactionPartTableSync : public db::DBNoSyncTableSyncTemplate<TransactionPartTableSync,TransactionPart>
 		{

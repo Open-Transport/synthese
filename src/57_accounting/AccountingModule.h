@@ -12,8 +12,36 @@
 
 namespace synthese
 {
-	/** @defgroup m37 37 Accounting
-		@ingroup m3
+	/**	@defgroup m57Exceptions 57.01 Exceptions
+		@ingroup m57
+
+		@defgroup m57LS 57.10 Table synchronizers
+		@ingroup m57
+		@image html uml_pt_operation_tables.png
+
+		@defgroup m57Rights 57.12 Rights
+		@ingroup m57
+
+		@defgroup m57Logs 57.13 DB Logs
+		@ingroup m57
+
+		@defgroup m57Admin 57.14 Administration pages
+		@ingroup m57
+
+		@defgroup m57Actions 57.15 Actions
+		@ingroup m57
+
+		@defgroup m57Functions 57.15 Services
+		@ingroup m57
+
+		@defgroup m57File 57.16 File formats
+		@ingroup m57
+
+		@defgroup m57Alarm 57.17 Messages recipient
+		@ingroup m57
+
+		@defgroup m57 57 Accounting
+		@ingroup m5
 
 	@{
 	*/

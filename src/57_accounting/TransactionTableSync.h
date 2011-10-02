@@ -39,7 +39,7 @@ namespace synthese
 		class Account;
 
 		/** Transaction table synchronizer.
-			@ingroup m37LS refLS
+			@ingroup m57LS refLS
 		*/
 
 		class TransactionTableSync : public db::DBNoSyncTableSyncTemplate<TransactionTableSync,Transaction>

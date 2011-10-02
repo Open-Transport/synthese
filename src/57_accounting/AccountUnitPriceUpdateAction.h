@@ -36,7 +36,7 @@ namespace synthese
 		class Account;
 
 		/** AccountUnitPriceUpdateAction action class.
-			@ingroup m37Actions refActions
+			@ingroup m57Actions refActions
 		*/
 		class AccountUnitPriceUpdateAction
 			: public util::FactorableTemplate<server::Action, AccountUnitPriceUpdateAction>

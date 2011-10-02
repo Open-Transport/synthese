@@ -12,7 +12,7 @@ namespace synthese
 	namespace accounts
 	{
 		/** Currency.
-			@ingroup m37
+			@ingroup m57
 		*/
 		class Currency : public util::RegistrableTemplate< Currency>
 		{
