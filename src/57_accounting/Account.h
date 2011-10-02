@@ -40,7 +40,7 @@ namespace synthese
 		class Currency;
 
 		/** Account.
-			@ingroup m37
+			@ingroup m57
 			The account can be used in several ways :
 				- standard account between two entities : leftUser and rightUser, with or without numbers.
 				- template account handled by an entity : all left variables are null or empty. leftUser will be specified in the transactions.

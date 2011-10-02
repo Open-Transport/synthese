@@ -35,7 +35,7 @@ namespace synthese
 		class Account;
 
 		/** AccountRenameAction action class.
-			@ingroup m37Actions refActions
+			@ingroup m57Actions refActions
 		*/
 		class AccountRenameAction
 			: public util::FactorableTemplate<server::Action, AccountRenameAction>

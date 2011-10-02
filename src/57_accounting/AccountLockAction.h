@@ -35,7 +35,7 @@ namespace synthese
 		class Account;
 
 		/** AccountLockAction action class.
-			@ingroup m37Actions refActions
+			@ingroup m57Actions refActions
 		*/
 		class AccountLockAction
 			: public util::FactorableTemplate<server::Action, AccountLockAction>
