@@ -38,3 +38,5 @@ boost_test(RoutePlanner "${DEPS}" "RoutePlannerTestData.inc.hpp;RoutePlannerTest
 # This is not a test, but we'll keep it here for now.
 add_executable(ImportRoutePlannerTestData ImportRoutePlannerTestData.cpp RoutePlannerTestData.inc.hpp RoutePlannerTestData.hpp)
 target_link_libraries(ImportRoutePlannerTestData ${Boost_LIBRARIES} ${DEPS})
+
+install(TARGETS ImportRoutePlannerTestData DESTINATION bin)
