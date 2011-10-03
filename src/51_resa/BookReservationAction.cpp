@@ -92,6 +92,8 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_ROLLING_STOCK_FILTER_ID = Action_PARAMETER_PREFIX + "tm";
 
 		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS(Action_PARAMETER_PREFIX + "ac");
+		const string BookReservationAction::PARAMETER_APPROACH_SPEED(Action_PARAMETER_PREFIX + "apsp");
+		const string BookReservationAction::PARAMETER_MAX_TRANSPORT_CONNECTION(Action_PARAMETER_PREFIX + "mtc");
 
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
@@ -148,29 +150,13 @@ namespace synthese
 			{
 				if (_journey.getOrigin())
 				{
-					const NamedPlace* place(GetPlaceFromOrigin(_journey, _originPlace));
-					if(place)
-					{
-						map.insert(PARAMETER_ORIGIN_CITY, place->getCity()->getName());
-						map.insert(PARAMETER_ORIGIN_PLACE, place->getName());
-					}
-					else if(dynamic_cast<City*>(_originPlace.get()))
-					{
-						map.insert(PARAMETER_ORIGIN_CITY, dynamic_cast<City*>(_originPlace.get())->getName());
-					}
+					map.insert(PARAMETER_ORIGIN_CITY,_originCity);
+					map.insert(PARAMETER_ORIGIN_PLACE,_originPlace);
 				}
 				if (_journey.getDestination())
 				{
-					const NamedPlace* place(GetPlaceFromDestination(_journey, _destinationPlace));
-					if(place)
-					{
-						map.insert(PARAMETER_DESTINATION_CITY, place->getCity()->getName());
-						map.insert(PARAMETER_DESTINATION_PLACE, place->getName());
-					}
-					else if(dynamic_cast<City*>(_destinationPlace.get()))
-					{
-						map.insert(PARAMETER_DESTINATION_CITY, dynamic_cast<City*>(_destinationPlace.get())->getName());
-					}
+					map.insert(PARAMETER_DESTINATION_CITY,_destinationCity);
+					map.insert(PARAMETER_DESTINATION_PLACE,_destinationPlace);
 				}
 				if (!_journey.getFirstDepartureTime().is_not_a_date_time())
 				{
@@ -180,6 +166,9 @@ namespace synthese
 				{
 					map.insert(PARAMETER_SITE, _site->getKey());
 					map.insert(PARAMETER_USER_CLASS_ID, static_cast<int>(_accessParameters.getUserClass()));
+					map.insert(PARAMETER_APPROACH_SPEED, static_cast<double>(_accessParameters.getApproachSpeed()));
+					if(_accessParameters.getMaxtransportConnectionsCount())
+						map.insert(PARAMETER_MAX_TRANSPORT_CONNECTION, static_cast<int>(*_accessParameters.getMaxtransportConnectionsCount()));
 					if(_rollingStockFilter)
 					{
 						map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, static_cast<int>(_rollingStockFilter->getRank()));
@@ -194,31 +183,37 @@ namespace synthese
 			return map;
 		}
 
-
-
 		void BookReservationAction::setOriginDestinationPlace(
-			string origcity,
-			string origplace,
-			string destcity,
-			string destplace
+			string originCity,
+			string originPlace,
+			string destinationCity,
+			string destinationPlace
 		){
+			_originCity  = originCity;
+			_originPlace = originPlace;
+			_destinationCity  = destinationCity;
+			_destinationPlace = destinationPlace;
+		}
+
+		void BookReservationAction::updatePlace()
+		{
 			if(ResaModule::GetJourneyPlannerWebsite())
 			{
-				_originPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(origcity,origplace);
-				_destinationPlace = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(destcity,destplace);
+				_originPlaceGeography = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_originCity,_originPlace);
+				_destinationPlaceGeography = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_destinationCity,_destinationPlace);
 			}
 			else
 			{
-				_originPlace = RoadModule::FetchPlace(
+				_originPlaceGeography = RoadModule::FetchPlace(
 					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					origcity,
-					origplace
-					);
-				_destinationPlace = RoadModule::FetchPlace(
+					_originCity,
+					_originPlace
+				);
+				_destinationPlaceGeography = RoadModule::FetchPlace(
 					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					destcity,
-					destplace
-					);
+					_destinationCity,
+					_destinationPlace
+				);
 			}
 		}
 
@@ -382,11 +377,12 @@ namespace synthese
 					map.get<string>(PARAMETER_DESTINATION_CITY),
 					map.get<string>(PARAMETER_DESTINATION_PLACE)
 				);
-				if(!_destinationPlace.get())
+				updatePlace();
+				if(!_destinationPlaceGeography.get())
 				{
 					throw ActionException("Invalid destination place");
 				}
-				if(!_originPlace.get())
+				if(!_originPlaceGeography.get())
 				{
 					throw ActionException("Invalid origin place");
 				}
@@ -396,12 +392,12 @@ namespace synthese
 				ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
 				ptime arrivalDateTime(departureDateTime);
 				arrivalDateTime += days(1);
-				if(	_originPlace->getPoint().get() &&
-					!_originPlace->getPoint()->isEmpty() &&
-					_destinationPlace->getPoint().get() &&
-					!_destinationPlace->getPoint()->isEmpty()
+				if(	_originPlaceGeography->getPoint().get() &&
+					!_originPlaceGeography->getPoint()->isEmpty() &&
+					_destinationPlaceGeography->getPoint().get() &&
+					!_destinationPlaceGeography->getPoint()->isEmpty()
 				){
-					arrivalDateTime += minutes(2 * static_cast<int>(_originPlace->getPoint()->distance(_destinationPlace->getPoint().get()) / 1000));
+					arrivalDateTime += minutes(2 * static_cast<int>(_originPlaceGeography->getPoint()->distance(_destinationPlaceGeography->getPoint().get()) / 1000));
 				}
 
 				// Accessibility
@@ -428,6 +424,13 @@ namespace synthese
 						map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
 						_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 					);
+
+
+					if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
+						_accessParameters.setApproachSpeed(map.get<double>(PARAMETER_APPROACH_SPEED));
+					if(map.getOptional<int>(PARAMETER_MAX_TRANSPORT_CONNECTION))
+						_accessParameters.setMaxtransportConnectionsCount(map.get<int>(PARAMETER_MAX_TRANSPORT_CONNECTION));
+
 				}
 				else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
 				{
@@ -435,8 +438,8 @@ namespace synthese
 				}
 
 				PTTimeSlotRoutePlanner rp(
-					_originPlace.get(),
-					_destinationPlace.get(),
+					_originPlaceGeography.get(),
+					_destinationPlaceGeography.get(),
 					departureDateTime,
 					departureDateTime,
 					arrivalDateTime,

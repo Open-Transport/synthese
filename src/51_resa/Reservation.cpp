@@ -72,7 +72,7 @@ namespace synthese
 		ReservationStatus Reservation::getStatus() const
 		{
 			if (_reservationRuleId == 0)
-				return TO_BE_DONE;
+				return NO_RESERVATION;
 
 			const ptime& cancellationTime(getTransaction()->getCancellationTime());
 			const ptime now(second_clock::local_time());

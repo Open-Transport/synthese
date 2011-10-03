@@ -35,11 +35,14 @@
 #include "StopArea.hpp"
 #include "Webpage.h"
 #include "Website.hpp"
+#include <geos/geom/Point.h>
 
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
+
 
 namespace synthese
 {
@@ -63,6 +66,8 @@ namespace synthese
 		const std::string PlacesListFunction::PARAMETER_NUMBER("n");
 		const std::string PlacesListFunction::PARAMETER_PAGE("page_id");
 		const string PlacesListFunction::PARAMETER_ITEM_PAGE("item_page_id");
+
+		const string PlacesListFunction::PARAMETER_SRID("srid");
 
 		const std::string PlacesListFunction::DATA_CITY_ID("city_id");
 		const std::string PlacesListFunction::DATA_CITY_NAME("city_name");
@@ -104,6 +109,11 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
 			}
+			if(_coordinatesSystem)
+			{
+					map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
+			}
+
 			return map;
 		}
 
@@ -171,6 +181,10 @@ namespace synthese
 					_city = cities.front().value;
 				}
 			}
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 		}
 
 
@@ -235,12 +249,23 @@ namespace synthese
 						{
 							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getKey() << "\"";
 						}
+						shared_ptr<Point> placePoint;
+						placePoint = _coordinatesSystem->convertPoint(*it.placeResult.value.get()->getPoint());
+						double x = 0.0;
+						double y = 0.0;
+						if(placePoint.get())
+						{
+							x = placePoint->getX();
+							y = placePoint->getY();
+						}
 						stream <<
 							" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
 							" levenshtein=\"" << it.placeResult.score.levenshtein << "\"" <<
 							" cityId=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getCity()->getKey() << "\"" <<
 							" cityName=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getCity()->getName() << "\"" <<
 							" name=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getName() << "\"" <<
+							" x=\"" << x << "\"" <<
+							" y=\"" << y << "\"" <<
 						">";
 
 						if(dynamic_cast<const House*>(it.placeResult.value.get()) && dynamic_cast<const House*>(it.placeResult.value.get())->getHouseNumber())
@@ -308,6 +333,7 @@ namespace synthese
 						{
 							stream << *dynamic_cast<const House*>(it.second.get())->getHouseNumber() << " ";
 						}
+
 						stream << it.first.getSource() << "</option>";
 					}
 					stream << "</options>";

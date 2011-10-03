@@ -40,6 +40,7 @@
 #include "PTPlaceAdmin.h"
 #include "StopPointAdmin.hpp"
 #include "StopAreaAddAction.h"
+#include "RollingStock.hpp"
 #include "StopArea.hpp"
 #include "DataSource.h"
 #include "Importer.hpp"
@@ -56,16 +57,25 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "PTUseRuleTableSync.h"
 #include "IConv.hpp"
+#include "ContinuousService.h"
+#include "ZipWriter.hpp"
+#include "Path.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+
+#include <geos/geom/LineString.h>
+#include <geos/geom/Geometry.h>
+#include <geos/geom/GeometryCollection.h>
+#include <geos/geom/Coordinate.h>
 
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -106,6 +116,12 @@ namespace synthese
 		const std::string GTFSFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string GTFSFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string GTFSFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+
+		const std::string GTFSFileFormat::Exporter_::PARAMETER_NETWORK_ID("ni");
+		const std::string GTFSFileFormat::Exporter_::LABEL_TAD("tad");
+		const int GTFSFileFormat::Exporter_::WGS84_SRID(4326);
+
+		std::map<std::string, util::RegistryKeyType> GTFSFileFormat::Exporter_::shapeId;
 	}
 
 	namespace impex
@@ -377,7 +393,7 @@ namespace synthese
 			}
 			else if(key == FILE_TRANSFERS)
 			{
-				//TODO
+				// TODO
 			}
 			else if(key == FILE_AGENCY)
 			{
@@ -492,7 +508,7 @@ namespace synthese
 					_calendars[_getValue("service_id")] = c;
 				}
 			}
-			else if(key == FILE_CALENDAR_DATES) //5
+			else if(key == FILE_CALENDAR_DATES) // 5
 			{
 				while(getline(inFile, line))
 				{
@@ -687,19 +703,19 @@ namespace synthese
 			}
 			else if(key == FILE_FARE_ATTRIBUTES)
 			{
-				//TODO
+				// TODO
 			}
 			else if(key == FILE_FARE_RULES)
 			{
-				//TODO
+				// TODO
 			}
 			else if(key == FILE_SHAPES)
 			{
-				//TODO
+				// TODO
 			}
 			else if(key == FILE_FREQUENCIES)
 			{
-				//TODO
+				// TODO
 			}
 			return true;
 		}
@@ -719,8 +735,8 @@ namespace synthese
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 			stream << t.title("Fichiers");
+			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 			stream << t.cell("Fichier stops", t.getForm().getTextInput(_getFileParameterName(FILE_STOPS), _pathsMap[FILE_STOPS].file_string()));
 			stream << t.cell("Fichier transfers (optionnel)", t.getForm().getTextInput(_getFileParameterName(FILE_TRANSFERS), _pathsMap[FILE_TRANSFERS].file_string()));
 			stream << t.cell("Fichier réseaux", t.getForm().getTextInput(_getFileParameterName(FILE_AGENCY), _pathsMap[FILE_AGENCY].file_string()));
@@ -880,7 +896,7 @@ namespace synthese
 					{
 						continue;
 					}
-					
+
 					try
 					{
 						shared_ptr<const PTUseRule> ptUseRule(
@@ -918,4 +934,637 @@ namespace synthese
 			}
 			return serializedPTUseRuleBlockMasks.str();
 		}
-}	}
+
+		// PROVIDING ALL FILES
+
+		util::ParametersMap GTFSFileFormat::Exporter_::getParametersMap() const
+		{
+			ParametersMap result;
+			if (_network.get() != NULL)
+			{
+				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+			return result;
+		}
+
+		void GTFSFileFormat::Exporter_::setFromParametersMap(const ParametersMap& map)
+		{
+			try
+			{
+				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), Env::GetOfficialEnv());
+			}
+			catch (...)
+			{
+				throw Exception("Transport network " + lexical_cast<string>(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID)) + " not found");
+			}
+		}
+
+		RegistryKeyType GTFSFileFormat::Exporter_::_key(RegistryKeyType key,RegistryKeyType suffix) const
+		{
+			RegistryKeyType gtfsKey;
+			gtfsKey = 0;
+			if(suffix)
+				gtfsKey = suffix << 32;
+			gtfsKey |= key & (RegistryKeyType)0xFFFFFFFF;
+			return gtfsKey;
+		}
+
+		string GTFSFileFormat::Exporter_::_Str(string str)const
+		{
+			string sub;
+			size_t rp;
+			size_t lp = str.find("\"", 0);
+			while(lp != string::npos)
+			{
+				rp = str.find("\"", lp+1);
+				if(rp != string::npos)
+				{
+					sub = str.substr(lp, rp);
+					sub = "\"" + sub + "\"";
+					str.replace(lp, rp, sub);
+					lp = rp + 3;
+				}
+				else
+				{
+					string sub = "\"\"\"";
+					str.replace(lp, 1, sub);
+					break;
+				}
+				lp = str.find("\"", lp);
+			}
+			if((str.find(",", 0) != string::npos) || (str.find("'", 0) != string::npos))
+			{
+				str = "\"" + str + "\"";
+			}
+			return str;
+		}
+
+		string GTFSFileFormat::Exporter_::_SubLine(string str)const
+		{
+			size_t lp = str.find(" (");
+
+			if(lp == string::npos)
+				return str;
+			return str.substr (0, lp);
+
+		}
+
+		void GTFSFileFormat::Exporter_::_addShapes(const Path * path,
+			RegistryKeyType shapeIdKey,
+			stringstream& shapeTxt,
+			stringstream& tripTxt,
+			string tripName
+		) const
+		{
+			if(shapeId.find(tripName) != shapeId.end())
+			{
+				tripTxt << shapeId[tripName];
+				return;
+			}
+
+			int cpt_seq = 0;
+			double lastx = 0.0;
+			double lasty = 0.0;
+
+			BOOST_FOREACH(Edge* edge, path->getAllEdges())
+			{
+				if( ! edge->getNext())
+					break;
+
+				shared_ptr<geos::geom::LineString> lineStr = edge->getRealGeometry();
+
+				shared_ptr<geos::geom::Geometry> prGeom(CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertGeometry(*lineStr));
+
+				size_t nb_Points = lineStr->getNumPoints();
+
+				for( int i=0; i< nb_Points; i++)
+				{
+					const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
+
+					if(( pt.y == lasty ) && (pt.x == lastx))
+						continue;
+
+					lastx = pt.x;
+					lasty = pt.y;
+
+					shapeTxt << shapeIdKey << ","
+						<< pt.y << ","
+						<< pt.x << ","
+						<< cpt_seq++
+						<< endl;
+				}
+			}
+			shapeId[tripName]=shapeIdKey;
+			tripTxt << shapeIdKey;
+		}
+
+		void GTFSFileFormat::Exporter_::_addTrips(stringstream& trips,
+			RegistryKeyType tripId,
+			RegistryKeyType service,
+			RegistryKeyType route,
+			string tripHeadSign
+		) const
+		{
+			trips << tripId << "," // trip_id
+				<< service << "," // service_id
+				<< route << "," // route_id
+				<< tripHeadSign << ","; // trip_head_sign
+		}
+
+		void GTFSFileFormat::Exporter_::_addCalendars( stringstream& calendar,
+			stringstream& calendarDates,
+			const SchedulesBasedService* service,
+			RegistryKeyType serviceId,
+			bool isContinuous
+		) const
+		{
+			if(isContinuous)
+			{
+				static_cast<const ContinuousService *>(service);
+			}
+			else
+			{
+				static_cast<const ScheduledService *>(service);
+			}
+			boost::gregorian::date currentDay, firstActiveDay;
+			boost::gregorian::date lastActiveDay = service->getLastActiveDate();
+			bool weekDays [7];
+			currentDay = firstActiveDay = service->getFirstActiveDate();
+			boost::gregorian::date::day_of_week_type dayOfWeek = firstActiveDay.day_of_week();
+			unsigned int firstActiveDayIndex = (dayOfWeek + 6) % 7; // 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+
+			// 0 -> Mon; 1 -> Tues; ...; 6 -> Sun
+			for(int i = 0; i<7; i++)
+			{
+				weekDays[(i+firstActiveDayIndex) % 7] = service->isActive(firstActiveDay + date_duration(i));
+			}
+
+			calendar << serviceId << ",";
+
+			for(int i=0; i<7; i++)
+			{
+				calendar << weekDays[i] << ",";
+			}
+
+			calendar << to_iso_string(service->getFirstActiveDate()) << ","
+				<< to_iso_string(service->getLastActiveDate())
+				<< endl;
+
+			// END CALENDAR.TXT
+
+			// BEGIN CALENDAR_DATES.TXT
+			for(int i = 0; currentDay <= lastActiveDay;i++)
+			{
+				bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
+				if(isNormalyActive != (service->isActive(currentDay) ? 1 : 0))
+				{
+					calendarDates << serviceId << ","
+						<< to_iso_string(currentDay) << ","
+						<< (2 - weekDays[(firstActiveDayIndex + i) % 7])
+						<< endl;
+				}
+				currentDay += date_duration(i);
+			}
+		}
+
+		void GTFSFileFormat::Exporter_::_addFrequencies(stringstream& frequencies,
+			RegistryKeyType tripId,
+			const ContinuousService* service
+		) const
+		{
+			boost::posix_time::time_duration headway = service->getMaxWaitingTime ();
+			boost::posix_time::time_duration DBSTI = service->getDepartureBeginScheduleToIndex(false, 0);
+			boost::posix_time::time_duration DESTI = service->getDepartureEndScheduleToIndex(false, 0);
+
+			frequencies << tripId << "," // trip_id
+				<< DBSTI << "," // start_time
+				<< DESTI << "," // start_time
+				<< headway.total_seconds() // headway_secs
+				<< endl;
+		}
+
+		void GTFSFileFormat::Exporter_::_addStopTimes(stringstream& stopTimes,
+			const LineStopTableSync::SearchResult linestops,
+			const SchedulesBasedService* service,
+			bool& stopTimesExist,
+			bool isContinuous
+		) const
+		{
+			bool passMidnight = false;
+
+			if(isContinuous)
+			{
+				static_cast<const ContinuousService *>(service);
+			}
+			else
+			{
+				static_cast<const ScheduledService *>(service);
+			}
+
+			BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
+			{
+				shared_ptr<geos::geom::Point> gp;
+				string departureTimeStr;
+				string arrivalTimeStr;
+				boost::posix_time::time_duration arrival;
+				boost::posix_time::time_duration departure;
+
+				if (ls->getRankInPath() > 0 && ls->isArrival())
+				{
+					arrival = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
+				}
+				else
+				{
+					arrival = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+				}
+
+				if (ls->getRankInPath()+1 != linestops.size() && ls->isDeparture())
+				{
+					departure = Service::GetTimeOfDay(service->getDepartureBeginScheduleToIndex(false, ls->getRankInPath()));
+				}
+				else
+				{
+					departure = Service::GetTimeOfDay(service->getArrivalBeginScheduleToIndex(false, ls->getRankInPath()));
+				}
+
+				// Correct trips over midnight
+				if(arrival.hours() >= 22 || departure.hours() >= 22)
+				passMidnight = true;
+
+				if(passMidnight)
+				{
+					if(arrival.hours() < 12)
+						arrival = arrival + hours(24);
+					if(departure.hours() < 12)
+						departure = departure + hours(24);
+				}
+
+				boost::posix_time::time_duration diff = arrival - departure;
+
+				if((diff.hours() == 0) && (diff.minutes() > 0))
+				{
+					departure = arrival;
+				}
+
+				arrivalTimeStr = to_simple_string(arrival);
+				departureTimeStr = to_simple_string(departure);
+				const StopPoint * stopPoint(static_cast<const StopPoint *>(ls->getFromVertex()));
+
+				if(stopPoint->hasGeometry())
+				{
+					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stopPoint->getGeometry());
+				}
+
+				if(gp.get())
+				{
+					stopTimes <<_key(service->getKey(), 1) << ","
+						<< _key(stopPoint->getKey()) << ","
+						<< ls->getRankInPath() << ","
+						<< arrivalTimeStr.substr(0, 8) << ","
+						<< departureTimeStr.substr(0, 8) << ","
+						<< ","
+						<< ","
+						<< ","
+						<< endl;
+					stopTimesExist = true;
+				}
+			}
+		}
+
+		void GTFSFileFormat::Exporter_::_filesProvider(const SchedulesBasedService* service,
+			stringstream& stopTimesTxt,
+			stringstream& tripsTxt,
+			stringstream& shapesTxt,
+			stringstream& calendarTxt,
+			stringstream& calendarDatesTxt,
+			stringstream& frequenciesTxt,
+			list < pair<const Calendar *, RegistryKeyType> > & calendarMap,
+			bool isContinuous
+		) const
+		{
+			RegistryKeyType serviceKey;
+			RegistryKeyType routeId;
+			string tripHeadSign;
+			bool stopTimesExist = false;
+
+			routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
+
+			tripHeadSign = _SubLine(_Str(static_cast<const JourneyPattern *>(&(*service->getPath()))->getName()));
+
+			RegistryKeyType tripId = _key(service->getKey(), 1);
+			const Path * path = service->getPath();
+
+			// BEGIN STOP_TIMES.TXT 1/2
+
+			LineStopTableSync::SearchResult lineStops(LineStopTableSync::Search(_env, service->getPath()->getKey()));
+
+			_addStopTimes(stopTimesTxt,
+				lineStops,
+				service,
+				stopTimesExist,
+				isContinuous
+			);
+
+			// END STOP_TIMES.TXT 1/2
+
+			const Calendar * currentCal = static_cast<const Calendar *>(service);
+			list <pair<const Calendar *, RegistryKeyType> >::iterator itCal = calendarMap.begin();
+			bool alreadyExist = false;
+			while(itCal != calendarMap.end())
+			{
+				if(*(itCal->first) == *currentCal)
+				{
+					alreadyExist = true;
+					break;
+				}
+				itCal++;
+			}
+
+			if(!alreadyExist)
+			{
+				serviceKey = _key(service->getKey());
+
+				calendarMap.push_back(make_pair(currentCal, serviceKey));
+
+				// BEGIN TRIPS.TXT 1.1
+				// trip_id,service_id,route_id,trip_headsign
+				if(stopTimesExist) // only trips wich have stops_times will be added
+				{
+					if(isContinuous)
+					{
+						// BEGIN FREQUENCIES.TXT 1_2
+
+						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+
+						// END FREQUENCIES.TXT 1_2
+					}
+
+					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+
+					// BEGIN SHAPES.TXT 1.1
+
+					_addShapes(path, tripId, shapesTxt, tripsTxt, tripHeadSign);
+
+					// END SHAPES.TXT 1.1
+
+					tripsTxt << endl;
+
+					// END TRIPS.TXT 1.1
+				}
+
+				// BEGIN CALENDAR.TX & CALENDAR_DATES 1/2
+
+				_addCalendars(calendarTxt, calendarDatesTxt, service, serviceKey, isContinuous);
+
+				// END CALENDAR.TX & CALENDAR_DATES 1/2
+			}
+			else
+			{
+				serviceKey = itCal->second;
+
+				// BEGIN TRIPS.TXT 1.2
+				// trip_id,service_id,route_id,trip_headsign
+				if(stopTimesExist)
+				{
+					_addTrips(tripsTxt, tripId, serviceKey, routeId, tripHeadSign);
+
+					if(isContinuous)
+					{
+						// BEGIN FREQUENCIES.TXT 2_2
+
+						_addFrequencies(frequenciesTxt, tripId, static_cast<const ContinuousService *>(service));
+
+						// END FREQUENCIES.TXT 2_2
+					}
+
+					// BEGIN SHAPES.TXT 1.2
+
+					_addShapes(path, tripId, shapesTxt, tripsTxt, tripHeadSign);
+
+					// END SHAPES.TXT 1.2
+
+					tripsTxt << endl;
+				}
+				// END TRIPS.TXT
+			}
+		}
+
+		// EXPORTER_::BUILD
+
+		void GTFSFileFormat::Exporter_::build(ostream& os) const
+		{
+			stringstream agencyTxt;
+			stringstream stopsTxt;
+			stringstream routesTxt;
+			stringstream tripsTxt;
+			stringstream stopTimesTxt;
+			stringstream calendarTxt;
+			stringstream calendarDatesTxt;
+			stringstream shapesTxt;
+			stringstream frequenciesTxt;
+			stringstream transfersTxt;
+
+			// Add header line to each file
+			agencyTxt << "﻿agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang" << endl;
+			stopsTxt << "stop_id,stop_code,stop_name,stop_lat,stop_lon,location_type,parent_station" << endl;
+			routesTxt << "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color" << endl;
+			tripsTxt << "trip_id,service_id,route_id,trip_headsign,shape_id" << endl;
+			stopTimesTxt << "﻿trip_id,stop_id,stop_sequence,arrival_time,departure_time,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled" << endl;
+			calendarTxt << "﻿service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date" << endl;
+			calendarDatesTxt << "﻿service_id,date,exception_type" << endl;
+			shapesTxt << "﻿﻿shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence" << endl;
+			frequenciesTxt << "trip_id,start_time,end_time,headway_secs" << endl;
+			transfersTxt << "﻿﻿.::. NOT YET .::." <<endl;
+
+			// BEGIN AGENCY.TXT
+			BOOST_FOREACH(Registry<TransportNetwork>::value_type myAgency, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
+			{
+				// ﻿agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang
+				agencyTxt << _key(myAgency.first) << "," // ﻿agency_id
+					<< _Str(myAgency.second->getRuleUserName()) << "," // agency_name
+					<< "," // agency_url
+					<< "," // agency_timezone
+					<< "," // agency_phone
+					<< endl; // agency_lang
+				}
+				// END AGENCY.TXT
+
+			// BEGIN STOPS.TXT
+			BOOST_FOREACH(
+				Registry<StopPoint>::value_type itps,
+				Env::GetOfficialEnv().getRegistry<StopPoint>()
+			){
+				const StopPoint& stopPoint(*itps.second);
+				if (stopPoint.getDepartureEdges().empty() && stopPoint.getArrivalEdges().empty()) continue;
+
+				shared_ptr<geos::geom::Point> gp;
+				if(stopPoint.hasGeometry())
+				{
+					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stopPoint.getGeometry());
+				}
+
+				if(gp.get())
+				{
+					stopsTxt << _key(stopPoint.getKey()) << "," // stop_id
+						<< stopPoint.getCodeBySources() << "," // stop_code
+						<< _Str(((stopPoint.getName()) == "" ? stopPoint.getConnectionPlace()->getName():stopPoint.getName())) << "," // stop_name
+						<< gp->getY() << "," // stop_lat
+						<< gp->getX() << "," // stop_lon
+						<< "0," // location_type
+						<< _key(stopPoint.getConnectionPlace()->getKey()) // parent_station
+						<< endl;
+				}
+			}
+
+			BOOST_FOREACH(
+				Registry<StopArea>::value_type itcp,
+				Env::GetOfficialEnv().getRegistry<StopArea>()
+			){
+				const StopArea* connPlace(itcp.second.get());
+
+				shared_ptr<geos::geom::Point> gp;
+				if(connPlace->getPoint().get() && !connPlace->getPoint()->isEmpty())
+				{
+					gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*connPlace->getPoint());
+				}
+				else // get first point coordinates
+				{
+					const StopArea::PhysicalStops& stops(connPlace->getPhysicalStops());
+					if(!stops.empty())
+					{
+						if(stops.begin()->second->hasGeometry())
+						{
+							gp = CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertPoint(*stops.begin()->second->getGeometry());
+						}
+					}
+				}
+
+				if(gp.get())
+				{
+					stopsTxt << _key(connPlace->getKey()) << "," //stop_id
+						<< "," //stop_code
+						<< _Str(connPlace->getName()) << "," //stop_name
+						<< gp->getY() << "," //stop_lat
+						<< gp->getX() << "," //stop_lon
+						<< "1," //location_type
+						<< endl; //StopArea does not have parentStation !
+				}
+			}
+			// END STOPS.TXT
+
+			// BEGIN ROUTES.TXT
+			BOOST_FOREACH(Registry<CommercialLine>::value_type  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
+			{
+				// ﻿route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+				if((static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+				{
+					string color;
+
+					if(!(myLine.second->getColor()))
+					{
+						color = "";
+					}
+					else
+					{
+						color = _Str(myLine.second->getColor()->toXMLColor());
+
+						if(color[0] == '#')
+						{
+							color = color.substr(1);
+						}
+					}
+					routesTxt << _key(myLine.first) << "," //route_id
+						<< _key(myLine.second->getNetwork()->getKey()) << "," //agency_id
+						<< _Str(myLine.second->getShortName()) << "," //route_short_name
+						<< _Str(myLine.second->getLongName()) << "," //route_long_name
+						<< _Str(myLine.second->getRuleUserName()) << "," //route_desc
+						<< static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getGTFSKey() << "," //route_type
+						<< "," //route_url
+						<< (color != "" ? color : "000000") << "," //route_color
+						<< "FFFFFF" //route_text_color
+						<< endl;
+				}
+			}
+
+			// END ROUTES.TXT
+
+			// BEGIN STOP_TIMES.TXT + CALENDAR + TRIPS.TXT # SERVICES 1/2
+
+			list < pair<const Calendar *, RegistryKeyType> > calendarMap;
+
+			BOOST_FOREACH(Registry<ScheduledService>::value_type itsdsrv, Env::GetOfficialEnv().getRegistry<ScheduledService>())
+			{
+				const ScheduledService* sdService(itsdsrv.second.get());
+
+				if(sdService)
+				{
+					if((static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+					{
+						_filesProvider(sdService,
+							stopTimesTxt,
+							tripsTxt,
+							shapesTxt,
+							calendarTxt,
+							calendarDatesTxt,
+							frequenciesTxt,
+							calendarMap,
+							false);
+					}
+				}
+				else
+				{
+					synthese::util::Log::GetInstance().warn("Unavailable Scheduled Service");
+					break;
+				}
+			}
+
+			// END STOP_TIMES.TXT + CALENDAR + TRIPS.TXT # SERVICES 1/2
+
+			// BEGIN STOP_TIMES.TXT + CALENDAR + TRIPS.TXT # SERVICES 2/2
+
+			BOOST_FOREACH(Registry<ContinuousService>::value_type itcssrv, Env::GetOfficialEnv().getRegistry<ContinuousService>())
+			{
+				const ContinuousService* csService(itcssrv.second.get());
+
+				if(csService)
+				{
+					if((static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+					{
+						_filesProvider(csService,
+							stopTimesTxt,
+							tripsTxt,
+							shapesTxt,
+							calendarTxt,
+							calendarDatesTxt,
+							frequenciesTxt,
+							calendarMap,
+							true);
+					}
+				}
+				else
+				{
+					synthese::util::Log::GetInstance().warn("Unavailable Continuous Service");
+					break;
+				}
+			}
+
+			// END CALENDAR & TRIPS.TXT # SERVICES
+
+			ZipWriter * zip = new ZipWriter(os);
+
+			zip->Write("agency.txt", agencyTxt);
+			zip->Write("routes.txt", routesTxt);
+			zip->Write("stops.txt", stopsTxt);
+			zip->Write("trips.txt", tripsTxt);
+			zip->Write("stop_times.txt", stopTimesTxt);
+			zip->Write("calendar.txt", calendarTxt);
+			zip->Write("calendar_dates.txt", calendarDatesTxt);
+			zip->Write("shapes.txt", shapesTxt);
+			zip->Write("frequencies.txt", frequenciesTxt);
+
+			zip->WriteDirectory();
+
+			os << flush;
+		}
+	}
+}

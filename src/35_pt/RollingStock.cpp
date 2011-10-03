@@ -58,7 +58,34 @@ namespace synthese
 
 		}
 
+		const string RollingStock::getGTFSKey() const
+		{
+			/* GTFS rolling stocks are:
+			 *
+			 * 0 - Tram, Streetcar, Light rail. Any light rail or street level system within a metropolitan area.
+			 * 1 - Subway, Metro. Any underground rail system within a metropolitan area.
+			 * 2 - Rail. Used for intercity or long-distance travel.
+			 * 3 - Bus. Used for short- and long-distance bus routes.
+			 * 4 - Ferry. Used for short- and long-distance boat service.
+			 * 5 - Cable car. Used for street-level cable cars where the cable runs beneath the car.
+			 * 6 - Gondola, Suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
+			 * 7 - Funicular. Any rail system designed for steep inclines.
+			 *
+			 */
 
+			string gtfsRollStock = "3"; // default is BUS
+
+			if(_tridentKey == "Metro")
+			{
+				gtfsRollStock = "1";
+			}
+			else if(_tridentKey == "Tramway")
+			{
+				gtfsRollStock = "0";
+			}
+
+			return gtfsRollStock;
+		}
 
 		PathClass::Identifier RollingStock::getIdentifier() const
 		{
