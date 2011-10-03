@@ -38,7 +38,7 @@ from synthesepy.functional_test import http_testcase
 log = logging.getLogger(__name__)
 
 
-class LoginTest(http_testcase.HTTPTestCase):
+class StopAreasListFunctionTest(http_testcase.HTTPTestCase):
     # Uncomment for debugging
     #system_packages = ('routePlanner', 'testData', 'core', 'demo', 'map')
 
@@ -60,6 +60,12 @@ class LoginTest(http_testcase.HTTPTestCase):
         expected_xml = """<?xml version="1.0" ?>
         <stopAreas xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
             xsi:noNamespaceSchemaLocation="http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd">
+            <stopArea cityId="1688849860511154" cityName="City54"
+                city_id="1688849860511154" city_name="City54" directionAlias=""
+                id="1970324837184607" name="07" stop_id="1970324837184607"
+                stop_name="07" stop_name_13="" stop_name_26=""
+                stop_name_for_timetables=""
+                x="153971.888184" y="5413842.009339"/>
             <stopArea cityId="1688849860530938" cityName="City38"
                 city_id="1688849860530938" city_name="City38"
                 directionAlias="" id="1970324837184596" name="96'&lt;&gt;&quot;"
@@ -80,12 +86,6 @@ class LoginTest(http_testcase.HTTPTestCase):
                     line_style="vertclair" longName="" name="" shortName="98"
                     style="vertclair" timetable_id="0"/>
             </stopArea>
-            <stopArea cityId="1688849860511154" cityName="City54"
-                city_id="1688849860511154" city_name="City54" directionAlias=""
-                id="1970324837184607" name="07" stop_id="1970324837184607"
-                stop_name="07" stop_name_13="" stop_name_26=""
-                stop_name_for_timetables=""
-                x="153971.888184" y="5413842.009339"/>
         </stopAreas>
         """
 
