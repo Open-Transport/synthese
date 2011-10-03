@@ -58,6 +58,8 @@ XmlParser.cpp
 XmlParser.h
 XmlToolkit.cpp
 XmlToolkit.h
+ZipWriter.cpp
+ZipWriter.hpp
 concurrent/SynchronizedQueue.h
 )
 
