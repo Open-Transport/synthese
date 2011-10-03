@@ -117,21 +117,21 @@ namespace synthese
 
 			typedef std::map<std::string, ThreadInfo> Threads;
 
-		    //! DbModule parameters
-		    static const std::string MODULE_PARAM_PORT;
-		    static const std::string MODULE_PARAM_NB_THREADS;
-		    static const std::string MODULE_PARAM_LOG_LEVEL;
+			//! DbModule parameters
+			static const std::string MODULE_PARAM_PORT;
+			static const std::string MODULE_PARAM_NB_THREADS;
+			static const std::string MODULE_PARAM_LOG_LEVEL;
 			static const std::string MODULE_PARAM_SMTP_SERVER;
 			static const std::string MODULE_PARAM_SMTP_PORT;
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
 
 			static const std::string VERSION;
 
-		    typedef std::map<std::string, Session*> SessionMap;
+			typedef std::map<std::string, Session*> SessionMap;
 
 		private:
 
-			static SessionMap				_sessionMap;
+			static SessionMap _sessionMap;
 
 			/// The io_service used to perform asynchronous operations.
 			static boost::asio::io_service _io_service;
@@ -193,8 +193,6 @@ namespace synthese
 				const HTTPRequest& req,
 				HTTPReply& rep
 			);
-
-
 
 		private:
 			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.

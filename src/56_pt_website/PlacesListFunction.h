@@ -28,6 +28,8 @@
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
 #include "TransportWebsiteTypes.hpp"
+#include "CoordinatesSystem.hpp"
+
 
 namespace synthese
 {
@@ -61,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
+			static const std::string PARAMETER_SRID;
 
 		protected:
 			static const std::string DATA_RESULTS_SIZE;
@@ -79,6 +82,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage>		_page;
 				boost::shared_ptr<const cms::Webpage>		_itemPage;
 				boost::shared_ptr<geography::City>	_city;
+				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
 

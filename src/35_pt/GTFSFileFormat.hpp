@@ -26,18 +26,22 @@
 #include "FileFormatTemplate.h"
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
-#include "NoExportPolicy.hpp"
+#include "OneFileExporter.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "Calendar.h"
 #include "PTDataCleanerFileFormat.hpp"
+#include "LineStopTableSync.h"
+#include "Path.h"
+#include "SchedulesBasedService.h"
 
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
+#include <list>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
@@ -57,6 +61,7 @@ namespace synthese
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
+		class TransportNetwork;
 		class PTUseRule;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -198,7 +203,92 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<GTFSFileFormat> Exporter_;
+			class Exporter_:
+				public impex::OneFileExporter<GTFSFileFormat>
+			{
+			private:
+				boost::shared_ptr<const pt::TransportNetwork> _network;
+
+				util::RegistryKeyType _key(util::RegistryKeyType key,
+					util::RegistryKeyType suffix = 0
+				) const;
+
+				std::string _Str(std::string str) const;
+
+				std::string _SubLine(std::string str) const;
+
+				void _addShapes(const graph::Path* path,
+					util::RegistryKeyType shapeIdKey,
+					std::stringstream& shapesTxt,
+					std::stringstream& tripTxt,
+					std::string tripName
+				) const;
+
+				void _addTrips(std::stringstream& trip_txt,
+					util::RegistryKeyType trip,
+					util::RegistryKeyType service,
+					util::RegistryKeyType route,
+					std::string tripHeadSign
+				) const;
+
+				void _addStopTimes(std::stringstream& stop_times_txt,
+					util::RegistryKeyType tripId,
+					util::RegistryKeyType stopId,
+					std::size_t rang,
+					std::string arrivalTime,
+					std::string departureTime
+				) const;
+
+				void _addFrequencies(std::stringstream& frequencies,
+					util::RegistryKeyType tripId,
+					const ContinuousService* service
+				) const;
+
+				void _filesProvider(const pt::SchedulesBasedService* service,
+					std::stringstream& stopTimesTxt,
+					std::stringstream& tripsTxt,
+					std::stringstream& shapesTxt,
+					std::stringstream& calendarTxt,
+					std::stringstream& calendarDatesTxt,
+					std::stringstream& frequenciesTxt,
+					std::list< std::pair< const calendar::Calendar * , util::RegistryKeyType > > & calendarMap,
+					bool isContinious
+				) const;
+
+				void _addStopTimes(std::stringstream& stopTimes,
+					const pt::LineStopTableSync::SearchResult linestops,
+					const pt::SchedulesBasedService* service,
+					bool& stopTimesExist,
+					bool isContinious
+				) const;
+
+				void _addCalendars(std::stringstream& calendar,
+					std::stringstream& calendarDates,
+					const pt::SchedulesBasedService* service,
+					util::RegistryKeyType serviceId,
+					bool isContinious
+				) const;
+
+				static const std::string LABEL_TAD;
+		        static const int WGS84_SRID;
+
+				static std::map<std::string,util::RegistryKeyType> shapeId;
+
+			public:
+				static const std::string PARAMETER_NETWORK_ID;
+
+				Exporter_(){}
+
+				virtual util::ParametersMap getParametersMap() const;
+
+				virtual void setFromParametersMap(const util::ParametersMap& map);
+
+				virtual void build(std::ostream& os) const;
+
+				virtual std::string getOutputMimeType() const { return "application/zip"; }
+				virtual std::string getFileName() const { return "GTFS.zip"; }
+
+			};
 		};
 	}
 }

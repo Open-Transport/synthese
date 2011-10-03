@@ -57,7 +57,7 @@ namespace synthese
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<RollingStock>	Registry;
+			typedef util::Registry<RollingStock> Registry;
 
 		protected:
 			std::string _article;
@@ -77,6 +77,7 @@ namespace synthese
 				const std::string& getArticle() const { return _article; }
 				const std::string& getIndicator() const { return _indicator; }
 				const std::string& getTridentKey() const { return _tridentKey; }
+				const std::string getGTFSKey() const;
 				bool getIsTridentKeyReference() const { return _isTridentKeyReference; }
 			//@}
 
