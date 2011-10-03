@@ -94,7 +94,11 @@ class Daemon(object):
         if os.path.isfile(pid_path):
             log.debug('Found pid file %s, removing it' % pid_path)
             # TODO: check if daemon is running with that pid and kill it if that's the case.
-            os.unlink(pid_path)
+            try:
+                os.unlink(pid_path)
+            except OSError:
+                # XXX not sure why that happens on the ci server.
+                pass
         return pid_path
 
     def start(self, kill_existing=True):
