@@ -36,8 +36,10 @@ import synthesepy.daemon
 import synthesepy.db_backends
 import synthesepy.doxygen
 import synthesepy.env
+import synthesepy.package
 import synthesepy.proxy
 import synthesepy.sqlite_to_mysql
+import synthesepy.system_install
 import synthesepy.test
 import synthesepy.utils
 import synthesepy.env
@@ -98,19 +100,22 @@ def sqlite_to_mysql(args, env):
 
 
 def create_project(args, env):
-    site_packages = None
-    if args.packages:
-        site_packages = {
-            'admin': ('admin',),
-            'main': args.packages,
-        }
     project_manager.create_project(
-        env, args.path, site_packages, args.conn_string,
+        env, args.path, args.system_packages, args.conn_string,
         overwrite=args.overwrite)
 
 
 def continuous_integration(args, env):
     synthesepy.continuous_integration.run(env, args)
+
+
+def system_install(args, env):
+    synthesepy.system_install.run(env, args)
+system_install.root_required = True
+
+
+def package(args, env):
+    synthesepy.package.run(env, args)
 
 
 # End of commands
@@ -158,6 +163,9 @@ def add_project_subparsers(subparsers):
     parser.add_argument('--dump', dest='db_dump')
     add_parser('db_remote_dump')
     add_parser('ssh')
+    add_parser('system_install_prepare')
+    add_parser('system_install')
+    add_parser('system_uninstall')
 
 
 def add_default_subparsers(subparsers):
@@ -256,7 +264,7 @@ def add_default_subparsers(subparsers):
     parser_create_project.set_defaults(func=create_project)
     parser_create_project.add_argument('--path', required=True)
     parser_create_project.add_argument(
-        '--packages', nargs='*')
+        '--system-packages', nargs='*')
     parser_create_project.add_argument('--conn-string')
     parser_create_project.add_argument(
         '--overwrite', action='store_true', default=False)
@@ -269,6 +277,17 @@ def add_default_subparsers(subparsers):
         '--no-clean-if-build-fails', action='store_true',
         help='Don\'t clean the build directory and build again in case of '
         'build failure')
+
+    parser_continuous_integration = subparsers.add_parser(
+        'system_install',
+        help='Install Synthese on the system (should be run from the installed'
+        ' location)')
+    parser_continuous_integration.set_defaults(func=system_install)
+
+    parser_package = subparsers.add_parser(
+        'package',
+        help='Create a Synthese package and save it to the configured location.')
+    parser_package.set_defaults(func=package)
 
 
 def main():
@@ -363,6 +382,9 @@ def main():
     parser.add_argument(
         '--restart-if-crashed', action='store_true',
         help='Automatically restart the daemon if it crashes')
+    parser.add_argument(
+        '--no-root-check', action='store_true',
+        help='Disable root user checks')
 
     subparsers = parser.add_subparsers(help='sub-command help')
     if project:
@@ -394,6 +416,13 @@ def main():
             else:
                 args.func(project, args, env)
         else:
+            root_required = getattr(args.func, 'root_required', False)
+            if not args.no_root_check and env.platform != 'win':
+                is_root = os.geteuid() == 0
+                if root_required and not is_root:
+                    raise Exception('You must run this command as root')
+                if not root_required and is_root:
+                    raise Exception('You can\'t run this command as root')
             args.func(args, env)
     finally:
         if config.beep_when_done:

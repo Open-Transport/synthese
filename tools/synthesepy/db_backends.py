@@ -30,7 +30,11 @@ import tempfile
 import time
 from UserDict import UserDict
 
-import MySQLdb
+try:
+    import MySQLdb
+except ImportError:
+    # Might not be installed yet when running system_install.
+    pass
 
 import synthesepy.build
 from synthesepy import daemon

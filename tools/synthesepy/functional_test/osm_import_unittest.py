@@ -97,10 +97,7 @@ class DBObjectTree(object):
 
 class OSMImportTest(http_testcase.HTTPTestCase):
     # Package override to avoid loading the testData package.
-    site_packages = {
-        'admin': ('admin',),
-        'main': (),
-    }
+    system_packages = ()
     OSM_SOURCE_ID = 16607027920896002
 
     @classmethod

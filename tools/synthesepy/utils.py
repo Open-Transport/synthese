@@ -29,6 +29,7 @@ import subprocess
 import sys
 import time
 import urllib2
+from xml.etree import ElementTree
 
 log = logging.getLogger(__name__)
 
@@ -272,3 +273,56 @@ def RemoveDirectory(*path):
       remove_with_retry(os.rmdir, os.path.join(root, name))
 
   remove_with_retry(os.rmdir, file_path)
+
+
+def maybe_makedirs(directory):
+    '''Create a directory if it doesn't already exist'''
+    if not os.path.isdir(directory):
+        os.makedirs(directory)
+
+
+class SVNInfo(object):
+    '''Class to retrieve metadata from a svn repository'''
+    def __init__(self, repo_path):
+        self.repo_path = repo_path
+
+        self._branch = None
+        self._version = None
+        self._last_msg = None
+
+    def _fetch_svn_info(self):
+        svn_info_output = subprocess.Popen(
+            ['svn', 'info', '--xml'],
+            cwd=self.repo_path,
+            stdout=subprocess.PIPE).communicate()[0]
+
+        info_tree = ElementTree.XML(svn_info_output)
+        self._branch = info_tree.find('entry/url').text.split('/')[-1]
+        self._version = info_tree.find('entry/commit').attrib['revision']
+
+    @property
+    def branch(self):
+        if not self._branch:
+            self._fetch_svn_info()
+        return self._branch
+
+    @property
+    def version(self):
+        if not self._version:
+            self._fetch_svn_info()
+        return self._version
+
+    def _fetch_svn_log(self):
+        svn_log_output = subprocess.Popen(
+            ['svn', 'log', '-l1', '--xml'],
+            cwd=self.repo_path,
+            stdout=subprocess.PIPE).communicate()[0]
+
+        log_tree = ElementTree.XML(svn_log_output)
+        self._last_msg = log_tree.find('logentry/msg').text
+
+    @property
+    def last_msg(self):
+        if not self._last_msg:
+            self._fetch_svn_log()
+        return self._last_msg
