@@ -298,5 +298,4 @@ class Tester(object):
 
         if failed_suites:
             log.error('The following suites failed: %s' % failed_suites)
-
-        sys.exit(1 if failed_suites else 0)
+            raise Exception('Tests failed')
