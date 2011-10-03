@@ -49,8 +49,7 @@ class Builder(object):
 
         self.download_cache_dir = join(
             self.env.c.thirdparty_dir, 'download_cache')
-        if not os.path.isdir(self.download_cache_dir):
-            os.makedirs(self.download_cache_dir)
+        utils.maybe_makedirs(self.download_cache_dir)
 
     def _download(self, url, md5=None):
         if 'SYNTHESE_CACHE_URL' in os.environ:
@@ -223,7 +222,8 @@ class CMakeBuilder(Builder):
         }
         self.tool = PLATFORM_TO_TOOL[self.env.platform]
 
-    def check_debian_package_requirements(self, required_packages):
+    def check_debian_package_requirements(self, required_packages,
+            do_install=False):
         if self.env.platform != 'lin':
             return
 
@@ -233,15 +233,20 @@ class CMakeBuilder(Builder):
 
         to_install = [p for p in required_packages if
             subprocess.call(
-                "dpkg -s {0} | grep -q 'Status:.*\sinstalled'".format(p),
+                "dpkg -s {0} 2>&1 | grep -q 'Status:.*\sinstalled'".format(p),
                 shell=True, stdout=subprocess.PIPE)]
         if not to_install:
             return
 
-        log.info('You must install the following packages to continue: %s. '
-            'That can be done with the command:' % to_install)
-        log.info('apt-get install %s', ' '.join(to_install))
-        sys.exit(1)
+        if do_install:
+            subprocess.check_call(
+                'apt-get -y install ' + ' '.join(to_install),
+                shell=True)
+        else:
+            log.info('You must install the following packages to continue: %s. '
+                'That can be done with the command:' % to_install)
+            log.info('apt-get install %s', ' '.join(to_install))
+            sys.exit(1)
 
     def _check_debian_build_packages(self):
         required_packages = 'g++ python-dev make'.split()
@@ -385,8 +390,7 @@ class CMakeBuilder(Builder):
         url = 'http://94.23.28.171/~spasche/libiconv2.dll'
         self._download(url, 'fd1dc6c680299a2ed1eedcc3eabda601')
         target = join(self.env.c.thirdparty_dir, 'iconv', 'libiconv2.dll')
-        if not os.path.isdir(os.path.dirname(target)):
-            os.makedirs(os.path.dirname(target))
+        utils.maybe_makedirs(os.path.dirname(target))
         if os.path.isfile(target):
             return
         fname = url.split('/')[-1]
@@ -571,12 +575,11 @@ def get_builder(env):
     if builder:
         return builder
 
-    if env.type == 'cmake':
-        builder_class = CMakeBuilder
-    elif env.type == 'scons':
+    if env.type == 'scons':
         builder_class = SconsBuilder
     else:
-        raise Exception('Unsupported env %s' % type(env).__name__)
+        # For cmake and installed env.
+        builder_class = CMakeBuilder
 
     builder = builder_class(env)
     return builder

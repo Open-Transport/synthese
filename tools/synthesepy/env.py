@@ -81,6 +81,15 @@ class Env(object):
     def daemon_path(self):
         return self.get_executable_path(self.daemon_relative_path, 's3-server')
 
+    @property
+    def testdata_importer_relative_path(self):
+        return os.path.join('test', '53_pt_routeplanner')
+
+    @property
+    def testdata_importer_path(self):
+        return self.get_executable_path(
+            self.testdata_importer_relative_path, 'ImportRoutePlannerTestData')
+
     def _prepare_for_launch_win(self):
         builder = build.get_builder(self)
         builder.install_iconv()
@@ -137,6 +146,10 @@ class InstalledEnv(Env):
 
     @property
     def daemon_relative_path(self):
+        return 'bin'
+
+    @property
+    def testdata_importer_relative_path(self):
         return 'bin'
 
 
