@@ -272,6 +272,10 @@ class Tester(object):
             ci['debug'] = '1'
             self.env.c.test_conn_strings[i] = ci.conn_string
 
+        # This makes error messages easier to analyze (they will be at the end
+        # of the output).
+        STOP_ON_FIRST_FAIL = True
+
         for suite in suites:
             # Hack to allow passing a suite with a space in it. On Windows,
             # an argument with a space will be split in two separate arguments.
@@ -295,6 +299,8 @@ class Tester(object):
                 traceback.print_exc()
             if not successful:
                 failed_suites.append(suite)
+                if STOP_ON_FIRST_FAIL:
+                    raise Exception('Suite %s failed' % suite)
 
         if failed_suites:
             log.error('The following suites failed: %s' % failed_suites)
