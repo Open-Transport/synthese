@@ -48,6 +48,7 @@ def run(env, args):
         config.env_type, config.env_path, config.mode, config)
 
     try:
+        log.info('Building')
         synthesepy.build.build(env, 'build')
     except Exception, e:
         if args.no_clean_if_build_fails:
@@ -60,9 +61,11 @@ def run(env, args):
     if config.env_type == 'scons':
         return
 
+    log.info('Running tests')
     tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)
 
+    log.info('Creating package')
     if not env.config.should_build_package(env):
         log.info('should_build_package returned False. Not building package.')
         return
