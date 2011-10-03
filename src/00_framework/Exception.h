@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 /// Exception class header.
-test///	@file Exception.h
+///	@file Exception.h
 ///	@author Hugues Romain
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
