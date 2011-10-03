@@ -174,14 +174,14 @@ namespace synthese
 			}
 		}
 
-		//Class used for trim:
+		// Class used for trim:
 		class sortableNumber
 		{
 		private:
 			string _value;
-			string _begin;// = _value except for 12s it is 12
-			string _end;  // =  ""    except for 12s it is  s
-			long int _numericalValue;// = 12 for 12 and 12s, = -1 for A
+			string _begin; // = _value except for 12s it is 12
+			string _end;   // =  ""    except for 12s it is  s
+			long int _numericalValue; // = 12 for 12 and 12s, = -1 for A
 
 			typedef enum {
 				isAnInteger,   //example : 12
@@ -202,7 +202,7 @@ namespace synthese
 				errno = 0;
 
 				_numericalValue = strtol (buffer, &pEnd, 10);
-				if (errno != 0 || pEnd == buffer)//Is A form
+				if (errno != 0 || pEnd == buffer) // Is A form
 				{
 					_numberType = beginIsNotInteger;
 					_begin = _value;
@@ -210,14 +210,14 @@ namespace synthese
 				}
 				else
 				{
-					if(*pEnd != 0 )//Is 12s form so pEnd is "s";
+					if(*pEnd != 0 ) // Is 12s form so pEnd is "s";
 					{
 						_numberType = beginIsInteger;
 						_end = string(pEnd);
 						*pEnd = '\0';
 						_begin = string(buffer);
 					}
-					else//Is 12 form
+					else // Is 12 form
 					{
 						_numberType = isAnInteger;
 						_begin = _value;
@@ -229,28 +229,33 @@ namespace synthese
 			bool operator<(sortableNumber const &otherNumber) const
 			{
 				if((_numberType != beginIsInteger)
-						&& (otherNumber._numberType != beginIsInteger))//No number have form "12S"
+						&& (otherNumber._numberType != beginIsInteger)) // No number have form "12S"
 				{
 					if((_numberType == beginIsNotInteger)
-							|| (otherNumber._numberType == beginIsNotInteger))//At least one number have form "A"
+							&& (otherNumber._numberType == beginIsNotInteger)) // They have both form "A"
 					{
 						return _value < otherNumber._value;
 					}
-					else//The two numbers have form 12
+					else if((_numberType == beginIsNotInteger)
+							|| (otherNumber._numberType == beginIsNotInteger)) // One is "A" form, other is "23" form
+					{
+						return _value > otherNumber._value; // Force "T1" to appear before "23"
+					}
+					else // The two numbers have form 12
 					{
 						return _numericalValue < otherNumber._numericalValue;
 					}
 				}
-				else if(_begin != otherNumber._begin)//At least one number have form 12S, and the other one have a different begin (eg. 13)
+				else if(_begin != otherNumber._begin) // At least one number have form 12S, and the other one have a different begin (eg. 13)
 				{
 					if((_numberType == isAnInteger)
-							|| (otherNumber._numberType == isAnInteger))//The second number have 13 form
+							|| (otherNumber._numberType == isAnInteger)) // here is a "13" type and an "12s" form
 					{
 						return _numericalValue < otherNumber._numericalValue;
 					}
-					else//The second number have A form
+					else // There is a "A" type and an "12s" form
 					{
-						return _value < otherNumber._value;
+						return _value > otherNumber._value;
 					}
 				}
 				else // Case 12/12s or 12s/12k : sort based on end
@@ -262,11 +267,11 @@ namespace synthese
 
 		void LinesListFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			//Sortering is made on numerical order
+			// Sorting is made on numerical order
 			//   (except for line number which doesn't begin by a number)
 			//   then alphabetic order.
 			//
-			//So, linesMap is like that:
+			// So, linesMap is like that:
 			//
 			// [1]  -> ligne 1 : XXX - XXX
 			// [2]  -> ligne 2 : XXX - XXX
@@ -278,7 +283,7 @@ namespace synthese
 			typedef map<sortableNumber,shared_ptr<const CommercialLine> > linesMapType;
 			linesMapType linesMap;
 
-			//Get CommercialLine Global Registry
+			// Get CommercialLine Global Registry
 			if(_network.get())
 			{
 				vector<shared_ptr<CommercialLine> > lines(
@@ -295,7 +300,7 @@ namespace synthese
 						continue;
 					}
 
-					//Insert respecting order described up there
+					// Insert respecting order described up there
 					linesMap[sortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
 				}
 			}
@@ -493,7 +498,7 @@ namespace synthese
 			{
 				mimeType = "text/xml";
 			}
-			else//default case : csv outputFormat
+			else // default case : csv outputFormat
 			{
 				mimeType = "text/csv";
 			}

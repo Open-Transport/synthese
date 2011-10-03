@@ -165,15 +165,15 @@ namespace synthese
 
 			ptime date = _date ? *_date : second_clock::local_time();
 
-			//and startDateTime is begin of the day (a day begin at 3:00):
+			// and startDateTime is begin of the day (a day begin at 3:00):
 			startDateTime = date - date.time_of_day() + hours(3);
-			//and endDateTime is end of the day (a day end at 27:00):
+			// and endDateTime is end of the day (a day end at 27:00):
 			endDateTime = date - date.time_of_day() + hours(27);
 
 			// XML header
 			if(!_page.get())
 			{
-				if(_commercialLineID)//destination of this line will be displayed
+				if(_commercialLineID) // destination of this line will be displayed
 				{
 					stream <<
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
@@ -197,7 +197,7 @@ namespace synthese
 			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, stops)
 			{
-				if(_commercialLineID)//only physicalStop used by the commercial line will be displayed
+				if(_commercialLineID) // only physicalStop used by the commercial line will be displayed
 				{
 					typedef map<RegistryKeyType, const StopArea * > stopAreaMapType;
 					stopAreaMapType stopAreaMap;
@@ -228,10 +228,12 @@ namespace synthese
 							if(it.second->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
 								continue;
 
-							//only physical stops the commercial line given will be displayed
-							const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							// only physical stops the commercial line given will be displayed
+							const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+							if(journeyPattern == NULL) // Could be a junction
+								continue;
 							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-							if(commercialLine->getKey()!=_commercialLineID)
+							if(commercialLine->getKey() != _commercialLineID)
 								continue;
 
 							const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
@@ -240,7 +242,7 @@ namespace synthese
 						}
 					}
 
-					//Generate output only if commercial line use stoppoint
+					// Generate output only if commercial line use stoppoint
 					if(stopAreaMap.empty())
 						continue;
 
@@ -265,7 +267,7 @@ namespace synthese
 						stream << "</physicalStop>";
 					}
 				}
-				else//all physical stop will be displayed, without lines destination information
+				else // all physical stop will be displayed, without lines destination information
 				{
 					if(_page.get())
 					{

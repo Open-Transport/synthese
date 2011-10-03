@@ -71,6 +71,8 @@ namespace synthese
 
 			// Accessibility
 			static const std::string PARAMETER_ACCESS_PARAMETERS;
+			static const std::string PARAMETER_APPROACH_SPEED;
+			static const std::string PARAMETER_MAX_TRANSPORT_CONNECTION;
 
 			// Journey information
 			static const std::string PARAMETER_ORIGIN_CITY;
@@ -109,6 +111,13 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
 
 		private:
+			std::string _originCity;
+			std::string _originPlace;
+			std::string _destinationCity;
+			std::string _destinationPlace;
+			void updatePlace();
+
+
 			//! @name All reservation modes
 			//@{
 			boost::shared_ptr<security::User>	_customer;
@@ -119,16 +128,16 @@ namespace synthese
 
 			//! @name Reservation on a service
 			//@{
-				boost::shared_ptr<const pt::ScheduledService>	_service;
+				boost::shared_ptr<const pt::ScheduledService> _service;
 			//@}
 
 			//! @name Reservation of a full journey
 			//@{
-				graph::Journey						_journey;
-				boost::shared_ptr<const pt_website::TransportWebsite>	_site;
+				graph::Journey _journey;
+				boost::shared_ptr<const pt_website::TransportWebsite> _site;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
-				boost::shared_ptr<geography::Place>			_originPlace;
-				boost::shared_ptr<geography::Place>			_destinationPlace;
+				boost::shared_ptr<geography::Place> _originPlaceGeography;
+				boost::shared_ptr<geography::Place> _destinationPlaceGeography;
 			//@}
 
 
@@ -164,10 +173,10 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void setOriginDestinationPlace(
-					std::string origcity,
-					std::string origplace,
-					std::string destcity,
-					std::string destplace
+					std::string originCity,
+					std::string originPlace,
+					std::string destinationCity,
+					std::string destinationPlace
 				);
 			//@}
 
