@@ -55,6 +55,7 @@ DEFAULTS = {
     'gdb': False,
     'netstat_cmd': None,
     'restart_if_crashed': False,
+    'no_root_check': False,
 
     'wsgi_proxy': True,
     'wsgi_proxy_port': None,
@@ -64,6 +65,7 @@ DEFAULTS = {
     'project_path': None,
     'project_name': None,
     'conn_string': 'sqlite://',
+    'sites_config': {},
 
     # remote project management
     'server': None,
@@ -79,7 +81,6 @@ DEFAULTS = {
     'mysql_dir': None,
     'boost_dir': None,
     'parallel_build': multiprocessing.cpu_count(),
-    'no_clean_if_build_fails': False,
     'kill_daemons_when_building': False,
     'build_only': None,
     'build_type': None,
@@ -89,8 +90,14 @@ DEFAULTS = {
     'no_init': False,
     'test_daemon_only': False,
 
+    # package
+    'packages_save_path': '/home/spasche/public_html/synthese/',
+    'packages_access_url': 'http://deb/~spasche/synthese/',
+
     # continuous_integration
+    'no_clean_if_build_fails': False,
     'suites': None,
+    'should_build_package': lambda env: False,
 }
 
 

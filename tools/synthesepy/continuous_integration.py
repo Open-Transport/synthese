@@ -24,7 +24,9 @@ import logging
 import os
 
 import synthesepy.build
+import synthesepy.package
 import synthesepy.test
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
@@ -34,10 +36,10 @@ def run(env, args):
 
     # The ci tool can set these settings in the environment:
     if 'tool' in os.environ:
-        # Note: backward compatibility: env_type should be used instead of tool. 
-        config.env_type = os.environ['tool'] 
+        # Note: backward compatibility: env_type should be used instead of tool.
+        config.env_type = os.environ['tool']
     if 'env_type' in os.environ:
-        config.env_type = os.environ['env_type'] 
+        config.env_type = os.environ['env_type']
     if 'mode' in os.environ:
         config.mode = os.environ['mode']
 
@@ -54,9 +56,26 @@ def run(env, args):
         synthesepy.build.build(env, 'clean')
         synthesepy.build.build(env, 'build')
 
-    # Don't bother with scons tests. It will be removed in the future.
+    # Don't bother with scons tests and package. It will be removed in the future.
     if config.env_type == 'scons':
         return
 
     tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)
+
+    if not env.config.should_build_package(env):
+        log.info('should_build_package returned False. Not building package.')
+        return
+
+    svn_info = utils.SVNInfo(env.source_path)
+    CREATE_PACKAGE_MESSAGE = 'cmd:create_package'
+
+    if CREATE_PACKAGE_MESSAGE not in svn_info.last_msg:
+        log.info('Didn\'t find %r in last commit message. '
+            'Not building package.', CREATE_PACKAGE_MESSAGE)
+        return
+
+    log.info('Found %r in last commit message. Building package...',
+        CREATE_PACKAGE_MESSAGE)
+    synthesepy.package.run(env, args)
+

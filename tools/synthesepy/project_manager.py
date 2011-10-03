@@ -34,9 +34,11 @@ import sys
 import time
 
 from synthesepy.config import Config
+from synthesepy.apache import Apache
 from synthesepy import daemon
 from synthesepy import db_backends
 from synthesepy import db_sync
+from synthesepy import external_tools
 from synthesepy import proxy
 from synthesepy import utils
 
@@ -64,14 +66,6 @@ def _copy_over(source_path, target_path):
                 os.makedirs(os.path.dirname(target))
             shutil.copy(source, target)
 
-
-# XXX remove unused and maybe move to utils
-
-def maybe_mkdir(path):
-    if os.path.isdir(path):
-        return
-    os.makedirs(path)
-
 def _ssh_command_line(config, with_server=True, extra_opts=''):
     return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {server}'.format(
         extra_opts=extra_opts,
@@ -91,19 +85,20 @@ def _rsync(config, remote_path, local_path):
         local_path=utils.to_cygwin_path(local_path)))
 
 
-
 class Package(object):
     def __init__(self, project, path):
         self.path = path
         self.name = os.path.split(path)[1]
-        if os.path.isfile(self.path):
-            self.path = open(self.path).read().strip().format(
-                source_path=project.env.source_path).replace('/', os.sep)
+        self.dependencies = []
 
         if not os.path.isdir(self.path):
             raise Exception('Path %r is not a directory for a package' % self.path)
 
         self.files_path = join(self.path, 'files')
+
+        package_config = join(self.path, 'config.py')
+        if os.path.isfile(package_config):
+            execfile(package_config, {}, self.__dict__)
 
     def __repr__(self):
         return '<Package %s %s>' % (self.name, self.path)
@@ -114,27 +109,112 @@ class Package(object):
             glob.glob(join(self.path, '*.importer')))
 
 
+class PackagesLoader(object):
+    def __init__(self, project):
+        self.project = project
+        # XXX does it work with installed packages?
+        system_packages_dir = join(project.env.source_path, 'packages')
+        self.system_packages = self._load_from_dir(system_packages_dir)
+        # _compute_dependencies call here is just for sanity check.
+        # They shouldn't depend on anything else.
+        self._compute_dependencies(self.system_packages)
+
+    def _load_from_dir(self, packages_dir):
+        IGNORED_DIRS = ('.svn', 'web_pages')
+
+        packages = {}
+        for package_path in glob.glob(join(packages_dir, '*')):
+            if (not os.path.isdir(package_path) or
+                os.path.basename(package_path) in IGNORED_DIRS):
+                continue
+            package = Package(self.project, package_path)
+            if package.name in packages:
+                raise Exception('Duplicate package names')
+            packages[package.name] = package
+
+        log.debug('Loaded packages %r from %r', packages.keys(), packages_dir)
+        return packages
+
+    def _compute_dependencies(self, packages):
+        to_visit = packages.keys()
+
+        while True:
+            if not to_visit:
+                break
+            package = packages[to_visit.pop(0)]
+            for dep in package.dependencies:
+                if dep in packages:
+                    continue
+                if dep not in self.system_packages:
+                    raise Exception('Can\'t resolve dependency to package %r' % dep)
+                packages[dep] = self.system_packages[dep]
+                to_visit.append(dep)
+
+        return packages
+
+    def load_packages(self, system_package_names, packages_dir):
+        packages = self._load_from_dir(packages_dir)
+
+        all_system_package_names = set(self.system_packages.keys())
+
+        if not set(system_package_names).issubset(all_system_package_names):
+            wrong_system_packages = \
+                set(system_package_names) - all_system_package_names
+            raise Exception('Some system packages don\'t exist: %r' %
+                wrong_system_packages)
+
+        for system_package_name in system_package_names:
+            packages[system_package_name] = self.system_packages[system_package_name]
+
+        packages = self._compute_dependencies(packages)
+
+        log.debug('Loaded packages: %r', packages.keys())
+        return packages.values()
+
+
 class Site(object):
-    IGNORED_SUFFIXES = ('.svn', '.py', 'web_pages')
     def __init__(self, project, path):
         self.path = path
 
         self.name = os.path.split(path)[1]
         self.base_path = ''
+        self.rewrite_rules = []
+        self.generate_apache_compat_config = False
+        self.system_packages = ('admin',)
 
         site_config = join(self.path, 'config.py')
         if os.path.isfile(site_config):
             execfile(site_config, {}, self.__dict__)
 
-        self.packages = []
-        for package_path in sorted(glob.glob(join(self.path, '*'))):
-            if package_path.endswith(self.IGNORED_SUFFIXES):
-                continue
-            self.packages.append(Package(project, package_path))
-        log.debug('Found packages: %s', self.packages)
+        project_site_config = project.config.sites_config.get(self.name, {})
+        self.__dict__.update(project_site_config)
+
+        self.packages = project.packages_loader.load_packages(
+            self.system_packages, self.path)
 
     def __repr__(self):
         return '<Site %s %s>' % (self.name, self.path)
+
+    def get_package(self, package_name):
+        for p in self.packages:
+            if p.name == package_name:
+                return p
+        return None
+
+
+def command(root_required=False):
+     def _command(f):
+         def wrapper(*args, **kwargs):
+             project = args[0]
+             if not project.env.c.no_root_check and project.env.platform != 'win':
+                is_root = os.geteuid() == 0
+                if root_required and not is_root:
+                    raise Exception('You must run this command as root')
+                if not root_required and is_root:
+                    raise Exception('You can\'t run this command as root')
+             return f(*args, **kwargs)
+         return wrapper
+     return _command
 
 
 class Project(object):
@@ -168,6 +248,7 @@ class Project(object):
 
     def set_env(self, env):
         self.env = env
+        self.packages_loader = PackagesLoader(self)
         self._load_sites()
         self.daemon = daemon.Daemon(self.env)
 
@@ -228,9 +309,7 @@ class Project(object):
                 self.config.site_id = non_admin_sites[0].id
 
     def _run_testdata_importer(self):
-        importer_path = self.env.get_executable_path(
-            join('test', '53_pt_routeplanner'),
-            'ImportRoutePlannerTestData')
+        importer_path = self.env.testdata_importer_path
         log.info('Runing testdata importer from %r', importer_path)
         self.env.prepare_for_launch()
         env = os.environ.copy()
@@ -300,6 +379,7 @@ class Project(object):
         # TODO: also sync fixtures at the top level of the project.
 
 
+    @command()
     def rundaemon(self, block=True):
         """Run Synthese daemon"""
         self.daemon.start()
@@ -328,6 +408,7 @@ class Project(object):
             log.info('Stopping daemon')
             self.daemon.stop()
 
+    @command()
     def stopdaemon(self):
         """Stop Synthese daemon"""
         self.daemon.stop()
@@ -338,11 +419,13 @@ class Project(object):
         for port in ports:
             utils.kill_listening_processes(port)
 
+    @command()
     def runproxy(self):
         """Run HTTP Proxy to serve static files"""
         proxy.serve_forever(self.env)
 
 
+    @command()
     def db_view(self):
         """Open database in a GUI tool (if applicable)"""
         if self.db_backend.name == 'sqlite':
@@ -353,6 +436,7 @@ class Project(object):
         else:
             raise NotImplementedError("Not implemented for this backend")
 
+    @command()
     def db_view_gis(self):
         """Open database in a GIS GUI tool (if applicable)"""
         if self.db_backend.name == 'sqlite':
@@ -363,10 +447,12 @@ class Project(object):
         else:
             raise NotImplementedError("Not implemented for this backend")
 
+    @command()
     def db_shell(self, sql=None):
         """Open a SQL interpreter on the database or execute the given SQL"""
         self.db_backend.shell(sql)
 
+    @command()
     def db_dump(self, db_backend=None, prefix=''):
         """Dump database to text file"""
 
@@ -396,6 +482,7 @@ class Project(object):
                 project_name=self.config.project_name))
         open(uncompressed_target, 'wb').write(output)
 
+    @command()
     def db_open_dump(self):
         """Open the latest database dump in a text editor"""
 
@@ -406,6 +493,7 @@ class Project(object):
         if os.path.isfile(self.config.editor_path):
             utils.call([self.config.editor_path, uncompressed_target], bg=True)
 
+    @command()
     def db_restore(self, db_dump):
         """Restore a database from a text file dump"""
         all_dumps = sorted(d for d in os.listdir(self.db_path) if 'sql' in d)
@@ -432,17 +520,21 @@ class Project(object):
         log.info('Restoring %s bytes of sql', len(sql))
         self.db_backend.restore(sql)
 
+    @command()
     def db_sync_to_files(self):
         db_sync.sync_to_files(self)
 
+    @command()
     def db_sync_from_files(self, host=None):
         db_sync.sync_from_files(self, host)
 
+    @command()
     def db_sync(self, host=None):
         db_sync.sync(self, host)
 
     # Commands for syncing or managing a remote project.
 
+    @command()
     def db_remote_dump(self):
         """Dump database from remote server"""
 
@@ -493,12 +585,62 @@ class Project(object):
             remote_backend = db_backends.create_backend(self.env, remote_conn_string)
             self.db_dump(remote_backend, 'remote_')
 
+    @command()
     def ssh(self):
         """Open a ssh shell on the remote server"""
         utils.call(_ssh_command_line(self.config))
 
+    # System install/uninstall
 
-def create_project(env, path, site_packages=None, conn_string=None,
+    def _get_tools(self):
+        supervisor = external_tools.Supervisor(self)
+        apache = Apache(self)
+        return [supervisor, apache]
+
+    @command()
+    def system_install_prepare(self, tools=None):
+        tools = self._get_tools()
+
+        for tool in tools:
+            tool.generate_config()
+
+    @command(root_required=True)
+    def system_install(self):
+        if self.env.platform == 'win':
+            raise Exception('Windows is not supported')
+
+        tools = self._get_tools()
+
+        import pwd
+        os.setegid(pwd.getpwnam('synthese').pw_gid)
+        os.seteuid(pwd.getpwnam('synthese').pw_uid)
+
+        for tool in tools:
+            tool.generate_config()
+
+        os.seteuid(0)
+        os.setegid(0)
+
+        for tool in tools:
+            tool.system_install()
+
+        log.info('Project installed on the system. You can start it with '
+            'the command (as root):\n  supervisorctl start synthese_%s',
+            self.config.project_name)
+
+    @command(root_required=True)
+    def system_uninstall(self):
+        tools = self._get_tools()
+
+        for tool in tools:
+            tool.system_uninstall()
+
+        log.info('Project uninstalled. You should stop the daemon with '
+            'this command (as root):\n  supervisorctl stop synthese_%s',
+            self.config.project_name)
+
+
+def create_project(env, path, system_packages=None, conn_string=None,
         overwrite=False):
     log.info('Creating project in %r', path)
     if overwrite:
@@ -529,27 +671,14 @@ def create_project(env, path, site_packages=None, conn_string=None,
         '@SYNTHESEPY_DIR@', repr(os.environ['SYNTHESEPY_DIR'])[1:-1])
     open(managepy_target, 'wb').write(synthesepy_content)
 
-    if not site_packages:
-        site_packages = {
-            'admin': ('admin',),
-            # XXX maybe don't load testData by default.
-            'main': ('core', 'routePlanner', 'testData'),
-        }
-    log.debug('site_packages: %r', site_packages)
+    if system_packages:
+        www_site_config_path = join(path, 'sites', 'www', 'config.py')
+        www_site_config = open(www_site_config_path).read()
+        assert 'system_packages = ' not in www_site_config
+        www_site_config += '\nsystem_packages = {0!r}'.format(system_packages)
 
-    for site_name, packages in site_packages.iteritems():
-        for package in packages:
-            package_source_path = '/'.join(
-                ['{source_path}', 'packages', package])
-            real_package_source_path = package_source_path.format(
-                source_path=env.source_path).replace('/', os.sep)
-            if not os.path.isdir(real_package_source_path):
-                raise Exception(
-                    'Package doesn\'t exist at %r', real_package_source_path)
-
-            package_target_path = join(path, 'sites', site_name, package)
-            # TODO: option to set svn:externals instead.
-            open(package_target_path, 'wb').write(package_source_path)
+        with open(www_site_config_path, 'wb') as f:
+            f.write(www_site_config)
 
     project = Project(path, env=env)
     project.reset()

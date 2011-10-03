@@ -42,9 +42,9 @@ class HTTPApi(object):
         self.debug = debug
         self.sid = None
         self.browser = None
-        ADMIN_BASE_PATH = 'synthese3/admin'
-        self.admin_url = 'http://{0}/{1}'.format(
-            self.hostname, ADMIN_BASE_PATH)
+        self.admin_base_url = 'http://{0}/admin/'.format(
+            self.hostname)
+        self.admin_url = self.admin_base_url + 'synthese'
         self.admin_base_params = {
             'SERVICE': 'admin',
         }
@@ -72,9 +72,13 @@ class HTTPApi(object):
 
         br = self._get_browser()
 
-        # Adding a trailing slash will redirect to the right URL
-        br.open(self.admin_url + '/')
+        # Base URL should redirect to a Synthese URL with the expected
+        # query parameters.
+        br.open(self.admin_base_url)
         qs = dict(urlparse.parse_qsl(br.geturl()))
+        # This string is only on the login screen.
+        if logged_in:
+            assert 'Mot de passe : ' not in br.response().read()
         self.admin_base_params['mt'] = qs['mt']
         return br
 

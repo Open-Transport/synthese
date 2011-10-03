@@ -48,10 +48,7 @@ class HTTPTestCase(unittest.TestCase):
     of the test methods for each backends, unless no_init was set to true
     when calling init_backends().
     """
-    site_packages = {
-        'admin': ('admin',),
-        'main': ('routePlanner', 'testData'),
-    }
+    system_packages = ('routePlanner', 'testData')
 
     def __init__(self, *args, **kwargs):
         super(HTTPTestCase, self).__init__(*args, **kwargs)
@@ -79,7 +76,7 @@ class HTTPTestCase(unittest.TestCase):
 
         log.info('Creating project')
         cls.project = project_manager.create_project(
-            cls.env, project_path, site_packages=cls.site_packages,
+            cls.env, project_path, system_packages=cls.system_packages,
             conn_string=cls.backend.conn_info.conn_string,
             overwrite=True)
 

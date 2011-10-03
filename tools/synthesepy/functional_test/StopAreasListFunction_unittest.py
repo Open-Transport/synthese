@@ -40,10 +40,7 @@ log = logging.getLogger(__name__)
 
 class LoginTest(http_testcase.HTTPTestCase):
     # Uncomment for debugging
-    #site_packages = {
-    #    'admin': ('admin',),
-    #    'main': ('routePlanner', 'testData', 'core', 'demo', 'map'),
-    #}
+    #system_packages = ('routePlanner', 'testData', 'core', 'demo', 'map')
 
     @classmethod
     def init_project(cls, project):
@@ -122,7 +119,7 @@ class LoginTest(http_testcase.HTTPTestCase):
             else:
                 acn = a.childNodes
                 bcn = b.childNodes
-                 
+
             self.assertEquals(len(acn), len(bcn), 'Child count mismatch')
 
             for ac, bc in zip(acn, bcn):

@@ -121,8 +121,7 @@ class WSGIProxy(object):
 
     SYNTHESE_SUFFIXES = ['/synthese', '/synthese3', '/admin']
 
-    # This only works if the project doesn't match a specific configuration.
-    ADMIN_URL = '/synthese3/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283'
+    ADMIN_URL = '/admin/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283'
 
     def __init__(self, env):
         self.env = env
@@ -179,11 +178,9 @@ class WSGIProxy(object):
         path_info = environ['PATH_INFO']
 
         # Redirect helper. Might not work depending on project settings.
-        if path_info in ('/admin', '/synthese3/admin/'):
-            return self._redirect(
-                environ,
-                start_response,
-                self.ADMIN_URL)
+        # TODO: some are for backward compatibility. Remove once migrated.
+        if path_info in ('/admin', '/admin/', '/synthese3/admin/'):
+            return self._redirect(environ, start_response, self.ADMIN_URL)
 
         if path_info.endswith(
             tuple(self.SYNTHESE_SUFFIXES + self.env.c.synthese_suffixes)):
