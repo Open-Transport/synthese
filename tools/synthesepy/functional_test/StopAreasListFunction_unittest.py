@@ -62,18 +62,6 @@ class StopAreasListFunctionTest(http_testcase.HTTPTestCase):
             xsi:noNamespaceSchemaLocation="http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd">
             <stopArea cityId="1688849860511154" cityName="City54"
                 city_id="1688849860511154" city_name="City54" directionAlias=""
-                id="1970324837184607" name="07" stop_id="1970324837184607"
-                stop_name="07" stop_name_13="" stop_name_26=""
-                stop_name_for_timetables=""
-                x="153971.888184" y="5413842.009339"/>
-            <stopArea cityId="1688849860530938" cityName="City38"
-                city_id="1688849860530938" city_name="City38"
-                directionAlias="" id="1970324837184596" name="96'&lt;&gt;&quot;"
-                stop_id="1970324837184596" stop_name="96'&lt;&gt;&quot;" stop_name_13=""
-                stop_name_26="" stop_name_for_timetables=""
-                x="155391.434330" y="5410401.567916"/>
-            <stopArea cityId="1688849860511154" cityName="City54"
-                city_id="1688849860511154" city_name="City54" directionAlias=""
                 id="1970324837184606" name="06" stop_id="1970324837184606"
                 stop_name="06" stop_name_13="" stop_name_26=""
                 stop_name_for_timetables=""
@@ -85,7 +73,19 @@ class StopAreasListFunctionTest(http_testcase.HTTPTestCase):
                     line_long_name="" line_map_url="" line_short_name="98"
                     line_style="vertclair" longName="" name="" shortName="98"
                     style="vertclair" timetable_id="0"/>
-            </stopArea>
+                </stopArea>
+            <stopArea cityId="1688849860511154" cityName="City54"
+                city_id="1688849860511154" city_name="City54" directionAlias=""
+                id="1970324837184607" name="07" stop_id="1970324837184607"
+                stop_name="07" stop_name_13="" stop_name_26=""
+                stop_name_for_timetables=""
+                x="153971.888184" y="5413842.009339"/>
+            <stopArea cityId="1688849860530938" cityName="City38"
+                city_id="1688849860530938" city_name="City38"
+                directionAlias="" id="1970324837184596" name="96'&lt;&gt;&quot;"
+                stop_id="1970324837184596" stop_name="96'&lt;&gt;&quot;" stop_name_13=""
+                stop_name_26="" stop_name_for_timetables=""
+                x="155391.434330" y="5410401.567916"/>
         </stopAreas>
         """
 
