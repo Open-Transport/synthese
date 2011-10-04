@@ -63,8 +63,16 @@ def download_and_replace():
     os.rename(new_dir, PREFIX)
     shutil.rmtree(temp_dir)
 
-    log.info('Synthese installed in %r. You may want to restart your projects '
-        'in order to use the new daemon.', PREFIX)
+
+def system_install():
+    synthesepy = join(PREFIX, 'bin', 'synthese.py')
+    log.info('Running system_install command')
+    cmd = [sys.executable, synthesepy]
+    if '-v' in sys.argv:
+        cmd.append('-v')
+    cmd.append('system_install')
+    subprocess.check_call(cmd)
+
 
 if __name__ == '__main__':
     usage = 'usage: %prog [options]'
@@ -87,3 +95,4 @@ if __name__ == '__main__':
         raise Exception('This script should be run as root')
 
     download_and_replace()
+    system_install()
