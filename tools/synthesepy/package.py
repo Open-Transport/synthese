@@ -53,13 +53,6 @@ def run(env, args):
         utils.RemoveDirectory(package_dir)
     os.makedirs(package_dir)
 
-    # latest symlink
-    if env.platform != 'win':
-        link_name = join(package_dir, os.pardir, 'latest')
-        if os.path.exists(link_name):
-            os.unlink(link_name)
-        os.symlink(revision_path, link_name)
-
     # Archive
 
     ARCHIVE_NAME = 'synthese.tar.bz2'
@@ -91,3 +84,10 @@ def run(env, args):
     log.debug('Deploy script written to %r', deploy_script_path)
 
     # TODO: remove old packages to avoid filling up the disk.
+
+    # latest symlink
+    if env.platform != 'win':
+        link_name = join(package_dir, os.pardir, 'latest')
+        if os.path.exists(link_name):
+            os.unlink(link_name)
+        os.symlink(revision_path, link_name)
