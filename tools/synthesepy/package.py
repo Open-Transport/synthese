@@ -55,7 +55,10 @@ def run(env, args):
 
     # latest symlink
     if env.platform != 'win':
-        os.symlink(revision_path, join(package_dir, os.pardir, 'latest'))
+        link_name = join(package_dir, os.pardir, 'latest')
+        if os.path.exists(link_name):
+            os.unlink(link_name)
+        os.symlink(revision_path, link_name)
 
     # Archive
 
