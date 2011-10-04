@@ -29,7 +29,14 @@
 #ifndef SYNTHESE_util_ZipWriter_hpp__
 #define SYNTHESE_util_ZipWriter_hpp__
 
+#ifdef WIN32
+typedef unsigned __int8 uint8_t;
+typedef unsigned __int16 uint16_t;
+typedef unsigned __int32 uint32_t;
+typedef unsigned __int64 uint64_t;
+#else
 #include <stdint.h>
+#endif
 #include <sstream>
 #include <vector>
 
