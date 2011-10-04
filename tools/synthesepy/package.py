@@ -43,14 +43,19 @@ def run(env, args):
     builder.install()
 
     svn_info = utils.SVNInfo(env.source_path)
-    package_relative_dir = '{platform}/{mode}/{branch}/r{version}'.format(
+    revision_path = 'r{0}'.format(svn_info.version)
+    package_relative_dir = '{platform}/{mode}/{branch}/{revision_path}'.format(
         platform=env.platform, mode=env.mode,
-        branch=svn_info.branch, version=svn_info.version)
+        branch=svn_info.branch, revision_path=revision_path)
 
     package_dir = join(env.config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
         utils.RemoveDirectory(package_dir)
     os.makedirs(package_dir)
+
+    # latest symlink
+    if env.platform != 'win':
+        os.symlink(revision_path, join(package_dir, os.pardir, 'latest'))
 
     # Archive
 
