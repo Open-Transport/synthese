@@ -403,7 +403,7 @@ namespace synthese
 						{
 							os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ")<br />";
 						}
-						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585).get());
+						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585ULL).get());
 
 						// Service
 						ScheduledService* service(

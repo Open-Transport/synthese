@@ -72,7 +72,7 @@ namespace synthese
 			)	);
 			if(sources.empty())
 			{
-				shared_ptr<MapSource> osmSource(new MapSource(21110623253299200));
+				shared_ptr<MapSource> osmSource(new MapSource(21110623253299200ULL));
 				osmSource->setName("OSM");
 				osmSource->setCoordinatesSystem(CoordinatesSystem::GetCoordinatesSystem(900913));
 				osmSource->setType(MapSource::OSM);
