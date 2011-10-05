@@ -220,7 +220,7 @@ namespace synthese
 			}
 
 
-			// TODO: Factor ParametesrMap constant
+			// TODO: Factor ParametersMap constant
 			if(_outputFormat == "json")
 			{
 				pm.outputJSON(stream, DATA_CITIES);
