@@ -87,7 +87,7 @@ class Daemon(object):
 
             if utils.can_connect(port):
                 raise DaemonException(
-                    'Error, something is already listening on port %s', port)
+                    'Error, something is already listening on port %s' % port)
 
     def _clean_pid_file(self):
         pid_path = join(self.env.c.project_path, 'synthese.pid')
