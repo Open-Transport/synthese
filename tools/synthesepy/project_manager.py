@@ -370,6 +370,7 @@ class Project(object):
         """Load fixtures into the database and prepare static files."""
         log.info('Syncing project')
         self._clean_files()
+        # TODO: don't import fixtures from a package more than once.
         for site in self.sites:
             for package in site.packages:
                 log.debug('Syncing %s %s', site, package)
@@ -625,7 +626,7 @@ class Project(object):
             tool.system_install()
 
         log.info('Project installed on the system. You can start it with '
-            'the command (as root):\n  supervisorctl start synthese_%s',
+            'the command (as root):\n  supervisorctl start synthese-%s',
             self.config.project_name)
 
     @command(root_required=True)
@@ -636,7 +637,7 @@ class Project(object):
             tool.system_uninstall()
 
         log.info('Project uninstalled. You should stop the daemon with '
-            'this command (as root):\n  supervisorctl stop synthese_%s',
+            'this command (as root):\n  supervisorctl stop synthese-%s',
             self.config.project_name)
 
 
