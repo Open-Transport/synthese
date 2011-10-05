@@ -1,1 +1,1 @@
-dependencies = ('admin', 'routePlanner', 'testData',)
+dependencies = ('routePlanner', 'testData',)
