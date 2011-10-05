@@ -180,7 +180,7 @@ class Site(object):
         self.base_path = ''
         self.rewrite_rules = []
         self.generate_apache_compat_config = False
-        self.system_packages = ('admin',)
+        self.system_packages = []
 
         site_config = join(self.path, 'config.py')
         if os.path.isfile(site_config):
@@ -251,6 +251,12 @@ class Project(object):
         self.packages_loader = PackagesLoader(self)
         self._load_sites()
         self.daemon = daemon.Daemon(self.env)
+
+    def get_site(self, site_name):
+        for s in self.sites:
+            if s.name == site_name:
+                return s
+        return None
 
     def _read_config(self):
         config_paths = [
@@ -676,7 +682,7 @@ def create_project(env, path, system_packages=None, conn_string=None,
         www_site_config_path = join(path, 'sites', 'www', 'config.py')
         www_site_config = open(www_site_config_path).read()
         assert 'system_packages = ' not in www_site_config
-        www_site_config += '\nsystem_packages = {0!r}'.format(system_packages)
+        www_site_config += '\nsystem_packages = {0!r}\n'.format(system_packages)
 
         with open(www_site_config_path, 'wb') as f:
             f.write(www_site_config)

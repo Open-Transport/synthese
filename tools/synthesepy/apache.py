@@ -102,7 +102,7 @@ Alias /synthese3 "{admin_files_path}/admin/"
 
         return rewrite_directives
 
-    def _get_site_config(self, site):
+    def _get_site_config(self, site, admin_package):
         # Admin is available on the virtual hosts. For backward compatibility,
         # an admin site can have "generate_apache_compat_config" parameter
         # set to True to generate the backward compatibility URLs.
@@ -206,8 +206,11 @@ Alias /{package_name} {package_files_path}/{package_name}
         format_config['custom_config'] = format_config.get(
             'apache_custom_config', '')
 
+        packages = site.packages[:]
+        if admin_package:
+            packages.append(admin_package)
         package_aliases = ''
-        for package in site.packages:
+        for package in packages:
             rewrite_directives = ''
             if package.name == 'admin':
                 rewrite_directives = '''
@@ -228,9 +231,15 @@ Alias /{package_name} {package_files_path}/{package_name}
     def generate_config(self):
         apache_config = '# Generated file, do not edit.\n\n'
 
+        # Admin site is special: an admin alias is added to every site.
+        # NOTE: this expects the site called 'admin' may contain an 'admin'
+        # package.
+        admin_site = self.project.get_site('admin')
+        admin_package = None
+        if admin_site and not admin_site.generate_apache_compat_config:
+            admin_package = admin_site.get_package('admin')
         for site in self.project.sites:
-            print site
-            apache_config += self._get_site_config(site)
+            apache_config += self._get_site_config(site, admin_package)
 
         utils.maybe_makedirs(os.path.dirname(self.config_path))
         with open(self.config_path, 'wb') as f:

@@ -49,7 +49,7 @@ DEFAULTS = {
     'no_proxy': False,
     'site_id': 0,
     'default_site': None,
-    'log_level': 1,
+    'log_level': 'info',
     'log_stdout': False,
     'log_file': None,
     'gdb': False,
