@@ -46,11 +46,11 @@ GeographyModule::PreInit();
 // Cities
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-City city54(1688849860511154,"City54");
+City city54(1688849860511154ULL,"City54");
 SAVE(City, city54);
-City city95(1688849860511295,"City95");
+City city95(1688849860511295ULL,"City95");
 SAVE(City, city95);
-City city38(1688849860530938,"City38");
+City city38(1688849860530938ULL,"City38");
 SAVE(City, city38);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,59 +62,59 @@ SAVE(City, city38);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 Coordinate co10(520000.0,1844000.0);
-Crossing c10(12103423998558210, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co10)));
+Crossing c10(12103423998558210ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co10)));
 SAVE(Crossing, c10);
 
 Coordinate co74(523000.0,1844000.0);
-Crossing c74(12103423998558274, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co74)));
+Crossing c74(12103423998558274ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co74)));
 SAVE(Crossing, c74);
 
 Coordinate co86(523000.0,1845342.0);
-Crossing c86(12103423998558286, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co86)));
+Crossing c86(12103423998558286ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co86)));
 SAVE(Crossing, c86);
 
 Coordinate co88(523000.0,1845342.0);
-Crossing c88(12103423998558288, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co88)));
+Crossing c88(12103423998558288ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co88)));
 SAVE(Crossing, c88);
 
 Coordinate co89(521000.0,1845000.0);
-Crossing c89(12103423998558289, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co89)));
+Crossing c89(12103423998558289ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co89)));
 SAVE(Crossing, c89);
 
 Coordinate co90(528000.0,1844000.0);
-Crossing c90(12103423998558290, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co90)));
+Crossing c90(12103423998558290ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co90)));
 SAVE(Crossing, c90);
 
 Coordinate co91(525000.0,1844000.0);
-Crossing c91(12103423998558291, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co91)));
+Crossing c91(12103423998558291ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co91)));
 SAVE(Crossing, c91);
 
 Coordinate co92(523263.0,1845331.0);
-Crossing c92(12103423998558292, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co92)));
+Crossing c92(12103423998558292ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co92)));
 SAVE(Crossing, c92);
 
 Coordinate co93(523000.0,1845342.0);
-Crossing c93(12103423998558293, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co93)));
+Crossing c93(12103423998558293ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co93)));
 SAVE(Crossing, c93);
 
 Coordinate co94(523000.0,1845342.0);
-Crossing c94(12103423998558294, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co94)));
+Crossing c94(12103423998558294ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co94)));
 SAVE(Crossing, c94);
 
 Coordinate co96(526000.0,1847000.0);
-Crossing c96(12103423998558296, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co96)));
+Crossing c96(12103423998558296ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co96)));
 SAVE(Crossing, c96);
 
 Coordinate co97(523266.0,1845341.0);
-Crossing c97(12103423998558297, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co97)));
+Crossing c97(12103423998558297ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co97)));
 SAVE(Crossing, c97);
 
 Coordinate co98(523000.0,1845342.0);
-Crossing c98(12103423998558298, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co98)));
+Crossing c98(12103423998558298ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co98)));
 SAVE(Crossing, c98);
 
 Coordinate co99(526000.0,1845000.0);
-Crossing c99(12103423998558299, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co99)));
+Crossing c99(12103423998558299ULL, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(co99)));
 SAVE(Crossing, c99);
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,81 +123,81 @@ SAVE(Crossing, c99);
 
 // Road 40
 
-RoadPlace rp40(16888498602639440);
+RoadPlace rp40(16888498602639440ULL);
 rp40.setName("40");
 rp40.setCity(&city54);
 SAVE(RoadPlace, rp40);
 
-MainRoadPart ro40(4222124650659840);
+MainRoadPart ro40(4222124650659840ULL);
 ro40.setRoadPlace(rp40);
 
-MainRoadChunk rc86_40(3940649673949187, &c86, 0, &ro40, 0);
+MainRoadChunk rc86_40(3940649673949187ULL, &c86, 0, &ro40, 0);
 SAVE(RoadChunk, rc86_40);
 ro40.addRoadChunk(rc86_40);
 
-MainRoadChunk rc89(3940649673949188, &c89, 1, &ro40, 200);
+MainRoadChunk rc89(3940649673949188ULL, &c89, 1, &ro40, 200);
 SAVE(RoadChunk, rc89);
 ro40.addRoadChunk(rc89);
 SAVE(Road, ro40);
 
 // Road 41
 
-RoadPlace rp41(16888498602639441);
+RoadPlace rp41(16888498602639441ULL);
 rp41.setName("41");
 rp41.setCity(&city54);
 SAVE(RoadPlace, rp41);
 
-MainRoadPart ro41(4222124650659841);
+MainRoadPart ro41(4222124650659841ULL);
 ro41.setRoadPlace(rp41);
 
-MainRoadChunk rc88_41(3940649673949288, &c88, 0, &ro41, 0);
+MainRoadChunk rc88_41(3940649673949288ULL, &c88, 0, &ro41, 0);
 SAVE(RoadChunk, rc88_41);
 ro41.addRoadChunk(rc88_41);
 
-MainRoadChunk rc86_41(3940649673949186, &c86, 1, &ro41, 300);
+MainRoadChunk rc86_41(3940649673949186ULL, &c86, 1, &ro41, 300);
 SAVE(RoadChunk, rc86_41);
 ro41.addRoadChunk(rc86_41);
 
-MainRoadChunk rc74(3940649673949174, &c74, 2, &ro41, 750);
+MainRoadChunk rc74(3940649673949174ULL, &c74, 2, &ro41, 750);
 SAVE(RoadChunk, rc74);
 ro41.addRoadChunk(rc74);
 
-MainRoadChunk rc93_41(3940649673949293, &c93, 3, &ro41, 1700);
+MainRoadChunk rc93_41(3940649673949293ULL, &c93, 3, &ro41, 1700);
 SAVE(RoadChunk, rc93_41);
 ro41.addRoadChunk(rc93_41);
 SAVE(Road, ro41);
 
 // Road 42
 
-RoadPlace rp42(16888498602639442);
+RoadPlace rp42(16888498602639442ULL);
 rp42.setName("42");
 rp42.setCity(&city38);
 SAVE(RoadPlace, rp42);
 
-MainRoadPart ro42(4222124650659842);
+MainRoadPart ro42(4222124650659842ULL);
 ro42.setRoadPlace(rp42);
 
-MainRoadChunk rc98_42(3940649673949298, &c98, 0, &ro42, 0);
+MainRoadChunk rc98_42(3940649673949298ULL, &c98, 0, &ro42, 0);
 SAVE(RoadChunk, rc98_42);
 ro42.addRoadChunk(rc98_42);
 
-MainRoadChunk rc97(3940649673949197, &c97, 1, &ro42, 200);
+MainRoadChunk rc97(3940649673949197ULL, &c97, 1, &ro42, 200);
 SAVE(RoadChunk, rc97);
 ro42.addRoadChunk(rc97);
 SAVE(Road, ro42);
 
-MainRoadPart ro44(4222124650659844);
+MainRoadPart ro44(4222124650659844ULL);
 ro44.setRoadPlace(rp42);
 
-MainRoadChunk rc98_44(3940649673949498, &c98, 0, &ro44, 0);
+MainRoadChunk rc98_44(3940649673949498ULL, &c98, 0, &ro44, 0);
 SAVE(RoadChunk, rc98_44);
 ro44.addRoadChunk(rc98_44);
 
-MainRoadChunk rc93(3940649673949193, &c93, 1, &ro44, 800);
+MainRoadChunk rc93(3940649673949193ULL, &c93, 1, &ro44, 800);
 SAVE(RoadChunk, rc93);
 ro44.addRoadChunk(rc93);
 
-MainRoadChunk rc94(3940649673949194, &c94, 2, &ro44, 1600);
+MainRoadChunk rc94(3940649673949194ULL, &c94, 2, &ro44, 1600);
 SAVE(RoadChunk, rc94);
 ro44.addRoadChunk(rc94);
 SAVE(Road, ro44);
@@ -205,84 +205,84 @@ SAVE(Road, ro44);
 
 // Road 43
 
-RoadPlace rp43(16888498602639443);
+RoadPlace rp43(16888498602639443ULL);
 rp43.setName("43");
 rp43.setCity(&city38);
 SAVE(RoadPlace, rp43);
 
-MainRoadPart ro43(4222124650659843);
+MainRoadPart ro43(4222124650659843ULL);
 ro43.setRoadPlace(rp43);
 
-MainRoadChunk rc93_43(3940649673949393, &c93, 0, &ro43, 0);
+MainRoadChunk rc93_43(3940649673949393ULL, &c93, 0, &ro43, 0);
 SAVE(RoadChunk, rc93_43);
 ro43.addRoadChunk(rc93_43);
 
-MainRoadChunk rc96(3940649673949396, &c96, 1, &ro43, 100);
+MainRoadChunk rc96(3940649673949396ULL, &c96, 1, &ro43, 100);
 SAVE(RoadChunk, rc96);
 ro43.addRoadChunk(rc96);
 
-MainRoadChunk rc99(3940649673949199, &c99, 2, &ro43, 150);
+MainRoadChunk rc99(3940649673949199ULL, &c99, 2, &ro43, 150);
 SAVE(RoadChunk, rc99);
 ro43.addRoadChunk(rc99);
 SAVE(Road, ro43);
 
 // Road 45
 
-RoadPlace rp45(16888498602639445);
+RoadPlace rp45(16888498602639445ULL);
 rp45.setName("45");
 rp45.setCity(&city54);
 SAVE(RoadPlace, rp45);
 
-MainRoadPart ro45(4222124650659845);
+MainRoadPart ro45(4222124650659845ULL);
 ro45.setRoadPlace(rp45);
 
-MainRoadChunk rc86_45(3940649673949546, &c86, 0, &ro45, 0);
+MainRoadChunk rc86_45(3940649673949546ULL, &c86, 0, &ro45, 0);
 SAVE(RoadChunk, rc86_45);
 ro45.addRoadChunk(rc86_45);
 
-MainRoadChunk rc10(3940649673949410, &c10, 1, &ro45, 400);
+MainRoadChunk rc10(3940649673949410ULL, &c10, 1, &ro45, 400);
 SAVE(RoadChunk, rc10);
 ro45.addRoadChunk(rc10);
 SAVE(Road, ro45);
 
 // Road 46
 
-RoadPlace rp46(16888498602639446);
+RoadPlace rp46(16888498602639446ULL);
 rp46.setName("46");
 rp46.setCity(&city38);
 SAVE(RoadPlace, rp46);
 
-MainRoadPart ro46(4222124650659846);
+MainRoadPart ro46(4222124650659846ULL);
 ro46.setRoadPlace(rp46);
 
-MainRoadChunk rc93_46(3940649673949693, &c93, 0, &ro46, 0);
+MainRoadChunk rc93_46(3940649673949693ULL, &c93, 0, &ro46, 0);
 SAVE(RoadChunk, rc93_46);
 ro46.addRoadChunk(rc93_46);
 
-MainRoadChunk rc91(3940649673949189, &c91, 1, &ro46, 400);
+MainRoadChunk rc91(3940649673949189ULL, &c91, 1, &ro46, 400);
 SAVE(RoadChunk, rc91);
 ro46.addRoadChunk(rc91);
 
-MainRoadChunk rc90(3940649673949190, &c90, 2, &ro46, 2000);
+MainRoadChunk rc90(3940649673949190ULL, &c90, 2, &ro46, 2000);
 SAVE(RoadChunk, rc90);
 ro46.addRoadChunk(rc90);
 SAVE(Road, ro46);
 
 // Road 47
 
-RoadPlace rp47(16888498602639447);
+RoadPlace rp47(16888498602639447ULL);
 rp47.setName("47");
 rp47.setCity(&city54);
 SAVE(RoadPlace, rp47);
 
-MainRoadPart ro47(4222124650659847);
+MainRoadPart ro47(4222124650659847ULL);
 ro47.setRoadPlace(rp47);
 
-MainRoadChunk rc88_47(3940649673949788, &c88, 0, &ro47, 0);
+MainRoadChunk rc88_47(3940649673949788ULL, &c88, 0, &ro47, 0);
 SAVE(RoadChunk, rc88_47);
 ro47.addRoadChunk(rc88_47);
 
-MainRoadChunk rc92(3940649673949292, &c92, 1, &ro47, 200);
+MainRoadChunk rc92(3940649673949292ULL, &c92, 1, &ro47, 200);
 SAVE(RoadChunk, rc92);
 ro47.addRoadChunk(rc92);
 SAVE(Road, ro47);
@@ -293,16 +293,16 @@ SAVE(Road, ro47);
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 // Place 93
-StopArea place93(1970324837184593,true,minutes(8));
+StopArea place93(1970324837184593ULL,true,minutes(8));
 place93.setName("93");
 place93.setCity(&city54);
 place93.setAllowedConnection(true);
 city54.addIncludedPlace(&place93);
-place93.addTransferDelay(562949953421389,3377699720880573,minutes(0));
+place93.addTransferDelay(562949953421389ULL,3377699720880573ULL,minutes(0));
 
 Coordinate cops73(521000.0,1847000.0);
 StopPoint ps73(
-	3377699720880573,
+	3377699720880573ULL,
 	"93/73",
 	&place93,
 	shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops73))
@@ -316,19 +316,19 @@ SAVE(StopArea, place93);
 
 
 // Place 94
-StopArea place94(1970324837184594,false,minutes(8));
+StopArea place94(1970324837184594ULL,false,minutes(8));
 place94.setName("94");
 place94.setCity(&city54);
 place94.setAllowedConnection(true);
-place94.addTransferDelay(3377699720880574,3377699720880575,minutes(11));
-place94.addTransferDelay(3377699720880575,3377699720880574,minutes(12));
-place94.addTransferDelay(3377699720880574,562949953421374,minutes(0));
-place94.addTransferDelay(562949953421374,3377699720880574,minutes(0));
-place94.addTransferDelay(3377699720880575,562949953421374,minutes(0));
-place94.addTransferDelay(562949953421374,3377699720880575,minutes(0));
+place94.addTransferDelay(3377699720880574ULL,3377699720880575ULL,minutes(11));
+place94.addTransferDelay(3377699720880575ULL,3377699720880574ULL,minutes(12));
+place94.addTransferDelay(3377699720880574ULL,562949953421374ULL,minutes(0));
+place94.addTransferDelay(562949953421374ULL,3377699720880574ULL,minutes(0));
+place94.addTransferDelay(3377699720880575ULL,562949953421374ULL,minutes(0));
+place94.addTransferDelay(562949953421374ULL,3377699720880575ULL,minutes(0));
 
 Coordinate cops75(523000.0,1845000.0);
-StopPoint ps75(3377699720880575,"94/75", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
+StopPoint ps75(3377699720880575ULL,"94/75", &place94, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops75)));
 //ps75.setCodeBySource("CTP:StopArea:SPOCE87353573");
 ps75.setProjectedPoint(Address(rc74,0));
 rc74.getFromCrossing()->addReachableVertex(&ps75);
@@ -337,14 +337,14 @@ place94.addPhysicalStop(ps75);
 SAVE(StopArea, place94);
 
 // Place 95
-StopArea place95(1970324837184595,false,minutes(8));
+StopArea place95(1970324837184595ULL,false,minutes(8));
 place95.setName("95");
 place95.setCity(&city95);
 place95.setAllowedConnection(false);
-place95.addTransferDelay(562949953421397,377699720880576,minutes(0));
+place95.addTransferDelay(562949953421397ULL,377699720880576ULL,minutes(0));
 
 Coordinate cops76(523266.0,1845339.0);
-StopPoint ps76(3377699720880576,"95/76", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
+StopPoint ps76(3377699720880576ULL,"95/76", &place95, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops76)));
 //ps76.setCodeBySource("CTP:StopArea:SPOCE87611939");
 ps76.setProjectedPoint(Address(rc97,0));
 rc97.getFromCrossing()->addReachableVertex(&ps76);
@@ -353,35 +353,35 @@ place95.addPhysicalStop(ps76);
 SAVE(StopArea, place95);
 
 // Place 96
-StopArea place96(1970324837184596,false,minutes(8));
+StopArea place96(1970324837184596ULL,false,minutes(8));
 place96.setName("96");
 place96.setCity(&city38);
 place96.setAllowedConnection(false);
 
 Coordinate cops77(524000.0,1849500.0);
-StopPoint ps77(3377699720880577,"96/77", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops77)));
+StopPoint ps77(3377699720880577ULL,"96/77", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops77)));
 SAVE(StopPoint, ps77);
 place96.addPhysicalStop(ps77);
 
 Coordinate cops78(524000.0,1849500.0);
-StopPoint ps78(3377699720880578,"96/78", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops78)));
+StopPoint ps78(3377699720880578ULL,"96/78", &place96, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops78)));
 SAVE(StopPoint, ps78);
 place96.addPhysicalStop(ps78);
 SAVE(StopArea, place96);
 
 // Place 97
-StopArea place97(1970324837184597,true,minutes(8));
+StopArea place97(1970324837184597ULL,true,minutes(8));
 place97.setName("97");
 place97.setCity(&city38);
 place97.setAllowedConnection(true);
 city38.addIncludedPlace(&place97);
-place97.addTransferDelay(562949953421396,3377699720880580,minutes(0));
-place97.addTransferDelay(562949953421399,3377699720880579,minutes(0));
-place97.addTransferDelay(3377699720880580,562949953421396,minutes(0));
-place97.addTransferDelay(3377699720880579,562949953421399,minutes(0));
+place97.addTransferDelay(562949953421396ULL,3377699720880580ULL,minutes(0));
+place97.addTransferDelay(562949953421399ULL,3377699720880579ULL,minutes(0));
+place97.addTransferDelay(3377699720880580ULL,562949953421396ULL,minutes(0));
+place97.addTransferDelay(3377699720880579ULL,562949953421399ULL,minutes(0));
 
 Coordinate cops79(526000,1845000);
-StopPoint ps79(3377699720880579,"97/79", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
+StopPoint ps79(3377699720880579ULL,"97/79", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops79)));
 //ps79.setCodeBySource("CTP:StopArea:SPOCE87353599");
 ps79.setProjectedPoint(Address(rc99, 0));
 rc99.getFromCrossing()->addReachableVertex(&ps79);
@@ -389,7 +389,7 @@ SAVE(StopPoint, ps79);
 place97.addPhysicalStop(ps79);
 
 Coordinate cops80(526000.0,1847000.0);
-StopPoint ps80(3377699720880580,"97/80", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops80)));
+StopPoint ps80(3377699720880580ULL,"97/80", &place97, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops80)));
 ps80.setProjectedPoint(Address(rc96,0));
 rc96.getFromCrossing()->addReachableVertex(&ps80);
 SAVE(StopPoint, ps80);
@@ -398,14 +398,14 @@ SAVE(StopArea, place97);
 
 
 // Place 98
-StopArea place98(1970324837184598,false,minutes(8));
+StopArea place98(1970324837184598ULL,false,minutes(8));
 place98.setName("98");
 place98.setCity(&city38);
 place98.setAllowedConnection(true);
 /*'562949953421391:3377699720880581:0,562949953421391:3377699720880582:0,3377699720880581:562949953421391:0,3377699720880582:562949953421391:0'*/
 
 Coordinate cops81(525000.0,1844000.0);
-StopPoint ps81(3377699720880581,"98/81", &place98, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops81)));
+StopPoint ps81(3377699720880581ULL,"98/81", &place98, shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops81)));
 //ps81.setCodeBySource("CTP:StopArea:SPOCE87353581");
 ps81.setProjectedPoint(Address(rc91,0));
 rc91.getFromCrossing()->addReachableVertex(&ps81);
@@ -413,23 +413,23 @@ SAVE(StopPoint, ps81);
 place98.addPhysicalStop(ps81);
 
 Coordinate cops82(525000.0,1844000.0);
-StopPoint ps82(3377699720880582,"98/82", &place98,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops82)));
+StopPoint ps82(3377699720880582ULL,"98/82", &place98,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops82)));
 SAVE(StopPoint, ps82);
 place98.addPhysicalStop(ps82);
 SAVE(StopArea, place98);
 
 
 // Place 99
-StopArea place99(1970324837184599,true,minutes(8));
+StopArea place99(1970324837184599ULL,true,minutes(8));
 place99.setName("99");
 place99.setCity(&city38);
 // connection type 5
 city38.addIncludedPlace(&place99);
-place99.addTransferDelay(3377699720880585,562949953421390,minutes(0));
-place99.addTransferDelay(562949953421390,3377699720880585,minutes(0));
+place99.addTransferDelay(3377699720880585ULL,562949953421390ULL,minutes(0));
+place99.addTransferDelay(562949953421390ULL,3377699720880585ULL,minutes(0));
 
 Coordinate cops83(528000.0,1849000.0);
-StopPoint ps83(3377699720880583,"99/83", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
+StopPoint ps83(3377699720880583ULL,"99/83", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops83)));
 //ps83.setCodeBySource("CTP:StopArea:SPOCE87611467");
 ps83.setProjectedPoint(Address(rc94,0));
 rc94.getFromCrossing()->addReachableVertex(&ps83);
@@ -437,28 +437,28 @@ SAVE(StopPoint, ps83);
 place99.addPhysicalStop(ps83);
 
 Coordinate cops84(528000.0,1845000.0);
-StopPoint ps84(3377699720880584,"99/84", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops84)));
+StopPoint ps84(3377699720880584ULL,"99/84", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops84)));
 ps84.setProjectedPoint(Address(rc90,0));
 rc90.getFromCrossing()->addReachableVertex(&ps84);
 SAVE(StopPoint, ps84);
 place99.addPhysicalStop(ps84);
 
 Coordinate cops85(528000.0,1847000.0);
-StopPoint ps85(3377699720880585,"99/85", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops85)));
+StopPoint ps85(3377699720880585ULL,"99/85", &place99,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops85)));
 SAVE(StopPoint, ps85);
 place99.addPhysicalStop(ps85);
 SAVE(StopArea, place99);
 
 
 // Place 05
-StopArea place05(1970324837184605, true, minutes(8));
+StopArea place05(1970324837184605ULL, true, minutes(8));
 place05.setName("05");
 place05.setCity(&city54);
 place05.setAllowedConnection(true);
-place05.addTransferDelay(562949953421410,3377699720880586,minutes(0));
+place05.addTransferDelay(562949953421410ULL,3377699720880586ULL,minutes(0));
 
 Coordinate cops86(520000,1845000.0);
-StopPoint ps86(3377699720880586,"05/86", &place05,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));
+StopPoint ps86(3377699720880586ULL,"05/86", &place05,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops86)));
 ps86.setProjectedPoint(Address(rc10,0));
 rc10.getFromCrossing()->addReachableVertex(&ps86);
 SAVE(StopPoint, ps86);
@@ -467,26 +467,26 @@ SAVE(StopArea, place05);
 
 
 // Place 06
-StopArea place06(1970324837184606, true, minutes(8));
+StopArea place06(1970324837184606ULL, true, minutes(8));
 place06.setName("06");
 place06.setCity(&city54);
 place06.setAllowedConnection(true);
 
 Coordinate cops06(526000,1852000.0);
-StopPoint ps06(3377699720880606,"06", &place06,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops06)));
+StopPoint ps06(3377699720880606ULL,"06", &place06,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops06)));
 SAVE(StopPoint, ps06);
 place06.addPhysicalStop(ps06);
 SAVE(StopArea, place06);
 
 
 // Place 07
-StopArea place07(1970324837184607, true, minutes(8));
+StopArea place07(1970324837184607ULL, true, minutes(8));
 place07.setName("07");
 place07.setCity(&city54);
 place07.setAllowedConnection(true);
 
 Coordinate cops07(523000,1852000.0);
-StopPoint ps07(3377699720880607,"07", &place07,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops07)));
+StopPoint ps07(3377699720880607ULL,"07", &place07,shared_ptr<Point>(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(cops07)));
 SAVE(StopPoint, ps07);
 place07.addPhysicalStop(ps07);
 SAVE(StopArea, place07);
@@ -497,10 +497,10 @@ SAVE(StopArea, place07);
 // Networks
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-TransportNetwork n34(6192449487677434,"Network34");
+TransportNetwork n34(6192449487677434ULL,"Network34");
 SAVE(TransportNetwork, n34);
 
-TransportNetwork n37(6192449487677437,"Network37");
+TransportNetwork n37(6192449487677437ULL,"Network37");
 SAVE(TransportNetwork, n37);
 
 
@@ -508,7 +508,7 @@ SAVE(TransportNetwork, n37);
 // Use rules
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-PTUseRule ur53(2305843009213693953);
+PTUseRule ur53(2305843009213693953ULL);
 ur53.setName("Compulsory reservation");
 ur53.setReservationType(PTUseRule::RESERVATION_RULE_MIXED_BY_DEPARTURE_PLACE);
 ur53.setOriginIsReference(false);
@@ -519,7 +519,7 @@ ur53.setHourDeadLine(time_duration(23,59,0));
 ur53.setAccessCapacity(1);
 SAVE(PTUseRule, ur53);
 
-PTUseRule ur54(2305843009213693954);
+PTUseRule ur54(2305843009213693954ULL);
 ur54.setName("1 seat only");
 ur54.setReservationType(PTUseRule::RESERVATION_RULE_FORBIDDEN);
 ur54.setAccessCapacity(1);
@@ -530,13 +530,13 @@ SAVE(PTUseRule, ur54);
 // Reservation contact
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-ReservationContact rc05(5910974511914805);
+ReservationContact rc05(5910974511914805ULL);
 rc05.setPhoneExchangeNumber("0800 929 929 (gratuit depuis un poste fixe) ou 05 34 25 33 75");
 rc05.setPhoneExchangeOpeningHours("entre 6h30 et 22h30");
 rc05.setDescription("Test");
 SAVE(ReservationContact, rc05);
 
-OnlineReservationRule or33(13229323905400833);
+OnlineReservationRule or33(13229323905400833ULL);
 or33.setReservationContact(&rc05);
 or33.setNeedsPhone(true);
 or33.setMaxSeats(1000);
@@ -549,7 +549,7 @@ SAVE(OnlineReservationRule, or33);
 // RollingStock
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-RollingStock rs57(13792273858822157);
+RollingStock rs57(13792273858822157ULL);
 rs57.setName("test");
 SAVE(RollingStock, rs57);
 
@@ -560,7 +560,7 @@ SAVE(RollingStock, rs57);
 
 // JourneyPattern 92
 
-CommercialLine cl92(11821949021891592);
+CommercialLine cl92(11821949021891592ULL);
 cl92.setNetwork(&n34);
 cl92.setShortName("92");
 cl92.setStyle("vertfonce");
@@ -572,32 +572,32 @@ cl92.setStyle("vertfonce");
 }
 SAVE(CommercialLine, cl92);
 
-JourneyPattern li92(2533274790397692, "92");
+JourneyPattern li92(2533274790397692ULL, "92");
 li92.setTimetableName("92.1");
 li92.setRollingStock(&rs57);
 li92.setCommercialLine(&cl92);
 
-DesignatedLinePhysicalStop ls86(2814749767106586, &li92, 0, true, false, 0, &ps86);
+DesignatedLinePhysicalStop ls86(2814749767106586ULL, &li92, 0, true, false, 0, &ps86);
 SAVE(LineStop, ls86);
 li92.addEdge(ls86);
 
-DesignatedLinePhysicalStop ls63(2814749767106563, &li92, 1, true, true, 100, &ps73);
+DesignatedLinePhysicalStop ls63(2814749767106563ULL, &li92, 1, true, true, 100, &ps73);
 SAVE(LineStop, ls63);
 li92.addEdge(ls63);
 
-DesignatedLinePhysicalStop ls61(2814749767106561, &li92, 2, true, true, 5500, &ps75);
+DesignatedLinePhysicalStop ls61(2814749767106561ULL, &li92, 2, true, true, 5500, &ps75);
 SAVE(LineStop, ls61);
 li92.addEdge(ls61);
 
-DesignatedLinePhysicalStop ls62(2814749767106562, &li92, 3, true, true, 6400, &ps79);
+DesignatedLinePhysicalStop ls62(2814749767106562ULL, &li92, 3, true, true, 6400, &ps79);
 SAVE(LineStop, ls62);
 li92.addEdge(ls62);
 
-DesignatedLinePhysicalStop ls60(2814749767106560, &li92, 4, false, true, 6500, &ps85);
+DesignatedLinePhysicalStop ls60(2814749767106560ULL, &li92, 4, false, true, 6500, &ps85);
 SAVE(LineStop, ls60);
 li92.addEdge(ls60);
 
-ScheduledService ss01(4503599627370501, "1", &li92);
+ScheduledService ss01(4503599627370501ULL, "1", &li92);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -624,7 +624,7 @@ ss01.setActive(day_clock::local_day() + days(2));
 SAVE(ScheduledService, ss01);
 li92.addService(ss01, true);
 
-ContinuousService cs97(4785074604214097, "", &li92, minutes(60), minutes(5));
+ContinuousService cs97(4785074604214097ULL, "", &li92, minutes(60), minutes(5));
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -650,7 +650,7 @@ cs97.setActive(day_clock::local_day() + days(1));
 SAVE(ContinuousService, cs97);
 li92.addService(cs97, true);
 
-ScheduledService ss02(4503599627370502, "2", &li92);
+ScheduledService ss02(4503599627370502ULL, "2", &li92);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -679,7 +679,7 @@ SAVE(JourneyPattern, li92);
 
 // JourneyPattern 93
 
-CommercialLine cl93(11821949021891593);
+CommercialLine cl93(11821949021891593ULL);
 cl93.setNetwork(&n34);
 cl93.setShortName("93");
 cl93.setStyle("bleuclair");
@@ -690,16 +690,16 @@ cl93.setStyle("bleuclair");
 }
 SAVE(CommercialLine, cl93);
 
-JourneyPattern li93(2533274790397693, "93-2");
+JourneyPattern li93(2533274790397693ULL, "93-2");
 li93.setTimetableName("93.2");
 li93.setRollingStock(&rs57);
 li93.setCommercialLine(&cl93);
 
-DesignatedLinePhysicalStop ls64(2814749767106564, &li93, 0, true, false, 6500, &ps73);
+DesignatedLinePhysicalStop ls64(2814749767106564ULL, &li93, 0, true, false, 6500, &ps73);
 SAVE(LineStop, ls64);
 li93.addEdge(ls64);
 
-DesignatedLinePhysicalStop ls65(2814749767106565, &li93, 1, true, true, 12141, &ps81);
+DesignatedLinePhysicalStop ls65(2814749767106565ULL, &li93, 1, true, true, 12141, &ps81);
 SAVE(LineStop, ls65);
 {
 //	DesignatedLinePhysicalStop::ViaPoints v;
@@ -709,11 +709,11 @@ SAVE(LineStop, ls65);
 }
 li93.addEdge(ls65);
 
-DesignatedLinePhysicalStop ls66(2814749767106566, &li93, 2, false, true, 12141, &ps75);
+DesignatedLinePhysicalStop ls66(2814749767106566ULL, &li93, 2, false, true, 12141, &ps75);
 SAVE(LineStop, ls66);
 li93.addEdge(ls66);
 
-ScheduledService ss18(4503599627370518, "18", &li93);
+ScheduledService ss18(4503599627370518ULL, "18", &li93);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -733,7 +733,7 @@ ss18.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss18);
 li93.addService(ss18, true);
 
-ScheduledService ss08(4503599627370508, "8", &li93);
+ScheduledService ss08(4503599627370508ULL, "8", &li93);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -753,7 +753,7 @@ ss08.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss08);
 li93.addService(ss08, true);
 
-ScheduledService ss07(4503599627370507, "7", &li93);
+ScheduledService ss07(4503599627370507ULL, "7", &li93);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -776,7 +776,7 @@ SAVE(JourneyPattern, li93);
 
 // JourneyPattern 94
 
-CommercialLine cl94(11821949021891594);
+CommercialLine cl94(11821949021891594ULL);
 cl94.setNetwork(&n34);
 cl94.setShortName("94");
 cl94.setStyle("orange");
@@ -787,36 +787,36 @@ cl94.setStyle("orange");
 }
 SAVE(CommercialLine, cl94);
 
-JourneyPattern li94(2533274790397694, "94-3");
+JourneyPattern li94(2533274790397694ULL, "94-3");
 li94.setTimetableName("94.3");
 li94.setRollingStock(&rs57);
 li94.setCommercialLine(&cl94);
 
-DesignatedLinePhysicalStop ls67(2814749767106567, &li94, 0, true, false, 14141, &ps83);
+DesignatedLinePhysicalStop ls67(2814749767106567ULL, &li94, 0, true, false, 14141, &ps83);
 SAVE(LineStop, ls67);
 li94.addEdge(ls67);
 
-DesignatedLinePhysicalStop ls69(2814749767106569, &li94, 1, true, true, 15141, &ps85);
+DesignatedLinePhysicalStop ls69(2814749767106569ULL, &li94, 1, true, true, 15141, &ps85);
 SAVE(LineStop, ls69);
 li94.addEdge(ls69);
 
-DesignatedLinePhysicalStop ls71(2814749767106571, &li94, 2, true, true, 16141, &ps80);
+DesignatedLinePhysicalStop ls71(2814749767106571ULL, &li94, 2, true, true, 16141, &ps80);
 SAVE(LineStop, ls71);
 li94.addEdge(ls71);
 
-DesignatedLinePhysicalStop ls70(2814749767106570, &li94, 3, true, true, 17141, &ps76);
+DesignatedLinePhysicalStop ls70(2814749767106570ULL, &li94, 3, true, true, 17141, &ps76);
 SAVE(LineStop, ls70);
 li94.addEdge(ls70);
 
-DesignatedLinePhysicalStop ls68(2814749767106568, &li94, 4, true, true, 17641, &ps73);
+DesignatedLinePhysicalStop ls68(2814749767106568ULL, &li94, 4, true, true, 17641, &ps73);
 SAVE(LineStop, ls68);
 li94.addEdge(ls68);
 
-DesignatedLinePhysicalStop ls9407(2814749767109407, &li94, 5, false, true, 18641, &ps07);
+DesignatedLinePhysicalStop ls9407(2814749767109407ULL, &li94, 5, false, true, 18641, &ps07);
 SAVE(LineStop, ls9407);
 li94.addEdge(ls9407);
 
-ScheduledService ss11(4503599627370511, "11", &li94);
+ScheduledService ss11(4503599627370511ULL, "11", &li94);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -845,7 +845,7 @@ ss11.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss11);
 li94.addService(ss11, true);
 
-ScheduledService ss06(4503599627370506, "06", &li94);
+ScheduledService ss06(4503599627370506ULL, "06", &li94);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -877,7 +877,7 @@ SAVE(JourneyPattern, li94);
 
 // JourneyPattern 95
 
-CommercialLine cl95(11821949021891595);
+CommercialLine cl95(11821949021891595ULL);
 cl95.setNetwork(&n34);
 cl95.setShortName("95");
 cl95.setStyle("rouge");
@@ -888,20 +888,20 @@ cl95.setStyle("rouge");
 }
 SAVE(CommercialLine, cl95);
 
-JourneyPattern li95(2533274790397695, "95-1");
+JourneyPattern li95(2533274790397695ULL, "95-1");
 li95.setTimetableName("95.1");
 li95.setRollingStock(&rs57);
 li95.setCommercialLine(&cl95);
 
-DesignatedLinePhysicalStop ls72(2814749767106572, &li95, 0, true, false, 17641, &ps75);
+DesignatedLinePhysicalStop ls72(2814749767106572ULL, &li95, 0, true, false, 17641, &ps75);
 SAVE(LineStop, ls72);
 li95.addEdge(ls72);
 
-DesignatedLinePhysicalStop ls73(2814749767106573, &li95, 1, false, true, 17641, &ps84);
+DesignatedLinePhysicalStop ls73(2814749767106573ULL, &li95, 1, false, true, 17641, &ps84);
 SAVE(LineStop, ls73);
 li95.addEdge(ls73);
 
-ScheduledService ss09(4503599627370509, "09", &li95);
+ScheduledService ss09(4503599627370509ULL, "09", &li95);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -918,7 +918,7 @@ ss09.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss09);
 li95.addService(ss09, true);
 
-ScheduledService ss10(4503599627370510, "10", &li95);
+ScheduledService ss10(4503599627370510ULL, "10", &li95);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -938,7 +938,7 @@ SAVE(JourneyPattern, li95);
 
 // JourneyPattern 96
 
-CommercialLine cl96(11821949021891596);
+CommercialLine cl96(11821949021891596ULL);
 cl96.setNetwork(&n34);
 cl96.setShortName("96");
 cl96.setStyle("jaune");
@@ -949,20 +949,20 @@ cl96.setStyle("jaune");
 }
 SAVE(CommercialLine, cl96);
 
-JourneyPattern li96(2533274790397696, "96-1");
+JourneyPattern li96(2533274790397696ULL, "96-1");
 li96.setTimetableName("96.1");
 li96.setRollingStock(&rs57);
 li96.setCommercialLine(&cl96);
 
-DesignatedLinePhysicalStop ls74(2814749767106574, &li96, 0, true, false, 17641, &ps79);
+DesignatedLinePhysicalStop ls74(2814749767106574ULL, &li96, 0, true, false, 17641, &ps79);
 SAVE(LineStop, ls74);
 li96.addEdge(ls74);
 
-DesignatedLinePhysicalStop ls75(2814749767106575, &li96, 1, false, true, 17641, &ps85);
+DesignatedLinePhysicalStop ls75(2814749767106575ULL, &li96, 1, false, true, 17641, &ps85);
 SAVE(LineStop, ls75);
 li96.addEdge(ls75);
 
-ScheduledService ss13(4503599627370513, "13", &li96);
+ScheduledService ss13(4503599627370513ULL, "13", &li96);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -979,7 +979,7 @@ ss13.setActive(day_clock::local_day() + days(1));
 SAVE(ScheduledService, ss13);
 li96.addService(ss13, true);
 
-ScheduledService ss14(4503599627370514, "14", &li96);
+ScheduledService ss14(4503599627370514ULL, "14", &li96);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -999,7 +999,7 @@ SAVE(JourneyPattern, li96);
 
 // JourneyPattern 97
 
-CommercialLine cl97(11821949021891597);
+CommercialLine cl97(11821949021891597ULL);
 cl97.setNetwork(&n34);
 cl97.setShortName("97");
 cl97.setStyle("rose");
@@ -1010,20 +1010,20 @@ cl97.setStyle("rose");
 }
 SAVE(CommercialLine, cl97);
 
-JourneyPattern li97(2533274790397697, "97");
+JourneyPattern li97(2533274790397697ULL, "97");
 li97.setTimetableName("97");
 li97.setRollingStock(&rs57);
 li97.setCommercialLine(&cl97);
 
-DesignatedLinePhysicalStop ls9773(2814749767109773, &li97, 0, true, false, 0, &ps73);
+DesignatedLinePhysicalStop ls9773(2814749767109773ULL, &li97, 0, true, false, 0, &ps73);
 SAVE(LineStop, ls9773);
 li97.addEdge(ls9773);
 
-DesignatedLinePhysicalStop ls9706(2814749767109706, &li97, 1, false, true, 2000, &ps06);
+DesignatedLinePhysicalStop ls9706(2814749767109706ULL, &li97, 1, false, true, 2000, &ps06);
 SAVE(LineStop, ls9706);
 li97.addEdge(ls9706);
 
-ContinuousService cs9701(4503599627379701, "9701", &li97);
+ContinuousService cs9701(4503599627379701ULL, "9701", &li97);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -1045,7 +1045,7 @@ SAVE(JourneyPattern, li97);
 
 // JourneyPattern 98
 
-CommercialLine cl98(11821949021891598);
+CommercialLine cl98(11821949021891598ULL);
 cl98.setNetwork(&n34);
 cl98.setShortName("98");
 cl98.setStyle("vertclair");
@@ -1056,20 +1056,20 @@ cl98.setStyle("vertclair");
 }
 SAVE(CommercialLine, cl98);
 
-JourneyPattern li98(2533274790397698, "98");
+JourneyPattern li98(2533274790397698ULL, "98");
 li98.setTimetableName("98");
 li98.setRollingStock(&rs57);
 li98.setCommercialLine(&cl98);
 
-DesignatedLinePhysicalStop ls9806(2814749767109806, &li98, 0, true, false, 0, &ps06);
+DesignatedLinePhysicalStop ls9806(2814749767109806ULL, &li98, 0, true, false, 0, &ps06);
 SAVE(LineStop, ls9806);
 li98.addEdge(ls9806);
 
-DesignatedLinePhysicalStop ls9807(2814749767109807, &li98, 1, false, true, 2000, &ps07);
+DesignatedLinePhysicalStop ls9807(2814749767109807ULL, &li98, 1, false, true, 2000, &ps07);
 SAVE(LineStop, ls9807);
 li98.addEdge(ls9807);
 
-ContinuousService cs9801(4503599627379801, "9801", &li98);
+ContinuousService cs9801(4503599627379801ULL, "9801", &li98);
 {
 	ScheduledService::Schedules a;
 	ScheduledService::Schedules d;
@@ -1100,7 +1100,7 @@ SAVE(JourneyPattern, li98);
 // Data sources
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DataSource ds05(16607023625928705);
+DataSource ds05(16607023625928705ULL);
 ds05.setName("test source");
 ds05.setFormat("Trident");
 SAVE(DataSource, ds05);
