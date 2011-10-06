@@ -177,9 +177,8 @@ class WSGIProxy(object):
     def __call__(self, environ, start_response):
         path_info = environ['PATH_INFO']
 
-        # Redirect helper. Might not work depending on project settings.
-        # TODO: some are for backward compatibility. Remove once migrated.
-        if path_info in ('/admin', '/admin/', '/synthese3/admin/'):
+        # Admin redirect helpers.
+        if path_info in ('/admin', '/admin/'):
             return self._redirect(environ, start_response, self.ADMIN_URL)
 
         if path_info.endswith(

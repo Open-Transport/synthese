@@ -187,11 +187,11 @@ def add_default_subparsers(subparsers):
         help='Disable MySQL database support')
     parser_build.add_argument(
         '--mysql-dir',
-        help='Path to MySQL installation (Not needed on Linux if using'
+        help='Path to MySQL installation (Not needed on Linux if using '
              'standard MySQL installation)')
     parser_build.add_argument(
         '--boost-dir',
-        help='Path to Boost installation (Not needed on Linux if using'
+        help='Path to Boost installation (Not needed on Linux if using '
              'standard Boost installation)')
     parser_build.add_argument(
         '--parallel-build', type=int,

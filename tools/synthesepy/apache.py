@@ -231,7 +231,7 @@ Alias /{package_name} {package_files_path}/{package_name}
     def generate_config(self):
         apache_config = '# Generated file, do not edit.\n\n'
 
-        # Admin site is special: an admin alias is added to every site.
+        # Admin site is special: an admin alias is added to every sites.
         # NOTE: this expects the site called 'admin' may contain an 'admin'
         # package.
         admin_site = self.project.get_site('admin')
