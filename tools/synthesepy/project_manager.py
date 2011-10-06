@@ -295,10 +295,15 @@ class Project(object):
             self.sites.append(Site(self, site_path))
         log.debug('Found sites: %s', self.sites)
 
-        # TODO: add vhost info.
         self.config.static_paths = []
+        admin_site = self.get_site('admin')
+        admin_package = None
+        if admin_site:
+            admin_package = admin_site.get_package('admin')
         for site in self.sites:
-            for package in site.packages:
+            for package in site.packages + [admin_package]:
+                if not package:
+                    continue
                 self.config.static_paths.append(
                     (site.base_path, package.files_path))
 
@@ -329,7 +334,6 @@ class Project(object):
             os.makedirs(self.htdocs_path)
 
     def _sync_files(self, site, package):
-        # TODO: create a directory per site, when vhosts are implemented.
         if self.UPDATE_HTDOCS:
             _copy_over(package.files_path, self.htdocs_path)
 
