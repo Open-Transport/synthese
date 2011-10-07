@@ -91,8 +91,8 @@ DEFAULTS = {
     'test_daemon_only': False,
 
     # package
-    'packages_save_path': '/home/spasche/public_html/synthese/',
-    'packages_access_url': 'http://deb/~spasche/synthese/',
+    'packages_save_path': None,
+    'packages_access_url': None,
 
     # continuous_integration
     'no_clean_if_build_fails': False,
