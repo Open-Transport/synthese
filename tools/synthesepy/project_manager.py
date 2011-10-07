@@ -87,9 +87,11 @@ def _rsync(config, remote_path, local_path):
 
 class Package(object):
     def __init__(self, project, path):
+        self.project = project
         self.path = path
         self.name = os.path.split(path)[1]
         self.dependencies = []
+        self.base_page_index = -1
 
         if not os.path.isdir(self.path):
             raise Exception('Path %r is not a directory for a package' % self.path)
@@ -103,10 +105,77 @@ class Package(object):
     def __repr__(self):
         return '<Package %s %s>' % (self.name, self.path)
 
-    @property
-    def fixtures(self):
-        return (glob.glob(join(self.path, '*.sql')) +
+    def _load_fixtures(self, site):
+        fixtures_files = (glob.glob(join(self.path, '*.sql')) +
             glob.glob(join(self.path, '*.importer')))
+
+        for fixtures_file in fixtures_files:
+            if fixtures_file.endswith('.sql'):
+                vars = {
+                    'site_id': site.id,
+                }
+                self.project.db_backend.import_fixtures(fixtures_file, vars)
+            elif fixtures_file.endswith('.importer'):
+                self.project._run_testdata_importer()
+
+    def _load_pages(self, site, local):
+        pages_dir = join(self.path, 'pages_local' if local else 'pages')
+        if not os.path.isdir(pages_dir):
+            return
+
+        # Equivalent to synthese::util::RegistryKeyType::encodeUId
+        def encode_uid(table_id, object_id, grid_node_id=1):
+            id = object_id
+            id |= (grid_node_id << 32)
+            id |= (table_id << 48)
+            return id
+
+        WEB_PAGES_TABLE_ID = 63
+        SITES_TABLE_ID = 25
+        SHARED_PAGES_SITE_ID = encode_uid(SITES_TABLE_ID, 100)
+
+        # id structure:
+        # 0 - 0x0100 0000: existing pages
+        # 0x0100 0000 - 0x7f00 000: pages for packages (126 packages)
+        # (0x7f00 000 = 0x0100 0000 + 126 * 0x0100 0000)
+        START_PAGE = 0x01000000
+        PAGES_PER_PACKAGE = 0x01000000
+        LOCAL_OFFSET = PAGES_PER_PACKAGE / 2
+
+        assert self.base_page_index >= 0, \
+            'Package %s is missing a base_page_index value' % self
+
+        def pid(local_id):
+            page_id = (START_PAGE + self.base_page_index * PAGES_PER_PACKAGE +
+                local_id)
+            if local:
+                page_id += LOCAL_OFFSET
+            return encode_uid(WEB_PAGES_TABLE_ID, page_id)
+
+        pages_config = {}
+        execfile(join(pages_dir, 'pages.py'), {
+            'pid': pid,
+        }, pages_config)
+
+        # TODO: implement smart_url lookup on some attributes (up_id,...) or in page content.
+
+        site_id = site.id if local else SHARED_PAGES_SITE_ID
+
+        log.debug('pages_config: %r', pages_config)
+        for page in pages_config['pages']:
+            page['site_id'] = site_id
+            if page['content1'].startswith('file:'):
+                file_path = page['content1'][len('file:'):]
+                page['content1'] = unicode(open(join(pages_dir, file_path), 'rb').read(), 'utf-8')
+            if ('title' not in page and
+                page.get('smart_url_path', '').startswith(':')):
+                page['title'] = page['smart_url_path'][1:]
+            self.project.db_backend.replace_into('t063_web_pages', page)
+
+    def load_data(self, site, local):
+        if not local:
+            self._load_fixtures(site)
+        self._load_pages(site, local)
 
 
 class PackagesLoader(object):
@@ -218,10 +287,6 @@ def command(root_required=False):
 
 
 class Project(object):
-    # FIXME: not used for now, there are some permissions issues when syncing
-    # on Windows.
-    UPDATE_HTDOCS = False
-
     def __init__(self, path, env=None, config=None):
         self.path = os.path.normpath(os.path.abspath(path))
         if not os.path.isdir(self.path):
@@ -328,15 +393,6 @@ class Project(object):
             ',triggerCheck=0'
         utils.call(importer_path, env=env)
 
-    def _clean_files(self):
-        if self.UPDATE_HTDOCS:
-            utils.RemoveDirectory(self.htdocs_path)
-            os.makedirs(self.htdocs_path)
-
-    def _sync_files(self, site, package):
-        if self.UPDATE_HTDOCS:
-            _copy_over(package.files_path, self.htdocs_path)
-
     @property
     def db_backend(self):
         if self._db_backend:
@@ -345,50 +401,36 @@ class Project(object):
             self.env, self.config.conn_string)
         return self._db_backend
 
-    def _clean_db(self):
+    def clean(self):
         self.db_backend.drop_db()
 
-    def _init_db(self):
-        self.db_backend.init_db()
-
-    def _sync_db(self, site, package):
-        for fixtures_file in package.fixtures:
-            if fixtures_file.endswith('.sql'):
-                vars = {
-                    'site_id': site.id,
-                }
-                self.db_backend.import_fixtures(fixtures_file, vars)
-            elif fixtures_file.endswith('.importer'):
-                self._run_testdata_importer()
-
-    def _clean(self):
-        self._clean_files()
-        self._clean_db()
-
-    def _init(self):
-        # Files will be initialized in _sync_files()
-        self._init_db()
-
-    def reset(self):
-        """Deletes database and files and run sync afterwards"""
-        log.info('Resetting project')
-        self._clean()
-        self._init()
-        self.sync()
-
-    def sync(self):
-        """Load fixtures into the database and prepare static files."""
-        log.info('Syncing project')
-        self._clean_files()
+    @command()
+    def load_data(self, local=False):
+        """Load data into the database."""
+        log.info('loading_data into project (local:%s)', local)
         # TODO: don't import fixtures from a package more than once.
         for site in self.sites:
             for package in site.packages:
-                log.debug('Syncing %s %s', site, package)
-                self._sync_files(site, package)
-                self._sync_db(site, package)
+                log.debug('Loading site:%s package:%s', site, package)
+                package.load_data(site, local)
 
-        # TODO: also sync fixtures at the top level of the project.
+    @command()
+    def load_local_data(self):
+        """
+        Load data into the database (data loaded only once meant to be edited)
+        """
+        self.load_data(True)
 
+    @command()
+    def reset(self):
+        """
+        Delete database and load inital data.
+        """
+        log.info('Resetting project')
+        self.clean()
+        self.db_backend.init_db()
+        self.load_data()
+        self.load_local_data()
 
     @command()
     def rundaemon(self, block=True):

@@ -74,6 +74,15 @@ class DBBackend(object):
                        for idx, value in enumerate(row)) for row in cursor.fetchall()]
             return (rv[0] if rv else None) if one else rv
 
+    def replace_into(self, table, object):
+        """Runs a REPLACE INTO query with the given object dict"""
+        columns = object.keys()
+        values = [object[c] for c in columns]
+        self.query(
+            'replace into %s(%s) values (%s)' % (
+                table, ','.join(columns), ','.join(['?'] * len(columns))
+            ), values)
+
     def init_db(self):
         utils.kill_listening_processes(self.env.c.port)
 

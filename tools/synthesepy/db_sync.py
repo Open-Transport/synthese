@@ -47,13 +47,13 @@ class Page(object):
         self.title = ''
         self.content1 = ''
         self.save = True
-    
+
     def __repr__(self):
         p = copy.copy(self)
         MAX_CONTENT = 200
         p.content1 = p.content1[:MAX_CONTENT]
         return '<Page %r>' % p.__dict__
-    
+
 
 class PagesIO(object):
     def __init__(self, project, site):
@@ -133,7 +133,7 @@ class HTTPPagesReader(HTTPPageMixin, PagesReader):
                 form = br.forms().next()
                 page.save = False
 
-            page.content1 = unicode(form['actionParamc1'], 'utf-8') 
+            page.content1 = unicode(form['actionParamc1'], 'utf-8')
 
             # TODO: copy other properties that could have changed.
 
@@ -202,7 +202,7 @@ class FilesPagesWriter(FilesPageMixin, PagesWriter):
         MAX_TITLE_LEN = 10
 
         for id, page in id_to_page.iteritems():
-            if page.smart_url_path: 
+            if page.smart_url_path:
                 parsed_url = urlparse.urlparse(page.smart_url_path)
                 path = ['by_smart_url']
                 if parsed_url.netloc:
@@ -391,7 +391,7 @@ def sync_site(project, site, host):
     log.info('db modified pages: %r (%i not to save)',
         [p for p in db_modified_pages if p.save],
         len([p for p in db_modified_pages if not p.save]))
-    
+
     common_modified_page_ids = (set(p.id for p in files_modified_pages) &
         set(p.id for p in db_modified_pages))
 
