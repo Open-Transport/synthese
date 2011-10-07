@@ -43,7 +43,7 @@ if(WIN32)
 endif()
 
 if(DEFINED BOOST_ROOT)
-	set(Boost_NO_SYSTEM_PATHS ON)
+  set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 find_package(Boost ${BOOST_VERSION} COMPONENTS ${BOOST_LIBS})
 if(NOT Boost_FOUND)
