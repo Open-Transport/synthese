@@ -476,8 +476,9 @@ class CMakeBuilder(Builder):
 
     def _build_make(self, build_only_project):
         utils.call(
-            'make -j%i %s' % (
+            'make -j%i %s %s' % (
                 self.env.c.parallel_build,
+                'VERBOSE=1' if self.env.c.verbose else '',
                 build_only_project if build_only_project else ''),
             cwd=self.env.env_path,
             shell=True)
