@@ -90,7 +90,7 @@ class HTTPTestCase(unittest.TestCase):
         if cls.no_init:
             return
         cls.project.stopdaemon()
-        cls.project._clean()
+        cls.project.clean()
 
     def get_http_api(self):
         return http_api.HTTPApi(self.backend.env)
