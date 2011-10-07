@@ -260,8 +260,10 @@ class MySQLBackend(DBBackend):
             # So, split lines at semicolons.
             current_line = ''
             for line in sql.splitlines():
-                if not current_line and line.strip().startswith('--'):
+                if not current_line and line.startswith('--'):
                     continue
+                # FIXME: this might break if there's a semicolon before a new
+                # line in a multi-line statement.
                 if not line.strip().endswith(';'):
                     current_line += line
                     continue
