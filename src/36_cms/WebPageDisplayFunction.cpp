@@ -93,6 +93,10 @@ namespace synthese
 					throw RequestException("Smart URL and site, or page ID must be specified");
 				}
 				_savedParameters.remove(PARAMETER_SMART_URL);
+				if(_smartURL[0] == ':')
+				{
+					throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
+				}
 
 				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
 				if(!_page.get())
@@ -126,8 +130,8 @@ namespace synthese
 			if(_page.get())
 			{
 				// If page has been fetched by its id and its smart URL is defined, then
-				// redirect permanently to the smart url
-				if(_smartURL.empty() && !_page->getSmartURLPath().empty())
+				// redirect permanently to the smart url, unless it starts with a colon (used for aliases).
+				if(_smartURL.empty() && !_page->getSmartURLPath().empty() && _page->getSmartURLPath()[0] != ':')
 				{
 					/// @todo handle default parameter of smart url
 					stringstream url;
