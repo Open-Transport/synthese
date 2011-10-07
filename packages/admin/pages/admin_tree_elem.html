@@ -1,0 +1,6 @@
+<div class="<?if&cond=<@is_last@>&then=lastblock&else=notlastblock?>">
+<div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@subtree@>&then=<img class="node" src="<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" />&else=<img src="ftv2lastnode.png" />?>?><img src="<@icon@>" class="icon" /></div>
+
+<div class="text level<@depth@>"><?if&cond=<@is_current@>&else=<a href="<@url@>">?><@title@><?if&cond=<@is_current@>&else=</a>?></div>
+<div <?if&cond=<@is_opened@>&else=style="display:none" ?> class="subtree subtree<@depth@>"><@subtree@></div>
+</div>
