@@ -134,8 +134,9 @@ def add_project_subparsers(subparsers):
             parser.set_defaults(project_func=project_method)
         return parser
 
+    add_parser('load_data')
+    add_parser('load_local_data')
     add_parser('reset')
-    add_parser('sync')
     add_parser('rundaemon', ('run', 'start'))
     add_parser('stopdaemon', ('stop',))
     add_parser('runproxy')
