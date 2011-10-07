@@ -175,23 +175,23 @@ namespace synthese
 		}
 
 		// Class used for trim:
-		class sortableNumber
+		class SortableNumber
 		{
 		private:
 			string _value;
 			string _begin; // = _value except for 12s it is 12
-			string _end;   // =  ""    except for 12s it is  s
+			string _end; // = "" except for 12s it is  s
 			long int _numericalValue; // = 12 for 12 and 12s, = -1 for A
 
 			typedef enum {
-				isAnInteger,   //example : 12
-				beginIsInteger,   //example : 12s
-				beginIsNotInteger //example : A, or T1
+				isAnInteger, // example : 12
+				beginIsInteger, // example : 12s
+				beginIsNotInteger // example : A, or T1
 			} numberType;
 			numberType _numberType;
 
 		public:
-			sortableNumber(string str)
+			SortableNumber(string str)
 			{
 				_numericalValue = -1;
 				_value = str;
@@ -226,7 +226,7 @@ namespace synthese
 				}
 			}
 
-			bool operator<(sortableNumber const &otherNumber) const
+			bool operator<(SortableNumber const &otherNumber) const
 			{
 				if((_numberType != beginIsInteger)
 						&& (otherNumber._numberType != beginIsInteger)) // No number have form "12S"
@@ -280,8 +280,8 @@ namespace synthese
 			// [A1] -> ligne A1: XXX - XXX
 			//
 
-			typedef map<sortableNumber,shared_ptr<const CommercialLine> > linesMapType;
-			linesMapType linesMap;
+			typedef map<SortableNumber, shared_ptr<const CommercialLine> > LinesMapType;
+			LinesMapType linesMap;
 
 			// Get CommercialLine Global Registry
 			if(_network.get())
@@ -301,17 +301,17 @@ namespace synthese
 					}
 
 					// Insert respecting order described up there
-					linesMap[sortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
+					linesMap[SortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
 				}
 			}
 			else if(_line.get())
 			{
-				linesMap[sortableNumber(_line->getShortName())] = _line;
+				linesMap[SortableNumber(_line->getShortName())] = _line;
 			}
 
 			// Populating the parameters map
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			BOOST_FOREACH(linesMapType::value_type it, linesMap)
+			BOOST_FOREACH(LinesMapType::value_type it, linesMap)
 			{
 				shared_ptr<const CommercialLine> line = it.second;
 				shared_ptr<ParametersMap> linePM(new ParametersMap(request.getFunction()->getSavedParameters()));
