@@ -42,7 +42,7 @@ if(WIN32)
   list(APPEND BOOST_LIBS bzip2)
 endif()
 
-if(DEFINED BOOST_ROOT)
+if(NOT $ENV{BOOST_ROOT} STREQUAL "")
   set(Boost_NO_SYSTEM_PATHS ON)
 endif()
 find_package(Boost ${BOOST_VERSION} COMPONENTS ${BOOST_LIBS})
