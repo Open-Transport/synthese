@@ -135,7 +135,7 @@ add_subdirectory(utils)
 # To build the packages, you can increment the build number and add a
 # "cmd:create_package" string in your commit message. (build number is ignored,
 # this is only used to do a dummy commit).
-# 2
+# 3
 
 # build a CPack driven installer package
 #include(InstallRequiredSystemLibraries)
