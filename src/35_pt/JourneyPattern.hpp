@@ -232,6 +232,12 @@ namespace synthese
 				///	@param stops Array of physical stops with arrival/departure information
 				/// @return true if the line serves exactly the stops in the same order with the same arrival/departure authorizations
 				bool operator==(const StopsWithDepartureArrivalAuthorization& stops) const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Full content comparison operator.
+				///	@param stops Array of physical stops with arrival/departure information
+				/// @return true if the line serves exactly the stops in the same order with the same arrival/departure authorizations
+				bool operator==(const JourneyPattern& other) const;
 			//@}
 		};
 	}
