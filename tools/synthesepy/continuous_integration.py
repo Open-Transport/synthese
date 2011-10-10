@@ -69,7 +69,7 @@ def run(env, args):
 
     try:
         log.info('Building')
-        ##synthesepy.build.build(env, 'build')
+        synthesepy.build.build(env, 'build')
     except Exception, e:
         if args.no_clean_if_build_fails:
             raise
@@ -83,7 +83,7 @@ def run(env, args):
 
     log.info('Running tests')
     tester = synthesepy.test.Tester(env)
-    ##tester.run_tests(config.suites)
+    tester.run_tests(config.suites)
 
     if not _should_build_package(env):
         return
