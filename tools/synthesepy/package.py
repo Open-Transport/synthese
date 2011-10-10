@@ -35,23 +35,26 @@ def run(env, args):
     if not env.config.prefix:
         raise Exception('Prefix is required.')
 
+    svn_info = utils.SVNInfo(env.source_path)
+    revision_path = 'r{0}'.format(svn_info.version)
+    package_relative_dir = os.sep.join([
+        env.platform, env.mode, svn_info.branch, revision_path])
+
+    package_dir = join(env.config.packages_save_path, package_relative_dir)
+    if os.path.isdir(package_dir):
+        if env.config.no_package_overwrite:
+            log.info('Package directory already exists (%r) not building.',
+                package_dir)
+            return
+        utils.RemoveDirectory(package_dir)
+    os.makedirs(package_dir)
+
     log.info('Cleaning prefix %r', env.config.prefix)
     utils.RemoveDirectory(env.config.prefix)
 
     log.info('Installing Synthese to %r', env.config.prefix)
     builder = synthesepy.build.get_builder(env)
     builder.install()
-
-    svn_info = utils.SVNInfo(env.source_path)
-    revision_path = 'r{0}'.format(svn_info.version)
-    package_relative_dir = '{platform}/{mode}/{branch}/{revision_path}'.format(
-        platform=env.platform, mode=env.mode,
-        branch=svn_info.branch, revision_path=revision_path)
-
-    package_dir = join(env.config.packages_save_path, package_relative_dir)
-    if os.path.isdir(package_dir):
-        utils.RemoveDirectory(package_dir)
-    os.makedirs(package_dir)
 
     # Archive
 
