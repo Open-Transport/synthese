@@ -294,6 +294,33 @@ namespace synthese
 		}
 
 
+
+		bool JourneyPattern::operator==( const JourneyPattern& other ) const
+		{
+			if(getEdges().size() != other.getEdges().size())
+			{
+				return false;
+			}
+
+			size_t rank(0);
+			BOOST_FOREACH(const Edge* edge, getEdges())
+			{
+				const Edge& otherEdge(*other.getEdge(rank));
+				if( edge->getFromVertex() == otherEdge.getFromVertex() ||
+					(rank > 0 && rank+1 < getEdges().size() && (edge->isDeparture() != otherEdge.isDeparture() || edge->isArrival() != otherEdge.isArrival())) ||
+					(dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && static_cast<const DesignatedLinePhysicalStop*>(&otherEdge)->getScheduleInput() != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
+					otherEdge.getMetricOffset() != edge->getMetricOffset()
+				){
+					return false;
+				}
+				++rank;
+			}
+
+			return true;
+		}
+
+
+
 		const LineStop* JourneyPattern::getLineStop( std::size_t rank ) const
 		{
 			return static_cast<const LineStop*>(getEdge(rank));
