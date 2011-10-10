@@ -42,8 +42,6 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
-#include "Importable.h"
-#include "DataSource.h"
 
 #include <geos/geom/LineString.h>
 
@@ -61,8 +59,6 @@ namespace synthese
 	using namespace html;
 	using namespace geography;
 	using namespace graph;
-	using namespace impex;
-
 
 	namespace util
 	{
@@ -83,7 +79,6 @@ namespace synthese
 		const string PTQualityControlAdmin::TAB_CITIES_WITHOUT_MAIN_STOP("cwm");
 		const string PTQualityControlAdmin::TAB_EDGES_AND_GEOMETRIES("eag");
 		const string PTQualityControlAdmin::TAB_RANK_CONTINUITY("rank_continuity");
-		const string PTQualityControlAdmin::TAB_DOUBLE_ROUTES("double_routes");
 
 
 
@@ -424,85 +419,7 @@ namespace synthese
 						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
 						"</p>"
 					;
-			}	}	
-
-			////////////////////////////////////////////////////////////////////
-			// DOUBLE ROUTES
-			if (openTabContent(stream, TAB_DOUBLE_ROUTES))
-			{
-				if(_runControl && getCurrentTab() == getActiveTab())
-				{
-					AdminFunctionRequest<JourneyPatternAdmin> openJourneyPatternRequest(request);
-
-					HTMLTable::ColsVector c;
-					c.push_back("Network");
-					c.push_back("Line");
-					c.push_back("Route 1");
-					c.push_back("Route 2");
-					c.push_back("Source");
-					c.push_back("Code");
-					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-
-					stream << t.open();
-
-					BOOST_FOREACH(const CommercialLine::Registry::value_type& itline, Env::GetOfficialEnv().getRegistry<CommercialLine>())
-					{
-						BOOST_FOREACH(Path* itroute, itline.second->getPaths())
-						{
-							const JourneyPattern& route(static_cast<const JourneyPattern&>(*itroute));
-							BOOST_FOREACH(const Importable::DataSourceLinks::value_type& link, route.getDataSourceLinks())
-							{
-								BOOST_FOREACH(Path* itroute2, itline.second->getPaths())
-								{
-									const JourneyPattern& route2(static_cast<const JourneyPattern&>(*itroute2));
-									if(	&route2 != &route &&
-										route2.hasLinkWithSource(*link.first) &&
-										route2.getCodeBySource(*link.first) == link.second &&
-										route2 == route
-									){
-										stream << t.row();
-
-										stream << t.col() << itline.second->getNetwork()->getName();
-
-										stream << t.col() << itline.second->getShortName();
-
-										// Route 1
-										stream << t.col();
-										openJourneyPatternRequest.getPage()->setLine(
-											Env::GetOfficialEnv().getSPtr(&route)
-										);
-										stream << HTMLModule::getHTMLLink(openJourneyPatternRequest.getURL(), lexical_cast<string>(route.getKey()));
-
-										// Route 2
-										stream << t.col();
-										openJourneyPatternRequest.getPage()->setLine(
-											Env::GetOfficialEnv().getSPtr(&route2)
-										);
-										stream << HTMLModule::getHTMLLink(openJourneyPatternRequest.getURL(), lexical_cast<string>(route2.getKey()));
-
-										// Code
-										stream << t.col() << link.first->getName();
-
-										stream << t.col() << link.second;
-									}
-								}
-							}
-						}
-					}
-
-					stream << t.close();
-				}	
-				else
-				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
-					runRequest.getPage()->setRunControl(true);
-
-					stream <<
-						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
-						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
-						"</p>"
-					;
-			}	}	
+			}	}
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
@@ -548,7 +465,7 @@ namespace synthese
 			_tabs.push_back(Tab("Localités sans arrêt principal", TAB_CITIES_WITHOUT_MAIN_STOP, false));
 			_tabs.push_back(Tab("Itinéraires de lignes", TAB_EDGES_AND_GEOMETRIES, false));
 			_tabs.push_back(Tab("Continuité des rangs", TAB_RANK_CONTINUITY, false));
-			_tabs.push_back(Tab("Parcours en double", TAB_DOUBLE_ROUTES, false));
+
 			_tabBuilded = true;
 		}
 	}

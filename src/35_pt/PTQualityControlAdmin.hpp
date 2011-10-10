@@ -49,7 +49,6 @@ namespace synthese
 				static const std::string TAB_CITIES_WITHOUT_MAIN_STOP;
 				static const std::string TAB_EDGES_AND_GEOMETRIES;
 				static const std::string TAB_RANK_CONTINUITY;
-				static const std::string TAB_DOUBLE_ROUTES;
 			//@}
 
 		private:
