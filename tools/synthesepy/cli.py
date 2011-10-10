@@ -278,6 +278,12 @@ def add_default_subparsers(subparsers):
         '--no-clean-if-build-fails', action='store_true',
         help='Don\'t clean the build directory and build again in case of '
         'build failure')
+    parser_continuous_integration.add_argument(
+        '--no-package-overwrite', action='store_true',
+        help='Don\'t overwrite existing package.')
+    parser_continuous_integration.add_argument(
+        '--force-create-package', action='store_true',
+        help='Force package creation.')
 
     parser_continuous_integration = subparsers.add_parser(
         'system_install',
@@ -289,6 +295,9 @@ def add_default_subparsers(subparsers):
         'package',
         help='Create a Synthese package and save it to the configured location.')
     parser_package.set_defaults(func=package)
+    parser_package.add_argument(
+        '--no-package-overwrite', action='store_true',
+        help='Don\'t overwrite existing package.')
 
 
 def main():

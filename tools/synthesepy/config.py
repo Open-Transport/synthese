@@ -93,11 +93,13 @@ DEFAULTS = {
     # package
     'packages_save_path': None,
     'packages_access_url': None,
+    'no_package_overwrite': False,
 
     # continuous_integration
     'no_clean_if_build_fails': False,
     'suites': None,
     'should_build_package': lambda env: False,
+    'force_create_package': False,
 }
 
 
