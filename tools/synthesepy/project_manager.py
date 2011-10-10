@@ -47,7 +47,7 @@ log = logging.getLogger(__name__)
 
 
 # Utilities
-# XXX maybe move to utils
+# XXX maybe move to utils. Not used for now.
 def _copy_over(source_path, target_path):
     """Copy source_path over target_path, replacing any existing files"""
 
@@ -166,7 +166,8 @@ class Package(object):
             page['site_id'] = site_id
             if page['content1'].startswith('file:'):
                 file_path = page['content1'][len('file:'):]
-                page['content1'] = unicode(open(join(pages_dir, file_path), 'rb').read(), 'utf-8')
+                page['content1'] = unicode(
+                    open(join(pages_dir, file_path), 'rb').read(), 'utf-8')
             if ('title' not in page and
                 page.get('smart_url_path', '').startswith(':')):
                 page['title'] = page['smart_url_path'][1:]
@@ -215,7 +216,8 @@ class PackagesLoader(object):
                 if dep in packages:
                     continue
                 if dep not in self.system_packages:
-                    raise Exception('Can\'t resolve dependency to package %r' % dep)
+                    raise Exception(
+                        'Can\'t resolve dependency to package %r' % dep)
                 packages[dep] = self.system_packages[dep]
                 to_visit.append(dep)
 
@@ -233,7 +235,8 @@ class PackagesLoader(object):
                 wrong_system_packages)
 
         for system_package_name in system_package_names:
-            packages[system_package_name] = self.system_packages[system_package_name]
+            packages[system_package_name] = \
+                self.system_packages[system_package_name]
 
         packages = self._compute_dependencies(packages)
 
@@ -275,7 +278,8 @@ def command(root_required=False):
      def _command(f):
          def wrapper(*args, **kwargs):
              project = args[0]
-             if not project.env.c.no_root_check and project.env.platform != 'win':
+             if (not project.env.c.no_root_check and
+                 project.env.platform != 'win'):
                 is_root = os.geteuid() == 0
                 if root_required and not is_root:
                     raise Exception('You must run this command as root')
