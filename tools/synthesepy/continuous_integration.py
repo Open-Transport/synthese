@@ -31,6 +31,26 @@ from synthesepy import utils
 log = logging.getLogger(__name__)
 
 
+def _should_build_package(env):
+    if env.config.force_create_package:
+        return True
+
+    if not env.config.should_build_package(env):
+        log.info('should_build_package returned False. Not building package.')
+        return False
+
+    svn_info = utils.SVNInfo(env.source_path)
+    CREATE_PACKAGE_MESSAGE = 'cmd:create_package'
+
+    if CREATE_PACKAGE_MESSAGE in svn_info.last_msg:
+        log.info('Found %r in last commit message. '
+            'Building package.', CREATE_PACKAGE_MESSAGE)
+        return True
+
+    log.info('Not building package')
+    return False
+
+
 def run(env, args):
     config = env.config
 
@@ -49,7 +69,7 @@ def run(env, args):
 
     try:
         log.info('Building')
-        synthesepy.build.build(env, 'build')
+        ##synthesepy.build.build(env, 'build')
     except Exception, e:
         if args.no_clean_if_build_fails:
             raise
@@ -63,22 +83,11 @@ def run(env, args):
 
     log.info('Running tests')
     tester = synthesepy.test.Tester(env)
-    tester.run_tests(config.suites)
+    ##tester.run_tests(config.suites)
+
+    if not _should_build_package(env):
+        return
 
     log.info('Creating package')
-    if not env.config.should_build_package(env):
-        log.info('should_build_package returned False. Not building package.')
-        return
-
-    svn_info = utils.SVNInfo(env.source_path)
-    CREATE_PACKAGE_MESSAGE = 'cmd:create_package'
-
-    if CREATE_PACKAGE_MESSAGE not in svn_info.last_msg:
-        log.info('Didn\'t find %r in last commit message. '
-            'Not building package.', CREATE_PACKAGE_MESSAGE)
-        return
-
-    log.info('Found %r in last commit message. Building package...',
-        CREATE_PACKAGE_MESSAGE)
     synthesepy.package.run(env, args)
 
