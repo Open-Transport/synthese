@@ -56,13 +56,16 @@ class Daemon(object):
         proxy.stop()
 
     def _wait_until_ready(self):
-        for i in range(40):
+        # TODO: make it an option?
+        WAIT_TIME_S = 4 * 60
+        POLL_INTERVAL_S = 2
+        for i in range(WAIT_TIME_S / POLL_INTERVAL_S):
             if not self.is_running():
                 raise DaemonException(
                     'Server has exited prematurely. Check the logs for details.')
             if utils.can_connect(self.env.c.port, True):
                 break
-            time.sleep(2)
+            time.sleep(POLL_INTERVAL_S)
         else:
             raise DaemonException('Server is not responding')
 
