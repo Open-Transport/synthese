@@ -35,7 +35,7 @@ class Apache(external_tools.ExternalTool):
 AddDefaultCharset UTF-8
 Order allow,deny
 Allow from all
-ProxyPass http://localhost:{port}/{proxy_path} retry=5
+ProxyPass http://localhost:{port}/{proxy_path} retry=1
 SetEnv proxy-nokeepalive 1
 '''
 
