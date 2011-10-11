@@ -242,14 +242,14 @@ namespace synthese
 
 			TimeSlotRoutePlanner::Result result;
 
-			// Control if departure and arrival VAMs has contains at least one vertex
+			// Check if departure and arrival VAMs has contains at least one vertex
 			if(	_originVam.getMap().empty() ||
 				_destinationVam.getMap().empty()
 			){
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, false, result);
 			}
 
-			// Control if the departure and arrival places are the same
+			// Check if the departure and arrival places are the same
 			if(	_originVam.intersercts(_destinationVam)
 			){
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, true, result);
