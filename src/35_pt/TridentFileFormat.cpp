@@ -414,9 +414,9 @@ namespace synthese
 				os << "<AreaCentroid>" << "\n";
 				os << "<objectId>" << TridentId (peerid, "AreaCentroid", ps) << "</objectId>" << "\n";
 
-				os << "<longitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
-				os << "<latitude>" << (ps.hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
-				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
+				os << "<longitude>" << (ps.hasGeometry() ? wgs84ps->getX() : 0) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps.hasGeometry() ? wgs84ps->getY() : 0) << "</latitude>" << "\n";
+				os << "<longLatType>" << (ps.hasGeometry() ? _getTridentFromSRID(wgs84ps->getSRID()) : "WGS84") << "</longLatType>" << "\n";
 
 				// we do not provide full addresses right now.
 				os << "<address><countryCode>" << ps.getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
@@ -618,9 +618,9 @@ namespace synthese
 				os << "<StopPoint" << (_withTisseoExtension ? " xsi:type=\"TisseoStopPointType\"" : "") << ">" << "\n";
 				os << "<objectId>" << TridentId (peerid, "StopPoint", *ls) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
-				os << "<longitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getX()) << "</longitude>" << "\n";
-				os << "<latitude>" << (ps->hasGeometry() ? 0 : wgs84ps->getY()) << "</latitude>" << "\n";
-				os << "<longLatType>" << _getTridentFromSRID(wgs84ps->getSRID()) << "</longLatType>" << "\n";
+				os << "<longitude>" << (ps->hasGeometry() ? wgs84ps->getX() :0) << "</longitude>" << "\n";
+				os << "<latitude>" << (ps->hasGeometry() ? wgs84ps->getY() : 0) << "</latitude>" << "\n";
+				os << "<longLatType>" << (ps->hasGeometry() ? _getTridentFromSRID(wgs84ps->getSRID()) : "WGS84") << "</longLatType>" << "\n";
 
 				os << "<address><countryCode>" << ps->getConnectionPlace()->getCity()->getCode() << "</countryCode></address>";
 
