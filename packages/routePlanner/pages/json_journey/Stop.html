@@ -1,0 +1,24 @@
+<?if&cond=<@arrival_longitude@>&then=
+  <?if&cond=<@is_first_leg@>&else=,?>{ name: "<@arrival_stop_name@>",
+  position: "<@arrival_longitude@>,<@arrival_latitude@>"
+  <?if&cond=<@is_last_leg@>&then=, means: "foot"}
+    &else=
+      <?if&cond=<@departure_longitude@>&then=
+        <?if&cond=
+          <?and&l=<?=&r=<@departure_longitude@>&l=<@arrival_longitude@>?>
+          &r=<?=&r=<@departure_latitude@>&l=<@arrival_latitude@>?>
+          ?>
+        &else=
+          ,means:"foot"}
+          ,{ type:'empty', name:"<@departure_stop_name@>",
+          position:"<@departure_longitude@>,<@departure_latitude@>"
+        ?>
+      &else=
+        }
+    ?>
+  ?>
+&else=
+  <?if&cond=<@is_first_leg@>&then=&else=,?>
+  { name: "<@departure_stop_name@>",
+  position: "<@departure_longitude@>,<@departure_latitude@>"
+?>
