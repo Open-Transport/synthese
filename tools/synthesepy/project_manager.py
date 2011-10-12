@@ -605,6 +605,7 @@ class Project(object):
             remote_db_path = join(self.db_path, 'remote_config.db3')
 
             log.info('Fetching db to %r', remote_db_path)
+            # TODO: this is won't with the new project system.
             _rsync(self.config, '/srv/data/s3-server/config.db3',
                 utils.to_cygwin_path(remote_db_path))
 
