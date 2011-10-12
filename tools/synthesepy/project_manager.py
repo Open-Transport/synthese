@@ -28,6 +28,7 @@ import gzip
 import logging
 import os
 from os.path import join
+import pprint
 import shutil
 import subprocess
 import sys
@@ -161,9 +162,10 @@ class Package(object):
 
         site_id = site.id if local else SHARED_PAGES_SITE_ID
 
-        log.debug('pages_config: %r', pages_config)
+        log.debug('pages_config:\n%s', pprint.pformat(pages_config))
         for page in pages_config['pages']:
-            page['site_id'] = site_id
+            if not 'site_id' in page:
+                page['site_id'] = site_id
             if page['content1'].startswith('file:'):
                 file_path = page['content1'][len('file:'):]
                 page['content1'] = unicode(
