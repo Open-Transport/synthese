@@ -65,6 +65,7 @@ namespace synthese
 
 		const string StopPointsListFunction::DATA_NAME("name");
 		const string StopPointsListFunction::DATA_STOPAREA_NAME("stopAreaName");
+                const string StopPointsListFunction::DATA_STOPAREA_CITY_NAME("stopAreaCityName");
 
 		ParametersMap StopPointsListFunction::_getParametersMap() const
 		{
@@ -179,6 +180,7 @@ namespace synthese
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
+						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
 						"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
 						"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
 						"\" lineStyle=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
@@ -190,6 +192,7 @@ namespace synthese
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
+                                                "\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
 						"\">";
 				}
 			}
@@ -312,6 +315,7 @@ namespace synthese
 			pm.insert(Request::PARAMETER_OBJECT_ID, stop.getKey());
 			pm.insert(DATA_NAME, stop.getName());
 			pm.insert(DATA_STOPAREA_NAME, stop.getConnectionPlace()->getFullName());
+			pm.insert(DATA_STOPAREA_CITY_NAME, stop.getConnectionPlace()->getCity()->getName());
 			_page->display(stream, request, pm);
 		}
 	}

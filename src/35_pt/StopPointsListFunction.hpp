@@ -67,7 +67,7 @@ namespace synthese
 		protected:
 				static const std::string DATA_NAME;
 				static const std::string DATA_STOPAREA_NAME;
-
+                                static const std::string DATA_STOPAREA_CITY_NAME;
 			//! \name Page parameters
 			//@{
 				boost::optional<boost::posix_time::ptime>	_date;
