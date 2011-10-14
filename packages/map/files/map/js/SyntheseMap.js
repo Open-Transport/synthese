@@ -1,3 +1,17 @@
+define([
+  "/core/js/Synthese.js",
+  "order!/map/vendor/OpenLayers/OpenLayers.js",
+  // For the OpenLayers debug version: Put the following code in the html, and comment the line above.
+  // <script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
+  "order!/map/vendor/OpenLayers/lib/OpenLayers/Lang/fr.js",
+  "order!/map/vendor/OpenLayers_maptypepanel/MapType.js",
+  "order!/map/vendor/OpenLayers_maptypepanel/MapTypePanel.js",
+], function(Synthese) {
+
+/**
+ * Class that manages an OpenLayer map to display public transportation objects
+ * (lines and stops).
+ */
 var SyntheseMap = OpenLayers.Class({
   MAP_SRID: "900913",
 
@@ -7,6 +21,7 @@ var SyntheseMap = OpenLayers.Class({
   layerSwitcher: null,
   // TODO: use Synthese object instead.
   urlOptions: null,
+  mapOptions: {},
 
   /**
    * Option where to recenter the map on the first display.
@@ -69,9 +84,9 @@ var SyntheseMap = OpenLayers.Class({
 
     this.beforeMapInit();
 
-    this.map = new OpenLayers.Map(mapId, {
+    this.map = new OpenLayers.Map(mapId, OpenLayers.Util.extend({
       projection: "EPSG:" + this.MAP_SRID
-    });
+    }, this.mapOptions));
 
     this.linesLayer = new OpenLayers.Layer.Vector("lines", {
       layerId: "lines",
@@ -130,17 +145,15 @@ var SyntheseMap = OpenLayers.Class({
             this.map.events.register("zoomend", this, this.redraw);
             this.redraw();
             return true;
-          } else {
-            return false;
           }
+          return false;
         },
         deactivate: function() {
           if (OpenLayers.Control.prototype.deactivate.apply(this, arguments)) {
             this.map.events.unregister("zoomend", this, this.redraw);
             return true;
-          } else {
-            return false;
           }
+          return false;
         },
         redraw: function() {
           $("#zoomLevel").text(this.map.zoom);
@@ -621,5 +634,9 @@ var SyntheseMap = OpenLayers.Class({
   afterPTFeaturesAdded: function() {
     console.log("afterPTFeaturesAdded");
   }
+
+});
+
+return SyntheseMap;
 
 });

@@ -60,56 +60,34 @@
     </div>
   </form>
 
+  <!-- GMap doesn't load correctly through require.js -->
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
-
-  <!-- Release versions -->
-  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.min.js"></script>
-  <script src="../core/vendor/backbone-0.5.1.min.js"></script>
-  <script src="../map/vendor/OpenLayers/OpenLayers.js"></script>
-
-  <!-- Debug versions -->
-  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
-  <!--
-  <script src="../core/vendor/jquery-1.6.2.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.js"></script>
-  <script src="../core/vendor/backbone-0.5.1.js"></script>
-  <script src="../map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  -->
-
-  <script src="../map/vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
-  <script src="../map/vendor/OpenLayers_maptypepanel/MapType.js"></script>
-  <script src="../map/vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
-
-  <script src="../core/js/Synthese.js"></script>
-  <script src="../map/js/SyntheseMap.js"></script>
-  <script src="../map/js/CityBrowser.js"></script>
-
-  <script src="../routePlanner/js/legacy/core.js"></script>
-  <script src="../routePlanner/js/legacy/interface.js"></script>
-  <!-- <script src="../routePlanner/js/legacy/FicheHoraire.js"></script>  -->
-  <script src="../routePlanner/js/RoutePlanner.js"></script>
-
-  <script src="../map/js/StopSelector.js"></script>
-
+  <!--<script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>-->
+  <script src="/core/vendor/requirejs/require.js"></script>
+  <script src="/core/js/init.js"></script>
   <script>
-  Synthese.init();
 
-  // route planner configuration:
-  legacyRoutePlannerConfig.minCharsToTriggerAutocomplete = 0;
-  legacyRoutePlannerConfig.routePlannerFormName = "routePlannerForm";
+  var stopSelector;
+  require([
+    "/core/js/Synthese.js",
+    "/map/js/CityBrowser.js",
+    "/routePlanner/js/RoutePlanner.js",
+    "/map/js/StopSelector.js",
+    "order!/routePlanner/js/legacy/core.js",
+    "order!/routePlanner/js/legacy/interface.js",
+  ], function(Synthese, CityBrowser, routePlanner, StopSelector) {
+    Synthese.init();
 
-  initAutoCompletions();
-  </script>
-  <script>
-  $(function() {
-    var form = this.getElementsByName("routePlannerForm")[0];
+    legacyRoutePlannerConfig.minCharsToTriggerAutocomplete = 0;
+    legacyRoutePlannerConfig.routePlannerFormName = "routePlannerForm";
+
+    routePlanner.initAutoCompletions();
+
+    var form = document.getElementsByName("routePlannerForm")[0];
     form.siteId.value = Synthese.siteId;
 
     var stopSelector = new StopSelector({
-      routePlanner: new RoutePlannerView({el: form}),
+      routePlanner: new routePlanner.RoutePlannerView({el: form}),
       routePlannerOptions: {
         formName: legacyRoutePlannerConfig.routePlannerFormName
       }

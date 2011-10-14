@@ -91,32 +91,19 @@
     <div id="errorMessage" class="error"></div>
   </footer>
 
+  <!-- GMap doesn't load correctly through require.js -->
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
-
-  <!-- Release versions -->
-  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.min.js"></script>
-  <script src="vendor/OpenLayers/OpenLayers.js"></script>
-
-  <!-- Debug versions -->
-  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
-  <!--
-  <script src="../core/vendor/jquery-1.6.2.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.js"></script>
-  <script src="vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  -->
-
-  <script src="vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
-  <script src="vendor/OpenLayers_maptypepanel/MapType.js"></script>
-  <script src="vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
-
-  <script src="../core/js/Synthese.js"></script>
-  <script src="js/SyntheseMap.js"></script>
-  <script src="js/CityMap.js"></script>
+  <!--<script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>-->
+  <script src="/core/vendor/requirejs/require.js"></script>
+  <script src="/core/js/init.js"></script>
   <script>
-  var cityMap = new CityMap("map");
+  var cityMap;
+  require([
+    "/map/js/CityMap.js"
+  ], function(CityMap) {
+    cityMap = new CityMap("map");
+  });
   </script>
+
 </body>
 </html>

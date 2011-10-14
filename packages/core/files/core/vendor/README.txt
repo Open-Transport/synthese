@@ -20,3 +20,9 @@ backbone-0.5.1.js:
   Version: 0.5.1
   http://documentcloud.github.com/backbone/backbone-min.js
   http://documentcloud.github.com/backbone/backbone.js
+
+requirejs/*.js
+  Version: 0.27.1
+  http://requirejs.org/docs/release/0.27.1/minified/require.js
+  http://requirejs.org/docs/release/0.27.1/minified/text.js
+  http://requirejs.org/docs/release/0.27.1/minified/order.js

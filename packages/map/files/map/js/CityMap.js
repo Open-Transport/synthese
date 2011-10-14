@@ -1,3 +1,7 @@
+define([
+  "/map/js/SyntheseMap.js"
+], function(SyntheseMap) {
+
 /**
  * Extension of SyntheseMap which displays the stops and lines of a specific
  * city. The city should be passed in a "city" GET parameter.
@@ -7,8 +11,8 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
   initialize: function(mapId, options) {
     SyntheseMap.prototype.initialize.apply(this, arguments);
 
-    var localStorage = window.localStorage || {};
-    if (this.urlOptions.debug || localStorage.debug)
+    var locStorage = window.localStorage || {};
+    if (this.urlOptions.debug || locStorage.debug)
       $(".debug").show();
   },
 
@@ -114,4 +118,8 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
       updatePTFeatures();
     });
   }
-})
+});
+
+return CityMap;
+
+});
