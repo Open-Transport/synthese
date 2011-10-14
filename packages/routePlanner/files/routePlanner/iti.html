@@ -55,7 +55,7 @@
         <input type="hidden" name="md" value="9999">
         <label>
           <input type="checkbox" id="noTransfer">Sans correspondance
-        </label> 
+        </label>
       </div>
       <div class="buttons"><input type="submit" value="Rechercher" /></div>
       <div class="buttons"><a class="submit" href="#" onclick="retour();">Trajet retour</a> </div>
@@ -2922,82 +2922,60 @@ var bootstrap = {
   </tr>
 </table>
 
-
+  <!-- GMap doesn't load correctly through require.js -->
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
-
-  <!-- Release versions -->
-  <script src="/core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="/core/vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="/core/vendor/underscore-1.1.6.min.js"></script>
-  <script src="/core/vendor/backbone-0.5.1.min.js"></script>
-  <script src="/map/vendor/OpenLayers/OpenLayers.js"></script>
-
-  <!-- Debug versions -->
-  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
-  <!--
-  <script src="/core/vendor/jquery-1.6.2.js"></script>
-  <script src="/core/vendor/jquery.tmpl.beta1.js"></script>
-  <script src="/core/vendor/underscore-1.1.6.js"></script>
-  <script src="/core/vendor/backbone-0.5.1.js"></script>
-  <script src="./map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  -->
-
-  <script src="/map/vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
-  <script src="/map/vendor/OpenLayers_maptypepanel/MapType.js"></script>
-  <script src="/map/vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
-
-  <script src="/core/js/Synthese.js"></script>
-  <script type="text/javascript" src="/routePlanner/js/legacy/utils.js"></script>
-  <script src="/map/js/SyntheseMap.js"></script>
-  <script src="/map/js/CityBrowser.js"></script>
-
-  <script src="/routePlanner/js/RoutePlanner.js"></script>
-  <script src="/map/js/StopSelector.js"></script>
-
-  <!-- XXX this is only in the old map if an itinerary is requested -->
-  <script type="text/javascript" src="/map/js/legacy/app.Gis.js"></script>
-
+  <!--<script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>-->
+  <script src="/core/vendor/requirejs/require.js"></script>
+  <script src="/core/js/init.js"></script>
   <script>
-  Synthese.init();
 
-  Synthese.ieFix();
+  var stopSelector;
+  require([
+    "/core/js/Synthese.js",
+    "/map/js/CityBrowserMap.js",
+    "/map/js/CityBrowser.js",
+    "/routePlanner/js/RoutePlanner.js",
+    "/map/js/StopSelector.js",
+    "order!/routePlanner/js/legacy/core.js",
+    "order!/routePlanner/js/legacy/interface.js",
+    "order!/map/js/legacy/app.Gis.js"
+  ], function(Synthese, CityBrowserMap, CityBrowser, routePlanner, StopSelector) {
 
-  // route planner configuration:
-  legacyRoutePlannerConfig.minCharsToTriggerAutocomplete = 0;
+    Synthese.init();
+    Synthese.ieFix();
 
-  initAutoCompletions();
+    // route planner configuration:
+    legacyRoutePlannerConfig.minCharsToTriggerAutocomplete = 0;
 
-  // legacy map application project customizations
+    routePlanner.initAutoCompletions();
 
-  app.Gis.prototype.getBackgroundLayers = function() {
+    // legacy map application project customizations
+
+    app.Gis.prototype.getBackgroundLayers = function() {
       var bgLayers = [];
       bgLayers.push(
-          new OpenLayers.Layer.OSM("OSM")
+        new OpenLayers.Layer.OSM("OSM")
       );
 
       var GOOGLE_NUM_ZOOM_LEVELS = 22;
 
       bgLayers.push(
-          new OpenLayers.Layer.Google("Carte", {
-              numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
-          })
+        new OpenLayers.Layer.Google("Carte", {
+          numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
+        })
       );
 
       bgLayers.push(
-          new OpenLayers.Layer.Google("Photo", {
-              type: google.maps.MapTypeId.SATELLITE,
-              numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
-          })
+        new OpenLayers.Layer.Google("Photo", {
+          type: google.maps.MapTypeId.SATELLITE,
+          numZoomLevels: GOOGLE_NUM_ZOOM_LEVELS
+        })
       );
       return bgLayers;
-  };
+    };
 
-  app.init();
+    app.init();
 
-  </script>
-
-<script>
-  $(function() {
     var MyMap = OpenLayers.Class(CityBrowserMap, {
       showLayerSwitcher: false,
       center: ["-0.3021", "46.6211", "10"],
@@ -3012,7 +2990,7 @@ var bootstrap = {
     });
 
     var stopSelector = new StopSelector({
-      routePlanner: new RoutePlannerView({el: this.getElementsByName("ri")[0]}),
+      routePlanner: new routePlanner.RoutePlannerView({el: document.getElementsByName("ri")[0]}),
       popupOptions: {
         cityBrowserOptions: {
           //mapClass: MyMap
@@ -3022,7 +3000,6 @@ var bootstrap = {
     // For debugging:
     //$(".mapLink:first").trigger("click");
   });
-</script>
-
+  </script>
   </body>
 </html>

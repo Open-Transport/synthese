@@ -3,7 +3,6 @@
 <head>
   <meta charset="utf-8">
   <title>Démo de sélection d'arrêt par carte</title>
-  <link href='http://fonts.googleapis.com/css?family=Maven+Pro' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/syntheseMap.css">
   <link rel="stylesheet" href="css/cityBrowser.css">
   <link rel="stylesheet" href="css/stopSelector.css">
@@ -27,72 +26,11 @@
     display: none;
   }
   </style>
-
-  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
-
-  <script src="../core/js/Synthese.js"></script>
-  <script src="../routePlanner/js/legacy/core.js"></script>
-  <script src="../routePlanner/js/legacy/interface.js"></script>
-  <!-- <script src="../routePlanner/js/legacy/FicheHoraire.js"></script>  -->
-
-  <script>
-// TODO: move some of this to the routePlanner library.
-function initAutoCompletions(siteId) {
-  if (document.getElementsByTagName) {
-    var inputElements = document.getElementsByTagName("input");
-    for (i = 0; inputElements[i]; i++)
-      inputElements[i].setAttribute("autocomplete", "off");
-  }
-  // TODO: refactor
-  initAutoCompleteForm(document.forms["routePlannerForm"], document.getElementById("submitButton"));
-  initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=1&si=' + siteId + '&t=' + city + '';
-  }, document.getElementById("origin_place_txt"), null, null);
-  initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=1&si=' + siteId + '&t=' + place + '';
-  }, null, null, null);
-  initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&o=0&si=' + siteId + '&t=' + city + '';
-  }, document.getElementById("destination_place_txt"), null, null);
-  initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&o=0&si=' + siteId + '&t=' + place + '';
-  }, null, null, null);
-  document.getElementById("origin_city_txt").focus();
-  if (document.getElementById("fh")) {
-    addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
-    addEvent(document.getElementById("fh"), "click", mouse_click_handler);
-  }
-}
-
-// TODO: replace with Synthese.init()
-$(function() {
-  function parseQueryString(str) {
-    var paramArray = str.split("&");
-    var regex = /^([^=]+)=(.*)$/;
-    var params = {};
-    for (var i = 0, sz = paramArray.length; i < sz; i++) {
-     var match = regex.exec(paramArray[i]);
-     if (!match)
-       throw "Bad parameter in queryString! '" + paramArray[i] + "'";
-       params[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
-     }
-     return params;
-  }
-
-  var urlOptions = parseQueryString(location.search.slice(1));
-
-  if (!urlOptions.siteId) {
-    alert("Missing siteId in query string");
-    return;
-  }
-  initAutoCompletions(urlOptions.siteId);
-});
-
-  </script>
-
 </head>
 <body>
   <h1>Démo de sélection d'arrêt par carte</h1>
+
+  FIXME: This example is broken at the moment (popup is blank).
 
   <form action="/todo" name="routePlannerForm">
     <div>
@@ -116,36 +54,28 @@ $(function() {
 
   <div class="stopSelectorPopup" id="stopSelector"></div>
 
+  <!-- GMap doesn't load correctly through require.js -->
   <script src="http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"></script>
-
-  <!-- Release versions -->
-  <script src="../core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.min.js"></script>
-  <script src="../core/vendor/backbone-0.5.1.min.js"></script>
-  <script src="vendor/OpenLayers/OpenLayers.js"></script>
-
-  <!-- Debug versions -->
-  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
-  <!--
-  <script src="../core/vendor/jquery-1.6.2.js"></script>
-  <script src="../core/vendor/jquery.tmpl.beta1.js"></script>
-  <script src="../core/vendor/underscore-1.1.6.js"></script>
-  <script src="../core/vendor/backbone-0.5.1.js"></script>
-  <script src="vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  -->
-
-  <script src="vendor/OpenLayers/lib/OpenLayers/Lang/fr.js"></script>
-  <script src="vendor/OpenLayers_maptypepanel/MapType.js"></script>
-  <script src="vendor/OpenLayers_maptypepanel/MapTypePanel.js"></script>
-
-  <script src="../core/js/Synthese.js"></script>
-  <script src="js/SyntheseMap.js"></script>
-  <script src="js/CityBrowser.js"></script>
-  <script src="js/StopSelector.js"></script>
+  <!--<script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>-->
+  <script src="/core/vendor/requirejs/require.js"></script>
+  <script src="/core/js/init.js"></script>
   <script>
 
-  $(function() {
+  var stopSelector;
+  require([
+    "/core/js/Synthese.js",
+    "/map/js/CityBrowserMap.js",
+    "/map/js/CityBrowser.js",
+    "/routePlanner/js/RoutePlanner.js",
+    "/map/js/StopSelector.js",
+    "/core/js/NewsTicker.js",
+    "order!/routePlanner/js/legacy/core.js",
+    "order!/routePlanner/js/legacy/interface.js",
+    "order!/map/js/legacy/app.Gis.js"
+  ], function(Synthese, CityBrowserMap, CityBrowser, routePlanner, StopSelector, newsTicker) {
+
+    Synthese.init();
+    routePlanner.initAutoCompletions();
 
     var stopSelector,
       $stopSelector = $("#stopSelector");
@@ -154,12 +84,14 @@ $(function() {
       if (stopSelector)
         return stopSelector;
       stopSelector = new StopSelector({
+        routePlanner: new routePlanner.RoutePlannerView({
+          el: document.getElementsByName("routePlannerForm")[0]
+        }),
         el: $stopSelector.get(0),
       });
       stopSelector.bind("close", function() {
         stopSelector.unbind("stopSelected");
       });
-
       return stopSelector;
     }
 
@@ -186,8 +118,6 @@ $(function() {
       });
     })
   });
-
   </script>
-
 </body>
 </html>

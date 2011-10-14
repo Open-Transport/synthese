@@ -1,3 +1,7 @@
+define([
+  "/core/js/Synthese.js",
+], function(Synthese) {
+
 // XXX rename to RoutePlannerFormView in order to have other objects not related to the form?
 var RoutePlannerView = Backbone.View.extend({
 
@@ -52,5 +56,47 @@ var RoutePlannerView = Backbone.View.extend({
     var noTransfer = this.$("input#noTransfer").prop("checked");
     this.$("input[name=md]").val(noTransfer ? "0" : "9999");
   }
+
+});
+
+// Legacy interface -----------------------------------------------------------
+
+/**
+ * Initialize the route planner form to enalbe auto completion on the inputs.
+ * Synthese.init(SITE_ID) needs to be called first in order to set the site id.
+ */
+function initAutoCompletions() {
+  if (document.getElementsByTagName) {
+    var inputElements = document.getElementsByTagName("input");
+    for (i = 0; inputElements[i]; i++)
+      inputElements[i].setAttribute("autocomplete", "off");
+  }
+
+  initAutoCompleteForm(
+    document.forms[legacyRoutePlannerConfig.routePlannerFormName],
+    document.getElementById("submitButton"));
+  initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
+    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
+  }, document.getElementById("origin_place_txt"), null, null);
+  initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
+    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
+  }, null, null, null);
+  initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
+    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
+  }, document.getElementById("destination_place_txt"), null, null);
+  initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
+    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
+  }, null, null, null);
+  document.getElementById("origin_city_txt").focus();
+  if (document.getElementById("fh")) {
+    addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
+    addEvent(document.getElementById("fh"), "click", mouse_click_handler);
+  }
+}
+
+return {
+  RoutePlannerView: RoutePlannerView,
+  initAutoCompletions: initAutoCompletions
+};
 
 });

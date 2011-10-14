@@ -1,4 +1,7 @@
-
+define([
+  "/map/js/CityBrowser.js"
+], function(CityBrowser) {
+  
 var StopSelectorPopup = Backbone.View.extend({
 
   template: $.template(null, [
@@ -70,8 +73,12 @@ var StopSelector = Backbone.View.extend({
   initialize: function(options) {
     _.bindAll(this, "mapLinkClick", "stopSelected");
 
-    this.routePlanner = options.routePlanner ||
-      new RoutePlannerView(options.routePlannerOptions || {});
+    this.routePlanner = options.routePlanner;
+    if (!this.routePlanner) {
+      alert("Missing routePlanner parameter");
+      // TODO: decouple.
+      //this.routePlanner = new RoutePlannerView(options.routePlannerOptions || {});
+    }
     this.routePlanner.bind("mapLinkClick", this.mapLinkClick);
 
     if (options.popupEl) {
@@ -114,4 +121,8 @@ var StopSelector = Backbone.View.extend({
       self.selectorPopup.close();
     });
   }
+});
+
+return StopSelector;
+
 });
