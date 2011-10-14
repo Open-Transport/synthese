@@ -1,4 +1,7 @@
-(function() {
+define([
+  "/core/js/Synthese.js",
+  "/map/js/CityBrowserMap.js"
+], function(Synthese, CityBrowserMap) {
 
 // === Models ===
 
@@ -324,94 +327,8 @@ var CitySelectorView = Backbone.View.extend({
   }
 });
 
-window.CityBrowserMap = OpenLayers.Class(SyntheseMap, {
 
-  initialize: function(mapId, options) {
-    _.extend(this, Backbone.Events);
-    SyntheseMap.prototype.initialize.apply(this, arguments);
-
-    var localStorage = window.localStorage || {};
-    if (this.urlOptions.debug || localStorage.debug)
-      $(".debug").show();
-  },
-
-  afterMapInit: function() {
-    var self = this;
-
-    // A protocol for fetching the stops on a given bbox.
-    var StopsProtocol = OpenLayers.Class(OpenLayers.Protocol, {
-      read: function(options) {
-        console.log("StopsProtocol read", options);
-        var bounds = options.filter.value;
-
-        self.fetchStops({bounds: bounds}, true).
-          then(function(stopFeatures) {
-            var resp = new OpenLayers.Protocol.Response({requestType: "read"});
-            resp.features = stopFeatures;
-            options.callback.call(options.scope, resp);
-        });
-      }
-    });
-
-    // Extension of BBOX strategy to avoid fetching features if the zoom level
-    // is not at least a given value. It also fires events on the map to
-    // announce when zoom in is required to fetch the features.
-    var MinZoomBBOXStrategy = OpenLayers.Class(OpenLayers.Strategy.BBOX, {
-      invalidBounds: function(mapBounds) {
-        console.log("invalidBounds called", mapBounds);
-        var invalid = OpenLayers.Strategy.BBOX.prototype.invalidBounds.apply(this, arguments);
-        // Our data is still in the requested bounds, nothing to do.
-        if (!invalid) {
-          self.trigger("zoomRequired", false);
-          return false;
-        }
-
-        var zoom = self.map.getZoomForExtent(mapBounds);
-        // Bounds are invalid but we have an acceptable zoom level.
-        if (zoom >= this.minZoom) {
-          self.trigger("zoomRequired", false);
-          return true;
-        }
-
-        // Zooming is required, don't fetch the data yet.
-        self.trigger("zoomRequired", true);
-        return false;
-      }
-    });
-
-    this.stopsLayer.protocol = new StopsProtocol();
-
-    // Below this zoom level (included), we show a message that zooming in is
-    // required.
-    var MIN_ZOOM = 11;
-    // Use a larger value with IE7 which has performance issues when there are
-    // many vector objects.
-    if (jQuery.browser.msie && parseInt(jQuery.browser.version) <= 7)
-      MIN_ZOOM = 14;
-
-    this.stopsLayer.styleMap.styles["default"].context.getDisplay = function(feature) {
-      var zoom = feature.layer.map.getZoom();
-      if (zoom <= MIN_ZOOM)
-        return "none";
-      return "";
-    }
-
-    var strategy = new MinZoomBBOXStrategy({
-      minZoom: MIN_ZOOM
-    });
-    this.stopsLayer.strategies = [strategy];
-    strategy.setLayer(this.stopsLayer);
-    strategy.activate();
-  },
-
-  onStopSelected: function(stopFeature) {
-    this.trigger("stopSelected", stopFeature);
-  }
-
-});
-
-
-window.CityBrowser = Backbone.View.extend({
+var CityBrowser = Backbone.View.extend({
 
   template: $.template(null, [
     '<div class="citySelector"></div>',
@@ -549,4 +466,6 @@ window.CityBrowser = Backbone.View.extend({
   }
 });
 
-})();
+return CityBrowser;
+
+});

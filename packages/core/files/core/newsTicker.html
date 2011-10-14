@@ -59,58 +59,42 @@
 
 
 </style>
-
-  </head>
-  <body>
-
-    <div id="actu-reseau">
-      <h2><a href="/actus">Actualités des réseaux</a></h2>
-      <div class="newsTicker">
-        <div class="itemsContainer">
-          <ul>
-            <li><a href="/" >1 Lorem ipsum dolor sit amet</a></li>
-            <li><a href="/" >2 Nunc elementum, massa eu bibendum</a></li>
-            <li><a href="/" >3 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
-            <li><a href="/" >4 rhoncus mi vehicula non. Nullam a</a></li>
-            <li><a href="/" >5 aliquam mauris ornare. Lorem ipsum dolor</a></li>
-            <li><a href="/" >6 Nunc elementum, massa eu bibendum</a></li>
-            <li><a href="/" >7 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
-          </ul>
-        </div>
-        <div class="navigation">
-          <a href="#" class="prevLink">Préc.</a>
-          <span class="curIndex">N</span>/<span class="total">T</span>
-          <a href="#" class="nextLink">Suiv.</a>
-        </div>
+</head>
+<body>
+  <div id="actu-reseau">
+    <h2><a href="/actus">Actualités des réseaux</a></h2>
+    <div class="newsTicker">
+      <div class="itemsContainer">
+        <ul>
+          <li><a href="/" >1 Lorem ipsum dolor sit amet</a></li>
+          <li><a href="/" >2 Nunc elementum, massa eu bibendum</a></li>
+          <li><a href="/" >3 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
+          <li><a href="/" >4 rhoncus mi vehicula non. Nullam a</a></li>
+          <li><a href="/" >5 aliquam mauris ornare. Lorem ipsum dolor</a></li>
+          <li><a href="/" >6 Nunc elementum, massa eu bibendum</a></li>
+          <li><a href="/" >7 Aliquam fringilla arcu sit amet nibh scelerisque</a></li>
+        </ul>
+      </div>
+      <div class="navigation">
+        <a href="#" class="prevLink">Préc.</a>
+        <span class="curIndex">N</span>/<span class="total">T</span>
+        <a href="#" class="nextLink">Suiv.</a>
       </div>
     </div>
+  </div>
 
-
-  <!-- Release versions -->
-  <!--
-  <script src="/core/vendor/jquery-1.6.2.min.js"></script>
-  <script src="/core/vendor/jquery.tmpl.beta1.min.js"></script>
-  <script src="/core/vendor/underscore-1.1.6.min.js"></script>
-  <script src="/core/vendor/backbone-0.5.1.min.js"></script>
-  <script src="/map/vendor/OpenLayers/OpenLayers.js"></script>
-  -->
-
-  <!-- Debug versions -->
-  <!-- You also need to checkout the full OpenLayers source in vendor/OpenLayers_full -->
-
-  <script src="/core/vendor/jquery-1.6.2.js"></script>
-  <script src="/core/vendor/jquery.tmpl.beta1.js"></script>
-  <script src="/core/vendor/underscore-1.1.6.js"></script>
-  <script src="/core/vendor/backbone-0.5.1.js"></script>
-
-  <script src="/core/js/NewsTicker.js"></script>
-
+  <script src="/core/vendor/requirejs/require.js"></script>
+  <script src="/core/js/init.js"></script>
   <script>
+  var newsTicker;
 
-  var newsTicker = new NewsTickerView({
-    el: $(".newsTicker")[0]
+  require([
+    "/core/js/NewsTicker.js",
+  ], function(newsTicker) {
+    newsTicker = new newsTicker.NewsTickerView({
+      el: $(".newsTicker")[0]
+    });
   });
   </script>
-
- </body>
+</body>
 </html>

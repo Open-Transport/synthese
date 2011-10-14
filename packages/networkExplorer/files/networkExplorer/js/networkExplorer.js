@@ -1,3 +1,12 @@
+define([
+  "/core/js/Synthese.js",
+  "/map/js/SyntheseMap.js",
+  // JQuery autcomplete
+  "order!/core/vendor/jquery-1.6.2.min.js",
+  "order!/networkExplorer/vendor/autocomplete/lib/jquery.bgiframe.min.js",
+  "order!/networkExplorer/vendor/autocomplete/jquery.autocomplete.js" 
+], function(Synthese, SyntheseMap) {
+
 /* ************
 
 Define the events for search form
@@ -1127,4 +1136,10 @@ var TisseoMap = OpenLayers.Class(SyntheseMap, {
     });
   }
   
+});
+
+return {
+  TisseoMap: TisseoMap
+};
+
 });

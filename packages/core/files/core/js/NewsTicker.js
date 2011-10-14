@@ -1,3 +1,7 @@
+define([
+  "/core/js/Synthese.js",
+], function(Synthese) {
+
 var NewsTickerView = Backbone.View.extend({
 
   events: {
@@ -77,4 +81,10 @@ var NewsTickerView = Backbone.View.extend({
     event.preventDefault();
     this.moveIndex(1);
   }
+});
+
+return {
+  NewsTickerView: NewsTickerView
+};
+
 });
