@@ -175,7 +175,7 @@ namespace synthese
 							);
 						}
 
-						// Name control
+						// Name check
 						if(_tscenario->getName().empty())
 						{
 							throw ActionException("Le scénario doit avoir un nom.");
@@ -303,7 +303,7 @@ namespace synthese
 							_folder = ScenarioFolderTableSync::GetEditable(folderId, *_env);
 						}
 
-						// Uniqueness control
+						// Uniqueness check
 						Env env;
 						ScenarioTemplateInheritedTableSync::Search(
 							env,
