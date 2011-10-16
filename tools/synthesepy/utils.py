@@ -281,6 +281,16 @@ def maybe_makedirs(directory):
         os.makedirs(directory)
 
 
+def maybe_remove(path):
+    '''Remove given file or directory if it exists'''
+    if os.path.isdir(path):
+        return RemoveDirectory(path)
+    try:
+        os.unlink(path)
+    except OSError:
+        pass
+
+
 class SVNInfo(object):
     '''Class to retrieve metadata from a svn repository'''
     def __init__(self, repo_path):
