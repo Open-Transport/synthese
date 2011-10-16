@@ -1,5 +1,5 @@
 # TODO: GLOB shouldn't be used. 
-file(GLOB proj_SRCS "src/src/*.c")
+file(GLOB proj_SRCS "src/src/*.c" "src/src/*.h")
 
 foreach(exclude jniproj.c  nad2nad.c nad2bin.c geod.c cs2cs.c proj.c)
   list(REMOVE_ITEM proj_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/proj/src/src/${exclude}")
