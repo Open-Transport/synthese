@@ -23,9 +23,9 @@ configure_file(
 )
 endif()
 
-file(GLOB_RECURSE geos_SRCS "src/*.cpp")
+file(GLOB_RECURSE geos_SRCS "src/*.cpp" "src/*.h")
 
-file(GLOB_RECURSE excludes "src/examples/*.cpp")
+file(GLOB_RECURSE excludes "src/examples/*.cpp" "src/examples/*.h")
 list(REMOVE_ITEM geos_SRCS ${excludes})
 
 list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/geom/GeometryFactory.cpp")
