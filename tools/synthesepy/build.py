@@ -432,6 +432,9 @@ class CMakeBuilder(Builder):
         return tool_path
 
     def _generate_build_system(self):
+        if self.config.clear_cmake_cache:
+            utils.maybe_remove(join(self.env.env_path, 'CMakeCache.txt'))
+
         args = [self.get_cmake_tool_path('cmake'), self.env.source_path]
 
         # Use ccache on Linux if available

@@ -206,6 +206,9 @@ def add_default_subparsers(subparsers):
     parser_build.add_argument(
         '--build-type', choices=['Debug', 'Release', 'RelWithDebInfo'],
         help='CMake build type')
+    parser_build.add_argument(
+        '-d', '--clear-cache', action='store_true', dest='clear_cmake_cache',
+        help='Clear the CMake cache before building.')
 
     parser_clean = subparsers.add_parser(
         'clean', help='Delete the object directory')

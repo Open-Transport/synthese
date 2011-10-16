@@ -84,6 +84,7 @@ DEFAULTS = {
     'kill_daemons_when_building': False,
     'build_only': None,
     'build_type': None,
+    'clear_cmake_cache': False,
 
     # runtests
     'test_conn_strings': ['sqlite://', 'mysql://db=synthese_test,host=localhost,user=synthese,passwd=synthese'],
