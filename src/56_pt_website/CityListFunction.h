@@ -52,7 +52,7 @@ namespace synthese
 		///	@ingroup m56Functions refFunctions
 		/// @author Hugues Romain
 		class CityListFunction:
-			public util::FactorableTemplate<cms::FunctionWithSite<true>, CityListFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>, CityListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
