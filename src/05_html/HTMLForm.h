@@ -440,6 +440,72 @@ namespace synthese
 
 
 
+				/** Auto Complete text input field generator from TableSync.
+					@param name name of the field in the form
+					@param valueID default ID value of the field
+					@param valueName default Name value of the field
+					@param tableID ID value of the table
+					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
+					@param fieldId unique ID of the field within the page,
+					@param className CSS class to use for display
+					@return std::string the HTML generated code
+					@author Hugues Romain
+					@date 2008-2010
+				*/
+				static std::string getTextInputAutoCompleteFromTableSync(
+					const std::string& site,
+					const std::string& name,
+					const std::string& valueID,
+					const std::string& valueName,
+					const std::string& tableID,
+					const std::string& extraParamName,
+					const std::string& extraParamDivID,
+					bool viewbottomButton = true,
+					bool viewIDButton = true,
+					bool useID = true,
+					bool viewID = false,
+					std::string displayTextBeforeTyping = std::string(),
+					std::string fieldId = std::string(),
+					std::string className = std::string()
+				);
+
+
+
+				/** Auto Complete text input field generator from Service.
+					@param name name of the field in the form
+					@param valueID default ID value of the field
+					@param valueName default Name value of the field
+					@param service Service name
+					@param rows Rows name of JSON result
+					@param row Row name of JSON result
+					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
+					@param fieldId unique ID of the field within the page,
+					@param className CSS class to use for display
+					@return std::string the HTML generated code
+					@author Hugues Romain
+					@date 2008-2010
+				*/
+				static std::string getTextInputAutoCompleteFromService(
+					const std::string& site,
+					const std::string& name,
+					const std::string& valueID,
+					const std::string& valueName,
+					const std::string& service,
+					const std::string& rows,
+					const std::string& row,
+					const std::string& extraParamName,
+					const std::string& extraParamDivID,
+					bool viewbottomButton = true,
+					bool viewIDButton = true,
+					bool useID = true,
+					bool viewID = false,
+					std::string displayTextBeforeTyping = std::string(),
+					std::string fieldId = std::string(),
+					std::string className = std::string()
+				);
+
+
+
 				/** Password field HTML generator (input type=password).
 					@param name name of the field in the form
 					@param value default value present in the field at the page load
