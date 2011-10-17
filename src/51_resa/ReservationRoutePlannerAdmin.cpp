@@ -313,7 +313,7 @@ namespace synthese
 						string(),
 						PARAMETER_START_CITY,
 						startPlace ?
-						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getKey() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getKey()) :
+						lexical_cast<string>(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getKey() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getKey()) :
 						_startCity,
 						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getName() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getName()) :
@@ -328,7 +328,7 @@ namespace synthese
 						string(),
 						PARAMETER_START_PLACE,
 						startPlace ?
-						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getKey()) :
+						(dynamic_cast<City*>(startPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(startPlace.get())->getKey())) :
 						_startPlace,
 						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getName()) :
@@ -343,7 +343,7 @@ namespace synthese
 						string(),
 						PARAMETER_END_CITY,
 						endPlace ?
-						(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getKey() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getKey()) :
+						lexical_cast<string>(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getKey() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getKey()) :
 						_endCity,
 						endPlace ?
 						(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
@@ -358,7 +358,7 @@ namespace synthese
 						string(),
 						PARAMETER_END_PLACE,
 						endPlace ?
-						(dynamic_cast<City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getKey()) :
+						(dynamic_cast<City*>(endPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(endPlace.get())->getKey())) :
 						_endPlace,
 						endPlace ?
 						(dynamic_cast<City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
