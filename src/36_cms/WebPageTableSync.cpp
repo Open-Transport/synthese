@@ -376,8 +376,8 @@ namespace synthese
 		WebPageTableSync::SiteWebPagesList WebPageTableSync::GetPagesList(
 			util::RegistryKeyType siteId,
 			const std::string& rootLabel,
-			std::string prefix,
-			RegistryKeyType upId
+			const std::string prefix,
+			const RegistryKeyType upId
 		){
 			SiteWebPagesList result;
 			if(!rootLabel.empty())
@@ -409,4 +409,23 @@ namespace synthese
 			query.addWhereField(COL_UP_ID, parentId);
 			query.execute(transaction);
 		}
+
+		db::RowsList WebPageTableSync::SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit
+			) const {
+				RowsList result;
+
+				SelectQuery<WebPageTableSync> query;
+				Env env;
+				if(prefix) query.addWhereField(WebPageTableSync::COL_TITLE, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				if(limit) query.setNumber(*limit);
+				query.addOrderField(COL_RANK,true);
+				WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+				BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+				{
+					result.push_back(std::make_pair(page->getKey(), page->getName()));
+				}
+				return result;
+		} ;
 }	}

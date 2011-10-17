@@ -130,6 +130,10 @@ namespace synthese
 				bool add,
 				db::DBTransaction& transaction
 			);
+
+			db::RowsList SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit) const;
 		};
 	}
 }

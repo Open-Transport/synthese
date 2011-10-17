@@ -1,0 +1,139 @@
+
+/** RowsListFunction class implementation.
+	@file RowsListFunction.cpp
+	@author Gaël Sauvanet
+	@date 2011
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "RowsListFunction.hpp"
+#include "HTMLModule.h"
+#include "Types.h"
+#include "RequestException.h"
+
+#include <boost/foreach.hpp>
+
+using namespace std;
+using namespace boost;
+
+namespace synthese
+{
+	using namespace server;
+	using namespace util;
+	using namespace pt_website;
+	using namespace cms;
+	using namespace db;
+
+	template<> const string util::FactorableTemplate<Function,RowsListFunction>::FACTORY_KEY("lr");
+
+	namespace cms
+	{
+		const string RowsListFunction::PARAMETER_INPUT("t");
+		const string RowsListFunction::PARAMETER_TABLE("table");
+		const string RowsListFunction::PARAMETER_NUMBER("n");
+		const string RowsListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+
+		const std::string RowsListFunction::DATA_RESULTS_SIZE("size");
+		const std::string RowsListFunction::DATA_CONTENT("content");
+
+		const string RowsListFunction::DATA_ROW("row");
+		const string RowsListFunction::DATA_ROWS("rows");
+		const string RowsListFunction::DATA_RANK("rank");
+
+
+
+		ParametersMap RowsListFunction::_getParametersMap() const
+		{
+			ParametersMap pm;
+			pm.insert(PARAMETER_INPUT, _input);
+			pm.insert(PARAMETER_NUMBER, _n);
+			pm.insert(PARAMETER_TABLE, _table);
+			if(!_outputFormat.empty())
+			{
+				pm.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+			return pm;
+		}
+
+
+
+		void RowsListFunction::_setFromParametersMap( const util::ParametersMap& map )
+		{
+//			_FunctionWithSite::_setFromParametersMap(map);
+
+			_input = map.getDefault<string>(PARAMETER_INPUT);
+			_table = map.getDefault<DBTableSync::TableId>(PARAMETER_TABLE);
+
+			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
+			if (!_input.empty() && !_n)
+			{
+				throw RequestException("Number of result must be limited");
+			}
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+		}
+
+
+
+		void RowsListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const {
+			boost::shared_ptr<DBTableSync> tableSync = DBModule::GetTableSync(_table);
+
+			RowsList resultat = tableSync->SearchForAutoComplete(_input,_n);
+
+			shared_ptr<ParametersMap> pm(new ParametersMap());
+			size_t i(0);
+			for (RowsList::const_iterator it = resultat.begin(); it != resultat.end(); ++it)
+			{
+				shared_ptr<ParametersMap> rowPm(new ParametersMap());
+
+				rowPm->insert(DATA_RANK, i++);
+				rowPm->insert("name", it->second);
+				rowPm->insert("roid", it->first);
+
+				pm->insert(DATA_ROW, rowPm);
+			}
+
+			// TODO: Factor ParametesrMap constant
+			if(_outputFormat == "json")
+			{
+				pm->outputJSON(stream, DATA_ROWS);
+			}
+		}
+
+
+
+		bool RowsListFunction::isAuthorized(const Session* session
+		) const {
+			return true;
+		}
+
+
+
+		std::string RowsListFunction::getOutputMimeType() const
+		{
+			// TODO: refactor this in ParametersMap
+			if(_outputFormat == "json")
+			{
+				return "application/json";
+			}
+			return "text/xml";
+		}
+}	}
