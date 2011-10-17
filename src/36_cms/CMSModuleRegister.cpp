@@ -32,6 +32,7 @@
 #include "WebpagePreviousFunction.hpp"
 #include "SubstractFunction.hpp"
 #include "ChrFunction.hpp"
+#include "RowsListFunction.hpp"
 
 #include "WebPageAdmin.h"
 
@@ -46,14 +47,14 @@
 
 void synthese::cms::moduleRegister()
 {
-	
+
 	// 36 CMS
 	synthese::cms::WebPageAdmin::integrate();
-	
+
 	synthese::cms::WebPageTableSync::integrate();
-	
+
 	synthese::cms::CMSModule::integrate();
-	
+
 	synthese::cms::AddService::integrate();
 	synthese::cms::BitAndFunction::integrate();
 	synthese::cms::DateService::integrate();
@@ -77,14 +78,15 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebpagePreviousFunction::integrate();
 	synthese::cms::SubstractFunction::integrate();
 	synthese::cms::ChrFunction::integrate();
-	
+	synthese::cms::RowsListFunction::integrate();
+
 	synthese::cms::WebPageAddAction::integrate();
 	synthese::cms::WebPageUpdateAction::integrate();
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
-	
-	
+
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::cms::Webpage>();
 }
