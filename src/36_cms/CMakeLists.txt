@@ -33,6 +33,8 @@ LanguageSelectorService.cpp
 LanguageSelectorService.hpp
 OrService.cpp
 OrService.hpp
+RowsListFunction.cpp
+RowsListFunction.hpp
 StrLenFunction.cpp
 StrLenFunction.hpp
 SubstractFunction.cpp
