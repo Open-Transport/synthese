@@ -59,6 +59,9 @@
 #include "UserTableSync.h"
 #include "Language.hpp"
 
+#include "CityListFunction.h"
+#include "PlacesListFunction.h"
+
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -229,6 +232,12 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 
+            // ToDo : move to the header of the page
+            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-1.6.2.min.js");
+            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-ui-1.8.15.custom.min.js");
+            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.autocomplete.css\">";
+            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.theme.css\">";
+
 			const Language& language(
 				_request.getUser()->getLanguage() ?
 				*_request.getUser()->getLanguage() :
@@ -300,29 +309,65 @@ namespace synthese
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
-			stream << st.cell("Commune départ", st.getForm().getTextInput(
+			stream << st.cell("Commune départ", html::HTMLForm::getTextInputAutoCompleteFromService(
+						string(),
 						PARAMETER_START_CITY,
 						startPlace ?
+						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getKey() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getKey()) :
+						_startCity,
+						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getName() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getName()) :
-						_startCity
+						_startCity,
+						pt_website::CityListFunction::FACTORY_KEY,
+						pt_website::CityListFunction::DATA_CITIES,
+						pt_website::CityListFunction::DATA_CITY,
+						string(),string(),
+						false, false, false
 				)	);
-			stream << st.cell("Arrêt départ", st.getForm().getTextInput(
+			stream << st.cell("Arrêt départ", html::HTMLForm::getTextInputAutoCompleteFromService(
+						string(),
 						PARAMETER_START_PLACE,
 						startPlace ?
+						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getKey()) :
+						_startPlace,
+						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? string() : dynamic_cast<NamedPlace*>(startPlace.get())->getName()) :
-						_startPlace
+						_startPlace,
+						pt_website::PlacesListFunction::FACTORY_KEY,
+						pt_website::PlacesListFunction::DATA_PLACES,
+						pt_website::PlacesListFunction::DATA_PLACE,
+						"ct",PARAMETER_START_CITY,
+						false, false, false
 				)	);
-			stream << st.cell("Commune arrivée", st.getForm().getTextInput(
+			stream << st.cell("Commune arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
+						string(),
 						PARAMETER_END_CITY,
 						endPlace ?
-						(dynamic_cast<const City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
-						_endCity
+						(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getKey() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getKey()) :
+						_endCity,
+						endPlace ?
+						(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getName() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getName()) :
+						_endCity,
+						pt_website::CityListFunction::FACTORY_KEY,
+						pt_website::CityListFunction::DATA_CITIES,
+						pt_website::CityListFunction::DATA_CITY,
+						string(),string(),
+						false, false, false
 				)	);
-			stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(
+			stream << st.cell("Arrêt arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
+						string(),
 						PARAMETER_END_PLACE,
 						endPlace ?
-						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
-						_endPlace
+						(dynamic_cast<City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getKey()) :
+						_endPlace,
+						endPlace ?
+						(dynamic_cast<City*>(endPlace.get()) ? string() : dynamic_cast<NamedPlace*>(endPlace.get())->getName()) :
+						_endPlace,
+						pt_website::PlacesListFunction::FACTORY_KEY,
+						pt_website::PlacesListFunction::DATA_PLACES,
+						pt_website::PlacesListFunction::DATA_PLACE,
+						"ct",PARAMETER_END_CITY,
+						false, false, false
 				)	);
 			stream << st.cell(
 				"Date",
