@@ -44,6 +44,7 @@ namespace synthese
 	namespace db
 	{
 		typedef std::vector<util::RegistryKeyType> RowIdList;
+		typedef std::vector<std::pair<util::RegistryKeyType, std::string> > RowsList;
 
 		class DBException;
 		class DBResult;
@@ -306,6 +307,16 @@ namespace synthese
 			virtual DBResultSPtr getRow(
 				util::RegistryKeyType id
 			) const = 0;
+
+			virtual RowsList SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit) const
+			{
+				RowsList result;
+
+				result.push_back(std::make_pair(0, "non definie"));
+				return result;
+			}
 		};
 }	}
 
