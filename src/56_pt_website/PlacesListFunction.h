@@ -53,7 +53,7 @@ namespace synthese
 		///	@date 2007
 		///	@ingroup m56Functions refFunctions
 		class PlacesListFunction:
-			public util::FactorableTemplate<cms::FunctionWithSite<true>,PlacesListFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>,PlacesListFunction>
 		{
 		public:
 			static const std::string PARAMETER_INPUT;
@@ -63,17 +63,20 @@ namespace synthese
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_SRID;
 
-		protected:
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CITY_ID;
 			static const std::string DATA_CITY_NAME;
 			static const std::string DATA_CONTENT;
+			static const std::string DATA_PLACES;
+			static const std::string DATA_PLACE;
 
 			static const std::string DATA_NAME;
 			static const std::string DATA_RANK;
 
+		protected:
 			//! \name Page parameters
 			//@{
 				std::string									_input;
@@ -82,6 +85,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage>		_page;
 				boost::shared_ptr<const cms::Webpage>		_itemPage;
 				boost::shared_ptr<geography::City>	_city;
+				std::string _outputFormat;
 				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
