@@ -66,6 +66,7 @@ namespace synthese
 		const std::string PlacesListFunction::PARAMETER_NUMBER("n");
 		const std::string PlacesListFunction::PARAMETER_PAGE("page_id");
 		const string PlacesListFunction::PARAMETER_ITEM_PAGE("item_page_id");
+		const string PlacesListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 
 		const string PlacesListFunction::PARAMETER_SRID("srid");
 
@@ -73,6 +74,8 @@ namespace synthese
 		const std::string PlacesListFunction::DATA_CITY_NAME("city_name");
 		const std::string PlacesListFunction::DATA_RESULTS_SIZE("size");
 		const std::string PlacesListFunction::DATA_CONTENT("content");
+		const std::string PlacesListFunction::DATA_PLACES("places");
+		const std::string PlacesListFunction::DATA_PLACE("place");
 
 		const string PlacesListFunction::DATA_NAME("name");
 		const string PlacesListFunction::DATA_RANK("rank");
@@ -108,6 +111,10 @@ namespace synthese
 			if(_itemPage.get())
 			{
 				map.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
+			}
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 			if(_coordinatesSystem)
 			{
@@ -151,6 +158,7 @@ namespace synthese
 			{
 				throw RequestException("Number of result must be limited");
 			}
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 
 			if(map.isDefined(PARAMETER_CITY_ID))
 			{
@@ -170,9 +178,13 @@ namespace synthese
 				if(!_cityText.empty())
 				{
 					const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-					if(!site) throw RequestException("Incorrect site");
+					GeographyModule::CitiesMatcher matcher;
+					if(!site)
+						matcher = (GeographyModule::GetCitiesMatcher());
+					else
+						matcher = site->getCitiesMatcher();
 					GeographyModule::CitiesMatcher::MatchResult cities(
-						site->getCitiesMatcher().bestMatches(_cityText,1)
+						matcher.bestMatches(_cityText,1)
 						);
 					if(cities.empty())
 					{
@@ -199,15 +211,22 @@ namespace synthese
 			if(!_input.empty())
 			{
 				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+
+				GeographyModule::CitiesMatcher matcher;
+				if(!site)
+						matcher = (GeographyModule::GetCitiesMatcher());
+					else
+						matcher = site->getCitiesMatcher();
+
 				RoadModule::ExtendedFetchPlacesResult places(
 					_city.get() ?
 					RoadModule::ExtendedFetchPlaces(_city, _input, *_n) :(
 						_cityText.empty() ?
 						PTModule::ExtendedFetchPlaces(_input, *_n) :
-						RoadModule::ExtendedFetchPlaces(site->getCitiesMatcher(), _cityText, _input, *_n)
+						RoadModule::ExtendedFetchPlaces(matcher, _cityText, _input, *_n)
 				)	);
 
-				if(_page.get() || _itemPage.get())
+				if(_page.get() || _itemPage.get() || !_outputFormat.empty())
 				{
 					BOOST_FOREACH(const RoadModule::ExtendedFetchPlaceResult& place, places)
 					{
@@ -279,7 +298,7 @@ namespace synthese
 			}
 			else if(_city.get())
 			{
-				if(_page.get() || _itemPage.get())
+				if(_page.get() || _itemPage.get() || !_outputFormat.empty())
 				{
 					size_t c(0);
 					BOOST_FOREACH(const LexicalMatcher<shared_ptr<Place> >::Map::value_type& it, _city->getAllPlacesMatcher().entries())
@@ -340,10 +359,26 @@ namespace synthese
 				}
 			}
 
+			ParametersMap pm(_savedParameters);
+
+			// TODO: Factor ParametesrMap constant
+			if(_outputFormat == "json")
+			{
+				size_t i(0);
+				BOOST_FOREACH(const PlacesList::value_type& it, placesList)
+				{
+					shared_ptr<ParametersMap> placePm(new ParametersMap());
+
+					placePm->insert(DATA_RANK, i);
+					placePm->insert(DATA_NAME, it.second);
+					placePm->insert(Request::PARAMETER_OBJECT_ID, it.first);
+					pm.insert(DATA_PLACE, placePm);
+					++i;
+				}
+				pm.outputJSON(stream, DATA_PLACES);
+			}
 			if(_page.get())
 			{
-				ParametersMap pm(_savedParameters);
-
 				pm.insert(DATA_RESULTS_SIZE, placesList.size());
 				if(_city.get())
 				{
@@ -400,6 +435,11 @@ namespace synthese
 			if(_itemPage.get())
 			{
 				return _itemPage->getMimeType();
+			}
+			// TODO: refactor this in ParametersMap
+			else if(_outputFormat == "json")
+			{
+				return "application/json";
 			}
 			return "text/xml";
 		}

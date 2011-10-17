@@ -133,14 +133,19 @@ namespace synthese
 			const Request& request
 		) const {
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-			if(!site) throw RequestException("Incorrect site");
+
+			GeographyModule::CitiesMatcher matcher;
+			if(!site)
+				matcher = (GeographyModule::GetCitiesMatcher());
+			else
+				matcher = site->getCitiesMatcher();
 
 			GeographyModule::CityList citiesList;
 
 			if(!_input.empty())
 			{
 				GeographyModule::CitiesMatcher::MatchResult matches(
-					site->getCitiesMatcher().bestMatches(_input, (_atLeastAStop || !_n) ? 0 : *_n)
+					matcher.bestMatches(_input, (_atLeastAStop || !_n) ? 0 : *_n)
 				);
 				size_t nbmatches(0);
 				BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)
@@ -189,7 +194,7 @@ namespace synthese
 			else
 			{
 				size_t c(0);
-				BOOST_FOREACH(const LexicalMatcher<shared_ptr<City> >::Map::value_type& it, site->getCitiesMatcher().entries())
+				BOOST_FOREACH(const LexicalMatcher<shared_ptr<City> >::Map::value_type& it, matcher.entries())
 				{
 					if(_atLeastAStop && it.second->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
 					{
