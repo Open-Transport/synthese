@@ -161,6 +161,247 @@ namespace synthese
 
 
 
+		std::string HTMLForm::getTextInputAutoCompleteFromTableSync(
+			const std::string& site,
+			const std::string& name,
+			const std::string& valueID,
+			const std::string& valueName,
+			const std::string& tableID,
+			const std::string& extraParamName,
+			const std::string& extraParamDivID,
+			bool bottomButton,
+			bool IDButton,
+			bool useID,
+			bool viewID,
+			std::string displayTextBeforeTyping,
+			std::string fieldId,
+			string className
+		){
+			if (fieldId.empty())
+				fieldId = name + "__ID";
+
+			string fieldIdAutoComplete;
+
+			if(useID)
+				fieldIdAutoComplete = name + "Selection__ID";
+			else
+				fieldIdAutoComplete = fieldId;
+
+			stringstream s;
+
+			s	<< "<div id=\"div" << name << "Selection\">"
+					<< "<input "
+					<< "type=\"text\" "
+					<< "name=\"" << (useID ? name + "Selection": name) << "\" "
+					<< "value=\"" << valueName << "\" "
+					<< "id=\"" << (useID ? name + "Selection__ID": fieldId) << "\" "
+					<< "style=\"width:144px; margin-right:0px;\"/>";
+			if(bottomButton)
+			{
+				s	<< "<input "
+					<< "type=\"button\" "
+					<< "value=\"v\" "
+					<< "onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" << fieldIdAutoComplete << "').autocomplete('close','');else {$('#" << fieldIdAutoComplete << "').autocomplete('search','');$('#" << fieldIdAutoComplete << "').focus();}\" "
+					<< "style=\"margin-left:0px;margin-right:0px;\"/> ";
+			}
+			if(IDButton)
+			{
+				s	<< "<input "
+					<< "type=\"button\" "
+					<< "value=\"ID\" "
+					<< "onclick=\"$('#div" << name << "Selection').hide();$('#div" << name << "').show();\" "
+					<< "style=\"margin-left:0px;\"/>";
+			}
+			s	<< "</div>";
+			if(useID)
+			{
+				s << "<div id=\"div" << name << "\" style=\"display:none\">"
+					<< "<input type=\"text\" "
+					<< "name=\"" << name << "\" "
+					<< "value=\"" << valueID << "\" "
+					<< "id=\"" << fieldId << "\" "
+					<< "style=\"margin-right:0px;\" />"
+
+					<< "<input type=\"button\" "
+					<< "value=\"ID\" "
+					<< "onclick=\"$('#div" << name << "Selection').show();$('#div" << name << "').hide();\" "
+					<< "style=\"margin-left:0px;\" />"
+				<< "</div>";
+			}
+
+			s << "<script type=\"text/javascript\">"
+				<< "$(function() {"
+					<< "$('#" << fieldIdAutoComplete << "').autocomplete({"
+						<< "source: function( request, response ) {"
+							<< "$.ajax({"
+								<< "url: 'synthese',"
+								<< "dataType: 'json',"
+								<< "data: {"
+									<< "SERVICE: 'lr',";
+									if(!site.empty())
+										s << "si: " << site << ",";
+									if(!extraParamName.empty())
+										s << extraParamName << ": " << "$('#" << extraParamDivID << "__ID').val(),";
+									s << "output_format: 'json',"
+									<< "table: " << tableID << ","
+									<< "n: 10,"
+									<< "t: request.term"
+								<< "},"
+								<< "success: function( data ) {"
+									<< "response( $.map( data.rows.row, function( item ) {"
+										<< "return {"
+											<< "label: item.name" << (viewID ? " + ' (' + item.roid + ')'," : ",")
+											<< "value: item.name,"
+											<< "id: item.roid"
+										<< "}"
+									<< "}));"
+								<< "}"
+							<< "});"
+						<< "},";
+			if(useID)
+			{
+						s << "select: function( event, ui ) {"
+							<< "$('#" << fieldId << "').val(ui.item.id);"
+						<< "},";
+			}
+						s << "minLength: 0,"
+						<< "autoFocus: true,"
+						<< "open: function() {"
+							<< "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
+						<< "},"
+						<< "close: function() {"
+							<< "$(this).removeClass('ui-corner-top').addClass('ui-corner-all');"
+						<< "}"
+					<< "});"
+				<< "});"
+			<< "</script>";
+
+			return s.str();
+		}
+
+
+
+		std::string HTMLForm::getTextInputAutoCompleteFromService(
+			const std::string& site,
+			const std::string& name,
+			const std::string& valueID,
+			const std::string& valueName,
+			const std::string& service,
+			const std::string& rows,
+			const std::string& row,
+			const std::string& extraParamName,
+			const std::string& extraParamDivID,
+			bool bottomButton,
+			bool IDButton,
+			bool useID,
+			bool viewID,
+			std::string displayTextBeforeTyping,
+			std::string fieldId,
+			string className
+		){
+			if (fieldId.empty())
+				fieldId = name + "__ID";
+
+			string fieldIdAutoComplete;
+
+			if(useID)
+				fieldIdAutoComplete = name + "Selection__ID";
+			else
+				fieldIdAutoComplete = fieldId;
+
+			stringstream s;
+
+			s	<< "<div id=\"div" << name << "Selection\">"
+					<< "<input "
+					<< "type=\"text\" "
+					<< "name=\"" << (useID ? name + "Selection": name) << "\" "
+					<< "value=\"" << valueName << "\" "
+					<< "id=\"" << (useID ? name + "Selection__ID": fieldId) << "\" "
+					<< "style=\"width:144px; margin-right:0px;\"/>";
+			if(bottomButton)
+			{
+				s	<< "<input "
+					<< "type=\"button\" "
+					<< "value=\"v\" "
+					<< "onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" << fieldIdAutoComplete << "').autocomplete('close','');else {$('#" << fieldIdAutoComplete << "').autocomplete('search','');$('#" << fieldIdAutoComplete << "').focus();}\" "
+					<< "style=\"margin-left:0px;margin-right:0px;\"/> ";
+			}
+			if(IDButton)
+			{
+				s	<< "<input "
+					<< "type=\"button\" "
+					<< "value=\"ID\" "
+					<< "onclick=\"$('#div" << name << "Selection').hide();$('#div" << name << "').show();\" "
+					<< "style=\"margin-left:0px;\"/>";
+			}
+			s	<< "</div>";
+			if(useID)
+			{
+				s << "<div id=\"div" << name << "\" style=\"display:none\">"
+					<< "<input type=\"text\" "
+					<< "name=\"" << name << "\" "
+					<< "value=\"" << valueID << "\" "
+					<< "id=\"" << fieldId << "\" "
+					<< "style=\"margin-right:0px;\" />"
+
+					<< "<input type=\"button\" "
+					<< "value=\"ID\" "
+					<< "onclick=\"$('#div" << name << "Selection').show();$('#div" << name << "').hide();\" "
+					<< "style=\"margin-left:0px;\" />"
+				<< "</div>";
+			}
+
+			s << "<script type=\"text/javascript\">"
+				<< "$(function() {"
+					<< "$('#" << fieldIdAutoComplete << "').autocomplete({"
+						<< "source: function( request, response ) {"
+							<< "$.ajax({"
+								<< "url: 'synthese',"
+								<< "dataType: 'json',"
+								<< "data: {"
+									<< "SERVICE: '" << service << "',";
+									if(!site.empty())
+										s << "si: " << site << ",";
+									if(!extraParamName.empty())
+										s << extraParamName << ": " << "$('#" << extraParamDivID << "__ID').val(),";
+									s << "output_format: 'json',"
+									<< "n: 10,"
+									<< "t: request.term"
+								<< "},"
+								<< "success: function( data ) {"
+									<< "response( $.map( data." << rows << "." << row << ", function( item ) {"
+										<< "return {"
+											<< "label: item.name" << (viewID ? " + ' (' + item.roid + ')'," : ",")
+											<< "value: item.name,"
+											<< "id: item.roid"
+										<< "}"
+									<< "}));"
+								<< "}"
+							<< "});"
+						<< "},";
+			if(useID)
+			{
+						s << "select: function( event, ui ) {"
+							<< "$('#" << fieldId << "').val(ui.item.id);"
+						<< "},";
+			}
+						s << "minLength: 0,"
+						<< "autoFocus: true,"
+						<< "open: function() {"
+							<< "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
+						<< "},"
+						<< "close: function() {"
+							<< "$(this).removeClass('ui-corner-top').addClass('ui-corner-all');"
+						<< "}"
+					<< "});"
+				<< "});"
+			<< "</script>";
+
+			return s.str();
+		}
+
+
+
 		std::string HTMLForm::getSubmitButton( const std::string& caption )
 		{
 			if (!_updateRight)
