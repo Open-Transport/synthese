@@ -63,7 +63,7 @@ namespace synthese
 			ParametersMap pm;
 			pm.insert(PARAMETER_INPUT, _input);
 			pm.insert(PARAMETER_NUMBER, _n);
-			pm.insert(PARAMETER_TABLE, _table);
+			pm.insert(PARAMETER_TABLE, static_cast<int>(_table));
 			if(!_outputFormat.empty())
 			{
 				pm.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
