@@ -117,7 +117,7 @@ namespace synthese
 							EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*stopPoint->getGeometry()->getCoordinate()));
 
 							Address projectedAddress(
-								*projection.get<1>(),
+								*(projection.get<1>().get()),
 								projection.get<2>()
 							);
 							stopPoint->setProjectedPoint(projectedAddress);
