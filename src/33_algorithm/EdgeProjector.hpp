@@ -189,7 +189,7 @@ namespace synthese
 			const geos::geom::GeometryFactory& gf(CoordinatesSystem::GetDefaultGeometryFactory());
 			boost::shared_ptr<geos::geom::Point> ptGeom(gf.createPoint(pt));
 
-			BOOST_FOREACH(T* edge, _from)
+			BOOST_FOREACH(T edge, _from)
 			{
 				boost::shared_ptr<geos::geom::LineString> edgeGeom = edge->getGeometry();
 				if(!edgeGeom.get() || edgeGeom->isEmpty())
