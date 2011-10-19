@@ -127,7 +127,10 @@ namespace synthese
 				{
 					throw MissingFileException();
 				}
-				_setFromParametersMap(map);
+				if(!_pathsMap.empty())
+				{
+					_setFromParametersMap(map);
+				}
 			}
 
 

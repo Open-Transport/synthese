@@ -215,23 +215,6 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPages(
-			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
-		) const	{
-
-			AdminInterfaceElement::PageLinks links;
-
-			if(	currentPage.getCurrentTreeBranch().find(*this))
-			{
-				links.push_back(currentPage.getCurrentTreeBranch().getNextSubPage(*this));
-			}
-
-			return links;
-		}
-
-
-
 		void PTCitiesAdmin::_buildTabs(
 			const security::Profile& profile
 		) const	{
@@ -241,5 +224,4 @@ namespace synthese
 
 			_tabBuilded = true;
 		}
-	}
-}
+}	}

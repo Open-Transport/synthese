@@ -91,9 +91,11 @@ namespace synthese
 				bool atLeastOneUnscheduledEdge(false);
 				for(Path::Edges::const_iterator itEdge(_path->getEdges().begin()); itEdge != _path->getEdges().end(); ++itEdge)
 				{
-					const LineStop& lineStop(static_cast<const LineStop&>(**itEdge));
-					if(	lineStop.getScheduleInput())
+					const LineStop* lineStop(dynamic_cast<const LineStop*>(*itEdge));
+					if(	!lineStop || lineStop->getScheduleInput())
 					{
+						const Edge& edge(**itEdge);
+
 						// Interpolation of preceding schedules
 						if(atLeastOneUnscheduledEdge)
 						{
@@ -102,8 +104,8 @@ namespace synthese
 								throw PathBeginsWithUnscheduledStopException(*_path);
 							}
 							
-							MetricOffset totalDistance(lineStop.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
-							size_t totalRankDiff(lineStop.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
+							MetricOffset totalDistance(edge.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
+							size_t totalRankDiff(edge.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
 							time_duration originDepartureSchedule(*_departureSchedules.rbegin());
 							time_duration totalTime(*itArrival - originDepartureSchedule);
 							for(Path::Edges::const_iterator it(lastScheduledEdge+1); it != itEdge && it != _path->getEdges().end(); ++it)
@@ -297,8 +299,9 @@ namespace synthese
 			size_t i(0);
 			BOOST_FOREACH(const Edge* edge, _path->getEdges())
 			{
-				if(!static_cast<const LineStop*>(edge)->getScheduleInput())
-				{
+				if(	dynamic_cast<const LineStop*>(edge) &&
+					!static_cast<const LineStop*>(edge)->getScheduleInput()
+				){
 					++i;
 					continue;
 				}

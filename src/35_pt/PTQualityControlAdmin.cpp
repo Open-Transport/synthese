@@ -457,7 +457,10 @@ namespace synthese
 									const JourneyPattern& route2(static_cast<const JourneyPattern&>(*itroute2));
 									if(	&route2 != &route &&
 										route2.hasLinkWithSource(*link.first) &&
-										route2.getCodeBySource(*link.first) == link.second &&
+										(	link.second.empty() ||
+											route2.getCodeBySource(*link.first).empty() ||
+											route2.getCodeBySource(*link.first) == link.second
+										) &&
 										route2 == route
 									){
 										stream << t.row();

@@ -31,6 +31,9 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "PTModule.h"
+#include "PTUseRuleTableSync.h"
+#include "AllowedUseRule.h"
+#include "ForbiddenUseRule.h"
 
 #include <boost/tokenizer.hpp>
 #include <assert.h>
@@ -47,6 +50,7 @@ namespace synthese
 	using namespace road;
 	using namespace impex;
 	using namespace security;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<DBTableSync,pt::StopAreaTableSync>::FACTORY_KEY("35.40.01 Connection places");
 	template<> const string FactorableTemplate<Fetcher<NamedPlace>, StopAreaTableSync>::FACTORY_KEY("7");
@@ -59,12 +63,13 @@ namespace synthese
 		const string StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION = "is_city_main_connection";
 		const string StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY = "default_transfer_delay";
 		const string StopAreaTableSync::TABLE_COL_TRANSFERDELAYS = "transfer_delays";
-		const string StopAreaTableSync::COL_NAME13("short_display_name");
-		const string StopAreaTableSync::COL_NAME26("long_display_name");
-		const string StopAreaTableSync::COL_CODE_BY_SOURCE("code_by_source");
-		const string StopAreaTableSync::COL_TIMETABLE_NAME("timetable_name");
+		const string StopAreaTableSync::COL_NAME13 = "short_display_name";
+		const string StopAreaTableSync::COL_NAME26 = "long_display_name";
+		const string StopAreaTableSync::COL_CODE_BY_SOURCE = "code_by_source";
+		const string StopAreaTableSync::COL_TIMETABLE_NAME = "timetable_name";
+		const string StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID = "handicapped_compliance_id";
 
-		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL("F");
+		const string StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL = "F";
 	}
 
 	namespace db
@@ -86,6 +91,7 @@ namespace synthese
 			DBTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
 			DBTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
 			DBTableSync::Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
+			DBTableSync::Field(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -103,33 +109,38 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Reading of the row
+			// Name
 			string name (rows->getText (StopAreaTableSync::TABLE_COL_NAME));
-			string name13(rows->getText(StopAreaTableSync::COL_NAME13));
-			string name26(rows->getText(StopAreaTableSync::COL_NAME26));
-			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
-			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
-			string transferDelaysStr (rows->getText (StopAreaTableSync::TABLE_COL_TRANSFERDELAYS));
-
-			// Update of the object
 			cp->setName (name);
+			
+			// Name 13
+			string name13(rows->getText(StopAreaTableSync::COL_NAME13));
 			if (!name13.empty())
+			{
 				cp->setName13(name13);
-			if (!name26.empty())
-				cp->setName26(name26);
-			cp->setTimetableName(rows->getText(StopAreaTableSync::COL_TIMETABLE_NAME));
+			}
 
+			// Name 26
+			string name26(rows->getText(StopAreaTableSync::COL_NAME26));
+			if (!name26.empty())
+			{
+				cp->setName26(name26);
+			}
+			
+			// Transfer is allowed
+			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
 			cp->setAllowedConnection(connectionType);
 
-			cp->clearTransferDelays ();
+			// Default transfer duration
+			posix_time::time_duration defaultTransferDelay(posix_time::minutes(rows->getInt (StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY)));
+			cp->clearTransferDelays();
 			cp->setDefaultTransferDelay (defaultTransferDelay);
 
-			cp->setDataSourceLinks(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
-					env
-			)	);
+			// Timetable name
+			cp->setTimetableName(rows->getText(StopAreaTableSync::COL_TIMETABLE_NAME));
 
+			// Transfer delay matrix
+			string transferDelaysStr (rows->getText (StopAreaTableSync::TABLE_COL_TRANSFERDELAYS));
 			typedef tokenizer<char_separator<char> > tokenizer;
 			char_separator<char> sep1 (",");
 			char_separator<char> sep2 (":");
@@ -156,42 +167,81 @@ namespace synthese
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Data source links
+				cp->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
+						env
+				)	);
+
+				// City
 				cp->setCity(NULL);
 				util::RegistryKeyType cityId (rows->getLongLong (StopAreaTableSync::TABLE_COL_CITYID));
-
 				try
 				{
 					cp->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 
-//					if (temporary == GET_REGISTRY)
-					{
-						shared_ptr<City> city = CityTableSync::GetEditable (cp->getCity ()->getKey (), env, linkLevel);
+					shared_ptr<City> city = CityTableSync::GetEditable (cp->getCity ()->getKey (), env, linkLevel);
 
-						bool isCityMainConnection (	rows->getBool (StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION));
-						if (isCityMainConnection)
-						{
-							city->addIncludedPlace (cp);
-						}
-						else
-						{
-							city->removeIncludedPlace(cp);
-						}
-						city->addPlaceToMatcher<StopArea>(env.getEditableSPtr(cp));
-						PTModule::GetGeneralStopsMatcher().add(cp->getFullName(), env.getEditableSPtr(cp));
+					bool isCityMainConnection (	rows->getBool (StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION));
+					if (isCityMainConnection)
+					{
+						city->addIncludedPlace (cp);
 					}
+					else
+					{
+						city->removeIncludedPlace(cp);
+					}
+					city->addPlaceToMatcher<StopArea>(env.getEditableSPtr(cp));
+					PTModule::GetGeneralStopsMatcher().add(cp->getFullName(), env.getEditableSPtr(cp));
 				}
 				catch(ObjectNotFoundException<City>& e)
 				{
 					throw LinkException<StopAreaTableSync>(rows, StopAreaTableSync::TABLE_COL_CITYID, e);
 				}
-			}
 
+				// Handicapped compliance
+				RuleUser::Rules rules(RuleUser::GetEmptyRules());
+				rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+				rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+				RegistryKeyType handicappedComplianceId(rows->getLongLong(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID));
+				if(handicappedComplianceId > 0)
+				{
+					try
+					{
+						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
+					}
+					catch(ObjectNotFoundException<PTUseRule>&)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop area " + lexical_cast<string>(cp->getKey()));
+				}	}
+				cp->setRules(rules);
+			}
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Save(
 			StopArea* object,
 			optional<DBTransaction&> transaction
 		){
+			ReplaceQuery<StopAreaTableSync> query(*object);
+
+			// Name
+			query.addField(object->getName());
+
+			// City
+			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+
+			// Transfer allowed
+			query.addField(object->getAllowedConnection());
+
+			// Is a main stop of the city
+			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
+
+			// Default transfer delay
+			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
+
 			// Transfer delay matrix
 			stringstream delays;
 			bool first(true);
@@ -209,27 +259,45 @@ namespace synthese
 				}
 				first = false;
 			}
-
-			// The query
-			ReplaceQuery<StopAreaTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(object->getAllowedConnection());
-			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
-			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
 			query.addField(delays.str());
+
+			// Name 13
 			query.addField(object->getName13());
+
+			// Name 26
 			query.addField(object->getName26());
+
+			// Data source links
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+
+			// Timetable name
 			query.addField(object->getTimetableName());
+
+			// Handicapped compliance
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
+			);
+
 			query.execute(transaction);
 		}
+
 
 
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
+			// General stops matcher
 			PTModule::GetGeneralStopsMatcher().remove(cp->getFullName());
+
+			// Handicapped compliance
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			cp->setRules(rules);
+
+			// City
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{

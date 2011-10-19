@@ -181,6 +181,8 @@ namespace synthese
 				/// Gets the identifier of the graph which the vertex belongs to.
 				/// @return RoadModule::GRAPH_ID
 				virtual graph::GraphIdType getGraphType() const;
+
+				virtual std::string getRuleUserName() const;
 			//@}
 		};
 	}

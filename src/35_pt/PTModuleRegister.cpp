@@ -19,6 +19,7 @@
 
 #include "CarPostalFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
+#include "HastusCSVFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
 #include "IneoRealTimeFileFormat.hpp"
@@ -174,6 +175,7 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::CarPostalFileFormat::integrate();
 	synthese::pt::GTFSFileFormat::integrate();
+	synthese::pt::HastusCSVFileFormat::integrate();
 	synthese::pt::HeuresFileFormat::integrate();
 	synthese::pt::IneoFileFormat::integrate();
 	synthese::pt::IneoRealTimeFileFormat::integrate();

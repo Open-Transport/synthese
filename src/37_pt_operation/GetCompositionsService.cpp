@@ -28,7 +28,7 @@
 #include "ScheduledService.h"
 #include "Webpage.h"
 #include "PTOperationModule.hpp"
-#include "Composition.hpp"
+#include "ServiceComposition.hpp"
 #include "Vehicle.hpp"
 #include "StopPoint.hpp"
 
@@ -236,12 +236,14 @@ namespace synthese
 			}
 
 			// Quays
-			if(_quayPage.get())
+			if(_quayPage.get() && dynamic_cast<const ServiceComposition*>(&composition))
 			{
+				const ServiceComposition& serviceComposition(static_cast<const ServiceComposition&>(composition));
+
 				stringstream s;
 				size_t rank(0);
 
-				BOOST_FOREACH(const Service::ServedVertices::value_type& quay, composition.getServedVertices())
+				BOOST_FOREACH(const Service::ServedVertices::value_type& quay, serviceComposition.getServedVertices())
 				{
 					displayQuay(
 						s,

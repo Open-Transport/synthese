@@ -32,6 +32,8 @@
 #include "ReverseRoadChunk.hpp"
 #include "Crossing.h"
 #include "ParametersMap.h"
+#include "AllowedUseRule.h"
+#include "ForbiddenUseRule.h"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
@@ -68,6 +70,8 @@ namespace synthese
 		const std::string StopArea::DATA_X("x");
 		const std::string StopArea::DATA_Y("y");
 
+
+
 		StopArea::StopArea(
 			util::RegistryKeyType id
 			, bool allowedConnection/*= CONNECTION_TYPE_FORBIDDEN */
@@ -78,6 +82,11 @@ namespace synthese
 			_defaultTransferDelay(defaultTransferDelay),
 			_score(UNKNOWN_VALUE)
 		{
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			setRules(rules);
 		}
 
 
@@ -492,5 +501,12 @@ namespace synthese
 				}
 				pm.setGeometry(static_pointer_cast<Geometry,Point>(getPoint()));
 			}
+		}
+
+
+
+		std::string StopArea::getRuleUserName() const
+		{
+			return "Zone d'arrêt";
 		}
 }	}

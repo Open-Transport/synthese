@@ -69,6 +69,8 @@ FareTableSync.cpp
 FareTableSync.h
 GTFSFileFormat.cpp
 GTFSFileFormat.hpp
+HastusCSVFileFormat.cpp
+HastusCSVFileFormat.hpp
 HeuresFileFormat.cpp
 HeuresFileFormat.hpp
 IneoFileFormat.cpp

@@ -21,10 +21,18 @@
 */
 
 #include "Depot.hpp"
+#include "ForbiddenUseRule.h"
+#include "PTOperationModule.hpp"
+
+#include <geos/geom/Point.h>
+
+using namespace geos::geom;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -35,9 +43,65 @@ namespace synthese
 	namespace pt_operation
 	{
 		Depot::Depot(RegistryKeyType id /*= 0*/ ):
+			Vertex(NULL, boost::shared_ptr<geos::geom::Point>()),
 			Registrable(id)
 		{
+			_hub = this;
 
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = ForbiddenUseRule::INSTANCE.get();
+			Hub::setRules(rules);
 		}
-	}
-}
+
+
+		GraphIdType Depot::getGraphType() const
+		{
+			return PTOperationModule::GRAPH_ID;
+		}
+
+
+		boost::posix_time::time_duration Depot::getMinTransferDelay() const
+		{
+			return boost::posix_time::not_a_date_time;
+		}
+
+		void Depot::getVertexAccessMap(VertexAccessMap&, GraphIdType graphId, const Vertex &,bool) const
+		{
+		}
+
+		bool Depot::isConnectionAllowed(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const
+		{
+			return false;
+		}
+
+		boost::posix_time::time_duration Depot::getTransferDelay(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const
+		{
+			return boost::posix_time::not_a_date_time;
+		}
+
+		HubScore Depot::getScore(void) const
+		{
+			return NO_TRANSFER_HUB_SCORE;
+		}
+
+		boost::shared_ptr<Point> Depot::getPoint() const
+		{
+			return dynamic_pointer_cast<Point,Geometry>(getGeometry());
+		}
+
+
+
+		bool Depot::containsAnyVertex(synthese::graph::GraphIdType graphId) const
+		{
+			return graphId == PTOperationModule::GRAPH_ID;
+		}
+
+
+
+		std::string Depot::getRuleUserName() const
+		{
+			return "Dépôt";
+		}
+}	}

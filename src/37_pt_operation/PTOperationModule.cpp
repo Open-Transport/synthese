@@ -25,7 +25,7 @@
 
 #include "PTOperationModule.hpp"
 #include "Vehicle.hpp"
-#include "Composition.hpp"
+#include "ServiceComposition.hpp"
 
 using namespace std;
 using namespace boost;
@@ -37,11 +37,15 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 
-
 	namespace util
 	{
 		template<>
 		const string FactorableTemplate<ModuleClass,PTOperationModule>::FACTORY_KEY("37_pt_operation");
+	}
+
+	namespace graph
+	{
+		template<> const GraphIdType GraphModuleTemplate<PTOperationModule>::GRAPH_ID(3);
 	}
 
 	namespace pt_operation
@@ -89,14 +93,14 @@ namespace synthese
 
 
 
-		void PTOperationModule::RegisterComposition(const Composition& composition )
+		void PTOperationModule::RegisterComposition(const ServiceComposition& composition )
 		{
 			_serviceCompositions[composition.getService()].insert(&composition);
 		}
 
 
 
-		void PTOperationModule::UnregisterComposition(const Composition& composition )
+		void PTOperationModule::UnregisterComposition(const ServiceComposition& composition )
 		{
 			_serviceCompositions[composition.getService()].erase(&composition);
 		}
