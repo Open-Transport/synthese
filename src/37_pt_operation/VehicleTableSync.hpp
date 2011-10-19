@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////
 ///	VehicleTableSync class header.
 ///	@file VehicleTableSync.hpp
-///	@author RCSobility
+///	@author Hugues Romain
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -44,6 +44,7 @@ namespace synthese
 		public:
 			//! @name Field names
 			//@{
+				static const std::string COL_OPERATOR_ID;
 				static const std::string COL_NAME;
 				static const std::string COL_NUMBER;
 				static const std::string COL_ALLOWED_LINES;

@@ -27,6 +27,7 @@
 #define SYNTHESE_HUB_H
 
 #include "GraphTypes.h"
+#include "RuleUser.h"
 
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 
@@ -48,7 +49,8 @@ namespace synthese
 		/** Generic hub interface.
 			@ingroup m18
 		*/
-		class Hub
+		class Hub:
+			public RuleUser
 		{
 		public:
 			//! @name Interface for query methods
@@ -100,6 +102,8 @@ namespace synthese
 				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 
 				virtual bool isConnectionPossible() const {	return getScore() > 0; }
+
+				virtual const RuleUser* _getParentRuleUser() const { return NULL; }
 			//@}
 		};
 	}

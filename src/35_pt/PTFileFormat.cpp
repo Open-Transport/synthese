@@ -298,22 +298,37 @@ namespace synthese
 				}
 				else
 				{
-					StopArea* curStop(new StopArea);
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&source, string()));
-					curStop->setDataSourceLinks(links);
-					curStop->setAllowedConnection(true);
-					if(defaultTransferDuration)
+					// Search for an existing stop area
+					StopArea* curStop(NULL);
+					StopAreaTableSync::SearchResult stopAreas(
+						StopAreaTableSync::Search(
+							env,
+							cityForStopAreaAutoGeneration->getKey(),
+							logic::indeterminate,
+							optional<string>(),
+							name
+					)	);
+					if(stopAreas.empty())
 					{
-						curStop->setDefaultTransferDelay(*defaultTransferDuration);
+						curStop = new StopArea(StopAreaTableSync::getId(), true);
+						Importable::DataSourceLinks links;
+						links.insert(make_pair(&source, string()));
+						curStop->setDataSourceLinks(links);
+						if(defaultTransferDuration)
+						{
+							curStop->setDefaultTransferDelay(*defaultTransferDuration);
+						}
+						curStop->setName(name);
+						curStop->setCity(cityForStopAreaAutoGeneration);
+						env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+						logStream << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
 					}
-					curStop->setKey(StopAreaTableSync::getId());
-					curStop->setName(name);
-					curStop->setCity(cityForStopAreaAutoGeneration);
-					env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+					else
+					{
+						curStop = stopAreas.begin()->get();
+						logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
+					}
 					stopPoint->setHub(curStop);
-
-					logStream << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
 				}
 
 				Importable::DataSourceLinks links;
@@ -397,12 +412,13 @@ namespace synthese
 			boost::optional<const std::string&> destination,
 			boost::optional<Destination*> destinationObj,
 			boost::optional<const RuleUser::Rules&> rules,
-			boost::optional<bool> direction,
+			boost::optional<bool> wayBack,
 			pt::RollingStock* rollingStock,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			bool removeOldCodes
 		){
 			// Attempting to find an existing route by value comparison
 			JourneyPattern* result(NULL);
@@ -426,9 +442,27 @@ namespace synthese
 					(!rules || jp->getRules() == *rules) &&
 					*jp == servedStops
 				){
-					logStream << "LOAD : Use of route " << jp->getKey() << " (" << jp->getName() << ") for " << (id ? *id : string("unknown")) << ")<br />";
-					result = jp;
-					break;
+					if(!result)
+					{
+						logStream << "LOAD : Use of route " << jp->getKey() << " (" << jp->getName() << ") for " << (id ? *id : string("unknown")) << ")<br />";
+						result = jp;
+						if(!id)
+						{
+							break;
+						}
+					}
+					else
+					{
+						if(removeOldCodes && id)
+						{
+							jp->setCodeBySource(source, string());
+							logStream << "INFO : Code " << *id << " was removed from route " << jp->getKey() << "<br />";
+						}
+						else
+						{
+							logStream << "WARN : Route " << *id << ") is defined twice or more.<br />";
+						}
+					}
 				}
 			}
 
@@ -516,9 +550,9 @@ namespace synthese
 			}
 
 			// Wayback
-			if(direction)
+			if(wayBack)
 			{
-				result->setWayBack(*direction);
+				result->setWayBack(*wayBack);
 			}
 
 			return result;

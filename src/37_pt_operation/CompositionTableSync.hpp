@@ -25,8 +25,10 @@
 #ifndef SYNTHESE_CompositionTableSync_hpp__
 #define SYNTHESE_CompositionTableSync_hpp__
 
-#include "Composition.hpp"
-#include "DBRegistryTableSyncTemplate.hpp"
+#include "ServiceComposition.hpp"
+#include "VehicleServiceComposition.hpp"
+#include "DBInheritanceTableSyncTemplate.hpp"
+#include "DBInheritedRegistryTableSync.hpp"
 
 namespace synthese
 {
@@ -35,16 +37,17 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		///	Composition table synchronizer.
 		///	@ingroup m37LS refLS
-		///	@author RCSobility
+		///	@author Hugues Romain
 		///	@date 2011
 		/// @since 3.2.1
 		class CompositionTableSync:
-			public db::DBRegistryTableSyncTemplate<CompositionTableSync,Composition>
+			public db::DBInheritanceTableSyncTemplate<CompositionTableSync, Composition>
 		{
 		public:
 			//! @name Field names
 			//@{
 				static const std::string COL_SERVICE_ID;
+				static const std::string COL_VEHICLE_SERVICE_ID;
 				static const std::string COL_VEHICLES;
 				static const std::string COL_DATES;
 				static const std::string COL_SERVED_VERTICES;
@@ -62,7 +65,7 @@ namespace synthese
 				///	@param raisingOrder The result records must be sorted ascendantly
 				///	@param linkLevel Level of links to build when reading foreign keys
 				///	@return Found objects.
-				///	@author RCSobility
+				///	@author Hugues Romain
 				///	@date 2011
 				/// @since 3.2.1
 				static SearchResult Search(
@@ -79,6 +82,36 @@ namespace synthese
 				static Composition::VehicleLinks UnserializeVehicles(const std::string& text, util::Env& env, util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL);
 				static std::string SerializeVehicles(const Composition::VehicleLinks& value);
 			//@}
+		};
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Service composition version.
+		/// @author Hugues Romain
+		/// @since 3.3.0
+		class ServiceCompositionInheritedTableSync:
+			public db::DBInheritedRegistryTableSync<
+				CompositionTableSync,
+				ServiceCompositionInheritedTableSync,
+				ServiceComposition
+			>
+		{
+		};
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Vehicle service composition version.
+		/// @author Hugues Romain
+		/// @since 3.3.0
+		class VehicleServiceCompositionInheritedTableSync:
+			public db::DBInheritedRegistryTableSync<
+				CompositionTableSync,
+				VehicleServiceCompositionInheritedTableSync,
+				VehicleServiceComposition
+			>
+		{
 		};
 	}
 }

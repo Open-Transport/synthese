@@ -238,7 +238,8 @@ namespace synthese
 							user_data->tripStops,
 							user_data->_dataSource,
 							user_data->_env,
-							user_data->_stream
+							user_data->_stream,
+							true
 					)	);
 					ScheduledService* service(
 						PTFileFormat::CreateOrUpdateService(

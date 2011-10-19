@@ -27,6 +27,7 @@
 #include "GraphTypes.h"
 #include "FactoryBase.h"
 #include "WithGeometry.hpp"
+#include "RuleUser.h"
 
 #include <map>
 #include <geos/geom/Point.h>
@@ -52,7 +53,8 @@ namespace synthese
 		///	@ingroup m18
 		class Vertex :
 			public virtual util::Registrable,
-			public WithGeometry<geos::geom::Point>
+			public WithGeometry<geos::geom::Point>,
+			public RuleUser
 		{
 		public:
 			typedef std::multimap<const Path*, const Edge*> Edges;
@@ -99,6 +101,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
+				virtual const RuleUser* _getParentRuleUser() const;
 				virtual GraphIdType getGraphType() const = 0;
 			//@}
 		};

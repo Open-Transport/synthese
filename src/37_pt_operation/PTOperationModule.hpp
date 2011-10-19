@@ -26,7 +26,7 @@
 #ifndef SYNTHESE_PTOperationModule_H__
 #define SYNTHESE_PTOperationModule_H__
 
-#include "ModuleClassTemplate.hpp"
+#include "GraphModuleTemplate.h"
 
 namespace synthese
 {
@@ -38,26 +38,23 @@ namespace synthese
 
 	//////////////////////////////////////////////////////////////////////////
 	/// 37 pt_operation Module namespace.
-	///	@author RCSobility
+	/// @image html uml_pt_operation.png
+	//////////////////////////////////////////////////////////////////////////
+	///	@author Hugues Romain
 	///	@date 2011
 	/// @ingroup m37
 	/// @since 3.2.1
 	namespace pt_operation
 	{
 		class Vehicle;
-		class Composition;
+		class ServiceComposition;
 
 		/**	@defgroup m37Exceptions 37.01 Exceptions
 			@ingroup m37
 
-			@defgroup m37LS 37.10 Table synchronizers
+			@defgroup m37LS 37.10 Tables
 			@ingroup m37
-
-			@defgroup m37Pages 37.11 Interface Pages
-			@ingroup m37
-
-			@defgroup m37Library 37.11 Interface Library
-			@ingroup m37
+			@image html uml_pt_operation_tables.png
 
 			@defgroup m37Rights 37.12 Rights
 			@ingroup m37
@@ -71,7 +68,7 @@ namespace synthese
 			@defgroup m37Actions 37.15 Actions
 			@ingroup m37
 
-			@defgroup m37Functions 37.15 Functions
+			@defgroup m37Functions 37.15 Services
 			@ingroup m37
 
 			@defgroup m37File 37.16 File formats
@@ -82,8 +79,7 @@ namespace synthese
 
 			@defgroup m37 37 pt_operation
 			@ingroup m3
-
-			@todo Write Module documentation
+			@image html uml_pt_operation_tables.png
 
 			@{
 		*/
@@ -91,15 +87,16 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 37 pt_operation Module class.
-		///	@author RCSobility
+		//////////////////////////////////////////////////////////////////////////
+		///	@author Hugues Romain
 		///	@date 2011
 		/// @since 3.2.1
 		class PTOperationModule:
-			public server::ModuleClassTemplate<PTOperationModule>
+			public graph::GraphModuleTemplate<PTOperationModule>
 		{
 		public:
 			typedef std::map<const pt::CommercialLine*, std::set<const Vehicle*> > LinesAllowedVehicles;
-			typedef std::map<const pt::ScheduledService*, std::set<const Composition*> > ServiceCompositions;
+			typedef std::map<const pt::ScheduledService*, std::set<const ServiceComposition*> > ServiceCompositions;
 
 		private:
 			static LinesAllowedVehicles _linesAllowedVehicles;
@@ -110,8 +107,8 @@ namespace synthese
 			static void UnregisterVehicle(const Vehicle& vehicle);
 			static LinesAllowedVehicles::mapped_type GetAllowedVehicles(const pt::CommercialLine& line);
 
-			static void RegisterComposition(const Composition& composition);
-			static void UnregisterComposition(const Composition& composition);
+			static void RegisterComposition(const ServiceComposition& composition);
+			static void UnregisterComposition(const ServiceComposition& composition);
 			static ServiceCompositions::mapped_type GetCompositions(const pt::ScheduledService& service);
 		};
 	}

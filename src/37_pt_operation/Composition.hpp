@@ -23,26 +23,26 @@
 #ifndef SYNTHESE_pt_operations_Composition_hpp__
 #define SYNTHESE_pt_operations_Composition_hpp__
 
-#include "Service.h"
 #include "Registrable.h"
+#include "Registry.h"
 #include "Calendar.h"
 
 #include <vector>
 
 namespace synthese
 {
-	namespace pt
-	{
-		class ScheduledService;
-	}
-
 	namespace pt_operation
 	{
 		class Vehicle;
 
-		/** Composition class.
-			@ingroup m37
-		*/
+		//////////////////////////////////////////////////////////////////////////
+		/// Composition class.
+		/// Allocation of one or more vehicles (train) to one or more services
+		/// (ScheduledService or VehicleService), valid on one or more days
+		/// (Calendar)
+		//////////////////////////////////////////////////////////////////////////
+		///	@ingroup m37
+		/// @author Hugues Romain
 		class Composition:
 			public virtual util::Registrable
 		{
@@ -57,30 +57,23 @@ namespace synthese
 
 			typedef std::vector<VehicleLink> VehicleLinks;
 
-		private:
-			const pt::ScheduledService* _service;
+		protected:
 			VehicleLinks _vehicles;
 			calendar::Calendar _calendar;
-			graph::Service::ServedVertices _servedVertices;
-
 
 		public:
 			Composition(util::RegistryKeyType id=0);
 
 			//! @name Setters
 			//@{
-				void setService(const pt::ScheduledService* value){ _service = value; }
 				void setVehicles(const VehicleLinks& value){ _vehicles = value; }
 				void setCalendar(const calendar::Calendar& value){ _calendar = value; }
-				void setServedVertices(const graph::Service::ServedVertices& value){ _servedVertices = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				const pt::ScheduledService* getService() const { return _service; }
 				const VehicleLinks& getVehicles() const { return _vehicles; }
 				const calendar::Calendar& getCalendar() const { return _calendar; }
-				const graph::Service::ServedVertices& getServedVertices() const { return _servedVertices; }
 			//@}
 		};
 	}

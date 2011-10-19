@@ -49,8 +49,7 @@ namespace synthese
 		AdminInterfaceElement::AdminInterfaceElement(
 		):	_tabBuilded(false),
 			_currentTab(NULL)
-		{
-		}
+		{}
 
 
 
@@ -58,8 +57,16 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& _request
 		) const	{
-			return PageLinks();
+			AdminInterfaceElement::PageLinks links;
+
+			if(	currentPage.getCurrentTreeBranch().find(*this))
+			{
+				links.push_back(currentPage.getCurrentTreeBranch().getNextSubPage(*this));
+			}
+
+			return links;
 		}
+
 
 
 		AdminInterfaceElement::PageLinks AdminInterfaceElement::getSubPagesOfModule(

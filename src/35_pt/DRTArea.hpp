@@ -64,8 +64,9 @@ namespace synthese
 			const Stops& getStops() const { return _stops; }
 
 			virtual graph::GraphIdType getGraphType() const;
+
+			virtual std::string getRuleUserName() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_DRTArea_hpp__

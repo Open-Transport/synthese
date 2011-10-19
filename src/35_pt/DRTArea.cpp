@@ -51,4 +51,11 @@ namespace synthese
 		{
 			return PTModule::GRAPH_ID;
 		}
+
+
+
+		std::string DRTArea::getRuleUserName() const
+		{
+			return "Zone de TAD";
+		}
 }	}

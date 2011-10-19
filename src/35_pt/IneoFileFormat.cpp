@@ -104,10 +104,13 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_READ_METHOD("line_read_method");
 		const std::string IneoFileFormat::Importer_::VALUE_CIDX("CIDX");
 		const std::string IneoFileFormat::Importer_::VALUE_SV("SV");
-		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD("line_short_name_field");
-		const std::string IneoFileFormat::Importer_::VALUE_NLGIV("NLGIV");
-		const std::string IneoFileFormat::Importer_::VALUE_MNLC("MNLC");
+		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD = "line_short_name_field";
+		const std::string IneoFileFormat::Importer_::VALUE_NLGIV = "NLGIV";
+		const std::string IneoFileFormat::Importer_::VALUE_MNLC = "MNLC";
 		const std::string IneoFileFormat::Importer_::PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE = "add_wayback_to_journeypattern_code";
+		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_ID_FIELD = "stop_id_field";
+		const std::string IneoFileFormat::Importer_::VALUE_MNLP = "MNLP";
+		const std::string IneoFileFormat::Importer_::VALUE_IDENTSMS = "IdentSMS";
 	}
 
 	namespace impex
@@ -198,7 +201,7 @@ namespace synthese
 						continue;
 					}
 
-					string id(_getValue("MNLP"));
+					string id(_getValue(PARAMETER_STOP_ID_FIELD));
 					string name(_getValue("LIBP"));
 
 					// Point
@@ -388,6 +391,7 @@ namespace synthese
 				string jpKey;
 				string lastStopCode;
 				MetricOffset dst(0);
+				bool atLeastAnInexistantStop(false);
 				while(true)
 				{
 					_readLine(inFile);
@@ -407,9 +411,11 @@ namespace synthese
 								stops,
 								_dataSource,
 								_env,
-								stream
+								stream,
+								true
 						)	);
 						stops.clear();
+						atLeastAnInexistantStop = false;
 						_journeyPatterns[make_pair(lineId,jpKey)] = route;
 					}
 					if(_section.empty())
@@ -443,6 +449,7 @@ namespace synthese
 							_getValue("NCH")
 						;
 						stops.clear();
+						atLeastAnInexistantStop = false;
 						lastStopCode.clear();
 						dst = 0;
 					}
@@ -463,14 +470,22 @@ namespace synthese
 								stream << "WARN : distance between " << lastStopCode << " and " << stopCode << " not found.<br />";
 							}
 						}
-						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-							_stopPoints.get(stopCode),
-							dst,
-							true,
-							true,
-							_getValue("TYPC") == "R"
-						);
-						stops.push_back(stop);
+						ImportableTableSync::ObjectBySource<StopPointTableSync>::Set linkedStops(_stopPoints.get(stopCode));
+						if(linkedStops.empty())
+						{
+							atLeastAnInexistantStop = true;
+						}
+						else
+						{
+							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+								linkedStops,
+								dst,
+								true,
+								true,
+								_getValue("TYPC") == "R"
+							);
+							stops.push_back(stop);
+						}
 						lastStopCode = stopCode;
 					}
 				}
@@ -671,6 +686,12 @@ namespace synthese
 			fields.push_back(make_pair(optional<string>(VALUE_MNLC), VALUE_MNLC));
 			stream << t.cell("Champ nom court des lignes", t.getForm().getSelectInput(PARAMETER_LINE_SHORT_NAME_FIELD, fields, optional<string>(_lineShortNameField)));
 
+			// Stop id field
+			vector<pair<optional<string>, string> > sfields;
+			sfields.push_back(make_pair(optional<string>(VALUE_MNLP), VALUE_MNLP));
+			sfields.push_back(make_pair(optional<string>(VALUE_IDENTSMS), VALUE_IDENTSMS));
+			stream << t.cell("Champ id arrêt", t.getForm().getSelectInput(PARAMETER_STOP_ID_FIELD, sfields, optional<string>(_stopIdField)));
+
 			// Add wayback to journey pattern code
 			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
 
@@ -742,6 +763,7 @@ namespace synthese
 		{
 			return _line[field];
 		}
+
 
 
 		bool IneoFileFormat::Importer_::_readLine(ifstream& file) const
@@ -824,6 +846,9 @@ namespace synthese
 			// Line short name field
 			map.insert(PARAMETER_LINE_SHORT_NAME_FIELD, _lineShortNameField);
 
+			// Stop id field
+			map.insert(PARAMETER_STOP_ID_FIELD, _stopIdField);
+
 			// Add wayback to journeypattern code
 			map.insert(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode);
 
@@ -858,6 +883,9 @@ namespace synthese
 
 			// Line short name field
 			_lineShortNameField = map.getDefault<string>(PARAMETER_LINE_SHORT_NAME_FIELD, VALUE_NLGIV);
+
+			// Stop id field
+			_stopIdField = map.getDefault<string>(PARAMETER_STOP_ID_FIELD, VALUE_MNLP);
 
 			// Add wayback to journeypattern code
 			_addWaybackToJourneyPatternCode = map.getDefault<bool>(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, false);

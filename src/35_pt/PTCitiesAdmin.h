@@ -1,5 +1,4 @@
 
-
 //////////////////////////////////////////////////////////////////////////
 /// PTCitiesAdmin class header.
 ///	@file PTCitiesAdmin.h
@@ -139,23 +138,7 @@ namespace synthese
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds links to the pages to put directly under the current page in
-			/// the pages tree.
-			///	@param currentPage Currently displayed page
-			/// @param request Current request
-			///	@return PageLinks each page to put under the current page
-			///	@author Hugues
-			///	@date 2009
-			virtual AdminInterfaceElement::PageLinks getSubPages(
-				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
-			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_PTCitiesAdmin_H__

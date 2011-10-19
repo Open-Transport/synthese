@@ -22,6 +22,7 @@
 
 #include "Vertex.h"
 #include "Edge.h"
+#include "Hub.h"
 
 #include <boost/foreach.hpp>
 
@@ -143,5 +144,11 @@ namespace synthese
 				_departureEdges.erase(it2);
 			}
 		}
-	}
-}
+
+
+
+		const RuleUser* Vertex::_getParentRuleUser() const
+		{
+			return _hub;
+		}
+}	}

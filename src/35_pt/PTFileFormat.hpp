@@ -209,6 +209,9 @@ namespace synthese
 			///	Gets a stop point.
 			///		- search stop points with link to the datasource whit the correct id
 			///		- if not found and if stop area is specified creates a new stop point in the stop area
+			/// @param stopArea the stop area to link with the stop in case of creation
+			///		(not updated if the stop already exists). If NULL, an existing stop area is
+			///		searched in the city with the same name as the stop point.
 			/// @param cityForStopAreaAutoGeneration if NULL no stop area is generated if stopArea is null
 			static std::set<StopPoint*> CreateOrUpdateStopPoints(
 				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
@@ -238,6 +241,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Search for an existing route which matches with the defined parameters, or create a new one if no existing route is compliant.
 			/// @param line The line
+			/// @param removeOldCodes Removes codes on similar routes with the same code for the data source (routes with different stops are not cleaned)
 			/// @pre The line object must link to all existing routes (use JourneyPatternTableSync::Search to populate the object)
 			/// @author Hugues Romain
 			static JourneyPattern* CreateOrUpdateRoute(
@@ -247,12 +251,13 @@ namespace synthese
 				boost::optional<const std::string&> destination,
 				boost::optional<Destination*> destinationObj,
 				boost::optional<const graph::RuleUser::Rules&> useRule,
-				boost::optional<bool> direction,
+				boost::optional<bool> wayBack,
 				pt::RollingStock* rollingStock,
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				bool removeOldCodes
 			);
 
 

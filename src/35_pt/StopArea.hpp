@@ -323,6 +323,8 @@ namespace synthese
 
 			//! @name Queries
 			//@{
+				virtual std::string getRuleUserName() const;
+
 				/** getPhysicalStopLabels.
 					@param withAll displays an item corresponding to all stops
 					@param noStopLabel displays an item corresponding to no stop (if empty, no empty item)
