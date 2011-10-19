@@ -71,6 +71,8 @@ GTFSFileFormat.cpp
 GTFSFileFormat.hpp
 HastusCSVFileFormat.cpp
 HastusCSVFileFormat.hpp
+HastusInterfaceFileFormat.cpp
+HastusInterfaceFileFormat.hpp
 HeuresFileFormat.cpp
 HeuresFileFormat.hpp
 IneoFileFormat.cpp

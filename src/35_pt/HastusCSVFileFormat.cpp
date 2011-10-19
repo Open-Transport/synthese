@@ -260,7 +260,7 @@ namespace synthese
 					date day(
 						from_string(_getValue(0))
 					);
-					typename TripIndex trip;
+					TripIndex trip;
 					trip.lineCode = _getValue(1);
 					trip.routeCode = _getValue(4);
 					trip.code = _getValue(5);

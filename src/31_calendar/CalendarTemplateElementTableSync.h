@@ -31,13 +31,12 @@
 #include <iostream>
 
 #include "DBRegistryTableSyncTemplate.hpp"
+#include "CalendarTemplateElement.h"
 
 namespace synthese
 {
 	namespace calendar
 	{
-		class CalendarTemplateElement;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// 19.10 Table : Calendar template element.
 		/// @ingroup m19LS refLS
