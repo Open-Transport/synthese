@@ -30,6 +30,7 @@
 #include "CrossingTableSync.hpp"
 #include "ImportableTableSync.hpp"
 #include "TransportNetworkRight.h"
+#include "PTUseRuleTableSync.h"
 
 #include <geos/geom/Coordinate.h>
 #include <geos/geom/Point.h>
@@ -58,9 +59,10 @@ namespace synthese
 		const string StopPointTableSync::COL_PLACEID = "place_id";
 		const string StopPointTableSync::COL_X = "x";
 		const string StopPointTableSync::COL_Y = "y";
-		const string StopPointTableSync::COL_OPERATOR_CODE("operator_code");
-		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID("projected_road_chunk_id");
-		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET("projected_metric_offset");
+		const string StopPointTableSync::COL_OPERATOR_CODE = "operator_code";
+		const string StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID = "projected_road_chunk_id";
+		const string StopPointTableSync::COL_PROJECTED_METRIC_OFFSET = "projected_metric_offset";
+		const string StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID = "handicapped_compliance_id";
 	}
 
 	namespace db
@@ -79,6 +81,7 @@ namespace synthese
 			DBTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
 			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
 			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
+			DBTableSync::Field(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
 			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			DBTableSync::Field()
 		};
@@ -98,6 +101,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 			object->setName(rows->getText ( StopPointTableSync::COL_NAME));
 
 			// Position : Lon/lat prior to x/y
@@ -122,16 +126,15 @@ namespace synthese
 				)	);
 			}
 
-			object->setDataSourceLinks(
-				ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
-					env
-			)	);
-
-			object->setHub(NULL);
-
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
+				// Data source links
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
+						env
+				)	);
+
 				// Stop area
 				try
 				{
@@ -169,6 +172,21 @@ namespace synthese
 						throw LinkException<RoadChunkTableSync>(rows, StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, e);
 					}
 				}
+
+				// Handicapped compliance
+				RuleUser::Rules rules(RuleUser::GetEmptyRules());
+				RegistryKeyType handicappedComplianceId(rows->getLongLong(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID));
+				if(handicappedComplianceId > 0)
+				{
+					try
+					{
+						rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = PTUseRuleTableSync::Get(handicappedComplianceId, env, linkLevel).get();
+					}
+					catch(ObjectNotFoundException<PTUseRule>&)
+					{
+						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop " + lexical_cast<string>(object->getKey()));
+				}	}
+				object->setRules(rules);
 			}
 		}
 
@@ -177,11 +195,15 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<StopPointTableSync,StopPoint>::Unlink(
 			StopPoint* obj
 		){
+			// Hub
 			StopArea* place = const_cast<StopArea*>(obj->getConnectionPlace());
 			place->removePhysicalStop(*obj);
-
 			obj->setHub(NULL);
 
+			// Handicapped compliance
+			obj->setRules(RuleUser::GetEmptyRules());
+
+			// Projected point
 			if(obj->getProjectedPoint().getRoadChunk())
 			{
 				obj->getProjectedPoint().getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
@@ -195,8 +217,14 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<StopPointTableSync> query(*object);
+
+			// Name
 			query.addField(object->getName());
+
+			// Stop area
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
+			
+			// X Y (deprecated)
 			if(object->hasGeometry())
 			{
 				query.addField(object->getGeometry()->getX());
@@ -207,9 +235,13 @@ namespace synthese
 				query.addFieldNull();
 				query.addFieldNull();
 			}
+
+			// Data source links
 			query.addField(
 				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
 			);
+
+			// Projected point
 			if(object->getProjectedPoint().getRoadChunk())
 			{
 				query.addField(object->getProjectedPoint().getRoadChunk()->getKey());
@@ -220,6 +252,14 @@ namespace synthese
 				query.addFieldNull();
 				query.addFieldNull();
 			}
+
+			// Handicapped compliance
+			query.addField(
+				object->getRule(USER_HANDICAPPED) && dynamic_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED)) ?
+				static_cast<const PTUseRule*>(object->getRule(USER_HANDICAPPED))->getKey() : RegistryKeyType(0)
+			);
+
+			// Geometry
 			if(object->hasGeometry())
 			{
 				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
@@ -305,5 +345,4 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}

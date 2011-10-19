@@ -164,5 +164,11 @@ namespace synthese
 		{
 			return RoadModule::GRAPH_ID;
 		}
-	}
-}
+
+
+
+		std::string Crossing::getRuleUserName() const
+		{
+			return "Intersection";
+		}
+}	}

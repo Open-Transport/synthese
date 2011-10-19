@@ -27,6 +27,7 @@
 #include "DepotTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace security;
 	using namespace pt_operation;
+	using namespace impex;
 
 	namespace util
 	{
@@ -46,7 +48,8 @@ namespace synthese
 
 	namespace pt_operation
 	{
-		const string DepotTableSync::COL_NAME ("name");
+		const string DepotTableSync::COL_NAME = "name";
+		const string DepotTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
 
 	namespace db
@@ -61,6 +64,7 @@ namespace synthese
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(DepotTableSync::COL_NAME, SQL_TEXT),
+			DBTableSync::Field(DepotTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			DBTableSync::Field()
 		};
@@ -95,6 +99,16 @@ namespace synthese
 					dynamic_pointer_cast<Point,Geometry>(rows->getGeometryFromWKT(TABLE_COL_GEOMETRY))
 				);
 			}
+
+			// Datasource links
+			if(linkLevel > UP_LINKS_LOAD_LEVEL)
+			{
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(DepotTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+			}
 		}
 
 
@@ -105,6 +119,9 @@ namespace synthese
 		){
 			ReplaceQuery<DepotTableSync> query(*object);
 			query.addField(object->getName());
+			query.addField(
+				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
+			);
 			if(object->hasGeometry())
 			{
 				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));

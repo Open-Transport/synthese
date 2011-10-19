@@ -215,6 +215,13 @@ namespace synthese
 						}
 						continue;
 					}
+
+					// Avoid depots
+					if(boost::algorithm::trim_copy(line.substr(55, 3)) == "DEP")
+					{
+						continue;
+					}
+
 					string name(boost::algorithm::trim_copy(line.substr(5, 50)));
 
 					PTFileFormat::ImportableStopPoint isp;
@@ -293,7 +300,7 @@ namespace synthese
 					// Route number
 					string routeNumber(trim_copy(line.substr(7,2)));
 					int technicalLineNumber(lexical_cast<int>(trim_copy(line.substr(4, 3))));
-
+					
 					// Route type
 					int routeType(lexical_cast<int>(line.substr(9,1)));
 					if(routeType != 0 && routeType != 1)
@@ -385,12 +392,13 @@ namespace synthese
 							optional<const string&>(),
 							destination,
 							optional<const RuleUser::Rules&>(),
-							true,
+							routeType == 1,
 							bus,
 							servedStops,
 							_dataSource,
 							_env,
-							stream
+							stream,
+							true
 					)	);
 
 					_routes.insert(

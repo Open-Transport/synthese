@@ -162,27 +162,32 @@ namespace synthese
 				_composition->setCalendar(calendar);
 			}
 
-			if(_service.get())
+			if(dynamic_cast<ServiceComposition*>(_composition.get()))
 			{
-				_composition->setService(_service.get());
-			}
+				ServiceComposition& serviceComposition(static_cast<ServiceComposition&>(*_composition));
 
-			if(_firstQuay.get())
-			{
-				Service::ServedVertices vertices;
-				size_t rank(0);
-				BOOST_FOREACH(const Path::Edges::value_type& edge, _composition->getService()->getPath()->getEdges())
+				if(_service.get())
 				{
-					if(rank++)
-					{
-						vertices.push_back(edge->getFromVertex());
-					}
-					else
-					{
-						vertices.push_back(_firstQuay.get());
-					}
+					serviceComposition.setService(_service.get());
 				}
-				_composition->setServedVertices(vertices);
+
+				if(_firstQuay.get())
+				{
+					Service::ServedVertices vertices;
+					size_t rank(0);
+					BOOST_FOREACH(const Path::Edges::value_type& edge, serviceComposition.getService()->getPath()->getEdges())
+					{
+						if(rank++)
+						{
+							vertices.push_back(edge->getFromVertex());
+						}
+						else
+						{
+							vertices.push_back(_firstQuay.get());
+						}
+					}
+					serviceComposition.setServedVertices(vertices);
+				}
 			}
 
 			if(_vehicles)

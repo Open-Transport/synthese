@@ -26,7 +26,9 @@
 #include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
-#include "WithGeometry.hpp"
+#include "Vertex.h"
+#include "Hub.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -37,13 +39,26 @@ namespace synthese
 		*/
 		class Depot:
 			public util::Named,
-			public util::Registrable,
-			public WithGeometry<geos::geom::Point>
+			public graph::Vertex,
+			public graph::Hub,
+			public impex::Importable
 		{
 		public:
 			typedef util::Registry<Depot> Registry;
 
 			Depot(util::RegistryKeyType id = 0);
+
+			virtual graph::GraphIdType getGraphType() const;
+
+			virtual boost::posix_time::time_duration getMinTransferDelay() const;
+			virtual void getVertexAccessMap(synthese::graph::VertexAccessMap &,synthese::graph::GraphIdType,const synthese::graph::Vertex &,bool) const;
+			virtual bool isConnectionAllowed(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const;
+			virtual boost::posix_time::time_duration getTransferDelay(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const;
+			virtual graph::HubScore getScore(void) const;
+			virtual boost::shared_ptr<geos::geom::Point> getPoint(void) const;
+			virtual bool containsAnyVertex(synthese::graph::GraphIdType) const;
+
+			virtual std::string getRuleUserName() const;
 		};
 	}
 }

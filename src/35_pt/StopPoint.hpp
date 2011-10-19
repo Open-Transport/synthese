@@ -87,6 +87,7 @@ namespace synthese
 				const pt::StopArea* getConnectionPlace() const;
 				virtual graph::GraphIdType getGraphType() const;
 				virtual graph::VertexAccess getVertexAccess(const road::Crossing& crossing) const;
+				virtual std::string getRuleUserName() const;
 			//@}
 		};
 

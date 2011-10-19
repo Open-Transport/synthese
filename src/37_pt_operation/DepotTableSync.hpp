@@ -45,6 +45,7 @@ namespace synthese
 			//! @name Field names
 			//@{
 				static const std::string COL_NAME;
+				static const std::string COL_DATASOURCE_LINKS;
 			//@}
 
 				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > DepotsList;

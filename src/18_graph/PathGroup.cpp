@@ -34,8 +34,8 @@ namespace synthese
 		PathGroup::PathGroup(
 			RegistryKeyType id
 		):	Registrable(id)
-		{
-		}
+		{}
+
 
 
 		const RuleUser* PathGroup::_getParentRuleUser() const

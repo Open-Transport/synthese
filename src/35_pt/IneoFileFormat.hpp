@@ -96,6 +96,9 @@ namespace synthese
 				static const std::string VALUE_NLGIV;
 				static const std::string VALUE_MNLC;
 				static const std::string PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE;
+				static const std::string PARAMETER_STOP_ID_FIELD;
+				static const std::string VALUE_MNLP;
+				static const std::string VALUE_IDENTSMS;
 				
 			private:
 				//! @name Parameters
@@ -107,6 +110,7 @@ namespace synthese
 					boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 					std::string _lineReadMethod;
 					std::string _lineShortNameField;
+					std::string _stopIdField;
 				//@}
 
 				static const std::string SEP;

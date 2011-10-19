@@ -36,8 +36,6 @@ namespace synthese
 	{
 		Composition::Composition(RegistryKeyType id):
 			Registrable(id)
-		{
-
-		}
+		{}
 	}
 }

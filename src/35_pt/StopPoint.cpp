@@ -101,6 +101,11 @@ namespace synthese
 			}
 			return VertexAccess();
 		}
-	}
-}
 
+
+
+		std::string StopPoint::getRuleUserName() const
+		{
+			return "Point d'arrêt";
+		}
+}	}
