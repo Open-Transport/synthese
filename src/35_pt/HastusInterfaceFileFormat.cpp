@@ -22,7 +22,7 @@
 
 #include "DataSource.h"
 #include "DBModule.h"
-#include "HastusInterfaceFileFormat.h"
+#include "HastusInterfaceFileFormat.hpp"
 #include "GraphConstants.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
@@ -61,6 +61,7 @@
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateElementTableSync.h"
+#include "CommercialLineTableSync.h"
 
 #include <algorithm>
 #include <iomanip>
@@ -103,7 +104,7 @@ namespace synthese
 
 	namespace pt
 	{
-		const string HastusInterfaceFileFormat::Importer_::PARAMETER_TRANSPORT_NETWORK_ID = "network_id");
+		const string HastusInterfaceFileFormat::Importer_::PARAMETER_TRANSPORT_NETWORK_ID = "network_id";
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -155,9 +156,9 @@ namespace synthese
 				vector<string> lineNumbers(_getVectorField(21, 5));
 				BOOST_FOREACH(const string& lineNumber, lineNumbers)
 				{
-					PTFileFormat::CreateOrUpdateLine(
-						lines,
-						lineNumber,
+//					PTFileFormat::CreateOrUpdateLine(
+//						lines,
+//						lineNumber,
 				}
 			}
 
@@ -175,7 +176,7 @@ namespace synthese
 			_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
-			if(_importStops)
+/*			if(_importStops)
 			{
 				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
 				{
@@ -186,11 +187,7 @@ namespace synthese
 					StopPointTableSync::Save(stop.second.get(), transaction);
 				}
 			}
-			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env.getRegistry<TransportNetwork>())
-			{
-				TransportNetworkTableSync::Save(network.second.get(), transaction);
-			}
-			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
+*/			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
 			{
 				CommercialLineTableSync::Save(cline.second.get(), transaction);
 			}
@@ -210,7 +207,7 @@ namespace synthese
 			{
 				JunctionTableSync::Save(junction.second.get(), transaction);
 			}
-			if(_importTimetablesAsTemplates)
+/*			if(_importTimetablesAsTemplates)
 			{
 				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, _calendarElementsToRemove)
 				{
@@ -225,14 +222,14 @@ namespace synthese
 					CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
 				}
 			}
-			return transaction;
+*/			return transaction;
 		}
 
 
 
 		//////////////////////////////////////////////////////////////////////////
 		// HELPERS
-		HastusInterfaceFileFormat::Importer_::Record HastusInterfaceFileFormat::Importer_::_loadNextRecord(
+		void HastusInterfaceFileFormat::Importer_::_loadNextRecord(
 		) const {
 			string line;
 			if(!getline(_file, line))
@@ -289,7 +286,7 @@ namespace synthese
 
 
 
-		void synthese::pt::HastusInterfaceFileFormat::Importer_::_loadRecordOfType( std::size_t recordNumber ) const
+		void synthese::pt::HastusInterfaceFileFormat::Importer_::_loadRecordOfType(std::size_t recordNumber, std::size_t nextRecordNumber) const
 		{
 			for(_loadNextRecord(); _record.recordNumber == 0 || _record.recordNumber == recordNumber; _loadNextRecord()) ;
 		}
@@ -307,7 +304,7 @@ namespace synthese
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.title("Paramètres");
-			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+//			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.title("Données (remplir un des deux champs)");
 			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, (_pathsSet.size() == 1) ? _pathsSet.begin()->file_string() : string()));
 			stream << t.cell("Répertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));

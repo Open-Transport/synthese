@@ -130,7 +130,7 @@ namespace synthese
 			};
 
 			class Exporter_:
-				public impex::NoExportPolicy<TridentFileFormat>
+				public impex::NoExportPolicy<HastusInterfaceFileFormat>
 			{
 			public:
 			};
