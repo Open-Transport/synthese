@@ -46,6 +46,7 @@ namespace synthese
 			virtual HubScore getScore() const { return 0; }
 			virtual boost::shared_ptr<geos::geom::Point> getPoint() const { return p; }
 			virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
+			virtual std::string getRuleUserName() const {return "Hub"; }
 		};
 
 		class FakeVertex:
@@ -54,6 +55,7 @@ namespace synthese
 		public:
 			FakeVertex(Hub* hub): Vertex(hub, boost::shared_ptr<geos::geom::Point>()), synthese::util::Registrable(0) {}
 			virtual GraphIdType getGraphType() const { return 0; }
+			virtual std::string getRuleUserName() const {return "Vertex"; }
 		};
 
 		class FakePath:
