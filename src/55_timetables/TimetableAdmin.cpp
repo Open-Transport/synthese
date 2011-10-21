@@ -394,8 +394,9 @@ namespace synthese
 							{
 								BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop.second->getDepartureEdges())
 								{
-									lines.insert(
-										static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+									if(dynamic_cast<const LineStop*>(edge.second))
+									 	lines.insert(
+											(dynamic_cast<const LineStop*>(edge.second))->getLine()->getCommercialLine()
 										);
 								}
 							}
