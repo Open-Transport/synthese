@@ -136,9 +136,9 @@ namespace synthese
 			}
 			return this < &other;
 		}
-		
-		
-		
+
+
+
 		bool HastusCSVFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ARRETS));
@@ -256,7 +256,7 @@ namespace synthese
 				{
 					// Strings
 					_loadLine(line);
-					
+
 					date day(
 						from_string(_getValue(0))
 					);
@@ -266,7 +266,7 @@ namespace synthese
 					trip.code = _getValue(5);
 					trip.team = _getValue(6);
 					trip.handicapped = (_getValue(13) == "X");
-					
+
 					// Storage
 					Trips::iterator itTrip(
 						_trips.find(trip)
@@ -312,7 +312,7 @@ namespace synthese
 					}
 
 					// Storage
-					BOOST_FOREACH(TripsByCode::mapped_type::value_type& itTrip, _tripsByCode[code])
+					BOOST_FOREACH(const TripsByCode::mapped_type::value_type& itTrip, _tripsByCode[code])
 					{
 						TripValues& trip(_trips[itTrip]);
 
