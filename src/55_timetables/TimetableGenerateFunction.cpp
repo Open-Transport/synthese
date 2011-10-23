@@ -769,28 +769,26 @@ namespace synthese
 					);
 					pm.insert(DATA_SERVICES_IN_COLS_SERVICES_ROW, serviceNumbersContent.str()); //10
 
-					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getAfterTransferTimetable(depth).getRows())
+					// At least a reservation rule
+					bool aReservationRule(false);
+					BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
 					{
-						// At least a reservation rule
-						bool aReservationRule(false);
-						BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
+						if(!service)
 						{
-							if(!service)
-							{
-								continue;
-							}
-							const PTUseRule* ptUseRule(
-								dynamic_cast<const PTUseRule*>(
-									&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-							)	);
-							if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
-							{
-								aReservationRule = true;
-								break;
-							}
+							continue;
 						}
-						pm.insert(DATA_AT_LEAST_A_RESERVATION_RULE, aReservationRule);
+						const PTUseRule* ptUseRule(
+							dynamic_cast<const PTUseRule*>(
+								&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+						)	);
+						if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
+						{
+							aReservationRule = true;
+							break;
+						}
 					}
+					pm.insert(DATA_AT_LEAST_A_RESERVATION_RULE, aReservationRule);
+
 				break;
 				}
 
