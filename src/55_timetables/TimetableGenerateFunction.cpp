@@ -96,10 +96,13 @@ namespace synthese
 		const std::string TimetableGenerateFunction::DATA_TIMETABLE_RANK("timetable_rank");
 
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_LINES_ROW("lines_row");
+		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_TRANSFERS_ROWS_BEFORE_SCHEDULES("transfers_rows_before_schedules");
+		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_TRANSFERS_ROWS_AFTER_SCHEDULES("transfers_rows_after_schedules");
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_SCHEDULES_ROWS("schedules_rows");
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_ROLLING_STOCK_ROW("rolling_stock_row");
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_RESERVATIONS_ROW("reservation_row");
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_NOTES_ROW("notes_row");
+		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_COLS_SERVICES_ROW("services_row");
 
 		const std::string TimetableGenerateFunction::DATA_SERVICES_IN_ROWS_SCHEDULES_ROWS("schedules_rows");
 
@@ -114,6 +117,7 @@ namespace synthese
 		const string TimetableGenerateFunction::DATA_LAST_DAY("last_day");
 
 		const std::string TimetableGenerateFunction::TYPE_LINE("line");
+		const std::string TimetableGenerateFunction::TYPE_SERVICE_NUMBER("servicenumber");
 		const std::string TimetableGenerateFunction::TYPE_TIME("time");
 		const std::string TimetableGenerateFunction::TYPE_NOTE("note");
 		const std::string TimetableGenerateFunction::TYPE_BOOKING("booking");
@@ -143,7 +147,7 @@ namespace synthese
 		const string TimetableGenerateFunction::DATA_STOP_NAME_26("stop_name_26");
 		const string TimetableGenerateFunction::DATA_TRANSPORT_MODE_ID("transport_mode_id");
 		const string TimetableGenerateFunction::DATA_SERVICE_ID("service_id");
-
+		const string TimetableGenerateFunction::DATA_SERVICE_NUMBER("service_number");
 
 
 
@@ -628,8 +632,8 @@ namespace synthese
 					);
 					pm.insert(DATA_SERVICES_IN_COLS_LINES_ROW, linesContent.str()); //4
 
-					// 5 : Time rows
-					stringstream timesContent;
+					// 5.1 : Transfers rows before schedules
+					stringstream transfersBeforeContent;
 					size_t globalRank(0);
 					for(size_t depth(object.getBeforeTransferTimetablesNumber()); depth > 0; --depth)
 					{
@@ -647,7 +651,7 @@ namespace synthese
 								result.getBeforeTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
 							_displaySchedulesRow(
-								timesContent,
+								transfersBeforeContent,
 								request,
 								row,
 								times,
@@ -658,7 +662,11 @@ namespace synthese
 							);
 						}
 					}
+					pm.insert(DATA_SERVICES_IN_COLS_TRANSFERS_ROWS_BEFORE_SCHEDULES, transfersBeforeContent.str()); //5.1
+
+					// 5.2 : Times rows
 					const TimetableResult::RowServicesVector services(result.getRowServices());
+					stringstream timesContent;
 					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getRows())
 					{
 						if(!row.getPlace())
@@ -678,6 +686,10 @@ namespace synthese
 							0
 						);
 					}
+					pm.insert(DATA_SERVICES_IN_COLS_SCHEDULES_ROWS, timesContent.str()); //5.2
+
+					// 5.3 : Transfers rows after schedules
+					stringstream transfersAfterContent;
 					for(size_t depth(1); depth <= object.getAfterTransferTimetablesNumber(); ++depth)
 					{
 						const TimetableResult::RowServicesVector services(
@@ -694,7 +706,7 @@ namespace synthese
 								result.getAfterTransferTimetable(depth).getRowSchedules(row.getRank())
 							);
 							_displaySchedulesRow(
-								timesContent,
+								transfersAfterContent,
 								request,
 								row,
 								times,
@@ -705,8 +717,7 @@ namespace synthese
 							);
 						}
 					}
-
-					pm.insert(DATA_SERVICES_IN_COLS_SCHEDULES_ROWS, timesContent.str()); //5
+					pm.insert(DATA_SERVICES_IN_COLS_TRANSFERS_ROWS_AFTER_SCHEDULES, transfersAfterContent.str()); //5.3
 
 					// 6 : Rolling stock rows
 					stringstream rollingStockContent;
@@ -749,28 +760,39 @@ namespace synthese
 					}
 					pm.insert(DATA_AT_LEAST_A_NOTE, aNote); //9
 
-					// At least a reservation rule
-					bool aReservationRule(false);
-					BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
-					{
-						if(!service)
-						{
-							continue;
-						}
-						const PTUseRule* ptUseRule(
-							dynamic_cast<const PTUseRule*>(
-								&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-						)	);
-						if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
-						{
-							aReservationRule = true;
-							break;
-						}
-					}
-					pm.insert(DATA_AT_LEAST_A_RESERVATION_RULE, aReservationRule);
+					// 10 : Service numbers rows
+					stringstream serviceNumbersContent;
+					_displayServiceNumbersRow(
+						serviceNumbersContent,
+						request,
+						services
+					);
+					pm.insert(DATA_SERVICES_IN_COLS_SERVICES_ROW, serviceNumbersContent.str()); //10
 
-				}
+					BOOST_FOREACH(const TimetableGenerator::Rows::value_type& row, generator.getAfterTransferTimetable(depth).getRows())
+					{
+						// At least a reservation rule
+						bool aReservationRule(false);
+						BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
+						{
+							if(!service)
+							{
+								continue;
+							}
+							const PTUseRule* ptUseRule(
+								dynamic_cast<const PTUseRule*>(
+									&service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+							)	);
+							if(ptUseRule && ptUseRule->getReservationType() != PTUseRule::RESERVATION_FORBIDDEN)
+							{
+								aReservationRule = true;
+								break;
+							}
+						}
+						pm.insert(DATA_AT_LEAST_A_RESERVATION_RULE, aReservationRule);
+					}
 				break;
+				}
 
 			case Timetable::TABLE_SERVICES_IN_ROWS:
 				if(_rowPage.get())
@@ -1097,6 +1119,48 @@ namespace synthese
 			{
 				pm.insert(DATA_TRANSPORT_MODE_ID, column.getLine()->getRollingStock()->getKey());
 			}
+
+			_cellPage->display(stream, request, pm);
+		}
+
+
+
+		void TimetableGenerateFunction::_displayServiceNumbersRow(
+			std::ostream& stream,
+			const server::Request& request,
+			const TimetableResult::RowServicesVector& services
+		) const {
+			ParametersMap pm(request.getFunction()->getSavedParameters());
+
+			pm.insert(DATA_TYPE, TYPE_SERVICE_NUMBER);
+
+			if(_cellPage.get())
+			{
+				stringstream content;
+				size_t colRank(0);
+				BOOST_FOREACH(const TimetableResult::RowServicesVector::value_type& service, services)
+				{
+					_displayServiceNumbersCell(content, request, colRank++, service);
+				}
+				pm.insert(DATA_CELLS_CONTENT, content.str());
+			}
+
+			_rowPage->display(stream, request, pm);
+		}
+
+
+
+		void TimetableGenerateFunction::_displayServiceNumbersCell(
+			std::ostream& stream,
+			const server::Request& request,
+			std::size_t colRank,
+			const pt::SchedulesBasedService* service
+		) const {
+			ParametersMap pm(_savedParameters);
+
+			pm.insert(DATA_TYPE, TYPE_SERVICE_NUMBER);
+			pm.insert(DATA_CELL_RANK, colRank);
+			if(service) pm.insert(DATA_SERVICE_NUMBER, (service->getServiceNumber()));
 
 			_cellPage->display(stream, request, pm);
 		}
