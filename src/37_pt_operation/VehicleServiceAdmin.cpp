@@ -39,6 +39,7 @@
 #include "VehicleServicesAdmin.hpp"
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
+#include "ServiceAdmin.h"
 
 using namespace std;
 using namespace boost;
@@ -144,6 +145,8 @@ namespace synthese
 				stream << f.cell("Date (vide = pas de filtre)", f.getForm().getCalendarInput(PARAMETER_DATE, _date));
 				stream << f.close();
 
+				AdminFunctionRequest<ServiceAdmin> openServiceRequest(request);
+
 				stream << "<h1>Itinéraire</h1>";
 				HTMLTable::ColsVector c;
 				c.push_back(string());
@@ -177,7 +180,8 @@ namespace synthese
 						const CommercialLine& line(*static_cast<ScheduledService*>(service)->getRoute()->getCommercialLine());
 						stream << "<span class=\"line " << line.getStyle() << "\">" << line.getShortName() << "</span>";
 
-						stream << t.col() << service->getServiceNumber();
+						openServiceRequest.getPage()->setService(Env::GetOfficialEnv().getSPtr(static_cast<ScheduledService*>(service)));
+						stream << t.col() << HTMLModule::getHTMLLink(openServiceRequest.getURL(), service->getServiceNumber());
 					}
 					else if(dynamic_cast<DeadRun*>(service))
 					{
