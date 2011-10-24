@@ -34,6 +34,9 @@ list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/geom/GeometryFac
 list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/io/WKBReader.cpp")
 list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/io/WKBReader.cpp")
 
+list(REMOVE_ITEM geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/src/operation/distance/DistanceOp.cpp")
+list(APPEND geos_SRCS "${PROJECT_SOURCE_DIR}/3rd/dev/geos/patch/operation/distance/DistanceOp.cpp")
+
 include_directories(${GEOS_INCLUDE_DIRS})
 
 add_library(geos ${geos_SRCS})
