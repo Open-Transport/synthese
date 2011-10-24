@@ -220,4 +220,18 @@ namespace synthese
 			pm.insert(prefix + "image", getImage()); // For LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_TIMETABLE_ID, getTimetableId());
 		}
+
+
+
+		bool CommercialLine::usesTransportMode( const RollingStock& transportMode ) const
+		{
+			BOOST_FOREACH(const Path* path, _paths)
+			{
+				if(static_cast<const JourneyPattern*>(path)->getRollingStock() == &transportMode)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 }	}
