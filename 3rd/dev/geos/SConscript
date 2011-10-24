@@ -17,6 +17,7 @@ class GeosProject (CppLibProject):
 sources = senv.Glob ('*.cpp', ['examples'], senv.SrcDir('src'), prefix='src/', recursive=True)
 sources.remove('src/geom/GeometryFactory.cpp')
 sources.remove('src/io/WKBReader.cpp')
+sources.remove('src/operation/distance/DistanceOp.cpp')
 sources.extend(senv.Glob ('*.cpp', ['examples'], senv.SrcDir('patch'), prefix='patch/', recursive=True))
 
 GeosProject(
