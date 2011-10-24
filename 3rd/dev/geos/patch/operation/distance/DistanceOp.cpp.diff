@@ -1,0 +1,17 @@
+--- src/operation/distance/DistanceOp.cpp	2011-07-22 20:47:48.231958700 +0200
++++ patch/operation/distance/DistanceOp.cpp	2011-10-24 12:32:41.304282400 +0200
+@@ -402,8 +402,12 @@
+ 
+ 	Point::ConstVect pts0;
+ 	Point::ConstVect pts1;
+-	PointExtracter::getPoints(*(geom[0]), pts0);
+-	PointExtracter::getPoints(*(geom[1]), pts1);
++
++	PointExtracter pe(pts0);
++	geom[0]->apply_ro(&pe);
++
++	PointExtracter pe1(pts1);
++	geom[1]->apply_ro(&pe1);
+ 
+ #if GEOS_DEBUG
+ 	std::cerr << "PointExtracter found "
