@@ -198,10 +198,11 @@ namespace synthese
 
 			// Transport mode sorting
 			_sortByTransportMode.clear();
-			if(!map.getDefault<string>(PARAMETER_SORT_BY_TRANSPORT_MODE).empty())
+			string strSBTM(map.getDefault<string>(PARAMETER_SORT_BY_TRANSPORT_MODE));
+			if(!strSBTM.empty())
 			{
 				vector<string> tms;
-				split(tms, map.get<string>(PARAMETER_SORT_BY_TRANSPORT_MODE), is_any_of(","));
+				split(tms, strSBTM, is_any_of(","));
 				BOOST_FOREACH(const string& tmstr, tms)
 				{
 					try
