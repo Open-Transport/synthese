@@ -1124,7 +1124,7 @@ namespace synthese
 						<< (2 - weekDays[(firstActiveDayIndex + i) % 7])
 						<< endl;
 				}
-				currentDay += date_duration(i);
+				currentDay += date_duration(1);
 			}
 		}
 
