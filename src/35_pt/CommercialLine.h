@@ -54,6 +54,7 @@ namespace synthese
 		class NonConcurrencyRule;
 		class ReservationContact;
 		class StopArea;
+		class RollingStock;
 
 		/** Commercial line.
 			@ingroup m35
@@ -201,6 +202,22 @@ namespace synthese
 					util::ParametersMap& pm,
 					std::string prefix = std::string()
 				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the line has route using a specific transport mode.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param transportMode the transport mode
+				/// @return true if the line has at least a route using the specified
+				/// transport mode
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				bool usesTransportMode(
+					const RollingStock& transportMode
+				) const;
+
 			//@}
 
 			//! @name Modifiers

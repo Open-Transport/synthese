@@ -43,11 +43,13 @@
 #include <geos/io/WKTWriter.h>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
 using namespace geos::io;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -74,6 +76,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES("ittd");
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES("ijpd");
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES("idbd");
+		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 		const string LinesListFunction::FORMAT_JSON("json");
@@ -91,6 +94,8 @@ namespace synthese
 		const string LinesListFunction::DATA_RANK("rank");
 		const string LinesListFunction::DATA_X("x");
 		const string LinesListFunction::DATA_Y("y");
+
+
 
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
@@ -112,6 +117,31 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
+
+			// Transport mode sorting
+			if(_sortByTransportMode.size() > 1)
+			{
+				stringstream s;
+				bool first(true);
+				BOOST_FOREACH(shared_ptr<const RollingStock> tm, _sortByTransportMode)
+				{
+					if(!tm.get())
+					{
+						continue;
+					}
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						s << ",";
+					}
+					s << tm->getKey();
+				}
+				result.insert(PARAMETER_SORT_BY_TRANSPORT_MODE, s.str());
+			}
+
 			return result;
 		}
 
@@ -145,8 +175,7 @@ namespace synthese
 
 			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
-			if(id)
-			try
+			if(id) try
 			{
 				_page = Env::GetOfficialEnv().get<Webpage>(*id);
 			}
@@ -166,6 +195,29 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, false);
 			_ignoreJourneyPlannerExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, false);
 			_ignoreTimetableExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, false);
+
+			// Transport mode sorting
+			_sortByTransportMode.clear();
+			if(!map.getDefault<string>(PARAMETER_SORT_BY_TRANSPORT_MODE).empty())
+			{
+				vector<string> tms;
+				split(tms, map.get<string>(PARAMETER_SORT_BY_TRANSPORT_MODE), is_any_of(","));
+				BOOST_FOREACH(const string& tmstr, tms)
+				{
+					try
+					{
+						shared_ptr<const RollingStock> tm(
+							Env::GetOfficialEnv().get<RollingStock>(lexical_cast<RegistryKeyType>(tmstr))
+						);
+						_sortByTransportMode.push_back(tm);
+					}
+					catch (ObjectNotFoundException<RollingStock>&)
+					{
+						throw RequestException("No rolling stock");
+					}
+				}
+			}
+			_sortByTransportMode.push_back(shared_ptr<RollingStock>()); // NULL pointer at end
 
 			// Saved parameters cleaning if output is a fixed format
 			if(!_page.get())
@@ -265,6 +317,8 @@ namespace synthese
 			}
 		};
 
+
+
 		void LinesListFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			// Sorting is made on numerical order
@@ -280,7 +334,10 @@ namespace synthese
 			// [A1] -> ligne A1: XXX - XXX
 			//
 
-			typedef map<SortableNumber, shared_ptr<const CommercialLine> > LinesMapType;
+			typedef std::map<
+				const RollingStock*,
+				map<SortableNumber, shared_ptr<const CommercialLine> >
+			> LinesMapType;
 			LinesMapType linesMap;
 
 			// Get CommercialLine Global Registry
@@ -289,61 +346,53 @@ namespace synthese
 				vector<shared_ptr<CommercialLine> > lines(
 					CommercialLineTableSync::Search(Env::GetOfficialEnv(), _network->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+				set<CommercialLine*> alreadyShownLines;
+				BOOST_FOREACH(shared_ptr<const RollingStock> tm, _sortByTransportMode)
 				{
-					const UseRule& useRule(line->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-					if(	dynamic_cast<const PTUseRule*>(&useRule) &&
-						(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
-							_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
-							_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
-					)	){
-						continue;
-					}
+					BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+					{
+						// Avoid to return a line twice
+						if(alreadyShownLines.find(line.get()) != alreadyShownLines.end())
+						{
+							continue;
+						}
 
-					// Insert respecting order described up there
-					linesMap[SortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
-				}
+						// Use rule tests
+						const UseRule& useRule(line->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+							(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
+								_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
+								_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
+						)	){
+							continue;
+						}
+
+						// Transport mode check
+						if(!tm.get() || line->usesTransportMode(*tm))
+						{
+							// Insert respecting order described up there
+							linesMap[tm.get()][SortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
+							alreadyShownLines.insert(line.get());
+						}
+				}	}
 			}
 			else if(_line.get())
 			{
-				linesMap[SortableNumber(_line->getShortName())] = _line;
+				linesMap[NULL][SortableNumber(_line->getShortName())] = _line;
 			}
 
 			// Populating the parameters map
 			ParametersMap pm(request.getFunction()->getSavedParameters());
-			BOOST_FOREACH(LinesMapType::value_type it, linesMap)
+			BOOST_FOREACH(boost::shared_ptr<const RollingStock> tm, _sortByTransportMode)
 			{
-				shared_ptr<const CommercialLine> line = it.second;
-				shared_ptr<ParametersMap> linePM(new ParametersMap(request.getFunction()->getSavedParameters()));
-				line->toParametersMap(*linePM);
-
-				// Rolling stock
-				set<RollingStock *> rollingStocks;
-				BOOST_FOREACH(Path* path, line->getPaths())
+				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{
-					if(!dynamic_cast<const JourneyPattern*>(path))
-					{
-						continue;
-					}
+					shared_ptr<const CommercialLine> line = it.second;
+					shared_ptr<ParametersMap> linePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+					line->toParametersMap(*linePM);
 
-					if(	!static_cast<const JourneyPattern*>(path)->getRollingStock()
-					){
-						continue;
-					}
-					rollingStocks.insert(
-						static_cast<const JourneyPattern*>(path)->getRollingStock()
-					);
-				}
-				BOOST_FOREACH(RollingStock * rs, rollingStocks)
-				{
-					shared_ptr<ParametersMap> rsPM(new ParametersMap(request.getFunction()->getSavedParameters()));
-					rs->toParametersMap(*rsPM);
-					linePM->insert(DATA_TRANSPORT_MODE, rsPM);
-				}
-
-				if(_outputStops)
-				{
-					set<const StopArea*> stopAreas;
+					// Rolling stock
+					set<RollingStock *> rollingStocks;
 					BOOST_FOREACH(Path* path, line->getPaths())
 					{
 						if(!dynamic_cast<const JourneyPattern*>(path))
@@ -351,97 +400,122 @@ namespace synthese
 							continue;
 						}
 
-						BOOST_FOREACH(Edge* edge, path->getEdges())
-						{
-							if(!edge->getFromVertex())
-							{
-								break;
-							}
-							const StopArea* stopArea(
-								dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
-							);
-							if(stopArea)
-							{
-								stopAreas.insert(stopArea);
-							}
-					}	}
-					shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(request.getFunction()->getSavedParameters()));
-					BOOST_FOREACH(const StopArea* stopArea, stopAreas)
-					{
-						shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(request.getFunction()->getSavedParameters()));
-						stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
-						stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
-					}
-					linePM->insert(DATA_STOP_AREAS, stopAreasPM);
-				}
-				if(!_outputGeometry.empty())
-				{
-					typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
-					VertexPairs geometries;
-					BOOST_FOREACH(Path* path, line->getPaths())
-					{
-						if(!dynamic_cast<const JourneyPattern*>(path))
-						{
+						if(	!static_cast<const JourneyPattern*>(path)->getRollingStock()
+						){
 							continue;
 						}
-
-						BOOST_FOREACH(Edge* edge, path->getEdges())
-						{
-							if(!edge->getNext())
-							{
-								break;
-							}
-							VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
-							if(geometries.find(od) == geometries.end())
-							{
-								shared_ptr<LineString> lineGeometry = edge->getRealGeometry();
-								if (lineGeometry)
-									geometries.insert(make_pair(od, lineGeometry));
-							}
-						}
-					}
-
-					shared_ptr<ParametersMap> geometryPM(new ParametersMap(request.getFunction()->getSavedParameters()));
-					if(_outputGeometry == FORMAT_WKT)
-					{
-						vector<shared_ptr<Geometry> > vec;
-						vector<Geometry*> vecd;
-						BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
-						{
-							shared_ptr<Geometry> prGeom(
-								_coordinatesSystem->convertGeometry(*it.second)
-							);
-							vec.push_back(prGeom);
-							vecd.push_back(prGeom.get());
-						}
-						shared_ptr<GeometryCollection> mls(
-							_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
+						rollingStocks.insert(
+							static_cast<const JourneyPattern*>(path)->getRollingStock()
 						);
-						geometryPM->insert(DATA_WKT, WKTWriter().write(mls.get()));
 					}
-					else
+					BOOST_FOREACH(RollingStock * rs, rollingStocks)
 					{
-						BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
-						{
-							shared_ptr<ParametersMap> edgePM(new ParametersMap(request.getFunction()->getSavedParameters()));
-							shared_ptr<Geometry> prGeom(
-								_coordinatesSystem->convertGeometry(*it.second)
-							);
-							for(size_t i(0); i<prGeom->getNumPoints(); ++i)
-							{
-								const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
-								shared_ptr<ParametersMap> pointPM(new ParametersMap(request.getFunction()->getSavedParameters()));
-								pointPM->insert(DATA_X, pt.x);
-								pointPM->insert(DATA_Y, pt.y);
-								edgePM->insert(DATA_POINT, pointPM);
-							}
-							geometryPM->insert(DATA_EDGE, edgePM);
-						}
+						shared_ptr<ParametersMap> rsPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						rs->toParametersMap(*rsPM);
+						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
-					linePM->insert(DATA_GEOMETRY, geometryPM);
-				}
-				pm.insert(DATA_LINE, linePM);
-			}
+
+					if(_outputStops)
+					{
+						set<const StopArea*> stopAreas;
+						BOOST_FOREACH(Path* path, line->getPaths())
+						{
+							if(!dynamic_cast<const JourneyPattern*>(path))
+							{
+								continue;
+							}
+
+							BOOST_FOREACH(Edge* edge, path->getEdges())
+							{
+								if(!edge->getFromVertex())
+								{
+									break;
+								}
+								const StopArea* stopArea(
+									dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
+								);
+								if(stopArea)
+								{
+									stopAreas.insert(stopArea);
+								}
+						}	}
+						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
+						{
+							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+							stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
+							stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
+						}
+						linePM->insert(DATA_STOP_AREAS, stopAreasPM);
+					}
+					if(!_outputGeometry.empty())
+					{
+						typedef map<pair<Vertex*, Vertex*>, shared_ptr<Geometry> > VertexPairs;
+						VertexPairs geometries;
+						BOOST_FOREACH(Path* path, line->getPaths())
+						{
+							if(!dynamic_cast<const JourneyPattern*>(path))
+							{
+								continue;
+							}
+
+							BOOST_FOREACH(Edge* edge, path->getEdges())
+							{
+								if(!edge->getNext())
+								{
+									break;
+								}
+								VertexPairs::key_type od(make_pair(edge->getFromVertex(), edge->getNext()->getFromVertex()));
+								if(geometries.find(od) == geometries.end())
+								{
+									shared_ptr<LineString> lineGeometry = edge->getRealGeometry();
+									if (lineGeometry)
+										geometries.insert(make_pair(od, lineGeometry));
+								}
+							}
+						}
+
+						shared_ptr<ParametersMap> geometryPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						if(_outputGeometry == FORMAT_WKT)
+						{
+							vector<shared_ptr<Geometry> > vec;
+							vector<Geometry*> vecd;
+							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+							{
+								shared_ptr<Geometry> prGeom(
+									_coordinatesSystem->convertGeometry(*it.second)
+								);
+								vec.push_back(prGeom);
+								vecd.push_back(prGeom.get());
+							}
+							shared_ptr<GeometryCollection> mls(
+								_coordinatesSystem->getGeometryFactory().createGeometryCollection(vecd)
+							);
+							geometryPM->insert(DATA_WKT, WKTWriter().write(mls.get()));
+						}
+						else
+						{
+							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
+							{
+								shared_ptr<ParametersMap> edgePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+								shared_ptr<Geometry> prGeom(
+									_coordinatesSystem->convertGeometry(*it.second)
+								);
+								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
+								{
+									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
+									shared_ptr<ParametersMap> pointPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+									pointPM->insert(DATA_X, pt.x);
+									pointPM->insert(DATA_Y, pt.y);
+									edgePM->insert(DATA_POINT, pointPM);
+								}
+								geometryPM->insert(DATA_EDGE, edgePM);
+							}
+						}
+						linePM->insert(DATA_GEOMETRY, geometryPM);
+					}
+					pm.insert(DATA_LINE, linePM);
+			}	}
 
 			if(_page.get()) // CMS output
 			{
@@ -512,7 +586,5 @@ namespace synthese
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false)
-		{
-		}
-	}
-}
+		{}
+}	}

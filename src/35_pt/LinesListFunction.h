@@ -43,6 +43,7 @@ namespace synthese
 	{
 		class CommercialLine;
 		class TransportNetwork;
+		class RollingStock;
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Lines list public Function class.
@@ -64,6 +65,7 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
+			static const std::string PARAMETER_SORT_BY_TRANSPORT_MODE;
 
 			static const std::string FORMAT_XML;
 			static const std::string FORMAT_JSON;
@@ -95,6 +97,8 @@ namespace synthese
 				bool _ignoreJourneyPlannerExcludedLines;
 				bool _ignoreDeparturesBoardExcludedLines;
 				std::string _outputGeometry;
+				typedef std::vector<boost::shared_ptr<const RollingStock> > TransportModeSorting;
+				TransportModeSorting _sortByTransportMode;
 			//@}
 
 
