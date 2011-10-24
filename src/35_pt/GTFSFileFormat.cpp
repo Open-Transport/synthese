@@ -1117,11 +1117,11 @@ namespace synthese
 			for(int i = 0; currentDay <= lastActiveDay;i++)
 			{
 				bool isNormalyActive = weekDays[(firstActiveDayIndex + i) % 7];
-				if(isNormalyActive != (service->isActive(currentDay) ? 1 : 0))
+				if(isNormalyActive != service->isActive(currentDay))
 				{
 					calendarDates << serviceId << ","
 						<< to_iso_string(currentDay) << ","
-						<< (2 - weekDays[(firstActiveDayIndex + i) % 7])
+						<< (2 - service->isActive(currentDay))
 						<< endl;
 				}
 				currentDay += date_duration(1);
