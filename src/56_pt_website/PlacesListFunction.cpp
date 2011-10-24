@@ -269,13 +269,16 @@ namespace synthese
 							stream << " id=\"" << dynamic_cast<const NamedPlace*>(it.placeResult.value.get())->getKey() << "\"";
 						}
 						shared_ptr<Point> placePoint;
-						placePoint = _coordinatesSystem->convertPoint(*it.placeResult.value.get()->getPoint());
 						double x = 0.0;
 						double y = 0.0;
-						if(placePoint.get())
+						if(it.placeResult.value.get()->getPoint().get())
 						{
-							x = placePoint->getX();
-							y = placePoint->getY();
+							placePoint = _coordinatesSystem->convertPoint(*it.placeResult.value.get()->getPoint());
+							if(placePoint.get())
+							{
+								x = placePoint->getX();
+								y = placePoint->getY();
+							}
 						}
 						stream <<
 							" score=\"" << it.placeResult.score.phoneticScore << "\"" <<
