@@ -243,6 +243,16 @@ namespace synthese
 				false
 			);
 
+			bool resaIsCompulsory=false;
+                        BOOST_FOREACH(Registry<PTUseRule>::value_type r, _env.getRegistry<PTUseRule>())
+                        {
+				const PTUseRule& rule(*r.second);
+
+				if (rule.getReservationType() == PTUseRule::RESERVATION_RULE_FORBIDDEN || (rule.getMinDelayDays().days() == 0 && rule.getMinDelayMinutes().total_seconds() == 0))       continue;
+				resaIsCompulsory = true;
+				break;
+			}
+
 			// Lines
 			const RollingStock* rollingStock(NULL);
 			BOOST_FOREACH(Registry<JourneyPattern>::value_type itline, _env.getRegistry<JourneyPattern>())
@@ -300,7 +310,10 @@ namespace synthese
 			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
 			os << "</registration>" << "\n";
 			os << "<lineId>" << TridentId (peerid, "Line", *_line) << "</lineId>" << "\n";
-			os << "<comment/>" << "\n";
+			if(!_withTisseoExtension && resaIsCompulsory)
+				os << "<comment>TAD : compulsory reservation</comment>" << "\n";
+			else
+				os << "<comment />" << "\n";
 			os << "</PTNetwork>" << "\n";
 
 			// --------------------------------------------------- GroupOfLine
@@ -812,6 +825,9 @@ namespace synthese
 						os << "<reservationRule>" << TridentId(peerid, "ReservationRule", pRule.getKey()) << "</reservationRule>" << "\n";
 					}
 				}
+				else //!_withTisseoExtension
+					if(resaIsCompulsory)
+                                                os << "<comment>TAD : compulsory reservation</comment>"  << "\n";
 				os << "</VehicleJourney>" << "\n";
 			}
 
