@@ -68,6 +68,14 @@ DEFAULTS = {
     'project_name': None,
     'conn_string': 'sqlite://',
     'sites_config': {},
+    'mail_admins': (),
+    'mail_sender': None,
+    'mail_host': 'localhost',
+    'mail_port': 25,
+    'mail_user': None,
+    'mail_password': None,
+    'mail_tls': False,
+    'send_mail_on_unexpected_stop': False,
 
     # remote project management
     'server': None,
