@@ -323,6 +323,10 @@ class Project(object):
         self._load_sites()
         self.daemon = daemon.Daemon(self.env)
 
+        if self.config.env_config_name in self.config.env_configs:
+            self.config.update_from_dict(
+                self.config.env_configs[self.config.env_config_name])
+
     def get_site(self, site_name):
         for s in self.sites:
             if s.name == site_name:
