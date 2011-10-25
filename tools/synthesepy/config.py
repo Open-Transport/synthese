@@ -38,6 +38,8 @@ DEFAULTS = {
     'verbose': False,
     'spatialite_path': 'spatialite',
     'beep_when_done': False,
+    'env_configs': {},
+    'env_config_name': 'prod',
 
     # XXX name it thirdparty_path for consistency?
     'thirdparty_dir': None,
@@ -154,8 +156,8 @@ class Config(object):
         execfile(
             config_path, self._get_config_globals(config_path), self.__dict__)
 
-    def update_from_obj(self, obj):
-        self.__dict__.update(obj.__dict__)
+    def update_from_dict(self, dict):
+        self.__dict__.update(dict)
 
     def update_finished(self):
         """Should be called once the config object is finished being updated"""
