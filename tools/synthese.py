@@ -146,6 +146,12 @@ class Bootstrap(object):
                 raise Exception(
                     'You must install the pysqlite Python module from:\n'
                     'http://code.google.com/p/pysqlite/downloads/list')
+            try:
+                import win32api
+            except ImportError:
+                raise Exception(
+                    'You must install the pywin32 Python module from:\n'
+                    'http://sourceforge.net/projects/pywin32/files/pywin32/')
 
         with open(join(self.pyenv_path, 'version.txt'), 'wb') as f:
             f.write(str(REQUIRED_ENV_VERSION))
