@@ -23,6 +23,7 @@
 import argparse
 import contextlib
 import datetime
+import email.mime.text
 import glob
 import gzip
 import logging
@@ -30,6 +31,8 @@ import os
 from os.path import join
 import pprint
 import shutil
+import smtplib
+import socket
 import subprocess
 import sys
 import time
@@ -306,6 +309,7 @@ class Project(object):
         self.htdocs_path = join(path, 'htdocs')
         self.daemon = None
         self._db_backend = None
+        self.__mail_conn = None
         self.db_path = join(path, 'db')
         if not os.path.isdir(self.db_path):
             os.makedirs(self.db_path)
@@ -445,6 +449,51 @@ class Project(object):
         self.load_data()
         self.load_local_data()
 
+    @property
+    def _mail_conn(self):
+        if self.__mail_conn:
+            return self.__mail_conn
+
+        c = self.config
+        self.__mail_conn = smtplib.SMTP(c.mail_host, c.mail_port)
+
+        if c.mail_tls:
+            self.__mail_conn.ehlo()
+            self.__mail_conn.starttls()
+            self.__mail_conn.ehlo()
+        if c.mail_user and c.mail_password:
+            self.__mail_conn.login(c.mail_user, c.mail_password)
+
+        return self.__mail_conn
+
+    def send_unexpected_stop_mail(self, restart_count, last_start_s):
+        if not self.config.send_mail_on_unexpected_stop:
+            return
+
+        log.info('Sending unexpected stop mail')
+        hostname = socket.gethostname()
+        subject = ('Synthese unexpected stop on {0} (project: {1}, '
+            'restarts: {2})'.format(
+                hostname, self.config.project_name, restart_count))
+        body = '''
+Synthese stopped unexpectedly on {0}. It is going to restart.
+Total restart count: {1}. Seconds since last start: {2}.
+
+Have a nice day,
+The synthese.py wrapper script.
+'''.format(hostname, restart_count, int(time.time() - last_start_s))
+
+        # TODO: include logs in the mail.
+
+        msg = email.mime.text.MIMEText(body)
+
+        msg['Subject'] = subject
+        msg['From'] = self.config.mail_sender
+        msg['To'] = ', '.join(self.config.mail_admins)
+
+        self._mail_conn.sendmail(
+            self.config.mail_sender, self.config.mail_admins, msg.as_string())
+
     @command()
     def rundaemon(self, block=True):
         """Run Synthese daemon"""
@@ -453,9 +502,11 @@ class Project(object):
             return
         log.info('Daemon running, press ctrl-c to stop')
 
+        restart_count = 0
         try:
             running = True
             while running:
+                start_time = time.time()
                 while self.daemon.is_running():
                     time.sleep(2)
                 log.info('Daemon terminated')
@@ -464,10 +515,12 @@ class Project(object):
                 if not expected_stop:
                     log.warn('Stop is unexpected, crash?')
                     if self.config.restart_if_crashed:
+                        self.send_unexpected_stop_mail(restart_count, start_time)
                         self.daemon.start(kill_existing=False)
                         running = True
                     else:
                         sys.exit(1)
+                restart_count += 1
         except:
             raise
         finally:
