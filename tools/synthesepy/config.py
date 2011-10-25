@@ -38,7 +38,7 @@ DEFAULTS = {
     'verbose': False,
     'spatialite_path': 'spatialite',
     'beep_when_done': False,
-    'env_configs': {},
+    'env_configs': {'prod': {}},
     'env_config_name': 'prod',
 
     # XXX name it thirdparty_path for consistency?
