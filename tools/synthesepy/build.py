@@ -24,6 +24,7 @@ import hashlib
 import logging
 import os
 from os.path import join
+import platform
 import shutil
 import subprocess
 import sys
@@ -476,6 +477,17 @@ class CMakeBuilder(Builder):
         if not os.path.isdir(self.env.env_path):
             os.makedirs(self.env.env_path)
         utils.call(args, cwd=self.env.env_path, env=env)
+
+        # Hack to disable incremental build on XP (it fails with:
+        # LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO)
+        # I didn't find a way to to this in CMakeLists.txt
+        # (http://www.cmake.org/pipermail/cmake/2010-February/035174.html didn't work)
+        if self.env.platform == 'win' and platform.release() == 'XP':
+            cmake_cache = join(self.env.env_path, 'CMakeCache.txt')
+            cache_content = open(cmake_cache).read()
+            cache_content = cache_content.replace(
+                'INCREMENTAL:YES', 'INCREMENTAL:NO')
+            open(cmake_cache, 'wb').write(cache_content)
 
     def _build_make(self, build_only_project):
         utils.call(
