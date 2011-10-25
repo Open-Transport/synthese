@@ -322,8 +322,8 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.14-win32.zip'
-        self._download(url, '89244f46153767f947604e9d7cd1ed91')
+        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.17-win32.zip'
+        self._download(url, 'a4599dbfcf5d8a7d958461e4bb62d7a4')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
@@ -487,7 +487,8 @@ class CMakeBuilder(Builder):
 
     def _run_devenv(self, build_project=None):
         # TODO: this should be extracted from system config
-        default_vs_path = 'C:\\Program Files (x86)\\Microsoft Visual Studio 9.0\\'
+        default_vs_path = (os.environ['ProgramFiles'] +
+            '\\Microsoft Visual Studio 9.0\\')
 
         utils.append_paths_to_environment('PATH', [
             default_vs_path + 'Common7\\IDE',
