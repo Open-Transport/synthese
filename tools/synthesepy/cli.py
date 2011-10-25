@@ -398,6 +398,9 @@ def main():
     parser.add_argument(
         '--no-root-check', action='store_true',
         help='Disable root user checks')
+    parser.add_argument(
+        '-n', '--env-config-name',
+        help='Environment config to use')
 
     subparsers = parser.add_subparsers(help='sub-command help')
     if project:
@@ -411,7 +414,7 @@ def main():
     logging.getLogger().setLevel(
         level=(logging.DEBUG if args.verbose else logging.INFO))
 
-    config.update_from_obj(args)
+    config.update_from_dict(args.__dict__)
 
     config.update_finished()
 
