@@ -323,9 +323,12 @@ class Project(object):
         self._load_sites()
         self.daemon = daemon.Daemon(self.env)
 
-        if self.config.env_config_name in self.config.env_configs:
-            self.config.update_from_dict(
-                self.config.env_configs[self.config.env_config_name])
+        if self.config.env_config_name not in self.config.env_configs:
+            raise Exception('Invalid env_config_name %r. Possible ones are '
+                '%r' % (self.config.env_config_name,
+                    self.config.env_configs.keys()))
+        self.config.update_from_dict(
+            self.config.env_configs[self.config.env_config_name])
 
     def get_site(self, site_name):
         for s in self.sites:
