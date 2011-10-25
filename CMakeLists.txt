@@ -24,7 +24,7 @@ endif()
 
 set(Boost_ADDITIONAL_VERSIONS "1.39" "1.42")
 # Uncomment to enable debugging output when finding Boost.
-set(Boost_DEBUG ON)
+#set(Boost_DEBUG ON)
 
 if(WIN32)
   set(Boost_USE_STATIC_LIBS ON)
