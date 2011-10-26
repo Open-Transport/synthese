@@ -161,6 +161,7 @@ Alias /synthese3 "{admin_files_path}/admin/"
         PACKAGE_ALIAS_TEMPLATE = '''
 # Package alias for {package_name}
 Alias /{package_name} {package_files_path}/{package_name}
+{package_pre_config}
 <Directory {package_files_path}>
     Options -Indexes FollowSymLinks MultiViews
     AllowOverride None
@@ -211,8 +212,13 @@ Alias /{package_name} {package_files_path}/{package_name}
             packages.append(admin_package)
         package_aliases = ''
         for package in packages:
+            package_pre_config = ''
             rewrite_directives = ''
             if package.name == 'admin':
+                package_pre_config = '''
+# Backward compatibility redirect
+Redirect /synthese3/admin /admin/
+'''
                 rewrite_directives = '''
     RewriteEngine on
     RewriteBase /
@@ -220,6 +226,7 @@ Alias /{package_name} {package_files_path}/{package_name}
                 '''
             package_aliases += PACKAGE_ALIAS_TEMPLATE.format(
                 package_name=package.name,
+                package_pre_config=package_pre_config,
                 package_files_path=package.files_path,
                 rewrite_directives=rewrite_directives)
         format_config['package_aliases'] = package_aliases
