@@ -76,6 +76,13 @@ def install_dependencies(env):
     builder.check_debian_package_requirements(
         required_packages, do_install=True)
 
+    # supervisor doesn't seem to be started automatically.
+    log.info('Starting supervisor')
+    try:
+        subprocess.check_call(
+            '/etc/init.d/supervisor start')
+    except:
+        pass
 
 def run(env, args):
     if sys.platform == 'win':
