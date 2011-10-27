@@ -468,18 +468,20 @@ class Project(object):
 
         return self.__mail_conn
 
-    def send_unexpected_stop_mail(self, restart_count, last_start_s):
-        if not self.config.send_mail_on_unexpected_stop:
+    def send_crash_mail(self, restart_count, last_start_s):
+        if not self.config.send_mail_on_crash:
             return
 
-        log.info('Sending unexpected stop mail')
+        log.info('Sending crash mail')
         hostname = socket.gethostname()
-        subject = ('Synthese unexpected stop on {0} (project: {1}, '
+        subject = ('Synthese crash on {0} (project: {1}, '
             'restarts: {2})'.format(
                 hostname, self.config.project_name, restart_count))
         body = '''
-Synthese stopped unexpectedly on {0}. It is going to restart.
+Synthese crashed on {0}. It is going to restart.
 Total restart count: {1}. Seconds since last start: {2}.
+
+TODO: put last logs here.
 
 Have a nice day,
 The synthese.py wrapper script.
@@ -517,7 +519,7 @@ The synthese.py wrapper script.
                 if not expected_stop:
                     log.warn('Stop is unexpected, crash?')
                     if self.config.restart_if_crashed:
-                        self.send_unexpected_stop_mail(restart_count, start_time)
+                        self.send_crash_mail(restart_count, start_time)
                         self.daemon.start(kill_existing=False)
                         running = True
                     else:
