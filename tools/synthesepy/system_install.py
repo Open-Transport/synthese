@@ -80,7 +80,7 @@ def install_dependencies(env):
     log.info('Starting supervisor')
     try:
         subprocess.check_call(
-            '/etc/init.d/supervisor start')
+            '/etc/init.d/supervisor start', shell=True)
     except:
         pass
 
