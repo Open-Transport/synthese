@@ -75,7 +75,7 @@ DEFAULTS = {
     'mail_user': None,
     'mail_password': None,
     'mail_tls': False,
-    'send_mail_on_unexpected_stop': False,
+    'send_mail_on_crash': False,
 
     # remote project management
     'server': None,
