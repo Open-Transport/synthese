@@ -399,8 +399,8 @@ def main():
         '--no-root-check', action='store_true',
         help='Disable root user checks')
     parser.add_argument(
-        '-n', '--env-config-name',
-        help='Environment config to use')
+        '-n', '--env-config-names',
+        help='Environment configs to use (comma separated)')
 
     subparsers = parser.add_subparsers(help='sub-command help')
     if project:
