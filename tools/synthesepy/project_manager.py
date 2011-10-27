@@ -343,9 +343,10 @@ class Project(object):
         return None
 
     def _read_config(self):
-        config_paths = [
-            join(self.path, 'config.py'), join(self.path, 'config_local.py')]
-        for config_path in config_paths:
+        for suffix in ['', '_local', '_local_' + socket.gethostname()]:
+            config_path = join(
+                self.path, 'config{suffix}.py'.format(suffix=suffix))
+            log.debug('Trying to read config file: %r', config_path)
             if not os.path.isfile(config_path):
                 continue
             log.debug('Reading config file: %r', config_path)
