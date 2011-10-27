@@ -113,9 +113,15 @@ namespace synthese
 				std::ostream& stream,
 				graph::ServicePointer& servicePointer,
 				const pt::StopPoint* stop
-				)const;
+			)const;
 
 		public:
+			DisplayScreenContentFunction():
+				_wayIsBackward(false)
+			{}
+
+
+			
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the display.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response
