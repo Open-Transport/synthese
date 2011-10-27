@@ -38,8 +38,8 @@ DEFAULTS = {
     'verbose': False,
     'spatialite_path': 'spatialite',
     'beep_when_done': False,
-    'env_configs': {'prod': {}},
-    'env_config_name': 'prod',
+    'env_configs': {},
+    'env_config_names': '',
 
     # XXX name it thirdparty_path for consistency?
     'thirdparty_dir': None,
