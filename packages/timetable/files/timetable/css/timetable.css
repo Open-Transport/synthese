@@ -1,0 +1,46 @@
+.caldiv {
+  position: fixed;
+  top: 20%;
+  margin: auto;
+  width: 600px;
+  height: 60%;
+  z-index: 3;
+  background-color: white;
+  border: solid 5px black;
+}
+
+.caltitle {
+  width: 580px;
+  background-color: black;
+  float: left;
+  padding: 10px;
+}
+
+.caltitleleft {
+  float: left;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+.caltitleright {
+  float: right;
+  color: white;
+  font-weight: bold;
+  font-size: 18px;
+  margin-right: 20px;
+}
+
+.calcontent {
+  float: left;
+  padding: 10px;
+}
+
+.key_sel, .key_unsel {
+  width: 25px;
+  height: 25px;
+  border: solid 1px black;
+  display: inline-block;
+  margin: 2px;
+  vertical-align: middle;
+}
