@@ -1,3 +1,5 @@
+-- TODO: replace these pages with files in pages/ or pages_local/.
+
 -- map package: pages 200-300
 
 -- 200
