@@ -175,10 +175,10 @@ function callSuggestions(i, valeur) {
       return;
   }
 
-  if(_xmlHttp && _xmlHttp.readyState !=0 ) {
+  if (_xmlHttp && _xmlHttp.readyState !=0 ) {
     _xmlHttp.abort()
   }
-  if(_waitObject[i] && _normalObject[i]) {
+  if (_waitObject[i] && _normalObject[i]) {
     _waitObject[i].style.display = 'inline';
     _normalObject[i].style.display = 'none';
   }
@@ -284,7 +284,7 @@ function calculateWidth(i) {
 }
 
 function setCompleteDivSize(i) {
-  if(_completeDiv) {
+  if (_completeDiv) {
     _completeDiv.style.left = calculateOffsetLeft(_inputField[i]) + "px";
     _completeDiv.style.top = calculateOffsetTop(_inputField[i]) + _inputField[i].offsetHeight - 1 + "px";
     _completeDiv.style.width = calculateWidth(i) + "px"
@@ -323,7 +323,7 @@ function drawList(i, valeur, liste) {
   setCompleteDivSize(i);
   // mise en place des suggestions
   _currentList = liste;
-  for(var f = 0; f < liste.length; ++f){
+  for (var f = 0; f < liste.length; ++f) {
     var nouveauDiv=document.createElement("DIV");
     nouveauDiv.onmousedown = divOnMouseDown;
     nouveauDiv.onmouseover = divOnMouseOver;
@@ -335,7 +335,7 @@ function drawList(i, valeur, liste) {
     _completeDiv.appendChild(nouveauDiv)
   }
   PressAction(i);
-  if(_completeDivRows > 0) {
+  if (_completeDivRows > 0) {
     _completeDiv.height = 16 * _completeDivRows+4;
     _enterIsForbidden = true;
   } else {
@@ -357,8 +357,8 @@ var _eventKeycode = null;
 
 
 function autoCompleteKeyUp(event) {
- // accès evenement compatible IE/Firefox
-  if(!event && window.event) {
+  // accès evenement compatible IE/Firefox
+  if (!event && window.event) {
     event=window.event;
   }
   if (_timeOut)
@@ -369,11 +369,11 @@ function autoCompleteKeyUp(event) {
 
   inputField = this; //event.target?event.target:event.srcElement;
   var i;
-  for(i = 0; i < _inputField.length; ++i)
+  for (i = 0; i < _inputField.length; ++i)
     if (_inputField[i] == inputField)
       break;
 
-  var command = "handleAutoComplete(" + event.keyCode + "," + i + ")";
+  var command = "handleAutoComplete(" + event.keyCode + ", " + i + ")";
   if (event.keyCode == 40 || event.keyCode == 38 || event.keyCode == 13 || event.keyCode == 27)
     eval(command);
   else
@@ -418,7 +418,7 @@ function handleAutoComplete(keyCode, i) {
   // Enter
   if (keyCode == 13 && isListVisible())
   {
-    if(cityId != null && _inputField[cityId].value == '')
+    if (cityId != null && _inputField[cityId].value == '')
     {
       setAndJump(i, _currentList[_highlightedSuggestionIndex][2], cityId, _currentList[_highlightedSuggestionIndex][1]);
     }
@@ -494,7 +494,7 @@ function PressAction(i) {
   if (_currentInputFieldValue[i].length > 0) {
     var indice;
     // T vaut true si on a dans la liste de suggestions un mot commencant comme l'entrée utilisateur
-    for (indice = 0; indice<suggestionLongueur; indice++){
+    for (indice = 0; indice<suggestionLongueur; indice++) {
       if (getSuggestion(suggestionList.item(indice)).toUpperCase().indexOf(_currentInputFieldValue[i].toUpperCase()) == 0) {
         trouve = true;
         break
@@ -507,11 +507,11 @@ function PressAction(i) {
 // taille de la selection dans le champ input
 function rangeSize(n) {
   var N = -1;
-  if (n.createTextRange){
+  if (n.createTextRange) {
     var fa = document.selection.createRange().duplicate();
     N = fa.text.length
-  } else if(n.setSelectionRange) {
-    N = n.selectionEnd-n.selectionStart
+  } else if (n.setSelectionRange) {
+    N = n.selectionEnd - n.selectionStart
   }
   return N
 }
@@ -523,9 +523,9 @@ function beforeRangeSize(n) {
     var fa = document.selection.createRange().duplicate();
     fa.moveEnd("textedit", 1);
     v = n.value.length-fa.text.length
-  } else if(n.setSelectionRange){
+  } else if (n.setSelectionRange) {
     v = n.selectionStart
-  }else{
+  } else {
     v = -1
   }
   return v
@@ -533,7 +533,7 @@ function beforeRangeSize(n) {
 
 
 // Retourne la valeur de la possibilite (texte) contenu dans une div de possibilite
-function getSuggestion(uneDiv){
+function getSuggestion(uneDiv) {
   if (!uneDiv) {
     return null;
   }
@@ -541,7 +541,7 @@ function getSuggestion(uneDiv){
 }
 
 // supprime les caractères retour chariot et line feed d'une chaine de caractères
-function trimCR(chaine){
+function trimCR(chaine) {
   for (var f = 0, nChaine="", zb = "\n\r"; f < chaine.length; f++) {
     if (zb.indexOf(chaine.charAt(f)) == -1) {
       nChaine+=chaine.charAt(f);
@@ -556,22 +556,22 @@ function hideCompleteDiv() {
 }
 
 // Rends les choix de completion visibles
-function showCompleteDiv(i){
+function showCompleteDiv(i) {
   _completeDiv.style.visibility = "visible";
   setCompleteDivSize(i)
 }
 
 
 // Handler de resize de la fenetre
-var onResizeHandler=function(event){
+function onResizeHandler(event) {
   // recalcule la taille des suggestions
-//  for(i=0; i<_inputField.length; ++i)
-//    setCompleteDivSize(i);
+  //for (i=0; i<_inputField.length; ++i)
+  //  setCompleteDivSize(i);
 }
 
 // Handler de blur sur le champ texte
-var onBlurHandler = function(event){
-    hideList();
+function onBlurHandler(event) {
+  hideList();
 };
 
 // declenchee quand on clique sur une div contenant une possibilite
@@ -581,7 +581,7 @@ function divOnMouseDown(i) {
 };
 
 // declenchee quand on passe sur une div de possibilite. La div précédente est passee en style normal
-var divOnMouseOver=function() {
+function divOnMouseOver() {
   if (_highlightedSuggestionDiv) {
     setStylePourElement(_highlightedSuggestionDiv, "AutoCompleteDiv");
   }
@@ -589,7 +589,7 @@ var divOnMouseOver=function() {
 };
 
 // declenchee quand la sourie quitte une div de possiblite. La div repasse a l'etat normal
-var divOnMouseOut = function() {
+function divOnMouseOut() {
   setStylePourElement(this, "AutoCompleteDiv");
 };
 
@@ -628,7 +628,7 @@ function mouse_event_handler(e) {
 
   var tname = (cell.nodeType == 1) ? cell.tagName.toLowerCase() : '';
 
-  while (tname != "table" && tname != "td" && tname != "th"){
+  while (tname != "table" && tname != "td" && tname != "th") {
     cell= cell.parentNode || cell.parentElement;
     tname = cell.tagName.toLowerCase();
   }
@@ -791,11 +791,11 @@ function getURLFromForm(form) {
 }
 
 function ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo) {
-  if(_xmlHttp&&_xmlHttp.readyState!=0){
+  if (_xmlHttp&&_xmlHttp.readyState!=0) {
     _xmlHttp.abort()
   }
   _xmlHttp=getXMLHTTP();
-  if(_xmlHttp){
+  if (_xmlHttp) {
     _xmlHttp.open("GET", url, true);
     _xmlHttp.onreadystatechange=function() {
       if (_xmlHttp.readyState == 4) {
