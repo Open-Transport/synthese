@@ -15,8 +15,7 @@ function swapValues(element1, element2) {
   element2.value = echange;
 }
 
-function globalKeyPressHandler(event)
-{
+function globalKeyPressHandler(event) {
   if (!event)
     event = window.event;
 
@@ -35,8 +34,7 @@ var clignoteState = 'visible';
 var clignoteElements;
 var totalElements = -1;
 
-function clignote()
-{
+function clignote() {
   var allElements = document.getElementsByTagName('*');
 
   // Cache elements to blink, since walking all elements is expensive,
@@ -84,7 +82,7 @@ var _timeOut;
 
 // retourne un objet xmlHttpRequest.
 // méthode compatible entre tous les navigateurs (IE/Firefox/Opera)
-function getXMLHTTP(){
+function getXMLHTTP() {
   var xhr = null;
   if (window.XMLHttpRequest) { // Firefox et autres
     xhr = new XMLHttpRequest();
@@ -104,19 +102,18 @@ function getXMLHTTP(){
   return xhr;
 }
 
-function XMLParse(text){
+function XMLParse(text) {
   if (window.ActiveXObject) {
     var docXML = new ActiveXObject("Microsoft.XMLDOM")
     docXML.loadXML(text)
     return docXML;
   } else {
     var parser=new DOMParser();
-    return parser.parseFromString(text,"text/xml");
+    return parser.parseFromString(text, "text/xml");
   }
 }
 
-function initAutoCompleteForm(form, submit)
-{
+function initAutoCompleteForm(form, submit) {
   _documentForm = form;
   _submitButton = submit;
   creeAutocompletionDiv();
@@ -148,19 +145,19 @@ function initAutoCompleteField(i, field, otherField, urlFunction, fieldToClean, 
 }
 
 // echappe les caractère spéciaux
-function escapeURI(La){
-  if(encodeURIComponent) {
+function escapeURI(La) {
+  if (encodeURIComponent) {
     return encodeURIComponent(La);
   }
-  if(escape) {
+  if (escape) {
     return escape(La)
   }
 }
 
-var _xmlHttp = null; //l'objet xmlHttpRequest utilisé pour contacter le serveur
+var _xmlHttp = null; // l'objet xmlHttpRequest utilisé pour contacter le serveur
 
-function callSuggestions(i, valeur){
-  //appel à l'url distante
+function callSuggestions(i, valeur) {
+  // appel à l'url distante
   var city = "";
   var place = "";
   if (_secondaryField[i])
@@ -237,8 +234,8 @@ function traiteXmlSuggestions(xmlDoc) {
   return optionsListe;
 }
 
-//insère une règle avec son nom
-function insereCSS(nom,regle){
+// insère une règle avec son nom
+function insereCSS(nom,regle) {
   if (document.styleSheets) {
     var I = document.styleSheets[0];
     if (I.addRule) { // méthode IE
@@ -249,16 +246,16 @@ function insereCSS(nom,regle){
   }
 }
 
-function initStyle(){
-  var AutoCompleteDivListeStyle = "font-size: 13px; word-wrap:break-word; ";
-  var AutoCompleteDivStyle = "display: block; padding-left: 3; padding-right: 3; height: 16px; overflow: hidden; background-color: white; cursor:pointer; text-align:left; padding-top:2px; padding-bottom:2px; ";
-  var AutoCompleteDivActStyle = "background-color: #3366cc; color: white ! important; cursor:pointer;text-align:left; padding-top:2px; padding-bottom:2px; ";
+function initStyle() {
+  var AutoCompleteDivListeStyle = "font-size: 13px; word-wrap: break-word; ";
+  var AutoCompleteDivStyle = "display: block; padding-left: 3; padding-right: 3; height: 16px; overflow: hidden; background-color: white; cursor:pointer; text-align: left; padding-top: 2px; padding-bottom: 2px; ";
+  var AutoCompleteDivActStyle = "background-color: #3366cc; color: white ! important; cursor: pointer; text-align: left; padding-top: 2px; padding-bottom: 2px; ";
   insereCSS(".AutoCompleteDivListeStyle", AutoCompleteDivListeStyle);
   insereCSS(".AutoCompleteDiv", AutoCompleteDivStyle);
   insereCSS(".AutoCompleteDivAct", AutoCompleteDivActStyle);
 }
 
-function setStylePourElement(c,name){
+function setStylePourElement(c,name) {
   c.className = name;
 }
 
@@ -286,7 +283,7 @@ function calculateWidth(i) {
   return _inputField[i].offsetWidth - 2 * 1;
 }
 
-function setCompleteDivSize(i){
+function setCompleteDivSize(i) {
   if(_completeDiv) {
     _completeDiv.style.left = calculateOffsetLeft(_inputField[i]) + "px";
     _completeDiv.style.top = calculateOffsetTop(_inputField[i]) + _inputField[i].offsetHeight - 1 + "px";
@@ -318,7 +315,7 @@ function creeAutocompletionDiv() {
 
 var currentList;
 
-function drawList(i, valeur, liste){
+function drawList(i, valeur, liste) {
   // Clean the old list
   while(_completeDiv.childNodes.length > 0) {
     _completeDiv.removeChild(_completeDiv.childNodes[0]);
@@ -359,8 +356,7 @@ function isListVisible() {
 var _eventKeycode = null;
 
 
-function autoCompleteKeyUp(event)
-{
+function autoCompleteKeyUp(event) {
  // accès evenement compatible IE/Firefox
   if(!event && window.event) {
     event=window.event;
@@ -384,8 +380,7 @@ function autoCompleteKeyUp(event)
     _timeOut = setTimeout(command, 500);
 }
 
-function handleAutoComplete(keyCode, i)
-{
+function handleAutoComplete(keyCode, i) {
   _timeOut = null;
   var inputField = _inputField[i];
   var cityId = null;
@@ -460,8 +455,7 @@ function setAndJump(id, value, idCity, cityValue) {
   }
 }
 
-function highlight(n)
-{
+function highlight(n) {
   _highlightedSuggestionIndex = n;
   var suggestionList = _completeDiv.getElementsByTagName("div");
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
@@ -523,7 +517,7 @@ function rangeSize(n) {
 }
 
 // taille du champ input non selectionne
-function beforeRangeSize(n){
+function beforeRangeSize(n) {
   var v = 0;
   if (n.createTextRange) {
     var fa = document.selection.createRange().duplicate();
@@ -634,7 +628,7 @@ function mouse_event_handler(e) {
 
   var tname = (cell.nodeType == 1) ? cell.tagName.toLowerCase() : '';
 
-  while(tname != "table" && tname !="td" && tname != "th"){
+  while (tname != "table" && tname != "td" && tname != "th"){
     cell= cell.parentNode || cell.parentElement;
     tname = cell.tagName.toLowerCase();
   }
@@ -646,7 +640,7 @@ function mouse_event_handler(e) {
     var row = cell.parentNode || cell.parentElement;
     var rowIdx = _getRowIndex(row);
 
-    if (cellIdx > 0 && cell.className!='completion') {
+    if (cellIdx > 0 && cell.className != 'completion') {
       _setCol();
     }
   }
@@ -657,15 +651,15 @@ function mouse_event_handler(e) {
     if (mouse_event_handler.previous.table)
       return;
     else {
-      tbleObj = row.parentNode || row.parentElement; //tbody
+      tbleObj = row.parentNode || row.parentElement; // tbody
       var tn = tbleObj.tagName.toLowerCase();
       while (tn != "table" && tn != "html") {
-          tbleObj = tbleObj.parentNode || tbleObj.parentElement;
-          tn = tbleObj.tagName.toLowerCase();
+        tbleObj = tbleObj.parentNode || tbleObj.parentElement;
+        tn = tbleObj.tagName.toLowerCase();
       }
       mouse_event_handler.previous.table = tbleObj;
     }
-  }//eof _getTable
+  }
 
   function _clearHighlight() {
     _clearRow();
@@ -673,14 +667,14 @@ function mouse_event_handler(e) {
 
     mouse_event_handler.previous.row = null;
     mouse_event_handler.previous.cellIdx = null;
-  }//eof clearHighlight
+  }
 
   function _clearRow() {
     if (mouse_event_handler.previous.row) {
       mouse_event_handler.previous.row.className = "";
       mouse_event_handler.previous.row.cells[0].className = "";
     }
-  }//eof clearRow
+  }
 
   function _setRow() {
     _clearRow();
@@ -692,7 +686,7 @@ function mouse_event_handler(e) {
     else {
       mouse_event_handler.previous.row = null;
     }
-  }//eof setRow
+  }
 
   function _clearCol() {
     _getTable();
@@ -703,7 +697,7 @@ function mouse_event_handler(e) {
         table.rows[i].cells[cell].className = '';
       }
     }
-  }//eof clearCol
+  }
 
   function _setCol () {
     _clearCol();
@@ -714,26 +708,25 @@ function mouse_event_handler(e) {
         trs[i].cells[cellIdx].className = 'hlt-col';
       }
       mouse_event_handler.previous.cellIdx = cellIdx;
-    }
-    else {
+    } else {
       mouse_event_handler.previous.cellIdx = null;
     }
-  }//eof setCol
+  }
 
-}//eof mouse_event
+}
 
 function _getRowIndex(row) {
-    var rtrn = row.rowIndex || 0;
+  var rtrn = row.rowIndex || 0;
 
-    if (rtrn == 0) {
-      do{
-          if (row.nodeType == 1) rtrn++;
-          row = row.previousSibling;
-      } while (row);
-      --rtrn;
-    }
-    return rtrn;
-}//eof getRowIndex
+  if (rtrn == 0) {
+    do{
+        if (row.nodeType == 1) rtrn++;
+        row = row.previousSibling;
+    } while (row);
+    --rtrn;
+  }
+  return rtrn;
+}
 
 function _getCellIndex(cell) {
   var rtrn = cell.cellIndex || 0;
@@ -746,7 +739,7 @@ function _getCellIndex(cell) {
     --rtrn;
   }
   return rtrn;
-}//eof getCellIndex
+}
 
 mouse_event_handler.previous = {cellIdx: null, row: null, table: null};
 
@@ -760,8 +753,7 @@ function addEvent(obj, event_name, fnc) {
   else
     obj["on" + event_name] = fnc;
 
-}//eof addEvent
-
+}
 
 
 window.onunload = function () {
@@ -771,8 +763,7 @@ window.onunload = function () {
 
 // Ajax generic interactivity ----------------------------------------------------------------------------------------------------------------------------
 
-function ajaxFullfill(divObject, url)
-{
+function ajaxFullfill(divObject, url) {
   if (_xmlHttp && _xmlHttp.readyState != 0) {
     _xmlHttp.abort()
   }
@@ -788,8 +779,7 @@ function ajaxFullfill(divObject, url)
   }
 }
 
-function getURLFromForm(form)
-{
+function getURLFromForm(form) {
   var url = form.action + "?";
   var first = true;
   for (var i = 0; i<form.elements.length; ++i)
@@ -800,8 +790,7 @@ function getURLFromForm(form)
   return url;
 }
 
-function ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo)
-{
+function ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo) {
   if(_xmlHttp&&_xmlHttp.readyState!=0){
     _xmlHttp.abort()
   }
@@ -823,14 +812,12 @@ function ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRun
   return false;
 }
 
-function ajaxSendFormAndRun(form, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo)
-{
+function ajaxSendFormAndRun(form, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo) {
   var url = getURLFromForm(form);
   return ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo);
 }
 
-function ajaxSendForm(divObject, form)
-{
+function ajaxSendForm(divObject, form) {
   var url = getURLFromForm(form);
   ajaxFulFill(divObject, url);
   return false;
@@ -845,8 +832,7 @@ var _destinationPlaceName;
 var _accessibility;
 var _site;
 
-function initRoutePlanningParametersBackup(originCityName, originPlaceName, destinationCityName, destinationPlaceName, accessibility, site)
-{
+function initRoutePlanningParametersBackup(originCityName, originPlaceName, destinationCityName, destinationPlaceName, accessibility, site) {
   _originCityName = originCityName;
   _originPlaceName = originPlaceName;
   _destinationCityName = destinationCityName;
@@ -863,8 +849,7 @@ var _userEMail;
 var _userId;
 var _sessionId;
 
-function initSession(sessionId, userName, userPhone, userEMail, userId)
-{
+function initSession(sessionId, userName, userPhone, userEMail, userId) {
   _userName = userName;
   _userPhone = userPhone;
   _sessionId = sessionId;
@@ -872,8 +857,7 @@ function initSession(sessionId, userName, userPhone, userEMail, userId)
   _userEMail = userEMail;
 }
 
-function ajaxLoginSuccess(xmlSession)
-{
+function ajaxLoginSuccess(xmlSession) {
   var docXML = XMLParse(xmlSession);
   var acceptedElements = docXML.getElementsByTagName('session');
   if (!acceptedElements.length || !acceptedElements[0].firstChild || !acceptedElements[0].firstChild.data)
@@ -897,8 +881,7 @@ function ajaxLoginSuccess(xmlSession)
   }
 }
 
-function ajaxLogout(functionToRun)
-{
+function ajaxLogout(functionToRun) {
   initSession("", "", "", "");
   return true;
 }
@@ -909,8 +892,7 @@ function ajaxLogout(functionToRun)
 
 var fadeDiv;
 
-function initLightBox()
-{
+function initLightBox() {
   // FIXME: with IE7 the lightBox div stands above the popup (it works with IE7 elsewhere).
   if (document.body.className.indexOf("ie7OrLess") != -1)
     return;
@@ -919,16 +901,14 @@ function initLightBox()
     return;
 
   fadeDiv = document.createElement("DIV");
-  fadeStyle = "display: block;visibility:hidden;  position: fixed;  top: 0%;  left: 0%;  width: 100%;height: 100%;  background-color: black;  z-index:10001;  -moz-opacity: 0.8;  -khtml-opacity:0.7;  opacity:.80;  filter: alpha(opacity=80);";
+  fadeStyle = "display: block; visibility: hidden; position: fixed; top: 0%; left: 0%; width: 100%; height: 100%; background-color: black; z-index: 10001; -moz-opacity: 0.8; -khtml-opacity:0.7; opacity: .80; filter: alpha(opacity=80);";
   fadeDiv.id = 'fade';
   fadeDiv.setAttribute("style", fadeStyle);
   fadeDiv.style.cssText = fadeStyle;
   document.body.appendChild(fadeDiv);
 }
 
-
-function showPopup(id)
-{
+function showPopup(id) {
   hidePopup();
   document.getElementById(id).style.display = 'block';
   if (fadeDiv)
@@ -936,12 +916,11 @@ function showPopup(id)
   document.getElementById('routesMap').style.display = 'block';
 }
 
-function hidePopup()
-{
+function hidePopup() {
   initLightBox();
   var aElm=document.body.getElementsByTagName('div');
-  for(var i = 0; i < aElm.length; i++)
-    if(aElm[i].className == 'popup_content')
+  for (var i = 0; i < aElm.length; i++)
+    if (aElm[i].className == 'popup_content')
       aElm[i].style.display = 'none';
   if (fadeDiv)
     fadeDiv.style.visibility = 'hidden';
