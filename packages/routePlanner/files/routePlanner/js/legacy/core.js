@@ -399,7 +399,8 @@ function handleAutoComplete(keyCode, i) {
     callSuggestions(i, valeur); // appel distant
     _currentInputFieldValue[i] = inputField.value;
   }
-  if (keyCode == 40 && isListVisible()) {   // Key down
+  // Key down
+  if (keyCode == 40 && isListVisible()) {
     if (_highlightedSuggestionIndex == -1 ||
         (_highlightedSuggestionIndex == _completeDiv.getElementsByTagName("div").length - 1))
       highlight(0);
@@ -460,7 +461,7 @@ function highlight(n) {
   var suggestionList = _completeDiv.getElementsByTagName("div");
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
   var suggestionLongueur = suggestionList.length;
-  for (var l = 0; l<suggestionLongueur; ++l) {
+  for (var l = 0; l < suggestionLongueur; ++l) {
     setStylePourElement(suggestionList.item(l), "AutoCompleteDiv");
   }
   if (_highlightedSuggestionDiv)
@@ -494,7 +495,7 @@ function PressAction(i) {
   if (_currentInputFieldValue[i].length > 0) {
     var indice;
     // T vaut true si on a dans la liste de suggestions un mot commencant comme l'entrée utilisateur
-    for (indice = 0; indice<suggestionLongueur; indice++) {
+    for (indice = 0; indice < suggestionLongueur; indice++) {
       if (getSuggestion(suggestionList.item(indice)).toUpperCase().indexOf(_currentInputFieldValue[i].toUpperCase()) == 0) {
         trouve = true;
         break
@@ -582,10 +583,11 @@ function divOnMouseDown(i) {
 
 // declenchee quand on passe sur une div de possibilite. La div précédente est passee en style normal
 function divOnMouseOver() {
-  if (_highlightedSuggestionDiv) {
-    setStylePourElement(_highlightedSuggestionDiv, "AutoCompleteDiv");
-  }
-  setStylePourElement(this, "AutoCompleteDivAct")
+  var highlightedIndex = 0, e = this;
+  while (e = e.previousSibling)
+    highlightedIndex++;
+
+  highlight(highlightedIndex);
 };
 
 // declenchee quand la sourie quitte une div de possiblite. La div repasse a l'etat normal
@@ -719,8 +721,9 @@ function _getRowIndex(row) {
   var rtrn = row.rowIndex || 0;
 
   if (rtrn == 0) {
-    do{
-        if (row.nodeType == 1) rtrn++;
+    do {
+        if (row.nodeType == 1)
+          rtrn++;
         row = row.previousSibling;
     } while (row);
     --rtrn;
@@ -747,7 +750,7 @@ function addEvent(obj, event_name, fnc) {
   if (typeof obj == "undefined")
     return;
   else if (obj.attachEvent)
-    obj.attachEvent("on"+event_name, fnc);
+    obj.attachEvent("on" + event_name, fnc);
   else if (obj.addEventListener)
     obj.addEventListener(event_name, fnc, false);
   else
@@ -782,7 +785,7 @@ function ajaxFullfill(divObject, url) {
 function getURLFromForm(form) {
   var url = form.action + "?";
   var first = true;
-  for (var i = 0; i<form.elements.length; ++i)
+  for (var i = 0; i < form.elements.length; ++i)
     if (form.elements[i].name) {
       url += (!first ? "&" : "") + form.elements[i].name + "=" + form.elements[i].value;
       first = false;
