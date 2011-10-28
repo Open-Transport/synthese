@@ -108,7 +108,7 @@ function XMLParse(text) {
     docXML.loadXML(text)
     return docXML;
   } else {
-    var parser=new DOMParser();
+    var parser = new DOMParser();
     return parser.parseFromString(text, "text/xml");
   }
 }
@@ -175,8 +175,8 @@ function callSuggestions(i, valeur) {
       return;
   }
 
-  if (_xmlHttp && _xmlHttp.readyState !=0 ) {
-    _xmlHttp.abort()
+  if (_xmlHttp && _xmlHttp.readyState != 0) {
+    _xmlHttp.abort();
   }
   if (_waitObject[i] && _normalObject[i]) {
     _waitObject[i].style.display = 'inline';
@@ -324,13 +324,13 @@ function drawList(i, valeur, liste) {
   // mise en place des suggestions
   _currentList = liste;
   for (var f = 0; f < liste.length; ++f) {
-    var nouveauDiv=document.createElement("DIV");
+    var nouveauDiv = document.createElement("DIV");
     nouveauDiv.onmousedown = divOnMouseDown;
     nouveauDiv.onmouseover = divOnMouseOver;
     nouveauDiv.onmouseout = divOnMouseOut;
     setStylePourElement(nouveauDiv, "AutoCompleteDiv");
     var nouveauSpan = document.createElement("SPAN");
-    nouveauSpan.innerHTML=liste[f][0]; // le texte de la suggestion
+    nouveauSpan.innerHTML = liste[f][0]; // le texte de la suggestion
     nouveauDiv.appendChild(nouveauSpan);
     _completeDiv.appendChild(nouveauDiv)
   }
@@ -359,7 +359,7 @@ var _eventKeycode = null;
 function autoCompleteKeyUp(event) {
   // accès evenement compatible IE/Firefox
   if (!event && window.event) {
-    event=window.event;
+    event = window.event;
   }
   if (_timeOut)
   {
@@ -542,9 +542,9 @@ function getSuggestion(uneDiv) {
 
 // supprime les caractères retour chariot et line feed d'une chaine de caractères
 function trimCR(chaine) {
-  for (var f = 0, nChaine="", zb = "\n\r"; f < chaine.length; f++) {
+  for (var f = 0, nChaine = "", zb = "\n\r"; f < chaine.length; f++) {
     if (zb.indexOf(chaine.charAt(f)) == -1) {
-      nChaine+=chaine.charAt(f);
+      nChaine += chaine.charAt(f);
     }
   }
   return nChaine
@@ -565,7 +565,7 @@ function showCompleteDiv(i) {
 // Handler de resize de la fenetre
 function onResizeHandler(event) {
   // recalcule la taille des suggestions
-  //for (i=0; i<_inputField.length; ++i)
+  //for (i = 0; i < _inputField.length; ++i)
   //  setCompleteDivSize(i);
 }
 
@@ -605,7 +605,7 @@ function mouse_click_handler(e) {
   var tname = (cell.nodeType == 1) ? cell.tagName.toLowerCase() : '';
 
   while(tname != "table" && tname !="td" && tname != "th") {
-    cell= cell.parentNode || cell.parentElement;
+    cell = cell.parentNode || cell.parentElement;
     tname = cell.tagName.toLowerCase();
   }
 
@@ -629,7 +629,7 @@ function mouse_event_handler(e) {
   var tname = (cell.nodeType == 1) ? cell.tagName.toLowerCase() : '';
 
   while (tname != "table" && tname != "td" && tname != "th") {
-    cell= cell.parentNode || cell.parentElement;
+    cell = cell.parentNode || cell.parentElement;
     tname = cell.tagName.toLowerCase();
   }
 
@@ -791,13 +791,13 @@ function getURLFromForm(form) {
 }
 
 function ajaxRunUrl(url, resultAnalyzeFunction, functionToRunIfOk, functionToRunIfKo) {
-  if (_xmlHttp&&_xmlHttp.readyState!=0) {
+  if (_xmlHttp && _xmlHttp.readyState != 0) {
     _xmlHttp.abort()
   }
-  _xmlHttp=getXMLHTTP();
+  _xmlHttp = getXMLHTTP();
   if (_xmlHttp) {
     _xmlHttp.open("GET", url, true);
-    _xmlHttp.onreadystatechange=function() {
+    _xmlHttp.onreadystatechange = function() {
       if (_xmlHttp.readyState == 4) {
         if (resultAnalyzeFunction(_xmlHttp.responseText))
           functionToRunIfOk(_xmlHttp.responseText);
@@ -918,12 +918,12 @@ function showPopup(id) {
 
 function hidePopup() {
   initLightBox();
-  var aElm=document.body.getElementsByTagName('div');
+  var aElm = document.body.getElementsByTagName('div');
   for (var i = 0; i < aElm.length; i++)
     if (aElm[i].className == 'popup_content')
       aElm[i].style.display = 'none';
   if (fadeDiv)
     fadeDiv.style.visibility = 'hidden';
-  document.getElementById('routesMap').style.display='none';
+  document.getElementById('routesMap').style.display = 'none';
 }
 
