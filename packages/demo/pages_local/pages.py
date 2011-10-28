@@ -1,7 +1,7 @@
 pages = [{
     'id': pid(0),
     'rank': 0,
-    'title': 'Template_',
+    'title': 'Template',
     'content1': 'file:template.html',
 }, {
     'id': pid(1),
