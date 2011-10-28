@@ -26,3 +26,6 @@ requirejs/*.js
   http://requirejs.org/docs/release/0.27.1/minified/require.js
   http://requirejs.org/docs/release/0.27.1/minified/text.js
   http://requirejs.org/docs/release/0.27.1/minified/order.js
+
+jquery-ui-1.8.15.custom.min.js
+  FIXME: how was it generated?
