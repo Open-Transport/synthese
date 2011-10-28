@@ -7,25 +7,25 @@ window.app = function() {
     /*
      * Private namespace
      */
-     
+
     /**
      * Property: maps
      * {Array} array keeping a reference to the three app.Gis objects instanciated
      */
     var maps = new Array(3);
-    
+
     /**
      * Property: solutionId
      * {Integer} Solution index to display (defaults to the first one)
      */
     var solutionId = 0;
-    
+
     /**
      * Method: refreshDisplay
      * refreshes solution ID indicator
      */
     var refreshDisplay = function() {
-        document.getElementById("resultNb").innerHTML = solutionId + 1; 
+        document.getElementById("resultNb").innerHTML = solutionId + 1;
     };
 
     /*
@@ -40,13 +40,13 @@ window.app = function() {
             // zoom level for start and stop maps (up to 17 = closer)
             zoomLevelForPoint: 15
         },
-        
+
         /**
          * Property: bootstrap
          * {Object} Initialization data we got from server at startup
          */
         bootstrap: null,
-        
+
         /**
          * Method: displayError
          *     Shows a window, with warning text inside
@@ -54,7 +54,7 @@ window.app = function() {
         displayError: function(msg){
             alert(msg);
         },
-    
+
         /**
          * Method: init
          *
@@ -64,18 +64,18 @@ window.app = function() {
                 return;
             // bootstrap data got from HTML page
             this.bootstrap = OpenLayers.Util.extend({}, bootstrap);
-            
+
             // initialize gis objects
             var G = app.Gis;
             var type = G.type;
-            
+
             // ID is 0 for start and stop maps because the starting and end point do not vary with solutions
-            maps[type.START] = new G({div: 'startMap', type: type.START, id: 0}); 
+            maps[type.START] = new G({div: 'startMap', type: type.START, id: 0});
             // commented because it's not available at startup (map div has no dimension)
             //maps[type.ROUTES] = new G({div: 'routesMap', type: type.ROUTES, id: solutionId});
             maps[type.STOP] = new G({div: 'stopMap', type: type.STOP, id: 0});
         },
-        
+
         /**
          * Method: displaySolution
          * display maps corresponding to given routing solution (between 0 and N-1)
@@ -88,15 +88,15 @@ window.app = function() {
             refreshDisplay();
             if (!maps[app.Gis.type.ROUTES]) {
                 maps[app.Gis.type.ROUTES] = new app.Gis({
-                    div: 'routesMap', 
-                    type:app.Gis.type.ROUTES, 
+                    div: 'routesMap',
+                    type:app.Gis.type.ROUTES,
                     id: solutionId
                 });
             } else {
                 maps[app.Gis.type.ROUTES].refresh(solutionId);
             }
         },
-        
+
         /**
          * Method: prevSolution
          * display maps corresponding to previous routing solution
@@ -109,7 +109,7 @@ window.app = function() {
             refreshDisplay();
             maps[app.Gis.type.ROUTES].refresh(solutionId);
         },
-        
+
         /**
          * Method: nextSolution
          * display maps corresponding to next routing solution
@@ -122,7 +122,7 @@ window.app = function() {
             refreshDisplay();
             maps[app.Gis.type.ROUTES].refresh(solutionId);
         },
-        
+
         /**
          * Method: zoomToThisPlace
          * sets map center and zooms to a connection zone (for instance)
@@ -132,7 +132,7 @@ window.app = function() {
         zoomToThisPlace: function() {
             maps[app.Gis.type.ROUTES].zoomToThisPlace(arguments);
         },
-        
+
         /**
          * Method: destroy
          *
@@ -168,13 +168,13 @@ window.app.Gis = function(options){
      * {integer} routing solution ID
      */
     this.id = options.id;
-    
+
     /**
      * Property: map
      * {OpenLayers.Map} map object
      */
     this.map = null;
-    
+
     this.epsg900913 = new OpenLayers.Projection("EPSG:900913");
     this.epsg4326 = new OpenLayers.Projection("EPSG:4326");
 
@@ -188,13 +188,13 @@ window.app.Gis.type = {
 };
 
 window.app.Gis.prototype = {
-    
+
     /**
      * Method: createMap
      * Creates the map
      */
     createMap: function() {
-        
+
         var map = new OpenLayers.Map(this.div, {
             projection: this.epsg900913,
             displayProjection: this.epsg4326,
@@ -211,10 +211,10 @@ window.app.Gis.prototype = {
             maxExtent: new OpenLayers.Bounds(-20037508.34, -20037508.34,
                                               20037508.34, 20037508.34)
         });
-        
+
         return map;
     },
-    
+
     getBackgroundLayers: function() {
         var bgLayers = [];
         bgLayers.push(
@@ -238,13 +238,13 @@ window.app.Gis.prototype = {
 
         return bgLayers;
     },
-    
+
     /**
      * Method: createLayers
      *     creates all layers
      */
     createLayers: function() {
-  
+
         var layers = [];
 
         layers.push.apply(layers, this.getBackgroundLayers());
@@ -276,7 +276,7 @@ window.app.Gis.prototype = {
                 })
             })
         );
-        
+
         layers.push( // icons for bus, metro lines ...
             new OpenLayers.Layer.Vector("Icons", {
                 styleMap: new OpenLayers.StyleMap({
@@ -290,7 +290,7 @@ window.app.Gis.prototype = {
                 })
             })
         );
-        
+
         layers.push(
             new OpenLayers.Layer.Vector("Labels", {
                 styleMap: new OpenLayers.StyleMap({
@@ -303,7 +303,7 @@ window.app.Gis.prototype = {
                         label : '${name}',
                         fontColor: "#ffffff", //"${color}",
                         fontSize: "13px",
-                        fontFamily: "Arial, sans-serif", //"Courier New, Courier, monospace", 
+                        fontFamily: "Arial, sans-serif", //"Courier New, Courier, monospace",
                         fontWeight: "bold",
                         labelAlign: "cm" //  "lb" "cm" "rt"
                     })
@@ -331,25 +331,25 @@ window.app.Gis.prototype = {
                 })
             })
         );
-        
+
         return layers;
     },
-    
+
     /**
      * Method: addDeferedControls
      *   Adds controls to the map object
-     * 
+     *
      */
     addDeferedControls: function() {
         var map = this.map;
-        
+
         map.addControl(new OpenLayers.Control.MapTypePanel());
-        
+
         var control = new OpenLayers.Control.SelectFeature(
             this.getLayerNamed("Points"), {
                 highlightOnly: true,
                 hover: true,
-                eventListeners: { 
+                eventListeners: {
                     "featurehighlighted": OpenLayers.Function.bind(function(options) {
                         var feature = options.feature;
                         if (feature.timer) {
@@ -368,29 +368,29 @@ window.app.Gis.prototype = {
         map.addControl(control);
         control.activate();
     },
-    
+
     /**
      * Method: destroyPopup
      * removes and destroys popup attached to a feature
      */
     destroyPopup: function(feature) {
         if (feature && feature.popup) {
-            feature.popup.destroy(); 
+            feature.popup.destroy();
             feature.popup = null;
         }
         feature.timer = null;
     },
-    
+
     /**
      * Method: displayPopup
      *     Displays a Popup on feature
      */
     displayPopup: function(feature) {
-        
+
         var centroid = feature.geometry.getCentroid();
-        
-        var popup = new OpenLayers.Popup.AutoSizedFramedCloud("popup", 
-            new OpenLayers.LonLat(centroid.x, centroid.y), 
+
+        var popup = new OpenLayers.Popup.AutoSizedFramedCloud("popup",
+            new OpenLayers.LonLat(centroid.x, centroid.y),
             null,
             feature.attributes.name,
             null,
@@ -400,7 +400,7 @@ window.app.Gis.prototype = {
         this.map.addPopup(popup);
         return popup;
     },
-    
+
     /**
      * Method: refresh
      *   called when solution ID has changed
@@ -415,28 +415,28 @@ window.app.Gis.prototype = {
         this.getLayerNamed("Points").destroyFeatures();
         this.displayRoutes();
     },
-    
+
     /**
      * Method: displayRoutes
      *   Adds vector features to the map
-     * 
+     *
      */
     displayRoutes: function() {
         var type = app.Gis.type;
         var points = app.bootstrap.routes[this.id].points;
         var nbpoints = points.length;
-        
+
         // pre-processing:
         points[0].type = 'start';
         points[nbpoints-1].type = 'stop';
-        
+
         // draw points and lines according to map type:
         switch (this.type) {
             case type.START:
                 // just display start point
-                this.drawPoint(points[0]); 
+                this.drawPoint(points[0]);
                 break;
-                
+
             case type.ROUTES:
                 for (var len=nbpoints, i=len-2; i>=0; i--) {
                     this.goFromTo({
@@ -446,34 +446,34 @@ window.app.Gis.prototype = {
                     });
                 }
                 break;
-                
+
             case type.STOP:
                 // just display final point
                 this.drawPoint(points[nbpoints-1]);
                 break;
-                
+
             default:
                 app.displayError("[app.Gis.displayRoutes] unknown map type");
                 break;
         }
-        
+
         // Zoom to data extent + 15%
         var b = this.getLayerNamed("Points").getDataExtent();
         b.extend(this.getLayerNamed("Routes").getDataExtent());
-        
+
         this.zoomToBounds(b);
     },
-    
+
     /**
      * Method: goFromTo
-     *   Adds vector features to the map, corresponding to one foot trip 
+     *   Adds vector features to the map, corresponding to one foot trip
      *   between one point and another
      */
     goFromTo: function(options) {
-    
+
         // display point A
         var p1 = this.drawPoint(options.start);
-        
+
         // display point B if requested
         var p2;
         if (options.displayFinalPoint) {
@@ -481,14 +481,14 @@ window.app.Gis.prototype = {
         } else {
             p2 = this.positionToLonLat(options.stop.position);
         }
-        
+
         // display Line
         if(options.start.wkt)
           this.drawLine({wkt: options.start.wkt, lineRef: options.start.means});
         else
           this.drawLine({from: p1, to: p2, lineRef: options.start.means});
     },
-    
+
     /**
      * Method: positionToLonLat
      *   converts a position string (lonlat 4326 string) into an OpenLayers.LonLat 900913
@@ -498,7 +498,7 @@ window.app.Gis.prototype = {
         ll.transform(this.epsg4326, this.epsg900913);
         return new OpenLayers.Geometry.Point(ll.lon, ll.lat);
     },
-    
+
     /**
     * Method: zoomToBounds
     * sets map center and zooms to a BoundingBox
@@ -510,7 +510,7 @@ window.app.Gis.prototype = {
             this.map.zoomToExtent(bounds.scale(1.15));
         }
     },
-    
+
     /**
     * Method: zoomToThisPlace
     * sets map center and zooms to a connection zone (for instance)
@@ -528,21 +528,21 @@ window.app.Gis.prototype = {
         }
         this.zoomToBounds(b);
     },
-    
+
     /**
      * Method: drawPoint
      *   Adds one point vector features to the map
      *   TODO: add styling
      */
     drawPoint: function(point) {
-    
+
         var layer = this.getLayerNamed("Points");
-        
+
         var p = this.positionToLonLat(point.position);
-        
+
         var fileName;
         var name = '<b>'+point.name+'</b>';
-        
+
         switch (point.type) {
             case 'start':
                 fileName = 'google_chart/flag.png';
@@ -555,24 +555,24 @@ window.app.Gis.prototype = {
                 //name = 'Correspondance à<br/><b>'+point.name+'</b>';
                 break;
         }
-        
+
         layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
-                picto: '/map/images/' + fileName, 
+                picto: '/map/images/' + fileName,
                 name: name
             })
         ]);
-        
+
         return p;
     },
-    
+
     /**
      * Method: drawLine
      *   Adds a linestring vector features to the map
      */
     drawLine: function(options) {
         var attributes = app.bootstrap.lines[options.lineRef];
-    
+
         var layer = this.getLayerNamed("Routes");
         var blackLayer = this.getLayerNamed("BlackRoutes");
         var line;
@@ -596,28 +596,28 @@ window.app.Gis.prototype = {
         blackLayer.addFeatures([
             new OpenLayers.Feature.Vector(line.clone(), attributes)
         ]);
-        
+
         var labelsLayer = this.getLayerNamed("Labels");
         var ll = line.getBounds().getCenterLonLat();
         var point = new OpenLayers.Geometry.Point(ll.lon, ll.lat);
         labelsLayer.addFeatures([
             new OpenLayers.Feature.Vector(point, attributes)
         ]);
-        
+
         var iconsLayer = this.getLayerNamed("Icons");
         iconsLayer.addFeatures([
             new OpenLayers.Feature.Vector(point.clone(), attributes)
         ]);
-        
+
         return line;
     },
-        
+
     /**
      * Method: init
      */
     init: function() {
         OpenLayers.Lang.setCode('fr');
-        
+
         OpenLayers.Popup.AutoSizedFramedCloud = OpenLayers.Class(
             OpenLayers.Popup.FramedCloud, {
                 'autoSize': true,
@@ -625,31 +625,31 @@ window.app.Gis.prototype = {
                 'relativePosition': 'bl'
         });
 
-        var map = this.createMap(this.div);        
-            
+        var map = this.createMap(this.div);
+
         var layers = this.createLayers();
         for (var i=0; i<layers.length; i++) {
             map.addLayer(layers[i]);
         }
-        
+
         this.map = map;
-        
+
         this.addDeferedControls();
-        
+
         this.displayRoutes();
     },
-    
+
     /**
      * Method: destroy
      */
     destroy: function() {
         this.map = null;
     },
-        
+
     /**
      * Method: getLayerNamed
      *     Use this to get a layer object from its name
-     */  
+     */
     getLayerNamed: function(name) {
         return this.map.getLayersByName(name)[0];
     }
