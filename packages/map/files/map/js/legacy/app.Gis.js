@@ -66,14 +66,13 @@ window.app = function() {
             this.bootstrap = OpenLayers.Util.extend({}, bootstrap);
 
             // initialize gis objects
-            var G = app.Gis;
-            var type = G.type;
+            var type = app.Gis.type;
 
             // ID is 0 for start and stop maps because the starting and end point do not vary with solutions
-            maps[type.START] = new G({div: 'startMap', type: type.START, id: 0});
+            maps[type.START] = new app.Gis({div: 'startMap', type: type.START, id: 0});
             // commented because it's not available at startup (map div has no dimension)
             //maps[type.ROUTES] = new G({div: 'routesMap', type: type.ROUTES, id: solutionId});
-            maps[type.STOP] = new G({div: 'stopMap', type: type.STOP, id: 0});
+            maps[type.STOP] = new app.Gis({div: 'stopMap', type: type.STOP, id: 0});
         },
 
         /**
