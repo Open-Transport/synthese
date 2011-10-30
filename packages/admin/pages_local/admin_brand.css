@@ -1,0 +1,7 @@
+#title > #brand {
+  color: blue;
+  float: right;
+
+  margin-right: 5em;
+  font-size: large;
+}
