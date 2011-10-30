@@ -163,7 +163,7 @@ class DBPagesWriter(PagesWriter):
         for page in pages:
             self.project.db_backend.query(
                 'update t063_web_pages set content1 = ? where id = ?',
-                page.content1, page.id)
+                [page.content1, page.id])
 
 
 class FilesPagesWriter(FilesPageMixin, PagesWriter):
@@ -348,10 +348,10 @@ def _sync_files_to_site(project, site, host, db_writer=False):
     SyncState(project, site).set_synced_pages(pages)
 
 
-def sync_from_files(project, host=None):
+def sync_from_files(project, host, write_db):
     for site in project.sites:
         log.info('Syncing files from site %r', site.name)
-        _sync_files_to_site(project, site, host)
+        _sync_files_to_site(project, site, host, db_writer=write_db)
 
 
 def sync_site(project, site, host):
