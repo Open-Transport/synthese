@@ -122,7 +122,7 @@ class Package(object):
             elif fixtures_file.endswith('.importer'):
                 self.project._run_testdata_importer()
 
-    def _load_pages(self, site, local):
+    def _load_pages(self, site, local, overwrite):
         pages_dir = join(self.path, 'pages_local' if local else 'pages')
         if not os.path.isdir(pages_dir):
             return
@@ -176,12 +176,19 @@ class Package(object):
             if ('title' not in page and
                 page.get('smart_url_path', '').startswith(':')):
                 page['title'] = page['smart_url_path'][1:]
+
+            if not overwrite and self.project.db_backend.query(
+                    'select 1 from t063_web_pages where id = ?', [page['id']]):
+                log.debug('Page %r already exists. Not overwriting.', page['id'])
+                continue
+            
+            log.debug("FINAL PAGE %r", page)
             self.project.db_backend.replace_into('t063_web_pages', page)
 
-    def load_data(self, site, local):
+    def load_data(self, site, local, overwrite):
         if not local:
             self._load_fixtures(site)
-        self._load_pages(site, local)
+        self._load_pages(site, local, overwrite)
 
 
 class PackagesLoader(object):
@@ -425,21 +432,21 @@ class Project(object):
         self.db_backend.drop_db()
 
     @command()
-    def load_data(self, local=False):
+    def load_data(self, local=False, overwrite=True):
         """Load data into the database."""
         log.info('loading_data into project (local:%s)', local)
         # TODO: don't import fixtures from a package more than once.
         for site in self.sites:
             for package in site.packages:
                 log.debug('Loading site:%s package:%s', site, package)
-                package.load_data(site, local)
+                package.load_data(site, local, overwrite)
 
     @command()
-    def load_local_data(self):
+    def load_local_data(self, overwrite):
         """
         Load data into the database (data loaded only once meant to be edited)
         """
-        self.load_data(True)
+        self.load_data(True, overwrite)
 
     @command()
     def reset(self):
@@ -450,7 +457,7 @@ class Project(object):
         self.clean()
         self.db_backend.init_db()
         self.load_data()
-        self.load_local_data()
+        self.load_local_data(True)
 
     @property
     def _mail_conn(self):
@@ -649,8 +656,8 @@ The synthese.py wrapper script.
         db_sync.sync_to_files(self)
 
     @command()
-    def db_sync_from_files(self, host=None):
-        db_sync.sync_from_files(self, host)
+    def db_sync_from_files(self, host, write_db):
+        db_sync.sync_from_files(self, host, write_db)
 
     @command()
     def db_sync(self, host=None):
@@ -666,16 +673,16 @@ The synthese.py wrapper script.
             raise Exception('No remote server defined in configuration')
 
         @contextlib.contextmanager
-        def remote_transaction_sqlite(conn_info):
-            remote_db_path = join(self.db_path, 'remote_config.db3')
+        def remote_transaction_sqlite(conn_info): 
+            remote_db_local_path = join(self.db_path, 'remote_config.db3')
 
-            log.info('Fetching db to %r', remote_db_path)
-            # TODO: this is won't with the new project system.
-            _rsync(self.config, '/srv/data/s3-server/config.db3',
-                utils.to_cygwin_path(remote_db_path))
+            log.info('Fetching db to %r', remote_db_local_path)
+            # TODO: this is wrong with the new project system.
+            _rsync(self.config, self.config.remote_db_path,
+                utils.to_cygwin_path(remote_db_local_path))
 
             remote_conn_info = self.db_backend.conn_info.copy()
-            remote_conn_info['path'] = remote_db_path
+            remote_conn_info['path'] = remote_db_local_path
 
             yield remote_conn_info
 
