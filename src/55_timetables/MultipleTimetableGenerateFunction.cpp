@@ -68,6 +68,11 @@ namespace synthese
 				}
 				++rank;
 			}
+			if(_ignorePastDates)
+			{
+				map.insert(TimetableGenerateFunction::PARAMETER_IGNORE_PAST_DATES, *_ignorePastDates);
+			}
+
 			return map;
 		}
 
@@ -100,6 +105,8 @@ namespace synthese
 					throw RequestException("No such calendar");
 				}
 			}
+
+			_ignorePastDates = map.getOptional<bool>(TimetableGenerateFunction::PARAMETER_IGNORE_PAST_DATES);
 
 			// Display templates
 			try
@@ -199,6 +206,7 @@ namespace synthese
 				function.setSavedParameters(_savedParameters);
 				function.setTimetable(tt.first);
 				function.setCalendarTemplate(tt.second);
+				if(_ignorePastDates) function.setIgnorePastDates(*_ignorePastDates);
 				function.setTimetableRank(timetableRank);
 				function.setPage(_pageForSubTimetable);
 				function.setRowPage(_rowPage);

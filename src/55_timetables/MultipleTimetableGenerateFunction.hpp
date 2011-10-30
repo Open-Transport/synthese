@@ -70,6 +70,7 @@ namespace synthese
 
 		protected:
 			typedef std::vector<std::pair<boost::shared_ptr<const Timetable>, boost::shared_ptr<const calendar::CalendarTemplate> > > Timetables;
+			boost::optional<bool> _ignorePastDates;
 
 			//! \name Page parameters
 			//@{
