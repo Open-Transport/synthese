@@ -62,6 +62,8 @@ include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
 
 include_directories("${PROJECT_SOURCE_DIR}/src")
+include_directories(${CMAKE_CURRENT_BINARY_DIR})
+
 
 foreach(module ${MODULES})
   # TODO: each module should only have an include path with the current module group or its dependencies.

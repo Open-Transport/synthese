@@ -58,7 +58,7 @@ namespace synthese
 			std::ostream& stream,
 			const AdminRequest& request
 		) const	{
-			stream << "<p>Bienvenue sur le module d'administration de SYNTHESE " << ServerModule::VERSION << ".</p>";
+			stream << "<p>Bienvenue sur le module d'administration de SYNTHESE " << ServerModule::VERSION_INFO << ".</p>";
 
 			stream << "<h1>Accès directs</h1>";
 
