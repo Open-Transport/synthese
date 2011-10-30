@@ -2,7 +2,7 @@ pages = [{
     'id': pid(0),
     'rank': 0,
     'title': 'routePlanner',
-    'content1': 'TODO',
+    'content1': '',
 }, {
     'id': pid(1), # 17732927894847489
     'rank': 0,
