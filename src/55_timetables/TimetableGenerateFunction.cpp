@@ -78,6 +78,7 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_CITY_PREFIX("city");
 		const string TimetableGenerateFunction::PARAMETER_DAY("day");
 		const string TimetableGenerateFunction::PARAMETER_WAYBACK_FILTER("wayback");
+		const string TimetableGenerateFunction::PARAMETER_IGNORE_PAST_DATES("ignore_past_dates");
 
 		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
 		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
@@ -166,6 +167,10 @@ namespace synthese
 			ParametersMap map;
 			if(_timetable.get())
 			{
+				if(_ignorePastDates)
+				{
+					map.insert(PARAMETER_IGNORE_PAST_DATES, *_ignorePastDates);
+				}
 				if(_commercialLine.get())
 				{
 					map.insert(Request::PARAMETER_OBJECT_ID, _commercialLine->getKey());
@@ -259,6 +264,7 @@ namespace synthese
 				_calendarTemplate = shared_ptr<CalendarTemplate>(new CalendarTemplate(curDate));
 			}
 
+			_ignorePastDates = map.getOptional<bool>(PARAMETER_IGNORE_PAST_DATES);
 
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
@@ -503,7 +509,12 @@ namespace synthese
 					_timetable->getGenerator(
 						Env::GetOfficialEnv(),
 						_calendarTemplate.get() && _calendarTemplate->isLimited() ?
-							optional<Calendar>(_calendarTemplate->getResult()) :
+							optional<Calendar>(
+								(_ignorePastDates && (*_ignorePastDates) ?
+									_calendarTemplate->getResult(Calendar(date(day_clock::local_day()),_calendarTemplate->getMaxDate())) :
+									_calendarTemplate->getResult()
+								)
+							) :
 							optional<Calendar>()
 				)	);
 				TimetableResult result(generator->build(true, _warnings));
@@ -581,7 +592,12 @@ namespace synthese
 									tt->getGenerator(
 										Env::GetOfficialEnv(),
 										_calendarTemplate.get() && _calendarTemplate->isLimited() ?
-											optional<Calendar>(_calendarTemplate->getResult()) :
+											optional<Calendar>(
+												(_ignorePastDates && (*_ignorePastDates) ?
+													_calendarTemplate->getResult(Calendar(date(day_clock::local_day()),_calendarTemplate->getMaxDate())) :
+													_calendarTemplate->getResult()
+												)
+											) :
 											optional<Calendar>()
 								)	);
 								TimetableResult r(g->build(true, warnings));
