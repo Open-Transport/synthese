@@ -78,7 +78,10 @@ DEFAULTS = {
     'send_mail_on_crash': False,
 
     # remote project management
+    # TODO: should be called remote_server
     'server': None,
+    # TODO: should use new project layout by default
+    'remote_db_path': '/srv/data/s3-server/config.db3',
     'ssh_global_opts': '',
     'ssh_opts': '',
     'rsync_opts': '',

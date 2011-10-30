@@ -135,7 +135,11 @@ def add_project_subparsers(subparsers):
         return parser
 
     add_parser('load_data')
-    add_parser('load_local_data')
+    def load_local_data(project, args, env):
+        project.load_local_data(args.overwrite)
+    parser = add_parser('load_local_data', func=load_local_data)
+    parser.add_argument('--overwrite', action='store_true', default=False,
+        help='Overwrite existing pages.')
     add_parser('reset')
     add_parser('rundaemon', ('run', 'start'))
     add_parser('stopdaemon', ('stop',))
@@ -151,9 +155,12 @@ def add_project_subparsers(subparsers):
     add_parser('db_open_dump', ('db_opendump',))
     add_parser('db_sync_to_files')
     def db_sync_from_files(project, args, env):
-        project.db_sync_from_files(args.host)
+        project.db_sync_from_files(args.host, args.write_db)
     parser = add_parser('db_sync_from_files', func=db_sync_from_files)
-    parser.add_argument('--host', help='Synthese host where to update pages')
+    parser.add_argument('--host', help='Synthese host where to update pages '
+        '(format: HOSTNAME:PORT)')
+    parser.add_argument('--write-db', action='store_true', default=False,
+        help='Write to the db instead of using HTTP')
     def db_sync(project, args, env):
         project.db_sync(args.host)
     parser = add_parser('db_sync', func=db_sync)
