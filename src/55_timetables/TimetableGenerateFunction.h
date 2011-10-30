@@ -69,6 +69,7 @@ namespace synthese
 			static const std::string PARAMETER_CITY_PREFIX;
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_WAYBACK_FILTER;
+			static const std::string PARAMETER_IGNORE_PAST_DATES;
 
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_NOTE_PAGE_ID;
@@ -155,6 +156,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _pageForSubTimetable;
 				boost::shared_ptr<TimetableResult::Warnings> _warnings;
 				boost::optional<bool> _waybackFilter;
+				boost::optional<bool> _ignorePastDates;
 				std::vector<boost::shared_ptr<Timetable> > _containerContent;
 				std::size_t _timetableRank;
 			//@}
@@ -198,6 +200,7 @@ namespace synthese
 				void setTimetable(boost::shared_ptr<const Timetable> value){ _timetable = value; }
 				void setLine(boost::shared_ptr<const pt::JourneyPattern> value){ _line = value; }
 				void setCalendarTemplate(boost::shared_ptr<const calendar::CalendarTemplate> value){ _calendarTemplate = value; }
+				void setIgnorePastDates(bool value){ _ignorePastDates = value; }
 				void setPage(boost::shared_ptr<const cms::Webpage> value){ _page = value; }
 				void setRowPage(boost::shared_ptr<const cms::Webpage> value){ _rowPage = value; }
 				void setCellPage(boost::shared_ptr<const cms::Webpage> value){ _cellPage = value; }
