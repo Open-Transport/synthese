@@ -76,6 +76,7 @@ namespace synthese
 		const string AdminFunction::DATA_IS_OPENED("is_opened");
 		const string AdminFunction::DATA_SUBTREE("subtree");
 		const string AdminFunction::DATA_VERSION("version");
+		const string AdminFunction::DATA_VERSION_INFO("version_info");
 
 
 		ParametersMap AdminFunction::_getParametersMap() const
@@ -361,6 +362,7 @@ namespace synthese
 
 			// version
 			pm.insert(DATA_VERSION, ServerModule::VERSION);
+			pm.insert(DATA_VERSION_INFO, ServerModule::VERSION_INFO);
 
 			_mainTemplate->display(stream, request, pm);
 		}

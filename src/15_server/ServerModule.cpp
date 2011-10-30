@@ -24,6 +24,9 @@
 #include "ServerModule.h"
 #include "EMail.h"
 #include "Log.h"
+#ifdef CMAKE
+#include "15_server/version.h"
+#endif
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
@@ -76,7 +79,14 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 
+		// TODO: inline once scons is removed.
+#ifdef CMAKE
+		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
+		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
+#else
 		const std::string ServerModule::VERSION("3.3.0");
+		const std::string ServerModule::VERSION_INFO("3.3.0");
+#endif
 
 		template<> const string ModuleClassTemplate<ServerModule>::NAME("Server kernel");
 

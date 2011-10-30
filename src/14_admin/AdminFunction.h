@@ -128,6 +128,7 @@ namespace synthese
 			static const std::string DATA_CONTENT;
 			static const std::string DATA_LOGOUT_URL;
 			static const std::string DATA_VERSION;
+			static const std::string DATA_VERSION_INFO;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of the admin compound by a CMS template.
