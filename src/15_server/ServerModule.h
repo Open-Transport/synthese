@@ -126,6 +126,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
 
 			static const std::string VERSION;
+			static const std::string VERSION_INFO;
 
 			typedef std::map<std::string, Session*> SessionMap;
 

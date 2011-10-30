@@ -1,6 +1,12 @@
 # 2.8.4 is required because of this issue: http://public.kitware.com/Bug/view.php?id=10356
 cmake_minimum_required(VERSION 2.8.4)
 
+# Version:
+set(VERSION_MAJOR 3)
+set(VERSION_MINOR 3)
+set(VERSION_REV 0)
+set(SYNTHESE_VERSION "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_REV}")
+
 # See http://www.cmake.org/Wiki/CMake_FAQ#Make_Override_Files
 # TODO: Maybe use shared libraries and remove this.
 set(CMAKE_USER_MAKE_RULES_OVERRIDE
@@ -71,6 +77,7 @@ if(WITH_MYSQL)
   endif()
 endif()
 
+
 if(WIN32)
   # NOTE: _MBCS WIN32 _WINDOWS are already set by cmake
   # TODO: should these defines be set (they are with scons)?:
@@ -104,6 +111,32 @@ if (CMAKE_COMPILER_IS_GNUCC OR CMAKE_COMPILER_IS_GNUCXX)
 endif ()
 
 add_definitions(-DCMAKE)
+
+# Version info.
+
+set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION}")
+if (NOT WIN32)
+  # TODO: not adding svn revision on Windows. It expects a native svn, and fails
+  # if Cygwin svn is found instead.
+  find_package(Subversion)
+  if (SUBVERSION_FOUND)
+    Subversion_WC_INFO(${PROJECT_SOURCE_DIR} Synthese)
+    set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION_INFO} r${Synthese_WC_REVISION}")
+  endif (SUBVERSION_FOUND)
+
+  exec_program("date"
+    ARGS "'+%Y%m%d %H:%M'"
+    OUTPUT_VARIABLE DATE)
+  set(SYNTHESE_VERSION_INFO "${SYNTHESE_VERSION_INFO} (built on ${DATE})")
+endif (NOT WIN32)
+
+# Note: this is using a .h file and not defines, otherwise everything gets
+# rebuilt each time CMake is invoked.
+configure_file(
+  "${PROJECT_SOURCE_DIR}/src/15_server/version.h.in"
+  "${PROJECT_BINARY_DIR}/src/15_server/version.h"
+)
+
 
 include(FindPythonInterp)
 if(NOT PYTHONINTERP_FOUND)
@@ -140,9 +173,9 @@ add_subdirectory(utils)
 # build a CPack driven installer package
 #include(InstallRequiredSystemLibraries)
 #set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/License.txt")
-set(CPACK_PACKAGE_VERSION_MAJOR "3")
-set(CPACK_PACKAGE_VERSION_MINOR "3")
-set(CPACK_PACKAGE_VERSION_PATCH "0")
+set(CPACK_PACKAGE_VERSION_MAJOR VERSION_MAJOR)
+set(CPACK_PACKAGE_VERSION_MINOR VERSION_MINOR)
+set(CPACK_PACKAGE_VERSION_PATCH VERSION_REV)
 set(CPACK_PACKAGE_CONTACT       "contact@rcsmobility.com")
 
 #if(NOT CPACK_PACKAGING_INSTALL_PREFIX)
