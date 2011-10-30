@@ -1,4 +1,5 @@
 .caldiv {
+  display: none;
   position: fixed;
   top: 20%;
   margin: auto;
@@ -24,6 +25,7 @@
 }
 
 .caltitleright {
+  cursor: pointer;
   float: right;
   color: white;
   font-weight: bold;
