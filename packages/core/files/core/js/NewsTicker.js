@@ -38,7 +38,7 @@ var NewsTickerView = Backbone.View.extend({
       var $ul = $("<ul></ul>");
       _.each(group, function(li) {
         $(li).appendTo($ul);
-      })
+      });
       $ul.appendTo($itemsContainer);
       return $ul;
     });
