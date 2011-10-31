@@ -348,10 +348,10 @@ def _sync_files_to_site(project, site, host, db_writer=False):
     SyncState(project, site).set_synced_pages(pages)
 
 
-def sync_from_files(project, host, write_db):
+def sync_from_files(project, host, use_http):
     for site in project.sites:
         log.info('Syncing files from site %r', site.name)
-        _sync_files_to_site(project, site, host, db_writer=write_db)
+        _sync_files_to_site(project, site, host, db_writer=not use_http)
 
 
 def sync_site(project, site, host):
