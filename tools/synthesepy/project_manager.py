@@ -71,20 +71,20 @@ def _copy_over(source_path, target_path):
             shutil.copy(source, target)
 
 def _ssh_command_line(config, with_server=True, extra_opts=''):
-    return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {server}'.format(
+    return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {remote_server}'.format(
         extra_opts=extra_opts,
         ssh_global_opts=config.ssh_global_opts,
         ssh_opts=config.ssh_opts,
-        server=config.server if with_server else '')
+        remote_server=config.remote_server if with_server else '')
 
 def _rsync(config, remote_path, local_path):
     utils.call(
         'rsync -avz --delete --delete-excluded '
         '{rsync_opts} -e "{ssh_command_line}" '
-        '{server}:{remote_path} {local_path}'.format(
+        '{remote_server}:{remote_path} {local_path}'.format(
         rsync_opts=config.rsync_opts,
         ssh_command_line=_ssh_command_line(config, False),
-        server=config.server,
+        remote_server=config.remote_server,
         remote_path=remote_path,
         local_path=utils.to_cygwin_path(local_path)))
 
@@ -656,8 +656,8 @@ The synthese.py wrapper script.
         db_sync.sync_to_files(self)
 
     @command()
-    def db_sync_from_files(self, host, write_db):
-        db_sync.sync_from_files(self, host, write_db)
+    def db_sync_from_files(self, host, use_http):
+        db_sync.sync_from_files(self, host, use_http)
 
     @command()
     def db_sync(self, host=None):
@@ -669,7 +669,7 @@ The synthese.py wrapper script.
     def db_remote_dump(self):
         """Dump database from remote server"""
 
-        if not self.config.server:
+        if not self.config.remote_server:
             raise Exception('No remote server defined in configuration')
 
         @contextlib.contextmanager
