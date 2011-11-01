@@ -95,4 +95,5 @@ if __name__ == '__main__':
         raise Exception('This script should be run as root')
 
     download_and_replace()
-    system_install()
+    if 'SYNTHESE_NO_SYSTEM_INSTALL' not in os.environ:
+        system_install()
