@@ -200,88 +200,108 @@ namespace synthese
 			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, stops)
 			{
-				if(_commercialLineID) // only physicalStop used by the commercial line will be displayed
+			    typedef map<RegistryKeyType, const CommercialLine *> commercialLineMap;
+				typedef map<RegistryKeyType, pair<const StopArea *, commercialLineMap > > stopAreaMapType;
+				stopAreaMapType stopAreaMap;
+
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
-					typedef map<RegistryKeyType, const StopArea * > stopAreaMapType;
-					stopAreaMapType stopAreaMap;
+					const LineStop* ls = static_cast<const LineStop*>(edge.second);
 
-					BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
+					ptime departureDateTime = startDateTime;
+					// Loop on services
+					optional<Edge::DepartureServiceIndex::Value> index;
+					while(true)
 					{
-						const LineStop* ls = static_cast<const LineStop*>(edge.second);
+						ServicePointer servicePointer(
+							ls->getNextService(
+								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+								departureDateTime,
+								endDateTime,
+								false,
+								index,
+								false,
+								false
+						)	);
+						if (!servicePointer.getService())
+							break;
+						++*index;
+						departureDateTime = servicePointer.getDepartureDateTime();
+						if(it.second->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+							continue;
 
-						ptime departureDateTime = startDateTime;
-						// Loop on services
-						optional<Edge::DepartureServiceIndex::Value> index;
-						while(true)
-						{
-							ServicePointer servicePointer(
-								ls->getNextService(
-									USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
-									departureDateTime,
-									endDateTime,
-									false,
-									index,
-									false,
-									false
-							)	);
-							if (!servicePointer.getService())
-								break;
-							++*index;
-							departureDateTime = servicePointer.getDepartureDateTime();
-							if(it.second->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-								continue;
+						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+						if(journeyPattern == NULL) // Could be a junction
+							continue;
 
-							// only physical stops the commercial line given will be displayed
-							const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-							if(journeyPattern == NULL) // Could be a junction
-								continue;
-							const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-							if(commercialLine->getKey() != _commercialLineID)
-								continue;
+                        const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+                        if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
+						    continue;
 
-							const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
+						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
 
-							stopAreaMap[destination->getKey()] = destination;
-						}
-					}
-
-					// Generate output only if commercial line use stoppoint
-					if(stopAreaMap.empty())
-						continue;
-
-					if(_page.get())
-					{
-						_display(stream, request, *it.second);
-					}
-					else
-					{
-						stream << "<physicalStop id=\"" << it.second->getKey() <<
-							"\" operatorCode=\""    << it.second->getCodeBySources() <<
-							"\">";
-
-						BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
-						{
-							stream << "<destination id=\"" << destination.second->getKey() <<
-								"\" name=\""    << destination.second->getName() <<
-								"\" cityName=\""<< destination.second->getCity()->getName() <<
-								"\" />";
-						}
-
-						stream << "</physicalStop>";
+                        stopAreaMapType::iterator it = stopAreaMap.find(destination->getKey());
+                        if(it == stopAreaMap.end()) // test if destination stop already in the map
+                        {
+                            commercialLineMap lineMap;
+                            lineMap[commercialLine->getKey()] = commercialLine;
+						    stopAreaMap[destination->getKey()] = make_pair(destination, lineMap);
+					    }
+					    else // destination stop is already in the map
+                        {
+                            commercialLineMap::iterator lineIt = stopAreaMap[destination->getKey()].second.find(commercialLine->getKey());
+                            
+                            if(lineIt == stopAreaMap[destination->getKey()].second.end()) // test if commercialLine already in the sub map
+                                stopAreaMap[destination->getKey()].second[commercialLine->getKey()] = commercialLine;
+					    }
 					}
 				}
-				else // all physical stop will be displayed, without lines destination information
+
+				// Generate output only if commercial line use stoppoint
+				if(_commercialLineID && stopAreaMap.empty())
+					continue;
+
+				if(_page.get())
 				{
-					if(_page.get())
-					{
-						_display(stream, request, *it.second);
+					_display(stream, request, *it.second);
+				}
+				else
+				{
+					stream << "<physicalStop id=\"" << it.second->getKey() <<
+						"\" operatorCode=\""    << it.second->getCodeBySources() <<
+						"\">";
+
+                    if(_commercialLineID)
+                    {
+					    BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
+					    {
+					    	stream << "<destination id=\"" << destination.first <<
+				    			"\" name=\""    << destination.second.first->getName() <<
+				    			"\" cityName=\""<< destination.second.first->getCity()->getName() <<
+				    			"\" />";
+				    	}
 					}
 					else
 					{
-						stream << "<physicalStop id=\"" << it.second->getKey() <<
-							"\" operatorCode=\""    << it.second->getCodeBySources() <<
-							"\" />";
+					    BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
+					    {
+					    	stream << "<destination id=\"" << destination.first <<
+				    			"\" name=\""    << destination.second.first->getName() <<
+				    			"\" cityName=\""<< destination.second.first->getCity()->getName() <<
+				    			"\" >";
+
+				    		BOOST_FOREACH(const commercialLineMap::value_type& line, destination.second.second)
+				    		{
+				    		    stream << "<line shortName=\""<< line.second->getShortName() <<
+				    			    "\" style=\""<< line.second->getStyle() <<
+				    			    "\" />";
+				    		}
+
+					    	stream << "</destination>";
+					    }
 					}
+
+					stream << "</physicalStop>";
 				}
 			}
 
