@@ -608,10 +608,11 @@ The synthese.py wrapper script.
         gzip.open(target, 'wb').write(output)
         log.info('Db dumped to %r', target)
 
-        uncompressed_target = join(
-            self.db_path, 'config_{project_name}.sql'.format(
-                project_name=self.config.project_name))
+        uncompressed_fname = 'config_{project_name}.sql'.format(
+                project_name=self.config.project_name)
+        uncompressed_target = join(self.db_path, uncompressed_fname)
         open(uncompressed_target, 'wb').write(output)
+        return uncompressed_fname
 
     @command()
     def db_open_dump(self):
@@ -638,7 +639,7 @@ The synthese.py wrapper script.
         dumps = [d for d in all_dumps if db_dump in d]
         if len(dumps) != 1:
             raise Exception('Not only one dump matches %r (possible dumps: %r)' %
-                (dumps, all_dumps))
+                (db_dump, all_dumps))
 
         sql_file = join(self.db_path, dumps[0])
         log.info('Restoring %s', sql_file)
@@ -715,7 +716,12 @@ The synthese.py wrapper script.
             remote_conn_string = remote_conn_info.conn_string
             log.info('Remote connection string: %r', remote_conn_string)
             remote_backend = db_backends.create_backend(self.env, remote_conn_string)
-            self.db_dump(remote_backend, 'remote_')
+            return self.db_dump(remote_backend, 'remote_')
+
+    @command()
+    def db_remote_restore(self):
+        sql_fname = self.db_remote_dump()
+        self.db_restore(sql_fname)
 
     @command()
     def ssh(self):
