@@ -1,1 +1,1 @@
-dependencies = ('map', 'routePlanner')
+dependencies = ('map', 'routePlanner', 'timetable')
