@@ -170,6 +170,7 @@ def add_project_subparsers(subparsers):
     parser = add_parser('db_restore', func=db_restore)
     parser.add_argument('--dump', dest='db_dump')
     add_parser('db_remote_dump')
+    add_parser('db_remote_restore')
     add_parser('ssh')
     add_parser('system_install_prepare')
     add_parser('system_install')
