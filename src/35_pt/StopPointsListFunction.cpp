@@ -65,7 +65,7 @@ namespace synthese
 
 		const string StopPointsListFunction::DATA_NAME("name");
 		const string StopPointsListFunction::DATA_STOPAREA_NAME("stopAreaName");
-                const string StopPointsListFunction::DATA_STOPAREA_CITY_NAME("stopAreaCityName");
+		const string StopPointsListFunction::DATA_STOPAREA_CITY_NAME("stopAreaCityName");
 
 		ParametersMap StopPointsListFunction::_getParametersMap() const
 		{
@@ -181,9 +181,9 @@ namespace synthese
 						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
 						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
-						"\" lineName=\""     << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+						"\" lineName=\"" << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
 						"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
-						"\" lineStyle=\""    << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
+						"\" lineStyle=\"" << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
 						"\">";
 				}
 				else
@@ -192,7 +192,7 @@ namespace synthese
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
 						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
-                                                "\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
+						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
 						"\">";
 				}
 			}
@@ -200,9 +200,9 @@ namespace synthese
 			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
 			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, stops)
 			{
-			    typedef map<RegistryKeyType, const CommercialLine *> commercialLineMap;
-				typedef map<RegistryKeyType, pair<const StopArea *, commercialLineMap > > stopAreaMapType;
-				stopAreaMapType stopAreaMap;
+				typedef map<RegistryKeyType, const CommercialLine *> CommercialLineMap;
+				typedef map<RegistryKeyType, pair<const StopArea *, CommercialLineMap > > StopAreaMapType;
+				StopAreaMapType stopAreaMap;
 
 				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
 				{
@@ -234,26 +234,26 @@ namespace synthese
 						if(journeyPattern == NULL) // Could be a junction
 							continue;
 
-                        const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-                        if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
-						    continue;
+						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+						if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
+							continue;
 
 						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
 
-                        stopAreaMapType::iterator it = stopAreaMap.find(destination->getKey());
-                        if(it == stopAreaMap.end()) // test if destination stop already in the map
-                        {
-                            commercialLineMap lineMap;
-                            lineMap[commercialLine->getKey()] = commercialLine;
-						    stopAreaMap[destination->getKey()] = make_pair(destination, lineMap);
-					    }
-					    else // destination stop is already in the map
-                        {
-                            commercialLineMap::iterator lineIt = stopAreaMap[destination->getKey()].second.find(commercialLine->getKey());
-                            
-                            if(lineIt == stopAreaMap[destination->getKey()].second.end()) // test if commercialLine already in the sub map
-                                stopAreaMap[destination->getKey()].second[commercialLine->getKey()] = commercialLine;
-					    }
+						StopAreaMapType::iterator it = stopAreaMap.find(destination->getKey());
+						if(it == stopAreaMap.end()) // test if destination stop already in the map
+						{
+							CommercialLineMap lineMap;
+							lineMap[commercialLine->getKey()] = commercialLine;
+							stopAreaMap[destination->getKey()] = make_pair(destination, lineMap);
+						}
+						else // destination stop is already in the map
+						{
+							CommercialLineMap::iterator lineIt = stopAreaMap[destination->getKey()].second.find(commercialLine->getKey());
+
+							if(lineIt == stopAreaMap[destination->getKey()].second.end()) // test if commercialLine already in the sub map
+								stopAreaMap[destination->getKey()].second[commercialLine->getKey()] = commercialLine;
+						}
 					}
 				}
 
@@ -268,37 +268,37 @@ namespace synthese
 				else
 				{
 					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\""    << it.second->getCodeBySources() <<
+						"\" operatorCode=\"" << it.second->getCodeBySources() <<
 						"\">";
 
-                    if(_commercialLineID)
-                    {
-					    BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
-					    {
-					    	stream << "<destination id=\"" << destination.first <<
-				    			"\" name=\""    << destination.second.first->getName() <<
-				    			"\" cityName=\""<< destination.second.first->getCity()->getName() <<
-				    			"\" />";
-				    	}
+					if(_commercialLineID)
+					{
+						BOOST_FOREACH(const StopAreaMapType::value_type& destination, stopAreaMap)
+						{
+							stream << "<destination id=\"" << destination.first <<
+								"\" name=\"" << destination.second.first->getName() <<
+								"\" cityName=\""<< destination.second.first->getCity()->getName() <<
+								"\" />";
+						}
 					}
 					else
 					{
-					    BOOST_FOREACH(const stopAreaMapType::value_type& destination, stopAreaMap)
-					    {
-					    	stream << "<destination id=\"" << destination.first <<
-				    			"\" name=\""    << destination.second.first->getName() <<
-				    			"\" cityName=\""<< destination.second.first->getCity()->getName() <<
-				    			"\" >";
+						BOOST_FOREACH(const StopAreaMapType::value_type& destination, stopAreaMap)
+						{
+							stream << "<destination id=\"" << destination.first <<
+								"\" name=\"" << destination.second.first->getName() <<
+								"\" cityName=\""<< destination.second.first->getCity()->getName() <<
+								"\" >";
 
-				    		BOOST_FOREACH(const commercialLineMap::value_type& line, destination.second.second)
-				    		{
-				    		    stream << "<line shortName=\""<< line.second->getShortName() <<
-				    			    "\" style=\""<< line.second->getStyle() <<
-				    			    "\" />";
-				    		}
+							BOOST_FOREACH(const CommercialLineMap::value_type& line, destination.second.second)
+							{
+								stream << "<line shortName=\""<< line.second->getShortName() <<
+									"\" style=\""<< line.second->getStyle() <<
+									"\" />";
+							}
 
-					    	stream << "</destination>";
-					    }
+							stream << "</destination>";
+						}
 					}
 
 					stream << "</physicalStop>";
