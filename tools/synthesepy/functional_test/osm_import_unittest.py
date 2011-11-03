@@ -102,13 +102,15 @@ class OSMImportTest(http_testcase.HTTPTestCase):
 
     @classmethod
     def init_project(cls, project):
-        # TODO: use INSERT INTO with column names.
-        project.db_backend.query("insert into t059_data_sources values(?,'osm','OpenStreetMap','','',4326);", [cls.OSM_SOURCE_ID])
+        project.db_backend.query(
+            "insert into t059_data_sources (id, name, format, icon, charset, srid) "
+            "values(?, 'osm', 'OpenStreetMap', '', '', 4326);", [cls.OSM_SOURCE_ID])
 
         # TODO: Create a dedicated test for Navstreets.
         # TODO: what encoding to use?
-        # TODO: use INSERT INTO with column names.
-        project.db_backend.query("insert into t059_data_sources values(16607027920896003,'Navstreets','Navstreets','','CP1252',27572);")
+        project.db_backend.query(
+            "insert into t059_data_sources (id, name, format, icon, charset, srid) "
+            "values(16607027920896003, 'Navstreets', 'Navstreets', '', 'CP1252', 27572);")
 
     def tearDown(self):
         # TODO: this should be handled by an import flag instead of cleaning
