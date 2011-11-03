@@ -181,6 +181,9 @@ if __name__ == '__main__':
     parser.add_option('--log-path',
         default=join(thisdir, 'logs.txt'),
         help='Location of log file')
+    parser.add_option('--pid-path',
+        default=join(thisdir, 'udf_proxy.pid'),
+        help='Location of pid file')
 
     (options, args) = parser.parse_args()
     if len(args) != 1:
@@ -201,9 +204,8 @@ if __name__ == '__main__':
             raise Exception('Without daemon, only start is allowed')
         main()
         sys.exit(0)
-
-    pid_file = join(thisdir, 'udf_proxy.pid')
-    daemon = UDFProxyDaemon(pid_file)
+ 
+    daemon = UDFProxyDaemon(options.pid_path)
     if 'start' == command:
         daemon.start()
     elif 'stop' == command:
