@@ -1,4 +1,6 @@
 define([
+  // TODO: not all modules need these dependencies. They should only be
+  // loaded if needed.
   "order!/core/vendor/jquery-1.6.2.min.js",
   "order!/core/vendor/jquery.tmpl.beta1.min.js",
   "order!/core/vendor/underscore-1.1.6.min.js",
