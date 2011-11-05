@@ -144,6 +144,10 @@ def add_project_subparsers(subparsers):
     add_parser('rundaemon', ('run', 'start'))
     add_parser('stopdaemon', ('stop',))
     add_parser('runproxy')
+    def project_command(project, args, env):
+        project.project_command(args.args)
+    parser = add_parser('project_command', ('pc',), project_command)
+    parser.add_argument('--args', nargs='+', help='Project command args')
     add_parser('db_view')
     add_parser('db_view_gis')
     def db_shell(project, args, env):
