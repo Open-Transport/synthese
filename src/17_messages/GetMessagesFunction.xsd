@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="messages">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="message" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="message_id" type="xs:long" use="required"/>
+						<xs:attribute name="title" type="xs:string" use="required"/>
+						<xs:attribute name="content" type="xs:string" use="required"/>
+						<xs:attribute name="priority" type="xs:integer" use="required"/>
+						<xs:attribute name="scenario_id" type="xs:long"/>
+						<xs:attribute name="scenario_name" type="xs:string"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
