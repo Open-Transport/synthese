@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="scenario">
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="variable" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="code" type="xs:string" use="required"/>
+						<xs:attribute name="help_message" type="xs:string" use="required"/>
+						<xs:attribute name="required" type="xs:boolean" use="required"/>
+						<xs:attribute name="value" type="xs:string" use="required"/>
+					</xs:complexType>
+				</xs:element>
+				<xs:element name="message" minOccurs="0" maxOccurs="unbounded">
+					<xs:complexType>
+						<xs:attribute name="message_id" type="xs:long" use="required"/>
+						<xs:attribute name="title" type="xs:string" use="required"/>
+						<xs:attribute name="content" type="xs:string" use="required"/>
+						<xs:attribute name="priority" type="xs:integer" use="required"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+			<xs:attribute name="scenario_id" type="xs:long" use="required"/>
+			<xs:attribute name="name" type="xs:string" use="required"/>
+			<xs:attribute name="folderId" type="xs:long"/>
+			<xs:attribute name="folderName" type="xs:string"/>
+			<xs:attribute name="active" type="xs:boolean"/>
+			<xs:attribute name="startDate" type="xs:string"/>
+			<xs:attribute name="endDate" type="xs:string"/>
+		</xs:complexType>
+	</xs:element>
+</xs:schema>
