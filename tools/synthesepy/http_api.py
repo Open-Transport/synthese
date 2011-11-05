@@ -124,7 +124,8 @@ class HTTPApi(object):
         response = urllib2.urlopen(url, post_data)
 
         content = response.read()
-        # TODO: detect errors?
+        if response.code != 200:
+            raise Exception('call_synthese didn\'t return a 200 status')
         log.debug('Result string: %r, info: %r', content, response.info())
         return (content, response.info())
 

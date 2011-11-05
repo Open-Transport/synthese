@@ -97,6 +97,7 @@ class DBBackend(object):
 
     def import_fixtures(self, fixtures_file, vars={}):
         log.info('Importing fixtures: %s', fixtures_file)
+        # XXX cursor not necessary, done in import_sql().
         with self.get_cursor() as cursor:
             with open(fixtures_file, 'rb') as f:
                 sql = f.read()

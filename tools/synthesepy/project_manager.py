@@ -115,9 +115,9 @@ class Package(object):
 
         for fixtures_file in fixtures_files:
             if fixtures_file.endswith('.sql'):
-                vars = {
-                    'site_id': site.id,
-                }
+                vars = {}
+                if site:
+                    vars['site_id'] = site.id
                 self.project.db_backend.import_fixtures(fixtures_file, vars)
             elif fixtures_file.endswith('.importer'):
                 self.project._run_testdata_importer()
@@ -163,7 +163,7 @@ class Package(object):
 
         # TODO: implement smart_url lookup on some attributes (up_id,...) or in page content.
 
-        site_id = site.id if local else SHARED_PAGES_SITE_ID
+        site_id = site.id if (site and local) else SHARED_PAGES_SITE_ID
 
         log.debug('pages_config:\n%s', pprint.pformat(pages_config))
         for page in pages_config['pages']:
@@ -332,6 +332,7 @@ class Project(object):
         self.env = env
         self.packages_loader = PackagesLoader(self)
         self._load_sites()
+        self._load_packages()
         self.daemon = daemon.Daemon(self.env)
 
         for env_config_name in self.config.env_config_names.split(','):
@@ -342,6 +343,15 @@ class Project(object):
                     '%r' % (env_config_name, self.config.env_configs.keys()))
             self.config.update_from_dict(
                 self.config.env_configs[env_config_name])
+
+        manager_path = join(self.path, 'manager')
+        self.manager_module = None
+        if not os.path.isdir(manager_path):
+            return
+
+        sys.path.append(manager_path)
+        self.manager_module = __import__('main')
+        log.debug('Manager module %r', self.manager_module)
 
     def get_site(self, site_name):
         for s in self.sites:
@@ -411,6 +421,20 @@ class Project(object):
             if len(non_admin_sites) > 0:
                 self.config.site_id = non_admin_sites[0].id
 
+    def _load_packages(self):
+        self.packages = []
+        packages_dir = join(self.path, 'packages')
+        if not os.path.isdir(packages_dir):
+            return
+        self.packages = self.packages_loader.load_packages([], packages_dir)
+
+    def _get_sites_and_packages(self):
+        for package in self.packages:
+            yield None, package
+        for site in self.sites:
+            for package in site.packages:
+                yield site, package
+
     def _run_testdata_importer(self):
         importer_path = self.env.testdata_importer_path
         log.info('Runing testdata importer from %r', importer_path)
@@ -436,10 +460,9 @@ class Project(object):
         """Load data into the database."""
         log.info('loading_data into project (local:%s)', local)
         # TODO: don't import fixtures from a package more than once.
-        for site in self.sites:
-            for package in site.packages:
-                log.debug('Loading site:%s package:%s', site, package)
-                package.load_data(site, local, overwrite)
+        for site, package in self._get_sites_and_packages():
+            log.debug('Loading site:%s package:%s', site, package)
+            package.load_data(site, local, overwrite)
 
     @command()
     def load_local_data(self, overwrite):
@@ -513,6 +536,9 @@ The synthese.py wrapper script.
         if not block:
             return
         log.info('Daemon running, press ctrl-c to stop')
+        if (self.manager_module and
+            hasattr(self.manager_module, 'on_daemon_started')):
+            self.manager_module.on_daemon_started(self)
 
         restart_count = 0
         try:
@@ -555,6 +581,11 @@ The synthese.py wrapper script.
         """Run HTTP Proxy to serve static files"""
         proxy.serve_forever(self.env)
 
+    @command()
+    def project_command(self, args):
+        if not self.manager_module:
+            raise Exception('No manager module')
+        self.manager_module.project_command(self, args)
 
     @command()
     def db_view(self):
