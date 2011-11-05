@@ -42,7 +42,7 @@ def _should_build_package(env):
     svn_info = utils.SVNInfo(env.source_path)
     CREATE_PACKAGE_MESSAGE = 'cmd:create_package'
 
-    if CREATE_PACKAGE_MESSAGE in svn_info.last_msg:
+    if svn_info.last_msg and CREATE_PACKAGE_MESSAGE in svn_info.last_msg:
         log.info('Found %r in last commit message. '
             'Building package.', CREATE_PACKAGE_MESSAGE)
         return True
