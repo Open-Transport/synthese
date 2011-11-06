@@ -69,6 +69,11 @@ command={synthese_py} --no-proxy -v -p {project_path} -s start
 # Quotes are required due to a bug in 3.0a8:
 # http://lists.supervisord.org/pipermail/supervisor-users/2010-March/000539.html
 environment=HOME='/home/synthese',USER='synthese'
+
+redirect_stderr=true
+stdout_logfile={stdout_logfile}
+stdout_logfile_maxbytes={stdout_logfile_maxbytes}
+stdout_logfile_backups={stdout_logfile_backups}
 """
         config = self.project.config
 
@@ -78,6 +83,10 @@ environment=HOME='/home/synthese',USER='synthese'
         format_config['program_name'] = 'synthese-{0}'.format(config.project_name)
         format_config['synthese_py'] = join(
             os.environ['SYNTHESEPY_DIR'], 'synthese.py')
+        format_config['stdout_logfile'] = config.log_file
+        format_config.setdefault('stdout_logfile_maxbytes', '500MB')
+        format_config.setdefault('stdout_logfile_backups', '4')
+
         supervisor_config = CONFIG_TEMPLATE.format(**format_config)
 
         utils.maybe_makedirs(os.path.dirname(self.config_path))
