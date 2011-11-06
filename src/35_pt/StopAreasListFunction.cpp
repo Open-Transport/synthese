@@ -113,6 +113,8 @@ namespace synthese
 			return result;
 		}
 
+
+
 		void StopAreasListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			RegistryKeyType roid(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0));
@@ -198,6 +200,12 @@ namespace synthese
 
 			// Output format
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			// Clean of template parameters for non CMS output
+			if(!_stopPage.get())
+			{
+				_templateParameters.clear();
+			}
 		}
 
 
