@@ -55,20 +55,35 @@ namespace synthese
 
 				struct Record
 				{
-					std::size_t recordNumber;
+					double recordNumber;
 					std::string content;
 				};
 
 				mutable std::ifstream _file;
-				mutable Record _record;
+				mutable boost::optional<Record> _record;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// @return Record : recordNumber == 0 => end of file
-				void _loadNextRecord() const;
-				void _loadRecordOfType(std::size_t recordNumber, std::size_t nextRecordNumber) const;
+				void _loadNextRecord(
+					double recordNumber
+				) const;
 
-				std::string _getTextField(std::size_t start, std::size_t length) const;
-				std::vector<std::string> _getVectorField(std::size_t start, std::size_t length) const;
+				void _loadNextRecord(
+				) const;
+
+				std::string _getTextField(
+					std::size_t start,
+					std::size_t length
+				) const;
+				
+				std::vector<std::string> _getNextVector(
+					double recordNumber,
+					std::size_t numberPosition,
+					std::size_t startPosition,
+					std::size_t recordLength
+				) const;
+
+				bool _eof() const;
 
 			public:
 				static const std::string PARAMETER_TRANSPORT_NETWORK_ID;

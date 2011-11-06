@@ -207,7 +207,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -271,7 +271,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);
@@ -303,7 +303,7 @@ namespace synthese
 			size_t rank
 		) const {
 
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, rank);

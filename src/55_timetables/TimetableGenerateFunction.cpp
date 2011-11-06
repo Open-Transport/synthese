@@ -559,7 +559,7 @@ namespace synthese
 			const timetables::TimetableResult& result,
 			size_t rank
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 			shared_ptr<TimetableResult::Warnings> warnings;
 
 			// Common parameters
@@ -905,7 +905,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableWarning& object
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_NUMBER, object.getNumber());
 			pm.insert(DATA_TEXT, object.getText());
@@ -918,7 +918,7 @@ namespace synthese
 				date lastDate(calendar.getLastActiveDate().end_of_month());
 				for(date day(firstDate); day <lastDate; day += days(1))
 				{
-					CalendarDateInterfacePage::Display(calendarContent, _noteCalendarPage, request, day, calendar.isActive(day));
+					CalendarDateInterfacePage::Display(calendarContent, _noteCalendarPage, request, getTemplateParameters(), day, calendar.isActive(day));
 				}
 				pm.insert(DATA_CALENDAR, calendarContent.str());
 				pm.insert(DATA_FIRST_DAY, firstDate.day());
@@ -938,7 +938,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowLinesVector& lines
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE);
 
@@ -971,7 +971,7 @@ namespace synthese
 			const pt::CommercialLine& object,
 			std::size_t colRank
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -989,7 +989,7 @@ namespace synthese
 			const server::Request& request,
 			std::size_t colRank
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_LINE); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -1010,7 +1010,7 @@ namespace synthese
 			bool isBeforeTransfer,
 			std::size_t depth
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_TIME); //0
 			pm.insert(DATA_GLOBAL_RANK, globalRank);
@@ -1067,7 +1067,7 @@ namespace synthese
 			std::size_t colRank,
 			const pt::SchedulesBasedService* service
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_TIME);
 			pm.insert(DATA_CELL_RANK, colRank);
@@ -1094,7 +1094,7 @@ namespace synthese
 			const TimetableResult::RowNotesVector& notes,
 			const TimetableResult::Columns& columns
 		) const {
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_NOTE);
 
@@ -1120,7 +1120,7 @@ namespace synthese
 			std::size_t colRank,
 			const TimetableColumn& column
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_NOTE);
 			pm.insert(DATA_CELL_RANK, colRank);
@@ -1144,7 +1144,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowServicesVector& services
 		) const {
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_SERVICE_NUMBER);
 
@@ -1170,7 +1170,7 @@ namespace synthese
 			std::size_t colRank,
 			const pt::SchedulesBasedService* service
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_SERVICE_NUMBER);
 			pm.insert(DATA_CELL_RANK, colRank);
@@ -1186,7 +1186,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowRollingStockVector& rollingStock
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 
@@ -1212,7 +1212,7 @@ namespace synthese
 			const pt::RollingStock* object,
 			std::size_t colRank
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_ROLLING_STOCK); //0
 			pm.insert(DATA_CELL_RANK, colRank); //1
@@ -1308,7 +1308,7 @@ namespace synthese
 			const server::Request& request,
 			const TimetableResult::RowServicesVector& services
 		) const {
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_BOOKING);
 
@@ -1334,7 +1334,7 @@ namespace synthese
 			std::size_t colRank,
 			const TimetableResult::RowServicesVector::value_type& service
 		) const {
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TYPE, TYPE_BOOKING);
 			pm.insert(DATA_CELL_RANK, colRank);

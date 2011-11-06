@@ -522,7 +522,7 @@ namespace synthese
 				@param continuousServiceRange Continuous service range (if <= 0 then no continuous service displayed)
 				@param site Displayed site
 			*/
-			static void DisplayStopCell(
+			void _displayStopCell(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
@@ -535,7 +535,7 @@ namespace synthese
 				boost::posix_time::time_duration continuousServiceRange,
 				bool isLastLeg,
 				bool isFirstLeg
-			);
+			) const;
 
 
 
@@ -548,7 +548,7 @@ namespace synthese
 				@param color Odd or even row in the journey board
 				@param distance Length of the junction
 			*/
-			static void DisplayJunctionCell(
+			void _displayJunctionCell(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
@@ -561,7 +561,7 @@ namespace synthese
 				bool isLastLeg,
 				bool isFirstLeg,
 				bool isFirstFoot
-			);
+			) const;
 
 
 
@@ -577,7 +577,7 @@ namespace synthese
 				@param alarm (19/20) Alarm
 				@param color (21) Odd or even color
 			*/
-			static void DisplayServiceCell(
+			void _displayServiceCell(
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
@@ -588,8 +588,7 @@ namespace synthese
 				bool color,
 				bool isLastLeg,
 				bool isFirstLeg
-			);
-
+			) const;
 		};
 }	}
 

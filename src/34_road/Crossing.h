@@ -51,7 +51,7 @@ namespace synthese
 			public graph::Hub,
 			public graph::Vertex,
 			public virtual util::Registrable,
-			public impex::Importable
+			public impex::ImportableTemplate<Crossing>
 		{
 		public:
 			  /// Chosen registry class.

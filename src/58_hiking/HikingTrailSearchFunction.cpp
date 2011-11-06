@@ -80,7 +80,7 @@ namespace synthese
 
 			BOOST_FOREACH(HikingTrailTableSync::SearchResult::value_type& trail, trails)
 			{
-				ParametersMap pm(request.getFunction()->getSavedParameters());
+				ParametersMap pm(getTemplateParameters());
 				pm.insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
 				_itemDisplayPage->display(stream, request, pm);
 			}

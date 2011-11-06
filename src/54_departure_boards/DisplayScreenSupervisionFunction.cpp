@@ -164,13 +164,13 @@ namespace synthese
 
 
 
-		void DisplayScreenSupervisionFunction::Display(
+		void DisplayScreenSupervisionFunction::_display(
 			std::ostream& stream,
 			const server::Request& request,
 			boost::shared_ptr<const cms::Webpage> page,
 			const std::string& textToParse
-		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+		) const {
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_TEXT, textToParse);
 

@@ -29,6 +29,9 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include <string>
+#include <boost/foreach.hpp>
+
 namespace synthese
 {
 	class CoordinatesSystem;
@@ -57,16 +60,19 @@ namespace synthese
 		///
 		/// Sources with automated import refer to a FileFormat instance.
 		///
-		class DataSource
-		:	public virtual util::Registrable
+		class DataSource:
+			public virtual util::Registrable
 		{
 		public:
-			// Typedefs
-
-			/// Chosen registry class.
 			typedef util::Registry<DataSource> Registry;
-
-			typedef std::map<std::string, Importable*> Links;
+			
+			// Typedefs
+			typedef std::map<
+				std::string, // Class name
+				std::map<
+					std::string, // Code
+					Importable* // Object
+			>	> Links;
 
 
 		private:
@@ -105,13 +111,65 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addLink(Importable& object) const;
-				void removeLink(Importable& object) const;
+				template<class T>
+				void addLinks(T& object) const
+				{
+					BOOST_FOREACH(const std::string& code, object.getCodesBySource(*this))
+					{
+						addLink(object, code);
+					}
+				}
+
+				template<class T>
+				void addLink(T& object, const std::string& code) const
+				{
+					_links[typename T::Registry::KEY].insert(
+						std::make_pair(code, static_cast<Importable*>(&object))
+					);
+				}
+
+				template<class T>
+				void removeLinks(T& object) const
+				{
+					vector<string> codes(object.getCodesBySource(*this));
+					BOOST_FOREACH(const std::string& code, codes)
+					{
+						removeLink(object, code);
+					}
+				}
+
+				template<class T>
+				void removeLink(T& object, const std::string& code) const
+				{
+					Links::iterator it(_links.find(typename T::Registry::KEY));
+					if(it != _links.end())
+					{
+						_links.erase(code);
+					}
+				}
 			//@}
 
 			//! @name Queries
 			//@{
-				Importable* getObjectByCode(const std::string& code) const;
+				template<class T>
+				T* getObjectByCode(const std::string& code) const
+				{
+					Links::const_iterator it(_links.find(typename T::Registry::KEY));
+					if(it == _links.end())
+					{
+						return NULL;
+					}
+					Links::mapped_type::const_iterator it2(it->second.find(code));
+					if(it2 == it->second.end())
+					{
+						return NULL;
+					}
+					else
+					{
+						return dynamic_cast<T*>(it2->second);
+					}
+				}
+
 				boost::shared_ptr<Importer> getImporter(util::Env& env) const;
 				bool canImport() const;
 				const CoordinatesSystem& getActualCoordinateSystem() const;

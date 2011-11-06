@@ -27,7 +27,6 @@
 #include "LinesListFunction.h"
 #include "TransportNetwork.h"
 #include "CommercialLine.h"
-#include "LineMarkerInterfacePage.h"
 #include "Webpage.h"
 #include "RollingStock.hpp"
 #include "Path.h"
@@ -219,12 +218,6 @@ namespace synthese
 				}
 			}
 			_sortByTransportMode.push_back(shared_ptr<RollingStock>()); // NULL pointer at end
-
-			// Saved parameters cleaning if output is a fixed format
-			if(!_page.get())
-			{
-				_savedParameters.clear();
-			}
 		}
 
 		// Class used for trim:
@@ -383,13 +376,13 @@ namespace synthese
 			}
 
 			// Populating the parameters map
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 			BOOST_FOREACH(boost::shared_ptr<const RollingStock> tm, _sortByTransportMode)
 			{
 				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{
 					shared_ptr<const CommercialLine> line = it.second;
-					shared_ptr<ParametersMap> linePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+					shared_ptr<ParametersMap> linePM(new ParametersMap(getTemplateParameters()));
 					line->toParametersMap(*linePM);
 
 					// Rolling stock
@@ -411,7 +404,7 @@ namespace synthese
 					}
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
 					{
-						shared_ptr<ParametersMap> rsPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						shared_ptr<ParametersMap> rsPM(new ParametersMap(getTemplateParameters()));
 						rs->toParametersMap(*rsPM);
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
@@ -440,10 +433,10 @@ namespace synthese
 									stopAreas.insert(stopArea);
 								}
 						}	}
-						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(getTemplateParameters()));
 						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
 						{
-							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(getTemplateParameters()));
 							stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
 							stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
 						}
@@ -476,7 +469,7 @@ namespace synthese
 							}
 						}
 
-						shared_ptr<ParametersMap> geometryPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+						shared_ptr<ParametersMap> geometryPM(new ParametersMap(getTemplateParameters()));
 						if(_outputGeometry == FORMAT_WKT)
 						{
 							vector<shared_ptr<Geometry> > vec;
@@ -498,14 +491,14 @@ namespace synthese
 						{
 							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
 							{
-								shared_ptr<ParametersMap> edgePM(new ParametersMap(request.getFunction()->getSavedParameters()));
+								shared_ptr<ParametersMap> edgePM(new ParametersMap(getTemplateParameters()));
 								shared_ptr<Geometry> prGeom(
 									_coordinatesSystem->convertGeometry(*it.second)
 								);
 								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
 								{
 									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
-									shared_ptr<ParametersMap> pointPM(new ParametersMap(request.getFunction()->getSavedParameters()));
+									shared_ptr<ParametersMap> pointPM(new ParametersMap(getTemplateParameters()));
 									pointPM->insert(DATA_X, pt.x);
 									pointPM->insert(DATA_Y, pt.y);
 									edgePM->insert(DATA_POINT, pointPM);
@@ -572,6 +565,10 @@ namespace synthese
 			else if(_outputFormat == FORMAT_XML)
 			{
 				mimeType = "text/xml";
+			}
+			else if(_outputFormat == FORMAT_JSON)
+			{
+				mimeType = "application/json";
 			}
 			else // default case : csv outputFormat
 			{

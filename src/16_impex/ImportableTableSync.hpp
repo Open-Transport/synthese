@@ -159,17 +159,20 @@ namespace synthese
 		void ImportableTableSync::ObjectBySource<T>::add(
 			typename T::ObjectType& object
 		){
-			const std::string& code(object.getCodeBySource(_source));
-			typename Map::iterator it(_map.find(code));
-			if(it != _map.end())
+			std::vector<std::string> codes(object.getCodesBySource(_source));
+			BOOST_FOREACH(const std::string& code, codes)
 			{
-				it->second.insert(&object);
-			}
-			else
-			{
-				Set s;
-				s.insert(&object);
-				_map.insert(std::make_pair(code,s));
+				typename Map::iterator it(_map.find(code));
+				if(it != _map.end())
+				{
+					it->second.insert(&object);
+				}
+				else
+				{
+					Set s;
+					s.insert(&object);
+					_map.insert(std::make_pair(code,s));
+				}
 			}
 		}
 }	}

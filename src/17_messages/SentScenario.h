@@ -45,7 +45,7 @@ namespace synthese
 		///	@ingroup m17
 		class SentScenario:
 			public Scenario,
-			public impex::Importable
+			public impex::ImportableTemplate<SentScenario>
 		{
 		public:
 

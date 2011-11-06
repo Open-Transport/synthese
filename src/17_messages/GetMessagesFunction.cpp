@@ -30,7 +30,6 @@
 #include "MessagesModule.h"
 #include "StaticFunctionRequest.h"
 #include "SentScenario.h"
-#include "MessagesObjectsCMSExporters.hpp"
 
 using namespace std;
 using namespace boost;
@@ -53,8 +52,14 @@ namespace synthese
 		const string GetMessagesFunction::PARAMETER_PRIORITY_ORDER("o");
 		const string GetMessagesFunction::PARAMETER_DATE("d");
 		const string GetMessagesFunction::PARAMETER_CMS_TEMPLATE_ID("t");
+		const string GetMessagesFunction::PARAMETER_OUTPUT_FORMAT("of");
 
+		const string GetMessagesFunction::DATA_MESSAGES("messages");
+		const string GetMessagesFunction::DATA_MESSAGE("message");
+		const string GetMessagesFunction::DATA_RANK("rank");
 
+		const string GetMessagesFunction::FORMAT_JSON("json");
+		const string GetMessagesFunction::FORMAT_XML("xml");
 
 		ParametersMap GetMessagesFunction::_getParametersMap() const
 		{
@@ -74,6 +79,13 @@ namespace synthese
 			{
 				map.insert(PARAMETER_DATE, _date);
 			}
+
+			// Output format
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+
 			return map;
 		}
 
@@ -81,6 +93,9 @@ namespace synthese
 
 		void GetMessagesFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Output format
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
 			_recipientId = map.get<RegistryKeyType>(PARAMETER_RECIPIENT_ID);
 			_maxMessagesNumber = map.getOptional<size_t>(PARAMETER_MAX_MESSAGES_NUMBER);
 			_bestPriorityOnly = map.getDefault<bool>(PARAMETER_BEST_PRIORITY_ONLY, true);
@@ -111,14 +126,17 @@ namespace synthese
 			}
 		}
 
+
+
 		void GetMessagesFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
+			ParametersMap pm(getTemplateParameters());
 			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(_recipientId));
-
 			size_t number(0);
+
 			optional<AlarmLevel> bestPriority;
 			if(_priorityOrder)
 			{
@@ -137,14 +155,11 @@ namespace synthese
 						break;
 					}
 					bestPriority = it->getLevel();
-					if(_cmsTemplate.get())
-					{
-						MessagesObjectsCMSExporters::DisplayMessage(stream, request, _cmsTemplate, *it);
-					}
-					else
-					{
-						stream << it->getLongMessage();
-					}
+
+					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
+					it->toParametersMap(*messagePM, true);
+					pm.insert(DATA_MESSAGE, messagePM);
+
 					++number;
 				}
 			}
@@ -172,15 +187,43 @@ namespace synthese
 					{
 						continue;
 					}
-					if(_cmsTemplate.get())
-					{
-						MessagesObjectsCMSExporters::DisplayMessage(stream, request, _cmsTemplate, *it);
-					}
-					else
-					{
-						stream << it->getLongMessage();
-					}
+					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
+					it->toParametersMap(*messagePM, true);
+					pm.insert(DATA_MESSAGE, messagePM);
 					++number;
+				}
+			}
+
+			if(_cmsTemplate.get())
+			{
+				size_t rank(0);
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
+				{
+					pmMessage->insert(DATA_RANK, rank++);
+					_cmsTemplate->display(stream, request, *pmMessage);
+				}
+			}
+			else if(_outputFormat == FORMAT_XML) // XML output
+			{
+				pm.outputXML(
+					stream,
+					DATA_MESSAGES,
+					true,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/17_messages/GetMessagesFunction.xsd"
+				);
+			}
+			else if(_outputFormat == FORMAT_JSON) // JSON output
+			{
+				pm.outputJSON(
+					stream,
+					DATA_MESSAGES
+				);
+			}
+			else
+			{
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
+				{
+					stream << pmMessage->get<string>(Alarm::DATA_CONTENT);
 				}
 			}
 		}
@@ -197,7 +240,24 @@ namespace synthese
 
 		std::string GetMessagesFunction::getOutputMimeType() const
 		{
-			return _cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/plain";
+			std::string mimeType;
+			if(_cmsTemplate.get())
+			{
+				mimeType = _cmsTemplate->getMimeType();
+			}
+			else if(_outputFormat == FORMAT_XML)
+			{
+				mimeType = "text/xml";
+			}
+			else if(_outputFormat == FORMAT_JSON)
+			{
+				mimeType = "application/json";
+			}
+			else
+			{
+				mimeType = "text/plain";
+			}
+			return mimeType;
 		}
 
 

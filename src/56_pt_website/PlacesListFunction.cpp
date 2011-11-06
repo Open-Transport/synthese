@@ -362,7 +362,7 @@ namespace synthese
 				}
 			}
 
-			ParametersMap pm(_savedParameters);
+			ParametersMap pm(getTemplateParameters());
 
 			// TODO: Factor ParametesrMap constant
 			if(_outputFormat == "json")
@@ -457,7 +457,7 @@ namespace synthese
 			size_t i(0);
 			BOOST_FOREACH(const PlacesList::value_type& it, items)
 			{
-				ParametersMap pm(_savedParameters);
+				ParametersMap pm(getTemplateParameters());
 
 				pm.insert(DATA_RANK, i);
 				pm.insert(DATA_NAME, it.second);

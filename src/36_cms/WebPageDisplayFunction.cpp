@@ -58,7 +58,7 @@ namespace synthese
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map(_savedParameters);
+			ParametersMap map(getTemplateParameters());
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
@@ -92,7 +92,7 @@ namespace synthese
 				{
 					throw RequestException("Smart URL and site, or page ID must be specified");
 				}
-				_savedParameters.remove(PARAMETER_SMART_URL);
+				_templateParameters.remove(PARAMETER_SMART_URL);
 				if(_smartURL[0] == ':')
 				{
 					throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
@@ -115,9 +115,9 @@ namespace synthese
 						throw Request::NotFoundException();
 					}
 
-					_savedParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
+					_templateParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
 				}
-				_savedParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
+				_templateParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
 
 			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
@@ -137,7 +137,7 @@ namespace synthese
 					stringstream url;
 					url << "http://" << request.getHostName() << _page->getSmartURLPath();
 
-					ParametersMap pm(_savedParameters);
+					ParametersMap pm(getTemplateParameters());
 					pm.remove(PARAMETER_PAGE_ID);
 					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
 					stringstream uri;
@@ -163,7 +163,7 @@ namespace synthese
 				}
 				else
 				{
-					_page->display(stream, request, request.getFunction()->getSavedParameters());
+					_page->display(stream, request, getTemplateParameters());
 				}
 			}
 		}
@@ -208,7 +208,7 @@ namespace synthese
 		{
 			BOOST_FOREACH(const ParametersMap::Map::value_type& param, value.getMap())
 			{
-				_savedParameters.insert(param.first, param.second);
+				_templateParameters.insert(param.first, param.second);
 			}
 		}
 }	}

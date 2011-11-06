@@ -2,7 +2,7 @@
 //////////////////////////////////////////////////////////////////////////
 /// DeviateServiceAction class header.
 ///	@file DeviateServiceAction.h
-///	@author Hugues
+///	@author Hugues Romain
 ///	@date 2010
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -53,6 +53,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<impex::DataSource> _dataSource;
+			std::string _serviceCodeBySource;
 			boost::shared_ptr<const ScheduledService> _service;
 			std::size_t _chainage;
 			std::string _database;

@@ -124,13 +124,13 @@ namespace synthese
 					shared_ptr<const DataSource> dataSource(
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_VEHICLE_SERVICE_DATASOURCE_ID))
 					);
-					Importable* obj(dataSource->getObjectByCode(map.get<string>(PARAMETER_VEHICLE_SERVICE_ID)));
-					if(!obj || !dynamic_cast<VehicleService*>(obj))
+					VehicleService* obj(dataSource->getObjectByCode<VehicleService>(map.get<string>(PARAMETER_VEHICLE_SERVICE_ID)));
+					if(!obj)
 					{
 						throw ActionException("No such vehicle service");
 					}
 					shared_ptr<VehicleService> vehicleService(
-						Env::GetOfficialEnv().getEditableSPtr(static_cast<VehicleService*>(obj))
+						Env::GetOfficialEnv().getEditableSPtr(obj)
 					);
 					size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_RANK));
 

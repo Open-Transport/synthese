@@ -197,7 +197,7 @@ namespace synthese
 			const ScheduledService& service,
 			const LineStop& lineStop
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// Current location
 			if(dynamic_cast<const LinePhysicalStop*>(&lineStop))

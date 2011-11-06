@@ -1673,7 +1673,7 @@ namespace synthese
 			const pt_website::HourPeriod* period,
 			const graph::AccessParameters& accessParameters
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			const City* originCity(dynamic_cast<const City*>(originPlace));
 			string originPlaceName;
@@ -1997,6 +1997,7 @@ namespace synthese
 						_reservationPage,
 						_dateTimePage,
 						request,
+						getTemplateParameters(),
 						journey
 					);
 				}
@@ -2117,7 +2118,7 @@ namespace synthese
 			bool isOrigin,
 			bool isDestination
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, place.getKey());
 			pm.insert(DATA_CELLS, cells);
@@ -2143,7 +2144,7 @@ namespace synthese
 			bool isLastWriting,
 			bool isFirstFoot
 		) const {
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 			pm.insert(DATA_IS_FOOT, isItFootLine);
@@ -2178,7 +2179,7 @@ namespace synthese
 			std::size_t columnNumber,
 			const graph::Journey& journey
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 
@@ -2223,7 +2224,7 @@ namespace synthese
 			boost::logic::tribool bikeFilter,
 			bool isTheLast
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// Rank
 			pm.insert(DATA_RANK, n);
@@ -2406,7 +2407,7 @@ namespace synthese
 						// LIGNE ARRET MONTEE Si premier point d'arret et si alerte
 						if (leg.getDepartureEdge()->getHub() != lastPlace)
 						{
-							DisplayStopCell(
+							_displayStopCell(
 								content,
 								stopCellPage,
 								request,
@@ -2425,7 +2426,7 @@ namespace synthese
 							__Couleur = !__Couleur;
 						}
 
-						DisplayServiceCell(
+						_displayServiceCell(
 							content,
 							serviceCellPage,
 							request,
@@ -2440,7 +2441,7 @@ namespace synthese
 
 						__Couleur = !__Couleur;
 
-						DisplayStopCell(
+						_displayStopCell(
 							content,
 							stopCellPage,
 							request,
@@ -2496,7 +2497,7 @@ namespace synthese
 								geometries
 						)	);
 
-						DisplayJunctionCell(
+						_displayJunctionCell(
 							content,
 							junctionPage,
 							request,
@@ -2524,7 +2525,7 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::DisplayStopCell(
+		void RoutePlannerFunction::_displayStopCell(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
@@ -2537,8 +2538,8 @@ namespace synthese
 			boost::posix_time::time_duration continuousServiceRange,
 			bool isLastLeg,
 			bool isFirstLeg
-		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+		) const {
+			ParametersMap pm(getTemplateParameters());
 
 			ptime endRangeTime(time);
 			if (continuousServiceRange.total_seconds() > 0)
@@ -2627,7 +2628,7 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::DisplayJunctionCell(
+		void RoutePlannerFunction::_displayJunctionCell(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
@@ -2640,8 +2641,8 @@ namespace synthese
 			bool isLastLeg,
 			bool isFirstLeg,
 			bool isFirstFoot
-		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+		) const {
+			ParametersMap pm(getTemplateParameters());
 
 			// Departure point
 			if(	departureVertex.getGeometry().get() &&
@@ -2697,7 +2698,7 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::DisplayServiceCell(
+		void RoutePlannerFunction::_displayServiceCell(
 			std::ostream& stream,
 			boost::shared_ptr<const cms::Webpage> page,
 			const server::Request& request,
@@ -2708,8 +2709,8 @@ namespace synthese
 			bool color,
 			bool isLastLeg,
 			bool isFirstLeg
-		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+		) const {
+			ParametersMap pm(getTemplateParameters());
 
 			// Continuous service
 			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());

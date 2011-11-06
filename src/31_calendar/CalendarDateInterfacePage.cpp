@@ -50,10 +50,11 @@ namespace synthese
 			std::ostream& stream,
 			boost::shared_ptr<const Webpage> page,
 			const server::Request& request,
+			const util::ParametersMap& templateParametersMap,
 			boost::gregorian::date value,
 			bool isActive
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(templateParametersMap);
 
 			pm.insert(DATA_DAY, value.day());
 			pm.insert(DATA_MONTH, value.month());

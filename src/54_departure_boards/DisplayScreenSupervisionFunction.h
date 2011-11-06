@@ -108,12 +108,12 @@ namespace synthese
 			/// @param request request which has called the display
 			/// @param page CMS template to use to display each destination of each destination of each service
 			/// @param textToParse text to parse
-			static void Display(
+			void _display(
 				std::ostream& stream,
 				const server::Request& request,
 				boost::shared_ptr<const cms::Webpage> page,
 				const std::string& textToParse
-			);
+			) const;
 
 		public:
 			DisplayScreenSupervisionFunction();

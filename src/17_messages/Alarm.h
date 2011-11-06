@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace messages
 	{
 		class Scenario;
@@ -51,6 +56,12 @@ namespace synthese
 			: public virtual util::Registrable
 		{
 		public:
+			static const std::string DATA_MESSAGE_ID;
+			static const std::string DATA_CONTENT;
+			static const std::string DATA_PRIORITY;
+			static const std::string DATA_SCENARIO_ID;
+			static const std::string DATA_SCENARIO_NAME;
+			static const std::string DATA_TITLE;
 
 		protected:
 			AlarmLevel			_level;
@@ -86,8 +97,25 @@ namespace synthese
 				void setLongMessage( const std::string& message);
 				void setScenario(const Scenario* scenario);
 			//@}
+
+			//! @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Message CMS exporter.
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					bool withScenario = true,
+					std::string prefix = std::string()
+				) const;
+			//@}
 		};
-	}
-}
+}	}
 
 #endif

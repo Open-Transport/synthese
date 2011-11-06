@@ -156,7 +156,7 @@ namespace synthese
 		class StopArea:
 			public graph::Hub,
 			public geography::NamedPlaceTemplate<StopArea>,
-			public impex::Importable
+			public impex::ImportableTemplate<StopArea>
 		{
 		private:
 			static const std::string DATA_STOP_ID;

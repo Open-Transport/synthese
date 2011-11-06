@@ -78,7 +78,7 @@ namespace synthese
 		public:
 
 		protected:
-			util::ParametersMap _savedParameters;
+			util::ParametersMap _templateParameters;
 			boost::shared_ptr<util::Env>	_env;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -95,14 +95,13 @@ namespace synthese
 			//! @name Getters
 			//@{
 				boost::shared_ptr<util::Env> getEnv() const { return _env; }
-				const util::ParametersMap& getSavedParameters() const { return _savedParameters; }
+				const util::ParametersMap& getTemplateParameters() const { return _templateParameters; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setEnv(boost::shared_ptr<util::Env> value){ _env = value; }
-				void setSavedParameters(const util::ParametersMap& value){ _savedParameters = value; }
-				void removeSavedParameter(const std::string& key){ _savedParameters.remove(key); }
+				void setTemplateParameters(const util::ParametersMap& value){ _templateParameters = value; }
 			//@}
 
 

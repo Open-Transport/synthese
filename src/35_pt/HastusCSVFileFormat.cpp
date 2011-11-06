@@ -235,13 +235,12 @@ namespace synthese
 					}
 
 					// Stop creation
-					PTFileFormat::CreateOrUpdateStopPoints(
+					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
 						code,
 						name,
-						NULL,
 						point.get(),
-						cityForStopAreaAutoGeneration,
+						*cityForStopAreaAutoGeneration,
 						_stopAreaDefaultTransferDuration,
 						_dataSource,
 						_env,

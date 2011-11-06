@@ -175,7 +175,7 @@ namespace synthese
 				/// @param screen display screen source object
 				/// @author Hugues Romain
 				/// @since 3.2.0
-				static void DisplayDepartureBoard(
+				void _displayDepartureBoard(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
@@ -185,7 +185,7 @@ namespace synthese
 					const boost::posix_time::ptime&  date,
 					const ArrivalDepartureListWithAlarm& rows,
 					const DisplayScreen& screen
-				);
+				) const;
 			private:
 
 				static const std::string DATA_ROW_RANK;
@@ -220,7 +220,7 @@ namespace synthese
 				/// @param screen display screen source object
 				/// @author Hugues Romain
 				/// @since 3.2.0
-				static void DisplayDepartureBoardRow(
+				void _displayDepartureBoardRow(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
@@ -231,7 +231,7 @@ namespace synthese
 					std::size_t pageNumber,
 					const ArrivalDepartureRow& row,
 					const DisplayScreen& screen
-				);
+				) const;
 
 
 
@@ -261,7 +261,7 @@ namespace synthese
 				/// @param screen display screen source object
 				/// @author Hugues Romain
 				/// @since 3.2.0
-				static void DisplayDepartureBoardDestination(
+				void _displayDepartureBoardDestination(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
@@ -275,7 +275,7 @@ namespace synthese
 					const DisplayScreen& screen,
 					bool isContinuation,
 					bool continuationStartsAtEnd
-				);
+				) const;
 
 
 
@@ -287,14 +287,14 @@ namespace synthese
 				/// Display of a transfer destination from an intermediate stop.
 				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
-				static void DisplayDepartureBoardTrandferDestination(
+				void _displayDepartureBoardTrandferDestination(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
 					const graph::ServicePointer& object,
 					std::size_t localTransferRank,
 					const DisplayScreen& screen
-				);
+				) const;
 
 			//@}
 
@@ -305,7 +305,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a route planning board.
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Journey-planner-based-departure-board-main-page
-				static void DisplayRoutePlanningBoard(
+				void _displayRoutePlanningBoard(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
@@ -314,7 +314,7 @@ namespace synthese
 					const boost::posix_time::ptime& date,
 					const RoutePlanningListWithAlarm& rows,
 					const DisplayScreen& screen
-				);
+				) const;
 			private:
 
 
@@ -329,7 +329,7 @@ namespace synthese
 				/// Displays a row of a route planning board.
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
 				//////////////////////////////////////////////////////////////////////////
-				static void DisplayRoutePlanningBoardRow(
+				void _displayRoutePlanningBoardRow(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
@@ -337,19 +337,19 @@ namespace synthese
 					std::size_t rowId,
 					const RoutePlanningRow& row,
 					const DisplayScreen& screen
-				);
+				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Variables sent to the cms :
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
 				//////////////////////////////////////////////////////////////////////////
-				static void DisplayRoutePlanningBoardDestination(
+				void _displayRoutePlanningBoardDestination(
 					std::ostream& stream,
 					const server::Request& request,
 					boost::shared_ptr<const cms::Webpage> page,
 					const pt::StopArea& place
-				);
+				) const;
 			//@}
 		};
 	}

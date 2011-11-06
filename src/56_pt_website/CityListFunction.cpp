@@ -118,12 +118,6 @@ namespace synthese
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
-
-			// Saved parameters cleaning if output is a fixed format
-			if(!_page.get() && !_itemPage.get())
-			{
-				_savedParameters.clear();
-			}
 		}
 
 
@@ -208,11 +202,11 @@ namespace synthese
 				}
 			}
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 			size_t i(0);
 			BOOST_FOREACH(const GeographyModule::CityList::value_type& it, citiesList)
 			{
-				shared_ptr<ParametersMap> cityPm(new ParametersMap(request.getFunction()->getSavedParameters()));
+				shared_ptr<ParametersMap> cityPm(new ParametersMap(getTemplateParameters()));
 
 				it->toParametersMap(*cityPm, _coordinatesSystem);
 				cityPm->insert(DATA_RANK, i++);

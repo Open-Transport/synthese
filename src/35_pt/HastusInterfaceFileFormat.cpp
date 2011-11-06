@@ -24,9 +24,8 @@
 #include "DBModule.h"
 #include "HastusInterfaceFileFormat.hpp"
 #include "GraphConstants.h"
-#include "StopArea.hpp"
-#include "StopAreaTableSync.hpp"
 #include "StopPoint.hpp"
+#include "StopPointTableSync.hpp"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -149,19 +148,216 @@ namespace synthese
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
 
-			// Record 1.1 : Lines
+			// Record 1.1 Lines number
+			vector<string> lineNumbers(
+				_getNextVector(1.1, 19, 22, 5)
+			);
+
+			// Record 2 : Lines
 			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
-			for(_loadNextRecord(); _record.recordNumber == 1.1; _loadNextRecord())
+			typedef map<string, shared_ptr<RollingStock> > LineTransportModes;
+			LineTransportModes lineTransportModes;
+			for(size_t lineRank(0); lineRank < lineNumbers.size(); ++lineRank)
 			{
-				vector<string> lineNumbers(_getVectorField(21, 5));
-				BOOST_FOREACH(const string& lineNumber, lineNumbers)
+				// Jump to record 2
+				_loadNextRecord(2);
+
+				// Line code
+				string lineCode(_getTextField(4, 4));
+
+				// Transport mode
+				string transportModeCode = _getTextField(70, 10);
+				string tridentKey;
+				if(transportModeCode == "Autobus")
 				{
-//					PTFileFormat::CreateOrUpdateLine(
-//						lines,
-//						lineNumber,
+					tridentKey = "Bus";
 				}
+				shared_ptr<RollingStock> rollingStock;
+				RollingStockTableSync::SearchResult rollingStocks(
+					RollingStockTableSync::Search(
+						_env,
+						tridentKey,
+						true
+				)	);
+				if(!rollingStocks.empty())
+				{
+					lineTransportModes[lineCode] = rollingStocks.front();
+				}
+			 
+				// Jump to record 2.2
+				_loadNextRecord(2.2);
+
+				// Line name
+				string name(_getTextField(6, 50));
+
+				// EOF is unusual here
+				if(_eof())
+				{
+					return false;
+				}
+
+				// Line import
+				PTFileFormat::CreateOrUpdateLine(
+					lines,
+					lineCode,
+					name,
+					lineCode,
+					optional<RGBColor>(),
+					*_network,
+					_dataSource,
+					_env,
+					os
+				);
 			}
 
+			// Record 11 : Services headers
+			struct TemporaryService
+			{
+				bool toRead;
+				string lineCode;
+				string calendar;
+				string code;
+				string routeCode;
+				ScheduledService::Schedules schedules;
+				vector<string> stops;
+				bool wayBack;
+			};
+			vector<TemporaryService> services;
+			typedef map<string, set<StopPoint*> > StopCodes;
+			StopCodes stopCodes;
+			for(_loadNextRecord(11); !_eof() && _record->recordNumber == 11; _loadNextRecord())
+			{
+				TemporaryService service;
+				service.toRead = (_getTextField(5,4) != "0");
+
+				// Filter on regular services
+				if(service.toRead)
+				{
+					service.lineCode = _getTextField(32,4);
+					service.calendar = _getTextField(103,7);
+					service.code = _getTextField(149,8);
+					service.routeCode = _getTextField(134,4);
+				}
+
+				services.push_back(service);
+			}
+
+			// Records 12 to 16 for each service
+			BOOST_FOREACH(TemporaryService& service, services)
+			{
+				// Jump to record 12.7
+				_loadNextRecord(12.7);
+
+				// Way back
+				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 1 == 1);
+				
+				// Schedules on record 12.8
+				vector<string> schedulesStr(_getNextVector(12.8, 37, 41, 4));
+				BOOST_FOREACH(const string& scheduleStr, schedulesStr)
+				{
+					service.schedules.push_back(
+						minutes(lexical_cast<long>(scheduleStr))
+					);
+				}
+				
+				// Stops on record 12.9
+				service.stops = _getNextVector(12.9, 37, 41, 9);
+				BOOST_FOREACH(const string& stopCode, service.stops)
+				{
+					stopCodes.insert(make_pair(stopCode, StopCodes::mapped_type()));
+				}
+			}
+		
+			// File closing
+			_file.close();
+
+			// Loop on stops
+			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
+			bool success(true);
+			BOOST_FOREACH(StopCodes::value_type& stopCode, stopCodes)
+			{
+				// Stop
+				stopCode.second = PTFileFormat::GetStopPoints(
+						stops,
+						stopCode.first,
+						optional<const string&>(),
+						os,
+						true
+				);
+				if(stopCode.second.empty())
+				{
+					success = false;
+				}
+			}
+			if(!success)
+			{
+				os << "ERR  : Au moins un arrêt non trouvé : import interrompu<br />";
+			}
+
+			// Loop on temporary services
+			BOOST_FOREACH(const TemporaryService& service, services)
+			{
+				// Line
+				CommercialLine* line(
+					PTFileFormat::GetLine(
+						lines,
+						service.lineCode,
+						_dataSource,
+						_env,
+						os
+				)	);
+				if(line == NULL)
+				{
+					os << "WARN : Inconsistent line number " << service.lineCode << " in service " << service.code << "<br />";
+					continue;
+				}
+
+				// Served stops
+				JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
+				BOOST_FOREACH(const string& stopCode, service.stops)
+				{
+					servedStops.push_back(
+						JourneyPattern::StopWithDepartureArrivalAuthorization(
+							stopCodes[stopCode]
+					)	);
+				}
+
+				// Route
+				JourneyPattern* route(
+					PTFileFormat::CreateOrUpdateRoute(
+						*line,
+						service.routeCode,
+						optional<const string&>(),
+						optional<const string&>(),
+						optional<Destination*>(),
+						optional<const RuleUser::Rules&>(),
+						service.wayBack,
+						lineTransportModes[service.lineCode].get(),
+						servedStops,
+						_dataSource,
+						_env,
+						os,
+						true
+				)	);
+				if(route == NULL)
+				{
+					os << "WARN : Route " << service.routeCode << " was not built in service " << service.code << "<br />";
+					continue;
+				}
+
+				// Service
+				PTFileFormat::CreateOrUpdateService(
+					*route,
+					service.schedules,
+					service.schedules,
+					service.code,
+					_dataSource,
+					_env,
+					os
+				);
+
+				// TODO Calendars
+			}
 
 			return true;
 		}
@@ -230,65 +426,134 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		// HELPERS
 		void HastusInterfaceFileFormat::Importer_::_loadNextRecord(
+			double recordNumber
 		) const {
-			string line;
-			if(!getline(_file, line))
+
+			while(!_eof() && (!_record || _record->recordNumber != recordNumber))
 			{
-				_record.recordNumber = 0;
-				return;
+				_loadNextRecord();
 			}
-			if(line.size() >= 5 && line.substr(0,5) != "     ")
-			{
-				_record.recordNumber = lexical_cast<size_t>(trim_copy(line.substr(0,5)));
-			}
-			_record.content = line;
 		}
 
 
 
-		std::string synthese::pt::HastusInterfaceFileFormat::Importer_::_getTextField( std::size_t start, std::size_t length ) const
+		void HastusInterfaceFileFormat::Importer_::_loadNextRecord() const
 		{
-			if(_record.content.size() < start)
+			string line;
+			while(line.size() < 5 || line.substr(0,5) == "     ")
+			{
+				if(!getline(_file, line))
+				{
+					Record record;
+					record.recordNumber = 0;
+					_record = record;
+					return;
+				}
+			}
+
+			string recordNumber;
+			for(size_t pos(1); pos<line.size(); ++pos)
+			{
+				if(line[pos] == ' ')
+				{
+					recordNumber = line.substr(1, pos-1);
+					break;
+				}
+			}
+			size_t lineRecordNumber(lexical_cast<size_t>(recordNumber));
+
+			Record record;
+			record.recordNumber = lineRecordNumber;
+			record.content = line;
+			_record = record;
+			return;
+		}
+
+
+
+		bool HastusInterfaceFileFormat::Importer_::_eof() const
+		{
+			return _record && _record->recordNumber == 0;
+		}
+
+
+
+		std::string synthese::pt::HastusInterfaceFileFormat::Importer_::_getTextField(
+			std::size_t start,
+			std::size_t length
+		) const	{
+			if(!_record)
 			{
 				return string();
 			}
-			if(_record.content.size() < start+length)
+			if(_record->content.size() < start)
 			{
-				return trim_copy(_record.content.substr(start));
+				return string();
 			}
-			return trim_copy(_record.content.substr(start, length));
+			if(_record->content.size() < start+length)
+			{
+				return trim_copy(_record->content.substr(start));
+			}
+			return trim_copy(_record->content.substr(start, length));
 		}
 
 
 
-		std::vector<std::string> synthese::pt::HastusInterfaceFileFormat::Importer_::_getVectorField( std::size_t start, std::size_t length ) const
-		{
+		std::vector<std::string> synthese::pt::HastusInterfaceFileFormat::Importer_::_getNextVector(
+			double recordNumber,
+			std::size_t numberPosition,
+			std::size_t start,
+			std::size_t length
+		) const	{
+
+			// Search of the section
+			_loadNextRecord(recordNumber);
+
+			// EOF check
+			if(_eof())
+			{
+				return vector<string>();
+			}
+
+			// Reading of the vector size
+			size_t vectorSize(
+				lexical_cast<size_t>(
+					trim_copy(
+						_record->content.substr(numberPosition, start-numberPosition)
+			)	)	);
+
+			// Loading of the first row
 			vector<string> result;
-			if(_record.content.size() < start)
+			if(_record->content.size() < start)
 			{
 				return result;
 			}
-			while(_record.content.size() >= start)
+			for(size_t loadedRecords(0); loadedRecords<vectorSize;)
 			{
-				if(_record.content.size() < start+length)
+				while(_record->content.size() >= start)
 				{
-					result.push_back(trim_copy(_record.content.substr(start)));
-					break;
+					++loadedRecords;
+					if(_record->content.size() < start+length)
+					{
+						result.push_back(trim_copy(_record->content.substr(start)));
+						break;
+					}
+					else
+					{
+						result.push_back(trim_copy(_record->content.substr(start, length)));
+					}
+					start += length;
 				}
-				else
+
+				// Load of the next line of the file
+				if(!getline(_file, _record->content))
 				{
-					result.push_back(trim_copy(_record.content.substr(start, length)));
+					_record->recordNumber = 0;
+					_record->content.clear();
+					return result;
 				}
-				start += length;
 			}
 			return result;
-		}
-
-
-
-		void synthese::pt::HastusInterfaceFileFormat::Importer_::_loadRecordOfType(std::size_t recordNumber, std::size_t nextRecordNumber) const
-		{
-			for(_loadNextRecord(); _record.recordNumber == 0 || _record.recordNumber == recordNumber; _loadNextRecord()) ;
 		}
 
 

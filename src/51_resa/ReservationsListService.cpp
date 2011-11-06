@@ -465,7 +465,7 @@ namespace synthese
 			std::size_t rank
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_NAME, reservation.getTransaction()->getCustomerName());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, reservation.getDeparturePlaceName());

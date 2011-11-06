@@ -47,7 +47,7 @@ namespace synthese
 			public Address,
 			public geography::NamedPlaceTemplate<House>,
 			public virtual util::Registrable,
-			public impex::Importable
+			public impex::ImportableTemplate<House>
 		{
 		public:
 			typedef util::Registry<House>	Registry;

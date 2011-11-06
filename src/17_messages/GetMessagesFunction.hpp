@@ -42,23 +42,14 @@ namespace synthese
 		class SentAlarm;
 
 		//////////////////////////////////////////////////////////////////////////
-		///	17.15 Function : GetMessagesFunction.
+		///	17.15 Service : Messages list.
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_list
+		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.2.0
-		//////////////////////////////////////////////////////////////////////////
 		/// Key : messages
-		///
-		/// Parameters :
-		///	<dl>
-		///	<dt>r</dt><dd>id of the recipient object.</dd>
-		///	<dt>n</dt><dd>max number of messages to display (optional)</dd>
-		///	<dt>b</dt><dd>1|0 : if 1, display only the messages with the best priority level (optional, default=1)</dd>
-		///	<dt>o</dt><dd>1|0 : if 1, messages order is from best priority to lower. In the same priority level, order is from latest beginning broadcast date to oldest. 0 is the inverse order.</dd>
-		/// <dt>d</dt><dd>date</dd>
-		///	<dt>t</dt><dd>id of the CMS template to use for the display of each message (optional, default is to display big content). The CMS template is called by the GetMessagesFunction::_display method.</dd>
-		///	</dl>
 		class GetMessagesFunction:
 			public util::FactorableTemplate<server::Function,GetMessagesFunction>
 		{
@@ -69,10 +60,19 @@ namespace synthese
 			static const std::string PARAMETER_PRIORITY_ORDER;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
+
+			static const std::string FORMAT_XML;
+			static const std::string FORMAT_JSON;
 
 		protected:
+			static const std::string DATA_MESSAGES;
+			static const std::string DATA_MESSAGE;
+			static const std::string DATA_RANK;
+
 			//! \name Page parameters
 			//@{
+				std::string _outputFormat;
 				util::RegistryKeyType _recipientId;
 				boost::optional<std::size_t> _maxMessagesNumber;
 				bool _bestPriorityOnly;
@@ -84,6 +84,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
 			/// @date 2010
@@ -93,6 +95,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Messages_list#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
 			/// @date 2010
