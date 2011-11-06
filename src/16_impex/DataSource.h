@@ -131,7 +131,7 @@ namespace synthese
 				template<class T>
 				void removeLinks(T& object) const
 				{
-					vector<string> codes(object.getCodesBySource(*this));
+					std::vector<std::string> codes(object.getCodesBySource(*this));
 					BOOST_FOREACH(const std::string& code, codes)
 					{
 						removeLink(object, code);
@@ -141,7 +141,7 @@ namespace synthese
 				template<class T>
 				void removeLink(T& object, const std::string& code) const
 				{
-					Links::iterator it(_links.find(typename T::Registry::KEY));
+					Links::iterator it(_links.find(T::Registry::KEY));
 					if(it != _links.end())
 					{
 						_links.erase(code);
@@ -154,7 +154,7 @@ namespace synthese
 				template<class T>
 				T* getObjectByCode(const std::string& code) const
 				{
-					Links::const_iterator it(_links.find(typename T::Registry::KEY));
+					Links::const_iterator it(_links.find(T::Registry::KEY));
 					if(it == _links.end())
 					{
 						return NULL;

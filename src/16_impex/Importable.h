@@ -222,7 +222,7 @@ namespace synthese
 				bool storeLinkInDataSource = false
 			){
 				// Check if the code is not already registered
-				pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
+				std::pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
 					_dataSourceLinks.equal_range(&source)
 				);
 				for(DataSourceLinks::const_iterator it(range.first); it != range.second; ++it)

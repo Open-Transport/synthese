@@ -26,7 +26,6 @@
 #include "GraphConstants.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
-#include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
@@ -211,17 +210,6 @@ namespace synthese
 			}
 
 			// Record 11 : Services headers
-			struct TemporaryService
-			{
-				bool toRead;
-				string lineCode;
-				string calendar;
-				string code;
-				string routeCode;
-				ScheduledService::Schedules schedules;
-				vector<string> stops;
-				bool wayBack;
-			};
 			vector<TemporaryService> services;
 			typedef map<string, set<StopPoint*> > StopCodes;
 			StopCodes stopCodes;
