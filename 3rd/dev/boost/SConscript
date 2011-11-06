@@ -161,7 +161,7 @@ class BoostProject (CppLibProject):
 			lenv.BJam (targets, 'src/boost-build.jam')
 			self.add_target(self.env.InstallAs (itargets, targets))
 
-BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39b')
+BOOST_VER = os.environ.get('SYNTHESE_BOOST_VERSION', '1.39d')
 
 for prjname in ['zlib', 'date_time', 'filesystem', 'iostreams', 
                 'program_options', 'regex', 
