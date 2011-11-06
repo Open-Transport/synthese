@@ -45,7 +45,7 @@ namespace synthese
 		class TransportNetwork:
 			virtual public util::Registrable,
 			public util::Named,
-			public impex::Importable
+			public impex::ImportableTemplate<TransportNetwork>
 		{
 		public:
 			/// Chosen registry class.

@@ -182,7 +182,7 @@ namespace synthese
 			
 			if(_page.get())
 			{	// CMS output
-				ParametersMap pm(request.getFunction()->getSavedParameters());
+				ParametersMap pm(getTemplateParameters());
 
 				pm.insert(DATA_LINE_STOP_ID, _lineStop->getKey());
 				pm.insert(DATA_RANK_IN_PATH, _lineStop->getRankInPath());

@@ -93,7 +93,7 @@ namespace synthese
 			const pt::CommercialLine& commercialLine,
 			optional<size_t> rank
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_STYLE_NAME, commercialLine.getStyle());
 			pm.insert(DATA_IMAGE_URL, commercialLine.getImage());

@@ -50,7 +50,7 @@ namespace synthese
 			const server::Request& request,
 			const boost::posix_time::ptime& dateTime
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_YEAR, dateTime.date().year());
 			pm.insert(DATA_MONTH, dateTime.date().month());
@@ -70,7 +70,7 @@ namespace synthese
 			const server::Request& request,
 			const boost::gregorian::date& date
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_YEAR, date.year());
 			pm.insert(DATA_MONTH, date.month());
@@ -88,7 +88,7 @@ namespace synthese
 			const server::Request& request,
 			const boost::posix_time::time_duration& duration
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_HOURS, duration.hours());
 			pm.insert(DATA_MINUTES, duration.minutes());

@@ -52,7 +52,6 @@ namespace synthese
 		void EvalService::_setFromParametersMap(const ParametersMap& map)
 		{
 			_text = map.getDefault<string>(PARAMETER_TEXT);
-			_savedParameters.remove(PARAMETER_TEXT);
 		}
 
 		void EvalService::run(
@@ -62,9 +61,8 @@ namespace synthese
 
 			Webpage p;
 			p.setContent(_text);
-			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, _savedParameters).get()));
-			p.display(stream, request, _savedParameters);
-
+			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, getTemplateParameters()).get()));
+			p.display(stream, request, getTemplateParameters());
 		}
 
 

@@ -175,7 +175,7 @@ namespace synthese
 			const graph::ServicePointer& ptr,
 			const Request& request
 		) const	{
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			const Edge& edge(departureTime ? *ptr.getDepartureEdge() : *ptr.getArrivalEdge());
 			const ptime& time(departureTime ? ptr.getDepartureDateTime() : ptr.getArrivalDateTime());

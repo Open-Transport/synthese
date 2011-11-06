@@ -247,7 +247,7 @@ namespace synthese
 								stopAreas,
 								id,
 								name,
-								*_defaultCity,
+								_defaultCity.get(),
 								false,
 								_stopAreaDefaultTransferDuration,
 								_dataSource,
@@ -350,14 +350,13 @@ namespace synthese
 					else
 					{
 						// Creation or update
-						PTFileFormat::CreateOrUpdateStopPoints(
+						PTFileFormat::CreateOrUpdateStop(
 							_stopPoints,
 							id,
 							name,
+							optional<const RuleUser::Rules&>(),
 							stopArea,
 							point.get(),
-							NULL,
-							optional<time_duration>(),
 							_dataSource,
 							_env,
 							stream

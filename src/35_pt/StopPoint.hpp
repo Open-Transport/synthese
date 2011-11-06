@@ -25,7 +25,6 @@
 
 #include "UtilConstants.h"
 #include "Vertex.h"
-#include "Registry.h"
 #include "Importable.h"
 #include "Named.h"
 #include "Address.h"
@@ -48,7 +47,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		class StopPoint:
 			public graph::Vertex,
-			public impex::Importable,
+			public impex::ImportableTemplate<StopPoint>,
 			public util::Named,
 			public road::ReachableFromCrossing
 		{

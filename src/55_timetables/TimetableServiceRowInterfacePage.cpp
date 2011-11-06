@@ -91,7 +91,7 @@ namespace synthese
 			size_t rank,
 			std::size_t followingServicesWithSameHour
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_DEPARTURE_HOUR, Service::GetTimeOfDay(object.getContent().begin()->second).hours()); //0
 			pm.insert(DATA_DEPARTURE_MINUTES, Service::GetTimeOfDay(object.getContent().begin()->second).minutes()); //1
@@ -160,7 +160,7 @@ namespace synthese
 			const pt::RollingStock* rollingStock,
 			std::size_t rank
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			if(object.first)
 			{

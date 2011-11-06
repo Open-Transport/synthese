@@ -71,7 +71,7 @@ namespace synthese
 		){
 			shared_ptr<JourneyPattern> route(new JourneyPattern);
 			route->setCommercialLine(&line);
-			route->setCodeBySource(source, string());
+			route->addCodeBySource(source, string());
 			route->setKey(JourneyPatternTableSync::getId());
 			env.getEditableRegistry<JourneyPattern>().add(route);
 			line.addPath(route.get());
@@ -183,7 +183,7 @@ namespace synthese
 			impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
 			const std::string& name,
-			const geography::City& city,
+			const geography::City* city,
 			bool updateCityIfExists,
 			boost::posix_time::time_duration defaultTransferDuration,
 			const impex::DataSource& source,
@@ -196,6 +196,13 @@ namespace synthese
 			// Create if necessary
 			if(result.empty())
 			{
+				// Abord if undefined city
+				if(!city)
+				{
+					logStream << "WARN : The stop area " << name << " cannot be created because of undefined city.<br/>";
+					return result;
+				}
+
 				StopArea* stopArea(
 					new StopArea(
 						StopAreaTableSync::getId(),
@@ -205,7 +212,7 @@ namespace synthese
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				stopArea->setDataSourceLinks(links);
-				stopArea->setCity(&city);
+				stopArea->setCity(city);
 				env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
 				stopAreas.add(*stopArea);
 				result.insert(stopArea);
@@ -216,7 +223,7 @@ namespace synthese
 			{
 				if(updateCityIfExists)
 				{
-					stopArea->setCity(&city);
+					stopArea->setCity(city);
 				}
 				stopArea->setName(name);
 			}
@@ -266,93 +273,156 @@ namespace synthese
 
 
 
-		set<StopPoint*> PTFileFormat::CreateOrUpdateStopPoints(
-			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
-			const std::string& id,
+		set<StopPoint*> PTFileFormat::CreateOrUpdateStop(
+			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			const std::string& code,
+			boost::optional<const std::string&> name,
+			boost::optional<const graph::RuleUser::Rules&> rules,
+			boost::optional<const StopArea*> stopArea,
+			boost::optional<const StopPoint::Geometry*> geometry,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
+			// Load if possible
+			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
+
+			// Creation if necessary
+			if(result.empty())
+			{
+				if(!stopArea || !*stopArea)
+				{
+					return result;
+				}
+
+				StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
+				Importable::DataSourceLinks links;
+				links.insert(make_pair(&source, code));
+				stop->setDataSourceLinks(links);
+				env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
+				stops.add(*stop);
+				result.insert(stop);
+
+				logStream << "CREA : Creation of the physical stop with key " << code;
+				if(name)
+				{
+					logStream << " (" << *name <<  ")";
+				}
+				logStream << "<br />";
+			}
+			else
+			{
+				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << code;
+				if(name)
+				{
+					logStream << " (" << *name <<  ")";
+				}
+				logStream << "<br />";
+			}
+
+			// Update
+			BOOST_FOREACH(StopPoint* stop, result)
+			{
+				if(name)
+				{
+					stop->setName(*name);
+				}
+
+				if(geometry && *geometry)
+				{
+					stop->setGeometry(
+						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(**geometry)
+					);
+				}
+
+				if(rules)
+				{
+					stop->setRules(*rules);
+				}
+
+				if(stopArea)
+				{
+					stop->setHub(*stopArea);
+				}
+			}
+			return result;
+		}
+
+
+
+		set<StopPoint*> PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			const std::string& code,
 			const std::string& name,
-			const StopArea* stopArea,
-			const StopPoint::Geometry* geometry,
-			const geography::City* cityForStopAreaAutoGeneration,
+			boost::optional<const StopPoint::Geometry*> geometry,
+			const geography::City& cityForStopAreaAutoGeneration,
 			boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream
 		){
 			// Load if possible
-			set<StopPoint*> result(GetStopPoints(stopPoints, id, name, logStream, false));
+			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
 
 			// Creation if necessary
 			if(result.empty())
 			{
-				if(!stopArea && !cityForStopAreaAutoGeneration)
+				// Search for an existing stop area
+				StopArea* curStop(NULL);
+				StopAreaTableSync::SearchResult stopAreas(
+					StopAreaTableSync::Search(
+						env,
+						cityForStopAreaAutoGeneration.getKey(),
+						logic::indeterminate,
+						optional<string>(),
+						name
+				)	);
+				if(stopAreas.empty())
 				{
-					return result;
-				}
-
-				StopPoint* stopPoint(new StopPoint(StopPointTableSync::getId()));
-				if(stopArea)
-				{
-					stopPoint->setHub(stopArea);
-
-					logStream << "LOAD : Link with existing commercial stop " << stopArea->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
+					curStop = new StopArea(StopAreaTableSync::getId(), true);
+					Importable::DataSourceLinks links;
+					links.insert(make_pair(&source, string()));
+					curStop->setDataSourceLinks(links);
+					if(defaultTransferDuration)
+					{
+						curStop->setDefaultTransferDelay(*defaultTransferDuration);
+					}
+					curStop->setName(name);
+					curStop->setCity(&cityForStopAreaAutoGeneration);
+					env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+					logStream << "CREA : Auto generation of the commercial stop for stop " << code << " (" << name <<  ")<br />";
 				}
 				else
 				{
-					// Search for an existing stop area
-					StopArea* curStop(NULL);
-					StopAreaTableSync::SearchResult stopAreas(
-						StopAreaTableSync::Search(
-							env,
-							cityForStopAreaAutoGeneration->getKey(),
-							logic::indeterminate,
-							optional<string>(),
-							name
-					)	);
-					if(stopAreas.empty())
-					{
-						curStop = new StopArea(StopAreaTableSync::getId(), true);
-						Importable::DataSourceLinks links;
-						links.insert(make_pair(&source, string()));
-						curStop->setDataSourceLinks(links);
-						if(defaultTransferDuration)
-						{
-							curStop->setDefaultTransferDelay(*defaultTransferDuration);
-						}
-						curStop->setName(name);
-						curStop->setCity(cityForStopAreaAutoGeneration);
-						env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
-						logStream << "CREA : Auto generation of the commercial stop for stop " << id << " (" << name <<  ")<br />";
-					}
-					else
-					{
-						curStop = stopAreas.begin()->get();
-						logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << id << " (" << name <<  ")<br />";
-					}
-					stopPoint->setHub(curStop);
+					curStop = stopAreas.begin()->get();
+					logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << code << " (" << name <<  ")<br />";
 				}
 
+				// Stop creation
+				StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
+				stop->setHub(curStop);
 				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, id));
-				stopPoint->setDataSourceLinks(links);
-				env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stopPoint));
-				stopPoints.add(*stopPoint);
-				result.insert(stopPoint);
+				links.insert(make_pair(&source, code));
+				stop->setDataSourceLinks(links);
+				env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
+				stops.add(*stop);
+				result.insert(stop);
 
-				logStream << "CREA : Creation of the physical stop with key " << id << " (" << name <<  ")<br />";
+				logStream << "CREA : Creation of the physical stop with key " << code << " (" << name <<  ")<br />";
 			}
 			else
 			{
-				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << id << " (" << name <<  ")<br />";
+				logStream << "LOAD : Link with existing stop " << (*result.begin())->getName() << " for stop " << code << " (" << name <<  ")<br />";
 			}
 
 			// Update
-			BOOST_FOREACH(StopPoint* stopPoint, result)
+			BOOST_FOREACH(StopPoint* stop, result)
 			{
-				stopPoint->setName(name);
-				if(geometry)
+				stop->setName(name);
+				if(geometry && *geometry)
 				{
-					stopPoint->setGeometry(
-						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*geometry)
+					stop->setGeometry(
+						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(**geometry)
 					);
 				}
 			}
@@ -438,7 +508,7 @@ namespace synthese
 				}
 
 				if(	(!rollingStock || jp->getRollingStock() == rollingStock) &&
-					(!id || jp->getCodeBySource(source) == *id) &&
+					(!id || jp->hasCodeBySource(source, *id)) &&
 					(!rules || jp->getRules() == *rules) &&
 					*jp == servedStops
 				){
@@ -455,7 +525,8 @@ namespace synthese
 					{
 						if(removeOldCodes && id)
 						{
-							jp->setCodeBySource(source, string());
+							jp->removeSourceLink(source, *id);
+							jp->addCodeBySource(source, string());
 							logStream << "INFO : Code " << *id << " was removed from route " << jp->getKey() << "<br />";
 						}
 						else

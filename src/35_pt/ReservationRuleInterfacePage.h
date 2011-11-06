@@ -46,6 +46,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -77,6 +82,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> page,
 				boost::shared_ptr<const cms::Webpage> dateTimePage,
 				const server::Request& request,
+				const util::ParametersMap& templateParametersMap,
 				const graph::Journey& journey
 			);
 		};

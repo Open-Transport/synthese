@@ -57,7 +57,6 @@ namespace synthese
 			std::string name
 		):	util::Registrable(id),
 			Path(),
-			Importable(),
 			Named(name),
 			Calendar(),
 			_isWalkingLine (false),

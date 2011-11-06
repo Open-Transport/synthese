@@ -36,34 +36,14 @@ namespace synthese
 		class DisplayScreen;
 
 		////////////////////////////////////////////////////////////////////////
-		///	DisplayGetNagiosStatusFunction public function class.
+		///	54.15 Service : Nagios monitoring informations about a departure board.
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_Nagios_connector
+		//////////////////////////////////////////////////////////////////////////
 		/// @author Hugues Romain
 		/// @date 2008
 		/// @ingroup m54Functions refFunctions
-		///
-		/// This function displays monitoring informations about a specified
-		/// display screen, according to the SYNTHESE nagios plugin format :
-		///		- at the first line : the returning code of the nagios plugin :
-		///		- from the second line : the nagios plugin standard output
-		///			according to the Nagios norm (see
-		///			http://nagios.sourceforge.net/docs/3_0/pluginapi.html)
-		///
-		/// The Nagios output plug-in return code can be :
-		///		- 0 = OK
-		///		- 1 = Warning
-		///		- 2 = Error
-		///		- 3 = Check deactivated
-		///
-		/// The value is computed from the monitoring current status :
-		///		(fill in here)
-		///
-		/// The Nagios plugin standard output follows this format :
-		///	@codeTEXT OUTPUT | TEMPERATURE VALUE
-		/// ERRORS DETAILS |
-		/// @endcode
-		///
-		class DisplayGetNagiosStatusFunction
-		:	public util::FactorableTemplate<server::Function,DisplayGetNagiosStatusFunction>
+		class DisplayGetNagiosStatusFunction:
+			public util::FactorableTemplate<server::Function,DisplayGetNagiosStatusFunction>
 		{
 		public:
 			static const std::string PARAMETER_DISPLAY_SCREEN_ID;
@@ -77,6 +57,8 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			///	Conversion from attributes to generic parameter maps.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_Nagios_connector#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			util::ParametersMap _getParametersMap() const;
 
@@ -84,13 +66,17 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_Nagios_connector#Request
+			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 
 		public:
 			////////////////////////////////////////////////////////////////////
-			/// Action to run, defined by each subclass.
+			/// Output generation.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_Nagios_connector#Response
+			//////////////////////////////////////////////////////////////////////////
 			///	@param stream Stream to write the output on
 			void run(std::ostream& stream, const server::Request& request) const;
 

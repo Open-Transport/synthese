@@ -72,7 +72,7 @@ namespace synthese
 			// Function parameters
 			if(_function.get())
 			{
-				ParametersMap savedParametersMap;
+				ParametersMap templateParametersMap;
 				BOOST_FOREACH(const ParametersMap::Map::value_type& it, _parametersMap.getMap())
 				{
 					if(	it.first != Request::PARAMETER_FUNCTION &&
@@ -80,10 +80,10 @@ namespace synthese
 						it.first != Request::PARAMETER_ACTION &&
 						(it.first.size() < Action_PARAMETER_PREFIX.size() || it.first.substr(0, Action_PARAMETER_PREFIX.size()) != Action_PARAMETER_PREFIX)
 					){
-						savedParametersMap.insert(it.first, it.second);
+						templateParametersMap.insert(it.first, it.second);
 					}
 				}
-				_function->setSavedParameters(savedParametersMap);
+				_function->setTemplateParameters(templateParametersMap);
 				_function->_setFromParametersMap(_parametersMap);
 			}
 		}

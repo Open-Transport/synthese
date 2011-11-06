@@ -51,7 +51,7 @@ namespace synthese
 		*/
 		class CalendarTemplate:
 			public virtual util::Registrable,
-			public impex::Importable,
+			public impex::ImportableTemplate<CalendarTemplate>,
 			public util::Named,
 			public tree::TreeNode<
 				CalendarTemplate,

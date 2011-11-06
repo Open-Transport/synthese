@@ -23,8 +23,10 @@
 #include "Alarm.h"
 #include "Scenario.h"
 #include "AlarmTemplate.h"
+#include "ParametersMap.h"
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -32,6 +34,14 @@ namespace synthese
 
 	namespace messages
 	{
+		const string Alarm::DATA_MESSAGE_ID("message_id");
+		const string Alarm::DATA_CONTENT("content");
+		const string Alarm::DATA_PRIORITY("priority");
+		const string Alarm::DATA_SCENARIO_ID("scenario_id");
+		const string Alarm::DATA_SCENARIO_NAME("scenario_name");
+		const string Alarm::DATA_TITLE("title");
+
+
 
 		Alarm::Alarm(
 			util::RegistryKeyType key,
@@ -40,6 +50,8 @@ namespace synthese
 			_scenario(scenario)
 		{
 		}
+
+
 
 		Alarm::Alarm(
 			const Alarm& source
@@ -113,5 +125,23 @@ namespace synthese
 		{
 			return _scenario;
 		}
-	}
-}
+
+
+
+		void Alarm::toParametersMap(
+			util::ParametersMap& pm,
+			bool withScenario,
+			std::string prefix /*= std::string() */
+		) const	{
+			pm.insert(prefix + "roid", getKey()); // Backward compatibility, deprecated
+			pm.insert(prefix + DATA_MESSAGE_ID, getKey());
+			pm.insert(prefix + DATA_TITLE, getShortMessage());
+			pm.insert(prefix + DATA_CONTENT, getLongMessage());
+			pm.insert(prefix + DATA_PRIORITY, static_cast<int>(getLevel()));
+			if(withScenario && getScenario())
+			{
+				pm.insert(prefix + DATA_SCENARIO_ID, getScenario()->getKey());
+				pm.insert(prefix + DATA_SCENARIO_NAME, getScenario()->getName());
+			}
+		}
+}	}

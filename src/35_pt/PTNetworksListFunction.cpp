@@ -134,7 +134,7 @@ namespace synthese
 			std::size_t rank
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			pm.insert(DATA_NETWORK_ID, object.getKey());
 			pm.insert(DATA_NAME, object.getName()); //1

@@ -1,7 +1,7 @@
 
 /** ServiceVertexRealTimeUpdateAction class header.
 	@file ServiceVertexRealTimeUpdateAction.h
-	@author Hugues
+	@author Hugues Romain
 	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -63,6 +63,7 @@ namespace synthese
 			std::size_t _lineStopRank;
 			bool _propagate;
 			bool _restorePlannedStop;
+			std::string _serviceCodeBySource;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

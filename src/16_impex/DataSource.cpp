@@ -74,39 +74,6 @@ namespace synthese
 
 
 
-		void DataSource::addLink( Importable& object ) const
-		{
-			_links.insert(
-				make_pair(object.getCodeBySource(*this), &object)
-			);
-		}
-
-
-
-		void DataSource::removeLink( Importable& object ) const
-		{
-			Links::iterator it(_links.find(object.getCodeBySource(*this)));
-			if(it != _links.end())
-			_links.erase(it);
-		}
-
-
-
-		Importable* DataSource::getObjectByCode( const std::string& code ) const
-		{
-			Links::const_iterator it(_links.find(code));
-			if(it == _links.end())
-			{
-				return NULL;
-			}
-			else
-			{
-				return it->second;
-			}
-		}
-
-
-
 		const CoordinatesSystem& DataSource::getActualCoordinateSystem() const
 		{
 			return _coordinatesSystem ? *_coordinatesSystem : CoordinatesSystem::GetInstanceCoordinatesSystem();

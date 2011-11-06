@@ -137,7 +137,7 @@ namespace synthese
 				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				const std::string& name,
-				const geography::City& city,
+				const geography::City* city,
 				bool updateCityIfExists,
 				boost::posix_time::time_duration defaultTransferDuration,
 				const impex::DataSource& source,
@@ -203,23 +203,43 @@ namespace synthese
 
 
 
+			//////////////////////////////////////////////////////////////////////////
+			///	Stop creation or update.
+			/// The stop is identified by the specified datasource and the code.
+			/// If the stop is not found, a stop is created in the specified stop area, if defined in
+			/// the corresponding parameter. If not, a error message is written on the log stream.
+			/// @param stops the stops which are registered to the data source
+			/// @param code the code of the stop to update or create, as known by the datasource
+			/// @param name the name of the stop (updated only if defined)
+			/// @param stopArea the stop area which the stop belongs to (updated only if defined)
+			/// @param geometry the location of the stop (updated only if defined)
+			/// @param source the data source
+			/// @param env the environment to read and populate
+			/// @param logStream the stream to write the logs on
+			/// @return the updated or created stops. Empty is no stop was neither found nor created in case
+			/// of the stop area parameter is not defined
+			static std::set<StopPoint*> CreateOrUpdateStop(
+				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+				const std::string& code,
+				boost::optional<const std::string&> name,
+				boost::optional<const graph::RuleUser::Rules&> useRules,
+				boost::optional<const StopArea*> stopArea,
+				boost::optional<const StopPoint::Geometry*> geometry,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
 
 
 			//////////////////////////////////////////////////////////////////////////
-			///	Gets a stop point.
-			///		- search stop points with link to the datasource whit the correct id
-			///		- if not found and if stop area is specified creates a new stop point in the stop area
-			/// @param stopArea the stop area to link with the stop in case of creation
-			///		(not updated if the stop already exists). If NULL, an existing stop area is
-			///		searched in the city with the same name as the stop point.
-			/// @param cityForStopAreaAutoGeneration if NULL no stop area is generated if stopArea is null
-			static std::set<StopPoint*> CreateOrUpdateStopPoints(
-				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
-				const std::string& id,
+			/// Stop creation or update with creation of a stop area based on the name if necessary.
+			static std::set<StopPoint*> CreateOrUpdateStopWithStopAreaAutocreation(
+				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+				const std::string& code,
 				const std::string& name,
-				const StopArea* stopArea,
-				const StopPoint::Geometry* geometry,
-				const geography::City* cityForStopAreaAutoGeneration,
+				boost::optional<const StopPoint::Geometry*> geometry,
+				const geography::City& cityForStopAreaAutoGeneration,
 				boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,

@@ -30,7 +30,6 @@
 #include "SentScenario.h"
 #include "AlarmTemplate.h"
 #include "SentAlarm.h"
-#include "MessagesObjectsCMSExporters.hpp"
 #include "ScenarioFolder.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
@@ -53,12 +52,18 @@ namespace synthese
 		const string ScenarioDisplayFunction::PARAMETER_MAIN_TEMPLATE("t");
 		const string ScenarioDisplayFunction::PARAMETER_MESSAGE_TEMPLATE("m");
 		const string ScenarioDisplayFunction::PARAMETER_VARIABLE_TEMPLATE("v");
+		const string ScenarioDisplayFunction::PARAMETER_OUTPUT_FORMAT("of");
 
 		const std::string ScenarioDisplayFunction::DATA_NAME("name");
+		const std::string ScenarioDisplayFunction::DATA_RANK("rank");
+		const std::string ScenarioDisplayFunction::DATA_SCENARIO("scenario");
+		const std::string ScenarioDisplayFunction::DATA_SCENARIO_ID("scenario_id");
 		const std::string ScenarioDisplayFunction::DATA_FOLDER_ID("folder_id");
 		const std::string ScenarioDisplayFunction::DATA_FOLDER_NAME("folder_name");
 		const std::string ScenarioDisplayFunction::DATA_VARIABLES("variables");
+		const std::string ScenarioDisplayFunction::DATA_VARIABLE("variable");
 		const std::string ScenarioDisplayFunction::DATA_MESSAGES("messages");
+		const std::string ScenarioDisplayFunction::DATA_MESSAGE("message");
 		const std::string ScenarioDisplayFunction::DATA_START_DATE("start_date");
 		const std::string ScenarioDisplayFunction::DATA_END_DATE("end_date");
 		const std::string ScenarioDisplayFunction::DATA_ACTIVE("active");
@@ -67,6 +72,9 @@ namespace synthese
 		const std::string ScenarioDisplayFunction::DATA_HELP_MESSAGE("help_message");
 		const std::string ScenarioDisplayFunction::DATA_REQUIRED("required");
 		const std::string ScenarioDisplayFunction::DATA_VALUE("value");
+
+		const string ScenarioDisplayFunction::FORMAT_JSON("json");
+		const string ScenarioDisplayFunction::FORMAT_XML("xml");
 
 		ParametersMap ScenarioDisplayFunction::_getParametersMap() const
 		{
@@ -87,6 +95,13 @@ namespace synthese
 			{
 				map.insert(PARAMETER_VARIABLE_TEMPLATE, _variableTemplate->getKey());
 			}
+
+			// Output format
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+
 			return map;
 		}
 
@@ -94,6 +109,10 @@ namespace synthese
 
 		void ScenarioDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Output format
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			// Scenario
 			try
 			{
 				_scenario = ScenarioTableSync::Get(
@@ -119,7 +138,6 @@ namespace synthese
 			{
 				throw RequestException("No such main CMS template : "+ e.getMessage());
 			}
-			_savedParameters.remove(PARAMETER_MAIN_TEMPLATE);
 
 			try
 			{
@@ -133,7 +151,6 @@ namespace synthese
 			{
 				throw RequestException("No such message CMS template : "+ e.getMessage());
 			}
-			_savedParameters.remove(PARAMETER_MESSAGE_TEMPLATE);
 
 			try
 			{
@@ -147,7 +164,6 @@ namespace synthese
 			{
 				throw RequestException("No such variable CMS template : "+ e.getMessage());
 			}
-			_savedParameters.remove(PARAMETER_VARIABLE_TEMPLATE);
 		}
 
 
@@ -159,10 +175,10 @@ namespace synthese
 
 			bool isTemplate(dynamic_cast<const ScenarioTemplate*>(_scenario.get()) != NULL);
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// roid
-			pm.insert(Request::PARAMETER_OBJECT_ID, _scenario->getKey());
+			pm.insert(DATA_SCENARIO_ID, _scenario->getKey());
 
 			// name
 			pm.insert(DATA_NAME, _scenario->getName());
@@ -171,7 +187,6 @@ namespace synthese
 			if(	isTemplate ||
 				static_cast<const SentScenario*>(_scenario.get())->getTemplate()
 			){
-				stringstream s;
 				const ScenarioTemplate::VariablesMap& variables(
 					(	isTemplate ?
 						static_cast<const ScenarioTemplate*>(_scenario.get()) :
@@ -180,6 +195,7 @@ namespace synthese
 				);
 				BOOST_FOREACH(const ScenarioTemplate::VariablesMap::value_type& variable, variables)
 				{
+					shared_ptr<ParametersMap> variablePM(new ParametersMap(getTemplateParameters()));
 					string value;
 					if(!isTemplate)
 					{
@@ -190,16 +206,15 @@ namespace synthese
 							value = it->second;
 						}
 					}
-					_displayVariable(s, request, variable.second, value);
+					_displayVariable(*variablePM, variable.second, value);
+					pm.insert(DATA_VARIABLE, variablePM);
 				}
-				pm.insert(DATA_VARIABLES, s.str());
 			}
 
 			// messages
 			if(_messageTemplate.get())
 			{
 				vector<shared_ptr<Alarm> > v;
-				stringstream s;
 
 				if (isTemplate)
 				{
@@ -222,16 +237,13 @@ namespace synthese
 					}
 				}
 
+				// Messages
 				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
 				{
-					MessagesObjectsCMSExporters::DisplayMessage(
-						s,
-						request,
-						_messageTemplate,
-						*alarm
-					);
+					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
+					alarm->toParametersMap(*messagePM, false);
+					pm.insert(DATA_MESSAGE, messagePM);
 				}
-				pm.insert(DATA_MESSAGES, s.str());
 			}
 
 			if(isTemplate)
@@ -267,7 +279,56 @@ namespace synthese
 				pm.insert(DATA_ACTIVE, scenario.getIsEnabled());
 			}
 
-			_mainTemplate->display(stream, request, pm);
+			// Output
+			if(_mainTemplate.get()) // CMS output
+			{
+				// Variables integration
+				if(_variableTemplate.get())
+				{
+					stringstream s;
+					size_t rank(0);
+					BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmVariable, pm.getSubMaps(DATA_VARIABLE))
+					{
+						pmVariable->insert(DATA_RANK, rank++);
+						_variableTemplate->display(s, request, *pmVariable);
+					}
+					pm.insert(DATA_VARIABLES, s.str());
+				}
+
+				// Messages integration
+				if(_messageTemplate.get())
+				{
+					stringstream s;
+					size_t rank(0);
+					BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
+					{
+						pmMessage->insert(DATA_RANK, rank++);
+						_messageTemplate->display(s, request, *pmMessage);
+					}
+					pm.insert(DATA_MESSAGES, s.str());
+				}
+
+				// Backward compatibility (deprecated tag)
+				pm.insert(Request::PARAMETER_OBJECT_ID, _scenario->getKey());
+
+				_mainTemplate->display(stream, request, pm);
+			}
+			else if(_outputFormat == FORMAT_XML) // XML output
+			{
+				pm.outputXML(
+					stream,
+					DATA_SCENARIO,
+					true,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/17_messages/ScenarioDisplayFunction.xsd"
+				);
+			}
+			else if(_outputFormat == FORMAT_JSON) // JSON output
+			{
+				pm.outputJSON(
+					stream,
+					DATA_SCENARIO
+				);
+			}
 		}
 
 
@@ -282,24 +343,33 @@ namespace synthese
 
 		std::string ScenarioDisplayFunction::getOutputMimeType() const
 		{
-			return _mainTemplate.get() ? _mainTemplate->getMimeType() : "text/plain";
+			std::string mimeType;
+			if(_mainTemplate.get())
+			{
+				mimeType = _mainTemplate->getMimeType();
+			}
+			else if(_outputFormat == FORMAT_XML)
+			{
+				mimeType = "text/xml";
+			}
+			else if(_outputFormat == FORMAT_JSON)
+			{
+				mimeType = "application/json";
+			}
+			else // For empty result
+			{
+				mimeType = "text/plain";
+			}
+			return mimeType;
 		}
 
 
 
 		void ScenarioDisplayFunction::_displayVariable(
-			std::ostream& stream,
-			const server::Request& request,
+			ParametersMap& pm,
 			const ScenarioTemplate::Variable& variable,
 			const std::string& value
 		) const	{
-
-			if(!_variableTemplate.get())
-			{
-				return;
-			}
-
-			ParametersMap pm(request.getFunction()->getSavedParameters());
 
 			// code
 			pm.insert(DATA_CODE, variable.code);
@@ -312,7 +382,5 @@ namespace synthese
 
 			// value
 			pm.insert(DATA_VALUE, value);
-
-			_variableTemplate->display(stream, request, pm);
 		}
 }	}

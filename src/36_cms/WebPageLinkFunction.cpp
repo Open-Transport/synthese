@@ -76,10 +76,6 @@ namespace synthese
 			}
 			optional<string> ot(map.getOptional<string>(PARAMETER_TEXT));
 			_text = ot ? *ot : _target->getName();
-			_savedParameters.remove(PARAMETER_TARGET);
-			_savedParameters.remove(PARAMETER_TEXT);
-			_savedParameters.remove(PARAMETER_CONFIRM);
-			_savedParameters.remove(PARAMETER_USE_SMART_URL);
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 
 			_confirm = map.getDefault<string>(PARAMETER_CONFIRM);
@@ -108,7 +104,7 @@ namespace synthese
 			{	// Classic URL
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 				openRequest.getFunction()->setPage(_target);
-				openRequest.getFunction()->addParameters(_savedParameters);
+				openRequest.getFunction()->addParameters(getTemplateParameters());
 				if(!_target->getRoot()->getClientURL().empty())
 				{
 					openRequest.setClientURL(_target->getRoot()->getClientURL());

@@ -181,7 +181,7 @@ namespace synthese
 			const SentScenario& scenario
 		) const	{
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());
@@ -212,7 +212,7 @@ namespace synthese
 			const ScenarioTemplate& scenario
 		) const	{
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// roid
 			pm.insert(Request::PARAMETER_OBJECT_ID, scenario.getKey());

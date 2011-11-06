@@ -291,7 +291,7 @@ namespace synthese
 		) const {
 			AdminRequest adminRequest(request, true);
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// error_message
 			if(errorMessage)
@@ -377,7 +377,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// title, icon, url
 			ExportAdminCompound(pm, request, link);
@@ -402,7 +402,7 @@ namespace synthese
 			bool isLast
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// icon, title, url
 			ExportAdminCompound(pm, request, tree.page);

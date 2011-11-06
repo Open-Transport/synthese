@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace cms
 	{
-		const string Webpage::Node::PARAMETER_TRANSMIT_PARAMETERS("tp");
+		const string Webpage::PARAMETER_VAR = "VAR";
 		synthese::util::shared_recursive_mutex Webpage::_SharedMutex;
 
 		Webpage::Webpage( util::RegistryKeyType id  ):
@@ -113,7 +113,7 @@ namespace synthese
 					}
 
 					// Function node
-					shared_ptr<FunctionNode> node(new FunctionNode);
+					shared_ptr<ServiceNode> node(new ServiceNode);
 
 					// function name
 					string functionName;
@@ -144,7 +144,18 @@ namespace synthese
 								{
 									Nodes parameterNodes;
 									it = _parse(parameterNodes, it, end, functionTermination);
-									node->parameters.push_back(make_pair(parameterName.str(), parameterNodes));
+
+									// Storage in template parameters if begins with VAR else in service parameters
+									string parameterNameStr(parameterName.str());
+									if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
+									{
+										node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
+									}
+									else
+									{
+										node->templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
+									}
+
 									if(*(it-1) != '&')
 									{
 										break;
@@ -153,7 +164,7 @@ namespace synthese
 								}
 						}	}
 
-						nodes.push_back(static_pointer_cast<Node,FunctionNode>(node));
+						nodes.push_back(static_pointer_cast<Node, ServiceNode>(node));
 					}
 					catch(FactoryException<Function>&)
 					{
@@ -267,7 +278,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const string& test, termination)
 					{
-						if(end - it >= test.size())
+						if(size_t(end - it) >= test.size())
 						{
 							string testIt;
 							for(size_t i(0); i< test.size(); ++i)
@@ -438,43 +449,49 @@ namespace synthese
 
 
 
-		void Webpage::FunctionNode::display(
+		void Webpage::ServiceNode::display(
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
 			const Webpage& page
 		) const	{
 
-			// Parameters
-			ParametersMap pm(request.getFunction()->getSavedParameters());
-			ParametersMap callParametersMap;
-			BOOST_FOREACH(const Parameters::value_type& param, parameters)
+			// Service parameters evaluation
+			ParametersMap serviceParametersMap;
+			BOOST_FOREACH(const Parameters::value_type& param, serviceParameters)
 			{
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
 					node->display(s, request, additionalParametersMap, page);
 				}
-				pm.insert(param.first, s.str());
-				callParametersMap.insert(param.first, s.str());
+				serviceParametersMap.insert(param.first, s.str());
 			}
-			if(callParametersMap.isDefined(PARAMETER_TRANSMIT_PARAMETERS))
+
+			// Template parameters evaluation
+			ParametersMap templateParametersMap(request.getFunction()->getTemplateParameters());
+			BOOST_FOREACH(const Parameters::value_type& param, templateParameters)
 			{
-				callParametersMap.merge(pm);
+				stringstream s;
+				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
+				{
+					node->display(s, request, additionalParametersMap, page);
+				}
+				templateParametersMap.insert(param.first, s.str());
 			}
 
 			// Function
 			shared_ptr<Function> function(functionCreator->create());
 			try
 			{
-				function->setSavedParameters(callParametersMap);
-				function->_setFromParametersMap(callParametersMap);
+				function->setTemplateParameters(templateParametersMap);
+				function->_setFromParametersMap(serviceParametersMap);
 				if (function->isAuthorized(request.getSession()))
 				{
 					function->run(stream, request);
 				}
 			}
-			catch(RequestException& e)
+			catch(RequestException&)
 			{
 
 			}

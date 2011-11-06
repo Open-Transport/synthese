@@ -58,7 +58,7 @@ namespace synthese
 			bool edit,
 			bool displayContent
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(DATA_TITLE, page.getName());
 

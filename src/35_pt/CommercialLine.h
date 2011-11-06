@@ -68,7 +68,7 @@ namespace synthese
 		class CommercialLine:
 			public graph::PathGroup,
 			public util::Named,
-			public impex::Importable
+			public impex::ImportableTemplate<CommercialLine>
 		{
 		public:
 			static const std::string DATA_LINE_SHORT_NAME;

@@ -40,6 +40,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace calendar
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -77,6 +82,7 @@ namespace synthese
 				std::ostream& stream,
 				boost::shared_ptr<const cms::Webpage> page,
 				const server::Request& request,
+				const util::ParametersMap& templateParametersMap,
 				boost::gregorian::date value,
 				bool isActive
 			);

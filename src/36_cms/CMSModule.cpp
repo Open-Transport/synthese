@@ -112,9 +112,9 @@ namespace synthese
 			)	);
 			if(function.get())
 			{
-				if(function->getSavedParameters().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
+				if(function->getTemplateParameters().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
 				{
-					return Env::GetOfficialEnv().get<Webpage>(function->getSavedParameters().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
+					return Env::GetOfficialEnv().get<Webpage>(function->getTemplateParameters().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
 				}
 				else
 				{

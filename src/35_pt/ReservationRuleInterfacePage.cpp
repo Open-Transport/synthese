@@ -52,9 +52,10 @@ namespace synthese
 			shared_ptr<const Webpage> page,
 			shared_ptr<const Webpage> dateTimePage,
 			const Request& request,
+			const util::ParametersMap& templateParametersMap,
 			const Journey& journey
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(templateParametersMap);
 
 			ptime now(second_clock::local_time());
 			ptime deadLine(journey.getReservationDeadLine());
@@ -74,7 +75,7 @@ namespace synthese
 						dateTimePage,
 						request,
 						deadLine
-						);
+					);
 					pm.insert(DATA_DEADLINE, s.str());
 				}
 				else

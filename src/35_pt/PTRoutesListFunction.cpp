@@ -286,7 +286,7 @@ namespace synthese
 			{
 				if(_page.get())
 				{
-					ParametersMap pm(_savedParameters);
+					ParametersMap pm(getTemplateParameters());
 
 					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey());
 					pm.insert(DATA_NAME, route->getName());

@@ -57,7 +57,7 @@ namespace synthese
 		*/
 		class ScheduledService:
 			public SchedulesBasedService,
-			public impex::Importable
+			public impex::ImportableTemplate<ScheduledService>
 		{
 		public:
 

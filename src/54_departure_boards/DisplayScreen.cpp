@@ -220,7 +220,7 @@ namespace synthese
 
 
 
-		ArrivalDepartureList DisplayScreen::_generateStandardScreen(
+		ArrivalDepartureList DisplayScreen::generateStandardScreen(
 			const boost::posix_time::ptime& startTime,
 			const boost::posix_time::ptime& endTime,
 			bool rootCall
@@ -304,7 +304,7 @@ namespace synthese
 							itDest->serviceUse.getArrivalDateTime() + minutes(continuationScreen->getMaxDelay())
 						);
 						ArrivalDepartureList subResult(
-							continuationScreen->_generateStandardScreen(transferStartTime, transferEndTime, false)
+							continuationScreen->generateStandardScreen(transferStartTime, transferEndTime, false)
 						);
 						if(!subResult.empty() && subResult.begin()->first.getService() != row.first.getService())
 						{
@@ -406,129 +406,6 @@ namespace synthese
 		}
 
 
-
-		void DisplayScreen::display(
-			std::ostream& stream,
-			const ptime& date,
-			const server::Request* request
-		) const {
-			if(	!_displayType ||
-				(	!_displayType->getDisplayInterface() && !_displayType->getDisplayMainPage()) ||
-				!_maintenanceIsOnline ||
-				!_displayedPlace
-			){
-				return;
-			}
-
-			try
-			{
-				// End time
-				ptime realStartDateTime(date);
-				realStartDateTime -= minutes(_clearingDelay);
-				ptime endDateTime(realStartDateTime);
-				endDateTime += minutes(_maxDelay);
-
-				VariablesMap variables;
-
-				if(_generationMethod == ROUTE_PLANNING)
-				{
-					RoutePlanningTableGenerator generator(
-						*_displayedPlace,
-						getDisplayedPlaces(),
-						realStartDateTime,
-						endDateTime,
-						_routePlanningWithTransfer
-					);
-
-					RoutePlanningListWithAlarm displayedObject;
-					displayedObject.map = generator.run();
-					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
-
-					if(	_displayType->getDisplayInterface() &&
-						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
-					){
-						_displayType->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()->display(
-							stream,
-							variables,
-							getTitle(),
-							getWiringCode(),
-							getServiceNumberDisplay(),
-							getTrackNumberDisplay(),
-							getRoutePlanningWithTransfer(),
-							getBlinkingDelay(),
-							getDisplayClock(),
-							*getDisplayedPlace(),
-							displayedObject,
-							request
-						);
-					}
-					else
-					{
-						assert(_displayType->getDisplayMainPage());
-
-						DisplayScreenContentFunction::DisplayRoutePlanningBoard(
-							stream,
-							*request,
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayMainPage()),
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayRowPage()),
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
-							realStartDateTime,
-							displayedObject,
-							*this
-						);
-					}
-				}
-				else if(_generationMethod == DISPLAY_CHILDREN_ONLY)
-				{
-					// computes nothing, children will be called by the cms method
-				}
-				else
-				{
-					ArrivalDepartureListWithAlarm displayedObject;
-					displayedObject.map = _generateStandardScreen(realStartDateTime, endDateTime);
-					displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(this, date);
-
-					if(	_displayType->getDisplayInterface() &&
-						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
-					){
-						_displayType->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->display(
-							stream,
-							variables,
-							getTitle(),
-							getWiringCode(),
-							getServiceNumberDisplay(),
-							getTrackNumberDisplay(),
-							getDisplayTeam(),
-							getType()->getMaxStopsNumber(),
-							getBlinkingDelay(),
-							getDisplayClock(),
-							getDisplayedPlace(),
-							displayedObject,
-							request
-						);
-					}
-					else
-					{
-						assert(_displayType->getDisplayMainPage());
-
-						DisplayScreenContentFunction::DisplayDepartureBoard(
-							stream,
-							*request,
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayMainPage()),
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayRowPage()),
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayDestinationPage()),
-							Env::GetOfficialEnv().getSPtr(_displayType->getDisplayTransferDestinationPage()),
-							realStartDateTime,
-							displayedObject,
-							*this
-						);
-					}
-				}
-			}
-			catch (InterfacePageException&)
-			{
-			}
-		}
 
 		int DisplayScreen::getWiringCode() const
 		{
