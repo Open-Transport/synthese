@@ -63,19 +63,21 @@ namespace synthese
 
 
 
-		const std::string& Importable::getCodeBySource( const DataSource& source ) const
+		const std::string& Importable::getACodeBySource( const DataSource& source ) const
 		{
-			DataSourceLinks::const_iterator it(_dataSourceLinks.find(&source));
-			if(it == _dataSourceLinks.end())
+			pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
+				_dataSourceLinks.equal_range(&source)
+			);
+			if(range.first == range.second)
 			{
 				throw NotLinkedWithSourceException(*this, source);
 			}
-			return it->second;
+			return range.first->second;
 		}
 
 
 
-		const std::string& Importable::getCodeBySource() const
+		const std::string& Importable::getACodeBySource() const
 		{
 
 			DataSourceLinks::const_iterator it(_dataSourceLinks.find(NULL));
@@ -88,34 +90,9 @@ namespace synthese
 
 
 
-		void Importable::setCodeBySource( const DataSource& source, const std::string& code, bool storeLinkInDataSource)
-		{
-			_dataSourceLinks[&source] = code;
-			if(storeLinkInDataSource)
-			{
-				source.addLink(*this);
-			}
-		}
-
-
-
 		bool Importable::hasUnknownOwner() const
 		{
 			return _dataSourceLinks.find(NULL) != _dataSourceLinks.end();
-		}
-
-
-
-		void Importable::cleanDataSourceLinks(
-			bool updateDataSources
-		){
-			if(updateDataSources)
-			{
-				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-				{
-					link.first->removeLink(*this);
-			}	}
-			_dataSourceLinks.clear();
 		}
 
 
@@ -140,40 +117,33 @@ namespace synthese
 
 
 
-		void Importable::removeSourceLink(
-			const DataSource& source,
-			bool updateDataSouce
-		){
-			//TODO protect this code by a mutex
-			DataSourceLinks::iterator it(_dataSourceLinks.find(&source));
-			if(it != _dataSourceLinks.end())
+		std::vector<std::string> Importable::getCodesBySource( const DataSource& source ) const
+		{
+			vector<string> result;
+			pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
+				_dataSourceLinks.equal_range(&source)
+			);
+			for(DataSourceLinks::const_iterator it(range.first); it != range.second; ++it)
 			{
-				if(updateDataSouce)
-				{
-					it->first->removeLink(*this);
-				}
-				_dataSourceLinks.erase(it);
+				result.push_back(it->second);
 			}
+			return result;
 		}
 
 
 
-		void Importable::setDataSourceLinks(
-			const DataSourceLinks& value,
-			bool storeLinkInDataSource
-		){
-			if(storeLinkInDataSource)
+		bool Importable::hasCodeBySource( const DataSource& source, const std::string& code ) const
+		{
+			pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
+				_dataSourceLinks.equal_range(&source)
+			);
+			for(DataSourceLinks::const_iterator it(range.first); it != range.second; ++it)
 			{
-				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+				if(it->second == code)
 				{
-					link.first->removeLink(*this);
-			}	}
-			_dataSourceLinks = value;
-			if(storeLinkInDataSource)
-			{
-				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-				{
-					link.first->addLink(*this);
-			}	}
+					return true;
+				}
+			}
+			return false;
 		}
 }	}

@@ -46,7 +46,7 @@ namespace synthese
 		class DeadRun:
 			public pt::SchedulesBasedService,
 			public graph::Path,
-			public impex::Importable
+			public impex::ImportableTemplate<DeadRun>
 		{
 		public:
 			typedef util::Registry<DeadRun> Registry;

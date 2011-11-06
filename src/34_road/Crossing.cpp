@@ -53,8 +53,7 @@ namespace synthese
 			const impex::DataSource* source
 		):	Hub(),
 			Vertex(this, geometry),
-			Registrable(key),
-			Importable()
+			Registrable(key)
 		{
 			if(source)
 			{

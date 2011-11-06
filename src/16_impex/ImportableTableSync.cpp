@@ -127,7 +127,7 @@ namespace synthese
 						}
 
 						// Storage
-						result[source.get()] = code;
+						result.insert(make_pair(source.get(), code));
 					}
 					catch(bad_lexical_cast)
 					{ // If bad cast, the source is ignored

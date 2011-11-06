@@ -74,7 +74,7 @@ namespace synthese
 				if(_dataSource.get())
 				{
 					map.insert(PARAMETER_DATASOURCE_ID, _dataSource->getKey());
-					map.insert(PARAMETER_SERVICE_ID, _service->getCodeBySource(*_dataSource));
+					map.insert(PARAMETER_SERVICE_ID, _serviceCodeBySource);
 				}
 				else
 				{
@@ -103,12 +103,13 @@ namespace synthese
 					shared_ptr<const DataSource> dataSource(
 						Env::GetOfficialEnv().getRegistry<DataSource>().get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID))
 					);
-					Importable* obj(dataSource->getObjectByCode(map.get<string>(PARAMETER_SERVICE_ID)));
-					if(!obj || !dynamic_cast<ScheduledService*>(obj))
+					_serviceCodeBySource = map.get<string>(PARAMETER_SERVICE_ID);
+					ScheduledService* obj(dataSource->getObjectByCode<ScheduledService>(_serviceCodeBySource));
+					if(!obj)
 					{
 						throw ActionException("No such service");
 					}
-					_service = Env::GetOfficialEnv().getEditableSPtr(static_cast<ScheduledService*>(obj));
+					_service = Env::GetOfficialEnv().getEditableSPtr(obj);
 				}
 				catch(ObjectNotFoundException<DataSource>&)
 				{

@@ -36,7 +36,7 @@ namespace synthese
 		*/
 		class Destination:
 			public virtual util::Registrable,
-			public impex::Importable
+			public impex::ImportableTemplate<Destination>
 		{
 		public:
 			/// Chosen registry class.

@@ -45,7 +45,7 @@ namespace synthese
 		*/
 		class VehicleService:
 			public util::Named,
-			public impex::Importable,
+			public impex::ImportableTemplate<VehicleService>,
 			public virtual util::Registrable
 		{
 		public:

@@ -81,10 +81,6 @@ namespace synthese
 					throw RequestException("No such page");
 				}
 			}
-			_savedParameters.remove(PARAMETER_PAGE_ID);
-			_savedParameters.remove(PARAMETER_NAME);
-			_savedParameters.remove(PARAMETER_SCRIPT);
-			_savedParameters.remove(PARAMETER_IDEM);
 		}
 
 
@@ -111,7 +107,7 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-					openRequest.getFunction()->setSavedParameters(_savedParameters);
+					openRequest.getFunction()->setTemplateParameters(_templateParameters);
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
 					{

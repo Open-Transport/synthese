@@ -53,10 +53,15 @@ namespace synthese
 			static const std::string PARAMETER_MAIN_TEMPLATE;
 			static const std::string PARAMETER_VARIABLE_TEMPLATE;
 			static const std::string PARAMETER_MESSAGE_TEMPLATE;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
+
+			static const std::string FORMAT_XML;
+			static const std::string FORMAT_JSON;
 
 		protected:
 			//! @name Parameters
 			//@{
+				std::string _outputFormat;
 				boost::shared_ptr<const Scenario> _scenario;
 			//@}
 
@@ -94,11 +99,16 @@ namespace synthese
 			static const std::string DATA_NAME;
 			static const std::string DATA_FOLDER_ID;
 			static const std::string DATA_FOLDER_NAME;
+			static const std::string DATA_VARIABLE;
 			static const std::string DATA_VARIABLES;
 			static const std::string DATA_MESSAGES;
 			static const std::string DATA_START_DATE;
 			static const std::string DATA_END_DATE;
 			static const std::string DATA_ACTIVE;
+			static const std::string DATA_MESSAGE;
+			static const std::string DATA_RANK;
+			static const std::string DATA_SCENARIO;
+			static const std::string DATA_SCENARIO_ID;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -124,16 +134,14 @@ namespace synthese
 			/// Display of a variable.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenario_display#Variable
 			//////////////////////////////////////////////////////////////////////////
-			/// @param stream Stream to display the content on.
-			/// @param request the current request
+			/// @param pm the parameters map to populate
 			/// @param variable variable to display
 			/// @param value value of the variable (for sent scenario)
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
 			void _displayVariable(
-				std::ostream& stream,
-				const server::Request& request,
+				util::ParametersMap& pm,
 				const ScenarioTemplate::Variable& variable,
 				const std::string& value
 			) const;

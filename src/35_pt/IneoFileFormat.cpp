@@ -55,6 +55,8 @@
 #include "Junction.hpp"
 #include "JunctionTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "AllowedUseRule.h"
+#include "ForbiddenUseRule.h"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -111,6 +113,13 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_ID_FIELD = "stop_id_field";
 		const std::string IneoFileFormat::Importer_::VALUE_MNLP = "MNLP";
 		const std::string IneoFileFormat::Importer_::VALUE_IDENTSMS = "IdentSMS";
+		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_CITY_CODE_FIELD = "stop_city_code_field";
+		const std::string IneoFileFormat::Importer_::VALUE_CODE_COMMUNE = "code_commune";
+		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_NAME_FIELD = "stop_name_field";
+		const std::string IneoFileFormat::Importer_::VALUE_LIBP = "LIBP";
+		const std::string IneoFileFormat::Importer_::VALUE_LIBCOM = "LIBCOM";
+		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
+		const std::string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 	}
 
 	namespace impex
@@ -182,18 +191,81 @@ namespace synthese
 			_clearFieldsMap();
 			date now(day_clock::local_day());
 
-			// 1 : Routes
-			// Stops
+			// 1 : Stops
 			if(key == FILE_PNT)
 			{
 				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
-				map<string, StopArea*> stopAreasByName;
 
-				// 2.2 : stops
-				PTFileFormat::ImportableStopPoints linkedStopPoints;
-				PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
+				// 1.1 Stop areas
+				if(_importStopAreas)
+				{
+					// Loop
+					while(_readLine(inFile))
+					{
+						if(_section != "P")
+						{
+							continue;
+						}
+
+						// Code field
+						string stopAreaCode(_getValue("MNCP"));
+
+						// Name field
+						string name(_getValue(_stopNameField));
+
+						// City
+						shared_ptr<const City> city;
+						if(!_stopCityCodeField.empty())
+						{
+							string cityCode(_getValue(_stopCityCodeField));
+							CityTableSync::SearchResult cities(
+								CityTableSync::Search(
+									_env,
+									optional<string>(),
+									optional<string>(),
+									cityCode
+							)	);
+							if(!cities.empty())
+							{
+								city = *cities.begin();
+							}
+						}
+						else
+						{
+							city = _defaultCity;
+						}
+
+						// Stop area creation or update
+						PTFileFormat::CreateOrUpdateStopAreas(
+							stopAreas,
+							stopAreaCode,
+							name,
+							city.get(),
+							!_stopCityCodeField.empty(),
+							_stopAreaDefaultTransferDuration,
+							_dataSource,
+							_env,
+							stream
+						);
+				}	}
+
+				
+				// 1.2 : stops
+				RuleUser::Rules handicappedRules;
+				handicappedRules.push_back(NULL);
+				handicappedRules.push_back(AllowedUseRule::INSTANCE.get());
+				handicappedRules.push_back(NULL);
+
+				RuleUser::Rules handicappedForbiddenRules;
+				handicappedForbiddenRules.push_back(NULL);
+				handicappedForbiddenRules.push_back(ForbiddenUseRule::INSTANCE.get());
+				handicappedForbiddenRules.push_back(NULL);
 
 				// Loop
+				inFile.clear();
+				inFile.seekg(0, ios::beg);
+				string fakeLine;
+				getline(inFile, fakeLine);
 				while(_readLine(inFile))
 				{
 					if(_section != "P")
@@ -201,8 +273,14 @@ namespace synthese
 						continue;
 					}
 
-					string id(_getValue(PARAMETER_STOP_ID_FIELD));
-					string name(_getValue("LIBP"));
+					// Code field
+					string id(_getValue(_stopIdField));
+
+					// MNLP code
+					string mnlp(_getValue(VALUE_MNLP));
+					
+					// Name field
+					string name(_getValue(_stopNameField));
 
 					// Point
 					shared_ptr<geos::geom::Point> point;
@@ -224,121 +302,47 @@ namespace synthese
 						}
 					}
 
-					if(request && !_autoImportStops)
+					// Handicapped
+					optional<const RuleUser::Rules&> handicapped;
+					if(!_stopHandicappedAccessibilityField.empty())
 					{
-						PTFileFormat::ImportableStopPoint isp;
-						isp.operatorCode = id;
-						isp.name = name;
-						isp.linkedStopPoints = _stopPoints.get(id);
-						isp.coords = point;
-
-						if(isp.linkedStopPoints.empty())
-						{
-							nonLinkedStopPoints.push_back(isp);
-						}
-						else if(_displayLinkedStops)
-						{
-							linkedStopPoints.push_back(isp);
-						}
+						handicapped = 
+							(_getValue(_stopHandicappedAccessibilityField) == "O") ?
+							handicappedRules :
+							handicappedForbiddenRules;
 					}
-					else
-					{
-						if(_stopPoints.contains(id))
-						{
-							BOOST_FOREACH(StopPoint* stopPoint, _stopPoints.get(id))
-							{
-								stopPoint->setName(name);
-								if(point.get())
-								{
-									stopPoint->setGeometry(point);
-								}
-								const_cast<StopArea*>(stopPoint->getConnectionPlace())->setName(name);
-							}
-						}
-						else
-						{
-							if(_autoImportStops)
-							{
-								StopArea* stopArea(NULL);
-								 // Search in the last created stop areas map
-								map<string, StopArea*>::const_iterator it(stopAreasByName.find(name));
-								if(it != stopAreasByName.end())
-								{
-									stopArea = it->second;
-								}
-								// Search in the database
-								if(!stopArea)
-								{
-									StopAreaTableSync::SearchResult stopAreas(
-										StopAreaTableSync::Search(
-											_env,
-											_defaultCity->getKey(),
-											logic::indeterminate,
-											optional<string>(),
-											name
-									)	);
-									if(!stopAreas.empty())
-									{
-										stopArea = stopAreas.begin()->get();
-									}
-								}
-								// Creation of the stop area
-								if(!stopArea)
-								{
-									stopArea = new StopArea(
-										StopAreaTableSync::getId(),
-										true,
-										_stopAreaDefaultTransferDuration
-									);
-									stopArea->setCity(_defaultCity.get());
-									stopArea->setName(name);
-									_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
-									stopAreasByName.insert(make_pair(name, stopArea));
-								}
-								PTFileFormat::CreateOrUpdateStopPoints(
-									_stopPoints,
-									id,
-									name,
-									stopArea,
-									point.get(),
-									_defaultCity.get(),
-									_stopAreaDefaultTransferDuration,
-									_dataSource,
-									_env,
-									stream
-								);
-							}
-							else
-							{
-								return false;
-							}
-						}
-					}
-				}
 
-				if(!nonLinkedStopPoints.empty() && !_autoImportStops)
-				{
-					if(request)
+					// Stop area
+					string stopAreaCode(_getValue("MNCP"));
+					set<StopArea*> stopAreas(stopAreas.get(stopAreaCode));
+					if(stopAreas.empty())
 					{
-						PTFileFormat::DisplayStopPointImportScreen(
-							nonLinkedStopPoints,
-							*request,
-							_env,
+						stream << "WARN : Stop area " << stopAreaCode << " was not found for stop " << id << ". Stop update or creation is ignored.<br />";
+						continue;
+					}
+
+					// Create or update stop
+					set<StopPoint*> matchingStops(
+						PTFileFormat::CreateOrUpdateStop(
+							_stopPoints,
+							id,
+							name,
+							handicapped,
+							*stopAreas.begin(),
+							point.get(),
 							_dataSource,
+							_env,
 							stream
-							);
-						if(_displayLinkedStops)
-						{
-							PTFileFormat::DisplayStopPointImportScreen(
-								linkedStopPoints,
-								*request,
-								_env,
-								_dataSource,
-								stream
-							);
-						}
+					)	);
+
+					// Adding of the code to the stop if not already exists
+					BOOST_FOREACH(StopPoint* stop, matchingStops)
+					{
+						stop->addCodeBySource(_dataSource, mnlp);
+						_stopPoints.add(*stop);
 					}
-					return false;
+
+					// Updating the code map to take into account of secondary codes
 				}
 			}
 			// 2 : Distances
@@ -470,7 +474,10 @@ namespace synthese
 								stream << "WARN : distance between " << lastStopCode << " and " << stopCode << " not found.<br />";
 							}
 						}
-						ImportableTableSync::ObjectBySource<StopPointTableSync>::Set linkedStops(_stopPoints.get(stopCode));
+						ImportableTableSync::ObjectBySource<StopPointTableSync>::Set linkedStops(
+							_stopPoints.get(
+								stopCode
+						)	);
 						if(linkedStops.empty())
 						{
 							atLeastAnInexistantStop = true;
@@ -692,6 +699,18 @@ namespace synthese
 			sfields.push_back(make_pair(optional<string>(VALUE_IDENTSMS), VALUE_IDENTSMS));
 			stream << t.cell("Champ id arrêt", t.getForm().getSelectInput(PARAMETER_STOP_ID_FIELD, sfields, optional<string>(_stopIdField)));
 
+			// Stop name field
+			vector<pair<optional<string>, string> > snfields;
+			snfields.push_back(make_pair(optional<string>(VALUE_LIBP), VALUE_LIBP));
+			snfields.push_back(make_pair(optional<string>(VALUE_LIBCOM), VALUE_LIBCOM));
+			stream << t.cell("Champ nom arrêt", t.getForm().getSelectInput(PARAMETER_STOP_NAME_FIELD, snfields, optional<string>(_stopNameField)));
+
+			// Stop city field
+			vector<pair<optional<string>, string> > scfields;
+			scfields.push_back(make_pair(optional<string>(string()), "Pas de champ commune"));
+			scfields.push_back(make_pair(optional<string>(VALUE_CODE_COMMUNE), VALUE_CODE_COMMUNE));
+			stream << t.cell("Champ commune arrêt", t.getForm().getSelectInput(PARAMETER_STOP_CITY_CODE_FIELD, scfields, optional<string>(_stopCityCodeField)));
+
 			// Add wayback to journey pattern code
 			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
 
@@ -852,6 +871,15 @@ namespace synthese
 			// Add wayback to journeypattern code
 			map.insert(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode);
 
+			// Stop city field
+			map.insert(PARAMETER_STOP_CITY_CODE_FIELD, _stopCityCodeField);
+
+			// Stop handicapped field
+			map.insert(PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD, _stopHandicappedAccessibilityField);
+
+			// Stop name field
+			map.insert(PARAMETER_STOP_NAME_FIELD, _stopNameField);
+
 			return map;
 		}
 
@@ -889,6 +917,15 @@ namespace synthese
 
 			// Add wayback to journeypattern code
 			_addWaybackToJourneyPatternCode = map.getDefault<bool>(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, false);
+
+			// Stop city field
+			_stopCityCodeField = map.getDefault<string>(PARAMETER_STOP_CITY_CODE_FIELD);
+
+			// Stop handicapped field
+			_stopHandicappedAccessibilityField = map.getDefault<string>(PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD);
+
+			// Stop name field
+			_stopNameField = map.getDefault<string>(PARAMETER_STOP_NAME_FIELD, VALUE_LIBP);
 
 			// Calendar dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));

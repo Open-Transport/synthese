@@ -65,7 +65,7 @@ namespace synthese
 			const ForumTopic& topic,
 			std::size_t rank
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			Env env;
 			ForumMessageTableSync::SearchResult messages(
@@ -142,7 +142,7 @@ namespace synthese
 			const ForumMessage& message,
 			std::size_t rank
 		){
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(request.getFunction()->getTemplateParameters());
 
 			pm.insert(Request::PARAMETER_OBJECT_ID, message.getKey());
 			if(message.getTopic())

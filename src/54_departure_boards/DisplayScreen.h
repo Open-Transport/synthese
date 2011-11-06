@@ -102,7 +102,7 @@ namespace synthese
 				tree::TreeMultiClassRootPolicy<geography::NamedPlace, DisplayScreenCPU>
 			>,
 			public util::Named,
-			public impex::Importable
+			public impex::ImportableTemplate<DisplayScreen>
 		{
 		public:
 
@@ -189,7 +189,7 @@ namespace synthese
 			//@{
 				boost::posix_time::ptime	_MomentFin(const boost::posix_time::ptime& __MomentDebut)			const;
 
-
+		public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Generation of the content of the screen for standard screens only (and derivated types).
 				/// @param startTime start time
@@ -198,7 +198,7 @@ namespace synthese
 				/// @result the result of generation
 				/// @author Hugues Romain
 				/// @since 3.2.0
-				ArrivalDepartureList _generateStandardScreen(
+				ArrivalDepartureList generateStandardScreen(
 					const boost::posix_time::ptime& startTime,
 					const boost::posix_time::ptime& endTime,
 					bool rootCall = true
@@ -338,14 +338,8 @@ namespace synthese
 
 				const geography::NamedPlace* getLocation() const;
 
-				//////////////////////////////////////////////////////////////////////////
-				/// Display the content generated for the screen
-				void display(
-					std::ostream& stream,
-					const boost::posix_time::ptime& date,
-					const server::Request* request
-				) const;
-
+			
+				
 				std::string getFullName() const;
 
 

@@ -105,7 +105,7 @@ namespace synthese
 			);
 			BOOST_FOREACH(shared_ptr<UserFavoriteJourney> fav, favorites)
 			{
-				ParametersMap pm(_savedParameters);
+				ParametersMap pm(getTemplateParameters());
 
 				pm.insert(Request::PARAMETER_OBJECT_ID, fav->getKey());
 				pm.insert(DATA_RANK, fav->getRank());

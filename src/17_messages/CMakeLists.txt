@@ -45,8 +45,6 @@ MessagesModule.gen.cpp
 MessagesModuleRegister.cpp
 MessagesModule.h
 MessagesModule.inc.cpp
-MessagesObjectsCMSExporters.cpp
-MessagesObjectsCMSExporters.hpp
 MessagesRight.cpp
 MessagesRight.h
 MessagesScenarioAdmin.cpp

@@ -41,7 +41,7 @@ namespace synthese
 			public util::Named,
 			public graph::Vertex,
 			public graph::Hub,
-			public impex::Importable
+			public impex::ImportableTemplate<Depot>
 		{
 		public:
 			typedef util::Registry<Depot> Registry;

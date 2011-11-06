@@ -2,7 +2,7 @@
 ///	Importable class header.
 ///	@file Importable.h
 ///	@author Hugues Romain (RCS)
-///	@date sam fév 21 2009
+///	@date 2009
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
 ///	software)
@@ -28,9 +28,12 @@
 
 #include "Registrable.h"
 #include "Exception.h"
+#include "DataSource.h"
 
 #include <string>
 #include <map>
+#include <vector>
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -53,7 +56,7 @@ namespace synthese
 			virtual public util::Registrable
 		{
 		public:
-			typedef std::map<const DataSource*, std::string> DataSourceLinks;
+			typedef std::multimap<const DataSource*, std::string> DataSourceLinks;
 
 			class NotLinkedWithSourceException : public synthese::Exception
 			{
@@ -72,7 +75,7 @@ namespace synthese
 				);
 			};
 
-		private:
+		protected:
 			// Attributes
 			DataSourceLinks _dataSourceLinks;
 
@@ -88,14 +91,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setDataSourceLinks(const DataSourceLinks& value, bool storeLinkInDataSource = false);
 			//@}
 
 			//! @name Modifiers
 			//@{
-				void setCodeBySource(const DataSource& source, const std::string& code, bool storeLinkInDataSource = false);
-				void removeSourceLink(const DataSource& source, bool updateDataSource = false);
-				void cleanDataSourceLinks(bool updateDataSource = false);
 			//@}
 
 			//! @name Services
@@ -108,13 +107,22 @@ namespace synthese
 
 				bool hasUnknownOwner() const;
 
-				const std::string& getCodeBySource(const DataSource& source) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Returns the first code for the datasource.
+				const std::string& getACodeBySource(const DataSource& source) const;
+
+
+				bool hasCodeBySource(const DataSource& source, const std::string& code) const;
+
+
+				std::vector<std::string> getCodesBySource(const DataSource& source) const;
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the code in the object owner database.
 				/// @throws NotLinkedWithSourceException if the object does not have an
 				/// anonymous owner.
-				const std::string& getCodeBySource() const;
+				const std::string& getACodeBySource() const;
 
 				std::string getCodeBySources() const;
 			//@}
@@ -123,7 +131,116 @@ namespace synthese
 			//@{
 			//@}
 		};
-	}
-}
+
+
+		template<class T>
+		class ImportableTemplate:
+			public Importable
+		{
+		public:
+			void cleanDataSourceLinks(bool updateDataSource = false)
+			{
+				if(updateDataSource)
+				{
+					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+					{
+						link.first->removeLinks(static_cast<T&>(*this));
+				}	}
+				_dataSourceLinks.clear();
+			}
+
+
+			void removeSourceLink(const DataSource& source, const std::string& code, bool updateDataSource = false)
+			{
+				//TODO protect this code by a mutex
+				std::pair<DataSourceLinks::iterator, DataSourceLinks::iterator> range(
+					_dataSourceLinks.equal_range(&source)
+				);
+				for(DataSourceLinks::iterator it(range.first); it != range.second; ++it)
+				{
+					if(it->second == code)
+					{
+						if(updateDataSource)
+						{
+							source.removeLink(static_cast<T&>(*this), code);
+						}
+						_dataSourceLinks.erase(it);
+						return;
+					}
+				}
+			}
+
+
+
+			void removeSourceLinks(const DataSource& source, bool updateDataSource = false)
+			{
+				//TODO protect this code by a mutex
+				std::pair<DataSourceLinks::iterator, DataSourceLinks::iterator> range(
+					_dataSourceLinks.equal_range(&source)
+				);
+				std::vector<DataSourceLinks::iterator> iterators;
+				for(DataSourceLinks::iterator it(range.first); it != range.second; ++it)
+				{
+					iterators.push_back(it);
+				}
+				BOOST_FOREACH(DataSourceLinks::iterator it, iterators)
+				{
+					if(updateDataSource)
+					{
+						source.removeLink(static_cast<T&>(*this), it->second);
+					}
+					_dataSourceLinks.erase(it);
+				}
+			}
+
+
+
+			void setDataSourceLinks(
+				const DataSourceLinks& value,
+				bool storeLinkInDataSource = false
+			){
+				if(storeLinkInDataSource)
+				{
+					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+					{
+						link.first->removeLink(static_cast<T&>(*this), link.second);
+				}	}
+				_dataSourceLinks = value;
+				if(storeLinkInDataSource)
+				{
+					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
+					{
+						link.first->addLink(static_cast<T&>(*this), link.second);
+				}	}
+			}
+
+
+
+			void addCodeBySource(
+				const DataSource& source,
+				const std::string& code,
+				bool storeLinkInDataSource = false
+			){
+				// Check if the code is not already registered
+				pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
+					_dataSourceLinks.equal_range(&source)
+				);
+				for(DataSourceLinks::const_iterator it(range.first); it != range.second; ++it)
+				{
+					if(it->second == code)
+					{
+						return;
+					}
+				}
+
+				// Registration of the code
+				_dataSourceLinks.insert(make_pair(&source, code));
+				if(storeLinkInDataSource)
+				{
+					source.addLink(static_cast<T&>(*this), code);
+				}
+			}
+		};
+}	}
 
 #endif // SYNTHESE_Importable_h__

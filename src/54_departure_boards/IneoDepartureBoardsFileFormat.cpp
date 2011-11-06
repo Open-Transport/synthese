@@ -104,7 +104,7 @@ namespace synthese
 				{
 					screen = new DisplayScreen(DisplayScreenTableSync::getId());
 					screen->setType(_defaultDisplayType.get());
-					screen->setCodeBySource(_dataSource, borneRef);
+					screen->addCodeBySource(_dataSource, borneRef);
 					screen->setAllPhysicalStopsDisplayed(false);
 					_env.getEditableRegistry<DisplayScreen>().add(shared_ptr<DisplayScreen>(screen));
 				}

@@ -1,7 +1,7 @@
 
 /** ScheduleRealTimeUpdateAction class header.
 	@file ScheduleRealTimeUpdateAction.h
-	@author Hugues
+	@author Hugues Romain
 	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -71,6 +71,7 @@ namespace synthese
 			bool _propagateConstantly;
 			boost::posix_time::time_duration _departureTime;
 			boost::posix_time::time_duration _arrivalTime;
+			std::string _serviceCodeBySource;
 			
 		protected:
 			//////////////////////////////////////////////////////////////////////////

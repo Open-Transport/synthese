@@ -54,7 +54,6 @@ namespace synthese
 			shared_ptr<Point> geometry
 		):	Registrable(id),
 			Vertex(place, geometry),
-			Importable(),
 			Named(name)
 		{
 		}

@@ -98,7 +98,7 @@ namespace synthese
 			const Request& request
 		) const {
 			
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			// Loop on screens
 			DisplayScreenTableSync::SearchResult screens(

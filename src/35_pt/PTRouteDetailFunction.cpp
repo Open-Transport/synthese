@@ -195,7 +195,7 @@ namespace synthese
 
 			if(_mainPage.get())
 			{
-				ParametersMap m(request.getFunction()->getSavedParameters());
+				ParametersMap m(getTemplateParameters());
 				m.insert(DATA_ID, _journeyPattern->getKey());
 				m.insert(DATA_NAME, _journeyPattern->getName());
 				m.insert(DATA_IS_MAIN, _journeyPattern->getMain());
@@ -230,7 +230,7 @@ namespace synthese
 						const StopPoint* stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea* connPlace(stopPoint->getConnectionPlace());
 
-						ParametersMap sm(request.getFunction()->getSavedParameters());
+						ParametersMap sm(getTemplateParameters());
 						sm.insert(DATA_ID, stopPoint->getKey());
 						sm.insert(DATA_RANK, edge->getRankInPath());
 						sm.insert(DATA_DEPARTURE_IS_ALLOWED, edge->isDepartureAllowed());

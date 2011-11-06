@@ -97,7 +97,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const ImportableTableSync::ObjectBySource<ScheduledServiceTableSync>::Map::mapped_type::value_type& obj, itService.second)
 					{
-						obj->removeSourceLink(_dataSource);
+						obj->removeSourceLinks(_dataSource);
 					}
 				}
 			}
@@ -108,7 +108,7 @@ namespace synthese
 				set<ScheduledService*> services(sourcedServices.get(*_courseId));
 				BOOST_FOREACH(ScheduledService* service, services)
 				{
-					service->removeSourceLink(_dataSource);
+					service->removeSourceLinks(_dataSource);
 					_services.insert(service);
 				}
 			}
@@ -234,7 +234,7 @@ namespace synthese
 						line->addPath(result);
 						result->setName(routeName);
 						result->setWayBack(wayBack);
-						result->setCodeBySource(*_plannedDataSource, string());
+						result->addCodeBySource(*_plannedDataSource, string());
 						_env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
 						routes.insert(result);
 
@@ -273,7 +273,7 @@ namespace synthese
 							service->comparePlannedSchedules(departureSchedules, arrivalSchedules)
 						){
 							os << "LOAD : Use of service " << service->getKey() << " (" << departureSchedules[0] << ") on route " << route->getKey() << " (" << route->getName() << ")<br />";
-							service->setCodeBySource(_dataSource, serviceRef);
+							service->addCodeBySource(_dataSource, serviceRef);
 							_services.insert(service);
 							break;
 						}
@@ -297,7 +297,7 @@ namespace synthese
 						);
 						service->setSchedules(departureSchedules, arrivalSchedules, true);
 						service->setPath(route);
-						service->setCodeBySource(_dataSource, serviceRef);
+						service->addCodeBySource(_dataSource, serviceRef);
 						service->setActive(today);
 						route->addService(*service, false);
 						_env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(service));

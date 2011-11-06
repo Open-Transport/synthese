@@ -189,7 +189,7 @@ namespace synthese
 			const Request& request
 		) const {
 
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 
 			shared_ptr<TimetableResult::Warnings> warnings(new TimetableResult::Warnings);
 			size_t timetableRank(0);
@@ -203,7 +203,7 @@ namespace synthese
 
 				stringstream content;
 				TimetableGenerateFunction function;
-				function.setSavedParameters(_savedParameters);
+				function.setTemplateParameters(_templateParameters);
 				function.setTimetable(tt.first);
 				function.setCalendarTemplate(tt.second);
 				if(_ignorePastDates) function.setIgnorePastDates(*_ignorePastDates);
@@ -222,7 +222,7 @@ namespace synthese
 			{
 				stringstream notes;
 				TimetableGenerateFunction function;
-				function.setSavedParameters(_savedParameters);
+				function.setTemplateParameters(_templateParameters);
 				function.setNotePage(_notePage);
 				function.setNoteCalendarPage(_noteCalendarPage);
 				BOOST_FOREACH(const TimetableResult::Warnings::value_type& warning, *warnings)

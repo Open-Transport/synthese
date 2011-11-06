@@ -79,8 +79,9 @@ namespace synthese
 			{
 				throw RequestException("No such main page");
 			}
-			_savedParameters.remove(PARAMETER_CMS_TEMPLATE_ID);
 		}
+
+
 
 		void XMLSessionIsValidFunction::run( std::ostream& stream, const Request& request ) const
 		{

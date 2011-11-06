@@ -1434,19 +1434,36 @@ namespace synthese
 						curStop = itcstop->second;
 					}
 
-					set<StopPoint*> stopPoints(
-						PTFileFormat::CreateOrUpdateStopPoints(
+					set<StopPoint*> stopPoints;
+					
+					if(curStop)
+					{
+						PTFileFormat::CreateOrUpdateStop(
 							_stops,
 							stopKey,
 							name,
+							optional<const RuleUser::Rules&>(),
 							curStop,
 							geometry.get(),
-							_autoGenerateStopAreas ? city.get() : NULL,
+							_dataSource,
+							_env,
+							os
+						);
+					}
+					else if(_autoGenerateStopAreas && city)
+					{
+						PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+							_stops,
+							stopKey,
+							name,
+							geometry.get(),
+							*city,
 							_defaultTransferDuration,
 							_dataSource,
 							_env,
 							os
-					)	);
+						);
+					}
 					if(stopPoints.empty())
 					{
 						os << "ERR  : stop " << stopKey << " not found and cannot be created in any commercial stop (" << name << ")<br />";
@@ -1686,7 +1703,7 @@ namespace synthese
 					if(cts.empty())
 					{
 						ct = new CalendarTemplate(CalendarTemplateTableSync::getId());
-						ct->setCodeBySource(_dataSource, calendarId);
+						ct->addCodeBySource(_dataSource, calendarId);
 						_env.getEditableRegistry<CalendarTemplate>().add(shared_ptr<CalendarTemplate>(ct));
 						_calendarTemplates.add(*ct);
 						calendarToImport = true;

@@ -81,7 +81,7 @@ namespace synthese
 		*/
 		class JourneyPattern:
 			public graph::Path,
-			public impex::Importable,
+			public impex::ImportableTemplate<JourneyPattern>,
 			public util::Named,
 			public calendar::Calendar
 		{

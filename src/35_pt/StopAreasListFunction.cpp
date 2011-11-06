@@ -29,7 +29,6 @@
 #include "CommercialLine.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "LineMarkerInterfacePage.h"
 #include "Request.h"
 #include "JourneyPattern.hpp"
 #include "Path.h"
@@ -199,12 +198,6 @@ namespace synthese
 
 			// Output format
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
-
-			// Saved parameters cleaning if output is a fixed format
-			if(!_stopPage.get())
-			{
-				_savedParameters.clear();
-			}
 		}
 
 
@@ -215,6 +208,8 @@ namespace synthese
 		{
 		}
 
+
+
 		struct StopAreasComparator
 		{
 		bool operator()(const StopArea* s1, const StopArea* s2) const
@@ -222,6 +217,8 @@ namespace synthese
 				return s1->getName() < s2->getName();
 			}
 		};
+
+
 
 		void StopAreasListFunction::run(
 			std::ostream& stream,
@@ -268,11 +265,11 @@ namespace synthese
 			}
 
 			// Stops loop
-			ParametersMap pm(request.getFunction()->getSavedParameters());
+			ParametersMap pm(getTemplateParameters());
 			size_t stopRank(0);
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
-				shared_ptr<ParametersMap> stopPm(new ParametersMap(request.getFunction()->getSavedParameters()));
+				shared_ptr<ParametersMap> stopPm(new ParametersMap(getTemplateParameters()));
 
 				it->toParametersMap(*stopPm, _coordinatesSystem);
 
@@ -287,7 +284,7 @@ namespace synthese
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
 					{
 						// For CMS output
-						shared_ptr<ParametersMap> pmLine(new ParametersMap(request.getFunction()->getSavedParameters()));
+						shared_ptr<ParametersMap> pmLine(new ParametersMap(getTemplateParameters()));
 
 						itLine->toParametersMap(*pmLine);
 

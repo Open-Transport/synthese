@@ -119,8 +119,6 @@ namespace synthese
 			class Node
 			{
 			public:
-				static const std::string PARAMETER_TRANSMIT_PARAMETERS;
-
 				virtual void display(
 					std::ostream& stream,
 					const server::Request& request,
@@ -144,12 +142,13 @@ namespace synthese
 				) const;
 			};
 
-			class FunctionNode : public Node
+			class ServiceNode : public Node
 			{
 			public:
 				const util::Factory<server::Function>::CreatorInterface* functionCreator;
 				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters parameters;
+				Parameters serviceParameters;
+				Parameters templateParameters;
 
 				virtual void display(
 					std::ostream& stream,
@@ -220,6 +219,8 @@ namespace synthese
 			typedef std::vector<Webpage*> Links;
 
 		private:
+			static const std::string PARAMETER_VAR;
+
 			mutable Nodes _nodes;
 
 			std::string _smartURLPath;

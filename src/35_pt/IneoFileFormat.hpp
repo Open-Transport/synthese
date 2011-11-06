@@ -99,11 +99,21 @@ namespace synthese
 				static const std::string PARAMETER_STOP_ID_FIELD;
 				static const std::string VALUE_MNLP;
 				static const std::string VALUE_IDENTSMS;
+				static const std::string PARAMETER_STOP_CITY_CODE_FIELD;
+				static const std::string VALUE_CODE_COMMUNE;
+				static const std::string PARAMETER_STOP_NAME_FIELD;
+				static const std::string VALUE_LIBP;
+				static const std::string VALUE_LIBCOM;
+				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
+				static const std::string VALUE_UFR;
 				
 			private:
 				//! @name Parameters
 				//@{
 					boost::shared_ptr<TransportNetwork> _network;
+
+					bool _importStopAreas;
+
 					bool _autoImportStops;
 					bool _displayLinkedStops;
 					boost::shared_ptr<const geography::City> _defaultCity;
@@ -111,6 +121,9 @@ namespace synthese
 					std::string _lineReadMethod;
 					std::string _lineShortNameField;
 					std::string _stopIdField;
+					std::string _stopNameField;
+					std::string _stopCityCodeField;
+					std::string _stopHandicappedAccessibilityField;
 				//@}
 
 				static const std::string SEP;
