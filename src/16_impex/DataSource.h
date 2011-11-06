@@ -123,7 +123,7 @@ namespace synthese
 				template<class T>
 				void addLink(T& object, const std::string& code) const
 				{
-					_links[typename T::Registry::KEY].insert(
+					_links[T::Registry::KEY].insert(
 						std::make_pair(code, static_cast<Importable*>(&object))
 					);
 				}
