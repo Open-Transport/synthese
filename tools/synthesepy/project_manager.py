@@ -382,7 +382,7 @@ class Project(object):
         if not self.config.project_name:
             self.config.project_name = os.path.split(self.path)[1]
         if not self.config.log_file:
-            self.config.log_file = join(self.path, 'logs', 'synthese.txt')
+            self.config.log_file = join(self.path, 'logs', 'synthese.log')
         log_dir = os.path.dirname(self.config.log_file)
         if not os.path.isdir(log_dir):
             os.makedirs(log_dir)
@@ -794,8 +794,11 @@ The synthese.py wrapper script.
             tool.system_install()
 
         log.info('Project installed on the system. You can start it with '
-            'the command (as root):\n  supervisorctl start synthese-%s',
-            self.config.project_name)
+            'the command (as root):\n'
+            '  supervisorctl start synthese-{project_name}\n'
+            'or restart it (as root):\n'
+            '  supervisorctl restart synthese-{project_name}\n'.format(
+            project_name=self.config.project_name))
 
     @command(root_required=True)
     def system_uninstall(self):
