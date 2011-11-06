@@ -28,6 +28,7 @@
 #include "OneFileTypeImporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
 #include "NoExportPolicy.hpp"
+#include "ScheduledService.h"
 
 namespace synthese
 {
@@ -61,6 +62,18 @@ namespace synthese
 
 				mutable std::ifstream _file;
 				mutable boost::optional<Record> _record;
+
+				struct TemporaryService
+				{
+					bool toRead;
+					std::string lineCode;
+					std::string calendar;
+					std::string code;
+					std::string routeCode;
+					ScheduledService::Schedules schedules;
+					std::vector<std::string> stops;
+					bool wayBack;
+				};
 
 				//////////////////////////////////////////////////////////////////////////
 				/// @return Record : recordNumber == 0 => end of file
