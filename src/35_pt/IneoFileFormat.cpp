@@ -314,8 +314,8 @@ namespace synthese
 
 					// Stop area
 					string stopAreaCode(_getValue("MNCP"));
-					set<StopArea*> stopAreas(stopAreas.get(stopAreaCode));
-					if(stopAreas.empty())
+					set<StopArea*> stopAreasSet(stopAreas.get(stopAreaCode));
+					if(stopAreasSet.empty())
 					{
 						stream << "WARN : Stop area " << stopAreaCode << " was not found for stop " << id << ". Stop update or creation is ignored.<br />";
 						continue;
@@ -328,7 +328,7 @@ namespace synthese
 							id,
 							name,
 							handicapped,
-							*stopAreas.begin(),
+							*stopAreasSet.begin(),
 							point.get(),
 							_dataSource,
 							_env,
