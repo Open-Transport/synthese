@@ -48,6 +48,7 @@ namespace synthese
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_USE_TEMPLATE;
 			static const std::string PARAMETER_SMART_URL;
+			static const std::string PARAMETER_DONT_REDIRECT_IF_SMART_URL;
 
 		protected:
 			//! \name Page parameters
@@ -55,6 +56,7 @@ namespace synthese
 				boost::shared_ptr<const Webpage>	_page;
 				bool					_useTemplate;
 				std::string _smartURL;
+				bool _dontRedirectIfSmartURL;
 			//@}
 
 
@@ -86,6 +88,7 @@ namespace synthese
 			//@{
 				void setPage(boost::shared_ptr<const Webpage> value) { _page = value; }
 				void setUseTemplate(bool value){ _useTemplate = value; }
+				void setDontRedirectIfSmartURL(bool value){ _dontRedirectIfSmartURL = value; }
 			//@}
 
 			//! @name Getters
