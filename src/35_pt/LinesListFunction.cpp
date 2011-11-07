@@ -183,6 +183,13 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			// Clean of template parameters for non CMS output
+			if(!_page.get())
+			{
+				_templateParameters.clear();
+			}
+
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
 			_outputStops = map.getDefault<bool>(PARAMETER_OUTPUT_STOPS, false);
 			CoordinatesSystem::SRID srid(
