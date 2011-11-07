@@ -59,6 +59,7 @@ namespace synthese
 		class JourneyPattern;
 		class CommercialLine;
 		class ScheduledService;
+		class RollingStock;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo file format.
@@ -84,6 +85,7 @@ namespace synthese
 				static const std::string FILE_CAL; // Calendars
 
 				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK;
 
 				static const std::string PARAMETER_AUTO_IMPORT_STOPS;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
@@ -111,6 +113,8 @@ namespace synthese
 				//! @name Parameters
 				//@{
 					boost::shared_ptr<TransportNetwork> _network;
+					
+// TODO				std::map<std::string, boost::shared_ptr<RollingStock> > _transportModeTypeLgMap;
 
 					bool _importStopAreas;
 
