@@ -55,16 +55,25 @@ namespace synthese
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
 		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
 		const string WebPageDisplayFunction::PARAMETER_SMART_URL("smart_url");
+		const string WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL = "dont_redirect_if_smart_url";
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
 			ParametersMap map(getTemplateParameters());
+
+			// Page
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
+
+			// Do not redirect if smart URL
+			map.insert(PARAMETER_DONT_REDIRECT_IF_SMART_URL, _dontRedirectIfSmartURL);
+
 			return map;
 		}
+
+
 
 		void WebPageDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -121,7 +130,16 @@ namespace synthese
 			}
 
 			_useTemplate = map.getDefault<bool>(PARAMETER_USE_TEMPLATE, true);
+
+			// Do not redirect if smart URL
+			_dontRedirectIfSmartURL = map.getDefault<bool>(PARAMETER_DONT_REDIRECT_IF_SMART_URL, false);
+			if(_dontRedirectIfSmartURL)
+			{
+				_templateParameters.insert(PARAMETER_DONT_REDIRECT_IF_SMART_URL, _dontRedirectIfSmartURL);
+			}
 		}
+
+
 
 		void WebPageDisplayFunction::run(
 			std::ostream& stream,
@@ -131,7 +149,7 @@ namespace synthese
 			{
 				// If page has been fetched by its id and its smart URL is defined, then
 				// redirect permanently to the smart url, unless it starts with a colon (used for aliases).
-				if(_smartURL.empty() && !_page->getSmartURLPath().empty() && _page->getSmartURLPath()[0] != ':')
+				if(!_dontRedirectIfSmartURL && _smartURL.empty() && !_page->getSmartURLPath().empty() && _page->getSmartURLPath()[0] != ':')
 				{
 					/// @todo handle default parameter of smart url
 					stringstream url;
@@ -197,10 +215,9 @@ namespace synthese
 
 
 		WebPageDisplayFunction::WebPageDisplayFunction():
-		_useTemplate(true)
-		{
-
-		}
+			_useTemplate(true),
+			_dontRedirectIfSmartURL(false)
+		{}
 
 
 

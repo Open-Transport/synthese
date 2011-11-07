@@ -108,6 +108,7 @@ namespace synthese
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 					openRequest.getFunction()->setTemplateParameters(_templateParameters);
+					openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
 					{
