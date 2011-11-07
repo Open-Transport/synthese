@@ -109,13 +109,14 @@ namespace synthese
 			/// @return the created network object.
 			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
+			/// The network of the line is never changed if an existing line is returned.
 			static CommercialLine* CreateOrUpdateLine(
 				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
 				const std::string& id,
-				const std::string& name,
-				const std::string& shortName,
+				boost::optional<const std::string&> name,
+				boost::optional<const std::string&> shortName,
 				boost::optional<util::RGBColor> color,
-				const TransportNetwork& network,
+				const TransportNetwork& defaultNetwork,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
