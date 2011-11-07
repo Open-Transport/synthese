@@ -232,6 +232,8 @@ ServiceUpdateAction.cpp
 ServiceUpdateAction.h
 ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
+ShapeFileFormat.cpp
+ShapeFileFormat.hpp
 StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp
