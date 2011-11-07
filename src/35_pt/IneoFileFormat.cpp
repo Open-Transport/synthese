@@ -98,7 +98,8 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::FILE_CAL("cal");
 		const std::string IneoFileFormat::Importer_::SEP(";");
 
-		const std::string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID("net");
+		const std::string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID = "net";
+		const std::string IneoFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK = "transport_mode_type_lg_mask";
 		const std::string IneoFileFormat::Importer_::PARAMETER_AUTO_IMPORT_STOPS("isa");
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
@@ -848,6 +849,13 @@ namespace synthese
 		util::ParametersMap IneoFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
+
+			// Network
+			if(_network.get())
+			{
+				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+
 			map.insert(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops);
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
 			if(_defaultCity.get())

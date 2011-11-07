@@ -97,7 +97,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,pt::HastusInterfaceFileFormat>::FACTORY_KEY("Trident");
+		template<> const string FactorableTemplate<FileFormat,pt::HastusInterfaceFileFormat>::FACTORY_KEY("HastusInterface");
 	}
 
 	namespace pt
