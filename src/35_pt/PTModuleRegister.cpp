@@ -26,6 +26,7 @@
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
 #include "TridentFileFormat.h"
+#include "ShapeFileFormat.hpp"
 
 #include "DestinationTableSync.hpp"
 #include "PTUseRuleTableSync.h"
@@ -181,7 +182,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::IneoFileFormat::integrate();
 	synthese::pt::IneoRealTimeFileFormat::integrate();
 	synthese::pt::OGTFileFormat::integrate();
-	synthese::pt::TridentFileFormat::integrate ();
+	synthese::pt::TridentFileFormat::integrate();
+	synthese::pt::ShapeFileFormat::integrate();
 
 	synthese::pt::DestinationAdmin::integrate();
 	synthese::pt::DestinationsAdmin::integrate();
