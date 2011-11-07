@@ -23,7 +23,6 @@
 #include "CarPostalFileFormat.hpp"
 #include "DataSource.h"
 #include "StopPoint.hpp"
-#include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "City.h"
@@ -40,18 +39,31 @@
 #include "DataSourceAdmin.h"
 #include "PTFileFormat.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
+#include "IConv.hpp"
+#include "AdminActionFunctionRequest.hpp"
+#include "HTMLModule.h"
+#include "HTMLForm.h"
+#include "StopPointAddAction.hpp"
+#include "StopPointUpdateAction.hpp"
+#include "PTPlaceAdmin.h"
+#include "StopPointAdmin.hpp"
+#include "StopAreaAddAction.h"
+#include "TransportNetworkTableSync.h"
+#include "RollingStockTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string/trim.hpp>
+#include <boost/algorithm/string.hpp>
 #include <map>
 #include <fstream>
+#include <geos/geom/Point.h>
+#include <geos/opDistance.h>
 
 using namespace std;
 using namespace boost;
 using namespace boost::filesystem;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -76,17 +88,23 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string CarPostalFileFormat::Importer_::FILE_BITFELD("2bitfeld");
-		const std::string CarPostalFileFormat::Importer_::FILE_ECKDATEN("1eckdaten");
-		const std::string CarPostalFileFormat::Importer_::FILE_ZUGUDAT("1zugudat");
+		const string CarPostalFileFormat::Importer_::FILE_KOORD = "koord";
+		const string CarPostalFileFormat::Importer_::FILE_BITFELD = "bitfeld";
+		const string CarPostalFileFormat::Importer_::FILE_ECKDATEN = "eckdaten";
+		const string CarPostalFileFormat::Importer_::FILE_ZUGDAT = "zugdat";
+
+		const string CarPostalFileFormat::Importer_::PARAMETER_SHOW_STOPS_ONLY = "show_stops_only";
+		const string CarPostalFileFormat::Importer_::PARAMETER_NETWORK_ID = "network_id";
+		const string CarPostalFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_ID = "transport_mode_id";
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<CarPostalFileFormat>::Files MultipleFileTypesImporter<CarPostalFileFormat>::FILES(
+			CarPostalFileFormat::Importer_::FILE_KOORD.c_str(),
 			CarPostalFileFormat::Importer_::FILE_ECKDATEN.c_str(),
 			CarPostalFileFormat::Importer_::FILE_BITFELD.c_str(),
-			CarPostalFileFormat::Importer_::FILE_ZUGUDAT.c_str(),
+			CarPostalFileFormat::Importer_::FILE_ZUGDAT.c_str(),
 		"");
 	}
 
@@ -98,7 +116,9 @@ namespace synthese
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_BITFELD);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
-			it = _pathsMap.find(FILE_ZUGUDAT);
+			it = _pathsMap.find(FILE_KOORD);
+			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it = _pathsMap.find(FILE_ZUGDAT);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			return true;
 		}
@@ -143,31 +163,292 @@ namespace synthese
 			{
 				throw Exception("Could no open the file " + filePath.file_string());
 			}
+			bool error(false);
 
-
-			// 1 : Time period
-			if(key == FILE_ECKDATEN)
+			// 0 : Coordinates
+			if(key == FILE_KOORD)
 			{
 				string line;
-				if(!getline(inFile, line))
-				{
-					throw Exception("Problem with Eckdaten file");
-				}
-				_startDate = date(
-					lexical_cast<int>(line.substr(6,4)),
-					lexical_cast<int>(line.substr(3,2)),
-					lexical_cast<int>(line.substr(0,2))
-				);
 
-				if(!getline(inFile, line))
+				while(getline(inFile, line))
 				{
-					throw Exception("Problem with Eckdaten file");
+					// Operator code
+					string operatorCode(line.substr(0, 7));
+
+					// Point
+					double x(1000 * lexical_cast<double>(line.substr(10,7)));
+					double y(1000 * lexical_cast<double>(line.substr(18,7)));
+					shared_ptr<Point> coord;
+					if(x && y)
+					{
+						coord = _dataSource.getCoordinatesSystem()->createPoint(x, y);
+					}
+
+					// Names
+					if(!_dataSource.getCharset().empty())
+					{
+						line = IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+					}
+					vector<string> cols;
+					std::string times(line.substr(26));
+					boost::algorithm::split( cols, times, boost::algorithm::is_any_of(","));
+					string cityName(cols[0]);
+					string name((cols.size() == 1) ? "Arrêt" : cols[1]);
+
+					// Search for an existing stop
+					set<StopPoint*> stops(
+						_stopPoints.get(operatorCode)
+					);
+
+					if(stops.empty() || _showStopsOnly)
+					{
+						Bahnhof bahnhof;
+						bahnhof.cityName = cityName;
+						bahnhof.name = name;
+						bahnhof.coords = coord;
+						bahnhof.operatorCode = operatorCode;
+
+						if(stops.empty())
+						{
+							bahnhof.stop = NULL;
+							_nonLinkedBahnhofs[bahnhof.operatorCode] = bahnhof;
+						}
+						else
+						{
+							bahnhof.stop = *stops.begin();
+							_linkedBahnhofs[bahnhof.operatorCode] = bahnhof;
+						}
+					}
 				}
-				_endDate = date(
-					lexical_cast<int>(line.substr(6,4)),
-					lexical_cast<int>(line.substr(3,2)),
-					lexical_cast<int>(line.substr(0,2))
-				);
+
+				// If at least a stop import has failed, no import but an admin screen if possible
+				if(!_nonLinkedBahnhofs.empty() && adminRequest)
+				{
+					os << "<h1>Arrêts non liés à SYNTHESE</h1>";
+
+					HTMLTable::ColsVector c;
+					c.push_back("Code");
+					c.push_back("Localité");
+					c.push_back("Nom");
+					c.push_back("Coords fichier");
+					c.push_back("Coords fichier");
+					c.push_back("Coords fichier (origine)");
+					c.push_back("Coords fichier (origine)");
+					c.push_back("Actions");
+
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					os << t.open();
+					os.precision(0);
+					BOOST_FOREACH(const Bahnhofs::value_type& bahnhof, _nonLinkedBahnhofs)
+					{
+						// Projected point
+						shared_ptr<Point> projected;
+						if(bahnhof.second.coords.get())
+						{
+							projected = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+								*bahnhof.second.coords
+							);
+						}
+
+						os << t.row();
+						os << t.col();
+						os << bahnhof.first;
+
+						os << t.col();
+						os << bahnhof.second.cityName;
+
+						os << t.col();
+						os << bahnhof.second.name;
+
+						if(projected.get())
+						{
+							os << t.col();
+							os << fixed << projected->getX();
+
+							os << t.col();
+							os << fixed << projected->getY();
+						}
+						else
+						{
+							os << t.col();
+							os << t.col();
+						}
+
+						if(bahnhof.second.coords.get())
+						{
+							os << t.col();
+							os << fixed << bahnhof.second.coords->getX();
+
+							os << t.col();
+							os << fixed << bahnhof.second.coords->getY();
+
+							os << t.col();
+							AdminActionFunctionRequest<StopPointAddAction, DataSourceAdmin> addRequest(*adminRequest);
+							addRequest.getAction()->setName(bahnhof.second.name);
+							addRequest.getAction()->setCityName(bahnhof.second.cityName);
+							addRequest.getAction()->setCreateCityIfNecessary(true);
+							Importable::DataSourceLinks links;
+							links.insert(make_pair(&_dataSource, bahnhof.first));
+							addRequest.getAction()->setDataSourceLinks(links);
+							addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
+							os << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
+						}
+						else
+						{
+							os << t.col();
+							os << t.col();
+							os << t.col();
+						}
+
+					}
+					os << t.close();
+				}
+
+				// Display of linked stops if specified
+				if(_showStopsOnly && adminRequest && !_linkedBahnhofs.empty())
+				{
+					os << "<h1>Arrêts liés à SYNTHESE</h1>";
+
+					HTMLTable::ColsVector c;
+					c.push_back("Code");
+					c.push_back("Zone d'arrêt SYNTHESE");
+					c.push_back("Arrêt physique");
+					c.push_back("Localité");
+					c.push_back("Nom");
+					c.push_back("Coords SYNTHESE");
+					c.push_back("Coords SYNTHESE");
+					c.push_back("Coords fichier");
+					c.push_back("Coords fichier");
+					c.push_back("Coords fichier (origine)");
+					c.push_back("Coords fichier (origine)");
+					c.push_back("Distance");
+					c.push_back("Actions");
+
+					AdminFunctionRequest<PTPlaceAdmin> openRequest(*adminRequest);
+					AdminFunctionRequest<StopPointAdmin> openPhysicalRequest(*adminRequest);
+
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					os << t.open();
+					os.precision(0);
+					BOOST_FOREACH(const Bahnhofs::value_type& bahnhof, _linkedBahnhofs)
+					{
+						// Projected point
+						shared_ptr<Point> projected;
+						if(bahnhof.second.coords.get())
+						{
+							projected = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+								*bahnhof.second.coords
+							);
+						}
+
+						os << t.row();
+						os << t.col();
+						os << bahnhof.first;
+
+						os << t.col();
+						openRequest.getPage()->setConnectionPlace(_env.getSPtr(bahnhof.second.stop->getConnectionPlace()));
+						os << HTMLModule::getHTMLLink(openRequest.getURL(), bahnhof.second.stop->getConnectionPlace()->getFullName());
+
+						os << t.col();
+						openPhysicalRequest.getPage()->setStop(_env.getSPtr(bahnhof.second.stop));
+						os << HTMLModule::getHTMLLink(openPhysicalRequest.getURL(), bahnhof.second.stop->getName());
+
+						os << t.col();
+						os << bahnhof.second.cityName;
+
+						os << t.col();
+						os << bahnhof.second.name;
+
+						if(bahnhof.second.stop->getGeometry().get())
+						{
+							os << t.col() << std::fixed << bahnhof.second.stop->getGeometry()->getX();
+							os << t.col() << std::fixed << bahnhof.second.stop->getGeometry()->getY();
+						}
+						else
+						{
+							os << t.col() << "(non localisé)";
+							os << t.col() << "(non localisé)";
+						}
+
+						if(bahnhof.second.coords.get())
+						{
+							double distance(-1);
+							if (bahnhof.second.stop->getGeometry().get() && projected.get())
+							{
+								distance = geos::operation::distance::DistanceOp::distance(
+									*projected,
+									*bahnhof.second.stop->getGeometry()
+								);
+							}
+
+							if(projected.get())
+							{
+								os << t.col();
+								os << fixed << projected->getX();
+
+								os << t.col();
+								os << fixed << projected->getY();
+							}
+							else
+							{
+								os << t.col();
+								os << t.col();
+							}
+
+							if(bahnhof.second.coords.get())
+							{
+								os << t.col();
+								os << fixed << bahnhof.second.coords->getX();
+
+								os << t.col();
+								os << fixed << bahnhof.second.coords->getY();
+							}
+							else
+							{
+								os << t.col();
+								os << t.col();
+							}
+
+							os << t.col();
+							if(distance == 0)
+							{
+								os << "identiques";
+							}
+							else if(distance > 0)
+							{
+								os << distance << " m";
+							}
+
+							os << t.col();
+							if(distance != 0)
+							{
+								AdminActionFunctionRequest<StopPointUpdateAction, DataSourceAdmin> moveRequest(*adminRequest);
+								moveRequest.getAction()->setStop(_env.getEditableSPtr(bahnhof.second.stop));
+								moveRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.coords));
+								os << HTMLModule::getLinkButton(moveRequest.getHTMLForm().getURL(), "Mettre à jour coordonnées");
+							}
+						}
+						else
+						{
+							os << t.col();
+							os << t.col();
+							os << t.col();
+							os << t.col();
+							os << t.col();
+							os << t.col();
+						}
+					}
+					os << t.close();
+				}
+
+				error = !_nonLinkedBahnhofs.empty() || _showStopsOnly;
+
+			} // 1 : Time period
+			else if(key == FILE_ECKDATEN)
+			{
+				// This file should already loaded at parameters reading
+				error = !_startDate || !_endDate;
+
 			} // 2 : Nodes
 			else if(key == FILE_BITFELD)
 			{
@@ -177,7 +458,7 @@ namespace synthese
 					int id(lexical_cast<int>(line.substr(0,6)));
 					string calendarString(line.substr(7));
 
-					date curDate(_startDate);
+					date curDate(*_startDate);
 					bool first(true);
 
 					Calendar calendar;
@@ -215,31 +496,8 @@ namespace synthese
 					_calendarMap[id] = calendar;
 				}
 			} // 3 : Services
-			else if (key == FILE_ZUGUDAT)
+			else if (key == FILE_ZUGDAT)
 			{
-				// Cleaning of each service handled by the datasource
-				ScheduledServiceTableSync::SearchResult originalServices(
-					ScheduledServiceTableSync::Search(
-						_env,
-						optional<RegistryKeyType>(),
-						optional<RegistryKeyType>(),
-						_dataSource.getKey(),
-						optional<string>(),
-						false,
-						0,
-						optional<size_t>(),
-						false,
-						false,
-						UP_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, originalServices)
-				{
-					for(date d(_startDate); d<=_endDate; d=d+days(1))
-					{
-						service->setInactive(d);
-					}
-				}
-
 				string line;
 				shared_ptr<ScheduledService> service;
 				string serviceNumber;
@@ -249,12 +507,12 @@ namespace synthese
 				vector<time_duration> departures;
 				vector<time_duration> arrivals;
 				Calendar mask;
-				for(date curDate(_startDate); curDate <= _endDate; curDate += days(1))
+				for(date curDate(*_startDate); curDate <= *_endDate; curDate += days(1))
 				{
 					mask.setActive(curDate);
 				}
 				bool serviceMustBeAvoided(false);
-				map<string, shared_ptr<CommercialLine> > lines;
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 
 				while(getline(inFile, line))
 				{
@@ -287,7 +545,7 @@ namespace synthese
 							string departureTime(line.substr(34,4));
 							string arrivalTime(line.substr(29,4));
 							bool isDeparture(departureTime != "9999" && departureTime != "    ");
-							bool isArrival(arrivalTime != "9999" && departureTime != "    ");
+							bool isArrival(arrivalTime != "9999" && arrivalTime != "    ");
 
 							JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet stop;
 							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& itstop, searchStop)
@@ -304,12 +562,12 @@ namespace synthese
 
 							arrivals.push_back(
 								isArrival ?
-								hours(lexical_cast<int>(line.substr(29,2))) + minutes(lexical_cast<int>(line.substr(31,2))) :
+								hours(lexical_cast<int>(arrivalTime.substr(0,2))) + minutes(lexical_cast<int>(arrivalTime.substr(2,2))) :
 								minutes(0)
 							);
 							departures.push_back(
 								isDeparture ?
-								hours(lexical_cast<int>(line.substr(34,2))) + minutes(lexical_cast<int>(line.substr(36,2))) :
+								hours(lexical_cast<int>(departureTime.substr(0,2))) + minutes(lexical_cast<int>(departureTime.substr(2,2))) :
 								minutes(0)
 							);
 						}
@@ -318,92 +576,54 @@ namespace synthese
 					// End of service
 					if(line.size() < 54 && !serviceMustBeAvoided)
 					{
-						// JourneyPattern
-						map<string, shared_ptr<CommercialLine> >::const_iterator itLine(lines.find(lineNumber));
-						shared_ptr<CommercialLine> cline;
-						if(itLine != lines.end())
-						{
-							cline = itLine->second;
-						}
-						else
-						{
-							CommercialLineTableSync::SearchResult lines(
-								CommercialLineTableSync::Search(_env, optional<RegistryKeyType>(),optional<string>(), lineNumber)
-							);
-							if(lines.empty())
-							{
-								os << "WARN : commercial line with key " << lineNumber << "not found<br />";
-								continue;
-							}
-							if(lines.size() > 1)
-							{
-								os << "WARN : more than one commercial line with key " << lineNumber << "<br />";
-							}
-							cline = CommercialLineTableSync::GetEditable(
-								lines.front()->getKey(),
-								_env,
-								UP_LINKS_LOAD_LEVEL
-							);
-
-							os << "LOAD : use of existing commercial line" << cline->getKey() << " (" << cline->getName() << ")<br />";
-
-							// Load of existing routes
-							JourneyPatternTableSync::SearchResult sroutes(
-								JourneyPatternTableSync::Search(_env, cline->getKey())
-							);
-							BOOST_FOREACH(shared_ptr<JourneyPattern> sroute, sroutes)
-							{
-								LineStopTableSync::Search(
-									_env,
-									sroute->getKey(),
-									optional<RegistryKeyType>(),
-									0,
-									optional<size_t>(),
-									true, true,
-									UP_LINKS_LOAD_LEVEL
-								);
-								ScheduledServiceTableSync::Search(
-									_env,
-									sroute->getKey(),
-									optional<RegistryKeyType>(),
-									optional<RegistryKeyType>(),
-									optional<string>(),
-									false,
-									0, optional<size_t>(), true, true,
-									UP_LINKS_LOAD_LEVEL
-								);
-							}
-						}
-
-						// Attempting to find an existing route
-						shared_ptr<JourneyPattern> route;
-						BOOST_FOREACH(const Path* sroute, cline->getPaths())
-						{
-							const JourneyPattern* lroute(static_cast<const JourneyPattern*>(sroute));
-							if(	*lroute == stops
-							){
-								route = const_pointer_cast<JourneyPattern>(_env.getSPtr(lroute));
-								continue;
-							}
-						}
-
-						// Create a new route if necessary
-						if(!route.get())
-						{
-							os << "CREA : Creation of route for " << cline->getName() << "<br />";
-							route = PTFileFormat::CreateJourneyPattern(
-								stops,
-								*cline,
+						// Line
+						CommercialLine* line(
+							PTFileFormat::CreateOrUpdateLine(
+								lines,
+								lineNumber,
+								optional<const string&>(),
+								optional<const string&>(),
+								optional<RGBColor>(),
+								*_network,
 								_dataSource,
 								_env,
 								os
-							);
-						}
-						else
+						)	);
+
+						// Update of the name with the code if nothing else is defined
+						if(line->getName().empty())
 						{
-							os << "LOAD : Use of route " << route->getKey() << " (" << route->getName() << ")<br />";
+							line->setName(lineNumber);
 						}
-						route->setRollingStock(Env::GetOfficialEnv().getEditable<RollingStock>(13792273858822585ULL).get());
+
+						// Wayback
+						int numericServiceNumber(0);
+						try
+						{
+							numericServiceNumber = lexical_cast<int>(serviceNumber);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
+						bool wayBack = (numericServiceNumber % 2 == 1);
+					
+						// Journey pattern
+						JourneyPattern* route(
+							PTFileFormat::CreateOrUpdateRoute(
+								*line,
+								optional<const string&>(),
+								optional<const string&>(),
+								optional<const string&>(),
+								optional<Destination*>(),
+								optional<const RuleUser::Rules&>(),
+								wayBack,
+								_transportMode.get(),
+								stops,
+								_dataSource,
+								_env,
+								os,
+								true
+						)	);
 
 						// Service
 						ScheduledService* service(
@@ -420,7 +640,6 @@ namespace synthese
 						// Calendar
 						if(service)
 						{
-							service->subDates(mask);
 							*service |= _calendarMap[calendarNumber];
 						}
 					}
@@ -445,9 +664,106 @@ namespace synthese
 			stream << t.title("Propriétés");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.title("Données");
+			stream << t.cell("Koord", t.getForm().getTextInput(_getFileParameterName(FILE_KOORD), _pathsMap[FILE_KOORD].file_string()));
 			stream << t.cell("Eckdaten", t.getForm().getTextInput(_getFileParameterName(FILE_ECKDATEN), _pathsMap[FILE_ECKDATEN].file_string()));
 			stream << t.cell("Bitfeld", t.getForm().getTextInput(_getFileParameterName(FILE_BITFELD), _pathsMap[FILE_BITFELD].file_string()));
-			stream << t.cell("Zugdat", t.getForm().getTextInput(_getFileParameterName(FILE_ZUGUDAT), _pathsMap[FILE_ZUGUDAT].file_string()));
+			stream << t.cell("Zugdat", t.getForm().getTextInput(_getFileParameterName(FILE_ZUGDAT), _pathsMap[FILE_ZUGDAT].file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Uniquement afficher liste d'arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_SHOW_STOPS_ONLY, _showStopsOnly));
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
+			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+			stream << t.cell("Mode de transport", t.getForm().getTextInput(PARAMETER_TRANSPORT_MODE_ID, _transportMode.get() ? lexical_cast<string>(_transportMode->getKey()) : string()));
 			stream << t.close();
+		}
+
+
+
+		util::ParametersMap CarPostalFileFormat::Importer_::_getParametersMap() const
+		{
+			ParametersMap pm(PTDataCleanerFileFormat::_getParametersMap());
+
+			// Show stops only
+			pm.insert(PARAMETER_SHOW_STOPS_ONLY, _showStopsOnly);
+
+			// Network
+			if(_network.get())
+			{
+				pm.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+
+			// Transport mode
+			if(_transportMode.get())
+			{
+				pm.insert(PARAMETER_TRANSPORT_MODE_ID, _transportMode->getKey());
+			}
+
+			return pm;
+		}
+
+
+
+		void CarPostalFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& pm )
+		{
+			PTDataCleanerFileFormat::_setFromParametersMap(pm);
+
+			// Show stops only
+			_showStopsOnly = pm.getDefault<bool>(PARAMETER_SHOW_STOPS_ONLY, false);
+
+			// Transport network
+			if(pm.isDefined(PARAMETER_NETWORK_ID)) try
+			{
+				_network = TransportNetworkTableSync::GetEditable(pm.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+			}
+			catch (ObjectNotFoundException<TransportNetwork>&)
+			{
+			}
+
+			// Transport mode
+			if(pm.isDefined(PARAMETER_TRANSPORT_MODE_ID)) try
+			{
+				_transportMode = RollingStockTableSync::GetEditable(pm.get<RegistryKeyType>(PARAMETER_TRANSPORT_MODE_ID), _env);
+			}
+			catch (ObjectNotFoundException<RollingStock>&)
+			{
+			}
+
+			// Import dates
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ECKDATEN));
+			if(it != _pathsMap.end())
+			{
+				ifstream inFile;
+				inFile.open(it->second.file_string().c_str());
+				if(!inFile)
+				{
+					throw Exception("Could no open the calendar file.");
+				}
+
+				date now(day_clock::local_day());
+				string line;
+				if(!getline(inFile, line))
+				{
+					throw Exception("Inconsistent Eckdaten file");
+				}
+				_startDate = date(
+					lexical_cast<int>(line.substr(6,4)),
+					lexical_cast<int>(line.substr(3,2)),
+					lexical_cast<int>(line.substr(0,2))
+				);
+				if(*_startDate < now && _fromToday)
+				{
+					_startDate = now;
+				}
+
+				if(!getline(inFile, line))
+				{
+					throw Exception("Inconsistent Eckdaten file");
+				}
+				_endDate = date(
+					lexical_cast<int>(line.substr(6,4)),
+					lexical_cast<int>(line.substr(3,2)),
+					lexical_cast<int>(line.substr(0,2))
+				);
+			}
 		}
 }	}
