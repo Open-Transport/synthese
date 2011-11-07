@@ -124,6 +124,12 @@ namespace synthese
 			{
 				throw RequestException("No such CMS template : "+ e.getMessage());
 			}
+
+			// Cleaning of template parameters for non CMS output
+			if(!_cmsTemplate.get())
+			{
+				_templateParameters.clear();
+			}
 		}
 
 

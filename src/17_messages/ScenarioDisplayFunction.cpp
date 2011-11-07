@@ -126,6 +126,7 @@ namespace synthese
 				throw RequestException("No such scenario");
 			}
 
+			// Main CMS template
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAIN_TEMPLATE));
@@ -139,6 +140,7 @@ namespace synthese
 				throw RequestException("No such main CMS template : "+ e.getMessage());
 			}
 
+			// Message CMS template
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MESSAGE_TEMPLATE));
@@ -152,6 +154,7 @@ namespace synthese
 				throw RequestException("No such message CMS template : "+ e.getMessage());
 			}
 
+			// Variable CMS template
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_VARIABLE_TEMPLATE));
@@ -163,6 +166,12 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such variable CMS template : "+ e.getMessage());
+			}
+
+			// Cleaning of template parameters for non CMS output
+			if(!_mainTemplate.get())
+			{
+				_templateParameters.clear();
 			}
 		}
 
