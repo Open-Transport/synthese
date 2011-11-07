@@ -425,16 +425,22 @@ namespace synthese
 
 					BOOST_FOREACH(const StopArea::TransferDelaysMap::value_type& it, _connectionPlace->getTransferDelays())
 					{
-						shared_ptr<StopPoint> startStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.first));
-						shared_ptr<StopPoint> endStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.second));
-						removeTransferRequest.getAction()->setFrom(startStop);
-						removeTransferRequest.getAction()->setTo(endStop);
+						try
+						{
+							shared_ptr<StopPoint> startStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.first));
+							shared_ptr<StopPoint> endStop(Env::GetOfficialEnv().getEditable<StopPoint>(it.first.second));
+							removeTransferRequest.getAction()->setFrom(startStop);
+							removeTransferRequest.getAction()->setTo(endStop);
 
-						stream << t.row();
-						stream << t.col() << startStop->getCodeBySources() << " / " << startStop->getName();
-						stream << t.col() << endStop->getCodeBySources() << " / " << endStop->getName();
-						stream << t.col() << (it.second.total_seconds() / 60) << " min";
-						stream << t.col() << HTMLModule::getLinkButton(removeTransferRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le délai de correspondance ?");
+							stream << t.row();
+							stream << t.col() << startStop->getCodeBySources() << " / " << startStop->getName();
+							stream << t.col() << endStop->getCodeBySources() << " / " << endStop->getName();
+							stream << t.col() << (it.second.total_seconds() / 60) << " min";
+							stream << t.col() << HTMLModule::getLinkButton(removeTransferRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le délai de correspondance ?");
+						}
+						catch(ObjectNotFoundException<StopPoint>&)
+						{
+						}
 					}
 
 					stream << t.row();
