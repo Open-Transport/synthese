@@ -20,11 +20,11 @@
 #include "CarPostalFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
+#include "HastusInterfaceFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
-#include "PladisStopsFileFormat.hpp"
 #include "TridentFileFormat.h"
 
 #include "DestinationTableSync.hpp"
@@ -176,11 +176,11 @@ void synthese::pt::moduleRegister()
 	synthese::pt::CarPostalFileFormat::integrate();
 	synthese::pt::GTFSFileFormat::integrate();
 	synthese::pt::HastusCSVFileFormat::integrate();
+	synthese::pt::HastusInterfaceFileFormat::integrate();
 	synthese::pt::HeuresFileFormat::integrate();
 	synthese::pt::IneoFileFormat::integrate();
 	synthese::pt::IneoRealTimeFileFormat::integrate();
 	synthese::pt::OGTFileFormat::integrate();
-	synthese::pt::PladisStopsFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate ();
 
 	synthese::pt::DestinationAdmin::integrate();

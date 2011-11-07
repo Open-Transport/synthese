@@ -434,10 +434,10 @@ namespace synthese
 		CommercialLine* PTFileFormat::CreateOrUpdateLine(
 			impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
 			const std::string& id,
-			const std::string& name,
-			const std::string& shortName,
+			optional<const std::string&> name,
+			optional<const std::string&> shortName,
 			boost::optional<util::RGBColor> color,
-			const TransportNetwork& network,
+			const TransportNetwork& defaultNetwork,
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream
@@ -447,9 +447,14 @@ namespace synthese
 			{
 				line = new CommercialLine(CommercialLineTableSync::getId());
 
-				logStream << "CREA : Creation of the commercial line with key " << id << " (" << name <<  ")<br />";
+				logStream << "CREA : Creation of the commercial line with key " << id;
+				if(name)
+				{
+					logStream << " (" << *name <<  ")";
+				}
+				logStream << "<br />";
 
-				line->setNetwork(&network);
+				line->setNetwork(&defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				line->setDataSourceLinks(links);
@@ -457,13 +462,13 @@ namespace synthese
 				lines.add(*line);
 			}
 
-			if(!name.empty())
+			if(name)
 			{
-				line->setName(name);
+				line->setName(*name);
 			}
-			if(!shortName.empty())
+			if(shortName)
 			{
-				line->setShortName(shortName);
+				line->setShortName(*shortName);
 			}
 			if(color)
 			{

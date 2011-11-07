@@ -27,6 +27,9 @@
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "PTDataCleanerFileFormat.hpp"
+#include "ImportableTableSync.hpp"
+#include "StopPointTableSync.hpp"
 
 #include <iostream>
 #include <map>
@@ -48,14 +51,15 @@ namespace synthese
 
 	namespace pt
 	{
+		class TransportNetwork;
+		class RollingStock;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// CarPostal file format.
 		/// @ingroup m35File refFile
 		//////////////////////////////////////////////////////////////////////////
-		/// The CarPostal export uses 5 files :
+		/// The CarPostal export reads 4 files :
 		///	<ul>
-		///		<li>BAHNHOF.DAT : Names of commercial stops</li>
 		///		<li>KOORD.DAT : Coordinates of commercial stops</li>
 		///		<li>ECKDATEN.DAT : Date range of the data</li>
 		///		<li>BITFELD.DAT : Calendars</li>
@@ -103,19 +107,44 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<CarPostalFileFormat>
+				public impex::MultipleFileTypesImporter<CarPostalFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 
 			public:
 				static const std::string FILE_ECKDATEN;
 				static const std::string FILE_BITFELD;
-				static const std::string FILE_ZUGUDAT;
+				static const std::string FILE_ZUGDAT;
+				static const std::string FILE_KOORD;
+
+				static const std::string PARAMETER_SHOW_STOPS_ONLY;
+				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_TRANSPORT_MODE_ID;
 
 			private:
-				typedef std::map<int, calendar::Calendar> CalendarMap;
+				//! @name Parameters
+				//@{
+					boost::shared_ptr<TransportNetwork> _network;
+					boost::shared_ptr<RollingStock> _transportMode;
+					bool _showStopsOnly;
+				//@}
 
-				mutable boost::gregorian::date _startDate;
-				mutable boost::gregorian::date _endDate;
+				typedef std::map<int, calendar::Calendar> CalendarMap;
+				struct Bahnhof
+				{
+					std::string operatorCode;
+					std::string cityName;
+					std::string name;
+					boost::shared_ptr<geos::geom::Point> coords;
+					StopPoint* stop;
+				};
+
+				typedef std::map<std::string, Bahnhof> Bahnhofs;
+
+				mutable Bahnhofs _nonLinkedBahnhofs;
+				mutable Bahnhofs _linkedBahnhofs;
+
+				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable CalendarMap _calendarMap;
 
 
@@ -137,7 +166,10 @@ namespace synthese
 					util::Env& env,
 					const impex::DataSource& dataSource
 				):	impex::MultipleFileTypesImporter<CarPostalFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource)
+					PTDataCleanerFileFormat(env, dataSource),
+					impex::Importer(env, dataSource),
+					_stopPoints(_dataSource, _env),
+					_showStopsOnly(false)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
@@ -150,6 +182,29 @@ namespace synthese
 					std::ostream& os,
 					const admin::AdminRequest& request
 				) const;
+
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from attributes to generic parameter maps.
+				/// @return Generated parameters map
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				virtual util::ParametersMap _getParametersMap() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Conversion from generic parameters map to attributes.
+				/// @param map Parameters map to interpret
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				virtual void _setFromParametersMap(const util::ParametersMap& map);
+
+
 
 				virtual db::DBTransaction _save() const;
 			};

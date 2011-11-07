@@ -139,8 +139,6 @@ PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
 PlaceAliasUpdateAction.hpp
-PladisStopsFileFormat.cpp
-PladisStopsFileFormat.hpp
 ProjectAllStopPointsAction.cpp
 ProjectAllStopPointsAction.hpp
 PTCitiesAdmin.cpp
