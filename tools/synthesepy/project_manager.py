@@ -181,8 +181,7 @@ class Package(object):
                     'select 1 from t063_web_pages where id = ?', [page['id']]):
                 log.debug('Page %r already exists. Not overwriting.', page['id'])
                 continue
-            
-            log.debug("FINAL PAGE %r", page)
+
             self.project.db_backend.replace_into('t063_web_pages', page)
 
     def load_data(self, site, local, overwrite):
