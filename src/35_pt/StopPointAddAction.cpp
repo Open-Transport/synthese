@@ -89,6 +89,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_X, _point->getX());
 				map.insert(PARAMETER_Y, _point->getY());
+				map.insert(PARAMETER_SRID, _point->getSRID());
 			}
 			map.insert(PARAMETER_NAME, _name);
 			if(_city.get())
@@ -100,12 +101,6 @@ namespace synthese
 				map.insert(PARAMETER_CITY_NAME, *_cityName);
 			}
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
-
-			// SRID
-			if(_coordinatesSystem)
-			{
-				map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
-			}
 
 			return map;
 		}
