@@ -91,6 +91,11 @@ namespace synthese
 				}
 			}
 
+			// Clean of template parameters for non CMS output
+			if(!_page.get())
+			{
+				_templateParameters.clear();
+			}
 		}
 
 		void GetDepartureBoardsService::run(
