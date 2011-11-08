@@ -531,11 +531,10 @@ namespace synthese
 					}
 					else if(line.substr(0,1) != "*")
 					{
-						StopPointTableSync::SearchResult searchStop(
-							StopPointTableSync::Search(
-								_env, optional<RegistryKeyType>(), line.substr(0,7)
-						)	);
-						if(searchStop.empty())
+						set<StopPoint*> stopsSet(
+							_stopPoints.get(line.substr(0,7))
+						);
+						if(stopsSet.empty())
 						{
 							os << "WARN : stop " << line << " not found<br />";
 							serviceMustBeAvoided = true;
@@ -547,14 +546,9 @@ namespace synthese
 							bool isDeparture(departureTime != "9999" && departureTime != "    ");
 							bool isArrival(arrivalTime != "9999" && arrivalTime != "    ");
 
-							JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet stop;
-							BOOST_FOREACH(const StopPointTableSync::SearchResult::value_type& itstop, searchStop)
-							{
-								stop.insert(itstop.get());
-							}
 							stops.push_back(
 								JourneyPattern::StopWithDepartureArrivalAuthorization(
-									stop,
+									stopsSet,
 									optional<MetricOffset>(),
 									isDeparture,
 									isArrival
