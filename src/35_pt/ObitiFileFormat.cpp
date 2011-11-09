@@ -395,7 +395,7 @@ namespace synthese
 				}
 
 				// RollingStock
-				const RollingStock* rollingStock;
+				RollingStock* rollingStock;
 				if(_rollingStock.get())
 				{
 					rollingStock = _rollingStock.get();
