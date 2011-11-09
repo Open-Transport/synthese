@@ -445,7 +445,13 @@ namespace synthese
 					{
 						continue;
 					}
-					result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
+					CommercialLine* line(
+						static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine()
+					);
+					if(line)
+					{
+						result.insert(line);
+					}
 				}
 				if(includeArrivals)
 				{
@@ -455,7 +461,12 @@ namespace synthese
 						{
 							continue;
 						}
-						result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
+						CommercialLine* line(
+							static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine()
+						);
+						{
+							result.insert(static_cast<const JourneyPattern*>(itEdge.first)->getCommercialLine());
+						}
 					}
 				}
 			}
