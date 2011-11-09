@@ -24,6 +24,7 @@
 #define SYNTHESE_impex_Exporter_hpp__
 
 #include "Env.h"
+#include "ParametersMap.h"
 
 namespace synthese
 {
