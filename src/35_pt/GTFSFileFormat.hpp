@@ -270,7 +270,7 @@ namespace synthese
 				) const;
 
 				static const std::string LABEL_TAD;
-		        static const int WGS84_SRID;
+				static const int WGS84_SRID;
 
 				static std::map<std::string,util::RegistryKeyType> shapeId;
 
