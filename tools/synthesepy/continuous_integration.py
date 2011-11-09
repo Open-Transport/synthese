@@ -26,7 +26,6 @@ import os
 import synthesepy.build
 import synthesepy.package
 import synthesepy.test
-from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
@@ -39,16 +38,7 @@ def _should_build_package(env):
         log.info('should_build_package returned False. Not building package.')
         return False
 
-    svn_info = utils.SVNInfo(env.source_path)
-    CREATE_PACKAGE_MESSAGE = 'cmd:create_package'
-
-    if svn_info.last_msg and CREATE_PACKAGE_MESSAGE in svn_info.last_msg:
-        log.info('Found %r in last commit message. '
-            'Building package.', CREATE_PACKAGE_MESSAGE)
-        return True
-
-    log.info('Not building package')
-    return False
+    return True
 
 
 def run(env, args):
@@ -81,13 +71,10 @@ def run(env, args):
     if config.env_type == 'scons':
         return
 
+    if _should_build_package(env):
+        log.info('Creating package')
+        synthesepy.package.run(env, args)
+
     log.info('Running tests')
     tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)
-
-    if not _should_build_package(env):
-        return
-
-    log.info('Creating package')
-    synthesepy.package.run(env, args)
-
