@@ -21,6 +21,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// scons workaround
+#ifdef PEGASE_TEST_SQL
+
 #include "PegaseFileFormat.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
@@ -31,8 +34,6 @@ using synthese::Exception;
 
 BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 {
-	// scons workaround
-#ifdef PEGASE_TEST_SQL
 
 	ifstream sqlStream(PEGASE_TEST_SQL);
 	PegaseFileFormat::SQLDumpParser parser(sqlStream);
@@ -67,5 +68,9 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	BOOST_REQUIRE(parser.getRow());
 	BOOST_REQUIRE(!parser.getRow());
 
-#endif
 }
+#else
+int main() {
+	return 0;
+}
+#endif
