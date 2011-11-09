@@ -129,7 +129,7 @@ namespace synthese
 				void _loadFieldsMap(const std::string& line) const;
 				std::string _getValue(const std::string& field) const;
 				void _loadLine(const std::string& line) const;
-				void _firstLine(std::ifstream& inFile, std::string& line);
+				void _firstLine(std::ifstream& inFile, std::string& line) const;
 
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
