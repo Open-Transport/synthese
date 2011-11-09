@@ -96,6 +96,7 @@ namespace synthese
 		const string CarPostalFileFormat::Importer_::PARAMETER_SHOW_STOPS_ONLY = "show_stops_only";
 		const string CarPostalFileFormat::Importer_::PARAMETER_NETWORK_ID = "network_id";
 		const string CarPostalFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_ID = "transport_mode_id";
+		const string CarPostalFileFormat::Importer_::PARAMETER_WAYBACK_BIT_POSITION = "wayback_bit_position";
 	}
 
 	namespace impex
@@ -519,8 +520,8 @@ namespace synthese
 				{
 					if(line.substr(0,2) == "*Z")
 					{
-						serviceNumber = line.substr(3,5);
-						lineNumber = line.substr(9,6);
+						serviceNumber = trim_copy(line.substr(3,5));
+						lineNumber = trim_copy(line.substr(9,6));
 						stops.clear();
 						departures.clear();
 						arrivals.clear();
@@ -595,7 +596,7 @@ namespace synthese
 						int numericServiceNumber(0);
 						try
 						{
-							numericServiceNumber = lexical_cast<int>(serviceNumber);
+							numericServiceNumber = lexical_cast<int>(serviceNumber.substr(serviceNumber.size() - 1 - _wayBackBitPosition, 1));
 						}
 						catch(bad_lexical_cast&)
 						{
@@ -669,6 +670,7 @@ namespace synthese
 			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Mode de transport", t.getForm().getTextInput(PARAMETER_TRANSPORT_MODE_ID, _transportMode.get() ? lexical_cast<string>(_transportMode->getKey()) : string()));
+			stream << t.cell("Position du chiffre aller retour", t.getForm().getTextInput(PARAMETER_WAYBACK_BIT_POSITION, lexical_cast<string>(_wayBackBitPosition)));
 			stream << t.close();
 		}
 
@@ -693,6 +695,9 @@ namespace synthese
 				pm.insert(PARAMETER_TRANSPORT_MODE_ID, _transportMode->getKey());
 			}
 
+			// Wayback bit position
+			pm.insert(PARAMETER_WAYBACK_BIT_POSITION, _wayBackBitPosition);
+
 			return pm;
 		}
 
@@ -704,6 +709,9 @@ namespace synthese
 
 			// Show stops only
 			_showStopsOnly = pm.getDefault<bool>(PARAMETER_SHOW_STOPS_ONLY, false);
+
+			// Wayback bit position
+			_wayBackBitPosition = pm.getDefault<size_t>(PARAMETER_WAYBACK_BIT_POSITION, 0);
 
 			// Transport network
 			if(pm.isDefined(PARAMETER_NETWORK_ID)) try
