@@ -35,6 +35,7 @@
 #include "LineStopTableSync.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateTableSync.h"
+#include "IConv.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -456,7 +457,7 @@ namespace synthese
 
 			SQLDumpParser parser(inFile);
 
-			os << "INFO : loading POINT_D_ARRET";
+			os << "INFO : loading POINT_D_ARRET<br />";
 			parser.setTableToParse("POINT_D_ARRET");
 			while(parser.getRow())
 			{
@@ -493,10 +494,12 @@ namespace synthese
 					}
 				}
 
+				IConv iconv(_dataSource.getCharset(), "UTF-8");
+
 				PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 					_stopPoints,
 					stopCode,
-					parser.getCell("PA_NOM_COURT"),
+					iconv.convert(parser.getCell("PA_NOM_COURT")),
 					point.get(),
 					*cityForStopAreaAutoGeneration,
 					optional<time_duration>(),
@@ -508,7 +511,7 @@ namespace synthese
 
 			ServiceInfoMap serviceInfos;
 
-			os << "INFO : loading ARR_SER";
+			os << "INFO : loading ARR_SER<br />";
 			parser.setTableToParse("ARR_SER");
 			while(parser.getRow())
 			{
@@ -526,7 +529,7 @@ namespace synthese
 				if(serviceInfo.find(rank) != serviceInfo.end())
 				{
 					os << "ERR : duplicate ranks (" << rank << ") found for service key: " <<
-						serviceKey;
+						serviceKey << "<br />";
 					continue;
 				}
 				
@@ -535,14 +538,14 @@ namespace synthese
 				if(!_stopPoints.contains(scheduleInfo.stopPointId))
 				{
 					os << "ERR : Found a ARR_SER entry without a matching stop point. Service key: " <<
-						serviceKey << " stop code: " << scheduleInfo.stopPointId;
+						serviceKey << " stop code: " << scheduleInfo.stopPointId << "<br />";
 					continue;
 				}
 
 				int arrivalTimeMinutes = parser.getCellInt("AS_HEURE_PASSAGE");
 				if(arrivalTimeMinutes < 0)
 				{
-					os << "WARN : Ignoring stop with no arrival time";
+					os << "WARN : Ignoring stop with no arrival time <br />";
 					continue;
 				}
 				scheduleInfo.arrivalTime = minutes(arrivalTimeMinutes);
@@ -562,7 +565,7 @@ namespace synthese
 
 			JourneyPatternInfoMap journeyPatternInfos;
 
-			os << "INFO : loading ITINERAIRE";
+			os << "INFO : loading ITINERAIRE<br />";
 			parser.setTableToParse("ITINERAIRE");
 			while(parser.getRow())
 			{
@@ -581,7 +584,7 @@ namespace synthese
 
 			CalendarMap calendars;
 
-			os << "INFO : loading CAL_DAT";
+			os << "INFO : loading CAL_DAT<br />";
 			parser.setTableToParse("CAL_DAT");
 			date now(day_clock::local_day());
 			while(parser.getRow())
@@ -614,7 +617,7 @@ namespace synthese
 			}
 
 			ServiceToCalendarIdMap serviceToCalendarId;
-			os << "INFO : loading CAL_SER";
+			os << "INFO : loading CAL_SER<br />";
 			parser.setTableToParse("CAL_SER");
 			while(parser.getRow())
 			{
@@ -635,7 +638,7 @@ namespace synthese
 				{
 					os << "WARN : unable to find journey pattern with name: " <<
 						serviceKey.journeyPatternId.name <<
-						" and start date: " << serviceKey.journeyPatternId.startDate << endl;
+						" and start date: " << serviceKey.journeyPatternId.startDate << "<br />";
 					continue;
 				}
 				JourneyPatternInfo& journeyPatternInfo = journeyPatternInfos[serviceKey.journeyPatternId];
@@ -653,10 +656,6 @@ namespace synthese
 					if(!linePrefixFilter.empty() && journeyPatternName.compare(0, linePrefixFilter.size(), linePrefixFilter))
 						continue;
 					
-				}
-				else
-				{
-					throw Exception("todo");
 				}
 
 				// CommercialLine
@@ -679,7 +678,7 @@ namespace synthese
 
 				if(serviceInfo.empty())
 				{
-					os << "ERR : no schedules found for service: " << serviceKey;
+					os << "ERR : no schedules found for service: " << serviceKey << "<br />";
 					continue;
 				}
 
@@ -695,7 +694,7 @@ namespace synthese
 
 					if(!_stopPoints.contains(scheduleInfo.stopPointId))
 					{
-						cout << "ERR : Missing stop point with id: " << scheduleInfo.stopPointId << endl;
+						os << "ERR : Missing stop point with id: " << scheduleInfo.stopPointId << "<br />";
 						continue;
 					}
 					set<StopPoint*> stopPoints = _stopPoints.get(scheduleInfo.stopPointId);
