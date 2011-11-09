@@ -31,7 +31,7 @@ using synthese::Exception;
 
 BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 {
-	// scons workardound
+	// scons workaround
 #ifdef PEGASE_TEST_SQL
 
 	ifstream sqlStream(PEGASE_TEST_SQL);
