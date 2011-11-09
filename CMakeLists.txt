@@ -90,6 +90,9 @@ if(WIN32)
   # This is to avoid:
   # fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj
   add_definitions(/bigobj)
+  
+  # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
+  SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO")
 
   # iconv
   add_library(iconv STATIC IMPORTED)
@@ -164,11 +167,6 @@ add_subdirectory(projects)
 add_subdirectory(tools)
 add_subdirectory(test)
 add_subdirectory(utils)
-
-# To build the packages, you can increment the build number and add a
-# "cmd:create_package" string in your commit message. (build number is ignored,
-# this is only used to do a dummy commit).
-# 3
 
 # build a CPack driven installer package
 #include(InstallRequiredSystemLibraries)
