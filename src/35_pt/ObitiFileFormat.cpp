@@ -717,7 +717,7 @@ namespace synthese
 
 
 
-		void ObitiFileFormat::Importer_::_firstLine(ifstream& inFile, std::string& line)
+		void ObitiFileFormat::Importer_::_firstLine(ifstream& inFile, std::string& line) const
 		{
 			inFile.clear();
 			inFile.seekg(0, ios::beg);
