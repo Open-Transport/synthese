@@ -120,6 +120,7 @@ namespace synthese
 				static const std::string PARAMETER_SHOW_STOPS_ONLY;
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_TRANSPORT_MODE_ID;
+				static const std::string PARAMETER_WAYBACK_BIT_POSITION;
 
 			private:
 				//! @name Parameters
@@ -127,6 +128,7 @@ namespace synthese
 					boost::shared_ptr<TransportNetwork> _network;
 					boost::shared_ptr<RollingStock> _transportMode;
 					bool _showStopsOnly;
+					std::size_t _wayBackBitPosition;
 				//@}
 
 				typedef std::map<int, calendar::Calendar> CalendarMap;
@@ -169,7 +171,8 @@ namespace synthese
 					PTDataCleanerFileFormat(env, dataSource),
 					impex::Importer(env, dataSource),
 					_stopPoints(_dataSource, _env),
-					_showStopsOnly(false)
+					_showStopsOnly(false),
+					_wayBackBitPosition(0)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
