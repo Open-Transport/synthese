@@ -37,10 +37,10 @@ DesignatedLinePhysicalStopInheritedTableSync.cpp
 DesignatedLinePhysicalStopInheritedTableSync.hpp
 Destination.cpp
 Destination.hpp
-DestinationsAdmin.hpp
-DestinationsAdmin.cpp
-DestinationAdmin.hpp
 DestinationAdmin.cpp
+DestinationAdmin.hpp
+DestinationsAdmin.cpp
+DestinationsAdmin.hpp
 DestinationTableSync.cpp
 DestinationTableSync.hpp
 DestinationUpdateAction.cpp
@@ -101,6 +101,8 @@ JunctionTableSync.cpp
 JunctionTableSync.hpp
 JunctionUpdateAction.cpp
 JunctionUpdateAction.hpp
+LineAlarmRecipient.cpp
+LineAlarmRecipient.hpp
 LineArea.cpp
 LineArea.hpp
 LineAreaInheritedTableSync.cpp
@@ -109,8 +111,6 @@ LineMarkerInterfacePage.cpp
 LineMarkerInterfacePage.h
 LinePhysicalStop.cpp
 LinePhysicalStop.hpp
-LineAlarmRecipient.cpp
-LineAlarmRecipient.hpp
 LinesListFunction.cpp
 LinesListFunction.h
 LineStop.cpp
@@ -135,6 +135,8 @@ NonPermanentService.cpp
 NonPermanentService.h
 OGTFileFormat.cpp
 OGTFileFormat.hpp
+PegaseFileFormat.cpp
+PegaseFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
@@ -150,9 +152,9 @@ PTFileFormat.cpp
 PTFileFormat.hpp
 PTModule.cpp
 PTModule.gen.cpp
-PTModuleRegister.cpp
 PTModule.h
 PTModule.inc.cpp
+PTModuleRegister.cpp
 PTNetworksAdmin.cpp
 PTNetworksAdmin.h
 PTNetworksListFunction.cpp
