@@ -31,6 +31,9 @@ using synthese::Exception;
 
 BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 {
+	// scons workardound
+#ifdef PEGASE_TEST_SQL
+
 	ifstream sqlStream(PEGASE_TEST_SQL);
 	PegaseFileFormat::SQLDumpParser parser(sqlStream);
 
@@ -63,4 +66,6 @@ BOOST_AUTO_TEST_CASE (testJourneyPatternCalendarScheduledService)
 	BOOST_REQUIRE(parser.getRow());
 	BOOST_REQUIRE(parser.getRow());
 	BOOST_REQUIRE(!parser.getRow());
+
+#endif
 }
