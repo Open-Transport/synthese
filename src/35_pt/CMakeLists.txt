@@ -135,6 +135,8 @@ NonPermanentService.cpp
 NonPermanentService.h
 OGTFileFormat.cpp
 OGTFileFormat.hpp
+ObitiFileFormat.cpp
+ObitiFileFormat.hpp
 PegaseFileFormat.cpp
 PegaseFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp

@@ -25,6 +25,7 @@
 #include "IneoFileFormat.hpp"
 #include "IneoRealTimeFileFormat.hpp"
 #include "OGTFileFormat.hpp"
+#include "ObitiFileFormat.hpp"
 #include "PegaseFileFormat.hpp"
 #include "TridentFileFormat.h"
 #include "ShapeFileFormat.hpp"
@@ -183,6 +184,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::IneoFileFormat::integrate();
 	synthese::pt::IneoRealTimeFileFormat::integrate();
 	synthese::pt::OGTFileFormat::integrate();
+	synthese::pt::ObitiFileFormat::integrate();
 	synthese::pt::PegaseFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate();
 	synthese::pt::ShapeFileFormat::integrate();
