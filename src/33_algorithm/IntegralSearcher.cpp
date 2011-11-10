@@ -181,7 +181,7 @@ namespace synthese
 			const graph::VertexAccessMap& vam,
 			const RoutePlanningIntermediateJourney& startJourney,
 			const boost::posix_time::ptime& desiredTime,
-			const boost::posix_time::ptime& minMaxDateTimeAtOrigin,
+			const boost::posix_time::ptime& callMinMaxDateTimeAtOrigin,
 			optional<size_t> maxDepth,
 			boost::optional<boost::posix_time::time_duration> totalDuration
 		){
@@ -201,6 +201,7 @@ namespace synthese
 				shared_ptr<RoutePlanningIntermediateJourney> journey(todo.front());
 
 				VertexAccessMap curVam;
+				ptime minMaxDateTimeAtOrigin(callMinMaxDateTimeAtOrigin);
 				if(journey->empty())
 				{
 					curVam = vam;
@@ -213,6 +214,14 @@ namespace synthese
 						*journey->getEndEdge().getFromVertex(),
 						_accessDirection == DEPARTURE_TO_ARRIVAL
 					);
+					if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+					{
+						minMaxDateTimeAtOrigin += journey->getDuration();
+					}
+					else
+					{
+						minMaxDateTimeAtOrigin -= journey->getDuration();
+					}
 				}
 
 				if(	!journey->empty() &&
