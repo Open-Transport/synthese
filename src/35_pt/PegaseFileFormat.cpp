@@ -319,6 +319,7 @@ namespace synthese
 
 
 		const std::string PegaseFileFormat::Importer_::PARAMETER_NETWORK_ID("net");
+		const std::string PegaseFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_LINE_FILTER_MODE("line_filter_mode");
 
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE1("FILTER_MODE1");
@@ -464,18 +465,26 @@ namespace synthese
 				string cityCode = parser.getCell("PA_COD_COMMU");
 				string stopCode = parser.getCell("PA_CODE_ARRET");
 
-				City* cityForStopAreaAutoGeneration(NULL);
+				shared_ptr<const City> cityForStopAreaAutoGeneration;
 				CityTableSync::SearchResult cities(
 					CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode, 0, 1)
 				);
 				if(cities.empty())
 				{
 					os << "WARN : City with code: " << cityCode << " not found (stop code: " << stopCode << ")<br />";
-					continue;
+					if(_defaultCity)
+					{
+						cityForStopAreaAutoGeneration = _defaultCity;
+					}
+					else
+					{
+						os << "ERR : no default city. Data might be inconsistent<br />";
+						continue;
+					}
 				}
 				else
 				{
-					cityForStopAreaAutoGeneration = cities.begin()->get();
+					cityForStopAreaAutoGeneration = *cities.begin();
 				}
 
 				shared_ptr<geos::geom::Point> point;
@@ -501,7 +510,7 @@ namespace synthese
 					stopCode,
 					iconv.convert(parser.getCell("PA_NOM_COURT")),
 					point.get(),
-					*cityForStopAreaAutoGeneration,
+					*cityForStopAreaAutoGeneration.get(),
 					optional<time_duration>(),
 					_dataSource,
 					_env,
@@ -711,6 +720,12 @@ namespace synthese
 					arrivals.push_back(scheduleInfo.arrivalTime);
 				}
 
+				if(stops.size() < 2)
+				{
+					os << "WARN : journey pattern has less than 2 stops. It is ignored. service key: " << serviceKey << "<br />";
+					continue;
+				}
+
 				JourneyPattern* journeyPattern(
 					PTFileFormat::CreateOrUpdateRoute(
 						*commercialLine,
@@ -789,6 +804,7 @@ namespace synthese
 				stream << t.title("Paramètres");
 				stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 				stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+				stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 				vector<pair<optional<string>, string> > methods;
 				methods.push_back(make_pair(optional<string>(FILTER_MODE1), FILTER_MODE1));
@@ -808,6 +824,12 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
 			}
+
+			if(_defaultCity.get())
+			{
+				map.insert(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity->getKey());
+			}
+
 			if(!_lineFilterMode.empty())
 			{
 				map.insert(PARAMETER_LINE_FILTER_MODE, _lineFilterMode);
@@ -828,6 +850,11 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<TransportNetwork>&)
 			{
+			}
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
+			{
+				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 			}
 
 			_lineFilterMode = map.getDefault<string>(PARAMETER_LINE_FILTER_MODE, FILTER_MODE1);
