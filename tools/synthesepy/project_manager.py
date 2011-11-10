@@ -529,7 +529,7 @@ class Project(object):
 
         log.info('Sending crash mail')
         hostname = socket.gethostname()
-        LINE_COUNT = 100
+        LINE_COUNT = 500
         try:
             last_log = tail(open(self.config.log_file), LINE_COUNT)
         except IOError:
