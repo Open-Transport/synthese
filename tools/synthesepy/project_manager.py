@@ -502,22 +502,57 @@ class Project(object):
         if not self.config.send_mail_on_crash:
             return
 
+        # adapted from http://stackoverflow.com/questions/136168/get-last-n-lines-of-a-file-with-python-similar-to-tail
+        def tail(f, window=20):
+            BUFSIZ = 1024
+            f.seek(0, os.SEEK_END)
+            bytes = f.tell()
+            size = window
+            block = -1
+            data = []
+            while size > 0 and bytes > 0:
+                if bytes - BUFSIZ > 0:
+                    # Seek back one whole BUFSIZ
+                    f.seek(block * BUFSIZ, os.SEEK_END)
+                    # read BUFFER
+                    data.append(f.read(BUFSIZ))
+                else:
+                    # file too small, start from beginning
+                    f.seek(0, os.SEEK_SET)
+                    # only read what was not read
+                    data.append(f.read(bytes))
+                linesFound = data[-1].count('\n')
+                size -= linesFound
+                bytes -= BUFSIZ
+                block -= 1
+            return '\n'.join(''.join(data).splitlines()[-window:])
+
         log.info('Sending crash mail')
         hostname = socket.gethostname()
+        LINE_COUNT = 100
+        try:
+            last_log = tail(open(self.config.log_file), LINE_COUNT)
+        except IOError:
+            last_log = "[Not available]"
+
         subject = ('Synthese crash on {0} (project: {1}, '
             'restarts: {2})'.format(
                 hostname, self.config.project_name, restart_count))
         body = '''
-Synthese crashed on {0}. It is going to restart.
-Total restart count: {1}. Seconds since last start: {2}.
+Synthese crashed on {hostname}. It is going to restart.
+Total restart count: {restart_count}. Seconds since last start: {uptime_s}.
 
-TODO: put last logs here.
+Last {line_count} lines of log:
+{last_log}
 
 Have a nice day,
 The synthese.py wrapper script.
-'''.format(hostname, restart_count, int(time.time() - last_start_s))
-
-        # TODO: include logs in the mail.
+'''.format(
+            hostname=hostname,
+            restart_count=restart_count,
+            line_count=LINE_COUNT,
+            last_log=last_log,
+            uptime_s=int(time.time() - last_start_s))
 
         msg = email.mime.text.MIMEText(body)
 
