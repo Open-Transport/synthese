@@ -88,6 +88,7 @@ namespace synthese
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsAnyOf(const std::string& source, size_t pos, const std::string& chars);
+			static std::string _convertToCP850(const std::string& text);
 
 		public:
 			FrenchPhoneticString();
