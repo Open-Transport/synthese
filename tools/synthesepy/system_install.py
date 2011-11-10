@@ -93,6 +93,8 @@ def run(env, args):
 
     create_synthese_user()
     install_dependencies(env)
-    log.info('Synthese was installed on the system. You can now run projects.')
+    log.info('Synthese was installed or updated on the system.')
+    log.info('To restart all your Synthese projects, type:')
+    log.info('  supervisorctl restart all')
 
 # TODO: system_uninstall
