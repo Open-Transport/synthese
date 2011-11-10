@@ -387,7 +387,7 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_tableSynchronizersMutex);
 			const DBModule::TablesByNameMap& tm(DBModule::GetTablesByName());
 
-			Log::GetInstance().debug(
+			Log::GetInstance().trace(
 				"Dispatching event: table: " + modifEvent.table + " type: " +
 				lexical_cast<string>(modifEvent.type) + " id: " + lexical_cast<string>(modifEvent.id)
 			);
