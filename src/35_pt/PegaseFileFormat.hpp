@@ -32,8 +32,14 @@
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 
+
 namespace synthese
 {
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -91,6 +97,7 @@ namespace synthese
 			{
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				// TODO: implement
 				static const std::string PARAMETER_LINE_FILTER_MODE;
 				static const std::string FILTER_MODE1;
@@ -98,6 +105,7 @@ namespace synthese
 
 			private:
 				boost::shared_ptr<TransportNetwork> _network;
+				boost::shared_ptr<const geography::City> _defaultCity;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				std::string _lineFilterMode;
