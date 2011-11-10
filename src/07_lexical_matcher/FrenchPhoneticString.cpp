@@ -1,5 +1,6 @@
 #include "FrenchPhoneticString.h"
 #include "IConv.hpp"
+#include "Log.h"
 
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/case_conv.hpp>
@@ -38,11 +39,33 @@ namespace synthese
 
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Try to convert the given string in UTF-8 to CP850. Return an empty
+		/// string in case of conversion failure.
+		/// @param text text to convert
+		/// @author Sylvain Pasche
+		/// @since 3.3.0
+		/// @date 2011
+		std::string FrenchPhoneticString::_convertToCP850(const std::string& text)
+		{
+			try
+			{
+				return to_lower_copy(ICONV.convert(text));
+			}
+			catch(IConv::ImpossibleConversion& e)
+			{
+				util::Log::GetInstance().warn("Failed to convert string to CP850 in FrenchPhoneticString", e);
+				return "";
+			};
+		}
+
+
+
 		std::string FrenchPhoneticString::to_plain_lower_copy(const std::string& text)
 		{
 			mutex::scoped_lock lock(_IConvMutex);
 
-			string source(to_lower_copy(ICONV.convert(text)));
+			string source(_convertToCP850(text));
 			stringstream result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{
@@ -65,7 +88,7 @@ namespace synthese
 
 			_source = ssource;
 
-			string source(to_lower_copy(ICONV.convert(ssource)));
+			string source(_convertToCP850(ssource));
 			PhoneticString result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{
