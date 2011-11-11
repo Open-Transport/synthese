@@ -39,13 +39,6 @@ namespace synthese
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Try to convert the given string in UTF-8 to CP850. Return an empty
-		/// string in case of conversion failure.
-		/// @param text text to convert
-		/// @author Sylvain Pasche
-		/// @since 3.3.0
-		/// @date 2011
 		std::string FrenchPhoneticString::_convertToCP850(const std::string& text)
 		{
 			try
