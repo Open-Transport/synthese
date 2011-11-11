@@ -479,9 +479,7 @@ namespace synthese
 					if(!starts_with(lineInfo.lineName, "LR"))
 					{
 						lineInfo.ignored = true;
-						return lineInfo;
 					}
-					lineInfo.lineName = lineInfo.lineName.substr(2, lineInfo.lineName.length() - 2);
 					return lineInfo;
 				}
 
