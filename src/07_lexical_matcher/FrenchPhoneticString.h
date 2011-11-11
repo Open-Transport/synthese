@@ -88,6 +88,13 @@ namespace synthese
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsAnyOf(const std::string& source, size_t pos, const std::string& chars);
+			//////////////////////////////////////////////////////////////////////////
+			/// Try to convert the given string in UTF-8 to CP850. Return an empty
+			/// string in case of conversion failure.
+			/// @param text text to convert
+			/// @author Sylvain Pasche
+			/// @since 3.3.0
+			/// @date 2011
 			static std::string _convertToCP850(const std::string& text);
 
 		public:
