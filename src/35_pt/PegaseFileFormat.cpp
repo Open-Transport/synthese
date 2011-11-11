@@ -322,8 +322,10 @@ namespace synthese
 		const std::string PegaseFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_LINE_FILTER_MODE("line_filter_mode");
 
-		const std::string PegaseFileFormat::Importer_::FILTER_MODE1("FILTER_MODE1");
-		const std::string PegaseFileFormat::Importer_::FILTER_MODE2("FILTER_MODE2");
+		const std::string PegaseFileFormat::Importer_::FILTER_MODE1("mode1");
+		const std::string PegaseFileFormat::Importer_::FILTER_MODE2("mode2");
+		const std::string PegaseFileFormat::Importer_::FILTER_MODE3("mode3");
+		const std::string PegaseFileFormat::Importer_::FILTER_MODE4("mode4");
 
 
 
@@ -412,7 +414,23 @@ namespace synthese
 			typedef unordered_map<ServiceKey, ServiceInfo> ServiceInfoMap;
 
 
-			pair<string, string> getLineIdAndRouteName(string jpName)
+			struct LineInfo
+			{
+				bool ignored;
+				string lineName;
+				string routeName;
+
+				LineInfo() : ignored(false)
+				{
+				}
+			};
+			ostream& operator<<(ostream& os, const LineInfo& li)
+			{
+				os << "ignored: " << li.ignored << " lineName: " << li.lineName << " routeName: " << li.routeName;
+				return os;
+			}
+
+			void _parseSuffix(const string& jpName, LineInfo& lineInfo)
 			{
 				size_t len = jpName.size();
 
@@ -421,24 +439,100 @@ namespace synthese
 					jpName[len - 2] == 'H' &&
 					(jpName[len - 5] == 'A' || jpName[len - 5] == 'R'))
 				{
-					return make_pair(jpName.substr(0, len - 5), jpName.substr(len - 4, 4));
+					lineInfo.lineName = jpName.substr(0, len - 5);
+					lineInfo.routeName = jpName.substr(len - 4, 4);
+					return;
 				}
 
 				// Format {lineName}[AR]nn
 				if(len > 3 &&
 					(jpName[len - 3] == 'A' || jpName[len - 3] == 'R'))
 				{
-					return make_pair(jpName.substr(0, len - 3), jpName.substr(len - 2, 2));
+					lineInfo.lineName = jpName.substr(0, len - 3);
+					lineInfo.routeName = jpName.substr(len - 2, 2);
+					return;
 				}
 
 				// Format {lineName}[AR]n
 				if(len > 2 &&
 					(jpName[len - 2] == 'A' || jpName[len - 2] == 'R'))
 				{
-					return make_pair(jpName.substr(0, len - 2), jpName.substr(len - 1, 1));
+					lineInfo.lineName = jpName.substr(0, len - 2);
+					lineInfo.routeName = jpName.substr(len - 1, 1);
+					return;
 				}
 
-				return make_pair(jpName, "");
+				lineInfo.lineName = jpName;
+				lineInfo.routeName = "";
+			}
+
+			LineInfo getLineInfo(const string& mode, const string& jpName)
+			{
+				LineInfo lineInfo;
+				_parseSuffix(jpName, lineInfo);
+				size_t len = lineInfo.lineName.length();
+
+				if(mode == PegaseFileFormat::Importer_::FILTER_MODE1)
+				{
+					// "LR{nnn}"
+
+					if(!starts_with(lineInfo.lineName, "LR"))
+					{
+						lineInfo.ignored = true;
+						return lineInfo;
+					}
+					lineInfo.lineName = lineInfo.lineName.substr(2, lineInfo.lineName.length() - 2);
+					return lineInfo;
+				}
+
+				if(mode == PegaseFileFormat::Importer_::FILTER_MODE2)
+				{
+					// "S{digit string}
+
+					if(lineInfo.lineName.length() <= 1 ||
+						!starts_with(lineInfo.lineName, "S") ||
+						!isdigit(lineInfo.lineName[1]))
+					{
+						lineInfo.ignored = true;
+						return lineInfo;
+					}
+					lineInfo.lineName = lineInfo.lineName.substr(1, lineInfo.lineName.length() - 1);
+					return lineInfo;
+				}
+
+				if(mode == PegaseFileFormat::Importer_::FILTER_MODE3)
+				{
+					// LR-{string}-{n}
+
+					if(!starts_with(lineInfo.lineName, "LR-") ||
+						len <= 4 ||
+						lineInfo.lineName[len - 4] != '-')
+					{
+						lineInfo.ignored = true;
+						return lineInfo;
+					}
+					lineInfo.lineName = lineInfo.lineName.substr(3, lineInfo.lineName.length() - (3 + 2));
+					return lineInfo;
+				}
+
+				if(mode == PegaseFileFormat::Importer_::FILTER_MODE4)
+				{
+					// !LR-{string}-{n}
+
+					if(!starts_with(lineInfo.lineName, "LR-") ||
+						len <= 4 ||
+						lineInfo.lineName[len - 4] != '-')
+					{
+						return lineInfo;
+					}
+					else
+					{
+						lineInfo.ignored = true;
+						return lineInfo;
+					}
+				}
+
+				throw Exception("Invalid line filter mode: " + mode);
 			}
 		}
 
@@ -652,19 +746,11 @@ namespace synthese
 				}
 				JourneyPatternInfo& journeyPatternInfo = journeyPatternInfos[serviceKey.journeyPatternId];
 
-				// TODO: implement prefix as an import parameter.
-				string linePrefixFilter("");
-				string& journeyPatternName(serviceKey.journeyPatternId.name);
 
-				pair<string, string> lineIdAndRouteName = getLineIdAndRouteName(journeyPatternName);
-				string& lineId = lineIdAndRouteName.first;
-
-				if(_lineFilterMode == FILTER_MODE1)
+				LineInfo lineInfo = getLineInfo(_lineFilterMode, serviceKey.journeyPatternId.name);
+				if (lineInfo.ignored)
 				{
-					// TODO: bail out earlier in parsing to improve performance.
-					if(!linePrefixFilter.empty() && journeyPatternName.compare(0, linePrefixFilter.size(), linePrefixFilter))
-						continue;
-					
+					continue;
 				}
 
 				// CommercialLine
@@ -672,10 +758,10 @@ namespace synthese
 				CommercialLine* commercialLine(
 					PTFileFormat::CreateOrUpdateLine(
 						_lines,
-						lineId,
+						lineInfo.lineName,
 						journeyPatternInfo.longName,
 						// TODO: Use shortName somewhere?
-						lineId,
+						lineInfo.lineName,
 						optional<RGBColor>(),
 						*_network,
 						_dataSource,
@@ -730,7 +816,7 @@ namespace synthese
 					PTFileFormat::CreateOrUpdateRoute(
 						*commercialLine,
 						optional<const string&>(), // id
-						lineIdAndRouteName.second.empty() ? optional<const string&>() : lineIdAndRouteName.second, // name
+						lineInfo.routeName.empty() ? optional<const string&>() : lineInfo.routeName, // name
 						optional<const string&>(), // destination
 						optional<Destination*>(),
 						optional<const RuleUser::Rules&>(),
@@ -806,10 +892,13 @@ namespace synthese
 				stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 				stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
-				vector<pair<optional<string>, string> > methods;
-				methods.push_back(make_pair(optional<string>(FILTER_MODE1), FILTER_MODE1));
-				methods.push_back(make_pair(optional<string>(FILTER_MODE2), FILTER_MODE2));
-				stream << t.cell("Méthode de filtrage des lignes", t.getForm().getSelectInput(PARAMETER_LINE_FILTER_MODE, methods, optional<string>(_lineFilterMode)));
+
+				vector<pair<optional<string>, string> > filterModes;
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE1), "LR{nnn}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE2), "S{nombre chaine}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "LR-{chaine}-{n}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE4), "!LR-{chaine}-{n}"));
+				stream << t.cell("Mode de filtrage des lignes", t.getForm().getSelectInput(PARAMETER_LINE_FILTER_MODE, filterModes, optional<string>(_lineFilterMode)));
 
 				stream << t.close();
 		}
