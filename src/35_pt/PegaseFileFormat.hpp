@@ -98,10 +98,11 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
-				// TODO: implement
 				static const std::string PARAMETER_LINE_FILTER_MODE;
 				static const std::string FILTER_MODE1;
 				static const std::string FILTER_MODE2;
+				static const std::string FILTER_MODE3;
+				static const std::string FILTER_MODE4;
 
 			private:
 				boost::shared_ptr<TransportNetwork> _network;
