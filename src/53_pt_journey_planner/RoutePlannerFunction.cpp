@@ -1447,13 +1447,16 @@ namespace synthese
 			const NamedPlace& np,
 			bool showCoords
 		){
-			shared_ptr<Point> gp(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*np.getPoint()
-			)	);
+			shared_ptr<Point> gp;
+			
+			showCoords &= (np.getPoint().get() != NULL && !np.getPoint()->isEmpty());
 
 			if(showCoords)
 			{
+				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					*np.getPoint()
+				);
+
 				stream <<
 					"<connectionPlace" <<
 					" latitude=\"" << gp->getY() << "\"" <<
