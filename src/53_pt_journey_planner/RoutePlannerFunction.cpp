@@ -1172,7 +1172,8 @@ namespace synthese
 									stream <<
 										"<vehicleType" <<
 										" id=\"" << line->getRollingStock()->getKey() << "\"" <<
-										" name=\"" << line->getRollingStock()->getArticle() << line->getRollingStock()->getName() << "\"" <<
+										" article=\"" << line->getRollingStock()->getArticle() << "\"" <<
+										" name=\"" << line->getRollingStock()->getName() << "\"" <<
 										" />";
 								}
 							}
