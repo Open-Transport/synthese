@@ -36,6 +36,7 @@
 #include "PTUseRule.h"
 #include "Vertex.h"
 #include "StopArea.hpp"
+#include "GetMessagesFunction.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -49,6 +50,7 @@ using namespace boost;
 using namespace geos::geom;
 using namespace geos::io;
 using namespace boost::algorithm;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -59,6 +61,7 @@ namespace synthese
 	using namespace cms;
 	using namespace graph;
 	using namespace impex;
+	using namespace messages;
 
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -72,10 +75,12 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_SRID("srid");
 		const string LinesListFunction::PARAMETER_OUTPUT_STOPS("os");
 		const string LinesListFunction::PARAMETER_OUTPUT_GEOMETRY("og");
-		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES("ittd");
-		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES("ijpd");
-		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES("idbd");
+		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES = "ittd";
+		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
+		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES = "idbd";
+		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
+		const string LinesListFunction::PARAMETER_OUTPUT_MESSAGES = "output_messages";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 		const string LinesListFunction::FORMAT_JSON("json");
@@ -99,20 +104,38 @@ namespace synthese
 		ParametersMap LinesListFunction::_getParametersMap() const
 		{
 			ParametersMap result;
+
+			// Network
 			if (_network.get() != NULL)
 			{
 				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
 			}
+
+			// SRID
 			if(_coordinatesSystem)
 			{
 				result.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
+
+			// Letters before numbers
+			result.insert(PARAMETER_LETTERS_BEFORE_NUMBERS, _lettersBeforeNumbers);
+
+			// Output geometry
 			result.insert(PARAMETER_OUTPUT_GEOMETRY, _outputGeometry);
+
+			// Output stops
 			result.insert(PARAMETER_OUTPUT_STOPS, _outputStops);
+
+			// Output messages
+			result.insert(PARAMETER_OUTPUT_MESSAGES, _outputMessages);
+
+			// Output format
 			if(!_outputFormat.empty())
 			{
 				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
+
+			// Ignore excluded lines
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
@@ -171,6 +194,12 @@ namespace synthese
 					}
 				}
 			}
+
+			// Letters before numbers
+			_lettersBeforeNumbers = map.getDefault<bool>(PARAMETER_LETTERS_BEFORE_NUMBERS, true);
+
+			// Output messages
+			_outputMessages = map.getDefault<bool>(PARAMETER_OUTPUT_MESSAGES, false);
 
 			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -235,6 +264,7 @@ namespace synthese
 			string _begin; // = _value except for 12s it is 12
 			string _end; // = "" except for 12s it is  s
 			long int _numericalValue; // = 12 for 12 and 12s, = -1 for A
+			bool _lettersBeforeNumbers;
 
 			typedef enum {
 				isAnInteger, // example : 12
@@ -244,7 +274,8 @@ namespace synthese
 			numberType _numberType;
 
 		public:
-			SortableNumber(string str)
+			SortableNumber(string str, bool lettersBeforeNumbers):
+				_lettersBeforeNumbers(lettersBeforeNumbers)
 			{
 				_numericalValue = -1;
 				_value = str;
@@ -290,9 +321,9 @@ namespace synthese
 						return _value < otherNumber._value;
 					}
 					else if((_numberType == beginIsNotInteger)
-							|| (otherNumber._numberType == beginIsNotInteger)) // One is "A" form, other is "23" form
+							&& (otherNumber._numberType == beginIsNotInteger)) // One is "A" form, other is "23" form
 					{
-						return _value > otherNumber._value; // Force "T1" to appear before "23"
+						return _lettersBeforeNumbers;
 					}
 					else // The two numbers have form 12
 					{
@@ -308,7 +339,7 @@ namespace synthese
 					}
 					else // There is a "A" type and an "12s" form
 					{
-						return _value > otherNumber._value;
+						return _lettersBeforeNumbers;
 					}
 				}
 				else // Case 12/12s or 12s/12k : sort based on end
@@ -372,14 +403,14 @@ namespace synthese
 						if(!tm.get() || line->usesTransportMode(*tm))
 						{
 							// Insert respecting order described up there
-							linesMap[tm.get()][SortableNumber(line->getShortName())] = const_pointer_cast<const CommercialLine>(line);
+							linesMap[tm.get()][SortableNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
 			}
 			else if(_line.get())
 			{
-				linesMap[NULL][SortableNumber(_line->getShortName())] = _line;
+				linesMap[NULL][SortableNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
 			}
 
 			// Populating the parameters map
@@ -515,6 +546,21 @@ namespace synthese
 						}
 						linePM->insert(DATA_GEOMETRY, geometryPM);
 					}
+
+					// Messages output
+					if(_outputMessages)
+					{
+						GetMessagesFunction::GetMessages(
+							*linePM,
+							getTemplateParameters(),
+							line->getKey(),
+							optional<size_t>(),
+							true,
+							true,
+							second_clock::local_time()
+						);
+					}
+
 					pm.insert(DATA_LINE, linePM);
 			}	}
 
@@ -533,7 +579,7 @@ namespace synthese
 					stream,
 					DATA_LINES,
 					true,
-					"http://synthese.rcsmobility.com/include/35_pt/LinesListFunction.xsd"
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/LinesListFunction.xsd"
 				);
 			}
 			else if(_outputFormat == FORMAT_JSON) // JSON output
@@ -590,6 +636,8 @@ namespace synthese
 			_outputStops(false),
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
-			_ignoreDeparturesBoardExcludedLines(false)
+			_ignoreDeparturesBoardExcludedLines(false),
+			_outputMessages(false),
+			_lettersBeforeNumbers(true)
 		{}
 }	}
