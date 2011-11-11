@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:element name="lines">
+		<xs:annotation>
+			<xs:documentation>Lines collection</xs:documentation>
+		</xs:annotation>
+		<xs:complexType>
+			<xs:sequence>
+				<xs:element name="line">
+					<xs:complexType>
+						<xs:sequence>
+							<xs:element name="transportMode" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="id" type="transportModeId" use="required"/>
+									<xs:attribute name="name" type="xs:string"/>
+									<xs:attribute name="article" type="xs:string"/>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="stopAreas" minOccurs="0">
+								<xs:complexType>
+									<xs:sequence>
+										<xs:element name="stopArea" minOccurs="0" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:attribute name="stop_id"/>
+												<xs:attribute name="stop_name"/>
+												<xs:attribute name="stop_name_13"/>
+												<xs:attribute name="stop_name_26"/>
+												<xs:attribute name="stop_name_for_timetables"/>
+												<xs:attribute name="city_id"/>
+												<xs:attribute name="city_name"/>
+												<xs:attribute name="x"/>
+												<xs:attribute name="y"/>
+											</xs:complexType>
+										</xs:element>
+									</xs:sequence>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="geometry" minOccurs="0">
+								<xs:complexType>
+									<xs:choice>
+										<xs:element name="wkt"/>
+										<xs:element name="edge" maxOccurs="unbounded">
+											<xs:complexType>
+												<xs:sequence>
+													<xs:element name="point">
+														<xs:complexType>
+															<xs:attribute name="x" use="required"/>
+															<xs:attribute name="y" use="required"/>
+														</xs:complexType>
+													</xs:element>
+												</xs:sequence>
+											</xs:complexType>
+										</xs:element>
+									</xs:choice>
+								</xs:complexType>
+							</xs:element>
+							<xs:element name="message" minOccurs="0" maxOccurs="unbounded">
+								<xs:complexType>
+									<xs:attribute name="message_id" use="required"/>
+									<xs:attribute name="title" use="required"/>
+									<xs:attribute name="content" use="required"/>
+									<xs:attribute name="priority" use="required"/>
+									<xs:attribute name="scenario_id"/>
+									<xs:attribute name="scenario_name"/>
+								</xs:complexType>
+							</xs:element>
+						</xs:sequence>
+						<xs:attribute name="line_id" use="required">
+							<xs:simpleType>
+								<xs:restriction base="xs:long">
+									<xs:minInclusive value="11821949021847553"/>
+									<xs:maxInclusive value="12103423998558207"/>
+								</xs:restriction>
+							</xs:simpleType>
+						</xs:attribute>
+						<xs:attribute name="line_short_name" type="xs:string"/>
+						<xs:attribute name="line_long_name"/>
+						<xs:attribute name="line_name"/>
+						<xs:attribute name="line_style"/>
+						<xs:attribute name="line_map_url"/>
+						<xs:attribute name="line_doc_url"/>
+						<xs:attribute name="line_creator_id"/>
+						<xs:attribute name="line_color"/>
+						<xs:attribute name="line_image"/>
+						<xs:attribute name="line_timetable_id" type="xs:long"/>
+					</xs:complexType>
+				</xs:element>
+			</xs:sequence>
+		</xs:complexType>
+	</xs:element>
+	<xs:simpleType name="lineId">
+		<xs:annotation>
+			<xs:documentation>Unique id of line (table 42)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="11821949021847553"/>
+			<xs:maxInclusive value="12103423998558207"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:simpleType name="transportModeId">
+		<xs:annotation>
+			<xs:documentation>Unique id of transport mode (table 49)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="11821949021847553"/>
+			<xs:maxInclusive value="12103423998558207"/>
+		</xs:restriction>
+	</xs:simpleType>
+</xs:schema>
