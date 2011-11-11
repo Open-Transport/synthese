@@ -140,65 +140,16 @@ namespace synthese
 		) const {
 
 			ParametersMap pm(getTemplateParameters());
-			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(_recipientId));
-			size_t number(0);
 
-			optional<AlarmLevel> bestPriority;
-			if(_priorityOrder)
-			{
-				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-				{
-					if(!it->getScenario()->isApplicable(_date))
-					{
-						continue;
-					}
-					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
-					{
-						break;
-					}
-					if( _bestPriorityOnly && bestPriority && it->getLevel() != *bestPriority)
-					{
-						break;
-					}
-					bestPriority = it->getLevel();
-
-					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
-					it->toParametersMap(*messagePM, true);
-					pm.insert(DATA_MESSAGE, messagePM);
-
-					++number;
-				}
-			}
-			else
-			{
-				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-				{
-					if(!it->getScenario()->isApplicable(_date))
-					{
-						bestPriority = it->getLevel();
-						break;
-					}
-				}
-				BOOST_REVERSE_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-				{
-					if(!it->getScenario()->isApplicable(_date))
-					{
-						continue;
-					}
-					if(_maxMessagesNumber && number >= *_maxMessagesNumber)
-					{
-						break;
-					}
-					if( _bestPriorityOnly && it->getLevel() != *bestPriority)
-					{
-						continue;
-					}
-					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
-					it->toParametersMap(*messagePM, true);
-					pm.insert(DATA_MESSAGE, messagePM);
-					++number;
-				}
-			}
+			GetMessages(
+				pm,
+				getTemplateParameters(),
+				_recipientId,
+				_maxMessagesNumber,
+				_bestPriorityOnly,
+				_priorityOrder,
+				_date
+			);
 
 			if(_cmsTemplate.get())
 			{
@@ -272,5 +223,77 @@ namespace synthese
 			_bestPriorityOnly(true),
 			_priorityOrder(true)
 		{
+		}
+
+
+
+		void GetMessagesFunction::GetMessages(
+			util::ParametersMap& pm,
+			const ParametersMap& templateParameters,
+			util::RegistryKeyType recipientId,
+			boost::optional<std::size_t> maxMessagesNumber,
+			bool bestPriorityOnly,
+			bool priorityOrder,
+			boost::posix_time::ptime date
+		){
+			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(recipientId));
+			size_t number(0);
+
+			optional<AlarmLevel> bestPriority;
+			if(priorityOrder)
+			{
+				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+				{
+					if(!it->getScenario()->isApplicable(date))
+					{
+						continue;
+					}
+					if(maxMessagesNumber && number >= *maxMessagesNumber)
+					{
+						break;
+					}
+					if(bestPriorityOnly && bestPriority && it->getLevel() != *bestPriority)
+					{
+						break;
+					}
+					bestPriority = it->getLevel();
+
+					shared_ptr<ParametersMap> messagePM(new ParametersMap(templateParameters));
+					it->toParametersMap(*messagePM, true);
+					pm.insert(DATA_MESSAGE, messagePM);
+
+					++number;
+				}
+			}
+			else
+			{
+				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+				{
+					if(!it->getScenario()->isApplicable(date))
+					{
+						bestPriority = it->getLevel();
+						break;
+					}
+				}
+				BOOST_REVERSE_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+				{
+					if(!it->getScenario()->isApplicable(date))
+					{
+						continue;
+					}
+					if(maxMessagesNumber && number >= *maxMessagesNumber)
+					{
+						break;
+					}
+					if(bestPriorityOnly && it->getLevel() != *bestPriority)
+					{
+						continue;
+					}
+					shared_ptr<ParametersMap> messagePM(new ParametersMap(templateParameters));
+					it->toParametersMap(*messagePM, true);
+					pm.insert(DATA_MESSAGE, messagePM);
+					++number;
+				}
+			}
 		}
 }	}

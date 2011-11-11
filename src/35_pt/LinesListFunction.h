@@ -56,16 +56,18 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
 		 public:
-			static const std::string PARAMETER_OUTPUT_FORMAT;
-			static const std::string PARAMETER_NETWORK_ID;
-			static const std::string PARAMETER_PAGE_ID;
-			static const std::string PARAMETER_SRID;
-			static const std::string PARAMETER_OUTPUT_STOPS;
-			static const std::string PARAMETER_OUTPUT_GEOMETRY;
 			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
+			static const std::string PARAMETER_LETTERS_BEFORE_NUMBERS;
+			static const std::string PARAMETER_NETWORK_ID;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
+			static const std::string PARAMETER_OUTPUT_GEOMETRY;
+			static const std::string PARAMETER_OUTPUT_MESSAGES;
+			static const std::string PARAMETER_OUTPUT_STOPS;
+			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_SORT_BY_TRANSPORT_MODE;
+			static const std::string PARAMETER_SRID;
 
 			static const std::string FORMAT_XML;
 			static const std::string FORMAT_JSON;
@@ -96,6 +98,8 @@ namespace synthese
 				bool _ignoreTimetableExcludedLines;
 				bool _ignoreJourneyPlannerExcludedLines;
 				bool _ignoreDeparturesBoardExcludedLines;
+				bool _outputMessages;
+				bool _lettersBeforeNumbers;
 				std::string _outputGeometry;
 				typedef std::vector<boost::shared_ptr<const RollingStock> > TransportModeSorting;
 				TransportModeSorting _sortByTransportMode;
