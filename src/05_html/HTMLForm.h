@@ -448,12 +448,11 @@ namespace synthese
 					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
 					@param fieldId unique ID of the field within the page,
 					@param className CSS class to use for display
-					@return std::string the HTML generated code
-					@author Hugues Romain
-					@date 2008-2010
+					@return std::string the HTML generated code (use addTextInputAutoComplete from ajax_forms.js)
+					@author Gaël Sauvanet
+					@date 2011
 				*/
 				static std::string getTextInputAutoCompleteFromTableSync(
-					const std::string& site,
 					const std::string& name,
 					const std::string& valueID,
 					const std::string& valueName,
@@ -481,12 +480,11 @@ namespace synthese
 					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
 					@param fieldId unique ID of the field within the page,
 					@param className CSS class to use for display
-					@return std::string the HTML generated code
+					@return std::string the HTML generated code (use addTextInputAutoComplete from ajax_forms.js)
 					@author Hugues Romain
 					@date 2008-2010
 				*/
 				static std::string getTextInputAutoCompleteFromService(
-					const std::string& site,
 					const std::string& name,
 					const std::string& valueID,
 					const std::string& valueName,
