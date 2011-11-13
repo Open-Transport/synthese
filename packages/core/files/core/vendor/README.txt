@@ -28,4 +28,8 @@ requirejs/*.js
   http://requirejs.org/docs/release/0.27.1/minified/order.js
 
 jquery-ui-1.8.15.custom.min.js
-  FIXME: how was it generated?
+  Version: 1.8.15
+  jquery.ui.core.js
+  jquery.ui.widget.js
+  jquery.ui.position.js
+  jquery.ui.autocomplete.js

@@ -110,13 +110,6 @@ namespace synthese
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
-
-            // ToDo : move to the header of the page
-            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-1.6.2.min.js");
-            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-ui-1.8.15.custom.min.js");
-            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.autocomplete.css\">";
-            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.theme.css\">";
-
 			// Requests
 			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(_request);
 			updateRequest.getAction()->setTypeId(_type->getKey());
@@ -144,7 +137,6 @@ namespace synthese
 				t.cell(
 					"Page CMS principale",
 					html::HTMLForm::getTextInputAutoCompleteFromTableSync(
-						string(),
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_MAIN_PAGE_ID,
 						_type->getDisplayMainPage() ? lexical_cast<string>(_type->getDisplayMainPage()->getKey()) : string(),
 						_type->getDisplayMainPage() ? lexical_cast<string>(_type->getDisplayMainPage()->getName()) : string(),
@@ -157,7 +149,6 @@ namespace synthese
 				t.cell(
 					"Page CMS pour rangée",
 					html::HTMLForm::getTextInputAutoCompleteFromTableSync(
-						string(),
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_ROW_PAGE_ID,
 						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getKey()) : string(),
 						_type->getDisplayRowPage() ? lexical_cast<string>(_type->getDisplayRowPage()->getName()) : string(),
@@ -170,7 +161,6 @@ namespace synthese
 				t.cell(
 					"Page CMS pour destination",
 					html::HTMLForm::getTextInputAutoCompleteFromTableSync(
-						string(),
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_DESTINATION_PAGE_ID,
 						_type->getDisplayDestinationPage() ? lexical_cast<string>(_type->getDisplayDestinationPage()->getKey()) : string(),
 						_type->getDisplayDestinationPage() ? lexical_cast<string>(_type->getDisplayDestinationPage()->getName()) : string(),
@@ -183,7 +173,6 @@ namespace synthese
 				t.cell(
 					"Page CMS pour destination en correspondance",
 					html::HTMLForm::getTextInputAutoCompleteFromTableSync(
-						string(),
 						UpdateDisplayTypeAction::PARAMETER_DISPLAY_TRANSFER_DESTINATION_PAGE_ID,
 						_type->getDisplayTransferDestinationPage() ? lexical_cast<string>(_type->getDisplayTransferDestinationPage()->getKey()) : string(),
 						_type->getDisplayTransferDestinationPage() ? lexical_cast<string>(_type->getDisplayTransferDestinationPage()->getName()) : string(),
@@ -196,7 +185,6 @@ namespace synthese
 				t.cell(
 					"Page CMS pour parser les résultats de monitoring",
 					html::HTMLForm::getTextInputAutoCompleteFromTableSync(
-						string(),
 						UpdateDisplayTypeAction::PARAMETER_MONITORING_PARSER_PAGE_ID,
 						_type->getMonitoringParserPage() ? lexical_cast<string>(_type->getMonitoringParserPage()->getKey()) : string(),
 						_type->getMonitoringParserPage() ? lexical_cast<string>(_type->getMonitoringParserPage()->getName()) : string(),

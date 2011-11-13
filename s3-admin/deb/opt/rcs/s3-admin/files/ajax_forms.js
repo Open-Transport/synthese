@@ -1,3 +1,101 @@
+function addTextInputAutoComplete(
+ name,
+ valueID,
+ valueName,
+ service,
+ rows,
+ row,
+ extraParamName,
+ extraParamDivID,
+ bottomButton,
+ IDButton,
+ useID,
+ viewID,
+ displayTextBeforeTyping,
+ fieldId,
+ className,
+ tableID){
+  if(fieldId.length == 0)
+    fieldId = name + "__ID";
+  
+  var fieldIdAutoComplete;
+  if(useID)
+    fieldIdAutoComplete = name + "Selection__ID";
+  else
+    fieldIdAutoComplete = fieldId;
+
+  var contenu;
+
+  // Add divs
+  contenu = "<div id=\"div" + name + "Selection\">";
+  contenu = contenu + "<input type=\"text\" name=\"" + (useID ? name + "Selection": name) + "\" value=\"" + valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
+  if(bottomButton) {
+    contenu = contenu + "<input type=\"button\" value=\"v\" onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
+  }
+  if(IDButton) {
+    contenu = contenu + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + name + "Selection').hide();$('#div" + name + "').show();\" style=\"margin-left:0px;\"/>";
+  }
+  contenu = contenu + "</div>";
+  if(useID) {
+    contenu = contenu + "<div id=\"div" + name + "\" style=\"display:none\">";
+    contenu = contenu + "<input type=\"text\" name=\"" + name + "\" value=\"" + valueID + "\" id=\"" + fieldId + "\" style=\"margin-right:0px;\" />";
+    contenu = contenu + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + name + "Selection').show();$('#div" + name + "').hide();\" style=\"margin-left:0px;\" />";
+    contenu = contenu + "</div>";
+  }
+
+  $('#divMain' + name).html(contenu);
+
+  // Execute js code
+  var jscode = "$(function() {"
+    + "$('#" + fieldIdAutoComplete + "').autocomplete({"
+      + "source: function( request, response ) {"
+        + "$.ajax({"
+          + "url: 'synthese',"
+          + "dataType: 'json',"
+          + "data: {"
+            + "SERVICE: '" + service + "',"
+            + "output_format: 'json',"
+            + "n: 10,"
+            + "t: request.term";
+            if(extraParamName.length > 0) {
+              jscode = jscode + ", " + extraParamName + ": ";
+			  if(extraParamDivID.length > 0) jscode = jscode + "$('#" + extraParamDivID + "__ID').val()";
+			  else jscode = jscode + "''";
+			}
+            if(service == "lr")
+              jscode = jscode + ", table: "  + tableID;
+
+          jscode = jscode + "},"
+          + "success: function( data ) {"
+            + "response( $.map( data." + rows + "." + row + ", function( item ) {"
+              + "return {"
+                + "label: item.name" + (viewID ? " + ' (' + item.roid + ')'," : ",")
+                + "value: item.name,"
+                + "id: item.roid"
+              + "}"
+            + "}));"
+          + "}"
+        + "});"
+      + "},";
+      if(useID) {
+        jscode = jscode + "select: function( event, ui ) {"
+          + "$('#" + fieldId + "').val(ui.item.id);"
+        + "},";
+      }
+      jscode = jscode + "minLength: 0,"
+      + "autoFocus: true,"
+      + "open: function() {"
+        + "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
+      + "},"
+      + "close: function() {"
+        + "$(this).removeClass('ui-corner-top').addClass('ui-corner-all');"
+      + "}"
+    + "});"
+  + "});";
+
+  eval(jscode);
+}
+
 
 function setGeoRM() {
 	return Geoportal.GeoRMHandler.addKey(
@@ -104,7 +202,11 @@ function add_new_row(link)
     } else if(addRow.cells[i].childNodes[0].tagName == 'INPUT') {
       values[i] = addRow.cells[i].childNodes[0].value;
       addRow.cells[i].childNodes[0].value = '';
-    } else {
+    } else if(addRow.cells[i].childNodes[0].tagName == 'DIV') {
+      values[i] = addRow.cells[i].childNodes[0].childNodes[1].childNodes[0].value;
+	  addRow.cells[i].childNodes[0].childNodes[0].childNodes[0].value = '';
+	}
+	else {
       values[i] = '';
     }
   }
@@ -165,6 +267,9 @@ function add_row(tableId, values)
       }
     } else if(addRow.cells[i].childNodes[0].tagName == 'INPUT') {
       newCell.innerHTML = '<input type="text" value="'+ values[i] +'"  />';
+    }
+	else if(addRow.cells[i].childNodes[0].tagName == 'DIV') {
+      newCell.innerHTML = '<input type="text" value="'+ values[i] +'"  />';
     } else if(i==addRow.cells.length-1) {
       var html = '<a href="#" onclick="remove_row(this); return false;"><img src="delete.png" alt="-" title="Supprimer l\'élément" /></a>';
       if(tblBody.className!='autoorder') {
@@ -205,10 +310,12 @@ function send_vector_field(tableId)
     var value='';
     for(var j=0; j<addRow.cells.length; ++j) {
       if(addRow.cells[j].childNodes[0].tagName == 'SELECT' ||
-         addRow.cells[j].childNodes[0].tagName == 'INPUT') {
+         addRow.cells[j].childNodes[0].tagName == 'INPUT' ||
+         addRow.cells[j].childNodes[0].tagName == 'DIV') {
         if(value.length>0) value += '|';
         value += row.cells[j].childNodes[0].value;
-    } }
+      }
+    }
     if(content.length) content += ',';
     content += value;
   }

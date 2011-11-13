@@ -31,6 +31,10 @@ REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime
 <link rel="icon" type="image/png" href="<@icon@>" />
 <style type="text/css">@import url(colors.css); @import url(admin.css); @import url(calendar-win2k-1.css);</style>
 <script type="text/javascript" src="calendar.js"></script><script type="text/javascript" src="lang/calendar-fr.js"></script><script type="text/javascript" src="calendar-setup.js"></script>
+<script type="text/javascript" src="/core/vendor/jquery-1.6.2.min.js"></script>
+<script type="text/javascript" src="/core/vendor/jquery-ui-1.8.15.custom.min.js"></script>
+<link rel="stylesheet" href="http://jqueryui.com/themes/base/jquery.ui.autocomplete.css" type="text/css" />
+<link rel="stylesheet" href="http://jqueryui.com/themes/base/jquery.ui.theme.css" type="text/css" />
 <script type="text/javascript" src="treeview.js"></script>
 <script type="text/javascript" src="tiny_mce/tiny_mce_src.js"></script>
 <script type="text/javascript" src="ajax_forms.js"></script>
