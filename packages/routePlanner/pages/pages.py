@@ -1,6 +1,7 @@
 pages = [{
     'id': pid(0),
     'rank': 0,
+    'up_id': pid(0, package_name='core'),
     'title': 'routePlanner',
     'content1': '',
 }, {

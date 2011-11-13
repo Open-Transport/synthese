@@ -1,5 +1,5 @@
 pages = [{
-    'id': pid(0),
+    'id': pid(0), # 17732927929122816 with local_site_id = 11
     'rank': 0,
     'title': 'Template',
     'content1': 'file:template.html',
