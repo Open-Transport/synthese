@@ -3,19 +3,16 @@
 BACKCOMPAT_ID_MAIN = 177329235327713281
 BACKCOMPAT_ID_POS_ELEM = 177329235327713283
 BACKCOMPAT_ID_TREE_ELEM = 177329235327713282
-BACKCOMPAT_ADMIN_SITE_ID = 7036874417766401
 
 pages = [{
-    # TODO: make all other pages children of this one.
     'id': pid(0),
-    'site_id': BACKCOMPAT_ADMIN_SITE_ID,
+    'up_id': pid(0, package_name='core'),
     'title': 'admin',
     'content1': '',
 }, {
     #'id': pid(1),
     'id': BACKCOMPAT_ID_MAIN,
     'up_id': pid(0),
-    'site_id': BACKCOMPAT_ADMIN_SITE_ID,
     'rank': 0,
     'smart_url_path': ':admin_main',
     'content1': 'file:admin_main.html',
@@ -24,7 +21,6 @@ pages = [{
     #'id': pid(2),
     'id': BACKCOMPAT_ID_POS_ELEM,
     'up_id': pid(0),
-    'site_id': BACKCOMPAT_ADMIN_SITE_ID,
     'rank': 1,
     'smart_url_path': ':admin_pos_elem',
     'content1': 'file:admin_pos_elem.html',
@@ -33,7 +29,6 @@ pages = [{
     #'id': pid(3),
     'id': BACKCOMPAT_ID_TREE_ELEM,
     'up_id': pid(0),
-    'site_id': BACKCOMPAT_ADMIN_SITE_ID,
     'rank': 2,
     'smart_url_path': ':admin_tree_elem',
     'content1': 'file:admin_tree_elem.html',
