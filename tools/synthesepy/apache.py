@@ -50,6 +50,14 @@ SetEnv proxy-nokeepalive 1
             config.project_path, 'conf', 'generated', 'apache',
             self.config_name)
 
+    def _format_path(self, path):
+        """
+        From Apache documentation:
+        # NOTE: Where filenames are specified, you must use forward slashes
+        # instead of backslashes (e.g., "c:/apache" instead of "c:\apache").
+        """
+        return path.replace(os.sep, '/')
+
     def _get_admin_compat_directives(self, site):
         site_config = '#' * 80
         site_config += '\n# Config for site: {0}\n'.format(site.name)
@@ -73,7 +81,8 @@ Alias /synthese3 "{admin_files_path}/admin/"
 
         format_config = {}
         format_config['port'] = self.project.config.port
-        format_config['admin_files_path'] = site.get_package('admin').files_path
+        format_config['admin_files_path'] = self._format_path(
+            site.get_package('admin').files_path)
         format_config['proxy_path'] = 'synthese3/admin'
         format_config['synthese_proxy'] = self.PROXY_TEMPLATE.format(
             **format_config)
@@ -159,9 +168,9 @@ Alias /synthese3 "{admin_files_path}/admin/"
 '''
 
         PACKAGE_ALIAS_TEMPLATE = '''
-# Package alias for {package_name}
-Alias /{package_name} {package_files_path}/{package_name}
+# Package configuration for {package_name}
 {package_pre_config}
+Alias /{package_name} {package_files_path}/{package_name}
 <Directory {package_files_path}>
     Options -Indexes FollowSymLinks MultiViews
     AllowOverride None
@@ -186,13 +195,14 @@ Alias /{package_name} {package_files_path}/{package_name}
         else:
             format_config['aliases'] = ''
 
-        format_config['document_root'] = self.project.htdocs_path
+        format_config['document_root'] = self._format_path(
+            self.project.htdocs_path)
         # DocumentRoot is set to the "main" package files by default
         main_package = site.get_package('main')
         if main_package:
-            format_config['document_root'] = main_package.files_path
+            format_config['document_root'] = self._format_path(
+                main_package.files_path)
 
-        format_config['project_root'] = self.project.path
         format_config['rewrite_directives'] = self._get_rewrite_directives(site)
 
         format_config['proxy_path'] = 'synthese'
@@ -214,12 +224,15 @@ Alias /{package_name} {package_files_path}/{package_name}
         for package in packages:
             package_pre_config = ''
             rewrite_directives = ''
+            package_custom_config = join(package.path, 'apache.conf')
+            if os.path.isfile(package_custom_config):
+                package_pre_config += open(package_custom_config).read()
             if package.name == 'admin':
-                package_pre_config = '''
+                package_pre_config += '''
 # Backward compatibility redirect
-Redirect /synthese3/admin /admin/
+Redirect /synthese3/admin /admin
 '''
-                rewrite_directives = '''
+                rewrite_directives += '''
     RewriteEngine on
     RewriteBase /
     RewriteRule ^admin/$ /admin/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283 [L,QSA]
@@ -227,7 +240,7 @@ Redirect /synthese3/admin /admin/
             package_aliases += PACKAGE_ALIAS_TEMPLATE.format(
                 package_name=package.name,
                 package_pre_config=package_pre_config,
-                package_files_path=package.files_path,
+                package_files_path=self._format_path(package.files_path),
                 rewrite_directives=rewrite_directives)
         format_config['package_aliases'] = package_aliases
 
@@ -262,6 +275,10 @@ Redirect /synthese3/admin /admin/
         utils.call('a2enmod proxy', shell=True)
         utils.call('a2enmod proxy_http', shell=True)
         utils.call('a2enmod rewrite', shell=True)
+        utils.call('a2enmod deflate', shell=True)
+        utils.call('a2enmod setenvif', shell=True)
+        utils.call('a2enmod headers', shell=True)
+        utils.call('a2enmod filter', shell=True)
         utils.call('/etc/init.d/apache2 graceful', shell=True)
 
     def system_uninstall(self):
