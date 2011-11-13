@@ -310,7 +310,6 @@ namespace synthese
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune départ", html::HTMLForm::getTextInputAutoCompleteFromService(
-						string(),
 						PARAMETER_START_CITY,
 						startPlace ?
 						lexical_cast<string>(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getKey() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getKey()) :
@@ -325,7 +324,6 @@ namespace synthese
 						false, false, false
 				)	);
 			stream << st.cell("Arrêt départ", html::HTMLForm::getTextInputAutoCompleteFromService(
-						string(),
 						PARAMETER_START_PLACE,
 						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(startPlace.get())->getKey())) :
@@ -340,7 +338,6 @@ namespace synthese
 						false, false, false
 				)	);
 			stream << st.cell("Commune arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
-						string(),
 						PARAMETER_END_CITY,
 						endPlace ?
 						lexical_cast<string>(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getKey() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getKey()) :
@@ -355,7 +352,6 @@ namespace synthese
 						false, false, false
 				)	);
 			stream << st.cell("Arrêt arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
-						string(),
 						PARAMETER_END_PLACE,
 						endPlace ?
 						(dynamic_cast<City*>(endPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(endPlace.get())->getKey())) :
