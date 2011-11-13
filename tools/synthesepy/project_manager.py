@@ -127,7 +127,7 @@ class Package(object):
         if not os.path.isdir(pages_dir):
             return
 
-        # Equivalent to synthese::util::RegistryKeyType::encodeUId
+        # Equivalent to synthese::util::RegistryKeyType::encodeUId (UtilTypes.cpp)
         def encode_uid(table_id, object_id, grid_node_id=1):
             id = object_id
             id |= (grid_node_id << 32)
@@ -136,24 +136,46 @@ class Package(object):
 
         WEB_PAGES_TABLE_ID = 63
         SITES_TABLE_ID = 25
-        SHARED_PAGES_SITE_ID = encode_uid(SITES_TABLE_ID, 100)
+        # Maybe 127 would have been better for this.
+        SHARED_PAGES_SITE_LOCAL_ID = 100
+        SHARED_PAGES_SITE_ID = encode_uid(
+            SITES_TABLE_ID, SHARED_PAGES_SITE_LOCAL_ID)
 
         # id structure:
-        # 0 - 0x0100 0000: existing pages
-        # 0x0100 0000 - 0x7f00 000: pages for packages (126 packages)
-        # (0x7f00 000 = 0x0100 0000 + 126 * 0x0100 0000)
-        START_PAGE = 0x01000000
-        PAGES_PER_PACKAGE = 0x01000000
-        LOCAL_OFFSET = PAGES_PER_PACKAGE / 2
+        # The lower 32bits of the 128bits page id are available for page numbers.
+        # 0xNN00 0000, bits 30-24: package id
+        # 0x00NN 0000, bits 23-16: site id
+        # 0x0000 NNNN, bits 0-15: pages
+        #
+        # Pages above 0x1000 0000 are reserved for new pages,
+        # Pages with package id == 0 are reserved for existing pages.
+        # Available packages: 126
+        # Available sites: 255
+        # Available pages per package+site: 65536
 
         assert self.base_page_index >= 0, \
             'Package %s is missing a base_page_index value' % self
 
-        def pid(local_id):
-            page_id = (START_PAGE + self.base_page_index * PAGES_PER_PACKAGE +
-                local_id)
-            if local:
-                page_id += LOCAL_OFFSET
+        site_id = site.id if (site and local) else SHARED_PAGES_SITE_ID
+
+        def pid(local_id, package_name=None):
+            page_id = local_id
+
+            if package_name:
+                package = site.get_package(package_name)
+            else:
+                package = self
+
+            assert package.base_page_index + 1 <= 127
+            page_id |= (1 + package.base_page_index) << 24
+
+            local_site_id = site_id & 0xffffffff
+            if not local:
+                # special case for shared page site.
+                local_site_id = 0
+            assert local_site_id <= 0xff
+            page_id |= local_site_id << 16
+
             return encode_uid(WEB_PAGES_TABLE_ID, page_id)
 
         pages_config = {}
@@ -162,8 +184,6 @@ class Package(object):
         }, pages_config)
 
         # TODO: implement smart_url lookup on some attributes (up_id,...) or in page content.
-
-        site_id = site.id if (site and local) else SHARED_PAGES_SITE_ID
 
         log.debug('pages_config:\n%s', pprint.pformat(pages_config))
         for page in pages_config['pages']:
