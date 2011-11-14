@@ -231,4 +231,69 @@ namespace synthese
 		{
 			stream << "\"" << replace_all_copy(value,"\"","'") << "\"";
 		}
+
+
+
+		void AjaxVectorFieldEditor::TextAutoCompleteInputField::getField( std::ostream& stream ) const
+		{
+			stream <<
+				getTextInputAutoCompleteFromService(
+				_nameField+"Field",
+				_valueID,
+				_valueName,
+				_service,
+				_serviceRows,
+				_serviceRow,
+				_extraParamName,
+				_extraParamDivID,
+				_bottomButton,
+				_IDButton,
+				_useID,
+				_viewID
+			);
+		}
+
+
+
+		AjaxVectorFieldEditor::TextAutoCompleteInputField::TextAutoCompleteInputField(
+			const std::string& title,
+			const std::string& nameField,
+			const std::string& valueID,
+			const std::string& valueName,
+			const std::string& service,
+			const std::string& serviceRows,
+			const std::string& serviceRow,
+			const std::string& extraParamName,
+			const std::string& extraParamDivID,
+			bool bottomButton,
+			bool IDButton,
+			bool useID,
+			bool viewID
+		):	AjaxVectorFieldEditor::Field(title),
+		_nameField(nameField),
+		_valueID(valueID),
+		_valueName(valueName),
+		_service(service),
+		_serviceRows(serviceRows),
+		_serviceRow(serviceRow),
+		_extraParamName(extraParamName),
+		_extraParamDivID(extraParamDivID),
+		_bottomButton(bottomButton),
+		_IDButton(IDButton),
+		_useID(useID),
+		_viewID(viewID)
+		{}
+
+
+
+		void AjaxVectorFieldEditor::TextAutoCompleteInputField::getInit( std::ostream& stream, const std::string& formName, std::size_t fieldRank ) const
+		{
+		}
+
+
+
+		void AjaxVectorFieldEditor::TextAutoCompleteInputField::outputValue( std::ostream& stream, const std::string& value ) const
+		{
+			stream << "\"" << replace_all_copy(value,"\"","'") << "\"";
+		}
 }	}

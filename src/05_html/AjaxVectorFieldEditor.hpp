@@ -115,6 +115,53 @@ namespace synthese
 				virtual void outputValue(std::ostream& stream, const std::string& value) const;
 			};
 
+
+			class TextAutoCompleteInputField:
+				public Field
+			{
+			private:
+				std::string _nameField;
+				std::string _valueID;
+				std::string _valueName;
+				std::string _service;
+				std::string _serviceRows;
+				std::string _serviceRow;
+				std::string _extraParamName;
+				std::string _extraParamDivID;
+				bool _bottomButton;
+				bool _IDButton;
+				bool _useID;
+				bool _viewID;
+
+
+			public:
+				TextAutoCompleteInputField(
+					const std::string& title,
+					const std::string& nameField,
+					const std::string& valueID,
+					const std::string& valueName,
+					const std::string& service,
+					const std::string& serviceRows,
+					const std::string& serviceRow,
+					const std::string& extraParamName,
+					const std::string& extraParamDivID,
+					const bool bottomButton,
+					const bool IDButton,
+					const bool useID,
+					const bool viewID
+				);
+
+				virtual void getField(std::ostream& stream) const;
+
+				virtual void getInit(
+					std::ostream& stream,
+					const std::string& formName,
+					std::size_t fieldRank
+				) const;
+
+				virtual void outputValue(std::ostream& stream, const std::string& value) const;
+			};
+
 			typedef std::vector<boost::shared_ptr<Field> > Fields;
 			typedef std::vector<std::string> Row;
 			typedef std::vector<Row> Rows;

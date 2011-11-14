@@ -32,7 +32,9 @@
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AjaxVectorFieldEditor.hpp"
+#include "AjaxVectorAutoCompleteFieldEditor.hpp"
 #include "StopArea.hpp"
+#include "PlacesListFunction.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -133,7 +135,19 @@ namespace synthese
 				AjaxVectorFieldEditor::Fields fields;
 
 				// Stop field
-				fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(new AjaxVectorFieldEditor::TextInputField("Arrêt")));
+				fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
+					new AjaxVectorFieldEditor::TextAutoCompleteInputField(
+						"Arrêt",
+						DRTAreaUpdateAction::PARAMETER_STOPS,
+						string(),
+						string(),
+						pt_website::PlacesListFunction::FACTORY_KEY,
+						pt_website::PlacesListFunction::DATA_PLACES,
+						pt_website::PlacesListFunction::DATA_PLACE,
+						"ct",string(),
+						false, false, true, false
+					)
+				));
 
 				// Creation of the editor
 				AjaxVectorFieldEditor editor(
@@ -146,7 +160,7 @@ namespace synthese
 				// Insertion of existing values
 				BOOST_FOREACH(const DRTArea::Stops::value_type& stop, _area->getStops())
 				{
-					AjaxVectorFieldEditor::Row row;
+					AjaxVectorAutoCompleteFieldEditor::Row row;
 					row.push_back(lexical_cast<string>(stop->getKey()));
 					editor.addRow(row);
 				}
