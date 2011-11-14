@@ -371,6 +371,7 @@ namespace synthese
 			typedef unordered_map<CalendarId, Calendar> CalendarMap;
 			struct ServiceKey;
 			typedef unordered_map<ServiceKey, CalendarId> ServiceToCalendarIdMap;
+			typedef unordered_map<ServiceKey, Calendar> ServiceToCalendarMap;
 
 			struct ServiceKey
 			{
@@ -644,9 +645,10 @@ namespace synthese
 				}
 
 				int arrivalTimeMinutes = parser.getCellInt("AS_HEURE_PASSAGE");
-				if(arrivalTimeMinutes < 0)
+				// FIXME: in the data dump, an arrival time of 0 means that the stop is not serviced.
+				// How can we distinguish when the stop is service at midnight?
+				if(arrivalTimeMinutes <= 0)
 				{
-					os << "WARN : Ignoring stop with no arrival time <br />";
 					continue;
 				}
 				scheduleInfo.arrivalTime = minutes(arrivalTimeMinutes);
@@ -657,8 +659,8 @@ namespace synthese
 				{
 					scheduleInfo.departureTime += minutes(waitingMinutes);
 				}
-				// Note: they seem to always be '0' in the dump.
-				scheduleInfo.departure = parser.getCellInt("AS_DESC_INTERDIT") == 0;
+
+				scheduleInfo.departure = parser.getCellInt("AS_MONT_INTERDIT") == 0;
 				scheduleInfo.arrival = parser.getCellInt("AS_DESC_INTERDIT") == 0;
 
 				serviceInfo[rank] = scheduleInfo;
@@ -726,6 +728,57 @@ namespace synthese
 					parser.getCell("CS_COD_ITINERAIR"), parser.getCell("CS_DAT_DEBVALID"),
 					parser.getCellInt("CS_COD_SERVICE"));
 				serviceToCalendarId[serviceKey] = parser.getCellInt("CS_CALENDRIER");
+			}
+
+			ServiceToCalendarMap serviceToCalendar;
+			os << "INFO : loading SERVICE<br />";
+			parser.setTableToParse("SERVICE");
+			while(parser.getRow())
+			{
+				ServiceKey serviceKey(
+					parser.getCell("SER_COD_ITINERAIR"), parser.getCell("SER_DAT_ITINERAIR"),
+					parser.getCellInt("SER_COD_SERVICE"));
+
+				if(serviceToCalendarId.find(serviceKey) == serviceToCalendarId.end())
+				{
+					continue;
+				}
+				CalendarId calendarId = serviceToCalendarId[serviceKey];
+				if(calendars.find(calendarId) == calendars.end())
+				{
+					continue;
+				}
+
+				Calendar cal = calendars[calendarId];
+
+				// Week starts on Monday
+				string runningDaysString = parser.getCell("SER_JOU_FONCT");
+				// Week starts on Sunday
+				bool runningDays[7];
+
+				for(int i = 0; i <= 5; i++)
+				{
+					runningDays[i + 1] = runningDaysString[i] != '-';
+				}
+				runningDays[0] = runningDaysString[6] != '-';
+
+				if (cal.empty())
+				{
+					os << "WARN : calendar id: " << calendarId << " from service " << serviceKey << " is empty<br />";
+					continue;
+				}
+
+				assert(cal.getFirstActiveDate() >= cal.getLastActiveDate());
+
+				date lastActiveDate(cal.getLastActiveDate());
+				for(date d(cal.getFirstActiveDate()); d <= lastActiveDate; d += days(1))
+				{
+					if(!runningDays[d.day_of_week()])
+					{
+						cal.setInactive(d);
+					}
+				}
+				serviceToCalendar[serviceKey] = cal;
 			}
 
 			// Extract the JourneyPatterns
@@ -844,18 +897,12 @@ namespace synthese
 				);
 				if(service)
 				{
-					if(serviceToCalendarId.find(serviceKey) == serviceToCalendarId.end())
+					if(serviceToCalendar.find(serviceKey) == serviceToCalendar.end())
 					{
 						os << "WARN : service has no calendar. service key: " << serviceKey << "<br />";
 						continue;
 					}
-					CalendarId calendarId = serviceToCalendarId[serviceKey];
-					if(calendars.find(calendarId) == calendars.end())
-					{
-						os << "WARN : can't find calendar id: " << calendarId << "<br />";
-						continue;
-					}
-					*service |= calendars[calendarId];
+					*service |= serviceToCalendar[serviceKey];
 				}
 			}
 
