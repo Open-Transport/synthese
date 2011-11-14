@@ -21,6 +21,7 @@
 
 
 import contextlib
+import gzip
 import logging
 import os
 import shutil
@@ -97,13 +98,15 @@ class DBBackend(object):
 
     def import_fixtures(self, fixtures_file, vars={}):
         log.info('Importing fixtures: %s', fixtures_file)
-        # XXX cursor not necessary, done in import_sql().
-        with self.get_cursor() as cursor:
-            with open(fixtures_file, 'rb') as f:
-                sql = f.read()
-                for (key, value) in vars.iteritems():
-                    sql = sql.replace("@@" + key + "@@", str(value))
-                self.import_sql(sql)
+        if fixtures_file.endswith('.gz'):
+            opener = gzip.open
+        else:
+            opener = open
+        with opener(fixtures_file, 'rb') as f:
+            sql = f.read()
+            for (key, value) in vars.iteritems():
+                sql = sql.replace("@@" + key + "@@", str(value))
+            self.import_sql(sql)
 
     def import_sql(self, sql):
         raise NotImplementedError()

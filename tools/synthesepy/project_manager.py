@@ -111,10 +111,11 @@ class Package(object):
 
     def _load_fixtures(self, site):
         fixtures_files = (glob.glob(join(self.path, '*.sql')) +
+            glob.glob(join(self.path, '*.sql.gz')) +
             glob.glob(join(self.path, '*.importer')))
 
         for fixtures_file in fixtures_files:
-            if fixtures_file.endswith('.sql'):
+            if fixtures_file.endswith(('.sql', '.sql.gz')):
                 vars = {}
                 if site:
                     vars['site_id'] = site.id
@@ -225,8 +226,14 @@ class PackagesLoader(object):
 
         packages = {}
         for package_path in glob.glob(join(packages_dir, '*')):
-            if (not os.path.isdir(package_path) or
-                os.path.basename(package_path) in IGNORED_DIRS):
+            if os.path.basename(package_path) in IGNORED_DIRS:
+                continue
+            if os.path.isfile(package_path):
+                paths = [l.strip() for l in open(package_path) if l.strip()]
+                if len(paths) != 1:
+                    continue
+                package_path = os.path.normpath(join(packages_dir, paths[0]))
+            if not os.path.isdir(package_path):
                 continue
             package = Package(self.project, package_path)
             if package.name in packages:
