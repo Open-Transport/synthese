@@ -32,7 +32,6 @@
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AjaxVectorFieldEditor.hpp"
-#include "AjaxVectorAutoCompleteFieldEditor.hpp"
 #include "StopArea.hpp"
 #include "PlacesListFunction.h"
 
@@ -160,7 +159,7 @@ namespace synthese
 				// Insertion of existing values
 				BOOST_FOREACH(const DRTArea::Stops::value_type& stop, _area->getStops())
 				{
-					AjaxVectorAutoCompleteFieldEditor::Row row;
+					AjaxVectorFieldEditor::Row row;
 					row.push_back(lexical_cast<string>(stop->getKey()));
 					editor.addRow(row);
 				}
