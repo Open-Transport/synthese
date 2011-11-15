@@ -72,14 +72,10 @@ class HTTPApi(object):
 
         br = self._get_browser()
 
-        # Base URL should redirect to a Synthese URL with the expected
-        # query parameters.
         br.open(self.admin_base_url)
-        qs = dict(urlparse.parse_qsl(br.geturl()))
-        # This string is only on the login screen.
-        if logged_in:
-            assert 'Mot de passe : ' not in br.response().read()
-        self.admin_base_params['mt'] = qs['mt']
+        # Keep this in sync with the :admin_main page in admin package.
+        MT_PAGE_ID = 177329235327713281
+        self.admin_base_params['mt'] = MT_PAGE_ID
         return br
 
     def get_admin_url(self, admin_page, params):
