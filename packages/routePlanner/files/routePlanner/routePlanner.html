@@ -69,12 +69,12 @@
 
   var stopSelector;
   require([
-    "/core/js/Synthese.js",
-    "/map/js/CityBrowser.js",
-    "/routePlanner/js/RoutePlanner.js",
-    "/map/js/StopSelector.js",
-    "order!/routePlanner/js/legacy/core.js",
-    "order!/routePlanner/js/legacy/interface.js",
+    "core/js/Synthese",
+    "map/js/CityBrowser",
+    "routePlanner/js/RoutePlanner",
+    "map/js/StopSelector",
+    "order!routePlanner/js/legacy/core",
+    "order!routePlanner/js/legacy/interface",
   ], function(Synthese, CityBrowser, routePlanner, StopSelector) {
     Synthese.init();
 

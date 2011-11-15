@@ -1,11 +1,11 @@
 define([
-  "/core/js/Synthese.js",
-  "order!/map/vendor/OpenLayers/OpenLayers.js",
+  "core/js/Synthese",
+  "order!map/vendor/OpenLayers/OpenLayers",
   // For the OpenLayers debug version: Put the following code in the html, and comment the line above.
   // <script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  "order!/map/vendor/OpenLayers/lib/OpenLayers/Lang/fr.js",
-  "order!/map/vendor/OpenLayers_maptypepanel/MapType.js",
-  "order!/map/vendor/OpenLayers_maptypepanel/MapTypePanel.js",
+  "order!map/vendor/OpenLayers/lib/OpenLayers/Lang/fr",
+  "order!map/vendor/OpenLayers_maptypepanel/MapType",
+  "order!map/vendor/OpenLayers_maptypepanel/MapTypePanel",
 ], function(Synthese) {
 
 /**

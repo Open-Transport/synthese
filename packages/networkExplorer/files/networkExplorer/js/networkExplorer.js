@@ -1,10 +1,10 @@
 define([
-  "/core/js/Synthese.js",
-  "/map/js/SyntheseMap.js",
+  "core/js/Synthese",
+  "map/js/SyntheseMap",
   // JQuery autcomplete
-  "order!/core/vendor/jquery-1.6.2.min.js",
-  "order!/networkExplorer/vendor/autocomplete/lib/jquery.bgiframe.min.js",
-  "order!/networkExplorer/vendor/autocomplete/jquery.autocomplete.js" 
+  "order!core/vendor/jquery-1.6.2.min",
+  "order!networkExplorer/vendor/autocomplete/lib/jquery.bgiframe.min",
+  "order!networkExplorer/vendor/autocomplete/jquery.autocomplete"
 ], function(Synthese, SyntheseMap) {
 
 /* ************
