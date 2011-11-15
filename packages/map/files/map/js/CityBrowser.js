@@ -1,6 +1,6 @@
 define([
-  "/core/js/Synthese.js",
-  "/map/js/CityBrowserMap.js"
+  "core/js/Synthese",
+  "map/js/CityBrowserMap"
 ], function(Synthese, CityBrowserMap) {
 
 // === Models ===

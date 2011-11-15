@@ -1,15 +1,15 @@
 define([
   // TODO: not all modules need these dependencies. They should only be
   // loaded if needed.
-  "order!/core/vendor/jquery-1.6.2.min.js",
-  "order!/core/vendor/jquery.tmpl.beta1.min.js",
-  "order!/core/vendor/underscore-1.1.6.min.js",
-  "order!/core/vendor/backbone-0.5.1.min.js",
+  "order!core/vendor/jquery-1.6.2.min",
+  "order!core/vendor/jquery.tmpl.beta1.min",
+  "order!core/vendor/underscore-1.1.6.min",
+  "order!core/vendor/backbone-0.5.1.min",
   // Debug versions:
-  //"order!/core/vendor/jquery-1.6.2.js",
-  //"order!/core/vendor/jquery.tmpl.beta1.js",
-  //"order!/core/vendor/underscore-1.1.6.js",
-  //"order!/core/vendor/backbone-0.5.1.js",
+  //"order!core/vendor/jquery-1.6.2",
+  //"order!core/vendor/jquery.tmpl.beta1",
+  //"order!core/vendor/underscore-1.1.6",
+  //"order!core/vendor/backbone-0.5.1",
 ], function() {
 
 // Dummy console.log for browsers without a console API.

@@ -2931,14 +2931,14 @@ var bootstrap = {
 
   var stopSelector;
   require([
-    "/core/js/Synthese.js",
-    "/map/js/CityBrowserMap.js",
-    "/map/js/CityBrowser.js",
-    "/routePlanner/js/RoutePlanner.js",
-    "/map/js/StopSelector.js",
-    "order!/routePlanner/js/legacy/core.js",
-    "order!/routePlanner/js/legacy/interface.js",
-    "order!/map/js/legacy/app.Gis.js"
+    "core/js/Synthese",
+    "map/js/CityBrowserMap",
+    "map/js/CityBrowser",
+    "routePlanner/js/RoutePlanner",
+    "map/js/StopSelector",
+    "order!routePlanner/js/legacy/core",
+    "order!routePlanner/js/legacy/interface",
+    "order!map/js/legacy/app.Gis.js"
   ], function(Synthese, CityBrowserMap, CityBrowser, routePlanner, StopSelector) {
 
     Synthese.init();
