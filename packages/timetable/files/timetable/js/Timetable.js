@@ -1,6 +1,6 @@
 define([
-  "/core/js/Synthese.js",
-  "order!/timetable/vendor/epoch/epoch_classes.js",
+  "core/js/Synthese",
+  "order!timetable/vendor/epoch/epoch_classes",
 ], function(Synthese) {
 
 var TimetableView = Backbone.View.extend({

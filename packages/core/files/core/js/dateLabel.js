@@ -1,5 +1,5 @@
 define([
-  "/core/js/Synthese.js",
+  "core/js/Synthese"
 ], function(Synthese) {
 
 function zeroFill(number, length) {

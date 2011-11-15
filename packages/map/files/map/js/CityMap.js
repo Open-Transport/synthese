@@ -1,5 +1,5 @@
 define([
-  "/map/js/SyntheseMap.js"
+  "map/js/SyntheseMap"
 ], function(SyntheseMap) {
 
 /**

@@ -1,5 +1,5 @@
 define([
-  "/map/js/CityBrowser.js"
+  "map/js/CityBrowser"
 ], function(CityBrowser) {
   
 var StopSelectorPopup = Backbone.View.extend({

@@ -1,5 +1,5 @@
 define([
-  "/core/js/Synthese.js",
+  "core/js/Synthese"
 ], function(Synthese) {
 
 // XXX rename to RoutePlannerFormView in order to have other objects not related to the form?
