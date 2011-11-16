@@ -68,6 +68,7 @@
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/filesystem/operations.hpp>
 
 #include <geos/geom/Geometry.h>
 #include <geos/geom/GeometryCollection.h>
@@ -103,27 +104,29 @@ namespace synthese
 		const std::string ObitiFileFormat::Importer_::FILE_ARRET("arrets");
 		const std::string ObitiFileFormat::Importer_::FILE_ITINERAIRES("itineraires");
 		const std::string ObitiFileFormat::Importer_::FILE_LIGNE("ligne");
-		const std::string ObitiFileFormat::Importer_::FILE_HORAIRE("horaire");
+
+		const std::string ObitiFileFormat::Importer_::PATH_HORAIRES("horaires");
 
 		const std::string ObitiFileFormat::Importer_::SEP(";");
 
-		const std::string ObitiFileFormat::Importer_::PARAMETER_LINE_OBITI_ID("line_obiti_id");
-		const std::string ObitiFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID("rolling_stock_id");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
-		const std::string ObitiFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
-		const std::string ObitiFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
-		const string ObitiFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+
+		const std::string ObitiFileFormat::Importer_::PARAMETER_PERIOD_CALENDAR_FIELD("period_calendar_field");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_DAYS_CALENDAR_FIELD("days_calendar_field");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_NUMBER_OF_OTHER_PARAMETERS("nb_other_parameters");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_BACKWARD_IN_SAME_FILE("backward_in_same_file");
 	}
 
 	namespace impex
 	{
 		template<> const MultipleFileTypesImporter<ObitiFileFormat>::Files MultipleFileTypesImporter<ObitiFileFormat>::FILES(
+			ObitiFileFormat::Importer_::FILE_LIGNE.c_str(),
 			ObitiFileFormat::Importer_::FILE_ARRET.c_str(),
 			ObitiFileFormat::Importer_::FILE_ITINERAIRES.c_str(),
-			ObitiFileFormat::Importer_::FILE_LIGNE.c_str(),
-			ObitiFileFormat::Importer_::FILE_HORAIRE.c_str(),
+			ObitiFileFormat::Importer_::PATH_HORAIRES.c_str(),
 		"");
 	}
 
@@ -132,10 +135,14 @@ namespace synthese
 	{
 		bool ObitiFileFormat::Importer_::_checkPathsMap() const
 		{
-			FilePathsMap::const_iterator it(_pathsMap.find(FILE_ARRET));
+			/*
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_LIGNE));
+			if(it == _pathsMap.end() || it->second.empty()) return false;
+			it= _pathsMap.find(FILE_ARRET);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
 			it = _pathsMap.find(FILE_ITINERAIRES);
 			if(it == _pathsMap.end() || it->second.empty()) return false;
+			*/
 			return true;
 		}
 
@@ -145,10 +152,9 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<ObitiFileFormat>(env, dataSource),
+			PTDataCleanerFileFormat(env, dataSource),
 			Importer(env, dataSource),
-			_importStopArea(false),
 			_interactive(true),
-			_displayLinkedStops(false),
 			_lines(_dataSource, env),
 			_stopAreas(_dataSource, env),
 			_stopPoints(_dataSource, env)
@@ -163,21 +169,46 @@ namespace synthese
 			boost::optional<const admin::AdminRequest&> request
 		) const {
 			ifstream inFile;
-			inFile.open(filePath.file_string().c_str());
-			if(!inFile)
-			{
-				throw Exception("Could no open the file " + filePath.file_string());
-			}
 			string line;
-			if(!getline(inFile, line))
+
+			if(key != PATH_HORAIRES)
 			{
-				return false;
+				inFile.open(filePath.file_string().c_str());
+				if(!inFile)
+				{
+					throw Exception("Could no open the file " + filePath.file_string());
+				}
+
+				if(!getline(inFile, line))
+				{
+					return false;
+				}
+				_loadFieldsMap(line);
+				stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
 			}
-			_loadFieldsMap(line);
+			else
+				stream << "INFO : Loading path " << filePath << " as " << key << "<br />";
 
-			stream << "INFO : Loading file " << filePath << " as " << key << "<br />";
 
-			// 1 : Stop Areas
+			// 1 : lines
+			if(key == FILE_LIGNE)
+			{
+				// Loop
+				while(getline(inFile, line))
+				{
+					_loadLine(line);
+
+					LineObitiElement lineObiti;
+
+					string idLigne = _getValue("IDLigne");
+					lineObiti.name = _getValue("Nom");
+					lineObiti.shortname = _getValue("Code Commerciale");
+					lineObiti.backward = _getValue("Sens") == "Retour" ? true : false;
+					_linesMap.insert(make_pair(idLigne, lineObiti));
+				}
+			}
+
+			// 2 : Stop Areas
 			if(key == FILE_ARRET)
 			{
 				PTFileFormat::ImportableStopAreas linkedStopAreas;
@@ -217,10 +248,6 @@ namespace synthese
 						{
 							nonLinkedStopAreas.push_back(isa);
 						}
-						else if(_displayLinkedStops)
-						{
-							linkedStopAreas.push_back(isa);
-						}
 					}
 
 					PTFileFormat::CreateOrUpdateStopAreas(
@@ -235,36 +262,9 @@ namespace synthese
 						stream
 					);
 				}
-
-				if(request)
-				{
-					PTFileFormat::DisplayStopAreaImportScreen(
-						nonLinkedStopAreas,
-						*request,
-						true,
-						false,
-						_defaultCity,
-						_env,
-						_dataSource,
-						stream
-					);
-					if(_displayLinkedStops)
-					{
-						PTFileFormat::DisplayStopAreaImportScreen(
-							linkedStopAreas,
-							*request,
-							true,
-							false,
-							_defaultCity,
-							_env,
-							_dataSource,
-							stream
-							);
-					}
-				}
 			}
 
-			// 2 : Physical Stops
+			// 3 : Physical Stops
 			if(key == FILE_ITINERAIRES)
 			{
 				// 2.2 : stops
@@ -276,9 +276,18 @@ namespace synthese
 				{
 					_loadLine(line);
 
+					// Line
 					string idLigne(_getValue("idLigne"));
+					LinesMap::const_iterator it(_linesMap.find(idLigne));
+					if(it == _linesMap.end())
+					{
+						stream << "WARN : Obiti line ID "<< idLigne << " not found<br />";
+						return false;
+					}
+					LineObitiElement lineObiti(it->second);
+
 					string stopAreaId(_getValue("idarret"));
-					string id(_getValue("nom_commune") + " " + _getValue("nom_arret") + " " + idLigne + " " + (_getValue("sens_aller") == "O" ? "A" : "R"));
+					string id(_getValue("nom_commune") + " " + _getValue("nom_arret") + " " + lineObiti.shortname + " " + (lineObiti.backward ? "R" : "A"));
 					string name(_getValue("app_comm_arret"));
 
 					// Stop area
@@ -308,10 +317,6 @@ namespace synthese
 					{
 						nonLinkedStopPoints.push_back(isp);
 					}
-					else if(request && _displayLinkedStops)
-					{
-						linkedStopPoints.push_back(isp);
-					}
 
 					// Creation or update
 					PTFileFormat::CreateOrUpdateStop(
@@ -326,71 +331,24 @@ namespace synthese
 						stream
 					);
 				}
+			}
 
-				if(request)
-				{
-					PTFileFormat::DisplayStopPointImportScreen(
-						nonLinkedStopPoints,
-						*request,
-						_env,
-						_dataSource,
-						stream
-					);
-					if(_displayLinkedStops)
-					{
-						PTFileFormat::DisplayStopPointImportScreen(
-							linkedStopPoints,
-							*request,
-							_env,
-							_dataSource,
-							stream
-						);
+			// 4 : schedules path
+			if(key == PATH_HORAIRES)
+			{
+				boost::filesystem::path path(filePath.file_string().c_str());
+				std::set<std::string> schedulesFiles;
+
+				if(boost::filesystem::is_directory(path)) {
+					for(boost::filesystem::directory_iterator it(path), end; it != end; ++it) {
+						if(boost::filesystem::is_regular_file(it->status())) {
+							schedulesFiles.insert(it->path().filename());
+						}
 					}
-				}
-			}
-
-			// 3 : lines
-			if(key == FILE_LIGNE)
-			{
-				// Loop
-				while(getline(inFile, line))
-				{
-					_loadLine(line);
-
-					LineObitiElement lineObiti;
-
-					string idLigne = _getValue("IDLigne");
-					lineObiti.name = _getValue("Nom");
-					lineObiti.shortname = _getValue("Code Commerciale");
-					lineObiti.backward = _getValue("Sens") == "Retour" ? true : false;
-					_linesMap.insert(make_pair(idLigne, lineObiti));
-				}
-			}
-
-			// 4 services & schedules
-			if(key == FILE_HORAIRE)
-			{
-				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
-
-				// Line
-				string id(_lineObitiID);
-				LinesMap::const_iterator it(_linesMap.find(id));
-				if(it == _linesMap.end())
-				{
-					stream << "WARN : Obiti line ID "<< id << " not found<br />";
-					return false;
-				}
-				LineObitiElement lineObiti(it->second);
-
-				// Network
-				const TransportNetwork* network;
-				if(_network.get())
-				{
-					network = _network.get();
 				}
 				else
 				{
-					stream << "WARN : network not defined";
+					stream << "Invalid path!" << "<br />";
 					return false;
 				}
 
@@ -406,196 +364,278 @@ namespace synthese
 					return false;
 				}
 
-				// Color
-				optional<RGBColor> color;
-				CommercialLine* commercialLine = PTFileFormat::CreateOrUpdateLine(
-					_lines,
-					id,
-					lineObiti.name, // route_long_name
-					lineObiti.shortname, // route_short_name
-					color,
-					*network,
-					_dataSource,
-					_env,
-					stream
-				);
+				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 
-				// Routes
-				string serviceID;
-				string daysCalendarName;
-				string periodCalendarName;
+				int numSens = 1;
+				if(_backwardInSameFile)
+					numSens = 2;
 
-				ScheduledService::Schedules departureSchedules;
-				ScheduledService::Schedules arrivalSchedules;
-				time_duration lastTd(minutes(0));
-
-				_firstLine(inFile,line);
-				int numService = 1;
-				while(_line[numService] != "'-1")
+				BOOST_FOREACH(const string& file, schedulesFiles)
 				{
-					// Service ID
-					serviceID = _line[numService];
-
-					// Period Calendar
-					getline(inFile, line);
-					_loadLine(line);
-					periodCalendarName = _line[numService];
-					CalendarTemplate* periodCalendar(NULL);
-					CalendarTemplateTableSync::SearchResult calendars(
-						CalendarTemplateTableSync::Search(
-							_env,
-							periodCalendarName,
-							optional<RegistryKeyType>(),
-							false,
-							true,
-							0,
-							1,
-							UP_LINKS_LOAD_LEVEL,
-							optional<RegistryKeyType>())
-					);
-					if(calendars.empty())
+					ifstream inFile;
+					string fileWithPath = filePath.file_string() + file;
+					stream << fileWithPath << "<br />";
+					inFile.open(fileWithPath.c_str());
+					if(!inFile)
 					{
-						stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
-					}
-					else
-					{
-						periodCalendar = calendars.begin()->get();
+						stream << "Could no open the file " << fileWithPath << "<br />";
+						return false;
 					}
 
-					// Days Calendar
-					getline(inFile, line);
-					_loadLine(line);
-					daysCalendarName = _line[numService];
-					CalendarTemplate* daysCalendar(NULL);
-					CalendarTemplateTableSync::SearchResult calendars2(
-						CalendarTemplateTableSync::Search(
-							_env,
-							daysCalendarName,
-							optional<RegistryKeyType>(),
-							false,
-							true,
-							0,
-							1,
-							UP_LINKS_LOAD_LEVEL,
-							optional<RegistryKeyType>())
-					);
-					if(calendars2.empty())
+					for(int i=1; i<=numSens; i++)
 					{
-						stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
-					}
-					else
-					{
-						daysCalendar = calendars2.begin()->get();
-					}
+						bool backward=false;
+						if((numSens == 1 && file[file.size()-5] == 'R') || (numSens == 2 && i == 2))
+							backward = true;
 
-					// move to Schedule
-					while(_line[0] != "   Transporteur")
-					{
-						getline(inFile, line);
-						_loadLine(line);
-					}
-
-					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
-					departureSchedules.clear();
-					arrivalSchedules.clear();
-					lastTd = minutes(0);
-
-					// Schedule
-					while(getline(inFile, line))
-					{
-						_loadLine(line);
-						string stopPointId(_line[0] + " " + _lineObitiID + " " + (lineObiti.backward ? "R" : "A"));
-						string timeStr(_line[numService]);
-
-						const StopPoint* stopPoint(NULL);
-						if(_stopPoints.contains(stopPointId))
-							stopPoint = *_stopPoints.get(stopPointId).begin();
-						else
+						streampos posSchedulesTable = inFile.tellg();
+						if(i == 2)
 						{
-							stream << "WARN : inconsistent stop id "<< stopPointId <<" in the service "<< numService <<"<br />";
-							continue;
-						}
-
-						if(timeStr.size() > 4)
-						{
-							time_duration td(
-								lexical_cast<int>(timeStr.substr(0,2)),
-								lexical_cast<int>(timeStr.substr(3,2)),
-								0
-							);
-							if(td < lastTd)
+							// move to second Schedules table
+							while(_line[0] != "")
 							{
-								td += hours(24);
+								getline(inFile, line);
+								_loadLine(line);
 							}
-							departureSchedules.push_back(td - seconds(td.seconds()));
-							arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
-							lastTd = td;
+							while(_line[0] == "")
+							{
+								posSchedulesTable = inFile.tellg();
+								getline(inFile, line);
+								_loadLine(line);
+							}
+						}
 
-							JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet linkedStops(_stopPoints.get(stopPointId));
-							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-								linkedStops,
-								optional<double>(),
-								true,
-								true,
-								true
-							);
-							stops.push_back(stop);
+						stream << "INFO : Loading file " << filePath.file_string().c_str()+file << "<br />";
+
+						CommercialLine* commercialLine(PTFileFormat::GetLine(lines, file, _dataSource, _env, stream));
+						if(!commercialLine)
+						{
+							stream << "No such line " << file << "<br />";
+							return false;
+						}
+
+						// Routes
+						string serviceID;
+						string daysCalendarName;
+						string periodCalendarName;
+
+						ScheduledService::Schedules departureSchedules;
+						ScheduledService::Schedules arrivalSchedules;
+						time_duration lastTd(minutes(0));
+
+						// Number of services
+						_firstLine(inFile, line, posSchedulesTable);
+
+						stream << "num of services : " << _line.size() << "<br />";
+
+						for(int numService = 1; numService < _line.size(); numService++)
+						{
+							_firstLine(inFile, line, posSchedulesTable);
+
+							// Get Period Calendar name
+							if(!_moveToField(inFile,_periodCalendarField))
+							{
+								stream << "No such period field " << _periodCalendarField << "<br />";
+								return false;
+							}
+							periodCalendarName = commercialLine->getNetwork()->getName() + " " + _line[numService];
+
+							// Get Days Calendar name
+							if(!_moveToField(inFile,_daysCalendarField))
+							{
+								stream << "No such period field " << _daysCalendarField << "<br />";
+								return false;
+							}
+							daysCalendarName = commercialLine->getNetwork()->getName() + " " + _line[numService];
+
+							// Ignore other parameters
+							for(int i = 0; i < _numberOfOtherParameters; i++)
+							{
+								if(getline(inFile, line))
+									_loadLine(line);
+								else
+								{
+									stream << "Error with the number of other parameters : " << _numberOfOtherParameters << "<br />";
+									return false;
+								}
+							}
+
+							JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+							departureSchedules.clear();
+							arrivalSchedules.clear();
+							lastTd = minutes(0);
+
+							// Schedule
+							while(getline(inFile, line))
+							{
+								_loadLine(line);
+								if(_line[0] == "")
+									break;
+								string stopPointId(_line[0] + " " + commercialLine->getShortName() + " " + (backward ? "R" : "A"));
+								string timeStr(_line[numService]);
+
+								const StopPoint* stopPoint(NULL);
+								if(_stopPoints.contains(stopPointId))
+									stopPoint = *_stopPoints.get(stopPointId).begin();
+								else
+								{
+									stream << "WARN : inconsistent stop id "<< stopPointId <<" in the service "<< numService <<"<br />";
+									return false;
+								}
+
+								if(timeStr.size() > 4)
+								{
+									time_duration td(
+										lexical_cast<int>(timeStr.substr(0,2)),
+										lexical_cast<int>(timeStr.substr(3,2)),
+										0
+									);
+									if(td < lastTd)
+									{
+										td += hours(24);
+									}
+									departureSchedules.push_back(td - seconds(td.seconds()));
+									arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
+									lastTd = td;
+
+									JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet linkedStops(_stopPoints.get(stopPointId));
+									JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+										linkedStops,
+										optional<double>(),
+										true,
+										true,
+										true
+									);
+									stops.push_back(stop);
+								}
+							}
+
+							if(stops.size() > 0)
+							{
+								stream << "service number " << numService << "<br />";
+
+								CalendarTemplate* periodCalendar(NULL);
+								CalendarTemplateTableSync::SearchResult calendars(
+									CalendarTemplateTableSync::Search(
+										_env,
+										periodCalendarName,
+										optional<RegistryKeyType>(),
+										false,
+										true,
+										0,
+										1,
+										UP_LINKS_LOAD_LEVEL,
+										optional<RegistryKeyType>())
+								);
+								if(calendars.empty())
+									stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
+								else
+									periodCalendar = calendars.begin()->get();
+
+
+								CalendarTemplate* daysCalendar(NULL);
+								CalendarTemplateTableSync::SearchResult calendars2(
+									CalendarTemplateTableSync::Search(
+										_env,
+										daysCalendarName,
+										optional<RegistryKeyType>(),
+										false,
+										true,
+										0,
+										1,
+										UP_LINKS_LOAD_LEVEL,
+										optional<RegistryKeyType>())
+								);
+								if(calendars2.empty())
+									stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
+								else
+									daysCalendar = calendars2.begin()->get();
+
+								// Route
+								JourneyPattern* route(
+									PTFileFormat::CreateOrUpdateRoute(
+										*commercialLine,
+										commercialLine->getShortName(),
+										commercialLine->getShortName(),
+										optional<const string&>(),
+										optional<Destination*>(),
+										optional<const RuleUser::Rules&>(),
+										backward,
+										rollingStock,
+										stops,
+										_dataSource,
+										_env,
+										stream,
+										true
+								)	);
+								if(route == NULL)
+								{
+									stream << "WARN : failure at route creation ("<< commercialLine->getShortName() <<")<br />";
+									return false;
+								}
+
+								// Service
+								ScheduledService* service(
+									PTFileFormat::CreateOrUpdateService(
+										*route,
+										departureSchedules,
+										arrivalSchedules,
+										serviceID,
+										_dataSource,
+										_env,
+										stream
+								)	);
+
+								// Calendars
+								if(service)
+								{
+									boost::shared_ptr<ServiceCalendarLink> serviceCalendarLink;
+
+									// Search for existing ServiceCalendarLink
+									ServiceCalendarLinkTableSync::SearchResult serviceCalendarLinks(
+										ServiceCalendarLinkTableSync::Search(
+											_env,
+											service->getKey(),
+											0)
+									);
+									if(!serviceCalendarLinks.empty())
+									{
+										BOOST_FOREACH(shared_ptr<ServiceCalendarLink> scl, serviceCalendarLinks)
+										{
+											if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
+											{
+												serviceCalendarLink = scl;
+												break;
+											}
+										}
+									}
+
+									if(!serviceCalendarLink)
+									{
+										serviceCalendarLink = boost::shared_ptr<ServiceCalendarLink>(new ServiceCalendarLink(ServiceCalendarLinkTableSync::getId()));
+
+										if(periodCalendar)
+											serviceCalendarLink->setCalendarTemplate2(periodCalendar);
+										if(daysCalendar)
+											serviceCalendarLink->setCalendarTemplate(daysCalendar);
+
+										serviceCalendarLink->setService(service);
+
+										service->addCalendarLink(*serviceCalendarLink,true);
+
+										_env.getEditableRegistry<ServiceCalendarLink>().add(shared_ptr<ServiceCalendarLink>(serviceCalendarLink));
+									}
+									service->setCalendarFromLinks();
+								}
+								else
+								{
+									stream << "WARN : failure at service creation ("<< serviceID <<")<br />";
+									return false;
+								}
+
+							}
 						}
 					}
-
-					// Route
-					JourneyPattern* route(
-						PTFileFormat::CreateOrUpdateRoute(
-							*commercialLine,
-							id,
-							id,
-							optional<const string&>(),
-							optional<Destination*>(),
-							optional<const RuleUser::Rules&>(),
-							lineObiti.backward,
-							rollingStock,
-							stops,
-							_dataSource,
-							_env,
-							stream,
-							true
-					)	);
-					if(route == NULL)
-					{
-						stream << "WARN : failure at route creation ("<< id <<")<br />";
-						continue;
-					}
-
-					// Service
-					ScheduledService* service(
-						PTFileFormat::CreateOrUpdateService(
-							*route,
-							departureSchedules,
-							arrivalSchedules,
-							serviceID,
-							_dataSource,
-							_env,
-							stream
-					)	);
-
-					// Calendars
-					if(service)
-					{
-						boost::shared_ptr<ServiceCalendarLink> link(new ServiceCalendarLink(ServiceCalendarLinkTableSync::getId()));
-
-						if(periodCalendar)
-							link->setCalendarTemplate(periodCalendar);
-						if(daysCalendar)
-							link->setCalendarTemplate2(daysCalendar);
-
-						link->setService(service);
-
-						_env.getEditableRegistry<ServiceCalendarLink>().add(shared_ptr<ServiceCalendarLink>(link));
-					}
-
-					// next service
-					_firstLine(inFile,line);
-					numService++;
 				}
 			}
 			return true;
@@ -611,23 +651,23 @@ namespace synthese
 
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			t.getForm().addHiddenField(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, string("1"));
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.title("Import arrêts");
+			stream << t.cell("Fichier ligne", t.getForm().getTextInput(_getFileParameterName(FILE_LIGNE), _pathsMap[FILE_LIGNE].file_string()));
 			stream << t.cell("Fichier arrêt", t.getForm().getTextInput(_getFileParameterName(FILE_ARRET), _pathsMap[FILE_ARRET].file_string()));
 			stream << t.cell("Fichier itinéraires", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAIRES), _pathsMap[FILE_ITINERAIRES].file_string()));
-			stream << t.title("Import services & horaires");
-			stream << t.cell("Fichier ligne", t.getForm().getTextInput(_getFileParameterName(FILE_LIGNE), _pathsMap[FILE_LIGNE].file_string()));
-			stream << t.cell("Fichier horaire", t.getForm().getTextInput(_getFileParameterName(FILE_HORAIRE), _pathsMap[FILE_HORAIRE].file_string()));
-			stream << t.cell("Ligne concernée (ID Obiti)", t.getForm().getTextInput(PARAMETER_LINE_OBITI_ID, _lineObitiID));
+			stream << t.title("Import horaires");
+			stream << t.cell("Repertoire horaires", t.getForm().getTextInput(_getFileParameterName(PATH_HORAIRES), _pathsMap[PATH_HORAIRES].file_string()));
 			stream << t.title("Paramètres");
-			stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			stream << t.cell("Mode de transport (ID)",
-			t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID, _rollingStock.get() ? lexical_cast<string>(_rollingStock->getKey()) : string()));
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
-			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
+			stream << t.cell("Mode de transport (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID, _rollingStock.get() ? lexical_cast<string>(_rollingStock->getKey()) : string()));
+			stream << t.cell("Champs période de circulation", t.getForm().getTextInput(PARAMETER_PERIOD_CALENDAR_FIELD, _periodCalendarField));
+			stream << t.cell("Champs jours de circulation", t.getForm().getTextInput(PARAMETER_DAYS_CALENDAR_FIELD, _daysCalendarField));
+			stream << t.cell("Nombre de lignes de paramètres à ignorer", t.getForm().getTextInput(PARAMETER_NUMBER_OF_OTHER_PARAMETERS, lexical_cast<string>(_numberOfOtherParameters)));
+			stream << t.cell("Horaires de retour dans le même fichier", t.getForm().getOuiNonRadioInput(PARAMETER_BACKWARD_IN_SAME_FILE, false));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.cell("Masque règles d'utilisation", t.getForm().getTextInput(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks)));
 			stream << t.close();
@@ -638,6 +678,9 @@ namespace synthese
 		db::DBTransaction ObitiFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+
+			// Add remove queries generated by _selectObjectsToRemove
+			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
 			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
@@ -717,39 +760,52 @@ namespace synthese
 
 
 
-		void ObitiFileFormat::Importer_::_firstLine(ifstream& inFile, std::string& line) const
+		void ObitiFileFormat::Importer_::_firstLine(ifstream& inFile, std::string& line, streampos pos) const
 		{
 			inFile.clear();
-			inFile.seekg(0, ios::beg);
+			inFile.seekg(pos);
 			getline(inFile, line);
 			_loadLine(line);
 		}
 
 
 
+		bool ObitiFileFormat::Importer_::_moveToField(ifstream& inFile, const std::string& field) const
+		{
+			if(_line[0] == field)
+				return true;
+			else
+			{
+				std::string line;
+				bool notTheEnd;
+				do {
+					notTheEnd = getline(inFile, line);
+					if(notTheEnd) _loadLine(line);
+				} while(_line[0] != field && notTheEnd);
+				if((_line[0] != field) || !notTheEnd)
+					return false;
+				else return true;
+			}
+		}
+
+
 
 		util::ParametersMap ObitiFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap map;
-			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
-			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
-			map.insert(PARAMETER_LINE_OBITI_ID, _lineObitiID);
-			if(_defaultCity.get())
-			{
-				map.insert(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity->getKey());
-			}
+			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
+
 			if(!_stopAreaDefaultTransferDuration.is_not_a_date_time())
 			{
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
-			}
-			if(_network.get())
-			{
-				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
 			}
 			if(_rollingStock.get())
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_ID, _rollingStock->getKey());
 			}
+			map.insert(PARAMETER_DAYS_CALENDAR_FIELD, _daysCalendarField);
+			map.insert(PARAMETER_PERIOD_CALENDAR_FIELD, _periodCalendarField);
+			map.insert(PARAMETER_NUMBER_OF_OTHER_PARAMETERS, _numberOfOtherParameters);
+			map.insert(PARAMETER_BACKWARD_IN_SAME_FILE, _backwardInSameFile);
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
 			return map;
 		}
@@ -758,24 +814,17 @@ namespace synthese
 
 		void ObitiFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
-			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
-			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
-			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
-			_lineObitiID = map.getDefault<string>(PARAMETER_LINE_OBITI_ID, string());
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
 
-			if(map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0))
-			{
-				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
-			}
+			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
+			_daysCalendarField = map.getDefault<string>(PARAMETER_DAYS_CALENDAR_FIELD);
+			_periodCalendarField = map.getDefault<string>(PARAMETER_PERIOD_CALENDAR_FIELD);
+			_numberOfOtherParameters = map.getDefault<int>(PARAMETER_NUMBER_OF_OTHER_PARAMETERS,0);
+			_backwardInSameFile = map.getDefault<bool>(PARAMETER_BACKWARD_IN_SAME_FILE,0);
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID, 0))
 			{
 				_rollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID), _env);
-			}
-
-			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
-			{
-				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 			}
 
 			string ptUseRuleBlockMasksStr(map.getDefault<string>(PARAMETER_USE_RULE_BLOCK_ID_MASK));
