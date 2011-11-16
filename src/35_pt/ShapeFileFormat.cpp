@@ -187,7 +187,7 @@ namespace synthese
 					isp.name = stopPointName;
 					isp.linkedStopPoints = _stopPoints.get(operatorCode);
 					isp.coords = geometry;
-					if(_defaultCity)
+					if(_defaultCity.get())
 						isp.cityName = _defaultCity->getName();
 
 					if(isp.linkedStopPoints.empty())
@@ -227,7 +227,7 @@ namespace synthese
 						StopAreaTableSync::SearchResult stopAreas(
 							StopAreaTableSync::Search(
 								_env,
-								_defaultCity->getKey(),
+								_defaultCity.get() ? _defaultCity->getKey() : boost::optional<util::RegistryKeyType>(),
 								logic::indeterminate,
 								optional<string>(),
 								stopAreaName
@@ -245,7 +245,8 @@ namespace synthese
 							true,
 							_stopAreaDefaultTransferDuration
 						);
-						stopArea->setCity(_defaultCity.get());
+						if(_defaultCity.get())
+							stopArea->setCity(_defaultCity.get());
 						stopArea->setName(stopAreaName);
 						_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
 						stopAreasByName.insert(make_pair(stopAreaName, stopArea));
