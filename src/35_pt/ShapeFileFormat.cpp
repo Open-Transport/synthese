@@ -89,9 +89,11 @@ namespace synthese
 		const std::string ShapeFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string ShapeFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 
-		const std::string ShapeFileFormat::Importer_::PARAMETER_ATTRIBUT_NAME1("name1");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_ATTRIBUT_NAME2("name2");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_ATTRIBUT_OPERATOR_CODE("operator_code");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME1("stop_name1");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME2("stop_name2");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_OPERATOR_CODE("stop_operator_code");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_NAME("city_name");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_CODE("city_code");
 
 		const std::string ShapeFileFormat::Importer_::_FIELD_GEOMETRY("Geometry");
 	}
@@ -119,6 +121,7 @@ namespace synthese
 			util::Env& env,
 			const impex::DataSource& dataSource
 		):	MultipleFileTypesImporter<ShapeFileFormat>(env, dataSource),
+			PTDataCleanerFileFormat(env, dataSource),
 			Importer(env, dataSource),
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env)
@@ -167,27 +170,59 @@ namespace synthese
 
 				string stopAreaName;
 				string stopPointName;
-				string operatorCode;
+				string stopOperatorCode;
+				string cityCode;
+				string cityName;
+				boost::shared_ptr<geography::City> city;
 
-				if(_name1)
+				if(_stopName1)
 				{
-					stopAreaName = rows->getText(*_name1);
-					stopPointName = rows->getText(*_name1);
+					stopAreaName = rows->getText(*_stopName1);
+					stopPointName = rows->getText(*_stopName1);
 				}
-				if(_name2)
-					stopPointName += " " + rows->getText(*_name2);
+				if(_stopName2)
+					stopPointName += " " + rows->getText(*_stopName2);
 
-				if(_operatorCode)
-					operatorCode = rows->getText(*_operatorCode);
+				if(_stopOperatorCode)
+					stopOperatorCode = rows->getText(*_stopOperatorCode);
+
+				if(_cityCode)
+					cityCode = rows->getText(*_cityCode);
+
+				if(_cityName)
+					cityName = rows->getText(*_cityName);
+
+				if(_cityCode || _cityName)
+				{
+					CityTableSync::SearchResult cities(
+						CityTableSync::Search(
+							_env,
+							optional<std::string>(),
+							_cityName ? cityName : optional<std::string>(),
+							_cityCode ? cityCode : optional<std::string>(),
+							0,
+							1)
+					);
+					if(cities.empty())
+					{
+						stream << "WARN : City " << cityName << " / " << cityCode << " not found<br />";
+					}
+					else
+					{
+						city = cities.front();
+					}
+				}
 
 				if(request)
 				{
 					PTFileFormat::ImportableStopPoint isp;
-					isp.operatorCode = operatorCode;
+					isp.operatorCode = stopOperatorCode;
 					isp.name = stopPointName;
-					isp.linkedStopPoints = _stopPoints.get(operatorCode);
+					isp.linkedStopPoints = _stopPoints.get(stopOperatorCode);
 					isp.coords = geometry;
-					if(_defaultCity.get())
+					if(city.get())
+						isp.cityName = city->getName();
+					else if(_defaultCity.get())
 						isp.cityName = _defaultCity->getName();
 
 					if(isp.linkedStopPoints.empty())
@@ -200,9 +235,9 @@ namespace synthese
 					}
 				}
 
-				if(_stopPoints.contains(operatorCode))
+				if(_stopPoints.contains(stopOperatorCode))
 				{
-					BOOST_FOREACH(StopPoint* stopPoint, _stopPoints.get(operatorCode))
+					BOOST_FOREACH(StopPoint* stopPoint, _stopPoints.get(stopOperatorCode))
 					{
 						stopPoint->setName(stopPointName);
 						if(geometry.get())
@@ -227,7 +262,7 @@ namespace synthese
 						StopAreaTableSync::SearchResult stopAreas(
 							StopAreaTableSync::Search(
 								_env,
-								_defaultCity.get() ? _defaultCity->getKey() : boost::optional<util::RegistryKeyType>(),
+								(city.get() ? city->getKey() : (_defaultCity.get() ? _defaultCity->getKey() : boost::optional<util::RegistryKeyType>())),
 								logic::indeterminate,
 								optional<string>(),
 								stopAreaName
@@ -245,7 +280,9 @@ namespace synthese
 							true,
 							_stopAreaDefaultTransferDuration
 						);
-						if(_defaultCity.get())
+						if(city.get())
+							stopArea->setCity(city.get());
+						else if(_defaultCity.get())
 							stopArea->setCity(_defaultCity.get());
 						stopArea->setName(stopAreaName);
 						_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
@@ -253,7 +290,7 @@ namespace synthese
 					}
 					PTFileFormat::CreateOrUpdateStop(
 						_stopPoints,
-						operatorCode,
+						stopOperatorCode,
 						stopPointName,
 						NULL,
 						stopArea,
@@ -298,9 +335,12 @@ namespace synthese
 
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			t.getForm().addHiddenField(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, string("1"));
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, false));
+			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier ShapeFile (arrêts)", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPE), _pathsMap[FILE_SHAPE].file_string()));
 			stream << t.title("Paramètres Généraux");
@@ -308,9 +348,11 @@ namespace synthese
 			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.title("Attributs du fichier arrêts");
-			stream << t.cell("Nom principal", t.getForm().getTextInput(PARAMETER_ATTRIBUT_NAME1, _name1 ? *_name1 : string()));
-			stream << t.cell("Nom complémentaire", t.getForm().getTextInput(PARAMETER_ATTRIBUT_NAME2,  _name2 ? *_name2 : string()));
-			stream << t.cell("Code Opérateur", t.getForm().getTextInput(PARAMETER_ATTRIBUT_OPERATOR_CODE,  _operatorCode ? *_operatorCode : string()));
+			stream << t.cell("Nom principal de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME1, _stopName1 ? *_stopName1 : string()));
+			stream << t.cell("Nom complémentaire de l'arrêt physique", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME2,  _stopName2 ? *_stopName2 : string()));
+			stream << t.cell("Code Opérateur de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_OPERATOR_CODE,  _stopOperatorCode ? *_stopOperatorCode : string()));
+			stream << t.cell("Nom de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_NAME, _cityName ? *_cityName : string()));
+			stream << t.cell("Code de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_CODE, _cityCode ? *_cityCode : string()));
 			stream << t.close();
 		}
 
@@ -319,6 +361,9 @@ namespace synthese
 		db::DBTransaction ShapeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+
+			// Add remove queries generated by _selectObjectsToRemove
+			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
 			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
@@ -337,7 +382,7 @@ namespace synthese
 
 		util::ParametersMap ShapeFileFormat::Importer_::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
 			if(_defaultCity.get())
 			{
@@ -348,14 +393,20 @@ namespace synthese
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
 
-			if(_name1)
-				map.insert(PARAMETER_ATTRIBUT_NAME1,*_name1);
+			if(_stopName1)
+				map.insert(PARAMETER_FIELD_STOP_NAME1,*_stopName1);
 
-			if(_name2)
-				map.insert(PARAMETER_ATTRIBUT_NAME2,*_name1);
+			if(_stopName2)
+				map.insert(PARAMETER_FIELD_STOP_NAME2,*_stopName2);
 
-			if(_operatorCode)
-				map.insert(PARAMETER_ATTRIBUT_OPERATOR_CODE,*_operatorCode);
+			if(_stopOperatorCode)
+				map.insert(PARAMETER_FIELD_STOP_OPERATOR_CODE,*_stopOperatorCode);
+
+			if(_cityName)
+				map.insert(PARAMETER_FIELD_CITY_NAME,*_cityName);
+
+			if(_cityCode)
+				map.insert(PARAMETER_FIELD_CITY_CODE,*_cityCode);
 
 			return map;
 		}
@@ -364,16 +415,18 @@ namespace synthese
 
 		void ShapeFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			PTDataCleanerFileFormat::_setFromParametersMap(map);
+
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
-			{
 				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
-			}
 
-			_name1 = map.getOptional<std::string>(PARAMETER_ATTRIBUT_NAME1);
-			_name2 = map.getOptional<std::string>(PARAMETER_ATTRIBUT_NAME2);
-			_operatorCode = map.getOptional<std::string>(PARAMETER_ATTRIBUT_OPERATOR_CODE);
+			_stopName1 = map.getOptional<std::string>(PARAMETER_FIELD_STOP_NAME1);
+			_stopName2 = map.getOptional<std::string>(PARAMETER_FIELD_STOP_NAME2);
+			_stopOperatorCode = map.getOptional<std::string>(PARAMETER_FIELD_STOP_OPERATOR_CODE);
+			_cityCode = map.getOptional<std::string>(PARAMETER_FIELD_CITY_CODE);
+			_cityName = map.getOptional<std::string>(PARAMETER_FIELD_CITY_NAME);
 		}
 }	}

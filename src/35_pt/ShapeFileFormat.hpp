@@ -26,6 +26,7 @@
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "PTDataCleanerFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
@@ -62,7 +63,8 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<ShapeFileFormat>
+				public impex::MultipleFileTypesImporter<ShapeFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 			public:
 				static const std::string FILE_SHAPE; // Shapefile
@@ -71,9 +73,11 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 
-				static const std::string PARAMETER_ATTRIBUT_NAME1;
-				static const std::string PARAMETER_ATTRIBUT_NAME2;
-				static const std::string PARAMETER_ATTRIBUT_OPERATOR_CODE;
+				static const std::string PARAMETER_FIELD_STOP_NAME1;
+				static const std::string PARAMETER_FIELD_STOP_NAME2;
+				static const std::string PARAMETER_FIELD_STOP_OPERATOR_CODE;
+				static const std::string PARAMETER_FIELD_CITY_NAME;
+				static const std::string PARAMETER_FIELD_CITY_CODE;
 
 				static const std::string _FIELD_GEOMETRY;
 
@@ -84,9 +88,11 @@ namespace synthese
 					boost::shared_ptr<const geography::City> _defaultCity;
 					boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
-					boost::optional<std::string> _name1;
-					boost::optional<std::string> _name2;
-					boost::optional<std::string> _operatorCode;
+					boost::optional<std::string> _stopName1;
+					boost::optional<std::string> _stopName2;
+					boost::optional<std::string> _stopOperatorCode;
+					boost::optional<std::string> _cityName;
+					boost::optional<std::string> _cityCode;
 				//@}
 
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
