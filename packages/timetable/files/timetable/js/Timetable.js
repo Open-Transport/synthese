@@ -1,13 +1,13 @@
 define([
   "core/js/Synthese",
-  "order!timetable/vendor/epoch/epoch_classes",
+  "order!timetable/vendor/epoch/epoch_classes"
 ], function(Synthese) {
 
 var TimetableView = Backbone.View.extend({
 
   events: {
     "click .ttnote": "noteClick",
-    "click .caltitleclose": "noteCloseClick",
+    "click .caltitleclose": "noteCloseClick"
   },
 
   initialize: function() {
