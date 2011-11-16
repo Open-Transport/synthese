@@ -9,7 +9,8 @@ var NewsTickerView = Backbone.View.extend({
     "click .nextLink": "nextLinkClick"
   },
 
-  REFRESH_DELAY_MS: 3000,
+  REFRESH_DELAY_MS: 3 * 1000,
+  INACTIVE_DELAY_MS: 40 * 1000,
 
   initialize: function(options) {
     var itemsPerGroup = options.itemsPerGroup || 3;
@@ -48,6 +49,16 @@ var NewsTickerView = Backbone.View.extend({
     $(this.el).show();
     this.index = -1;
     this.moveIndex(1);
+
+    var self = this;
+    self.lastMove = Date.now();
+    $(window).on('mousemove', function() {
+      self.lastMove = Date.now();
+      if (!self.paused)
+        return;
+      self.paused = false;
+      self.moveIndex(1);
+    });
   },
 
   goToIndex: function(index, noAnim) {
@@ -60,9 +71,16 @@ var NewsTickerView = Backbone.View.extend({
   },
 
   moveIndex: function(offset) {
-    if (this.timeout)
+    this.paused = false;
+    if (this.timeout) {
       clearTimeout(this.timeout);
+    }
     this.goToIndex((this.index + offset + this.ulGroups.length) % this.ulGroups.length);
+
+    if (Date.now() - this.lastMove > 2000) {
+      this.paused = true;
+      return;
+    }
 
     var self = this;
     this.timeout = setTimeout(function() {
