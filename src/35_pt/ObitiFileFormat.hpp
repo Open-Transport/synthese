@@ -24,6 +24,7 @@
 #define SYNTHESE_ObitiFileFormat_H__
 
 #include "FileFormatTemplate.h"
+#include "PTDataCleanerFileFormat.hpp"
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
@@ -38,6 +39,7 @@
 #include "Path.h"
 #include "SchedulesBasedService.h"
 
+#include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
@@ -67,8 +69,7 @@ namespace synthese
 		class ServiceCalendarLink;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// GTFS file format.
-		/// See http://code.google.com/intl/fr/transit/spec/transit_feed_specification.html
+		/// Obiti file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35File refFile
 		class ObitiFileFormat:
@@ -78,34 +79,35 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<ObitiFileFormat>
+				public impex::MultipleFileTypesImporter<ObitiFileFormat>,
+				public PTDataCleanerFileFormat
 			{
 			public:
 				static const std::string FILE_ARRET;
 				static const std::string FILE_ITINERAIRES;
 				static const std::string FILE_LIGNE;
-				static const std::string FILE_HORAIRE;
+				static const std::string PATH_HORAIRES;
 
-				static const std::string PARAMETER_LINE_OBITI_ID;
-				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_ROLLING_STOCK_ID;
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
-				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
-				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
+
+				static const std::string PARAMETER_PERIOD_CALENDAR_FIELD;
+				static const std::string PARAMETER_DAYS_CALENDAR_FIELD;
+				static const std::string PARAMETER_NUMBER_OF_OTHER_PARAMETERS;
+				static const std::string PARAMETER_BACKWARD_IN_SAME_FILE;
 
 			private:
 				static const std::string SEP;
 
-				boost::shared_ptr<const TransportNetwork> _network;
 				boost::shared_ptr<RollingStock> _rollingStock;
-				std::string _lineObitiID;
+				std::string _periodCalendarField;
+				std::string _daysCalendarField;
+				int _numberOfOtherParameters;
+				bool _backwardInSameFile;
 
-				bool _importStopArea;
 				bool _interactive;
-				bool _displayLinkedStops;
-				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
 				typedef std::map<std::string, std::size_t> FieldsMap;
@@ -129,7 +131,8 @@ namespace synthese
 				void _loadFieldsMap(const std::string& line) const;
 				std::string _getValue(const std::string& field) const;
 				void _loadLine(const std::string& line) const;
-				void _firstLine(std::ifstream& inFile, std::string& line) const;
+				void _firstLine(std::ifstream& inFile, std::string& line, std::streampos pos) const;
+				bool _moveToField(std::ifstream& inFile, const std::string& field) const;
 
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
