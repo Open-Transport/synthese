@@ -56,6 +56,7 @@ namespace synthese
 			static const std::string PARAMETER_VEHICLE_SERVICE_DATASOURCE_ID;
 			static const std::string PARAMETER_VEHICLE_SERVICE_ID;
 			static const std::string PARAMETER_VEHICLE_SERVICE_SERVICE_RANK;
+			static const std::string PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK;
 			static const std::string PARAMETER_LATE_DURATION_SECONDS;
 			
 			static const std::string PARAMETER_LINE_STOP_RANK;

@@ -25,6 +25,10 @@ DepotTableSync.cpp
 DepotTableSync.hpp
 DepotUpdateAction.cpp
 DepotUpdateAction.hpp
+DriverService.cpp
+DriverService.hpp
+DriverServiceTableSync.cpp
+DriverServiceTableSync.hpp
 GetCompositionsService.cpp
 GetCompositionsService.hpp
 GetVehiclesService.cpp

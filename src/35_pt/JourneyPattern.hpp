@@ -185,7 +185,17 @@ namespace synthese
 
 				const pt::StopPoint* getDestination () const;
 				const pt::StopPoint* getOrigin () const;
-				const LineStop* getLineStop(std::size_t rank) const;
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Line stop getter.
+				/// @param rank rank of the line stop in the journey pattern
+				/// @param ignoreUnscheduledStops ignore the stops without schedules
+				/// @return the line stop
+				const LineStop* getLineStop(
+					std::size_t rank,
+					bool ignoreUnscheduledStops = false
+				) const;
 
 				std::size_t getScheduledStopsNumber() const;
 

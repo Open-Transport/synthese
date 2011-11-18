@@ -31,6 +31,7 @@
 #include "LineStop.h"
 #include "DataSourceTableSync.h"
 #include "VehicleService.hpp"
+#include "DriverService.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,6 +57,7 @@ namespace synthese
 		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_DATASOURCE_ID = Action_PARAMETER_PREFIX + "sv_ds_id";
 		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_ID = Action_PARAMETER_PREFIX + "sv_id";
 		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_SERVICE_RANK = Action_PARAMETER_PREFIX + "sv_s_rk";
+		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK = Action_PARAMETER_PREFIX + "sv_sd_rk";
 		const string RealTimeVehicleUpdateAction::PARAMETER_LATE_DURATION_SECONDS = Action_PARAMETER_PREFIX + "la";
 		
 		const string RealTimeVehicleUpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
@@ -132,24 +134,53 @@ namespace synthese
 					shared_ptr<VehicleService> vehicleService(
 						Env::GetOfficialEnv().getEditableSPtr(obj)
 					);
-					size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_RANK));
 
-					size_t curRank(0);
-					BOOST_FOREACH(SchedulesBasedService* service, vehicleService->getServices())
+					// Service by rank in vehicle service
+					if(map.isDefined(PARAMETER_VEHICLE_SERVICE_SERVICE_RANK))
 					{
-						if(service->isActive(now.date()))
+						size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_RANK));
+
+						size_t curRank(0);
+						BOOST_FOREACH(SchedulesBasedService* service, vehicleService->getServices())
 						{
-							if(curRank == rank)
+							if(service->isActive(now.date()))
 							{
-								_service = dynamic_cast<ScheduledService*>(service);
-								break;
+								if(curRank == rank)
+								{
+									_service = dynamic_cast<ScheduledService*>(service);
+									break;
+								}
+								++curRank;
 							}
-							++curRank;
 						}
-					}
-					if(!_service)
+						if(!_service)
+						{
+							throw ActionException("No such service");
+						}
+					} // Service by rank in driver services sequence
+					else if(map.isDefined(PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK))
 					{
-						throw ActionException("No such service");
+						size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK));
+
+						size_t curRank(0);
+						BOOST_FOREACH(const DriverService* driverService, vehicleService->getDriverServices())
+						{
+							BOOST_FOREACH(const DriverService::Element& service, driverService->getServices())
+							{
+								if(service.service->isActive(now.date()))
+								{
+									if(curRank == rank)
+									{
+										_service = dynamic_cast<ScheduledService*>(service.service);
+										break;
+									}
+									++curRank;
+								}
+						}	}
+						if(!_service)
+						{
+							throw ActionException("No such service");
+						}
 					}
 				}
 				catch(ObjectNotFoundException<DataSource>&)
