@@ -31,6 +31,8 @@
 #include "GraphTypes.h"
 #include "DepotTableSync.hpp"
 #include "ImportableTableSync.hpp"
+#include "DriverService.hpp"
+#include "ScheduledService.h"
 
 #include <iostream>
 #include <map>
@@ -66,6 +68,7 @@ namespace synthese
 	{
 		class Depot;
 		class DeadRun;
+		class VehicleService;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Heures file format.
@@ -110,7 +113,29 @@ namespace synthese
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 
 				mutable impex::ImportableTableSync::ObjectBySource<DepotTableSync> _depots;
-				
+
+				struct Troncon
+				{
+					DriverService::Services services;
+					VehicleService* vehicleService;
+					Troncon(VehicleService* vs):
+					vehicleService(vs) {}
+				};
+
+				struct ScheduleMapElement
+				{
+					pt::ScheduledService::Schedules departure;
+					pt::ScheduledService::Schedules arrival;
+					std::vector<VehicleService*> vehicleServices;
+					typedef std::vector<
+						std::pair<
+							boost::shared_ptr<Troncon>,
+							std::size_t
+						>
+					> DriverServices;
+					DriverServices driverServices;
+				};
+
 				typedef std::map<std::pair<int, std::string>, pt::JourneyPattern*> RoutesMap;
 				mutable RoutesMap _routes;
 
@@ -130,6 +155,12 @@ namespace synthese
 					DeadRunRoute
 				> DeadRunRoutes;
 				mutable DeadRunRoutes _deadRunRoutes;
+
+				typedef std::map<
+					std::string,
+					boost::shared_ptr<Troncon>
+				> Troncons;
+				mutable Troncons _troncons;
 
 			protected:
 

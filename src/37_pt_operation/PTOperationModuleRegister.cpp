@@ -4,6 +4,7 @@
 
 #include "CompositionTableSync.hpp"
 #include "DepotTableSync.hpp"
+#include "DriverServiceTableSync.hpp"
 #include "VehicleTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
@@ -31,6 +32,7 @@
 #include "Depot.hpp"
 #include "DeadRun.hpp"
 #include "DeadRunEdge.hpp"
+#include "DriverService.hpp"
 #include "Vehicle.hpp"
 #include "VehiclePosition.hpp"
 #include "VehicleService.hpp"
@@ -44,10 +46,11 @@ void synthese::pt_operation::moduleRegister()
 	
 	// 37 PT Operation
 	synthese::pt_operation::CompositionTableSync::integrate();
+	synthese::pt_operation::DeadRunTableSync::integrate();
+	synthese::pt_operation::DepotTableSync::integrate();
+	synthese::pt_operation::DriverServiceTableSync::integrate();
 	synthese::pt_operation::ServiceCompositionInheritedTableSync::integrate();
 	synthese::pt_operation::VehicleServiceCompositionInheritedTableSync::integrate();
-	synthese::pt_operation::DepotTableSync::integrate();
-	synthese::pt_operation::DeadRunTableSync::integrate();
 	synthese::pt_operation::VehicleTableSync::integrate();
 	synthese::pt_operation::VehiclePositionTableSync::integrate();
 	synthese::pt_operation::VehicleServiceTableSync::integrate();
@@ -78,6 +81,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::Depot>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
+	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
 	synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehiclePosition>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehicleService>();
