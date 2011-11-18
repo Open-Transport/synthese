@@ -288,10 +288,12 @@ class MySQLBackend(DBBackend):
         if sys.platform != 'win32':
             return
 
-        # Keep this in sync with tools/synthesepy/build.py
         utils.append_paths_to_environment('PATH', [
             os.path.join(
-                self.env.c.thirdparty_dir, 'mysql-5.5.14-win32', 'bin')])
+                self.env.c.thirdparty_dir,
+                'mysql-{mysql_ver}-win32'.format(
+                    mysql_ver=synthesepy.build.MYSQL_VER),
+                'bin')])
 
     def _mysql_command(self, command, extra_opts='', input=''):
         self._setup_path()

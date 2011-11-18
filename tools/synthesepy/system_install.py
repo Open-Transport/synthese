@@ -78,6 +78,7 @@ def install_dependencies(env):
 
     # supervisor doesn't seem to be started automatically.
     log.info('Starting supervisor')
+    # TODO: hide error message.
     try:
         subprocess.check_call(
             '/etc/init.d/supervisor start', shell=True)
