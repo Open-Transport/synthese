@@ -33,7 +33,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		DriverService::DriverService(util::RegistryKeyType id):
-			ImportableTemplate<DriverService>(),
+			impex::ImportableTemplate<DriverService>(),
 			util::Registrable(id)
 		{
 		}
