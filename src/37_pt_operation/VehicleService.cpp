@@ -22,6 +22,9 @@
 
 #include "VehicleService.hpp"
 #include "SchedulesBasedService.h"
+#include "DriverService.hpp"
+
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -82,5 +85,52 @@ namespace synthese
 		void VehicleService::clear()
 		{
 			_services.clear();
+		}
+
+
+
+		void VehicleService::addDriverService( const DriverService& value )
+		{
+			_driverServices.insert(&value);
+		}
+
+
+
+		void VehicleService::removeDriverService( const DriverService& value )
+		{
+			_driverServices.erase(&value);
+		}
+
+
+
+		bool VehicleService::DriverServiceCompare::operator()( const DriverService* ds1, const DriverService* ds2 ) const
+		{
+			if(ds1 == ds2)
+			{
+				return false;
+			}
+			if(ds1 == NULL || ds1->getServices().empty())
+			{
+				return false;
+			}
+			if(ds2 == NULL || ds2->getServices().empty())
+			{
+				return true;
+			}
+			const SchedulesBasedService& s1(*ds1->getServices().begin()->service);
+			const SchedulesBasedService& s2(*ds2->getServices().begin()->service);
+
+			const time_duration& t1(s1.getDepartureSchedule(false, 0));
+			const time_duration& t2(s2.getDepartureSchedule(false, 0));
+
+			if(t1 != t2)
+			{
+				return t1 < t2;
+			}
+
+			const time_duration& at1(s1.getLastArrivalSchedule(false));
+			const time_duration& at2(s2.getLastArrivalSchedule(false));
+
+			return at1 < at2;
 		}
 }	}

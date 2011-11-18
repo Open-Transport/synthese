@@ -59,6 +59,7 @@
 #include "DeadRunTableSync.hpp"
 #include "VehicleService.hpp"
 #include "VehicleServiceTableSync.hpp"
+#include "DriverServiceTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -151,6 +152,10 @@ namespace synthese
 			BOOST_FOREACH(Registry<VehicleService>::value_type vehicleService, _env.getRegistry<VehicleService>())
 			{
 				VehicleServiceTableSync::Save(vehicleService.second.get(), transaction);
+			}
+			BOOST_FOREACH(Registry<DriverService>::value_type driverService, _env.getRegistry<DriverService>())
+			{
+				DriverServiceTableSync::Save(driverService.second.get(), transaction);
 			}
 			return transaction;
 		}
@@ -401,10 +406,7 @@ namespace synthese
 				string line;
 				typedef map<
 					pair<JourneyPattern*, string>, // string is service number
-					pair<
-						pair<ScheduledService::Schedules, ScheduledService::Schedules>, // departure / arrival schedules
-						vector<VehicleService*> // technical line, elementary service number
-					>
+					ScheduleMapElement
 				> SchedulesMap;
 				SchedulesMap services;
 
@@ -459,6 +461,8 @@ namespace synthese
 						*loadedVehicleServices.begin()
 					);
 
+					Troncons::mapped_type troncon(new Troncon(vehicleService));
+
 					// Line number
 					int lineNumber(lexical_cast<int>(trim_copy(line.substr(0,3))));
 					pair<int, int> lineKey(
@@ -471,6 +475,7 @@ namespace synthese
 					for(size_t i(29); i+1<line.size(); ++i)
 					{
 						string routeNumber(trim_copy(line.substr(i,2)));
+						DriverService::Element tronconElement;
 
 						// Dead run
 						DeadRunRoutes::iterator it(_deadRunRoutes.find(make_pair(lineNumber, routeNumber)));
@@ -560,6 +565,11 @@ namespace synthese
 							vehicleService->insert(*deadRun);
 							_services[line.substr(0,6)].push_back(deadRun);
 
+							tronconElement.service = deadRun;
+							tronconElement.startRank = 0;
+							tronconElement.endRank = 1;
+							troncon->services.push_back(tronconElement);
+
 							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 						}
 						else // ScheduledService
@@ -593,44 +603,80 @@ namespace synthese
 								size_t schedulesNumber(route->getScheduledStopsNumber());
 								for(size_t s(0); s<schedulesNumber; ++s)
 								{
-									itS->second.first.first.push_back(time_duration(not_a_date_time));
-									itS->second.first.second.push_back(time_duration(not_a_date_time));
+									itS->second.departure.push_back(time_duration(not_a_date_time));
+									itS->second.arrival.push_back(time_duration(not_a_date_time));
 								}
 
 								// Register the vehicle service
-								itS->second.second.push_back(vehicleService);
+								itS->second.vehicleServices.push_back(vehicleService);
 							}
+
+							tronconElement.service = NULL;
+							tronconElement.startRank = 0;
 
 							// Read the available schedules
 							size_t rank(0);
+							bool alreadyNonNull(false);
+							bool alreadyNull(false);
 							for(i+=11; i<line.size() && line[i]!=';'; i+=8, ++rank)
 							{
 								string arrivalSchedule(line.substr(i, 4));
 								string departureSchedule(line.substr(i+4, 4));
 
+								if(rank >= itS->second.departure.size())
+								{
+									logStream << "WARN : inconsistent stops number in troncons file " << serviceNumber << "/" << lineNumber << "/" << routeNumber << "<br />";
+									continue;
+								}
+
 								if(departureSchedule != "9999")
 								{
-									itS->second.first.first[rank] = time_duration(
+									itS->second.departure[rank] = time_duration(
 										lexical_cast<int>(departureSchedule.substr(0,2)),
 										lexical_cast<int>(departureSchedule.substr(2,2)),
 										0
 									);
+
+									if(!alreadyNonNull)
+									{
+										alreadyNonNull = true;
+										tronconElement.startRank = route->getLineStop(rank, true)->getRankInPath();
+									}
+								}
+								else
+								{
+									if(!alreadyNull && alreadyNonNull)
+									{
+										alreadyNull = true;
+										tronconElement.endRank = route->getLineStop(rank - 1, true)->getRankInPath();
+									}
 								}
 								if(arrivalSchedule != "9999")
 								{
-									itS->second.first.second[rank] = time_duration(
+									itS->second.arrival[rank] = time_duration(
 										lexical_cast<int>(arrivalSchedule.substr(0,2)),
 										lexical_cast<int>(arrivalSchedule.substr(2,2)),
 										0
 									);
 								}
 							}
+							if(!alreadyNull)
+							{
+								tronconElement.endRank = route->getLineStop(rank - 1, true)->getRankInPath();
+							}
+							troncon->services.push_back(tronconElement);
+							itS->second.driverServices.push_back(
+								make_pair(
+									troncon,
+									troncon->services.size() - 1
+							)	);
 						}
 					}
+					_troncons.insert(make_pair(line.substr(0,6), troncon));
 				}
 
 				// Storage of the ScheduledServices
-				BOOST_FOREACH(const SchedulesMap::value_type& it, services)
+				BOOST_FOREACH(SchedulesMap::value_type& it, services)
 				{
 					JourneyPattern* route(it.first.first);
 					ScheduledService* curService(NULL);
@@ -641,7 +687,7 @@ namespace synthese
 							continue;
 						}
 						if(	service->getServiceNumber() == it.first.second &&
-							static_cast<ScheduledService*>(service)->comparePlannedSchedules(it.second.first.first, it.second.first.second)
+							static_cast<ScheduledService*>(service)->comparePlannedSchedules(it.second.departure, it.second.arrival)
 						){
 							curService = static_cast<ScheduledService*>(service);
 							break;
@@ -654,12 +700,16 @@ namespace synthese
 						continue;
 					}
 
-					BOOST_FOREACH(const SchedulesMap::mapped_type::second_type::value_type& vs, it.second.second)
+					BOOST_FOREACH(VehicleService* vs, it.second.vehicleServices)
 					{
 						vs->insert(*curService);
 					}
-				}
 
+					BOOST_FOREACH(const ScheduleMapElement::DriverServices::value_type& es, it.second.driverServices)
+					{
+						es.first->services[es.second].service = static_cast<SchedulesBasedService*>(curService);
+					}
+				}
 			} // 3 : Services
 			else if (key == FILE_SERVICES)
 			{
@@ -667,6 +717,16 @@ namespace synthese
 				{
 					logStream << "ERR  : Start date or end date not defined<br />";
 					return false;
+				}
+
+				// Cleaning all vehicle services
+				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& dsset, driverServices.getMap())
+				{
+					BOOST_FOREACH(DriverService* ds, dsset.second)
+					{
+						ds->clear();
+					}
 				}
 
 				string line;
@@ -678,6 +738,9 @@ namespace synthese
 
 				while(getline(inFile, line))
 				{
+					// Driver service
+					string driverServiceCode(trim_copy(line.substr(0,6)));
+
 					// Read of calendar
 					vector<bool> days(7, false);
 					for(size_t i(0); i<7; ++i)
@@ -694,6 +757,36 @@ namespace synthese
 						}
 					}
 
+					// Driver service
+					set<DriverService*> loadedDriverServices(driverServices.get(driverServiceCode));
+					if(!loadedDriverServices.empty())
+					{
+						logStream << "LOAD : link between driver services " << driverServiceCode << " and ";
+						BOOST_FOREACH(DriverService* ds, loadedDriverServices)
+						{
+							logStream << ds->getKey();
+						}
+						logStream << "<br />";
+					}
+					else
+					{
+						shared_ptr<DriverService> ds(new DriverService(DriverServiceTableSync::getId()));
+
+						Importable::DataSourceLinks links;
+						links.insert(make_pair(&_dataSource, driverServiceCode));
+						ds->setDataSourceLinks(links);
+						_env.getEditableRegistry<DriverService>().add(ds);
+						driverServices.add(*ds);
+						loadedDriverServices.insert(ds.get());
+
+						logStream << "CREA : Creation of the driver service with key " << driverServiceCode << "<br />";
+					}
+					DriverService* driverService(
+						*loadedDriverServices.begin()
+					);
+					*driverService |= cal;
+					DriverService::Services services;
+
 					// Services list
 					for(size_t i(13); i+6<line.size(); i+=29)
 					{
@@ -705,7 +798,17 @@ namespace synthese
 						{
 							*deadRun |= cal;
 						}
+
+						// Driver services
+						BOOST_FOREACH(DriverService::Services::value_type& service, _troncons[line.substr(i,6)]->services)
+						{
+							services.push_back(service);
+						}
+						
+						driverService->setVehicleService(_troncons[line.substr(i,6)]->vehicleService);
 					}
+
+					driverService->setServices(services);
 				}
 			}
 			inFile.close();

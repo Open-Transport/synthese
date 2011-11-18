@@ -40,6 +40,8 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		class DriverService;
+
 		/** Vehicle service class.
 			@ingroup m37
 		*/
@@ -49,11 +51,19 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
+			class DriverServiceCompare
+			{
+			public:
+				bool operator()(const DriverService* ds1, const DriverService* ds2) const;
+			};
+
 			typedef util::Registry<VehicleService> Registry;
 			typedef std::vector<pt::SchedulesBasedService*> Services;
+			typedef std::set<const DriverService*, DriverServiceCompare> DriverServices;
 
 		private:
 			Services _services;
+			DriverServices _driverServices;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
@@ -61,21 +71,28 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setServices(const Services& value){ _services = value; }
+				void setDriverServices(const DriverServices& value){ _driverServices = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				const Services& getServices() const { return _services; }
+				const DriverServices& getDriverServices() { return _driverServices; }
 			//@}
 
 			//! @name Updaters
 			//@{
+				void addDriverService(const DriverService& value);
+				void removeDriverService(const DriverService& value);
 				void insert(pt::SchedulesBasedService& value);
 				void clear();
 			//@}
 
 			//! @name Services
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Service extractor.
+				/// @param rank the rank of the service in the vehicle service
 				/// @return the nth service of the vehicle service, NULL if non existent
 				pt::SchedulesBasedService* getService(std::size_t rank) const;
 			//@}
