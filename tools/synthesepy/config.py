@@ -58,6 +58,7 @@ DEFAULTS = {
     'netstat_cmd': None,
     'restart_if_crashed': False,
     'no_root_check': False,
+    'extra_params': None,
 
     'wsgi_proxy': True,
     'wsgi_proxy_port': None,
