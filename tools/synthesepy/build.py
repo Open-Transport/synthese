@@ -42,6 +42,7 @@ REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']
 
+MYSQL_VER = '5.5.17'
 
 class Builder(object):
     def __init__(self, env):
@@ -323,7 +324,8 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        url = 'http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/mysql-5.5.17-win32.zip'
+        url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
+            'mysql-{mysql_ver}-win32.zip'.format(mysql_ver=MYSQL_VER))
         self._download(url, 'a4599dbfcf5d8a7d958461e4bb62d7a4')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
