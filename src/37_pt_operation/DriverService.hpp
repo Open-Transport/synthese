@@ -25,6 +25,7 @@
 
 #include "Importable.h"
 #include "Calendar.h"
+#include "Named.h"
 
 namespace synthese
 {
@@ -41,41 +42,54 @@ namespace synthese
 			@ingroup m37
 		*/
 		class DriverService:
+			public util::Named,
 			public impex::ImportableTemplate<DriverService>,
 			public calendar::Calendar,
 			public virtual util::Registrable
 		{
 		public:
-			struct Element
+			struct Chunk
 			{
-				pt::SchedulesBasedService* service;
-				std::size_t startRank;
-				std::size_t endRank;
+				struct Element
+				{
+					pt::SchedulesBasedService* service;
+					std::size_t startRank;
+					std::size_t endRank;
+
+					Element():
+					service(NULL),
+						startRank(0),
+						endRank(0)
+					{}
+				};
+
+				VehicleService* vehicleService;
+				std::vector<Element> elements;
+
+				Chunk(VehicleService* _vehicleService = NULL):
+					vehicleService(_vehicleService)
+				{}
 			};
-			typedef std::vector<Element> Services;
+
+			typedef std::vector<Chunk> Chunks;
 			typedef util::Registry<DriverService> Registry;
 
 		private:
-			Services _services;
-			VehicleService* _vehicleService;
+			Chunks _chunks;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);
 
 			//! @name Getters
 			//@{
-				const Services& getServices() const { return _services; }
-				VehicleService* getVehicleService() const { return _vehicleService; }
+				const Chunks& getChunks() const { return _chunks; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setServices(const Services& value){ _services = value; }
-				void setVehicleService(VehicleService* value){ _vehicleService = value; }
+				void setChunks(const Chunks& value){ _chunks = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_operation_DriverService_hpp__
-

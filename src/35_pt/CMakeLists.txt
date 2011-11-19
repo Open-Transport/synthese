@@ -13,8 +13,6 @@ CleanAllStopPointProjectionsAction.cpp
 CleanAllStopPointProjectionsAction.hpp
 CommercialLine.cpp
 CommercialLine.h
-CommercialLineAddAction.cpp
-CommercialLineAddAction.h
 CommercialLineAdmin.cpp
 CommercialLineAdmin.h
 CommercialLineCalendarTemplateUpdateAction.cpp

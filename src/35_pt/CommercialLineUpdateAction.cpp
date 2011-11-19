@@ -129,10 +129,11 @@ namespace synthese
 
 		void CommercialLineUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			// JourneyPattern
-			try
+			// Line
+			RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_LINE_ID, 0));
+			if(id) try
 			{
-				_line = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_LINE_ID), *_env);
+				_line = CommercialLineTableSync::GetEditable(id, *_env);
 			}
 			catch(ObjectNotFoundException<CommercialLine>&)
 			{
@@ -147,6 +148,10 @@ namespace synthese
 			catch(ObjectNotFoundException<TransportNetwork>&)
 			{
 				throw ActionException("No such network");
+			}
+			if(!_line.get() && (!_network || !_network->get()))
+			{
+				throw ActionException("A network must be defined");
 			}
 
 			// Color
@@ -239,6 +244,11 @@ namespace synthese
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
+			if(!_line.get())
+			{
+				_line.reset(new CommercialLine);
+			}
+
 			if(_color)
 			{
 				_line->setColor(*_color);
@@ -289,6 +299,11 @@ namespace synthese
 			}
 
 			CommercialLineTableSync::Save(_line.get());
+
+			if(request.getActionWillCreateObject())
+			{
+				request.setActionCreatedId(_line->getKey());
+			}
 
 			// ::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

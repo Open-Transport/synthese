@@ -165,9 +165,14 @@ namespace synthese
 						size_t curRank(0);
 						BOOST_FOREACH(const DriverService* driverService, vehicleService->getDriverServices())
 						{
-							BOOST_FOREACH(const DriverService::Element& service, driverService->getServices())
+							if(!driverService->isActive(now.date()))
 							{
-								if(service.service->isActive(now.date()))
+								continue;
+							}
+
+							BOOST_FOREACH(const DriverService::Chunk& chunk, driverService->getChunks())
+							{
+								BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
 								{
 									if(curRank == rank)
 									{
@@ -175,8 +180,7 @@ namespace synthese
 										break;
 									}
 									++curRank;
-								}
-						}	}
+						}	}	}
 						if(!_service)
 						{
 							throw ActionException("No such service");

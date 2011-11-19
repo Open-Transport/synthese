@@ -114,14 +114,6 @@ namespace synthese
 
 				mutable impex::ImportableTableSync::ObjectBySource<DepotTableSync> _depots;
 
-				struct Troncon
-				{
-					DriverService::Services services;
-					VehicleService* vehicleService;
-					Troncon(VehicleService* vs):
-					vehicleService(vs) {}
-				};
-
 				struct ScheduleMapElement
 				{
 					pt::ScheduledService::Schedules departure;
@@ -129,8 +121,8 @@ namespace synthese
 					std::vector<VehicleService*> vehicleServices;
 					typedef std::vector<
 						std::pair<
-							boost::shared_ptr<Troncon>,
-							std::size_t
+							boost::shared_ptr<DriverService::Chunk>,
+							std::size_t // Rank in the chunk
 						>
 					> DriverServices;
 					DriverServices driverServices;
@@ -158,7 +150,7 @@ namespace synthese
 
 				typedef std::map<
 					std::string,
-					boost::shared_ptr<Troncon>
+					boost::shared_ptr<DriverService::Chunk>
 				> Troncons;
 				mutable Troncons _troncons;
 

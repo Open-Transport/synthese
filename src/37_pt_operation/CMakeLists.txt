@@ -27,8 +27,14 @@ DepotUpdateAction.cpp
 DepotUpdateAction.hpp
 DriverService.cpp
 DriverService.hpp
+DriverServiceAdmin.cpp
+DriverServiceAdmin.hpp
+DriverServicesAdmin.cpp
+DriverServicesAdmin.hpp
 DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
+DriverServiceUpdateAction.cpp
+DriverServiceUpdateAction.hpp
 GetCompositionsService.cpp
 GetCompositionsService.hpp
 GetVehiclesService.cpp
@@ -68,6 +74,8 @@ VehicleServiceComposition.cpp
 VehicleServiceComposition.hpp
 VehicleServiceTableSync.cpp
 VehicleServiceTableSync.hpp
+VehicleServiceUpdateAction.cpp
+VehicleServiceUpdateAction.hpp
 VehicleServicesAdmin.cpp
 VehicleServicesAdmin.hpp
 VehicleTableSync.cpp

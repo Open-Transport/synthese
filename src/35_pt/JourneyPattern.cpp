@@ -330,13 +330,15 @@ namespace synthese
 				size_t edgeRank(0);
 				BOOST_FOREACH(const Edge* edge, _edges)
 				{
-					if(!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) || static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput())
-					{
+					if(	edge->getRankInPath() > 0 &&
+						(	!dynamic_cast<const DesignatedLinePhysicalStop*>(edge) ||
+							static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()
+					)	){
 						++edgeRank;
 					}
 					if(rank == edgeRank)
 					{
-						static_cast<const LineStop*>(edge);
+						return static_cast<const LineStop*>(edge);
 					}
 				}
 			}
