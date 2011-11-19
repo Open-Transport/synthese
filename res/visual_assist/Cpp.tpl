@@ -462,7 +462,7 @@ a:File header::
 	@file $FILE_BASE$.$FILE_EXT$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -878,7 +878,7 @@ a:Interface Page Header::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -962,7 +962,7 @@ a:Interface Page Implementation::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1035,7 +1035,7 @@ a:Interface Library Element Header::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1121,7 +1121,7 @@ a:Interface Library Element Implementation::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1189,7 +1189,7 @@ a:Right Header::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1264,7 +1264,7 @@ a:Right Implementation::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1340,7 +1340,7 @@ a:Exception Implementation:EXC:
 	@file $FILE_BASE$.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1382,7 +1382,7 @@ a:Exception Header:EXH:
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -1443,7 +1443,7 @@ a:Admin Page header::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -1634,7 +1634,7 @@ a:Admin Page Implementation::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -1823,7 +1823,7 @@ a:Action Header::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -1922,7 +1922,7 @@ a:Action Implementation::
 /// @date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2039,7 +2039,7 @@ a:10 Table Sync Header::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2122,7 +2122,7 @@ a:10 Table Sync implementation::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2316,7 +2316,7 @@ a:Inherited Table Sync Header::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2393,7 +2393,7 @@ a:Inherited Table Sync Implementation::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2501,7 +2501,7 @@ a:Function Header::
 ///	@date $YEAR$
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -2625,7 +2625,7 @@ a:Function Implementation::
 	@date $YEAR$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -2709,7 +2709,7 @@ a:CPP implementation::
 	@file $FILE_BASE$.$FILE_EXT$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -2743,7 +2743,7 @@ a:GNU GPL Licence for header:GPLH:
 	@file $FILE_BASE$.$FILE_EXT$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -2767,7 +2767,7 @@ a:GNU GPL Licence for implementation:GPLC:
 	@file $FILE_BASE$.$FILE_EXT$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -2844,7 +2844,7 @@ a:Module Class Header::
 	@since $Version$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
@@ -2947,7 +2947,7 @@ a:Module Class Implementation::
 	@since $Version$
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
 	This program is free software; you can redistribute it and/or
 	modify it under the terms of the GNU General Public License
