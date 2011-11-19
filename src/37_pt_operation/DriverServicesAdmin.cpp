@@ -141,7 +141,7 @@ namespace synthese
 			h.push_back(make_pair(string(), string()));
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Lignes"));
-			h.push_back(make_pair(string(), "Code opérateur"));
+			h.push_back(make_pair(string(), "Code opÃ©rateur"));
 			h.push_back(make_pair(string(), string()));
 
 			ActionResultHTMLTable t(
@@ -190,7 +190,7 @@ namespace synthese
 				// Delete link
 				stream << t.col();
 				removeRequest.getAction()->setObjectId(driverService->getKey());
-				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service agent "+ driverService->getName() + " ?");
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer le service agent "+ driverService->getName() + " ?");
 			}
 
 			stream << t.row(string());
