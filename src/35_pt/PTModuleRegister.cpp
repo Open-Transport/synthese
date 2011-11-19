@@ -74,7 +74,6 @@
 #include "RealTimeUpdateScreenServiceInterfacePage.h"
 #include "LineMarkerInterfacePage.h"
 
-#include "CommercialLineAddAction.h"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
 #include "CopyGeometriesAction.hpp"
@@ -225,7 +224,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::LineMarkerInterfacePage::integrate();
 	synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
 
-	synthese::pt::CommercialLineAddAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 	synthese::pt::CommercialLineUpdateAction::integrate();
 	synthese::pt::ContinuousServiceUpdateAction::integrate();

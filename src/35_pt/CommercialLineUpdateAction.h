@@ -126,6 +126,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setLine(boost::shared_ptr<pt::CommercialLine> value) { _line = value; }
+				void setNetwork(boost::optional<boost::shared_ptr<const TransportNetwork> > value){ _network = value; }
 			//@}
 		};
 	}

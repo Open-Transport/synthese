@@ -40,6 +40,11 @@
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"
 #include "ServiceAdmin.h"
+#include "DriverService.hpp"
+#include "DriverServiceAdmin.hpp"
+#include "ImportableAdmin.hpp"
+#include "StaticActionRequest.h"
+#include "VehicleServiceUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,7 +61,8 @@ namespace synthese
 	using namespace graph;
 	using namespace html;
 	using namespace geography;
-	
+	using namespace impex;
+		
 
 
 	namespace util
@@ -73,13 +79,15 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string VehicleServiceAdmin::TAB_ROUTE("route");
+		const string VehicleServiceAdmin::TAB_DRIVER_SERVICES("driver_services");
+
 		const string VehicleServiceAdmin::PARAMETER_DATE("date");
 
 
 
 		VehicleServiceAdmin::VehicleServiceAdmin()
 			: AdminInterfaceElementTemplate<VehicleServiceAdmin>()
-		{ }
+		{}
 
 
 		
@@ -135,7 +143,7 @@ namespace synthese
 
 			////////////////////////////////////////////////////////////////////
 			// ROUTE TAB
-			// if (openTabContent(stream, TAB_ROUTE))
+			if (openTabContent(stream, TAB_ROUTE))
 			{
 				stream << "<h1>Date</h1>";
 
@@ -199,7 +207,7 @@ namespace synthese
 						const Hub* hub(service->getPath()->getEdge(0)->getFromVertex()->getHub());
 						if(lastHub && hub != lastHub)
 						{
-							stream << HTMLModule::getHTMLImage("error.png", "Le lieu de déèart est différent de la précédente arrivée");
+							stream << HTMLModule::getHTMLImage("error.png", "Le lieu de départ est différent de la précédente arrivée");
 						}
 						if(dynamic_cast<const Depot*>(hub))
 						{
@@ -250,8 +258,91 @@ namespace synthese
 			}
 			
 			////////////////////////////////////////////////////////////////////
+			// DRIVER SERVICES TAB
+			if (openTabContent(stream, TAB_DRIVER_SERVICES))
+			{
+				stream << "<h1>Date</h1>";
+
+				AdminFunctionRequest<VehicleServiceAdmin> openRequest(request);
+				SearchFormHTMLTable f(openRequest.getHTMLForm("date"));
+				stream << f.open();
+				stream << f.cell("Date (vide = pas de filtre)", f.getForm().getCalendarInput(PARAMETER_DATE, _date));
+				stream << f.close();
+
+				AdminFunctionRequest<DriverServiceAdmin> openServiceRequest(request);
+
+				stream << "<h1>Services agents</h1>";
+				HTMLTable::ColsVector c;
+				c.push_back("Heure début");
+				c.push_back("Heure fin");
+				c.push_back("Nb");
+				c.push_back(string());
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				BOOST_FOREACH(const VehicleService::DriverServices::value_type& driverService, _vehicleService->getDriverServices())
+				{
+					// Date filter
+					if(!_date.is_not_a_date() && !driverService->isActive(_date))
+					{
+						continue;
+					}
+
+					openServiceRequest.getPage()->setDriverService(
+						Env::GetOfficialEnv().getSPtr(driverService)
+					);
+
+					if(driverService->getChunks().empty())
+					{
+						stream << t.row();
+						stream << t.col(2);
+						stream << "Service agent vide";
+						stream << t.col();
+						stream << "0";
+					}
+					else
+					{
+						BOOST_FOREACH(const DriverService::Chunk& chunk, driverService->getChunks())
+						{
+							if(chunk.vehicleService != _vehicleService.get())
+							{
+								continue;
+							}
+
+							const DriverService::Chunk::Element& firstService(*chunk.elements.begin());
+							const DriverService::Chunk::Element& lastService(*chunk.elements.rbegin());
+
+							stream << t.row();
+							stream << t.col();
+							stream << firstService.service->getDepartureSchedule(false, firstService.startRank);
+
+							stream << t.col();
+							stream << lastService.service->getArrivalSchedule(false, lastService.endRank);
+
+							stream << t.col();
+							stream << chunk.elements.size();
+						}
+					}
+
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(openServiceRequest.getURL(), "Ouvrir", string(), DriverServiceAdmin::ICON);
+				}
+
+				stream << t.close();
+			}
+
+			////////////////////////////////////////////////////////////////////
+			// OPERATOR CODES TAB
+			if (openTabContent(stream, ImportableAdmin::TAB_DATA_SOURCES))
+			{
+				StaticActionRequest<VehicleServiceUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setVehicleService(const_pointer_cast<VehicleService>(_vehicleService));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_vehicleService, updateOnlyRequest);
+			}
+
+			////////////////////////////////////////////////////////////////////
 			/// END TABS
-			// closeTabContent(stream);
+			closeTabContent(stream);
 		}
 
 
@@ -283,6 +374,8 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Itinéraire", TAB_ROUTE, profile.isAuthorized<GlobalRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("Services agents", TAB_DRIVER_SERVICES, profile.isAuthorized<GlobalRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			_tabs.push_back(Tab("Sources de données", ImportableAdmin::TAB_DATA_SOURCES, profile.isAuthorized<GlobalRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}
@@ -299,6 +392,4 @@ namespace synthese
 			links.push_back(p);
 			return links;
 		}
-	}
-}
-
+}	}

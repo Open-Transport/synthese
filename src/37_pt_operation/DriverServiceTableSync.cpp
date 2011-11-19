@@ -56,10 +56,10 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		const string DriverServiceTableSync::COL_NAME = "name";
 		const string DriverServiceTableSync::COL_SERVICES = "services";
 		const string DriverServiceTableSync::COL_DATES = "dates";
 		const string DriverServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-		const string DriverServiceTableSync::COL_VEHICLE_SERVICE_ID = "vehicle_service_id";
 	}
 	
 	namespace db
@@ -73,10 +73,10 @@ namespace synthese
 		template<> const DBTableSync::Field DBTableSyncTemplate<DriverServiceTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
+			DBTableSync::Field(DriverServiceTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(DriverServiceTableSync::COL_SERVICES, SQL_TEXT),
 			DBTableSync::Field(DriverServiceTableSync::COL_DATES, SQL_TEXT),
 			DBTableSync::Field(DriverServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(DriverServiceTableSync::COL_VEHICLE_SERVICE_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
@@ -98,10 +98,25 @@ namespace synthese
 			// Dates
 			object->setFromSerializedString(rows->getText(DriverServiceTableSync::COL_DATES));
 
+			// Name
+			object->setName(rows->getText(DriverServiceTableSync::COL_NAME));
+
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				// Services
-				object->setServices(DriverServiceTableSync::UnserializeServices(rows->getText(DriverServiceTableSync::COL_SERVICES), env, linkLevel));
+				object->setChunks(
+					DriverServiceTableSync::UnserializeServices(
+						rows->getText(DriverServiceTableSync::COL_SERVICES),
+						env,
+						linkLevel
+				)	);
+				BOOST_FOREACH(const DriverService::Chunk& chunk, object->getChunks())
+				{
+					if(chunk.vehicleService)
+					{
+						chunk.vehicleService->addDriverService(*object);
+					}
+				}
 
 				// Data sources and operator codes
 				object->setDataSourceLinks(
@@ -110,25 +125,6 @@ namespace synthese
 						env
 					),	true
 				);
-
-				// Vehicle service
-				RegistryKeyType vehicleServiceId(rows->getLongLong(DriverServiceTableSync::COL_VEHICLE_SERVICE_ID));
-				object->setVehicleService(NULL);
-				if(vehicleServiceId > 0) try
-				{
-					shared_ptr<VehicleService> vehicleService(
-						VehicleServiceTableSync::GetEditable(vehicleServiceId, env, linkLevel)
-					);
-					object->setVehicleService(
-						vehicleService.get()
-					);
-					vehicleService->addDriverService(*object);
-				}
-				catch (ObjectNotFoundException<VehicleService>&)
-				{
-					Log::GetInstance().warn("No such vehicle service "+ lexical_cast<string>(vehicleServiceId) + " in driver service " + lexical_cast<string>(object->getKey()));
-				}
-				
 			}
 		}
 
@@ -143,10 +139,10 @@ namespace synthese
 			object->serialize(datesStr);
 
 			ReplaceQuery<DriverServiceTableSync> query(*object);
-			query.addField(DriverServiceTableSync::SerializeServices(object->getServices()));
+			query.addField(object->getName());
+			query.addField(DriverServiceTableSync::SerializeServices(object->getChunks()));
 			query.addField(datesStr.str());
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
-			query.addField(object->getVehicleService() ? object->getVehicleService()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 
@@ -155,9 +151,12 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<DriverServiceTableSync,DriverService>::Unlink(
 			DriverService* obj
 		){
-			if(obj->getVehicleService())
+			BOOST_FOREACH(const DriverService::Chunk& chunk, obj->getChunks())
 			{
-				obj->getVehicleService()->removeDriverService(*obj);
+				if(chunk.vehicleService)
+				{
+					chunk.vehicleService->removeDriverService(*obj);
+				}
 			}
 		}
 
@@ -202,7 +201,7 @@ namespace synthese
 	{
 		DriverServiceTableSync::SearchResult DriverServiceTableSync::Search(
 			util::Env& env,
-			// boost::optional<util::RegistryKeyType> parameterId /*= boost::optional<util::RegistryKeyType>()*/,
+			boost::optional<std::string> searchName,
 			size_t first /*= 0*/,
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
@@ -210,14 +209,14 @@ namespace synthese
 			util::LinkLevel linkLevel
 		){
 			SelectQuery<DriverServiceTableSync> query;
-			// if(parameterId)
-			// {
-			// 	query.addWhereField(COL_PARENT_ID, *parentFolderId);
-			// }
-			// if(orderByName)
-			// {
-			// 	query.addOrderField(COL_NAME, raisingOrder);
-			// }
+			if(searchName)
+			{
+				query.addWhereField(COL_NAME, *searchName, ComposedExpression::OP_LIKE);
+			}
+			if(orderByName)
+			{
+			 	query.addOrderField(COL_NAME, raisingOrder);
+			}
 			if (number)
 			{
 				query.setNumber(*number + 1);
@@ -232,41 +231,57 @@ namespace synthese
 
 
 
-		std::string DriverServiceTableSync::SerializeServices( const DriverService::Services& services )
+		std::string DriverServiceTableSync::SerializeServices( const DriverService::Chunks& services )
 		{
 			stringstream servicesStr;
 			bool firstService(true);
-			BOOST_FOREACH(const DriverService::Element& service, services)
+			BOOST_FOREACH(const DriverService::Chunk& chunk, services)
 			{
-				if(firstService)
+				bool firstElement(true);
+				BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
 				{
-					firstService = false;
-				}
-				else
-				{
-					servicesStr << ",";
-				}
-				servicesStr <<
-					service.service->getKey() << ":" <<
-					service.startRank << ":" <<
-					service.endRank
-				;
-			}
+					if(firstService)
+					{
+						firstService = false;
+					}
+					else
+					{
+						servicesStr << ",";
+					}
+					servicesStr <<
+						service.service->getKey() << ":" <<
+						service.startRank << ":" <<
+						service.endRank
+					;
+					if(firstElement)
+					{
+						firstElement = false;
+						if(chunk.vehicleService)
+						{
+							servicesStr << ":" << chunk.vehicleService->getKey();
+						}
+					}
+			}	}
 			return servicesStr.str();
 		}
 
 
 
-		DriverService::Services DriverServiceTableSync::UnserializeServices( const std::string& value, util::Env& env, util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */ )
-		{
+		DriverService::Chunks DriverServiceTableSync::UnserializeServices(
+			const std::string& value,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
 			vector<string> servicesStrs;
 			if(!value.empty())
 			{
 				split(servicesStrs, value, is_any_of(","));
 			}
 
-			DriverService::Services services;
+			DriverService::Chunks services;
 
+			VehicleService* currentVehicleService(NULL);
+			DriverService::Chunks::reverse_iterator itServices(services.rend());
 			BOOST_FOREACH(const string& elementStr, servicesStrs)
 			{
 				if(elementStr.empty())
@@ -276,14 +291,25 @@ namespace synthese
 				vector<string> elementStrs;
 				split(elementStrs, elementStr, is_any_of(":"));
 
-				if(elementStrs.size() != 3)
+				if(elementStrs.size() < 3)
 				{
 					continue;
 				}
 
+				if(elementStrs.size() == 4 || itServices == services.rend())
+				{
+					DriverService::Chunk chunk;
+					if(elementStrs.size() == 4)
+					{
+						chunk.vehicleService = VehicleServiceTableSync::GetEditable(lexical_cast<RegistryKeyType>(elementStrs[3]), env, linkLevel).get();
+					}
+					services.push_back(chunk);
+					itServices = services.rbegin();
+				}
+
 				try
 				{
-					DriverService::Element element;
+					DriverService::Chunk::Element element;
 
 					RegistryKeyType id(lexical_cast<RegistryKeyType>(elementStrs[0]));
 					if(decodeTableId(id) == ScheduledServiceTableSync::TABLE.ID)
@@ -296,7 +322,8 @@ namespace synthese
 					}
 					element.startRank = lexical_cast<size_t>(elementStrs[1]);
 					element.endRank = lexical_cast<size_t>(elementStrs[2]);
-					services.push_back(element);
+
+					itServices->elements.push_back(element);
 				}
 				catch(ObjectNotFoundException<ScheduledService>&)
 				{
@@ -306,10 +333,12 @@ namespace synthese
 				{
 					Log::GetInstance().warn("No such dead run "+ elementStrs[0]);
 				}
+				catch (ObjectNotFoundException<VehicleService>&)
+				{
+					Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+				}
 			}
 
 			return services;
 		}
-	}
-}
-
+}	}

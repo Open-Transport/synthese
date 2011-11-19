@@ -37,6 +37,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "ActionResultHTMLTable.h"
 #include "VehicleServiceAdmin.hpp"
+#include "VehicleServiceUpdateAction.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -56,7 +57,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, VehicleServicesAdmin>::FACTORY_KEY("VehicleServicesAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, VehicleServicesAdmin>::FACTORY_KEY("VehicleServices");
 	}
 
 	namespace admin
@@ -119,9 +120,9 @@ namespace synthese
 
 			AdminFunctionRequest<VehicleServicesAdmin> searchRequest(request);
 
-//			AdminActionFunctionRequest<VehicleServiceUpdateAction, VehicleServiceAdmin> createRequest(request);
-//			createRequest.setActionFailedPage<VehiclesAdmin>();
-//			createRequest.setActionWillCreateObject();
+			AdminActionFunctionRequest<VehicleServiceUpdateAction, VehicleServiceAdmin> createRequest(request);
+			createRequest.setActionFailedPage<VehicleServicesAdmin>();
+			createRequest.setActionWillCreateObject();
 
 			AdminActionFunctionRequest<RemoveObjectAction, VehicleServicesAdmin> removeRequest(request);
 
@@ -148,7 +149,7 @@ namespace synthese
 				searchRequest.getHTMLForm(),
 				_requestParameters,
 				vehicleServices,
-				searchRequest.getHTMLForm() // createRequest.getHTMLForm("add")
+				createRequest.getHTMLForm("add")
 			);
 
 			stream << t.open();
@@ -182,11 +183,7 @@ namespace synthese
 				}
 
 				// Operator code
-				stream << t.col();
-				if(!vehicleService->getDataSourceLinks().empty())
-				{
-					stream << vehicleService->getDataSourceLinks().begin()->second;
-				}
+				stream << t.col() << vehicleService->getCodeBySources();
 
 				// Delete link
 				stream << t.col();
@@ -194,13 +191,13 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le service véhicule "+ vehicleService->getName() + " ?");
 			}
 
-//			stream << t.row(string());
-//			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NAME, "", "Entrez le nom du véhicule ici");
-//			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_NUMBER, "", "Entrez le numéro du véhicule ici");
-//			stream << t.col() << t.getActionForm().getTextInput(VehicleUpdateAction::PARAMETER_REGISTRATION_NUMBERS, "", "Entrez l'immatriculation ici");
-//			stream << t.col();
-//			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
-//			stream << t.col();
+			stream << t.row(string());
+			stream << t.col() << t.getActionForm().getTextInput(VehicleServiceUpdateAction::PARAMETER_NAME, "", "Entrez le nom du service véhicule ici");
+			stream << t.col();
+			stream << t.col();
+			stream << t.col();
+			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
+			stream << t.col();
 			stream << t.close();
 		}
 
@@ -222,6 +219,29 @@ namespace synthese
 				links.push_back(getNewCopiedPage());
 			}
 			
+			return links;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks VehicleServicesAdmin::getSubPages(
+			const AdminInterfaceElement& currentPage,
+			const admin::AdminRequest& request
+		) const	{
+			AdminInterfaceElement::PageLinks links;
+
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
+			){
+				BOOST_FOREACH(const VehicleService::Registry::value_type& service, Env::GetOfficialEnv().getRegistry<VehicleService>())
+				{
+					shared_ptr<VehicleServiceAdmin> p(
+						getNewPage<VehicleServiceAdmin>()
+					);
+					p->setVehicleService(service.second);
+					links.push_back(p);
+				}
+			}
 			return links;
 		}
 }	}

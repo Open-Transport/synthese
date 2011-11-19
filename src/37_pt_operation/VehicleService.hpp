@@ -77,7 +77,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const Services& getServices() const { return _services; }
-				const DriverServices& getDriverServices() { return _driverServices; }
+				const DriverServices& getDriverServices() const { return _driverServices; }
 			//@}
 
 			//! @name Updaters

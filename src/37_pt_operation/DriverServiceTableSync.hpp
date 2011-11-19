@@ -44,10 +44,10 @@ namespace synthese
 		public:
 			//! @name Field names
 			//@{
+				static const std::string COL_NAME;
 				static const std::string COL_SERVICES;
 				static const std::string COL_DATES;
 				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_VEHICLE_SERVICE_ID;
 			//@}
 			
 
@@ -68,7 +68,7 @@ namespace synthese
 				/// @since 3.3.0
 				static SearchResult Search(
 					util::Env& env,
-					// boost::optional<util::RegistryKeyType> parameterId = boost::optional<util::RegistryKeyType>(),
+					boost::optional<std::string> searchName = boost::optional<std::string>(),
 					std::size_t first = 0,
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,
@@ -79,12 +79,12 @@ namespace synthese
 
 
 				static std::string SerializeServices(
-					const DriverService::Services& services
+					const DriverService::Chunks& services
 				);
 
 
 
-				static DriverService::Services UnserializeServices(
+				static DriverService::Chunks UnserializeServices(
 					const std::string& value,
 					util::Env& env,
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
@@ -92,7 +92,6 @@ namespace synthese
 				
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DriverServiceTableSync_hpp__
