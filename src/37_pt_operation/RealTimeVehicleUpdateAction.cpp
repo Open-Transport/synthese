@@ -180,7 +180,17 @@ namespace synthese
 										break;
 									}
 									++curRank;
-						}	}	}
+								}
+								if(_service)
+								{
+									break;
+								}
+							}
+							if(_service)
+							{
+								break;
+							}
+						}
 						if(!_service)
 						{
 							throw ActionException("No such service");
