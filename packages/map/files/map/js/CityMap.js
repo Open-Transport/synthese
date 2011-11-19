@@ -59,7 +59,9 @@ var CityMap = OpenLayers.Class(SyntheseMap, {
 
     var linesList = _.values(idToLine);
     linesList = _(linesList).chain().map(function(line) {
-      line.displayName = line.name || line.line_short_name;
+      line.displayName = line.line_short_name;
+      if (line.name)
+        line.displayName += ", " + line.name;
       line.color =  line.line_color && ("rgb" + line.line_color) || "transparent";
       return line;
     }).sortBy(function(line) {
