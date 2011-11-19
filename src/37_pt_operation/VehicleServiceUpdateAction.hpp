@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// CommercialLineAddAction class header.
-///	@file CommercialLineAddAction.h
-///	@author Hugues
-///	@date 2010
+/// VehicleServiceUpdateAction class header.
+///	@file VehicleServiceUpdateAction.hpp
+///	@author Hugues Romain
+///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
@@ -22,29 +22,43 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_CommercialLineAddAction_H__
-#define SYNTHESE_CommercialLineAddAction_H__
+#ifndef SYNTHESE_VehicleServiceUpdateAction_H__
+#define SYNTHESE_VehicleServiceUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Importable.h"
 
 namespace synthese
 {
-	namespace pt
+	namespace pt_operation
 	{
-		class TransportNetwork;
+		class VehicleService;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// CommercialLineAddAction action class.
-		/// @ingroup m35Actions refActions
-		class CommercialLineAddAction:
-			public util::FactorableTemplate<server::Action, CommercialLineAddAction>
+		/// 37.15 Action : VehicleServiceUpdateAction.
+		/// @ingroup m37Actions refActions
+		///	@author Hugues Romain
+		///	@date 2011
+		/// @since 3.3.0
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : VehicleServiceUpdateAction
+		///
+		/// Parameters :
+		///	<dl>
+		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
+		///	</dl>
+		class VehicleServiceUpdateAction:
+			public util::FactorableTemplate<server::Action, VehicleServiceUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_NETWORK_ID;
+			static const std::string PARAMETER_VEHICLE_SERVICE_ID;
+			static const std::string PARAMETER_NAME;
 
 		private:
-			boost::shared_ptr<const TransportNetwork> _network;
+			boost::shared_ptr<VehicleService> _vehicleService;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+			boost::optional<std::string> _name;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -65,7 +79,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-
+			
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -76,9 +90,13 @@ namespace synthese
 
 
 
-			void setNetwork(boost::shared_ptr<const TransportNetwork> value);
+			//! @name Setters
+			//@{
+				void setVehicleService(boost::shared_ptr<VehicleService> value) { _vehicleService = value; }
+			//@}
 		};
 	}
 }
 
-#endif // SYNTHESE_CommercialLineAddAction_H__
+#endif // SYNTHESE_VehicleServiceUpdateAction_H__
+

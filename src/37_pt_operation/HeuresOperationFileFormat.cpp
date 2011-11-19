@@ -461,7 +461,7 @@ namespace synthese
 						*loadedVehicleServices.begin()
 					);
 
-					Troncons::mapped_type troncon(new Troncon(vehicleService));
+					Troncons::mapped_type troncon(new DriverService::Chunk(vehicleService));
 
 					// Line number
 					int lineNumber(lexical_cast<int>(trim_copy(line.substr(0,3))));
@@ -475,7 +475,7 @@ namespace synthese
 					for(size_t i(29); i+1<line.size(); ++i)
 					{
 						string routeNumber(trim_copy(line.substr(i,2)));
-						DriverService::Element tronconElement;
+						DriverService::Chunk::Element tronconElement;
 
 						// Dead run
 						DeadRunRoutes::iterator it(_deadRunRoutes.find(make_pair(lineNumber, routeNumber)));
@@ -568,7 +568,7 @@ namespace synthese
 							tronconElement.service = deadRun;
 							tronconElement.startRank = 0;
 							tronconElement.endRank = 1;
-							troncon->services.push_back(tronconElement);
+							troncon->elements.push_back(tronconElement);
 
 							for(i+=11; i<line.size() && line[i]!=';'; ++i) ;
 						}
@@ -664,11 +664,11 @@ namespace synthese
 							{
 								tronconElement.endRank = route->getLineStop(rank - 1, true)->getRankInPath();
 							}
-							troncon->services.push_back(tronconElement);
+							troncon->elements.push_back(tronconElement);
 							itS->second.driverServices.push_back(
 								make_pair(
 									troncon,
-									troncon->services.size() - 1
+									troncon->elements.size() - 1
 							)	);
 						}
 					}
@@ -707,7 +707,7 @@ namespace synthese
 
 					BOOST_FOREACH(const ScheduleMapElement::DriverServices::value_type& es, it.second.driverServices)
 					{
-						es.first->services[es.second].service = static_cast<SchedulesBasedService*>(curService);
+						es.first->elements[es.second].service = static_cast<SchedulesBasedService*>(curService);
 					}
 				}
 			} // 3 : Services
@@ -785,7 +785,7 @@ namespace synthese
 						*loadedDriverServices.begin()
 					);
 					*driverService |= cal;
-					DriverService::Services services;
+					DriverService::Chunks services;
 
 					// Services list
 					for(size_t i(13); i+6<line.size(); i+=29)
@@ -800,15 +800,10 @@ namespace synthese
 						}
 
 						// Driver services
-						BOOST_FOREACH(DriverService::Services::value_type& service, _troncons[line.substr(i,6)]->services)
-						{
-							services.push_back(service);
-						}
-						
-						driverService->setVehicleService(_troncons[line.substr(i,6)]->vehicleService);
+						services.push_back(*_troncons[line.substr(i,6)]);
 					}
 
-					driverService->setServices(services);
+					driverService->setChunks(services);
 				}
 			}
 			inFile.close();

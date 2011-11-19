@@ -1,5 +1,4 @@
 
-
 //////////////////////////////////////////////////////////////////////////
 /// VehicleServiceAdmin class header.
 ///	@file VehicleServiceAdmin.hpp
@@ -48,6 +47,7 @@ namespace synthese
 			/// @name Parameter identifiers
 			//@{
 				static const std::string TAB_ROUTE;
+				static const std::string TAB_DRIVER_SERVICES;
 
 				static const std::string PARAMETER_DATE;
 			//@}
@@ -152,8 +152,7 @@ namespace synthese
 
 			void setVehicleService(boost::shared_ptr<const VehicleService> value){ _vehicleService = value; }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_VehicleServiceAdmin_H__
 

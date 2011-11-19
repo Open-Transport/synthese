@@ -14,6 +14,8 @@
 #include "GetVehiclesService.hpp"
 
 #include "DepotsAdmin.hpp"
+#include "DriverServiceAdmin.hpp"
+#include "DriverServicesAdmin.hpp"
 #include "VehicleAdmin.hpp"
 #include "VehiclesAdmin.hpp"
 #include "PTOperationStatisticsAdmin.hpp"
@@ -23,10 +25,12 @@
 #include "CompositionUpdateAction.hpp"
 #include "CompositionVehicleAddAction.hpp"
 #include "CompositionVehicleRemoveAction.hpp"
+#include "DepotUpdateAction.hpp"
+#include "DriverServiceUpdateAction.hpp"
+#include "RealTimeVehicleUpdateAction.hpp"
 #include "VehicleUpdateAction.hpp"
 #include "VehiclePositionUpdateAction.hpp"
-#include "DepotUpdateAction.hpp"
-#include "RealTimeVehicleUpdateAction.hpp"
+#include "VehicleServiceUpdateAction.hpp"
 
 #include "Composition.hpp"
 #include "Depot.hpp"
@@ -66,11 +70,15 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::CompositionVehicleRemoveAction::integrate();
 	synthese::pt_operation::CompositionUpdateAction::integrate();
 	synthese::pt_operation::DepotUpdateAction::integrate();
+	synthese::pt_operation::DriverServiceUpdateAction::integrate();
+	synthese::pt_operation::RealTimeVehicleUpdateAction::integrate();
 	synthese::pt_operation::VehicleUpdateAction::integrate();
 	synthese::pt_operation::VehiclePositionUpdateAction::integrate();
-	synthese::pt_operation::RealTimeVehicleUpdateAction::integrate();
+	synthese::pt_operation::VehicleServiceUpdateAction::integrate();
 	
 	synthese::pt_operation::DepotsAdmin::integrate();
+	synthese::pt_operation::DriverServiceAdmin::integrate();
+	synthese::pt_operation::DriverServicesAdmin::integrate();
 	synthese::pt_operation::VehicleAdmin::integrate();
 	synthese::pt_operation::VehiclesAdmin::integrate();
 	synthese::pt_operation::PTOperationStatisticsAdmin::integrate();

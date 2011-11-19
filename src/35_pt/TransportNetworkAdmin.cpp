@@ -38,7 +38,7 @@
 #include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "CommercialLineAddAction.h"
+#include "CommercialLineUpdateAction.h"
 #include "ImportableAdmin.hpp"
 #include "TransportNetworkUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
@@ -163,7 +163,7 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 			}
 
-			AdminActionFunctionRequest<CommercialLineAddAction,CommercialLineAdmin> creationRequest(_request);
+			AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> creationRequest(_request);
 			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setNetwork(_network);
