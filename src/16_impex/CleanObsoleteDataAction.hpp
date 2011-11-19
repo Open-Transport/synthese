@@ -2,11 +2,11 @@
 //////////////////////////////////////////////////////////////////////////
 /// CleanObsoleteDataAction class header.
 ///	@file CleanObsoleteDataAction.hpp
-///	@author RCSobility
+///	@author Hugues Romain
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// 16.15 Action : CleanObsoleteDataAction.
 		/// @ingroup m16Actions refActions
-		///	@author RCSobility
+		///	@author Hugues Romain
 		///	@date 2011
 		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////

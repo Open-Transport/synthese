@@ -2,11 +2,11 @@
 //////////////////////////////////////////////////////////////////////////
 ///	VehiclePositionTableSync class header.
 ///	@file VehiclePositionTableSync.hpp
-///	@author RCSobility
+///	@author Hugues Romain
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		///	VehiclePosition table synchronizer.
 		///	@ingroup m37LS refLS
-		///	@author RCSobility
+		///	@author Hugues Romain
 		///	@date 2011
 		/// @since 3.2.1
 		class VehiclePositionTableSync:
@@ -68,7 +68,7 @@ namespace synthese
 				///	@param raisingOrder The result records must be sorted ascendantly
 				///	@param linkLevel Level of links to build when reading foreign keys
 				///	@return Found objects.
-				///	@author RCSobility
+				///	@author Hugues Romain
 				///	@date 2011
 				/// @since 3.2.1
 				static SearchResult Search(

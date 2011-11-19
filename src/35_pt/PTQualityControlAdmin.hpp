@@ -2,11 +2,11 @@
 //////////////////////////////////////////////////////////////////////////
 /// PTQualityControlAdmin class header.
 ///	@file PTQualityControlAdmin.hpp
-///	@author RCSobility
+///	@author Hugues Romain
 ///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCS <contact@reseaux-conseil.com>
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
 ///	This program is free software; you can redistribute it and/or
 ///	modify it under the terms of the GNU General Public License
@@ -35,7 +35,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		/// PTQualityControlAdmin Admin compound class.
 		///	@ingroup m35Admin refAdmin
-		///	@author RCSobility
+		///	@author Hugues Romain
 		///	@date 2011
 		class PTQualityControlAdmin:
 			public admin::AdminInterfaceElementTemplate<PTQualityControlAdmin>
@@ -65,7 +65,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Builds the tabs of the page.
 			/// @param profile The profile of the current user
-			/// @author RCSobility
+			/// @author Hugues Romain
 			/// @date 2011
 			virtual void _buildTabs(
 				const security::Profile& profile
@@ -74,7 +74,7 @@ namespace synthese
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			PTQualityControlAdmin();
 
@@ -84,7 +84,7 @@ namespace synthese
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
 			///	@throw AdminParametersException if a parameter has incorrect value.
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			void setFromParametersMap(
 				const util::ParametersMap& map
@@ -94,7 +94,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			util::ParametersMap getParametersMap() const;
 
@@ -104,7 +104,7 @@ namespace synthese
 			/// Display of the content of the admin element.
 			///	@param stream Stream to write the page content on.
 			///	@param request The current request
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			void display(
 				std::ostream& stream,
@@ -119,7 +119,7 @@ namespace synthese
 			/// level is READ.
 			///	@param request The current request
 			///	@return bool True if the displayed page can be displayed
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			bool isAuthorized(
 				const security::User& user
@@ -134,7 +134,7 @@ namespace synthese
 			///	@param currentPage Currently displayed page
 			/// @param request Current request
 			///	@return PageLinks each page to put under the module page in the page
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
 				const server::ModuleClass& module,
@@ -147,7 +147,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page
-			///	@author RCSobility
+			///	@author Hugues Romain
 			///	@date 2011
 			virtual std::string getTitle() const;
 		};
