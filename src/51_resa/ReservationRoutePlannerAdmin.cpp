@@ -232,11 +232,11 @@ namespace synthese
 			const admin::AdminRequest& _request
 		) const {
 
-            // ToDo : move to the header of the page
-            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-1.6.2.min.js");
-            stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-ui-1.8.15.custom.min.js");
-            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.autocomplete.css\">";
-            stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.theme.css\">";
+			// TODO: move to the header of the page
+			stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-1.7.min.js");
+			stream << HTMLModule::GetHTMLJavascriptOpen("/core/vendor/jquery-ui-1.8.15.custom.min.js");
+			stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.autocomplete.css\">";
+			stream << "<link rel=\"stylesheet\" href=\"http://jqueryui.com/themes/base/jquery.ui.theme.css\">";
 
 			const Language& language(
 				_request.getUser()->getLanguage() ?
