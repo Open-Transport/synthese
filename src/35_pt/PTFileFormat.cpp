@@ -45,6 +45,7 @@
 #include "City.h"
 #include "StopPointUpdateAction.hpp"
 #include "DestinationTableSync.hpp"
+#include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
 
@@ -587,6 +588,22 @@ namespace synthese
 					result->addEdge(*ls);
 					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
 					++rank;
+				}
+
+				// Geometries
+				for(Path::Edges::iterator itEdge(result->getEdges().begin()); itEdge != result->getEdges().end() && itEdge+1 != result->getEdges().end(); ++itEdge)
+				{
+					Env env2;
+					shared_ptr<DesignatedLinePhysicalStop> templateObject(
+						DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+							static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
+							static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
+							env2
+					)	);
+					if(templateObject.get())
+					{
+						(*itEdge)->setGeometry(templateObject->getGeometry());
+					}
 				}
 			}
 

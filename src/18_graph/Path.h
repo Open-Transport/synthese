@@ -105,6 +105,7 @@ namespace synthese
 			//@{
 				const ServiceSet&	getServices()	const { return _services; }
 				const Edges&		getEdges()		const { return _edges; }
+				Edges&				getEdges()			  { return _edges; }
 				PathClass*			getPathClass()	const { return _pathClass; }
 				PathGroup*			getPathGroup()	const { return _pathGroup; }
 			//@}
