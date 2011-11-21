@@ -178,6 +178,11 @@ namespace synthese
 			}
 			else
 			{
+				if(!pm.hasSubMaps(DATA_MESSAGE))
+				{
+					throw RequestException("Message not found");
+				}
+
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
 				{
 					stream << pmMessage->get<string>(Alarm::DATA_CONTENT);
