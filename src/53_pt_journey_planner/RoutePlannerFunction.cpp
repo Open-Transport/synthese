@@ -1449,7 +1449,7 @@ namespace synthese
 			bool showCoords
 		){
 			shared_ptr<Point> gp;
-			
+
 			showCoords &= (np.getPoint().get() != NULL && !np.getPoint()->isEmpty());
 
 			if(showCoords)
@@ -2278,12 +2278,15 @@ namespace synthese
 				pm.insert(DATA_DEPARTURE_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getOrigin()->getHub()).getFullName());
 			}
 
-			shared_ptr<Point> departurePoint(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*departurePlace.getPoint()
-			)	);
-			pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
-			pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint->getY());
+			if(departurePlace.getPoint())
+			{
+				shared_ptr<Point> departurePoint(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*departurePlace.getPoint()
+				)	);
+				pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
+				pm.insert(DATA_DEPARTURE_PLACE_LATITUDE, departurePoint->getY());
+			}
 
 			// Arrival time
 			{
@@ -2314,13 +2317,15 @@ namespace synthese
 				pm.insert(DATA_ARRIVAL_PLACE_NAME, dynamic_cast<const NamedPlace&>(*journey.getDestination()->getHub()).getFullName());
 			}
 
-			shared_ptr<Point> arrivalPoint(
-				CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
-					*arrivalPlace.getPoint()
-			)	);
-			pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
-			pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getY());
-
+			if(arrivalPlace.getPoint())
+			{
+				shared_ptr<Point> arrivalPoint(
+					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*arrivalPlace.getPoint()
+				)	);
+				pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
+				pm.insert(DATA_ARRIVAL_PLACE_LATITUDE, arrivalPoint->getY());
+			}
 			// Duration
 			if(_textDurationPage.get())
 			{
