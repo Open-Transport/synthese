@@ -287,7 +287,9 @@ namespace synthese
 				{
 					os << ",";
 				}
-				bool is_array(itSubMap.second.size() > 1);
+				// FIXME: see https://extranet.rcsmobility.com/issues/10786
+				//bool is_array(itSubMap.second.size() > 1);
+				bool is_array(true);
 				if(is_array)
 				{
 					os << "\"" << itSubMap.first << "\":[";
