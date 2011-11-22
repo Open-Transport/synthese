@@ -21,58 +21,37 @@
 */
 
 #include "ObitiFileFormat.hpp"
-#include "TransportNetwork.h"
-#include "StopArea.hpp"
+#include "Importer.hpp"
 #include "PTFileFormat.hpp"
+#include "ImpExModule.h"
+#include "IConv.hpp"
+#include "HTMLForm.h"
+#include "PropertiesHTMLTable.h"
+#include "DataSource.h"
+#include "DataSourceAdmin.h"
+#include "AdminFunctionRequest.hpp"
+#include "City.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "RollingStock.hpp"
+#include "ServiceCalendarLink.hpp"
+#include "StopArea.hpp"
+#include "TransportNetwork.h"
+#include "CalendarTemplateTableSync.h"
+#include "CityTableSync.h"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
+#include "PTUseRuleTableSync.h"
+#include "RollingStockTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
-#include "ImpExModule.h"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
+#include "ServiceCalendarLinkTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
-#include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
-#include "RollingStock.hpp"
-#include "RollingStockTableSync.hpp"
-#include "StopArea.hpp"
-#include "DataSource.h"
-#include "CalendarTemplateTableSync.h"
-#include "Importer.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLForm.h"
-#include "DBModule.h"
-#include "ObitiFileFormat.hpp"
-#include "City.h"
-#include "PTFileFormat.hpp"
-#include "CityTableSync.h"
-#include "DestinationTableSync.hpp"
-#include "Junction.hpp"
-#include "JunctionTableSync.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "PTUseRuleTableSync.h"
-#include "IConv.hpp"
-#include "ContinuousService.h"
-#include "Path.h"
-#include "ServiceCalendarLink.hpp"
-#include "ServiceCalendarLinkTableSync.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
 #include <boost/filesystem/operations.hpp>
-
 #include <geos/geom/Geometry.h>
-#include <geos/geom/GeometryCollection.h>
-#include <geos/geom/Coordinate.h>
 
 using namespace std;
 using namespace boost;
@@ -438,7 +417,7 @@ namespace synthese
 								stream << "No such period field " << _periodCalendarField << "<br />";
 								return false;
 							}
-							periodCalendarName = commercialLine->getNetwork()->getName() + " " + _line[numService];
+							periodCalendarName = _line[numService] + " " + commercialLine->getNetwork()->getName();
 
 							// Get Days Calendar name
 							if(!_moveToField(inFile,_daysCalendarField))
@@ -446,7 +425,7 @@ namespace synthese
 								stream << "No such period field " << _daysCalendarField << "<br />";
 								return false;
 							}
-							daysCalendarName = commercialLine->getNetwork()->getName() + " " + _line[numService];
+							daysCalendarName = _line[numService] + " " + commercialLine->getNetwork()->getName();
 
 							// Ignore other parameters
 							for(int i = 0; i < _numberOfOtherParameters; i++)
@@ -819,7 +798,7 @@ namespace synthese
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_daysCalendarField = map.getDefault<string>(PARAMETER_DAYS_CALENDAR_FIELD);
 			_periodCalendarField = map.getDefault<string>(PARAMETER_PERIOD_CALENDAR_FIELD);
-			_numberOfOtherParameters = map.getDefault<int>(PARAMETER_NUMBER_OF_OTHER_PARAMETERS,0);
+			_numberOfOtherParameters = map.getDefault<size_t>(PARAMETER_NUMBER_OF_OTHER_PARAMETERS,0);
 			_backwardInSameFile = map.getDefault<bool>(PARAMETER_BACKWARD_IN_SAME_FILE,0);
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID, 0))
