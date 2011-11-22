@@ -27,6 +27,7 @@
 #include "Importable.h"
 #include "Registrable.h"
 #include "Registry.h"
+#include "DriverService.hpp"
 
 #include <set>
 #include <vector>
@@ -51,19 +52,19 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
-			class DriverServiceCompare
+			class DriverServiceChunkCompare
 			{
 			public:
-				bool operator()(const DriverService* ds1, const DriverService* ds2) const;
+				bool operator()(const DriverService::Chunk* ds1, const DriverService::Chunk* ds2) const;
 			};
 
 			typedef util::Registry<VehicleService> Registry;
 			typedef std::vector<pt::SchedulesBasedService*> Services;
-			typedef std::set<const DriverService*, DriverServiceCompare> DriverServices;
+			typedef std::set<const DriverService::Chunk*, DriverServiceChunkCompare> DriverServiceChunks;
 
 		private:
 			Services _services;
-			DriverServices _driverServices;
+			DriverServiceChunks _driverServiceChunks;
 
 		public:
 			VehicleService(util::RegistryKeyType id=0);
@@ -71,19 +72,19 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setServices(const Services& value){ _services = value; }
-				void setDriverServices(const DriverServices& value){ _driverServices = value; }
+				void setDriverServices(const DriverServiceChunks& value){ _driverServiceChunks = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				const Services& getServices() const { return _services; }
-				const DriverServices& getDriverServices() const { return _driverServices; }
+				const DriverServiceChunks& getDriverServiceChunks() const { return _driverServiceChunks; }
 			//@}
 
 			//! @name Updaters
 			//@{
-				void addDriverService(const DriverService& value);
-				void removeDriverService(const DriverService& value);
+				void addDriverServiceChunk(const DriverService::Chunk& value);
+				void removeDriverServiceChunk(const DriverService::Chunk& value);
 				void insert(pt::SchedulesBasedService& value);
 				void clear();
 			//@}

@@ -280,49 +280,30 @@ namespace synthese
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 
-				BOOST_FOREACH(const VehicleService::DriverServices::value_type& driverService, _vehicleService->getDriverServices())
+				BOOST_FOREACH(const DriverService::Chunk* chunk, _vehicleService->getDriverServiceChunks())
 				{
 					// Date filter
-					if(!_date.is_not_a_date() && !driverService->isActive(_date))
+					if(!_date.is_not_a_date() && !chunk->driverService->isActive(_date))
 					{
 						continue;
 					}
 
 					openServiceRequest.getPage()->setDriverService(
-						Env::GetOfficialEnv().getSPtr(driverService)
+						Env::GetOfficialEnv().getSPtr(chunk->driverService)
 					);
 
-					if(driverService->getChunks().empty())
-					{
-						stream << t.row();
-						stream << t.col(2);
-						stream << "Service agent vide";
-						stream << t.col();
-						stream << "0";
-					}
-					else
-					{
-						BOOST_FOREACH(const DriverService::Chunk& chunk, driverService->getChunks())
-						{
-							if(chunk.vehicleService != _vehicleService.get())
-							{
-								continue;
-							}
+					const DriverService::Chunk::Element& firstService(*chunk->elements.begin());
+					const DriverService::Chunk::Element& lastService(*chunk->elements.rbegin());
 
-							const DriverService::Chunk::Element& firstService(*chunk.elements.begin());
-							const DriverService::Chunk::Element& lastService(*chunk.elements.rbegin());
+					stream << t.row();
+					stream << t.col();
+					stream << firstService.service->getDepartureSchedule(false, firstService.startRank);
 
-							stream << t.row();
-							stream << t.col();
-							stream << firstService.service->getDepartureSchedule(false, firstService.startRank);
+					stream << t.col();
+					stream << lastService.service->getArrivalSchedule(false, lastService.endRank);
 
-							stream << t.col();
-							stream << lastService.service->getArrivalSchedule(false, lastService.endRank);
-
-							stream << t.col();
-							stream << chunk.elements.size();
-						}
-					}
+					stream << t.col();
+					stream << chunk->elements.size();
 
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(openServiceRequest.getURL(), "Ouvrir", string(), DriverServiceAdmin::ICON);
