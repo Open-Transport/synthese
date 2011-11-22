@@ -163,28 +163,21 @@ namespace synthese
 						size_t rank(map.get<size_t>(PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK));
 
 						size_t curRank(0);
-						BOOST_FOREACH(const DriverService* driverService, vehicleService->getDriverServices())
+						BOOST_FOREACH(const DriverService::Chunk* chunk, vehicleService->getDriverServiceChunks())
 						{
-							if(!driverService->isActive(now.date()))
+							if(!chunk->driverService->isActive(now.date()))
 							{
 								continue;
 							}
 
-							BOOST_FOREACH(const DriverService::Chunk& chunk, driverService->getChunks())
+							BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk->elements)
 							{
-								BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
+								if(curRank == rank)
 								{
-									if(curRank == rank)
-									{
-										_service = dynamic_cast<ScheduledService*>(service.service);
-										break;
-									}
-									++curRank;
-								}
-								if(_service)
-								{
+									_service = dynamic_cast<ScheduledService*>(service.service);
 									break;
 								}
+								++curRank;
 							}
 							if(_service)
 							{

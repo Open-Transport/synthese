@@ -114,7 +114,7 @@ namespace synthese
 				{
 					if(chunk.vehicleService)
 					{
-						chunk.vehicleService->addDriverService(*object);
+						chunk.vehicleService->addDriverServiceChunk(chunk);
 					}
 				}
 
@@ -155,7 +155,7 @@ namespace synthese
 			{
 				if(chunk.vehicleService)
 				{
-					chunk.vehicleService->removeDriverService(*obj);
+					chunk.vehicleService->removeDriverServiceChunk(chunk);
 				}
 			}
 		}

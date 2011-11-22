@@ -22,7 +22,6 @@
 
 #include "VehicleService.hpp"
 #include "SchedulesBasedService.h"
-#include "DriverService.hpp"
 
 using namespace boost::posix_time;
 
@@ -89,36 +88,41 @@ namespace synthese
 
 
 
-		void VehicleService::addDriverService( const DriverService& value )
-		{
-			_driverServices.insert(&value);
+		void VehicleService::addDriverServiceChunk(
+			const DriverService::Chunk& value
+		){
+			_driverServiceChunks.insert(&value);
 		}
 
 
 
-		void VehicleService::removeDriverService( const DriverService& value )
-		{
-			_driverServices.erase(&value);
+		void VehicleService::removeDriverServiceChunk(
+			const DriverService::Chunk& value
+		){
+			_driverServiceChunks.erase(&value);
 		}
 
 
 
-		bool VehicleService::DriverServiceCompare::operator()( const DriverService* ds1, const DriverService* ds2 ) const
-		{
+		bool VehicleService::DriverServiceChunkCompare::operator()(
+			const DriverService::Chunk* ds1,
+			const DriverService::Chunk* ds2
+		) const	{
 			if(ds1 == ds2)
 			{
 				return false;
 			}
-			if(ds1 == NULL || ds1->getChunks().empty() || ds1->getChunks().begin()->elements.empty())
+			if(ds1->elements.empty())
 			{
 				return false;
 			}
-			if(ds2 == NULL || ds2->getChunks().empty() || ds2->getChunks().begin()->elements.empty())
+			if(ds2->elements.empty())
 			{
 				return true;
 			}
-			const SchedulesBasedService& s1(*ds1->getChunks().begin()->elements.begin()->service);
-			const SchedulesBasedService& s2(*ds2->getChunks().begin()->elements.begin()->service);
+
+			const SchedulesBasedService& s1(*ds1->elements.begin()->service);
+			const SchedulesBasedService& s2(*ds2->elements.begin()->service);
 
 			const time_duration& t1(s1.getDepartureSchedule(false, 0));
 			const time_duration& t2(s2.getDepartureSchedule(false, 0));
@@ -131,6 +135,11 @@ namespace synthese
 			const time_duration& at1(s1.getLastArrivalSchedule(false));
 			const time_duration& at2(s2.getLastArrivalSchedule(false));
 
-			return at1 < at2;
+			if(at1 != at2)
+			{
+				return at1 < at2;
+			}
+
+			return ds1 < ds2;
 		}
 }	}
