@@ -180,7 +180,8 @@ namespace synthese
 			{
 				if(!pm.hasSubMaps(DATA_MESSAGE))
 				{
-					throw RequestException("Message not found");
+					// Backward compatibility: return an empty string if no message is found.
+					return;
 				}
 
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
