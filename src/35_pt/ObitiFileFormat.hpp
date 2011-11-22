@@ -25,27 +25,18 @@
 
 #include "FileFormatTemplate.h"
 #include "PTDataCleanerFileFormat.hpp"
-#include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
-#include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "JourneyPatternTableSync.hpp"
-#include "Calendar.h"
-#include "LineStopTableSync.h"
-#include "Path.h"
-#include "SchedulesBasedService.h"
 
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <string>
 #include <vector>
-#include <list>
-#include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
 {
@@ -104,7 +95,7 @@ namespace synthese
 				boost::shared_ptr<RollingStock> _rollingStock;
 				std::string _periodCalendarField;
 				std::string _daysCalendarField;
-				int _numberOfOtherParameters;
+				size_t _numberOfOtherParameters;
 				bool _backwardInSameFile;
 
 				bool _interactive;
