@@ -37,6 +37,15 @@ namespace synthese
 			util::Registrable(id)
 		{
 		}
-	}
-}
 
+
+
+		void DriverService::setChunks(const Chunks& value )
+		{
+			_chunks = value;
+			BOOST_FOREACH(Chunk& chunk, _chunks)
+			{
+				chunk.driverService = this;
+			}
+		}
+}	}

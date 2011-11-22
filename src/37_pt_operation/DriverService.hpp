@@ -57,16 +57,19 @@ namespace synthese
 					std::size_t endRank;
 
 					Element():
-					service(NULL),
+						service(NULL),
 						startRank(0),
 						endRank(0)
 					{}
 				};
 
+				DriverService* driverService;
 				VehicleService* vehicleService;
 				std::vector<Element> elements;
 
-				Chunk(VehicleService* _vehicleService = NULL):
+				Chunk(
+					VehicleService* _vehicleService = NULL
+				):	driverService(NULL),
 					vehicleService(_vehicleService)
 				{}
 			};
@@ -87,7 +90,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setChunks(const Chunks& value){ _chunks = value; }
+				void setChunks(const Chunks& value);
 			//@}
 		};
 }	}
