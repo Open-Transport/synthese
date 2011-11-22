@@ -240,6 +240,10 @@ namespace synthese
 
 						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
 
+						//Ignore if destination is the _stopArea himself
+						if(destination->getKey() == _stopArea->getKey())
+							continue;
+
 						StopAreaMapType::iterator it = stopAreaMap.find(destination->getKey());
 						if(it == stopAreaMap.end()) // test if destination stop already in the map
 						{
