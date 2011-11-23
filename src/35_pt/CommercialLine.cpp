@@ -62,7 +62,7 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_CREATOR_ID("creatorId");
 		const string CommercialLine::DATA_LINE_MAP_URL("line_map_url");
 		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
-		const string CommercialLine::DATA_LINE_TIMETABLE_ID("timetable_id");
+		const string CommercialLine::DATA_LINE_TIMETABLE_ID("line_timetable_id");
 
 
 
