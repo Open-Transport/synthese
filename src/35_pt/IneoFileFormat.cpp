@@ -111,6 +111,8 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::VALUE_NLGIV = "NLGIV";
 		const std::string IneoFileFormat::Importer_::VALUE_MNLC = "MNLC";
 		const std::string IneoFileFormat::Importer_::PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE = "add_wayback_to_journeypattern_code";
+		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_ID_FIELD = "stop_area_id_field";
+		const std::string IneoFileFormat::Importer_::VALUE_MNCP = "MNCP";
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_ID_FIELD = "stop_id_field";
 		const std::string IneoFileFormat::Importer_::VALUE_MNLP = "MNLP";
 		const std::string IneoFileFormat::Importer_::VALUE_IDENTSMS = "IdentSMS";
@@ -209,7 +211,7 @@ namespace synthese
 						}
 
 						// Code field
-						string stopAreaCode(_getValue("MNCP"));
+						string stopAreaCode(_getValue(_stopAreaIdField));
 
 						// Name field
 						string name(_getValue(_stopNameField));
@@ -314,7 +316,7 @@ namespace synthese
 					}
 
 					// Stop area
-					string stopAreaCode(_getValue("MNCP"));
+					string stopAreaCode(_getValue(_stopAreaIdField));
 					set<StopArea*> stopAreasSet(stopAreas.get(stopAreaCode));
 					if(stopAreasSet.empty())
 					{
@@ -919,6 +921,9 @@ namespace synthese
 
 			// Line short name field
 			_lineShortNameField = map.getDefault<string>(PARAMETER_LINE_SHORT_NAME_FIELD, VALUE_NLGIV);
+
+			// Stop area id field
+			_stopAreaIdField = map.getDefault<string>(PARAMETER_STOP_AREA_ID_FIELD, VALUE_MNCP);
 
 			// Stop id field
 			_stopIdField = map.getDefault<string>(PARAMETER_STOP_ID_FIELD, VALUE_MNLP);
