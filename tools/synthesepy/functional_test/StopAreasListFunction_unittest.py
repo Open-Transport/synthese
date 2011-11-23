@@ -72,7 +72,7 @@ class StopAreasListFunctionTest(http_testcase.HTTPTestCase):
                     line_id="11821949021891598" line_image=""
                     line_long_name="" line_map_url="" line_short_name="98"
                     line_style="vertclair" longName="" name="" shortName="98"
-                    style="vertclair" timetable_id="0"/>
+                    style="vertclair" line_timetable_id="0"/>
                 </stopArea>
             <stopArea cityId="1688849860511154" cityName="City54"
                 city_id="1688849860511154" city_name="City54" directionAlias=""
