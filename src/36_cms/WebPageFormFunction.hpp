@@ -60,6 +60,7 @@ namespace synthese
 				std::string _script;
 				bool _idem;
 				bool _useSmartURL;
+				util::ParametersMap _parameters;
 			//@}
 
 

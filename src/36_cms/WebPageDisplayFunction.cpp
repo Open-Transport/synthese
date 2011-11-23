@@ -221,14 +221,4 @@ namespace synthese
 			_useTemplate(true),
 			_dontRedirectIfSmartURL(false)
 		{}
-
-
-
-		void WebPageDisplayFunction::addParameters( const util::ParametersMap& value )
-		{
-			BOOST_FOREACH(const ParametersMap::Map::value_type& param, value.getMap())
-			{
-				_templateParameters.insert(param.first, param.second);
-			}
-		}
 }	}
