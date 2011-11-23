@@ -81,6 +81,13 @@ namespace synthese
 					throw RequestException("No such page");
 				}
 			}
+
+			// Additional parameters
+			_parameters = map;
+			_parameters.remove(PARAMETER_NAME);
+			_parameters.remove(PARAMETER_SCRIPT);
+			_parameters.remove(PARAMETER_IDEM);
+			_parameters.remove(PARAMETER_PAGE_ID);
 		}
 
 
@@ -107,7 +114,6 @@ namespace synthese
 				try
 				{
 					StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-					openRequest.getFunction()->setTemplateParameters(_templateParameters);
 					openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
 					openRequest.getFunction()->setPage(_page);
 					if(!_page->getRoot()->getClientURL().empty())
@@ -116,6 +122,10 @@ namespace synthese
 					}
 
 					HTMLForm form(openRequest.getHTMLForm(_name));
+					BOOST_FOREACH(const ParametersMap::Map::value_type& parameter, _parameters.getMap())
+					{
+						form.addHiddenField(parameter.first, parameter.second);
+					}
 					stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
 					stream << form.getHiddenFields();
 				}

@@ -59,6 +59,7 @@ namespace synthese
 				std::string _text;
 				bool _useSmartURL;
 				std::string _confirm;
+				util::ParametersMap _parameters;
 			//@}
 
 

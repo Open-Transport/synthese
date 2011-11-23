@@ -29,6 +29,7 @@
 #include "Webpage.h"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
+#include "URI.hpp"
 
 using namespace std;
 using namespace boost;
@@ -79,6 +80,13 @@ namespace synthese
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 
 			_confirm = map.getDefault<string>(PARAMETER_CONFIRM);
+
+			// Additional parameters
+			_parameters = map;
+			_parameters.remove(PARAMETER_TEXT);
+			_parameters.remove(PARAMETER_TARGET);
+			_parameters.remove(PARAMETER_USE_SMART_URL);
+			_parameters.remove(PARAMETER_CONFIRM);
 		}
 
 
@@ -105,12 +113,16 @@ namespace synthese
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 				openRequest.getFunction()->setPage(_target);
 				openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
-				openRequest.getFunction()->addParameters(getTemplateParameters());
 				if(!_target->getRoot()->getClientURL().empty())
 				{
 					openRequest.setClientURL(_target->getRoot()->getClientURL());
 				}
 				url = openRequest.getURL();
+
+				// Parameters
+				stringstream uri;
+				_parameters.outputURI(uri);
+				url += URI::PARAMETER_SEPARATOR + uri.str();
 			}
 			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
 		}
