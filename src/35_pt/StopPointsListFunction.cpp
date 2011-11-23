@@ -28,6 +28,7 @@
 #include "StopPointsListFunction.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "RollingStock.hpp"
 #include "Edge.h"
 #include "LineStop.h"
 #include "SchedulesBasedService.h"
@@ -296,9 +297,34 @@ namespace synthese
 
 							BOOST_FOREACH(const CommercialLineMap::value_type& line, destination.second.second)
 							{
+								// Rolling stock
+								set<RollingStock *> rollingStocks;
+								BOOST_FOREACH(Path* path, line.second->getPaths())
+								{
+									if(!dynamic_cast<const JourneyPattern*>(path))
+										continue;
+
+									if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+										continue;
+
+									rollingStocks.insert(
+										static_cast<const JourneyPattern*>(path)->getRollingStock()
+									);
+								}
+
 								stream << "<line shortName=\""<< line.second->getShortName() <<
-									"\" style=\""<< line.second->getStyle() <<
-									"\" />";
+									"\" style=\""<< line.second->getStyle()<<
+									"\" >";
+
+								BOOST_FOREACH(RollingStock * rs, rollingStocks)
+								{
+									stream << "<transportMode article=\""<< rs->getArticle() <<
+										"\" id=\""<< rs->getKey()<<
+										"\" name=\""<< rs->getName()<<
+										"\" />";
+								}
+
+								stream << "</line>";
 							}
 
 							stream << "</destination>";
