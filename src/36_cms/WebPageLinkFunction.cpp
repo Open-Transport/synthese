@@ -107,7 +107,7 @@ namespace synthese
 				url = _target->getSmartURLPath();
 
 				// Parameters
-				if(!_parameters.empty())
+				if(!_parameters.getMap().empty())
 				{
 					stringstream uri;
 					_parameters.outputURI(uri);
@@ -126,7 +126,7 @@ namespace synthese
 				url = openRequest.getURL();
 
 				// Parameters
-				if(!_parameters.empty())
+				if(!_parameters.getMap().empty())
 				{
 					stringstream uri;
 					_parameters.outputURI(uri);
