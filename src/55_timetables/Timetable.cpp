@@ -86,11 +86,11 @@ namespace synthese
 				g->setWaybackFilter(_wayBackFilter);
 				if(_transferTimetableBefore)
 				{
-					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env));
+					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env, mask));
 				}
 				if(_transferTimetableAfter)
 				{
-					g->setAfterTransferTimetable(_transferTimetableAfter->getGenerator(env));
+					g->setAfterTransferTimetable(_transferTimetableAfter->getGenerator(env, mask));
 				}
 			}
 			return g;
