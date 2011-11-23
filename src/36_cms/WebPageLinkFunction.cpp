@@ -106,7 +106,13 @@ namespace synthese
 			){	// URL is smart URL
 				url = _target->getSmartURLPath();
 
-				// TODO : add parameter
+				// Parameters
+				if(!_parameters.empty())
+				{
+					stringstream uri;
+					_parameters.outputURI(uri);
+					url += Request::PARAMETER_STARTER + uri.str();
+				}
 			}
 			else
 			{	// Classic URL
@@ -120,9 +126,12 @@ namespace synthese
 				url = openRequest.getURL();
 
 				// Parameters
-				stringstream uri;
-				_parameters.outputURI(uri);
-				url += URI::PARAMETER_SEPARATOR + uri.str();
+				if(!_parameters.empty())
+				{
+					stringstream uri;
+					_parameters.outputURI(uri);
+					url += URI::PARAMETER_SEPARATOR + uri.str();
+				}
 			}
 			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
 		}
