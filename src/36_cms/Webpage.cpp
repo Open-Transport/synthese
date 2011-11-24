@@ -43,8 +43,18 @@ namespace synthese
 
 	namespace cms
 	{
+		const string Webpage::DATA_PAGE_ = "page_";
+		const string Webpage::DATA_TITLE("title");
+		const string Webpage::DATA_ABSTRACT("abstract");
+		const string Webpage::DATA_IMAGE("image");
+		const string Webpage::DATA_PUBLICATION_DATE("date");
+		const string Webpage::DATA_FORUM("forum");
+		const string Webpage::DATA_DEPTH("depth");
+
 		const string Webpage::PARAMETER_VAR = "VAR";
 		synthese::util::shared_recursive_mutex Webpage::_SharedMutex;
+
+
 
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
@@ -55,8 +65,7 @@ namespace synthese
 			_hasForum(false),
 			_ignoreWhiteChars(false),
 			_rawEditor(false)
-		{
-		}
+		{}
 
 
 
@@ -445,6 +454,28 @@ namespace synthese
 				stream.put(*it);
 			}
 			return it == end ? end : newEnd + termination.size();
+		}
+
+
+
+		void Webpage::toParametersMap(
+			util::ParametersMap& pm,
+			std::string prefix /*= std::string() */
+		) const {
+			pm.insert(prefix + DATA_TITLE, getName());
+
+			pm.insert(prefix + DATA_ABSTRACT, getAbstract());
+			pm.insert(prefix + DATA_IMAGE, getImage());
+
+			pm.insert(
+				prefix + DATA_PUBLICATION_DATE,
+				getStartDate().is_not_a_date_time() ? string() : lexical_cast<string>(getStartDate())
+			);
+
+			pm.insert(prefix + Request::PARAMETER_OBJECT_ID, getKey());
+			pm.insert(prefix + DATA_FORUM, getHasForum());
+
+			pm.insert(prefix + DATA_DEPTH, getDepth());
 		}
 
 

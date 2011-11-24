@@ -113,6 +113,14 @@ namespace synthese
 			public util::Named
 		{
 		private:
+			static const std::string DATA_PAGE_;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_ABSTRACT;
+			static const std::string DATA_IMAGE;
+			static const std::string DATA_PUBLICATION_DATE;
+			static const std::string DATA_FORUM;
+			static const std::string DATA_DEPTH;
+
 
 			// Precompiled webpage
 
@@ -403,6 +411,20 @@ namespace synthese
 				/// @date 2010
 				/// @since 3.2.0
 				std::string getFullName() const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// CMS exporter.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = DATA_PAGE_
+				) const;
 			//@}
 		};
 	}
