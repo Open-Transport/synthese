@@ -90,11 +90,14 @@ namespace synthese
 		const std::string ShapeFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 
 		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME1("stop_name1");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME2("stop_name2");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_DIRECTION("stop_direction");
 		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_OPERATOR_CODE("stop_operator_code");
 		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_NAME("city_name");
 		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_CODE("city_code");
-
+		const std::string ShapeFileFormat::Importer_::PARAMETER_USE_DIRECTION("use_direction");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_DIRECTION("value_forward_direction");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_BACKWARD_DIRECTION("value_backward_direction");
+		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION("value_forward_backward_direction");
 		const std::string ShapeFileFormat::Importer_::_FIELD_GEOMETRY("Geometry");
 	}
 
@@ -177,20 +180,44 @@ namespace synthese
 
 				if(_stopName1)
 				{
-					stopAreaName = rows->getText(*_stopName1);
+					stopAreaName = trim_copy(rows->getText(*_stopName1));
 					stopPointName = rows->getText(*_stopName1);
 				}
-				if(_stopName2)
-					stopPointName += " " + rows->getText(*_stopName2);
+				if(_stopDirection && !_useDirection)
+				{
+					stopPointName += " " + trim_copy(rows->getText(*_stopDirection));
+				}
 
-				if(_stopOperatorCode)
-					stopOperatorCode = rows->getText(*_stopOperatorCode);
+
+				if(_stopOperatorCode && !_useDirection)
+					stopOperatorCode = trim_copy(rows->getText(*_stopOperatorCode));
+				else if(_useDirection && _stopDirection)
+				{
+					stopOperatorCode = trim_copy(rows->getText(*_stopName1));
+					if(!_valueForwardDirection || !_valueBackwardDirection)
+					{
+						stream << "ERR : value Forward or Backward direction is not defined.<br />";
+						return false;
+					}
+
+					if(trim_copy(rows->getText(*_stopDirection)) == *_valueForwardDirection)
+					{
+						stopOperatorCode += " A";
+						stopPointName += " A";
+					}
+
+					else if (trim_copy(rows->getText(*_stopDirection)) == *_valueBackwardDirection)
+					{
+						stopOperatorCode += " R";
+						stopPointName += " R";
+					}
+				}
 
 				if(_cityCode)
-					cityCode = rows->getText(*_cityCode);
+					cityCode = trim_copy(rows->getText(*_cityCode));
 
 				if(_cityName)
-					cityName = rows->getText(*_cityName);
+					cityName = trim_copy(rows->getText(*_cityName));
 
 				if(_cityCode || _cityName)
 				{
@@ -349,10 +376,15 @@ namespace synthese
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.title("Attributs du fichier arrêts");
 			stream << t.cell("Nom principal de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME1, _stopName1 ? *_stopName1 : string()));
-			stream << t.cell("Nom complémentaire de l'arrêt physique", t.getForm().getTextInput(PARAMETER_FIELD_STOP_NAME2,  _stopName2 ? *_stopName2 : string()));
+			stream << t.cell("Sens de l'arrêt physique", t.getForm().getTextInput(PARAMETER_FIELD_STOP_DIRECTION,  _stopDirection ? *_stopDirection : string()));
 			stream << t.cell("Code Opérateur de l'arrêt", t.getForm().getTextInput(PARAMETER_FIELD_STOP_OPERATOR_CODE,  _stopOperatorCode ? *_stopOperatorCode : string()));
 			stream << t.cell("Nom de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_NAME, _cityName ? *_cityName : string()));
 			stream << t.cell("Code de la commune", t.getForm().getTextInput(PARAMETER_FIELD_CITY_CODE, _cityCode ? *_cityCode : string()));
+			stream << t.title("Génération code opérateur personnalisé");
+			stream << t.cell("Utiliser le sens", t.getForm().getOuiNonRadioInput(PARAMETER_USE_DIRECTION, _useDirection));
+			stream << t.cell("Code aller", t.getForm().getTextInput(PARAMETER_VALUE_FORWARD_DIRECTION, _valueForwardDirection ? *_valueForwardDirection : string()));
+			stream << t.cell("Code retour", t.getForm().getTextInput(PARAMETER_VALUE_BACKWARD_DIRECTION, _valueBackwardDirection ? *_valueBackwardDirection : string()));
+			stream << t.cell("Code aller/retour", t.getForm().getTextInput(PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION, _valueForwardBackwardDirection ? *_valueForwardBackwardDirection : string()));
 			stream << t.close();
 		}
 
@@ -384,6 +416,7 @@ namespace synthese
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
+			map.insert(PARAMETER_USE_DIRECTION, _useDirection);
 			if(_defaultCity.get())
 			{
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity->getKey());
@@ -396,8 +429,8 @@ namespace synthese
 			if(_stopName1)
 				map.insert(PARAMETER_FIELD_STOP_NAME1,*_stopName1);
 
-			if(_stopName2)
-				map.insert(PARAMETER_FIELD_STOP_NAME2,*_stopName2);
+			if(_stopDirection)
+				map.insert(PARAMETER_FIELD_STOP_DIRECTION,*_stopDirection);
 
 			if(_stopOperatorCode)
 				map.insert(PARAMETER_FIELD_STOP_OPERATOR_CODE,*_stopOperatorCode);
@@ -407,6 +440,15 @@ namespace synthese
 
 			if(_cityCode)
 				map.insert(PARAMETER_FIELD_CITY_CODE,*_cityCode);
+
+			if(_valueForwardDirection)
+				map.insert(PARAMETER_VALUE_FORWARD_DIRECTION,*_valueForwardDirection);
+
+			if(_valueBackwardDirection)
+				map.insert(PARAMETER_VALUE_FORWARD_DIRECTION,*_valueBackwardDirection);
+
+			if(_valueForwardBackwardDirection)
+				map.insert(PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION,*_valueForwardBackwardDirection);
 
 			return map;
 		}
@@ -420,13 +462,18 @@ namespace synthese
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
+			_useDirection = map.getDefault<bool>(PARAMETER_USE_DIRECTION, false);
+
 			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
 				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 
 			_stopName1 = map.getOptional<std::string>(PARAMETER_FIELD_STOP_NAME1);
-			_stopName2 = map.getOptional<std::string>(PARAMETER_FIELD_STOP_NAME2);
+			_stopDirection = map.getOptional<std::string>(PARAMETER_FIELD_STOP_DIRECTION);
 			_stopOperatorCode = map.getOptional<std::string>(PARAMETER_FIELD_STOP_OPERATOR_CODE);
 			_cityCode = map.getOptional<std::string>(PARAMETER_FIELD_CITY_CODE);
 			_cityName = map.getOptional<std::string>(PARAMETER_FIELD_CITY_NAME);
+			_valueForwardDirection = map.getOptional<std::string>(PARAMETER_VALUE_FORWARD_DIRECTION);
+			_valueBackwardDirection = map.getOptional<std::string>(PARAMETER_VALUE_BACKWARD_DIRECTION);
+			_valueForwardBackwardDirection = map.getOptional<std::string>(PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION);
 		}
 }	}
