@@ -92,6 +92,8 @@ namespace synthese
 		const std::string ObitiFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_USE_RULE_BLOCK_ID_MASK("use_rule_block_id_mask");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_STOPS_DATA_SOURCE_ID("stops_data_source_id");
+		const std::string ObitiFileFormat::Importer_::PARAMETER_STOPS_FROM_DATA_SOURCE("stops_from_data_source");
 
 		const std::string ObitiFileFormat::Importer_::PARAMETER_PERIOD_CALENDAR_FIELD("period_calendar_field");
 		const std::string ObitiFileFormat::Importer_::PARAMETER_DAYS_CALENDAR_FIELD("days_calendar_field");
@@ -344,6 +346,9 @@ namespace synthese
 				}
 
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
+				shared_ptr<ImportableTableSync::ObjectBySource<StopPointTableSync> > stopPointsFromOtherImport;
+				if(_stopsFromDataSource && _stopsDataSource)
+					stopPointsFromOtherImport.reset(new ImportableTableSync::ObjectBySource<StopPointTableSync>(*_stopsDataSource, _env));
 
 				int numSens = 1;
 				if(_backwardInSameFile)
@@ -450,12 +455,51 @@ namespace synthese
 								_loadLine(line);
 								if(_line[0] == "")
 									break;
-								string stopPointId(_line[0] + " " + commercialLine->getShortName() + " " + (backward ? "R" : "A"));
+								string stopPointId(to_lower_copy(trim_copy(_line[0])) + " " + commercialLine->getShortName() + " " + (backward ? "R" : "A"));
 								string timeStr(_line[numService]);
 
-								const StopPoint* stopPoint(NULL);
+								JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet stopPoints;
 								if(_stopPoints.contains(stopPointId))
-									stopPoint = *_stopPoints.get(stopPointId).begin();
+									stopPoints = _stopPoints.get(stopPointId);
+								else if(stopPointsFromOtherImport)
+								{
+									// Todo : Add a generic function ?
+									string stopPointName = to_lower_copy(trim_copy(_line[0]));
+									replace_all(stopPointName,"é","e");
+									replace_all(stopPointName,"è","e");
+									replace_all(stopPointName,"ê","e");
+									replace_all(stopPointName,"ë","e");
+									replace_all(stopPointName,"â","a");
+									replace_all(stopPointName,"à","a");
+									replace_all(stopPointName,"ô","o");
+									replace_all(stopPointName,"'"," ");
+									replace_all(stopPointName,"-"," ");
+									replace_all(stopPointName,"*","");
+
+									string stopPointId(stopPointName + " " + (backward ? "R" : "A"));
+									string stopPointId2(stopPointName);
+									string stopPointId3(stopPointName + " " + (backward ? "A" : "R"));
+									if(stopPointsFromOtherImport->contains(stopPointId))
+									{
+										stopPoints = stopPointsFromOtherImport->get(stopPointId);
+										stream << "stop id "<< stopPointId <<" found in the service "<< numService <<"<br />";
+									}
+									else if(stopPointsFromOtherImport->contains(stopPointId2))
+									{
+										stopPoints = stopPointsFromOtherImport->get(stopPointId2);
+										stream << "stop id "<< stopPointId2 <<" found in the service "<< numService <<"<br />";
+									}
+									else if(stopPointsFromOtherImport->contains(stopPointId3))
+									{
+										stopPoints = stopPointsFromOtherImport->get(stopPointId3);
+										stream << "stop id "<< stopPointId3 <<" found in the service "<< numService <<"<br />";
+									}
+									else
+									{
+										stream << "stop id "<< stopPointId <<"/" << stopPointId2 << " not found in the service "<< numService <<"<br />";
+										return false;
+									}
+								}
 								else
 								{
 									stream << "WARN : inconsistent stop id "<< stopPointId <<" in the service "<< numService <<"<br />";
@@ -477,9 +521,8 @@ namespace synthese
 									arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
 									lastTd = td;
 
-									JourneyPattern::StopWithDepartureArrivalAuthorization::StopsSet linkedStops(_stopPoints.get(stopPointId));
 									JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-										linkedStops,
+										stopPoints,
 										optional<double>(),
 										true,
 										true,
@@ -584,7 +627,6 @@ namespace synthese
 											if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
 											{
 												serviceCalendarLink = scl;
-												break;
 											}
 										}
 									}
@@ -595,8 +637,12 @@ namespace synthese
 
 										if(periodCalendar)
 											serviceCalendarLink->setCalendarTemplate2(periodCalendar);
+										else
+											stream << "WARN : Calendar <pre>\"" << periodCalendarName << "\"</pre> not found<br />";
 										if(daysCalendar)
 											serviceCalendarLink->setCalendarTemplate(daysCalendar);
+										else
+											stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
 
 										serviceCalendarLink->setService(service);
 
@@ -628,6 +674,11 @@ namespace synthese
 		) const	{
 			stream << "<h1>Fichiers</h1>";
 
+			std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > choices;
+			choices.push_back(make_pair(RegistryKeyType(0), string("(aucune source sélectionnée)")));
+			BOOST_FOREACH(const Registry<DataSource>::value_type& source, Env::GetOfficialEnv().getRegistry<DataSource>())
+				choices.push_back(make_pair(source.first, source.second->getName()));
+
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
 			t.getForm().addHiddenField(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, string("1"));
@@ -639,6 +690,8 @@ namespace synthese
 			stream << t.cell("Fichier ligne", t.getForm().getTextInput(_getFileParameterName(FILE_LIGNE), _pathsMap[FILE_LIGNE].file_string()));
 			stream << t.cell("Fichier arrêt", t.getForm().getTextInput(_getFileParameterName(FILE_ARRET), _pathsMap[FILE_ARRET].file_string()));
 			stream << t.cell("Fichier itinéraires", t.getForm().getTextInput(_getFileParameterName(FILE_ITINERAIRES), _pathsMap[FILE_ITINERAIRES].file_string()));
+			stream << t.cell("Arrêts provenant d'une autre source de données", t.getForm().getOuiNonRadioInput(PARAMETER_STOPS_FROM_DATA_SOURCE, false));
+			stream << t.cell("Source de l'import des arrêts",t.getForm().getSelectInput(PARAMETER_STOPS_DATA_SOURCE_ID, choices, optional<RegistryKeyType>(RegistryKeyType(0))));
 			stream << t.title("Import horaires");
 			stream << t.cell("Repertoire horaires", t.getForm().getTextInput(_getFileParameterName(PATH_HORAIRES), _pathsMap[PATH_HORAIRES].file_string()));
 			stream << t.title("Paramètres");
@@ -781,11 +834,16 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_ID, _rollingStock->getKey());
 			}
+			if(_stopsDataSource.get())
+			{
+				map.insert(PARAMETER_STOPS_DATA_SOURCE_ID, _stopsDataSource->getKey());
+			}
 			map.insert(PARAMETER_DAYS_CALENDAR_FIELD, _daysCalendarField);
 			map.insert(PARAMETER_PERIOD_CALENDAR_FIELD, _periodCalendarField);
 			map.insert(PARAMETER_NUMBER_OF_OTHER_PARAMETERS, _numberOfOtherParameters);
 			map.insert(PARAMETER_BACKWARD_IN_SAME_FILE, _backwardInSameFile);
 			map.insert(PARAMETER_USE_RULE_BLOCK_ID_MASK, _serializePTUseRuleBlockMasks(_ptUseRuleBlockMasks));
+			map.insert(PARAMETER_STOPS_FROM_DATA_SOURCE, _stopsFromDataSource);
 			return map;
 		}
 
@@ -800,6 +858,13 @@ namespace synthese
 			_periodCalendarField = map.getDefault<string>(PARAMETER_PERIOD_CALENDAR_FIELD);
 			_numberOfOtherParameters = map.getDefault<size_t>(PARAMETER_NUMBER_OF_OTHER_PARAMETERS,0);
 			_backwardInSameFile = map.getDefault<bool>(PARAMETER_BACKWARD_IN_SAME_FILE,0);
+			_stopsFromDataSource = map.getDefault<bool>(PARAMETER_STOPS_FROM_DATA_SOURCE,0);
+
+			if(_stopsFromDataSource)
+				if(map.getDefault<RegistryKeyType>(PARAMETER_STOPS_DATA_SOURCE_ID, 0))
+				{
+					_stopsDataSource = DataSourceTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_STOPS_DATA_SOURCE_ID), _env);
+				}
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID, 0))
 			{
