@@ -1,6 +1,6 @@
 
-/** ShapeFileFormat class header.
-	@file ShapeFileFormat.hpp
+/** StopsShapeFileFormat class header.
+	@file StopsShapeFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_ShapeFileFormat_H__
-#define SYNTHESE_ShapeFileFormat_H__
+#ifndef SYNTHESE_StopsShapeFileFormat_H__
+#define SYNTHESE_StopsShapeFileFormat_H__
 
 #include "FileFormatTemplate.h"
 #include "MultipleFileTypesImporter.hpp"
@@ -56,14 +56,14 @@ namespace synthese
 		/// Shapefile file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35File refFile
-		class ShapeFileFormat:
-			public impex::FileFormatTemplate<ShapeFileFormat>
+		class StopsShapeFileFormat:
+			public impex::FileFormatTemplate<StopsShapeFileFormat>
 		{
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<ShapeFileFormat>,
+				public impex::MultipleFileTypesImporter<StopsShapeFileFormat>,
 				public PTDataCleanerFileFormat
 			{
 			public:
@@ -156,7 +156,7 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<ShapeFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<StopsShapeFileFormat> Exporter_;
 		};
 	}
 }

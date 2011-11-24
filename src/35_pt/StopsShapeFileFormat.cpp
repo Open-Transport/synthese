@@ -1,6 +1,6 @@
 
-/** ShapeFileFormat class implementation.
-	@file ShapeFileFormat.cpp
+/** StopsShapeFileFormat class implementation.
+	@file StopsShapeFileFormat.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ShapeFileFormat.hpp"
+#include "StopsShapeFileFormat.hpp"
 #include "StopArea.hpp"
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
@@ -45,7 +45,6 @@
 #include "HTMLModule.h"
 #include "HTMLForm.h"
 #include "DBModule.h"
-#include "ShapeFileFormat.hpp"
 #include "City.h"
 #include "PTFileFormat.hpp"
 #include "CityTableSync.h"
@@ -78,40 +77,40 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,ShapeFileFormat>::FACTORY_KEY("Shapefile");
+		template<> const string FactorableTemplate<FileFormat,StopsShapeFileFormat>::FACTORY_KEY("StopsShapefile");
 	}
 
 	namespace pt
 	{
-		const std::string ShapeFileFormat::Importer_::FILE_SHAPE("shape");
+		const std::string StopsShapeFileFormat::Importer_::FILE_SHAPE("shape");
 
-		const std::string ShapeFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME1("stop_name1");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_DIRECTION("stop_direction");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_OPERATOR_CODE("stop_operator_code");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_NAME("city_name");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_CODE("city_code");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_USE_DIRECTION("use_direction");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_DIRECTION("value_forward_direction");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_BACKWARD_DIRECTION("value_backward_direction");
-		const std::string ShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION("value_forward_backward_direction");
-		const std::string ShapeFileFormat::Importer_::_FIELD_GEOMETRY("Geometry");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_NAME1("stop_name1");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_DIRECTION("stop_direction");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_FIELD_STOP_OPERATOR_CODE("stop_operator_code");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_NAME("city_name");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_FIELD_CITY_CODE("city_code");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_USE_DIRECTION("use_direction");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_DIRECTION("value_forward_direction");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_BACKWARD_DIRECTION("value_backward_direction");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION("value_forward_backward_direction");
+		const std::string StopsShapeFileFormat::Importer_::_FIELD_GEOMETRY("Geometry");
 	}
 
 	namespace impex
 	{
-		template<> const MultipleFileTypesImporter<ShapeFileFormat>::Files MultipleFileTypesImporter<ShapeFileFormat>::FILES(
-			ShapeFileFormat::Importer_::FILE_SHAPE.c_str(),
+		template<> const MultipleFileTypesImporter<StopsShapeFileFormat>::Files MultipleFileTypesImporter<StopsShapeFileFormat>::FILES(
+			StopsShapeFileFormat::Importer_::FILE_SHAPE.c_str(),
 		"");
 	}
 
 
 	namespace pt
 	{
-		bool ShapeFileFormat::Importer_::_checkPathsMap() const
+		bool StopsShapeFileFormat::Importer_::_checkPathsMap() const
 		{
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_SHAPE));
 			if(it == _pathsMap.end() || it->second.empty()) return false;
@@ -120,10 +119,10 @@ namespace synthese
 
 
 
-		ShapeFileFormat::Importer_::Importer_(
+		StopsShapeFileFormat::Importer_::Importer_(
 			util::Env& env,
 			const impex::DataSource& dataSource
-		):	MultipleFileTypesImporter<ShapeFileFormat>(env, dataSource),
+		):	MultipleFileTypesImporter<StopsShapeFileFormat>(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
 			Importer(env, dataSource),
 			_displayLinkedStops(false),
@@ -132,7 +131,7 @@ namespace synthese
 
 
 
-		bool ShapeFileFormat::Importer_::_parse(
+		bool StopsShapeFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
 			const std::string& key,
@@ -354,7 +353,7 @@ namespace synthese
 
 
 
-		void ShapeFileFormat::Importer_::displayAdmin(
+		void StopsShapeFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
 			const admin::AdminRequest& request
 		) const	{
@@ -390,7 +389,7 @@ namespace synthese
 
 
 
-		db::DBTransaction ShapeFileFormat::Importer_::_save() const
+		db::DBTransaction StopsShapeFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
 
@@ -412,7 +411,7 @@ namespace synthese
 
 
 
-		util::ParametersMap ShapeFileFormat::Importer_::_getParametersMap() const
+		util::ParametersMap StopsShapeFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
@@ -455,7 +454,7 @@ namespace synthese
 
 
 
-		void ShapeFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
+		void StopsShapeFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 
