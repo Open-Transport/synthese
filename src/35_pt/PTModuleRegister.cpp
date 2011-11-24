@@ -28,7 +28,7 @@
 #include "ObitiFileFormat.hpp"
 #include "PegaseFileFormat.hpp"
 #include "TridentFileFormat.h"
-#include "ShapeFileFormat.hpp"
+#include "StopsShapeFileFormat.hpp"
 
 #include "DestinationTableSync.hpp"
 #include "PTUseRuleTableSync.h"
@@ -186,7 +186,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ObitiFileFormat::integrate();
 	synthese::pt::PegaseFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate();
-	synthese::pt::ShapeFileFormat::integrate();
+	synthese::pt::StopsShapeFileFormat::integrate();
 
 	synthese::pt::DestinationAdmin::integrate();
 	synthese::pt::DestinationsAdmin::integrate();
