@@ -1,36 +1,38 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 /// StopPointsListFunction class header.
-///	@file StopPointsListFunction.hpp
-///	@author Hugues Romain
-///	@date 2010
+/// @file StopPointsListFunction.hpp
+/// @author Hugues Romain
+/// @date 2010
 ///
-///	This file belongs to the SYNTHESE project (public transportation specialized software)
-///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+/// This file belongs to the SYNTHESE project (public transportation specialized software)
+/// Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 ///
-///	This program is free software; you can redistribute it and/or
-///	modify it under the terms of the GNU General Public License
-///	as published by the Free Software Foundation; either version 2
-///	of the License, or (at your option) any later version.
+/// This program is free software; you can redistribute it and/or
+/// modify it under the terms of the GNU General Public License
+/// as published by the Free Software Foundation; either version 2
+/// of the License, or (at your option) any later version.
 ///
-///	This program is distributed in the hope that it will be useful,
-///	but WITHOUT ANY WARRANTY; without even the implied warranty of
-///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-///	GNU General Public License for more details.
+/// This program is distributed in the hope that it will be useful,
+/// but WITHOUT ANY WARRANTY; without even the implied warranty of
+/// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/// GNU General Public License for more details.
 ///
-///	You should have received a copy of the GNU General Public License
-///	along with this program; if not, write to the Free Software
-///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+/// You should have received a copy of the GNU General Public License
+/// along with this program; if not, write to the Free Software
+/// Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #ifndef SYNTHESE_PTPhysicalStopsListFunction_H__
 #define SYNTHESE_PTPhysicalStopsListFunction_H__
 
+#include "UtilTypes.h"
 #include "FactorableTemplate.h"
 #include "Function.h"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <geos/geom/Envelope.h>
+#include <map>
 
 namespace synthese
 {
@@ -45,14 +47,15 @@ namespace synthese
 	{
 		class StopArea;
 		class StopPoint;
+		class CommercialLine;
 
 		//////////////////////////////////////////////////////////////////////////
-		///	35.15 Function : Physical Stops Search.
+		/// 35.15 Function : Physical Stops Search.
 		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list
 		//////////////////////////////////////////////////////////////////////////
-		///	@ingroup m35Functions refFunctions
-		///	@author Hugues Romain, Xavier Raffin
-		///	@date 2010
+		/// @ingroup m35Functions refFunctions
+		/// @author Hugues Romain, Xavier Raffin
+		/// @date 2010
 		/// @since 3.1.18
 		class StopPointsListFunction:
 			public util::FactorableTemplate<server::Function,StopPointsListFunction>
@@ -67,13 +70,13 @@ namespace synthese
 		protected:
 				static const std::string DATA_NAME;
 				static const std::string DATA_STOPAREA_NAME;
-                                static const std::string DATA_STOPAREA_CITY_NAME;
+				static const std::string DATA_STOPAREA_CITY_NAME;
 			//! \name Page parameters
 			//@{
-				boost::optional<boost::posix_time::ptime>	_date;
-				boost::shared_ptr<const pt::StopArea>		_stopArea;
-				boost::optional<util::RegistryKeyType>		_commercialLineID;
-				boost::shared_ptr<const cms::Webpage>				_page;
+				boost::optional<boost::posix_time::ptime> _date;
+				boost::optional<boost::shared_ptr<const pt::StopArea> > _stopArea;
+				boost::optional<util::RegistryKeyType> _commercialLineID;
+				boost::shared_ptr<const cms::Webpage> _page;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
 			//@}
@@ -83,7 +86,7 @@ namespace synthese
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list#Request
 			//////////////////////////////////////////////////////////////////////////
-			///	@return Generated parameters map
+			/// @return Generated parameters map
 			/// @author Xavier Raffin
 			/// @date 2010
 			util::ParametersMap _getParametersMap() const;
@@ -94,7 +97,7 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list#Request
 			//////////////////////////////////////////////////////////////////////////
-			///	@param map Parameters map to interpret
+			/// @param map Parameters map to interpret
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual void _setFromParametersMap(
@@ -115,7 +118,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
+			// void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -148,6 +151,25 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2010
 			virtual std::string getOutputMimeType() const;
+
+		private:
+			//////////////////////////////////////////////////////////////////////////
+			/// StopPoints are stored in a map as key
+			/// Value is another map containing StopArea Destination deserved from this StopPoint
+			/// For each destination, there is a map containing all lines
+			/// (several lines could reach the same destination from the same stopPoint)
+			typedef std::map<util::RegistryKeyType, const CommercialLine *> CommercialLineMapType;
+			typedef std::map<util::RegistryKeyType, std::pair<const StopArea *, CommercialLineMapType > > StopAreaDestinationMapType;
+			typedef std::map<const StopPoint *, StopAreaDestinationMapType > StopPointMapType;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Add the StopPoint to the stopPoint map
+			/// @author Xavier Raffin
+			/// @date 2011
+			void addStop(StopPointMapType & stopPointMap,
+			const StopPoint & sp,
+			boost::posix_time::ptime & startDateTime,
+			boost::posix_time::ptime & endDateTime)const;
 		};
 	}
 }
