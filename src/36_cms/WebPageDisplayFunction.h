@@ -44,6 +44,9 @@ namespace synthese
 		class WebPageDisplayFunction:
 			public util::FactorableTemplate<FunctionWithSite<false>, WebPageDisplayFunction>
 		{
+		private:
+			static const std::string DATA_CONTENT;
+
 		public:
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_USE_TEMPLATE;

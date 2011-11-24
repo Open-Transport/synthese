@@ -30,7 +30,6 @@
 #include "CMSModule.hpp"
 #include "StaticFunctionRequest.h"
 #include "WebPageDisplayFunction.h"
-#include "WebPageInterfacePage.h"
 #include "ServerModule.h"
 #include "HTMLModule.h"
 
@@ -146,7 +145,9 @@ namespace synthese
 
 				if(_displayPage.get())
 				{
-					WebPageInterfacePage::Display(stream, *_displayPage, request, *page, false);
+					ParametersMap pm(getTemplateParameters());
+					page->toParametersMap(pm, string());
+					_displayPage->display(stream, request, pm);
 				}
 				else if(_root.get())
 				{

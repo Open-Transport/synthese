@@ -26,7 +26,6 @@
 #include "Request.h"
 #include "Webpage.h"
 #include "WebPagePositionFunction.hpp"
-#include "WebPageInterfacePage.h"
 #include "CMSModule.hpp"
 
 #include <deque>
@@ -100,6 +99,8 @@ namespace synthese
 			}
 		}
 
+
+
 		void WebPagePositionFunction::run(
 			std::ostream& stream,
 			const Request& request
@@ -125,7 +126,9 @@ namespace synthese
 				}
 				if(_displayPage.get())
 				{
-					WebPageInterfacePage::Display(stream, *_displayPage, request, *curPage, false, false);
+					ParametersMap pm(getTemplateParameters());
+					curPage->toParametersMap(pm, string());
+					_displayPage->display(stream, request, pm);
 				}
 				else
 				{

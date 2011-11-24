@@ -29,7 +29,6 @@
 #include "Interface.h"
 #include "Webpage.h"
 #include "Website.hpp"
-#include "WebPageInterfacePage.h"
 #include "Action.h"
 #include "CMSModule.hpp"
 
@@ -52,6 +51,8 @@ namespace synthese
 
 	namespace cms
 	{
+		const string WebPageDisplayFunction::DATA_CONTENT = "content";
+
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
 		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
 		const string WebPageDisplayFunction::PARAMETER_SMART_URL("smart_url");
@@ -174,13 +175,17 @@ namespace synthese
 
 				if(_useTemplate && _page->getTemplate())
 				{
-					WebPageInterfacePage::Display(
-						stream,
-						*_page->getTemplate(),
-						request,
-						*_page,
-						false
-					);
+					ParametersMap pm(getTemplateParameters());
+
+					// Page data
+					_page->toParametersMap(pm);
+
+					// Generated content
+					stringstream content;
+					_page->display(content, request, pm);
+					pm.insert(DATA_CONTENT, content.str());
+
+					_page->getTemplate()->display(stream, request, pm);
 				}
 				else
 				{

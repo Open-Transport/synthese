@@ -27,7 +27,6 @@
 #include "Webpage.h"
 #include "WebPageLinksFunction.hpp"
 #include "AdminParametersException.h"
-#include "WebPageInterfacePage.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -97,7 +96,9 @@ namespace synthese
 
 				if(_displayPage.get())
 				{
-					WebPageInterfacePage::Display(stream, *_displayPage, request, *link, false);
+					ParametersMap pm(getTemplateParameters());
+					link->toParametersMap(pm, string());
+					_displayPage->display(stream, request, pm);
 				}
 				++number;
 			}
