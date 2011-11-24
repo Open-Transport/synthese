@@ -969,7 +969,7 @@ namespace synthese
 				vector<pair<optional<string>, string> > filterModes;
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE1), "LR{nnn}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE2), "S{nombre chaine}"));
-				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "(LR|SR)-{chaine}-{n}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "LR-{chaine}-{n} ou SR-{chaine}-{nn}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE4), "!LR-{chaine}-{n}"));
 				stream << t.cell("Mode de filtrage des lignes", t.getForm().getSelectInput(PARAMETER_LINE_FILTER_MODE, filterModes, optional<string>(_lineFilterMode)));
 				stream << t.cell("Condition d'utilisation pour les réservations (ID)", t.getForm().getTextInput(PARAMETER_RESERVATION_RULE_ID, _reservationUseRule.get() ? lexical_cast<string>(_reservationUseRule->getKey()) : string()));
