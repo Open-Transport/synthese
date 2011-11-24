@@ -31,7 +31,6 @@
 #include "WebPageDisplayFunction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "Interface.h"
-#include "WebPageInterfacePage.h"
 #include "ResultHTMLTable.h"
 #include "HTMLModule.h"
 #include "WebPageAddAction.h"

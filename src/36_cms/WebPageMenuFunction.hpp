@@ -47,35 +47,34 @@ namespace synthese
 		///
 		/// Parameters :
 		///	<ul>
-		///		<li>root : id of the parent page of each item of first range (default is the current displayed page, 0 is the root of the site)</li>
-		///		<li>min_depth : minimal depth of items to display (depth is relative to the root, default=1)</li>
-		///		<li>max_depth : maximal depth of items to display (depth is relative to the root, default=1)</li>
-		///		<li>The code to generate is a combination af 5 parameters by depth level : </li>
-		///		<ul>
-		///			<li>beginning_x (x = depth) : code to output before the item if the item does not correspond to the current displayed page</li>
-		///			<li>ending_x (x = depth) : code to output after the item if the item does not correspond to the current displayed page</li>
-		///			<li>beginning_selected_x (x = depth) : code to output before the item if the item corresponds to the current displayed page (default is like beginning_x)</li>
-		///			<li>ending_selected_x (x = depth) : code to output after the item if the item corresponds to the current displayed page (default is like ending_x)</li>
-		///			<li>beginning_before_submenu_x (x = depth) : code to output before a sub menu</li>
-		///			<li>ending_after_submenu_x (x = depth) : code to output after a sub menu</li>
-		///		</ul>
 		///	</ul>
 		class WebPageMenuFunction:
 			public util::FactorableTemplate<server::Function,WebPageMenuFunction>
 		{
+		private:
+			static const std::string DATA_RANK;
+			static const std::string DATA_DEPTH;
+			static const std::string DATA_IS_LAST_PAGE;
+			static const std::string DATA_IS_THE_CURRENT_PAGE;
+			static const std::string DATA_CURRENT_PAGE_IN_BRANCH;
+
 		public:
 			static const std::string PARAMETER_ROOT_ID;
 			static const std::string PARAMETER_MIN_DEPTH;
 			static const std::string PARAMETER_MAX_DEPTH;
+			static const std::string PARAMETER_MAX_NUMBER;
 			static const std::string PARAMETER_BEGINNING;
 			static const std::string PARAMETER_ENDING;
 			static const std::string PARAMETER_BEGINNING_SELECTED;
 			static const std::string PARAMETER_ENDING_SELECTED;
 			static const std::string PARAMETER_BEGINNING_BEFORE_SUBMENU;
 			static const std::string PARAMETER_ENDING_AFTER_SUBMENU;
+			static const std::string PARAMETER_ITEM_PAGE_ID;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
+			static const std::string VALUE_RSS;
 
 		protected:
-			struct MenuDefinition_
+			struct MenuDefinition_ // Deprecated
 			{
 				std::string beginning;
 				std::string ending;
@@ -89,9 +88,12 @@ namespace synthese
 			//@{
 				boost::optional<util::RegistryKeyType> _rootId;
 				boost::shared_ptr<const Webpage> _root;
+				boost::optional<std::size_t> _maxNumber;
 				std::size_t _minDepth;
 				std::size_t _maxDepth;
-				std::map<std::size_t, MenuDefinition_> _menuDefinition;
+				boost::shared_ptr<const Webpage> _itemPage;
+				std::map<std::size_t, MenuDefinition_> _menuDefinition; // Deprecated
+				std::string _outputFormat;
 			//@}
 
 
@@ -125,15 +127,13 @@ namespace synthese
 				const server::Request& request /*= NULL*/,
 				boost::shared_ptr<const Webpage> root,
 				std::size_t depth,
-				boost::shared_ptr<const Webpage> currentPage
+				boost::shared_ptr<const Webpage> currentPage,
+				std::size_t rank,
+				bool isLastPage
 			) const;
 
 		public:
 			WebPageMenuFunction();
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
 
 
 

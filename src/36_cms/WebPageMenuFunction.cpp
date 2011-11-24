@@ -31,7 +31,7 @@
 #include "WebPageTableSync.h"
 #include "HTMLModule.h"
 #include "CMSModule.hpp"
-
+#include "ServerModule.h"
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -48,15 +48,27 @@ namespace synthese
 
 	namespace cms
 	{
+		const string WebPageMenuFunction::DATA_RANK = "rank";
+		const string WebPageMenuFunction::DATA_DEPTH = "depth";
+		const string WebPageMenuFunction::DATA_IS_LAST_PAGE = "is_last_page";
+		const string WebPageMenuFunction::DATA_IS_THE_CURRENT_PAGE = "is_the_current_page";
+		const string WebPageMenuFunction::DATA_CURRENT_PAGE_IN_BRANCH = "current_page_in_branch";
+
 		const std::string WebPageMenuFunction::PARAMETER_ROOT_ID("root");
 		const std::string WebPageMenuFunction::PARAMETER_MIN_DEPTH("min_depth");
 		const std::string WebPageMenuFunction::PARAMETER_MAX_DEPTH("max_depth");
+		const std::string WebPageMenuFunction::PARAMETER_MAX_NUMBER("max_number");
 		const std::string WebPageMenuFunction::PARAMETER_BEGINNING("beginning_");
 		const std::string WebPageMenuFunction::PARAMETER_ENDING("ending_");
 		const std::string WebPageMenuFunction::PARAMETER_BEGINNING_SELECTED("beginning_selected_");
 		const std::string WebPageMenuFunction::PARAMETER_ENDING_SELECTED("ending_selected_");
 		const std::string WebPageMenuFunction::PARAMETER_BEGINNING_BEFORE_SUBMENU("beginning_before_submenu_");
 		const std::string WebPageMenuFunction::PARAMETER_ENDING_AFTER_SUBMENU("ending_after_submenu_");
+		const std::string WebPageMenuFunction::PARAMETER_ITEM_PAGE_ID("item_page_id");
+		const std::string WebPageMenuFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+		const std::string WebPageMenuFunction::VALUE_RSS = "rss";
+
+
 
 		ParametersMap WebPageMenuFunction::_getParametersMap() const
 		{
@@ -64,17 +76,38 @@ namespace synthese
 			map.insert(PARAMETER_ROOT_ID, _root.get() ? _root->getKey() : RegistryKeyType(0));
 			map.insert(PARAMETER_MIN_DEPTH, _minDepth);
 			map.insert(PARAMETER_MAX_DEPTH, _maxDepth);
-			for(std::map<size_t,MenuDefinition_>::const_iterator it(_menuDefinition.begin()); it!=_menuDefinition.end(); ++it)
+
+			// Max number
+			if(_maxNumber)
 			{
-				map.insert(PARAMETER_BEGINNING + lexical_cast<string>(it->first), it->second.beginning);
-				map.insert(PARAMETER_ENDING + lexical_cast<string>(it->first), it->second.ending);
-				map.insert(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(it->first), it->second.beginningSelected);
-				map.insert(PARAMETER_ENDING_SELECTED + lexical_cast<string>(it->first), it->second.endingSelected);
-				map.insert(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(it->first), it->second.beginningBeforeSubmenu);
-				map.insert(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(it->first), it->second.endingAfterSubmenu);
+				map.insert(PARAMETER_MAX_NUMBER, *_maxNumber);
+			}
+
+			// Output definition
+			if(_itemPage.get())
+			{
+				map.insert(PARAMETER_ITEM_PAGE_ID, _itemPage->getKey());
+			}
+			else if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+			else
+			{
+				for(std::map<size_t,MenuDefinition_>::const_iterator it(_menuDefinition.begin()); it!=_menuDefinition.end(); ++it)
+				{
+					map.insert(PARAMETER_BEGINNING + lexical_cast<string>(it->first), it->second.beginning);
+					map.insert(PARAMETER_ENDING + lexical_cast<string>(it->first), it->second.ending);
+					map.insert(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(it->first), it->second.beginningSelected);
+					map.insert(PARAMETER_ENDING_SELECTED + lexical_cast<string>(it->first), it->second.endingSelected);
+					map.insert(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(it->first), it->second.beginningBeforeSubmenu);
+					map.insert(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(it->first), it->second.endingAfterSubmenu);
+				}
 			}
 			return map;
 		}
+
+
 
 		void WebPageMenuFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -94,45 +127,110 @@ namespace synthese
 			_minDepth = map.getDefault<size_t>(PARAMETER_MIN_DEPTH, 1);
 			_maxDepth = map.getDefault<size_t>(PARAMETER_MAX_DEPTH, _minDepth);
 
-			for(size_t i(_minDepth); i<=_maxDepth; ++i)
+			// Max number
+			_maxNumber = map.getOptional<size_t>(PARAMETER_MAX_NUMBER);
+
+			// CMS output
+			if(map.isDefined(PARAMETER_ITEM_PAGE_ID))
 			{
-				MenuDefinition_ curMenuDefinition;
-				curMenuDefinition.beginning = map.getDefault<string>(PARAMETER_BEGINNING + lexical_cast<string>(i));
-				curMenuDefinition.ending = map.getDefault<string>(PARAMETER_ENDING + lexical_cast<string>(i));
-				if(map.getOptional<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i)))
+				RegistryKeyType pageId(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE_ID));
+				try
 				{
-					curMenuDefinition.beginningSelected = map.get<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i));
+					_itemPage = Env::GetOfficialEnv().get<Webpage>(pageId);
 				}
-				else
+				catch(ObjectNotFoundException<Webpage>&)
 				{
-					curMenuDefinition.beginningSelected = curMenuDefinition.beginning;
+					throw RequestException("No such page "+ lexical_cast<string>(pageId));
 				}
-				if(map.getOptional<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i)))
+			}
+			else if(!map.getDefault<string>(PARAMETER_OUTPUT_FORMAT).empty())
+			{
+				_outputFormat = map.get<string>(PARAMETER_OUTPUT_FORMAT);
+			}
+			else
+			{
+				// Old output (deprecated)
+				for(size_t i(_minDepth); i<=_maxDepth; ++i)
 				{
-					curMenuDefinition.endingSelected = map.getDefault<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i));
+					MenuDefinition_ curMenuDefinition;
+					curMenuDefinition.beginning = map.getDefault<string>(PARAMETER_BEGINNING + lexical_cast<string>(i));
+					curMenuDefinition.ending = map.getDefault<string>(PARAMETER_ENDING + lexical_cast<string>(i));
+					if(map.getOptional<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i)))
+					{
+
+						curMenuDefinition.beginningSelected = map.get<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i));
+					}
+					else
+					{
+						curMenuDefinition.beginningSelected = curMenuDefinition.beginning;
+					}
+					if(map.getOptional<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i)))
+					{
+						curMenuDefinition.endingSelected = map.getDefault<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i));
+					}
+					else
+					{
+						curMenuDefinition.endingSelected = curMenuDefinition.ending;
+					}
+					curMenuDefinition.beginningBeforeSubmenu = map.getDefault<string>(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(i));
+					curMenuDefinition.endingAfterSubmenu = map.getDefault<string>(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(i));
+					_menuDefinition[i] = curMenuDefinition;
 				}
-				else
-				{
-					curMenuDefinition.endingSelected = curMenuDefinition.ending;
-				}
-				curMenuDefinition.beginningBeforeSubmenu = map.getDefault<string>(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(i));
-				curMenuDefinition.endingAfterSubmenu = map.getDefault<string>(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(i));
-				_menuDefinition[i] = curMenuDefinition;
 			}
 		}
+
+
 
 		void WebPageMenuFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			// Root page
 			shared_ptr<const Webpage> currentPage(CMSModule::GetWebPage(request));
+			shared_ptr<const Webpage> rootPage(_rootId ? _root : currentPage);
+
+			// RSS header
+			if(!_itemPage.get() && _outputFormat == VALUE_RSS)
+			{
+				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
+				openRequest.getFunction()->setPage(rootPage);
+
+				stream <<
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+					"<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">" <<
+					"<channel>" <<
+					"<title>" << rootPage->getName() << "</title>" <<
+					"<description><![CDATA[" << rootPage->getAbstract() << "]]></description>" <<
+					"<link>" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link>" <<
+					"<generator>SYNTHESE " << ServerModule::VERSION << "</generator>"
+				;
+				if(!rootPage->getImage().empty())
+				{
+					stream << "<image><url>" << rootPage->getImage() << "</url><title>" <<
+						rootPage->getName() << "</title><link>" <<
+						HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link></image>"
+					;
+				}
+				stream << "<atom:link href=\"" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "\" rel=\"self\" type=\"application/rss+xml\" />";
+			}
+
+			// Content
 			_getMenuContentRecursive(
 				stream,
 				request,
-				_rootId ? _root : currentPage,
+				rootPage,
 				0,
-				currentPage
+				currentPage,
+				0,
+				true
 			);
+
+			// RSS footer
+			if(!_itemPage.get() && _outputFormat == VALUE_RSS)
+			{
+				stream << "</channel></rss>";
+			}
 		}
 
 
@@ -147,6 +245,14 @@ namespace synthese
 
 		std::string WebPageMenuFunction::getOutputMimeType() const
 		{
+			if(_itemPage.get())
+			{
+				return _itemPage->getMimeType();
+			}
+			else if(_outputFormat == VALUE_RSS)
+			{
+				return "application/rss+xml";
+			}
 			return "text/html";
 		}
 
@@ -157,13 +263,12 @@ namespace synthese
 			const server::Request& request /*= NULL*/,
 			boost::shared_ptr<const Webpage> root,
 			std::size_t depth,
-			boost::shared_ptr<const Webpage> currentPage
+			boost::shared_ptr<const Webpage> currentPage,
+			size_t rank,
+			bool isLastPage
 		) const	{
 			/** - Page in branch update */
 			bool returned_page_in_branch(currentPage.get() ? (root == currentPage) : false);
-
-			map<size_t, MenuDefinition_>::const_iterator it(_menuDefinition.find(depth));
-			MenuDefinition_ menuDefinition(it == _menuDefinition.end() ? MenuDefinition_() : it->second);
 
 			/** - Recursion attempting if :
 			- the max depth is not reached
@@ -171,56 +276,125 @@ namespace synthese
 			*/
 			stringstream submenu;
 
+			size_t number(0);
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(
 					Env::GetOfficialEnv(),
 					root.get() ? optional<RegistryKeyType>() : currentPage->getRoot()->getKey(),
 					root.get() ? root->getKey() : optional<RegistryKeyType>(0)
 			)	);
-			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
+				shared_ptr<Webpage> page(*it);
+
+				// Avoid no displayed pages
 				if(!page->mustBeDisplayed())
 				{
 					continue;
 				}
 
+				// Is it the last page of the menu ?
+				bool isLastSubPage(
+					it+1 == pages.end() ||
+					(_maxNumber && number+1 == *_maxNumber)
+				);
+
+				// Recursion
 				returned_page_in_branch |= _getMenuContentRecursive(
 					submenu,
 					request,
 					const_pointer_cast<const Webpage>(page),
 					depth + 1,
-					currentPage
+					currentPage,
+					number,
+					isLastSubPage
 				);
+
+				// End of loop if last page
+				number++;
+				if(isLastSubPage)
+				{
+					break;
+				}
 			}
+
+			map<size_t, MenuDefinition_>::const_iterator it(_menuDefinition.find(depth));
+			MenuDefinition_ menuDefinition(it == _menuDefinition.end() ? MenuDefinition_() : it->second);
 
 			/** - Preparing the output of the current level if the min depth is reached */
 			if (root.get() && _minDepth <= depth)
 			{
-				stream <<
-					(	(root == currentPage || returned_page_in_branch) ?
-						menuDefinition.beginningSelected :
-						menuDefinition.beginning
-					);
-
 				StaticFunctionRequest<WebPageDisplayFunction> subPageRequest(request, false);
 				subPageRequest.getFunction()->setPage(root);
-				stream << HTMLModule::getHTMLLink(root->getSmartURLPath().empty() ? subPageRequest.getURL() : root->getSmartURLPath(), root->getName());
 
-				stream <<
-					(	(root == currentPage || returned_page_in_branch) ?
-						menuDefinition.endingSelected :
-						menuDefinition.ending
-					);
+				if(_itemPage.get())
+				{
+					ParametersMap pm(getTemplateParameters());
+					root->toParametersMap(pm);
+					pm.insert(DATA_RANK, rank);
+					pm.insert(DATA_DEPTH, depth);
+					pm.insert(DATA_IS_THE_CURRENT_PAGE, root == currentPage);
+					pm.insert(DATA_IS_LAST_PAGE, isLastPage);
+					pm.insert(DATA_CURRENT_PAGE_IN_BRANCH, returned_page_in_branch);
+					_itemPage->display(stream, request, pm);
+				}
+				else if(_outputFormat == VALUE_RSS)
+				{
+					stream <<
+						"<item>" <<
+						"<title>" << root->getName() << "</title>" <<
+						"<description><![CDATA[" << root->getAbstract() << "]]></description>" <<
+						"<link>" << HTMLModule::HTMLEncode(subPageRequest.getURL(true, true)) << "</link>" <<
+						"<guid isPermaLink=\"true\">" << HTMLModule::HTMLEncode(subPageRequest.getURL(true, true)) << "</guid>"
+					;
+					if(!root->getStartDate().is_not_a_date_time())
+					{
+						stream <<
+							"<pubDate>" <<
+							root->getStartDate().date().day_of_week() << ", " <<
+							root->getStartDate().date().day() << " " <<
+							root->getStartDate().date().month() << " " <<
+							root->getStartDate().date().year() << " " <<
+							root->getStartDate().time_of_day() << " " <<
+							"+0100" <<
+							"</pubDate>"
+						;
+					}
+					stream << "</item>";
+				}
+				else
+				{
+					stream <<
+						(	(root == currentPage || returned_page_in_branch) ?
+							menuDefinition.beginningSelected :
+							menuDefinition.beginning
+						)
+					;
+
+					stream << HTMLModule::getHTMLLink(root->getSmartURLPath().empty() ? subPageRequest.getURL() : root->getSmartURLPath(), root->getName());
+
+					stream <<
+						(	(root == currentPage || returned_page_in_branch) ?
+							menuDefinition.endingSelected :
+							menuDefinition.ending
+						)
+					;
+				}
 			}
 
 			/** - Submenu only if applicable */
-			if(!submenu.str().empty() && _maxDepth > depth)
-			{
-				stream <<
-					menuDefinition.beginningBeforeSubmenu <<
-					submenu.str() <<
-					menuDefinition.endingAfterSubmenu
-				;
+			if(	!submenu.str().empty() &&
+				_maxDepth > depth
+			){
+				if(!_itemPage.get() && _outputFormat.empty())
+				{
+					stream << menuDefinition.beginningBeforeSubmenu;
+				}
+				stream << submenu.str();
+				if(!_itemPage.get() && _outputFormat.empty())
+				{
+					stream << menuDefinition.endingAfterSubmenu;
+				}
 			}
 
 			return returned_page_in_branch;
@@ -233,5 +407,4 @@ namespace synthese
 		{
 
 		}
-	}
-}
+}	}

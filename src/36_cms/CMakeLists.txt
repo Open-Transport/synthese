@@ -53,8 +53,6 @@ WebPageDisplayFunction.cpp
 WebPageDisplayFunction.h
 WebPageFormFunction.cpp
 WebPageFormFunction.hpp
-WebPageInterfacePage.cpp
-WebPageInterfacePage.h
 WebPageLastNewsFunction.cpp
 WebPageLastNewsFunction.hpp
 WebPageLinkAddAction.cpp
