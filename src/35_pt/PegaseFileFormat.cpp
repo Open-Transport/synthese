@@ -36,6 +36,7 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "IConv.hpp"
+#include "PTUseRuleTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -321,11 +322,11 @@ namespace synthese
 		const std::string PegaseFileFormat::Importer_::PARAMETER_NETWORK_ID("net");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_LINE_FILTER_MODE("line_filter_mode");
-
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE1("mode1");
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE2("mode2");
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE3("mode3");
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE4("mode4");
+		const std::string PegaseFileFormat::Importer_::PARAMETER_RESERVATION_RULE_ID("reservation_rule_id");
 
 
 
@@ -418,16 +419,18 @@ namespace synthese
 			struct LineInfo
 			{
 				bool ignored;
+				bool needReservation;
 				string lineName;
 				string routeName;
 
-				LineInfo() : ignored(false)
+				LineInfo() : ignored(false), needReservation(false)
 				{
 				}
 			};
 			ostream& operator<<(ostream& os, const LineInfo& li)
 			{
-				os << "ignored: " << li.ignored << " lineName: " << li.lineName << " routeName: " << li.routeName;
+				os << "ignored: " << li.ignored << "needResa " << li.needReservation <<
+					" lineName: " << li.lineName << " routeName: " << li.routeName;
 				return os;
 			}
 
@@ -495,27 +498,44 @@ namespace synthese
 						lineInfo.ignored = true;
 						return lineInfo;
 					}
-					lineInfo.lineName = lineInfo.lineName.substr(1, lineInfo.lineName.length() - 1);
+					lineInfo.lineName = lineInfo.lineName.substr(1, len - 1);
 					return lineInfo;
 				}
 
 				if(mode == PegaseFileFormat::Importer_::FILTER_MODE3)
 				{
-					// LR-{string}-{n}
+					// LR-{string}-{n} or SR-{string}-{nn}
 
-					if(!starts_with(lineInfo.lineName, "LR-") ||
-						len <= 4 ||
-						lineInfo.lineName[len - 4] != '-')
+					// LR-{string}-{n}
+					if(starts_with(lineInfo.lineName, "LR-") &&
+						len >= 6 &&
+						lineInfo.lineName[len - 2] == '-')
 					{
-						lineInfo.ignored = true;
+						lineInfo.needReservation = false;
+						lineInfo.lineName = lineInfo.lineName.substr(3, len - (3 + 2));
 						return lineInfo;
 					}
-					lineInfo.lineName = lineInfo.lineName.substr(3, lineInfo.lineName.length() - (3 + 2));
+
+					// SR-{string}-{nn}
+					if(starts_with(lineInfo.lineName, "SR-") &&
+						len >= 7 &&
+						lineInfo.lineName[len - 3] == '-')
+					{
+						lineInfo.needReservation = true;
+						string previousLineName(lineInfo.lineName);
+						lineInfo.lineName = previousLineName.substr(3, len - (3 + 3));
+						lineInfo.routeName = previousLineName.substr(len - 2, 2);
+						return lineInfo;
+					}
+
+					// Not found
+					lineInfo.ignored = true;
 					return lineInfo;
 				}
 
 				if(mode == PegaseFileFormat::Importer_::FILTER_MODE4)
 				{
+					// FIXME: unused for now.
 					// !LR-{string}-{n}
 
 					if(!starts_with(lineInfo.lineName, "LR-") ||
@@ -863,14 +883,22 @@ namespace synthese
 					continue;
 				}
 
+				// Use rules
+				RuleUser::Rules rules(RuleUser::GetEmptyRules());
+				if (lineInfo.needReservation && _reservationUseRule.get())
+				{
+					rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = _reservationUseRule.get();
+				}
+
 				JourneyPattern* journeyPattern(
 					PTFileFormat::CreateOrUpdateRoute(
 						*commercialLine,
 						optional<const string&>(), // id
-						lineInfo.routeName.empty() ? optional<const string&>() : lineInfo.routeName, // name
+						lineInfo.routeName + ":" + (lineInfo.needReservation ? "resa:" : "") +
+							journeyPatternInfo.longName, // name
 						optional<const string&>(), // destination
 						optional<Destination*>(),
-						optional<const RuleUser::Rules&>(),
+						rules,
 						journeyPatternInfo.wayBack,
 						NULL,
 						stops,
@@ -941,9 +969,10 @@ namespace synthese
 				vector<pair<optional<string>, string> > filterModes;
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE1), "LR{nnn}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE2), "S{nombre chaine}"));
-				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "LR-{chaine}-{n}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "(LR|SR)-{chaine}-{n}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE4), "!LR-{chaine}-{n}"));
 				stream << t.cell("Mode de filtrage des lignes", t.getForm().getSelectInput(PARAMETER_LINE_FILTER_MODE, filterModes, optional<string>(_lineFilterMode)));
+				stream << t.cell("Condition d'utilisation pour les réservations (ID)", t.getForm().getTextInput(PARAMETER_RESERVATION_RULE_ID, _reservationUseRule.get() ? lexical_cast<string>(_reservationUseRule->getKey()) : string()));
 
 				stream << t.close();
 		}
@@ -969,6 +998,11 @@ namespace synthese
 				map.insert(PARAMETER_LINE_FILTER_MODE, _lineFilterMode);
 			}
 
+			if(_reservationUseRule.get())
+			{
+				map.insert(PARAMETER_RESERVATION_RULE_ID, _reservationUseRule->getKey());
+			}
+
 			return map;
 		}
 
@@ -992,6 +1026,14 @@ namespace synthese
 			}
 
 			_lineFilterMode = map.getDefault<string>(PARAMETER_LINE_FILTER_MODE, FILTER_MODE1);
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_RESERVATION_RULE_ID, 0))
+			{
+				_reservationUseRule = PTUseRuleTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_RESERVATION_RULE_ID),
+					_env
+				);
+			}
 		}
 
 
