@@ -72,13 +72,16 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
+				static const std::string PARAMETER_USE_DIRECTION;
 
 				static const std::string PARAMETER_FIELD_STOP_NAME1;
-				static const std::string PARAMETER_FIELD_STOP_NAME2;
+				static const std::string PARAMETER_FIELD_STOP_DIRECTION;
 				static const std::string PARAMETER_FIELD_STOP_OPERATOR_CODE;
 				static const std::string PARAMETER_FIELD_CITY_NAME;
 				static const std::string PARAMETER_FIELD_CITY_CODE;
-
+				static const std::string PARAMETER_VALUE_FORWARD_DIRECTION;
+				static const std::string PARAMETER_VALUE_BACKWARD_DIRECTION;
+				static const std::string PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION;
 				static const std::string _FIELD_GEOMETRY;
 
 			private:
@@ -89,10 +92,14 @@ namespace synthese
 					boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 
 					boost::optional<std::string> _stopName1;
-					boost::optional<std::string> _stopName2;
+					boost::optional<std::string> _stopDirection;
 					boost::optional<std::string> _stopOperatorCode;
 					boost::optional<std::string> _cityName;
 					boost::optional<std::string> _cityCode;
+					bool _useDirection;
+					boost::optional<std::string> _valueForwardDirection;
+					boost::optional<std::string> _valueBackwardDirection;
+					boost::optional<std::string> _valueForwardBackwardDirection;
 				//@}
 
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
