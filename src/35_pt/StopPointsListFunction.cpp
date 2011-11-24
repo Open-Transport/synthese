@@ -96,8 +96,8 @@ namespace synthese
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
-
-			try
+ 
+			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) try
 			{
 				_stopArea = Env::GetOfficialEnv().getRegistry<StopArea>().get(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
 			}
@@ -175,110 +175,66 @@ namespace synthese
 			// XML header
 			if(!_page.get())
 			{
+				stream << "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+					"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" ";
+
+				if(_stopArea)
+				{
+					stream << DATA_STOPAREA_NAME << "=\"" << _stopArea->get()->getName() <<
+						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->get()->getCity()->getName() <<
+						"\"";
+				}
 				if(_commercialLineID) // destination of this line will be displayed
 				{
-					stream <<
-						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
-						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
-						"\" lineName=\"" << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
+					stream << "lineName=\"" << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getName() <<
 						"\" lineShortName=\""<< Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getShortName() <<
 						"\" lineStyle=\"" << Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle() <<
-						"\">";
+						"\"";
 				}
-				else
+				stream << ">";
+			}
+
+			// Search for stopPoints
+
+			StopPointMapType stopPointMap;
+
+			if(_stopArea) // If a stopArea is provided : display only stoppoints of this stopArea
+			{
+				const StopArea::PhysicalStops& stops(_stopArea->get()->getPhysicalStops());
+				BOOST_FOREACH(const StopArea::PhysicalStops::value_type& stopPoint, stops)
 				{
-					stream <<
-						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-						"<physicalStops xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/35_pt/StopPointsListFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance"<<
-						"\" " << DATA_STOPAREA_NAME << "=\"" << _stopArea->getName() <<
-						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->getCity()->getName() <<
-						"\">";
+					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
+				}
+			}
+			else
+			{
+				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
+				{
+					if( _bbox && !_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
+					{
+						continue;
+					}
+					addStop(stopPointMap, *stopPoint.second, startDateTime, endDateTime);
 				}
 			}
 
-			const StopArea::PhysicalStops& stops(_stopArea->getPhysicalStops());
-			BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, stops)
+			// Generate XML output
+
+			BOOST_FOREACH(const StopPointMapType::value_type& sp, stopPointMap)
 			{
-				typedef map<RegistryKeyType, const CommercialLine *> CommercialLineMap;
-				typedef map<RegistryKeyType, pair<const StopArea *, CommercialLineMap > > StopAreaMapType;
-				StopAreaMapType stopAreaMap;
-
-				BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
-				{
-					const LineStop* ls = static_cast<const LineStop*>(edge.second);
-
-					ptime departureDateTime = startDateTime;
-					// Loop on services
-					optional<Edge::DepartureServiceIndex::Value> index;
-					while(true)
-					{
-						ServicePointer servicePointer(
-							ls->getNextService(
-								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
-								departureDateTime,
-								endDateTime,
-								false,
-								index,
-								false,
-								false
-						)	);
-						if (!servicePointer.getService())
-							break;
-						++*index;
-						departureDateTime = servicePointer.getDepartureDateTime();
-						if(it.second->getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
-							continue;
-
-						const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
-						if(journeyPattern == NULL) // Could be a junction
-							continue;
-
-						const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
-						if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
-							continue;
-
-						const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
-
-						//Ignore if destination is the _stopArea himself
-						if(destination->getKey() == _stopArea->getKey())
-							continue;
-
-						StopAreaMapType::iterator it = stopAreaMap.find(destination->getKey());
-						if(it == stopAreaMap.end()) // test if destination stop already in the map
-						{
-							CommercialLineMap lineMap;
-							lineMap[commercialLine->getKey()] = commercialLine;
-							stopAreaMap[destination->getKey()] = make_pair(destination, lineMap);
-						}
-						else // destination stop is already in the map
-						{
-							CommercialLineMap::iterator lineIt = stopAreaMap[destination->getKey()].second.find(commercialLine->getKey());
-
-							if(lineIt == stopAreaMap[destination->getKey()].second.end()) // test if commercialLine already in the sub map
-								stopAreaMap[destination->getKey()].second[commercialLine->getKey()] = commercialLine;
-						}
-					}
-				}
-
-				// Generate output only if commercial line use stoppoint
-				if(_commercialLineID && stopAreaMap.empty())
-					continue;
-
 				if(_page.get())
 				{
-					_display(stream, request, *it.second);
+					_display(stream, request, *sp.first);
 				}
 				else
 				{
-					stream << "<physicalStop id=\"" << it.second->getKey() <<
-						"\" operatorCode=\"" << it.second->getCodeBySources() <<
+					stream << "<physicalStop id=\"" << sp.first->getKey() <<
+						"\" operatorCode=\"" << sp.first->getCodeBySources() <<
 						"\">";
 
 					if(_commercialLineID)
 					{
-						BOOST_FOREACH(const StopAreaMapType::value_type& destination, stopAreaMap)
+						BOOST_FOREACH(const StopAreaDestinationMapType::value_type& destination, sp.second)
 						{
 							stream << "<destination id=\"" << destination.first <<
 								"\" name=\"" << destination.second.first->getName() <<
@@ -288,14 +244,14 @@ namespace synthese
 					}
 					else
 					{
-						BOOST_FOREACH(const StopAreaMapType::value_type& destination, stopAreaMap)
+						BOOST_FOREACH(const StopAreaDestinationMapType::value_type& destination, sp.second)
 						{
 							stream << "<destination id=\"" << destination.first <<
 								"\" name=\"" << destination.second.first->getName() <<
 								"\" cityName=\""<< destination.second.first->getCity()->getName() <<
 								"\" >";
 
-							BOOST_FOREACH(const CommercialLineMap::value_type& line, destination.second.second)
+							BOOST_FOREACH(const CommercialLineMapType::value_type& line, destination.second.second)
 							{
 								// Rolling stock
 								set<RollingStock *> rollingStocks;
@@ -339,7 +295,81 @@ namespace synthese
 			stream << "</physicalStops>";
 		}
 
+		void StopPointsListFunction::addStop(
+			StopPointMapType & stopPointMap,
+			const StopPoint & sp,
+			ptime & startDateTime,
+			ptime & endDateTime
+		) const {
 
+			StopAreaDestinationMapType stopAreaMap;
+			stopPointMap[&sp] = stopAreaMap;
+			
+			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
+			{
+				const LineStop* ls = static_cast<const LineStop*>(edge.second);
+
+				ptime departureDateTime = startDateTime;
+				// Loop on services
+				optional<Edge::DepartureServiceIndex::Value> index;
+				while(true)
+				{
+					ServicePointer servicePointer(
+						ls->getNextService(
+							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+							departureDateTime,
+							endDateTime,
+							false,
+							index,
+							false,
+							false
+					)	);
+					if (!servicePointer.getService())
+						break;
+					++*index;
+					departureDateTime = servicePointer.getDepartureDateTime();
+					if(sp.getKey() != servicePointer.getRealTimeDepartureVertex()->getKey())
+						continue;
+
+					const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+					if(journeyPattern == NULL) // Could be a junction
+						continue;
+
+					const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+					if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
+						continue;
+
+					const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
+
+					if(_stopArea)
+					{
+						//Ignore if destination is the _stopArea himself
+						if(destination->getKey() == _stopArea->get()->getKey())
+							continue;
+					}
+					if(_commercialLineID)
+					{
+						//Ignore if destination is the _stopArea himself
+						if(commercialLine->getKey() == _commercialLineID)
+							continue;
+					}
+
+					StopAreaDestinationMapType::iterator it = stopPointMap[&sp].find(destination->getKey());
+					if(it == stopPointMap[&sp].end()) // test if destination stop already in the map
+					{
+						CommercialLineMapType lineMap;
+						lineMap[commercialLine->getKey()] = commercialLine;
+						stopPointMap[&sp][destination->getKey()] = make_pair(destination, lineMap);
+					}
+					else // destination stop is already in the map
+					{
+						CommercialLineMapType::iterator lineIt = stopPointMap[&sp][destination->getKey()].second.find(commercialLine->getKey());
+							if(lineIt == stopPointMap[&sp][destination->getKey()].second.end()) // test if commercialLine already in the sub map
+							stopPointMap[&sp][destination->getKey()].second[commercialLine->getKey()] = commercialLine;
+						}
+					}
+				}
+			}
 
 		bool StopPointsListFunction::isAuthorized(
 			const Session* session
@@ -349,7 +379,7 @@ namespace synthese
 
 
 
-		std::string StopPointsListFunction::getOutputMimeType() const
+		string StopPointsListFunction::getOutputMimeType() const
 		{
 			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
