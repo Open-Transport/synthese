@@ -234,8 +234,6 @@ ServiceUpdateAction.cpp
 ServiceUpdateAction.h
 ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
-ShapeFileFormat.cpp
-ShapeFileFormat.hpp
 StopArea.cpp
 StopArea.hpp
 StopAreaAddAction.cpp
@@ -266,6 +264,8 @@ StopPointUpdateAction.cpp
 StopPointUpdateAction.hpp
 StopPointWFSType.cpp
 StopPointWFSType.hpp
+StopsShapeFileFormat.cpp
+StopsShapeFileFormat.hpp
 TransportNetwork.cpp
 TransportNetwork.h
 TransportNetworkAdmin.cpp
