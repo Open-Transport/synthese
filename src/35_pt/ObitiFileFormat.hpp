@@ -83,6 +83,8 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_USE_RULE_BLOCK_ID_MASK;
+				static const std::string PARAMETER_STOPS_DATA_SOURCE_ID;
+				static const std::string PARAMETER_STOPS_FROM_DATA_SOURCE;
 
 				static const std::string PARAMETER_PERIOD_CALENDAR_FIELD;
 				static const std::string PARAMETER_DAYS_CALENDAR_FIELD;
@@ -97,6 +99,8 @@ namespace synthese
 				std::string _daysCalendarField;
 				size_t _numberOfOtherParameters;
 				bool _backwardInSameFile;
+				bool _stopsFromDataSource;
+				boost::shared_ptr<impex::DataSource> _stopsDataSource;
 
 				bool _interactive;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
