@@ -35,7 +35,11 @@ var Synthese = {
         var match = regex.exec(paramArray[i]);
         if (!match)
           continue;
-        params[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
+        try {
+          params[decodeURIComponent(match[1])] = decodeURIComponent(match[2]);
+        } catch(e) {
+          continue;
+        }
       }
       return params;
     }
