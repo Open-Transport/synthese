@@ -210,7 +210,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 				{
-					if( _bbox && !_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
+					if( _bbox && stopPoint.second->getGeometry() && !_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
 					{
 						continue;
 					}
@@ -229,8 +229,14 @@ namespace synthese
 				else
 				{
 					stream << "<physicalStop id=\"" << sp.first->getKey() <<
-						"\" operatorCode=\"" << sp.first->getCodeBySources() <<
-						"\">";
+						"\" operatorCode=\"" << sp.first->getCodeBySources();
+					if(sp.first->getGeometry())
+					{
+						stream << "\" x=\"" << sp.first->getGeometry()->getX() <<
+							"\" y=\"" << sp.first->getGeometry()->getY();
+						
+					}
+					stream << "\">";
 
 					if(_commercialLineID)
 					{
