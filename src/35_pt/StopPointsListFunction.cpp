@@ -210,7 +210,9 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 				{
-					if( _bbox && stopPoint.second->getGeometry() && !_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
+					if( _bbox &&
+						!stopPoint.second->getGeometry() ||
+						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
 					{
 						continue;
 					}
