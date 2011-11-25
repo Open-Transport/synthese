@@ -355,12 +355,6 @@ namespace synthese
 						if(destination->getKey() == _stopArea->get()->getKey())
 							continue;
 					}
-					if(_commercialLineID)
-					{
-						//Ignore if destination is the _stopArea himself
-						if(commercialLine->getKey() == _commercialLineID)
-							continue;
-					}
 
 					StopAreaDestinationMapType::iterator it = stopPointMap[&sp].find(destination->getKey());
 					if(it == stopPointMap[&sp].end()) // test if destination stop already in the map
