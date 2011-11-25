@@ -210,9 +210,9 @@ namespace synthese
 			{
 				BOOST_FOREACH(const Registry<StopPoint>::value_type& stopPoint, Env::GetOfficialEnv().getRegistry<StopPoint>())
 				{
-					if( _bbox &&
-						!stopPoint.second->getGeometry() ||
-						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate()))
+					if(_bbox &&
+						(!stopPoint.second->getGeometry() ||
+						!_bbox->contains(*stopPoint.second->getGeometry()->getCoordinate())))
 					{
 						continue;
 					}
@@ -234,9 +234,13 @@ namespace synthese
 						"\" operatorCode=\"" << sp.first->getCodeBySources();
 					if(sp.first->getGeometry())
 					{
-						stream << "\" x=\"" << sp.first->getGeometry()->getX() <<
-							"\" y=\"" << sp.first->getGeometry()->getY();
-						
+						shared_ptr<geos::geom::Point> gp = _coordinatesSystem->convertPoint(*sp.first->getGeometry());
+
+						if(gp.get())
+						{
+							stream << "\" x=\"" << gp->getX() <<
+								"\" y=\"" << gp->getY();
+						}			
 					}
 					stream << "\">";
 
@@ -308,11 +312,7 @@ namespace synthese
 			const StopPoint & sp,
 			ptime & startDateTime,
 			ptime & endDateTime
-		) const {
-
-			StopAreaDestinationMapType stopAreaMap;
-			stopPointMap[&sp] = stopAreaMap;
-			
+		) const {			
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
 			{
 				const LineStop* ls = static_cast<const LineStop*>(edge.second);
@@ -320,6 +320,7 @@ namespace synthese
 				ptime departureDateTime = startDateTime;
 				// Loop on services
 				optional<Edge::DepartureServiceIndex::Value> index;
+				bool spHaveZeroDestination = true;
 				while(true)
 				{
 					ServicePointer servicePointer(
@@ -354,6 +355,13 @@ namespace synthese
 						//Ignore if destination is the _stopArea himself
 						if(destination->getKey() == _stopArea->get()->getKey())
 							continue;
+					}
+					
+					if(spHaveZeroDestination)
+					{
+						StopAreaDestinationMapType stopAreaMap;
+						stopPointMap[&sp] = stopAreaMap;
+						spHaveZeroDestination = false;
 					}
 
 					StopAreaDestinationMapType::iterator it = stopPointMap[&sp].find(destination->getKey());
