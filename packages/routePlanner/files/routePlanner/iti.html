@@ -9,14 +9,11 @@
 <link rel="stylesheet" href="/map/css/legacy/map.css" type="text/css" />
 
 <link rel="stylesheet" href="/routePlanner/css/routePlanner.css">
-<link rel="stylesheet" href="/map/css/syntheseMap.css">
-<link rel="stylesheet" href="/map/css/cityBrowser.css">
 <link rel="stylesheet" href="/map/css/stopSelector.css">
-
-<script type="text/javascript" src="/routePlanner/js/legacy/core.js"></script>
-<script type="text/javascript" src="/routePlanner/js/legacy/interface.js"></script>
-<script type="text/javascript" src="/routePlanner/js/legacy/FicheHoraire.js"></script>
-
+<script>
+// FIXME
+var _departureTimes = [];
+</script>
     <title>Route Planner with Map Demo</title>
   </head>
   <body>
@@ -2938,7 +2935,7 @@ var bootstrap = {
     "map/js/StopSelector",
     "order!routePlanner/js/legacy/core",
     "order!routePlanner/js/legacy/interface",
-    "order!map/js/legacy/app.Gis.js"
+    "order!map/js/legacy/app.Gis"
   ], function(Synthese, CityBrowserMap, CityBrowser, routePlanner, StopSelector) {
 
     Synthese.init();

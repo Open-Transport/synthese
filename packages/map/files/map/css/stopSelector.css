@@ -1,3 +1,5 @@
+@import url("cityBrowser.css");
+
 .stopSelectorPopup {
   display: none;
   z-index: 3000;
