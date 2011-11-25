@@ -182,7 +182,7 @@ namespace synthese
 				{
 					stream << DATA_STOPAREA_NAME << "=\"" << _stopArea->get()->getName() <<
 						"\" " << DATA_STOPAREA_CITY_NAME << "=\"" << _stopArea->get()->getCity()->getName() <<
-						"\"";
+						"\" ";
 				}
 				if(_commercialLineID) // destination of this line will be displayed
 				{
