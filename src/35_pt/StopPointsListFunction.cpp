@@ -231,7 +231,9 @@ namespace synthese
 				else
 				{
 					stream << "<physicalStop id=\"" << sp.first->getKey() <<
+						"\" name=\"" << sp.first->getName() <<
 						"\" operatorCode=\"" << sp.first->getCodeBySources();
+
 					if(sp.first->getGeometry())
 					{
 						shared_ptr<geos::geom::Point> gp = _coordinatesSystem->convertPoint(*sp.first->getGeometry());
