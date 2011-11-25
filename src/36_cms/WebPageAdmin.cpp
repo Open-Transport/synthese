@@ -193,7 +193,18 @@ namespace synthese
 				}
 
 				stream << "<h1>Résumé</h1>";
-				stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract());
+				if(canBeWYSIWYG && !_page->getRawEditor())
+				{
+					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract());
+				}
+				else
+				{
+					AjaxForm f(contentUpdateRequest.getAjaxForm("update_abstract"));
+					stream << f.open();
+					stream << f.getTextAreaInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 20, 40, false);
+					stream << f.getSubmitButton("Sauvegarder");
+					stream << f.close();
+				}
 			}
 
 			////////////////////////////////////////////////////////////////////
