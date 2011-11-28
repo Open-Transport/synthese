@@ -58,8 +58,10 @@
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "CalendarTemplateElementTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "TransportNetworkTableSync.h"
+#include "CalendarTemplateTableSync.h"
+#include "CalendarFileFormat.hpp"
 
 #include <algorithm>
 #include <iomanip>
@@ -122,6 +124,13 @@ namespace synthese
 		util::ParametersMap HastusInterfaceFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result(PTDataCleanerFileFormat::_getParametersMap());
+
+			// Transport network
+			if(_network.get())
+			{
+				result.insert(PARAMETER_TRANSPORT_NETWORK_ID, _network->getKey());
+			}
+
 			return result;
 		}
 
@@ -130,7 +139,23 @@ namespace synthese
 		void HastusInterfaceFileFormat::Importer_::_setFromParametersMap(const ParametersMap& map)
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
+
+			// Transport network
+			RegistryKeyType networkId(map.getDefault<RegistryKeyType>(PARAMETER_TRANSPORT_NETWORK_ID, 0));
+			if(networkId) try
+			{
+				_network = TransportNetworkTableSync::GetEditable(
+					networkId,
+					_env
+				);
+			}
+			catch(ObjectNotFoundException<TransportNetwork>&)
+			{
+				throw RequestException("No such network");
+			}
 		}
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 		// INPUT
@@ -140,6 +165,9 @@ namespace synthese
 			ostream& os,
 			boost::optional<const admin::AdminRequest&> adminRequest
 		) const {
+
+			// Load object linked to the datasource
+			impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendars(_dataSource, _env);
 
 			_file.open(filePath.file_string().c_str());
 			if(!_file)
@@ -216,10 +244,10 @@ namespace synthese
 			for(_loadNextRecord(11); !_eof() && _record->recordNumber == 11; _loadNextRecord())
 			{
 				TemporaryService service;
-				service.toRead = (_getTextField(5,4) != "0");
+				service.toRead = (_getTextField(5,4) == "0");
 
 				// Filter on regular services
-				if(service.toRead)
+				if(_getTextField(5,4) != "2")
 				{
 					service.lineCode = _getTextField(32,4);
 					service.calendar = _getTextField(103,7);
@@ -236,11 +264,16 @@ namespace synthese
 				// Jump to record 12.7
 				_loadNextRecord(12.7);
 
+				if((!service.code.empty() && _getTextField(105, 5) != service.code) || (service.code.empty() && _getTextField(105, 5) != "0"))
+				{
+					os << "WARN : Service order is different in section 11 and section 12 : " << service.code << "<br />";
+				}
+
 				// Way back
 				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 1 == 1);
 				
 				// Schedules on record 12.8
-				vector<string> schedulesStr(_getNextVector(12.8, 37, 41, 4));
+				vector<string> schedulesStr(_getNextVector(12.8, 37, 41, 5));
 				BOOST_FOREACH(const string& scheduleStr, schedulesStr)
 				{
 					service.schedules.push_back(
@@ -261,6 +294,7 @@ namespace synthese
 
 			// Loop on stops
 			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
+			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
 			bool success(true);
 			BOOST_FOREACH(StopCodes::value_type& stopCode, stopCodes)
 			{
@@ -274,17 +308,36 @@ namespace synthese
 				);
 				if(stopCode.second.empty())
 				{
+					PTFileFormat::ImportableStopPoint isp;
+					isp.operatorCode = stopCode.first;
+					isp.name = stopCode.first;
+					nonLinkedStopPoints.push_back(isp);
 					success = false;
 				}
 			}
 			if(!success)
 			{
-				os << "ERR  : Au moins un arrêt non trouvé : import interrompu<br />";
+				PTFileFormat::DisplayStopPointImportScreen(
+					nonLinkedStopPoints,
+					*adminRequest,
+					_env,
+					_dataSource,
+					os
+				);
+
+				os << "ERR  : Au moins un arrÃªt non trouvÃ© : import interrompu<br />";
+				return false;
 			}
 
 			// Loop on temporary services
+			set<string> missingCalendars;
 			BOOST_FOREACH(const TemporaryService& service, services)
 			{
+				if(!service.toRead)
+				{
+					continue;
+				}
+
 				// Line
 				CommercialLine* line(
 					PTFileFormat::GetLine(
@@ -334,17 +387,44 @@ namespace synthese
 				}
 
 				// Service
-				PTFileFormat::CreateOrUpdateService(
-					*route,
-					service.schedules,
-					service.schedules,
-					service.code,
-					_dataSource,
-					_env,
-					os
-				);
+				ScheduledService* sservice(
+					PTFileFormat::CreateOrUpdateService(
+						*route,
+						service.schedules,
+						service.schedules,
+						service.code,
+						_dataSource,
+						_env,
+						os
+				)	);
 
-				// TODO Calendars
+				// Calendar
+				CalendarTemplate* calendar(
+					CalendarFileFormat::GetCalendarTemplate(
+						calendars,
+						service.calendar,
+						os
+				)	);
+				if(calendar)
+				{
+					*sservice |= calendar->getResult(_calendar);
+				}
+				else
+				{
+					missingCalendars.insert(service.calendar);	
+				}
+			}
+
+			// Abort if at least one missing calendar
+			if(!missingCalendars.empty())
+			{
+				os << "ERR  : At least a calendar is missing. Details :<ul>";
+				BOOST_FOREACH(const string& code, missingCalendars)
+				{
+					os << "<li>" << code << "</li>";
+				}
+				os << "</ul>";
+				return false;
 			}
 
 			return true;
@@ -359,19 +439,8 @@ namespace synthese
 			// Add remove queries generated by _selectObjectsToRemove
 			_addRemoveQueries(transaction);
 
-			// Saving of each created or altered objects
-/*			if(_importStops)
-			{
-				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
-				{
-					StopAreaTableSync::Save(cstop.second.get(), transaction);
-				}
-				BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
-				{
-					StopPointTableSync::Save(stop.second.get(), transaction);
-				}
-			}
-*/			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
+			// Save each created or altered objects
+			BOOST_FOREACH(Registry<CommercialLine>::value_type cline, _env.getRegistry<CommercialLine>())
 			{
 				CommercialLineTableSync::Save(cline.second.get(), transaction);
 			}
@@ -387,26 +456,7 @@ namespace synthese
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env.getRegistry<Junction>())
-			{
-				JunctionTableSync::Save(junction.second.get(), transaction);
-			}
-/*			if(_importTimetablesAsTemplates)
-			{
-				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, _calendarElementsToRemove)
-				{
-					CalendarTemplateElementTableSync::RemoveRow(element->getKey(), transaction);
-				}
-				BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTemplate, _env.getRegistry<CalendarTemplate>())
-				{
-					CalendarTemplateTableSync::Save(calendarTemplate.second.get(), transaction);
-				}
-				BOOST_FOREACH(const Registry<CalendarTemplateElement>::value_type& calendarTemplateElement, _env.getRegistry<CalendarTemplateElement>())
-				{
-					CalendarTemplateElementTableSync::Save(calendarTemplateElement.second.get(), transaction);
-				}
-			}
-*/			return transaction;
+			return transaction;
 		}
 
 
@@ -448,7 +498,7 @@ namespace synthese
 					break;
 				}
 			}
-			size_t lineRecordNumber(lexical_cast<size_t>(recordNumber));
+			double lineRecordNumber(lexical_cast<double>(recordNumber));
 
 			Record record;
 			record.recordNumber = lineRecordNumber;
@@ -470,14 +520,22 @@ namespace synthese
 			std::size_t start,
 			std::size_t length
 		) const	{
+			// Empty record
 			if(!_record)
 			{
 				return string();
 			}
+
+			// Fix of the position
+			--start;
+
+			// Current record is too short to match
 			if(_record->content.size() < start)
 			{
 				return string();
 			}
+
+			// Read the current record
 			if(_record->content.size() < start+length)
 			{
 				return trim_copy(_record->content.substr(start));
@@ -493,6 +551,10 @@ namespace synthese
 			std::size_t start,
 			std::size_t length
 		) const	{
+
+			// Fix of the positions
+			--numberPosition;
+			--start;
 
 			// Search of the section
 			_loadNextRecord(recordNumber);
@@ -516,29 +578,44 @@ namespace synthese
 			{
 				return result;
 			}
+			size_t position(start);
 			for(size_t loadedRecords(0); loadedRecords<vectorSize;)
 			{
-				while(_record->content.size() >= start)
+				while(_record->content.size() >= position)
 				{
-					++loadedRecords;
-					if(_record->content.size() < start+length)
+					if(_record->content.size() < position+length)
 					{
-						result.push_back(trim_copy(_record->content.substr(start)));
+						string value(trim_copy(_record->content.substr(position)));
+						if(!value.empty())
+						{
+							result.push_back(value);
+							++loadedRecords;
+						}
 						break;
 					}
 					else
 					{
-						result.push_back(trim_copy(_record->content.substr(start, length)));
+						string value(trim_copy(_record->content.substr(position, length)));
+						if(!value.empty())
+						{
+							result.push_back(value);
+							++loadedRecords;
+						}
 					}
-					start += length;
+					position += length;
 				}
 
-				// Load of the next line of the file
-				if(!getline(_file, _record->content))
+				if(loadedRecords < vectorSize)
 				{
-					_record->recordNumber = 0;
-					_record->content.clear();
-					return result;
+					// Load of the next line of the file
+					if(!getline(_file, _record->content))
+					{
+						_record->recordNumber = 0;
+						_record->content.clear();
+						return result;
+					}
+
+					position = start;
 				}
 			}
 			return result;
@@ -555,12 +632,14 @@ namespace synthese
 			stream << t.open();
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.title("Paramètres");
-//			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			stream << t.title("Données (remplir un des deux champs)");
+			stream << t.cell("Effacer donnÃ©es anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
+			stream << t.title("DonnÃ©es (remplir un des deux champs)");
 			stream << t.cell("Ligne", t.getForm().getTextInput(PARAMETER_PATH, (_pathsSet.size() == 1) ? _pathsSet.begin()->file_string() : string()));
-			stream << t.cell("Répertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));
+			stream << t.cell("RÃ©pertoire", t.getForm().getTextInput(PARAMETER_DIRECTORY, _dirPath.file_string()));
+			stream << t.title("ParamÃ¨tres");
+			stream << t.cell("RÃ©seau", t.getForm().getTextInput(PARAMETER_TRANSPORT_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
+			stream << t.cell("Date dÃ©but", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
+			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.close();
 		}
 }	}
