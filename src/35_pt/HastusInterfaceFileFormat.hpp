@@ -84,11 +84,29 @@ namespace synthese
 				void _loadNextRecord(
 				) const;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a text field in the file.
+				/// @param start the position of the field in the line according to the file
+				/// format specification (begins at 1 instead of 0 as usually)
+				/// @param length length of the field
+				/// @return the returned text is trimmed
 				std::string _getTextField(
 					std::size_t start,
 					std::size_t length
 				) const;
 				
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets a fields vector in the file.
+				/// @param numberPosition the position of the length field in the first line according to the file
+				/// format specification (begins at 1 instead of 0 as usually)
+				/// @param startPosition the position of the first field in the first line according to the file
+				/// format specification (begins at 1 instead of 0 as usually)
+				/// @param recordLength length of each field
+				/// @return all the returned text elements are trimmed
 				std::vector<std::string> _getNextVector(
 					double recordNumber,
 					std::size_t numberPosition,
