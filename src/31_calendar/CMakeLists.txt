@@ -5,6 +5,8 @@ Calendar.cpp
 Calendar.h
 CalendarDateInterfacePage.cpp
 CalendarDateInterfacePage.hpp
+CalendarFileFormat.cpp
+CalendarFileFormat.hpp
 CalendarHTMLViewer.h
 CalendarModule.cpp
 CalendarModule.gen.cpp
