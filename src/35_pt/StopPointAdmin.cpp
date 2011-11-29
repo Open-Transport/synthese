@@ -160,9 +160,12 @@ namespace synthese
 					set<const CommercialLine*> lines;
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stop->getDepartureEdges())
 					{
-						lines.insert(
-							static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
-						);
+						if(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine())
+						{
+							lines.insert(
+								static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+							);
+						}
 					}
 					BOOST_FOREACH(const CommercialLine* line, lines)
 					{
