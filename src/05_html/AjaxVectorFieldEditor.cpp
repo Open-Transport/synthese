@@ -118,7 +118,7 @@ namespace synthese
 				stream << "add_row('" << _getTableId() << "', [";
 
 				Fields::const_iterator it(_fields.begin());
-				BOOST_FOREACH(const string& value, row)
+				BOOST_FOREACH(const Row::value_type& value, row)
 				{
 					if(it != _fields.begin())
 					{
@@ -196,12 +196,12 @@ namespace synthese
 
 
 
-		void AjaxVectorFieldEditor::SelectField::outputValue( std::ostream& stream, const std::string& value ) const
+		void AjaxVectorFieldEditor::SelectField::outputValue( std::ostream& stream, const std::vector<std::string>& value ) const
 		{
 			stream << "\"";
-			if(!value.empty())
+			if(!value.empty() && !value.front().empty())
 			{
-				stream << lexical_cast<RegistryKeyType>(value);
+				stream << lexical_cast<RegistryKeyType>(value.front());
 			}
 			stream << "\"";
 		}
@@ -227,9 +227,10 @@ namespace synthese
 
 
 
-		void AjaxVectorFieldEditor::TextInputField::outputValue( std::ostream& stream, const std::string& value ) const
+		void AjaxVectorFieldEditor::TextInputField::outputValue( std::ostream& stream, const std::vector<std::string>& value ) const
 		{
-			stream << "\"" << replace_all_copy(value,"\"","'") << "\"";
+			if(!value.empty())
+				stream << "\"" << replace_all_copy(value.front(),"\"","'") << "\"";
 		}
 
 
@@ -292,8 +293,9 @@ namespace synthese
 
 
 
-		void AjaxVectorFieldEditor::TextAutoCompleteInputField::outputValue( std::ostream& stream, const std::string& value ) const
+		void AjaxVectorFieldEditor::TextAutoCompleteInputField::outputValue( std::ostream& stream, const std::vector<std::string>& value ) const
 		{
-			stream << "\"" << replace_all_copy(value,"\"","'") << "\"";
+			if(value.size() > 1)
+				stream << "[\"" << replace_all_copy(value[0],"\"","'") << "\", \"" << replace_all_copy(value[1],"\"","'") << "\"]";
 		}
 }	}

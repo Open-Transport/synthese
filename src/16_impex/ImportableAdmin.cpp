@@ -77,8 +77,8 @@ namespace synthese
 			BOOST_FOREACH(const Importable::DataSourceLinks::value_type& link, object.getDataSourceLinks())
 			{
 				AjaxVectorFieldEditor::Row row;
-				row.push_back(link.first ? lexical_cast<string>(link.first->getKey()) : string());
-				row.push_back(link.second);
+				row.push_back(vector<string>(1,(link.first ? lexical_cast<string>(link.first->getKey()) : string())));
+				row.push_back(vector<string>(1,link.second));
 				editor.addRow(row);
 			}
 
