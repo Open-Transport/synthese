@@ -32,6 +32,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "MainRoadChunk.hpp"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -48,7 +49,8 @@ namespace synthese
 		class RoadPlace:
 			public virtual geography::Place,
 			public graph::PathGroup,
-			public geography::NamedPlaceTemplate<RoadPlace>
+			public geography::NamedPlaceTemplate<RoadPlace>,
+			public impex::ImportableTemplate<RoadPlace>
 		{
 		public:
 

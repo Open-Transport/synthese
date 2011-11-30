@@ -25,7 +25,10 @@
 
 #include "Registry.h"
 #include "NamedPlaceTemplate.h"
+#include "Importable.h"
+#include "WithGeometry.hpp"
 
+#include <geos/geom/Point.h>
 #include <string>
 
 namespace synthese
@@ -41,7 +44,9 @@ namespace synthese
 		/// @image html uml_public_place.png
 		///
 		class PublicPlace:
-			public geography::NamedPlaceTemplate<PublicPlace>
+			public geography::NamedPlaceTemplate<PublicPlace>,
+			public impex::ImportableTemplate<PublicPlace>,
+			public WithGeometry<geos::geom::Point>
 		{
 		public:
 
