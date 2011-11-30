@@ -160,7 +160,10 @@ namespace synthese
 				BOOST_FOREACH(const DRTArea::Stops::value_type& stop, _area->getStops())
 				{
 					AjaxVectorFieldEditor::Row row;
-					row.push_back(lexical_cast<string>(stop->getKey()));
+					vector<string> field;
+					field.push_back(lexical_cast<string>(stop->getKey()));
+					field.push_back(lexical_cast<string>(stop->getCity()->getName() + " " + stop->getName()));
+					row.push_back(field);
 					editor.addRow(row);
 				}
 
