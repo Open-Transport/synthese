@@ -26,9 +26,11 @@
 #include "CityTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -36,6 +38,7 @@ namespace synthese
 	using namespace util;
 	using namespace road;
 	using namespace geography;
+	using namespace impex;
 
 	namespace util
 	{
@@ -47,19 +50,22 @@ namespace synthese
 	{
 		const string PublicPlaceTableSync::COL_NAME ("name");
 		const string PublicPlaceTableSync::COL_CITYID ("city_id");
+		const string PublicPlaceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
 
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<PublicPlaceTableSync>::TABLE(
 			"t013_public_places"
-			);
+		);
 
 		template<> const DBTableSync::Field DBTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field(PublicPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			DBTableSync::Field()
 		};
 
@@ -68,14 +74,27 @@ namespace synthese
 			DBTableSync::Index()
 		};
 
+
+
 		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Load(
 			PublicPlace* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 			string name (rows->getText (PublicPlaceTableSync::COL_NAME));
 			object->setName(name);
+
+			// Geometry
+			shared_ptr<Point> point(
+				static_pointer_cast<Point, Geometry>(
+					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
+			)	);
+			if(point.get())
+			{
+				object->setGeometry(point);
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -83,6 +102,13 @@ namespace synthese
 				object->setCity(city);
 
 				city->addPlaceToMatcher<PublicPlace>(env.getEditableSPtr(object));
+
+				// Datasource links
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(PublicPlaceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
 			}
 		}
 
@@ -105,6 +131,8 @@ namespace synthese
 			ReplaceQuery<PublicPlaceTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry())); // Must stay at last position
 			query.execute(transaction);
 		}
 

@@ -55,7 +55,6 @@ namespace synthese
 	namespace road
 	{
 		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
-		const std::string CrossingTableSync::COL_SOURCE_ID ("source_id");
 	}
 
 	namespace db
@@ -68,7 +67,6 @@ namespace synthese
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			DBTableSync::Field(CrossingTableSync::COL_SOURCE_ID, SQL_INTEGER),
 			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			DBTableSync::Field()
 		};
@@ -78,13 +76,14 @@ namespace synthese
 			DBTableSync::Index()
 		};
 
+
+
 		template<> void DBDirectTableSyncTemplate<CrossingTableSync, Crossing>::Load(
 			Crossing* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-
 			// Geometry
 			shared_ptr<Point> point(
 				static_pointer_cast<Point, Geometry>(
@@ -118,7 +117,6 @@ namespace synthese
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
 			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
-			query.addFieldNull();
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

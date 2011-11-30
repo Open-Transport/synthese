@@ -49,6 +49,10 @@ namespace synthese
 			static const std::string FIELDS_SEPARATOR;
 
 		public:
+			// Don't attempt to define such a constant : it will be not initialized
+			// at calls in _FIELDS initialization
+			// static const std::string COL_DATASOURCE_LINKS;
+
 			template<class T>
 			class ObjectBySource
 			{

@@ -46,6 +46,7 @@ namespace synthese
 		public:
 			static const std::string COL_NAME;
 			static const std::string COL_CITYID;
+			static const std::string COL_DATASOURCE_LINKS;
 
 
 

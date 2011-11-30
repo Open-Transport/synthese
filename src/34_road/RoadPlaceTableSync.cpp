@@ -32,6 +32,7 @@
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
 #include "Conversion.h"
+#include "ImportableTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -42,7 +43,7 @@ namespace synthese
 	using namespace util;
 	using namespace road;
 	using namespace geography;
-
+	using namespace impex;
 
 	namespace util
 	{
@@ -51,10 +52,10 @@ namespace synthese
 
 	namespace road
 	{
-		const string RoadPlaceTableSync::COL_NAME("name");
-		const string RoadPlaceTableSync::COL_CITYID("city_id");
+		const string RoadPlaceTableSync::COL_NAME = "name";
+		const string RoadPlaceTableSync::COL_CITYID = "city_id";
+		const string RoadPlaceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
-
 
 	namespace db
 	{
@@ -67,6 +68,7 @@ namespace synthese
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
 			DBTableSync::Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			DBTableSync::Field(RoadPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -77,6 +79,7 @@ namespace synthese
 				, ""),
 			DBTableSync::Index()
 		};
+
 
 
 		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Load(
@@ -97,6 +100,13 @@ namespace synthese
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 				city->addPlaceToMatcher<RoadPlace>(env.getEditableSPtr(object));
+
+				// Datasource links
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
 			}
 		}
 
@@ -109,6 +119,7 @@ namespace synthese
 			ReplaceQuery<RoadPlaceTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

@@ -35,6 +35,7 @@
 #include "DataSourceAdmin.h"
 #include "ImportFunction.h"
 #include "PropertiesHTMLTable.h"
+#include "RoadFileFormat.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -267,9 +268,6 @@ namespace synthese
 							continue;
 						}
 
-						// Chunk length
-						double length(geometry->getLength());
-
 						// Name
 						string roadName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
 
@@ -365,144 +363,20 @@ namespace synthese
 							)	);
 						}
 
-						// Search for an existing road which ends at the left node
-						MainRoadPart* road(NULL);
-						double startMetricOffset(0);
-						BOOST_FOREACH(Path* croad, roadPlace->getPaths())
-						{
-							if(!dynamic_cast<MainRoadPart*>(croad))
-							{
-								continue;
-							}
-							if(croad->getLastEdge()->getFromVertex() == leftNode.get())
-							{
-								road = static_cast<MainRoadPart*>(croad);
-								startMetricOffset = croad->getLastEdge()->getMetricOffset();
-								break;
-							}
-						}
-						if(road)
-						{
-							// Adding geometry to the last chunk
-							_setGeometryAndHouses(
-								static_cast<MainRoadChunk&>(*road->getLastEdge()),
-								geometry,
-								rightHouseNumberingPolicy,
-								leftHouseNumberingPolicy,
-								rightHouseNumberBounds,
-								leftHouseNumberBounds
-								);
-
-							// Second road chunk creation
-							shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
-							secondRoadChunk->setRoad(road);
-							secondRoadChunk->setFromCrossing(rightNode.get());
-							secondRoadChunk->setRankInPath((*(road->getEdges().end()-1))->getRankInPath() + 1);
-							secondRoadChunk->setMetricOffset(startMetricOffset + length);
-							secondRoadChunk->setKey(RoadChunkTableSync::getId());
-							road->addRoadChunk(*secondRoadChunk);
-							_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
-
-							// Search for a second existing road which starts at the right node
-							MainRoadPart* road2 = NULL;
-							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
-							{
-								if(!dynamic_cast<MainRoadPart*>(croad))
-								{
-									continue;
-								}
-								if(croad->getEdge(0)->getFromVertex() == rightNode.get())
-								{
-									road2 = static_cast<MainRoadPart*>(croad);
-									break;
-								}
-							}
-							// If found, merge the two roads
-							if(road2)
-							{
-								RegistryKeyType lastEdgeId(road->getLastEdge()->getKey());
-								road->merge(*road2);
-								_env.getEditableRegistry<MainRoadChunk>().remove(lastEdgeId);
-								_env.getEditableRegistry<MainRoadPart>().remove(road2->getKey());
-							}
-
-						}
-						else
-						{
-							// If not found search for an existing road which begins at the right node
-							BOOST_FOREACH(Path* croad, roadPlace->getPaths())
-							{
-								if(!dynamic_cast<MainRoadPart*>(croad))
-								{
-									continue;
-								}
-								if(croad->getEdge(0)->getFromVertex() == rightNode.get())
-								{
-									road = static_cast<MainRoadPart*>(croad);
-									break;
-								}
-							}
-
-							if(road)
-							{
-								// First road chunk creation
-								shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
-								firstRoadChunk->setRoad(road);
-								firstRoadChunk->setFromCrossing(leftNode.get());
-								firstRoadChunk->setRankInPath(0);
-								firstRoadChunk->setMetricOffset(0);
-								firstRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->insertRoadChunk(*firstRoadChunk, length, 1);
-								_setGeometryAndHouses(
-									*firstRoadChunk,
-									geometry,
-									rightHouseNumberingPolicy,
-									leftHouseNumberingPolicy,
-									rightHouseNumberBounds,
-									leftHouseNumberBounds
-									);
-
-								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
-							}
-							else
-							{
-								shared_ptr<MainRoadPart> road(new MainRoadPart(0, Road::ROAD_TYPE_UNKNOWN));
-								road->setRoadPlace(*roadPlace);
-								road->setKey(RoadTableSync::getId());
-								_env.getEditableRegistry<MainRoadPart>().add(road);
-
-								// First road chunk
-								shared_ptr<MainRoadChunk> firstRoadChunk(new MainRoadChunk);
-								firstRoadChunk->setRoad(road.get());
-								firstRoadChunk->setFromCrossing(leftNode.get());
-								firstRoadChunk->setRankInPath(0);
-								firstRoadChunk->setMetricOffset(0);
-								firstRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->addRoadChunk(*firstRoadChunk);
-								_setGeometryAndHouses(
-									*firstRoadChunk,
-									geometry,
-									rightHouseNumberingPolicy,
-									leftHouseNumberingPolicy,
-									rightHouseNumberBounds,
-									leftHouseNumberBounds
-									);
-
-								_env.getEditableRegistry<MainRoadChunk>().add(firstRoadChunk);
-
-								// Second road chunk
-								shared_ptr<MainRoadChunk> secondRoadChunk(new MainRoadChunk);
-								secondRoadChunk->setRoad(road.get());
-								secondRoadChunk->setFromCrossing(rightNode.get());
-								secondRoadChunk->setRankInPath(1);
-								secondRoadChunk->setMetricOffset(length);
-								secondRoadChunk->setKey(RoadChunkTableSync::getId());
-								road->addRoadChunk(*secondRoadChunk);
-								_env.getEditableRegistry<MainRoadChunk>().add(secondRoadChunk);
-							}
-						}
-//					}
-				}
+						// Chunk insertion
+						RoadFileFormat::AddRoadChunk(
+							*roadPlace,
+							*leftNode,
+							*rightNode,
+							geometry,
+							rightHouseNumberingPolicy,
+							leftHouseNumberingPolicy,
+							rightHouseNumberBounds,
+							leftHouseNumberBounds,
+							_env
+						);
+					}
+//				}
 			}
 
 			os << "<b>SUCCESS : Data loaded</b><br />";
@@ -580,23 +454,6 @@ namespace synthese
  				}
 			}
 			return MainRoadChunk::HouseNumberBounds();
-		}
-
-
-
-		void NavstreetsFileFormat::Importer_::_setGeometryAndHouses(
-			MainRoadChunk& chunk,
-			shared_ptr<geos::geom::LineString> geometry,
-			MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
-			){
-				chunk.setGeometry(geometry);
-				chunk.setRightHouseNumberBounds(rightHouseNumberBounds);
-				chunk.setRightHouseNumberingPolicy(rightHouseNumberingPolicy);
-				chunk.setLeftHouseNumberBounds(leftHouseNumberBounds);
-				chunk.setLeftHouseNumberingPolicy(leftHouseNumberingPolicy);
 		}
 
 

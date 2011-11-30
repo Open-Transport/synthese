@@ -36,6 +36,8 @@ RoadChunk.cpp
 RoadChunk.h
 RoadChunkTableSync.cpp
 RoadChunkTableSync.h
+RoadFileFormat.cpp
+RoadFileFormat.hpp
 RoadModule.cpp
 RoadModule.gen.cpp
 RoadModuleRegister.cpp
@@ -45,6 +47,8 @@ RoadPlace.cpp
 RoadPlace.h
 RoadPlaceTableSync.cpp
 RoadPlaceTableSync.h
+RoadShapeFileFormat.cpp
+RoadShapeFileFormat.hpp
 RoadTableSync.cpp
 RoadTableSync.h
 )
