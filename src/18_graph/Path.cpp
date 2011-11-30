@@ -361,7 +361,8 @@ namespace synthese
 			if(	other._pathGroup != _pathGroup ||
 				other._edges.empty() ||
 				_edges.empty() ||
-				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex()
+				other.getEdge(0)->getFromVertex() != getLastEdge()->getFromVertex() ||
+				&other == this
 			){
 				throw Exception("The two roads cannot be merged");
 			}

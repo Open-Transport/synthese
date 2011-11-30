@@ -48,6 +48,8 @@ namespace synthese
 		{
 		}
 
+
+
 		PublicPlace::~PublicPlace ()
 		{
 		}

@@ -173,19 +173,7 @@ namespace synthese
 				);
 
 
-
-				static void _setGeometryAndHouses(
-					MainRoadChunk& chunk,
-					boost::shared_ptr<geos::geom::LineString> geometry,
-					MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy,
-					MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
-					MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
-					MainRoadChunk::HouseNumberBounds leftHouseNumberBounds
-				);
-
-
 			protected:
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks that all necessary input files are available.
 				/// @result true if all necessary files are present
