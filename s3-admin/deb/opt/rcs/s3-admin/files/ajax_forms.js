@@ -1,49 +1,34 @@
-function addTextInputAutoComplete(
- name,
- valueID,
- valueName,
- service,
- rows,
- row,
- extraParamName,
- extraParamDivID,
- bottomButton,
- IDButton,
- useID,
- viewID,
- displayTextBeforeTyping,
- fieldId,
- className,
- tableID){
-  if(fieldId.length == 0)
-    fieldId = name + "__ID";
+function addTextInputAutoComplete(params){
+  if(params.fieldId.length == 0)
+    params.fieldId = params.name + "__ID";
   
   var fieldIdAutoComplete;
-  if(useID)
-    fieldIdAutoComplete = name + "Selection__ID";
+  if(params.useId)
+    fieldIdAutoComplete = params.name + "Selection__ID";
   else
-    fieldIdAutoComplete = fieldId;
+    fieldIdAutoComplete = params.fieldId;
 
-  var contenu;
+  var content;
 
   // Add divs
-  contenu = "<div id=\"div" + name + "Selection\">";
-  contenu = contenu + "<input type=\"text\" name=\"" + (useID ? name + "Selection": name) + "\" value=\"" + valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
-  if(bottomButton) {
-    contenu = contenu + "<input type=\"button\" value=\"v\" onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
+  content = "<div id=\"div" + params.name + "Selection\">";
+  content = content + "<input type=\"text\" name=\"" + (params.useId ? params.name + "Selection": params.name) + "\" value=\"" + params.valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
+  if(params.bottomButton) {
+    content = content + "<input type=\"button\" value=\"v\" onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
   }
-  if(IDButton) {
-    contenu = contenu + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + name + "Selection').hide();$('#div" + name + "').show();\" style=\"margin-left:0px;\"/>";
+  if(params.idButton) {
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.name + "Selection').hide();$('#div" + params.name + "').show();\" style=\"margin-left:0px;\"/>";
   }
-  contenu = contenu + "</div>";
-  if(useID) {
-    contenu = contenu + "<div id=\"div" + name + "\" style=\"display:none\">";
-    contenu = contenu + "<input type=\"text\" name=\"" + name + "\" value=\"" + valueID + "\" id=\"" + fieldId + "\" style=\"margin-right:0px;\" />";
-    contenu = contenu + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + name + "Selection').show();$('#div" + name + "').hide();\" style=\"margin-left:0px;\" />";
-    contenu = contenu + "</div>";
+  content = content + "</div>";
+  if(params.useId) {
+    content = content + "<div id=\"div" + params.name + "\" style=\"display:none\">";
+    content = content + "<input type=\"text\" name=\"" + params.name + "\" value=\"" + params.valueId + "\" id=\"" + params.fieldId + "\" style=\"margin-right:0px;\" />";
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.name + "Selection').show();$('#div" + params.name + "').hide();\" style=\"margin-left:0px;\" />";
+    content = content + "</div>";
   }
 
-  $('#divMain' + name).html(contenu);
+  // Replace input with 
+  $('input[type="text"][name="' + params.name + '"]').replaceWith(content);
 
   // Execute js code
   var jscode = "$(function() {"
@@ -53,23 +38,23 @@ function addTextInputAutoComplete(
           + "url: 'synthese',"
           + "dataType: 'json',"
           + "data: {"
-            + "SERVICE: '" + service + "',"
+            + "SERVICE: '" + params.service + "',"
             + "output_format: 'json',"
             + "n: 10,"
             + "t: request.term";
-            if(extraParamName.length > 0) {
-              jscode = jscode + ", " + extraParamName + ": ";
-			  if(extraParamDivID.length > 0) jscode = jscode + "$('#" + extraParamDivID + "__ID').val()";
+            if(params.extraParamName.length > 0) {
+              jscode = jscode + ", " + params.extraParamName + ": ";
+			  if(params.extraParamDivId.length > 0) jscode = jscode + "$('#" + params.extraParamDivId + "__ID').val()";
 			  else jscode = jscode + "''";
 			}
-            if(service == "lr")
-              jscode = jscode + ", table: "  + tableID;
+            if(params.service == "lr")
+              jscode = jscode + ", table: "  + params.tableId;
 
           jscode = jscode + "},"
           + "success: function( data ) {"
-            + "response( $.map( data." + rows + "." + row + ", function( item ) {"
+            + "response( $.map( data." + params.rows + "." + params.row + ", function( item ) {"
               + "return {"
-                + "label: item.name" + (viewID ? " + ' (' + item.roid + ')'," : ",")
+                + "label: item.name" + (params.viewId ? " + ' (' + item.roid + ')'," : ",")
                 + "value: item.name,"
                 + "id: item.roid"
               + "}"
@@ -77,13 +62,14 @@ function addTextInputAutoComplete(
           + "}"
         + "});"
       + "},";
-      if(useID) {
+      if(params.useId) {
         jscode = jscode + "select: function( event, ui ) {"
-          + "$('#" + fieldId + "').val(ui.item.id);"
+          + "$('#" + params.fieldId + "').val(ui.item.id);"
         + "},";
       }
       jscode = jscode + "minLength: 0,"
-      + "autoFocus: true,"
+      + "autoFocus: false,"
+      + "delay: 150,"
       + "open: function() {"
         + "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
       + "},"
@@ -203,8 +189,10 @@ function add_new_row(link)
       values[i] = addRow.cells[i].childNodes[0].value;
       addRow.cells[i].childNodes[0].value = '';
     } else if(addRow.cells[i].childNodes[0].tagName == 'DIV') {
-      values[i] = addRow.cells[i].childNodes[0].childNodes[1].childNodes[0].value;
-	  addRow.cells[i].childNodes[0].childNodes[0].childNodes[0].value = '';
+      values[i] = new Array();
+      values[i][0] = addRow.cells[i].childNodes[1].childNodes[0].value;
+      values[i][1] = addRow.cells[i].childNodes[0].childNodes[0].value;
+	  addRow.cells[i].childNodes[0].childNodes[0].value = '';
 	}
 	else {
       values[i] = '';
@@ -269,7 +257,8 @@ function add_row(tableId, values)
       newCell.innerHTML = '<input type="text" value="'+ values[i] +'"  />';
     }
 	else if(addRow.cells[i].childNodes[0].tagName == 'DIV') {
-      newCell.innerHTML = '<input type="text" value="'+ values[i] +'"  />';
+      newCell.innerHTML = '<input type="hidden" value="'+ values[i][0] +'"  />';
+      newCell.innerHTML += values[i][1];
     } else if(i==addRow.cells.length-1) {
       var html = '<a href="#" onclick="remove_row(this); return false;"><img src="delete.png" alt="-" title="Supprimer l\'élément" /></a>';
       if(tblBody.className!='autoorder') {
