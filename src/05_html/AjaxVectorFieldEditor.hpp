@@ -58,7 +58,7 @@ namespace synthese
 					std::size_t fieldRank
 				) const = 0;
 
-				virtual void outputValue(std::ostream& stream, const std::string& value) const = 0;
+				virtual void outputValue(std::ostream& stream, const std::vector<std::string>& value) const = 0;
 			};
 
 
@@ -90,7 +90,7 @@ namespace synthese
 					std::size_t fieldRank
 				) const;
 
-				virtual void outputValue(std::ostream& stream, const std::string& value) const;
+				virtual void outputValue(std::ostream& stream, const std::vector<std::string>& value) const;
 			};
 
 
@@ -112,7 +112,7 @@ namespace synthese
 					std::size_t fieldRank
 				) const;
 
-				virtual void outputValue(std::ostream& stream, const std::string& value) const;
+				virtual void outputValue(std::ostream& stream, const std::vector<std::string>& value) const;
 			};
 
 
@@ -159,11 +159,11 @@ namespace synthese
 					std::size_t fieldRank
 				) const;
 
-				virtual void outputValue(std::ostream& stream, const std::string& value) const;
+				virtual void outputValue(std::ostream& stream, const std::vector<std::string>& value) const;
 			};
 
 			typedef std::vector<boost::shared_ptr<Field> > Fields;
-			typedef std::vector<std::string> Row;
+			typedef std::vector<std::vector<std::string> > Row;
 			typedef std::vector<Row> Rows;
 
 		private:

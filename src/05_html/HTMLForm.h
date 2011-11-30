@@ -454,15 +454,15 @@ namespace synthese
 				*/
 				static std::string getTextInputAutoCompleteFromTableSync(
 					const std::string& name,
-					const std::string& valueID,
+					const std::string& valueId,
 					const std::string& valueName,
-					const std::string& tableID,
+					const std::string& tableId,
 					const std::string& extraParamName,
-					const std::string& extraParamDivID,
+					const std::string& extraParamDivId,
 					bool viewbottomButton = true,
-					bool viewIDButton = true,
-					bool useID = true,
-					bool viewID = false,
+					bool viewIdButton = true,
+					bool useId = true,
+					bool viewId = false,
 					std::string displayTextBeforeTyping = std::string(),
 					std::string fieldId = std::string(),
 					std::string className = std::string()
@@ -481,8 +481,8 @@ namespace synthese
 					@param fieldId unique ID of the field within the page,
 					@param className CSS class to use for display
 					@return std::string the HTML generated code (use addTextInputAutoComplete from ajax_forms.js)
-					@author Hugues Romain
-					@date 2008-2010
+					@author Gaël Sauvanet
+					@date 2011
 				*/
 				static std::string getTextInputAutoCompleteFromService(
 					const std::string& name,
@@ -492,11 +492,11 @@ namespace synthese
 					const std::string& rows,
 					const std::string& row,
 					const std::string& extraParamName,
-					const std::string& extraParamDivID,
+					const std::string& extraParamDivId,
 					bool viewbottomButton = true,
 					bool viewIDButton = true,
-					bool useID = true,
-					bool viewID = false,
+					bool useId = true,
+					bool viewId = false,
 					std::string displayTextBeforeTyping = std::string(),
 					std::string fieldId = std::string(),
 					std::string className = std::string()

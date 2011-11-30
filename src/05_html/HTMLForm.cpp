@@ -163,41 +163,42 @@ namespace synthese
 
 		std::string HTMLForm::getTextInputAutoCompleteFromTableSync(
 			const std::string& name,
-			const std::string& valueID,
+			const std::string& valueId,
 			const std::string& valueName,
-			const std::string& tableID,
+			const std::string& tableId,
 			const std::string& extraParamName,
-			const std::string& extraParamDivID,
+			const std::string& extraParamDivId,
 			bool bottomButton,
-			bool IDButton,
-			bool useID,
-			bool viewID,
+			bool idButton,
+			bool useId,
+			bool viewId,
 			std::string displayTextBeforeTyping,
 			std::string fieldId,
 			string className
 		){
 			stringstream s;
 
-			s 	<< "<div id=\"divMain" << name << "\"></div>";
+			s	<< GetTextInput(name, (useId ? valueId : valueName), displayTextBeforeTyping, fieldId, className);
+
 			s	<< "<script type=\"text/javascript\">"
-				<< "addTextInputAutoComplete("
-					<< "'" << name << "',"
-					<< "'" << valueID << "',"
-					<< "'" << valueName << "',"
-					<< "'lr',"
-					<< "'rows',"
-					<< "'row',"
-					<< "'" << extraParamName << "',"
-					<< "'" << extraParamDivID << "',"
-					<< bottomButton << ","
-					<< IDButton << ","
-					<< useID << ","
-					<< viewID << ","
-					<< "'" << displayTextBeforeTyping << "',"
-					<< "'" << fieldId << "',"
-					<< "'" << className << "',"
-					<< "'" << tableID << "'"
-				<< ");"
+				<< "addTextInputAutoComplete({"
+					<< "name:'" << name << "',"
+					<< "valueId:'" << valueId << "',"
+					<< "valueName:'" << valueName << "',"
+					<< "service:'lr',"
+					<< "rows:'rows',"
+					<< "row:'row',"
+					<< "extraParamName:'" << extraParamName << "',"
+					<< "extraParamDivId:'" << extraParamDivId << "',"
+					<< "bottomButton:" << bottomButton << ","
+					<< "idButton:" << idButton << ","
+					<< "useId:" << useId << ","
+					<< "viewId:" << viewId << ","
+					<< "displayTextBeforeTyping:'" << displayTextBeforeTyping << "',"
+					<< "fieldId:'" << fieldId << "',"
+					<< "className:'" << className << "',"
+					<< "tableId:'" << tableId << "'"
+				<< "});"
 				<< "</script>";
 			return s.str();
 		}
@@ -206,43 +207,44 @@ namespace synthese
 
 		std::string HTMLForm::getTextInputAutoCompleteFromService(
 			const std::string& name,
-			const std::string& valueID,
+			const std::string& valueId,
 			const std::string& valueName,
 			const std::string& service,
 			const std::string& rows,
 			const std::string& row,
 			const std::string& extraParamName,
-			const std::string& extraParamDivID,
+			const std::string& extraParamDivId,
 			bool bottomButton,
-			bool IDButton,
-			bool useID,
-			bool viewID,
+			bool idButton,
+			bool useId,
+			bool viewId,
 			std::string displayTextBeforeTyping,
 			std::string fieldId,
 			std::string className
 		){
 			stringstream s;
 
-			s 	<< "<div id=\"divMain" << name << "\"></div>";
+			s << GetTextInput(name, (useId ? valueId : valueName), displayTextBeforeTyping, fieldId, className);
+
 			s	<< "<script type=\"text/javascript\">"
-				<< "addTextInputAutoComplete("
-					<< "'" << name << "',"
-					<< "'" << valueID << "',"
-					<< "'" << valueName << "',"
-					<< "'" << service  << "',"
-					<< "'" << rows  << "',"
-					<< "'" << row  << "',"
-					<< "'" << extraParamName << "',"
-					<< "'" << extraParamDivID << "',"
-					<< bottomButton << ","
-					<< IDButton << ","
-					<< useID << ","
-					<< viewID << ","
-					<< "'" << displayTextBeforeTyping << "',"
-					<< "'" << fieldId << "',"
-					<< "'" << className << "',"
-					<< "''"
-				<< ");"
+				<< "addTextInputAutoComplete({"
+					<< "name:'" << name << "',"
+					<< "valueId:'" << valueId << "',"
+					<< "valueName:'" << valueName << "',"
+					<< "service:'" << service  << "',"
+					<< "rows:'" << rows  << "',"
+					<< "row:'" << row  << "',"
+					<< "extraParamName:'" << extraParamName << "',"
+					<< "extraParamDivId:'" << extraParamDivId << "',"
+					<< "bottomButton:" << bottomButton << ","
+					<< "idButton:" << idButton << ","
+					<< "useId:" << useId << ","
+					<< "viewId:" << viewId << ","
+					<< "displayTextBeforeTyping:'" << displayTextBeforeTyping << "',"
+					<< "fieldId:'" << fieldId << "',"
+					<< "className:'" << className << "',"
+					<< "tableId:''"
+				<< "});"
 				<< "</script>";
 			return s.str();
 		}

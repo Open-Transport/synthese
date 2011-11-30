@@ -31,7 +31,6 @@
 #include "RollingStockUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
-#include "AjaxVectorFieldEditor.hpp"
 #include "StopArea.hpp"
 
 #include <boost/lexical_cast.hpp>
