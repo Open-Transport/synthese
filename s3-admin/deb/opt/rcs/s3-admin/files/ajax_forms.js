@@ -37,10 +37,12 @@ function addTextInputAutoComplete(params){
         + "$.ajax({"
           + "url: 'synthese',"
           + "dataType: 'json',"
+          + "mode: 'abort',"
+          + "port: 'autocomplete"+ params.name + "',"
           + "data: {"
             + "SERVICE: '" + params.service + "',"
             + "output_format: 'json',"
-            + "n: 10,"
+            + "n: 12,"
             + "t: request.term";
             if(params.extraParamName.length > 0) {
               jscode = jscode + ", " + params.extraParamName + ": ";
@@ -67,11 +69,14 @@ function addTextInputAutoComplete(params){
           + "$('#" + params.fieldId + "').val(ui.item.id);"
         + "},";
       }
-      jscode = jscode + "minLength: 0,"
+      jscode = jscode + "minLength: 3,"
       + "autoFocus: false,"
       + "delay: 150,"
       + "open: function() {"
         + "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
+      + "},"
+      + "blur : function() {"
+        + "$(this).removeClass('ui-corner-top').addClass('ui-corner-all');"
       + "},"
       + "close: function() {"
         + "$(this).removeClass('ui-corner-top').addClass('ui-corner-all');"
