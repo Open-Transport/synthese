@@ -31,5 +31,6 @@ technical_infos = """Informations techniques:
 
 Import à blanc: {dummy}
 
-Appels syntheses: {content}
+Appels syntheses:
+{synthese_calls}
 """
