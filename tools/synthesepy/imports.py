@@ -133,7 +133,7 @@ class ImportTemplate(DirObjectLoader):
 
         return self.imports[import_id]
 
-    def create_import(self, args):
+    def create_import(self, args={}):
         self._load_imports()
         import_ = self.create_object(self.imports, self.path, Import, self)
         if self.after_create:
@@ -284,7 +284,7 @@ class ImportRun(object):
 
         body += i18n.technical_infos.format(
             dummy=self.dummy,
-            content='\n'.join(self.synthese_calls))
+            synthese_calls='\n\n'.join(self.synthese_calls))
 
         return (summary, body)
 
@@ -307,7 +307,6 @@ class Import(DirObjectLoader):
             self.config = config['config']
         else:
             self.config = {}
-        log.debug('Config: %s', self.config)
 
         self._read_params()
 
