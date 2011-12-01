@@ -73,6 +73,9 @@ def install_dependencies(env):
     # MySQL
     required_packages.extend(['libmysqlclient16', 'libcurl3'])
 
+    # WSGI
+    required_packages.extend(['libapache2-mod-wsgi'])
+
     builder.check_debian_package_requirements(
         required_packages, do_install=True)
 

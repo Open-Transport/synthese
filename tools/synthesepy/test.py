@@ -33,7 +33,6 @@ if sys.version_info >= (2, 7):
 else:
     import unittest2 as unittest
 
-from synthesepy.functional_test import http_testcase
 import synthesepy.build
 from synthesepy import db_backends
 from synthesepy import utils
@@ -43,9 +42,12 @@ log = logging.getLogger(__name__)
 
 
 class Tester(object):
+    instance = None
+
     def __init__(self, env):
         self.env = env
         self.config = env.config
+        Tester.instance = self
 
     def run_style_tests(self, suite_args):
 
@@ -143,9 +145,11 @@ class Tester(object):
         return not (error_count > 0 or (file_count == 0 and delete_only_file_count == 0))
 
     def run_python_tests(self, suite_args):
-        http_testcase.init_backends(
-            self.env, self.env.c.test_conn_strings, self.config.no_init,
-            self.config.test_daemon_only)
+        # Save data on our instance, for access from the tests.
+        self.backends = []
+        for conn_string in self.env.c.test_conn_strings:
+            self.backends.append(db_backends.create_backend(
+                self.env, conn_string))
 
         sys_argv = sys.argv[0:1]
 

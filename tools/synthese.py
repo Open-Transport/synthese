@@ -32,7 +32,7 @@ import traceback
 log = logging.getLogger(__name__)
 
 # Increment this when the Python environment needs to be updated.
-REQUIRED_ENV_VERSION = 2
+REQUIRED_ENV_VERSION = 3
 
 SYNTHESEPY_DIR = '@SYNTHESEPY_DIR@'
 
@@ -175,7 +175,7 @@ class Bootstrap(object):
         log.info('Current env version (%i) is lower than the required '
             'version (%i). Deleting env and reinstalling.', env_version,
             REQUIRED_ENV_VERSION)
-        
+
         if os.path.isdir(self.pyenv_path):
             shutil.rmtree(self.pyenv_path)
 
@@ -194,10 +194,14 @@ class Bootstrap(object):
 
     def run_synthese(self):
         if sys.platform == 'win32':
-            python = join(self.pyenv_path, 'Scripts', 'python.exe')
+            env_bin_dir = join(self.pyenv_path, 'Scripts')
+            python = join(env_bin_dir, 'python.exe')
         else:
-            python = join(self.pyenv_path, 'bin', 'python')
+            env_bin_dir = join(self.pyenv_path, 'bin')
+            python = join(env_bin_dir, 'python')
 
+        os.environ['SYNTHESE_ENV_BIN_DIR'] = env_bin_dir
+        os.environ['SYNTHESE_TOOLS_DIR'] = self.tools_path
         os.environ['SYNTHESE_THIRDPARTY_DIR'] = self.thirdparty_dir
 
         pythonpath = os.environ.get('PYTHONPATH', '')
