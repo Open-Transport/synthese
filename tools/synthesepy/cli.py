@@ -177,11 +177,16 @@ def add_project_subparsers(subparsers):
     add_parser('db_remote_restore')
     add_parser('ssh')
     def imports(project, args, env):
-        project.imports(args.subcommand, args.template_id, args.import_id)
+        project.imports(
+            args.subcommand, args.template_id, args.import_id, args.dummy,
+            args.no_mail, args.args)
     parser = add_parser('imports', func=imports)
     parser.add_argument('--cmd', dest='subcommand')
     parser.add_argument('--template-id')
     parser.add_argument('--import-id')
+    parser.add_argument('--dummy', action='store_true', default=False)
+    parser.add_argument('--no-mail', action='store_true', default=False)
+    parser.add_argument('--args')
     add_parser('system_install_prepare')
     add_parser('system_install')
     add_parser('system_uninstall')

@@ -25,6 +25,7 @@ import contextlib
 import datetime
 import glob
 import gzip
+import json
 import logging
 import os
 from os.path import join
@@ -797,7 +798,7 @@ The synthese.py wrapper script.
         utils.call(_ssh_command_line(self.config))
 
     @command()
-    def imports(self, subcommand, template_id, import_id):
+    def imports(self, subcommand, template_id, import_id, dummy, no_mail, args):
         """Imports management"""
         if subcommand == 'list_templates':
             import_templates = self.imports_manager.get_import_templates()
@@ -814,11 +815,12 @@ The synthese.py wrapper script.
         elif subcommand == 'create':
             import_template = self.imports_manager.get_import_template(
                 template_id)
-            import_ = import_template.create_import()
+            create_args = json.loads(args)
+            import_ = import_template.create_import(create_args)
             log.info('Created import with id: %s', import_.id)
         elif subcommand == 'execute':
             import_ = self.imports_manager.get_import(template_id, import_id)
-            import_.execute()
+            import_.execute(dummy, no_mail)
         else:
             raise Exception('Unknown import subcommand: %s', subcommand)
 
