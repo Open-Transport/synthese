@@ -29,5 +29,7 @@ end_of_messages = "\n\nFin des messages\n\n"
 
 technical_infos = """Informations techniques:
 
+Import à blanc: {dummy}
+
 Appels syntheses: {content}
 """

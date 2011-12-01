@@ -105,6 +105,7 @@ class ImportTemplate(DirObjectLoader):
         self.manager = manager
 
         # default config
+        self.after_create = None
         self.do_import = None
         self.notifications = {}
 
@@ -127,11 +128,17 @@ class ImportTemplate(DirObjectLoader):
 
     def get_import(self, import_id):
         self._load_imports()
+        if import_id == ':latest':
+            import_id = str(max(int(id) for id in self.imports.keys()))
+
         return self.imports[import_id]
 
-    def create_import(self):
+    def create_import(self, args):
         self._load_imports()
-        return self.create_object(self.imports, self.path, Import, self)
+        import_ = self.create_object(self.imports, self.path, Import, self)
+        if self.after_create:
+            self.after_create(import_, args)
+        return import_
 
 
 class Param(object):
@@ -171,6 +178,7 @@ class ImportRun(object):
 
         self.date = 0
         self.execution_time = -1
+        self.dummy = False
         self.messages = dict((l, []) for l in self.LEVEL_NAMES)
         self.synthese_calls = []
 
@@ -190,15 +198,17 @@ class ImportRun(object):
             value = param.value
             if value is None:
                 continue
-            if param.type == 'file':
+            if param.type in ('file', 'directory'):
                 if not os.path.isabs(param.value):
                     # relative paths are relative to the import directory and
                     # should be separated with forward slashes.
                     relative_path = param.value.replace('/', os.sep)
                     value = os.path.join(self.import_.path, relative_path)
-                if not os.path.isfile(value):
-                    raise ImportException('File to import can\'t be found at '
-                        '%r' % value)
+                if ((param.type == 'file' and not os.path.isfile(value)) or
+                    (param.type == 'directory' and not os.path.isdir(value))):
+                    raise ImportException('%s to import can\'t be found at %r' %
+                        ('File' if param.type == 'file' else 'Directory', value))
+
             synthese_params[param.id] = value
         return synthese_params
 
@@ -238,7 +248,8 @@ class ImportRun(object):
             traceback.format_exc(exception))
 
     def finish(self):
-        state_keys = ('date', 'execution_time', 'messages', 'synthese_calls')
+        state_keys = ('date', 'execution_time', 'messages', 'dummy',
+            'synthese_calls')
         state = dict((k, getattr(self, k)) for k in state_keys)
         json.dump(
             state, open(self.state_path, 'wb'),
@@ -272,6 +283,7 @@ class ImportRun(object):
         body += i18n.end_of_messages
 
         body += i18n.technical_infos.format(
+            dummy=self.dummy,
             content='\n'.join(self.synthese_calls))
 
         return (summary, body)
@@ -397,8 +409,6 @@ class Import(DirObjectLoader):
         return self.create_object(self.runs, self.runs_path, ImportRun, self)
 
     def send_run_finish_mail_notifications(self, run):
-        print self.template.notifications
-
         level_to_mails = {}
         for level in ImportRun.LEVEL_NAMES:
             # TODO: also allow passing a username instead of an email
@@ -416,6 +426,7 @@ class Import(DirObjectLoader):
             same_or_higher_levels = set(ImportRun.LEVEL_NAMES[index:])
             if same_or_higher_levels & levels_with_messages:
                 levels_to_notify.add(level)
+        log.debug('Levels with messages: %s', levels_to_notify)
 
         config = self.template.manager.project.env.config
         for level in levels_to_notify:
@@ -425,10 +436,11 @@ class Import(DirObjectLoader):
             subject, body = run.get_summary(level)
             utils.send_mail(config, emails, subject, body)
 
-    def execute(self):
+    def execute(self, dummy=False, no_mail=False):
         log.info('Executing import')
 
         run = self._create_run()
+        run.dummy = dummy
         try:
             if self.template.do_import:
                 self.template.do_import(self, run)
@@ -438,20 +450,20 @@ class Import(DirObjectLoader):
             run.add_failure(e)
         finally:
             run.finish()
-            self.send_run_finish_mail_notifications(run)
+            if not no_mail:
+                self.send_run_finish_mail_notifications(run)
             if not run.successful:
                 log.warn('Import failed!')
-                if 1:
+                if 0:
                     subject, body = run.get_summary()
                     log.debug('Summary: %s\n\n%s', subject, body)
 
     def _do_import(self, run):
         synthese_params = run.convert_params(self.params)
 
-        # TODO: implement dummy mode.
         if 'di' not in synthese_params:
             # Do import
-            synthese_params['di'] = '1'
+            synthese_params['di'] = '0' if run.dummy else '1'
 
         run.call_synthese(synthese_params)
 
