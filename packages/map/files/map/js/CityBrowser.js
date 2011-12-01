@@ -27,7 +27,6 @@ var CitySelectorModel = Backbone.Model.extend({
     this.fixedUpCities = {};
   },
 
-
   showStartingWith: function(prefix) {
     var prefix = prefix.toLowerCase();
     this.set({prefix: prefix});

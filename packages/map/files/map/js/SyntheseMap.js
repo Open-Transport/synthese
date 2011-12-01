@@ -507,7 +507,6 @@ var SyntheseMap = OpenLayers.Class({
 
         lineFeatures.push.apply(lineFeatures, bgFeatures);
         lineFeatures.push.apply(lineFeatures, features);
-        
       });
 
        return lineFeatures;
@@ -563,8 +562,7 @@ var SyntheseMap = OpenLayers.Class({
         );
 
         var pointLatLon = OpenLayers.Projection.transform(
-            point.clone(), self.map.getProjectionObject(),
-            latLonProj);
+          point.clone(), self.map.getProjectionObject(), latLonProj);
 
         if (invalidBounds.contains(pointLatLon.x, pointLatLon.y)) {
           console.warn("Ignoring stops with invalid coordinates", attributes);
