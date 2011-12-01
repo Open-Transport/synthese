@@ -63,7 +63,8 @@ class Supervisor(ExternalTool):
             self.config_name)
 
     def generate_config(self):
-        CONFIG_TEMPLATE = """[program:{program_name}]
+        CONFIG_TEMPLATE = """# Generated file, do not edit!
+[program:{program_name}]
 user=synthese
 command={synthese_py} --no-proxy -v -p {project_path} -s start
 # Quotes are required due to a bug in 3.0a8:
@@ -104,3 +105,48 @@ stdout_logfile_backups={stdout_logfile_backups}
     def system_uninstall(self):
         os.unlink(self._get_link_path())
         utils.call('supervisorctl reread', shell=True)
+
+
+class WSGI(ExternalTool):
+    def __init__(self, project):
+        super(WSGI, self).__init__(project)
+
+    def generate_config(self):
+        WSGI_APP_TEMPLATE = """# Generated file, do not edit!
+import os
+from os.path import join
+import sys 
+
+bootstrap_config = {bootstrap_config}
+
+activate_this = join(bootstrap_config['env_bin_dir'], 'activate_this.py') 
+execfile(activate_this, dict(__file__=activate_this))
+
+sys.path.append(bootstrap_config['tools_dir'])
+import synthesepy.web
+
+application = synthesepy.web.get_application(bootstrap_config)
+"""
+        wsgi_path = join(
+            self.project.config.project_path, 'conf', 'generated',
+            'wsgi', 'app.wsgi')
+        utils.maybe_makedirs(os.path.dirname(wsgi_path))
+
+        config = self.project.config
+        wsgi_app_content = WSGI_APP_TEMPLATE.format(
+            bootstrap_config=repr({
+                'env_bin_dir': os.environ['SYNTHESE_ENV_BIN_DIR'],
+                'tools_dir': os.environ['SYNTHESE_TOOLS_DIR'],
+                'thirdparty_dir': os.environ['SYNTHESE_THIRDPARTY_DIR'],
+                'env_type': config.env_type,
+                'env_path': config.env_path,
+                'mode': config.mode,
+                'project_path': self.project.path}))
+
+        with open(wsgi_path, 'wb') as f:
+            f.write(wsgi_app_content)
+        log.info('WSGI config written to %s', wsgi_path)
+
+    def system_install(self):
+        # Nothing to do.
+        pass

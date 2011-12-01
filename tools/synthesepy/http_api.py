@@ -26,13 +26,20 @@ import urllib2
 import urlparse
 
 import mechanize
+import requests
 
 log = logging.getLogger(__name__)
+
+
+class HTTPApiException(Exception):
+    pass
 
 
 class HTTPApi(object):
     def __init__(self, env, hostname=None, username='root', password='root',
         debug=False):
+        self.env = env
+        # TODO: use wsgi_proxy_port only for admin requests (and if using proxy).
         if hostname:
             self.hostname = hostname
         else:
@@ -41,6 +48,7 @@ class HTTPApi(object):
         self.password = password
         self.debug = debug
         self.sid = None
+        self.sid2 = None
         self.browser = None
         self.admin_base_url = 'http://{0}/admin/'.format(
             self.hostname)
@@ -121,7 +129,7 @@ class HTTPApi(object):
 
         content = response.read()
         if response.code != 200:
-            raise Exception('call_synthese didn\'t return a 200 status')
+            raise HTTPApiException('call_synthese didn\'t return a 200 status')
         log.debug('Result string: %r, info: %r', content, response.info())
         return (content, response.info())
 
@@ -147,3 +155,46 @@ class HTTPApi(object):
             'co': '0',
             'nr': '1',
         }, send_sid=True)
+
+    # New API using requests module.
+    # TODO: migrate above code to use this new API.
+
+    def _get_sid2(self):
+        # TODO: handle expired sid's properly.
+        if self.sid2:
+            return self.sid2
+
+        r = self.call_action2('login', {
+            'actionParamlogin': 'root',
+            'actionParampwd': 'root'
+        })
+        if 'sid' not in r.cookies:
+            raise HTTPApiException('Authentication failure')
+        self.sid2 = r.cookies['sid']
+        return self.sid2
+
+    def call_synthese2(self, params, send_sid=False, use_get=False):
+        if send_sid:
+            params['sid'] = self._get_sid2()
+
+        # TODO: allow non-localhost?
+        url = 'http://localhost:%s/synthese' % self.env.config.port
+        log.debug('Calling %s with parameters: %s', url, params)
+
+        if use_get:
+            r = requests.get(url, params=params)
+        else:
+            r = requests.post(url, data=params)
+
+        if r.status_code != 200:
+            raise HTTPApiException('call_synthese didn\'t return a 200 status')
+
+        return r
+
+    def call_action2(self, action, params, send_sid=False, use_get=False):
+        params['a'] = action
+        return self.call_synthese2(params, send_sid, use_get)
+
+    def call_service2(self, service, params, send_sid=False, use_get=False):
+        params['SERVICE'] = service
+        return self.call_synthese2(params, send_sid, use_get)

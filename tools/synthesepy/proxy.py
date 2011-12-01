@@ -123,7 +123,7 @@ class WSGIProxy(object):
 
     ADMIN_URL = '/admin/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283'
 
-    def __init__(self, env):
+    def __init__(self, env, project):
         self.env = env
         self.proxy_app = Proxy('http://localhost:%s/' % env.c.port)
 
@@ -194,7 +194,7 @@ USE_PASTE_HTTPD = True
 wsgi_httpd = None
 
 
-def start(env):
+def start(env, project):
     global wsgi_httpd
 
     if USE_PASTE_HTTPD:
@@ -202,7 +202,7 @@ def start(env):
         paste_log = logging.getLogger('paste.httpserver.ThreadPool')
         paste_log.setLevel(logging.WARNING)
         wsgi_httpd = paste.httpserver.serve(
-            WSGIProxy(env), '0.0.0.0', env.c.wsgi_proxy_port, start_loop=False)
+            WSGIProxy(env, project), '0.0.0.0', env.c.wsgi_proxy_port, start_loop=False)
     else:
         wsgi_httpd = simple_server.make_server(
             '', env.c.wsgi_proxy_port, WSGIProxy(env))
@@ -223,7 +223,7 @@ def stop():
         wsgi_httpd.shutdown()
 
 
-def serve_forever(env):
+def serve_forever(env, project):
     utils.kill_listening_processes(env.c.wsgi_proxy_port)
 
     if utils.can_connect(env.c.wsgi_proxy_port):
@@ -231,7 +231,7 @@ def serve_forever(env):
             'Error, something is already listening on port %s',
             env.c.wsgi_proxy_port)
 
-    proxy = start(env)
+    proxy = start(env, project)
     log.info('Proxy running, press ctrl-c to stop')
     try:
         while True:

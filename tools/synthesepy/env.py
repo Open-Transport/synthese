@@ -53,6 +53,7 @@ class Env(object):
         self.platform_exe_suffix = '.exe' if (self.platform == 'win') else ''
 
         self.env_path = env_path if env_path else self.default_env_path
+        self.config.env_path = self.env_path
 
     @property
     def default_env_path(self):

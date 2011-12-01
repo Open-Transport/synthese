@@ -23,7 +23,6 @@
 import argparse
 import contextlib
 import datetime
-import email.mime.text
 import glob
 import gzip
 import logging
@@ -31,7 +30,6 @@ import os
 from os.path import join
 import pprint
 import shutil
-import smtplib
 import socket
 import subprocess
 import sys
@@ -43,6 +41,7 @@ from synthesepy import daemon
 from synthesepy import db_backends
 from synthesepy import db_sync
 from synthesepy import external_tools
+from synthesepy import imports
 from synthesepy import proxy
 from synthesepy import utils
 
@@ -342,7 +341,6 @@ class Project(object):
         self.htdocs_path = join(path, 'htdocs')
         self.daemon = None
         self._db_backend = None
-        self.__mail_conn = None
         self.db_path = join(path, 'db')
         if not os.path.isdir(self.db_path):
             os.makedirs(self.db_path)
@@ -359,7 +357,8 @@ class Project(object):
         self.packages_loader = PackagesLoader(self)
         self._load_sites()
         self._load_packages()
-        self.daemon = daemon.Daemon(self.env)
+        self.daemon = daemon.Daemon(self.env, self)
+        self.imports_manager = imports.ImportsManager(self)
 
         for env_config_name in self.config.env_config_names.split(','):
             if not env_config_name:
@@ -372,7 +371,8 @@ class Project(object):
 
         manager_path = join(self.path, 'manager')
         self.manager_module = None
-        if not os.path.isdir(manager_path):
+        if (not os.path.isdir(manager_path) or
+            not os.path.isfile(join(manager_path, 'main.py'))):
             return
 
         sys.path.append(manager_path)
@@ -508,23 +508,6 @@ class Project(object):
         self.load_data()
         self.load_local_data(True)
 
-    @property
-    def _mail_conn(self):
-        if self.__mail_conn:
-            return self.__mail_conn
-
-        c = self.config
-        self.__mail_conn = smtplib.SMTP(c.mail_host, c.mail_port)
-
-        if c.mail_tls:
-            self.__mail_conn.ehlo()
-            self.__mail_conn.starttls()
-            self.__mail_conn.ehlo()
-        if c.mail_user and c.mail_password:
-            self.__mail_conn.login(c.mail_user, c.mail_password)
-
-        return self.__mail_conn
-
     def send_crash_mail(self, restart_count, last_start_s):
         if not self.config.send_mail_on_crash:
             return
@@ -581,14 +564,7 @@ The synthese.py wrapper script.
             last_log=last_log,
             uptime_s=int(time.time() - last_start_s))
 
-        msg = email.mime.text.MIMEText(body)
-
-        msg['Subject'] = subject
-        msg['From'] = self.config.mail_sender
-        msg['To'] = ', '.join(self.config.mail_admins)
-
-        self._mail_conn.sendmail(
-            self.config.mail_sender, self.config.mail_admins, msg.as_string())
+        utils.send_mail(self.env.config, self.config.mail_admins, subject, body)
 
     @command()
     def rundaemon(self, block=True):
@@ -640,7 +616,7 @@ The synthese.py wrapper script.
     @command()
     def runproxy(self):
         """Run HTTP Proxy to serve static files"""
-        proxy.serve_forever(self.env)
+        proxy.serve_forever(self.env, self)
 
     @command()
     def project_command(self, args):
@@ -820,12 +796,39 @@ The synthese.py wrapper script.
         """Open a ssh shell on the remote server"""
         utils.call(_ssh_command_line(self.config))
 
+    @command()
+    def imports(self, subcommand, template_id, import_id):
+        """Imports management"""
+        if subcommand == 'list_templates':
+            import_templates = self.imports_manager.get_import_templates()
+            for import_template in import_templates:
+                log.info('Import template: id=%s label=%r', import_template.id,
+                    import_template.label)
+                for import_ in import_template.get_imports():
+                    log.info('Import: %s, path=%s', import_.id, import_.path)
+        elif subcommand == 'list_imports':
+            import_template = self.imports_manager.get_import_template(
+                template_id)
+            for import_ in import_template.get_imports():
+                log.info('Import: %s, path=%s', import_.id, import_.path)
+        elif subcommand == 'create':
+            import_template = self.imports_manager.get_import_template(
+                template_id)
+            import_ = import_template.create_import()
+            log.info('Created import with id: %s', import_.id)
+        elif subcommand == 'execute':
+            import_ = self.imports_manager.get_import(template_id, import_id)
+            import_.execute()
+        else:
+            raise Exception('Unknown import subcommand: %s', subcommand)
+
     # System install/uninstall
 
     def _get_tools(self):
         supervisor = external_tools.Supervisor(self)
         apache = Apache(self)
-        return [supervisor, apache]
+        wsgi = external_tools.WSGI(self)
+        return [supervisor, apache, wsgi]
 
     @command()
     def system_install_prepare(self, tools=None):
@@ -842,8 +845,8 @@ The synthese.py wrapper script.
         tools = self._get_tools()
 
         import pwd
-        os.setegid(pwd.getpwnam('synthese').pw_gid)
-        os.seteuid(pwd.getpwnam('synthese').pw_uid)
+        os.setegid(pwd.getpwnam(self.config.synthese_user).pw_gid)
+        os.seteuid(pwd.getpwnam(self.config.synthese_group).pw_uid)
 
         for tool in tools:
             tool.generate_config()
@@ -874,7 +877,7 @@ The synthese.py wrapper script.
 
 
 def create_project(env, path, system_packages=None, conn_string=None,
-        overwrite=False):
+        overwrite=False, initialize=True):
     log.info('Creating project in %r', path)
     if overwrite:
         utils.RemoveDirectory(path)
@@ -914,5 +917,6 @@ def create_project(env, path, system_packages=None, conn_string=None,
             f.write(www_site_config)
 
     project = Project(path, env=env)
-    project.reset()
+    if initialize:
+        project.reset()
     return project

@@ -113,7 +113,7 @@ class DBBackend(object):
 
     def start_daemon(self):
         self.env.c.conn_string = self.conn_info.conn_string
-        self.daemon = daemon.Daemon(self.env)
+        self.daemon = daemon.Daemon(self.env, use_proxy=False)
         self.daemon.start()
 
     def stop_daemon(self):

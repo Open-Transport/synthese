@@ -40,18 +40,22 @@ class DaemonException(Exception):
 
 
 class Daemon(object):
-    def __init__(self, env):
+    def __init__(self, env, project=None, use_proxy=True):
         self.env = env
+        self.project = project
+        self.use_proxy = self.env.c.wsgi_proxy
+        if not use_proxy:
+            self.use_proxy = False
         self.proc = None
         self.stopped = True
 
     def _start_wsgi_proxy(self):
-        if not self.env.c.wsgi_proxy:
+        if not self.use_proxy:
             return
-        proxy.start(self.env)
+        proxy.start(self.env, self.project)
 
     def _stop_wsgi_proxy(self):
-        if not self.env.c.wsgi_proxy:
+        if not self.use_proxy:
             return
         proxy.stop()
 
