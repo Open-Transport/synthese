@@ -1,8 +1,10 @@
 argparse
 BeautifulSoup
+flask
 mechanize
 # Fails when installed from pip on Windows. It is only installed on Linux.
 #MySQL-python
 Paste
+requests
 static
 unittest2

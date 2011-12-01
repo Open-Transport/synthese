@@ -45,6 +45,7 @@ DEFAULTS = {
     'thirdparty_dir': None,
     # Environment
     'env_type': 'cmake',
+    'env_path': None,
     'mode': 'debug',
     # Daemon
     'port': 8080,
@@ -77,6 +78,10 @@ DEFAULTS = {
     'mail_password': None,
     'mail_tls': False,
     'send_mail_on_crash': False,
+    'apache_conf_suffix': '',
+    # Put in the project config.
+    # Generate with: python -c "import os; print repr(os.urandom(24))"
+    'secret_key': 'override me!',
 
     # remote project management
     'remote_server': None,
@@ -114,6 +119,10 @@ DEFAULTS = {
     'suites': None,
     'should_build_package': lambda env: False,
     'force_create_package': False,
+
+    # system_install
+    'synthese_user': 'synthese',
+    'synthese_group': 'synthese',
 }
 
 

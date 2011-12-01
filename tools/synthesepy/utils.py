@@ -20,10 +20,12 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
+import email.mime.text
 import errno
 import httplib
 import logging
 import os
+import smtplib
 import stat
 import subprocess
 import sys
@@ -289,6 +291,34 @@ def maybe_remove(path):
         os.unlink(path)
     except OSError:
         pass
+
+
+_mail_conn = None
+
+def send_mail(config, recipients, subject, body):
+    if not recipients:
+        return
+
+    global _mail_conn
+
+    if not _mail_conn:
+        _mail_conn = smtplib.SMTP(config.mail_host, config.mail_port)
+
+        if config.mail_tls:
+            _mail_conn.ehlo()
+            _mail_conn.starttls()
+            _mail_conn.ehlo()
+        if config.mail_user and config.mail_password:
+            _mail_conn.login(config.mail_user, config.mail_password)
+
+    msg = email.mime.text.MIMEText(body, _charset='utf-8')
+
+    msg['Subject'] = subject
+    msg['From'] = config.mail_sender
+    msg['To'] = ', '.join(recipients)
+
+    log.info('Sending mail %r to %s', subject, recipients)
+    _mail_conn.sendmail(config.mail_sender, recipients, msg.as_string())
 
 
 class SVNInfo(object):

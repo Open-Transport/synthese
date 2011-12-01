@@ -30,6 +30,7 @@ else:
     import unittest2 as unittest
 
 import synthesepy.functional_test
+import synthesepy.test
 from synthesepy import daemon
 from synthesepy import db_backends
 from synthesepy import http_api
@@ -66,7 +67,7 @@ class HTTPTestCase(unittest.TestCase):
     def setUpClass(cls):
         log.info('setupClass %s, with backend %s', cls.__name__, cls.backend)
 
-        project_path = os.path.join(env.env_path, 'projects', 'test')
+        project_path = os.path.join(cls.env.env_path, 'projects', 'test')
 
         if cls.no_init:
             cls.project = project_manager.Project(project_path, cls.env)
@@ -96,44 +97,25 @@ class HTTPTestCase(unittest.TestCase):
         return http_api.HTTPApi(self.backend.env)
 
 
-env = None
-backends = []
-no_init = False
-daemon_only = False
-
-
-def init_backends(_env, conn_strings, _no_init, _daemon_only):
-    global env, backends, no_init, daemon_only
-
-    log.debug('init_backends')
-    env = _env
-    backends = []
-    no_init = _no_init
-    daemon_only = _daemon_only
-    for conn_string in conn_strings:
-        backends.append(db_backends.create_backend(env, conn_string))
-
-    log.debug('Initialized backends %s', backends)
-
-
 def do_load_tests(scope, loader):
     # Based on the code from unittest/loader.py, TestLoader.loadTestsFromModule
 
     module = sys.modules[scope['__name__']]
 
     tests = []
+    tester = synthesepy.test.Tester.instance
     for name in dir(module):
         obj = getattr(module, name)
         if isinstance(obj, type) and issubclass(obj, HTTPTestCase):
             log.debug('Found FunctionalTestCase: %s', obj)
 
-            for backend in backends:
+            for backend in tester.backends:
                 class_name = obj.__name__ + '_' + backend.name
                 new_class = type(class_name, (obj,), {})
-                new_class.env = env
+                new_class.env = tester.env
                 new_class.backend = backend
-                new_class.no_init = no_init
-                new_class.daemon_only = daemon_only
+                new_class.no_init = tester.config.no_init
+                new_class.daemon_only = tester.config.test_daemon_only
 
                 tests.append(loader.loadTestsFromTestCase(new_class))
 
