@@ -54,12 +54,13 @@ function addTextInputAutoComplete(params){
 
           jscode = jscode + "},"
           + "success: function( data ) {"
-            + "response( $.map( data." + params.rows + "." + params.row + ", function( item ) {"
-              + "return {"
-                + "label: item.name" + (params.viewId ? " + ' (' + item.roid + ')'," : ",")
-                + "value: item.name,"
-                + "id: item.roid"
-              + "}"
+            + "if($('#" + fieldIdAutoComplete + "').is(':focus'))"
+              + "response( $.map( data." + params.rows + "." + params.row + ", function( item ) {"
+                + "return {"
+                  + "label: item.name" + (params.viewId ? " + ' (' + item.roid + ')'," : ",")
+                  + "value: item.name,"
+                  + "id: item.roid"
+                + "}"
             + "}));"
           + "}"
         + "});"
