@@ -119,7 +119,7 @@ input[type=submit]:hover {background-color:#0080E0;}
 				boost::optional<const std::string&> title = boost::optional<const std::string&>()
 			);
 
-			static std::string GetHTMLJavascriptOpen(std::string url=std::string());
+			static std::string GetHTMLJavascriptOpen(std::string url=std::string(), bool defer=false);
 
 			static std::string GetHTMLJavascriptClose();
 

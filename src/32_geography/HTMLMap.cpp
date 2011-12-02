@@ -126,33 +126,33 @@ namespace synthese
 				// TODO : add ajax call on click on the button (replace it by a link button)
 			}
 			stream << "<div id=\"" << _id << "\"></div>";
-			stream << HTMLModule::GetHTMLJavascriptOpen("http://openlayers.org/api/2.10/OpenLayers.js");
+			stream << HTMLModule::GetHTMLJavascriptOpen("http://openlayers.org/api/2.10/OpenLayers.js", true);
 
-            // For Geoportail
-            BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
-            {
-                if(mapSource.second->getType() == MapSource::IGN)
-                {
-                    stringstream streamTemp;
-                    streamTemp << "http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << mapSource.second->getURL() << "&amp;includeEngine=true&amp;";
-                    stream << HTMLModule::GetHTMLJavascriptOpen(streamTemp.str());
+			// For Geoportail
+			BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
+			{
+				if(mapSource.second->getType() == MapSource::IGN)
+				{
+					stringstream streamTemp;
+					streamTemp << "http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << mapSource.second->getURL() << "&amp;includeEngine=true&amp;";
+					stream << HTMLModule::GetHTMLJavascriptOpen(streamTemp.str());
 
-                    stream << HTMLModule::GetHTMLJavascriptOpen();
-                    stream << "if (window.__Geoportal$timer===undefined) {" <<
-                              "var __Geoportal$timer= null;" <<
-                              "}" <<
-                              "if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
-                              "var gGEOPORTALRIGHTSMANAGEMENT= {" <<
-                              "apiKey:['"<< mapSource.second->getURL() <<"']" <<
-                              "};" <<
-                              "}";
-                    stream << HTMLModule::GetHTMLJavascriptClose();
-                }
-            }
+					stream << HTMLModule::GetHTMLJavascriptOpen();
+					stream << "if (window.__Geoportal$timer===undefined) {" <<
+						"var __Geoportal$timer= null;" <<
+						"}" <<
+						"if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
+						"var gGEOPORTALRIGHTSMANAGEMENT= {" <<
+						"apiKey:['"<< mapSource.second->getURL() <<"']" <<
+						"};" <<
+						"}";
+					stream << HTMLModule::GetHTMLJavascriptClose();
+				}
+			}
 
 
-            stream << HTMLModule::GetHTMLJavascriptOpen();
-            stream << "var map, vectors, controls;";
+			stream << HTMLModule::GetHTMLJavascriptOpen();
+			stream << "var map, vectors, controls;";
 			//support functions
 			stream <<
 				"var lastFeature = null;" <<
