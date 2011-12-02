@@ -314,7 +314,8 @@ namespace synthese
 			const StopPoint & sp,
 			ptime & startDateTime,
 			ptime & endDateTime
-		) const {			
+		) const {
+			bool spHaveZeroDestination = true;
 			BOOST_FOREACH(const Vertex::Edges::value_type& edge, sp.getDepartureEdges())
 			{
 				const LineStop* ls = static_cast<const LineStop*>(edge.second);
@@ -322,7 +323,6 @@ namespace synthese
 				ptime departureDateTime = startDateTime;
 				// Loop on services
 				optional<Edge::DepartureServiceIndex::Value> index;
-				bool spHaveZeroDestination = true;
 				while(true)
 				{
 					ServicePointer servicePointer(
@@ -358,7 +358,7 @@ namespace synthese
 						if(destination->getKey() == _stopArea->get()->getKey())
 							continue;
 					}
-					
+
 					if(spHaveZeroDestination)
 					{
 						StopAreaDestinationMapType stopAreaMap;
@@ -376,12 +376,12 @@ namespace synthese
 					else // destination stop is already in the map
 					{
 						CommercialLineMapType::iterator lineIt = stopPointMap[&sp][destination->getKey()].second.find(commercialLine->getKey());
-							if(lineIt == stopPointMap[&sp][destination->getKey()].second.end()) // test if commercialLine already in the sub map
+						if(lineIt == stopPointMap[&sp][destination->getKey()].second.end()) // test if commercialLine already in the sub map
 							stopPointMap[&sp][destination->getKey()].second[commercialLine->getKey()] = commercialLine;
-						}
 					}
 				}
 			}
+		}
 
 		bool StopPointsListFunction::isAuthorized(
 			const Session* session
