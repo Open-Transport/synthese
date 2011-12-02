@@ -54,6 +54,8 @@ namespace synthese
 			static const std::string COL_INDICATOR;
 			static const std::string COL_TRIDENT;
 			static const std::string COL_IS_TRIDENT_REFERENCE;
+			static const std::string COL_CO2_EMISSIONS;
+			static const std::string COL_ENERGY_CONSUMPTION;
 
 			RollingStockTableSync();
 
@@ -95,6 +97,10 @@ namespace synthese
 			static Labels GetLabels(
 				std::string unknownLabel = "(inconnu)"
 			);
+
+			db::RowsList SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit) const;
 		};
 	}
 }

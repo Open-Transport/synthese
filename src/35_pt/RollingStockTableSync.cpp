@@ -51,6 +51,8 @@ namespace synthese
 		const string RollingStockTableSync::COL_INDICATOR("indicator_label");
 		const string RollingStockTableSync::COL_TRIDENT("trident_key");
 		const string RollingStockTableSync::COL_IS_TRIDENT_REFERENCE("is_trident_reference");
+		const string RollingStockTableSync::COL_CO2_EMISSIONS("CO2_emissions");
+		const string RollingStockTableSync::COL_ENERGY_CONSUMPTION("energy_consumption");
 	}
 
 	namespace db
@@ -67,6 +69,8 @@ namespace synthese
 			DBTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
 			DBTableSync::Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
 			DBTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
+			DBTableSync::Field(RollingStockTableSync::COL_CO2_EMISSIONS, SQL_DOUBLE),
+			DBTableSync::Field(RollingStockTableSync::COL_ENERGY_CONSUMPTION, SQL_DOUBLE),
 			DBTableSync::Field()
 		};
 
@@ -89,6 +93,8 @@ namespace synthese
 			object->setIndicator(rows->getText(RollingStockTableSync::COL_INDICATOR));
 			object->setTridentKey(rows->getText(RollingStockTableSync::COL_TRIDENT));
 			object->setIsTridentKeyReference(rows->getBool(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE));
+			object->setCO2Emissions(rows->getDouble(RollingStockTableSync::COL_CO2_EMISSIONS));
+			object->setEnergyConsumption(rows->getDouble(RollingStockTableSync::COL_ENERGY_CONSUMPTION));
 		}
 
 
@@ -103,6 +109,8 @@ namespace synthese
 			query.addField(object->getIndicator());
 			query.addField(object->getTridentKey());
 			query.addField(object->getIsTridentKeyReference());
+			query.addField(object->getCO2Emissions());
+			query.addField(object->getEnergyConsumption());
 			query.execute(transaction);
 		}
 
@@ -205,5 +213,26 @@ namespace synthese
 			}
 			return result;
 		}
+
+
+
+		db::RowsList RollingStockTableSync::SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit
+			) const {
+				RowsList result;
+
+				SelectQuery<RollingStockTableSync> query;
+				Env env;
+				if(prefix) query.addWhereField(RollingStockTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				if(limit) query.setNumber(*limit);
+				query.addOrderField(COL_NAME,true);
+				RollingStockTableSync::SearchResult elements(RollingStockTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+				BOOST_FOREACH(shared_ptr<RollingStock> elem, elements)
+				{
+					result.push_back(std::make_pair(elem->getKey(), elem->getName()));
+				}
+				return result;
+		} ;
 	}
 }
