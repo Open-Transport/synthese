@@ -149,23 +149,37 @@ namespace synthese
 
 
 
-		std::string HTMLModule::GetHTMLJavascriptOpen( std::string url/*=std::string()*/ )
-		{
+		std::string HTMLModule::GetHTMLJavascriptOpen(
+			string url /*= string() */,
+			bool defer /*= false */
+		){
 			stringstream s;
-			s << "<script type=\"text/javascript\"";
-			if (!url.empty())
+			s << "<script";
+			if(defer)
+			{
+				s << " defer";
+			}
+			if(!url.empty())
+			{
 				s << " src=\"" << url << "\"";
+			}
 			s << ">";
-			if (url.empty())
-				s << "\r// <![CDATA[\r";
+			if(url.empty())
+			{
+				s << "\n";
+			}
 			else
+			{
 				s << "</script>";
+			}
 			return s.str();
 		}
 
+
+
 		std::string HTMLModule::GetHTMLJavascriptClose()
 		{
-			return string("\r// ]]>\r</script>");
+			return string("\n</script>");
 		}
 
 
