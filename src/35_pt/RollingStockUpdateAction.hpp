@@ -52,10 +52,16 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_ROLLING_STOCK_ID;
 			static const std::string PARAMETER_NAME;
+			static const std::string PARAMETER_ARTICLE;
+			static const std::string PARAMETER_CO2_EMISSIONS;
+			static const std::string PARAMETER_ENERGY_CONSUMPTION;
 
 		private:
 			boost::shared_ptr<RollingStock> _rollingStock;
 			boost::optional<std::string> _name;
+			boost::optional<std::string> _article;
+			boost::optional<double> _CO2Emissions;
+			boost::optional<double> _energyConsumption;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

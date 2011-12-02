@@ -46,6 +46,9 @@ namespace synthese
 	{
 		const string RollingStockUpdateAction::PARAMETER_ROLLING_STOCK_ID = Action_PARAMETER_PREFIX + "id";
 		const string RollingStockUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
+		const string RollingStockUpdateAction::PARAMETER_ARTICLE = Action_PARAMETER_PREFIX + "ar";
+		const string RollingStockUpdateAction::PARAMETER_CO2_EMISSIONS = Action_PARAMETER_PREFIX + "co2";
+		const string RollingStockUpdateAction::PARAMETER_ENERGY_CONSUMPTION = Action_PARAMETER_PREFIX + "ec";
 
 		ParametersMap RollingStockUpdateAction::getParametersMap() const
 		{
@@ -57,6 +60,18 @@ namespace synthese
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
+			}
+			if(_article)
+			{
+				map.insert(PARAMETER_ARTICLE, *_article);
+			}
+			if(_CO2Emissions)
+			{
+				map.insert(PARAMETER_CO2_EMISSIONS, *_CO2Emissions);
+			}
+			if(_energyConsumption)
+			{
+				map.insert(PARAMETER_ENERGY_CONSUMPTION, *_energyConsumption);
 			}
 			return map;
 		}
@@ -82,6 +97,18 @@ namespace synthese
 			{
 				_name = map.get<string>(PARAMETER_NAME);
 			}
+			if(map.isDefined(PARAMETER_ARTICLE))
+			{
+				_article = map.get<string>(PARAMETER_ARTICLE);
+			}
+			if(map.isDefined(PARAMETER_CO2_EMISSIONS))
+			{
+				_CO2Emissions = map.get<double>(PARAMETER_CO2_EMISSIONS);
+			}
+			if(map.isDefined(PARAMETER_ENERGY_CONSUMPTION))
+			{
+				_energyConsumption = map.get<double>(PARAMETER_ENERGY_CONSUMPTION);
+			}
 		}
 
 
@@ -92,6 +119,18 @@ namespace synthese
 			if(_name)
 			{
 				_rollingStock->setName(*_name);
+			}
+			if(_article)
+			{
+				_rollingStock->setArticle(*_article);
+			}
+			if(_CO2Emissions)
+			{
+				_rollingStock->setCO2Emissions(*_CO2Emissions);
+			}
+			if(_energyConsumption)
+			{
+				_rollingStock->setEnergyConsumption(*_energyConsumption);
 			}
 
 			RollingStockTableSync::Save(_rollingStock.get());
