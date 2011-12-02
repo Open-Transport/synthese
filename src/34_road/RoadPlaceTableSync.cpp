@@ -33,6 +33,7 @@
 #include "ReplaceQuery.h"
 #include "Conversion.h"
 #include "ImportableTableSync.hpp"
+#include "PTModule.h"
 
 using namespace std;
 using namespace boost;
@@ -44,6 +45,8 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 	using namespace impex;
+	using namespace pt;
+	
 
 	namespace util
 	{
@@ -100,6 +103,7 @@ namespace synthese
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 				city->addPlaceToMatcher<RoadPlace>(env.getEditableSPtr(object));
+				PTModule::GetGeneralStopsMatcher().add(object->getFullName(), env.getEditableSPtr(object));
 
 				// Datasource links
 				object->setDataSourceLinks(
