@@ -70,6 +70,7 @@
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
 #include <geos/geom/MultiLineString.h>
+#include <geos/operation/distance/DistanceOp.h>
 #include <boost/lexical_cast.hpp>
 #include <boost/foreach.hpp>
 #include <sstream>
@@ -213,6 +214,8 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_RESERVATION_PHONE_NUMBER("reservation_phone_number");
 		const string RoutePlannerFunction::DATA_ONLINE_RESERVATION("online_reservation");
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_WAITING("continuous_service_waiting");
+		const string RoutePlannerFunction::DATA_CO2_EMISSIONS("co2_emissions");
+		const string RoutePlannerFunction::DATA_ENERGY_CONSUMPTION("energy_consumption");
 
 		// Cells
 		const string RoutePlannerFunction::DATA_ODD_ROW("is_odd_row");
@@ -2237,6 +2240,32 @@ namespace synthese
 			// Filters
 			pm.insert(DATA_HANDICAPPED_FILTER, handicappedFilter);
 			pm.insert(DATA_BIKE_FILTER, bikeFilter);
+
+			// CO2 Emissions and Energy consumption
+			double co2Emissions = 0;
+			double energyConsumption = 0;
+			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
+			{
+				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
+				if(line == NULL) continue;
+
+				double distance = su.getDistance();
+
+				// if the route has no distance data
+				if(distance == 0)
+				{
+					if(departurePlace.getPoint() && arrivalPlace.getPoint())
+					{
+						distance = CoordinatesSystem::GetCoordinatesSystem(27572).convertGeometry(
+							*su.getGeometry())->getLength();
+						distance *= 1.10;
+					}
+				}
+				co2Emissions += distance*line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+				energyConsumption += distance*line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+			}
+			pm.insert(DATA_CO2_EMISSIONS, co2Emissions);
+			pm.insert(DATA_ENERGY_CONSUMPTION, energyConsumption);
 
 			// Departure time
 			{

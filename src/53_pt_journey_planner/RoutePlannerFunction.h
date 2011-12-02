@@ -217,6 +217,8 @@ namespace synthese
 				static const std::string DATA_DEPARTURE_PLACE_LATITUDE;
 				static const std::string DATA_ARRIVAL_PLACE_LONGITUDE;
 				static const std::string DATA_ARRIVAL_PLACE_LATITUDE;
+				static const std::string DATA_CO2_EMISSIONS;
+				static const std::string DATA_ENERGY_CONSUMPTION;
 			//@}
 
 			//! @name Cells
