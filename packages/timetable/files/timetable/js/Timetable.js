@@ -1,5 +1,6 @@
 define([
   "core/js/Synthese",
+  "core/js/backbone",
   "order!timetable/vendor/epoch/epoch_classes"
 ], function(Synthese) {
 
