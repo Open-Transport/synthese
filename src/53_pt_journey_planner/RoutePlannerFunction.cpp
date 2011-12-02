@@ -2254,7 +2254,7 @@ namespace synthese
 				// if the route has no distance data
 				if(distance == 0)
 				{
-					if(departurePlace.getPoint() && arrivalPlace.getPoint())
+					if(su.getGeometry())
 					{
 						distance = CoordinatesSystem::GetCoordinatesSystem(27572).convertGeometry(
 							*su.getGeometry())->getLength();
