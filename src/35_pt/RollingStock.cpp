@@ -41,7 +41,11 @@ namespace synthese
 		const string RollingStock::DATA_ID("id");
 		const string RollingStock::DATA_NAME("name");
 		const string RollingStock::DATA_ARTICLE("article");
+		const string RollingStock::DATA_CO2_EMISSIONS("co2_emissions");
+		const string RollingStock::DATA_ENERGY_CONSUMPTION("energy_consumption");
 
+		const unsigned int RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS = 1000; // 1km
+		const unsigned int RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS = 100000;  // 100km
 
 		RollingStock::RollingStock(
 			util::RegistryKeyType key
@@ -102,6 +106,8 @@ namespace synthese
 			pm.insert(DATA_ID, getKey());
 			pm.insert(DATA_NAME, getName());
 			pm.insert(DATA_ARTICLE, getArticle());
+			pm.insert(DATA_CO2_EMISSIONS, getCO2Emissions());
+			pm.insert(DATA_ENERGY_CONSUMPTION, getEnergyConsumption());
 		}
 	}
 }

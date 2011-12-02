@@ -53,16 +53,22 @@ namespace synthese
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
 			static const std::string DATA_ARTICLE;
+			static const std::string DATA_CO2_EMISSIONS;
+			static const std::string DATA_ENERGY_CONSUMPTION;
 
 		public:
-
 			/// Chosen registry class.
 			typedef util::Registry<RollingStock> Registry;
+
+			static const unsigned int CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+			static const unsigned int ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
 
 		protected:
 			std::string _article;
 			std::string _indicator;
 			std::string _tridentKey;
+			double _CO2Emissions;
+			double _energyConsumption;
 			bool _isTridentKeyReference;
 
 		public:
@@ -79,6 +85,8 @@ namespace synthese
 				const std::string& getTridentKey() const { return _tridentKey; }
 				const std::string getGTFSKey() const;
 				bool getIsTridentKeyReference() const { return _isTridentKeyReference; }
+				const double getCO2Emissions() const { return _CO2Emissions; }
+				const double getEnergyConsumption() const { return _energyConsumption; }
 			//@}
 
 
@@ -88,6 +96,8 @@ namespace synthese
 				void setIndicator(const std::string& value) { _indicator = value; }
 				void setTridentKey(const std::string& value) { _tridentKey = value; }
 				void setIsTridentKeyReference(bool value) { _isTridentKeyReference = value; }
+				void setCO2Emissions(double value) { _CO2Emissions = value; }
+				void setEnergyConsumption(double value) { _energyConsumption = value; }
 			//@}
 
 			//! @name Services
