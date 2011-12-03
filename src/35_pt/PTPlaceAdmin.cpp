@@ -191,18 +191,7 @@ namespace synthese
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
 
 						stringstream popupcontent;
-						set<const CommercialLine*> lines;
-						BOOST_FOREACH(const Vertex::Edges::value_type& edge, it.second->getDepartureEdges())
-						{
-							if(!dynamic_cast<const LineStop*>(edge.second))
-							{
-								continue;
-							}
-							lines.insert(
-								static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
-							);
-						}
-						BOOST_FOREACH(const CommercialLine* line, lines)
+						BOOST_FOREACH(const CommercialLine* line, it.second->getCommercialLines())
 						{
 							popupcontent <<
 								"<span class=\"line " << line->getStyle() << "\">" <<
@@ -311,18 +300,7 @@ namespace synthese
 
 					// Lines cell
 					stream << t.col();
-					set<const CommercialLine*> lines;
-					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
-					{
-						if(!dynamic_cast<const LineStop*>(edge.second))
-						{
-							continue;
-						}
-						lines.insert(
-							static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
-						);
-					}
-					BOOST_FOREACH(const CommercialLine* line, lines)
+					BOOST_FOREACH(const CommercialLine* line, stop->getCommercialLines())
 					{
 						stream <<
 							"<span class=\"line " << line->getStyle() << "\">" <<
