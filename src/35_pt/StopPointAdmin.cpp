@@ -32,13 +32,16 @@
 #include "StopPoint.hpp"
 #include "StopPointUpdateAction.hpp"
 #include "StopArea.hpp"
-#include "PTPlaceAdmin.h"
 #include "ImportableAdmin.hpp"
 #include "HTMLMap.hpp"
 #include "CommercialLine.h"
 #include "LineStop.h"
 #include "JourneyPattern.hpp"
 #include "MapSource.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "JourneyPatternAdmin.hpp"
+#include "CommercialLineAdmin.h"
+#include "PTPlaceAdmin.h"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -75,6 +78,7 @@ namespace synthese
 	{
 		const string StopPointAdmin::TAB_LINKS("li");
 		const string StopPointAdmin::TAB_PROPERTIES("pr");
+		const string StopPointAdmin::TAB_ROUTES("tab_routes");
 
 
 
@@ -157,23 +161,13 @@ namespace synthese
 				if(_stop->getGeometry().get())
 				{
 					stringstream popupcontent;
-					set<const CommercialLine*> lines;
-					BOOST_FOREACH(const Vertex::Edges::value_type& edge, _stop->getDepartureEdges())
-					{
-						if(static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine())
-						{
-							lines.insert(
-								static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
-							);
-						}
-					}
-					BOOST_FOREACH(const CommercialLine* line, lines)
+					BOOST_FOREACH(const CommercialLine* line, _stop->getCommercialLines())
 					{
 						popupcontent <<
 							"<span class=\"line " << line->getStyle() << "\">" <<
 							line->getShortName() <<
 							"</span>"
-							;
+						;
 					}
 					map.addPoint(HTMLMap::MapPoint(*_stop->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), _stop->getName() + "<br />" + popupcontent.str(), 21, 25));
 				}
@@ -229,6 +223,118 @@ namespace synthese
 				updateOnlyRequest.getAction()->setStop(const_pointer_cast<StopPoint>(_stop));
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_stop, updateOnlyRequest);
 			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// ROUTES TAB
+			if (openTabContent(stream, TAB_ROUTES))
+			{
+				// Declarations
+				AdminFunctionRequest<JourneyPatternAdmin> openJourneyPatternRequest(request);
+				AdminFunctionRequest<CommercialLineAdmin> openLineRequest(request);
+				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+
+				// Table
+				HTMLTable::ColsVector c;
+				c.push_back("");
+				c.push_back("Ligne");
+				c.push_back("Origine");
+				c.push_back("Destination");
+				c.push_back("A");
+				c.push_back("D");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				BOOST_FOREACH(const StopPoint::JourneyPatternsMap::value_type& it, _stop->getJourneyPatterns())
+				{
+					// Declarations
+					const JourneyPattern& journeyPattern(*it.first);
+
+					// Row
+					stream << t.row();
+					
+					// Open button
+					openJourneyPatternRequest.getPage()->setLine(Env::GetOfficialEnv().getSPtr(&journeyPattern));
+					stream <<
+						t.col() <<
+						HTMLModule::getLinkButton(
+							openJourneyPatternRequest.getURL(),
+							"Ouvrir",
+							string(),
+							JourneyPatternAdmin::ICON
+						)
+					;
+
+					// Line
+					openLineRequest.getPage()->setCommercialLine(Env::GetOfficialEnv().getSPtr(journeyPattern.getCommercialLine()));
+					stream <<
+						t.col() <<
+						"<span class=\"line " << journeyPattern.getCommercialLine()->getStyle() << "\">" <<
+						HTMLModule::getHTMLLink(
+							openLineRequest.getURL(),
+							journeyPattern.getCommercialLine()->getShortName()
+						) <<
+						"</span>"
+					;
+
+					// Origin
+					stream << t.col();
+					if(journeyPattern.getEdges().size() >= 2)
+					{
+						const StopArea& stopArea(
+							*static_cast<StopPoint*>(journeyPattern.getEdge(0)->getFromVertex())->getConnectionPlace()
+						);
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(
+								&stopArea
+						)	);
+						stream <<
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								stopArea.getFullName()
+							)
+						;
+					}
+
+					// Destination
+					stream << t.col();
+					if(journeyPattern.getEdges().size() >= 2)
+					{
+						const StopArea& stopArea(
+							*static_cast<StopPoint*>(journeyPattern.getLastEdge()->getFromVertex())->getConnectionPlace()
+						);
+						openPlaceRequest.getPage()->setConnectionPlace(
+							Env::GetOfficialEnv().getSPtr(
+								&stopArea
+						)	);
+						stream <<
+							HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								stopArea.getFullName()
+							)
+						;
+					}
+
+					// Arrival
+					stream <<
+						t.col() <<
+						(	it.second.first ?
+							HTMLModule::getHTMLImage("bullet_green.png","Arrivée possible") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Arrivée impossible")
+						)
+					;
+
+					// Departure
+					stream <<
+						t.col() <<
+						(	it.second.second ?
+							HTMLModule::getHTMLImage("bullet_green.png","Départ possible") :
+							HTMLModule::getHTMLImage("bullet_white.png", "Départ impossible")
+						)
+					;
+				}
+				stream << t.close();
+			}
+
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS

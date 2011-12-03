@@ -48,13 +48,13 @@ namespace synthese
 			//@{
 				static const std::string TAB_PROPERTIES;
 				static const std::string TAB_LINKS;
+				static const std::string TAB_ROUTES;
 			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
 				boost::shared_ptr<const pt::StopPoint>	_stop;
-			// html::ResultHTMLTable::RequestParameters	_requestParameters;
 			//@}
 
 		protected:

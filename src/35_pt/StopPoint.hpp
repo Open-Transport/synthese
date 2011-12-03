@@ -38,6 +38,8 @@ namespace synthese
 	{
 		class LineStop;
 		class StopArea;
+		class CommercialLine;
+		class JourneyPattern;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Physical stop (bus stop, etc.).
@@ -81,12 +83,44 @@ namespace synthese
 				void setProjectedPoint(const road::Address& value){ _projectedPoint = value; }
 			//@}
 
-			//! @name Query methods
+			//! @name Services
 			//@{
 				const pt::StopArea* getConnectionPlace() const;
 				virtual graph::GraphIdType getGraphType() const;
 				virtual graph::VertexAccess getVertexAccess(const road::Crossing& crossing) const;
 				virtual std::string getRuleUserName() const;
+
+
+
+				typedef std::set<const CommercialLine*> LinesSet;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// List of lines calling at the stop.
+				/// @param withDepartures returns lines with a departure from the stop
+				/// @param withArrivals returns lines with an arrival from the stop
+				/// @return the lines calling at the stop
+				/// @author Hugues Romain
+				LinesSet getCommercialLines(
+					bool withDepartures = true,
+					bool withArrivals = true
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Mapped type : arrival / departure
+				typedef std::map<JourneyPattern*, std::pair<bool, bool> > JourneyPatternsMap;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// List of journey patterns calling at the stop
+				/// @param withDepartures returns journey patterns with a departure from the stop
+				/// @param withArrivals returns journey patterns with an arrival from the stop
+				/// @return the journey patterns calling at the stop
+				/// @author Hugues Romain
+				JourneyPatternsMap getJourneyPatterns(
+					bool withDepartures = true,
+					bool withArrivals = true
+				) const;
 			//@}
 		};
 
