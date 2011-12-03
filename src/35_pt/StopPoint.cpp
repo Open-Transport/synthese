@@ -25,6 +25,8 @@
 #include "PTModule.h"
 #include "StopArea.hpp"
 #include "ReverseRoadChunk.hpp"
+#include "LineStop.h"
+#include "JourneyPattern.hpp"
 
 #include <boost/date_time/time_duration.hpp>
 
@@ -106,5 +108,101 @@ namespace synthese
 		std::string StopPoint::getRuleUserName() const
 		{
 			return "Point d'arrêt";
+		}
+
+
+
+		StopPoint::LinesSet StopPoint::getCommercialLines(
+			bool withDepartures,
+			bool withArrivals
+		) const	{
+
+			// Declarations
+			LinesSet lines;
+
+			// Departures
+			if(withDepartures)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					lines.insert(
+						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+					);
+			}	}
+
+			// Arrivals
+			if(withArrivals)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					lines.insert(
+						static_cast<const LineStop*>(edge.second)->getLine()->getCommercialLine()
+					);
+			}	}
+
+			// Exit
+			return lines;
+		}
+
+
+
+		StopPoint::JourneyPatternsMap StopPoint::getJourneyPatterns(
+			bool withDepartures /*= true*/,
+			bool withArrivals /*= true */
+		) const	{
+
+			// Declarations
+			JourneyPatternsMap journeyPatterns;
+
+			// Departures
+			if(withDepartures)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getDepartureEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					journeyPatterns.insert(
+						make_pair(
+							static_cast<const LineStop*>(edge.second)->getLine(),
+							make_pair(false, true)
+					)	);
+			}	}
+
+			// Arrivals
+			if(withArrivals)
+			{
+				BOOST_FOREACH(const Vertex::Edges::value_type& edge, getArrivalEdges())
+				{
+					if(!dynamic_cast<const LineStop*>(edge.second))
+					{
+						continue;
+					}
+					JourneyPatternsMap::iterator it(journeyPatterns.find(static_cast<const LineStop*>(edge.second)->getLine()));
+					if(it == journeyPatterns.end())
+					{
+						journeyPatterns.insert(
+							make_pair(
+								static_cast<const LineStop*>(edge.second)->getLine(),
+								make_pair(true, false)
+						)	);
+					}
+					else
+					{
+						it->second.first = true;
+					}
+			}	}
+
+			// Exit
+			return journeyPatterns;
 		}
 }	}
