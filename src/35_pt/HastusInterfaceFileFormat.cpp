@@ -283,13 +283,16 @@ namespace synthese
 				
 				// Stops on record 12.9
 				service.stops = _getNextVector(12.9, 37, 41, 9);
-				BOOST_FOREACH(const string& stopCode, service.stops)
+				if(service.toRead)
 				{
-					stopCodes.insert(
-						make_pair(
+					BOOST_FOREACH(const string& stopCode, service.stops)
+					{
+						stopCodes.insert(
+							make_pair(
 							IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(stopCode),
 							StopCodes::mapped_type()
-					)	);
+							)	);
+					}
 				}
 			}
 		
