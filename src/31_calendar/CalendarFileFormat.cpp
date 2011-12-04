@@ -46,7 +46,7 @@ namespace synthese
 			}
 			else
 			{
-				logStream << "WARN : no road place with key " << code << "<br />";
+				logStream << "WARN : no calendar template with key " << code << "<br />";
 				return NULL;
 			}
 		}

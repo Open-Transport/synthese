@@ -289,9 +289,9 @@ namespace synthese
 					{
 						stopCodes.insert(
 							make_pair(
-							IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(stopCode),
-							StopCodes::mapped_type()
-							)	);
+								stopCode,
+								StopCodes::mapped_type()
+						)	);
 					}
 				}
 			}
@@ -542,12 +542,19 @@ namespace synthese
 				return string();
 			}
 
+			// Declarations
+			IConv converter(_dataSource.getCharset(), "UTF-8");
+
 			// Read the current record
 			if(_record->content.size() < start+length)
 			{
-				return trim_copy(_record->content.substr(start));
+				return converter.convert(
+					trim_copy(_record->content.substr(start))
+				);
 			}
-			return trim_copy(_record->content.substr(start, length));
+			return converter.convert(
+				trim_copy(_record->content.substr(start, length))
+			);
 		}
 
 
@@ -558,6 +565,9 @@ namespace synthese
 			std::size_t start,
 			std::size_t length
 		) const	{
+
+			// Declarations
+			IConv converter(_dataSource.getCharset(), "UTF-8");
 
 			// Fix of the positions
 			--numberPosition;
@@ -592,7 +602,10 @@ namespace synthese
 				{
 					if(_record->content.size() < position+length)
 					{
-						string value(trim_copy(_record->content.substr(position)));
+						string value(
+							converter.convert(
+								trim_copy(_record->content.substr(position))
+						)	);
 						if(!value.empty())
 						{
 							result.push_back(value);
@@ -602,7 +615,10 @@ namespace synthese
 					}
 					else
 					{
-						string value(trim_copy(_record->content.substr(position, length)));
+						string value(
+							converter.convert(
+								trim_copy(_record->content.substr(position, length))
+						)	);
 						if(!value.empty())
 						{
 							result.push_back(value);
