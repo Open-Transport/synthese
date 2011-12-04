@@ -270,7 +270,7 @@ namespace synthese
 				}
 
 				// Way back
-				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 1 == 1);
+				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 2 == 1);
 				
 				// Schedules on record 12.8
 				vector<string> schedulesStr(_getNextVector(12.8, 37, 41, 5));
