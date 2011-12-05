@@ -157,7 +157,9 @@ class WSGIProxy(object):
             environ['PATH_INFO'] = path_info
 
             path = app.root + path_info
-            if os.path.isfile(path):
+            if (os.path.isfile(path) or
+                (path_info.endswith('/') and os.path.isfile(
+                    os.path.join(path, 'index.html')))):
                 return app(environ, start_response)
 
         log.debug('Path %r not found in any static directories, forwarding '
