@@ -147,7 +147,7 @@ namespace synthese
 
 
 			// Loading the file into SQLite as virtual table
-			VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
 			size_t badGeometry(0);
 
 			stringstream query;

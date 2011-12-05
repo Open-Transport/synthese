@@ -278,7 +278,8 @@ namespace synthese
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream,
-				bool removeOldCodes
+				bool removeOldCodes,
+				bool updateMetricOffsetOnUpdate
 			);
 
 

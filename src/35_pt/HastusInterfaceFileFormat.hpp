@@ -29,6 +29,7 @@
 #include "PTDataCleanerFileFormat.hpp"
 #include "NoExportPolicy.hpp"
 #include "ScheduledService.h"
+#include "GraphTypes.h"
 
 namespace synthese
 {
@@ -65,12 +66,14 @@ namespace synthese
 
 				struct TemporaryService
 				{
-					bool toRead;
 					std::string lineCode;
 					std::string calendar;
 					std::string code;
 					std::string routeCode;
 					ScheduledService::Schedules schedules;
+					std::vector<graph::MetricOffset> scheduledStopsDistances;
+					std::vector<std::string> scheduledStops;
+					ScheduledService::Schedules allSchedules;
 					std::vector<std::string> stops;
 					bool wayBack;
 				};

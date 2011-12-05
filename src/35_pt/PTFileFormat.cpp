@@ -494,8 +494,12 @@ namespace synthese
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream,
-			bool removeOldCodes
+			bool removeOldCodes,
+			bool updateMetricOffsetOnUpdate
 		){
+			// Declaration
+			bool creation(false);
+
 			// Attempting to find an existing route by value comparison
 			JourneyPattern* result(NULL);
 			BOOST_FOREACH(Path* route, line.getPaths())
@@ -546,6 +550,7 @@ namespace synthese
 			// Create a new route if necessary
 			if(!result)
 			{
+				creation = true;
 				logStream << "CREA : Creation of route " << (name ? *name : string()) << " for " << (id ? *id : string("unknown")) << "<br />";
 				result = new JourneyPattern(
 					JourneyPatternTableSync::getId()
@@ -607,24 +612,37 @@ namespace synthese
 				}
 			}
 
-			// Update
-			Path::Edges::const_iterator it(result->getEdges().begin());
-			BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
+
+			//////////////////////////////////////////////////////////////////////////
+			// Updates
+
+			// Metric offsets
+			if(creation || updateMetricOffsetOnUpdate)
 			{
-				if(stop._metricOffset)
+				Path::Edges::const_iterator it(result->getEdges().begin());
+				BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
 				{
-					const_cast<Edge*>(*it)->setMetricOffset(*stop._metricOffset);
+					if(stop._metricOffset)
+					{
+						const_cast<Edge*>(*it)->setMetricOffset(*stop._metricOffset);
+					}
+					++it;
 				}
-				++it;
 			}
+
+			// Name
 			if(name)
 			{
 				result->setName(*name);
 			}
+
+			// Destination text
 			if(destination)
 			{
 				result->setDirection(*destination);
 			}
+
+			// Destination sign id
 			if(destinationObj)
 			{
 				result->setDirectionObj(*destinationObj);

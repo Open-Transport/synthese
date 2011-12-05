@@ -16,14 +16,14 @@ namespace synthese
 	
 	namespace lexical_matcher
 	{
-		IConv FrenchPhoneticString::ICONV("UTF-8","CP850");
-		std::string FrenchPhoneticString::ACCENTUATED_A(IConv::IConv("UTF-8","CP850").convert("àäáâÀÄÁÂ"));
-		std::string FrenchPhoneticString::ACCENTUATED_E(IConv::IConv("UTF-8","CP850").convert("èëéêÈËÉÊ"));
-		std::string FrenchPhoneticString::ACCENTUATED_I(IConv::IConv("UTF-8","CP850").convert("ìíîÌÍÎ"));
-		std::string FrenchPhoneticString::ACCENTUATED_O(IConv::IConv("UTF-8","CP850").convert("òóôÒÓÔ"));
-		std::string FrenchPhoneticString::ACCENTUATED_U(IConv::IConv("UTF-8","CP850").convert("ùúûÙÚÛ"));
-		std::string FrenchPhoneticString::VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
-		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP850").convert("aàäáâeèëéêiìïíîy"));
+		IConv FrenchPhoneticString::ICONV("UTF-8","CP1252");
+		std::string FrenchPhoneticString::ACCENTUATED_A(IConv::IConv("UTF-8","CP1252").convert("àäáâÀÄÁÂ"));
+		std::string FrenchPhoneticString::ACCENTUATED_E(IConv::IConv("UTF-8","CP1252").convert("èëéêÈËÉÊ"));
+		std::string FrenchPhoneticString::ACCENTUATED_I(IConv::IConv("UTF-8","CP1252").convert("ìíîÌÍÎ"));
+		std::string FrenchPhoneticString::ACCENTUATED_O(IConv::IConv("UTF-8","CP1252").convert("òóôÒÓÔ"));
+		std::string FrenchPhoneticString::ACCENTUATED_U(IConv::IConv("UTF-8","CP1252").convert("ùúûÙÚÛ"));
+		std::string FrenchPhoneticString::VOWELS(IConv::IConv("UTF-8","CP1252").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
+		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP1252").convert("aàäáâeèëéêiìïíîy"));
 
 		mutex FrenchPhoneticString::_IConvMutex;
 
@@ -39,7 +39,7 @@ namespace synthese
 
 
 
-		std::string FrenchPhoneticString::_convertToCP850(const std::string& text)
+		std::string FrenchPhoneticString::_convertTo8bits(const std::string& text)
 		{
 			try
 			{
@@ -47,7 +47,7 @@ namespace synthese
 			}
 			catch(IConv::ImpossibleConversion& e)
 			{
-				util::Log::GetInstance().warn("Failed to convert string to CP850 in FrenchPhoneticString", e);
+				util::Log::GetInstance().warn("Failed to convert string to CP1252 in FrenchPhoneticString", e);
 				return "";
 			};
 		}
@@ -58,7 +58,7 @@ namespace synthese
 		{
 			mutex::scoped_lock lock(_IConvMutex);
 
-			string source(_convertToCP850(text));
+			string source(_convertTo8bits(text));
 			stringstream result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{
@@ -81,7 +81,7 @@ namespace synthese
 
 			_source = ssource;
 
-			string source(_convertToCP850(ssource));
+			string source(_convertTo8bits(ssource));
 			PhoneticString result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{

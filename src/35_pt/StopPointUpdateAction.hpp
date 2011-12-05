@@ -39,6 +39,8 @@ namespace geos
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace pt
 	{
 		class StopPoint;
@@ -72,6 +74,7 @@ namespace synthese
 			static const std::string PARAMETER_OPERATOR_CODE;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_STOP_AREA;
+			static const std::string PARAMETER_SRID;
 
 		private:
 			boost::shared_ptr<StopPoint> _stop;
@@ -79,6 +82,7 @@ namespace synthese
 			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<std::string> _name;
 			boost::optional<boost::shared_ptr<const StopArea> > _stopArea;
+			const CoordinatesSystem* _coordinatesSystem;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
