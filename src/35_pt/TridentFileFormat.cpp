@@ -295,7 +295,7 @@ namespace synthese
 			// Writing of the header
 			os << "<?xml version='1.0' encoding='UTF-8'?>" << "\n" << "\n";
 		    if (_withTisseoExtension)
-				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  http://www.rcsmobility.com/synthese/include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd'>" << "\n";
+				os << "<TisseoPTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  https://extranet-rcsmobility.com/projects/synthese/repository/raw/doc/include/35_pt/trident2-tisseo/tisseo-chouette-extension.xsd'>" << "\n";
 			else
 				os << "<ChouettePTNetwork xmlns='http://www.trident.org/schema/trident' xmlns:xsi='http://www.w3.org/2001/XMLSchema-instance' xsi:schemaLocation='http://www.trident.org/schema/trident  http://www.rcsmobility.com/synthese/include/35_pt/chouette/Chouette.xsd'>" << "\n";
 
@@ -349,8 +349,11 @@ namespace synthese
 				os << "<objectId>" << TridentId (peerid, "StopArea", *ps) << "</objectId>" << "\n";
 				os << "<creatorId>" << ps->getCodeBySources() << "</creatorId>" << "\n";
 
-				os << "<name>" << ps->getConnectionPlace ()->getName ();
-				if (!ps->getName().empty()) os << " (" + ps->getName () + ")";
+				os << "<name>";
+				if(ps->getName().empty())
+					os << ps->getConnectionPlace ()->getName ();
+				else
+					os << ps->getName ();
 				os << "</name>" << "\n";
 
 				set<const Edge*> edges;
@@ -647,9 +650,11 @@ namespace synthese
 
 
 				os << "<containedIn>" << TridentId (peerid, "StopArea", *ps) << "</containedIn>" << "\n";
-				os << "<name>" << ps->getConnectionPlace ()->getCity ()->getName () << " " <<
-					ps->getConnectionPlace ()->getName ();
-				if (ps->getName ().empty () == false) os << " (" + ps->getName () + ")";
+				os << "<name>";
+				if (ps->getName ().empty ())
+					os << ps->getConnectionPlace ()->getName ();
+				else
+					os << ps->getName ();
 				os << "</name>" << "\n";
 
 				os << "<lineIdShortcut>" << TridentId (peerid, "Line", *_line) << "</lineIdShortcut>" << "\n";
