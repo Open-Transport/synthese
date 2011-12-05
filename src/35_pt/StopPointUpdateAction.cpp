@@ -62,6 +62,7 @@ namespace synthese
 		const string StopPointUpdateAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
 		const string StopPointUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string StopPointUpdateAction::PARAMETER_STOP_AREA = Action_PARAMETER_PREFIX + "sa";
+		const string StopPointUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
 
 
 
@@ -77,6 +78,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_X, _point->getX());
 				map.insert(PARAMETER_Y, _point->getY());
+				map.insert(PARAMETER_SRID, _point->getSRID());
 			}
 
 			if(_dataSourceLinks)
@@ -131,7 +133,12 @@ namespace synthese
 			if(	!map.getDefault<string>(PARAMETER_X).empty() &&
 				!map.getDefault<string>(PARAMETER_Y).empty()
 			){
-				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
+				CoordinatesSystem::SRID srid(
+					map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+				);
+				_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+				_point = _coordinatesSystem->createPoint(
 					map.get<double>(PARAMETER_X),
 					map.get<double>(PARAMETER_Y)
 				);

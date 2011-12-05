@@ -239,6 +239,7 @@ namespace synthese
 							user_data->_dataSource,
 							user_data->_env,
 							user_data->_stream,
+							true,
 							true
 					)	);
 					ScheduledService* service(
