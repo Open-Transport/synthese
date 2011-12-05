@@ -222,6 +222,10 @@ namespace synthese
 		{
 		bool operator()(const StopArea* s1, const StopArea* s2) const
 			{
+				if(s1->getName() == s2->getName())
+				{
+					return s1 < s2;
+				}
 				return s1->getName() < s2->getName();
 			}
 		};
