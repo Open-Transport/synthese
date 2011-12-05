@@ -870,6 +870,32 @@ namespace synthese
 					{
 						stream << " continuousServiceDuration=\"" << journey.getContinuousServiceRange() << "\"";
 					}
+
+					// CO2 Emissions and Energy consumption
+					double co2Emissions = 0;
+					double energyConsumption = 0;
+					BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
+					{
+						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
+						if(line == NULL) continue;
+
+						double distance = su.getDistance();
+
+						// if the route has no distance data
+						if(distance == 0)
+						{
+							if(su.getGeometry())
+							{
+								distance = CoordinatesSystem::GetCoordinatesSystem(27572).convertGeometry(
+									*su.getGeometry())->getLength();
+									distance *= 1.10;
+							}
+						}
+						co2Emissions += distance*line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+						energyConsumption += distance*line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+					}
+					stream << " " << DATA_CO2_EMISSIONS << "=\"" << co2Emissions << "\"";
+					stream << " " << DATA_ENERGY_CONSUMPTION << "=\"" << energyConsumption << "\"";
 					stream << ">";
 
 					if(journey.getReservationCompliance(false) != false)
