@@ -31,7 +31,6 @@
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
-#include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineStopTableSync.h"
@@ -1225,6 +1224,11 @@ namespace synthese
 
 						os << "LOAD : link between stops by code " << stopKey << " (" << nameNode.getText() << ") and "
 							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
+
+						if(curStop->getName() != nameNode.getText())
+						{
+							os << "NOTI : stop area is differently named in source file and in SYNTHESE (source=" << nameNode.getText() << ", SYNTHESE=" << curStop->getName() << ")<br />";
+						}
 					}
 					else if(!cityCode.empty())
 					{
@@ -1576,16 +1580,19 @@ namespace synthese
 
 
 			// Routes
-			map<string,JourneyPattern*> routes;
+			map<string, Route> routes;
 			int routesNumber(chouetteLineDescriptionNode.nChildNode("JourneyPattern"));
 			for(int routeRank(0); routeRank < routesNumber; ++routeRank)
 			{
+				Route route;
+
 				XMLNode routeNode(chouetteLineDescriptionNode.getChildNode("JourneyPattern",routeRank));
-				string objectId(routeNode.getChildNode("objectId").getText());
+				route.objectId = routeNode.getChildNode("objectId").getText();
 				string routeId(routeNode.getChildNode("routeId").getText());
+				route.name = routeNames[routeId];
+				route.wayBack = routeWaybacks[routeId];
 
 				// Reading stops list
-				JourneyPattern::StopsWithDepartureArrivalAuthorization routeStops;
 				int lineStopsNumber(routeNode.nChildNode("stopPointList"));
 				string lastStopPoint;
 				for(int lineStopRank(0); lineStopRank < lineStopsNumber; ++lineStopRank)
@@ -1595,33 +1602,19 @@ namespace synthese
 					);
 					if(stopPointCode == lastStopPoint)
 					{
-						os << "WARN : StopPoint " << lastStopPoint << " is repeated in journey pattern " << objectId << "<br />";
+						os << "WARN : StopPoint " << lastStopPoint << " is repeated in journey pattern " << route.objectId << "<br />";
 						continue;
 					}
 					lastStopPoint = stopPointCode;
-					routeStops.push_back(
+					route.stops.push_back(
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
 							stopPoints[stopPointCode]
 					)	);
 				}
 
-				routes[objectId] = PTFileFormat::CreateOrUpdateRoute(
-					*cline,
-					_mergeRoutes ? optional<const string&>() : optional<const string&>(objectId),
-					optional<const string&>(routeNames[routeId]),
-					optional<const string&>(),
-					optional<Destination*>(),
-					optional<const RuleUser::Rules&>(),
-					routeWaybacks[routeId],
-					rollingStock.get(),
-					routeStops,
-					_dataSource,
-					_env,
-					os,
-					true
-				);
+				routes[route.objectId] = route;
 			}
-
+					
 			// Services
 			map<string, ScheduledService*> services;
 			int servicesNumber(chouetteLineDescriptionNode.nChildNode("VehicleJourney"));
@@ -1635,19 +1628,20 @@ namespace synthese
 
 				// Creation of the service
 
-				map<string,JourneyPattern*>::const_iterator itLine(routes.find(jpKeyNode.getText()));
+				map<string,Route>::const_iterator itLine(routes.find(jpKeyNode.getText()));
 				if(itLine == routes.end())
 				{
 					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored because journey pattern " << jpKeyNode.getText() << " was not found.<br />";
 					continue;
 				}
-				JourneyPattern* line(itLine->second);
+				Route route(itLine->second);
 				size_t stopsNumber(serviceNode.nChildNode("VehicleJourneyAtStop"));
-				if(stopsNumber != line->getEdges().size())
+				if(stopsNumber != route.stops.size())
 				{
 					os << "WARN : Service " << serviceNumber << " / " << keyNode.getText() << " ignored due to bad stops number<br />";
 					continue;
 				}
+				bool updatedRoute(false);
 
 				ScheduledService::Schedules deps;
 				ScheduledService::Schedules arrs;
@@ -1658,6 +1652,26 @@ namespace synthese
 					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
 					XMLNode depNode(vjsNode.getChildNode("departureTime"));
 					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
+					
+					// Route boarding and alight possibility
+					if(	vjsNode.nChildNode("boardingAlightingPossibility") &&
+						stopRank > 0 &&
+						stopRank + 1 < stopsNumber
+					){
+						string bap(vjsNode.getChildNode("boardingAlightingPossibility").getText());
+						if(bap == "BoardOnly")
+						{
+							route.stops[stopRank]._arrival = false;
+							updatedRoute = true;
+						}
+						else if(bap == "AlightOnly")
+						{
+							route.stops[stopRank]._departure = false;
+							updatedRoute = true;
+						}
+					}
+
+					// Schedules
 					time_duration depHour(duration_from_string(depNode.getText()));
 					time_duration arrHour(duration_from_string(arrNode.getText()));
 					time_duration depSchedule(depHour + hours(24 * (lastDep.hours() / 24 + (depHour < Service::GetTimeOfDay(lastDep) ? 1 : 0))));
@@ -1668,9 +1682,40 @@ namespace synthese
 					arrs.push_back(arrSchedule);
 				}
 
+				JourneyPattern* journeyPattern(NULL);
+				if(!updatedRoute && route.journeyPattern)
+				{
+					journeyPattern = route.journeyPattern;
+				}
+				else
+				{
+					// Route creation
+					journeyPattern = PTFileFormat::CreateOrUpdateRoute(
+						*cline,
+						(_mergeRoutes || updatedRoute) ? optional<const string&>() : optional<const string&>(route.objectId),
+						optional<const string&>(route.name),
+						optional<const string&>(),
+						optional<Destination*>(),
+						optional<const RuleUser::Rules&>(),
+						route.wayBack,
+						rollingStock.get(),
+						route.stops,
+						_dataSource,
+						_env,
+						os,
+						true,
+						true
+					);
+					if(!updatedRoute)
+					{
+						routes[route.objectId].journeyPattern = journeyPattern;
+					}
+				}
+
+				// Service creation
 				ScheduledService* service(
 					PTFileFormat::CreateOrUpdateService(
-						*line,
+						*journeyPattern,
 						deps,
 						arrs,
 						serviceNumber,

@@ -334,7 +334,7 @@ namespace synthese
 								"mapProjection," << // from map projection
 								"new OpenLayers.Projection(\"EPSG:4326\")" << // to WGS 1984
 							");" <<
-							"new OpenLayers.Ajax.Request(addURL + '&actionParamlon='+ newpoint.x +'&actionParamlat=' + newpoint.y," <<
+							"new OpenLayers.Ajax.Request(addURL + '&actionParamsrid=4326&actionParamx='+ newpoint.x +'&actionParamy=' + newpoint.y," <<
 							"{   method: 'get'," <<
 								"onComplete: function(transport) {" <<
 //									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<

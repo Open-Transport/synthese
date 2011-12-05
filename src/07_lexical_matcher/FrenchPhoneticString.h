@@ -37,6 +37,10 @@ namespace synthese
 {
 	namespace lexical_matcher
 	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Phonetic encoding for French language.
+		/// Strings are converted to CP1252 8-bit strings before encoding.
+		/// This encoding allows French characters like œ.
 		class FrenchPhoneticString
 		{
 		public:
@@ -88,14 +92,17 @@ namespace synthese
 			static bool _IsFollowedBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsAnyOf(const std::string& source, size_t pos, const std::string& chars);
+
+
+
 			//////////////////////////////////////////////////////////////////////////
-			/// Try to convert the given string in UTF-8 to CP850. Return an empty
-			/// string in case of conversion failure.
+			/// Try to convert the given string in UTF-8 to internal 8-bit enconding
+			/// (CP1252). Return an empty string in case of conversion failure.
 			/// @param text text to convert
 			/// @author Sylvain Pasche
 			/// @since 3.3.0
 			/// @date 2011
-			static std::string _convertToCP850(const std::string& text);
+			static std::string _convertTo8bits(const std::string& text);
 
 		public:
 			FrenchPhoneticString();

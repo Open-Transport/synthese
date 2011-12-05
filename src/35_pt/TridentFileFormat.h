@@ -34,6 +34,7 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
+#include "JourneyPattern.hpp"
 
 #include <iostream>
 #include <vector>
@@ -138,6 +139,20 @@ namespace synthese
 					bool		_treatAllStopAreaAsQuay;
 					bool		_importTimetablesAsTemplates;
 				//@}
+
+				struct Route
+				{
+					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+					std::string objectId;
+					std::string name;
+					bool wayBack;
+					JourneyPattern* journeyPattern;
+
+					Route():
+					wayBack(false),
+					journeyPattern(NULL)
+					{}
+				};
 
 				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
 				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendarTemplates;

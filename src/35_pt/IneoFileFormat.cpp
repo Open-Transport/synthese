@@ -419,6 +419,7 @@ namespace synthese
 								_dataSource,
 								_env,
 								stream,
+								true,
 								true
 						)	);
 						stops.clear();

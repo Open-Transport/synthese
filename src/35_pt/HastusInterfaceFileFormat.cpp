@@ -237,63 +237,84 @@ namespace synthese
 				);
 			}
 
-			// Record 11 : Services headers
+			// Records 13 : Services
 			vector<TemporaryService> services;
 			typedef map<string, set<StopPoint*> > StopCodes;
 			StopCodes stopCodes;
-			for(_loadNextRecord(11); !_eof() && _record->recordNumber == 11; _loadNextRecord())
+			for(_loadNextRecord(12.1); !_eof(); _loadNextRecord(12.1))
 			{
+				// Declarations
 				TemporaryService service;
-				service.toRead = (_getTextField(5,4) == "0");
 
-				// Filter on regular services
-				if(_getTextField(5,4) != "2")
+				// Jump dead runs
+				if(_getTextField(7,2) != "0")
 				{
-					service.lineCode = _getTextField(32,4);
-					service.calendar = _getTextField(103,7);
-					service.code = _getTextField(149,8);
-					service.routeCode = _getTextField(134,4);
+					_loadNextRecord();
+					continue;
 				}
 
-				services.push_back(service);
-			}
-
-			// Records 12 to 16 for each service
-			BOOST_FOREACH(TemporaryService& service, services)
-			{
-				// Jump to record 12.7
-				_loadNextRecord(12.7);
-
-				if((!service.code.empty() && _getTextField(105, 5) != service.code) || (service.code.empty() && _getTextField(105, 5) != "0"))
-				{
-					os << "WARN : Service order is different in section 11 and section 12 : " << service.code << "<br />";
-				}
-
-				// Way back
-				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 2 == 1);
-				
-				// Schedules on record 12.8
-				vector<string> schedulesStr(_getNextVector(12.8, 37, 41, 5));
+				// Schedules on record 12.1
+				vector<string> schedulesStr(_getNextVector(12.1, 37, 41, 5));
 				BOOST_FOREACH(const string& scheduleStr, schedulesStr)
 				{
 					service.schedules.push_back(
 						minutes(lexical_cast<long>(scheduleStr))
 					);
 				}
+
+				// Line number on record 12.1
+				service.lineCode = _getTextField(29,5);
+
+				// Read scheduled stops in record 12.2
+				service.scheduledStops = _getNextVector(12.2, 37, 41, 6);
+				BOOST_FOREACH(const string& stopCode, service.scheduledStops)
+				{
+					stopCodes.insert(
+						make_pair(
+							stopCode,
+							StopCodes::mapped_type()
+					)	);
+				}
+
+				// Distances in record 12.5
+				vector<string> distancesStr(_getNextVector(12.5, 37, 41, 6));
+				BOOST_FOREACH(const string& distanceStr, distancesStr)
+				{
+					service.scheduledStopsDistances.push_back(
+						lexical_cast<MetricOffset>(distanceStr)
+					);
+				}
+
+				// Jump to record 12.7
+				_loadNextRecord(12.7);
+
+				// Service Properties in record 12.7
+				service.calendar = _getTextField(87,7);
+				service.code = _getTextField(40,10);
+				service.routeCode = _getTextField(124,4);
+				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 2 == 1);
 				
+				// All schedules on record 12.8
+				vector<string> allSchedulesStr(_getNextVector(12.8, 37, 41, 5));
+				BOOST_FOREACH(const string& allScheduleStr, allSchedulesStr)
+				{
+					service.allSchedules.push_back(
+						minutes(lexical_cast<long>(allScheduleStr))
+					);
+				}
+			
 				// Stops on record 12.9
 				service.stops = _getNextVector(12.9, 37, 41, 9);
-				if(service.toRead)
+				BOOST_FOREACH(const string& stopCode, service.stops)
 				{
-					BOOST_FOREACH(const string& stopCode, service.stops)
-					{
-						stopCodes.insert(
-							make_pair(
-								stopCode,
-								StopCodes::mapped_type()
-						)	);
-					}
+					stopCodes.insert(
+						make_pair(
+							stopCode,
+							StopCodes::mapped_type()
+					)	);
 				}
+
+				services.push_back(service);
 			}
 		
 			// File closing
@@ -307,11 +328,11 @@ namespace synthese
 			{
 				// Stop
 				stopCode.second = PTFileFormat::GetStopPoints(
-						stops,
-						stopCode.first,
-						optional<const string&>(),
-						os,
-						true
+					stops,
+					stopCode.first,
+					optional<const string&>(),
+					os,
+					true
 				);
 				if(stopCode.second.empty())
 				{
@@ -340,11 +361,6 @@ namespace synthese
 			set<string> missingCalendars;
 			BOOST_FOREACH(const TemporaryService& service, services)
 			{
-				if(!service.toRead)
-				{
-					continue;
-				}
-
 				// Line
 				CommercialLine* line(
 					PTFileFormat::GetLine(
@@ -362,12 +378,71 @@ namespace synthese
 
 				// Served stops
 				JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
-				BOOST_FOREACH(const string& stopCode, service.stops)
+				size_t scheduledStopsI(0);
+				size_t lastScheduledStop(0);
+				MetricOffset metricOffset(0);
+				for(size_t allStopsI(0); allStopsI < service.stops.size(); ++allStopsI)
 				{
+					// Declarations
+					const std::set<StopPoint*>& possibleStops(
+						stopCodes[service.stops[allStopsI]]
+					);
+
+					// Is a scheduled stop ? Schedules must match and the stop must be the same
+					bool isScheduledStop(false);
+					if(service.allSchedules[allStopsI] == service.schedules[scheduledStopsI])
+					{
+						BOOST_FOREACH(StopPoint* tstop, stopCodes[service.scheduledStops[scheduledStopsI]])
+						{
+							if(possibleStops.find(tstop) != possibleStops.end())
+							{
+								isScheduledStop = true;
+								break;
+							}
+						}
+					}
+
+					if(isScheduledStop)
+					{
+						metricOffset += service.scheduledStopsDistances[scheduledStopsI];
+						++scheduledStopsI;
+					}
 					servedStops.push_back(
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
-							stopCodes[stopCode]
+							possibleStops,
+							metricOffset,
+							true,
+							true,
+							isScheduledStop
 					)	);
+
+					// Distances pseudo-interpolation
+					if(isScheduledStop && allStopsI>0)
+					{
+						// Total length
+						MetricOffset totalLength(*servedStops[allStopsI]._metricOffset - *servedStops[lastScheduledStop]._metricOffset);
+
+						size_t rank(1);
+						for(size_t unScheduledStopI(lastScheduledStop+1); unScheduledStopI<allStopsI; ++unScheduledStopI)
+						{
+							servedStops[unScheduledStopI]._metricOffset = 
+								*servedStops[lastScheduledStop]._metricOffset +
+								floor(
+									(double(rank) / double(allStopsI-lastScheduledStop)) *
+									double(totalLength)
+								)
+							;
+							++rank;
+						}
+
+						// Record the last scheduled stop
+						lastScheduledStop = allStopsI;
+					}
+				}
+				if(scheduledStopsI < service.scheduledStops.size())
+				{
+					os << "WARN : A scheduled stop did not match with the full stop list : " << service.scheduledStops[scheduledStopsI] << " after " << service.stops[lastScheduledStop] << ". Service is ignored.<br />";
+					continue;
 				}
 
 				// Route
@@ -376,7 +451,7 @@ namespace synthese
 						*line,
 						service.routeCode,
 						optional<const string&>(),
-						optional<const string&>(),
+						service.routeCode,
 						optional<Destination*>(),
 						optional<const RuleUser::Rules&>(),
 						service.wayBack,
@@ -385,7 +460,8 @@ namespace synthese
 						_dataSource,
 						_env,
 						os,
-						true
+						true, // Remove old codes
+						false // Don't update metric offsets on update because default metric offset are approximations
 				)	);
 				if(route == NULL)
 				{
@@ -596,9 +672,9 @@ namespace synthese
 				return result;
 			}
 			size_t position(start);
-			for(size_t loadedRecords(0); loadedRecords<vectorSize;)
+			for(size_t loadedRecords(0); loadedRecords < vectorSize;)
 			{
-				while(_record->content.size() >= position)
+				while(_record->content.size() >= position && loadedRecords < vectorSize)
 				{
 					if(_record->content.size() < position+length)
 					{
