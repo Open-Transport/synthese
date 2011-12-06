@@ -1,35 +1,49 @@
-/*
- This file is the original SQLite command-line backend
- slightly modified by Alessandro Furieri in order to:
-
- - autoload the SpatiaLite and VirtualShape extensions
- - release any related memory allocation when exiting
-
+/* 
+/ spatialite
+/
+/ a CLI backend for SpatiaLite 
+/
+/ version 1.0, 2008 Decmber 11
+/
+/ Author: Sandro Furieri a.furieri@lqt.it
+/
+/ Copyright (C) 2008  Alessandro Furieri
+/
+/    This program is free software: you can redistribute it and/or modify
+/    it under the terms of the GNU General Public License as published by
+/    the Free Software Foundation, either version 3 of the License, or
+/    (at your option) any later version.
+/
+/    This program is distributed in the hope that it will be useful,
+/    but WITHOUT ANY WARRANTY; without even the implied warranty of
+/    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+/    GNU General Public License for more details.
+/
+/    You should have received a copy of the GNU General Public License
+/    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+/
 */
 
-
-
 /*
-** 2001 September 15
-**
-** The author disclaims copyright to this source code.  In place of
-** a legal notice, here is a blessing:
-**
-**    May you do good and not evil.
-**    May you find forgiveness for yourself and forgive others.
-**    May you share freely, never taking more than you give.
-**
-*************************************************************************
-** This file contains code to implement the "sqlite" command line
-** utility for accessing SQLite databases.
-**
-** $Id: shell.c,v 1.178 2008/05/05 16:27:24 drh Exp $
+
+ DISCLAIMER
+ ==========
+ 
+ This file is the original SQLite command-line backend
+ slightly modified by Alessandro Furieri in order to
+ fully support the SpatiaLite extensions
+
 */
 
 /* Sandro Furieri 30 May 2008
 / #include "sqlite3.h"
 */
+#ifdef SPATIALITE_AMALGAMATION
 #include <spatialite/sqlite3.h>
+#else
+#include <sqlite3.h>
+#endif
+
 #include <spatialite.h>
 #ifdef __MINGW32__
 #define LIBICONV_STATIC
@@ -466,7 +480,7 @@ create_utf8_converter (char *charset)
       }
 /* creating new converters */
     locale_to_utf8 = iconv_open ("UTF-8", charset);
-    if (locale_to_utf8 == (iconv_t)(-1))
+    if (locale_to_utf8 == (iconv_t) (-1))
       {
 	  locale_to_utf8 = NULL;
 	  fprintf (stderr,
@@ -476,7 +490,7 @@ create_utf8_converter (char *charset)
 	  return;
       }
     utf8_to_locale = iconv_open (charset, "UTF-8");
-    if (utf8_to_locale == (iconv_t)(-1))
+    if (utf8_to_locale == (iconv_t) (-1))
       {
 	  utf8_to_locale = NULL;
 	  fprintf (stderr,
@@ -501,7 +515,7 @@ create_input_utf8_converter (char *charset)
       }
 /* creating new converter */
     in_charset_to_utf8 = iconv_open ("UTF-8", charset);
-    if (in_charset_to_utf8 == (iconv_t)(-1))
+    if (in_charset_to_utf8 == (iconv_t) (-1))
       {
 	  in_charset_to_utf8 = NULL;
 	  fprintf (stderr,
@@ -519,13 +533,11 @@ convert_from_utf8 (char *buf, int maxlen)
     char *utf8buf = 0;
 #ifdef __MINGW32__
     const char *pBuf;
-    int len;
-    int utf8len;
 #else
     char *pBuf;
+#endif
     size_t len;
     size_t utf8len;
-#endif
     char *pUtf8buf;
     if (!utf8_to_locale)
 	return;
@@ -539,7 +551,8 @@ convert_from_utf8 (char *buf, int maxlen)
     utf8len = maxlen;
     pBuf = buf;
     pUtf8buf = utf8buf;
-    if (iconv (utf8_to_locale, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t)(-1))
+    if (iconv (utf8_to_locale, &pBuf, &len, &pUtf8buf, &utf8len) ==
+	(size_t) (-1))
       {
 	  fprintf (stderr, "\n*** ILLEGAL CHARACTER SEQUENCE ***\n\n");
 	  fflush (stderr);
@@ -558,13 +571,11 @@ convert_to_utf8 (char *buf, int maxlen)
     char *utf8buf = 0;
 #ifdef __MINGW32__
     const char *pBuf;
-    int len;
-    int utf8len;
 #else
     char *pBuf;
+#endif
     size_t len;
     size_t utf8len;
-#endif
     char *pUtf8buf;
     if (!locale_to_utf8)
 	return;
@@ -578,7 +589,8 @@ convert_to_utf8 (char *buf, int maxlen)
     utf8len = maxlen;
     pBuf = buf;
     pUtf8buf = utf8buf;
-    if (iconv (locale_to_utf8, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t)(-1))
+    if (iconv (locale_to_utf8, &pBuf, &len, &pUtf8buf, &utf8len) ==
+	(size_t) (-1))
       {
 	  fprintf (stderr, "\n*** ILLEGAL CHARACTER SEQUENCE ***\n\n");
 	  fflush (stderr);
@@ -597,13 +609,11 @@ convert_input_to_utf8 (char *buf, int maxlen)
     char *utf8buf = 0;
 #ifdef __MINGW32__
     const char *pBuf;
-    int len;
-    int utf8len;
 #else
     char *pBuf;
+#endif
     size_t len;
     size_t utf8len;
-#endif
     char *pUtf8buf;
     if (!in_charset_to_utf8)
 	return;
@@ -617,7 +627,8 @@ convert_input_to_utf8 (char *buf, int maxlen)
     utf8len = maxlen;
     pBuf = buf;
     pUtf8buf = utf8buf;
-    if (iconv (in_charset_to_utf8, &pBuf, &len, &pUtf8buf, &utf8len) == (size_t)(-1))
+    if (iconv (in_charset_to_utf8, &pBuf, &len, &pUtf8buf, &utf8len) ==
+	(size_t) (-1))
       {
 	  fprintf (stderr, "\n*** ILLEGAL CHARACTER SEQUENCE ***\n\n");
 	  fflush (stderr);
@@ -1187,7 +1198,7 @@ callback (void *pArg, int nArg, char **azArg, char **azCol)
 			  w = 10;
 		      }
 		    if (p->mode == MODE_Explain && azArg[i]
-			&& (int)strlen (azArg[i]) > w)
+			&& (int) strlen (azArg[i]) > w)
 		      {
 			  w = strlen (azArg[i]);
 		      }
@@ -1638,6 +1649,7 @@ dump_callback (void *pArg, int nArg, char **azArg, char **azCol)
 	  if (zTmp)
 	    {
 		zSelect = appendText (zSelect, zTmp, '\'');
+		free (zTmp);
 	    }
 	  zSelect = appendText (zSelect, " || ' VALUES(' || ", 0);
 	  rc = sqlite3_step (pTableInfo);
@@ -1677,6 +1689,48 @@ dump_callback (void *pArg, int nArg, char **azArg, char **azCol)
 	      free (zSelect);
       }
     return 0;
+}
+
+static void
+spatialite_autocreate (sqlite3 * db)
+{
+/* attempting to perform self-initialization for a newly created DB */
+    int ret;
+    char sql[1024];
+    char *err_msg = NULL;
+    int count;
+    int i;
+    char **results;
+    int rows;
+    int columns;
+
+/* checking if this DB is really empty */
+    strcpy (sql, "SELECT Count(*) from sqlite_master");
+    ret = sqlite3_get_table (db, sql, &results, &rows, &columns, NULL);
+    if (ret != SQLITE_OK)
+	return;
+    if (rows < 1)
+	;
+    else
+      {
+	  for (i = 1; i <= rows; i++)
+	      count = atoi (results[(i * columns) + 0]);
+      }
+    sqlite3_free_table (results);
+
+    if (count > 0)
+	return;
+
+/* all right, it's empty: proceding to initialize */
+    strcpy (sql, "SELECT InitSpatialMetadata()");
+    ret = sqlite3_exec (db, sql, NULL, NULL, &err_msg);
+    if (ret != SQLITE_OK)
+      {
+	  fprintf (stderr, "InitSpatialMetadata() error: %s\n", err_msg);
+	  sqlite3_free (err_msg);
+	  return;
+      }
+    spatial_ref_sys_init (db, 1);
 }
 
 /*
@@ -1763,11 +1817,19 @@ static char zHelp[] =
     "                  .charset CP850\n"
     "                        [use the Windows CHCP command in order to check better\n"
     "                         which one charset is used on your Command Prompt]\n\n"
+    ".chkdupl <table>  Check a TABLE for duplicated rows\n\n"
+    ".remdupl <table>  Removes any duplicated row from a TABLE\n\n"
     ".loadshp <args>   Loads a SHAPEFILE into a SpatiaLite table\n"
-    "                  arg_list: shp_path table_name charset [SRID] [column_name]\n\n"
+    "                  arg_list: shp_path table_name charset [SRID] [column_name]\n"
+    "                      [2d] [compressed]\n\n"
     ".dumpshp <args>   Dumps a SpatiaLite table into a SHAPEFILE\n"
     "                  arg_list: table_name column_name shp_path charset [geom_type]\n"
     "                      geom_type={ POINT | LINESTRING | POLYGON | MULTIPOINT }\n\n"
+    ".loaddbf <args>   Loads a DBF into a SpatiaLite table\n"
+    "                  arg_list: dbf_path table_name charset\n\n"
+    ".dumpkml <args>   Dumps a SpatiaLite table as a KML file\n"
+    "                  arg_list: table_name geom_column kml_path\n"
+    "                      [precision] [name_column] [desc_column]\n\n"
     ".read <args>      Execute an SQL script\n"
     "                  arg_list: script_path charset\n"
 /* end Sandro Furieri 2008-06-20 */
@@ -1801,6 +1863,13 @@ open_db (struct callback_data *p)
 #ifndef SQLITE_OMIT_LOAD_EXTENSION
 	  sqlite3_enable_load_extension (p->db, 1);
 #endif
+
+/* Sandro Furieri 2009-11-08 */
+	  sqlite3_exec (p->db, "PRAGMA foreign_keys = 1", NULL, 0, NULL);
+/* end Sandro Furieri 2008-11-08 */
+/* Sandro Furieri 2010-08-07 */
+	  spatialite_autocreate (p->db);
+/* end Sandro Furieri 2010-08-07 */
       }
 }
 
@@ -1974,20 +2043,55 @@ do_meta_command (char *zLine, struct callback_data *p)
 	  open_db (p);
 	  dump_shapefile (p->db, table, column, shp_path, outCS, type, 1, NULL);
       }
+    else if (c == 'd' && n > 1 && strncmp (azArg[0], "dumpkml", n) == 0
+	     && (nArg == 4 || nArg == 5 || nArg == 6 || nArg == 7))
+      {
+	  /* dumping a spatial table as KML file */
+	  char *table = azArg[1];
+	  char *geom = azArg[2];
+	  char *kml_path = azArg[3];
+	  char *name = NULL;
+	  char *desc = NULL;
+	  int precision = 8;
+	  if (nArg >= 5)
+	      precision = atoi (azArg[4]);
+	  if (nArg >= 6)
+	      name = azArg[5];
+	  if (nArg == 7)
+	      desc = azArg[6];
+	  open_db (p);
+	  dump_kml (p->db, table, geom, kml_path, name, desc, precision);
+      }
     else if (c == 'l' && n > 1 && strncmp (azArg[0], "loadshp", n) == 0
-	     && (nArg == 4 || nArg == 5 || nArg == 6))
+	     && (nArg == 4 || nArg == 5 || nArg == 6 || nArg == 7 || nArg == 8))
       {
 	  char *shp_path = azArg[1];
 	  char *table = azArg[2];
 	  char *inCS = azArg[3];
 	  int srid = -1;
+	  int coerce2d = 0;
+	  int compressed = 0;
 	  char *column = NULL;
 	  if (nArg >= 5)
 	      srid = atoi (azArg[4]);
 	  if (nArg == 6)
 	      column = azArg[5];
+	  if (nArg >= 7)
+	      coerce2d = 1;
+	  if (nArg == 8)
+	      compressed = 1;
 	  open_db (p);
-	  load_shapefile (p->db, shp_path, table, inCS, srid, column, 1, NULL);
+	  load_shapefile (p->db, shp_path, table, inCS, srid, column, coerce2d,
+			  compressed, 1, NULL);
+      }
+    else if (c == 'l' && n > 1 && strncmp (azArg[0], "loaddbf", n) == 0
+	     && nArg == 4)
+      {
+	  char *dbf_path = azArg[1];
+	  char *table = azArg[2];
+	  char *inCS = azArg[3];
+	  open_db (p);
+	  load_dbf (p->db, dbf_path, table, inCS, 1, NULL);
       }
     else if (c == 'r' && strncmp (azArg[0], "read", n) == 0)
       {
@@ -2009,10 +2113,20 @@ do_meta_command (char *zLine, struct callback_data *p)
 		fclose (alt);
 	    }
       }
-    else
-/* end Sandro Furieri 2008-06-20 */
-
-    if (c == 'b' && n > 1 && strncmp (azArg[0], "bail", n) == 0 && nArg > 1)
+    else if (c == 'c' && strncmp (azArg[0], "chkdupl", n) == 0 && nArg == 2)
+      {
+	  char *table = azArg[1];
+	  open_db (p);
+	  check_duplicated_rows (p->db, table);
+      }
+    else if (c == 'r' && strncmp (azArg[0], "remdupl", n) == 0 && nArg == 2)
+      {
+	  char *table = azArg[1];
+	  open_db (p);
+	  remove_duplicated_rows (p->db, table);
+      }
+    else if (c == 'b' && n > 1 && strncmp (azArg[0], "bail", n) == 0
+	     && nArg > 1)
       {
 	  bail_on_error = booleanValue (azArg[1]);
       }
@@ -3105,7 +3219,7 @@ Sandro Furieri 30 May 2008
 ===========================
 registering the SpatiaLite extension
 */
-    spatialite_init (0);
+    spatialite_init (1);
 
     stdin_is_interactive = isatty (0);
 

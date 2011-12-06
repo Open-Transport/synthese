@@ -1,7 +1,7 @@
 /* 
  gaiaaux.h -- Gaia common utility functions
   
- version 2.3, 2008 October 13
+ version 2.4, 2009 September 17
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -58,11 +58,9 @@ extern "C"
 
 /* function prototipes */
 
-    GAIAAUX_DECLARE const char *gaiaGetLocaleCharset ();
+    GAIAAUX_DECLARE const char *gaiaGetLocaleCharset (void);
     GAIAAUX_DECLARE int gaiaConvertCharset (char **buf, const char *fromCs,
 					    const char *toCs);
-    GAIAAUX_DECLARE int gaiaToUTF8 (char **buf, const char *fromCs,
-				    const char *toCs);
     GAIAAUX_DECLARE void *gaiaCreateUTF8Converter (const char *fromCS);
     GAIAAUX_DECLARE void gaiaFreeUTF8Converter (void *cvtCS);
     GAIAAUX_DECLARE char *gaiaConvertToUTF8 (void *cvtCS, const char *buf,

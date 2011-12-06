@@ -1,7 +1,7 @@
 /* 
  gaiaexif.h -- Gaia common EXIF Metadata reading functions
   
- version 2.3, 2008 October 13
+ version 2.4, 2009 September 17
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -67,7 +67,6 @@ extern "C"
 #define GAIA_PDF_BLOB		7
 #define GAIA_GEOMETRY_BLOB	8
 #define GAIA_TIFF_BLOB		9
-#define GAIA_WAVELET_BLOB	10
 
 /* constants used for EXIF value types */
 #define GAIA_EXIF_NONE		0
