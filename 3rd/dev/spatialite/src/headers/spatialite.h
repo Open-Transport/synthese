@@ -1,7 +1,7 @@
 /* 
  spatialite.h -- Gaia spatial support for SQLite 
   
- version 2.3, 2008 October 13
+ version 2.4, 2009 September 17
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -57,7 +57,6 @@ extern "C"
 #endif
 
     SPATIALITE_DECLARE const char *spatialite_version (void);
-    SPATIALITE_DECLARE const char *virtualtext_version (void);
     SPATIALITE_DECLARE void spatialite_init (int verbose);
     SPATIALITE_DECLARE int dump_shapefile (sqlite3 * sqlite, char *table,
 					   char *column, char *charset,
@@ -65,10 +64,23 @@ extern "C"
 					   int verbose, int *rows);
     SPATIALITE_DECLARE int load_shapefile (sqlite3 * sqlite, char *shp_path,
 					   char *table, char *charset, int srid,
-					   char *column, int verbose,
+					   char *column, int coerce2d,
+					   int compressed, int verbose,
 					   int *rows);
+    SPATIALITE_DECLARE int load_dbf (sqlite3 * sqlite, char *shp_path,
+				     char *table, char *charset, int verbose,
+				     int *rows);
     SPATIALITE_DECLARE double math_round (double value);
     SPATIALITE_DECLARE sqlite3_int64 math_llabs (sqlite3_int64 value);
+    SPATIALITE_DECLARE int spatial_ref_sys_init (sqlite3 * sqlite, int verbose);
+    SPATIALITE_DECLARE int dump_kml (sqlite3 * sqlite, char *table,
+				     char *geom_col, char *kml_path,
+				     char *name_col, char *desc_col,
+				     int precision);
+    SPATIALITE_DECLARE void check_duplicated_rows (sqlite3 * sqlite,
+						   char *table);
+    SPATIALITE_DECLARE void remove_duplicated_rows (sqlite3 * sqlite,
+						    char *table);
 
 #ifdef __cplusplus
 }

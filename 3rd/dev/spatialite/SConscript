@@ -10,7 +10,7 @@ if senv.GetPlatform () == 'win32':
 	deps.append('iconv.cppinc')
 	senv.Append( CPPDEFINES = ['_WIN32'] )
 #'OMIT_GEOS', 
-senv.Append( CPPDEFINES = ['SQLITE_ENABLE_RTREE'])
+senv.Append( CPPDEFINES = ['SQLITE_ENABLE_RTREE', 'SPATIALITE_AMALGAMATION'])
 
 senv.Append( LINKFLAGS = ['-lm', '-lproj'] )
 

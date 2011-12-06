@@ -454,6 +454,11 @@ EXHIBIT A -Mozilla Public License.
      Klaus Foerster <klaus.foerster@svg.cc> [AsSvg()]
      Luigi Costalli <luigi.costalli@gmail.com> [Dijkstra's shortest path algorithm]
 
+     The Vanuatu Team - University of Toronto [WKT parser]
+     Supervisor: Greg Wilson <gvwilson@cs.toronto.ca>
+     [you can find the complete team composition in gg_wkt.c]
+
+
      Alternatively, the contents of this file may be used under the terms of
      either the GNU General Public License Version 2 or later (the "GPL"), or
      the GNU Lesser General Public License Version 2.1 or later (the "LGPL"),

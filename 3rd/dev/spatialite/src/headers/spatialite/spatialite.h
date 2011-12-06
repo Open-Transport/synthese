@@ -1,7 +1,7 @@
 /* 
  spatialite.h -- Gaia support for SQLite extensions
   
- version 2.3, 2008 October 13
+ version 2.4, 2009 September 17
 
  Author: Sandro Furieri a.furieri@lqt.it
 
@@ -43,7 +43,9 @@ the terms of any one of the MPL, the GPL or the LGPL.
 */
 
 int virtualshape_extension_init (sqlite3 * db);
+int virtualdbf_extension_init (sqlite3 * db);
 int virtualtext_extension_init (sqlite3 * db);
 int virtualnetwork_extension_init (sqlite3 * db);
 int virtualfdo_extension_init (sqlite3 * db);
 int mbrcache_extension_init (sqlite3 * db);
+int virtual_spatialindex_extension_init (sqlite3 * db);
