@@ -13,6 +13,7 @@ if(WIN32)
 endif()
 
 add_definitions(-DSQLITE_ENABLE_RTREE)
+add_definitions(-DSPATIALITE_AMALGAMATION)
 
 add_library(spatialite ${spatialite_SRCS})
 
