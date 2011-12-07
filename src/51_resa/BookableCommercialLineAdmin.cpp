@@ -238,7 +238,7 @@ namespace synthese
 						_hideOldServices,
 						0,
 						optional<size_t>(),
-						true, true, UP_LINKS_LOAD_LEVEL
+						true, true, DOWN_LINKS_LOAD_LEVEL
 				)	);
 				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
 				{
