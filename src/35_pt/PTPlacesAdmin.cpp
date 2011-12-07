@@ -350,8 +350,7 @@ namespace synthese
 						_city.get() ? optional<string>() : (_searchCity.empty() ? string() : ("%"+ _searchCity +"%")),
 						true,
 						true,
-						0,
-						50
+						0
 				)	);
 
 				AdminActionFunctionRequest<StopAreaAddAction,PTPlaceAdmin> stopAddRequest(request);
