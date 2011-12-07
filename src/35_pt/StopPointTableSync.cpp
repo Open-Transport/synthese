@@ -347,10 +347,10 @@ namespace synthese
 				query.addOrderFieldOther<StopAreaTableSync>(StopAreaTableSync::TABLE_COL_NAME, raisingOrder);
 				query.addOrderField(StopPointTableSync::COL_NAME, raisingOrder);
 			}
-			if (number)
+			if(number)
 			{
 				query.setNumber(*number + 1);
-				if (first > 0)
+				if(first > 0)
 					query.setFirst(first);
 			}
 
