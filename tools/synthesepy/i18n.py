@@ -67,7 +67,6 @@ Appels syntheses:
     logged_out = u"Vous êtes maintenant déconnecté"
 
     # layout
-    synthese_manager = u"Admnistration Synthese"
     error = u"Erreur: "
     login = u"Connexion"
     logout = u"Déconnecter"

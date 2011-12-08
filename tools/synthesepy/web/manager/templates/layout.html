@@ -1,7 +1,7 @@
 <!DOCTYPE html>
   <head>
     <meta charset="utf-8">
-    <title>Synthese Manager</title>
+    <title>Synthese Manager ({{ project_name }})</title>
     <link rel=stylesheet type=text/css href="{{ url_for('.static', filename='vendor/bootstrap/bootstrap.css') }}">
     <style>
       /* Override some defaults */
@@ -83,7 +83,7 @@
     <div class="topbar">
       <div class="fill">
         <div class="container">
-          <a class="brand" href="{{ url_for('.index') }}">{{ i18n.synthese_manager }}</a>
+          <a class="brand" href="{{ url_for('.index') }}">Synthese Manager ({{ project_name }})</a>
           <div class="pull-right login-info">
             {% if not session.logged_in %}
               <a href="{{ url_for('.login') }}">{{ i18n.login }}</a>
