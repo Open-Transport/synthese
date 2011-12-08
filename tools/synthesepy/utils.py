@@ -299,6 +299,8 @@ def send_mail(config, recipients, subject, body):
     if not recipients:
         return
 
+    log.info('Sending mail %r to %s', subject, recipients)
+
     global _mail_conn
 
     if not _mail_conn:
@@ -317,7 +319,6 @@ def send_mail(config, recipients, subject, body):
     msg['From'] = config.mail_sender
     msg['To'] = ', '.join(recipients)
 
-    log.info('Sending mail %r to %s', subject, recipients)
     _mail_conn.sendmail(config.mail_sender, recipients, msg.as_string())
 
 

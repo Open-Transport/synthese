@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %}<h1>Templates d'import disponibles</h1>{% endblock %}
+{% block body %}
+  <ul>
+  {% for template in templates %}
+    <li><a href="{{ url_for('.import_template', template_id=template.id) }}">{{ template.label }}</a>
+  {% else %}
+    <li><em>No templates</em>
+  {% endfor %}
+  </ul>
+{% endblock %}

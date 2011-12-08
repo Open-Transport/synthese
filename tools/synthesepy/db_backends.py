@@ -202,6 +202,8 @@ class SQLiteBackend(DBBackend):
             cursor.executescript(sql)
 
     def _call_spatialite(self, cmd, shell=True, **kwargs):
+        # TODO: this should use the compiled spatialite.
+
         # Warning: shell=False is required on Linux, otherwise it launches the
         # interpreter and it hangs.
         cmd = [self.env.config.spatialite_path] + cmd

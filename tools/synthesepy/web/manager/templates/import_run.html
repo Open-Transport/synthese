@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block title %}<h1>{{import_.template.label}}, import {{ import_.id }}, run {{ run.id }}</h1>{% endblock %}
+{% block body %}
+
+<p>
+Résultat: 
+{% if run.successful %}
+  <span class="label success">Succès</span>
+{% else %}
+  <span class="label important">Echec</span>
+{% endif %}
+</p>
+
+<p>Résumé:</p>
+
+<pre>
+{{ run.get_summary() }}
+</pre>
+
+{% endblock %}
