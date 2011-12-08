@@ -16,7 +16,8 @@ do
 		--param tmp_dir=$S3_SERVER_TMP_DIR \
 		--param port=$S3_SERVER_PORT \
 		--param log_level=$S3_SERVER_LOG_LEVEL \
-                --param nb_threads=$S3_NB_THREADS
+		--param nb_threads=$S3_NB_THREADS \
+		--param session_max_duration=$S3_SESSION_MAX_DURATION
 	) || (echo "Failed!" && exit 1)
 	rm -f $S3_SERVER_PID_FILE
 
