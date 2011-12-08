@@ -57,8 +57,12 @@ def get_application(bootstrap_config={}, project=None):
     app.secret_key = project.config.secret_key
 
     @app.context_processor
-    def inject_user():
+    def inject_i18n():
         return dict(i18n=synthesepy.i18n)
+
+    @app.context_processor
+    def inject_project_name():
+        return dict(project_name=project.config.project_name)
 
     if project.manager_module and hasattr(project.manager_module, 'get_webapp'):
         app = project.manager_module.get_webapp(project, app)
