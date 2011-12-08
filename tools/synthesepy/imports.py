@@ -44,6 +44,7 @@ class ImportsManager(object):
         self.templates = None
 
     def _load_templates(self):
+        # TODO: detect if the config file changed, and reload.
         if self.templates is not None:
             return
 
@@ -288,6 +289,8 @@ class ImportRun(object):
             f.write(summary.encode('utf-8'))
 
     def get_summary(self, min_level='unknown'):
+        # FIXME: this is wrong: the summary should be generated every time
+        # (if messages are available) because the min_level can change.
         if os.path.isfile(self.summary_path):
             self._summary = open(self.summary_path, 'rb').read().decode('utf-8')
         if self._summary:
