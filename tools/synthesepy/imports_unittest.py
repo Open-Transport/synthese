@@ -85,17 +85,26 @@ class TestImports(unittest.TestCase):
             }
         ],
     }]
-    
+
+    def assertIn(self, a, b, msg=None):
+        """Backport for Python 2.6"""
+        if hasattr(unittest.TestCase, 'assertIn'):
+            # use native one if available.
+            return unittest.TestCase.assertIn(self, a, b, msg)
+        if msg is None:
+            msg = '"%s" not found in "%s"' % (a, b)
+        self.assert_(a in b, msg)
+
     def _mock_send_mail(self, config, recipients, subject, body):
         self.emails.append((sorted(recipients), subject, body))
-    
+
     def setUp(self):
         self._orig_HTTPApi = synthesepy.http_api.HTTPApi
         synthesepy.http_api.HTTPApi = MockHTTPApi
         self._orig_send_mail = utils.send_mail
         utils.send_mail = self._mock_send_mail
         self.emails = []
-        
+
         self.tester = synthesepy.test.Tester.instance
 
     def tearDown(self):
@@ -120,7 +129,7 @@ class TestImports(unittest.TestCase):
             'import_templates = {0!r}'.format(import_templates))
 
         return project_manager.Project(self.project_path, self.tester.env)
-    
+
     def _reload_project(self):
         return project_manager.Project(self.project_path, self.tester.env)
 
@@ -200,7 +209,7 @@ class TestImports(unittest.TestCase):
         project = self._init_project(import_templates)
 
         test_template = project.imports_manager.get_import_template('test_template')
-        
+
         self.assertFalse(test_template.has_access('unauthorized'))
         self.assertFalse(test_template.has_access('unauthorized', True))
 
@@ -231,7 +240,7 @@ class TestImports(unittest.TestCase):
 
         self.assertEquals(len(self.emails), 1)
         email = self.emails[0]
-        self.assertEquals(email[0], 
+        self.assertEquals(email[0],
             ['admin0@example.com', 'admin1@example.com',
              'uploader0@example.com', 'uploader1@example.com'])
         self.assertIn('nouveau commentaire', email[1])
