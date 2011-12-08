@@ -300,7 +300,8 @@ class ImportRun(object):
                 continue
             summary += i18n.import_level_section.format(level=level.upper())
             for message in self.messages[level]:
-                summary += '{0}: {1}\n'.format(level.upper(), message)
+                summary += u'{0}: {1}\n'.format(
+                    level.upper(), unicode(message, 'utf-8', 'replace'))
 
         summary += i18n.end_of_messages
 

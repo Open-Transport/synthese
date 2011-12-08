@@ -225,12 +225,17 @@ def import_execute(template_id, import_id):
 
 
 @manager.route('/import_execute/<template_id>/<import_id>/run/<run_id>')
-def import_run_detail(template_id, import_id, run_id):
+def import_run_detail(template_id, import_id, run_id, raw=0):
     import_ = _get_import(template_id, import_id)
 
     try:
         run = import_.get_run(run_id)
     except KeyError:
         abort(404)
+
+    if request.args.get('raw') == '1':
+        response = flask.current_app.make_response(run.get_summary())
+        response.mimetype = 'text/plain'
+        return response
 
     return render_template('import_run.html', import_=import_, run=run)
