@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block body %}
+  <h2>{{ i18n.login }}</h2>
+  {% if error %}
+    <div class="alert-message error">
+      <a class="close" href="#">&times;</a>
+      <p><strong>{{ i18n.error }}</strong> {{ error }}</p>
+    </div>
+  {% endif %}
+  <form action="{{ url_for('.login') }}" method=post>
+    <dl>
+      <dt>{{ i18n.username }}
+      <dd><input type=text name=username>
+      <dt>{{ i18n.password }}
+      <dd><input type=password name=password>
+      <dd><input type=submit value=Login>
+    </dl>
+    <input type=hidden name=next value="{{ request.args.next }}">
+  </form>
+{% endblock %}
