@@ -4,7 +4,7 @@
 // Description:
 //
 //
-// Author: Hugues Romain (RCS) <hugues.romain@reseaux-conseil.com>, (C) 2009
+// Author: Hugues Romain (RCS) <hromain@rcsmobility.com>, (C) 2009
 //
 // Copyright: See COPYING file that comes with this distribution
 //
