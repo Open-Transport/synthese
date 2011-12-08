@@ -5,7 +5,7 @@
   {% for template in templates %}
     <li><a href="{{ url_for('.import_template', template_id=template.id) }}">{{ template.label }}</a>
   {% else %}
-    <li><em>No templates</em>
+    <li><em>{{ i18n.no_templates }}</em>
   {% endfor %}
   </ul>
 {% endblock %}
