@@ -69,8 +69,8 @@ Appels syntheses:
     # layout
     synthese_manager = u"Admnistration Synthese"
     error = u"Erreur: "
-    log_in = u"Connexion"
-    log_out = u"Déconnecter"
+    login = u"Connexion"
+    logout = u"Déconnecter"
 
     # login
     username = u"Nom d'utilisateur"

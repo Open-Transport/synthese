@@ -86,9 +86,9 @@
           <a class="brand" href="{{ url_for('.index') }}">{{ i18n.synthese_manager }}</a>
           <div class="pull-right login-info">
             {% if not session.logged_in %}
-              <a href="{{ url_for('.login') }}">{{ i18n.log_in }}</a>
+              <a href="{{ url_for('.login') }}">{{ i18n.login }}</a>
             {% else %}
-              Utilisateur: {{ session.username }} <a href="{{ url_for('.logout') }}">{{ i18n.log_out }}</a>
+              Utilisateur: {{ session.username }} <a href="{{ url_for('.logout') }}">{{ i18n.logout }}</a>
             {% endif %}
           </div>
         </div>
