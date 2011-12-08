@@ -44,8 +44,8 @@ SetEnv proxy-nokeepalive 1
 
         config = self.project.config
 
-        self.config_name = 'synthese_{0}.conf'.format(
-            config.project_name)
+        self.config_name = 'synthese_{0}{1}.conf'.format(
+            config.project_name, project.config.apache_conf_suffix)
         self.config_path = join(
             config.project_path, 'conf', 'generated', 'apache',
             self.config_name)
@@ -153,12 +153,21 @@ Alias /synthese3 "{admin_files_path}/admin/"
         {synthese_proxy}
     </Location>
 
-
     # The admin requires a synthese URL under /admin.
     # TODO: Remove this once it's been migrated to the new package system.
     <Location /admin/synthese>
         {synthese_proxy_admin}
     </Location>
+
+    # WSGI
+    {wsgi_comment_switch}WSGIDaemonProcess {wsgi_process_name} user={synthese_user} group={synthese_group}
+    {wsgi_comment_switch}WSGIProcessGroup {wsgi_process_name}
+
+    WSGIScriptAlias /w {wsgi_script_path}
+    <Directory {wsgi_script_dir}>
+        Order allow,deny
+        Allow from all
+    </Directory>
 
     {custom_config}
 
@@ -213,6 +222,19 @@ Alias /{package_name} {package_files_path}/{package_name}
         proxy_format_config['proxy_path'] = 'admin/synthese'
         format_config['synthese_proxy_admin'] = self.PROXY_TEMPLATE.format(
             **proxy_format_config)
+
+        # WSGI
+        format_config['wsgi_comment_switch'] = (
+            '#' if self.project.env.platform == 'win' else '')
+        format_config['wsgi_process_name'] = \
+            'synthese-{project_name}-{site_name}'.format(
+                project_name=self.project.config.project_name,
+                site_name=site.name)
+        wsgi_script_path = join(
+            self.project.path, 'conf', 'generated', 'wsgi', 'app.wsgi')
+        format_config['wsgi_script_path'] = self._format_path(wsgi_script_path)
+        format_config['wsgi_script_dir'] = self._format_path(
+            os.path.dirname(wsgi_script_path))
 
         format_config['custom_config'] = format_config.get(
             'apache_custom_config', '')
@@ -279,6 +301,7 @@ Redirect /synthese3/admin /admin
         utils.call('a2enmod setenvif', shell=True)
         utils.call('a2enmod headers', shell=True)
         utils.call('a2enmod filter', shell=True)
+        utils.call('a2enmod wsgi', shell=True)
         utils.call('/etc/init.d/apache2 graceful', shell=True)
 
     def system_uninstall(self):

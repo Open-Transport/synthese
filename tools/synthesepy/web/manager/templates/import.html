@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+{% block title %}<h1>{{import_.template.label}}, import {{ import_.id }}</h1>{% endblock %}
+{% block body %}
+  <style>
+  article {
+    padding: 0.5em;
+    border-top: thin dashed #aaa;
+  }
+  article header {
+    position: relative;
+  }
+  article time {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  article h4 {
+    margin: 0;
+  }
+  </style>
+
+  <h1>Configuration</h1>
+
+  <form action="{{ url_for('.import_update',
+                   template_id=import_.template.id, import_id=import_.id) }}"
+        enctype=multipart/form-data method=post>
+
+    <fieldset>
+      {% for param in import_.params.itervalues() %}
+        {% if is_admin or param.uploader_visible %}
+          <div class="clearfix">
+            {# todo: check param.admin_only #}
+            <label>{{ param.label }}</label>
+            <div class="input">
+            {% if param.type == 'string' %}
+              <input type=text
+                {% if not is_admin and param.uploader_readonly %}readonly{% endif %}
+                size=30 name={{ param.id }} value="{{ param.value }}">
+            {% elif param.type == 'bool' %}
+              <input type=checkbox name={{ param.id }}
+                {% if param.value == '1' %}checked{% endif %}>
+            {% elif param.type == 'file' %}
+              <input type=file name={{ param.id }}><br>
+                  (actuellement: {{ param.value }})
+            {% else %}
+              unknown type
+            {% endif %}
+            </div>
+          </div><!-- /clearfix -->
+        {% endif %}
+      {% endfor %}
+
+      <div class="clearfix">
+        <label id="optionsCheckboxes">Options</label>
+        <div class="input">
+          <ul class="inputs-list">
+            <li>
+              <label>
+                <input type="checkbox" name="no_mail" value="option2" />
+                <span>Ne pas envoyer de mail</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div><!-- /clearfix -->
+
+      <div class="actions">
+        <input type="submit" class="btn primary" value="Sauver">
+      </div>
+    </fieldset>
+  </form>
+
+  <h1>Commentaires</h1>
+
+  <form action="{{ url_for('.import_add_comment',
+                   template_id=import_.template.id, import_id=import_.id) }}"
+        method=post class=form-stacked>
+    <fieldset>
+      <div class="clearfix">
+        <div class="input">
+          <textarea class="xxlarge" id="textarea2" name="comment" rows="3"></textarea>
+        </div>
+      </div>
+      <div class="actions">
+        <input type="submit" class="btn primary" value="Publier">
+      </div>
+    </fieldset>
+  </form>
+
+
+  {% if is_admin %}
+  <h1>Exécution</h1>
+
+  <form action="{{ url_for('.import_execute',
+                   template_id=import_.template.id, import_id=import_.id) }}"
+        method=post class=form-stacked>
+    <fieldset>
+
+      <div class="clearfix">
+        <label id="optionsCheckboxes">Options</label>
+        <div class="input">
+          <ul class="inputs-list">
+            <li>
+              <label>
+                <input type="checkbox" name="dummy">
+                <span>Simulation</span>
+              </label>
+            </li>
+            <li>
+              <label>
+                <input type="checkbox" name="no_mail">
+                <span>Ne pas envoyer de mail</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+      </div><!-- /clearfix -->
+
+      <div class="actions">
+        <input type="submit" class="btn primary" value="Lancer l'import">
+      </div>
+    </fieldset>
+
+  </form>
+  {% endif %}
+
+  <h1>Historique</h1>
+
+  {% for event in events|reverse %}
+    <article>
+      <header>
+        {% if event.type == 'update' %}
+        <h4>Mise à jour de l'import par {{ event.username }}</h4>
+        {% elif event.type == 'comment' %}
+        <h4>Commentaire de {{ event.username }}</h4>
+        {% elif event.type == 'run' %}
+        <h4>Exécution de l'import par {{ event.username }}</h4>
+        {% endif %}
+        <time>{{ event.time_string }}</time>
+      </header>
+      {% if event.type == 'update' %}
+        <p></p>
+      {% elif event.type == 'comment' %}
+        <p>{{ event.content }}</p>
+      {% elif event.type == 'run' %}
+        <p>
+          {% if event.successful %}
+            <span class="label success">Succès</span>
+          {% else %}
+            <span class="label important">Echec</span>
+          {% endif %}
+          <a href="{{ url_for('.import_run_detail',
+                      template_id=import_.template.id, import_id=import_.id, run_id=event.id) }}">
+            Détail de l'éxecution {{ event.id }}
+          </a>
+        </p>
+
+      {% endif %}
+    </article>
+  {% else %}
+    Aucune historique
+  {% endfor %}
+
+{% endblock %}

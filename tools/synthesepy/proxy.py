@@ -32,6 +32,7 @@ from wsgiref import simple_server
 import static
 from paste.proxy import parse_headers
 from paste.proxy import Proxy
+import werkzeug.wsgi
 
 from synthesepy import utils
 
@@ -127,6 +128,10 @@ class WSGIProxy(object):
         self.env = env
         self.proxy_app = Proxy('http://localhost:%s/' % env.c.port)
 
+        # import here to avoid circular dependencies.
+        from synthesepy import web
+        self.web_app = web.get_application(project=project)
+
         self.static_apps = []
         for base, path in env.c.static_paths:
             self.static_apps.append((base, static.Cling(path)))
@@ -178,6 +183,12 @@ class WSGIProxy(object):
 
     def __call__(self, environ, start_response):
         path_info = environ['PATH_INFO']
+
+        # Web app
+        WEB_APP_PREFIX = '/w/'
+        if path_info.startswith(WEB_APP_PREFIX):
+            werkzeug.wsgi.pop_path_info(environ)
+            return self.web_app(environ, start_response)
 
         # Admin redirect helpers.
         if path_info in ('/admin', '/admin/'):

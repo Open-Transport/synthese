@@ -47,7 +47,7 @@ class ImportsManager(object):
         if self.templates is not None:
             return
 
-        self.templates = {}
+        self.templates = OrderedDict()
         config_path = join(self.project.path, 'manager', 'imports_config.py')
         config = {}
         if os.path.isfile(config_path):
@@ -58,7 +58,6 @@ class ImportsManager(object):
             log.warn('No imports config')
             return
         for template_config in config['import_templates']:
-            print template_config
             template = ImportTemplate(self, template_config)
             self.templates[template.id] = template
 
@@ -82,7 +81,7 @@ class DirObjectLoader(object):
         ids = [id for id in os.listdir(directory) if
             os.path.isdir(join(directory, id))]
         for id in sorted(ids, key=int):
-            path = join(self.path, id)
+            path = join(directory, id)
             ctor_args = list(args) + [id, path]
             objects[id] = class_(*ctor_args)
         return objects
@@ -107,38 +106,62 @@ class ImportTemplate(DirObjectLoader):
         # default config
         self.after_create = None
         self.do_import = None
-        self.notifications = {}
+        self.run_results_notifications = {}
+        self.admins = []
+        self.uploaders = []
 
         self.__dict__.update(config)
+
+        def parse_emails(emails):
+            username_to_emails = dict((username, [email_or_emails] if
+                isinstance(email_or_emails, basestring) else email_or_emails) for
+                (username, email_or_emails) in emails)
+            emails = sum(username_to_emails.itervalues(), [])
+            return username_to_emails, set(emails)
+            
+        self.admins, self.admin_emails = parse_emails(self.admins)
+        self.uploaders, self.uploader_emails = parse_emails(self.uploaders)
+
         if not hasattr(self, 'label'):
             self.label = self.id
-        self.imports = None
+        if not isinstance(self.label, unicode):
+            self.label = unicode(self.label, 'utf-8')
+
+        self._imports = None
         self.path = join(self.manager.project.path, 'imports', self.id)
         utils.maybe_makedirs(self.path)
 
     def _load_imports(self):
-        if self.imports is not None:
+        if self._imports is not None:
             return
 
-        self.imports = self.load_from_dir(self.path, Import, self)
+        self._imports = self.load_from_dir(self.path, Import, self)
 
     def get_imports(self):
         self._load_imports()
-        return self.imports.values()
+        return self._imports.values()
+    imports = property(get_imports)
 
     def get_import(self, import_id):
         self._load_imports()
         if import_id == ':latest':
-            import_id = str(max(int(id) for id in self.imports.keys()))
+            import_id = str(max(int(id) for id in self._imports.keys()))
 
-        return self.imports[import_id]
+        return self._imports[import_id]
 
     def create_import(self, args={}):
         self._load_imports()
-        import_ = self.create_object(self.imports, self.path, Import, self)
+        import_ = self.create_object(self._imports, self.path, Import, self)
         if self.after_create:
             self.after_create(import_, args)
         return import_
+
+    def has_access(self, username, admin_only=False):
+        if username in self.admins:
+            return True
+        if admin_only:
+            return False
+        return username in self.uploaders
 
 
 class Param(object):
@@ -149,6 +172,8 @@ class Param(object):
         self.default = None
         self.value = None
         self.no_send = False
+        self.uploader_visible = False
+        self.uploader_readonly = False
 
     def __repr__(self):
         return '<Param %s>' % self.__dict__
@@ -156,7 +181,7 @@ class Param(object):
 
 class Event(object):
     def __init__(self):
-        self.user = None
+        self.username = None
         self.time = time.time()
         self.type = 'general'
         self.content = ''
@@ -175,16 +200,15 @@ class ImportRun(object):
         self.id = id
         self.path = path
         self.state_path = join(self.path, 'state.json')
+        self._summary = None
+        self.summary_path = join(self.path, 'summary.txt')
 
+        self.successful = True
         self.date = 0
         self.execution_time = -1
         self.dummy = False
         self.messages = dict((l, []) for l in self.LEVEL_NAMES)
         self.synthese_calls = []
-
-    @property
-    def successful(self):
-        return len(self.messages['err']) == 0
 
     def convert_params(self, params):
         '''
@@ -196,8 +220,9 @@ class ImportRun(object):
             if param.no_send:
                 continue
             value = param.value
-            if value is None:
+            if value == '':
                 continue
+
             if param.type in ('file', 'directory'):
                 if not os.path.isabs(param.value):
                     # relative paths are relative to the import directory and
@@ -223,6 +248,8 @@ class ImportRun(object):
             if not line:
                 continue
             self.messages[level].append(line)
+            if level == 'err':
+                self.successful = False
 
     def call_synthese(self, synthese_params):
         project = self.import_.template.manager.project
@@ -243,50 +270,47 @@ class ImportRun(object):
 
     def add_failure(self, exception):
         log.warn('Adding import failure: %s', exception)
+        self.successful = False
         self.messages['err'].append(
             'Caught an exception inside import script: %s' %
             traceback.format_exc(exception))
 
     def finish(self):
-        state_keys = ('date', 'execution_time', 'messages', 'dummy',
+        state_keys = ('successful', 'date', 'execution_time', 'messages', 'dummy',
             'synthese_calls')
         state = dict((k, getattr(self, k)) for k in state_keys)
         json.dump(
             state, open(self.state_path, 'wb'),
             sort_keys=True, indent=2)
 
-        with open(join(self.path, 'summary.txt'), 'wb') as f:
-            subject, body = self.get_summary()
-            f.write(subject)
-            f.write('\n\n')
-            f.write(body)
+        with open(self.summary_path, 'wb') as f:
+            summary = self.get_summary()
+            f.write(summary.encode('utf-8'))
 
     def get_summary(self, min_level='unknown'):
-        config = self.import_.template.manager.project.config
-        summary = i18n.import_summary.format(
-            template_label=self.import_.template.label,
-            project_name=config.project_name,
-            hostname=socket.gethostname(),
-            level=min_level.upper(),
-        )
-
-        body = i18n.start_of_summary.format(level=min_level.upper())
+        if os.path.isfile(self.summary_path):
+            self._summary = open(self.summary_path, 'rb').read().decode('utf-8')
+        if self._summary:
+            return self._summary
+        summary = i18n.start_of_summary.format(level=min_level.upper())
         index = self.LEVEL_NAMES.index(min_level)
         all_levels = self.LEVEL_NAMES[index:]
         for level in all_levels:
             if not self.messages[level]:
                 continue
-            body += i18n.import_level_section.format(level=level.upper())
+            summary += i18n.import_level_section.format(level=level.upper())
             for message in self.messages[level]:
-                body += '{0}: {1}\n'.format(level.upper(), message)
+                summary += '{0}: {1}\n'.format(level.upper(), message)
 
-        body += i18n.end_of_messages
+        summary += i18n.end_of_messages
 
-        body += i18n.technical_infos.format(
+        summary += i18n.technical_infos.format(
             dummy=self.dummy,
             synthese_calls='\n\n'.join(self.synthese_calls))
 
-        return (summary, body)
+        self._summary = summary
+        return self._summary
+    summary = property(get_summary)
 
 
 class Import(DirObjectLoader):
@@ -294,7 +318,7 @@ class Import(DirObjectLoader):
         self.template = template
         self.id = id
         self.path = path
-        self.runs = None
+        self._runs = None
         self.params_path = join(self.path, 'params.json')
         self.events_path = join(self.path, 'events.json')
         self.runs_path = join(self.path, 'runs')
@@ -320,16 +344,19 @@ class Import(DirObjectLoader):
 
         # built-in params
         default_params = [{
-            'label': 'Etat',
+            'label': i18n.state,
             'id': 'state',
             'default': 'open',
             'no_send': True,
-        }] + self.template.defaults + [{
-            'label': 'Description',
+            'uploader_visible': True,
+            'uploader_readonly': True,
+        }, {
+            'label': i18n.description,
             'id': 'description',
             'default': '',
             'no_send': True,
-        }]
+            'uploader_visible': True,
+        }] + self.template.defaults
 
         for default_param in default_params:
             param = Param()
@@ -340,23 +367,30 @@ class Import(DirObjectLoader):
             elif isinstance(default_param, dict):
                 param.__dict__.update(default_param)
 
+            if param.default is None:
+                param.default = ''
+            param.default = str(param.default)
             param.value = param.default
+            if not isinstance(param.label, unicode):
+                param.label = unicode(param.label, 'utf-8')
 
             if param.id in saved_params:
                 param.value = saved_params[param.id]
 
             self.params[param.id] = param
 
-    def update_param(self, id, value):
-        self.params[id].value = value
-        saved_params = dict((id, param.value)
-            for (id, param) in self.params.iteritems()
-            if param.value != param.default)
+    def save_params(self, username=None, no_mail=False):
+        saved_params = dict((id, param.value) for
+            (id, param) in self.params.iteritems() if
+            param.value != param.default)
         json.dump(
             saved_params, open(self.params_path, 'wb'),
             sort_keys=True, indent=2)
 
-        # TODO: add event
+        event = Event()
+        event.type = 'update'
+        event.username = username
+        self._add_event(event, None, no_mail)
 
     def get_events(self):
         try:
@@ -371,7 +405,7 @@ class Import(DirObjectLoader):
         return events
     events = property(get_events)
 
-    def _add_event(self, event):
+    def _add_event(self, event, extra=None, no_mail=False):
         events = self.get_events()
         events.append(event)
         saved_events = [event.__dict__ for event in events]
@@ -379,40 +413,86 @@ class Import(DirObjectLoader):
             saved_events, open(self.events_path, 'wb'),
             sort_keys=True, indent=2)
 
-        # TODO: send notification
+        if not no_mail:
+            self._send_event_notifications(event, extra)
 
     def add_comment(self, username, comment):
         event = Event()
         event.type = 'comment'
-        event.user = username
+        event.username = username
         event.content = comment
         self._add_event(event)
 
     def _load_runs(self):
-        if self.runs is not None:
+        if self._runs is not None:
             return
-        self.runs = self.load_from_dir(self.runs_path, ImportRun, self)
+        self._runs = self.load_from_dir(self.runs_path, ImportRun, self)
 
     def get_runs(self):
         self._load_runs()
-        return self.runs.values()
-    # TODO rename runs instance var _runs and uncomment (do the same for _imports above).
-    #runs = property(get_runs)
+        return self._runs.values()
+    runs = property(get_runs)
 
     def get_run(self, run_id):
         self._load_runs()
-        return self.runs[run_id]
+        return self._runs[run_id]
 
     def _create_run(self):
         self._load_runs()
-        return self.create_object(self.runs, self.runs_path, ImportRun, self)
+        return self.create_object(self._runs, self.runs_path, ImportRun, self)
 
-    def send_run_finish_mail_notifications(self, run):
+    def _send_event_notifications(self, event, extra):
+        t = self.template
+        to_send = []
+
+        if event.type == 'comment':
+            emails = t.admin_emails | t.uploader_emails
+            detail = i18n.new_comment
+            body = i18n.new_comment_body.format(
+                username=event.username,
+                comment=event.content
+            )
+            to_send = ((emails, body),)
+
+        elif event.type == 'run':
+            run = extra
+            detail = i18n.import_result
+            to_send = self._get_run_finish_notifications(run)
+
+        elif event.type == 'update':
+            emails = t.admin_emails | t.uploader_emails
+            detail = i18n.import_update
+            body =  i18n.import_updated_body.format(
+                username=event.username
+            )
+            to_send = ((emails, body),)
+
+        else:
+            raise Exception('Unknown event type %r' % event.type)
+
+        config = self.template.manager.project.env.config
+
+        subject = i18n.mail_summary.format(
+            project_name=config.project_name,
+            hostname=socket.gethostname(),
+            template_label=self.template.label,
+            detail=detail
+        )
+
+        for emails, body in to_send:
+            if not emails:
+                continue
+            utils.send_mail(config, list(emails), subject, body)
+
+    def _get_run_finish_notifications(self, run):
         level_to_mails = {}
         for level in ImportRun.LEVEL_NAMES:
             # TODO: also allow passing a username instead of an email
-            level_to_mails[level] = self.template.notifications.get(
-                'import_%s' % level, [])
+            level_to_mails[level] = set(self.template.run_results_notifications.get(
+                level, []))
+
+        # admins always get errors.
+        level_to_mails['err'].update(self.template.admin_emails)
 
         levels_with_messages = set()
         for level in ImportRun.LEVEL_NAMES:
@@ -428,14 +508,16 @@ class Import(DirObjectLoader):
         log.debug('Levels with messages: %s', levels_to_notify)
 
         config = self.template.manager.project.env.config
+        to_send = []
         for level in levels_to_notify:
             emails = level_to_mails[level]
             if not emails:
                 continue
-            subject, body = run.get_summary(level)
-            utils.send_mail(config, emails, subject, body)
+            body = run.get_summary(level)
+            to_send.append((emails, body))
+        return to_send
 
-    def execute(self, dummy=False, no_mail=False):
+    def execute(self, username=None, dummy=False, no_mail=False):
         log.info('Executing import')
 
         run = self._create_run()
@@ -449,8 +531,13 @@ class Import(DirObjectLoader):
             run.add_failure(e)
         finally:
             run.finish()
-            if not no_mail:
-                self.send_run_finish_mail_notifications(run)
+            event = Event()
+            event.type = 'run'
+            event.username = username
+            event.id = run.id
+            event.successful = run.successful
+            self._add_event(event, run, no_mail)
+
             if not run.successful:
                 log.warn('Import failed!')
                 if 0:

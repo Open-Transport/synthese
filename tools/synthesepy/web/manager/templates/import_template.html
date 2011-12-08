@@ -1,0 +1,26 @@
+{% extends "layout.html" %}
+{% block title %}<h1>Templates d'import {{ template.label }}</h1>{% endblock %}
+{% block body %}
+
+  <ul>
+  {% for import_ in template.imports|reverse %}
+    <li><a href="{{ url_for('.import_', template_id=template.id, import_id=import_.id) }}">
+      import {{ import_.id }}</a>
+  {% else %}
+    <li><em>{{ i18n.no_imports }}</em>
+  {% endfor %}
+  </ul>
+
+  {% if is_admin %}
+    <form action="{{ url_for('.import_template_create_import',
+                     template_id=template.id) }}"
+          method=post class=form-stacked>
+      <fieldset>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Crééer un nouvel import">
+        </div>
+      </fieldset>
+    </form>
+  {% endif %}
+  
+{% endblock %}

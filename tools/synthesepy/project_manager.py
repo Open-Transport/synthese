@@ -36,6 +36,9 @@ import subprocess
 import sys
 import time
 
+from werkzeug import wsgi
+from werkzeug.serving import run_simple
+
 from synthesepy.config import Config
 from synthesepy.apache import Apache
 from synthesepy import daemon
@@ -618,6 +621,29 @@ The synthese.py wrapper script.
     def runproxy(self):
         """Run HTTP Proxy to serve static files"""
         proxy.serve_forever(self.env, self)
+
+    # This is mostly for debugging. The webapp is also available with "runproxy"
+    # (however it doesn't auto-reload on change).
+    @command()
+    def runwebapp(self):
+        """Run Web Frontend"""
+        # import here to avoid import cycles.
+        import synthesepy.web
+
+        web_app = synthesepy.web.get_application(project=self)
+
+        def root_app(environ, start_response):
+            status = '200 OK'
+            output = 'Dummy root app'
+            response_headers = [('Content-type', 'text/plain'),
+                                ('Content-Length', str(len(output)))]
+            start_response(status, response_headers)
+            return [output]
+
+        app = wsgi.DispatcherMiddleware(root_app, {
+            '/w': web_app
+        })
+        run_simple('0.0.0.0', 5000, app, use_reloader=True)
 
     @command()
     def project_command(self, args):
