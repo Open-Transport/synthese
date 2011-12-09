@@ -908,7 +908,7 @@ namespace synthese
 					BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 					{
 						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
-						if(line == NULL) continue;
+						if((line == NULL)||(!line->getRollingStock())) continue;
 
 						double distance = su.getDistance();
 
@@ -922,8 +922,11 @@ namespace synthese
 									distance *= 1.10;
 							}
 						}
-						co2Emissions += distance*line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
-						energyConsumption += distance*line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+						if(distance > 0)
+						{
+							co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+							energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+						}
 					}
 					stream << " " << DATA_CO2_EMISSIONS << "=\"" << co2Emissions << "\"";
 					stream << " " << DATA_ENERGY_CONSUMPTION << "=\"" << energyConsumption << "\"";
@@ -2304,7 +2307,7 @@ namespace synthese
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
-				if(line == NULL) continue;
+				if((line == NULL)||(!line->getRollingStock())) continue;
 
 				double distance = su.getDistance();
 
@@ -2315,11 +2318,14 @@ namespace synthese
 					{
 						distance = CoordinatesSystem::GetCoordinatesSystem(27572).convertGeometry(
 							*su.getGeometry())->getLength();
-						distance *= 1.10;
+							distance *= 1.10;
 					}
 				}
-				co2Emissions += distance*line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
-				energyConsumption += distance*line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+				if(distance > 0)
+				{
+					co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
+					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+				}
 			}
 			pm.insert(DATA_CO2_EMISSIONS, co2Emissions);
 			pm.insert(DATA_ENERGY_CONSUMPTION, energyConsumption);
