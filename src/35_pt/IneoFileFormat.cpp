@@ -123,6 +123,7 @@ namespace synthese
 		const std::string IneoFileFormat::Importer_::VALUE_LIBCOM = "LIBCOM";
 		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
 		const std::string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
+		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
 	}
 
 	namespace impex
@@ -369,20 +370,30 @@ namespace synthese
 			// 3 : Destinations
 			else if(key == FILE_DST)
 			{
-				ImportableTableSync::ObjectBySource<DestinationTableSync> destinations(_dataSource, _env);
 				while(_readLine(inFile))
 				{
 					if(_section == "DST")
 					{
-						PTFileFormat::CreateOrUpdateDestination(
-							_destinations,
-							_getValue("NDSTG"),
-							_getValue("DSTBL"),
-							_getValue("DSTTS"),
-							_dataSource,
-							_env,
-							stream
-						);
+						Destination* destination(
+							PTFileFormat::CreateOrUpdateDestination(
+								_destinations,
+								_getValue("NDSTG"),
+								_getValue("DSTBL"),
+								_getValue("DSTTS"),
+								_dataSource,
+								_env,
+								stream
+						)	);
+
+						// Destination overload
+						if(!_journeyPatternLineOverloadField.empty())
+						{
+							string overloadedLine(_getValue(_journeyPatternLineOverloadField));
+							if(!overloadedLine.empty())
+							{
+								_destinationLineOverloads[destination] = overloadedLine;
+							}
+						}
 					}
 				}
 			}
@@ -391,6 +402,7 @@ namespace synthese
 			{
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 				CommercialLine* line(NULL);
+				Destination* destination(NULL);
 				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 				string lineId;
 				string jpName;
@@ -399,6 +411,7 @@ namespace synthese
 				string lastStopCode;
 				MetricOffset dst(0);
 				bool atLeastAnInexistantStop(false);
+				CommercialLine* overloadedLine(NULL);
 				while(true)
 				{
 					_readLine(inFile);
@@ -407,11 +420,11 @@ namespace synthese
 					{
 						JourneyPattern* route(
 							PTFileFormat::CreateOrUpdateRoute(
-								*line,
+								overloadedLine ? *overloadedLine : *line,
 								optional<const string&>(),
 								jpName,
 								optional<const string&>(), // destination
-								optional<Destination*>(),
+								destination,
 								optional<const RuleUser::Rules&>(),
 								jpWayback,
 								NULL,
@@ -460,6 +473,34 @@ namespace synthese
 						atLeastAnInexistantStop = false;
 						lastStopCode.clear();
 						dst = 0;
+
+						// Destination
+						destination = NULL;
+						overloadedLine = NULL;
+						string destinationCode(_getValue("NDST"));
+						if(!destinationCode.empty())
+						{
+							set<Destination*> destinations(_destinations.get(destinationCode));
+							if(destinations.empty())
+							{
+								stream << "WARN : Destination " << destinationCode << " not found in journey pattern " << jpKey << "<br />";
+							}
+							else
+							{
+								destination = *destinations.begin();
+								map<Destination*,string>::const_iterator it(_destinationLineOverloads.find(destination));
+								if(it != _destinationLineOverloads.end())
+								{
+									overloadedLine = PTFileFormat::GetLine(
+										lines,
+										it->second,
+										_dataSource,
+										_env,
+										stream
+									);
+								}
+							}
+						}
 					}
 					else if(_section == "PC")
 					{
@@ -718,6 +759,9 @@ namespace synthese
 			// Add wayback to journey pattern code
 			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
 
+			// Journey pattern line overload field
+			stream << t.cell("Champ de forçage de ligne dans le fichier girouettes", t.getForm().getTextInput(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField));
+
 			stream << t.close();
 		}
 
@@ -891,6 +935,12 @@ namespace synthese
 			// Stop name field
 			map.insert(PARAMETER_STOP_NAME_FIELD, _stopNameField);
 
+			// Journey pattern line overload field
+			if(!_journeyPatternLineOverloadField.empty())
+			{
+				map.insert(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField);
+			}
+
 			return map;
 		}
 
@@ -940,6 +990,9 @@ namespace synthese
 
 			// Stop name field
 			_stopNameField = map.getDefault<string>(PARAMETER_STOP_NAME_FIELD, VALUE_LIBP);
+
+			// Journey pattern line overload field
+			_journeyPatternLineOverloadField = map.getDefault<string>(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD);
 
 			// Calendar dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));

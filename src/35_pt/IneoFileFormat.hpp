@@ -110,6 +110,7 @@ namespace synthese
 				static const std::string VALUE_LIBCOM;
 				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
 				static const std::string VALUE_UFR;
+				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
 				
 			private:
 				//! @name Parameters
@@ -118,8 +119,8 @@ namespace synthese
 					
 // TODO				std::map<std::string, boost::shared_ptr<RollingStock> > _transportModeTypeLgMap;
 
+					std::string _journeyPatternLineOverloadField;
 					bool _importStopAreas;
-
 					bool _autoImportStops;
 					bool _displayLinkedStops;
 					boost::shared_ptr<const geography::City> _defaultCity;
@@ -137,6 +138,8 @@ namespace synthese
 
 				typedef std::map<std::string, std::vector<std::string> > FieldMaps;
 				mutable FieldMaps _fieldsMap;
+
+				mutable std::map<Destination*, std::string> _destinationLineOverloads;
 
 				bool _interactive;
 

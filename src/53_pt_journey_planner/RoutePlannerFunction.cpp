@@ -119,6 +119,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME("ha");
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
+		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
 
 		const string RoutePlannerFunction::PARAMETER_PAGE("page");
 		const string RoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
@@ -761,6 +762,36 @@ namespace synthese
 				result.getJourneys().size() > *_maxSolutionsNumber
 			){
 				result.removeFirstJourneys(result.getJourneys().size() - *_maxSolutionsNumber);
+			}
+
+			// Min max duration filter
+			if(_minMaxDurationRatioFilter)
+			{
+				// Min duration
+				time_duration minDuration(not_a_date_time);
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+				{
+					if(minDuration.is_not_a_date_time() || minDuration > journey.getDuration())
+					{
+						minDuration = journey.getDuration();
+					}
+				}
+
+				// Filter
+				algorithm::TimeSlotRoutePlanner::Result filteredJourneys;
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+				{
+					if(journey.getDuration().total_seconds() / minDuration.total_seconds() < *_minMaxDurationRatioFilter)
+					{
+						filteredJourneys.push_back(journey);
+					}
+				}
+				result = PTRoutePlannerResult(
+					result.getDeparturePlace(),
+					result.getArrivalPlace(),
+					result.getSamePlaces(),
+					filteredJourneys
+				);
 			}
 
 			// Display

@@ -240,24 +240,26 @@ namespace synthese
 				}
 				inFile.close();
 
-				PTFileFormat::DisplayStopPointImportScreen(
-					nonLinkedStopPoints,
-					*request,
-					_env,
-					stopsDataSource,
-					stream
-				);
-				if(_displayLinkedStops)
+				if(request)
 				{
 					PTFileFormat::DisplayStopPointImportScreen(
-						linkedStopPoints,
+						nonLinkedStopPoints,
 						*request,
 						_env,
 						stopsDataSource,
 						stream
 					);
+					if(_displayLinkedStops)
+					{
+						PTFileFormat::DisplayStopPointImportScreen(
+							linkedStopPoints,
+							*request,
+							_env,
+							stopsDataSource,
+							stream
+						);
+					}
 				}
-
 				if(!nonLinkedStopPoints.empty())
 				{
 					stream << "ERR  : At least a stop could not be linked.<br/>";
