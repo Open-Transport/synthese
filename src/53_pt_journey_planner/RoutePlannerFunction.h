@@ -141,6 +141,9 @@ namespace synthese
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
+			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
+			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
+			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 
 		private:
 			static const std::string DATA_LINES;
@@ -295,6 +298,7 @@ namespace synthese
 				bool _showResTab;
 				bool _showCoords;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
+				boost::optional<double> _minMaxDurationRatioFilter;
 			//@}
 
 			//! @name Pages
