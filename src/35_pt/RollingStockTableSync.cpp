@@ -26,6 +26,7 @@
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "TransportNetworkRight.h"
+#include "ImportableTableSync.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -38,6 +39,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace security;
+	using namespace impex;
 
 	namespace util
 	{
@@ -53,6 +55,7 @@ namespace synthese
 		const string RollingStockTableSync::COL_IS_TRIDENT_REFERENCE("is_trident_reference");
 		const string RollingStockTableSync::COL_CO2_EMISSIONS("CO2_emissions");
 		const string RollingStockTableSync::COL_ENERGY_CONSUMPTION("energy_consumption");
+		const string RollingStockTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
 
 	namespace db
@@ -71,6 +74,7 @@ namespace synthese
 			DBTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
 			DBTableSync::Field(RollingStockTableSync::COL_CO2_EMISSIONS, SQL_DOUBLE),
 			DBTableSync::Field(RollingStockTableSync::COL_ENERGY_CONSUMPTION, SQL_DOUBLE),
+			DBTableSync::Field(RollingStockTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -82,9 +86,9 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(
-			RollingStock* object
-			, const db::DBResultSPtr& rows
-			, Env& env,
+			RollingStock* object,
+			const db::DBResultSPtr& rows,
+			Env& env,
 			LinkLevel linkLevel
 		){
 			// Properties
@@ -95,6 +99,16 @@ namespace synthese
 			object->setIsTridentKeyReference(rows->getBool(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE));
 			object->setCO2Emissions(rows->getDouble(RollingStockTableSync::COL_CO2_EMISSIONS));
 			object->setEnergyConsumption(rows->getDouble(RollingStockTableSync::COL_ENERGY_CONSUMPTION));
+
+			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			{
+				// Data source links
+				object->setDataSourceLinks(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(RollingStockTableSync::COL_DATASOURCE_LINKS), env
+					), linkLevel > UP_LINKS_LOAD_LEVEL
+				);
+			}
 		}
 
 
@@ -111,6 +125,7 @@ namespace synthese
 			query.addField(object->getIsTridentKeyReference());
 			query.addField(object->getCO2Emissions());
 			query.addField(object->getEnergyConsumption());
+			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 
@@ -119,6 +134,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Unlink(
 			RollingStock* obj
 		){
+			obj->cleanDataSourceLinks(true);
 		}
 
 

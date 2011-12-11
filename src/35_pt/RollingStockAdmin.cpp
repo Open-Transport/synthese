@@ -32,6 +32,7 @@
 #include "PropertiesHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "StopArea.hpp"
+#include "ImportableAdmin.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -46,7 +47,7 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace html;
-
+	using namespace impex;
 
 	namespace util
 	{
@@ -123,6 +124,10 @@ namespace synthese
 				stream << t.cell("Emission de CO2 en g/km/voyageur", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_CO2_EMISSIONS, lexical_cast<string>(_rollingStock->getCO2Emissions())));
 				stream << t.cell("Consommation énergétique en L/100km équivalent pétrole", t.getForm().GetTextInput(RollingStockUpdateAction::PARAMETER_ENERGY_CONSUMPTION, lexical_cast<string>(_rollingStock->getEnergyConsumption())));
 				stream << t.close();
+
+				StaticActionRequest<RollingStockUpdateAction> updateOnlyRequest(request);
+				updateOnlyRequest.getAction()->setRollingStock(const_pointer_cast<RollingStock>(_rollingStock));
+				ImportableAdmin::DisplayDataSourcesTab(stream, *_rollingStock, updateOnlyRequest);
 			}
 		}
 

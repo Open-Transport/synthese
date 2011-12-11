@@ -51,16 +51,17 @@ namespace synthese
 			util::RegistryKeyType key
 		):	graph::PathClass(),
 			util::Registrable(key),
+			_CO2Emissions(0),
+			_energyConsumption(0),
 			_isTridentKeyReference(false)
-		{
-		}
+		{}
 
 
 
 		RollingStock::~RollingStock()
-		{
+		{}
 
-		}
+
 
 		const string RollingStock::getGTFSKey() const
 		{
@@ -109,5 +110,4 @@ namespace synthese
 			pm.insert(DATA_CO2_EMISSIONS, getCO2Emissions());
 			pm.insert(DATA_ENERGY_CONSUMPTION, getEnergyConsumption());
 		}
-	}
-}
+}	}
