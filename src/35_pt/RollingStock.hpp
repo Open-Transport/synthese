@@ -27,6 +27,7 @@
 #include "Registry.h"
 #include "PathClass.h"
 #include "Named.h"
+#include "Importable.h"
 
 #include <string>
 
@@ -47,7 +48,8 @@ namespace synthese
 		class RollingStock:
 			public virtual util::Registrable,
 			public graph::PathClass,
-			public util::Named
+			public util::Named,
+			public impex::ImportableTemplate<RollingStock>
 		{
 		private:
 			static const std::string DATA_ID;

@@ -56,6 +56,7 @@ namespace synthese
 			static const std::string COL_IS_TRIDENT_REFERENCE;
 			static const std::string COL_CO2_EMISSIONS;
 			static const std::string COL_ENERGY_CONSUMPTION;
+			static const std::string COL_DATASOURCE_LINKS;
 
 			RollingStockTableSync();
 

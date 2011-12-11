@@ -46,6 +46,7 @@
 #include "StopPointUpdateAction.hpp"
 #include "DestinationTableSync.hpp"
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
+#include "RollingStockTableSync.hpp"
 
 #include <geos/operation/distance/DistanceOp.h>
 
@@ -1150,5 +1151,25 @@ namespace synthese
 				}
 			}
 			return result;
+		}
+
+
+
+		RollingStock* PTFileFormat::GetTransportMode(
+			const impex::ImportableTableSync::ObjectBySource<RollingStockTableSync>& transportModes,
+			const std::string& id,
+			std::ostream& logStream
+		){
+			RollingStock* transportMode(NULL);
+			if(transportModes.contains(id))
+			{
+				set<RollingStock*> loadedTransportModes(transportModes.get(id));
+				if(loadedTransportModes.size() > 1)
+				{
+					logStream << "WARN : more than one transport mode with key " << id << "<br />";
+				}
+				transportMode = *loadedTransportModes.begin();
+			}
+			return transportMode;
 		}
 }	}
