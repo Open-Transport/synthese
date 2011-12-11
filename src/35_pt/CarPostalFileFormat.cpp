@@ -83,7 +83,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,CarPostalFileFormat>::FACTORY_KEY("CarPostal");
+		template<> const string FactorableTemplate<FileFormat,CarPostalFileFormat>::FACTORY_KEY("Hafas");
 	}
 
 	namespace pt
@@ -211,12 +211,18 @@ namespace synthese
 
 				while(getline(inFile, line))
 				{
+					// Jump comments
+					if(line[0] == '%' || line[0] == ' ')
+					{
+						continue;
+					}
+
 					// Operator code
 					string operatorCode(line.substr(0, 7));
 
 					// Point
-					double x(1000 * lexical_cast<double>(line.substr(10,7)));
-					double y(1000 * lexical_cast<double>(line.substr(18,7)));
+					double x(1000 * lexical_cast<double>(trim_copy(line.substr(10,7))));
+					double y(1000 * lexical_cast<double>(trim_copy(line.substr(18,7))));
 					shared_ptr<Point> coord;
 					if(x && y)
 					{
@@ -494,6 +500,12 @@ namespace synthese
 				string line;
 				while(getline(inFile, line))
 				{
+					// Jump comments
+					if(line[0] == '%' || line[0] == ' ')
+					{
+						continue;
+					}
+
 					int id(lexical_cast<int>(line.substr(0,6)));
 					string calendarString(line.substr(7));
 
@@ -558,6 +570,12 @@ namespace synthese
 
 				while(getline(inFile, line))
 				{
+					// Jump comments
+					if(line[0] == '%' || line[0] == ' ')
+					{
+						continue;
+					}
+
 					if(line.substr(0,2) == "*Z")
 					{
 						serviceNumber = trim_copy(line.substr(3,5));
@@ -821,7 +839,7 @@ namespace synthese
 			_importFullServices = pm.getDefault<bool>(PARAMETER_IMPORT_FULL_SERVICES, false);
 
 			// Transport network
-			if(pm.isDefined(PARAMETER_NETWORK_ID)) try
+			if(pm.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0)) try
 			{
 				_network = TransportNetworkTableSync::GetEditable(pm.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
 			}
@@ -845,6 +863,13 @@ namespace synthese
 				if(!getline(inFile, line))
 				{
 					throw Exception("Inconsistent Eckdaten file");
+				}
+				while(line[0]=='%')
+				{
+					if(!getline(inFile, line))
+					{
+						throw Exception("Inconsistent Eckdaten file");
+					}
 				}
 				_startDate = date(
 					lexical_cast<int>(line.substr(6,4)),
