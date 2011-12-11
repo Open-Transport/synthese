@@ -55,6 +55,7 @@ namespace synthese
 			static const std::string PARAMETER_ARTICLE;
 			static const std::string PARAMETER_CO2_EMISSIONS;
 			static const std::string PARAMETER_ENERGY_CONSUMPTION;
+			static const std::string PARAMETER_DATASOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<RollingStock> _rollingStock;
@@ -62,6 +63,7 @@ namespace synthese
 			boost::optional<std::string> _article;
 			boost::optional<double> _CO2Emissions;
 			boost::optional<double> _energyConsumption;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

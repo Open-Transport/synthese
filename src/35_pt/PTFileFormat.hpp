@@ -53,6 +53,7 @@ namespace synthese
 		class CommercialLineTableSync;
 		class StopPointTableSync;
 		class RollingStock;
+		class RollingStockTableSync;
 		class Destination;
 		class DestinationTableSync;
 
@@ -255,6 +256,14 @@ namespace synthese
 				boost::optional<const std::string&> name,
 				std::ostream& logStream,
 				bool errorIfNotFound = true
+			);
+
+
+
+			static RollingStock* GetTransportMode(
+				const impex::ImportableTableSync::ObjectBySource<RollingStockTableSync>& transportModes,
+				const std::string& id,
+				std::ostream& logStream
 			);
 
 
