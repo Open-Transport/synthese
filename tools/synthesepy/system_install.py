@@ -81,12 +81,16 @@ def install_dependencies(env):
 
     # supervisor doesn't seem to be started automatically.
     log.info('Starting supervisor')
-    # TODO: hide error message.
-    try:
-        subprocess.check_call(
-            '/etc/init.d/supervisor start', shell=True)
-    except:
-        pass
+
+    # FIXME: looks like supervisor isn't behaving correctly if started from
+    # this install script.
+    if 0:
+        try:
+            # TODO: hide error message.
+            subprocess.check_call(
+                '/etc/init.d/supervisor start', shell=True)
+        except:
+            pass
 
 def run(env, args):
     if sys.platform == 'win':
