@@ -179,14 +179,14 @@ namespace synthese
 
 			AdminInterfaceElement::PageLinks links;
 
-			const RollingStockAdmin* ua(
+			const RollingStockAdmin* rsa(
 				dynamic_cast<const RollingStockAdmin*>(&currentPage)
 			);
 
-			if(ua)
+			if(rsa)
 			{
 				shared_ptr<RollingStockAdmin> p(getNewPage<RollingStockAdmin>());
-				p->setRollingStock(ua->getRollingStock());
+				p->setRollingStock(rsa->getRollingStock());
 				links.push_back(p);
 			}
 
