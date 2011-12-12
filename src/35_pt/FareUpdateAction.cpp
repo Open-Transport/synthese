@@ -198,7 +198,7 @@ namespace synthese
 			}
 			else
 			{
-				_fare->setPermittedConnectionsNumber(boost::optional<unsigned int>());
+				_fare->setPermittedConnectionsNumber(boost::optional<int>());
 			}
 			if(_requiredContinuity)
 			{
