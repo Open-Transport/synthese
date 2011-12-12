@@ -52,6 +52,8 @@
 
 #include "DestinationAdmin.hpp"
 #include "DestinationsAdmin.hpp"
+#include "FareAdmin.h"
+#include "FaresAdmin.h"
 #include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
@@ -80,6 +82,7 @@
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
 #include "DeviateServiceAction.hpp"
+#include "FareUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
@@ -207,6 +210,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::StopPointAdmin::integrate();
 	synthese::pt::DRTAreaAdmin::integrate();
 	synthese::pt::DRTAreasAdmin::integrate();
+	synthese::pt::FareAdmin::integrate();
+	synthese::pt::FaresAdmin::integrate();
 	synthese::pt::RollingStockAdmin::integrate();
 	synthese::pt::RollingStocksAdmin::integrate();
 
@@ -234,6 +239,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
 	synthese::pt::RollingStockUpdateAction::integrate();
+	synthese::pt::FareUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();
