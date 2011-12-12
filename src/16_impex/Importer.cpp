@@ -57,7 +57,7 @@ namespace synthese
 			{
 				switch(entry.level)
 				{
-				case DEBUG: stream << "DEBG"; break;
+				case DEBG: stream << "DEBG"; break;
 				case LOAD: stream << "LOAD"; break;
 				case CREA: stream << "CREA"; break;
 				case INFO: stream << "INFO"; break;
