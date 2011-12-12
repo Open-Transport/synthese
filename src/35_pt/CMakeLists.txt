@@ -5,8 +5,6 @@ AdvancedSelectTableSync.cpp
 AdvancedSelectTableSync.h
 AreaGeneratedLineStop.cpp
 AreaGeneratedLineStop.hpp
-CarPostalFileFormat.cpp
-CarPostalFileFormat.hpp
 CheckLineCalendarFunction.cpp
 CheckLineCalendarFunction.hpp
 CleanAllStopPointProjectionsAction.cpp
@@ -75,6 +73,8 @@ FareUpdateAction.cpp
 FareUpdateAction.hpp
 GTFSFileFormat.cpp
 GTFSFileFormat.hpp
+HafasFileFormat.cpp
+HafasFileFormat.hpp
 HastusCSVFileFormat.cpp
 HastusCSVFileFormat.hpp
 HastusInterfaceFileFormat.cpp

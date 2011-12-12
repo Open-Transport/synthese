@@ -17,8 +17,8 @@
 #include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
 
-#include "CarPostalFileFormat.hpp"
 #include "GTFSFileFormat.hpp"
+#include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
 #include "HastusInterfaceFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
@@ -179,8 +179,8 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::PTModule::integrate();
 
-	synthese::pt::CarPostalFileFormat::integrate();
 	synthese::pt::GTFSFileFormat::integrate();
+	synthese::pt::HafasFileFormat::integrate();
 	synthese::pt::HastusCSVFileFormat::integrate();
 	synthese::pt::HastusInterfaceFileFormat::integrate();
 	synthese::pt::HeuresFileFormat::integrate();

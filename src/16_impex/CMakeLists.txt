@@ -29,6 +29,7 @@ ImportableAdmin.cpp
 ImportableAdmin.hpp
 ImportableTableSync.cpp
 ImportableTableSync.hpp
+Importer.cpp
 Importer.hpp
 ImportFunction.cpp
 ImportFunction.h
