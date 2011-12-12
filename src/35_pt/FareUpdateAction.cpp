@@ -136,7 +136,7 @@ namespace synthese
 			}
 			if(map.isDefined(PARAMETER_TYPE))
 			{
-				_type = map.get<int>(PARAMETER_TYPE);
+				_type = (FareType::FareTypeNumber) map.get<int>(PARAMETER_TYPE);
 			}
 			if(map.isDefined(PARAMETER_CURRENCY))
 			{
