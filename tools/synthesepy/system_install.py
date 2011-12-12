@@ -76,21 +76,22 @@ def install_dependencies(env):
     # WSGI
     required_packages.extend(['libapache2-mod-wsgi'])
 
+    # spatialite-bin
+    # TODO: we should use our own build of spatialite, however it currently
+    # has some issues with some of the db_xxx commands.
+    required_packages.extend(['spatialite-bin'])
+
     builder.check_debian_package_requirements(
         required_packages, do_install=True)
 
     # supervisor doesn't seem to be started automatically.
     log.info('Starting supervisor')
-
-    # FIXME: looks like supervisor isn't behaving correctly if started from
-    # this install script.
-    if 0:
-        try:
-            # TODO: hide error message.
-            subprocess.check_call(
-                '/etc/init.d/supervisor start', shell=True)
-        except:
-            pass
+    try:
+        # TODO: hide error message.
+        subprocess.check_call(
+            '/etc/init.d/supervisor start', shell=True)
+    except:
+        pass
 
 def run(env, args):
     if sys.platform == 'win':
