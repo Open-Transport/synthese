@@ -51,7 +51,7 @@ namespace synthese
 				typedef enum
 				{
 					ALL = 0,
-					DEBUG = 10,
+					DEBG = 10,
 					LOAD = 20,
 					CREA = 25,
 					INFO = 30,
