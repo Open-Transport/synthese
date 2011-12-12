@@ -50,9 +50,9 @@ namespace synthese
 			std::string _name; //!< Fare name
 			boost::shared_ptr<FareType> _type; //!< Fare type
 			std::string _currency; //!< Fare currency
-			boost::optional<unsigned int> _permittedConnectionsNumber; //!< Number of permitted connections
+			boost::optional<int> _permittedConnectionsNumber; //!< Number of permitted connections
 			bool _requiredContinuity;
-			unsigned int _validityPeriod; //!< Maximal validity period (minutes)
+			int _validityPeriod; //!< Maximal validity period (minutes)
 
 		public:
 			Fare(
@@ -66,9 +66,9 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				const boost::shared_ptr<FareType> getType() const { return _type; }
 				const std::string& getCurrency() const { return _currency; }
-				const boost::optional<unsigned int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }
+				const boost::optional<int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }
 				bool getRequiredContinuity() const { return _requiredContinuity; }
-				unsigned int getValidityPeriod() const { return _validityPeriod; }
+				int getValidityPeriod() const { return _validityPeriod; }
 			//@}
 
 			//! @name Setters
@@ -76,9 +76,9 @@ namespace synthese
 				void setName(const std::string& name) { _name = name; }
 				void setTypeNumber(FareType::FareTypeNumber number);
 				void setCurrency(const std::string& currency) { _currency = currency; }
-				void setPermittedConnectionsNumber(const boost::optional<unsigned int> permittedConnectionsNumber) { _permittedConnectionsNumber = permittedConnectionsNumber; }
+				void setPermittedConnectionsNumber(const boost::optional<int> permittedConnectionsNumber) { _permittedConnectionsNumber = permittedConnectionsNumber; }
 				void setRequiredContinuity(const bool requiredContinuity) { _requiredContinuity = requiredContinuity; }
-				void setValidityPeriod(const unsigned int validityPeriod) { _validityPeriod = validityPeriod; }
+				void setValidityPeriod(const int validityPeriod) { _validityPeriod = validityPeriod; }
 			//@}
 		};
 	}

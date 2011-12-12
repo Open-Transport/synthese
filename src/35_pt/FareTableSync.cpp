@@ -114,7 +114,7 @@ namespace synthese
 				)	);
 			}
 			fare->setCurrency(rows->getText(FareTableSync::COL_CURRENCY));
-			fare->setPermittedConnectionsNumber(rows->getOptionalUnsignedInt(FareTableSync::COL_PERMITTED_CONNECTIONS_NUMBER));
+			fare->setPermittedConnectionsNumber(rows->getOptionalInt(FareTableSync::COL_PERMITTED_CONNECTIONS_NUMBER));
 			fare->setRequiredContinuity(rows->getBool(FareTableSync::COL_REQUIRED_CONTINUITY));
 			fare->setValidityPeriod(rows->getInt(FareTableSync::COL_VALIDITY_PERIOD));
 		}
