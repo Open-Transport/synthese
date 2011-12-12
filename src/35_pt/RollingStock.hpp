@@ -87,8 +87,8 @@ namespace synthese
 				const std::string& getTridentKey() const { return _tridentKey; }
 				const std::string getGTFSKey() const;
 				bool getIsTridentKeyReference() const { return _isTridentKeyReference; }
-				const double getCO2Emissions() const { return _CO2Emissions; }
-				const double getEnergyConsumption() const { return _energyConsumption; }
+				double getCO2Emissions() const { return _CO2Emissions; }
+				double getEnergyConsumption() const { return _energyConsumption; }
 			//@}
 
 
