@@ -1,6 +1,6 @@
 
-/** Fare class implementation.
-	@file Fare.cpp
+/** FareTypeFlatRate class header.
+	@file FareTypeFlatRate.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,54 +20,39 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Fare.h"
-#include "FareType.hpp"
-#include "FareTypeFlatRate.hpp"
-#include "FareTypeDistance.hpp"
-#include "Registry.h"
+#ifndef SYNTHESE_FareTypeFlatRate_H__
+#define SYNTHESE_FareTypeFlatRate_H__
 
-using namespace std;
-using namespace boost;
+#include "FareType.hpp"
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace util
-	{
-		template<> const string Registry<pt::Fare>::KEY("Fare");
-	}
-
 	namespace pt
 	{
-		Fare::Fare(RegistryKeyType key)
-		:	Registrable(key),
-			_requiredContinuity(false)
+		/** FareTypeFlatRate handling class
+			@ingroup m35
+		*/
+		class FareTypeFlatRate : public FareType
 		{
-		}
+		 public:
+
+
+		 private:
+
+
+		public:
+			FareTypeFlatRate();
 
 
 
-		Fare::~Fare()
-		{
-		}
+			~FareTypeFlatRate();
 
 
 
-		void Fare::setTypeNumber(FareType::FareTypeNumber number)
-		{
-			switch(number)
-			{
-				case FareType::FARE_TYPE_FLAT_RATE:
-					_type = shared_ptr<FareTypeFlatRate>(new FareTypeFlatRate());
-					break;
-				case FareType::FARE_TYPE_DISTANCE:
-					_type = shared_ptr<FareTypeDistance>(new FareTypeDistance());
-					break;
-				default:
-					_type = shared_ptr<FareType>(new FareType(FareType::FARE_TYPE_UNKNOWN));
-					break;
-			}
-		}
+			double fareCalculation();
+
+		};
 	}
 }
+
+#endif

@@ -65,6 +65,14 @@ FaresAdmin.cpp
 FaresAdmin.h
 FareTableSync.cpp
 FareTableSync.h
+FareType.cpp
+FareType.hpp
+FareTypeDistance.cpp
+FareTypeDistance.hpp
+FareTypeFlatRate.cpp
+FareTypeFlatRate.hpp
+FareUpdateAction.cpp
+FareUpdateAction.hpp
 GTFSFileFormat.cpp
 GTFSFileFormat.hpp
 HastusCSVFileFormat.cpp
