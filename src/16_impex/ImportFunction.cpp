@@ -100,6 +100,7 @@ namespace synthese
 				stringstream output;
 				_doImport = _importer->beforeParsing();
 				_doImport &= _importer->parseFiles(output, optional<const AdminRequest&>()) && map.getDefault<bool>(PARAMETER_DO_IMPORT, false);
+				_importer->getLogger().output(output);
 				_doImport &=_importer->afterParsing();
 				_output = output.str();
 			}

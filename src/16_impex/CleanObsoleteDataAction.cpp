@@ -28,6 +28,7 @@
 #include "Request.h"
 #include "DataSourceTableSync.h"
 #include "Importer.hpp"
+#include "FileFormat.h"
 
 using namespace std;
 using namespace boost::gregorian;
@@ -76,6 +77,10 @@ namespace synthese
 			{
 				throw ActionException("No such datasource");
 			}
+			if(!_importer.get())
+			{
+				throw ActionException("Invalid datasource : maybe file format is undefined ?");
+			}
 
 			// Date
 			_firstDate = from_string(map.get<string>(PARAMETER_FIRST_DATE));
@@ -101,7 +106,13 @@ namespace synthese
 
 		void CleanObsoleteDataAction::setDataSource(const DataSource& dataSource)
 		{
-			_importer  = dataSource.getImporter(*_env);
+			try
+			{
+				_importer  = dataSource.getImporter(*_env);
+			}
+			catch(FactoryException<FileFormat>&)
+			{
+			}
 		}
 
 

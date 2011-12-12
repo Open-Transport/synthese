@@ -168,6 +168,7 @@ namespace synthese
 				bool doImport(_doImport);
 				doImport &= _importer->beforeParsing();
 				doImport &= _importer->parseFiles(stream, request);
+				_importer->getLogger().output(stream);
 				doImport &= _importer->afterParsing();
 				if(doImport)
 				{

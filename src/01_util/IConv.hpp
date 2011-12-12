@@ -77,7 +77,7 @@ namespace synthese
 			/// @date 2010
 			std::string convert(
 				const std::string& text
-			);
+			) const;
 		};
 	}
 }

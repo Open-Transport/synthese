@@ -47,7 +47,7 @@ namespace synthese
 
 		std::string IConv::convert(
 			const std::string& text
-		){
+		) const {
 			if(text.empty())
 			{
 				return string();

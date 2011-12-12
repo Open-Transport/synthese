@@ -44,17 +44,69 @@ namespace synthese
 		class Importer
 		{
 		public:
+
+			class Logger
+			{
+			public:
+				typedef enum
+				{
+					ALL = 0,
+					DEBUG = 10,
+					LOAD = 20,
+					CREA = 25,
+					INFO = 30,
+					WARN = 40,
+					NOTI = 50,
+					ERROR = 60,
+					NOLOG = 99
+				} Level;
+
+				struct Entry
+				{
+					Level level;
+					std::string content;
+					Entry(Level level_, const std::string& content_):
+					level(level_), content(content_) {}
+				};
+
+				typedef std::vector<Entry> Entries;
+
+			private:
+				Entries _entries;
+				Level _maxLoggedLevel;
+				const Level _minLevel;
+
+			public:
+				Logger(
+					Level minLevel
+				);
+
+				void log(
+					Level level,
+					const std::string& content
+				);
+
+				void output(
+					std::ostream& stream
+				) const;
+
+				Level getMaxLoggedLevel() const { return _maxLoggedLevel; }
+			};
+
 			Importer(
 				util::Env& env,
-				const DataSource& dataSource
+				const DataSource& dataSource,
+				Logger::Level minLevel = Logger::ALL
 			):	_env(env),
-				_dataSource(dataSource)
+				_dataSource(dataSource),
+				_logger(minLevel)
 			{}
 
 		protected:
 			mutable util::Env&						_env;
 			const DataSource&						_dataSource;
 			boost::optional<boost::filesystem::path> _logPath;
+			mutable Logger							_logger;
 
 			virtual db::DBTransaction _save() const = 0;
 
@@ -63,6 +115,7 @@ namespace synthese
 			//@{
 				const DataSource& getDataSource() const { return _dataSource; }
 				boost::optional<boost::filesystem::path> getLogPath() const { return _logPath; }
+				const Logger& getLogger() const { return _logger; }
 			//@}
 
 			//! @name Setters
