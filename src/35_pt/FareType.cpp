@@ -1,6 +1,6 @@
 
-/** Fare class implementation.
-	@file Fare.cpp
+/** FareType class implementation.
+	@file FareType.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,54 +20,48 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Fare.h"
 #include "FareType.hpp"
-#include "FareTypeFlatRate.hpp"
-#include "FareTypeDistance.hpp"
-#include "Registry.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
-	using namespace util;
-
-	namespace util
-	{
-		template<> const string Registry<pt::Fare>::KEY("Fare");
-	}
-
 	namespace pt
 	{
-		Fare::Fare(RegistryKeyType key)
-		:	Registrable(key),
-			_requiredContinuity(false)
+		FareType::FareType(
+			FareTypeNumber typeNumber
+		):	_typeNumber(typeNumber),
+			_accessPrice(0)
 		{
 		}
 
 
 
-		Fare::~Fare()
+		string FareType::GetTypeName(FareTypeNumber value)
 		{
-		}
-
-
-
-		void Fare::setTypeNumber(FareType::FareTypeNumber number)
-		{
-			switch(number)
+			switch(value)
 			{
-				case FareType::FARE_TYPE_FLAT_RATE:
-					_type = shared_ptr<FareTypeFlatRate>(new FareTypeFlatRate());
-					break;
-				case FareType::FARE_TYPE_DISTANCE:
-					_type = shared_ptr<FareTypeDistance>(new FareTypeDistance());
-					break;
-				default:
-					_type = shared_ptr<FareType>(new FareType(FareType::FARE_TYPE_UNKNOWN));
-					break;
+//				case FARE_TYPE_SECTION: return "Section";
+				case FARE_TYPE_DISTANCE: return "Kilométrique";
+//				case FARE_TYPE_ZONAL: return "Zonale";
+				case FARE_TYPE_FLAT_RATE: return "Forfaitaire";
+				default: return "Autre type";
 			}
+			return "Autre type";
+		}
+
+
+
+		FareType::TypesList FareType::GetTypesList()
+		{
+			TypesList result;
+//			result.push_back(make_pair(FARE_TYPE_FREE, GetTypeName(FARE_TYPE_FREE)));
+//			result.push_back(make_pair(FARE_TYPE_SECTION, GetTypeName(FARE_TYPE_SECTION)));
+			result.push_back(make_pair(FARE_TYPE_DISTANCE, GetTypeName(FARE_TYPE_DISTANCE)));
+//			result.push_back(make_pair(FARE_TYPE_ZONAL, GetTypeName(FARE_TYPE_ZONAL)));
+			result.push_back(make_pair(FARE_TYPE_FLAT_RATE, GetTypeName(FARE_TYPE_FLAT_RATE)));
+			return result;
 		}
 	}
 }

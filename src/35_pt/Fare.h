@@ -25,20 +25,16 @@
 
 #include "Registrable.h"
 #include "Registry.h"
+#include "FareType.hpp"
 
 #include <string>
+#include <boost/optional/optional.hpp>
 
 namespace synthese
 {
 	namespace pt
 	{
 		/** Fare handling class
-
-			Compliance values :
-				- true : with toll
-				- indeterminate : no sense
-				- false : toll free
-
 			@ingroup m35
 		*/
 		class Fare
@@ -46,21 +42,17 @@ namespace synthese
 		{
 		 public:
 
-			typedef enum
-			{
-				FARE_TYPE_FREE = 0,
-				FARE_TYPE_SECTION = 1,
-				FARE_TYPE_DISTANCE = 2,
-				FARE_TYPE_ZONAL = 3
-			} FareType;
-
 			/// Chosen registry class.
 			typedef util::Registry<Fare>	Registry;
 
 		 private:
 
 			std::string _name; //!< Fare name
-			FareType _type; //!< Fare type
+			boost::shared_ptr<FareType> _type; //!< Fare type
+			std::string _currency; //!< Fare currency
+			boost::optional<unsigned int> _permittedConnectionsNumber; //!< Number of permitted connections
+			bool _requiredContinuity;
+			unsigned int _validityPeriod; //!< Maximal validity period (minutes)
 
 		public:
 			Fare(
@@ -71,14 +63,22 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				const std::string& getName () const { return _name; }
-				const FareType& getType () const { return _type; }
+				const std::string& getName() const { return _name; }
+				const boost::shared_ptr<FareType> getType() const { return _type; }
+				const std::string& getCurrency() const { return _currency; }
+				const boost::optional<unsigned int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }
+				bool getRequiredContinuity() const { return _requiredContinuity; }
+				unsigned int getValidityPeriod() const { return _validityPeriod; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setName (const std::string& name) { _name = name; }
-				void setType (const FareType& fareType) { _type = fareType; }
+				void setName(const std::string& name) { _name = name; }
+				void setTypeNumber(FareType::FareTypeNumber number);
+				void setCurrency(const std::string& currency) { _currency = currency; }
+				void setPermittedConnectionsNumber(const boost::optional<unsigned int> permittedConnectionsNumber) { _permittedConnectionsNumber = permittedConnectionsNumber; }
+				void setRequiredContinuity(const bool requiredContinuity) { _requiredContinuity = requiredContinuity; }
+				void setValidityPeriod(const unsigned int validityPeriod) { _validityPeriod = validityPeriod; }
 			//@}
 		};
 	}
