@@ -1,6 +1,6 @@
 
-/** CarPostalFileFormat class header.
-	@file CarPostalFileFormat.hpp
+/** HafasFileFormat class header.
+	@file HafasFileFormat.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CarPostalFileFormat_H__
-#define SYNTHESE_CarPostalFileFormat_H__
+#ifndef SYNTHESE_HafasFileFormat_H__
+#define SYNTHESE_HafasFileFormat_H__
 
 #include "FileFormatTemplate.h"
 #include "Calendar.h"
@@ -30,6 +30,7 @@
 #include "PTDataCleanerFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
+#include "IConv.hpp"
 
 #include <iostream>
 #include <map>
@@ -56,10 +57,10 @@ namespace synthese
 		class RollingStock;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// CarPostal file format.
+		/// Hafas file format.
 		/// @ingroup m35File refFile
 		//////////////////////////////////////////////////////////////////////////
-		/// The CarPostal export reads 4 files :
+		/// The Hafas export reads 4 files :
 		///	<ul>
 		///		<li>KOORD.DAT : Coordinates of commercial stops</li>
 		///		<li>ECKDATEN.DAT : Date range of the data</li>
@@ -76,13 +77,13 @@ namespace synthese
 		///		can read such BAHNHOF.DAT and KOORD.DAT and show differences with SYNTHESE.</li>
 		///		<li>Import of the services : the import is automated, and is possible only if all stops
 		///		are referenced in the SYNTHESE database, and if the line has been manually created in
-		///		the SYNTHESE database and linked to the CarPostal database by the operator_code field</li>
+		///		the SYNTHESE database and linked to the Hafas database by the operator_code field</li>
 		///	</ul>
 		///
 		///	<h3>Import of the stops</h3>
 		///
 		/// The physical stops must be linked with the items of BAHNHOF.DAT.
-		/// More than one physical stop can be linked with the same CarPostal stop. In this case,
+		/// More than one physical stop can be linked with the same Hafas stop. In this case,
 		/// the import will select automatically the actual stop regarding the whole itinerary.
 		///
 		/// <h3>Import of the services</h3>
@@ -101,14 +102,14 @@ namespace synthese
 		///			<li>Creation of a service if ncessary</li>
 		///		</ul>
 		///	</ol>
-		class CarPostalFileFormat:
-			public impex::FileFormatTemplate<CarPostalFileFormat>
+		class HafasFileFormat:
+			public impex::FileFormatTemplate<HafasFileFormat>
 		{
 		public:
 
 			//////////////////////////////////////////////////////////////////////////
 			class Importer_:
-				public impex::MultipleFileTypesImporter<CarPostalFileFormat>,
+				public impex::MultipleFileTypesImporter<HafasFileFormat>,
 				public PTDataCleanerFileFormat
 			{
 
@@ -118,11 +119,15 @@ namespace synthese
 				static const std::string FILE_ZUGDAT;
 				static const std::string FILE_KOORD;
 				static const std::string FILE_GLEIS;
+				static const std::string FILE_METABHF;
+				static const std::string FILE_UMSTEIGB;
+				static const std::string FILE_UMSTEIGZ;
 
 				static const std::string PARAMETER_SHOW_STOPS_ONLY;
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_WAYBACK_BIT_POSITION;
 				static const std::string PARAMETER_IMPORT_FULL_SERVICES;
+				static const std::string PARAMETER_IMPORT_STOPS;
 
 			private:
 				//! @name Parameters
@@ -131,6 +136,7 @@ namespace synthese
 					bool _showStopsOnly;
 					std::size_t _wayBackBitPosition;
 					bool _importFullServices;
+					bool _importStops;
 				//@}
 
 				typedef std::map<int, calendar::Calendar> CalendarMap;
@@ -139,23 +145,106 @@ namespace synthese
 					std::string operatorCode;
 					std::string cityName;
 					std::string name;
-					boost::shared_ptr<geos::geom::Point> coords;
-					StopPoint* stop;
-				};
+					bool main;
+					boost::shared_ptr<geos::geom::Point> point;
+					mutable std::set<StopPoint*> stops;
+					boost::posix_time::time_duration defaultTransferDuration;
+					std::set<std::string> gleisSet;
+					bool used;
 
+					Bahnhof():
+						main(false),
+						used(false)
+					{}
+				};
 				typedef std::map<std::string, Bahnhof> Bahnhofs;
+				mutable Bahnhofs _bahnhofs;
+
+				struct Zug
+				{
+					std::string number;
+					std::string lineNumber;
+					std::size_t version;
+					std::size_t calendarNumber;
+					std::string transportModeCode;
+
+					// Served stops
+					struct Stop
+					{
+						std::string stopCode;
+						std::string gleisCode;
+						boost::posix_time::time_duration departureTime;
+						boost::posix_time::time_duration arrivalTime;
+						
+						Stop():
+							departureTime(boost::posix_time::not_a_date_time),
+							arrivalTime(boost::posix_time::not_a_date_time)
+						{}
+					};
+					typedef std::vector<Stop> Stops;
+					Stops stops;
+				};
+				typedef std::vector<Zug> Zugs;
+				mutable Zugs _zugs;
 
 				mutable Bahnhofs _nonLinkedBahnhofs;
 				mutable Bahnhofs _linkedBahnhofs;
+				const util::IConv _iconv;
 
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable CalendarMap _calendarMap;
+
+				typedef std::pair<
+					std::string, // Service code
+					std::string // Line code
+				> ServiceId;
+				typedef std::map<
+					boost::tuple<
+						std::string, // Stop code
+						ServiceId, // From service
+						ServiceId // To service
+					>,
+					boost::posix_time::time_duration // Inter service transfer duration
+				> InterServiceTransferDurationMap;
+				mutable InterServiceTransferDurationMap _interServiceTransferDurationMap;
+
+				typedef std::map<
+					std::pair<
+						std::string, // From stop
+						std::string // To stop
+					>,
+					boost::posix_time::time_duration // Inter stop transfer duration
+				> InterStopTransferDurationMap;
+				mutable InterStopTransferDurationMap _interStopTransferDurationMap;
+
+				typedef std::map<
+					std::string, // Stop code
+					std::set<std::string> // Linked stops code
+				> StopAreaMappingMap;
+				mutable StopAreaMappingMap _stopAreaMappingMap;
 
 				typedef std::map<
 					boost::tuple<std::string, std::string, std::size_t>, // Number, Line, Version
 					std::map<std::string, std::string> // StopArea, StopPoint
 				> GleisMap;
 				mutable GleisMap _gleisMap;
+
+
+				//! @name File lines handling
+				//@{
+					mutable std::string _line;
+					mutable std::ifstream _file;
+					bool _openFile(const boost::filesystem::path& path) const;
+					bool _loadLine() const;
+					std::string _getField(std::size_t start, std::size_t len) const;
+					std::string _getField(std::size_t start) const;
+				//@}
+
+				void _showBahnhofScreen(
+					std::ostream& os,
+					boost::optional<const admin::AdminRequest&> adminRequest
+				) const;
+
+				bool _importObjects(std::ostream& os) const;
 
 			protected:
 
@@ -174,13 +263,14 @@ namespace synthese
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
-				):	impex::MultipleFileTypesImporter<CarPostalFileFormat>(env, dataSource),
+				):	impex::MultipleFileTypesImporter<HafasFileFormat>(env, dataSource),
 					PTDataCleanerFileFormat(env, dataSource),
 					impex::Importer(env, dataSource),
-					_stopPoints(_dataSource, _env),
 					_showStopsOnly(false),
 					_wayBackBitPosition(0),
-					_importFullServices(false)
+					_importFullServices(false),
+					_importStops(false),
+					_iconv(dataSource.getCharset().empty() ? string("UTF-8") : dataSource.getCharset(), "UTF-8")
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
@@ -220,7 +310,7 @@ namespace synthese
 				virtual db::DBTransaction _save() const;
 			};
 
-			typedef impex::NoExportPolicy<CarPostalFileFormat> Exporter_;
+			typedef impex::NoExportPolicy<HafasFileFormat> Exporter_;
 		};
 	}
 }

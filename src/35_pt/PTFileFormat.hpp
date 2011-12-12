@@ -149,6 +149,20 @@ namespace synthese
 
 
 
+			static StopArea* CreateStopArea(
+				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+				const std::string& id,
+				const std::string& name,
+				geography::City& city,
+				boost::posix_time::time_duration defaultTransferDuration,
+				bool mainStopArea,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
 			static std::set<StopArea*> GetStopAreas(
 				const impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 				const std::string& id,
@@ -227,6 +241,18 @@ namespace synthese
 				boost::optional<const graph::RuleUser::Rules&> useRules,
 				boost::optional<const StopArea*> stopArea,
 				boost::optional<const StopPoint::Geometry*> geometry,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
+			static StopPoint* CreateStop(
+				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+				const std::string& code,
+				boost::optional<const std::string&> name,
+				const StopArea& stopArea,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream

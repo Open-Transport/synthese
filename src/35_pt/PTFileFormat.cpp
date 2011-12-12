@@ -181,6 +181,42 @@ namespace synthese
 
 
 
+
+
+		StopArea* PTFileFormat::CreateStopArea(
+			impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+			const std::string& id,
+			const std::string& name,
+			geography::City& city,
+			boost::posix_time::time_duration defaultTransferDuration,
+			bool mainStopArea,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
+			StopArea* stopArea(
+				new StopArea(
+					StopAreaTableSync::getId(),
+					true,
+					defaultTransferDuration
+			)	);
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&source, id));
+			stopArea->setDataSourceLinks(links);
+			stopArea->setCity(&city);
+			stopArea->setName(name);
+			if(mainStopArea)
+			{
+				city.addIncludedPlace(stopArea);
+			}
+			env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
+			stopAreas.add(*stopArea);
+
+			return stopArea;
+		}
+
+
+
 		set<StopArea*> PTFileFormat::CreateOrUpdateStopAreas(
 			impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
 			const std::string& id,
@@ -198,26 +234,25 @@ namespace synthese
 			// Create if necessary
 			if(result.empty())
 			{
-				// Abord if undefined city
+				// Abort if undefined city
 				if(!city)
 				{
 					logStream << "WARN : The stop area " << name << " cannot be created because of undefined city.<br/>";
 					return result;
 				}
 
-				StopArea* stopArea(
-					new StopArea(
-						StopAreaTableSync::getId(),
-						true,
-						defaultTransferDuration
+				result.insert(
+					CreateStopArea(
+						stopAreas,
+						id,
+						name,
+						*const_cast<geography::City*>(city), // Possible because of false in main parameter
+						defaultTransferDuration,
+						false,
+						source,
+						env,
+						logStream
 				)	);
-				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, id));
-				stopArea->setDataSourceLinks(links);
-				stopArea->setCity(city);
-				env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
-				stopAreas.add(*stopArea);
-				result.insert(stopArea);
 			}
 
 			// Update
@@ -275,6 +310,44 @@ namespace synthese
 
 
 
+		StopPoint* PTFileFormat::CreateStop(
+			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			const std::string& code,
+			boost::optional<const std::string&> name,
+			const StopArea& stopArea,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
+			// Object creation
+			StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&source, code));
+			stop->setDataSourceLinks(links);
+			env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
+			stops.add(*stop);
+
+			// Properties
+			stop->setHub(&stopArea);
+			if(name)
+			{
+				stop->setName(*name);
+			}
+			
+			// Log
+			logStream << "CREA : Creation of the physical stop with key " << code;
+			if(name)
+			{
+				logStream << " (" << *name <<  ")";
+			}
+			logStream << "<br />";
+
+			// Return
+			return stop;
+		}
+
+
+
 		set<StopPoint*> PTFileFormat::CreateOrUpdateStop(
 			impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
 			const std::string& code,
@@ -297,20 +370,16 @@ namespace synthese
 					return result;
 				}
 
-				StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
-				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
-				stop->setDataSourceLinks(links);
-				env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
-				stops.add(*stop);
-				result.insert(stop);
-
-				logStream << "CREA : Creation of the physical stop with key " << code;
-				if(name)
-				{
-					logStream << " (" << *name <<  ")";
-				}
-				logStream << "<br />";
+				result.insert(
+					CreateStop(
+						stops,
+						code,
+						name,
+						**stopArea,
+						source,
+						env,
+						logStream
+				)	);
 			}
 			else
 			{
@@ -401,16 +470,16 @@ namespace synthese
 				}
 
 				// Stop creation
-				StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
-				stop->setHub(curStop);
-				Importable::DataSourceLinks links;
-				links.insert(make_pair(&source, code));
-				stop->setDataSourceLinks(links);
-				env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
-				stops.add(*stop);
-				result.insert(stop);
-
-				logStream << "CREA : Creation of the physical stop with key " << code << " (" << name <<  ")<br />";
+				result.insert(
+					CreateStop(
+						stops,
+						code,
+						name,
+						*curStop,
+						source,
+						env,
+						logStream
+				)	);
 			}
 			else
 			{
@@ -1093,8 +1162,13 @@ namespace synthese
 
 
 
-		CommercialLine* PTFileFormat::GetLine( impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines, const std::string& id, const impex::DataSource& source, util::Env& env, std::ostream& logStream )
-		{
+		CommercialLine* PTFileFormat::GetLine(
+			impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
+			const std::string& id,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
 			CommercialLine* line(NULL);
 			if(lines.contains(id))
 			{
