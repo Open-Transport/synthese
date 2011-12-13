@@ -79,9 +79,11 @@ DEFAULTS = {
     'mail_tls': False,
     'send_mail_on_crash': False,
     'apache_conf_suffix': '',
+    # web frontend configuration
     # Put in the project config.
     # Generate with: python -c "import os; print repr(os.urandom(24))"
-    'secret_key': 'override me!',
+    'web_secret_key': 'override me!',
+    'web_debug': False,
 
     # remote project management
     'remote_server': None,

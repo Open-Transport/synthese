@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
-{% block title %}<h1>{{import_.template.label}}, import {{ import_.id }}</h1>{% endblock %}
+{% block breadcrumb %}
+<li><a href="{{ url_for('.import_template_list') }}"
+  >Imports</a> <span class="divider">/</span></li>
+<li><a href="{{ url_for('.import_template', template_id=import_.template.id) }}"
+  >{{ import_.template.label }}</a> <span class="divider">/</span></li>
+<li>import {{ import_.id }}</li>
+{% endblock %}
 {% block body %}
   <style>
   article {
@@ -153,6 +159,16 @@
                       template_id=import_.template.id, import_id=import_.id, run_id=event.id) }}">
             Détail de l'éxecution {{ event.id }}
           </a>
+          <small>
+            <a href="{{ url_for('.import_run_detail',
+                        template_id=import_.template.id, import_id=import_.id, run_id=event.id) }}?raw_summary=1">
+              (résumé)
+            </a>
+            <a href="{{ url_for('.import_run_detail',
+                        template_id=import_.template.id, import_id=import_.id, run_id=event.id) }}?raw_log=1">
+              (log)
+            </a>
+          </small>
         </p>
 
       {% endif %}

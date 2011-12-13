@@ -20,6 +20,7 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import collections
+import gzip
 import json
 import logging
 import os
@@ -202,13 +203,15 @@ class ImportRun(object):
         self.path = path
         self.state_path = join(self.path, 'state.json')
         self._summary = None
-        self.summary_path = join(self.path, 'summary.txt')
+        self.summary_path = join(self.path, 'summary.txt.gz')
+        self._log = None
+        self.log_path = join(self.path, 'log.txt.gz')
 
         self.successful = True
         self.date = 0
         self.execution_time = -1
         self.dummy = False
-        self.messages = dict((l, []) for l in self.LEVEL_NAMES)
+        self.messages = None
         self.synthese_calls = []
 
     def convert_params(self, params):
@@ -253,6 +256,8 @@ class ImportRun(object):
                 self.successful = False
 
     def call_synthese(self, synthese_params):
+        if self.messages is None:
+            self.messages = dict((l, []) for l in self.LEVEL_NAMES)
         project = self.import_.template.manager.project
         http_api = synthesepy.http_api.HTTPApi(project.env)
 
@@ -263,11 +268,19 @@ class ImportRun(object):
 
         log.debug('Import HTTP result, %s', res)
         if 0:
-            log.debug('Import HTTP body, %r', res.content)
+            log.debug('Import HTTP body, %r', res.content) 
         self._process_import_log(res.content)
 
-        self.synthese_calls.append('URL: {0}, params: {1}'.format(
-            res.request.url, res.request.data))
+        synthese_call = 'URL: {0}, params: {1}'.format(
+            res.request.url, res.request.data)
+        self.synthese_calls.append(synthese_call)
+
+        if self._log is None:
+            self._log = u''
+        self._log += synthese_call + '\n\n'
+        self._log += unicode(
+            res.content.replace('<br />', '\n'), 'utf-8', 'replace')
+        self._log += '\n\n' + ('-' * 80)
 
     def add_failure(self, exception):
         log.warn('Adding import failure: %s', exception)
@@ -284,16 +297,20 @@ class ImportRun(object):
             state, open(self.state_path, 'wb'),
             sort_keys=True, indent=2)
 
-        with open(self.summary_path, 'wb') as f:
-            summary = self.get_summary()
-            f.write(summary.encode('utf-8'))
+        with gzip.open(self.summary_path, 'wb') as f:
+            f.write(self.summary.encode('utf-8'))
+
+        with gzip.open(self.log_path, 'wb') as f:
+            f.write(self.log.encode('utf-8'))
 
     def get_summary(self, min_level='unknown'):
-        # FIXME: this is wrong: the summary should be generated every time
-        # (if messages are available) because the min_level can change.
-        if os.path.isfile(self.summary_path):
-            self._summary = open(self.summary_path, 'rb').read().decode('utf-8')
-        if self._summary:
+        if self.messages is None:
+            if self._summary:
+                return self._summary
+            if os.path.isfile(self.summary_path):
+                self._summary = gzip.open(self.summary_path, 'rb').read().decode('utf-8')
+            else:
+                self._summary = 'Not available'
             return self._summary
         summary = i18n.start_of_summary.format(level=min_level.upper())
         index = self.LEVEL_NAMES.index(min_level)
@@ -312,9 +329,18 @@ class ImportRun(object):
             dummy=self.dummy,
             synthese_calls='\n\n'.join(self.synthese_calls))
 
-        self._summary = summary
-        return self._summary
+        return summary
     summary = property(get_summary)
+
+    def get_log(self):
+        if self._log:
+            return self._log
+        if os.path.isfile(self.log_path):
+            self._log = gzip.open(self.log_path, 'rb').read().decode('utf-8')
+        else:
+            self._log = 'Not available'
+        return self._log
+    log = property(get_log)
 
 
 class Import(DirObjectLoader):

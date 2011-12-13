@@ -1,5 +1,9 @@
 {% extends "layout.html" %}
-{% block title %}<h1>Templates d'import {{ template.label }}</h1>{% endblock %}
+{% block breadcrumb %}
+<li><a href="{{ url_for('.import_template_list') }}"
+  >Imports</a> <span class="divider">/</span></li>
+<li>Templates d'import {{ template.label }}</li>
+{% endblock %}
 {% block body %}
 
   <ul>

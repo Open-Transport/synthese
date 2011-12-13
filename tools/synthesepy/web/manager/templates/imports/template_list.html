@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block title %}<h1>Templates d'import disponibles</h1>{% endblock %}
+{% block breadcrumb %}
+<li>Templates d'import disponibles</li>
+{% endblock %}
 {% block body %}
   <ul>
   {% for template in templates %}
