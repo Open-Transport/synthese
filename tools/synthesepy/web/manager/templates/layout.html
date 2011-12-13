@@ -106,23 +106,20 @@
       <div class="content">
 
         <div class="page-header">
-          {% block title %}{% endblock %}
+
+{% macro breadcrumb_entry(link, name, last=False) -%}
+  <li><a href="{{ link }}"
+    >{{ name }}</a> {% if not last %}<span class="divider">/</span>{% endif %}</li>
+{%- endmacro %}
+
           <ul class="breadcrumb">
-            <li><a href="{{ url_for('.index') }}"
-              >Synthese Manager ({{ project_name }})</a> <span class="divider">/</span></li>
+            {{ breadcrumb_entry(url_for('.index'), "Synthese Manager (%s)" % project_name) }}
             {% block breadcrumb %}{% endblock %}
           </ul>
         </div>
 
         <div class="row">
           <div class="span14">
-
-            {# TODO: implement breadcrumb navigation
-            <ul class="breadcrumb">
-              <li><a href="#">Home</a> <span class="divider">/</span></li>
-              <li><a href="#">Middle page</a> <span class="divider">/</span></li>
-            </ul>
-            #}
 
             {% for message in get_flashed_messages() %}
               <div class="alert-message info">
