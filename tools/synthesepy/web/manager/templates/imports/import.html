@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-<li><a href="{{ url_for('.import_template_list') }}"
-  >Imports</a> <span class="divider">/</span></li>
-<li><a href="{{ url_for('.import_template', template_id=import_.template.id) }}"
-  >{{ import_.template.label }}</a> <span class="divider">/</span></li>
-<li>import {{ import_.id }}</li>
+  {{ breadcrumb_entry(url_for('.import_template_list'),
+    "Imports") }}
+  {{ breadcrumb_entry(url_for('.import_template', template_id=import_.template.id),
+    import_.template.label) }}
+  <li>import {{ import_.id }}</li>
 {% endblock %}
 {% block body %}
   <style>
