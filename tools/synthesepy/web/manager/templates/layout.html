@@ -31,6 +31,11 @@
                 box-shadow: 0 1px 2px rgba(0,0,0,.15);
       }
 
+      .breadcrumb li {
+        color: black;
+        font-weight: bold;
+      }
+
       /* Page header tweaks */
       .page-header {
         background-color: #f5f5f5;
@@ -69,14 +74,15 @@
         margin-left: 250px;
       }
     </style>
-    <script src="/core/vendor/jquery-1.7.min.js"></script>
+    <script src="{{ url_for('.static_core', filename='core/vendor/jquery-1.7.1.min.js') }}"></script>
+    
+    <script src="{{ url_for('.static', filename='vendor/bootstrap/js/bootstrap-alerts.js') }}"></script>
     <script>
     $(function() {
-      $(".close").click(function() {
-        $(this).closest(".alert-message").remove();
-      });
+      $(".alert-message").alert();
     })
     </script>
+    {% block head %}{% endblock %}
   </head>
   <body>
 
@@ -101,6 +107,11 @@
 
         <div class="page-header">
           {% block title %}{% endblock %}
+          <ul class="breadcrumb">
+            <li><a href="{{ url_for('.index') }}"
+              >Synthese Manager ({{ project_name }})</a> <span class="divider">/</span></li>
+            {% block breadcrumb %}{% endblock %}
+          </ul>
         </div>
 
         <div class="row">

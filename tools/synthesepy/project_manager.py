@@ -54,24 +54,6 @@ log = logging.getLogger(__name__)
 
 
 # Utilities
-# XXX maybe move to utils. Not used for now.
-def _copy_over(source_path, target_path):
-    """Copy source_path over target_path, replacing any existing files"""
-
-    base_parts_count = len(source_path.split(os.path.sep))
-    for path, dirlist, filelist in os.walk(source_path):
-        for exclude in ['.git', '.hg', '.svn']:
-            if exclude in dirlist:
-                dirlist.remove(exclude)
-        for name in filelist:
-            relative_path = os.sep.join(path.split(os.sep)[base_parts_count:])
-
-            source = join(path, name)
-            target = join(target_path, relative_path, name)
-
-            if not os.path.isdir(os.path.dirname(target)):
-                os.makedirs(os.path.dirname(target))
-            shutil.copy(source, target)
 
 def _ssh_command_line(config, with_server=True, extra_opts=''):
     return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {remote_server}'.format(

@@ -1,0 +1,46 @@
+{% extends "layout.html" %}
+{% block head %}
+<style>
+.container {
+  width: 95%;
+}
+.span14 {
+  width: 90%;
+}
+</style>
+{% endblock %}
+{% block breadcrumb %}
+<li><a href="{{ url_for('.import_template_list') }}"
+  >Imports</a> <span class="divider">/</span></li>
+<li><a href="{{ url_for('.import_template', template_id=import_.template.id) }}"
+  >{{ import_.template.label }}</a> <span class="divider">/</span></li>
+<li><a href="{{ url_for('.import_', template_id=import_.template.id, import_id=import_.id) }}"
+  >import {{ import_.id }}</a> <span class="divider">/</span></li>
+<li>run {{ run.id }}</li>
+{% endblock %}
+{% block body %}
+
+<p>
+Résultat: 
+{% if run.successful %}
+  <span class="label success">Succès</span>
+{% else %}
+  <span class="label important">Echec</span>
+{% endif %}
+</p>
+
+<p><a href="#log">Aller aux logs</a></p>
+
+<p>Résumé: (<a href="?raw_summary=1">sortie brute</a>)</p>
+
+<pre>
+{{ run.summary }}
+</pre>
+
+<p id="log">Log: (<a href="?raw_log=1">sortie brute</a>)</p>
+
+<pre>
+{{ run.log }}
+</pre>
+
+{% endblock %}

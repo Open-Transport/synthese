@@ -25,6 +25,7 @@ import errno
 import httplib
 import logging
 import os
+import shutil
 import smtplib
 import stat
 import subprocess
@@ -275,6 +276,25 @@ def RemoveDirectory(*path):
       remove_with_retry(os.rmdir, os.path.join(root, name))
 
   remove_with_retry(os.rmdir, file_path)
+
+
+def copy_over(source_path, target_path):
+    """Copy source_path over target_path, replacing any existing files"""
+
+    base_parts_count = len(source_path.split(os.path.sep))
+    for path, dirlist, filelist in os.walk(source_path):
+        for exclude in ['.git', '.hg', '.svn']:
+            if exclude in dirlist:
+                dirlist.remove(exclude)
+        for name in filelist:
+            relative_path = os.sep.join(path.split(os.sep)[base_parts_count:])
+
+            source = os.path.join(path, name)
+            target = os.path.join(target_path, relative_path, name)
+
+            if not os.path.isdir(os.path.dirname(target)):
+                os.makedirs(os.path.dirname(target))
+            shutil.copy(source, target)
 
 
 def maybe_makedirs(directory):

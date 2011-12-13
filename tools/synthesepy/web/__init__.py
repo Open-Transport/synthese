@@ -53,8 +53,8 @@ def get_application(bootstrap_config={}, project=None):
     app = Flask(__name__)
     app.project = project
 
-    app.debug = getattr(project.config, 'web_debug', False)
-    app.secret_key = project.config.secret_key
+    app.debug = project.config.web_debug
+    app.secret_key = project.config.web_secret_key
 
     @app.context_processor
     def inject_i18n():
@@ -64,9 +64,9 @@ def get_application(bootstrap_config={}, project=None):
     def inject_project_name():
         return dict(project_name=project.config.project_name)
 
+    app.register_blueprint(manager.manager, url_prefix='/manager')
+
     if project.manager_module and hasattr(project.manager_module, 'get_webapp'):
         app = project.manager_module.get_webapp(project, app)
-
-    app.register_blueprint(manager.manager, url_prefix='/manager')
 
     return app

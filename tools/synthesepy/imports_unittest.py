@@ -189,13 +189,14 @@ class TestImports(unittest.TestCase):
             'warn': ['a warning']})
 
         self.assertEqual(len(self.emails), 2)
+
         email = self.emails[0]
         self.assertEqual(email[0], ['admin0@example.com'])
         self.assertIn(u'résultat de l\'exécution', email[1])
         self.assertIn('an error', email[2])
+
         email = self.emails[1]
         self.assertEqual(email[0], ['user_noti@example.com'])
-
         self.assertIn(u'résultat de l\'exécution', email[1])
         self.assertIn('a notification', email[2])
 
