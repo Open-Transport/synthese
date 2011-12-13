@@ -10,13 +10,13 @@
 </style>
 {% endblock %}
 {% block breadcrumb %}
-<li><a href="{{ url_for('.import_template_list') }}"
-  >Imports</a> <span class="divider">/</span></li>
-<li><a href="{{ url_for('.import_template', template_id=import_.template.id) }}"
-  >{{ import_.template.label }}</a> <span class="divider">/</span></li>
-<li><a href="{{ url_for('.import_', template_id=import_.template.id, import_id=import_.id) }}"
-  >import {{ import_.id }}</a> <span class="divider">/</span></li>
-<li>run {{ run.id }}</li>
+  {{ breadcrumb_entry(url_for('.import_template_list'),
+    "Imports") }}
+  {{ breadcrumb_entry(url_for('.import_template', template_id=import_.template.id),
+    import_.template.label) }}
+  {{ breadcrumb_entry(url_for('.import_', template_id=import_.template.id, import_id=import_.id),
+    "import %s" % import_.id) }}
+  <li>run {{ run.id }}</li>
 {% endblock %}
 {% block body %}
 
