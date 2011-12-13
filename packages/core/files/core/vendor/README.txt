@@ -1,10 +1,12 @@
+jquery-1.7.1.min.js:
+  http://code.jquery.com/jquery-1.7.min.js
+
+# For backward compatibility. To remove once all projects are migrated.
+jquery-1.6.2.min.js:
 jquery-1.7.min.js:
 jquery-1.7.js:
   http://code.jquery.com/jquery-1.7.min.js
   http://code.jquery.com/jquery-1.7.js
-
-# For backward compatibility. To remove once all projects are migrated.
-jquery-1.6.2.min.js:
   http://code.jquery.com/jquery-1.6.2.min.js
 
 jquery.tmpl.beta1.min.js:
