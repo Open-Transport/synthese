@@ -297,11 +297,14 @@ class ImportRun(object):
             state, open(self.state_path, 'wb'),
             sort_keys=True, indent=2)
 
-        with gzip.open(self.summary_path, 'wb') as f:
-            f.write(self.summary.encode('utf-8'))
+        # Note: this should use "with" once Python >= 2.7 is a requirement.
+        f = gzip.open(self.summary_path, 'wb')
+        f.write(self.summary.encode('utf-8'))
+        f.close()
 
-        with gzip.open(self.log_path, 'wb') as f:
-            f.write(self.log.encode('utf-8'))
+        f = gzip.open(self.log_path, 'wb')
+        f.write(self.log.encode('utf-8'))
+        f.close()
 
     def get_summary(self, min_level='unknown'):
         if self.messages is None:
