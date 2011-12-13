@@ -32,7 +32,6 @@ from flask import abort, helpers, Blueprint, flash, redirect, render_template, \
 import werkzeug
 
 import synthesepy.http_api
-import imports as manager_imports
 from synthesepy import i18n
 from synthesepy import utils
 
