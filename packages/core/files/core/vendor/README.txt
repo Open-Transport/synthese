@@ -39,3 +39,11 @@ jquery-ui-1.8.15.custom.min.js
   jquery.ui.widget.js
   jquery.ui.position.js
   jquery.ui.autocomplete.js
+
+jquery.ui.theme.css
+  Version: 1.8.16
+  http://jqueryui.com/themes/base/jquery.ui.theme.css
+
+jquery.ui.autocomplete.css
+  Version: 1.8.16
+  http://jqueryui.com/themes/base/jquery.ui.autocomplete.css
