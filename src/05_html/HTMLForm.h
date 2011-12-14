@@ -452,13 +452,30 @@ namespace synthese
 					@author Gaël Sauvanet
 					@date 2011
 				*/
-				static std::string getTextInputAutoCompleteFromTableSync(
+				std::string getTextInputAutoCompleteFromTableSync(
 					const std::string& name,
 					const std::string& valueId,
 					const std::string& valueName,
 					const std::string& tableId,
 					const std::string& extraParamName,
-					const std::string& extraParamDivId,
+					const std::string& extraParamInputName,
+					bool viewbottomButton = true,
+					bool viewIdButton = true,
+					bool useId = true,
+					bool viewId = false,
+					std::string displayTextBeforeTyping = std::string(),
+					std::string className = std::string()
+				);
+
+
+
+				static std::string GetTextInputAutoCompleteFromTableSync(
+					const std::string& name,
+					const std::string& valueId,
+					const std::string& valueName,
+					const std::string& tableId,
+					const std::string& extraParamName,
+					const std::string& extraParamInputName,
 					bool viewbottomButton = true,
 					bool viewIdButton = true,
 					bool useId = true,
@@ -478,13 +495,12 @@ namespace synthese
 					@param rows Rows name of JSON result
 					@param row Row name of JSON result
 					@param displayTextBeforeTyping text to be displayed at the page load and erased at the first field focus
-					@param fieldId unique ID of the field within the page,
 					@param className CSS class to use for display
 					@return std::string the HTML generated code (use addTextInputAutoComplete from ajax_forms.js)
 					@author Gaël Sauvanet
 					@date 2011
 				*/
-				static std::string getTextInputAutoCompleteFromService(
+				std::string getTextInputAutoCompleteFromService(
 					const std::string& name,
 					const std::string& valueID,
 					const std::string& valueName,
@@ -492,7 +508,26 @@ namespace synthese
 					const std::string& rows,
 					const std::string& row,
 					const std::string& extraParamName,
-					const std::string& extraParamDivId,
+					const std::string& extraParamInputName,
+					bool viewbottomButton = true,
+					bool viewIDButton = true,
+					bool useId = true,
+					bool viewId = false,
+					std::string displayTextBeforeTyping = std::string(),
+					std::string className = std::string()
+				);
+
+
+
+				static std::string GetTextInputAutoCompleteFromService(
+					const std::string& name,
+					const std::string& valueID,
+					const std::string& valueName,
+					const std::string& service,
+					const std::string& rows,
+					const std::string& row,
+					const std::string& extraParamName,
+					const std::string& extraParamInputName,
 					bool viewbottomButton = true,
 					bool viewIDButton = true,
 					bool useId = true,
@@ -501,7 +536,6 @@ namespace synthese
 					std::string fieldId = std::string(),
 					std::string className = std::string()
 				);
-
 
 
 				/** Password field HTML generator (input type=password).

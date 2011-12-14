@@ -238,7 +238,7 @@ namespace synthese
 		void AjaxVectorFieldEditor::TextAutoCompleteInputField::getField( std::ostream& stream ) const
 		{
 			stream <<
-				getTextInputAutoCompleteFromService(
+				GetTextInputAutoCompleteFromService(
 				_nameField+"Field",
 				_valueID,
 				_valueName,
