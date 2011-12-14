@@ -46,12 +46,12 @@ class MockHTTPApi(object):
     def __init__(self, *args, **kwargs):
         pass
 
-    def call_service2(*args, **kwargs):
+    def call_service2(self, service, params, **kwargs):
         class MockResponse(object):
             pass
         class MockRequest(object):
             url = 'http://mock-host/synthese'
-            data = 'mock request data'
+            data = params
 
         r = MockResponse()
         r.request = MockRequest()

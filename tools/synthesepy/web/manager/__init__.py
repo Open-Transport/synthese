@@ -20,21 +20,16 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 
-import datetime
 from functools import wraps
 import logging
 import os
-from os.path import join
 
 import flask
 from flask import abort, helpers, Blueprint, flash, redirect, render_template, \
-    request, session, url_for 
-import werkzeug
+    request, session, url_for
 
 import synthesepy.http_api
 from synthesepy import i18n
-from synthesepy import utils
-
 
 log = logging.getLogger(__name__)
 
@@ -52,7 +47,8 @@ def before_request():
 def admin_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get('username') not in ('foo'):
+        admins = flask.current_app.project.config.web_admins
+        if session.get('username') not in admins:
             flash('Admin privilege is required')
             return redirect(url_for('.login', next=request.url))
         return f(*args, **kwargs)
@@ -126,158 +122,39 @@ def logout():
     flash(i18n.logged_out)
     return redirect(url_for('.index'))
 
+@manager.route('/db')
+@admin_required
+def db():
+    return render_template('db.html')
+
+@manager.route('/db_clean_datasource', methods=['POST'])
+@admin_required
+def db_clean_datasource():
+    project = flask.current_app.project
+    dummy = request.form.get('dummy') == 'on'
+
+    messages = []
+
+    def run_sql(sql, args):
+        messages.append('Running SQL: {0} args={1}'.format(sql, args))
+        if not dummy:
+            project.db_backend.query(sql)
+
+    datasource_id = request.form.get('datasource_id')
+
+    # FIXME: this shouldn't delete objects used by other sources.
+    run_sql("delete from t042_commercial_lines where creator_id like '?'",
+        (datasource_id,))
+    run_sql("delete from t007_connection_places where code_by_source like '?'"
+        (datasource_id,))
+    run_sql("delete from t012_physical_stops where operator_code like '?'"
+        (datasource_id,))
+
+    return render_template('result.html', 
+        title='Clean Datasource Result',
+        output='\n'.join(messages)
+    )
+
 
 # Imports management
-# TODO: move to a separate file?
-
-
-@manager.route('/imports')
-def import_template_list():
-    if not session.get('logged_in'):
-        return redirect(url_for('.login', next=url_for('.imports')))
-    imports_manager = flask.current_app.project.imports_manager
-    templates = imports_manager.get_import_templates()
-
-    return render_template('imports/template_list.html', templates=templates)
-
-
-@manager.route('/imports/<template_id>')
-def import_template(template_id):
-    imports_manager = flask.current_app.project.imports_manager
-    try:
-        template = imports_manager.get_import_template(template_id)
-    except KeyError:
-        abort(404)
-
-    if not template.has_access(session['username']):
-        abort(401)
-
-    is_admin = template.has_access(session['username'], True)
-
-    return render_template(
-        'imports/template.html', template=template, is_admin=is_admin)
-
-
-@manager.route('/imports/<template_id>/create_import', methods=['POST'])
-def import_template_create_import(template_id):
-    imports_manager = flask.current_app.project.imports_manager
-    try:
-        template = imports_manager.get_import_template(template_id)
-    except KeyError:
-        abort(404)
-
-    if not template.has_access(session['username'], True):
-        abort(401)
-    
-    template.create_import()
-    flash(i18n.import_created)
-
-    return redirect(url_for('.import_template', template_id=template_id))
-
-
-def _get_import(template_id, import_id):
-    imports_manager = flask.current_app.project.imports_manager
-    try:
-        import_ = imports_manager.get_import(template_id, import_id)
-    except KeyError:
-        abort(404)
-
-    if not import_.template.has_access(session['username']):
-        abort(401)
-
-    return import_
-
-
-@manager.route('/imports/<template_id>/<import_id>')
-def import_(template_id, import_id):
-    import_ = _get_import(template_id, import_id)
-
-    events = import_.events
-    for event in events:
-        event.time_string = i18n.format_datetime(
-            datetime.datetime.fromtimestamp(event.time))
-
-    is_admin = import_.template.has_access(session['username'], True)
-
-    return render_template(
-        'imports/import.html', import_=import_, events=events,
-        is_admin=is_admin)
-
-
-@manager.route('/import/<template_id>/<import_id>/update', methods=['POST'])
-def import_update(template_id, import_id):
-    import_ = _get_import(template_id, import_id)
-
-    f = request.form
-    for param in import_.params.itervalues():
-        if param.type == 'file':
-            file = request.files[param.id]
-            filename = werkzeug.secure_filename(file.filename)
-            if not filename:
-                continue
-            relative_path = u'files/{0}'.format(filename)
-            target_path = join(import_.path, 'files', filename)
-            utils.maybe_makedirs(os.path.dirname(target_path))
-
-            file.save(target_path)
-
-            param.value = relative_path
-        else:
-            value = f.get(param.id)
-            if value is not None:
-                param.value = value
-
-            # TODO: bool type: convert checkbox values to 0 or 1.
-
-    import_.save_params(session['username'], f.get('no_mail'))
-    flash(i18n.import_updated)
-
-    return redirect(
-        url_for('.import_', template_id=template_id, import_id=import_id))
-
-
-@manager.route('/import/<template_id>/<import_id>/add_comment', methods=['POST'])
-def import_add_comment(template_id, import_id):
-    import_ = _get_import(template_id, import_id)
-
-    import_.add_comment(session['username'], request.form['comment'])
-    flash(i18n.import_comment_added)
-
-    return redirect(
-        url_for('.import_', template_id=template_id, import_id=import_id))
-
-
-@manager.route('/import/<template_id>/<import_id>/execute', methods=['POST'])
-def import_execute(template_id, import_id):
-    import_ = _get_import(template_id, import_id)
-    if not import_.template.has_access(session['username'], True):
-        abort(401)
-
-    f = request.form
-    import_.execute(session['username'], f.get('dummy'), f.get('no_mail'))
-    flash(i18n.import_executed)
-
-    return redirect(
-        url_for('.import_', template_id=template_id, import_id=import_id))
-
-
-@manager.route('/import_execute/<template_id>/<import_id>/run/<run_id>')
-def import_run_detail(template_id, import_id, run_id, raw=0):
-    import_ = _get_import(template_id, import_id)
-
-    try:
-        run = import_.get_run(run_id)
-    except KeyError:
-        abort(404)
-
-    if request.args.get('raw_summary') == '1':
-        response = flask.current_app.make_response(run.summary)
-        response.mimetype = 'text/plain'
-        return response
-
-    if request.args.get('raw_log') == '1':
-        response = flask.current_app.make_response(run.log)
-        response.mimetype = 'text/plain'
-        return response
-
-    return render_template('imports/run.html', import_=import_, run=run)
+import imports

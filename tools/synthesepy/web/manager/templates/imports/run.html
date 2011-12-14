@@ -1,14 +1,4 @@
-{% extends "layout.html" %}
-{% block head %}
-<style>
-.container {
-  width: 95%;
-}
-.span14 {
-  width: 90%;
-}
-</style>
-{% endblock %}
+{% extends "layout_wide.html" %}
 {% block breadcrumb %}
   {{ breadcrumb_entry(url_for('.import_template_list'),
     "Imports") }}
