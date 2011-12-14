@@ -256,8 +256,33 @@ namespace synthese
 			}
 
 			// Search stops around the departure and arrival places using the road network
-			VertexAccessMap ovam(_extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL));
-			VertexAccessMap dvam(_extendToPhysicalStops(_destinationVam, _originVam, ARRIVAL_TO_DEPARTURE));
+			// FIXME: need to handle approcahSpeed = 0 in IntegralSearcher himself
+			VertexAccessMap ovam,dvam;
+			if(_accessParameters.getApproachSpeed() != 0)
+			{
+				ovam = _extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL);
+				dvam = _extendToPhysicalStops(_destinationVam, _originVam, ARRIVAL_TO_DEPARTURE);
+			}
+			else
+			{
+				// FIXME: I need to exclude Roads part of VAM
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, _originVam.getMap())
+				{
+					const Vertex* vertex(itps.first);
+					if(	vertex->getGraphType() == PTModule::GRAPH_ID)
+					{
+						ovam.insert(vertex, itps.second);
+					}
+				}
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, _destinationVam.getMap())
+				{
+					const Vertex* vertex(itps.first);
+					if(	vertex->getGraphType() == PTModule::GRAPH_ID
+					){
+						dvam.insert(vertex, itps.second);
+					}
+				}
+			}
 
 			// Log the result of road approaches calculation
 			if(	_logStream
