@@ -5,3 +5,7 @@ form .mapLink {
   padding-left: 20px;
   background: url(../images/map.png) no-repeat left center;
 }
+
+.placeholder {
+  color: #aaa;
+}

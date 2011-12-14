@@ -15,6 +15,10 @@ jquery.tmpl.beta1.js:
   http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.min.js
   http://ajax.microsoft.com/ajax/jquery.templates/beta1/jquery.tmpl.js
 
+jquery.placeholder.min.js:
+  Version: 1.8.6
+  https://raw.github.com/mathiasbynens/jquery-placeholder/master/jquery.placeholder.min.js
+
 underscore-1.1.6.min.js:
 underscore-1.1.6.js:
   Version: 1.1.6

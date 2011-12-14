@@ -234,28 +234,14 @@ function traiteXmlSuggestions(xmlDoc) {
   return optionsListe;
 }
 
-// insère une règle avec son nom
-function insereCSS(nom,regle) {
-  if (document.styleSheets) {
-    var I = document.styleSheets[0];
-    if (I.addRule) { // méthode IE
-      I.addRule(nom, regle)
-    } else if (I.insertRule) { // méthode DOM
-      I.insertRule(nom + " { " + regle + " }", I.cssRules.length);
-    }
-  }
-}
-
 function initStyle() {
-  var AutoCompleteDivListeStyle = "font-size: 13px; word-wrap: break-word; ";
-  var AutoCompleteDivStyle = "display: block; padding-left: 3; padding-right: 3; height: 16px; overflow: hidden; background-color: white; cursor:pointer; text-align: left; padding-top: 2px; padding-bottom: 2px; ";
-  var AutoCompleteDivActStyle = "background-color: #3366cc; color: white ! important; cursor: pointer; text-align: left; padding-top: 2px; padding-bottom: 2px; ";
-  insereCSS(".AutoCompleteDivListeStyle", AutoCompleteDivListeStyle);
-  insereCSS(".AutoCompleteDiv", AutoCompleteDivStyle);
-  insereCSS(".AutoCompleteDivAct", AutoCompleteDivActStyle);
+  $("<link>").attr({
+    "rel": "stylesheet",
+    "href": requireJSConfig.baseUrl + "routePlanner/css/legacy/autocomplete.css"
+  }).appendTo($("head"));
 }
 
-function setStylePourElement(c,name) {
+function setStyleForElement(c, name) {
   c.className = name;
 }
 
@@ -310,7 +296,7 @@ function creeAutocompletionDiv() {
   _completeDiv.style.position = "absolute";
   _completeDiv.style.backgroundColor = "white";
   document.body.appendChild(_completeDiv);
-  setStylePourElement(_completeDiv, "AutoCompleteDivListeStyle");
+  setStyleForElement(_completeDiv, "autoCompleteDivListeStyle");
 }
 
 var currentList;
@@ -328,7 +314,7 @@ function drawList(i, valeur, liste) {
     nouveauDiv.onmousedown = divOnMouseDown;
     nouveauDiv.onmouseover = divOnMouseOver;
     nouveauDiv.onmouseout = divOnMouseOut;
-    setStylePourElement(nouveauDiv, "AutoCompleteDiv");
+    setStyleForElement(nouveauDiv, "autoCompleteDiv");
     var nouveauSpan = document.createElement("SPAN");
     nouveauSpan.innerHTML = liste[f][0]; // le texte de la suggestion
     nouveauDiv.appendChild(nouveauSpan);
@@ -462,10 +448,10 @@ function highlight(n) {
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
   var suggestionLongueur = suggestionList.length;
   for (var l = 0; l < suggestionLongueur; ++l) {
-    setStylePourElement(suggestionList.item(l), "AutoCompleteDiv");
+    setStyleForElement(suggestionList.item(l), "autoCompleteDiv");
   }
   if (_highlightedSuggestionDiv)
-    setStylePourElement(_highlightedSuggestionDiv, "AutoCompleteDivAct");
+    setStyleForElement(_highlightedSuggestionDiv, "autoCompleteDivAct");
 }
 
 
@@ -592,7 +578,7 @@ function divOnMouseOver() {
 
 // declenchee quand la sourie quitte une div de possiblite. La div repasse a l'etat normal
 function divOnMouseOut() {
-  setStylePourElement(this, "AutoCompleteDiv");
+  setStyleForElement(this, "autoCompleteDiv");
 };
 
 
