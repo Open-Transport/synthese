@@ -74,12 +74,6 @@ namespace synthese
 
 
 
-			~FareType()
-			{
-			}
-
-
-
 			virtual double fareCalculation()
 			{
 				return _accessPrice;
