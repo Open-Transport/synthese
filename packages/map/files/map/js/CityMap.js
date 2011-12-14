@@ -1,6 +1,6 @@
 define([
   "map/js/SyntheseMap",
-  "order!core/vendor/jquery-1.7.min",
+  "order!core/vendor/jquery-1.7.1.min",
   "order!core/vendor/jquery.tmpl.beta1.min"
 ], function(SyntheseMap) {
 

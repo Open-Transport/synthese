@@ -7,7 +7,7 @@ function retour()
   var dct = document.getElementById("destination_city_txt").value;
   var dpt = document.getElementById("destination_place_txt").value;
   document.getElementById("origin_city_txt").value = dct;
-   document.getElementById("origin_place_txt").value = dpt;
+  document.getElementById("origin_place_txt").value = dpt;
   document.getElementById("destination_city_txt").value = oct;
   document.getElementById("destination_place_txt").value = opt;
   document.getElementById("origin_city_txt").form.submit();
@@ -24,9 +24,8 @@ function showJourneyBoard(n)
   curJourneyBoard = n;
   showPopup('jb' + n);
 
-  if (document.getElementById('reservationFormDiv'+n))
-  {
-    document.getElementById('reservationFormDiv'+n).innerHTML = _sessionId
+  if (document.getElementById('reservationFormDiv' + n)) {
+    document.getElementById('reservationFormDiv' + n).innerHTML = _sessionId
       ? getReservationForm()
       : "Vous devez vous identifier pour réserver.<br />" + getHorizontalLoginForm("displayReservationForm","displayReservationLoginError");
     if (document.getElementById('reservationFormPassword'))
@@ -46,9 +45,7 @@ function ajaxResa(text)
   {
     // Reservation failed
     return false;
-  }
-  else
-  {
+  } else {
     return true;
   }
 }
@@ -153,8 +150,7 @@ function mainLoginSuccess()
 
 function displayFavoriteBar()
 {
-  if (_sessionId > 0)
-  {
+  if (_sessionId > 0) {
     var url = "synthese3?fonction=page&page=favorites_row&i=2";
     ajaxFullfill(document.getElementById("favorites"), url);
     document.getElementById("favorites").style.display = 'block';
