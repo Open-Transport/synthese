@@ -1,0 +1,35 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+  <li>Database Tools</li>
+{% endblock %}
+
+{% block body %}
+
+  <form action="{{ url_for('.db_clean_datasource') }}"
+        method=post>
+    <fieldset>
+      <legend>Clean a Datasource</legend>
+      <div class="clearfix">
+        <label for="datasource_id">datasource id</label>
+        <div class="input">
+          <input id="datasource_id" name="datasource_id" type="text">
+        </div>
+      </div>
+      <div class="clearfix">
+        <label for="dummy">Dummy mode</label>
+        <div class="input">
+          <input id="dummy" name="dummy" type="checkbox" checked>
+        </div>
+      </div>
+      <div class="actions">
+        <input type="submit" class="btn primary" value="Go">
+      </div>
+    </fieldset>
+  </form>
+
+  <h2>Datasource clean result:</h2>
+
+  <p>Result here</p>
+
+
+{% endblock %}

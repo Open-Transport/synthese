@@ -84,6 +84,7 @@ DEFAULTS = {
     # Generate with: python -c "import os; print repr(os.urandom(24))"
     'web_secret_key': 'override me!',
     'web_debug': False,
+    'web_admins': set(('root',)),
 
     # remote project management
     'remote_server': None,

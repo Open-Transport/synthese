@@ -179,7 +179,8 @@ class HTTPApi(object):
 
         # TODO: allow non-localhost?
         url = 'http://localhost:%s/synthese' % self.env.config.port
-        log.debug('Calling %s with parameters: %s', url, params)
+        log.debug('Calling %s with parameters: %s\n  url: %s', url, params,
+            '{0}?{1}'.format(url, urllib.urlencode(params)))
 
         if use_get:
             r = requests.get(url, params=params)
