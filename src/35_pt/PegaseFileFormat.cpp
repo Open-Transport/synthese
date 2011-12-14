@@ -478,9 +478,9 @@ namespace synthese
 
 				if(mode == PegaseFileFormat::Importer_::FILTER_MODE1)
 				{
-					// "LR{nnn}"
+					// "LR{nnn}" || "LSR{nnn}"
 
-					if(!starts_with(lineInfo.lineName, "LR"))
+					if(!starts_with(lineInfo.lineName, "LR") && !starts_with(lineInfo.lineName, "LSR"))
 					{
 						lineInfo.ignored = true;
 					}
@@ -489,6 +489,7 @@ namespace synthese
 
 				if(mode == PegaseFileFormat::Importer_::FILTER_MODE2)
 				{
+					// FIXME: unused for now.
 					// "S{digit string}
 
 					if(lineInfo.lineName.length() <= 1 ||
@@ -962,13 +963,14 @@ namespace synthese
 				stream << t.title("Fichier");
 				stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
 				stream << t.title("Paramètres");
-				stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+				stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
+				stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 				stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 				stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 
 				vector<pair<optional<string>, string> > filterModes;
-				filterModes.push_back(make_pair(optional<string>(FILTER_MODE1), "LR{nnn}"));
+				filterModes.push_back(make_pair(optional<string>(FILTER_MODE1), "LR{nnn} || LSR{nnn}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE2), "S{nombre chaine}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE3), "LR-{chaine}-{n} ou SR-{chaine}-{nn}"));
 				filterModes.push_back(make_pair(optional<string>(FILTER_MODE4), "!LR-{chaine}-{n}"));
