@@ -135,6 +135,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_CELL_PAGE;
 			static const std::string PARAMETER_SERVICE_CELL_PAGE;
 			static const std::string PARAMETER_JUNCTION_CELL_PAGE;
+			static const std::string PARAMETER_TICKET_CELL_PAGE;
 			static const std::string PARAMETER_MAP_STOP_PAGE;
 			static const std::string PARAMETER_MAP_SERVICE_PAGE;
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
@@ -144,6 +145,7 @@ namespace synthese
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
+			static const std::string PARAMETER_FARE_CALCULATION;
 
 		private:
 			static const std::string DATA_LINES;
@@ -222,6 +224,10 @@ namespace synthese
 				static const std::string DATA_ARRIVAL_PLACE_LATITUDE;
 				static const std::string DATA_CO2_EMISSIONS;
 				static const std::string DATA_ENERGY_CONSUMPTION;
+				static const std::string DATA_TICKETS;
+					static const std::string DATA_TICKET_NAME;
+					static const std::string DATA_TICKET_PRICE;
+					static const std::string DATA_TICKET_CURRENCY;
 			//@}
 
 			//! @name Cells
@@ -299,6 +305,7 @@ namespace synthese
 				bool _showCoords;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
+				bool _fareCalculation;
 			//@}
 
 			//! @name Pages
@@ -319,6 +326,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _stopCellPage;
 				boost::shared_ptr<const cms::Webpage> _serviceCellPage;
 				boost::shared_ptr<const cms::Webpage> _junctionPage;
+				boost::shared_ptr<const cms::Webpage> _ticketCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapStopCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapServiceCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;

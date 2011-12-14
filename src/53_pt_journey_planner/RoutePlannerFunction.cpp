@@ -66,6 +66,11 @@
 #include "PTModule.h"
 #include "Destination.hpp"
 #include "Junction.hpp"
+#include "Fare.h"
+#include "FareTicket.hpp"
+
+#include "UseRule.h"
+#include "PTUseRule.h"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -120,6 +125,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
+		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION("fc");
 
 		const string RoutePlannerFunction::PARAMETER_PAGE("page");
 		const string RoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
@@ -137,6 +143,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_STOP_CELL_PAGE("stop_cell_page");
 		const string RoutePlannerFunction::PARAMETER_SERVICE_CELL_PAGE("service_cell_page");
 		const string RoutePlannerFunction::PARAMETER_JUNCTION_CELL_PAGE("junction_cell_page");
+		const string RoutePlannerFunction::PARAMETER_TICKET_CELL_PAGE("ticket_cell_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
@@ -217,6 +224,10 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_CONTINUOUS_SERVICE_WAITING("continuous_service_waiting");
 		const string RoutePlannerFunction::DATA_CO2_EMISSIONS("co2_emissions");
 		const string RoutePlannerFunction::DATA_ENERGY_CONSUMPTION("energy_consumption");
+		const string RoutePlannerFunction::DATA_TICKETS("tickets");
+		const string RoutePlannerFunction::DATA_TICKET_NAME("ticket_name");
+		const string RoutePlannerFunction::DATA_TICKET_PRICE("ticket_price");
+		const string RoutePlannerFunction::DATA_TICKET_CURRENCY("ticket_currency");
 
 		// Cells
 		const string RoutePlannerFunction::DATA_ODD_ROW("is_odd_row");
@@ -451,6 +462,9 @@ namespace synthese
 			// Max solutions number
 			_maxSolutionsNumber = map.getOptional<size_t>(PARAMETER_MAX_SOLUTIONS_NUMBER);
 
+			// Fare Calculation
+			_fareCalculation = map.getDefault<bool>(PARAMETER_FARE_CALCULATION,false);
+
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
 			_accessParameters = site->getAccessParameters(
@@ -679,6 +693,18 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such junction cell page : "+ e.getMessage());
+			}
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TICKET_CELL_PAGE));
+				if(id)
+				{
+					_ticketCellPage = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such ticket cell page : "+ e.getMessage());
 			}
 			try
 			{
@@ -2329,6 +2355,87 @@ namespace synthese
 			}
 			pm.insert(DATA_CO2_EMISSIONS, co2Emissions);
 			pm.insert(DATA_ENERGY_CONSUMPTION, energyConsumption);
+
+			// Fare calculation
+			if((_fareCalculation) && (_ticketCellPage.get()))
+			{
+				typedef pair<vector<FareTicket>,double> Solution;
+				typedef vector<Solution> Solutions;
+				Solutions solutions;
+				Solution firstSolution;
+				firstSolution.second = 0;
+				solutions.push_back(firstSolution);
+
+				const ServicePointer* lastService = NULL;
+
+				BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
+				{
+					const UseRule& useRule = su.getService()->getUseRule(_accessParameters.getUserClassRank());
+					if(!dynamic_cast<const PTUseRule*>(&useRule))
+					{
+						lastService = &su;
+						continue;
+					}
+					const PTUseRule* ptUseRule = dynamic_cast<const PTUseRule*>(&useRule);
+
+					BOOST_FOREACH(Solutions::value_type& solution, solutions)
+					{
+						// TODO for each Fare of this service
+						const Fare* fare = ptUseRule->getDefaultFare();
+						if(fare == NULL)
+						{
+							continue;
+						}
+
+						bool ticketAvailable = false;
+						// test if an old ticket is available
+						BOOST_FOREACH(FareTicket& ticket, solution.first)
+						{
+							if((ticket.getFare() == NULL) || (ticket.getFare() != fare))
+								continue;
+
+							if(ticket.isAvailable(&su,lastService))
+							{
+								ticketAvailable = true;
+								ticket.useService(&su);
+							}
+						}
+						// if there is no ticket available, add new one
+						if(!ticketAvailable)
+						{
+							FareTicket ticket(&su,fare);
+
+							solution.first.push_back(ticket);
+							solution.second += ticket.getPrice();
+						}
+					}
+					lastService = &su;
+				}
+
+				// Select the best solution according to the total price
+				vector<FareTicket> ticketsList;
+				double minPrice = std::numeric_limits<int>::max();
+				BOOST_FOREACH(Solutions::value_type& solution, solutions)
+				{
+					if(solution.second < minPrice)
+					{
+						ticketsList = solution.first;
+						minPrice = solution.second;
+					}
+				}
+				stringstream sTickets;
+				BOOST_FOREACH(const FareTicket& ticket, ticketsList)
+				{
+					ParametersMap pmTicket(getTemplateParameters());
+					pmTicket.insert(DATA_TICKET_PRICE, ticket.getPrice());
+					pmTicket.insert(DATA_TICKET_NAME, ticket.getFare() ? ticket.getFare()->getName() : string());
+					pmTicket.insert(DATA_TICKET_CURRENCY, ticket.getFare() ? ticket.getFare()->getCurrency() : string());
+					_ticketCellPage->display(sTickets, request, pmTicket);
+				}
+				pm.insert(DATA_TICKETS, sTickets.str());
+				ticketsList.clear();
+				solutions.clear();
+			}
 
 			// Departure time
 			{
