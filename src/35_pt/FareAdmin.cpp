@@ -128,7 +128,7 @@ namespace synthese
 									FareUpdateAction::PARAMETER_PERMITTED_CONNECTIONS_NUMBER,
 									_fare->getPermittedConnectionsNumber() ? lexical_cast<string>(*_fare->getPermittedConnectionsNumber()) : string()
 								));
-				stream << t.cell("Continuité obligatoire", t.getForm().getOuiNonRadioInput(FareUpdateAction::PARAMETER_REQUIRED_CONTINUITY, _fare->getRequiredContinuity()));
+				stream << t.cell("Continuité obligatoire", t.getForm().getOuiNonRadioInput(FareUpdateAction::PARAMETER_REQUIRED_CONTINUITY, _fare->isRequiredContinuity()));
 				stream << t.cell("Durée de validité (en minutes)", t.getForm().getTextInput(FareUpdateAction::PARAMETER_VALIDITY_PERIOD, lexical_cast<string>(_fare->getValidityPeriod())));
 
 				// Specific properties

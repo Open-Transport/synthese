@@ -26,9 +26,12 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "FareType.hpp"
+#include "ServicePointer.h"
 
 #include <string>
+#include <vector>
 #include <boost/optional/optional.hpp>
+#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
@@ -41,7 +44,6 @@ namespace synthese
 		:	public virtual util::Registrable
 		{
 		 public:
-
 			/// Chosen registry class.
 			typedef util::Registry<Fare>	Registry;
 
@@ -51,14 +53,28 @@ namespace synthese
 			boost::shared_ptr<FareType> _type; //!< Fare type
 			std::string _currency; //!< Fare currency
 			boost::optional<int> _permittedConnectionsNumber; //!< Number of permitted connections
-			bool _requiredContinuity;
+			bool _requiredContinuity; //!< continuity requirement
 			int _validityPeriod; //!< Maximal validity period (minutes)
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor.
+			/// @param key id of the object (optional)
+			/// @author Gaël Sauvanet
+			/// @date 2011
 			Fare(
 				util::RegistryKeyType key = 0
 			);
-			~Fare ();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Set the FareType according to the corresponding FareType number
+			/// @param number the number of the FareType
+			/// @author Gaël Sauvanet
+			/// @date 2011
+			void setTypeNumber(FareType::FareTypeNumber number);
+
 
 
 			//! @name Getters
@@ -67,14 +83,13 @@ namespace synthese
 				const boost::shared_ptr<FareType> getType() const { return _type; }
 				const std::string& getCurrency() const { return _currency; }
 				const boost::optional<int> getPermittedConnectionsNumber() const { return _permittedConnectionsNumber; }
-				bool getRequiredContinuity() const { return _requiredContinuity; }
+				bool isRequiredContinuity() const { return _requiredContinuity; }
 				int getValidityPeriod() const { return _validityPeriod; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setName(const std::string& name) { _name = name; }
-				void setTypeNumber(FareType::FareTypeNumber number);
 				void setCurrency(const std::string& currency) { _currency = currency; }
 				void setPermittedConnectionsNumber(const boost::optional<int> permittedConnectionsNumber) { _permittedConnectionsNumber = permittedConnectionsNumber; }
 				void setRequiredContinuity(const bool requiredContinuity) { _requiredContinuity = requiredContinuity; }

@@ -56,7 +56,6 @@ namespace synthese
 		FareType::TypesList FareType::GetTypesList()
 		{
 			TypesList result;
-//			result.push_back(make_pair(FARE_TYPE_FREE, GetTypeName(FARE_TYPE_FREE)));
 //			result.push_back(make_pair(FARE_TYPE_SECTION, GetTypeName(FARE_TYPE_SECTION)));
 			result.push_back(make_pair(FARE_TYPE_DISTANCE, GetTypeName(FARE_TYPE_DISTANCE)));
 //			result.push_back(make_pair(FARE_TYPE_ZONAL, GetTypeName(FARE_TYPE_ZONAL)));
