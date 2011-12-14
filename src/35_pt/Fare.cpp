@@ -48,12 +48,6 @@ namespace synthese
 
 
 
-		Fare::~Fare()
-		{
-		}
-
-
-
 		void Fare::setTypeNumber(FareType::FareTypeNumber number)
 		{
 			switch(number)

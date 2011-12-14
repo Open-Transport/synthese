@@ -131,7 +131,7 @@ namespace synthese
 				query.addField(*object->getPermittedConnectionsNumber());
 			else
 				query.addFieldNull();
-			query.addField(object->getRequiredContinuity());
+			query.addField(object->isRequiredContinuity());
 			query.addField(object->getValidityPeriod());
 
 			if(object->getType())

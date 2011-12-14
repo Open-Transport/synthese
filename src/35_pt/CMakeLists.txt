@@ -63,6 +63,8 @@ FaresAdmin.cpp
 FaresAdmin.h
 FareTableSync.cpp
 FareTableSync.h
+FareTicket.cpp
+FareTicket.hpp
 FareType.cpp
 FareType.hpp
 FareTypeDistance.cpp
