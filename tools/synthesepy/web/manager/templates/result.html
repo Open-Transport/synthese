@@ -1,0 +1,14 @@
+{% extends "layout_wide.html" %}
+
+{% block breadcrumb %}
+  <li>{{ title }}</li>
+{% endblock %}
+
+{% block body %}
+  <h1>{{ title }}</h1>
+
+<pre>
+{{ output }}
+</pre>
+
+{% endblock %}

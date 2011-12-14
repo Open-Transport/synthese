@@ -28,6 +28,7 @@ from os.path import join
 import socket
 import time
 import traceback
+import urllib
 
 import requests
 
@@ -271,8 +272,9 @@ class ImportRun(object):
             log.debug('Import HTTP body, %r', res.content) 
         self._process_import_log(res.content)
 
-        synthese_call = 'URL: {0}, params: {1}'.format(
-            res.request.url, res.request.data)
+        synthese_call = 'URL: {0}, params: {1} url: {2}'.format(
+            res.request.url, res.request.data, '{0}?{1}'.format(
+                res.request.url, urllib.urlencode(res.request.data)))
         self.synthese_calls.append(synthese_call)
 
         if self._log is None:
