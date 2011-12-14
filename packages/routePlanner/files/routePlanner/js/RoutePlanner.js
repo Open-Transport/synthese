@@ -1,7 +1,13 @@
 define([
   "core/js/Synthese",
-  "core/js/backbone"
-], function(Synthese) {
+  "core/js/backbone",
+  "order!core/vendor/jquery-1.7.1.min",
+  "order!core/vendor/jquery.placeholder.min"
+], function(Synthese, __Backbone, __$) {
+
+$(function() {
+  $('input, textarea').placeholder();
+});
 
 // XXX rename to RoutePlannerFormView in order to have other objects not related to the form?
 var RoutePlannerView = Backbone.View.extend({
