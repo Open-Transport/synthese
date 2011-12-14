@@ -46,7 +46,7 @@ function addTextInputAutoComplete(params){
             + "t: request.term";
             if(params.extraParamName.length > 0) {
               jscode = jscode + ", " + params.extraParamName + ": ";
-			  if(params.extraParamDivId.length > 0) jscode = jscode + "$('#" + params.extraParamDivId + "__ID').val()";
+			  if(params.extraParamInputName.length > 0) jscode = jscode + "$('input[type=text][name="+params.extraParamInputName+"]').val()";
 			  else jscode = jscode + "''";
 			}
             if(params.service == "lr")
