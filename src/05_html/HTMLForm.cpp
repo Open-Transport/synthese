@@ -167,7 +167,45 @@ namespace synthese
 			const std::string& valueName,
 			const std::string& tableId,
 			const std::string& extraParamName,
-			const std::string& extraParamDivId,
+			const std::string& extraParamInputName,
+			bool bottomButton,
+			bool idButton,
+			bool useId,
+			bool viewId,
+			std::string displayTextBeforeTyping,
+			string className
+		){
+			stringstream s;
+
+			removeHiddenFieldIfExists(name, (useId ? valueId : valueName));
+
+			std::string fieldId = _getFieldId(name);
+
+			return GetTextInputAutoCompleteFromTableSync(
+				name,
+				valueId,
+				valueName,
+				tableId,
+				extraParamName,
+				extraParamInputName,
+				bottomButton,
+				idButton,
+				useId,
+				viewId,
+				displayTextBeforeTyping,
+				fieldId,
+				className);
+		}
+
+
+
+		std::string HTMLForm::GetTextInputAutoCompleteFromTableSync(
+			const std::string& name,
+			const std::string& valueId,
+			const std::string& valueName,
+			const std::string& tableId,
+			const std::string& extraParamName,
+			const std::string& extraParamInputName,
 			bool bottomButton,
 			bool idButton,
 			bool useId,
@@ -189,7 +227,7 @@ namespace synthese
 					<< "rows:'rows',"
 					<< "row:'row',"
 					<< "extraParamName:'" << extraParamName << "',"
-					<< "extraParamDivId:'" << extraParamDivId << "',"
+					<< "extraParamInputName:'" << extraParamInputName << "',"
 					<< "bottomButton:" << bottomButton << ","
 					<< "idButton:" << idButton << ","
 					<< "useId:" << useId << ","
@@ -213,7 +251,49 @@ namespace synthese
 			const std::string& rows,
 			const std::string& row,
 			const std::string& extraParamName,
-			const std::string& extraParamDivId,
+			const std::string& extraParamInputName,
+			bool bottomButton,
+			bool idButton,
+			bool useId,
+			bool viewId,
+			std::string displayTextBeforeTyping,
+			std::string className
+		){
+			stringstream s;
+
+			removeHiddenFieldIfExists(name, (useId ? valueId : valueName));
+
+			std::string fieldId = _getFieldId(name);
+
+			return GetTextInputAutoCompleteFromService(
+				name,
+				valueId,
+				valueName,
+				service,
+				rows,
+				row,
+				extraParamName,
+				extraParamInputName,
+				bottomButton,
+				idButton,
+				useId,
+				viewId,
+				displayTextBeforeTyping,
+				fieldId,
+				className);
+		}
+
+
+
+		std::string HTMLForm::GetTextInputAutoCompleteFromService(
+			const std::string& name,
+			const std::string& valueId,
+			const std::string& valueName,
+			const std::string& service,
+			const std::string& rows,
+			const std::string& row,
+			const std::string& extraParamName,
+			const std::string& extraParamInputName,
 			bool bottomButton,
 			bool idButton,
 			bool useId,
@@ -235,7 +315,7 @@ namespace synthese
 					<< "rows:'" << rows  << "',"
 					<< "row:'" << row  << "',"
 					<< "extraParamName:'" << extraParamName << "',"
-					<< "extraParamDivId:'" << extraParamDivId << "',"
+					<< "extraParamInputName:'" << extraParamInputName << "',"
 					<< "bottomButton:" << bottomButton << ","
 					<< "idButton:" << idButton << ","
 					<< "useId:" << useId << ","

@@ -303,7 +303,7 @@ namespace synthese
 			AdminFunctionRequest<ReservationRoutePlannerAdmin> searchRequest(_request);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
-			stream << st.cell("Commune départ", html::HTMLForm::getTextInputAutoCompleteFromService(
+			stream << st.cell("Commune départ", st.getForm().getTextInputAutoCompleteFromService(
 						PARAMETER_START_CITY,
 						startPlace ?
 						lexical_cast<string>(dynamic_cast<City*>(startPlace.get()) ? dynamic_cast<City*>(startPlace.get())->getKey() : dynamic_cast<NamedPlace*>(startPlace.get())->getCity()->getKey()) :
@@ -317,7 +317,7 @@ namespace synthese
 						string(),string(),
 						false, false, false
 				)	);
-			stream << st.cell("Arrêt départ", html::HTMLForm::getTextInputAutoCompleteFromService(
+			stream << st.cell("Arrêt départ", st.getForm().getTextInputAutoCompleteFromService(
 						PARAMETER_START_PLACE,
 						startPlace ?
 						(dynamic_cast<City*>(startPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(startPlace.get())->getKey())) :
@@ -331,7 +331,7 @@ namespace synthese
 						"ct",PARAMETER_START_CITY,
 						false, false, false
 				)	);
-			stream << st.cell("Commune arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
+			stream << st.cell("Commune arrivée", st.getForm().getTextInputAutoCompleteFromService(
 						PARAMETER_END_CITY,
 						endPlace ?
 						lexical_cast<string>(dynamic_cast<City*>(endPlace.get()) ? dynamic_cast<City*>(endPlace.get())->getKey() : dynamic_cast<NamedPlace*>(endPlace.get())->getCity()->getKey()) :
@@ -345,7 +345,7 @@ namespace synthese
 						string(),string(),
 						false, false, false
 				)	);
-			stream << st.cell("Arrêt arrivée", html::HTMLForm::getTextInputAutoCompleteFromService(
+			stream << st.cell("Arrêt arrivée", st.getForm().getTextInputAutoCompleteFromService(
 						PARAMETER_END_PLACE,
 						endPlace ?
 						(dynamic_cast<City*>(endPlace.get()) ? string() : lexical_cast<string>(dynamic_cast<NamedPlace*>(endPlace.get())->getKey())) :
