@@ -240,7 +240,7 @@ namespace synthese
 			// Record 5 : Main calendar
 			_loadNextRecord(5);
 			set<string> missingCalendars;
-			string mainCalendarCode(_getTextField(9, 4));
+			string mainCalendarCode(_getTextField(4, 9));
 			CalendarTemplate* mainCalendar(
 				CalendarFileFormat::GetCalendarTemplate(
 					calendars,
@@ -507,7 +507,7 @@ namespace synthese
 						service.calendar,
 						os
 				)	);
-				if(calendar)
+				if(calendar && !mainMask.empty())
 				{
 					*sservice |= calendar->getResult(mainMask);
 				}
