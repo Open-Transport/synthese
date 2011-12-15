@@ -32,7 +32,6 @@
 #define sqlite3_mprintf SPLite3_mprintf
 #define sqlite3_vmprintf SPLite3_vmprintf
 #define sqlite3_snprintf SPLite3_snprintf
-#define sqlite3_vsnprintf SPLite3_vsnprintf
 #define sqlite3_malloc SPLite3_malloc
 #define sqlite3_realloc SPLite3_realloc
 #define sqlite3_free SPLite3_free
@@ -55,7 +54,6 @@
 #define sqlite3_prepare16 SPLite3_prepare16
 #define sqlite3_prepare16_v2 SPLite3_prepare16_v2
 #define sqlite3_sql SPLite3_sql
-#define sqlite3_stmt_readonly SPLite3_stmt_readonly
 #define sqlite3_bind_blob SPLite3_bind_blob
 #define sqlite3_bind_double SPLite3_bind_double
 #define sqlite3_bind_int SPLite3_bind_int
@@ -221,7 +219,6 @@
 #define sqlite3_sort_count SPLite3_sort_count
 #define sqlite3_max_blobsize SPLite3_max_blobsize
 #define sqlite3_found_count SPLite3_found_count
-#define sqlite3_blob_reopen SPLite3_blob_reopen
 #define sqlite3_like_count SPLite3_like_count
 #define sqlite3_xferopt_count SPLite3_xferopt_count
 #define sqlite3_profile SPLite3_profile
@@ -339,9 +336,9 @@ extern "C" {
 ** [sqlite3_libversion_number()], [sqlite3_sourceid()],
 ** [sqlite_version()] and [sqlite_source_id()].
 */
-#define SQLITE_VERSION        "3.7.5"
-#define SQLITE_VERSION_NUMBER 3007005
-#define SQLITE_SOURCE_ID      "2011-01-28 17:03:50 ed759d5a9edb3bba5f48f243df47be29e3fe8cd7"
+#define SQLITE_VERSION        "3.7.3"
+#define SQLITE_VERSION_NUMBER 3007003
+#define SQLITE_SOURCE_ID      "2010-10-08 02:34:02 2677848087c9c090efb17c1893e77d6136a9111d"
 
 /*
 ** CAPI3REF: Run-Time Library Version Numbers
@@ -622,7 +619,7 @@ SQLITE_API int sqlite3_exec(
 #define SQLITE_INTERRUPT    9   /* Operation terminated by sqlite3_interrupt()*/
 #define SQLITE_IOERR       10   /* Some kind of disk I/O error occurred */
 #define SQLITE_CORRUPT     11   /* The database disk image is malformed */
-#define SQLITE_NOTFOUND    12   /* Unknown opcode in sqlite3_file_control() */
+#define SQLITE_NOTFOUND    12   /* NOT USED. Table or record not found */
 #define SQLITE_FULL        13   /* Insertion failed because database is full */
 #define SQLITE_CANTOPEN    14   /* Unable to open the database file */
 #define SQLITE_PROTOCOL    15   /* Database lock protocol error */
@@ -774,18 +771,6 @@ SQLITE_API int sqlite3_exec(
 ** equal SQLITE_SYNC_NORMAL, that means to use normal fsync() semantics.
 ** If the lower four bits equal SQLITE_SYNC_FULL, that means
 ** to use Mac OS X style fullsync instead of fsync().
-**
-** Do not confuse the SQLITE_SYNC_NORMAL and SQLITE_SYNC_FULL flags
-** with the [PRAGMA synchronous]=NORMAL and [PRAGMA synchronous]=FULL
-** settings.  The [synchronous pragma] determines when calls to the
-** xSync VFS method occur and applies uniformly across all platforms.
-** The SQLITE_SYNC_NORMAL and SQLITE_SYNC_FULL flags determine how
-** energetic or rigorous or forceful the sync operations are and
-** only make a difference on Mac OSX for the default SQLite code.
-** (Third-party VFS implementations might also make the distinction
-** between SQLITE_SYNC_NORMAL and SQLITE_SYNC_FULL, but among the
-** operating systems natively supported by SQLite, only Mac OSX
-** cares about the difference.)
 */
 #define SQLITE_SYNC_NORMAL        0x00002
 #define SQLITE_SYNC_FULL          0x00003
@@ -854,9 +839,7 @@ struct sqlite3_file {
 ** core reserves all opcodes less than 100 for its own use.
 ** A [SQLITE_FCNTL_LOCKSTATE | list of opcodes] less than 100 is available.
 ** Applications that define a custom xFileControl method should use opcodes
-** greater than 100 to avoid conflicts.  VFS implementations should
-** return [SQLITE_NOTFOUND] for file control opcodes that they do not
-** recognize.
+** greater than 100 to avoid conflicts.
 **
 ** The xSectorSize() method returns the sector size of the
 ** device that underlies the file.  The sector size is the
@@ -949,21 +932,6 @@ struct sqlite3_io_methods {
 ** for the nominated database. Allocating database file space in large
 ** chunks (say 1MB at a time), may reduce file-system fragmentation and
 ** improve performance on some systems.
-**
-** The [SQLITE_FCNTL_FILE_POINTER] opcode is used to obtain a pointer
-** to the [sqlite3_file] object associated with a particular database
-** connection.  See the [sqlite3_file_control()] documentation for
-** additional information.
-**
-** ^(The [SQLITE_FCNTL_SYNC_OMITTED] opcode is generated internally by
-** SQLite and sent to all VFSes in place of a call to the xSync method
-** when the database connection has [PRAGMA synchronous] set to OFF.)^
-** Some specialized VFSes need this signal in order to operate correctly
-** when [PRAGMA synchronous | PRAGMA synchronous=OFF] is set, but most 
-** VFSes do not need this signal and should silently ignore this opcode.
-** Applications should not call [sqlite3_file_control()] with this
-** opcode as doing so may disrupt the operation of the specilized VFSes
-** that do require it.  
 */
 #define SQLITE_FCNTL_LOCKSTATE        1
 #define SQLITE_GET_LOCKPROXYFILE      2
@@ -971,9 +939,6 @@ struct sqlite3_io_methods {
 #define SQLITE_LAST_ERRNO             4
 #define SQLITE_FCNTL_SIZE_HINT        5
 #define SQLITE_FCNTL_CHUNK_SIZE       6
-#define SQLITE_FCNTL_FILE_POINTER     7
-#define SQLITE_FCNTL_SYNC_OMITTED     8
-
 
 /*
 ** CAPI3REF: Mutex Handle
@@ -2092,7 +2057,7 @@ SQLITE_API void sqlite3_free_table(char **result);
 ** NULL pointer if [sqlite3_malloc()] is unable to allocate enough
 ** memory to hold the resulting string.
 **
-** ^(The sqlite3_snprintf() routine is similar to "snprintf()" from
+** ^(In sqlite3_snprintf() routine is similar to "snprintf()" from
 ** the standard C library.  The result is written into the
 ** buffer supplied as the second parameter whose size is given by
 ** the first parameter. Note that the order of the
@@ -2110,8 +2075,6 @@ SQLITE_API void sqlite3_free_table(char **result);
 ** parameter "n" is the total size of the buffer, including space for
 ** the zero terminator.  So the longest string that can be completely
 ** written will be n-1 characters.
-**
-** ^The sqlite3_vsnprintf() routine is a varargs version of sqlite3_snprintf().
 **
 ** These routines all implement some additional formatting
 ** options that are useful for constructing SQL statements.
@@ -2176,7 +2139,6 @@ SQLITE_API void sqlite3_free_table(char **result);
 SQLITE_API char *sqlite3_mprintf(const char*,...);
 SQLITE_API char *sqlite3_vmprintf(const char*, va_list);
 SQLITE_API char *sqlite3_snprintf(int,char*,const char*, ...);
-SQLITE_API char *sqlite3_vsnprintf(int,char*,const char*, va_list);
 
 /*
 ** CAPI3REF: Memory Allocation Subsystem
@@ -2554,7 +2516,7 @@ SQLITE_API void sqlite3_progress_handler(sqlite3*, int, int(*)(void*), void*);
 ** case the database must already exist, otherwise an error is returned.</dd>)^
 **
 ** ^(<dt>[SQLITE_OPEN_READWRITE] | [SQLITE_OPEN_CREATE]</dt>
-** <dd>The database is opened for reading and writing, and is created if
+** <dd>The database is opened for reading and writing, and is creates it if
 ** it does not already exist. This is the behavior that is always used for
 ** sqlite3_open() and sqlite3_open16().</dd>)^
 ** </dl>
@@ -2901,37 +2863,6 @@ SQLITE_API int sqlite3_prepare16_v2(
 SQLITE_API const char *sqlite3_sql(sqlite3_stmt *pStmt);
 
 /*
-** CAPI3REF: Determine If An SQL Statement Writes The Database
-**
-** ^The sqlite3_stmt_readonly(X) interface returns true (non-zero) if 
-** and only if the [prepared statement] X makes no direct changes to
-** the content of the database file.
-**
-** Note that [application-defined SQL functions] or
-** [virtual tables] might change the database indirectly as a side effect.  
-** ^(For example, if an application defines a function "eval()" that 
-** calls [sqlite3_exec()], then the following SQL statement would
-** change the database file through side-effects:
-**
-** <blockquote><pre>
-**    SELECT eval('DELETE FROM t1') FROM t2;
-** </pre></blockquote>
-**
-** But because the [SELECT] statement does not change the database file
-** directly, sqlite3_stmt_readonly() would still return true.)^
-**
-** ^Transaction control statements such as [BEGIN], [COMMIT], [ROLLBACK],
-** [SAVEPOINT], and [RELEASE] cause sqlite3_stmt_readonly() to return true,
-** since the statements themselves do not actually modify the database but
-** rather they control the timing of when other statements modify the 
-** database.  ^The [ATTACH] and [DETACH] statements also cause
-** sqlite3_stmt_readonly() to return true since, while those statements
-** change the configuration of a database connection, they do not make 
-** changes to the content of the database files on disk.
-*/
-SQLITE_API int sqlite3_stmt_readonly(sqlite3_stmt *pStmt);
-
-/*
 ** CAPI3REF: Dynamically Typed Value Object
 ** KEYWORDS: {protected sqlite3_value} {unprotected sqlite3_value}
 **
@@ -3030,10 +2961,7 @@ typedef struct sqlite3_context sqlite3_context;
 **
 ** ^The fifth argument to sqlite3_bind_blob(), sqlite3_bind_text(), and
 ** sqlite3_bind_text16() is a destructor used to dispose of the BLOB or
-** string after SQLite has finished with it.  ^The destructor is called
-** to dispose of the BLOB or string even if the call to sqlite3_bind_blob(),
-** sqlite3_bind_text(), or sqlite3_bind_text16() fails.  
-** ^If the fifth argument is
+** string after SQLite has finished with it. ^If the fifth argument is
 ** the special value [SQLITE_STATIC], then SQLite assumes that the
 ** information is in static, unmanaged space and does not need to be freed.
 ** ^If the fifth argument has the value [SQLITE_TRANSIENT], then
@@ -3321,17 +3249,13 @@ SQLITE_API const void *sqlite3_column_decltype16(sqlite3_stmt*,int);
 ** be the case that the same database connection is being used by two or
 ** more threads at the same moment in time.
 **
-** For all versions of SQLite up to and including 3.6.23.1, a call to
-** [sqlite3_reset()] was required after sqlite3_step() returned anything
-** other than [SQLITE_ROW] before any subsequent invocation of
-** sqlite3_step().  Failure to reset the prepared statement using 
-** [sqlite3_reset()] would result in an [SQLITE_MISUSE] return from
-** sqlite3_step().  But after version 3.6.23.1, sqlite3_step() began
-** calling [sqlite3_reset()] automatically in this circumstance rather
-** than returning [SQLITE_MISUSE].  This is not considered a compatibility
-** break because any application that ever receives an SQLITE_MISUSE error
-** is broken by definition.  The [SQLITE_OMIT_AUTORESET] compile-time option
-** can be used to restore the legacy behavior.
+** For all versions of SQLite up to and including 3.6.23.1, it was required
+** after sqlite3_step() returned anything other than [SQLITE_ROW] that
+** [sqlite3_reset()] be called before any subsequent invocation of
+** sqlite3_step().  Failure to invoke [sqlite3_reset()] in this way would
+** result in an [SQLITE_MISUSE] return from sqlite3_step().  But after
+** version 3.6.23.1, sqlite3_step() began calling [sqlite3_reset()] 
+** automatically in this circumstance rather than returning [SQLITE_MISUSE].  
 **
 ** <b>Goofy Interface Alert:</b> In the legacy interface, the sqlite3_step()
 ** API always returns a generic error code, [SQLITE_ERROR], following any
@@ -3668,7 +3592,7 @@ SQLITE_API int sqlite3_reset(sqlite3_stmt *pStmt);
 ** ^(The fifth parameter is an arbitrary pointer.  The implementation of the
 ** function can gain access to this pointer using [sqlite3_user_data()].)^
 **
-** ^The sixth, seventh and eighth parameters, xFunc, xStep and xFinal, are
+** ^The seventh, eighth and ninth parameters, xFunc, xStep and xFinal, are
 ** pointers to C-language functions that implement the SQL function or
 ** aggregate. ^A scalar SQL function requires an implementation of the xFunc
 ** callback only; NULL pointers must be passed as the xStep and xFinal
@@ -3677,15 +3601,12 @@ SQLITE_API int sqlite3_reset(sqlite3_stmt *pStmt);
 ** SQL function or aggregate, pass NULL poiners for all three function
 ** callbacks.
 **
-** ^(If the ninth parameter to sqlite3_create_function_v2() is not NULL,
-** then it is destructor for the application data pointer. 
-** The destructor is invoked when the function is deleted, either by being
-** overloaded or when the database connection closes.)^
-** ^The destructor is also invoked if the call to
-** sqlite3_create_function_v2() fails.
-** ^When the destructor callback of the tenth parameter is invoked, it
-** is passed a single argument which is a copy of the application data 
-** pointer which was the fifth parameter to sqlite3_create_function_v2().
+** ^If the tenth parameter to sqlite3_create_function_v2() is not NULL,
+** then it is invoked when the function is deleted, either by being
+** overloaded or when the database connection closes.
+** ^When the destructure callback of the tenth parameter is invoked, it
+** is passed a single argument which is a copy of the pointer which was
+** the fifth parameter to sqlite3_create_function_v2().
 **
 ** ^It is permitted to register multiple implementations of the same
 ** functions with the same name but with either differing numbers of
@@ -3781,7 +3702,7 @@ SQLITE_API SQLITE_DEPRECATED int sqlite3_memory_alarm(void(*)(void*,sqlite3_int6
 ** The xFunc (for scalar functions) or xStep (for aggregates) parameters
 ** to [sqlite3_create_function()] and [sqlite3_create_function16()]
 ** define callbacks that implement the SQL functions and aggregates.
-** The 3rd parameter to these callbacks is an array of pointers to
+** The 4th parameter to these callbacks is an array of pointers to
 ** [protected sqlite3_value] objects.  There is one [sqlite3_value] object for
 ** each parameter to the SQL function.  These routines are used to
 ** extract values from the [sqlite3_value] objects.
@@ -4148,15 +4069,6 @@ SQLITE_API void sqlite3_result_zeroblob(sqlite3_context*, int n);
 ** ^Collating functions are deleted when they are overridden by later
 ** calls to the collation creation functions or when the
 ** [database connection] is closed using [sqlite3_close()].
-**
-** ^The xDestroy callback is <u>not</u> called if the 
-** sqlite3_create_collation_v2() function fails.  Applications that invoke
-** sqlite3_create_collation_v2() with a non-NULL xDestroy argument should 
-** check the return code and dispose of the application data pointer
-** themselves rather than expecting SQLite to deal with it for them.
-** This is different from every other SQLite interface.  The inconsistency 
-** is unfortunate but cannot be changed without breaking backwards 
-** compatibility.
 **
 ** See also:  [sqlite3_collation_needed()] and [sqlite3_collation_needed16()].
 */
@@ -4912,9 +4824,7 @@ struct sqlite3_index_info {
 ** ^The sqlite3_create_module_v2() interface has a fifth parameter which
 ** is a pointer to a destructor for the pClientData.  ^SQLite will
 ** invoke the destructor function (if it is not NULL) when SQLite
-** no longer needs the pClientData pointer.  ^The destructor will also
-** be invoked if the call to sqlite3_create_module_v2() fails.
-** ^The sqlite3_create_module()
+** no longer needs the pClientData pointer.  ^The sqlite3_create_module()
 ** interface is equivalent to sqlite3_create_module_v2() with a NULL
 ** destructor.
 */
@@ -5096,30 +5006,6 @@ SQLITE_API int sqlite3_blob_open(
   int flags,
   sqlite3_blob **ppBlob
 );
-
-/*
-** CAPI3REF: Move a BLOB Handle to a New Row
-**
-** ^This function is used to move an existing blob handle so that it points
-** to a different row of the same database table. ^The new row is identified
-** by the rowid value passed as the second argument. Only the row can be
-** changed. ^The database, table and column on which the blob handle is open
-** remain the same. Moving an existing blob handle to a new row can be
-** faster than closing the existing handle and opening a new one.
-**
-** ^(The new row must meet the same criteria as for [sqlite3_blob_open()] -
-** it must exist and there must be either a blob or text value stored in
-** the nominated column.)^ ^If the new row is not present in the table, or if
-** it does not contain a blob or text value, or if another error occurs, an
-** SQLite error code is returned and the blob handle is considered aborted.
-** ^All subsequent calls to [sqlite3_blob_read()], [sqlite3_blob_write()] or
-** [sqlite3_blob_reopen()] on an aborted blob handle immediately return
-** SQLITE_ABORT. ^Calling [sqlite3_blob_bytes()] on an aborted blob handle
-** always returns zero.
-**
-** ^This function sets the database handle error code and message.
-*/
-SQLITE_API SQLITE_EXPERIMENTAL int sqlite3_blob_reopen(sqlite3_blob *, sqlite3_int64);
 
 /*
 ** CAPI3REF: Close A BLOB Handle
@@ -5509,8 +5395,7 @@ SQLITE_API int sqlite3_mutex_notheld(sqlite3_mutex*);
 #define SQLITE_MUTEX_STATIC_OPEN      4  /* sqlite3BtreeOpen() */
 #define SQLITE_MUTEX_STATIC_PRNG      5  /* sqlite3_random() */
 #define SQLITE_MUTEX_STATIC_LRU       6  /* lru page list */
-#define SQLITE_MUTEX_STATIC_LRU2      7  /* NOT USED */
-#define SQLITE_MUTEX_STATIC_PMEM      7  /* sqlite3PageMalloc() */
+#define SQLITE_MUTEX_STATIC_LRU2      7  /* lru page list */
 
 /*
 ** CAPI3REF: Retrieve the mutex for a database connection
@@ -5529,7 +5414,7 @@ SQLITE_API sqlite3_mutex *sqlite3_db_mutex(sqlite3*);
 ** ^The [sqlite3_file_control()] interface makes a direct call to the
 ** xFileControl method for the [sqlite3_io_methods] object associated
 ** with a particular database identified by the second argument. ^The
-** name of the database is "main" for the main database or "temp" for the
+** name of the database "main" for the main database or "temp" for the
 ** TEMP database, or the name that appears after the AS keyword for
 ** databases that are added using the [ATTACH] SQL command.
 ** ^A NULL pointer can be used in place of "main" to refer to the
@@ -5538,12 +5423,6 @@ SQLITE_API sqlite3_mutex *sqlite3_db_mutex(sqlite3*);
 ** are passed directly through to the second and third parameters of
 ** the xFileControl method.  ^The return value of the xFileControl
 ** method becomes the return value of this routine.
-**
-** ^The SQLITE_FCNTL_FILE_POINTER value for the op parameter causes
-** a pointer to the underlying [sqlite3_file] object to be written into
-** the space pointed to by the 4th parameter.  ^The SQLITE_FCNTL_FILE_POINTER
-** case is a short-circuit path which does not actually invoke the
-** underlying sqlite3_io_methods.xFileControl method.
 **
 ** ^If the second parameter (zDbName) does not match the name of any
 ** open database file, then SQLITE_ERROR is returned.  ^This error
@@ -5661,8 +5540,7 @@ SQLITE_API int sqlite3_status(int op, int *pCurrent, int *pHighwater, int resetF
 ** The value written into the *pCurrent parameter is undefined.</dd>)^
 **
 ** ^(<dt>SQLITE_STATUS_MALLOC_COUNT</dt>
-** <dd>This parameter records the number of separate memory allocations
-** currently checked out.</dd>)^
+** <dd>This parameter records the number of separate memory allocations.</dd>)^
 **
 ** ^(<dt>SQLITE_STATUS_PAGECACHE_USED</dt>
 ** <dd>This parameter returns the number of pages used out of the
@@ -5768,28 +5646,6 @@ SQLITE_API int sqlite3_db_status(sqlite3*, int op, int *pCur, int *pHiwtr, int r
 ** <dd>This parameter returns the number of lookaside memory slots currently
 ** checked out.</dd>)^
 **
-** ^(<dt>SQLITE_DBSTATUS_LOOKASIDE_HIT</dt>
-** <dd>This parameter returns the number malloc attempts that were 
-** satisfied using lookaside memory. Only the high-water value is meaningful;
-** the current value is always zero.
-** checked out.</dd>)^
-**
-** ^(<dt>SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE</dt>
-** <dd>This parameter returns the number malloc attempts that might have
-** been satisfied using lookaside memory but failed due to the amount of
-** memory requested being larger than the lookaside slot size.
-** Only the high-water value is meaningful;
-** the current value is always zero.
-** checked out.</dd>)^
-**
-** ^(<dt>SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL</dt>
-** <dd>This parameter returns the number malloc attempts that might have
-** been satisfied using lookaside memory but failed due to all lookaside
-** memory already being in use.
-** Only the high-water value is meaningful;
-** the current value is always zero.
-** checked out.</dd>)^
-**
 ** ^(<dt>SQLITE_DBSTATUS_CACHE_USED</dt>
 ** <dd>This parameter returns the approximate number of of bytes of heap
 ** memory used by all pager caches associated with the database connection.)^
@@ -5812,14 +5668,11 @@ SQLITE_API int sqlite3_db_status(sqlite3*, int op, int *pCur, int *pHiwtr, int r
 ** </dd>
 ** </dl>
 */
-#define SQLITE_DBSTATUS_LOOKASIDE_USED       0
-#define SQLITE_DBSTATUS_CACHE_USED           1
-#define SQLITE_DBSTATUS_SCHEMA_USED          2
-#define SQLITE_DBSTATUS_STMT_USED            3
-#define SQLITE_DBSTATUS_LOOKASIDE_HIT        4
-#define SQLITE_DBSTATUS_LOOKASIDE_MISS_SIZE  5
-#define SQLITE_DBSTATUS_LOOKASIDE_MISS_FULL  6
-#define SQLITE_DBSTATUS_MAX                  6   /* Largest defined DBSTATUS */
+#define SQLITE_DBSTATUS_LOOKASIDE_USED     0
+#define SQLITE_DBSTATUS_CACHE_USED         1
+#define SQLITE_DBSTATUS_SCHEMA_USED        2
+#define SQLITE_DBSTATUS_STMT_USED          3
+#define SQLITE_DBSTATUS_MAX                3   /* Largest defined DBSTATUS */
 
 
 /*
@@ -5947,13 +5800,11 @@ typedef struct sqlite3_pcache sqlite3_pcache;
 ** first parameter, szPage, is the size in bytes of the pages that must
 ** be allocated by the cache.  ^szPage will not be a power of two.  ^szPage
 ** will the page size of the database file that is to be cached plus an
-** increment (here called "R") of less than 250.  SQLite will use the
+** increment (here called "R") of about 100 or 200.  SQLite will use the
 ** extra R bytes on each page to store metadata about the underlying
 ** database page on disk.  The value of R depends
 ** on the SQLite version, the target platform, and how SQLite was compiled.
-** ^(R is constant for a particular build of SQLite. Except, there are two
-** distinct values of R when SQLite is compiled with the proprietary
-** ZIPVFS extension.)^  ^The second argument to
+** ^R is constant for a particular build of SQLite.  ^The second argument to
 ** xCreate(), bPurgeable, is true if the cache being created will
 ** be used to cache database pages of a file stored on disk, or
 ** false if it is used for an in-memory database. The cache implementation
@@ -5985,7 +5836,7 @@ typedef struct sqlite3_pcache sqlite3_pcache;
 ** If the requested page is already in the page cache, then the page cache
 ** implementation must return a pointer to the page buffer with its content
 ** intact.  If the requested page is not already in the cache, then the
-** cache implementation should use the value of the createFlag
+** behavior of the cache implementation should use the value of the createFlag
 ** parameter to help it determined what action to take:
 **
 ** <table border=1 width=85% align=center>
@@ -6069,12 +5920,11 @@ typedef struct sqlite3_backup sqlite3_backup;
 **
 ** See Also: [Using the SQLite Online Backup API]
 **
-** ^SQLite holds a write transaction open on the destination database file
-** for the duration of the backup operation.
-** ^The source database is read-locked only while it is being read;
-** it is not locked continuously for the entire backup operation.
-** ^Thus, the backup may be performed on a live source database without
-** preventing other database connections from
+** ^Exclusive access is required to the destination database for the 
+** duration of the operation. ^However the source database is only
+** read-locked while it is actually being read; it is not locked
+** continuously for the entire backup operation. ^Thus, the backup may be
+** performed on a live source database without preventing other users from
 ** reading or writing to the source database while the backup is underway.
 ** 
 ** ^(To perform a backup operation: 
@@ -6101,11 +5951,11 @@ typedef struct sqlite3_backup sqlite3_backup;
 ** sqlite3_backup_init(D,N,S,M) identify the [database connection]
 ** and database name of the source database, respectively.
 ** ^The source and destination [database connections] (parameters S and D)
-** must be different or else sqlite3_backup_init(D,N,S,M) will fail with
+** must be different or else sqlite3_backup_init(D,N,S,M) will file with
 ** an error.
 **
 ** ^If an error occurs within sqlite3_backup_init(D,N,S,M), then NULL is
-** returned and an error code and error message are stored in the
+** returned and an error code and error message are store3d in the
 ** destination [database connection] D.
 ** ^The error code and message for the failed call to sqlite3_backup_init()
 ** can be retrieved using the [sqlite3_errcode()], [sqlite3_errmsg()], and/or
@@ -6122,7 +5972,7 @@ typedef struct sqlite3_backup sqlite3_backup;
 ** the source and destination databases specified by [sqlite3_backup] object B.
 ** ^If N is negative, all remaining source pages are copied. 
 ** ^If sqlite3_backup_step(B,N) successfully copies N pages and there
-** are still more pages to be copied, then the function returns [SQLITE_OK].
+** are still more pages to be copied, then the function resturns [SQLITE_OK].
 ** ^If sqlite3_backup_step(B,N) successfully finishes copying all pages
 ** from source to destination, then it returns [SQLITE_DONE].
 ** ^If an error occurs while running sqlite3_backup_step(B,N),
@@ -6136,7 +5986,7 @@ typedef struct sqlite3_backup sqlite3_backup;
 ** <li> the destination database was opened read-only, or
 ** <li> the destination database is using write-ahead-log journaling
 ** and the destination and source page sizes differ, or
-** <li> the destination database is an in-memory database and the
+** <li> The destination database is an in-memory database and the
 ** destination and source page sizes differ.
 ** </ol>)^
 **
@@ -6467,8 +6317,7 @@ SQLITE_API void *sqlite3_wal_hook(
 ** from SQL.
 **
 ** ^Every new [database connection] defaults to having the auto-checkpoint
-** enabled with a threshold of 1000 or [SQLITE_DEFAULT_WAL_AUTOCHECKPOINT]
-** pages.  The use of this interface
+** enabled with a threshold of 1000 pages.  The use of this interface
 ** is only necessary if the default setting is found to be suboptimal
 ** for a particular application.
 */

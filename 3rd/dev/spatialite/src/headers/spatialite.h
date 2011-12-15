@@ -72,15 +72,8 @@ extern "C"
 				     int *rows);
     SPATIALITE_DECLARE double math_round (double value);
     SPATIALITE_DECLARE sqlite3_int64 math_llabs (sqlite3_int64 value);
-    SPATIALITE_DECLARE int spatial_ref_sys_init (sqlite3 * sqlite, int verbose);
-    SPATIALITE_DECLARE int dump_kml (sqlite3 * sqlite, char *table,
-				     char *geom_col, char *kml_path,
-				     char *name_col, char *desc_col,
-				     int precision);
-    SPATIALITE_DECLARE void check_duplicated_rows (sqlite3 * sqlite,
-						   char *table);
-    SPATIALITE_DECLARE void remove_duplicated_rows (sqlite3 * sqlite,
-						    char *table);
+    SPATIALITE_DECLARE void spatial_ref_sys_init (sqlite3 * sqlite,
+						  int verbose);
 
 #ifdef __cplusplus
 }
