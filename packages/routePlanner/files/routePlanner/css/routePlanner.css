@@ -1,11 +1,1 @@
-/* TODO: there should be a class on the form for better targetting */
-form .mapLink {
-  display: none;
-  float: right;
-  padding-left: 20px;
-  background: url(../images/map.png) no-repeat left center;
-}
-
-.placeholder {
-  color: #aaa;
-}
+/* package routePlanner.css */

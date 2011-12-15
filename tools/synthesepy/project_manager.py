@@ -86,6 +86,7 @@ class Package(object):
             raise Exception('Path %r is not a directory for a package' % self.path)
 
         self.files_path = join(self.path, 'files')
+        self.files_local_path = join(self.path, 'files_local')
 
         package_config = join(self.path, 'config.py')
         if os.path.isfile(package_config):
@@ -175,6 +176,8 @@ class Package(object):
         for page in pages_config['pages']:
             if not 'site_id' in page:
                 page['site_id'] = site_id
+            if not 'do_not_use_template' in page:
+                page['do_not_use_template'] = True
             if page['content1'].startswith('file:'):
                 file_path = page['content1'][len('file:'):]
                 page['content1'] = unicode(
@@ -190,10 +193,24 @@ class Package(object):
 
             self.project.db_backend.replace_into('t063_web_pages', page)
 
+    def _load_local_files(self, site, overwrite):
+        main_package = site.get_package('main')
+        if not main_package:
+            log.warn('Site %s is missing a "main" package, not copying '
+                'local files' % site)
+            return
+
+        target_dir = join(main_package.files_path, 'local')
+        log.debug('Copying local files from %r to %r',
+            self.files_local_path, target_dir)
+        utils.copy_over(self.files_local_path, target_dir, overwrite)
+
     def load_data(self, site, local, overwrite):
         if not local:
             self._load_fixtures(site)
         self._load_pages(site, local, overwrite)
+        if local:
+            self._load_local_files(site, overwrite)
 
 
 class PackagesLoader(object):
