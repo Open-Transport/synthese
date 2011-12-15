@@ -106,10 +106,17 @@ var SyntheseMap = OpenLayers.Class({
 
     var self = this;
 
-    // TODO: there should be callbacks for both hovering and clicking a feature.
     var select = new OpenLayers.Control.SelectFeature(this.stopsLayer, {
+      hover: true,
+      highlightOnly: true,
       onSelect: function() {
         self.onStopSelected.apply(self, arguments);
+      },
+      // Hack to get the onSelect callback to be called even if hover is true.
+      clickFeature: function() {
+        this.hover = false;
+        OpenLayers.Control.SelectFeature.prototype.clickFeature.apply(this, arguments);
+        this.hover = true;
       }
     });
     this.map.addControl(select);
@@ -315,7 +322,7 @@ var SyntheseMap = OpenLayers.Class({
   },
 
   getStopsStyleMap: function() {
-    var context = {
+    var defaultContext = {
       getPointRadius: function(feature) {
         var zoom = feature.layer.map.getZoom();
         if (zoom <= 12)
@@ -326,7 +333,7 @@ var SyntheseMap = OpenLayers.Class({
       },
       getLabel: function(feature) {
         var zoom = feature.layer.map.getZoom();
-        if (zoom <= 13)
+        if (zoom <= 14)
           return "";
         return feature.attributes.name;
       },
@@ -338,7 +345,7 @@ var SyntheseMap = OpenLayers.Class({
       }
     };
 
-    var style = new OpenLayers.Style({
+    var defaultStyle = new OpenLayers.Style({
       strokeColor: "red",
       strokeOpacity: 0.5,
       strokeWidth: 2,
@@ -350,13 +357,37 @@ var SyntheseMap = OpenLayers.Class({
       labelAlign: "lt",
       labelXOffset: "5",
       labelYOffset: "-5",
-      display: "${getDisplay}"
+      display: "${getDisplay}",
+      fontSize: "small"
     }, {
-      context: context
+      context: defaultContext
+    });
+
+    var selectContext = OpenLayers.Util.extend({}, defaultContext);
+    OpenLayers.Util.extend(selectContext, {
+      getLabel: function(feature) {
+        return feature.attributes.name;
+      }
+    });
+
+    var selectStyle = OpenLayers.Util.extend({}, defaultStyle.defaultStyle);
+    OpenLayers.Util.extend(selectStyle, {
+      display: "",
+      pointRadius: 6,
+      fillColor: "red",
+      strokeColor: "black",
+      labelXOffset: "15",
+      fontColor: "#222",
+      fontSize: "18px"
+    });
+
+    selectStyle = new OpenLayers.Style(selectStyle, {
+      context: selectContext
     });
 
     return new OpenLayers.StyleMap({
-      'default': style
+      'default': defaultStyle,
+      'select': selectStyle
     });
   },
 
