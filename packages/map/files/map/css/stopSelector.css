@@ -1,6 +1,16 @@
 @import url("cityBrowser.css");
 
+/* CSS reset for the popup */
+.stopSelectorPopup * {
+  text-align: left;
+  margin: 0;
+  padding: 0;
+}
+
 .stopSelectorPopup {
+  font-family: 'Maven Pro', arial, serif;
+  font-size: small;
+
   display: none;
   z-index: 3000;
 

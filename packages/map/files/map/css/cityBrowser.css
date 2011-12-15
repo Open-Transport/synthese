@@ -34,6 +34,7 @@
 }
 .citySelector > .letters > li {
   vertical-align: middle;
+  text-align: center;
   border-bottom: 1px solid gray;
   background-color: #D1D1D1;
   background-image: -moz-linear-gradient(116deg, #D1D1D1, #FFFFFF 110px);
