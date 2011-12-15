@@ -235,29 +235,29 @@ namespace synthese
 
 		PTRoutePlannerResult PTTimeSlotRoutePlanner::run() const
 		{
-			if(	_logStream
-			){
+			if(_logStream)
+			{
 				*_logStream << "<h2>Origin access map calculation</h2>";
 			}
 
 			TimeSlotRoutePlanner::Result result;
 
 			// Check if departure and arrival VAMs has contains at least one vertex
-			if(	_originVam.getMap().empty() ||
+			if(_originVam.getMap().empty() ||
 				_destinationVam.getMap().empty()
 			){
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, false, result);
 			}
 
 			// Check if the departure and arrival places are the same
-			if(	_originVam.intersercts(_destinationVam)
-			){
+			if(_originVam.intersercts(_destinationVam))
+			{
 				return PTRoutePlannerResult(_departurePlace, _arrivalPlace, true, result);
 			}
 
 			// Search stops around the departure and arrival places using the road network
-			// FIXME: need to handle approcahSpeed = 0 in IntegralSearcher himself
-			VertexAccessMap ovam,dvam;
+			// FIXME: Need to handle approcahSpeed = 0 in IntegralSearcher himself
+			VertexAccessMap ovam, dvam;
 			if(_accessParameters.getApproachSpeed() != 0)
 			{
 				ovam = _extendToPhysicalStops(_originVam, _destinationVam, DEPARTURE_TO_ARRIVAL);
@@ -265,11 +265,11 @@ namespace synthese
 			}
 			else
 			{
-				// FIXME: I need to exclude Roads part of VAM
+				// FIXME: Need to exclude Roads part of VAM
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, _originVam.getMap())
 				{
 					const Vertex* vertex(itps.first);
-					if(	vertex->getGraphType() == PTModule::GRAPH_ID)
+					if(vertex->getGraphType() == PTModule::GRAPH_ID)
 					{
 						ovam.insert(vertex, itps.second);
 					}
@@ -277,8 +277,8 @@ namespace synthese
 				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, _destinationVam.getMap())
 				{
 					const Vertex* vertex(itps.first);
-					if(	vertex->getGraphType() == PTModule::GRAPH_ID
-					){
+					if(vertex->getGraphType() == PTModule::GRAPH_ID)
+					{
 						dvam.insert(vertex, itps.second);
 					}
 				}
