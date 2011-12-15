@@ -32,7 +32,6 @@
 #define sqlite3_mprintf SPLite3_mprintf
 #define sqlite3_vmprintf SPLite3_vmprintf
 #define sqlite3_snprintf SPLite3_snprintf
-#define sqlite3_vsnprintf SPLite3_vsnprintf
 #define sqlite3_malloc SPLite3_malloc
 #define sqlite3_realloc SPLite3_realloc
 #define sqlite3_free SPLite3_free
@@ -55,7 +54,6 @@
 #define sqlite3_prepare16 SPLite3_prepare16
 #define sqlite3_prepare16_v2 SPLite3_prepare16_v2
 #define sqlite3_sql SPLite3_sql
-#define sqlite3_stmt_readonly SPLite3_stmt_readonly
 #define sqlite3_bind_blob SPLite3_bind_blob
 #define sqlite3_bind_double SPLite3_bind_double
 #define sqlite3_bind_int SPLite3_bind_int
@@ -221,7 +219,6 @@
 #define sqlite3_sort_count SPLite3_sort_count
 #define sqlite3_max_blobsize SPLite3_max_blobsize
 #define sqlite3_found_count SPLite3_found_count
-#define sqlite3_blob_reopen SPLite3_blob_reopen
 #define sqlite3_like_count SPLite3_like_count
 #define sqlite3_xferopt_count SPLite3_xferopt_count
 #define sqlite3_profile SPLite3_profile
@@ -423,27 +420,6 @@ struct sqlite3_api_routines {
   sqlite3_stmt *(*next_stmt)(sqlite3*,sqlite3_stmt*);
   const char *(*sql)(sqlite3_stmt*);
   int (*status)(int,int*,int*,int);
-  int (*backup_finish)(sqlite3_backup*);
-  sqlite3_backup *(*backup_init)(sqlite3*,const char*,sqlite3*,const char*);
-  int (*backup_pagecount)(sqlite3_backup*);
-  int (*backup_remaining)(sqlite3_backup*);
-  int (*backup_step)(sqlite3_backup*,int);
-  const char *(*compileoption_get)(int);
-  int (*compileoption_used)(const char*);
-  int (*create_function_v2)(sqlite3*,const char*,int,int,void*,void (*xFunc)(sqlite3_context*,int,sqlite3_value**),void (*xStep)(sqlite3_context*,int,sqlite3_value**),void (*xFinal)(sqlite3_context*),void(*xDestroy)(void*));
-  int (*db_config)(sqlite3*,int,...);
-  sqlite3_mutex *(*db_mutex)(sqlite3*);
-  int (*db_status)(sqlite3*,int,int*,int*,int);
-  int (*extended_errcode)(sqlite3*);
-  void (*log)(int,const char*,...);
-  sqlite3_int64 (*soft_heap_limit64)(sqlite3_int64);
-  const char *(*sourceid)(void);
-  int (*stmt_status)(sqlite3_stmt*,int,int);
-  int (*strnicmp)(const char*,const char*,int);
-  int (*unlock_notify)(sqlite3*,void(*)(void**,int),void*);
-  int (*wal_autocheckpoint)(sqlite3*,int);
-  int (*wal_checkpoint)(sqlite3*,const char*);
-  void *(*wal_hook)(sqlite3*,int(*)(void*,sqlite3*,const char*,int),void*);
 };
 
 /*
@@ -623,27 +599,6 @@ struct sqlite3_api_routines {
 #define sqlite3_next_stmt              sqlite3_api->next_stmt
 #define sqlite3_sql                    sqlite3_api->sql
 #define sqlite3_status                 sqlite3_api->status
-#define sqlite3_backup_finish          sqlite3_api->backup_finish
-#define sqlite3_backup_init            sqlite3_api->backup_init
-#define sqlite3_backup_pagecount       sqlite3_api->backup_pagecount
-#define sqlite3_backup_remaining       sqlite3_api->backup_remaining
-#define sqlite3_backup_step            sqlite3_api->backup_step
-#define sqlite3_compileoption_get      sqlite3_api->compileoption_get
-#define sqlite3_compileoption_used     sqlite3_api->compileoption_used
-#define sqlite3_create_function_v2     sqlite3_api->create_function_v2
-#define sqlite3_db_config              sqlite3_api->db_config
-#define sqlite3_db_mutex               sqlite3_api->db_mutex
-#define sqlite3_db_status              sqlite3_api->db_status
-#define sqlite3_extended_errcode       sqlite3_api->extended_errcode
-#define sqlite3_log                    sqlite3_api->log
-#define sqlite3_soft_heap_limit64      sqlite3_api->soft_heap_limit64
-#define sqlite3_sourceid               sqlite3_api->sourceid
-#define sqlite3_stmt_status            sqlite3_api->stmt_status
-#define sqlite3_strnicmp               sqlite3_api->strnicmp
-#define sqlite3_unlock_notify          sqlite3_api->unlock_notify
-#define sqlite3_wal_autocheckpoint     sqlite3_api->wal_autocheckpoint
-#define sqlite3_wal_checkpoint         sqlite3_api->wal_checkpoint
-#define sqlite3_wal_hook               sqlite3_api->wal_hook
 #endif /* SQLITE_CORE */
 
 #define SQLITE_EXTENSION_INIT1     const sqlite3_api_routines *sqlite3_api = 0;

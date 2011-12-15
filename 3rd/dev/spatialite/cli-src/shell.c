@@ -1817,19 +1817,13 @@ static char zHelp[] =
     "                  .charset CP850\n"
     "                        [use the Windows CHCP command in order to check better\n"
     "                         which one charset is used on your Command Prompt]\n\n"
-    ".chkdupl <table>  Check a TABLE for duplicated rows\n\n"
-    ".remdupl <table>  Removes any duplicated row from a TABLE\n\n"
     ".loadshp <args>   Loads a SHAPEFILE into a SpatiaLite table\n"
-    "                  arg_list: shp_path table_name charset [SRID] [column_name]\n"
-    "                      [2d] [compressed]\n\n"
+    "                  arg_list: shp_path table_name charset [SRID] [column_name] [2d] [compressed]\n\n"
     ".dumpshp <args>   Dumps a SpatiaLite table into a SHAPEFILE\n"
     "                  arg_list: table_name column_name shp_path charset [geom_type]\n"
     "                      geom_type={ POINT | LINESTRING | POLYGON | MULTIPOINT }\n\n"
     ".loaddbf <args>   Loads a DBF into a SpatiaLite table\n"
     "                  arg_list: dbf_path table_name charset\n\n"
-    ".dumpkml <args>   Dumps a SpatiaLite table as a KML file\n"
-    "                  arg_list: table_name geom_column kml_path\n"
-    "                      [precision] [name_column] [desc_column]\n\n"
     ".read <args>      Execute an SQL script\n"
     "                  arg_list: script_path charset\n"
 /* end Sandro Furieri 2008-06-20 */
@@ -2043,25 +2037,6 @@ do_meta_command (char *zLine, struct callback_data *p)
 	  open_db (p);
 	  dump_shapefile (p->db, table, column, shp_path, outCS, type, 1, NULL);
       }
-    else if (c == 'd' && n > 1 && strncmp (azArg[0], "dumpkml", n) == 0
-	     && (nArg == 4 || nArg == 5 || nArg == 6 || nArg == 7))
-      {
-	  /* dumping a spatial table as KML file */
-	  char *table = azArg[1];
-	  char *geom = azArg[2];
-	  char *kml_path = azArg[3];
-	  char *name = NULL;
-	  char *desc = NULL;
-	  int precision = 8;
-	  if (nArg >= 5)
-	      precision = atoi (azArg[4]);
-	  if (nArg >= 6)
-	      name = azArg[5];
-	  if (nArg == 7)
-	      desc = azArg[6];
-	  open_db (p);
-	  dump_kml (p->db, table, geom, kml_path, name, desc, precision);
-      }
     else if (c == 'l' && n > 1 && strncmp (azArg[0], "loadshp", n) == 0
 	     && (nArg == 4 || nArg == 5 || nArg == 6 || nArg == 7 || nArg == 8))
       {
@@ -2112,18 +2087,6 @@ do_meta_command (char *zLine, struct callback_data *p)
 		process_input (p, alt, azArg[2]);
 		fclose (alt);
 	    }
-      }
-    else if (c == 'c' && strncmp (azArg[0], "chkdupl", n) == 0 && nArg == 2)
-      {
-	  char *table = azArg[1];
-	  open_db (p);
-	  check_duplicated_rows (p->db, table);
-      }
-    else if (c == 'r' && strncmp (azArg[0], "remdupl", n) == 0 && nArg == 2)
-      {
-	  char *table = azArg[1];
-	  open_db (p);
-	  remove_duplicated_rows (p->db, table);
       }
     else if (c == 'b' && n > 1 && strncmp (azArg[0], "bail", n) == 0
 	     && nArg > 1)
