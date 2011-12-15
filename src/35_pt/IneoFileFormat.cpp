@@ -59,6 +59,8 @@
 #include "ForbiddenUseRule.h"
 
 #include <fstream>
+#include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/geom/LineString.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -68,6 +70,8 @@ using namespace boost::algorithm;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace geos::geom;
+
 
 namespace synthese
 {
@@ -89,6 +93,7 @@ namespace synthese
 
 	namespace pt
 	{
+		const std::string IneoFileFormat::Importer_::FILE_PTF("ptf");
 		const std::string IneoFileFormat::Importer_::FILE_PNT("pnt");
 		const std::string IneoFileFormat::Importer_::FILE_DIS("dis");
 		const std::string IneoFileFormat::Importer_::FILE_DST("dst");
@@ -130,6 +135,7 @@ namespace synthese
 	{
 		template<> const MultipleFileTypesImporter<IneoFileFormat>::Files MultipleFileTypesImporter<IneoFileFormat>::FILES(
 			IneoFileFormat::Importer_::FILE_PNT.c_str(),
+			IneoFileFormat::Importer_::FILE_PTF.c_str(),
 			IneoFileFormat::Importer_::FILE_DIS.c_str(),
 			IneoFileFormat::Importer_::FILE_DST.c_str(),
 			IneoFileFormat::Importer_::FILE_LIG.c_str(),
@@ -349,6 +355,45 @@ namespace synthese
 					// Updating the code map to take into account of secondary codes
 				}
 			}
+			else if(key == FILE_PTF)
+			{
+				Geometries::key_type key;
+				CoordinateSequence* sequence(NULL);
+				while(_readLine(inFile))
+				{
+					if(_section == "NLP")
+					{
+						if(sequence && sequence->getSize() > 1)
+						{
+							_geometries.insert(
+								make_pair(
+									key,
+									shared_ptr<LineString>(
+										_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+							)	)	);
+						}
+						key = make_pair(_getValue("NLP1"), _getValue("NLP2"));
+						sequence = _dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
+					}
+					if(_section == "PF" && sequence)
+					{
+						sequence->add(
+							Coordinate(
+								lexical_cast<double>(_getValue("X")),
+								lexical_cast<double>(_getValue("Y"))
+						)	);
+					}
+				}
+				if(sequence && sequence->getSize() > 1)
+				{
+					_geometries.insert(
+						make_pair(
+							key,
+							shared_ptr<LineString>(
+								_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+					)	)	);
+				}
+			}
 			// 2 : Distances
 			else if(key == FILE_DIS)
 			{
@@ -505,8 +550,10 @@ namespace synthese
 					else if(_section == "PC")
 					{
 						string stopCode(_getValue("MNL"));
+						shared_ptr<LineString> lineString;
 						if(!lastStopCode.empty())
 						{
+							// Distance
 							std::map<std::pair<std::string, std::string>, graph::MetricOffset>::const_iterator it(_distances.find(
 									make_pair(lastStopCode, stopCode)
 							)	);
@@ -517,6 +564,16 @@ namespace synthese
 							else
 							{
 								stream << "WARN : distance between " << lastStopCode << " and " << stopCode << " not found.<br />";
+							}
+
+							// Geometry
+							Geometries::const_iterator itGeom(
+								_geometries.find(
+									make_pair(lastStopCode, stopCode)
+							)	);
+							if(itGeom != _geometries.end())
+							{
+								lineString = itGeom->second;
 							}
 						}
 						ImportableTableSync::ObjectBySource<StopPointTableSync>::Set linkedStops(
@@ -529,6 +586,10 @@ namespace synthese
 						}
 						else
 						{
+							if(lineString.get())
+							{
+								stops.rbegin()->_geometry = lineString;
+							}
 							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 								linkedStops,
 								dst,
@@ -682,8 +743,17 @@ namespace synthese
 						{
 							td += hours(24);
 						}
-						departureSchedules.push_back(td - seconds(td.seconds()));
+
 						arrivalSchedules.push_back(td.seconds() ? td + seconds(60 - td.seconds()) : td);
+
+						// TBAT
+						string tbatStr(_getValue("TBAT"));
+						if(!tbatStr.empty())
+						{
+							td += minutes(lexical_cast<long>(tbatStr));
+						}
+						departureSchedules.push_back(td - seconds(td.seconds()));
+
 						lastTd = td;
 					}
 					if(_section.empty())
@@ -710,6 +780,7 @@ namespace synthese
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier PNT (arrêts)", t.getForm().getTextInput(_getFileParameterName(FILE_PNT), _pathsMap[FILE_PNT].file_string()));
+			stream << t.cell("Fichier PTF (points de forme)", t.getForm().getTextInput(_getFileParameterName(FILE_PTF), _pathsMap[FILE_PTF].file_string()));
 			stream << t.cell("Fichier DIS (distances)", t.getForm().getTextInput(_getFileParameterName(FILE_DIS), _pathsMap[FILE_DIS].file_string()));
 			stream << t.cell("Fichier DST (destinations)", t.getForm().getTextInput(_getFileParameterName(FILE_DST), _pathsMap[FILE_DST].file_string()));
 			stream << t.cell("Fichier LIG (lignes)", t.getForm().getTextInput(_getFileParameterName(FILE_LIG), _pathsMap[FILE_LIG].file_string()));

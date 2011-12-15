@@ -148,15 +148,18 @@ namespace synthese
 					break;
 
 				case 'a':
-				case 131:
-				case 132:
-				case 133:
-				case 134:
-				case 142:
-				case 143:
-				case 181:
-				case 182:
-				case 183:
+				case 224:
+				case 225:
+				case 226:
+				case 227:
+				case 228:
+				case 229:
+				case 192:
+				case 193:
+				case 194:
+				case 195:
+				case 196:
+				case 197:
 					if(	_IsFollowedBy(source, pos, "in") &&
 						!_IsFollowedBy(source, pos, "ine")
 					){
@@ -165,7 +168,7 @@ namespace synthese
 						break;
 					}
 
-					if( source[pos+1] == 139) // ï
+					if( source[pos+1] == 239) // ï
 					{
 						pos += 1;
 						result.push_back(A);
@@ -286,14 +289,18 @@ namespace synthese
 						break;
 					}
 
-				case 130:
-				case 136:
-				case 137:
-				case 138:
-				case 144:
-				case 210:
-				case 211:
-				case 212:
+				case 200:
+				case 201:
+				case 202:
+				case 203:
+				case 232:
+				case 233:
+				case 234:
+				case 235:
+				case 198:
+				case 230:
+				case 140:
+				case 156:
 					if(	(	_IsFollowedBy(source, pos, "i") ||
 							_IsFollowedBy(source, pos, "y") ||
 							_IsFollowedBy(source, pos, "u") ||
@@ -374,12 +381,12 @@ namespace synthese
 					break;
 
 				case 'i':
-				case 140:
-				case 141:
-				case 161:
-				case 214:
-				case 215:
-				case 222:
+				case 204:
+				case 205:
+				case 206:
+				case 236:
+				case 237:
+				case 238:
 					if(	_IsFollowedBy(source, pos, "ng") &&
 						_IsLast(source, pos, 3)
 					){
@@ -412,8 +419,8 @@ namespace synthese
 						break;
 					}
 
-				case 139: // ï
-				case 216: // Ï
+				case 207: // ï
+				case 239: // Ï
 					result.push_back(I);
 					break;
 
@@ -459,11 +466,15 @@ namespace synthese
 					break;
 
 				case 'o':
-				case 147:
-				case 149:
-				case 224:
-				case 226: // Ô
-				case 227:
+				case 210:
+				case 211:
+				case 212:
+				case 213:
+				case 240:
+				case 242:
+				case 243:
+				case 244:
+				case 245:
 					if(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
@@ -491,8 +502,8 @@ namespace synthese
 						break;
 					}
 
-				case 148: // ö
-				case 153:
+				case 214: // ö
+				case 246:
 					result.push_back(O);
 					break;
 
@@ -605,10 +616,12 @@ namespace synthese
 					break;
 
 				case 'u':
-				case 150:
-				case 151:
-				case 234: // Û
-				case 235: // Ù
+				case 217:
+				case 218:
+				case 219:
+				case 249:
+				case 250:
+				case 251:
 					if(	_IsFollowedBy(source, pos, "n") &&
 						_IsLast(source, pos+1)
 					){
@@ -617,8 +630,8 @@ namespace synthese
 						break;
 					}
 				
-				case 129: // ü
-				case 154: // Ü
+				case 220: // ü
+				case 252: // Ü
 					result.push_back(U);
 					break;
 

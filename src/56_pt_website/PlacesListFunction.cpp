@@ -118,7 +118,7 @@ namespace synthese
 			}
 			if(_coordinatesSystem)
 			{
-					map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
+				map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
 
 			return map;
@@ -197,6 +197,12 @@ namespace synthese
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+			// Cleaning of template parameters for non CMS output
+			if(!_outputFormat.empty())
+			{
+				_templateParameters.clear();
+			}
 		}
 
 
@@ -380,7 +386,7 @@ namespace synthese
 				}
 				pm.outputJSON(stream, DATA_PLACES);
 			}
-			if(_page.get())
+			else if(_page.get())
 			{
 				pm.insert(DATA_RESULTS_SIZE, placesList.size());
 				if(_city.get())

@@ -58,27 +58,70 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE = Action_PARAMETER_PREFIX + "lme";
 		const string UpdateAlarmMessagesAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "id");
 		const string UpdateAlarmMessagesAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
+		const string UpdateAlarmMessagesAction::PARAMETER_RAW_EDITOR = Action_PARAMETER_PREFIX + "raw_editor";
+
 
 
 		ParametersMap UpdateAlarmMessagesAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_alarm.get() != NULL) map.insert(PARAMETER_ALARM_ID, _alarm->getKey());
+			if (_alarm.get())
+			{
+				map.insert(PARAMETER_ALARM_ID, _alarm->getKey());
+			}
+			if(_type)
+			{
+				map.insert(PARAMETER_TYPE, static_cast<int>(*_type));
+			}
+			if(_shortMessage)
+			{
+				map.insert(PARAMETER_SHORT_MESSAGE, *_shortMessage);
+			}
+			if(_longMessage)
+			{
+				map.insert(PARAMETER_LONG_MESSAGE, *_longMessage);
+			}
+			if(_rawEditor)
+			{
+				map.insert(PARAMETER_RAW_EDITOR, *_rawEditor);
+			}
 			return map;
 		}
 
 		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
 		{
+			// Alarm
 			try
 			{
 				setAlarmId(map.get<RegistryKeyType>(PARAMETER_ALARM_ID));
-				_type = static_cast<AlarmLevel>(map.get<int>(PARAMETER_TYPE));
-				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
-				_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
 			}
 			catch (ParametersMap::MissingParameterException& e)
 			{
 				throw ActionException(e, *this);
+			}
+
+			// Type
+			if(map.isDefined(PARAMETER_TYPE))
+			{
+				_type = static_cast<AlarmLevel>(map.get<int>(PARAMETER_TYPE));
+			}
+
+			// Short name
+			if(map.isDefined(PARAMETER_SHORT_MESSAGE))
+			{
+				_shortMessage = map.get<string>(PARAMETER_SHORT_MESSAGE);
+			}
+
+			// Long name
+			if(map.isDefined(PARAMETER_LONG_MESSAGE))
+			{
+				_longMessage = map.get<string>(PARAMETER_LONG_MESSAGE);
+			}
+
+			// Raw editor
+			if(map.isDefined(PARAMETER_RAW_EDITOR))
+			{
+				_rawEditor = map.get<bool>(PARAMETER_RAW_EDITOR);
 			}
 		}
 
@@ -87,18 +130,41 @@ namespace synthese
 		void UpdateAlarmMessagesAction::run(
 			Request& request
 		) throw(ActionException) {
-			stringstream s;
-			DBLogModule::appendToLogIfChange(s,
-				"type",
-				MessagesModule::getLevelLabel(_alarm->getLevel()),
-				MessagesModule::getLevelLabel(_type)
-			);
-			DBLogModule::appendToLogIfChange(s, "message court", _alarm->getShortMessage(), _shortMessage);
-			DBLogModule::appendToLogIfChange(s, "message long", _alarm->getLongMessage(), _longMessage);
 
-			_alarm->setLevel(_type);
-			_alarm->setShortMessage(_shortMessage);
-			_alarm->setLongMessage(_longMessage);
+			stringstream s;
+
+			// Type
+			if(_type)
+			{
+				DBLogModule::appendToLogIfChange(s,
+					"type",
+					MessagesModule::getLevelLabel(_alarm->getLevel()),
+					MessagesModule::getLevelLabel(*_type)
+				);
+				_alarm->setLevel(*_type);
+			}
+
+			// Short message
+			if(_shortMessage)
+			{
+				DBLogModule::appendToLogIfChange(s, "message court", _alarm->getShortMessage(), *_shortMessage);
+				_alarm->setShortMessage(*_shortMessage);
+			}
+
+			// Long message
+			if(_longMessage)
+			{
+				DBLogModule::appendToLogIfChange(s, "message long", _alarm->getLongMessage(), *_longMessage);
+				_alarm->setLongMessage(*_longMessage);
+			}
+
+			// Raw editor
+			if(_rawEditor)
+			{
+				DBLogModule::appendToLogIfChange(s, "éditeur technique", lexical_cast<string>(_alarm->getRawEditor()), lexical_cast<string>(*_rawEditor));
+				_alarm->setRawEditor(*_rawEditor);
+			}
+
 			AlarmTableSync::Save(_alarm.get());
 
 			// Log

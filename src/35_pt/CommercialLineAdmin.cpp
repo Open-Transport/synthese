@@ -63,6 +63,9 @@
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
 #include "JourneyPatternCopy.hpp"
+#include "FreeDRTAreaTableSync.hpp"
+#include "FreeDRTAreaUpdateAction.hpp"
+#include "FreeDRTAreaAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -96,9 +99,11 @@ namespace synthese
 		const string CommercialLineAdmin::TAB_DATES("da");
 		const string CommercialLineAdmin::TAB_ROUTES_FORWARD("rof");
 		const string CommercialLineAdmin::TAB_ROUTES_BACKWARD("rob");
+		const string CommercialLineAdmin::TAB_FREE_DRT("drt");
 		const string CommercialLineAdmin::TAB_NON_CONCURRENCY("nc");
 		const string CommercialLineAdmin::TAB_PROPERTIES("pr");
 		const string CommercialLineAdmin::TAB_EXPORT("ex");
+
 		const string CommercialLineAdmin::PARAMETER_SEARCH_NAME("na");
 		const string CommercialLineAdmin::PARAMETER_DATES_START("ds");
 		const string CommercialLineAdmin::PARAMETER_DATES_END("de");
@@ -155,6 +160,7 @@ namespace synthese
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const {
+			
 			////////////////////////////////////////////////////////////////////
 			// TAB FORWARD ROUTES
 			if (openTabContent(stream, TAB_ROUTES_FORWARD))
@@ -162,12 +168,91 @@ namespace synthese
 				_displayRoutes(stream, _request, false);
 			}
 
+
 			////////////////////////////////////////////////////////////////////
 			// TAB BACKWARD ROUTES
 			if (openTabContent(stream, TAB_ROUTES_BACKWARD))
 			{
 				_displayRoutes(stream, _request, true);
 			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// TAB FREE DRT AREAS
+			if (openTabContent(stream, TAB_FREE_DRT))
+			{
+				// Title
+				stream << "<h1>Zones TAD libéralisé</h1>";
+
+				// Declarations
+				AdminFunctionRequest<FreeDRTAreaAdmin> openRequest(_request);
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
+				AdminActionFunctionRequest<FreeDRTAreaUpdateAction,FreeDRTAreaAdmin> addRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
+
+				// Search for areas
+				FreeDRTAreaTableSync::SearchResult areas(
+					FreeDRTAreaTableSync::Search(
+						Env::GetOfficialEnv(),
+						_cline->getKey()
+				)	);
+				
+				// Table initialization
+				ActionResultHTMLTable::HeaderVector cols;
+				cols.push_back(make_pair(string(), string()));
+				cols.push_back(make_pair(string(), "Nom"));
+				cols.push_back(make_pair(string(), "Périmètre"));
+				cols.push_back(make_pair(string(), string()));
+				ActionResultHTMLTable t(
+					cols,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					areas,
+					addRequest.getHTMLForm("create")
+				);
+				stream << t.open();
+
+				// Loop on items
+				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				{
+					// Declarations
+					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
+					removeRequest.getAction()->setObjectId(area->getKey());
+
+					// Open button cell
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTAreaAdmin::ICON);
+
+					// Name cell
+					stream << t.col();
+					stream << area->getName();
+
+					// Cities cell
+					stream << t.col();
+					bool first(true);
+					BOOST_FOREACH(const FreeDRTArea::Cities::value_type& city, area->getCities())
+					{
+						if(first)
+						{
+							first = false;
+						}
+						else
+						{
+							stream << ", ";
+						}
+						stream << city->getName();
+					}
+
+					// Remove cell
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone "+ area->getName() + " ?");
+				}
+
+				// Table closing
+				stream << t.close();
+			}
+
+
 			////////////////////////////////////////////////////////////////////
 			// TAB HOURS
 			if (openTabContent(stream, TAB_DATES))
@@ -400,10 +485,13 @@ namespace synthese
 		}
 
 
+
 		std::string CommercialLineAdmin::getTitle() const
 		{
 			return _cline.get() ? "<span class=\"linesmall " + _cline->getStyle() +"\">" + _cline->getShortName() + "</span>" : DEFAULT_TITLE;
 		}
+
+
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -414,8 +502,9 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
+				// Journey patterns
 				JourneyPatternTableSync::SearchResult routes(
-					JourneyPatternTableSync::Search(*_env, _cline->getKey())
+					JourneyPatternTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
 				);
 				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
 				{
@@ -425,9 +514,24 @@ namespace synthese
 					p->setLine(line);
 					links.push_back(p);
 				}
+
+				// Free DRT areas
+				FreeDRTAreaTableSync::SearchResult areas(
+					FreeDRTAreaTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				{
+					shared_ptr<FreeDRTAreaAdmin> p(
+						getNewPage<FreeDRTAreaAdmin>()
+					);
+					p->setArea(area);
+					links.push_back(p);
+				}
 			}
 			return links;
 		}
+
+
 
 		void CommercialLineAdmin::_buildTabs(
 			const security::Profile& profile
@@ -436,6 +540,7 @@ namespace synthese
 
 			_tabs.push_back(Tab("Parcours aller", TAB_ROUTES_FORWARD, true, JourneyPatternAdmin::ICON));
 			_tabs.push_back(Tab("Parcours retour", TAB_ROUTES_BACKWARD, true, JourneyPatternAdmin::ICON));
+			_tabs.push_back(Tab("TAD libéralisés", TAB_FREE_DRT, true, string()));
 			_tabs.push_back(Tab("Dates de fonctionnement", TAB_DATES, true, "calendar.png"));
 			_tabs.push_back(Tab("Non concurrence", TAB_NON_CONCURRENCY, true, "lock.png"));
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));

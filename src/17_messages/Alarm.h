@@ -68,6 +68,7 @@ namespace synthese
 			std::string			_shortMessage;  //!< Alarm message
 			std::string			_longMessage;  //!< Alarm message
 			const Scenario* 	_scenario;
+			bool				_rawEditor;
 
 			Alarm(
 				util::RegistryKeyType key,
@@ -88,6 +89,7 @@ namespace synthese
 				const std::string&		getLongMessage()	const;
 				const AlarmLevel&		getLevel()			const;
 				const Scenario*			getScenario()		const;
+				bool					getRawEditor() const { return _rawEditor; }
 			//@}
 
 			//! @name Setters
@@ -96,6 +98,7 @@ namespace synthese
 				void setShortMessage( const std::string& message);
 				void setLongMessage( const std::string& message);
 				void setScenario(const Scenario* scenario);
+				void setRawEditor(bool value){ _rawEditor = value; }
 			//@}
 
 			//! @name Services

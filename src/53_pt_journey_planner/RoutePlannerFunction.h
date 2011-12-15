@@ -461,7 +461,9 @@ namespace synthese
 				bool isItContinuousService,
 				bool isFirstWriting,
 				bool isLastWriting,
-				bool isFirstFoot
+				bool isFirstFoot,
+				bool isOriginRow,
+				bool isDestinationRow
 			) const;
 
 

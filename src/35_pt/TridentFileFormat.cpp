@@ -1129,8 +1129,12 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateLine(
 					_lines,
 					lineKeyNode.getText(),
-					charset_converter.convert(clineNameNode.getText()),
-					charset_converter.convert(clineShortNameNode.getText()),
+					clineNameNode.isEmpty() ?
+						optional<const string&>() :
+						optional<const string&>(charset_converter.convert(clineNameNode.getText())),
+					clineShortNameNode.isEmpty() ?
+						optional<const string&>() :
+						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
 					optional<RGBColor>(),
 					*network,
 					_dataSource,
@@ -1183,9 +1187,19 @@ namespace synthese
 					XMLNode areaTypeNode(extensionNode.getChildNode("areaType",0));
 					if(to_lower_copy(string(areaTypeNode.getText())) != string("commercialstoppoint")) continue;
 
+					// Stop area key
 					XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
-					XMLNode nameNode(stopAreaNode.getChildNode("name", 0));
 					string stopKey(keyNode.getText());
+					
+					// Stop area name
+					string name;
+					{
+						XMLNode nameNode(stopAreaNode.getChildNode("name"));
+						if(!nameNode.isEmpty())
+						{
+							name = charset_converter.convert(nameNode.getText());
+						}
+					}
 
 					XMLNode areaNode(stopAreaNode.getChildNode("centroidOfArea", 0));
 					string cityCode;
@@ -1195,7 +1209,7 @@ namespace synthese
 						map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
 						if(itPlace == areaCentroids.end())
 						{
-							os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << nameNode.getText() << ")<br />";
+							os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << name << ")<br />";
 							failure = true;
 							continue;
 						}
@@ -1227,12 +1241,12 @@ namespace synthese
 						// Load existing commercial stop point
 						curStop = cstops.front();
 
-						os << "LOAD : link between stops by code " << stopKey << " (" << nameNode.getText() << ") and "
+						os << "LOAD : link between stops by code " << stopKey << " (" << name << ") and "
 							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
 
-						if(curStop->getName() != nameNode.getText())
+						if(curStop->getName() != name)
 						{
-							os << "NOTI : stop area is differently named in source file and in SYNTHESE (source=" << nameNode.getText() << ", SYNTHESE=" << curStop->getName() << ")<br />";
+							os << "NOTI : stop area is differently named in source file and in SYNTHESE (source=" << name << ", SYNTHESE=" << curStop->getName() << ")<br />";
 						}
 					}
 					else if(!cityCode.empty())
@@ -1269,14 +1283,14 @@ namespace synthese
 								city->getKey(),
 								logic::indeterminate,
 								optional<string>(),
-								string(nameNode.getText()),
+								name,
 								false
 						)	);
 						if(!cstops.empty())
 						{
 							curStop = cstops.front();
 
-							os << "LOAD : link between stops by city and name " << stopKey << " (" << nameNode.getText() << ") and "
+							os << "LOAD : link between stops by city and name " << stopKey << " (" << name << ") and "
 								<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
 						}
 						else
@@ -1292,7 +1306,7 @@ namespace synthese
 							curStop->setCity(city.get());
 							_env.getEditableRegistry<StopArea>().add(curStop);
 
-							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << nameNode.getText() <<  ")<br />";
+							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << name <<  ")<br />";
 						}
 					}
 					else
@@ -1310,9 +1324,7 @@ namespace synthese
 						continue;
 					}
 
-					curStop->setName(
-						charset_converter.convert(nameNode.getText())
-					);
+					curStop->setName(name);
 
 					// Link from physical stops
 					int pstopsNumber(stopAreaNode.nChildNode("contains"));
@@ -1424,7 +1436,7 @@ namespace synthese
 
 									if(cityAliasResult.empty())
 									{
-										os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode", 0).getText() << ")<br />";
+										os << "ERR  : stop point " << stopKey << " with area centroid " << areaCentroid.getChildNode("name").getText() << " does not link to a valid city (" << addressNode.getChildNode("countryCode").getText() << ")<br />";
 										failure = true;
 										continue;
 									}
@@ -1447,7 +1459,7 @@ namespace synthese
 					
 					if(curStop)
 					{
-						PTFileFormat::CreateOrUpdateStop(
+						stopPoints = PTFileFormat::CreateOrUpdateStop(
 							_stops,
 							stopKey,
 							name,
@@ -1461,7 +1473,7 @@ namespace synthese
 					}
 					else if(_autoGenerateStopAreas && city)
 					{
-						PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+						stopPoints = PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 							_stops,
 							stopKey,
 							name,
@@ -1652,11 +1664,20 @@ namespace synthese
 				ScheduledService::Schedules arrs;
 				time_duration lastDep(0,0,0);
 				time_duration lastArr(0,0,0);
+				size_t ignoredStops(0);
 				for(size_t stopRank(0); stopRank < stopsNumber; ++stopRank)
 				{
 					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
 					XMLNode depNode(vjsNode.getChildNode("departureTime"));
 					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
+
+					// Jump over non served stops
+					if(depNode.isEmpty() && arrNode.isEmpty())
+					{
+						route.stops.erase(route.stops.begin() + (stopRank - ignoredStops));
+						++ignoredStops;
+						continue;
+					}
 					
 					// Route boarding and alight possibility
 					if(	vjsNode.nChildNode("boardingAlightingPossibility") &&
@@ -1666,19 +1687,19 @@ namespace synthese
 						string bap(vjsNode.getChildNode("boardingAlightingPossibility").getText());
 						if(bap == "BoardOnly")
 						{
-							route.stops[stopRank]._arrival = false;
+							route.stops[stopRank - ignoredStops]._arrival = false;
 							updatedRoute = true;
 						}
 						else if(bap == "AlightOnly")
 						{
-							route.stops[stopRank]._departure = false;
+							route.stops[stopRank - ignoredStops]._departure = false;
 							updatedRoute = true;
 						}
 					}
 
 					// Schedules
-					time_duration depHour(duration_from_string(depNode.getText()));
-					time_duration arrHour(duration_from_string(arrNode.getText()));
+					time_duration depHour(duration_from_string(depNode.isEmpty() ? arrNode.getText() : depNode.getText()));
+					time_duration arrHour(duration_from_string(arrNode.isEmpty() ? depNode.getText() : arrNode.getText()));
 					time_duration depSchedule(depHour + hours(24 * (lastDep.hours() / 24 + (depHour < Service::GetTimeOfDay(lastDep) ? 1 : 0))));
 					time_duration arrSchedule(arrHour + hours(24 * (lastArr.hours() / 24 + (arrHour < Service::GetTimeOfDay(lastArr) ? 1 : 0))));
 					lastDep = depSchedule;

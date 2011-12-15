@@ -383,4 +383,11 @@ namespace synthese
 				_orderedPlaces.addList(make_pair(itj, jlist));
 			}
 		}
+
+
+
+		void PTRoutePlannerResult::removeJourney( Journeys::iterator it )
+		{
+			_journeys.erase(it);
+		}
 }	}

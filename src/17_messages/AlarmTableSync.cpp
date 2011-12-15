@@ -70,13 +70,14 @@ namespace synthese
 		const string AlarmTableSync::COL_PERIODEND = "period_end";
 		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id";
 		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
+		const string AlarmTableSync::COL_RAW_EDITOR = "raw_editor";
 	}
 
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<AlarmTableSync>::TABLE(
 			"t003_alarms"
-			);
+		);
 
 		template<> const DBTableSync::Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
 		{
@@ -90,6 +91,7 @@ namespace synthese
 			DBTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_DATETIME),
 			DBTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
 			DBTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
 			DBTableSync::Field()
 		};
 
@@ -129,6 +131,7 @@ namespace synthese
 			alarm->setLevel (static_cast<AlarmLevel>(rows->getInt ( AlarmTableSync::COL_LEVEL)));
 			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
+			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
 		}
 
 

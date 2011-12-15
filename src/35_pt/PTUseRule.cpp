@@ -62,6 +62,7 @@ namespace synthese
 			_minDelayDays(days(0)),
 			_maxDelayDays(optional<date_duration>()),
 			_hourDeadLine(not_a_date_time),
+			_reservationMinDepartureTime(not_a_date_time),
 			_defaultFare(NULL),
 			_forbiddenInDepartureBoards(false),
 			_forbiddenInTimetables(false),
@@ -83,8 +84,8 @@ namespace synthese
 
 
 		ptime PTUseRule::getReservationDeadLine (
-			const ptime& originDateTime
-			, const ptime& departureTime
+			const ptime& originDateTime,
+			const ptime& departureTime
 		) const {
 
 			const ptime& referenceTime(
@@ -93,23 +94,54 @@ namespace synthese
 				departureTime
 			);
 
-			ptime minutesMoment = referenceTime;
-			ptime daysMoment = referenceTime;
-
-			if ( _minDelayMinutes.total_seconds() ) minutesMoment -= _minDelayMinutes;
-
-			if ( _minDelayDays.days() )
-			{
-				daysMoment = daysMoment - _minDelayDays + time_duration(23,59,59);
+			// Minutes delay
+			ptime minutesMoment(referenceTime);
+			if(	!_reservationMinDepartureTime.is_not_a_date_time() &&
+				referenceTime.time_of_day() < _reservationMinDepartureTime
+			){
+				minutesMoment = minutesMoment - _minDelayDays + time_duration(23,59,59);
+				if ( _hourDeadLine < minutesMoment.time_of_day() )
+				{
+					minutesMoment = ptime(minutesMoment.date(), _hourDeadLine);
+				}
+			}
+			else if(_minDelayMinutes.total_seconds()
+			){
+				minutesMoment -= _minDelayMinutes;
 			}
 
-			if ( _hourDeadLine < daysMoment.time_of_day() )
-				daysMoment = ptime(daysMoment.date(), _hourDeadLine);
+			// Days delay
+			ptime daysMoment(referenceTime);
+			if(	_minDelayDays.days()
+			){
+				daysMoment = daysMoment - _minDelayDays + time_duration(23,59,59);
+				if ( _hourDeadLine < daysMoment.time_of_day() )
+				{
+					daysMoment = ptime(daysMoment.date(), _hourDeadLine);
+				}
+			}
 
-			if ( minutesMoment < daysMoment )
-				return minutesMoment;
-			else
-				return daysMoment;
+			// Choosing worse delay
+			ptime result(
+				minutesMoment < daysMoment ?
+				minutesMoment :
+				daysMoment
+			);
+
+			// Forbidden days
+			if(_reservationForbiddenDays.size() < 7)
+			{
+				while( _reservationForbiddenDays.find(result.date().day_of_week()) != _reservationForbiddenDays.end())
+				{
+					result = ptime(result.date() - days(1), result.time_of_day());
+					if ( _hourDeadLine < result.time_of_day() )
+					{
+						result = ptime(result.date(), _hourDeadLine);
+					}
+				}
+			}
+
+			return result;
 		}
 
 
