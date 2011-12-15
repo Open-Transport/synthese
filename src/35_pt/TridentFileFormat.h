@@ -32,6 +32,7 @@
 #include "ImportableTableSync.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "StopPointTableSync.hpp"
+#include "StopAreaTableSync.hpp"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "JourneyPattern.hpp"
@@ -156,6 +157,7 @@ namespace synthese
 
 				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
 				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendarTemplates;
+				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stops;
 				mutable impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync> _networks;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;

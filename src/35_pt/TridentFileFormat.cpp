@@ -24,9 +24,6 @@
 #include "DBModule.h"
 #include "TridentFileFormat.h"
 #include "GraphConstants.h"
-#include "StopArea.hpp"
-#include "StopAreaTableSync.hpp"
-#include "StopPoint.hpp"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
@@ -135,6 +132,7 @@ namespace synthese
 			_importTimetablesAsTemplates(false),
 			_mergeRoutes(true),
 			_calendarTemplates(_dataSource, env),
+			_stopAreas(_dataSource, env),
 			_stops(_dataSource, env),
 			_networks(dataSource, env),
 			_lines(dataSource, env)
@@ -1222,14 +1220,13 @@ namespace synthese
 					}
 
 					// Search of an existing connection place with the same code
-					shared_ptr<StopArea> curStop;
-					StopAreaTableSync::SearchResult cstops(
-						StopAreaTableSync::Search(
-							_env,
-							optional<RegistryKeyType>(),
-							logic::indeterminate,
+					StopArea* curStop(NULL);
+					set<StopArea*> cstops(
+						PTFileFormat::GetStopAreas(
+							_stopAreas,
 							stopKey,
-							optional<string>(),
+							optional<const string&>(),
+							os,
 							false
 					)	);
 					if(cstops.size() > 1)
@@ -1239,26 +1236,23 @@ namespace synthese
 					if(!cstops.empty())
 					{
 						// Load existing commercial stop point
-						curStop = cstops.front();
-
-						os << "LOAD : link between stops by code " << stopKey << " (" << name << ") and "
-							<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
+						curStop = *cstops.begin();
 
 						if(curStop->getName() != name)
 						{
 							os << "NOTI : stop area is differently named in source file and in SYNTHESE (source=" << name << ", SYNTHESE=" << curStop->getName() << ")<br />";
 						}
 					}
-					else if(!cityCode.empty())
+					else if(!cityCode.empty()) // Link by city and name
 					{
 						// Search of the city
-						shared_ptr<const City> city;
+						City* city(NULL);
 						CityTableSync::SearchResult cityResult(
 							CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode)
 						);
 						if(!cityResult.empty())
 						{
-							city = cityResult.front();
+							city = cityResult.front().get();
 						}
 						else
 						{
@@ -1274,40 +1268,23 @@ namespace synthese
 								continue;
 							}
 
-							city = _env.getSPtr(cityAliasResult.front()->getCity());
+							city = const_cast<City*>(cityAliasResult.front()->getCity());
 						}
 
-						StopAreaTableSync::SearchResult cstops(
-							StopAreaTableSync::Search(
-								_env,
-								city->getKey(),
-								logic::indeterminate,
-								optional<string>(),
-								name,
-								false
-						)	);
-						if(!cstops.empty())
-						{
-							curStop = cstops.front();
+						// Stop area creation
+						curStop = PTFileFormat::CreateStopArea(
+							_stopAreas,
+							stopKey,
+							name,
+							*city,
+							_defaultTransferDuration,
+							false,
+							_dataSource,
+							_env,
+							os
+						);
 
-							os << "LOAD : link between stops by city and name " << stopKey << " (" << name << ") and "
-								<< curStop->getKey() << " (" << curStop->getFullName() << ")<br />";
-						}
-						else
-						{
-							// Commercial stop point creation with some default values
-							curStop.reset(new StopArea);
-							Importable::DataSourceLinks links;
-							links.insert(make_pair(&_dataSource, stopKey));
-							curStop->setDataSourceLinks(links);
-							curStop->setAllowedConnection(true);
-							curStop->setDefaultTransferDelay(_defaultTransferDuration);
-							curStop->setKey(StopAreaTableSync::getId());
-							curStop->setCity(city.get());
-							_env.getEditableRegistry<StopArea>().add(curStop);
-
-							os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << name <<  ")<br />";
-						}
+						os << "CREA : Creation of the commercial stop with key " << stopKey << " (" << name <<  ")<br />";
 					}
 					else
 					{
@@ -1330,7 +1307,7 @@ namespace synthese
 					int pstopsNumber(stopAreaNode.nChildNode("contains"));
 					for(int pstopRank(0); pstopRank < pstopsNumber; ++pstopRank)
 					{
-						commercialStopsByPhysicalStop[stopAreaNode.getChildNode("contains", pstopRank).getText()] = curStop.get();
+						commercialStopsByPhysicalStop[stopAreaNode.getChildNode("contains", pstopRank).getText()] = curStop;
 					}
 				}
 			}
@@ -1367,9 +1344,7 @@ namespace synthese
 						os << "WARN : Physical stop " << stopKey << " does not have any area centroid (" << name <<  ")<br />";
 					}
 					else
-
 					{
-
 						map<string, XMLNode>::iterator itPlace(areaCentroids.find(areaCentroidNode.getText()));
 						if(itPlace == areaCentroids.end())
 						{

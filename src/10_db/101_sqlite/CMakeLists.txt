@@ -12,6 +12,8 @@ SQLiteResult.cpp
 SQLiteResult.hpp
 SQLiteVirtualTable.cpp
 SQLiteVirtualTable.hpp
+VirtualDBFVirtualTable.cpp
+VirtualDBFVirtualTable.hpp
 VirtualShapeVirtualTable.cpp
 VirtualShapeVirtualTable.hpp
 )
