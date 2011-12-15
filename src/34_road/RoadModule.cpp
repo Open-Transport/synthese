@@ -132,15 +132,19 @@ namespace synthese
 			}
 
 			GeographyModule::CitiesMatcher::MatchResult cities(
-				citiesMatcher.bestMatches(cityName,1)
+				citiesMatcher.bestMatches(cityName,50)
 			);
-			if(cities.empty())
+			BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchResult::value_type& city, cities)
 			{
-				throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
+				RoadModule::ExtendedFetchPlacesResult result(
+					ExtendedFetchPlaces(city, placeName, resultsNumber)
+				);
+				if(!result.empty())
+				{
+					return result;
+				}
 			}
-
-			GeographyModule::CitiesMatcher::MatchResult::value_type city(cities.front());
-			return ExtendedFetchPlaces(city, placeName, resultsNumber);
+			throw UndeterminedPlaceException(cityName, placeName, UndeterminedPlaceException::NO_RESULT_FROM_CITY_SEARCH);
 		}
 
 
