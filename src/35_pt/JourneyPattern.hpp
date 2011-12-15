@@ -175,11 +175,11 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				virtual std::string getRuleUserName() const { return "Mission " + getName(); }
+				virtual std::string getRuleUserName() const;
 
 				virtual bool isActive(const boost::gregorian::date& date) const;
 
-				bool isPedestrianMode() const;
+				virtual bool isPedestrianMode() const;
 
 				bool isReservable () const;
 
@@ -226,13 +226,15 @@ namespace synthese
 					bool _departure;
 					bool _arrival;
 					boost::optional<bool> _withTimes;
+					boost::shared_ptr<geos::geom::LineString> _geometry;
 
 					StopWithDepartureArrivalAuthorization(
 						const std::set<StopPoint*>& stop,
 						boost::optional<graph::MetricOffset> metricOffset = boost::optional<graph::MetricOffset>(),
 						bool departure = true,
 						bool arrival = true,
-						boost::optional<bool> withTimes = true
+						boost::optional<bool> withTimes = true,
+						boost::shared_ptr<geos::geom::LineString> geometry = boost::shared_ptr<geos::geom::LineString>()
 					);
 				};
 				typedef std::vector<StopWithDepartureArrivalAuthorization> StopsWithDepartureArrivalAuthorization;

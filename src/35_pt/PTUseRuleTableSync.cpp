@@ -28,11 +28,13 @@
 #include "TransportNetworkRight.h"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -40,6 +42,7 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace security;
+	using namespace graph;
 
 	template<> const string util::FactorableTemplate<DBTableSync,PTUseRuleTableSync>::FACTORY_KEY("35.10.06 Public transportation use rules");
 
@@ -52,6 +55,8 @@ namespace synthese
 		const string PTUseRuleTableSync::COL_MINDELAYDAYS ("min_delay_days");
 		const string PTUseRuleTableSync::COL_MAXDELAYDAYS ("max_delay_days");
 		const string PTUseRuleTableSync::COL_HOURDEADLINE ("hour_deadline");
+		const string PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME = "reservation_min_departure_time";
+		const string PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS = "reservation_forbidden_days";
 		const string PTUseRuleTableSync::COL_NAME("name");
 		const string PTUseRuleTableSync::COL_DEFAULT_FARE("default_fare_id");
 		const string PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS("forbidden_in_departure_boards");
@@ -76,6 +81,8 @@ namespace synthese
 			DBTableSync::Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
 			DBTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
 			DBTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
+			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME, SQL_TIME),
+			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS, SQL_TEXT),
 			DBTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
 			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, SQL_BOOLEAN),
 			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, SQL_BOOLEAN),
@@ -87,6 +94,8 @@ namespace synthese
 		{
 			DBTableSync::Index()
 		};
+
+
 
 		template<> void DBDirectTableSyncTemplate<PTUseRuleTableSync,PTUseRule>::Load(
 			PTUseRule* rr,
@@ -139,6 +148,13 @@ namespace synthese
 			time_duration hourDeadline(rows->getHour(PTUseRuleTableSync::COL_HOURDEADLINE));
 			rr->setHourDeadLine (hourDeadline);
 
+			// Reservation min departure time
+			rr->setReservationMinDepartureTime(rows->getHour(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME));
+
+			// Reservation forbidden days
+			string forbiddenDays(rows->getText(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS));
+			rr->setReservationForbiddenDays(PTUseRuleTableSync::UnserializeForbiddenDays(forbiddenDays));
+
 			// Name
 			rr->setName(rows->getText(PTUseRuleTableSync::COL_NAME));
 			rr->setAccessCapacity(rows->getOptionalUnsignedInt(PTUseRuleTableSync::COL_CAPACITY));
@@ -177,6 +193,8 @@ namespace synthese
 			query.addField(static_cast<int>(object->getMinDelayDays().days()));
 			query.addField(object->getMaxDelayDays() ? object->getMaxDelayDays()->days() : 0);
 			query.addField(object->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(object->getHourDeadLine()));
+			query.addField(object->getReservationMinDepartureTime().is_not_a_date_time() ? string() : to_simple_string(object->getReservationMinDepartureTime()));
+			query.addField(PTUseRuleTableSync::SerializeForbiddenDays(object->getReservationForbiddenDays()));
 			query.addField(object->getDefaultFare() ? object->getDefaultFare()->getKey() : RegistryKeyType(0));
 			query.addField(object->getForbiddenInDepartureBoards());
 			query.addField(object->getForbiddenInTimetables());
@@ -258,5 +276,111 @@ namespace synthese
 				}
 			}
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		std::string PTUseRuleTableSync::SerializeForbiddenDays( const PTUseRule::ReservationForbiddenDays& value )
+		{
+			bool first(true);
+			stringstream forbiddenDays;
+			BOOST_FOREACH(const date::day_of_week_type& day, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					forbiddenDays << ",";
+				}
+				forbiddenDays << day;
+			}
+			return forbiddenDays.str();
+		}
+
+
+
+		PTUseRule::ReservationForbiddenDays PTUseRuleTableSync::UnserializeForbiddenDays( const std::string& value )
+		{
+			if(value.empty())
+			{
+				return PTUseRule::ReservationForbiddenDays();
+			}
+			else
+			{
+				PTUseRule::ReservationForbiddenDays days;
+				vector<string> daysVec;
+				split(daysVec, value, is_any_of(","));
+				BOOST_FOREACH(const string& dayStr, daysVec)
+				{
+					try
+					{
+						days.insert(static_cast<date::day_of_week_type>(lexical_cast<int>(dayStr)));
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+				}
+				return days;
+			}
+		}
+
+
+
+		graph::RuleUser::Rules PTUseRuleTableSync::UnserializeUseRules(
+			const std::string& value,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			RuleUser::Rules result(USER_CLASSES_VECTOR_SIZE, NULL);
+
+			if(!value.empty())
+			{
+				vector<string> rules;
+				split(rules, value, is_any_of(","));
+				BOOST_FOREACH(const string& rule, rules)
+				{
+					vector<string> parts;
+					split(parts, rule, is_any_of(":"));
+
+					try
+					{
+						size_t i(lexical_cast<size_t>(parts[0]) - USER_CLASS_CODE_OFFSET);
+						RegistryKeyType ruleId(lexical_cast<RegistryKeyType>(rule[1]));
+						result[i] = GetEditable(ruleId, env, linkLevel).get();
+					}
+					catch(ObjectNotFoundException<PTUseRule>&)
+					{
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
+		std::string PTUseRuleTableSync::SerializeUseRules(
+			const graph::RuleUser::Rules& value
+		){
+			stringstream stream;
+			bool first(true);
+			for(size_t index(0); index<value.size(); ++index)
+			{
+				if(value[index] && dynamic_cast<const PTUseRule*>(value[index]))
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << ",";
+					}
+					stream << (USER_CLASS_CODE_OFFSET + index) << ":" << static_cast<const PTUseRule*>(value[index])->getKey();
+				}
+			}
+			return stream.str();
 		}
 }	}

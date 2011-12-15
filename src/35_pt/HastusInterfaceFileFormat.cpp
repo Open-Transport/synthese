@@ -237,6 +237,26 @@ namespace synthese
 				);
 			}
 
+			// Record 5 : Main calendar
+			_loadNextRecord(5);
+			set<string> missingCalendars;
+			string mainCalendarCode(_getTextField(9, 4));
+			CalendarTemplate* mainCalendar(
+				CalendarFileFormat::GetCalendarTemplate(
+					calendars,
+					mainCalendarCode,
+					os
+			)	);
+			Calendar mainMask;
+			if(mainCalendar)
+			{
+				mainMask = mainCalendar->getResult(_calendar);
+			}
+			else
+			{
+				missingCalendars.insert(mainCalendarCode);
+			}
+
 			// Records 13 : Services
 			vector<TemporaryService> services;
 			typedef map<string, set<StopPoint*> > StopCodes;
@@ -358,7 +378,6 @@ namespace synthese
 			}
 
 			// Loop on temporary services
-			set<string> missingCalendars;
 			BOOST_FOREACH(const TemporaryService& service, services)
 			{
 				// Line
@@ -490,7 +509,7 @@ namespace synthese
 				)	);
 				if(calendar)
 				{
-					*sservice |= calendar->getResult(_calendar);
+					*sservice |= calendar->getResult(mainMask);
 				}
 				else
 				{

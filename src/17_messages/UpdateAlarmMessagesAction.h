@@ -55,13 +55,15 @@ namespace synthese
 			static const std::string PARAMETER_SHORT_MESSAGE;
 			static const std::string PARAMETER_LONG_MESSAGE;
 			static const std::string PARAMETER_ALARM_ID;
+			static const std::string PARAMETER_RAW_EDITOR;
 
 		private:
-			AlarmLevel		_type;
-			std::string _shortMessage;
-			std::string _longMessage;
 			boost::shared_ptr<Alarm>		_alarm;
-
+			boost::optional<AlarmLevel>		_type;
+			boost::optional<std::string> _shortMessage;
+			boost::optional<std::string> _longMessage;
+			boost::optional<bool> _rawEditor;
+			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/
@@ -94,6 +96,9 @@ namespace synthese
 			) throw(server::ActionException);
 
 			virtual bool isAuthorized(const server::Session* session) const;
+
+			void setRawEditor(boost::optional<bool> value){ _rawEditor = value; }
+			void setAlarm(boost::shared_ptr<Alarm> value){ _alarm = value; }
 		};
 	}
 }

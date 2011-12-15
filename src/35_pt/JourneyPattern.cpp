@@ -368,16 +368,26 @@ namespace synthese
 		}
 
 
+
+		std::string JourneyPattern::getRuleUserName() const
+		{
+			return "Parcours " + getName();
+		}
+
+
+
 		JourneyPattern::StopWithDepartureArrivalAuthorization::StopWithDepartureArrivalAuthorization(
 			const std::set<StopPoint*>& stop,
 			boost::optional<MetricOffset> metricOffset /*= boost::optional<MetricOffset>()*/,
 			bool departure /*= true*/,
 			bool arrival /*= true */,
-			boost::optional<bool> withTimes
+			boost::optional<bool> withTimes,
+			boost::shared_ptr<geos::geom::LineString> geometry
 		):	_stop(stop),
 			_metricOffset(metricOffset),
 			_departure(departure),
 			_arrival(arrival),
-			_withTimes(withTimes)
+			_withTimes(withTimes),
+			_geometry(geometry)
 		{}
 }	}

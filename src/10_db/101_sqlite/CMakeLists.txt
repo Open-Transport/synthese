@@ -10,6 +10,10 @@ SQLiteModule.inc.cpp
 SQLiteModuleRegister.cpp
 SQLiteResult.cpp
 SQLiteResult.hpp
+SQLiteVirtualTable.cpp
+SQLiteVirtualTable.hpp
+VirtualShapeVirtualTable.cpp
+VirtualShapeVirtualTable.hpp
 )
 
 set_source_files_properties(SQLiteModule.gen.cpp SQLiteModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

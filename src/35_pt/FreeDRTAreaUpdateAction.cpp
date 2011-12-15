@@ -24,10 +24,11 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "DRTAreaUpdateAction.hpp"
+#include "FreeDRTAreaUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
-#include "DRTAreaTableSync.hpp"
+#include "FreeDRTAreaTableSync.hpp"
+#include "CommercialLineTableSync.h"
 
 using namespace std;
 
@@ -39,16 +40,17 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::DRTAreaUpdateAction>::FACTORY_KEY("DRTAreaUpdate");
+		template<> const string FactorableTemplate<Action, pt::FreeDRTAreaUpdateAction>::FACTORY_KEY("FreeDRTAreaUpdate");
 	}
 
 	namespace pt
 	{
-		const string DRTAreaUpdateAction::PARAMETER_AREA_ID = Action_PARAMETER_PREFIX + "id";
-		const string DRTAreaUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		const string DRTAreaUpdateAction::PARAMETER_STOPS = Action_PARAMETER_PREFIX + "st";
+		const string FreeDRTAreaUpdateAction::PARAMETER_AREA_ID = Action_PARAMETER_PREFIX + "id";
+		const string FreeDRTAreaUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
+		const string FreeDRTAreaUpdateAction::PARAMETER_CITIES = Action_PARAMETER_PREFIX + "cities";
+		const string FreeDRTAreaUpdateAction::PARAMETER_COMMERCIAL_LINE_ID = Action_PARAMETER_PREFIX + "line_id";
 
-		ParametersMap DRTAreaUpdateAction::getParametersMap() const
+		ParametersMap FreeDRTAreaUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_area.get())
@@ -59,28 +61,32 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NAME, *_name);
 			}
-			if(_stops)
+			if(_cities)
 			{
-				map.insert(PARAMETER_STOPS, DRTAreaTableSync::SerializeStops(*_stops));
+				map.insert(PARAMETER_CITIES, FreeDRTAreaTableSync::SerializeCities(*_cities));
+			}
+			if(_line && _line->get())
+			{
+				map.insert(PARAMETER_COMMERCIAL_LINE_ID, (*_line)->getKey());
 			}
 			return map;
 		}
 
 
 
-		void DRTAreaUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void FreeDRTAreaUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.getOptional<RegistryKeyType>(PARAMETER_AREA_ID)) try
 			{
-				_area = DRTAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_AREA_ID), *_env);
+				_area = FreeDRTAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_AREA_ID), *_env);
 			}
-			catch (ObjectNotFoundException<DRTArea>&)
+			catch (ObjectNotFoundException<FreeDRTArea>&)
 			{
 				throw ActionException("No such area");
 			}
 			else
 			{
-				_area.reset(new DRTArea);
+				_area.reset(new FreeDRTArea);
 			}
 
 			if(map.isDefined(PARAMETER_NAME))
@@ -88,15 +94,27 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 
-			if(map.isDefined(PARAMETER_STOPS))
+			if(map.isDefined(PARAMETER_CITIES))
 			{
-				_stops = DRTAreaTableSync::UnserializeStops(map.get<string>(PARAMETER_STOPS), *_env);
+				_cities = FreeDRTAreaTableSync::UnserializeCities(map.get<string>(PARAMETER_CITIES), *_env);
+			}
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID, 0))
+			{
+				try
+				{
+					_line = CommercialLineTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID), *_env);
+				}
+				catch (ObjectNotFoundException<CommercialLine>&)
+				{
+					throw ActionException("No such line");
+				}
 			}
 		}
 
 
 
-		void DRTAreaUpdateAction::run(
+		void FreeDRTAreaUpdateAction::run(
 			Request& request
 		){
 //			stringstream text;
@@ -105,12 +123,16 @@ namespace synthese
 			{
 				_area->setName(*_name);
 			}
-			if(_stops)
+			if(_cities)
 			{
-				_area->setStops(*_stops);
+				_area->setCities(*_cities);
+			}
+			if(_line)
+			{
+				_area->setLine(_line->get());
 			}
 
-			DRTAreaTableSync::Save(_area.get());
+			FreeDRTAreaTableSync::Save(_area.get());
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 
@@ -122,10 +144,9 @@ namespace synthese
 
 
 
-		bool DRTAreaUpdateAction::isAuthorized(
+		bool FreeDRTAreaUpdateAction::isAuthorized(
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+}	}

@@ -804,20 +804,20 @@ namespace synthese
 				}
 
 				// Filter
-				algorithm::TimeSlotRoutePlanner::Result filteredJourneys;
-				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+				vector<PTRoutePlannerResult::Journeys::iterator> toRemove;
+				for(PTRoutePlannerResult::Journeys::iterator itJourney(result.getJourneys().begin()); itJourney != result.getJourneys().end(); ++itJourney)
 				{
+					const Journey& journey(*itJourney);
 					if(journey.getDuration().total_seconds() / minDuration.total_seconds() < *_minMaxDurationRatioFilter)
 					{
-						filteredJourneys.push_back(journey);
+						toRemove.push_back(itJourney);
 					}
 				}
-				result = PTRoutePlannerResult(
-					result.getDeparturePlace(),
-					result.getArrivalPlace(),
-					result.getSamePlaces(),
-					filteredJourneys
-				);
+				BOOST_FOREACH(PTRoutePlannerResult::Journeys::iterator& itToRemove, toRemove)
+				{
+					result.removeJourney(itToRemove);
+				}
+
 			}
 
 			// Display
@@ -1899,7 +1899,9 @@ namespace synthese
 								it->getContinuousServiceRange().total_seconds() > 0,
 								itPlaces->isOrigin,
 								true,
-								pedestrianMode && !lastPedestrianMode
+								pedestrianMode && !lastPedestrianMode,
+								itPlaces->isOrigin,
+								itPlaces->isDestination
 							);
 							++itPlaces; ++itSheetRow;
 							lastPedestrianMode = pedestrianMode;
@@ -1949,7 +1951,9 @@ namespace synthese
 								it->getContinuousServiceRange().total_seconds() > 0,
 								true,
 								itPlaces->isDestination,
-								false
+								false,
+								itPlaces->isOrigin,
+								itPlaces->isDestination
 							);
 						}
 					}
@@ -1967,7 +1971,9 @@ namespace synthese
 							false,
 							true,
 							true,
-							false
+							false,
+							itPlaces->isOrigin,
+							itPlaces->isDestination
 						);
 					}
 				}
@@ -2195,7 +2201,9 @@ namespace synthese
 					false,
 					true,
 					true,
-					false
+					false,
+					itPlaces->isOrigin,
+					itPlaces->isDestination
 				);
 			}
 		}
@@ -2235,10 +2243,14 @@ namespace synthese
 			bool isItContinuousService,
 			bool isFirstWriting,
 			bool isLastWriting,
-			bool isFirstFoot
+			bool isFirstFoot,
+			bool isOriginRow,
+			bool isDestinationRow
 		) const {
 			ParametersMap pm(getTemplateParameters());
 
+			pm.insert(DATA_IS_DESTINATION_ROW, isDestinationRow);
+			pm.insert(DATA_IS_ORIGIN_ROW, isOriginRow);
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
 			pm.insert(DATA_IS_FOOT, isItFootLine);
 			{

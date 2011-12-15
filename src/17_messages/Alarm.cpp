@@ -47,9 +47,9 @@ namespace synthese
 			util::RegistryKeyType key,
 			const Scenario* scenario
 		):	_level(ALARM_LEVEL_INFO),
-			_scenario(scenario)
-		{
-		}
+			_scenario(scenario),
+			_rawEditor(false)
+		{}
 
 
 
@@ -58,9 +58,9 @@ namespace synthese
 		):	_level(source._level),
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
-			_scenario(source._scenario)
-		{
-		}
+			_scenario(source._scenario),
+			_rawEditor(source._rawEditor)
+		{}
 
 
 
@@ -70,10 +70,11 @@ namespace synthese
 		):	_level(source._level),
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
-			_scenario(scenario)
-		{
+			_scenario(scenario),
+			_rawEditor(source._rawEditor)
+		{}
 
-		}
+
 
 		const AlarmLevel& Alarm::getLevel () const
 		{

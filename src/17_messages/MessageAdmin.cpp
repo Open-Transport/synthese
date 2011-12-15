@@ -47,6 +47,8 @@
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "ActionException.h"
+#include "TinyMCE.hpp"
+#include "StaticActionRequest.h"
 
 #include <boost/foreach.hpp>
 
@@ -137,18 +139,42 @@ namespace synthese
 				AdminActionFunctionRequest<UpdateAlarmMessagesAction,MessageAdmin> updateMessagesRequest(_request);
 				updateMessagesRequest.getAction()->setAlarmId(_alarm->getKey());
 
-				PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
-				stream << tu.open();
-				stream << tu.cell(
-					"Type",
-					tu.getForm().getRadioInputCollection(
-						UpdateAlarmMessagesAction::PARAMETER_TYPE,
-						MessagesModule::getLevelLabels(),
-						optional<AlarmLevel>(_alarm->getLevel())
-				)	);
-				stream << tu.cell("Titre", tu.getForm().getTextInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage()));
-				stream << tu.cell("Contenu", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60, false));
-				stream << tu.close();
+				if(_alarm->getRawEditor())
+				{
+					PropertiesHTMLTable tu(updateMessagesRequest.getHTMLForm("messages"));
+					stream << tu.open();
+					stream << tu.cell(
+						"Type",
+						tu.getForm().getRadioInputCollection(
+							UpdateAlarmMessagesAction::PARAMETER_TYPE,
+							MessagesModule::getLevelLabels(),
+							optional<AlarmLevel>(_alarm->getLevel())
+					)	);
+					stream << tu.cell("Titre", tu.getForm().getTextInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage()));
+					stream << tu.cell("Contenu", tu.getForm().getTextAreaInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage(), 6, 60, false));
+					stream << tu.close();
+				}
+				else
+				{
+					StaticActionRequest<UpdateAlarmMessagesAction> contentUpdateRequest(_request);
+					contentUpdateRequest.getAction()->setAlarm(const_pointer_cast<Alarm>(_alarm));
+
+					TinyMCE tinyMCE;
+					tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
+					stream << tinyMCE.open();
+
+					stream << TinyMCE::GetFakeFormWithInput(UpdateAlarmMessagesAction::PARAMETER_SHORT_MESSAGE, _alarm->getShortMessage());
+					stream << TinyMCE::GetFakeFormWithInput(UpdateAlarmMessagesAction::PARAMETER_LONG_MESSAGE, _alarm->getLongMessage());
+				}
+
+				AdminActionFunctionRequest<UpdateAlarmMessagesAction, MessageAdmin> rawEditorUpdateRequest(_request);
+				rawEditorUpdateRequest.getAction()->setAlarm(const_pointer_cast<Alarm>(_alarm));
+				rawEditorUpdateRequest.getAction()->setRawEditor(!_alarm->getRawEditor());
+				stream <<
+					HTMLModule::getLinkButton(
+					rawEditorUpdateRequest.getHTMLForm().getURL(),
+					"Passer à l'éditeur "+ string(_alarm->getRawEditor() ? "WYSIWYG" : "technique")
+				);
 			}
 
 			// Alarm messages destinations loop
