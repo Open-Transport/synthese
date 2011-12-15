@@ -66,17 +66,6 @@ namespace synthese
 				const AdminInterfaceElement& other
 			) const;
 
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds the tabs of the page.
-			/// @param profile The profile of the current user
-			/// @author Hugues Romain
-			/// @date 2011
-			virtual void _buildTabs(
-				const security::Profile& profile
-			) const;
-
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
