@@ -1127,10 +1127,10 @@ namespace synthese
 				PTFileFormat::CreateOrUpdateLine(
 					_lines,
 					lineKeyNode.getText(),
-					clineNameNode.isEmpty() ?
+					clineNameNode.isEmpty() || !clineNameNode.nText() ?
 						optional<const string&>() :
 						optional<const string&>(charset_converter.convert(clineNameNode.getText())),
-					clineShortNameNode.isEmpty() ?
+					clineShortNameNode.isEmpty() || !clineShortNameNode.nText() ?
 						optional<const string&>() :
 						optional<const string&>(charset_converter.convert(clineShortNameNode.getText())),
 					optional<RGBColor>(),
