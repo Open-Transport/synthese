@@ -31,6 +31,7 @@
 #include "CoordinatesSystem.hpp"
 #include "DBTransaction.hpp"
 #include "VirtualShapeVirtualTable.hpp"
+#include "VirtualDBFVirtualTable.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "DataSourceAdmin.h"
 #include "ImportFunction.h"
@@ -135,7 +136,7 @@ namespace synthese
 			if(key == FILE_MTDAREA)
 			{
 				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+				VirtualDBFVirtualTable table(filePath, _dataSource.getCharset());
 
 				map<string, string> departementCodes;
 				typedef map<pair<string, string>, City*> CityCodes;

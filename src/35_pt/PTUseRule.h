@@ -31,6 +31,7 @@
 
 #include <string>
 #include <boost/optional.hpp>
+#include <set>
 
 namespace synthese
 {
@@ -83,6 +84,7 @@ namespace synthese
 
 
 			typedef std::vector<std::pair<boost::optional<ReservationRuleType>, std::string> > ReservationRuleTypesList;
+			typedef std::set<boost::gregorian::date::day_of_week_type> ReservationForbiddenDays;
 
 		private:
 
@@ -117,6 +119,9 @@ namespace synthese
 				boost::optional<boost::gregorian::date_duration> _maxDelayDays;  //!< Maxium number of days between reservation and departure.
 
 				boost::posix_time::time_duration _hourDeadLine; //!< Latest reservation hour the last day open for reservation
+				boost::posix_time::time_duration _reservationMinDepartureTime; //!< Minimal time for reservation the day of the departure. If departure time is before, then the reservation must be done the preceding day, before _hourDeadLine or midnight if not defined
+
+				ReservationForbiddenDays _reservationForbiddenDays;
 
 				bool _forbiddenInDepartureBoards;
 				bool _forbiddenInTimetables;
@@ -149,6 +154,8 @@ namespace synthese
 				bool getForbiddenInDepartureBoards ()	const { return _forbiddenInDepartureBoards; }
 				bool getForbiddenInTimetables ()		const { return _forbiddenInTimetables; }
 				bool getForbiddenInJourneyPlanning ()	const { return _forbiddenInJourneyPlanning; }
+				const boost::posix_time::time_duration& getReservationMinDepartureTime() const { return _reservationMinDepartureTime; }
+				const std::set<boost::gregorian::date::day_of_week_type>& getReservationForbiddenDays() const { return _reservationForbiddenDays; }
 			//@}
 
 			//! @name Setters
@@ -169,6 +176,8 @@ namespace synthese
 				void setForbiddenInDepartureBoards (bool value){ _forbiddenInDepartureBoards = value; }
 				void setForbiddenInJourneyPlanning (bool value){ _forbiddenInJourneyPlanning = value; }
 				void setForbiddenInTimetables (bool value){ _forbiddenInTimetables = value; }
+				void setReservationMinDepartureTime(const boost::posix_time::time_duration& value){ _reservationMinDepartureTime = value; }
+				void setReservationForbiddenDays(const std::set<boost::gregorian::date::day_of_week_type>& value){ _reservationForbiddenDays = value; }
 			//@}
 
 			//! @name Service

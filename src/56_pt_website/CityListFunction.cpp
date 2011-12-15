@@ -118,6 +118,12 @@ namespace synthese
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
+
+			// Cleaning of template parameters for non CMS output
+			if(!_outputFormat.empty())
+			{
+				_templateParameters.clear();
+			}
 		}
 
 
@@ -224,7 +230,7 @@ namespace synthese
 			{
 				pm.outputJSON(stream, DATA_CITIES);
 			}
-			if(_page.get())
+			else if(_page.get())
 			{
 				// Size
 				pm.insert(DATA_RESULTS_SIZE, citiesList.size());

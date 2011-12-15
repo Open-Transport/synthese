@@ -54,6 +54,14 @@
 #include "DestinationsAdmin.hpp"
 #include "FareAdmin.h"
 #include "FaresAdmin.h"
+#include "FreeDRTArea.hpp"
+#include "FreeDRTAreaAdmin.hpp"
+#include "FreeDRTAreaTableSync.hpp"
+#include "FreeDRTAreaUpdateAction.hpp"
+#include "FreeDRTTimeSlot.hpp"
+#include "FreeDRTTimeSlotAdmin.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
+#include "FreeDRTTimeSlotUpdateAction.hpp"
 #include "PTQualityControlAdmin.hpp"
 #include "TransportNetworkAdmin.h"
 #include "CommercialLineAdmin.h"
@@ -82,7 +90,10 @@
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
 #include "DeviateServiceAction.hpp"
+#include "DRTAreaUpdateAction.hpp"
 #include "FareUpdateAction.hpp"
+#include "FreeDRTAreaUpdateAction.hpp"
+#include "FreeDRTTimeSlotUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
@@ -109,7 +120,6 @@
 #include "LineStopUpdateAction.hpp"
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
-#include "DRTAreaUpdateAction.hpp"
 #include "RollingStockUpdateAction.hpp"
 
 #include "LineAlarmRecipient.hpp"
@@ -122,6 +132,8 @@
 // Registries
 
 #include "Destination.hpp"
+#include "FreeDRTArea.hpp"
+#include "FreeDRTTimeSlot.hpp"
 #include "JourneyPattern.hpp"
 #include "LineArea.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
@@ -152,7 +164,11 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::TransportNetworkTableSync::integrate();
 
+	synthese::pt::DesignatedLinePhysicalStopInheritedTableSync::integrate();
 	synthese::pt::DestinationTableSync::integrate();
+	synthese::pt::DRTAreaTableSync::integrate();
+	synthese::pt::FreeDRTAreaTableSync::integrate();
+	synthese::pt::FreeDRTTimeSlotTableSync::integrate();
 	synthese::pt::PTUseRuleTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopPointTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::StopPointTableSync>::integrate();
@@ -173,8 +189,6 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 	synthese::pt::LineStopTableSync::integrate();
 	synthese::pt::LineAreaInheritedTableSync::integrate();
-	synthese::pt::DesignatedLinePhysicalStopInheritedTableSync::integrate();
-	synthese::pt::DRTAreaTableSync::integrate();
 	synthese::pt::ServiceCalendarLinkTableSync::integrate();
 
 	synthese::pt::PTModule::integrate();
@@ -238,6 +252,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationUpdateAction::integrate();
 	synthese::pt::DeviateServiceAction::integrate();
 	synthese::pt::DRTAreaUpdateAction::integrate();
+	synthese::pt::FreeDRTAreaUpdateAction::integrate();
+	synthese::pt::FreeDRTTimeSlotUpdateAction::integrate();
 	synthese::pt::RollingStockUpdateAction::integrate();
 	synthese::pt::FareUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
@@ -277,6 +293,9 @@ void synthese::pt::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::pt::Destination>();
+	synthese::util::Env::Integrate<synthese::pt::DRTArea>();
+	synthese::util::Env::Integrate<synthese::pt::FreeDRTArea>();
+	synthese::util::Env::Integrate<synthese::pt::FreeDRTTimeSlot>();
 	synthese::util::Env::Integrate<synthese::pt::JourneyPattern>();
 	synthese::util::Env::Integrate<synthese::pt::LineArea>();
 	synthese::util::Env::Integrate<synthese::pt::DesignatedLinePhysicalStop>();
@@ -292,7 +311,5 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::Fare>();
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
-	synthese::util::Env::Integrate<synthese::pt::DRTArea>();
 	synthese::util::Env::Integrate<synthese::pt::ServiceCalendarLink>();
-
 }

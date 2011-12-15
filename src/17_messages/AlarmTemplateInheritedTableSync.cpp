@@ -83,6 +83,7 @@ namespace synthese
 			query.addFieldNull();
 			query.addField(object->getScenario() ? object->getScenario()->getKey() : RegistryKeyType(0));
 			query.addField(0);
+			query.addField(object->getRawEditor());
 			query.execute(transaction);
 		}
 	}

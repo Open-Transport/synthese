@@ -60,9 +60,11 @@ namespace synthese
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS = Action_PARAMETER_PREFIX + "md";
 		const string PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES = Action_PARAMETER_PREFIX + "mm";
 		const string PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE = Action_PARAMETER_PREFIX + "dl";
-		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS(Action_PARAMETER_PREFIX + "fb");
-		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_TIMETABLES(Action_PARAMETER_PREFIX + "ft");
-		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER(Action_PARAMETER_PREFIX + "fj");
+		const string PTUseRuleUpdateAction::PARAMETER_RESERVATION_MIN_DEPARTURE_TIME = Action_PARAMETER_PREFIX + "_reservation_min_departure_time";
+		const string PTUseRuleUpdateAction::PARAMETER_RESERVATION_FORBIDDEN_DAYS = Action_PARAMETER_PREFIX + "_reservation_forbidden_days";
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS = Action_PARAMETER_PREFIX + "fb";
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_TIMETABLES = Action_PARAMETER_PREFIX + "ft";
+		const string PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER = Action_PARAMETER_PREFIX + "fj";
 
 		ParametersMap PTUseRuleUpdateAction::getParametersMap() const
 		{
@@ -132,6 +134,26 @@ namespace synthese
 					map.insert(PARAMETER_HOUR_DEADLINE, string());
 				}
 			}
+
+			// Reservation min departure time
+			if(_reservationMinDepartureTime)
+			{
+				if(!_reservationMinDepartureTime->is_not_a_date_time())
+				{
+					map.insert(PARAMETER_RESERVATION_MIN_DEPARTURE_TIME, to_simple_string(*_reservationMinDepartureTime));
+				}
+				else
+				{
+					map.insert(PARAMETER_RESERVATION_MIN_DEPARTURE_TIME, string());
+				}
+			}
+
+			// Reservation forbidden days
+			if(_reservationForbiddenDays)
+			{
+				map.insert(PARAMETER_RESERVATION_FORBIDDEN_DAYS, PTUseRuleTableSync::SerializeForbiddenDays(*_reservationForbiddenDays));
+			}
+
 			if(_forbiddenInDepartureBoards)
 			{
 				map.insert(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS, *_forbiddenInDepartureBoards);
@@ -246,8 +268,25 @@ namespace synthese
 				}
 				else
 				{
-					_hourDeadLine = optional<time_duration>();
+					_hourDeadLine = time_duration(not_a_date_time);
 				}
+			}
+
+			if(map.isDefined(PARAMETER_RESERVATION_MIN_DEPARTURE_TIME))
+			{
+				if(!map.getDefault<string>(PARAMETER_RESERVATION_MIN_DEPARTURE_TIME).empty())
+				{
+					_reservationMinDepartureTime = duration_from_string(map.get<string>(PARAMETER_RESERVATION_MIN_DEPARTURE_TIME));
+				}
+				else
+				{
+					_reservationMinDepartureTime = time_duration(not_a_date_time);
+				}
+			}
+
+			if(map.isDefined(PARAMETER_RESERVATION_FORBIDDEN_DAYS))
+			{
+				_reservationForbiddenDays = PTUseRuleTableSync::UnserializeForbiddenDays(map.get<string>(PARAMETER_RESERVATION_FORBIDDEN_DAYS));
 			}
 
 			if(map.isDefined(PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS))

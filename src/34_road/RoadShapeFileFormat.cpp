@@ -157,9 +157,7 @@ namespace synthese
 					}
 
 					// Name field
-					string name(
-						IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(rows->getText(_roadPlacesNameField))
-					);
+					string name(rows->getText(_roadPlacesNameField));
 
 					// Code field
 					string code(

@@ -58,10 +58,12 @@ namespace synthese
 		public:
 			static const std::string TAB_ROUTES_FORWARD;
 			static const std::string TAB_ROUTES_BACKWARD;
+			static const std::string TAB_FREE_DRT;
 			static const std::string TAB_DATES;
 			static const std::string TAB_NON_CONCURRENCY;
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_EXPORT;
+
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_DATES_START;
 			static const std::string PARAMETER_DATES_END;

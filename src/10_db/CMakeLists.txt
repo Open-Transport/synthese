@@ -42,12 +42,8 @@ SelectQuery.hpp
 spatial_ref_sys_sql.inc.h
 SQLExpression.cpp
 SQLExpression.hpp
-SQLiteVirtualTable.cpp
-SQLiteVirtualTable.hpp
 UpdateQuery.cpp
 UpdateQuery.hpp
-VirtualShapeVirtualTable.cpp
-VirtualShapeVirtualTable.hpp
 )
 
 set_source_files_properties(DBModule.gen.cpp DBModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

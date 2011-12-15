@@ -111,12 +111,15 @@ namespace synthese
 			//@{
 				bool getSamePlaces() const { return _samePlaces; }
 				const Journeys& getJourneys() const { return _journeys; }
+				Journeys& getJourneys() { return _journeys; }
 				const PlacesListConfiguration& getOrderedPlaces() const { return _orderedPlaces; }
 				const geography::Place* getDeparturePlace() const { return _departurePlace; }
 				const geography::Place* getArrivalPlace() const { return _arrivalPlace; }
 			//@}
 
 			void removeFirstJourneys(size_t value);
+
+			void removeJourney(Journeys::iterator it);
 
 
 

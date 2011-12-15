@@ -565,7 +565,8 @@ namespace synthese
 			util::Env& env,
 			std::ostream& logStream,
 			bool removeOldCodes,
-			bool updateMetricOffsetOnUpdate
+			bool updateMetricOffsetOnUpdate,
+			bool attemptToCopyExistingGeometries
 		){
 			// Declaration
 			bool creation(false);
@@ -660,26 +661,38 @@ namespace synthese
 							*stop._stop.begin(),
 							stop._withTimes ? *stop._withTimes : true
 					)	);
+					if(stop._geometry.get())
+					{
+						ls->setGeometry(stop._geometry);
+					}
 					result->addEdge(*ls);
 					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
 					++rank;
 				}
 
 				// Geometries
-				for(Path::Edges::iterator itEdge(result->getEdges().begin()); itEdge != result->getEdges().end() && itEdge+1 != result->getEdges().end(); ++itEdge)
+				if(attemptToCopyExistingGeometries)
 				{
-					Env env2;
-					shared_ptr<DesignatedLinePhysicalStop> templateObject(
-						DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
-							static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
-							static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
-							env2
-					)	);
-					if(templateObject.get())
+					for(Path::Edges::iterator itEdge(result->getEdges().begin()); itEdge != result->getEdges().end() && itEdge+1 != result->getEdges().end(); ++itEdge)
 					{
-						(*itEdge)->setGeometry(templateObject->getGeometry());
-					}
-				}
+						// Don't update already defined geometry
+						if((*itEdge)->getGeometry().get())
+						{
+							continue;
+						}
+
+						Env env2;
+						shared_ptr<DesignatedLinePhysicalStop> templateObject(
+							DesignatedLinePhysicalStopInheritedTableSync::SearchSimilarLineStop(
+								static_cast<const StopPoint&>(*(*itEdge)->getFromVertex()),
+								static_cast<const StopPoint&>(*(*(itEdge+1))->getFromVertex()),
+								env2
+						)	);
+						if(templateObject.get())
+						{
+							(*itEdge)->setGeometry(templateObject->getGeometry());
+						}
+				}	}
 			}
 
 

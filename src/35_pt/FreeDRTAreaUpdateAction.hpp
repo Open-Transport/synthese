@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// PTUseRuleUpdateAction class header.
-///	@file PTUseRuleUpdateAction.hpp
+/// FreeDRTAreaUpdateAction class header.
+///	@file FreeDRTAreaUpdateAction.hpp
 ///	@author Hugues Romain
-///	@date 2010
+///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -22,63 +22,46 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_PTUseRuleUpdateAction_H__
-#define SYNTHESE_PTUseRuleUpdateAction_H__
+#ifndef SYNTHESE_FreeDRTAreaUpdateAction_H__
+#define SYNTHESE_FreeDRTAreaUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "PTUseRule.h"
+#include "FreeDRTArea.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
+		class CommercialLine;
+
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : Transport condition update.
-		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Use_rule_update
-		//////////////////////////////////////////////////////////////////////////
+		/// 35.15 Action : FreeDRTAreaUpdateAction.
 		/// @ingroup m35Actions refActions
-		/// @author Hugues Romain
-		/// @date 2010
-		/// @since 3.1.16
-		class PTUseRuleUpdateAction:
-			public util::FactorableTemplate<server::Action, PTUseRuleUpdateAction>
+		///	@author Hugues Romain
+		///	@date 2011
+		/// @since 3.2.1
+		//////////////////////////////////////////////////////////////////////////
+		/// Key : FreeDRTAreaUpdateAction
+		///
+		/// Parameters :
+		///	<dl>
+		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
+		//	</dl>
+		class FreeDRTAreaUpdateAction:
+			public util::FactorableTemplate<server::Action, FreeDRTAreaUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_RULE_ID;
-			static const std::string PARAMETER_TEMPLATE_ID;
+			static const std::string PARAMETER_AREA_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_CAPACITY;
-			static const std::string PARAMETER_ORIGIN_IS_REFERENCE;
-			static const std::string PARAMETER_FARE_ID;
-			static const std::string PARAMETER_TYPE;
-			static const std::string PARAMETER_MAX_DELAY_DAYS;
-			static const std::string PARAMETER_MIN_DELAY_DAYS;
-			static const std::string PARAMETER_MIN_DELAY_MINUTES;
-			static const std::string PARAMETER_HOUR_DEADLINE;
-			static const std::string PARAMETER_RESERVATION_MIN_DEPARTURE_TIME;
-			static const std::string PARAMETER_RESERVATION_FORBIDDEN_DAYS;
-			static const std::string PARAMETER_FORBIDDEN_IN_TIMETABLES;
-			static const std::string PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS;
-			static const std::string PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER;
+			static const std::string PARAMETER_CITIES;
+			static const std::string PARAMETER_COMMERCIAL_LINE_ID;
 
 		private:
-			boost::shared_ptr<PTUseRule> _rule;
-			boost::shared_ptr<const PTUseRule> _template;
+			boost::shared_ptr<FreeDRTArea> _area;
 			boost::optional<std::string> _name;
-			boost::optional<graph::UseRule::AccessCapacity> _capacity;
-			boost::optional<bool> _originIsReference;
-			boost::optional<boost::shared_ptr<const Fare> > _fare;
-			boost::optional<PTUseRule::ReservationRuleType> _type;
-			boost::optional<boost::posix_time::time_duration> _minDelayMinutes;
-			boost::optional<boost::gregorian::date_duration> _minDelayDays;
-			boost::optional<boost::optional<boost::gregorian::date_duration> > _maxDelayDays;
-			boost::optional<boost::posix_time::time_duration> _hourDeadLine;
-			boost::optional<boost::posix_time::time_duration> _reservationMinDepartureTime;
-			boost::optional<PTUseRule::ReservationForbiddenDays> _reservationForbiddenDays;
-			boost::optional<bool> _forbiddenInTimetables;
-			boost::optional<bool> _forbiddenInDepartureBoards;
-			boost::optional<bool> _forbiddenInJourneyPlanner;
+			boost::optional<FreeDRTArea::Cities> _cities;
+			boost::optional<boost::shared_ptr<CommercialLine> > _line;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -112,9 +95,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setRule(boost::shared_ptr<PTUseRule> value) { _rule = value; }
+				void setArea(boost::shared_ptr<FreeDRTArea> value) { _area = value; }
 			//@}
 		};
-}	}
+	}
+}
 
-#endif // SYNTHESE_PTUseRuleUpdateAction_H__
+#endif // SYNTHESE_DRTAreaUpdateAction_H__

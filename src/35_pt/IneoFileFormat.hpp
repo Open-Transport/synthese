@@ -77,6 +77,7 @@ namespace synthese
 			{
 			public:
 				static const std::string FILE_PNT; // Stops
+				static const std::string FILE_PTF; // Geometries
 				static const std::string FILE_DIS; // Distances
 				static const std::string FILE_DST; // Destinations
 				static const std::string FILE_LIG; // Lines
@@ -118,6 +119,12 @@ namespace synthese
 					boost::shared_ptr<TransportNetwork> _network;
 					
 // TODO				std::map<std::string, boost::shared_ptr<RollingStock> > _transportModeTypeLgMap;
+
+					typedef std::map<
+						std::pair<std::string, std::string>,
+						boost::shared_ptr<geos::geom::LineString>
+					> Geometries;
+					mutable Geometries _geometries;
 
 					std::string _journeyPatternLineOverloadField;
 					bool _importStopAreas;

@@ -162,7 +162,7 @@ namespace synthese
 					AjaxVectorFieldEditor::Row row;
 					vector<string> field;
 					field.push_back(lexical_cast<string>(stop->getKey()));
-					field.push_back(lexical_cast<string>(stop->getCity()->getName() + " " + stop->getName()));
+					field.push_back(stop->getFullName());
 					row.push_back(field);
 					editor.addRow(row);
 				}

@@ -134,8 +134,7 @@ namespace synthese
 			}
 
 			if(	source == "chu" ||
-				source == "chr" ||
-				source == "clinique"
+				source == "chr"
 			){
 				return "hôpital";
 			}

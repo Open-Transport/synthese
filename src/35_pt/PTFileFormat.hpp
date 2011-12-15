@@ -314,7 +314,8 @@ namespace synthese
 				util::Env& env,
 				std::ostream& logStream,
 				bool removeOldCodes,
-				bool updateMetricOffsetOnUpdate
+				bool updateMetricOffsetOnUpdate,
+				bool attemptToCopyExistingGeometries = true
 			);
 
 

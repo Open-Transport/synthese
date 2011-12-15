@@ -29,6 +29,7 @@
 
 #include "DBRegistryTableSyncTemplate.hpp"
 #include "PTUseRule.h"
+#include "RuleUser.h"
 
 namespace synthese
 {
@@ -37,8 +38,8 @@ namespace synthese
 		/** Public transportation use rules table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class PTUseRuleTableSync
-		:	public db::DBRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
+		class PTUseRuleTableSync:
+			public db::DBRegistryTableSyncTemplate<PTUseRuleTableSync,PTUseRule>
 		{
 		public:
 			static const std::string COL_NAME;
@@ -49,6 +50,8 @@ namespace synthese
 			static const std::string COL_MINDELAYDAYS;
 			static const std::string COL_MAXDELAYDAYS;
 			static const std::string COL_HOURDEADLINE;
+			static const std::string COL_RESERVATION_MIN_DEPARTURE_TIME;
+			static const std::string COL_RESERVATION_FORBIDDEN_DAYS;
 			static const std::string COL_DEFAULT_FARE;
 			static const std::string COL_FORBIDDEN_IN_DEPARTURE_BOARDS;
 			static const std::string COL_FORBIDDEN_IN_TIMETABLES;
@@ -76,8 +79,27 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
 			);
+
+
+
+			static std::string SerializeForbiddenDays(
+				const PTUseRule::ReservationForbiddenDays& value
+			);
+
+			static PTUseRule::ReservationForbiddenDays UnserializeForbiddenDays(
+				const std::string& value
+			);
+
+			static graph::RuleUser::Rules UnserializeUseRules(
+				const std::string& value,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+			static std::string SerializeUseRules(
+				const graph::RuleUser::Rules& value
+			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ServiceDateTableSync_H__
