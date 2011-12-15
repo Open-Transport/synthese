@@ -2353,8 +2353,13 @@ namespace synthese
 					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
 				}
 			}
-			pm.insert(DATA_CO2_EMISSIONS, co2Emissions);
-			pm.insert(DATA_ENERGY_CONSUMPTION, energyConsumption);
+			// TODO : set precision outside of RoutePlannerFunction
+			stringstream sCO2Emissions, sEnergyConsumption;
+			sCO2Emissions << std::fixed << setprecision(2) << co2Emissions;
+			sEnergyConsumption << std::fixed << setprecision(2) << energyConsumption;
+			cout.unsetf(ios::fixed);
+			pm.insert(DATA_CO2_EMISSIONS, sCO2Emissions.str());
+			pm.insert(DATA_ENERGY_CONSUMPTION, sEnergyConsumption.str());
 
 			// Fare calculation
 			if((_fareCalculation) && (_ticketCellPage.get()))
