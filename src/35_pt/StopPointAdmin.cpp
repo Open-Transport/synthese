@@ -42,6 +42,7 @@
 #include "JourneyPatternAdmin.hpp"
 #include "CommercialLineAdmin.h"
 #include "PTPlaceAdmin.h"
+#include "JourneyPatternCopy.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -248,6 +249,12 @@ namespace synthese
 				{
 					// Declarations
 					const JourneyPattern& journeyPattern(*it.first);
+
+					// Avoid sublines
+					if(dynamic_cast<const JourneyPatternCopy*>(&journeyPattern))
+					{
+						continue;
+					}
 
 					// Row
 					stream << t.row();
