@@ -588,6 +588,10 @@ var SyntheseMap = OpenLayers.Class({
         var attributes = {};
         self.copyAttributes(stopArea, attributes);
 
+        if (attributes.x === undefined || attributes.y === undefined) {
+          return;
+        }
+
         var point = new OpenLayers.Geometry.Point(
           parseFloat(attributes.x),
           parseFloat(attributes.y)
