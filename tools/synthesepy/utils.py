@@ -278,7 +278,7 @@ def RemoveDirectory(*path):
   remove_with_retry(os.rmdir, file_path)
 
 
-def copy_over(source_path, target_path):
+def copy_over(source_path, target_path, overwrite=True):
     """Copy source_path over target_path, replacing any existing files"""
 
     base_parts_count = len(source_path.split(os.path.sep))
@@ -291,6 +291,8 @@ def copy_over(source_path, target_path):
 
             source = os.path.join(path, name)
             target = os.path.join(target_path, relative_path, name)
+            if not overwrite and os.path.isfile(target):
+                continue
 
             if not os.path.isdir(os.path.dirname(target)):
                 os.makedirs(os.path.dirname(target))

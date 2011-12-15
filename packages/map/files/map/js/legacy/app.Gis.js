@@ -540,7 +540,7 @@ window.app.Gis.prototype = {
         var p = this.positionToLonLat(point.position);
 
         var fileName;
-        var name = '<b>'+point.name+'</b>';
+        var name = '<b>' + point.name + '</b>';
 
         switch (point.type) {
             case 'start':
@@ -557,7 +557,7 @@ window.app.Gis.prototype = {
 
         layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
-                picto: '/map/images/' + fileName,
+                picto: requireJSConfig.baseUrl + '/map/img/' + fileName,
                 name: name
             })
         ]);
