@@ -136,6 +136,7 @@ namespace synthese
 			//! @name Fields of mtdarea table
 			//@{
 				static const std::string _FIELD_AREA_ID;
+				static const std::string _FIELD_AREACODE_2;
 				static const std::string _FIELD_AREACODE_3;
 				static const std::string _FIELD_AREACODE_4;
 				static const std::string _FIELD_GOVT_CODE;
