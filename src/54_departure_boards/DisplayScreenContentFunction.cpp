@@ -406,25 +406,28 @@ namespace synthese
 
 			const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 
-			stream <<"<line id=\""<< commercialLine->getKey() <<
-				"\" creatorId=\"";
-			if(!commercialLine->getDataSourceLinks().empty())
+			if(commercialLine)
 			{
-				stream << commercialLine->getDataSourceLinks().begin()->second;
+				stream <<"<line id=\""<< commercialLine->getKey() <<
+					"\" creatorId=\"";
+				if(!commercialLine->getDataSourceLinks().empty())
+				{
+					stream << commercialLine->getDataSourceLinks().begin()->second;
+				}
+				stream <<
+					"\" name=\""      << commercialLine->getName() <<
+					"\" shortName=\"" << commercialLine->getShortName() <<
+					"\" longName=\""  << commercialLine->getLongName() <<
+					"\" color=\""     << commercialLine->getColor() <<
+					"\" style=\""     << commercialLine->getStyle() <<
+					"\" image=\""     << commercialLine->getImage() <<
+					"\" direction=\"" << (
+						journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
+						journeyPattern->getDirectionObj()->getDisplayedText() :
+						journeyPattern->getDirection()
+					) <<
+					"\" />";
 			}
-			stream <<
-				"\" name=\""      << commercialLine->getName() <<
-				"\" shortName=\"" << commercialLine->getShortName() <<
-				"\" longName=\""  << commercialLine->getLongName() <<
-				"\" color=\""     << commercialLine->getColor() <<
-				"\" style=\""     << commercialLine->getStyle() <<
-				"\" image=\""     << commercialLine->getImage() <<
-				"\" direction=\"" << (
-					journeyPattern->getDirection().empty() && journeyPattern->getDirectionObj() ?
-					journeyPattern->getDirectionObj()->getDisplayedText() :
-					journeyPattern->getDirection()
-				) <<
-				"\" />";
 
 			const StopArea & origin(
 					*journeyPattern->getOrigin()->getConnectionPlace()
