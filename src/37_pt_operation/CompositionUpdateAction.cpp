@@ -106,7 +106,7 @@ namespace synthese
 			}
 			else
 			{
-				_composition.reset(new Composition);
+				_composition.reset(new ServiceComposition);
 			}
 
 			if(map.getOptional<RegistryKeyType>(PARAMETER_FIRST_QUAY))
