@@ -8,6 +8,8 @@ AjaxForm.hpp
 AjaxVectorFieldEditor.cpp
 AjaxVectorFieldEditor.hpp
 Constants.h
+EditArea.cpp
+EditArea.hpp
 HTMLFilter.h
 HTMLForm.cpp
 HTMLForm.h
