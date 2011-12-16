@@ -586,7 +586,7 @@ namespace synthese
 						}
 						else
 						{
-							if(lineString.get())
+							if(lineString.get() && !atLeastAnInexistantStop)
 							{
 								stops.rbegin()->_geometry = lineString;
 							}

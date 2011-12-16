@@ -88,6 +88,7 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_GEOMETRY("Geometry");
 
 		const string NavstreetsFileFormat::_FIELD_AREA_ID("AREA_ID");
+		const string NavstreetsFileFormat::_FIELD_AREACODE_2("AREACODE_2");
 		const string NavstreetsFileFormat::_FIELD_AREACODE_3("AREACODE_3");
 		const string NavstreetsFileFormat::_FIELD_AREACODE_4("AREACODE_4");
 		const string NavstreetsFileFormat::_FIELD_GOVT_CODE("GOVT_CODE");
@@ -138,8 +139,14 @@ namespace synthese
 				// Loading the file into SQLite as virtual table
 				VirtualDBFVirtualTable table(filePath, _dataSource.getCharset());
 
-				map<string, string> departementCodes;
-				typedef map<pair<string, string>, City*> CityCodes;
+				map<
+					pair<string,string>, // Region,Departement
+					string
+				> departementCodes;
+				typedef map<
+					pair<string, string>,
+					City*
+				> CityCodes;
 				CityCodes cityCodes;
 
 				{	// 1.1 Departements
@@ -148,14 +155,17 @@ namespace synthese
 					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 					while(rows->next())
 					{
-						string item(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3));
-
+						pair<string,string> item(
+							make_pair(
+								rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_2),
+								rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3)
+						)	);
 						if(departementCodes.find(item) != departementCodes.end())
 						{
 							continue;
 						}
 						departementCodes.insert(
-							make_pair(item, rows->getText(NavstreetsFileFormat::_FIELD_GOVT_CODE))
+							make_pair(item, lexical_cast<string>(rows->getInt(NavstreetsFileFormat::_FIELD_GOVT_CODE)))
 						);
 				}	}
 
@@ -167,7 +177,10 @@ namespace synthese
 					{
 						stringstream code;
 						int cityID(rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID));
-						code << departementCodes[rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3)];
+						code << departementCodes[make_pair(
+							rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_2),
+							rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3)
+						) ];
 						code << setw(3) << setfill('0') << rows->getInt(NavstreetsFileFormat::_FIELD_GOVT_CODE);
 						if(_citiesMap.find(cityID) != _citiesMap.end())
 						{
