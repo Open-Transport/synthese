@@ -61,8 +61,9 @@ namespace synthese
 			VehicleLinks _vehicles;
 			calendar::Calendar _calendar;
 
-		public:
 			Composition(util::RegistryKeyType id=0);
+
+		public:
 
 			//! @name Setters
 			//@{
