@@ -156,6 +156,7 @@ namespace synthese
 
 				// Projected point
 				RegistryKeyType chunkId(rows->getLongLong(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID));
+				object->setProjectedPoint(Address());
 				if(chunkId > 0)
 				{
 					try

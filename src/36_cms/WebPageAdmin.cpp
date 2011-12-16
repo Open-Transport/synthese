@@ -42,6 +42,7 @@
 #include "TinyMCE.hpp"
 #include "StaticActionRequest.h"
 #include "AjaxForm.hpp"
+#include "EditArea.hpp"
 
 #include <boost/algorithm/string/find.hpp>
 
@@ -187,7 +188,8 @@ namespace synthese
 				{
 					AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
 					stream << f.open();
-					stream << f.getTextAreaInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 80, false);
+					EditArea editArea(stream);
+					editArea.getAjaxForm(stream, contentUpdateRequest.getURL(), WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 80);
 					stream << f.getSubmitButton("Sauvegarder");
 					stream << f.close();
 				}
