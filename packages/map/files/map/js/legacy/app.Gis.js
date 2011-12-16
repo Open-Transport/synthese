@@ -551,13 +551,13 @@ window.app.Gis.prototype = {
                 break;
             default: // 'connection':
                 fileName = 'google_chart/connection.png';
-                //name = 'Correspondance à<br/><b>'+point.name+'</b>';
+                //name = 'Correspondance à<br/><b>' + point.name + '</b>';
                 break;
         }
 
         layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
-                picto: requireJSConfig.baseUrl + '/map/img/' + fileName,
+                picto: requireJSConfig.baseUrl + 'map/img/' + fileName,
                 name: name
             })
         ]);
