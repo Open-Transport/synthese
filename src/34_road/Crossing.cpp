@@ -50,9 +50,10 @@ namespace synthese
 			util::RegistryKeyType key,
 			shared_ptr<Point> geometry,
 			std::string codeBySource,
-			const impex::DataSource* source
+			const impex::DataSource* source,
+			bool withIndexation
 		):	Hub(),
-			Vertex(this, geometry),
+			Vertex(this, geometry, withIndexation),
 			Registrable(key)
 		{
 			if(source)

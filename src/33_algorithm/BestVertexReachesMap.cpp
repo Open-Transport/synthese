@@ -82,22 +82,22 @@ namespace synthese
 			);
 			assert(duration.total_seconds() >= 0);
 
-			TimeMap::const_iterator itc(_bestTimeMap.find(vertex));
+			TimeMap::value_type& vertexItem(_bestTimeMap[vertex->getIndex()]);
 
-			if (itc == _bestTimeMap.end ())
-			{
+			if(	vertexItem.empty()
+			){
 				if(propagateInConnectionPlace)
 				{
-					_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
+					_insertAndPropagateInConnectionPlace(vertexItem, transferNumber, duration, journeysptr, *vertex);
 				}
 				else
 				{
-					_insert(vertex, transferNumber, duration, journeysptr);
+					_insert(vertexItem, transferNumber, duration, journeysptr);
 				}
 				return false;
 			}
 
-			BOOST_FOREACH(const TimeMap::mapped_type::value_type& item, itc->second)
+			BOOST_FOREACH(const TimeMap::value_type::value_type& item, vertexItem)
 			{
 				if(item.first < transferNumber)
 				{
@@ -115,11 +115,11 @@ namespace synthese
 					{
 						if(propagateInConnectionPlace)
 						{
-							_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
+							_insertAndPropagateInConnectionPlace(vertexItem, transferNumber, duration, journeysptr, *vertex);
 						}
 						else
 						{
-							_insert(vertex, transferNumber, duration, journeysptr);
+							_insert(vertexItem, transferNumber, duration, journeysptr);
 						}
 						return false;
 					}
@@ -128,17 +128,17 @@ namespace synthese
 				{
 					if(propagateInConnectionPlace)
 					{
-						_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
+						_insertAndPropagateInConnectionPlace(vertexItem, transferNumber, duration, journeysptr, *vertex);
 					}
 					else
 					{
-						_insert(vertex, transferNumber, duration, journeysptr);
+						_insert(vertexItem, transferNumber, duration, journeysptr);
 					}
 					if(item.second.first >= duration)
 					{
 						if(propagateInConnectionPlace)
 						{
-							_removeDurationsForMoreTransfers(vertex, item.first);
+							_removeDurationsForMoreTransfers(vertexItem, item.first);
 						}
 						return false;
 					}
@@ -146,11 +146,11 @@ namespace synthese
 			}
 			if(propagateInConnectionPlace)
 			{
-				_insertAndPropagateInConnectionPlace(vertex, transferNumber, duration, journeysptr);
+				_insertAndPropagateInConnectionPlace(vertexItem, transferNumber, duration, journeysptr, *vertex);
 			}
 			else
 			{
-				_insert(vertex, transferNumber, duration, journeysptr);
+				_insert(vertexItem, transferNumber, duration, journeysptr);
 			}
 			return false;
 		}
@@ -158,22 +158,15 @@ namespace synthese
 
 
 		void BestVertexReachesMap::_insert(
-			const TimeMap::key_type& vertex,
-			const TimeMap::mapped_type::key_type& transfers,
+			TimeMap::value_type& vertexItem,
+			size_t transfers,
 			boost::posix_time::time_duration duration,
 			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 		){
-			TimeMap::iterator itc = _bestTimeMap.find (vertex);
-
-			if (itc == _bestTimeMap.end ())
+			TimeMap::value_type::iterator it(vertexItem.find(transfers));
+			if (it == vertexItem.end())
 			{
-				itc = _bestTimeMap.insert(make_pair(vertex, TimeMap::mapped_type())).first;
-			}
-
-			TimeMap::mapped_type::iterator it(itc->second.find(transfers));
-			if (it == itc->second.end())
-			{
-				itc->second.insert(make_pair(transfers, make_pair(duration, journey)));
+				vertexItem.insert(make_pair(transfers, make_pair(duration, journey)));
 			}
 			else
 			{
@@ -184,19 +177,20 @@ namespace synthese
 
 
 		void BestVertexReachesMap::_insertAndPropagateInConnectionPlace(
-			const TimeMap::key_type& vertex,
-			const TimeMap::mapped_type::key_type& transfers,
+			TimeMap::value_type& vertexItem,
+			size_t transfers,
 			boost::posix_time::time_duration duration,
-			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
+			boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
+			const graph::Vertex& vertex
 		){
-			_insert(vertex, transfers, duration, journey);
+			_insert(vertexItem, transfers, duration, journey);
 
-			if(!vertex->getHub()->isConnectionPossible()) return;
+			if(!vertex.getHub()->isConnectionPossible()) return;
 
-			const Hub* p(vertex->getHub());
+			const Hub* p(vertex.getHub());
 			assert (p != 0);
 
-			if (vertex->getGraphType() == PTModule::GRAPH_ID) /// @todo Move this section into PT Module
+			if (vertex.getGraphType() == PTModule::GRAPH_ID) /// @todo Move this section into PT Module
 			{
 				const StopArea* cp(static_cast<const StopArea*>(p));
 				const StopArea::PhysicalStops& ps(cp->getPhysicalStops());
@@ -205,15 +199,15 @@ namespace synthese
 					posix_time::time_duration bestTimeAtStop(duration);
 					if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 					{
-						if (!p->isConnectionAllowed(*vertex, *itp->second)) continue;
-						bestTimeAtStop += p->getTransferDelay(*vertex, *itp->second);
+						if (!p->isConnectionAllowed(vertex, *itp->second)) continue;
+						bestTimeAtStop += p->getTransferDelay(vertex, *itp->second);
 					}
 					else
 					{
-						if (!p->isConnectionAllowed(*itp->second,*vertex)) continue;
-						bestTimeAtStop += p->getTransferDelay(*itp->second, *vertex);
+						if (!p->isConnectionAllowed(*itp->second, vertex)) continue;
+						bestTimeAtStop += p->getTransferDelay(*itp->second, vertex);
 					}
-					_insert(itp->second, transfers+1, bestTimeAtStop, journey);
+					_insert(_bestTimeMap[itp->second->getIndex()], transfers+1, bestTimeAtStop, journey);
 				}
 			}
 		}
@@ -221,18 +215,17 @@ namespace synthese
 
 
 		void BestVertexReachesMap::_removeDurationsForMoreTransfers(
-			const TimeMap::key_type& vertex,
-			const TimeMap::mapped_type::key_type& transfers
+			TimeMap::value_type& vertexItem,
+			std::size_t transfers
 		){
-			TimeMap::iterator itc = _bestTimeMap.find(vertex);
-			vector<TimeMap::mapped_type::iterator> toDelete;
-			for(TimeMap::mapped_type::iterator it(itc->second.find(transfers)); it != itc->second.end(); ++it)
+			vector<TimeMap::value_type::iterator> toDelete;
+			for(TimeMap::value_type::iterator it(vertexItem.find(transfers)); it != vertexItem.end(); ++it)
 			{
 				toDelete.push_back(it);
 			}
-			BOOST_FOREACH(TimeMap::mapped_type::iterator it, toDelete)
+			BOOST_FOREACH(TimeMap::value_type::iterator it, toDelete)
 			{
-				itc->second.erase(it);
+				vertexItem.erase(it);
 			}
 		}
 
@@ -241,15 +234,17 @@ namespace synthese
 		BestVertexReachesMap::BestVertexReachesMap(
 			PlanningPhase accessDirection,
 			const graph::VertexAccessMap& vam,
-			const graph::VertexAccessMap& destinationVam
-		):	_accessDirection(accessDirection)
+			const graph::VertexAccessMap& destinationVam,
+			std::size_t vertexNumber
+		):	_bestTimeMap(vertexNumber),
+			_accessDirection(accessDirection)
 		{
 			for (VertexAccessMap::VamMap::const_iterator it(vam.getMap().begin()); it != vam.getMap().end(); ++it)
 			{
 				if(destinationVam.getMap().find(it->first) == destinationVam.getMap().end())
 				{
 					_insert(
-						it->first,
+						_bestTimeMap[it->first->getIndex()],
 						0,
 						it->second.approachTime,
 						shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(accessDirection))
@@ -257,5 +252,4 @@ namespace synthese
 				}
 			}
 		}
-	}
-}
+}	}

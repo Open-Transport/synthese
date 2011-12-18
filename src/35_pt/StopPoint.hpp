@@ -67,7 +67,8 @@ namespace synthese
 				util::RegistryKeyType id = 0,
 				std::string name = std::string(),
 				const pt::StopArea* place = NULL,
-				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>()
+				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>(),
+				bool withIndexation = true
 			);
 
 			~StopPoint();

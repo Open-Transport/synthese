@@ -133,7 +133,11 @@ namespace synthese
 			else
 			{
 				crossing = new Crossing(
-					CrossingTableSync::getId()
+					CrossingTableSync::getId(),
+					shared_ptr<Point>(),
+					string(),
+					NULL,
+					false
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));

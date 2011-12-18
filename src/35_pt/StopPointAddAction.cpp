@@ -230,11 +230,14 @@ namespace synthese
 				StopAreaTableSync::Save(_place.get(), transaction);
 			}
 
-			StopPoint object;
-			object.setHub(_place.get());
-			object.setName(_name);
+			StopPoint object(
+				StopPointTableSync::getId(),
+				_name,
+				_place.get(),
+				_point,
+				false
+			);
 			object.setDataSourceLinks(_operatorCode);
-			object.setGeometry(_point);
 
 			StopPointTableSync::Save(&object, transaction);
 
