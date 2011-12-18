@@ -56,7 +56,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 		BestVertexReachesMap bestVertexReachesMap(
 			DEPARTURE_TO_ARRIVAL,
 			ovam,
-			dvam
+			dvam,
+			Vertex::GetMaxIndex()
 		);
 
 		IntegralSearcher i(
@@ -95,7 +96,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 		BestVertexReachesMap bestVertexReachesMap(
 			DEPARTURE_TO_ARRIVAL,
 			ovam,
-			dvam
+			dvam,
+			Vertex::GetMaxIndex()
 		);
 
 		IntegralSearcher i(
