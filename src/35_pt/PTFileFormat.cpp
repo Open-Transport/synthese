@@ -53,6 +53,7 @@
 using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -320,7 +321,14 @@ namespace synthese
 			std::ostream& logStream
 		){
 			// Object creation
-			StopPoint* stop(new StopPoint(StopPointTableSync::getId()));
+			StopPoint* stop(
+				new StopPoint(
+					StopPointTableSync::getId(),
+					string(),
+					&stopArea,
+					shared_ptr<Point>(),
+					false
+			)	);
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, code));
 			stop->setDataSourceLinks(links);
@@ -328,7 +336,6 @@ namespace synthese
 			stops.add(*stop);
 
 			// Properties
-			stop->setHub(&stopArea);
 			if(name)
 			{
 				stop->setName(*name);

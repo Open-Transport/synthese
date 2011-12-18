@@ -50,12 +50,13 @@ namespace synthese
 	namespace pt
 	{
 		StopPoint::StopPoint(
-			RegistryKeyType id
-			, string name
-			, const StopArea* place,
-			shared_ptr<Point> geometry
+			RegistryKeyType id,
+			string name,
+			const StopArea* place,
+			shared_ptr<Point> geometry,
+			bool withIndexation
 		):	Registrable(id),
-			Vertex(place, geometry),
+			Vertex(place, geometry, withIndexation),
 			Named(name)
 		{
 		}

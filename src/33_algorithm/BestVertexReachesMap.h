@@ -25,7 +25,7 @@
 
 #include "AlgorithmTypes.h"
 
-#include <map>
+#include <vector>
 #include <boost/date_time/posix_time/posix_time_duration.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -36,7 +36,6 @@ namespace synthese
 		class Vertex;
 		class VertexAccessMap;
 	}
-
 
 	namespace algorithm
 	{
@@ -98,8 +97,7 @@ namespace synthese
 		{
 		 private:
 
-			typedef std::map<
-				const graph::Vertex*,
+			typedef std::vector<
 				std::map<
 					std::size_t,
 					std::pair<
@@ -111,29 +109,31 @@ namespace synthese
 			const PlanningPhase _accessDirection;
 
 			void _insert(
-				const TimeMap::key_type& vertex,
-				const TimeMap::mapped_type::key_type& transfers,
+				TimeMap::value_type& vertexItem,
+				std::size_t transfers,
 				boost::posix_time::time_duration duration,
 				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
 			);
 
 			void _insertAndPropagateInConnectionPlace(
-				const TimeMap::key_type& vertex,
-				const TimeMap::mapped_type::key_type& transfers,
+				TimeMap::value_type& vertexItem,
+				std::size_t transfers,
 				boost::posix_time::time_duration duration,
-				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
+				const graph::Vertex& vertex
 			);
 
 			void _removeDurationsForMoreTransfers(
-				const TimeMap::key_type& vertex,
-				const TimeMap::mapped_type::key_type& transfers
+				TimeMap::value_type& vertexItem,
+				std::size_t transfers
 			);
 
 		public:
 			BestVertexReachesMap(
 				PlanningPhase accessDirection,
 				const graph::VertexAccessMap& vam,
-				const graph::VertexAccessMap& destinationVam
+				const graph::VertexAccessMap& destinationVam,
+				std::size_t vertexNumber
 			);
 
 			//! @name Query methods
@@ -153,7 +153,6 @@ namespace synthese
 				);
 			//@}
 		};
-	}
-}
+}	}
 
 #endif

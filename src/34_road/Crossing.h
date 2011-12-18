@@ -74,7 +74,8 @@ namespace synthese
 				util::RegistryKeyType key = 0,
 				boost::shared_ptr<geos::geom::Point> geometry = boost::shared_ptr<geos::geom::Point>(),
 				std::string codeBySource = std::string(),
-				const impex::DataSource* source = NULL
+				const impex::DataSource* source = NULL,
+				bool withIndexation = true
 			);
 
 
