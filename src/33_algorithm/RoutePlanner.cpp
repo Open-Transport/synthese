@@ -266,7 +266,7 @@ namespace synthese
 			ptime lastBestEndTime(minMaxDateTimeAtDestination);
 
 			// Initialization of the best vertex reaches map
-			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam);
+			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam, Vertex::GetMaxIndex());
 
 			optional<RoutePlannerLogger> logger(
 				_logStream ?

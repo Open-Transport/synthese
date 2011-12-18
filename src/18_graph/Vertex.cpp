@@ -33,11 +33,15 @@ namespace synthese
 {
 	namespace graph
 	{
+		size_t Vertex::_maxIndex(0);
+
 		Vertex::Vertex(
 			const Hub* hub,
-			boost::shared_ptr<Point> geometry
+			boost::shared_ptr<Point> geometry,
+			bool withIndexation
 		):	WithGeometry<Point>(geometry),
-			_hub(hub)
+			_hub(hub),
+			_index(withIndexation ? _maxIndex++ : 0)
 		{}
 
 

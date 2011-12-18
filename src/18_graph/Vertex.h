@@ -65,11 +65,17 @@ namespace synthese
 			Edges _departureEdges; //!< Departure edges from this physical stop
 			Edges _arrivalEdges; //!< Arrival edges to this physical stop
 
+			std::size_t _index;
+
+		private:
+			static std::size_t _maxIndex;
+
 		protected:
 
 			Vertex(
 				const Hub* hub,
-				boost::shared_ptr<geos::geom::Point> geometry
+				boost::shared_ptr<geos::geom::Point> geometry,
+				bool withIndexation = true
 			);
 
 		public:
@@ -82,6 +88,7 @@ namespace synthese
 				const Hub*		getHub()				const;
 				const Edges&	getDepartureEdges ()	const;
 				const Edges&	getArrivalEdges ()		const;
+				std::size_t getIndex() const { return _index; }
 			//@}
 
 			//! @name Setters
@@ -103,6 +110,8 @@ namespace synthese
 			//@{
 				virtual const RuleUser* _getParentRuleUser() const;
 				virtual GraphIdType getGraphType() const = 0;
+
+				static std::size_t GetMaxIndex(){ return _maxIndex; }
 			//@}
 		};
 	}

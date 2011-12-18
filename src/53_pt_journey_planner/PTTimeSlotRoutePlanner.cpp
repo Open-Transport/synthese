@@ -108,7 +108,8 @@ namespace synthese
 			BestVertexReachesMap bvrmd(
 				direction,
 				vam,
-				emptyMap
+				emptyMap,
+				Vertex::GetMaxIndex()
 			); // was optim=true
 
 			ptime highestArrivalTime(direction == DEPARTURE_TO_ARRIVAL ? getHighestArrivalTime() : getLowestDepartureTime());
