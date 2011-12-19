@@ -10,8 +10,146 @@
     <input type=button value="Redémarrer le démon">
   </form>
   #}
+  <h1>Administration</h1>
 
-  <h2>Gestion des imports</h2>
+  {% if is_admin() %}
+    <form action="{{ url_for('.update_synthese') }}" method=post>
+      <fieldset>
+        <legend>Update Synthese</legend>
+        <div class="clearfix">
+          <label for="install_url">install script URL</label>
+          <div class="input">
+            <input id="install_url" name="install_url" type="text"
+                   value="http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/latest/install_synthese.py">
+            <span class="help-block"><a href="http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/?C=M;O=D"
+              >See here for possible URLs</a></span>
+          </div>
+        </div>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Go">
+        </div>
+      </fieldset>
+    </form>
+
+    <form action="{{ url_for('.update_project') }}" method=post>
+      <fieldset>
+        <legend>Update Project</legend>
+        <div class="clearfix">
+          <label id="optionsCheckboxes">Options</label>
+          <div class="input">
+            <ul class="inputs-list">
+              <li>
+                <label>
+                  <input type="checkbox" checked name="system_install">
+                  <span>Run <var>system_install</var></span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked name="load_data">
+                  <span>Run <var>load_data</var> and <var>load_local_data</var></span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" name="load_data_overwrite">
+                  <span>Overwrite existing data with <var>load_local_data.</var>
+                        <em>Use with care!</em></span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Go">
+        </div>
+      </fieldset>
+    </form>
+
+    <form action="{{ url_for('.svn_status') }}" method=post>
+      <fieldset>
+        <legend>SVN status</legend>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Go">
+        </div>
+      </fieldset>
+    </form>
+
+    <form action="{{ url_for('.svn_update') }}" method=post>
+      <fieldset>
+        <legend>SVN update</legend>
+        <div class="clearfix">
+          <label for="svn_username">SVN username</label>
+          <div class="input">
+            <input id="svn_username" name="svn_username" type="text">
+          </div>
+        </div>
+        <div class="clearfix">
+          <label for="svn_password">SVN password</label>
+          <div class="input">
+            <input id="svn_password" name="svn_password" type="password">
+          </div>
+        </div>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Go">
+        </div>
+      </fieldset>
+    </form>
+
+    {#
+    <form action="{{ url_for('.update_project') }}" method=post>
+      <fieldset>
+        <legend>Project Control</legend>
+        <div class="clearfix">
+          <label>Status: foo</label>
+        </div>
+        <!--
+        <div class="clearfix">
+          <label id="optionsCheckboxes">Options</label>
+          <div class="input">
+            <ul class="inputs-list">
+              <li>
+                <label>
+                  <input type="checkbox" checked name="system_install">
+                  <span>Run <var>system_install</var></span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" checked name="load_data">
+                  <span>Run <var>load_data</var> and <var>load_local_data</var></span>
+                </label>
+              </li>
+              <li>
+                <label>
+                  <input type="checkbox" name="load_data_overwrite">
+                  <span>Overwrite existing data with <var>load_local_data.</var>
+                        <em>Use with care!</em></span>
+                </label>
+              </li>
+            </ul>
+          </div>
+        </div>
+         -->
+        <div class="actions">
+          <input type="submit" class="btn success" value="Start">
+          <input type="submit" class="btn danger" value="Stop">
+        </div>
+      </fieldset>
+    </form>
+    #}
+
+    <h3>Administration Logs</h3>
+
+    <pre>{{ last_admin_log }}</pre>
+
+    <h1>Database Administration</h1>
+
+    <p><a href="{{ url_for('.db') }}">Database Administration Page</a></p>
+
+  {% endif %}
+
+  <h1>Gestion des imports</h1>
 
   <p><a href="{{ url_for('.import_template_list') }}">Liste des imports</a></p>
 

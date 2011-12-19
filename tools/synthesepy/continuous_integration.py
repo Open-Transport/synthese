@@ -44,18 +44,20 @@ def _should_build_package(env):
 def run(env, args):
     config = env.config
 
+    env_type = env.type
+    env_mode = env.mode
     # The ci tool can set these settings in the environment:
     if 'tool' in os.environ:
         # Note: backward compatibility: env_type should be used instead of tool.
-        config.env_type = os.environ['tool']
+        env_type = os.environ['tool']
     if 'env_type' in os.environ:
-        config.env_type = os.environ['env_type']
+        env_type = os.environ['env_type']
     if 'mode' in os.environ:
-        config.mode = os.environ['mode']
+        env_mode = os.environ['mode']
 
     # Create the env again, to take into account the tool/mode.
     env = synthesepy.env.create_env(
-        config.env_type, config.env_path, config.mode, config)
+        env_type, config.env_path, env_mode, config)
 
     try:
         log.info('Building')
@@ -68,7 +70,7 @@ def run(env, args):
         synthesepy.build.build(env, 'build')
 
     # Don't bother with scons tests and package. It will be removed in the future.
-    if config.env_type == 'scons':
+    if env.type == 'scons':
         return
 
     if _should_build_package(env):

@@ -191,6 +191,14 @@ def add_project_subparsers(subparsers):
     add_parser('system_install_prepare')
     add_parser('system_install')
     add_parser('system_uninstall')
+    def root_delegate(project, args, env):
+        project.root_delegate(args.subcommand, args.args)
+    parser = add_parser('root_delegate', func=root_delegate)
+    parser.add_argument('subcommand', help='Sub-command')
+    parser.add_argument(
+        'args', nargs='*',
+        help='Command arguments')
+    add_parser('update_synthese')
 
 
 def add_default_subparsers(subparsers):
@@ -391,10 +399,11 @@ def main():
             'WARNING: NOT FULLY IMPLEMENTED YET')
     # Environment options
     parser.add_argument(
-        '-t', '--env-type', choices=['scons', 'cmake', 'installed'])
+        '-t', '--env-type',
+        choices=['scons', 'cmake', 'installed'], default='cmake')
     parser.add_argument('-b', '--env-path', help='Env path')
     parser.add_argument(
-        '-m', '--mode', choices=['release', 'debug'])
+        '-m', '--mode', choices=['release', 'debug'], default='debug')
     parser.add_argument(
         '--beep', dest='beep_when_done', action='store_true',
         help='Emit a beep on completion')

@@ -206,7 +206,33 @@ def call(cmd, shell=None, **kwargs):
             raise subprocess.CalledProcessError(p.returncode, cmd)
         return output
 
-    subprocess.check_call(cmd, shell=shell, **kwargs)
+    # Backport of Python 2.7 check_ouput.
+    class CalledProcessError2(subprocess.CalledProcessError):
+        def __init__(self, returncode, cmd, output=None):
+            self.returncode = returncode
+            self.cmd = cmd
+            self.output = output
+
+    def check_output(*popenargs, **kwargs):
+        if 'stdout' in kwargs:
+            raise ValueError('stdout argument not allowed, it will be overridden.')
+        process = subprocess.Popen(stdout=subprocess.PIPE, *popenargs, **kwargs)
+        output, unused_err = process.communicate()
+
+        retcode = process.poll()
+        if retcode:
+            cmd = kwargs.get("args")
+            if cmd is None:
+                cmd = popenargs[0]
+            raise CalledProcessError2(retcode, cmd, output=output)
+        return output
+
+    if kwargs.get('ret_output'):
+        del kwargs['ret_output']
+        kwargs['stderr'] = subprocess.STDOUT
+        return check_output(cmd, shell=shell, **kwargs)
+    else:
+        subprocess.check_call(cmd, shell=shell, **kwargs)
 
 
 # From http://src.chromium.org/svn/trunk/tools/build/scripts/common/chromium_utils.py
@@ -313,6 +339,32 @@ def maybe_remove(path):
         os.unlink(path)
     except OSError:
         pass
+
+
+# adapted from http://stackoverflow.com/questions/136168/get-last-n-lines-of-a-file-with-python-similar-to-tail
+def tail(f, window=20):
+    BUFSIZ = 1024
+    f.seek(0, os.SEEK_END)
+    bytes = f.tell()
+    size = window
+    block = -1
+    data = []
+    while size > 0 and bytes > 0:
+        if bytes - BUFSIZ > 0:
+            # Seek back one whole BUFSIZ
+            f.seek(block * BUFSIZ, os.SEEK_END)
+            # read BUFFER
+            data.append(f.read(BUFSIZ))
+        else:
+            # file too small, start from beginning
+            f.seek(0, os.SEEK_SET)
+            # only read what was not read
+            data.append(f.read(bytes))
+        linesFound = data[-1].count('\n')
+        size -= linesFound
+        bytes -= BUFSIZ
+        block -= 1
+    return '\n'.join(''.join(data).splitlines()[-window:])
 
 
 _mail_conn = None
