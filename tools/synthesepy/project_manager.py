@@ -990,7 +990,7 @@ The synthese.py wrapper script.
             if self.env.config.dummy:
                 return
             utils.call('curl -s {0} | python'.format(install_url))
-        if command in ('stop_project', 'start_project'):
+        elif command in ('stop_project', 'start_project'):
             supervisor_command = 'stop' if command == 'stop_project' else 'start'
             utils.call([
                 '/usr/bin/supervisorctl', supervisor_command,
