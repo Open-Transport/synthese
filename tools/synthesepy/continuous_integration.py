@@ -77,6 +77,9 @@ def run(env, args):
         log.info('Creating package')
         synthesepy.package.run(env, args)
 
+    if args.no_tests:
+        return
+
     log.info('Running tests')
     tester = synthesepy.test.Tester(env)
     tester.run_tests(config.suites)
