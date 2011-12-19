@@ -319,6 +319,9 @@ def add_default_subparsers(subparsers):
     parser_continuous_integration.add_argument(
         '--force-create-package', action='store_true',
         help='Force package creation.')
+    parser_continuous_integration.add_argument(
+        '--no-tests', action='store_true',
+        help='Don\'t run unit tests.')
 
     parser_continuous_integration = subparsers.add_parser(
         'system_install',
