@@ -34,32 +34,20 @@ log = logging.getLogger(__name__)
 # Increment this when the Python environment needs to be updated.
 REQUIRED_ENV_VERSION = 3
 
-SYNTHESEPY_DIR = '@SYNTHESEPY_DIR@'
-
 class Bootstrap(object):
-    project_path = None
     pyenv_path = None
     tools_path = None
     env_type = None
     env_path = None
 
     def __init__(self):
-        bootstrap_script = os.environ.get('SYNTHESE_BOOTSTRAP_SCRIPT', __file__)
-        bootstrap_script = os.path.abspath(bootstrap_script)
-
-        bootstrap_script_dir = os.path.dirname(bootstrap_script)
+        synthesepy_path = os.path.abspath(__file__)
+        self.synthesepy_dir = os.path.dirname(synthesepy_path)
 
         self.thirdparty_dir = os.environ.get(
             'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
         if not os.path.isdir(self.thirdparty_dir):
             os.makedirs(self.thirdparty_dir)
-
-        self.synthesepy_dir = bootstrap_script_dir
-
-        script_name = os.path.split(sys.argv[0])[1]
-        if script_name == 'manage.py':
-            log.debug('Running script from project location')
-            self._get_project_config(bootstrap_script_dir)
 
         if os.path.isdir(
             os.path.join(
@@ -70,15 +58,6 @@ class Bootstrap(object):
             return
 
         self.config = self._get_source_config()
-
-    def _get_project_config(self, bootstrap_script_dir):
-        self.project_path = bootstrap_script_dir
-
-        if SYNTHESEPY_DIR.startswith('@'):
-            # TODO: try to detect Synthese at the usual locations.
-            raise Exception('Auto detect not implemented yet')
-
-        self.synthesepy_dir = SYNTHESEPY_DIR
 
     def _get_installed_config(self):
         self.env_type = 'installed'
@@ -200,19 +179,11 @@ class Bootstrap(object):
             env_bin_dir = join(self.pyenv_path, 'bin')
             python = join(env_bin_dir, 'python')
 
-        os.environ['SYNTHESE_ENV_BIN_DIR'] = env_bin_dir
-        os.environ['SYNTHESE_TOOLS_DIR'] = self.tools_path
-        os.environ['SYNTHESE_THIRDPARTY_DIR'] = self.thirdparty_dir
-
         pythonpath = os.environ.get('PYTHONPATH', '')
         if pythonpath:
             pythonpath += os.pathsep
         os.environ['PYTHONPATH'] = pythonpath + self.tools_path
 
-        os.environ['SYNTHESEPY_DIR'] = self.synthesepy_dir
-
-        if self.project_path:
-            sys.argv.insert(1, '--project-path=' + self.project_path)
         if self.env_type:
             sys.argv.insert(1, '--env-type=' + self.env_type)
         if self.env_path:

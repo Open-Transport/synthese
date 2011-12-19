@@ -23,6 +23,7 @@
 import hashlib
 import logging
 import os
+from os.path import join
 import sys
 import urllib2
 
@@ -40,7 +41,7 @@ class Env(object):
         self.c = self.config
 
         self.source_path = os.path.normpath(
-            os.path.join(
+            join(
                 os.path.dirname(os.path.abspath(__file__)),
                 os.pardir, os.pardir))
         if sys.platform in ('win32', 'cygwin'):
@@ -62,7 +63,7 @@ class Env(object):
             'command line (-b) or environment (SYNTHESE_ENV_PATH).')
 
     def get_executable_path(self, env_relative_path, executable_file):
-        return os.path.join(
+        return join(
             self.env_path, env_relative_path, self.executable_relative_path,
             executable_file + self.platform_exe_suffix)
 
@@ -72,11 +73,11 @@ class Env(object):
 
     @property
     def daemon_launch_path(self):
-        return os.path.join(self.env_path, self.daemon_relative_path)
+        return join(self.env_path, self.daemon_relative_path)
 
     @property
     def daemon_relative_path(self):
-        return os.path.join('src', 'bin', 'server')
+        return join('src', 'bin', 'server')
 
     @property
     def daemon_path(self):
@@ -84,7 +85,26 @@ class Env(object):
 
     @property
     def testdata_importer_relative_path(self):
-        return os.path.join('test', '53_pt_routeplanner')
+        return join('test', '53_pt_routeplanner')
+
+    @property
+    def pyenv_path(self):
+        return join(self.c.thirdparty_dir, 'env')
+
+    @property
+    def pyenv_bin_path(self):
+        if self.platform == 'win':
+            return join(self.pyenv_path, 'Scripts')
+
+        return join(self.pyenv_path, 'bin')
+
+    @property
+    def tools_path(self):
+        return join(self.source_path, 'tools')
+
+    @property
+    def synthesepy_path(self):
+        return join(self.tools_path, 'synthese.py')
 
     @property
     def testdata_importer_path(self):
@@ -95,7 +115,7 @@ class Env(object):
         builder = build.get_builder(self)
         builder.install_iconv()
 
-        iconv_path = os.path.join(self.c.thirdparty_dir, 'iconv')
+        iconv_path = join(self.c.thirdparty_dir, 'iconv')
         utils.append_paths_to_environment('PATH', [iconv_path])
 
     def _prepare_for_launch_lin(self):
@@ -120,11 +140,11 @@ class SconsEnv(Env):
 
     @property
     def default_env_path(self):
-        return os.path.join(self.source_path, 'build', self.mode)
+        return join(self.source_path, 'build', self.mode)
 
     def _prepare_for_launch_lin(self):
         utils.append_paths_to_environment(
-            'LD_LIBRARY_PATH', [os.path.join(self.env_path, 'repo', 'bin')])
+            'LD_LIBRARY_PATH', [join(self.env_path, 'repo', 'bin')])
         super(SconsEnv, self)._prepare_for_launch_lin()
 
 
@@ -133,12 +153,12 @@ class CMakeEnv(Env):
 
     @property
     def default_env_path(self):
-        return os.path.join(self.source_path, 'build_cmake', self.mode)
+        return join(self.source_path, 'build_cmake', self.mode)
 
     @property
     def executable_relative_path(self):
         if self.platform == 'win':
-            return os.path.join('Debug' if (self.mode == 'debug') else 'Release')
+            return join('Debug' if (self.mode == 'debug') else 'Release')
         return os.curdir
 
 
@@ -153,18 +173,20 @@ class InstalledEnv(Env):
     def testdata_importer_relative_path(self):
         return 'bin'
 
+    @property
+    def pyenv_path(self):
+        return join(self.env_path, 'share', 'synthese', 'env')
+
+    @property
+    def tools_path(self):
+        return join(self.env_path, 'share', 'synthese', 'tools')
+
+    @property
+    def synthesepy_path(self):
+        return join(self.env_path, 'bin', 'synthese.py')
+
 
 def create_env(env_type, env_path, mode, config):
-    # TODO: maybe drop these env variables, and use only cli flags from synthese.py
-    if not env_type:
-        env_type = os.environ.get('SYNTHESE_ENV_TYPE')
-    if not env_type:
-        raise Exception('Env type must be specified on the command line or in environment')
-    if not mode:
-        mode = os.environ.get('SYNTHESE_MODE')
-    if not env_path:
-        env_path = os.environ.get('SYNTHESE_ENV_PATH')
-
     if env_type == 'scons':
         env_class = SconsEnv
     elif env_type == 'cmake':

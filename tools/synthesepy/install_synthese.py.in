@@ -90,7 +90,7 @@ if __name__ == '__main__':
                                logging.INFO))
 
     if (sys.platform != 'win32' and
-        os.environ.get("SYNTHESE_SKIP_ROOT_CHECK") != '1'
+        os.environ.get('SYNTHESE_SKIP_ROOT_CHECK') != '1'
         and os.geteuid() != 0):
         raise Exception('This script should be run as root')
 

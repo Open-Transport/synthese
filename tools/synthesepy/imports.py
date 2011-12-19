@@ -292,8 +292,8 @@ class ImportRun(object):
             traceback.format_exc(exception))
 
     def finish(self):
-        state_keys = ('successful', 'date', 'execution_time', 'messages', 'dummy',
-            'synthese_calls')
+        state_keys = ('successful', 'date', 'execution_time', 'messages',
+            'dummy', 'synthese_calls')
         state = dict((k, getattr(self, k)) for k in state_keys)
         json.dump(
             state, open(self.state_path, 'wb'),
@@ -313,7 +313,8 @@ class ImportRun(object):
             if self._summary:
                 return self._summary
             if os.path.isfile(self.summary_path):
-                self._summary = gzip.open(self.summary_path, 'rb').read().decode('utf-8')
+                self._summary = gzip.open(
+                    self.summary_path, 'rb').read().decode('utf-8')
             else:
                 self._summary = 'Not available'
             return self._summary
@@ -523,8 +524,8 @@ class Import(DirObjectLoader):
         level_to_mails = {}
         for level in ImportRun.LEVEL_NAMES:
             # TODO: also allow passing a username instead of an email
-            level_to_mails[level] = set(self.template.run_results_notifications.get(
-                level, []))
+            level_to_mails[level] = set(
+                self.template.run_results_notifications.get(level, []))
 
         # admins always get errors.
         level_to_mails['err'].update(self.template.admin_emails)
