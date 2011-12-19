@@ -41,12 +41,6 @@ DEFAULTS = {
     'env_configs': {},
     'env_config_names': '',
 
-    # XXX name it thirdparty_path for consistency?
-    'thirdparty_dir': None,
-    # Environment
-    'env_type': 'cmake',
-    'env_path': None,
-    'mode': 'debug',
     # Daemon
     'port': 8080,
     'no_proxy': False,
@@ -133,9 +127,8 @@ class Config(object):
     def __init__(self):
         self.__dict__.update(DEFAULTS)
 
-        # Set defaults
-        if not self.thirdparty_dir:
-            self.thirdparty_dir = os.environ['SYNTHESE_THIRDPARTY_DIR']
+        self.thirdparty_dir = os.environ.get(
+            'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
 
     def _get_config_globals(self, path):
         return {
@@ -145,13 +138,13 @@ class Config(object):
 
     def update_from_files(self, config_names, config_path):
         conf_dir = config_path if config_path else join(
-            os.environ['SYNTHESE_THIRDPARTY_DIR'], 'config')
+            self.thirdparty_dir, 'config')
 
         all_configs = {}
 
         suffixes = ['', '_local', '_local_' + socket.gethostname()]
         system_suffix_file = join(
-            os.environ['SYNTHESE_THIRDPARTY_DIR'], 'config_suffix.txt')
+            self.thirdparty_dir, 'config_suffix.txt')
         try:
             system_suffix = open(system_suffix_file).read().strip()
             suffixes.append('_local_' + system_suffix)

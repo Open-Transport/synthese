@@ -30,6 +30,7 @@ import logging
 import os
 from os.path import join
 import pprint
+import re
 import shutil
 import socket
 import subprocess
@@ -194,6 +195,8 @@ class Package(object):
             self.project.db_backend.replace_into('t063_web_pages', page)
 
     def _load_local_files(self, site, overwrite):
+        if not site:
+            return
         main_package = site.get_package('main')
         if not main_package:
             log.warn('Site %s is missing a "main" package, not copying '
@@ -314,6 +317,82 @@ class Site(object):
         return None
 
 
+class CommandException(Exception):
+    def __init__(self, command_result):
+        self.command_result = command_result
+
+    def __str__(self):
+        return 'Command Exception while running: %s' % self.command_result
+
+
+class CommandResult(object):
+    # TODO: Maybe simplify with just a success bool status.
+    SUCCESS = 0
+    IGNORED_FAILURE = 1
+    FAILURE = 2
+
+    def __init__(self):
+        self.commandline = []
+        self.status = self.SUCCESS
+        self.output = ''
+
+    @property
+    def success(self):
+        return self.status == self.SUCCESS
+
+    def __str__(self):
+        return '<CommandResult, commandline: {0}, output: {1}>'.format(
+            self.commandline, self.output)
+
+    @classmethod
+    def call_project(cls, project, command, args=[], sudo=False):
+        cmd = []
+        if sudo:
+            cmd.append('/usr/bin/sudo')
+        # TODO: option to add the executable in case the script is not executable?
+        #cmd.append(sys.executable)
+        cmd.append(project.env.synthesepy_path)
+        if project.config.verbose:
+            cmd.append('-v')
+        cmd.append('--env-type=' + project.env.type)
+        cmd.append('--env-path=' + project.env.env_path)
+        cmd.append('--mode=' + project.env.mode)
+        cmd.append('--project-path=' + project.path)
+
+        cmd.append(command)
+        cmd.extend(args)
+        return cls.call_command(project, cmd)
+
+    @classmethod
+    def call_command(cls, project, cmd, hide_arg=None):
+        command_result = CommandResult()
+        command_result.commandline = cmd
+        if hide_arg:
+            command_result.commandline = command_result.commandline.replace(hide_arg, '***')
+
+        try:
+            command_result.output = utils.call(
+                cmd, cwd=project.path, ret_output=True)
+        except subprocess.CalledProcessError, e:
+            command_result.output = e.output
+            command_result.status = CommandResult.FAILURE
+
+        return command_result
+
+
+class CommandsResult(object):
+    def __init__(self, title):
+        self.title = title
+        self.success = True
+        self.command_results = []
+
+    def add_command_result(self, command_result):
+        self.command_results.append(command_result)
+        if not command_result.success:
+            self.success = False
+            raise CommandException(command_result)
+
+
 def command(root_required=False):
      def _command(f):
          def wrapper(*args, **kwargs):
@@ -347,6 +426,23 @@ class Project(object):
         self.db_path = join(path, 'db')
         if not os.path.isdir(self.db_path):
             os.makedirs(self.db_path)
+
+        self.admin_log = logging.getLogger('synthesepy.admin')
+        self.admin_log_path = join(self.path, 'logs', 'admin.log')
+
+        class KeptClosedFileHandler(logging.FileHandler):
+            '''Extension of logging.FileHandler which tries to keep the log
+            file closed, so that multiple processes can write to it.
+            Concurrent access might have unpredictable results though'''
+            def emit(self, record):
+                logging.FileHandler.emit(self, record)
+                self.close()
+
+        admin_handler = KeptClosedFileHandler(self.admin_log_path, delay=True)
+        admin_formatter = logging.Formatter(
+            '%(asctime)s  %(levelname)-12s  %(message)s')
+        admin_handler.setFormatter(admin_formatter)
+        self.admin_log.addHandler(admin_handler)
 
         self._read_config()
 
@@ -515,36 +611,11 @@ class Project(object):
         if not self.config.send_mail_on_crash:
             return
 
-        # adapted from http://stackoverflow.com/questions/136168/get-last-n-lines-of-a-file-with-python-similar-to-tail
-        def tail(f, window=20):
-            BUFSIZ = 1024
-            f.seek(0, os.SEEK_END)
-            bytes = f.tell()
-            size = window
-            block = -1
-            data = []
-            while size > 0 and bytes > 0:
-                if bytes - BUFSIZ > 0:
-                    # Seek back one whole BUFSIZ
-                    f.seek(block * BUFSIZ, os.SEEK_END)
-                    # read BUFFER
-                    data.append(f.read(BUFSIZ))
-                else:
-                    # file too small, start from beginning
-                    f.seek(0, os.SEEK_SET)
-                    # only read what was not read
-                    data.append(f.read(bytes))
-                linesFound = data[-1].count('\n')
-                size -= linesFound
-                bytes -= BUFSIZ
-                block -= 1
-            return '\n'.join(''.join(data).splitlines()[-window:])
-
         log.info('Sending crash mail')
         hostname = socket.gethostname()
         LINE_COUNT = 500
         try:
-            last_log = tail(open(self.config.log_file), LINE_COUNT)
+            last_log = utils.tail(open(self.config.log_file), LINE_COUNT)
         except IOError:
             last_log = "[Not available]"
 
@@ -768,7 +839,7 @@ The synthese.py wrapper script.
             raise Exception('No remote server defined in configuration')
 
         @contextlib.contextmanager
-        def remote_transaction_sqlite(conn_info): 
+        def remote_transaction_sqlite(conn_info):
             remote_db_local_path = join(self.db_path, 'remote_config.db3')
 
             log.info('Fetching db to %r', remote_db_local_path)
@@ -902,6 +973,105 @@ The synthese.py wrapper script.
             'this command (as root):\n  supervisorctl stop synthese-%s',
             self.config.project_name)
 
+    # Manager commands
+
+    @command(root_required=True)
+    def root_delegate(self, command, args=[]):
+        if command == 'update_synthese':
+            install_url = args[0]
+
+            # Security check: we don't want a compromised synthese user be
+            # able to execute any remote script.
+            REQUIRED_URL_RE = '^http://ci.rcsmobility.com/~build/[\w/\.]+$'
+            if not re.match(REQUIRED_URL_RE, install_url):
+                raise Exception('The install url must match the regexp %r' %
+                    REQUIRED_URL_RE)
+
+            if self.env.config.dummy:
+                return
+            utils.call('curl -s {0} | python'.format(install_url))
+        if command in ('stop_project', 'start_project'):
+            supervisor_command = 'stop' if command == 'stop_project' else 'start'
+            utils.call([
+                '/usr/bin/supervisorctl', supervisor_command,
+                'synthese-{0}'.format(self.config.project_name)])
+        else:
+            raise Exception('Unknown command %r' % command)
+
+    @command()
+    def update_synthese(self, install_url=None):
+        self.admin_log.info('update_synthese called')
+
+        if install_url is None:
+            install_url = 'http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/latest/install_synthese.py'
+        commands_result = CommandsResult('Update Synthese')
+
+        try:
+            commands_result.add_command_result(
+                CommandResult.call_project(
+                    self, 'root_delegate',
+                    ['update_synthese', install_url], sudo=True))
+
+        except CommandException, e:
+            self.admin_log.warn('update_synthese failed')
+            log.exception('Failure while running commands: %s', e)
+
+        return commands_result
+
+    @command()
+    def update_project(self, system_install=True, load_data=True, overwrite=False):
+        self.admin_log.info('update_project called')
+
+        commands_result = CommandsResult('Update Project')
+        try:
+            # TODO: implement daemon stop/start for development mode (without supervisor).
+            commands_result.add_command_result(
+                CommandResult.call_project(
+                    self, 'root_delegate', ['stop_project'], sudo=True))
+
+            if system_install:
+                commands_result.add_command_result(
+                    CommandResult.call_project(
+                        self, 'system_install', sudo=True))
+
+            if load_data:
+                commands_result.add_command_result(
+                    CommandResult.call_project(self, 'load_data'))
+                load_local_data_args = []
+                if overwrite:
+                    load_local_data_args = ['--overwrite']
+                commands_result.add_command_result(
+                    CommandResult.call_project(
+                        self, 'load_local_data', load_local_data_args))
+
+            commands_result.add_command_result(
+                CommandResult.call_project(
+                    self, 'root_delegate', ['start_project'], sudo=True))
+
+        except CommandException, e:
+            self.admin_log.warn('update_project failed')
+            log.exception('Failure while running commands: %s', e)
+
+        return commands_result
+
+    @command()
+    def svn(self, command, username=None, password=None):
+        commands_result = CommandsResult('Subversion ({0})'.format(command))
+
+        try:
+            cmd = 'svn %s --no-auth-cache' % command
+            if username:
+                cmd += ' --username=%s' % username
+            if password:
+                cmd += ' --password=%s' % password
+            commands_result.add_command_result(
+                CommandResult.call_command(self, cmd, hide_arg=password))
+
+        except CommandException, e:
+            log.exception('Failure while running commands: %s', e)
+
+        return commands_result
+
 
 def create_project(env, path, system_packages=None, conn_string=None,
         overwrite=False, initialize=True):
@@ -926,13 +1096,6 @@ def create_project(env, path, system_packages=None, conn_string=None,
             if line.startswith('#conn_string'):
                 lines[index] = "conn_string = '{0}'".format(conn_string)
         open(config_path, 'wb').writelines(lines)
-
-    synthesepy_source = join(env.source_path, 'tools', 'synthese.py')
-    managepy_target = join(path, 'manage.py')
-    synthesepy_content = open(synthesepy_source, 'rb').read()
-    synthesepy_content = synthesepy_content.replace(
-        '@SYNTHESEPY_DIR@', repr(os.environ['SYNTHESEPY_DIR'])[1:-1])
-    open(managepy_target, 'wb').write(synthesepy_content)
 
     if system_packages:
         www_site_config_path = join(path, 'sites', 'www', 'config.py')

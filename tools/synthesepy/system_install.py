@@ -97,7 +97,7 @@ def run(env, args):
     if sys.platform == 'win':
         raise Exception('Windows is not supported')
 
-    if os.environ.get("SYNTHESE_SKIP_ROOT_CHECK") != "1" and os.geteuid() != 0:
+    if os.environ.get('SYNTHESE_SKIP_ROOT_CHECK') != '1' and os.geteuid() != 0:
         raise Exception('This script should be run as root')
 
     create_synthese_user()

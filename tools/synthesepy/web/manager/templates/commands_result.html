@@ -1,0 +1,42 @@
+{% extends "layout_wide.html" %}
+
+{% block head %}
+  <style>
+    {% if not commands_result.success %}
+      .content {
+        background-color: #FFAAAA !important;
+      }
+    {% endif %}
+  </style>
+{% endblock %}
+
+{% block breadcrumb %}
+  <li>Commands Result</li>
+{% endblock %}
+
+{% macro success_label(success) -%}
+  {% if success %}
+    <span class="label success">Success</span>
+  {% else %}
+    <span class="label important">Failure</span>
+  {% endif %}
+{%- endmacro %}
+
+{% block body %}
+  <h1>{{ commands_result.title }}</h1>
+
+  <p>Status: {{ success_label(commands_result.success) }}</p>
+
+  {% for command_result in commands_result.command_results %}
+    <h3>Command {{ loop.index }}</h3>
+    <p>Command line: <code>{{ command_result.commandline }}</code></p>
+    <p>Status: {{ success_label(command_result.success) }}</p>
+    <p>Output:</p>
+    <pre>{{ command_result.output }}</pre>
+  {% endfor %}
+
+  <div class="well">
+    <a href="{{ url_for('.index') }}">Back to Manager</a>
+  </div>
+
+{% endblock %}

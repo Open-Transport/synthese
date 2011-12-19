@@ -39,7 +39,6 @@ log = logging.getLogger(__name__)
 def get_application(bootstrap_config={}, project=None):
     if not project:
         assert bootstrap_config
-        os.environ['SYNTHESE_THIRDPARTY_DIR'] = bootstrap_config['thirdparty_dir']
 
         config = synthesepy.config.Config()
         env = synthesepy.env.create_env(
@@ -57,12 +56,11 @@ def get_application(bootstrap_config={}, project=None):
     app.secret_key = project.config.web_secret_key
 
     @app.context_processor
-    def inject_i18n():
-        return dict(i18n=synthesepy.i18n)
-
-    @app.context_processor
-    def inject_project_name():
-        return dict(project_name=project.config.project_name)
+    def inject_context():
+        return dict(
+            i18n=synthesepy.i18n,
+            project_name=project.config.project_name
+        )
 
     app.register_blueprint(manager.manager, url_prefix='/manager')
 

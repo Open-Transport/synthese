@@ -52,7 +52,6 @@ def import_template(template_id):
     if not template.has_access(session['username']):
         abort(401)
 
-    # TODO: add a context_processor for is_admin
     is_admin = template.has_access(session['username'], True)
 
     return render_template(

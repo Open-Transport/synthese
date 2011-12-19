@@ -82,8 +82,7 @@ stdout_logfile_backups={stdout_logfile_backups}
         # NOTE: supervisor doesn't seem to like underscores in names. Use
         # dashes instead.
         format_config['program_name'] = 'synthese-{0}'.format(config.project_name)
-        format_config['synthese_py'] = join(
-            os.environ['SYNTHESEPY_DIR'], 'synthese.py')
+        format_config['synthese_py'] = self.project.env.synthesepy_path
         format_config['stdout_logfile'] = config.log_file
         format_config.setdefault('stdout_logfile_maxbytes', '500MB')
         format_config.setdefault('stdout_logfile_backups', '4')
@@ -132,15 +131,15 @@ application = synthesepy.web.get_application(bootstrap_config)
             'wsgi', 'app.wsgi')
         utils.maybe_makedirs(os.path.dirname(wsgi_path))
 
+        env = self.project.env
         config = self.project.config
         wsgi_app_content = WSGI_APP_TEMPLATE.format(
             bootstrap_config=repr({
-                'env_bin_dir': os.environ['SYNTHESE_ENV_BIN_DIR'],
-                'tools_dir': os.environ['SYNTHESE_TOOLS_DIR'],
-                'thirdparty_dir': os.environ['SYNTHESE_THIRDPARTY_DIR'],
-                'env_type': config.env_type,
-                'env_path': config.env_path,
-                'mode': config.mode,
+                'env_bin_dir': self.project.env.pyenv_bin_path,
+                'tools_dir': self.project.env.tools_path,
+                'env_type': env.type,
+                'env_path': env.env_path,
+                'mode': env.mode,
                 'project_path': self.project.path}))
 
         with open(wsgi_path, 'wb') as f:

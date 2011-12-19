@@ -30,6 +30,7 @@ from flask import abort, helpers, Blueprint, flash, redirect, render_template, \
 
 import synthesepy.http_api
 from synthesepy import i18n
+from synthesepy import utils
 
 log = logging.getLogger(__name__)
 
@@ -42,6 +43,17 @@ def before_request():
      if (request.endpoint not in ('manager.login', 'manager.static') and
          not session.get('logged_in')):
          return redirect(url_for('.login', next=url_for(request.endpoint, **request.view_args)))
+
+
+@manager.context_processor
+def inject_context():
+    def is_admin():
+        admins = flask.current_app.project.config.web_admins
+        return session.get('username') in admins
+
+    return dict(
+        is_admin=is_admin,
+    )
 
 
 def admin_required(f):
@@ -57,7 +69,15 @@ def admin_required(f):
 
 @manager.route('/')
 def index():
-    return render_template('index.html')
+    project = flask.current_app.project
+    ADMIN_LOG_LINE_COUNT = 20
+    try:
+        last_admin_log = utils.tail(
+            open(project.admin_log_path, 'rb'), ADMIN_LOG_LINE_COUNT)
+    except IOError:
+        last_admin_log = "[Not available]"
+
+    return render_template('index.html', last_admin_log=last_admin_log)
 
 
 class WrongPassword(Exception):
@@ -121,6 +141,57 @@ def logout():
     session.pop('logged_in', None)
     flash(i18n.logged_out)
     return redirect(url_for('.index'))
+
+# Management commands
+
+def _do_command(project_fun, *args, **kwargs):
+    commands_result = project_fun(*args, **kwargs)
+    return render_template('commands_result.html',
+        commands_result=commands_result
+    )
+
+
+@manager.route('/update_synthese', methods=['POST'])
+@admin_required
+def update_synthese():
+    project = flask.current_app.project
+    
+    install_url = request.form.get('install_url')
+    return _do_command(project.update_synthese, install_url)
+
+
+@manager.route('/update_project', methods=['POST'])
+@admin_required
+def update_project():
+    project = flask.current_app.project
+
+    system_install = request.form.get('system_install') == 'on'
+    load_data = request.form.get('load_data') == 'on'
+    overwrite = request.form.get('overwrite') == 'on'
+    return _do_command(
+        project.update_project, system_install, load_data, overwrite)
+
+
+@manager.route('/svn_status', methods=['POST'])
+@admin_required
+def svn_status():
+    project = flask.current_app.project
+
+    return _do_command(project.svn, 'status')
+
+
+@manager.route('/svn_update', methods=['POST'])
+@admin_required
+def svn_update():
+    project = flask.current_app.project
+
+    return _do_command(
+        project.svn, 'update',
+        request.form.get('svn_username'), request.form.get('svn_password'))
+
+
+# Database commands
+
 
 @manager.route('/db')
 @admin_required
