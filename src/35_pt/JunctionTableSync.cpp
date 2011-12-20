@@ -199,7 +199,7 @@ namespace synthese
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByStop,
 			bool raisingOrder,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			SelectQuery<JunctionTableSync> query;
 			if(startStopFilter)

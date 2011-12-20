@@ -119,7 +119,7 @@ namespace synthese
 			bool orderByStatus /*= false */,
 			bool orderByConflict /*= false */,
 			bool raisingOrder /*= false*/,
-			LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			LinkLevel linkLevel
 		){
 			stringstream query;
 			query
