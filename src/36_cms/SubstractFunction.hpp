@@ -81,10 +81,7 @@ namespace synthese
 
 
 		public:
-			//! @name Setters
-			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
-			//@}
+			SubstractFunction();
 
 
 

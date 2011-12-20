@@ -26,7 +26,10 @@
 #include "Request.h"
 #include "IfFunction.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -51,18 +54,22 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void IfFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_condition = map.get<string>(PARAMETER_CONDITION);
+			_condition = trim_copy_if(map.get<string>(PARAMETER_CONDITION), is_any_of(" \r\n"));
 			_then = map.getDefault<string>(PARAMETER_THEN);
 			_else = map.getDefault<string>(PARAMETER_ELSE);
 		}
+
+
 
 		void IfFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			if(_condition.empty() || _condition == "0" || _condition == " ")
+			if(_condition.empty() || _condition == "0")
 			{
 				stream << _else;
 			}
@@ -86,5 +93,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}

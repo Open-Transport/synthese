@@ -26,7 +26,12 @@
 #include "Request.h"
 #include "SubstractFunction.hpp"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -41,6 +46,8 @@ namespace synthese
 		const string SubstractFunction::PARAMETER_LEFT("l");
 		const string SubstractFunction::PARAMETER_RIGHT("r");
 
+
+
 		ParametersMap SubstractFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -49,11 +56,26 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void SubstractFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.getDefault<double>(PARAMETER_LEFT, 0);
-			_right = map.getDefault<double>(PARAMETER_RIGHT, 0);
+			// Left
+			string leftStr(trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n")));
+			if(!leftStr.empty())
+			{
+				_left = lexical_cast<double>(leftStr);
+			}
+
+			// Right
+			string rightStr(trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n")));
+			if(!rightStr.empty())
+			{
+				_right = lexical_cast<double>(rightStr);
+			}
 		}
+
+
 
 		void SubstractFunction::run(
 			std::ostream& stream,
@@ -76,5 +98,11 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+
+
+
+		SubstractFunction::SubstractFunction():
+			_left(0),
+			_right(0)
+		{}
+}	}

@@ -49,6 +49,7 @@
 #include "StopAreaAddAction.h"
 #include "TransportNetworkTableSync.h"
 #include "RollingStockTableSync.hpp"
+#include "ContinuousServiceTableSync.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>
@@ -174,6 +175,10 @@ namespace synthese
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<ContinuousService>::value_type& service, _env.getRegistry<ContinuousService>())
+			{
+				ContinuousServiceTableSync::Save(service.second.get(), transaction);
 			}
 			return transaction;
 		}
@@ -436,6 +441,13 @@ namespace synthese
 						itZug->lineNumber = _getField(9,6);
 						itZug->version = lexical_cast<size_t>(_getField(16, 2));
 						zugNumber = itZug->number +"/"+ itZug->lineNumber;
+
+						// Continuous service
+						if(!_getField(21,4).empty())
+						{
+							itZug->continuousServiceRange = minutes(lexical_cast<long>(_getField(21, 4)));
+							itZug->continuousServiceWaitingTime = minutes(lexical_cast<long>(_getField(26, 3)));
+						}
 					}
 					else if(_getField(0, 5) == "*A VE") // Calendar
 					{
@@ -1359,8 +1371,10 @@ namespace synthese
 				}
 
 				// Service
-				ScheduledService* service(
-					PTFileFormat::CreateOrUpdateService(
+				SchedulesBasedService* service(NULL);
+				if(zug.continuousServiceRange.is_not_a_date_time())
+				{
+					service = PTFileFormat::CreateOrUpdateService(
 						*route,
 						departures,
 						arrivals,
@@ -1368,7 +1382,22 @@ namespace synthese
 						_dataSource,
 						_env,
 						os
-				)	);
+					);
+				}
+				else
+				{
+					service = PTFileFormat::CreateOrUpdateContinuousService(
+						*route,
+						departures,
+						arrivals,
+						zug.number,
+						zug.continuousServiceRange,
+						zug.continuousServiceWaitingTime,
+						_dataSource,
+						_env,
+						os
+					);
+				}
 
 				// Calendar
 				if(service)
