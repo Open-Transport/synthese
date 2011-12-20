@@ -66,7 +66,7 @@ namespace synthese
 				std::string			_prefix;
 
 				RequestParameters()
-					: maxSize(30),
+					: maxSize(200),
 					first(0),
 					raisingOrder(true)
 				{}
