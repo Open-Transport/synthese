@@ -59,7 +59,7 @@ namespace synthese
 				int number = 0,
 				bool orderByName = true,
 				bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 			static boost::shared_ptr<City> GetEditableFromCode(

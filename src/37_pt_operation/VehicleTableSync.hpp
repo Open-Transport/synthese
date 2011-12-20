@@ -83,7 +83,7 @@ namespace synthese
 					bool orderByNumber = true,
 					bool orderByRegistration = true,
 					bool raisingOrder = true,
-					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 
 

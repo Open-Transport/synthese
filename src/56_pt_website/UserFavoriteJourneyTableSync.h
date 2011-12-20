@@ -69,7 +69,7 @@ namespace synthese
 				, int first = 0
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
 				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 

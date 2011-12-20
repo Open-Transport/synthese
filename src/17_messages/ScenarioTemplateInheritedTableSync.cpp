@@ -110,7 +110,7 @@ namespace synthese
 			boost::optional<std::size_t> number /*= -1 */,
 			bool orderByName /*= true */,
 			bool raisingOrder /*= false*/,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			stringstream query;
 			query

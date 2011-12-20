@@ -205,7 +205,7 @@ namespace synthese
 			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
 			bool raisingOrder,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			SelectQuery<HikingTrailTableSync> query;
 			if(name)
