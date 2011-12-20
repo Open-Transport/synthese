@@ -28,8 +28,11 @@
 #include "Request.h"
 #include "Fetcher.h"
 
+#include <boost/algorithm/string/trim.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -164,5 +167,11 @@ namespace synthese
 			}
 			return it->second;
 		}
-	}
-}
+
+
+
+		std::string CMSModule::Trim( const std::string& value )
+		{
+			return trim_copy_if(value, is_any_of(" \r\n\t"));
+		}
+}	}

@@ -58,8 +58,8 @@ namespace synthese
 
 		void AndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n"));
-			_right = trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n"));
+			_left = trim_copy_if(map.getDefault<string>(PARAMETER_LEFT), is_any_of(" \r\n"));
+			_right = trim_copy_if(map.getDefault<string>(PARAMETER_RIGHT), is_any_of(" \r\n"));
 		}
 
 
