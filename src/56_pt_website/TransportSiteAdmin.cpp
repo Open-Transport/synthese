@@ -102,36 +102,28 @@ namespace synthese
 
 	namespace pt_website
 	{
-		const string TransportSiteAdmin::PARAMETER_SEARCH_PAGE("pp");
-		const string TransportSiteAdmin::PARAMETER_SEARCH_RANK("pr");
-		const string TransportSiteAdmin::PARAMETER_DATE_TIME("dt");
-		const string TransportSiteAdmin::PARAMETER_START_CITY("sc");
-		const string TransportSiteAdmin::PARAMETER_START_PLACE("sp");
-		const string TransportSiteAdmin::PARAMETER_END_CITY("ec");
-		const string TransportSiteAdmin::PARAMETER_END_PLACE("ep");
-		const string TransportSiteAdmin::PARAMETER_RESULTS_NUMBER("rn");
-		const string TransportSiteAdmin::PARAMETER_ACCESSIBILITY("ac");
-		const string TransportSiteAdmin::PARAMETER_LOG("lo");
-		const string TransportSiteAdmin::PARAMETER_ROLLING_STOCK_FILTER("rf");
-		const string TransportSiteAdmin::PARAMETER_JOURNEY_PLANNING_ALGORITHM("ja");
+		const string TransportSiteAdmin::PARAMETER_SEARCH_PAGE = "pp";
+		const string TransportSiteAdmin::PARAMETER_SEARCH_RANK = "pr";
+		const string TransportSiteAdmin::PARAMETER_JOURNEY_PLANNING_ALGORITHM = "ja";
 
 		const string TransportSiteAdmin::TAB_PROPERTIES("pr");
 		const string TransportSiteAdmin::TAB_PERIMETER("pe");
 		const string TransportSiteAdmin::TAB_ROUTE_PLANNING("rp");
 		const string TransportSiteAdmin::TAB_WEB_PAGES("wp");
 
-		TransportSiteAdmin::TransportSiteAdmin()
-			: AdminInterfaceElementTemplate<TransportSiteAdmin>(),
-			_dateTime(not_a_date_time),
-			_accessibility(USER_PEDESTRIAN),
-			_log(false),
-			_rollingStockFilter(NULL),
+
+
+		TransportSiteAdmin::TransportSiteAdmin():
+			AdminInterfaceElementTemplate<TransportSiteAdmin>(),
 			_pt_journey_planning(true)
-		{ }
+		{}
+
+
 
 		void TransportSiteAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
+			// Site
 			try
 			{
 				_site = TransportWebsiteTableSync::Get(
@@ -145,46 +137,17 @@ namespace synthese
 				throw AdminParametersException("No such site");
 			}
 
+			// Search page
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
 
-			_startCity = map.getDefault<string>(PARAMETER_START_CITY);
-			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
-			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
-			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
-			_log = map.getDefault<bool>(PARAMETER_LOG, false);
-			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK);
+			// Journey planner
+			_journeyPlanner.setSite(_site);
+			_journeyPlanner._setFromParametersMap(map);
+			_journeyPlanner.setOutputFormat(RoutePlannerFunction::VALUE_ADMIN_HTML);
+
+			// Use PT algorithm
 			_pt_journey_planning = map.getDefault<bool>(PARAMETER_JOURNEY_PLANNING_ALGORITHM, true);
-
-			if(!map.getDefault<string>(PARAMETER_DATE_TIME).empty())
-			{
-				_dateTime = time_from_string(map.get<string>(PARAMETER_DATE_TIME));
-			}
-			else
-			{
-				_dateTime = ptime(second_clock::local_time());
-			}
-			_resultsNumber = map.getOptional<size_t>(PARAMETER_RESULTS_NUMBER);
-			_accessibility = static_cast<UserClassCode>(
-				map.getDefault<int>(PARAMETER_ACCESSIBILITY, UNKNOWN_VALUE)
-			);
-
-			if(!_site->getRollingStockFilters().empty())
-			{
-				if(map.getOptional<size_t>(PARAMETER_ROLLING_STOCK_FILTER))
-				{
-					TransportWebsite::RollingStockFilters::const_iterator it(_site->getRollingStockFilters().find(map.get<size_t>(PARAMETER_ROLLING_STOCK_FILTER)));
-					if(it == _site->getRollingStockFilters().end())
-					{
-						throw AdminParametersException("No such rolling stock filter");
-					}
-					_rollingStockFilter = it->second;
-				}
-				else
-				{
-					_rollingStockFilter = _site->getRollingStockFilters().begin()->second;
-				}
-			}
 		}
 
 
@@ -192,26 +155,13 @@ namespace synthese
 		util::ParametersMap TransportSiteAdmin::getParametersMap() const
 		{
 			ParametersMap m(_pageSearchParameter.getParametersMap());
-			m.insert(PARAMETER_START_CITY, _startCity);
-			m.insert(PARAMETER_START_PLACE, _startPlace);
-			m.insert(PARAMETER_END_CITY, _endCity);
-			m.insert(PARAMETER_END_PLACE, _endPlace);
-			if(!_dateTime.is_not_a_date_time())
-			{
-				m.insert(PARAMETER_DATE_TIME, _dateTime);
-			}
-			m.insert(PARAMETER_LOG, _log);
-			m.insert(PARAMETER_RESULTS_NUMBER, _resultsNumber);
-			m.insert(PARAMETER_ACCESSIBILITY, static_cast<int>(_accessibility));
+
+			m.merge(_journeyPlanner._getParametersMap());
 			m.insert(PARAMETER_SEARCH_PAGE, _searchPage);
 			m.insert(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning);
 			if(_site.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
-				if(_rollingStockFilter)
-				{
-					m.insert(PARAMETER_ROLLING_STOCK_FILTER, static_cast<int>(_rollingStockFilter->getRank()));
-				}
 			}
 			return m;
 		}
@@ -366,102 +316,51 @@ namespace synthese
 
 				SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 				stream << st.open();
-				stream << st.cell("Commune départ", st.getForm().getTextInput(PARAMETER_START_CITY, _startCity));
-				stream << st.cell("Arrêt départ", st.getForm().getTextInput(PARAMETER_START_PLACE, _startPlace));
-				stream << st.cell("Commune arrivée", st.getForm().getTextInput(PARAMETER_END_CITY, _endCity));
-				stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(PARAMETER_END_PLACE, _endPlace));
-				stream << st.cell("Date/Heure", st.getForm().getCalendarInput(PARAMETER_DATE_TIME, _dateTime));
+				stream << st.cell("Commune départ", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT, _journeyPlanner.getDeparturePlace().cityResult.key.getSource()));
+				stream << st.cell("Arrêt départ", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT, dynamic_cast<NamedPlace*>(_journeyPlanner.getDeparturePlace().placeResult.value.get()) ? _journeyPlanner.getDeparturePlace().placeResult.key.getSource() : string()));
+				stream << st.cell("Commune arrivée", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT, _journeyPlanner.getArrivalPlace().cityResult.key.getSource()));
+				stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT, dynamic_cast<NamedPlace*>(_journeyPlanner.getArrivalPlace().placeResult.value.get()) ? _journeyPlanner.getArrivalPlace().placeResult.key.getSource() : string()));
+				stream << st.cell("Date/Heure", st.getForm().getCalendarInput(RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME, _journeyPlanner.getStartDepartureDate()));
 				stream << st.cell(
 					"Nombre réponses",
 					st.getForm().getSelectNumberInput(
-						PARAMETER_RESULTS_NUMBER,
+						RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER,
 						1, 99,
-						_resultsNumber ? *_resultsNumber : UNKNOWN_VALUE,
+						_journeyPlanner.getMaxSolutionsNumber() ? *_journeyPlanner.getMaxSolutionsNumber() : UNKNOWN_VALUE,
 						1,
 						"(illimité)"
 				)	);
 				stream << st.cell(
 					"Accessibilité",
-					st.getForm().getSelectInput(PARAMETER_ACCESSIBILITY, TransportWebsiteModule::GetAccessibilityNames(), optional<UserClassCode>(_accessibility)));
-				stream << st.cell("Trace", st.getForm().getOuiNonRadioInput(PARAMETER_LOG, _log));
+					st.getForm().getSelectInput(
+						RoutePlannerFunction::PARAMETER_ACCESSIBILITY,
+						TransportWebsiteModule::GetAccessibilityNames(),
+						optional<UserClassCode>(_journeyPlanner.getAccessParameters().getUserClass())
+				)	);
+				stream << st.cell(
+					"Trace",
+					st.getForm().getTextInput(
+						RoutePlannerFunction::PARAMETER_LOG_PATH,
+						_journeyPlanner.getLogPath() ? _journeyPlanner.getLogPath()->file_string() : string()
+				)	);
 				if(!_site->getRollingStockFilters().empty())
 				{
 					stream << st.cell(
 						"Modes de transport",
 						st.getForm().getSelectInput(
-							PARAMETER_ROLLING_STOCK_FILTER,
+							RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID,
 							_site->getRollingStockFiltersList(),
-							optional<size_t>(_rollingStockFilter->getRank())
+							_journeyPlanner.getTransportModeFilter() ? optional<size_t>(_journeyPlanner.getTransportModeFilter()->getRank()) : optional<size_t>()
 					)	);
 				}
 				stream << st.cell("Transport public", st.getForm().getOuiNonRadioInput(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning));
 				stream << st.close();
 
-				// No calculation without cities
-				if (_startCity.empty() || _endCity.empty())
-					return;
-
-				if (_log)
-					stream << "<h1>Trace</h1>";
-
-				algorithm::PlanningOrder _planningOrder(DEPARTURE_FIRST);
-				// Route planning
-				RoadModule::ExtendedFetchPlaceResult startPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _startCity, _startPlace));
-				RoadModule::ExtendedFetchPlaceResult endPlace(RoadModule::ExtendedFetchPlace(_site->getCitiesMatcher(), _endCity, _endPlace));
-
-				ptime maxDepartureTime(_dateTime);
-				if(_planningOrder == DEPARTURE_FIRST)
-				{
-					maxDepartureTime += days(1);
-				}
-				else
-				{
-					maxDepartureTime -= days(1);
-				}
-				ptime maxArrivalTime(maxDepartureTime);
-				if(_planningOrder == DEPARTURE_FIRST)
-				{
-					maxArrivalTime += days(1);
-					if(	startPlace.placeResult.value->getPoint().get() &&
-						!startPlace.placeResult.value->getPoint()->isEmpty() &&
-						endPlace.placeResult.value->getPoint().get() &&
-						!endPlace.placeResult.value->getPoint()->isEmpty()
-					){
-						maxArrivalTime += minutes(2 * static_cast<int>(startPlace.placeResult.value->getPoint()->distance(endPlace.placeResult.value->getPoint().get()) / 1000));
-					}
-				}
-				else
-				{
-					maxArrivalTime -= days(1);
-					if(	startPlace.placeResult.value->getPoint().get() &&
-						!startPlace.placeResult.value->getPoint()->isEmpty() &&
-						endPlace.placeResult.value->getPoint().get() &&
-						!endPlace.placeResult.value->getPoint()->isEmpty()
-					){
-						maxArrivalTime -= minutes(2 * static_cast<int>(startPlace.placeResult.value->getPoint()->distance(endPlace.placeResult.value->getPoint().get()) / 1000));
-					}
-				}
-
 				stream << "<h1>Résultats</h1>";
 
 				if(_pt_journey_planning)
 				{
-					PTTimeSlotRoutePlanner r(
-						startPlace.placeResult.value.get(),
-						endPlace.placeResult.value.get(),
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
-						_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
-						_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
-						_resultsNumber,
-						_site->getAccessParameters(_accessibility, _rollingStockFilter ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()),
-						_planningOrder,
-						false,
-						_log ? &stream : NULL
-						);
-					const PTRoutePlannerResult jv(r.run());
-
-					jv.displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
+					_journeyPlanner.run(stream, _request);
 				}
 				else
 				{
@@ -472,15 +371,15 @@ namespace synthese
 						1000
 					);
 					RoadJourneyPlanner r(
-						startPlace.placeResult.value.get(),
-						endPlace.placeResult.value.get(),
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxArrivalTime,
-						_planningOrder == DEPARTURE_FIRST ? maxDepartureTime : _dateTime,
-						_planningOrder == DEPARTURE_FIRST ? _dateTime : maxDepartureTime,
-						_planningOrder == DEPARTURE_FIRST ? maxArrivalTime : _dateTime,
+						_journeyPlanner.getDeparturePlace().placeResult.value.get(),
+						_journeyPlanner.getArrivalPlace().placeResult.value.get(),
+						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getStartDepartureDate() : _journeyPlanner.getEndArrivalDate(),
+						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getEndDepartureDate() : _journeyPlanner.getStartDepartureDate(),
+						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getStartDepartureDate() : _journeyPlanner.getEndDepartureDate(),
+						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getEndArrivalDate() : _journeyPlanner.getStartDepartureDate(),
 						1,
 						ap,
-						_planningOrder
+						_journeyPlanner.getPlanningOrder()
 					);
 					RoadJourneyPlannerResult jv(r.run());
 

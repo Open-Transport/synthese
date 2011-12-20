@@ -31,6 +31,7 @@
 #include "WebPageTableSync.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "RoutePlannerFunction.h"
 
 namespace synthese
 {
@@ -62,15 +63,6 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<TransportSiteAdmin>
 		{
 		public:
-			static const std::string PARAMETER_START_CITY;
-			static const std::string PARAMETER_START_PLACE;
-			static const std::string PARAMETER_END_CITY;
-			static const std::string PARAMETER_END_PLACE;
-			static const std::string PARAMETER_DATE_TIME;
-			static const std::string PARAMETER_RESULTS_NUMBER;
-			static const std::string PARAMETER_ACCESSIBILITY;
-			static const std::string PARAMETER_LOG;
-			static const std::string PARAMETER_ROLLING_STOCK_FILTER;
 			static const std::string PARAMETER_SEARCH_PAGE;
 			static const std::string PARAMETER_SEARCH_RANK;
 			static const std::string PARAMETER_JOURNEY_PLANNING_ALGORITHM;
@@ -82,17 +74,9 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const TransportWebsite>	_site;
-			std::string						_startCity;
-			std::string						_startPlace;
-			std::string						_endCity;
-			std::string						_endPlace;
-			boost::posix_time::ptime		_dateTime;
-			graph::UserClassCode			_accessibility;
-			bool							_log;
-			RollingStockFilter*				_rollingStockFilter;
+			pt_journey_planner::RoutePlannerFunction	_journeyPlanner;
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
-			boost::optional<size_t>			_resultsNumber;
 			bool							_pt_journey_planning;
 
 		public:
@@ -185,9 +169,7 @@ namespace synthese
 
 
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
-
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_TransportSiteAdmin_H__
