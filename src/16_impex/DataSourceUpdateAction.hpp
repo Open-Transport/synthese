@@ -63,6 +63,7 @@ namespace synthese
 			static const std::string PARAMETER_ICON;
 			static const std::string PARAMETER_CHARSET;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_DEFAULT_IMPORT_REQUEST;
 
 		private:
 			boost::shared_ptr<DataSource> _dataSource;
@@ -71,6 +72,7 @@ namespace synthese
 			boost::optional<std::string> _icon;
 			boost::optional<std::string> _charset;
 			boost::optional<const CoordinatesSystem*> _coordinatesSystem;
+			boost::optional<std::string> _defaultImportRequest;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

@@ -82,6 +82,8 @@ namespace synthese
 			std::string _icon;
 			std::string	_charset;
 			const CoordinatesSystem* _coordinatesSystem;
+			std::string _defaultImportRequest;
+
 			mutable Links _links;
 
 		public:
@@ -98,6 +100,7 @@ namespace synthese
 				const std::string& getIcon() const { return _icon; }
 				const std::string& getCharset() const { return _charset; }
 				const CoordinatesSystem* getCoordinatesSystem() const { return _coordinatesSystem; }
+				const std::string& getDefaultImportRequest() const { return _defaultImportRequest; }
 			//@}
 
 			//! @name Setters
@@ -107,6 +110,7 @@ namespace synthese
 				void setIcon(const std::string& value) { _icon = value; }
 				void setCharset(const std::string& value) { _charset = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* value){ _coordinatesSystem = value; }
+				void setDefaultImportRequest(const std::string& value){ _defaultImportRequest = value; }
 			//@}
 
 			//! @name Modifiers

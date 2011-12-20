@@ -141,6 +141,7 @@ namespace synthese
 				stream << t.cell("Icone", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_ICON, _dataSource->getIcon()) + " " + HTMLModule::getHTMLImage(_dataSource->getIcon().empty() ? "note.png" : _dataSource->getIcon(), _dataSource->getFormat()));
 				stream << t.cell("Jeu de caractères (défaut = auto-détection)", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_CHARSET, _dataSource->getCharset()));
 				stream << t.cell("SRID", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_SRID, _dataSource->getCoordinatesSystem() ? lexical_cast<string>(_dataSource->getCoordinatesSystem()->getSRID()) : string()));
+				stream << t.cell("Requête import par défaut", t.getForm().getTextInput(DataSourceUpdateAction::PARAMETER_DEFAULT_IMPORT_REQUEST, _dataSource->getDefaultImportRequest()));
 				stream << t.close();
 			}
 
@@ -165,6 +166,11 @@ namespace synthese
 			if(openTabContent(stream, TAB_IMPORT))
 			{
 				_importer->displayAdmin(stream, request);
+
+				stream << "<h1>Requête</h1><p>";
+				_importer->getParametersMap().outputURI(stream);
+				stream << "</p><h1>Log import</h1>";
+
 				bool doImport(_doImport);
 				doImport &= _importer->beforeParsing();
 				doImport &= _importer->parseFiles(stream, request);

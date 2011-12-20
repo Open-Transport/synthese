@@ -53,6 +53,7 @@ namespace synthese
 		const string DataSourceUpdateAction::PARAMETER_ICON = Action_PARAMETER_PREFIX + "ic";
 		const string DataSourceUpdateAction::PARAMETER_CHARSET = Action_PARAMETER_PREFIX + "cs";
 		const string DataSourceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "sr";
+		const string DataSourceUpdateAction::PARAMETER_DEFAULT_IMPORT_REQUEST = Action_PARAMETER_PREFIX + "default_import_request";
 
 
 
@@ -82,6 +83,10 @@ namespace synthese
 			if(_coordinatesSystem)
 			{
 				map.insert(PARAMETER_SRID, *_coordinatesSystem ? lexical_cast<int>((*_coordinatesSystem)->getSRID()) : 0);
+			}
+			if(_defaultImportRequest)
+			{
+				map.insert(PARAMETER_DEFAULT_IMPORT_REQUEST, *_defaultImportRequest);
 			}
 			return map;
 		}
@@ -148,6 +153,12 @@ namespace synthese
 					_coordinatesSystem = cs;
 				}
 			}
+
+			// Default import request
+			if(map.isDefined(PARAMETER_DEFAULT_IMPORT_REQUEST))
+			{
+				_defaultImportRequest = map.get<string>(PARAMETER_DEFAULT_IMPORT_REQUEST);
+			}
 		}
 
 
@@ -177,6 +188,11 @@ namespace synthese
 			if(_coordinatesSystem)
 			{
 				_dataSource->setCoordinatesSystem(*_coordinatesSystem);
+			}
+
+			if(_defaultImportRequest)
+			{
+				_dataSource->setDefaultImportRequest(*_defaultImportRequest);
 			}
 
 			DataSourceTableSync::Save(_dataSource.get());

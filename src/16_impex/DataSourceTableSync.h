@@ -50,6 +50,7 @@ namespace synthese
 			 static const std::string COL_ICON;
 			 static const std::string COL_CHARSET;
 			 static const std::string COL_SRID;
+			 static const std::string COL_DEFAULT_IMPORT_REQUEST;
 
 			DataSourceTableSync ();
 
