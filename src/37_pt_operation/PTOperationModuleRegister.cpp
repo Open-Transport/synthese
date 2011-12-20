@@ -13,6 +13,7 @@
 #include "GetCompositionsService.hpp"
 #include "GetVehiclesService.hpp"
 
+#include "DepotAdmin.hpp"
 #include "DepotsAdmin.hpp"
 #include "DriverServiceAdmin.hpp"
 #include "DriverServicesAdmin.hpp"
@@ -76,6 +77,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehiclePositionUpdateAction::integrate();
 	synthese::pt_operation::VehicleServiceUpdateAction::integrate();
 	
+	synthese::pt_operation::DepotAdmin::integrate();
 	synthese::pt_operation::DepotsAdmin::integrate();
 	synthese::pt_operation::DriverServiceAdmin::integrate();
 	synthese::pt_operation::DriverServicesAdmin::integrate();

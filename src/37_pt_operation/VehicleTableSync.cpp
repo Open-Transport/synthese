@@ -199,7 +199,7 @@ namespace synthese
 			bool orderByNumber,
 			bool orderByRegistration,
 			bool raisingOrder,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			SelectQuery<VehicleTableSync> query;
 			if(name)

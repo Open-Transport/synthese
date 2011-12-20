@@ -132,7 +132,7 @@ namespace synthese
 			boost::optional<std::string> name /*= boost::optional<std::string>()*/,
 			int first /*= 0*/,
 			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			stringstream query;
 			query

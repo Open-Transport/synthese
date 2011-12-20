@@ -82,7 +82,7 @@ namespace synthese
 				bool raisingOrder = true,
 				int first = 0,
 				int number = 0,
-				util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 
