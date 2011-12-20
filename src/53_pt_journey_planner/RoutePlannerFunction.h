@@ -33,6 +33,7 @@
 #include "PTRoutePlannerResult.h"
 
 #include <boost/optional.hpp>
+#include <boost/filesystem/path.hpp>
 
 namespace synthese
 {
@@ -99,7 +100,7 @@ namespace synthese
 		/// Usage : https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner
 		///
 		class RoutePlannerFunction:
-			public util::FactorableTemplate<cms::FunctionWithSite<true>,RoutePlannerFunction>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>, RoutePlannerFunction>
 		{
 		public:
 			static const std::string PARAMETER_SITE;
@@ -119,6 +120,17 @@ namespace synthese
 			static const std::string PARAMETER_HIGHEST_DEPARTURE_TIME;
 			static const std::string PARAMETER_HIGHEST_ARRIVAL_TIME;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
+			static const std::string PARAMETER_LOG_PATH;
+			static const std::string PARAMETER_SHOW_COORDINATES;
+			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
+			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
+			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
+			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
+			static const std::string PARAMETER_FARE_CALCULATION;
+
+			static const std::string PARAMETER_OUTPUT_FORMAT;
+			static const std::string VALUE_ADMIN_HTML;
+
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_SCHEDULES_ROW_PAGE;
 			static const std::string PARAMETER_SCHEDULES_CELL_PAGE;
@@ -140,12 +152,6 @@ namespace synthese
 			static const std::string PARAMETER_MAP_SERVICE_PAGE;
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
-			static const std::string PARAMETER_SHOW_COORDINATES;
-			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
-			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
-			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
-			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
-			static const std::string PARAMETER_FARE_CALCULATION;
 
 		private:
 			static const std::string DATA_LINES;
@@ -306,6 +312,8 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
 				bool _fareCalculation;
+				boost::optional<boost::filesystem::path>	_logPath;
+				std::string									_outputFormat;
 			//@}
 
 			//! @name Pages
@@ -332,11 +340,36 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;
 			//@}
 
+
+		public:
+			//! @name Getters
+			//@{
+				const road::RoadModule::ExtendedFetchPlaceResult& getDeparturePlace() const { return _departure_place; }
+				const road::RoadModule::ExtendedFetchPlaceResult& getArrivalPlace() const { return _arrival_place; }
+				const boost::posix_time::ptime& getStartDepartureDate() const { return _startDate; }
+				const boost::posix_time::ptime& getStartArrivalDate() const { return _startArrivalDate; }
+				const boost::posix_time::ptime& getEndDepartureDate() const { return _endDate; }
+				const boost::posix_time::ptime& getEndArrivalDate() const { return _endArrivalDate; }
+				boost::optional<std::size_t> getMaxSolutionsNumber() const { return _maxSolutionsNumber; }
+				const graph::AccessParameters& getAccessParameters() const { return _accessParameters; }
+				boost::shared_ptr<const pt_website::RollingStockFilter> getTransportModeFilter() const { return _rollingStockFilter; }
+				algorithm::PlanningOrder getPlanningOrder() const { return _planningOrder; }
+				boost::optional<boost::filesystem::path> getLogPath() const { return _logPath; }
+				const std::string& getOutputFormat() const { return _outputFormat; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setOutputFormat(const std::string& value){ _outputFormat = value; }
+			//@}
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
-			util::ParametersMap _getParametersMap() const;
+			virtual util::ParametersMap _getParametersMap() const;
 
 
 
@@ -344,8 +377,9 @@ namespace synthese
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
-			void _setFromParametersMap(const util::ParametersMap& map);
+			virtual void _setFromParametersMap(const util::ParametersMap& map);
 
+		private:
 			static void _XMLDisplayConnectionPlace(
 				std::ostream& stream,
 				const geography::NamedPlace& place,
