@@ -26,9 +26,9 @@
 #include "JourneyPattern.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPoint.hpp"
-#include "ScheduledService.h"
 #include "AdminInterfaceElement.h"
 #include "RuleUser.h"
+#include "SchedulesBasedService.h"
 
 namespace synthese
 {
@@ -56,6 +56,8 @@ namespace synthese
 		class RollingStockTableSync;
 		class Destination;
 		class DestinationTableSync;
+		class ScheduledService;
+		class ContinuousService;
 
 
 		/** PTFileFormat class.
@@ -329,15 +331,28 @@ namespace synthese
 
 			static ScheduledService* CreateOrUpdateService(
 				JourneyPattern& route,
-				const ScheduledService::Schedules& departureSchedules,
-				const ScheduledService::Schedules& arrivalSchedules,
+				const SchedulesBasedService::Schedules& departureSchedules,
+				const SchedulesBasedService::Schedules& arrivalSchedules,
 				const std::string& number,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
 			);
+
+
+
+			static ContinuousService* CreateOrUpdateContinuousService(
+				JourneyPattern& route,
+				const SchedulesBasedService::Schedules& departureSchedules,
+				const SchedulesBasedService::Schedules& arrivalSchedules,
+				const std::string& number,
+				const boost::posix_time::time_duration& range,
+				const boost::posix_time::time_duration& waitingTime,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_PTFileFormat_hpp__
