@@ -25,11 +25,9 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "ChrFunction.hpp"
-
-#include <boost/algorithm/string.hpp>
+#include "CMSModule.hpp"
 
 using namespace std;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -56,7 +54,7 @@ namespace synthese
 
 		void ChrFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_code = trim_copy_if(map.get<string>(PARAMETER_CODE), is_any_of(" \r\n"));
+			_code = CMSModule::Trim(map.get<string>(PARAMETER_CODE));
 		}
 
 

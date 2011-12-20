@@ -25,11 +25,9 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "OrService.hpp"
-
-#include <boost/algorithm/string.hpp>
+#include "CMSModule.hpp"
 
 using namespace std;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -58,8 +56,8 @@ namespace synthese
 
 		void OrService::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n"));
-			_right = trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n"));
+			_left = CMSModule::Trim(map.getDefault<string>(PARAMETER_LEFT));
+			_right = CMSModule::Trim(map.getDefault<string>(PARAMETER_RIGHT));
 		}
 
 

@@ -162,6 +162,14 @@ namespace synthese
 			/// @since 3.2.0
 			/// @warning Non thread safe
 			static Website* GetSiteByClientURL(const std::string& key);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Trims a string according to the CMS rules.
+			/// @param value the string to trim
+			/// @result the string trimmed on spaces, tabs, and carriage returns
+			static std::string Trim(const std::string& value);
 		};
 	}
 	/** @} */

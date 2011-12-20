@@ -25,9 +25,9 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "SuperiorFunction.hpp"
+#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
@@ -61,14 +61,14 @@ namespace synthese
 		void SuperiorFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Left
-			string leftStr(trim_copy_if(map.get<string>(PARAMETER_L), is_any_of(" \r\n")));
+			string leftStr(CMSModule::Trim(map.get<string>(PARAMETER_L)));
 			if(!leftStr.empty())
 			{
 				_left = lexical_cast<double>(leftStr);
 			}
 
 			// Right
-			string rightStr(trim_copy_if(map.get<string>(PARAMETER_R), is_any_of(" \r\n")));
+			string rightStr(CMSModule::Trim(map.get<string>(PARAMETER_R)));
 			if(!rightStr.empty())
 			{
 				_right = lexical_cast<double>(rightStr);
