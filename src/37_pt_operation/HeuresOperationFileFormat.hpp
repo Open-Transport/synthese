@@ -100,6 +100,7 @@ namespace synthese
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_PT_DATASOURCE_ID;
+				static const std::string PARAMETER_STOPS_DATASOURCE_ID;
 				static const std::string PARAMETER_CLEAN_OLD_DATA;
 				static const std::string PARAMETER_DAY7_CALENDAR_ID;
 
@@ -108,6 +109,7 @@ namespace synthese
 				bool _displayLinkedStops;
 				boost::shared_ptr<const pt::TransportNetwork> _network;
 				boost::shared_ptr<const impex::DataSource> _ptDataSource;
+				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
 				boost::optional<boost::gregorian::date> _startDate;
 				boost::optional<boost::gregorian::date> _endDate;
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
