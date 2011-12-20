@@ -104,6 +104,7 @@ namespace synthese
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("pt_datasource_id");
+		const string HeuresOperationFileFormat::Importer_::PARAMETER_STOPS_DATASOURCE_ID = "stops_datasource_id";
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_END_DATE("end_date");
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_START_DATE("start_date");
 		const string HeuresOperationFileFormat::Importer_::PARAMETER_CLEAN_OLD_DATA("clean_old_data");
@@ -243,7 +244,7 @@ namespace synthese
 				}
 
 				// Load of the depots and stops
-				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(*_ptDataSource, _env);
+				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(*_stopsDataSource, _env);
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*_ptDataSource, _env);
 				
 				// Parsing the file
@@ -265,6 +266,9 @@ namespace synthese
 					int routeType(lexical_cast<int>(line.substr(9,1)));
 					if(routeType == 0 || routeType == 1)
 					{
+						// Declarations
+						bool ignoreRoute(false);
+
 						// Commercial line number
 						int commercialLineNumber(lexical_cast<int>(trim_copy(line.substr(0, 4))));
 
@@ -276,10 +280,16 @@ namespace synthese
 							logStream
 						);
 
+						// Check of the line
+						if(!cline)
+						{
+							logStream << "WARN : line " << commercialLineNumber << " not found in route " << routeNumber << "<br />";
+							ignoreRoute = true;
+						}
+
 						// Stops
 						JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
 						MetricOffset distance(0);
-						bool ignoreRoute(false);
 						for(size_t i(10); i+1<line.size(); i += 10)
 						{
 							if(line.size() < i+9)
@@ -836,6 +846,7 @@ namespace synthese
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDataSource.get() ? lexical_cast<string>(_ptDataSource->getKey()) : string()));
+			stream << t.cell("Source de données arrêts", t.getForm().getTextInput(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource.get() ? lexical_cast<string>(_stopsDataSource->getKey()) : string()));
 			stream << t.cell("Calendrier des jours fériés",
 				t.getForm().getSelectInput(
 					PARAMETER_DAY7_CALENDAR_ID,
@@ -844,6 +855,7 @@ namespace synthese
 			)	);
 			stream << t.close();
 		}
+
 
 
 		util::ParametersMap HeuresOperationFileFormat::Importer_::_getParametersMap() const
@@ -857,6 +869,10 @@ namespace synthese
 			if(_ptDataSource.get())
 			{
 				map.insert(PARAMETER_PT_DATASOURCE_ID, _ptDataSource->getKey());
+			}
+			if(_stopsDataSource.get())
+			{
+				map.insert(PARAMETER_STOPS_DATASOURCE_ID, _stopsDataSource->getKey());
 			}
 			if(_startDate)
 			{
@@ -913,6 +929,8 @@ namespace synthese
 					throw RequestException("No such calendar");
 				}
 			}
+
+			// Public transport data source
 			if(map.getDefault<RegistryKeyType>(PARAMETER_PT_DATASOURCE_ID, 0))
 			{
 				try
@@ -927,6 +945,23 @@ namespace synthese
 			if(!_ptDataSource.get())
 			{
 				throw RequestException("A PT data source must be defined");
+			}
+
+			// Stops data source
+			if(map.getDefault<RegistryKeyType>(PARAMETER_STOPS_DATASOURCE_ID, 0))
+			{
+				try
+				{
+					_stopsDataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOPS_DATASOURCE_ID), _env);
+				}
+				catch(ObjectNotFoundException<DataSource>&)
+				{
+					throw RequestException("No such data source for stops");
+				}
+			}
+			if(!_stopsDataSource.get())
+			{
+				throw RequestException("A stops data source must be defined");
 			}
 		}
 }	}

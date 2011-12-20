@@ -120,10 +120,10 @@ namespace synthese
 			HTMLForm f(addRequest.getHTMLForm("add"));
 
 			HTMLTable::ColsVector c;
-			c.push_back("ID");
+			c.push_back(string());
 			c.push_back("Texte affiché");
-			c.push_back("Action");
-			c.push_back("Action");
+			c.push_back("Code");
+			c.push_back(string());
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
 			stream << f.open();
@@ -142,16 +142,16 @@ namespace synthese
 				// Row init
 				stream << t.row();
 
-				// ID
-				stream << t.col() << destination->getKey();
-
-				// Displayed text
-				stream << t.col() << destination->getDisplayedText();
-
 				// Open button
 				openRequest.getPage()->setDestination(const_pointer_cast<const Destination>(destination));
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir");
+
+				// Displayed text
+				stream << t.col() << destination->getDisplayedText();
+
+				// Code
+				stream << t.col() << destination->getCodeBySources();
 				
 				// Delete button
 				deleteRequest.getAction()->setObjectId(destination->getKey());
