@@ -54,6 +54,7 @@ table {margin-bottom:1.5em;border-collapse:collapse;}
 #admintree2 { width:274px; }
 .adminpos img, .adminpos a { vertical-align:middle; } 
 #admintree a { text-decoration:none;} 
+#title p, #admintree p { display:inline; margin:0; padding: 0; }
 
 .tree_icons { float:left; width:32px; height:20px; vertical-align:top;}
 .tree_icon { float:left; width:16px; height:20px;  vertical-align:top; }
