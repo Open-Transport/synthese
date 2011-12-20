@@ -26,7 +26,14 @@
 #include "Request.h"
 #include "NotService.hpp"
 
+#include "BitAndFunction.hpp"
+
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -34,7 +41,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<Function,cms::NotService>::FACTORY_KEY("NotService");
+	template<> const string util::FactorableTemplate<Function,cms::NotService>::FACTORY_KEY("not");
 	
 	namespace cms
 	{
