@@ -170,8 +170,9 @@ namespace synthese
 							"}" <<
 						"}; " <<
 
-						"xhr.open('GET', \"" << _ajaxSaveURL << "&\" + ed.getElement().name +\"=\"+ ed.getContent(),  true);" <<
-						"xhr.send(null);" <<
+						"xhr.open('POST','" << _ajaxSaveURL << "');" <<
+						"xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');" <<
+						"xhr.send(ed.getElement().name +'='+ encodeURIComponent(ed.getContent()));" <<
 					"}"
 				;
 			}
