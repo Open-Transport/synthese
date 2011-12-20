@@ -283,11 +283,15 @@ namespace synthese
 						continue;
 					}
 
-					// Code field
-					string id(_getValue(_stopIdField));
-
 					// MNLP code
 					string mnlp(_getValue(VALUE_MNLP));
+
+					// Code field
+					string id(_getValue(_stopIdField));
+					if(id.empty())
+					{
+						id = mnlp;
+					}
 					
 					// Name field
 					string name(_getValue(_stopNameField));
@@ -345,14 +349,22 @@ namespace synthese
 							stream
 					)	);
 
-					// Adding of the code to the stop if not already exists
-					BOOST_FOREACH(StopPoint* stop, matchingStops)
+					if(_stopIdField != VALUE_MNLP && !mnlp.empty())
 					{
-						stop->addCodeBySource(_dataSource, mnlp);
-						_stopPoints.add(*stop);
-					}
+						// Remove old code links
+						set<StopPoint*> oldStops(PTFileFormat::GetStopPoints(_stopPoints, mnlp, name, stream, false));
+						BOOST_FOREACH(StopPoint* stop, oldStops)
+						{
+							stop->removeSourceLink(_dataSource, mnlp);
+						}
 
-					// Updating the code map to take into account of secondary codes
+						// Adding of the code to the stop if not already exists
+						BOOST_FOREACH(StopPoint* stop, matchingStops)
+						{
+							stop->addCodeBySource(_dataSource, mnlp);
+							_stopPoints.add(*stop);
+						}
+					}
 				}
 			}
 			else if(key == FILE_PTF)
