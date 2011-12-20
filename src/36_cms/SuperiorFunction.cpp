@@ -26,7 +26,12 @@
 #include "Request.h"
 #include "SuperiorFunction.hpp"
 
+#include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -41,6 +46,8 @@ namespace synthese
 		const string SuperiorFunction::PARAMETER_L("l");
 		const string SuperiorFunction::PARAMETER_R("r");
 
+
+
 		ParametersMap SuperiorFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -49,11 +56,26 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void SuperiorFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.get<double>(PARAMETER_L);
-			_right = map.get<double>(PARAMETER_R);
+			// Left
+			string leftStr(trim_copy_if(map.get<string>(PARAMETER_L), is_any_of(" \r\n")));
+			if(!leftStr.empty())
+			{
+				_left = lexical_cast<double>(leftStr);
+			}
+
+			// Right
+			string rightStr(trim_copy_if(map.get<string>(PARAMETER_R), is_any_of(" \r\n")));
+			if(!rightStr.empty())
+			{
+				_right = lexical_cast<double>(rightStr);
+			}
 		}
+
+
 
 		void SuperiorFunction::run(
 			std::ostream& stream,
@@ -74,15 +96,12 @@ namespace synthese
 
 		std::string SuperiorFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return "text/plain";
 		}
 
 
 
 		SuperiorFunction::SuperiorFunction():
 		_left(0), _right(0)
-		{
-
-		}
-	}
-}
+		{}
+}	}

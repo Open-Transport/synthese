@@ -26,6 +26,9 @@
 #include "Request.h"
 #include "EqualFunction.hpp"
 
+#include <boost/algorithm/string.hpp>
+
+using namespace boost::algorithm;
 using namespace std;
 
 namespace synthese
@@ -41,6 +44,8 @@ namespace synthese
 		const string EqualFunction::PARAMETER_L("l");
 		const string EqualFunction::PARAMETER_R("r");
 
+
+
 		ParametersMap EqualFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -49,11 +54,15 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void EqualFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.getDefault<string>(PARAMETER_L);
-			_right = map.getDefault<string>(PARAMETER_R);
+			_left = trim_copy_if(map.getDefault<string>(PARAMETER_L), is_any_of(" \r\n"));
+			_right = trim_copy_if(map.getDefault<string>(PARAMETER_R), is_any_of(" \r\n"));
 		}
+
+
 
 		void EqualFunction::run(
 			std::ostream& stream,
@@ -74,7 +83,6 @@ namespace synthese
 
 		std::string EqualFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return "text/plain";
 		}
-	}
-}
+}	}

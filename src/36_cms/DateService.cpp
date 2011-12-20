@@ -26,12 +26,14 @@
 #include "Request.h"
 #include "DateService.hpp"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -52,6 +54,8 @@ namespace synthese
 			_withTime(false)
 		{}
 
+
+
 		ParametersMap DateService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -59,9 +63,11 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void DateService::_setFromParametersMap(const ParametersMap& map)
 		{
-			string day(map.getDefault<string>(PARAMETER_DAY));
+			string day(trim_copy_if(map.getDefault<string>(PARAMETER_DAY), is_any_of(" \r\n")));
 			_time = boost::posix_time::second_clock::local_time();
 			if(day.size() > 1 && day[0] == '+')
 			{
@@ -74,6 +80,8 @@ namespace synthese
 
 			_withTime = map.getDefault<bool>(PARAMETER_WITH_TIME, false);
 		}
+
+
 
 		void DateService::run(
 			std::ostream& stream,
