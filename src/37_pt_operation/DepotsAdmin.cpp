@@ -33,6 +33,7 @@
 #include "DepotTableSync.hpp"
 #include "RemoveObjectAction.hpp"
 #include "ActionResultHTMLTable.h"
+#include "DepotAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -49,7 +50,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, DepotsAdmin>::FACTORY_KEY("DepotsAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, DepotsAdmin>::FACTORY_KEY("Depots");
 	}
 
 	namespace admin
@@ -109,12 +110,12 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
-//			AdminFunctionRequest<VehicleAdmin> openRequest(request);
+			AdminFunctionRequest<DepotAdmin> openRequest(request);
 
 			AdminFunctionRequest<DepotsAdmin> searchRequest(request);
 
 			AdminActionFunctionRequest<DepotUpdateAction, DepotsAdmin> createRequest(request);
-			//createRequest.setActionFailedPage<VehiclesAdmin>();
+			createRequest.setActionFailedPage<DepotsAdmin>();
 			createRequest.setActionWillCreateObject();
 
 			AdminActionFunctionRequest<RemoveObjectAction, DepotsAdmin> removeRequest(request);
@@ -131,9 +132,10 @@ namespace synthese
 			)	);
 
 			ActionResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), string()));
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-			h.push_back(make_pair(string(), "Actions"));
-			h.push_back(make_pair(string(), "Actions"));
+			h.push_back(make_pair(string(), "Code"));
+			h.push_back(make_pair(string(), string()));
 
 			ActionResultHTMLTable t(
 				h,
@@ -147,25 +149,31 @@ namespace synthese
 
 			BOOST_FOREACH(shared_ptr<Depot> depot, depots)
 			{
+				// Row
 				stream << t.row(lexical_cast<string>(depot->getKey()));
+
+				// Open
+				stream << t.col();
+				openRequest.getPage()->setDepot(const_pointer_cast<const Depot>(depot));
+				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DepotAdmin::ICON);
+
+				// Name
 				stream << t.col() << depot->getName();
 
-				stream << t.col();
-//				openRequest.getPage()->setVehicle(const_pointer_cast<const Vehicle>(vehicle));
-//				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleAdmin::ICON);
+				// Code by sources
+				stream << t.col() << depot->getCodeBySources();
 
+				// Remove
 				stream << t.col();
 				removeRequest.getAction()->setObjectId(depot->getKey());
 				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le dépôt "+ depot->getName() + " ?");
 			}
 
 			stream << t.row(string());
+			stream << t.col();
 			stream << t.col() << t.getActionForm().getTextInput(DepotUpdateAction::PARAMETER_NAME, "", "Entrez le nom du dépôt ici");
-			stream << t.col();
 			stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
-			stream << t.col();
 			stream << t.close();
-
 		}
 
 

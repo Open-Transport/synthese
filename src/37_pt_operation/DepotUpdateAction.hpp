@@ -27,6 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Importable.h"
 
 namespace synthese
 {
@@ -57,6 +58,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<Depot> _depot;
 			boost::optional<std::string> _name;
+			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

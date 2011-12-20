@@ -19,6 +19,8 @@ DeadRunTableSync.cpp
 DeadRunTableSync.hpp
 Depot.cpp
 Depot.hpp
+DepotAdmin.cpp
+DepotAdmin.hpp
 DepotsAdmin.cpp
 DepotsAdmin.hpp
 DepotTableSync.cpp
