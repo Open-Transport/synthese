@@ -68,7 +68,8 @@
 #include "Junction.hpp"
 #include "Fare.h"
 #include "FareTicket.hpp"
-
+#include "HTMLForm.h"
+#include "CMSModule.hpp"
 #include "UseRule.h"
 #include "PTUseRule.h"
 
@@ -101,7 +102,7 @@ namespace synthese
 	using namespace algorithm;
 	using namespace pt_journey_planner;
 	using namespace resa;
-	using namespace pt;
+	using namespace html;
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<pt_journey_planner::RoutePlannerFunction::_FunctionWithSite,pt_journey_planner::RoutePlannerFunction>::FACTORY_KEY("rp");
@@ -126,6 +127,11 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
 		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION("fc");
+		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION("max_transfer_duration");
+		const string RoutePlannerFunction::PARAMETER_LOG_PATH = "log_path";
+
+		const string RoutePlannerFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
+		const string RoutePlannerFunction::VALUE_ADMIN_HTML = "admin";
 
 		const string RoutePlannerFunction::PARAMETER_PAGE("page");
 		const string RoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
@@ -147,7 +153,6 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
-		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION("max_transfer_duration");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -284,9 +289,12 @@ namespace synthese
 			_FunctionWithSite::_setFromParametersMap(map);
 
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-			if(!site) throw RequestException("Incorrect site");
-
-			_outputRoadApproachDetail = site->getDisplayRoadApproachDetail();
+			
+			_outputRoadApproachDetail = 
+				site ?
+				site->getDisplayRoadApproachDetail() :
+				true
+			;
 
 			// Max transfer duration
 			if(map.isDefined(PARAMETER_MAX_TRANSFER_DURATION))
@@ -313,10 +321,10 @@ namespace synthese
 //			}
 //			else // 2a
 			{
-				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
-				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
-				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
-				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
+				_originCityText = CMSModule::Trim(map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT));
+				_destinationCityText = CMSModule::Trim(map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT));
+				_originPlaceText = CMSModule::Trim(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
+				_destinationPlaceText = CMSModule::Trim(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
 				if(	_originCityText.empty() && _originPlaceText.empty() ||
 					_destinationCityText.empty() && _destinationPlaceText.empty()
 				){
@@ -334,7 +342,10 @@ namespace synthese
 				}	}
 				else
 				{
-					_departure_place = site->extendedFetchPlace(_originCityText, _originPlaceText);
+					_departure_place = site ?
+						site->extendedFetchPlace(_originCityText, _originPlaceText) :
+						RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
+					;
 				}
 				if(_destinationCityText.empty())
 				{
@@ -345,7 +356,10 @@ namespace synthese
 				}	}
 				else
 				{
-					_arrival_place = site->extendedFetchPlace(_destinationCityText, _destinationPlaceText);
+					_arrival_place = site ?
+						site->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
+						RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
+					;
 				}
 			}
 
@@ -357,15 +371,24 @@ namespace synthese
 					date day(from_string(map.get<string>(PARAMETER_DAY)));
 
 					_planningOrder = DEPARTURE_FIRST;
-					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= site->getPeriods().size())
+
+					// Period
+					if(site)
 					{
-						throw RequestException("Bad value for period id");
+						_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
+						if (_periodId >= site->getPeriods().size())
+						{
+							throw RequestException("Bad value for period id");
+						}
+						_period = &site->getPeriods().at(_periodId);
 					}
+
 					_startDate = ptime(day, time_duration(0, 0, 0));
 					_endDate = _startDate;
-					_period = &site->getPeriods().at(_periodId);
-					site->applyPeriod(*_period, _startDate, _endDate);
+					if(site)
+					{
+						site->applyPeriod(*_period, _startDate, _endDate);
+					}
 					_startArrivalDate = _startDate;
 					_endArrivalDate = _endDate;
 					if(	_departure_place.placeResult.value &&
@@ -467,14 +490,42 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			_accessParameters = site->getAccessParameters(
-				acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-				_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
-			);
+			if(site)
+			{
+				_accessParameters = site->getAccessParameters(
+					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
+					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+				);
+			}
+			else
+			{
+				if(acint && *acint == USER_HANDICAPPED)
+				{
+					_accessParameters = AccessParameters(
+						*acint, false, false, 300, posix_time::minutes(23), 0.556
+					);
+				}
+				else if(acint && *acint == USER_BIKE)
+				{
+					_accessParameters = AccessParameters(
+						*acint, false, false, 3000, posix_time::minutes(23), 4.167
+					);
+				}
+				else
+				{
+					_accessParameters = AccessParameters(
+						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833
+					);
+				}
+			}
+
+			// Max depth
 			if(map.getOptional<size_t>(PARAMETER_MAX_DEPTH))
 			{
 				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
 			}
+
+			// Approach speed
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
 			{
 				_accessParameters.setApproachSpeed(*(map.getOptional<double>(PARAMETER_APPROACH_SPEED)));
@@ -482,8 +533,11 @@ namespace synthese
 
 			if(	!_departure_place.placeResult.value || !_arrival_place.placeResult.value
 			){
-				throw RequestException("No calculation");
+				return;
 			}
+
+			// Output format
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 
 			//XML output options
 			_showResTab = true;
@@ -835,6 +889,10 @@ namespace synthese
 					_accessParameters
 				);
 			}
+			else if(_outputFormat == VALUE_ADMIN_HTML)
+			{
+				result.displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
+			}
 			else
 			{
 				stream <<
@@ -851,8 +909,11 @@ namespace synthese
 				{
 					stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
 				}
+				if(_site.get())
+				{
+					stream << " siteId=\"" << _site->getKey() << "\">";
+				}
 				stream <<
-					" siteId=\"" << _site->getKey() << "\">" <<
 					"<timeBounds" <<
 						" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime()) << "\"" <<
 						" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime()) << "\"" <<
