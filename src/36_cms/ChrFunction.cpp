@@ -26,7 +26,10 @@
 #include "Request.h"
 #include "ChrFunction.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -40,6 +43,8 @@ namespace synthese
 	{
 		const string ChrFunction::PARAMETER_CODE("code");
 
+
+
 		ParametersMap ChrFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -47,10 +52,14 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void ChrFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_code = map.get<string>(PARAMETER_CODE);
+			_code = trim_copy_if(map.get<string>(PARAMETER_CODE), is_any_of(" \r\n"));
 		}
+
+
 
 		void ChrFunction::run(
 			std::ostream& stream,
@@ -73,5 +82,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}

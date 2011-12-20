@@ -27,9 +27,11 @@
 #include "AddService.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -44,6 +46,8 @@ namespace synthese
 		const string AddService::PARAMETER_LEFT("l");
 		const string AddService::PARAMETER_RIGHT("r");
 		
+
+
 		ParametersMap AddService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -52,17 +56,32 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void AddService::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.get<string>(PARAMETER_LEFT);
-			_right = map.get<string>(PARAMETER_RIGHT);
+			// Left
+			string leftStr(trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n")));
+			if(!leftStr.empty())
+			{
+				_left = lexical_cast<double>(leftStr);
+			}
+
+			// Right
+			string rightStr(trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n")));
+			if(!rightStr.empty())
+			{
+				_right = lexical_cast<double>(rightStr);
+			}
 		}
+
+
 
 		void AddService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << ((_left.empty() ? 0 : lexical_cast<int>(_left)) + (_right.empty() ? 0 : lexical_cast<int>(_right)));
+			stream << (_left + _right);
 		}
 		
 		
@@ -79,5 +98,11 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+
+
+
+		AddService::AddService():
+			_left(0),
+			_right(0)
+		{}
+}	}

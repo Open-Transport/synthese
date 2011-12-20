@@ -26,7 +26,10 @@
 #include "Request.h"
 #include "AndFunction.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -41,6 +44,8 @@ namespace synthese
 		const string AndFunction::PARAMETER_LEFT("l");
 		const string AndFunction::PARAMETER_RIGHT("r");
 
+
+
 		ParametersMap AndFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -49,11 +54,15 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void AndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.get<string>(PARAMETER_LEFT);
-			_right = map.get<string>(PARAMETER_RIGHT);
+			_left = trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n"));
+			_right = trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n"));
 		}
+
+
 
 		void AndFunction::run(
 			std::ostream& stream,
@@ -76,5 +85,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}

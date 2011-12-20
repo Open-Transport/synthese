@@ -28,8 +28,11 @@
 #include "WebPageDisplayFunction.h"
 #include "CMSModule.hpp"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -132,7 +135,7 @@ namespace synthese
 					}
 					try
 					{
-						node->functionCreator = Factory<Function>::GetCreator(functionName);
+						node->functionCreator = Factory<Function>::GetCreator(trim_copy_if(functionName, is_any_of(" \r\n")));
 
 						// parameters
 						if(it != end && *it == '?')
@@ -155,7 +158,7 @@ namespace synthese
 									it = _parse(parameterNodes, it, end, functionTermination);
 
 									// Storage in template parameters if begins with VAR else in service parameters
-									string parameterNameStr(parameterName.str());
+									string parameterNameStr(trim_copy_if(parameterName.str(), is_any_of(" \r\n")));
 									if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
 									{
 										node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));

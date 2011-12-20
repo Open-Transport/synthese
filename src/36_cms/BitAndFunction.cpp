@@ -27,9 +27,11 @@
 #include "BitAndFunction.hpp"
 
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -44,6 +46,8 @@ namespace synthese
 		const string BitAndFunction::PARAMETER_LEFT("l");
 		const string BitAndFunction::PARAMETER_RIGHT("r");
 
+
+
 		ParametersMap BitAndFunction::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -52,25 +56,32 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void BitAndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.get<string>(PARAMETER_LEFT);
-			_right = map.get<string>(PARAMETER_RIGHT);
+			// Left
+			string leftStr(trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n")));
+			if(!leftStr.empty())
+			{
+				_left = lexical_cast<int>(leftStr);
+			}
+
+			// Right
+			string rightStr(trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n")));
+			if(!rightStr.empty())
+			{
+				_right = lexical_cast<int>(rightStr);
+			}
 		}
+
+
 
 		void BitAndFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			try
-			{
-				int number(lexical_cast<int>(_left) & lexical_cast<int>(_right));
-				stream << number;
-			}
-			catch(bad_lexical_cast)
-			{
-				stream << "0";
-			}
+			stream << (_left & _right);
 		}
 
 
@@ -85,7 +96,13 @@ namespace synthese
 
 		std::string BitAndFunction::getOutputMimeType() const
 		{
-			return "text/html";
+			return "text/plain";
 		}
-	}
-}
+
+
+
+		BitAndFunction::BitAndFunction():
+			_left(0),
+			_right(0)
+		{}
+}	}
