@@ -25,13 +25,12 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "AddService.hpp"
+#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -61,14 +60,14 @@ namespace synthese
 		void AddService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Left
-			string leftStr(trim_copy_if(map.get<string>(PARAMETER_LEFT), is_any_of(" \r\n")));
+			string leftStr(CMSModule::Trim(map.get<string>(PARAMETER_LEFT)));
 			if(!leftStr.empty())
 			{
 				_left = lexical_cast<double>(leftStr);
 			}
 
 			// Right
-			string rightStr(trim_copy_if(map.get<string>(PARAMETER_RIGHT), is_any_of(" \r\n")));
+			string rightStr(CMSModule::Trim(map.get<string>(PARAMETER_RIGHT)));
 			if(!rightStr.empty())
 			{
 				_right = lexical_cast<double>(rightStr);

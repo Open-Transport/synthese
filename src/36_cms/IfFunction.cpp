@@ -25,11 +25,9 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "IfFunction.hpp"
-
-#include <boost/algorithm/string.hpp>
+#include "CMSModule.hpp"
 
 using namespace std;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -58,7 +56,7 @@ namespace synthese
 
 		void IfFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_condition = trim_copy_if(map.get<string>(PARAMETER_CONDITION), is_any_of(" \r\n"));
+			_condition = CMSModule::Trim(map.get<string>(PARAMETER_CONDITION));
 			_then = map.getDefault<string>(PARAMETER_THEN);
 			_else = map.getDefault<string>(PARAMETER_ELSE);
 		}

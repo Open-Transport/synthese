@@ -25,10 +25,8 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "EqualFunction.hpp"
+#include "CMSModule.hpp"
 
-#include <boost/algorithm/string.hpp>
-
-using namespace boost::algorithm;
 using namespace std;
 
 namespace synthese
@@ -58,8 +56,8 @@ namespace synthese
 
 		void EqualFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = trim_copy_if(map.getDefault<string>(PARAMETER_L), is_any_of(" \r\n"));
-			_right = trim_copy_if(map.getDefault<string>(PARAMETER_R), is_any_of(" \r\n"));
+			_left = CMSModule::Trim(map.getDefault<string>(PARAMETER_L));
+			_right = CMSModule::Trim(map.getDefault<string>(PARAMETER_R));
 		}
 
 

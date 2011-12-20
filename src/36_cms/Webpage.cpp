@@ -135,7 +135,7 @@ namespace synthese
 					}
 					try
 					{
-						node->functionCreator = Factory<Function>::GetCreator(trim_copy_if(functionName, is_any_of(" \r\n")));
+						node->functionCreator = Factory<Function>::GetCreator(CMSModule::Trim(functionName));
 
 						// parameters
 						if(it != end && *it == '?')
@@ -158,7 +158,7 @@ namespace synthese
 									it = _parse(parameterNodes, it, end, functionTermination);
 
 									// Storage in template parameters if begins with VAR else in service parameters
-									string parameterNameStr(trim_copy_if(parameterName.str(), is_any_of(" \r\n")));
+									string parameterNameStr(CMSModule::Trim(parameterName.str()));
 									if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
 									{
 										node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
@@ -246,7 +246,7 @@ namespace synthese
 							{
 								Nodes parameterNodes;
 								it = _parse(parameterNodes, it, end, functionTermination);
-								node->parameters.push_back(make_pair(parameterName.str(), parameterNodes));
+								node->parameters.push_back(make_pair(CMSModule::Trim(parameterName.str()), parameterNodes));
 								if(*(it-1) != '&')
 								{
 									break;

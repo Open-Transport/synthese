@@ -25,15 +25,12 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "NotService.hpp"
-
-#include "BitAndFunction.hpp"
+#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
-#include <boost/algorithm/string.hpp>
 
 using namespace std;
 using namespace boost;
-using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -61,7 +58,7 @@ namespace synthese
 		void NotService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// The parameter
-			string pStr(trim_copy_if(map.get<string>(PARAMETER_P), is_any_of(" \r\n")));
+			string pStr(CMSModule::Trim(map.getDefault<string>(PARAMETER_P)));
 			if(!pStr.empty())
 			{
 				_parameter = lexical_cast<bool>(pStr);
