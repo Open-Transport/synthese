@@ -147,7 +147,7 @@ namespace synthese
 			Env env;
 			ScenarioTemplate::VariablesMap result;
 			AlarmTemplateInheritedTableSync::SearchResult alarms(
-				AlarmTemplateInheritedTableSync::Search(env, scenarioId)
+				AlarmTemplateInheritedTableSync::Search(env, scenarioId, 0, optional<size_t>(), false, false, FIELDS_ONLY_LOAD_LEVEL)
 			);
 			BOOST_FOREACH(shared_ptr<const AlarmTemplate> alarm, alarms)
 			{
