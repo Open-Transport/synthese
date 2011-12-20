@@ -50,6 +50,7 @@ namespace synthese
 		const string DataSourceTableSync::COL_ICON("icon");
 		const string DataSourceTableSync::COL_CHARSET("charset");
 		const string DataSourceTableSync::COL_SRID("srid");
+		const string DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST = "default_import_request";
 	}
 
 	namespace db
@@ -66,13 +67,18 @@ namespace synthese
 			DBTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
 			DBTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
 			DBTableSync::Field(DataSourceTableSync::COL_SRID, SQL_INTEGER),
+			DBTableSync::Field(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST, SQL_TEXT),
 			DBTableSync::Field()
 		};
+
+
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<DataSourceTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
 		};
+
+
 
 		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Load(
 			DataSource* object,
@@ -80,12 +86,18 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 			string name (rows->getText(DataSourceTableSync::COL_NAME));
-			string format (rows->getText(DataSourceTableSync::COL_FORMAT));
-
 			object->setName(name);
+
+			// Format
+			string format (rows->getText(DataSourceTableSync::COL_FORMAT));
 			object->setFormat(format);
+
+			// Icon
 			object->setIcon(rows->getText(DataSourceTableSync::COL_ICON));
+
+			// Charset
 			object->setCharset(rows->getText(DataSourceTableSync::COL_CHARSET));
 
 			// CoordinatesSystem
@@ -102,7 +114,12 @@ namespace synthese
 			{
 				object->setCoordinatesSystem(NULL);
 			}
+
+			// Default import request
+			object->setDefaultImportRequest(rows->getText(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST));
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Save(
 			DataSource* object,
@@ -114,8 +131,11 @@ namespace synthese
 			query.addField(object->getIcon());
 			query.addField(object->getCharset());
 			query.addField(object->getCoordinatesSystem() ? object->getCoordinatesSystem()->getSRID() : CoordinatesSystem::SRID(0));
+			query.addField(object->getDefaultImportRequest());
 			query.execute(transaction);
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<DataSourceTableSync,DataSource>::Unlink(
 			DataSource* object
