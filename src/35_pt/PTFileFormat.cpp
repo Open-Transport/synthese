@@ -763,8 +763,8 @@ namespace synthese
 
 		ScheduledService* PTFileFormat::CreateOrUpdateService(
 			JourneyPattern& route,
-			const ScheduledService::Schedules& departureSchedules,
-			const ScheduledService::Schedules& arrivalSchedules,
+			const SchedulesBasedService::Schedules& departureSchedules,
+			const SchedulesBasedService::Schedules& arrivalSchedules,
 			const std::string& number,
 			const impex::DataSource& source,
 			util::Env& env,
@@ -831,6 +831,88 @@ namespace synthese
 			{
 				logStream << "LOAD : Use of service " << result->getKey() << " (" << result->getServiceNumber() << ") for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
 			}
+			return result;
+		}
+
+
+
+		ContinuousService* PTFileFormat::CreateOrUpdateContinuousService(
+			JourneyPattern& route,
+			const SchedulesBasedService::Schedules& departureSchedules,
+			const SchedulesBasedService::Schedules& arrivalSchedules,
+			const std::string& number,
+			const boost::posix_time::time_duration& range,
+			const boost::posix_time::time_duration& waitingTime,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream
+		){
+			// Comparison of the size of schedules and the size of the route
+			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
+				route.getScheduledStopsNumber() != arrivalSchedules.size()
+			){
+				logStream << "WARN : Inconsistent schedules size in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+				return NULL;
+			}
+
+			// Checks for schedules validity
+			BOOST_FOREACH(const time_duration& td, departureSchedules)
+			{
+				if(td.is_not_a_date_time())
+				{
+					logStream << "WARN : At least an undefined time in departure schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					return NULL;
+				}
+			}
+			BOOST_FOREACH(const time_duration& ta, arrivalSchedules)
+			{
+				if(ta.is_not_a_date_time())
+				{
+					logStream << "WARN : At least an undefined time in arrival schedules in the service " << number << " at " << departureSchedules[0] << " on route " << route.getKey() << " (" << route.getName() << ")<br />";
+					return NULL;
+				}
+			}
+
+			// Search for a corresponding service
+			ContinuousService* result(NULL);
+			BOOST_FOREACH(Service* tservice, route.getServices())
+			{
+				ContinuousService* curService(dynamic_cast<ContinuousService*>(tservice));
+
+				if(!curService) continue;
+
+				if(	curService->getServiceNumber() == number &&
+					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+					curService->getRange() == range &&
+					curService->getMaxWaitingTime() == waitingTime
+				){
+					result = curService;
+					break;
+				}
+			}
+
+			// If not found creation
+			if(!result)
+			{
+				result = new ContinuousService(
+					ContinuousServiceTableSync::getId(),
+					number,
+					&route,
+					range,
+					waitingTime
+				);
+				result->setSchedules(departureSchedules, arrivalSchedules, true);
+				result->setPath(&route);
+				route.addService(*result, false);
+				env.getEditableRegistry<ContinuousService>().add(shared_ptr<ContinuousService>(result));
+
+				logStream << "CREA : Creation of continuous service " << result->getServiceNumber() << " for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+			}
+			else
+			{
+				logStream << "LOAD : Use of continuous service " << result->getKey() << " (" << result->getServiceNumber() << ") for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
+			}
+
 			return result;
 		}
 

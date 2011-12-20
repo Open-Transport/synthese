@@ -167,6 +167,8 @@ namespace synthese
 					std::size_t version;
 					std::size_t calendarNumber;
 					std::string transportModeCode;
+					boost::posix_time::time_duration continuousServiceRange;
+					boost::posix_time::time_duration continuousServiceWaitingTime;
 
 					// Served stops
 					struct Stop
