@@ -444,21 +444,22 @@ namespace synthese
 			if(value.isDestination)
 			{
 				position = _result.end();
-				typename List::iterator previous(position);
-				--previous;
-				while(previous->isDestination)
-				{
-					--position;
-					--previous;
-				}
+//				typename List::iterator previous(position);
+//				--previous;
+//				while(previous->isDestination)
+//				{
+//					--position;
+//					--previous;
+//				}
 			}
 			else if(value.isOrigin)
 			{
-				position = minPos;
-				while(position != _result.end() && position->isOrigin)
-				{
-					++position;
-				}
+				position = _result.begin();
+//				position = minPos;
+//				while(position != _result.end() && position->isOrigin)
+//				{
+//					++position;
+//				}
 			}
 			else
 			{
