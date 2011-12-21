@@ -403,10 +403,10 @@ def main():
     # Environment options
     parser.add_argument(
         '-t', '--env-type',
-        choices=['scons', 'cmake', 'installed'], default='cmake')
+        choices=['scons', 'cmake', 'installed'])
     parser.add_argument('-b', '--env-path', help='Env path')
     parser.add_argument(
-        '-m', '--mode', choices=['release', 'debug'], default='debug')
+        '-m', '--mode', choices=['release', 'debug'])
     parser.add_argument(
         '--beep', dest='beep_when_done', action='store_true',
         help='Emit a beep on completion')

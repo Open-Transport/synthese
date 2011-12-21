@@ -40,7 +40,13 @@ DEFAULTS = {
     'beep_when_done': False,
     'env_configs': {},
     'env_config_names': '',
-
+    'mysqldump_opts': '',
+ 
+    # Environment (only used during initialization,
+    # use the env object afterwards)
+    'env_type': 'cmake',
+    'env_path': None,
+    'mode': 'debug',
     # Daemon
     'port': 8080,
     'no_proxy': False,
