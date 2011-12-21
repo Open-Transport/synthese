@@ -787,12 +787,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
@@ -847,12 +847,12 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
 		BOOST_CHECK(itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
 		BOOST_CHECK(itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
 		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
@@ -879,22 +879,22 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
-		++itl;
-		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK(!itl->isOrigin);
-		BOOST_CHECK(itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
 		BOOST_CHECK(itl->isDestination);
 		BOOST_CHECK_EQUAL(itl->place->getName(), CE.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
 		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
@@ -921,22 +921,22 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
-		++itl;
-		BOOST_REQUIRE(itl != l.end());
-		BOOST_CHECK(!itl->isOrigin);
-		BOOST_CHECK(itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
 		++itl;
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
 		BOOST_CHECK(itl->isDestination);
 		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
 		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
@@ -963,8 +963,49 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CA.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(itl->isOrigin);
+		BOOST_CHECK(!itl->isDestination);
 		BOOST_CHECK_EQUAL(itl->place->getName(), CD.getName());
 		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		++itl;
+		BOOST_REQUIRE(itl != l.end());
+		BOOST_CHECK(!itl->isOrigin);
+		BOOST_CHECK(itl->isDestination);
+		BOOST_CHECK_EQUAL(itl->place->getName(), CB.getName());
+		++itl;
+		BOOST_CHECK(itl == l.end());
+	}
+
+	{ // 13407 Crash if a destination stop is used for transfer too
+		Journey j0;
+		ServicePointer s0_0(false, USER_PEDESTRIAN, S, now);
+		s0_0.setDepartureInformations(A, now, now, PD);
+		s0_0.setArrivalInformations(B, now, now, PF);
+		j0 = Journey(j0, s0_0);
+
+		Journey j1;
+		ServicePointer s1_0(false, USER_PEDESTRIAN, S, now);
+		s1_0.setDepartureInformations(A, now, now, PA);
+		s1_0.setArrivalInformations(B, now, now, PB);
+		j1 = Journey(j1, s1_0);
+		ServicePointer s1_1(false, USER_PEDESTRIAN, S, now);
+		s1_1.setDepartureInformations(B, now, now, PA);
+		s1_1.setArrivalInformations(C, now, now, PB);
+		j1 = Journey(j1, s1_1);
+
+		PTRoutePlannerResult::Journeys j;
+		j.push_back(j0);
+		j.push_back(j1);
+		PTRoutePlannerResult r(&CA, &CB, false, j);
+		const PTRoutePlannerResult::PlacesListConfiguration::List& l(r.getOrderedPlaces().getResult());
+		PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator itl(l.begin());
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(itl->isOrigin);
 		BOOST_CHECK(!itl->isDestination);
@@ -978,7 +1019,7 @@ BOOST_AUTO_TEST_CASE (placesListOrder_DoubleOriginsDestinationsTest)
 		BOOST_REQUIRE(itl != l.end());
 		BOOST_CHECK(!itl->isOrigin);
 		BOOST_CHECK(itl->isDestination);
-		BOOST_CHECK_EQUAL(itl->place->getName(), CF.getName());
+		BOOST_CHECK_EQUAL(itl->place->getName(), CC.getName());
 		++itl;
 		BOOST_CHECK(itl == l.end());
 	}
