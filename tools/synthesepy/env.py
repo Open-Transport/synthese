@@ -40,9 +40,12 @@ class Env(object):
         # shortcut
         self.c = self.config
         # Remove env settings only used for initialization
-        del self.c.env_type
-        del self.c.env_path
-        del self.c.mode
+        try:
+            del self.c.env_type
+            del self.c.env_path
+            del self.c.mode
+        except AttributeError:
+            pass
 
         self.source_path = os.path.normpath(
             join(
