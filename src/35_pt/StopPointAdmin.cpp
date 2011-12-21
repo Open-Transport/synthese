@@ -43,6 +43,8 @@
 #include "CommercialLineAdmin.h"
 #include "PTPlaceAdmin.h"
 #include "JourneyPatternCopy.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "DRTArea.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -234,6 +236,7 @@ namespace synthese
 				AdminFunctionRequest<JourneyPatternAdmin> openJourneyPatternRequest(request);
 				AdminFunctionRequest<CommercialLineAdmin> openLineRequest(request);
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
+				AdminFunctionRequest<DRTAreaAdmin> openDRTAreaRequest(request);
 
 				// Table
 				HTMLTable::ColsVector c;
@@ -285,40 +288,78 @@ namespace synthese
 
 					// Origin
 					stream << t.col();
-					if(journeyPattern.getEdges().size() >= 2)
-					{
-						const StopArea& stopArea(
-							*static_cast<StopPoint*>(journeyPattern.getEdge(0)->getFromVertex())->getConnectionPlace()
-						);
-						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(
-								&stopArea
-						)	);
-						stream <<
-							HTMLModule::getHTMLLink(
-								openPlaceRequest.getURL(),
-								stopArea.getFullName()
-							)
-						;
+					if(	journeyPattern.getEdges().size() >= 2
+					){
+						if(dynamic_cast<StopPoint*>(journeyPattern.getEdge(0)->getFromVertex()))
+						{
+							const StopArea& stopArea(
+								*static_cast<StopPoint*>(journeyPattern.getEdge(0)->getFromVertex())->getConnectionPlace()
+							);
+							openPlaceRequest.getPage()->setConnectionPlace(
+								Env::GetOfficialEnv().getSPtr(
+									&stopArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openPlaceRequest.getURL(),
+									stopArea.getFullName()
+								)
+							;
+						}
+						else if(dynamic_cast<DRTArea*>(journeyPattern.getEdge(0)->getFromVertex()))
+						{
+							const DRTArea& drtArea(
+								*static_cast<DRTArea*>(journeyPattern.getEdge(0)->getFromVertex())
+							);
+							openDRTAreaRequest.getPage()->setArea(
+								Env::GetOfficialEnv().getSPtr(
+									&drtArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openDRTAreaRequest.getURL(),
+									drtArea.getName()
+								)
+							;
+						}
 					}
 
 					// Destination
 					stream << t.col();
-					if(journeyPattern.getEdges().size() >= 2)
-					{
-						const StopArea& stopArea(
-							*static_cast<StopPoint*>(journeyPattern.getLastEdge()->getFromVertex())->getConnectionPlace()
-						);
-						openPlaceRequest.getPage()->setConnectionPlace(
-							Env::GetOfficialEnv().getSPtr(
-								&stopArea
-						)	);
-						stream <<
-							HTMLModule::getHTMLLink(
-								openPlaceRequest.getURL(),
-								stopArea.getFullName()
-							)
-						;
+					if(	journeyPattern.getEdges().size() >= 2
+					){
+						if(dynamic_cast<StopPoint*>(journeyPattern.getLastEdge()->getFromVertex()))
+						{
+							const StopArea& stopArea(
+								*static_cast<StopPoint*>(journeyPattern.getLastEdge()->getFromVertex())->getConnectionPlace()
+							);
+							openPlaceRequest.getPage()->setConnectionPlace(
+								Env::GetOfficialEnv().getSPtr(
+									&stopArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openPlaceRequest.getURL(),
+									stopArea.getFullName()
+								)
+							;
+						}
+						else if(dynamic_cast<DRTArea*>(journeyPattern.getLastEdge()->getFromVertex()))
+						{
+							const DRTArea& drtArea(
+								*static_cast<DRTArea*>(journeyPattern.getLastEdge()->getFromVertex())
+							);
+							openDRTAreaRequest.getPage()->setArea(
+								Env::GetOfficialEnv().getSPtr(
+									&drtArea
+							)	);
+							stream <<
+								HTMLModule::getHTMLLink(
+									openDRTAreaRequest.getURL(),
+									drtArea.getName()
+								)
+							;
+						}
 					}
 
 					// Arrival
