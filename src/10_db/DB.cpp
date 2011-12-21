@@ -164,7 +164,8 @@ namespace synthese
 		{
 			CoordinatesSystem::ClearCoordinatesSystems();
 			DBModule::ClearStorageCoordinatesSystem();
-			DBModule::UnregisterParameter(CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM);
+			// FIXME : the next line caused a double free
+			// DBModule::UnregisterParameter(CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM);
 		}
 
 
