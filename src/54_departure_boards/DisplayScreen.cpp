@@ -350,16 +350,16 @@ namespace synthese
 			);
 			if(it != _transfers.end())
 			{
-				ptime routePlanningEndTime(startTime);
+				ptime routePlanningEndTime(approachJourney.getFirstDepartureTime());
 				routePlanningEndTime += days(1);
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
 						_displayedPlace,
 						it2,
-						startTime,
-						endTime,
-						startTime,
+						approachJourney.getFirstDepartureTime(),
+						approachJourney.getFirstDepartureTime(),
+						approachJourney.getFirstDepartureTime(),
 						routePlanningEndTime,
 						1,
 						AccessParameters(
