@@ -225,7 +225,7 @@ namespace synthese
 				rep.status = HTTPReply::ok;
 				rep.content.append(output.str());
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
-				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType()));
+				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType() + "; charset=utf-8"));
 				if(request.getFunction().get() && !request.getFunction()->getFileName().empty())
 				{
 					rep.headers.insert(make_pair("Content-Disposition", "attachement; filename="+ request.getFunction()->getFileName()));
