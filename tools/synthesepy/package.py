@@ -32,27 +32,30 @@ log = logging.getLogger(__name__)
 
 
 def run(env, args):
-    if not env.config.prefix:
+    config = env.config
+    if not config.prefix:
         raise Exception('Prefix is required.')
 
     svn_info = utils.SVNInfo(env.source_path)
     revision_path = 'r{0}'.format(svn_info.version)
-    package_relative_dir = os.sep.join([
-        env.platform, env.mode, svn_info.branch, revision_path])
+    build_type = (config.build_type if config.build_type else env.mode).lower()
 
-    package_dir = join(env.config.packages_save_path, package_relative_dir)
+    package_relative_dir = os.sep.join([
+        env.platform, build_type, svn_info.branch, revision_path])
+
+    package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
-        if env.config.no_package_overwrite:
+        if config.no_package_overwrite:
             log.info('Package directory already exists (%r) not building.',
                 package_dir)
             return
         utils.RemoveDirectory(package_dir)
     os.makedirs(package_dir)
 
-    log.info('Cleaning prefix %r', env.config.prefix)
-    utils.RemoveDirectory(env.config.prefix)
+    log.info('Cleaning prefix %r', config.prefix)
+    utils.RemoveDirectory(config.prefix)
 
-    log.info('Installing Synthese to %r', env.config.prefix)
+    log.info('Installing Synthese to %r', config.prefix)
     builder = synthesepy.build.get_builder(env)
     builder.install()
 
@@ -62,8 +65,8 @@ def run(env, args):
     archive_path = join(package_dir, ARCHIVE_NAME)
 
     log.info('Creating archive %r', archive_path)
-    prefix_parent = os.path.dirname(env.config.prefix)
-    prefix_tail = os.path.basename(env.config.prefix)
+    prefix_parent = os.path.dirname(config.prefix)
+    prefix_tail = os.path.basename(config.prefix)
     utils.call([
         'tar', '-C',  utils.to_cygwin_path(prefix_parent),
         '-jcf', utils.to_cygwin_path(archive_path),
@@ -77,11 +80,11 @@ def run(env, args):
         env.source_path, 'tools', 'synthesepy', 'install_synthese.py.in')
     deploy_script_content = open(source_deploy_script).read()
 
-    archive_url = (env.config.packages_access_url + package_relative_dir +
+    archive_url = (config.packages_access_url + package_relative_dir +
         '/' + ARCHIVE_NAME)
     deploy_script_content = deploy_script_content.replace(
         '@@ARCHIVE_URL@@', archive_url).replace(
-        '@@PREFIX@@', env.config.prefix)
+        '@@PREFIX@@', config.prefix)
     with open(deploy_script_path, 'wb') as f:
         f.write(deploy_script_content)
     log.debug('Deploy script written to %r', deploy_script_path)
