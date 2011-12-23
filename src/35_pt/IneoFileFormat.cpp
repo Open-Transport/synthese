@@ -72,7 +72,6 @@ using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace geos::geom;
 
-
 namespace synthese
 {
 	using namespace impex;
@@ -93,41 +92,42 @@ namespace synthese
 
 	namespace pt
 	{
-		const std::string IneoFileFormat::Importer_::FILE_PTF("ptf");
-		const std::string IneoFileFormat::Importer_::FILE_PNT("pnt");
-		const std::string IneoFileFormat::Importer_::FILE_DIS("dis");
-		const std::string IneoFileFormat::Importer_::FILE_DST("dst");
-		const std::string IneoFileFormat::Importer_::FILE_LIG("lig");
-		const std::string IneoFileFormat::Importer_::FILE_CJV("cjv");
-		const std::string IneoFileFormat::Importer_::FILE_HOR("hor");
-		const std::string IneoFileFormat::Importer_::FILE_CAL("cal");
-		const std::string IneoFileFormat::Importer_::SEP(";");
+		const string IneoFileFormat::Importer_::FILE_PTF("ptf");
+		const string IneoFileFormat::Importer_::FILE_PNT("pnt");
+		const string IneoFileFormat::Importer_::FILE_DIS("dis");
+		const string IneoFileFormat::Importer_::FILE_DST("dst");
+		const string IneoFileFormat::Importer_::FILE_LIG("lig");
+		const string IneoFileFormat::Importer_::FILE_CJV("cjv");
+		const string IneoFileFormat::Importer_::FILE_HOR("hor");
+		const string IneoFileFormat::Importer_::FILE_CAL("cal");
+		const string IneoFileFormat::Importer_::SEP(";");
 
-		const std::string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID = "net";
-		const std::string IneoFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK = "transport_mode_type_lg_mask";
-		const std::string IneoFileFormat::Importer_::PARAMETER_AUTO_IMPORT_STOPS("isa");
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
-		const std::string IneoFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
-		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_READ_METHOD("line_read_method");
-		const std::string IneoFileFormat::Importer_::VALUE_CIDX("CIDX");
-		const std::string IneoFileFormat::Importer_::VALUE_SV("SV");
-		const std::string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD = "line_short_name_field";
-		const std::string IneoFileFormat::Importer_::VALUE_NLGIV = "NLGIV";
-		const std::string IneoFileFormat::Importer_::VALUE_MNLC = "MNLC";
-		const std::string IneoFileFormat::Importer_::PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE = "add_wayback_to_journeypattern_code";
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_ID_FIELD = "stop_area_id_field";
-		const std::string IneoFileFormat::Importer_::VALUE_MNCP = "MNCP";
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_ID_FIELD = "stop_id_field";
-		const std::string IneoFileFormat::Importer_::VALUE_MNLP = "MNLP";
-		const std::string IneoFileFormat::Importer_::VALUE_IDENTSMS = "IdentSMS";
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_CITY_CODE_FIELD = "stop_city_code_field";
-		const std::string IneoFileFormat::Importer_::VALUE_CODE_COMMUNE = "code_commune";
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_NAME_FIELD = "stop_name_field";
-		const std::string IneoFileFormat::Importer_::VALUE_LIBP = "LIBP";
-		const std::string IneoFileFormat::Importer_::VALUE_LIBCOM = "LIBCOM";
-		const std::string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
-		const std::string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
+		const string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID = "net";
+		const string IneoFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK = "transport_mode_type_lg_mask";
+		const string IneoFileFormat::Importer_::PARAMETER_AUTO_IMPORT_STOPS("isa");
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
+		const string IneoFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const string IneoFileFormat::Importer_::PARAMETER_LINE_READ_METHOD("line_read_method");
+		const string IneoFileFormat::Importer_::VALUE_CIDX("CIDX");
+		const string IneoFileFormat::Importer_::VALUE_SV("SV");
+		const string IneoFileFormat::Importer_::PARAMETER_LINE_SHORT_NAME_FIELD = "line_short_name_field";
+		const string IneoFileFormat::Importer_::VALUE_NLGIV = "NLGIV";
+		const string IneoFileFormat::Importer_::VALUE_MNLC = "MNLC";
+		const string IneoFileFormat::Importer_::PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE = "add_wayback_to_journeypattern_code";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_AREA_ID_FIELD = "stop_area_id_field";
+		const string IneoFileFormat::Importer_::VALUE_MNCP = "MNCP";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_ID_FIELD = "stop_id_field";
+		const string IneoFileFormat::Importer_::VALUE_MNLP = "MNLP";
+		const string IneoFileFormat::Importer_::VALUE_IDENTSMS = "IdentSMS";
+		const string IneoFileFormat::Importer_::MNLP_PREFIX = "MNLP_**_";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_CITY_CODE_FIELD = "stop_city_code_field";
+		const string IneoFileFormat::Importer_::VALUE_CODE_COMMUNE = "code_commune";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_NAME_FIELD = "stop_name_field";
+		const string IneoFileFormat::Importer_::VALUE_LIBP = "LIBP";
+		const string IneoFileFormat::Importer_::VALUE_LIBCOM = "LIBCOM";
+		const string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
+		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
 	}
 
@@ -189,7 +189,7 @@ namespace synthese
 		bool IneoFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
-			const std::string& key,
+			const string& key,
 			boost::optional<const admin::AdminRequest&> request
 		) const {
 			ifstream inFile;
@@ -261,23 +261,14 @@ namespace synthese
 
 				
 				// 1.2 : stops
-				RuleUser::Rules handicappedRules;
-				handicappedRules.push_back(NULL);
-				handicappedRules.push_back(AllowedUseRule::INSTANCE.get());
-				handicappedRules.push_back(NULL);
-
-				RuleUser::Rules handicappedForbiddenRules;
-				handicappedForbiddenRules.push_back(NULL);
-				handicappedForbiddenRules.push_back(ForbiddenUseRule::INSTANCE.get());
-				handicappedForbiddenRules.push_back(NULL);
-
-				// Loop
+				StopsMap stops;
 				inFile.clear();
 				inFile.seekg(0, ios::beg);
 				string fakeLine;
 				getline(inFile, fakeLine);
 				while(_readLine(inFile))
 				{
+					// Read only stop section
 					if(_section != "P")
 					{
 						continue;
@@ -292,23 +283,28 @@ namespace synthese
 					{
 						id = mnlp;
 					}
-					
-					// Name field
-					string name(_getValue(_stopNameField));
 
 					// Point
-					shared_ptr<geos::geom::Point> point;
+					shared_ptr<Point> geometry;
 					if(!_getValue("X").empty() && !_getValue("Y").empty())
 					{
 						try
 						{
-							point = _dataSource.getActualCoordinateSystem().createPoint(
+							geometry = _dataSource.getActualCoordinateSystem().createPoint(
 								lexical_cast<double>(_getValue("X")),
 								lexical_cast<double>(_getValue("Y"))
 							);
-							if(point->isEmpty())
+							if(geometry->isEmpty())
 							{
-								point.reset();
+								geometry.reset();
+							}
+							else
+							{
+								_points.insert(
+									make_pair(
+										mnlp,
+										geometry
+								)	);
 							}
 						}
 						catch(boost::bad_lexical_cast&)
@@ -316,14 +312,26 @@ namespace synthese
 						}
 					}
 
+					// Search for already defined stop
+					StopsMap::iterator it(stops.find(id));
+					if(it != stops.end())
+					{
+						it->second.codes.insert(_mnlp_prefix + mnlp);
+						continue;
+					}
+
+					// Declaration
+					Stop stop;
+					stop.codes.insert(_mnlp_prefix + mnlp);
+					stop.geometry = geometry;
+
+					// Name field
+					stop.name = _getValue(_stopNameField);
+
 					// Handicapped
-					optional<const RuleUser::Rules&> handicapped;
 					if(!_stopHandicappedAccessibilityField.empty())
 					{
-						handicapped = 
-							(_getValue(_stopHandicappedAccessibilityField) == "O") ?
-							handicappedRules :
-							handicappedForbiddenRules;
+						stop.ufr = (_getValue(_stopHandicappedAccessibilityField) == "O");
 					}
 
 					// Stop area
@@ -334,36 +342,88 @@ namespace synthese
 						stream << "WARN : Stop area " << stopAreaCode << " was not found for stop " << id << ". Stop update or creation is ignored.<br />";
 						continue;
 					}
+					stop.stopArea = *stopAreasSet.begin();
+
+					stops.insert(
+						make_pair(
+							id,
+							stop
+					)	);
+				}
+
+				// Handicapped rules
+				RuleUser::Rules handicappedRules;
+				handicappedRules.push_back(NULL);
+				handicappedRules.push_back(AllowedUseRule::INSTANCE.get());
+				handicappedRules.push_back(NULL);
+
+				RuleUser::Rules handicappedForbiddenRules;
+				handicappedForbiddenRules.push_back(NULL);
+				handicappedForbiddenRules.push_back(ForbiddenUseRule::INSTANCE.get());
+				handicappedForbiddenRules.push_back(NULL);
+
+				// Stop removals
+				typedef map<string, StopPoint*> ToRemove;
+				ToRemove toRemove;
+				BOOST_FOREACH(const impex::ImportableTableSync::ObjectBySource<StopPointTableSync>::Map::value_type& itStop, _stopPoints.getMap())
+				{
+					BOOST_FOREACH(StopPoint* stop, itStop.second)
+					{
+						BOOST_FOREACH(const std::string& code, stop->getCodesBySource(_dataSource))
+						{
+							if(!_mnlp_prefix.empty() && code.size() > _mnlp_prefix.size() && code.substr(0, _mnlp_prefix.size()) == _mnlp_prefix)
+							{
+								stop->removeSourceLink(_dataSource, code);
+								toRemove.insert(make_pair(code, stop));
+								continue;
+							}
+							StopsMap::const_iterator it(stops.find(code));
+							if(it == stops.end())
+							{
+								stop->removeSourceLink(_dataSource, code);
+								toRemove.insert(make_pair(code, stop));
+							}
+						}
+					}
+				}
+
+				// Code removal
+				BOOST_FOREACH(ToRemove::value_type& it, toRemove)
+				{
+					_stopPoints.remove(it.first, *it.second);
+				}
+
+				// Stop updates and creations
+				BOOST_FOREACH(const StopsMap::value_type& itStop, stops)
+				{
+					optional<const RuleUser::Rules&> handicapped(
+						itStop.second.ufr ?
+						handicappedRules :
+						handicappedForbiddenRules
+					);
 
 					// Create or update stop
 					set<StopPoint*> matchingStops(
 						PTFileFormat::CreateOrUpdateStop(
 							_stopPoints,
-							id,
-							name,
+							itStop.first,
+							itStop.second.name,
 							handicapped,
-							*stopAreasSet.begin(),
-							point.get(),
+							itStop.second.stopArea,
+							itStop.second.geometry.get(),
 							_dataSource,
 							_env,
 							stream
 					)	);
 
-					if(_stopIdField != VALUE_MNLP && !mnlp.empty())
+					if(_stopIdField != VALUE_MNLP)
 					{
-						// Remove old code links
-						set<StopPoint*> oldStops(PTFileFormat::GetStopPoints(_stopPoints, mnlp, name, stream, false));
-						BOOST_FOREACH(StopPoint* stop, oldStops)
-						{
-							stop->removeSourceLink(_dataSource, mnlp);
-						}
-
 						// Adding of the code to the stop if not already exists
-						BOOST_FOREACH(StopPoint* stop, matchingStops)
+						BOOST_FOREACH(const string& code, itStop.second.codes)
 						{
-							stop->addCodeBySource(_dataSource, mnlp);
-							_stopPoints.add(*stop);
+							(*matchingStops.begin())->addCodeBySource(_dataSource, code);
 						}
+						_stopPoints.add(**matchingStops.begin());
 					}
 				}
 			}
@@ -371,21 +431,42 @@ namespace synthese
 			{
 				Geometries::key_type key;
 				CoordinateSequence* sequence(NULL);
+				string lastCode;
 				while(_readLine(inFile))
 				{
 					if(_section == "NLP")
 					{
-						if(sequence && sequence->getSize() > 1)
+						if(sequence)
 						{
-							_geometries.insert(
-								make_pair(
-									key,
-									shared_ptr<LineString>(
-										_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
-							)	)	);
+							if(_points[lastCode].get())
+							{
+								sequence->add(
+									*_points[lastCode]->getCoordinate()
+								);
+							}
+							if(sequence->getSize() > 1)
+							{
+								_geometries.insert(
+									make_pair(
+										key,
+										shared_ptr<LineString>(
+											_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+								)	)	);
+							}
 						}
-						key = make_pair(_getValue("NLP1"), _getValue("NLP2"));
+						key = make_pair(
+							_mnlp_prefix + _getValue("NLP1"),
+							_mnlp_prefix + _getValue("NLP2")
+						);
 						sequence = _dataSource.getActualCoordinateSystem().getGeometryFactory().getCoordinateSequenceFactory()->create(0, 2);
+
+						if(_points[_getValue("NLP1")].get())
+						{
+							sequence->add(
+								*_points[_getValue("NLP1")]->getCoordinate()
+							);
+						}
+						lastCode = _getValue("NLP2");
 					}
 					if(_section == "PF" && sequence)
 					{
@@ -396,14 +477,23 @@ namespace synthese
 						)	);
 					}
 				}
-				if(sequence && sequence->getSize() > 1)
+				if(sequence)
 				{
-					_geometries.insert(
-						make_pair(
-							key,
-							shared_ptr<LineString>(
-								_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
-					)	)	);
+					if(_points[lastCode].get())
+					{
+						sequence->add(
+							*_points[lastCode]->getCoordinate()
+						);
+					}
+					if(sequence->getSize() > 1)
+					{
+						_geometries.insert(
+							make_pair(
+								key,
+								shared_ptr<LineString>(
+									_dataSource.getActualCoordinateSystem().getGeometryFactory().createLineString(sequence)
+						)	)	);
+					}
 				}
 			}
 			// 2 : Distances
@@ -416,8 +506,8 @@ namespace synthese
 						_distances.insert(
 							make_pair(
 								make_pair(
-									_getValue("MNEO"),
-									_getValue("MNED")
+									_mnlp_prefix + _getValue("MNEO"),
+									_mnlp_prefix + _getValue("MNED")
 								),
 								lexical_cast<MetricOffset>(_getValue("DIST"))
 						)	);
@@ -561,12 +651,12 @@ namespace synthese
 					}
 					else if(_section == "PC")
 					{
-						string stopCode(_getValue("MNL"));
+						string stopCode(_mnlp_prefix + _getValue("MNL"));
 						shared_ptr<LineString> lineString;
 						if(!lastStopCode.empty())
 						{
 							// Distance
-							std::map<std::pair<std::string, std::string>, graph::MetricOffset>::const_iterator it(_distances.find(
+							std::map<std::pair<string, string>, graph::MetricOffset>::const_iterator it(_distances.find(
 									make_pair(lastStopCode, stopCode)
 							)	);
 							if(it != _distances.end())
@@ -845,6 +935,8 @@ namespace synthese
 			// Journey pattern line overload field
 			stream << t.cell("Champ de forçage de ligne dans le fichier girouettes", t.getForm().getTextInput(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD, _journeyPatternLineOverloadField));
 
+			// Auto-purge
+			stream << t.cell("Purge automatique des jours passés", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_PURGE, _autoPurge));
 			stream << t.close();
 		}
 
@@ -909,7 +1001,7 @@ namespace synthese
 
 
 
-		std::string IneoFileFormat::Importer_::_getValue( const std::string& field ) const
+		string IneoFileFormat::Importer_::_getValue( const string& field ) const
 		{
 			return _line[field];
 		}
@@ -930,7 +1022,7 @@ namespace synthese
 
 
 
-		void IneoFileFormat::Importer_::_loadLine( const std::string& line ) const
+		void IneoFileFormat::Importer_::_loadLine( const string& line ) const
 		{
 			_line.clear();
 
@@ -1061,6 +1153,10 @@ namespace synthese
 
 			// Stop id field
 			_stopIdField = map.getDefault<string>(PARAMETER_STOP_ID_FIELD, VALUE_MNLP);
+			if(_stopIdField != VALUE_MNLP)
+			{
+				_mnlp_prefix = MNLP_PREFIX;
+			}
 
 			// Add wayback to journeypattern code
 			_addWaybackToJourneyPatternCode = map.getDefault<bool>(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, false);

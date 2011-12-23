@@ -104,6 +104,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_ID_FIELD;
 				static const std::string VALUE_MNLP;
 				static const std::string VALUE_IDENTSMS;
+				static const std::string MNLP_PREFIX;
 				static const std::string PARAMETER_STOP_CITY_CODE_FIELD;
 				static const std::string VALUE_CODE_COMMUNE;
 				static const std::string PARAMETER_STOP_NAME_FIELD;
@@ -117,6 +118,20 @@ namespace synthese
 				//! @name Parameters
 				//@{
 					boost::shared_ptr<TransportNetwork> _network;
+
+					struct Stop
+					{
+						std::set<std::string> codes;
+						std::string name;
+						boost::shared_ptr<geos::geom::Point> geometry;
+						bool ufr;
+						StopArea* stopArea;
+					};
+
+					typedef std::map<
+						std::string, // Stop code
+						Stop // Stop
+					> StopsMap;
 					
 // TODO				std::map<std::string, boost::shared_ptr<RollingStock> > _transportModeTypeLgMap;
 
@@ -125,6 +140,12 @@ namespace synthese
 						boost::shared_ptr<geos::geom::LineString>
 					> Geometries;
 					mutable Geometries _geometries;
+
+					typedef std::map<
+						std::string,
+						boost::shared_ptr<geos::geom::Point>
+					> Points;
+					mutable Points _points;
 
 					std::string _journeyPatternLineOverloadField;
 					bool _importStopAreas;
@@ -139,6 +160,7 @@ namespace synthese
 					std::string _stopNameField;
 					std::string _stopCityCodeField;
 					std::string _stopHandicappedAccessibilityField;
+					std::string _mnlp_prefix;
 				//@}
 
 				static const std::string SEP;

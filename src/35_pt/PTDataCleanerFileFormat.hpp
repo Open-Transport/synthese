@@ -58,6 +58,7 @@ namespace synthese
 			static const std::string PARAMETER_FROM_TODAY;
 			static const std::string PARAMETER_CLEAN_OLD_DATA;
 			static const std::string PARAMETER_CLEAN_UNUSED_STOPS;
+			static const std::string PARAMETER_AUTO_PURGE;
 
 			PTDataCleanerFileFormat(
 				util::Env& env,
@@ -75,6 +76,7 @@ namespace synthese
 			bool _fromToday;
 			bool _cleanOldData;
 			bool _cleanUnusedStops;
+			bool _autoPurge;
 
 		private:
 			mutable std::set<boost::shared_ptr<JourneyPattern> > _journeyPatternsToRemove;

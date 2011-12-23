@@ -56,6 +56,7 @@ namespace synthese
 		const string PTDataCleanerFileFormat::PARAMETER_END_DATE("end_date");
 		const string PTDataCleanerFileFormat::PARAMETER_FROM_TODAY("from_today");
 		const string PTDataCleanerFileFormat::PARAMETER_START_DATE("start_date");
+		const string PTDataCleanerFileFormat::PARAMETER_AUTO_PURGE = "auto_purge";
 
 
 
@@ -65,7 +66,8 @@ namespace synthese
 		):	Importer(env, dataSource),
 			_fromToday(false),
 			_cleanOldData(true),
-			_cleanUnusedStops(false)
+			_cleanUnusedStops(false),
+			_autoPurge(false)
 		{}
 
 
@@ -113,6 +115,15 @@ namespace synthese
 						else
 						{
 							service->subDates(_calendar);
+						}
+
+						// If auto purge : delete all days before today
+						if(_autoPurge && service->getFirstActiveDate() < now)
+						{
+							date yesterday(now);
+							yesterday -= days(1);
+							Calendar dates(service->getFirstActiveDate(), yesterday);
+							service->subDates(dates);
 						}
 					}
 				}
@@ -324,6 +335,7 @@ namespace synthese
 		{
 			_cleanOldData = map.getDefault<bool>(PARAMETER_CLEAN_OLD_DATA, true);
 			_cleanUnusedStops = map.getDefault<bool>(PARAMETER_CLEAN_UNUSED_STOPS, false);
+			_autoPurge = map.getDefault<bool>(PARAMETER_AUTO_PURGE, false);
 
 			RegistryKeyType calendarId(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_ID, 0));
 			if(calendarId) try
@@ -398,6 +410,10 @@ namespace synthese
 			}
 			result.insert(PARAMETER_FROM_TODAY, _fromToday);
 			result.insert(PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops);
+			if(_autoPurge)
+			{
+				result.insert(PARAMETER_AUTO_PURGE, _autoPurge);
+			}
 			return result;
 		}
 
