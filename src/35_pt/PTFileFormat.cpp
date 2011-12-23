@@ -668,10 +668,6 @@ namespace synthese
 							*stop._stop.begin(),
 							stop._withTimes ? *stop._withTimes : true
 					)	);
-					if(stop._geometry.get())
-					{
-						ls->setGeometry(stop._geometry);
-					}
 					result->addEdge(*ls);
 					env.getEditableRegistry<DesignatedLinePhysicalStop>().add(ls);
 					++rank;
@@ -718,6 +714,17 @@ namespace synthese
 					}
 					++it;
 				}
+			}
+
+			// Geometries
+			size_t rank(0);
+			BOOST_FOREACH(const JourneyPattern::StopWithDepartureArrivalAuthorization stop, servedStops)
+			{
+				if(stop._geometry.get())
+				{
+					const_cast<Edge*>(result->getEdge(rank))->setGeometry(stop._geometry);
+				}
+				++rank;
 			}
 
 			// Name
