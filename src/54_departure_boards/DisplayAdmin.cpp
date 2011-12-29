@@ -221,7 +221,7 @@ namespace synthese
 				stream << t.cell("Nom", t.getForm().getTextInput(UpdateDisplayScreenAction::PARAMETER_NAME, _displayScreen->getName()));
 
 				stream << t.title("Données techniques");
-				stream << t.cell("UID", Conversion::ToString(_displayScreen->getKey()));
+				stream << t.cell("UID", lexical_cast<string>(_displayScreen->getKey()));
 				stream <<
 					t.cell(
 						"Type d'afficheur",
@@ -507,7 +507,7 @@ namespace synthese
 						optional<EndFilter>(_displayScreen->getEndFilter()),
 						true
 						)	);
-					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, Conversion::ToString(_displayScreen->getMaxDelay())) + " minutes");
+					stream << t.cell("Délai maximum d'affichage", t.getForm().getTextInput(UpdateDisplayPreselectionParametersAction::PARAMETER_DISPLAY_MAX_DELAY, lexical_cast<string>(_displayScreen->getMaxDelay())) + " minutes");
 					stream << t.cell("Délai d'effacement", t.getForm().getSelectInput(
 						UpdateDisplayPreselectionParametersAction::PARAMETER_CLEANING_DELAY,
 						UpdateDisplayPreselectionParametersAction::GetClearDelaysList(),
@@ -528,7 +528,7 @@ namespace synthese
 								"Délai maximum présélection",
 								t.getForm().getTextInput(
 									UpdateDisplayPreselectionParametersAction::PARAMETER_PRESELECTION_DELAY,
-									Conversion::ToString(_displayScreen->getForceDestinationDelay())
+									lexical_cast<string>(_displayScreen->getForceDestinationDelay())
 								) + " minutes"
 							)
 						;
@@ -596,7 +596,7 @@ namespace synthese
 					stream << "<h1>Arrêts de desserte</h1>";
 
 					HTMLForm uaf(updateAllDisplayRequest.getHTMLForm("updaall"));
-					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, Conversion::ToString(!_displayScreen->getAllPhysicalStopsDisplayed()));
+					uaf.addHiddenField(UpdateAllStopsDisplayScreenAction::PARAMETER_VALUE, lexical_cast<string>(!_displayScreen->getAllPhysicalStopsDisplayed()));
 					stream << "<p>Mode : "	<< (_displayScreen->getAllPhysicalStopsDisplayed() ? "Tous arrêts (y compris nouveaux)" : "Sélection d'arrêts");
 					stream << " " << uaf.getLinkButton("Passer en mode " + string(_displayScreen->getAllPhysicalStopsDisplayed() ? "Sélection d'arrêts" : "Tous arrêts"));
 					stream << "</p>";
@@ -686,7 +686,7 @@ namespace synthese
 						_displayScreen->getForbiddenPlaces()
 					){
 						HTMLForm ntu(
-							rmForbiddenRequest.getHTMLForm("rmfp"+ Conversion::ToString(it.second->getKey()))
+							rmForbiddenRequest.getHTMLForm("rmfp"+ lexical_cast<string>(it.second->getKey()))
 						);
 						ntu.addHiddenField(
 							DisplayScreenRemoveForbiddenPlaceAction::PARAMETER_PLACE,
@@ -728,11 +728,11 @@ namespace synthese
 						_displayScreen->getForcedDestinations()
 					){
 						HTMLForm psdf(
-							rmPreselRequest.getHTMLForm("rmpres" + Conversion::ToString(it.second->getKey()))
+							rmPreselRequest.getHTMLForm("rmpres" + lexical_cast<string>(it.second->getKey()))
 						);
 						psdf.addHiddenField(
 							RemovePreselectionPlaceFromDisplayScreenAction::PARAMETER_PLACE,
-							Conversion::ToString(it.second->getKey())
+							lexical_cast<string>(it.second->getKey())
 						);
 						stream << l.element("broadcastpoint");
 						stream <<
@@ -1128,8 +1128,8 @@ namespace synthese
 			if (_displayScreen.get() == NULL) return false;
 			if (_displayScreen->getLocation() == NULL) return user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ) || user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ);
 			return
-				user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocation()->getKey())) ||
-				user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_displayScreen->getLocation()->getKey()));
+				user.getProfile()->isAuthorized<ArrivalDepartureTableRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocation()->getKey())) ||
+				user.getProfile()->isAuthorized<DisplayMaintenanceRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_displayScreen->getLocation()->getKey()));
 		}
 
 		DisplayAdmin::DisplayAdmin(
@@ -1168,7 +1168,7 @@ namespace synthese
 					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
-						Conversion::ToString(_displayScreen->getLocation()->getKey())
+						lexical_cast<string>(_displayScreen->getLocation()->getKey())
 					) :
 					profile.isAuthorized<ArrivalDepartureTableRight>(
 						WRITE,

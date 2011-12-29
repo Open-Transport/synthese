@@ -25,11 +25,11 @@
 
 #include "DisplayMonitoringStatus.h"
 #include "DisplayScreen.h"
-#include "Conversion.h"
 
 #include <sstream>
 #include <assert.h>
 #include <boost/tokenizer.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -97,46 +97,46 @@ namespace synthese
 
 			// General
 			if (it == tokens.end()) return;
-			setGeneralStatus(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR);
+			setGeneralStatus(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR);
 
 			// Memory
 			if (++it == tokens.end()) return;
 			setMemoryStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 
 			// Clock
 			if (++it == tokens.end()) return;
 			setClockStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 
 			// EEPROM
 			if (++it == tokens.end()) return;
 			setEepromStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 
 			// Temperature sensor
 			if (++it == tokens.end()) return;
 			setTempSensorStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 
 			// Light
 			if (++it == tokens.end()) return;
 			setLightStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 			if (++it == tokens.end()) return;
 			setLightDetail(*it);
@@ -144,9 +144,9 @@ namespace synthese
 			// Display
 			if (++it == tokens.end()) return;
 			setDisplayStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 			if (++it == tokens.end()) return;
 			setDisplayDetail(*it);
@@ -154,23 +154,23 @@ namespace synthese
 			// Sound
 			if (++it == tokens.end()) return;
 			setSoundStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 			if (++it == tokens.end()) return;
 			setSoundDetail(*it);
 
 			// Temperature
 			if (++it == tokens.end()) return;
-			if (Conversion::ToInt(*it) == UNKNOWN_VALUE)
+			if (lexical_cast<int>(*it) == UNKNOWN_VALUE)
 			{
 				setTemperatureStatus(DISPLAY_MONITORING_UNKNOWN);
 				if (++it == tokens.end()) return;
 			}
 			else
 			{
-				if (Conversion::ToBool(*it))
+				if (lexical_cast<bool>(*it))
 				{
 					setTemperatureStatus(DISPLAY_MONITORING_OK);
 					if (++it == tokens.end()) return;
@@ -179,21 +179,21 @@ namespace synthese
 				{
 					if (++it == tokens.end()) return;
 					setTemperatureStatus(
-						(Conversion::ToInt(*it) == UNKNOWN_VALUE || !Conversion::ToBool(*it)) ?
+						(lexical_cast<int>(*it) == UNKNOWN_VALUE || !lexical_cast<bool>(*it)) ?
 						DISPLAY_MONITORING_ERROR :
 						DISPLAY_MONITORING_WARNING
 					);
 				}
 			}
 			if (++it == tokens.end()) return;
-			setTemperatureValue((it->empty() || *it == "-1") ? optional<double>() : Conversion::ToDouble(*it));
+			setTemperatureValue((it->empty() || *it == "-1") ? optional<double>() : lexical_cast<double>(*it));
 
 			// Communication
 			if (++it == tokens.end()) return;
 			setCommunicationStatus(
-				(Conversion::ToInt(*it) == UNKNOWN_VALUE) ?
+				(lexical_cast<int>(*it) == UNKNOWN_VALUE) ?
 				DISPLAY_MONITORING_UNKNOWN :
-				(Conversion::ToBool(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
+				(lexical_cast<bool>(*it) ? DISPLAY_MONITORING_OK : DISPLAY_MONITORING_ERROR)
 			);
 
 			// Localization

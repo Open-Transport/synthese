@@ -267,7 +267,7 @@ namespace synthese
 					);
 					shared_ptr<SentAlarm> alarm(alarms.empty() ? shared_ptr<SentAlarm>() : alarms.front());
 
-					stream << t.row(Conversion::ToString(screen->getKey()));
+					stream << t.row(lexical_cast<string>(screen->getKey()));
 					if (!_place || !_place->get())
 					{
 						stream <<
@@ -463,7 +463,7 @@ namespace synthese
 				{
 					updateRequest.getPage()->setCPU(cpu);
 
-					stream << t.row(Conversion::ToString(cpu->getKey()));
+					stream << t.row(lexical_cast<string>(cpu->getKey()));
 					if (!_place)
 					{
 						stream <<

@@ -30,7 +30,6 @@
 #include "ParametersMap.h"
 #include "DBLogModule.h"
 #include "ArrivalDepartureTableRight.h"
-#include "Conversion.h"
 #include "ObjectNotFoundException.h"
 
 using namespace std;
@@ -209,14 +208,14 @@ namespace synthese
 			DelaysList clearDelayMap;
 			for (int i=-5; i<-1; ++i)
 			{
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(-i) + " minutes avant le départ"));
+				clearDelayMap.insert(make_pair(i, lexical_cast<string>(-i) + " minutes avant le départ"));
 			}
 			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
 			clearDelayMap.insert(make_pair(0, "heure du départ"));
 			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
 			for (int i=2; i<6; ++i)
 			{
-				clearDelayMap.insert(make_pair(i, Conversion::ToString(i) + " minutes après le départ"));
+				clearDelayMap.insert(make_pair(i, lexical_cast<string>(i) + " minutes après le départ"));
 			}
 			return clearDelayMap;
 		}
