@@ -25,6 +25,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "SubStrFunction.hpp"
+#include "IConv.hpp"
 
 using namespace std;
 
@@ -56,12 +57,18 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void SubStrFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_text = map.getDefault<string>(PARAMETER_TEXT);
+			_text = IConv("UTF-8", "CP1252").convert(
+				map.getDefault<string>(PARAMETER_TEXT, string(), false)
+			);
 			_first = map.getDefault<size_t>(PARAMETER_FIRST, 0);
 			_size = map.getOptional<size_t>(PARAMETER_LENGTH);
 		}
+
+
 
 		void SubStrFunction::run(
 			std::ostream& stream,
@@ -69,11 +76,11 @@ namespace synthese
 		) const {
 			if(_size && *_size < _text.size() - _first)
 			{
-				stream << _text.substr(_first, *_size);
+				stream << IConv("CP1252", "UTF-8").convert(_text.substr(_first, *_size));
 			}
 			else if(_first < _text.size())
 			{
-				stream << _text.substr(_first);
+				stream << IConv("CP1252", "UTF-8").convert(_text.substr(_first));
 			}
 		}
 
@@ -91,5 +98,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}

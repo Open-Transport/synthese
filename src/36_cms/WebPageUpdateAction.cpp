@@ -237,11 +237,11 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_CONTENT1))
 			{
-				_content1 = map.get<string>(PARAMETER_CONTENT1);
+				_content1 = map.get<string>(PARAMETER_CONTENT1, false);
 			}
 			if(map.isDefined(PARAMETER_ABSTRACT))
 			{
-				_abstract = map.get<string>(PARAMETER_ABSTRACT);
+				_abstract = map.get<string>(PARAMETER_ABSTRACT, false);
 			}
 			if(map.isDefined(PARAMETER_IMAGE))
 			{

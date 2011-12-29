@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "IfFunction.hpp"
-#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -56,9 +55,9 @@ namespace synthese
 
 		void IfFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_condition = CMSModule::Trim(map.get<string>(PARAMETER_CONDITION));
-			_then = map.getDefault<string>(PARAMETER_THEN);
-			_else = map.getDefault<string>(PARAMETER_ELSE);
+			_condition = map.getDefault<string>(PARAMETER_CONDITION);
+			_then = map.getDefault<string>(PARAMETER_THEN, string(), false);
+			_else = map.getDefault<string>(PARAMETER_ELSE, string(), false);
 		}
 
 

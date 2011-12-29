@@ -153,27 +153,26 @@ namespace synthese
 				for(size_t i(_minDepth); i<=_maxDepth; ++i)
 				{
 					MenuDefinition_ curMenuDefinition;
-					curMenuDefinition.beginning = map.getDefault<string>(PARAMETER_BEGINNING + lexical_cast<string>(i));
-					curMenuDefinition.ending = map.getDefault<string>(PARAMETER_ENDING + lexical_cast<string>(i));
-					if(map.getOptional<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i)))
+					curMenuDefinition.beginning = map.getDefault<string>(PARAMETER_BEGINNING + lexical_cast<string>(i), false);
+					curMenuDefinition.ending = map.getDefault<string>(PARAMETER_ENDING + lexical_cast<string>(i), false);
+					if(map.getOptional<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i), false))
 					{
-
-						curMenuDefinition.beginningSelected = map.get<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i));
+						curMenuDefinition.beginningSelected = map.get<string>(PARAMETER_BEGINNING_SELECTED + lexical_cast<string>(i), false);
 					}
 					else
 					{
 						curMenuDefinition.beginningSelected = curMenuDefinition.beginning;
 					}
-					if(map.getOptional<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i)))
+					if(map.getOptional<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i), false))
 					{
-						curMenuDefinition.endingSelected = map.getDefault<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i));
+						curMenuDefinition.endingSelected = map.getDefault<string>(PARAMETER_ENDING_SELECTED + lexical_cast<string>(i), false);
 					}
 					else
 					{
 						curMenuDefinition.endingSelected = curMenuDefinition.ending;
 					}
-					curMenuDefinition.beginningBeforeSubmenu = map.getDefault<string>(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(i));
-					curMenuDefinition.endingAfterSubmenu = map.getDefault<string>(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(i));
+					curMenuDefinition.beginningBeforeSubmenu = map.getDefault<string>(PARAMETER_BEGINNING_BEFORE_SUBMENU + lexical_cast<string>(i), false);
+					curMenuDefinition.endingAfterSubmenu = map.getDefault<string>(PARAMETER_ENDING_AFTER_SUBMENU + lexical_cast<string>(i), false);
 					_menuDefinition[i] = curMenuDefinition;
 				}
 			}

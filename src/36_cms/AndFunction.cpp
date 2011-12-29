@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "AndFunction.hpp"
-#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -56,8 +55,8 @@ namespace synthese
 
 		void AndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = CMSModule::Trim(map.getDefault<string>(PARAMETER_LEFT));
-			_right = CMSModule::Trim(map.getDefault<string>(PARAMETER_RIGHT));
+			_left = map.getDefault<bool>(PARAMETER_LEFT, false);
+			_right = map.getDefault<bool>(PARAMETER_RIGHT, false);
 		}
 
 
@@ -66,7 +65,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << (!_left.empty() && _left != "0" && !_right.empty() && _right != "0");
+			stream << _left && _right;
 		}
 
 
