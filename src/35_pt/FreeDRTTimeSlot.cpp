@@ -47,7 +47,9 @@ namespace synthese
 			Registrable(id),
 			NonPermanentService(id),
 			_firstDeparture(not_a_date_time),
-			_lastArrival(not_a_date_time)
+			_lastArrival(not_a_date_time),
+			_commercialSpeed(0),
+			_maxSpeed(0)
 		{}
 
 

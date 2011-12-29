@@ -72,7 +72,12 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2011
 			FreeDRTTimeSlotAdmin();
-			
+
+
+
+			virtual PageLinks _getCurrentTreeBranch() const;
+
+
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.

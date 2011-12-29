@@ -143,7 +143,8 @@ namespace synthese
 						pt_website::PlacesListFunction::FACTORY_KEY,
 						pt_website::PlacesListFunction::DATA_PLACES,
 						pt_website::PlacesListFunction::DATA_PLACE,
-						"ct",string(),
+						pt_website::PlacesListFunction::PARAMETER_CITY_TEXT,
+						string(),
 						false, false, true, false
 					)
 				));

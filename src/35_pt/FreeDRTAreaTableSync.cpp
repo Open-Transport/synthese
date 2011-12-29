@@ -29,6 +29,7 @@
 #include "SelectQuery.hpp"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
+#include "StopAreaTableSync.hpp"
 #include "RollingStockTableSync.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
 #include "TransportNetworkRight.h"
@@ -60,6 +61,7 @@ namespace synthese
 		const string FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID = "transport_mode_id";
 		const string FreeDRTAreaTableSync::COL_NAME = "name";
 		const string FreeDRTAreaTableSync::COL_CITIES = "cities";
+		const string FreeDRTAreaTableSync::COL_STOP_AREAS = "stop_areas";
 		const string FreeDRTAreaTableSync::COL_USE_RULES = "use_rules";
 	}
 	
@@ -78,6 +80,7 @@ namespace synthese
 			DBTableSync::Field(FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID, SQL_INTEGER),
 			DBTableSync::Field(FreeDRTAreaTableSync::COL_NAME, SQL_TEXT),
 			DBTableSync::Field(FreeDRTAreaTableSync::COL_CITIES, SQL_TEXT),
+			DBTableSync::Field(FreeDRTAreaTableSync::COL_STOP_AREAS, SQL_TEXT),
 			DBTableSync::Field(FreeDRTAreaTableSync::COL_USE_RULES, SQL_TEXT),
 			DBTableSync::Field()
 		};
@@ -146,6 +149,17 @@ namespace synthese
 				)	);
 			}
 
+			// Stop areas
+			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			{
+				object->setStopAreas(
+					FreeDRTAreaTableSync::UnserializeStopAreas(
+						rows->getText(FreeDRTAreaTableSync::COL_STOP_AREAS),
+						env,
+						linkLevel
+				)	);
+			}
+
 			// Use rules
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
@@ -169,6 +183,7 @@ namespace synthese
 			query.addField(object->getRollingStock() ? object->getRollingStock()->getKey() : RegistryKeyType(0));
 			query.addField(object->getName());
 			query.addField(FreeDRTAreaTableSync::SerializeCities(object->getCities()));
+			query.addField(FreeDRTAreaTableSync::SerializeStopAreas(object->getStopAreas()));
 			query.addField(PTUseRuleTableSync::SerializeUseRules(object->getRules()));
 			query.execute(transaction);
 		}
@@ -306,6 +321,57 @@ namespace synthese
 					s << ",";
 				}
 				s << city->getKey();
+			}
+			return s.str();
+		}
+
+
+
+		FreeDRTArea::StopAreas FreeDRTAreaTableSync::UnserializeStopAreas(
+			const std::string& value,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			FreeDRTArea::StopAreas result;
+			if(!value.empty())
+			{
+				vector<string> stopAreas;
+				split(stopAreas, value, is_any_of(","));
+				BOOST_FOREACH(const string& stopArea, stopAreas)
+				{
+					try
+					{
+						RegistryKeyType stopAreaId(lexical_cast<RegistryKeyType>(stopArea));
+						result.insert(
+							StopAreaTableSync::GetEditable(stopAreaId, env, linkLevel).get()
+						);
+					}
+					catch(ObjectNotFoundException<City>&)
+					{
+					}
+				}
+			}
+			return result;
+
+		}
+
+
+
+		std::string FreeDRTAreaTableSync::SerializeStopAreas( const FreeDRTArea::StopAreas& value )
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const FreeDRTArea::StopAreas::value_type& stopArea, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << stopArea->getKey();
 			}
 			return s.str();
 		}
