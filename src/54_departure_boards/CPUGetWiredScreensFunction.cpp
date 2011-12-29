@@ -148,7 +148,7 @@ namespace synthese
 			}
 			catch (...)
 			{
-				throw RequestException("Display screen CPU " + Conversion::ToString(id) + " not found");
+				throw RequestException("Display screen CPU " + lexical_cast<string>(id) + " not found");
 			}
 		}
 

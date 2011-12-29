@@ -31,7 +31,6 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "DisplayMonitoringStatus.h"
-#include "Conversion.h"
 
 #include <sstream>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -84,7 +83,7 @@ namespace synthese
 				return;
 
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
 			c.push_back(field);
 			c.push_back(oldValue + " => " + newValue);
 			DBLog::_addEntry(FACTORY_KEY, level, c, &user, screen.getKey());
@@ -96,7 +95,7 @@ namespace synthese
 				return;
 
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MAINTENANCE_ADMIN)));
 			c.push_back(field);
 			c.push_back(oldValue + " => " + newValue);
 			DBLog::_addEntry(FACTORY_KEY, level, c, &user, cpu.getKey());
@@ -174,7 +173,7 @@ namespace synthese
 				<< DisplayMonitoringStatus::GetStatusString(newStatus);
 
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_STATUS_CHANGE)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_STATUS_CHANGE)));
 			c.push_back(s.str());
 			c.push_back(newValue.getDetail());
 
@@ -204,7 +203,7 @@ namespace synthese
 			const ptime& downTime
 		){
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_UP)));
 			c.push_back(string());
 			c.push_back("Etait perdu depuis " + to_simple_string(downTime));
 
@@ -222,7 +221,7 @@ namespace synthese
 			const ptime& downTime )
 		{
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_UP)));
 			c.push_back(string());
 			c.push_back("Etait perdu depuis " + to_simple_string(downTime));
 
@@ -243,14 +242,14 @@ namespace synthese
 			// Control last entry : if already a down entry, do not reyrite any identical entry
 			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, screen.getKey()));
 			if(	lastEntry.get() == NULL ||
-				lastEntry->getContent()[0] == Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN))
+				lastEntry->getContent()[0] == lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN))
 			){
 				return;
 			}
 
 			// Write the entry
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN)));
 			c.push_back(string());
 			c.push_back(string());
 
@@ -273,7 +272,7 @@ namespace synthese
 
 			{
 				DBLogEntry::Content c;
-				c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+				c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_UP)));
 				c.push_back(string());
 				c.push_back("Premier contact");
 
@@ -291,7 +290,7 @@ namespace synthese
 				s	<< " => " << DisplayMonitoringStatus::GetStatusString(newStatus);
 
 				DBLogEntry::Content c;
-				c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_STATUS_CHANGE)));
+				c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_STATUS_CHANGE)));
 				c.push_back(s.str());
 				c.push_back(value.getDetail());
 
@@ -318,7 +317,7 @@ namespace synthese
 		void DisplayMaintenanceLog::AddMonitoringFirstEntry( const DisplayScreenCPU& cpu, const DisplayMonitoringStatus& value )
 		{
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_UP)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_UP)));
 			c.push_back(string());
 			c.push_back("Premier contact");
 
@@ -336,14 +335,14 @@ namespace synthese
 			// Control last entry : if already a down entry, do not rewrite any identical entry
 			shared_ptr<const DBLogEntry> lastEntry(DBLog::_getLastEntry(FACTORY_KEY, cpu.getKey()));
 			if(	lastEntry.get() == NULL ||
-				lastEntry->getContent()[0] == Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN))
+				lastEntry->getContent()[0] == lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN))
 			){
 				return;
 			}
 
 			// Write the entry
 			DBLogEntry::Content c;
-			c.push_back(Conversion::ToString(static_cast<int>(DISPLAY_MONITORING_DOWN)));
+			c.push_back(lexical_cast<string>(static_cast<int>(DISPLAY_MONITORING_DOWN)));
 			c.push_back(string());
 			c.push_back(string());
 
