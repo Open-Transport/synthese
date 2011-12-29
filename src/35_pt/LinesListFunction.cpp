@@ -500,7 +500,7 @@ namespace synthese
 							}
 						}
 
-						shared_ptr<ParametersMap> geometryPM(new ParametersMap(getTemplateParameters()));
+						shared_ptr<ParametersMap> geometryPM(new ParametersMap);
 						if(_outputGeometry == FORMAT_WKT)
 						{
 							vector<shared_ptr<Geometry> > vec;
