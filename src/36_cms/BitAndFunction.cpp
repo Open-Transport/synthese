@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "BitAndFunction.hpp"
-#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -60,18 +59,10 @@ namespace synthese
 		void BitAndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Left
-			string leftStr(CMSModule::Trim(map.get<string>(PARAMETER_LEFT)));
-			if(!leftStr.empty())
-			{
-				_left = lexical_cast<int>(leftStr);
-			}
+			_left = map.getDefault<int>(PARAMETER_LEFT, 0);
 
 			// Right
-			string rightStr(CMSModule::Trim(map.get<string>(PARAMETER_RIGHT)));
-			if(!rightStr.empty())
-			{
-				_right = lexical_cast<int>(rightStr);
-			}
+			_right = map.getDefault<int>(PARAMETER_RIGHT, 0);
 		}
 
 

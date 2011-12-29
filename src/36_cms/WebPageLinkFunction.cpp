@@ -75,11 +75,11 @@ namespace synthese
 			{
 				throw RequestException("No such web page");
 			}
-			optional<string> ot(map.getOptional<string>(PARAMETER_TEXT));
+			optional<string> ot(map.getOptional<string>(PARAMETER_TEXT, false));
 			_text = ot ? *ot : _target->getName();
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 
-			_confirm = map.getDefault<string>(PARAMETER_CONFIRM);
+			_confirm = map.getDefault<string>(PARAMETER_CONFIRM, false);
 
 			// Additional parameters
 			_parameters = map;

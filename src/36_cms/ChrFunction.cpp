@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "ChrFunction.hpp"
-#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -54,7 +53,7 @@ namespace synthese
 
 		void ChrFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_code = CMSModule::Trim(map.get<string>(PARAMETER_CODE));
+			_code = map.get<string>(PARAMETER_CODE);
 		}
 
 
@@ -63,7 +62,10 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << atoi(_code.c_str());
+			if(!_code.empty())
+			{
+				stream << atoi(_code.c_str());
+			}
 		}
 
 

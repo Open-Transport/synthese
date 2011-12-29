@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "EqualFunction.hpp"
-#include "CMSModule.hpp"
 
 using namespace std;
 
@@ -56,8 +55,8 @@ namespace synthese
 
 		void EqualFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = CMSModule::Trim(map.getDefault<string>(PARAMETER_L));
-			_right = CMSModule::Trim(map.getDefault<string>(PARAMETER_R));
+			_left = map.getDefault<string>(PARAMETER_L);
+			_right = map.getDefault<string>(PARAMETER_R);
 		}
 
 

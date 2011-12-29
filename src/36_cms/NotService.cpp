@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "NotService.hpp"
-#include "CMSModule.hpp"
 
 #include <boost/lexical_cast.hpp>
 
@@ -57,12 +56,7 @@ namespace synthese
 
 		void NotService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// The parameter
-			string pStr(CMSModule::Trim(map.getDefault<string>(PARAMETER_P)));
-			if(!pStr.empty())
-			{
-				_parameter = lexical_cast<bool>(pStr);
-			}
+			_parameter = map.getDefault<bool>(PARAMETER_P, false);
 		}
 
 

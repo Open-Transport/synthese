@@ -25,7 +25,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "DateService.hpp"
-#include "CMSModule.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -66,7 +65,7 @@ namespace synthese
 
 		void DateService::_setFromParametersMap(const ParametersMap& map)
 		{
-			string day(CMSModule::Trim(map.getDefault<string>(PARAMETER_DAY)));
+			string day(map.getDefault<string>(PARAMETER_DAY));
 			_time = boost::posix_time::second_clock::local_time();
 			if(day.size() > 1 && day[0] == '+')
 			{

@@ -56,8 +56,8 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				std::string _left;
-				std::string _right;
+				bool _left;
+				bool _right;
 			//@}
 
 

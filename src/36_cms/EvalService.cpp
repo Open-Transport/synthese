@@ -49,10 +49,14 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void EvalService::_setFromParametersMap(const ParametersMap& map)
 		{
-			_text = map.getDefault<string>(PARAMETER_TEXT);
+			_text = map.getDefault<string>(PARAMETER_TEXT, string(), false);
 		}
+
+
 
 		void EvalService::run(
 			std::ostream& stream,
