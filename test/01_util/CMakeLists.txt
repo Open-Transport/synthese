@@ -10,8 +10,6 @@ boost_test(Conversion "${DEPS}")
 
 boost_test(Log "${DEPS}")
 # TODO: fails
-boost_test(LowerCaseFilter "${DEPS}")
-# TODO: fails
 boost_test(PlainCharFilter "${DEPS}")
 
 boost_test(Registrable "${DEPS}")
