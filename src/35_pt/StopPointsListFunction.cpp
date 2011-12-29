@@ -221,7 +221,7 @@ namespace synthese
 				// Main attributes
 				sp.first->toParametersMap(
 					*stopPM,
-					false,
+					!_stopArea,
 					*_coordinatesSystem
 				);
 
@@ -289,9 +289,9 @@ namespace synthese
 					subMap->merge(getTemplateParameters());
 
 					// Merge of stop area data
-					vector<shared_ptr<ParametersMap> > stopAreaMap(subMap->getSubMaps(StopPoint::TAG_STOP_AREA));
-					if(!stopAreaMap.empty())
+					if(subMap->hasSubMaps(StopPoint::TAG_STOP_AREA))
 					{
+						vector<shared_ptr<ParametersMap> > stopAreaMap(subMap->getSubMaps(StopPoint::TAG_STOP_AREA));
 						subMap->merge(**stopAreaMap.begin(), DATA_STOP_AREA_PREFIX);
 					}
 
