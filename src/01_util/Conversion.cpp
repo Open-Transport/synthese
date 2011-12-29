@@ -46,8 +46,24 @@ namespace synthese
 		{
 			std::string str = boost::to_lower_copy (s);
 			boost::trim (str);
-			if ((str == "true") || (str == "yes") || (lexical_cast<int>(str)>0)) return true;
-			if ((str == "false") || (str == "no") || (str == "0")) return false;
+			if(	str == "false" ||
+				str == "no" ||
+				str == "0"
+			){
+				return false;
+			}
+			try
+			{
+				if(	str == "true" ||
+					str == "yes" ||
+					(!str.empty() && lexical_cast<int>(str)>0)
+				){
+					return true;
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+			}
 			return boost::logic::indeterminate;
 		}
 
