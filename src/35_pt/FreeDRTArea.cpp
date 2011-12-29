@@ -26,6 +26,8 @@
 #include "CommercialLine.h"
 #include "RollingStock.hpp"
 #include "PTModule.h"
+#include "City.h"
+#include "StopArea.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -54,10 +56,31 @@ namespace synthese
 
 
 
-		bool FreeDRTArea::includesPlace( const geography::Place& place ) const
-		{
-			// TODO implementation
+		bool FreeDRTArea::includesPlace(
+			const geography::Place& place
+		) const	{
+			// Check if the place is in a city included in the area
+			const NamedPlace* namedPlace(dynamic_cast<const NamedPlace*>(&place));
+			if(namedPlace)
+			{
+				Cities::const_iterator it(_cities.find(const_cast<City*>(namedPlace->getCity())));
+				if( it != _cities.end())
+				{
+					return true;
+				}
+			}
 
+			// Check if the place is a stop area included in the area
+			const StopArea* stopArea(dynamic_cast<const StopArea*>(&place));
+			if(stopArea)
+			{
+				if(	_stopAreas.find(const_cast<StopArea*>(stopArea)) != _stopAreas.end())
+				{
+					return true;
+				}
+			}
+
+			// No valid check : the place does not belong to the area
 			return false;
 		}
 
@@ -205,9 +228,75 @@ namespace synthese
 			const geography::Place& place
 		) const	{
 
-			ReachableStopAreas result;
+			// Check of the precondition
+			assert(includesPlace(place));
 
-			// TODO implementation
+			// Declarations
+			ReachableStopAreas result;
+			set<StopArea*> attemptedStopAreas;
+
+			// Loop on cities
+			BOOST_FOREACH(City* city, _cities)
+			{
+				// Loop on stops
+				BOOST_FOREACH(const City::PlacesMatcher::Map::value_type& item, city->getLexicalMatcher(StopArea::FACTORY_KEY).entries())
+				{
+					// Declaration
+					shared_ptr<StopArea> stopArea(static_pointer_cast<StopArea, NamedPlace>(item.second));
+
+					// Storage of the attempt
+					attemptedStopAreas.insert(stopArea.get());
+
+					// Get the journey
+					Journey journey(
+						getJourney(
+							direction,
+							time,
+							direction == DEPARTURE_TO_ARRIVAL ? place : *stopArea,
+							direction == DEPARTURE_TO_ARRIVAL ? *stopArea : place
+					)	);
+
+					// Storage
+					if(!journey.empty())
+					{
+						result.insert(
+							make_pair(
+								stopArea.get(),
+								journey
+						)	);
+					}
+				}
+
+			}
+
+			// Loop on stops
+			BOOST_FOREACH(StopArea* stopArea, _stopAreas)
+			{
+				// Avoid already attempted stops
+				if(attemptedStopAreas.find(stopArea) != attemptedStopAreas.end())
+				{
+					continue;
+				}
+
+				// Get the journey
+				Journey journey(
+					getJourney(
+						direction,
+						time,
+						direction == DEPARTURE_TO_ARRIVAL ? place : *stopArea,
+						direction == DEPARTURE_TO_ARRIVAL ? *stopArea : place
+				)	);
+
+				// Storage
+				if(!journey.empty())
+				{
+					result.insert(
+						make_pair(
+							stopArea,
+							journey
+					)	);
+				}
+			}
 
 			return result;
 		}

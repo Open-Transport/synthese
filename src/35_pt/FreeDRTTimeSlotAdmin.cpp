@@ -36,6 +36,8 @@
 #include "FreeDRTTimeSlotUpdateAction.hpp"
 #include "CityListFunction.h"
 #include "PTRuleUserAdmin.hpp"
+#include "FreeDRTAreaAdmin.hpp"
+#include "FreeDRTArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -122,15 +124,14 @@ namespace synthese
 			stream << propertiesTable.open();
 			stream << propertiesTable.cell("ID", lexical_cast<string>(_timeSlot->getKey()));
 			stream << propertiesTable.cell("Numéro service", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER, _timeSlot->getServiceNumber()));
-			stream << propertiesTable.cell("Heure début", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE, to_simple_string(_timeSlot->getFirstDeparture())));
-			stream << propertiesTable.cell("Heure fin", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL, to_simple_string(_timeSlot->getLastArrival())));
+			stream << propertiesTable.cell("Heure début", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE, _timeSlot->getFirstDeparture().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getFirstDeparture())));
+			stream << propertiesTable.cell("Heure fin", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL, _timeSlot->getLastArrival().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getLastArrival())));
 			stream << propertiesTable.cell("Capacité max", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_CAPACITY, _timeSlot->getMaxCapacity() ? lexical_cast<string>(*_timeSlot->getMaxCapacity()) : string()));
 			stream << propertiesTable.cell("Vitesse commerciale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_COMMERCIAL_SPEED, lexical_cast<string>(_timeSlot->getCommercialSpeed())));
 			stream << propertiesTable.cell("Vitesse maximale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_SPEED, lexical_cast<string>(_timeSlot->getMaxSpeed())));
 			stream << propertiesTable.close();
 
 			// Use rule editor
-			stream << "<h1>Conditions d'accès</h1>";
 			PTRuleUserAdmin<FreeDRTTimeSlot, FreeDRTTimeSlotAdmin>::Display(stream, _timeSlot, request);
 		}
 
@@ -146,5 +147,19 @@ namespace synthese
 		bool FreeDRTTimeSlotAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _timeSlot == static_cast<const FreeDRTTimeSlotAdmin&>(other)._timeSlot;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks FreeDRTTimeSlotAdmin::_getCurrentTreeBranch() const
+		{
+			shared_ptr<FreeDRTAreaAdmin> p(
+				getNewPage<FreeDRTAreaAdmin>()
+			);
+			p->setArea(Env::GetOfficialEnv().getSPtr(_timeSlot->getArea()));
+
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(getNewCopiedPage());
+			return links;
 		}
 }	}

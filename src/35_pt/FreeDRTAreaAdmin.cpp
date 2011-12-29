@@ -35,12 +35,21 @@
 #include "PropertiesHTMLTable.h"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "CityListFunction.h"
+#include "PlacesListFunction.h"
+#include "AdminFunctionRequest.hpp"
+#include "FreeDRTTimeSlotAdmin.hpp"
+#include "FreeDRTTimeSlotUpdateAction.hpp"
+#include "RemoveObjectAction.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
+#include "CommercialLineAdmin.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
+	using namespace graph;	
+	using namespace db;	
 	using namespace admin;
 	using namespace server;
 	using namespace util;
@@ -50,7 +59,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTAreaAdmin>::FACTORY_KEY("FreeDRTAreaAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTAreaAdmin>::FACTORY_KEY("FreeDRTArea");
 	}
 
 	namespace admin
@@ -126,7 +135,7 @@ namespace synthese
 
 					AjaxVectorFieldEditor::Fields fields;
 
-					// Stop field
+					// Cities field
 					fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
 						new AjaxVectorFieldEditor::TextAutoCompleteInputField(
 							"Commune",
@@ -136,7 +145,8 @@ namespace synthese
 							pt_website::CityListFunction::FACTORY_KEY,
 							pt_website::CityListFunction::DATA_CITIES,
 							pt_website::CityListFunction::DATA_CITY,
-							"ct",string(),
+							string(),
+							string(),
 							false, false, true, false
 						)
 					));
@@ -163,13 +173,50 @@ namespace synthese
 					editor.display(stream);
 				}				
 
-				stream << "<h1>Arrêts isolés supplémentaires</h1>";
+				{
+					stream << "<h1>Arrêts isolés</h1>";
+					StaticActionRequest<FreeDRTAreaUpdateAction> updateRequest(request);
+					updateRequest.getAction()->setArea(const_pointer_cast<FreeDRTArea>(_area));
 
-				stream << "<p class=\"info\">Non implémenté</p>";
+					AjaxVectorFieldEditor::Fields fields;
 
-				stream << "<h1>Arrêts isolés supplémentaires</h1>";
+					// Stops field
+					fields.push_back(shared_ptr<AjaxVectorFieldEditor::Field>(
+						new AjaxVectorFieldEditor::TextAutoCompleteInputField(
+							"Arrêt",
+							FreeDRTAreaUpdateAction::PARAMETER_STOP_AREAS,
+							string(),
+							string(),
+							pt_website::PlacesListFunction::FACTORY_KEY,
+							pt_website::PlacesListFunction::DATA_PLACES,
+							pt_website::PlacesListFunction::DATA_PLACE,
+							pt_website::PlacesListFunction::PARAMETER_CITY_TEXT,
+							string(),
+							false, false, true, false
+						)
+					));
 
-				stream << "<p class=\"info\">Non implémenté</p>";
+					// Creation of the editor
+					AjaxVectorFieldEditor editor(
+						FreeDRTAreaUpdateAction::PARAMETER_STOP_AREAS,
+						updateRequest.getURL(),
+						fields,
+						true
+					);
+
+					// Insertion of existing values
+					BOOST_FOREACH(const FreeDRTArea::StopAreas::value_type& stopArea, _area->getStopAreas())
+					{
+						AjaxVectorFieldEditor::Row row;
+						vector<string> field;
+						field.push_back(lexical_cast<string>(stopArea->getKey()));
+						field.push_back(stopArea->getFullName());
+						row.push_back(field);
+						editor.addRow(row);
+					}
+
+					editor.display(stream);
+				}
 
 				stream << "<h1>Propriétés</h1>";
 
@@ -190,13 +237,85 @@ namespace synthese
 			// SERVICES TAB
 			if (openTabContent(stream, TAB_SERVICES))
 			{
+				// Declarations
+				AdminFunctionRequest<FreeDRTTimeSlotAdmin> openRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, FreeDRTAreaAdmin> removeRequest(request);
 
+				// Search for services
+				AdminFunctionRequest<FreeDRTAreaAdmin> searchRequest(request);
+				FreeDRTTimeSlotTableSync::SearchResult services(
+					FreeDRTTimeSlotTableSync::Search(
+						Env::GetOfficialEnv(),
+						_area->getKey(),
+						_requestParameters.first,
+						_requestParameters.maxSize,
+						true,
+						_requestParameters.raisingOrder
+				)	);
+
+				// Add request and form
+				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction,FreeDRTTimeSlotAdmin> addRequest(request);
+				addRequest.setActionWillCreateObject();
+				addRequest.getAction()->setArea(const_pointer_cast<FreeDRTArea>(_area));
+				HTMLForm addForm(addRequest.getHTMLForm("addDRTTimeslot"));
+				stream << addForm.open();
+
+				// Table initialization
+				ResultHTMLTable::HeaderVector cols;
+				cols.push_back(make_pair(string(), string()));
+				cols.push_back(make_pair(string(), "Num"));
+				cols.push_back(make_pair(string(), "Périmètre"));
+				cols.push_back(make_pair(string(), string()));
+				ResultHTMLTable t(
+					cols,
+					searchRequest.getHTMLForm(),
+					_requestParameters,
+					services
+				);
+				stream << t.open();
+				BOOST_FOREACH(const Service* itService, _area->getServices())
+				{
+					// Declarations
+					const FreeDRTTimeSlot& service(static_cast<const FreeDRTTimeSlot&>(*itService));
+					openRequest.getPage()->setTimeSlot(Env::GetOfficialEnv().getEditableSPtr(const_cast<FreeDRTTimeSlot*>(&service)));
+					removeRequest.getAction()->setObjectId(service.getKey());
+
+					// New row
+					stream << t.row();
+
+					// Open button cell
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTTimeSlotAdmin::ICON);
+
+					// Name cell
+					stream << t.col();
+					stream << service.getServiceNumber();
+
+					// Remove cell
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone "+ service.getServiceNumber() + " ?");
+				}
+
+				// New row
+				stream << t.row();
+
+				// Empty cell
+				stream << t.col();
+
+				// Name field
+				stream << t.col() << addForm.getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER, string(), "(numéro)");
+
+				// Add button
+				stream << t.col() << addForm.getSubmitButton("Ajouter");
+
+				// Table closing
+				stream << t.close() << addForm.close();
 			}
 
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
-			// closeTabContent(stream);
+			closeTabContent(stream);
 		}
 
 
@@ -207,16 +326,23 @@ namespace synthese
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;
-			
-			// const FreeDRTAreaAdmin* ua(
-			//	dynamic_cast<const FreeDRTAreaAdmin*>(&currentPage)
-			// );
-			
-			// if(ua)
-			// {
-			//	shared_ptr<FreeDRTAreaAdmin> p(getNewOtherPage<FreeDRTAreaAdmin>());
-			//	links.push_back(p);
-			// }
+
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
+			){
+				// Free DRT areas
+				FreeDRTTimeSlotTableSync::SearchResult timeSlots(
+					FreeDRTTimeSlotTableSync::Search(Env::GetOfficialEnv(), _area->getKey())
+				);
+				BOOST_FOREACH(shared_ptr<FreeDRTTimeSlot> timeSlot, timeSlots)
+				{
+					shared_ptr<FreeDRTTimeSlotAdmin> p(
+						getNewPage<FreeDRTTimeSlotAdmin>()
+					);
+					p->setTimeSlot(timeSlot);
+					links.push_back(p);
+				}
+			}
 			
 			return links;
 		}
@@ -245,5 +371,19 @@ namespace synthese
 			_tabs.push_back(Tab("Services", TAB_SERVICES, profile.isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
+		}
+
+
+
+		AdminInterfaceElement::PageLinks FreeDRTAreaAdmin::_getCurrentTreeBranch() const
+		{
+			shared_ptr<CommercialLineAdmin> p(
+				getNewPage<CommercialLineAdmin>()
+			);
+			p->setCommercialLine(Env::GetOfficialEnv().getSPtr(_area->getLine()));
+
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(getNewCopiedPage());
+			return links;
 		}
 }	}

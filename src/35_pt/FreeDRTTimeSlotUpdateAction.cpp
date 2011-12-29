@@ -30,6 +30,7 @@
 #include "FreeDRTTimeSlotTableSync.hpp"
 #include "CommercialLineTableSync.h"
 #include "PTUseRuleTableSync.h"
+#include "FreeDRTAreaTableSync.hpp"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -48,6 +49,7 @@ namespace synthese
 	namespace pt
 	{
 		const string FreeDRTTimeSlotUpdateAction::PARAMETER_TIME_SLOT_ID = Action_PARAMETER_PREFIX + "id";
+		const string FreeDRTTimeSlotUpdateAction::PARAMETER_AREA_ID = Action_PARAMETER_PREFIX + "area_id";
 		const string FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER = Action_PARAMETER_PREFIX + "service_number";
 		const string FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE = Action_PARAMETER_PREFIX + "first_departure";
 		const string FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL = Action_PARAMETER_PREFIX + "last_arrival";
@@ -62,6 +64,10 @@ namespace synthese
 			if(_timeSlot.get())
 			{
 				map.insert(PARAMETER_TIME_SLOT_ID, _timeSlot->getKey());
+			}
+			if(_area.get())
+			{
+				map.insert(PARAMETER_AREA_ID, _area->getKey());
 			}
 			if(_serviceNumber)
 			{
@@ -119,6 +125,16 @@ namespace synthese
 				_timeSlot.reset(new FreeDRTTimeSlot);
 			}
 
+			// Area
+			if(map.getDefault<RegistryKeyType>(PARAMETER_AREA_ID, 0)) try
+			{
+				_area = FreeDRTAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_AREA_ID), *_env);
+			}
+			catch (ObjectNotFoundException<FreeDRTArea>&)
+			{
+				throw ActionException("No such area");
+			}
+
 			// Service number
 			if(map.isDefined(PARAMETER_SERVICE_NUMBER))
 			{
@@ -128,13 +144,17 @@ namespace synthese
 			// First departure
 			if(map.isDefined(PARAMETER_FIRST_DEPARTURE))
 			{
-				_firstDeparture = duration_from_string(map.get<string>(PARAMETER_FIRST_DEPARTURE));
+				_firstDeparture = map.get<string>(PARAMETER_FIRST_DEPARTURE).empty() ?
+					time_duration(not_a_date_time) :					
+					duration_from_string(map.get<string>(PARAMETER_FIRST_DEPARTURE));
 			}
 
 			// Last arrival
 			if(map.isDefined(PARAMETER_LAST_ARRIVAL))
 			{
-				_lastArrival = duration_from_string(map.get<string>(PARAMETER_LAST_ARRIVAL));
+				_lastArrival = map.get<string>(PARAMETER_LAST_ARRIVAL).empty() ?
+					time_duration(not_a_date_time) :					
+					duration_from_string(map.get<string>(PARAMETER_LAST_ARRIVAL));
 			}
 
 			// Max capacity
@@ -172,6 +192,10 @@ namespace synthese
 		){
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
+			if(_area.get())
+			{
+				_timeSlot->setArea(_area.get());
+			}
 			if(_serviceNumber)
 			{
 				_timeSlot->setServiceNumber(*_serviceNumber);

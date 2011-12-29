@@ -162,6 +162,7 @@ namespace synthese
 				/// @param direction departure to arrival or arrival to departure
 				/// @param time time at the place (min if departure to arrival, max else)
 				/// @param place (departure if departure to arrival, arrival else)
+				/// @pre place must belong to the area (use includesPlace to check)
 				/// @return the list of all reachable stop areas with the best journey for
 				/// each of them
 				ReachableStopAreas getReachableStopAreas(

@@ -52,6 +52,7 @@ namespace synthese
 		private:
 			/// @name Search parameters
 			//@{
+			html::ResultHTMLTable::RequestParameters	_requestParameters;
 				boost::shared_ptr<const FreeDRTArea> _area;
 			//@}
 
@@ -85,7 +86,10 @@ namespace synthese
 			///	@author Hugues Romain
 			///	@date 2011
 			FreeDRTAreaAdmin();
-			
+
+
+			virtual PageLinks _getCurrentTreeBranch() const;
+
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.

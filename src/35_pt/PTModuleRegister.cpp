@@ -31,6 +31,7 @@
 #include "StopsShapeFileFormat.hpp"
 
 #include "DestinationTableSync.hpp"
+#include "FreeDRTAreaTableSync.hpp"
 #include "PTUseRuleTableSync.h"
 #include "ContinuousServiceTableSync.h"
 #include "ScheduledServiceTableSync.h"
@@ -54,10 +55,7 @@
 #include "DestinationsAdmin.hpp"
 #include "FareAdmin.h"
 #include "FaresAdmin.h"
-#include "FreeDRTArea.hpp"
 #include "FreeDRTAreaAdmin.hpp"
-#include "FreeDRTAreaTableSync.hpp"
-#include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTTimeSlot.hpp"
 #include "FreeDRTTimeSlotAdmin.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
@@ -208,6 +206,8 @@ void synthese::pt::moduleRegister()
 
 	synthese::pt::DestinationAdmin::integrate();
 	synthese::pt::DestinationsAdmin::integrate();
+	synthese::pt::FreeDRTAreaAdmin::integrate();
+	synthese::pt::FreeDRTTimeSlotAdmin::integrate();
 	synthese::pt::PTQualityControlAdmin::integrate();
 	synthese::pt::ServiceAdmin::integrate();
 	synthese::pt::TransportNetworkAdmin::integrate();

@@ -53,6 +53,7 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_TIME_SLOT_ID;
+			static const std::string PARAMETER_AREA_ID;
 			static const std::string PARAMETER_SERVICE_NUMBER;
 			static const std::string PARAMETER_FIRST_DEPARTURE;
 			static const std::string PARAMETER_LAST_ARRIVAL;
@@ -63,6 +64,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<FreeDRTTimeSlot> _timeSlot;
+			boost::shared_ptr<FreeDRTArea> _area;
 			boost::optional<std::string> _serviceNumber;
 			boost::optional<boost::posix_time::time_duration> _firstDeparture;
 			boost::optional<boost::posix_time::time_duration> _lastArrival;
@@ -103,7 +105,8 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setTimeSlot(boost::shared_ptr<FreeDRTTimeSlot> value) { _timeSlot = value; }
+				void setTimeSlot(boost::shared_ptr<FreeDRTTimeSlot> value){ _timeSlot = value; }
+				void setArea(boost::shared_ptr<FreeDRTArea> value){ _area = value; }
 			//@}
 		};
 	}

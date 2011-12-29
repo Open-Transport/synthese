@@ -55,12 +55,14 @@ namespace synthese
 			static const std::string PARAMETER_AREA_ID;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_CITIES;
+			static const std::string PARAMETER_STOP_AREAS;
 			static const std::string PARAMETER_COMMERCIAL_LINE_ID;
 
 		private:
 			boost::shared_ptr<FreeDRTArea> _area;
 			boost::optional<std::string> _name;
 			boost::optional<FreeDRTArea::Cities> _cities;
+			boost::optional<FreeDRTArea::StopAreas> _stopAreas;
 			boost::optional<boost::shared_ptr<CommercialLine> > _line;
 
 		protected:
@@ -96,6 +98,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setArea(boost::shared_ptr<FreeDRTArea> value) { _area = value; }
+				void setLine(boost::optional<boost::shared_ptr<CommercialLine> > value) { _line = value; }
 			//@}
 		};
 	}

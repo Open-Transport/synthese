@@ -142,10 +142,10 @@ namespace synthese
 			object->setMaxCapacity(rows->getOptionalUnsignedInt(FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY));
 
 			// Commercial speed
-			object->setCommercialSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED));
+			object->setCommercialSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(rows->getText(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED)));
 
 			// Max speed
-			object->setMaxSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(FreeDRTTimeSlotTableSync::COL_MAX_SPEED));
+			object->setMaxSpeed(lexical_cast<FreeDRTTimeSlot::KMHSpeed>(rows->getText(FreeDRTTimeSlotTableSync::COL_MAX_SPEED)));
 
 			// Use rules
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
