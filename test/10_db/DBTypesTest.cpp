@@ -276,6 +276,7 @@ void testTypes(const TestBackend& testBackend)
 			DBModule::SetConnectionString(testBackend.getConnectionString());
 
 			ScopedModule<DBModule> scopedDBModule;
+			CoordinatesSystem::SetDefaultCoordinatesSystems(4326); // WGS84
 
 			BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestTypesTableSync>::TABLE.CreatedTable);
 			BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestTypesTableSync>::TABLE.MigratedSchema);
@@ -309,9 +310,10 @@ void testTypes(const TestBackend& testBackend)
 
 			cout << "____Loading table t100_testtypes again" << endl;
 			DBModule::SetConnectionString(testBackend.getConnectionString());
-
+			
 			ModuleClassTemplate<DBModule>::PreInit();
 			ModuleClassTemplate<DBModule>::Init();
+			CoordinatesSystem::SetDefaultCoordinatesSystems(4326); // WGS84
 
 			BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestTypesTableSync>::TABLE.CreatedTable);
 			BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestTypesTableSync>::TABLE.MigratedSchema);
