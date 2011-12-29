@@ -51,6 +51,7 @@ namespace synthese
 		const string GetMessagesFunction::PARAMETER_BEST_PRIORITY_ONLY("b");
 		const string GetMessagesFunction::PARAMETER_PRIORITY_ORDER("o");
 		const string GetMessagesFunction::PARAMETER_DATE("d");
+		const string GetMessagesFunction::PARAMETER_END_DATE = "end_date";
 		const string GetMessagesFunction::PARAMETER_CMS_TEMPLATE_ID("t");
 		const string GetMessagesFunction::PARAMETER_OUTPUT_FORMAT("of");
 
@@ -60,6 +61,8 @@ namespace synthese
 
 		const string GetMessagesFunction::FORMAT_JSON("json");
 		const string GetMessagesFunction::FORMAT_XML("xml");
+
+
 
 		ParametersMap GetMessagesFunction::_getParametersMap() const
 		{
@@ -75,10 +78,19 @@ namespace synthese
 			{
 				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
 			}
+
+			// Date
 			if(!_date.is_not_a_date_time())
 			{
 				map.insert(PARAMETER_DATE, _date);
 			}
+
+			// End date
+			if(!_endDate.is_not_a_date_time() && _endDate != _date)
+			{
+				map.insert(PARAMETER_END_DATE, _endDate);
+			}
+
 
 			// Output format
 			if(!_outputFormat.empty())
@@ -111,6 +123,16 @@ namespace synthese
 				_date = second_clock::local_time();
 			}
 
+			// End date
+			if(!map.getDefault<string>(PARAMETER_END_DATE).empty())
+			{
+				_endDate = time_from_string(map.get<string>(PARAMETER_END_DATE));
+			}
+			else
+			{
+				_endDate = _date;
+			}
+
 			// CMS template
 			try
 			{
@@ -124,12 +146,6 @@ namespace synthese
 			{
 				throw RequestException("No such CMS template : "+ e.getMessage());
 			}
-
-			// Cleaning of template parameters for non CMS output
-			if(!_cmsTemplate.get())
-			{
-				_templateParameters.clear();
-			}
 		}
 
 
@@ -139,16 +155,16 @@ namespace synthese
 			const Request& request
 		) const {
 
-			ParametersMap pm(getTemplateParameters());
+			ParametersMap pm;
 
 			GetMessages(
 				pm,
-				getTemplateParameters(),
 				_recipientId,
 				_maxMessagesNumber,
 				_bestPriorityOnly,
 				_priorityOrder,
-				_date
+				_date,
+				_endDate
 			);
 
 			if(_cmsTemplate.get())
@@ -156,7 +172,13 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
 				{
+					// Template parameters
+					pmMessage->merge(getTemplateParameters());
+
+					// Rank
 					pmMessage->insert(DATA_RANK, rank++);
+
+					// Display
 					_cmsTemplate->display(stream, request, *pmMessage);
 				}
 			}
@@ -235,12 +257,12 @@ namespace synthese
 
 		void GetMessagesFunction::GetMessages(
 			util::ParametersMap& pm,
-			const ParametersMap& templateParameters,
 			util::RegistryKeyType recipientId,
 			boost::optional<std::size_t> maxMessagesNumber,
 			bool bestPriorityOnly,
 			bool priorityOrder,
-			boost::posix_time::ptime date
+			ptime date,
+			ptime endDate
 		){
 			MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(recipientId));
 			size_t number(0);
@@ -250,7 +272,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 				{
-					if(!it->getScenario()->isApplicable(date))
+					if(!it->getScenario()->isApplicable(date, endDate))
 					{
 						continue;
 					}
@@ -264,7 +286,7 @@ namespace synthese
 					}
 					bestPriority = it->getLevel();
 
-					shared_ptr<ParametersMap> messagePM(new ParametersMap(templateParameters));
+					shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					it->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 
@@ -275,7 +297,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 				{
-					if(!it->getScenario()->isApplicable(date))
+					if(it->getScenario()->isApplicable(date, endDate))
 					{
 						bestPriority = it->getLevel();
 						break;
@@ -283,7 +305,7 @@ namespace synthese
 				}
 				BOOST_REVERSE_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 				{
-					if(!it->getScenario()->isApplicable(date))
+					if(!it->getScenario()->isApplicable(date, endDate))
 					{
 						continue;
 					}
@@ -295,7 +317,7 @@ namespace synthese
 					{
 						continue;
 					}
-					shared_ptr<ParametersMap> messagePM(new ParametersMap(templateParameters));
+					shared_ptr<ParametersMap> messagePM(new ParametersMap);
 					it->toParametersMap(*messagePM, true);
 					pm.insert(DATA_MESSAGE, messagePM);
 					++number;
