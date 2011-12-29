@@ -138,6 +138,7 @@ namespace synthese
 			static const std::string PARAMETER_LINE_MARKER_PAGE;
 			static const std::string PARAMETER_BOARD_PAGE;
 			static const std::string PARAMETER_WARNING_PAGE;
+			static const std::string PARAMETER_WARNING_CHECK_PAGE;
 			static const std::string PARAMETER_RESERVATION_PAGE;
 			static const std::string PARAMETER_DURATION_PAGE;
 			static const std::string PARAMETER_TEXT_DURATION_PAGE;
@@ -163,6 +164,9 @@ namespace synthese
 			static const std::string DATA_SOLUTIONS_NUMBER;
 			static const std::string DATA_MAPS_LINES;
 			static const std::string DATA_MAPS;
+			static const std::string DATA_FILTERED_JOURNEYS;
+			static const std::string DATA_MAX_WARNING_LEVEL_ON_STOP;
+			static const std::string DATA_MAX_WARNING_LEVEL_ON_LINE;
 
 			//! @name Cells
 			//@{
@@ -189,6 +193,8 @@ namespace synthese
 			static const std::string DATA_PLACE_NAME;
 			//@}
 
+			static const std::string DATA_LINE_ID;
+			static const std::string DATA_STOP_ID;
 			static const std::string DATA_INTERNAL_DATE;
 			static const std::string DATA_IS_HOME;
 			static const std::string DATA_ORIGIN_CITY_TEXT;
@@ -231,9 +237,11 @@ namespace synthese
 				static const std::string DATA_CO2_EMISSIONS;
 				static const std::string DATA_ENERGY_CONSUMPTION;
 				static const std::string DATA_TICKETS;
-					static const std::string DATA_TICKET_NAME;
-					static const std::string DATA_TICKET_PRICE;
-					static const std::string DATA_TICKET_CURRENCY;
+				static const std::string DATA_TICKET_NAME;
+				static const std::string DATA_TICKET_PRICE;
+				static const std::string DATA_TICKET_CURRENCY;
+				static const std::string DATA_START_DATE;
+				static const std::string DATA_END_DATE;
 			//@}
 
 			//! @name Cells
@@ -325,6 +333,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _lineMarkerPage;
 				boost::shared_ptr<const cms::Webpage> _boardPage;
 				boost::shared_ptr<const cms::Webpage> _warningPage;
+				boost::shared_ptr<const cms::Webpage> _warningCheckPage;
 				boost::shared_ptr<const cms::Webpage> _reservationPage;
 				boost::shared_ptr<const cms::Webpage> _durationPage;
 				boost::shared_ptr<const cms::Webpage> _textDurationPage;
@@ -441,7 +450,8 @@ namespace synthese
 				const geography::Place* originPlace,
 				const geography::Place* destinationPlace,
 				const pt_website::HourPeriod* period,
-				const graph::AccessParameters& accessParameters
+				const graph::AccessParameters& accessParameters,
+				bool filteredJourneys
 			) const;
 
 		private:
@@ -524,7 +534,26 @@ namespace synthese
 			///	@param request current request
 			///	@param columnNumber Column rank from left to right
 			///	@param journey The journey to describe
+			/// @pre _linesRowPage is not null
 			void _displayLinesCell(
+				std::ostream& stream,
+				const server::Request& request,
+				std::size_t columnNumber,
+				const graph::Journey& journey
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of schedule sheet lines warning cell.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Warning-cell
+			//////////////////////////////////////////////////////////////////////////
+			///	@param stream Stream to write on
+			///	@param request current request
+			///	@param columnNumber Column rank from left to right
+			///	@param journey The journey to describe
+			/// @pre _warningPage is not null
+			void _displayWarningCell(
 				std::ostream& stream,
 				const server::Request& request,
 				std::size_t columnNumber,
