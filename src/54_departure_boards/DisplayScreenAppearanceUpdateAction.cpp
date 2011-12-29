@@ -133,7 +133,7 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<DisplayScreen>& e)
 			{
-				throw ActionException("Specified display screen "+ Conversion::ToString(id) +" not found in "+ FACTORY_KEY + e.getMessage());
+				throw ActionException("Specified display screen "+ lexical_cast<string>(id) +" not found in "+ FACTORY_KEY + e.getMessage());
 			}
 		}
 

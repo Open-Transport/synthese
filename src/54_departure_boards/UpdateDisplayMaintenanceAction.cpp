@@ -78,8 +78,8 @@ namespace synthese
 				*_displayScreen,
 				*request.getUser(),
 				"Etat en ligne de l'afficheur",
-				Conversion::ToString(_displayScreen->getIsOnline()),
-				Conversion::ToString(_online),
+				lexical_cast<string>(_displayScreen->getIsOnline()),
+				lexical_cast<string>(_online),
 				_online ? DBLogEntry::DB_LOG_INFO : DBLogEntry::DB_LOG_WARNING
 			);
 			_displayScreen->setMaintenanceIsOnline(_online);

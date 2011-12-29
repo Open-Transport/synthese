@@ -31,7 +31,6 @@
 #include "Request.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "Conversion.h"
 
 using namespace std;
 using namespace boost;
@@ -102,7 +101,7 @@ namespace synthese
 		) const {
 			return
 				_place.get() ?
-				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, Conversion::ToString(_place->getKey())) :
+				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_place->getKey())) :
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
 		}
