@@ -24,7 +24,6 @@
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
 
-#include "PlainCharFilter.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "City.h"
