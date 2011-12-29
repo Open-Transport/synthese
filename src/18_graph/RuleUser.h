@@ -30,6 +30,8 @@
 #include "GraphTypes.h"
 #include "GraphConstants.h"
 
+#include <vector>
+
 namespace synthese
 {
 	namespace graph

@@ -266,7 +266,7 @@ MapInfoRenderer::renderPhysicalStops (Map& map)
 	const DrawablePhysicalStop* dps = *it;
 
 	std::string href (_urlPattern);
-	boost::replace_all (href, "$id", Conversion::ToString (dps->getPhysicalStopId ()));
+	boost::replace_all (href, "$id", lexical_cast<sttring>(dps->getPhysicalStopId ()));
 
 	_output << "<area href='" << href << "' shape='circle' coords='";
 	_output << dps->getPoint ().x  << ","

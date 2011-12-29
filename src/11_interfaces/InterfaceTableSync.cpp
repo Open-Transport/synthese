@@ -20,8 +20,6 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "Conversion.h"
-
 #include "DBResult.hpp"
 #include "ReplaceQuery.h"
 #include "InterfaceTableSync.h"
@@ -159,9 +157,9 @@ namespace synthese
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 
 			if (number)
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 			if (first)
-				query << " OFFSET " << Conversion::ToString(*first);
+				query << " OFFSET " << *first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}

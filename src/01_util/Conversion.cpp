@@ -32,6 +32,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -40,145 +41,24 @@ namespace synthese
 {
 	namespace util
 	{
-		bool Conversion::ToBool (const std::string& s)
-		{
-			string str(to_lower_copy(s));
-			trim(str);
-			if((ToInt(str) > 0) || (str == "true") || (str == "yes")) return true;
-			return false;
-		}
-
-
-
-
 		boost::logic::tribool
 		Conversion::ToTribool (const std::string& s)
 		{
 			std::string str = boost::to_lower_copy (s);
 			boost::trim (str);
-			if ((str == "true") || (str == "yes") || (ToInt(str)>0)) return true;
+			if ((str == "true") || (str == "yes") || (lexical_cast<int>(str)>0)) return true;
 			if ((str == "false") || (str == "no") || (str == "0")) return false;
 			return boost::logic::indeterminate;
-
 		}
 
 
 
-		int
-		Conversion::ToInt (const std::string& s)
-		{
-			return atoi (s.c_str ());
-		}
-
-
-		long
-		Conversion::ToLong (const std::string& s)
-		{
-			return atol (s.c_str ());
-		}
-
-
-
-		long long
-		Conversion::ToLongLong (const std::string& s)
-		{
-			long long i = 0;
-			sscanf(s.c_str (), INT64_FORMAT, &i);
-			return i;
-		}
-
-
-
-		double
-		Conversion::ToDouble (const std::string& s)
-		{
-			return atof (s.c_str ());
-		}
-
-
-
-		std::string
-		Conversion::ToString (int i)
-		{
-			std::stringstream ss;
-			ss << i;
-			return ss.str ();
-		}
-
-
-		std::string
-		Conversion::ToString (long long l)
-		{
-			std::stringstream ss;
-			ss << l;
-			return ss.str ();
-		}
-
-
-		std::string
-		Conversion::ToString (unsigned long long l)
-		{
-			std::stringstream ss;
-			ss << l;
-			return ss.str ();
-		}
-
-
-
-		std::string
-		Conversion::ToString (unsigned int i)
-		{
-			std::stringstream ss;
-			ss << i;
-			return ss.str ();
-		}
-
-
-
-		std::string
-		Conversion::ToString (long l)
-		{
-			std::stringstream ss;
-			ss << l;
-			return ss.str ();
-		}
-
-		std::string
-		Conversion::ToOctalString (long l)
+		std::string	Conversion::ToOctalString (long l)
 		{
 			std::stringstream ss;
 			ss << std::oct;
 			ss << l;
 			return ss.str ();
-		}
-
-		std::string
-		Conversion::ToString (unsigned long l)
-		{
-			std::stringstream ss;
-			ss << l;
-			return ss.str ();
-		}
-
-
-		std::string
-		Conversion::ToString (double d)
-		{
-			std::stringstream ss;
-			ss << std::fixed << d;
-			return ss.str ();
-		}
-
-
-		std::string
-		Conversion::ToString (const std::string& s)
-		{
-			return s;
-		}
-
-		std::string Conversion::ToString( boost::logic::tribool t )
-		{
-			return (t == true) ? "1" : "0";
 		}
 
 
@@ -220,38 +100,41 @@ namespace synthese
 
 
 
-	    std::string Conversion::ToPrepaddedString (const std::string& s, char padchar, int paddedsize)
+	    std::string Conversion::ToPrepaddedString (const std::string& s, char padchar, size_t paddedsize)
 	    {
-		assert (s.length () <= paddedsize);
-		std::stringstream ss;
-		for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
-		ss << s;
-		return ss.str ();
+			assert (s.length () <= paddedsize);
+			std::stringstream ss;
+			for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+			ss << s;
+			return ss.str ();
 	    }
 
 
-	    std::string Conversion::ToPostpaddedString (const std::string& s, char padchar, int paddedsize)
+
+	    std::string Conversion::ToPostpaddedString (const std::string& s, char padchar, size_t paddedsize)
 	    {
-		assert (s.length () <= paddedsize);
-		std::stringstream ss;
-		ss << s;
-		for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
-		return ss.str ();
+			assert (s.length () <= paddedsize);
+			std::stringstream ss;
+			ss << s;
+			for (size_t i=0; i<(paddedsize - s.length ()); ++i) ss << padchar;
+			return ss.str ();
 	    }
 
 
-	    std::string Conversion::ToTruncatedString (const std::string& s, int size)
+	    std::string Conversion::ToTruncatedString (const std::string& s, size_t size)
 	    {
-		return (s.length () <= size ? s : (s.substr (0, size) + "  (...)"));
+			return (s.length () <= size ? s : (s.substr (0, size) + "  (...)"));
 	    }
 
-		std::string Conversion::ToFixedSizeString( int number, int size )
+
+
+		std::string Conversion::ToFixedSizeString( int number, size_t size )
 		{
 			if (size < 1)
-				return ToString(number);
+				return lexical_cast<string>(number);
 			stringstream s;
 			for (; size; size--)
-				if (number < pow(10.0, size - 1))
+				if (number < pow(10.0, long(size) - 1))
 					s << "0";
 			s << number;
 			return s.str();
@@ -284,5 +167,4 @@ namespace synthese
 			}
 			return ss.str();
 		}
-	}
-}
+}	}

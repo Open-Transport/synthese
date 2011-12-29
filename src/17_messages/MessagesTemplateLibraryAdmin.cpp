@@ -92,7 +92,7 @@ namespace synthese
 				{
 					_folder = TextTemplateTableSync::Get(id, _getEnv());
 				}
-				catch(ObjectNotFoundException<TextTemplate>& e)
+				catch(ObjectNotFoundException<TextTemplate>&)
 				{
 				}
 			}

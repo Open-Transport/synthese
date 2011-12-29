@@ -165,9 +165,9 @@ namespace synthese
 			if (orderByName)
 				query << " ORDER BY " << TABLE_COL_NAME << (raisingOrder ? " ASC" : " DESC");
 			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query << " LIMIT " << (number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
 			return LoadFromQuery(query.str(), env, linkLevel);
 

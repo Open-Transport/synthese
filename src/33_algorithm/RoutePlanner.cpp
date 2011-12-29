@@ -83,7 +83,7 @@ namespace synthese
 			_logStream(logStream),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
-				destinationVam.getCentroid()->distance(originVam.getCentroid().get()) :
+				int(destinationVam.getCentroid()->distance(originVam.getCentroid().get())) :
 				numeric_limits<int>::max()
 			),
 			_journeyTemplates(journeyTemplates),

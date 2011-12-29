@@ -73,7 +73,7 @@ namespace synthese
 
 			std::string typeStr (GetStringAttr (node, "connectionType"));
 
-			bool type(Conversion::ToBool(typeStr));
+			bool type(lexical_cast<bool>(typeStr));
 
 			posix_time::time_duration defaultTransferDelay(posix_time::minutes(GetIntAttr(
 					node,

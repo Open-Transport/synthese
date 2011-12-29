@@ -24,13 +24,12 @@
 
 #include <string>
 
-#include "01_util/Conversion.h"
-
 #include "11_interfaces/Interface.h"
 #include "11_interfaces/ValueElementList.h"
 #include "11_interfaces/InterfacePageException.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
@@ -49,8 +48,8 @@ namespace synthese
 			, const ParametersVector& parameters, interfaces::VariablesMap& variables, const void* object, const server::Request* request) const
 		{
 			string text = _string->getValue(parameters, variables, object, request);
-			int start = Conversion::ToInt(_start->getValue(parameters, variables, object, request));
-			int length = Conversion::ToInt(_length->getValue(parameters, variables, object, request));
+			int start = lexical_cast<int>(_start->getValue(parameters, variables, object, request));
+			int length = lexical_cast<int>(_length->getValue(parameters, variables, object, request));
 
 			stream << text.substr(start, length);
 			return string();

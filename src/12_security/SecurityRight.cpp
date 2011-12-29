@@ -21,9 +21,6 @@
 */
 
 #include "SecurityRight.h"
-
-#include "Conversion.h"
-
 #include "SecurityModule.h"
 #include "SecurityConstants.hpp"
 #include "Profile.h"
@@ -63,10 +60,12 @@ namespace synthese
 			if (_parameter == GLOBAL_PERIMETER)
 				return "(tous profils)";
 
-			return (env.getRegistry<Profile>().contains(Conversion::ToLongLong(_parameter)))
-				? env.getRegistry<Profile>().get(Conversion::ToLongLong(_parameter))->getName()
-				: "(invalide)";
+			return env.getRegistry<Profile>().contains(lexical_cast<RegistryKeyType>(_parameter)) ?
+				env.getRegistry<Profile>().get(lexical_cast<RegistryKeyType>(_parameter))->getName() :
+				"(invalide)";
 		}
+
+
 
 		bool SecurityRight::perimeterIncludes(
 			const std::string& perimeter,
@@ -79,11 +78,11 @@ namespace synthese
 
 			const Registry<Profile>& registry(env.getRegistry<Profile>());
 
-			if (registry.contains(Conversion::ToLongLong(_parameter))
-				&& registry.contains(Conversion::ToLongLong(perimeter))
+			if (registry.contains(lexical_cast<RegistryKeyType>(_parameter))
+				&& registry.contains(lexical_cast<RegistryKeyType>(perimeter))
 			){
-				const Profile* currentProfile(registry.get(Conversion::ToLongLong(_parameter)).get());
-				for(const Profile* includedProfile(registry.get(Conversion::ToLongLong(perimeter)).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
+				const Profile* currentProfile(registry.get(lexical_cast<RegistryKeyType>(_parameter)).get());
+				for(const Profile* includedProfile(registry.get(lexical_cast<RegistryKeyType>(perimeter)).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
 				{
 					if (currentProfile == includedProfile)
 					{
@@ -102,7 +101,7 @@ namespace synthese
 		){
 			BOOST_FOREACH(shared_ptr<Profile> profile, SecurityModule::getSubProfiles(parent))
 			{
-				plv.push_back(make_pair(Conversion::ToString(profile->getKey()), prefix + profile->getName()));
+				plv.push_back(make_pair(lexical_cast<string>(profile->getKey()), prefix + profile->getName()));
 
 				addSubProfilesLabel(plv, profile, "&nbsp;&nbsp;" + prefix);
 			}

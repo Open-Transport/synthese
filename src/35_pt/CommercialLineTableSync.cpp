@@ -491,19 +491,19 @@ namespace synthese
 
 			for (RightsOfSameClassMap::const_iterator it = rights.begin(); it != rights.end(); ++it)
 			{
-				if (decodeTableId(Conversion::ToLongLong(it->first)) == TransportNetworkTableSync::TABLE.ID)
+				if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == TransportNetworkTableSync::TABLE.ID)
 				{
 					if (it->second->getPublicRightLevel() < neededLevel)
-						forbiddenNetworks.insert(Conversion::ToLongLong(it->first));
+						forbiddenNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
 					else
-						allowedNetworks.insert(Conversion::ToLongLong(it->first));
+						allowedNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
 				}
-				else if (decodeTableId(Conversion::ToLongLong(it->first)) == CommercialLineTableSync::TABLE.ID)
+				else if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == CommercialLineTableSync::TABLE.ID)
 				{
 					if (it->second->getPublicRightLevel() < neededLevel)
-						forbiddenLines.insert(Conversion::ToLongLong(it->first));
+						forbiddenLines.insert(lexical_cast<RegistryKeyType>(it->first));
 					else
-						allowedLines.insert(Conversion::ToLongLong(it->first));
+						allowedLines.insert(lexical_cast<RegistryKeyType>(it->first));
 				}
 			}
 

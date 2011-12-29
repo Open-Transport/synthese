@@ -152,8 +152,8 @@ namespace synthese
 				tokenizer::iterator valueIter = valueTokens.begin();
 
 				// departureRank:arrivalRank:transferDelay
-				RegistryKeyType startStop(Conversion::ToLongLong(*valueIter));
-				RegistryKeyType endStop(Conversion::ToLongLong(*(++valueIter)));
+				RegistryKeyType startStop(lexical_cast<RegistryKeyType>(*valueIter));
+				RegistryKeyType endStop(lexical_cast<RegistryKeyType>(*(++valueIter)));
 				const string delay(*(++valueIter));
 				if(delay == StopAreaTableSync::FORBIDDEN_DELAY_SYMBOL)
 				{

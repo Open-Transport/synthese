@@ -317,7 +317,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForbiddenPlace(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addForbiddenPlace(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
@@ -331,7 +331,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addDisplayedPlace(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addDisplayedPlace(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{
@@ -345,7 +345,7 @@ namespace synthese
 				{
 					try
 					{
-						object->addForcedDestination(StopAreaTableSync::Get(Conversion::ToLongLong(stop), env, linkLevel).get());
+						object->addForcedDestination(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(stop), env, linkLevel).get());
 					}
 					catch (ObjectNotFoundException<StopArea>& e)
 					{

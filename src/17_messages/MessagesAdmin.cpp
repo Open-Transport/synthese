@@ -283,7 +283,7 @@ namespace synthese
 				{
 					rowColorCSS = CSS_ALARM_DISPLAYED_WITH_END_DATE;
 				}
-				stream << t1.row(Conversion::ToString(message->getKey()), rowColorCSS);
+				stream << t1.row(lexical_cast<string>(message->getKey()), rowColorCSS);
 
 				// Dates
 				stream << t1.col();

@@ -26,6 +26,7 @@
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
 #include "Log.h"
+#include "Conversion.h"
 #include "101_sqlite/SQLiteDB.h"
 #include "101_sqlite/SQLiteException.hpp"
 #include "101_sqlite/SQLiteResult.hpp"

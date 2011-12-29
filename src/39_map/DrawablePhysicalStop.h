@@ -55,7 +55,7 @@ public:
 
 private:
 
-    const int _physicalStopId;
+	const long long _physicalStopId;
     const std::string _name;
 	geos::geom::Coordinate _point;
 

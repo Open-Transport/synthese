@@ -56,7 +56,7 @@ namespace synthese
 		) const {
 			shared_ptr<const User> user(request->getUser());
 			if (user)
-				stream << Conversion::ToString(user->getKey());
+				stream << user->getKey();
 
 			return string();
 		}

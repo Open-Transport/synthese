@@ -56,12 +56,21 @@ namespace synthese
 		const string UpdateAlarmMessagesFromTemplateAction::PARAMETER_TEMPLATE_ID(Action_PARAMETER_PREFIX + "ti");
 
 
+
 		ParametersMap UpdateAlarmMessagesFromTemplateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if (_message.get() != NULL) map.insert(PARAMETER_ALARM_ID, _message.get());
+
+			// Alarm
+			if (_message.get())
+			{
+				map.insert(PARAMETER_ALARM_ID, _message->getKey());
+			}
+
 			return map;
 		}
+
+
 
 		void UpdateAlarmMessagesFromTemplateAction::_setFromParametersMap(const ParametersMap& map
 		) throw(ActionException)
