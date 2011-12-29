@@ -385,13 +385,6 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks AdminInterfaceElement::_getCurrentTreeBranch() const
-		{
-			return PageLinks();
-		}
-
-
-
 		const AdminInterfaceElement::PageLinks& AdminInterfaceElement::getCurrentTreeBranch() const
 		{
 			if(!_theoreticalTreePosition)
