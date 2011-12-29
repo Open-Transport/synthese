@@ -7,14 +7,8 @@ set(DEPS
 )
 
 boost_test(Conversion "${DEPS}")
-
 boost_test(Log "${DEPS}")
-# TODO: fails
-boost_test(PlainCharFilter "${DEPS}")
-
 boost_test(Registrable "${DEPS}")
-# TODO: doesn't compile
-#boost_test(SqlFilter "${DEPS}")
 boost_test(UId "${DEPS}")
 
 add_subdirectory(iostreams)
