@@ -23,72 +23,65 @@
 #ifndef SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 #define SYNTHESE_UTIL_REGISTRYKEYEXCEPTION_H
 
-// Util
-#include "Conversion.h"
 #include "Exception.h"
+#include "UtilTypes.h"
 
 #include <string>
 #include <iostream>
-
+#include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
 	namespace util
 	{
-
-
 		/** Registry key related exception class.
 			Should not be used directly, use Registrable::RegistryKeyException.
-		@ingroup m01Registry m01Exceptions refExceptions
+			@ingroup m01Registry m01Exceptions refExceptions
 		*/
 		template<class T>
-		class RegistryKeyException : public synthese::Exception
+		class RegistryKeyException:
+			public synthese::Exception
 		{
-		 private:
+		private:
 
 			const RegistryKeyType _key; //!< Key
 
-		 public:
+		public:
 
 			RegistryKeyException(
 				const std::string& message,
 				const RegistryKeyType& key
 			);
-			~RegistryKeyException () throw ();
+			~RegistryKeyException() throw();
 
 
 			//! @name Getters/Setters
 			//@{
-			const RegistryKeyType& getKey () const;
+				const RegistryKeyType& getKey() const;
 			//@}
 
 
 			//! @name Query methods.
 			//@{
 			//@}
-
-
-		 private:
-
 		};
+
 
 
 		template<class T>
 		RegistryKeyException<T>::RegistryKeyException(
-			const std::string& message
-			, const RegistryKeyType& key
-		): Exception (message + " : key=" + Conversion::ToString (key))
-			, _key (key)
-		{
-		}
-
+			const std::string& message,
+			const RegistryKeyType& key
+		):	Exception(message + " : key=" + boost::lexical_cast<std::string>(key)),
+			_key(key)
+		{}
 
 
 
 		template<class T>
 		RegistryKeyException<T>::~RegistryKeyException () throw ()
-		{
-		}
+		{}
+
 
 
 		template<class T>
@@ -96,9 +89,6 @@ namespace synthese
 		{
 			return _key;
 		}
+}	}
 
-
-
-	}
-}
 #endif
