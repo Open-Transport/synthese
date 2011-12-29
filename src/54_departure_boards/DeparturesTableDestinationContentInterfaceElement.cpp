@@ -24,7 +24,6 @@
 #include <sstream>
 #include <boost/iostreams/filtering_stream.hpp>
 
-#include "LowerCaseFilter.h"
 #include "PlainCharFilter.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
@@ -152,20 +151,13 @@ namespace synthese
 						&& place->getCity() != __DerniereCommune
 					)
 				){
-					stringstream ss;
-					boost::iostreams::filtering_ostream out;
-					out.push (LowerCaseFilter());
-					out.push (ss);
-
-					out << place->getCity () ->getName() << flush;
-					string cityName (ss.str ());
-
-					if(
-						!cityName.empty()
-						&& cityName[0] >= 'a'
-						&& cityName[0] <= 'z'
-					){
-					    cityName[0] = cityName[0] - 'a' + 'A';
+					string cityName(place->getCity()->getName());
+					if(cityName.size() > 1)
+					{
+						cityName =
+							to_upper_copy(cityName.substr(0, 1)) +
+							to_lower_copy(cityName.substr(1)
+						;
 					}
 					stream << __AvantCommune << cityName << __ApresCommune;
 
