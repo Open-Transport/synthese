@@ -60,7 +60,7 @@ namespace synthese
 		template<class T>
 		AdminInterfaceElement::PageLinks synthese::admin::AdminInterfaceElementTemplate<T>::_getCurrentTreeBranch() const
 		{
-			PageLinks links;
+			AdminInterfaceElement::PageLinks links;
 			links.push_back(getNewCopiedPage());
 			return links;
 		}
