@@ -1,7 +1,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ///	DataSource class header.
 ///	@file DataSource.h
-///	@author Hugues Romain (RCS)
+///	@author Hugues Romain
 ///	@date sam fév 21 2009
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized
@@ -29,6 +29,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include <vector>
 #include <string>
 #include <boost/foreach.hpp>
 
