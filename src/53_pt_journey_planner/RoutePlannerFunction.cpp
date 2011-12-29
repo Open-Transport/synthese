@@ -72,6 +72,8 @@
 #include "CMSModule.hpp"
 #include "UseRule.h"
 #include "PTUseRule.h"
+#include "MessagesModule.h"
+#include "SentScenario.h"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -104,6 +106,7 @@ namespace synthese
 	using namespace resa;
 	using namespace html;
 	using namespace cms;
+	using namespace messages;
 
 	template<> const string util::FactorableTemplate<pt_journey_planner::RoutePlannerFunction::_FunctionWithSite,pt_journey_planner::RoutePlannerFunction>::FACTORY_KEY("rp");
 
@@ -140,6 +143,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_LINE_MARKER_PAGE("line_marker_page");
 		const string RoutePlannerFunction::PARAMETER_BOARD_PAGE("board_page");
 		const string RoutePlannerFunction::PARAMETER_WARNING_PAGE("warning_page");
+		const string RoutePlannerFunction::PARAMETER_WARNING_CHECK_PAGE = "warning_check_page";
 		const string RoutePlannerFunction::PARAMETER_RESERVATION_PAGE("reservation_page");
 		const string RoutePlannerFunction::PARAMETER_DURATION_PAGE("duration_page");
 		const string RoutePlannerFunction::PARAMETER_TEXT_DURATION_PAGE("text_duration_page");
@@ -166,7 +170,10 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_RESERVATIONS("reservations");
 		const string RoutePlannerFunction::DATA_BOARDS("boards");
 		const string RoutePlannerFunction::DATA_MAPS_LINES("maps_lines");
-		const string RoutePlannerFunction::DATA_MAPS("maps");
+		const string RoutePlannerFunction::DATA_MAPS = "maps";
+		const string RoutePlannerFunction::DATA_FILTERED_JOURNEYS = "filtered_journeys";
+		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_STOP = "max_warning_level_on_stop";
+		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_LINE = "max_warning_level_on_line";
 
 		const string RoutePlannerFunction::DATA_INTERNAL_DATE("internal_date");
 		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
@@ -192,8 +199,10 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_IS_DESTINATION_ROW("is_destination_row");
 		const string RoutePlannerFunction::DATA_PLACE_NAME("place_name");
 
-		const string RoutePlannerFunction::DATA_IS_FIRST_ROW("is_first_row");
-		const string RoutePlannerFunction::DATA_IS_LAST_ROW("is_last_row");
+		const string RoutePlannerFunction::DATA_LINE_ID = "line_id";
+		const string RoutePlannerFunction::DATA_STOP_ID = "stop_id";
+		const string RoutePlannerFunction::DATA_IS_FIRST_ROW = "is_first_row";
+		const string RoutePlannerFunction::DATA_IS_LAST_ROW = "is_last_row";
 		const string RoutePlannerFunction::DATA_COLUMN_NUMBER("column_number");
 		const string RoutePlannerFunction::DATA_IS_FOOT("is_foot");
 		const string RoutePlannerFunction::DATA_FIRST_TIME("first_time");
@@ -206,6 +215,8 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_CONTENT("content");
 		const string RoutePlannerFunction::DATA_RANK("rank");
 
+		const string RoutePlannerFunction::DATA_START_DATE = "start_date";
+		const string RoutePlannerFunction::DATA_END_DATE = "end_date";
 		const string RoutePlannerFunction::DATA_IS_THE_LAST_JOURNEY_BOARD("is_the_last_journey_board");
 		const string RoutePlannerFunction::DATA_DEPARTURE_TIME("departure_time");
 		const string RoutePlannerFunction::DATA_DEPARTURE_DATE("departure_date");
@@ -279,6 +290,14 @@ namespace synthese
 			{
 				map.insert(PARAMETER_MAX_TRANSFER_DURATION, _maxTransferDuration->total_seconds() / 60);
 			}
+			if(_minMaxDurationRatioFilter)
+			{
+				map.insert(PARAMETER_MIN_MAX_DURATION_RATIO_FILTER, *_minMaxDurationRatioFilter);
+			}
+			if(_warningCheckPage.get())
+			{
+				map.insert(PARAMETER_WARNING_CHECK_PAGE, _warningCheckPage->getKey());
+			}
 			return map;
 		}
 
@@ -302,6 +321,12 @@ namespace synthese
 				_maxTransferDuration = minutes(map.get<int>(PARAMETER_MAX_TRANSFER_DURATION));
 			}
 
+			// Min max duration filter
+			if(map.getDefault<double>(PARAMETER_MIN_MAX_DURATION_RATIO_FILTER, 0) > 0)
+			{
+				_minMaxDurationRatioFilter = map.get<double>(PARAMETER_MIN_MAX_DURATION_RATIO_FILTER);
+			}
+
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
 //			if (favoriteId) // 2b
@@ -321,10 +346,10 @@ namespace synthese
 //			}
 //			else // 2a
 			{
-				_originCityText = CMSModule::Trim(map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT));
-				_destinationCityText = CMSModule::Trim(map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT));
-				_originPlaceText = CMSModule::Trim(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
-				_destinationPlaceText = CMSModule::Trim(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
+				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
+				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
+				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
+				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
 				if(	_originCityText.empty() && _originPlaceText.empty() ||
 					_destinationCityText.empty() && _destinationPlaceText.empty()
 				){
@@ -784,6 +809,8 @@ namespace synthese
 			{
 				throw RequestException("No such map service page : "+ e.getMessage());
 			}
+
+			// Map junction page
 			try
 			{
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAP_JUNCTION_PAGE));
@@ -797,6 +824,19 @@ namespace synthese
 				throw RequestException("No such map junction page : "+ e.getMessage());
 			}
 
+			// Warning check page
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_WARNING_CHECK_PAGE));
+				if(id)
+				{
+					_warningCheckPage = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such warning check page : "+ e.getMessage());
+			}
 		}
 
 
@@ -845,6 +885,7 @@ namespace synthese
 			}
 
 			// Min max duration filter
+			bool filteredJourneys(false);
 			if(_minMaxDurationRatioFilter)
 			{
 				// Min duration
@@ -859,12 +900,15 @@ namespace synthese
 
 				// Filter
 				vector<PTRoutePlannerResult::Journeys::iterator> toRemove;
-				for(PTRoutePlannerResult::Journeys::iterator itJourney(result.getJourneys().begin()); itJourney != result.getJourneys().end(); ++itJourney)
-				{
+				for(PTRoutePlannerResult::Journeys::iterator itJourney(result.getJourneys().begin());
+					itJourney != result.getJourneys().end() && itJourney+1 != result.getJourneys().end();
+					++itJourney
+				){
 					const Journey& journey(*itJourney);
 					if(journey.getDuration().total_seconds() / minDuration.total_seconds() < *_minMaxDurationRatioFilter)
 					{
 						toRemove.push_back(itJourney);
+						filteredJourneys = true;
 					}
 				}
 				BOOST_FOREACH(PTRoutePlannerResult::Journeys::iterator& itToRemove, toRemove)
@@ -886,7 +930,8 @@ namespace synthese
 					_departure_place.placeResult.value.get(),
 					_arrival_place.placeResult.value.get(),
 					_period,
-					_accessParameters
+					_accessParameters,
+					filteredJourneys
 				);
 			}
 			else if(_outputFormat == VALUE_ADMIN_HTML)
@@ -1825,7 +1870,8 @@ namespace synthese
 			const geography::Place* originPlace,
 			const geography::Place* destinationPlace,
 			const pt_website::HourPeriod* period,
-			const graph::AccessParameters& accessParameters
+			const graph::AccessParameters& accessParameters,
+			bool filteredJourneys
 		) const	{
 			ParametersMap pm(getTemplateParameters());
 
@@ -1853,6 +1899,7 @@ namespace synthese
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
 			pm.insert(DATA_PERIOD_ID, periodId);
+			pm.insert(DATA_FILTERED_JOURNEYS, filteredJourneys);
 
 			// Text formatted date
 			if(_dateTimePage.get())
@@ -2064,7 +2111,7 @@ namespace synthese
 			if(_linesRowPage.get())
 			{
 				stringstream linesRow;
-				size_t n = 1;
+				size_t n(1);
 				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
 				{
 					_displayLinesCell(
@@ -2123,10 +2170,92 @@ namespace synthese
 			{
 				stringstream warnings;
 
-				/// @todo warnings
+				size_t n(1);
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+				{
+					_displayWarningCell(
+						warnings,
+						request,
+						n,
+						journey
+					);
+					++n;
+				}
 
 				pm.insert(DATA_WARNINGS, warnings.str());
 			}
+
+			// Warning levels
+			AlarmLevel minLineLevel(ALARM_LEVEL_NO_ALARM);
+			AlarmLevel minStopLevel(ALARM_LEVEL_NO_ALARM);
+			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+			{
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
+				{
+					// Line
+					const JourneyPattern* journeyPattern(
+						dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
+					);
+					if(	journeyPattern
+					){
+						MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(journeyPattern->getCommercialLine()->getKey()));
+						BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+						{
+							if(it->getScenario()->isApplicable(leg.getDepartureDateTime(), leg.getArrivalDateTime()))
+							{
+								if(it->getLevel() > minLineLevel)
+								{
+									minLineLevel = it->getLevel();
+								}
+								break;
+							}
+						}
+
+						// Departure stop
+						const StopArea* departureStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getDepartureEdge()->getFromVertex()->getHub()
+						)	);
+						if(departureStopArea)
+						{
+							MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(departureStopArea->getKey()));
+							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+							{
+								if(it->getScenario()->isApplicable(leg.getDepartureDateTime()))
+								{
+									if(it->getLevel() > minStopLevel)
+									{
+										minStopLevel = it->getLevel();
+									}
+									break;
+								}
+							}
+						}
+
+						// Arrival stop
+						const StopArea* arrivalStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getArrivalEdge()->getFromVertex()->getHub()
+						)	);
+						if(arrivalStopArea)
+						{
+							MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(arrivalStopArea->getKey()));
+							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+							{
+								if(it->getScenario()->isApplicable(leg.getArrivalDateTime()))
+								{
+									if(it->getLevel() > minStopLevel)
+									{
+										minStopLevel = it->getLevel();
+									}
+									break;
+								}
+							}
+						}
+					}
+			}	}
+			pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, minLineLevel);
+			pm.insert(DATA_MAX_WARNING_LEVEL_ON_STOP, minStopLevel);
 
 
 			// Durations row
@@ -2371,6 +2500,114 @@ namespace synthese
 			}
 
 			_linesRowPage->display(stream ,request, pm);
+		}
+
+
+
+		void RoutePlannerFunction::_displayWarningCell(
+			std::ostream& stream,
+			const server::Request& request,
+			std::size_t columnNumber,
+			const graph::Journey& journey
+		) const	{
+
+			// Precondition check
+			assert(_warningPage.get());
+
+			// Declarations
+			ParametersMap pm(getTemplateParameters());
+
+			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
+
+			// Content
+			if(_warningCheckPage.get())
+			{
+				// Declarations
+				stringstream content;
+				typedef map<CommercialLine*, pair<ptime, ptime> > Lines;
+				Lines lines;
+				typedef map<const StopArea*, pair<ptime, ptime> > Stops;
+				Stops stops;
+				
+				// Reading of all parts of the journey
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
+				{
+					// Line
+					const JourneyPattern* journeyPattern(
+						dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
+					);
+					if(	journeyPattern
+					){
+						lines.insert(
+							make_pair(
+								journeyPattern->getCommercialLine(),
+								make_pair(leg.getDepartureDateTime(), leg.getArrivalDateTime())
+						)	);
+
+						// Departure stop
+						const StopArea* departureStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getDepartureEdge()->getFromVertex()->getHub()
+						)	);
+						if(departureStopArea)
+						{
+							Stops::iterator it(
+								stops.find(departureStopArea)
+							);
+							if(it == stops.end())
+							{
+								stops.insert(
+									make_pair(
+										departureStopArea,
+										make_pair(leg.getDepartureDateTime(), leg.getDepartureDateTime())	
+								)	);
+							}
+							else
+							{
+								it->second.second = leg.getDepartureDateTime();
+							}
+						}
+
+						// Arrival stop
+						const StopArea* arrivalStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getArrivalEdge()->getFromVertex()->getHub()
+						)	);
+						if(arrivalStopArea)
+						{
+							stops.insert(
+								make_pair(
+									arrivalStopArea,
+									make_pair(leg.getArrivalDateTime(), leg.getArrivalDateTime())
+							)	);
+						}
+					}
+				}
+
+				// Loop on lines
+				BOOST_FOREACH(const Lines::value_type& line, lines)
+				{
+					ParametersMap pm2(getTemplateParameters());
+					pm2.insert(DATA_LINE_ID, line.first->getKey());
+					pm2.insert(DATA_START_DATE, line.second.first);
+					pm2.insert(DATA_END_DATE, line.second.second);
+					_warningCheckPage->display(content, request, pm2);
+				}
+
+				// Loop on stops
+				BOOST_FOREACH(const Stops::value_type& stop, stops)
+				{
+					ParametersMap pm2(getTemplateParameters());
+					pm2.insert(DATA_STOP_ID, stop.first->getKey());
+					pm2.insert(DATA_START_DATE, stop.second.first);
+					pm2.insert(DATA_END_DATE, stop.second.second);
+					_warningCheckPage->display(content, request, pm2);
+				}
+
+				pm.insert(DATA_CONTENT, content.str());
+			}
+
+			_warningPage->display(stream ,request, pm);
 		}
 
 
