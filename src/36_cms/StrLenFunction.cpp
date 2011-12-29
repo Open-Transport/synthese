@@ -25,6 +25,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "StrLenFunction.hpp"
+#include "IConv.hpp"
 
 using namespace std;
 
@@ -49,7 +50,9 @@ namespace synthese
 
 		void StrLenFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_text = map.getDefault<string>(PARAMETER_TEXT);
+			_text = IConv("UTF-8", "CP1252").convert(
+				map.getDefault<string>(PARAMETER_TEXT, string(), false)
+			);
 		}
 
 		void StrLenFunction::run(
@@ -73,5 +76,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}
