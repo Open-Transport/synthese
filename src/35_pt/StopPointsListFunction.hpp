@@ -61,16 +61,20 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,StopPointsListFunction>
 		{
 		public:
-				static const std::string PARAMETER_DATE;
-				static const std::string PARAMETER_LINE_ID;
-				static const std::string PARAMETER_PAGE_ID;
-				static const std::string PARAMETER_BBOX;
-				static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_LINE_ID;
+			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_BBOX;
+			static const std::string PARAMETER_SRID;
 
 		protected:
-				static const std::string DATA_NAME;
-				static const std::string DATA_STOPAREA_NAME;
-				static const std::string DATA_STOPAREA_CITY_NAME;
+			static const std::string TAG_PHYSICAL_STOP;
+			static const std::string TAG_DESTINATION;
+			static const std::string DATA_STOP_AREA_PREFIX;
+
+			static const std::string DATA_STOPAREA_NAME;
+			static const std::string DATA_STOPAREA_CITY_NAME;
+
 			//! \name Page parameters
 			//@{
 				boost::optional<boost::posix_time::ptime> _date;
@@ -106,19 +110,9 @@ namespace synthese
 
 
 
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stops_list#Response
-			//////////////////////////////////////////////////////////////////////////
-			void _display(
-				std::ostream& stream,
-				const server::Request& request,
-				const StopPoint& stop
-			) const;
-
-
 		public:
 			//! @name Setters
 			//@{
-			// void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -166,10 +160,12 @@ namespace synthese
 			/// Add the StopPoint to the stopPoint map
 			/// @author Xavier Raffin
 			/// @date 2011
-			void addStop(StopPointMapType & stopPointMap,
-			const StopPoint & sp,
-			boost::posix_time::ptime & startDateTime,
-			boost::posix_time::ptime & endDateTime)const;
+			void addStop(
+				StopPointMapType & stopPointMap,
+				const StopPoint & sp,
+				boost::posix_time::ptime & startDateTime,
+				boost::posix_time::ptime & endDateTime
+			) const;
 		};
 	}
 }

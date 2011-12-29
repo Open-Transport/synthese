@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace pt
 	{
 		class LineStop;
@@ -57,6 +62,16 @@ namespace synthese
 
 			/// Chosen registry class.
 			typedef util::Registry<StopPoint>	Registry;
+
+		private:
+			static const std::string DATA_ID;
+			static const std::string DATA_NAME;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
+			static const std::string DATA_OPERATOR_CODE;
+
+		public:
+			static const std::string TAG_STOP_AREA;
 
 		private:
 			road::Address _projectedPoint;
@@ -112,6 +127,8 @@ namespace synthese
 				/// Mapped type : arrival / departure
 				typedef std::map<JourneyPattern*, std::pair<bool, bool> > JourneyPatternsMap;
 
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// List of journey patterns calling at the stop
 				/// @param withDepartures returns journey patterns with a departure from the stop
@@ -121,6 +138,18 @@ namespace synthese
 				JourneyPatternsMap getJourneyPatterns(
 					bool withDepartures = true,
 					bool withArrivals = true
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Parameters map output.
+				/// @author Hugues Romain
+				void toParametersMap(
+					util::ParametersMap& pm,
+					bool withStopAreaData = true,
+					const CoordinatesSystem& coordinatesSystem = CoordinatesSystem::GetInstanceCoordinatesSystem(),
+					std::string prefix = std::string()
 				) const;
 			//@}
 		};

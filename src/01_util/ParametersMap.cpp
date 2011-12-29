@@ -79,20 +79,6 @@ namespace synthese
 
 
 
-		template<>
-		string ParametersMap::get(
-			const string& parameterName
-		) const {
-			Map::const_iterator it(_map.find(parameterName));
-			if (it == _map.end())
-			{
-				throw ParametersMap::MissingParameterException(parameterName);
-			}
-			return it->second;
-		}
-
-
-
 		void ParametersMap::insert( const std::string& parameterName, const std::string& value )
 		{
 			_map[parameterName] = value;
@@ -379,12 +365,23 @@ namespace synthese
 
 
 
-		void ParametersMap::merge(const ParametersMap& other)
-		{
+		void ParametersMap::merge(
+			const ParametersMap& other,
+			string prefix
+		){
 			BOOST_FOREACH(ParametersMap::Map::value_type it, other._map)
 			{
-				if(_map.find(it.first) != _map.end()) continue;
-				_map.insert(make_pair(it.first,it.second));
+				// Declaration
+				string key(prefix + it.first);
+
+				// Check if the item already exists
+				if(_map.find(key) != _map.end())
+				{
+					continue;
+				}
+
+				// Insertion of the item in the current map
+				_map.insert(make_pair(key, it.second));
 			}
 		}
 
@@ -448,6 +445,13 @@ namespace synthese
 
 
 
+		std::string ParametersMap::Trim( const std::string& value )
+		{
+			return trim_copy_if(value, is_any_of(" \r\n\t"));
+		}
+
+
+
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),
 			_message("Missing parameter in request parsing : " + _field)
@@ -473,5 +477,4 @@ namespace synthese
 		{
 			return _field;
 		}
-	}
-}
+}	}

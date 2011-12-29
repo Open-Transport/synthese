@@ -49,6 +49,15 @@ namespace synthese
 
 	namespace pt
 	{
+		const string StopPoint::DATA_ID = "id";
+		const string StopPoint::DATA_NAME = "name";
+		const string StopPoint::DATA_OPERATOR_CODE = "operatorCode";
+		const string StopPoint::DATA_X = "x";
+		const string StopPoint::DATA_Y = "y";
+		const string StopPoint::TAG_STOP_AREA = "stopArea";
+
+
+
 		StopPoint::StopPoint(
 			RegistryKeyType id,
 			string name,
@@ -205,5 +214,37 @@ namespace synthese
 
 			// Exit
 			return journeyPatterns;
+		}
+
+
+
+		void StopPoint::toParametersMap(
+			util::ParametersMap& pm,
+			bool withStopAreaData /*= true*/,
+			const CoordinatesSystem& coordinatesSystem /*= CoordinatesSystem::GetInstanceCoordinatesSystem()*/,
+			std::string prefix /*= std::string() */
+		) const	{
+
+			// Main data
+			pm.insert(DATA_ID, getKey());
+			pm.insert(DATA_NAME, getName());
+			pm.insert(DATA_OPERATOR_CODE, getCodeBySources());
+			if(getGeometry().get())
+			{
+				shared_ptr<Point> gp = coordinatesSystem.convertPoint(*getGeometry());
+				if(gp.get())
+				{
+					pm.insert(DATA_X, gp->getX());
+					pm.insert(DATA_Y, gp->getY());
+				}
+			}
+
+			// Stop area data
+			if(withStopAreaData)
+			{
+				shared_ptr<ParametersMap> stopAreaPM;
+				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
+				pm.insert(TAG_STOP_AREA, stopAreaPM);
+			}
 		}
 }	}

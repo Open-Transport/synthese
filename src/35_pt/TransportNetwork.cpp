@@ -21,6 +21,9 @@
 */
 
 #include "TransportNetwork.h"
+#include "ParametersMap.h"
+
+using namespace std;
 
 namespace synthese
 {
@@ -33,6 +36,11 @@ namespace synthese
 
 	namespace pt
 	{
+		const string TransportNetwork::DATA_NETWORK_ID("network_id");
+		const string TransportNetwork::DATA_NAME("name");
+
+
+
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
 			std::string name
@@ -46,4 +54,14 @@ namespace synthese
 
 		TransportNetwork::~TransportNetwork()
 		{}
+
+
+
+		void TransportNetwork::toParametersMap(
+			util::ParametersMap& pm,
+			std::string prefix /*= std::string() */
+		) const	{
+			pm.insert(prefix + DATA_NETWORK_ID, getKey());
+			pm.insert(prefix + DATA_NAME, getName());
+		}
 }	}

@@ -195,14 +195,14 @@ namespace synthese
 			pm.insert(prefix + "id", getKey()); // For StopAreasList and LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_SHORT_NAME, getShortName());
 			pm.insert(prefix + "lineShortName", getShortName()); // For StopAreasList compatibility
-			pm.insert(prefix + "shortName", getShortName()); // For LinesListFunction compatibility
+			pm.insert(prefix + "shortName", getShortName()); // For LinesListFunction/StopPointsListFunction compatibility
 			pm.insert(prefix + DATA_LINE_LONG_NAME, getLongName());
 			pm.insert(prefix + "longName", getLongName()); // For LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_NAME, getName());
 			pm.insert(prefix + "name", getName()); // For LinesListFunction compatibility
 			pm.insert(prefix + DATA_LINE_STYLE, getStyle());
 			pm.insert(prefix + "lineStyle", getStyle()); // For StopAreasList compatibility
-			pm.insert(prefix + "style", getStyle()); // For LinesListFunction compatibility
+			pm.insert(prefix + "style", getStyle()); // For LinesListFunction/StopPointsListFunction compatibility
 			pm.insert(prefix + DATA_LINE_MAP_URL, getMapURL());
 			pm.insert(prefix + DATA_LINE_DOC_URL, getDocURL());
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,

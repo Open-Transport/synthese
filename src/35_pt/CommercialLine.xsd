@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- edited with XMLSpy v2008 rel. 2 sp2 (http://www.altova.com) by Romain Hugues (Réseaux Conseil & Solutions) -->
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" attributeFormDefault="unqualified">
+	<xs:simpleType name="lineId">
+		<xs:annotation>
+			<xs:documentation>Unique id of line (table 42)</xs:documentation>
+		</xs:annotation>
+		<xs:restriction base="xs:long">
+			<xs:minInclusive value="11821949021847553"/>
+			<xs:maxInclusive value="12103423998558207"/>
+		</xs:restriction>
+	</xs:simpleType>
+	<xs:complexType name="LineType">
+		<xs:annotation>
+			<xs:documentation>A line</xs:documentation>
+		</xs:annotation>
+		<xs:attribute name="id" type="lineId" use="required"/>
+		<xs:attribute name="shortName" type="xs:string"/>
+		<xs:attribute name="image" type="xs:string"/>
+		<xs:attribute name="longName" type="xs:string"/>
+		<xs:attribute name="name" type="xs:string"/>
+		<xs:attribute name="style" type="xs:string"/>
+		<xs:attribute name="color" type="xs:string"/>
+	</xs:complexType>
+</xs:schema>

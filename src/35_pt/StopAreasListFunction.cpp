@@ -200,12 +200,6 @@ namespace synthese
 
 			// Output format
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
-
-			// Clean of template parameters for non CMS output
-			if(!_stopPage.get())
-			{
-				_templateParameters.clear();
-			}
 		}
 
 
@@ -213,8 +207,7 @@ namespace synthese
 		StopAreasListFunction::StopAreasListFunction():
 			_coordinatesSystem(NULL),
 			_outputLines(true)
-		{
-		}
+		{}
 
 
 
@@ -277,18 +270,12 @@ namespace synthese
 			}
 
 			// Stops loop
-			ParametersMap pm(getTemplateParameters());
-			size_t stopRank(0);
+			ParametersMap pm;
 			BOOST_FOREACH(StopSet::value_type it, stopSet)
 			{
-				shared_ptr<ParametersMap> stopPm(new ParametersMap(getTemplateParameters()));
+				shared_ptr<ParametersMap> stopPm(new ParametersMap);
 
 				it->toParametersMap(*stopPm, _coordinatesSystem);
-
-				if(_stopPage.get())
-				{
-					stopPm->insert(DATA_STOP_RANK, stopRank++);
-				}
 
 				// Lines calling at the stop
 				if(_outputLines)
@@ -296,7 +283,7 @@ namespace synthese
 					BOOST_FOREACH(const StopArea::Lines::value_type& itLine, it->getLines(false))
 					{
 						// For CMS output
-						shared_ptr<ParametersMap> pmLine(new ParametersMap(getTemplateParameters()));
+						shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
 						itLine->toParametersMap(*pmLine);
 
@@ -324,17 +311,32 @@ namespace synthese
 			}
 			else if(_stopPage.get()) // CMS output
 			{
+				size_t stopRank(0);
+
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmStop, pm.getSubMaps(DATA_STOP_AREA))
 				{
+					// CMS template parameters
+					pmStop->merge(getTemplateParameters());
+
+					// Rank
+					pmStop->insert(DATA_STOP_RANK, stopRank++);
+
+					// Lines
 					if(_linePage.get() && _outputLines && pmStop->hasSubMaps(DATA_LINE))
 					{
 						stringstream lineStream;
 						BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pmStop->getSubMaps(DATA_LINE))
 						{
+							// CMS template parameters
+							pmLine->merge(getTemplateParameters());
+
+							// Display
 							_linePage->display(lineStream, request, *pmLine);
 						}
 						pmStop->insert(DATA_LINES, lineStream.str());
 					}
+
+					// Display
 					_stopPage->display(stream, request, *pmStop);
 				}
 			}
