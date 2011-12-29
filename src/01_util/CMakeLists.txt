@@ -20,7 +20,6 @@ IConv.cpp
 IConv.hpp
 Log.cpp
 Log.h
-LowerCaseFilter.h
 MacAddressGetter.cpp
 MacAddressGetter.h
 MD5.cpp
