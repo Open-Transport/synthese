@@ -51,7 +51,19 @@ namespace synthese
 			boost::shared_ptr<T> getNewCopiedPage() const;
 
 			virtual boost::shared_ptr<AdminInterfaceElement> getNewBaseCopiedPage() const;
+
+			virtual AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
 		};
+
+
+
+		template<class T>
+		AdminInterfaceElement::PageLinks synthese::admin::AdminInterfaceElementTemplate<T>::_getCurrentTreeBranch() const
+		{
+			PageLinks links;
+			links.push_back(getNewCopiedPage());
+			return links;
+		}
 
 
 
