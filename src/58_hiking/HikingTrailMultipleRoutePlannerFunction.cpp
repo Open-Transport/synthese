@@ -146,7 +146,7 @@ namespace synthese
 
 
 			// Ranks
-			_beginningRank = map.get<RegistryKeyType>(PARAMETER_TRAIL_BEGINNING);
+			_beginningRank = map.get<size_t>(PARAMETER_TRAIL_BEGINNING);
 			if(_beginningRank >= _trail->getStops().size())
 			{
 				throw RequestException("Beginning rank is too high");

@@ -147,7 +147,7 @@ namespace synthese
 					dbl->calculateAbsoluteShiftedPoints (shiftedPoints, (_config.getBorderWidth () / 2));
 
 					std::string href (_urlPattern);
-					boost::replace_all (href, "$id", Conversion::ToString (dbl->getLineId ()));
+					boost::replace_all (href, "$id", lexical_cast<string>(dbl->getLineId ()));
 
 					_output << "<area href='" << href << "' shape='poly' coords='";
 					for (size_t i=0; i<points1.size (); ++i)
@@ -192,7 +192,7 @@ namespace synthese
 
 					// HACK : there is no interpoint concept in synthese. so refres gives interpoint id
 					// in metric offset...
-					boost::replace_all (href, "$id", Conversion::ToString(ls->getMetricOffset()));
+					boost::replace_all (href, "$id", lexical_cast<string>(ls->getMetricOffset()));
 					_output << "<area href='" << href << "' shape='poly' coords='";
 
 					_output << (int) points1[i].x << "," << (int) (map.getHeight () - points1[i].y) << ",";
@@ -219,7 +219,7 @@ namespace synthese
 			const DrawablePhysicalStop* dps = *it;
 
 			std::string href (_urlPattern);
-			boost::replace_all (href, "$id", Conversion::ToString (dps->getPhysicalStopId ()));
+			boost::replace_all (href, "$id", lexical_cast<string>(dps->getPhysicalStopId ()));
 
 			_output << "<area href='" << href << "' shape='circle' coords='";
 			_output << dps->getPoint ().x  << ","

@@ -129,7 +129,7 @@ namespace synthese
 				}
 				catch (...)
 				{
-					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+					Log::GetInstance().warn("Reservation rule not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 				}
 
 				try
@@ -144,7 +144,7 @@ namespace synthese
 				}
 				catch (...)
 				{
-					Log::GetInstance().warn("E-Mail interface not found for online reservation rule "+ Conversion::ToString(object->getKey()));
+					Log::GetInstance().warn("E-Mail interface not found for online reservation rule "+ lexical_cast<string>(object->getKey()));
 				}
 
 			}

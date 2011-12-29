@@ -108,7 +108,14 @@ namespace synthese
 
 			DBLogModule::appendToLogIfChange(s, "Nom", _folder->getName(), _name);
 			_folder->setName(_name);
-			DBLogModule::appendToLogIfChange(s, "Répertoire parent", Conversion::ToString(_folder->getParentId()), Conversion::ToString(_parent->getKey()));
+
+			// Parent
+			DBLogModule::appendToLogIfChange(
+				s,
+				"Répertoire parent",
+				lexical_cast<string>(_folder->getParentId()),
+				lexical_cast<string>(_parent->getKey())
+			);
 			_folder->setParentId(_parent.get() ? _parent->getKey() : 0);
 
 			TextTemplateTableSync::Save(_folder.get());

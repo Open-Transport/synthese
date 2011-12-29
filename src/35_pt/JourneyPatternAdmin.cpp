@@ -752,7 +752,7 @@ namespace synthese
 				cols.push_back("D/A");
 				for(int i(0); i<=23; ++i)
 				{
-					cols.push_back(Conversion::ToString(i));
+					cols.push_back(lexical_cast<string>(i));
 				}
 				HTMLTable t(cols, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();

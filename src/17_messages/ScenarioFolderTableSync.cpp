@@ -26,7 +26,7 @@
 
 #include "ScenarioFolderTableSync.h"
 #include "ScenarioFolder.h"
-
+#include "Conversion.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
@@ -193,7 +193,7 @@ namespace synthese
 			;
 			if(parentFolderId)
 			{
-				query << " AND " << COL_PARENT_ID << "=" << Conversion::ToString(*parentFolderId);
+				query << " AND " << COL_PARENT_ID << "=" << *parentFolderId;
 			}
 			if(name)
 			{

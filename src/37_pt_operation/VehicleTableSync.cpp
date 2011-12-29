@@ -303,7 +303,7 @@ namespace synthese
 						CommercialLineTableSync::Get(lexical_cast<RegistryKeyType>(lineId), env, linkLevel).get()
 					);
 				}
-				catch(ObjectNotFoundException<CommercialLine>& e)
+				catch(ObjectNotFoundException<CommercialLine>&)
 				{
 					Log::GetInstance().warn("No such line "+ lexical_cast<string>(lineId));
 				}

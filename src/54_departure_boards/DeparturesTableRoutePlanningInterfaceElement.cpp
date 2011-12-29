@@ -85,11 +85,11 @@ namespace synthese
 		{
 			const RoutePlanningList& ptds(static_cast<const RoutePlanningListWithAlarm*>(object)->map);
 
-			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
-			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
-			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
-			int withtransfer(_withTransfer ? Conversion::ToBool(_withTransfer->getValue(parameters, variables, object, request)) : false);
-			int blinkingDelay(_blinkingDelay? Conversion::ToInt(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
+			int departuresToHide(_departuresToHide ? lexical_cast<int>(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
+			bool displayServiceNumber(_displayServiceNumber ? lexical_cast<bool>(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
+			bool displayQuai(_displayQuai ? lexical_cast<bool>(_displayQuai->getValue(parameters, variables, object, request)) : false);
+			int withtransfer(_withTransfer ? lexical_cast<bool>(_withTransfer->getValue(parameters, variables, object, request)) : false);
+			int blinkingDelay(_blinkingDelay? lexical_cast<int>(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
 			shared_ptr<const StopArea> place(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(_originId->getValue(parameters, variables, object, request)), Env::GetOfficialEnv()));
 			int departuresNumber = ptds.size() - departuresToHide;
 
@@ -119,7 +119,7 @@ namespace synthese
 					sortedRows.insert(make_pair(s.str(), it));
 				}
 			}
-			catch(InterfacePageException& e)
+			catch(InterfacePageException&)
 			{
 				for(RoutePlanningList::const_iterator it = ptds.begin(); departuresNumber && (it != ptds.end()); ++it, --departuresNumber)
 				{

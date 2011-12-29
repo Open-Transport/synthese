@@ -173,9 +173,9 @@ bool orderByStatus, bool orderByConflict, bool raisingOrder, util::LinkLevel lin
 	if (level != ALARM_LEVEL_UNKNOWN)
 		query << " AND a." << COL_LEVEL << "=" << ((int) level);
 	if (number > 0)
-		query << " LIMIT " << Conversion::ToString(number + 1);
+		query << " LIMIT " << (number + 1);
 	if (first > 0)
-		query << " OFFSET " << Conversion::ToString(first);
+		query << " OFFSET " << first;
 
 	try
 	{

@@ -304,7 +304,7 @@ namespace synthese
 			os << "<versionDate>" << to_iso_extended_string(day_clock::local_day()) << "</versionDate>" << "\n";
 			os << "<name>" << tn->getName () << "</name>" << "\n";
 			os << "<registration>" << "\n";
-			os << "<registrationNumber>" << Conversion::ToString (tn->getKey ()) << "</registrationNumber>" << "\n";
+			os << "<registrationNumber>" << tn->getKey() << "</registrationNumber>" << "\n";
 			os << "</registration>" << "\n";
 			os << "<lineId>" << TridentId (peerid, "Line", *_line) << "</lineId>" << "\n";
 			if(!_withTisseoExtension && resaIsCompulsory)
@@ -561,7 +561,7 @@ namespace synthese
 					os << "<routeId>" << TridentId (peerid, "ChouetteRoute", *line.second) << "</routeId>" << "\n";
 				}
 				os << "<registration>" << "\n";
-				os << "<registrationNumber>" << Conversion::ToString (_line->getKey ()) << "</registrationNumber>" << "\n";
+				os << "<registrationNumber>" << _line->getKey() << "</registrationNumber>" << "\n";
 				os << "</registration>" << "\n";
 
 				os << "</Line>" << "\n";
@@ -610,7 +610,9 @@ namespace synthese
 
 				os << "<RouteExtension><wayBack>";
 				if (!logic::indeterminate(line->getWayBack()))
-					os << Conversion::ToString(wayback);
+				{
+					os << wayback;
+				}
 				os << "</wayBack></RouteExtension>" << "\n";
 				os << "</ChouetteRoute>" << "\n";
 			}
@@ -684,7 +686,7 @@ namespace synthese
 						os << "<objectId>" << TridentId (peerid, "PtLink", *from) << "</objectId>" << "\n";
 						os << "<startOfLink>" << TridentId (peerid, "StopPoint", *from) << "</startOfLink>" << "\n";
 						os << "<endOfLink>" << TridentId (peerid, "StopPoint", *to) << "</endOfLink>" << "\n";
-						os << "<linkDistance>" << Conversion::ToString(to->getMetricOffset() - from->getMetricOffset()) << "</linkDistance>" << "\n";   // in meters!
+						os << "<linkDistance>" << (to->getMetricOffset() - from->getMetricOffset()) << "</linkDistance>" << "\n";   // in meters!
 						os << "</PtLink>" << "\n";
 					}
 					from = to;

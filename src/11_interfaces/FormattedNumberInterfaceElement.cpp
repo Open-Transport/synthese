@@ -1,23 +1,23 @@
 
 /** FormattedNumberInterfaceElement class implementation.
-@file FormattedNumberInterfaceElement.cpp
+	@file FormattedNumberInterfaceElement.cpp
 
-This file belongs to the SYNTHESE project (public transportation specialized software)
-Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
 
-This program is free software; you can redistribute it and/or
-modify it under the terms of the GNU General Public License
-as published by the Free Software Foundation; either version 2
-of the License, or (at your option) any later version.
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
 
-This program is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
 
-You should have received a copy of the GNU General Public License
-along with this program; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
 #include "FormattedNumberInterfaceElement.h"
@@ -28,6 +28,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "11_interfaces/StaticValueInterfaceElement.h"
 
 #include "01_util/Conversion.h"
+
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -75,14 +77,14 @@ namespace synthese
 			, interfaces::VariablesMap& variables
 			, const void* object /*= NULL*/, const server::Request* request /*= NULL*/ ) const
 		{
-			int __Nombre = Conversion::ToInt(_numberVIE->getValue(parameters, variables, object, request));
+			int __Nombre = lexical_cast<int>(_numberVIE->getValue(parameters, variables, object, request));
 			if (_numberToAdd != NULL)
 			{
-				__Nombre += Conversion::ToInt(_numberToAdd->getValue(parameters, variables, object, request));
+				__Nombre += lexical_cast<int>(_numberToAdd->getValue(parameters, variables, object, request));
 			}
 			std::string __Format = _formatVIE->getValue(parameters, variables, object, request);
 
-			int numbers = Conversion::ToInt(__Format);
+			int numbers = lexical_cast<int>(__Format);
 			if (numbers > 0)
 			{
 				s << Conversion::ToFixedSizeString(__Nombre, numbers);
@@ -100,5 +102,4 @@ namespace synthese
 			s << __Nombre;
 			return string();
 		}
-	}
-}
+}	}

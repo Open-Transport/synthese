@@ -180,9 +180,9 @@ namespace synthese
 				// eg << TABLE_COL_NAME << " LIKE '%" << Conversion::ToDBString(name, false) << "%'"
 				;
 			if (number > 0)
-				query << " LIMIT " << Conversion::ToString(number + 1);
+				query << " LIMIT " << (number + 1);
 			if (first > 0)
-				query << " OFFSET " << Conversion::ToString(first);
+				query << " OFFSET " << first;
 
 			LoadFromQuery(query.str(), env, linkLevel);
 		}

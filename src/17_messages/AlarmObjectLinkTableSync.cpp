@@ -288,7 +288,7 @@ namespace synthese
 				<< " SELECT *"
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId);
+				<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << alarmId;
 			if (number)
 				query << " LIMIT " << (*number + 1);
 			if (first > 0)

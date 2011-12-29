@@ -90,7 +90,7 @@ namespace synthese
 				// Jump interface elements with parse errors
 				catch (InterfacePageException& e)
 				{
-					Log::GetInstance().warn("Interface page "+ Conversion::ToString(getKey()) +" error on " + line, e);
+					Log::GetInstance().warn("Interface page "+ lexical_cast<string>(getKey()) +" error on " + line, e);
 					continue;
 				}
 

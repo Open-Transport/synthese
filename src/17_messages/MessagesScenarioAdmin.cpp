@@ -246,7 +246,7 @@ namespace synthese
 					messRequest.getPage()->setMessage(alarm);
 					deleteRequest.getAction()->setObjectId(alarm->getKey());
 
-					stream << t.row(Conversion::ToString(alarm->getKey()));
+					stream << t.row(lexical_cast<string>(alarm->getKey()));
 					stream << t.col() << alarm->getShortMessage();
 					stream << t.col() << ""; // Emplacement
 					stream << t.col() << HTMLModule::getLinkButton(messRequest.getURL(), "Ouvrir");

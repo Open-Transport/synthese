@@ -93,12 +93,12 @@ namespace synthese
 			if (dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm).get())
 			{
 				shared_ptr<const AlarmTemplate> alarmTemplate = dynamic_pointer_cast<const AlarmTemplate, const Alarm>(_alarm);
-				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), "Ajout de destinataire " + _recipientKey + " #" + Conversion::ToString(_objectId), request.getUser().get());
+				MessagesLibraryLog::addUpdateEntry(alarmTemplate.get(), "Ajout de destinataire " + _recipientKey + " #" + lexical_cast<string>(_objectId), request.getUser().get());
 			}
 			else
 			{
 				shared_ptr<const SentAlarm> sentAlarm = dynamic_pointer_cast<const SentAlarm, const Alarm>(_alarm);
-				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire à message diffusé " + _recipientKey + " #" + Conversion::ToString(_objectId), request.getUser().get());
+				MessagesLog::addUpdateEntry(sentAlarm.get(), "Ajout de destinataire à message diffusé " + _recipientKey + " #" + lexical_cast<string>(_objectId), request.getUser().get());
 			}
 		}
 

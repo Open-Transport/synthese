@@ -80,8 +80,8 @@ namespace synthese
 		{
 			const ArrivalDepartureRow* __DP = (const ArrivalDepartureRow*) object;
 
-			int firstIntermediatesStops(Conversion::ToInt(_firstIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
-			int numberOfIntermediatesStops(Conversion::ToInt(_numberOfIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
+			int firstIntermediatesStops(lexical_cast<int>(_firstIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
+			int numberOfIntermediatesStops(lexical_cast<int>(_numberOfIntermediatesStopsToDisplayVIE->getValue(parameters, variables, object, request)));
 			bool __AfficherTerminus = !_displayTerminusVIE->isFalse(parameters, variables, object, request);
 			string __TypeAffichage = _displayTypeVIE->getValue(parameters, variables, object, request);
 			string __SeparateurEntreArrets = _stopsSeparatorVIE->getValue(parameters, variables, object, request);
@@ -125,7 +125,7 @@ namespace synthese
 							transferPage->display(transferString, transferServiceUse, localTransferRank++, totalTransferRank++, variables, request);
 						}
 					}
-					catch(InterfacePageException& e)
+					catch(InterfacePageException&)
 					{
 					}
 
@@ -156,7 +156,7 @@ namespace synthese
 					{
 						cityName =
 							to_upper_copy(cityName.substr(0, 1)) +
-							to_lower_copy(cityName.substr(1)
+							to_lower_copy(cityName.substr(1))
 						;
 					}
 					stream << __AvantCommune << cityName << __ApresCommune;

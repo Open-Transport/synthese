@@ -249,14 +249,14 @@ namespace synthese
 			// Rights
 			bool writingRight(searchRequest.isAuthorized<ResaRight>(WRITE,UNKNOWN_RIGHT_LEVEL));
 
-			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(Conversion::ToInt(content[ResaDBLog::COL_TYPE])));
+			ResaDBLog::_EntryType entryType(static_cast<ResaDBLog::_EntryType>(lexical_cast<int>(content[ResaDBLog::COL_TYPE])));
 			shared_ptr<ReservationTransaction> tr;
 			ReservationStatus status(NO_RESERVATION);
 			Env env;
 
-			if (Conversion::ToLongLong(content[ResaDBLog::COL_RESA]) > 0)
+			if (lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]) > 0)
 			{
-				tr = ReservationTransactionTableSync::GetEditable(Conversion::ToLongLong(content[ResaDBLog::COL_RESA]), env);
+				tr = ReservationTransactionTableSync::GetEditable(lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]), env);
 
 				ReservationTableSync::SearchResult reservations(
 					ReservationTableSync::Search(env, tr->getKey())
