@@ -24,6 +24,7 @@
 
 #include "URI.hpp"
 #include "ParametersMap.h"
+#include "Conversion.h"
 
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
