@@ -79,7 +79,7 @@ namespace synthese
 			_text = ot ? *ot : _target->getName();
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 
-			_confirm = map.getDefault<string>(PARAMETER_CONFIRM, false);
+			_confirm = map.getDefault<string>(PARAMETER_CONFIRM, string(), false);
 
 			// Additional parameters
 			_parameters = map;

@@ -62,7 +62,7 @@ namespace synthese
 			try
 			{
 				_login = map.get<string>(PARAMETER_LOGIN);
-				_password = map.get<string>(PARAMETER_PASSWORD);
+				_password = map.get<string>(PARAMETER_PASSWORD, false);
 			}
 			catch(ParametersMap::MissingParameterException e)
 			{
