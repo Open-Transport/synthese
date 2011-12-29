@@ -48,6 +48,7 @@ namespace synthese
 		const string FreeDRTAreaUpdateAction::PARAMETER_AREA_ID = Action_PARAMETER_PREFIX + "id";
 		const string FreeDRTAreaUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 		const string FreeDRTAreaUpdateAction::PARAMETER_CITIES = Action_PARAMETER_PREFIX + "cities";
+		const string FreeDRTAreaUpdateAction::PARAMETER_STOP_AREAS = Action_PARAMETER_PREFIX + "stop_areas";
 		const string FreeDRTAreaUpdateAction::PARAMETER_COMMERCIAL_LINE_ID = Action_PARAMETER_PREFIX + "line_id";
 
 		ParametersMap FreeDRTAreaUpdateAction::getParametersMap() const
@@ -64,6 +65,10 @@ namespace synthese
 			if(_cities)
 			{
 				map.insert(PARAMETER_CITIES, FreeDRTAreaTableSync::SerializeCities(*_cities));
+			}
+			if(_stopAreas)
+			{
+				map.insert(PARAMETER_STOP_AREAS, FreeDRTAreaTableSync::SerializeStopAreas(*_stopAreas));
 			}
 			if(_line && _line->get())
 			{
@@ -99,6 +104,11 @@ namespace synthese
 				_cities = FreeDRTAreaTableSync::UnserializeCities(map.get<string>(PARAMETER_CITIES), *_env);
 			}
 
+			if(map.isDefined(PARAMETER_STOP_AREAS))
+			{
+				_stopAreas = FreeDRTAreaTableSync::UnserializeStopAreas(map.get<string>(PARAMETER_STOP_AREAS), *_env);
+			}
+
 			if(map.getDefault<RegistryKeyType>(PARAMETER_COMMERCIAL_LINE_ID, 0))
 			{
 				try
@@ -126,6 +136,10 @@ namespace synthese
 			if(_cities)
 			{
 				_area->setCities(*_cities);
+			}
+			if(_stopAreas)
+			{
+				_area->setStopAreas(*_stopAreas);
 			}
 			if(_line)
 			{

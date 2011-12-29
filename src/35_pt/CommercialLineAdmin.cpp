@@ -186,29 +186,38 @@ namespace synthese
 
 				// Declarations
 				AdminFunctionRequest<FreeDRTAreaAdmin> openRequest(_request);
-				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
-				AdminActionFunctionRequest<FreeDRTAreaUpdateAction,FreeDRTAreaAdmin> addRequest(_request);
 				AdminActionFunctionRequest<RemoveObjectAction, CommercialLineAdmin> removeRequest(_request);
 
 				// Search for areas
+				AdminFunctionRequest<CommercialLineAdmin> searchRequest(_request);
 				FreeDRTAreaTableSync::SearchResult areas(
 					FreeDRTAreaTableSync::Search(
 						Env::GetOfficialEnv(),
-						_cline->getKey()
+						_cline->getKey(),
+						_requestParameters.first,
+						_requestParameters.maxSize,
+						_requestParameters.orderField == PARAMETER_SEARCH_NAME,
+						_requestParameters.raisingOrder
 				)	);
-				
+
+				// Add request and form
+				AdminActionFunctionRequest<FreeDRTAreaUpdateAction,FreeDRTAreaAdmin> addRequest(_request);
+				addRequest.setActionWillCreateObject();
+				addRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
+				HTMLForm addForm(addRequest.getHTMLForm("addFreeDRT"));
+				stream << addForm.open();
+
 				// Table initialization
-				ActionResultHTMLTable::HeaderVector cols;
+				ResultHTMLTable::HeaderVector cols;
 				cols.push_back(make_pair(string(), string()));
-				cols.push_back(make_pair(string(), "Nom"));
+				cols.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 				cols.push_back(make_pair(string(), "Périmètre"));
 				cols.push_back(make_pair(string(), string()));
-				ActionResultHTMLTable t(
+				ResultHTMLTable t(
 					cols,
 					searchRequest.getHTMLForm(),
 					_requestParameters,
-					areas,
-					addRequest.getHTMLForm("create")
+					areas
 				);
 				stream << t.open();
 
@@ -219,6 +228,9 @@ namespace synthese
 					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
 					removeRequest.getAction()->setObjectId(area->getKey());
 
+					// New row
+					stream << t.row();
+
 					// Open button cell
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTAreaAdmin::ICON);
@@ -227,20 +239,45 @@ namespace synthese
 					stream << t.col();
 					stream << area->getName();
 
-					// Cities cell
+					// Perimeter cell
 					stream << t.col();
-					bool first(true);
-					BOOST_FOREACH(const FreeDRTArea::Cities::value_type& city, area->getCities())
+					if(!area->getCities().empty())
 					{
-						if(first)
+						stream << "Localités : ";
+						bool first(true);
+						BOOST_FOREACH(const FreeDRTArea::Cities::value_type& city, area->getCities())
 						{
-							first = false;
+							if(first)
+							{
+								first = false;
+							}
+							else
+							{
+								stream << ", ";
+							}
+							stream << city->getName();
 						}
-						else
+					}
+					if(!area->getStopAreas().empty())
+					{
+						if(!area->getCities().empty())
 						{
-							stream << ", ";
+							stream << "<br />";
 						}
-						stream << city->getName();
+						stream << "Arrêts : ";
+						bool first(true);
+						BOOST_FOREACH(const FreeDRTArea::StopAreas::value_type& stopArea, area->getStopAreas())
+						{
+							if(first)
+							{
+								first = false;
+							}
+							else
+							{
+								stream << ", ";
+							}
+							stream << stopArea->getFullName();
+						}
 					}
 
 					// Remove cell
@@ -248,8 +285,23 @@ namespace synthese
 					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone "+ area->getName() + " ?");
 				}
 
+				// New row
+				stream << t.row();
+
+				// Empty cell
+				stream << t.col();
+
+				// Name field
+				stream << t.col() << addForm.getTextInput(FreeDRTAreaUpdateAction::PARAMETER_NAME, string(), "(nom)");
+
+				// Empty field
+				stream << t.col();
+
+				// Add button
+				stream << t.col() << addForm.getSubmitButton("Ajouter");
+
 				// Table closing
-				stream << t.close();
+				stream << t.close() << addForm.close();
 			}
 
 
@@ -560,14 +612,13 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CommercialLineAdmin::_getCurrentTreeBranch() const
 		{
-			PageLinks links;
-
 			shared_ptr<TransportNetworkAdmin> p(
 				getNewPage<TransportNetworkAdmin>()
 			);
 			p->setNetwork(Env::GetOfficialEnv().getSPtr(_cline->getNetwork()));
 
-			links.push_back(p);
+			PageLinks links(p->_getCurrentTreeBranch());
+			links.push_back(getNewCopiedPage());
 			return links;
 		}
 
