@@ -59,6 +59,7 @@ namespace synthese
 			static const std::string PARAMETER_BEST_PRIORITY_ONLY;
 			static const std::string PARAMETER_PRIORITY_ORDER;
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 
@@ -78,6 +79,7 @@ namespace synthese
 				bool _bestPriorityOnly;
 				bool _priorityOrder;
 				boost::posix_time::ptime _date;
+				boost::posix_time::ptime _endDate;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 			//@}
 
@@ -112,12 +114,12 @@ namespace synthese
 
 			static void GetMessages(
 				util::ParametersMap& pm,
-				const util::ParametersMap& templateParameters,
 				util::RegistryKeyType recipientId,
 				boost::optional<std::size_t> maxMessagesNumber,
 				bool bestPriorityOnly,
 				bool priorityOrder,
-				boost::posix_time::ptime date
+				boost::posix_time::ptime date,
+				boost::posix_time::ptime endDate
 			);
 
 
