@@ -62,9 +62,9 @@ namespace synthese
 					*_env
 				);
 
-				_password = map.get<string>(PARAMETER_PASS1);
+				_password = map.get<string>(PARAMETER_PASS1, false);
 
-				string pass2(map.getDefault<string>(PARAMETER_PASS2));
+				string pass2(map.getDefault<string>(PARAMETER_PASS2, string(), false));
 				if (pass2 != _password)
 					throw ActionException("Les mots de passe entrés ne sont pas identiques");
 
