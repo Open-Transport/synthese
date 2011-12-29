@@ -194,7 +194,7 @@ namespace synthese
 			{
 				query << " LIMIT " << (*number + 1);
 				if (first > 0)
-					query << " OFFSET " << Conversion::ToString(first);
+					query << " OFFSET " << first;
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
