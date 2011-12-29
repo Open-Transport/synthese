@@ -53,7 +53,7 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////
 		///	Encodes a universal id.
 		///	@param tableId (2 bytes)
-		///	@param gridNodeId (12 bits)
+		///	@param gridNodeId (2 bytes)
 		///	@param objectId (4 bytes)
 		///	@author Marc Jambert
 		////////////////////////////////////////////////////////////////////
