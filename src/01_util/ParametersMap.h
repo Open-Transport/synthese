@@ -138,20 +138,11 @@ namespace synthese
 
 
 
-				/** Search for the value of a parameter in a ParameterMap object.
-					@param parameterName Name of the searched parameter
-					@param neededParameter Throw an exception if the parameter is not found and if this parameter is true
-					@param source Name of the action or function that requested the parameter (for the error message only)
-					@return std::string Value of the parameter (empty if parameter nor found)
-					@throw ParametersMap::MissingParameterException if the parameter is not found and if it is needed
-					@author Hugues Romain
-					@date 2007
-				*/
-				std::string getString(
-					const std::string& parameterName,
-					bool neededParameter,
-					const std::string& source
-				) const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Trims a string considering spaces, tabs, and carriage returns as blank characters.
+				/// @param value the string to trim
+				/// @return the trimmed string
+				static std::string Trim(const std::string& value);
 
 
 
@@ -238,7 +229,8 @@ namespace synthese
 				/// returned
 				template<class C>
 				boost::optional<C> getOptional(
-					const std::string& parameterName
+					const std::string& parameterName,
+					bool trim = true
 				) const;
 
 
@@ -266,7 +258,8 @@ namespace synthese
 				/// cannot be converted into the type specified by the template parameter C.
 				template<class C>
 				C get(
-					const std::string& parameterName
+					const std::string& parameterName,
+					bool trim = true
 				) const;
 
 
@@ -286,7 +279,8 @@ namespace synthese
 				template<class C>
 				C getDefault(
 					const std::string& parameterName,
-					const C defaultValue
+					const C defaultValue,
+					bool trim = true
 				) const;
 
 
@@ -296,7 +290,7 @@ namespace synthese
 				/// available.
 				/// @param parameterName key of the parameter to get
 				/// @return the parameter value converted into the C type, a default value
-				/// if impossible.
+				/// if impossible. The value will be trimmed.
 				/// @author Hugues Romain
 				//////////////////////////////////////////////////////////////////////////
 				/// If the parameter does not exist, is empty, or cannot be converted into
@@ -325,9 +319,13 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Merges this map with an other, with priority to the current one.
-				/// @param other map to read an integrate into the current one
+				/// @param other map to read and integrate into the current one
+				/// @param prefix prefix to add before the keys coming from the map to read
 				/// @author Hugues Romain
-				void merge(const ParametersMap& other);
+				void merge(
+					const ParametersMap& other,
+					std::string prefix = std::string()
+				);
 
 
 
@@ -347,33 +345,64 @@ namespace synthese
 			//@}
 		};
 
+
+
 		template<class C>
 		boost::optional<C> ParametersMap::getOptional(
-			const std::string& parameterName
+			const std::string& parameterName,
+			bool trim
 		) const {
 			try
 			{
 				Map::const_iterator it(_map.find(parameterName));
-				return (it == _map.end() || it->second.empty()) ? boost::optional<C>() : boost::optional<C>(boost::lexical_cast<C>(it->second));
+				if(it == _map.end())
+				{
+					return boost::optional<C>();
+				}
+				std::string value(
+					trim ?
+					Trim(it->second) :
+					it->second
+				);
+				if(value.empty())
+				{
+					return boost::optional<C>();
+				}
+				return boost::lexical_cast<C>(value);
 			}
-			catch(...)
+			catch(boost::bad_lexical_cast&)
 			{
 				return boost::optional<C>();
 			}
 		}
 
 
+
 		template<class C>
 		C ParametersMap::getDefault(
 			const std::string& parameterName,
-			const C defaultValue
+			const C defaultValue,
+			bool trim
 		) const {
 			try
 			{
 				Map::const_iterator it(_map.find(parameterName));
-				return (it == _map.end() || it->second.empty()) ? defaultValue : boost::lexical_cast<C>(it->second);
+				if(it == _map.end())
+				{
+					return defaultValue;
+				}
+				std::string value(
+					trim ?
+					Trim(it->second) :
+					it->second
+				);
+				if(value.empty())
+				{
+					return defaultValue;
+				}
+				return boost::lexical_cast<C>(value);
 			}
-			catch(...)
+			catch(boost::bad_lexical_cast&)
 			{
 				return defaultValue;
 			}
@@ -385,14 +414,15 @@ namespace synthese
 		C ParametersMap::getDefault(
 			const std::string& parameterName
 		) const {
-			return getDefault(parameterName, C());
+			return getDefault(parameterName, C(), true);
 		}
 
 
 
 		template<class C>
 		C ParametersMap::get(
-			const std::string& parameterName
+			const std::string& parameterName,
+			bool trim
 		) const {
 			try
 			{
@@ -401,22 +431,18 @@ namespace synthese
 				{
 					throw ParametersMap::MissingParameterException(parameterName);
 				}
-				return boost::lexical_cast<C>(boost::trim_copy(it->second));
+				std::string value(
+					trim ?
+					Trim(it->second) :
+					it->second
+				);
+				return boost::lexical_cast<C>(value);
 			}
-			catch(...)
+			catch(boost::bad_lexical_cast&)
 			{
 				throw ParametersMap::MissingParameterException(parameterName);
 			}
 		}
-
-
-
-		// Specialization for retrieving strings, which we don't want to trim.
-		template<>
-		std::string ParametersMap::get(
-			const std::string& parameterName
-		) const;
-	}
-}
+}	}
 
 #endif // SYNTHESE_server_ParametersMap_h__

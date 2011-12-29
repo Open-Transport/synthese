@@ -212,13 +212,6 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
-
-			// Clean of template parameters for non CMS output
-			if(!_page.get())
-			{
-				_templateParameters.clear();
-			}
-
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
 			_outputStops = map.getDefault<bool>(PARAMETER_OUTPUT_STOPS, false);
 			CoordinatesSystem::SRID srid(
@@ -414,13 +407,13 @@ namespace synthese
 			}
 
 			// Populating the parameters map
-			ParametersMap pm(getTemplateParameters());
+			ParametersMap pm;
 			BOOST_FOREACH(boost::shared_ptr<const RollingStock> tm, _sortByTransportMode)
 			{
 				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{
 					shared_ptr<const CommercialLine> line = it.second;
-					shared_ptr<ParametersMap> linePM(new ParametersMap(getTemplateParameters()));
+					shared_ptr<ParametersMap> linePM(new ParametersMap);
 					line->toParametersMap(*linePM);
 
 					// Rolling stock
@@ -442,7 +435,7 @@ namespace synthese
 					}
 					BOOST_FOREACH(RollingStock * rs, rollingStocks)
 					{
-						shared_ptr<ParametersMap> rsPM(new ParametersMap(getTemplateParameters()));
+						shared_ptr<ParametersMap> rsPM(new ParametersMap);
 						rs->toParametersMap(*rsPM);
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
@@ -471,10 +464,10 @@ namespace synthese
 									stopAreas.insert(stopArea);
 								}
 						}	}
-						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap(getTemplateParameters()));
+						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap);
 						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
 						{
-							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap(getTemplateParameters()));
+							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 							stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
 							stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
 						}
@@ -529,14 +522,14 @@ namespace synthese
 						{
 							BOOST_FOREACH(const VertexPairs::value_type& it, geometries)
 							{
-								shared_ptr<ParametersMap> edgePM(new ParametersMap(getTemplateParameters()));
+								shared_ptr<ParametersMap> edgePM(new ParametersMap);
 								shared_ptr<Geometry> prGeom(
 									_coordinatesSystem->convertGeometry(*it.second)
 								);
 								for(size_t i(0); i<prGeom->getNumPoints(); ++i)
 								{
 									const Coordinate& pt(prGeom->getCoordinates()->getAt(i));
-									shared_ptr<ParametersMap> pointPM(new ParametersMap(getTemplateParameters()));
+									shared_ptr<ParametersMap> pointPM(new ParametersMap);
 									pointPM->insert(DATA_X, pt.x);
 									pointPM->insert(DATA_Y, pt.y);
 									edgePM->insert(DATA_POINT, pointPM);
@@ -552,11 +545,11 @@ namespace synthese
 					{
 						GetMessagesFunction::GetMessages(
 							*linePM,
-							getTemplateParameters(),
 							line->getKey(),
 							optional<size_t>(),
 							true,
 							true,
+							second_clock::local_time(),
 							second_clock::local_time()
 						);
 					}
@@ -569,7 +562,13 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
 				{
+					// Template parameters
+					pmLine->merge(getTemplateParameters());
+
+					// Rank
 					pmLine->insert(DATA_RANK, rank++);
+
+					// Display
 					_page->display(stream, request, *pmLine);
 				}
 			}

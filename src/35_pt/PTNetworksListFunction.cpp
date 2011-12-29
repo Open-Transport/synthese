@@ -47,10 +47,11 @@ namespace synthese
 	{
 		const string PTNetworksListFunction::PARAMETER_PAGE_ID("p");
 
-		const string PTNetworksListFunction::DATA_NETWORK_ID("network_id");
-		const string PTNetworksListFunction::DATA_NAME("name");
-		const string PTNetworksListFunction::DATA_RANK("rank");
-		const string PTNetworksListFunction::DATA_RANK_IS_ODD("rank_is_odd");
+		const string PTNetworksListFunction::TAG_NETWORKS = "networks";
+		const string PTNetworksListFunction::TAG_NETWORK = "network";
+		const string PTNetworksListFunction::ATTR_RANK = "rank";
+
+
 
 		ParametersMap PTNetworksListFunction::_getParametersMap() const
 		{
@@ -61,6 +62,8 @@ namespace synthese
 			}
 			return map;
 		}
+
+
 
 		void PTNetworksListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -75,38 +78,54 @@ namespace synthese
 			}
 		}
 
+
+
 		void PTNetworksListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
-			size_t rank(0);
-			if(!_page.get())
-			{
-				/// @todo generate XML header
-			}
+			ParametersMap pm;
+
 			TransportNetworkTableSync::SearchResult networks(
 				TransportNetworkTableSync::Search(Env::GetOfficialEnv())
 			);
 			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& it, networks)
 			{
-				if(_page.get())
+				// Declaration
+				shared_ptr<ParametersMap> networkPM(new ParametersMap);
+
+				// Parameters
+				it->toParametersMap(*networkPM);
+
+				// Registering the network
+				pm.insert(TAG_NETWORK, networkPM);
+			}
+
+			// Output
+			if(_page.get()) // CMS output
+			{
+				size_t rank(0);
+				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmNetwork, pm.getSubMaps(TAG_NETWORK))
 				{
-					_displayNetwork(
-						stream,
-						request,
-						*it,
-						rank++
-					);
-				}
-				else
-				{
-					/// @todo generate XML List item
+					// Template parameters
+					pmNetwork->merge(getTemplateParameters());
+
+					// Rank
+					pmNetwork->insert(ATTR_RANK, rank++);
+
+					// Display
+					_page->display(stream, request, *pmNetwork);
 				}
 			}
-			if(!_page.get())
+			else // XML output
 			{
-				/// @todo generate XML footer
+				pm.outputXML(
+					stream,
+					TAG_NETWORKS,
+					true,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/PTNetworksListFunction.xsd"
+				);
 			}
 		}
 
@@ -124,24 +143,4 @@ namespace synthese
 		{
 			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
-
-
-
-		void PTNetworksListFunction::_displayNetwork(
-			std::ostream& stream,
-			const server::Request& request,
-			const pt::TransportNetwork& object,
-			std::size_t rank
-		) const {
-
-			ParametersMap pm(getTemplateParameters());
-
-			pm.insert(DATA_NETWORK_ID, object.getKey());
-			pm.insert(DATA_NAME, object.getName()); //1
-			pm.insert(DATA_RANK, rank);
-			pm.insert(DATA_RANK_IS_ODD, rank % 2); //3
-
-			_page->display(stream, request, pm);
-		}
-	}
-}
+}	}

@@ -35,6 +35,11 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace pt
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -51,11 +56,15 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<TransportNetwork> Registry;
 
+		private:
+			static const std::string DATA_NETWORK_ID;
+			static const std::string DATA_NAME;
+
 		protected:
 			calendar::CalendarTemplate* _daysCalendarsParent;
 			calendar::CalendarTemplate* _periodsCalendarsParent;
 
-		 public:
+		public:
 
 			TransportNetwork (
 				util::RegistryKeyType id = 0,
@@ -78,6 +87,21 @@ namespace synthese
 			//! @name Services
 			//@{
 				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Exporter.
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 	}
