@@ -25,8 +25,10 @@
 // messages
 #include "AlarmObjectLinkException.h"
 
-// util
-#include "Conversion.h"
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -35,7 +37,7 @@ namespace synthese
 	namespace messages
 	{
 		AlarmObjectLinkException::AlarmObjectLinkException(RegistryKeyType objectId, RegistryKeyType alarmId, const std::string& message)
-			: synthese::Exception(message + " "+ Conversion::ToString(objectId) +" in message " + Conversion::ToString(alarmId))
+			: synthese::Exception(message + " "+ lexical_cast<string>(objectId) +" in message " + lexical_cast<string>(alarmId))
 		{
 		}
 

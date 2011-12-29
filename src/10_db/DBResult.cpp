@@ -25,6 +25,7 @@
 #include "DBConstants.h"
 #include "DBModule.h"
 #include "CoordinatesSystem.hpp"
+#include "Conversion.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/posix_time.hpp>

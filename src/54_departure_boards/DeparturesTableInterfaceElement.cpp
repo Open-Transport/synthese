@@ -88,17 +88,17 @@ namespace synthese
 
 			int __MultiplicateurRangee(_multiplicateurRangeeVIE->isFalse(parameters, variables, object, request)
 				? 1
-				: Conversion::ToInt(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
+				: lexical_cast<int>(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
 			);
-			int __Pages = Conversion::ToInt(_pagesVIE->getValue(parameters, variables, object, request));
+			int __Pages = lexical_cast<int>(_pagesVIE->getValue(parameters, variables, object, request));
 			const string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
-			int departuresToHide(_departuresToHide ? Conversion::ToInt(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
+			int departuresToHide(_departuresToHide ? lexical_cast<int>(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
 			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
-			bool displayServiceNumber(_displayServiceNumber ? Conversion::ToBool(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
-			bool displayQuai(_displayQuai ? Conversion::ToBool(_displayQuai->getValue(parameters, variables, object, request)) : false);
-			bool displayTeam(_displayTeam ? Conversion::ToBool(_displayTeam->getValue(parameters, variables, object, request)) : false);
-			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? Conversion::ToInt(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
-			int blinkingDelay(_blinkingDelay? Conversion::ToInt(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
+			bool displayServiceNumber(_displayServiceNumber ? lexical_cast<bool>(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
+			bool displayQuai(_displayQuai ? lexical_cast<bool>(_displayQuai->getValue(parameters, variables, object, request)) : false);
+			bool displayTeam(_displayTeam ? lexical_cast<bool>(_displayTeam->getValue(parameters, variables, object, request)) : false);
+			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? lexical_cast<int>(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
+			int blinkingDelay(_blinkingDelay? lexical_cast<int>(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
 
 			const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
 			if(page == NULL)

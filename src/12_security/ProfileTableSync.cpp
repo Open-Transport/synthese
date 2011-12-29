@@ -295,10 +295,10 @@ namespace synthese
 					right->setParameter(*it);
 
 					++it;
-					right->setPrivateLevel(static_cast<RightLevel>(Conversion::ToInt(*it)));
+					right->setPrivateLevel(static_cast<RightLevel>(lexical_cast<int>(*it)));
 
 					++it;
-					right->setPublicLevel(static_cast<RightLevel>(Conversion::ToInt(*it)));
+					right->setPublicLevel(static_cast<RightLevel>(lexical_cast<int>(*it)));
 
 					profile->addRight(right);
 				}

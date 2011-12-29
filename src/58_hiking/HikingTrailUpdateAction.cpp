@@ -78,7 +78,7 @@ namespace synthese
 			{
 				_trail = HikingTrailTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_TRAIL_ID), *_env);
 			}
-			catch(ObjectNotFoundException<HikingTrail>& e)
+			catch(ObjectNotFoundException<HikingTrail>&)
 			{
 				throw ActionException("No such trail");
 			}

@@ -111,7 +111,7 @@ namespace synthese
 			const DBLogEntry::Content& c(cols.getContent());
 
 			// Type
-			switch (static_cast<EntryType>(Conversion::ToInt(c[_COL_TYPE])))
+			switch (static_cast<EntryType>(lexical_cast<int>(c[_COL_TYPE])))
 			{
 			case DISPLAY_MONITORING_STATUS_CHANGE: v.push_back("Changement d'état"); break;
 			case DISPLAY_MAINTENANCE_ADMIN: v.push_back("Administration"); break;

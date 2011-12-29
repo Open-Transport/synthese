@@ -20,19 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-
 #include "PostscriptRenderer.h"
-
 #include "Geometry.h"
 #include "DrawableLine.h"
 #include "DrawablePhysicalStop.h"
-
 #include "Map.h"
 #include "MapBackground.h"
 #include "MapBackgroundManager.h"
-
 #include "Log.h"
-#include "Conversion.h"
 #include "Registry.h"
 #include "JourneyPattern.hpp"
 
@@ -41,10 +36,12 @@
 #include <fstream>
 #include <geos/geom/Coordinate.h>
 #include <geos/algorithm/Angle.h>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace geos::geom;
 using namespace geos::algorithm;
+using namespace boost;
 
 namespace synthese
 {
@@ -134,8 +131,8 @@ namespace synthese
 				if (mbg != 0)
 			{
 				Log::GetInstance ().debug ("Best scaling background scaleX=" +
-							Conversion::ToString (mbg->getScaleX ()) + " scaleY=" +
-							Conversion::ToString (mbg->getScaleY ()));
+							lexical_cast<string>(mbg->getScaleX ()) + " scaleY=" +
+							lexical_cast<string>(mbg->getScaleY ()));
 					// Draw background
 					std::pair<int,int>  tlIndexes = mbg->getIndexesOfTileContaining (realFrame.getX(), realFrame.getY());
 					std::pair<int,int>  brIndexes = mbg->getIndexesOfTileContaining (
@@ -157,8 +154,8 @@ namespace synthese
 						if (j > mbg->getNbTilesY()-1) continue;
 
 							const MapBackgroundTile* tile = mbg->getTile (i, j);
-					Log::GetInstance ().debug ("Dumping background tile [" + Conversion::ToString (i) +
-					"," + Conversion::ToString (j) + "]");
+					Log::GetInstance ().debug ("Dumping background tile [" + lexical_cast<string>(i) +
+					"," + lexical_cast<string>(j) + "]");
 							if (tile != 0) { // Any background available for this tile ?
 								// cout << "Drawing tile " << i << "," << j <<  "  "<< tile->getPath ().string () << endl;
 								++nbtiles;

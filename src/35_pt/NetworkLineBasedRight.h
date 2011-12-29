@@ -36,8 +36,6 @@
 #include "SecurityConstants.hpp"
 #include "RightTemplate.h"
 
-#include "Conversion.h"
-
 namespace synthese
 {
 	namespace security
@@ -92,7 +90,7 @@ namespace synthese
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return "all";
 
-			util::RegistryKeyType id(util::Conversion::ToLongLong(this->_parameter));
+			util::RegistryKeyType id(boost::lexical_cast<util::RegistryKeyType>(this->_parameter));
 			try
 			{
 				util::RegistryObjectType tableId(util::decodeTableId(id));
@@ -126,8 +124,8 @@ namespace synthese
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return true;
 
-			util::RegistryKeyType id1(util::Conversion::ToLongLong(this->_parameter));
-			util::RegistryKeyType id2(util::Conversion::ToLongLong(perimeter));
+			util::RegistryKeyType id1(boost::lexical_cast<util::RegistryKeyType>(this->_parameter));
+			util::RegistryKeyType id2(boost::lexical_cast<util::RegistryKeyType>(perimeter));
 			try
 			{
 				util::RegistryTableType tableId1(util::decodeTableId(id1));

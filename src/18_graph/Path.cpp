@@ -26,7 +26,6 @@
 #include "Vertex.h"
 #include "Service.h"
 #include "Exception.h"
-#include "Conversion.h"
 #include "Hub.h"
 #include "Log.h"
 #include "DBModule.h"
@@ -58,13 +57,12 @@ namespace synthese
 			RuleUser(),
 			_pathGroup(NULL),
 			_pathClass(NULL)
-		{
-		}
+		{}
+
 
 
 		Path::~Path ()
-		{
-		}
+		{}
 
 
 
@@ -74,6 +72,7 @@ namespace synthese
 		}
 
 
+
 // 		const Service* Path::getService(
 // 			int serviceIndex
 // 		) const {
@@ -81,7 +80,6 @@ namespace synthese
 // 			advance (it, serviceIndex);
 // 			return (*it);
 // 		}
-
 
 
 
@@ -96,8 +94,8 @@ namespace synthese
 			if (result.second == false)
 			{
 				throw Exception(
-					"Service number " + Conversion::ToString (service.getServiceNumber ())
-					+ " is already defined in path " + Conversion::ToString (getKey())
+					"Service number " + service.getServiceNumber() +
+					" is already defined in path " + lexical_cast<string>(getKey())
 				);
 			}
 			markScheduleIndexesUpdateNeeded(false);

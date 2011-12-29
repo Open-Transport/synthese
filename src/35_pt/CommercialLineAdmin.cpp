@@ -338,7 +338,7 @@ namespace synthese
 					cols.push_back("Date");
 					for(int i(0); i<=23; ++i)
 					{
-						cols.push_back(Conversion::ToString(i));
+						cols.push_back(lexical_cast<string>(i));
 					}
 					optional<date> d;
 					int lastHour;

@@ -59,44 +59,14 @@ namespace synthese
 
 		public:
 
-			/** Converts a string to a boolean value.
-			*  The input string is trimmed before parsing.
-			*  Accepted syntaxes for string are (case insensitive):
-			*   - true/false
-			*   - yes/no
-			*   - 0/1
-			*/
-			static bool ToBool (const std::string& s);
-
 			static boost::logic::tribool ToTribool (const std::string& s);
 
-			static int ToInt (const std::string& s);
-			static long ToLong (const std::string& s);
-			static long long ToLongLong (const std::string& s);
+			static std::string ToPrepaddedString (const std::string& s, char padchar, std::size_t paddedsize);
+			static std::string ToPostpaddedString (const std::string& s, char padchar, std::size_t paddedsize);
 
-			static double ToDouble (const std::string& s);
-
-			static std::string ToPrepaddedString (const std::string& s, char padchar, int paddedsize);
-			static std::string ToPostpaddedString (const std::string& s, char padchar, int paddedsize);
-
-			static std::string ToTruncatedString (const std::string& s, int size = 255);
-
-			static std::string ToString (int i);
-			static std::string ToString (unsigned int i);
-
-			static std::string ToString (long long l);
-			static std::string ToString (unsigned long long l);
-
-			static std::string ToString (long l);
-
-			static std::string ToString (unsigned long l);
-
-			static std::string ToString (double d);
-			static std::string ToString (const std::string& s);
+			static std::string ToTruncatedString (const std::string& s, std::size_t size = 255);
 
 			static std::string ToOctalString (long l);
-
-			static std::string ToString (boost::logic::tribool t);
 
 			static std::vector<std::string> ToStringVector(const std::string& text);
 
@@ -113,7 +83,7 @@ namespace synthese
 			*/
 			static std::string ToDBString (const std::string& s, bool withApostrophes=true);
 
-			static std::string ToFixedSizeString(int number, int size);
+			static std::string ToFixedSizeString(int number, size_t size);
 
 			/** Converts string to a string that can be used as a XML attribute.
 				@param inputString String to convert

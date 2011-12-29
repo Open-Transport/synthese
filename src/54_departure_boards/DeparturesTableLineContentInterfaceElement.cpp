@@ -74,8 +74,8 @@ namespace synthese
 				, variables
 				, _htmlStartLine->getValue(parameters, variables, object, request)
 				, _htmlEndLine->getValue(parameters, variables, object, request)
-				, Conversion::ToInt(_cellWidth->getValue(parameters, variables, object, request))
-				, Conversion::ToInt(_cellHeight->getValue(parameters, variables, object,request))
+				, lexical_cast<int>(_cellWidth->getValue(parameters, variables, object, request))
+				, lexical_cast<int>(_cellHeight->getValue(parameters, variables, object,request))
 				, *line->getCommercialLine()
 				, request
 				);

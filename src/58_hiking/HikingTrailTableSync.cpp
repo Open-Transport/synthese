@@ -113,7 +113,7 @@ namespace synthese
 							StopAreaTableSync::GetEditable(lexical_cast<RegistryKeyType>(stopid), env, linkLevel).get()
 						);
 					}
-					catch(ObjectNotFoundException<StopArea>& e)
+					catch(ObjectNotFoundException<StopArea>&)
 					{
 						Log::GetInstance().warn("No such stop "+ stopid +" in HikingTrail "+ lexical_cast<string>(object->getKey()));
 					}

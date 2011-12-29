@@ -147,7 +147,7 @@ namespace synthese
 					<< AlarmObjectLinkTableSync::COL_OBJECT_ID
 				<< " FROM " << TABLE.NAME
 				<< " WHERE "
-					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << util::Conversion::ToString(alarmId)
+					<< AlarmObjectLinkTableSync::COL_ALARM_ID << "=" << alarmId
 					<< " AND " << AlarmObjectLinkTableSync::COL_RECIPIENT_KEY << "=" << util::Conversion::ToDBString(recipientKey);
 			if (number)
 			    query << " LIMIT " << (*number + 1);

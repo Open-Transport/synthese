@@ -561,7 +561,7 @@ namespace synthese
 					stream << rt.row();
 					stream << rt.col() << "Client";
 					stream << rt.col() << _customer->getFullName() << " (" << _customer->getPhone() << ")";
-					rf.addHiddenField(BookReservationAction::PARAMETER_CUSTOMER_ID, Conversion::ToString(_customer->getKey()));
+					rf.addHiddenField(BookReservationAction::PARAMETER_CUSTOMER_ID, lexical_cast<string>(_customer->getKey()));
 				}
 				else
 				{

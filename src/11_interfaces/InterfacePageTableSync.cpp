@@ -26,7 +26,6 @@
 #include "InterfaceTableSync.h"
 #include "InterfacePage.h"
 #include "Interface.h"
-#include "Conversion.h"
 #include "Log.h"
 #include "Factory.h"
 #include "DBConstants.h"
@@ -219,9 +218,9 @@ namespace synthese
 
 			if (number)
 			{
-				query << " LIMIT " << Conversion::ToString(*number + 1);
+				query << " LIMIT " << (*number + 1);
 				if (first)
-					query << " OFFSET " << Conversion::ToString(*first);
+					query << " OFFSET " << *first;
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);

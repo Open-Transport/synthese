@@ -212,7 +212,7 @@ namespace synthese
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
 				deleteScenarioRequest.getAction()->setObjectId(scenario->getKey());
-				stream << t3.row(Conversion::ToString(scenario->getKey()));
+				stream << t3.row(lexical_cast<string>(scenario->getKey()));
 				stream << t3.col() << scenario->getName();
 				stream << t3.col() << HTMLModule::getLinkButton(updateScenarioRequest.getURL(), "Ouvrir", string(), "cog_edit.png");
 				stream << t3.col() << HTMLModule::getLinkButton(deleteScenarioRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le scénario " + scenario->getName() + " ?", "cog_delete.png");
