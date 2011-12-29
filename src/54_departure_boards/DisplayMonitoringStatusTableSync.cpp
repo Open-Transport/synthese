@@ -150,12 +150,12 @@ namespace synthese
 					}
 					else
 					{
-						Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ Conversion::ToString(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+						Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
 					}
 				}
 				catch (ObjectNotFoundException<DisplayScreen>&)
 				{
-					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ Conversion::ToString(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
+					Log::GetInstance().warn("Data corrupted in "+ TABLE.NAME + " on display screen : "+ lexical_cast<string>(rows->getLongLong(DisplayMonitoringStatusTableSync::COL_SCREEN_ID)) + " not found");
 				}
 			}
 		}
