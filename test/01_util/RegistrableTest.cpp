@@ -35,7 +35,7 @@ class RegistrableForTest:
 	public Registrable
 {
 public:
-	typedef util::Registry<RegistrableForTest> Registry;
+	typedef synthese::util::Registry<RegistrableForTest> Registry;
 
 	RegistrableForTest(
 		RegistryKeyType key
