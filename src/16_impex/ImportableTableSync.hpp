@@ -76,8 +76,11 @@ namespace synthese
 
 				void add(typename T::ObjectType& object);
 
+				void remove(const std::string& code, typename T::ObjectType& object);
+
 				const Map& getMap() const { return _map; }
 			};
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -176,6 +179,24 @@ namespace synthese
 					Set s;
 					s.insert(&object);
 					_map.insert(std::make_pair(code,s));
+				}
+			}
+		}
+
+
+
+		template<class T>
+		void synthese::impex::ImportableTableSync::ObjectBySource<T>::remove(
+			const std::string& code,
+			typename T::ObjectType& object
+		){
+			typename Map::iterator it(_map.find(code));
+			if(it != _map.end())
+			{
+				it->second.erase(&object);
+				if(it->second.empty())
+				{
+					_map.erase(it);
 				}
 			}
 		}
