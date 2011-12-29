@@ -90,20 +90,16 @@ namespace synthese
 					throw RequestException("No such page");
 				}
 			}
-
-			// Clean of template parameters for non CMS output
-			if(!_page.get())
-			{
-				_templateParameters.clear();
-			}
 		}
+
+
 
 		void GetDepartureBoardsService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			
-			ParametersMap pm(getTemplateParameters());
+			ParametersMap pm;
 
 			// Loop on screens
 			DisplayScreenTableSync::SearchResult screens(
@@ -117,7 +113,7 @@ namespace synthese
 			)	);
 			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
 			{
-				// Output
+				// Declaration
 				shared_ptr<ParametersMap> pmScreen(new ParametersMap);
 
 				screen->toParametersMap(*pmScreen);
@@ -130,7 +126,13 @@ namespace synthese
 				size_t rank(0);
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmScreen, pm.getSubMaps(DATA_SCREEN))
 				{
+					// Template parameters
+					pmScreen->merge(getTemplateParameters());
+
+					// Rank
 					pmScreen->insert(DATA_RANK, rank++);
+
+					// Display
 					_page->display(stream, request, *pmScreen);
 				}
 			}
@@ -157,7 +159,7 @@ namespace synthese
 
 		std::string GetDepartureBoardsService::getOutputMimeType() const
 		{
-			return "text/html";
+			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
 	}
 }
