@@ -15,7 +15,7 @@ boost_test(PlainCharFilter "${DEPS}")
 boost_test(Registrable "${DEPS}")
 # TODO: doesn't compile
 #boost_test(SqlFilter "${DEPS}")
-boost_test(Uid "${DEPS}")
+boost_test(UId "${DEPS}")
 
 add_subdirectory(iostreams)
 add_subdirectory(threads)
