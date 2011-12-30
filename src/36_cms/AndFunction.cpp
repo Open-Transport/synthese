@@ -65,7 +65,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			stream << _left && _right;
+			stream << (_left && _right);
 		}
 
 
