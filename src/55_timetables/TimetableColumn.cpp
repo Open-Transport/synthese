@@ -21,10 +21,8 @@
 */
 
 #include "TimetableColumn.h"
-
 #include "TimetableRow.h"
 #include "TimetableGenerator.h"
-
 #include "SchedulesBasedService.h"
 #include "Path.h"
 #include "JourneyPattern.hpp"
@@ -32,6 +30,8 @@
 #include "Vertex.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
+
+#include <list>
 
 using namespace std;
 using namespace boost::posix_time;
@@ -53,109 +53,219 @@ namespace synthese
 			_calendar(service)
 		{
 			_calendar &= timetablegenerator.getBaseCalendar();
-			const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
 
-			const Path::Edges& edges(service.getPath()->getAllEdges());
-			Path::Edges::const_iterator itEdge(edges.begin());
-			bool first(true);
-
-			for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
+			// Cells are populated with the most important intermediate places
+			if(timetablegenerator.getAutoIntermediateStops())
 			{
-				if(!itRow->getPlace())
+				// The departure place
+				const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
+				TimetableGenerator::Rows::const_iterator itRow(rows.begin());
+				if(!itRow->getPlace() || !itRow->getIsDeparture())
 				{
-					continue;
+					return;
 				}
 
-				Path::Edges::const_iterator itEdge2;
-
-				// Arr / Dep in the same place
-				if(	itRow != rows.begin() &&
-					(itRow-1)->getPlace() &&
-					itRow->getPlace() == (itRow-1)->getPlace() &&
-					itRow->getIsDeparture() &&
-					!(itRow-1)->getIsDeparture() &&
-					itEdge != edges.begin() &&
-					(*(itEdge-1))->isDeparture() &&
-					dynamic_cast<const StopArea*>((*(itEdge-1))->getFromVertex()->getHub())->getKey() == (itRow-1)->getPlace()->getKey()
-				){
-					_content.push_back(
-						make_pair(
-							dynamic_cast<const StopPoint*>((*(itEdge-1))->getFromVertex()),
-							service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
-					)	);
-					continue;
-				}
-
-				bool exit(false);
-				for (itEdge2 = itEdge; itEdge2 != edges.end() && !exit; ++itEdge2)
+				// The departure edge
+				const Path::Edges& edges(service.getPath()->getAllEdges());
+				Path::Edges::const_iterator itEdge;
+				for(itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
 				{
-					if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
-						&&(	(*itEdge2)->isDeparture() && itRow->getIsDeparture()
-							|| (*itEdge2)->isArrival() && itRow->getIsArrival()
-						) &&
-						(	!first ||
-							timetablegenerator.getAuthorizedPhysicalStops().empty() ||
-							timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
-						)
+					if(	dynamic_cast<const StopArea*>((*itEdge)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey() &&
+						(*itEdge)->isDeparture()
 					){
-						// Attempt to find an other position which allow to output previous schedules
-						for(TimetableGenerator::Rows::const_iterator itRow4(itRow + 1); itRow4 != rows.end() && !exit; ++itRow4)
+						break;
+					}	
+				}
+				if(itEdge == edges.end())
+				{
+					return;
+				}
+
+				// Collecting arrival edges
+				list<Edge*> bestEdges;
+				list<Edge*>::iterator worseEdge(bestEdges.end());
+				for(++itEdge; itEdge != edges.end() && (itEdge+1) != edges.end(); ++itEdge)
+				{
+					// Jump over departure only edges
+					if(!(*itEdge)->isArrival())
+					{
+						continue;
+					}
+
+					// If best edges size has not reached the limit, the edge is always stored
+					if(bestEdges.size() < *timetablegenerator.getAutoIntermediateStops())
+					{
+						list<Edge*>::iterator itInsertedEdge(
+							bestEdges.insert(
+								bestEdges.end(),
+								*itEdge
+						)	);
+						
+						// The worse edge
+						if(bestEdges.size() == 1)
 						{
-							Path::Edges::const_iterator itEdge3;
-							for(itEdge3 = itEdge; itEdge3 != itEdge2 && !exit; ++itEdge3)
-							{
-								if(	dynamic_cast<const StopArea*>((*itEdge3)->getFromVertex()->getHub())->getKey() == itRow4->getPlace()->getKey()
-									&&(	(*itEdge3)->isDeparture() && itRow4->getIsDeparture()
-									) &&
-								(	!first ||
-									timetablegenerator.getAuthorizedPhysicalStops().empty() ||
-									timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge3)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
-									)
-								){
-									exit = true;
-									break;
-								}
-							}
-							if(exit)
-							{
-								exit = false;
-								for(TimetableGenerator::Rows::const_iterator itRow5(itRow4 + 1); itRow5 != rows.end() && !exit; ++itRow5)
-								{
-									for(Path::Edges::const_iterator itEdge4 = itEdge3+1; itEdge4 != edges.end(); ++itEdge4)
-									{
-										if(	dynamic_cast<const StopArea*>((*itEdge4)->getFromVertex()->getHub())->getKey() == itRow5->getPlace()->getKey() &&
-											((*itEdge4)->isArrival() && itRow5->getIsArrival())
-										){
-											exit = true;
-											break;
-										}
-								}	}
+							worseEdge = itInsertedEdge;
+						}
+						else
+						{
+							if(	dynamic_cast<const StopArea*>((*itEdge)->getFromVertex()->getHub())->getScore() <
+								dynamic_cast<const StopArea*>((*worseEdge)->getFromVertex()->getHub())->getScore()
+							){
+								worseEdge = itInsertedEdge;
 							}
 						}
-
-						if(!exit)
-						{
-							// Record the schedule in the col
-							first = false;
-							_content.push_back(
-								make_pair(
-									dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
-									((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
-										service.getDepartureBeginScheduleToIndex(false, (*itEdge2)->getRankInPath()) :
-										service.getArrivalBeginScheduleToIndex(false, (*itEdge2)->getRankInPath())
+					}
+					else // Edge is stored if the score of the place is better than the worse score of the list
+					{
+						if(	dynamic_cast<const StopArea*>((*itEdge)->getFromVertex()->getHub())->getScore() >
+							dynamic_cast<const StopArea*>((*worseEdge)->getFromVertex()->getHub())->getScore()
+						){
+							bestEdges.erase(worseEdge);
+							list<Edge*>::iterator itInsertedEdge(
+								bestEdges.insert(
+									bestEdges.end(),
+									*itEdge
 							)	);
-							if (itEdge2 == edges.begin())
-								_originType = Terminus;
-							if (itEdge2 == edges.end() - 1)
-								_destinationType = Terminus;
-							itEdge = itEdge2 + 1;
-							break;
+							worseEdge = itInsertedEdge;
+							for(list<Edge*>::iterator itBestEdge(bestEdges.begin());
+								itBestEdge != bestEdges.end();
+								++itBestEdge
+							){
+								if(	dynamic_cast<const StopArea*>((*itBestEdge)->getFromVertex()->getHub())->getScore() <
+									dynamic_cast<const StopArea*>((*worseEdge)->getFromVertex()->getHub())->getScore()
+								){
+									worseEdge = itBestEdge;
+								}
+							}
 						}
 					}
 				}
-				if (itEdge2 == edges.end() || exit)
+
+				// Generating the cells
+				size_t toInsert(*timetablegenerator.getAutoIntermediateStops());
+				for(list<Edge*>::const_iterator itEdge(bestEdges.begin());
+					itEdge != bestEdges.end();
+					++itEdge
+				){
+					_content.push_back(
+						make_pair(
+							dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex()),
+							service.getArrivalBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
+					)	);
+					--toInsert;
+				}
+
+				for(;toInsert;--toInsert)
 				{
 					_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
+				}
+			}
+			else
+			{ // Cells are populated according to the rows definitions
+				const TimetableGenerator::Rows& rows(timetablegenerator.getRows());
+
+				const Path::Edges& edges(service.getPath()->getAllEdges());
+				Path::Edges::const_iterator itEdge(edges.begin());
+				bool first(true);
+
+				for(TimetableGenerator::Rows::const_iterator itRow(rows.begin()); itRow != rows.end(); ++itRow)
+				{
+					if(!itRow->getPlace())
+					{
+						continue;
+					}
+
+					Path::Edges::const_iterator itEdge2;
+
+					// Arr / Dep in the same place
+					if(	itRow != rows.begin() &&
+						(itRow-1)->getPlace() &&
+						itRow->getPlace() == (itRow-1)->getPlace() &&
+						itRow->getIsDeparture() &&
+						!(itRow-1)->getIsDeparture() &&
+						itEdge != edges.begin() &&
+						(*(itEdge-1))->isDeparture() &&
+						dynamic_cast<const StopArea*>((*(itEdge-1))->getFromVertex()->getHub())->getKey() == (itRow-1)->getPlace()->getKey()
+					){
+						_content.push_back(
+							make_pair(
+								dynamic_cast<const StopPoint*>((*(itEdge-1))->getFromVertex()),
+								service.getDepartureBeginScheduleToIndex(false, (itEdge-1) - edges.begin())
+						)	);
+						continue;
+					}
+
+					bool exit(false);
+					for (itEdge2 = itEdge; itEdge2 != edges.end() && !exit; ++itEdge2)
+					{
+						if(	dynamic_cast<const StopArea*>((*itEdge2)->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+							&&(	(*itEdge2)->isDeparture() && itRow->getIsDeparture()
+								|| (*itEdge2)->isArrival() && itRow->getIsArrival()
+							) &&
+							(	!first ||
+								timetablegenerator.getAuthorizedPhysicalStops().empty() ||
+								timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
+							)
+						){
+							// Attempt to find an other position which allow to output previous schedules
+							for(TimetableGenerator::Rows::const_iterator itRow4(itRow + 1); itRow4 != rows.end() && !exit; ++itRow4)
+							{
+								Path::Edges::const_iterator itEdge3;
+								for(itEdge3 = itEdge; itEdge3 != itEdge2 && !exit; ++itEdge3)
+								{
+									if(	dynamic_cast<const StopArea*>((*itEdge3)->getFromVertex()->getHub())->getKey() == itRow4->getPlace()->getKey()
+										&&(	(*itEdge3)->isDeparture() && itRow4->getIsDeparture()
+										) &&
+									(	!first ||
+										timetablegenerator.getAuthorizedPhysicalStops().empty() ||
+										timetablegenerator.getAuthorizedPhysicalStops().find(dynamic_cast<const StopPoint*>((*itEdge3)->getFromVertex())) != timetablegenerator.getAuthorizedPhysicalStops().end()
+										)
+									){
+										exit = true;
+										break;
+									}
+								}
+								if(exit)
+								{
+									exit = false;
+									for(TimetableGenerator::Rows::const_iterator itRow5(itRow4 + 1); itRow5 != rows.end() && !exit; ++itRow5)
+									{
+										for(Path::Edges::const_iterator itEdge4 = itEdge3+1; itEdge4 != edges.end(); ++itEdge4)
+										{
+											if(	dynamic_cast<const StopArea*>((*itEdge4)->getFromVertex()->getHub())->getKey() == itRow5->getPlace()->getKey() &&
+												((*itEdge4)->isArrival() && itRow5->getIsArrival())
+											){
+												exit = true;
+												break;
+											}
+									}	}
+								}
+							}
+
+							if(!exit)
+							{
+								// Record the schedule in the col
+								first = false;
+								_content.push_back(
+									make_pair(
+										dynamic_cast<const StopPoint*>((*itEdge2)->getFromVertex()),
+										((*itEdge2)->isDeparture() && itRow->getIsDeparture()) ?
+											service.getDepartureBeginScheduleToIndex(false, (*itEdge2)->getRankInPath()) :
+											service.getArrivalBeginScheduleToIndex(false, (*itEdge2)->getRankInPath())
+								)	);
+								if (itEdge2 == edges.begin())
+									_originType = Terminus;
+								if (itEdge2 == edges.end() - 1)
+									_destinationType = Terminus;
+								itEdge = itEdge2 + 1;
+								break;
+							}
+						}
+					}
+					if (itEdge2 == edges.end() || exit)
+					{
+						_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
+					}
 				}
 			}
 		}

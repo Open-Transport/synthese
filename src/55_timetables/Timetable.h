@@ -109,6 +109,7 @@ namespace synthese
 				Timetable* 	_transferTimetableBefore;
 				Timetable*	_transferTimetableAfter;
 				boost::optional<bool>		_wayBackFilter;
+				boost::optional<std::size_t> _autoIntermediateStops;
 			//@}
 
 		public:
@@ -133,6 +134,7 @@ namespace synthese
 				void setTransferTimetableBefore(Timetable* value){ _transferTimetableBefore = value; }
 				void setTransferTimetableAfter(Timetable* value){ _transferTimetableAfter = value; }
 				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
+				void setAutoIntermediateStops(boost::optional<std::size_t> value){ _autoIntermediateStops = value; }
 			//@}
 
 			//! @name Modifiers
