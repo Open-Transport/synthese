@@ -80,6 +80,11 @@ namespace synthese
 				{
 					return;
 				}
+				_content.push_back(
+					make_pair(
+						dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex()),
+						service.getDepartureBeginScheduleToIndex(false, (*itEdge)->getRankInPath())
+				)	);
 
 				// Collecting arrival edges
 				list<Edge*> bestEdges;
@@ -159,6 +164,13 @@ namespace synthese
 				{
 					_content.push_back(make_pair<const StopPoint*, time_duration>(NULL, time_duration(not_a_date_time)));
 				}
+
+				Path::Edges::const_reverse_iterator itrEdge = edges.rbegin();
+				_content.push_back(
+					make_pair(
+						dynamic_cast<const StopPoint*>((*itrEdge)->getFromVertex()),
+						service.getArrivalBeginScheduleToIndex(false, (*itrEdge)->getRankInPath())
+				)	);
 			}
 			else
 			{ // Cells are populated according to the rows definitions
