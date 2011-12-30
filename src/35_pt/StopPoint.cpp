@@ -242,7 +242,7 @@ namespace synthese
 			// Stop area data
 			if(withStopAreaData)
 			{
-				shared_ptr<ParametersMap> stopAreaPM;
+				shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
 				getConnectionPlace()->toParametersMap(*stopAreaPM, &coordinatesSystem);
 				pm.insert(TAG_STOP_AREA, stopAreaPM);
 			}
