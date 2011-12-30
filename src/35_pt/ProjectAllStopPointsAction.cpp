@@ -141,5 +141,4 @@ namespace synthese
 //			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 			return true;
 		}
-	}
-}
+}	}
