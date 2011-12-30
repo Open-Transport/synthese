@@ -74,6 +74,7 @@ namespace synthese
 				bool						_withContinuousServices;
 				boost::optional<bool>		_wayBackFilter;
 				const util::Env&			_env;
+				boost::optional<std::size_t> _autoIntermediateStops;
 			//@}
 
 			//! @name Rendering parameters
@@ -99,6 +100,7 @@ namespace synthese
 				const calendar::Calendar& getBaseCalendar() const { return _baseCalendar; }
 				const Rows&		getRows()		const { return _rows; }
 				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const { return _authorizedPhysicalStops; }
+				boost::optional<std::size_t> getAutoIntermediateStops() const { return _autoIntermediateStops; }
 			//@}
 
 			//! @name Services
@@ -124,6 +126,7 @@ namespace synthese
 				void setBeforeTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableBefore = value; }
 				void setAfterTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableAfter = value; }
 				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
+				void setAutoIntermediateStops(boost::optional<std::size_t> value){ _autoIntermediateStops = value; }
 			//@}
 		};
 	}

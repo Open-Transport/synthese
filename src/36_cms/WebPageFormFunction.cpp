@@ -124,7 +124,7 @@ namespace synthese
 					HTMLForm form(openRequest.getHTMLForm(_name));
 					BOOST_FOREACH(const ParametersMap::Map::value_type& parameter, _parameters.getMap())
 					{
-						form.addHiddenField(parameter.first, parameter.second);
+						form.addHiddenField(parameter.first, ParametersMap::Trim(parameter.second));
 					}
 					stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
 					stream << form.getHiddenFields();

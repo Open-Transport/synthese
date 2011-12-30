@@ -70,6 +70,7 @@ namespace synthese
 			static const std::string PARAMETER_DAY;
 			static const std::string PARAMETER_WAYBACK_FILTER;
 			static const std::string PARAMETER_IGNORE_PAST_DATES;
+			static const std::string PARAMETER_AUTO_INTERMEDIATE_STOPS;
 
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_NOTE_PAGE_ID;

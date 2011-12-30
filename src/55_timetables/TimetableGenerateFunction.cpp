@@ -79,6 +79,7 @@ namespace synthese
 		const string TimetableGenerateFunction::PARAMETER_DAY("day");
 		const string TimetableGenerateFunction::PARAMETER_WAYBACK_FILTER("wayback");
 		const string TimetableGenerateFunction::PARAMETER_IGNORE_PAST_DATES("ignore_past_dates");
+		const string TimetableGenerateFunction::PARAMETER_AUTO_INTERMEDIATE_STOPS = "auto_intermediate_stops";
 
 		const string TimetableGenerateFunction::PARAMETER_PAGE_ID("page_id");
 		const string TimetableGenerateFunction::PARAMETER_NOTE_PAGE_ID("note_page_id");
@@ -338,6 +339,8 @@ namespace synthese
 						throw RequestException("No such place");
 					}
 					timetable->setContentType(Timetable::TABLE_SERVICES_IN_ROWS);
+					timetable->setAutoIntermediateStops(map.getOptional<size_t>(PARAMETER_AUTO_INTERMEDIATE_STOPS));
+
 					TimetableRow row;
 					row.setIsArrival(false);
 					row.setIsDeparture(true);
@@ -357,6 +360,8 @@ namespace synthese
 						throw RequestException("No such stop");
 					}
 					timetable->setContentType(Timetable::TABLE_SERVICES_IN_ROWS);
+					timetable->setAutoIntermediateStops(map.getOptional<size_t>(PARAMETER_AUTO_INTERMEDIATE_STOPS));
+
 					TimetableRow row;
 					row.setIsArrival(false);
 					row.setIsDeparture(true);

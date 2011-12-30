@@ -84,6 +84,7 @@ namespace synthese
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
 				g->setWaybackFilter(_wayBackFilter);
+				g->setAutoIntermediateStops(_autoIntermediateStops);
 				if(_transferTimetableBefore)
 				{
 					g->setBeforeTransferTimetable(_transferTimetableBefore->getGenerator(env, mask));
