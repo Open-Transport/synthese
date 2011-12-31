@@ -27,6 +27,7 @@
 
 #include "FreeDRTTimeSlot.hpp"
 #include "DBRegistryTableSyncTemplate.hpp"
+#include "FetcherTemplate.h"
 
 namespace synthese
 {
@@ -39,7 +40,8 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.1
 		class FreeDRTTimeSlotTableSync:
-			public db::DBRegistryTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>
+			public db::DBRegistryTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>,
+			public db::FetcherTemplate<graph::Service, FreeDRTTimeSlotTableSync>
 		{
 		public:
 			//! @name Field names

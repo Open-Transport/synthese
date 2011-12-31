@@ -50,7 +50,9 @@ namespace synthese
 			_lastArrival(not_a_date_time),
 			_commercialSpeed(0),
 			_maxSpeed(0)
-		{}
+		{
+			setCalendarFromLinks();
+		}
 
 
 

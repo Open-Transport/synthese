@@ -166,7 +166,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::DestinationTableSync::integrate();
 	synthese::pt::DRTAreaTableSync::integrate();
 	synthese::pt::FreeDRTAreaTableSync::integrate();
-	synthese::pt::FreeDRTTimeSlotTableSync::integrate();
 	synthese::pt::PTUseRuleTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::StopPointTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Vertex>, synthese::pt::StopPointTableSync>::integrate();
@@ -177,6 +176,8 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ScheduledServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ScheduledServiceTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
 	synthese::pt::FareTableSync::integrate();
 	synthese::pt::RollingStockTableSync::integrate();
 	synthese::pt::NonConcurrencyRuleTableSync::integrate();
