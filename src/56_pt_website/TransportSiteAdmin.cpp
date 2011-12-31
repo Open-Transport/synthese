@@ -354,6 +354,21 @@ namespace synthese
 					)	);
 				}
 				stream << st.cell("Transport public", st.getForm().getOuiNonRadioInput(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning));
+				stream << st.cell(
+					"Durée max correspondance",
+					st.getForm().getSelectNumberInput(
+						RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION,
+						1, 99,
+						_journeyPlanner.getMaxTransferDuration() ? (_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) : UNKNOWN_VALUE,
+						1,
+						"(illimité)"
+				)	);
+				stream << st.cell(
+					"Vitesse d'approche",
+					st.getForm().getTextInput(
+						RoutePlannerFunction::PARAMETER_APPROACH_SPEED,
+						lexical_cast<string>(_journeyPlanner.getAccessParameters().getApproachSpeed())
+				)	);
 				stream << st.close();
 
 				stream << "<h1>Résultats</h1>";

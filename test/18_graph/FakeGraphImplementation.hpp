@@ -61,12 +61,16 @@ namespace synthese
 		class FakePath:
 			public Path
 		{
+		private:
+			bool _isRoad;
+
 		public:
-			FakePath() : Path(), synthese::util::Registrable(0) {}
+			FakePath(bool road) : Path(), synthese::util::Registrable(0), _isRoad(road) {}
 			virtual bool isPedestrianMode() const { return true; }
 			virtual bool isActive(const boost::gregorian::date& date) const { return true; }
 			virtual const RuleUser* _getParentRuleUser() const {return NULL; }
 			virtual std::string getRuleUserName() const { return "Path"; }
+			virtual bool isRoad() const { return _isRoad; }
 		};
 
 		class FakeEdge:

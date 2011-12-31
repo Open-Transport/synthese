@@ -57,7 +57,7 @@ namespace synthese
 			graph::Journey::Distance distanceToEnd,
 			bool similarity,
 			Score score
-		):	Journey(journey, serviceUse, journey._phase == DEPARTURE_TO_ARRIVAL),
+		):	Journey(journey),
 			_phase(journey._phase),
 			_startApproachDuration(
 				journey._phase == DEPARTURE_TO_ARRIVAL ?
@@ -79,6 +79,14 @@ namespace synthese
 			_similarity(similarity),
 			_score(similarity ? 0 : score)
 		{
+			if(journey._phase == DEPARTURE_TO_ARRIVAL)
+			{
+				append(serviceUse);
+			}
+			else
+			{
+				prepend(serviceUse);
+			}
 		}
 
 
@@ -86,7 +94,7 @@ namespace synthese
 		RoutePlanningIntermediateJourney::RoutePlanningIntermediateJourney(
 			const RoutePlanningIntermediateJourney& journey1,
 			const RoutePlanningIntermediateJourney& journey2
-		):	Journey(journey1, journey2, journey1._phase == DEPARTURE_TO_ARRIVAL),
+		):	Journey(journey1),
 			_phase(journey1._phase),
 			_startApproachDuration(journey1._startApproachDuration),
 			_endApproachDuration(journey2._endApproachDuration),
@@ -96,6 +104,15 @@ namespace synthese
 			_score(journey2._score)
 		{
 			assert(journey1._phase == journey2._phase);
+
+			if(journey1._phase == DEPARTURE_TO_ARRIVAL)
+			{
+				append(journey2);
+			}
+			else
+			{
+				prepend(journey2);
+			}
 		}
 
 
@@ -290,7 +307,7 @@ namespace synthese
 				}
 
 
-				/** <li>A journey without compulsor reservation is best</li> */
+				/** <li>A journey without compulsory reservation is best</li> */
 				if (getReservationCompliance(false) == true && other.getReservationCompliance(false) != true)
 					return false;
 				if (other.getReservationCompliance(false) == true && getReservationCompliance(false) != true)
