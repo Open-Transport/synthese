@@ -172,13 +172,6 @@ class Tester(object):
         test_prog = unittest.main(argv=sys_argv, module=None, exit=False)
         return test_prog.result.wasSuccessful()
 
-    # TODO: fix these tests and remove this list
-    KNOWN_FAILURES = set([
-        ('01_util', 'LowerCaseFilter'),
-        ('01_util', 'PlainCharFilter'),
-        ('05_html', 'HTMLFilter'),
-        ('53_pt_routeplanner', 'PTRoutePlannerResult'),
-    ])
 
     def _run_cpp_tests_cmake(self, suite_args):
         builder = synthesepy.build.get_builder(self.env)
