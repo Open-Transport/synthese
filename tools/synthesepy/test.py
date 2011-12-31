@@ -172,6 +172,9 @@ class Tester(object):
         test_prog = unittest.main(argv=sys_argv, module=None, exit=False)
         return test_prog.result.wasSuccessful()
 
+    # put tests which cannot be repaired in this list
+    KNOWN_FAILURES = set([
+    ])
 
     def _run_cpp_tests_cmake(self, suite_args):
         builder = synthesepy.build.get_builder(self.env)
