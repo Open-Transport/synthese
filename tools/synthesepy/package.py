@@ -59,6 +59,13 @@ def run(env, args):
     builder = synthesepy.build.get_builder(env)
     builder.install()
 
+    env_dir = os.path.join(config.prefix, 'share', 'synthese', 'env')
+    if not os.path.isdir(env_dir):
+        raise Exception('CMake install didn\'t create the environment '
+            'directory in %r, cannot continue' % env_dir)
+    with open(join(env_dir, 'sealed.txt'), 'wb') as f:
+        f.write('Environment sealed\n')
+
     # Archive
 
     ARCHIVE_NAME = 'synthese.tar.bz2'

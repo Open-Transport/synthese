@@ -1,10 +1,3 @@
-# TODO remove all support of having that file in the build dir
-#configure_file(
-#    "${PROJECT_SOURCE_DIR}/tools/synthese.py"
-#    "${PROJECT_BINARY_DIR}/synthese.py"
-#    @ONLY
-#)
-
 install(
   FILES "synthese.py"
   DESTINATION bin
