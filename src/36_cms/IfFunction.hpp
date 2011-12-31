@@ -58,7 +58,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				std::string _condition;
+				bool _condition;
 				std::string _then;
 				std::string _else;
 			//@}
