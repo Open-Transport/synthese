@@ -93,7 +93,7 @@ namespace synthese
 			util::RegistryKeyType id(boost::lexical_cast<util::RegistryKeyType>(this->_parameter));
 			try
 			{
-				util::RegistryObjectType tableId(util::decodeTableId(id));
+				util::RegistryTableType tableId(util::decodeTableId(id));
 
 				if (tableId == pt::TransportNetworkTableSync::TABLE.ID)
 				{
