@@ -31,6 +31,8 @@
 #include "CityTableSync.h"
 #include "FreeDRTAreaTableSync.hpp"
 #include "PTUseRuleTableSync.h"
+#include "ServiceCalendarLinkTableSync.hpp"
+#include "ServiceCalendarLink.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -46,10 +48,12 @@ namespace synthese
 	using namespace security;
 	using namespace pt;
 	using namespace geography;
+	using namespace graph;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<DBTableSync,FreeDRTTimeSlotTableSync>::FACTORY_KEY("35.81 Free DRT Time slots");
+		template<> const string FactorableTemplate<Fetcher<Service>, FreeDRTTimeSlotTableSync>::FACTORY_KEY("83");
 	}
 
 	namespace pt
@@ -157,6 +161,21 @@ namespace synthese
 						linkLevel
 				)	);
 			}
+
+			// Calendar
+			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				// Search of calendar template links (overrides manually defined calendar)
+				ServiceCalendarLinkTableSync::SearchResult links(
+					ServiceCalendarLinkTableSync::Search(
+						env,
+						object->getKey()
+				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
+				BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+				{
+					object->addCalendarLink(*link, false);
+				}
+			}
 		}
 
 
@@ -182,6 +201,10 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Unlink(
 			FreeDRTTimeSlot* obj
 		){
+			if(obj->getPath())
+			{
+				obj->getPath()->removeService(*obj);
+			}
 		}
 
 
