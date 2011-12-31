@@ -150,7 +150,7 @@ namespace synthese
 				if(_accessDirection == DEPARTURE_TO_ARRIVAL)
 				{
 					ptime maxTransferTime(minMaxDateTimeAtOrigin = desiredTime + *maxTransferWaitingTime);
-					if(maxTransferTime < _minMaxDateTimeAtDestination)
+					if(maxTransferTime > _minMaxDateTimeAtDestination) // TODO introduce here max speed
 					{
 						minMaxDateTimeAtOrigin = maxTransferTime;
 					}
@@ -158,7 +158,7 @@ namespace synthese
 				else
 				{
 					ptime minTransferTime(minMaxDateTimeAtOrigin = desiredTime - *maxTransferWaitingTime);
-					if(minTransferTime > _minMaxDateTimeAtDestination)
+					if(minTransferTime < _minMaxDateTimeAtDestination) // TODO introduce here max speed
 					{
 						minMaxDateTimeAtOrigin = minTransferTime;
 					}

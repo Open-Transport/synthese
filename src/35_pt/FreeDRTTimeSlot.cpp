@@ -74,11 +74,12 @@ namespace synthese
 			const geography::Place& to
 		) const	{
 
+
 			ServicePointer sp;
 
 			// TODO Implementation
 
-			return Journey(sp);
+			return Journey();
 		}
 
 
@@ -93,7 +94,7 @@ namespace synthese
 
 			// TODO Implementation
 
-			return Journey(sp);
+			return Journey();
 
 		}
 

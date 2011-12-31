@@ -57,48 +57,22 @@ namespace synthese
 				ServiceUses							_journeyLegs;
 			//@}
 
-			//! @name Query cache
+			//! @name Internal data
 			//@{
 				boost::posix_time::time_duration	_effectiveDuration;
-				int				_transportConnectionCount;
+				std::size_t _transportConnectionCount;
 				double			_distance;
+			
+				void _updateInternalData(
+					const ServicePointer& leg
+				);
 			//@}
-
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Empty journey constructor.
 			Journey();
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Journey constructor from a service pointer.
-			Journey(
-				const ServicePointer& servicePointer
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds a journey by adding a service use to an existing journey.
-			/// @param journey the journey to fill
-			/// @param serviceUse the leg to add to the journey
-			/// @param order if true the leg is pushed to the end of the journey, else to the beginning
-			Journey(
-				const Journey& journey,
-				const ServicePointer& serviceUse,
-				bool order = true
-			);
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds a journey by concatenation of two journeys.
-			/// @param journey1 first journey
-			/// @param journey2 second journey
-			/// @param order if true the second journey is pushed after the first, else the first is pushed after the second
-			Journey(
-				const Journey& journey1,
-				const Journey& journey2,
-				bool order = true
-			);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Destructor.
@@ -119,12 +93,12 @@ namespace synthese
 				/** Returns the effective amount of time spent
 					travelling, excluding tranfer delays.
 				*/
-				boost::posix_time::time_duration getEffectiveDuration () const;
+				boost::posix_time::time_duration getEffectiveDuration () const { return _effectiveDuration; }
 
-				/** Continuous service range of this journey.
-					@return Range duration in minutes, or 0 if unique service.
-				*/
-				boost::posix_time::time_duration			getContinuousServiceRange () const;
+
+
+				double getDistance () const { return _distance; }
+				std::size_t getTransportConnectionsCount() const { return _transportConnectionCount; }
 			//@}
 
 			//! @name Setters
@@ -151,7 +125,13 @@ namespace synthese
 				const Edge* getOrigin() const;
 				const Edge* getDestination() const;
 
-				double getDistance () const;
+
+
+				/** Continuous service range of this journey.
+					@return Range duration in minutes, or 0 if unique service.
+				*/
+				boost::posix_time::time_duration getContinuousServiceRange() const;
+
 
 
 				/** Detects max alarm level in journey.

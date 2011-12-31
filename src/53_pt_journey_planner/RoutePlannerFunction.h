@@ -361,6 +361,7 @@ namespace synthese
 				const boost::posix_time::ptime& getEndDepartureDate() const { return _endDate; }
 				const boost::posix_time::ptime& getEndArrivalDate() const { return _endArrivalDate; }
 				boost::optional<std::size_t> getMaxSolutionsNumber() const { return _maxSolutionsNumber; }
+				boost::optional<boost::posix_time::time_duration> getMaxTransferDuration() const { return _maxTransferDuration; }
 				const graph::AccessParameters& getAccessParameters() const { return _accessParameters; }
 				boost::shared_ptr<const pt_website::RollingStockFilter> getTransportModeFilter() const { return _rollingStockFilter; }
 				algorithm::PlanningOrder getPlanningOrder() const { return _planningOrder; }

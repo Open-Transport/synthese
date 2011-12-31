@@ -281,7 +281,8 @@ namespace synthese
 						continue;
 					}
 
-					Journey rootJourney(Journey(), itDest->serviceUse);
+					Journey rootJourney;
+					rootJourney.append(itDest->serviceUse);
 
 					// Transfers at destinations
 					if(rootCall)
@@ -320,7 +321,8 @@ namespace synthese
 										continue;
 									}
 
-									Journey approachJourney(rootJourney, item->serviceUse);
+									Journey approachJourney(rootJourney);
+									approachJourney.append(item->serviceUse);
 									item->transferDestinations = _generateTransferDestinations(
 										approachJourney,
 										*item->place,

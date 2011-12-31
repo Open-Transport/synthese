@@ -205,7 +205,8 @@ namespace synthese
 								);
 							}
 						}
-						result = Journey(it.second.approachJourney, secondJourney);
+						result = it.second.approachJourney;
+						result.append(secondJourney);
 					}
 				}
 			}

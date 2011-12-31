@@ -359,7 +359,7 @@ namespace synthese
 					*_service->getPath()->getEdge(arrivalRank)
 				);
 
-				_journey = Journey(sp);
+				_journey.append(sp);
 			}
 			else
 			{

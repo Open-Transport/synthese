@@ -2203,7 +2203,10 @@ namespace synthese
 					);
 					if(	journeyPattern
 					){
-						MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(journeyPattern->getCommercialLine()->getKey()));
+						MessagesModule::MessagesByRecipientId::mapped_type messages(
+							MessagesModule::GetMessages(
+								journeyPattern->getCommercialLine()->getKey()
+						)	);
 						BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 						{
 							if(it->getScenario()->isApplicable(leg.getDepartureDateTime(), leg.getArrivalDateTime()))
@@ -2223,7 +2226,9 @@ namespace synthese
 						)	);
 						if(departureStopArea)
 						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(departureStopArea->getKey()));
+							MessagesModule::MessagesByRecipientId::mapped_type messages(
+								MessagesModule::GetMessages(departureStopArea->getKey())
+							);
 							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 							{
 								if(it->getScenario()->isApplicable(leg.getDepartureDateTime()))
@@ -2244,7 +2249,9 @@ namespace synthese
 						)	);
 						if(arrivalStopArea)
 						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(MessagesModule::GetMessages(arrivalStopArea->getKey()));
+							MessagesModule::MessagesByRecipientId::mapped_type messages(
+								MessagesModule::GetMessages(arrivalStopArea->getKey())
+							);
 							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
 							{
 								if(it->getScenario()->isApplicable(leg.getArrivalDateTime()))

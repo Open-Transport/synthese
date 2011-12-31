@@ -44,79 +44,16 @@ namespace synthese
 {
 	namespace graph
 	{
-
 		Journey::Journey(
 		):	_effectiveDuration(posix_time::seconds(0)),
 			_transportConnectionCount (0),
 			_distance (0)
-		{
-		}
-
-
-
-		Journey::Journey(
-			const Journey& journey,
-			const ServicePointer& serviceUse,
-			bool order
-		):	_effectiveDuration(journey._effectiveDuration + serviceUse.getDuration()),
-			_transportConnectionCount(
-				serviceUse.getService()->getPath()->isRoad() ?
-				journey._transportConnectionCount :
-				journey._transportConnectionCount + 1
-			),
-			_distance(journey._distance + serviceUse.getDistance())
-		{
-			append(journey);
-			if(order)
-			{
-				append(serviceUse);
-			}
-			else
-			{
-				prepend(serviceUse);
-			}
-		}
-
-
-
-		Journey::Journey(
-			const Journey& journey1,
-			const Journey& journey2,
-			bool order
-		):	_effectiveDuration(journey1._effectiveDuration + journey2._effectiveDuration),
-			_transportConnectionCount(
-				journey1._transportConnectionCount +
-				journey2._transportConnectionCount + 1
-			),
-			_distance(journey1._distance + journey2._distance)
-		{
-			append(journey1);
-			if(order)
-			{
-				append(journey2);
-			}
-			else
-			{
-				prepend(journey2);
-			}
-		}
-
-
-
-		Journey::Journey(
-			const ServicePointer& servicePointer
-		):	_effectiveDuration(servicePointer.getDuration()),
-			_transportConnectionCount(1),
-			_distance(servicePointer.getDistance())
-		{
-			append(servicePointer);
-		}
+		{}
 
 
 
 		Journey::~Journey ()
-		{
-		}
+		{}
 
 
 
@@ -127,7 +64,6 @@ namespace synthese
 
 
 
-
 		const ServicePointer& Journey::getJourneyLeg(
 			size_t index
 		) const	{
@@ -135,7 +71,6 @@ namespace synthese
 
 			return _journeyLegs.at(index);
 		}
-
 
 
 
@@ -175,9 +110,26 @@ namespace synthese
 
 
 
+		void Journey::_updateInternalData( const ServicePointer& leg )
+		{
+			if(!leg.getService()->getPath()->isRoad())
+			{
+				++_transportConnectionCount;
+			}
+			_effectiveDuration += leg.getDuration();
+			_distance += leg.getDistance();
+		}
+
+
+
 		void Journey::prepend(
 			const ServicePointer& leg
 		){
+			// Update of transport connections count
+			// Put this code always before push_front
+			_updateInternalData(leg);
+
+			// Storage of the service pointer
 			_journeyLegs.push_front(leg);
 		}
 
@@ -186,6 +138,11 @@ namespace synthese
 		void Journey::append(
 			const ServicePointer& leg
 		){
+			// Update of transport connections count
+			// Put this code always before push_front
+			_updateInternalData(leg);
+
+			// Storage of the service pointer
 			_journeyLegs.push_back(leg);
 		}
 
@@ -236,18 +193,6 @@ namespace synthese
 			_transportConnectionCount = 0;
 			_distance = 0;
 			_journeyLegs.clear();
-		}
-
-
-
-		posix_time::time_duration Journey::getEffectiveDuration() const
-		{
-			return _effectiveDuration;
-		}
-
-		double Journey::getDistance() const
-		{
-			return _distance;
 		}
 
 
@@ -358,5 +303,4 @@ namespace synthese
 				service.setServiceRange(duration);
 			}
 		}
-	}
-}
+}	}
