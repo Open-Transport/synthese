@@ -105,7 +105,7 @@ namespace synthese
 				_itemPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
 			}
 			_input = map.getDefault<string>(PARAMETER_INPUT);
-			_atLeastAStop = map.getDefault<bool>(PARAMETER_AT_LEAST_A_STOP, false);
+			_atLeastAStop = map.isTrue(PARAMETER_AT_LEAST_A_STOP);
 
 			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
 			if (!_input.empty() && !_n)

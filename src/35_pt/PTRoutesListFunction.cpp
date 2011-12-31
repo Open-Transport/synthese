@@ -116,9 +116,9 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-			_mergeIncludingRoutes = map.getDefault<bool>(PARAMETER_MERGE_INCLUDING_ROUTES, false);
+			_mergeIncludingRoutes = map.isTrue(PARAMETER_MERGE_INCLUDING_ROUTES);
 
-			_mergeSameRoutes = map.getDefault<bool>(PARAMETER_MERGE_SAME_ROUTES, false);
+			_mergeSameRoutes = map.isTrue(PARAMETER_MERGE_SAME_ROUTES);
 
 			// Filter on the "main route" attribute
 			_filterMainRoutes = map.getOptional<bool>(PARAMETER_FILTER_MAIN_ROUTES);

@@ -196,10 +196,10 @@ namespace synthese
 			}
 
 			// Letters before numbers
-			_lettersBeforeNumbers = map.getDefault<bool>(PARAMETER_LETTERS_BEFORE_NUMBERS, true);
+			_lettersBeforeNumbers = map.isTrue(PARAMETER_LETTERS_BEFORE_NUMBERS);
 
 			// Output messages
-			_outputMessages = map.getDefault<bool>(PARAMETER_OUTPUT_MESSAGES, false);
+			_outputMessages = map.isTrue(PARAMETER_OUTPUT_MESSAGES);
 
 			// Output
 			optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID));
@@ -213,16 +213,16 @@ namespace synthese
 			}
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
-			_outputStops = map.getDefault<bool>(PARAMETER_OUTPUT_STOPS, false);
+			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
 			CoordinatesSystem::SRID srid(
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			// Parameters
-			_ignoreDeparturesBoardExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, false);
-			_ignoreJourneyPlannerExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, false);
-			_ignoreTimetableExcludedLines = map.getDefault<bool>(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, false);
+			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
+			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
+			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
 
 			// Transport mode sorting
 			_sortByTransportMode.clear();

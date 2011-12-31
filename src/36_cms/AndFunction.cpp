@@ -55,8 +55,8 @@ namespace synthese
 
 		void AndFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_left = map.getDefault<bool>(PARAMETER_LEFT, false);
-			_right = map.getDefault<bool>(PARAMETER_RIGHT, false);
+			_left = map.isTrue(PARAMETER_LEFT);
+			_right = map.isTrue(PARAMETER_RIGHT);
 		}
 
 

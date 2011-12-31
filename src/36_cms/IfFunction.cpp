@@ -55,7 +55,7 @@ namespace synthese
 
 		void IfFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_condition = map.getDefault<string>(PARAMETER_CONDITION);
+			_condition = map.isTrue(PARAMETER_CONDITION);
 			_then = map.getDefault<string>(PARAMETER_THEN, string(), false);
 			_else = map.getDefault<string>(PARAMETER_ELSE, string(), false);
 		}
@@ -66,7 +66,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			if(_condition.empty() || _condition == "0")
+			if(_condition)
 			{
 				stream << _else;
 			}

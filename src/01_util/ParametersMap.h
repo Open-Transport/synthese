@@ -250,6 +250,17 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
+				/// Tests if the specified parameter is defined, non empty and non equal to 0.
+				/// @param parameterName key of the parameter to test
+				/// @return true if the parameter is present in the map, non empty, and non equal to 0
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				bool isTrue(const std::string& parameterName) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
 				/// Gets the value of a compulsory parameter and converts it into C type.
 				/// @param parameterName key of the parameter to get
 				/// @return the parameter value converted into the C type

@@ -56,7 +56,7 @@ namespace synthese
 
 		void NotService::_setFromParametersMap(const ParametersMap& map)
 		{
-			_parameter = map.getDefault<bool>(PARAMETER_P, false);
+			_parameter = map.isTrue(PARAMETER_P);
 		}
 
 
