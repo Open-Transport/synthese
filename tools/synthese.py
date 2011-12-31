@@ -87,10 +87,12 @@ class Bootstrap(object):
         return join(self.pyenv_path, 'bin', executable)
 
     def _do_create_env(self):
-        virtualenv_script = join(self.tools_path, 'virtualenv.py')
+        virtualenv_script = join(
+            self.tools_path, 'synthesepy', 'third_party', 'virtualenv.py')
         log.info('Installing Python environment...')
         subprocess.check_call([
-            sys.executable, virtualenv_script, '--distribute', self.pyenv_path
+            sys.executable, virtualenv_script, '--distribute',
+            '--never-download', self.pyenv_path
         ], cwd=self.tools_path)
 
         log.info('Installing dependencies...')
@@ -107,6 +109,7 @@ class Bootstrap(object):
             subprocess.check_call([
                 self._get_env_executable('pip'),
                 'install',
+                '--use-mirrors',
                 '--download-cache=%s' % download_cache,
                 '-r',
                 requirements_file])
@@ -147,6 +150,8 @@ class Bootstrap(object):
             return 0
 
     def maybe_create_pyenv(self):
+        if os.path.isfile(join(self.pyenv_path, 'sealed.txt')):
+            return
         env_version = self._get_env_version()
         if env_version >= REQUIRED_ENV_VERSION:
             return
