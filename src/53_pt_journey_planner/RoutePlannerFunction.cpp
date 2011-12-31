@@ -174,6 +174,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_FILTERED_JOURNEYS = "filtered_journeys";
 		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_STOP = "max_warning_level_on_stop";
 		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_LINE = "max_warning_level_on_line";
+		const string RoutePlannerFunction::DATA_HAS_RESERVATION = "has_reservation";
 
 		const string RoutePlannerFunction::DATA_INTERNAL_DATE("internal_date");
 		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
@@ -1633,10 +1634,14 @@ namespace synthese
 			return true;
 		}
 
+
+
 		std::string RoutePlannerFunction::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : "text/xml";
 		}
+
+
 
 		void RoutePlannerFunction::_XMLDisplayConnectionPlace(
 			std::ostream& stream,
@@ -2276,10 +2281,12 @@ namespace synthese
 
 
 			// Reservations row
-			if(_reservationPage.get())
+			stringstream reservations;
+			bool hasReservation(false);
+			BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, object.getJourneys())
 			{
-				stringstream reservations;
-				BOOST_FOREACH(PTRoutePlannerResult::Journeys::value_type journey, object.getJourneys())
+				// Display of the reservation row cell
+				if(_reservationPage.get())
 				{
 					ReservationRuleInterfacePage::Display(
 						reservations,
@@ -2290,8 +2297,12 @@ namespace synthese
 						journey
 					);
 				}
-				pm.insert(DATA_RESERVATIONS, reservations.str());
+
+				// Register the reservation availability
+				hasReservation |= bool(journey.getReservationCompliance(false) != false);
 			}
+			pm.insert(DATA_RESERVATIONS, reservations.str());
+			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
 
 			// Maps lines
