@@ -453,6 +453,32 @@ namespace synthese
 
 
 
+		bool ParametersMap::isTrue( const std::string& parameterName ) const
+		{
+			Map::const_iterator it(_map.find(parameterName));
+			
+			if(it == _map.end())
+			{
+				return false;
+			}
+
+			string value(Trim(it->second));
+
+			if(value.empty())
+			{
+				return false;
+			}
+
+			if(value == "0")
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),
 			_message("Missing parameter in request parsing : " + _field)

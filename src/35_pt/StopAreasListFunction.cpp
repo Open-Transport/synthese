@@ -141,7 +141,7 @@ namespace synthese
 			}
 
 			// Output lines
-			_outputLines = map.getDefault<bool>(PARAMETER_OUTPUT_LINES, false);
+			_outputLines = map.isTrue(PARAMETER_OUTPUT_LINES);
 
 			// SRID
 			CoordinatesSystem::SRID srid(
