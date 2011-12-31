@@ -179,9 +179,10 @@ namespace synthese
 					boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
 					IndexMap::iterator next(it);
 					++next;
-					if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime() >= newMaxTime ||
-						_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime() <= newMaxTime
-						// Add reach ability test
+					if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime(false) >= newMaxTime ||
+						_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime(false) <= newMaxTime
+						// TODO Add reach ability test
+						// TODO take into account of strict
 					){
 						journeysToRemove.push_back(journey);
 					}
