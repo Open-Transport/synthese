@@ -90,6 +90,14 @@ if(WIN32)
   # This is to avoid:
   # fatal error C1128: number of sections exceeded object file format limit : compile with /bigobj
   add_definitions(/bigobj)
+
+  # This is to avoid:
+  # warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
+  add_definitions(/wd4290)
+
+  # This is to avoid:
+  # warning C4250: 'xxx' : inherits 'yyy' via dominance
+  add_definitions(/wd4250)
   
   # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
   SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO")
