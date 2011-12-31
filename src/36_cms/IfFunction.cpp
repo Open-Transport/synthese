@@ -68,11 +68,11 @@ namespace synthese
 		) const {
 			if(_condition)
 			{
-				stream << _else;
+				stream << _then;
 			}
 			else
 			{
-				stream << _then;
+				stream << _else;
 			}
 		}
 
