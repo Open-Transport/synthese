@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		VertexAccessMap map1;
 		VertexAccessMap map2;
 
-		FakePath L;
+		FakePath L(false);
 		FakeService S;
 		S.setPath(&L);
 		FakeHub h1;
@@ -100,7 +100,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		ServicePointer sp3_0(false, 0, S, d3_0s);
 		sp3_0.setDepartureInformations(e1, d3_0s, d3_0s, *e1.getFromVertex());
 		sp3_0.setArrivalInformations(e3, d3_0e, d3_0e, *e3.getFromVertex());
-		j3 = Journey(j3, sp3_0);
+		j3.append(sp3_0);
 
 		// The first map contains a point of the second one, reached in 5 minutes
 		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
@@ -120,7 +120,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		VertexAccessMap map1;
 		VertexAccessMap map2;
 
-		FakePath L;
+		FakePath L(false);
 		FakeService S;
 		S.setPath(&L);
 		FakeHub h1;
@@ -145,7 +145,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		ServicePointer sp3_0(false, 0, S, d3_0s);
 		sp3_0.setArrivalInformations(e2, d3_0e, d3_0e, *e2.getFromVertex());
 		sp3_0.setDepartureInformations(e3, d3_0s, d3_0s, *e3.getFromVertex());
-		j3 = Journey(j3, sp3_0);
+		j3.append(sp3_0);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3));
@@ -165,7 +165,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		VertexAccessMap map1;
 		VertexAccessMap map2;
 
-		FakePath L;
+		FakePath L(false);
 		FakeService S;
 		S.setPath(&L);
 		FakeHub h1;
@@ -193,7 +193,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		ServicePointer sp3_1(false, 0, S, d3_1s);
 		sp3_1.setDepartureInformations(e1, d3_1s, d3_1s, *e1.getFromVertex());
 		sp3_1.setArrivalInformations(e3, d3_1e, d3_1e, *e3.getFromVertex());
-		j3_1 = Journey(j3_1, sp3_1);
+		j3_1.append(sp3_1);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map1.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_1));
@@ -204,7 +204,7 @@ BOOST_AUTO_TEST_CASE (Intersections)
 		ServicePointer sp3_2(false, 0, S, d3_2s);
 		sp3_2.setArrivalInformations(e2, d3_2e, d3_2e, *e2.getFromVertex());
 		sp3_2.setDepartureInformations(e3, d3_2s, d3_2s, *e3.getFromVertex());
-		j3_2 = Journey(j3_2, sp3_2);
+		j3_2.append(sp3_2);
 
 		// The second map contains a point of the first one, reached in 5 minutes
 		map2.insert(&v3, VertexAccess(boost::posix_time::minutes(5), 1000, j3_2));
