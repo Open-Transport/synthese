@@ -28,6 +28,7 @@
 #include "Journey.h"
 #include "TimeSlotRoutePlanner.h"
 #include "PlacesList.hpp"
+#include "MessagesTypes.h"
 
 namespace synthese
 {
@@ -82,7 +83,8 @@ namespace synthese
 			//@{
 				const geography::Place* const		_departurePlace;
 				const geography::Place* const		_arrivalPlace;
-				bool		_samePlaces;	//!< Whether the route planning was attempted between to identical places (in this case the result is always empty)
+				bool _samePlaces;	//!< Whether the route planning was attempted between to identical places (in this case the result is always empty)
+				bool _filtered;
 			//@}
 
 			//! @name Journeys found
@@ -115,11 +117,47 @@ namespace synthese
 				const PlacesListConfiguration& getOrderedPlaces() const { return _orderedPlaces; }
 				const geography::Place* getDeparturePlace() const { return _departurePlace; }
 				const geography::Place* getArrivalPlace() const { return _arrivalPlace; }
+				bool getFiltered() const { return _filtered; }
 			//@}
 
-			void removeFirstJourneys(size_t value);
+			//! @name Modifiers
+			//@{
+				void removeFirstJourneys(size_t value);
 
-			void removeJourney(Journeys::iterator it);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes the too long journeys compared to the shortest one.
+				/// The journeys which are too long are removed from the result.
+				/// If at least one journey was removed, then the _filtered attribute is
+				/// set to true.
+				/// @param maximal duration ratio between longest and shortest journeys
+				/// @author Hugues Romain
+				/// @date 2011
+				/// @since 3.3.0
+				void filterOnDurationRatio(double ratio);
+
+
+
+				void filterOnWaitingTime(
+					boost::posix_time::time_duration minWaitingTime
+				);
+			//@}
+
+			//! @name Services
+			//@{
+				struct MaxAlarmLevels
+				{
+					messages::AlarmLevel lineLevel;
+					messages::AlarmLevel stopLevel;
+
+					MaxAlarmLevels();
+				};
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the biggest alarm level of all lines and stop used by the journeys
+				/// @return the biggest alarm level of all lines and stop used by the journeys
+				MaxAlarmLevels getMaxAlarmLevels() const;
+			//@}
 
 
 

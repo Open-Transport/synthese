@@ -72,8 +72,6 @@
 #include "CMSModule.hpp"
 #include "UseRule.h"
 #include "PTUseRule.h"
-#include "MessagesModule.h"
-#include "SentScenario.h"
 
 #include <geos/io/WKTWriter.h>
 #include <geos/geom/LineString.h>
@@ -129,6 +127,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
+		const string RoutePlannerFunction::PARAMETER_MIN_WAITING_TIME_FILTER = "min_waiting_time_filter";
 		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION("fc");
 		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION("max_transfer_duration");
 		const string RoutePlannerFunction::PARAMETER_LOG_PATH = "log_path";
@@ -551,6 +550,12 @@ namespace synthese
 				_accessParameters.setMaxtransportConnectionsCount(map.getOptional<size_t>(PARAMETER_MAX_DEPTH));
 			}
 
+			// Filter on waiting time
+			if(map.getDefault<long>(PARAMETER_MIN_WAITING_TIME_FILTER, 0))
+			{
+				_minWaitingTimeFilter = minutes(map.get<long>(PARAMETER_MIN_WAITING_TIME_FILTER));
+			}
+
 			// Approach speed
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
 			{
@@ -886,37 +891,15 @@ namespace synthese
 			}
 
 			// Min max duration filter
-			bool filteredJourneys(false);
 			if(_minMaxDurationRatioFilter)
 			{
-				// Min duration
-				time_duration minDuration(not_a_date_time);
-				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
-				{
-					if(minDuration.is_not_a_date_time() || minDuration > journey.getDuration())
-					{
-						minDuration = journey.getDuration();
-					}
-				}
+				result.filterOnDurationRatio(*_minMaxDurationRatioFilter);
+			}
 
-				// Filter
-				vector<PTRoutePlannerResult::Journeys::iterator> toRemove;
-				for(PTRoutePlannerResult::Journeys::iterator itJourney(result.getJourneys().begin());
-					itJourney != result.getJourneys().end() && itJourney+1 != result.getJourneys().end();
-					++itJourney
-				){
-					const Journey& journey(*itJourney);
-					if(journey.getDuration().total_seconds() / minDuration.total_seconds() < *_minMaxDurationRatioFilter)
-					{
-						toRemove.push_back(itJourney);
-						filteredJourneys = true;
-					}
-				}
-				BOOST_FOREACH(PTRoutePlannerResult::Journeys::iterator& itToRemove, toRemove)
-				{
-					result.removeJourney(itToRemove);
-				}
-
+			// Min waiting time filter
+			if(_minWaitingTimeFilter)
+			{
+				result.filterOnWaitingTime(*_minWaitingTimeFilter);
 			}
 
 			// Display
@@ -931,8 +914,7 @@ namespace synthese
 					_departure_place.placeResult.value.get(),
 					_arrival_place.placeResult.value.get(),
 					_period,
-					_accessParameters,
-					filteredJourneys
+					_accessParameters
 				);
 			}
 			else if(_outputFormat == VALUE_ADMIN_HTML)
@@ -1875,8 +1857,7 @@ namespace synthese
 			const geography::Place* originPlace,
 			const geography::Place* destinationPlace,
 			const pt_website::HourPeriod* period,
-			const graph::AccessParameters& accessParameters,
-			bool filteredJourneys
+			const graph::AccessParameters& accessParameters
 		) const	{
 			ParametersMap pm(getTemplateParameters());
 
@@ -1904,7 +1885,7 @@ namespace synthese
 			//pm.insert("" /*lexical_cast<string>(destinationPlace->getKey())*/);
 			pm.insert(DATA_DESTINATION_PLACE_TEXT, destinationPlaceName);
 			pm.insert(DATA_PERIOD_ID, periodId);
-			pm.insert(DATA_FILTERED_JOURNEYS, filteredJourneys);
+			pm.insert(DATA_FILTERED_JOURNEYS, object.getFiltered());
 
 			// Text formatted date
 			if(_dateTimePage.get())
@@ -2191,84 +2172,9 @@ namespace synthese
 			}
 
 			// Warning levels
-			AlarmLevel minLineLevel(ALARM_LEVEL_NO_ALARM);
-			AlarmLevel minStopLevel(ALARM_LEVEL_NO_ALARM);
-			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
-			{
-				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
-				{
-					// Line
-					const JourneyPattern* journeyPattern(
-						dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
-					);
-					if(	journeyPattern
-					){
-						MessagesModule::MessagesByRecipientId::mapped_type messages(
-							MessagesModule::GetMessages(
-								journeyPattern->getCommercialLine()->getKey()
-						)	);
-						BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-						{
-							if(it->getScenario()->isApplicable(leg.getDepartureDateTime(), leg.getArrivalDateTime()))
-							{
-								if(it->getLevel() > minLineLevel)
-								{
-									minLineLevel = it->getLevel();
-								}
-								break;
-							}
-						}
-
-						// Departure stop
-						const StopArea* departureStopArea(
-							dynamic_cast<const StopArea*>(
-								leg.getDepartureEdge()->getFromVertex()->getHub()
-						)	);
-						if(departureStopArea)
-						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(
-								MessagesModule::GetMessages(departureStopArea->getKey())
-							);
-							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-							{
-								if(it->getScenario()->isApplicable(leg.getDepartureDateTime()))
-								{
-									if(it->getLevel() > minStopLevel)
-									{
-										minStopLevel = it->getLevel();
-									}
-									break;
-								}
-							}
-						}
-
-						// Arrival stop
-						const StopArea* arrivalStopArea(
-							dynamic_cast<const StopArea*>(
-								leg.getArrivalEdge()->getFromVertex()->getHub()
-						)	);
-						if(arrivalStopArea)
-						{
-							MessagesModule::MessagesByRecipientId::mapped_type messages(
-								MessagesModule::GetMessages(arrivalStopArea->getKey())
-							);
-							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
-							{
-								if(it->getScenario()->isApplicable(leg.getArrivalDateTime()))
-								{
-									if(it->getLevel() > minStopLevel)
-									{
-										minStopLevel = it->getLevel();
-									}
-									break;
-								}
-							}
-						}
-					}
-			}	}
-			pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, minLineLevel);
-			pm.insert(DATA_MAX_WARNING_LEVEL_ON_STOP, minStopLevel);
-
+			PTRoutePlannerResult::MaxAlarmLevels alarmLevels(object.getMaxAlarmLevels());
+			pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, alarmLevels.lineLevel);
+			pm.insert(DATA_MAX_WARNING_LEVEL_ON_STOP, alarmLevels.stopLevel);
 
 			// Durations row
 			if(_durationPage.get())
