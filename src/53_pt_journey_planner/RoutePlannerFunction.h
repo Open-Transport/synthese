@@ -124,6 +124,7 @@ namespace synthese
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
+			static const std::string PARAMETER_MIN_WAITING_TIME_FILTER;
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
@@ -320,6 +321,7 @@ namespace synthese
 				bool _showCoords;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
+				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
 				bool _fareCalculation;
 				boost::optional<boost::filesystem::path>	_logPath;
 				std::string									_outputFormat;
@@ -452,8 +454,7 @@ namespace synthese
 				const geography::Place* originPlace,
 				const geography::Place* destinationPlace,
 				const pt_website::HourPeriod* period,
-				const graph::AccessParameters& accessParameters,
-				bool filteredJourneys
+				const graph::AccessParameters& accessParameters
 			) const;
 
 		private:
