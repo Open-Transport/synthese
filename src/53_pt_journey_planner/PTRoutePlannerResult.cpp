@@ -515,34 +515,65 @@ namespace synthese
 		void PTRoutePlannerResult::filterOnWaitingTime(
 			boost::posix_time::time_duration minWaitingTime
 		){
-			// Filter
-			vector<Journeys::iterator> toRemove;
-			for(Journeys::iterator itJourney(getJourneys().begin());
-				itJourney != getJourneys().end() && itJourney+1 != getJourneys().end();
-				++itJourney
-			){
-				if(	itJourney->getContinuousServiceRange().total_seconds() ||
-					(itJourney+1)->getContinuousServiceRange().total_seconds()
-				){
-					continue;
-				}
-				if(	(itJourney+1)->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime ||
-					(itJourney+1)->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime
-				){
-					if(itJourney->getDuration() < (itJourney+1)->getDuration())
-					{
-						toRemove.push_back(itJourney + 1);
-					}
-					else
-					{
-						toRemove.push_back(itJourney);
-					}
-					_filtered = true;
-				}
-			}
-			BOOST_FOREACH(Journeys::iterator& itToRemove, toRemove)
+			// Nothing to filter
+			if(_journeys.empty())
 			{
-				_journeys.erase(itToRemove);
+				return;
+			}
+
+			// Declarations
+			Journeys result;
+			bool filteredByThisMethod(false);
+
+			// Filter
+			Journeys::const_iterator itJourney(getJourneys().begin());
+			while(
+				itJourney != getJourneys().end()
+			){
+				bool forDeparture(itJourney+1 != getJourneys().end() && (itJourney+1)->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime);
+				bool forArrival(itJourney+1 != getJourneys().end() && (itJourney+1)->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime);
+
+				Journeys::const_iterator bestJourney(itJourney);
+				Journeys::const_iterator itJourney2(itJourney+1);
+
+				for(;
+					(	(forDeparture || forArrival) &&
+						itJourney2 != getJourneys().end() &&
+						!itJourney->getContinuousServiceRange().total_seconds() &&
+						!itJourney2->getContinuousServiceRange().total_seconds() &&
+						(	forDeparture && itJourney2->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime ||
+							forArrival && itJourney2->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime
+						)
+					);
+					++itJourney2
+				){
+					filteredByThisMethod = true;
+					if(itJourney2->getDuration() < bestJourney->getDuration())
+					{
+						bestJourney = itJourney2;
+					}
+
+					if(forDeparture)
+					{
+						forDeparture = (itJourney2->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime);
+					}
+
+					if(forArrival)
+					{
+						forArrival = (itJourney2->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime);
+					}
+				}
+
+				result.push_back(*bestJourney);
+				itJourney = itJourney2;
+			}
+
+
+			if(filteredByThisMethod)
+			{
+				_filtered = true;
+				_journeys = result;
+				_createOrderedPlaces();
 			}
 		}
 }	}
