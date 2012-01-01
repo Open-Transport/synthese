@@ -21,7 +21,6 @@ set_source_files_properties(PTRoutePlannerModule.gen.cpp PTRoutePlannerModule.in
 add_library(53_pt_journey_planner ${pt_journey_planner_SRCS})
 
 target_link_libraries(53_pt_journey_planner
-  17_messages
   33_algorithm
   35_pt
   51_resa
