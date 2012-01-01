@@ -408,20 +408,25 @@ namespace synthese
 			time_duration maxDuration(seconds(long(ceil(double(minDuration.total_seconds()) * ratio))));
 
 			// Filter
+			Journeys result;
+			bool filteredByThisMethod(false);
 			vector<Journeys::iterator> toRemove;
-			for(Journeys::iterator itJourney(getJourneys().begin());
-				itJourney != getJourneys().end() && itJourney+1 != getJourneys().end();
-				++itJourney
-			){
-				if(itJourney->getDuration() > maxDuration)
+			BOOST_FOREACH(const Journeys::value_type& journey, getJourneys())
+			{
+				if(journey.getDuration() > maxDuration)
 				{
-					toRemove.push_back(itJourney);
 					_filtered = true;
+					filteredByThisMethod = true;
+				}
+				else
+				{
+					result.push_back(journey);
 				}
 			}
-			BOOST_FOREACH(Journeys::iterator& itToRemove, toRemove)
+			if(filteredByThisMethod)
 			{
-				_journeys.erase(itToRemove);
+				_journeys = result;
+				_createOrderedPlaces();
 			}
 		}
 
