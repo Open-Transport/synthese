@@ -35,6 +35,9 @@
 #include "Service.h"
 #include "Junction.hpp"
 #include "JunctionStop.hpp"
+#include "MessagesModule.h"
+#include "SentScenario.h"
+#include "SentAlarm.h"
 
 using namespace std;
 using namespace boost;
@@ -48,6 +51,7 @@ namespace synthese
 	using namespace algorithm;
 	using namespace html;
 	using namespace pt;
+	using namespace messages;
 
 	namespace pt_journey_planner
 	{
@@ -59,7 +63,8 @@ namespace synthese
 		):	_departurePlace(departurePlace),
 			_arrivalPlace(arrivalPlace),
 			_samePlaces(samePlaces),
-			_journeys(journeys)
+			_journeys(journeys),
+			_filtered(false)
 		{
 			_createOrderedPlaces();
 		}
@@ -73,6 +78,7 @@ namespace synthese
 			_journeys = other._journeys;
 			_orderedPlaces = other._orderedPlaces;
 			_samePlaces = other._samePlaces;
+			_filtered = other._filtered;
 		}
 
 
@@ -386,8 +392,152 @@ namespace synthese
 
 
 
-		void PTRoutePlannerResult::removeJourney( Journeys::iterator it )
+		void PTRoutePlannerResult::filterOnDurationRatio( double ratio )
 		{
-			_journeys.erase(it);
+			// Min duration
+			time_duration minDuration(not_a_date_time);
+			BOOST_FOREACH(const Journeys::value_type& journey, getJourneys())
+			{
+				if(minDuration.is_not_a_date_time() || minDuration > journey.getDuration())
+				{
+					minDuration = journey.getDuration();
+				}
+			}
+
+			// Max duration
+			time_duration maxDuration(seconds(long(ceil(double(minDuration.total_seconds()) * ratio))));
+
+			// Filter
+			vector<Journeys::iterator> toRemove;
+			for(Journeys::iterator itJourney(getJourneys().begin());
+				itJourney != getJourneys().end() && itJourney+1 != getJourneys().end();
+				++itJourney
+			){
+				if(itJourney->getDuration() > maxDuration)
+				{
+					toRemove.push_back(itJourney);
+					_filtered = true;
+				}
+			}
+			BOOST_FOREACH(Journeys::iterator& itToRemove, toRemove)
+			{
+				_journeys.erase(itToRemove);
+			}
+		}
+
+
+
+		PTRoutePlannerResult::MaxAlarmLevels::MaxAlarmLevels():
+			lineLevel(ALARM_LEVEL_NO_ALARM),
+			stopLevel(ALARM_LEVEL_NO_ALARM)
+		{}
+
+
+
+		PTRoutePlannerResult::MaxAlarmLevels PTRoutePlannerResult::getMaxAlarmLevels() const
+		{
+			MaxAlarmLevels result;
+			BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, getJourneys())
+			{
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
+				{
+					// Line
+					const JourneyPattern* journeyPattern(
+						dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
+					);
+					if(	journeyPattern
+					){
+						MessagesModule::MessagesByRecipientId::mapped_type messages(
+							MessagesModule::GetMessages(
+								journeyPattern->getCommercialLine()->getKey()
+						)	);
+						BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+						{
+							if(	it->getScenario()->isApplicable(leg.getDepartureDateTime(), leg.getArrivalDateTime()) &&
+								it->getLevel() > result.lineLevel
+							){
+								result.lineLevel = it->getLevel();
+							}
+						}
+
+						// Departure stop
+						const StopArea* departureStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getDepartureEdge()->getFromVertex()->getHub()
+						)	);
+						if(departureStopArea)
+						{
+							MessagesModule::MessagesByRecipientId::mapped_type messages(
+								MessagesModule::GetMessages(departureStopArea->getKey())
+							);
+							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+							{
+								if(	it->getScenario()->isApplicable(leg.getDepartureDateTime()) &&
+									it->getLevel() > result.stopLevel
+								){
+									result.stopLevel = it->getLevel();
+								}
+							}
+						}
+
+						// Arrival stop
+						const StopArea* arrivalStopArea(
+							dynamic_cast<const StopArea*>(
+								leg.getArrivalEdge()->getFromVertex()->getHub()
+						)	);
+						if(arrivalStopArea)
+						{
+							MessagesModule::MessagesByRecipientId::mapped_type messages(
+								MessagesModule::GetMessages(arrivalStopArea->getKey())
+							);
+							BOOST_FOREACH(const MessagesModule::MessagesByRecipientId::mapped_type::value_type& it, messages)
+							{
+								if(	it->getScenario()->isApplicable(leg.getArrivalDateTime()) &&
+									it->getLevel() > result.stopLevel
+								){
+									result.stopLevel = it->getLevel();
+								}
+							}
+						}
+					}
+			}	}
+
+			return result;
+		}
+
+
+
+		void PTRoutePlannerResult::filterOnWaitingTime(
+			boost::posix_time::time_duration minWaitingTime
+		){
+			// Filter
+			vector<Journeys::iterator> toRemove;
+			for(Journeys::iterator itJourney(getJourneys().begin());
+				itJourney != getJourneys().end() && itJourney+1 != getJourneys().end();
+				++itJourney
+			){
+				if(	itJourney->getContinuousServiceRange().total_seconds() ||
+					(itJourney+1)->getContinuousServiceRange().total_seconds()
+				){
+					continue;
+				}
+				if(	(itJourney+1)->getFirstDepartureTime() - itJourney->getFirstDepartureTime() < minWaitingTime ||
+					(itJourney+1)->getFirstArrivalTime() - itJourney->getFirstArrivalTime() < minWaitingTime
+				){
+					if(itJourney->getDuration() < (itJourney+1)->getDuration())
+					{
+						toRemove.push_back(itJourney + 1);
+					}
+					else
+					{
+						toRemove.push_back(itJourney);
+					}
+					_filtered = true;
+				}
+			}
+			BOOST_FOREACH(Journeys::iterator& itToRemove, toRemove)
+			{
+				_journeys.erase(itToRemove);
+			}
 		}
 }	}
