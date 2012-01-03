@@ -27,7 +27,8 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
+#include "BaseCalendarUpdateAction.hpp"
 
 namespace synthese
 {
@@ -49,18 +50,18 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
 		class DriverServiceUpdateAction:
-			public util::FactorableTemplate<server::Action, DriverServiceUpdateAction>
+			public util::FactorableTemplate<server::Action, DriverServiceUpdateAction>,
+			public impex::BaseImportableUpdateAction,
+			public calendar::BaseCalendarUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_DRIVER_SERVICE_ID;
-			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_NAME;
 
 		private:
 			boost::shared_ptr<DriverService> _driverService;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
-			boost::optional<boost::gregorian::date> _date;
 			boost::optional<std::string> _name;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -75,6 +76,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -95,11 +97,8 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setDriverService(boost::shared_ptr<DriverService> value) { _driverService = value; }
-				void setDate(boost::optional<boost::gregorian::date> value) { _date = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DriverServiceUpdateAction_H__
-

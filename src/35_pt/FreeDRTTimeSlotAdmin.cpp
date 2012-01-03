@@ -23,7 +23,10 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "FreeDRTTimeSlotAdmin.hpp"
+
 #include "AdminParametersException.h"
+#include "BaseCalendarAdmin.hpp"
+#include "CalendarTemplate.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
@@ -45,15 +48,16 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
+	using namespace calendar;
+	using namespace html;
+	using namespace pt;
+	using namespace security;
 	using namespace server;
 	using namespace util;
-	using namespace security;
-	using namespace pt;
-	using namespace html;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTTimeSlotAdmin>::FACTORY_KEY("FreeDRTTimeSlotAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTTimeSlotAdmin>::FACTORY_KEY("FreeDRTTimeSlot");
 	}
 
 	namespace admin
@@ -64,6 +68,11 @@ namespace synthese
 
 	namespace pt
 	{
+		const string FreeDRTTimeSlotAdmin::TAB_CALENDAR = "calendar";
+		const string FreeDRTTimeSlotAdmin::TAB_PROPERTIES = "properties";
+
+
+
 		FreeDRTTimeSlotAdmin::FreeDRTTimeSlotAdmin()
 			: AdminInterfaceElementTemplate<FreeDRTTimeSlotAdmin>()
 		{ }
@@ -112,34 +121,67 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
-			stream << "<h1>Propriétés</h1>";
+			////////////////////////////////////////////////////////////////////
+			// TAB PROPERTIES
+			if (openTabContent(stream, TAB_PROPERTIES))
+			{
+				stream << "<h1>Propriétés</h1>";
 
-			AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
-			updateRequest.getAction()->setTimeSlot(const_pointer_cast<FreeDRTTimeSlot>(_timeSlot));
+				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
+				updateRequest.getAction()->setTimeSlot(const_pointer_cast<FreeDRTTimeSlot>(_timeSlot));
 
-			// Properties editor
-			PropertiesHTMLTable propertiesTable(
-				updateRequest.getHTMLForm("properties")
-			);
-			stream << propertiesTable.open();
-			stream << propertiesTable.cell("ID", lexical_cast<string>(_timeSlot->getKey()));
-			stream << propertiesTable.cell("Numéro service", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER, _timeSlot->getServiceNumber()));
-			stream << propertiesTable.cell("Heure début", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE, _timeSlot->getFirstDeparture().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getFirstDeparture())));
-			stream << propertiesTable.cell("Heure fin", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL, _timeSlot->getLastArrival().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getLastArrival())));
-			stream << propertiesTable.cell("Capacité max", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_CAPACITY, _timeSlot->getMaxCapacity() ? lexical_cast<string>(*_timeSlot->getMaxCapacity()) : string()));
-			stream << propertiesTable.cell("Vitesse commerciale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_COMMERCIAL_SPEED, lexical_cast<string>(_timeSlot->getCommercialSpeed())));
-			stream << propertiesTable.cell("Vitesse maximale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_SPEED, lexical_cast<string>(_timeSlot->getMaxSpeed())));
-			stream << propertiesTable.close();
+				// Properties editor
+				PropertiesHTMLTable propertiesTable(
+					updateRequest.getHTMLForm("properties")
+				);
+				stream << propertiesTable.open();
+				stream << propertiesTable.cell("ID", lexical_cast<string>(_timeSlot->getKey()));
+				stream << propertiesTable.cell("Numéro service", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER, _timeSlot->getServiceNumber()));
+				stream << propertiesTable.cell("Heure début", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE, _timeSlot->getFirstDeparture().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getFirstDeparture())));
+				stream << propertiesTable.cell("Heure fin", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL, _timeSlot->getLastArrival().is_not_a_date_time() ? string() : to_simple_string(_timeSlot->getLastArrival())));
+				stream << propertiesTable.cell("Capacité max", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_CAPACITY, _timeSlot->getMaxCapacity() ? lexical_cast<string>(*_timeSlot->getMaxCapacity()) : string()));
+				stream << propertiesTable.cell("Vitesse commerciale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_COMMERCIAL_SPEED, lexical_cast<string>(_timeSlot->getCommercialSpeed())));
+				stream << propertiesTable.cell("Vitesse maximale", propertiesTable.getForm().getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_MAX_SPEED, lexical_cast<string>(_timeSlot->getMaxSpeed())));
+				stream << propertiesTable.close();
 
-			// Use rule editor
-			PTRuleUserAdmin<FreeDRTTimeSlot, FreeDRTTimeSlotAdmin>::Display(stream, _timeSlot, request);
+				// Use rule editor
+				PTRuleUserAdmin<FreeDRTTimeSlot, FreeDRTTimeSlotAdmin>::Display(stream, _timeSlot, request);
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// TAB CALENDAR
+			if (openTabContent(stream, TAB_CALENDAR))
+			{
+				const TransportNetwork* network(
+					static_cast<const CommercialLine*>(_timeSlot->getPath()->getPathGroup())->getNetwork()
+				);
+				
+				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
+				updateRequest.getAction()->setTimeSlot(
+					const_pointer_cast<FreeDRTTimeSlot>(_timeSlot)
+				);
+
+				BaseCalendarAdmin::Display(
+					stream,
+					*_timeSlot,
+					updateRequest,
+					network->getDaysCalendarsParent() ? optional<RegistryKeyType>(network->getDaysCalendarsParent()->getKey()) : optional<RegistryKeyType>(),
+					network->getPeriodsCalendarsParent() ? optional<RegistryKeyType>(network->getPeriodsCalendarsParent()->getKey()) : optional<RegistryKeyType>()
+				);
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// END TABS
+			closeTabContent(stream);
 		}
 
 
 		
 		std::string FreeDRTTimeSlotAdmin::getTitle() const
 		{
-			return (_timeSlot.get() && _timeSlot->getServiceNumber().empty()) ? _timeSlot->getServiceNumber() : DEFAULT_TITLE;
+			return (_timeSlot.get() && !_timeSlot->getServiceNumber().empty()) ? _timeSlot->getServiceNumber() : DEFAULT_TITLE;
 		}
 
 
@@ -161,5 +203,17 @@ namespace synthese
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(getNewCopiedPage());
 			return links;
+		}
+
+
+
+		void FreeDRTTimeSlotAdmin::_buildTabs( const security::Profile& profile ) const
+		{
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			_tabs.push_back(Tab("Calendrier", TAB_CALENDAR, true));
+
+			_tabBuilded = true;
 		}
 }	}

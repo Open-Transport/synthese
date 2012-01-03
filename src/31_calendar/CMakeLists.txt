@@ -1,13 +1,22 @@
 set_source_groups()
 
 set(calendar_SRCS
+BaseCalendarAdmin.cpp
+BaseCalendarAdmin.hpp
+BaseCalendarUpdateAction.cpp
+BaseCalendarUpdateAction.hpp
 Calendar.cpp
 Calendar.h
 CalendarDateInterfacePage.cpp
 CalendarDateInterfacePage.hpp
 CalendarFileFormat.cpp
 CalendarFileFormat.hpp
-CalendarHTMLViewer.h
+CalendarLink.cpp
+CalendarLink.hpp
+CalendarLinkTableSync.cpp
+CalendarLinkTableSync.hpp
+CalendarLinkUpdateAction.cpp
+CalendarLinkUpdateAction.hpp
 CalendarModule.cpp
 CalendarModule.gen.cpp
 CalendarModuleRegister.cpp

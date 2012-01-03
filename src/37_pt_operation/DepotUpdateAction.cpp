@@ -28,8 +28,6 @@
 #include "GlobalRight.h"
 #include "Request.h"
 #include "DepotTableSync.hpp"
-#include "ImportableAdmin.hpp"
-#include "ImportableTableSync.hpp"
 
 using namespace std;
 
@@ -62,10 +60,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NAME, *_name);
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -95,10 +93,7 @@ namespace synthese
 			}
 
 			// Data source links
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -115,10 +110,7 @@ namespace synthese
 			}
 
 			// Data source links
-			if(_dataSourceLinks)
-			{
-				_depot->setDataSourceLinks(*_dataSourceLinks);
-			}
+			_doImportableUpdate(*_depot, request);
 
 			DepotTableSync::Save(_depot.get());
 

@@ -106,7 +106,7 @@ namespace synthese
 				PTModule::GetGeneralStopsMatcher().add(object->getFullName(), env.getEditableSPtr(object));
 
 				// Datasource links
-				object->setDataSourceLinks(
+				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
 						env

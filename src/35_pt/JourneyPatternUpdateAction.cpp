@@ -29,9 +29,8 @@
 #include "Request.h"
 #include "JourneyPatternTableSync.hpp"
 #include "RollingStockTableSync.hpp"
-#include "ImportableTableSync.hpp"
-#include "ImportableAdmin.hpp"
 #include "DestinationTableSync.hpp"
+#include "ScheduledServiceTableSync.h"
 
 using namespace std;
 using namespace boost;
@@ -42,6 +41,8 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
+	using namespace graph;
+	using namespace db;
 
 	namespace util
 	{
@@ -83,10 +84,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_TRANSPORT_MODE_ID, _transportMode->get() ? (*_transportMode)->getKey() : RegistryKeyType(0));
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			if(_direction)
 			{
 				map.insert(PARAMETER_DIRECTION_ID, _directionObj->get() ? (*_directionObj)->getKey() : RegistryKeyType(0));
@@ -163,9 +164,14 @@ namespace synthese
 				}
 			}
 
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
+
+			// Massive calendar service updates
+			_setCalendarUpdateFromParametersMap(*_env, map);
+			if(_calendarUpdateToDo())
 			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
+				ScheduledServiceTableSync::Search(*_env, _route->getKey());
 			}
 		}
 
@@ -174,6 +180,9 @@ namespace synthese
 		void JourneyPatternUpdateAction::run(
 			Request& request
 		){
+
+			DBTransaction transaction;
+
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
@@ -197,16 +206,33 @@ namespace synthese
 			{
 				_route->setWayBack(*_wayback);
 			}
-			if(_dataSourceLinks)
-			{
-				_route->setDataSourceLinks(*_dataSourceLinks);
-			}
+
+			// Importable
+			_doImportableUpdate(*_route, request);
+
 			if(_directionObj)
 			{
 				_route->setDirectionObj(_directionObj->get());
 			}
 
-			JourneyPatternTableSync::Save(_route.get());
+			JourneyPatternTableSync::Save(_route.get(), transaction);
+
+			// Massive date update of services
+			if(_calendarUpdateToDo())
+			{
+				BOOST_FOREACH(Service* itService, _route->getServices())
+				{
+					ScheduledService* service(dynamic_cast<ScheduledService*>(itService));
+					if(service == NULL)
+					{
+						continue;
+					}
+
+					_doCalendarUpdate(*service, request);
+
+					ScheduledServiceTableSync::Save(service, transaction);
+				}
+			}
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}

@@ -31,8 +31,6 @@
 #include "TransportNetworkTableSync.h"
 #include "ReservationContactTableSync.h"
 #include "CommercialLineTableSync.h"
-#include "ImportableTableSync.hpp"
-#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost;
@@ -78,10 +76,6 @@ namespace synthese
 			{
 				map.insert(PARAMETER_COLOR, *_color ? (*_color)->toXMLColor() : string());
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
 			if(_image)
 			{
 				map.insert(PARAMETER_IMAGE, *_image);
@@ -122,6 +116,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_TIMETABLE_ID, *_timetableId);
 			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -161,14 +159,8 @@ namespace synthese
 				_color = color.empty() ? optional<RGBColor>() : RGBColor::FromXMLColor(color);
 			}
 
-			// Creator ID
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS),
-					*_env
-				);
-			}
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
 
 			// Image
 			if(map.isDefined(PARAMETER_IMAGE))
@@ -253,10 +245,10 @@ namespace synthese
 			{
 				_line->setColor(*_color);
 			}
-			if(_dataSourceLinks)
-			{
-				_line->setDataSourceLinks(*_dataSourceLinks);
-			}
+
+			// Importable
+			_doImportableUpdate(*_line, request);
+
 			if(_image)
 			{
 				_line->setImage(*_image);

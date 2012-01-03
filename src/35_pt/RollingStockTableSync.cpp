@@ -100,14 +100,22 @@ namespace synthese
 			object->setCO2Emissions(rows->getDouble(RollingStockTableSync::COL_CO2_EMISSIONS));
 			object->setEnergyConsumption(rows->getDouble(RollingStockTableSync::COL_ENERGY_CONSUMPTION));
 
+			// Data source links
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				// Data source links
-				object->setDataSourceLinks(
+				Importable::DataSourceLinks dsl(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(RollingStockTableSync::COL_DATASOURCE_LINKS), env
-					), linkLevel > UP_LINKS_LOAD_LEVEL
-				);
+						rows->getText(RollingStockTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(linkLevel > UP_LINKS_LOAD_LEVEL)
+				{
+					object->setDataSourceLinksWithRegistration(dsl);
+				}
+				else
+				{
+					object->setDataSourceLinksWithoutRegistration(dsl);
+				}
 			}
 		}
 

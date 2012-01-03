@@ -42,7 +42,7 @@ namespace synthese
 	namespace calendar
 	{
 		/** CalendarTemplate class.
-			@ingroup m19
+			@ingroup m31
 
 			<h3>Calendar template category</h3>
 

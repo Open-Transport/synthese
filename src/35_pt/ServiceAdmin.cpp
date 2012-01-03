@@ -23,45 +23,40 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ServiceAdmin.h"
+
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "AdminModule.h"
 #include "AdminParametersException.h"
+#include "BaseCalendarAdmin.hpp"
+#include "CalendarTemplate.h"
+#include "ContinuousService.h"
+#include "ContinuousServiceTableSync.h"
+#include "ContinuousServiceUpdateAction.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "DRTArea.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "HTMLForm.h"
+#include "ImportableAdmin.hpp"
+#include "JourneyPattern.hpp"
+#include "JourneyPatternAdmin.hpp"
+#include "LineArea.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
 #include "PTModule.h"
-#include "TransportNetworkRight.h"
+#include "PTPlaceAdmin.h"
+#include "PTRuleUserAdmin.hpp"
+#include "ResultHTMLTable.h"
 #include "ScheduledServiceTableSync.h"
 #include "ScheduledService.h"
-#include "ContinuousServiceTableSync.h"
-#include "ContinuousService.h"
-#include "ResultHTMLTable.h"
-#include "JourneyPattern.hpp"
-#include "LineArea.hpp"
-#include "StopPoint.hpp"
-#include "StopArea.hpp"
-#include "HTMLForm.h"
-#include "AdminActionFunctionRequest.hpp"
 #include "ScheduleRealTimeUpdateAction.h"
-#include "ServiceVertexRealTimeUpdateAction.h"
-#include "CalendarHTMLViewer.h"
-#include "JourneyPatternAdmin.hpp"
-#include "Profile.h"
-#include "PTPlaceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "ContinuousServiceUpdateAction.h"
-#include "PropertiesHTMLTable.h"
-#include "PTRuleUserAdmin.hpp"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
-#include "AdminModule.h"
-#include "ServiceApplyCalendarAction.h"
-#include "CalendarTemplateTableSync.h"
-#include "ServiceDateChangeAction.h"
-#include "DRTAreaAdmin.hpp"
-#include "DRTArea.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "ServiceCalendarLinkUpdateAction.hpp"
-#include "ServiceCalendarLink.hpp"
-#include "CalendarTemplateAdmin.h"
-#include "RemoveObjectAction.hpp"
-#include "ImportableAdmin.hpp"
+#include "ServiceVertexRealTimeUpdateAction.h"
+#include "StopPoint.hpp"
+#include "StopArea.hpp"
+#include "TransportNetworkRight.h"
 
 using namespace std;
 using namespace boost;
@@ -488,136 +483,22 @@ namespace synthese
 			// TAB CALENDAR
 			if (openTabContent(stream, TAB_CALENDAR))
 			{
-				// Session variables
-				string sessionStartDateStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE));
-				date sessionStartDate;
-				if(!sessionStartDateStr.empty())
-				{
-					sessionStartDate = from_string(sessionStartDateStr);
-				}
-				string sessionEndDateStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE));
-				date sessionEndDate;
-				if(!sessionEndDateStr.empty())
-				{
-					sessionEndDate = from_string(sessionEndDateStr);
-				}
-				string sessionCalendarTemplateIdStr(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID));
-				RegistryKeyType sessionCalendarTemplateId(0);
-				if(!sessionCalendarTemplateIdStr.empty())
-				{
-					sessionCalendarTemplateId = lexical_cast<RegistryKeyType>(sessionCalendarTemplateIdStr);
-				}
-				string sessionCalendarTemplateIdStr2(request.getSession()->getSessionVariable(ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2));
-				RegistryKeyType sessionCalendarTemplateId2(0);
-				if(!sessionCalendarTemplateIdStr2.empty())
-				{
-					sessionCalendarTemplateId2 = lexical_cast<RegistryKeyType>(sessionCalendarTemplateIdStr2);
-				}
-
-				stream << "<h1>Définition par lien</h1>";
-
-				if(_service->getCalendarLinks().empty())
-				{
-					stream << "<p class=\"info\">Lorsque un calendrier de service est défini par lien, la définition par date est impossible et certaines fonctions temps réel peuvent ne pas fonctionner.</p>";
-				}
-
-				AdminActionFunctionRequest<ServiceCalendarLinkUpdateAction,ServiceAdmin> calendarLinkAddRequest(request);
-				calendarLinkAddRequest.getAction()->setService(static_pointer_cast<NonPermanentService, SchedulesBasedService>(const_pointer_cast<SchedulesBasedService>(_service)));
-
-				AdminFunctionRequest<CalendarTemplateAdmin> openCalendarRequest(request);
-
-				AdminActionFunctionRequest<RemoveObjectAction,ServiceAdmin> calendarLinkRemoveRequest(request);
-				
-				HTMLForm calendarLinkAddForm(calendarLinkAddRequest.getHTMLForm("calendar_link_add"));
-				stream << calendarLinkAddForm.open();
-
-				HTMLTable::ColsVector vs;
-				vs.push_back("Date début");
-				vs.push_back("Date fin");
-				vs.push_back("Calendrier jours");
-				vs.push_back("Calendrier période");
-				vs.push_back("Action");
-				HTMLTable tc(vs, ResultHTMLTable::CSS_CLASS);
-				stream << tc.open();
-				BOOST_FOREACH(NonPermanentService::CalendarLinks::value_type link, _service->getCalendarLinks())
-				{
-					stream << tc.row();
-					stream << tc.col() << link->getStartDate();
-					stream << tc.col() << link->getEndDate();
-					
-					// Calendar days
-					stream << tc.col();
-					if(link->getCalendarTemplate())
-					{
-						openCalendarRequest.getPage()->setCalendar(Env::GetOfficialEnv().getSPtr(link->getCalendarTemplate()));
-						stream << HTMLModule::getHTMLLink(openCalendarRequest.getURL(), link->getCalendarTemplate()->getName());
-					}
-
-					// Calendar period
-					stream << tc.col();
-					if(link->getCalendarTemplate2())
-					{
-						openCalendarRequest.getPage()->setCalendar(Env::GetOfficialEnv().getSPtr(link->getCalendarTemplate2()));
-						stream << HTMLModule::getHTMLLink(openCalendarRequest.getURL(), link->getCalendarTemplate2()->getName());
-					}
-
-					// Remove button
-					calendarLinkRemoveRequest.getAction()->setObjectId(link->getKey());
-					stream << tc.col() << HTMLModule::getLinkButton(calendarLinkRemoveRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?");
-				}
 				const TransportNetwork* network(
 					static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())->getNetwork()
 				);
-				stream << tc.row();
-				stream << tc.col() << calendarLinkAddForm.getCalendarInput(ServiceCalendarLinkUpdateAction::PARAMETER_START_DATE, sessionStartDate);
-				stream << tc.col() << calendarLinkAddForm.getCalendarInput(ServiceCalendarLinkUpdateAction::PARAMETER_END_DATE, sessionEndDate);
-				stream << tc.col() << calendarLinkAddForm.getSelectInput(
-						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(
-							"(aucun)",
-							optional<RegistryKeyType>(),
-							network->getDaysCalendarsParent() ? optional<RegistryKeyType>(network->getDaysCalendarsParent()->getKey()) : optional<RegistryKeyType>()
-						),
-						optional<RegistryKeyType>(sessionCalendarTemplateId)
-				);
-				stream << tc.col() << calendarLinkAddForm.getSelectInput(
-						ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2,
-						CalendarTemplateTableSync::GetCalendarTemplatesList(
-							"(aucun)",
-							optional<RegistryKeyType>(),
-							network->getPeriodsCalendarsParent() ? optional<RegistryKeyType>(network->getPeriodsCalendarsParent()->getKey()) : optional<RegistryKeyType>()
-						),
-						optional<RegistryKeyType>(sessionCalendarTemplateId2)
-				);
-				stream << tc.col() << calendarLinkAddForm.getSubmitButton("Ajouter");
-				stream << tc.close();
-				stream << calendarLinkAddForm.close();
 				
-				if(_service->getCalendarLinks().empty())
-				{
-					stream << "<h1>Définition par date</h1>";
+				AdminActionFunctionRequest<ServiceUpdateAction, ServiceAdmin> updateRequest(request);
+				updateRequest.getAction()->setService(
+					const_pointer_cast<SchedulesBasedService>(_service)
+				);
 
-					AdminActionFunctionRequest<ServiceApplyCalendarAction,ServiceAdmin> updateRequest(request);
-					updateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
-					PropertiesHTMLTable p(updateRequest.getHTMLForm("applycalendar"));
-					stream << p.open();
-					stream << p.cell("Date début", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_START_DATE, sessionStartDate));
-					stream << p.cell("Date fin", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_END_DATE, sessionEndDate));
-					stream << p.cell("Période", p.getForm().getTextInput(ServiceApplyCalendarAction::PARAMETER_PERIOD, "1", string(), AdminModule::CSS_2DIGIT_INPUT));
-					stream << p.cell("Modèle", p.getForm().getSelectInput(
-							ServiceApplyCalendarAction::PARAMETER_CALENDAR_TEMPLATE_ID,
-							CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
-							optional<RegistryKeyType>(sessionCalendarTemplateId)
-					)	);
-					stream << p.cell("Ajout", p.getForm().getOuiNonRadioInput(ServiceApplyCalendarAction::PARAMETER_ADD, true));
-					stream << p.close();
-				}
-
-				stream << "<h1>Résultat</h1>";
-				AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> updateDateRequest(request);
-				updateDateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
-				CalendarHTMLViewer<AdminActionFunctionRequest<ServiceDateChangeAction,ServiceAdmin> > cv(*_service, &updateDateRequest);
-				cv.display(stream);
+				BaseCalendarAdmin::Display(
+					stream,
+					*_service,
+					updateRequest,
+					network->getDaysCalendarsParent() ? optional<RegistryKeyType>(network->getDaysCalendarsParent()->getKey()) : optional<RegistryKeyType>(),
+					network->getPeriodsCalendarsParent() ? optional<RegistryKeyType>(network->getPeriodsCalendarsParent()->getKey()) : optional<RegistryKeyType>()
+				);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -627,7 +508,10 @@ namespace synthese
 				stream << "<h1>Propriétés</h1>";
 
 				AdminActionFunctionRequest<ServiceUpdateAction,ServiceAdmin> updateRequest(request);
-				updateRequest.getAction()->setService(const_pointer_cast<Service>(static_pointer_cast<const Service>(_service)));
+				updateRequest.getAction()->setService(
+					const_pointer_cast<SchedulesBasedService>(
+						_service
+				)	);
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.cell("Numéro", t.getForm().getTextInput(ServiceUpdateAction::PARAMETER_SERVICE_NUMBER, _service->getServiceNumber()));
@@ -642,7 +526,10 @@ namespace synthese
 				if(_scheduledService.get())
 				{
 					StaticActionRequest<ServiceUpdateAction> updateOnlyRequest(request);
-					updateOnlyRequest.getAction()->setService(const_pointer_cast<Service>(static_pointer_cast<const Service>(_scheduledService)));
+					updateOnlyRequest.getAction()->setService(
+						const_pointer_cast<SchedulesBasedService>(
+							_service
+					)	);
 					ImportableAdmin::DisplayDataSourcesTab(stream, *_scheduledService, updateOnlyRequest);
 				}
 			}

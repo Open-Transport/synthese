@@ -43,6 +43,9 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<FreeDRTTimeSlotAdmin>
 		{
 		public:
+			static const std::string TAB_PROPERTIES;
+			static const std::string TAB_CALENDAR;
+
 			/// @name Parameter identifiers
 			//@{
 			//@}
@@ -123,6 +126,13 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
+
+
+
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
+
 
 
 			

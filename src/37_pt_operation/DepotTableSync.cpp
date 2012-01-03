@@ -103,7 +103,7 @@ namespace synthese
 			// Datasource links
 			if(linkLevel > UP_LINKS_LOAD_LEVEL)
 			{
-				object->setDataSourceLinks(
+				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(DepotTableSync::COL_DATASOURCE_LINKS),
 						env

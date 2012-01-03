@@ -104,7 +104,7 @@ namespace synthese
 				city->addPlaceToMatcher<PublicPlace>(env.getEditableSPtr(object));
 
 				// Datasource links
-				object->setDataSourceLinks(
+				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(PublicPlaceTableSync::COL_DATASOURCE_LINKS),
 						env

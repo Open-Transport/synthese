@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "Composition.hpp"
+#include "BaseCalendarUpdateAction.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -56,21 +57,21 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
 		class CompositionUpdateAction:
-			public util::FactorableTemplate<server::Action, CompositionUpdateAction>
+			public util::FactorableTemplate<server::Action, CompositionUpdateAction>,
+			public calendar::BaseCalendarUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_COMPOSITION_ID;
 			static const std::string PARAMETER_SERVICE_ID;
-			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_FIRST_QUAY;
 			static const std::string PARAMETER_VEHICLES;
 
 		private:
 			boost::shared_ptr<Composition> _composition;
 			boost::shared_ptr<pt::ScheduledService> _service;
-			boost::optional<boost::gregorian::date> _date;
 			boost::shared_ptr<pt::StopPoint> _firstQuay;
 			boost::optional<Composition::VehicleLinks> _vehicles;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -85,6 +86,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -107,7 +109,6 @@ namespace synthese
 				void setComposition(boost::shared_ptr<Composition> value) { _composition = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_CompositionUpdateAction_H__

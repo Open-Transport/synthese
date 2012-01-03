@@ -111,10 +111,11 @@ namespace synthese
  				}
 
 				// Data source links
-				object->setDataSourceLinks(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(rows->getText(CalendarTemplateTableSync::COL_DATASOURCE_LINKS), env)
-				);
-
+				object->setDataSourceLinksWithoutRegistration(
+					ImportableTableSync::GetDataSourceLinksFromSerializedString(
+						rows->getText(CalendarTemplateTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
 
 				// Parent
 				try

@@ -130,7 +130,7 @@ namespace synthese
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
-				network->setDataSourceLinks(links);
+				network->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<TransportNetwork>().add(shared_ptr<TransportNetwork>(network));
 				networks.add(*network);
 				logStream << "CREA : Creation of the network with key " << id << " (" << name <<  ")<br />";
@@ -203,7 +203,7 @@ namespace synthese
 			)	);
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, id));
-			stopArea->setDataSourceLinks(links);
+			stopArea->setDataSourceLinksWithoutRegistration(links);
 			stopArea->setCity(&city);
 			stopArea->setName(name);
 			if(mainStopArea)
@@ -331,7 +331,7 @@ namespace synthese
 			)	);
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, code));
-			stop->setDataSourceLinks(links);
+			stop->setDataSourceLinksWithoutRegistration(links);
 			env.getEditableRegistry<StopPoint>().add(shared_ptr<StopPoint>(stop));
 			stops.add(*stop);
 
@@ -460,7 +460,7 @@ namespace synthese
 					curStop = new StopArea(StopAreaTableSync::getId(), true);
 					Importable::DataSourceLinks links;
 					links.insert(make_pair(&source, string()));
-					curStop->setDataSourceLinks(links);
+					curStop->setDataSourceLinksWithoutRegistration(links);
 					if(defaultTransferDuration)
 					{
 						curStop->setDefaultTransferDelay(*defaultTransferDuration);
@@ -535,7 +535,7 @@ namespace synthese
 				line->setNetwork(&defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
-				line->setDataSourceLinks(links);
+				line->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<CommercialLine>().add(shared_ptr<CommercialLine>(line));
 				lines.add(*line);
 			}
@@ -648,7 +648,7 @@ namespace synthese
 				{
 					links.insert(make_pair(&source, string()));
 				}
-				result->setDataSourceLinks(links);
+				result->setDataSourceLinksWithoutRegistration(links);
 
 				// Storage in the environment
 				env.getEditableRegistry<JourneyPattern>().add(shared_ptr<JourneyPattern>(result));
@@ -1259,7 +1259,7 @@ namespace synthese
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
-				destination->setDataSourceLinks(links);
+				destination->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<Destination>().add(shared_ptr<Destination>(destination));
 				destinations.add(*destination);
 				logStream << "CREA : Creation of the destination with key " << id << " (" << displayText <<  ")<br />";

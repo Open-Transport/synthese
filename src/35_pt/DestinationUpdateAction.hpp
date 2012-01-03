@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
@@ -49,7 +50,8 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
 		class DestinationUpdateAction:
-			public util::FactorableTemplate<server::Action, DestinationUpdateAction>
+			public util::FactorableTemplate<server::Action, DestinationUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_DESTINATION_ID;
@@ -62,7 +64,7 @@ namespace synthese
 			boost::optional<std::string> _displayedText;
 			boost::optional<std::string> _ttsText;
 			boost::optional<std::string> _comment;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -77,6 +79,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -99,7 +102,6 @@ namespace synthese
 				void setDestination(boost::shared_ptr<Destination> value) { _destination = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DestinationUpdateAction_H__

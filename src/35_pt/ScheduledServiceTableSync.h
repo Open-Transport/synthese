@@ -45,7 +45,7 @@ namespace synthese
 		class ScheduledServiceTableSync:
 			public db::DBRegistryTableSyncTemplate<ScheduledServiceTableSync,ScheduledService>,
 			public db::FetcherTemplate<SchedulesBasedService, ScheduledServiceTableSync>,
-			public db::FetcherTemplate<graph::Service, ScheduledServiceTableSync>
+			public db::FetcherTemplate<calendar::Calendar, ScheduledServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;

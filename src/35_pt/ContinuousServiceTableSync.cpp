@@ -37,8 +37,8 @@
 #include "ReplaceQuery.h"
 #include "LoadException.h"
 #include "LineStopTableSync.h"
-#include "ServiceCalendarLinkTableSync.hpp"
-#include "ServiceCalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
+#include "CalendarLink.hpp"
 
 #include <set>
 #include <sstream>
@@ -57,10 +57,11 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace security;
+	using namespace calendar;
 
 	template<> const string util::FactorableTemplate<DBTableSync,ContinuousServiceTableSync>::FACTORY_KEY("35.60.02 Continuous services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ContinuousServiceTableSync>::FACTORY_KEY("17");
-	template<> const string FactorableTemplate<Fetcher<Service>, ContinuousServiceTableSync>::FACTORY_KEY("17");
+	template<> const string FactorableTemplate<Fetcher<Calendar>, ContinuousServiceTableSync>::FACTORY_KEY("17");
 
 	namespace pt
 	{
@@ -184,8 +185,8 @@ namespace synthese
 			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				// Search of calendar template links (overrides manually defined calendar)
-				ServiceCalendarLinkTableSync::SearchResult links(
-					ServiceCalendarLinkTableSync::Search(
+				CalendarLinkTableSync::SearchResult links(
+					CalendarLinkTableSync::Search(
 						env,
 						cs->getKey()
 				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
@@ -195,7 +196,7 @@ namespace synthese
 				}
 				else
 				{
-					BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+					BOOST_FOREACH(shared_ptr<CalendarLink> link, links)
 					{
 						cs->addCalendarLink(*link, false);
 					}

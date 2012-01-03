@@ -37,7 +37,6 @@
 #include "CalendarTemplatePropertiesUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "CalendarHTMLViewer.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SearchFormHTMLTable.h"
@@ -46,6 +45,7 @@
 #include "CalendarTemplateTableSync.h"
 #include "CalendarTemplateCleanAction.hpp"
 #include "ImportableAdmin.hpp"
+#include "BaseCalendarAdmin.hpp"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -302,11 +302,7 @@ namespace synthese
 
 				Calendar mask(_resultStartDate, _resultEndDate);
 				Calendar result(_calendar->getResult(mask));
-
-				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
-				addRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
-				CalendarHTMLViewer<AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> > v(result);
-				v.display(stream);
+				BaseCalendarAdmin::Display(stream, result);
 			}
 
 			////////////////////////////////////////////////////////////////////

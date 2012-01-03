@@ -28,8 +28,6 @@
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "RollingStockTableSync.hpp"
-#include "ImportableTableSync.hpp"
-#include "ImportableAdmin.hpp"
 
 using namespace std;
 
@@ -52,7 +50,6 @@ namespace synthese
 		const string RollingStockUpdateAction::PARAMETER_ARTICLE = Action_PARAMETER_PREFIX + "ar";
 		const string RollingStockUpdateAction::PARAMETER_CO2_EMISSIONS = Action_PARAMETER_PREFIX + "co2";
 		const string RollingStockUpdateAction::PARAMETER_ENERGY_CONSUMPTION = Action_PARAMETER_PREFIX + "ec";
-		const string RollingStockUpdateAction::PARAMETER_DATASOURCE_LINKS = Action_PARAMETER_PREFIX + "datasource_links";
 
 
 
@@ -79,10 +76,9 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ENERGY_CONSUMPTION, *_energyConsumption);
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(PARAMETER_DATASOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
 
 			return map;
 		}
@@ -120,10 +116,9 @@ namespace synthese
 			{
 				_energyConsumption = map.get<double>(PARAMETER_ENERGY_CONSUMPTION);
 			}
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -147,10 +142,9 @@ namespace synthese
 			{
 				_rollingStock->setEnergyConsumption(*_energyConsumption);
 			}
-			if(_dataSourceLinks)
-			{
-				_rollingStock->setDataSourceLinks(*_dataSourceLinks);
-			}
+
+			// Importable
+			_doImportableUpdate(*_rollingStock, request);
 
 			RollingStockTableSync::Save(_rollingStock.get());
 

@@ -33,8 +33,8 @@
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"
 #include "ImportableTableSync.hpp"
-#include "ServiceCalendarLinkTableSync.hpp"
-#include "ServiceCalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
+#include "CalendarLink.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -51,10 +51,11 @@ namespace synthese
 	using namespace graph;
 	using namespace security;
 	using namespace impex;
-
+	using namespace calendar;
+	
 	template<> const string util::FactorableTemplate<DBTableSync,ScheduledServiceTableSync>::FACTORY_KEY("35.60.03 Scheduled services");
 	template<> const string FactorableTemplate<Fetcher<SchedulesBasedService>, ScheduledServiceTableSync>::FACTORY_KEY("16");
-	template<> const string FactorableTemplate<Fetcher<Service>, ScheduledServiceTableSync>::FACTORY_KEY("16");
+	template<> const string FactorableTemplate<Fetcher<Calendar>, ScheduledServiceTableSync>::FACTORY_KEY("16");
 
 	namespace pt
 	{
@@ -145,11 +146,20 @@ namespace synthese
 				}
 				ss->setRules(rules);
 
-				ss->setDataSourceLinks(
+				// Data source links
+				Importable::DataSourceLinks dsl(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS), env
-					), linkLevel > UP_LINKS_LOAD_LEVEL
-				);
+						rows->getText(ScheduledServiceTableSync::COL_DATASOURCE_LINKS),
+						env
+				)	);
+				if(linkLevel > UP_LINKS_LOAD_LEVEL)
+				{
+					ss->setDataSourceLinksWithRegistration(dsl);
+				}
+				else
+				{
+					ss->setDataSourceLinksWithoutRegistration(dsl);
+				}
 			}
 
 			// Schedules
@@ -177,8 +187,8 @@ namespace synthese
 			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				// Search of calendar template links (overrides manually defined calendar)
-				ServiceCalendarLinkTableSync::SearchResult links(
-					ServiceCalendarLinkTableSync::Search(
+				CalendarLinkTableSync::SearchResult links(
+					CalendarLinkTableSync::Search(
 						env,
 						ss->getKey()
 				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
@@ -188,7 +198,7 @@ namespace synthese
 				}
 				else
 				{
-					BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+					BOOST_FOREACH(shared_ptr<CalendarLink> link, links)
 					{
 						ss->addCalendarLink(*link, false);
 					}

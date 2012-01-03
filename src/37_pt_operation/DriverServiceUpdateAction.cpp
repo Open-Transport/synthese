@@ -26,11 +26,8 @@
 #include "ParametersMap.h"
 #include "DriverServiceUpdateAction.hpp"
 #include "Request.h"
-#include "ImportableAdmin.hpp"
 #include "DriverService.hpp"
-#include "ImportableTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
-#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost::gregorian;
@@ -50,7 +47,6 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string DriverServiceUpdateAction::PARAMETER_DRIVER_SERVICE_ID = Action_PARAMETER_PREFIX + "driver_service_id";
-		const string DriverServiceUpdateAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "date";
 		const string DriverServiceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 
 		
@@ -58,22 +54,25 @@ namespace synthese
 		ParametersMap DriverServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
+
+			// Driver service
 			if(_driverService.get())
 			{
 				map.insert(PARAMETER_DRIVER_SERVICE_ID, _driverService->getKey());
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
-			if(_date)
-			{
-				map.insert(PARAMETER_DATE, *_date);
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
+			// Dates
+			_getCalendarUpdateParametersMap(map);
+
+			// Name
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
 			}
+
 			return map;
 		}
 		
@@ -97,20 +96,12 @@ namespace synthese
 			}
 
 			// Creator ID
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS),
-					*_env
-				);
-			}
+			_setImportableUpdateFromParametersMap(*_env, map);
 
 			// Date
-			if(map.isDefined(PARAMETER_DATE))
-			{
-				_date = from_simple_string(map.get<string>(PARAMETER_DATE));
-			}
+			_setCalendarUpdateFromParametersMap(*_env, map);
 
+			// Name
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
@@ -132,10 +123,7 @@ namespace synthese
 			}
 
 			// Data source links
-			if(_dataSourceLinks)
-			{
-				_driverService->setDataSourceLinks(*_dataSourceLinks);
-			}
+			_doImportableUpdate(*_driverService, request);
 
 			// Name
 			if(_name)
@@ -144,17 +132,7 @@ namespace synthese
 			}
 
 			// Date change
-			if(_date)
-			{
-				if(_driverService->isActive(*_date))
-				{
-					_driverService->setInactive(*_date);
-				}
-				else
-				{
-					_driverService->setActive(*_date);
-				}
-			}
+			_doCalendarUpdate(*_driverService, request);
 
 			DriverServiceTableSync::Save(_driverService.get());
 

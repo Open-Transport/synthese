@@ -90,10 +90,10 @@ namespace synthese
 		{
 			ParametersMap map;
 			if (_scenario.get()) map.insert(PARAMETER_SCENARIO_ID, _scenario->getKey());
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -336,11 +336,8 @@ namespace synthese
 						_message = *alarms.begin();
 					}
 
-					// Datasource
-					if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-					{
-						_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-					}
+					// Importable
+					_setImportableUpdateFromParametersMap(*_env, map);
 
 					// Enabled
 					if(map.isDefined(PARAMETER_ENABLED))
@@ -446,7 +443,7 @@ namespace synthese
 			{
 				Importable::DataSourceLinks links;
 				links.insert(Importable::DataSourceLinks::value_type(_scenarioDataSource.get(), _dataSourceLinkId));
-				_sscenario->setDataSourceLinks(links);
+				_sscenario->setDataSourceLinksWithoutRegistration(links);
 			}
 
 			// Name
@@ -509,10 +506,7 @@ namespace synthese
 				}
 
 				// Datasource
-				if(_dataSourceLinks)
-				{
-					_sscenario->setDataSourceLinks(*_dataSourceLinks);
-				}
+				_doImportableUpdate(*_sscenario, request);
 
 				// Variables
 				if(_sscenario->getTemplate())
@@ -729,5 +723,4 @@ namespace synthese
 				throw ActionException(PARAMETER_SCENARIO_ID, e, *this);
 			}
 		}
-	}
-}
+}	}

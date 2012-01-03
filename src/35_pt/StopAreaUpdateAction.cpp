@@ -29,10 +29,8 @@
 #include "Request.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "ImportableTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
-#include "ImportableAdmin.hpp"
 
 using namespace std;
 using namespace boost::posix_time;
@@ -105,10 +103,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_TIMETABLE_NAME, *_timetableName);
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -169,10 +167,8 @@ namespace synthese
 				_defaultTransferDuration = minutes(map.get<int>(PARAMETER_DEFAULT_TRANSFER_DURATION));
 			}
 
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -229,10 +225,8 @@ namespace synthese
 				_place->setTimetableName(*_timetableName);
 			}
 
-			if(_dataSourceLinks)
-			{
-				_place->setDataSourceLinks(*_dataSourceLinks);
-			}
+			// Importable
+			_doImportableUpdate(*_place, request);
 
 			StopAreaTableSync::Save(_place.get());
 

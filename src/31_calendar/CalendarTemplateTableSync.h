@@ -36,8 +36,8 @@ namespace synthese
 	namespace calendar
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 19.10 Table : Calendar templates.
-		///	@ingroup m19LS refLS
+		/// 31.10 Table : Calendar templates.
+		///	@ingroup m31LS refLS
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t054_calendar_templates

@@ -43,7 +43,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::ServiceUpdateAction>::FACTORY_KEY("ServiceUpdateAction");
+		template<> const string FactorableTemplate<Action, pt::ServiceUpdateAction>::FACTORY_KEY("service_update");
 	}
 
 	namespace pt
@@ -57,12 +57,28 @@ namespace synthese
 		ParametersMap ServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
+
+			// The service
 			if(_service.get())
 			{
 				map.insert(PARAMETER_OBJECT_ID, _service->getKey());
-				map.insert(PARAMETER_SERVICE_NUMBER, _serviceNumber);
-				map.insert(PARAMETER_TEAM_NUMBER, _teamNumber);
 			}
+
+			// Service number
+			if(_serviceNumber)
+			{
+				map.insert(PARAMETER_SERVICE_NUMBER, *_serviceNumber);
+			}
+
+			// Team number
+			if(_teamNumber)
+			{
+				map.insert(PARAMETER_TEAM_NUMBER, *_teamNumber);
+			}
+
+			// Date by value
+			_getCalendarUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -70,21 +86,34 @@ namespace synthese
 
 		void ServiceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// The service
 			try
 			{
-				_service = Fetcher<Service>::FetchEditable(map.get<RegistryKeyType>(PARAMETER_OBJECT_ID), *_env);
+				_service = Fetcher<SchedulesBasedService>::FetchEditable(
+					map.get<RegistryKeyType>(PARAMETER_OBJECT_ID),
+					*_env
+				);
 			}
-			catch(ObjectNotFoundException<Service>&)
+			catch(ObjectNotFoundException<SchedulesBasedService>&)
 			{
 				throw ActionException("No such service");
 			}
 
-			_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
-
-			if(dynamic_cast<ScheduledService*>(_service.get()))
+			// Service number
+			if(map.isDefined(PARAMETER_SERVICE_NUMBER))
 			{
+				_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
+			}
+
+			// Team number
+			if(	map.isDefined(PARAMETER_TEAM_NUMBER) &&
+				dynamic_cast<ScheduledService*>(_service.get())
+			){
 				_teamNumber = map.get<string>(PARAMETER_TEAM_NUMBER);
 			}
+
+			// Calendar by date
+			_setCalendarUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -95,13 +124,23 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			_service->setServiceNumber(_serviceNumber);
-			if(dynamic_cast<ScheduledService*>(_service.get()))
+			// Service number
+			if(_serviceNumber)
 			{
-				static_cast<ScheduledService*>(_service.get())->setTeam(_teamNumber);
+				_service->setServiceNumber(*_serviceNumber);
 			}
 
-			Fetcher<Service>::FetchSave(*_service);
+			// Team number
+			if(_teamNumber)
+			{
+				static_cast<ScheduledService*>(_service.get())->setTeam(*_teamNumber);
+			}
+
+			// Calendar by date
+			_doCalendarUpdate(*_service, request);
+
+			// Save
+			Fetcher<SchedulesBasedService>::FetchSave(*_service);
 
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
@@ -113,5 +152,4 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
-	}
-}
+}	}

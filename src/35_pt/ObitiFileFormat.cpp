@@ -33,7 +33,7 @@
 #include "City.h"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "RollingStock.hpp"
-#include "ServiceCalendarLink.hpp"
+#include "CalendarLink.hpp"
 #include "StopArea.hpp"
 #include "TransportNetwork.h"
 #include "CalendarTemplateTableSync.h"
@@ -43,7 +43,7 @@
 #include "PTUseRuleTableSync.h"
 #include "RollingStockTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
-#include "ServiceCalendarLinkTableSync.hpp"
+#include "CalendarLinkTableSync.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 
@@ -612,18 +612,18 @@ namespace synthese
 								// Calendars
 								if(service)
 								{
-									boost::shared_ptr<ServiceCalendarLink> serviceCalendarLink;
+									boost::shared_ptr<CalendarLink> serviceCalendarLink;
 
-									// Search for existing ServiceCalendarLink
-									ServiceCalendarLinkTableSync::SearchResult serviceCalendarLinks(
-										ServiceCalendarLinkTableSync::Search(
+									// Search for existing CalendarLink
+									CalendarLinkTableSync::SearchResult serviceCalendarLinks(
+										CalendarLinkTableSync::Search(
 											_env,
 											service->getKey(),
-											0)
-									);
+											0
+									)	);
 									if(!serviceCalendarLinks.empty())
 									{
-										BOOST_FOREACH(shared_ptr<ServiceCalendarLink> scl, serviceCalendarLinks)
+										BOOST_FOREACH(shared_ptr<CalendarLink> scl, serviceCalendarLinks)
 										{
 											if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
 											{
@@ -634,7 +634,7 @@ namespace synthese
 
 									if(!serviceCalendarLink)
 									{
-										serviceCalendarLink = boost::shared_ptr<ServiceCalendarLink>(new ServiceCalendarLink(ServiceCalendarLinkTableSync::getId()));
+										serviceCalendarLink = boost::shared_ptr<CalendarLink>(new CalendarLink(CalendarLinkTableSync::getId()));
 
 										if(periodCalendar)
 											serviceCalendarLink->setCalendarTemplate2(periodCalendar);
@@ -645,11 +645,11 @@ namespace synthese
 										else
 											stream << "WARN : Calendar <pre>\"" << daysCalendarName << "\"</pre> not found<br />";
 
-										serviceCalendarLink->setService(service);
+										serviceCalendarLink->setCalendar(service);
 
 										service->addCalendarLink(*serviceCalendarLink,true);
 
-										_env.getEditableRegistry<ServiceCalendarLink>().add(shared_ptr<ServiceCalendarLink>(serviceCalendarLink));
+										_env.getEditableRegistry<CalendarLink>().add(shared_ptr<CalendarLink>(serviceCalendarLink));
 									}
 									service->setCalendarFromLinks();
 								}
@@ -740,9 +740,9 @@ namespace synthese
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
 			}
-			BOOST_FOREACH(Registry<ServiceCalendarLink>::value_type link, _env.getRegistry<ServiceCalendarLink>())
+			BOOST_FOREACH(Registry<CalendarLink>::value_type link, _env.getRegistry<CalendarLink>())
 			{
-				ServiceCalendarLinkTableSync::Save(link.second.get(), transaction);
+				CalendarLinkTableSync::Save(link.second.get(), transaction);
 			}
 
 			return transaction;

@@ -27,6 +27,7 @@
 #include "DataSource.h"
 #include "Request.h"
 #include "Action.h"
+#include "BaseImportableUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -39,9 +40,8 @@ namespace synthese
 
 	namespace impex
 	{
-		const string ImportableAdmin::TAB_DATA_SOURCES("tab_data_sources");
+		const string ImportableAdmin::TAB_DATA_SOURCES = "tab_data_sources";
 
-		const string ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS(Action_PARAMETER_PREFIX + "dsl");
 
 
 		void ImportableAdmin::DisplayDataSourcesTab(
@@ -67,7 +67,7 @@ namespace synthese
 
 			// Creation of the editor
 			AjaxVectorFieldEditor editor(
-				PARAMETER_DATA_SOURCE_LINKS,
+				BaseImportableUpdateAction::PARAMETER_DATA_SOURCE_LINKS,
 				updateRequest.getURL(),
 				fields,
 				true

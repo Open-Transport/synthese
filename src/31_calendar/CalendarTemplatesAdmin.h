@@ -31,8 +31,8 @@ namespace synthese
 {
 	namespace calendar
 	{
-		/** CalendarTemplatesAdmin Class.
-			@ingroup m19Admin refAdmin
+		/** 31.14 CalendarTemplatesAdmin Class.
+			@ingroup m31Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

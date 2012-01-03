@@ -34,11 +34,11 @@ namespace synthese
 	{
 		class CalendarTemplate;
 
-		/** 19.15 Public function : Calendar Templates List.
+		/** 31.15 Public function : Calendar Templates List.
 			@author Hugues Romain
 			@date 2010
 			@since 3.1.16
-			@ingroup m19Functions refFunctions
+			@ingroup m31Functions refFunctions
 		*/
 		class CalendarTemplatesListFunction:
 			public util::FactorableTemplate<server::Function,CalendarTemplatesListFunction>

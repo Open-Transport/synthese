@@ -225,7 +225,7 @@ namespace synthese
 						links.insert(make_pair(link.first, string()));
 					}
 				}
-				_place->setDataSourceLinks(links);
+				_place->setDataSourceLinksWithoutRegistration(links);
 				_place->setName(_name);
 				StopAreaTableSync::Save(_place.get(), transaction);
 			}
@@ -237,7 +237,7 @@ namespace synthese
 				_point,
 				false
 			);
-			object.setDataSourceLinks(_operatorCode);
+			object.setDataSourceLinksWithoutRegistration(_operatorCode);
 
 			StopPointTableSync::Save(&object, transaction);
 

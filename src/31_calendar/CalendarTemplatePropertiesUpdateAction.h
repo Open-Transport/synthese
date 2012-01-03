@@ -28,16 +28,18 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "CalendarTemplate.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
 	namespace calendar
 	{
-		/** CalendarTemplatePropertiesUpdateAction action class.
-			@ingroup m19Actions refActions
+		/** 31.15 CalendarTemplatePropertiesUpdateAction action class.
+			@ingroup m31Actions refActions
 		*/
 		class CalendarTemplatePropertiesUpdateAction:
-			public util::FactorableTemplate<server::Action, CalendarTemplatePropertiesUpdateAction>
+			public util::FactorableTemplate<server::Action, CalendarTemplatePropertiesUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_CALENDAR_ID;
@@ -49,7 +51,6 @@ namespace synthese
 			boost::shared_ptr<CalendarTemplate> _calendar;
 			boost::optional<std::string> _name;
 			boost::optional<CalendarTemplate::Category> _category;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<boost::shared_ptr<CalendarTemplate> > _parent;
 			
 		protected:

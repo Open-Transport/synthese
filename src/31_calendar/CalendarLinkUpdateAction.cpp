@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// ServiceCalendarLinkUpdateAction class implementation.
-/// @file ServiceCalendarLinkUpdateAction.cpp
+/// CalendarLinkUpdateAction class implementation.
+/// @file CalendarLinkUpdateAction.cpp
 /// @author Hugues Romain
 /// @date 2011
 ///
@@ -24,14 +24,13 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "ServiceCalendarLinkUpdateAction.hpp"
-#include "TransportNetworkRight.h"
+#include "CalendarLinkUpdateAction.hpp"
 #include "Request.h"
 #include "Fetcher.h"
-#include "NonPermanentService.h"
 #include "CalendarTemplateTableSync.h"
-#include "ServiceCalendarLink.hpp"
-#include "ServiceCalendarLinkTableSync.hpp"
+#include "CalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
+#include "BaseCalendarUpdateAction.hpp"
 
 using namespace std;
 using namespace boost;
@@ -44,38 +43,33 @@ namespace synthese
 	using namespace util;
 	using namespace db;
 	using namespace calendar;
-	using namespace graph;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, pt::ServiceCalendarLinkUpdateAction>::FACTORY_KEY("ServiceCalendarLinkUpdate");
+		template<> const string FactorableTemplate<Action, CalendarLinkUpdateAction>::FACTORY_KEY("ServiceCalendarLinkUpdate");
 	}
 
-	namespace pt
+	namespace calendar
 	{
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_LINK_ID = Action_PARAMETER_PREFIX + "link_id";
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "service_id";
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "start_date";
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "end_date";
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID = Action_PARAMETER_PREFIX + "calendar_id";
-		const string ServiceCalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2 = Action_PARAMETER_PREFIX + "calendar_id2";
-
-		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE("service_admin_start_date");
-		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE("service_admin_end_date");
-		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID("service_admin_calendar_template_id");
-		const string ServiceCalendarLinkUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2("service_admin_calendar_template_id2");
+		const string CalendarLinkUpdateAction::PARAMETER_LINK_ID = Action_PARAMETER_PREFIX + "link_id";
+		const string CalendarLinkUpdateAction::PARAMETER_CALENDAR_ID = Action_PARAMETER_PREFIX + "calendar_id";
+		const string CalendarLinkUpdateAction::PARAMETER_START_DATE = Action_PARAMETER_PREFIX + "start_date";
+		const string CalendarLinkUpdateAction::PARAMETER_END_DATE = Action_PARAMETER_PREFIX + "end_date";
+		const string CalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID = Action_PARAMETER_PREFIX + "calendar_id";
+		const string CalendarLinkUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID2 = Action_PARAMETER_PREFIX + "calendar_id2";
 
 
-		ParametersMap ServiceCalendarLinkUpdateAction::getParametersMap() const
+
+		ParametersMap CalendarLinkUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			if(_link.get())
 			{
 				map.insert(PARAMETER_LINK_ID, _link->getKey());
 			}
-			if(_service)
+			if(_calendar)
 			{
-				map.insert(PARAMETER_SERVICE_ID, _service->get() ? (*_service)->getKey() : RegistryKeyType(0));
+				map.insert(PARAMETER_CALENDAR_ID, _calendar->get() ? (*_calendar)->getKey() : RegistryKeyType(0));
 			}
 			if(_minDate)
 			{
@@ -85,20 +79,20 @@ namespace synthese
 			{
 				map.insert(PARAMETER_END_DATE, *_maxDate);
 			}
-			if(_calendar)
+			if(_calendarTpl)
 			{
-				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID, _calendar->get() ? (*_calendar)->getKey() : RegistryKeyType(0));
+				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID, _calendarTpl->get() ? (*_calendarTpl)->getKey() : RegistryKeyType(0));
 			}
-			if(_calendar2)
+			if(_calendarTpl2)
 			{
-				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID2, _calendar2->get() ? (*_calendar2)->getKey() : RegistryKeyType(0));
+				map.insert(PARAMETER_CALENDAR_TEMPLATE_ID2, _calendarTpl2->get() ? (*_calendarTpl2)->getKey() : RegistryKeyType(0));
 			}
 			return map;
 		}
 
 
 
-		void ServiceCalendarLinkUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void CalendarLinkUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Link
 			if(map.isDefined(PARAMETER_LINK_ID))
@@ -106,35 +100,35 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINK_ID));
 				try
 				{
-					_link = ServiceCalendarLinkTableSync::GetEditable(id, *_env);
+					_link = CalendarLinkTableSync::GetEditable(id, *_env);
 				}
-				catch(ObjectNotFoundException<ServiceCalendarLink>&)
+				catch(ObjectNotFoundException<CalendarLink>&)
 				{
 					throw ActionException("No such calendar link");
 				}
 			}
 			else
 			{
-				_link = shared_ptr<ServiceCalendarLink>(new ServiceCalendarLink);
+				_link = shared_ptr<CalendarLink>(new CalendarLink);
 			}
 
 			// Service
-			if(map.isDefined(PARAMETER_SERVICE_ID))
+			if(map.isDefined(PARAMETER_CALENDAR_ID))
 			{
-				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_ID));
 				if(id > 0) try
 				{
-					_service = dynamic_pointer_cast<NonPermanentService,Service>(
-						Fetcher<Service>::FetchEditable(id,	*_env)
+					_calendar = dynamic_pointer_cast<Calendar>(
+						Fetcher<Calendar>::FetchEditable(id, *_env)
 					);
-					if(!_service.get())
+					if(!_calendar.get())
 					{
-						throw ActionException("Bad service type");
+						throw ActionException("Bad calendar type");
 					}
 				}
-				catch(ObjectNotFoundException<Service>&)
+				catch(ObjectNotFoundException<Calendar>&)
 				{
-					throw ActionException("No such service");
+					throw ActionException("No such calendar");
 				}
 			}
 
@@ -164,7 +158,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_TEMPLATE_ID));
 				if(id > 0) try
 				{
-					_calendar = CalendarTemplateTableSync::GetEditable(id, *_env);
+					_calendarTpl = CalendarTemplateTableSync::GetEditable(id, *_env);
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>&)
 				{
@@ -178,7 +172,7 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CALENDAR_TEMPLATE_ID2));
 				if(id > 0) try
 				{
-					_calendar2 = CalendarTemplateTableSync::GetEditable(id, *_env);
+					_calendarTpl2 = CalendarTemplateTableSync::GetEditable(id, *_env);
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>&)
 				{
@@ -189,16 +183,16 @@ namespace synthese
 
 
 
-		void ServiceCalendarLinkUpdateAction::run(
+		void CalendarLinkUpdateAction::run(
 			Request& request
 		){
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 			
 			// Service
-			if(_service)
+			if(_calendar)
 			{
-				_link->setService(_service->get());
+				_link->setCalendar(_calendar->get());
 			}
 
 			// Start date
@@ -208,7 +202,7 @@ namespace synthese
 				if(!_minDate->is_not_a_date() && !_minDate->is_special())
 				{
 					request.getSession()->setSessionVariable(
-						SESSION_VARIABLE_SERVICE_ADMIN_START_DATE,
+						BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE,
 						to_iso_extended_string(*_minDate)
 					);
 				}
@@ -221,34 +215,40 @@ namespace synthese
 				if(!_maxDate->is_not_a_date() && !_maxDate->is_special())
 				{
 					request.getSession()->setSessionVariable(
-						SESSION_VARIABLE_SERVICE_ADMIN_END_DATE,
+						BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE,
 						to_iso_extended_string(*_maxDate)
 					);
 				}
 			}
 
 			// Calendar template
-			if(_calendar)
+			if(_calendarTpl)
 			{
-				_link->setCalendarTemplate(_calendar->get());
-				if(_calendar->get())
+				_link->setCalendarTemplate(_calendarTpl->get());
+				if(_calendarTpl->get())
 				{
-					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID, lexical_cast<string>((*_calendar)->getKey()));
+					request.getSession()->setSessionVariable(
+						BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID,
+						lexical_cast<string>((*_calendarTpl)->getKey())
+					);
 				}
 			}
 			
 			// Calendar template 2
-			if(_calendar2)
+			if(_calendarTpl2)
 			{
-				_link->setCalendarTemplate2(_calendar2->get());
-				if(_calendar2->get())
+				_link->setCalendarTemplate2(_calendarTpl2->get());
+				if(_calendarTpl2->get())
 				{
-					request.getSession()->setSessionVariable(SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2, lexical_cast<string>((*_calendar2)->getKey()));
+					request.getSession()->setSessionVariable(
+						BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2,
+						lexical_cast<string>((*_calendarTpl2)->getKey())
+					);
 				}
 			}
 
 			// Saving
-			ServiceCalendarLinkTableSync::Save(_link.get());
+			CalendarLinkTableSync::Save(_link.get());
 
 			// Return of the created object id
 			if(request.getActionWillCreateObject())
@@ -261,9 +261,9 @@ namespace synthese
 
 
 
-		bool ServiceCalendarLinkUpdateAction::isAuthorized(
+		bool CalendarLinkUpdateAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			return true; // TODO session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
 		}
 }	}

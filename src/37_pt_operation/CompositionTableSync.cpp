@@ -57,6 +57,8 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,CompositionTableSync>::FACTORY_KEY("37.11 Compositions");
 		template<> const string FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY("ServiceCompositionInheritedTableSync");
 		template<> const string FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY("VehicleServiceCompositionInheritedTableSync");
+		template<> const string FactorableTemplate<Fetcher<Calendar>, ServiceCompositionInheritedTableSync>::FACTORY_KEY("70.1");
+		template<> const string FactorableTemplate<Fetcher<Calendar>, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY("70.2");
 	}
 
 	namespace pt_operation
@@ -108,8 +110,8 @@ namespace synthese
 		string DBInheritanceTableSyncTemplate<CompositionTableSync,Composition>::_GetSubClassKey(const DBResultSPtr& row)
 		{
 			return row->getLongLong(CompositionTableSync::COL_SERVICE_ID) ?
-				ServiceCompositionInheritedTableSync::FACTORY_KEY :
-				VehicleServiceCompositionInheritedTableSync::FACTORY_KEY
+				FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY :
+				FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY
 			;
 		}
 
@@ -119,8 +121,8 @@ namespace synthese
 		string DBInheritanceTableSyncTemplate<CompositionTableSync, Composition>::_GetSubClassKey(const Composition* obj)
 		{
 			return	(dynamic_cast<const ServiceComposition*>(obj) != NULL) ?
-				ServiceCompositionInheritedTableSync::FACTORY_KEY :
-				VehicleServiceCompositionInheritedTableSync::FACTORY_KEY
+				FactorableTemplate<CompositionTableSync, ServiceCompositionInheritedTableSync>::FACTORY_KEY :
+				FactorableTemplate<CompositionTableSync, VehicleServiceCompositionInheritedTableSync>::FACTORY_KEY
 			;
 		}
 
@@ -133,13 +135,11 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Dates
-			Calendar calendarValue;
-			calendarValue.setFromSerializedString(rows->getText(CompositionTableSync::COL_DATES));
-			object->setCalendar(calendarValue);
+			object->setFromSerializedString(rows->getText(CompositionTableSync::COL_DATES));
 
+			// Vehicles
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
-				// Vehicles
 				object->setVehicles(
 					CompositionTableSync::UnserializeVehicles(rows->getText(CompositionTableSync::COL_VEHICLES), env, linkLevel)
 				);
@@ -298,7 +298,7 @@ namespace synthese
 		){
 			// Dates
 			stringstream datesString;
-			object->getCalendar().serialize(datesString);
+			object->serialize(datesString);
 
 			// Vertices
 			stringstream verticesString;
@@ -334,7 +334,7 @@ namespace synthese
 		){
 			// Dates
 			stringstream datesString;
-			object->getCalendar().serialize(datesString);
+			object->serialize(datesString);
 
 			ReplaceQuery<CompositionTableSync> query(*object);
 			query.addField(0);

@@ -71,7 +71,7 @@ namespace synthese
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
-				roadPlace->setDataSourceLinks(links);
+				roadPlace->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<RoadPlace>().add(shared_ptr<RoadPlace>(roadPlace));
 				roadPlaces.add(*roadPlace);
 				logStream << "CREA : Creation of the road place with key " << code << " (" << city.getName() << " " << name <<  ")<br />";
@@ -142,7 +142,7 @@ namespace synthese
 				);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, code));
-				crossing->setDataSourceLinks(links);
+				crossing->setDataSourceLinksWithoutRegistration(links);
 				env.getEditableRegistry<Crossing>().add(shared_ptr<Crossing>(crossing));
 				crossings.add(*crossing);
 				logStream << "CREA : Creation of the crossing with key " << code << "<br />";

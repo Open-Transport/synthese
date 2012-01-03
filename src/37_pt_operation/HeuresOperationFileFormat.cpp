@@ -219,7 +219,7 @@ namespace synthese
 
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&_dataSource, id));
-						depot->setDataSourceLinks(links);
+						depot->setDataSourceLinksWithoutRegistration(links);
 						_env.getEditableRegistry<Depot>().add(depot);
 						_depots.add(*depot);
 						loadedDepots.insert(depot.get());
@@ -460,7 +460,7 @@ namespace synthese
 
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&_dataSource, vehicleServiceCode));
-						vs->setDataSourceLinks(links);
+						vs->setDataSourceLinksWithoutRegistration(links);
 						_env.getEditableRegistry<VehicleService>().add(vs);
 						vehicleServices.add(*vs);
 						loadedVehicleServices.insert(vs.get());
@@ -546,7 +546,7 @@ namespace synthese
 								// Source links
 								Importable::DataSourceLinks links;
 								links.insert(make_pair(&_dataSource, string()));
-								deadRun->setDataSourceLinks(links);
+								deadRun->setDataSourceLinksWithoutRegistration(links);
 
 								// Route
 								deadRun->setRoute(
@@ -784,7 +784,7 @@ namespace synthese
 
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&_dataSource, driverServiceCode));
-						ds->setDataSourceLinks(links);
+						ds->setDataSourceLinksWithoutRegistration(links);
 						_env.getEditableRegistry<DriverService>().add(ds);
 						driverServices.add(*ds);
 						loadedDriverServices.insert(ds.get());

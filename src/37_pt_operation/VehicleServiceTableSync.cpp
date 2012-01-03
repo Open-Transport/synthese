@@ -101,12 +101,11 @@ namespace synthese
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				// Data sources and operator codes
-				object->setDataSourceLinks(
+				object->setDataSourceLinksWithRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(VehicleServiceTableSync::COL_DATASOURCE_LINKS),
 						env
-					),	true
-				);
+				)	);
 
 				// Services
 				object->setServices(VehicleServiceTableSync::UnserializeServices(rows->getText(VehicleServiceTableSync::COL_SERVICES), env, linkLevel));

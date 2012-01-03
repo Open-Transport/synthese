@@ -60,7 +60,7 @@ namespace synthese
 			{
 				DataSourceLinks links;
 				links.insert(make_pair(source, codeBySource));
-				setDataSourceLinks(links);
+				setDataSourceLinksWithoutRegistration(links);
 			}
 		}
 
