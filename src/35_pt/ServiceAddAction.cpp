@@ -35,8 +35,8 @@
 #include "JourneyPatternTableSync.hpp"
 #include "Fetcher.h"
 #include "DBTransaction.hpp"
-#include "ServiceCalendarLink.hpp"
-#include "ServiceCalendarLinkTableSync.hpp"
+#include "CalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -49,6 +49,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace db;
+	using namespace calendar;
 
 	namespace util
 	{
@@ -243,15 +244,15 @@ namespace synthese
 				// Copy of calendar template elements
 				if(_template.get() && !_template->getCalendarLinks().empty())
 				{
-					BOOST_FOREACH(ServiceCalendarLink* calendarLink, _template->getCalendarLinks())
+					BOOST_FOREACH(CalendarLink* calendarLink, _template->getCalendarLinks())
 					{
-						ServiceCalendarLink newLink;
-						newLink.setService(&object);
+						CalendarLink newLink;
+						newLink.setCalendar(&object);
 						newLink.setCalendarTemplate(calendarLink->getCalendarTemplate());
 						newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
 						newLink.setStartDate(calendarLink->getStartDate());
 						newLink.setEndDate(calendarLink->getEndDate());
-						ServiceCalendarLinkTableSync::Save(&newLink, transaction);
+						CalendarLinkTableSync::Save(&newLink, transaction);
 					}
 				}
 
@@ -285,15 +286,15 @@ namespace synthese
 						// Copy of calendar template elements
 						if(_template.get() && !_template->getCalendarLinks().empty())
 						{
-							BOOST_FOREACH(ServiceCalendarLink* calendarLink, _template->getCalendarLinks())
+							BOOST_FOREACH(CalendarLink* calendarLink, _template->getCalendarLinks())
 							{
-								ServiceCalendarLink newLink;
-								newLink.setService(&object2);
+								CalendarLink newLink;
+								newLink.setCalendar(&object2);
 								newLink.setCalendarTemplate(calendarLink->getCalendarTemplate());
 								newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
 								newLink.setStartDate(calendarLink->getStartDate());
 								newLink.setEndDate(calendarLink->getEndDate());
-								ServiceCalendarLinkTableSync::Save(&newLink, transaction);
+								CalendarLinkTableSync::Save(&newLink, transaction);
 							}
 						}
 
@@ -326,5 +327,4 @@ namespace synthese
 		{
 			_line = value;
 		}
-	}
-}
+}	}

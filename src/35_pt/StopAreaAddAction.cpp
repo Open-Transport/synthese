@@ -134,7 +134,7 @@ namespace synthese
 			stopArea.setCity(_city.get());
 			stopArea.setDefaultTransferDelay(minutes(2));
 			stopArea.setName(_name);
-			stopArea.setDataSourceLinks(_dataSourceLinks);
+			stopArea.setDataSourceLinksWithoutRegistration(_dataSourceLinks);
 			StopAreaTableSync::Save(&stopArea, transaction);
 
 			transaction.run();

@@ -27,7 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace geos
 {
@@ -65,13 +65,13 @@ namespace synthese
 		///		<li>actionParamsa : stop area</li>
 		///	</ul>
 		class StopPointUpdateAction:
-			public util::FactorableTemplate<server::Action, StopPointUpdateAction>
+			public util::FactorableTemplate<server::Action, StopPointUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_STOP_ID;
 			static const std::string PARAMETER_X;
 			static const std::string PARAMETER_Y;
-			static const std::string PARAMETER_OPERATOR_CODE;
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_STOP_AREA;
 			static const std::string PARAMETER_SRID;
@@ -79,10 +79,10 @@ namespace synthese
 		private:
 			boost::shared_ptr<StopPoint> _stop;
 			boost::shared_ptr<geos::geom::Point> _point;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<std::string> _name;
 			boost::optional<boost::shared_ptr<const StopArea> > _stopArea;
 			const CoordinatesSystem* _coordinatesSystem;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -97,6 +97,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////

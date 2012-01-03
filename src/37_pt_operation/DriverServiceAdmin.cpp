@@ -23,7 +23,9 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DriverServiceAdmin.hpp"
+
 #include "AdminParametersException.h"
+#include "BaseCalendarAdmin.hpp"
 #include "ParametersMap.h"
 #include "DriverService.hpp"
 #include "HTMLTable.h"
@@ -40,7 +42,6 @@
 #include "NamedPlace.h"
 #include "DriverServiceUpdateAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "CalendarHTMLViewer.h"
 #include "ImportableAdmin.hpp"
 #include "VehicleServiceAdmin.hpp"
 #include "VehicleService.hpp"
@@ -281,19 +282,23 @@ namespace synthese
 			// CALENDAR TAB
 			if(openTabContent(stream, TAB_CALENDAR))
 			{
-				stream << "<h1>Résultat</h1>";
+				// Update request
 				AdminActionFunctionRequest<DriverServiceUpdateAction, DriverServiceAdmin> updateDateRequest(request);
 				updateDateRequest.getAction()->setDriverService(const_pointer_cast<DriverService>(_driverService));
-				CalendarHTMLViewer<AdminActionFunctionRequest<DriverServiceUpdateAction, DriverServiceAdmin> > cv(*_driverService, &updateDateRequest);
-				cv.display(stream);
+
+				// Display
+				BaseCalendarAdmin::Display(stream, *_driverService, updateDateRequest);
 			}
 
 			////////////////////////////////////////////////////////////////////
 			// DATASOURCE LINKS TAB
 			if(openTabContent(stream, TAB_DATASOURCE_LINKS))
 			{
+				// Update request
 				StaticActionRequest<DriverServiceUpdateAction> updateOnlyRequest(request);
 				updateOnlyRequest.getAction()->setDriverService(const_pointer_cast<DriverService>(_driverService));
+				
+				// Table
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_driverService, updateOnlyRequest);
 			}
 

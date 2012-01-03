@@ -46,8 +46,6 @@ namespace synthese
 	using namespace calendar;
 	using namespace graph;
 
-
-
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::CompositionUpdateAction>::FACTORY_KEY("CompositionUpdateAction");
@@ -56,7 +54,6 @@ namespace synthese
 	namespace pt_operation
 	{
 		const string CompositionUpdateAction::PARAMETER_COMPOSITION_ID = Action_PARAMETER_PREFIX + "ci";
-		const string CompositionUpdateAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "da";
 		const string CompositionUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "si";
 		const string CompositionUpdateAction::PARAMETER_FIRST_QUAY = Action_PARAMETER_PREFIX + "fq";
 		const string CompositionUpdateAction::PARAMETER_VEHICLES = Action_PARAMETER_PREFIX + "ve";
@@ -74,10 +71,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
 			}
-			if(_date)
-			{
-				map.insert(PARAMETER_DATE, to_iso_extended_string(*_date));
-			}
+
+			// Dates
+			_getCalendarUpdateParametersMap(map);
+
 			if(_firstQuay.get())
 			{
 				map.insert(PARAMETER_FIRST_QUAY, _firstQuay->getKey());
@@ -93,6 +90,7 @@ namespace synthese
 
 		void CompositionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Composition
 			if(map.getOptional<RegistryKeyType>(PARAMETER_COMPOSITION_ID))
 			{
 				try
@@ -121,16 +119,15 @@ namespace synthese
 				}
 			}
 
-			// Date
-			if(map.getDefault<string>(PARAMETER_DATE).empty())
-			{
-				_date = day_clock::local_day();
-			}
-			else
-			{
-				_date = from_simple_string(map.get<string>(PARAMETER_DATE));
+			// Dates
+			_setCalendarUpdateFromParametersMap(*_env, map);
+			if(	!_composition->getKey() && !_calendarUpdateToDo()
+			){
+				// Default value
+				setDate(day_clock::local_day());
 			}
 
+			// Vehicles
 			if(map.isDefined(PARAMETER_VEHICLES))
 			{
 				_vehicles = CompositionTableSync::UnserializeVehicles(map.get<string>(PARAMETER_VEHICLES), *_env);
@@ -155,12 +152,8 @@ namespace synthese
 			//stringstream text;
 			//::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			Calendar calendar;
-			if(_date)
-			{
-				calendar.setActive(*_date);
-				_composition->setCalendar(calendar);
-			}
+			// Dates
+			_doCalendarUpdate(*_composition, request);
 
 			if(dynamic_cast<ServiceComposition*>(_composition.get()))
 			{
@@ -212,5 +205,4 @@ namespace synthese
 		) const {
 			return true;
 		}
-	}
-}
+}	}

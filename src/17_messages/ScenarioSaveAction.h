@@ -30,6 +30,7 @@
 #include "SentScenario.h"
 #include "ActionException.h"
 #include "MessagesTypes.h"
+#include "BaseImportableUpdateAction.hpp"
 
 #include <string>
 
@@ -53,7 +54,8 @@ namespace synthese
 		///	@ingroup m17Actions refActions
 		/// @author Hugues Romain
 		class ScenarioSaveAction:
-			public util::FactorableTemplate<server::Action, ScenarioSaveAction>
+			public util::FactorableTemplate<server::Action, ScenarioSaveAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_CREATE_TEMPLATE;
@@ -101,7 +103,6 @@ namespace synthese
 				boost::optional<AlarmLevel>							_level;
 				std::string											_dataSourceLinkId;
 				boost::shared_ptr<SentAlarm>						_message;
-				boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			//@}
 
 			//! @name Action to do

@@ -95,7 +95,7 @@ namespace synthese
 			}
 
 			// Code by source
-			object->setDataSourceLinks(
+			object->setDataSourceLinksWithoutRegistration(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
 					rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE),
 					env

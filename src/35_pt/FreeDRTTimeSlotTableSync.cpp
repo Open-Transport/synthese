@@ -31,8 +31,8 @@
 #include "CityTableSync.h"
 #include "FreeDRTAreaTableSync.hpp"
 #include "PTUseRuleTableSync.h"
-#include "ServiceCalendarLinkTableSync.hpp"
-#include "ServiceCalendarLink.hpp"
+#include "CalendarLinkTableSync.hpp"
+#include "CalendarLink.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -49,11 +49,12 @@ namespace synthese
 	using namespace pt;
 	using namespace geography;
 	using namespace graph;
+	using namespace calendar;
 
 	namespace util
 	{
 		template<> const string FactorableTemplate<DBTableSync,FreeDRTTimeSlotTableSync>::FACTORY_KEY("35.81 Free DRT Time slots");
-		template<> const string FactorableTemplate<Fetcher<Service>, FreeDRTTimeSlotTableSync>::FACTORY_KEY("83");
+		template<> const string FactorableTemplate<Fetcher<Calendar>, FreeDRTTimeSlotTableSync>::FACTORY_KEY("83");
 	}
 
 	namespace pt
@@ -66,6 +67,7 @@ namespace synthese
 		const string FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED = "commercial_speed";
 		const string FreeDRTTimeSlotTableSync::COL_MAX_SPEED = "max_speed";
 		const string FreeDRTTimeSlotTableSync::COL_USE_RULES = "use_rules";
+		const string FreeDRTTimeSlotTableSync::COL_DATES = "dates";
 	}
 	
 	namespace db
@@ -87,6 +89,7 @@ namespace synthese
 			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED, SQL_DOUBLE),
 			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_MAX_SPEED, SQL_DOUBLE),
 			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_USE_RULES, SQL_TEXT),
+			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_DATES, SQL_TEXT),
 			DBTableSync::Field()
 		};
 
@@ -166,15 +169,27 @@ namespace synthese
 			if(linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				// Search of calendar template links (overrides manually defined calendar)
-				ServiceCalendarLinkTableSync::SearchResult links(
-					ServiceCalendarLinkTableSync::Search(
+				CalendarLinkTableSync::SearchResult links(
+					CalendarLinkTableSync::Search(
 						env,
 						object->getKey()
 				)	); // UP_LINK_LOAD_LEVEL to avoid multiple calls to setCalendarFromLinks
-				BOOST_FOREACH(shared_ptr<ServiceCalendarLink> link, links)
+				if(links.empty())
 				{
-					object->addCalendarLink(*link, false);
+					object->setFromSerializedString(rows->getText(FreeDRTTimeSlotTableSync::COL_DATES));
 				}
+				else
+				{
+					BOOST_FOREACH(shared_ptr<CalendarLink> link, links)
+					{
+						object->addCalendarLink(*link, false);
+					}
+					object->setCalendarFromLinks();
+				}
+			}
+			else
+			{
+				object->setFromSerializedString(rows->getText(FreeDRTTimeSlotTableSync::COL_DATES));
 			}
 		}
 
@@ -184,6 +199,13 @@ namespace synthese
 			FreeDRTTimeSlot* object,
 			optional<DBTransaction&> transaction
 		){
+			// Dates preparation
+			stringstream datesStr;
+			if(object->getCalendarLinks().empty())
+			{
+				object->serialize(datesStr);
+			}
+
 			ReplaceQuery<FreeDRTTimeSlotTableSync> query(*object);
 			query.addField(object->getArea() ? object->getArea()->getKey() : RegistryKeyType(0));
 			query.addField(object->getServiceNumber());
@@ -193,6 +215,9 @@ namespace synthese
 			query.addField(object->getCommercialSpeed());
 			query.addField(object->getMaxSpeed());
 			query.addField(PTUseRuleTableSync::SerializeUseRules(object->getRules()));
+			query.addField(
+				datesStr.str()
+			);
 			query.execute(transaction);
 		}
 

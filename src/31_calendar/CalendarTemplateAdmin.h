@@ -37,8 +37,8 @@ namespace synthese
 		class CalendarTemplate;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 19.14 Admin : Calendar template editor.
-		/// @ingroup m19Admin refAdmin
+		/// 31.14 Admin : Calendar template editor.
+		/// @ingroup m31Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2008
 		//////////////////////////////////////////////////////////////////////////

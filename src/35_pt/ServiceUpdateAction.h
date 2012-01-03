@@ -27,16 +27,14 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "BaseCalendarUpdateAction.hpp"
 
 namespace synthese
 {
-	namespace graph
-	{
-		class Service;
-	}
-
 	namespace pt
 	{
+		class SchedulesBasedService;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Service properties update.
 		/// @ingroup m35Actions refActions
@@ -44,7 +42,7 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : ServiceUpdateAction
+		/// Key : service_update
 		///
 		/// Parameters :
 		///	<ul>
@@ -53,7 +51,8 @@ namespace synthese
 		///		<li>actionParamte : team number</li>
 		///	</ul>
 		class ServiceUpdateAction:
-			public util::FactorableTemplate<server::Action, ServiceUpdateAction>
+			public util::FactorableTemplate<server::Action, ServiceUpdateAction>,
+			public calendar::BaseCalendarUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_OBJECT_ID;
@@ -61,9 +60,10 @@ namespace synthese
 			static const std::string PARAMETER_TEAM_NUMBER;
 
 		private:
-			boost::shared_ptr<graph::Service> _service;
-			std::string _serviceNumber;
-			std::string _teamNumber;
+			boost::shared_ptr<SchedulesBasedService> _service;
+			boost::optional<std::string> _serviceNumber;
+			boost::optional<std::string> _teamNumber;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -78,6 +78,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -97,10 +98,9 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<graph::Service> value) { _service = value; }
+				void setService(boost::shared_ptr<SchedulesBasedService> value) { _service = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ServiceUpdateAction_H__

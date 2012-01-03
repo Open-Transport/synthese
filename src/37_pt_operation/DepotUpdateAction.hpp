@@ -27,7 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
@@ -49,7 +49,8 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
 		class DepotUpdateAction:
-			public util::FactorableTemplate<server::Action, DepotUpdateAction>
+			public util::FactorableTemplate<server::Action, DepotUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_DEPOT;
@@ -58,7 +59,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<Depot> _depot;
 			boost::optional<std::string> _name;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -73,6 +74,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -95,7 +97,6 @@ namespace synthese
 				void setDepot(boost::shared_ptr<Depot> value) { _depot = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DepotUpdateAction_H__

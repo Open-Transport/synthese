@@ -26,9 +26,7 @@
 #include "ParametersMap.h"
 #include "VehicleServiceUpdateAction.hpp"
 #include "Request.h"
-#include "ImportableAdmin.hpp"
 #include "VehicleService.hpp"
-#include "ImportableTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
 
 using namespace std;
@@ -59,10 +57,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_VEHICLE_SERVICE_ID, _vehicleService->getKey());
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
@@ -90,13 +88,7 @@ namespace synthese
 			}
 
 			// Creator ID
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS),
-					*_env
-				);
-			}
+			_setImportableUpdateFromParametersMap(*_env, map);
 
 			// Name
 			if(map.isDefined(PARAMETER_NAME))
@@ -118,10 +110,8 @@ namespace synthese
 				_vehicleService.reset(new VehicleService);
 			}
 
-			if(_dataSourceLinks)
-			{
-				_vehicleService->setDataSourceLinks(*_dataSourceLinks);
-			}
+			// Importable
+			_doImportableUpdate(*_vehicleService, request);
 
 			if(_name)
 			{

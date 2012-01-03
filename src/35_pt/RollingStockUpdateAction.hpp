@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "RollingStock.hpp"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
@@ -47,7 +48,8 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		//	</dl>
 		class RollingStockUpdateAction:
-			public util::FactorableTemplate<server::Action, RollingStockUpdateAction>
+			public util::FactorableTemplate<server::Action, RollingStockUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_ROLLING_STOCK_ID;
@@ -55,7 +57,6 @@ namespace synthese
 			static const std::string PARAMETER_ARTICLE;
 			static const std::string PARAMETER_CO2_EMISSIONS;
 			static const std::string PARAMETER_ENERGY_CONSUMPTION;
-			static const std::string PARAMETER_DATASOURCE_LINKS;
 
 		private:
 			boost::shared_ptr<RollingStock> _rollingStock;
@@ -63,7 +64,7 @@ namespace synthese
 			boost::optional<std::string> _article;
 			boost::optional<double> _CO2Emissions;
 			boost::optional<double> _energyConsumption;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -78,6 +79,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -100,7 +102,6 @@ namespace synthese
 				void setRollingStock(boost::shared_ptr<RollingStock> value) { _rollingStock = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_RollingStockUpdateAction_H__

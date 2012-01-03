@@ -48,8 +48,8 @@ namespace synthese
 	namespace calendar
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 19.11 Interface : calendar date.
-		///	@ingroup m19Pages refPages
+		/// 31.11 Interface : calendar date.
+		///	@ingroup m31Pages refPages
 		///	@author Hugues Romain
 		///	@date 2010
 		/// @since 3.1.16

@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(impex_SRCS
+BaseImportableUpdateAction.cpp
+BaseImportableUpdateAction.hpp
 CleanObsoleteDataAction.cpp
 CleanObsoleteDataAction.hpp
 DataSource.cpp

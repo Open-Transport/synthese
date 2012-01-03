@@ -1,6 +1,6 @@
 
-/** ServiceCalendarLinkTableSync class implementation.
-	@file ServiceCalendarLinkTableSync.cpp
+/** CalendarLinkTableSync class implementation.
+	@file CalendarLinkTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,16 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "CalendarLinkTableSync.hpp"
 
-#include "ServiceCalendarLinkTableSync.hpp"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
+#include "Calendar.h"
+#include "CalendarLink.hpp"
 #include "CalendarTemplateTableSync.h"
 #include "Fetcher.h"
-#include "NonPermanentService.h"
-#include "TransportNetworkRight.h"
-#include "ServiceCalendarLink.hpp"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -39,69 +39,67 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace calendar;
-	using namespace graph;
-	using namespace pt;
 	using namespace security;
 
-	template<> const string util::FactorableTemplate<DBTableSync,ServiceCalendarLinkTableSync>::FACTORY_KEY(
-		"35.80.01 Service calendar links"
+	template<> const string util::FactorableTemplate<DBTableSync, CalendarLinkTableSync>::FACTORY_KEY(
+		"90.01 Calendar links"
 	);
 
-	namespace pt
+	namespace calendar
 	{
-		const string ServiceCalendarLinkTableSync::COL_SERVICE_ID = "service_id";
-		const string ServiceCalendarLinkTableSync::COL_START_DATE = "start_date";
-		const string ServiceCalendarLinkTableSync::COL_END_DATE = "end_date";
-		const string ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID = "calendar_id";
-		const string ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2 = "calendar2_id";
+		const string CalendarLinkTableSync::COL_SERVICE_ID = "service_id";
+		const string CalendarLinkTableSync::COL_START_DATE = "start_date";
+		const string CalendarLinkTableSync::COL_END_DATE = "end_date";
+		const string CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID = "calendar_id";
+		const string CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2 = "calendar2_id";
 	}
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<ServiceCalendarLinkTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<CalendarLinkTableSync>::TABLE(
 			"t076_service_calendar_links"
 		);
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ServiceCalendarLinkTableSync>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarLinkTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_START_DATE, SQL_TEXT),
-			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_END_DATE, SQL_TEXT),
-			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
-			DBTableSync::Field(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2, SQL_INTEGER),
+			DBTableSync::Field(CalendarLinkTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			DBTableSync::Field(CalendarLinkTableSync::COL_START_DATE, SQL_TEXT),
+			DBTableSync::Field(CalendarLinkTableSync::COL_END_DATE, SQL_TEXT),
+			DBTableSync::Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			DBTableSync::Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ServiceCalendarLinkTableSync>::_INDEXES[]=
+		template<> const DBTableSync::Index DBTableSyncTemplate<CalendarLinkTableSync>::_INDEXES[]=
 		{
-			DBTableSync::Index(ServiceCalendarLinkTableSync::COL_SERVICE_ID.c_str(), ""),
+			DBTableSync::Index(CalendarLinkTableSync::COL_SERVICE_ID.c_str(), ""),
 			DBTableSync::Index()
 		};
 
 
 
-		template<> void DBDirectTableSyncTemplate<ServiceCalendarLinkTableSync,ServiceCalendarLink>::Load(
-			ServiceCalendarLink* object,
+		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync,CalendarLink>::Load(
+			CalendarLink* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
 			// Start date
-			object->setStartDate(rows->getDate(ServiceCalendarLinkTableSync::COL_START_DATE));
+			object->setStartDate(rows->getDate(CalendarLinkTableSync::COL_START_DATE));
 
 			// End date
-			object->setEndDate(rows->getDate(ServiceCalendarLinkTableSync::COL_END_DATE));
+			object->setEndDate(rows->getDate(CalendarLinkTableSync::COL_END_DATE));
 
 			if (linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				// Calendar template
 				object->setCalendarTemplate(NULL);
-				RegistryKeyType calendarTemplateId(rows->getLongLong(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID));
+				RegistryKeyType calendarTemplateId(rows->getLongLong(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID));
 				if(calendarTemplateId > 0) try
 				{
 					object->setCalendarTemplate(CalendarTemplateTableSync::GetEditable(calendarTemplateId, env).get());
@@ -113,7 +111,7 @@ namespace synthese
 
 				// Calendar template 2
 				object->setCalendarTemplate2(NULL);
-				RegistryKeyType calendarTemplateId2(rows->getLongLong(ServiceCalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2));
+				RegistryKeyType calendarTemplateId2(rows->getLongLong(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2));
 				if(calendarTemplateId2 > 0) try
 				{
 					object->setCalendarTemplate2(CalendarTemplateTableSync::GetEditable(calendarTemplateId2, env).get());
@@ -125,33 +123,33 @@ namespace synthese
 
 				// Service
 				// Must stay at the last position because the service reads the object content
-				object->setService(NULL);
-				RegistryKeyType serviceId(rows->getLongLong(ServiceCalendarLinkTableSync::COL_SERVICE_ID));
+				object->setCalendar(NULL);
+				RegistryKeyType serviceId(rows->getLongLong(CalendarLinkTableSync::COL_SERVICE_ID));
 				if(serviceId > 0) try
 				{
-					object->setService(dynamic_cast<NonPermanentService*>(Fetcher<Service>::FetchEditable(serviceId, env).get()));
+					object->setCalendar(dynamic_cast<Calendar*>(Fetcher<Calendar>::FetchEditable(serviceId, env).get()));
 					if(linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 					{
-						object->getService()->addCalendarLink(*object, true);
+						object->getCalendar()->addCalendarLink(*object, true);
 					}
 				}
-				catch(ObjectNotFoundException<Service>)
+				catch(ObjectNotFoundException<Calendar>)
 				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(serviceId) + " for service in service calendar link " + lexical_cast<string>(object->getKey()));
+					Log::GetInstance().warn("Bad value " + lexical_cast<string>(serviceId) + " for calendar in link " + lexical_cast<string>(object->getKey()));
 				}
 			}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<ServiceCalendarLinkTableSync,ServiceCalendarLink>::Save(
-			ServiceCalendarLink* object,
+		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync, CalendarLink>::Save(
+			CalendarLink* object,
 			optional<DBTransaction&> transaction
 		){
-			if(!object->getService()) throw Exception("ServiceCalendarLink save error. Missing service");
+			if(!object->getCalendar()) throw Exception("CalendarLink save error. Missing service");
 			
-			ReplaceQuery<ServiceCalendarLinkTableSync> query(*object);
-			query.addField(object->getService()->getKey());
+			ReplaceQuery<CalendarLinkTableSync> query(*object);
+			query.addField(object->getCalendar()->getKey());
 			query.addField((object->getStartDate().is_special() || object->getStartDate().is_not_a_date()) ? string() : to_iso_extended_string(object->getStartDate()));
 			query.addField((object->getEndDate().is_special() || object->getEndDate().is_not_a_date()) ? string() : to_iso_extended_string(object->getEndDate()));
 			query.addField(object->getCalendarTemplate() ? object->getCalendarTemplate()->getKey() : RegistryKeyType(0));
@@ -161,26 +159,26 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<ServiceCalendarLinkTableSync,ServiceCalendarLink>::Unlink(ServiceCalendarLink* obj)
+		template<> void DBDirectTableSyncTemplate<CalendarLinkTableSync,CalendarLink>::Unlink(CalendarLink* obj)
 		{
-			if(obj->getService())
+			if(obj->getCalendar())
 			{
-				obj->getService()->removeCalendarLink(*obj, true);
+				obj->getCalendar()->removeCalendarLink(*obj, true);
 			}
 		}
 
 
 
-		template<> bool DBTableSyncTemplate<ServiceCalendarLinkTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<CalendarLinkTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+			return true; // TODO
 		}
 
 
 
-		template<> void DBTableSyncTemplate<ServiceCalendarLinkTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<CalendarLinkTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -188,7 +186,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<ServiceCalendarLinkTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<CalendarLinkTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -196,7 +194,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<ServiceCalendarLinkTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<CalendarLinkTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -204,9 +202,9 @@ namespace synthese
 		}
 	}
 
-	namespace pt
+	namespace calendar
 	{
-		ServiceCalendarLinkTableSync::SearchResult ServiceCalendarLinkTableSync::Search(
+		CalendarLinkTableSync::SearchResult CalendarLinkTableSync::Search(
 			Env& env,
 			boost::optional<util::RegistryKeyType> serviceId,
 			int first,
@@ -215,7 +213,7 @@ namespace synthese
 			bool raisingOrder,
 			util::LinkLevel linkLevel
 		){
-			SelectQuery<ServiceCalendarLinkTableSync> query;
+			SelectQuery<CalendarLinkTableSync> query;
 			if (serviceId)
 			{
 				query.addWhereField(COL_SERVICE_ID, *serviceId);

@@ -23,11 +23,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "JourneyPatternAdmin.hpp"
-#include "JourneyPatternRankContinuityRestoreAction.hpp"
+
+#include "BaseCalendarAdmin.hpp"
+#include "CommercialLine.h"
 #include "CommercialLineAdmin.h"
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "PTModule.h"
 #include "Profile.h"
-#include "CommercialLine.h"
 #include "HTMLModule.h"
 #include "StopPoint.hpp"
 #include "JourneyPattern.hpp"
@@ -62,7 +64,6 @@
 #include "DRTArea.hpp"
 #include "HTMLMap.hpp"
 #include "StopPointUpdateAction.hpp"
-#include "ServiceApplyCalendarAction.h"
 #include "AdminModule.h"
 #include "CalendarTemplateTableSync.h"
 #include "Destination.hpp"
@@ -517,6 +518,7 @@ namespace synthese
 				}
 			}
 
+
 			////////////////////////////////////////////////////////////////////
 			// TAB SCHEDULED SERVICES
 			if (openTabContent(stream, TAB_SCHEDULED_SERVICES))
@@ -592,23 +594,8 @@ namespace synthese
 				stream << "<h1>Mise à jour collective des calendriers</h1>";
 
 				stream << "<p class=\"info\">Cette fonction met également à jour les services continus</p>";
-
-				date now(day_clock::local_day());
-				AdminActionFunctionRequest<ServiceApplyCalendarAction, JourneyPatternAdmin> updateRequest(_request);
-				updateRequest.getAction()->setJourneyPattern(_line);
-				PropertiesHTMLTable p(updateRequest.getHTMLForm("applycalendar"));
-				stream << p.open();
-				stream << p.cell("Date début", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_START_DATE, now));
-				stream << p.cell("Date fin", p.getForm().getCalendarInput(ServiceApplyCalendarAction::PARAMETER_END_DATE, now));
-				stream << p.cell("Période", p.getForm().getTextInput(ServiceApplyCalendarAction::PARAMETER_PERIOD, "1", string(), AdminModule::CSS_2DIGIT_INPUT));
-				stream << p.cell("Modèle", p.getForm().getSelectInput(
-						ServiceApplyCalendarAction::PARAMETER_CALENDAR_TEMPLATE_ID,
-						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
-						optional<RegistryKeyType>(0)
-				)	);
-				stream << p.cell("Ajout", p.getForm().getOuiNonRadioInput(ServiceApplyCalendarAction::PARAMETER_ADD, true));
-				stream << p.close();
 			}
+
 
 			////////////////////////////////////////////////////////////////////
 			// TAB CONTINUOUS SERVICES

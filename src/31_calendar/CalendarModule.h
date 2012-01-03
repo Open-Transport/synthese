@@ -1,7 +1,7 @@
 
 /** CalendarModule class header.
 	@file CalendarModule.h
-	@author Hugues
+	@author Hugues Romain
 	@date 2009
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
@@ -30,51 +30,49 @@
 
 namespace synthese
 {
-	/**	@defgroup m19Actions 19 Actions
-		@ingroup m19
+	/**	@defgroup m31Actions 31 Actions
+		@ingroup m31
 
-		@defgroup m19Pages 19 Pages
-		@ingroup m19
+		@defgroup m31Pages 31 Pages
+		@ingroup m31
 
-		@defgroup m19Functions 19 Functions
-		@ingroup m19
+		@defgroup m31Functions 31 Functions
+		@ingroup m31
 
-		@defgroup m19Exceptions 19 Exceptions
-		@ingroup m19
+		@defgroup m31Exceptions 31 Exceptions
+		@ingroup m31
 
-		@defgroup m19Alarm 19 Messages recipient
-		@ingroup m19
+		@defgroup m31Alarm 31 Messages recipient
+		@ingroup m31
 
-		@defgroup m19LS 19 Table synchronizers
-		@ingroup m19
+		@defgroup m31LS 31 Table synchronizers
+		@ingroup m31
 
-		@defgroup m19Admin 19 Administration pages
-		@ingroup m19
+		@defgroup m31Admin 31 Administration pages
+		@ingroup m31
 
-		@defgroup m19Rights 19 Rights
-		@ingroup m19
+		@defgroup m31Rights 31 Rights
+		@ingroup m31
 
-		@defgroup m19Logs 19 DB Logs
-		@ingroup m19
+		@defgroup m31Logs 31 DB Logs
+		@ingroup m31
 
-		@defgroup m19 19 Calendar
-		@ingroup m1
-
-		(Module documentation)
+		@defgroup m31 31 Calendar
+		@ingroup m3
 
 		@{
 	*/
 
-	/** 19 calendar Module namespace.
-		@author Hugues
+	/** 31 calendar Module namespace.
+		@author Hugues Romain
 		@date 2009
 	*/
 	namespace calendar
 	{
 		class CalendarTemplate;
 
-		/** 19 calendar Module class.
-			@author Hugues
+		/** 31 calendar Module class.
+			@author Hugues Romain
 			@date 2009
 		*/
 		class CalendarModule:

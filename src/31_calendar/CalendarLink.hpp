@@ -1,6 +1,6 @@
 
-/** ServiceCalendarLink class header.
-	@file ServiceCalendarLink.hpp
+/** CalendarLink class header.
+	@file CalendarLink.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -34,31 +34,25 @@ namespace synthese
 	{
 		class Calendar;
 		class CalendarTemplate;
-	}
-
-	namespace pt
-	{
-		class NonPermanentService;
-		class CommercialLine;
-
+	
 		//////////////////////////////////////////////////////////////////////////
-		/// Service calendar link.
-		///	@ingroup m35
+		/// Calendar link.
+		///	@ingroup m31
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
-		class ServiceCalendarLink:
+		class CalendarLink:
 			public util::Registrable
 		{
 		public:
 
 			/// Chosen registry class.
-			typedef util::Registry<ServiceCalendarLink>	Registry;
+			typedef util::Registry<CalendarLink>	Registry;
 
 		private:
 
 			//! @name Content
 			//@{
-				NonPermanentService* _service;
+				Calendar* _calendar;
 				calendar::CalendarTemplate* _calendarTemplate;
 				calendar::CalendarTemplate* _calendarTemplate2;
 				boost::gregorian::date _startDate;
@@ -68,13 +62,13 @@ namespace synthese
 
 		public:
 
-			ServiceCalendarLink(
+			CalendarLink(
 				util::RegistryKeyType id = 0
 			);
 
 			//! @name Getters
 			//@{
-				NonPermanentService* getService() const { return _service; }
+				Calendar* getCalendar() const { return _calendar; }
 				calendar::CalendarTemplate* getCalendarTemplate() const { return _calendarTemplate; }
 				calendar::CalendarTemplate* getCalendarTemplate2() const { return _calendarTemplate2; }
 				const boost::gregorian::date& getStartDate() const { return _startDate; }
@@ -83,7 +77,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(NonPermanentService* value){ _service = value; }
+				void setCalendar(Calendar* value){ _calendar = value; }
 				void setCalendarTemplate(calendar::CalendarTemplate* value){ _calendarTemplate = value; }
 				void setCalendarTemplate2(calendar::CalendarTemplate* value){ _calendarTemplate2 = value; }
 				void setStartDate(const boost::gregorian::date& value){ _startDate = value; }
@@ -96,9 +90,9 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				void addDatesToCalendar(calendar::Calendar& cal) const;
+				/// @pre _calendar is not null
+				void addDatesToCalendar() const;
 			//@}
-
 		};
 }	}
 

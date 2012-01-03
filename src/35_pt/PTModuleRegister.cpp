@@ -49,7 +49,6 @@
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
-#include "ServiceCalendarLinkTableSync.hpp"
 
 #include "DestinationAdmin.hpp"
 #include "DestinationsAdmin.hpp"
@@ -97,7 +96,6 @@
 #include "JunctionUpdateAction.hpp"
 #include "NonConcurrencyRuleAddAction.h"
 #include "ScheduleRealTimeUpdateAction.h"
-#include "ServiceCalendarLinkUpdateAction.hpp"
 #include "ServiceAddAction.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopAreaUpdateAction.h"
@@ -109,9 +107,7 @@
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
 #include "JourneyPatternUpdateAction.hpp"
-#include "ServiceApplyCalendarAction.h"
 #include "LineStopAddAction.h"
-#include "ServiceDateChangeAction.h"
 #include "StopPointUpdateAction.hpp"
 #include "StopPointAddAction.hpp"
 #include "StopAreaAddAction.h"
@@ -148,7 +144,6 @@
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
 #include "DRTArea.hpp"
-#include "ServiceCalendarLink.hpp"
 
 
 #include "PTModule.inc.cpp"
@@ -172,12 +167,12 @@ void synthese::pt::moduleRegister()
 	synthese::pt::JunctionTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::ContinuousServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ContinuousServiceTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ContinuousServiceTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt::ContinuousServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::ScheduledServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::pt::SchedulesBasedService>, synthese::pt::ScheduledServiceTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::ScheduledServiceTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt::ScheduledServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::graph::Service>, synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt::FreeDRTTimeSlotTableSync>::integrate();
 	synthese::pt::FareTableSync::integrate();
 	synthese::pt::RollingStockTableSync::integrate();
 	synthese::pt::NonConcurrencyRuleTableSync::integrate();
@@ -188,7 +183,6 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 	synthese::pt::LineStopTableSync::integrate();
 	synthese::pt::LineAreaInheritedTableSync::integrate();
-	synthese::pt::ServiceCalendarLinkTableSync::integrate();
 
 	synthese::pt::PTModule::integrate();
 
@@ -265,8 +259,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTUseRuleUpdateAction::integrate();
 	synthese::pt::ScheduleRealTimeUpdateAction::integrate();
 	synthese::pt::ServiceAddAction::integrate();
-	synthese::pt::ServiceApplyCalendarAction::integrate();
-	synthese::pt::ServiceCalendarLinkUpdateAction::integrate();
 	synthese::pt::ServiceTimetableUpdateAction::integrate();
 	synthese::pt::ServiceUpdateAction::integrate();
 	synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
@@ -275,7 +267,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::TransportNetworkUpdateAction::integrate();
 	synthese::pt::JourneyPatternUpdateAction::integrate();
 	synthese::pt::LineStopAddAction::integrate();
-	synthese::pt::ServiceDateChangeAction::integrate();
 	synthese::pt::StopPointUpdateAction::integrate();
 	synthese::pt::StopPointAddAction::integrate();
 	synthese::pt::StopAreaAddAction::integrate();
@@ -312,5 +303,4 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::Fare>();
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
-	synthese::util::Env::Integrate<synthese::pt::ServiceCalendarLink>();
 }

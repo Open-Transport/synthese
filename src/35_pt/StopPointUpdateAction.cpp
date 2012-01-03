@@ -29,8 +29,6 @@
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
-#include "ImportableTableSync.hpp"
-#include "ImportableAdmin.hpp"
 #include "HTMLMap.hpp"
 
 #include <geos/io/WKTReader.h>
@@ -59,7 +57,6 @@ namespace synthese
 		const string StopPointUpdateAction::PARAMETER_STOP_ID = Action_PARAMETER_PREFIX + "id";
 		const string StopPointUpdateAction::PARAMETER_X = Action_PARAMETER_PREFIX + "x";
 		const string StopPointUpdateAction::PARAMETER_Y = Action_PARAMETER_PREFIX + "y";
-		const string StopPointUpdateAction::PARAMETER_OPERATOR_CODE = Action_PARAMETER_PREFIX + "oc";
 		const string StopPointUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
 		const string StopPointUpdateAction::PARAMETER_STOP_AREA = Action_PARAMETER_PREFIX + "sa";
 		const string StopPointUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
@@ -81,10 +78,6 @@ namespace synthese
 				map.insert(PARAMETER_SRID, _point->getSRID());
 			}
 
-			if(_dataSourceLinks)
-			{
-				map.insert(PARAMETER_OPERATOR_CODE, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
 			if(_name)
 			{
 				map.insert(PARAMETER_NAME, *_name);
@@ -93,10 +86,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_STOP_AREA, _stopArea->get() ? (*_stopArea)->getKey() : RegistryKeyType(0));
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -150,23 +143,13 @@ namespace synthese
 				_point.reset(static_cast<Point*>(reader.read(map.get<string>(HTMLMap::PARAMETER_ACTION_WKT))));
 			}
 
-			if(map.isDefined(PARAMETER_OPERATOR_CODE))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(
-					map.get<string>(PARAMETER_OPERATOR_CODE),
-					*_env
-				);
-			}
-
 			if(map.isDefined(PARAMETER_NAME))
 			{
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -181,10 +164,10 @@ namespace synthese
 			{
 				_stop->setGeometry(_point);
 			}
-			if(_dataSourceLinks)
-			{
-				_stop->setDataSourceLinks(*_dataSourceLinks);
-			}
+
+			// Importable
+			_doImportableUpdate(*_stop, request);
+
 			if(_name)
 			{
 				_stop->setName(*_name);

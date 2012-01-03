@@ -23,7 +23,6 @@
 #include "NonPermanentService.h"
 #include "JourneyPattern.hpp"
 #include "PTUseRule.h"
-#include "ServiceCalendarLink.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -108,43 +107,11 @@ namespace synthese
 		}
 
 
-		
-		void NonPermanentService::setCalendarFromLinks()
+
+		calendar::Calendar& NonPermanentService::operator|=( const calendar::Calendar& op )
 		{
-			recursive_mutex::scoped_lock lock(_calendarLinksMutex);
-			clear();
-			BOOST_FOREACH(const CalendarLinks::value_type& link, _calendarLinks)
-			{
-				link->addDatesToCalendar(*this);
-			}
+			Calendar::operator|=(op);
 			updatePathCalendar();
-		}
-
-
-
-		void NonPermanentService::removeCalendarLink(
-			const ServiceCalendarLink& link,
-			bool updateCalendar
-		){
-			recursive_mutex::scoped_lock lock(_calendarLinksMutex);
-			_calendarLinks.erase(const_cast<ServiceCalendarLink*>(&link));
-			if(updateCalendar)
-			{
-				setCalendarFromLinks();
-			}
-		}
-
-
-
-		void NonPermanentService::addCalendarLink(
-			const ServiceCalendarLink& link,
-			bool updateCalendar
-		){
-			recursive_mutex::scoped_lock lock(_calendarLinksMutex);
-			_calendarLinks.insert(const_cast<ServiceCalendarLink*>(&link));
-			if(updateCalendar)
-			{
-				setCalendarFromLinks();
-			}
+			return *this;
 		}
 }	}
