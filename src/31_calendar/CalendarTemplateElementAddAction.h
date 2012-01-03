@@ -40,8 +40,8 @@ namespace synthese
 		class CalendarTemplate;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 19.15 Action : Adds an element to an existing calendar template.
-		/// @ingroup m19Actions refActions
+		/// 31.15 Action : Adds an element to an existing calendar template.
+		/// @ingroup m31Actions refActions
 		/// @author Hugues Romain
 		/// @date 2010
 		//////////////////////////////////////////////////////////////////////////

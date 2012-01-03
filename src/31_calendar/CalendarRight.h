@@ -32,7 +32,7 @@ namespace synthese
 	namespace calendar
 	{
 		/** CalendarRight Right Class.
-			@ingroup m19Rights refRights
+			@ingroup m31Rights refRights
 
 			Here are the different right levels :
 

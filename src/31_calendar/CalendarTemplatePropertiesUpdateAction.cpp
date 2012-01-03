@@ -73,10 +73,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_CATEGORY, static_cast<int>(*_category));
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -143,11 +143,8 @@ namespace synthese
 				_category = static_cast<CalendarTemplate::Category>(map.get<int>(PARAMETER_CATEGORY));
 			}
 
-			// Datasource
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+			// Importable
+			_setImportableUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -166,10 +163,9 @@ namespace synthese
 			{
 				_calendar->setParent(_parent->get());
 			}
-			if(_dataSourceLinks)
-			{
-				_calendar->setDataSourceLinks(*_dataSourceLinks);
-			}
+
+			// Importable
+			_doImportableUpdate(*_calendar, request);
 
 			CalendarTemplateTableSync::Save(_calendar.get());
 

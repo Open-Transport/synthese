@@ -25,18 +25,24 @@
 #ifndef SYNTHESE_ENV_CALENDAR_H
 #define SYNTHESE_ENV_CALENDAR_H
 
+#include "Registrable.h"
+
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <bitset>
 #include <map>
 #include <vector>
 #include <boost/optional/optional.hpp>
+#include <set>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace synthese
 {
 	namespace calendar
 	{
+		class CalendarLink;
+
 		/** Calendar described by an array of booleans (one per day).
-			@ingroup m19
+			@ingroup m31
 
 			The Calendar class implements the service calendar, holding a
 			bitset representing year days. Each year day can be activated or not.
@@ -46,10 +52,12 @@ namespace synthese
 			In a year bitset, a date is represented by the bit at the rank corresponding to its day number in the year.
 			Example : 2008-02-03 => bit 34 of the 2008 bitset.
 		*/
-		class Calendar
+		class Calendar:
+			public virtual util::Registrable
 		{
 		public:
 			typedef std::vector<boost::gregorian::date> DatesVector;
+			typedef std::set<CalendarLink*> CalendarLinks;
 
 		private:
 
@@ -65,10 +73,16 @@ namespace synthese
 
 			static size_t _BitPos(const boost::gregorian::date& d);
 
+			CalendarLinks _calendarLinks;
+			mutable boost::shared_ptr<boost::recursive_mutex> _mutex;
+
 		public:
 			//! @name Constructors
 			//@{
-				Calendar();
+				Calendar(
+					util::RegistryKeyType id = 0
+				);
+
 				Calendar(
 					const boost::gregorian::date& firstDate,
 					const boost::gregorian::date& lastDate
@@ -90,8 +104,20 @@ namespace synthese
 				);
 			//@}
 
+			//! @name Getters
+			//@{
+				const CalendarLinks& getCalendarLinks() const { return _calendarLinks; }
+			//@}
+
+			//! @name Setters
+			//@{
+				void setCalendarLinks(const CalendarLinks& value){ _calendarLinks = value; }
+			//@}
+
 			//! @name Services
 			//@{
+				bool isLinked() const;
+
 				boost::gregorian::date getFirstActiveDate() const;
 				boost::gregorian::date getLastActiveDate() const;
 
@@ -143,7 +169,7 @@ namespace synthese
 				Calendar& operator<<= (std::size_t i);
 				Calendar operator<< (std::size_t i);
 				Calendar& operator&= (const Calendar& op);
-				Calendar& operator|= (const Calendar& op);
+				virtual Calendar& operator|= (const Calendar& op);
 				Calendar operator& (const Calendar& op2) const;
 				Calendar operator| (const Calendar& op2) const;
 
@@ -169,6 +195,10 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void setCalendarFromLinks();
+				void removeCalendarLink(const CalendarLink& link, bool updateCalendar);
+				void addCalendarLink(const CalendarLink& link, bool updateCalendar);
+
 				virtual void setActive(const boost::gregorian::date& date);
 				virtual void setInactive(const boost::gregorian::date& date);
 				void subDates(const Calendar& calendar);
@@ -186,9 +216,6 @@ namespace synthese
 				void setFromSerializedString(const std::string& value);
 			//@}
 		};
-
-
-	}
-}
+}	}
 
 #endif

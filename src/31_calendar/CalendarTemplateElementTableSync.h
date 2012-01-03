@@ -38,8 +38,8 @@ namespace synthese
 	namespace calendar
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 19.10 Table : Calendar template element.
-		/// @ingroup m19LS refLS
+		/// 31.10 Table : Calendar template element.
+		/// @ingroup m31LS refLS
 		/// @author Hugues Romain
 		/// @date 2008
 		//////////////////////////////////////////////////////////////////////////

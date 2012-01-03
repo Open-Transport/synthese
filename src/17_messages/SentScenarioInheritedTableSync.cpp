@@ -101,7 +101,7 @@ namespace synthese
 				}
 
 				// Data source links
-				obj->setDataSourceLinks(
+				obj->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
 						env

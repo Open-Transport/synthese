@@ -1128,7 +1128,7 @@ namespace synthese
 						{
 							links.insert(make_pair(&_dataSource, bahnhof.operatorCode));
 						}
-						newStopArea->setDataSourceLinks(links);
+						newStopArea->setDataSourceLinksWithoutRegistration(links);
 						stopAreas.add(*newStopArea);
 					}
 				}

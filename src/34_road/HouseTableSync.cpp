@@ -99,7 +99,7 @@ namespace synthese
 			}
 
 			// Code by source
-			object->setDataSourceLinks(
+			object->setDataSourceLinksWithoutRegistration(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
 					rows->getText(HouseTableSync::COL_DATA_SOURCE_LINKS),
 					env

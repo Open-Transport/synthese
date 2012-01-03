@@ -50,12 +50,15 @@ void synthese::pt_operation::moduleRegister()
 {
 	
 	// 37 PT Operation
-	synthese::pt_operation::CompositionTableSync::integrate();
 	synthese::pt_operation::DeadRunTableSync::integrate();
 	synthese::pt_operation::DepotTableSync::integrate();
-	synthese::pt_operation::DriverServiceTableSync::integrate();
-	synthese::pt_operation::ServiceCompositionInheritedTableSync::integrate();
-	synthese::pt_operation::VehicleServiceCompositionInheritedTableSync::integrate();
+	synthese::util::FactorableTemplate<synthese::db::DBTableSync, synthese::pt_operation::DriverServiceTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::DriverServiceTableSync>::integrate();
+	synthese::pt_operation::CompositionTableSync::integrate();
+	synthese::util::FactorableTemplate<synthese::pt_operation::CompositionTableSync, synthese::pt_operation::ServiceCompositionInheritedTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::ServiceCompositionInheritedTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::pt_operation::CompositionTableSync, synthese::pt_operation::VehicleServiceCompositionInheritedTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::VehicleServiceCompositionInheritedTableSync>::integrate();
 	synthese::pt_operation::VehicleTableSync::integrate();
 	synthese::pt_operation::VehiclePositionTableSync::integrate();
 	synthese::pt_operation::VehicleServiceTableSync::integrate();

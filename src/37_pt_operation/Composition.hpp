@@ -44,7 +44,8 @@ namespace synthese
 		///	@ingroup m37
 		/// @author Hugues Romain
 		class Composition:
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public calendar::Calendar
 		{
 		public:
 			typedef util::Registry<Composition> Registry;
@@ -59,7 +60,6 @@ namespace synthese
 
 		protected:
 			VehicleLinks _vehicles;
-			calendar::Calendar _calendar;
 
 			Composition(util::RegistryKeyType id=0);
 
@@ -68,16 +68,13 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setVehicles(const VehicleLinks& value){ _vehicles = value; }
-				void setCalendar(const calendar::Calendar& value){ _calendar = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				const VehicleLinks& getVehicles() const { return _vehicles; }
-				const calendar::Calendar& getCalendar() const { return _calendar; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_operations_Composition_hpp__

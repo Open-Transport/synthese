@@ -104,6 +104,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_USE_RULES, PTUseRuleTableSync::SerializeUseRules(*_useRules));
 			}
+
+			// Calendar
+			_getCalendarUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -183,6 +187,9 @@ namespace synthese
 					*_env
 				);
 			}
+
+			// Calendar
+			_setCalendarUpdateFromParametersMap(*_env, map);
 		}
 
 
@@ -224,6 +231,9 @@ namespace synthese
 			{
 				_timeSlot->setRules(*_useRules);
 			}
+
+			// Calendar
+			_doCalendarUpdate(*_timeSlot, request);
 
 			FreeDRTTimeSlotTableSync::Save(_timeSlot.get());
 

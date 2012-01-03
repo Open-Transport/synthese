@@ -26,15 +26,11 @@
 #include "Service.h"
 #include "Calendar.h"
 
-#include <set>
-#include <boost/thread/recursive_mutex.hpp>
-
 namespace synthese
 {
 	namespace pt
 	{
 		class PTUseRule;
-		class ServiceCalendarLink;
 
 		/** NonPermanentService class.
 			@ingroup m35
@@ -48,9 +44,6 @@ namespace synthese
 			public graph::Service,
 			public calendar::Calendar
 		{
-		public:
-			typedef std::set<ServiceCalendarLink*> CalendarLinks;
-
 		protected:
 			NonPermanentService(
 				util::RegistryKeyType id = 0
@@ -60,26 +53,8 @@ namespace synthese
 				graph::Path* path
 			);
 
-			CalendarLinks _calendarLinks;
-			mutable boost::recursive_mutex _calendarLinksMutex;
-	
+
 		public:
-			//! @name Getters
-			//@{
-				const CalendarLinks& getCalendarLinks() const { return _calendarLinks; }
-			//@}
-
-			//! @name Setters
-			//@{
-				void setCalendarLinks(const CalendarLinks& value){ _calendarLinks = value; }
-			//@}
-
-
-			void setCalendarFromLinks();
-
-			void removeCalendarLink(const ServiceCalendarLink& link, bool updateCalendar);
-			void addCalendarLink(const ServiceCalendarLink& link, bool updateCalendar);
-
 			/** Latest schedule of the service : the last arrival at the last vertex.
 				@return The latest schedule of the service
 			*/
@@ -98,6 +73,8 @@ namespace synthese
 			 * @param date the date to unmark
 			 */
 			virtual void setInactive(const boost::gregorian::date& d);
+
+			virtual calendar::Calendar& operator|= (const calendar::Calendar& op);
 
 			void updatePathCalendar();
 		};

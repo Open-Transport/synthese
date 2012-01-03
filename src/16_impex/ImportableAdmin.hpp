@@ -44,15 +44,12 @@ namespace synthese
 		public:
 			static const std::string TAB_DATA_SOURCES;
 
-			static const std::string PARAMETER_DATA_SOURCE_LINKS;
-
 			static void DisplayDataSourcesTab(
 				std::ostream& stream,
 				const Importable& object,
 				const server::Request& updateRequest
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_impex_ImportableAdmin_hpp__

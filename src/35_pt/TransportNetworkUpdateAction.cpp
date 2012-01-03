@@ -29,8 +29,6 @@
 #include "Request.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
-#include "ImportableTableSync.hpp"
-#include "ImportableAdmin.hpp"
 #include "CalendarTemplateTableSync.h"
 
 using namespace std;
@@ -69,10 +67,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NAME, *_name);
 			}
-			if(_dataSourceLinks)
-			{
-				map.insert(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS, ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks));
-			}
+
+			// Importable
+			_getImportableUpdateParametersMap(map);
+
 			return map;
 		}
 
@@ -115,10 +113,7 @@ namespace synthese
 			}
 
 			// Data source links
-			if(map.isDefined(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS))
-			{
-				_dataSourceLinks = ImportableTableSync::GetDataSourceLinksFromSerializedString(map.get<string>(ImportableAdmin::PARAMETER_DATA_SOURCE_LINKS), *_env);
-			}
+			_setImportableUpdateFromParametersMap(*_env, map);
 
 			// Days calendars parent
 			if(map.isDefined(PARAMETER_DAYS_CALENDARS_PARENT_ID))
@@ -171,10 +166,7 @@ namespace synthese
 			}
 
 			// Data source links
-			if(_dataSourceLinks)
-			{
-				_network->setDataSourceLinks(*_dataSourceLinks);
-			}
+			_doImportableUpdate(*_network, request);
 
 			// Days calendars parent
 			if(_daysCalendarsParent)

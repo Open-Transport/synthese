@@ -27,8 +27,9 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "BaseImportableUpdateAction.hpp"
+
 #include <boost/date_time/time_duration.hpp>
-#include "Importable.h"
 
 namespace synthese
 {
@@ -63,7 +64,8 @@ namespace synthese
 		///		<li>actionParamma : wether the stop is selected as default in the city when no stop is specified</li>
 		///	</ul>
 		class StopAreaUpdateAction:
-			public util::FactorableTemplate<server::Action, StopAreaUpdateAction>
+			public util::FactorableTemplate<server::Action, StopAreaUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_PLACE_ID;
@@ -86,7 +88,7 @@ namespace synthese
 			boost::shared_ptr<geography::City> _city;
 			boost::optional<bool> _isMain;
 			boost::optional<std::string> _timetableName;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -101,6 +103,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -123,7 +126,6 @@ namespace synthese
 				void setPlace(boost::shared_ptr<pt::StopArea> value) { _place = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_StopAreaUpdateAction_H__

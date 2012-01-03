@@ -49,7 +49,6 @@ namespace synthese
 			typedef std::vector<boost::shared_ptr<ObjectClass> > SearchResult;
 			typedef ObjectClass ObjectType;
 
-		protected:
 			/** Object links loader from the database.
 				@param obj Pointer to the object to load from the database
 				@param rows Row to read

@@ -41,7 +41,7 @@ namespace synthese
 		/// @since 3.3.1
 		class FreeDRTTimeSlotTableSync:
 			public db::DBRegistryTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>,
-			public db::FetcherTemplate<graph::Service, FreeDRTTimeSlotTableSync>
+			public db::FetcherTemplate<calendar::Calendar, FreeDRTTimeSlotTableSync>
 		{
 		public:
 			//! @name Field names
@@ -54,6 +54,7 @@ namespace synthese
 				static const std::string COL_COMMERCIAL_SPEED;
 				static const std::string COL_MAX_SPEED;
 				static const std::string COL_USE_RULES;
+				static const std::string COL_DATES;
 			//@}
 			
 

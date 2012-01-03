@@ -45,7 +45,7 @@ namespace synthese
 		class ContinuousServiceTableSync:
 			public db::DBRegistryTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>,
 			public db::FetcherTemplate<SchedulesBasedService, ContinuousServiceTableSync>,
-			public db::FetcherTemplate<graph::Service, ContinuousServiceTableSync>
+			public db::FetcherTemplate<calendar::Calendar, ContinuousServiceTableSync>
 		{
 		public:
 			static const std::string COL_SERVICENUMBER;

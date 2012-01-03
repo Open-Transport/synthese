@@ -27,18 +27,25 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Importable.h"
-#include "TransportNetwork.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace pt
 	{
+		class TransportNetwork;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// TransportNetworkUpdateAction action class.
 		/// @ingroup m53Actions refActions
 		class TransportNetworkUpdateAction:
-			public util::FactorableTemplate<server::Action, TransportNetworkUpdateAction>
+			public util::FactorableTemplate<server::Action, TransportNetworkUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_NETWORK_ID;
@@ -49,9 +56,9 @@ namespace synthese
 		private:
 			boost::shared_ptr<TransportNetwork> _network;
 			boost::optional<std::string> _name;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _daysCalendarsParent;
 			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _periodsCalendarsParent;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -66,6 +73,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////

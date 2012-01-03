@@ -95,6 +95,7 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void setDataSourceLinksWithoutRegistration(const DataSourceLinks& value){ _dataSourceLinks = value; }
 			//@}
 
 			//! @name Services
@@ -195,23 +196,23 @@ namespace synthese
 
 
 
-			void setDataSourceLinks(
-				const DataSourceLinks& value,
-				bool storeLinkInDataSource = false
+			void setDataSourceLinksWithRegistration(
+				const DataSourceLinks& value
 			){
-				if(storeLinkInDataSource)
+				// Unregister old links
+				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 				{
-					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-					{
-						link.first->removeLink(static_cast<T&>(*this), link.second);
-				}	}
-				_dataSourceLinks = value;
-				if(storeLinkInDataSource)
+					link.first->removeLink(static_cast<T&>(*this), link.second);
+				}
+
+				// Saving new links
+				setDataSourceLinksWithoutRegistration(value);
+
+				// Registering new links
+				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
 				{
-					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-					{
-						link.first->addLink(static_cast<T&>(*this), link.second);
-				}	}
+					link.first->addLink(static_cast<T&>(*this), link.second);
+				}
 			}
 
 

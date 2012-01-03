@@ -145,7 +145,7 @@ namespace synthese
 				}
 
 				// Data sources and operator codes
-				line->setDataSourceLinks(
+				line->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(JourneyPatternTableSync::COL_DATASOURCE_ID),
 						env

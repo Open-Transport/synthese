@@ -168,7 +168,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Data source links
-				cp->setDataSourceLinks(
+				cp->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(StopAreaTableSync::COL_CODE_BY_SOURCE),
 						env

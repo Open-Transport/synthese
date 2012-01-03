@@ -171,7 +171,7 @@ namespace synthese
 			size_t rank(0);
 			BOOST_FOREACH(const PTOperationModule::ServiceCompositions::mapped_type::value_type& composition, PTOperationModule::GetCompositions(*_service))
 			{
-				if(composition->getCalendar().isActive(_date))
+				if(composition->isActive(_date))
 				{
 					displayComposition(
 						stream,

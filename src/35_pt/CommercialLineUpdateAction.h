@@ -28,17 +28,13 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "RGBColor.h"
-#include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
 		class CommercialLine;
-	}
-
-	namespace pt
-	{
 		class ReservationContact;
 		class TransportNetwork;
 
@@ -63,7 +59,8 @@ namespace synthese
 		///		<li>actionParamdsl : data source links</li>
 		///	</ul>
 		class CommercialLineUpdateAction:
-			public util::FactorableTemplate<server::Action, CommercialLineUpdateAction>
+			public util::FactorableTemplate<server::Action, CommercialLineUpdateAction>,
+			public impex::BaseImportableUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_LINE_ID;
@@ -89,7 +86,6 @@ namespace synthese
 			boost::optional<std::string>			_image;		//!< Display image (cartouche)
 			boost::optional<boost::shared_ptr<const TransportNetwork> >	_network;	//!< Network
 			boost::optional<boost::shared_ptr<const pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<std::string> _mapURL;
 			boost::optional<std::string> _docURL;
 			boost::optional<util::RegistryKeyType> _timetableId;

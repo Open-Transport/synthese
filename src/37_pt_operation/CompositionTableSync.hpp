@@ -29,6 +29,7 @@
 #include "VehicleServiceComposition.hpp"
 #include "DBInheritanceTableSyncTemplate.hpp"
 #include "DBInheritedRegistryTableSync.hpp"
+#include "FetcherTemplate.h"
 
 namespace synthese
 {
@@ -95,7 +96,8 @@ namespace synthese
 				CompositionTableSync,
 				ServiceCompositionInheritedTableSync,
 				ServiceComposition
-			>
+			>,
+			public db::FetcherTemplate<calendar::Calendar, ServiceCompositionInheritedTableSync>
 		{
 		};
 
@@ -110,7 +112,8 @@ namespace synthese
 				CompositionTableSync,
 				VehicleServiceCompositionInheritedTableSync,
 				VehicleServiceComposition
-			>
+			>,
+			public db::FetcherTemplate<calendar::Calendar, VehicleServiceCompositionInheritedTableSync>
 		{
 		};
 	}

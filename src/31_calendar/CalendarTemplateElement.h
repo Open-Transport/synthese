@@ -36,7 +36,7 @@ namespace synthese
 		class CalendarTemplate;
 
 		/** Element of calendar template class.
-			@ingroup m19
+			@ingroup m31
 
 			An element of a calendar describes a range of dates by several ways :
 				- single date d : minDate=d, maxDate=d

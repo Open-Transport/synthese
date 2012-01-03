@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// ServiceDateChangeAction class header.
-///	@file ServiceDateChangeAction.h
+/// CalendarLinkUpdateAction class header.
+///	@file CalendarLinkUpdateAction.hpp
 ///	@author Hugues Romain
-///	@date 2010
+///	@date 2011
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -22,44 +22,47 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_ServiceDateChangeAction_H__
-#define SYNTHESE_ServiceDateChangeAction_H__
+#ifndef SYNTHESE_ServiceCalendarLinkUpdateAction_H__
+#define SYNTHESE_ServiceCalendarLinkUpdateAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
 
-#include <boost/date_time/gregorian/greg_date.hpp>
-
 namespace synthese
 {
-	namespace pt
+	namespace calendar
 	{
-		class SchedulesBasedService;
+		class CalendarTemplate;
+		class Calendar;
+		class CalendarLink;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : ServiceDateChangeAction.
+		/// 31.15 Action : Service calendar link update.
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
 		///	@date 2010
-		/// @since 3.1.16
+		/// @since 3.3.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : ServiceDateChangeAction
-		///
-		/// Parameters :
-		///	<ul>
-		///		<li>actionParamid : id of the service to update</li>
-		///		<li>actionParamda : date to change</li>
-		///	</ul>
-		class ServiceDateChangeAction:
-			public util::FactorableTemplate<server::Action, ServiceDateChangeAction>
+		/// Key : CalendarLinkUpdateAction
+		class CalendarLinkUpdateAction:
+			public util::FactorableTemplate<server::Action, CalendarLinkUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_SERVICE_ID;
-			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_LINK_ID;
+			static const std::string PARAMETER_CALENDAR_ID;
+			static const std::string PARAMETER_START_DATE;
+			static const std::string PARAMETER_END_DATE;
+			static const std::string PARAMETER_CALENDAR_TEMPLATE_ID;
+			static const std::string PARAMETER_CALENDAR_TEMPLATE_ID2;
 
 		private:
-			boost::shared_ptr<SchedulesBasedService> _service;
-			boost::gregorian::date _date;
+			boost::shared_ptr<CalendarLink> _link;
+			boost::optional<boost::shared_ptr<Calendar> > _calendar;
+			boost::optional<boost::gregorian::date> _minDate;
+			boost::optional<boost::gregorian::date> _maxDate;
+			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _calendarTpl;
+			boost::optional<boost::shared_ptr<calendar::CalendarTemplate> > _calendarTpl2;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -74,6 +77,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -93,11 +97,10 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setService(boost::shared_ptr<SchedulesBasedService> value) { _service = value; }
-				void setDate(boost::gregorian::date value) { _date = value; }
+				void setLink(boost::shared_ptr<CalendarLink> value) { _link = value; }
+				void setCalendar(boost::optional<boost::shared_ptr<Calendar> > value) { _calendar = value; }
 			//@}
 		};
-	}
-}
+}	}
 
-#endif // SYNTHESE_ServiceDateChangeAction_H__
+#endif // SYNTHESE_ServiceUpdateAction_H__

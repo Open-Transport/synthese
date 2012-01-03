@@ -28,6 +28,7 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "FreeDRTTimeSlot.hpp"
+#include "BaseCalendarUpdateAction.hpp"
 
 namespace synthese
 {
@@ -49,7 +50,8 @@ namespace synthese
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		//	</dl>
 		class FreeDRTTimeSlotUpdateAction:
-			public util::FactorableTemplate<server::Action, FreeDRTTimeSlotUpdateAction>
+			public util::FactorableTemplate<server::Action, FreeDRTTimeSlotUpdateAction>,
+			public calendar::BaseCalendarUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_TIME_SLOT_ID;
@@ -73,6 +75,7 @@ namespace synthese
 			boost::optional<FreeDRTTimeSlot::KMHSpeed> _maxSpeed;
 			boost::optional<graph::RuleUser::Rules> _useRules;
 
+
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
@@ -86,6 +89,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -109,7 +113,6 @@ namespace synthese
 				void setArea(boost::shared_ptr<FreeDRTArea> value){ _area = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DRTAreaUpdateAction_H__

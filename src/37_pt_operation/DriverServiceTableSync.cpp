@@ -48,10 +48,12 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace impex;
 	using namespace pt;
+	using namespace calendar;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,DriverServiceTableSync>::FACTORY_KEY("37.40 Driver services");
+		template<> const string FactorableTemplate<DBTableSync, DriverServiceTableSync>::FACTORY_KEY("37.40 Driver services");
+		template<> const string FactorableTemplate<Fetcher<Calendar>, DriverServiceTableSync>::FACTORY_KEY("81");
 	}
 
 	namespace pt_operation
@@ -119,12 +121,11 @@ namespace synthese
 				}
 
 				// Data sources and operator codes
-				object->setDataSourceLinks(
+				object->setDataSourceLinksWithRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(DriverServiceTableSync::COL_DATASOURCE_LINKS),
 						env
-					),	true
-				);
+				)	);
 			}
 		}
 

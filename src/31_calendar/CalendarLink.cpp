@@ -1,6 +1,6 @@
 
-/** ServiceCalendarLink class implementation.
-	@file ServiceCalendarLink.cpp
+/** CalendarLink class implementation.
+	@file CalendarLink.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ServiceCalendarLink.hpp"
+#include "CalendarLink.hpp"
+
 #include "Calendar.h"
 #include "CalendarTemplate.h"
 
@@ -31,28 +32,29 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace util;
-	using namespace pt;
 	using namespace calendar;
 
 	namespace util
 	{
-		template<> const string Registry<ServiceCalendarLink>::KEY("ServiceCalendarLink");
+		template<> const string Registry<CalendarLink>::KEY("CalendarLink");
 	}
 
-	namespace pt
+	namespace calendar
 	{
-		ServiceCalendarLink::ServiceCalendarLink(
+		CalendarLink::CalendarLink(
 			RegistryKeyType id
 		):	Registrable(id),
-			_service(NULL),
+			_calendar(NULL),
 			_calendarTemplate(NULL),
 			_calendarTemplate2(NULL)
 		{}
 
 
 
-		void ServiceCalendarLink::addDatesToCalendar(calendar::Calendar& cal) const
+		void CalendarLink::addDatesToCalendar() const
 		{
+			assert(_calendar);
+
 			// Base calendar
 			Calendar result;
 			if(!_startDate.is_not_a_date() && !_endDate.is_not_a_date())
@@ -83,6 +85,6 @@ namespace synthese
 			}
 
 			// Add dates to the retval
-			cal |= result;
+			*_calendar |= result;
 		}
 }	}

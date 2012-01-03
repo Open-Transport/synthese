@@ -238,7 +238,7 @@ namespace synthese
 						rows->getText(DisplayScreenTableSync::COL_DATASOURCE_LINKS),
 						env
 				)	);
-				object->setDataSourceLinks(links, true);
+				object->setDataSourceLinksWithRegistration(links);
 
 				// Up & root
 				RegistryKeyType upId(rows->getLongLong(DisplayScreenTableSync::COL_UP_ID));

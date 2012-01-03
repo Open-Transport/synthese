@@ -28,6 +28,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 #include "Importable.h"
+#include "BaseImportableUpdateAction.hpp"
+#include "BaseCalendarUpdateAction.hpp"
 
 namespace synthese
 {
@@ -46,7 +48,9 @@ namespace synthese
 		///	@date 2010
 		/// @since 3.1.16
 		class JourneyPatternUpdateAction:
-			public util::FactorableTemplate<server::Action, JourneyPatternUpdateAction>
+			public util::FactorableTemplate<server::Action, JourneyPatternUpdateAction>,
+			public impex::BaseImportableUpdateAction,
+			public calendar::BaseCalendarUpdateAction
 		{
 		public:
 			static const std::string PARAMETER_ROUTE_ID;
@@ -65,8 +69,8 @@ namespace synthese
 			boost::optional<std::string> _name;
 			boost::optional<std::string> _direction;
 			boost::optional<bool> _wayback;
-			boost::optional<impex::Importable::DataSourceLinks> _dataSourceLinks;
 			boost::optional<bool> _main;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -85,6 +89,7 @@ namespace synthese
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);
+
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -109,7 +114,6 @@ namespace synthese
 				void setRoute(boost::shared_ptr<JourneyPattern> value) { _route = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_LineUpdateAction_H__

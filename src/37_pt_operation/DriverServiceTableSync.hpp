@@ -27,6 +27,7 @@
 
 #include "DriverService.hpp"
 #include "DBRegistryTableSyncTemplate.hpp"
+#include "FetcherTemplate.h"
 
 namespace synthese
 {
@@ -39,7 +40,8 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.3.0
 		class DriverServiceTableSync:
-			public db::DBRegistryTableSyncTemplate<DriverServiceTableSync,DriverService>
+			public db::DBRegistryTableSyncTemplate<DriverServiceTableSync, DriverService>,
+			public db::FetcherTemplate<calendar::Calendar, DriverServiceTableSync>
 		{
 		public:
 			//! @name Field names

@@ -97,7 +97,7 @@ namespace synthese
 
 			// Data source links
 			std::string creatorId(rows->getText (TransportNetworkTableSync::COL_CREATOR_ID));
-			object->setDataSourceLinks(ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env));
+			object->setDataSourceLinksWithoutRegistration(ImportableTableSync::GetDataSourceLinksFromSerializedString(creatorId, env));
 
 			{ // Days calendars parent
 				object->setDaysCalendarsParent(NULL);

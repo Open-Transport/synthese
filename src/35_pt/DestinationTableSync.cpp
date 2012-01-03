@@ -94,7 +94,7 @@ namespace synthese
 			object->setTTSText(rows->getText(DestinationTableSync::COL_TTS_TEXT));
 			object->setComment(rows->getText(DestinationTableSync::COL_COMMENT));
 
-			object->setDataSourceLinks(
+			object->setDataSourceLinksWithoutRegistration(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
 					rows->getText(DestinationTableSync::COL_DATA_SOURCE_LINKS),
 					env
