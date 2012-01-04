@@ -43,7 +43,7 @@ namespace synthese
 	namespace resa
 	{
 		/** ReservationCancellationEMailContentInterfacePage Interface Page Class.
-			@ingroup m31Pages refPages
+			@ingroup m51Pages refPages
 			@author Hugues
 			@date 2009
 

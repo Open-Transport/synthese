@@ -63,7 +63,7 @@ namespace synthese
 		/// Reservation booking action.
 		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m31Actions refActions
+		/// @ingroup m51Actions refActions
 		class BookReservationAction
 			: public util::FactorableTemplate<server::Action, BookReservationAction>
 		{

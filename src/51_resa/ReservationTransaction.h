@@ -39,7 +39,7 @@ namespace synthese
 		class Reservation;
 
 		/** ReservationTransaction class.
-			@ingroup m31
+			@ingroup m51
 		*/
 		class ReservationTransaction
 		:	public virtual util::Registrable

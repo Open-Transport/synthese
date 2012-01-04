@@ -38,7 +38,7 @@ namespace synthese
 	namespace resa
 	{
 		/** ReservationUserUpdateAction action class.
-			@ingroup m31Actions refActions
+			@ingroup m51Actions refActions
 
 			@bug If two new logins are requested for the same couple surname / name at the
 			same time, it is possible that the two users become the same login

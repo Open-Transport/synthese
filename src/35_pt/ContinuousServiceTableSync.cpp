@@ -214,12 +214,24 @@ namespace synthese
 				path->addService(*cs, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 				cs->updatePathCalendar();
 			}
+
+			// Registration in the line
+			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				cs->getRoute()->getCommercialLine()->registerService(*cs);
+			}
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Unlink(
 			ContinuousService* obj
 		){
+			// Unregister from the route
 			obj->getPath()->removeService(*obj);
+
+			// Unregister from the line
+			obj->getRoute()->getCommercialLine()->unregisterService(*obj);
 		}
 
 

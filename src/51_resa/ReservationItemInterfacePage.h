@@ -41,7 +41,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** ReservationItemInterfacePage Interface Page Class.
-			@ingroup m31Pages refPages
+			@ingroup m51Pages refPages
 			@author Hugues Romain
 			@date 2008
 

@@ -265,7 +265,7 @@ namespace synthese
 				{
 					reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
 				}
-				reservations[service->getServiceNumber()].addReservation(resa);
+				reservations[service->getServiceNumber()].addReservation(resa.get());
 			}
 
 			if(!_serviceNumber)
@@ -485,11 +485,14 @@ namespace synthese
 				}
 				else
 				{
-					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
+					BOOST_FOREACH(const Reservation* reservation, serviceReservations)
 					{
 						ReservationStatus status(reservation->getStatus());
-						openReservationRequest.getPage()->setReservation(reservation);
-						vehicleUpdateRquest.getAction()->setReservation(const_pointer_cast<Reservation>(reservation));
+						openReservationRequest.getPage()->setReservation(_env->getSPtr(reservation));
+						vehicleUpdateRquest.getAction()->setReservation(
+							_env->getEditableSPtr(
+								const_cast<Reservation*>(reservation)
+						)	);
 
 						customerRequest.getPage()->setUser(
 							UserTableSync::Get(

@@ -33,6 +33,7 @@
 #include "JourneyPatternTableSync.hpp"
 #include "VehicleTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
+#include "ResaModule.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -146,6 +147,8 @@ namespace synthese
 
 			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
 			{
+				// Vehicle
+				object->setVehicle(NULL);
 				RegistryKeyType vehicleId(rows->getLongLong(ReservationTableSync::COL_VEHICLE_ID));
 				if(vehicleId > 0)
 				{
@@ -161,6 +164,8 @@ namespace synthese
 					}
 				}
 
+				// Vehicle position at departure
+				object->setVehiclePositionAtDeparture(NULL);
 				RegistryKeyType vpd(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE));
 				if(vpd > 0)
 				{
@@ -176,6 +181,8 @@ namespace synthese
 					}
 				}
 
+				// Vehicle position at arrival
+				object->setVehiclePositionAtArrival(NULL);
 				RegistryKeyType vpa(rows->getLongLong(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL));
 				if(vpa > 0)
 				{
@@ -192,7 +199,8 @@ namespace synthese
 				}
 
 				// Keep this call at last position to be avoid the registration of the reservation in the transaction in case of
-				// unhabdled exception thrown by the previous links
+				// unhanded exception thrown by the previous links
+				object->setTransaction(NULL);
 				RegistryKeyType transactionId(rows->getLongLong(ReservationTableSync::COL_TRANSACTION_ID));
 				try
 				{
@@ -208,16 +216,26 @@ namespace synthese
 					util::Log::GetInstance().warn("No such transaction "+ lexical_cast<string>(transactionId) +" in reservation "+ lexical_cast<string>(object->getKey()));
 				}
 			}
+
+			// Indexation
+			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				recursive_mutex::scoped_lock lock(ResaModule::GetReservationsByServiceMutex());
+				if(object->getTransaction() && ResaModule::MustBeIndexed(*object->getTransaction()))
+				{
+					ResaModule::AddReservationByService(*object);
+				}
+			}
 		}
 
 
 
 		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
-			object->setTransaction(NULL);
-			object->setVehicle(NULL);
-			object->setVehiclePositionAtDeparture(NULL);
-			object->setVehiclePositionAtArrival(NULL);
+			// TODO : update transaction
+
+			// Indexation
+			ResaModule::RemoveReservationByService(*object);
 		}
 
 
@@ -381,6 +399,26 @@ namespace synthese
 					query << " OFFSET " << first;
 			}
 
+			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		ReservationTableSync::SearchResult ReservationTableSync::Search(
+			util::Env& env,
+			boost::posix_time::ptime minArrivalDate,
+			boost::posix_time::ptime maxDepartureDate,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		){
+			stringstream query;
+			query <<
+				"SELECT r.*" <<
+				" FROM " << TABLE.NAME << " r INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " t" << " ON r." << COL_TRANSACTION_ID << "=t." << TABLE_COL_ID <<
+				" WHERE " <<
+				"(SELECT MAX(r2." << COL_ARRIVAL_TIME << ") FROM " << TABLE.NAME << " r2 WHERE r2." << COL_TRANSACTION_ID << "=t." << TABLE_COL_ID << ") > '" << boost::gregorian::to_iso_extended_string(minArrivalDate.date()) << " " << boost::posix_time::to_simple_string(minArrivalDate.time_of_day()) << "' AND " <<
+				"(SELECT MIN(r3." << COL_DEPARTURE_TIME << ") FROM " << TABLE.NAME << " r3 WHERE r3." << COL_TRANSACTION_ID << "=t." << TABLE_COL_ID << ") < '" << boost::gregorian::to_iso_extended_string(maxDepartureDate.date()) << " " << boost::posix_time::to_simple_string(maxDepartureDate.time_of_day()) << "' AND " <<
+				"t." << ReservationTransactionTableSync::COL_CANCELLATION_TIME << " IS NULL "
+				" ORDER BY t." << TABLE_COL_ID;
 			return LoadFromQuery(query.str(), env, linkLevel);
 		}
 }	}

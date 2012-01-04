@@ -55,7 +55,7 @@ namespace synthese
 		/**	Online reservation rule class.
 			@author Hugues Romain
 			@date 2007
-			@ingroup m31
+			@ingroup m51
 		*/
 		class OnlineReservationRule
 		:	public virtual util::Registrable

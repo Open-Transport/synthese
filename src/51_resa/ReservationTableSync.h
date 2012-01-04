@@ -36,7 +36,7 @@ namespace synthese
 	namespace resa
 	{
 		/** Reservation table synchronizer.
-			@ingroup m31LS refLS
+			@ingroup m51LS refLS
 
 			@warning The load method does not update the transaction attribute. To do it, load the transaction first and load each reservation which belongs to it.
 		*/
@@ -82,6 +82,26 @@ namespace synthese
 				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			/** Reservation search.
+				The returned reservations includes their corresponding transaction as shared pointer.
+				@param minArrivalDate min arrival date
+				@param maxDepartureDate max departure date
+				@return Found Reservation objects.
+				@author Hugues Romain
+				@date 2011
+				@warning the reservation transactions could not be entirely loaded.
+			*/
+			static SearchResult Search(
+				util::Env& env,
+				boost::posix_time::ptime minArrivalDate,
+				boost::posix_time::ptime maxDepartureDate,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
 
 
 			/** Search of reservations by line and date.

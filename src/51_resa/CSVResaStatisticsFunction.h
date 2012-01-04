@@ -43,7 +43,7 @@ namespace synthese
 		/** CSVResaStatisticsFunction Function class.
 			@author Hugues Romain
 			@date 2009
-			@ingroup m31Functions refFunctions
+			@ingroup m51Functions refFunctions
 		*/
 		class CSVResaStatisticsFunction:
 			public util::FactorableTemplate<server::Function,CSVResaStatisticsFunction>

@@ -51,11 +51,15 @@
 #include "TransportWebsite.h"
 #include "TransportWebsiteTableSync.h"
 #include "Language.hpp"
+#include "ScheduledServiceTableSync.h"
+#include "FreeDRTTimeSlotTableSync.hpp"
+#include "ServerModule.h"
 
 #include <boost/foreach.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -83,6 +87,10 @@ namespace synthese
 		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
 		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
+		const boost::posix_time::time_duration ResaModule::BEFORE_RESERVATION_INDEXATION_DURATION = hours(1);
+		const boost::posix_time::time_duration ResaModule::AFTER_RESERVATION_INDEXATION_DURATION = hours(6);
+		const boost::posix_time::time_duration ResaModule::DURATION_BETWEEN_RESERVATIONS_REINDEX = minutes(10);
+
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
@@ -90,6 +98,8 @@ namespace synthese
 		recursive_mutex ResaModule::_sessionsCallIdsMutex;
 		shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
 		shared_ptr<TransportWebsite> ResaModule::_journeyPlannerWebsite;
+		ResaModule::ReservationsByService ResaModule::_reservationsByService;
+		boost::recursive_mutex ResaModule::_reservationsByServiceMutex;
 	}
 
 	namespace server
@@ -150,6 +160,13 @@ namespace synthese
 				ResaModule::_autoresaProfile->addRight(r3);
 				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
 			}
+
+			// Reservation loader
+			shared_ptr<thread> theThread(
+				new thread(
+					&ResaModule::UpdateReservationsByService
+			)	);
+			ServerModule::AddThread(theThread, "Reservations indexer");
 		}
 
 
@@ -377,5 +394,109 @@ namespace synthese
 		pt_website::TransportWebsite* ResaModule::GetJourneyPlannerWebsite()
 		{
 			return _journeyPlannerWebsite.get();
+		}
+
+
+
+		void ResaModule::AddReservationByService( const Reservation& reservation )
+		{
+			recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
+
+			RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
+			if(tableId == ScheduledServiceTableSync::TABLE.ID)
+			{
+				_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].insert(&reservation);
+			}
+			else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+			{
+				_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].insert(&reservation);
+			}
+		}
+
+
+
+		void ResaModule::RemoveReservationByService( const Reservation& reservation )
+		{
+			recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
+
+			RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
+			if(tableId == ScheduledServiceTableSync::TABLE.ID)
+			{
+				_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].erase(&reservation);
+			}
+			else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+			{
+				_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].erase(&reservation);
+			}
+		}
+
+
+
+		const ResaModule::ReservationsByService::mapped_type& ResaModule::GetReservationsByService(
+			const graph::Service& service
+		){
+			return _reservationsByService[&service];
+		}
+
+
+
+		void ResaModule::UpdateReservationsByService()
+		{
+			while(true)
+			{
+				// Thread status update
+				ServerModule::SetCurrentThreadRunningAction();
+
+				{
+					// Mutex lock
+					recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
+
+					// Clear already loaded objects
+					_reservationsByService.clear();
+					Env::GetOfficialEnv().getEditableRegistry<ReservationTransaction>().clear();
+					Env::GetOfficialEnv().getEditableRegistry<Reservation>().clear();
+
+					// Reservations load
+					ptime now(second_clock::local_time());
+					ReservationTableSync::SearchResult reservations(
+						ReservationTableSync::Search(
+						Env::GetOfficialEnv(),
+							now - BEFORE_RESERVATION_INDEXATION_DURATION,
+							now + AFTER_RESERVATION_INDEXATION_DURATION
+					)	);
+
+					// Populating the map
+					BOOST_FOREACH(shared_ptr<Reservation> reservation, reservations)
+					{
+						AddReservationByService(*reservation);
+					}
+				}
+
+				// Thread status update
+				ServerModule::SetCurrentThreadWaiting();
+
+				// Next load in 10 minutes
+				this_thread::sleep(DURATION_BETWEEN_RESERVATIONS_REINDEX);
+			}
+		}
+
+
+
+		bool ResaModule::MustBeIndexed( const ReservationTransaction& transaction )
+		{
+			ptime now(second_clock::local_time());
+
+			if(	!transaction.getCancellationTime().is_not_a_date_time() ||
+				transaction.getReservations().empty()
+			){
+				return false;
+			}
+
+			if((*transaction.getReservations().begin())->getArrivalTime() < (now - BEFORE_RESERVATION_INDEXATION_DURATION))
+			{
+				return false;
+			}
+
+			return (*transaction.getReservations().rbegin())->getDepartureTime() < (now + AFTER_RESERVATION_INDEXATION_DURATION);
 		}
 }	}

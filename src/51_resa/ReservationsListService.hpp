@@ -71,6 +71,7 @@ namespace synthese
 			static const std::string PARAMETER_MINIMAL_ARRIVAL_RANK;
 			static const std::string PARAMETER_MAXIMAL_ARRIVAL_RANK;
 			static const std::string PARAMETER_LINKED_WITH_VEHICLE_ONLY;
+			static const std::string PARAMETER_USE_CACHE;
 
 			static const std::string DATA_NAME;
 			static const std::string DATA_LANGUAGE;
@@ -105,6 +106,7 @@ namespace synthese
 				boost::optional<std::size_t> _minArrivalRank;
 				boost::optional<std::size_t> _maxArrivalRank;
 				bool _linkedWithVehicleOnly;
+				bool _useCache;
 			//@}
 
 
