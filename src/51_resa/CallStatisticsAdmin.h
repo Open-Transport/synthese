@@ -40,7 +40,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// CallStatisticsAdmin Admin compound class.
-		///	@ingroup m31Admin refAdmin
+		///	@ingroup m51Admin refAdmin
 		///	@author Hugues
 		///	@date 2009
 		class CallStatisticsAdmin:

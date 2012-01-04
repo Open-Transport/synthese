@@ -47,7 +47,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** ReservationTransaction table synchronizer.
-			@ingroup m31LS refLS
+			@ingroup m51LS refLS
 		*/
 		class ReservationTransactionTableSync:
 			public db::DBNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>

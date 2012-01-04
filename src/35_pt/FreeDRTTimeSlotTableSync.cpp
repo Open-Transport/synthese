@@ -191,6 +191,13 @@ namespace synthese
 			{
 				object->setFromSerializedString(rows->getText(FreeDRTTimeSlotTableSync::COL_DATES));
 			}
+
+
+			// Registration in the line
+			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				object->getArea()->getLine()->registerService(*object);
+			}
 		}
 
 
@@ -226,9 +233,13 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<FreeDRTTimeSlotTableSync,FreeDRTTimeSlot>::Unlink(
 			FreeDRTTimeSlot* obj
 		){
-			if(obj->getPath())
+			if(obj->getArea())
 			{
+				// Unregister from the area
 				obj->getPath()->removeService(*obj);
+			
+				// Unregister from the line
+				obj->getArea()->getLine()->unregisterService(*obj);
 			}
 		}
 

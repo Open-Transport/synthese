@@ -42,7 +42,7 @@ namespace synthese
 	namespace resa
 	{
 		/** Reservation StatisticsTableSync class.
-			@ingroup m31
+			@ingroup m51
 		*/
 		class ResaStatisticsTableSync
 		{

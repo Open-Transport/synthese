@@ -44,7 +44,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** Reservation class.
-			@ingroup m31
+			@ingroup m51
 
 			A Reservation object can link to its departures and arrival places, commercial lines, etc.
 			In order to prevent from broken links, the object contains a copy of the main informations.

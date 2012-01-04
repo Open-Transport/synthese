@@ -48,6 +48,11 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
+	namespace graph
+	{
+		class Service;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
@@ -90,27 +95,41 @@ namespace synthese
 
 			typedef std::set<const pt::NonConcurrencyRule*> NonConcurrencyRules;
 
+			typedef std::multimap<std::string, graph::Service*> ServicesByNumber;
+
 		private:
-			std::string			_shortName;	//!< Name (cartouche)
-			std::string			_longName;	//!< Name for schedule card
+			/// @name data
+			//@{
+				std::string			_shortName;	//!< Name (cartouche)
+				std::string			_longName;	//!< Name for schedule card
 
-			boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
-			std::string			_style;		//!< CSS style (cartouche)
-			std::string			_image;		//!< Display image (cartouche)
+				boost::optional<util::RGBColor>		_color;		//!< JourneyPattern color
+				std::string			_style;		//!< CSS style (cartouche)
+				std::string			_image;		//!< Display image (cartouche)
 
-			const pt::TransportNetwork*	_network;	//!< Network
+				const pt::TransportNetwork*	_network;	//!< Network
 
-			const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
-			PlacesSet	_optionalReservationPlaces;
+				const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
+				PlacesSet	_optionalReservationPlaces;
 
-			NonConcurrencyRules _nonConcurrencyRules;
-			mutable boost::recursive_mutex _nonConcurrencyRulesMutex;
+				NonConcurrencyRules _nonConcurrencyRules;
 
-			calendar::CalendarTemplate* _calendarTemplate;	//!< List of days when the line is supposed to run
+				calendar::CalendarTemplate* _calendarTemplate;	//!< List of days when the line is supposed to run
 
-			std::string _mapURL;
-			std::string _docURL;
-			util::RegistryKeyType _timetableId;
+				std::string _mapURL;
+				std::string _docURL;
+				util::RegistryKeyType _timetableId;
+			//@}
+
+			/// @name Mutexes
+			//@{
+				mutable boost::recursive_mutex _nonConcurrencyRulesMutex;
+			//@}
+
+			/// @name Indices
+			//@{
+				mutable ServicesByNumber _servicesByNumber;
+			//@}
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -155,8 +174,19 @@ namespace synthese
 				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
 			//@}
 
+			/// @name Indices maintenance
+			//@{
+				void registerService(const graph::Service& service) const;
+				void unregisterService(const graph::Service& service) const;
+			//@}
+
 			//! @name Services
 			//@{
+				typedef std::vector<graph::Service*> ServicesVector;
+				ServicesVector getServices(const std::string& number) const;
+				ServicesVector getServices() const;
+
+
 				virtual std::string getRuleUserName() const { return "Ligne " + getName(); }
 
 				//////////////////////////////////////////////////////////////////////////

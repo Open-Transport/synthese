@@ -40,7 +40,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** ReservationConfirmationEMailInterfacePage Interface Page Class.
-			@ingroup m31Pages refPages
+			@ingroup m51Pages refPages
 			@author Hugues
 			@date 2009
 

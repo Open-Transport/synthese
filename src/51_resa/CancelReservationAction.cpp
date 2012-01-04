@@ -80,14 +80,18 @@ namespace synthese
 			// Load of the transaction
 			try
 			{
-				_transaction = ReservationTransactionTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_RESERVATION_TRANSACTION_ID), *_env, FIELDS_ONLY_LOAD_LEVEL);
+				_transaction = ReservationTransactionTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_RESERVATION_TRANSACTION_ID),
+					*_env,
+					FIELDS_ONLY_LOAD_LEVEL
+				);
 			}
 			catch(...)
 			{
 				throw ActionException("No such reservation");
 			}
 
-			// Control of the date : a cancellation has no sense if after the arrival time
+			// Check of the date : a cancellation has no sense if after the arrival time
 			ptime now(second_clock::local_time());
 			ReservationTableSync::SearchResult reservations(
 				ReservationTableSync::Search(*_env, _transaction->getKey())

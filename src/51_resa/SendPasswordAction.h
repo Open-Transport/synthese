@@ -38,7 +38,7 @@ namespace synthese
 	namespace resa
 	{
 		/** SendPasswordAction action class.
-			@ingroup m31Actions refActions
+			@ingroup m51Actions refActions
 		*/
 		class SendPasswordAction:
 			public util::FactorableTemplate<server::Action, SendPasswordAction>

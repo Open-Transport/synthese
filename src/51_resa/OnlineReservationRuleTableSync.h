@@ -37,7 +37,7 @@ namespace synthese
 	namespace resa
 	{
 		/** OnlineReservationRule table synchronizer.
-			@ingroup m31LS refLS
+			@ingroup m51LS refLS
 		*/
 		class OnlineReservationRuleTableSync : public db::DBRegistryTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>
 		{

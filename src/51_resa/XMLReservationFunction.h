@@ -37,7 +37,7 @@ namespace synthese
 		/** XMLReservationFunction Function class.
 			@author Hugues Romain
 			@date 2009
-			@ingroup m31Functions refFunctions
+			@ingroup m51Functions refFunctions
 
 			<h3>Prérequis</h3>
 
