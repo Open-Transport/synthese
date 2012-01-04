@@ -37,7 +37,7 @@ namespace synthese
 		/** ReservationEditFunction Function class.
 			@author Hugues
 			@date 2009
-			@ingroup m31Functions refFunctions
+			@ingroup m51Functions refFunctions
 		*/
 		class ReservationEditFunction:
 			public util::FactorableTemplate<interfaces::RequestWithInterface,ReservationEditFunction>

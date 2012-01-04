@@ -219,6 +219,12 @@ namespace synthese
 				);
 				ss->updatePathCalendar();
 			}
+
+			// Registration in the line
+			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				ss->getRoute()->getCommercialLine()->registerService(*ss);
+			}
 		}
 
 
@@ -228,6 +234,9 @@ namespace synthese
 		){
 			ss->getPath()->removeService(*ss);
 			ss->cleanDataSourceLinks(true);
+
+			// Unregister from the line
+			ss->getRoute()->getCommercialLine()->unregisterService(*ss);
 		}
 
 

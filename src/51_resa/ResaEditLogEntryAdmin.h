@@ -40,7 +40,7 @@ namespace synthese
 	namespace resa
 	{
 		/** ResaEditLogEntryAdmin Class.
-			@ingroup m31Admin refAdmin
+			@ingroup m51Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

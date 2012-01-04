@@ -51,7 +51,7 @@ namespace synthese
 
 			@todo If several services have the same number, the reservations are aggregated into one unique group, corresponding to the customer view.
 
-			@ingroup m31Admin refAdmin
+			@ingroup m51Admin refAdmin
 			@author Hugues Romain
 			@date 2008
 		*/

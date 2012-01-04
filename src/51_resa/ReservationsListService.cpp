@@ -96,6 +96,7 @@ namespace synthese
 		const string ReservationsListService::PARAMETER_MINIMAL_ARRIVAL_RANK("min_arr_rank");
 		const string ReservationsListService::PARAMETER_MAXIMAL_ARRIVAL_RANK("max_arr_rank");
 		const string ReservationsListService::PARAMETER_LINKED_WITH_VEHICLE_ONLY("linked_with_vehicle_only");
+		const string ReservationsListService::PARAMETER_USE_CACHE = "use_cache";
 
 		const string ReservationsListService::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string ReservationsListService::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
@@ -164,6 +165,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_MAXIMAL_ARRIVAL_RANK, *_maxArrivalRank);
 			}
+			if(_useCache)
+			{
+				map.insert(PARAMETER_USE_CACHE, _useCache);
+			}
 			map.insert(PARAMETER_LINKED_WITH_VEHICLE_ONLY, _linkedWithVehicleOnly);
 
 			return map;
@@ -173,25 +178,35 @@ namespace synthese
 
 		void ReservationsListService::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Cache
+			_useCache = map.getDefault<bool>(PARAMETER_USE_CACHE, false);
+
 			// Date
-			try
+			if(_useCache)
 			{
-				if(!map.getDefault<string>(PARAMETER_DATE).empty())
+				_date = day_clock::local_day();
+			}
+			else if(map.isDefined(PARAMETER_DATE))
+			{
+				try
 				{
-					_date = from_string(map.get<string>(PARAMETER_DATE));
-				}
-				else
-				{
-					_date = day_clock::local_day();
-					if(second_clock::local_time().time_of_day() < time_duration(3,0,0))
+					if(!map.getDefault<string>(PARAMETER_DATE).empty())
 					{
-						_date -= days(1);
+						_date = from_string(map.get<string>(PARAMETER_DATE));
+					}
+					else
+					{
+						_date = day_clock::local_day();
+						if(second_clock::local_time().time_of_day() < time_duration(3,0,0))
+						{
+							_date -= days(1);
+						}
 					}
 				}
-			}
-			catch (...)
-			{
-				throw RequestException("Bad value for date");
+				catch (...)
+				{
+					throw RequestException("Bad value for date");
+				}
 			}
 
 			if(map.isDefined(PARAMETER_SERVICE_ID))
@@ -200,8 +215,14 @@ namespace synthese
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
 				try
 				{
-					_service = ScheduledServiceTableSync::Get(id, *_env);
- 					_line = _env->getSPtr(static_cast<const CommercialLine*>(_service->getPath()->getPathGroup()));
+					_service =
+						_useCache ?
+						Env::GetOfficialEnv().get<ScheduledService>(id) :
+						ScheduledServiceTableSync::Get(id, *_env)
+					;
+					_line = (_useCache ? Env::GetOfficialEnv() : *_env).getSPtr(
+						static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())
+					);
 					_serviceNumber = _service->getServiceNumber();
 				}
 				catch (ObjectNotFoundException<ScheduledServiceTableSync>&)
@@ -212,15 +233,24 @@ namespace synthese
 			else
 			{
 				// Line
-				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
 				try
 				{
-					_line = CommercialLineTableSync::Get(id, *_env);
+					RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_LINE_ID));
+					if(_useCache)
+					{
+						_line = Env::GetOfficialEnv().get<CommercialLine>(id);
+					}
+					else
+					{
+						_line = CommercialLineTableSync::Get(id, *_env);
+					}
 				}
 				catch (ObjectNotFoundException<CommercialLine>&)
 				{
 					throw RequestException("Bad value for line ID");
 				}
+
+				// Service number
 				if(!map.getDefault<string>(PARAMETER_SERVICE_NUMBER).empty())
 				{
 					_serviceNumber = map.get<string>(PARAMETER_SERVICE_NUMBER);
@@ -228,20 +258,23 @@ namespace synthese
 			}
 
 			// Routes reading
-			JourneyPatternTableSync::SearchResult routes(
-				JourneyPatternTableSync::Search(*_env, _line->getKey())
-			);
-			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+			if(!_useCache)
 			{
-				LineStopTableSync::Search(
-					*_env,
-					line->getKey(),
-					optional<RegistryKeyType>(),
-					0,
-					optional<size_t>(),
-					true, true,
-					UP_LINKS_LOAD_LEVEL
+				JourneyPatternTableSync::SearchResult routes(
+					JourneyPatternTableSync::Search(*_env, _line->getKey())
 				);
+				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+				{
+					LineStopTableSync::Search(
+						*_env,
+						line->getKey(),
+						optional<RegistryKeyType>(),
+						0,
+						optional<size_t>(),
+						true, true,
+						UP_LINKS_LOAD_LEVEL
+					);
+				}
 			}
 
 			// Reservation display page
@@ -290,82 +323,105 @@ namespace synthese
 			// Local variables
 			ptime now(second_clock::local_time());
 
-			// Temporary variables
-			int seatsNumber(0);
-
-			// Reservations reading
-			ReservationTableSync::SearchResult sqlreservations(
-				ReservationTableSync::Search(
+			// Services reading
+			if(!_useCache)
+			{
+				ScheduledServiceTableSync::Search(
 					*_env,
+					optional<RegistryKeyType>(),
 					_line->getKey(),
-					_date,
+					optional<RegistryKeyType>(),
 					_serviceNumber,
 					false,
-					logic::tribool(false)
-			)	);
+					0,
+					optional<size_t>(),
+					true, true, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				);
+			}
 
-			// Services reading
-			vector<shared_ptr<ScheduledService> > sortedServices;
+			// Get the services sorted by number
+			CommercialLine::ServicesVector services(
+				_serviceNumber ?
+				_line->getServices(*_serviceNumber) :
+				_line->getServices()
+			);
+
+			// Reservations list
+			map<string, ServiceReservations> reservations;
+			if(_useCache)
 			{
-				map<string, shared_ptr<ScheduledService> > servicesByNumber;
+				// Lock the cached reservations list
+				recursive_mutex::scoped_lock lock(ResaModule::GetReservationsByServiceMutex());
 
-				ScheduledServiceTableSync::SearchResult services(
-					ScheduledServiceTableSync::Search(
-						*_env,
-						optional<RegistryKeyType>(),
-						_line->getKey(),
-						optional<RegistryKeyType>(),
-						_serviceNumber,
-						false,
-						0,
-						optional<size_t>(),
-						true, true, UP_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+				// Loop on services
+				BOOST_FOREACH(const Service* service, services)
 				{
-					if(	!service->isActive(_date) ||
-						servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
-					){
-						continue;
+					const ResaModule::ReservationsByService::mapped_type& reservationsEnv(
+						ResaModule::GetReservationsByService(
+							*service
+					)	);
+					BOOST_FOREACH(const ResaModule::ReservationsByService::mapped_type::value_type& resa, reservationsEnv)
+					{
+						reservations[service->getServiceNumber()].addReservation(resa);
 					}
-
-					servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
-					sortedServices.push_back(service);
 				}
 			}
-			if(sortedServices.empty()) return;
-
-			// Sort reservations
-			map<string, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
+			else
 			{
-				if(!_env->getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
+				// Reservations reading
+				ReservationTableSync::SearchResult sqlreservations(
+					ReservationTableSync::Search(
+						*_env,
+						_line->getKey(),
+						_date,
+						_serviceNumber,
+						false,
+						logic::tribool(false)
+				)	);
 
-				const ScheduledService* service(_env->getRegistry<ScheduledService>().get(resa->getServiceId()).get());
-				if(reservations.find(service->getServiceNumber()) == reservations.end())
+				// Sort reservations
+				BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
 				{
-					reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
+					if(!_env->getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
+
+					const ScheduledService* service(
+						_env->getRegistry<ScheduledService>().get(resa->getServiceId()).get()
+					);
+					if(reservations.find(service->getServiceNumber()) == reservations.end())
+					{
+						reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
+					}
+					reservations[service->getServiceNumber()].addReservation(resa.get());
 				}
-				reservations[service->getServiceNumber()].addReservation(resa);
 			}
 
 			// Display of services
 			size_t rank(0);
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
+			int seatsNumber(0);
+			set<string> serviceNumbers;
+			BOOST_FOREACH(const Service* service, services)
 			{
-				const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
-				int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
+				serviceNumbers.insert(service->getServiceNumber());
+			}
+			BOOST_FOREACH(const string& serviceNumber, serviceNumbers)
+			{
+				const ServiceReservations::ReservationsList& serviceReservations (reservations[serviceNumber].getReservations());
+				int serviceSeatsNumber(reservations[serviceNumber].getSeatsNumber());
 				string plural((serviceSeatsNumber > 1) ? "s" : "");
 				seatsNumber += serviceSeatsNumber;
 
 				if(_reservationPage.get())
 				{
-					BOOST_FOREACH(shared_ptr<const Reservation> reservation, serviceReservations)
+					BOOST_FOREACH(const Reservation* reservation, serviceReservations)
 					{
 						// Departure rank check
-						if(_minDepartureRank || _maxDepartureRank)
-						{
+						if(	(_minDepartureRank || _maxDepartureRank) &&
+							decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+						){
 							bool result(true);
+							shared_ptr<const ScheduledService> service(
+								Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+							);
 							shared_ptr<const StopArea> stopArea(
 								Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
 							);
@@ -374,7 +430,9 @@ namespace synthese
 								try
 								{
 									const Edge& edge(
-										Env::GetOfficialEnv().get<JourneyPattern>(service->getPath()->getKey())->findEdgeByVertex(itStop.second)
+										Env::GetOfficialEnv().get<JourneyPattern>(
+											service->getPath()->getKey()
+										)->findEdgeByVertex(itStop.second)
 									);
 									if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
 										_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
@@ -394,9 +452,13 @@ namespace synthese
 						}
 
 						// Arrival rank check
-						if(_minArrivalRank || _maxArrivalRank)
-						{
+						if(	(_minArrivalRank || _maxArrivalRank) &&
+							decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+						){
 							bool result(true);
+							shared_ptr<const ScheduledService> service(
+								Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+							);
 							shared_ptr<const StopArea> stopArea(
 								Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
 							);
@@ -508,9 +570,13 @@ namespace synthese
 
 		ReservationsListService::ReservationsListService():
 			FactorableTemplate<server::Function,ReservationsListService>(),
-			_linkedWithVehicleOnly(false)
+			_linkedWithVehicleOnly(false),
+			_useCache(false)
 		{
-			setEnv(shared_ptr<Env>(new Env));
+			if(!_useCache)
+			{
+				setEnv(shared_ptr<Env>(new Env));
+			}
 		}
 	}
 }

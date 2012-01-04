@@ -32,7 +32,7 @@ namespace synthese
 	namespace resa
 	{
 		/** ResaRight Right Class.
-			@ingroup m31Rights refRights
+			@ingroup m51Rights refRights
 
 			Here are the different right levels :
 

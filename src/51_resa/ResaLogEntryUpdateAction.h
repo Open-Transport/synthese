@@ -41,7 +41,7 @@ namespace synthese
 	namespace resa
 	{
 		/** ResaLogEntryUpdateAction action class.
-			@ingroup m31Actions refActions
+			@ingroup m51Actions refActions
 		*/
 		class ResaLogEntryUpdateAction
 			: public util::FactorableTemplate<server::Action, ResaLogEntryUpdateAction>

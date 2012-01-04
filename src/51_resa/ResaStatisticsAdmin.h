@@ -45,7 +45,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 31.14 Admin : Reservation and calls statistics viewer.
-		///	@ingroup m31Admin refAdmin
+		///	@ingroup m51Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2009
 		class ResaStatisticsAdmin:

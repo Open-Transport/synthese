@@ -35,7 +35,7 @@ namespace synthese
 		class ReservationTransaction;
 
 		/** CancelReservationAction action class.
-			@ingroup m31Actions refActions
+			@ingroup m51Actions refActions
 		*/
 		class CancelReservationAction
 			: public util::FactorableTemplate<server::Action, CancelReservationAction>

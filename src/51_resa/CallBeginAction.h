@@ -34,7 +34,7 @@ namespace synthese
 	{
 		////////////////////////////////////////////////////////////////////
 		/// Call begin action class.
-		///	@ingroup m31Actions refActions
+		///	@ingroup m51Actions refActions
 		class CallBeginAction
 			: public util::FactorableTemplate<server::Action, CallBeginAction>
 		{

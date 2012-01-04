@@ -27,28 +27,14 @@
 
 #include <boost/foreach.hpp>
 
-using namespace boost;
-
 namespace synthese
 {
 	namespace resa
 	{
-
-
-/*		boost::shared_ptr<Reservation> ServiceReservations::getReservation(
-			const ReservationTransaction* transaction
+		bool ServiceReservations::ReservationsLess::operator()(
+			const Reservation* left,
+			const Reservation* right
 		) const	{
-			const ReservationTransaction::Reservations& r(transaction->getReservations());
-			for (ReservationTransaction::Reservations::const_iterator ite(r.begin()); ite != r.end(); ++ite)
-				if ((*ite)->getServiceId() == service->getKey())
-					return *ite;
-		}
-*/
-
-
-
-		bool ServiceReservations::ReservationsLess::operator()( boost::shared_ptr<const Reservation> left, boost::shared_ptr<const Reservation> right ) const
-		{
 			return
 				left->getDepartureTime() < right->getDepartureTime() ||
 				(	left->getDepartureTime() == right->getDepartureTime() &&
@@ -67,25 +53,32 @@ namespace synthese
 					left->getDeparturePlaceName() == right->getDeparturePlaceName() &&
 					left->getArrivalPlaceName() == right->getArrivalPlaceName() &&
 					left->getTransaction()->getBookingTime() == right->getTransaction()->getBookingTime() &&
-					left.get() < right.get()
+					left < right
 				)
 			;
 		}
 
-		void ServiceReservations::addReservation( boost::shared_ptr<const Reservation> reservation )
-		{
+
+
+		void ServiceReservations::addReservation(
+			const Reservation* reservation
+		){
 			_reservations.insert(reservation);
 		}
+
+
 
 		const ServiceReservations::ReservationsList& ServiceReservations::getReservations() const
 		{
 			return _reservations;
 		}
 
+
+
 		int ServiceReservations::getSeatsNumber() const
 		{
 			int result(0);
-			BOOST_FOREACH(shared_ptr<const Reservation> resa, _reservations)
+			BOOST_FOREACH(const Reservation* resa, _reservations)
 			{
 				if (resa->getTransaction()->getCancellationTime().is_not_a_date_time())
 				{
@@ -94,5 +87,4 @@ namespace synthese
 			}
 			return result;
 		}
-	}
-}
+}	}

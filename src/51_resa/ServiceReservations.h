@@ -23,10 +23,7 @@
 #ifndef SYNTHESE_resa_ServiceReservations_h__
 #define SYNTHESE_resa_ServiceReservations_h__
 
-#include <boost/shared_ptr.hpp>
 #include <set>
-
-#include "Env.h"
 
 namespace synthese
 {
@@ -35,24 +32,25 @@ namespace synthese
 		class Reservation;
 
 		/** Container for ordered reservations list of a service class.
-			@ingroup m31
+			@ingroup m51
 		*/
 		class ServiceReservations
 		{
 		public:
-			struct ReservationsLess : public std::binary_function<boost::shared_ptr<const Reservation>, boost::shared_ptr<const Reservation>, bool>
+			struct ReservationsLess:
+				public std::binary_function<const Reservation*, const Reservation*, bool>
 			{
-				bool operator()(boost::shared_ptr<const Reservation> left, boost::shared_ptr<const Reservation> right) const;
+				bool operator()(const Reservation* left, const Reservation* right) const;
 			};
 
-			typedef std::set<boost::shared_ptr<const Reservation>, ReservationsLess> ReservationsList;
+			typedef std::set<const Reservation*, ReservationsLess> ReservationsList;
 
 
 		private:
 			ReservationsList	_reservations;
 
 		public:
-			void addReservation(boost::shared_ptr<const Reservation> reservation);
+			void addReservation(const Reservation* reservation);
 			const ReservationsList& getReservations() const;
 
 			int getSeatsNumber() const;

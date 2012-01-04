@@ -36,7 +36,7 @@ namespace synthese
 	namespace resa
 	{
 		/** CallStatisticsTableSync class.
-			@ingroup m31
+			@ingroup m51
 		*/
 		class CallStatisticsTableSync
 		{

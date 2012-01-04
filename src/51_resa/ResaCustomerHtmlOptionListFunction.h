@@ -35,7 +35,7 @@ namespace synthese
 		/** ResaCustomerHtmlOptionListFunction Function class.
 			@author Hugues Romain
 			@date 2008
-			@ingroup m31Functions refFunctions
+			@ingroup m51Functions refFunctions
 		*/
 		class ResaCustomerHtmlOptionListFunction:
 			public util::FactorableTemplate<server::Function,ResaCustomerHtmlOptionListFunction>

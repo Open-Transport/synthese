@@ -234,4 +234,57 @@ namespace synthese
 			}
 			return false;
 		}
+
+
+
+		void CommercialLine::registerService( const Service& service ) const
+		{
+			_servicesByNumber.insert(
+				make_pair(
+					service.getServiceNumber(),
+					const_cast<Service*>(&service)
+			)	);
+		}
+
+
+
+		void CommercialLine::unregisterService( const Service& service ) const
+		{
+			for(ServicesByNumber::iterator it(_servicesByNumber.lower_bound(service.getServiceNumber()));
+				it != _servicesByNumber.upper_bound(service.getServiceNumber());
+				++it
+			){
+				if(it->second == &service)
+				{
+					_servicesByNumber.erase(it);
+					break;
+				}
+			}
+		}
+
+
+
+		CommercialLine::ServicesVector CommercialLine::getServices( const std::string& number ) const
+		{
+			ServicesVector result;
+			for(ServicesByNumber::const_iterator it(_servicesByNumber.lower_bound(number));
+				it != _servicesByNumber.upper_bound(number);
+				++it
+			){
+				result.push_back(it->second);
+			}
+			return result;
+		}
+
+
+
+		CommercialLine::ServicesVector CommercialLine::getServices() const
+		{
+			ServicesVector result;
+			BOOST_FOREACH(const ServicesByNumber::value_type& it, _servicesByNumber)
+			{
+				result.push_back(it.second);
+			}
+			return result;
+		}
 }	}

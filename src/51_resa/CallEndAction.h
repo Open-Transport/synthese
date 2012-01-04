@@ -33,7 +33,7 @@ namespace synthese
 	namespace resa
 	{
 		/** CallEndAction action class.
-			@ingroup m31Actions refActions
+			@ingroup m51Actions refActions
 		*/
 		class CallEndAction
 			: public util::FactorableTemplate<server::Action, CallEndAction>
