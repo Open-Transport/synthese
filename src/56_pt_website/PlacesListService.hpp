@@ -223,7 +223,7 @@ namespace synthese
 					}
 
 					// Allocation
-					shared_ptr<util::ParametersMap> pm(new util::ParametersMap);
+					boost::shared_ptr<util::ParametersMap> pm(new util::ParametersMap);
 
 					// Attributes
 					pm->insert(DATA_KEY, item.key.getSource());
