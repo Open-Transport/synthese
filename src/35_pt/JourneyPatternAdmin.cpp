@@ -334,7 +334,7 @@ namespace synthese
 							);
 						lineStopUpdateAction.getAction()->setReadLengthFromGeometry(false);
 					}
-		
+
 					// DRT area
 					if(lineArea.get())
 					{
@@ -829,7 +829,15 @@ namespace synthese
 			const security::User& user
 		) const	{
 			if (_line.get() == NULL) return false;
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+
+			if(_line->getPathGroup())
+			{
+				return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(static_cast<const CommercialLine*>(_line->getPathGroup())->getKey()));
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 

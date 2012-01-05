@@ -46,14 +46,16 @@ namespace synthese
 		template<>
 		ParameterLabelsVector RightTemplate<TransportNetworkRight>::getStaticParametersLabels()
 		{
-			ParameterLabelsVector m;
-			m.push_back(make_pair(GLOBAL_PERIMETER, "(all)"));
-
-			return m;
+			return NetworkLineBasedRight<TransportNetworkRight>::_getStaticParametersLabels();
 		}
 	}
 
 	namespace pt
 	{
+		TransportNetworkRight::TransportNetworkRight()
+			: pt::NetworkLineBasedRight<TransportNetworkRight>()
+		{
+			setParameter(GLOBAL_PERIMETER);
+		}
 	}
 }

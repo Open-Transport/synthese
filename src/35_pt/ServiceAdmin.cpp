@@ -150,7 +150,16 @@ namespace synthese
 		bool ServiceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+			if(_service.get() == NULL) return false;
+
+			if(_service->getPath() && _service->getPath()->getPathGroup())
+			{
+				return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())->getKey()));
+			}
+			else
+			{
+				return false;
+			}
 		}
 
 
@@ -486,7 +495,7 @@ namespace synthese
 				const TransportNetwork* network(
 					static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())->getNetwork()
 				);
-				
+
 				AdminActionFunctionRequest<ServiceUpdateAction, ServiceAdmin> updateRequest(request);
 				updateRequest.getAction()->setService(
 					const_pointer_cast<SchedulesBasedService>(_service)
