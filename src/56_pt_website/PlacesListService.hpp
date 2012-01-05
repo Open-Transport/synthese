@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 #include "LexicalMatcher.h"
+#include "City.h"
 
 namespace synthese
 {
@@ -36,9 +37,15 @@ namespace synthese
 		class Webpage;
 	}
 
-	namespace geography
+	namespace pt
 	{
-		class City;
+		class StopArea;
+	}
+
+	namespace road
+	{
+		class RoadPlace;
+		class PublicPlace;
 	}
 
 	namespace pt_website
