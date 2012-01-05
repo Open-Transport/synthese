@@ -4,7 +4,7 @@
 
 #include <boost/test/auto_unit_test.hpp>
 
-using namespace synthese::lexmatcher;
+using namespace synthese::lexical_matcher;
 
 
 std::vector<std::string>
@@ -66,24 +66,24 @@ getTestBase1 ()
 
 BOOST_AUTO_TEST_CASE (testBasicMatches)
 {
-    LexicalMatcher<int> matcher (true, true);
+    LexicalMatcher<int> matcher;
     std::vector<std::string> testBase = getTestBase1 ();
     for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
 
-    BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("all. peuplier").key);
-    BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("    all   .   peuplier   ").key);
-    BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("peupier").key);
-    BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("peupier allée").key);
-    BOOST_CHECK_EQUAL (std::string ("Peupliers, allée des"), matcher.bestMatch ("PeuPlieER").key);
+    BOOST_CHECK_EQUAL (FrenchSentence("Peupliers, allée des").getPhoneticString(), matcher.bestMatch ("all. peuplier").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Peupliers, allée des").getPhoneticString(), matcher.bestMatch ("    all   .   peuplier   ").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Peupliers, allée des").getPhoneticString(), matcher.bestMatch ("peupier").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Peupliers, allée des").getPhoneticString(), matcher.bestMatch ("peupier allée").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Peupliers, allée des").getPhoneticString(), matcher.bestMatch ("PeuPlieER").key.getPhoneticString());
 
-    BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("rue div leclerc").key);
-    BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("ruedivleclerc").key);
-    BOOST_CHECK_EQUAL (std::string ("Division Leclerc, rue de la"), matcher.bestMatch ("lecler").key);
+    BOOST_CHECK_EQUAL (FrenchSentence("Division Leclerc, rue de la").getPhoneticString(), matcher.bestMatch ("rue div leclerc").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Division Leclerc, rue de la").getPhoneticString(), matcher.bestMatch ("ruedivleclerc").key.getPhoneticString());
+    BOOST_CHECK_EQUAL (FrenchSentence("Division Leclerc, rue de la").getPhoneticString(), matcher.bestMatch ("lecler").key.getPhoneticString());
 
-    BOOST_CHECK_EQUAL (std::string ("Sophoras, allée des"), matcher.bestMatch ("soforas").key);
+    BOOST_CHECK_EQUAL (FrenchSentence("Sophoras, allée des").getPhoneticString(), matcher.bestMatch ("soforas").key.getPhoneticString());
 
 
-    BOOST_CHECK_EQUAL (std::string ("Portes des Loges, chemin de la"), matcher.bestMatch ("loge porte chemin").key);
+    BOOST_CHECK_EQUAL (FrenchSentence("Portes des Loges, chemin de la").getPhoneticString(), matcher.bestMatch ("loge porte chemin").key.getPhoneticString());
 
 }
 
@@ -101,7 +101,7 @@ BOOST_AUTO_TEST_CASE (testWholeWordMatchingCriterium)
 	LexicalMatcher<int> matcher;
 	for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
 
-	BOOST_CHECK_EQUAL (std::string ("ANPE bidule"), matcher.bestMatch ("ANPE").key);
+	BOOST_CHECK_EQUAL (FrenchSentence("ANPE bidule").getPhoneticString(), matcher.bestMatch ("ANPE").key.getPhoneticString());
     }
     {
 	std::vector<std::string> testBase;
@@ -113,7 +113,7 @@ BOOST_AUTO_TEST_CASE (testWholeWordMatchingCriterium)
 	LexicalMatcher<int> matcher;
 	for (size_t i=0; i<testBase.size (); ++i) matcher.add (testBase[i], 0);
 
-	BOOST_CHECK_EQUAL (std::string ("Rue de Saint-Cyprien"), matcher.bestMatch ("rue saint-siprien").key);
+	BOOST_CHECK_EQUAL (FrenchSentence("Rue de Saint-Cyprien").getPhoneticString(), matcher.bestMatch ("rue saint-siprien").key.getPhoneticString());
     }
 }
 
