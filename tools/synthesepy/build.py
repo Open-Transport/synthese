@@ -140,7 +140,7 @@ class SconsBuilder(Builder):
         'graph',
         'road',
         'pt',
-        'carto',
+        #'carto',
         'pt-routeplanner',
     ]
 
