@@ -114,7 +114,7 @@ namespace synthese
 		typename LexicalMatcher<T>::MatchHit LexicalMatcher<T>::bestMatch(
 			const std::string& fuzzyKey
 		) const {
-			return bestMatches (fuzzyKey).front ();
+			return bestMatches (fuzzyKey, 1).front ();
 		}
 
 
