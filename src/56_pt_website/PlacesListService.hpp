@@ -216,14 +216,14 @@ namespace synthese
 				{
 					// Avoid empty cities
 					if(_citiesWithAtLeastAStop &&
-						dynamic_cast<City*>(item.value.get()) &&
-						dynamic_cast<City&>(*item.value).getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0
+						dynamic_cast<geography::City*>(item.value.get()) &&
+						dynamic_cast<geography::City&>(*item.value).getLexicalMatcher(pt::StopArea::FACTORY_KEY).size() == 0
 					){
 						continue;
 					}
 
 					// Allocation
-					shared_ptr<ParametersMap> pm(new ParametersMap);
+					shared_ptr<util::ParametersMap> pm(new util::ParametersMap);
 
 					// Attributes
 					pm->insert(DATA_KEY, item.key.getSource());
