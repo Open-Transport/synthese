@@ -211,7 +211,8 @@ namespace synthese
 		bool TransportNetworkAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+			if (_network.get() == NULL) return false;
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_network->getKey()));
 		}
 
 
@@ -220,6 +221,7 @@ namespace synthese
 		{
 			return _network.get() ? _network->getName() : DEFAULT_TITLE;
 		}
+
 
 
 		AdminInterfaceElement::PageLinks TransportNetworkAdmin::getSubPages(

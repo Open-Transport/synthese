@@ -25,7 +25,6 @@
 #ifndef SYNTHESE_env_TransportNetworkRight_H__
 #define SYNTHESE_env_TransportNetworkRight_H__
 
-#include "RightTemplate.h"
 #include "NetworkLineBasedRight.h"
 
 namespace synthese
@@ -56,6 +55,7 @@ namespace synthese
 			public pt::NetworkLineBasedRight<TransportNetworkRight>
 		{
 		public:
+			TransportNetworkRight();
 		};
 	}
 }

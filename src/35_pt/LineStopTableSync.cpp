@@ -173,7 +173,8 @@ namespace synthese
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			//TODO test if the user has sufficient right level
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -251,7 +252,7 @@ namespace synthese
 			LineStop& lineStop
 		){
 			DBTransaction transaction;
-		
+
 			if(!lineStop.getParentPath()->getEdges().empty())
 			{
 				for(size_t rank((*lineStop.getParentPath()->getEdges().rbegin())->getRankInPath()); rank >= lineStop.getRankInPath(); --rank)
