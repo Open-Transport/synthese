@@ -87,10 +87,14 @@ namespace synthese
 			}
 		}
 
-		void CalendarTemplatesListFunction::run(
+
+
+		util::ParametersMap CalendarTemplatesListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			ParametersMap pm;
 
 			CalendarTemplateTableSync::SearchResult s(CalendarTemplateTableSync::Search(Env::GetOfficialEnv()));
 
@@ -103,6 +107,8 @@ namespace synthese
 				stream << ">" << object->getName() << "</option>";
 			}
 			stream << "</select>";
+
+			return pm;
 		}
 
 

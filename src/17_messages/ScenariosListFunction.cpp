@@ -112,10 +112,14 @@ namespace synthese
 			}
 		}
 
-		void ScenariosListFunction::run(
+
+
+		util::ParametersMap ScenariosListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			ParametersMap pm;
 
 			if(_showTemplates)
 			{
@@ -146,6 +150,8 @@ namespace synthese
 					_displaySentScenario(stream, request, *message);
 				}
 			}
+
+			return pm;
 		}
 
 

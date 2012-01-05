@@ -92,7 +92,7 @@ namespace synthese
 
 
 
-		void WebPageFormFunction::run(
+		util::ParametersMap WebPageFormFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -108,7 +108,7 @@ namespace synthese
 				shared_ptr<const Function> fws(request.getFunction());
 				if(!fws.get())
 				{
-					return;
+					return ParametersMap();
 				}
 
 				try
@@ -133,6 +133,8 @@ namespace synthese
 				{
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

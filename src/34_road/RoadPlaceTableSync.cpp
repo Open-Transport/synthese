@@ -22,18 +22,17 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include <sstream>
-
 #include "RoadPlaceTableSync.h"
-#include "RoadPlace.h"
+
 #include "CityTableSync.h"
+#include "GeographyModule.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
-#include "ReplaceQuery.h"
-#include "Conversion.h"
 #include "ImportableTableSync.hpp"
-#include "PTModule.h"
+#include "ReplaceQuery.h"
+#include "RoadModule.h"
+#include "RoadPlace.h"
 
 using namespace std;
 using namespace boost;
@@ -45,7 +44,6 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 	using namespace impex;
-	using namespace pt;
 	
 
 	namespace util
@@ -91,10 +89,11 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Properties
-			object->setKey(rows->getLongLong(TABLE_COL_ID));
+			// Name
 			object->setName(rows->getText(RoadPlaceTableSync::COL_NAME));
 
+			// City
+			object->setCity(NULL);
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				RegistryKeyType cityId(rows->getLongLong(RoadPlaceTableSync::COL_CITYID));
@@ -102,15 +101,39 @@ namespace synthese
 				// City
 				object->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
-				city->addPlaceToMatcher<RoadPlace>(env.getEditableSPtr(object));
-				PTModule::GetGeneralStopsMatcher().add(object->getFullName(), env.getEditableSPtr(object));
 
-				// Datasource links
+				// Registration to city matcher
+				city->addPlaceToMatcher(env.getEditableSPtr(object));
+			}
+				
+			// Datasource links
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
 				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(RoadPlaceTableSync::COL_DATASOURCE_LINKS),
 						env
 				)	);
+			}
+
+			// Registration to all places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+			){
+				GeographyModule::GetGeneralAllPlacesMatcher().add(
+					object->getFullName(),
+					env.getEditableSPtr(object)
+				);
+			}
+
+			// Registration to road places matcher
+			if(&env == &Env::GetOfficialEnv() &&
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+			){
+				RoadModule::GetGeneralRoadsMatcher().add(
+					object->getFullName(),
+					env.getEditableSPtr(object)
+				);
 			}
 		}
 
@@ -132,11 +155,24 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<RoadPlaceTableSync,RoadPlace>::Unlink(
 			RoadPlace* obj
 		){
-			City* city = const_cast<City*>(obj->getCity ());
+			// City matcher
+			City* city = const_cast<City*>(obj->getCity());
 			if (city != NULL)
 			{
-//				city->removePlaceFromMatcher<RoadPlace>(obj);
-				obj->setCity(NULL);
+				city->removePlaceFromMatcher(*obj);
+			}
+
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					obj->getFullName()
+				);
+
+				// General public places
+				RoadModule::GetGeneralRoadsMatcher().remove(
+					obj->getFullName()
+				);
 			}
 		}
 

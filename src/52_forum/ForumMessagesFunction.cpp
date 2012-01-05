@@ -105,7 +105,9 @@ namespace synthese
 			}
 		}
 
-		void ForumMessagesFunction::run(
+
+
+		util::ParametersMap ForumMessagesFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -132,6 +134,7 @@ namespace synthese
 				++rank;
 			}
 
+			return util::ParametersMap();
 		}
 
 

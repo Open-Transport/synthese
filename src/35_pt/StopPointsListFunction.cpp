@@ -172,7 +172,7 @@ namespace synthese
 
 
 
-		void StopPointsListFunction::run(
+		util::ParametersMap StopPointsListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -325,6 +325,8 @@ namespace synthese
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/StopPointsListFunction.xsd"
 				);
 			}
+
+			return pm;
 		}
 
 

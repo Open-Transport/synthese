@@ -180,7 +180,7 @@ namespace synthese
 
 
 
-		void WebPageMenuFunction::run(
+		util::ParametersMap WebPageMenuFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -230,6 +230,8 @@ namespace synthese
 			{
 				stream << "</channel></rss>";
 			}
+
+			return util::ParametersMap();
 		}
 
 

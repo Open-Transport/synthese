@@ -81,7 +81,7 @@ namespace synthese
 
 
 
-		void DateService::run(
+		util::ParametersMap DateService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -90,6 +90,7 @@ namespace synthese
 			{
 				stream << " " << to_simple_string(_time.time_of_day());
 			}
+			return util::ParametersMap();
 		}
 
 

@@ -67,11 +67,12 @@ namespace synthese
 
 
 
-		void BitAndFunction::run(
+		util::ParametersMap BitAndFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_left & _right);
+			return util::ParametersMap();
 		}
 
 

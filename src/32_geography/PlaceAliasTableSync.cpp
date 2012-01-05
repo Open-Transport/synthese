@@ -106,7 +106,7 @@ namespace synthese
 				{
 					city->addIncludedPlace(obj);
 				}
-				city->addPlaceToMatcher<PlaceAlias>(env.getEditableSPtr(obj));
+				city->addPlaceToMatcher(env.getEditableSPtr(obj));
 			}
 		}
 
@@ -116,7 +116,7 @@ namespace synthese
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-//				city->removePlaceFromMatcher<PlaceAlias>(obj);
+				city->removePlaceFromMatcher(*obj);
 				obj->setCity(NULL);
 				city->removeIncludedPlace(obj);
 			}

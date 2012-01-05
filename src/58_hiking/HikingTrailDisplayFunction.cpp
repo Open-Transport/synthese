@@ -68,7 +68,9 @@ namespace synthese
 			_key = map.get<string>(PARAMETER_KEY);
 		}
 
-		void HikingTrailDisplayFunction::run(
+
+
+		ParametersMap HikingTrailDisplayFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -92,6 +94,8 @@ namespace synthese
 			{
 				stream << _hikingTrail->getURL();
 			}
+
+			return ParametersMap();
 		}
 
 

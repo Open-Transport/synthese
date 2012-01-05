@@ -102,7 +102,7 @@ namespace synthese
 			/// @param stream stream to write the output on
 			/// @param request request which has launched the function
 			//////////////////////////////////////////////////////////////////////////
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 
 			virtual bool isAuthorized(const server::Session* session) const;
 

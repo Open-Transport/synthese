@@ -77,7 +77,9 @@ namespace synthese
 			_action = static_cast<Action>(map.get<int>(PARAMETER_ACTION));
 		}
 
-		void CentreonConfigExportFunction::run(
+
+
+		util::ParametersMap CentreonConfigExportFunction::run(
 			std::ostream& stream,
 			const server::Request& request
 		) const	{
@@ -421,6 +423,8 @@ namespace synthese
 			}
 
 			stream << "COMMIT;";
+
+			return util::ParametersMap();
 		}
 
 		CentreonConfigExportFunction::CentreonConfigExportFunction()

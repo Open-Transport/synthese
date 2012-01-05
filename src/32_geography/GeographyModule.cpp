@@ -88,6 +88,7 @@ namespace synthese
 
 	namespace geography
 	{
+		GeographyModule::GeneralAllPlacesMatcher GeographyModule::_generalAllPlacesMatcher;
 		GeographyModule::CitiesMatcher GeographyModule::_citiesMatcher;
 		GeographyModule::CitiesMatcher GeographyModule::_citiesT9Matcher;
 
@@ -96,7 +97,11 @@ namespace synthese
 		void GeographyModule::AddToCitiesMatchers(
 			GeographyModule::CitiesMatcher::Content city
 		){
-			_citiesMatcher.add(city->getName() +" "+ city->getCode(), city);
+			// Declarations
+			const string key(city->getName() +" "+ city->getCode());
+
+			_citiesMatcher.add(key, city);
+			_generalAllPlacesMatcher.add(key, city);
 
 			stringstream ss;
 			boost::iostreams::filtering_ostream out;
@@ -138,12 +143,4 @@ namespace synthese
 			}
 			return result;
 		}
-
-
-
-		const GeographyModule::CitiesMatcher& GeographyModule::GetCitiesMatcher()
-		{
-			return _citiesMatcher;
-		}
-	}
-}
+}	}

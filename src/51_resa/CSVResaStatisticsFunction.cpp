@@ -92,7 +92,9 @@ namespace synthese
 				_searchColStep = static_cast<ResaStatisticsTableSync::Step>(map.get<int>(PARAM_COL_STEP));
 		}
 
-		void CSVResaStatisticsFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap CSVResaStatisticsFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			ResaStatisticsTableSync::ResaCountSearchResult r(
 				ResaStatisticsTableSync::CountCalls(
@@ -184,6 +186,8 @@ namespace synthese
 
 				stream << totalSum << "\r\n";
 			}
+
+			return util::ParametersMap();
 		}
 
 

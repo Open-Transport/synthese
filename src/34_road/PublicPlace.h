@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace road
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -49,6 +54,8 @@ namespace synthese
 			public WithGeometry<geos::geom::Point>
 		{
 		public:
+			static const std::string DATA_ID;
+			static const std::string DATA_NAME;
 
 			/// Chosen registry class.
 			typedef util::Registry<PublicPlace>	Registry;
@@ -72,6 +79,18 @@ namespace synthese
 				) const;
 
 				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+			//@}
+
+			/// @name Services
+			//@{
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const std::string& prefix
+				) const;
+
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
 	}

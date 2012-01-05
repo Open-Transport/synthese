@@ -110,7 +110,9 @@ namespace synthese
 			}
 		}
 
-		void ServiceInformationsFunction::run(
+
+
+		util::ParametersMap ServiceInformationsFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -142,6 +144,8 @@ namespace synthese
 					_displaySIRI(stream);
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

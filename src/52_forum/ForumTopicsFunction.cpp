@@ -100,7 +100,7 @@ namespace synthese
 
 
 
-		void ForumTopicsFunction::run(
+		util::ParametersMap ForumTopicsFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -127,6 +127,8 @@ namespace synthese
 				}
 				++rank;
 			}
+
+			return util::ParametersMap();
 		}
 
 

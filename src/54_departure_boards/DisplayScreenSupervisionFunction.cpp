@@ -99,7 +99,9 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenSupervisionFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap DisplayScreenSupervisionFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			// Assertions
 			assert(_displayScreen.get() != NULL);
@@ -148,6 +150,8 @@ namespace synthese
 
 			// Saving
 			DisplayMonitoringStatusTableSync::Save(&status);
+
+			return ParametersMap();
 		}
 
 

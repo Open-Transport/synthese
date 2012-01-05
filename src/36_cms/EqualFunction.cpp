@@ -61,11 +61,12 @@ namespace synthese
 
 
 
-		void EqualFunction::run(
+		util::ParametersMap EqualFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_right == _left);
+			return util::ParametersMap();
 		}
 
 

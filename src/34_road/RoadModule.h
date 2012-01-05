@@ -82,12 +82,27 @@ namespace synthese
 	*/
 	namespace road
 	{
+		class RoadPlace;
+		class PublicPlace;
+
 		/** 34 Transport network module class.
 		*/
 		class RoadModule:
 			public graph::GraphModuleTemplate<RoadModule>
 		{
 		public:
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<RoadPlace> > GeneralRoadsMatcher;
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<PublicPlace> > GeneralPublicPlacesMatcher;
+
+		private:
+			static GeneralRoadsMatcher _generalRoadsMatcher;
+			static GeneralPublicPlacesMatcher _generalPublicPlacesMatcher;
+
+		public:
+			static GeneralRoadsMatcher& GetGeneralRoadsMatcher(){ return _generalRoadsMatcher; }
+			static GeneralPublicPlacesMatcher& GetGeneralPublicPlacesMatcher(){ return _generalPublicPlacesMatcher; }
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Exception to throw when text fields does not permit to determinate a undetermined place.
@@ -115,8 +130,6 @@ namespace synthese
 					const std::string& placeName,
 					Reason reason
 				);
-
-
 			};
 
 			struct ExtendedFetchPlaceResult

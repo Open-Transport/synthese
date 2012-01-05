@@ -206,7 +206,6 @@ namespace synthese
 
 
 
-
 			template<class R>
 			boost::shared_ptr<R> getEditable(
 				util::RegistryKeyType id
@@ -217,11 +216,26 @@ namespace synthese
 
 
 			template<class R>
+			bool contains(
+				const R& object
+			) const {
+				return
+					this->getRegistry<R>().contains(object.getKey()) &&
+					&object == this->getEditableRegistry<R>().get(object.getKey()).get()
+				;
+			}
+
+
+
+			template<class R>
 			boost::shared_ptr<const R> getSPtr(
 				const R* object
 			) const {
-				if(object == NULL) return boost::shared_ptr<const R>();
-				assert(object == this->getEditableRegistry<R>().get(object->getKey()).get());
+				if(object == NULL)
+				{
+					return boost::shared_ptr<const R>();
+				}
+				assert(this->contains(*object));
 				return this->getEditableRegistry<R>().get(object->getKey());
 			}
 
@@ -231,10 +245,14 @@ namespace synthese
 			boost::shared_ptr<R> getEditableSPtr(
 				R* object
 			) const {
-				if(object == NULL) return boost::shared_ptr<R>();
-				assert(object == this->getEditableRegistry<R>().getEditable(object->getKey()).get());
+				if(object == NULL)
+				{
+					return boost::shared_ptr<R>();
+				}
+				assert(this->contains(*object));
 				return this->getEditableRegistry<R>().getEditable(object->getKey());
 			}
+
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -245,6 +263,7 @@ namespace synthese
 			{
 				_map.clear();
 			}
+
 
 
 			//////////////////////////////////////////////////////////////////////////

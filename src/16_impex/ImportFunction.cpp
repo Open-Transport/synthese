@@ -116,8 +116,13 @@ namespace synthese
 
 
 
-		void ImportFunction::run( std::ostream& stream, const Request& request ) const
-		{
+		ParametersMap ImportFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const	{
+
+			ParametersMap pm;
+
 			if(_doImport)
 			{
 				_importer->save().run();
@@ -139,6 +144,8 @@ namespace synthese
 			{
 				stream << _output;
 			}
+
+			return pm;
 		}
 
 

@@ -61,11 +61,12 @@ namespace synthese
 
 
 
-		void NotService::run(
+		util::ParametersMap NotService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << !_parameter;
+			return util::ParametersMap();
 		}
 		
 		

@@ -23,33 +23,42 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTCitiesAdmin.h"
-#include "AdminParametersException.h"
-#include "ParametersMap.h"
-#include "PTModule.h"
-#include "TransportNetworkRight.h"
-#include "GeographyModule.h"
-#include "PropertiesHTMLTable.h"
-#include "ResultHTMLTable.h"
-#include "AdminFunctionRequest.hpp"
-#include "PTPlacesAdmin.h"
-#include "FrenchSentence.h"
-#include "Profile.h"
+
 #include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "AdminParametersException.h"
 #include "CityAddAction.h"
+#include "FrenchSentence.h"
+#include "GeographyModule.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "PTModule.h"
+#include "PTPlaceAdmin.h"
+#include "PTPlacesAdmin.h"
+#include "PTRoadsAdmin.h"
+#include "RemoveObjectAction.hpp"
+#include "ResultHTMLTable.h"
+#include "RoadPlace.h"
 #include "StopArea.hpp"
+#include "TransportNetworkRight.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace admin;
+	using namespace db;
+	using namespace geography;
+	using namespace lexical_matcher;
+	using namespace html;
+	using namespace pt;
+	using namespace pt_website;
+	using namespace road;
+	using namespace security;
 	using namespace server;
 	using namespace util;
-	using namespace security;
-	using namespace pt;
-	using namespace geography;
-	using namespace html;
-	using namespace lexical_matcher;
 
 	namespace util
 	{
@@ -59,21 +68,13 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::ICON("building.png");
-		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::DEFAULT_TITLE("Localités");
+		template<> const string AdminInterfaceElementTemplate<PTCitiesAdmin>::DEFAULT_TITLE("Lieux");
 	}
 
 	namespace pt
 	{
-		const string PTCitiesAdmin::PARAM_SEARCH_NAME("na");
-		const string PTCitiesAdmin::PARAM_SEARCH_AT_LEAST_A_STOP("als");
-		const string PTCitiesAdmin::TAB_LIST("li");
-		const string PTCitiesAdmin::TAB_PHONETIC("ph");
-
-
-
 		PTCitiesAdmin::PTCitiesAdmin():
-			AdminInterfaceElementTemplate<PTCitiesAdmin>(),
-			_searchAtLeastAStop(false)
+			AdminInterfaceElementTemplate<PTCitiesAdmin>()
 		{}
 
 
@@ -81,11 +82,8 @@ namespace synthese
 		void PTCitiesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			_searchName = map.getDefault<string>(PARAM_SEARCH_NAME);
-			_searchAtLeastAStop = map.getDefault<bool>(PARAM_SEARCH_AT_LEAST_A_STOP, false);
-
-			// Search table initialization
-			_requestParameters.setFromParametersMap(map.getMap(), PARAM_SEARCH_NAME, 50);
+			_placesListService._setFromParametersMap(map);
+			_placesListService.setNumber(10);
 		}
 
 
@@ -93,8 +91,9 @@ namespace synthese
 		ParametersMap PTCitiesAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			m.insert(PARAM_SEARCH_NAME, _searchName);
-			m.insert(PARAM_SEARCH_AT_LEAST_A_STOP, _searchAtLeastAStop);
+
+			m.merge(_placesListService._getParametersMap());
+
 			return m;
 		}
 
@@ -113,83 +112,268 @@ namespace synthese
 			const AdminRequest& request
 		) const	{
 
-			////////////////////////////////////////////////////////////////////
-			// TAB LIST
-//			if (openTabContent(stream, TAB_PHONETIC))
+			// The search Form
+			AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
+			stream << "<h1>Recherche</h1>";
+			PropertiesHTMLTable t(searchRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.cell(
+				"Nom",
+				t.getForm().getTextInput(
+					PlacesListService::PARAMETER_TEXT,
+					_placesListService.getText()
+			)	);
+			stream << t.cell(
+				"Communes avec arrêt uniquement",
+				t.getForm().getOuiNonRadioInput(
+					PlacesListService::PARAMETER_CITIES_WITH_AT_LEAST_A_STOP,
+					_placesListService.getCitiesWithAtLeastAStop()
+			)	);
+			stream << t.close();
+
+			// Informations about the query
+			if(!_placesListService.getText().empty())
 			{
-				AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
+				// Phonetic string
+				stream <<
+					"<p>Phonétique du texte recherché : " <<
+					FrenchSentence(_placesListService.getText()).getPhoneticString() <<
+					"</p>";
 
-				stream << "<h1>Recherche</h1>";
+				// XML response
+				StaticFunctionRequest<PlacesListService> testRequest;
+				testRequest.getFunction()->_setFromParametersMap(_placesListService._getParametersMap());
+				testRequest.getFunction()->setOutputFormat(PlacesListService::VALUE_XML);
+				stream << HTMLModule::getLinkButton(testRequest.getURL(), "Réponse XML");
 
-				PropertiesHTMLTable t(searchRequest.getHTMLForm());
-				stream << t.open();
-				stream << t.cell("Nom", t.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
-				stream << t.cell("Communes avec arrêt uniquement", t.getForm().getOuiNonRadioInput(PARAM_SEARCH_AT_LEAST_A_STOP, _searchAtLeastAStop));
-				stream << t.close();
+				// JSON response
+				testRequest.getFunction()->setOutputFormat(PlacesListService::VALUE_JSON);
+				stream << HTMLModule::getLinkButton(testRequest.getURL(), "Réponse JSON");
+			}
 
-				if(!_searchName.empty())
-				{
-					AdminFunctionRequest<PTPlacesAdmin> openCityRequest(request);
+			// Search service
+			ParametersMap pm(
+				_placesListService.run(stream, request)
+			);
 
-					stream << "<h1>Resultat</h1>";
+			// Remove request (common for place class)
+			AdminActionFunctionRequest<RemoveObjectAction, PTCitiesAdmin> removeRequest(request);
 
-					stream << "<p>Phonétique du texte recherché : " << FrenchSentence(_searchName).getPhoneticString() << "</p>";
 
-					HTMLTable::ColsVector c;
-					c.push_back("Localité");
-					c.push_back("Phonétique");
-					c.push_back("Score");
-					c.push_back("Levenshtein");
-					c.push_back("Actions");
-					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
-					stream << t.open();
+			//////////////////////////////////////////////////////////////////////////
+			// Cities
+			{
+				stream << "<h1>Localités</h1>";
 
-					const GeographyModule::CitiesMatcher& matcher(GeographyModule::GetCitiesMatcher());
-					GeographyModule::CitiesMatcher::MatchResult result(matcher.bestMatches(_searchName, _searchAtLeastAStop ? 0 : 20));
-
-					size_t matches(0);
-					BOOST_FOREACH(const GeographyModule::CitiesMatcher::MatchHit& it, result)
-					{
-						if(_searchAtLeastAStop && it.value->getLexicalMatcher(StopArea::FACTORY_KEY).size() == 0)
-						{
-							continue;
-						}
-
-						openCityRequest.getPage()->setCity(it.value);
-
-						stream << t.row();
-						stream << t.col() << it.key.getSource();
-						stream << t.col() << it.key.getPhoneticString();
-						stream << t.col() << it.score.phoneticScore;
-						stream << t.col() << it.score.levenshtein;
-						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), "building.png");
-
-						++matches;
-						if(matches > 20)
-						{
-							break;
-						}
-					}
-
-					stream << t.close();
-				}
-
-				stream << "<h1>Création</h1>";
-
+				// Requests
+				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(request);
 				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
 				creationRequest.setActionWillCreateObject();
 				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+				HTMLForm creationForm(creationRequest.getHTMLForm("create_city"));
 
-				PropertiesHTMLTable tc(creationRequest.getHTMLForm());
-				stream << tc.open();
-				stream << tc.cell("Nom", t.getForm().GetTextInput(CityAddAction::PARAMETER_NAME, string()));
-				stream << tc.cell("Code", t.getForm().GetTextInput(CityAddAction::PARAMETER_CODE, string()));
-				stream << tc.close();
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Localité");
+				c.push_back("Code");
+				c.push_back("Phonétique");
+				c.push_back("Score");
+				c.push_back("Levenshtein");
+				c.push_back(string());
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << creationForm.open() << t.open();
+				const ParametersMap& citiesPM(
+					**pm.getSubMaps(PlacesListService::DATA_CITIES).begin()
+				);
+				if(citiesPM.hasSubMaps(PlacesListService::DATA_CITY))
+				{
+					BOOST_FOREACH(
+						shared_ptr<ParametersMap> item,
+						citiesPM.getSubMaps(PlacesListService::DATA_CITY)
+					){
+						// New row
+						stream << t.row();
+
+						// City load
+						shared_ptr<const City> city(
+							Env::GetOfficialEnv().get<City>(
+								item->get<RegistryKeyType>(City::DATA_CITY_ID)
+						)	);
+
+						// Open button
+						openCityRequest.getPage()->setCity(city);
+						stream << t.col() <<
+							HTMLModule::getLinkButton(
+								openCityRequest.getURL(),
+								"Ouvrir",
+								string(),
+								PTPlacesAdmin::ICON
+							)
+						;
+
+						// Key
+						stream << t.col() << item->get<string>(PlacesListService::DATA_KEY);
+						stream << t.col() << item->get<string>(City::DATA_CITY_CODE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+						
+						// Remove button
+						stream << t.col();
+						if(city->empty())
+						{
+							removeRequest.getAction()->setObjectId(city->getKey());
+							stream << HTMLModule::getLinkButton(
+								removeRequest.getURL(),
+								"Supprimer",
+								"Etes-vous sûr de vouloir supprimer la localité "+ city->getName() +" ?"
+							);
+						}
+				}	}
+
+				// Creation row
+				stream << t.row();
+				stream << t.col();
+				stream << t.col() << creationForm.getTextInput(CityAddAction::PARAMETER_NAME, string(), "(nom de la localité)");
+				stream << t.col() << creationForm.getTextInput(CityAddAction::PARAMETER_CODE, string(), "(code de la localité)");
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col() << creationForm.getSubmitButton("Ajouter");
+
+				// Table and form closing
+				stream << t.close() << creationForm.close();
 			}
 
-			////////////////////////////////////////////////////////////////////
-			// END TABS
-//			closeTabContent(stream);
+
+			//////////////////////////////////////////////////////////////////////////
+			// Stops
+			{
+				stream << "<h1>Arrêts</h1>";
+
+				// Requests
+				AdminFunctionRequest<PTPlaceAdmin> openStopRequest(request);
+				
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Localité");
+				c.push_back("Arrêt");
+				c.push_back("Phonétique");
+				c.push_back("Score");
+				c.push_back("Levenshtein");
+				c.push_back(string());
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				const ParametersMap& stopsPM(
+					**pm.getSubMaps(PlacesListService::DATA_STOPS).begin()
+				);
+				if(stopsPM.hasSubMaps(PlacesListService::DATA_STOP))
+				{
+					BOOST_FOREACH(
+						shared_ptr<ParametersMap> item,
+						stopsPM.getSubMaps(PlacesListService::DATA_STOP)
+					){
+						// New row
+						stream << t.row();
+
+						// Load of the stop area
+						shared_ptr<const StopArea> stopArea(
+							Env::GetOfficialEnv().get<StopArea>(
+								item->get<RegistryKeyType>(StopArea::DATA_STOP_ID)
+						)	);
+
+						// Open button
+						openStopRequest.getPage()->setConnectionPlace(stopArea);
+						stream << t.col() <<
+							HTMLModule::getLinkButton(
+								openStopRequest.getURL(),
+								"Ouvrir",
+								string(),
+								PTPlaceAdmin::ICON
+							)
+						;
+
+						// Key
+						stream << t.col() << item->get<string>(StopArea::DATA_CITY_NAME);
+						stream << t.col() << item->get<string>(StopArea::DATA_STOP_NAME);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+
+						// Remove button only if no stops inside
+						stream << t.col();
+						if(stopArea->getPhysicalStops().empty())
+						{
+							removeRequest.getAction()->setObjectId(stopArea->getKey());
+							stream << HTMLModule::getLinkButton(
+								removeRequest.getURL(),
+								"Supprimer",
+								"Etes-vous sûr de vouloir supprimer la zone d'arrêt "+ stopArea->getFullName() +" ?"
+							);
+						}
+				}	}
+
+				// Table and form closing
+				stream << t.close();
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// Road places
+			{
+				stream << "<h1>Rues</h1>";
+
+				// Requests
+				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
+				
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Localité");
+				c.push_back("Rue");
+				c.push_back("Phonétique");
+				c.push_back("Score");
+				c.push_back("Levenshtein");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				const ParametersMap& roadsPM(
+					**pm.getSubMaps(PlacesListService::DATA_ROADS).begin()
+				);
+				if(roadsPM.hasSubMaps(PlacesListService::DATA_ROAD))
+				{
+					BOOST_FOREACH(
+						shared_ptr<ParametersMap> item,
+						roadsPM.getSubMaps(PlacesListService::DATA_ROAD)
+					){
+						stream << t.row();
+
+						// Open button
+						openRoadRequest.getPage()->setRoadPlace(
+							Env::GetOfficialEnv().get<RoadPlace>(
+								item->get<RegistryKeyType>(RoadPlace::DATA_ID)
+						)	);
+						stream << t.col() <<
+							HTMLModule::getLinkButton(
+								openRoadRequest.getURL(),
+								"Ouvrir",
+								string(),
+								PTRoadsAdmin::ICON
+							)
+						;
+
+						// Key
+						stream << t.col() << item->get<string>(City::DATA_CITY_NAME);
+						stream << t.col() << item->get<string>(RoadPlace::DATA_NAME);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+				}	}
+
+				// Table and form closing
+				stream << t.close();
+			}
 		}
 
 
@@ -211,17 +395,5 @@ namespace synthese
 			}
 
 			return links;
-		}
-
-
-
-		void PTCitiesAdmin::_buildTabs(
-			const security::Profile& profile
-		) const	{
-			_tabs.clear();
-
-//			_tabs.push_back(Tab("Recherche phonétique", TAB_PHONETIC, true, "text_allcaps.png"));
-
-			_tabBuilded = true;
 		}
 }	}

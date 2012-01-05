@@ -135,7 +135,9 @@ namespace synthese
 			}
 		}
 
-		void RealTimeUpdateFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap RealTimeUpdateFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if(getInterface())
 			{
@@ -155,6 +157,8 @@ namespace synthese
 			{
 				_display(stream, request, *_service, *_service->getRoute()->getLineStop(_lineStopRank));
 			}
+
+			return util::ParametersMap();
 		}
 
 

@@ -74,7 +74,8 @@ namespace synthese
 		}
 
 
-		void DisplayGetNagiosStatusFunction::run( std::ostream& stream, const Request& request ) const
+
+		ParametersMap DisplayGetNagiosStatusFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if(	!_screen->getIsOnline()
 			){
@@ -99,6 +100,8 @@ namespace synthese
 					stream << status->getDetail() << "|temp=" << status->getTemperatureValue() << "\n";
 				}
 			}
+
+			return ParametersMap();
 		}
 
 

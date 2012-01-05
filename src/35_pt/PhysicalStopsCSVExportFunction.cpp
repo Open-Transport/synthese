@@ -105,10 +105,14 @@ namespace synthese
 			}
 		}
 
-		void PhysicalStopsCSVExportFunction::run(
+
+
+		util::ParametersMap PhysicalStopsCSVExportFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const	{
+
+			util::ParametersMap pm;
 
 			stream << fixed;
 			BOOST_FOREACH(Registry<StopPoint>::value_type itps, Env::GetOfficialEnv().getRegistry<StopPoint>())
@@ -140,6 +144,8 @@ namespace synthese
 					endl
 				;
 			}
+
+			return pm;
 		}
 
 

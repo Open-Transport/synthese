@@ -75,12 +75,16 @@ namespace synthese
 			}
 		}
 
-		void ReservationEditFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap ReservationEditFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			const ReservationEditInterfacePage* page(getInterface()->getPage<ReservationEditInterfacePage>());
 
 			VariablesMap v;
 			page->display(stream, *_resa, v, &request);
+
+			return util::ParametersMap();
 		}
 
 

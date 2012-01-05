@@ -123,10 +123,12 @@ namespace synthese
 
 
 
-		void MapRequest::run( std::ostream& stream, const Request& request ) const
+		ParametersMap MapRequest::run( std::ostream& stream, const Request& request ) const
 		{
 			if (!_map.get())
-				return;
+			{
+				return ParametersMap();
+			}
 
 			// Prepare the map (once for all renderings!)
 			_map->prepare ();
@@ -154,6 +156,7 @@ namespace synthese
 
 			Log::GetInstance ().debug ("Sent result url " + resultURL);
 
+			return ParametersMap();
 		}
 
 
@@ -265,5 +268,4 @@ namespace synthese
 		{
 			return "text/plain";
 		}
-	}
-}
+}	}

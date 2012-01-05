@@ -36,6 +36,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace road
 	{
 		class Road;
@@ -53,6 +58,8 @@ namespace synthese
 			public impex::ImportableTemplate<RoadPlace>
 		{
 		public:
+			static const std::string DATA_ID;
+			static const std::string DATA_NAME;
 
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
@@ -88,6 +95,15 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const std::string& prefix
+				) const;
+
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
+
 				virtual std::string getRuleUserName() const;
 
 				virtual void getVertexAccessMap(

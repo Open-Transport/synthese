@@ -111,7 +111,7 @@ namespace synthese
 
 			/** Action to run, defined by each subclass.
 			*/
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 
 			void setTextInput(const std::string& text);
 			void setNumber(int number);

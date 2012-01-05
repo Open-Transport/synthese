@@ -37,6 +37,7 @@
 
 #include "BookableCommercialLineAdmin.h"
 #include "BookableCommercialLinesAdmin.h"
+#include "FreeDRTBookingAdmin.hpp"
 #include "ResaCustomerAdmin.h"
 #include "ResaCustomersAdmin.h"
 #include "ReservationRoutePlannerAdmin.h"
@@ -92,10 +93,11 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ReservationTransactionTableSync::integrate();
 	synthese::resa::OnlineReservationRuleTableSync::integrate();
 	
-	synthese::resa::ResaCustomerAdmin::integrate();
-	synthese::resa::ResaCustomersAdmin::integrate();
 	synthese::resa::BookableCommercialLineAdmin::integrate();
 	synthese::resa::BookableCommercialLinesAdmin::integrate();
+	synthese::resa::FreeDRTBookingAdmin::integrate();
+	synthese::resa::ResaCustomerAdmin::integrate();
+	synthese::resa::ResaCustomersAdmin::integrate();
 	synthese::resa::ReservationRoutePlannerAdmin::integrate();
 	synthese::resa::ResaLogAdmin::integrate();
 	synthese::resa::ResaEditLogEntryAdmin::integrate();

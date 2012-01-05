@@ -95,7 +95,7 @@ namespace synthese
 			_number = map.getOptional<size_t>(PARAMETER_MAX_NUMBER);
 		}
 
-		void WebPageLastNewsFunction::run(
+		util::ParametersMap WebPageLastNewsFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -187,6 +187,8 @@ namespace synthese
 			{
 				stream << "</channel></rss>";
 			}
+
+			return util::ParametersMap();
 		}
 
 

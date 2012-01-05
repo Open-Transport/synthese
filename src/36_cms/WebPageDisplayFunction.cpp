@@ -145,7 +145,7 @@ namespace synthese
 
 
 
-		void WebPageDisplayFunction::run(
+		util::ParametersMap WebPageDisplayFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -192,6 +192,8 @@ namespace synthese
 					_page->display(stream, request, getTemplateParameters());
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

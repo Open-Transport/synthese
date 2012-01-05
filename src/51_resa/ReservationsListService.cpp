@@ -305,7 +305,7 @@ namespace synthese
 
 
 
-		void ReservationsListService::run(
+		util::ParametersMap ReservationsListService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -501,6 +501,8 @@ namespace synthese
 					}
 				}
 			} // End services loop
+
+			return util::ParametersMap();
 		}
 
 
