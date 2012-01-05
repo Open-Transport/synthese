@@ -27,7 +27,7 @@
 #include "GeographyModule.h"
 #include "CoordinatesSystem.hpp"
 #include "DBModule.h"
-#include "10_db/101_sqlite/SQLiteDB.h"
+#include "101_sqlite/SQLiteDB.h"
 
 using namespace synthese::geography;
 using namespace geos::geom;
