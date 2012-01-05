@@ -132,15 +132,15 @@ class SconsBuilder(Builder):
     # This should be populated automatically once all tests build.
     TEST_TARGETS = [
         # FIXME: commented targets don't compile.
-        #'util',
+        'util',
         'db',
-        'html',
-        #'lex-matcher',
-        #'geography',
+        #'html',
+        'lex-matcher',
+        'geography',
         'graph',
         'road',
         'pt',
-        #'carto',
+        'carto',
         'pt-routeplanner',
     ]
 
