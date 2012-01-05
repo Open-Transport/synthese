@@ -234,6 +234,8 @@ namespace synthese
 				}
 			}
 
+			transaction.run();
+
 //			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 
