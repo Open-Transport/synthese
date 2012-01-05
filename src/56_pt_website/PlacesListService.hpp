@@ -29,17 +29,13 @@
 #include "Function.h"
 #include "LexicalMatcher.h"
 #include "City.h"
+#include "StopArea.hpp"
 
 namespace synthese
 {
 	namespace cms
 	{
 		class Webpage;
-	}
-
-	namespace pt
-	{
-		class StopArea;
 	}
 
 	namespace road
