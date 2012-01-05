@@ -66,7 +66,7 @@ namespace synthese
 			}
 		}
 
-		void WebpagePreviousFunction::run(
+		util::ParametersMap WebpagePreviousFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -76,6 +76,7 @@ namespace synthese
 			{
 				stream << previous->getKey();
 			}
+			return util::ParametersMap();
 		}
 
 

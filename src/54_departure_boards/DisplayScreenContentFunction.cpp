@@ -459,11 +459,11 @@ namespace synthese
 
 
 
-		void DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
+		util::ParametersMap DisplayScreenContentFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if(!_screen->getType())
 			{
-				return;
+				return ParametersMap();
 			}
 			if(	_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage()
 			){
@@ -471,7 +471,7 @@ namespace synthese
 				if(	!_screen->getIsOnline() ||
 					!_screen->getDisplayedPlace()
 				){
-					return;
+					return ParametersMap();
 				}
 
 				try
@@ -739,6 +739,8 @@ namespace synthese
 				// XML footer
 				stream << "</timeTable>";
 			}
+
+			return util::ParametersMap();
 		}
 
 

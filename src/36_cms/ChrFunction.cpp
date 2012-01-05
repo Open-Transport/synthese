@@ -58,7 +58,7 @@ namespace synthese
 
 
 
-		void ChrFunction::run(
+		util::ParametersMap ChrFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -66,6 +66,7 @@ namespace synthese
 			{
 				stream << atoi(_code.c_str());
 			}
+			return util::ParametersMap();
 		}
 
 

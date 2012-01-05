@@ -113,7 +113,9 @@ namespace synthese
 			}
 		}
 
-		void AlarmTestOnDisplayScreenFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap AlarmTestOnDisplayScreenFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			try
 			{
@@ -167,7 +169,10 @@ namespace synthese
 				const DeparturesTableInterfacePage* page(
 					_type->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
 				);
-				if (page == NULL) return;
+				if (page == NULL)
+				{
+					return ParametersMap();
+				}
 
 				VariablesMap variables;
 
@@ -189,6 +194,8 @@ namespace synthese
 			catch (InterfacePageException&)
 			{
 			}
+
+			return util::ParametersMap();
 		}
 
 

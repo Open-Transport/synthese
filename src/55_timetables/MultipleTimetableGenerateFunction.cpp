@@ -184,7 +184,9 @@ namespace synthese
 
 		}
 
-		void MultipleTimetableGenerateFunction::run(
+
+
+		util::ParametersMap MultipleTimetableGenerateFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -237,6 +239,8 @@ namespace synthese
 			}
 
 			_page->display(stream, request, pm);
+
+			return pm;
 		}
 
 

@@ -506,7 +506,7 @@ namespace synthese
 
 
 
-		void TimetableGenerateFunction::run( std::ostream& stream, const Request& request ) const
+		util::ParametersMap TimetableGenerateFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			if(_page.get())
 			{
@@ -535,6 +535,8 @@ namespace synthese
 					_timetableRank
 				);
 			}
+
+			return util::ParametersMap();
 		}
 
 

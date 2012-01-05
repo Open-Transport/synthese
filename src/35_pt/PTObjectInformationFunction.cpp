@@ -93,10 +93,13 @@ namespace synthese
 
 
 
-		void PTObjectInformationFunction::run(
+		util::ParametersMap PTObjectInformationFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			util::ParametersMap pm;
+
 			if(_network.get())
 			{
 				if(_info == "name")
@@ -204,6 +207,8 @@ namespace synthese
 					stream << _service->getServiceNumber();
 				}
 			}
+
+			return pm;
 		}
 
 

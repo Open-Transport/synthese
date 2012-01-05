@@ -847,13 +847,13 @@ namespace synthese
 
 
 
-		void RoutePlannerFunction::run(
+		util::ParametersMap RoutePlannerFunction::run(
 			ostream& stream,
 			const Request& request
 		) const	{
 			if (!_departure_place.placeResult.value || !_arrival_place.placeResult.value)
 			{
-				return;
+				return ParametersMap();
 			}
 
 			ptime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
@@ -1572,6 +1572,8 @@ namespace synthese
 				stream << "</routePlannerResult>"
 				;
 			}
+
+			return util::ParametersMap();
 		}
 
 

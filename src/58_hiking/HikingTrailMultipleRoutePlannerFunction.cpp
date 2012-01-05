@@ -402,7 +402,9 @@ namespace synthese
 
 		}
 
-		void HikingTrailMultipleRoutePlannerFunction::run(
+
+
+		ParametersMap HikingTrailMultipleRoutePlannerFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -537,6 +539,8 @@ namespace synthese
 					accessParameters
 				);
 */			}
+
+			return ParametersMap();
 		}
 
 

@@ -126,7 +126,10 @@ namespace synthese
 			/// @param request the current request
 			/// @author Hugues Romain
 			/// @date 2010
-			virtual void run(std::ostream& stream, const server::Request& request) const;
+			virtual util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
 
 
 

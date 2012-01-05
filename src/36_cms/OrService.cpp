@@ -61,11 +61,12 @@ namespace synthese
 
 
 
-		void OrService::run(
+		util::ParametersMap OrService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_left || _right);
+			return util::ParametersMap();
 		}
 		
 		

@@ -70,7 +70,7 @@ namespace synthese
 
 
 
-		void SubStrFunction::run(
+		util::ParametersMap SubStrFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -82,6 +82,7 @@ namespace synthese
 			{
 				stream << IConv("CP1252", "UTF-8").convert(_text.substr(_first));
 			}
+			return util::ParametersMap();
 		}
 
 

@@ -77,6 +77,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SEARCH_NAME;
 			static const std::string PARAMETER_ITEM_DISPLAY_PAGE_ID;
+			static const std::string DATA_HIKING_TRAIL;
 
 		protected:
 			//! \name Page parameters
@@ -119,7 +120,10 @@ namespace synthese
 			/// @param request the current request
 			/// @author Hugues Romain
 			/// @date 2010
-			virtual void run(std::ostream& stream, const server::Request& request) const;
+			virtual util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
 
 
 

@@ -128,7 +128,7 @@ namespace synthese
 
 
 
-		void CityListFunction::run(
+		util::ParametersMap CityListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -249,6 +249,8 @@ namespace synthese
 			{
 				_displayItems(stream, pm, request);
 			}
+
+			return pm;
 		}
 
 

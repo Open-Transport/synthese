@@ -98,7 +98,12 @@ namespace synthese
 		public:
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Rows_list#Response
 			//////////////////////////////////////////////////////////////////////////
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
+
+
 
 			void setTextInput(const std::string& text){ _input = text; }
 			void setNumber(boost::optional<std::size_t> number){ _n = number; }

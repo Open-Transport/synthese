@@ -80,7 +80,8 @@ namespace synthese
 		}
 
 
-		void CPUGetWiredScreensFunction::run( std::ostream& stream, const Request& request ) const
+
+		util::ParametersMap CPUGetWiredScreensFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			// Last monitoring status
 			DisplayMonitoringStatusTableSync::SearchResult entries(
@@ -112,20 +113,24 @@ namespace synthese
 			DisplayMonitoringStatusTableSync::Save(&status);
 
 			// Output generation
-			stream <<
-				"<?xml version='1.0' encoding='UTF-8'?>\n" <<
-				"<" << DISPLAY_SCREENS_XML_TAG << ">\n";
-
+			util::ParametersMap pm;
 			BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())
 			{
-				if(!screen->getIsOnline()) continue;
-				stream <<
-					"<" << DISPLAY_SCREEN_XML_TAG << " " <<
-					DISPLAY_SCREEN_ID_XML_FIELD << "=\"" << screen->getKey() << "\" " <<
-					DISPLAY_SCREEN_COMPORT_XML_FIELD << "=\"" << screen->getComPort() << "\" " <<
-					" />\n";
+				if(!screen->getIsOnline())
+				{
+					continue;
+				}
+
+				shared_ptr<util::ParametersMap> screenPM(new ParametersMap);
+				screenPM->insert(DISPLAY_SCREEN_ID_XML_FIELD, screen->getKey());
+				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen->getComPort());
+
+				pm.insert(DISPLAY_SCREEN_XML_TAG, screenPM);
 			}
-			stream << "</" << DISPLAY_SCREENS_XML_TAG << ">\n";
+
+			pm.outputXML(stream, DISPLAY_SCREENS_XML_TAG, true);
+
+			return pm;
 		}
 
 

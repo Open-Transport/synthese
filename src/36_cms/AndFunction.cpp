@@ -61,11 +61,12 @@ namespace synthese
 
 
 
-		void AndFunction::run(
+		util::ParametersMap AndFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_left && _right);
+			return util::ParametersMap();
 		}
 
 

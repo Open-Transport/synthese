@@ -78,7 +78,7 @@ namespace synthese
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_Nagios_connector#Response
 			//////////////////////////////////////////////////////////////////////////
 			///	@param stream Stream to write the output on
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 
 
 

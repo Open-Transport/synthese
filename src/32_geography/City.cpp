@@ -45,10 +45,11 @@ namespace synthese
 
 	namespace geography
 	{
-		const std::string City::DATA_CITY_ID("city_id");
-		const std::string City::DATA_CITY_NAME("city_name");
-		const std::string City::DATA_CITY_X("city_x");
-		const std::string City::DATA_CITY_Y("city_y");
+		const std::string City::DATA_CITY_ID = "city_id";
+		const std::string City::DATA_CITY_NAME = "city_name";
+		const std::string City::DATA_CITY_CODE = "city_code";
+		const std::string City::DATA_CITY_X = "city_x";
+		const std::string City::DATA_CITY_Y = "city_y";
 
 
 
@@ -73,9 +74,8 @@ namespace synthese
 
 
 		City::~City ()
-		{
+		{}
 
-		}
 
 
 		void City::getVertexAccessMap(
@@ -84,45 +84,12 @@ namespace synthese
 			const GraphTypes& whatToSearch
 		) const {
 
-/*			if (_includedPlaces.empty ())
-			{
-				if (_connectionPlacesMatcher.size () > 0)
-				{
-					_connectionPlacesMatcher.entries().begin()->second->getVertexAccessMap(
-						result, accessDirection, accessParameters,
-						whatToSearch
-					);
-				}
-				else if (_placeAliasesMatcher.size () > 0)
-				{
-					_placeAliasesMatcher.entries().begin()->second->getVertexAccessMap(
-						result, accessDirection, accessParameters
-						, whatToSearch
-					);
-				}
-				else if (_publicPlacesMatcher.size () > 0)
-				{
-					_publicPlacesMatcher.entries().begin()->second->getVertexAccessMap(
-						result, accessDirection, accessParameters
-						, whatToSearch
-					);
-				}
-				else if (_roadsMatcher.size () > 0)
-				{
-					_roadsMatcher.entries().begin()->second->getVertexAccessMap(
-						result, accessDirection, accessParameters
-						, whatToSearch
-					);
-				}
-			}
-			else
-*/			{
-				IncludingPlace::getVertexAccessMap(
-					result,
-					accessParameters,
-					whatToSearch
-				);
-			}
+			IncludingPlace::getVertexAccessMap(
+				result,
+				accessParameters,
+				whatToSearch
+			);
+
 		}
 
 
@@ -171,6 +138,9 @@ namespace synthese
 			// Name
 			pm.insert(prefix + DATA_CITY_NAME, getName());
 
+			// Code
+			pm.insert(prefix + DATA_CITY_CODE, _code);
+
 			// X and Y
 			if(coordinatesSystem && getPoint())
 			{
@@ -188,5 +158,36 @@ namespace synthese
 					pm.insert(prefix + DATA_CITY_Y, s.str());
 				}
 			}
+		}
+
+
+
+		void City::addPlaceToMatcher( PlacesMatcher::Content place )
+		{
+			getLexicalMatcher(place->getFactoryKey()).add(place->getName(), place);
+			_allPlacesMatcher.add(place->getNameForAllPlacesMatcher(),place);
+		}
+
+
+
+		void City::removePlaceFromMatcher(
+			const geography::NamedPlace& place
+		){
+			getLexicalMatcher(place.getFactoryKey()).remove(place.getName());
+			_allPlacesMatcher.remove(place.getNameForAllPlacesMatcher());
+		}
+
+
+
+		bool City::empty() const
+		{
+			BOOST_FOREACH(const PlacesMatchers::value_type& matcher, _lexicalMatchers)
+			{
+				if(matcher.second.size() != 0)
+				{
+					return false;
+				}
+			}
+			return true;
 		}
 }	}

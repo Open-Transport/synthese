@@ -301,13 +301,6 @@ namespace synthese
 
 
 
-		PTModule::GeneralStopsMatcher& PTModule::GetGeneralStopsMatcher()
-		{
-			return _generalStopsMatcher;
-		}
-
-
-
 		RoadModule::ExtendedFetchPlacesResult PTModule::ExtendedFetchPlaces(
 			const std::string& placeName,
 			std::size_t resultsNumber

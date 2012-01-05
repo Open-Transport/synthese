@@ -75,18 +75,25 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
+			// Name
 		    object->setName(rows->getText ( CityTableSync::TABLE_COL_NAME));
+
+			// Code
 		    object->setCode(rows->getText ( CityTableSync::TABLE_COL_CODE));
 
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			// Lexical matchers
+			if (linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
-				GeographyModule::AddToCitiesMatchers(env.getEditableSPtr(object));
+				// Add to cities and all places matcher
+				GeographyModule::AddToCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(object));
 			}
 		}
 
 
+
 		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Unlink(City* obj)
 		{
+			// Remove from cities matcher
 			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
 		}
 

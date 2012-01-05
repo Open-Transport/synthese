@@ -168,7 +168,7 @@ namespace synthese
 			/// Function to display, defined by each subclass.
 			///	@param stream Stream to write the output on.
 			/// @param request The request which has launched the function
-			virtual void run(
+			virtual util::ParametersMap run(
 				std::ostream& stream,
 				const Request& request
 			) const = 0;

@@ -47,7 +47,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,XMLSessionIsValidFunction>
 		{
 		public:
-			static const std::string PARAMETER_SESSION_ID_TO_CONTROL;
+			static const std::string PARAMETER_SESSION_ID_TO_CHECK;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
 
 		private:
@@ -57,7 +57,7 @@ namespace synthese
 
 			//! \name Page parameters
 			//@{
-				std::string _sessionIdToControl;
+				std::string _sessionIdToCheck;
 				boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 			//@}
 
@@ -96,7 +96,10 @@ namespace synthese
 			/// @param stream Stream to display the content on.
 			/// @author Hugues Romain (RCSmobility)
 			/// @date 2009-2011
-			virtual void run(std::ostream& stream, const server::Request& request) const;
+			virtual util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
 
 
 

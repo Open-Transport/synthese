@@ -49,10 +49,14 @@ namespace synthese
 		{
 		}
 
-		void GetMapOpenLayersConstructorService::run(
+
+
+		util::ParametersMap GetMapOpenLayersConstructorService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			ParametersMap pm;
 			
 			// Map source
 			MapSource* mapSource(
@@ -67,6 +71,8 @@ namespace synthese
 
 			// Gets the constructor
 			stream << mapSource->getOpenLayersConstructor();
+
+			return pm;
 		}
 		
 		

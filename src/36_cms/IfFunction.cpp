@@ -62,7 +62,7 @@ namespace synthese
 
 
 
-		void IfFunction::run(
+		util::ParametersMap IfFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -74,6 +74,7 @@ namespace synthese
 			{
 				stream << _else;
 			}
+			return util::ParametersMap();
 		}
 
 

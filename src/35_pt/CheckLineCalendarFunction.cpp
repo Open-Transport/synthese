@@ -70,10 +70,14 @@ namespace synthese
 			_duration = days(map.getDefault<int>(PARAMETER_DURATION, 45));
 		}
 
-		void CheckLineCalendarFunction::run(
+
+
+		util::ParametersMap CheckLineCalendarFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			ParametersMap pm;
 
 			if(	!_line.get()
 			){
@@ -102,6 +106,7 @@ namespace synthese
 				}
 			}
 
+			return pm;
 		}
 
 

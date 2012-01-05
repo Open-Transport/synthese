@@ -20,9 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "CoordinatesSystem.hpp"
 #include "DBModule.h"
-#include "FactorableTemplate.h"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
 #include "Log.h"

@@ -21,6 +21,9 @@
 */
 
 #include "PublicPlace.h"
+
+#include "City.h"
+#include "ParametersMap.h"
 #include "Registry.h"
 
 #include <geos/geom/Point.h>
@@ -41,18 +44,21 @@ namespace synthese
 
 	namespace road
 	{
+		const string PublicPlace::DATA_ID = "id";
+		const string PublicPlace::DATA_NAME = "name";
+
+
+
 		PublicPlace::PublicPlace (
 			util::RegistryKeyType id
 		):	Registrable(id),
 			NamedPlaceTemplate<PublicPlace>()
-		{
-		}
+		{}
 
 
 
 		PublicPlace::~PublicPlace ()
-		{
-		}
+		{}
 
 
 
@@ -75,6 +81,32 @@ namespace synthese
 		{
 			/// @todo Envelope of entrances
 			return boost::shared_ptr<Point>();
+		}
+
+
+
+		void PublicPlace::toParametersMap( util::ParametersMap& pm, const std::string& prefix ) const
+		{
+
+			// ID
+			pm.insert(prefix + DATA_ID, getKey());
+
+			// Name
+			pm.insert(prefix + DATA_NAME, getName());
+
+			// City
+			if(getCity())
+			{
+				getCity()->toParametersMap(pm, NULL, prefix);
+			}
+		}
+
+
+
+		void PublicPlace::toParametersMap( util::ParametersMap& pm ) const
+		{
+			string emptyPrefix;
+			toParametersMap(pm, emptyPrefix);
 		}
 	}
 }

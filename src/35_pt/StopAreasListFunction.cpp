@@ -225,7 +225,7 @@ namespace synthese
 
 
 
-		void StopAreasListFunction::run(
+		util::ParametersMap StopAreasListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -344,6 +344,8 @@ namespace synthese
 			{
 				pm.outputXML(stream, DATA_STOP_AREAS, true, "http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd");
 			}
+
+			return pm;
 		}
 
 

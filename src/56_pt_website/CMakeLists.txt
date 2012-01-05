@@ -13,6 +13,8 @@ ObjectSiteLinkTableSync.cpp
 ObjectSiteLinkTableSync.h
 PlacesListFunction.cpp
 PlacesListFunction.h
+PlacesListService.cpp
+PlacesListService.hpp
 RollingStockFilter.cpp
 RollingStockFilter.h
 RollingStockFilterTableSync.cpp
