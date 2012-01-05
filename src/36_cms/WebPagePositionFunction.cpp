@@ -101,7 +101,7 @@ namespace synthese
 
 
 
-		void WebPagePositionFunction::run(
+		util::ParametersMap WebPagePositionFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -140,6 +140,8 @@ namespace synthese
 					first = false;
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

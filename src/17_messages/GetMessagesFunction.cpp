@@ -150,7 +150,7 @@ namespace synthese
 
 
 
-		void GetMessagesFunction::run(
+		util::ParametersMap GetMessagesFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -203,7 +203,7 @@ namespace synthese
 				if(!pm.hasSubMaps(DATA_MESSAGE))
 				{
 					// Backward compatibility: return an empty string if no message is found.
-					return;
+					return pm;
 				}
 
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmMessage, pm.getSubMaps(DATA_MESSAGE))
@@ -211,6 +211,8 @@ namespace synthese
 					stream << pmMessage->get<string>(Alarm::DATA_CONTENT);
 				}
 			}
+
+			return pm;
 		}
 
 

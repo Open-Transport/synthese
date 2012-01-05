@@ -158,7 +158,7 @@ namespace synthese
 			public geography::NamedPlaceTemplate<StopArea>,
 			public impex::ImportableTemplate<StopArea>
 		{
-		private:
+		public:
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_STOP_NAME;
 			static const std::string DATA_CITY_ID;
@@ -168,8 +168,6 @@ namespace synthese
 			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
-
-		public:
 
 			/// Chosen registry class.
 			typedef util::Registry<StopArea>	Registry;

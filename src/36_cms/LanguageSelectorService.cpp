@@ -102,7 +102,7 @@ namespace synthese
 
 
 
-		void LanguageSelectorService::run(
+		util::ParametersMap LanguageSelectorService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -132,6 +132,8 @@ namespace synthese
 					Language::GetIso639_2LanguagesVector(*language),
 					_value ? optional<string>(_value->getIso639_2Code()) : optional<string>()
 				);
+
+			return util::ParametersMap();
 		}
 
 

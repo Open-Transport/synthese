@@ -94,7 +94,7 @@ namespace synthese
 
 
 
-		void GetDepartureBoardsService::run(
+		util::ParametersMap GetDepartureBoardsService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -145,6 +145,8 @@ namespace synthese
 					"http://synthese.rcsmobility.com/include/54_departure_boards/GetDepartureBoards.xsd"
 				);
 			}
+
+			return pm;
 		}
 		
 		

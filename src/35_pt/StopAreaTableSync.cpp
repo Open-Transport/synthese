@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "StopAreaTableSync.hpp"
+
 #include "ReplaceQuery.h"
 #include "LinkException.h"
 #include "CityTableSync.h"
@@ -192,8 +193,7 @@ namespace synthese
 					{
 						city->removeIncludedPlace(cp);
 					}
-					city->addPlaceToMatcher<StopArea>(env.getEditableSPtr(cp));
-					PTModule::GetGeneralStopsMatcher().add(cp->getFullName(), env.getEditableSPtr(cp));
+					city->addPlaceToMatcher(env.getEditableSPtr(cp));
 				}
 				catch(ObjectNotFoundException<City>& e)
 				{
@@ -216,6 +216,26 @@ namespace synthese
 						Log::GetInstance().warn("Bad value " + lexical_cast<string>(handicappedComplianceId) + " for handicapped compliance in stop area " + lexical_cast<string>(cp->getKey()));
 				}	}
 				cp->setRules(rules);
+
+			// Registration to all places matcher
+				if(	&env == &Env::GetOfficialEnv() &&
+					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				){
+					GeographyModule::GetGeneralAllPlacesMatcher().add(
+						cp->getFullName(),
+						env.getEditableSPtr(cp)
+					);
+				}
+
+				// Registration to road places matcher
+				if(&env == &Env::GetOfficialEnv() &&
+					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				){
+					PTModule::GetGeneralStopsMatcher().add(
+						cp->getFullName(),
+						env.getEditableSPtr(cp)
+					);
+				}
 			}
 		}
 
@@ -287,9 +307,6 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Unlink(
 			StopArea* cp
 		){
-			// General stops matcher
-			PTModule::GetGeneralStopsMatcher().remove(cp->getFullName());
-
 			// Handicapped compliance
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -301,9 +318,21 @@ namespace synthese
 			City* city(const_cast<City*>(cp->getCity()));
 			if (city != NULL)
 			{
-				/// @todo make the remove : segfautl !!!!
-//				city->removePlaceFromMatcher<StopArea>(cp);
+				city->removePlaceFromMatcher(*cp);
 				city->removeIncludedPlace(cp);
+			}
+
+			if(Env::GetOfficialEnv().contains(*cp))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					cp->getFullName()
+				);
+
+				// General public places
+				PTModule::GetGeneralStopsMatcher().remove(
+					cp->getFullName()
+				);
 			}
 		}
 

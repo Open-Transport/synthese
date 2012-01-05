@@ -210,10 +210,13 @@ namespace synthese
 
 
 
-		void AdminFunction::run(
+		ParametersMap AdminFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const	{
+
+			ParametersMap pm;
+
 			try
 			{
 				shared_ptr<LoginAdmin> loginPage(new LoginAdmin);
@@ -258,6 +261,8 @@ namespace synthese
 			{
 				throw RequestException("Admin interface page error (page not found in database?): " + e.getMessage());
 			}
+
+			return pm;
 		}
 
 

@@ -23,6 +23,9 @@
 */
 
 #include "BookableCommercialLineAdmin.h"
+
+#include "FreeDRTAreaTableSync.hpp"
+#include "FreeDRTBookingAdmin.hpp"
 #include "UserTableSync.h"
 #include "ResaModule.h"
 #include "ServiceReservations.h"
@@ -81,20 +84,24 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, BookableCommercialLineAdmin>::FACTORY_KEY("BookableCommercialLineAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, BookableCommercialLineAdmin>::FACTORY_KEY = "BookableCommercialLine";
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<BookableCommercialLineAdmin>::ICON("chart_line.png");
-		template<> const string AdminInterfaceElementTemplate<BookableCommercialLineAdmin>::DEFAULT_TITLE("Ligne inconnue");
+		template<> const string AdminInterfaceElementTemplate<BookableCommercialLineAdmin>::ICON = "chart_line.png";
+		template<> const string AdminInterfaceElementTemplate<BookableCommercialLineAdmin>::DEFAULT_TITLE = "Ligne inconnue";
 	}
 
 	namespace resa
 	{
-		const string BookableCommercialLineAdmin::PARAMETER_DATE("da");
-		const string BookableCommercialLineAdmin::PARAMETER_DISPLAY_CANCELLED("dc");
-		const string BookableCommercialLineAdmin::PARAMETER_SERVICE("se");
+		const string BookableCommercialLineAdmin::PARAMETER_DATE = "da";
+		const string BookableCommercialLineAdmin::PARAMETER_DISPLAY_CANCELLED = "dc";
+		const string BookableCommercialLineAdmin::PARAMETER_SERVICE = "se";
+
+		const string BookableCommercialLineAdmin::TAB_RESAS = "resas";
+		const string BookableCommercialLineAdmin::TAB_FREE_DRT = "free_drt";
+
 
 
 		BookableCommercialLineAdmin::BookableCommercialLineAdmin()
@@ -103,6 +110,8 @@ namespace synthese
 			_hideOldServices(false),
 			_displayCancelled(false)
 		{ }
+
+
 
 		void BookableCommercialLineAdmin::setFromParametersMap(
 			const ParametersMap& map
@@ -183,422 +192,471 @@ namespace synthese
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
-			// Rights
-			bool globalReadRight(
-				_request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
-			);
-			bool globalDeleteRight(
-				_request.isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
-			);
 
-			// Requests
-			AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request);
-
-			AdminActionFunctionRequest<CancelReservationAction,BookableCommercialLineAdmin> cancelRequest(_request);
-
-			AdminFunctionRequest<ResaCustomerAdmin> customerRequest(_request);
-
-			AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
-
-			AdminFunctionRequest<ReservationAdmin> openReservationRequest(_request);
-
-			AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request);
-
-			// Local variables
-			ptime now(second_clock::local_time());
-
-			// Temporary variables
-			int seatsNumber(0);
-//			bool round_trip = false;
-//			bool next_overflow = false;
-//			bool course = false;
-
-			// Reservations reading
-			ReservationTableSync::SearchResult sqlreservations(
-				ReservationTableSync::Search(
-					_getEnv(),
-					_line->getKey(),
-					_date,
-					_serviceNumber,
-					_hideOldServices,
-					_displayCancelled ? logic::indeterminate : logic::tribool(false)
-			)	);
-			// Services reading
-			vector<shared_ptr<ScheduledService> > sortedServices;
+			////////////////////////////////////////////////////////////////////
+			// TAB RESAS
+			if (openTabContent(stream, TAB_RESAS))
 			{
-				map<string, shared_ptr<ScheduledService> > servicesByNumber;
+				// Rights
+				bool globalReadRight(
+					_request.isAuthorized<ResaRight>(security::READ,UNKNOWN_RIGHT_LEVEL)
+				);
+				bool globalDeleteRight(
+					_request.isAuthorized<ResaRight>(security::DELETE_RIGHT,UNKNOWN_RIGHT_LEVEL)
+				);
 
-				ScheduledServiceTableSync::SearchResult services(
-					ScheduledServiceTableSync::Search(
+				// Requests
+				AdminFunctionRequest<BookableCommercialLineAdmin> searchRequest(_request);
+
+				AdminActionFunctionRequest<CancelReservationAction,BookableCommercialLineAdmin> cancelRequest(_request);
+
+				AdminFunctionRequest<ResaCustomerAdmin> customerRequest(_request);
+
+				AdminFunctionRequest<BookableCommercialLineAdmin> printRequest(_request);
+
+				AdminFunctionRequest<ReservationAdmin> openReservationRequest(_request);
+
+				AdminActionFunctionRequest<ReservationUpdateAction, BookableCommercialLineAdmin> vehicleUpdateRquest(_request);
+
+				// Local variables
+				ptime now(second_clock::local_time());
+
+				// Temporary variables
+				int seatsNumber(0);
+	//			bool round_trip = false;
+	//			bool next_overflow = false;
+	//			bool course = false;
+
+				// Reservations reading
+				ReservationTableSync::SearchResult sqlreservations(
+					ReservationTableSync::Search(
 						_getEnv(),
-						optional<RegistryKeyType>(),
 						_line->getKey(),
-						optional<RegistryKeyType>(),
+						_date,
 						_serviceNumber,
 						_hideOldServices,
-						0,
-						optional<size_t>(),
-						true, true, DOWN_LINKS_LOAD_LEVEL
+						_displayCancelled ? logic::indeterminate : logic::tribool(false)
 				)	);
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+				// Services reading
+				vector<shared_ptr<ScheduledService> > sortedServices;
 				{
-					if(	!service->isActive(_date) ||
-						servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
-					){
-						continue;
-					}
+					map<string, shared_ptr<ScheduledService> > servicesByNumber;
 
-					servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
-					sortedServices.push_back(service);
-				}
-			}
-			if(_serviceNumber && sortedServices.empty()) return;
-
-			// Sort reservations
-			map<string, ServiceReservations> reservations;
-			BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
-			{
-				if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
-
-				const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
-				if(reservations.find(service->getServiceNumber()) == reservations.end())
-				{
-					reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
-				}
-				reservations[service->getServiceNumber()].addReservation(resa.get());
-			}
-
-			if(!_serviceNumber)
-			{
-
-				stream << "<h1>Recherche</h1>";
-
-				SearchFormHTMLTable st(searchRequest.getHTMLForm());
-				stream << st.open();
-				stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
-				stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
-				stream << st.close();
-
-				stream << "<h1>Liens</h1>";
-
-				date date(_date);
-				date -= days(1);
-				searchRequest.getPage()->_hideOldServices = false;
-				searchRequest.getPage()->_date = date;
-
-				stream <<
-					"<p>" << HTMLModule::getLinkButton(
-						searchRequest.getURL(),
-						"Jour précédent",
-						string(),
-						"resultset_previous.png"
-					) << " ";
-
-				searchRequest.getPage()->_date = _date;
-				searchRequest.getPage()->_hideOldServices = !_hideOldServices;
-
-				stream << HTMLModule::getLinkButton(
-						searchRequest.getURL(),
-						_hideOldServices ? "Journée entière" : "Prochains services",
-						string(),
-						_hideOldServices ? "stop_blue.png" : "stop_green.png"
-					) << " ";
-
-				date = _date;
-				date += days(1);
-				searchRequest.getPage()->_hideOldServices = false;
-				searchRequest.getPage()->_date = date;
-
-				stream << HTMLModule::getLinkButton(
-						searchRequest.getURL(),
-						"Jour suivant",
-						string(),
-						"resultset_next.png"
-					) << "</p>"
-				;
-
-				stream << "<h1>Résultats</h1>";
-			}
-			else
-			{
-				int serviceSeatsNumber(reservations[sortedServices[0]->getServiceNumber()].getSeatsNumber());
-				string plural((serviceSeatsNumber > 1) ? "s" : "");
-				stream << "<h1>";
-				if (serviceSeatsNumber > 0)
-				{
-					stream << serviceSeatsNumber << " place" << plural << " réservée" << plural;
-				}
-				else
-				{
-					stream << "Aucune réservation";
-				}
-				stream << "</h1>";
-
-				UseRule::ReservationAvailabilityType pedestrianAbility(sortedServices[0]->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-				UseRule::ReservationAvailabilityType handicappedAbility(sortedServices[0]->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
-				UseRule::ReservationAvailabilityType bikeAbility(sortedServices[0]->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
-				if(	pedestrianAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
-					pedestrianAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
-					handicappedAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
-					handicappedAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
-					bikeAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
-					bikeAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE
-				){
-					stream <<
-						"<p class=\"info\">" <<
-						"ATTENTION Cette liste de réservations est provisoire tant que le service est ouvert à la réservation." <<
-						"</p>"
-					;
-					ptime pedestrianDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-					ptime handicappedDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
-					ptime bikeDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
-					ptime deadLine(pedestrianDeadLine);
-					if(deadLine.is_not_a_date_time() || (!handicappedDeadLine.is_not_a_date_time() && handicappedDeadLine > deadLine))
+					ScheduledServiceTableSync::SearchResult services(
+						ScheduledServiceTableSync::Search(
+							_getEnv(),
+							optional<RegistryKeyType>(),
+							_line->getKey(),
+							optional<RegistryKeyType>(),
+							_serviceNumber,
+							_hideOldServices,
+							0,
+							optional<size_t>(),
+							true, true, DOWN_LINKS_LOAD_LEVEL
+					)	);
+					BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
 					{
-						deadLine = handicappedDeadLine;
+						if(	!service->isActive(_date) ||
+							servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
+						){
+							continue;
+						}
+
+						servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
+						sortedServices.push_back(service);
 					}
-					if(deadLine.is_not_a_date_time() || (!bikeDeadLine.is_not_a_date_time() && bikeDeadLine > deadLine))
-					{
-						deadLine = bikeDeadLine;
-					}
-					stream <<
-						"<p class=\"info\">" <<
-						"Le service sera fermé à la réservation à partir du " <<
-						deadLine.date() <<
-						" à " << deadLine.time_of_day() <<
-						"</p>"
-					;
 				}
-			}
+				if(_serviceNumber && sortedServices.empty()) return;
 
-			HTMLTable::ColsVector c;
-			c.push_back("Statut");
-			c.push_back("Heure départ");
-			c.push_back("Arrêt départ");
-			c.push_back("Arrêt arrivée");
-			c.push_back("Heure arrivée");
-			c.push_back("Places");
-			c.push_back("Client");
-			if (globalDeleteRight && !_serviceNumber)
-				c.push_back("Actions");
-			HTMLTable t(c,"adminresults");
-			stream << t.open();
+				// Sort reservations
+				map<string, ServiceReservations> reservations;
+				BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
+				{
+					if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
 
-			// Display of services
-			BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
-			{
-				const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
-				int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
-				string plural((serviceSeatsNumber > 1) ? "s" : "");
-				seatsNumber += serviceSeatsNumber;
+					const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
+					if(reservations.find(service->getServiceNumber()) == reservations.end())
+					{
+						reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
+					}
+					reservations[service->getServiceNumber()].addReservation(resa.get());
+				}
 
-				// Display
 				if(!_serviceNumber)
 				{
-					stream << t.row();
 
-					stream << t.col(1, string(), true);
+					stream << "<h1>Recherche</h1>";
 
-					{
-						UseRule::ReservationAvailabilityType status(
-							service->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
-							);
-						switch(status)
-						{
-						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
-							break;
+					SearchFormHTMLTable st(searchRequest.getHTMLForm());
+					stream << st.open();
+					stream << st.cell("Date", st.getForm().getCalendarInput(PARAMETER_DATE, _date));
+					stream << st.cell("Afficher annulations", st.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_CANCELLED, _displayCancelled));
+					stream << st.close();
 
-						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
-							break;
+					stream << "<h1>Liens</h1>";
 
-						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-							stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
-							break;
-						}
-					}
+					date date(_date);
+					date -= days(1);
+					searchRequest.getPage()->_hideOldServices = false;
+					searchRequest.getPage()->_date = date;
 
-					{
-						UseRule::ReservationAvailabilityType status(
-							service->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
-							);
-						switch(status)
-						{
-						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
-							break;
+					stream <<
+						"<p>" << HTMLModule::getLinkButton(
+							searchRequest.getURL(),
+							"Jour précédent",
+							string(),
+							"resultset_previous.png"
+						) << " ";
 
-						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
-							break;
+					searchRequest.getPage()->_date = _date;
+					searchRequest.getPage()->_hideOldServices = !_hideOldServices;
 
-						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-							stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
-							break;
-						}
-					}
+					stream << HTMLModule::getLinkButton(
+							searchRequest.getURL(),
+							_hideOldServices ? "Journée entière" : "Prochains services",
+							string(),
+							_hideOldServices ? "stop_blue.png" : "stop_green.png"
+						) << " ";
 
-					{
-						UseRule::ReservationAvailabilityType status(
-							service->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET)
-							);
-						switch(status)
-						{
-						case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
-							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
-							break;
+					date = _date;
+					date += days(1);
+					searchRequest.getPage()->_hideOldServices = false;
+					searchRequest.getPage()->_date = date;
 
-						case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
-							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
-							break;
+					stream << HTMLModule::getLinkButton(
+							searchRequest.getURL(),
+							"Jour suivant",
+							string(),
+							"resultset_next.png"
+						) << "</p>"
+					;
 
-						case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
-							stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
-							break;
-						}
-					}
-
-					stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de ";
-					const Edge* edge(service->getPath()->getEdge(0));
-					if(dynamic_cast<const NamedPlace*>(edge->getHub()))
-					{
-						stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
-					}
-					else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
-					{
-						stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
-					}
-					stream << " à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
-					if (serviceSeatsNumber > 0)
-						stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
-
-					printRequest.getPage()->setServiceNumber(service->getServiceNumber());
-
-					stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
-				}
-
-				if (serviceReservations.empty())
-				{
-					stream << t.row();
-					stream << t.col(8) << "Aucune réservation";
+					stream << "<h1>Résultats</h1>";
 				}
 				else
 				{
-					BOOST_FOREACH(const Reservation* reservation, serviceReservations)
+					int serviceSeatsNumber(reservations[sortedServices[0]->getServiceNumber()].getSeatsNumber());
+					string plural((serviceSeatsNumber > 1) ? "s" : "");
+					stream << "<h1>";
+					if (serviceSeatsNumber > 0)
 					{
-						ReservationStatus status(reservation->getStatus());
-						openReservationRequest.getPage()->setReservation(_env->getSPtr(reservation));
-						vehicleUpdateRquest.getAction()->setReservation(
-							_env->getEditableSPtr(
-								const_cast<Reservation*>(reservation)
-						)	);
+						stream << serviceSeatsNumber << " place" << plural << " réservée" << plural;
+					}
+					else
+					{
+						stream << "Aucune réservation";
+					}
+					stream << "</h1>";
 
-						customerRequest.getPage()->setUser(
-							UserTableSync::Get(
-								reservation->getTransaction()->getCustomerUserId(),
-								_getEnv()
-						)	);
-
-						cancelRequest.getAction()->setTransaction(
-							ReservationTransactionTableSync::GetEditable(
-								reservation->getTransaction()->getKey(),
-								_getEnv()
-						)	);
-
-						stream << t.row();
-						stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
+					UseRule::ReservationAvailabilityType pedestrianAbility(sortedServices[0]->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+					UseRule::ReservationAvailabilityType handicappedAbility(sortedServices[0]->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
+					UseRule::ReservationAvailabilityType bikeAbility(sortedServices[0]->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
+					if(	pedestrianAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+						pedestrianAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
+						handicappedAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+						handicappedAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE ||
+						bikeAbility == UseRule::RESERVATION_COMPULSORY_POSSIBLE ||
+						bikeAbility == UseRule::RESERVATION_OPTIONAL_POSSIBLE
+					){
 						stream <<
-							t.col() <<
-							(	reservation->getDepartureTime().date() != _date ?
-								to_simple_string(reservation->getDepartureTime()) :
-								to_simple_string(reservation->getDepartureTime().time_of_day())
-							)
+							"<p class=\"info\">" <<
+							"ATTENTION Cette liste de réservations est provisoire tant que le service est ouvert à la réservation." <<
+							"</p>"
 						;
-						stream << t.col() << reservation->getDeparturePlaceName();
-						stream << t.col() << reservation->getArrivalPlaceName();
+						ptime pedestrianDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+						ptime handicappedDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET));
+						ptime bikeDeadLine(sortedServices[0]->getReservationDeadLine(_date, USER_BIKE - USER_CLASS_CODE_OFFSET));
+						ptime deadLine(pedestrianDeadLine);
+						if(deadLine.is_not_a_date_time() || (!handicappedDeadLine.is_not_a_date_time() && handicappedDeadLine > deadLine))
+						{
+							deadLine = handicappedDeadLine;
+						}
+						if(deadLine.is_not_a_date_time() || (!bikeDeadLine.is_not_a_date_time() && bikeDeadLine > deadLine))
+						{
+							deadLine = bikeDeadLine;
+						}
 						stream <<
-							t.col() <<
-							(	reservation->getArrivalTime().date() != _date ?
-								to_simple_string(reservation->getArrivalTime())	:
-								to_simple_string(reservation->getArrivalTime().time_of_day())
-							)
+							"<p class=\"info\">" <<
+							"Le service sera fermé à la réservation à partir du " <<
+							deadLine.date() <<
+							" à " << deadLine.time_of_day() <<
+							"</p>"
 						;
-						stream << t.col() << reservation->getTransaction()->getSeats();
-
-						// Customer name
-						stream << t.col();
-						if (globalReadRight && !_serviceNumber)
-						{
-							stream  << HTMLModule::getHTMLLink(
-								customerRequest.getURL(),
-								reservation->getTransaction()->getCustomerName()
-							);
-						}
-						else
-						{
-							stream << reservation->getTransaction()->getCustomerName();
-						}
-
-						if(!_serviceNumber)
-						{
-							// Cancel link
-							if (globalDeleteRight)
-							{
-								stream << t.col();
-								switch(status)
-								{
-								case OPTION:
-									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
-									break;
-
-								case TO_BE_DONE:
-									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
-									break;
-
-								case AT_WORK:
-									stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
-									break;
-								}
-							}
-
-							stream << " " << HTMLModule::getLinkButton(openReservationRequest.getURL(), "Ouvrir");
-
-							HTMLForm uv(vehicleUpdateRquest.getHTMLForm("uv"+ lexical_cast<string>(reservation->getKey())));
-							stream << uv.open();
-							stream << uv.getSelectInput(
-								ReservationUpdateAction::PARAMETER_VEHICLE_ID,
-								VehicleTableSync::GetVehiclesList(*_env, string("(non affecté)")),
-								optional<RegistryKeyType>(reservation->getVehicle() ? reservation->getVehicle()->getKey() : RegistryKeyType(0))
-							);
-							stream << uv.getSubmitButton("Enregistrer");
-							stream << uv.close();
-						}
 					}
 				}
-			} // End services loop
 
-			stream << t.close();
+				HTMLTable::ColsVector c;
+				c.push_back("Statut");
+				c.push_back("Heure départ");
+				c.push_back("Arrêt départ");
+				c.push_back("Arrêt arrivée");
+				c.push_back("Heure arrivée");
+				c.push_back("Places");
+				c.push_back("Client");
+				if (globalDeleteRight && !_serviceNumber)
+					c.push_back("Actions");
+				HTMLTable t(c,"adminresults");
+				stream << t.open();
 
-			if(!_serviceNumber)
-			{
-				string plural(seatsNumber > 1 ? "s" : "");
-				stream << "<h1>Total</h1>";
-				stream <<
-					"<p class=\"info\">" <<
-					seatsNumber << " place" << plural << " réservée" << plural << " au total." <<
-					"</p>"
-				;
+				// Display of services
+				BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
+				{
+					const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
+					int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
+					string plural((serviceSeatsNumber > 1) ? "s" : "");
+					seatsNumber += serviceSeatsNumber;
+
+					// Display
+					if(!_serviceNumber)
+					{
+						stream << t.row();
+
+						stream << t.col(1, string(), true);
+
+						{
+							UseRule::ReservationAvailabilityType status(
+								service->getReservationAbility(_date, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+								);
+							switch(status)
+							{
+							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+								stream << HTMLModule::getHTMLImage("pedestrian_access.png","Piétons") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								break;
+							}
+						}
+
+						{
+							UseRule::ReservationAvailabilityType status(
+								service->getReservationAbility(_date, USER_HANDICAPPED - USER_CLASS_CODE_OFFSET)
+								);
+							switch(status)
+							{
+							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+								stream << HTMLModule::getHTMLImage("handicapped_access.png","Handicapés") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								break;
+							}
+						}
+
+						{
+							UseRule::ReservationAvailabilityType status(
+								service->getReservationAbility(_date, USER_BIKE - USER_CLASS_CODE_OFFSET)
+								);
+							switch(status)
+							{
+							case UseRule::RESERVATION_COMPULSORY_TOO_EARLY:
+								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop.png", "Pas encore ouvert");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_POSSIBLE:
+								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("stop_blue.png", "Ouvert à la réservation");
+								break;
+
+							case UseRule::RESERVATION_COMPULSORY_TOO_LATE:
+								stream << HTMLModule::getHTMLImage("bike_access.png","Vélos") << HTMLModule::getHTMLImage("tick.png", "Fermé à la réservation");
+								break;
+							}
+						}
+
+						stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de ";
+						const Edge* edge(service->getPath()->getEdge(0));
+						if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+						{
+							stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+						}
+						else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+						{
+							stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+						}
+						stream << " à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
+						if (serviceSeatsNumber > 0)
+							stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
+
+						printRequest.getPage()->setServiceNumber(service->getServiceNumber());
+
+						stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
+					}
+
+					if (serviceReservations.empty())
+					{
+						stream << t.row();
+						stream << t.col(8) << "Aucune réservation";
+					}
+					else
+					{
+						BOOST_FOREACH(const Reservation* reservation, serviceReservations)
+						{
+							ReservationStatus status(reservation->getStatus());
+							openReservationRequest.getPage()->setReservation(_env->getSPtr(reservation));
+							vehicleUpdateRquest.getAction()->setReservation(
+								_env->getEditableSPtr(
+									const_cast<Reservation*>(reservation)
+							)	);
+
+							customerRequest.getPage()->setUser(
+								UserTableSync::Get(
+									reservation->getTransaction()->getCustomerUserId(),
+									_getEnv()
+							)	);
+
+							cancelRequest.getAction()->setTransaction(
+								ReservationTransactionTableSync::GetEditable(
+									reservation->getTransaction()->getKey(),
+									_getEnv()
+							)	);
+
+							stream << t.row();
+							stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
+							stream <<
+								t.col() <<
+								(	reservation->getDepartureTime().date() != _date ?
+									to_simple_string(reservation->getDepartureTime()) :
+									to_simple_string(reservation->getDepartureTime().time_of_day())
+								)
+							;
+							stream << t.col() << reservation->getDeparturePlaceName();
+							stream << t.col() << reservation->getArrivalPlaceName();
+							stream <<
+								t.col() <<
+								(	reservation->getArrivalTime().date() != _date ?
+									to_simple_string(reservation->getArrivalTime())	:
+									to_simple_string(reservation->getArrivalTime().time_of_day())
+								)
+							;
+							stream << t.col() << reservation->getTransaction()->getSeats();
+
+							// Customer name
+							stream << t.col();
+							if (globalReadRight && !_serviceNumber)
+							{
+								stream  << HTMLModule::getHTMLLink(
+									customerRequest.getURL(),
+									reservation->getTransaction()->getCustomerName()
+								);
+							}
+							else
+							{
+								stream << reservation->getTransaction()->getCustomerName();
+							}
+
+							if(!_serviceNumber)
+							{
+								// Cancel link
+								if (globalDeleteRight)
+								{
+									stream << t.col();
+									switch(status)
+									{
+									case OPTION:
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
+										break;
+
+									case TO_BE_DONE:
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
+										break;
+
+									case AT_WORK:
+										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
+										break;
+									}
+								}
+
+								stream << " " << HTMLModule::getLinkButton(openReservationRequest.getURL(), "Ouvrir");
+
+								HTMLForm uv(vehicleUpdateRquest.getHTMLForm("uv"+ lexical_cast<string>(reservation->getKey())));
+								stream << uv.open();
+								stream << uv.getSelectInput(
+									ReservationUpdateAction::PARAMETER_VEHICLE_ID,
+									VehicleTableSync::GetVehiclesList(*_env, string("(non affecté)")),
+									optional<RegistryKeyType>(reservation->getVehicle() ? reservation->getVehicle()->getKey() : RegistryKeyType(0))
+								);
+								stream << uv.getSubmitButton("Enregistrer");
+								stream << uv.close();
+							}
+						}
+					}
+				} // End services loop
+
+				stream << t.close();
+
+				if(!_serviceNumber)
+				{
+					string plural(seatsNumber > 1 ? "s" : "");
+					stream << "<h1>Total</h1>";
+					stream <<
+						"<p class=\"info\">" <<
+						seatsNumber << " place" << plural << " réservée" << plural << " au total." <<
+						"</p>"
+					;
+				}
+
+				if(_serviceNumber)
+				{
+					stream << HTMLModule::GetHTMLJavascriptOpen() <<
+						"window.print();" << HTMLModule::GetHTMLJavascriptClose();
+				}
 			}
 
-			if(_serviceNumber)
+
+			////////////////////////////////////////////////////////////////////
+			// TAB FREE DRT
+			if (openTabContent(stream, TAB_FREE_DRT))
 			{
-				stream << HTMLModule::GetHTMLJavascriptOpen() <<
-					"window.print();" << HTMLModule::GetHTMLJavascriptClose();
+				// Request
+				AdminFunctionRequest<FreeDRTBookingAdmin> openRequest(_request);
+
+				// Areas
+				FreeDRTAreaTableSync::SearchResult areas(
+					FreeDRTAreaTableSync::Search(
+						Env::GetOfficialEnv(),
+						_line->getKey()
+				)	);
+
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Zone");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				{
+					// New row
+					stream << t.row();
+
+					// Open button
+					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
+					stream <<
+						t.col() <<
+						HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), FreeDRTBookingAdmin::ICON)
+					;
+
+					// Name
+					stream << t.col() << area->getName();
+				}
 			}
 
+
+			////////////////////////////////////////////////////////////////////
+			// END TABS
+			closeTabContent(stream);
 		}
 
+		
+		
 		bool BookableCommercialLineAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -655,30 +713,13 @@ namespace synthese
 		}
 
 
+
 		std::string BookableCommercialLineAdmin::getIcon() const
 		{
 			return _serviceNumber ? "car.png" : ICON;
 		}
 
-		void BookableCommercialLineAdmin::setServiceNumber(const optional<string>& value)
-		{
-			_serviceNumber = value;
-		}
 
-		const optional<string>& BookableCommercialLineAdmin::getServiceNumber() const
-		{
-			return _serviceNumber;
-		}
-
-		void BookableCommercialLineAdmin::setCommercialLine(boost::shared_ptr<pt::CommercialLine> value)
-		{
-			_line = const_pointer_cast<const CommercialLine>(value);
-		}
-
-		boost::shared_ptr<const pt::CommercialLine> BookableCommercialLineAdmin::getCommercialLine() const
-		{
-			return _line;
-		}
 
 		AdminInterfaceElement::PageLinks BookableCommercialLineAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -698,14 +739,22 @@ namespace synthese
 				shared_ptr<BookableCommercialLineAdmin> p(
 					getNewPage<BookableCommercialLineAdmin>()
 				);
-				p->setCommercialLineC(_line);
+				p->setCommercialLine(_line);
 				p->_serviceNumber = ba->_serviceNumber;
 
 				links.push_back(p);
 			}
 
+			// Free DRT Time slot booking
+			if( currentPage.getCurrentTreeBranch().find(*this) &&
+				dynamic_cast<const FreeDRTBookingAdmin*>(&currentPage)
+			){
+				links.push_back(currentPage.getNewBaseCopiedPage());
+			}
+
 			return links;
 		}
+
 
 
 		bool BookableCommercialLineAdmin::_hasSameContent(const AdminInterfaceElement& other) const
@@ -718,6 +767,7 @@ namespace synthese
 		}
 
 
+
 		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
 			return
@@ -728,9 +778,13 @@ namespace synthese
 
 
 
-		void BookableCommercialLineAdmin::setCommercialLineC( boost::shared_ptr<const pt::CommercialLine> value )
+		void BookableCommercialLineAdmin::_buildTabs( const security::Profile& profile ) const
 		{
-			_line = value;
+			_tabs.clear();
+
+			_tabs.push_back(Tab("Liste des réservations", TAB_RESAS, true, "resa_compulsory.png"));
+			_tabs.push_back(Tab("Réservation TAD libéralisé", TAB_FREE_DRT, true, FreeDRTBookingAdmin::ICON));
+
+			_tabBuilded = true;
 		}
-	}
-}
+}	}

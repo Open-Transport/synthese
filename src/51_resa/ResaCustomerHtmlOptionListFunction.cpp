@@ -72,10 +72,16 @@ namespace synthese
 			_number = map.getDefault<size_t>(PARAMETER_NUMBER, 20);
 		}
 
-		void ResaCustomerHtmlOptionListFunction::run( std::ostream& stream, const Request& request ) const
-		{
+
+
+		util::ParametersMap ResaCustomerHtmlOptionListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const	{
 			if (!_name && !_surname)
-				return;
+			{
+				return util::ParametersMap();
+			}
 
 			Env env;
 			UserTableSync::SearchResult users(
@@ -100,6 +106,8 @@ namespace synthese
 			{
 				stream << "<option value=\"" << user->getKey() << "\">" << user->getName() << " " << user->getSurname() << " (" << user->getPhone() << " / " << user->getEMail() << ")</option>";
 			}
+
+			return util::ParametersMap();
 		}
 
 		void ResaCustomerHtmlOptionListFunction::setNumber( int number )

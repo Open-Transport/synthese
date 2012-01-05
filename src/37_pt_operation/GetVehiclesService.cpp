@@ -111,7 +111,9 @@ namespace synthese
 			}
 		}
 
-		void GetVehiclesService::run(
+		
+		
+		util::ParametersMap GetVehiclesService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -151,6 +153,8 @@ namespace synthese
 					);
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

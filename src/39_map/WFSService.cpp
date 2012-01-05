@@ -259,7 +259,7 @@ namespace synthese
 
 
 
-		void WFSService::run(
+		ParametersMap WFSService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -471,6 +471,8 @@ namespace synthese
 					"</ogc:Filter_Capabilities>" <<
 				"</wfs:WFS_Capabilites>";
 			}
+
+			return ParametersMap();
 		}
 
 

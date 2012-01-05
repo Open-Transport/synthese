@@ -52,6 +52,11 @@ namespace synthese
 
 	namespace road
 	{
+		const string RoadPlace::DATA_ID = "id";
+		const string RoadPlace::DATA_NAME = "name";
+
+
+
 		RoadPlace::RoadPlace(
 			RegistryKeyType key
 		):	Registrable(key),
@@ -303,5 +308,32 @@ namespace synthese
 			// No return
 			return shared_ptr<House>();
 		}
-	}
-}
+
+
+
+		void RoadPlace::toParametersMap(
+			util::ParametersMap& pm,
+			const std::string& prefix
+		) const	{
+			
+			// ID
+			pm.insert(prefix + DATA_ID, getKey());
+
+			// Name
+			pm.insert(prefix + DATA_NAME, getName());
+
+			// City
+			if(getCity())
+			{
+				getCity()->toParametersMap(pm, NULL, prefix);
+			}
+		}
+
+
+
+		void RoadPlace::toParametersMap( util::ParametersMap& pm ) const
+		{
+			string emptyPrefix;
+			toParametersMap(pm, emptyPrefix);
+		}
+}	}

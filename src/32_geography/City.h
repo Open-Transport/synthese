@@ -64,14 +64,15 @@ namespace synthese
 
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<NamedPlace> > PlacesMatcher;
 
-		private:
 			static const std::string DATA_CITY_ID;
 			static const std::string DATA_CITY_NAME;
+			static const std::string DATA_CITY_CODE;
 			static const std::string DATA_CITY_X;
 			static const std::string DATA_CITY_Y;
 
 			typedef std::map<std::string, PlacesMatcher> PlacesMatchers;
 
+		private:
 			PlacesMatcher	_allPlacesMatcher;
 			PlacesMatchers _lexicalMatchers;
 
@@ -115,8 +116,17 @@ namespace synthese
 
 			//@}
 
-			//! @name Query methods
+			//! @name Services
 			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if no place belongs to the city.
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2012
+				bool empty() const;
+
+
+
 				void getVertexAccessMap(
 					graph::VertexAccessMap& result,
 					const graph::AccessParameters& accessParameters,
@@ -144,22 +154,17 @@ namespace synthese
 				}
 
 
-				template<class T>
+				
 				void addPlaceToMatcher(
 					PlacesMatcher::Content place
-				){
-					getLexicalMatcher(place->getFactoryKey()).add(place->getName(), place);
-					_allPlacesMatcher.add(place->getNameForAllPlacesMatcher(),place);
-				}
+				);
 
 
-				template<class T>
+
 				void removePlaceFromMatcher(
-					PlacesMatcher::Content place
-				){
-					getLexicalMatcher(place->getFactoryKey()).remove(place->getName());
-					_allPlacesMatcher.remove(place->getNameForAllPlacesMatcher());
-				}
+					const geography::NamedPlace& place
+				);
+				
 
 
 				//////////////////////////////////////////////////////////////////////////

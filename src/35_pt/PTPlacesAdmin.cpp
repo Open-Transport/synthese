@@ -67,7 +67,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, PTPlacesAdmin>::FACTORY_KEY("PTPlacesAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, PTPlacesAdmin>::FACTORY_KEY("PTPlaces");
 	}
 
 	namespace admin

@@ -158,14 +158,14 @@ namespace synthese
 
 
 
-		void GetCompositionsService::run(
+		util::ParametersMap GetCompositionsService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
 			if(!_compositionPage.get())
 			{
-				return;
+				return ParametersMap();
 			}
 
 			size_t rank(0);
@@ -181,6 +181,8 @@ namespace synthese
 					);
 				}
 			}
+
+			return util::ParametersMap();
 		}
 
 

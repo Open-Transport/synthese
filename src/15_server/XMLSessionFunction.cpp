@@ -48,8 +48,12 @@ namespace synthese
 		{
 		}
 
-		void XMLSessionFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		ParametersMap XMLSessionFunction::run( std::ostream& stream, const Request& request ) const
 		{
+			ParametersMap result;
+
 			stream <<
 				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 				"<login xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_Session_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
@@ -71,6 +75,8 @@ namespace synthese
 			}
 
 			stream << "</login>";
+
+			return result;
 		}
 
 

@@ -90,7 +90,7 @@ namespace synthese
 
 
 
-		void RowsListFunction::run(
+		util::ParametersMap RowsListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -98,7 +98,8 @@ namespace synthese
 
 			RowsList resultat = tableSync->SearchForAutoComplete(_input,_n);
 
-			shared_ptr<ParametersMap> pm(new ParametersMap());
+			ParametersMap pm;
+
 			size_t i(0);
 			for (RowsList::const_iterator it = resultat.begin(); it != resultat.end(); ++it)
 			{
@@ -108,14 +109,16 @@ namespace synthese
 				rowPm->insert("name", it->second);
 				rowPm->insert("roid", it->first);
 
-				pm->insert(DATA_ROW, rowPm);
+				pm.insert(DATA_ROW, rowPm);
 			}
 
 			// TODO: Factor ParametesrMap constant
 			if(_outputFormat == "json")
 			{
-				pm->outputJSON(stream, DATA_ROWS);
+				pm.outputJSON(stream, DATA_ROWS);
 			}
+
+			return pm;
 		}
 
 

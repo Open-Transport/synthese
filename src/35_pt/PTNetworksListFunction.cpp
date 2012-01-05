@@ -80,7 +80,7 @@ namespace synthese
 
 
 
-		void PTNetworksListFunction::run(
+		util::ParametersMap PTNetworksListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -127,6 +127,8 @@ namespace synthese
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/PTNetworksListFunction.xsd"
 				);
 			}
+
+			return pm;
 		}
 
 

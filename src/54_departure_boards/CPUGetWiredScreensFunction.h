@@ -93,7 +93,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
 			///	@param stream Stream to write the output on
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 
 
 

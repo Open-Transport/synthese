@@ -75,7 +75,9 @@ namespace synthese
 			}
 		}
 
-		void XMLReservationFunction::run( std::ostream& stream, const Request& request ) const
+
+
+		util::ParametersMap XMLReservationFunction::run( std::ostream& stream, const Request& request ) const
 		{
 			shared_ptr<const ReservationTransaction> resa(_resa);
 			if(!resa.get() && request.getActionCreatedId())
@@ -129,6 +131,8 @@ namespace synthese
 				}
 			}
 			stream << "</reservation>";
+
+			return util::ParametersMap();
 		}
 
 

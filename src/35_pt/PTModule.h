@@ -52,6 +52,8 @@ namespace synthese
 	///	@ingroup m35
 	namespace pt
 	{
+		class StopArea;
+
 		/**	@defgroup m35Actions 35 Actions
 			@ingroup m35
 
@@ -127,13 +129,13 @@ namespace synthese
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
-			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> > GeneralStopsMatcher;
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<StopArea> > GeneralStopsMatcher;
 
 		private:
 			static GeneralStopsMatcher _generalStopsMatcher;
 
 		public:
-			static GeneralStopsMatcher& GetGeneralStopsMatcher();
+			static GeneralStopsMatcher& GetGeneralStopsMatcher(){ return _generalStopsMatcher; }
 
 			static road::RoadModule::ExtendedFetchPlacesResult ExtendedFetchPlaces(
 				const std::string& placeName,
@@ -145,7 +147,10 @@ namespace synthese
 			);
 
 
+
 			static void RTDataCleaner();
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the labels of each PT use rule, including undefined value.
@@ -156,6 +161,8 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Alphabetical order.
 			static Labels GetPTUseRuleLabels();
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the labels of each PT use rule, including undefined value.

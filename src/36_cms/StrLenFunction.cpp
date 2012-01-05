@@ -55,11 +55,12 @@ namespace synthese
 			);
 		}
 
-		void StrLenFunction::run(
+		util::ParametersMap StrLenFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << _text.size();
+			return util::ParametersMap();
 		}
 
 

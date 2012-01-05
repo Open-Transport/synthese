@@ -58,24 +58,37 @@ namespace synthese
 		class BookableCommercialLineAdmin:
 			public admin::AdminInterfaceElementTemplate<BookableCommercialLineAdmin>
 		{
+		public:
+			static const std::string PARAMETER_DISPLAY_CANCELLED;
+			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_SERVICE;
+
+			static const std::string TAB_RESAS;
+			static const std::string TAB_FREE_DRT;
+
+		private:
 			bool											_displayCancelled;
 			boost::shared_ptr<const pt::CommercialLine>	_line;
 			boost::gregorian::date							_date;
 			bool											_hideOldServices;
 			boost::optional<std::string>					_serviceNumber;
 
-		public:
-			static const std::string PARAMETER_DISPLAY_CANCELLED;
-			static const std::string PARAMETER_DATE;
-			static const std::string PARAMETER_SERVICE;
 
+		public:
 			BookableCommercialLineAdmin();
 
-			void setServiceNumber(const boost::optional<std::string>& value);
-			void setCommercialLine(boost::shared_ptr<pt::CommercialLine> value);
-			void setCommercialLineC(boost::shared_ptr<const pt::CommercialLine> value);
-			boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const;
-			const boost::optional<std::string>& getServiceNumber() const;
+			/// @name Setters
+			//@{
+				void setServiceNumber(const boost::optional<std::string>& value){ _serviceNumber = value; }
+				void setCommercialLine(boost::shared_ptr<const pt::CommercialLine> value){ _line = value; }
+			//@}
+
+			/// @name Getters
+			//@{
+				boost::shared_ptr<const pt::CommercialLine> getCommercialLine() const { return _line; }
+				const boost::optional<std::string>& getServiceNumber() const { return _serviceNumber; }
+			//@}
+
 
 
 			/** Initialization of the parameters from a parameters map.
@@ -120,6 +133,8 @@ namespace synthese
 				const security::User& profile
 			) const;
 
+
+
 			/** Sub pages getter.
 				@param currentPage Currently displayed page
 				@return PageLinks each subpage of the current page
@@ -132,10 +147,13 @@ namespace synthese
 			) const;
 
 
+
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
+
+
 
 			/** Title generator.
 				@return The title of the page
@@ -152,7 +170,15 @@ namespace synthese
 			*/
 			virtual std::string getIcon() const;
 
+
+
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
+
+
+			virtual void _buildTabs(
+				const security::Profile& profile
+			) const;
 		};
 	}
 }

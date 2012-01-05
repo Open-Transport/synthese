@@ -43,31 +43,38 @@ namespace synthese
 
 	namespace server
 	{
-		const string XMLSessionIsValidFunction::PARAMETER_SESSION_ID_TO_CONTROL("si");
+		const string XMLSessionIsValidFunction::PARAMETER_SESSION_ID_TO_CHECK("si");
 		const string XMLSessionIsValidFunction::PARAMETER_CMS_TEMPLATE_ID("ti");
 
 		const string XMLSessionIsValidFunction::TAG_VALID_SESSION("validSession");
 		const string XMLSessionIsValidFunction::ATTR_ID("id");
 		const string XMLSessionIsValidFunction::ATTR_VALID("valid");
 
+
+
 		ParametersMap XMLSessionIsValidFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(!_sessionIdToControl.empty())
+			
+			if(!_sessionIdToCheck.empty())
 			{
-				map.insert(PARAMETER_SESSION_ID_TO_CONTROL, _sessionIdToControl);
+				map.insert(PARAMETER_SESSION_ID_TO_CHECK, _sessionIdToCheck);
 			}
+
 			if(_cmsTemplate.get())
 			{
 				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
 			}
+			
 			return map;
 		}
+
+
 
 		void XMLSessionIsValidFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Session number
-			_sessionIdToControl = map.get<string>(PARAMETER_SESSION_ID_TO_CONTROL);
+			_sessionIdToCheck = map.get<string>(PARAMETER_SESSION_ID_TO_CHECK);
 
 			// CMS template
 			optional<RegistryKeyType> tid(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
@@ -83,10 +90,16 @@ namespace synthese
 
 
 
-		void XMLSessionIsValidFunction::run( std::ostream& stream, const Request& request ) const
-		{
+		ParametersMap XMLSessionIsValidFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const	{
+
+			// Declarations
+			ParametersMap pm;
+
 			// Service
-			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToControl);
+			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToCheck);
 			bool value (sit != ServerModule::getSessions().end());
 			if(value) try
 			{
@@ -97,12 +110,12 @@ namespace synthese
 				value = false;
 			}
 
+			pm.insert(ATTR_ID, _sessionIdToCheck);
+			pm.insert(ATTR_VALID, value);
+
 			// CMS response
 			if(_cmsTemplate.get())
 			{
-				ParametersMap pm;
-				pm.insert(ATTR_ID, _sessionIdToControl);
-				pm.insert(ATTR_VALID, value);
 				_cmsTemplate->display(stream, request, pm);
 			}
 			else // XML response
@@ -110,9 +123,11 @@ namespace synthese
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<" << TAG_VALID_SESSION << " xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/src/15_server/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
-					" " << ATTR_ID << "=\"" << _sessionIdToControl << "\" " << ATTR_VALID << "=\"" << (value ? "true" : "false") << "\" />"
+					" " << ATTR_ID << "=\"" << _sessionIdToCheck << "\" " << ATTR_VALID << "=\"" << (value ? "true" : "false") << "\" />"
 				;
 			}
+
+			return pm;
 		}
 
 

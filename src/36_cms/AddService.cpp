@@ -67,11 +67,12 @@ namespace synthese
 
 
 
-		void AddService::run(
+		util::ParametersMap AddService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_left + _right);
+			return util::ParametersMap();
 		}
 		
 		

@@ -177,7 +177,7 @@ namespace synthese
 
 
 
-		void ScenarioDisplayFunction::run(
+		util::ParametersMap ScenarioDisplayFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -338,6 +338,8 @@ namespace synthese
 					DATA_SCENARIO
 				);
 			}
+
+			return pm;
 		}
 
 

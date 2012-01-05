@@ -67,11 +67,12 @@ namespace synthese
 
 
 
-		void SubstractFunction::run(
+		util::ParametersMap SubstractFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			stream << (_left - _right);
+			return util::ParametersMap();
 		}
 
 

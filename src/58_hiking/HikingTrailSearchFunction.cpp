@@ -43,8 +43,10 @@ namespace synthese
 
 	namespace hiking
 	{
-		const string HikingTrailSearchFunction::PARAMETER_SEARCH_NAME("sn");
-		const string HikingTrailSearchFunction::PARAMETER_ITEM_DISPLAY_PAGE_ID("pi");
+		const string HikingTrailSearchFunction::PARAMETER_SEARCH_NAME = "sn";
+		const string HikingTrailSearchFunction::PARAMETER_ITEM_DISPLAY_PAGE_ID = "pi";
+		
+		const string HikingTrailSearchFunction::DATA_HIKING_TRAIL = "hiking_trail";
 
 		ParametersMap HikingTrailSearchFunction::_getParametersMap() const
 		{
@@ -71,19 +73,40 @@ namespace synthese
 			}
 		}
 
-		void HikingTrailSearchFunction::run(
+
+
+		ParametersMap HikingTrailSearchFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 
-			HikingTrailTableSync::SearchResult trails(HikingTrailTableSync::Search(Env::GetOfficialEnv(), _searchName));
+			ParametersMap pm;
 
-			BOOST_FOREACH(HikingTrailTableSync::SearchResult::value_type& trail, trails)
-			{
-				ParametersMap pm(getTemplateParameters());
-				pm.insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
-				_itemDisplayPage->display(stream, request, pm);
+			HikingTrailTableSync::SearchResult trails(
+				HikingTrailTableSync::Search(Env::GetOfficialEnv(), _searchName)
+			);
+			BOOST_FOREACH(
+				HikingTrailTableSync::SearchResult::value_type& trail,
+				trails
+			){
+				shared_ptr<ParametersMap> itemMap(new ParametersMap);
+				
+				itemMap->insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
+				
+				pm.insert(DATA_HIKING_TRAIL, itemMap);
 			}
+
+			if(_itemDisplayPage.get())
+			{
+				BOOST_FOREACH(shared_ptr<ParametersMap> itemMap, pm.getSubMaps(DATA_HIKING_TRAIL))
+				{
+					itemMap->merge(getTemplateParameters());
+
+					_itemDisplayPage->display(stream, request, *itemMap);
+				}
+			}
+
+			return pm;
 		}
 
 

@@ -67,11 +67,13 @@ namespace synthese
 
 
 
-		void ExportFunction::run(
+		util::ParametersMap ExportFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+			util::ParametersMap pm;
 			_exporter->build(stream);
+			return pm;
 		}
 
 

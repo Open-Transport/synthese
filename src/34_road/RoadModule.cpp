@@ -72,6 +72,10 @@ namespace synthese
 
 	namespace road
 	{
+		RoadModule::GeneralRoadsMatcher RoadModule::_generalRoadsMatcher;
+		RoadModule::GeneralPublicPlacesMatcher RoadModule::_generalPublicPlacesMatcher;
+
+
 		RoadModule::ExtendedFetchPlaceResult RoadModule::ExtendedFetchPlace(
 			const GeographyModule::CitiesMatcher& citiesMatcher,
 			const std::string& cityName,

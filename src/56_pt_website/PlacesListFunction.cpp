@@ -207,7 +207,7 @@ namespace synthese
 
 
 
-		void PlacesListFunction::run(
+		util::ParametersMap PlacesListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const	{
@@ -408,6 +408,8 @@ namespace synthese
 			{
 				_displayItems(stream, placesList, request);
 			}
+
+			return pm;
 		}
 
 		void PlacesListFunction::setTextInput( const std::string& text )

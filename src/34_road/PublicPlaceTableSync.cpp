@@ -19,14 +19,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "PublicPlaceTableSync.h"
-#include "PublicPlace.h"
+
 #include "CityTableSync.h"
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
+#include "GeographyModule.h"
 #include "ImportableTableSync.hpp"
+#include "PublicPlace.h"
+#include "ReplaceQuery.h"
+#include "RoadModule.h"
+#include "SelectQuery.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -96,32 +99,75 @@ namespace synthese
 				object->setGeometry(point);
 			}
 
+			// City
+			object->setCity(NULL);
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				City* city(CityTableSync::GetEditable(rows->getLongLong (PublicPlaceTableSync::COL_CITYID), env, linkLevel).get());
 				object->setCity(city);
 
-				city->addPlaceToMatcher<PublicPlace>(env.getEditableSPtr(object));
+				// Registration to city matcher
+				city->addPlaceToMatcher(env.getEditableSPtr(object));
+			}
 
-				// Datasource links
+			// Datasource links
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
 				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(PublicPlaceTableSync::COL_DATASOURCE_LINKS),
 						env
 				)	);
 			}
+
+			// Registration to all places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				GeographyModule::GetGeneralAllPlacesMatcher().add(
+					object->getFullName(),
+					env.getEditableSPtr(object)
+				);
+			}
+
+			// Registration to public places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				RoadModule::GetGeneralPublicPlacesMatcher().add(
+					object->getFullName(),
+					env.getEditableSPtr(object)
+				);
+			}
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
 			PublicPlace* obj
 		){
+			// City matcher
 			City* city(const_cast<City*>(obj->getCity()));
 			if (city != NULL)
 			{
-//				city->removePlaceFromMatcher<PublicPlace>(obj);
-				obj->setCity(NULL);
+				city->removePlaceFromMatcher(*obj);
 			}
+
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					obj->getFullName()
+				);
+
+				// General public places
+				RoadModule::GetGeneralPublicPlacesMatcher().remove(
+					obj->getFullName()
+				);
+			}
+
 		}
+
 
 
 		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Save(

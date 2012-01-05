@@ -189,143 +189,107 @@ namespace synthese
 		}
 
 
-		void PTRouteDetailFunction::run(ostream& stream, const Request& request) const
+
+		util::ParametersMap PTRouteDetailFunction::run(ostream& stream, const Request& request) const
 		{
 			const CommercialLine * commercialLine(_journeyPattern->getCommercialLine());
 
+			ParametersMap m;
+
+			// Properties
+			m.insert(DATA_ID, _journeyPattern->getKey());
+			m.insert(DATA_NAME, _journeyPattern->getName());
+			m.insert(DATA_IS_MAIN, _journeyPattern->getMain());
+			m.insert(DATA_LINE_ID, commercialLine->getKey());
+			m.insert(DATA_LINE_NAME, commercialLine->getName());
+			m.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName());
+			m.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName());
+			m.insert(DATA_LINE_IMAGE, commercialLine->getImage());
+			m.insert(DATA_LINE_STYLE, commercialLine->getStyle());
+			if(commercialLine->getColor())
+			{
+				m.insert(DATA_LINE_COLOR, commercialLine->getColor()->toXMLColor());
+			}
+			m.insert(
+				DATA_DIRECTION,
+				_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj() ?
+					_journeyPattern->getDirectionObj()->getDisplayedText() :
+					_journeyPattern->getDirection()
+			);
+
+			// Edges
+			BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
+			{
+				if(	(!edge->isDepartureAllowed() || !_displayDepartureStops) &&
+					(!edge->isArrivalAllowed() || !_displayArrivalStops)
+				){
+					continue;
+				}
+
+				const StopPoint* stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
+				const StopArea* connPlace(stopPoint->getConnectionPlace());
+
+				shared_ptr<ParametersMap> sm(new ParametersMap);
+				sm->insert(DATA_ID, stopPoint->getKey());
+				sm->insert(DATA_RANK, edge->getRankInPath());
+				sm->insert(DATA_DEPARTURE_IS_ALLOWED, edge->isDepartureAllowed());
+				sm->insert(DATA_ARRIVAL_IS_ALLOWED, edge->isArrivalAllowed());
+				sm->insert(DATA_NAME, stopPoint->getName());
+				sm->insert(DATA_OPERATOR_CODE, stopPoint->getCodeBySources());
+				sm->insert(DATA_STOP_AREA_ID, connPlace->getKey());
+				sm->insert(DATA_STOP_AREA_NAME, connPlace->getName());
+				sm->insert(DATA_CITY_ID, connPlace->getCity()->getKey());
+				sm->insert(DATA_CITY_NAME, connPlace->getCity()->getName());
+				sm->insert(DATA_DIRECTION_ALIAS, connPlace->getName26());
+				if(_service.get())
+				{
+					if(edge->isDepartureAllowed())
+					{
+						sm->insert(DATA_DEPARTURE_TIME, to_simple_string(Service::GetTimeOfDay(_service->getDepartureSchedule(false, edge->getRankInPath()))));
+					}
+					if(edge->isArrivalAllowed())
+					{
+						sm->insert(DATA_ARRIVAL_TIME, to_simple_string(Service::GetTimeOfDay(_service->getArrivalSchedule(false, edge->getRankInPath()))));
+					}
+				}
+
+				m.insert(TAG_STOP, sm);
+			}
+
+
+			// CMS Display
 			if(_mainPage.get())
 			{
-				ParametersMap m(getTemplateParameters());
-				m.insert(DATA_ID, _journeyPattern->getKey());
-				m.insert(DATA_NAME, _journeyPattern->getName());
-				m.insert(DATA_IS_MAIN, _journeyPattern->getMain());
-				m.insert(DATA_LINE_ID, commercialLine->getKey());
-				m.insert(DATA_LINE_NAME, commercialLine->getName());
-				m.insert(DATA_LINE_SHORT_NAME, commercialLine->getShortName());
-				m.insert(DATA_LINE_LONG_NAME, commercialLine->getLongName());
-				m.insert(DATA_LINE_IMAGE, commercialLine->getImage());
-				m.insert(DATA_LINE_STYLE, commercialLine->getStyle());
-				if(commercialLine->getColor())
-				{
-					m.insert(DATA_LINE_COLOR, commercialLine->getColor()->toXMLColor());
-				}
-				m.insert(
-					DATA_DIRECTION,
-					_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj() ?
-						_journeyPattern->getDirectionObj()->getDisplayedText() :
-						_journeyPattern->getDirection()
-				);
+				// Template parameters
+				m.merge(getTemplateParameters());
 
+				// Stops
 				if(_stopPage.get())
 				{
 					stringstream s;
-					BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
+					BOOST_FOREACH(shared_ptr<ParametersMap> item, m.getSubMaps(TAG_STOP))
 					{
-						if(	(!edge->isDepartureAllowed() || !_displayDepartureStops) &&
-							(!edge->isArrivalAllowed() || !_displayArrivalStops)
-						){
-							continue;
-						}
+						item->merge(getTemplateParameters());
 
-						const StopPoint* stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
-						const StopArea* connPlace(stopPoint->getConnectionPlace());
-
-						ParametersMap sm(getTemplateParameters());
-						sm.insert(DATA_ID, stopPoint->getKey());
-						sm.insert(DATA_RANK, edge->getRankInPath());
-						sm.insert(DATA_DEPARTURE_IS_ALLOWED, edge->isDepartureAllowed());
-						sm.insert(DATA_ARRIVAL_IS_ALLOWED, edge->isArrivalAllowed());
-						sm.insert(DATA_NAME, stopPoint->getName());
-						sm.insert(DATA_OPERATOR_CODE, stopPoint->getCodeBySources());
-						sm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
-						sm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
-						sm.insert(DATA_CITY_ID, connPlace->getCity()->getKey());
-						sm.insert(DATA_CITY_NAME, connPlace->getCity()->getName());
-						sm.insert(DATA_DIRECTION_ALIAS, connPlace->getName26());
-						if(_service.get())
-						{
-							if(edge->isDepartureAllowed())
-							{
-								sm.insert(DATA_DEPARTURE_TIME, to_simple_string(Service::GetTimeOfDay(_service->getDepartureSchedule(false, edge->getRankInPath()))));
-							}
-							if(edge->isArrivalAllowed())
-							{
-								sm.insert(DATA_ARRIVAL_TIME, to_simple_string(Service::GetTimeOfDay(_service->getArrivalSchedule(false, edge->getRankInPath()))));
-							}
-						}
-
-						_stopPage->display(s, request, sm);
+						_stopPage->display(s, request, *item);
 					}
 					m.insert(DATA_STOPS, s.str());
 				}
 
 				_mainPage->display(stream, request, m);
+			}
+			else
+			{
+				m.outputXML(
+					stream,
+					TAG_ROUTE,
+					true,
+					"https://extranet.rcsmobility.com/attachments/download/14018/PTRouteDetailFunction.xsd"
+				);
+			}
 
-			} else {
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<" << TAG_ROUTE << " xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/attachments/download/14018/PTRouteDetailFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance" <<
-					"\" " << DATA_ID << "=\""            << _journeyPattern->getKey() <<
-					"\" " << DATA_NAME << "=\""          << _journeyPattern->getName()<<
-					"\" " << DATA_LINE_ID << "=\""        << commercialLine->getKey() <<
-					"\" " << DATA_LINE_NAME << "=\""      << commercialLine->getName() <<
-					"\" " << DATA_LINE_SHORT_NAME << "=\"" << commercialLine->getShortName() <<
-					"\" " << DATA_LINE_LONG_NAME << "=\""  << commercialLine->getLongName() <<
-					"\" " << DATA_LINE_IMAGE <<"=\""     << commercialLine->getImage() <<
-					"\" " << DATA_LINE_STYLE <<"=\""     << commercialLine->getStyle();
-				if(commercialLine->getColor())
-				{
-					stream << "\" " << DATA_LINE_COLOR << "=\""     << commercialLine->getColor()->toXMLColor();
-				}
-				stream <<
-					"\" " << DATA_DIRECTION << "=\"";
-				
-				if(_journeyPattern->getDirection().empty() && _journeyPattern->getDirectionObj())
-				{
-					stream << _journeyPattern->getDirectionObj()->getDisplayedText();
-				}
-				else
-				{
-					stream << _journeyPattern->getDirection();
-				}
-
-				stream << "\">";
-
-				BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
-				{
-					const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
-
-					const StopArea * connPlace(stopPoint->getConnectionPlace());
-
-					stream << "<" << TAG_STOP << " " << DATA_ID << "=\""   << stopPoint->getKey() <<
-						"\" " << DATA_RANK << "=\""          << edge->getRankInPath() <<
-						"\" " << DATA_DEPARTURE_IS_ALLOWED << "=\""          << edge->isDepartureAllowed() <<
-						"\" " << DATA_ARRIVAL_IS_ALLOWED << "=\""          << edge->isArrivalAllowed() <<
-						"\" " << DATA_NAME << "=\""          << stopPoint->getName() <<
-						"\" " << DATA_OPERATOR_CODE << "=\""  << stopPoint->getCodeBySources() <<
-						"\" " << DATA_STOP_AREA_ID << "=\""        << connPlace->getKey() <<
-						"\" " << DATA_STOP_AREA_NAME << "=\""      << connPlace->getName() <<
-						"\" " << DATA_CITY_ID << "=\""        << connPlace->getCity()->getKey() <<
-						"\" " << DATA_CITY_NAME << "=\""      << connPlace->getCity()->getName() <<
-						"\" " << DATA_DIRECTION_ALIAS << "=\""<< connPlace->getName26();
-					if(_service.get())
-					{
-						if(edge->isDepartureAllowed())
-						{
-							stream << "\" " << DATA_DEPARTURE_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getDepartureSchedule(false, edge->getRankInPath())));
-						}
-						if(edge->isArrivalAllowed())
-						{
-							stream << "\" " << DATA_ARRIVAL_TIME << "=\"" << to_simple_string(Service::GetTimeOfDay(_service->getArrivalSchedule(false, edge->getRankInPath())));
-						}
-					}
-
-					stream << "\" />";
-				}
-				// XML footer
-				stream <<
-					"</route>";
-		}	}
+			return m;
+		}
 
 
 

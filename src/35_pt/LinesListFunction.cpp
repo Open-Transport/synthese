@@ -344,8 +344,10 @@ namespace synthese
 
 
 
-		void LinesListFunction::run( std::ostream& stream, const Request& request ) const
-		{
+		util::ParametersMap LinesListFunction::run(
+			std::ostream& stream,
+			const Request& request
+		) const	{
 			// Sorting is made on numerical order
 			//   (except for line number which doesn't begin by a number)
 			//   then alphabetic order.
@@ -595,6 +597,8 @@ namespace synthese
 					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
 				}
 			}
+
+			return pm;
 		}
 
 

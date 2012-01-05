@@ -81,7 +81,9 @@ namespace synthese
 			}
 		}
 
-		void WebPageLinksFunction::run(
+
+
+		util::ParametersMap WebPageLinksFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -107,6 +109,8 @@ namespace synthese
 			{
 				stream << number;
 			}
+
+			return util::ParametersMap();
 		}
 
 

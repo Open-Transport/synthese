@@ -91,7 +91,7 @@ namespace synthese
 
 
 
-		void WebPageLinkFunction::run(
+		util::ParametersMap WebPageLinkFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -134,6 +134,8 @@ namespace synthese
 				}
 			}
 			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
+
+			return util::ParametersMap();
 		}
 
 

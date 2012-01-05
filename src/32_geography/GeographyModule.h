@@ -98,14 +98,17 @@ namespace synthese
 		{
 		public:
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<City> > CitiesMatcher;
+			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> > GeneralAllPlacesMatcher;
 			typedef std::vector<CitiesMatcher::Content> CityList;
 
 		private:
-
+			static GeneralAllPlacesMatcher _generalAllPlacesMatcher;
 			static CitiesMatcher _citiesMatcher;
 			static CitiesMatcher _citiesT9Matcher;
 
 		public:
+			static GeneralAllPlacesMatcher& GetGeneralAllPlacesMatcher(){ return _generalAllPlacesMatcher; }
+			static const CitiesMatcher& GetCitiesMatcher(){ return _citiesMatcher; }
 
 
 
@@ -130,8 +133,6 @@ namespace synthese
 			static void RemoveFromCitiesMatchers(
 				CitiesMatcher::Content city
 			);
-
-			static const CitiesMatcher& GetCitiesMatcher();
 		};
 	}
 	/** @} */

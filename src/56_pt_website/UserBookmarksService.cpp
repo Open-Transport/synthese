@@ -83,7 +83,7 @@ namespace synthese
 
 
 
-		void UserBookmarksService::run(
+		util::ParametersMap UserBookmarksService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -116,6 +116,8 @@ namespace synthese
 
 				_itemDisplayTemplate->display(stream, request, pm);
 			}
+
+			return util::ParametersMap();
 		}
 
 

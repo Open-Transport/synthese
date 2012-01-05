@@ -90,7 +90,7 @@ namespace synthese
 			/// @param stream Stream to display the content on.
 			/// @author Hugues
 			/// @date 2010
-			virtual void run(
+			virtual util::ParametersMap run(
 				std::ostream& stream,
 				const server::Request& request
 			) const;

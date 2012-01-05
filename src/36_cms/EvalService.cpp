@@ -58,7 +58,7 @@ namespace synthese
 
 
 
-		void EvalService::run(
+		util::ParametersMap EvalService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -67,6 +67,8 @@ namespace synthese
 			p.setContent(_text);
 			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, getTemplateParameters()).get()));
 			p.display(stream, request, getTemplateParameters());
+
+			return util::ParametersMap();
 		}
 
 

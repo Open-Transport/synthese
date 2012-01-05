@@ -175,22 +175,26 @@ namespace synthese
 
 
 
-		void LineStopGetService::run(
+		util::ParametersMap LineStopGetService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
+			ParametersMap pm;
+
+			pm.insert(DATA_LINE_STOP_ID, _lineStop->getKey());
+			pm.insert(DATA_RANK_IN_PATH, _lineStop->getRankInPath());
+			pm.insert(DATA_ROUTE_ID, _lineStop->getParentPath()->getKey());
+			pm.insert(DATA_STOP_ID, _lineStop->getPhysicalStop()->getKey());
+
 			if(_page.get())
 			{	// CMS output
-				ParametersMap pm(getTemplateParameters());
-
-				pm.insert(DATA_LINE_STOP_ID, _lineStop->getKey());
-				pm.insert(DATA_RANK_IN_PATH, _lineStop->getRankInPath());
-				pm.insert(DATA_ROUTE_ID, _lineStop->getParentPath()->getKey());
-				pm.insert(DATA_STOP_ID, _lineStop->getPhysicalStop()->getKey());
+				pm.merge(getTemplateParameters());
 
 				_page->display(stream, request, pm);
 			}
+
+			return pm;
 		}
 		
 		

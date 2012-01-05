@@ -129,7 +129,10 @@ namespace synthese
 			/// Output.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Response
 			//////////////////////////////////////////////////////////////////////////
-			void run(std::ostream& stream, const server::Request& request) const;
+			util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
 
 
 			//! @name Setters

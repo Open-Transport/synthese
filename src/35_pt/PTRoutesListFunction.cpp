@@ -170,7 +170,7 @@ namespace synthese
 
 
 
-		void PTRoutesListFunction::run(
+		util::ParametersMap PTRoutesListFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -363,6 +363,8 @@ namespace synthese
 				// XML footer
 				stream << "</directions>";
 			}
+
+			return util::ParametersMap();
 		}
 
 

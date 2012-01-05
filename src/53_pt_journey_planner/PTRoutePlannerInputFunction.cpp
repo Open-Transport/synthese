@@ -98,7 +98,7 @@ namespace synthese
 
 
 
-		void PTRoutePlannerInputFunction::run(
+		util::ParametersMap PTRoutePlannerInputFunction::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
@@ -111,7 +111,7 @@ namespace synthese
 			)	);
 			if(!site.get())
 			{
-				return;
+				return ParametersMap();
 			}
 
 			if(_field == FIELD_PERIOD)
@@ -197,6 +197,8 @@ namespace synthese
 					"\" value=\"" << (_value.empty() ? requestParametersMap.getDefault<string>(inputName) : _value) << "\" id=\"" << _field << "_txt\" " << _html << " />"
 				;
 			}
+
+			return util::ParametersMap();
 		}
 
 
