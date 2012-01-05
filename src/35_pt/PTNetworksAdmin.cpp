@@ -100,7 +100,7 @@ namespace synthese
 		bool PTNetworksAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
@@ -149,22 +149,25 @@ namespace synthese
 			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
 			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
 			{
-				openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
-				stream << t.row();
-				stream << t.col();
-				stream << network->getName();
-				stream << t.col();
-				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
-
-				// Remove button
-				stream << t.col();
-				CommercialLineTableSync::SearchResult lines(
-					CommercialLineTableSync::Search(_getEnv(), network->getKey(), optional<string>(), optional<string>(), 0, 1)
-				);
-				if(lines.empty())
+				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
 				{
-					removeRequest.getAction()->setObjectId(network->getKey());
-					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le réseau "+ network->getName() +" ?");
+					openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					stream << t.row();
+					stream << t.col();
+					stream << network->getName();
+					stream << t.col();
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
+
+					// Remove button
+					stream << t.col();
+					CommercialLineTableSync::SearchResult lines(
+						CommercialLineTableSync::Search(_getEnv(), network->getKey(), optional<string>(), optional<string>(), 0, 1)
+					);
+					if(lines.empty())
+					{
+						removeRequest.getAction()->setObjectId(network->getKey());
+						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le réseau "+ network->getName() +" ?");
+					}
 				}
 			}
 			stream << t.row();
@@ -209,11 +212,14 @@ namespace synthese
 			);
 			BOOST_FOREACH(const TransportNetworkTableSync::SearchResult::value_type& network, networks)
 			{
-				shared_ptr<TransportNetworkAdmin> link(
-					getNewPage<TransportNetworkAdmin>()
-				);
-				link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
-				links.push_back(link);
+				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
+				{
+					shared_ptr<TransportNetworkAdmin> link(
+						getNewPage<TransportNetworkAdmin>()
+					);
+					link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					links.push_back(link);
+				}
 			}
 
 			return links;

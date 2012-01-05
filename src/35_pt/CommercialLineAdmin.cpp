@@ -160,7 +160,7 @@ namespace synthese
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const {
-			
+
 			////////////////////////////////////////////////////////////////////
 			// TAB FORWARD ROUTES
 			if (openTabContent(stream, TAB_ROUTES_FORWARD))
@@ -533,7 +533,7 @@ namespace synthese
 			const security::User& user
 		) const	{
 			if (_cline.get() == NULL) return false;
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ);
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_cline->getKey()));
 		}
 
 
@@ -746,7 +746,7 @@ namespace synthese
 					// Stops number
 					stream << t.col();
 					stream << line->getEdges().size();
-					
+
 					// Length
 					stream << t.col();
 					stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();

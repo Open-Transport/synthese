@@ -280,7 +280,8 @@ namespace synthese
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT);
+			//TODO test if the user has sufficient right level for this service
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 

@@ -119,7 +119,8 @@ namespace synthese
 		bool ContinuousServiceUpdateAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			//TODO test if the user has sufficient right level for this service
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL, string());
 		}
 	}
 }

@@ -309,7 +309,7 @@ namespace synthese
 				);
 			}
 			transaction.run();
-			
+
 			//			::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
 
@@ -318,6 +318,7 @@ namespace synthese
 		bool LineStopUpdateAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			//TODO test if the user has sufficient right level for this commercial line
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL, string());
 		}
 }	}

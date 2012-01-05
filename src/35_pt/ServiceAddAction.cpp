@@ -240,7 +240,7 @@ namespace synthese
 
 				ScheduledServiceTableSync::Save(&object, transaction);
 
-				
+
 				// Copy of calendar template elements
 				if(_template.get() && !_template->getCalendarLinks().empty())
 				{
@@ -311,7 +311,8 @@ namespace synthese
 		bool ServiceAddAction::isAuthorized(
 			const Session* session
 		) const {
-			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+			//TODO test if the user has sufficient right level for this service
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE, UNKNOWN_RIGHT_LEVEL, string());
 		}
 
 
