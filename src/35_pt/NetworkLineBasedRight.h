@@ -124,8 +124,12 @@ namespace synthese
 			if (this->_parameter == security::GLOBAL_PERIMETER)
 				return true;
 
+			if (perimeter == security::GLOBAL_PERIMETER)
+				return false;
+
 			util::RegistryKeyType id1(boost::lexical_cast<util::RegistryKeyType>(this->_parameter));
-			util::RegistryKeyType id2(boost::lexical_cast<util::RegistryKeyType>(perimeter));
+			util::RegistryKeyType id2 = boost::lexical_cast<util::RegistryKeyType>(perimeter);
+
 			try
 			{
 				util::RegistryTableType tableId1(util::decodeTableId(id1));
