@@ -15,6 +15,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 
 set(DEPS
   32_geography
+  36_cms
 )
 
 boost_test(Projection "${DEPS}")
