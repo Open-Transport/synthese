@@ -57,13 +57,15 @@ namespace synthese
 	{
 		const string PlacesListService::PARAMETER_CITY_ID = "city_id";
 		const string PlacesListService::PARAMETER_CITIES_WITH_AT_LEAST_A_STOP = "cities_with_at_least_a_stop";
+		const string PlacesListService::PARAMETER_CLASS_FILTER = "class_filter";
 		const string PlacesListService::PARAMETER_CLASS_PAGE_ID = "class_page_id";
 		const string PlacesListService::PARAMETER_ITEM_PAGE_ID = "item_page_id";
+		const string PlacesListService::PARAMETER_MIN_SCORE = "min_score";
+		const string PlacesListService::PARAMETER_NUMBER = "number";
 		const string PlacesListService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PlacesListService::PARAMETER_SITE_ID = "site_id";
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
-		const string PlacesListService::PARAMETER_NUMBER = "number";
 
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
@@ -92,7 +94,8 @@ namespace synthese
 
 		PlacesListService::PlacesListService():
 			_sorted(true),
-			_citiesWithAtLeastAStop(true)
+			_citiesWithAtLeastAStop(true),
+			_minScore(0)
 		{}
 
 
@@ -151,6 +154,18 @@ namespace synthese
 				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 
+			// Min score
+			if(_minScore > 0)
+			{
+				map.insert(PARAMETER_MIN_SCORE, _minScore);
+			}
+
+			// Class filter
+			if(!_classFilter.empty())
+			{
+				map.insert(PARAMETER_CLASS_FILTER, _classFilter);
+			}
+
 			return map;
 		}
 
@@ -191,6 +206,12 @@ namespace synthese
 
 			// Cities with at least a stop
 			_citiesWithAtLeastAStop = map.getDefault<bool>(PARAMETER_CITIES_WITH_AT_LEAST_A_STOP, _citiesWithAtLeastAStop);
+
+			// Min score
+			_minScore = map.getDefault<double>(PARAMETER_MIN_SCORE, _minScore);
+
+			// Class filter
+			_classFilter = map.getDefault<string>(PARAMETER_CLASS_FILTER);
 
 			// Output
 			if(map.isDefined(PARAMETER_ITEM_PAGE_ID))
@@ -236,40 +257,49 @@ namespace synthese
 
 			// ParametersMap populating
 			ParametersMap result;
-			if(_sorted)
+			if(_sorted || !_classFilter.empty())
 			{
 				if(_city.get())
 				{
 					// Stops
+					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
-							_city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(_text, _number ? *_number : 0)
-						);
+							_city->getLexicalMatcher(StopArea::FACTORY_KEY).bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_STOPS, pm);
 					}
 
 					// Roads
+					if(_classFilter.empty() || _classFilter == DATA_ROAD)
 					{ /// TODO catch addresses
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
 							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 								_text,
-								_number ? *_number : 0
-							)
-						);
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_ROADS, pm);
 					}
 
 					// Public places
+					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_PLACE)
 					{
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
-							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(_text, _number ? *_number : 0)
-						);
+							_city->getLexicalMatcher(PublicPlace::FACTORY_KEY).bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
 				}
@@ -280,44 +310,58 @@ namespace synthese
 				else
 				{
 					// Cities
+					if(_classFilter.empty() || _classFilter == DATA_CITY)
 					{
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<City>(
 							*pm,
 							GeographyModule::GetCitiesMatcher().bestMatches(
 								_text,
-								(_number && !_citiesWithAtLeastAStop) ? *_number : 0
+								(_number && !_citiesWithAtLeastAStop) ? *_number : 0,
+								_minScore
 						)	);
 						result.insert(DATA_CITIES, pm);
 					}
 
 					// Stops
+					if(_classFilter.empty() || _classFilter == DATA_STOP)
 					{
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<StopArea>(
 							*pm,
-							PTModule::GetGeneralStopsMatcher().bestMatches(_text, _number ? *_number : 0)
-						);
+							PTModule::GetGeneralStopsMatcher().bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_STOPS, pm);
 					}
 
 					// Roads
+					if(_classFilter.empty() || _classFilter == DATA_ROAD)
 					{ /// TODO catch addresses
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<RoadPlace>(
 							*pm,
-							RoadModule::GetGeneralRoadsMatcher().bestMatches(_text, _number ? *_number : 0)
-						);
+							RoadModule::GetGeneralRoadsMatcher().bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_ROADS, pm);
 					}
 
 					// Public places
+					if(_classFilter.empty() || _classFilter == DATA_PUBLIC_PLACE)
 					{
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<PublicPlace>(
 							*pm,
-							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(_text, _number ? *_number : 0)
-						);
+							RoadModule::GetGeneralPublicPlacesMatcher().bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
 				}
@@ -326,22 +370,28 @@ namespace synthese
 			{
 				shared_ptr<ParametersMap> pm(new ParametersMap);
 				if(_city.get())
-				{
+				{ /// TODO take into account of _classFilter
 					_registerItems<NamedPlace>(
 						*pm,
-						_city->getAllPlacesMatcher().bestMatches(_text, _number ? *_number : 0)
-					);
+						_city->getAllPlacesMatcher().bestMatches(
+							_text,
+							_number ? *_number : 0,
+							_minScore
+					)	);
 				}
 				else if(_site.get())
 				{
 					 /// TODO
 				}
 				else
-				{
+				{ /// TODO take into account of _classFilter
 					_registerItems<Place>(
 						*pm,
-						GeographyModule::GetGeneralAllPlacesMatcher().bestMatches(_text, _number ? *_number : 0)
-					);
+						GeographyModule::GetGeneralAllPlacesMatcher().bestMatches(
+							_text,
+							_number ? *_number : 0,
+							_minScore
+					)	);
 				}
 				result.insert(DATA_PLACES, pm);
 			}
@@ -704,9 +754,12 @@ namespace synthese
 
 
 
-		shared_ptr<const NamedPlace> PlacesListService::getPlaceFromBestResult(
+		PlacesListService::PlaceResult PlacesListService::getPlaceFromBestResult(
 			const ParametersMap& result
 		) const {
+
+			PlacesListService::PlaceResult placeResult;
+
 			if(_sorted)
 			{
 				shared_ptr<ParametersMap> bestPlaceMap(*result.getSubMaps(DATA_BEST_PLACE).begin());
@@ -715,61 +768,51 @@ namespace synthese
 				ParametersMap::SubMapsKeys keys(bestPlaceMap->getSubMapsKeys());
 				if(keys.empty())
 				{
-					return shared_ptr<const NamedPlace>();
+					return placeResult;
 				}
 				string className(*keys.begin());
+				shared_ptr<ParametersMap> itemMap(
+					*bestPlaceMap->getSubMaps(className).begin()
+				);
+				placeResult.score.phoneticScore = itemMap->get<double>(DATA_PHONETIC_SCORE);
+				placeResult.score.levenshtein = itemMap->get<size_t>(DATA_LEVENSHTEIN);
+				placeResult.key = itemMap->get<string>(DATA_KEY);
 
 				// City
 				if(className == DATA_CITY)
 				{
-					shared_ptr<const City> city(
-						Env::GetOfficialEnv().get<City>(
-							(*bestPlaceMap->getSubMaps(DATA_CITY).begin())->get<RegistryKeyType>(
+					placeResult.value = static_pointer_cast<Place, City>(
+						Env::GetOfficialEnv().getEditable<City>(
+							itemMap->get<RegistryKeyType>(
 								City::DATA_CITY_ID
 					)	)	);
-					if(!city->getIncludedPlaces().empty())
-					{
-						const Place* mainPlace(*city->getIncludedPlaces().begin());
-						if(dynamic_cast<const StopArea*>(mainPlace))
-						{
-							return static_pointer_cast<const NamedPlace, const StopArea>(
-								Env::GetOfficialEnv().getSPtr(
-									dynamic_cast<const StopArea*>(mainPlace)
-							)	);
-						}
-					}
-					if(city->getLexicalMatcher(StopArea::FACTORY_KEY).size())
-					{
-						return
-							city->getLexicalMatcher(StopArea::FACTORY_KEY).entries().begin()->second;
-					}
 				}
 				else if(className == DATA_STOP)
 				{
-					return
-						Env::GetOfficialEnv().get<StopArea>(
-							(*bestPlaceMap->getSubMaps(DATA_STOP).begin())->get<RegistryKeyType>(
+					placeResult.value = static_pointer_cast<Place, StopArea>(
+						Env::GetOfficialEnv().getEditable<StopArea>(
+							itemMap->get<RegistryKeyType>(
 								StopArea::DATA_STOP_ID
-						)	);
+					)	)	);
 				}
 				else if(className == DATA_ROAD)
 				{
-					return
-						Env::GetOfficialEnv().get<RoadPlace>(
-							(*bestPlaceMap->getSubMaps(DATA_ROAD).begin())->get<RegistryKeyType>(
+					placeResult.value = static_pointer_cast<Place, RoadPlace>(
+						Env::GetOfficialEnv().getEditable<RoadPlace>(
+							itemMap->get<RegistryKeyType>(
 								RoadPlace::DATA_ID
-					)	);
+					)	)	);
 				}
 				else if(className == DATA_PUBLIC_PLACE)
 				{
-					return
-						Env::GetOfficialEnv().get<PublicPlace>(
-							(*bestPlaceMap->getSubMaps(DATA_PUBLIC_PLACE).begin())->get<RegistryKeyType>(
+					placeResult.value = static_pointer_cast<Place, PublicPlace>(
+						Env::GetOfficialEnv().getEditable<PublicPlace>(
+							itemMap->get<RegistryKeyType>(
 								PublicPlace::DATA_ID
-						)	);
+					)	)	);
 				}
 			}
 
-			return shared_ptr<NamedPlace>();
+			return placeResult;
 		}
 }	}
