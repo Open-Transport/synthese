@@ -47,6 +47,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
+	using namespace geography;
 	using namespace graph;
 	using namespace html;
 	using namespace server;
@@ -105,14 +106,18 @@ namespace synthese
 			Request fakeRequest;
 			placesListService.setNumber(1);
 			placesListService.setText(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE));
-			_departurePlace = placesListService.getPlaceFromBestResult(
-				placesListService.run(fakeStream, fakeRequest)
+			_departurePlace = dynamic_pointer_cast<NamedPlace, Place>(
+				placesListService.getPlaceFromBestResult(
+					placesListService.run(fakeStream, fakeRequest)
+				).value
 			);
 
 			// Arrival place
 			placesListService.setText(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE));
-			_arrivalPlace = placesListService.getPlaceFromBestResult(
-				placesListService.run(fakeStream, fakeRequest)
+			_arrivalPlace = dynamic_pointer_cast<NamedPlace, Place>(
+				placesListService.getPlaceFromBestResult(
+					placesListService.run(fakeStream, fakeRequest)
+				).value
 			);
 
 			// Date and time

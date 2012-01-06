@@ -421,8 +421,10 @@ namespace synthese
 					Request fakeRequest;
 					placesListService.setNumber(1);
 					placesListService.setText(map.getDefault<string>(PARAMETER_ORIGIN_PLACE));
-					_departurePlace = placesListService.getPlaceFromBestResult(
-						placesListService.run(fakeStream, fakeRequest)
+					_departurePlace = dynamic_pointer_cast<NamedPlace, Place>(
+						placesListService.getPlaceFromBestResult(
+							placesListService.run(fakeStream, fakeRequest)
+						).value
 					);
 
 					/// TODO check if the origin belong to the area
@@ -435,8 +437,10 @@ namespace synthese
 
 					// Arrival place
 					placesListService.setText(map.getDefault<string>(PARAMETER_DESTINATION_PLACE));
-					_arrivalPlace = placesListService.getPlaceFromBestResult(
-						placesListService.run(fakeStream, fakeRequest)
+					_arrivalPlace = dynamic_pointer_cast<NamedPlace, Place>(
+						placesListService.getPlaceFromBestResult(
+							placesListService.run(fakeStream, fakeRequest)
+						).value
 					);
 
 					/// TODO check if the destinations belong to the area

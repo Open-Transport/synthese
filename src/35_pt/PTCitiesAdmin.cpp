@@ -132,6 +132,11 @@ namespace synthese
 			)	);
 			stream << t.close();
 
+			// Search service
+			ParametersMap pm(
+				_placesListService.run(stream, request)
+			);
+
 			// Informations about the query
 			if(!_placesListService.getText().empty())
 			{
@@ -139,7 +144,8 @@ namespace synthese
 				stream <<
 					"<p>Phonétique du texte recherché : " <<
 					FrenchSentence(_placesListService.getText()).getPhoneticString() <<
-					"</p>";
+					"<br />Tests formats normalisés :"
+				;
 
 				// XML response
 				StaticFunctionRequest<PlacesListService> testRequest;
@@ -150,12 +156,13 @@ namespace synthese
 				// JSON response
 				testRequest.getFunction()->setOutputFormat(PlacesListService::VALUE_JSON);
 				stream << HTMLModule::getLinkButton(testRequest.getURL(), "Réponse JSON");
-			}
 
-			// Search service
-			ParametersMap pm(
-				_placesListService.run(stream, request)
-			);
+				// Best match
+				PlacesListService::PlaceResult placeResult(
+					_placesListService.getPlaceFromBestResult(pm)
+				);
+				stream << "<br />Meilleure correspondance : " << placeResult.key.getSource() << "</p>";
+			}
 
 			// Remove request (common for place class)
 			AdminActionFunctionRequest<RemoveObjectAction, PTCitiesAdmin> removeRequest(request);

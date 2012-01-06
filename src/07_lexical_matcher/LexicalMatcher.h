@@ -77,7 +77,8 @@ namespace synthese
 
 				MatchResult	bestMatches(
 					const std::string& fuzzyKey,
-					size_t nbMatches
+					size_t nbMatches,
+					double minScore = 0
 				) const;
 
 				MatchResult	match(
@@ -122,14 +123,15 @@ namespace synthese
 		template<class T>
 		typename LexicalMatcher<T>::MatchResult LexicalMatcher<T>::bestMatches(
 			const std::string& fuzzyKey,
-			size_t nbMatches
+			size_t nbMatches,
+			double minScore
 		) const {
 			if(_map.empty ())
 			{
 				return typename LexicalMatcher<T>::MatchResult();
 			}
 
-			MatchResult result = match(fuzzyKey, 0.0, 0);
+			MatchResult result = match(fuzzyKey, minScore, 0);
 
 			if(nbMatches && result.size () > nbMatches)
 			{
