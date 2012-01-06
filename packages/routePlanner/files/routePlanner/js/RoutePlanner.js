@@ -69,7 +69,7 @@ var RoutePlannerView = Backbone.View.extend({
 // Legacy interface -----------------------------------------------------------
 
 /**
- * Initialize the route planner form to enalbe auto completion on the inputs.
+ * Initialize the route planner form to enable auto completion on the inputs.
  * Synthese.init(SITE_ID) needs to be called first in order to set the site id.
  */
 function initAutoCompletions() {
@@ -82,19 +82,30 @@ function initAutoCompletions() {
   initAutoCompleteForm(
     document.forms[legacyRoutePlannerConfig.routePlannerFormName],
     document.getElementById("submitButton"));
-  initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
-  }, document.getElementById("origin_place_txt"), null, null);
-  initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
-  }, null, null, null);
-  initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
-    return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
-  }, document.getElementById("destination_place_txt"), null, null);
-  initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
-    return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
-  }, null, null, null);
-  document.getElementById("origin_city_txt").focus();
+  if(!legacyRoutePlannerConfig.routePlannerFormOneField) {
+    initAutoCompleteField(0, document.getElementById("origin_city_txt"), null, function (city, place) {
+      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
+    }, document.getElementById("origin_place_txt"), null, null);
+    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_city_txt"), function (city, place) {
+      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
+    }, null, null, null);
+    initAutoCompleteField(2, document.getElementById("destination_city_txt"), null, function (city, place) {
+      return Synthese.URL + '?fonction=lc&n=10&at_least_a_stop=1&si=' + Synthese.siteId + '&t=' + city + '';
+    }, document.getElementById("destination_place_txt"), null, null);
+    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_city_txt"), function (city, place) {
+      return Synthese.URL + '?ct=' + city + '&fonction=lp&n=10&si=' + Synthese.siteId + '&t=' + place + '';
+    }, null, null, null);
+    document.getElementById("origin_city_txt").focus();
+  }
+  else {
+    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_place_class"), function (place, place2) {
+      return Synthese.URL + '?fonction=places_list&number=3&si=' + Synthese.siteId + '&text=' + place + '';
+    }, null, null, null);
+    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_place_class"), function (place, place2) {
+      return Synthese.URL + '?fonction=places_list&number=3&si=' + Synthese.siteId + '&text=' + place + '';
+    }, null, null, null);
+    document.getElementById("origin_place_txt").focus();
+  }
   if (document.getElementById("fh")) {
     addEvent(document.getElementById("fh"), "mouseover", mouse_event_handler);
     addEvent(document.getElementById("fh"), "click", mouse_click_handler);

@@ -5,8 +5,12 @@ var legacyRoutePlannerConfig = {
   // NOTE: the request is made if the number of typed characters is greater
   // than this value.
   minCharsToTriggerAutocomplete: 2,
-  // Name of the route planner form.
-  routePlannerFormName: "ri"
+  // Name of the route planner form
+  routePlannerFormName: "ri",
+  // Type of autocomplete form
+  // false -> city and place input fields
+  // true -> only one input field
+  routePlannerFormOneField: false
 };
 
 function swapValues(element1, element2) {
@@ -150,7 +154,7 @@ function escapeURI(La) {
     return encodeURIComponent(La);
   }
   if (escape) {
-    return escape(La)
+    return escape(La);
   }
 }
 
@@ -160,7 +164,7 @@ function callSuggestions(i, valeur) {
   // appel à l'url distante
   var city = "";
   var place = "";
-  if (_secondaryField[i])
+  if ((_secondaryField[i]) && (!legacyRoutePlannerConfig.routePlannerFormOneField))
   {
     city = _secondaryField[i].value;
     place = valeur;
@@ -222,16 +226,88 @@ function getFromCache(value1, value2) {
 
 // Transformation XML en tableau
 function traiteXmlSuggestions(xmlDoc) {
-  var options = xmlDoc.getElementsByTagName('option');
-  var optionsListe = new Array();
-  for (var i = 0; i < options.length; ++i) {
-    optionsListe.push(
-    new Array(
-      options[i].firstChild.data,
-      options[i].getAttribute('cityName'),
-      options[i].getAttribute('name')));
+  var optionsListe = new Array();   
+  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+    // Best place
+    var bestPlaceNode = xmlDoc.getElementsByTagName('best_place')[0];
+    optionsListe.push(new Array('Meilleure proposition : ', '', '',null));
+    var cities = bestPlaceNode.getElementsByTagName('city');
+    var stops = bestPlaceNode.getElementsByTagName('stop');
+    var roads = bestPlaceNode.getElementsByTagName('road');
+    if(cities.length > 0) {
+      optionsListe.push(traiteXmlCity(cities[0]));
+    }
+    if(stops.length > 0) {
+      optionsListe.push(traiteXmlStop(stops[0]));
+    }
+    if(roads.length > 0) {
+      optionsListe.push(traiteXmlRoad(roads[0]));
+    }
+    // Cities
+    var citiesNode = xmlDoc.getElementsByTagName('cities')[0];
+    var cities = citiesNode.getElementsByTagName('city');
+    if(cities.length > 0) {
+      optionsListe.push(new Array('Communes : ', '', '',null));
+    }
+    for (var i = 0; i < cities.length; ++i) {
+      optionsListe.push(traiteXmlCity(cities[i]));
+    }
+    
+    // Stops
+    var stopsNode = xmlDoc.getElementsByTagName('stops')[0];
+    var stops = stopsNode.getElementsByTagName('stop');
+    if(stops.length > 0) {
+      optionsListe.push(new Array('Arrêts : ', '', '',null));
+    }
+    for (var i = 0; i < stops.length; ++i) {
+      optionsListe.push(traiteXmlStop(stops[i]));
+    }
+    
+    // Roads
+    var roadsNode = xmlDoc.getElementsByTagName('roads')[0];
+    var roads = roadsNode.getElementsByTagName('road');
+    if(roads.length > 0) {
+      optionsListe.push(new Array('Rues : ', '', '',null));
+    }
+    for (var i = 0; i < roads.length; ++i) {
+      optionsListe.push(traiteXmlRoad(roads[i]));
+    }
+  }
+  else {
+    var options = xmlDoc.getElementsByTagName('option');
+    for (var i = 0; i < options.length; ++i) {
+      optionsListe.push(
+      new Array(
+        options[i].firstChild.data,
+        options[i].getAttribute('cityName'),
+        options[i].getAttribute('name')));
+    }
   }
   return optionsListe;
+}
+
+function traiteXmlCity(city) {
+  return new Array(
+    city.getAttribute('key'),
+    city.getAttribute('city_name'),
+    '',
+    'city');
+}
+
+function traiteXmlStop(stop) {
+  return new Array(
+    stop.getAttribute('key'),
+    stop.getAttribute('cityName'),
+    stop.getAttribute('stop_name'),
+    'stop');
+}
+
+function traiteXmlRoad(road) {
+  return new Array(
+    road.getAttribute('key'),
+    road.getAttribute('city_name'),
+    road.getAttribute('name'),
+    'road');
 }
 
 function initStyle() {
@@ -245,14 +321,18 @@ function setStyleForElement(c, name) {
   c.className = name;
 }
 
+function getStyleForElement(c) {
+  return c.className;
+}
+
 // calcule le décalage à gauche
 function calculateOffsetLeft(r) {
-  return calculateOffset(r, "offsetLeft")
+  return calculateOffset(r, "offsetLeft");
 }
 
 // calcule le décalage vertical
 function calculateOffsetTop(r) {
-  return calculateOffset(r, "offsetTop")
+  return calculateOffset(r, "offsetTop");
 }
 
 function calculateOffset(r, attr) {
@@ -261,7 +341,7 @@ function calculateOffset(r, attr) {
     kb += r[attr];
     r = r.offsetParent;
   }
-  return kb
+  return kb;
 }
 
 // calcule la largeur du champ
@@ -292,7 +372,7 @@ function creeAutocompletionDiv() {
   _completeDiv.style.paddingLeft = "0";
   _completeDiv.style.paddingTop = "0";
   _completeDiv.style.paddingBottom = "0";
-  _completeDiv.style.visibility = "hidden";
+  _completeDiv.style.display = "none";
   _completeDiv.style.position = "absolute";
   _completeDiv.style.backgroundColor = "white";
   document.body.appendChild(_completeDiv);
@@ -311,10 +391,15 @@ function drawList(i, valeur, liste) {
   _currentList = liste;
   for (var f = 0; f < liste.length; ++f) {
     var nouveauDiv = document.createElement("DIV");
-    nouveauDiv.onmousedown = divOnMouseDown;
-    nouveauDiv.onmouseover = divOnMouseOver;
-    nouveauDiv.onmouseout = divOnMouseOut;
-    setStyleForElement(nouveauDiv, "autoCompleteDiv");
+    if((!legacyRoutePlannerConfig.routePlannerFormOneField) || (liste[f][3] != null)) {
+      nouveauDiv.onmousedown = divOnMouseDown;
+      nouveauDiv.onmouseover = divOnMouseOver;
+      nouveauDiv.onmouseout = divOnMouseOut;
+      setStyleForElement(nouveauDiv, "autoCompleteDiv");
+    }
+    else {
+       setStyleForElement(nouveauDiv, "autoCompleteDivTitle");   
+    }
     var nouveauSpan = document.createElement("SPAN");
     nouveauSpan.innerHTML = liste[f][0]; // le texte de la suggestion
     nouveauDiv.appendChild(nouveauSpan);
@@ -336,7 +421,7 @@ function hideList() {
 }
 
 function isListVisible() {
-  return _completeDiv && _completeDiv.style && _completeDiv.style.visibility == 'visible';
+  return _completeDiv && _completeDiv.style && _completeDiv.style.display == 'block';
 }
 
 var _eventKeycode = null;
@@ -370,11 +455,14 @@ function handleAutoComplete(keyCode, i) {
   _timeOut = null;
   var inputField = _inputField[i];
   var cityId = null;
-  if (_secondaryField[i])
-  {
+  if ((_secondaryField[i]) && (!legacyRoutePlannerConfig.routePlannerFormOneField)) {
     for (cityId = 0; cityId < _inputField.length; ++cityId)
       if (_inputField[cityId] == _secondaryField[i])
         break;
+  }
+
+  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+    _secondaryField[i].value = '';
   }
 
   // On input value change
@@ -427,6 +515,11 @@ function setAndJump(id, value, idCity, cityValue) {
     _inputField[idCity].value = cityValue;
   }
   _inputField[id].value = value;
+
+  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+    _secondaryField[id].value = _currentList[_highlightedSuggestionIndex][3];
+  }
+  
   hideList();
 
   var next;
@@ -448,9 +541,10 @@ function highlight(n) {
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
   var suggestionLongueur = suggestionList.length;
   for (var l = 0; l < suggestionLongueur; ++l) {
-    setStyleForElement(suggestionList.item(l), "autoCompleteDiv");
+    if(getStyleForElement(suggestionList.item(l)) != "autoCompleteDivTitle")
+      setStyleForElement(suggestionList.item(l), "autoCompleteDiv");
   }
-  if (_highlightedSuggestionDiv)
+  if ((_highlightedSuggestionDiv) && (getStyleForElement(_highlightedSuggestionDiv) != "autoCompleteDivTitle"))
     setStyleForElement(_highlightedSuggestionDiv, "autoCompleteDivAct");
 }
 
@@ -477,18 +571,25 @@ function PressAction(i) {
     showCompleteDiv(i)
   }
   var trouve = false;
-  // si on a du texte sur lequel travailler
-  if (_currentInputFieldValue[i].length > 0) {
-    var indice;
-    // T vaut true si on a dans la liste de suggestions un mot commencant comme l'entrée utilisateur
-    for (indice = 0; indice < suggestionLongueur; indice++) {
-      if (getSuggestion(suggestionList.item(indice)).toUpperCase().indexOf(_currentInputFieldValue[i].toUpperCase()) == 0) {
-        trouve = true;
-        break
+  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+    if(suggestionLongueur > 1)
+      highlight(1);
+  }
+  else
+  {
+    // si on a du texte sur lequel travailler
+    if (_currentInputFieldValue[i].length > 0) {
+      var indice;
+      // T vaut true si on a dans la liste de suggestions un mot commencant comme l'entrée utilisateur
+      for (indice = 0; indice < suggestionLongueur; indice++) {
+        if (getSuggestion(suggestionList.item(indice)).toUpperCase().indexOf(_currentInputFieldValue[i].toUpperCase()) == 0) {
+          trouve = true;
+          break
+        }
       }
     }
+    highlight(0);
   }
-  highlight(0);
 }
 
 // taille de la selection dans le champ input
@@ -500,7 +601,7 @@ function rangeSize(n) {
   } else if (n.setSelectionRange) {
     N = n.selectionEnd - n.selectionStart
   }
-  return N
+  return N;
 }
 
 // taille du champ input non selectionne
@@ -515,7 +616,7 @@ function beforeRangeSize(n) {
   } else {
     v = -1
   }
-  return v
+  return v;
 }
 
 
@@ -524,7 +625,7 @@ function getSuggestion(uneDiv) {
   if (!uneDiv) {
     return null;
   }
-  return trimCR(uneDiv.getElementsByTagName('span')[0].firstChild.data)
+  return trimCR(uneDiv.getElementsByTagName('span')[0].firstChild.data);
 }
 
 // supprime les caractères retour chariot et line feed d'une chaine de caractères
@@ -534,17 +635,17 @@ function trimCR(chaine) {
       nChaine += chaine.charAt(f);
     }
   }
-  return nChaine
+  return nChaine;
 }
 
 // Cache completement les choix de completion
 function hideCompleteDiv() {
-  _completeDiv.style.visibility = "hidden"
+  _completeDiv.style.display = "none"
 }
 
 // Rends les choix de completion visibles
 function showCompleteDiv(i) {
-  _completeDiv.style.visibility = "visible";
+  _completeDiv.style.display = "block";
   setCompleteDivSize(i)
 }
 
@@ -915,4 +1016,3 @@ function hidePopup() {
     fadeDiv.style.visibility = 'hidden';
   document.getElementById('routesMap').style.display = 'none';
 }
-
