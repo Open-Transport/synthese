@@ -84,6 +84,7 @@ namespace synthese
 		){
 			_placesListService._setFromParametersMap(map);
 			_placesListService.setNumber(10);
+			_placesListService.setOutputFormat(string());
 		}
 
 

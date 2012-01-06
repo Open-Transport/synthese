@@ -57,7 +57,7 @@ namespace synthese
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<FareAdmin>::ICON("database_edit.png");
-		template<> const string AdminInterfaceElementTemplate<FareAdmin>::DEFAULT_TITLE("Mode");
+		template<> const string AdminInterfaceElementTemplate<FareAdmin>::DEFAULT_TITLE("Tarification");
 	}
 
 	namespace pt

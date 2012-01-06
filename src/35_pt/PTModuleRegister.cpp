@@ -50,6 +50,8 @@
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
 
+#include "ContactCenterAdmin.hpp"
+#include "ContactCentersAdmin.hpp"
 #include "DestinationAdmin.hpp"
 #include "DestinationsAdmin.hpp"
 #include "FareAdmin.h"
@@ -84,6 +86,7 @@
 #include "CleanAllStopPointProjectionsAction.hpp"
 #include "CommercialLineCalendarTemplateUpdateAction.hpp"
 #include "CommercialLineUpdateAction.h"
+#include "ContactCenterUpdateAction.hpp"
 #include "CopyGeometriesAction.hpp"
 #include "DestinationUpdateAction.hpp"
 #include "DeviateServiceAction.hpp"
@@ -199,6 +202,8 @@ void synthese::pt::moduleRegister()
 	synthese::pt::TridentFileFormat::integrate();
 	synthese::pt::StopsShapeFileFormat::integrate();
 
+	synthese::pt::ContactCenterAdmin::integrate();
+	synthese::pt::ContactCentersAdmin::integrate();
 	synthese::pt::DestinationAdmin::integrate();
 	synthese::pt::DestinationsAdmin::integrate();
 	synthese::pt::FreeDRTAreaAdmin::integrate();
@@ -242,6 +247,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::CleanAllStopPointProjectionsAction::integrate();
 	synthese::pt::CommercialLineCalendarTemplateUpdateAction::integrate();
 	synthese::pt::CommercialLineUpdateAction::integrate();
+	synthese::pt::ContactCenterUpdateAction::integrate();
 	synthese::pt::ContinuousServiceUpdateAction::integrate();
 	synthese::pt::CopyGeometriesAction::integrate();
 	synthese::pt::DestinationUpdateAction::integrate();

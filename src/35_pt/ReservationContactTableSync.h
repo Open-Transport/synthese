@@ -23,27 +23,27 @@
 #ifndef SYNTHESE_ReservationRuleTableSync_H__
 #define SYNTHESE_ReservationRuleTableSync_H__
 
+#include "DBRegistryTableSyncTemplate.hpp"
 
+#include <iostream>
 #include <vector>
 #include <string>
-#include <iostream>
-
 #include <boost/shared_ptr.hpp>
-
-#include "ReservationContact.h"
-#include "DBRegistryTableSyncTemplate.hpp"
 
 namespace synthese
 {
 	namespace pt
 	{
+		class ReservationContact;
+
 		/** Reservation contact table synchronizer.
 			@ingroup m35LS refLS
 		*/
-		class ReservationContactTableSync
-		:	public db::DBRegistryTableSyncTemplate<ReservationContactTableSync,ReservationContact>
+		class ReservationContactTableSync:
+			public db::DBRegistryTableSyncTemplate<ReservationContactTableSync, ReservationContact>
 		{
 		public:
+			static const std::string COL_NAME;
 			static const std::string COL_PHONEEXCHANGENUMBER;
 			static const std::string COL_PHONEEXCHANGEOPENINGHOURS;
 			static const std::string COL_DESCRIPTION;
@@ -61,14 +61,16 @@ namespace synthese
 				@author Hugues Romain
 				@date 2006
 			*/
-			static void Search(
+			static SearchResult Search(
 				util::Env& env,
-				int first = 0,
-				int number = 0,
+				boost::optional<const std::string&> name = boost::optional<const std::string&>(),
+				bool orderByName = true,
+				bool raisingOrder = true,
+				size_t first = 0,
+				size_t number = 0,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ReservationRuleTableSync_H__
