@@ -24,45 +24,62 @@
 
 #include "FreeDRTBookingAdmin.hpp"
 
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "AdminParametersException.h"
 #include "BookableCommercialLineAdmin.h"
+#include "BookReservationAction.h"
 #include "FreeDRTArea.hpp"
 #include "FreeDRTTimeSlot.hpp"
+#include "Language.hpp"
 #include "ParametersMap.h"
+#include "PlacesListService.hpp"
 #include "ResaModule.h"
 #include "ResaRight.h"
+#include "ResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace admin;
+	using namespace graph;
+	using namespace html;
 	using namespace server;
 	using namespace util;
 	using namespace security;
 	using namespace resa;
 	using namespace pt;
+	using namespace pt_website;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTBookingAdmin>::FACTORY_KEY("FreeDRTBookingAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, FreeDRTBookingAdmin>::FACTORY_KEY = "FreeDRTBooking";
 	}
 
 	namespace admin
 	{
 		template<> const string AdminInterfaceElementTemplate<FreeDRTBookingAdmin>::ICON = "resa_compulsory.png";
-		template<> const string AdminInterfaceElementTemplate<FreeDRTBookingAdmin>::DEFAULT_TITLE = "R�servation TAD lib�ralis�";
+		template<> const string AdminInterfaceElementTemplate<FreeDRTBookingAdmin>::DEFAULT_TITLE = "Saisie de réservation";
 	}
 
 	namespace resa
 	{
 		const string FreeDRTBookingAdmin::PARAMETER_AREA_ID = "area_id";
+		const string FreeDRTBookingAdmin::PARAMETER_ARRIVAL_PLACE = "arrival_place";
+		const string FreeDRTBookingAdmin::PARAMETER_DATE = "date";
+		const string FreeDRTBookingAdmin::PARAMETER_DEPARTURE_PLACE = "departure_place";
+		const string FreeDRTBookingAdmin::PARAMETER_TIME = "time";
 
 
 
-		FreeDRTBookingAdmin::FreeDRTBookingAdmin()
-			: AdminInterfaceElementTemplate<FreeDRTBookingAdmin>()
+		FreeDRTBookingAdmin::FreeDRTBookingAdmin(
+		):	AdminInterfaceElementTemplate<FreeDRTBookingAdmin>(),
+			_dateTime(second_clock::local_time())
 		{ }
 
 
@@ -81,6 +98,30 @@ namespace synthese
 			{
 				throw AdminParametersException("No such free DRT time slot");
 			}
+
+			// Departure place
+			PlacesListService placesListService;
+			stringstream fakeStream;
+			Request fakeRequest;
+			placesListService.setNumber(1);
+			placesListService.setText(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE));
+			_departurePlace = placesListService.getPlaceFromBestResult(
+				placesListService.run(fakeStream, fakeRequest)
+			);
+
+			// Arrival place
+			placesListService.setText(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE));
+			_arrivalPlace = placesListService.getPlaceFromBestResult(
+				placesListService.run(fakeStream, fakeRequest)
+			);
+
+			// Date and time
+			_dateTime = ptime(
+				from_string(map.get<string>(PARAMETER_DATE)),
+				map.getDefault<string>(PARAMETER_TIME).empty() ?
+				minutes(0) :
+				duration_from_string(map.get<string>(PARAMETER_TIME))
+			);
 		}
 
 
@@ -89,10 +130,29 @@ namespace synthese
 		{
 			ParametersMap m;
 
-			// Time slot
+			// Area
 			if(_area.get())
 			{
 				m.insert(PARAMETER_AREA_ID, _area->getKey());
+			}
+
+			// Departure place
+			if(_departurePlace.get())
+			{
+				m.insert(PARAMETER_DEPARTURE_PLACE, _departurePlace->getKey());
+			}
+
+			// Arrival place
+			if(_arrivalPlace.get())
+			{
+				m.insert(PARAMETER_ARRIVAL_PLACE, _arrivalPlace->getKey());
+			}
+
+			// Date time
+			if(!_dateTime.is_not_a_date_time())
+			{
+				m.insert(PARAMETER_DATE, _dateTime.date());
+				m.insert(PARAMETER_TIME, _dateTime.time_of_day());
 			}
 
 			return m;
@@ -113,7 +173,196 @@ namespace synthese
 			const admin::AdminRequest& request
 		) const	{
 
-			
+			// Query form
+			AdminFunctionRequest<FreeDRTBookingAdmin> queryRequest(request);
+			SearchFormHTMLTable t(queryRequest.getHTMLForm("query"));
+			stream << t.open();
+			stream << t.cell(
+				"Départ",
+				t.getForm().getTextInput(
+					PARAMETER_DEPARTURE_PLACE,
+					_departurePlace.get() ? _departurePlace->getFullName() : string()
+			)	);
+			stream << t.cell(
+				"Arrivée",
+				t.getForm().getTextInput(
+				PARAMETER_ARRIVAL_PLACE,
+				_arrivalPlace.get() ? _arrivalPlace->getFullName() : string()
+			)	);
+			stream << t.row();
+			const Language& language(
+				request.getUser()->getLanguage() ?
+					*request.getUser()->getLanguage() :
+					Language::GetLanguageFromIso639_1Code("fr")
+			);
+			vector<pair<optional<string>, string> > dates;
+			vector<pair<optional<string>, string> > times;
+			{
+				date date(day_clock::local_day());
+				for(size_t i=0; i<14; ++i)
+				{
+					dates.push_back(
+						make_pair(
+							to_iso_extended_string(date),
+							language.getWeekDayName(date.day_of_week()) +" "+ to_simple_string(date)
+					)	);
+					date += days(1);
+				}
+				for(size_t i=0; i<24; ++i)
+				{
+					times.push_back(
+						make_pair(
+							lexical_cast<string>(i) +":00",
+							lexical_cast<string>(i) +":00"
+					)	);
+				}
+			}
+
+			stream << t.cell(
+				"Date",
+				t.getForm().getSelectInput(
+					PARAMETER_DATE,
+					dates,
+					optional<string>(to_iso_extended_string(_dateTime.date()))
+			)	);
+			stream << t.cell(
+				"Heure",
+				t.getForm().getSelectInput(
+					PARAMETER_TIME,
+					times,
+					optional<string>(lexical_cast<string>(_dateTime.time_of_day().hours())+":00")
+			)	);
+			stream << t.close();
+
+			// Result
+			if(	_departurePlace.get() &&
+				_departurePlace->getPoint().get() &&
+				_arrivalPlace.get() &&
+				_arrivalPlace->getPoint().get()
+			){
+				/// TODO check if the places belong to the area
+
+				// Declarations
+				typedef map<
+					ptime,
+					ptime
+				> Results;
+				Results results;
+
+				// Begin and end times
+				ptime beginTime(_dateTime);
+				beginTime -= hours(3);
+				ptime endTime(_dateTime);
+				endTime += hours(3);
+
+				// Time slots
+				BOOST_FOREACH(const Service* itServ, _area->getServices())
+				{
+					// Declarations
+					const FreeDRTTimeSlot& timeSlot(static_cast<const FreeDRTTimeSlot&>(*itServ));
+
+					// Calendar check
+					if(!timeSlot.isActive(_dateTime.date()))
+					{
+						continue;
+					}
+
+					// Title
+					stream << "<h1>Service " << timeSlot.getServiceNumber() << " (" <<
+						timeSlot.getFirstDeparture() << " à " << timeSlot.getLastArrival() <<
+						")</h1>"
+					;
+
+					// Best journey time at min speed
+					double dst(
+						_arrivalPlace->getPoint()->distance(
+							_departurePlace->getPoint().get()
+					)	);
+					time_duration bestCommercialJourneyTime(
+						minutes(long(0.06 * dst / timeSlot.getCommercialSpeed()))
+					);
+
+
+					// Time bounds
+					ptime lowerBound(_dateTime.date(), timeSlot.getFirstDeparture());
+					if(lowerBound < beginTime)
+					{
+						lowerBound = beginTime;
+					}
+					ptime upperBound(_dateTime.date(), timeSlot.getLastArrival());
+					upperBound -= bestCommercialJourneyTime;
+					if(upperBound > endTime)
+					{
+						upperBound = endTime;
+					}
+
+					// Reservations
+					/// TODO
+
+					// Time loop
+					for(ptime curTime(lowerBound);
+						curTime <= upperBound;
+						curTime = curTime + minutes(5)
+					){
+						// Reservations check
+						/// TODO
+
+						// Storage
+						results.insert(
+							make_pair(
+								curTime,
+								curTime + bestCommercialJourneyTime
+						)	);
+					}
+
+					// The form
+					AdminActionFunctionRequest<BookReservationAction, FreeDRTBookingAdmin> bookRequest(request);
+					bookRequest.setActionWillCreateObject();
+					bookRequest.getAction()->setFreeDRTTimeSlot(
+						const_pointer_cast<FreeDRTTimeSlot>(
+							Env::GetOfficialEnv().getSPtr(&timeSlot)
+					)	);
+					HTMLForm f(bookRequest.getHTMLForm("book"));
+					stream << f.open();
+
+					// The table
+					HTMLTable::ColsVector c;
+					c.push_back(string());
+					c.push_back("Départ");
+					c.push_back("Arrivée");
+					c.push_back("Durée");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+					BOOST_FOREACH(const Results::value_type& result, results)
+					{
+						// New row
+						stream << t.row();
+
+						// Form
+						stream << t.col() <<
+							f.getRadioInput(
+								BookReservationAction::PARAMETER_DATE_TIME,
+								optional<string>(
+									to_iso_extended_string(result.first.date()) + " " +
+										to_simple_string(result.first.time_of_day())
+								),
+								optional<string>()
+							);
+
+						// Departure time
+						stream << t.col() << to_simple_string(result.first.time_of_day());
+
+						// Arrival time
+						stream << t.col() << to_simple_string(result.second.time_of_day());
+
+						// Duration
+						stream << t.col() << to_simple_string(result.second - result.first);
+					}
+					stream << t.close();
+
+					// Form is closed too
+					stream << f.close();
+			}	}
 		}
 
 

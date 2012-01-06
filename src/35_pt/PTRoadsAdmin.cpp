@@ -29,7 +29,7 @@
 #include "TransportNetworkRight.h"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
-#include "Road.h"
+#include "MainRoadPart.hpp"
 #include "PTRoadAdmin.h"
 #include "AdminFunctionRequest.hpp"
 #include "PTCitiesAdmin.h"
@@ -124,7 +124,7 @@ namespace synthese
 			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 			{
 				openRoadRequest.getPage()->setRoad(
-					Env::GetOfficialEnv().getSPtr(static_cast<Road*>(road))
+					Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road))
 				);
 
 				stream << t.row();
@@ -153,7 +153,7 @@ namespace synthese
 				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 				{
 					shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
-					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<Road*>(road)));
+					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road)));
 					links.push_back(p);
 				}
 			}

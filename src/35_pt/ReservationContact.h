@@ -23,7 +23,9 @@
 #ifndef SYNTHESE_ENV_RESERVATIONRULE_H
 #define SYNTHESE_ENV_RESERVATIONRULE_H
 
+#include "Named.h"
 #include "Registrable.h"
+
 #include "Registry.h"
 
 namespace synthese
@@ -33,8 +35,9 @@ namespace synthese
 		/** Reservation contact.
 			@ingroup m35
 		*/
-		class ReservationContact
-		:	public virtual util::Registrable
+		class ReservationContact:
+			public virtual util::Registrable,
+			public util::Named
 		{
 		public:
 

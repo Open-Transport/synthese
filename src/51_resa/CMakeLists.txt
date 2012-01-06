@@ -71,10 +71,6 @@ ReservationConfirmationEMailItemInterfacePage.cpp
 ReservationConfirmationEMailItemInterfacePage.h
 ReservationConfirmationEMailSubjectInterfacePage.cpp
 ReservationConfirmationEMailSubjectInterfacePage.h
-ReservationContactAdmin.cpp
-ReservationContactAdmin.h
-ReservationContactsAdmin.cpp
-ReservationContactsAdmin.h
 ReservationEditFunction.cpp
 ReservationEditFunction.h
 ReservationEditInterfacePage.cpp

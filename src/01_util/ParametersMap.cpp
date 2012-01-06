@@ -479,6 +479,18 @@ namespace synthese
 
 
 
+		ParametersMap::SubMapsKeys ParametersMap::getSubMapsKeys() const
+		{
+			SubMapsKeys result;
+			BOOST_FOREACH(const SubParametersMap::value_type& item, _subMap)
+			{
+				result.insert(item.first);
+			}
+			return result;
+		}
+
+
+
 		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
 			_field(field),
 			_message("Missing parameter in request parsing : " + _field)

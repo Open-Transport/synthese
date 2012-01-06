@@ -72,6 +72,7 @@ namespace synthese
 			static const std::string PARAMETER_ITEM_PAGE_ID;
 			static const std::string PARAMETER_CLASS_PAGE_ID;
 
+			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
 			static const std::string DATA_PLACES;
 			static const std::string DATA_STOPS;
@@ -172,6 +173,7 @@ namespace synthese
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
 				void setSorted(bool value){ _sorted = value; }
 				void setNumber(boost::optional<std::size_t> value){ _number = value; }
+				void setText(const std::string& value){ _text = value; }
 			//@}
 
 
@@ -204,6 +206,18 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads the best result and load the corresponding object from the
+			/// main environment.
+			/// Notes :
+			///	- if the object is a city, then the first main stop of the city is returned
+			//////////////////////////////////////////////////////////////////////////
+			/// @author Hugues Romain
+			/// @date 2012
+			boost::shared_ptr<const geography::NamedPlace> getPlaceFromBestResult(
+				const util::ParametersMap& result
+			) const;
 
 		private:
 			template<class T>

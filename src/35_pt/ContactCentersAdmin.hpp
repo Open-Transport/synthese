@@ -1,8 +1,7 @@
 
-
 //////////////////////////////////////////////////////////////////////////
-/// FreeDRTBookingAdmin class header.
-///	@file FreeDRTBookingAdmin.hpp
+/// ContactCentersAdmin class header.
+///	@file ContactCentersAdmin.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -23,54 +22,24 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_FreeDRTBookingAdmin_H__
-#define SYNTHESE_FreeDRTBookingAdmin_H__
+#ifndef SYNTHESE_ContactCentersAdmin_H__
+#define SYNTHESE_ContactCentersAdmin_H__
 
 #include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
 
-#include <boost/date_time/posix_time/ptime.hpp>
-
 namespace synthese
 {
-	namespace geography
-	{
-		class NamedPlace;
-	}
-
 	namespace pt
 	{
-		class FreeDRTArea;
-	}
-
-	namespace resa
-	{
 		//////////////////////////////////////////////////////////////////////////
-		/// FreeDRTBookingAdmin Admin compound class.
-		///	@ingroup m51Admin refAdmin
+		/// ContactCentersAdmin Admin compound class.
+		///	@ingroup m35Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2012
-		class FreeDRTBookingAdmin:
-			public admin::AdminInterfaceElementTemplate<FreeDRTBookingAdmin>
+		class ContactCentersAdmin:
+			public admin::AdminInterfaceElementTemplate<ContactCentersAdmin>
 		{
-		public:
-			/// @name Parameter identifiers
-			//@{
-				static const std::string PARAMETER_AREA_ID;
-				static const std::string PARAMETER_DEPARTURE_PLACE;
-				static const std::string PARAMETER_ARRIVAL_PLACE;
-				static const std::string PARAMETER_DATE;
-				static const std::string PARAMETER_TIME;
-			//@}
-
-		private:
-			/// @name Search parameters
-			//@{
-				boost::shared_ptr<const pt::FreeDRTArea> _area;
-				boost::posix_time::ptime _dateTime;
-				boost::shared_ptr<const geography::NamedPlace> _departurePlace;
-				boost::shared_ptr<const geography::NamedPlace> _arrivalPlace;
-			//@}
 
 
 		public:
@@ -78,17 +47,10 @@ namespace synthese
 			/// Constructor.
 			///	@author Hugues Romain
 			///	@date 2012
-			FreeDRTBookingAdmin();
+			ContactCentersAdmin();
 
 
 
-			/// @name Setters
-			//@{
-				void setArea(boost::shared_ptr<const pt::FreeDRTArea> value){ _area = value; }
-			//@}
-			
-			
-			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -99,8 +61,8 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -121,9 +83,9 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
-			/// Authorization check.
+			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right
 			/// level is READ.
 			///	@param request The current request
@@ -136,8 +98,36 @@ namespace synthese
 
 
 
-			virtual PageLinks _getCurrentTreeBranch() const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds links to the pages of the current class to put directly under
+			/// a module admin page in the pages tree.
+			///	@param module The module
+			///	@param currentPage Currently displayed page
+			/// @param request Current request
+			///	@return PageLinks each page to put under the module page in the page
+			///	@author Hugues Romain
+			///	@date 2012
+			virtual AdminInterfaceElement::PageLinks getSubPagesOfModule(
+				const server::ModuleClass& module,
+				const AdminInterfaceElement& currentPage,
+				const admin::AdminRequest& request
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Builds links to the pages to put directly under the current page in
+			/// the pages tree.
+			///	@param currentPage Currently displayed page
+			/// @param request Current request
+			///	@return PageLinks each page to put under the current page
+			///	@author Hugues Romain
+			///	@date 2012
+			virtual AdminInterfaceElement::PageLinks getSubPages(
+				const AdminInterfaceElement& currentPage,
+				const admin::AdminRequest& request
+			) const;
 		};
 }	}
 
-#endif // SYNTHESE_FreeDRTBookingAdmin_H__
+#endif // SYNTHESE_ContactCentersAdmin_H__

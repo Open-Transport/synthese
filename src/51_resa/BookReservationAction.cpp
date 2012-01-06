@@ -21,40 +21,44 @@
 */
 
 #include "BookReservationAction.h"
-#include "Language.hpp"
-#include "TransportWebsite.h"
-#include "StopArea.hpp"
-#include "RoutePlannerFunction.h"
-#include "PTTimeSlotRoutePlanner.h"
+
+#include "ActionException.h"
+#include "City.h"
+#include "CommercialLine.h"
+#include "FreeDRTArea.hpp"
+#include "FreeDRTTimeSlot.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
+#include "GeographyModule.h"
+#include "Journey.h"
+#include "JourneyPattern.hpp"
 #include "JourneysResult.h"
+#include "Language.hpp"
+#include "LineStop.h"
 #include "NamedPlace.h"
-#include "ResaRight.h"
-#include "ReservationTransaction.h"
-#include "Reservation.h"
-#include "ReservationTransactionTableSync.h"
-#include "ReservationTableSync.h"
+#include "OnlineReservationRule.h"
+#include "Place.h"
+#include "PlacesListService.hpp"
+#include "PTTimeSlotRoutePlanner.h"
+#include "PTUseRule.h"
+#include "Request.h"
 #include "ResaDBLog.h"
 #include "ResaModule.h"
-#include "ActionException.h"
-#include "Request.h"
-#include "PTUseRule.h"
-#include "Place.h"
-#include "City.h"
-#include "Journey.h"
-#include "LineStop.h"
-#include "JourneyPattern.hpp"
-#include "CommercialLine.h"
-#include "Road.h"
-#include "UseRule.h"
-#include "NamedPlace.h"
-#include "RoadPlace.h"
+#include "ResaRight.h"
 #include "ResaTypes.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
+#include "Road.h"
+#include "RoadPlace.h"
+#include "RoutePlannerFunction.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "StopArea.hpp"
+#include "TransportWebsite.h"
+#include "UseRule.h"
 #include "User.h"
 #include "UserTableSync.h"
-#include "GeographyModule.h"
-#include "OnlineReservationRule.h"
-#include "Env.h"
-#include "ScheduledService.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -76,13 +80,11 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
-	using namespace pt;
 	using namespace algorithm;
-
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<Action, resa::BookReservationAction>::FACTORY_KEY("bra");
+		template<> const string FactorableTemplate<Action, resa::BookReservationAction>::FACTORY_KEY = "bra";
 	}
 
 	namespace resa
@@ -91,9 +93,9 @@ namespace synthese
 		const string BookReservationAction::PARAMETER_USER_CLASS_ID = Action_PARAMETER_PREFIX + "acc";
 		const string BookReservationAction::PARAMETER_ROLLING_STOCK_FILTER_ID = Action_PARAMETER_PREFIX + "tm";
 
-		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS(Action_PARAMETER_PREFIX + "ac");
-		const string BookReservationAction::PARAMETER_APPROACH_SPEED(Action_PARAMETER_PREFIX + "apsp");
-		const string BookReservationAction::PARAMETER_MAX_TRANSPORT_CONNECTION(Action_PARAMETER_PREFIX + "mtc");
+		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS = Action_PARAMETER_PREFIX + "ac";
+		const string BookReservationAction::PARAMETER_APPROACH_SPEED = Action_PARAMETER_PREFIX + "apsp";
+		const string BookReservationAction::PARAMETER_MAX_TRANSPORT_CONNECTION = Action_PARAMETER_PREFIX + "mtc";
 
 		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
 		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
@@ -104,32 +106,33 @@ namespace synthese
 
 		const string BookReservationAction::PARAMETER_CREATE_CUSTOMER = Action_PARAMETER_PREFIX + "cc";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
-		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME(Action_PARAMETER_PREFIX + "csn");
+		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME = Action_PARAMETER_PREFIX + "csn";
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
 		const string BookReservationAction::PARAMETER_CUSTOMER_SURNAME = Action_PARAMETER_PREFIX + "cs";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ALLOW_EMPTY_SURNAME = Action_PARAMETER_PREFIX + "aes";
 		const string BookReservationAction::PARAMETER_CUSTOMER_PHONE = Action_PARAMETER_PREFIX + "cuph";
 		const string BookReservationAction::PARAMETER_CUSTOMER_EMAIL = Action_PARAMETER_PREFIX + "cupe";
-		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE(Action_PARAMETER_PREFIX + "cl");
+		const string BookReservationAction::PARAMETER_CUSTOMER_LANGUAGE = Action_PARAMETER_PREFIX + "cl";
 
 		const string BookReservationAction::PARAMETER_PASSWORD = Action_PARAMETER_PREFIX + "pass";
 
 		const string BookReservationAction::PARAMETER_SEATS_NUMBER = Action_PARAMETER_PREFIX + "senu";
 
-		const string BookReservationAction::PARAMETER_SERVICE_ID(Action_PARAMETER_PREFIX + "se");
-		const string BookReservationAction::PARAMETER_DEPARTURE_RANK(Action_PARAMETER_PREFIX + "dr");
-		const string BookReservationAction::PARAMETER_ARRIVAL_RANK(Action_PARAMETER_PREFIX + "ar");
+		const string BookReservationAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "se";
+		const string BookReservationAction::PARAMETER_DEPARTURE_RANK = Action_PARAMETER_PREFIX + "dr";
+		const string BookReservationAction::PARAMETER_ARRIVAL_RANK = Action_PARAMETER_PREFIX + "ar";
 
-		const string BookReservationAction::PARAMETER_IGNORE_RESERVATION_RULES(Action_PARAMETER_PREFIX + "irr");
+		const string BookReservationAction::PARAMETER_IGNORE_RESERVATION_RULES = Action_PARAMETER_PREFIX + "irr";
+
 
 
 		BookReservationAction::BookReservationAction(
 		):	util::FactorableTemplate<server::Action, BookReservationAction>(),
 			_createCustomer(false),
 			_seatsNumber(1),
-			_ignoreReservation(false)
+			_ignoreReservation(false),
+			_userClassCode(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
 		{}
-
 
 
 
@@ -138,7 +141,24 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_CREATE_CUSTOMER, _createCustomer);
 			map.insert(PARAMETER_IGNORE_RESERVATION_RULES, _ignoreReservation);
-			if(_service.get() && _journey.size() == 1)
+			
+			// Reservation by service on a free DRT
+			if(_freeDRTTimeSlot.get())
+			{
+				map.insert(PARAMETER_SERVICE_ID, _freeDRTTimeSlot->getKey());
+				if(_departurePlace.get())
+				{
+					map.insert(PARAMETER_ORIGIN_PLACE, _departurePlace->getFullName());
+				}
+				if(_arrivalPlace.get())
+				{
+					map.insert(PARAMETER_DESTINATION_PLACE, _arrivalPlace->getFullName());
+				}
+				map.insert(PARAMETER_DATE_TIME, _departureDateTime);
+				map.insert(PARAMETER_USER_CLASS_ID, _userClassCode + USER_CLASS_CODE_OFFSET);
+			}
+			// Reservation by service on a virtual line
+			else if(_service.get() && _journey.size() == 1)
 			{
 				map.insert(PARAMETER_SERVICE_ID, _service->getKey());
 				const ServicePointer& su(*_journey.getServiceUses().begin());
@@ -146,6 +166,7 @@ namespace synthese
 				map.insert(PARAMETER_ARRIVAL_RANK, su.getArrivalEdge()->getRankInPath());
 				map.insert(PARAMETER_DATE_TIME, su.getOriginDateTime().date());
 			}
+			// Reservation by journey planning
 			else if (!_journey.empty())
 			{
 				if (_journey.getOrigin())
@@ -183,6 +204,8 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void BookReservationAction::setOriginDestinationPlace(
 			string originCity,
 			string originPlace,
@@ -194,6 +217,8 @@ namespace synthese
 			_destinationCity  = destinationCity;
 			_destinationPlace = destinationPlace;
 		}
+
+
 
 		void BookReservationAction::updatePlace()
 		{
@@ -327,39 +352,114 @@ namespace synthese
 			// Reservation on a service
 			if(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_ID))
 			{
-				try
+				RegistryKeyType serviceId(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
+
+				// Scheduled service (virtual line)
+				if(decodeTableId(serviceId) == ScheduledServiceTableSync::TABLE.ID)
 				{
-					_service = Env::GetOfficialEnv().get<ScheduledService>(map.get<RegistryKeyType>(PARAMETER_SERVICE_ID));
+					try
+					{
+						_service = Env::GetOfficialEnv().get<ScheduledService>(serviceId);
+					}
+					catch(ObjectNotFoundException<ScheduledService>&)
+					{
+						throw RequestException("No such service");
+					}
+
+					gregorian::date date(gregorian::from_string(map.get<string>(PARAMETER_DATE_TIME)));
+
+					size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
+					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
+					if(departureRank >= _service->getPath()->getEdges().size())
+					{
+						throw RequestException("Invalid departure rank");
+					}
+					if(	arrivalRank >= _service->getPath()->getEdges().size() ||
+						arrivalRank <= departureRank
+					){
+						throw RequestException("Invalid arrival rank");
+					}
+
+					ServicePointer sp(
+						false,
+						map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN) - USER_CLASS_CODE_OFFSET,
+						*_service,
+						date,
+						*_service->getPath()->getEdge(departureRank),
+						*_service->getPath()->getEdge(arrivalRank)
+					);
+
+					_journey.append(sp);
 				}
-				catch(ObjectNotFoundException<ScheduledService>&)
+				// Free DRT
+				else if(decodeTableId(serviceId) == FreeDRTTimeSlotTableSync::TABLE.ID)
 				{
-					throw RequestException("No such service");
+					// Service
+					try
+					{
+						_freeDRTTimeSlot = Env::GetOfficialEnv().get<FreeDRTTimeSlot>(serviceId);
+					}
+					catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
+					{
+						throw RequestException("No such service");
+					}
+
+					// Date time
+					_departureDateTime = time_from_string(map.get<string>(PARAMETER_DATE_TIME));
+
+					// User class code
+					_userClassCode = map.getDefault<UserClassCode>(
+						PARAMETER_USER_CLASS_ID,
+						USER_PEDESTRIAN
+					) - USER_CLASS_CODE_OFFSET;
+
+					/// TODO check if the user class code is allowed on this service
+
+					// Departure place
+					PlacesListService placesListService;
+					stringstream fakeStream;
+					Request fakeRequest;
+					placesListService.setNumber(1);
+					placesListService.setText(map.getDefault<string>(PARAMETER_ORIGIN_PLACE));
+					_departurePlace = placesListService.getPlaceFromBestResult(
+						placesListService.run(fakeStream, fakeRequest)
+					);
+
+					/// TODO check if the origin belong to the area
+
+					// Location check
+					if(!_originPlaceGeography->getPoint().get())
+					{
+						throw ActionException("The origin place must be located");
+					}
+
+					// Arrival place
+					placesListService.setText(map.getDefault<string>(PARAMETER_DESTINATION_PLACE));
+					_arrivalPlace = placesListService.getPlaceFromBestResult(
+						placesListService.run(fakeStream, fakeRequest)
+					);
+
+					/// TODO check if the destinations belong to the area
+
+					// Location check
+					if(!_destinationPlaceGeography->getPoint().get())
+					{
+						throw ActionException("The destination place must be located");
+					}
+
+					/// TODO check the availability according to existing reservations
+
+					// Arrival time
+					/// TODO compute the travel time according to existing reservations and roads
+					double dst(
+						_originPlaceGeography->getPoint()->distance(
+							_destinationPlaceGeography->getPoint().get()
+					)	);
+					time_duration bestCommercialJourneyTime(
+						minutes(long(0.06 * dst / _freeDRTTimeSlot->getCommercialSpeed()))
+					);
+					_arrivalDateTime = _departureDateTime + bestCommercialJourneyTime;
 				}
-
-				gregorian::date date(gregorian::from_string(map.get<string>(PARAMETER_DATE_TIME)));
-
-				size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
-				size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
-				if(departureRank >= _service->getPath()->getEdges().size())
-				{
-					throw RequestException("Invalid departure rank");
-				}
-				if(	arrivalRank >= _service->getPath()->getEdges().size() ||
-					arrivalRank <= departureRank
-				){
-					throw RequestException("Invalid arrival rank");
-				}
-
-				ServicePointer sp(
-					false,
-					map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN) - USER_CLASS_CODE_OFFSET,
-					*_service,
-					date,
-					*_service->getPath()->getEdge(departureRank),
-					*_service->getPath()->getEdge(arrivalRank)
-				);
-
-				_journey.append(sp);
 			}
 			else
 			{
@@ -483,89 +583,141 @@ namespace synthese
 			rt.setSeats(_seatsNumber);
 			ReservationTransactionTableSync::Save(&rt);
 
-			// New reservation for each journey leg
+			// Contact center
 			const OnlineReservationRule* reservationContact(NULL);
-			BOOST_FOREACH(const ServicePointer& su, _journey.getServiceUses())
-			{
-				assert(su.getService() != NULL);
-				assert(su.getDepartureEdge() != NULL);
-				assert(su.getDepartureEdge()->getHub() != NULL);
-				assert(su.getArrivalEdge() != NULL);
-				assert(su.getArrivalEdge()->getHub() != NULL);
 
+			// Journey mode
+			if(!_journey.empty())
+			{
+				// New reservation for each journey leg
+				BOOST_FOREACH(const ServicePointer& su, _journey.getServiceUses())
+				{
+					assert(su.getService() != NULL);
+					assert(su.getDepartureEdge() != NULL);
+					assert(su.getDepartureEdge()->getHub() != NULL);
+					assert(su.getArrivalEdge() != NULL);
+					assert(su.getArrivalEdge()->getHub() != NULL);
+
+					shared_ptr<Reservation> r(rt.newReservation());
+					r->setKey(ReservationTableSync::getId());
+					_env->getEditableRegistry<Reservation>().add(r);
+
+					r->setDeparturePlaceId(
+						dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()) ?
+						dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey() :
+						RegistryKeyType(0)
+					);
+					if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
+					{
+						r->setDeparturePlaceName(
+							dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
+						);
+					}
+					r->setDepartureTime(su.getDepartureDateTime());
+					r->setOriginDateTime(su.getOriginDateTime());
+					r->setArrivalPlaceId(
+						dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()) ?
+						dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey() :
+						RegistryKeyType(0)
+					);
+					if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
+					{
+						r->setArrivalPlaceName(
+							dynamic_cast<const NamedPlace*>(
+								su.getArrivalEdge()->getHub()
+							)->getFullName()
+						);
+					}
+					r->setArrivalTime(su.getArrivalDateTime());
+
+					const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
+					if (line)
+					{
+						assert(line->getCommercialLine() != NULL);
+
+						r->setLineCode(line->getCommercialLine()->getShortName());
+						r->setLineId(line->getCommercialLine()->getKey());
+					}
+					const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
+					if (road)
+					{
+						r->setLineCode(road->getRoadPlace()->getName());
+						r->setLineId(road->getKey());
+					}
+
+
+					if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation))
+					){
+						if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
+							static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()
+						){
+							const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
+									static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()->getReservationContact()
+							)	);
+							if(onlineContact)
+							{
+								reservationContact = onlineContact;
+							}
+						}
+						if(dynamic_cast<const PTUseRule*>(&su.getUseRule()))
+						{
+							r->setReservationRuleId(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
+						}
+						r->setReservationDeadLine(
+							su.getUseRule().getReservationDeadLine(
+								su.getOriginDateTime(),
+								su.getDepartureDateTime()
+						)	);
+					}
+					r->setServiceId(su.getService()->getKey());
+					r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
+
+					ReservationTableSync::Save(r.get());
+			}	}
+			else // Free DRT mode
+			{
 				shared_ptr<Reservation> r(rt.newReservation());
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 
 				r->setDeparturePlaceId(
-					dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()) ?
-					dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey() :
-					RegistryKeyType(0)
+					_departurePlace->getKey()
 				);
-				if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
-				{
-					r->setDeparturePlaceName(
-						dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub())->getFullName()
-					);
-				}
-				r->setDepartureTime(su.getDepartureDateTime());
-				r->setOriginDateTime(su.getOriginDateTime());
+				r->setDeparturePlaceName(
+					_departurePlace->getFullName()
+				);
+				r->setDepartureTime(_departureDateTime);
+				r->setOriginDateTime(_departureDateTime);
 				r->setArrivalPlaceId(
-					dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()) ?
-					dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey() :
-					RegistryKeyType(0)
+					_arrivalPlace->getKey()
 				);
-				if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
+				r->setArrivalPlaceName(
+					_arrivalPlace->getFullName()
+				);
+				r->setArrivalTime(_arrivalDateTime);
+
+				r->setLineCode(_freeDRTTimeSlot->getArea()->getLine()->getShortName());
+				r->setLineId(_freeDRTTimeSlot->getArea()->getLine()->getKey());
+
+				reservationContact = OnlineReservationRule::GetOnlineReservationRule(
+					_freeDRTTimeSlot->getArea()->getLine()->getReservationContact()
+				);
+
+				if(dynamic_cast<const PTUseRule*>(&_freeDRTTimeSlot->getUseRule(_userClassCode)))
 				{
-					r->setArrivalPlaceName(
-						dynamic_cast<const NamedPlace*>(
-							su.getArrivalEdge()->getHub()
-						)->getFullName()
+					r->setReservationRuleId(
+						static_cast<const PTUseRule&>(
+							_freeDRTTimeSlot->getUseRule(_userClassCode)
+						).getKey()
 					);
 				}
-				r->setArrivalTime(su.getArrivalDateTime());
-
-				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
-				if (line)
-				{
-					assert(line->getCommercialLine() != NULL);
-
-					r->setLineCode(line->getCommercialLine()->getShortName());
-					r->setLineId(line->getCommercialLine()->getKey());
-				}
-				const Road* road(dynamic_cast<const Road*>(su.getService()->getPath()));
-				if (road)
-				{
-					r->setLineCode(road->getRoadPlace()->getName());
-					r->setLineId(road->getKey());
-				}
-
-
-				if(	UseRule::IsReservationPossible(su.getUseRule().getReservationAvailability(su, _ignoreReservation))
-				){
-					if(	dynamic_cast<const JourneyPattern*>(su.getService()->getPath()) &&
-						static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()
-					){
-						const OnlineReservationRule* onlineContact(OnlineReservationRule::GetOnlineReservationRule(
-								static_cast<const JourneyPattern*>(su.getService()->getPath())->getCommercialLine()->getReservationContact()
-						)	);
-						if(onlineContact)
-						{
-							reservationContact = onlineContact;
-						}
-					}
-					if(dynamic_cast<const PTUseRule*>(&su.getUseRule()))
-					{
-						r->setReservationRuleId(static_cast<const PTUseRule&>(su.getUseRule()).getKey());
-					}
-					r->setReservationDeadLine(
-						su.getUseRule().getReservationDeadLine(
-							su.getOriginDateTime(),
-							su.getDepartureDateTime()
-					)	);
-				}
-				r->setServiceId(su.getService()->getKey());
-				r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
+				r->setReservationDeadLine(
+					_freeDRTTimeSlot->getUseRule(_userClassCode).getReservationDeadLine(
+						_departureDateTime,
+						_departureDateTime
+				)	);
+				r->setServiceId(_freeDRTTimeSlot->getKey());
+				r->setServiceCode(_freeDRTTimeSlot->getServiceNumber());
 
 				ReservationTableSync::Save(r.get());
 			}
