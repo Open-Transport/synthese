@@ -19,6 +19,12 @@ CommercialLineTableSync.cpp
 CommercialLineTableSync.h
 CommercialLineUpdateAction.cpp
 CommercialLineUpdateAction.h
+ContactCenterAdmin.cpp
+ContactCenterAdmin.hpp
+ContactCentersAdmin.cpp
+ContactCentersAdmin.hpp
+ContactCenterUpdateAction.cpp
+ContactCenterUpdateAction.hpp
 ContinuousService.cpp
 ContinuousService.h
 ContinuousServiceTableSync.cpp

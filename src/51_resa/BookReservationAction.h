@@ -49,6 +49,7 @@ namespace synthese
 	namespace pt
 	{
 		class ScheduledService;
+		class FreeDRTTimeSlot;
 	}
 
 	namespace geography
@@ -126,9 +127,19 @@ namespace synthese
 			std::size_t							_seatsNumber;
 			bool								_ignoreReservation;
 
-			//! @name Reservation on a service
+			//! @name Reservation on a scheduled service
 			//@{
 				boost::shared_ptr<const pt::ScheduledService> _service;
+			//@}
+
+			//! @name Reservation on a free DRT service
+			//@{
+				boost::shared_ptr<const pt::FreeDRTTimeSlot> _freeDRTTimeSlot;
+				boost::posix_time::ptime _departureDateTime;
+				boost::posix_time::ptime _arrivalDateTime;
+				size_t _userClassCode;
+				boost::shared_ptr<const geography::NamedPlace> _departurePlace;
+				boost::shared_ptr<const geography::NamedPlace> _arrivalPlace;
 			//@}
 
 			//! @name Reservation of a full journey
@@ -187,6 +198,7 @@ namespace synthese
 				void setSite(boost::shared_ptr<const pt_website::TransportWebsite> value){ _site = value; }
 				void setCreateCustomer(bool value){ _createCustomer = value; }
 				void setIgnoreReservationRules(bool value){ _ignoreReservation = value; }
+				void setFreeDRTTimeSlot(boost::shared_ptr<const pt::FreeDRTTimeSlot> value){ _freeDRTTimeSlot = value; }
 			//@}
 
 			virtual bool isAuthorized(const server::Session* session) const;

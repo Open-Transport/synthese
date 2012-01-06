@@ -22,15 +22,16 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "CommercialLineUpdateAction.h"
-#include "TransportNetworkRight.h"
+
+#include "ActionException.h"
+#include "CommercialLineTableSync.h"
+#include "ParametersMap.h"
 #include "Request.h"
-#include "CommercialLineTableSync.h"
-#include "TransportNetworkTableSync.h"
+#include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
-#include "CommercialLineTableSync.h"
+#include "TransportNetworkRight.h"
+#include "TransportNetworkTableSync.h"
 
 using namespace std;
 using namespace boost;

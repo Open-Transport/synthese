@@ -632,6 +632,7 @@ namespace synthese
 				c.push_back(string());
 				c.push_back("Zone");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
 				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
 				{
 					// New row
@@ -647,6 +648,7 @@ namespace synthese
 					// Name
 					stream << t.col() << area->getName();
 				}
+				stream << t.close();
 			}
 
 
@@ -783,7 +785,26 @@ namespace synthese
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Liste des réservations", TAB_RESAS, true, "resa_compulsory.png"));
-			_tabs.push_back(Tab("Réservation TAD libéralisé", TAB_FREE_DRT, true, FreeDRTBookingAdmin::ICON));
+
+			// Areas
+			FreeDRTAreaTableSync::SearchResult areas(
+				FreeDRTAreaTableSync::Search(
+					Env::GetOfficialEnv(),
+					_line->getKey(),
+					0,
+					1,
+					false
+			)	);
+			if(!areas.empty())
+			{
+				_tabs.push_back(
+					Tab(
+						"Saisie de réservation",
+						TAB_FREE_DRT,
+						true,
+						FreeDRTBookingAdmin::ICON
+				)	);
+			}
 
 			_tabBuilded = true;
 		}

@@ -22,12 +22,13 @@
 
 #include "OnlineReservationRuleTableSync.h"
 
-#include "ReservationContactTableSync.h"
-#include "InterfaceTableSync.h"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
+#include "InterfaceTableSync.h"
 #include "ReplaceQuery.h"
+#include "ReservationContact.h"
+#include "ReservationContactTableSync.h"
 
 #include <sstream>
 #include <boost/lexical_cast.hpp>

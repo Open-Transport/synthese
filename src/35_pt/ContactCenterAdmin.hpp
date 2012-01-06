@@ -1,8 +1,7 @@
 
-
 //////////////////////////////////////////////////////////////////////////
-/// FreeDRTBookingAdmin class header.
-///	@file FreeDRTBookingAdmin.hpp
+/// ContactCenterAdmin class header.
+///	@file ContactCenterAdmin.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -23,54 +22,46 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_FreeDRTBookingAdmin_H__
-#define SYNTHESE_FreeDRTBookingAdmin_H__
+#ifndef SYNTHESE_contactCenterAdmin_H__
+#define SYNTHESE_contactCenterAdmin_H__
 
-#include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
-
-#include <boost/date_time/posix_time/ptime.hpp>
 
 namespace synthese
 {
-	namespace geography
-	{
-		class NamedPlace;
-	}
-
 	namespace pt
 	{
-		class FreeDRTArea;
-	}
+		class ReservationContact;
 
-	namespace resa
-	{
 		//////////////////////////////////////////////////////////////////////////
-		/// FreeDRTBookingAdmin Admin compound class.
-		///	@ingroup m51Admin refAdmin
+		/// ContactCenterAdmin Admin compound class.
+		///	@ingroup m35Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2012
-		class FreeDRTBookingAdmin:
-			public admin::AdminInterfaceElementTemplate<FreeDRTBookingAdmin>
+		class ContactCenterAdmin:
+			public admin::AdminInterfaceElementTemplate<ContactCenterAdmin>
 		{
 		public:
-			/// @name Parameter identifiers
-			//@{
-				static const std::string PARAMETER_AREA_ID;
-				static const std::string PARAMETER_DEPARTURE_PLACE;
-				static const std::string PARAMETER_ARRIVAL_PLACE;
-				static const std::string PARAMETER_DATE;
-				static const std::string PARAMETER_TIME;
-			//@}
 
 		private:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const pt::FreeDRTArea> _area;
-				boost::posix_time::ptime _dateTime;
-				boost::shared_ptr<const geography::NamedPlace> _departurePlace;
-				boost::shared_ptr<const geography::NamedPlace> _arrivalPlace;
+				boost::shared_ptr<const ReservationContact> _contactCenter;
 			//@}
+
+		protected:
+			//////////////////////////////////////////////////////////////////////////
+			/// Tests if two admin pages can be considered as the same one.
+			/// @param other Other page to compare with. The other page will always be
+			///	       of the same class.
+			/// @return true if the other page can be considered as the same than the
+			///         current one.
+			/// @author Hugues Romain
+			/// @date 2012
+			virtual bool _hasSameContent(
+				const AdminInterfaceElement& other
+			) const;
+
 
 
 		public:
@@ -78,17 +69,10 @@ namespace synthese
 			/// Constructor.
 			///	@author Hugues Romain
 			///	@date 2012
-			FreeDRTBookingAdmin();
+			ContactCenterAdmin();
 
 
 
-			/// @name Setters
-			//@{
-				void setArea(boost::shared_ptr<const pt::FreeDRTArea> value){ _area = value; }
-			//@}
-			
-			
-			
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -99,8 +83,8 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -121,9 +105,9 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
-			/// Authorization check.
+			/// Authorization control.
 			/// Returns if the page can be displayed. In most cases, the needed right
 			/// level is READ.
 			///	@param request The current request
@@ -136,8 +120,17 @@ namespace synthese
 
 
 
-			virtual PageLinks _getCurrentTreeBranch() const;
+			//////////////////////////////////////////////////////////////////////////
+			/// Title getter.
+			///	@return The title of the page
+			///	@author Hugues Romain
+			///	@date 2012
+			virtual std::string getTitle() const;
+
+			void setContactCenter(boost::shared_ptr<const ReservationContact> value){ _contactCenter = value; }
+
+			boost::shared_ptr<const ReservationContact> getContactCenter() const { return _contactCenter; }
 		};
 }	}
 
-#endif // SYNTHESE_FreeDRTBookingAdmin_H__
+#endif // SYNTHESE_contactCenterAdmin_H__

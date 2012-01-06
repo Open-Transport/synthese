@@ -28,6 +28,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 #include "Registry.h"
 
@@ -132,6 +133,22 @@ namespace synthese
 
 
 
+				typedef std::set<std::string> SubMapsKeys;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the list of the keys of submaps.
+				/// @author Hugues Romain
+				/// @date 2012
+				/// @since 3.3.0
+				/// @return the list of the keys of submaps.
+				SubMapsKeys getSubMapsKeys() const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Tests if a submap registered at the specified key exists.
+				/// @param key the key to test
+				/// @return true or false
 				bool hasSubMaps(
 					const std::string& key
 				) const;
