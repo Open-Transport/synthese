@@ -17,10 +17,15 @@
 }
 
 #completeDiv .autoCompleteDivAct {
+  height: 16px;
   background-color: #3366cc;
   color: white !important;
   cursor: pointer;
   text-align: left;
   padding-top: 2px;
   padding-bottom: 2px;
+}
+
+#completeDiv .autoCompleteDivTitle {
+  font-weight: bold;
 }
