@@ -21,18 +21,19 @@
 */
 
 #include "RoutePlannerFunction.h"
-#include "UserFavoriteJourneyTableSync.h"
-#include "UserFavoriteJourney.h"
-#include "TransportWebsite.h"
-#include "HourPeriod.h"
-#include "PTTimeSlotRoutePlanner.h"
-#include "RequestException.h"
-#include "Request.h"
-#include "Interface.h"
-#include "ObjectNotFoundException.h"
-#include "PTRoutePlannerResult.h"
+
 #include "Edge.h"
+#include "HourPeriod.h"
+#include "ObjectNotFoundException.h"
 #include "JourneyPattern.hpp"
+#include "PlacesListService.hpp"
+#include "PTRoutePlannerResult.h"
+#include "PTTimeSlotRoutePlanner.h"
+#include "Request.h"
+#include "RequestException.h"
+#include "TransportWebsite.h"
+#include "UserFavoriteJourney.h"
+#include "UserFavoriteJourneyTableSync.h"
 #include "Road.h"
 #include "RoadPlace.h"
 #include "Hub.h"
@@ -120,6 +121,8 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CLASS_FILTER = "departure_class_filter";
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CLASS_FILTER = "arrival_class_filter";
 		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID("fid");
 		const string RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME("da");
 		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME("ii");
@@ -283,6 +286,8 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 		const string RoutePlannerFunction::DATA_WKT("wkt");
 
+
+
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
@@ -329,63 +334,71 @@ namespace synthese
 
 			// Origin and destination places
 			optional<RegistryKeyType> favoriteId(map.getOptional<RegistryKeyType>(PARAMETER_FAVORITE_ID));
-//			if (favoriteId) // 2b
-//			{
-//				try
-//				{
-//					_favorite = UserFavoriteJourneyTableSync::Get(*favoriteId, Env::GetOfficialEnv());
-//					_originCityText = _favorite->getOriginCityName();
-//					_originPlaceText = _favorite->getOriginPlaceName();
-//					_destinationCityText = _favorite->getDestinationCityName();
-//					_destinationPlaceText = _favorite->getDestinationPlaceName();
-//				}
-//				catch(ObjectNotFoundException<UserFavoriteJourney> e)
-//				{
-//					throw RequestException(e.getMessage());
-//				}
-//			}
-//			else // 2a
+			if (favoriteId) // Favorite places
 			{
+				/// TODO implement it
+			}
+			else if( // Two fields input
+				map.isDefined(PARAMETER_DEPARTURE_CITY_TEXT) &&
+				map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT)
+			){
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
 				_originPlaceText = map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_TEXT);
 				_destinationPlaceText = map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_TEXT);
-				if(	_originCityText.empty() && _originPlaceText.empty() ||
-					_destinationCityText.empty() && _destinationPlaceText.empty()
+				if(	(	!_originCityText.empty() || !_originPlaceText.empty()) &&
+					(	!_destinationCityText.empty() || !_destinationPlaceText.empty())
 				){
-					_home = true;
+					if(_originCityText.empty())
+					{
+						RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
+						if(!results.empty())
+						{
+							_departure_place = *results.begin();
+					}	}
+					else
+					{
+						_departure_place = site ?
+							site->extendedFetchPlace(_originCityText, _originPlaceText) :
+							RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
+						;
+					}
+					if(_destinationCityText.empty())
+					{
+						RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
+						if(!results.empty())
+						{
+							_arrival_place = *results.begin();
+					}	}
+					else
+					{
+						_arrival_place = site ?
+							site->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
+							RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
+						;
+					}
 				}
 			}
-			if (!_home)
+			else // One field input
 			{
-				if(_originCityText.empty())
-				{
-					RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_originPlaceText, 1));
-					if(!results.empty())
-					{
-						_departure_place = *results.begin();
-				}	}
-				else
-				{
-					_departure_place = site ?
-						site->extendedFetchPlace(_originCityText, _originPlaceText) :
-						RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
-					;
-				}
-				if(_destinationCityText.empty())
-				{
-					RoadModule::ExtendedFetchPlacesResult results(PTModule::ExtendedFetchPlaces(_destinationPlaceText, 1));
-					if(!results.empty())
-					{
-						_arrival_place = *results.begin();
-				}	}
-				else
-				{
-					_arrival_place = site ?
-						site->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
-						RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
-					;
-				}
+				PlacesListService placesListService;
+				placesListService.setNumber(1);
+				stringstream fakeStream;
+				Request fakeRequest;
+
+				// Departure
+				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));
+				placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
+				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.run(fakeStream, fakeRequest)
+				);
+
+				// Arrival
+				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
+				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
+				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.run(fakeStream, fakeRequest)
+				);
 			}
 
 			try

@@ -27,8 +27,9 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
-#include "LexicalMatcher.h"
+
 #include "City.h"
+#include "LexicalMatcher.h"
 #include "StopArea.hpp"
 
 namespace synthese
@@ -71,6 +72,8 @@ namespace synthese
 			static const std::string VALUE_JSON;
 			static const std::string PARAMETER_ITEM_PAGE_ID;
 			static const std::string PARAMETER_CLASS_PAGE_ID;
+			static const std::string PARAMETER_MIN_SCORE;
+			static const std::string PARAMETER_CLASS_FILTER;
 
 			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
@@ -104,6 +107,8 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _itemPage;
 				boost::shared_ptr<const cms::Webpage> _classPage;
 				boost::optional<std::size_t> _number;
+				double _minScore;
+				std::string _classFilter;
 			//@}
 			
 			
@@ -170,6 +175,7 @@ namespace synthese
 
 			/// @name Setters
 			//@{
+				void setClassFilter(const std::string& value){ _classFilter = value; }
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
 				void setSorted(bool value){ _sorted = value; }
 				void setNumber(boost::optional<std::size_t> value){ _number = value; }
@@ -206,16 +212,19 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 
+			
+			typedef lexical_matcher::LexicalMatcher<
+				boost::shared_ptr<geography::Place>
+			>::MatchResult::value_type PlaceResult;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the best result and load the corresponding object from the
 			/// main environment.
-			/// Notes :
-			///	- if the object is a city, then the first main stop of the city is returned
 			//////////////////////////////////////////////////////////////////////////
+			/// @return a named place or a city
 			/// @author Hugues Romain
 			/// @date 2012
-			boost::shared_ptr<const geography::NamedPlace> getPlaceFromBestResult(
+			PlaceResult getPlaceFromBestResult(
 				const util::ParametersMap& result
 			) const;
 
