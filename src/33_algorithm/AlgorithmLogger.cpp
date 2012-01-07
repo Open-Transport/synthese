@@ -1,0 +1,623 @@
+
+/** AlgorithmLogger class implementation.
+	@file AlgorithmLogger.cpp
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#include "AlgorithmLogger.hpp"
+
+#include "CommercialLine.h" // TODO remove it
+#include "JourneyPattern.hpp" // TODO remove it
+#include "LineStop.h" // TODO remove it
+#include "ResultHTMLTable.h"
+#include "Road.h" // TODO remove it
+#include "RoadModule.h" // TODO remove it
+#include "RoadPlace.h" // TODO remove it
+#include "RoutePlanningIntermediateJourney.hpp"
+#include "Service.h"
+#include "StopArea.hpp" // TODO remove it
+#include "StopPoint.hpp" // TODO remove it
+#include "Vertex.h"
+#include "VertexAccessMap.h"
+
+#include <iomanip>
+#include <sstream>
+
+using namespace std;
+using namespace boost;
+using namespace boost::filesystem;
+using namespace boost::posix_time;
+
+namespace synthese
+{
+	using namespace geography; // TODO remove it
+	using namespace graph;
+	using namespace html;
+	using namespace pt; // TODO remove it
+	using namespace road; // TODO remove it
+
+	namespace algorithm
+	{
+		AlgorithmLogger::AlgorithmLogger(
+			path dir
+		):	_directory(dir),
+			_active(!dir.empty()),
+			_fileNumber(0),
+			_journeyPlannerTable(11, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerStepTable(9, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerResult(NULL),
+			_journeyPlannerSearchNumber(0),
+			_timeSlotJourneyPlannerStepNumber(0)
+		{}
+
+
+
+		boost::filesystem::path AlgorithmLogger::_getCurrentFilePath() const
+		{
+			stringstream fileName;
+			fileName << "file";
+			fileName << setfill('0');
+			fileName << setw(10);
+			fileName << _fileNumber;
+			fileName << ".html";
+			return path(_directory / fileName.str());
+		}
+
+
+
+		shared_ptr<ofstream> AlgorithmLogger::_openNewFile() const
+		{
+			++_fileNumber;
+			shared_ptr<ofstream> result(
+				new ofstream(
+					_getCurrentFilePath().file_string().c_str()
+			)	);
+			return result;
+		}
+
+
+
+		void AlgorithmLogger::openIntegralSearchLog(
+			PlanningPhase planningPhase,
+			const boost::posix_time::ptime& desiredTime
+		) const	{
+			if(!_active)
+			{
+				return;
+			}
+
+			_integralSearchPlanningPhase = planningPhase;
+			_integralSearchDesiredTime = desiredTime;
+			_integralSearchFile = _openNewFile();
+			*_integralSearchFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_integralSearchFile << "<table class=\"adminresults\">";
+		}
+
+
+
+		void AlgorithmLogger::logIntegralSearchJourney(
+			const RoutePlanningIntermediateJourney& journey
+		) const {
+
+			if(!_active)
+			{
+				return;
+			}
+
+			if(journey.empty())
+			{
+				*_integralSearchFile << "<tr><td colspan=\"7\">Empty journey</td></tr>";
+			}
+			else
+			{
+				*_integralSearchFile
+					<< "<tr>"
+					<< "<th colspan=\"7\">Journey</th>"
+					<< "</tr>"
+					;
+
+				// Departure time
+				Journey::ServiceUses::const_iterator its(journey.getServiceUses().begin());
+
+/*					if (journey->getContinuousServiceRange() > 1)
+				{
+					ptime endRange(its->getDepartureDateTime());
+					endRange += journey->getContinuousServiceRange();
+					*_integralSearchFile << " - Service continu jusqu'à " << endRange;
+				}
+				if (journey->getReservationCompliance() == true)
+				{
+					*_integralSearchFile << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+				}
+				if (journey->getReservationCompliance() == boost::logic::indeterminate)
+				{
+					*_integralSearchFile << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+				}
+*/
+				*_integralSearchFile << "<tr>";
+				*_integralSearchFile << "<td>";
+				*_integralSearchFile << its->getDepartureDateTime();
+				*_integralSearchFile << "</td>";
+
+				// JourneyPattern
+				const LineStop* ls(
+					dynamic_cast<const LineStop*>(
+						_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
+				)	);
+				const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+				*_integralSearchFile << "<td";
+				if (ls)
+				{
+					*_integralSearchFile << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
+				}
+				*_integralSearchFile << ">";
+				*_integralSearchFile << (
+						ls ?
+						ls->getLine()->getCommercialLine()->getShortName() :
+						road->getRoadPlace()->getName()
+					) <<
+					"</td>"
+				;
+
+				// Transfers
+				if (its == journey.getServiceUses().end() -1)
+				{
+					*_integralSearchFile << "<td colspan=\"4\">(trajet direct)</td>";
+				}
+				else
+				{
+					while(true)
+					{
+						// Arrival
+						*_integralSearchFile << "<td>";
+						*_integralSearchFile << its->getArrivalDateTime();
+						*_integralSearchFile << "</td>";
+
+						// Place
+						*_integralSearchFile << "<td>";
+						if(dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub()))
+						{
+							*_integralSearchFile << dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName();
+						}
+						*_integralSearchFile << "</td>";
+
+						// Next service use
+						++its;
+
+						// Departure
+						*_integralSearchFile << "<td>" << its->getDepartureDateTime() << "</td>";
+
+						// JourneyPattern
+						const LineStop* ls(
+							dynamic_cast<const LineStop*>(
+								_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
+						)	);
+						const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
+						*_integralSearchFile << "<td";
+						if (ls)
+							*_integralSearchFile << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
+						*_integralSearchFile << ">";
+						*_integralSearchFile <<
+							(	ls ?
+								ls->getLine()->getCommercialLine()->getShortName() :
+								road->getRoadPlace()->getName()
+							) <<
+							"</td>"
+						;
+
+						// Exit if last service use
+						if (its == journey.getServiceUses().end() -1)
+							break;
+
+						// Empty final arrival col
+						*_integralSearchFile << "<td></td>";
+
+						// New row and empty origin departure cols;
+						*_integralSearchFile << "</tr><tr>";
+						*_integralSearchFile << "<td></td>";
+						*_integralSearchFile << "<td></td>";
+					}
+				}
+
+				// Final arrival
+				*_integralSearchFile << "<td>" << its->getArrivalDateTime() << "</td>";
+
+
+//					*_integralSearchFile << todo.getLog();
+			}
+		}
+
+
+
+		void AlgorithmLogger::closeIntegralSearchLog() const
+		{
+			if(!_active)
+			{
+				return;
+			}
+
+			*_integralSearchFile << "<tr><th colspan=\"7\">";
+			if (_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL)
+			{
+				*_integralSearchFile << "DEPARTURE_TO_ARRIVAL";
+			}
+			else
+			{
+				*_integralSearchFile << "ARRIVAL_TO_DEPARTURE   ";
+			}
+			*_integralSearchFile <<
+				" IntegralSearch. Start "
+				<< " at " << _integralSearchDesiredTime
+				<< "</th></tr>"
+				<< "</table></body></html>"
+			;
+
+			_integralSearchFile->close();
+			_integralSearchFile.reset();
+		}
+
+
+
+		void AlgorithmLogger::openJourneyPlannerLog(
+			const RoutePlanningIntermediateJourney& result
+		) const	{
+			if(!_active)
+			{
+				return;
+			}
+
+			_journeyPlannerFile = _openNewFile();
+			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerFile << _journeyPlannerTable.open();
+
+			// recordJourneyPlannerLogNewResult(result);
+			
+			_journeyPlannerSearchNumber = 0;
+		}
+
+
+
+		void AlgorithmLogger::recordJourneyPlannerLogIntegralSearch(
+			shared_ptr<const RoutePlanningIntermediateJourney> journey,
+			const ptime& originDateTime,
+			const JourneysResult& todo
+		) const {
+			if(!_active || todo.empty())
+			{
+				return;
+			}
+
+			++_journeyPlannerSearchNumber;
+
+			if(_journeyPlannerStepFile.get())
+			{
+				_journeyPlannerStepFile->close();
+			}
+			_journeyPlannerStepFile = _openNewFile();
+			*_journeyPlannerStepFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.open();
+
+			*_journeyPlannerFile << _journeyPlannerTable.row();
+			*_journeyPlannerFile << _journeyPlannerTable.col() <<
+				"<a href=\"" << _getCurrentFilePath().filename() << "\">" <<
+				_journeyPlannerSearchNumber <<
+				"</a>";
+			*_journeyPlannerFile << _journeyPlannerTable.col();
+
+			if(journey.get())
+			{
+				*_journeyPlannerFile << _journeyPlannerTable.col();
+				if(dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub()))
+				{
+					*_journeyPlannerFile << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub())->getFullName();
+				}
+				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndTime(false);
+				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getScore();
+				*_journeyPlannerFile << _journeyPlannerTable.col() << *journey->getDistanceToEnd();
+	//			*_journeyPlannerFile << _journeyPlannerTable.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
+				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndEdge().getHub()->getScore();
+	//			*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getMinSpeedToEnd();
+			}
+			else
+			{
+				*_journeyPlannerFile << _journeyPlannerTable.col() << "START";
+				*_journeyPlannerFile << _journeyPlannerTable.col() << originDateTime;
+				*_journeyPlannerFile << _journeyPlannerTable.col(3);
+			}
+
+
+			*_journeyPlannerFile << _journeyPlannerTable.col() << todo.getJourneys().size();
+
+			_todoBeforeClean.clear();
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, todo.getJourneys())
+			{
+				_todoBeforeClean.push_back(
+					it.first
+				);
+			}
+		}
+
+
+
+		void AlgorithmLogger::recordJourneyPlannerLogCleanup(
+			bool resultFound,
+			const JourneysResult& todo
+		) const {
+			if(!_active)
+			{
+				return;
+			}
+
+/*							// Departure time
+							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
+
+												if (journey->getContinuousServiceRange() > 1)
+							{
+							ptime endRange(its->getDepartureDateTime());
+							endRange += journey->getContinuousServiceRange();
+							stream << " - Service continu jusqu'à " << endRange.;
+							}
+							if (journey->getReservationCompliance() == true)
+							{
+							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+							}
+							if (journey->getReservationCompliance() == boost::logic::indeterminate)
+							{
+							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+							}
+
+							stream << "<tr>";
+							stream << "<td>" << its->getDepartureDateTime() << "</td>";
+
+							// JourneyPattern
+							const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+							const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+							stream << "<td";
+							if (ls)
+								stream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
+							stream << ">";
+							stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
+
+							// Transfers
+							if (its == journey->getServiceUses().end() -1)
+							{
+								stream << "<td colspan=\"4\">(trajet direct)</td>";
+							}
+							else
+							{
+								while(true)
+								{
+									// Arrival
+									stream << "<td>" << its->getArrivalDateTime() << "</td>";
+
+									// Place
+									stream <<
+										"<td>" <<
+										dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName() <<
+										"</td>"
+										;
+
+									// Next service use
+									++its;
+
+									// Departure
+									stream << "<td>" << its->getDepartureDateTime() << "</td>";
+
+									// JourneyPattern
+									const LineStop* ls(dynamic_cast<const LineStop*>(its->getEdge()));
+									const Road* road(dynamic_cast<const Road*>(its->getEdge()->getParentPath()));
+									stream << "<td";
+									if (ls)
+										stream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
+									stream << ">";
+									stream << (ls ? ls->getLine()->getCommercialLine()->getShortName() : road->getRoadPlace()->getName()) << "</td>";
+
+									// Exit if last service use
+									if (its == journey->getServiceUses().end() -1)
+										break;
+
+									// Empty final arrival col
+									stream << "<td></td>";
+
+									// New row and empty origin departure cols;
+									stream << "</tr><tr>";
+									stream << "<td></td>";
+									stream << "<td></td>";
+								}
+							}
+
+							// Final arrival
+							stream << "<td>" << its->getArrivalDateTime() << "</td>";
+*/
+
+
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true);
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "rk";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "status";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "place";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "time";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "jyscore";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "dist";
+//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp / dst";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "plscore";
+//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp";
+//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "journey";
+
+			size_t r(1);
+			size_t cleaneds(0);
+			size_t added(0);
+			size_t updated(0);
+			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, _todoBeforeClean)
+			{
+				const Vertex* vertex(journey->getEndEdge().getFromVertex());
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
+				if (journey->empty())
+				{
+					*_journeyPlannerStepFile << _journeyPlannerStepTable.col(9) << "Empty fake journey";
+					continue;
+				}
+
+				bool cleaned(!todo.get(vertex).get());
+				Map::const_iterator it2(_lastTodo.find(vertex));
+
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << r++;
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
+				if(cleaned)
+				{
+					*_journeyPlannerStepFile << "cleaned";
+					++cleaneds;
+				}
+				else if(it2 != _lastTodo.end())
+				{
+					if(it2->second == journey)
+					{
+						*_journeyPlannerStepFile << "existing";
+					}
+					else
+					{
+						*_journeyPlannerStepFile << "updated";
+						++updated;
+					}
+				}
+				else
+				{
+					*_journeyPlannerStepFile << "new";
+					++added;
+				}
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
+				if(dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub()))
+				{
+					*_journeyPlannerStepFile << dynamic_cast<const geography::NamedPlace*>(journey->getEndEdge().getHub())->getFullName();
+				}
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndTime(false);
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getScore();
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << *journey->getDistanceToEnd();
+//				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndEdge().getHub()->getScore();
+//				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getMinSpeedToEnd();
+			}
+
+			_lastTodo.clear();
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, todo.getJourneys())
+			{
+				_lastTodo.insert(make_pair(it.first->getEndEdge().getFromVertex(), it.first));
+			}
+
+			*_journeyPlannerFile << _journeyPlannerTable.col() << "-" << cleaneds;
+			*_journeyPlannerFile << _journeyPlannerTable.col() << "u" << updated;
+			*_journeyPlannerFile << _journeyPlannerTable.col() << "+" << added;
+			*_journeyPlannerFile << _journeyPlannerTable.col() << (resultFound ? "RESULT" : "");
+		}
+
+
+
+		void AlgorithmLogger::closeJourneyPlannerLog() const
+		{
+			if(!_active)
+			{
+				return;
+			}
+
+			*_journeyPlannerFile << _journeyPlannerTable.close();
+			*_journeyPlannerFile << "</body></html>";
+			_journeyPlannerFile->close();
+			_journeyPlannerFile.reset();
+		}
+
+
+
+		void AlgorithmLogger::openTimeSlotJourneyPlannerLog() const
+		{
+			if(!_active)
+			{
+				return;
+			}
+
+			if(!_timeSlotJourneyPlannerFile.get())
+			{
+				_timeSlotJourneyPlannerFile = _openNewFile();
+				*_timeSlotJourneyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
+			}
+			_timeSlotJourneyPlannerStepNumber = 0;
+		}
+
+
+
+		void AlgorithmLogger::logTimeSlotJourneyPlannerStep(
+			const ptime& originDateTime
+		) const	{
+			if(!_active)
+			{
+				return;
+			}
+
+			++_journeyPlannerSearchNumber;
+
+			*_timeSlotJourneyPlannerFile <<
+				"<h2>Route planning " << _journeyPlannerSearchNumber <<
+				" at " << originDateTime << "</h2>"
+			;
+		}
+
+
+
+		void AlgorithmLogger::closeTimeSlotJourneyPlannerLog() const
+		{
+			if(!_active)
+			{
+				return;
+			}
+
+			*_timeSlotJourneyPlannerFile << "</body></html>";
+			_timeSlotJourneyPlannerFile->close();
+			_timeSlotJourneyPlannerFile.reset();
+		}
+
+
+
+		void AlgorithmLogger::logTimeSlotJourneyPlannerApproachMap(
+			bool isDeparture,
+			const VertexAccessMap& vam
+		) const	{
+
+			string od(isDeparture ? "Origin" : "Destination");
+
+			*_timeSlotJourneyPlannerFile << "<h2>" << od << " access map calculation</h2>";
+
+			*_timeSlotJourneyPlannerFile << "<h3>" << od << "s</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+
+			BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, vam.getMap())
+			{
+				*_timeSlotJourneyPlannerFile	<<
+					"<tr><td>" <<
+					dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
+					"</td><td>" <<
+					static_cast<const StopPoint* const>(it.first)->getName() <<
+					"</td><td>" <<
+					it.second.approachDistance <<
+					"</td><td>" <<
+					it.second.approachTime.total_seconds() / 60 <<
+					"</td></tr>"
+					;
+			}
+			*_timeSlotJourneyPlannerFile << "</table>";
+		}
+}	}

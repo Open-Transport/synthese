@@ -377,7 +377,7 @@ namespace synthese
 						optional<posix_time::time_duration>() :
 						optional<posix_time::time_duration>(
 							accessDirection == DEPARTURE_TO_ARRIVAL ?
-							result.getFirstDepartureTime() - originDateTime : // FIRST FIX : put getFirstArrivalTime
+							result.getFirstArrivalTime() - originDateTime :
 							originDateTime - result.getFirstDepartureTime()
 						),
 					maxTransferDuration
