@@ -102,7 +102,7 @@ namespace synthese
 					false,
 					true
 			)	);
-			BOOST_FOREACH(shared_ptr<User> user, users)
+			BOOST_FOREACH(const shared_ptr<User>& user, users)
 			{
 				stream << "<option value=\"" << user->getKey() << "\">" << user->getName() << " " << user->getSurname() << " (" << user->getPhone() << " / " << user->getEMail() << ")</option>";
 			}

@@ -266,7 +266,7 @@ namespace synthese
 			SearchResult links(
 				Search(lenv, sourceAlarm.getKey())
 			);
-			BOOST_FOREACH(shared_ptr<AlarmObjectLink> aol, links)
+			BOOST_FOREACH(const shared_ptr<AlarmObjectLink>& aol, links)
 			{
 				AlarmObjectLink naol;
 				naol.setAlarm(&destAlarm);

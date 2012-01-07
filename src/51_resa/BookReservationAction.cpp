@@ -23,6 +23,7 @@
 #include "BookReservationAction.h"
 
 #include "ActionException.h"
+#include "AlgorithmLogger.hpp"
 #include "City.h"
 #include "CommercialLine.h"
 #include "FreeDRTArea.hpp"
@@ -71,6 +72,7 @@ using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace algorithm;
 	using namespace server;
 	using namespace pt_journey_planner;
 	using namespace security;
@@ -80,7 +82,6 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace geography;
-	using namespace algorithm;
 
 	namespace util
 	{
@@ -541,6 +542,7 @@ namespace synthese
 					_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
 				}
 
+				AlgorithmLogger logger; // Will log nothing
 				PTTimeSlotRoutePlanner rp(
 					_originPlaceGeography.get(),
 					_destinationPlaceGeography.get(),
@@ -551,7 +553,8 @@ namespace synthese
 					1,
 					_accessParameters,
 					DEPARTURE_FIRST,
-					_ignoreReservation
+					_ignoreReservation,
+					logger
 				);
 				PTRoutePlannerResult jr(rp.run());
 

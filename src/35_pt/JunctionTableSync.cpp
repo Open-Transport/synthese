@@ -212,7 +212,7 @@ namespace synthese
 					);
 					if(!stops.empty())
 					{
-						BOOST_FOREACH(shared_ptr<StopPoint> stop, stops)
+						BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
 						{
 							expr = ComposedExpression::Get(
 								expr,
@@ -240,7 +240,7 @@ namespace synthese
 					);
 					if(!stops.empty())
 					{
-						BOOST_FOREACH(shared_ptr<StopPoint> stop, stops)
+						BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
 						{
 							expr = ComposedExpression::Get(
 								expr,

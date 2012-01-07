@@ -249,7 +249,7 @@ namespace synthese
 
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+			BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 			{
 				if(!screen->getLocation())
 				{

@@ -184,7 +184,7 @@ namespace synthese
 
 			stream << t.open();
 			AdminFunctionRequest<DisplaySearchAdmin> goRequest(_request);
-			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> pl, searchResult)
+			BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& pl, searchResult)
 			{
 				stream << t.row();
 				try
@@ -282,7 +282,7 @@ namespace synthese
 				)	);
 
 				bool currentToAdd(sa && sa->getPlace() && sa->getPlace()->get());
-				BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> result, searchResult)
+				BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& result, searchResult)
 				{
 					shared_ptr<DisplaySearchAdmin> p(
 						getNewPage<DisplaySearchAdmin>()

@@ -210,7 +210,7 @@ namespace synthese
 			stream << f.open();
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<User> user, users)
+			BOOST_FOREACH(const shared_ptr<User>& user, users)
 			{
 				userRequest.getPage()->setUser(user);
 				deleteUserRequest.getAction()->setObjectId(user->getKey());

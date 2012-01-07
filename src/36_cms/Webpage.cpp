@@ -340,7 +340,7 @@ namespace synthese
 				{
 					// Search of label
 					stringstream label;
-					BOOST_FOREACH(boost::shared_ptr<Node> node, static_cast<GotoNode*>(itNode->get())->direction)
+					BOOST_FOREACH(const shared_ptr<Node>& node, static_cast<GotoNode*>(itNode->get())->direction)
 					{
 						node->display(label, request, additionalParametersMap, *this);
 					}

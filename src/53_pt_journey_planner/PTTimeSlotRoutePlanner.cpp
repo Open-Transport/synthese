@@ -21,16 +21,18 @@
 */
 
 #include "PTTimeSlotRoutePlanner.h"
+
+#include "AlgorithmLogger.hpp"
+#include "Hub.h"
+#include "IntegralSearcher.h"
+#include "JourneysResult.h"
+#include "Log.h"
+#include "NamedPlace.h"
+#include "Place.h"
 #include "PTModule.h"
 #include "RoadModule.h"
-#include "Place.h"
-#include "Log.h"
-#include "JourneysResult.h"
-#include "VertexAccessMap.h"
-#include "IntegralSearcher.h"
 #include "StopPoint.hpp"
-#include "NamedPlace.h"
-#include "Hub.h"
+#include "VertexAccessMap.h"
 
 #include <sstream>
 
@@ -40,7 +42,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
+	using namespace algorithm;
 	using namespace road;
 	using namespace graph;
 	using namespace geography;
@@ -61,7 +63,7 @@ namespace synthese
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
 			bool ignoreReservation,
-			std::ostream* logStream,
+			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
@@ -80,13 +82,14 @@ namespace synthese
 				planningOrder,
 				100,
 				ignoreReservation,
-				logStream,
+				logger,
 				maxTransferDuration
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
 		{
 		}
+
 
 
 		VertexAccessMap PTTimeSlotRoutePlanner::_extendToPhysicalStops(
@@ -130,7 +133,7 @@ namespace synthese
 				_accessParameters.getMaxApproachTime(),
 				_accessParameters.getApproachSpeed(),
 				false,
-				_logStream
+				_logger
 			);
 			iso.integralSearch(vam, optional<size_t>(), optional<posix_time::time_duration>());
 
@@ -234,14 +237,11 @@ namespace synthese
 		}
 
 
+
 		PTRoutePlannerResult PTTimeSlotRoutePlanner::run() const
 		{
-			if(_logStream)
-			{
-				*_logStream << "<h2>Origin access map calculation</h2>";
-			}
-
 			TimeSlotRoutePlanner::Result result;
+			_logger.openTimeSlotJourneyPlannerLog();
 
 			// Check if departure and arrival VAMs has contains at least one vertex
 			if(_originVam.getMap().empty() ||
@@ -285,44 +285,9 @@ namespace synthese
 				}
 			}
 
-			// Log the result of road approaches calculation
-			if(	_logStream
-			){
-				*_logStream << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, ovam.getMap())
-				{
-					*_logStream	<<
-						"<tr><td>" <<
-						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-						"</td><td>" << static_cast<const StopPoint*>(it.first)->getName() <<
-						"</td><td>" << it.second.approachDistance <<
-						"</td><td>" << it.second.approachTime.total_seconds() / 60 <<
-						"</td></tr>"
-						;
-				}
-				*_logStream << "</table>";
-
-				*_logStream << "<h2>Destination access map calculation</h2>";
-
-				*_logStream << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
-				{
-					*_logStream	<<
-						"<tr><td>" <<
-						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-						"</td><td>" <<
-						static_cast<const StopPoint* const>(it.first)->getName() <<
-						"</td><td>" <<
-						it.second.approachDistance <<
-						"</td><td>" <<
-						it.second.approachTime.total_seconds() / 60 <<
-						"</td></tr>"
-						;
-				}
-				*_logStream << "</table>";
-			}
+			// Log the vams
+			_logger.logTimeSlotJourneyPlannerApproachMap(true, ovam);
+			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 
 			// Handle of the case of possible full road approach
 			if(	ovam.intersercts(dvam)
@@ -358,7 +323,7 @@ namespace synthese
 					_planningOrder,
 					100,
 					_ignoreReservation,
-					_logStream,
+					_logger,
 					_maxTransferDuration
 				);
 				return PTRoutePlannerResult(
@@ -382,7 +347,7 @@ namespace synthese
 					_planningOrder,
 					100,
 					_ignoreReservation,
-					_logStream,
+					_logger,
 					_maxTransferDuration
 				);
 				return PTRoutePlannerResult(

@@ -222,7 +222,7 @@ namespace synthese
 				stream << t.open();
 
 				// Loop on items
-				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
 				{
 					// Declarations
 					openRequest.getPage()->setArea(const_pointer_cast<const FreeDRTArea>(area));
@@ -427,7 +427,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<NonConcurrencyRule> rule, rules)
+				BOOST_FOREACH(const shared_ptr<NonConcurrencyRule>& rule, rules)
 				{
 					removeRequest.getAction()->setObjectId(rule->getKey());
 
@@ -558,7 +558,7 @@ namespace synthese
 				JourneyPatternTableSync::SearchResult routes(
 					JourneyPatternTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+				BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
 				{
 					shared_ptr<JourneyPatternAdmin> p(
 						getNewPage<JourneyPatternAdmin>()
@@ -571,7 +571,7 @@ namespace synthese
 				FreeDRTAreaTableSync::SearchResult areas(
 					FreeDRTAreaTableSync::Search(Env::GetOfficialEnv(), _cline->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
 				{
 					shared_ptr<FreeDRTAreaAdmin> p(
 						getNewPage<FreeDRTAreaAdmin>()
@@ -685,7 +685,7 @@ namespace synthese
 
 			stream << t.open();
 			AdminFunctionRequest<JourneyPatternAdmin> lineOpenRequest(request);
-			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+			BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
 			{
 				// Row initialization
 				lineOpenRequest.getPage()->setLine(line);

@@ -197,7 +197,7 @@ namespace synthese
 			);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				if (usedLines.find(line->getKey()) != usedLines.end())
 				{

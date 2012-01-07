@@ -164,19 +164,19 @@ namespace synthese
 			}
 
 			// Scheduled services to delete are removed from the environment to avoid useless saving
-			BOOST_FOREACH(shared_ptr<ScheduledService> sservice, _scheduledServicesToRemove)
+			BOOST_FOREACH(const shared_ptr<ScheduledService>& sservice, _scheduledServicesToRemove)
 			{
 				_env.getEditableRegistry<ScheduledService>().remove(sservice->getKey());
 			}
 
 			// Continuous services to delete are removed from the environment to avoid useless saving
-			BOOST_FOREACH(shared_ptr<ContinuousService> cservice, _continuousServicesToRemove)
+			BOOST_FOREACH(const shared_ptr<ContinuousService>& cservice, _continuousServicesToRemove)
 			{
 				_env.getEditableRegistry<ContinuousService>().remove(cservice->getKey());
 			}
 
 			// Journey patterns to delete are removed from the environment to avoid useless saving
-			BOOST_FOREACH(shared_ptr<JourneyPattern> journeyPattern, _journeyPatternsToRemove)
+			BOOST_FOREACH(const shared_ptr<JourneyPattern>& journeyPattern, _journeyPatternsToRemove)
 			{
 				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
 				{
@@ -229,7 +229,7 @@ namespace synthese
 							optional<RegistryKeyType>(),
 							stop.getKey()
 					)	);
-					BOOST_FOREACH(shared_ptr<LineStop> lineStop, lineStops)
+					BOOST_FOREACH(const shared_ptr<LineStop>& lineStop, lineStops)
 					{
 						if(	dynamic_cast<const JourneyPattern*>(lineStop->getParentPath()) &&
 							!static_cast<const JourneyPattern*>(lineStop->getParentPath())->hasLinkWithSource(*dataSourceInCheckEnv)
@@ -270,13 +270,13 @@ namespace synthese
 				}
 
 				// Stops to delete are removed from the environment to avoid useless saving
-				BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
+				BOOST_FOREACH(const shared_ptr<StopPoint>& stop, _stopsToRemove)
 				{
 					_env.getEditableRegistry<StopPoint>().remove(stop->getKey());
 				}
 
 				// Stop areas to delete are removed from the environment to avoid useless saving
-				BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
+				BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 				{
 					_env.getEditableRegistry<StopArea>().remove(stopArea->getKey());
 				}
@@ -287,15 +287,15 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
-			BOOST_FOREACH(shared_ptr<ScheduledService> sservice, _scheduledServicesToRemove)
+			BOOST_FOREACH(const shared_ptr<ScheduledService>& sservice, _scheduledServicesToRemove)
 			{
 				ScheduledServiceTableSync::RemoveRow(sservice->getKey(), transaction);
 			}
-			BOOST_FOREACH(shared_ptr<ContinuousService> cservice, _continuousServicesToRemove)
+			BOOST_FOREACH(const shared_ptr<ContinuousService>& cservice, _continuousServicesToRemove)
 			{
 				ContinuousServiceTableSync::RemoveRow(cservice->getKey(), transaction);
 			}
-			BOOST_FOREACH(shared_ptr<JourneyPattern> journeyPattern, _journeyPatternsToRemove)
+			BOOST_FOREACH(const shared_ptr<JourneyPattern>& journeyPattern, _journeyPatternsToRemove)
 			{
 				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
 				{
@@ -303,11 +303,11 @@ namespace synthese
 				}
 				JourneyPatternTableSync::RemoveRow(journeyPattern->getKey(), transaction);
 			}
-			BOOST_FOREACH(shared_ptr<StopPoint> stop, _stopsToRemove)
+			BOOST_FOREACH(const shared_ptr<StopPoint>& stop, _stopsToRemove)
 			{
 				StopPointTableSync::RemoveRow(stop->getKey(), transaction);
 			}
-			BOOST_FOREACH(shared_ptr<StopArea> stopArea, _stopAreasToRemove)
+			BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 			{
 				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
 			}

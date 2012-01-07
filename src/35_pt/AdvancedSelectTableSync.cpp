@@ -116,7 +116,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					id
 			)	);
-			BOOST_FOREACH(shared_ptr<ScheduledService> serv, services)
+			BOOST_FOREACH(const shared_ptr<ScheduledService>& serv, services)
 			{
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{
@@ -176,7 +176,7 @@ namespace synthese
 			ContinuousServiceTableSync::SearchResult cservices(
 				ContinuousServiceTableSync::Search(env, optional<RegistryKeyType>(), id)
 			);
-			BOOST_FOREACH(shared_ptr<ContinuousService> serv, cservices)
+			BOOST_FOREACH(const shared_ptr<ContinuousService>& serv, cservices)
 			{
 				BOOST_FOREACH(const date& d, serv->getActiveDates())
 				{

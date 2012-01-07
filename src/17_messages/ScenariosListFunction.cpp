@@ -129,7 +129,7 @@ namespace synthese
 						_parentFolder.get() ? _parentFolder->getKey() : 0
 				)	);
 
-				BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, scenarios)
+				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
 				{
 					_displayScenarioTemplate(stream, request, *scenario);
 				}
@@ -145,7 +145,7 @@ namespace synthese
 						now
 				)	);
 
-				BOOST_FOREACH(shared_ptr<SentScenario> message, scenarios)
+				BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
 				{
 					_displaySentScenario(stream, request, *message);
 				}

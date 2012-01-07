@@ -149,7 +149,9 @@ namespace synthese
 
 
 
-		void ParametersMap::insert( const std::string& parameterName, boost::shared_ptr<ParametersMap> value )
+		void ParametersMap::insert(
+			const std::string& parameterName,
+			const boost::shared_ptr<ParametersMap>& value )
 		{
 			SubParametersMap::iterator it(
 				_subMap.insert(make_pair(parameterName, SubParametersMap::mapped_type())).first

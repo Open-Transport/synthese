@@ -993,7 +993,7 @@ namespace synthese
 					CityTableSync::Search(
 						_env
 				)	);
-				BOOST_FOREACH(shared_ptr<City> city, cities)
+				BOOST_FOREACH(const shared_ptr<City>& city, cities)
 				{
 					citiesByName.insert(make_pair(city->getName(), city.get()));
 				}

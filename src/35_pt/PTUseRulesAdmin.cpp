@@ -142,7 +142,7 @@ namespace synthese
 			ActionResultHTMLTable t(h, st.getForm(), _requestParameters, ptrules, creationRequest.getHTMLForm(), PTUseRuleUpdateAction::PARAMETER_TEMPLATE_ID);
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<PTUseRule> ptrule, ptrules)
+			BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
 			{
 				openRequest.getPage()->setRule(ptrule);
 				stream << t.row(lexical_cast<string>(ptrule->getKey()));
@@ -191,7 +191,7 @@ namespace synthese
 
 			PTUseRuleTableSync::SearchResult ptrules(PTUseRuleTableSync::Search(Env::GetOfficialEnv()));
 
-			BOOST_FOREACH(shared_ptr<PTUseRule> ptrule, ptrules)
+			BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
 			{
 				const PTUseRulesAdmin* ua(
 					dynamic_cast<const PTUseRulesAdmin*>(&currentPage)

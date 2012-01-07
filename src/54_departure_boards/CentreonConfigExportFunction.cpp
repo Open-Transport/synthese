@@ -185,7 +185,7 @@ namespace synthese
 				ProfileTableSync::SearchResult profiles(
 					ProfileTableSync::Search(env)
 				);
-				BOOST_FOREACH(shared_ptr<const Profile> profile, profiles)
+				BOOST_FOREACH(const shared_ptr<const Profile>& profile, profiles)
 				{
 					if(!profile->isAuthorized<DisplayMaintenanceRight>()) continue;
 
@@ -217,7 +217,7 @@ namespace synthese
 				UserTableSync::SearchResult users(
 					UserTableSync::Search(env)
 				);
-				BOOST_FOREACH(shared_ptr<const User> user, users)
+				BOOST_FOREACH(const shared_ptr<const User>& user, users)
 				{
 					if(user->getLogin() == SecurityModule::ROOT_USER) continue;
 					if(!user->getProfile()->isAuthorized<DisplayMaintenanceRight>()) continue;
@@ -270,7 +270,7 @@ namespace synthese
 					DisplayTypeTableSync::Search(env)
 				);
 				UniqueStringsSet hostgroups;
-				BOOST_FOREACH(shared_ptr<const DisplayType> type, types)
+				BOOST_FOREACH(const shared_ptr<const DisplayType>& type, types)
 				{
 					const string& hostgroup(hostgroups.getUniqueString(_ConvertToNagiosName(type->getName())));
 					stream <<
@@ -313,7 +313,7 @@ namespace synthese
 					DisplayScreenTableSync::Search(env)
 				);
 				UniqueStringsSet hosts;
-				BOOST_FOREACH(shared_ptr<const DisplayScreen> screen, screens)
+				BOOST_FOREACH(const shared_ptr<const DisplayScreen>& screen, screens)
 				{
 					if(!screen->isMonitored()) continue;
 

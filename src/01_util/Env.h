@@ -207,7 +207,7 @@ namespace synthese
 
 
 			template<class R>
-			boost::shared_ptr<R> getEditable(
+			const boost::shared_ptr<R>& getEditable(
 				util::RegistryKeyType id
 			) const {
 				return this->getEditableRegistry<R>().getEditable(id);
@@ -274,15 +274,14 @@ namespace synthese
 			static Env& GetOfficialEnv() { return *_officialRegistries; }
 
 
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Official environment static getter.
 			/// @return Pointer to the main environment containing the physical memory loaded
 			/// of each table that use this feature (see DBDirectTableSyncTemplate).
 			//////////////////////////////////////////////////////////////////////////
-			static boost::shared_ptr<Env> GetOfficialEnvSPtr() { return _officialRegistries; }
-
+			static const boost::shared_ptr<Env>& GetOfficialEnvSPtr() { return _officialRegistries; }
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_util_Env_h__

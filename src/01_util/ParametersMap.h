@@ -341,9 +341,9 @@ namespace synthese
 				void insert(const std::string& parameterName, const boost::posix_time::ptime& value);
 				void insert(const std::string& parameterName, const boost::gregorian::date& value);
 				void insert(const std::string& parameterName, const boost::posix_time::time_duration& value);
-				void insert(const std::string& parameterName, boost::shared_ptr<ParametersMap> value);
+				void insert(const std::string& parameterName, const boost::shared_ptr<ParametersMap>& value);
 
-				void setGeometry(boost::shared_ptr<geos::geom::Geometry> value){ _geometry = value; }
+				void setGeometry(const boost::shared_ptr<geos::geom::Geometry>& value){ _geometry = value; }
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Merges this map with an other, with priority to the current one.

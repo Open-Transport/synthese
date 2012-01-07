@@ -179,7 +179,7 @@ namespace synthese
 
 			// Alarm messages destinations loop
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-			BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
+			BOOST_FOREACH(const shared_ptr<AlarmRecipient>& recipient, recipients)
 			{
 				////////////////////////////////////////////////////////////////////
 				// TAB STOPS
@@ -214,7 +214,7 @@ namespace synthese
 
 			// Alarm messages destinations loop
 			vector<shared_ptr<AlarmRecipient> > recipients(Factory<AlarmRecipient>::GetNewCollection());
-			BOOST_FOREACH(shared_ptr<AlarmRecipient> recipient, recipients)
+			BOOST_FOREACH(const shared_ptr<AlarmRecipient>& recipient, recipients)
 			{
 				_tabs.push_back(Tab(recipient->getTitle(), recipient->getFactoryKey(), true));
 			}

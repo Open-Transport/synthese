@@ -267,7 +267,7 @@ namespace synthese
 				if(_stopPage.get())
 				{
 					stringstream s;
-					BOOST_FOREACH(shared_ptr<ParametersMap> item, m.getSubMaps(TAG_STOP))
+					BOOST_FOREACH(const shared_ptr<ParametersMap>& item, m.getSubMaps(TAG_STOP))
 					{
 						item->merge(getTemplateParameters());
 

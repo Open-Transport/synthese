@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(algorithm_SRCS
+AlgorithmLogger.cpp
+AlgorithmLogger.hpp
 AlgorithmModule.cpp
 AlgorithmModule.gen.cpp
 AlgorithmModuleRegister.cpp
@@ -19,8 +21,6 @@ JourneyTemplates.h
 PlacesList.hpp
 RoutePlanner.cpp
 RoutePlanner.h
-RoutePlannerLogger.cpp
-RoutePlannerLogger.h
 RoutePlanningIntermediateJourney.cpp
 RoutePlanningIntermediateJourney.hpp
 RoutePlanningUserPrefPanel.cpp

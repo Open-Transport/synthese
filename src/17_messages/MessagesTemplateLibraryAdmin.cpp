@@ -165,7 +165,7 @@ namespace synthese
 
 /*			stream << "<h1>Répertoires</h1>";
 			HTMLList l;
-			BOOST_FOREACH(shared_ptr<TextTemplate> folder, folders)
+			BOOST_FOREACH(const shared_ptr<TextTemplate>& folder, folders)
 			{
 			}
 
@@ -187,7 +187,7 @@ namespace synthese
 			if(!templates.empty())
 			{
 				stream << "<h1>Modèles de texte</h1>";
-				BOOST_FOREACH(shared_ptr<TextTemplate> tt, templates)
+				BOOST_FOREACH(const shared_ptr<TextTemplate>& tt, templates)
 				{
 					// Variables
 					deleteRequest.getAction()->setObjectId(tt->getKey());

@@ -55,6 +55,7 @@ namespace synthese
 
 	namespace algorithm
 	{
+		class AlgorithmLogger;
 		class JourneyTemplates;
 
 		/** Route planner class.
@@ -112,7 +113,7 @@ namespace synthese
 
 			//! @name Logging
 			//@{
-				std::ostream* const					_logStream;
+				const AlgorithmLogger& _logger;
 			//@}
 
 
@@ -160,7 +161,7 @@ namespace synthese
 				graph::GraphIdType			graphToUse,
 				double						vmax,
 				bool						ignoreReservation,
-				std::ostream* logStream = NULL,
+				const AlgorithmLogger& logger,
 				boost::optional<const JourneyTemplates&> journeyTemplates = boost::optional<const JourneyTemplates&>(),
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
@@ -177,6 +178,6 @@ namespace synthese
 			*/
 			graph::Journey run();
 		};
-	}
-}
+}	}
+
 #endif

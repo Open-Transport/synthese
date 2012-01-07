@@ -154,7 +154,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<DriverService> driverService, driverServices)
+			BOOST_FOREACH(const shared_ptr<DriverService>& driverService, driverServices)
 			{
 				stream << t.row(lexical_cast<string>(driverService->getKey()));
 

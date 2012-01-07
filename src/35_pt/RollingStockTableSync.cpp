@@ -252,7 +252,7 @@ namespace synthese
 				if(limit) query.setNumber(*limit);
 				query.addOrderField(COL_NAME,true);
 				RollingStockTableSync::SearchResult elements(RollingStockTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-				BOOST_FOREACH(shared_ptr<RollingStock> elem, elements)
+				BOOST_FOREACH(const shared_ptr<RollingStock>& elem, elements)
 				{
 					result.push_back(std::make_pair(elem->getKey(), elem->getName()));
 				}

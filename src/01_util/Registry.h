@@ -134,7 +134,7 @@ namespace synthese
 					@throws ObjectNotFoundInRegistryException<T> if the key does not exists
 					in the registry and autoCreate is false
 				*/
-				boost::shared_ptr<T> getEditable(
+				const boost::shared_ptr<T>& getEditable(
 					const RegistryKeyType key
 				);
 
@@ -159,11 +159,17 @@ namespace synthese
 				*/
 				void clear () { _registry.clear(); }
 
+
+
 				/** Adds an object to the registry.
 					@param ptr Shared pointer to the object to add
 					@throws RegistryKeyException if the key of the object is 0 or if the keys is already used in the registry
 				*/
-				void add (boost::shared_ptr<T> ptr);
+				void add(
+					const boost::shared_ptr<T>& ptr
+				);
+
+
 
 				/** Replaces an object in the registry.
 					@param ptr Shared pointer to the new object to add instead of the old one
@@ -171,7 +177,11 @@ namespace synthese
 					@throws ObjectNotFoundInRegistryException if no object with the same key was existing in the registry
 					This method cleans the ordered vector.
 				*/
-				void replace (boost::shared_ptr<T> ptr);
+				void replace(
+					const boost::shared_ptr<T>& ptr
+				);
+
+
 
 				/** Removes an object from the registry.
 					@param key key of the object to remove
@@ -180,7 +190,6 @@ namespace synthese
 					This method cleans the ordered vector.
 				*/
 				void remove (const RegistryKeyType& key);
-
 			//@}
 
 
@@ -195,13 +204,15 @@ namespace synthese
 
 
 		template<class T>
-		boost::shared_ptr<T> Registry<T>::getEditable(
+		const boost::shared_ptr<T>& Registry<T>::getEditable(
 			const RegistryKeyType key
 		){
 			typename Map::iterator it(_registry.find(key));
 
 			if(it == _registry.end())
+			{
 				throw util::ObjectNotFoundInRegistryException<T>(key);
+			}
 
 			return it->second;
 		}
@@ -215,7 +226,9 @@ namespace synthese
 			typename Map::const_iterator it(_registry.find(key));
 
 			if(it == _registry.end())
+			{
 				throw util::ObjectNotFoundInRegistryException<T>(key);
+			}
 
 			return boost::const_pointer_cast<const T, T>(it->second);
 		}
@@ -223,8 +236,9 @@ namespace synthese
 
 
 		template<class T>
-		void Registry<T>::add (boost::shared_ptr<T> ptr)
-		{
+		void Registry<T>::add(
+			const boost::shared_ptr<T>& ptr
+		){
 			if (ptr->getKey() == 0)
 			{
 				throw RegistryKeyException<T>("Object with unknown key cannot be registered.", 0);
@@ -239,9 +253,11 @@ namespace synthese
 		}
 
 
+
 		template<class T>
-		void Registry<T>::replace (boost::shared_ptr<T> ptr)
-		{
+		void Registry<T>::replace(
+			const boost::shared_ptr<T>& ptr
+		){
 			remove (ptr->getKey ());
 			_registry.insert (std::make_pair (ptr->getKey (), ptr));
 		}
@@ -259,8 +275,6 @@ namespace synthese
 
 			_registry.erase (key);
 		}
-
-	}
-}
+}	}
 
 #endif

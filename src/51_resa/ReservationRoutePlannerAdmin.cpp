@@ -23,6 +23,8 @@
 */
 
 #include "ReservationRoutePlannerAdmin.h"
+
+#include "AlgorithmLogger.hpp"
 #include "GeographyModule.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
@@ -448,6 +450,7 @@ namespace synthese
 				);
 				resaRequest.getAction()->setAccessParameters(ap);
 				stringstream trace;
+				AlgorithmLogger logger;
 				PTTimeSlotRoutePlanner r(
 					startPlace.get(),
 					endPlace.get(),
@@ -458,7 +461,8 @@ namespace synthese
 					5,
 					ap,
 					_planningOrder,
-					_ignoreReservation
+					_ignoreReservation,
+					logger
 				);
 				jv = r.run();
 			}

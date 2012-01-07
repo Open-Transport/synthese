@@ -112,14 +112,14 @@ namespace synthese
 				TimeMap::value_type& vertexItem,
 				std::size_t transfers,
 				boost::posix_time::time_duration duration,
-				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
+				const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
 			);
 
 			void _insertAndPropagateInConnectionPlace(
 				TimeMap::value_type& vertexItem,
 				std::size_t transfers,
 				boost::posix_time::time_duration duration,
-				boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
+				const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey,
 				const graph::Vertex& vertex
 			);
 
@@ -146,7 +146,7 @@ namespace synthese
 					@return true if the described journey is useful
 				*/
 				bool isUseLess(
-					boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
+					const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey,
 					const boost::posix_time::ptime& originDateTime,
 					bool propagateInConnectionPlace,
 					bool strict = true

@@ -162,7 +162,7 @@ namespace synthese
 				AlarmTemplateInheritedTableSync::SearchResult alarms(
 					AlarmTemplateInheritedTableSync::Search(env, id)
 				);
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
+				BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
 				{
 					AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
 				}
@@ -172,7 +172,7 @@ namespace synthese
 				ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
 					ScenarioSentAlarmInheritedTableSync::Search(env, id)
 				);
-				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
 				{
 					AlarmTableSync::Remove(NULL, alarm->getKey(), transaction, false);
 				}

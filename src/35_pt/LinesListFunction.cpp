@@ -145,7 +145,7 @@ namespace synthese
 			{
 				stringstream s;
 				bool first(true);
-				BOOST_FOREACH(shared_ptr<const RollingStock> tm, _sortByTransportMode)
+				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{
 					if(!tm.get())
 					{
@@ -374,9 +374,9 @@ namespace synthese
 					CommercialLineTableSync::Search(Env::GetOfficialEnv(), _network->getKey())
 				);
 				set<CommercialLine*> alreadyShownLines;
-				BOOST_FOREACH(shared_ptr<const RollingStock> tm, _sortByTransportMode)
+				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{
-					BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+					BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 					{
 						// Avoid to return a line twice
 						if(alreadyShownLines.find(line.get()) != alreadyShownLines.end())
@@ -410,7 +410,7 @@ namespace synthese
 
 			// Populating the parameters map
 			ParametersMap pm;
-			BOOST_FOREACH(boost::shared_ptr<const RollingStock> tm, _sortByTransportMode)
+			BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 			{
 				BOOST_FOREACH(const LinesMapType::mapped_type::value_type& it, linesMap[tm.get()])
 				{

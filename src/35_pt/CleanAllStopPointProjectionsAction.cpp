@@ -83,7 +83,7 @@ namespace synthese
 			)	);
 
 
-			BOOST_FOREACH(shared_ptr<StopPoint> stopPoint, stopPoints)
+			BOOST_FOREACH(const shared_ptr<StopPoint>& stopPoint, stopPoints)
 			{
 				// Todo
 				if(_automatedOnly && false)

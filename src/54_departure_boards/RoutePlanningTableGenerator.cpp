@@ -21,8 +21,11 @@
 */
 
 #include "RoutePlanningTableGenerator.h"
-#include "PTTimeSlotRoutePlanner.h"
+
+#include "AlgorithmLogger.hpp"
 #include "PTRoutePlannerResult.h"
+#include "PTTimeSlotRoutePlanner.h"
+
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -39,12 +42,13 @@ namespace synthese
 
 	namespace departure_boards
 	{
-
-
 		RoutePlanningList RoutePlanningTableGenerator::run()
 		{
+			// Declarations
+			AlgorithmLogger logger;
 			RoutePlanningList result;
 
+			// Loop on destinations
 			BOOST_FOREACH(const DisplayedPlacesList::value_type& itDestination, _destinations)
 			{
 				PTTimeSlotRoutePlanner rp(
@@ -65,7 +69,8 @@ namespace synthese
 						_withTransfer ? 2 : 1
 					),
 					DEPARTURE_FIRST,
-					false
+					false,
+					logger
 				);
 
 				PTRoutePlannerResult solution(rp.run());
@@ -78,6 +83,8 @@ namespace synthese
 
 			return result;
 		}
+
+
 
 		RoutePlanningTableGenerator::RoutePlanningTableGenerator(
 			const StopArea& origin,
@@ -92,5 +99,4 @@ namespace synthese
 			_withTransfer(withTransfer)
 		{
 		}
-	}
-}
+}	}

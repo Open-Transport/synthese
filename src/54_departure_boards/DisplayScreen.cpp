@@ -22,27 +22,27 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "DisplayScreen.h"
+
+#include "AlgorithmLogger.hpp"
 #include "Registry.h"
 #include "Interface.h"
 #include "InterfacePageException.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Edge.h"
-#include "DisplayScreen.h"
 #include "DisplayType.h"
 #include "DisplayMaintenanceLog.h"
 #include "DeparturesTableInterfacePage.h"
 #include "DeparturesTableRoutePlanningInterfacePage.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "DisplayScreenCPU.h"
-#include "NamedPlace.h"
 #include "DisplayMonitoringStatus.h"
 #include "RoutePlanningTableGenerator.h"
 #include "Webpage.h"
 #include "DisplayScreenContentFunction.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
-
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -68,8 +68,6 @@ namespace synthese
 	using namespace pt_journey_planner;
 	using namespace algorithm;
 
-
-
 	namespace util
 	{
 		template<> const string Registry<departure_boards::DisplayScreen>::KEY("DisplayScreen");
@@ -86,6 +84,8 @@ namespace synthese
 		const std::string DisplayScreen::DATA_TYPE_ID("type_id");
 		const std::string DisplayScreen::DATA_LOCATION_ID("location_id");
 		const std::string DisplayScreen::DATA_CPU_ID("cpu_id");
+
+
 
 		DisplayScreen::DisplayScreen(
 			RegistryKeyType key
@@ -110,8 +110,8 @@ namespace synthese
 			_destinationForceDelay(120),	// default = 2 hours
 			_maintenanceIsOnline(true),
 			_allowCanceled(false)
-		{
-		}
+		{}
+
 
 
 		void DisplayScreen::setDestinationForceDelay(int delay)
@@ -165,10 +165,7 @@ namespace synthese
 			return _title;
 		}
 
-		void DisplayScreen::setBlinkingDelay( int delay)
-		{
-			_blinkingDelay = delay;
-		}
+
 
 		void DisplayScreen::setTrackNumberDisplay( bool value )
 		{
@@ -354,6 +351,7 @@ namespace synthese
 			{
 				ptime routePlanningEndTime(approachJourney.getFirstDepartureTime());
 				routePlanningEndTime += days(1);
+				AlgorithmLogger logger;
 				BOOST_FOREACH(const TransferDestinationsList::mapped_type::value_type& it2, it->second)
 				{
 					PTTimeSlotRoutePlanner rp(
@@ -374,7 +372,8 @@ namespace synthese
 							approachJourney.size()+1
 						),
 						DEPARTURE_FIRST,
-						false
+						false,
+						logger
 					);
 
 					const PTRoutePlannerResult solution(rp.run());
@@ -501,11 +500,6 @@ namespace synthese
 		}
 
 
-
-		void DisplayScreen::setAllPhysicalStopsDisplayed( bool value )
-		{
-			_allPhysicalStopsDisplayed = value;
-		}
 
 		bool DisplayScreen::getAllPhysicalStopsDisplayed() const
 		{

@@ -272,7 +272,7 @@ namespace synthese
 			Env env;
 			query.addWhereField(WebPageTableSync::COL_LINKS, "%"+ lexical_cast<string>(id) +"%", ComposedExpression::OP_LIKE);
 			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
 			{
 				Webpage::Links newLinks;
 				BOOST_FOREACH(Webpage* linkedPage, page->getLinks())
@@ -422,7 +422,7 @@ namespace synthese
 				if(limit) query.setNumber(*limit);
 				query.addOrderField(COL_RANK,true);
 				WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-				BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+				BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
 				{
 					result.push_back(std::make_pair(page->getKey(), page->getName()));
 				}

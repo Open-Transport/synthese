@@ -98,7 +98,7 @@ namespace synthese
 			// Type name
 			stringstream typeName;
 			bool first(true);
-			BOOST_FOREACH(shared_ptr<WFSType> type, _types)
+			BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 			{
 				if(first)
 				{
@@ -278,7 +278,7 @@ namespace synthese
 						"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " <<
 						"xsi:schemaLocation=\"https://extranet-rcsmobility.com/projects/synthese http://" << request.getHostName() << request.getClientURL() << "?" << Request::PARAMETER_SERVICE << "=" << FACTORY_KEY << "&amp;" << PARAMETER_REQUEST << "=" << VALUE_REQUEST_DescribeFeatureType << "&amp;" << PARAMETER_TYPENAME << "=";
 				bool first(true);
-				BOOST_FOREACH(shared_ptr<WFSType> type, _types)
+				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
 					if(first)
 					{
@@ -294,7 +294,7 @@ namespace synthese
 					">";
 
 				// Features
-				BOOST_FOREACH(shared_ptr<WFSType> type, _types)
+				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
 					if(_envelope)
 					{
@@ -321,7 +321,7 @@ namespace synthese
 					"<import namespace=\"http://www.opengis.net/gml\" schemaLocation=\"../gml/3.1.1/base/gml.xsd\" />"
 				;
 
-				BOOST_FOREACH(shared_ptr<WFSType> type, _types)
+				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
 					type->getSchema(stream);
 				}
@@ -441,7 +441,7 @@ namespace synthese
 					// FeatureTypeList
 					"<wfs:FeatureTypeList>";
 
-				BOOST_FOREACH(shared_ptr<WFSType> type, _types)
+				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
 					stream <<
 						"<wfs:FeatureType xmlns:synthese=\"https://extranet-rcsmobility.com/projects/synthese\">" <<

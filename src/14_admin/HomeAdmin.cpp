@@ -64,7 +64,7 @@ namespace synthese
 
 			stream << "<ul>";
 
-			BOOST_FOREACH(boost::shared_ptr<const AdminInterfaceElement> link, getSubPages(*this, request))
+			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, getSubPages(*this, request))
 			{
 				AdminRequest r(request, true);
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(link));

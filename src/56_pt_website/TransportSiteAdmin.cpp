@@ -23,6 +23,8 @@
 */
 
 #include "TransportSiteAdmin.h"
+
+#include "AlgorithmLogger.hpp"
 #include "TransportWebsiteModule.h"
 #include "TransportWebsiteTableSync.h"
 #include "TransportWebsite.h"
@@ -261,7 +263,7 @@ namespace synthese
 				v.push_back("Actions");
 				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
 				stream << f.open() << t.open();
-				BOOST_FOREACH(shared_ptr<ObjectSiteLink> link, cities)
+				BOOST_FOREACH(const shared_ptr<ObjectSiteLink>& link, cities)
 				{
 					cityRemoveRequest.getAction()->setObjectId(link->getKey());
 
@@ -341,7 +343,7 @@ namespace synthese
 					"Trace",
 					st.getForm().getTextInput(
 						RoutePlannerFunction::PARAMETER_LOG_PATH,
-						_journeyPlanner.getLogPath() ? _journeyPlanner.getLogPath()->file_string() : string()
+						_journeyPlanner.getLogger().getDirectory().file_string()
 				)	);
 				if(!_site->getRollingStockFilters().empty())
 				{
@@ -394,7 +396,8 @@ namespace synthese
 						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getEndArrivalDate() : _journeyPlanner.getStartDepartureDate(),
 						1,
 						ap,
-						_journeyPlanner.getPlanningOrder()
+						_journeyPlanner.getPlanningOrder(),
+						_journeyPlanner.getLogger()
 					);
 					RoadJourneyPlannerResult jv(r.run());
 
@@ -444,7 +447,7 @@ namespace synthese
 				TransportWebsiteTableSync::SearchResult sites(
 					TransportWebsiteTableSync::Search(Env::GetOfficialEnv())
 				);
-				BOOST_FOREACH(shared_ptr<TransportWebsite> site, sites)
+				BOOST_FOREACH(const shared_ptr<TransportWebsite>& site, sites)
 				{
 					shared_ptr<TransportSiteAdmin> p(
 						getNewPage<TransportSiteAdmin>()
@@ -467,7 +470,7 @@ namespace synthese
 				dynamic_cast<const WebPageAdmin*>(&currentPage)
 			){
 				WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _site->getKey(), RegistryKeyType(0)));
-				BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+				BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
 				{
 					shared_ptr<WebPageAdmin> p(
 						getNewPage<WebPageAdmin>()

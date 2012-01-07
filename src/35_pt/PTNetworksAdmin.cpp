@@ -147,7 +147,7 @@ namespace synthese
 			stream << t.open();
 			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
 			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
-			BOOST_FOREACH(shared_ptr<TransportNetwork> network, networks)
+			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
 			{
 				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
 				{
