@@ -271,7 +271,7 @@ namespace synthese
 					_getEnv(),
 					_profile->getKey()
 			)	);
-			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
+			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
 			{
 				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);

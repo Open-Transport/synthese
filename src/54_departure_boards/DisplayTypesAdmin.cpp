@@ -174,7 +174,7 @@ namespace synthese
 
 			// Display types loop
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<DisplayType> dt, types)
+			BOOST_FOREACH(const shared_ptr<DisplayType>& dt, types)
 			{
 				deleteRequest.getAction()->setObjectId(dt->getKey());
 				openRequest.getPage()->setType(dt);
@@ -310,7 +310,7 @@ namespace synthese
 					UP_LINKS_LOAD_LEVEL
 			)	);
 			AdminInterfaceElement::PageLinks links;
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
+			BOOST_FOREACH(const shared_ptr<DisplayType>& displayType, types)
 			{
 				shared_ptr<DisplayTypeAdmin> p(getNewPage<DisplayTypeAdmin>());
 				p->setType(displayType);

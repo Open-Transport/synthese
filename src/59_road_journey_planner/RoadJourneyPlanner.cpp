@@ -21,6 +21,9 @@
 */
 
 #include "RoadJourneyPlanner.h"
+
+#include "AlgorithmLogger.hpp"
+#include "Hub.h"
 #include "PTModule.h"
 #include "RoadModule.h"
 #include "Place.h"
@@ -30,7 +33,6 @@
 #include "IntegralSearcher.h"
 #include "StopPoint.hpp"
 #include "NamedPlace.h"
-#include "Hub.h"
 
 #include <sstream>
 
@@ -59,7 +61,7 @@ namespace synthese
 			const boost::optional<std::size_t> maxSolutionsNumber,
 			const graph::AccessParameters accessParameters,
 			const PlanningOrder planningOrder,
-			std::ostream* logStream
+			const AlgorithmLogger& logger
 		):	TimeSlotRoutePlanner(
 				origin->getVertexAccessMap(
 					accessParameters, RoadModule::GRAPH_ID, RoadModule::GRAPH_ID, 0
@@ -77,7 +79,7 @@ namespace synthese
 				planningOrder,
 				accessParameters.getApproachSpeed(),
 				true,
-				logStream
+				logger
 			),
 			_departurePlace(origin),
 			_arrivalPlace(destination)
@@ -85,13 +87,9 @@ namespace synthese
 		}
 
 
+
 		RoadJourneyPlannerResult RoadJourneyPlanner::run() const
 		{
-			if(	_logStream
-			){
-				*_logStream << "<h2>Origin access map calculation</h2>";
-			}
-
 			TimeSlotRoutePlanner::Result result;
 
 			// Control if departure and arrival VAMs has contains at least one vertex
@@ -106,43 +104,10 @@ namespace synthese
 			VertexAccessMap ovam(_originVam);
 			VertexAccessMap dvam(_destinationVam);
 
-			if(	_logStream
-			){
-				*_logStream << "<h3>Origins</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
+			// Log vams 
+			_logger.logTimeSlotJourneyPlannerApproachMap(true, ovam);
+			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 
-				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, ovam.getMap())
-				{
-					*_logStream	<<
-						"<tr><td>" <<
-						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-						"</td><td>" << static_cast<const StopPoint*>(it.first)->getName() <<
-						"</td><td>" << it.second.approachDistance <<
-						"</td><td>" << it.second.approachTime.total_seconds() / 60 <<
-						"</td></tr>"
-						;
-				}
-				*_logStream << "</table>";
-
-				*_logStream << "<h2>Destination access map calculation</h2>";
-
-				*_logStream << "<h3>Destinations</h3><table class=\"adminresults\"><tr><th>Connection Place</th><th>Physical Stop</th><th>Dst.</th><th>Time</th></tr>";
-
-				BOOST_FOREACH(VertexAccessMap::VamMap::value_type it, dvam.getMap())
-				{
-					*_logStream	<<
-						"<tr><td>" <<
-						dynamic_cast<const NamedPlace*>(it.first->getHub())->getFullName() <<
-						"</td><td>" <<
-						static_cast<const StopPoint*>(it.first)->getName() <<
-						"</td><td>" <<
-						it.second.approachDistance <<
-						"</td><td>" <<
-						it.second.approachTime.total_seconds() / 60 <<
-						"</td></tr>"
-						;
-				}
-				*_logStream << "</table>";
-			}
 // 			if (result.empty())
 // 			{
 // 				_previousContinuousServiceDuration = posix_time::minutes(0);
@@ -171,7 +136,7 @@ namespace synthese
 				_planningOrder,
 				_vmax,
 				true,
-				_logStream
+				_logger
 			);
 			return RoadJourneyPlannerResult(
 				_departurePlace,

@@ -94,7 +94,7 @@ namespace synthese
 					{
 //						object->setParent(GetEditable(pid, env, linkLevel).get());
 					}
-					catch(ObjectNotFoundException<TreeFolderRoot>& e)
+					catch(ObjectNotFoundException<TreeFolderRoot>&)
 					{
 						Log::GetInstance().warn("No such parent "+ lexical_cast<string>(pid) +" in folder "+ lexical_cast<string>(object->getKey()));
 					}

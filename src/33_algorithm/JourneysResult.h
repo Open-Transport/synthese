@@ -23,15 +23,15 @@
 #ifndef SYNTHESE_routeplanner_JourneysResult_h__
 #define SYNTHESE_routeplanner_JourneysResult_h__
 
+#include "BestVertexReachesMap.h"
+#include "GraphTypes.h"
+#include "RoutePlanningIntermediateJourney.hpp"
+
 #include <map>
 #include <set>
-#include <vector>
 #include <sstream>
+#include <vector>
 #include <boost/foreach.hpp>
-
-#include "BestVertexReachesMap.h"
-#include "RoutePlanningIntermediateJourney.hpp"
-#include "GraphTypes.h"
 
 namespace synthese
 {
@@ -96,17 +96,23 @@ namespace synthese
 					@param journey the journey to remove
 					@author Hugues Romain
 				*/
-				void remove(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
+				void remove(
+					const RoutePlanningIntermediateJourney& journey
+				);
+
 
 
 				void remove(const graph::Vertex* vertex);
+
 
 
 				/** Adds a journey to the result object.
 					@param journey the journey to add
 					@author Hugues Romain
 				*/
-				void add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey);
+				void add(
+					const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
+				);
 
 
 
@@ -162,7 +168,6 @@ namespace synthese
 				bool empty() const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_routeplanner_JourneysResult_h__

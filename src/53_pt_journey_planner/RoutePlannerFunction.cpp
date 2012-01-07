@@ -22,6 +22,8 @@
 
 #include "RoutePlannerFunction.h"
 
+#include "AccessParameters.h"
+#include "AlgorithmLogger.hpp"
 #include "Edge.h"
 #include "HourPeriod.h"
 #include "ObjectNotFoundException.h"
@@ -53,7 +55,6 @@
 #include "User.h"
 #include "City.h"
 #include "Place.h"
-#include "AccessParameters.h"
 #include "PTConstants.h"
 #include "DateTimeInterfacePage.h"
 #include "NamedPlace.h"
@@ -71,7 +72,6 @@
 #include "FareTicket.hpp"
 #include "HTMLForm.h"
 #include "CMSModule.hpp"
-#include "UseRule.h"
 #include "PTUseRule.h"
 
 #include <geos/io/WKTWriter.h>
@@ -91,16 +91,15 @@ using namespace geos::io;
 
 namespace synthese
 {
+	using namespace algorithm;
 	using namespace util;
 	using namespace server;
 	using namespace pt;
-	using namespace interfaces;
 	using namespace pt_website;
 	using namespace db;
 	using namespace graph;
 	using namespace geography;
 	using namespace road;
-	using namespace algorithm;
 	using namespace pt_journey_planner;
 	using namespace resa;
 	using namespace html;
@@ -288,6 +287,17 @@ namespace synthese
 
 
 
+		RoutePlannerFunction::RoutePlannerFunction(
+		):	_startDate(not_a_date_time),
+			_endDate(not_a_date_time),
+			_period(NULL),
+			_startArrivalDate(not_a_date_time),
+			_endArrivalDate(not_a_date_time),
+			_logger(new AlgorithmLogger())
+		{}
+
+
+
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
@@ -303,6 +313,13 @@ namespace synthese
 			{
 				map.insert(PARAMETER_WARNING_CHECK_PAGE, _warningCheckPage->getKey());
 			}
+
+			// Log path
+			if(_logger && !_logger->getDirectory().empty())
+			{
+				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().file_string());
+			}
+
 			return map;
 		}
 
@@ -319,6 +336,14 @@ namespace synthese
 				site->getDisplayRoadApproachDetail() :
 				true
 			;
+
+			// Log path
+			if(!map.getDefault<string>(PARAMETER_LOG_PATH).empty())
+			{
+				_logger.reset(
+					new AlgorithmLogger(map.get<string>(PARAMETER_LOG_PATH))
+				);
+			}
 
 			// Max transfer duration
 			if(map.isDefined(PARAMETER_MAX_TRANSFER_DURATION))
@@ -340,7 +365,9 @@ namespace synthese
 			}
 			else if( // Two fields input
 				map.isDefined(PARAMETER_DEPARTURE_CITY_TEXT) &&
-				map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT)
+				map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT) &&
+				map.isDefined(PARAMETER_ARRIVAL_CITY_TEXT) &&
+				map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT)
 			){
 				_originCityText = map.getDefault<string>(PARAMETER_DEPARTURE_CITY_TEXT);
 				_destinationCityText = map.getDefault<string>(PARAMETER_ARRIVAL_CITY_TEXT);
@@ -379,8 +406,11 @@ namespace synthese
 					}
 				}
 			}
-			else // One field input
-			{
+			// One field input
+			else if(
+				map.isDefined(PARAMETER_DEPARTURE_PLACE_TEXT) &&
+				map.isDefined(PARAMETER_ARRIVAL_PLACE_TEXT)
+			){
 				PlacesListService placesListService;
 				placesListService.setNumber(1);
 				stringstream fakeStream;
@@ -889,7 +919,7 @@ namespace synthese
 				_accessParameters,
 				DEPARTURE_FIRST,
 				false,
-				NULL,
+				*_logger,
 				_maxTransferDuration
 			);
 
@@ -1587,18 +1617,6 @@ namespace synthese
 			}
 
 			return util::ParametersMap();
-		}
-
-
-
-		RoutePlannerFunction::RoutePlannerFunction()
-			: _startDate(not_a_date_time)
-			, _endDate(not_a_date_time)
-			, _period(NULL)
-			, _home(false),
-			_startArrivalDate(not_a_date_time),
-			_endArrivalDate(not_a_date_time)
-		{
 		}
 
 

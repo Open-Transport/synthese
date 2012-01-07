@@ -137,7 +137,7 @@ namespace synthese
 					_requestParameters.orderField == PARAM_SEARCH_NAME,
 					_requestParameters.raisingOrder
 			)	);
-			BOOST_FOREACH(shared_ptr<Destination> destination, destinations)
+			BOOST_FOREACH(const shared_ptr<Destination>& destination, destinations)
 			{
 				// Row init
 				stream << t.row();
@@ -215,7 +215,7 @@ namespace synthese
 					DestinationTableSync::Search(
 						*_env
 				)	);
-				BOOST_FOREACH(shared_ptr<Destination> destination, destinations)
+				BOOST_FOREACH(const shared_ptr<Destination>& destination, destinations)
 				{
 					shared_ptr<DestinationAdmin> p(getNewPage<DestinationAdmin>());
 					p->setDestination(const_pointer_cast<const Destination>(destination));

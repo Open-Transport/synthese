@@ -21,10 +21,12 @@
 */
 
 #include "JourneysResult.h"
-#include "IntegralSearcher.h"
+
 #include "Edge.h"
+#include "IntegralSearcher.h"
 #include "Vertex.h"
 
+using namespace boost;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -49,206 +51,165 @@ namespace synthese
 
 
 
-		//! @name Getters
-		//@{
-			/** Result object getter.
-				@return const ResultSet& the result
-				@author Hugues Romain
-			*/
-			const JourneysResult::ResultSet& JourneysResult::getJourneys() const
+		const JourneysResult::ResultSet& JourneysResult::getJourneys() const
+		{
+			return _result;
+		}
+
+
+
+		void JourneysResult::remove(
+			const RoutePlanningIntermediateJourney& journey
+		){
+			const graph::Vertex* vertex(journey.getEndEdge().getFromVertex());
+			remove(vertex);
+		}
+
+
+
+		void JourneysResult::remove(const graph::Vertex* vertex)
+		{
+			IndexMap::iterator it(_index.find(vertex));
+			if (it != _index.end())
 			{
-				return _result;
+				ResultSet::iterator its(it->second);
+				_result.erase(its);
+				_index.erase(it);
 			}
-		//@}
+		}
 
 
 
-		//! @name Update methods
-		//@{
-			/** Removes the specified journey from the result object.
-				@param journey the journey to remove
-				@author Hugues Romain
-			*/
-			void JourneysResult::remove(boost::shared_ptr<RoutePlanningIntermediateJourney> journey)
+		void JourneysResult::add(
+			const shared_ptr<RoutePlanningIntermediateJourney>& journey
+		){
+			const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
+			boost::posix_time::time_duration duration(
+				_accessDirection == DEPARTURE_TO_ARRIVAL ?
+				journey->getEndTime() - _originDateTime :
+				_originDateTime - journey->getEndTime()
+			);
+			remove(vertex);
+			_index.insert(
+				std::make_pair(
+					vertex,
+					_result.insert(
+						std::make_pair(journey, duration)
+					).first
+			)	);
+		}
+
+
+
+		void JourneysResult::addEmptyJourney()
+		{
+			graph::Vertex* nullVertex(NULL);
+			_index.insert(
+				std::make_pair(
+					nullVertex,
+					_result.insert(
+						std::make_pair(
+							boost::shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(_accessDirection)),
+							boost::posix_time::minutes(0)
+					)	).first
+			)	);
+		}
+
+
+
+		boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::front()
+		{
+			assert(!empty());
+
+			boost::shared_ptr<RoutePlanningIntermediateJourney> ptr(_result.begin()->first);
+			_index.erase(ptr->empty() ? NULL : ptr->getEndEdge().getFromVertex());
+			_result.erase(_result.begin());
+			return ptr;
+		}
+
+
+
+		void JourneysResult::cleanup(
+			bool updateMinSpeed,
+			const ptime& newMaxTime,
+			BestVertexReachesMap& bvrm,
+			bool propagateInConnectionPlace,
+			bool strict,
+			const IntegralSearcher& is
+		){
+			std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToAdd;
+			std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToRemove;
+
+			time_duration newTotalDuration(
+				_accessDirection == DEPARTURE_TO_ARRIVAL ?
+				newMaxTime - is.getOriginDateTime() :
+				is.getOriginDateTime() - newMaxTime
+			);
+
+			for (IndexMap::iterator it(_index.begin()); it != _index.end();)
 			{
-				const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
-				remove(vertex);
-			}
-
-
-
-			void JourneysResult::remove(const graph::Vertex* vertex)
-			{
-				IndexMap::iterator it(_index.find(vertex));
-				if (it != _index.end())
+				boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
+				IndexMap::iterator next(it);
+				++next;
+				if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime(false) >= newMaxTime ||
+					_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime(false) <= newMaxTime
+					// TODO Add reach ability test
+					// TODO take into account of strict
+				){
+					journeysToRemove.push_back(journey);
+				}
+				else if (updateMinSpeed)
 				{
-					ResultSet::iterator its(it->second);
-					_result.erase(its);
+					_result.erase(it->second);
 					_index.erase(it);
+					journey->setScore(
+						is._getScore(
+							newTotalDuration,
+							*journey->getDistanceToEnd(),
+							_accessDirection == DEPARTURE_TO_ARRIVAL ?
+								journey->getFirstArrivalTime() - is.getOriginDateTime() :
+								is.getOriginDateTime() - journey->getLastDepartureTime(),
+							*(	_accessDirection == DEPARTURE_TO_ARRIVAL ?
+								journey->getDestination():
+								journey->getOrigin()
+							)->getFromVertex()->getHub()
+					)	);
+					journeysToAdd.push_back(journey);
 				}
+				it = next;
 			}
-
-
-
-			/** Adds a journey to the result object.
-				@param journey the journey to add
-				@author Hugues Romain
-			*/
-			void JourneysResult::add(boost::shared_ptr<RoutePlanningIntermediateJourney> journey)
+			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToRemove)
 			{
-				const graph::Vertex* vertex(journey->getEndEdge().getFromVertex());
-				boost::posix_time::time_duration duration(
-					_accessDirection == DEPARTURE_TO_ARRIVAL ?
-					journey->getEndTime() - _originDateTime :
-					_originDateTime - journey->getEndTime()
-				);
-				remove(vertex);
-				_index.insert(
-					std::make_pair(
-						vertex,
-						_result.insert(
-							std::make_pair(journey, duration)
-						).first
-				)	);
+				remove(*journey);
 			}
-
-
-
-			/** Adds an empty journey for a specified vertex.
-				@param method Access direction of the journey to create
-				@author Hugues Romain
-				@date 2008
-			*/
-			void JourneysResult::addEmptyJourney()
+			BOOST_FOREACH(const shared_ptr<RoutePlanningIntermediateJourney>& journey, journeysToAdd)
 			{
-				graph::Vertex* nullVertex(NULL);
-				_index.insert(
-					std::make_pair(
-						nullVertex,
-						_result.insert(
-							std::make_pair(
-								boost::shared_ptr<RoutePlanningIntermediateJourney>(new RoutePlanningIntermediateJourney(_accessDirection)),
-								boost::posix_time::minutes(0)
-						)	).first
-				)	);
+				add(journey);
 			}
+		}
 
 
 
-			/** Gets the first journey of the result set and remove it.
-				@return Pointer to the first journey
-				@warning The returned pointer must be deleted after use
-			*/
-			boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::front()
+		boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::get(const graph::Vertex* vertex) const
+		{
+			IndexMap::const_iterator it(_index.find(vertex));
+			if (it != _index.end())
 			{
-				assert(!empty());
-
-				boost::shared_ptr<RoutePlanningIntermediateJourney> ptr(_result.begin()->first);
-				_index.erase(ptr->empty() ? NULL : ptr->getEndEdge().getFromVertex());
-				_result.erase(_result.begin());
-				return ptr;
+				ResultSet::const_iterator its(it->second);
+				return its->first;
 			}
+			else
+				return boost::shared_ptr<RoutePlanningIntermediateJourney>();
+		}
 
 
 
-			/** Removes useless result journeys according to the current best reaches.
-				@param updateMinSpeed
-				@param newMaxTime
-				@param bvrm the best reaches map to control
-				@author Hugues Romain
-			*/
-			void JourneysResult::cleanup(
-				bool updateMinSpeed,
-				const ptime& newMaxTime,
-				BestVertexReachesMap& bvrm,
-				bool propagateInConnectionPlace,
-				bool strict,
-				const IntegralSearcher& is
-			){
-				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToAdd;
-				std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToRemove;
-
-				time_duration newTotalDuration(
-					_accessDirection == DEPARTURE_TO_ARRIVAL ?
-					newMaxTime - is.getOriginDateTime() :
-					is.getOriginDateTime() - newMaxTime
-				);
-
-				for (IndexMap::iterator it(_index.begin()); it != _index.end();)
-				{
-					boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
-					IndexMap::iterator next(it);
-					++next;
-					if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime(false) >= newMaxTime ||
-						_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime(false) <= newMaxTime
-						// TODO Add reach ability test
-						// TODO take into account of strict
-					){
-						journeysToRemove.push_back(journey);
-					}
-					else if (updateMinSpeed)
-					{
-						_result.erase(it->second);
-						_index.erase(it);
-						journey->setScore(
-							is._getScore(
-								newTotalDuration,
-								*journey->getDistanceToEnd(),
-								_accessDirection == DEPARTURE_TO_ARRIVAL ?
-									journey->getFirstArrivalTime() - is.getOriginDateTime() :
-									is.getOriginDateTime() - journey->getLastDepartureTime(),
-								*(	_accessDirection == DEPARTURE_TO_ARRIVAL ?
-									journey->getDestination():
-									journey->getOrigin()
-								)->getFromVertex()->getHub()
-						)	);
-						journeysToAdd.push_back(journey);
-					}
-					it = next;
-				}
-				BOOST_FOREACH(boost::shared_ptr<RoutePlanningIntermediateJourney> journey, journeysToRemove)
-				{
-					remove(journey);
-				}
-				BOOST_FOREACH(boost::shared_ptr<RoutePlanningIntermediateJourney> journey, journeysToAdd)
-				{
-					add(journey);
-				}
-			}
-		//@}
-
-
-
-		//! @name Queries
-		//@{
-			/** Gets the result journey that reaches the specified vertex.
-				@param vertex Vertex to be reached by the returned result journey
-				@return const pt::Journey* const The result journey that reaches the specified vertex
-				@author Hugues Romain
-			*/
-			boost::shared_ptr<RoutePlanningIntermediateJourney> JourneysResult::get(const graph::Vertex* vertex) const
-			{
-				IndexMap::const_iterator it(_index.find(vertex));
-				if (it != _index.end())
-				{
-					ResultSet::const_iterator its(it->second);
-					return its->first;
-				}
-				else
-					return boost::shared_ptr<RoutePlanningIntermediateJourney>();
-			}
-
-
-
-			/** Is the result empty ?.
-				@return bool true if the result is empty
-				@author Hugues Romain
-			*/
-			bool JourneysResult::empty() const
-			{
-				return _result.empty();
-			}
-		//@}
-
-	}
-}
+		/** Is the result empty ?.
+			@return bool true if the result is empty
+			@author Hugues Romain
+		*/
+		bool JourneysResult::empty() const
+		{
+			return _result.empty();
+		}
+}	}

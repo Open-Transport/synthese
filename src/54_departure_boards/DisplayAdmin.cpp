@@ -1015,7 +1015,7 @@ namespace synthese
 
 				vector<shared_ptr<SentAlarm> > alarms(DisplayScreenTableSync::GetCurrentDisplayedMessage(Env::GetOfficialEnv(), _displayScreen->getKey()));
 				AdminFunctionRequest<MessageAdmin> viewMessageRequest(_request);
-				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
 				{
 					// Avoid malformed message
 					if(alarm->getScenario() == NULL) continue;
@@ -1069,7 +1069,7 @@ namespace synthese
 					h2.push_back("Admin");
 					HTMLTable t2(h2, ResultHTMLTable::CSS_CLASS);
 					stream << t2.open();
-					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, futures)
+					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, futures)
 					{
 						stream << t2.row();
 						stream << t2.col() << HTMLModule::getHTMLImage((alarm->getLevel() == ALARM_LEVEL_WARNING) ? "full_screen_message_display.png" : "partial_message_display.png",	"Message : " + alarm->getShortMessage());

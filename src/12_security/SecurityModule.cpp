@@ -139,7 +139,7 @@ namespace synthese
 			ProfileTableSync::SearchResult profiles(
 				ProfileTableSync::Search(env)
 			);
-			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
+			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
 			{
 				m.push_back(make_pair(profile->getKey(), profile->getName()));
 			}
@@ -167,7 +167,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					false
 			)	);
-			BOOST_FOREACH(shared_ptr<User> user, users)
+			BOOST_FOREACH(const shared_ptr<User>& user, users)
 			{
 				m.push_back(make_pair(user->getKey(), user->getSurname() + " " + user->getName()));
 			}
@@ -201,7 +201,7 @@ namespace synthese
 					optional<size_t>(),
 					FIELDS_ONLY_LOAD_LEVEL
 			)	);
-			BOOST_FOREACH(shared_ptr<Profile> cprofile, profiles)
+			BOOST_FOREACH(const shared_ptr<Profile>& cprofile, profiles)
 			{
 				 v.push_back(cprofile);
 			}

@@ -21,6 +21,8 @@
 */
 
 #include "TimeSlotRoutePlanner.h"
+
+#include "AlgorithmLogger.hpp"
 #include "RoutePlanner.h"
 
 #include <boost/foreach.hpp>
@@ -54,7 +56,7 @@ namespace synthese
 			PlanningOrder planningOrder,
 			double vmax,
 			bool ignoreReservation,
-			std::ostream* logStream,
+			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -70,11 +72,10 @@ namespace synthese
 			_planningOrder(planningOrder),
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
-			_logStream(logStream),
+			_logger(logger),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration)
-		{
-		}
+		{}
 
 
 
@@ -90,7 +91,7 @@ namespace synthese
 			const PlanningOrder planningOrder,
 			double vmax,
 			bool ignoreReservation,
-			std::ostream* logStream,
+			const AlgorithmLogger& logger,
 			boost::optional<boost::posix_time::time_duration> maxTransferDuration
 		):	_originVam(originVam),
 			_destinationVam(destinationVam),
@@ -111,11 +112,10 @@ namespace synthese
 			_parentContinuousService(continuousService),
 			_journeyTemplates(graphToUse),
 			_vmax(vmax),
-			_logStream(logStream),
+			_logger(logger),
 			_ignoreReservation(ignoreReservation),
 			_maxTransferDuration(maxTransferDuration)
-		{
-		}
+		{}
 
 
 
@@ -154,10 +154,7 @@ namespace synthese
 				_planningOrder == DEPARTURE_FIRST ? originDateTime <= _highestDepartureTime : originDateTime >= _lowestArrivalTime;
 				_planningOrder == DEPARTURE_FIRST ? originDateTime += minutes(1) : originDateTime -= minutes(1)
 			){
-				if(	_logStream
-				){
-					*_logStream << "<h2>Route planning " << (result.size()+1) << " at " << _lowestDepartureTime << "</h2>";
-				}
+				_logger.logTimeSlotJourneyPlannerStep(originDateTime);
 
 				RoutePlanner r(
 					_originVam,
@@ -172,7 +169,7 @@ namespace synthese
 					_graphToUse,
 					_vmax,
 					_ignoreReservation,
-					_logStream,
+					_logger,
 					_journeyTemplates,
 					_maxTransferDuration
 				);
@@ -195,7 +192,7 @@ namespace synthese
 						_planningOrder,
 						_vmax,
 						_ignoreReservation,
-						_logStream,
+						_logger,
 						_maxTransferDuration
 					);
 					Result subResult(_MergeSubResultAndParentContinuousService(journey, tsr.run()));

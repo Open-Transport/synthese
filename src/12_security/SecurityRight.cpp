@@ -99,7 +99,7 @@ namespace synthese
 			shared_ptr<Profile> parent,
 			std::string prefix
 		){
-			BOOST_FOREACH(shared_ptr<Profile> profile, SecurityModule::getSubProfiles(parent))
+			BOOST_FOREACH(const shared_ptr<Profile>& profile, SecurityModule::getSubProfiles(parent))
 			{
 				plv.push_back(make_pair(lexical_cast<string>(profile->getKey()), prefix + profile->getName()));
 

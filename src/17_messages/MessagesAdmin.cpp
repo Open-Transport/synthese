@@ -248,7 +248,7 @@ namespace synthese
 
 			stream << t1.open();
 
-			BOOST_FOREACH(shared_ptr<SentScenario> message, scenarios)
+			BOOST_FOREACH(const shared_ptr<SentScenario>& message, scenarios)
 			{
 				bool isDisplayedWithEndDate(
 					(message->getPeriodStart().is_not_a_date_time() || message->getPeriodStart() <= now)

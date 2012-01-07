@@ -1,6 +1,3 @@
-#ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
-#define SYNTHESE_CTABLEAUAFFICHAGE_H
-
 ////////////////////////////////////////////////////////////////////
 /// DisplayScreen class header.
 ///	@file DisplayScreen.h
@@ -25,22 +22,26 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////
 
-#include <set>
-#include <string>
-#include <ostream>
-#include <map>
+#ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
+#define SYNTHESE_CTABLEAUAFFICHAGE_H
 
+#include "Importable.h"
+#include "Named.h"
 #include "Registrable.h"
+#include "TreeNode.hpp"
+#include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "TreeMultiClassRootPolicy.hpp"
+
 #include "Registry.h"
 #include "DBLog.h"
 #include "DeparturesTableTypes.h"
 #include "ForcedDestinationsArrivalDepartureTableGenerator.h"
 #include "StandardArrivalDepartureTableGenerator.h"
-#include "TreeNode.hpp"
-#include "TreeAlphabeticalOrderingPolicy.hpp"
-#include "TreeMultiClassRootPolicy.hpp"
-#include "Named.h"
-#include "Importable.h"
+
+#include <set>
+#include <string>
+#include <ostream>
+#include <map>
 
 namespace synthese
 {
@@ -232,8 +233,8 @@ namespace synthese
 
 			//!	\name Setters
 			//@{
-				void	setAllPhysicalStopsDisplayed(bool value);
-				void	setBlinkingDelay(int);
+				void	setAllPhysicalStopsDisplayed(bool value){ _allPhysicalStopsDisplayed = value; }
+				void	setBlinkingDelay(int value){ _blinkingDelay = value; }
 				void	setClearingDelay(int delay);
 				void	setDestinationForceDelay(int);
 				void	setDirection(DeparturesTableDirection direction);

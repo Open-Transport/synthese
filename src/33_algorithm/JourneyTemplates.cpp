@@ -130,6 +130,7 @@ namespace synthese
 					journeyTemplate.size() - 1 - 2 * precedingJourney.size()
 				] == &hub;
 			}
+			return false;
 		}
 	}
 }

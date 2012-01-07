@@ -550,7 +550,7 @@ namespace synthese
 				stream << ts.open();
 
 				size_t i(0);
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, sservices)
+				BOOST_FOREACH(const shared_ptr<ScheduledService>& service, sservices)
 				{
 					serviceRequest.getPage()->setService(service);
 					removeRequest.getAction()->setObjectId(service->getKey());
@@ -630,7 +630,7 @@ namespace synthese
 				stream << tc.open();
 
 				size_t i(0);
-				BOOST_FOREACH(shared_ptr<ContinuousService> service, cservices)
+				BOOST_FOREACH(const shared_ptr<ContinuousService>& service, cservices)
 				{
 					serviceRequest.getPage()->setService(service);
 					removeRequest.getAction()->setObjectId(service->getKey());
@@ -899,7 +899,7 @@ namespace synthese
 				ScheduledServiceTableSync::SearchResult services(
 					ScheduledServiceTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<const ScheduledService> service, services)
+				BOOST_FOREACH(const shared_ptr<const ScheduledService>& service, services)
 				{
 					shared_ptr<ServiceAdmin> p(
 						getNewPage<ServiceAdmin>()
@@ -910,7 +910,7 @@ namespace synthese
 				ContinuousServiceTableSync::SearchResult cservices(
 					ContinuousServiceTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<const ContinuousService> service, cservices)
+				BOOST_FOREACH(const shared_ptr<const ContinuousService>& service, cservices)
 				{
 					shared_ptr<ServiceAdmin> p(
 						getNewPage<ServiceAdmin>()

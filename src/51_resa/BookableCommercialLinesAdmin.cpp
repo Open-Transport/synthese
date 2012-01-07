@@ -115,7 +115,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, lines);
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				openRequest.getPage()->setCommercialLine(line);
 
@@ -128,11 +128,15 @@ namespace synthese
 
 		}
 
+
+
 		bool BookableCommercialLinesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string());
 		}
+
+
 
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
@@ -166,7 +170,7 @@ namespace synthese
 					optional<size_t>()
 					, false, true, true, true
 			)	);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				shared_ptr<BookableCommercialLineAdmin> p(
 					getNewPage<BookableCommercialLineAdmin>()

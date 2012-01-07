@@ -175,7 +175,7 @@ namespace synthese
 						}
 
 						RoadTableSync::SearchResult paths(RoadTableSync::Search(_env, roadPlace->getKey()));
-						BOOST_FOREACH(shared_ptr<Path> path, paths)
+						BOOST_FOREACH(const shared_ptr<Path>& path, paths)
 						{
 							RoadChunkTableSync::Search(_env, path->getKey());
 						}

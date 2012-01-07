@@ -106,7 +106,7 @@ namespace synthese
 
 			AdminRequest r(_request, true);
 			AdminInterfaceElement::PageLinks links(getSubPages(*this, _request));
-			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> page, links)
+			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
 			{
 				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
 				stream << "<li>" << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
@@ -130,13 +130,13 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			Factory<AdminInterfaceElement>::ObjectsCollection pages(Factory<AdminInterfaceElement>::GetNewCollection());
-			BOOST_FOREACH(shared_ptr<AdminInterfaceElement> page, pages)
+			BOOST_FOREACH(const shared_ptr<AdminInterfaceElement>& page, pages)
 			{
 				page->setEnv(_env);
 				PageLinks l(
 					page->getSubPagesOfModule(*_moduleClass, currentPage, request)
 				);
-				BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, l)
+				BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, l)
 				{
 					links.push_back(link);
 				}

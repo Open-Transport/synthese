@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace algorithm
+	{
+		class AlgorithmLogger;
+	}
+
 	namespace geography
 	{
 		class Place;
@@ -110,7 +115,7 @@ namespace synthese
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
 				bool								ignoreReservation,
-				std::ostream* logStream = NULL,
+				const algorithm::AlgorithmLogger& algorithmLogger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 

@@ -163,7 +163,7 @@ namespace synthese
 			stream << t.open();
 
 			// Profiles loop
-			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
+			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
 			{
 				profileRequest.getPage()->setProfile(profile);
 				deleteProfileRequest.getAction()->setObjectId(profile->getKey());
@@ -242,7 +242,7 @@ namespace synthese
 					_getEnv(),
 					0
 			)	);
-			BOOST_FOREACH(shared_ptr<Profile> profile, profiles)
+			BOOST_FOREACH(const shared_ptr<Profile>& profile, profiles)
 			{
 				shared_ptr<ProfileAdmin> p(getNewPage<ProfileAdmin>());
 				p->setProfile(profile);

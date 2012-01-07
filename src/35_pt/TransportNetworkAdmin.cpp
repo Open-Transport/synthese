@@ -151,7 +151,7 @@ namespace synthese
 
 			stream << t.open();
 			AdminFunctionRequest<CommercialLineAdmin> lineOpenRequest(_request);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				lineOpenRequest.getPage()->setCommercialLine(line);
 				stream << t.row();
@@ -244,7 +244,7 @@ namespace synthese
 						true, false, true,
 						UP_LINKS_LOAD_LEVEL
 				)	);
-				BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+				BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 				{
 					shared_ptr<CommercialLineAdmin> p(
 						getNewPage<CommercialLineAdmin>()

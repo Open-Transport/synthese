@@ -247,7 +247,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+				BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 				{
 					if(screen->getParent())
 					{
@@ -459,7 +459,7 @@ namespace synthese
 
 				stream << t.open();
 
-				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
+				BOOST_FOREACH(const shared_ptr<DisplayScreenCPU>& cpu, cpus)
 				{
 					updateRequest.getPage()->setCPU(cpu);
 
@@ -605,7 +605,7 @@ namespace synthese
 						_place->get() ? (*_place)->getKey() : 0,
 						optional<string>()
 				)	);
-				BOOST_FOREACH(shared_ptr<DisplayScreenCPU> cpu, cpus)
+				BOOST_FOREACH(const shared_ptr<DisplayScreenCPU>& cpu, cpus)
 				{
 					shared_ptr<DisplayScreenCPUAdmin> p(getNewPage<DisplayScreenCPUAdmin>());
 					p->setCPU(cpu);
@@ -620,7 +620,7 @@ namespace synthese
 						optional<RegistryKeyType>(),
 						_place->get() ? (*_place)->getKey() : 0
 				)	);
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+				BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 				{
 					if(	screen->getRoot<DisplayScreenCPU>() ||
 						screen->getParent() != NULL

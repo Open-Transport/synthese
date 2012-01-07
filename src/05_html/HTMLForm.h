@@ -792,7 +792,7 @@ namespace synthese
 						s << " selected=\"selected\"";
 					s << ">" << HTMLModule::HTMLEncode(zeroLabel) << "</option>";
 				}
-				BOOST_FOREACH(boost::shared_ptr<const T> object, registry)
+				BOOST_FOREACH(const boost::shared_ptr<const T>& object, registry)
 				{
 					s << "<option value=\"" << object->getKey() << "\"";
 					if (value && object == *value)

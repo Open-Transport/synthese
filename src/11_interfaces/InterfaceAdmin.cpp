@@ -130,7 +130,7 @@ namespace synthese
 			stream << t.open();
 
 			InterfacePageTableSync::SearchResult pages(InterfacePageTableSync::Search(Env::GetOfficialEnv(), _interface->getKey()));
-			BOOST_FOREACH(shared_ptr<InterfacePage> page, pages)
+			BOOST_FOREACH(const shared_ptr<InterfacePage>& page, pages)
 			{
 				openRequest.getPage()->setPage(const_pointer_cast<const InterfacePage>(page));
 
@@ -165,7 +165,7 @@ namespace synthese
 			){
 
 				InterfaceTableSync::SearchResult interfaces(InterfaceTableSync::Search(Env::GetOfficialEnv()));
-				BOOST_FOREACH(shared_ptr<Interface> interf, interfaces)
+				BOOST_FOREACH(const shared_ptr<Interface>& interf, interfaces)
 				{
 					shared_ptr<InterfaceAdmin> p(getNewPage<InterfaceAdmin>());
 					p->_interface = const_pointer_cast<const Interface>(interf);
@@ -186,7 +186,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			InterfacePageTableSync::SearchResult pages(InterfacePageTableSync::Search(Env::GetOfficialEnv(), _interface->getKey()));
-			BOOST_FOREACH(shared_ptr<InterfacePage> page, pages)
+			BOOST_FOREACH(const shared_ptr<InterfacePage>& page, pages)
 			{
 				shared_ptr<InterfacePageAdmin> p(getNewPage<InterfacePageAdmin>());
 				p->setPage(const_pointer_cast<const InterfacePage>(page));

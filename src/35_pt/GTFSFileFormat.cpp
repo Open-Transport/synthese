@@ -1162,7 +1162,7 @@ namespace synthese
 				static_cast<const ScheduledService *>(service);
 			}
 
-			BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
+			BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
 			{
 				shared_ptr<geos::geom::Point> gp;
 				string departureTimeStr;

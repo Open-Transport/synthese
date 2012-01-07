@@ -219,7 +219,7 @@ namespace synthese
 				result.push_back(make_pair(optional<RegistryKeyType>(0), *noDepotLabel));
 			}
 			SearchResult depots(Search(env));
-			BOOST_FOREACH(shared_ptr<Depot> depot, depots)
+			BOOST_FOREACH(const shared_ptr<Depot>& depot, depots)
 			{
 				result.push_back(make_pair(optional<RegistryKeyType>(depot->getKey()), depot->getName()));
 			}

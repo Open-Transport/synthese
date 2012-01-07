@@ -623,7 +623,7 @@ namespace synthese
 									)	);
 									if(!serviceCalendarLinks.empty())
 									{
-										BOOST_FOREACH(shared_ptr<CalendarLink> scl, serviceCalendarLinks)
+										BOOST_FOREACH(const shared_ptr<CalendarLink>& scl, serviceCalendarLinks)
 										{
 											if((scl->getCalendarTemplate2() == periodCalendar) && (scl->getCalendarTemplate() == daysCalendar))
 											{

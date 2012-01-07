@@ -67,7 +67,7 @@ namespace synthese
 
 
 		bool BestVertexReachesMap::isUseLess(
-			boost::shared_ptr<RoutePlanningIntermediateJourney> journeysptr,
+			const boost::shared_ptr<RoutePlanningIntermediateJourney>& journeysptr,
 			const ptime& originDateTime,
 			bool propagateInConnectionPlace,
 			bool strict
@@ -161,7 +161,7 @@ namespace synthese
 			TimeMap::value_type& vertexItem,
 			size_t transfers,
 			boost::posix_time::time_duration duration,
-			boost::shared_ptr<RoutePlanningIntermediateJourney> journey
+			const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
 		){
 			TimeMap::value_type::iterator it(vertexItem.find(transfers));
 			if (it == vertexItem.end())
@@ -180,7 +180,7 @@ namespace synthese
 			TimeMap::value_type& vertexItem,
 			size_t transfers,
 			boost::posix_time::time_duration duration,
-			boost::shared_ptr<RoutePlanningIntermediateJourney> journey,
+			const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey,
 			const graph::Vertex& vertex
 		){
 			_insert(vertexItem, transfers, duration, journey);

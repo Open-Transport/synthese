@@ -712,7 +712,7 @@ namespace synthese
 			std::size_t& rank
 		) const	{
 
-			BOOST_FOREACH(shared_ptr<ParametersMap> item, maps)
+			BOOST_FOREACH(const shared_ptr<ParametersMap>& item, maps)
 			{
 				// Template parameters
 				item->merge(getTemplateParameters());

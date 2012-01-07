@@ -240,7 +240,7 @@ namespace synthese
 
 					// Links to folders or timetable edition
 					AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request);
-					BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
+					BOOST_FOREACH(const shared_ptr<Timetable>& tt, timetables)
 					{
 						editTimetableRequest.getPage()->setTimetable(tt);
 						copyTimetableRequest.getAction()->setTemplate(const_pointer_cast<const Timetable>(tt));
@@ -382,7 +382,7 @@ namespace synthese
 					int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
 					int lastRank(UNKNOWN_VALUE);
 					set<const CommercialLine*> lines;
-					BOOST_FOREACH(shared_ptr<TimetableRow> row, rows)
+					BOOST_FOREACH(const shared_ptr<TimetableRow>& row, rows)
 					{
 						lastRank = row->getRank();
 						deleteRowRequest.getAction()->setObjectId(row->getKey());
@@ -703,7 +703,7 @@ namespace synthese
 			TimetableTableSync::SearchResult timetables(
 				TimetableTableSync::Search(Env::GetOfficialEnv(), _timetable.get() ? _timetable->getKey() : 0)
 			);
-			BOOST_FOREACH(shared_ptr<Timetable> tt, timetables)
+			BOOST_FOREACH(const shared_ptr<Timetable>& tt, timetables)
 			{
 				shared_ptr<TimetableAdmin> page(
 					getNewPage<TimetableAdmin>()

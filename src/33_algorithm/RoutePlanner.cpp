@@ -22,20 +22,20 @@
 
 #include "RoutePlanner.h"
 
-#include "IntegralSearcher.h"
+#include "AlgorithmLogger.hpp"
 #include "BestVertexReachesMap.h"
-#include "Hub.h"
 #include "Edge.h"
+#include "Hub.h"
+#include "IntegralSearcher.h"
+#include "Journey.h"
 #include "Service.h"
 #include "Vertex.h"
-#include "Journey.h"
 #include "VertexAccessMap.h"
-#include "RoutePlannerLogger.h"
 
 #include <algorithm>
+#include <limits>
 #include <set>
 #include <sstream>
-#include <limits>
 
 #undef max
 #undef min
@@ -67,7 +67,7 @@ namespace synthese
 			graph::GraphIdType graphToUse,
 			double vmax,
 			bool ignoreReservation,
-			std::ostream* logStream /*= NULL*/,
+			const AlgorithmLogger& logger,
 			boost::optional<const JourneyTemplates&> journeyTemplates,
 			const optional<time_duration>	maxTransferDuration
 		):	_originVam(originVam),
@@ -80,7 +80,7 @@ namespace synthese
 			_maxEndTime(maxEndTime),
 			_whatToSearch(whatToSearch),
 			_graphToUse(graphToUse),
-			_logStream(logStream),
+			_logger(logger),
 			_totalDistance(
 				(destinationVam.getCentroid().get() && originVam.getCentroid().get()) ?
 				int(destinationVam.getCentroid()->distance(originVam.getCentroid().get())) :
@@ -268,15 +268,9 @@ namespace synthese
 			// Initialization of the best vertex reaches map
 			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam, Vertex::GetMaxIndex());
 
-			optional<RoutePlannerLogger> logger(
-				_logStream ?
-				optional<RoutePlannerLogger>(RoutePlannerLogger(*_logStream, todo, result)) :
-				optional<RoutePlannerLogger>()
-			);
-			if(logger)
-			{
-				logger->open();
-			}
+			// Open logger
+			_logger.openJourneyPlannerLog(result);
+			shared_ptr<const RoutePlanningIntermediateJourney> journey;
 
 			// Initialization of the integral searcher
 			IntegralSearcher is(
@@ -296,7 +290,7 @@ namespace synthese
 				_maxDuration,
 				_vmax,
 				_ignoreReservation,
-				NULL,
+				_logger,
 				_totalDistance,
 				_journeyTemplates
 			);
@@ -316,10 +310,7 @@ namespace synthese
 			// Main loop
 			while(true)
 			{
-				if(logger)
-				{
-					logger->recordIntegralSearch(todo);
-				}
+				_logger.recordJourneyPlannerLogIntegralSearch(journey, originDateTime, todo);
 
 				bool resultFound(false);
 
@@ -342,17 +333,13 @@ namespace synthese
 					if (journey > result)
 					{
 						result = journey;
-						if(logger)
-						{
-							logger->recordNewResult(result);
-						}
 						resultFound = true;
 						bestEndTime = result.getEndTime();
 					}
 
 					if (va.approachTime.total_seconds() == 0)
 					{
-						todo.remove(it->first);
+						todo.remove(*it->first);
 					}
 
 					it = next;
@@ -377,14 +364,11 @@ namespace synthese
 					break;
 				}
 
-				if(logger)
-				{
-					logger->recordCleanup(todo);
-				}
+				_logger.recordJourneyPlannerLogCleanup(resultFound, todo);
 
 				// Recursion from the next reached point
 				lastBestEndTime = bestEndTime;
-				shared_ptr<const RoutePlanningIntermediateJourney> journey(todo.front());
+				journey = todo.front();
 
 				is.integralSearch(
 					*journey,
@@ -393,25 +377,19 @@ namespace synthese
 						optional<posix_time::time_duration>() :
 						optional<posix_time::time_duration>(
 							accessDirection == DEPARTURE_TO_ARRIVAL ?
-							result.getFirstDepartureTime() - originDateTime :
+							result.getFirstDepartureTime() - originDateTime : // FIRST FIX : put getFirstArrivalTime
 							originDateTime - result.getFirstDepartureTime()
 						),
 					maxTransferDuration
 				);
 			}
 
-			if(logger)
-			{
-				logger->close();
-			}
+			_logger.closeJourneyPlannerLog();
 		}
 
 
 
 		RoutePlanner::SamePlacesException::SamePlacesException()
 			: Exception("Same places in route planner")
-		{
-
-		}
-	}
-}
+		{}
+}	}

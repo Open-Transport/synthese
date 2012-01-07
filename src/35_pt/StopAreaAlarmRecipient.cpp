@@ -199,7 +199,7 @@ namespace synthese
 			);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<StopArea> stop, stops)
+			BOOST_FOREACH(const shared_ptr<StopArea>& stop, stops)
 			{
 				if (usedStops.find(stop->getKey()) != usedStops.end())
 				{

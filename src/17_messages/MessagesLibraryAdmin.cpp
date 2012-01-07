@@ -208,7 +208,7 @@ namespace synthese
 			);
 			stream << t3.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioTemplate> scenario, scenarios)
+			BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& scenario, scenarios)
 			{
 				updateScenarioRequest.getPage()->setScenario(scenario);
 				deleteScenarioRequest.getAction()->setObjectId(scenario->getKey());
@@ -247,7 +247,7 @@ namespace synthese
 			HTMLList l;
 			stream << f.open() << l.open();
 
-			BOOST_FOREACH(shared_ptr<ScenarioFolder> folder, folders)
+			BOOST_FOREACH(const shared_ptr<ScenarioFolder>& folder, folders)
 			{
 				if(folder == _folder) continue;
 
@@ -315,7 +315,7 @@ namespace synthese
 				ScenarioFolderTableSync::SearchResult folders(
 					ScenarioFolderTableSync::Search(*_env, _folder.get() ? _folder->getKey() : 0)
 				);
-				BOOST_FOREACH(shared_ptr<ScenarioFolder> cfolder, folders)
+				BOOST_FOREACH(const shared_ptr<ScenarioFolder>& cfolder, folders)
 				{
 					shared_ptr<MessagesLibraryAdmin> p(
 						getNewPage<MessagesLibraryAdmin>()
@@ -330,7 +330,7 @@ namespace synthese
 						*_env,
 						_folder.get() ? _folder->getKey() : 0
 				)	);
-				BOOST_FOREACH(shared_ptr<ScenarioTemplate> tpl, scenarios)
+				BOOST_FOREACH(const shared_ptr<ScenarioTemplate>& tpl, scenarios)
 				{
 					shared_ptr<MessagesScenarioAdmin> p(
 						getNewPage<MessagesScenarioAdmin>()
