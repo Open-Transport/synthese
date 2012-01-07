@@ -44,20 +44,22 @@ namespace synthese
 	private:
 		boost::shared_ptr<G> _geometry;
 
-	public:
 
+	public:
 		//////////////////////////////////////////////////////////////////////////
 		/// Default constructor
 		WithGeometry() {}
+
 
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Copy constructor
 		/// @param geometry geometry to copy
 		WithGeometry(
-			boost::shared_ptr<G> geometry
+			const boost::shared_ptr<G>& geometry
 		):	_geometry(geometry.get() ? static_cast<G*>(geometry->clone()) : NULL)
 		{}
+
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -65,7 +67,7 @@ namespace synthese
 		/// @param geometry geometry to convert
 		/// @param spatialReference new spatial reference
 		WithGeometry(
-			boost::shared_ptr<G> geometry,
+			const boost::shared_ptr<G>& geometry,
 			const CoordinatesSystem& spatialReference
 		):	_geometry(
 			geometry.get() ?
@@ -76,24 +78,33 @@ namespace synthese
 		)
 		{}
 
+
+			
 		virtual ~WithGeometry(){}
+
 
 
 		//! @name Getters
 		//@{
-			boost::shared_ptr<G> getGeometry() const { return _geometry; }
+			const boost::shared_ptr<G>& getGeometry() const { return _geometry; }
 		//@}
+
+
 
 		//! @name Setters
 		//@{
-			void setGeometry(boost::shared_ptr<G> value){ _geometry = value; }
+			void setGeometry(const boost::shared_ptr<G>& value){ _geometry = value; }
 		//@}
+
+
 
 		//! @name Modifiers
 		//@{
 			void resetGeometry(){ _geometry.reset(); }
 			void cloneGeometry(const G& value){_geometry.reset(value.clone()); }
 		//@}
+
+
 
 		//! @name Services
 		//@{

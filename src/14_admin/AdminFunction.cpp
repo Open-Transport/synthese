@@ -350,7 +350,7 @@ namespace synthese
 			);
 			pm.insert(DATA_CONTENT, contentStream.str());
 
-			BOOST_FOREACH(shared_ptr<ModuleClass> module, Factory<ModuleClass>::GetNewCollection())
+			BOOST_FOREACH(const shared_ptr<ModuleClass>& module, Factory<ModuleClass>::GetNewCollection())
 			{
 				module->addAdminPageParameters(pm, adminRequest);
 			}

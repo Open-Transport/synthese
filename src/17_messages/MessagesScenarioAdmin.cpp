@@ -209,7 +209,7 @@ namespace synthese
 					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
 						ScenarioSentAlarmInheritedTableSync::Search(*_env, _sentScenario->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
 					}
@@ -219,7 +219,7 @@ namespace synthese
 					AlarmTemplateInheritedTableSync::SearchResult alarms(
 						AlarmTemplateInheritedTableSync::Search(*_env, _templateScenario->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
+					BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
 					}
@@ -241,7 +241,7 @@ namespace synthese
 				stream << t.open();
 
 				AdminFunctionRequest<MessageAdmin> messRequest(_request);
-				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
+				BOOST_FOREACH(const shared_ptr<Alarm>& alarm, v)
 				{
 					messRequest.getPage()->setMessage(alarm);
 					deleteRequest.getAction()->setObjectId(alarm->getKey());
@@ -345,7 +345,7 @@ namespace synthese
 						*_env,
 						_scenario->getKey(), 0, optional<size_t>(), false, false, false, false, UP_LINKS_LOAD_LEVEL
 				)	);
-				BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+				BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
 				{
 					shared_ptr<MessageAdmin> p(
 						getNewPage<MessageAdmin>()
@@ -361,7 +361,7 @@ namespace synthese
 						*_env,
 						_scenario->getKey(), 0, optional<size_t>(), false, false, UP_LINKS_LOAD_LEVEL
 				)	);
-				BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
+				BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
 				{
 					shared_ptr<MessageAdmin> p(
 						getNewPage<MessageAdmin>()

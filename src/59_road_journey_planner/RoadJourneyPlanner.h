@@ -33,6 +33,11 @@
 
 namespace synthese
 {
+	namespace algorithm
+	{
+		class AlgorithmLogger;
+	}
+
 	namespace geography
 	{
 		class Place;
@@ -62,12 +67,11 @@ namespace synthese
 				const boost::optional<std::size_t>	maxSolutionsNumber,
 				const graph::AccessParameters		accessParameters,
 				const algorithm::PlanningOrder		planningOrder,
-				std::ostream* logStream = NULL
+				const algorithm::AlgorithmLogger& logger
 			);
 
 			RoadJourneyPlannerResult run() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ptrouteplanner_RoadRoutePlanner_h__

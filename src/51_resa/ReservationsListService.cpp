@@ -263,7 +263,7 @@ namespace synthese
 				JourneyPatternTableSync::SearchResult routes(
 					JourneyPatternTableSync::Search(*_env, _line->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+				BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
 				{
 					LineStopTableSync::Search(
 						*_env,
@@ -380,7 +380,7 @@ namespace synthese
 				)	);
 
 				// Sort reservations
-				BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
+				BOOST_FOREACH(const shared_ptr<const Reservation>& resa, sqlreservations)
 				{
 					if(!_env->getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
 

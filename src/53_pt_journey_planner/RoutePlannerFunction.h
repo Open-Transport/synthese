@@ -25,18 +25,24 @@
 #ifndef SYNTHESE_RoutePlannerFunction_H__
 #define SYNTHESE_RoutePlannerFunction_H__
 
-#include "FunctionWithSite.h"
-#include "AccessParameters.h"
 #include "FactorableTemplate.h"
-#include "TransportWebsite.h"
+#include "FunctionWithSite.h"
+
+#include "AccessParameters.h"
 #include "AlgorithmTypes.h"
 #include "PTRoutePlannerResult.h"
+#include "TransportWebsite.h"
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
 
 namespace synthese
 {
+	namespace algorithm
+	{
+		class AlgorithmLogger;
+	}
+
 	namespace road
 	{
 		class Crossing;
@@ -79,11 +85,6 @@ namespace synthese
 		class ServicePointer;
 		class Journey;
 		class Vertex;
-	}
-
-	namespace geography
-	{
-		class Place;
 	}
 
 	namespace pt_journey_planner
@@ -200,7 +201,6 @@ namespace synthese
 			static const std::string DATA_LINE_ID;
 			static const std::string DATA_STOP_ID;
 			static const std::string DATA_INTERNAL_DATE;
-			static const std::string DATA_IS_HOME;
 			static const std::string DATA_ORIGIN_CITY_TEXT;
 			static const std::string DATA_HANDICAPPED_FILTER;
 			static const std::string DATA_ORIGIN_PLACE_TEXT;
@@ -315,7 +315,6 @@ namespace synthese
 				boost::optional<std::size_t>				_maxSolutionsNumber;
 				std::size_t									_periodId;
 				const pt_website::HourPeriod*			_period;
-				bool										_home;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				bool										_outputRoadApproachDetail;
@@ -325,7 +324,7 @@ namespace synthese
 				boost::optional<double> _minMaxDurationRatioFilter;
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
 				bool _fareCalculation;
-				boost::optional<boost::filesystem::path>	_logPath;
+				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
 			//@}
 
@@ -369,8 +368,8 @@ namespace synthese
 				const graph::AccessParameters& getAccessParameters() const { return _accessParameters; }
 				boost::shared_ptr<const pt_website::RollingStockFilter> getTransportModeFilter() const { return _rollingStockFilter; }
 				algorithm::PlanningOrder getPlanningOrder() const { return _planningOrder; }
-				boost::optional<boost::filesystem::path> getLogPath() const { return _logPath; }
 				const std::string& getOutputFormat() const { return _outputFormat; }
+				const algorithm::AlgorithmLogger& getLogger() const { return *_logger; }
 			//@}
 
 			//! @name Setters

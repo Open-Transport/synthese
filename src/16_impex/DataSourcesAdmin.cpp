@@ -148,7 +148,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
+			BOOST_FOREACH(const shared_ptr<DataSource>& dataSource, dataSources)
 			{
 				openRequest.getPage()->setDataSource(const_pointer_cast<const DataSource>(dataSource));
 				removeRequest.getAction()->setObjectId(dataSource->getKey());
@@ -203,7 +203,7 @@ namespace synthese
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(*_env)
 			);
-			BOOST_FOREACH(shared_ptr<DataSource> dataSource, dataSources)
+			BOOST_FOREACH(const shared_ptr<DataSource>& dataSource, dataSources)
 			{
 				shared_ptr<DataSourceAdmin> p(getNewPage<DataSourceAdmin>());
 				p->setDataSource(dataSource);

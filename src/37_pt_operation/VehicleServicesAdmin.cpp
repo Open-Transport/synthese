@@ -154,7 +154,7 @@ namespace synthese
 
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<VehicleService> vehicleService, vehicleServices)
+			BOOST_FOREACH(const shared_ptr<VehicleService>& vehicleService, vehicleServices)
 			{
 				stream << t.row(lexical_cast<string>(vehicleService->getKey()));
 

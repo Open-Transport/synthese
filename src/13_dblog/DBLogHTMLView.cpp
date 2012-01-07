@@ -301,7 +301,7 @@ namespace synthese
 			);
 
 			stream << t.open();
-			BOOST_FOREACH(shared_ptr<DBLogEntry> dbe, entries)
+			BOOST_FOREACH(const shared_ptr<DBLogEntry>& dbe, entries)
 			{
 				shared_ptr<const User> user;
 				try

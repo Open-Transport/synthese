@@ -230,7 +230,7 @@ namespace synthese
 					AlarmTemplateInheritedTableSync::SearchResult alarms(
 						AlarmTemplateInheritedTableSync::Search(*_env, _scenario->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<AlarmTemplate> alarm, alarms)
+					BOOST_FOREACH(const shared_ptr<AlarmTemplate>& alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, AlarmTemplate>(alarm));
 					}
@@ -240,14 +240,14 @@ namespace synthese
 					ScenarioSentAlarmInheritedTableSync::SearchResult alarms(
 						ScenarioSentAlarmInheritedTableSync::Search(*_env, _scenario->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<SentAlarm> alarm, alarms)
+					BOOST_FOREACH(const shared_ptr<SentAlarm>& alarm, alarms)
 					{
 						v.push_back(static_pointer_cast<Alarm, SentAlarm>(alarm));
 					}
 				}
 
 				// Messages
-				BOOST_FOREACH(shared_ptr<Alarm> alarm, v)
+				BOOST_FOREACH(const shared_ptr<Alarm>& alarm, v)
 				{
 					shared_ptr<ParametersMap> messagePM(new ParametersMap(getTemplateParameters()));
 					alarm->toParametersMap(*messagePM, false);

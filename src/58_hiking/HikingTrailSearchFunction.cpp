@@ -98,7 +98,7 @@ namespace synthese
 
 			if(_itemDisplayPage.get())
 			{
-				BOOST_FOREACH(shared_ptr<ParametersMap> itemMap, pm.getSubMaps(DATA_HIKING_TRAIL))
+				BOOST_FOREACH(const shared_ptr<ParametersMap>& itemMap, pm.getSubMaps(DATA_HIKING_TRAIL))
 				{
 					itemMap->merge(getTemplateParameters());
 

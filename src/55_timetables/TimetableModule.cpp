@@ -71,7 +71,7 @@ namespace synthese
 			TimetableTableSync::SearchResult folders(
 				TimetableTableSync::Search(env, folderId)
 			);
-			BOOST_FOREACH(shared_ptr<Timetable> folder, folders)
+			BOOST_FOREACH(const shared_ptr<Timetable>& folder, folders)
 			{
 				if (folder->getKey() == forbiddenFolderId)
 					continue;

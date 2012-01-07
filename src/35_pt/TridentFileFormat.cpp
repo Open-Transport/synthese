@@ -755,7 +755,7 @@ namespace synthese
 				LineStopTableSync::SearchResult linestops(
 					LineStopTableSync::Search(_env, srv->getPath()->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
+				BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
 				{
 					os << "<vehicleJourneyAtStop>" << "\n";
 					os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
@@ -865,7 +865,7 @@ namespace synthese
 					LineStopTableSync::SearchResult linestops(
 						LineStopTableSync::Search(_env, srv->getPath()->getKey())
 					);
-					BOOST_FOREACH(shared_ptr<LineStop> ls, linestops)
+					BOOST_FOREACH(const shared_ptr<LineStop>& ls, linestops)
 					{
 						os << "<vehicleJourneyAtStop>" << "\n";
 						os << "<stopPointId>" << TridentId (peerid, "StopPoint", *ls) << "</stopPointId>" << "\n";
@@ -1004,7 +1004,7 @@ namespace synthese
 					StopAreaTableSync::SearchResult places(
 						StopAreaTableSync::Search(senv, city->getKey(), true)
 					);
-					BOOST_FOREACH(shared_ptr<const StopArea> cp, places)
+					BOOST_FOREACH(const shared_ptr<const StopArea>& cp, places)
 					{
 						// filter physical stops not concerned by this line.
 						if(!_env.getRegistry<StopArea>().contains(cp->getKey())) continue;
@@ -1519,7 +1519,7 @@ namespace synthese
 			JourneyPatternTableSync::SearchResult sroutes(
 				JourneyPatternTableSync::Search(_env, cline->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<JourneyPattern> line, sroutes)
+			BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, sroutes)
 			{
 				LineStopTableSync::Search(
 					_env,
@@ -1781,7 +1781,7 @@ namespace synthese
 						}
 						if(calendarToImport)
 						{
-							BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, elements)
+							BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& element, elements)
 							{
 								_calendarElementsToRemove.insert(element);
 								_env.getEditableRegistry<CalendarTemplateElement>().remove(element->getKey());
@@ -1991,7 +1991,7 @@ namespace synthese
 			}
 			if(_importTimetablesAsTemplates)
 			{
-				BOOST_FOREACH(shared_ptr<CalendarTemplateElement> element, _calendarElementsToRemove)
+				BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& element, _calendarElementsToRemove)
 				{
 					CalendarTemplateElementTableSync::RemoveRow(element->getKey(), transaction);
 				}

@@ -133,7 +133,7 @@ namespace synthese
 			ResultHTMLTable t(h, searchRequest.getHTMLForm(), _requestParameters, lines);
 			stream << t.open();
 
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				openRequest.getPage()->setCommercialLine(line);
 
@@ -194,7 +194,7 @@ namespace synthese
 					optional<size_t>()
 					, false, true, true, true
 			)	);
-			BOOST_FOREACH(shared_ptr<CommercialLine> line, lines)
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
 			{
 				shared_ptr<ResaStatisticsAdmin> p(
 					getNewPage<ResaStatisticsAdmin>()

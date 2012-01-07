@@ -42,6 +42,7 @@ namespace synthese
 
 	namespace algorithm
 	{
+		class AlgorithmLogger;
 		class BestVertexReachesMap;
 		class JourneyTemplates;
 		class JourneysResult;
@@ -83,7 +84,7 @@ namespace synthese
 				boost::posix_time::ptime&					_minMaxDateTimeAtDestination;
 				const bool									_inverted;	//!< Indicates that the AccessDirection is the contrary to the planning order (2nd phase)
 				const bool									_optim;
-				std::ostream* const							_logStream;
+				const AlgorithmLogger&						_logger;
 				boost::optional<boost::posix_time::time_duration>	_maxDuration;
 				const double								_vmax;
 				bool										_ignoreReservation;
@@ -168,7 +169,7 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration>	maxDuration,
 				double												vmax,
 				bool												ignoreReservation,
-				std::ostream* const									logStream = NULL,
+				const AlgorithmLogger&								logger,
 				int													totalDistance = 0,
 				boost::optional<const JourneyTemplates&>			journeyTemplates = boost::optional<const JourneyTemplates&>()
 			);
@@ -209,7 +210,7 @@ namespace synthese
 				@date 2007
 			*/
 			_JourneyUsefulness evaluateJourney(
-				boost::shared_ptr<RoutePlanningIntermediateJourney> journey
+				const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
 			) const;
 
 

@@ -111,7 +111,7 @@ namespace synthese
 					optional<RegistryKeyType>(),
 					_stopArea.get() ? optional<RegistryKeyType>(_stopArea->getKey()) : optional<RegistryKeyType>()
 			)	);
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+			BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 			{
 				// Declaration
 				shared_ptr<ParametersMap> pmScreen(new ParametersMap);
@@ -124,7 +124,7 @@ namespace synthese
 			if(_page.get()) // CMS output
 			{
 				size_t rank(0);
-				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmScreen, pm.getSubMaps(DATA_SCREEN))
+				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& pmScreen, pm.getSubMaps(DATA_SCREEN))
 				{
 					// Template parameters
 					pmScreen->merge(getTemplateParameters());

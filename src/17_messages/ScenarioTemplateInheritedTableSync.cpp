@@ -149,7 +149,7 @@ namespace synthese
 			AlarmTemplateInheritedTableSync::SearchResult alarms(
 				AlarmTemplateInheritedTableSync::Search(env, scenarioId, 0, optional<size_t>(), false, false, FIELDS_ONLY_LOAD_LEVEL)
 			);
-			BOOST_FOREACH(shared_ptr<const AlarmTemplate> alarm, alarms)
+			BOOST_FOREACH(const shared_ptr<const AlarmTemplate>& alarm, alarms)
 			{
 				ScenarioTemplate::GetVariablesInformations(alarm->getShortMessage(), result);
 				ScenarioTemplate::GetVariablesInformations(alarm->getLongMessage(), result);
@@ -168,7 +168,7 @@ namespace synthese
 			AlarmTemplateInheritedTableSync::SearchResult alarms(
 				AlarmTemplateInheritedTableSync::Search(env, sourceId)
 			);
-			BOOST_FOREACH(shared_ptr<AlarmTemplate> templateAlarm, alarms)
+			BOOST_FOREACH(const shared_ptr<AlarmTemplate>& templateAlarm, alarms)
 			{
 				AlarmTemplate alarm(dest, *templateAlarm);
 				AlarmTableSync::Save(&alarm);

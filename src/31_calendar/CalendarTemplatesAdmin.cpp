@@ -223,7 +223,7 @@ namespace synthese
 						UP_LINKS_LOAD_LEVEL,
 						RegistryKeyType(0)
 				)	);
-				BOOST_FOREACH(shared_ptr<CalendarTemplate> ct, calendars)
+				BOOST_FOREACH(const shared_ptr<CalendarTemplate>& ct, calendars)
 				{
 					shared_ptr<CalendarTemplateAdmin> page(
 						getNewPage<CalendarTemplateAdmin>()

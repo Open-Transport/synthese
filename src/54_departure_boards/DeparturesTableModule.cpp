@@ -82,7 +82,7 @@ namespace synthese
 			DisplayTypeTableSync::SearchResult types(
 				DisplayTypeTableSync::Search(Env::GetOfficialEnv())
 			);
-			BOOST_FOREACH(shared_ptr<DisplayType> displayType, types)
+			BOOST_FOREACH(const shared_ptr<DisplayType>& displayType, types)
 			{
 				m.push_back(make_pair(displayType->getKey(), displayType->getName()));
 			}
@@ -107,7 +107,7 @@ namespace synthese
 				string(),
 				AT_LEAST_ONE_BROADCASTPOINT
 			);
-			BOOST_FOREACH(shared_ptr<ConnectionPlaceWithBroadcastPoint> con, bpv)
+			BOOST_FOREACH(const shared_ptr<ConnectionPlaceWithBroadcastPoint>& con, bpv)
 			{
 				localizations.push_back(make_pair(con->place->getKey(), con->cityName + " " + con->place->getName()));
 			}
@@ -125,7 +125,7 @@ namespace synthese
 				m.push_back(make_pair(optional<RegistryKeyType>(), "(toutes)"));
 			}
 			vector<shared_ptr<const CommercialLine> > c = getCommercialLineWithBroadcastPoints(env);
-			BOOST_FOREACH(shared_ptr<const CommercialLine> line, c)
+			BOOST_FOREACH(const shared_ptr<const CommercialLine>& line, c)
 			{
 				m.push_back(make_pair(line->getKey(), line->getShortName()));
 			}

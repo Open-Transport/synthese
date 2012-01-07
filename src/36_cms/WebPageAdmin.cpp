@@ -344,7 +344,7 @@ namespace synthese
 			AdminInterfaceElement::PageLinks links;
 
 			WebPageTableSync::SearchResult pages(WebPageTableSync::Search(Env::GetOfficialEnv(), _page->getRoot()->getKey(), _page->getKey()));
-			BOOST_FOREACH(shared_ptr<Webpage> page, pages)
+			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
 			{
 				shared_ptr<WebPageAdmin> p(
 					getNewPage<WebPageAdmin>()

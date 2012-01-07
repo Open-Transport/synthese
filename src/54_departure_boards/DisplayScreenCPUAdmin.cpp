@@ -282,7 +282,7 @@ namespace synthese
 				c.push_back("Actions");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+				BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 				{
 					displayRequest.getPage()->setScreen(screen);
 					stream << t.row();
@@ -376,7 +376,7 @@ namespace synthese
 			DisplayScreenTableSync::SearchResult screens(
 				DisplayScreenTableSync::SearchFromCPU(_getEnv(), _cpu->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<DisplayScreen> screen, screens)
+			BOOST_FOREACH(const shared_ptr<DisplayScreen>& screen, screens)
 			{
 				shared_ptr<DisplayAdmin> p(getNewPage<DisplayAdmin>());
 				p->setScreen(screen);

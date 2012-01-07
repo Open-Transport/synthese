@@ -137,7 +137,7 @@ namespace synthese
 			}
 			else
 			{
-				BOOST_FOREACH(shared_ptr<DesignatedLinePhysicalStop> edge, edges)
+				BOOST_FOREACH(const shared_ptr<DesignatedLinePhysicalStop>& edge, edges)
 				{
 					// The most detailed geometry is selected as template
 					if(edge->getGeometry().get() &&
@@ -150,7 +150,7 @@ namespace synthese
 
 			if(geom.get())
 			{
-				BOOST_FOREACH(shared_ptr<DesignatedLinePhysicalStop> edge, edges)
+				BOOST_FOREACH(const shared_ptr<DesignatedLinePhysicalStop>& edge, edges)
 				{
 					edge->setGeometry(geom);
 					LineStopTableSync::Save(edge.get(), transaction);

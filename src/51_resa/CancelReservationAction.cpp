@@ -96,7 +96,7 @@ namespace synthese
 			ReservationTableSync::SearchResult reservations(
 				ReservationTableSync::Search(*_env, _transaction->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<Reservation> resa, reservations)
+			BOOST_FOREACH(const shared_ptr<Reservation>& resa, reservations)
 			{
 				if (resa->getReservationRuleId() != 0)
 				{

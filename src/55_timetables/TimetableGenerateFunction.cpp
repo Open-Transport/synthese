@@ -591,7 +591,7 @@ namespace synthese
 						stringstream content;
 						Env env;
 						warnings.reset(new TimetableResult::Warnings);
-						BOOST_FOREACH(shared_ptr<Timetable> tt, _containerContent)
+						BOOST_FOREACH(const shared_ptr<Timetable>& tt, _containerContent)
 						{
 							try
 							{

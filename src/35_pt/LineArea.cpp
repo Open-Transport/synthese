@@ -137,7 +137,7 @@ namespace synthese
 		Edge::SubEdges LineArea::getSubEdges() const
 		{
 			SubEdges result;
-			BOOST_FOREACH(shared_ptr<AreaGeneratedLineStop> generatedLineStop, _generatedLineStops)
+			BOOST_FOREACH(const shared_ptr<AreaGeneratedLineStop>& generatedLineStop, _generatedLineStops)
 			{
 				result.push_back(generatedLineStop.get());
 			}

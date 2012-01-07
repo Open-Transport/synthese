@@ -124,7 +124,7 @@ namespace synthese
 
 			// Recursion
 			PageLinks pages(adminPage->getSubPages(*this, request));
-			BOOST_FOREACH(shared_ptr<const AdminInterfaceElement> link, pages)
+			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, pages)
 			{
 				position.push_back(link);
 				if (*link == *this)

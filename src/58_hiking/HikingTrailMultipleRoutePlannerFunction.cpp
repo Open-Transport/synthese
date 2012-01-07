@@ -22,9 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "HikingTrailMultipleRoutePlannerFunction.hpp"
+
+#include "AlgorithmLogger.hpp"
 #include "RequestException.h"
 #include "Request.h"
-#include "HikingTrailMultipleRoutePlannerFunction.hpp"
 #include "NamedPlace.h"
 #include "City.h"
 #include "HikingTrail.h"
@@ -409,6 +411,9 @@ namespace synthese
 			const Request& request
 		) const {
 
+			// Declarations
+			AlgorithmLogger logger;
+
 			// Beginning journey
 			{
 				ptime startDate;
@@ -439,7 +444,8 @@ namespace synthese
 					optional<size_t>(),
 					accessParameters,
 					DEPARTURE_FIRST,
-					false
+					false,
+					logger
 				);
 
 				// Computing
@@ -501,7 +507,8 @@ namespace synthese
 					optional<size_t>(),
 					accessParameters,
 					DEPARTURE_FIRST,
-					false
+					false,
+					logger
 				);
 
 				// Computing
@@ -557,5 +564,4 @@ namespace synthese
 		{
 			return _page.get() ? _page->getMimeType() : "text/html";
 		}
-	}
-}
+}	}

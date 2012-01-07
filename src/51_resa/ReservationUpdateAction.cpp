@@ -312,7 +312,7 @@ namespace synthese
 							_realDepartureTime
 					)	);
 					bool geomToWrite(true);
-					BOOST_FOREACH(shared_ptr<VehiclePosition> oldPosition, oldPositions)
+					BOOST_FOREACH(const shared_ptr<VehiclePosition>& oldPosition, oldPositions)
 					{
 						if(oldPosition->getGeometry())
 						{
@@ -390,7 +390,7 @@ namespace synthese
 							_realArrivalTime
 					)	);
 					bool geomToWrite(true);
-					BOOST_FOREACH(shared_ptr<VehiclePosition> oldPosition, oldPositions)
+					BOOST_FOREACH(const shared_ptr<VehiclePosition>& oldPosition, oldPositions)
 					{
 						if(oldPosition->getGeometry())
 						{

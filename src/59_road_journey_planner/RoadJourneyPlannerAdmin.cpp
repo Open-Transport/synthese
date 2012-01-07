@@ -23,6 +23,8 @@
 */
 
 #include "RoadJourneyPlannerAdmin.h"
+
+#include "AlgorithmLogger.hpp"
 #include "GeographyModule.h"
 #include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
@@ -194,6 +196,7 @@ namespace synthese
 				false, false, 30000, posix_time::hours(5), 1.111,
 				1000
 			);
+			AlgorithmLogger logger;
 			RoadJourneyPlanner r(
 				startPlace.get(),
 				endPlace.get(),
@@ -203,12 +206,13 @@ namespace synthese
 				_planningOrder == DEPARTURE_FIRST ? endDate : now,
 				1,
 				ap,
-				_planningOrder
+				_planningOrder,
+				logger
 			);
 			RoadJourneyPlannerResult jv(r.run());
 
 
-			stream << "<h1>R&eacute;sultats</h1>";
+			stream << "<h1>Résultats</h1>";
 
 			jv.displayHTMLTable(stream);
 
@@ -225,11 +229,15 @@ namespace synthese
 			}
 		}
 
+
+
 		bool RoadJourneyPlannerAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			return true;
 		}
+
+
 
 		AdminInterfaceElement::PageLinks RoadJourneyPlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,

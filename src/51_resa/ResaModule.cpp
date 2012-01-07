@@ -466,7 +466,7 @@ namespace synthese
 					)	);
 
 					// Populating the map
-					BOOST_FOREACH(shared_ptr<Reservation> reservation, reservations)
+					BOOST_FOREACH(const shared_ptr<Reservation>& reservation, reservations)
 					{
 						AddReservationByService(*reservation);
 					}

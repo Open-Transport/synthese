@@ -334,7 +334,7 @@ namespace synthese
 				FreeDRTTimeSlotTableSync::SearchResult timeSlots(
 					FreeDRTTimeSlotTableSync::Search(Env::GetOfficialEnv(), _area->getKey())
 				);
-				BOOST_FOREACH(shared_ptr<FreeDRTTimeSlot> timeSlot, timeSlots)
+				BOOST_FOREACH(const shared_ptr<FreeDRTTimeSlot>& timeSlot, timeSlots)
 				{
 					shared_ptr<FreeDRTTimeSlotAdmin> p(
 						getNewPage<FreeDRTTimeSlotAdmin>()

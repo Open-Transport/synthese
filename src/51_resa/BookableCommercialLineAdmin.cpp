@@ -155,7 +155,7 @@ namespace synthese
 			JourneyPatternTableSync::SearchResult routes(
 				JourneyPatternTableSync::Search(_getEnv(), _line->getKey())
 			);
-			BOOST_FOREACH(shared_ptr<JourneyPattern> line, routes)
+			BOOST_FOREACH(const shared_ptr<JourneyPattern>& line, routes)
 			{
 				LineStopTableSync::Search(
 					_getEnv(),
@@ -254,7 +254,7 @@ namespace synthese
 							optional<size_t>(),
 							true, true, DOWN_LINKS_LOAD_LEVEL
 					)	);
-					BOOST_FOREACH(shared_ptr<ScheduledService> service, services)
+					BOOST_FOREACH(const shared_ptr<ScheduledService>& service, services)
 					{
 						if(	!service->isActive(_date) ||
 							servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
@@ -270,7 +270,7 @@ namespace synthese
 
 				// Sort reservations
 				map<string, ServiceReservations> reservations;
-				BOOST_FOREACH(shared_ptr<const Reservation> resa, sqlreservations)
+				BOOST_FOREACH(const shared_ptr<const Reservation>& resa, sqlreservations)
 				{
 					if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
 
@@ -399,7 +399,7 @@ namespace synthese
 				stream << t.open();
 
 				// Display of services
-				BOOST_FOREACH(shared_ptr<ScheduledService> service, sortedServices)
+				BOOST_FOREACH(const shared_ptr<ScheduledService>& service, sortedServices)
 				{
 					const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
 					int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
@@ -633,7 +633,7 @@ namespace synthese
 				c.push_back("Zone");
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(shared_ptr<FreeDRTArea> area, areas)
+				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
 				{
 					// New row
 					stream << t.row();

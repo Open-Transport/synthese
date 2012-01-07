@@ -57,7 +57,7 @@ namespace synthese
 			, const server::Request* request) const
 		{
 			string label_to_go;
-			BOOST_FOREACH(shared_ptr<LibraryInterfaceElement> component, _components)
+			BOOST_FOREACH(const shared_ptr<LibraryInterfaceElement>& component, _components)
 			{
 				if (label_to_go.empty() || component->getLabel() == label_to_go)
 				{

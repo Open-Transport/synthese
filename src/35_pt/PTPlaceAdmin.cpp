@@ -465,7 +465,7 @@ namespace synthese
 					stream << t.open();
 					stream << t.row();
 					stream << t.col(6, string(), true) << "Jonctions bidirectionnelles";
-					BOOST_FOREACH(shared_ptr<Junction> junction, allJunctions)
+					BOOST_FOREACH(const shared_ptr<Junction>& junction, allJunctions)
 					{
 						if(!junction->getBack())
 						{
@@ -496,7 +496,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col(6, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
-					BOOST_FOREACH(shared_ptr<Junction> junction, startings)
+					BOOST_FOREACH(const shared_ptr<Junction>& junction, startings)
 					{
 						if(junction->getBack())
 						{
@@ -525,7 +525,7 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col(6, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
-					BOOST_FOREACH(shared_ptr<Junction> junction, endings)
+					BOOST_FOREACH(const shared_ptr<Junction>& junction, endings)
 					{
 						if(junction->getBack())
 						{
@@ -592,7 +592,7 @@ namespace synthese
 						*_env,
 						_connectionPlace->getKey()
 				)	);
-				BOOST_FOREACH(shared_ptr<PlaceAlias> alias, aliases)
+				BOOST_FOREACH(const shared_ptr<PlaceAlias>& alias, aliases)
 				{
 					removeRequest.getAction()->setObjectId(alias->getKey());
 					stream << t.row();

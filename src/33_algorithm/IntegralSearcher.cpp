@@ -19,8 +19,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "NamedPlace.h"
 #include "IntegralSearcher.h"
+
+#include "AlgorithmLogger.hpp"
 #include "BestVertexReachesMap.h"
 #include "JourneysResult.h"
 #include "RoadPlace.h"
@@ -29,18 +30,12 @@
 #include "Edge.h"
 #include "Path.h"
 #include "Hub.h"
+#include "PTUseRule.h" // TODO remove it
+#include "RoadModule.h" // TODO remove it
 #include "RoutePlanningIntermediateJourney.hpp"
 #include "JourneyTemplates.h"
-#include "StopArea.hpp"
-// To be removed by a log class
-#include "LineStop.h"
-#include "Road.h"
-#include "JourneyPattern.hpp"
-#include "CommercialLine.h"
-#include "RoadModule.h"
 #include "Service.h"
 #include "Log.h"
-#include "PTUseRule.h"
 
 #include <sstream>
 #include <limits>
@@ -54,11 +49,10 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
 	using namespace util;
 	using namespace graph;
-	using namespace road;
-	using namespace geography;
+	using namespace pt; // TODO remove it
+	using namespace road; // TODO remove it
 
 	namespace algorithm
 	{
@@ -82,7 +76,7 @@ namespace synthese
 			optional<posix_time::time_duration> maxDuration,
 			double vmax,
 			bool ignoreReservation,
-			ostream* const logStream,
+			const AlgorithmLogger& logger,
 			int totalDistance,
 			boost::optional<const JourneyTemplates&> journeyTemplates
 		):	_accessDirection(accessDirection),
@@ -100,7 +94,7 @@ namespace synthese
 			_optim(optim),
 			_maxDuration(maxDuration),
 			_vmax(vmax),
-			_logStream(logStream),
+			_logger(logger),
 			_totalDistance(totalDistance),
 			_journeyTemplates(journeyTemplates),
 			_ignoreReservation(ignoreReservation)
@@ -189,10 +183,10 @@ namespace synthese
 			JourneysResult todo(_originDateTime, _accessDirection);
 			todo.addEmptyJourney();
 
-			if (_logStream)
-			{
-				*_logStream << "<table class=\"adminresults\">";
-			}
+			_logger.openIntegralSearchLog(
+				_accessDirection,
+				desiredTime
+			);
 
 			// The Loop
 			while(!todo.empty())
@@ -224,118 +218,7 @@ namespace synthese
 					}
 				}
 
-				if(	!journey->empty() &&
-					_logStream
-				){
-					*_logStream
-						<< "<tr>"
-						<< "<th colspan=\"7\">Journey</th>"
-						<< "</tr>"
-						;
-
-					// Departure time
-					Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
-
-/*					if (journey->getContinuousServiceRange() > 1)
-					{
-						ptime endRange(its->getDepartureDateTime());
-						endRange += journey->getContinuousServiceRange();
-						*_logStream << " - Service continu jusqu'à " << endRange;
-					}
-					if (journey->getReservationCompliance() == true)
-					{
-						*_logStream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
-					}
-					if (journey->getReservationCompliance() == boost::logic::indeterminate)
-					{
-						*_logStream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
-					}
-*/
-					*_logStream << "<tr>";
-					*_logStream << "<td>";
-					*_logStream << its->getDepartureDateTime();
-					*_logStream << "</td>";
-
-					// JourneyPattern
-					const LineStop* ls(dynamic_cast<const LineStop*>(
-						_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()
-					)	);
-					const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
-					*_logStream << "<td";
-					if (ls)
-						*_logStream << " class=\"" + ls->getLine()->getCommercialLine()->getStyle() << "\"";
-					*_logStream << ">";
-					*_logStream << (
-							ls ?
-							ls->getLine()->getCommercialLine()->getShortName() :
-							road->getRoadPlace()->getName()
-						) <<
-						"</td>"
-					;
-
-					// Transfers
-					if (its == journey->getServiceUses().end() -1)
-					{
-						*_logStream << "<td colspan=\"4\">(trajet direct)</td>";
-					}
-					else
-					{
-						while(true)
-						{
-							// Arrival
-							*_logStream << "<td>";
-							*_logStream << its->getArrivalDateTime();
-							*_logStream << "</td>";
-
-							// Place
-							*_logStream << "<td>";
-							if(dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub()))
-							{
-								*_logStream << dynamic_cast<const NamedPlace*>(its->getArrivalEdge()->getHub())->getFullName();
-							}
-							*_logStream << "</td>";
-
-							// Next service use
-							++its;
-
-							// Departure
-							*_logStream << "<td>" << its->getDepartureDateTime() << "</td>";
-
-							// JourneyPattern
-							const LineStop* ls(dynamic_cast<const LineStop*>(_accessDirection == DEPARTURE_TO_ARRIVAL ? its->getDepartureEdge() : its->getArrivalEdge()));
-							const Road* road(dynamic_cast<const Road*>(its->getService()->getPath()));
-							*_logStream << "<td";
-							if (ls)
-								*_logStream << " class=\"" << ls->getLine()->getCommercialLine()->getStyle() << "\"";
-							*_logStream << ">";
-							*_logStream <<
-								(	ls ?
-									ls->getLine()->getCommercialLine()->getShortName() :
-									road->getRoadPlace()->getName()
-								) <<
-								"</td>"
-							;
-
-							// Exit if last service use
-							if (its == journey->getServiceUses().end() -1)
-								break;
-
-							// Empty final arrival col
-							*_logStream << "<td></td>";
-
-							// New row and empty origin departure cols;
-							*_logStream << "</tr><tr>";
-							*_logStream << "<td></td>";
-							*_logStream << "<td></td>";
-						}
-					}
-
-					// Final arrival
-					*_logStream << "<td>" << its->getArrivalDateTime() << "</td>";
-
-
-//					*_logStream << todo.getLog();
-				}
+				_logger.logIntegralSearchJourney(*journey);
 
 				RoutePlanningIntermediateJourney currentJourney(
 					_accessDirection == DEPARTURE_TO_ARRIVAL ? startJourney : *journey,
@@ -610,13 +493,21 @@ namespace synthese
 								{
 									if (_accessDirection == DEPARTURE_TO_ARRIVAL)
 									{
-										_minMaxDateTimeAtDestination = serviceUse.getArrivalDateTime();
-										_minMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										ptime newMinMaxDateTimeAtDestination(serviceUse.getArrivalDateTime());
+										newMinMaxDateTimeAtDestination += _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										if(newMinMaxDateTimeAtDestination < _minMaxDateTimeAtDestination)
+										{
+											_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
+										}
 									}
 									else
 									{
-										_minMaxDateTimeAtDestination = serviceUse.getDepartureDateTime();
-										_minMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										ptime newMinMaxDateTimeAtDestination(serviceUse.getDepartureDateTime());
+										newMinMaxDateTimeAtDestination -= _destinationVam.getVertexAccess(reachedVertex).approachTime;
+										if(newMinMaxDateTimeAtDestination > _minMaxDateTimeAtDestination)
+										{
+											_minMaxDateTimeAtDestination = newMinMaxDateTimeAtDestination;
+										}
 									}
 								}
 							} // next arrival edge
@@ -641,25 +532,13 @@ namespace synthese
 			}
 */
 
-			if(	_logStream
-			){
-				*_logStream << "<tr><th colspan=\"7\">";
-				if (_accessDirection == DEPARTURE_TO_ARRIVAL)
-					*_logStream << "DEPARTURE_TO_ARRIVAL";
-				else
-					*_logStream << "ARRIVAL_TO_DEPARTURE   ";
-				*_logStream	<< " IntegralSearch. Start "
-					<< " at " << desiredTime
-					<< "</th></tr>"
-					<< "</table>"
-					;
-			}
+			_logger.closeIntegralSearchLog();
 		}
 
 // ------------------------------------------------------------------------- Utilities
 
 		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
-			shared_ptr<RoutePlanningIntermediateJourney> journeysptr
+			const shared_ptr<RoutePlanningIntermediateJourney>& journeysptr
 		) const {
 
 			const RoutePlanningIntermediateJourney& journey(*journeysptr);

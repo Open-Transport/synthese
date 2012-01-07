@@ -39,10 +39,11 @@ namespace synthese
 {
 	namespace algorithm
 	{
+		class AlgorithmLogger;
 		class RoutePlanner;
 
 		/** TimeSlotRoutePlanner class.
-			@ingroup m53
+			@ingroup m33
 		*/
 		class TimeSlotRoutePlanner
 		{
@@ -72,7 +73,7 @@ namespace synthese
 
 			//! @name Logging
 			//@{
-				std::ostream* const					_logStream;
+				const AlgorithmLogger& _logger;
 			//@}
 
 			//! @name Intermediate values
@@ -102,7 +103,7 @@ namespace synthese
 				PlanningOrder					planningOrder,
 				double							vmax,
 				bool							ignoreReservation,
-				std::ostream* logStream = NULL,
+				const AlgorithmLogger& logger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
@@ -130,7 +131,7 @@ namespace synthese
 				PlanningOrder					planningOrder,
 				double						vmax,
 				bool							ignoreReservation,
-				std::ostream* logStream = NULL,
+				const AlgorithmLogger& logger,
 				boost::optional<boost::posix_time::time_duration> maxTransferDuration = boost::optional<boost::posix_time::time_duration>()
 			);
 
@@ -140,6 +141,7 @@ namespace synthese
 				const boost::posix_time::ptime&		getHighestDepartureTime() const;
 				const boost::posix_time::ptime&		getLowestArrivalTime() const;
 				const boost::posix_time::ptime&		getHighestArrivalTime() const;
+				const AlgorithmLogger& getLogger() const { return _logger; }
 			//@}
 
 			/** Launch of the route planning
