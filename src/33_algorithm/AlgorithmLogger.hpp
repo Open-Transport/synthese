@@ -54,6 +54,10 @@ namespace synthese
 
 			boost::shared_ptr<std::ofstream> _openNewFile() const;
 			mutable size_t _fileNumber;
+			mutable boost::posix_time::time_duration _chrono;
+			mutable boost::posix_time::ptime _chronoStartTime;
+			void _startChrono() const;
+			boost::posix_time::time_duration _stopChrono() const;
 
 			boost::filesystem::path _getCurrentFilePath() const;
 
