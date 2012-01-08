@@ -73,6 +73,7 @@ namespace synthese
 				mutable boost::shared_ptr<std::ofstream> _journeyPlannerStepFile;
 				mutable html::HTMLTable _journeyPlannerStepTable;
 				mutable std::size_t _journeyPlannerSearchNumber;
+				mutable boost::posix_time::time_duration _journeyPlannerStepStartChrono;
 			//@}
 
 			/// @name Journey planner
