@@ -59,9 +59,9 @@ namespace synthese
 		):	_directory(dir),
 			_active(!dir.empty()),
 			_fileNumber(0),
-			_timeSlotJourneyPlannerTable(6, ResultHTMLTable::CSS_CLASS),
-			_journeyPlannerTable(12, ResultHTMLTable::CSS_CLASS),
-			_journeyPlannerStepTable(9, ResultHTMLTable::CSS_CLASS),
+			_timeSlotJourneyPlannerTable(5, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerTable(13, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerStepTable(8, ResultHTMLTable::CSS_CLASS),
 			_journeyPlannerResult(NULL),
 			_journeyPlannerSearchNumber(0),
 			_timeSlotJourneyPlannerStepNumber(0)
@@ -346,7 +346,6 @@ namespace synthese
 				"<a href=\"" << _getCurrentFilePath().filename() << "\">" <<
 				_journeyPlannerSearchNumber <<
 				"</a>";
-			*_journeyPlannerFile << _journeyPlannerTable.col();
 
 			if(journey.get())
 			{
@@ -493,7 +492,6 @@ namespace synthese
 
 
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
-			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true);
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "rk";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "status";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "place";
@@ -502,8 +500,6 @@ namespace synthese
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "dist";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp / dst";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "plscore";
-//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp";
-//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "journey";
 
 			size_t r(1);
 			size_t cleaneds(0);
@@ -515,14 +511,13 @@ namespace synthese
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.row();
 				if (journey->empty())
 				{
-					*_journeyPlannerStepFile << _journeyPlannerStepTable.col(9) << "Empty fake journey";
+					*_journeyPlannerStepFile << _journeyPlannerStepTable.col(8) << "Empty fake journey";
 					continue;
 				}
 
 				bool cleaned(!todo.get(vertex).get());
 				Map::const_iterator it2(_lastTodo.find(vertex));
 
-				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << r++;
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
 				if(cleaned)
@@ -608,10 +603,8 @@ namespace synthese
 
 			if(_timeSlotJourneyPlannerFile)
 			{
-				*_timeSlotJourneyPlannerFile <<
-					_timeSlotJourneyPlannerTable.col() << _journeyPlannerSearchNumber <<
-					_timeSlotJourneyPlannerTable.col() << jpChrono.total_microseconds()
-				;
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << _journeyPlannerSearchNumber;
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << jpChrono.total_microseconds() << " μs";
 			}
 
 			_startChrono();
