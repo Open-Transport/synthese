@@ -22,6 +22,7 @@
 
 #include "RoutePlannerTestData.inc.hpp"
 
+#include "AlgorithmLogger.hpp"
 #include "PTTimeSlotRoutePlanner.h"
 #include "RoutePlanner.h"
 #include "PTModule.h"
@@ -40,6 +41,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 
 	#include "RoutePlannerTestData.hpp"
 
+	AlgorithmLogger logger;
 	AccessParameters::AllowedPathClasses pc;
 	AccessParameters a(
 		USER_PEDESTRIAN, false, false, 1000, boost::posix_time::minutes(23), 1.11, 10, pc
@@ -65,7 +67,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
 			100,
-			false
+			false,
+			logger
 		);
 
 		Journey j(r.run());
@@ -91,7 +94,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
 			100,
-			false
+			false,
+			logger
 		);
 
 		Journey j(r.run());
@@ -133,7 +137,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
 			100,
-			false
+			false,
+			logger
 		);
 
 		Journey j(r.run());
@@ -168,7 +173,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
 			100,
-			false
+			false,
+			logger
 		);
 
 		Journey j(r.run());
@@ -211,7 +217,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			PTModule::GRAPH_ID,
 			PTModule::GRAPH_ID,
 			100,
-			false
+			false,
+			logger
 		);
 
 		Journey j(r.run());
@@ -248,7 +255,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			boost::optional<std::size_t>(),
 			a,
 			DEPARTURE_FIRST,
-			false
+			false,
+			logger
 		);
 		PTRoutePlannerResult result(r.run());
 
@@ -267,7 +275,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			boost::optional<std::size_t>(),
 			a,
 			DEPARTURE_FIRST,
-			false
+			false,
+			logger
 		);
 		PTRoutePlannerResult result(r.run());
 
@@ -286,7 +295,8 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 			boost::optional<std::size_t>(),
 			a,
 			DEPARTURE_FIRST,
-			false
+			false,
+			logger
 		);
 		PTRoutePlannerResult result(r.run());
 
