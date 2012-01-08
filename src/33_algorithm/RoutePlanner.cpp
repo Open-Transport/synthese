@@ -269,7 +269,7 @@ namespace synthese
 			BestVertexReachesMap bestVertexReachesMap(accessDirection, startVam, endVam, Vertex::GetMaxIndex());
 
 			// Open logger
-			_logger.openJourneyPlannerLog(result);
+			_logger.openJourneyPlannerLog(result, accessDirection);
 			shared_ptr<const RoutePlanningIntermediateJourney> journey;
 
 			// Initialization of the integral searcher
@@ -310,7 +310,7 @@ namespace synthese
 			// Main loop
 			while(true)
 			{
-				_logger.recordJourneyPlannerLogIntegralSearch(journey, originDateTime, todo);
+				_logger.recordJourneyPlannerLogIntegralSearch(journey, originDateTime, bestEndTime, todo);
 
 				bool resultFound(false);
 

@@ -275,13 +275,15 @@ namespace synthese
 
 
 		void AlgorithmLogger::openJourneyPlannerLog(
-			const RoutePlanningIntermediateJourney& result
+			const RoutePlanningIntermediateJourney& result,
+			PlanningPhase planningPhase
 		) const	{
 			if(!_active)
 			{
 				return;
 			}
 
+			_journeyPlanningPhase = planningPhase;
 			_journeyPlannerFile = _openNewFile();
 			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
 			*_journeyPlannerFile << _journeyPlannerTable.open();
@@ -296,6 +298,7 @@ namespace synthese
 		void AlgorithmLogger::recordJourneyPlannerLogIntegralSearch(
 			shared_ptr<const RoutePlanningIntermediateJourney> journey,
 			const ptime& originDateTime,
+			const ptime& bestDateTime,
 			const JourneysResult& todo
 		) const {
 			if(!_active || todo.empty())
@@ -330,7 +333,20 @@ namespace synthese
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndTime(false);
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getScore();
 				*_journeyPlannerFile << _journeyPlannerTable.col() << *journey->getDistanceToEnd();
-	//			*_journeyPlannerFile << _journeyPlannerTable.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
+				*_journeyPlannerFile << _journeyPlannerTable.col();
+				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
+				{
+					*_journeyPlannerFile << 
+						(3.6 * (*journey->getDistanceToEnd()) / (bestDateTime - journey->getEndTime()).total_seconds())
+					;
+				}
+				else
+				{
+					*_journeyPlannerFile << 
+						(3.6 * (*journey->getDistanceToEnd()) / (journey->getEndTime() - bestDateTime).total_seconds())
+					;
+				}
+				
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndEdge().getHub()->getScore();
 	//			*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getMinSpeedToEnd();
 			}
@@ -338,7 +354,7 @@ namespace synthese
 			{
 				*_journeyPlannerFile << _journeyPlannerTable.col() << "START";
 				*_journeyPlannerFile << _journeyPlannerTable.col() << originDateTime;
-				*_journeyPlannerFile << _journeyPlannerTable.col(3);
+				*_journeyPlannerFile << _journeyPlannerTable.col(4);
 			}
 
 
@@ -597,6 +613,10 @@ namespace synthese
 			bool isDeparture,
 			const VertexAccessMap& vam
 		) const	{
+			if(!_active)
+			{
+				return;
+			}
 
 			string od(isDeparture ? "Origin" : "Destination");
 
