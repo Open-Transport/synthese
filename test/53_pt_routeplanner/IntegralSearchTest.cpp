@@ -22,6 +22,7 @@
 
 #include "RoutePlannerTestData.inc.hpp"
 
+#include "AlgorithmLogger.hpp"
 #include "IntegralSearcher.h"
 #include "VertexAccessMap.h"
 #include "PTModule.h"
@@ -60,6 +61,7 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			Vertex::GetMaxIndex()
 		);
 
+		AlgorithmLogger logger;
 		IntegralSearcher i(
 			DEPARTURE_TO_ARRIVAL,
 			a,
@@ -76,7 +78,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			false,
 			boost::optional<boost::posix_time::time_duration>(),
 			100,
-			false
+			false,
+			logger
 		);
 
 		i.integralSearch(
@@ -100,6 +103,7 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			Vertex::GetMaxIndex()
 		);
 
+		AlgorithmLogger logger;
 		IntegralSearcher i(
 			DEPARTURE_TO_ARRIVAL,
 			a,
@@ -116,7 +120,8 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 			false,
 			boost::optional<boost::posix_time::time_duration>(),
 			100,
-			false
+			false,
+			logger
 		);
 
 		i.integralSearch(
@@ -127,5 +132,4 @@ BOOST_AUTO_TEST_CASE (RoutePlanner)
 
 		BOOST_REQUIRE_EQUAL(result.getJourneys().size(), 4);
 	}
-
 }
