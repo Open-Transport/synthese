@@ -59,7 +59,8 @@ namespace synthese
 		):	_directory(dir),
 			_active(!dir.empty()),
 			_fileNumber(0),
-			_journeyPlannerTable(11, ResultHTMLTable::CSS_CLASS),
+			_timeSlotJourneyPlannerTable(6, ResultHTMLTable::CSS_CLASS),
+			_journeyPlannerTable(12, ResultHTMLTable::CSS_CLASS),
 			_journeyPlannerStepTable(9, ResultHTMLTable::CSS_CLASS),
 			_journeyPlannerResult(NULL),
 			_journeyPlannerSearchNumber(0),
@@ -284,7 +285,7 @@ namespace synthese
 
 
 		void AlgorithmLogger::openJourneyPlannerLog(
-			const RoutePlanningIntermediateJourney& result,
+			const boost::posix_time::ptime& originDateTime,
 			PlanningPhase planningPhase
 		) const	{
 			if(!_active)
@@ -295,13 +296,23 @@ namespace synthese
 			_stopChrono();
 
 			_journeyPlanningPhase = planningPhase;
+			_journeyPlannerOriginDateTime = originDateTime;
+			_journeyPlannerSearchNumber = 0;
+			_journeyPlannerStartChrono = _chrono;
+			++_timeSlotJourneyPlannerStepNumber;
+
 			_journeyPlannerFile = _openNewFile();
 			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
 			*_journeyPlannerFile << _journeyPlannerTable.open();
 
-			// recordJourneyPlannerLogNewResult(result);
-			
-			_journeyPlannerSearchNumber = 0;
+			if(_timeSlotJourneyPlannerFile)
+			{
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.row();
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() <<
+					"<a href=\"" << _getCurrentFilePath().filename() << "\">" << _timeSlotJourneyPlannerStepNumber << "</a>";
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << (planningPhase == DEPARTURE_TO_ARRIVAL ? "DA" : "AD");
+				*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.col() << originDateTime;
+			}
 
 			_startChrono();
 		}
@@ -310,7 +321,6 @@ namespace synthese
 
 		void AlgorithmLogger::recordJourneyPlannerLogIntegralSearch(
 			shared_ptr<const RoutePlanningIntermediateJourney> journey,
-			const ptime& originDateTime,
 			const ptime& bestDateTime,
 			const JourneysResult& todo
 		) const {
@@ -363,12 +373,11 @@ namespace synthese
 				}
 				
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndEdge().getHub()->getScore();
-	//			*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getMinSpeedToEnd();
 			}
 			else
 			{
 				*_journeyPlannerFile << _journeyPlannerTable.col() << "START";
-				*_journeyPlannerFile << _journeyPlannerTable.col() << originDateTime;
+				*_journeyPlannerFile << _journeyPlannerTable.col() << _journeyPlannerOriginDateTime;
 				*_journeyPlannerFile << _journeyPlannerTable.col(4);
 			}
 
@@ -390,6 +399,7 @@ namespace synthese
 
 		void AlgorithmLogger::recordJourneyPlannerLogCleanup(
 			bool resultFound,
+			const ptime& bestDateTime,
 			const JourneysResult& todo
 		) const {
 			if(!_active)
@@ -397,7 +407,7 @@ namespace synthese
 				return;
 			}
 
-			_stopChrono();
+			time_duration lastChrono(_stopChrono());
 
 /*							// Departure time
 							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
@@ -490,7 +500,7 @@ namespace synthese
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "time";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "jyscore";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "dist";
-//			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp / dst";
+			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp / dst";
 			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "plscore";
 //			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "minsp";
 //			*_journeyPlannerStepFile << _journeyPlannerStepTable.col(1, string(), true) << "journey";
@@ -545,9 +555,22 @@ namespace synthese
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndTime(false);
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getScore();
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << *journey->getDistanceToEnd();
-//				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << (60 * (journey->getMinSpeedToEnd() ? (journey->getDistanceToEnd() / journey->getMinSpeedToEnd()) : -1));
+
+				*_journeyPlannerStepFile << _journeyPlannerTable.col();
+				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
+				{
+					*_journeyPlannerStepFile << 
+						(3.6 * (*journey->getDistanceToEnd()) / (bestDateTime - journey->getEndTime()).total_seconds())
+						;
+				}
+				else
+				{
+					*_journeyPlannerStepFile << 
+						(3.6 * (*journey->getDistanceToEnd()) / (journey->getEndTime() - bestDateTime).total_seconds())
+						;
+				}
+
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getEndEdge().getHub()->getScore();
-//				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getMinSpeedToEnd();
 			}
 
 			_lastTodo.clear();
@@ -560,6 +583,7 @@ namespace synthese
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "u" << updated;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "+" << added;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << (resultFound ? "RESULT" : "");
+			*_journeyPlannerFile << _journeyPlannerTable.col() << lastChrono.total_microseconds() << "μs";
 
 			_startChrono();
 		}
@@ -574,11 +598,21 @@ namespace synthese
 			}
 			_stopChrono();
 
+			time_duration jpChrono = _chrono - _journeyPlannerStartChrono;
+
 			*_journeyPlannerFile << _journeyPlannerTable.close();
-			*_journeyPlannerFile << "<p>Temps de calcul : " << _chrono.total_microseconds() << " μs</p>";
+			*_journeyPlannerFile << "<p>Temps de calcul : " << jpChrono.total_microseconds() << " μs</p>";
 			*_journeyPlannerFile << "</body></html>";
 			_journeyPlannerFile->close();
 			_journeyPlannerFile.reset();
+
+			if(_timeSlotJourneyPlannerFile)
+			{
+				*_timeSlotJourneyPlannerFile <<
+					_timeSlotJourneyPlannerTable.col() << _journeyPlannerSearchNumber <<
+					_timeSlotJourneyPlannerTable.col() << jpChrono.total_microseconds()
+				;
+			}
 
 			_startChrono();
 		}
@@ -615,12 +649,8 @@ namespace synthese
 
 			_stopChrono();
 
-			++_journeyPlannerSearchNumber;
-
-			*_timeSlotJourneyPlannerFile <<
-				"<h2>Route planning " << _journeyPlannerSearchNumber <<
-				" at " << originDateTime << "</h2>"
-			;
+			*_timeSlotJourneyPlannerFile << "<h1>Journey plannings</h1>";
+			*_timeSlotJourneyPlannerFile << _timeSlotJourneyPlannerTable.open();
 
 			_startChrono();
 		}
@@ -636,7 +666,10 @@ namespace synthese
 
 			_stopChrono();
 
-			*_timeSlotJourneyPlannerFile << "</body></html>";
+			*_timeSlotJourneyPlannerFile <<
+				_timeSlotJourneyPlannerTable.close() <<
+				"</body></html>"
+			;
 			_timeSlotJourneyPlannerFile->close();
 			_timeSlotJourneyPlannerFile.reset();
 
