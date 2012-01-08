@@ -2,14 +2,24 @@
 
 function retour()
 {
-  var oct = document.getElementById("origin_city_txt").value;
   var opt = document.getElementById("origin_place_txt").value;
-  var dct = document.getElementById("destination_city_txt").value;
   var dpt = document.getElementById("destination_place_txt").value;
-  document.getElementById("origin_city_txt").value = dct;
   document.getElementById("origin_place_txt").value = dpt;
-  document.getElementById("destination_city_txt").value = oct;
   document.getElementById("destination_place_txt").value = opt;
+  
+  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+    var oct = document.getElementById("origin_class_txt").value;
+    var dct = document.getElementById("destination_class_txt").value;
+    document.getElementById("origin_class_txt").value = dct;
+    document.getElementById("destination_class_txt").value = oct;
+  }
+  else {
+    var oct = document.getElementById("origin_city_txt").value;
+    var dct = document.getElementById("destination_city_txt").value;
+    document.getElementById("origin_city_txt").value = dct;
+    document.getElementById("destination_city_txt").value = oct;
+  }
+  
   document.getElementById("origin_city_txt").form.submit();
   return 0;
 }
