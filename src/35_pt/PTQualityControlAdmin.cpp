@@ -22,10 +22,14 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "PTQualityControlAdmin.hpp"
+
+#include "DesignatedLinePhysicalStop.hpp"
 #include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
-#include "PTQualityControlAdmin.hpp"
+#include "ScheduledService.h"
+#include "ServiceAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -47,8 +51,9 @@
 
 #include <geos/geom/LineString.h>
 
-using namespace boost;
 using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
 using namespace geos::geom;
 
 namespace synthese
@@ -66,24 +71,25 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, PTQualityControlAdmin>::FACTORY_KEY("PTQualityControlAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, PTQualityControlAdmin>::FACTORY_KEY = "PTQualityControl";
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<PTQualityControlAdmin>::ICON("cog.png");
-		template<> const string AdminInterfaceElementTemplate<PTQualityControlAdmin>::DEFAULT_TITLE("Contrôle qualité");
+		template<> const string AdminInterfaceElementTemplate<PTQualityControlAdmin>::ICON = "cog.png";
+		template<> const string AdminInterfaceElementTemplate<PTQualityControlAdmin>::DEFAULT_TITLE = "Contrôle qualité";
 	}
 
 	namespace pt
 	{
-		const string PTQualityControlAdmin::PARAM_RUN_CONTROL("rc");
+		const string PTQualityControlAdmin::PARAM_RUN_CONTROL = "rc";
 
-		const string PTQualityControlAdmin::TAB_STOPS_WITHOUT_COORDINATE("swc");
-		const string PTQualityControlAdmin::TAB_CITIES_WITHOUT_MAIN_STOP("cwm");
-		const string PTQualityControlAdmin::TAB_EDGES_AND_GEOMETRIES("eag");
-		const string PTQualityControlAdmin::TAB_RANK_CONTINUITY("rank_continuity");
-		const string PTQualityControlAdmin::TAB_DOUBLE_ROUTES("double_routes");
+		const string PTQualityControlAdmin::TAB_STOPS_WITHOUT_COORDINATE = "swc";
+		const string PTQualityControlAdmin::TAB_CITIES_WITHOUT_MAIN_STOP = "cwm";
+		const string PTQualityControlAdmin::TAB_EDGES_AND_GEOMETRIES = "eag";
+		const string PTQualityControlAdmin::TAB_RANK_CONTINUITY = "rank_continuity";
+		const string PTQualityControlAdmin::TAB_DOUBLE_ROUTES = "double_routes";
+		const string PTQualityControlAdmin::TAB_SPEED = "speed";
 
 
 
@@ -426,6 +432,7 @@ namespace synthese
 					;
 			}	}	
 
+
 			////////////////////////////////////////////////////////////////////
 			// DOUBLE ROUTES
 			if (openTabContent(stream, TAB_DOUBLE_ROUTES))
@@ -507,6 +514,95 @@ namespace synthese
 					;
 			}	}	
 
+
+			////////////////////////////////////////////////////////////////////
+			// SPEED
+			if (openTabContent(stream, TAB_SPEED))
+			{
+				if(_runControl && getCurrentTab() == getActiveTab())
+				{
+					AdminFunctionRequest<ServiceAdmin> openServiceRequest(request);
+
+					HTMLTable::ColsVector c;
+					c.push_back("Network");
+					c.push_back("Line");
+					c.push_back("Service");
+					c.push_back("Stop 1");
+					c.push_back("Stop 2");
+					c.push_back("Vitesse");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+
+					stream << t.open();
+
+					BOOST_FOREACH(const ScheduledService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<ScheduledService>())
+					{
+						time_duration lastDepartureTime(not_a_date_time);
+						const DesignatedLinePhysicalStop* lastDepartureLineStop(NULL);
+						const ScheduledService& service(*item.second);
+						
+						BOOST_FOREACH(Edge* edge, service.getPath()->getEdges())
+						{
+							if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
+							{
+								break;
+							}
+							const DesignatedLinePhysicalStop& lineStop(
+								dynamic_cast<DesignatedLinePhysicalStop&>(*edge)
+							);
+
+							if(	lineStop.isArrivalAllowed() &&
+								lineStop.getScheduleInput() &&
+								lastDepartureLineStop &&
+								lastDepartureLineStop->getFromVertex()->getGeometry().get() &&
+								lineStop.getFromVertex()->getGeometry().get() &&
+								service.getArrivalSchedule(false, lineStop.getRankInPath()) != lastDepartureTime
+							){
+								double speed(
+									3.6 * lineStop.getFromVertex()->getGeometry()->distance(
+										lastDepartureLineStop->getFromVertex()->getGeometry().get()
+									) / (
+										service.getArrivalSchedule(false, lineStop.getRankInPath()).total_seconds() - 
+										lastDepartureTime.total_seconds()
+								)	);
+								if(speed > 120)
+								{
+									stream << t.row();
+									stream << t.col() << service.getRoute()->getCommercialLine()->getNetwork()->getName();
+									stream << t.col() << service.getRoute()->getCommercialLine()->getShortName();
+
+									// Service cell
+									openServiceRequest.getPage()->setService(Env::GetOfficialEnv().getSPtr(&service));
+									stream << t.col() << HTMLModule::getLinkButton(openServiceRequest.getURL(), service.getServiceNumber());
+
+									stream << t.col() << dynamic_cast<const StopArea*>(lineStop.getHub())->getFullName();
+									stream << t.col() << dynamic_cast<const StopArea*>(lastDepartureLineStop->getHub())->getFullName();
+									stream << t.col() << speed;
+								}
+							}
+							if(	lineStop.isDepartureAllowed() &&
+								lineStop.getScheduleInput()
+							){
+								lastDepartureTime = service.getDepartureSchedule(false, lineStop.getRankInPath());
+								lastDepartureLineStop = &lineStop;
+							}
+						}
+					}
+
+					stream << t.close();
+				}	
+				else
+				{
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					runRequest.getPage()->setRunControl(true);
+
+					stream <<
+						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						"</p>"
+					;
+			}	}	
+
+
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
@@ -552,6 +648,7 @@ namespace synthese
 			_tabs.push_back(Tab("Itinéraires de lignes", TAB_EDGES_AND_GEOMETRIES, false));
 			_tabs.push_back(Tab("Continuité des rangs", TAB_RANK_CONTINUITY, false));
 			_tabs.push_back(Tab("Parcours en double", TAB_DOUBLE_ROUTES, false));
+			_tabs.push_back(Tab("Vitesse", TAB_SPEED, false));
 			_tabBuilded = true;
 		}
 	}

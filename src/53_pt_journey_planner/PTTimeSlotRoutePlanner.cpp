@@ -321,7 +321,7 @@ namespace synthese
 					_maxSolutionsNumber,
 					_accessParameters,
 					_planningOrder,
-					100,
+					70, // 252 km/h TODO take it configurable
 					_ignoreReservation,
 					_logger,
 					_maxTransferDuration
