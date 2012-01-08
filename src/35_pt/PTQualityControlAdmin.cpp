@@ -531,6 +531,7 @@ namespace synthese
 					c.push_back("Stop 1");
 					c.push_back("Stop 2");
 					c.push_back("Vitesse");
+					c.push_back("Distance");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
 					stream << t.open();
@@ -561,10 +562,12 @@ namespace synthese
 									lastDepartureLineStop->getFromVertex()->getGeometry().get()
 								) > 5000
 							){
-								double speed(
-									3.6 * lineStop.getFromVertex()->getGeometry()->distance(
+								double dist(
+									lineStop.getFromVertex()->getGeometry()->distance(
 										lastDepartureLineStop->getFromVertex()->getGeometry().get()
-									) / (
+								)	);
+								double speed(
+									3.6 * dist / (
 										service.getArrivalSchedule(false, lineStop.getRankInPath()).total_seconds() - 
 										lastDepartureTime.total_seconds()
 								)	);
@@ -581,6 +584,7 @@ namespace synthese
 									stream << t.col() << dynamic_cast<const StopArea*>(lineStop.getHub())->getFullName();
 									stream << t.col() << dynamic_cast<const StopArea*>(lastDepartureLineStop->getHub())->getFullName();
 									stream << t.col() << speed;
+									stream << t.col() << dist;
 								}
 								if(speed > maxSpeed)
 								{
@@ -599,6 +603,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col(5, string(), true) << "Max";
 					stream << t.col(1, string(), true) << maxSpeed;
+					stream << t.col(1, string(), true);
 
 					stream << t.close();
 				}	

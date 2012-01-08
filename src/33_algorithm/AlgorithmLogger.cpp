@@ -107,6 +107,7 @@ namespace synthese
 			_integralSearchFile = _openNewFile();
 			*_integralSearchFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
 			*_integralSearchFile << "<table class=\"adminresults\">";
+			_startChrono();
 		}
 
 
@@ -119,6 +120,8 @@ namespace synthese
 			{
 				return;
 			}
+
+			_stopChrono();
 
 			if(journey.empty())
 			{
@@ -139,15 +142,15 @@ namespace synthese
 				{
 					ptime endRange(its->getDepartureDateTime());
 					endRange += journey->getContinuousServiceRange();
-					*_integralSearchFile << " - Service continu jusqu'à " << endRange;
+					*_integralSearchFile << " - Service continu jusqu'Ã  " << endRange;
 				}
 				if (journey->getReservationCompliance() == true)
 				{
-					*_integralSearchFile << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+					*_integralSearchFile << " - RÃ©servation obligatoire avant le " << journey->getReservationDeadLine();
 				}
 				if (journey->getReservationCompliance() == boost::logic::indeterminate)
 				{
-					*_integralSearchFile << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+					*_integralSearchFile << " - RÃ©servation facultative avant le " << journey->getReservationDeadLine();
 				}
 */
 				*_integralSearchFile << "<tr>";
@@ -241,6 +244,8 @@ namespace synthese
 
 //					*_integralSearchFile << todo.getLog();
 			}
+
+			_startChrono();
 		}
 
 
@@ -251,6 +256,8 @@ namespace synthese
 			{
 				return;
 			}
+
+			_stopChrono();
 
 			*_integralSearchFile << "<tr><th colspan=\"7\">";
 			if (_integralSearchPlanningPhase == DEPARTURE_TO_ARRIVAL)
@@ -270,6 +277,8 @@ namespace synthese
 
 			_integralSearchFile->close();
 			_integralSearchFile.reset();
+
+			_startChrono();
 		}
 
 
@@ -283,6 +292,8 @@ namespace synthese
 				return;
 			}
 
+			_stopChrono();
+
 			_journeyPlanningPhase = planningPhase;
 			_journeyPlannerFile = _openNewFile();
 			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
@@ -291,6 +302,8 @@ namespace synthese
 			// recordJourneyPlannerLogNewResult(result);
 			
 			_journeyPlannerSearchNumber = 0;
+
+			_startChrono();
 		}
 
 
@@ -305,6 +318,8 @@ namespace synthese
 			{
 				return;
 			}
+
+			_stopChrono();
 
 			++_journeyPlannerSearchNumber;
 
@@ -367,6 +382,8 @@ namespace synthese
 					it.first
 				);
 			}
+
+			_startChrono();
 		}
 
 
@@ -380,6 +397,8 @@ namespace synthese
 				return;
 			}
 
+			_stopChrono();
+
 /*							// Departure time
 							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
 
@@ -387,15 +406,15 @@ namespace synthese
 							{
 							ptime endRange(its->getDepartureDateTime());
 							endRange += journey->getContinuousServiceRange();
-							stream << " - Service continu jusqu'à " << endRange.;
+							stream << " - Service continu jusqu'Ã  " << endRange.;
 							}
 							if (journey->getReservationCompliance() == true)
 							{
-							stream << " - Réservation obligatoire avant le " << journey->getReservationDeadLine();
+							stream << " - RÃ©servation obligatoire avant le " << journey->getReservationDeadLine();
 							}
 							if (journey->getReservationCompliance() == boost::logic::indeterminate)
 							{
-							stream << " - Réservation facultative avant le " << journey->getReservationDeadLine();
+							stream << " - RÃ©servation facultative avant le " << journey->getReservationDeadLine();
 							}
 
 							stream << "<tr>";
@@ -541,6 +560,8 @@ namespace synthese
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "u" << updated;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "+" << added;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << (resultFound ? "RESULT" : "");
+
+			_startChrono();
 		}
 
 
@@ -551,11 +572,15 @@ namespace synthese
 			{
 				return;
 			}
+			_stopChrono();
 
 			*_journeyPlannerFile << _journeyPlannerTable.close();
+			*_journeyPlannerFile << "<p>Temps de calcul : " << _chrono.total_microseconds() << " Î¼s</p>";
 			*_journeyPlannerFile << "</body></html>";
 			_journeyPlannerFile->close();
 			_journeyPlannerFile.reset();
+
+			_startChrono();
 		}
 
 
@@ -566,6 +591,7 @@ namespace synthese
 			{
 				return;
 			}
+			_stopChrono();
 
 			if(!_timeSlotJourneyPlannerFile.get())
 			{
@@ -573,6 +599,8 @@ namespace synthese
 				*_timeSlotJourneyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
 			}
 			_timeSlotJourneyPlannerStepNumber = 0;
+
+			_startChrono();
 		}
 
 
@@ -585,12 +613,16 @@ namespace synthese
 				return;
 			}
 
+			_stopChrono();
+
 			++_journeyPlannerSearchNumber;
 
 			*_timeSlotJourneyPlannerFile <<
 				"<h2>Route planning " << _journeyPlannerSearchNumber <<
 				" at " << originDateTime << "</h2>"
 			;
+
+			_startChrono();
 		}
 
 
@@ -602,9 +634,13 @@ namespace synthese
 				return;
 			}
 
+			_stopChrono();
+
 			*_timeSlotJourneyPlannerFile << "</body></html>";
 			_timeSlotJourneyPlannerFile->close();
 			_timeSlotJourneyPlannerFile.reset();
+
+			_startChrono();
 		}
 
 
@@ -617,6 +653,8 @@ namespace synthese
 			{
 				return;
 			}
+
+			_stopChrono();
 
 			string od(isDeparture ? "Origin" : "Destination");
 
@@ -639,5 +677,31 @@ namespace synthese
 					;
 			}
 			*_timeSlotJourneyPlannerFile << "</table>";
+
+			_startChrono();
+		}
+
+
+
+		void AlgorithmLogger::_startChrono() const
+		{
+			if(_chronoStartTime.is_not_a_date_time())
+			{
+				_chronoStartTime = microsec_clock::local_time();
+			}
+		}
+
+
+
+		boost::posix_time::time_duration AlgorithmLogger::_stopChrono() const
+		{
+			time_duration result(seconds(0));
+			if(!_chronoStartTime.is_not_a_date_time())
+			{
+				result = microsec_clock::local_time() - _chronoStartTime;
+				_chrono += result;
+				_chronoStartTime = ptime(not_a_date_time);
+			}
+			return result;
 		}
 }	}
