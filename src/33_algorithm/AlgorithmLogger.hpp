@@ -76,6 +76,7 @@ namespace synthese
 				mutable std::size_t _journeyPlannerSearchNumber;
 				mutable Map _lastTodo;
 				mutable Vector _todoBeforeClean;
+				mutable PlanningPhase _journeyPlanningPhase;
 			//@}
 
 			/// @name Time slot journey planner
@@ -113,10 +114,14 @@ namespace synthese
 
 			/// @name Journey planner
 			//@{
-				void openJourneyPlannerLog(const RoutePlanningIntermediateJourney& result) const;
+				void openJourneyPlannerLog(
+					const RoutePlanningIntermediateJourney& result,
+					PlanningPhase planningPhase
+				) const;
 				void recordJourneyPlannerLogIntegralSearch(
 					boost::shared_ptr<const RoutePlanningIntermediateJourney> journey,
 					const boost::posix_time::ptime& originDateTime,
+					const boost::posix_time::ptime& bestDateTime,
 					const JourneysResult& todo
 				) const;
 				void recordJourneyPlannerLogCleanup(bool resultFound, const JourneysResult& todo) const;
