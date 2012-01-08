@@ -591,12 +591,13 @@ namespace synthese
 					-# the minimal time to do a transfer in the connecting place
 					-# the minimal travel time from the connecting place and the goal according to the current vmax
 			*/
+			assert(journey.getDistanceToEnd());
+
 			if(	!_destinationVam.contains(reachedVertex) &&
 				reachedVertex->getHub()->isConnectionPossible() &&
-				_searchOnlyNodes
+				_searchOnlyNodes &&
+				*journey.getDistanceToEnd() > 5000
 			){
-				assert(journey.getDistanceToEnd());
-
 				ptime bestHopedGoalAccessDateTime (reachDateTime);
 				posix_time::time_duration minimalGoalReachDuration(
 					reachedVertex->getHub()->getMinTransferDelay()	// Minimal time to transfer

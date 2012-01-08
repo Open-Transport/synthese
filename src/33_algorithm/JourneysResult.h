@@ -144,7 +144,8 @@ namespace synthese
 					BestVertexReachesMap& bvrm,
 					bool propagateInConnectionPlace,
 					bool strict,
-					const IntegralSearcher& is
+					const IntegralSearcher& is,
+					double vmax
 				);
 			//@}
 

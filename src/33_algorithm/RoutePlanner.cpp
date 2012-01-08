@@ -354,7 +354,8 @@ namespace synthese
 						bestVertexReachesMap,
 						true,
 						!secondTime,
-						is
+						is,
+						_vmax
 					);
 				}
 
