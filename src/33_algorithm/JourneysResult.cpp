@@ -23,6 +23,7 @@
 #include "JourneysResult.h"
 
 #include "Edge.h"
+#include "Hub.h"
 #include "IntegralSearcher.h"
 #include "Vertex.h"
 
@@ -135,7 +136,8 @@ namespace synthese
 			BestVertexReachesMap& bvrm,
 			bool propagateInConnectionPlace,
 			bool strict,
-			const IntegralSearcher& is
+			const IntegralSearcher& is,
+			double vmax
 		){
 			std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToAdd;
 			std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > journeysToRemove;
@@ -151,10 +153,35 @@ namespace synthese
 				boost::shared_ptr<RoutePlanningIntermediateJourney> journey(it->second->first);
 				IndexMap::iterator next(it);
 				++next;
-				if(	_accessDirection == DEPARTURE_TO_ARRIVAL && journey->getEndTime(false) >= newMaxTime ||
-					_accessDirection == ARRIVAL_TO_DEPARTURE && journey->getEndTime(false) <= newMaxTime
-					// TODO Add reach ability test
-					// TODO take into account of strict
+
+				ptime bestHopedGoalAccessDateTime (journey->getEndTime(false));
+				time_duration bestTransferDelay(
+					journey->getEndEdge().getFromVertex()->getHub()->getMinTransferDelay()
+				);
+				if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+				{
+					bestHopedGoalAccessDateTime += bestTransferDelay;	// Minimal time to transfer
+				}
+				else
+				{
+					bestHopedGoalAccessDateTime -= bestTransferDelay;	// Minimal time to transfer
+				}
+				if(journey->getDistanceToEnd() && *journey->getDistanceToEnd() > 5000)
+				{
+					time_duration bestPossibleDuration(
+						seconds(static_cast<long>(*journey->getDistanceToEnd() / vmax))
+					);
+					if(_accessDirection == DEPARTURE_TO_ARRIVAL)
+					{
+						bestHopedGoalAccessDateTime	+= bestPossibleDuration;	// Minimal time to reach the goal
+					}
+					else
+					{
+						bestHopedGoalAccessDateTime	-= bestPossibleDuration;	// Minimal time to reach the goal
+					}
+				}
+				if(	_accessDirection == DEPARTURE_TO_ARRIVAL && bestHopedGoalAccessDateTime >= newMaxTime ||
+					_accessDirection == ARRIVAL_TO_DEPARTURE && bestHopedGoalAccessDateTime <= newMaxTime
 				){
 					journeysToRemove.push_back(journey);
 				}
