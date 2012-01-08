@@ -522,6 +522,7 @@ namespace synthese
 				if(_runControl && getCurrentTab() == getActiveTab())
 				{
 					AdminFunctionRequest<ServiceAdmin> openServiceRequest(request);
+					double maxSpeed(0);
 
 					HTMLTable::ColsVector c;
 					c.push_back("Network");
@@ -555,7 +556,10 @@ namespace synthese
 								lastDepartureLineStop &&
 								lastDepartureLineStop->getFromVertex()->getGeometry().get() &&
 								lineStop.getFromVertex()->getGeometry().get() &&
-								service.getArrivalSchedule(false, lineStop.getRankInPath()) != lastDepartureTime
+								service.getArrivalSchedule(false, lineStop.getRankInPath()) != lastDepartureTime &&
+								lineStop.getFromVertex()->getGeometry()->distance(
+									lastDepartureLineStop->getFromVertex()->getGeometry().get()
+								) > 5000
 							){
 								double speed(
 									3.6 * lineStop.getFromVertex()->getGeometry()->distance(
@@ -564,7 +568,7 @@ namespace synthese
 										service.getArrivalSchedule(false, lineStop.getRankInPath()).total_seconds() - 
 										lastDepartureTime.total_seconds()
 								)	);
-								if(speed > 120)
+								if(speed > 150)
 								{
 									stream << t.row();
 									stream << t.col() << service.getRoute()->getCommercialLine()->getNetwork()->getName();
@@ -578,6 +582,10 @@ namespace synthese
 									stream << t.col() << dynamic_cast<const StopArea*>(lastDepartureLineStop->getHub())->getFullName();
 									stream << t.col() << speed;
 								}
+								if(speed > maxSpeed)
+								{
+									maxSpeed = speed;
+								}
 							}
 							if(	lineStop.isDepartureAllowed() &&
 								lineStop.getScheduleInput()
@@ -587,6 +595,10 @@ namespace synthese
 							}
 						}
 					}
+
+					stream << t.row();
+					stream << t.col(5, string(), true) << "Max";
+					stream << t.col(1, string(), true) << maxSpeed;
 
 					stream << t.close();
 				}	
