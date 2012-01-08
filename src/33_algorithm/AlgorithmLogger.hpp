@@ -68,25 +68,32 @@ namespace synthese
 				mutable PlanningPhase _integralSearchPlanningPhase;
 			//@}
 
+			/// @name Journey planner step
+			//@{
+				mutable boost::shared_ptr<std::ofstream> _journeyPlannerStepFile;
+				mutable html::HTMLTable _journeyPlannerStepTable;
+				mutable std::size_t _journeyPlannerSearchNumber;
+			//@}
+
 			/// @name Journey planner
 			//@{
 				mutable boost::shared_ptr<std::ofstream> _journeyPlannerFile;
-				mutable boost::shared_ptr<std::ofstream> _journeyPlannerStepFile;
 				typedef std::map<const graph::Vertex*, boost::shared_ptr<RoutePlanningIntermediateJourney> > Map;
 				typedef std::vector<boost::shared_ptr<RoutePlanningIntermediateJourney> > Vector;
+				mutable boost::posix_time::time_duration _journeyPlannerStartChrono;
+				mutable boost::posix_time::ptime _journeyPlannerOriginDateTime;
 				mutable html::HTMLTable _journeyPlannerTable;
-				mutable html::HTMLTable _journeyPlannerStepTable;
 				mutable const RoutePlanningIntermediateJourney* _journeyPlannerResult;
-				mutable std::size_t _journeyPlannerSearchNumber;
 				mutable Map _lastTodo;
 				mutable Vector _todoBeforeClean;
 				mutable PlanningPhase _journeyPlanningPhase;
+				mutable size_t _timeSlotJourneyPlannerStepNumber;
 			//@}
 
 			/// @name Time slot journey planner
 			//@{
 				mutable boost::shared_ptr<std::ofstream> _timeSlotJourneyPlannerFile;
-				mutable size_t _timeSlotJourneyPlannerStepNumber;
+				mutable html::HTMLTable _timeSlotJourneyPlannerTable;
 			//@}
 
 		public:
@@ -119,16 +126,19 @@ namespace synthese
 			/// @name Journey planner
 			//@{
 				void openJourneyPlannerLog(
-					const RoutePlanningIntermediateJourney& result,
+					const boost::posix_time::ptime& originDateTime,
 					PlanningPhase planningPhase
 				) const;
 				void recordJourneyPlannerLogIntegralSearch(
 					boost::shared_ptr<const RoutePlanningIntermediateJourney> journey,
-					const boost::posix_time::ptime& originDateTime,
 					const boost::posix_time::ptime& bestDateTime,
 					const JourneysResult& todo
 				) const;
-				void recordJourneyPlannerLogCleanup(bool resultFound, const JourneysResult& todo) const;
+				void recordJourneyPlannerLogCleanup(
+					bool resultFound,
+					const boost::posix_time::ptime& bestDateTime,
+					const JourneysResult& todo
+				) const;
 				void closeJourneyPlannerLog() const;
 			//@}
 
