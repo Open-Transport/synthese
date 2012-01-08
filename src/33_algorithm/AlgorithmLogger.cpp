@@ -300,6 +300,7 @@ namespace synthese
 			_journeyPlannerSearchNumber = 0;
 			_journeyPlannerStartChrono = _chrono;
 			++_timeSlotJourneyPlannerStepNumber;
+			_journeyPlannerStepStartChrono = _chrono;
 
 			_journeyPlannerFile = _openNewFile();
 			*_journeyPlannerFile << "<html><head><link rel=\"stylesheet\" href=\"https://extranet.rcsmobility.com/svn/synthese3/trunk/s3-admin/deb/opt/rcs/s3-admin/files/admin.css\"></link></head><body>";
@@ -405,8 +406,6 @@ namespace synthese
 			{
 				return;
 			}
-
-			time_duration lastChrono(_stopChrono());
 
 /*							// Departure time
 							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
@@ -551,7 +550,7 @@ namespace synthese
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << journey->getScore();
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col() << *journey->getDistanceToEnd();
 
-				*_journeyPlannerStepFile << _journeyPlannerTable.col();
+				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
 				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
 				{
 					*_journeyPlannerStepFile << 
@@ -578,8 +577,9 @@ namespace synthese
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "u" << updated;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << "+" << added;
 			*_journeyPlannerFile << _journeyPlannerTable.col() << (resultFound ? "RESULT" : "");
-			*_journeyPlannerFile << _journeyPlannerTable.col() << lastChrono.total_microseconds() << "μs";
+			*_journeyPlannerFile << _journeyPlannerTable.col() << (_chrono - _journeyPlannerStepStartChrono).total_microseconds() << "μs";
 
+			_journeyPlannerStepStartChrono = _chrono;
 			_startChrono();
 		}
 
