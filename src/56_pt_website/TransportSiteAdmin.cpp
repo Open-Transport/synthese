@@ -361,8 +361,8 @@ namespace synthese
 					st.getForm().getSelectNumberInput(
 						RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION,
 						1, 99,
-						_journeyPlanner.getMaxTransferDuration() ? (_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) : UNKNOWN_VALUE,
-						30,
+						_journeyPlanner.getMaxTransferDuration() ? (_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) : 60,
+						1,
 						"(illimité)"
 				)	);
 				stream << st.cell(
