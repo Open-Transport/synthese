@@ -98,10 +98,10 @@ function initAutoCompletions() {
     document.getElementById("origin_city_txt").focus();
   }
   else {
-    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_place_class"), function (place, place2) {
+    initAutoCompleteField(1, document.getElementById("origin_place_txt"), document.getElementById("origin_class_txt"), function (place, place2) {
       return Synthese.URL + '?fonction=places_list&number=3&si=' + Synthese.siteId + '&text=' + place + '';
     }, null, null, null);
-    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_place_class"), function (place, place2) {
+    initAutoCompleteField(3, document.getElementById("destination_place_txt"), document.getElementById("destination_class_txt"), function (place, place2) {
       return Synthese.URL + '?fonction=places_list&number=3&si=' + Synthese.siteId + '&text=' + place + '';
     }, null, null, null);
     document.getElementById("origin_place_txt").focus();
