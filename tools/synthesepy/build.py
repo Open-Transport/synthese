@@ -454,8 +454,12 @@ class CMakeBuilder(Builder):
             if self.mysql_dir:
                 os.environ['MYSQL_DIR'] = self.mysql_dir
 
-        build_type = (self.config.build_type if self.config.build_type else
-            self.env.mode.capitalize())
+        MODE_TO_CMAKE_BUILD_TYPE = {
+            'debug': 'Debug',
+            'release': 'Release',
+            'relwithdebinfo': 'RelWithDebInfo',
+        }
+        build_type = MODE_TO_CMAKE_BUILD_TYPE[self.env.mode]
         args.append('-DCMAKE_BUILD_TYPE=' + build_type)
 
         # TODO: maybe change optimization flags in debug mode:
@@ -532,8 +536,8 @@ class CMakeBuilder(Builder):
 
         args = ['devenv.com', 'synthese3.sln']
         if build_project:
-            build_type = self.env.mode.capitalize()
-            args.extend(['/build', build_type, '/project', build_project])
+            args.extend([
+                '/build', self.env.vs_build_type, '/project', build_project])
 
         utils.call(
             args,
