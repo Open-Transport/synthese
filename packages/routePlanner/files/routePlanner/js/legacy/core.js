@@ -23,8 +23,7 @@ function globalKeyPressHandler(event) {
   if (!event)
     event = window.event;
 
-  if (event.keyCode == 13 && _enterIsForbidden || event.keyCode == 27)
-  {
+  if (event.keyCode == 13 && _enterIsForbidden || event.keyCode == 27) {
     event.returnValue = false;
 
     event.cancel = true;
@@ -43,15 +42,13 @@ function clignote() {
 
   // Cache elements to blink, since walking all elements is expensive,
   // especially on IE <= 7.
-  if (!clignoteElements || totalElements != allElements.length)
-  {
+  if (!clignoteElements || totalElements != allElements.length) {
     clignoteElements = [];
     totalElements = allElements.length;
 
     for (var i = 0; i < allElements.length; ++i)
     {
-      if (allElements.item(i).className == 'clignote')
-      {
+      if (allElements.item(i).className == 'clignote') {
         clignoteElements.push(allElements.item(i));
       }
     }
@@ -59,8 +56,7 @@ function clignote() {
 
   clignoteState = (clignoteState == 'visible') ? 'hidden' : 'visible';
 
-  for (i = 0; i < clignoteElements.length; ++i)
-  {
+  for (i = 0; i < clignoteElements.length; ++i) {
     clignoteElements[i].style.visibility = clignoteState;
   }
   setTimeout("clignote()", 500);
@@ -425,8 +421,7 @@ function autoCompleteKeyUp(event) {
   if (!event && window.event) {
     event = window.event;
   }
-  if (_timeOut)
-  {
+  if (_timeOut) {
     clearTimeout(_timeOut);
     _timeOut = null;
   }
@@ -460,8 +455,7 @@ function handleAutoComplete(keyCode, i) {
 
   // On input value change
   if ((inputField.value != _currentInputFieldValue[i] || (keyCode == 40 && !isListVisible())) &&
-      inputField.value.length > legacyRoutePlannerConfig.minCharsToTriggerAutocomplete)
-  {
+      inputField.value.length > legacyRoutePlannerConfig.minCharsToTriggerAutocomplete) {
     var valeur = escapeURI(inputField.value);
     callSuggestions(i, valeur); // appel distant
     _currentInputFieldValue[i] = inputField.value;
