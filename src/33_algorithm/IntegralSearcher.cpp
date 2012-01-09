@@ -426,8 +426,13 @@ namespace synthese
 									0 :
 									(
 										(_destinationVam.getCentroid().get() && reachedVertex->getHub()->getPoint().get()) ?
-										_destinationVam.getCentroid()->distance(
-											reachedVertex->getHub()->getPoint().get()
+//										_destinationVam.getCentroid()->distance(
+//											reachedVertex->getHub()->getPoint().get()
+sqrt(
+(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) *
+(_destinationVam.getCentroid()->getX() - reachedVertex->getHub()->getPoint()->getX()) +
+(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY()) *
+(_destinationVam.getCentroid()->getY() - reachedVertex->getHub()->getPoint()->getY())
 										):
 										numeric_limits<graph::Journey::Distance>::max()
 									)
