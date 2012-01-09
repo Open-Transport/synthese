@@ -102,6 +102,7 @@ namespace synthese
 			{
 				return;
 			}
+			_stopChrono();
 
 			_integralSearchPlanningPhase = planningPhase;
 			_integralSearchDesiredTime = desiredTime;
@@ -406,6 +407,7 @@ namespace synthese
 			{
 				return;
 			}
+			_stopChrono();
 
 /*							// Departure time
 							Journey::ServiceUses::const_iterator its(journey->getServiceUses().begin());
