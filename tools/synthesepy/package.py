@@ -38,10 +38,9 @@ def run(env, args):
 
     svn_info = utils.SVNInfo(env.source_path)
     revision_path = 'r{0}'.format(svn_info.version)
-    build_type = (config.build_type if config.build_type else env.mode).lower()
 
     package_relative_dir = os.sep.join([
-        env.platform, build_type, svn_info.branch, revision_path])
+        env.platform, env.mode, svn_info.branch, revision_path])
 
     package_dir = join(config.packages_save_path, package_relative_dir)
     if os.path.isdir(package_dir):
