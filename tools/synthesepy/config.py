@@ -46,6 +46,7 @@ DEFAULTS = {
     # use the env object afterwards)
     'env_type': 'cmake',
     'env_path': None,
+    # One of: debug, release, relwithdebinfo
     'mode': 'debug',
     # Daemon
     'port': 8080,
@@ -104,7 +105,6 @@ DEFAULTS = {
     'parallel_build': multiprocessing.cpu_count(),
     'kill_daemons_when_building': False,
     'build_only': None,
-    'build_type': None,
     'clear_cmake_cache': False,
 
     # runtests

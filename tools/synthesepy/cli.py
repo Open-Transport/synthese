@@ -236,9 +236,6 @@ def add_default_subparsers(subparsers):
         '-o', '--build-only',
         help='Build only the specified project')
     parser_build.add_argument(
-        '--build-type', choices=['Debug', 'Release', 'RelWithDebInfo'],
-        help='CMake build type')
-    parser_build.add_argument(
         '-d', '--clear-cache', action='store_true', dest='clear_cmake_cache',
         help='Clear the CMake cache before building.')
 
@@ -406,7 +403,7 @@ def main():
         choices=['scons', 'cmake', 'installed'])
     parser.add_argument('-b', '--env-path', help='Env path')
     parser.add_argument(
-        '-m', '--mode', choices=['release', 'debug'])
+        '-m', '--mode', choices=['debug', 'release', 'relwithdebinfo'])
     parser.add_argument(
         '--beep', dest='beep_when_done', action='store_true',
         help='Emit a beep on completion')
