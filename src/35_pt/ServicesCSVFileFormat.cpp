@@ -554,15 +554,15 @@ namespace synthese
 
 
 		std::string ServicesCSVFileFormat::Importer_::_replaceAllSubStrings(
-		std::string result,
-		const std::string& replaceWhat,
-		const std::string& replaceWithWhat)
-		{
+			std::string result,
+			const std::string& replaceWhat,
+			const std::string& replaceWithWhat
+		) const {
 			while(1)
 			{
 				const int pos = result.find(replaceWhat);
 				if (pos==-1) break;
-				result.replace(pos,replaceWhat.size(),replaceWithWhat);
+				result.replace(pos, replaceWhat.size(), replaceWithWhat);
 			}
 			return result;
 		}

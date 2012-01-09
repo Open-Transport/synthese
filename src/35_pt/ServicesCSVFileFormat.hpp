@@ -125,7 +125,7 @@ namespace synthese
 
 				std::string _getValue(const std::size_t field) const;
 				void _loadLine(const std::string& line) const;
-				std::string _replaceAllSubStrings(std::string result,const std::string& replaceWhat,const std::string& replaceWithWhat);
+				std::string _replaceAllSubStrings(std::string result, const std::string& replaceWhat, const std::string& replaceWithWhat) const;
 
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
