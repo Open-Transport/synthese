@@ -29,6 +29,7 @@
 #include "PegaseFileFormat.hpp"
 #include "TridentFileFormat.h"
 #include "StopsShapeFileFormat.hpp"
+#include "ServicesCSVFileFormat.hpp"
 
 #include "DestinationTableSync.hpp"
 #include "FreeDRTAreaTableSync.hpp"
@@ -201,6 +202,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PegaseFileFormat::integrate();
 	synthese::pt::TridentFileFormat::integrate();
 	synthese::pt::StopsShapeFileFormat::integrate();
+	synthese::pt::ServicesCSVFileFormat::integrate();
 
 	synthese::pt::ContactCenterAdmin::integrate();
 	synthese::pt::ContactCentersAdmin::integrate();

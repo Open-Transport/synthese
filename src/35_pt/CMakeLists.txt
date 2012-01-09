@@ -250,6 +250,8 @@ ServiceAddAction.cpp
 ServiceAddAction.h
 ServiceAdmin.cpp
 ServiceAdmin.h
+ServicesCSVFileFormat.hpp
+ServicesCSVFileFormat.cpp
 ServiceTimetableUpdateAction.cpp
 ServiceTimetableUpdateAction.h
 ServiceUpdateAction.cpp
