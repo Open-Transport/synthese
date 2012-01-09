@@ -213,9 +213,9 @@ namespace synthese
 					string backwardStr;
 
 					//TODO selection of attributs must be generic
-					file = _replaceAllSubStrings(file,string(" _"), string("-"));
+					string fileStr = _replaceAllSubStrings(file, string(" _"), string("-"));
 					vector<string> fields;
-					split(fields, file, is_any_of(string("_")));
+					split(fields, fileStr, is_any_of(string("_")));
 					if(fields.size() < 4)
 						return false;
 					lineNameStr = fields[0];
@@ -554,14 +554,18 @@ namespace synthese
 
 
 		std::string ServicesCSVFileFormat::Importer_::_replaceAllSubStrings(
-			std::string result,
+			const std::string source,
 			const std::string& replaceWhat,
 			const std::string& replaceWithWhat
 		) const {
+			string result = source;
 			while(1)
 			{
 				const int pos = result.find(replaceWhat);
-				if (pos==-1) break;
+				if(pos == -1)
+				{
+					break;
+				}
 				result.replace(pos, replaceWhat.size(), replaceWithWhat);
 			}
 			return result;
