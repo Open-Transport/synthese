@@ -123,8 +123,9 @@ namespace synthese
 				PTUseRuleBlockMasks _ptUseRuleBlockMasks;
 				static std::string _serializePTUseRuleBlockMasks(const PTUseRuleBlockMasks& object);
 
-				std::string _getValue(const std::size_t field ) const;
+				std::string _getValue(const std::size_t field) const;
 				void _loadLine(const std::string& line) const;
+				std::string _replaceAllSubStrings(std::string result,const std::string& replaceWhat,const std::string& replaceWithWhat);
 
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
