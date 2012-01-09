@@ -157,8 +157,6 @@ namespace synthese
 					return false;
 				}
 
-				bool backward = false;
-
 				// RollingStock
 				RollingStock* rollingStock;
 				if(_rollingStock.get())
@@ -215,18 +213,19 @@ namespace synthese
 					string backwardStr;
 
 					//TODO selection of attributs must be generic
-					int fileNameLength = file.size();
-					if(fileNameLength < 25)
-						return false;
+					file = _replaceAllSubStrings(file,string(" _"), string("-"));
 					vector<string> fields;
 					split(fields, file, is_any_of(string("_")));
+					if(fields.size() < 4)
+						return false;
 					lineNameStr = fields[0];
 					backwardStr = fields[1];
 					periodCalendarName = fields[2];
-					daysCalendarName = file.substr(fileNameLength-14,8);
+					daysCalendarName = fields[3].substr(0,fields[3].size()-4);
 					stream << periodCalendarName << " ; " << daysCalendarName << " ; " << lineNameStr << " ;"  << backwardStr << endl;
 
-					if(backwardStr == "Retour")
+					bool backward = false;
+					if(backwardStr == "RETOUR")
 						backward = true;
 
 					CommercialLine* commercialLine(PTFileFormat::GetLine(lines, lineNameStr, _dataSource, _env, stream));
@@ -550,6 +549,22 @@ namespace synthese
 				utfline = IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
+		}
+
+
+
+		std::string ServicesCSVFileFormat::Importer_::_replaceAllSubStrings(
+		std::string result,
+		const std::string& replaceWhat,
+		const std::string& replaceWithWhat)
+		{
+			while(1)
+			{
+				const int pos = result.find(replaceWhat);
+				if (pos==-1) break;
+				result.replace(pos,replaceWhat.size(),replaceWithWhat);
+			}
+			return result;
 		}
 
 
