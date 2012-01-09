@@ -157,10 +157,10 @@ class SconsEnv(Env):
 
 class CMakeEnv(Env):
     type = 'cmake'
-    MODE_TO_VS_BUILD_TYPE = {
+    MODE_TO_CMAKE_BUILD_TYPE = {
         'debug': 'Debug',
         'release': 'Release',
-        'relwithdebinfo': 'Release',
+        'relwithdebinfo': 'RelWithDebInfo',
     }
 
     @property
@@ -168,14 +168,13 @@ class CMakeEnv(Env):
         return join(self.source_path, 'build_cmake', self.mode)
 
     @property
-    def vs_build_type(self):
-        assert self.platform == 'win', 'vs_build_type is for Windows only'
-        return self.MODE_TO_VS_BUILD_TYPE[self.mode]
+    def build_type(self):
+        return self.MODE_TO_CMAKE_BUILD_TYPE[self.mode]
 
     @property
     def executable_relative_path(self):
         if self.platform == 'win':
-            return self.vs_build_type
+            return self.build_type
         return os.curdir
 
 
