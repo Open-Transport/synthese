@@ -164,17 +164,13 @@ function callSuggestions(i, valeur) {
   // appel à l'url distante
   var city = "";
   var place = "";
-  if ((_secondaryField[i]) && (!legacyRoutePlannerConfig.routePlannerFormOneField))
-  {
+  if (_secondaryField[i] && (!legacyRoutePlannerConfig.routePlannerFormOneField)) {
     city = _secondaryField[i].value;
     place = valeur;
-  }
-  else
-  {
+  } else {
     city = valeur;
   }
-  if (getFromCache(city, place))
-  {
+  if (getFromCache(city, place)) {
       drawList(i, valeur, getFromCache(city, place));
       return;
   }
@@ -227,27 +223,27 @@ function getFromCache(value1, value2) {
 // Transformation XML en tableau
 function traiteXmlSuggestions(xmlDoc) {
   var optionsListe = new Array();   
-  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+  if (legacyRoutePlannerConfig.routePlannerFormOneField) {
     // Best place
     var bestPlaceNode = xmlDoc.getElementsByTagName('best_place')[0];
-    optionsListe.push(new Array('Meilleure proposition : ', '', '',null));
+    optionsListe.push(['Meilleure proposition : ', '', '', null]);
     var cities = bestPlaceNode.getElementsByTagName('city');
     var stops = bestPlaceNode.getElementsByTagName('stop');
     var roads = bestPlaceNode.getElementsByTagName('road');
-    if(cities.length > 0) {
+    if (cities.length > 0) {
       optionsListe.push(traiteXmlCity(cities[0]));
     }
-    if(stops.length > 0) {
+    if (stops.length > 0) {
       optionsListe.push(traiteXmlStop(stops[0]));
     }
-    if(roads.length > 0) {
+    if (roads.length > 0) {
       optionsListe.push(traiteXmlRoad(roads[0]));
     }
     // Cities
     var citiesNode = xmlDoc.getElementsByTagName('cities')[0];
     var cities = citiesNode.getElementsByTagName('city');
-    if(cities.length > 0) {
-      optionsListe.push(new Array('Communes : ', '', '',null));
+    if (cities.length > 0) {
+      optionsListe.push(['Communes : ', '', '', null]);
     }
     for (var i = 0; i < cities.length; ++i) {
       optionsListe.push(traiteXmlCity(cities[i]));
@@ -256,8 +252,8 @@ function traiteXmlSuggestions(xmlDoc) {
     // Stops
     var stopsNode = xmlDoc.getElementsByTagName('stops')[0];
     var stops = stopsNode.getElementsByTagName('stop');
-    if(stops.length > 0) {
-      optionsListe.push(new Array('Arrêts : ', '', '',null));
+    if (stops.length > 0) {
+      optionsListe.push(['Arrêts : ', '', '', null]);
     }
     for (var i = 0; i < stops.length; ++i) {
       optionsListe.push(traiteXmlStop(stops[i]));
@@ -266,48 +262,46 @@ function traiteXmlSuggestions(xmlDoc) {
     // Roads
     var roadsNode = xmlDoc.getElementsByTagName('roads')[0];
     var roads = roadsNode.getElementsByTagName('road');
-    if(roads.length > 0) {
-      optionsListe.push(new Array('Rues : ', '', '',null));
+    if (roads.length > 0) {
+      optionsListe.push(['Rues : ', '', '', null]);
     }
     for (var i = 0; i < roads.length; ++i) {
       optionsListe.push(traiteXmlRoad(roads[i]));
     }
-  }
-  else {
+  } else {
     var options = xmlDoc.getElementsByTagName('option');
     for (var i = 0; i < options.length; ++i) {
-      optionsListe.push(
-      new Array(
+      optionsListe.push([
         options[i].firstChild.data,
         options[i].getAttribute('cityName'),
-        options[i].getAttribute('name')));
+        options[i].getAttribute('name')]);
     }
   }
   return optionsListe;
 }
 
 function traiteXmlCity(city) {
-  return new Array(
+  return [
     city.getAttribute('key'),
     city.getAttribute('city_name'),
     '',
-    'city');
+    'city'];
 }
 
 function traiteXmlStop(stop) {
-  return new Array(
+  return [
     stop.getAttribute('key'),
     stop.getAttribute('cityName'),
     stop.getAttribute('stop_name'),
-    'stop');
+    'stop'];
 }
 
 function traiteXmlRoad(road) {
-  return new Array(
+  return [
     road.getAttribute('key'),
     road.getAttribute('city_name'),
     road.getAttribute('name'),
-    'road');
+    'road'];
 }
 
 function initStyle() {
@@ -391,13 +385,12 @@ function drawList(i, valeur, liste) {
   _currentList = liste;
   for (var f = 0; f < liste.length; ++f) {
     var nouveauDiv = document.createElement("DIV");
-    if((!legacyRoutePlannerConfig.routePlannerFormOneField) || (liste[f][3] != null)) {
+    if (!legacyRoutePlannerConfig.routePlannerFormOneField || (liste[f][3] != null)) {
       nouveauDiv.onmousedown = divOnMouseDown;
       nouveauDiv.onmouseover = divOnMouseOver;
       nouveauDiv.onmouseout = divOnMouseOut;
       setStyleForElement(nouveauDiv, "autoCompleteDiv");
-    }
-    else {
+    } else {
        setStyleForElement(nouveauDiv, "autoCompleteDivTitle");   
     }
     var nouveauSpan = document.createElement("SPAN");
@@ -455,13 +448,13 @@ function handleAutoComplete(keyCode, i) {
   _timeOut = null;
   var inputField = _inputField[i];
   var cityId = null;
-  if ((_secondaryField[i]) && (!legacyRoutePlannerConfig.routePlannerFormOneField)) {
+  if (_secondaryField[i] && !legacyRoutePlannerConfig.routePlannerFormOneField) {
     for (cityId = 0; cityId < _inputField.length; ++cityId)
       if (_inputField[cityId] == _secondaryField[i])
         break;
   }
 
-  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+  if (legacyRoutePlannerConfig.routePlannerFormOneField) {
     _secondaryField[i].value = '';
   }
 
@@ -491,14 +484,10 @@ function handleAutoComplete(keyCode, i) {
   }
 
   // Enter
-  if (keyCode == 13 && isListVisible())
-  {
-    if (cityId != null && _inputField[cityId].value == '')
-    {
+  if (keyCode == 13 && isListVisible()) {
+    if (cityId != null && _inputField[cityId].value == '') {
       setAndJump(i, _currentList[_highlightedSuggestionIndex][2], cityId, _currentList[_highlightedSuggestionIndex][1]);
-    }
-    else
-    {
+    } else {
       setAndJump(i, getSuggestion(_highlightedSuggestionDiv));
     }
   }
@@ -510,13 +499,12 @@ function handleAutoComplete(keyCode, i) {
 }
 
 function setAndJump(id, value, idCity, cityValue) {
-  if (idCity != null)
-  {
+  if (idCity != null) {
     _inputField[idCity].value = cityValue;
   }
   _inputField[id].value = value;
 
-  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
+  if (legacyRoutePlannerConfig.routePlannerFormOneField) {
     _secondaryField[id].value = _currentList[_highlightedSuggestionIndex][3];
   }
   
@@ -528,8 +516,7 @@ function setAndJump(id, value, idCity, cityValue) {
     _fieldToCleanAtUpdate[id].value = "";
 
   for (++next; next < _documentForm.elements.length && _documentForm.elements[next].type != "text"; ++next);
-  if (next < _documentForm.elements.length)
-  {
+  if (next < _documentForm.elements.length) {
     _documentForm.elements[next].focus();
     _documentForm.elements[next].select();
   }
@@ -541,7 +528,7 @@ function highlight(n) {
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
   var suggestionLongueur = suggestionList.length;
   for (var l = 0; l < suggestionLongueur; ++l) {
-    if(getStyleForElement(suggestionList.item(l)) != "autoCompleteDivTitle")
+    if (getStyleForElement(suggestionList.item(l)) != "autoCompleteDivTitle")
       setStyleForElement(suggestionList.item(l), "autoCompleteDiv");
   }
   if ((_highlightedSuggestionDiv) && (getStyleForElement(_highlightedSuggestionDiv) != "autoCompleteDivTitle"))
@@ -571,12 +558,10 @@ function PressAction(i) {
     showCompleteDiv(i)
   }
   var trouve = false;
-  if(legacyRoutePlannerConfig.routePlannerFormOneField) {
-    if(suggestionLongueur > 1)
+  if (legacyRoutePlannerConfig.routePlannerFormOneField) {
+    if (suggestionLongueur > 1)
       highlight(1);
-  }
-  else
-  {
+  } else {
     // si on a du texte sur lequel travailler
     if (_currentInputFieldValue[i].length > 0) {
       var indice;
@@ -771,8 +756,7 @@ function mouse_event_handler(e) {
       row.className = 'hlt';
       row.cells[0].className = 'hlt';
       mouse_event_handler.previous.row = row;
-    }
-    else {
+    } else {
       mouse_event_handler.previous.row = null;
     }
   }
@@ -953,9 +937,7 @@ function ajaxLoginSuccess(xmlSession) {
   if (!acceptedElements.length || !acceptedElements[0].firstChild || !acceptedElements[0].firstChild.data)
   {  // login failed
     return false;
-  }
-  else
-  {
+  } else {
     var userNameElements = docXML.getElementsByTagName('name');
     var userPhoneElements = docXML.getElementsByTagName('phone');
     var userEMailElements = docXML.getElementsByTagName('email');
