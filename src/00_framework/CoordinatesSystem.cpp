@@ -37,8 +37,8 @@ using namespace geos::algorithm;
 namespace synthese
 {
 	const string CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
-	const CoordinatesSystem* CoordinatesSystem::_instanceCoordinatesSystem(NULL);
-	CoordinatesSystem::CoordinatesSystemsMap CoordinatesSystem::_coordinates_systems;
+	const CoordinatesSystem* CoordinatesSystem::_InstanceCoordinatesSystem(NULL);
+	CoordinatesSystem::CoordinatesSystemsMap CoordinatesSystem::_CoordinatesSystems;
 
 
 
@@ -76,8 +76,8 @@ namespace synthese
 
 	const CoordinatesSystem& CoordinatesSystem::GetCoordinatesSystem( SRID srid )
 	{
-		CoordinatesSystemsMap::const_iterator it(_coordinates_systems.find(srid));
-		if(it == _coordinates_systems.end())
+		CoordinatesSystemsMap::const_iterator it(_CoordinatesSystems.find(srid));
+		if(it == _CoordinatesSystems.end())
 		{
 			throw CoordinatesSystemNotFoundException(srid);
 		}
@@ -88,21 +88,21 @@ namespace synthese
 
 	void CoordinatesSystem::AddCoordinatesSystem( SRID srid, const std::string& name, const std::string& projSequence )
 	{
-		_coordinates_systems.insert(make_pair(srid, new CoordinatesSystem(srid, name, projSequence)));
+		_CoordinatesSystems.insert(make_pair(srid, new CoordinatesSystem(srid, name, projSequence)));
 	}
 
 
 
 	void CoordinatesSystem::ClearCoordinatesSystems()
 	{
-		_coordinates_systems.clear();
+		_CoordinatesSystems.clear();
 	};
 
 
 
 	void CoordinatesSystem::SetDefaultCoordinatesSystems( SRID instanceSRID )
 	{
-		_instanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
+		_InstanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
 	}
 
 
@@ -138,7 +138,7 @@ namespace synthese
 	CoordinatesSystem::CoordinatesSystemsTextMap CoordinatesSystem::GetCoordinatesSystemsTextMap()
 	{
 		CoordinatesSystemsTextMap result;
-		BOOST_FOREACH(const CoordinatesSystemsMap::value_type& it, _coordinates_systems)
+		BOOST_FOREACH(const CoordinatesSystemsMap::value_type& it, _CoordinatesSystems)
 		{
 			result.insert(make_pair(it.first, lexical_cast<string>(it.first) +" "+ it.second->getName()));
 		}
