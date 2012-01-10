@@ -36,6 +36,7 @@ import socket
 import subprocess
 import sys
 import time
+import traceback
 
 from werkzeug import wsgi
 from werkzeug.serving import run_simple
@@ -45,6 +46,7 @@ from synthesepy.apache import Apache
 from synthesepy import daemon
 from synthesepy import db_backends
 from synthesepy import db_sync
+from synthesepy import deploy
 from synthesepy import external_tools
 from synthesepy import imports
 from synthesepy import proxy
@@ -52,27 +54,6 @@ from synthesepy import utils
 
 
 log = logging.getLogger(__name__)
-
-
-# Utilities
-
-def _ssh_command_line(config, with_server=True, extra_opts=''):
-    return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {remote_server}'.format(
-        extra_opts=extra_opts,
-        ssh_global_opts=config.ssh_global_opts,
-        ssh_opts=config.ssh_opts,
-        remote_server=config.remote_server if with_server else '')
-
-def _rsync(config, remote_path, local_path):
-    utils.call(
-        'rsync -avz --delete --delete-excluded '
-        '{rsync_opts} -e "{ssh_command_line}" '
-        '{remote_server}:{remote_path} {local_path}'.format(
-        rsync_opts=config.rsync_opts,
-        ssh_command_line=_ssh_command_line(config, False),
-        remote_server=config.remote_server,
-        remote_path=remote_path,
-        local_path=utils.to_cygwin_path(local_path)))
 
 
 class Package(object):
@@ -317,24 +298,21 @@ class Site(object):
         return None
 
 
-class CommandException(Exception):
-    def __init__(self, command_result):
-        self.command_result = command_result
-
-    def __str__(self):
-        return 'Command Exception while running: %s' % self.command_result
-
-
 class CommandResult(object):
     # TODO: Maybe simplify with just a success bool status.
     SUCCESS = 0
     IGNORED_FAILURE = 1
     FAILURE = 2
 
-    def __init__(self):
+    TYPE_PROCESS = 0
+    TYPE_METHOD = 1
+
+    def __init__(self, type=TYPE_PROCESS, method_name=None):
         self.commandline = []
         self.status = self.SUCCESS
         self.output = ''
+        self.type = type
+        self.method_name = method_name
 
     @property
     def success(self):
@@ -345,22 +323,8 @@ class CommandResult(object):
             self.commandline, self.output)
 
     @classmethod
-    def call_project(cls, project, command, args=[], sudo=False):
-        cmd = []
-        if sudo:
-            cmd.append('/usr/bin/sudo')
-        # TODO: option to add the executable in case the script is not executable?
-        #cmd.append(sys.executable)
-        cmd.append(project.env.synthesepy_path)
-        if project.config.verbose:
-            cmd.append('-v')
-        cmd.append('--env-type=' + project.env.type)
-        cmd.append('--env-path=' + project.env.env_path)
-        cmd.append('--mode=' + project.env.mode)
-        cmd.append('--project-path=' + project.path)
-
-        cmd.append(command)
-        cmd.extend(args)
+    def call_project(cls, project, command, global_args=[], args=[], sudo=False):
+        cmd = project.build_command_line(command, global_args, args, sudo=sudo)
         return cls.call_command(project, cmd)
 
     @classmethod
@@ -379,6 +343,27 @@ class CommandResult(object):
 
         return command_result
 
+    @classmethod
+    def call_method(cls, method, *args, **kwargs):
+        command_result = CommandResult(
+            type=cls.TYPE_METHOD, method_name=method.__name__)
+        try:
+            method(*args, **kwargs)
+        except Exception, e:
+            command_result.output = traceback.format_exc(e)
+            command_result.status = CommandResult.FAILURE
+
+        return command_result
+
+
+class CommandsException(Exception):
+    def __init__(self, command_result, commands_result):
+        self.command_result = command_result
+        self.commands_result = commands_result
+
+    def __str__(self):
+        return 'Commands Exception while running: %s' % self.commands_result
+
 
 class CommandsResult(object):
     def __init__(self, title):
@@ -390,23 +375,41 @@ class CommandsResult(object):
         self.command_results.append(command_result)
         if not command_result.success:
             self.success = False
-            raise CommandException(command_result)
+            raise CommandsException(command_result, self)
+
+    def __str__(self):
+        return '<CommandsResult: title=%s, %s>' % (
+            self.title, self.command_results)
 
 
-def command(root_required=False):
-     def _command(f):
-         def wrapper(*args, **kwargs):
-             project = args[0]
-             if (not project.env.c.no_root_check and
-                 project.env.platform != 'win'):
-                is_root = os.geteuid() == 0
-                if root_required and not is_root:
-                    raise Exception('You must run this command as root')
-                if not root_required and is_root:
-                    raise Exception('You can\'t run this command as root')
-             return f(*args, **kwargs)
-         return wrapper
-     return _command
+def command(root_required=False, root_allowed=False):
+    def _command(f):
+        def wrapper(*args, **kwargs):
+            project = args[0]
+            if (not project.env.c.no_root_check and
+                project.env.platform != 'win'):
+               is_root = os.geteuid() == 0
+               if root_required and not is_root:
+                   raise Exception('You must run this command as root')
+               if not root_allowed and not root_required and is_root:
+                   raise Exception('You can\'t run this command as root')
+            return f(*args, **kwargs)
+        return wrapper
+    return _command
+
+
+def commands_result():
+    def _command(f):
+        def wrapper(*args, **kwargs):
+            project = args[0]
+            try:
+                return f(*args, **kwargs)
+            except CommandsException, e:
+                project.admin_log.warn('Failure while running commands: %s' % e.commands_result.title)
+                log.exception('Failure while running commands: %s', e)
+                return e.commands_result
+        return wrapper
+    return _command
 
 
 class Project(object):
@@ -426,8 +429,10 @@ class Project(object):
         self.db_path = join(path, 'db')
         if not os.path.isdir(self.db_path):
             os.makedirs(self.db_path)
+        self._deployer = None
 
         self.admin_log = logging.getLogger('synthesepy.admin')
+        self.admin_log.setLevel(logging.DEBUG)
         self.admin_log_path = join(self.path, 'logs', 'admin.log')
 
         class KeptClosedFileHandler(logging.FileHandler):
@@ -467,6 +472,11 @@ class Project(object):
                     '%r' % (env_config_name, self.config.env_configs.keys()))
             self.config.update_from_dict(
                 self.config.env_configs[env_config_name])
+
+        if not self.config.remote_db_path:
+            sep = '/' if self.config.remote_project_path.startswith('/') else '\\'
+            self.config.remote_db_path = sep.join([
+                self.config.remote_project_path, 'db', 'config.db3'])
 
         manager_path = join(self.path, 'manager')
         self.manager_module = None
@@ -843,8 +853,7 @@ The synthese.py wrapper script.
             remote_db_local_path = join(self.db_path, 'remote_config.db3')
 
             log.info('Fetching db to %r', remote_db_local_path)
-            # TODO: this is wrong with the new project system.
-            _rsync(self.config, self.config.remote_db_path,
+            utils.rsync(self.config, '{remote_server}:' + self.config.remote_db_path,
                 utils.to_cygwin_path(remote_db_local_path))
 
             remote_conn_info = self.db_backend.conn_info.copy()
@@ -857,7 +866,7 @@ The synthese.py wrapper script.
             MYSQL_FORWARDED_PORT = 33000
 
             p = subprocess.Popen(
-                _ssh_command_line(
+                utils.ssh_command_line(
                     self.config,
                     extra_opts='-N -L {forwarded_port}:localhost:3306'.format(
                         forwarded_port=MYSQL_FORWARDED_PORT)), shell=True)
@@ -891,7 +900,7 @@ The synthese.py wrapper script.
     @command()
     def ssh(self):
         """Open a ssh shell on the remote server"""
-        utils.call(_ssh_command_line(self.config))
+        utils.call(utils.ssh_command_line(self.config))
 
     @command()
     def imports(self, subcommand, template_id, import_id, dummy, no_mail, args):
@@ -975,6 +984,34 @@ The synthese.py wrapper script.
 
     # Manager commands
 
+    def build_command_line(self, command, global_args=[], args=[], sudo=False,
+            remote=False):
+        cmd = []
+        if sudo:
+            cmd.append('/usr/bin/sudo')
+        if self.env.platform == 'win':
+            cmd.append(sys.executable)
+        else:
+            # Python path is hardcoded in order to match the sudo rule.
+            cmd.append('/usr/bin/python')
+        cmd.append(self.env.synthesepy_path)
+        if self.config.verbose:
+            cmd.append('-v')
+        cmd.append('--env-type=' + self.env.type)
+        cmd.append('--env-path=' + self.env.env_path)
+        cmd.append('--mode=' + self.env.mode)
+        project_path = self.config.remote_project_path if remote else self.path
+        cmd.append('--project-path=' + project_path)
+        cmd.extend(global_args)
+
+        cmd.append(command)
+        cmd.extend(args)
+        return cmd
+
+    def call_project(self, command, global_args=[], args=[], sudo=False):
+        cmd = self.build_command_line(command, global_args, args, sudo)
+        utils.call(cmd, cwd=self.path)
+
     @command(root_required=True)
     def root_delegate(self, command, args=[]):
         if command == 'update_synthese':
@@ -990,15 +1027,59 @@ The synthese.py wrapper script.
             if self.env.config.dummy:
                 return
             utils.call('curl -s {0} | python'.format(install_url))
-        elif command in ('stop_project', 'start_project'):
-            supervisor_command = 'stop' if command == 'stop_project' else 'start'
+        elif command in ('start_supervisor', 'stop_supervisor'):
+            supervisor_command = 'start' if command == 'start_supervisor' else 'stop'
             utils.call([
                 '/usr/bin/supervisorctl', supervisor_command,
                 'synthese-{0}'.format(self.config.project_name)])
+        elif command in ('start_initd', 'stop_initd'):
+            initd_command = 'start' if command == 'start_initd' else 'stop'
+            utils.call(['/etc/init.d/s3-server', initd_command])
         else:
             raise Exception('Unknown command %r' % command)
 
+    @command(root_allowed=True)
+    def bgstart(self):
+        if self.env.platform == 'win' and self.config.bg_process_manager != 'python':
+            raise Exception('Only bg_process_manager == python is supported '
+                'on Windows.')
+        
+        if self.config.bg_process_manager == 'python':
+            if self.env.platform == 'lin' and os.geteuid() == 0:
+                raise Exception('You can\'t run this command root')
+
+            cmd = self.build_command_line('rundaemon', ['-s'])
+            stdout = open(self.env.c.log_file, 'wb')
+
+            subprocess.Popen(cmd,
+                stderr=subprocess.STDOUT,
+                stdout=stdout)
+        elif self.config.bg_process_manager == 'supervisor':
+            self.call_project('root_delegate', args=['start_supervisor'], sudo=True)
+        elif self.config.bg_process_manager == 'initd':
+            self.call_project('root_delegate', args=['start_initd'], sudo=True)
+        else:
+            raise Exception('Unknown bg_process_manager %r' %
+                self.config.bg_process_manager)
+
+    @command(root_allowed=True)
+    def bgstop(self):
+        if self.env.platform == 'win' and self.config.bg_process_manager != 'python':
+            raise Exception('Only bg_process_manager == python is supported '
+                'on Windows.')
+
+        if self.config.bg_process_manager == 'python':
+            self.stopdaemon()
+        elif self.config.bg_process_manager == 'supervisor':
+            self.call_project('root_delegate', args=['stop_supervisor'], sudo=True)
+        elif self.config.bg_process_manager == 'initd':
+            self.call_project('root_delegate', args=['stop_initd'], sudo=True)
+        else:
+            raise Exception('Unknown bg_process_manager %r' % 
+                self.config.bg_process_manager)
+
     @command()
+    @commands_result()
     def update_synthese(self, install_url=None):
         self.admin_log.info('update_synthese called')
 
@@ -1006,71 +1087,76 @@ The synthese.py wrapper script.
             install_url = 'http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/latest/install_synthese.py'
         commands_result = CommandsResult('Update Synthese')
 
-        try:
-            commands_result.add_command_result(
-                CommandResult.call_project(
-                    self, 'root_delegate',
-                    ['update_synthese', install_url], sudo=True))
-
-        except CommandException, e:
-            self.admin_log.warn('update_synthese failed')
-            log.exception('Failure while running commands: %s', e)
+        commands_result.add_command_result(
+            CommandResult.call_project(
+                self, 'root_delegate',
+                args=['update_synthese', install_url], sudo=True))
 
         return commands_result
 
     @command()
+    @commands_result()
     def update_project(self, system_install=True, load_data=True, overwrite=False):
         self.admin_log.info('update_project called')
 
         commands_result = CommandsResult('Update Project')
-        try:
-            # TODO: implement daemon stop/start for development mode (without supervisor).
+
+        commands_result.add_command_result(
+            CommandResult.call_project(self, 'bgstop'))
+
+        if system_install:
             commands_result.add_command_result(
                 CommandResult.call_project(
-                    self, 'root_delegate', ['stop_project'], sudo=True))
+                    self, 'system_install', sudo=True))
 
-            if system_install:
-                commands_result.add_command_result(
-                    CommandResult.call_project(
-                        self, 'system_install', sudo=True))
-
-            if load_data:
-                commands_result.add_command_result(
-                    CommandResult.call_project(self, 'load_data'))
-                load_local_data_args = []
-                if overwrite:
-                    load_local_data_args = ['--overwrite']
-                commands_result.add_command_result(
-                    CommandResult.call_project(
-                        self, 'load_local_data', load_local_data_args))
-
+        if load_data:
+            commands_result.add_command_result(
+                CommandResult.call_project(self, 'load_data'))
+            load_local_data_args = []
+            if overwrite:
+                load_local_data_args = ['--overwrite']
             commands_result.add_command_result(
                 CommandResult.call_project(
-                    self, 'root_delegate', ['start_project'], sudo=True))
+                    self, 'load_local_data', load_local_data_args))
 
-        except CommandException, e:
-            self.admin_log.warn('update_project failed')
-            log.exception('Failure while running commands: %s', e)
+        commands_result.add_command_result(
+            CommandResult.call_project(self, 'bgstart'))
 
         return commands_result
 
     @command()
+    @commands_result()
     def svn(self, command, username=None, password=None):
         commands_result = CommandsResult('Subversion ({0})'.format(command))
 
-        try:
-            cmd = 'svn %s --no-auth-cache' % command
-            if username:
-                cmd += ' --username=%s' % username
-            if password:
-                cmd += ' --password=%s' % password
-            commands_result.add_command_result(
-                CommandResult.call_command(self, cmd, hide_arg=password))
-
-        except CommandException, e:
-            log.exception('Failure while running commands: %s', e)
+        cmd = 'svn %s --no-auth-cache' % command
+        if username:
+            cmd += ' --username=%s' % username
+        if password:
+            cmd += ' --password=%s' % password
+        commands_result.add_command_result(
+            CommandResult.call_command(self, cmd, hide_arg=password))
 
         return commands_result
+
+    # Deploy
+    
+    @property
+    def deployer(self):
+        if self._deployer:
+            return self._deployer
+        self._deployer = deploy.Deployer(self)
+        return self._deployer
+    
+    @command()
+    @commands_result()
+    def deploy(self):
+        return self.deployer.deploy()
+    
+    @command()
+    @commands_result()
+    def restore_deploy(self):
+        return self.deployer.restore_deploy()
 
 
 def create_project(env, path, system_packages=None, conn_string=None,

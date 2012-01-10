@@ -170,6 +170,30 @@ def to_cygwin_path(path):
     return stdout_content.rstrip()
 
 
+def ssh_command_line(config, with_server=True, extra_opts=''):
+    return 'ssh {extra_opts} {ssh_global_opts} {ssh_opts} {remote_server}'.format(
+        extra_opts=extra_opts,
+        ssh_global_opts=config.ssh_global_opts,
+        ssh_opts=config.ssh_opts,
+        remote_server=config.remote_server if with_server else '')
+
+
+def rsync_command_line(config, from_, to):
+    from_ = from_.format(remote_server=config.remote_server)
+    to = to.format(remote_server=config.remote_server)
+    return (
+        'rsync -avz --delete --delete-excluded '
+        '{rsync_opts} -e "{ssh_command_line}" '
+        '{from_} {to}'.format(
+        rsync_opts=config.rsync_opts,
+        ssh_command_line=ssh_command_line(config, False),
+        from_=from_, to=to))
+
+
+def rsync(config, from_, to):
+    call(rsync_command_line(config, from_, to))
+
+
 def call(cmd, shell=None, **kwargs):
 
     if shell is None:

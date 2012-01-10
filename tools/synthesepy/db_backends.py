@@ -84,6 +84,9 @@ class DBBackend(object):
                 table, ','.join(columns), ','.join(['?'] * len(columns))
             ), values)
 
+    def get_tables(self):
+        raise NotImplementedError()
+
     def init_db(self):
         utils.kill_listening_processes(self.env.c.port)
 
@@ -125,12 +128,12 @@ class DBBackend(object):
         """Open a SQL interpreter on the database or execute the given SQL"""
         raise NotImplementedError()
 
-    def dump(self):
-        """Return a database dump as a string"""
+    def dump(self, table=None):
+        """Return a database or table dump as a string"""
         raise NotImplementedError()
 
-    def restore(self, sql):
-        """Restore this database from the provided sql"""
+    def restore(self, sql, dropdb=True):
+        """Run the provided sql (used to restore the db or a table)."""
         raise NotImplementedError()
 
 
@@ -187,6 +190,10 @@ class SQLiteBackend(DBBackend):
             conn.execute("SELECT load_extension('%s')" % module_path)
         return conn
 
+    def get_tables(self):
+        sql = "select name from sqlite_master where type='table' order by name;"
+        return [row['name'] for row in self.query(sql)]
+
     def _create_db(self):
         # Nothing to do, the sqlite file will be created if it doesn't exist.
         pass
@@ -215,21 +222,22 @@ class SQLiteBackend(DBBackend):
         if output:
             print output
 
-    def dump(self):
-        args = ['-bail', self.conn_info['path'], '.dump']
+    def dump(self, table=None):
+        cmd = '.dump' if table is None else ('.dump %s' % table)
+        args = ['-bail', self.conn_info['path'], cmd]
         log.debug('Running: %r', args)
         output = self._call_spatialite(args, input='')
         # Remove the Spatialite header, which isn't valid SQL.
         # (-noheader doesn't have any effect)
         return output[output.index('BEGIN TRANSACTION'):]
 
-    def restore(self, sql):
+    def restore(self, sql, dropdb=True):
         db_path = self.conn_info['path']
-        if os.path.isfile(db_path):
+        if dropdb and os.path.isfile(db_path):
             os.unlink(db_path)
 
         self._call_spatialite(['-bail', '-noheader', db_path], input=sql)
-        log.info('Database %r restored', db_path)
+        log.info('sql executed on database %r', db_path)
 
 
 class MySQLBackend(DBBackend):
@@ -252,6 +260,10 @@ class MySQLBackend(DBBackend):
             args['db'] = self.conn_info['db']
 
         return MySQLdb.connect(**args)
+
+    def get_tables(self):
+        sql = 'show tables;'
+        return [row.values()[0] for row in self.query(sql)]
 
     def _create_db(self):
         with self.get_cursor(False) as cursor:
@@ -297,7 +309,7 @@ class MySQLBackend(DBBackend):
                     mysql_ver=synthesepy.build.MYSQL_VER),
                 'bin')])
 
-    def _mysql_command(self, command, extra_opts='', input=''):
+    def _mysql_command(self, command, extra_opts='', input='', table=None):
         self._setup_path()
         default_args = {
             'port': '3306',
@@ -307,10 +319,11 @@ class MySQLBackend(DBBackend):
         args.update(dict(
             command=command,
             extra_opts=extra_opts,
+            table=table if table else '',
         ))
  
         cmd = ('{command} {extra_opts} -u{user} -p{passwd} -h{host} '
-            '-P{port} {db}'.format(**args))
+            '-P{port} {db} {table}'.format(**args))
 
         if input is not None:
             return utils.call(cmd, input=input)
@@ -321,11 +334,11 @@ class MySQLBackend(DBBackend):
         if output:
             print output
 
-    def dump(self):
+    def dump(self, table=None):
         return self._mysql_command(
-            'mysqldump', extra_opts=self.env.c.mysqldump_opts)
+            'mysqldump', extra_opts=self.env.c.mysqldump_opts, table=table)
 
-    def restore(self, sql):
+    def restore(self, sql, dropdb=True):
         return self._mysql_command(
             'mysql', input=sql)
 
