@@ -17,7 +17,6 @@
 }
 
 #completeDiv .autoCompleteDivAct {
-  height: 16px;
   background-color: #3366cc;
   color: white !important;
   cursor: pointer;
