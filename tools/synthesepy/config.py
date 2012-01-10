@@ -41,7 +41,11 @@ DEFAULTS = {
     'env_configs': {},
     'env_config_names': '',
     'mysqldump_opts': '',
- 
+
+    # bgstart/bgstop
+    # One of: supervisor, initd, python
+    'bg_process_manager': 'python',
+
     # Environment (only used during initialization,
     # use the env object afterwards)
     'env_type': 'cmake',
@@ -87,10 +91,13 @@ DEFAULTS = {
     'web_debug': False,
     'web_admins': set(('root',)),
 
-    # remote project management
+    # remote project management and deployment
     'remote_server': None,
-    # TODO: should use new project layout by default
-    'remote_db_path': '/srv/data/s3-server/config.db3',
+    'remote_project_path': '/srv/synthese/{project_name}',
+    # If dealing with an old-style project, use this instead:
+    # '/srv/data/s3-server/config.db3',
+    'remote_db_path': None,
+
     'ssh_global_opts': '',
     'ssh_opts': '',
     'rsync_opts': '',
@@ -201,6 +208,9 @@ class Config(object):
                     'Invalid log level value {0!r} allowed: {1!r}'.format(
                         self.log_level, levels))
             self.log_level = level_name_to_int[self.log_level]
+
+        self.remote_project_path = self.remote_project_path.format(
+            project_name=self.project_name)
 
     def __repr__(self):
         return '<Config %s>' % self.__dict__
