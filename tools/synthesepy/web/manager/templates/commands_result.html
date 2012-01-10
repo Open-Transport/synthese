@@ -29,7 +29,7 @@
 
   {% for command_result in commands_result.command_results %}
     <h3>Command {{ loop.index }}</h3>
-    <p>Command line: <code>{{ command_result.commandline }}</code></p>
+    <p>Command line: <code>{{ command_result.commandline|join(' ') }}</code></p>
     <p>Status: {{ success_label(command_result.success) }}</p>
     <p>Output:</p>
     <pre>{{ command_result.output }}</pre>

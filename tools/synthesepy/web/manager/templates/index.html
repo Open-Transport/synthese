@@ -10,7 +10,7 @@
     <input type=button value="Redémarrer le démon">
   </form>
   #}
-  <h1>Administration</h1>
+  <h1>General Administration</h1>
 
   {% if is_admin() %}
     <form action="{{ url_for('.update_synthese') }}" method=post>
@@ -19,14 +19,14 @@
         <div class="clearfix">
           <label for="install_url">install script URL</label>
           <div class="input">
-            <input id="install_url" name="install_url" type="text"
+            <input id="install_url" name="install_url" type="text" class="xxlarge"
                    value="http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/latest/install_synthese.py">
             <span class="help-block"><a href="http://ci.rcsmobility.com/~build/synthese/lin/release/trunk/?C=M;O=D"
               >See here for possible URLs</a></span>
           </div>
         </div>
         <div class="actions">
-          <input type="submit" class="btn primary" value="Go">
+          <input type="submit" class="btn primary" value="Update Synthese">
         </div>
       </fieldset>
     </form>
@@ -40,7 +40,7 @@
             <ul class="inputs-list">
               <li>
                 <label>
-                  <input type="checkbox" checked name="system_install">
+                  <input type="checkbox" name="system_install">
                   <span>Run <var>system_install</var></span>
                 </label>
               </li>
@@ -61,7 +61,7 @@
           </div>
         </div>
         <div class="actions">
-          <input type="submit" class="btn primary" value="Go">
+          <input type="submit" class="btn primary" value="Update Project">
         </div>
       </fieldset>
     </form>
@@ -70,7 +70,7 @@
       <fieldset>
         <legend>SVN status</legend>
         <div class="actions">
-          <input type="submit" class="btn primary" value="Go">
+          <input type="submit" class="btn primary" value="SVN status">
         </div>
       </fieldset>
     </form>
@@ -91,7 +91,7 @@
           </div>
         </div>
         <div class="actions">
-          <input type="submit" class="btn primary" value="Go">
+          <input type="submit" class="btn primary" value="SVN update">
         </div>
       </fieldset>
     </form>
@@ -139,7 +139,20 @@
     </form>
     #}
 
-    <h3>Administration Logs</h3>
+    <h1>Deployment</h1>
+    
+    <p>Deployment will copy the database content to the server TODO</p>
+
+    <form action="{{ url_for('.update_project') }}"
+          method=post class=form-stacked>
+      <fieldset>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Run Deploy Now">
+        </div>
+      </fieldset>
+    </form>
+
+    <h1>Administration Logs</h1>
 
     <pre>{{ last_admin_log }}</pre>
 

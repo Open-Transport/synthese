@@ -191,6 +191,8 @@ def add_project_subparsers(subparsers):
     add_parser('system_install_prepare')
     add_parser('system_install')
     add_parser('system_uninstall')
+    add_parser('bgstart')
+    add_parser('bgstop')
     def root_delegate(project, args, env):
         project.root_delegate(args.subcommand, args.args)
     parser = add_parser('root_delegate', func=root_delegate)
@@ -199,6 +201,9 @@ def add_project_subparsers(subparsers):
         'args', nargs='*',
         help='Command arguments')
     add_parser('update_synthese')
+    add_parser('update_project')
+    add_parser('deploy')
+    add_parser('restore_deploy')
 
 
 def add_default_subparsers(subparsers):
@@ -461,9 +466,23 @@ def main():
         if project:
             project.set_env(env)
             if hasattr(args, 'project_func'):
-                args.project_func(project)
+                res = args.project_func(project)
             else:
-                args.func(project, args, env)
+                res = args.func(project, args, env)
+            if isinstance(res, project_manager.CommandsResult):
+                commands_result = res
+                if config.verbose:
+                    # TODO: move this formatting to the object, to be reused for email.
+                    log.debug('Result of %s', commands_result.title)
+                    for command_result in commands_result.command_results:
+                        log.debug('_' * 80)
+                        if command_result.type == project_manager.CommandResult.TYPE_PROCESS:
+                            log.debug('Command line: %s', command_result.commandline)
+                        else:
+                            log.debug('Method: %s', command_result.method_name)
+                        log.debug('Result: %s', command_result.output)
+                if not commands_result.success:
+                    raise Exception('Failure while executing: %s' % commands_result.title)
         else:
             root_required = getattr(args.func, 'root_required', False)
             if not args.no_root_check and env.platform != 'win':
