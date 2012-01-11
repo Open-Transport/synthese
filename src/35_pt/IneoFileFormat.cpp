@@ -21,6 +21,10 @@
 */
 
 #include "IneoFileFormat.hpp"
+
+#include "PTModule.h"
+#include "PTUseRule.h"
+#include "PTUseRuleTableSync.h"
 #include "TransportNetwork.h"
 #include "StopArea.hpp"
 #include "PTFileFormat.hpp"
@@ -129,6 +133,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD = "stop_handicapped_accessibility_field";
 		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
+		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 	}
 
 	namespace impex
@@ -354,12 +359,14 @@ namespace synthese
 				// Handicapped rules
 				RuleUser::Rules handicappedRules;
 				handicappedRules.push_back(NULL);
-				handicappedRules.push_back(AllowedUseRule::INSTANCE.get());
+				handicappedRules.push_back(NULL);
+				handicappedRules.push_back(_handicappedAllowedUseRule.get());
 				handicappedRules.push_back(NULL);
 
 				RuleUser::Rules handicappedForbiddenRules;
 				handicappedForbiddenRules.push_back(NULL);
-				handicappedForbiddenRules.push_back(ForbiddenUseRule::INSTANCE.get());
+				handicappedForbiddenRules.push_back(NULL);
+				handicappedForbiddenRules.push_back(NULL);
 				handicappedForbiddenRules.push_back(NULL);
 
 				// Stop removals
@@ -929,6 +936,31 @@ namespace synthese
 			scfields.push_back(make_pair(optional<string>(VALUE_CODE_COMMUNE), VALUE_CODE_COMMUNE));
 			stream << t.cell("Champ commune arrêt", t.getForm().getSelectInput(PARAMETER_STOP_CITY_CODE_FIELD, scfields, optional<string>(_stopCityCodeField)));
 
+			// Stop accessibility field
+			vector<pair<optional<string>, string> > safields;
+			safields.push_back(make_pair(optional<string>(string()), "Pas de champ accessibilité arrêt"));
+			safields.push_back(make_pair(optional<string>(VALUE_UFR), VALUE_UFR));
+			stream <<
+				t.cell(
+					"Champ accessibilité arrêt",
+					t.getForm().getSelectInput(
+						PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD,
+						safields,
+						optional<string>(_stopHandicappedAccessibilityField)
+				)	)
+			;
+
+			// Handicapped use rule
+			stream <<
+				t.cell(
+					"ID règle accessibilité arrêt",
+					t.getForm().getSelectInput(
+						PARAMETER_HANDICAPPED_ALLOWED_USE_RULE,
+						PTModule::GetPTUseRuleLabels(),
+						boost::optional<util::RegistryKeyType>()
+				)	)
+			;
+
 			// Add wayback to journey pattern code
 			stream << t.cell("Ajouter le sens au code de chainage", t.getForm().getOuiNonRadioInput(PARAMETER_ADD_WAYBACK_TO_JOURNEYPATTERN_CODE, _addWaybackToJourneyPatternCode));
 
@@ -1110,6 +1142,12 @@ namespace synthese
 			// Stop name field
 			map.insert(PARAMETER_STOP_NAME_FIELD, _stopNameField);
 
+			// Handicapped allowed use rule
+			if(_handicappedAllowedUseRule.get())
+			{
+				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
+			}
+
 			// Journey pattern line overload field
 			if(!_journeyPatternLineOverloadField.empty())
 			{
@@ -1172,6 +1210,19 @@ namespace synthese
 
 			// Journey pattern line overload field
 			_journeyPatternLineOverloadField = map.getDefault<string>(PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD);
+
+			// Handicapped PT use rule
+			RegistryKeyType handicappedPTUseRuleId(
+				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE)
+			);
+			if(handicappedPTUseRuleId) try
+			{
+				_handicappedAllowedUseRule = PTUseRuleTableSync::GetEditable(handicappedPTUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such handicapped use rule");
+			}
 
 			// Calendar dates
 			FilePathsMap::const_iterator it(_pathsMap.find(FILE_CAL));

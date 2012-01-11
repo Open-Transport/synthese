@@ -55,6 +55,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class PTUseRule;
 		class TransportNetwork;
 		class JourneyPattern;
 		class CommercialLine;
@@ -112,6 +113,7 @@ namespace synthese
 				static const std::string VALUE_LIBCOM;
 				static const std::string PARAMETER_STOP_HANDICAPPED_ACCESSIBILITY_FIELD;
 				static const std::string VALUE_UFR;
+				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
 				
 			private:
@@ -161,6 +163,7 @@ namespace synthese
 					std::string _stopCityCodeField;
 					std::string _stopHandicappedAccessibilityField;
 					std::string _mnlp_prefix;
+					boost::shared_ptr<PTUseRule> _handicappedAllowedUseRule;
 				//@}
 
 				static const std::string SEP;
