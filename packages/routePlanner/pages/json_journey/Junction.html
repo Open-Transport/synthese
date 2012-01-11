@@ -3,13 +3,16 @@
 			name: "Départ",
 			position: "<@departure_longitude@>,<@departure_latitude@>"
 		}
-?>
 
-<?if&cond=<@reached_place_is_named@>&then=&else=,{name: "",position: "<@departure_longitude@>,<@departure_latitude@>",means: "foot", wkt: "<@wkt@>"}?>
+&else=
 
-<?if&cond=<@is_last_leg@>&then=
-		,{
-			name: "Arrivée",
-			position: "<@arrival_longitude@>,<@arrival_latitude@>"
-		}
+    <?if&cond=<@reached_place_is_named@>&then=}&else=,{name: "",position: "<@departure_longitude@>,<@departure_latitude@>",means: "foot", wkt: "<@wkt@>"}?>
+
+    <?if&cond=<@is_last_leg@>&then=
+		  ,{
+			  name: "Arrivée",
+			  position: "<@arrival_longitude@>,<@arrival_latitude@>"
+		  }
+    ?>
+
 ?>
