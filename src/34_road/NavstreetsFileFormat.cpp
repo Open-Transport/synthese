@@ -73,7 +73,7 @@ namespace synthese
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
 
-		const string NavstreetsFileFormat::_FIELD_LINK_ID("LINK_ID");
+		const string NavstreetsFileFormat::_FIELD_OBJECTID("OBJECTID");
 		const string NavstreetsFileFormat::_FIELD_ST_NAME("ST_NAME");
 		const string NavstreetsFileFormat::_FIELD_REF_IN_ID("REF_IN_ID");
 		const string NavstreetsFileFormat::_FIELD_NREF_IN_ID("NREF_IN_ID");
@@ -164,8 +164,11 @@ namespace synthese
 						{
 							continue;
 						}
+						stringstream code;
+						code << setw(2) << setfill('0') << rows->getInt(NavstreetsFileFormat::_FIELD_GOVT_CODE);
+
 						departementCodes.insert(
-							make_pair(item, lexical_cast<string>(rows->getInt(NavstreetsFileFormat::_FIELD_GOVT_CODE)))
+							make_pair(item, code.str())
 						);
 				}	}
 
@@ -239,10 +242,6 @@ namespace synthese
 
 				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
 
-				// Recently added road places
-				typedef map<pair<RegistryKeyType, string>, shared_ptr<RoadPlace> > RecentlyCreatedRoadPlaces;
-				RecentlyCreatedRoadPlaces recentlyCreatedRoadPlaces;
-
 				stringstream query;
 				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
 				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
@@ -270,8 +269,6 @@ namespace synthese
 						continue;
 					}
 
-
-
 ///	@todo Handle this case with aliases
 //					for(size_t area(0); area< (lAreaId == rAreaId ? size_t(1) : size_t(2)); ++area)
 //					{
@@ -279,11 +276,15 @@ namespace synthese
 						_CitiesMap::const_iterator itc(_citiesMap.find(/*area ?*/ lAreaId /*: rAreaId*/));
 						if(	itc == _citiesMap.end()
 						){
+							os << "ERR : City " << lAreaId << " not found.<br />";
 							continue;
 						}
 
 						// Name
 						string roadName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
+
+						// Code
+						string roadCode(rows->getText(NavstreetsFileFormat::_FIELD_OBJECTID));
 
 						// City
 						City* city(itc->second);
@@ -295,7 +296,6 @@ namespace synthese
 						// House numbering policy
 						MainRoadChunk::HouseNumberingPolicy rightHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(rightAddressSchema));
 						MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy(_getHouseNumberingPolicyFromAddressSchema(leftAddressSchema));
-
 
 						// Left node
 						_CrossingsMap::const_iterator ita1(_navteqCrossings.find(leftId));
@@ -340,42 +340,16 @@ namespace synthese
 							rightNode = ita2->second;
 						}
 
-
-						// Search for an existing road place
-						shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(
-								city->getKey(),
-								roadName,
-								_env
-						)	);
-
-						// Search for a recently created road place
-						RecentlyCreatedRoadPlaces::iterator it(
-							recentlyCreatedRoadPlaces.find(
-							make_pair(
-								city->getKey(),
-								roadName
-						)	)	);
-						if(it != recentlyCreatedRoadPlaces.end())
-						{
-							roadPlace = it->second;
-						}
-
-						// Road place creation if necessary
-						if(!roadPlace.get())
-						{
-							roadPlace.reset(new RoadPlace);
-							roadPlace->setCity(city);
-							roadPlace->setKey(RoadPlaceTableSync::getId());
-							roadPlace->setName(roadName);
-							_env.getEditableRegistry<RoadPlace>().add(roadPlace);
-							recentlyCreatedRoadPlaces.insert(
-								make_pair(
-									make_pair(
-										city->getKey(),
-										roadName
-									), roadPlace
-							)	);
-						}
+						// RoadPlace
+						RoadPlace* roadPlace = RoadFileFormat::CreateOrUpdateRoadPlace(
+							_roadPlaces,
+							roadCode,
+							roadName,
+							*city,
+							_dataSource,
+							_env,
+							os
+						);
 
 						// Chunk insertion
 						RoadFileFormat::AddRoadChunk(
