@@ -25,9 +25,11 @@
 #define SYNTHESE_road_NavstreetFileFormat_hpp__
 
 #include "FileFormatTemplate.h"
+#include "ImportableTableSync.hpp"
 #include "MainRoadChunk.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "RoadPlaceTableSync.h"
 
 #include <map>
 #include <ostream>
@@ -119,6 +121,7 @@ namespace synthese
 			//! @name Fields of streets table
 			//@{
 				static const std::string _FIELD_LINK_ID;
+				static const std::string _FIELD_OBJECTID;
 				static const std::string _FIELD_ST_NAME;
 				static const std::string _FIELD_REF_IN_ID;
 				static const std::string _FIELD_NREF_IN_ID;
@@ -165,6 +168,8 @@ namespace synthese
 
 				mutable _CitiesMap _citiesMap;	//!< Mapping table between Navstreets and SYNTHESE id for streets
 
+				mutable impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync> _roadPlaces;
+
 				static MainRoadChunk::HouseNumberingPolicy _getHouseNumberingPolicyFromAddressSchema(
 					const std::string& addressSchema
 				);
@@ -203,7 +208,8 @@ namespace synthese
 					util::Env& env,
 					const impex::DataSource& dataSource
 				):	impex::MultipleFileTypesImporter<NavstreetsFileFormat>(env, dataSource),
-					impex::Importer(env, dataSource)
+					impex::Importer(env, dataSource),
+					_roadPlaces(dataSource, env)
 				{}
 
 				//////////////////////////////////////////////////////////////////////////
