@@ -463,7 +463,7 @@ namespace synthese
 									stopPoints = _stopPoints.get(stopPointId);
 								else if(stopPointsFromOtherImport)
 								{
-									// Todo : Add a generic function ?
+									// TODO Add a generic function
 									string stopPointName = to_lower_copy(trim_copy(_line[0]));
 									replace_all(stopPointName,"é","e");
 									replace_all(stopPointName,"è","e");
@@ -658,7 +658,6 @@ namespace synthese
 									stream << "WARN : failure at service creation ("<< serviceID <<")<br />";
 									return false;
 								}
-
 							}
 						}
 					}
