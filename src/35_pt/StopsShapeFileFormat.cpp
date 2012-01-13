@@ -107,7 +107,6 @@ namespace synthese
 		"");
 	}
 
-
 	namespace pt
 	{
 		bool StopsShapeFileFormat::Importer_::_checkPathsMap() const
@@ -137,18 +136,11 @@ namespace synthese
 			const std::string& key,
 			boost::optional<const admin::AdminRequest&> request
 		) const {
-
-			ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
-			map<string, StopArea*> stopAreasByName;
-
-			// 2.2 : stops
 			PTFileFormat::ImportableStopPoints linkedStopPoints;
 			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
 
-
 			// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
-			size_t badGeometry(0);
+			VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
 
 			stringstream query;
 			query << "SELECT *, AsText(" << _FIELD_GEOMETRY << ") AS " << _FIELD_GEOMETRY << "_ASTEXT FROM " << table.getName();
@@ -166,7 +158,6 @@ namespace synthese
 				if(!geometry.get())
 				{
 					stream << "ERR : Empty geometry.<br />";
-					++badGeometry;
 					continue;
 				}
 
@@ -187,12 +178,11 @@ namespace synthese
 					stopPointName += " " + trim_copy(rows->getText(*_stopDirection));
 				}
 
-
 				if(_stopOperatorCode && !_useDirection)
-					stopOperatorCode = trim_copy(rows->getText(*_stopOperatorCode));
+					stopOperatorCode = to_lower_copy(trim_copy(rows->getText(*_stopOperatorCode)));
 				else if(_useDirection && _stopDirection)
 				{
-					stopOperatorCode = trim_copy(rows->getText(*_stopName1));
+					stopOperatorCode = to_lower_copy(trim_copy(rows->getText(*_stopName1)));
 					if(!_valueForwardDirection || !_valueBackwardDirection)
 					{
 						stream << "ERR : value Forward or Backward direction is not defined.<br />";
@@ -202,15 +192,25 @@ namespace synthese
 					if(trim_copy(rows->getText(*_stopDirection)) == *_valueForwardDirection)
 					{
 						stopOperatorCode += " A";
-						stopPointName += " A";
 					}
 
 					else if (trim_copy(rows->getText(*_stopDirection)) == *_valueBackwardDirection)
 					{
 						stopOperatorCode += " R";
-						stopPointName += " R";
 					}
 				}
+
+				// TODO Add a generic function
+				replace_all(stopOperatorCode,"é","e");
+				replace_all(stopOperatorCode,"è","e");
+				replace_all(stopOperatorCode,"ê","e");
+				replace_all(stopOperatorCode,"ë","e");
+				replace_all(stopOperatorCode,"â","a");
+				replace_all(stopOperatorCode,"à","a");
+				replace_all(stopOperatorCode,"ô","o");
+				replace_all(stopOperatorCode,"'"," ");
+				replace_all(stopOperatorCode,"-"," ");
+				replace_all(stopOperatorCode,"*","");
 
 				if(_cityCode)
 					cityCode = trim_copy(rows->getText(*_cityCode));
@@ -261,71 +261,33 @@ namespace synthese
 					}
 				}
 
-				if(_stopPoints.contains(stopOperatorCode))
+				const City* cityForStopAreaAutoGeneration;
+
+				if(city.get())
 				{
-					BOOST_FOREACH(StopPoint* stopPoint, _stopPoints.get(stopOperatorCode))
-					{
-						stopPoint->setName(stopPointName);
-						if(geometry.get())
-						{
-							stopPoint->setGeometry(geometry);
-						}
-						const_cast<StopArea*>(stopPoint->getConnectionPlace())->setName(stopAreaName);
-					}
+					cityForStopAreaAutoGeneration = city.get();
+				}
+				else if(_defaultCity.get())
+				{
+					cityForStopAreaAutoGeneration = _defaultCity.get();
 				}
 				else
 				{
-					StopArea* stopArea(NULL);
-					 // Search in the last created stop areas map
-					map<string, StopArea*>::const_iterator it(stopAreasByName.find(stopAreaName));
-					if(it != stopAreasByName.end())
-					{
-						stopArea = it->second;
-					}
-					// Search in the database
-					if(!stopArea)
-					{
-						StopAreaTableSync::SearchResult stopAreas(
-							StopAreaTableSync::Search(
-								_env,
-								(city.get() ? city->getKey() : (_defaultCity.get() ? _defaultCity->getKey() : boost::optional<util::RegistryKeyType>())),
-								logic::indeterminate,
-								optional<string>(),
-								stopAreaName
-						)	);
-						if(!stopAreas.empty())
-						{
-							stopArea = stopAreas.begin()->get();
-						}
-					}
-					// Creation of the stop area
-					if(!stopArea)
-					{
-						stopArea = new StopArea(
-							StopAreaTableSync::getId(),
-							true,
-							_stopAreaDefaultTransferDuration
-						);
-						if(city.get())
-							stopArea->setCity(city.get());
-						else if(_defaultCity.get())
-							stopArea->setCity(_defaultCity.get());
-						stopArea->setName(stopAreaName);
-						_env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
-						stopAreasByName.insert(make_pair(stopAreaName, stopArea));
-					}
-					PTFileFormat::CreateOrUpdateStop(
-						_stopPoints,
-						stopOperatorCode,
-						stopPointName,
-						NULL,
-						stopArea,
-						geometry.get(),
-						_dataSource,
-						_env,
-						stream
-					);
+					stream << "WARN : City not defined<br />";
+					continue;
 				}
+
+				PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+					_stopPoints,
+					stopOperatorCode,
+					stopPointName,
+					geometry.get(),
+					*cityForStopAreaAutoGeneration,
+					_stopAreaDefaultTransferDuration,
+					_dataSource,
+					_env,
+					stream
+				);
 			}
 
 			if(request)
@@ -444,7 +406,7 @@ namespace synthese
 				map.insert(PARAMETER_VALUE_FORWARD_DIRECTION,*_valueForwardDirection);
 
 			if(_valueBackwardDirection)
-				map.insert(PARAMETER_VALUE_FORWARD_DIRECTION,*_valueBackwardDirection);
+				map.insert(PARAMETER_VALUE_BACKWARD_DIRECTION,*_valueBackwardDirection);
 
 			if(_valueForwardBackwardDirection)
 				map.insert(PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION,*_valueForwardBackwardDirection);
@@ -458,7 +420,7 @@ namespace synthese
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 
-			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
+			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 5));
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
 			_useDirection = map.getDefault<bool>(PARAMETER_USE_DIRECTION, false);
