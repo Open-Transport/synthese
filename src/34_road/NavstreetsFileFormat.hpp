@@ -144,6 +144,7 @@ namespace synthese
 				static const std::string _FIELD_AREACODE_4;
 				static const std::string _FIELD_GOVT_CODE;
 				static const std::string _FIELD_ADMIN_LVL;
+				static const std::string _FIELD_AREA_NAME;
 			//@}
 
 		public:
