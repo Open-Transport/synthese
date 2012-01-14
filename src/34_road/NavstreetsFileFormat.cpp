@@ -93,6 +93,7 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_AREACODE_4("AREACODE_4");
 		const string NavstreetsFileFormat::_FIELD_GOVT_CODE("GOVT_CODE");
 		const string NavstreetsFileFormat::_FIELD_ADMIN_LVL("ADMIN_LVL");
+		const string NavstreetsFileFormat::_FIELD_AREA_NAME("AREA_NAME");
 	}
 
 	namespace impex
@@ -149,6 +150,11 @@ namespace synthese
 				> CityCodes;
 				CityCodes cityCodes;
 
+				map<
+					int,
+					string
+				> missingCities;
+
 				{	// 1.1 Departements
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=3";
@@ -194,8 +200,25 @@ namespace synthese
 
 						if(!city.get())
 						{
-							os << "WARN : City " << code.str() << " not found.<br />";
-							continue;
+							CityTableSync::SearchResult cities = CityTableSync::Search(
+								_env,
+								boost::optional<std::string>(), // exactname
+								boost::optional<std::string>(rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)), // likeName
+								boost::optional<std::string>(),
+								0, 0, true, true,
+								util::UP_LINKS_LOAD_LEVEL
+							);
+
+							if(cities.empty())
+							{
+								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
+								missingCities.insert(make_pair(cityId, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME);
+								continue;
+							}
+							else
+							{
+								city = cities.front();
+							}
 						}
 
 						_citiesMap.insert(make_pair(
@@ -274,8 +297,8 @@ namespace synthese
 //					{
 						// Test if the record can be imported
 						_CitiesMap::const_iterator itc(_citiesMap.find(/*area ?*/ lAreaId /*: rAreaId*/));
-						if(	itc == _citiesMap.end()
-						){
+						if((itc == _citiesMap.end()) || (!itc->second)){
+							// TODO test
 							os << "ERR : City " << lAreaId << " not found.<br />";
 							continue;
 						}
@@ -283,11 +306,13 @@ namespace synthese
 						// Name
 						string roadName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
 
-						// Code
-						string roadCode(rows->getText(NavstreetsFileFormat::_FIELD_OBJECTID));
-
 						// City
 						City* city(itc->second);
+
+						// Code
+						string roadCode;
+						roadCode = city->getName();
+						roadCode += string(" ") + roadName;
 
 						// House number bounds
 						MainRoadChunk::HouseNumberBounds rightHouseNumberBounds(_getHouseNumberBoundsFromAddresses(rightRefHouseNumber, rightNRefHouseNumber));
@@ -317,7 +342,6 @@ namespace synthese
 						{
 							leftNode = ita1->second;
 						}
-
 
 						// Right node
 						_CrossingsMap::const_iterator ita2(_navteqCrossings.find(rightId));
