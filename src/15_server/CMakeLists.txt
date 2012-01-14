@@ -13,6 +13,7 @@ DbModuleConfigTableSync.cpp
 DbModuleConfigTableSync.h
 DynamicRequest.cpp
 DynamicRequest.h
+Function.cpp
 Function.h
 HtmlFormCalendarFieldInterfaceElement.cpp
 HtmlFormCalendarFieldInterfaceElement.h
