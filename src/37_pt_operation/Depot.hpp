@@ -55,7 +55,7 @@ namespace synthese
 			virtual bool isConnectionAllowed(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const;
 			virtual boost::posix_time::time_duration getTransferDelay(const synthese::graph::Vertex &,const synthese::graph::Vertex &) const;
 			virtual graph::HubScore getScore(void) const;
-			virtual boost::shared_ptr<geos::geom::Point> getPoint(void) const;
+			virtual const boost::shared_ptr<geos::geom::Point>& getPoint(void) const;
 			virtual bool containsAnyVertex(synthese::graph::GraphIdType) const;
 
 			virtual std::string getRuleUserName() const;

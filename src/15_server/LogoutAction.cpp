@@ -38,13 +38,17 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void LogoutAction::_setFromParametersMap(const ParametersMap& map )
 		{
-
 		}
+
+
 
 		void LogoutAction::run(Request& request)
 		{
+			request.getSession()->removeSessionIdCookie(request);
 			request.deleteSession();
 		}
 
@@ -55,5 +59,4 @@ namespace synthese
 		) const {
 			return true;
 		}
-	}
-}
+}	}

@@ -405,7 +405,7 @@ namespace synthese
 			{
 				if(element.first.substr(0, keyBegin.size()) == keyBegin)
 				{
-					result.insert(element.first, element.second);
+					result.insert(element.first.substr(keyBegin.size()), element.second);
 				}
 			}
 			return result;

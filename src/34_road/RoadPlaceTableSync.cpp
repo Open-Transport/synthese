@@ -103,7 +103,10 @@ namespace synthese
 				City* city(CityTableSync::GetEditable(cityId, env, linkLevel).get());
 
 				// Registration to city matcher
-				city->addPlaceToMatcher(env.getEditableSPtr(object));
+				if(!object->getName().empty())
+				{
+					city->addPlaceToMatcher(env.getEditableSPtr(object));
+				}
 			}
 				
 			// Datasource links
@@ -118,7 +121,8 @@ namespace synthese
 
 			// Registration to all places matcher
 			if(	&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
+				!object->getName().empty()
 			){
 				GeographyModule::GetGeneralAllPlacesMatcher().add(
 					object->getFullName(),
@@ -128,7 +132,8 @@ namespace synthese
 
 			// Registration to road places matcher
 			if(&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
+				!object->getName().empty()
 			){
 				RoadModule::GetGeneralRoadsMatcher().add(
 					object->getFullName(),
@@ -265,7 +270,4 @@ namespace synthese
 			}
 			return roadPlaces.front();
 		}
-	}
-}
-
-
+}	}

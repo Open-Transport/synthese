@@ -36,7 +36,9 @@
 #include "PlacesListService.hpp"
 #include "ResaModule.h"
 #include "ResaRight.h"
+#include "ReservationRoutePlannerAdmin.h"
 #include "ResultHTMLTable.h"
+#include "RoutePlannerFunction.h"
 #include "SearchFormHTMLTable.h"
 
 using namespace std;
@@ -55,6 +57,7 @@ namespace synthese
 	using namespace security;
 	using namespace resa;
 	using namespace pt;
+	using namespace pt_journey_planner;
 	using namespace pt_website;
 
 	namespace util
@@ -81,7 +84,7 @@ namespace synthese
 		FreeDRTBookingAdmin::FreeDRTBookingAdmin(
 		):	AdminInterfaceElementTemplate<FreeDRTBookingAdmin>(),
 			_dateTime(second_clock::local_time())
-		{ }
+		{}
 
 
 		
@@ -102,13 +105,11 @@ namespace synthese
 
 			// Departure place
 			PlacesListService placesListService;
-			stringstream fakeStream;
-			Request fakeRequest;
 			placesListService.setNumber(1);
 			placesListService.setText(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE));
 			_departurePlace = dynamic_pointer_cast<NamedPlace, Place>(
 				placesListService.getPlaceFromBestResult(
-					placesListService.run(fakeStream, fakeRequest)
+					placesListService.runWithoutOutput()
 				).value
 			);
 
@@ -116,7 +117,7 @@ namespace synthese
 			placesListService.setText(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE));
 			_arrivalPlace = dynamic_pointer_cast<NamedPlace, Place>(
 				placesListService.getPlaceFromBestResult(
-					placesListService.run(fakeStream, fakeRequest)
+					placesListService.runWithoutOutput()
 				).value
 			);
 
@@ -127,6 +128,8 @@ namespace synthese
 				minutes(0) :
 				duration_from_string(map.get<string>(PARAMETER_TIME))
 			);
+
+				setBaseReservationFromParametersMap(*_env, map);
 		}
 
 
@@ -134,6 +137,8 @@ namespace synthese
 		ParametersMap FreeDRTBookingAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+
+			m.merge(getBaseReservationParametersMap());
 
 			// Area
 			if(_area.get())
@@ -144,13 +149,39 @@ namespace synthese
 			// Departure place
 			if(_departurePlace.get())
 			{
-				m.insert(PARAMETER_DEPARTURE_PLACE, _departurePlace->getKey());
+				if(dynamic_cast<const NamedPlace*>(_departurePlace.get()))
+				{
+					m.insert(
+						PARAMETER_DEPARTURE_PLACE,
+						dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<const City*>(_departurePlace.get()))
+				{
+					m.insert(
+						PARAMETER_DEPARTURE_PLACE,
+						dynamic_cast<const City*>(_departurePlace.get())->getName()
+					);
+				}
 			}
 
 			// Arrival place
 			if(_arrivalPlace.get())
 			{
-				m.insert(PARAMETER_ARRIVAL_PLACE, _arrivalPlace->getKey());
+				if(dynamic_cast<const NamedPlace*>(_arrivalPlace.get()))
+				{
+					m.insert(
+						PARAMETER_ARRIVAL_PLACE,
+						dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<const City*>(_arrivalPlace.get()))
+				{
+					m.insert(
+						PARAMETER_ARRIVAL_PLACE,
+						dynamic_cast<const City*>(_arrivalPlace.get())->getName()
+					);
+				}
 			}
 
 			// Date time
@@ -186,13 +217,22 @@ namespace synthese
 				"Départ",
 				t.getForm().getTextInput(
 					PARAMETER_DEPARTURE_PLACE,
-					_departurePlace.get() ? _departurePlace->getFullName() : string()
-			)	);
+					_departurePlace.get() ? 
+						(	dynamic_cast<const NamedPlace*>(_departurePlace.get()) ?
+							dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName() :
+							dynamic_cast<const City*>(_departurePlace.get())->getName()
+						): string()
+				)	)
+			;
 			stream << t.cell(
 				"Arrivée",
 				t.getForm().getTextInput(
 				PARAMETER_ARRIVAL_PLACE,
-				_arrivalPlace.get() ? _arrivalPlace->getFullName() : string()
+				_arrivalPlace.get() ?
+					(	dynamic_cast<const NamedPlace*>(_arrivalPlace.get()) ?
+						dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getFullName() :
+						dynamic_cast<const City*>(_arrivalPlace.get())->getName()
+					): string()
 			)	);
 			stream << t.row();
 			const Language& language(
@@ -327,6 +367,14 @@ namespace synthese
 						const_pointer_cast<FreeDRTTimeSlot>(
 							Env::GetOfficialEnv().getSPtr(&timeSlot)
 					)	);
+					bookRequest.getAction()->getJourneyPlanner().setDeparturePlace(
+						const_pointer_cast<Place, const Place>(
+							_departurePlace
+					)	);
+					bookRequest.getAction()->getJourneyPlanner().setArrivalPlace(
+						const_pointer_cast<Place, const Place>(
+							_arrivalPlace)
+					)	;
 					HTMLForm f(bookRequest.getHTMLForm("book"));
 					stream << f.open();
 
@@ -346,7 +394,7 @@ namespace synthese
 						// Form
 						stream << t.col() <<
 							f.getRadioInput(
-								BookReservationAction::PARAMETER_DATE_TIME,
+								Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
 								optional<string>(
 									to_iso_extended_string(result.first.date()) + " " +
 										to_simple_string(result.first.time_of_day())
@@ -364,6 +412,19 @@ namespace synthese
 						stream << t.col() << to_simple_string(result.second - result.first);
 					}
 					stream << t.close();
+					stream <<
+						f.setFocus(
+							Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
+							0
+						)
+					;
+
+					// Reservation form
+					displayReservationForm(
+						stream,
+						f,
+						request
+					);
 
 					// Form is closed too
 					stream << f.close();

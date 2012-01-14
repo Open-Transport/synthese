@@ -39,6 +39,7 @@
 #include "OnlineReservationRule.h"
 #include "Place.h"
 #include "PlacesListService.hpp"
+#include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTUseRule.h"
 #include "Request.h"
@@ -90,21 +91,6 @@ namespace synthese
 
 	namespace resa
 	{
-		const string BookReservationAction::PARAMETER_SITE = Action_PARAMETER_PREFIX + "sit";
-		const string BookReservationAction::PARAMETER_USER_CLASS_ID = Action_PARAMETER_PREFIX + "acc";
-		const string BookReservationAction::PARAMETER_ROLLING_STOCK_FILTER_ID = Action_PARAMETER_PREFIX + "tm";
-
-		const string BookReservationAction::PARAMETER_ACCESS_PARAMETERS = Action_PARAMETER_PREFIX + "ac";
-		const string BookReservationAction::PARAMETER_APPROACH_SPEED = Action_PARAMETER_PREFIX + "apsp";
-		const string BookReservationAction::PARAMETER_MAX_TRANSPORT_CONNECTION = Action_PARAMETER_PREFIX + "mtc";
-
-		const string BookReservationAction::PARAMETER_ORIGIN_CITY = Action_PARAMETER_PREFIX + "dct";
-		const string BookReservationAction::PARAMETER_ORIGIN_PLACE = Action_PARAMETER_PREFIX + "dpt";
-		const string BookReservationAction::PARAMETER_DESTINATION_CITY = Action_PARAMETER_PREFIX + "act";
-		const string BookReservationAction::PARAMETER_DESTINATION_PLACE = Action_PARAMETER_PREFIX + "apt";
-		const string BookReservationAction::PARAMETER_DATE_TIME = Action_PARAMETER_PREFIX + "da";
-
-
 		const string BookReservationAction::PARAMETER_CREATE_CUSTOMER = Action_PARAMETER_PREFIX + "cc";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
 		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME = Action_PARAMETER_PREFIX + "csn";
@@ -140,23 +126,21 @@ namespace synthese
 		ParametersMap BookReservationAction::getParametersMap() const
 		{
 			ParametersMap map;
+
+			// Customer creation
 			map.insert(PARAMETER_CREATE_CUSTOMER, _createCustomer);
+
+			// Ignore reservation rules
 			map.insert(PARAMETER_IGNORE_RESERVATION_RULES, _ignoreReservation);
-			
+
+			// Journey planner
+			ParametersMap jpMap(_journeyPlanner._getParametersMap());
+			map.merge(jpMap, Action_PARAMETER_PREFIX);
+
 			// Reservation by service on a free DRT
 			if(_freeDRTTimeSlot.get())
 			{
 				map.insert(PARAMETER_SERVICE_ID, _freeDRTTimeSlot->getKey());
-				if(_departurePlace.get())
-				{
-					map.insert(PARAMETER_ORIGIN_PLACE, _departurePlace->getFullName());
-				}
-				if(_arrivalPlace.get())
-				{
-					map.insert(PARAMETER_DESTINATION_PLACE, _arrivalPlace->getFullName());
-				}
-				map.insert(PARAMETER_DATE_TIME, _departureDateTime);
-				map.insert(PARAMETER_USER_CLASS_ID, _userClassCode + USER_CLASS_CODE_OFFSET);
 			}
 			// Reservation by service on a virtual line
 			else if(_service.get() && _journey.size() == 1)
@@ -165,82 +149,12 @@ namespace synthese
 				const ServicePointer& su(*_journey.getServiceUses().begin());
 				map.insert(PARAMETER_DEPARTURE_RANK, su.getDepartureEdge()->getRankInPath());
 				map.insert(PARAMETER_ARRIVAL_RANK, su.getArrivalEdge()->getRankInPath());
-				map.insert(PARAMETER_DATE_TIME, su.getOriginDateTime().date());
 			}
-			// Reservation by journey planning
-			else if (!_journey.empty())
-			{
-				if (_journey.getOrigin())
-				{
-					map.insert(PARAMETER_ORIGIN_CITY,_originCity);
-					map.insert(PARAMETER_ORIGIN_PLACE,_originPlace);
-				}
-				if (_journey.getDestination())
-				{
-					map.insert(PARAMETER_DESTINATION_CITY,_destinationCity);
-					map.insert(PARAMETER_DESTINATION_PLACE,_destinationPlace);
-				}
-				if (!_journey.getFirstDepartureTime().is_not_a_date_time())
-				{
-					map.insert(PARAMETER_DATE_TIME, _journey.getFirstDepartureTime());
-				}
-				if(_site.get())
-				{
-					map.insert(PARAMETER_SITE, _site->getKey());
-					map.insert(PARAMETER_USER_CLASS_ID, static_cast<int>(_accessParameters.getUserClass()));
-					map.insert(PARAMETER_APPROACH_SPEED, static_cast<double>(_accessParameters.getApproachSpeed()));
-					if(_accessParameters.getMaxtransportConnectionsCount())
-						map.insert(PARAMETER_MAX_TRANSPORT_CONNECTION, static_cast<int>(*_accessParameters.getMaxtransportConnectionsCount()));
-					if(_rollingStockFilter)
-					{
-						map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, static_cast<int>(_rollingStockFilter->getRank()));
-					}
-				}
-				else
-				{
-					map.insert(PARAMETER_ACCESS_PARAMETERS, _accessParameters.serialize());
-				}
-			}
+
+			// Seats number
 			map.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
+
 			return map;
-		}
-
-
-
-		void BookReservationAction::setOriginDestinationPlace(
-			string originCity,
-			string originPlace,
-			string destinationCity,
-			string destinationPlace
-		){
-			_originCity  = originCity;
-			_originPlace = originPlace;
-			_destinationCity  = destinationCity;
-			_destinationPlace = destinationPlace;
-		}
-
-
-
-		void BookReservationAction::updatePlace()
-		{
-			if(ResaModule::GetJourneyPlannerWebsite())
-			{
-				_originPlaceGeography = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_originCity,_originPlace);
-				_destinationPlaceGeography = ResaModule::GetJourneyPlannerWebsite()->fetchPlace(_destinationCity,_destinationPlace);
-			}
-			else
-			{
-				_originPlaceGeography = RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					_originCity,
-					_originPlace
-				);
-				_destinationPlaceGeography = RoadModule::FetchPlace(
-					_site.get() ? _site->getCitiesMatcher() : GeographyModule::GetCitiesMatcher(),
-					_destinationCity,
-					_destinationPlace
-				);
-			}
 		}
 
 
@@ -350,6 +264,18 @@ namespace synthese
 				throw ActionException("Invalid seats number");
 			}
 
+			// Journey planner initialization
+			ParametersMap jpMap(map.getExtract(Action_PARAMETER_PREFIX));
+			_journeyPlanner._setFromParametersMap(jpMap);
+			_journeyPlanner.setMaxSolutions(1);
+			_journeyPlanner.setEndDepartureDate(_journeyPlanner.getStartDepartureDate());
+
+			// Extraction of parameters from journey planner for other methods
+			_departurePlace = _journeyPlanner.getDeparturePlace().placeResult.value;
+			_arrivalPlace = _journeyPlanner.getArrivalPlace().placeResult.value;
+			_departureDateTime = _journeyPlanner.getStartDepartureDate();
+			_userClassCode = _journeyPlanner.getAccessParameters().getUserClassRank();
+
 			// Reservation on a service
 			if(map.getOptional<RegistryKeyType>(PARAMETER_SERVICE_ID))
 			{
@@ -367,7 +293,7 @@ namespace synthese
 						throw RequestException("No such service");
 					}
 
-					gregorian::date date(gregorian::from_string(map.get<string>(PARAMETER_DATE_TIME)));
+					gregorian::date date(_departureDateTime.date());
 
 					size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
 					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
@@ -383,7 +309,7 @@ namespace synthese
 
 					ServicePointer sp(
 						false,
-						map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN) - USER_CLASS_CODE_OFFSET,
+						_userClassCode,
 						*_service,
 						date,
 						*_service->getPath()->getEdge(departureRank),
@@ -405,50 +331,24 @@ namespace synthese
 						throw RequestException("No such service");
 					}
 
-					// Date time
-					_departureDateTime = time_from_string(map.get<string>(PARAMETER_DATE_TIME));
-
-					// User class code
-					_userClassCode = map.getDefault<UserClassCode>(
-						PARAMETER_USER_CLASS_ID,
-						USER_PEDESTRIAN
-					) - USER_CLASS_CODE_OFFSET;
-
 					/// TODO check if the user class code is allowed on this service
 
-					// Departure place
-					PlacesListService placesListService;
-					stringstream fakeStream;
-					Request fakeRequest;
-					placesListService.setNumber(1);
-					placesListService.setText(map.getDefault<string>(PARAMETER_ORIGIN_PLACE));
-					_departurePlace = dynamic_pointer_cast<NamedPlace, Place>(
-						placesListService.getPlaceFromBestResult(
-							placesListService.run(fakeStream, fakeRequest)
-						).value
-					);
 
 					/// TODO check if the origin belong to the area
 
 					// Location check
-					if(!_originPlaceGeography->getPoint().get())
-					{
+					if(	!_departurePlace.get() ||
+						!_departurePlace->getPoint().get()
+					){
 						throw ActionException("The origin place must be located");
 					}
-
-					// Arrival place
-					placesListService.setText(map.getDefault<string>(PARAMETER_DESTINATION_PLACE));
-					_arrivalPlace = dynamic_pointer_cast<NamedPlace, Place>(
-						placesListService.getPlaceFromBestResult(
-							placesListService.run(fakeStream, fakeRequest)
-						).value
-					);
 
 					/// TODO check if the destinations belong to the area
 
 					// Location check
-					if(!_destinationPlaceGeography->getPoint().get())
-					{
+					if(	!_arrivalPlace.get() ||
+						!_arrivalPlace->getPoint().get()
+					){
 						throw ActionException("The destination place must be located");
 					}
 
@@ -457,8 +357,8 @@ namespace synthese
 					// Arrival time
 					/// TODO compute the travel time according to existing reservations and roads
 					double dst(
-						_originPlaceGeography->getPoint()->distance(
-							_destinationPlaceGeography->getPoint().get()
+						_departurePlace->getPoint()->distance(
+							_arrivalPlace->getPoint().get()
 					)	);
 					time_duration bestCommercialJourneyTime(
 						minutes(long(0.06 * dst / _freeDRTTimeSlot->getCommercialSpeed()))
@@ -466,104 +366,27 @@ namespace synthese
 					_arrivalDateTime = _departureDateTime + bestCommercialJourneyTime;
 				}
 			}
+			// Journey planning
 			else
 			{
-				// Website
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_SITE, 0));
-				if (id > 0 && Env::GetOfficialEnv().getRegistry<TransportWebsite>().contains(id))
-				{
-					_site = Env::GetOfficialEnv().getRegistry<TransportWebsite>().get(id);
-				}
-
-				// Journey
-				setOriginDestinationPlace(
-					map.get<string>(PARAMETER_ORIGIN_CITY),
-					map.get<string>(PARAMETER_ORIGIN_PLACE),
-					map.get<string>(PARAMETER_DESTINATION_CITY),
-					map.get<string>(PARAMETER_DESTINATION_PLACE)
-				);
-				updatePlace();
-				if(!_destinationPlaceGeography.get())
+				if(!_departurePlace.get())
 				{
 					throw ActionException("Invalid destination place");
 				}
-				if(!_originPlaceGeography.get())
+				if(!_arrivalPlace.get())
 				{
 					throw ActionException("Invalid origin place");
 				}
 
-
-				// Departure date time
-				ptime departureDateTime(time_from_string(map.get<string>(PARAMETER_DATE_TIME)));
-				ptime arrivalDateTime(departureDateTime);
-				arrivalDateTime += days(1);
-				if(	_originPlaceGeography->getPoint().get() &&
-					!_originPlaceGeography->getPoint()->isEmpty() &&
-					_destinationPlaceGeography->getPoint().get() &&
-					!_destinationPlaceGeography->getPoint()->isEmpty()
-				){
-					arrivalDateTime += minutes(2 * static_cast<int>(_originPlaceGeography->getPoint()->distance(_destinationPlaceGeography->getPoint().get()) / 1000));
-				}
-
-				// Accessibility
-				if(_site.get())
-				{
-					try
-					{
-						// Rolling stock filter
-						if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
-						{
-							_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
-						}
-					}
-					catch(ObjectNotFoundException<RollingStockFilter>&)
-					{
-					}
-
-					if(_rollingStockFilter.get() && _rollingStockFilter->getSite() != _site.get())
-					{
-						throw ActionException("Bad rolling stock filter");
-					}
-
-					_accessParameters = _site->getAccessParameters(
-						map.getDefault<UserClassCode>(PARAMETER_USER_CLASS_ID, USER_PEDESTRIAN),
-						_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
-					);
-
-
-					if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
-						_accessParameters.setApproachSpeed(map.get<double>(PARAMETER_APPROACH_SPEED));
-					if(map.getOptional<int>(PARAMETER_MAX_TRANSPORT_CONNECTION))
-						_accessParameters.setMaxtransportConnectionsCount(map.get<int>(PARAMETER_MAX_TRANSPORT_CONNECTION));
-
-				}
-				else if(!map.getDefault<string>(PARAMETER_ACCESS_PARAMETERS).empty())
-				{
-					_accessParameters = map.get<string>(PARAMETER_ACCESS_PARAMETERS);
-				}
-
-				AlgorithmLogger logger; // Will log nothing
-				PTTimeSlotRoutePlanner rp(
-					_originPlaceGeography.get(),
-					_destinationPlaceGeography.get(),
-					departureDateTime,
-					departureDateTime,
-					arrivalDateTime,
-					arrivalDateTime,
-					1,
-					_accessParameters,
-					DEPARTURE_FIRST,
-					_ignoreReservation,
-					logger
-				);
-				PTRoutePlannerResult jr(rp.run());
-
-				if (jr.getJourneys().empty())
+				_journeyPlanner.runWithoutOutput();
+				
+				if(	!_journeyPlanner.getResult().get() ||
+					_journeyPlanner.getResult()->getJourneys().empty())
 				{
 					throw ActionException("The route planning does not find a journey to book");
 				}
 
-				_journey = jr.getJourneys().front();
+				_journey = _journeyPlanner.getResult()->getJourneys().front();
 			}
 		}
 
@@ -683,23 +506,30 @@ namespace synthese
 			}	}
 			else // Free DRT mode
 			{
+				/// TODO read including place
+				if(	!dynamic_cast<const NamedPlace*>(_departurePlace.get()) ||
+					!dynamic_cast<const NamedPlace*>(_arrivalPlace.get())
+				){
+					return;
+				}
+
 				shared_ptr<Reservation> r(rt.newReservation());
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 
 				r->setDeparturePlaceId(
-					_departurePlace->getKey()
+					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getKey()
 				);
 				r->setDeparturePlaceName(
-					_departurePlace->getFullName()
+					dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName()
 				);
 				r->setDepartureTime(_departureDateTime);
 				r->setOriginDateTime(_departureDateTime);
 				r->setArrivalPlaceId(
-					_arrivalPlace->getKey()
+					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getKey()
 				);
 				r->setArrivalPlaceName(
-					_arrivalPlace->getFullName()
+					dynamic_cast<const NamedPlace*>(_arrivalPlace.get())->getFullName()
 				);
 				r->setArrivalTime(_arrivalDateTime);
 

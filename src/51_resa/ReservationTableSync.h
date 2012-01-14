@@ -63,6 +63,8 @@ namespace synthese
 			static const std::string COL_VEHICLE_POSITION_ID_AT_DEPARTURE;
 			static const std::string COL_VEHICLE_POSITION_ID_AT_ARRIVAL;
 			static const std::string COL_CANCELLED_BY_OPERATOR;
+			static const std::string COL_ACKNOWLEDGE_TIME;
+			static const std::string COL_ACKNOWLEDGE_USER_ID;
 
 
 
@@ -119,7 +121,6 @@ namespace synthese
 				util::RegistryKeyType commercialLineId,
 				const boost::gregorian::date& day,
 				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
-				bool hideOldServices = false,
 				boost::logic::tribool cancelled = false,
 				bool orderByService = true,
 				bool raisingOrder = true,

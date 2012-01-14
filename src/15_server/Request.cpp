@@ -73,6 +73,13 @@ namespace synthese
 
 
 
+		void Request::removeCookie( std::string name )
+		{
+			_cookiesMap.erase(name);
+		}
+
+
+
 		void Request::deleteSession()
 		{
 			delete _session;
@@ -304,5 +311,4 @@ namespace synthese
 			}
 			return form;
 		}
-	}
-}
+}	}

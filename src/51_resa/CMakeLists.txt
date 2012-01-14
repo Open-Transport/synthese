@@ -1,6 +1,8 @@
 set_source_groups()
 
 set(resa_SRCS
+BaseReservationActionAdmin.cpp
+BaseReservationActionAdmin.hpp
 BookableCommercialLineAdmin.cpp
 BookableCommercialLineAdmin.h
 BookableCommercialLinesAdmin.cpp

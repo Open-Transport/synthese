@@ -80,7 +80,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<geos::geom::Point> Crossing::getPoint() const
+		const boost::shared_ptr<geos::geom::Point>& Crossing::getPoint() const
 		{
 			return WithGeometry<Point>::getGeometry();
 		}

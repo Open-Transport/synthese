@@ -23,16 +23,18 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTPlaceAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
-#include "TransportNetworkRight.h"
-#include "StopAreaTableSync.hpp"
-#include "PublicPlaceTableSync.h"
-#include "StopArea.hpp"
-#include "ResultHTMLTable.h"
-#include "StopPoint.hpp"
 #include "PTPlacesAdmin.h"
+#include "PTRuleUserAdmin.hpp"
+#include "PublicPlaceTableSync.h"
+#include "ResultHTMLTable.h"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "StopPoint.hpp"
+#include "TransportNetworkRight.h"
 #include "City.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -235,7 +237,10 @@ namespace synthese
 					stream << t.close();
 				}
 
+				// Accessibility admin
+				PTRuleUserAdmin<StopArea, PTPlaceAdmin>::Display(stream, _connectionPlace, request);
 
+				// Importable admin
 				StaticActionRequest<StopAreaUpdateAction> updateOnlyRequest(request);
 				updateOnlyRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_connectionPlace, updateOnlyRequest);

@@ -375,7 +375,6 @@ namespace synthese
 						_line->getKey(),
 						_date,
 						_serviceNumber,
-						false,
 						logic::tribool(false)
 				)	);
 

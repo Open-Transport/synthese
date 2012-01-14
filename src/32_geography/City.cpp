@@ -142,7 +142,7 @@ namespace synthese
 			pm.insert(prefix + DATA_CITY_CODE, _code);
 
 			// X and Y
-			if(coordinatesSystem && getPoint())
+			if(coordinatesSystem && getPoint().get())
 			{
 				shared_ptr<Point> center(
 					coordinatesSystem->convertPoint(*getPoint())

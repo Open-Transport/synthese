@@ -123,6 +123,11 @@ namespace synthese
 			stream << t.open();
 			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 			{
+				if(!dynamic_cast<MainRoadPart*>(road))
+				{
+					continue;
+				}
+
 				openRoadRequest.getPage()->setRoad(
 					Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road))
 				);
@@ -152,6 +157,11 @@ namespace synthese
 			){
 				BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 				{
+					if(!dynamic_cast<MainRoadPart*>(road))
+					{
+						continue;
+					}
+
 					shared_ptr<PTRoadAdmin> p(getNewPage<PTRoadAdmin>());
 					p->setRoad(Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road)));
 					links.push_back(p);

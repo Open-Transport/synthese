@@ -21,7 +21,8 @@
 */
 
 #include "CityTableSync.h"
-#include "Conversion.h"
+
+#include "City.h"
 #include "GeographyModule.h"
 #include "ReplaceQuery.h"
 

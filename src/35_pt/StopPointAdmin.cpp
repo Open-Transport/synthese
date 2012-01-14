@@ -23,28 +23,30 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "StopPointAdmin.hpp"
-#include "AdminParametersException.h"
-#include "ParametersMap.h"
-#include "PTModule.h"
-#include "TransportNetworkRight.h"
-#include "PropertiesHTMLTable.h"
+
+#include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
+#include "AdminParametersException.h"
+#include "CommercialLine.h"
+#include "CommercialLineAdmin.h"
+#include "DRTArea.hpp"
+#include "DRTAreaAdmin.hpp"
+#include "HTMLMap.hpp"
+#include "ImportableAdmin.hpp"
+#include "JourneyPattern.hpp"
+#include "JourneyPatternAdmin.hpp"
+#include "JourneyPatternCopy.hpp"
+#include "LineStop.h"
+#include "MapSource.hpp"
+#include "ParametersMap.h"
+#include "PropertiesHTMLTable.h"
+#include "PTModule.h"
+#include "PTPlaceAdmin.h"
+#include "PTRuleUserAdmin.hpp"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointUpdateAction.hpp"
-#include "StopArea.hpp"
-#include "ImportableAdmin.hpp"
-#include "HTMLMap.hpp"
-#include "CommercialLine.h"
-#include "LineStop.h"
-#include "JourneyPattern.hpp"
-#include "MapSource.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "JourneyPatternAdmin.hpp"
-#include "CommercialLineAdmin.h"
-#include "PTPlaceAdmin.h"
-#include "JourneyPatternCopy.hpp"
-#include "DRTAreaAdmin.hpp"
-#include "DRTArea.hpp"
+#include "TransportNetworkRight.h"
 
 #include <boost/lexical_cast.hpp>
 #include <geos/geom/Point.h>
@@ -215,6 +217,9 @@ namespace synthese
 						_stop->getGeometry().get() ? lexical_cast<string>(_stop->getGeometry()->getY()) : string()
 				)	);
 				stream << t.close();
+
+				// Accessibility admin
+				PTRuleUserAdmin<StopPoint, StopPointAdmin>::Display(stream, _stop, request);
 			}
 
 

@@ -97,7 +97,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				///	Virtual centroid getter.
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const = 0;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const = 0;
 
 				virtual bool containsAnyVertex(GraphIdType graphType) const = 0;
 

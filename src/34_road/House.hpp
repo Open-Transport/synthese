@@ -106,7 +106,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the point representing the place.
 				/// @return the point of the address
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const;
 
 
 

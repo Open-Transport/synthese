@@ -23,6 +23,7 @@
 #include "PTTimeSlotRoutePlanner.h"
 
 #include "AlgorithmLogger.hpp"
+#include "FreeDRTArea.hpp"
 #include "Hub.h"
 #include "IntegralSearcher.h"
 #include "JourneysResult.h"
@@ -31,6 +32,7 @@
 #include "Place.h"
 #include "PTModule.h"
 #include "RoadModule.h"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "VertexAccessMap.h"
 
@@ -306,6 +308,13 @@ namespace synthese
 				result.push_back(resultJourney);
 			}
 
+			// Free DRT approach
+			{
+				ovam = _extendByFreeDRT(ovam, dvam, DEPARTURE_TO_ARRIVAL);
+				dvam = _extendByFreeDRT(ovam, dvam, ARRIVAL_TO_DEPARTURE);
+			}
+
+
 			if(result.empty())
 			{
 				TimeSlotRoutePlanner r(
@@ -357,5 +366,38 @@ namespace synthese
 					r.run()
 				);
 			}
+		}
+
+
+
+		VertexAccessMap PTTimeSlotRoutePlanner::_extendByFreeDRT(
+			const graph::VertexAccessMap& vam,
+			const graph::VertexAccessMap& destinationVam,
+			algorithm::PlanningPhase direction
+		) const	{
+
+			// Declarations
+			VertexAccessMap result;
+
+			// Loop on each stop
+			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
+			{
+				// Select stop areas
+				const StopPoint* stopPoint(dynamic_cast<const StopPoint*>(itps.first));
+				if(!stopPoint)
+				{
+					continue;
+				}
+
+				// Free DRTs loop
+				StopArea::FreeDRTs freeDRTs(stopPoint->getConnectionPlace()->getFreeDRTs());
+				BOOST_FOREACH(const StopArea::FreeDRTs::value_type& freeDRT, freeDRTs)
+				{
+					// Select 
+
+				}
+			}
+
+			return result;
 		}
 }	}

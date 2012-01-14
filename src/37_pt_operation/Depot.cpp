@@ -86,9 +86,11 @@ namespace synthese
 			return NO_TRANSFER_HUB_SCORE;
 		}
 
-		boost::shared_ptr<Point> Depot::getPoint() const
+
+
+		const boost::shared_ptr<Point>& Depot::getPoint() const
 		{
-			return dynamic_pointer_cast<Point,Geometry>(getGeometry());
+			return getGeometry();
 		}
 
 

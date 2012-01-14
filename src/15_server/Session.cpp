@@ -97,7 +97,9 @@ namespace synthese
 		{
 			ServerModule::SessionMap::iterator it = ServerModule::getSessions().find(_key);
 			if (it != ServerModule::getSessions().end())
+			{
 				ServerModule::getSessions().erase(it);
+			}
 		}
 
 
@@ -140,6 +142,13 @@ namespace synthese
 				this->getKey(),
 				ServerModule::GetSessionMaxDuration().total_seconds()
 			);
+		}
+
+
+
+		void Session::removeSessionIdCookie( Request &request ) const
+		{
+			request.removeCookie(COOKIE_SESSIONID);
 		}
 
 

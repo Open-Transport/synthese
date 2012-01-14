@@ -39,6 +39,11 @@ namespace synthese
 		class VehiclePosition;
 	}
 
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
 		class ReservationTransaction;
@@ -49,8 +54,8 @@ namespace synthese
 			A Reservation object can link to its departures and arrival places, commercial lines, etc.
 			In order to prevent from broken links, the object contains a copy of the main informations.
 		*/
-		class Reservation
-		:	public virtual util::Registrable
+		class Reservation:
+			public virtual util::Registrable
 		{
 		public:
 
@@ -86,6 +91,8 @@ namespace synthese
 				const pt_operation::VehiclePosition*	_vehiclePositionAtDeparture;
 				const pt_operation::VehiclePosition*	_vehiclePositionAtArrival;
 				bool							_cancelledByOperator;
+				boost::posix_time::ptime		_acknowledgeTime;
+				security::User*					_acknowledgeUser;
 			//@}
 
 		public:
@@ -111,6 +118,8 @@ namespace synthese
 				void setVehiclePositionAtDeparture	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtDeparture = value; }
 				void setVehiclePositionAtArrival	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtArrival = value; }
 				void setCancelledByOperator(bool value){ _cancelledByOperator = value; }
+				void setAcknowledgeTime(const boost::posix_time::ptime& value){ _acknowledgeTime = value; }
+				void setAcknowledgeUser(security::User* value){ _acknowledgeUser = value; }
 
 				/** Transaction setter.
 					@param transaction the transaction which the reservation belongs
@@ -144,6 +153,8 @@ namespace synthese
 				const pt_operation::VehiclePosition*	getVehiclePositionAtDeparture()	const { return _vehiclePositionAtDeparture; }
 				const pt_operation::VehiclePosition*	getVehiclePositionAtArrival()	const { return _vehiclePositionAtArrival; }
 				bool							getCancelledByOperator()	const { return _cancelledByOperator; }
+				const boost::posix_time::ptime& getAcknowledgeTime() const { return _acknowledgeTime; }
+				security::User* getAcknowledgeUser() const { return _acknowledgeUser; }
 			//@}
 
 
