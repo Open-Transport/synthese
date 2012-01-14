@@ -385,24 +385,41 @@ namespace synthese
 
 	namespace pt
 	{
-
 		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
 			optional<RegistryKeyType> networkId,
 			optional<string> name,
 			optional<string> creatorId,
-			int first
-			, boost::optional<std::size_t> number
-			, bool orderByNetwork
-			, bool orderByName
-			, bool raisingOrder,
-			LinkLevel linkLevel
+			int first,
+			boost::optional<std::size_t> number,
+			bool orderByNetwork,
+			bool orderByName,
+			bool raisingOrder,
+			LinkLevel linkLevel,
+			boost::optional<const security::RightsOfSameClassMap&> rights,
+			security::RightLevel neededLevel
 		){
 			stringstream query;
 			query
 				<< " SELECT l.*"
 				<< " FROM " << TABLE.NAME << " AS l "
 				<< " WHERE 1";
+
+			// Rights
+			if(rights && neededLevel > FORBIDDEN)
+			{
+				query <<
+					getSQLLinesList(
+						*rights,
+						true,
+						neededLevel,
+						false,
+						GLOBAL_PERIMETER
+					)
+				;
+			}
+
+			// Creator id
 			if(creatorId && *creatorId != "%%" && *creatorId != "%")
 			{
 				if (creatorId->empty())

@@ -166,10 +166,10 @@ namespace synthese
 				/// @author Hugues Romain
 				void setHourDeadLine (const boost::posix_time::time_duration& hourDeadLine);
 
-				void setMinDelayMinutes (boost::posix_time::time_duration minDelayMinutes) { _minDelayMinutes = minDelayMinutes; }
-				void setMinDelayDays (boost::gregorian::date_duration minDelayDays) { _maxDelayDays = minDelayDays; }
-				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> maxDelayDays){ _maxDelayDays = maxDelayDays; }
-				void setOriginIsReference (bool originIsReference){ _originIsReference = originIsReference; }
+				void setMinDelayMinutes (boost::posix_time::time_duration value) { _minDelayMinutes = value; }
+				void setMinDelayDays (boost::gregorian::date_duration value) { _minDelayDays = value; }
+				void setMaxDelayDays (const boost::optional<boost::gregorian::date_duration> value){ _maxDelayDays = value; }
+				void setOriginIsReference (bool value){ _originIsReference = value; }
 				void setReservationType(ReservationRuleType value){ _reservationType = value; }
 				void setAccessCapacity(AccessCapacity value){ _accessCapacity = value; }
 				void setDefaultFare(const Fare* value){ _defaultFare = value; }

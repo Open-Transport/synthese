@@ -55,7 +55,7 @@ namespace synthese
 		*/
 		class City:
 			public IncludingPlace,
-			public util::Registrable
+			public virtual util::Registrable
 		{
 		public:
 

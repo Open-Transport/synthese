@@ -28,6 +28,8 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include "SecurityTypes.hpp"
+
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
@@ -68,6 +70,8 @@ namespace synthese
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_SORT_BY_TRANSPORT_MODE;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_RIGHT_CLASS;
+			static const std::string PARAMETER_RIGHT_LEVEL;
 
 			static const std::string FORMAT_XML;
 			static const std::string FORMAT_JSON;
@@ -103,6 +107,8 @@ namespace synthese
 				std::string _outputGeometry;
 				typedef std::vector<boost::shared_ptr<const RollingStock> > TransportModeSorting;
 				TransportModeSorting _sortByTransportMode;
+				std::string _rightClass;
+				boost::optional<security::RightLevel> _rightLevel;
 			//@}
 
 

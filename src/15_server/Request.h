@@ -232,6 +232,7 @@ namespace synthese
 				*/
 				void setClientURL(const std::string& url){ _clientURL = url; }
 				void setCookie(std::string name, std::string value, int maxAge);
+				void removeCookie(std::string name);
 				void setRedirectAfterAction(bool value){ _redirectAfterAction = value; }
 			//@}
 

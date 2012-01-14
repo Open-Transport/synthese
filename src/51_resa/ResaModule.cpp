@@ -270,7 +270,9 @@ namespace synthese
 			switch(status)
 			{
 			case OPTION: return "stop_blue.png";
+			case ACKNOWLEDGED_OPTION: return "stop_blue.png";
 			case TO_BE_DONE: return "stop_green.png";
+			case ACKNOWLEDGED: return "stop_green.png";
 			case CANCELLED: return "cross.png";
 			case CANCELLED_AFTER_DELAY: return "asterisk_red.png";
 			case AT_WORK: return "car.png";
@@ -287,7 +289,9 @@ namespace synthese
 			switch(status)
 			{
 			case OPTION: return "option";
-			case TO_BE_DONE: return "confirmé";
+			case ACKNOWLEDGED_OPTION: return "option confirmée";
+			case TO_BE_DONE: return "en attente";
+			case ACKNOWLEDGED: return "confirmé";
 			case CANCELLED: return "annulé";
 			case CANCELLED_AFTER_DELAY: return "annulé hors délai";
 			case AT_WORK: return "en cours";

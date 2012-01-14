@@ -52,6 +52,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class FreeDRTArea;
 		class StopPoint;
 		class CommercialLine;
 
@@ -287,7 +288,7 @@ namespace synthese
 				*/
 				virtual graph::HubScore getScore() const;
 
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const;
 
 				virtual bool isConnectionPossible() const;
 
@@ -319,7 +320,7 @@ namespace synthese
 			//@}
 
 
-			//! @name Queries
+			//! @name Services
 			//@{
 				virtual std::string getRuleUserName() const;
 
@@ -373,10 +374,16 @@ namespace synthese
 					const CoordinatesSystem* coordinatesSystem = &CoordinatesSystem::GetInstanceCoordinatesSystem(),
 					std::string prefix = std::string()
 				) const;
-			//@}
 
+
+
+				typedef std::set<FreeDRTArea*> FreeDRTs;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Free DRT calling at the stop.
+				FreeDRTs getFreeDRTs() const;
+			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_pt_StopArea_hpp__

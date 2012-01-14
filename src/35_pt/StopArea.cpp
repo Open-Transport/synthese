@@ -21,19 +21,21 @@
 */
 
 #include "StopArea.hpp"
-#include "Registry.h"
-#include "PTModule.h"
-#include "StopPoint.hpp"
-#include "Edge.h"
-#include "CommercialLine.h"
-#include "JourneyPattern.hpp"
-#include "VertexAccessMap.h"
-#include "RoadModule.h"
-#include "ReverseRoadChunk.hpp"
-#include "Crossing.h"
-#include "ParametersMap.h"
+
 #include "AllowedUseRule.h"
+#include "CommercialLine.h"
+#include "Crossing.h"
+#include "Edge.h"
 #include "ForbiddenUseRule.h"
+#include "FreeDRTArea.hpp"
+#include "JourneyPattern.hpp"
+#include "ParametersMap.h"
+#include "PTModule.h"
+#include "Registry.h"
+#include "ReverseRoadChunk.hpp"
+#include "RoadModule.h"
+#include "StopPoint.hpp"
+#include "VertexAccessMap.h"
 
 #include <boost/foreach.hpp>
 #include <geos/geom/Envelope.h>
@@ -280,7 +282,7 @@ namespace synthese
 
 
 
-		shared_ptr<Point> StopArea::getPoint() const
+		const shared_ptr<Point>& StopArea::getPoint() const
 		{
 			if (!_isoBarycentre.get())
 			{
@@ -519,5 +521,20 @@ namespace synthese
 		std::string StopArea::getRuleUserName() const
 		{
 			return "Zone d'arrêt";
+		}
+
+
+
+		StopArea::FreeDRTs StopArea::getFreeDRTs() const
+		{
+			FreeDRTs result;
+			BOOST_FOREACH(const FreeDRTArea::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<FreeDRTArea>())
+			{
+				if(item.second->includesPlace(*this))
+				{
+					result.insert(item.second.get());
+				}
+			}
+			return result;
 		}
 }	}

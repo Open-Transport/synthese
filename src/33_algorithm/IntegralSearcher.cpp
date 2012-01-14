@@ -239,6 +239,13 @@ namespace synthese
 					if(origin->getGraphType() != _graphToUse)
 						continue;
 
+					// Checks if the vertex use rules are compliant with current user profile
+					const UseRule& vertexUseRule(origin->getUseRule(_accessParameters.getUserClassRank()));
+					if(	!vertexUseRule.isCompatibleWith(_accessParameters)
+					){
+						continue;
+					}
+
 					// Approach to the vertex
 					RoutePlanningIntermediateJourney fullApproachJourney(currentJourney);
 					if(fullApproachJourney.empty())
@@ -384,6 +391,13 @@ namespace synthese
 								}
 
 								const Vertex* reachedVertex(curEdge->getFromVertex());
+
+								// Checks if the vertex use rules are compliant with current user profile
+								const UseRule& vertexUseRule(reachedVertex->getUseRule(_accessParameters.getUserClassRank()));
+								if(	!vertexUseRule.isCompatibleWith(_accessParameters)
+								){
+									continue;
+								}
 
 								// The reached vertex is analyzed only in 3 cases :
 								//  - if the vertex belongs to the goal

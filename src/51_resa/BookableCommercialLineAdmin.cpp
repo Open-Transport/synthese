@@ -234,7 +234,6 @@ namespace synthese
 						_line->getKey(),
 						_date,
 						_serviceNumber,
-						_hideOldServices,
 						_displayCancelled ? logic::indeterminate : logic::tribool(false)
 				)	);
 				// Services reading

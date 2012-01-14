@@ -26,19 +26,14 @@
 #define SYNTHESE_ReservationRoutePlannerAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
+#include "BaseReservationActionAdmin.hpp"
+
 #include "AlgorithmTypes.h"
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace resa
 	{
-		class ReservationTransaction;
-
 		/** Route planning with reservation ability admin page class.
 			@ingroup m51Admin refAdmin
 			@author Hugues Romain
@@ -50,7 +45,8 @@ namespace synthese
 				- PARAMETER_DATE / ti : if route planning order is departure first : min hour of departure, else max date arrival
 		*/
 		class ReservationRoutePlannerAdmin:
-			public admin::AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>
+			public admin::AdminInterfaceElementTemplate<ReservationRoutePlannerAdmin>,
+			public BaseReservationActionAdmin
 		{
 			std::string						_startCity;
 			std::string						_startPlace;
@@ -59,9 +55,6 @@ namespace synthese
 			boost::posix_time::ptime		_dateTime;
 			bool							_disabledPassenger;
 			bool										_withoutTransfer;
-			boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;
-			boost::shared_ptr<const security::User>		_customer;
-			int											_seatsNumber;
 			algorithm::PlanningOrder					_planningOrder;
 			double										_approachSpeed;
 			double										_effectiveApproachSpeed;
@@ -77,8 +70,6 @@ namespace synthese
 			static const std::string PARAMETER_TIME;
 			static const std::string PARAMETER_DISABLED_PASSENGER;
 			static const std::string PARAMETER_WITHOUT_TRANSFER;
-			static const std::string PARAMETER_CUSTOMER_ID;
-			static const std::string PARAMETER_SEATS_NUMBER;
 			static const std::string PARAMETER_PLANNING_ORDER;
 			static const std::string PARAMETER_APPROACH_SPEED;
 			static const std::string PARAMETER_ENABLED_PEDESTRIAN;
@@ -87,7 +78,6 @@ namespace synthese
 			ReservationRoutePlannerAdmin();
 
 
-			void setCustomer(boost::shared_ptr<const security::User> value);
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -131,6 +121,8 @@ namespace synthese
 				const security::User& user
 			) const;
 
+
+
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param parentLink Link to the parent page
 				@param currentPage Currently displayed page
@@ -144,12 +136,13 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 
+
+
 			virtual bool isPageVisibleInTree(
 				const AdminInterfaceElement& currentPage,
 				const admin::AdminRequest& request
 			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ReservationRoutePlannerAdmin_H__

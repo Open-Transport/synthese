@@ -250,14 +250,18 @@ namespace synthese
 				_minDelayMinutes = minutes(map.getDefault<long>(PARAMETER_MIN_DELAY_MINUTES, 0));
 			}
 
+			// Minimal delay (days)
 			if(map.isDefined(PARAMETER_MIN_DELAY_DAYS))
 			{
 				_minDelayDays = days(map.getDefault<long>(PARAMETER_MIN_DELAY_DAYS, 0));
 			}
 
+			// Maximal delay (days)
 			if(map.isDefined(PARAMETER_MAX_DELAY_DAYS))
 			{
-				_maxDelayDays = (map.getDefault<long>(PARAMETER_MAX_DELAY_DAYS, 0) > 0 ? days(map.get<long>(PARAMETER_MAX_DELAY_DAYS)) : optional<date_duration>());
+				_maxDelayDays = map.getDefault<long>(PARAMETER_MAX_DELAY_DAYS, 0) > 0 ?
+					days(map.get<long>(PARAMETER_MAX_DELAY_DAYS)) :
+					optional<date_duration>();
 			}
 
 			if(map.isDefined(PARAMETER_HOUR_DEADLINE))
@@ -356,6 +360,16 @@ namespace synthese
 			if(_minDelayMinutes)
 			{
 				_rule->setMinDelayMinutes(*_minDelayMinutes);
+			}
+
+			if(_reservationMinDepartureTime)
+			{
+				_rule->setReservationMinDepartureTime(*_reservationMinDepartureTime);
+			}
+
+			if(_reservationForbiddenDays)
+			{
+				_rule->setReservationForbiddenDays(*_reservationForbiddenDays);
 			}
 
 			if(_forbiddenInDepartureBoards)

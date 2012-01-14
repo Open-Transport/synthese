@@ -57,6 +57,11 @@ namespace synthese
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
 
+		private:
+			mutable boost::shared_ptr<geos::geom::Point> _point;
+
+
+		public:
 			/// Chosen registry class.
 			typedef util::Registry<PublicPlace>	Registry;
 
@@ -78,7 +83,7 @@ namespace synthese
 					const geography::Place::GraphTypes& whatToSearch
 				) const;
 
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const;
 			//@}
 
 			/// @name Services

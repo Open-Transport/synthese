@@ -89,7 +89,7 @@ namespace synthese
 					...
 				) const;
 
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const = 0;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const = 0;
 
 				virtual bool includes(const Place* place) const;
 			//@}
