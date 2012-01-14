@@ -212,7 +212,7 @@ namespace synthese
 							if(cities.empty())
 							{
 								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
-								missingCities.insert(make_pair(cityId, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME);
+								missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
 							else
