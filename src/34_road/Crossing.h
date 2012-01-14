@@ -171,7 +171,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the point representing the hub
 				/// @return itself (got from vertex superclass)
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const;
 			//@}
 
 

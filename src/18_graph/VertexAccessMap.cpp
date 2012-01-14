@@ -131,7 +131,7 @@ namespace synthese
 
 
 
-		shared_ptr<Point> VertexAccessMap::getCentroid(
+		const shared_ptr<Point>& VertexAccessMap::getCentroid(
 		) const	{
 			if(!_isobarycentre.get())
 			{

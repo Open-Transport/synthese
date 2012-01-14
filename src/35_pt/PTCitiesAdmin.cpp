@@ -134,7 +134,7 @@ namespace synthese
 
 			// Search service
 			ParametersMap pm(
-				_placesListService.run(stream, request)
+				_placesListService.runWithoutOutput()
 			);
 
 			// Informations about the query

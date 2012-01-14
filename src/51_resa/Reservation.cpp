@@ -80,19 +80,43 @@ namespace synthese
 			if (cancellationTime.is_not_a_date_time())
 			{
 				if (now < _reservationDeadLine)
-					return OPTION;
+				{
+					if(_acknowledgeTime.is_not_a_date_time())
+					{
+						return OPTION;
+					}
+					else
+					{
+						return ACKNOWLEDGED_OPTION;
+					}
+				}
 				if (now < _departureTime)
-					return TO_BE_DONE;
+				{
+					if(_acknowledgeTime.is_not_a_date_time())
+					{
+						return TO_BE_DONE;
+					}
+					else
+					{
+						return ACKNOWLEDGED;
+					}
+				}
 				if (now < _arrivalTime)
+				{
 					return AT_WORK;
+				}
 				return DONE;
 			}
 			else
 			{
 				if (cancellationTime < _reservationDeadLine)
+				{
 					return CANCELLED;
+				}
 				if (cancellationTime < _departureTime)
+				{
 					return CANCELLED_AFTER_DELAY;
+				}
 				return NO_SHOW;
 			}
 		}
@@ -106,7 +130,25 @@ namespace synthese
 
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(_reservationDeadLine);
+			case ACKNOWLEDGED_OPTION:
+				statusText += " le " + to_simple_string(_acknowledgeTime);
+				if(_acknowledgeUser)
+				{
+					statusText += " par " + _acknowledgeUser->getFullName();
+				}
+
+			case OPTION:
+				statusText += " pouvant être annulée avant le " + to_simple_string(_reservationDeadLine);
+				break;
+
+			case ACKNOWLEDGED:
+				statusText += " le " + to_simple_string(_acknowledgeTime);
+				if(_acknowledgeUser)
+				{
+					statusText += " par " + _acknowledgeUser->getFullName();
+				}
+				break;
+
 			case CANCELLED: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
 			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
 			case NO_SHOW: return statusText + " constatée le " + to_simple_string(getTransaction()->getCancellationTime());

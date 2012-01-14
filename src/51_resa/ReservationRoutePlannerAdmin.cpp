@@ -29,11 +29,6 @@
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "BookReservationAction.h"
-#include "ResaCustomerHtmlOptionListFunction.h"
-#include "ReservationTransaction.h"
-#include "ReservationTransactionTableSync.h"
-#include "Reservation.h"
-#include "ReservationTableSync.h"
 #include "NamedPlace.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
@@ -57,8 +52,6 @@
 #include "PTModule.h"
 #include "AccessParameters.h"
 #include "RoadPlace.h"
-#include "User.h"
-#include "UserTableSync.h"
 #include "Language.hpp"
 
 #include "CityListFunction.h"
@@ -109,8 +102,6 @@ namespace synthese
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_TIME("ti");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_DISABLED_PASSENGER("dp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_WITHOUT_TRANSFER("wt");
-		const std::string ReservationRoutePlannerAdmin::PARAMETER_CUSTOMER_ID("cu");
-		const std::string ReservationRoutePlannerAdmin::PARAMETER_SEATS_NUMBER("sn");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_PLANNING_ORDER("po");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_APPROACH_SPEED("apsp");
 		const std::string ReservationRoutePlannerAdmin::PARAMETER_ENABLED_PEDESTRIAN("epe");
@@ -123,7 +114,6 @@ namespace synthese
 			_disabledPassenger(false),
 			_withoutTransfer(false),
 			_dateTime(second_clock::local_time()),
-			_seatsNumber(1),
 			_planningOrder(DEPARTURE_FIRST),
 			_enabledPedestrian(true),
 			_approachSpeed(0.833),//0.833 = 3km/h, 1.111 = 4km/h
@@ -169,38 +159,7 @@ namespace synthese
 				_effectiveApproachSpeed = 0;
 			}
 
-			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID))
-			{
-				try
-				{
-					_confirmedTransaction = ReservationTransactionTableSync::GetEditable(
-						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-						_getEnv()
-					);
-					ReservationTableSync::SearchResult reservations(
-						ReservationTableSync::Search(*_env, _confirmedTransaction->getKey())
-					);
-				}
-				catch (...)
-				{
-					throw AdminParametersException("Reservation load error");
-				}
-			}
-
-			if(map.getOptional<RegistryKeyType>(PARAMETER_CUSTOMER_ID))
-			{
-				try
-				{
-					_customer = UserTableSync::Get(
-						map.get<RegistryKeyType>(PARAMETER_CUSTOMER_ID),
-						_getEnv()
-					);
-				}
-				catch (...)
-				{
-					throw AdminParametersException("No such User");
-				}
-			}
+			setBaseReservationFromParametersMap(*_env, map);
 		}
 
 
@@ -208,6 +167,7 @@ namespace synthese
 		ParametersMap ReservationRoutePlannerAdmin::getParametersMap() const
 		{
 			ParametersMap m;
+			m.merge(getBaseReservationParametersMap());
 			m.insert(PARAMETER_START_CITY, _startCity);
 			m.insert(PARAMETER_START_PLACE, _startPlace);
 			m.insert(PARAMETER_END_CITY, _endCity);
@@ -216,14 +176,9 @@ namespace synthese
 			m.insert(PARAMETER_TIME, _dateTime.time_of_day());
 			m.insert(PARAMETER_DISABLED_PASSENGER, _disabledPassenger);
 			m.insert(PARAMETER_WITHOUT_TRANSFER, _withoutTransfer);
-			m.insert(PARAMETER_SEATS_NUMBER, _seatsNumber);
 			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
 			m.insert(PARAMETER_APPROACH_SPEED, _approachSpeed);
 			m.insert(PARAMETER_IGNORE_RESERVATION, _ignoreReservation);
-			if(_customer.get())
-			{
-				m.insert(PARAMETER_CUSTOMER_ID, _customer->getKey());
-			}
 			return m;
 		}
 
@@ -268,11 +223,6 @@ namespace synthese
 				resaRequest.getAction()->setSite(Env::GetOfficialEnv().getSPtr(ResaModule::GetJourneyPlannerWebsite()));
 			}
 			resaRequest.getAction()->setIgnoreReservationRules(_ignoreReservation);
-
-			StaticFunctionRequest<ResaCustomerHtmlOptionListFunction> customerSearchRequest(_request, true);
-			customerSearchRequest.getFunction()->setNumber(20);
-
-			stream << HTMLModule::GetHTMLJavascriptOpen("resa.js");
 
 			// Confirmation
 			if (_confirmedTransaction.get())
@@ -526,11 +476,10 @@ namespace synthese
 				){
 					withReservation = true;
 					resaRequest.getAction()->setJourney(*it);
-					resaRequest.getAction()->setOriginDestinationPlace(
-							_startCity,
-							_startPlace,
-							_endCity,
-							_endPlace);
+					resaRequest.getAction()->getJourneyPlanner().setOriginCityText(_startCity);
+					resaRequest.getAction()->getJourneyPlanner().setOriginPlaceText(_startPlace);
+					resaRequest.getAction()->getJourneyPlanner().setDestinationCityText(_endCity);
+					resaRequest.getAction()->getJourneyPlanner().setDestinationPlaceText(_endPlace);
 					break;
 				}
 			}
@@ -540,7 +489,12 @@ namespace synthese
 				stream << rf.open();
 			}
 
-			jv.displayHTMLTable(stream, rf, BookReservationAction::PARAMETER_DATE_TIME, _ignoreReservation);
+			jv.displayHTMLTable(
+				stream,
+				rf,
+				Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
+				_ignoreReservation
+			);
 
 			if(jv.getJourneys().empty())
 			{
@@ -555,96 +509,31 @@ namespace synthese
 			}
 			else
 			{
-				stream << rf.setFocus(BookReservationAction::PARAMETER_DATE_TIME, 0);
+				stream <<
+					rf.setFocus(
+						Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
+						0
+					)
+				;
 
-				HTMLTable rt(2,"propertysheet");
-				stream << rt.open();
-
-				if (_customer.get())
-				{
-					stream << rt.row();
-					stream << rt.col() << "Client";
-					stream << rt.col() << _customer->getFullName() << " (" << _customer->getPhone() << ")";
-					rf.addHiddenField(BookReservationAction::PARAMETER_CUSTOMER_ID, lexical_cast<string>(_customer->getKey()));
-				}
-				else
-				{
-					stream << rt.row();
-					stream << rt.col() << "Recherche client";
-					stream << rt.col() << "Nom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_NAME, string());
-					stream << "	Prénom : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_SURNAME, string());
-
-					stream << HTMLModule::GetHTMLJavascriptOpen();
-					stream
-						<< "document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').onkeyup = "
-						<< "function(){ programCustomerUpdate("
-						<< "'" << rf.getName() << "'"
-						<< ",'" << BookReservationAction::PARAMETER_CREATE_CUSTOMER << "'"
-						<< ",'ie_bug_curstomer_div'"
-						<< ",'" << BookReservationAction::PARAMETER_CUSTOMER_ID << "'"
-						<< ",'" << customerSearchRequest.getURL()
-						<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
-						<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
-						<< "); };";
-					stream << "document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').onkeyup = "
-						<< "function(){ programCustomerUpdate("
-						<< "'" << rf.getName() << "'"
-						<< ",'" << BookReservationAction::PARAMETER_CREATE_CUSTOMER << "'"
-						<< ",'ie_bug_curstomer_div'"
-						<< ",'" << BookReservationAction::PARAMETER_CUSTOMER_ID << "'"
-						<< ",'" << customerSearchRequest.getURL()
-						<< "&" << ResaCustomerHtmlOptionListFunction::PARAMETER_NAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_NAME) << "').value"
-						<< "+'&" << ResaCustomerHtmlOptionListFunction::PARAMETER_SURNAME <<"='+document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_SURNAME) << "').value"
-						<< "); };";
-					stream <<
-						"document.forms." << rf.getName() << ".onsubmit = " <<
-						"function(){" <<
-						"document.getElementById('" << rf.getFieldId(PARAMETER_SEATS_NUMBER) << "').value=" <<
-						"document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_SEATS_NUMBER) << "').value;" <<
-						"document.getElementById('" << rf.getFieldId(PARAMETER_CUSTOMER_ID) << "').value=" <<
-						"document.getElementById('" << rf.getFieldId(BookReservationAction::PARAMETER_CUSTOMER_ID) << "').value;" <<
-						"};"
-					;
-
-					stream << HTMLModule::GetHTMLJavascriptClose();
-
-					stream << rt.row();
-					stream << rt.col() << "Client";
-					stream << rt.col() << rf.getRadioInput(
-						BookReservationAction::PARAMETER_CREATE_CUSTOMER,
-						optional<bool>(true),
-						optional<bool>(true),
-						"Nouveau client"
-					);
-					stream << " : Téléphone : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_PHONE, string());
-					stream << "	E-mail : " << rf.getTextInput(BookReservationAction::PARAMETER_CUSTOMER_EMAIL, string());
-					stream << "<br />" << rf.getRadioInput(
-						BookReservationAction::PARAMETER_CREATE_CUSTOMER,
-						optional<bool>(false),
-						optional<bool>(true),
-						"Client existant",
-						true
-					);
-					stream << "<span id=\"ie_bug_curstomer_div\"></span>";
-				}
-
-
-				stream << rt.row();
-				stream << rt.col() << "Nombre de places";
-				stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_SEATS_NUMBER, lexical_cast<string>(_seatsNumber));
-
-				stream << rt.row();
-				stream << rt.col(2, string(), true) << rf.getSubmitButton("Réserver");
-
-				stream << rt.close() << rf.close();
+				displayReservationForm(
+					stream,
+					rf,
+					_request
+				);
+				stream << rf.close();
 			}
 		}
+
+
 
 		bool ReservationRoutePlannerAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			return user.getProfile()->isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL);
 		}
+
+
 
 		AdminInterfaceElement::PageLinks ReservationRoutePlannerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
@@ -670,10 +559,4 @@ namespace synthese
 		) const	{
 			return true;
 		}
-
-		void ReservationRoutePlannerAdmin::setCustomer(boost::shared_ptr<const User> value)
-		{
-			_customer = value;
-		}
-	}
-}
+}	}

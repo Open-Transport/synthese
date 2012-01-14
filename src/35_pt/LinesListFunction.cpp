@@ -81,6 +81,8 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
 		const string LinesListFunction::PARAMETER_OUTPUT_MESSAGES = "output_messages";
+		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
+		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 		const string LinesListFunction::FORMAT_JSON("json");
@@ -164,6 +166,18 @@ namespace synthese
 				result.insert(PARAMETER_SORT_BY_TRANSPORT_MODE, s.str());
 			}
 
+			// Right class
+			if(!_rightClass.empty())
+			{
+				result.insert(PARAMETER_RIGHT_CLASS, _rightClass);
+			}
+
+			// Right level
+			if(_rightLevel)
+			{
+				result.insert(PARAMETER_RIGHT_LEVEL, static_cast<int>(*_rightLevel));
+			}
+
 			return result;
 		}
 
@@ -197,6 +211,20 @@ namespace synthese
 
 			// Letters before numbers
 			_lettersBeforeNumbers = map.isTrue(PARAMETER_LETTERS_BEFORE_NUMBERS);
+
+			// Right class
+			_rightClass = map.getDefault<string>(PARAMETER_RIGHT_CLASS);
+			if(	!_rightClass.empty() &&
+				!Factory<Right>::contains(_rightClass)
+			){
+				throw RequestException("No such right class");
+			}
+
+			// Right level
+			if(map.getOptional<int>(PARAMETER_RIGHT_LEVEL))
+			{
+				_rightLevel = static_cast<RightLevel>(map.get<int>(PARAMETER_RIGHT_LEVEL));
+			}
 
 			// Output messages
 			_outputMessages = map.isTrue(PARAMETER_OUTPUT_MESSAGES);
@@ -370,9 +398,23 @@ namespace synthese
 			// Get CommercialLine Global Registry
 			if(_network.get())
 			{
-				vector<shared_ptr<CommercialLine> > lines(
-					CommercialLineTableSync::Search(Env::GetOfficialEnv(), _network->getKey())
-				);
+				CommercialLineTableSync::SearchResult lines(
+					CommercialLineTableSync::Search(
+						Env::GetOfficialEnv(),
+						_network->getKey(),
+						optional<string>(),
+						optional<string>(),
+						0,
+						optional<size_t>(),
+						true,
+						false,
+						true,
+						UP_LINKS_LOAD_LEVEL,
+						(_rightClass.empty() && _rightLevel) ?
+							optional<const RightsOfSameClassMap&>() :
+							request.getUser()->getProfile()->getRights(_rightClass),
+						_rightLevel ? *_rightLevel : FORBIDDEN
+				)	);
 				set<CommercialLine*> alreadyShownLines;
 				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{

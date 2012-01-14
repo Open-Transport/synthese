@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// FreeDRTBookingAdmin class header.
-///	@file FreeDRTBookingAdmin.hpp
+/// BaseReservationActionAdmin class header.
+///	@file BaseReservationActionAdmin.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -22,57 +22,57 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_FreeDRTBookingAdmin_H__
-#define SYNTHESE_FreeDRTBookingAdmin_H__
+#ifndef SYNTHESE_BaseReservationActionAdmin_H__
+#define SYNTHESE_BaseReservationActionAdmin_H__
 
-#include "AdminInterfaceElementTemplate.h"
-#include "BaseReservationActionAdmin.hpp"
+#include "AdminInterfaceElement.h"
 
-#include "ResultHTMLTable.h"
-
-#include <boost/date_time/posix_time/ptime.hpp>
+#include <string>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
-	namespace geography
+	namespace html
 	{
-		class Place;
+		class HTMLForm;
 	}
 
-	namespace pt
+	namespace util
 	{
-		class FreeDRTArea;
+		class ParametersMap;
+	}
+
+	namespace security
+	{
+		class User;
 	}
 
 	namespace resa
 	{
+		class ReservationTransaction;
+
 		//////////////////////////////////////////////////////////////////////////
-		/// FreeDRTBookingAdmin Admin compound class.
+		/// BaseReservationActionAdmin Admin compound class.
 		///	@ingroup m51Admin refAdmin
 		///	@author Hugues Romain
 		///	@date 2012
-		class FreeDRTBookingAdmin:
-			public admin::AdminInterfaceElementTemplate<FreeDRTBookingAdmin>,
-			public BaseReservationActionAdmin
+		class BaseReservationActionAdmin
 		{
 		public:
 			/// @name Parameter identifiers
 			//@{
-				static const std::string PARAMETER_AREA_ID;
-				static const std::string PARAMETER_DEPARTURE_PLACE;
-				static const std::string PARAMETER_ARRIVAL_PLACE;
-				static const std::string PARAMETER_DATE;
-				static const std::string PARAMETER_TIME;
+				static const std::string PARAMETER_CUSTOMER_ID;
+				static const std::string PARAMETER_SEATS_NUMBER;
 			//@}
 
-		private:
+		protected:
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const pt::FreeDRTArea> _area;
-				boost::posix_time::ptime _dateTime;
-				boost::shared_ptr<const geography::Place> _departurePlace;
-				boost::shared_ptr<const geography::Place> _arrivalPlace;
+				boost::shared_ptr<const security::User>		_customer;
+				size_t										_seatsNumber;
+				boost::shared_ptr<ReservationTransaction>	_confirmedTransaction;
 			//@}
+
 
 
 		public:
@@ -80,15 +80,15 @@ namespace synthese
 			/// Constructor.
 			///	@author Hugues Romain
 			///	@date 2012
-			FreeDRTBookingAdmin();
+			BaseReservationActionAdmin();
 
 
 
 			/// @name Setters
 			//@{
-				void setArea(boost::shared_ptr<const pt::FreeDRTArea> value){ _area = value; }
+				void setCustomer(boost::shared_ptr<const security::User> value){ _customer = value; }
 			//@}
-			
+
 			
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -97,7 +97,8 @@ namespace synthese
 			///	@throw AdminParametersException if a parameter has incorrect value.
 			///	@author Hugues Romain
 			///	@date 2012
-			void setFromParametersMap(
+			void setBaseReservationFromParametersMap(
+				util::Env& env,
 				const util::ParametersMap& map
 			);
 
@@ -107,39 +108,17 @@ namespace synthese
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
 			///	@date 2012
-			util::ParametersMap getParametersMap() const;
+			util::ParametersMap getBaseReservationParametersMap() const;
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Display of the content of the admin element.
-			///	@param stream Stream to write the page content on.
-			///	@param request The current request
-			///	@author Hugues Romain
-			///	@date 2012
-			void display(
+			void displayReservationForm(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				html::HTMLForm& rf,
+				const admin::AdminRequest& request
 			) const;
-
-
-			
-			//////////////////////////////////////////////////////////////////////////
-			/// Authorization check.
-			/// Returns if the page can be displayed. In most cases, the needed right
-			/// level is READ.
-			///	@param request The current request
-			///	@return bool True if the displayed page can be displayed
-			///	@author Hugues Romain
-			///	@date 2012
-			bool isAuthorized(
-				const security::User& user
-			) const;
-
-
-
-			virtual PageLinks _getCurrentTreeBranch() const;
 		};
 }	}
 
-#endif // SYNTHESE_FreeDRTBookingAdmin_H__
+#endif // SYNTHESE_BaseReservationActionAdmin_H__
+

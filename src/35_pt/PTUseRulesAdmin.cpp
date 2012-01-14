@@ -191,19 +191,15 @@ namespace synthese
 
 			PTUseRuleTableSync::SearchResult ptrules(PTUseRuleTableSync::Search(Env::GetOfficialEnv()));
 
-			BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
-			{
-				const PTUseRulesAdmin* ua(
-					dynamic_cast<const PTUseRulesAdmin*>(&currentPage)
-				);
-
-				if(ua)
+			if(	currentPage == *this ||
+				currentPage.getCurrentTreeBranch().find(*this)
+			){
+				BOOST_FOREACH(const shared_ptr<PTUseRule>& ptrule, ptrules)
 				{
 					shared_ptr<PTUseRuleAdmin> p(getNewPage<PTUseRuleAdmin>());
 					p->setRule(ptrule);
 					links.push_back(p);
-				}
-			}
+			}	}
 
 			return links;
 		}

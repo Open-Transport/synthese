@@ -127,16 +127,67 @@ namespace synthese
 			)	);
 			if(_rule->getReservationType() != PTUseRule::RESERVATION_RULE_FORBIDDEN)
 			{
-				stream << t.cell("Heure limite de réservation", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE, _rule->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(_rule->getHourDeadLine())));
-				stream << t.cell("Délai maximal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MAX_DELAY_DAYS, _rule->getMaxDelayDays() ? lexical_cast<string>(_rule->getMaxDelayDays()->days()) : string()));
-				stream << t.cell("Délai minimal en jours", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS, lexical_cast<string>(_rule->getMinDelayDays().days())));
-				stream << t.cell("Délai minimal en minutes", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES, lexical_cast<string>(_rule->getMinDelayMinutes().total_seconds() / 60)));
-				stream << t.cell("Heure au départ est la référence", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_ORIGIN_IS_REFERENCE, _rule->getOriginIsReference()));
-				stream << t.cell("Heure min de départ pour réservation le jour même", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_RESERVATION_MIN_DEPARTURE_TIME, _rule->getReservationMinDepartureTime().is_not_a_date_time() ? string() : to_simple_string(_rule->getReservationMinDepartureTime())));
-				stream << t.cell("Jours de réservation interdits (0=dimanche, 6=samedi)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_RESERVATION_FORBIDDEN_DAYS, PTUseRuleTableSync::SerializeForbiddenDays(_rule->getReservationForbiddenDays())));
+				stream <<
+					t.cell(
+						"Heure limite de réservation",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_HOUR_DEADLINE,
+							_rule->getHourDeadLine().is_not_a_date_time() ? string() : to_simple_string(_rule->getHourDeadLine())
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Délai maximal en jours",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_MAX_DELAY_DAYS,
+							_rule->getMaxDelayDays() ? lexical_cast<string>(_rule->getMaxDelayDays()->days()) : string()
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Délai minimal en jours",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_DAYS,
+							lexical_cast<string>(_rule->getMinDelayDays().days())
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Délai minimal en minutes",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_MIN_DELAY_MINUTES,
+							lexical_cast<string>(_rule->getMinDelayMinutes().total_seconds() / 60)
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Heure au départ est la référence",
+						t.getForm().getOuiNonRadioInput(
+							PTUseRuleUpdateAction::PARAMETER_ORIGIN_IS_REFERENCE,
+							_rule->getOriginIsReference()
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Heure min de départ pour réservation le jour même",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_RESERVATION_MIN_DEPARTURE_TIME,
+							_rule->getReservationMinDepartureTime().is_not_a_date_time() ?
+								string() :
+								to_simple_string(_rule->getReservationMinDepartureTime())
+					)	)
+				;
+				stream <<
+					t.cell(
+						"Jours de réservation interdits (0=dimanche, 6=samedi)",
+						t.getForm().getTextInput(
+							PTUseRuleUpdateAction::PARAMETER_RESERVATION_FORBIDDEN_DAYS,
+							PTUseRuleTableSync::SerializeForbiddenDays(_rule->getReservationForbiddenDays())
+					)	)
+				;
 			}
 			stream << t.title("Autres propriétés");
-			stream << t.cell("Capacité maximale (vide=illimité)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
+			stream << t.cell("Capacité maximale (vide=illimité, 0=interdit)", t.getForm().getTextInput(PTUseRuleUpdateAction::PARAMETER_CAPACITY, _rule->getAccessCapacity() ? lexical_cast<string>(*_rule->getAccessCapacity()) : string()));
 			stream << t.cell("Tarification principale", t.getForm().getSelectInput(PTUseRuleUpdateAction::PARAMETER_FARE_ID, FareTableSync::GetList(_getEnv()), optional<RegistryKeyType>(_rule->getDefaultFare() ? _rule->getDefaultFare()->getKey() : 0)));
 			stream << t.title("Autres propriétés");
 			stream << t.cell("Ignorer dans tableaux de départs", t.getForm().getOuiNonRadioInput(PTUseRuleUpdateAction::PARAMETER_FORBIDDEN_IN_DEPARTURE_BOARDS, _rule->getForbiddenInDepartureBoards()));

@@ -31,6 +31,7 @@
 #include "ReservationTransactionTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
+#include "UserTableSync.h"
 #include "VehicleTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "ResaModule.h"
@@ -50,6 +51,7 @@ namespace synthese
 	using namespace resa;
 	using namespace pt;
 	using namespace pt_operation;
+	using namespace security;
 
 	namespace util
 	{
@@ -76,7 +78,9 @@ namespace synthese
 		const string ReservationTableSync::COL_SEAT_NUMBER("seat_number");
 		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE("vehicle_position_id_at_departure");
 		const string ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL("vehicle_position_id_at_arrival");
-		const string ReservationTableSync::COL_CANCELLED_BY_OPERATOR("cancelled_by_operator");
+		const string ReservationTableSync::COL_CANCELLED_BY_OPERATOR = "cancelled_by_operator";
+		const string ReservationTableSync::COL_ACKNOWLEDGE_TIME = "acknowledge_time";
+		const string ReservationTableSync::COL_ACKNOWLEDGE_USER_ID = "acknowledge_user_id";
 	}
 
 	namespace db
@@ -107,11 +111,17 @@ namespace synthese
 			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE, SQL_INTEGER),
 			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL, SQL_INTEGER),
 			DBTableSync::Field(ReservationTableSync::COL_CANCELLED_BY_OPERATOR, SQL_BOOLEAN),
+			DBTableSync::Field(ReservationTableSync::COL_ACKNOWLEDGE_TIME, SQL_DATETIME),
+			DBTableSync::Field(ReservationTableSync::COL_ACKNOWLEDGE_USER_ID, SQL_INTEGER),
 			DBTableSync::Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTableSync>::_INDEXES[]=
 		{
+			DBTableSync::Index(
+				ReservationTableSync::COL_LINE_ID.c_str(),
+				ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
+			""),
 			DBTableSync::Index(
 				ReservationTableSync::COL_SERVICE_ID.c_str(),
 				ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
@@ -122,6 +132,8 @@ namespace synthese
 			""),
 			DBTableSync::Index()
 		};
+
+
 
 		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Load(
 			Reservation* object
@@ -217,6 +229,23 @@ namespace synthese
 				}
 			}
 
+			// Acknowledge time
+			object->setAcknowledgeTime(rows->getDateTime(ReservationTableSync::COL_ACKNOWLEDGE_TIME));
+
+			// Acknowledge user
+			RegistryKeyType id(rows->getLongLong(ReservationTableSync::COL_ACKNOWLEDGE_USER_ID));
+			object->setAcknowledgeUser(NULL);
+			if(	linkLevel >= UP_LINKS_LOAD_LEVEL &&
+				id
+			) try {
+				object->setAcknowledgeUser(
+					UserTableSync::GetEditable(id, env, linkLevel).get()
+				);
+			}
+			catch(ObjectNotFoundException<User>&)
+			{
+			}
+
 			// Indexation
 			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
@@ -224,6 +253,10 @@ namespace synthese
 				if(object->getTransaction() && ResaModule::MustBeIndexed(*object->getTransaction()))
 				{
 					ResaModule::AddReservationByService(*object);
+				}
+				else
+				{
+					ResaModule::RemoveReservationByService(*object);
 				}
 			}
 		}
@@ -264,6 +297,8 @@ namespace synthese
 			query.addField(object->getVehiclePositionAtDeparture() ? object->getVehiclePositionAtDeparture()->getKey() : RegistryKeyType(0));
 			query.addField(object->getVehiclePositionAtArrival() ? object->getVehiclePositionAtArrival()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCancelledByOperator());
+			query.addField(object->getAcknowledgeTime());
+			query.addField(object->getAcknowledgeUser() ? object->getAcknowledgeUser()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
 		}
 
@@ -333,7 +368,6 @@ namespace synthese
 			util::RegistryKeyType commercialLineId,
 			const date& day,
 			optional<string> serviceNumber,
-			bool hideOldServices,
 			logic::tribool cancellations,
 			bool orderByService,
 			bool raisingOrder,
@@ -344,11 +378,7 @@ namespace synthese
 			stringstream query;
 			query <<
 				" SELECT " << TABLE.NAME << ".*" <<
-				" FROM " << TABLE.NAME <<
-				" INNER JOIN " << ScheduledServiceTableSync::TABLE.NAME <<
-					" s ON s." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_SERVICE_ID <<
-				" INNER JOIN " << JourneyPatternTableSync::TABLE.NAME <<
-					" l ON l." << TABLE_COL_ID << "=s." << ScheduledServiceTableSync::COL_PATHID
+				" FROM " << TABLE.NAME
 			;
 			if(!indeterminate(cancellations))
 			{
@@ -356,7 +386,7 @@ namespace synthese
 			}
 			query <<
 				" WHERE " <<
-				"l." << JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID << "=" << commercialLineId << " AND " <<
+				TABLE.NAME << "." << COL_LINE_ID << "=" << commercialLineId << " AND " <<
 				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(day) << " 03:00' ";
 			date dayp(day);
 			dayp += days(1);
@@ -365,32 +395,17 @@ namespace synthese
 			;
 			if(serviceNumber)
 			{
-				query << " AND s." << ScheduledServiceTableSync::COL_SERVICENUMBER << "=\"" << *serviceNumber << "\"";
+				query << " AND " << TABLE.NAME << "." << COL_SERVICE_CODE << "=\"" << *serviceNumber << "\"";
 			}
 			if(!indeterminate(cancellations))
 			{
 				query << " AND t." << ReservationTransactionTableSync::COL_CANCELLATION_TIME << " IS " << (cancellations == true ? "NOT " : "") << " NULL";
 			}
 
-			if(hideOldServices)
-			{
-				ptime now(second_clock::local_time());
-				now -= hours(1);
-				time_duration snow(now.time_of_day());
-				if(snow <= time_duration(3,0,0))
-				{
-					snow += hours(24);
-				}
-				query <<
-					" AND s." << ScheduledServiceTableSync::COL_SCHEDULES << ">='00:00:00#00:" <<
-					to_simple_string(snow).substr(0, 5) << "'" ;
-			}
-
 			if(orderByService)
 			{
 				query <<
-					" ORDER BY substr(s." << ScheduledServiceTableSync::COL_SCHEDULES << ",0,17) " <<
-					(raisingOrder ? "ASC" : "DESC");
+					" ORDER BY " << TABLE.NAME << "." << COL_SERVICE_CODE << " " << (raisingOrder ? "ASC" : "DESC");
 			}
 			if (number)
 			{

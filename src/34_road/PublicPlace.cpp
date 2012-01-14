@@ -77,10 +77,10 @@ namespace synthese
 
 
 
-		boost::shared_ptr<Point> PublicPlace::getPoint() const
+		const boost::shared_ptr<Point>& PublicPlace::getPoint() const
 		{
 			/// @todo Envelope of entrances
-			return boost::shared_ptr<Point>();
+			return _point;
 		}
 
 

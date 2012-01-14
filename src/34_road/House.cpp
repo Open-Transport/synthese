@@ -77,7 +77,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<geos::geom::Point> House::getPoint() const
+		const boost::shared_ptr<geos::geom::Point>& House::getPoint() const
 		{
 			return this->getGeometry();
 		}

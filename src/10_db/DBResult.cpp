@@ -213,6 +213,10 @@ namespace synthese
 			try
 			{
 				string text(getText(name));
+				if(text.empty())
+				{
+					return ptime(not_a_date_time);
+				}
 				return time_from_string(text);
 			}
 			catch(...)

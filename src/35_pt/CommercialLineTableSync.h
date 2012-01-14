@@ -85,12 +85,14 @@ namespace synthese
 				boost::optional<util::RegistryKeyType> networkId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<std::string> name = boost::optional<std::string>(),
 				boost::optional<std::string> creatorId = boost::optional<std::string>(),
-				int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>()
-				, bool orderByNetwork = true
-				, bool orderByName = false
-				, bool raisingOrder = true,
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				bool orderByNetwork = true,
+				bool orderByName = false,
+				bool raisingOrder = true,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				boost::optional<const security::RightsOfSameClassMap&> rights = boost::optional<const security::RightsOfSameClassMap&>(),
+				security::RightLevel neededLevel = security::FORBIDDEN
 			);
 
 

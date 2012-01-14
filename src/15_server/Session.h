@@ -114,6 +114,10 @@ namespace synthese
 
 
 
+				void removeSessionIdCookie(Request &request) const;
+
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Sets a session variable content.
 				/// If the content is empty, the variable is removed.

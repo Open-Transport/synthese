@@ -33,14 +33,16 @@ namespace synthese
 
 		typedef enum
 		{
-			OPTION = 0
-			, TO_BE_DONE = 3
-			, CANCELLED = 5
-			, CANCELLED_AFTER_DELAY = 7
-			, AT_WORK = 10
-			, NO_SHOW = 15
-			, DONE = 20
-			, NO_RESERVATION = 25
+			OPTION = 0,
+			ACKNOWLEDGED_OPTION = 1,
+			TO_BE_DONE = 3,
+			ACKNOWLEDGED = 4,
+			CANCELLED = 5,
+			CANCELLED_AFTER_DELAY = 7,
+			AT_WORK = 10,
+			NO_SHOW = 15,
+			DONE = 20,
+			NO_RESERVATION = 25
 		} ReservationStatus;
 
 		/** @} */

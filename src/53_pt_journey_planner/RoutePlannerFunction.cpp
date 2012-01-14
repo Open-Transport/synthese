@@ -110,34 +110,34 @@ namespace synthese
 
 	namespace pt_journey_planner
 	{
-		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER("msn");
-		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH("md");
-		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED("apsp");
-		const string RoutePlannerFunction::PARAMETER_DAY("dy");
-		const string RoutePlannerFunction::PARAMETER_PERIOD_ID("pi");
-		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY("ac");
-		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT("dct");
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT("act");
-		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT("dpt");
-		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT("apt");
+		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
+		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH = "md";
+		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED = "apsp";
+		const string RoutePlannerFunction::PARAMETER_DAY = "dy";
+		const string RoutePlannerFunction::PARAMETER_PERIOD_ID = "pi";
+		const string RoutePlannerFunction::PARAMETER_ACCESSIBILITY = "ac";
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT = "dct";
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT = "act";
+		const string RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT = "dpt";
+		const string RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT = "apt";
 		const string RoutePlannerFunction::PARAMETER_DEPARTURE_CLASS_FILTER = "departure_class_filter";
 		const string RoutePlannerFunction::PARAMETER_ARRIVAL_CLASS_FILTER = "arrival_class_filter";
-		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID("fid");
-		const string RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME("da");
-		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME("ii");
-		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME("ha");
-		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME("ia");
-		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID("tm");
+		const string RoutePlannerFunction::PARAMETER_FAVORITE_ID = "fid";
+		const string RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME = "da";
+		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME = "ii";
+		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME = "ha";
+		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME = "ia";
+		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
 		const string RoutePlannerFunction::PARAMETER_MIN_WAITING_TIME_FILTER = "min_waiting_time_filter";
-		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION("fc");
-		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION("max_transfer_duration");
+		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION = "fc";
+		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION = "max_transfer_duration";
 		const string RoutePlannerFunction::PARAMETER_LOG_PATH = "log_path";
 
 		const string RoutePlannerFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string RoutePlannerFunction::VALUE_ADMIN_HTML = "admin";
 
-		const string RoutePlannerFunction::PARAMETER_PAGE("page");
+		const string RoutePlannerFunction::PARAMETER_PAGE = "page";
 		const string RoutePlannerFunction::PARAMETER_SCHEDULES_ROW_PAGE("schedules_row_page");
 		const string RoutePlannerFunction::PARAMETER_SCHEDULES_CELL_PAGE("schedule_cell_page");
 		const string RoutePlannerFunction::PARAMETER_LINES_ROW_PAGE("lines_row_page");
@@ -301,14 +301,20 @@ namespace synthese
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+
+			// Max transfer duration
 			if(_maxTransferDuration)
 			{
 				map.insert(PARAMETER_MAX_TRANSFER_DURATION, _maxTransferDuration->total_seconds() / 60);
 			}
+
+			// Min max duration ratio filter
 			if(_minMaxDurationRatioFilter)
 			{
 				map.insert(PARAMETER_MIN_MAX_DURATION_RATIO_FILTER, *_minMaxDurationRatioFilter);
 			}
+
+			// Warning check page
 			if(_warningCheckPage.get())
 			{
 				map.insert(PARAMETER_WARNING_CHECK_PAGE, _warningCheckPage->getKey());
@@ -318,6 +324,62 @@ namespace synthese
 			if(_logger && !_logger->getDirectory().empty())
 			{
 				map.insert(PARAMETER_LOG_PATH, _logger->getDirectory().file_string());
+			}
+
+			// Departure place
+			if(_departure_place.placeResult.value.get())
+			{
+				if(dynamic_cast<NamedPlace*>(_departure_place.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_DEPARTURE_PLACE_TEXT,
+						dynamic_cast<NamedPlace*>(_departure_place.placeResult.value.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<City*>(_departure_place.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_DEPARTURE_PLACE_TEXT,
+						dynamic_cast<City*>(_departure_place.placeResult.value.get())->getName()
+					);
+				}
+			}
+
+			// Arrival place
+			if(_arrival_place.placeResult.value.get())
+			{
+				if(dynamic_cast<NamedPlace*>(_arrival_place.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_ARRIVAL_PLACE_TEXT,
+						dynamic_cast<NamedPlace*>(_arrival_place.placeResult.value.get())->getFullName()
+					);
+				}
+				else if(dynamic_cast<City*>(_arrival_place.placeResult.value.get()))
+				{
+					map.insert(
+						PARAMETER_ARRIVAL_PLACE_TEXT,
+						dynamic_cast<City*>(_arrival_place.placeResult.value.get())->getName()
+					);
+				}
+			}
+
+			// Start Date
+			if(!_startDate.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_LOWEST_DEPARTURE_TIME, _startDate);
+			}
+
+			// End date
+			if(!_endDate.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_HIGHEST_DEPARTURE_TIME, _endDate);
+			}
+
+			// Max solutions number
+			if(	_maxSolutionsNumber)
+			{
+				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
 			}
 
 			return map;
@@ -413,21 +475,19 @@ namespace synthese
 			){
 				PlacesListService placesListService;
 				placesListService.setNumber(1);
-				stringstream fakeStream;
-				Request fakeRequest;
 
 				// Departure
 				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));
 				placesListService.setText(map.get<string>(PARAMETER_DEPARTURE_PLACE_TEXT));
 				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.run(fakeStream, fakeRequest)
+					placesListService.runWithoutOutput()
 				);
 
 				// Arrival
 				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
 				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
 				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
-					placesListService.run(fakeStream, fakeRequest)
+					placesListService.runWithoutOutput()
 				);
 			}
 
@@ -924,25 +984,25 @@ namespace synthese
 			);
 
 			// Computing
-			PTRoutePlannerResult result = r.run();
+			_result.reset(new PTRoutePlannerResult(r.run()));
 
 			if(	_planningOrder == ARRIVAL_FIRST &&
 				_maxSolutionsNumber &&
-				result.getJourneys().size() > *_maxSolutionsNumber
+				_result->getJourneys().size() > *_maxSolutionsNumber
 			){
-				result.removeFirstJourneys(result.getJourneys().size() - *_maxSolutionsNumber);
+				_result->removeFirstJourneys(_result->getJourneys().size() - *_maxSolutionsNumber);
 			}
 
 			// Min max duration filter
 			if(_minMaxDurationRatioFilter)
 			{
-				result.filterOnDurationRatio(*_minMaxDurationRatioFilter);
+				_result->filterOnDurationRatio(*_minMaxDurationRatioFilter);
 			}
 
 			// Min waiting time filter
 			if(_minWaitingTimeFilter)
 			{
-				result.filterOnWaitingTime(*_minWaitingTimeFilter);
+				_result->filterOnWaitingTime(*_minWaitingTimeFilter);
 			}
 
 			// Display
@@ -951,7 +1011,7 @@ namespace synthese
 				display(
 					stream,
 					request,
-					result,
+					*_result,
 					_startDate.date(),
 					_periodId,
 					_departure_place.placeResult.value.get(),
@@ -962,7 +1022,7 @@ namespace synthese
 			}
 			else if(_outputFormat == VALUE_ADMIN_HTML)
 			{
-				result.displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
+				_result->displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
 			}
 			else
 			{
@@ -1034,7 +1094,7 @@ namespace synthese
 					"<journeys>"
 				;
 				const PTRoutePlannerResult::PlacesListConfiguration::List& placesList(
-					result.getOrderedPlaces().getResult()
+					_result->getOrderedPlaces().getResult()
 				);
 				PlacesContentVector sheetRows(placesList.size());
 				BOOST_FOREACH(PlacesContentVector::value_type& stream, sheetRows)
@@ -1042,7 +1102,7 @@ namespace synthese
 					stream.reset(new ostringstream);
 				}
 
-				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, _result->getJourneys())
 				{
 					bool hasALineAlert(false); // Interactive
 					bool hasAStopAlert(false); // Interactive
@@ -1267,9 +1327,9 @@ namespace synthese
 												"<startAddress>";
 
 
-											if(dynamic_cast<const NamedPlace*>(result.getDeparturePlace()))
+											if(dynamic_cast<const NamedPlace*>(_result->getDeparturePlace()))
 											{
-												_XMLDisplayAddress(stream, dynamic_cast<const NamedPlace&>(*result.getDeparturePlace()),_showCoords);
+												_XMLDisplayAddress(stream, dynamic_cast<const NamedPlace&>(*_result->getDeparturePlace()),_showCoords);
 											}
 											else if(dynamic_cast<const Crossing*>(jl.begin()->getDepartureEdge()->getFromVertex()))
 											{
@@ -1544,9 +1604,9 @@ namespace synthese
 							"</startAddress>" <<
 							"<endAddress>";
 
-						if(dynamic_cast<const NamedPlace*>(result.getArrivalPlace()))
+						if(dynamic_cast<const NamedPlace*>(_result->getArrivalPlace()))
 						{
-							_XMLDisplayAddress(stream, dynamic_cast<const NamedPlace&>(*result.getArrivalPlace()),_showCoords);
+							_XMLDisplayAddress(stream, dynamic_cast<const NamedPlace&>(*_result->getArrivalPlace()),_showCoords);
 						}
 						else if(dynamic_cast<const Crossing*>((jl.end()-1)->getArrivalEdge()->getFromVertex()))
 						{
@@ -1585,7 +1645,7 @@ namespace synthese
 					stream << "<resultTable>";
 
 					PlacesContentVector::iterator itSheetRow(sheetRows.begin());
-					BOOST_FOREACH(const PTRoutePlannerResult::PlacesListConfiguration::List::value_type& row, result.getOrderedPlaces().getResult())
+					BOOST_FOREACH(const PTRoutePlannerResult::PlacesListConfiguration::List::value_type& row, _result->getOrderedPlaces().getResult())
 					{
 						assert(dynamic_cast<const NamedPlace*>(row.place));
 						//						const NamedPlace* np(dynamic_cast<const NamedPlace*>(row.place));
@@ -1617,20 +1677,6 @@ namespace synthese
 			}
 
 			return util::ParametersMap();
-		}
-
-
-
-		const optional<std::size_t>& RoutePlannerFunction::getMaxSolutions() const
-		{
-			return _maxSolutionsNumber;
-		}
-
-
-
-		void RoutePlannerFunction::setMaxSolutions(boost::optional<std::size_t> number)
-		{
-			_maxSolutionsNumber = number;
 		}
 
 
@@ -3289,5 +3335,39 @@ namespace synthese
 			}
 
 			page->display(stream, request, pm);
+		}
+
+
+
+		void RoutePlannerFunction::setDeparturePlace(
+			const boost::shared_ptr<geography::Place>& value
+		){
+			road::RoadModule::ExtendedFetchPlaceResult item;
+			if(dynamic_cast<const NamedPlace*>(value.get()))
+			{
+				item.placeResult.value = dynamic_pointer_cast<NamedPlace, Place>(value);
+			}
+			else
+			{
+				item.cityResult.value = dynamic_pointer_cast<City, Place>(value);
+			}
+			_departure_place = item;
+		}
+
+
+
+		void RoutePlannerFunction::setArrivalPlace(
+			const boost::shared_ptr<geography::Place>& value
+		){
+			road::RoadModule::ExtendedFetchPlaceResult item;
+			if(dynamic_cast<const NamedPlace*>(value.get()))
+			{
+				item.placeResult.value = dynamic_pointer_cast<NamedPlace, Place>(value);
+			}
+			else
+			{
+				item.cityResult.value = dynamic_pointer_cast<City, Place>(value);
+			}
+			_arrival_place = item;
 		}
 }	}

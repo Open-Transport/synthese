@@ -92,7 +92,7 @@ namespace synthese
 			ParametersMap values(map.getExtract(PARAMETER_VALUE_PREFIX));
 			BOOST_FOREACH(const ParametersMap::Map::value_type& element, values.getMap())
 			{
-				_values[element.first.substr(PARAMETER_VALUE_PREFIX.size())] = lexical_cast<RegistryKeyType>(element.second);
+				_values[element.first] = lexical_cast<RegistryKeyType>(element.second);
 			}
 		}
 

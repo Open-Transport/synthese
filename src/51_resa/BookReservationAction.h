@@ -26,9 +26,11 @@
 #define SYNTHESE_BookReservationAction_H__
 
 #include "Action.h"
-#include "Journey.h"
 #include "FactorableTemplate.h"
+
 #include "AccessParameters.h"
+#include "Journey.h"
+#include "RoutePlannerFunction.h"
 
 #include <boost/shared_ptr.hpp>
 #include <string>
@@ -65,22 +67,10 @@ namespace synthese
 		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m51Actions refActions
-		class BookReservationAction
-			: public util::FactorableTemplate<server::Action, BookReservationAction>
+		class BookReservationAction:
+			public util::FactorableTemplate<server::Action, BookReservationAction>
 		{
 		public:
-
-			// Accessibility
-			static const std::string PARAMETER_ACCESS_PARAMETERS;
-			static const std::string PARAMETER_APPROACH_SPEED;
-			static const std::string PARAMETER_MAX_TRANSPORT_CONNECTION;
-
-			// Journey information
-			static const std::string PARAMETER_ORIGIN_CITY;
-			static const std::string PARAMETER_ORIGIN_PLACE;
-			static const std::string PARAMETER_DESTINATION_CITY;
-			static const std::string PARAMETER_DESTINATION_PLACE;
-			static const std::string PARAMETER_DATE_TIME;
 
 			// Customer information
 			static const std::string PARAMETER_CREATE_CUSTOMER;
@@ -99,11 +89,6 @@ namespace synthese
 			// Reservation information
 			static const std::string PARAMETER_SEATS_NUMBER;
 
-			// Access parameters by site
-			static const std::string PARAMETER_SITE;
-			static const std::string PARAMETER_USER_CLASS_ID;
-			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
-
 			// Reservation by service
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_DEPARTURE_RANK;
@@ -112,10 +97,6 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
 
 		private:
-			std::string _originCity;
-			std::string _originPlace;
-			std::string _destinationCity;
-			std::string _destinationPlace;
 			void updatePlace();
 
 
@@ -138,17 +119,16 @@ namespace synthese
 				boost::posix_time::ptime _departureDateTime;
 				boost::posix_time::ptime _arrivalDateTime;
 				size_t _userClassCode;
-				boost::shared_ptr<const geography::NamedPlace> _departurePlace;
-				boost::shared_ptr<const geography::NamedPlace> _arrivalPlace;
+				boost::shared_ptr<const geography::Place> _departurePlace;
+				boost::shared_ptr<const geography::Place> _arrivalPlace;
 			//@}
 
 			//! @name Reservation of a full journey
 			//@{
+				pt_journey_planner::RoutePlannerFunction _journeyPlanner;
 				graph::Journey _journey;
 				boost::shared_ptr<const pt_website::TransportWebsite> _site;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
-				boost::shared_ptr<geography::Place> _originPlaceGeography;
-				boost::shared_ptr<geography::Place> _destinationPlaceGeography;
 			//@}
 
 
@@ -181,15 +161,7 @@ namespace synthese
 			/// @param request the request which launched the action
 			void run(server::Request& request);
 
-			//! @name Modifiers
-			//@{
-				void setOriginDestinationPlace(
-					std::string originCity,
-					std::string originPlace,
-					std::string destinationCity,
-					std::string destinationPlace
-				);
-			//@}
+
 
 			//! @name Setters
 			//@{
@@ -199,9 +171,21 @@ namespace synthese
 				void setCreateCustomer(bool value){ _createCustomer = value; }
 				void setIgnoreReservationRules(bool value){ _ignoreReservation = value; }
 				void setFreeDRTTimeSlot(boost::shared_ptr<const pt::FreeDRTTimeSlot> value){ _freeDRTTimeSlot = value; }
+				void setDeparturePlace(boost::shared_ptr<const geography::Place> value){ _departurePlace = value; }
+				void setArrivalPlace(boost::shared_ptr<const geography::Place> value){ _arrivalPlace = value; }
 			//@}
 
+			/// @name Getters
+			//@{
+				const pt_journey_planner::RoutePlannerFunction& getJourneyPlanner() const { return _journeyPlanner; }
+				pt_journey_planner::RoutePlannerFunction& getJourneyPlanner(){ return _journeyPlanner; }
+			//@}
+
+
+
 			virtual bool isAuthorized(const server::Session* session) const;
+
+
 
 			static const geography::NamedPlace* GetPlaceFromOrigin(
 				const graph::Journey& journey,

@@ -112,7 +112,7 @@ namespace synthese
 					const GraphTypes& whatToSearch
 				) const;
 
-				virtual boost::shared_ptr<geos::geom::Point> getPoint() const;
+				const virtual boost::shared_ptr<geos::geom::Point>& getPoint() const;
 
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()

@@ -294,7 +294,7 @@ namespace synthese
 				{
 					forbiddenDays << ",";
 				}
-				forbiddenDays << day;
+				forbiddenDays << int(day);
 			}
 			return forbiddenDays.str();
 		}

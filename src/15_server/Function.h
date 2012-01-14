@@ -33,7 +33,7 @@
 #include <boost/shared_ptr.hpp>
 
 ////////////////////////////////////////////////////////////////////
-/// @defgroup refFunctions Functions
+/// @defgroup refFunctions Published services
 ///	@ingroup ref
 
 namespace synthese
@@ -49,7 +49,7 @@ namespace synthese
 		class Request;
 
 		//////////////////////////////////////////////////////////////////////////
-		/// Public function abstract class to use in a Request.
+		/// Published service abstract class to use in a Request.
 		///
 		/// A public function is a feature that can be used by passing a SYNTHESE Request,
 		/// and that produces an output.
@@ -88,19 +88,18 @@ namespace synthese
 				boost::shared_ptr<util::Env> env = util::Env::GetOfficialEnvSPtr()
 			):	util::FactoryBase<Function>(),
 				_env(env)
-			{
-			}
+			{}
 
 		public:
 			//! @name Getters
 			//@{
-				boost::shared_ptr<util::Env> getEnv() const { return _env; }
+				const boost::shared_ptr<util::Env>& getEnv() const { return _env; }
 				const util::ParametersMap& getTemplateParameters() const { return _templateParameters; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setEnv(boost::shared_ptr<util::Env> value){ _env = value; }
+				void setEnv(const boost::shared_ptr<util::Env>& value){ _env = value; }
 				void setTemplateParameters(const util::ParametersMap& value){ _templateParameters = value; }
 			//@}
 
@@ -110,6 +109,7 @@ namespace synthese
 				@return The generated parameters map
 			*/
 			virtual util::ParametersMap _getParametersMap() const = 0;
+
 
 
 			/** Gets the Mime type of the data produced by the function.
@@ -135,6 +135,7 @@ namespace synthese
 			virtual void _copy(const Function& function) {}
 
 
+
 			/** Conversion from generic parameters map to attributes.
 				@param map The map to interpret (comes from _parseString())
 				@throw RequestException if a parameter is missing or has corrupted value
@@ -150,6 +151,7 @@ namespace synthese
 				The default behavior is to do nothing and continue the execution without any session.
 			*/
 			virtual bool _runBeforeDisplayIfNoSession(std::ostream& stream) { return false; }
+
 
 
 			/** Authorization control.
@@ -172,6 +174,15 @@ namespace synthese
 				std::ostream& stream,
 				const Request& request
 			) const = 0;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Runs the service without output.
+			/// @author Hugues Romain
+			/// @date 2012
+			/// @since 3.3.0
+			util::ParametersMap runWithoutOutput() const;
 		};
 }	}
 

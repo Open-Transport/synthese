@@ -148,7 +148,7 @@ TRIDENT : VertexAccess => AccesPoint
 			void insert (const Vertex* vertex, const VertexAccess& vertexAccess);
 
 
-			boost::shared_ptr<geos::geom::Point> getCentroid() const;
+			const boost::shared_ptr<geos::geom::Point>& getCentroid() const;
 
 			boost::posix_time::time_duration getMinApproachTime () const;
 

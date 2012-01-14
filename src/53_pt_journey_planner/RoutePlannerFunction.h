@@ -91,8 +91,7 @@ namespace synthese
 	{
 		class RoutePlannerInterfacePage;
 		class UserFavoriteJourney;
-		class PTRoutePlannerResult;
-
+	
 		////////////////////////////////////////////////////////////////////
 		/// 53.15 Function : public transportation route planner.
 		///	@ingroup m53Functions refFunctions
@@ -353,6 +352,10 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;
 			//@}
 
+			/// @name Result
+			//@{
+				mutable boost::shared_ptr<PTRoutePlannerResult> _result;
+			//@}
 
 		public:
 			//! @name Getters
@@ -370,11 +373,25 @@ namespace synthese
 				algorithm::PlanningOrder getPlanningOrder() const { return _planningOrder; }
 				const std::string& getOutputFormat() const { return _outputFormat; }
 				const algorithm::AlgorithmLogger& getLogger() const { return *_logger; }
+				const boost::shared_ptr<PTRoutePlannerResult>& getResult() const { return _result; }
 			//@}
 
 			//! @name Setters
 			//@{
+				void setMaxSolutions(boost::optional<std::size_t> value){ _maxSolutionsNumber = value; }
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
+				void setStartArrivalDate(const boost::posix_time::ptime& value){ _startArrivalDate = value; }
+				void setEndDepartureDate(const boost::posix_time::ptime& value){ _endDate = value; }
+				void setOriginCityText(const std::string& value){ _originCityText = value; }
+				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
+				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
+				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
+			//@}
+
+			/// @name Modifiers
+			//@{
+				void setDeparturePlace(const boost::shared_ptr<geography::Place>& value);
+				void setArrivalPlace(const boost::shared_ptr<geography::Place>& value);
 			//@}
 
 
@@ -392,6 +409,52 @@ namespace synthese
 			///	@param map Parameters map to interpret
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
 			virtual void _setFromParametersMap(const util::ParametersMap& map);
+
+
+
+			RoutePlannerFunction();
+
+
+
+			/** Action to run, defined by each subclass.
+			*/
+			virtual util::ParametersMap run(
+				std::ostream& stream,
+				const server::Request& request
+			) const;
+
+
+
+			virtual bool isAuthorized(const server::Session* session) const;
+
+
+
+			virtual std::string getOutputMimeType() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of a result on a webpage.
+			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Main-page
+			//////////////////////////////////////////////////////////////////////////
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			/// @param page page to use for display
+			/// @param request current request
+			/// @param object result to display
+			void display(
+				std::ostream& stream,
+				const server::Request& request,
+				const PTRoutePlannerResult& object,
+				const boost::gregorian::date& date,
+				size_t periodId,
+				const geography::Place* originPlace,
+				const geography::Place* destinationPlace,
+				const pt_website::HourPeriod* period,
+				const graph::AccessParameters& accessParameters
+			) const;
+
 
 		private:
 			static void _XMLDisplayConnectionPlace(
@@ -422,43 +485,8 @@ namespace synthese
 				bool showCoords
 			);
 
-		public:
-			/** Action to run, defined by each subclass.
-			*/
-			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 
-			const boost::optional<std::size_t>& getMaxSolutions() const;
-			void setMaxSolutions(boost::optional<std::size_t> number);
 
-			RoutePlannerFunction();
-
-			virtual bool isAuthorized(const server::Session* session) const;
-
-			virtual std::string getOutputMimeType() const;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Display of a result on a webpage.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Main-page
-			//////////////////////////////////////////////////////////////////////////
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			/// @param page page to use for display
-			/// @param request current request
-			/// @param object result to display
-			void display(
-				std::ostream& stream,
-				const server::Request& request,
-				const PTRoutePlannerResult& object,
-				const boost::gregorian::date& date,
-				size_t periodId,
-				const geography::Place* originPlace,
-				const geography::Place* destinationPlace,
-				const pt_website::HourPeriod* period,
-				const graph::AccessParameters& accessParameters
-			) const;
-
-		private:
 			//////////////////////////////////////////////////////////////////////////
 			/// Display a row on a web page.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Schedules-sheet-row

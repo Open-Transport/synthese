@@ -110,7 +110,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<geos::geom::Point> RoadPlace::getPoint() const
+		const boost::shared_ptr<geos::geom::Point>& RoadPlace::getPoint() const
 		{
 			if (!_isoBarycentre.get())
 			{
