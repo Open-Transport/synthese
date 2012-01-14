@@ -118,8 +118,8 @@ namespace synthese
 			/// containing the departure and arrival places with empty approach, and
 			/// other stops with non empty approach, using the road network to reach them.
 			/// @author Hugues Romain
-			graph::VertexAccessMap _extendByFreeDRT(
-				const graph::VertexAccessMap& vam,
+			void _extendByFreeDRT(
+				graph::VertexAccessMap& vam,
 				const graph::VertexAccessMap& destinationVam,
 				algorithm::PlanningPhase direction
 			) const;

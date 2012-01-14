@@ -310,8 +310,8 @@ namespace synthese
 
 			// Free DRT approach
 			{
-				ovam = _extendByFreeDRT(ovam, dvam, DEPARTURE_TO_ARRIVAL);
-				dvam = _extendByFreeDRT(ovam, dvam, ARRIVAL_TO_DEPARTURE);
+				_extendByFreeDRT(ovam, dvam, DEPARTURE_TO_ARRIVAL);
+				_extendByFreeDRT(dvam, ovam, ARRIVAL_TO_DEPARTURE);
 			}
 
 
@@ -370,14 +370,11 @@ namespace synthese
 
 
 
-		VertexAccessMap PTTimeSlotRoutePlanner::_extendByFreeDRT(
-			const graph::VertexAccessMap& vam,
-			const graph::VertexAccessMap& destinationVam,
-			algorithm::PlanningPhase direction
+		void PTTimeSlotRoutePlanner::_extendByFreeDRT(
+			VertexAccessMap& vam,
+			const VertexAccessMap& destinationVam,
+			PlanningPhase direction
 		) const	{
-
-			// Declarations
-			VertexAccessMap result;
 
 			// Loop on each stop
 			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
@@ -397,7 +394,5 @@ namespace synthese
 
 				}
 			}
-
-			return result;
 		}
 }	}
