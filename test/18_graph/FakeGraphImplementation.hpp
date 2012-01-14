@@ -44,7 +44,7 @@ namespace synthese
 			virtual bool isConnectionAllowed(const Vertex& origin, const Vertex& destination) const { return true; }
 			virtual boost::posix_time::time_duration getTransferDelay(	const Vertex& origin,const Vertex& destination	) const { return boost::posix_time::minutes(0); }
 			virtual HubScore getScore() const { return 0; }
-			virtual boost::shared_ptr<geos::geom::Point> getPoint() const { return p; }
+			virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const { return p; }
 			virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
 			virtual std::string getRuleUserName() const {return "Hub"; }
 		};
@@ -57,6 +57,21 @@ namespace synthese
 			virtual GraphIdType getGraphType() const { return 0; }
 			virtual std::string getRuleUserName() const {return "Vertex"; }
 		};
+
+
+
+		class FakePathGroup:
+			public PathGroup
+		{
+		private:
+			bool _regular;
+
+		public:
+			FakePathGroup(): PathGroup() { _regular = true; }
+			virtual bool isRegular() const { return _regular; }
+		};
+
+
 
 		class FakePath:
 			public Path
@@ -72,6 +87,8 @@ namespace synthese
 			virtual std::string getRuleUserName() const { return "Path"; }
 			virtual bool isRoad() const { return _isRoad; }
 		};
+
+
 
 		class FakeEdge:
 			public Edge
