@@ -237,7 +237,7 @@ function traiteXmlSuggestions(xmlDoc) {
       optionsListe.push(traiteXmlRoad(roads[0]));
     }
     if (addresses.length > 0) {
-        optionsListe.push(traiteXmlAddress(roads[0]));
+        optionsListe.push(traiteXmlAddress(addresses[0]));
     }
 
     // Cities
