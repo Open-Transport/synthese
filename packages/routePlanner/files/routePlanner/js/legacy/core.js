@@ -326,7 +326,7 @@ function traiteXmlRoad(road) {
 
 function traiteXmlAddress(address) {
   return [
-    address.getAttribute('key'),
+    address.getAttribute('number') + ' ' + address.getAttribute('road_name') + ' ' + address.getAttribute('road_city_name'),
     address.getAttribute('road_city_name'),
     address.getAttribute('number')+' '+address.getAttribute('road_name'),
     'address'];
