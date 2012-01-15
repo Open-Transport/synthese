@@ -23,6 +23,7 @@
 #include "Vertex.h"
 #include "Hub.h"
 #include "Path.h"
+#include "PathGroup.h"
 #include "Service.h"
 #include "Edge.h"
 
@@ -69,6 +70,7 @@ namespace synthese
 		public:
 			FakePathGroup(): PathGroup() { _regular = true; }
 			virtual bool isRegular() const { return _regular; }
+			virtual std::string getRuleUserName() const { return "FakePathGroup"; }
 		};
 
 
@@ -86,6 +88,7 @@ namespace synthese
 			virtual const RuleUser* _getParentRuleUser() const {return NULL; }
 			virtual std::string getRuleUserName() const { return "Path"; }
 			virtual bool isRoad() const { return _isRoad; }
+			void setPathGroup(FakePathGroup* value){ _pathGroup = value; }
 		};
 
 
