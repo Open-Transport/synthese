@@ -21,9 +21,11 @@
 */
 
 #include "Crossing.h"
+
+#include "AllowedUseRule.h"
+#include "ReachableFromCrossing.hpp"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
-#include "ReachableFromCrossing.hpp"
 
 using namespace std;
 using namespace boost;
@@ -56,12 +58,20 @@ namespace synthese
 			Vertex(this, geometry, withIndexation),
 			Registrable(key)
 		{
+			// Data source
 			if(source)
 			{
 				DataSourceLinks links;
 				links.insert(make_pair(source, codeBySource));
 				setDataSourceLinksWithoutRegistration(links);
 			}
+
+			// Default accessibility
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			Hub::setRules(rules);
 		}
 
 
