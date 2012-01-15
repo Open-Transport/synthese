@@ -36,11 +36,13 @@
 #include "AllowedUseRule.h"
 #include "ForbiddenUseRule.h"
 
+#include <boost/algorithm/>
 #include <boost/tokenizer.hpp>
 #include <assert.h>
 
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -111,8 +113,9 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Name
-			string name (rows->getText (StopAreaTableSync::TABLE_COL_NAME));
-			cp->setName (name);
+			string name(rows->getText(StopAreaTableSync::TABLE_COL_NAME));
+			trim(name);
+			cp->setName(name);
 			
 			// Name 13
 			string name13(rows->getText(StopAreaTableSync::COL_NAME13));

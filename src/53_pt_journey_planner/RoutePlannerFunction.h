@@ -305,14 +305,14 @@ namespace synthese
 				std::string									_destinationCityText;
 				std::string									_originPlaceText;
 				std::string									_destinationPlaceText;
+				boost::gregorian::date						_day;
+				std::size_t									_periodId;
 				boost::posix_time::ptime					_startDate;
 				boost::posix_time::ptime					_endDate;
 				boost::posix_time::ptime					_startArrivalDate;
 				boost::posix_time::ptime					_endArrivalDate;
-				algorithm::PlanningOrder					_planningOrder;
 				graph::AccessParameters						_accessParameters;
 				boost::optional<std::size_t>				_maxSolutionsNumber;
-				std::size_t									_periodId;
 				const pt_website::HourPeriod*			_period;
 				boost::shared_ptr<const UserFavoriteJourney>		_favorite;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
@@ -370,7 +370,6 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> getMaxTransferDuration() const { return _maxTransferDuration; }
 				const graph::AccessParameters& getAccessParameters() const { return _accessParameters; }
 				boost::shared_ptr<const pt_website::RollingStockFilter> getTransportModeFilter() const { return _rollingStockFilter; }
-				algorithm::PlanningOrder getPlanningOrder() const { return _planningOrder; }
 				const std::string& getOutputFormat() const { return _outputFormat; }
 				const algorithm::AlgorithmLogger& getLogger() const { return *_logger; }
 				const boost::shared_ptr<PTRoutePlannerResult>& getResult() const { return _result; }
