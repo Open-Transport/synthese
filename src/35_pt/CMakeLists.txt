@@ -222,6 +222,7 @@ RealTimeUpdateFunction.cpp
 RealTimeUpdateFunction.h
 RealTimeUpdateScreenServiceInterfacePage.cpp
 RealTimeUpdateScreenServiceInterfacePage.h
+ReservableService.hpp
 ReservationContact.cpp
 ReservationContact.h
 ReservationContactTableSync.cpp

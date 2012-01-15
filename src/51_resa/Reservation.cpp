@@ -53,7 +53,9 @@ namespace synthese
 			_vehicle(NULL),
 			_vehiclePositionAtDeparture(NULL),
 			_vehiclePositionAtArrival(NULL),
-			_cancelledByOperator(false)
+			_cancelledByOperator(false),
+			_acknowledgeTime(not_a_date_time),
+			_acknowledgeUser(NULL)
 		{}
 
 

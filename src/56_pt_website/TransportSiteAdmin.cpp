@@ -390,13 +390,13 @@ namespace synthese
 					RoadJourneyPlanner r(
 						_journeyPlanner.getDeparturePlace().placeResult.value.get(),
 						_journeyPlanner.getArrivalPlace().placeResult.value.get(),
-						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getStartDepartureDate() : _journeyPlanner.getEndArrivalDate(),
-						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getEndDepartureDate() : _journeyPlanner.getStartDepartureDate(),
-						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getStartDepartureDate() : _journeyPlanner.getEndDepartureDate(),
-						_journeyPlanner.getPlanningOrder() == DEPARTURE_FIRST ? _journeyPlanner.getEndArrivalDate() : _journeyPlanner.getStartDepartureDate(),
+						_journeyPlanner.getStartDepartureDate(),
+						_journeyPlanner.getStartDepartureDate(),
+						_journeyPlanner.getStartDepartureDate(),
+						_journeyPlanner.getStartDepartureDate() + hours(24),
 						1,
 						ap,
-						_journeyPlanner.getPlanningOrder(),
+						DEPARTURE_FIRST,
 						_journeyPlanner.getLogger()
 					);
 					RoadJourneyPlannerResult jv(r.run());
