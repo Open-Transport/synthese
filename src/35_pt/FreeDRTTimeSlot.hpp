@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_pt_FreeDRTTimeSlot_hpp__
 #define SYNTHESE_pt_FreeDRTTimeSlot_hpp__
 
+#include "ReservableService.hpp"
+
 #include "Registrable.h"
 #include "Registry.h"
 #include "NonPermanentService.h"
@@ -52,7 +54,8 @@ namespace synthese
 		///	@ingroup m35
 		class FreeDRTTimeSlot:
 			public virtual util::Registrable,
-			public NonPermanentService
+			public NonPermanentService,
+			public ReservableService
 		{
 		public:
 			/// Chosen registry class.
@@ -183,6 +186,16 @@ namespace synthese
 				virtual boost::posix_time::time_duration getArrivalEndScheduleToIndex(bool RTData, std::size_t rankInPath) const;
 
 
+
+				virtual graph::UseRule::ReservationAvailabilityType getReservationAbility(
+					const boost::gregorian::date& date,
+					std::size_t userClassRank
+				) const;
+
+				virtual boost::posix_time::ptime getReservationDeadLine(
+					const boost::gregorian::date& date,
+					std::size_t userClassRank
+				) const;
 			//@}
 		};
 }	}
