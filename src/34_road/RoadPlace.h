@@ -139,8 +139,7 @@ namespace synthese
 			//@{
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_RoadPlace_h__
 

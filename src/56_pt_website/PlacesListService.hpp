@@ -260,7 +260,8 @@ namespace synthese
 					// Business object export and registration
 					_attemptToRead<T, geography::City>(*item.value, pm, map, DATA_CITY);
 					_attemptToRead<T, pt::StopArea>(*item.value, pm, map, DATA_STOP);
-					_attemptToRead<T, road::RoadPlace>(*item.value, pm, map, DATA_ROAD); // Todo address
+					_attemptToRead<T, road::RoadPlace>(*item.value, pm, map, DATA_ROAD);
+					_attemptToRead<T, road::House>(*item.value, pm, map, DATA_ADDRESS);
 					_attemptToRead<T, road::PublicPlace>(*item.value, pm, map, DATA_STOP);
 
 					if(_number)

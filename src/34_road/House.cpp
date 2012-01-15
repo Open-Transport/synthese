@@ -46,6 +46,13 @@ namespace synthese
 
 	namespace road
 	{
+		const std::string House::DATA_ROAD_PREFIX = "road_";
+		const std::string House::DATA_NUMBER = "number";
+		const std::string House::DATA_X = "x";
+		const std::string House::DATA_Y = "y";
+
+
+
 		House::House(
 			MainRoadChunk& chunk,
 			MainRoadChunk::HouseNumber houseNumber,
@@ -127,5 +134,36 @@ namespace synthese
 		{
 			return text;
 		}
-	}
-}
+
+
+
+		void House::toParametersMap(
+			util::ParametersMap& pm,
+			const std::string& prefix
+		) const	{
+
+			// Road place informations
+			getRoadChunk()->getRoad()->getRoadPlace()->toParametersMap(pm, DATA_ROAD_PREFIX);
+
+			// Number
+			if(getHouseNumber())
+			{
+				pm.insert(DATA_NUMBER, *getHouseNumber());
+			}
+
+			// Location
+			if(getGeometry().get())
+			{
+				pm.insert(DATA_X, getGeometry()->getX());
+				pm.insert(DATA_Y, getGeometry()->getY());
+			}
+		}
+
+
+
+		void House::toParametersMap( util::ParametersMap& pm ) const
+		{
+			string emptyPrefix;
+			toParametersMap(pm, emptyPrefix);
+		}
+}	}
