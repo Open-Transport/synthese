@@ -376,6 +376,18 @@ namespace synthese
 				map.insert(PARAMETER_HIGHEST_DEPARTURE_TIME, _endDate);
 			}
 
+			// Start Arrival Date
+			if(!_startArrivalDate.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_LOWEST_ARRIVAL_TIME, _startArrivalDate);
+			}
+
+			// End Arrival date
+			if(!_endArrivalDate.is_not_a_date_time())
+			{
+				map.insert(PARAMETER_HIGHEST_ARRIVAL_TIME, _endArrivalDate);
+			}
+
 			// Max solutions number
 			if(	_maxSolutionsNumber)
 			{
@@ -491,101 +503,54 @@ namespace synthese
 				);
 			}
 
+			// Date parameters
 			try
 			{
-				// Date
+				// 1a : by day and time period
 				if(!map.getDefault<string>(PARAMETER_DAY).empty())
-				{ // 1a
-					date day(from_string(map.get<string>(PARAMETER_DAY)));
-
-					_planningOrder = DEPARTURE_FIRST;
-
-					// Period
-					if(site)
+				{
+					// Site check
+					if(!site)
 					{
-						_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-						if (_periodId >= site->getPeriods().size())
-						{
-							throw RequestException("Bad value for period id");
-						}
-						_period = &site->getPeriods().at(_periodId);
+						throw RequestException("A site must be defined to use this date specification method.");
 					}
 
-					_startDate = ptime(day, time_duration(0, 0, 0));
-					_endDate = _startDate;
-					if(site)
+					// Day
+					_day = from_string(map.get<string>(PARAMETER_DAY));
+
+					// Time period
+					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
+					if (_periodId >= site->getPeriods().size())
 					{
-						site->applyPeriod(*_period, _startDate, _endDate);
+						throw RequestException("Bad value for period id");
 					}
-					_startArrivalDate = _startDate;
-					_endArrivalDate = _endDate;
-					if(	_departure_place.placeResult.value &&
-						_arrival_place.placeResult.value &&
-						_departure_place.placeResult.value->getPoint().get() &&
-						_arrival_place.placeResult.value->getPoint().get() &&
-						!_departure_place.placeResult.value->getPoint()->isEmpty() &&
-						!_arrival_place.placeResult.value->getPoint()->isEmpty()
-					){
-						_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
-					}
+					_period = &site->getPeriods().at(_periodId);
 				}
+				// 1abcde : optional bounds specification
 				else
-				{ // 1b
-					if(	!map.getOptional<string>(PARAMETER_HIGHEST_ARRIVAL_TIME)
-					){ // All default values
-						_planningOrder = DEPARTURE_FIRST;
-						if(!map.getDefault<string>(PARAMETER_LOWEST_DEPARTURE_TIME).empty())
-						{
-							_startDate = time_from_string(map.get<string>(PARAMETER_LOWEST_DEPARTURE_TIME));
-						}
-						else
-						{
-							_startDate = ptime(second_clock::local_time());
-						}
-						_startArrivalDate = _startDate;
-						if(!map.getDefault<string>(PARAMETER_HIGHEST_DEPARTURE_TIME).empty())
-						{
-							_endDate = time_from_string(map.get<string>(PARAMETER_HIGHEST_DEPARTURE_TIME));
-						}
-						else
-						{
-							_endDate = _startDate;
-							_endDate += days(1);
-						}
-						_endArrivalDate = _endDate;
-						if(	_departure_place.placeResult.value &&
-							_arrival_place.placeResult.value &&
-							_departure_place.placeResult.value->getPoint().get() &&
-							_arrival_place.placeResult.value->getPoint() &&
-							!_departure_place.placeResult.value->getPoint()->isEmpty() &&
-							!_arrival_place.placeResult.value->getPoint()->isEmpty()
-						){
-							_endArrivalDate += minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
-						}
+				{
+					// Lowest departure time
+					if(!map.getDefault<string>(PARAMETER_LOWEST_DEPARTURE_TIME).empty())
+					{
+						_startDate = time_from_string(map.get<string>(PARAMETER_LOWEST_DEPARTURE_TIME));
 					}
-					else if(!map.getOptional<string>(PARAMETER_LOWEST_DEPARTURE_TIME))
-					{ // Arrival to departure from the specified arrival time
-						_planningOrder = ARRIVAL_FIRST;
+
+					// Highest departure time
+					if(!map.getDefault<string>(PARAMETER_HIGHEST_DEPARTURE_TIME).empty())
+					{
+						_endDate = time_from_string(map.get<string>(PARAMETER_HIGHEST_DEPARTURE_TIME));
+					}
+
+					// Lowest arrival time
+					if(!map.getDefault<string>(PARAMETER_LOWEST_ARRIVAL_TIME).empty())
+					{
+						_startArrivalDate = time_from_string(map.get<string>(PARAMETER_LOWEST_ARRIVAL_TIME));
+					}
+
+					// Highest departure time
+					if(!map.getDefault<string>(PARAMETER_HIGHEST_ARRIVAL_TIME).empty())
+					{
 						_endArrivalDate = time_from_string(map.get<string>(PARAMETER_HIGHEST_ARRIVAL_TIME));
-						if(!map.getDefault<string>(PARAMETER_LOWEST_ARRIVAL_TIME).empty())
-						{
-							_startArrivalDate = time_from_string(map.get<string>(PARAMETER_LOWEST_ARRIVAL_TIME));
-						}
-						else
-						{
-							_startArrivalDate = _endArrivalDate;
-							_startArrivalDate -= days(1);
-						}
-						_startDate = _startArrivalDate;
-						if(	_departure_place.placeResult.value &&
-							_arrival_place.placeResult.value &&
-							_departure_place.placeResult.value->getPoint().get() &&
-							_arrival_place.placeResult.value->getPoint().get() &&
-							!_departure_place.placeResult.value->getPoint()->isEmpty() &&
-							!_arrival_place.placeResult.value->getPoint()->isEmpty()
-						){
-							_startDate -= minutes(2 * static_cast<int>(_departure_place.placeResult.value->getPoint()->distance(_arrival_place.placeResult.value->getPoint().get()) / 1000));
-						}
 					}
 				}
 			}
@@ -954,30 +919,115 @@ namespace synthese
 			ostream& stream,
 			const Request& request
 		) const	{
+
+			// Checks if there is something to plan
 			if (!_departure_place.placeResult.value || !_arrival_place.placeResult.value)
 			{
 				return ParametersMap();
 			}
 
-			ptime startDate(_planningOrder == DEPARTURE_FIRST ? _startDate : _endArrivalDate);
-			if(_planningOrder == ARRIVAL_FIRST)
-			{
-				startDate = ptime(startDate.date(), hours(3));
+			// Declarations
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// Time bounds generation
+
+			// Declarations
+			ptime startDate;
+			ptime endDate;
+			ptime startArrivalDate;
+			ptime endArrivalDate;
+			PlanningOrder planningOrder(DEPARTURE_FIRST);
+
+			// Max run time for bounds extension
+			time_duration maxRunTime(minutes(0));
+			if(	_departure_place.placeResult.value &&
+				_arrival_place.placeResult.value &&
+				_departure_place.placeResult.value->getPoint().get() &&
+				_arrival_place.placeResult.value->getPoint().get() &&
+				!_departure_place.placeResult.value->getPoint()->isEmpty() &&
+				!_arrival_place.placeResult.value->getPoint()->isEmpty()
+			){
+				maxRunTime = minutes(
+					2 * static_cast<int>(
+						_departure_place.placeResult.value->getPoint()->distance(
+							_arrival_place.placeResult.value->getPoint().get()
+						) / 1000
+				)	);
 			}
-			ptime endDate(_planningOrder == DEPARTURE_FIRST ? _endDate : _endArrivalDate);
+
+			// 1a Day and period
+			if(!_day.is_not_a_date())
+			{
+				startDate = ptime(_day, time_duration(0, 0, 0));
+				endDate = startDate;
+				site->applyPeriod(*_period, startDate, endDate);
+				
+				startArrivalDate = startDate;
+				endArrivalDate = endDate + maxRunTime;
+			}
+			// 1d : full bounds specification
+			else if(
+				!_startDate.is_not_a_date_time() &&
+				!_endArrivalDate.is_not_a_date_time()
+			){
+				startDate = _startDate;
+				endDate = _endDate.is_not_a_date_time() ?
+					_endArrivalDate - maxRunTime :
+					_endDate;
+				endArrivalDate = _endArrivalDate;
+				startArrivalDate = _startArrivalDate.is_not_a_date_time() ?
+					_startDate :
+					_startArrivalDate;
+			}
+			// 1b : departure date(s) only
+			else if(
+				!_startDate.is_not_a_date_time()
+			){
+				startDate = _startDate;
+				endDate = _endDate.is_not_a_date_time() ?
+					_startDate + hours(24) :
+					_endDate;
+				endArrivalDate = endDate + maxRunTime;
+				startArrivalDate = _startDate;
+			}
+			// 1c : arrival date(s) only
+			else if(
+				!_endArrivalDate.is_not_a_date_time()
+			){
+				endArrivalDate = _endArrivalDate;
+				startArrivalDate = _startArrivalDate.is_not_a_date_time() ?
+					_endArrivalDate - hours(24) :
+					_startArrivalDate;
+				endDate = _endArrivalDate;
+				startDate = startArrivalDate - maxRunTime;
+				planningOrder = ARRIVAL_FIRST;
+			}
+			// 1e : full default values
+			else
+			{
+				startDate = second_clock::local_time();
+				endDate = startDate + hours(24);
+				startArrivalDate = startDate;
+				endArrivalDate = endDate + maxRunTime;
+			}
 
 
-			// Initialisation
+			//////////////////////////////////////////////////////////////////////////
+			// Journey planning
+
+			// Initialization
 			PTTimeSlotRoutePlanner r(
 				_departure_place.placeResult.value.get(),
 				_arrival_place.placeResult.value.get(),
 				startDate,
 				endDate,
-				_planningOrder == DEPARTURE_FIRST ? _startArrivalDate : startDate,
-				_endArrivalDate,
-				_planningOrder == DEPARTURE_FIRST ? _maxSolutionsNumber : optional<size_t>(),
+				startArrivalDate,
+				endArrivalDate,
+				_maxSolutionsNumber,
 				_accessParameters,
-				DEPARTURE_FIRST,
+				planningOrder,
 				false,
 				*_logger,
 				_maxTransferDuration
@@ -985,13 +1035,6 @@ namespace synthese
 
 			// Computing
 			_result.reset(new PTRoutePlannerResult(r.run()));
-
-			if(	_planningOrder == ARRIVAL_FIRST &&
-				_maxSolutionsNumber &&
-				_result->getJourneys().size() > *_maxSolutionsNumber
-			){
-				_result->removeFirstJourneys(_result->getJourneys().size() - *_maxSolutionsNumber);
-			}
 
 			// Min max duration filter
 			if(_minMaxDurationRatioFilter)
@@ -1005,7 +1048,11 @@ namespace synthese
 				_result->filterOnWaitingTime(*_minWaitingTimeFilter);
 			}
 
+
+			//////////////////////////////////////////////////////////////////////////
 			// Display
+
+			// CMS display
 			if(_page.get())
 			{
 				display(
@@ -2070,7 +2117,7 @@ namespace synthese
 								curET.getDepartureDateTime().time_of_day(),
 								lastDateTime.time_of_day(),
 								it->getContinuousServiceRange().total_seconds() > 0,
-								itPlaces->isOrigin,
+								itPlaces->isOrigin && itl == jl.begin(),
 								true,
 								pedestrianMode && !lastPedestrianMode,
 								itPlaces->isOrigin,
@@ -2123,7 +2170,7 @@ namespace synthese
 								lastDateTime.time_of_day(),
 								it->getContinuousServiceRange().total_seconds() > 0,
 								true,
-								itPlaces->isDestination,
+								itPlaces->isDestination && itl+1 == jl.end(),
 								false,
 								itPlaces->isOrigin,
 								itPlaces->isDestination
