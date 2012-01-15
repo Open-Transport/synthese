@@ -36,7 +36,7 @@
 #include "AllowedUseRule.h"
 #include "ForbiddenUseRule.h"
 
-#include <boost/algorithm/>
+#include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 #include <assert.h>
 
