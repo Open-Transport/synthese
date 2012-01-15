@@ -148,7 +148,7 @@ namespace synthese
 			// Number
 			if(getHouseNumber())
 			{
-				pm.insert(DATA_NUMBER, *getHouseNumber());
+				pm.insert(DATA_NUMBER, lexical_cast<string>(*getHouseNumber()));
 			}
 
 			// Location
