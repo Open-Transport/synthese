@@ -34,8 +34,11 @@
 #include "RoadModule.h"
 #include "RoadPlace.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
+using namespace boost::algorithm;
 
 namespace synthese
 {
@@ -90,7 +93,10 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			// Name
-			object->setName(rows->getText(RoadPlaceTableSync::COL_NAME));
+			object->setName(
+				trim_copy(
+					rows->getText(RoadPlaceTableSync::COL_NAME)
+			)	);
 
 			// City
 			object->setCity(NULL);
