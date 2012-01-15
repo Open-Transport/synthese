@@ -158,10 +158,10 @@ namespace synthese
 				// Left last number
 				stream << t.col();
 				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getLeftHouseNumberBounds()
+					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getLeftHouseNumberBounds()->second
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getLeftHouseNumberBounds()->second
 					;
 				}
 
@@ -178,10 +178,10 @@ namespace synthese
 				// Left last number
 				stream << t.col();
 				if( mainRoad->getEdges().size() > 1 &&
-					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getRightHouseNumberBounds()
+					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()
 				){
 					stream <<
-						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getRightHouseNumberBounds()->second
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge()->getPrevious())->getRightHouseNumberBounds()->second
 					;
 				}
 
