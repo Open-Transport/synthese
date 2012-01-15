@@ -159,16 +159,24 @@ namespace synthese
 					stream << "Intersection de routes";
 
 					stream << t.col();
-					set<const Road*> roads;
+					set<const MainRoadPart*> roads;
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getDepartureEdges())
 					{
-						roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
+						if(!dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()))
+						{
+							continue;
+						}
+						roads.insert(dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()));
 					}
 					BOOST_FOREACH(const Vertex::Edges::value_type& edge, crossing.getArrivalEdges())
 					{
-						roads.insert(dynamic_cast<const Road*>(edge.second->getParentPath()));
+						if(!dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()))
+						{
+							continue;
+						}
+						roads.insert(dynamic_cast<const MainRoadPart*>(edge.second->getParentPath()));
 					}
-					BOOST_FOREACH(const Road* road, roads)
+					BOOST_FOREACH(const MainRoadPart* road, roads)
 					{
 						if(road->getKey() <= 0 || road == _road.get()) continue;
 						openRoadRequest.getPage()->setRoad(Env::GetOfficialEnv().getSPtr(road));

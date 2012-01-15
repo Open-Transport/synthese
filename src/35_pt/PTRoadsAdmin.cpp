@@ -23,7 +23,9 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTRoadsAdmin.h"
+
 #include "AdminParametersException.h"
+#include "MainRoadChunk.hpp"
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
@@ -115,30 +117,84 @@ namespace synthese
 			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
 
 			HTMLTable::ColsVector c;
-			c.push_back("Début");
-			c.push_back("Fin");
+			c.push_back(string());
+			c.push_back("Gauche");
+			c.push_back("Gauche");
+			c.push_back("Droite");
+			c.push_back("Droite");
 			c.push_back("Longueur");
-			c.push_back("Actions");
+			c.push_back(string());
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 			stream << t.open();
 			BOOST_FOREACH(Path* road, _roadPlace->getPaths())
 			{
-				if(!dynamic_cast<MainRoadPart*>(road))
+				// Avoid auto generated objects
+				MainRoadPart* mainRoad(dynamic_cast<MainRoadPart*>(road));
+				if(!mainRoad)
 				{
 					continue;
 				}
 
-				openRoadRequest.getPage()->setRoad(
-					Env::GetOfficialEnv().getSPtr(static_cast<MainRoadPart*>(road))
-				);
-
+				// New row
 				stream << t.row();
-				stream << t.col();
 
+				// Open button
 				stream << t.col();
-				stream << t.col();
-				stream << t.col();
+				openRoadRequest.getPage()->setRoad(
+					Env::GetOfficialEnv().getSPtr(mainRoad)
+				);
 				stream << HTMLModule::getLinkButton(openRoadRequest.getURL(), "Ouvrir", string(), PTRoadAdmin::ICON);
+
+				// Left first number
+				stream << t.col();
+				if( !mainRoad->getEdges().empty() &&
+					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()
+				){
+					stream <<
+						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getLeftHouseNumberBounds()->first
+					;
+				}
+
+				// Left last number
+				stream << t.col();
+				if( mainRoad->getEdges().size() > 1 &&
+					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getLeftHouseNumberBounds()
+				){
+					stream <<
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getLeftHouseNumberBounds()->second
+					;
+				}
+
+				// Right first number
+				stream << t.col();
+				if( !mainRoad->getEdges().empty() &&
+					static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()
+				){
+					stream <<
+						static_cast<const MainRoadChunk*>(mainRoad->getEdge(0))->getRightHouseNumberBounds()->first
+					;
+				}
+
+				// Left last number
+				stream << t.col();
+				if( mainRoad->getEdges().size() > 1 &&
+					static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getRightHouseNumberBounds()
+				){
+					stream <<
+						static_cast<const MainRoadChunk*>(mainRoad->getLastEdge())->getRightHouseNumberBounds()->second
+					;
+				}
+
+				// Length
+				stream << t.col();
+				if( !mainRoad->getEdges().empty())
+				{
+					stream << mainRoad->getLastEdge()->getMetricOffset() - mainRoad->getEdge(0)->getMetricOffset();
+				}
+
+				// Delete
+				stream << t.col();
+				/// TODO
 			}
 			stream << t.close();
 		}

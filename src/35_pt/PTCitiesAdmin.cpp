@@ -30,6 +30,7 @@
 #include "CityAddAction.h"
 #include "FrenchSentence.h"
 #include "GeographyModule.h"
+#include "House.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -330,6 +331,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			// Road places
+			if(pm.hasSubMaps(PlacesListService::DATA_ROADS))
 			{
 				stream << "<h1>Rues</h1>";
 
@@ -374,6 +376,65 @@ namespace synthese
 						// Key
 						stream << t.col() << item->get<string>(City::DATA_CITY_NAME);
 						stream << t.col() << item->get<string>(RoadPlace::DATA_NAME);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+				}	}
+
+				// Table and form closing
+				stream << t.close();
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// Addresses
+			if(pm.hasSubMaps(PlacesListService::DATA_ADDRESSES))
+			{
+				stream << "<h1>Rues</h1>";
+
+				// Requests
+				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
+				
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Localité");
+				c.push_back("Rue");
+				c.push_back("Numéro");
+				c.push_back("Phonétique");
+				c.push_back("Score");
+				c.push_back("Levenshtein");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				const ParametersMap& roadsPM(
+					**pm.getSubMaps(PlacesListService::DATA_ADDRESSES).begin()
+				);
+				if(roadsPM.hasSubMaps(PlacesListService::DATA_ADDRESS))
+				{
+					BOOST_FOREACH(
+						shared_ptr<ParametersMap> item,
+						roadsPM.getSubMaps(PlacesListService::DATA_ADDRESS)
+					){
+						stream << t.row();
+
+						// Open button
+						openRoadRequest.getPage()->setRoadPlace(
+							Env::GetOfficialEnv().get<RoadPlace>(
+								item->get<RegistryKeyType>(House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID)
+						)	);
+						stream << t.col() <<
+							HTMLModule::getLinkButton(
+								openRoadRequest.getURL(),
+								"Ouvrir",
+								string(),
+								PTRoadsAdmin::ICON
+							)
+						;
+
+						// Key
+						stream << t.col() << item->get<string>(House::DATA_ROAD_PREFIX + City::DATA_CITY_NAME);
+						stream << t.col() << item->get<string>(House::DATA_ROAD_PREFIX + RoadPlace::DATA_NAME);
+						stream << t.col() << item->get<string>(House::DATA_NUMBER);
 						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
 						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
 						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
