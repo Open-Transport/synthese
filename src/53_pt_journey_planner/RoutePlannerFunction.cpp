@@ -1059,7 +1059,7 @@ namespace synthese
 					stream,
 					request,
 					*_result,
-					_startDate.date(),
+					startDate.date(),
 					_periodId,
 					_departure_place.placeResult.value.get(),
 					_arrival_place.placeResult.value.get(),
@@ -1103,7 +1103,7 @@ namespace synthese
 				{
 					stream <<
 						"<timePeriod id=\"" << _periodId << "\" date=\"" <<
-						to_iso_extended_string(_startDate.date()) << "\" name=\"" <<
+						to_iso_extended_string(startDate.date()) << "\" name=\"" <<
 						_period->getCaption() << "\" />"
 					;
 				}
