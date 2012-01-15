@@ -226,6 +226,7 @@ function traiteXmlSuggestions(xmlDoc) {
     var cities = bestPlaceNode.getElementsByTagName('city');
     var stops = bestPlaceNode.getElementsByTagName('stop');
     var roads = bestPlaceNode.getElementsByTagName('road');
+    var addresses = bestPlaceNode.getElementsByTagName('address');
     if (cities.length > 0) {
       optionsListe.push(traiteXmlCity(cities[0]));
     }
@@ -235,35 +236,58 @@ function traiteXmlSuggestions(xmlDoc) {
     if (roads.length > 0) {
       optionsListe.push(traiteXmlRoad(roads[0]));
     }
+    if (addresses.length > 0) {
+        optionsListe.push(traiteXmlAddress(roads[0]));
+    }
+
     // Cities
     var citiesNode = xmlDoc.getElementsByTagName('cities')[0];
-    var cities = citiesNode.getElementsByTagName('city');
-    if (cities.length > 0) {
-      optionsListe.push(['Communes : ', '', '', null]);
-    }
-    for (var i = 0; i < cities.length; ++i) {
-      optionsListe.push(traiteXmlCity(cities[i]));
+    if(citiesNode) {
+        var cities = citiesNode.getElementsByTagName('city');
+        if (cities.length > 0) {
+            optionsListe.push(['Communes : ', '', '', null]);
+        }
+        for (var i = 0; i < cities.length; ++i) {
+            optionsListe.push(traiteXmlCity(cities[i]));
+        }
     }
     
     // Stops
     var stopsNode = xmlDoc.getElementsByTagName('stops')[0];
-    var stops = stopsNode.getElementsByTagName('stop');
-    if (stops.length > 0) {
-      optionsListe.push(['Arrêts : ', '', '', null]);
-    }
-    for (var i = 0; i < stops.length; ++i) {
-      optionsListe.push(traiteXmlStop(stops[i]));
+    if(stopsNode) {
+        var stops = stopsNode.getElementsByTagName('stop');
+        if (stops.length > 0) {
+            optionsListe.push(['Arrêts : ', '', '', null]);
+        }
+        for (var i = 0; i < stops.length; ++i) {
+            optionsListe.push(traiteXmlStop(stops[i]));
+        }
     }
     
     // Roads
     var roadsNode = xmlDoc.getElementsByTagName('roads')[0];
-    var roads = roadsNode.getElementsByTagName('road');
-    if (roads.length > 0) {
-      optionsListe.push(['Rues : ', '', '', null]);
+    if(roadsNode) {
+        var roads = roadsNode.getElementsByTagName('road');
+        if (roads.length > 0) {
+            optionsListe.push(['Rues : ', '', '', null]);
+        }
+        for (var i = 0; i < roads.length; ++i) {
+            optionsListe.push(traiteXmlRoad(roads[i]));
+        }
     }
-    for (var i = 0; i < roads.length; ++i) {
-      optionsListe.push(traiteXmlRoad(roads[i]));
+
+    // Addresses
+    var addressesNode = xmlDoc.getElementsByTagName('addresses')[0];
+    if(addressesNode) {
+        var addresses = addressesNode.getElementsByTagName('address');
+        if (addresses.length > 0) {
+            optionsListe.push(['Adresses : ', '', '', null]);
+        }
+        for (var i = 0; i < addresses.length; ++i) {
+            optionsListe.push(traiteXmlAddress(addresses[i]));
+        }
     }
+    
   } else {
     var options = xmlDoc.getElementsByTagName('option');
     for (var i = 0; i < options.length; ++i) {
@@ -298,6 +322,14 @@ function traiteXmlRoad(road) {
     road.getAttribute('city_name'),
     road.getAttribute('name'),
     'road'];
+}
+
+function traiteXmlAddress(address) {
+  return [
+    address.getAttribute('key'),
+    address.getAttribute('road_city_name'),
+    address.getAttribute('number')+' '+address.getAttribute('road_name'),
+    'address'];
 }
 
 function initStyle() {
