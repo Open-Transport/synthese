@@ -41,8 +41,9 @@ namespace synthese
 
 	namespace road
 	{
-		class RoadPlace;
+		class House;
 		class PublicPlace;
+		class RoadPlace;
 	}
 
 	namespace pt_website
