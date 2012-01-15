@@ -390,7 +390,7 @@ namespace synthese
 			// Addresses
 			if(pm.hasSubMaps(PlacesListService::DATA_ADDRESSES))
 			{
-				stream << "<h1>Rues</h1>";
+				stream << "<h1>Adresses</h1>";
 
 				// Requests
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
