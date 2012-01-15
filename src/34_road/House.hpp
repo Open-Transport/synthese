@@ -50,6 +50,11 @@ namespace synthese
 			public impex::ImportableTemplate<House>
 		{
 		public:
+			static const std::string DATA_ROAD_PREFIX;
+			static const std::string DATA_NUMBER;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
+
 			typedef util::Registry<House>	Registry;
 
 			//////////////////////////////////////////////////////////////////////////
@@ -120,9 +125,25 @@ namespace synthese
 				virtual std::string getNameForAllPlacesMatcher(
 					std::string text = std::string()
 				) const;
+
+				
+			
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of house into parameters map.
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const std::string& prefix
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of house into parameters map.
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_road_House_hpp__

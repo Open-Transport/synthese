@@ -26,6 +26,7 @@
 
 #include "City.h"
 #include "GeographyModule.h"
+#include "House.hpp"
 #include "HTMLTable.h"
 #include "PTModule.h"
 #include "PublicPlace.h"
@@ -277,16 +278,73 @@ namespace synthese
 
 					// Roads
 					if(_classFilter.empty() || _classFilter == DATA_ROAD)
-					{ /// TODO catch addresses
-						shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<NamedPlace>(
-							*pm,
-							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
-								_text,
-								_number ? *_number : 0,
-								_minScore
-						)	);
-						result.insert(DATA_ROADS, pm);
+					{
+						bool done(false);
+						vector<string> words;
+						split(words, _text, is_any_of(", "));
+						if(words.size() > 1)
+						{	// Text points to an address
+							try
+							{
+								MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
+
+								string roadName(_text.substr(words[0].size() + 1));
+
+								City::PlacesMatcher::MatchResult places(
+									_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+										roadName,
+										_number ? *_number : 0,
+										_minScore
+								)	);
+
+								// Transformation into house places list
+								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+								BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
+								{
+									const RoadPlace& roadPlace(
+										dynamic_cast<const RoadPlace&>(*place.value)
+									);
+
+									shared_ptr<House> house(roadPlace.getHouse(number));
+
+									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+									houseResult.key = place.key;
+									houseResult.score = place.score;
+									houseResult.value = house.get() ?
+										dynamic_pointer_cast<NamedPlace, House>(house) :
+										place.value
+									;
+
+									newList.push_back(houseResult);
+								}
+
+								// Registration
+								shared_ptr<ParametersMap> pm(new ParametersMap);
+								_registerItems<NamedPlace>(
+									*pm,
+									newList
+								);
+								result.insert(DATA_ADDRESSES, pm);
+								done = true;
+							}
+							catch (bad_lexical_cast)
+							{
+							}
+						}
+
+						// Roads if not address
+						if(!done)
+						{
+							shared_ptr<ParametersMap> pm(new ParametersMap);
+							_registerItems<NamedPlace>(
+								*pm,
+								_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+									_text,
+									_number ? *_number : 0,
+									_minScore
+							)	);
+							result.insert(DATA_ROADS, pm);
+						}
 					}
 
 					// Public places
@@ -339,16 +397,73 @@ namespace synthese
 
 					// Roads
 					if(_classFilter.empty() || _classFilter == DATA_ROAD)
-					{ /// TODO catch addresses
-						shared_ptr<ParametersMap> pm(new ParametersMap);
-						_registerItems<RoadPlace>(
-							*pm,
-							RoadModule::GetGeneralRoadsMatcher().bestMatches(
-								_text,
-								_number ? *_number : 0,
-								_minScore
-						)	);
-						result.insert(DATA_ROADS, pm);
+					{
+						bool done(false);
+						vector<string> words;
+						split(words, _text, is_any_of(", "));
+						if(words.size() > 1)
+						{	// Text points to an address
+							try
+							{
+								MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
+
+								string roadName(_text.substr(words[0].size() + 1));
+
+								RoadModule::GeneralRoadsMatcher::MatchResult places(
+									RoadModule::GetGeneralRoadsMatcher().bestMatches(
+										roadName,
+										_number ? *_number : 0,
+										_minScore
+								)	);
+
+								// Transformation into house places list
+								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+								BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& place, places)
+								{
+									const RoadPlace& roadPlace(
+										dynamic_cast<const RoadPlace&>(*place.value)
+									);
+
+									shared_ptr<House> house(roadPlace.getHouse(number));
+
+									LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+									houseResult.key = place.key;
+									houseResult.score = place.score;
+									houseResult.value = house.get() ?
+										dynamic_pointer_cast<NamedPlace, House>(house) :
+										place.value
+									;
+
+									newList.push_back(houseResult);
+								}
+
+								// Registration
+								shared_ptr<ParametersMap> pm(new ParametersMap);
+								_registerItems<NamedPlace>(
+									*pm,
+									newList
+								);
+								result.insert(DATA_ADDRESSES, pm);
+								done = true;
+							}
+							catch (bad_lexical_cast)
+							{
+							}
+						}
+
+						// Roads if not address
+						if(!done)
+						{
+							shared_ptr<ParametersMap> pm(new ParametersMap);
+							_registerItems<RoadPlace>(
+								*pm,
+								RoadModule::GetGeneralRoadsMatcher().bestMatches(
+									_text,
+									_number ? *_number : 0,
+									_minScore
+							)	);
+							result.insert(DATA_ROADS, pm);
+						}
 					}
 
 					// Public places
@@ -461,7 +576,22 @@ namespace synthese
 					}
 				}
 
-				// TODO add addresses
+				// Addresses
+				if(	result.hasSubMaps(DATA_ADDRESSES) &&
+					(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
+				){
+					shared_ptr<ParametersMap> addressBestMap(
+						*(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS).begin()
+					);
+					if(	!bestMap.get() ||
+						addressBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
+						addressBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
+						addressBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
+					){
+						bestMap = addressBestMap;
+						className = DATA_ADDRESS;
+					}
+				}
 
 				// Registration on the result
 				shared_ptr<ParametersMap> bestPlace(new ParametersMap);
@@ -809,6 +939,19 @@ namespace synthese
 						Env::GetOfficialEnv().getEditable<PublicPlace>(
 							itemMap->get<RegistryKeyType>(
 								PublicPlace::DATA_ID
+					)	)	);
+				}
+				else if(className == DATA_ADDRESS)
+				{
+					const shared_ptr<RoadPlace>& roadPlace(
+						Env::GetOfficialEnv().getEditable<RoadPlace>(
+							itemMap->get<RegistryKeyType>(
+								House::DATA_ROAD_PREFIX + RoadPlace::DATA_ID
+					)	)	);
+					placeResult.value = static_pointer_cast<Place, House>(
+						roadPlace->getHouse(
+							itemMap->get<RegistryKeyType>(
+								House::DATA_NUMBER
 					)	)	);
 				}
 			}
