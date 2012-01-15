@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_ENV_SCHEDULEDSERVICE_H
 #define SYNTHESE_ENV_SCHEDULEDSERVICE_H
 
+#include "Importable.h"
+#include "ReservableService.hpp"
+#include "SchedulesBasedService.h"
+
 #include "Types.h"
 #include "Registry.h"
-#include "SchedulesBasedService.h"
-#include "Importable.h"
 
 #include <string>
 #include <boost/tuple/tuple.hpp>
@@ -57,7 +59,8 @@ namespace synthese
 		*/
 		class ScheduledService:
 			public SchedulesBasedService,
-			public impex::ImportableTemplate<ScheduledService>
+			public impex::ImportableTemplate<ScheduledService>,
+			public ReservableService
 		{
 		public:
 
@@ -118,12 +121,12 @@ namespace synthese
 
 				virtual void clearNonConcurrencyCache() const;
 
-				graph::UseRule::ReservationAvailabilityType getReservationAbility(
+				virtual graph::UseRule::ReservationAvailabilityType getReservationAbility(
 					const boost::gregorian::date& date,
 					std::size_t userClassRank
 				) const;
 
-				boost::posix_time::ptime getReservationDeadLine(
+				virtual boost::posix_time::ptime getReservationDeadLine(
 					const boost::gregorian::date& date,
 					std::size_t userClassRank
 				) const;

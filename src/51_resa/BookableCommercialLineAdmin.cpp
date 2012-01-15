@@ -26,6 +26,7 @@
 
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTBookingAdmin.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
 #include "UserTableSync.h"
 #include "ResaModule.h"
 #include "ServiceReservations.h"
@@ -237,13 +238,15 @@ namespace synthese
 						_displayCancelled ? logic::indeterminate : logic::tribool(false)
 				)	);
 				// Services reading
-				vector<shared_ptr<ScheduledService> > sortedServices;
+				vector<shared_ptr<ReservableService> > sortedServices;
 				{
-					map<string, shared_ptr<ScheduledService> > servicesByNumber;
+					// Declaration
+					map<string, shared_ptr<ReservableService> > servicesByNumber;
 
+					// Scheduled services
 					ScheduledServiceTableSync::SearchResult services(
 						ScheduledServiceTableSync::Search(
-							_getEnv(),
+							Env::GetOfficialEnv(),
 							optional<RegistryKeyType>(),
 							_line->getKey(),
 							optional<RegistryKeyType>(),
@@ -264,26 +267,45 @@ namespace synthese
 						servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
 						sortedServices.push_back(service);
 					}
+
+					// Free DRT services
+					FreeDRTAreaTableSync::SearchResult areas(
+						FreeDRTAreaTableSync::Search(
+							Env::GetOfficialEnv(),
+							_line->getKey()
+					)	);
+					BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
+					{
+						FreeDRTTimeSlotTableSync::SearchResult freeDRTs(
+							FreeDRTTimeSlotTableSync::Search(
+								Env::GetOfficialEnv(),
+								area->getKey()
+						)	);
+						BOOST_FOREACH(const shared_ptr<FreeDRTTimeSlot>& service, freeDRTs)
+						{
+							if(	!service->isActive(_date) ||
+								servicesByNumber.find(service->getServiceNumber()) != servicesByNumber.end()
+							){
+								continue;
+							}
+
+							servicesByNumber.insert(make_pair(service->getServiceNumber(), service));
+							sortedServices.push_back(service);
+						}
+					}
 				}
 				if(_serviceNumber && sortedServices.empty()) return;
 
-				// Sort reservations
+				// Sort reservations by service number
 				map<string, ServiceReservations> reservations;
 				BOOST_FOREACH(const shared_ptr<const Reservation>& resa, sqlreservations)
 				{
-					if(!_getEnv().getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
-
-					const ScheduledService* service(_getEnv().getRegistry<ScheduledService>().get(resa->getServiceId()).get());
-					if(reservations.find(service->getServiceNumber()) == reservations.end())
-					{
-						reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
-					}
-					reservations[service->getServiceNumber()].addReservation(resa.get());
+					reservations[resa->getServiceCode()].addReservation(resa.get());
 				}
 
+				// Search form
 				if(!_serviceNumber)
 				{
-
 					stream << "<h1>Recherche</h1>";
 
 					SearchFormHTMLTable st(searchRequest.getHTMLForm());
@@ -334,7 +356,7 @@ namespace synthese
 				}
 				else
 				{
-					int serviceSeatsNumber(reservations[sortedServices[0]->getServiceNumber()].getSeatsNumber());
+					int serviceSeatsNumber(reservations[dynamic_cast<Service*>(sortedServices[0].get())->getServiceNumber()].getSeatsNumber());
 					string plural((serviceSeatsNumber > 1) ? "s" : "");
 					stream << "<h1>";
 					if (serviceSeatsNumber > 0)
@@ -398,10 +420,15 @@ namespace synthese
 				stream << t.open();
 
 				// Display of services
-				BOOST_FOREACH(const shared_ptr<ScheduledService>& service, sortedServices)
+				BOOST_FOREACH(const shared_ptr<ReservableService>& service, sortedServices)
 				{
-					const ServiceReservations::ReservationsList& serviceReservations (reservations[service->getServiceNumber()].getReservations());
-					int serviceSeatsNumber(reservations[service->getServiceNumber()].getSeatsNumber());
+					const string& serviceNumber(
+						dynamic_cast<Service*>(service.get())->getServiceNumber()
+					);
+					const ServiceReservations::ReservationsList& serviceReservations(
+						reservations[serviceNumber].getReservations()
+					);
+					int serviceSeatsNumber(reservations[serviceNumber].getSeatsNumber());
 					string plural((serviceSeatsNumber > 1) ? "s" : "");
 					seatsNumber += serviceSeatsNumber;
 
@@ -472,21 +499,38 @@ namespace synthese
 							}
 						}
 
-						stream << t.col(6, string(), true) << "Service " << service->getServiceNumber() << " - départ de ";
-						const Edge* edge(service->getPath()->getEdge(0));
-						if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+						// Service title
+						stream << t.col(6, string(), true);
+						
+						if(dynamic_cast<ScheduledService*>(service.get()))
 						{
-							stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+							stream << "Service " << serviceNumber << " - départ de ";
+							const Edge* edge(
+								dynamic_cast<Service*>(service.get())->getPath()->getEdge(0)
+							);
+							if(dynamic_cast<const NamedPlace*>(edge->getHub()))
+							{
+								stream << dynamic_cast<const NamedPlace*>(edge->getHub())->getFullName();
+							}
+							else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+							{
+								stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+							}
+							stream << " à " <<
+								Service::GetTimeOfDay(dynamic_cast<ScheduledService*>(service.get())->getDepartureSchedule(false, 0))
+							;
 						}
-						else if(dynamic_cast<const DRTArea*>(edge->getFromVertex()))
+						else if(dynamic_cast<FreeDRTTimeSlot*>(service.get()))
 						{
-							stream << static_cast<const DRTArea*>(edge->getFromVertex())->getName();
+							stream << "Tranche horaire de " << dynamic_cast<FreeDRTTimeSlot*>(service.get())->getFirstDeparture() <<
+								" à " << dynamic_cast<FreeDRTTimeSlot*>(service.get())->getLastArrival();
 						}
-						stream << " à " << Service::GetTimeOfDay(service->getDepartureSchedule(false, 0));
 						if (serviceSeatsNumber > 0)
+						{
 							stream << " - " << serviceSeatsNumber << " place" << plural << " réservée" << plural;
+						}
 
-						printRequest.getPage()->setServiceNumber(service->getServiceNumber());
+						printRequest.getPage()->setServiceNumber(dynamic_cast<Service*>(service.get())->getServiceNumber());
 
 						stream << t.col(1, string(), true) << HTMLModule::getHTMLLink(printRequest.getURL(), HTMLModule::getHTMLImage("printer.png", "Imprimer"));
 					}

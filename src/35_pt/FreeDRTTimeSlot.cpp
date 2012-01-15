@@ -198,4 +198,29 @@ namespace synthese
 		{
 			return _lastArrival;
 		}
+
+
+
+		graph::UseRule::ReservationAvailabilityType FreeDRTTimeSlot::getReservationAbility(
+			const boost::gregorian::date& date,
+			std::size_t userClassRank
+		) const	{
+
+			if(!isActive(date))
+			{
+				return UseRule::RESERVATION_FORBIDDEN;
+			}
+
+			return UseRule::RESERVATION_COMPULSORY_POSSIBLE; // TODO temporary
+		}
+
+
+
+		boost::posix_time::ptime FreeDRTTimeSlot::getReservationDeadLine(
+			const boost::gregorian::date& date,
+			std::size_t userClassRank
+		) const	{
+
+			return ptime(date, _lastArrival); // TODO apply reservation rule delay
+		}
 }	}
