@@ -34,9 +34,9 @@ using namespace boost;
 BOOST_AUTO_TEST_CASE (UsefulForTransfer)
 {
 	// No edge
-	FakeHub h1;
-	FakeHub h2;
-	FakeHub h3;
+	FakeHub h1(true);
+	FakeHub h2(true);
+	FakeHub h3(true);
 
 	// No vertex
 //	BOOST_CHECK(!h1.isUsefulForTransfer());

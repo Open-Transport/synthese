@@ -372,8 +372,21 @@ namespace synthese
 
 			_edges.pop_back();
 			vertex->removeArrivalEdge(lastEdge);
-			other._edges[0]->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
-			other._edges[0]->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
+
+			lastEdge->getPrevious()->setNext(other._edges[0]);
+			other._edges[0]->setPrevious(lastEdge->getPrevious());
+
+			BOOST_FOREACH(Edge* edge, other._edges)
+			{
+				if(edge->getPreviousConnectionDeparture() == NULL)
+				{
+					edge->setPreviousConnectionDeparture(lastEdge->getPreviousConnectionDeparture());
+				}
+				if(edge->getPreviousDepartureForFineSteppingOnly() == NULL)
+				{
+					edge->setPreviousDepartureForFineSteppingOnly(lastEdge->getPreviousDepartureForFineSteppingOnly());
+				}
+			}
 
 			BOOST_FOREACH(Edge* edge, _edges)
 			{
@@ -381,9 +394,17 @@ namespace synthese
 				{
 					edge->setFollowingConnectionArrival(other._edges[0]);
 				}
+				if(edge->getFollowingConnectionArrival() == NULL)
+				{
+					edge->setFollowingConnectionArrival(other._edges[0]->getFollowingConnectionArrival());
+				}
 				if(edge->getFollowingArrivalForFineSteppingOnly() == lastEdge)
 				{
 					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]);
+				}
+				if(edge->getFollowingArrivalForFineSteppingOnly() == NULL)
+				{
+					edge->setFollowingArrivalForFineSteppingOnly(other._edges[0]->getFollowingArrivalForFineSteppingOnly());
 				}
 			}
 
