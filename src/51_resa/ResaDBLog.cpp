@@ -254,16 +254,22 @@ namespace synthese
 			ReservationStatus status(NO_RESERVATION);
 			Env env;
 
-			if (lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]) > 0)
+			try
 			{
-				tr = ReservationTransactionTableSync::GetEditable(lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]), env);
+				if (lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]) > 0)
+				{
+					tr = ReservationTransactionTableSync::GetEditable(lexical_cast<RegistryKeyType>(content[ResaDBLog::COL_RESA]), env);
 
-				ReservationTableSync::SearchResult reservations(
-					ReservationTableSync::Search(env, tr->getKey())
-				);
+					ReservationTableSync::SearchResult reservations(
+						ReservationTableSync::Search(env, tr->getKey())
+					);
 
-				//ReservationTableSync::search(tr.get());
-				status = tr->getStatus();
+					//ReservationTableSync::search(tr.get());
+					status = tr->getStatus();
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
 			}
 
 			// Column Symbol
