@@ -46,37 +46,4 @@ namespace synthese
 		):	Registrable(id),
 			_publicPlace(NULL)
 		{}
-
-
-
-		graph::VertexAccess PublicPlaceEntrance::getVertexAccess(
-			const Crossing& crossing
-		) const	{
-			if(getRoadChunk())
-			{
-				if(getRoadChunk()->getFromCrossing() == &crossing)
-				{
-					return VertexAccess(minutes(static_cast<long>(getMetricOffset() / 50)), getMetricOffset());
-				}
-				if(	getRoadChunk()->getReverseRoadChunk() &&
-					getRoadChunk()->getReverseRoadChunk()->getFromCrossing() == &crossing
-				){
-					return VertexAccess(
-						minutes(
-							static_cast<long>(
-								(getRoadChunk()->getEndMetricOffset() - getRoadChunk()->getMetricOffset() - getMetricOffset()) / 50
-						)	),
-						getRoadChunk()->getEndMetricOffset() - getRoadChunk()->getMetricOffset() - getMetricOffset()
-					);
-				}
-			}
-			return VertexAccess();
-		}
-
-
-
-		graph::GraphIdType PublicPlaceEntrance::getGraphType() const
-		{
-			return RoadModule::GRAPH_ID;
-		}
 }	}
