@@ -410,7 +410,7 @@ namespace synthese
 						false,
 						true,
 						UP_LINKS_LOAD_LEVEL,
-						(_rightClass.empty() && _rightLevel) ?
+						((_rightClass.empty() && _rightLevel) || !request.getUser()) ?
 							optional<const RightsOfSameClassMap&>() :
 							request.getUser()->getProfile()->getRights(_rightClass),
 						_rightLevel ? *_rightLevel : FORBIDDEN
