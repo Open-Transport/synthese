@@ -26,7 +26,6 @@
 #include "Address.h"
 #include "Importable.h"
 #include "Named.h"
-#include "ReachableFromCrossing.hpp"
 #include "Registrable.h"
 
 #include "Registry.h"
@@ -43,8 +42,7 @@ namespace synthese
 		class PublicPlaceEntrance:
 			public Address,
 			public impex::Importable,
-			public util::Named,
-			public ReachableFromCrossing
+			public util::Named
 		{
 		public:
 			typedef util::Registry<PublicPlaceEntrance> Registry;
@@ -77,8 +75,6 @@ namespace synthese
 
 			/// @name Virtual services
 			//@{
-				virtual graph::VertexAccess getVertexAccess(const Crossing& crossing) const;
-				virtual graph::GraphIdType getGraphType() const;
 			//@}
 		};
 	}
