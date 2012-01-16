@@ -263,7 +263,7 @@ namespace synthese
 					_attemptToRead<T, pt::StopArea>(*item.value, pm, map, DATA_STOP);
 					_attemptToRead<T, road::RoadPlace>(*item.value, pm, map, DATA_ROAD);
 					_attemptToRead<T, road::House>(*item.value, pm, map, DATA_ADDRESS);
-					_attemptToRead<T, road::PublicPlace>(*item.value, pm, map, DATA_STOP);
+					_attemptToRead<T, road::PublicPlace>(*item.value, pm, map, DATA_PUBLIC_PLACE);
 
 					if(_number)
 					{
