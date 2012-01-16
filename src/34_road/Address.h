@@ -90,8 +90,9 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setHouseNumber(MainRoadChunk::HouseNumber& value){ _houseNumber = value; }
+				void setHouseNumber(boost::optional<MainRoadChunk::HouseNumber> value){ _houseNumber = value; }
 				void setRoadChunk(MainRoadChunk* value){ _roadChunk = value; }
+				void setMetricOffset(graph::MetricOffset value){ _metricOffset = value; }
 			//@}
 
 			//! @name Services

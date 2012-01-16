@@ -123,6 +123,7 @@ namespace synthese
 				std::string _publicPlacesCityCodeField;
 
 				mutable impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync> _roadPlaces;
+				mutable std::map<std::string, MainRoadChunk*> _roadChunks;
 
 
 
