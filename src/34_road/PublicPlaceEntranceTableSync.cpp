@@ -135,14 +135,14 @@ namespace synthese
 
 				// Metric offset
 				object->setMetricOffset(rows->getDouble(PublicPlaceEntranceTableSync::COL_METRIC_OFFSET));
-
-				// Link
-				object->getRoadChunk()->getFromCrossing()->addReachableVertex(object);
 			}
 
 			// House number
+			MainRoadChunk::HouseNumber houseNumber = rows->getInt(PublicPlaceEntranceTableSync::COL_NUMBER);
 			object->setHouseNumber(
-				rows->getOptionalUnsignedInt(PublicPlaceEntranceTableSync::COL_NUMBER)
+				houseNumber ?
+				optional<MainRoadChunk::HouseNumber>(houseNumber) :
+				optional<MainRoadChunk::HouseNumber>()
 			);
 
 			// Datasource links
@@ -181,12 +181,6 @@ namespace synthese
 			if(obj->getPublicPlace())
 			{
 				obj->getPublicPlace()->removeEntrance(*obj);
-			}
-
-			// Link with road
-			if(obj->getRoadChunk())
-			{
-				obj->getRoadChunk()->getFromCrossing()->removeReachableVertex(obj);
 			}
 		}
 
