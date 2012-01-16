@@ -29,7 +29,14 @@
 
   {% for command_result in commands_result.command_results %}
     <h3>Command {{ loop.index }}</h3>
-    <p>Command line: <code>{{ command_result.commandline|join(' ') }}</code></p>
+    {% if command_result.type == command_result.TYPE_PROCESS %}
+      <p>Type: PROCESS</p>
+      {# TODO: show command_result.commandline as a string (it can be an array or already a string) #}
+      <p>Command line: <code>{{ command_result.commandline }}</code></p>
+    {% else %}
+      <p>Type: METHOD</p>
+      <p>Method name: <code>{{ command_result.method_name }}</code></p>
+    {% endif %}
     <p>Status: {{ success_label(command_result.success) }}</p>
     <p>Output:</p>
     <pre>{{ command_result.output }}</pre>

@@ -39,10 +39,10 @@ NO_DEPLOY_TABLES = set([
     'sqlite_sequence',
     'views_geometry_columns',
     'virts_geometry_columns',
- 
+
     # MySQL specific
     'trigger_metadata',
- 
+
     # deprecated
     't023_interface_pages',
     't024_interfaces',
@@ -57,17 +57,17 @@ NO_DEPLOY_TABLES = set([
     't039_scenarios',
     't040_alarm_object_links',
     't051_scenario_folder',
-    
+
     # resa
     't044_reservations',
     't046_reservation_transactions',
-    
+
     # logs
     't045_log_entries',
-    
+
     # departure table
     't057_display_monitoring_status',
-    
+
     # forum
     't067_forum_topics',
     't068_forum_messages',
@@ -105,7 +105,7 @@ class Deployer(object):
                 f.write('-- '  + '-' * 77 + '\n')
                 f.write('-- Dump of table %s\n\n' % table)
                 if db_backend.name == 'sqlite':
-                    f.write('drop table %s;\n\n' % table)
+                    f.write('drop table if exists %s;\n\n' % table)
                 f.write(db_backend.dump(table))
             #f.write('\ncommit;\n')
 
@@ -119,9 +119,9 @@ class Deployer(object):
                 '{remote_server}:' + unixjoin(
                     config.remote_project_path, self.dump_local_path)))
 
-    def _launch_restore(self): 
+    def _launch_remote(self, cmd):
         project_cmd = ' '.join(
-            self.project.build_command_line('restore_deploy', remote=True))
+            self.project.build_command_line(cmd, remote=True))
         deploy_cmd = (
             utils.ssh_command_line(self.project.config) + ' ' + project_cmd)
 
@@ -131,15 +131,20 @@ class Deployer(object):
     # TODO: email in case of failure.
     def deploy(self):
         commands_result = project_manager.CommandsResult('deploy')
-        self._dump_tables()
+        commands_result.add_command_result(
+            project_manager.CommandResult.call_method(self._dump_tables))
+        commands_result.add_command_result(self._launch_remote('prepare_deploy'))
         commands_result.add_command_result(self._transfer_dump())
-        commands_result.add_command_result(self._launch_restore())
+        commands_result.add_command_result(self._launch_remote('restore_deploy'))
         return commands_result
 
     def _restore_tables(self):
         sql = open(self.dump_path, 'rb').read()
         log.info('Restoring %s bytes of sql from %r', len(sql), self.dump_path)
         self.project.db_backend.restore(sql, dropdb=False)
+
+    def prepare_deploy(self):
+        utils.maybe_makedirs(os.path.dirname(self.dump_path))
 
     def restore_deploy(self):
         commands_result = project_manager.CommandsResult('restore_deploy')

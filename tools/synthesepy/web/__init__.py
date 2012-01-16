@@ -41,6 +41,7 @@ def get_application(bootstrap_config={}, project=None):
         assert bootstrap_config
 
         config = synthesepy.config.Config()
+
         env = synthesepy.env.create_env(
             bootstrap_config['env_type'],
             bootstrap_config['env_path'],
@@ -48,6 +49,8 @@ def get_application(bootstrap_config={}, project=None):
             config)
 
         project = project_manager.Project(bootstrap_config['project_path'], env=env)
+
+        config.update_finished()
 
     app = Flask(__name__)
     app.project = project

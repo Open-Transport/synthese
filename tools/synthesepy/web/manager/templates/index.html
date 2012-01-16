@@ -139,11 +139,15 @@
     </form>
     #}
 
-    <h1>Deployment</h1>
-    
-    <p>Deployment will copy the database content to the server TODO</p>
+    {% if config.remote_server %}
 
-    <form action="{{ url_for('.update_project') }}"
+    <h1>Deployment</h1>
+
+    <p>Deployment will copy the database content to the server
+       <code>{{ config.remote_server }}</code> (using remote project path:
+       <code>{{ config.remote_project_path }}</code>)</p>
+
+    <form action="{{ url_for('.deploy') }}"
           method=post class=form-stacked>
       <fieldset>
         <div class="actions">
@@ -151,6 +155,8 @@
         </div>
       </fieldset>
     </form>
+
+    {% endif %}
 
     <h1>Administration Logs</h1>
 
