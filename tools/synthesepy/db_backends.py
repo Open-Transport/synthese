@@ -321,7 +321,7 @@ class MySQLBackend(DBBackend):
             extra_opts=extra_opts,
             table=table if table else '',
         ))
- 
+
         cmd = ('{command} {extra_opts} -u{user} -p{passwd} -h{host} '
             '-P{port} {db} {table}'.format(**args))
 

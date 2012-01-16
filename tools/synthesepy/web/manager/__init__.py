@@ -77,7 +77,10 @@ def index():
     except IOError:
         last_admin_log = "[Not available]"
 
-    return render_template('index.html', last_admin_log=last_admin_log)
+    return render_template(
+        'index.html',
+        last_admin_log=last_admin_log,
+        config=project.config)
 
 
 class WrongPassword(Exception):
@@ -188,6 +191,14 @@ def svn_update():
     return _do_command(
         project.svn, 'update',
         request.form.get('svn_username'), request.form.get('svn_password'))
+
+
+@manager.route('/deploy', methods=['POST'])
+@admin_required
+def deploy():
+    project = flask.current_app.project
+
+    return _do_command(project.deploy)
 
 
 # Database commands

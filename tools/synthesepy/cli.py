@@ -58,7 +58,7 @@ class AliasedSubParsersAction(argparse._SubParsersAction):
             if aliases:
                 dest += ' (%s)' % ','.join(aliases)
             sup = super(AliasedSubParsersAction._AliasedPseudoAction, self)
-            sup.__init__(option_strings=[], dest=dest, help=help) 
+            sup.__init__(option_strings=[], dest=dest, help=help)
 
     def add_parser(self, name, **kwargs):
         if 'aliases' in kwargs:
@@ -203,6 +203,7 @@ def add_project_subparsers(subparsers):
     add_parser('update_synthese')
     add_parser('update_project')
     add_parser('deploy')
+    add_parser('prepare_deploy')
     add_parser('restore_deploy')
 
 
@@ -361,7 +362,7 @@ def main():
     config = synthesepy.config.Config()
 
     config.update_from_files(
-        [c for c in config_args.config_names.split(',') if c], 
+        [c for c in config_args.config_names.split(',') if c],
         config_args.config_path)
 
     # Phase 2: Process project settings.
