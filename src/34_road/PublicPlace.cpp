@@ -28,6 +28,7 @@
 #include "PublicPlaceEntrance.hpp"
 #include "ReverseRoadChunk.hpp"
 #include "RoadModule.h"
+#include "VertexAccessMap.h"
 
 #include <geos/geom/Point.h>
 
