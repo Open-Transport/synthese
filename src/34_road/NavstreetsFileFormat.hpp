@@ -167,10 +167,8 @@ namespace synthese
 				//@}
 
 				typedef std::map<int, geography::City*> _CitiesMap;
-				typedef std::map<int, string> _MissingCitiesMap;
 
 				mutable _CitiesMap _citiesMap;	//!< Mapping table between Navstreets and SYNTHESE id for streets
-				_MissingCitiesMap _missingCities;
 
 				bool _citiesAutoCreation;	//!< Creation of cities if not present in the cities table of SYNTHESE
 
