@@ -16,3 +16,4 @@ set(DEPS
 boost_test(VertexAccessMap "${DEPS}" "FakeGraphImplementation.hpp")
 boost_test(Hub "${DEPS}" "FakeGraphImplementation.hpp")
 boost_test(Journey "${DEPS}" "FakeGraphImplementation.hpp")
+boost_test(Path "${DEPS}" "FakeGraphImplementation.hpp")
