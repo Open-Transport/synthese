@@ -73,6 +73,8 @@ namespace synthese
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
 
+		const string NavstreetsFileFormat::Importer_::PARAMETER_CITIES_AUTO_CREATION("cities_auto_creation");
+
 		const string NavstreetsFileFormat::_FIELD_OBJECTID("OBJECTID");
 		const string NavstreetsFileFormat::_FIELD_ST_NAME("ST_NAME");
 		const string NavstreetsFileFormat::_FIELD_REF_IN_ID("REF_IN_ID");
@@ -150,11 +152,6 @@ namespace synthese
 				> CityCodes;
 				CityCodes cityCodes;
 
-				map<
-					int,
-					string
-				> missingCities;
-
 				{	// 1.1 Departements
 					stringstream query;
 					query << "SELECT * FROM " << table.getName() << " WHERE " << NavstreetsFileFormat::_FIELD_ADMIN_LVL << "=3";
@@ -212,7 +209,7 @@ namespace synthese
 							if(cities.empty())
 							{
 								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
-								missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
+								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
 							else
@@ -238,19 +235,42 @@ namespace synthese
 					DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
 					while(rows->next())
 					{
+						int cityID(rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID));
+						City* city = NULL;
 						CityCodes::const_iterator it(cityCodes.find(
 								make_pair(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3), rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4))
 						)	);
 
 						if(it == cityCodes.end())
 						{
-							os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3) << "/" << rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4) << " not found.<br />";
-							continue;
+							CityTableSync::SearchResult cities = CityTableSync::Search(
+								_env,
+								boost::optional<std::string>(), // exactname
+								boost::optional<std::string>(rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)), // likeName
+								boost::optional<std::string>(),
+								0, 0, true, true,
+								util::UP_LINKS_LOAD_LEVEL
+							);
+
+							if(cities.empty())
+							{
+								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
+								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
+								continue;
+							}
+							else
+							{
+								city = cities.front().get();
+							}
+						}
+						else
+						{
+							city = it->second;
 						}
 
 						_citiesMap.insert(make_pair(
-								rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID),
-								it->second
+								cityID,
+								city
 						)	);
 				}	}
 
@@ -262,6 +282,12 @@ namespace synthese
 
 				typedef map<string, shared_ptr<Crossing> > _CrossingsMap;
 				_CrossingsMap _navteqCrossings;
+
+				typedef map<
+					string,
+					City*
+				> CreatedCities;
+				CreatedCities createdCities;
 
 				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
 
@@ -296,18 +322,57 @@ namespace synthese
 //					for(size_t area(0); area< (lAreaId == rAreaId ? size_t(1) : size_t(2)); ++area)
 //					{
 						// Test if the record can be imported
+						// City
+						City* city = NULL;
 						_CitiesMap::const_iterator itc(_citiesMap.find(/*area ?*/ lAreaId /*: rAreaId*/));
-						if((itc == _citiesMap.end()) || (!itc->second)){
-							// TODO test
+						if((itc == _citiesMap.end()) || !itc->second)
+						{
+							// Auto creation of the city
+							if(_citiesAutoCreation)
+							{
+								// Try to find the city in _missingCities map
+								_MissingCitiesMap::const_iterator itc(_missingCities.find(lAreaId));
+								if(itc != _missingCities.end())
+								{
+									// If a city with that name has already been created
+									CreatedCities::const_iterator itcc(createdCities.find(itc->second));
+									if(itcc != createdCities.end())
+									{
+										city = itcc->second;
+									}
+									else
+									{
+										shared_ptr<City> newCity = boost::shared_ptr<City>(new City);
+										newCity->setName(itc->second);
+										newCity->setKey(CityTableSync::getId());
+										_env.getEditableRegistry<City>().add(newCity);
+										city = newCity.get();
+										_citiesMap.insert(make_pair(
+												lAreaId,
+												city
+										)	);
+										createdCities.insert(make_pair(
+												itc->second,
+												city
+										)	);
+										os << "AUTOCREATION " << itc->second << " (" << lAreaId << ").<br />";
+									}
+								}
+							}
+						}
+						else
+						{
+							city = itc->second;
+						}
+
+						if(city == NULL)
+						{
 							os << "ERR : City " << lAreaId << " not found.<br />";
 							continue;
 						}
 
 						// Name
 						string roadName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
-
-						// City
-						City* city(itc->second);
 
 						// Code
 						string roadCode;
@@ -401,6 +466,10 @@ namespace synthese
 		DBTransaction NavstreetsFileFormat::Importer_::_save() const
 		{
 			DBTransaction transaction;
+			BOOST_FOREACH(const Registry<City>::value_type& city, _env.getEditableRegistry<City>())
+			{
+				CityTableSync::Save(city.second.get(), transaction);
+			}
 			BOOST_FOREACH(const Registry<Crossing>::value_type& crossing, _env.getEditableRegistry<Crossing>())
 			{
 				CrossingTableSync::Save(crossing.second.get(), transaction);
@@ -482,6 +551,7 @@ namespace synthese
 			stream << t.title("Données");
 			stream << t.cell("Rues (streets)", t.getForm().getTextInput(_getFileParameterName(FILE_STREETS), _pathsMap[FILE_STREETS].file_string()));
 			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(_getFileParameterName(FILE_MTDAREA), _pathsMap[FILE_MTDAREA].file_string()));
+			stream << t.cell("Auto création des communes", t.getForm().getOuiNonRadioInput(PARAMETER_CITIES_AUTO_CREATION, false));
 			stream << t.close();
 		}
 
@@ -490,6 +560,7 @@ namespace synthese
 		util::ParametersMap NavstreetsFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap result;
+			result.insert(PARAMETER_CITIES_AUTO_CREATION, _citiesAutoCreation);
 			return result;
 		}
 
@@ -497,5 +568,6 @@ namespace synthese
 
 		void NavstreetsFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
+			_citiesAutoCreation = map.getDefault<bool>(PARAMETER_CITIES_AUTO_CREATION, false);
 		}
 }	}
