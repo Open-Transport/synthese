@@ -1043,12 +1043,14 @@ The synthese.py wrapper script.
         if self.env.platform == 'win' and self.config.bg_process_manager != 'python':
             raise Exception('Only bg_process_manager == python is supported '
                 'on Windows.')
-        
+
+        log.info('Starting Synthese in the background')
         if self.config.bg_process_manager == 'python':
             if self.env.platform == 'lin' and os.geteuid() == 0:
                 raise Exception('You can\'t run this command root')
 
             cmd = self.build_command_line('rundaemon', ['-s'])
+            log.debug('Synthese command line: %s', ' '.join(cmd))
             stdout = open(self.env.c.log_file, 'wb')
 
             subprocess.Popen(cmd,
@@ -1068,6 +1070,7 @@ The synthese.py wrapper script.
             raise Exception('Only bg_process_manager == python is supported '
                 'on Windows.')
 
+        log.info('Stopping Synthese in the background')
         if self.config.bg_process_manager == 'python':
             self.stopdaemon()
         elif self.config.bg_process_manager == 'supervisor':
@@ -1075,7 +1078,7 @@ The synthese.py wrapper script.
         elif self.config.bg_process_manager == 'initd':
             self.call_project('root_delegate', args=['stop_initd'], sudo=True)
         else:
-            raise Exception('Unknown bg_process_manager %r' % 
+            raise Exception('Unknown bg_process_manager %r' %
                 self.config.bg_process_manager)
 
     @command()
@@ -1140,19 +1143,24 @@ The synthese.py wrapper script.
         return commands_result
 
     # Deploy
-    
+
     @property
     def deployer(self):
         if self._deployer:
             return self._deployer
         self._deployer = deploy.Deployer(self)
         return self._deployer
-    
+
     @command()
     @commands_result()
     def deploy(self):
         return self.deployer.deploy()
-    
+
+    @command()
+    @commands_result()
+    def prepare_deploy(self):
+        return self.deployer.prepare_deploy()
+
     @command()
     @commands_result()
     def restore_deploy(self):
