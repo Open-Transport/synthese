@@ -140,8 +140,9 @@ namespace synthese
 
 			BOOST_FOREACH(ReachableFromCrossing* vertex, _reachableVertices)
 			{
-				if(vertex->getGraphType() != whatToSearch)
-				{
+				if(	vertex->getGraphType() != whatToSearch ||
+					!dynamic_cast<Vertex*>(vertex)
+				){
 					continue;
 				}
 

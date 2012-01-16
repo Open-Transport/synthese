@@ -23,18 +23,23 @@
 #include "PublicPlace.h"
 
 #include "City.h"
+#include "Crossing.h"
 #include "ParametersMap.h"
-#include "Registry.h"
+#include "PublicPlaceEntrance.hpp"
+#include "ReverseRoadChunk.hpp"
+#include "RoadModule.h"
 
 #include <geos/geom/Point.h>
 
 using namespace std;
+using namespace boost::posix_time;
 using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace road;
 	using namespace geography;
+	using namespace graph;
+	using namespace road;
 
 	namespace util
 	{
@@ -70,17 +75,53 @@ namespace synthese
 
 
 
-		void PublicPlace::getVertexAccessMap( graph::VertexAccessMap& result, const graph::AccessParameters& accessParameters, const geography::Place::GraphTypes& whatToSearch ) const
-		{
-			/// @todo Place entrances
+		void PublicPlace::getVertexAccessMap(
+			graph::VertexAccessMap& result,
+			const graph::AccessParameters& accessParameters,
+			const geography::Place::GraphTypes& whatToSearch
+		) const	{
+
+			// Return results only if road graph is searched
+			if(whatToSearch.find(RoadModule::GRAPH_ID) == whatToSearch.end())
+			{
+				return;
+			}
+
+			// Loop en entrances
+			BOOST_FOREACH(
+				const Entrances::value_type& it,
+				_entrances
+			){
+				if(!it->getRoadChunk())
+				{
+					continue;
+				}
+				result.insert(
+					it->getRoadChunk()->getFromCrossing(),
+					VertexAccess(
+						minutes(
+							static_cast<long>(
+								it->getMetricOffset() / 50
+						)	),
+						it->getMetricOffset()
+				)	);
+				result.insert(
+					it->getRoadChunk()->getReverseRoadChunk()->getFromCrossing(),
+					VertexAccess(
+						minutes(
+							static_cast<long>(
+								(it->getRoadChunk()->getEndMetricOffset() - it->getRoadChunk()->getMetricOffset() - it->getMetricOffset()) / 50
+						)	),
+						it->getRoadChunk()->getEndMetricOffset() - it->getRoadChunk()->getMetricOffset() - it->getMetricOffset()
+				)	);
+			}
 		}
 
 
 
 		const boost::shared_ptr<Point>& PublicPlace::getPoint() const
 		{
-			/// @todo Envelope of entrances
-			return _point;
+			return getGeometry();
 		}
 
 
@@ -108,5 +149,18 @@ namespace synthese
 			string emptyPrefix;
 			toParametersMap(pm, emptyPrefix);
 		}
-	}
-}
+
+
+
+		void PublicPlace::addEntrance( PublicPlaceEntrance& entrance )
+		{
+			_entrances.insert(&entrance);
+		}
+
+
+
+		void PublicPlace::removeEntrance( PublicPlaceEntrance& entrance )
+		{
+			_entrances.erase(&entrance);
+		}
+}	}
