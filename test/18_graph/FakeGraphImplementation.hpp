@@ -36,15 +36,18 @@ namespace synthese
 		class FakeHub:
 			public Hub
 		{
+		private:
+			bool _allowedConnection;
+
 		public:
-			FakeHub() {}
+			FakeHub(bool allowedConnection = true): _allowedConnection(allowedConnection) {}
 			boost::shared_ptr<geos::geom::Point> p;
 
 			virtual boost::posix_time::time_duration getMinTransferDelay() const { return boost::posix_time::minutes(0); }
 			virtual void getVertexAccessMap(VertexAccessMap& result, GraphIdType whatToSearch,const Vertex& vertex, bool vertexIsOrigin ) const {}
-			virtual bool isConnectionAllowed(const Vertex& origin, const Vertex& destination) const { return true; }
+			virtual bool isConnectionAllowed(const Vertex& origin, const Vertex& destination) const { return _allowedConnection; }
 			virtual boost::posix_time::time_duration getTransferDelay(	const Vertex& origin,const Vertex& destination	) const { return boost::posix_time::minutes(0); }
-			virtual HubScore getScore() const { return 0; }
+			virtual HubScore getScore() const { return _allowedConnection ? 1 : 0; }
 			virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const { return p; }
 			virtual bool containsAnyVertex(GraphIdType graphType) const { return true; }
 			virtual std::string getRuleUserName() const {return "Hub"; }
@@ -68,7 +71,7 @@ namespace synthese
 			bool _regular;
 
 		public:
-			FakePathGroup(): PathGroup() { _regular = true; }
+			FakePathGroup(): PathGroup(), Registrable(0) { _regular = true; }
 			virtual bool isRegular() const { return _regular; }
 			virtual std::string getRuleUserName() const { return "FakePathGroup"; }
 		};
@@ -96,10 +99,29 @@ namespace synthese
 		class FakeEdge:
 			public Edge
 		{
+			bool _isDeparture;
+			bool _isArrival;
+
 		public:
-			FakeEdge() : Edge(), synthese::util::Registrable(0) {}
-			virtual bool isDepartureAllowed() const { return true; }
-			virtual bool isArrivalAllowed() const {return true;}
+			FakeEdge(
+				FakePath* path = NULL,
+				size_t rank = 0,
+				bool isDeparture = true,
+				bool isArrival = true,
+				MetricOffset metricOffset = 0,
+				FakeVertex* vertex = NULL
+			):	Edge(
+					path,
+					rank,
+					vertex,
+					metricOffset
+				),
+				synthese::util::Registrable(0),
+				_isDeparture(isDeparture),
+				_isArrival(isArrival)
+			{}
+			virtual bool isDepartureAllowed() const { return _isDeparture; }
+			virtual bool isArrivalAllowed() const {return _isArrival;}
 		};
 
 		class FakeService:
