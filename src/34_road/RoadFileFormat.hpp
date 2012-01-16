@@ -35,6 +35,10 @@ namespace synthese
 
 	namespace road
 	{
+		class PublicPlace;
+		class PublicPlaceEntrance;
+		class PublicPlaceEntranceTableSync;
+		class PublicPlaceTableSync;
 		class RoadPlace;
 		class RoadPlaceTableSync;
 		class Crossing;
@@ -80,6 +84,41 @@ namespace synthese
 			);
 
 
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Public place import helper.
+			//////////////////////////////////////////////////////////////////////////
+			/// @param code code of the road place for the data source.
+			static PublicPlace* CreateOrUpdatePublicPlace(
+				impex::ImportableTableSync::ObjectBySource<PublicPlaceTableSync>& publicPlaces,
+				const std::string& code,
+				const std::string& name,
+				boost::optional<boost::shared_ptr<geos::geom::Point> > geometry,
+				const geography::City& city,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Public place entrance import helper.
+			//////////////////////////////////////////////////////////////////////////
+			/// @param code code of the road place for the data source.
+			static PublicPlaceEntrance* CreateOrUpdatePublicPlaceEntrance(
+				impex::ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync>& publicPlaceEntrances,
+				const std::string& code,
+				boost::optional<const std::string&> name,
+				graph::MetricOffset metricOffset,
+				boost::optional<MainRoadChunk::HouseNumber> number,
+				MainRoadChunk& roadChunk,
+				PublicPlace& publicPlace,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream
+			);
+
 		private:
 			static void _setGeometryAndHouses(
 				MainRoadChunk& chunk,
@@ -91,7 +130,7 @@ namespace synthese
 			);
 
 		public:
-			static void AddRoadChunk(
+			static MainRoadChunk* AddRoadChunk(
 				RoadPlace& roadPlace,
 				Crossing& startNode,
 				Crossing& endNode,
@@ -103,8 +142,7 @@ namespace synthese
 				util::Env& env
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_road_RoadFileFormat_hpp__
 

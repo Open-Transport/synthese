@@ -21,29 +21,31 @@
 */
 
 #include "RoadShapeFileFormat.hpp"
-#include "CrossingTableSync.hpp"
-#include "RoadTableSync.h"
-#include "RoadChunkTableSync.h"
-#include "CityTableSync.h"
-#include "DataSource.h"
-#include "Crossing.h"
-#include "CoordinatesSystem.hpp"
-#include "DBTransaction.hpp"
-#include "VirtualShapeVirtualTable.hpp"
+
 #include "AdminFunctionRequest.hpp"
+#include "CityTableSync.h"
+#include "CoordinatesSystem.hpp"
+#include "Crossing.h"
+#include "CrossingTableSync.hpp"
+#include "DataSource.h"
 #include "DataSourceAdmin.h"
+#include "DBTransaction.hpp"
 #include "ImportFunction.h"
 #include "PropertiesHTMLTable.h"
-#include "RoadFileFormat.hpp"
 #include "PublicPlaceTableSync.h"
+#include "PublicPlaceEntranceTableSync.hpp"
+#include "RoadChunkTableSync.h"
+#include "RoadFileFormat.hpp"
+#include "RoadTableSync.h"
+#include "VirtualShapeVirtualTable.hpp"
 
-#include <boost/lexical_cast.hpp>
+#include <fstream>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LineString.h>
-#include <fstream>
 
 using namespace std;
 using namespace boost;
@@ -329,17 +331,20 @@ namespace synthese
 					}
 
 					// Import
-					RoadFileFormat::AddRoadChunk(
-						*roadPlace,
-						*startCrossing,
-						*endCrossing,
-						geometry,
-						rightHouseNumberingPolicy,
-						leftHouseNumberingPolicy,
-						rightHouseNumbers,
-						leftHouseNumbers,
-						_env
-					);
+					_roadChunks.insert(
+						make_pair(
+							code,
+							RoadFileFormat::AddRoadChunk(
+								*roadPlace,
+								*startCrossing,
+								*endCrossing,
+								geometry,
+								rightHouseNumberingPolicy,
+								leftHouseNumberingPolicy,
+								rightHouseNumbers,
+								leftHouseNumbers,
+								_env
+					)	)	);
 				}				
 			}
 			// Public places
@@ -361,6 +366,7 @@ namespace synthese
 
 				// Public places
 				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(_dataSource, _env);
 
 				// Loading the file into SQLite as virtual table
 				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
@@ -371,6 +377,96 @@ namespace synthese
 				// Load of each record
 				while(rows->next())
 				{
+					//////////////////////////////////////////////////////////////////////////
+					// Public place
+
+					// Code
+					string code(rows->getText(_publicPlacesCodeField));
+					if(code.empty())
+					{
+						os << "WARN : Each road chunk code must be non empty<br />";
+						continue;
+					}
+
+					// City field
+					string cityCode(rows->getText(_publicPlacesCityCodeField));
+					shared_ptr<City> city(
+						CityTableSync::GetEditableFromCode(cityCode, _env)
+					);
+					if(!city.get())
+					{
+						os << "<b>WARN : Unknown city " << cityCode << " in public place " << code << ". Public place is ignored.<br />";
+						continue;
+					}
+
+					// Name field
+					string name(rows->getText(_publicPlacesNameField));
+
+					// Geometry
+					shared_ptr<Point> geometry(
+						dynamic_pointer_cast<Point, Geometry>(
+							rows->getGeometryFromWKT(RoadShapeFileFormat::Importer_::FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
+					)	);
+					if(!geometry.get())
+					{
+						os << "ERR : Empty geometry in the " << code << " road place.<br />";
+						continue;
+					}
+
+					// Import
+					PublicPlace* publicPlace(
+						RoadFileFormat::CreateOrUpdatePublicPlace(
+							publicPlaces,
+							code,
+							name,
+							geometry,
+							*city,
+							_dataSource,
+							_env,
+							os
+					)	);
+
+
+					//////////////////////////////////////////////////////////////////////////
+					// Public place entrance
+
+					// House number
+					optional<MainRoadChunk::HouseNumber> houseNumber;
+					if(rows->getInt(_publicPlacesNumberField) > 0)
+					{
+						houseNumber = rows->getInt(_publicPlacesNumberField);
+					}
+
+					// Road chunk
+					string roadChunkId(rows->getText(_publicPlacesRoadChunkField));
+					map<string, MainRoadChunk*>::iterator itRoadChunk(_roadChunks.find(roadChunkId));
+					if(itRoadChunk == _roadChunks.end())
+					{
+						os << "<b>WARN : Unknown road chunk " << roadChunkId << " in public place " << code << ". Public place entrance is ignored.<br />";
+						continue;
+					}
+					MainRoadChunk* roadChunk = itRoadChunk->second;
+
+					// Metric offset + check of house number consistency
+					MetricOffset metricOffset(
+						houseNumber	?
+						roadChunk->getHouseNumberMetricOffset(*houseNumber) :
+						roadChunk->getMetricOffset()
+					);
+
+					// Import
+					RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+						publicPlaceEntrances,
+						code,
+						optional<const string&>(),
+						metricOffset,
+						houseNumber,
+						*roadChunk,
+						*publicPlace,
+						_dataSource,
+						_env,
+						os
+					);
 				}
 			}
 
@@ -403,6 +499,10 @@ namespace synthese
 			BOOST_FOREACH(const Registry<PublicPlace>::value_type& publicPlace, _env.getEditableRegistry<PublicPlace>())
 			{
 				PublicPlaceTableSync::Save(publicPlace.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<PublicPlaceEntrance>::value_type& publicPlaceEntrance, _env.getEditableRegistry<PublicPlaceEntrance>())
+			{
+				PublicPlaceEntranceTableSync::Save(publicPlaceEntrance.second.get(), transaction);
 			}
 			return transaction;
 		}

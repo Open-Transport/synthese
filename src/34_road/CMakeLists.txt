@@ -23,6 +23,10 @@ OSMFileFormat.cpp
 OSMFileFormat.hpp
 PublicPlace.cpp
 PublicPlace.h
+PublicPlaceEntrance.cpp
+PublicPlaceEntrance.hpp
+PublicPlaceEntranceTableSync.cpp
+PublicPlaceEntranceTableSync.hpp
 PublicPlaceTableSync.cpp
 PublicPlaceTableSync.h
 ReachableFromCrossing.hpp

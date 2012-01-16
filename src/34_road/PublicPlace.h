@@ -23,10 +23,11 @@
 #ifndef SYNTHESE_road_PUBLICPLACE_H
 #define SYNTHESE_road_PUBLICPLACE_H
 
-#include "Registry.h"
 #include "NamedPlaceTemplate.h"
 #include "Importable.h"
 #include "WithGeometry.hpp"
+
+#include "Registry.h"
 
 #include <geos/geom/Point.h>
 #include <string>
@@ -40,6 +41,8 @@ namespace synthese
 
 	namespace road
 	{
+		class PublicPlaceEntrance;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Public place.
 		///	@ingroup m34
@@ -57,9 +60,13 @@ namespace synthese
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
 
-		private:
-			mutable boost::shared_ptr<geos::geom::Point> _point;
+			typedef std::set<PublicPlaceEntrance*> Entrances;
 
+		private:
+			/// @name
+			//@{
+				Entrances _entrances;
+			//@}
 
 		public:
 			/// Chosen registry class.
@@ -70,6 +77,17 @@ namespace synthese
 			);
 
 			virtual ~PublicPlace ();
+
+			/// @name Getters
+			//@{
+				const Entrances& getEntrances() const { return _entrances; }
+			//@}
+
+			/// @name Modifiers
+			//@{
+				void addEntrance(PublicPlaceEntrance& entrance);
+				void removeEntrance(PublicPlaceEntrance& entrance);
+			//@}
 
 			virtual std::string getNameForAllPlacesMatcher(
 				std::string text = std::string()
