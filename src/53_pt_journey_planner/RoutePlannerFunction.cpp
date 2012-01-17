@@ -3140,6 +3140,10 @@ namespace synthese
 				pm.insert(DATA_LONGITUDE, point->getX());
 				pm.insert(DATA_LATITUDE, point->getY());
 			}
+			if(dynamic_cast<const StopArea*>(&place))
+			{
+				dynamic_cast<const StopArea&>(place).toParametersMap(pm, &CoordinatesSystem::GetCoordinatesSystem(4326), "STOP_AREA_");
+			}
 
 			// Arrival stop
 			if(arrivalPhysicalStop)
