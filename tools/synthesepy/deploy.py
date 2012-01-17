@@ -22,6 +22,7 @@
 import logging
 import os
 from os.path import join
+import time
 
 import project_manager
 import utils
@@ -149,5 +150,8 @@ class Deployer(object):
     def restore_deploy(self):
         commands_result = project_manager.CommandsResult('restore_deploy')
         self.project.bgstop()
+        # TODO: this should wait until we are sure the daemon is stopped
+        log.debug("Sleeping a while to let the daemon stop.")
+        time.sleep(10)
         self._restore_tables()
         self.project.bgstart()
