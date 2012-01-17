@@ -29,6 +29,7 @@
 #include "CommercialLine.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "RollingStock.hpp"
 #include "Request.h"
 #include "JourneyPattern.hpp"
 #include "Path.h"
@@ -286,6 +287,27 @@ namespace synthese
 						shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
 						itLine->toParametersMap(*pmLine);
+						
+						// Rolling stock
+						set<RollingStock *> rollingStocks;
+						BOOST_FOREACH(Path* path, itLine->getPaths())
+						{
+							if(!dynamic_cast<const JourneyPattern*>(path))
+								continue;
+
+							if(!static_cast<const JourneyPattern*>(path)->getRollingStock())
+								continue;
+
+							rollingStocks.insert(
+								static_cast<const JourneyPattern*>(path)->getRollingStock()
+							);
+						}
+						BOOST_FOREACH(RollingStock * rs, rollingStocks)
+						{
+							shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+							rs->toParametersMap(*transportModePM);
+							pmLine->insert("transportMode", transportModePM);
+						}	
 
 						stopPm->insert(DATA_LINE, pmLine);
 					}
