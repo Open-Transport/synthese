@@ -136,8 +136,6 @@ namespace synthese
 			const std::string& key,
 			boost::optional<const admin::AdminRequest&> adminRequest
 		) const {
-			typedef std::map<int, string> MissingCitiesMap;
-			MissingCitiesMap missingCities;
 
 			// 1 : Administrative areas
 			if(key == FILE_MTDAREA)
@@ -211,8 +209,8 @@ namespace synthese
 
 							if(cities.empty())
 							{
-								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
-								missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
+								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " (" << cityID << ") not found.<br />";
+								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
 							else
@@ -257,8 +255,8 @@ namespace synthese
 
 							if(cities.empty())
 							{
-								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " not found.<br />";
-								missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
+								os << "WARN : City " << rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME) << " (" << cityID << ") not found.<br />";
+								_missingCities.insert(make_pair(cityID, rows->getText(NavstreetsFileFormat::_FIELD_AREA_NAME)));
 								continue;
 							}
 							else
@@ -334,8 +332,8 @@ namespace synthese
 							if(_citiesAutoCreation)
 							{
 								// Try to find the city in _missingCities map
-								MissingCitiesMap::const_iterator itc(missingCities.find(lAreaId));
-								if(itc != missingCities.end())
+								_MissingCitiesMap::const_iterator itc(_missingCities.find(lAreaId));
+								if(itc != _missingCities.end())
 								{
 									// If a city with that name has already been created
 									CreatedCities::const_iterator itcc(createdCities.find(itc->second));
