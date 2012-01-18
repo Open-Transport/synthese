@@ -65,19 +65,19 @@ clignote();
 
 // Completion handler --------------------------------------------------------------------------------------------------------------------
 
-var _urlFunction = new Array();
+var _urlFunction = [];
 var _currentInputField;
 var _enterIsForbidden = false;
 var _documentForm = null; // le formulaire contenant notre champ texte
-var _inputField = new Array(); // le champ texte lui-même
-var _secondaryField = new Array(); // le champ texte lui-même
+var _inputField = []; // le champ texte lui-même
+var _secondaryField = []; // le champ texte lui-même
 var _submitButton = null; // le bouton submit de notre formulaire
-var _oldInputFieldValue = new Array(); // valeur précédente du champ texte
-var _currentInputFieldValue = new Array(); // valeur actuelle du champ texte
-var _resultCache = new Array(); // mécanisme de cache des requetes
-var _fieldToCleanAtUpdate = new Array();
-var _normalObject = new Array();
-var _waitObject = new Array();
+var _oldInputFieldValue = []; // valeur précédente du champ texte
+var _currentInputFieldValue = []; // valeur actuelle du champ texte
+var _resultCache = []; // mécanisme de cache des requetes
+var _fieldToCleanAtUpdate = [];
+var _normalObject = [];
+var _waitObject = [];
 var _timeOut;
 
 // retourne un objet xmlHttpRequest.
@@ -117,7 +117,7 @@ function initAutoCompleteForm(form, submit) {
   _documentForm = form;
   _submitButton = submit;
   creeAutocompletionDiv();
-  cacheResults("", new Array());
+  cacheResults("", []);
   window.onresize = onResizeHandler;
 }
 
@@ -218,7 +218,7 @@ function getFromCache(value1, value2) {
 
 // Transformation XML en tableau
 function traiteXmlSuggestions(xmlDoc) {
-  var optionsListe = new Array();   
+  var optionsListe = [];
   if (legacyRoutePlannerConfig.routePlannerFormOneField) {
     // Best place
     var bestPlaceNode = xmlDoc.getElementsByTagName('best_place')[0];
@@ -246,7 +246,7 @@ function traiteXmlSuggestions(xmlDoc) {
 
     // Cities
     var citiesNode = xmlDoc.getElementsByTagName('cities')[0];
-    if(citiesNode) {
+    if (citiesNode) {
         var cities = citiesNode.getElementsByTagName('city');
         if (cities.length > 0) {
             optionsListe.push(['Communes : ', '', '', null]);
@@ -255,10 +255,10 @@ function traiteXmlSuggestions(xmlDoc) {
             optionsListe.push(traiteXmlCity(cities[i]));
         }
     }
-    
+
     // Stops
     var stopsNode = xmlDoc.getElementsByTagName('stops')[0];
-    if(stopsNode) {
+    if (stopsNode) {
         var stops = stopsNode.getElementsByTagName('stop');
         if (stops.length > 0) {
             optionsListe.push(['Arrêts : ', '', '', null]);
@@ -267,10 +267,10 @@ function traiteXmlSuggestions(xmlDoc) {
             optionsListe.push(traiteXmlStop(stops[i]));
         }
     }
-    
+
     // Roads
     var roadsNode = xmlDoc.getElementsByTagName('roads')[0];
-    if(roadsNode) {
+    if (roadsNode) {
         var roads = roadsNode.getElementsByTagName('road');
         if (roads.length > 0) {
             optionsListe.push(['Rues : ', '', '', null]);
@@ -282,7 +282,7 @@ function traiteXmlSuggestions(xmlDoc) {
 
     // Addresses
     var addressesNode = xmlDoc.getElementsByTagName('addresses')[0];
-    if(addressesNode) {
+    if (addressesNode) {
         var addresses = addressesNode.getElementsByTagName('address');
         if (addresses.length > 0) {
             optionsListe.push(['Adresses : ', '', '', null]);
@@ -294,7 +294,7 @@ function traiteXmlSuggestions(xmlDoc) {
 
     // Public places
     var ppNode = xmlDoc.getElementsByTagName('public_places')[0];
-    if(ppNode) {
+    if (ppNode) {
         var pps = ppNode.getElementsByTagName('public_place');
         if (pps.length > 0) {
             optionsListe.push(['Lieux publics : ', '', '', null]);
@@ -304,7 +304,7 @@ function traiteXmlSuggestions(xmlDoc) {
         }
     }
 
-    
+
   } else {
     var options = xmlDoc.getElementsByTagName('option');
     for (var i = 0; i < options.length; ++i) {
@@ -345,7 +345,7 @@ function traiteXmlAddress(address) {
   return [
     address.getAttribute('number') + ' ' + address.getAttribute('road_name') + ' ' + address.getAttribute('road_city_name'),
     address.getAttribute('road_city_name'),
-    address.getAttribute('number')+' '+address.getAttribute('road_name'),
+    address.getAttribute('number') + ' ' + address.getAttribute('road_name'),
     'address'];
 }
 
@@ -444,7 +444,7 @@ function drawList(i, valeur, liste) {
       nouveauDiv.onmouseout = divOnMouseOut;
       setStyleForElement(nouveauDiv, "autoCompleteDiv");
     } else {
-       setStyleForElement(nouveauDiv, "autoCompleteDivTitle");   
+       setStyleForElement(nouveauDiv, "autoCompleteDivTitle");
     }
     var nouveauSpan = document.createElement("SPAN");
     nouveauSpan.innerHTML = liste[f][0]; // le texte de la suggestion
@@ -558,7 +558,7 @@ function setAndJump(id, value, idCity, cityValue) {
   if (legacyRoutePlannerConfig.routePlannerFormOneField) {
     _secondaryField[id].value = _currentList[_highlightedSuggestionIndex][3];
   }
-  
+
   hideList();
 
   var next;
@@ -740,7 +740,7 @@ function mouse_click_handler(e) {
     var row = cell.parentNode || cell.parentElement;
     var rowIdx = _getRowIndex(row);
 
-    if (cellIdx > 0 && cell.className!='completion') {
+    if (cellIdx > 0 && cell.className != 'completion') {
       showJourneyBoard(cellIdx);
     }
   }
@@ -773,9 +773,9 @@ function mouse_event_handler(e) {
   function _getTable() {
     var tbleObj;
 
-    if (mouse_event_handler.previous.table)
+    if (mouse_event_handler.previous.table) {
       return;
-    else {
+    } else {
       tbleObj = row.parentNode || row.parentElement; // tbody
       var tn = tbleObj.tagName.toLowerCase();
       while (tn != "table" && tn != "html") {
