@@ -76,9 +76,16 @@
     </style>
     <script src="{{ url_for('.static_core', filename='core/vendor/jquery-1.7.1.min.js') }}"></script>
     <script src="{{ url_for('.static', filename='vendor/bootstrap/js/bootstrap-alerts.js') }}"></script>
+    <script src="{{ url_for('.static', filename='vendor/bootstrap/js/bootstrap-modal.js') }}"></script>
     <script>
     $(function() {
       $(".alert-message").alert();
+
+      $("form").submit(function() {
+        setTimeout(function() {
+          $("#modal-waiting-dialog").modal({backdrop: true, show: true});
+        }, 300);
+      });
     })
     </script>
     {% block head %}{% endblock %}
@@ -131,6 +138,16 @@
 
           </div>
         </div>
+      </div>
+    </div>
+
+    <div id="modal-waiting-dialog" class="modal hide fade">
+      <div class="modal-header">
+        <a href="#" class="close">&times;</a>
+        <h3>Please Wait</h3>
+      </div>
+      <div class="modal-body">
+        <p>Command in progress…</p>
       </div>
     </div>
   </body>

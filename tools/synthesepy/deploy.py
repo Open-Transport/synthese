@@ -19,6 +19,8 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import datetime
+import gzip
 import logging
 import os
 from os.path import join
@@ -86,39 +88,100 @@ def unixjoin(*paths):
     return '/'.join(paths)
 
 
-class Deployer(object):
+class Dump(object):
+    def __init__(self, id, path):
+        self.id = id
+        self.path = path
+        self.date = datetime.datetime.fromtimestamp(os.path.getctime(self.path))
+
+    def __repr__(self):
+        return '<Dump %s>' % self.__dict__
+
+    @property
+    def sql_path(self):
+        return join(self.path, 'dump.sql.gz')
+
+    def delete(self):
+        log.info('Deleting old dump: %s', self)
+        utils.maybe_remove(self.path)
+
+
+class Deployer(utils.DirObjectLoader):
+    MAX_DUMPS_TO_KEEP = 500
+
     def __init__(self, project):
         self.project = project
-        self.dump_local_path = join('deploy', 'dump.sql')
-        self.dump_path = join(project.path, self.dump_local_path)
-        utils.maybe_makedirs(os.path.dirname(self.dump_path))
 
-    def _dump_tables(self):
+        self._dumps = None
+        self.deploy_path = join(project.path, 'deploy')
+        self.lock_path = join(self.deploy_path, 'locked.txt')
+        self.dumps_path = join(self.deploy_path, 'dumps')
+        utils.maybe_makedirs(self.dumps_path)
+        self.remote_dump_local_path = join('deploy', 'dump.sql.gz')
+
+    def refresh(self):
+        # Clear the dumps cache. It will be repopulated on next access.
+        self._dumps = None
+
+    @property
+    def locked(self):
+        return os.path.isfile(self.lock_path)
+
+    @locked.setter
+    def locked(self, locked):
+        try:
+            if locked:
+                open(self.lock_path, 'w').write('Deploy locked')
+            else:
+                os.unlink(self.lock_path)
+        except IOError, e:
+            log.debug('Ignoring IOError while setting deploy lock: %s', e)
+
+    def _load_dumps(self):
+        if self._dumps is not None:
+            return
+        self._dumps = self.load_from_dir(self.dumps_path, Dump)
+
+    def get_dumps(self):
+        self._load_dumps()
+        return self._dumps.values()
+    dumps = property(get_dumps)
+
+    def _get_dump(self, dump_id):
+        self._load_dumps()
+        return self._dumps[dump_id]
+
+    def _create_dump(self):
+        self._load_dumps()
+        return self.create_object(self._dumps, self.dumps_path, Dump)
+
+    def _dump_tables(self, dump):
         db_backend = self.project.db_backend
-        with open(self.dump_path, 'wb') as f:
-            #f.write('begin transaction;\n\n')
-            for table in db_backend.get_tables():
-                if table in NO_DEPLOY_TABLES:
-                    continue
-                # ignore index tables on SQLite
-                if table.startswith('idx_t'):
-                    continue
-                f.write('-- '  + '-' * 77 + '\n')
-                f.write('-- Dump of table %s\n\n' % table)
-                if db_backend.name == 'sqlite':
-                    f.write('drop table if exists %s;\n\n' % table)
-                f.write(db_backend.dump(table))
-            #f.write('\ncommit;\n')
+        f = gzip.open(dump.sql_path, 'wb')
+        #f.write('begin transaction;\n\n')
+        for table in db_backend.get_tables():
+            if table in NO_DEPLOY_TABLES:
+                continue
+            # ignore index tables on SQLite
+            if table.startswith('idx_t'):
+                continue
+            f.write('-- '  + '-' * 77 + '\n')
+            f.write('-- Dump of table %s\n\n' % table)
+            if db_backend.name == 'sqlite':
+                f.write('drop table if exists %s;\n\n' % table)
+            f.write(db_backend.dump(table))
+        #f.write('\ncommit;\n')
+        f.close()
 
-    def _transfer_dump(self):
+    def _transfer_dump(self, dump):
         config = self.project.config
         return project_manager.CommandResult.call_command(
             self.project,
             utils.rsync_command_line(
                 config,
-                utils.to_cygwin_path(self.dump_path),
+                utils.to_cygwin_path(dump.sql_path),
                 '{remote_server}:' + unixjoin(
-                    config.remote_project_path, self.dump_local_path)))
+                    config.remote_project_path, self.remote_dump_local_path)))
 
     def _launch_remote(self, cmd):
         project_cmd = ' '.join(
@@ -132,26 +195,49 @@ class Deployer(object):
     # TODO: email in case of failure.
     def deploy(self):
         commands_result = project_manager.CommandsResult('deploy')
+
+        if self.locked:
+            log.warn('Deploy is locked, not performing deploy.')
+            return commands_result
+
+        dump = self._create_dump()
         commands_result.add_command_result(
-            project_manager.CommandResult.call_method(self._dump_tables))
-        commands_result.add_command_result(self._launch_remote('prepare_deploy'))
-        commands_result.add_command_result(self._transfer_dump())
-        commands_result.add_command_result(self._launch_remote('restore_deploy'))
+            project_manager.CommandResult.call_method(self._dump_tables, dump))
+
+        self.deploy_restore(dump.id, commands_result)
+
+        # Clean old dumps.
+        for dump_to_delete in self.dumps[:-self.MAX_DUMPS_TO_KEEP]:
+            dump_to_delete.delete()
+
+        return commands_result
+
+    def deploy_restore(self, dump_id, commands_result=None):
+        if not commands_result:
+            commands_result = project_manager.CommandsResult('deploy_restore')
+        dump = self._get_dump(dump_id)
+        if not dump:
+            raise Exception('Unable to find dump with id %s', dump_id)
+
+        commands_result.add_command_result(self._launch_remote('deploy_remote_prepare'))
+        commands_result.add_command_result(self._transfer_dump(dump))
+        commands_result.add_command_result(self._launch_remote('deploy_remote_restore'))
         return commands_result
 
     def _restore_tables(self):
-        sql = open(self.dump_path, 'rb').read()
-        log.info('Restoring %s bytes of sql from %r', len(sql), self.dump_path)
+        sql_path = join(self.project.path, self.remote_dump_local_path)
+        sql = gzip.open(sql_path, 'rb').read()
+        log.info('Restoring %s bytes of sql from %r', len(sql), sql_path)
         self.project.db_backend.restore(sql, dropdb=False)
 
-    def prepare_deploy(self):
-        utils.maybe_makedirs(os.path.dirname(self.dump_path))
+    def deploy_remote_prepare(self):
+        utils.maybe_makedirs(self.deploy_path)
 
-    def restore_deploy(self):
-        commands_result = project_manager.CommandsResult('restore_deploy')
+    def deploy_remote_restore(self):
+        commands_result = project_manager.CommandsResult('deploy_remote_restore')
         self.project.bgstop()
         # TODO: this should wait until we are sure the daemon is stopped
         log.debug("Sleeping a while to let the daemon stop.")
-        time.sleep(10)
+        ##XXX time.sleep(10)
         self._restore_tables()
         self.project.bgstart()

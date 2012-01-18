@@ -203,8 +203,8 @@ def add_project_subparsers(subparsers):
     add_parser('update_synthese')
     add_parser('update_project')
     add_parser('deploy')
-    add_parser('prepare_deploy')
-    add_parser('restore_deploy')
+    add_parser('deploy_remote_prepare')
+    add_parser('deploy_remote_restore')
 
 
 def add_default_subparsers(subparsers):

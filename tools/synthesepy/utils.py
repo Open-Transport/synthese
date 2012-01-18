@@ -25,6 +25,7 @@ import errno
 import httplib
 import logging
 import os
+from os.path import join
 import shutil
 import smtplib
 import stat
@@ -33,6 +34,8 @@ import sys
 import time
 import urllib2
 from xml.etree import ElementTree
+
+from synthesepy.third_party.ordered_dict import OrderedDict
 
 log = logging.getLogger(__name__)
 
@@ -465,3 +468,33 @@ class SVNInfo(object):
         if not self._last_msg:
             self._fetch_svn_log()
         return self._last_msg
+
+
+class DirObjectLoader(object):
+    '''
+    Mixin for loading creating and loading objects corresponding to directories
+    on the filesystem.
+    The directory where to load objects from should contain a list of
+    directories with a numerical name.
+    '''
+    def load_from_dir(self, directory, class_, *args):
+        objects = OrderedDict()
+        ids = [id for id in os.listdir(directory) if
+            os.path.isdir(join(directory, id))]
+        for id in sorted(ids, key=int):
+            path = join(directory, id)
+            ctor_args = list(args) + [id, path]
+            objects[id] = class_(*ctor_args)
+        return objects
+
+    def create_object(self, objects, directory, class_, *args):
+        max_id = 0
+        if objects:
+            max_id = max(int(id) for id in objects.keys())
+        new_id = str(max_id + 1)
+        object_path = join(directory, new_id)
+        os.makedirs(object_path)
+        ctor_args = list(args) + [new_id, object_path]
+        object = class_(*ctor_args)
+        objects[object.id] = object
+        return object

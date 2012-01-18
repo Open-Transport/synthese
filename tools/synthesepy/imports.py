@@ -78,31 +78,7 @@ class ImportsManager(object):
         return import_template.get_import(import_id)
 
 
-class DirObjectLoader(object):
-    def load_from_dir(self, directory, class_, *args):
-        objects = OrderedDict()
-        ids = [id for id in os.listdir(directory) if
-            os.path.isdir(join(directory, id))]
-        for id in sorted(ids, key=int):
-            path = join(directory, id)
-            ctor_args = list(args) + [id, path]
-            objects[id] = class_(*ctor_args)
-        return objects
-
-    def create_object(self, objects, directory, class_, *args):
-        max_id = 0
-        if objects:
-            max_id = max(int(id) for id in objects.keys())
-        new_id = str(max_id + 1)
-        object_path = join(directory, new_id)
-        os.makedirs(object_path)
-        ctor_args = list(args) + [new_id, object_path]
-        object = class_(*ctor_args)
-        objects[object.id] = object
-        return object
-
-
-class ImportTemplate(DirObjectLoader):
+class ImportTemplate(utils.DirObjectLoader):
     def __init__(self, manager, config):
         self.manager = manager
 
@@ -349,7 +325,7 @@ class ImportRun(object):
     log = property(get_log)
 
 
-class Import(DirObjectLoader):
+class Import(utils.DirObjectLoader):
     def __init__(self, template, id, path):
         self.template = template
         self.id = id
