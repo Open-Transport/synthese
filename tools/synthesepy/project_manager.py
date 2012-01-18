@@ -1158,13 +1158,18 @@ The synthese.py wrapper script.
 
     @command()
     @commands_result()
-    def prepare_deploy(self):
-        return self.deployer.prepare_deploy()
+    def deploy_restore(self, dump_id):
+        return self.deployer.deploy_restore(dump_id)
 
     @command()
     @commands_result()
-    def restore_deploy(self):
-        return self.deployer.restore_deploy()
+    def deploy_remote_prepare(self):
+        return self.deployer.deploy_remote_prepare()
+
+    @command()
+    @commands_result()
+    def deploy_remote_restore(self):
+        return self.deployer.deploy_remote_restore()
 
 
 def create_project(env, path, system_packages=None, conn_string=None,
