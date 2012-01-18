@@ -77,10 +77,14 @@ def index():
     except IOError:
         last_admin_log = "[Not available]"
 
+    deployer = project.deployer
+    deployer.refresh()
+
     return render_template(
         'index.html',
         last_admin_log=last_admin_log,
-        config=project.config)
+        config=project.config,
+        deployer=deployer)
 
 
 class WrongPassword(Exception):
@@ -197,6 +201,27 @@ def svn_update():
 @admin_required
 def deploy():
     project = flask.current_app.project
+
+    if request.form.get('unlock'):
+        flash('Deploy unlocked')
+        project.deployer.locked = False
+        return redirect(url_for('.index'))
+
+    if request.form.get('lock'):
+        flash('Deploy locked')
+        project.deployer.locked = True
+        return redirect(url_for('.index'))
+
+    for k in request.form.iterkeys():
+        if not k.startswith('restore_'):
+            continue
+        dump_id = k.split('restore_')[1]
+        dump = project.deployer._get_dump(dump_id)
+        if not dump:
+            abort(404)
+        template = _do_command(project.deploy_restore, dump.id)
+        project.deployer.locked = True
+        return template
 
     return _do_command(project.deploy)
 
