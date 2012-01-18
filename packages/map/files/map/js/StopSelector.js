@@ -112,15 +112,28 @@ var StopSelector = Backbone.View.extend({
   },
 
   stopSelected: function(stopFeature) {
-    this.routePlanner.setCity(
-      this.currentDirection, stopFeature.data.city_name);
-    this.routePlanner.setPlace(
-      this.currentDirection, stopFeature.data.stop_name);
+    if (legacyRoutePlannerConfig.routePlannerFormOneField) {
+      this.routePlanner.setPlace(
+        this.currentDirection, stopFeature.data.city_name + " " + stopFeature.data.stop_name);
+      this.routePlanner.setClass(
+        this.currentDirection, "stop");
+        
+      var self = this;
+      $(this.selectorPopup.el).fadeOut(null, function() {
+        self.selectorPopup.close();
+      });
+    }
+    else {
+      this.routePlanner.setCity(
+        this.currentDirection, stopFeature.data.city_name);
+      this.routePlanner.setPlace(
+        this.currentDirection, stopFeature.data.stop_name);
 
-    var self = this;
-    $(this.selectorPopup.el).fadeOut(null, function() {
-      self.selectorPopup.close();
-    });
+      var self = this;
+      $(this.selectorPopup.el).fadeOut(null, function() {
+        self.selectorPopup.close();
+      });
+    }
   }
 });
 
