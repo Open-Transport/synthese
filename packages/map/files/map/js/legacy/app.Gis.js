@@ -557,7 +557,7 @@ window.app.Gis.prototype = {
 
         layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
-                picto: requireJSConfig.baseUrl + 'map/img/' + fileName,
+                picto: requireJSConfig.baseUrl + 'local/map/img/' + fileName,
                 name: name
             })
         ]);
