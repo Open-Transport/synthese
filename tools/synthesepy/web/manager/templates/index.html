@@ -13,6 +13,9 @@
     table.deploy-restore .btn {
       padding: 0;
     }
+    .actions .label {
+      margin: 0px 5px 0px 15px;
+    }
   </style>
 {% endblock %}
 
@@ -35,6 +38,7 @@
         </div>
         <div class="actions">
           <input type="submit" class="btn primary" value="Update Synthese">
+          <span class="label notice">Notice</span>This won't interrupt the service.
         </div>
       </fieldset>
     </form>
@@ -70,6 +74,8 @@
         </div>
         <div class="actions">
           <input type="submit" class="btn primary" value="Update Project">
+          <span class="label important">Important</span>
+          The service will be interrupted during daemon restart.
         </div>
       </fieldset>
     </form>
