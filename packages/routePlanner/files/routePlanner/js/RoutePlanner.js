@@ -23,12 +23,12 @@ var RoutePlannerView = Backbone.View.extend({
     this.departure = {
       city: this.$("#origin_city_txt"),
       place: this.$("#origin_place_txt"),
-      class: this.$("#origin_class_txt")
+      class_: this.$("#origin_class_txt")
     };
     this.arrival = {
       city: this.$("#destination_city_txt"),
       place: this.$("#destination_place_txt"),
-      class: this.$("#destination_class_txt")
+      class_: this.$("#destination_class_txt")
     };
 
     this.$(".mapLink").show();
@@ -55,10 +55,10 @@ var RoutePlannerView = Backbone.View.extend({
     return this.getDirectionObj(departure).place.val(placeName);
   },
   getClass: function(departure) {
-    return this.getDirectionObj(departure).class.val();
+    return this.getDirectionObj(departure).class_.val();
   },
   setClass: function(departure, className) {
-    return this.getDirectionObj(departure).class.val(className);
+    return this.getDirectionObj(departure).class_.val(className);
   },
   
   mapLinkClick: function(event) {
