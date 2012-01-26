@@ -62,7 +62,7 @@ DEFAULTS = {
     'log_file': None,
     'gdb': False,
     'netstat_cmd': None,
-    'restart_if_crashed': False,
+    'restart_if_crashed_or_hung': False,
     'no_root_check': False,
     'extra_params': None,
 
@@ -82,7 +82,7 @@ DEFAULTS = {
     'mail_user': None,
     'mail_password': None,
     'mail_tls': False,
-    'send_mail_on_crash': False,
+    'send_mail_on_restart': False,
     'apache_conf_suffix': '',
     # web frontend configuration
     # Put in the project config.
@@ -196,6 +196,14 @@ class Config(object):
             utils.netstat_cmd = self.netstat_cmd
 
         utils.dummy = self.dummy
+
+        # Backward compatibility. To be removed in the future.
+        if (not self.send_mail_on_restart and
+            hasattr(self, 'send_mail_on_crash')):
+            self.send_mail_on_restart = self.send_mail_on_crash
+        if (not self.restart_if_crashed_or_hung and
+            hasattr(self, 'restart_if_crashed')):
+            self.restart_if_crashed_or_hung = self.restart_if_crashed
 
         # Convert log level to int
         try:
