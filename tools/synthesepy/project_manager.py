@@ -35,6 +35,7 @@ import shutil
 import socket
 import subprocess
 import sys
+import threading
 import time
 import traceback
 
@@ -617,23 +618,26 @@ class Project(object):
         self.load_data()
         self.load_local_data(True)
 
-    def send_crash_mail(self, restart_count, last_start_s):
-        if not self.config.send_mail_on_crash:
+    def send_restart_mail(self, fail_kind, restart_count, last_start_s):
+        if not self.config.send_mail_on_restart:
             return
 
-        log.info('Sending crash mail')
+        log.info('Sending restart mail')
         hostname = socket.gethostname()
-        LINE_COUNT = 500
+        LINE_COUNT = 1000
         try:
             last_log = utils.tail(open(self.config.log_file), LINE_COUNT)
         except IOError:
             last_log = "[Not available]"
 
-        subject = ('Synthese crash on {0} (project: {1}, '
-            'restarts: {2})'.format(
-                hostname, self.config.project_name, restart_count))
+        subject = ('Synthese {fail_kind} on {hostname} (project: {project}, '
+            'restarts: {restart_count})'.format(
+                fail_kind=fail_kind,
+                hostname=hostname,
+                project=self.config.project_name,
+                restart_count=restart_count))
         body = '''
-Synthese crashed on {hostname}. It is going to restart.
+Detected Synthese {fail_kind} on {hostname}. It is going to restart.
 Total restart count: {restart_count}. Seconds since last start: {uptime_s}.
 
 Last {line_count} lines of log:
@@ -642,6 +646,7 @@ Last {line_count} lines of log:
 Have a nice day,
 The synthese.py wrapper script.
 '''.format(
+            fail_kind=fail_kind,
             hostname=hostname,
             restart_count=restart_count,
             line_count=LINE_COUNT,
@@ -661,29 +666,73 @@ The synthese.py wrapper script.
             hasattr(self.manager_module, 'on_daemon_started')):
             self.manager_module.on_daemon_started(self)
 
+        hang_detector_running = True
+        hang_detected_event = threading.Event()
+
+        def hang_detector():
+            HANG_CHECK_INTERVAL_S = 60
+            RESTART_HANG_COUNT = 2
+            hangs_count = 0
+            while hang_detector_running:
+                if not self.daemon.ready:
+                    log.debug('Hang detector: daemon not ready')
+                    time.sleep(HANG_CHECK_INTERVAL_S)
+                    hangs_count = 0
+                    continue
+                log.debug('Checking for hangs')
+                if not utils.can_connect(self.config.port, False, '/hang_check'):
+                    hangs_count += 1
+                    log.warn('Detected hang. Hangs count is %s', hangs_count)
+                else:
+                    hangs_count = 0
+                if hangs_count >= RESTART_HANG_COUNT:
+                    hangs_count = 0
+                    log.warn('Hang detected, setting hang detected event.')
+                    hang_detected_event.set()
+                time.sleep(HANG_CHECK_INTERVAL_S)
+
+        if self.config.restart_if_crashed_or_hung:
+            hang_detector_thread = threading.Thread(target=hang_detector)
+            hang_detector_thread.daemon = True
+            hang_detector_thread.start()
+
         restart_count = 0
         try:
-            running = True
-            while running:
+            while True:
+                restart = False
                 start_time = time.time()
-                while self.daemon.is_running():
+                while (self.daemon.is_running() and
+                    not hang_detected_event.is_set()):
                     time.sleep(2)
-                log.info('Daemon terminated')
-                expected_stop = self.daemon.stopped
-                running = False
-                if not expected_stop:
-                    log.warn('Stop is unexpected, crash?')
-                    if self.config.restart_if_crashed:
-                        self.send_crash_mail(restart_count, start_time)
-                        self.daemon.start(kill_existing=False)
-                        running = True
-                    else:
-                        sys.exit(1)
+                if hang_detected_event.is_set():
+                    log.info('Hang detected')
+                    hang_detected_event.clear()
+                    fail_kind = 'hang'
+                    self.daemon.stop()
+                    restart = True
+                else:
+                    log.info('Daemon terminated')
+                    crashed = not self.daemon.stopped
+                    fail_kind = 'crash'
+                    if crashed:
+                        log.warn('Stop is unexpected, crash?')
+                        restart_reason = 'Crash'
+                        if self.config.restart_if_crashed_or_hung:
+                            restart = True
+
+                if not restart:
+                    sys.exit(1)
+                    break
+
+                log.info('Restarting daemon')
+                self.send_restart_mail(fail_kind, restart_count, start_time)
+                self.daemon.start(kill_proxy=False)
                 restart_count += 1
         except:
             raise
         finally:
             log.info('Stopping daemon')
+            hang_detector_running = False
             self.daemon.stop()
 
     @command()

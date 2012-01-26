@@ -19,6 +19,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+
 import errno
 import logging
 import os
@@ -48,6 +49,7 @@ class Daemon(object):
             self.use_proxy = False
         self.proc = None
         self.stopped = True
+        self._ready = False
 
     def _start_wsgi_proxy(self):
         if not self.use_proxy:
@@ -78,6 +80,12 @@ class Daemon(object):
             return False
         return self.proc.poll() is None
 
+    @property
+    def ready(self):
+        if not self.is_running():
+            return False
+        return self._ready
+
     def setsignals(self):
         def terminate(sig, frame):
             log.info('Got TERM signal, stopping daemon')
@@ -85,9 +93,9 @@ class Daemon(object):
         signal.signal(signal.SIGTERM, terminate)
 
     @classmethod
-    def kill_existing(cls, env):
+    def kill_existing(cls, env, kill_proxy=True):
         ports_to_check = [env.c.port]
-        if env.c.wsgi_proxy:
+        if kill_proxy and env.c.wsgi_proxy:
             ports_to_check.append(env.c.wsgi_proxy_port)
         for port in ports_to_check:
             utils.kill_listening_processes(port)
@@ -108,11 +116,11 @@ class Daemon(object):
                 pass
         return pid_path
 
-    def start(self, kill_existing=True):
+    def start(self, kill_proxy=True):
+        self._ready = False
         self.env.prepare_for_launch()
 
-        if kill_existing:
-            self.kill_existing(self.env)
+        self.kill_existing(self.env, kill_proxy)
 
         if not os.path.isfile(self.env.daemon_path):
             raise DaemonException(
@@ -174,11 +182,12 @@ class Daemon(object):
             pid = int(open(pid_path).read())
         log.info('daemon ready on port %i %s (script pid: %i)', self.env.c.port,
             '' if pid < 0 else 'with pid %i' % pid, os.getpid())
+        self._ready = True
         try:
             self._start_wsgi_proxy()
         except socket.error, e:
             # XXX Ignore address already in use if restarted.
-            if kill_existing:
+            if kill_proxy:
                 raise
             log.warn('Ignoring address already in use for wsgi proxy')
 
@@ -199,3 +208,4 @@ class Daemon(object):
         self._stop_wsgi_proxy()
         assert not utils.can_connect(self.env.c.port, False)
         self.stopped = True
+        self._ready = False
