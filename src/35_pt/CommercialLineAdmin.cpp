@@ -480,7 +480,16 @@ namespace synthese
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
 				stream << t.title("Réseau");
-				stream << t.cell("Réseau", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NETWORK_ID, _cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string()));
+				stream << t.cell(
+					"Réseau",
+					t.getForm().getTextInputAutoCompleteFromTableSync(
+						CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
+						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string(),
+						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getName()) : string(),
+						lexical_cast<string>(TransportNetworkTableSync::TABLE.ID),
+						string(),string(),
+						false, true, true, true
+				)	);
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
 				stream << t.cell("Nom long (feuille de route)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_LONG_NAME, _cline->getLongName()));

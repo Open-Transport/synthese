@@ -27,6 +27,7 @@
 #include "TransportNetworkRight.h"
 #include "CommercialLineTableSync.h"
 #include "CalendarTemplateTableSync.h"
+#include "TransportNetwork.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>
@@ -229,4 +230,24 @@ namespace synthese
 			}
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+
+
+		db::RowsList TransportNetworkTableSync::SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit
+		) const {
+			RowsList result;
+
+			SelectQuery<TransportNetworkTableSync> query;
+			Env env;
+			if(prefix) query.addWhereField(TransportNetworkTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+			if(limit) query.setNumber(*limit);
+			TransportNetworkTableSync::SearchResult networks(TransportNetworkTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
+			{
+				result.push_back(std::make_pair(network->getKey(), network->getName()));
+			}
+			return result;
+		} ;
 }	}
