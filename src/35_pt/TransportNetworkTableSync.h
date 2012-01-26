@@ -72,6 +72,20 @@ namespace synthese
 				, bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			/** Network search for AutoComplete.
+				@param prefix Part of the name of the transport network
+				@param limit Number of results to answer. The size of the vector is less
+					or equal to number
+				@return Found networks (object id and name).
+				@author Gaël Sauvanet
+				@date 2012
+			*/
+			db::RowsList SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit) const;
 		};
 	}
 }

@@ -115,6 +115,7 @@ namespace synthese
 			);
 
 
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Increase or decrease each rank of a siblings collection after a specific rank.
 			/// @param siteId ID of the site which must belong the pages to update
@@ -131,6 +132,16 @@ namespace synthese
 				db::DBTransaction& transaction
 			);
 
+
+
+			/** Webpage search for AutoComplete.
+				@param prefix Part of the name of the webpage
+				@param limit Number of results to answer. The size of the vector is less
+					or equal to number
+				@return Found webpages (object id and name).
+				@author Gaël Sauvanet
+				@date 2011
+			*/
 			db::RowsList SearchForAutoComplete(
 				const boost::optional<std::string> prefix,
 				const boost::optional<std::size_t> limit) const;

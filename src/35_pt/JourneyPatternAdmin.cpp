@@ -67,6 +67,7 @@
 #include "AdminModule.h"
 #include "CalendarTemplateTableSync.h"
 #include "Destination.hpp"
+#include "DestinationTableSync.hpp"
 #include "MapSource.hpp"
 
 #include <geos/geom/Envelope.h>
@@ -707,8 +708,14 @@ namespace synthese
 				);
 				stream << p.cell(
 					"Direction (girouette)",
-					p.getForm().getTextInput(JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID, _line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getKey()) : string())
-				);
+					p.getForm().getTextInputAutoCompleteFromTableSync(
+						JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID,
+						_line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getKey()) : string(),
+						_line->getDirectionObj() ? lexical_cast<string>(_line->getDirectionObj()->getDisplayedText()) : string(),
+						lexical_cast<string>(DestinationTableSync::TABLE.ID),
+						string(),string(),
+						false, true, true, true
+				)	);
 				stream << p.cell(
 					"Sens",
 					p.getForm().getRadioInputCollection(

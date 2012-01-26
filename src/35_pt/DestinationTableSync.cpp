@@ -190,4 +190,24 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+
+
+		db::RowsList DestinationTableSync::SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit
+		) const {
+			RowsList result;
+
+			SelectQuery<DestinationTableSync> query;
+			Env env;
+			if(prefix) query.addWhereField(DestinationTableSync::COL_DISPLAYED_TEXT, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+			if(limit) query.setNumber(*limit);
+			DestinationTableSync::SearchResult destinations(DestinationTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+			BOOST_FOREACH(const shared_ptr<Destination>& destination, destinations)
+			{
+				result.push_back(std::make_pair(destination->getKey(), destination->getDisplayedText()));
+			}
+			return result;
+		} ;
 }	}
