@@ -146,9 +146,9 @@ def find_executable(executable):
     return None
 
 
-def can_connect(port, verbose=False):
+def can_connect(port, verbose=False, path=''):
     """Returns whether it is possible to reach the given port on localhost with HTTP"""
-    url = 'http://localhost:%s' % port
+    url = 'http://localhost:{0}{1}'.format(port, path)
     try:
         req = urllib2.urlopen(url, timeout=5).read()
     # Linux may raise BadStatusLine when failing to connect.
