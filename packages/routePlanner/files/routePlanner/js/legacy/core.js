@@ -346,7 +346,7 @@ function traiteXmlAddress(address) {
     address.getAttribute('number') + ' ' + address.getAttribute('road_name') + ' ' + address.getAttribute('road_city_name'),
     address.getAttribute('road_city_name'),
     address.getAttribute('number') + ' ' + address.getAttribute('road_name'),
-    'address'];
+    'road'];
 }
 
 function traiteXmlPublicPlace(pp) {
