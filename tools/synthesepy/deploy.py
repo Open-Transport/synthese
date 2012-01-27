@@ -57,6 +57,7 @@ NO_DEPLOY_TABLES = set([
     't048_user_favorite_journey',
 
     # messages
+    't003_alarms',
     't039_scenarios',
     't040_alarm_object_links',
     't051_scenario_folder',
