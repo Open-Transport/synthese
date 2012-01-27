@@ -162,7 +162,7 @@ namespace synthese
 					StaticActionRequest<StopPointUpdateAction> moveAction(request);
 
 					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
-					
+
 					// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 					if(!mapCenter.get() || mapCenter->isEmpty())
 					{
@@ -256,7 +256,7 @@ namespace synthese
 				addRequest.getAction()->setPlace(const_pointer_cast<StopArea>(_connectionPlace));
 
 				AdminActionFunctionRequest<RemoveObjectAction,PTPlaceAdmin> removeRequest(request);
-				
+
 				HTMLForm f(addRequest.getHTMLForm());
 				stream << f.open();
 
@@ -588,7 +588,7 @@ namespace synthese
 
 				HTMLForm f(addRequest.getHTMLForm("addAlias"));
 				stream << f.open();
-				
+
 				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
 

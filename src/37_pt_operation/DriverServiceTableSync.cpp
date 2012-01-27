@@ -63,7 +63,7 @@ namespace synthese
 		const string DriverServiceTableSync::COL_DATES = "dates";
 		const string DriverServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<DriverServiceTableSync>::TABLE(
@@ -195,9 +195,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace pt_operation
 	{
 		DriverServiceTableSync::SearchResult DriverServiceTableSync::Search(

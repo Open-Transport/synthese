@@ -60,7 +60,7 @@ namespace synthese
 		const string StopAreaAddAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "sn";
 		const string StopAreaAddAction::PARAMETER_CREATE_CITY_IF_NECESSARY = Action_PARAMETER_PREFIX + "cc";
 		const string StopAreaAddAction::PARAMETER_DATA_SOURCE_LINKS = Action_PARAMETER_PREFIX + "sl";
-		
+
 
 
 		ParametersMap StopAreaAddAction::getParametersMap() const

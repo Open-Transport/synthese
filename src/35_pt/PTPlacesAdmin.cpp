@@ -361,7 +361,7 @@ namespace synthese
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
 
 				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request);
-				
+
 				AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 
 				HTMLForm f(stopAddRequest.getHTMLForm());
@@ -402,7 +402,7 @@ namespace synthese
 
 					openRequest.getPage()->setConnectionPlace(const_pointer_cast<const StopArea>(place));
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PTPlaceAdmin::ICON);
-					
+
 					// Remove button only if no stops inside
 					stream << t.col();
 					if(place->getPhysicalStops().empty())

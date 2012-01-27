@@ -42,7 +42,7 @@ log = logging.getLogger(__name__)
 # request. Paste proxy doesn't provide it, so we monkey patch the __call__
 # method here. The modification from Paste are shown in comments.
 def paste_proxy_patched_call(self, environ, start_response):
-    if (self.allowed_request_methods and 
+    if (self.allowed_request_methods and
         environ['REQUEST_METHOD'].lower() not in self.allowed_request_methods):
         return httpexceptions.HTTPBadRequest("Disallowed")(environ, start_response)
 
@@ -76,30 +76,30 @@ def paste_proxy_patched_call(self, environ, start_response):
             body = environ['wsgi.input'].read(-1)
             headers['content-length'] = str(len(body))
         else:
-            headers['content-length'] = environ['CONTENT_LENGTH'] 
+            headers['content-length'] = environ['CONTENT_LENGTH']
             length = int(environ['CONTENT_LENGTH'])
             body = environ['wsgi.input'].read(length)
     else:
         body = ''
-        
+
     path_info = urllib.quote(environ['PATH_INFO'])
-    if self.path:            
+    if self.path:
         request_path = path_info
         if request_path and request_path[0] == '/':
             request_path = request_path[1:]
-            
+
         path = urlparse.urljoin(self.path, request_path)
     else:
         path = path_info
     if environ.get('QUERY_STRING'):
         path += '?' + environ['QUERY_STRING']
-        
+
     conn.request(environ['REQUEST_METHOD'],
                  path,
                  body, headers)
     res = conn.getresponse()
     headers_out = parse_headers(res.msg)
-    
+
     status = '%s %s' % (res.status, res.reason)
     start_response(status, headers_out)
     # @@: Default?

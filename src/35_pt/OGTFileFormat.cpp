@@ -93,7 +93,7 @@ namespace synthese
 		}
 
 
-	
+
 		OGTFileFormat::Importer_::Importer_( util::Env& env, const impex::DataSource& dataSource ):
 			OneFileTypeImporter<OGTFileFormat>(env, dataSource),
 			Importer(env, dataSource),
@@ -115,7 +115,7 @@ namespace synthese
 			stream << t.cell("Fichier", t.getForm().getTextInput(PARAMETER_PATH, _pathsSet.empty() ? string() : _pathsSet.begin()->file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
-			stream << t.cell("Calendrier", 
+			stream << t.cell("Calendrier",
 				t.getForm().getSelectInput(
 					PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
 					CalendarTemplateTableSync::GetCalendarTemplatesList(),

@@ -88,9 +88,9 @@ namespace synthese
 			//@{
 				void setArea(boost::shared_ptr<const pt::FreeDRTArea> value){ _area = value; }
 			//@}
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -101,8 +101,8 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -123,7 +123,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization check.
 			/// Returns if the page can be displayed. In most cases, the needed right

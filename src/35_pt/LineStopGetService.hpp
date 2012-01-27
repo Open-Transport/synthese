@@ -60,15 +60,15 @@ namespace synthese
 			static const std::string DATA_RANK_IN_PATH;
 			static const std::string DATA_ROUTE_ID;
 			static const std::string DATA_STOP_ID;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::shared_ptr<const DesignatedLinePhysicalStop> _lineStop;
 				boost::shared_ptr<const cms::Webpage> _page;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
@@ -78,9 +78,9 @@ namespace synthese
 			/// @date 2011
 			/// @since 3.3.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
@@ -92,8 +92,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -110,9 +110,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2011
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

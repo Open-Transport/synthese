@@ -47,7 +47,7 @@ namespace synthese
 	using namespace server;
 	using namespace html;
 	using namespace admin;
-	using namespace util;	
+	using namespace util;
 
 	namespace calendar
 	{
@@ -140,7 +140,7 @@ namespace synthese
 					stream << tc.row();
 					stream << tc.col() << link->getStartDate();
 					stream << tc.col() << link->getEndDate();
-					
+
 					// Calendar days
 					stream << tc.col();
 					if(link->getCalendarTemplate())

@@ -77,7 +77,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void VehicleServicesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -102,7 +102,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool VehicleServicesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -143,7 +143,7 @@ namespace synthese
 			h.push_back(make_pair(string(), "Lignes"));
 			h.push_back(make_pair(string(), "Code opérateur"));
 			h.push_back(make_pair(string(), string()));
-			
+
 			ActionResultHTMLTable t(
 				h,
 				searchRequest.getHTMLForm(),
@@ -162,7 +162,7 @@ namespace synthese
 				stream << t.col();
 				openRequest.getPage()->setVehicleService(const_pointer_cast<const VehicleService>(vehicleService));
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), VehicleServiceAdmin::ICON);
-				
+
 				// Name
 				stream << t.col() << vehicleService->getName();
 
@@ -208,9 +208,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -218,7 +218,7 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 

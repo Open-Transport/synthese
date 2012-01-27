@@ -41,12 +41,12 @@ namespace synthese
 	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,departure_boards::GetDepartureBoardsService>::FACTORY_KEY("GetDepartureBoards");
-	
+
 	namespace departure_boards
 	{
 		const string GetDepartureBoardsService::PARAMETER_STOP_ID("stop_id");
 		const string GetDepartureBoardsService::PARAMETER_PAGE_ID("page_id");
-		
+
 		const string GetDepartureBoardsService::DATA_SCREENS("screens");
 		const string GetDepartureBoardsService::DATA_SCREEN("screen");
 		const string GetDepartureBoardsService::DATA_RANK("rank");
@@ -98,7 +98,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			ParametersMap pm;
 
 			// Loop on screens
@@ -148,9 +148,9 @@ namespace synthese
 
 			return pm;
 		}
-		
-		
-		
+
+
+
 		bool GetDepartureBoardsService::isAuthorized(
 			const Session* session
 		) const {

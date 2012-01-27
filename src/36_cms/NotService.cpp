@@ -38,11 +38,11 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::NotService>::FACTORY_KEY("not");
-	
+
 	namespace cms
 	{
 		const string NotService::PARAMETER_P = "p";
-		
+
 
 
 		ParametersMap NotService::_getParametersMap() const
@@ -68,9 +68,9 @@ namespace synthese
 			stream << !_parameter;
 			return util::ParametersMap();
 		}
-		
-		
-		
+
+
+
 		bool NotService::isAuthorized(
 			const Session* session
 		) const {

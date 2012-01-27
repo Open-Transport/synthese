@@ -149,7 +149,7 @@ namespace synthese
 			if(map.isDefined(PARAMETER_FIRST_DEPARTURE))
 			{
 				_firstDeparture = map.get<string>(PARAMETER_FIRST_DEPARTURE).empty() ?
-					time_duration(not_a_date_time) :					
+					time_duration(not_a_date_time) :
 					duration_from_string(map.get<string>(PARAMETER_FIRST_DEPARTURE));
 			}
 
@@ -157,7 +157,7 @@ namespace synthese
 			if(map.isDefined(PARAMETER_LAST_ARRIVAL))
 			{
 				_lastArrival = map.get<string>(PARAMETER_LAST_ARRIVAL).empty() ?
-					time_duration(not_a_date_time) :					
+					time_duration(not_a_date_time) :
 					duration_from_string(map.get<string>(PARAMETER_LAST_ARRIVAL));
 			}
 

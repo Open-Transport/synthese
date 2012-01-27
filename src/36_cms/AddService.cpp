@@ -38,12 +38,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::AddService>::FACTORY_KEY("+");
-	
+
 	namespace cms
 	{
 		const string AddService::PARAMETER_LEFT("l");
 		const string AddService::PARAMETER_RIGHT("r");
-		
+
 
 
 		ParametersMap AddService::_getParametersMap() const
@@ -74,9 +74,9 @@ namespace synthese
 			stream << (_left + _right);
 			return util::ParametersMap();
 		}
-		
-		
-		
+
+
+
 		bool AddService::isAuthorized(
 			const Session* session
 		) const {

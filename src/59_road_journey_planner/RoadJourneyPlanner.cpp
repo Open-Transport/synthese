@@ -104,7 +104,7 @@ namespace synthese
 			VertexAccessMap ovam(_originVam);
 			VertexAccessMap dvam(_destinationVam);
 
-			// Log vams 
+			// Log vams
 			_logger.logTimeSlotJourneyPlannerApproachMap(true, ovam);
 			_logger.logTimeSlotJourneyPlannerApproachMap(false, dvam);
 

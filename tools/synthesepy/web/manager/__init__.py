@@ -132,7 +132,7 @@ def add_package_static_rule(package_name):
             system_packages = flask.current_app.project.packages_loader.system_packages
             package_files_path = system_packages[package_name].files_path
             return helpers.send_from_directory(package_files_path, filename)
-    
+
         return send_package_static_file
 
     endpoint_name = 'static_{0}'.format(package_name)
@@ -162,7 +162,7 @@ def _do_command(project_fun, *args, **kwargs):
 @admin_required
 def update_synthese():
     project = flask.current_app.project
-    
+
     install_url = request.form.get('install_url')
     return _do_command(project.update_synthese, install_url)
 
@@ -257,7 +257,7 @@ def db_clean_datasource():
     run_sql("delete from t012_physical_stops where operator_code like '?'"
         (datasource_id,))
 
-    return render_template('result.html', 
+    return render_template('result.html',
         title='Clean Datasource Result',
         output='\n'.join(messages)
     )

@@ -147,7 +147,7 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			if(!object->getCalendar()) throw Exception("CalendarLink save error. Missing service");
-			
+
 			ReplaceQuery<CalendarLinkTableSync> query(*object);
 			query.addField(object->getCalendar()->getKey());
 			query.addField((object->getStartDate().is_special() || object->getStartDate().is_not_a_date()) ? string() : to_iso_extended_string(object->getStartDate()));

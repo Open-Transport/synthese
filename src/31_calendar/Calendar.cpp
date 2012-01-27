@@ -249,7 +249,7 @@ namespace synthese
 			const Calendar& op
 		){
 			recursive_mutex::scoped_lock lock(*_mutex);
-			
+
 			set<greg_year> years;
 			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
 			{
@@ -473,7 +473,7 @@ namespace synthese
 		}
 
 
-		
+
 		void Calendar::setCalendarFromLinks()
 		{
 			recursive_mutex::scoped_lock lock(*_mutex);

@@ -51,7 +51,7 @@ namespace synthese
 		const string MapSourceTableSync::COL_SRID("srid");
 		const string MapSourceTableSync::COL_TYPE("type");
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<MapSourceTableSync>::TABLE(
@@ -179,9 +179,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace geography
 	{
 		MapSourceTableSync::SearchResult MapSourceTableSync::Search(

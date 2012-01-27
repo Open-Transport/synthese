@@ -75,7 +75,7 @@ namespace synthese
 
 				// Line update
 				obj->getLine()->addEdge(*obj);
-			
+
 				// Sublines update
 				BOOST_FOREACH(JourneyPatternCopy* copy, static_cast<LineStop*>(obj)->getLine()->getSubLines())
 				{
@@ -141,7 +141,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<LineStopTableSync> query;
-			
+
 			if(startStop)
 			{
 				query.addWhereField(COL_PHYSICALSTOPID, *startStop);

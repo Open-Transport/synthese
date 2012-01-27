@@ -443,7 +443,7 @@ namespace synthese
 			publicPlaceEntrance->setRoadChunk(&roadChunk);
 			publicPlaceEntrance->setHouseNumber(number);
 			publicPlaceEntrance->setMetricOffset(metricOffset);
-			
+
 			return publicPlaceEntrance;
 		}
 }	}

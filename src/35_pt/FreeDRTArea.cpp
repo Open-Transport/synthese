@@ -41,7 +41,7 @@ namespace synthese
 	using namespace util;
 	using namespace graph;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string Registry<pt::FreeDRTArea>::KEY("FreeDRTArea");

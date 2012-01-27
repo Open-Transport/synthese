@@ -269,7 +269,7 @@ namespace synthese {
 			stream << t.title("Paramètres");
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
-			stream << t.cell("Calendrier", 
+			stream << t.cell("Calendrier",
 				t.getForm().getSelectInput(
 				PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID,
 				CalendarTemplateTableSync::GetCalendarTemplatesList(),

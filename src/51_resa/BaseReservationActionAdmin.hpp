@@ -89,8 +89,8 @@ namespace synthese
 				void setCustomer(boost::shared_ptr<const security::User> value){ _customer = value; }
 			//@}
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -102,8 +102,8 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain

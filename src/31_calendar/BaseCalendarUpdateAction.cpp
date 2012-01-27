@@ -37,7 +37,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace db;
-	
+
 	namespace calendar
 	{
 		const string BaseCalendarUpdateAction::PARAMETER_CALENDAR_TEMPLATE_ID = Action_PARAMETER_PREFIX + "bcu_calendar_id";

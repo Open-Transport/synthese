@@ -115,7 +115,7 @@ namespace synthese
 				static const std::string VALUE_UFR;
 				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 				static const std::string PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD;
-				
+
 			private:
 				//! @name Parameters
 				//@{
@@ -134,7 +134,7 @@ namespace synthese
 						std::string, // Stop code
 						Stop // Stop
 					> StopsMap;
-					
+
 // TODO				std::map<std::string, boost::shared_ptr<RollingStock> > _transportModeTypeLgMap;
 
 					typedef std::map<

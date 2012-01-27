@@ -74,7 +74,7 @@ namespace synthese
 						(*itEdge)->isDeparture()
 					){
 						break;
-					}	
+					}
 				}
 				if(itEdge == edges.end())
 				{
@@ -105,7 +105,7 @@ namespace synthese
 								bestEdges.end(),
 								*itEdge
 						)	);
-						
+
 						// The worse edge
 						if(bestEdges.size() == 1)
 						{
@@ -386,7 +386,7 @@ namespace synthese
 		bool TimetableColumn::operator==( const TimetableColumn& op ) const
 		{
 			assert(op._content.size() == _content.size());
-			
+
 			// Two empty columns are identical
 			if(_line == NULL && op._line == NULL)
 			{
@@ -404,7 +404,7 @@ namespace synthese
 			{
 				return false;
 			}
-			
+
 			// Search for different schedules
 			for(Content::const_iterator it1(_content.begin()), it2(op._content.begin());
 				it1 != _content.end();

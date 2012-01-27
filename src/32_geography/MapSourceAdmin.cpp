@@ -43,7 +43,7 @@ namespace synthese
 	using namespace security;
 	using namespace geography;
 	using namespace html;
-	
+
 
 	namespace util
 	{
@@ -63,7 +63,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void MapSourceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -90,7 +90,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool MapSourceAdmin::isAuthorized(
 			const security::User& user
 		) const	{

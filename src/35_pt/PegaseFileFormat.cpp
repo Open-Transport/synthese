@@ -655,7 +655,7 @@ namespace synthese
 						serviceKey << "<br />";
 					continue;
 				}
-				
+
 				ScheduleInfo scheduleInfo;
 				scheduleInfo.stopPointId = parser.getCell("AS_COD_ARRET");
 				if(!_stopPoints.contains(scheduleInfo.stopPointId))

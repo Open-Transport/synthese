@@ -96,8 +96,8 @@ namespace synthese
 				/// Always run _createOrderedPlaces immediately after every update of _journeys (segfault issue)
 				Journeys	_journeys;
 
-				
-				
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Indexation of the places used by the journeys.
 				/// Run it after each every update of _journeys (segfault issue)

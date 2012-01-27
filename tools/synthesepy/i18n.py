@@ -49,7 +49,7 @@ if lang == "fr":
     start_of_summary = u"Liste des messages avec un niveau égal ou supérieur à {level}:\n\n"
     import_level_section = u"\nNiveau {level}:\n\n"
     end_of_messages = u"\n\nFin des messages\n\n"
-    
+
     technical_infos = u"""Informations techniques:
 
 Import à blanc: {dummy}
@@ -57,9 +57,9 @@ Import à blanc: {dummy}
 Appels syntheses:
 {synthese_calls}
 """
-    
+
     # Web Manager
-    
+
     # view messages
     bad_credentials = u"Nom d'utilisateur ou mot de passe invalide"
     cant_reach_synthese = u"Problème lors de la communication avec Synthese (démon arrêté ?)"
@@ -78,16 +78,16 @@ Appels syntheses:
     # import template list
     no_templates = u"Pas de template d'import"
     import_created = u"Nouvel import créé"
-    
+
     # import template
     no_imports = u"Pas d'import"
 
     # import, update
     import_updated = u"Import mis à jour"
-    
+
     # import, new comment
     import_comment_added = u"Votre commentaire à été publié"
-    
+
     # import, execute
     import_executed = u"Import executé"
 

@@ -266,7 +266,7 @@ namespace synthese
 
 					// Row
 					stream << t.row();
-					
+
 					// Open button
 					openJourneyPatternRequest.getPage()->setLine(Env::GetOfficialEnv().getSPtr(&journeyPattern));
 					stream <<

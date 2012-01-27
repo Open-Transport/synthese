@@ -121,7 +121,7 @@ namespace synthese
 			{}
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the display.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response

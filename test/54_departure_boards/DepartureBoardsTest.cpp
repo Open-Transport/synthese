@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	a1.addPhysicalStop(s11);
 	StopPoint s12(12, "S12", &a1);
 	a1.addPhysicalStop(s12);
-	
+
 	StopArea a2(2);
 	a2.setName("A2");
 	StopPoint s2(2, "S2", &a2);
@@ -81,7 +81,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 	CommercialLine l;
 	JourneyPattern jp1(1, "JP1");
 	jp1.setCommercialLine(&l);
-	
+
 	DesignatedLinePhysicalStop jp1s1(0, &jp1, 0, true, true, 0, &s11);
 	jp1.addEdge(jp1s1);
 
@@ -290,7 +290,7 @@ BOOST_AUTO_TEST_CASE(DepartureBoardsTest)
 		// Stops : all stops
 		// Size : 2
 		// Algorithm : preselection
-		
+
 		ForcedDestinationsArrivalDepartureTableGenerator::PhysicalStops stops;
 		stops.insert(make_pair(s11.getKey(), &s11));
 		stops.insert(make_pair(s12.getKey(), &s12));

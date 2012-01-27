@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::ContactCenterUpdateAction>::FACTORY_KEY = "ContactCenterUpdate";
@@ -52,9 +52,9 @@ namespace synthese
 		const string ContactCenterUpdateAction::PARAMETER_PHONE_NUMBER = Action_PARAMETER_PREFIX + "_phone_numbers";
 		const string ContactCenterUpdateAction::PARAMETER_PHONE_OPENING_HOURS = Action_PARAMETER_PREFIX + "_phone_opening_hours";
 		const string ContactCenterUpdateAction::PARAMETER_WEBSITE_URL = Action_PARAMETER_PREFIX + "_website_url";
-		
-		
-		
+
+
+
 		ParametersMap ContactCenterUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -67,9 +67,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ContactCenterUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Contact center
@@ -119,9 +119,9 @@ namespace synthese
 				_description = map.get<string>(PARAMETER_DESCRIPTION);
 			}
 		}
-		
-		
-		
+
+
+
 		void ContactCenterUpdateAction::run(
 			Request& request
 		){
@@ -164,9 +164,9 @@ namespace synthese
 				request.setActionCreatedId(_contactCenter->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool ContactCenterUpdateAction::isAuthorized(
 			const Session* session
 		) const {

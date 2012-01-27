@@ -43,7 +43,7 @@ namespace synthese
 	using namespace graph;
 
 	template<> const string util::FactorableTemplate<Function,pt::LineStopGetService>::FACTORY_KEY("LineStopGet");
-	
+
 	namespace pt
 	{
 		const string LineStopGetService::PARAMETER_ROUTE_ID("route_id");
@@ -54,7 +54,7 @@ namespace synthese
 		const string LineStopGetService::DATA_RANK_IN_PATH("rank_in_path");
 		const string LineStopGetService::DATA_ROUTE_ID("route_id");
 		const string LineStopGetService::DATA_STOP_ID("stop_id");
-		
+
 		ParametersMap LineStopGetService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -196,9 +196,9 @@ namespace synthese
 
 			return pm;
 		}
-		
-		
-		
+
+
+
 		bool LineStopGetService::isAuthorized(
 			const Session* session
 		) const {

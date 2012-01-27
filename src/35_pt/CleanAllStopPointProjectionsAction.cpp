@@ -40,7 +40,7 @@ namespace synthese
 	using namespace util;
 	using namespace road;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::CleanAllStopPointProjectionsAction>::FACTORY_KEY("CleanAllStopPointProjections");
@@ -49,25 +49,25 @@ namespace synthese
 	namespace pt
 	{
 		const string CleanAllStopPointProjectionsAction::PARAMETER_AUTOMATED_ONLY = Action_PARAMETER_PREFIX + "_automated_only";
-		
-		
-		
+
+
+
 		ParametersMap CleanAllStopPointProjectionsAction::getParametersMap() const
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_AUTOMATED_ONLY, _automatedOnly);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CleanAllStopPointProjectionsAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_automatedOnly = map.getDefault<bool>(PARAMETER_AUTOMATED_ONLY, true);
 		}
-		
-		
-		
+
+
+
 		void CleanAllStopPointProjectionsAction::run(
 			Request& request
 		){
@@ -98,9 +98,9 @@ namespace synthese
 
 			transaction.run();
 		}
-		
-		
-		
+
+
+
 		bool CleanAllStopPointProjectionsAction::isAuthorized(
 			const Session* session
 		) const {

@@ -63,7 +63,7 @@ namespace synthese
 			boost::optional<std::string> _shortMessage;
 			boost::optional<std::string> _longMessage;
 			boost::optional<bool> _rawEditor;
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 			*/

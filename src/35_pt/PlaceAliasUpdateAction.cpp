@@ -40,7 +40,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace geography;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::PlaceAliasUpdateAction>::FACTORY_KEY("PlaceAliasUpdateAction");
@@ -53,9 +53,9 @@ namespace synthese
 		const string PlaceAliasUpdateAction::PARAMETER_CITY_ID = Action_PARAMETER_PREFIX + "ci";
 		const string PlaceAliasUpdateAction::PARAMETER_IS_CITY_MAIN_PLACE = Action_PARAMETER_PREFIX + "im";
 		const string PlaceAliasUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		
-		
-		
+
+
+
 		ParametersMap PlaceAliasUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -81,9 +81,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void PlaceAliasUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			if(map.isDefined(PARAMETER_ALIAS_ID))
@@ -136,9 +136,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 		}
-		
-		
-		
+
+
+
 		void PlaceAliasUpdateAction::run(
 			Request& request
 		){
@@ -171,9 +171,9 @@ namespace synthese
 
 			PlaceAliasTableSync::Save(_alias.get());
 		}
-		
-		
-		
+
+
+
 		bool PlaceAliasUpdateAction::isAuthorized(
 			const Session* session
 		) const {

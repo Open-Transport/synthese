@@ -53,7 +53,7 @@ namespace synthese
 	using namespace util;
 
 	template<> const string util::FactorableTemplate<Function,pt_website::PlacesListService>::FACTORY_KEY("places_list");
-	
+
 	namespace pt_website
 	{
 		const string PlacesListService::PARAMETER_CITY_ID = "city_id";
@@ -796,9 +796,9 @@ namespace synthese
 
 			return result;
 		}
-		
-		
-		
+
+
+
 		bool PlacesListService::isAuthorized(
 			const Session* session
 		) const {

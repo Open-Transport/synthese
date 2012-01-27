@@ -246,7 +246,7 @@ namespace synthese
 				// Load of the depots and stops
 				ImportableTableSync::ObjectBySource<StopPointTableSync> stops(*_stopsDataSource, _env);
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(*_ptDataSource, _env);
-				
+
 				// Parsing the file
 				string line;
 				CommercialLine* cline(NULL);
@@ -261,7 +261,7 @@ namespace synthese
 					// Route number
 					string routeNumber(trim_copy(line.substr(7,2)));
 					int technicalLineNumber(lexical_cast<int>(trim_copy(line.substr(4, 3))));
-					
+
 					// Route type
 					int routeType(lexical_cast<int>(line.substr(9,1)));
 					if(routeType == 0 || routeType == 1)

@@ -111,8 +111,8 @@ namespace synthese
 				double _minScore;
 				std::string _classFilter;
 			//@}
-			
-			
+
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
@@ -123,9 +123,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.3.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Places_list_(version_2)#Request
@@ -137,7 +137,7 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
+
 
 		private:
 			void _displayClass(
@@ -192,9 +192,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session
@@ -213,7 +213,7 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 
-			
+
 			typedef lexical_matcher::LexicalMatcher<
 				boost::shared_ptr<geography::Place>
 			>::MatchResult::value_type PlaceResult;

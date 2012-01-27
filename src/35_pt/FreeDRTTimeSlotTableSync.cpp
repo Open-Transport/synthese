@@ -69,7 +69,7 @@ namespace synthese
 		const string FreeDRTTimeSlotTableSync::COL_USE_RULES = "use_rules";
 		const string FreeDRTTimeSlotTableSync::COL_DATES = "dates";
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::TABLE(
@@ -237,7 +237,7 @@ namespace synthese
 			{
 				// Unregister from the area
 				obj->getPath()->removeService(*obj);
-			
+
 				// Unregister from the line
 				obj->getArea()->getLine()->unregisterService(*obj);
 			}
@@ -277,9 +277,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		FreeDRTTimeSlotTableSync::SearchResult FreeDRTTimeSlotTableSync::Search(

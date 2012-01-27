@@ -27,7 +27,7 @@
 namespace synthese
 {
 	using namespace util;
-	
+
 	template<> const std::string util::FactorableTemplate<server::Action,server::LogoutAction>::FACTORY_KEY("logout");
 
 	namespace server

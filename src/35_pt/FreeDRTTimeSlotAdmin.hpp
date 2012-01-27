@@ -60,7 +60,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Tests if two admin pages can be considered as the same one.
 			/// @param other Other page to compare with. The other page will always be
-			///	       of the same class. 
+			///	       of the same class.
 			/// @return true if the other page can be considered as the same than the
 			///         current one.
 			/// @author Hugues Romain
@@ -81,7 +81,7 @@ namespace synthese
 			virtual PageLinks _getCurrentTreeBranch() const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Initialization of the parameters from a parameters map.
 			///	@param map The parameters map to use for the initialization.
@@ -92,8 +92,8 @@ namespace synthese
 				const util::ParametersMap& map
 			);
 
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creation of the parameters map from the object attributes.
 			///	@author Hugues Romain
@@ -114,7 +114,7 @@ namespace synthese
 			) const;
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Authorization check.
 			/// Returns if the page can be displayed. In most cases, the needed right
@@ -135,7 +135,7 @@ namespace synthese
 
 
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Title getter.
 			///	@return The title of the page

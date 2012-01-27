@@ -8,8 +8,8 @@
 
 void synthese::db::moduleRegister()
 {
-	
+
 	synthese::db::DBModule::integrate();
-	
+
 	synthese::db::RemoveObjectAction::integrate();
 }

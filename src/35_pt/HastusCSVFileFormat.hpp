@@ -77,7 +77,7 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
-				
+
 			private:
 				static const std::string SEP;
 
@@ -102,7 +102,7 @@ namespace synthese
 					std::string code;
 					std::string team;
 					bool handicapped;
-					
+
 					bool operator <(const TripIndex& other) const;
 				};
 

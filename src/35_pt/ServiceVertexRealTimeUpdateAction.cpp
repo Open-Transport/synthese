@@ -73,7 +73,7 @@ namespace synthese
 		ParametersMap ServiceVertexRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
-			
+
 			// Service
 			if(_service.get())
 			{

@@ -185,8 +185,8 @@ namespace synthese
 
 				const pt::StopPoint* getDestination () const;
 				const pt::StopPoint* getOrigin () const;
-				
-				
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Line stop getter.
 				/// @param rank rank of the line stop in the journey pattern
