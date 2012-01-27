@@ -123,7 +123,7 @@ namespace synthese
 				) const;
 
 
-				
+
 				graph::Journey getJourneyDepartureToArrival(
 					const boost::posix_time::ptime time,
 					const geography::Place& from,
@@ -140,10 +140,10 @@ namespace synthese
 
 
 				virtual void _computeNextRTUpdate();
-				
+
 				virtual bool isContinuous () const;
 
-				
+
 				/** Gets a departure schedule for this service.
 					@param rank Rank of the stop where to get the departure schedule
 					@return The schedule at the specified stop rank

@@ -114,11 +114,11 @@ class WSGI(ExternalTool):
         WSGI_APP_TEMPLATE = """# Generated file, do not edit!
 import os
 from os.path import join
-import sys 
+import sys
 
 bootstrap_config = {bootstrap_config}
 
-activate_this = join(bootstrap_config['env_bin_dir'], 'activate_this.py') 
+activate_this = join(bootstrap_config['env_bin_dir'], 'activate_this.py')
 execfile(activate_this, dict(__file__=activate_this))
 
 sys.path.append(bootstrap_config['tools_dir'])

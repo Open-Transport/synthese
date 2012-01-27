@@ -58,7 +58,7 @@ namespace synthese
 		const string PublicPlaceEntranceTableSync::COL_NUMBER = "number";
 		const string PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<PublicPlaceEntranceTableSync>::TABLE(
@@ -218,9 +218,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace road
 	{
 		PublicPlaceEntranceTableSync::SearchResult PublicPlaceEntranceTableSync::Search(

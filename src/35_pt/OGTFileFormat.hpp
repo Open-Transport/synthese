@@ -59,7 +59,7 @@ namespace synthese
 				public PTDataCleanerFileFormat
 			{
 			public:
-				
+
 			private:
 
 				//! @name Parameters
@@ -76,14 +76,14 @@ namespace synthese
 							const calendar::Calendar& calendar
 						);
 						virtual ~ExpatParser();
-						
+
 						virtual void parse(std::istream &data) throw(std::runtime_error);
 
 					private:
 						static void startElement(void *d, const XML_Char* name, const XML_Char** attrs) throw(Exception);
 						static void endElement(void *d, const XML_Char* name) throw(Exception);
 						static void characters(void*, const XML_Char* txt, int txtlen);
-						
+
 						struct expat_user_data
 						{
 							const calendar::Calendar& _calendar;
@@ -107,9 +107,9 @@ namespace synthese
 								const calendar::Calendar& calendar
 							);
 						};
-						
+
 						expat_user_data user_data;
-						
+
 						typedef std::map<std::string, std::string> AttributeMap;
 						static AttributeMap createAttributeMap(const XML_Char **attrs);
 					};
@@ -142,7 +142,7 @@ namespace synthese
 				) const;
 
 
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////

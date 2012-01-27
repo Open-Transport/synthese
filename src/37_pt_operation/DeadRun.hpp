@@ -54,7 +54,7 @@ namespace synthese
 		private:
 			pt::TransportNetwork* _network;
 
-			
+
 		public:
 			DeadRun(
 				util::RegistryKeyType id = 0,

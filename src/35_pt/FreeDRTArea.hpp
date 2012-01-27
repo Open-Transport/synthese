@@ -176,7 +176,7 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the next journey between to places.
 				/// @param direction departure to arrival or arrival to departure
-				/// @param time time (at the departure if departure to arrival, at the 
+				/// @param time time (at the departure if departure to arrival, at the
 				/// arrival else)
 				/// @param from departure place
 				/// @param to arrival place

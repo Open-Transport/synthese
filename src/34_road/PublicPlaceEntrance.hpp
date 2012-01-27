@@ -61,7 +61,7 @@ namespace synthese
 			//@{
 				PublicPlace* _publicPlace;
 			//@}
-		
+
 		public:
 			/// @name Getters
 			//@{

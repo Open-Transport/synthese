@@ -78,7 +78,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void FreeDRTTimeSlotAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -107,7 +107,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool FreeDRTTimeSlotAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -156,7 +156,7 @@ namespace synthese
 				const TransportNetwork* network(
 					static_cast<const CommercialLine*>(_timeSlot->getPath()->getPathGroup())->getNetwork()
 				);
-				
+
 				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
 				updateRequest.getAction()->setTimeSlot(
 					const_pointer_cast<FreeDRTTimeSlot>(_timeSlot)
@@ -178,7 +178,7 @@ namespace synthese
 		}
 
 
-		
+
 		std::string FreeDRTTimeSlotAdmin::getTitle() const
 		{
 			return (_timeSlot.get() && !_timeSlot->getServiceNumber().empty()) ? _timeSlot->getServiceNumber() : DEFAULT_TITLE;

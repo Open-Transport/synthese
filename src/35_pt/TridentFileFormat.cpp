@@ -1190,7 +1190,7 @@ namespace synthese
 					// Stop area key
 					XMLNode keyNode(stopAreaNode.getChildNode("objectId", 0));
 					string stopKey(keyNode.getText());
-					
+
 					// Stop area name
 					string name;
 					{
@@ -1433,7 +1433,7 @@ namespace synthese
 					}
 
 					set<StopPoint*> stopPoints;
-					
+
 					if(curStop)
 					{
 						stopPoints = PTFileFormat::CreateOrUpdateStop(
@@ -1608,7 +1608,7 @@ namespace synthese
 
 				routes[route.objectId] = route;
 			}
-					
+
 			// Services
 			map<string, ScheduledService*> services;
 			int servicesNumber(chouetteLineDescriptionNode.nChildNode("VehicleJourney"));
@@ -1655,7 +1655,7 @@ namespace synthese
 						++ignoredStops;
 						continue;
 					}
-					
+
 					// Route boarding and alight possibility
 					if(	vjsNode.nChildNode("boardingAlightingPossibility") &&
 						stopRank > 0 &&

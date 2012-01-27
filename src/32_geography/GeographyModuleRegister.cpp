@@ -30,7 +30,7 @@
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace geography
 	{
 		void moduleRegister()
@@ -39,14 +39,14 @@ namespace synthese
 			CityNameValueInterfaceElement::integrate();
 
 			GeographyModule::integrate();
-			
+
 			CityTableSync::integrate();
 			CityAliasTableSync::integrate();
 			MapSourceTableSync::integrate();
 			PlaceAliasTableSync::integrate();
 
 			PlaceAlias::integrate();
-			
+
 			CityAddAction::integrate();
 			CityUpdateAction::integrate();
 			MapSourceUpdateAction::integrate();
@@ -55,7 +55,7 @@ namespace synthese
 
 			MapSourceAdmin::integrate();
 			MapSourcesAdmin::integrate();
-			
+
 			// Registries
 			Env::Integrate<City>();
 			Env::Integrate<CityAlias>();

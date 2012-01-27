@@ -227,7 +227,7 @@ namespace synthese
 						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
 						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
 						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
-						
+
 						// Remove button
 						stream << t.col();
 						if(city->empty())
@@ -263,7 +263,7 @@ namespace synthese
 
 				// Requests
 				AdminFunctionRequest<PTPlaceAdmin> openStopRequest(request);
-				
+
 				// The table
 				HTMLTable::ColsVector c;
 				c.push_back(string());
@@ -337,7 +337,7 @@ namespace synthese
 
 				// Requests
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
-				
+
 				// The table
 				HTMLTable::ColsVector c;
 				c.push_back(string());
@@ -394,7 +394,7 @@ namespace synthese
 
 				// Requests
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
-				
+
 				// The table
 				HTMLTable::ColsVector c;
 				c.push_back(string());

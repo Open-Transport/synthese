@@ -63,7 +63,7 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace calendar;
-	using namespace impex;		
+	using namespace impex;
 
 	namespace util
 	{
@@ -89,7 +89,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DriverServiceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -115,7 +115,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DriverServiceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -297,7 +297,7 @@ namespace synthese
 				// Update request
 				StaticActionRequest<DriverServiceUpdateAction> updateOnlyRequest(request);
 				updateOnlyRequest.getAction()->setDriverService(const_pointer_cast<DriverService>(_driverService));
-				
+
 				// Table
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_driverService, updateOnlyRequest);
 			}
@@ -344,7 +344,7 @@ namespace synthese
 			);
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(p);
-			
+
 			return links;
 		}
 }	}

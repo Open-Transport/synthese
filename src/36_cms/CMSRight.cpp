@@ -63,7 +63,7 @@ namespace synthese
 		{
 			if (_parameter == GLOBAL_PERIMETER)
 				return "all";
-			
+
 			try
 			{
 				util::RegistryKeyType id(boost::lexical_cast<util::RegistryKeyType>(_parameter));

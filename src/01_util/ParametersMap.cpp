@@ -458,7 +458,7 @@ namespace synthese
 		bool ParametersMap::isTrue( const std::string& parameterName ) const
 		{
 			Map::const_iterator it(_map.find(parameterName));
-			
+
 			if(it == _map.end())
 			{
 				return false;

@@ -34,7 +34,7 @@ namespace synthese
 	{
 		class Calendar;
 		class CalendarTemplate;
-	
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Calendar link.
 		///	@ingroup m31

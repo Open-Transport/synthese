@@ -55,7 +55,7 @@ namespace synthese
 		ParametersMap XMLSessionIsValidFunction::_getParametersMap() const
 		{
 			ParametersMap map;
-			
+
 			if(!_sessionIdToCheck.empty())
 			{
 				map.insert(PARAMETER_SESSION_ID_TO_CHECK, _sessionIdToCheck);
@@ -65,7 +65,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
 			}
-			
+
 			return map;
 		}
 

@@ -185,7 +185,7 @@ namespace synthese
 
 			// Network
 			query.addField(object->getTransportNetwork() ? object->getTransportNetwork()->getKey() : RegistryKeyType(0));
-			
+
 			// Depot
 			Depot* depot(object->getDepot());
 			query.addField(depot ? depot->getKey() : RegistryKeyType(0));
@@ -199,7 +199,7 @@ namespace synthese
 
 			// Schedules
 			query.addField(object->encodeSchedules());
-			
+
 			// Dates
 			stringstream datesStr;
 			object->serialize(datesStr);

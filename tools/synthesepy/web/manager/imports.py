@@ -25,7 +25,7 @@ from os.path import join
 
 import flask
 from flask import abort, helpers, flash, redirect, render_template, \
-    request, session, url_for 
+    request, session, url_for
 import werkzeug
 
 from synthesepy import i18n
@@ -68,7 +68,7 @@ def import_template_create_import(template_id):
 
     if not template.has_access(session['username'], True):
         abort(401)
-    
+
     template.create_import()
     flash(i18n.import_created)
 

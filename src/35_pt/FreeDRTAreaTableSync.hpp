@@ -51,10 +51,10 @@ namespace synthese
 				static const std::string COL_STOP_AREAS;
 				static const std::string COL_USE_RULES;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	FreeDRTArea search.
 				///	@param env Environment to populate

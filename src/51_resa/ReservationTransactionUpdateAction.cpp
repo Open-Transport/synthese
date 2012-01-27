@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, resa::ReservationTransactionUpdateAction>::FACTORY_KEY("ReservationTransactionUpdateAction");
@@ -47,9 +47,9 @@ namespace synthese
 		const string ReservationTransactionUpdateAction::PARAMETER_RESERVATION_TRANSACTION_ID = Action_PARAMETER_PREFIX + "ti";
 		const string ReservationTransactionUpdateAction::PARAMETER_SEATS = Action_PARAMETER_PREFIX + "se";
 		const string ReservationTransactionUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "na";
-		
-		
-		
+
+
+
 		ParametersMap ReservationTransactionUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -67,9 +67,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ReservationTransactionUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -91,9 +91,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 		}
-		
-		
-		
+
+
+
 		void ReservationTransactionUpdateAction::run(
 			Request& request
 		){
@@ -107,9 +107,9 @@ namespace synthese
 			}
 			ReservationTransactionTableSync::Save(_reservationTransaction.get());
 		}
-		
-		
-		
+
+
+
 		bool ReservationTransactionUpdateAction::isAuthorized(
 			const Session* session
 		) const {

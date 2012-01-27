@@ -111,8 +111,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		util::ParametersMap GetVehiclesService::run(
 			std::ostream& stream,
 			const Request& request

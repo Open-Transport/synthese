@@ -126,8 +126,8 @@ namespace synthese
 					std::string text = std::string()
 				) const;
 
-				
-			
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Export of house into parameters map.
 				void toParametersMap(

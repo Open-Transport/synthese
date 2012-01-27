@@ -49,10 +49,10 @@ namespace synthese
 				static const std::string COL_SRID;
 				static const std::string COL_TYPE;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	MapSource search.
 				///	@param env Environment to populate

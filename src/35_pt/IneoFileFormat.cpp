@@ -264,7 +264,7 @@ namespace synthese
 						);
 				}	}
 
-				
+
 				// 1.2 : stops
 				StopsMap stops;
 				inFile.clear();
@@ -618,7 +618,7 @@ namespace synthese
 					{
 						jpName = _getValue("LIBCH");
 						jpWayback = (_getValue("SENS") != "A");
-						jpKey = 
+						jpKey =
 							_addWaybackToJourneyPatternCode ?
 							_getValue("SENS") + _getValue("NCH") :
 							_getValue("NCH")
@@ -905,7 +905,7 @@ namespace synthese
 			stream << t.cell("Import automatique arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_IMPORT_STOPS, _autoImportStops));
 			stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
-			
+
 			// Line read method
 			vector<pair<optional<string>, string> > methods;
 			methods.push_back(make_pair(optional<string>(VALUE_CIDX), VALUE_CIDX));

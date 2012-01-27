@@ -47,7 +47,7 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace db;
-	
+
 	namespace pt
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
@@ -143,7 +143,7 @@ namespace synthese
 					itService.second->getPath()->removeService(*itService.second);
 				}
 			}
-			
+
 			// Continuous services without any active date
 			BOOST_FOREACH(const Registry<ContinuousService>::value_type& itCService, _env.getRegistry<ContinuousService>())
 			{

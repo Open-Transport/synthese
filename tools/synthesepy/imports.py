@@ -97,7 +97,7 @@ class ImportTemplate(utils.DirObjectLoader):
                 (username, email_or_emails) in emails)
             emails = sum(username_to_emails.itervalues(), [])
             return username_to_emails, set(emails)
-            
+
         self.admins, self.admin_emails = parse_emails(self.admins)
         self.uploaders, self.uploader_emails = parse_emails(self.uploaders)
 
@@ -245,7 +245,7 @@ class ImportRun(object):
 
         log.debug('Import HTTP result, %s', res)
         if 0:
-            log.debug('Import HTTP body, %r', res.content) 
+            log.debug('Import HTTP body, %r', res.content)
         self._process_import_log(res.content)
 
         synthese_call = 'URL: {0}, params: {1} url: {2}'.format(

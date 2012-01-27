@@ -59,7 +59,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<FileFormat,departure_boards::IneoDepartureBoardsFileFormat>::FACTORY_KEY("Ineo SIV bornes");
 	}
-	
+
 	namespace departure_boards
 	{
 		const string IneoDepartureBoardsFileFormat::Importer_::PARAMETER_PT_DATASOURCE_ID("ps");
@@ -125,7 +125,7 @@ namespace synthese
 					split(nomParts, nom, is_any_of(" "));
 					screen->setMacAddress(nomParts[0]);
 				}
-				
+
 				// Allowed lines
 				stringstream linesQuery;
 				linesQuery << "SELECT ref_ligne, sens FROM " << _database << ".BORNE_ARRET " <<

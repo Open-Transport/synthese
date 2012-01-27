@@ -6,6 +6,6 @@
 
 void synthese::graph::moduleRegister()
 {
-	
+
 	synthese::graph::RuleUserUpdateAction::integrate();
 }

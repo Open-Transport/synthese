@@ -354,7 +354,7 @@ class OSMImportTest(http_testcase.HTTPTestCase):
                 'Courtelevant', 'Rue des Chènevières',
                 'Courtelevant', 'Impasse de la Chapperette'
             ),
-            [   
+            [
                 [u'Courtelevant Rue des Ch\xe8nevi\xe8res', 0],
                 [u'Rue des Grandes Gasses', 32],
                 [u'Rue de la Vendeline', 98],

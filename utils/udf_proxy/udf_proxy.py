@@ -204,7 +204,7 @@ if __name__ == '__main__':
             raise Exception('Without daemon, only start is allowed')
         main()
         sys.exit(0)
- 
+
     daemon = UDFProxyDaemon(options.pid_path)
     if 'start' == command:
         daemon.start()

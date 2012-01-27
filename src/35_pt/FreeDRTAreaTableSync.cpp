@@ -64,7 +64,7 @@ namespace synthese
 		const string FreeDRTAreaTableSync::COL_STOP_AREAS = "stop_areas";
 		const string FreeDRTAreaTableSync::COL_USE_RULES = "use_rules";
 	}
-	
+
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<FreeDRTAreaTableSync>::TABLE(
@@ -240,9 +240,9 @@ namespace synthese
 		}
 
 	}
-	
-	
-	
+
+
+
 	namespace pt
 	{
 		FreeDRTAreaTableSync::SearchResult FreeDRTAreaTableSync::Search(

@@ -340,7 +340,7 @@ namespace synthese
 			{
 				stop->setName(*name);
 			}
-			
+
 			// Log
 			logStream << "CREA : Creation of the physical stop with key " << code;
 			if(name)

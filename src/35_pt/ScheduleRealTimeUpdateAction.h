@@ -72,7 +72,7 @@ namespace synthese
 			boost::posix_time::time_duration _departureTime;
 			boost::posix_time::time_duration _arrivalTime;
 			std::string _serviceCodeBySource;
-			
+
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

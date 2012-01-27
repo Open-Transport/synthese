@@ -103,7 +103,7 @@ namespace synthese
 							{
 								throw PathBeginsWithUnscheduledStopException(*_path);
 							}
-							
+
 							MetricOffset totalDistance(edge.getMetricOffset() - (*lastScheduledEdge)->getMetricOffset());
 							size_t totalRankDiff(edge.getRankInPath() - (*lastScheduledEdge)->getRankInPath());
 							time_duration originDepartureSchedule(*_departureSchedules.rbegin());

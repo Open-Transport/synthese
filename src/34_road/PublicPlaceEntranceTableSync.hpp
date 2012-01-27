@@ -51,10 +51,10 @@ namespace synthese
 				static const std::string COL_NUMBER;
 				static const std::string COL_DATASOURCE_LINKS;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	PublicPlaceEntrance search.
 				///	@param env Environment to populate

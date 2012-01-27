@@ -58,11 +58,11 @@
 
 void synthese::resa::moduleRegister()
 {
-	
+
 	synthese::resa::ResaModule::integrate();
-	
+
 	synthese::resa::ResaRight::integrate();
-	
+
 	synthese::resa::BookReservationAction::integrate();
 	synthese::resa::CancelReservationAction::integrate();
 	synthese::resa::CallBeginAction::integrate();
@@ -72,13 +72,13 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ReservationUserUpdateAction::integrate();
 	synthese::resa::SendPasswordAction::integrate();
 	synthese::resa::ReservationUpdateAction::integrate();
-	
+
 	synthese::resa::XMLReservationFunction::integrate();
 	synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 	synthese::resa::ReservationEditFunction::integrate();
 	synthese::resa::CSVResaStatisticsFunction::integrate();
 	synthese::resa::ReservationsListService::integrate();
-	
+
 	synthese::resa::ReservationItemInterfacePage::integrate();
 	synthese::resa::ReservationConfirmationEMailInterfacePage::integrate();
 	synthese::resa::ReservationConfirmationEMailItemInterfacePage::integrate();
@@ -88,11 +88,11 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ReservationEditInterfacePage::integrate();
 	synthese::resa::ReservationCancellationEMailSubjectInterfacePage::integrate();
 	synthese::resa::ReservationCancellationEMailContentInterfacePage::integrate();
-	
+
 	synthese::resa::ReservationTableSync::integrate();
 	synthese::resa::ReservationTransactionTableSync::integrate();
 	synthese::resa::OnlineReservationRuleTableSync::integrate();
-	
+
 	synthese::resa::BookableCommercialLineAdmin::integrate();
 	synthese::resa::BookableCommercialLinesAdmin::integrate();
 	synthese::resa::FreeDRTBookingAdmin::integrate();
@@ -105,10 +105,10 @@ void synthese::resa::moduleRegister()
 	synthese::resa::ResaStatisticsAdmin::integrate();
 	synthese::resa::ResaStatisticsMenuAdmin::integrate();
 	synthese::resa::ReservationAdmin::integrate();
-	
-	
+
+
 	synthese::resa::ResaDBLog::integrate();
-	
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::resa::Reservation>();
 	synthese::util::Env::Integrate<synthese::resa::ReservationTransaction>();

@@ -58,7 +58,7 @@ namespace synthese
 			static const std::string PARAMETER_VEHICLE_SERVICE_SERVICE_RANK;
 			static const std::string PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK;
 			static const std::string PARAMETER_LATE_DURATION_SECONDS;
-			
+
 			static const std::string PARAMETER_LINE_STOP_RANK;
 			static const std::string PARAMETER_LINE_STOP_METRIC_OFFSET;
 			static const std::string PARAMETER_AT_ARRIVAL;
@@ -77,7 +77,7 @@ namespace synthese
 			bool _propagateConstantly;
 			boost::posix_time::time_duration _departureTime;
 			boost::posix_time::time_duration _arrivalTime;
-			
+
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.

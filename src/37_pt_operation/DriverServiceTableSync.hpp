@@ -51,10 +51,10 @@ namespace synthese
 				static const std::string COL_DATES;
 				static const std::string COL_DATASOURCE_LINKS;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	DriverService search.
 				///	@param env Environment to populate
@@ -91,7 +91,7 @@ namespace synthese
 					util::Env& env,
 					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
-				
+
 			//@}
 		};
 }	}

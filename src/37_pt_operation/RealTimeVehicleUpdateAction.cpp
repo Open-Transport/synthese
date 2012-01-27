@@ -59,7 +59,7 @@ namespace synthese
 		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_SERVICE_RANK = Action_PARAMETER_PREFIX + "sv_s_rk";
 		const string RealTimeVehicleUpdateAction::PARAMETER_VEHICLE_SERVICE_SERVICE_OR_DRIVER_EXCHANGE_RANK = Action_PARAMETER_PREFIX + "sv_sd_rk";
 		const string RealTimeVehicleUpdateAction::PARAMETER_LATE_DURATION_SECONDS = Action_PARAMETER_PREFIX + "la";
-		
+
 		const string RealTimeVehicleUpdateAction::PARAMETER_LINE_STOP_RANK = Action_PARAMETER_PREFIX + "ls";
 		const string RealTimeVehicleUpdateAction::PARAMETER_LINE_STOP_METRIC_OFFSET = Action_PARAMETER_PREFIX + "mo";
 		const string RealTimeVehicleUpdateAction::PARAMETER_AT_ARRIVAL = Action_PARAMETER_PREFIX + "aa";

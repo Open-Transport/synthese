@@ -87,7 +87,7 @@ namespace synthese
 				new DeadRunEdge(*this, stop)
 			);
 			addEdge(*startEdge);
-			
+
 			Edge* endEdge(
 				fromDepotToStop ?
 				new DeadRunEdge(length, *this, stop) :
@@ -128,7 +128,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DeadRun::isContinuous() const
 		{
 			return false;
@@ -175,7 +175,7 @@ namespace synthese
 		{
 		}
 
-		
+
 		bool DeadRun::isPedestrianMode(void) const
 		{
 			return false;

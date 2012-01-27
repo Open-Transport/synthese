@@ -62,7 +62,7 @@ namespace synthese
 	using namespace html;
 	using namespace geography;
 	using namespace impex;
-		
+
 
 
 	namespace util
@@ -90,7 +90,7 @@ namespace synthese
 		{}
 
 
-		
+
 		void VehicleServiceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -127,7 +127,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool VehicleServiceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -256,7 +256,7 @@ namespace synthese
 				}
 				stream << t.close();
 			}
-			
+
 			////////////////////////////////////////////////////////////////////
 			// DRIVER SERVICES TAB
 			if (openTabContent(stream, TAB_DRIVER_SERVICES))

@@ -99,7 +99,7 @@ namespace synthese
 					std::size_t start,
 					std::size_t length
 				) const;
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////

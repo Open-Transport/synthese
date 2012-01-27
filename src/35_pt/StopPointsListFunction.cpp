@@ -105,7 +105,7 @@ namespace synthese
 					CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID()
 			)	);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
- 
+
 			// Stop area request
 			if(map.getOptional<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) try
 			{

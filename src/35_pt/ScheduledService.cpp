@@ -100,7 +100,7 @@ namespace synthese
 
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
-			
+
 			// Check of real time vertex
 			if(	RTData && !allowCanceled && !_RTVertices[edgeIndex])
 			{

@@ -124,7 +124,7 @@ namespace synthese
 
 						// The departure is kept in the results
 						_insert(servicePointer);
-						
+
 						// Checks if the maximal number of results is reached
 						++insertedServices;
 						if(	_maxSize && insertedServices >= *_maxSize)

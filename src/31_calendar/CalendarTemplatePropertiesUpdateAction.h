@@ -52,7 +52,7 @@ namespace synthese
 			boost::optional<std::string> _name;
 			boost::optional<CalendarTemplate::Category> _category;
 			boost::optional<boost::shared_ptr<CalendarTemplate> > _parent;
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map

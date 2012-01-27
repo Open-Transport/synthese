@@ -36,7 +36,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,geography::GetMapOpenLayersConstructorService>::FACTORY_KEY("GetMapOpenLayersConstructor");
-	
+
 	namespace geography
 	{
 		ParametersMap GetMapOpenLayersConstructorService::_getParametersMap() const
@@ -57,7 +57,7 @@ namespace synthese
 		) const {
 
 			ParametersMap pm;
-			
+
 			// Map source
 			MapSource* mapSource(
 				MapSource::GetSessionMapSource(*request.getSession())
@@ -74,9 +74,9 @@ namespace synthese
 
 			return pm;
 		}
-		
-		
-		
+
+
+
 		bool GetMapOpenLayersConstructorService::isAuthorized(
 			const Session* session
 		) const {

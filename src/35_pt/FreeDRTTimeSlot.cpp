@@ -60,7 +60,7 @@ namespace synthese
 			const geography::Place& from,
 			const geography::Place& to
 		) const	{
-			
+
 			// Distance
 			double distance(from.getPoint()->distance(to.getPoint().get()));
 

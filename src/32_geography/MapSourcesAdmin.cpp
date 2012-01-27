@@ -47,7 +47,7 @@ namespace synthese
 	using namespace html;
 	using namespace db;
 	using namespace geography;
-	
+
 
 	namespace util
 	{
@@ -71,7 +71,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void MapSourcesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -96,7 +96,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool MapSourcesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -165,12 +165,12 @@ namespace synthese
 				{
 					stream << "(non défini)";
 				}
-				
+
 				// Open button
 				openRequest.getPage()->setMapSource(const_pointer_cast<const MapSource>(mapSource));
 				stream << t.col();
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir");
-				
+
 				// Delete button
 				deleteRequest.getAction()->setObjectId(mapSource->getKey());
 				stream << t.col();
@@ -197,9 +197,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const GeographyModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -207,23 +207,23 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks MapSourcesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const MapSourcesAdmin* ua(
 				dynamic_cast<const MapSourcesAdmin*>(&currentPage)
 			);
-			
+
 			const MapSourceAdmin* ua2(
 				dynamic_cast<const MapSourceAdmin*>(&currentPage)
 			);
@@ -242,7 +242,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 }	}

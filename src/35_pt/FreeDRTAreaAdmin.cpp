@@ -48,8 +48,8 @@ using namespace boost;
 
 namespace synthese
 {
-	using namespace graph;	
-	using namespace db;	
+	using namespace graph;
+	using namespace db;
 	using namespace admin;
 	using namespace server;
 	using namespace util;
@@ -80,7 +80,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void FreeDRTAreaAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -109,7 +109,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool FreeDRTAreaAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -171,7 +171,7 @@ namespace synthese
 					}
 
 					editor.display(stream);
-				}				
+				}
 
 				{
 					stream << "<h1>Arrêts isolés</h1>";
@@ -319,12 +319,12 @@ namespace synthese
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks FreeDRTAreaAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			if(	currentPage == *this ||
@@ -343,7 +343,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 

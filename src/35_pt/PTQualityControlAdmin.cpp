@@ -356,7 +356,7 @@ namespace synthese
 				}
 			}
 
-			
+
 			////////////////////////////////////////////////////////////////////
 			// RANK CONTINUITY
 			if (openTabContent(stream, TAB_RANK_CONTINUITY))
@@ -419,7 +419,7 @@ namespace synthese
 						}
 					}
 					stream << t.close();
-				}	
+				}
 				else
 				{
 					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
@@ -430,7 +430,7 @@ namespace synthese
 						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
 						"</p>"
 					;
-			}	}	
+			}	}
 
 
 			////////////////////////////////////////////////////////////////////
@@ -501,7 +501,7 @@ namespace synthese
 					}
 
 					stream << t.close();
-				}	
+				}
 				else
 				{
 					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
@@ -512,7 +512,7 @@ namespace synthese
 						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
 						"</p>"
 					;
-			}	}	
+			}	}
 
 
 			////////////////////////////////////////////////////////////////////
@@ -541,7 +541,7 @@ namespace synthese
 						time_duration lastDepartureTime(not_a_date_time);
 						const DesignatedLinePhysicalStop* lastDepartureLineStop(NULL);
 						const ScheduledService& service(*item.second);
-						
+
 						BOOST_FOREACH(Edge* edge, service.getPath()->getEdges())
 						{
 							if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
@@ -568,7 +568,7 @@ namespace synthese
 								)	);
 								double speed(
 									3.6 * dist / (
-										service.getArrivalSchedule(false, lineStop.getRankInPath()).total_seconds() - 
+										service.getArrivalSchedule(false, lineStop.getRankInPath()).total_seconds() -
 										lastDepartureTime.total_seconds()
 								)	);
 								if(speed > 150)
@@ -606,7 +606,7 @@ namespace synthese
 					stream << t.col(1, string(), true);
 
 					stream << t.close();
-				}	
+				}
 				else
 				{
 					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
@@ -617,7 +617,7 @@ namespace synthese
 						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
 						"</p>"
 					;
-			}	}	
+			}	}
 
 
 			////////////////////////////////////////////////////////////////////

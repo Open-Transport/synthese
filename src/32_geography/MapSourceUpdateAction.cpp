@@ -35,7 +35,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, geography::MapSourceUpdateAction>::FACTORY_KEY("MapSourceUpdateAction");
@@ -48,9 +48,9 @@ namespace synthese
 		const string MapSourceUpdateAction::PARAMETER_URL = Action_PARAMETER_PREFIX + "url";
 		const string MapSourceUpdateAction::PARAMETER_SRID = Action_PARAMETER_PREFIX + "srid";
 		const string MapSourceUpdateAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "type";
-		
-		
-		
+
+
+
 		ParametersMap MapSourceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -76,9 +76,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void MapSourceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Map source
@@ -135,9 +135,9 @@ namespace synthese
 				_type = static_cast<MapSource::Type>(typeId);
 			}
 		}
-		
-		
-		
+
+
+
 		void MapSourceUpdateAction::run(
 			Request& request
 		){
@@ -167,9 +167,9 @@ namespace synthese
 				request.setActionCreatedId(_mapSource->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool MapSourceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

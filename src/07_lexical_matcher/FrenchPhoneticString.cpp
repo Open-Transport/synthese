@@ -13,7 +13,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace util;
-	
+
 	namespace lexical_matcher
 	{
 		IConv FrenchPhoneticString::ICONV("UTF-8","CP1252");
@@ -629,7 +629,7 @@ namespace synthese
 						result.push_back(AN);
 						break;
 					}
-				
+
 				case 220: // ü
 				case 252: // Ü
 					result.push_back(U);

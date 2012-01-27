@@ -42,7 +42,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::CopyGeometriesAction>::FACTORY_KEY("CopyGeometriesAction");
@@ -53,8 +53,8 @@ namespace synthese
 		const string CopyGeometriesAction::PARAMETER_STARTING_STOP = Action_PARAMETER_PREFIX + "ss";
 		const string CopyGeometriesAction::PARAMETER_ENDING_STOP = Action_PARAMETER_PREFIX + "es";
 		const string CopyGeometriesAction::PARAMETER_EDGE_ID = Action_PARAMETER_PREFIX + "ei";
-		
-		
+
+
 		ParametersMap CopyGeometriesAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -72,9 +72,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CopyGeometriesAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -116,9 +116,9 @@ namespace synthese
 				throw ActionException("No such edge");
 			}
 		}
-		
-		
-		
+
+
+
 		void CopyGeometriesAction::run(
 			Request& request
 		){
@@ -159,9 +159,9 @@ namespace synthese
 
 			transaction.run();
 		}
-		
-		
-		
+
+
+
 		bool CopyGeometriesAction::isAuthorized(
 			const Session* session
 		) const {

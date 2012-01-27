@@ -77,7 +77,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DriverServicesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -102,7 +102,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DriverServicesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -210,7 +210,7 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
@@ -225,12 +225,12 @@ namespace synthese
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks DriverServicesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
 
 			if(	currentPage == *this ||

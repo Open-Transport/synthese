@@ -70,7 +70,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DestinationsAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -95,7 +95,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DestinationsAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -152,7 +152,7 @@ namespace synthese
 
 				// Code
 				stream << t.col() << destination->getCodeBySources();
-				
+
 				// Delete button
 				deleteRequest.getAction()->setObjectId(destination->getKey());
 				stream << t.col();
@@ -177,9 +177,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -187,23 +187,23 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 
 
-		
+
 		AdminInterfaceElement::PageLinks DestinationsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			const DestinationsAdmin* ua(
 				dynamic_cast<const DestinationsAdmin*>(&currentPage)
 			);
-			
+
 			const DestinationAdmin* ua2(
 				dynamic_cast<const DestinationAdmin*>(&currentPage)
 			);
@@ -222,7 +222,7 @@ namespace synthese
 					links.push_back(p);
 				}
 			}
-			
+
 			return links;
 		}
 }	}

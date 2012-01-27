@@ -64,7 +64,7 @@ namespace synthese
 	using namespace security;
 	using namespace dblog;
 	using namespace impex;
-	
+
 	template<> const string util::FactorableTemplate<Action,messages::ScenarioSaveAction>::FACTORY_KEY("scenario_save");
 
 	namespace messages

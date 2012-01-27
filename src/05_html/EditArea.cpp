@@ -89,7 +89,7 @@ namespace synthese
 								"alert('Error during save action');" <<
 						"}" <<
 					"}; " <<
-					
+
 					"xhr.open('POST','" << ajaxSaveURL << "');" <<
 					"xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');" <<
 					"xhr.send(document.getElementById(id).name +'='+ encodeURIComponent(value));" <<
@@ -119,7 +119,7 @@ namespace synthese
 			{
 				stream << "save, |, ";
 			}
-			stream << 
+			stream <<
 				"search, go_to_line, fullscreen, |, undo, redo, |, select_font,|, change_smooth_selection, highlight, reset_highlight, word_wrap, |, help\""
 			;
 			if(saveCallback)

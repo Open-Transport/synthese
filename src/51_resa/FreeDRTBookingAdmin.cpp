@@ -87,7 +87,7 @@ namespace synthese
 		{}
 
 
-		
+
 		void FreeDRTBookingAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -195,7 +195,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool FreeDRTBookingAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -217,7 +217,7 @@ namespace synthese
 				"Départ",
 				t.getForm().getTextInput(
 					PARAMETER_DEPARTURE_PLACE,
-					_departurePlace.get() ? 
+					_departurePlace.get() ?
 						(	dynamic_cast<const NamedPlace*>(_departurePlace.get()) ?
 							dynamic_cast<const NamedPlace*>(_departurePlace.get())->getFullName() :
 							dynamic_cast<const City*>(_departurePlace.get())->getName()

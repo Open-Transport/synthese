@@ -362,17 +362,17 @@ namespace synthese
 				*_journeyPlannerFile << _journeyPlannerTable.col();
 				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
 				{
-					*_journeyPlannerFile << 
+					*_journeyPlannerFile <<
 						(3.6 * (*journey->getDistanceToEnd()) / (bestDateTime - journey->getEndTime()).total_seconds())
 					;
 				}
 				else
 				{
-					*_journeyPlannerFile << 
+					*_journeyPlannerFile <<
 						(3.6 * (*journey->getDistanceToEnd()) / (journey->getEndTime() - bestDateTime).total_seconds())
 					;
 				}
-				
+
 				*_journeyPlannerFile << _journeyPlannerTable.col() << journey->getEndEdge().getHub()->getScore();
 			}
 			else
@@ -555,13 +555,13 @@ namespace synthese
 				*_journeyPlannerStepFile << _journeyPlannerStepTable.col();
 				if(_journeyPlanningPhase == DEPARTURE_TO_ARRIVAL)
 				{
-					*_journeyPlannerStepFile << 
+					*_journeyPlannerStepFile <<
 						(3.6 * (*journey->getDistanceToEnd()) / (bestDateTime - journey->getEndTime()).total_seconds())
 						;
 				}
 				else
 				{
-					*_journeyPlannerStepFile << 
+					*_journeyPlannerStepFile <<
 						(3.6 * (*journey->getDistanceToEnd()) / (journey->getEndTime() - bestDateTime).total_seconds())
 						;
 				}
