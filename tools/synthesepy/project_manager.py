@@ -1038,8 +1038,15 @@ The synthese.py wrapper script.
         cmd = []
         if sudo:
             cmd.append('/usr/bin/sudo')
-        if self.env.platform == 'win':
-            cmd.append(sys.executable)
+
+        # TODO: implement a better way to detect the remote OS
+        remote_os = 'lin'
+        if self.env.platform == 'win' and self.config.remote_server == 'localhost':
+            remote_os = 'win'
+
+        if remote_os == 'win':
+            # This assumes Cygwin ssh is running (might work if not though).
+            cmd.extend(['cmd', '/c', sys.executable])
         else:
             # Python path is hardcoded in order to match the sudo rule.
             cmd.append('/usr/bin/python')
@@ -1055,6 +1062,7 @@ The synthese.py wrapper script.
 
         cmd.append(command)
         cmd.extend(args)
+        cmd = [arg.replace('\\', '\\\\') for arg in cmd]
         return cmd
 
     def call_project(self, command, global_args=[], args=[], sudo=False):
