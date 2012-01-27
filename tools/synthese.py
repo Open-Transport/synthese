@@ -90,10 +90,15 @@ class Bootstrap(object):
         virtualenv_script = join(
             self.tools_path, 'synthesepy', 'third_party', 'virtualenv.py')
         log.info('Installing Python environment...')
-        subprocess.check_call([
+        virtualenv_cmd = [
             sys.executable, virtualenv_script, '--distribute',
             '--never-download', self.pyenv_path
-        ], cwd=self.tools_path)
+        ]
+        # Make system site package available on Windows, in order to have
+        # access to pywin32 and other requirements.
+        if sys.platform == 'win32':
+            virtualenv_cmd.append('--system-site-packages')
+        subprocess.check_call(virtualenv_cmd, cwd=self.tools_path)
 
         log.info('Installing dependencies...')
         requirements_files = [
