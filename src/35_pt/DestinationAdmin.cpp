@@ -46,7 +46,7 @@ namespace synthese
 	using namespace pt;
 	using namespace impex;
 	using namespace html;
-	
+
 
 	namespace util
 	{
@@ -66,7 +66,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DestinationAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -93,7 +93,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DestinationAdmin::isAuthorized(
 			const security::User& user
 		) const	{

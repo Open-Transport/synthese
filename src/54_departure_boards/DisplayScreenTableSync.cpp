@@ -905,7 +905,7 @@ namespace synthese
 			{
 				vector<string> parts;
 				split(parts, line, is_any_of("|"));
-				
+
 				RegistryKeyType id(lexical_cast<RegistryKeyType>(parts[0]));
 				try
 				{

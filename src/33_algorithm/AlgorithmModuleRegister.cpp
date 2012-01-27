@@ -5,5 +5,5 @@
 
 void synthese::algorithm::moduleRegister()
 {
-	
+
 }

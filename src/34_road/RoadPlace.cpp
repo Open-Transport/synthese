@@ -315,7 +315,7 @@ namespace synthese
 			util::ParametersMap& pm,
 			const std::string& prefix
 		) const	{
-			
+
 			// ID
 			pm.insert(prefix + DATA_ID, getKey());
 

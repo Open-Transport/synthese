@@ -38,9 +38,9 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
-	
 
-	
+
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::DestinationUpdateAction>::FACTORY_KEY("DestinationUpdateAction");
@@ -52,9 +52,9 @@ namespace synthese
 		const string DestinationUpdateAction::PARAMETER_COMMENT = Action_PARAMETER_PREFIX + "comment";
 		const string DestinationUpdateAction::PARAMETER_DISPLAYED_TEXT = Action_PARAMETER_PREFIX + "displayed_text";
 		const string DestinationUpdateAction::PARAMETER_TTS_TEXT = Action_PARAMETER_PREFIX + "tts_text";
-		
-		
-		
+
+
+
 		ParametersMap DestinationUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -80,9 +80,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DestinationUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Destination
@@ -123,9 +123,9 @@ namespace synthese
 			// Data source links
 			_setImportableUpdateFromParametersMap(*_env, map);
 		}
-		
-		
-		
+
+
+
 		void DestinationUpdateAction::run(
 			Request& request
 		){
@@ -159,9 +159,9 @@ namespace synthese
 				request.setActionCreatedId(_destination->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool DestinationUpdateAction::isAuthorized(
 			const Session* session
 		) const {

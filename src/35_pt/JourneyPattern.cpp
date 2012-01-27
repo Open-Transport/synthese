@@ -306,7 +306,7 @@ namespace synthese
 			{
 				const Edge& otherEdge(*other.getEdge(rank));
 				if( edge->getFromVertex() != otherEdge.getFromVertex() ||
-					(rank > 0 && edge->isDeparture() != otherEdge.isDeparture()) || 
+					(rank > 0 && edge->isDeparture() != otherEdge.isDeparture()) ||
 					(rank+1 < getEdges().size() && edge->isArrival() != otherEdge.isArrival()) ||
 					(dynamic_cast<const DesignatedLinePhysicalStop*>(edge) && static_cast<const DesignatedLinePhysicalStop*>(&otherEdge)->getScheduleInput() != static_cast<const DesignatedLinePhysicalStop*>(edge)->getScheduleInput()) ||
 					otherEdge.getMetricOffset() != edge->getMetricOffset()

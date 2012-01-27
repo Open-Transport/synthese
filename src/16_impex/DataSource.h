@@ -66,7 +66,7 @@ namespace synthese
 		{
 		public:
 			typedef util::Registry<DataSource> Registry;
-			
+
 			// Typedefs
 			typedef std::map<
 				std::string, // Class name

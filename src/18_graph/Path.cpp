@@ -564,7 +564,7 @@ namespace synthese
 				{
 					Edge* nextArrival(lastEdge.getFollowingArrivalForFineSteppingOnly());
 					Edge* nextConnectingArrival(lastEdge.getFollowingConnectionArrival());
-					
+
 					{
 						Edge* oldNextArrival(lastRealEdge->getFollowingArrivalForFineSteppingOnly());
 

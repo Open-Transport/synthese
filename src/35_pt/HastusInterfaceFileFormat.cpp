@@ -210,7 +210,7 @@ namespace synthese
 				{
 					lineTransportModes[lineCode] = rollingStocks.front();
 				}
-			 
+
 				// Jump to record 2.2
 				_loadNextRecord(2.2);
 
@@ -313,7 +313,7 @@ namespace synthese
 				service.code = _getTextField(40,10);
 				service.routeCode = _getTextField(124,4);
 				service.wayBack = (lexical_cast<int>(_getTextField(51, 4)) % 2 == 1);
-				
+
 				// All schedules on record 12.8
 				vector<string> allSchedulesStr(_getNextVector(12.8, 37, 41, 5));
 				BOOST_FOREACH(const string& allScheduleStr, allSchedulesStr)
@@ -322,7 +322,7 @@ namespace synthese
 						minutes(lexical_cast<long>(allScheduleStr))
 					);
 				}
-			
+
 				// Stops on record 12.9
 				service.stops = _getNextVector(12.9, 37, 41, 9);
 				BOOST_FOREACH(const string& stopCode, service.stops)
@@ -336,7 +336,7 @@ namespace synthese
 
 				services.push_back(service);
 			}
-		
+
 			// File closing
 			_file.close();
 
@@ -444,7 +444,7 @@ namespace synthese
 						size_t rank(1);
 						for(size_t unScheduledStopI(lastScheduledStop+1); unScheduledStopI<allStopsI; ++unScheduledStopI)
 						{
-							servedStops[unScheduledStopI]._metricOffset = 
+							servedStops[unScheduledStopI]._metricOffset =
 								*servedStops[lastScheduledStop]._metricOffset +
 								floor(
 									(double(rank) / double(allStopsI-lastScheduledStop)) *
@@ -513,7 +513,7 @@ namespace synthese
 				}
 				else
 				{
-					missingCalendars.insert(service.calendar);	
+					missingCalendars.insert(service.calendar);
 				}
 			}
 

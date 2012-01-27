@@ -37,13 +37,13 @@ namespace synthese
 			Here are the different right levels :
 
 			Private rights : none
-				
+
 			Public rights :
 				- USE : View a CMS page
 				- READ : View a CMS page source
 				- WRITE : Edit a CMS page source
 				- DELETE : Delete a CMS page
-				
+
 			Perimeter definition :
 				- an ID of a website : apply on all pages of the website and the website itself
 				- an ID of a page : apply on the page and its subpages. All accesses on the website are forbidden
@@ -56,7 +56,7 @@ namespace synthese
 				@return description of the perimeter
 			*/
 			std::string	displayParameter(util::Env& env)	const;
-			
+
 
 			/** Tests if a page or site is included in the right perimeter.
 				@param id of a site or a page

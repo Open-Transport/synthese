@@ -56,10 +56,10 @@ namespace synthese
 				static const std::string COL_USE_RULES;
 				static const std::string COL_DATES;
 			//@}
-			
+
 
 			//! @name Services
-			//@{		
+			//@{
 				//////////////////////////////////////////////////////////////////////////
 				///	FreeDRTTimeSlot search.
 				///	@param env Environment to populate

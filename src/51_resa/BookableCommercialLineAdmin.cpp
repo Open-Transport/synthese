@@ -501,7 +501,7 @@ namespace synthese
 
 						// Service title
 						stream << t.col(6, string(), true);
-						
+
 						if(dynamic_cast<ScheduledService*>(service.get()))
 						{
 							stream << "Service " << serviceNumber << " - départ de ";
@@ -700,8 +700,8 @@ namespace synthese
 			closeTabContent(stream);
 		}
 
-		
-		
+
+
 		bool BookableCommercialLineAdmin::isAuthorized(
 			const security::User& user
 		) const	{

@@ -48,7 +48,7 @@
 
 void synthese::pt_operation::moduleRegister()
 {
-	
+
 	// 37 PT Operation
 	synthese::pt_operation::DeadRunTableSync::integrate();
 	synthese::pt_operation::DepotTableSync::integrate();
@@ -62,14 +62,14 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehicleTableSync::integrate();
 	synthese::pt_operation::VehiclePositionTableSync::integrate();
 	synthese::pt_operation::VehicleServiceTableSync::integrate();
-	
+
 	synthese::pt_operation::PTOperationModule::integrate();
-	
+
 	synthese::pt_operation::GetCompositionsService::integrate();
 	synthese::pt_operation::GetVehiclesService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
-	
+
 	synthese::pt_operation::CompositionVehicleAddAction::integrate();
 	synthese::pt_operation::CompositionVehicleRemoveAction::integrate();
 	synthese::pt_operation::CompositionUpdateAction::integrate();
@@ -79,7 +79,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehicleUpdateAction::integrate();
 	synthese::pt_operation::VehiclePositionUpdateAction::integrate();
 	synthese::pt_operation::VehicleServiceUpdateAction::integrate();
-	
+
 	synthese::pt_operation::DepotAdmin::integrate();
 	synthese::pt_operation::DepotsAdmin::integrate();
 	synthese::pt_operation::DriverServiceAdmin::integrate();
@@ -98,5 +98,5 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehiclePosition>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehicleService>();
-	
+
 }

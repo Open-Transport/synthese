@@ -37,7 +37,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::VehicleServiceUpdateAction>::FACTORY_KEY("VehicleServiceUpdate");
@@ -47,9 +47,9 @@ namespace synthese
 	{
 		const string VehicleServiceUpdateAction::PARAMETER_VEHICLE_SERVICE_ID = Action_PARAMETER_PREFIX + "vehicle_service_id";
 		const string VehicleServiceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
-		
-		
-		
+
+
+
 		ParametersMap VehicleServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -67,9 +67,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void VehicleServiceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Vehicle service
@@ -96,9 +96,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 		}
-		
-		
-		
+
+
+
 		void VehicleServiceUpdateAction::run(
 			Request& request
 		){
@@ -127,9 +127,9 @@ namespace synthese
 
 //			x::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool VehicleServiceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

@@ -58,7 +58,7 @@ for dir in dirs:
     register_path = module_file[:-4] + "Register.cpp"
     gen_path = module_file[:-4] + ".gen.cpp"
     inc_path = module_file[:-4] + ".inc.cpp"
-    
+
     if not os.path.isfile(join(dir, inc_path)):
         print "No module for %s" % small_module
         continue

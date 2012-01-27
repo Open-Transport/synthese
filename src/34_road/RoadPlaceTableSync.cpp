@@ -47,7 +47,7 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 	using namespace impex;
-	
+
 
 	namespace util
 	{
@@ -114,7 +114,7 @@ namespace synthese
 					city->addPlaceToMatcher(env.getEditableSPtr(object));
 				}
 			}
-				
+
 			// Datasource links
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{

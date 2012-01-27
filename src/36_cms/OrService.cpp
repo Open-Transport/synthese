@@ -35,12 +35,12 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,cms::OrService>::FACTORY_KEY("or");
-	
+
 	namespace cms
 	{
 		const string OrService::PARAMETER_LEFT("l");
 		const string OrService::PARAMETER_RIGHT("r");
-		
+
 
 
 		ParametersMap OrService::_getParametersMap() const
@@ -68,9 +68,9 @@ namespace synthese
 			stream << (_left || _right);
 			return util::ParametersMap();
 		}
-		
-		
-		
+
+
+
 		bool OrService::isAuthorized(
 			const Session* session
 		) const {

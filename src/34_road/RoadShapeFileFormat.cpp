@@ -74,9 +74,9 @@ namespace synthese
 		const string RoadShapeFileFormat::Importer_::FILE_ROAD_PLACES = "road_places";
 		const string RoadShapeFileFormat::Importer_::FILE_ROAD_CHUNKS = "road_chunks";
 		const string RoadShapeFileFormat::Importer_::FILE_PUBLIC_PLACES = "public_places";
-		
+
 		const string RoadShapeFileFormat::Importer_::FIELD_GEOMETRY = "Geometry";
-		
+
 		const string RoadShapeFileFormat::Importer_::PARAMETER_FIELD_ROAD_PLACES_CITY_CODE = "field_road_places_city_code";
 		const string RoadShapeFileFormat::Importer_::PARAMETER_FIELD_ROAD_PLACES_CODE = "field_road_places_code";
 		const string RoadShapeFileFormat::Importer_::PARAMETER_FIELD_ROAD_PLACES_NAME = "field_road_places_name";
@@ -345,7 +345,7 @@ namespace synthese
 								leftHouseNumbers,
 								_env
 					)	)	);
-				}				
+				}
 			}
 			// Public places
 			else if(key == FILE_PUBLIC_PLACES)

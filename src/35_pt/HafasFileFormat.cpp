@@ -501,7 +501,7 @@ namespace synthese
 						itStop->stopCode = stopCode;
 						if(isDeparture)
 						{
-							itStop->departureTime = 
+							itStop->departureTime =
 								hours(lexical_cast<int>(departureTimeStr.substr(0,2))) +
 								minutes(lexical_cast<int>(departureTimeStr.substr(2,2)))
 							;
@@ -1341,7 +1341,7 @@ namespace synthese
 						return false;
 					}
 				}
-			
+
 				// Journey pattern
 				JourneyPattern* route(
 					PTFileFormat::CreateOrUpdateRoute(

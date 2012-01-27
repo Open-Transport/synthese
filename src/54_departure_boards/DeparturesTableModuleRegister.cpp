@@ -85,16 +85,16 @@
 
 void synthese::departure_boards::moduleRegister()
 {
-	
+
 	synthese::departure_boards::DeparturesTableModule::integrate();
-	
+
 	synthese::departure_boards::DeparturesTableInterfaceElement::integrate();
 	synthese::departure_boards::DeparturesTableRoutePlanningInterfaceElement::integrate();
 	synthese::departure_boards::DeparturesTableLineContentInterfaceElement::integrate();
 	synthese::departure_boards::DeparturesTableDestinationContentInterfaceElement::integrate();
 	synthese::departure_boards::DisplayScreenHasAlarmValueInterfaceElement::integrate();
 	synthese::departure_boards::DisplayScreenAlarmContentValueInterfaceElement::integrate();
-	
+
 	synthese::departure_boards::DeparturesTableInterfacePage::integrate();
 	synthese::departure_boards::DeparturesTableRoutePlanningInterfacePage::integrate();
 	synthese::departure_boards::DepartureTableRowInterfacePage::integrate();
@@ -103,7 +103,7 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::ParseDisplayReturnInterfacePage::integrate();
 	synthese::departure_boards::DeparturesTableTransferDestinationInterfacePage::integrate();
 	synthese::departure_boards::DeparturesTableDestinationInterfacepage::integrate();
-	
+
 	synthese::departure_boards::DisplaySearchAdmin::integrate();
 	synthese::departure_boards::DisplayTypesAdmin::integrate();
 	synthese::departure_boards::BroadcastPointsAdmin::integrate();
@@ -111,12 +111,12 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::DisplayTypeAdmin::integrate();
 	synthese::departure_boards::DisplayScreenCPUAdmin::integrate();
 	synthese::departure_boards::DeparturesTableBenchmarkAdmin::integrate();
-	
+
 	synthese::departure_boards::DisplayTypeTableSync::integrate();
 	synthese::departure_boards::DisplayScreenTableSync::integrate();
 	synthese::departure_boards::DisplayMonitoringStatusTableSync::integrate();
 	synthese::departure_boards::DisplayScreenCPUTableSync::integrate();
-	
+
 	synthese::departure_boards::CreateDisplayTypeAction::integrate();
 	synthese::departure_boards::UpdateDisplayTypeAction::integrate();
 	synthese::departure_boards::CreateDisplayScreenAction::integrate();
@@ -139,7 +139,7 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::DisplayScreenTransferDestinationAddAction::integrate();
 	synthese::departure_boards::DisplayScreenTransferDestinationRemoveAction::integrate();
 	synthese::departure_boards::DisplayScreenUpdateDisplayedStopAreaAction::integrate();
-	
+
 	synthese::departure_boards::DisplayScreenContentFunction::integrate();
 	synthese::departure_boards::DisplayScreenSupervisionFunction::integrate();
 	synthese::departure_boards::AlarmTestOnDisplayScreenFunction::integrate();
@@ -147,17 +147,17 @@ void synthese::departure_boards::moduleRegister()
 	synthese::departure_boards::CentreonConfigExportFunction::integrate();
 	synthese::departure_boards::CPUGetWiredScreensFunction::integrate();
 	synthese::departure_boards::GetDepartureBoardsService::integrate();
-	
+
 	synthese::departure_boards::ArrivalDepartureTableRight::integrate();
 	synthese::departure_boards::DisplayMaintenanceRight::integrate();
-	
+
 	synthese::departure_boards::ArrivalDepartureTableLog::integrate();
 	synthese::departure_boards::DisplayMaintenanceLog::integrate();
-	
+
 	synthese::departure_boards::DisplayScreenAlarmRecipient::integrate();
-	
+
 	synthese::departure_boards::IneoDepartureBoardsFileFormat::integrate();
-	
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreen>();
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayType>();

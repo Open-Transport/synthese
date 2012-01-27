@@ -273,7 +273,7 @@ namespace synthese
 				void	removeDisplayedPlace(const pt::StopArea*);
 				void	removeForbiddenPlace(const pt::StopArea*);
 				void	removeForcedDestination(const pt::StopArea*);
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds a destination by transfer to display if necessary.
 				/// @param transferPlace place to the transfer must be
@@ -339,8 +339,8 @@ namespace synthese
 
 				const geography::NamedPlace* getLocation() const;
 
-			
-				
+
+
 				std::string getFullName() const;
 
 
@@ -377,7 +377,7 @@ namespace synthese
 				*/
 				bool isMonitored() const;
 
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Exports the object into a parameters map.
 				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_in_CMS

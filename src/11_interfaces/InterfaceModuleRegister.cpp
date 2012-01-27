@@ -45,17 +45,17 @@
 
 void synthese::interfaces::moduleRegister()
 {
-	
+
 	synthese::interfaces::InterfaceRight::integrate();
-	
+
 	synthese::interfaces::InterfaceModule::integrate();
-	
+
 	synthese::interfaces::InterfaceAdmin::integrate();
 	synthese::interfaces::InterfacePageAdmin::integrate();
-	
+
 	synthese::interfaces::InterfacePageUpdateAction::integrate();
 	synthese::interfaces::InterfacePageAddAction::integrate();
-	
+
 	synthese::interfaces::ParameterValueInterfaceElement::integrate();
 	synthese::interfaces::IfThenElseInterfaceElement::integrate();
 	synthese::interfaces::FormattedNumberInterfaceElement::integrate();
@@ -76,12 +76,12 @@ void synthese::interfaces::moduleRegister()
 	synthese::interfaces::SetInterfaceElement::integrate();
 	synthese::interfaces::StrLenInterfaceElement::integrate();
 	synthese::interfaces::LowerCaseInterfaceElement::integrate();
-	
+
 	synthese::interfaces::InterfaceTableSync::integrate();
 	synthese::interfaces::InterfacePageTableSync::integrate();
-	
+
 	synthese::interfaces::NonPredefinedInterfacePage::integrate();
-	
+
 	// Registries
 	synthese::util::Env::Integrate<synthese::interfaces::Interface>();
 	synthese::util::Env::Integrate<synthese::interfaces::InterfacePage>();

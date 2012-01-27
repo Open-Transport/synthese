@@ -307,7 +307,7 @@ namespace synthese
 				RowType place;
 				bool isOrigin;
 				bool isDestination;
-				
+
 				PlaceInformation(
 					RowType _place,
 					bool _isOrigin,

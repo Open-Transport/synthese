@@ -67,7 +67,7 @@ namespace synthese
 		ParametersMap DeviateServiceAction::getParametersMap() const
 		{
 			ParametersMap map;
-			
+
 			// Service
 			if(_service.get())
 			{

@@ -224,7 +224,7 @@ namespace synthese
 
 			// Stop area
 			query.addField(dynamic_cast<const StopArea*>(object->getHub()) ? dynamic_cast<const StopArea*>(object->getHub())->getKey() : RegistryKeyType(0));
-			
+
 			// X Y (deprecated)
 			if(object->hasGeometry())
 			{

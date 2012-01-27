@@ -154,7 +154,7 @@ namespace synthese
 				}
 
 
-				
+
 				void addPlaceToMatcher(
 					PlacesMatcher::Content place
 				);
@@ -164,7 +164,7 @@ namespace synthese
 				void removePlaceFromMatcher(
 					const geography::NamedPlace& place
 				);
-				
+
 
 
 				//////////////////////////////////////////////////////////////////////////

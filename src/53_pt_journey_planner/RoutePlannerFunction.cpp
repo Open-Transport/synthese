@@ -404,8 +404,8 @@ namespace synthese
 			_FunctionWithSite::_setFromParametersMap(map);
 
 			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
-			
-			_outputRoadApproachDetail = 
+
+			_outputRoadApproachDetail =
 				site ?
 				site->getDisplayRoadApproachDetail() :
 				true
@@ -963,7 +963,7 @@ namespace synthese
 				startDate = ptime(_day, time_duration(0, 0, 0));
 				endDate = startDate;
 				site->applyPeriod(*_period, startDate, endDate);
-				
+
 				startArrivalDate = startDate;
 				endArrivalDate = endDate + maxRunTime;
 			}
@@ -2578,7 +2578,7 @@ namespace synthese
 				Lines lines;
 				typedef map<const StopArea*, pair<ptime, ptime> > Stops;
 				Stops stops;
-				
+
 				// Reading of all parts of the journey
 				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 				{
@@ -2609,7 +2609,7 @@ namespace synthese
 								stops.insert(
 									make_pair(
 										departureStopArea,
-										make_pair(leg.getDepartureDateTime(), leg.getDepartureDateTime())	
+										make_pair(leg.getDepartureDateTime(), leg.getDepartureDateTime())
 								)	);
 							}
 							else

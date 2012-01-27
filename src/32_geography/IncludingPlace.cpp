@@ -84,8 +84,8 @@ namespace synthese
 			}
 		}
 
-		
-		
+
+
 		const shared_ptr<Point>& IncludingPlace::getPoint() const
 		{
 			if (!_isoBarycentre.get())

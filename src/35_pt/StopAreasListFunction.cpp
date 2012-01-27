@@ -72,7 +72,7 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_STOP_PAGE_ID = "stop_page_id";
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
 		const string StopAreasListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
-		
+
 		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
 		const string StopAreasListFunction::DATA_STOP_RANK("stop_rank");
@@ -287,7 +287,7 @@ namespace synthese
 						shared_ptr<ParametersMap> pmLine(new ParametersMap);
 
 						itLine->toParametersMap(*pmLine);
-						
+
 						// Rolling stock
 						set<RollingStock *> rollingStocks;
 						BOOST_FOREACH(Path* path, itLine->getPaths())
@@ -307,7 +307,7 @@ namespace synthese
 							shared_ptr<ParametersMap> transportModePM(new ParametersMap);
 							rs->toParametersMap(*transportModePM);
 							pmLine->insert("transportMode", transportModePM);
-						}	
+						}
 
 						stopPm->insert(DATA_LINE, pmLine);
 					}

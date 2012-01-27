@@ -379,7 +379,7 @@ namespace synthese
 				}
 
 				_journeyPlanner.runWithoutOutput();
-				
+
 				if(	!_journeyPlanner.getResult().get() ||
 					_journeyPlanner.getResult()->getJourneys().empty())
 				{

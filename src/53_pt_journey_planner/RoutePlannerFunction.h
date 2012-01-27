@@ -91,7 +91,7 @@ namespace synthese
 	{
 		class RoutePlannerInterfacePage;
 		class UserFavoriteJourney;
-	
+
 		////////////////////////////////////////////////////////////////////
 		/// 53.15 Function : public transportation route planner.
 		///	@ingroup m53Functions refFunctions

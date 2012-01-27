@@ -105,7 +105,7 @@ BOOST_AUTO_TEST_CASE(MySQLReconnect)
 	}
 	else
 	{
-		cout << 
+		cout <<
 			"WARNING: Neither SYNTHESE_MYSQL_RESTART_COMMAND or SYNTHESE_MYSQL_RESTART_MANUAL "
 			"environment variable defined. Can't run test" << endl;
 		return;

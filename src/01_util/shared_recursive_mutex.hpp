@@ -53,7 +53,7 @@ namespace util
 			bool upgrade;
 			bool exclusive_waiting_blocked;
 		};
-		
+
 
 		state_data state;
 		boost::mutex state_change;
@@ -66,7 +66,7 @@ namespace util
 			exclusive_cond.notify_one();
 			shared_cond.notify_all();
 		}
-		
+
 
 	public:
 		shared_recursive_mutex()
@@ -83,7 +83,7 @@ namespace util
 		{
 			boost::this_thread::disable_interruption do_not_disturb;
 			boost::mutex::scoped_lock lk(state_change);
-				
+
 			// NOTE: modification from boost shared_mutex: don't wait while
 			// exclusive_waiting_blocked is true, otherwise a reader might
 			// deadlock if it calls lock_shared recursively.
@@ -98,7 +98,7 @@ namespace util
 		{
 			boost::mutex::scoped_lock lk(state_change);
 			bool const last_reader=!--state.shared_count;
-				
+
 			if(last_reader)
 			{
 				if(state.upgrade)
@@ -119,7 +119,7 @@ namespace util
 		{
 			boost::this_thread::disable_interruption do_not_disturb;
 			boost::mutex::scoped_lock lk(state_change);
-				
+
 			while(state.shared_count || state.exclusive)
 			{
 				state.exclusive_waiting_blocked=true;

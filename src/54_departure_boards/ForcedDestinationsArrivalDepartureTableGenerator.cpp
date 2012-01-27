@@ -131,7 +131,7 @@ namespace synthese
 					ServicePointer serviceInstance;
 
 					optional<Edge::DepartureServiceIndex::Value> minIndex;
-					
+
 					// Loop on services while all arrival stops are not reached
 					set<const Edge*> nonServedEdges;
 					AccessParameters ap;

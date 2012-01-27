@@ -38,7 +38,7 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace impex;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt_operation::DriverServiceUpdateAction>::FACTORY_KEY("DriverServiceUpdate");
@@ -49,8 +49,8 @@ namespace synthese
 		const string DriverServiceUpdateAction::PARAMETER_DRIVER_SERVICE_ID = Action_PARAMETER_PREFIX + "driver_service_id";
 		const string DriverServiceUpdateAction::PARAMETER_NAME = Action_PARAMETER_PREFIX + "name";
 
-		
-		
+
+
 		ParametersMap DriverServiceUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -75,9 +75,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void DriverServiceUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Driver service
@@ -107,9 +107,9 @@ namespace synthese
 				_name = map.get<string>(PARAMETER_NAME);
 			}
 		}
-		
-		
-		
+
+
+
 		void DriverServiceUpdateAction::run(
 			Request& request
 		){
@@ -143,9 +143,9 @@ namespace synthese
 
 //			x::AddUpdateEntry(*_object, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool DriverServiceUpdateAction::isAuthorized(
 			const Session* session
 		) const {

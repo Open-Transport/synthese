@@ -59,10 +59,10 @@ namespace synthese
 			static const std::string PARAMETER_PHONE_NUMBER;
 			static const std::string PARAMETER_PHONE_OPENING_HOURS;
 			static const std::string PARAMETER_WEBSITE_URL;
-			
+
 		private:
 			boost::shared_ptr<ReservationContact> _contactCenter;
-			
+
 			boost::optional<std::string> _name;
 			boost::optional<std::string> _phoneNumber;
 			boost::optional<std::string> _phoneOpeningHours;
@@ -88,7 +88,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

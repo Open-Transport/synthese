@@ -38,7 +38,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, impex::CleanObsoleteDataAction>::FACTORY_KEY("CleanObsoleteDataAction");
@@ -48,8 +48,8 @@ namespace synthese
 	{
 		const string CleanObsoleteDataAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "datasource_id";
 		const string CleanObsoleteDataAction::PARAMETER_FIRST_DATE = Action_PARAMETER_PREFIX + "first_date";
-		
-		
+
+
 		ParametersMap CleanObsoleteDataAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -63,9 +63,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void CleanObsoleteDataAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Datasource
@@ -85,17 +85,17 @@ namespace synthese
 			// Date
 			_firstDate = from_string(map.get<string>(PARAMETER_FIRST_DATE));
 		}
-		
-		
-		
+
+
+
 		void CleanObsoleteDataAction::run(
 			Request& request
 		){
 			_importer->cleanObsoleteData(_firstDate);
 		}
-		
-		
-		
+
+
+
 		bool CleanObsoleteDataAction::isAuthorized(
 			const Session* session
 		) const {

@@ -79,7 +79,7 @@ namespace synthese
 		{}
 
 
-			
+
 		virtual ~WithGeometry(){}
 
 

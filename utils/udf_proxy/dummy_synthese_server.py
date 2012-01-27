@@ -24,7 +24,7 @@
 import BaseHTTPServer
 import SimpleHTTPServer
 
-class HandlerWithPost(SimpleHTTPServer.SimpleHTTPRequestHandler): 
+class HandlerWithPost(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
         print 'Got GET %r' % (self.path,)
         self._dummy_response()

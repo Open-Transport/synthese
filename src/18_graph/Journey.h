@@ -62,7 +62,7 @@ namespace synthese
 				boost::posix_time::time_duration	_effectiveDuration;
 				std::size_t _transportConnectionCount;
 				double			_distance;
-			
+
 				void _updateInternalData(
 					const ServicePointer& leg
 				);

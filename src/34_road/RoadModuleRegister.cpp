@@ -49,7 +49,7 @@ void synthese::road::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::road::PublicPlaceTableSync>::integrate();
 	synthese::road::RoadPlace::integrate();
 	synthese::road::PublicPlace::integrate();
-	
+
 	synthese::road::NavstreetsFileFormat::integrate();
 	synthese::road::OSMFileFormat::integrate();
 	synthese::road::RoadShapeFileFormat::integrate();

@@ -34,7 +34,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, server::SetSessionVariableAction>::FACTORY_KEY("SetSessionVariable");
@@ -44,9 +44,9 @@ namespace synthese
 	{
 		const string SetSessionVariableAction::PARAMETER_VARIABLE = Action_PARAMETER_PREFIX + "variable";
 		const string SetSessionVariableAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "value";
-		
-		
-		
+
+
+
 		ParametersMap SetSessionVariableAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -54,9 +54,9 @@ namespace synthese
 			map.insert(PARAMETER_VALUE, _value);
 			return map;
 		}
-		
-		
-		
+
+
+
 		void SetSessionVariableAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Variable
@@ -69,17 +69,17 @@ namespace synthese
 			// Value
 			_value = map.get<string>(PARAMETER_VALUE);
 		}
-		
-		
-		
+
+
+
 		void SetSessionVariableAction::run(
 			Request& request
 		){
 			const_cast<Session*>(request.getSession())->setSessionVariable(_variable, _value);
 		}
-		
-		
-		
+
+
+
 		bool SetSessionVariableAction::isAuthorized(
 			const Session* session
 		) const {

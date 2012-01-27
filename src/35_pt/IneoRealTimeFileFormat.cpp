@@ -57,7 +57,7 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<FileFormat,pt::IneoRealTimeFileFormat>::FACTORY_KEY("Ineo temps réel");
 	}
-	
+
 	namespace pt
 	{
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID("ps");

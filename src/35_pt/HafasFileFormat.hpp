@@ -177,7 +177,7 @@ namespace synthese
 						std::string gleisCode;
 						boost::posix_time::time_duration departureTime;
 						boost::posix_time::time_duration arrivalTime;
-						
+
 						Stop():
 							departureTime(boost::posix_time::not_a_date_time),
 							arrivalTime(boost::posix_time::not_a_date_time)

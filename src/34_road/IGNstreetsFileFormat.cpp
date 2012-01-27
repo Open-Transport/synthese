@@ -126,7 +126,7 @@ namespace synthese
 				size_t roadNotFound(0);
 				size_t emptyStreetName(0);
 				size_t badGeometry(0);
-				
+
 				{	// Address
 					stringstream query;
 					query << "SELECT *, AsText(" << IGNstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << IGNstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();

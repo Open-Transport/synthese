@@ -188,7 +188,7 @@ namespace synthese
 		){
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			
+
 			// Service
 			if(_calendar)
 			{
@@ -233,7 +233,7 @@ namespace synthese
 					);
 				}
 			}
-			
+
 			// Calendar template 2
 			if(_calendarTpl2)
 			{

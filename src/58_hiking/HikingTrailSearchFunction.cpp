@@ -45,7 +45,7 @@ namespace synthese
 	{
 		const string HikingTrailSearchFunction::PARAMETER_SEARCH_NAME = "sn";
 		const string HikingTrailSearchFunction::PARAMETER_ITEM_DISPLAY_PAGE_ID = "pi";
-		
+
 		const string HikingTrailSearchFunction::DATA_HIKING_TRAIL = "hiking_trail";
 
 		ParametersMap HikingTrailSearchFunction::_getParametersMap() const
@@ -90,9 +90,9 @@ namespace synthese
 				trails
 			){
 				shared_ptr<ParametersMap> itemMap(new ParametersMap);
-				
+
 				itemMap->insert(Request::PARAMETER_OBJECT_ID, trail->getKey());
-				
+
 				pm.insert(DATA_HIKING_TRAIL, itemMap);
 			}
 

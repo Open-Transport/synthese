@@ -390,7 +390,7 @@ namespace synthese
 				StopArea::FreeDRTs freeDRTs(stopPoint->getConnectionPlace()->getFreeDRTs());
 				BOOST_FOREACH(const StopArea::FreeDRTs::value_type& freeDRT, freeDRTs)
 				{
-					// Select 
+					// Select
 
 				}
 			}
