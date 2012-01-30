@@ -1,0 +1,13 @@
+{
+  "__doc__": "This file is a sample configuration for the displays. You should create a page with the same name in the Synthese CMS to use your own configuration",
+  "defaults": {
+    "refreshTimeout": 120, 
+    "fallbackTimeout": 900, 
+    "fallbackUrl": "/kiosk/default_fallback.html"
+  },
+  "displays": {
+    "display0": {
+      "url": "/kiosk/tests/sample_page.html"
+    }
+  }
+}
