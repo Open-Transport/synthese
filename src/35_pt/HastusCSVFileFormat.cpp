@@ -108,8 +108,8 @@ namespace synthese
 	{
 		template<> const MultipleFileTypesImporter<HastusCSVFileFormat>::Files MultipleFileTypesImporter<HastusCSVFileFormat>::FILES(
 			HastusCSVFileFormat::Importer_::FILE_ARRETS.c_str(),
-			HastusCSVFileFormat::Importer_::FILE_ITINERAIRES.c_str(),
 			HastusCSVFileFormat::Importer_::FILE_VOYAGES.c_str(),
+			HastusCSVFileFormat::Importer_::FILE_ITINERAIRES.c_str(),
 		"");
 	}
 
@@ -134,7 +134,11 @@ namespace synthese
 			{
 				return team < other.team;
 			}
-			return this < &other;
+			if(handicapped != other.handicapped)
+			{
+				return handicapped < other.handicapped;
+			}
+			return false;
 		}
 
 
