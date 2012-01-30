@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+
+{% block body %}
+  <div class="row">
+    <div class="span14">
+      {% if error %}
+        <div class="alert-message error">
+          <a class="close" href="#">&times;</a>
+          <p><strong>Error:</strong> {{ error }}</p>
+        </div>
+      {% endif %}
+      <form action="{{ url_for('login') }}" method=post>
+        <fieldset>
+          <div class="clearfix">
+            <label>Password</label>
+            <div class="input">
+              <input type=password name=password autofocus>
+            </div>
+          </div>
+        </fieldset>
+
+        <div class="actions">
+          <button type="submit" class="btn primary">Login</button>
+        </div>
+
+        <input type=hidden name=next value="{{ request.args.next }}">
+      </form>
+    </div>
+  </div>
+{% endblock %}

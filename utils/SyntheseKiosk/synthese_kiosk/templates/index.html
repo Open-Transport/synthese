@@ -1,0 +1,192 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  <style>
+  .online {
+    background-color: lime;
+  }
+  .offline {
+    background-color: red;
+    color: white;
+  }
+  .unknown {
+    background-color: lightGray;
+  }
+  .logs {
+    font-size: 11px;
+  }
+  </style>
+{% endblock %}
+
+{% block nav %}
+  <ul class="nav">
+    <li><a href="#configuration">Configuration</a></li>
+    <li><a href="#management">Management</a></li>
+    <li><a href="#status">Status</a></li>
+  </ul>
+{% endblock %}
+
+
+{% block body %}
+
+  <!--
+  <div class="page-header">
+    <h1>Page name <small>Supporting text or tagline</small></h1>
+  </div>
+  -->
+  <div class="row" id="configuration">
+    <div class="span14">
+      <h1>Configuration</h1>
+
+      <form data-bind="submit: saveConfig">
+        <fieldset>
+
+          <div class="clearfix">
+            <label for="kiosk_name">Kiosk Name</label>
+            <div class="input">
+              <input class="xlarge" id="kiosk_name" name="kiosk_name"
+                     data-bind="value: kioskName" size="30" type="text" >
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="synthese_url">Synthese URL</label>
+            <div class="input">
+              <input class="xlarge" id="kiosk_name" name="synthese_url"
+                     data-bind="value: syntheseUrl" size="30" type="text"
+                     placeholder="http://example.com">
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="admin_password">Admin Password</label>
+            <div class="input">
+              <input class="xlarge" id="admin_password" name="admin_password"
+                     data-bind="value: adminPassword" size="30" type="password" />
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="secret_key">Secret Key</label>
+            <div class="input">
+              <input class="xlarge" id="secret_key" name="secret_key"
+                     data-bind="value: secretKey" size="30" type="text">
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="browser">Browser</label>
+            <div class="input">
+              <select name="browser" id="browser"
+                      data-bind="options: availableBrowsers, value: browser">
+              </select>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="display_names">Display Names</label>
+            <div class="input">
+              <input class="xlarge" id="display_names" name="display_names"
+                     data-bind="value: displayNames" size="30" type="text">
+              <span class="help-block">
+                Comma separated list of display names.
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="debug">Debug</label>
+            <div class="input">
+              <input id="debug" name="debug"
+                     data-bind="checked: debug" type="checkbox">
+            </div>
+          </div><!-- /clearfix -->
+
+        </fieldset>
+        <div class="actions">
+          <input type="submit" class="btn primary" value="Save changes" data-bind="click: saveConfig">
+          <button type="reset" class="btn">Cancel</button>
+           <span class="help-block">
+             You need to click "apply config" below for changes to take effect.
+           </span>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+
+  <div class="row" id="management">
+    <div class="span11">
+      <h1>Management</h1>
+
+      <form action="{{ url_for('force_reload') }}" method=post>
+        <fieldset>
+          <legend>Force Displays Reload</legend>
+          <div class="input">
+            Force a browser reload of all displays.
+          </div>
+          <div class="actions">
+            <input type="submit" class="btn primary" value="Force Displays Reload">
+          </div>
+        </fieldset>
+      </form>
+
+      <form action="{{ url_for('clear_proxy_cache') }}" method=post>
+        <fieldset>
+          <legend>Clear Proxy Cache</legend>
+          <div class="input">
+            Clears the proxy cache used for showing content when offline.
+          </div>
+          <div class="actions">
+            <input type="submit" class="btn primary" value="Clear Proxy Cache">
+          </div>
+        </fieldset>
+      </form>
+
+      <form action="{{ url_for('stop_kiosk') }}" method=post>
+        <fieldset>
+          <legend>Stop Kiosk</legend>
+          <div class="input">
+            Stops Synthese Kiosk.
+          </div>
+          <div class="actions">
+            <input type="submit" class="btn primary" value="Stop SyntheseKiosk">
+            <span class="label important">Warning:</span> this will kill all browsers.
+          </div>
+        </fieldset>
+      </form>
+
+    </div>
+
+
+  </div>
+
+
+  <div class="row" id="status">
+    <div class="span14">
+      <h1>Status</h1>
+
+      <button class="btn" data-bind="click: refresh">Refresh Status</button>
+
+      <p>
+        <dl>
+          <dt>Status</dt>
+          <dd data-bind="text: online, attr: { class: online }"></dd>
+        </dl>
+      </p>
+
+
+      <p>Last logs (most recent first)</p>
+      <pre data-bind="text: logs" class="logs"></pre>
+
+    </div>
+
+
+  </div>
+
+{% endblock %}
+
+{% block scripts %}
+  <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+{% endblock %}
