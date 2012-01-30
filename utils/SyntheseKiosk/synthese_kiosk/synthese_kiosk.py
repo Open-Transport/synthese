@@ -85,9 +85,8 @@ class Proxy(object):
         utils.maybe_makedirs(self._cache_dir)
         self._host = 'localhost'
         self._port = 8123
-
+        self._proc = None
         self._polipo_path = get_thirdparty_binary('polipo')
-
 
     def _ensure_stopped(self):
         if sys.platform == 'win32':
@@ -109,14 +108,9 @@ class Proxy(object):
         self._running = True
 
         options = {
-            # XXX debug. Breaks on Windows.
-            #'proxyAddress': '::0',
             'diskCacheRoot': self._convert_polipo_path(self._cache_dir),
             'dnsUseGethostbyname': 'happily',
-            # XXX not sure
-            'relaxTransparency': 'maybe',
             'logFile': self._convert_polipo_path(self._log_file),
-
             'proxyOffline': 'false' if self._online else 'true',
         }
         cmd_line = [self._polipo_path]
@@ -124,14 +118,15 @@ class Proxy(object):
             cmd_line.append('{0}={1}'.format(name, value))
         log.debug('Polipo command line: %s', cmd_line)
 
-        self.proc = subprocess.Popen(cmd_line)
+        self._proc = subprocess.Popen(cmd_line)
 
         time.sleep(2)
-        if self.proc.poll() is not None:
+        if self._proc.poll() is not None:
             raise Exception('Failed to start polipo')
 
     def stop(self):
-        self.proc.terminate()
+        if self._proc:
+            self._proc.terminate()
         self._running = False
 
     @property
@@ -342,7 +337,7 @@ def display_rpc():
 def screenshot(index):
     display = g.kiosk._displays[index]
     base64_png = display.browser.get_screenshot_as_base64()
-    response = flask.make_response(base64.decodestring(base64_png)) 
+    response = flask.make_response(base64.decodestring(base64_png))
     response.mimetype = 'image/png'
     return response
 
@@ -369,7 +364,6 @@ class SyntheseKiosk(object):
         self._log_path = os.path.join(self._config_dir, 'logs.txt')
 
         logger = logging.root
-
         formatter = logging.Formatter('%(asctime)s:%(levelname)s:%(message)s')
 
         file_handler = logging.FileHandler(self._log_path)
@@ -382,7 +376,7 @@ class SyntheseKiosk(object):
             logger.addHandler(stream_handler)
 
         logger.setLevel(logging.DEBUG if self._verbose else logging.INFO)
-        
+
         logging.getLogger('werkzeug').setLevel(logging.WARN)
 
     def _init_display(self, index):
@@ -455,7 +449,7 @@ class SyntheseKiosk(object):
             log.info('No displays configured. Open http://localhost:5000/'
                 ' to configure the application.')
             return
-        
+
         self.online = self._is_online()
         for display in self._displays:
             display.refresh(force_reload)
