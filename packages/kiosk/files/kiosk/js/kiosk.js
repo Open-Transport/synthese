@@ -136,14 +136,14 @@ var KioskView = Backbone.View.extend({
       url: "/kiosk/config.json",
       dataType: "json",
     }).error(function() {
-      self.error("Error fetching config")
+      self.error("Error fetching or parsing config")
     }).success(function(config) {
       // Try to load it again with cache: false, in order to have the latest
       // version. Might fail if offline.
       $.ajax({
         url: "/kiosk/config.json",
         dataType: "json",
-        cache: self.params.offline,
+        cache: false,
       }).error(function() {
         _parseConfig(config);
       }).success(function(config) {
