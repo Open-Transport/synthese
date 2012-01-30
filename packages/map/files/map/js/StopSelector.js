@@ -2,7 +2,7 @@ define([
   "map/js/CityBrowser",
   "core/js/backbone"
 ], function(CityBrowser) {
-  
+
 var StopSelectorPopup = Backbone.View.extend({
 
   template: $.template(null, [
