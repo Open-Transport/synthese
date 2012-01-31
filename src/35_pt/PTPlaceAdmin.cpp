@@ -59,6 +59,7 @@
 #include "PlaceAliasUpdateAction.hpp"
 #include "PlaceAliasTableSync.h"
 #include "MapSource.hpp"
+#include "CityListFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -227,7 +228,18 @@ namespace synthese
 					stream << t.cell("ID", lexical_cast<string>(_connectionPlace->getKey()));
 					stream << t.title("Localisation");
 					stream << t.cell("Localité", _connectionPlace->getCity()->getName());
-					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
+//					stream << t.cell("Localité", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey())));
+					stream << t.cell("Localité", t.getForm().getTextInputAutoCompleteFromService(
+							StopAreaUpdateAction::PARAMETER_CITY_ID,
+							lexical_cast<string>(_connectionPlace->getCity()->getKey()),
+							lexical_cast<string>(_connectionPlace->getCity()->getName()),
+							pt_website::CityListFunction::FACTORY_KEY,
+							pt_website::CityListFunction::DATA_CITIES,
+							pt_website::CityListFunction::DATA_CITY,
+							string(),string(),
+							false, true, true, true
+					)	);
+
 					stream << t.cell("Arrêt principal", t.getForm().getOuiNonRadioInput(StopAreaUpdateAction::PARAMETER_IS_MAIN, _connectionPlace->getCity()->includes(_connectionPlace.get())));
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
@@ -608,7 +620,17 @@ namespace synthese
 				}
 
 				stream << t.row();
-				stream << t.col() << f.getTextInput(PlaceAliasUpdateAction::PARAMETER_CITY_ID, lexical_cast<string>(_connectionPlace->getCity()->getKey()));
+				stream << t.col() << f.getTextInputAutoCompleteFromService(
+					PlaceAliasUpdateAction::PARAMETER_CITY_ID,
+					lexical_cast<string>(_connectionPlace->getCity()->getKey()),
+					lexical_cast<string>(_connectionPlace->getCity()->getName()),
+					pt_website::CityListFunction::FACTORY_KEY,
+					pt_website::CityListFunction::DATA_CITIES,
+					pt_website::CityListFunction::DATA_CITY,
+					string(),string(),
+					false, true, true, false
+				);
+
 				stream << t.col() << f.getTextInput(PlaceAliasUpdateAction::PARAMETER_NAME, string());
 				stream << t.col() << f.getOuiNonRadioInput(PlaceAliasUpdateAction::PARAMETER_IS_CITY_MAIN_PLACE, false);
 				stream << t.col() << f.getSubmitButton("Ajouter");
