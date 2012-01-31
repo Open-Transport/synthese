@@ -1,8 +1,9 @@
 {
   "__doc__": "See https://extranet.rcsmobility.com/projects/synthese/wiki/Synthese_Kiosk",
   "defaults": {
-    "refreshTimeout": 120, 
-    "fallbackTimeout": 900, 
+    "refreshTimeout": 120,
+    "configRefreshTimeout": 300,
+    "fallbackTimeout": 900,
     "fallbackUrl": "/kiosk/default_fallback.html"
   },
   "displays": {
