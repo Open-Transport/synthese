@@ -309,7 +309,15 @@ namespace synthese
 				}
 
 				stream << t.row();
-				stream << t.col() << f.getTextInput(WebPageLinkAddAction::PARAMETER_DESTINATION_ID, string(), "(id page à lier)");
+				stream << t.col() << f.getTextInputAutoCompleteFromTableSync(
+					WebPageLinkAddAction::PARAMETER_DESTINATION_ID,
+					string(),
+					string(),
+					lexical_cast<string>(WebPageTableSync::TABLE.ID),
+					string(),string(),
+					false, true, true, true
+				);
+
 				stream << t.col();
 				stream << t.col(2) << f.getSubmitButton("Ajouter");
 
