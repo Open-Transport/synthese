@@ -2,6 +2,20 @@ define([
   "core/js/backbone"
 ], function() {
 
+// Utils
+
+// from OpenLayers/Util.js
+function urlAppend(url, paramStr) {
+  var newUrl = url;
+  if (paramStr) {
+    var parts = (url + " ").split(/[?&]/);
+    newUrl += (parts.pop() === " " ?
+      paramStr :
+      parts.length ? "&" + paramStr : "?" + paramStr);
+  }
+  return newUrl;
+};
+
 
 var FrameView = Backbone.View.extend({
   FRAME_LOAD_TIMEOUT_S: 20,
@@ -45,11 +59,10 @@ var FrameView = Backbone.View.extend({
     });
 
     if (cacheBust)
-      url += "?" + Date.now();
+      url = urlAppend(url, Date.now());
     this.el.src = url;
     return dfd;
   },
-
 
   refresh: function() {
     return this.loadUrl(this.url, true);
@@ -64,7 +77,8 @@ var FrameView = Backbone.View.extend({
     }
   },
 
-})
+});
+
 
 var KioskView = Backbone.View.extend({
 
@@ -72,8 +86,22 @@ var KioskView = Backbone.View.extend({
     "click .refresh-now": "refresh",
   },
 
+  GLOBAL_DEFAULTS: {
+    refreshTimeout: 2 * 60,
+    configRefreshTimeout: 5 * 60,
+    fallbackTimeout: 15 * 60,
+    fallbackUrl: "/kiosk/default_fallback.html",
+  },
+
   initialize: function(options) {
-    this.params = JSON.parse(unescape(location.hash.substring(1)));
+    var paramString = unescape(location.hash.substring(1));
+    try {
+      this.params = JSON.parse(paramString);
+    } catch (e) {
+      this.params = {};
+      this.error("Unable to parse params: " + e);
+      return;
+    }
     this.debug = this.params.debug && this.params.debug != "0";
     if (this.debug) {
       $("body").addClass("debug");
@@ -82,8 +110,6 @@ var KioskView = Backbone.View.extend({
       this.error("Missing display variable");
       return;
     }
-
-    this.loadConfig();
 
     var self = this;
     self.stopped = false;
@@ -98,6 +124,12 @@ var KioskView = Backbone.View.extend({
         self.toggleStatus();
       }
     });
+
+    this.initFrames();
+    this.loadConfig(true)
+      .fail(function(message) {
+        self.error(message);
+      });
   },
 
   updateStatus: function() {
@@ -115,41 +147,83 @@ var KioskView = Backbone.View.extend({
     this.updateStatus();
   },
 
-  loadConfig: function() {
+  loadConfig: function(useCache) {
     var self = this;
 
-    function _parseConfig(config) {
+    var dfd = $.ajax({
+      url: "/kiosk/config.json",
+      dataType: "json",
+      cache: useCache,
+    })
+
+    var dfd2 = $.Deferred();
+    dfd.then(function(config) {
+      if (!useCache) {
+        dfd2.resolve(config);
+        return;
+      }
+
+      // Try to load it again without cache: false, in order to have the latest
+      // version. Might fail if offline.
+      return $.ajax({
+        url: "/kiosk/config.json",
+        dataType: "json",
+        cache: false,
+      }).fail(function() {
+        self.log("Failed fetching config without cache, using cached version");
+        dfd2.resolve(config);
+      }).done(function(config) {
+        dfd2.resolve(config);
+      });
+    }, function(jqXHR, textStatus, errorThrown) {
+      dfd2.reject("Error fetching or parsing config: " + textStatus +
+        " exception: " + errorThrown);
+    });
+
+    dfd2.done(function(config) {
       self.log("got config", config);
 
-      self.config = config.defaults;
+      self.config = {};
+      $.extend(self.config, self.GLOBAL_DEFAULTS);
+      $.extend(self.config, config.defaults);
       if (!config.displays[self.params.display]) {
         self.error("Display '" + self.params.display + "' not found in config");
         return;
       }
       $.extend(self.config, config.displays[self.params.display]);
       self.log("display config", self.config);
+      if (JSON.stringify(self.config) == self.lastConfigString) {
+        self.log("Config didn't change since last fetch. Not reloading");
+        return;
+      }
 
-      self.initFrames();
-    }
+      self.lastConfigString = JSON.stringify(self.config);
 
-    $.ajax({
-      url: "/kiosk/config.json",
-      dataType: "json",
-    }).error(function() {
-      self.error("Error fetching or parsing config")
-    }).success(function(config) {
-      // Try to load it again with cache: false, in order to have the latest
-      // version. Might fail if offline.
-      $.ajax({
-        url: "/kiosk/config.json",
-        dataType: "json",
-        cache: false,
-      }).error(function() {
-        _parseConfig(config);
-      }).success(function(config) {
-        _parseConfig(config);
-      });
+      self.lastSuccess = Date.now();
+      if (self.refreshTimeout)
+        clearTimeout(self.refreshTimeout);
+      if (self.refreshConfigTimeout)
+        clearTimeout(self.refreshConfigTimeout);
+
+      $.when(
+        self.getFrame("fallback").loadUrl(self.config.fallbackUrl),
+        self.getFrame("page0").loadUrl(self.config.url),
+        self.getFrame("page1").loadUrl(self.config.url))
+        .always(function() {
+          self.refresh();
+
+          self.log("scheduling next config refresh in " + self.config.configRefreshTimeout + "s");
+          if (self.refreshConfigTimeout)
+            clearTimeout(self.refreshConfigTimeout);
+          self.refreshConfigTimeout = setTimeout(function() {
+            self.refreshConfig()
+          }, self.config.configRefreshTimeout * 1000)
+
+        });
+      self.showFrame("fallback");
     });
+
+    return dfd2.promise();
   },
 
   initFrames: function() {
@@ -162,18 +236,6 @@ var KioskView = Backbone.View.extend({
       });
 
     }, this);
-
-    this.lastSuccess = Date.now();
-    var self = this;
-
-    $.when(
-      this.getFrame("fallback").loadUrl(this.config.fallbackUrl),
-      this.getFrame("page0").loadUrl(this.config.url),
-      this.getFrame("page1").loadUrl(this.config.url))
-      .always(function() {
-        self.refresh();
-      });
-    this.showFrame("fallback");
   },
 
   error: function(msg) {
@@ -184,7 +246,6 @@ var KioskView = Backbone.View.extend({
     this.$(".errorMsg").text(msg)
     this.$(".error").show();
   },
-
 
   getFrame: function(frameName) {
     if (this.frames[frameName])
@@ -260,8 +321,30 @@ var KioskView = Backbone.View.extend({
     this._message("fatal", arguments, "error");
   },
 
+  refreshConfig: function() {
+    var self = this;
+
+    self.log("____Refreshing config");
+
+    if (self.stopped)
+      return;
+
+    var dd = this.loadConfig(false)
+      .fail(function(message) {
+        self.warn("Ignoring error while trying to refresh config: " + message);
+      });
+
+    self.log("scheduling next config refresh in " + self.config.configRefreshTimeout + "s");
+    if (self.refreshConfigTimeout)
+      clearTimeout(self.refreshConfigTimeout);
+    self.refreshConfigTimeout = setTimeout(function() {
+      self.refreshConfig()
+    }, self.config.configRefreshTimeout * 1000)
+
+  },
+
   refresh: function() {
-    this.log("_refreshing");
+    this.log("__Refreshing frame");
 
     var hiddenPage = this.getFrame("hiddenPage"),
       activePage = this.getFrame("activePage");
@@ -305,7 +388,7 @@ var kv = new KioskView({
 });
 
 window.onerror = function(e) {
-  kw.error("JS error detected" + e);
+  kv.error("JS error detected" + e);
 }
 
 });
