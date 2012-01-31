@@ -4,31 +4,31 @@ function addTextInputAutoComplete(params){
   
   var fieldIdAutoComplete;
   if(params.useId)
-    fieldIdAutoComplete = params.name + "Selection__ID";
+    fieldIdAutoComplete = params.fieldId + "Selection__ID";
   else
     fieldIdAutoComplete = params.fieldId;
 
   var content;
 
   // Add divs
-  content = "<div id=\"div" + params.name + "Selection\">";
+  content = "<div id=\"div" + params.fieldId + "Selection\">";
   content = content + "<input type=\"text\" name=\"" + (params.useId ? params.name + "Selection": params.name) + "\" value=\"" + params.valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
   if(params.bottomButton) {
     content = content + "<input type=\"button\" value=\"v\" onclick=\"if($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
   }
   if(params.idButton) {
-    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.name + "Selection').hide();$('#div" + params.name + "').show();\" style=\"margin-left:0px;\"/>";
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.fieldId + "Selection').hide();$('#div" + params.fieldId + "').show();\" style=\"margin-left:0px;\"/>";
   }
   content = content + "</div>";
   if(params.useId) {
-    content = content + "<div id=\"div" + params.name + "\" style=\"display:none\">";
+    content = content + "<div id=\"div" + params.fieldId + "\" style=\"display:none\">";
     content = content + "<input type=\"text\" name=\"" + params.name + "\" value=\"" + params.valueId + "\" id=\"" + params.fieldId + "\" style=\"margin-right:0px;\" />";
-    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.name + "Selection').show();$('#div" + params.name + "').hide();\" style=\"margin-left:0px;\" />";
+    content = content + "<input type=\"button\" value=\"ID\" onclick=\"$('#div" + params.fieldId + "Selection').show();$('#div" + params.fieldId + "').hide();\" style=\"margin-left:0px;\" />";
     content = content + "</div>";
   }
 
   // Replace input with 
-  $('input[type="text"][name="' + params.name + '"]').replaceWith(content);
+  $('input[type="text"][id="' + params.fieldId + '"]').replaceWith(content);
 
   // Execute js code
   var jscode = "$(function() {"
@@ -38,7 +38,7 @@ function addTextInputAutoComplete(params){
           + "url: 'synthese',"
           + "dataType: 'json',"
           + "mode: 'abort',"
-          + "port: 'autocomplete"+ params.name + "',"
+          + "port: 'autocomplete"+ params.fieldId + "',"
           + "data: {"
             + "SERVICE: '" + params.service + "',"
             + "output_format: 'json',"
@@ -46,9 +46,9 @@ function addTextInputAutoComplete(params){
             + "t: request.term";
             if(params.extraParamName.length > 0) {
               jscode = jscode + ", " + params.extraParamName + ": ";
-			  if(params.extraParamInputName.length > 0) jscode = jscode + "$('input[type=text][name="+params.extraParamInputName+"]').val()";
-			  else jscode = jscode + "''";
-			}
+			        if(params.extraParamInputName.length > 0) jscode = jscode + "$('input[type=text][name="+params.extraParamInputName+"]').val()";
+			        else jscode = jscode + "''";
+			      }
             if(params.service == "lr")
               jscode = jscode + ", table: "  + params.tableId;
 
