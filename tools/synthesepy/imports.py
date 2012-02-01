@@ -136,6 +136,8 @@ class ImportTemplate(utils.DirObjectLoader):
         return import_
 
     def has_access(self, username, admin_only=False):
+        if username == 'root':
+            return True
         if username in self.admins:
             return True
         if admin_only:
@@ -190,6 +192,9 @@ class ImportRun(object):
         self.dummy = False
         self.messages = None
         self.synthese_calls = []
+
+    def __repr__(self):
+        return '<ImportRun id:{id} success:{successful}>'.format(**self.__dict__)
 
     def convert_params(self, params):
         '''
@@ -256,13 +261,17 @@ class ImportRun(object):
         if self._log is None:
             self._log = u''
         self._log += synthese_call + '\n\n'
-        self._log += unicode(
-            res.content.replace('<br />', '\n'), 'utf-8', 'replace')
+        content = res.content.replace('<br />', '\n')
+        if not isinstance(content, unicode):
+            content = unicode(content, 'utf-8', 'replace')
+        self._log += content
         self._log += '\n\n' + ('-' * 80)
 
     def add_failure(self, exception):
         log.warn('Adding import failure: %s', exception)
         self.successful = False
+        if self.messages is None:
+            self.messages = dict((l, []) for l in self.LEVEL_NAMES)
         self.messages['err'].append(
             'Caught an exception inside import script: %s' %
             traceback.format_exc(exception))
@@ -540,6 +549,7 @@ class Import(utils.DirObjectLoader):
             else:
                 self._do_import(run)
         except Exception, e:
+            log.warn('Import exception: %s', traceback.format_exc(e))
             run.add_failure(e)
         finally:
             run.finish()
@@ -555,6 +565,7 @@ class Import(utils.DirObjectLoader):
                 if 0:
                     subject, body = run.get_summary()
                     log.debug('Summary: %s\n\n%s', subject, body)
+            return run
 
     def _do_import(self, run):
         synthese_params = run.convert_params(self.params)

@@ -211,6 +211,7 @@ class TestImports(unittest.TestCase):
 
         test_template = project.imports_manager.get_import_template('test_template')
 
+        self.assertTrue(test_template.has_access('root'))
         self.assertFalse(test_template.has_access('unauthorized'))
         self.assertFalse(test_template.has_access('unauthorized', True))
 
