@@ -128,14 +128,15 @@ class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
     self.socket.close()
 
 def main():
-    with open(LOG_PATH, 'wb') as f:
-        f.write('')
-    handler = logging.handlers.RotatingFileHandler(
-        LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=3)
-    handler.setFormatter(logging.Formatter(
-        '%(asctime)s %(levelname)-10s %(message)s'))
-    handler.setLevel(logging.INFO)
-    log.addHandler(handler)
+    if LOG_PATH:
+        with open(LOG_PATH, 'wb') as f:
+            f.write('')
+        handler = logging.handlers.RotatingFileHandler(
+            LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=3)
+        handler.setFormatter(logging.Formatter(
+            '%(asctime)s %(levelname)-10s %(message)s'))
+        handler.setLevel(logging.INFO)
+        log.addHandler(handler)
     # XXX why is this needed?
     log.setLevel(logging.DEBUG if VERBOSE else logging.INFO)
 
@@ -180,7 +181,7 @@ if __name__ == '__main__':
          help='URL where to forward requests')
     parser.add_option('--log-path',
         default=join(thisdir, 'logs.txt'),
-        help='Location of log file')
+        help='Location of log file (or "no" to disable)')
     parser.add_option('--pid-path',
         default=join(thisdir, 'udf_proxy.pid'),
         help='Location of pid file')
@@ -193,7 +194,8 @@ if __name__ == '__main__':
     LISTENING_PORT = options.port
     TARGET_URL = options.target_url
     VERBOSE = options.verbose
-    LOG_PATH = options.log_path
+    if options.log_path != 'no':
+        LOG_PATH = options.log_path
 
     if options.no_daemon:
         logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)

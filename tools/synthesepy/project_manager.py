@@ -981,10 +981,15 @@ The synthese.py wrapper script.
     # System install/uninstall
 
     def _get_tools(self):
-        supervisor = external_tools.Supervisor(self)
-        apache = Apache(self)
-        wsgi = external_tools.WSGI(self)
-        return [supervisor, apache, wsgi]
+        tools = [
+            external_tools.SyntheseSupervisor(self),
+            Apache(self),
+            external_tools.WSGI(self),
+        ]
+        if self.config.use_udf_proxy:
+            tools.append(external_tools.UDFProxySupervisor(self))
+
+        return tools
 
     @command()
     def system_install_prepare(self, tools=None):
