@@ -118,6 +118,7 @@ var KioskView = Backbone.View.extend({
     $(window).keypress(function(event) {
       if (event.which == H_KEY_CODE) {
         self.stopped = true;
+        self.clearTimeouts();
         self.error("Stop key pressed: disabling refresh.")
       }
       if (event.which == S_KEY_CODE) {
@@ -145,6 +146,13 @@ var KioskView = Backbone.View.extend({
     status.toggleClass("visible");
 
     this.updateStatus();
+  },
+
+  clearTimeouts: function() {
+    if (this.refreshTimeout)
+      clearTimeout(this.refreshTimeout);
+    if (this.refreshConfigTimeout)
+      clearTimeout(this.refreshConfigTimeout);
   },
 
   loadConfig: function(useCache) {
@@ -200,10 +208,7 @@ var KioskView = Backbone.View.extend({
       self.lastConfigString = JSON.stringify(self.config);
 
       self.lastSuccess = Date.now();
-      if (self.refreshTimeout)
-        clearTimeout(self.refreshTimeout);
-      if (self.refreshConfigTimeout)
-        clearTimeout(self.refreshConfigTimeout);
+      self.clearTimeouts();
 
       $.when(
         self.getFrame("fallback").loadUrl(self.config.fallbackUrl),
