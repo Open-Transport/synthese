@@ -974,7 +974,7 @@ The synthese.py wrapper script.
             log.info('Created import with id: %s', import_.id)
         elif subcommand == 'execute':
             import_ = self.imports_manager.get_import(template_id, import_id)
-            import_.execute(dummy, no_mail)
+            import_.execute(None, dummy, no_mail)
         else:
             raise Exception('Unknown import subcommand: %s', subcommand)
 
