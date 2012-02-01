@@ -56,8 +56,8 @@ class Supervisor(ExternalTool):
         super(Supervisor, self).__init__(project)
 
         config = self.project.config
-        self.config_name = 'synthese_{0}.conf'.format(
-            config.project_name)
+        self.config_name = '{0}.conf'.format(
+            self.get_config_name())
         self.config_path = join(
             config.project_path, 'conf', 'generated', 'supervisor',
             self.config_name)
@@ -66,7 +66,7 @@ class Supervisor(ExternalTool):
         CONFIG_TEMPLATE = """# Generated file, do not edit!
 [program:{program_name}]
 user=synthese
-command={synthese_py} --no-proxy -v -p {project_path} -s start
+command={command}
 # Quotes are required due to a bug in 3.0a8:
 # http://lists.supervisord.org/pipermail/supervisor-users/2010-March/000539.html
 environment=HOME='/home/synthese',USER='synthese'
@@ -81,9 +81,9 @@ stdout_logfile_backups={stdout_logfile_backups}
         format_config = config.__dict__.copy()
         # NOTE: supervisor doesn't seem to like underscores in names. Use
         # dashes instead.
-        format_config['program_name'] = 'synthese-{0}'.format(config.project_name)
-        format_config['synthese_py'] = self.project.env.synthesepy_path
-        format_config['stdout_logfile'] = config.log_file
+        format_config['program_name'] = self.get_config_name().replace('_', '-')
+        format_config['command'] = self.get_command()
+        format_config['stdout_logfile'] = os.path.abspath(self.get_log_file())
         format_config.setdefault('stdout_logfile_maxbytes', '500MB')
         format_config.setdefault('stdout_logfile_backups', '4')
 
@@ -104,6 +104,37 @@ stdout_logfile_backups={stdout_logfile_backups}
     def system_uninstall(self):
         os.unlink(self._get_link_path())
         utils.call('supervisorctl reread', shell=True)
+
+
+class SyntheseSupervisor(Supervisor):
+    def get_config_name(self):
+        return 'synthese_{0}'.format(self.project.config.project_name)
+
+    def get_log_file(self):
+        return self.project.config.log_file
+
+    def get_command(self):
+        return '{synthese_py} --no-proxy -v -p {project_path} -s start'.format(
+            synthese_py=self.project.env.synthesepy_path,
+            project_path=self.project.config.project_path)
+
+
+class UDFProxySupervisor(Supervisor):
+    def get_config_name(self):
+        return 'udf_proxy_{0}'.format(self.project.config.project_name)
+
+    def get_log_file(self):
+        return join(self.project.config.project_path, 'logs', 'udf_proxy.log')
+
+    def get_command(self): 
+        config = self.project.config
+        return ('python {script} -n -p {udf_proxy_port} --log-path=no '
+            '-t http://localhost:{synthese_port} start'.format(
+            script=join(
+                self.project.env.source_path, 'utils',
+                'udf_proxy', 'udf_proxy.py'),
+            udf_proxy_port=config.udf_proxy_port,
+            synthese_port=config.port))
 
 
 class WSGI(ExternalTool):
