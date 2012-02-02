@@ -987,7 +987,9 @@ The synthese.py wrapper script.
         elif subcommand == 'create':
             import_template = self.imports_manager.get_import_template(
                 template_id)
-            create_args = json.loads(args)
+            create_args = {}
+            if args:
+                create_args = json.loads(args)
             import_ = import_template.create_import(create_args)
             log.info('Created import with id: %s', import_.id)
         elif subcommand == 'execute':
