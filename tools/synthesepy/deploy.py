@@ -204,27 +204,28 @@ class Deployer(utils.DirObjectLoader):
 
         utils.send_mail(config, config.mail_admins, subject, body)
 
-    def deploy(self):
+    def deploy(self, no_mail=False):
         try:
             commands_result = project_manager.CommandsResult('deploy')
 
             if self.locked:
                 log.warn('Deploy is locked, not performing deploy.')
                 return commands_result
-    
+
             dump = self._create_dump()
             commands_result.add_command_result(
                 project_manager.CommandResult.call_method(self._dump_tables, dump))
-    
+
             self.deploy_restore(dump.id, commands_result)
-    
+
             # Clean old dumps.
             for dump_to_delete in self.dumps[:-self.MAX_DUMPS_TO_KEEP]:
                 dump_to_delete.delete()
-    
+
             return commands_result
-        except project_manager.CommandsException, e: 
-            self._send_fail_mail(e.commands_result)
+        except project_manager.CommandsException, e:
+            if not no_mail:
+                self._send_fail_mail(e.commands_result)
             raise e
 
     def deploy_restore(self, dump_id, commands_result=None):
