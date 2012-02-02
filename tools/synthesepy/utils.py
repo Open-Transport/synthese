@@ -414,7 +414,10 @@ def send_mail(config, recipients, subject, body):
         if config.mail_user and config.mail_password:
             _mail_conn.login(config.mail_user, config.mail_password)
 
-    msg = email.mime.text.MIMEText(body, _charset='utf-8')
+    # Old Pythons produce errors when MIMEText is given a unicode string.
+    CHARSET = 'utf-8'
+    body = body.encode(CHARSET)
+    msg = email.mime.text.MIMEText(body, _charset=CHARSET)
 
     msg['Subject'] = subject
     msg['From'] = config.mail_sender
