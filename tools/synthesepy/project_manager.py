@@ -1110,7 +1110,7 @@ The synthese.py wrapper script.
         elif command in ('start_supervisor', 'stop_supervisor'):
             supervisor_command = 'start' if command == 'start_supervisor' else 'stop'
             utils.call([
-                '/usr/bin/supervisorctl', supervisor_command,
+                self.config.supervisorctl_path, supervisor_command,
                 'synthese-{0}'.format(self.config.project_name)])
         elif command in ('start_initd', 'stop_initd'):
             initd_command = 'start' if command == 'start_initd' else 'stop'
