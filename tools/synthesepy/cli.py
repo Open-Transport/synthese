@@ -202,7 +202,10 @@ def add_project_subparsers(subparsers):
         help='Command arguments')
     add_parser('update_synthese')
     add_parser('update_project')
-    add_parser('deploy')
+    def deploy(project, args, env):
+        project.deploy(args.no_mail)
+    parser = add_parser('deploy', func=deploy)
+    parser.add_argument('--no-mail', action='store_true', default=False)
     add_parser('deploy_remote_prepare')
     add_parser('deploy_remote_restore')
 
