@@ -391,7 +391,7 @@ def tail(f, window=20):
         size -= linesFound
         bytes -= BUFSIZ
         block -= 1
-    return '\n'.join(''.join(data).splitlines()[-window:])
+    return '\n'.join(''.join(reversed(data)).splitlines()[-window:])
 
 
 _mail_conn = None
