@@ -932,16 +932,23 @@ The synthese.py wrapper script.
         def remote_transaction_mysql(conn_info):
             MYSQL_FORWARDED_PORT = 33000
 
-            p = subprocess.Popen(
-                utils.ssh_command_line(
-                    self.config,
-                    extra_opts='-N -L {forwarded_port}:localhost:3306'.format(
-                        forwarded_port=MYSQL_FORWARDED_PORT)), shell=True)
+            if utils.can_connect(MYSQL_FORWARDED_PORT):
+                raise Exception('MySQL tunnel port (%s) is not '
+                    'available' % MYSQL_FORWARDED_PORT)
+
+            ssh_command_line = utils.ssh_command_line(
+                self.config,
+                extra_opts='-N -L {forwarded_port}:localhost:3306'.format(
+                    forwarded_port=MYSQL_FORWARDED_PORT))
+            log.debug('ssh command line for tunnel: %s', ssh_command_line)
+            p = subprocess.Popen(ssh_command_line, shell=True)
+            log.info('Waiting a bit for the tunnel to establish...')
+            time.sleep(3)
 
             remote_conn_info = db_backends.ConnectionInfo(
                 self.config.remote_conn_string)
             remote_conn_info.data['port'] = MYSQL_FORWARDED_PORT
-            remote_conn_info.data['host'] = 'localhost'
+            remote_conn_info.data['host'] = '127.0.0.1'
 
             yield remote_conn_info
             p.kill()
