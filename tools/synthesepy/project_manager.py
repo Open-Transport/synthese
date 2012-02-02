@@ -456,7 +456,13 @@ class Project(object):
                 logging.FileHandler.emit(self, record)
                 self.close()
 
-        admin_handler = KeptClosedFileHandler(self.admin_log_path, delay=True)
+        # FIXME: older Pythons have an issue when overriding FileHandler
+        if sys.version_info < (2, 6, 6):
+            admin_handler = logging.FileHandler(self.admin_log_path)
+        else:
+            admin_handler = KeptClosedFileHandler(
+                self.admin_log_path, delay=True)
+
         admin_formatter = logging.Formatter(
             '%(asctime)s  %(levelname)-12s  %(message)s')
         admin_handler.setFormatter(admin_formatter)
@@ -1227,8 +1233,8 @@ The synthese.py wrapper script.
 
     @command()
     @commands_result()
-    def deploy(self):
-        return self.deployer.deploy()
+    def deploy(self, no_mail=False):
+        return self.deployer.deploy(no_mail)
 
     @command()
     @commands_result()
