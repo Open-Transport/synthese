@@ -217,7 +217,8 @@ namespace synthese
 			MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
 			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-			util::Env& env
+			util::Env& env,
+			Road::RoadType roadType = Road::ROAD_TYPE_UNKNOWN
 		){
 			// Declarations
 			MainRoadChunk* result(NULL);
@@ -429,9 +430,9 @@ namespace synthese
 				logStream << "CREA : Creation of the public place entrance with key " << code << " (" << publicPlace.getFullName();
 				if(name)
 				{
-					logStream << " " << *name <<  ")";
+					logStream << " " << *name;
 				}
-				logStream << "<br />";
+				logStream << ")<br />";
 			}
 
 			// Properties update
