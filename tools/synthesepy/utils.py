@@ -416,7 +416,8 @@ def send_mail(config, recipients, subject, body):
 
     # Old Pythons produce errors when MIMEText is given a unicode string.
     CHARSET = 'utf-8'
-    body = body.encode(CHARSET)
+    if isinstance(body, unicode):
+        body = body.encode(CHARSET)
     msg = email.mime.text.MIMEText(body, _charset=CHARSET)
 
     msg['Subject'] = subject

@@ -248,7 +248,7 @@ class ImportRun(object):
         try:
             res = http_api.call_service2('ImportFunction', synthese_params)
         except (synthesepy.http_api.HTTPApiException, requests.RequestException) as e:
-            raise ImportException('Failure while calling Synthese: %s', e)
+            raise ImportException('Failure while calling Synthese: %s' % e)
 
         log.debug('Import HTTP result, %s', res)
         if 0:
