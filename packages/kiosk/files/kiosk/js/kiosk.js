@@ -159,7 +159,7 @@ var KioskView = Backbone.View.extend({
     var self = this;
 
     var dfd = $.ajax({
-      url: "/kiosk/config.json",
+      url: "/kiosk_config.json",
       dataType: "json",
       cache: useCache,
     })
@@ -174,7 +174,7 @@ var KioskView = Backbone.View.extend({
       // Try to load it again without cache: false, in order to have the latest
       // version. Might fail if offline.
       return $.ajax({
-        url: "/kiosk/config.json",
+        url: "/kiosk_config.json",
         dataType: "json",
         cache: false,
       }).fail(function() {
