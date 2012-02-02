@@ -218,7 +218,7 @@ namespace synthese
 			MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 			MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
 			util::Env& env,
-			Road::RoadType roadType = Road::ROAD_TYPE_UNKNOWN
+			Road::RoadType roadType
 		){
 			// Declarations
 			MainRoadChunk* result(NULL);
