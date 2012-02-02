@@ -473,15 +473,8 @@ def main():
             if isinstance(res, project_manager.CommandsResult):
                 commands_result = res
                 if config.verbose:
-                    # TODO: move this formatting to the object, to be reused for email.
-                    log.debug('Result of %s', commands_result.title)
-                    for command_result in commands_result.command_results:
-                        log.debug('_' * 80)
-                        if command_result.type == project_manager.CommandResult.TYPE_PROCESS:
-                            log.debug('Command line: %s', command_result.commandline)
-                        else:
-                            log.debug('Method: %s', command_result.method_name)
-                        log.debug('Result: %s', command_result.output)
+                    log.debug('Commands Result summary: %s',
+                        commands_result.summary())
                 if not commands_result.success:
                     raise Exception('Failure while executing: %s' % commands_result.title)
         else:
