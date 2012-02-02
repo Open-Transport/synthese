@@ -372,15 +372,27 @@ class CommandsResult(object):
         self.success = True
         self.command_results = []
 
+    def __str__(self):
+        return '<CommandsResult: title=%s, %s>' % (
+            self.title, self.command_results)
+
     def add_command_result(self, command_result):
         self.command_results.append(command_result)
         if not command_result.success:
             self.success = False
             raise CommandsException(command_result, self)
 
-    def __str__(self):
-        return '<CommandsResult: title=%s, %s>' % (
-            self.title, self.command_results)
+    def summary(self):
+        output = 'Result of {0}\n'.format(self.title)
+        for command_result in self.command_results:
+            output += '_' * 80 + '\n'
+            if command_result.type == CommandResult.TYPE_PROCESS:
+                output += 'Command line: {0}\n'.format(command_result.commandline)
+            else:
+                output += 'Method: {0}\n'.format(command_result.method_name)
+            output += 'Success: {0}\n\n'.format(command_result.success)
+            output += 'Result: {0}\n\n'.format(command_result.output)
+        return output
 
 
 def command(root_required=False, root_allowed=False):
@@ -626,7 +638,7 @@ class Project(object):
         hostname = socket.gethostname()
         LINE_COUNT = 1000
         try:
-            last_log = utils.tail(open(self.config.log_file), LINE_COUNT)
+            last_log = utils.tail(open(self.config.log_file, 'rb'), LINE_COUNT)
         except IOError:
             last_log = "[Not available]"
 

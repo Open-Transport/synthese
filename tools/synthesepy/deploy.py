@@ -24,6 +24,7 @@ import gzip
 import logging
 import os
 from os.path import join
+import socket
 import time
 
 import project_manager
@@ -193,25 +194,38 @@ class Deployer(utils.DirObjectLoader):
         return project_manager.CommandResult.call_command(
             self.project, deploy_cmd)
 
-    # TODO: email in case of failure.
+    def _send_fail_mail(self, commands_result):
+        config = self.project.config
+        subject = ('Synthese deploy failure on {hostname} '
+            '(project: {project})'.format(
+                hostname=socket.gethostname(),
+                project=config.project_name))
+        body = commands_result.summary()
+
+        utils.send_mail(config, config.mail_admins, subject, body)
+
     def deploy(self):
-        commands_result = project_manager.CommandsResult('deploy')
+        try:
+            commands_result = project_manager.CommandsResult('deploy')
 
-        if self.locked:
-            log.warn('Deploy is locked, not performing deploy.')
+            if self.locked:
+                log.warn('Deploy is locked, not performing deploy.')
+                return commands_result
+    
+            dump = self._create_dump()
+            commands_result.add_command_result(
+                project_manager.CommandResult.call_method(self._dump_tables, dump))
+    
+            self.deploy_restore(dump.id, commands_result)
+    
+            # Clean old dumps.
+            for dump_to_delete in self.dumps[:-self.MAX_DUMPS_TO_KEEP]:
+                dump_to_delete.delete()
+    
             return commands_result
-
-        dump = self._create_dump()
-        commands_result.add_command_result(
-            project_manager.CommandResult.call_method(self._dump_tables, dump))
-
-        self.deploy_restore(dump.id, commands_result)
-
-        # Clean old dumps.
-        for dump_to_delete in self.dumps[:-self.MAX_DUMPS_TO_KEEP]:
-            dump_to_delete.delete()
-
-        return commands_result
+        except project_manager.CommandsException, e: 
+            self._send_fail_mail(e.commands_result)
+            raise e
 
     def deploy_restore(self, dump_id, commands_result=None):
         if not commands_result:
