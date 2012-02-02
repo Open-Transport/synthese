@@ -45,6 +45,7 @@ DEFAULTS = {
     # bgstart/bgstop
     # One of: supervisor, initd, python
     'bg_process_manager': 'python',
+    'supervisorctl_path': '/usr/bin/supervisorctl',
 
     # Environment (only used during initialization,
     # use the env object afterwards)
