@@ -93,11 +93,13 @@ class ImportTemplate(utils.DirObjectLoader):
 
         def parse_emails(emails):
             username_to_emails = dict((username, [email_or_emails] if
-                isinstance(email_or_emails, basestring) else email_or_emails) for
+                isinstance(email_or_emails, basestring) else list(email_or_emails)) for
                 (username, email_or_emails) in emails)
             emails = sum(username_to_emails.itervalues(), [])
             return username_to_emails, set(emails)
 
+        if not self.admins:
+            self.admins = [('root', manager.project.config.mail_admins)]
         self.admins, self.admin_emails = parse_emails(self.admins)
         self.uploaders, self.uploader_emails = parse_emails(self.uploaders)
 
@@ -484,8 +486,7 @@ class Import(utils.DirObjectLoader):
             emails = t.admin_emails | t.uploader_emails
             detail = i18n.import_update
             body =  i18n.import_updated_body.format(
-                username=event.username
-            )
+                username=event.username)
             to_send = ((emails, body),)
 
         else:
@@ -497,8 +498,7 @@ class Import(utils.DirObjectLoader):
             project_name=config.project_name,
             hostname=socket.gethostname(),
             template_label=self.template.label,
-            detail=detail
-        )
+            detail=detail)
 
         for emails, body in to_send:
             if not emails:
@@ -519,6 +519,7 @@ class Import(utils.DirObjectLoader):
         for level in ImportRun.LEVEL_NAMES:
             if run.messages[level]:
                 levels_with_messages.add(level)
+        log.debug('Levels with messages: %s', levels_with_messages)
 
         levels_to_notify = set()
         for level in ImportRun.LEVEL_NAMES:
@@ -526,16 +527,22 @@ class Import(utils.DirObjectLoader):
             same_or_higher_levels = set(ImportRun.LEVEL_NAMES[index:])
             if same_or_higher_levels & levels_with_messages:
                 levels_to_notify.add(level)
-        log.debug('Levels with messages: %s', levels_to_notify)
+        log.debug('Levels to notify: %s', levels_to_notify)
 
         config = self.template.manager.project.env.config
         to_send = []
-        for level in levels_to_notify:
-            emails = level_to_mails[level]
+        notified_emails = set()
+
+        for level in ImportRun.LEVEL_NAMES:
+            if level not in levels_to_notify:
+                continue
+            emails = level_to_mails[level] - notified_emails
             if not emails:
                 continue
+            notified_emails.update(emails)
             body = run.get_summary(level)
             to_send.append((emails, body))
+
         return to_send
 
     def execute(self, username=None, dummy=False, no_mail=False):
