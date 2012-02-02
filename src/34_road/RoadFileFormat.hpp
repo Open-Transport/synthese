@@ -25,6 +25,7 @@
 
 #include "ImportableTableSync.hpp"
 #include "MainRoadChunk.hpp"
+#include "Road.h"
 
 namespace synthese
 {
@@ -139,7 +140,8 @@ namespace synthese
 				MainRoadChunk::HouseNumberingPolicy leftHouseNumberingPolicy,
 				MainRoadChunk::HouseNumberBounds rightHouseNumberBounds,
 				MainRoadChunk::HouseNumberBounds leftHouseNumberBounds,
-				util::Env& env
+				util::Env& env,
+				Road::RoadType roadType = Road::ROAD_TYPE_UNKNOWN
 			);
 		};
 }	}
