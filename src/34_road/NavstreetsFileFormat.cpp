@@ -21,26 +21,32 @@
 */
 
 #include "NavstreetsFileFormat.hpp"
-#include "CrossingTableSync.hpp"
-#include "RoadTableSync.h"
-#include "RoadChunkTableSync.h"
-#include "RoadPlaceTableSync.h"
+
+#include "AdminFunctionRequest.hpp"
 #include "CityTableSync.h"
-#include "DataSource.h"
-#include "Crossing.h"
 #include "CoordinatesSystem.hpp"
+#include "Crossing.h"
+#include "CrossingTableSync.hpp"
+#include "DataSource.h"
+#include "DataSourceAdmin.h"
 #include "DBTransaction.hpp"
+#include "EdgeProjector.hpp"
+#include "ImportFunction.h"
+#include "PublicPlaceTableSync.h"
+#include "PublicPlaceEntranceTableSync.hpp"
+#include "PropertiesHTMLTable.h"
+#include "Road.h"
+#include "RoadChunkTableSync.h"
+#include "RoadFileFormat.hpp"
+#include "RoadPlaceTableSync.h"
+#include "RoadTableSync.h"
 #include "VirtualShapeVirtualTable.hpp"
 #include "VirtualDBFVirtualTable.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "DataSourceAdmin.h"
-#include "ImportFunction.h"
-#include "PropertiesHTMLTable.h"
-#include "RoadFileFormat.hpp"
 
-#include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
+#include <boost/assign/list_of.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/lexical_cast.hpp>
 #include <geos/geom/CoordinateSequenceFactory.h>
 #include <geos/geom/GeometryFactory.h>
 #include <geos/geom/LineString.h>
@@ -53,15 +59,16 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace road;
-	using namespace util;
-	using namespace impex;
+	using namespace algorithm;
+	using namespace admin;
+	using namespace db;
 	using namespace geography;
 	using namespace graph;
-	using namespace db;
-	using namespace admin;
-	using namespace server;
 	using namespace html;
+	using namespace impex;
+	using namespace road;
+	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -72,6 +79,7 @@ namespace synthese
 	{
 		const string NavstreetsFileFormat::Importer_::FILE_MTDAREA("1mtdarea");
 		const string NavstreetsFileFormat::Importer_::FILE_STREETS("2streets");
+		const string NavstreetsFileFormat::Importer_::FILE_PUBLIC_PLACES("3places");
 
 		const string NavstreetsFileFormat::Importer_::PARAMETER_CITIES_AUTO_CREATION("cities_auto_creation");
 
@@ -96,6 +104,18 @@ namespace synthese
 		const string NavstreetsFileFormat::_FIELD_GOVT_CODE("GOVT_CODE");
 		const string NavstreetsFileFormat::_FIELD_ADMIN_LVL("ADMIN_LVL");
 		const string NavstreetsFileFormat::_FIELD_AREA_NAME("AREA_NAME");
+
+		const string NavstreetsFileFormat::_FIELD_POI_ID("POI_ID");
+		const string NavstreetsFileFormat::_FIELD_POI_NAME("POI_NAME");
+		const string NavstreetsFileFormat::_FIELD_POI_ST_NUM("POI_ST_NUM");
+		const string NavstreetsFileFormat::_FIELD_POI_ST_NAME("ST_NAME");
+
+		const std::map<int,Road::RoadType> highwayTypes = boost::assign::map_list_of
+			(1, Road::ROAD_TYPE_PRINCIPLEAXIS)
+			(2, Road::ROAD_TYPE_PRINCIPLEAXIS)
+			(3, Road::ROAD_TYPE_SECONDARYAXIS)
+			(4, Road::ROAD_TYPE_SECONDARYAXIS)
+			(5, Road::ROAD_TYPE_ACCESSROAD);
 	}
 
 	namespace impex
@@ -103,6 +123,7 @@ namespace synthese
 		template<> const MultipleFileTypesImporter<NavstreetsFileFormat>::Files MultipleFileTypesImporter<NavstreetsFileFormat>::FILES(
 			NavstreetsFileFormat::Importer_::FILE_MTDAREA.c_str(),
 			NavstreetsFileFormat::Importer_::FILE_STREETS.c_str(),
+			NavstreetsFileFormat::Importer_::FILE_PUBLIC_PLACES.c_str(),
 		"");
 	}
 
@@ -117,9 +138,11 @@ namespace synthese
 				return false;
 			}
 
-			// STREETS
+			// STREETS and PUBLIC_PLACES
 			it = _pathsMap.find(FILE_STREETS);
-			if(it == _pathsMap.end() || it->second.empty() || !exists(it->second))
+			FilePathsMap::const_iterator it2(_pathsMap.find(FILE_PUBLIC_PLACES));
+			if((it == _pathsMap.end() || it->second.empty() || !exists(it->second))
+				&& (it2 == _pathsMap.end() || it2->second.empty() || !exists(it2->second)))
 			{
 				return false;
 			}
@@ -451,10 +474,118 @@ namespace synthese
 							leftHouseNumberingPolicy,
 							rightHouseNumberBounds,
 							leftHouseNumberBounds,
-							_env
+							_env,
+							Road::ROAD_TYPE_UNKNOWN
 						);
 					}
 //				}
+			} // 3 : Public places
+			else if(key == FILE_PUBLIC_PLACES)
+			{
+				// Loading the file into SQLite as virtual table
+				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset(), _dataSource.getCoordinatesSystem()->getSRID());
+
+				const GeometryFactory& geometryFactory(_dataSource.getCoordinatesSystem()->getGeometryFactory());
+
+				// Public places
+				ImportableTableSync::ObjectBySource<PublicPlaceTableSync> publicPlaces(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<PublicPlaceEntranceTableSync> publicPlaceEntrances(_dataSource, _env);
+
+				stringstream query;
+				query << "SELECT *, AsText(" << NavstreetsFileFormat::_FIELD_GEOMETRY << ") AS " << NavstreetsFileFormat::_FIELD_GEOMETRY << "_ASTEXT" << " FROM " << table.getName();
+				DBResultSPtr rows(DBModule::GetDB()->execQuery(query.str()));
+				while(rows->next())
+				{
+					// Code field
+					string poiId(rows->getText(NavstreetsFileFormat::_FIELD_POI_ID));
+
+					// Name field
+					string poiName(rows->getText(NavstreetsFileFormat::_FIELD_POI_NAME));
+
+					// House number
+					optional<MainRoadChunk::HouseNumber> houseNumber;
+					if(rows->getInt(NavstreetsFileFormat::_FIELD_POI_ST_NUM) > 0)
+					{
+						houseNumber = rows->getInt(NavstreetsFileFormat::_FIELD_POI_ST_NUM);
+					}
+
+					// Street name field
+					string streetName(rows->getText(NavstreetsFileFormat::_FIELD_ST_NAME));
+
+					// Geometry
+					shared_ptr<Point> geometry(
+						dynamic_pointer_cast<Point, Geometry>(
+							rows->getGeometryFromWKT(NavstreetsFileFormat::_FIELD_GEOMETRY+"_ASTEXT", geometryFactory)
+					)	);
+					if(!geometry.get())
+					{
+						os << "ERR : Empty geometry in the " << poiId << " public place.<br />";
+						continue;
+					}
+
+					EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
+						RoadChunkTableSync::SearchByMaxDistance(
+							*geometry.get(), _maxDistance,
+							Env::GetOfficialEnv(), UP_LINKS_LOAD_LEVEL
+					)	);
+
+					if(!paths.empty())
+					{
+						EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, _maxDistance);
+						try
+						{
+							EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(projector.projectEdge(*geometry.get()->getCoordinate()));
+
+							Address projectedAddress(
+								*(projection.get<1>().get()),
+								projection.get<2>()
+							);
+
+							const City* city = projectedAddress.getRoadChunk()->getRoad()->getRoadPlace()->getCity();
+
+							// PublicPlace
+							PublicPlace* publicPlace(
+								RoadFileFormat::CreateOrUpdatePublicPlace(
+									publicPlaces,
+									poiId,
+									poiName,
+									geometry,
+									*city,
+									_dataSource,
+									_env,
+									os
+							)	);
+
+							// PublicPlaceEntrance
+							MainRoadChunk* roadChunk = projectedAddress.getRoadChunk();
+
+							// Metric offset + check of house number consistency
+							MetricOffset metricOffset(
+								houseNumber	?
+								roadChunk->getHouseNumberMetricOffset(*houseNumber) :
+								roadChunk->getMetricOffset()
+							);
+
+							RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+								publicPlaceEntrances,
+								poiId,
+								optional<const string&>(),
+								metricOffset,
+								houseNumber,
+								*roadChunk,
+								*publicPlace,
+								_dataSource,
+								_env,
+								os
+							);
+						}
+						catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+						{
+						}
+					}
+
+
+				}
 			}
 
 			os << "<b>SUCCESS : Data loaded</b><br />";
@@ -486,6 +617,14 @@ namespace synthese
 			BOOST_FOREACH(const Registry<MainRoadChunk>::value_type& roadChunk, _env.getEditableRegistry<MainRoadChunk>())
 			{
 				RoadChunkTableSync::Save(roadChunk.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<PublicPlace>::value_type& publicPlace, _env.getEditableRegistry<PublicPlace>())
+			{
+				PublicPlaceTableSync::Save(publicPlace.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<PublicPlaceEntrance>::value_type& publicPlaceEntrance, _env.getEditableRegistry<PublicPlaceEntrance>())
+			{
+				PublicPlaceEntranceTableSync::Save(publicPlaceEntrance.second.get(), transaction);
 			}
 			return transaction;
 		}
@@ -552,6 +691,7 @@ namespace synthese
 			stream << t.title("Données");
 			stream << t.cell("Rues (streets)", t.getForm().getTextInput(_getFileParameterName(FILE_STREETS), _pathsMap[FILE_STREETS].file_string()));
 			stream << t.cell("Zones administratives (mtdarea)", t.getForm().getTextInput(_getFileParameterName(FILE_MTDAREA), _pathsMap[FILE_MTDAREA].file_string()));
+			stream << t.cell("Lieux publics (poi)", t.getForm().getTextInput(_getFileParameterName(FILE_PUBLIC_PLACES), _pathsMap[FILE_PUBLIC_PLACES].file_string()));
 			stream << t.cell("Auto création des communes", t.getForm().getOuiNonRadioInput(PARAMETER_CITIES_AUTO_CREATION, false));
 			stream << t.close();
 		}

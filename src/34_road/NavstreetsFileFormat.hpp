@@ -147,6 +147,14 @@ namespace synthese
 				static const std::string _FIELD_AREA_NAME;
 			//@}
 
+			//! @name Fields of public places table
+			//@{
+				static const std::string _FIELD_POI_ID;
+				static const std::string _FIELD_POI_NAME;
+				static const std::string _FIELD_POI_ST_NUM;
+				static const std::string _FIELD_POI_ST_NAME;
+			//@}
+
 		public:
 
 			class Importer_:
@@ -159,6 +167,7 @@ namespace synthese
 				//@{
 					static const std::string FILE_MTDAREA;
 					static const std::string FILE_STREETS;
+					static const std::string FILE_PUBLIC_PLACES;
 				//@}
 
 				//! @name Parameters
@@ -173,6 +182,8 @@ namespace synthese
 				mutable _MissingCitiesMap _missingCities;
 
 				bool _citiesAutoCreation;	//!< Creation of cities if not present in the cities table of SYNTHESE
+
+				static const int _maxDistance = 100;
 
 				mutable impex::ImportableTableSync::ObjectBySource<RoadPlaceTableSync> _roadPlaces;
 
