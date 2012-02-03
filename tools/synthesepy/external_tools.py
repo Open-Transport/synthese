@@ -70,22 +70,24 @@ command={command}
 # Quotes are required due to a bug in 3.0a8:
 # http://lists.supervisord.org/pipermail/supervisor-users/2010-March/000539.html
 environment=HOME='/home/synthese',USER='synthese'
-
-redirect_stderr=true
-stdout_logfile={stdout_logfile}
-stdout_logfile_maxbytes={stdout_logfile_maxbytes}
-stdout_logfile_backups={stdout_logfile_backups}
 """
         config = self.project.config
-
         format_config = config.__dict__.copy()
         # NOTE: supervisor doesn't seem to like underscores in names. Use
         # dashes instead.
         format_config['program_name'] = self.get_config_name().replace('_', '-')
         format_config['command'] = self.get_command()
-        format_config['stdout_logfile'] = os.path.abspath(self.get_log_file())
-        format_config.setdefault('stdout_logfile_maxbytes', '500MB')
-        format_config.setdefault('stdout_logfile_backups', '4')
+        log_file = self.get_log_file()
+        if log_file:
+            CONFIG_TEMPLATE += """
+redirect_stderr=true
+stdout_logfile={stdout_logfile}
+stdout_logfile_maxbytes={stdout_logfile_maxbytes}
+stdout_logfile_backups={stdout_logfile_backups}
+"""         
+            format_config['stdout_logfile'] = os.path.abspath(log_file)
+            format_config.setdefault('stdout_logfile_maxbytes', '500MB')
+            format_config.setdefault('stdout_logfile_backups', '4')
 
         supervisor_config = CONFIG_TEMPLATE.format(**format_config)
 
@@ -124,16 +126,18 @@ class UDFProxySupervisor(Supervisor):
         return 'udf_proxy_{0}'.format(self.project.config.project_name)
 
     def get_log_file(self):
-        return join(self.project.config.project_path, 'logs', 'udf_proxy.log')
+        return None
 
     def get_command(self): 
-        config = self.project.config
-        return ('python {script} -n -p {udf_proxy_port} --log-path=no '
+        config = self.project.config 
+        return ('python {script} -n -p {udf_proxy_port} --log-path={log_path} '
             '-t http://localhost:{synthese_port} start'.format(
             script=join(
                 self.project.env.source_path, 'utils',
                 'udf_proxy', 'udf_proxy.py'),
             udf_proxy_port=config.udf_proxy_port,
+            log_path=join(self.project.config.project_path,
+                'logs', 'udf_proxy.log'),
             synthese_port=config.port))
 
 
