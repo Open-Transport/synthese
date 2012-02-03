@@ -305,24 +305,28 @@ class ImportRun(object):
             else:
                 self._summary = 'Not available'
             return self._summary
-        summary = i18n.start_of_summary.format(level=min_level.upper())
+
+        lines = []
+        lines.append(i18n.start_of_summary.format(level=min_level.upper()))
         index = self.LEVEL_NAMES.index(min_level)
         all_levels = self.LEVEL_NAMES[index:]
+
         for level in all_levels:
             if not self.messages[level]:
                 continue
-            summary += i18n.import_level_section.format(level=level.upper())
-            for message in self.messages[level]:
-                summary += u'{0}: {1}\n'.format(
-                    level.upper(), unicode(message, 'utf-8', 'replace'))
+            level_upper = level.upper()
+            lines.append(i18n.import_level_section.format(level=level_upper))
+            for message in self.messages[level]: 
+                lines.append(u'{0}: {1}\n'.format(
+                    level_upper, unicode(message, 'utf-8', 'replace')))
 
-        summary += i18n.end_of_messages
+        lines.append(i18n.end_of_messages)
 
-        summary += i18n.technical_infos.format(
+        lines.append(i18n.technical_infos.format(
             dummy=self.dummy,
-            synthese_calls='\n\n'.join(self.synthese_calls))
+            synthese_calls='\n\n'.join(self.synthese_calls)))
 
-        return summary
+        return ''.join(lines)
     summary = property(get_summary)
 
     def get_log(self):
