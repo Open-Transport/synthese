@@ -26,6 +26,7 @@
 #include "PTTimeSlotRoutePlanner.h"
 #include "RoutePlanner.h"
 #include "PTModule.h"
+#include "FreeDRTArea.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
@@ -38,6 +39,7 @@ using namespace synthese::pt;
 BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 {
 	ScopedCoordinatesSystemUser scopedCoordinatesSystemUser;
+	ScopedRegistrable<FreeDRTArea> scopedFreeDRTAreaRegistrable;
 
 	#include "RoutePlannerTestData.hpp"
 
