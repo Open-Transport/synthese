@@ -387,15 +387,12 @@ namespace synthese
 				}
 
 				// Free DRTs loop
-				// TODO getFreeDRTs breaks test_53_pt_routeplanner
-				/*
 				StopArea::FreeDRTs freeDRTs(stopPoint->getConnectionPlace()->getFreeDRTs());
 				BOOST_FOREACH(const StopArea::FreeDRTs::value_type& freeDRT, freeDRTs)
 				{
 					// Select
 
 				}
-				*/
 			}
 		}
 }	}
