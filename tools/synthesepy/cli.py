@@ -360,7 +360,8 @@ def main():
 
     # Hack to get logging before argument parsing is done.
     logging.basicConfig(
-        level=(logging.DEBUG if '-v' in sys.argv else logging.INFO))
+        level=(logging.DEBUG if '-v' in sys.argv else logging.INFO),
+        format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
     config = synthesepy.config.Config()
 
