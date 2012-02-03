@@ -60,7 +60,6 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @date 2011
 		class FreeDRTArea:
-			public virtual util::Registrable,
 			public util::Named,
 			public graph::Path
 		{
