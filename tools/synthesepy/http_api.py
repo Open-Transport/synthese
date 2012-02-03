@@ -182,10 +182,14 @@ class HTTPApi(object):
         log.debug('Calling %s with parameters: %s\n  url: %s', url, params,
             '{0}?{1}'.format(url, urllib.urlencode(params)))
 
+        requests.defaults.max_retries = 1
+        common_kwargs = {
+            'prefetch': True,
+        }
         if use_get:
-            r = requests.get(url, params=params)
+            r = requests.get(url, params=params, **common_kwargs)
         else:
-            r = requests.post(url, data=params)
+            r = requests.post(url, data=params, **common_kwargs)
 
         if r.status_code != 200:
             raise HTTPApiException('call_synthese didn\'t return a 200 status')
