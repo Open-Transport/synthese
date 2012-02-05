@@ -32,18 +32,25 @@ from synthesepy import i18n
 from synthesepy import utils
 from . import manager
 
+def _get_imports_manager():
+    imports_manager = flask.current_app.project.imports_manager
+    # TODO: this forces a reload of all objects on every access. There should
+    # be something more efficient 
+    imports_manager.templates = None
+    return imports_manager
+
 @manager.route('/imports')
 def import_template_list():
     if not session.get('logged_in'):
         return redirect(url_for('.login', next=url_for('.imports')))
-    imports_manager = flask.current_app.project.imports_manager
+    imports_manager = _get_imports_manager()
     templates = imports_manager.get_import_templates()
 
     return render_template('imports/template_list.html', templates=templates)
 
 @manager.route('/imports/<template_id>')
 def import_template(template_id):
-    imports_manager = flask.current_app.project.imports_manager
+    imports_manager = _get_imports_manager()
     try:
         template = imports_manager.get_import_template(template_id)
     except KeyError:
@@ -60,7 +67,7 @@ def import_template(template_id):
 
 @manager.route('/imports/<template_id>/create_import', methods=['POST'])
 def import_template_create_import(template_id):
-    imports_manager = flask.current_app.project.imports_manager
+    imports_manager = _get_imports_manager()
     try:
         template = imports_manager.get_import_template(template_id)
     except KeyError:
@@ -76,7 +83,7 @@ def import_template_create_import(template_id):
 
 
 def _get_import(template_id, import_id):
-    imports_manager = flask.current_app.project.imports_manager
+    imports_manager = _get_imports_manager()
     try:
         import_ = imports_manager.get_import(template_id, import_id)
     except KeyError:
