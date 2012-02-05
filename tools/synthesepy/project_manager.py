@@ -19,6 +19,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+# TODO: this file should be renamed to project.py
 
 import argparse
 import contextlib
@@ -1149,6 +1150,8 @@ The synthese.py wrapper script.
             self.call_project('root_delegate', args=['start_supervisor'], sudo=True)
         elif self.config.bg_process_manager == 'initd':
             self.call_project('root_delegate', args=['start_initd'], sudo=True)
+        elif self.config.bg_process_manager == 'dummy':
+            log.info('Dummy bg_process_manager. Doing nothing.')
         else:
             raise Exception('Unknown bg_process_manager %r' %
                 self.config.bg_process_manager)
@@ -1166,6 +1169,8 @@ The synthese.py wrapper script.
             self.call_project('root_delegate', args=['stop_supervisor'], sudo=True)
         elif self.config.bg_process_manager == 'initd':
             self.call_project('root_delegate', args=['stop_initd'], sudo=True)
+        elif self.config.bg_process_manager == 'dummy':
+            log.info('Dummy bg_process_manager. Doing nothing.')
         else:
             raise Exception('Unknown bg_process_manager %r' %
                 self.config.bg_process_manager)

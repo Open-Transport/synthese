@@ -43,7 +43,7 @@ DEFAULTS = {
     'mysqldump_opts': '',
 
     # bgstart/bgstop
-    # One of: supervisor, initd, python
+    # One of: supervisor, initd, python, dummy
     'bg_process_manager': 'python',
     'supervisorctl_path': '/usr/bin/supervisorctl',
 
