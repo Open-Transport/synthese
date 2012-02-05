@@ -130,7 +130,7 @@ class UDFProxySupervisor(Supervisor):
 
     def get_command(self): 
         config = self.project.config 
-        return ('python {script} -n -p {udf_proxy_port} --log-path={log_path} '
+        return ('python {script} -ns -p {udf_proxy_port} --log-path={log_path} '
             '-t http://localhost:{synthese_port} start'.format(
             script=join(
                 self.project.env.source_path, 'utils',

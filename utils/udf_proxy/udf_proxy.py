@@ -173,7 +173,9 @@ if __name__ == '__main__':
     parser.add_option('-v', '--verbose', action='store_true',
          default=False, help='Print debug logging')
     parser.add_option('-n', '--no-daemon', action='store_true',
-         default=False, help='Don\'t daemonize and print logs to stderr')
+         default=False, help='Don\'t daemonize')
+    parser.add_option('-s', '--silent', action='store_true',
+         default=False, help='Don\'t print logs to stderr (if not daemonized)')
     parser.add_option('-p', '--port', type='int',
          default=9080, help='Proxy listening port')
     parser.add_option('-t', '--target-url',
@@ -197,7 +199,7 @@ if __name__ == '__main__':
     if options.log_path != 'no':
         LOG_PATH = options.log_path
 
-    if options.no_daemon:
+    if options.no_daemon and not options.silent:
         logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)
     command = args[0]
 
