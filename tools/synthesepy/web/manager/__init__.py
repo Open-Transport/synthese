@@ -225,6 +225,17 @@ def deploy():
 
     return _do_command(project.deploy)
 
+@manager.route('/deploy_logs/<dump_id>')
+@admin_required
+def deploy_logs(dump_id):
+    project = flask.current_app.project
+    dump = project.deployer._get_dump(dump_id)
+    if not dump:
+        abort(404)
+    return render_template('result.html',
+        title='Deploy %s logs' % dump.id,
+        output=dump.logs)
+
 
 # Database commands
 

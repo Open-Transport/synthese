@@ -95,9 +95,24 @@ class Dump(object):
         self.id = id
         self.path = path
         self.date = datetime.datetime.fromtimestamp(os.path.getctime(self.path))
+        self._logs = None
 
     def __repr__(self):
         return '<Dump %s>' % self.__dict__
+
+    @property
+    def logs(self):
+        if self._logs:
+            return self._logs
+        try:
+            self._logs = open(join(self.path, 'logs.txt')).read()
+        except IOError:
+            self._logs = 'N/A'
+        return self._logs
+
+    @logs.setter
+    def logs(self, value):
+        open(join(self.path, 'logs.txt'), 'wb').write(value)
 
     @property
     def sql_path(self):
@@ -222,6 +237,7 @@ class Deployer(utils.DirObjectLoader):
             for dump_to_delete in self.dumps[:-self.MAX_DUMPS_TO_KEEP]:
                 dump_to_delete.delete()
 
+            dump.logs = commands_result.summary()
             return commands_result
         except project_manager.CommandsException, e:
             if not no_mail:
