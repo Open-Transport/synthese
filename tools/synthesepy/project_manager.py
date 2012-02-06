@@ -334,11 +334,14 @@ class CommandResult(object):
         command_result = CommandResult()
         command_result.commandline = cmd
         if hide_arg:
-            command_result.commandline = command_result.commandline.replace(hide_arg, '***')
+            command_result.commandline = \
+                command_result.commandline.replace(hide_arg, '***')
 
         try:
             command_result.output = utils.call(
                 cmd, cwd=project.path, ret_output=True)
+            log.debug('Command output:\n%s',
+                '\n'.join('\t' + l for l in command_result.output.splitlines()))
         except subprocess.CalledProcessError, e:
             command_result.output = e.output
             command_result.status = CommandResult.FAILURE
