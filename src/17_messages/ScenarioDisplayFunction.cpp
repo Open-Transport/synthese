@@ -292,7 +292,7 @@ namespace synthese
 			if(_mainTemplate.get()) // CMS output
 			{
 				// Variables integration
-				if(_variableTemplate.get())
+				if(_variableTemplate.get() && pm.hasSubMaps(DATA_VARIABLE))
 				{
 					stringstream s;
 					size_t rank(0);
