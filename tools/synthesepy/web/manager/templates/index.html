@@ -144,6 +144,7 @@
                   <tr>
                     <th style="width: 20%;">Id</th>
                     <th>Date</th>
+                    <th>Logs</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -155,6 +156,9 @@
                     </td>
                     <td>
                       {{ dump.date.strftime('%Y-%m-%d %H:%M') }}
+                    </td>
+                    <td>
+                      <a href="{{ url_for('.deploy_logs', dump_id=dump.id) }}">logs</a>
                     </td>
                     <td>
                       <input type="submit" name="restore_{{dump.id}}" class="btn small" value="Restore">
