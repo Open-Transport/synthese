@@ -91,6 +91,7 @@ var KioskView = Backbone.View.extend({
     configRefreshTimeout: 5 * 60,
     fallbackTimeout: 15 * 60,
     fallbackUrl: "/kiosk/default_fallback.html",
+    interactive: false,
   },
 
   initialize: function(options) {
@@ -200,32 +201,49 @@ var KioskView = Backbone.View.extend({
       }
       $.extend(self.config, config.displays[self.params.display]);
       self.log("display config", self.config);
-      if (JSON.stringify(self.config) == self.lastConfigString) {
+      if (JSON.stringify(config) == self.lastConfigString) {
         self.log("Config didn't change since last fetch. Not reloading");
         return;
       }
 
-      self.lastConfigString = JSON.stringify(self.config);
+      self.lastConfigString = JSON.stringify(config);
 
       self.lastSuccess = Date.now();
       self.clearTimeouts();
+      document.body.classList.remove("interactive");
+      if (self.config.interactive)
+        document.body.classList.add("interactive");
 
-      $.when(
-        self.getFrame("fallback").loadUrl(self.config.fallbackUrl),
-        self.getFrame("page0").loadUrl(self.config.url),
-        self.getFrame("page1").loadUrl(self.config.url))
-        .always(function() {
-          self.refresh();
+      var loadComplete;
 
-          self.log("scheduling next config refresh in " + self.config.configRefreshTimeout + "s");
-          if (self.refreshConfigTimeout)
-            clearTimeout(self.refreshConfigTimeout);
-          self.refreshConfigTimeout = setTimeout(function() {
-            self.refreshConfig()
-          }, self.config.configRefreshTimeout * 1000)
-
-        });
       self.showFrame("fallback");
+
+      if (self.config.interactive) {
+        // Load the interactive page in a visible frame. Some applications
+        // (e.g OpenLayers) don't like to be loaded in a hidden element.
+        loadComplete = self.getFrame("fallback")
+          .loadUrl(self.config.fallbackUrl)
+          .pipe(function() {
+            self.showFrame("page0");
+            return self.getFrame("page0").loadUrl(self.config.url);
+          });
+      } else {
+        loadComplete = $.when(
+          self.getFrame("fallback").loadUrl(self.config.fallbackUrl),
+          self.getFrame("page0").loadUrl(self.config.url),
+          self.getFrame("page1").loadUrl(self.config.url));
+      }
+
+      loadComplete.always(function() {
+        self.refresh();
+
+        self.log("scheduling next config refresh in " + self.config.configRefreshTimeout + "s");
+        if (self.refreshConfigTimeout)
+          clearTimeout(self.refreshConfigTimeout);
+        self.refreshConfigTimeout = setTimeout(function() {
+          self.refreshConfig()
+        }, self.config.configRefreshTimeout * 1000)
+      });
     });
 
     return dfd2.promise();
@@ -343,12 +361,14 @@ var KioskView = Backbone.View.extend({
     if (self.refreshConfigTimeout)
       clearTimeout(self.refreshConfigTimeout);
     self.refreshConfigTimeout = setTimeout(function() {
-      self.refreshConfig()
+      self.refreshConfig();
     }, self.config.configRefreshTimeout * 1000)
 
   },
 
   refresh: function() {
+    if (this.config.interactive)
+      return;
     this.log("__Refreshing frame");
 
     var hiddenPage = this.getFrame("hiddenPage"),
