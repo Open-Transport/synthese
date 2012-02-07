@@ -28,6 +28,7 @@
 #include "GeographyModule.h"
 #include "House.hpp"
 #include "HTMLTable.h"
+#include "MimeTypes.hpp"
 #include "PTModule.h"
 #include "PublicPlace.h"
 #include "Request.h"
@@ -245,7 +246,16 @@ namespace synthese
 			}
 			else
 			{
-				_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT, VALUE_XML);
+				// Output format
+				_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT, MimeTypes::XML);
+				if(_outputFormat == VALUE_JSON)
+				{
+					_outputFormat = MimeTypes::JSON;
+				}
+				if(_outputFormat == VALUE_XML)
+				{
+					_outputFormat = MimeTypes::XML;
+				}
 			}
 		}
 
@@ -611,7 +621,8 @@ namespace synthese
 				{
 					if(_classPage.get())
 					{
-						if(!result.getSubMaps(DATA_CITIES).empty()
+						if(	result.hasSubMaps(DATA_CITIES) &&
+							(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 						){
 							_displayClass(
 								stream,
@@ -620,7 +631,8 @@ namespace synthese
 								request
 							);
 						}
-						if(!result.getSubMaps(DATA_STOPS).empty()
+						if(	result.hasSubMaps(DATA_STOPS) &&
+							(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
 						){
 							_displayClass(
 								stream,
@@ -629,7 +641,8 @@ namespace synthese
 								request
 							);
 						}
-						if(!result.getSubMaps(DATA_ADDRESSES).empty()
+						if(	result.hasSubMaps(DATA_ADDRESSES) &&
+							(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayClass(
 								stream,
@@ -638,7 +651,8 @@ namespace synthese
 								request
 							);
 						}
-						if(!result.getSubMaps(DATA_ROADS).empty()
+						if(	result.hasSubMaps(DATA_ROADS) &&
+							(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
 						){
 							_displayClass(
 								stream,
@@ -647,7 +661,8 @@ namespace synthese
 								request
 							);
 						}
-						if(!result.getSubMaps(DATA_PUBLIC_PLACES).empty()
+						if(	result.hasSubMaps(DATA_PUBLIC_PLACES) &&
+							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayClass(
 								stream,
@@ -660,7 +675,8 @@ namespace synthese
 					else
 					{
 						size_t rank(0);
-						if(!result.getSubMaps(DATA_CITIES).empty()
+						if(	result.hasSubMaps(DATA_CITIES) &&
+							(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 						){
 							_displayItems(
 								stream,
@@ -670,7 +686,8 @@ namespace synthese
 								rank
 							);
 						}
-						if(!result.getSubMaps(DATA_STOPS).empty()
+						if(	result.hasSubMaps(DATA_STOPS) &&
+							(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
 						){
 							_displayItems(
 								stream,
@@ -680,7 +697,8 @@ namespace synthese
 								rank
 							);
 						}
-						if(!result.getSubMaps(DATA_ADDRESSES).empty()
+						if(	result.hasSubMaps(DATA_ADDRESSES) &&
+							(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayItems(
 								stream,
@@ -690,7 +708,8 @@ namespace synthese
 								rank
 							);
 						}
-						if(!result.getSubMaps(DATA_ROADS).empty()
+						if(	result.hasSubMaps(DATA_ROADS) &&
+							(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
 						){
 							_displayItems(
 								stream,
@@ -700,7 +719,8 @@ namespace synthese
 								rank
 							);
 						}
-						if(!result.getSubMaps(DATA_PUBLIC_PLACES).empty()
+						if(	result.hasSubMaps(DATA_PUBLIC_PLACES) &&
+							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayItems(
 								stream,
@@ -718,44 +738,59 @@ namespace synthese
 					const ParametersMap& pm(
 						**result.getSubMaps(DATA_PLACES).begin()
 					);
-					_displayItems(
-						stream,
-						DATA_CITY,
-						pm.getSubMaps(DATA_CITY),
-						request,
-						rank
-					);
-					_displayItems(
-						stream,
-						DATA_STOP,
-						pm.getSubMaps(DATA_STOP),
-						request,
-						rank
-					);
-					_displayItems(
-						stream,
-						DATA_ADDRESS,
-						pm.getSubMaps(DATA_ADDRESS),
-						request,
-						rank
-					);
-					_displayItems(
-						stream,
-						DATA_ROAD,
-						pm.getSubMaps(DATA_ROAD),
-						request,
-						rank
-					);
-					_displayItems(
-						stream,
-						DATA_PUBLIC_PLACE,
-						pm.getSubMaps(DATA_PUBLIC_PLACE),
-						request,
-						rank
-					);
+					if(pm.hasSubMaps(DATA_CITY))
+					{
+						_displayItems(
+							stream,
+							DATA_CITY,
+							pm.getSubMaps(DATA_CITY),
+							request,
+							rank
+						);
+					}
+					if(pm.hasSubMaps(DATA_STOP))
+					{
+						_displayItems(
+							stream,
+							DATA_STOP,
+							pm.getSubMaps(DATA_STOP),
+							request,
+							rank
+						);
+					}
+					if(pm.hasSubMaps(DATA_ADDRESS))
+					{
+						_displayItems(
+							stream,
+							DATA_ADDRESS,
+							pm.getSubMaps(DATA_ADDRESS),
+							request,
+							rank
+						);
+					}
+					if(pm.hasSubMaps(DATA_ROAD))
+					{
+						_displayItems(
+							stream,
+							DATA_ROAD,
+							pm.getSubMaps(DATA_ROAD),
+							request,
+							rank
+						);
+					}
+					if(pm.hasSubMaps(DATA_PUBLIC_PLACE))
+					{
+						_displayItems(
+							stream,
+							DATA_PUBLIC_PLACE,
+							pm.getSubMaps(DATA_PUBLIC_PLACE),
+							request,
+							rank
+						);
+					}
 				}
 			}
-			else if(_outputFormat == VALUE_JSON)
+			else if(_outputFormat == MimeTypes::JSON)
 			{
 				if(_sorted)
 				{
@@ -772,7 +807,7 @@ namespace synthese
 					);
 				}
 			}
-			else if(_outputFormat == VALUE_XML)
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				if(_sorted)
 				{
@@ -793,6 +828,13 @@ namespace synthese
 					);
 				}
 			}
+			else if(_outputFormat == MimeTypes::CSV)
+			{
+				result.outputCSV(
+					stream,
+					DATA_PLACES
+				);
+			}
 
 			return result;
 		}
@@ -809,15 +851,7 @@ namespace synthese
 
 		std::string PlacesListService::getOutputMimeType() const
 		{
-			if(_itemPage.get())
-			{
-				return _itemPage->getMimeType();
-			}
-			if(_outputFormat == VALUE_JSON)
-			{
-				return "application/json";
-			}
-			return "text/xml";
+			return _itemPage.get() ? _itemPage->getMimeType() : _outputFormat;
 		}
 
 
