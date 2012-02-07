@@ -26,6 +26,8 @@ MD5.cpp
 MD5.h
 MD5Wrapper.cpp
 MD5Wrapper.h
+MimeTypes.cpp
+MimeTypes.hpp
 Named.h
 ObjectNotFoundException.h
 ObjectNotFoundInRegistryException.h
