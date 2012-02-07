@@ -40,6 +40,7 @@ import flask
 from flask import g, request
 import requests
 from selenium import webdriver
+from selenium.webdriver.firefox import firefox_binary
 
 import utils
 
@@ -99,7 +100,8 @@ class Proxy(object):
         if sys.platform != 'win32':
             return path
         log.debug('Path %s, cwd: %s', path, os.getcwd())
-        if os.path.splitdrive(path)[0] != os.path.splitdrive(os.getcwd())[0]:
+        if (os.path.splitdrive(path)[0].lower() !=
+            os.path.splitdrive(os.getcwd())[0].lower()):
             raise Exception('Wrong drive expectations')
         return os.path.splitdrive(path)[1].replace(os.sep, '/')
 
@@ -111,8 +113,10 @@ class Proxy(object):
             'diskCacheRoot': self._convert_polipo_path(self._cache_dir),
             'dnsUseGethostbyname': 'happily',
             'logFile': self._convert_polipo_path(self._log_file),
-            'proxyOffline': 'false' if self._online else 'true',
         }
+        if not self._online:
+            options['proxyOffline'] = 'true'
+
         cmd_line = [self._polipo_path]
         for name, value in options.iteritems():
             cmd_line.append('{0}={1}'.format(name, value))
@@ -152,13 +156,16 @@ class Proxy(object):
 
 
 class Display(object):
-    def __init__(self, kiosk, synthese_url, index, name, browser_name):
+    def __init__(self, kiosk, index, name):
+        config = kiosk.config
         self._kiosk = kiosk
         self._proxy = kiosk._proxy
-        self._synthese_url = synthese_url
+        self._synthese_url = config['synthese_url']
         self._index = index
         self._name = name
-        self._browser_name = browser_name
+        self._browser_name = config['browser']
+        self._browser_path = config['browser_path']
+        self._debug = config['debug']
         self._browser = None
         self._url = None
 
@@ -173,10 +180,13 @@ class Display(object):
         return self._browser
 
     def _create_chrome_browser(self):
+        if self._browser_path:
+            raise Exception('browser_path not yet supported for Chrome')
         chromedriver_path = get_thirdparty_binary('chromedriver')
 
         options = webdriver.ChromeOptions()
-        options.add_argument('--kiosk')
+        if not self._debug:
+            options.add_argument('--kiosk')
 
         options.add_argument(
             '--proxy-server=http://{_host}:{_port}'.format(**self._proxy.__dict__))
@@ -185,28 +195,43 @@ class Display(object):
             executable_path=chromedriver_path,
             chrome_options=options)
 
-
     def _create_firefox_browser(self):
         profile = webdriver.FirefoxProfile()
 
         profile.set_preference('network.proxy.type', 1);
         profile.set_preference('network.proxy.http', self._proxy._host)
         profile.set_preference('network.proxy.http_port', self._proxy._port)
-
         xpi_path = os.path.join(
-            os.path.dirname(os.path.abspath(__file__)),
-            'r_kiosk-0.9.0-fx.xpi')
-        # FIXME: a bug in webdriver breaks adding extension.
-        if 0:
+            thisdir, os.pardir, 'third_party', 'r_kiosk-0.9.0-fx.xpi')
+        if not self._debug:
             profile.add_extension(xpi_path)
 
-        return webdriver.Firefox(firefox_profile=profile)
+        binary = firefox_binary.FirefoxBinary(firefox_path=self._browser_path)
+
+        return webdriver.Firefox(firefox_profile=profile, firefox_binary=binary)
+
+    def _create_opera_browser(self):
+        if self._browser_path:
+            raise Exception('browser_path not yet supported for Chrome')
+
+        selenium_jar = os.path.join(
+            thisdir, os.pardir, 'third_party', 'selenium-server-standalone-2.18.0.jar')
+        if not os.path.isfile(selenium_jar):
+            raise Exception('Please download '
+                'http://selenium.googlecode.com/files/selenium-server-standalone-2.18.0.jar '
+                'to %r' % selenium_jar)
+
+        # TODO: proxy.
+
+        return webdriver.Opera(executable_path=selenium_jar)
 
     def _create_browser(self):
         if self._browser_name == 'chrome':
             return self._create_chrome_browser()
         elif self._browser_name == 'firefox':
             return self._create_firefox_browser()
+        elif self._browser_name == 'opera':
+            return self._create_opera_browser()
         else:
             raise Exception('Unsupported browser: %s', self._browser_name)
 
@@ -215,7 +240,7 @@ class Display(object):
         kiosk_params = {
             'display': self._name,
         }
-        if self._kiosk.config['debug']:
+        if self._debug:
             kiosk_params['debug'] = True
         if not self._kiosk.online:
             kiosk_params['offline'] = True
@@ -248,6 +273,7 @@ DEFAULT_CONFIG = {
     'admin_password': gen_password(),
     'secret_key': gen_password(),
     'browser': 'firefox',
+    'browser_path': None,
     'displays': [],
     'debug': False,
 }
@@ -382,7 +408,7 @@ class SyntheseKiosk(object):
     def _init_display(self, index):
         c = self.config
         name = c['displays'][index]
-        return Display(self, c['synthese_url'], index, name, c['browser'])
+        return Display(self, index, name)
 
     def _init_displays(self):
         self._displays = []
@@ -463,6 +489,7 @@ class SyntheseKiosk(object):
     def update_config(self, old_config):
         if (self.config['debug'] != old_config['debug'] or
             self.config['browser'] != old_config['browser'] or
+            self.config['browser_path'] != old_config['browser_path'] or
             self.config['synthese_url'] != old_config['synthese_url'] or
             len(self.config['displays']) != len(old_config['displays'])):
             for display in self._displays:
