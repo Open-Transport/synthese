@@ -25,6 +25,7 @@ import logging
 import os
 import sys
 import time
+import traceback
 
 from synthese_kiosk import SyntheseKiosk
 import system_config
@@ -33,7 +34,6 @@ import utils
 log = logging.getLogger(__name__)
 
 def main():
-    
     parser = argparse.ArgumentParser(description='Synthese Kiosk.')
     parser.add_argument(
         '-c', '--config-dir', default=os.path.expanduser('~/.synthese_kiosk'),
@@ -55,7 +55,7 @@ def main():
     try:
         kiosk.start()
     except Exception, e:
-        raise
+        traceback.print_exc()
     finally:
         try:
             kiosk.stop()

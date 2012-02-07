@@ -10,12 +10,26 @@ function ConfigViewModel() {
   this.syntheseUrl = ko.observable();
   this.adminPassword = ko.observable();
   this.secretKey = ko.observable();
-  this.availableBrowsers = ['firefox', 'chrome'];
+  this.availableBrowsers = ["firefox", "chrome"];
   this.browser = ko.observable();
+  this.browserPath = ko.observable();
   this.displayNames = ko.observable();
   this.debug = ko.observable();
-
+  
   var self = this;
+
+  this.displayNamesArray = ko.computed(function() {
+    if (!self.displayNames())
+      return [];
+    return self.displayNames().split(",").filter(function(display) {
+      return display;
+    }).map(function(displayName, index) {
+      return {
+        index: index,
+        label: displayName
+      }
+    });
+  });
 
   this._loadConfigObj = function(config) {
     console.log("config", config);
@@ -24,13 +38,14 @@ function ConfigViewModel() {
     self.adminPassword(config.admin_password);
     self.secretKey(config.secret_key);
     self.browser(config.browser);
+    self.browserPath(config.browser_path);
     self.displayNames(config.displays.join(","));
     self.debug(config.debug);
   };
 
   this.loadConfig = function() {
 
-    $.getJSON('/get_config').then(
+    $.getJSON("/get_config").then(
       function(config) {
         self._loadConfigObj(config);
       },
@@ -48,12 +63,15 @@ function ConfigViewModel() {
       admin_password: configObj.adminPassword,
       secret_key: configObj.secretKey,
       browser: configObj.browser,
-      displays: configObj.displayNames.split(","),
+      browser_path: configObj.browserPath,
+      displays: configObj.displayNames.split(",").filter(function(d) {
+        return d;
+      }),
       debug: configObj.debug
     };
-    $.post('/set_config', {
+    $.post("/set_config", {
         data: JSON.stringify(config),
-      }, 'json'
+      }, "json"
     ).then(function(config) {
       self._loadConfigObj(config);
     }, function() {
@@ -65,7 +83,7 @@ function ConfigViewModel() {
 
 function StatusViewModel() {
 
-  this.online = ko.observable('unknown');
+  this.online = ko.observable("unknown");
   this.logs = ko.observable();
 
   var self = this;
@@ -74,7 +92,7 @@ function StatusViewModel() {
     $.getJSON("/get_status").then(function(status) {
       console.log("status", status);
 
-      self.online(status.online ? 'online' : 'offline');
+      self.online(status.online ? "online" : "offline");
 
       self.logs(status.logs);
 
@@ -87,20 +105,17 @@ function StatusViewModel() {
 };
 
 
+function ViewModel() {
+  this.config = new ConfigViewModel();
+  this.status = new StatusViewModel();
+}
+
 var App = {
   init: function() {
-    console.log("init");
-
-
-    this.configViewModel = new ConfigViewModel();
-    ko.applyBindings(this.configViewModel, $('#configuration').get(0));
-    this.configViewModel.loadConfig();
-
-    this.statusViewModel = new StatusViewModel();
-    ko.applyBindings(this.statusViewModel, $('#status').get(0));
-    this.statusViewModel.refresh();
-
-
+    this.viewModel = new ViewModel();
+    this.viewModel.config.loadConfig();
+    this.viewModel.status.refresh();
+    ko.applyBindings(this.viewModel);
   }
 };
 

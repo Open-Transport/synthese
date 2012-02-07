@@ -34,7 +34,7 @@
     <h1>Page name <small>Supporting text or tagline</small></h1>
   </div>
   -->
-  <div class="row" id="configuration">
+  <div class="row" id="configuration" data-bind="with: config">
     <div class="span14">
       <h1>Configuration</h1>
 
@@ -80,6 +80,14 @@
               <select name="browser" id="browser"
                       data-bind="options: availableBrowsers, value: browser">
               </select>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="browser_path">Browser Path</label>
+            <div class="input">
+              <input class="xlarge" id="browser_path" name="browser_path"
+                     data-bind="value: browserPath" size="30" type="text">
             </div>
           </div><!-- /clearfix -->
 
@@ -163,21 +171,28 @@
   </div>
 
 
-  <div class="row" id="status">
+  <div class="row" id="status" data-bind="with: status">
     <div class="span14">
       <h1>Status</h1>
 
       <button class="btn" data-bind="click: refresh">Refresh Status</button>
 
+      <h3>Screenshots</h2>
       <p>
-        <dl>
-          <dt>Status</dt>
-          <dd data-bind="text: online, attr: { class: online }"></dd>
-        </dl>
+        <ul data-bind="foreach: $root.config.displayNamesArray">
+          <li>
+            <a data-bind="attr: { href: '/screenshot/' + $data.index },
+                          text: 'Display ' + $data.label"></a>
+          </li>
+        </ul>
       </p>
 
+      <h3>Status</h3>
+      <p>
+        <div data-bind="text: online, attr: { class: online }"></div>
+      </p>
 
-      <p>Last logs (most recent first)</p>
+      <h3>Last logs (most recent first)</h3>
       <pre data-bind="text: logs" class="logs"></pre>
 
     </div>
