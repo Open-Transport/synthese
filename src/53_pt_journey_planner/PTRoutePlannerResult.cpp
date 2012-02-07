@@ -333,20 +333,28 @@ namespace synthese
 
 
 
-		const geography::NamedPlace* PTRoutePlannerResult::GetNamedPlaceFromLegs(
-			const graph::ServicePointer* arrivalLeg,
-			const graph::ServicePointer* departureLeg,
-			const geography::NamedPlace* defaultValue
+		bool PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(
+			Journey::ServiceUses::const_iterator itl,
+			const Journey::ServiceUses& jl
 		){
-			if(arrivalLeg && dynamic_cast<const NamedPlace*>(arrivalLeg->getArrivalEdge()->getHub()))
-			{
-				return dynamic_cast<const NamedPlace*>(arrivalLeg->getArrivalEdge()->getHub());
-			}
-			if(departureLeg && dynamic_cast<const NamedPlace*>(departureLeg->getDepartureEdge()->getHub()))
-			{
-				return dynamic_cast<const NamedPlace*>(departureLeg->getDepartureEdge()->getHub());
-			}
-			return defaultValue;
+			return
+				itl == jl.begin() ||
+				(	!itl->getService()->getPath()->isPedestrianMode() &&
+					(itl-1)->getService()->getPath()->isPedestrianMode()
+				)
+			;
+		}
+
+
+
+		bool PTRoutePlannerResult::HaveToDisplayArrivalStopOnGrid(
+			Journey::ServiceUses::const_iterator itl,
+			const Journey::ServiceUses& jl
+		){
+			return
+				!itl->getService()->getPath()->isPedestrianMode() ||
+				itl+1 == jl.end()
+			;
 		}
 
 
@@ -363,22 +371,30 @@ namespace synthese
 				{
 					const ServicePointer& leg(*itl);
 
-					if(itl == jl.begin())
-					{
+					if(	HaveToDisplayDepartureStopOnGrid(itl, jl)
+					){
 						PlacesListConfiguration::PlaceInformation item(
-							GetNamedPlaceFromLegs(NULL, &leg, getNamedPlace(_departurePlace)),
-							true,
+							GetNamedPlaceForDeparture(
+								leg.getService()->getPath()->isPedestrianMode(),
+								itl == jl.begin() ? NULL : &(*(itl-1)),
+								leg,
+								*getNamedPlace(_departurePlace)
+							),
+							itl == jl.begin(),
 							false
 						);
 						jlist.push_back(item);
 					}
 
-					if(	!leg.getService()->getPath()->isPedestrianMode() ||
-						itl+1 == jl.end() ||
-						!(itl+1)->getService()->getPath()->isPedestrianMode()
+					if(	HaveToDisplayArrivalStopOnGrid(itl, jl)
 					){
 						PlacesListConfiguration::PlaceInformation item(
-							GetNamedPlaceFromLegs(&leg, itl+1 == jl.end() ? NULL : &(*(itl+1)), getNamedPlace(_arrivalPlace)),
+							GetNamedPlaceForArrival(
+								leg.getService()->getPath()->isPedestrianMode(),
+								leg,
+								itl+1 == jl.end() ? NULL : &(*(itl+1)),
+								*getNamedPlace(_arrivalPlace)
+							),
 							false,
 							itl+1 == jl.end()
 						);
@@ -575,5 +591,65 @@ namespace synthese
 				_journeys = result;
 				_createOrderedPlaces();
 			}
+		}
+
+
+
+		const geography::NamedPlace* PTRoutePlannerResult::GetNamedPlaceForDeparture(
+			bool isPedestrian,
+			const graph::ServicePointer* arrivalLeg,
+			const graph::ServicePointer& departureLeg,
+			const geography::NamedPlace& defaultValue
+		){
+			const NamedPlace* placeToSearch(NULL);
+			// Case Pedestrian :
+			if(isPedestrian)
+			{
+				// If first element : use of the origin place
+				if(arrivalLeg)
+				{ // Use of the last arrival place
+					placeToSearch = dynamic_cast<const NamedPlace*>(arrivalLeg->getArrivalEdge()->getHub());
+				}
+			}
+			else // Use of the PT departure place
+			{
+				placeToSearch = dynamic_cast<const NamedPlace*>(departureLeg.getDepartureEdge()->getHub());
+			}
+			if(!placeToSearch)
+			{	// Case of crossing with city as departure place
+				// Todo see how the right place can be found
+				placeToSearch = &defaultValue;
+			}
+			return placeToSearch;
+		}
+
+
+
+		const geography::NamedPlace* PTRoutePlannerResult::GetNamedPlaceForArrival(
+			bool isPedestrian,
+			const graph::ServicePointer& arrivalLeg,
+			const graph::ServicePointer* departureLeg,
+			const geography::NamedPlace& defaultValue
+		){
+			const NamedPlace* placeToSearch(NULL);
+			// Case Pedestrian :
+			if(isPedestrian)
+			{
+				// If last element : use of the destination place
+				if(departureLeg)
+				{ // Use of the next departure place
+					placeToSearch = dynamic_cast<const NamedPlace*>(departureLeg->getDepartureEdge()->getHub());
+				}
+			}
+			else // Use of the PT arrival place
+			{
+				placeToSearch = dynamic_cast<const NamedPlace*>(arrivalLeg.getArrivalEdge()->getHub());
+			}
+			if(!placeToSearch)
+			{	// Case of crossing with city as arrival place
+				// Todo see how the right place can be found
+				placeToSearch = &defaultValue;
+			}
+			return placeToSearch;
 		}
 }	}

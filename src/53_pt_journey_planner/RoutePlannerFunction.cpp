@@ -1249,17 +1249,16 @@ namespace synthese
 
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
-						const ServicePointer& curET(*itl);
+						const ServicePointer& leg(*itl);
 
-						if(	itl == jl.begin() ||
-							!curET.getService()->getPath()->isPedestrianMode() ||
-							lastPedestrianMode != curET.getService()->getPath()->isPedestrianMode()
+						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl)
 						){
 							const NamedPlace* placeToSearch(
-								PTRoutePlannerResult::GetNamedPlaceFromLegs(
+								PTRoutePlannerResult::GetNamedPlaceForDeparture(
+									leg.getService()->getPath()->isPedestrianMode(),
 									itl == jl.begin() ? NULL : &(*(itl - 1)),
-									&curET,
-									PTRoutePlannerResult::getNamedPlace(_departure_place.placeResult.value.get())
+									leg,
+									*placesList.begin()->place
 							)	);
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow)
@@ -1267,7 +1266,7 @@ namespace synthese
 								**itSheetRow << "<cell />";
 							}
 
-							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
+							pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
 
 							// Saving of the columns on each lines
 							if(itl == jl.begin())
@@ -1276,10 +1275,10 @@ namespace synthese
 							}
 							**itSheetRow <<
 								" departureDateTime=\"" <<
-								posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"";
+								posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"";
 							if(journey.getContinuousServiceRange().total_seconds() > 0)
 							{
-								posix_time::ptime edTime(curET.getDepartureDateTime());
+								posix_time::ptime edTime(leg.getDepartureDateTime());
 								edTime += journey.getContinuousServiceRange();
 								**itSheetRow << " endDepartureDateTime=\"" <<
 									posix_time::to_iso_extended_string(edTime) << "\"";
@@ -1294,15 +1293,14 @@ namespace synthese
 							lastPedestrianMode = pedestrianMode;
 						}
 
-						if(	itl == jl.end()-1
-						||	!(itl+1)->getService()->getPath()->isPedestrianMode()
-						||	!curET.getService()->getPath()->isPedestrianMode()
+						if(	PTRoutePlannerResult::HaveToDisplayArrivalStopOnGrid(itl, jl)
 						){
 							const NamedPlace* placeToSearch(
-								PTRoutePlannerResult::GetNamedPlaceFromLegs(
-									&curET,
+								PTRoutePlannerResult::GetNamedPlaceForArrival(
+									leg.getService()->getPath()->isPedestrianMode(),
+									leg,
 									itl == jl.end()-1 ? NULL : &(*(itl+1)),
-									PTRoutePlannerResult::getNamedPlace(_arrival_place.placeResult.value.get())
+									*placesList.rbegin()->place
 							)	);
 
 							for (; itPlaces->place != placeToSearch; ++itPlaces, ++itSheetRow )
@@ -1315,10 +1313,10 @@ namespace synthese
 								**itSheetRow << " />";
 							}
 							**itSheetRow << "<cell arrivalDateTime=\"" <<
-								posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+								posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 							if(journey.getContinuousServiceRange().total_seconds() > 0)
 							{
-								posix_time::ptime eaTime(curET.getArrivalDateTime());
+								posix_time::ptime eaTime(leg.getArrivalDateTime());
 								eaTime += journey.getContinuousServiceRange();
 								**itSheetRow << " endArrivalDateTime=\"" <<
 									posix_time::to_iso_extended_string(eaTime) << "\"";
@@ -1334,7 +1332,7 @@ namespace synthese
 						}
 
 
-						const JourneyPattern* line(dynamic_cast<const JourneyPattern*> (curET.getService()->getPath()));
+						const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()));
 						if(line != NULL)
 						{
 							// Insertion of fake leg if site does not output road approach detail
@@ -1344,7 +1342,7 @@ namespace synthese
 								{
 									if(line->isPedestrianMode())
 									{
-										partialDistance += curET.getDistance();
+										partialDistance += leg.getDistance();
 									}
 									else
 									{
@@ -1401,9 +1399,9 @@ namespace synthese
 											stream <<
 												"</startAddress>" <<
 												"<endAddress>";
-											if(dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub()))
+											if(dynamic_cast<const NamedPlace*>(leg.getDepartureEdge()->getHub()))
 											{
-												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()),_showCoords);
+												_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*leg.getDepartureEdge()->getHub()),_showCoords);
 											}
 											else if(dynamic_cast<const Crossing*>((itl-1)->getArrivalEdge()->getFromVertex()))
 											{
@@ -1429,27 +1427,27 @@ namespace synthese
 
 							stream <<
 								"<" << (line->isPedestrianMode() ? "connection" : "transport") <<
-									" length=\"" << ceil(curET.getDistance()) << "\"" <<
-									" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
-									" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+									" length=\"" << ceil(leg.getDistance()) << "\"" <<
+									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
+									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 							if(journey.getContinuousServiceRange().total_seconds() > 0)
 							{
-								posix_time::ptime edTime(curET.getDepartureDateTime());
+								posix_time::ptime edTime(leg.getDepartureDateTime());
 								edTime += journey.getContinuousServiceRange();
-								posix_time::ptime eaTime(curET.getArrivalDateTime());
+								posix_time::ptime eaTime(leg.getArrivalDateTime());
 								eaTime += journey.getContinuousServiceRange();
 								stream <<
 									" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
 									" endArrivalTime=\"" << posix_time::to_iso_extended_string(eaTime) << "\"";
 							}
-							const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(curET.getService()));
+							const ContinuousService* cserv(dynamic_cast<const ContinuousService*>(leg.getService()));
 							if(cserv && cserv->getMaxWaitingTime().total_seconds() > 0)
 							{
 								stream << " possibleWaitingTime=\"" << (cserv->getMaxWaitingTime().total_seconds() / 60) << "\"";
 							}
 							stream <<
-									" startStopIsTerminus=\"" << (curET.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
-									" endStopIsTerminus=\"" << (curET.getArrivalEdge()->getRankInPath()+1 == curET.getArrivalEdge()->getParentPath()->getEdges().size() ? "true" : "false") << "\"";
+									" startStopIsTerminus=\"" << (leg.getDepartureEdge()->getRankInPath() == 0 ? "true" : "false") << "\"" <<
+									" endStopIsTerminus=\"" << (leg.getArrivalEdge()->getRankInPath()+1 == leg.getArrivalEdge()->getParentPath()->getEdges().size() ? "true" : "false") << "\"";
 							if(!line->getDirection().empty())
 							{
 								stream << " destinationText=\"" << line->getDirection() << "\"";
@@ -1460,8 +1458,8 @@ namespace synthese
 							}
 							stream <<
 								">";
-							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*curET.getDepartureEdge()->getFromVertex()),_showCoords);
-							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*curET.getArrivalEdge()->getFromVertex()),_showCoords);
+							_XMLDisplayPhysicalStop(stream, "startStop", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()),_showCoords);
+							_XMLDisplayPhysicalStop(stream, "endStop", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()),_showCoords);
 							_XMLDisplayPhysicalStop(stream, "destinationStop", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()),_showCoords);
 							if(!line->isPedestrianMode())
 							{
@@ -1508,23 +1506,23 @@ namespace synthese
 							stream << "</transport>";
 						}
 
-						const Road* road(dynamic_cast<const Road*> (curET.getService()->getPath ()));
+						const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
 						if(road != NULL)
 						{
 							if(_outputRoadApproachDetail)
 							{
 								stream <<
 									"<street" <<
-									" length=\"" << ceil(curET.getDistance()) << "\"" <<
+									" length=\"" << ceil(leg.getDistance()) << "\"" <<
 									" city=\"" << road->getRoadPlace()->getCity()->getName() << "\"" <<
 									" name=\"" << road->getRoadPlace()->getName() << "\"" <<
-									" departureTime=\"" << posix_time::to_iso_extended_string(curET.getDepartureDateTime()) << "\"" <<
-									" arrivalTime=\"" << posix_time::to_iso_extended_string(curET.getArrivalDateTime()) << "\"";
+									" departureTime=\"" << posix_time::to_iso_extended_string(leg.getDepartureDateTime()) << "\"" <<
+									" arrivalTime=\"" << posix_time::to_iso_extended_string(leg.getArrivalDateTime()) << "\"";
 								if(journey.getContinuousServiceRange().total_seconds() > 0)
 								{
-									posix_time::ptime edTime(curET.getDepartureDateTime());
+									posix_time::ptime edTime(leg.getDepartureDateTime());
 									edTime += journey.getContinuousServiceRange();
-									posix_time::ptime eaTime(curET.getArrivalDateTime());
+									posix_time::ptime eaTime(leg.getArrivalDateTime());
 									eaTime += journey.getContinuousServiceRange();
 									stream <<
 										" endDepartureTime=\"" << posix_time::to_iso_extended_string(edTime) << "\"" <<
@@ -1533,11 +1531,11 @@ namespace synthese
 								stream <<
 									">" <<
 									"<startAddress>";
-								if(dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub()))
+								if(dynamic_cast<const NamedPlace*>(leg.getDepartureEdge()->getHub()))
 								{
-									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getDepartureEdge()->getHub()),_showCoords);
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*leg.getDepartureEdge()->getHub()),_showCoords);
 								}
-								else if(dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getFromVertex()))
+								else if(dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getFromVertex()))
 								{
 									if(itl == jl.begin() && dynamic_cast<const RoadPlace*>(_departure_place.placeResult.value.get()))
 									{
@@ -1551,7 +1549,7 @@ namespace synthese
 									{
 										_XMLDisplayAddress(
 											stream,
-											*dynamic_cast<const Crossing*>(curET.getDepartureEdge()->getFromVertex()),
+											*dynamic_cast<const Crossing*>(leg.getDepartureEdge()->getFromVertex()),
 											*road->getRoadPlace(),
 											_showCoords
 											);
@@ -1560,11 +1558,11 @@ namespace synthese
 								stream <<
 									"</startAddress>" <<
 									"<endAddress>";
-								if(dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub()))
+								if(dynamic_cast<const NamedPlace*>(leg.getArrivalEdge()->getHub()))
 								{
-									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*curET.getArrivalEdge()->getHub()),_showCoords);
+									_XMLDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*leg.getArrivalEdge()->getHub()),_showCoords);
 								}
-								else if(dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getFromVertex()))
+								else if(dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getFromVertex()))
 								{
 									if(itl == jl.end() - 1 && dynamic_cast<const RoadPlace*>(_arrival_place.placeResult.value.get()))
 									{
@@ -1578,7 +1576,7 @@ namespace synthese
 									{
 										_XMLDisplayAddress(
 											stream,
-											*dynamic_cast<const Crossing*>(curET.getArrivalEdge()->getFromVertex()),
+											*dynamic_cast<const Crossing*>(leg.getArrivalEdge()->getFromVertex()),
 											*road->getRoadPlace(),
 											_showCoords
 										);
@@ -1591,7 +1589,7 @@ namespace synthese
 							}
 							else
 							{
-								partialDistance += ceil(curET.getDistance());
+								partialDistance += ceil(leg.getDistance());
 								if(!firstApproach && lastApproachBeginning == jl.end())
 								{
 									lastApproachBeginning = itl;
@@ -2070,43 +2068,24 @@ namespace synthese
 					const Journey::ServiceUses& jl(it->getServiceUses());
 					for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
 					{
-						const ServicePointer& curET(*itl);
+						const ServicePointer& leg(*itl);
 
-						if(	itl == jl.begin() ||
-							!curET.getService()->getPath()->isPedestrianMode() ||
-							!(itl-1)->getService()->getPath()->isPedestrianMode()
+						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl)
 						){
-							const NamedPlace* placeToSearch(NULL);
-							// Case Pedestrian :
-							if(	curET.getService()->getPath()->isPedestrianMode())
-							{
-								// If first element : use of the origin place
-								if(itl == jl.begin())
-								{
-									placeToSearch = dynamic_cast<const NamedPlace*>(object.getDeparturePlace());
-								}
-								else
-								{ // Use of the last arrival place
-									placeToSearch = dynamic_cast<const NamedPlace*>((*(itl-1)).getArrivalEdge()->getHub());
-								}
-							}
-							else // Use of the PT departure place
-							{
-								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getDepartureEdge()->getHub());
-							}
-							if(!placeToSearch)
-							{	// Case of crossing with city as departure place
-								// Todo see how the right place can be found
-								placeToSearch = placesList.begin()->place;
-							}
-							assert(placeToSearch);
+							const NamedPlace* placeToSearch(
+								PTRoutePlannerResult::GetNamedPlaceForDeparture(
+									leg.getService()->getPath()->isPedestrianMode(),
+									itl == jl.begin() ? NULL : &(*(itl-1)),
+									leg,
+									*placesList.begin()->place
+							)	);
 
-							ptime lastDateTime(curET.getDepartureDateTime());
+							ptime lastDateTime(leg.getDepartureDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
 							_displayEmptyCells(request, placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
 
-							pedestrianMode = curET.getService()->getPath()->isPedestrianMode();
+							pedestrianMode = leg.getService()->getPath()->isPedestrianMode();
 
 							// Saving of the columns on each lines
 							_displayScheduleCell(
@@ -2114,7 +2093,7 @@ namespace synthese
 								request,
 								i,
 								pedestrianMode,
-								curET.getDepartureDateTime().time_of_day(),
+								leg.getDepartureDateTime().time_of_day(),
 								lastDateTime.time_of_day(),
 								it->getContinuousServiceRange().total_seconds() > 0,
 								itPlaces->isOrigin && itl == jl.begin(),
@@ -2127,38 +2106,19 @@ namespace synthese
 							lastPedestrianMode = pedestrianMode;
 						}
 
-						if(	itl+1 == jl.end() ||
-							!(itl+1)->getService()->getPath()->isPedestrianMode() ||
-							!curET.getService()->getPath()->isPedestrianMode()
+						if(	PTRoutePlannerResult::HaveToDisplayArrivalStopOnGrid(itl, jl)
 						){
-							const NamedPlace* placeToSearch(NULL);
-							// Case Pedestrian :
-							if(	curET.getService()->getPath()->isPedestrianMode())
-							{
-								// If last element : use of the destination place
-								if(itl+1 == jl.end())
-								{
-									placeToSearch = dynamic_cast<const NamedPlace*>(object.getArrivalPlace());
-								}
-								else
-								{ // Use of the next departure place
-									placeToSearch = dynamic_cast<const NamedPlace*>((*(itl+1)).getDepartureEdge()->getHub());
-								}
-							}
-							else // Use of the PT arrival place
-							{
-								placeToSearch = dynamic_cast<const NamedPlace*>(curET.getArrivalEdge()->getHub());
-							}
-							if(!placeToSearch)
-							{	// Case of crossing with city as arrival place
-								// Todo see how the right place can be found
-								placeToSearch = placesList.rbegin()->place;
-							}
-							assert(placeToSearch);
+							const NamedPlace* placeToSearch(
+								PTRoutePlannerResult::GetNamedPlaceForArrival(
+									leg.getService()->getPath()->isPedestrianMode(),
+									leg,
+									itl+1 == jl.end() ? NULL : &(*(itl+1)),
+									*placesList.rbegin()->place
+							)	);
 
 							_displayEmptyCells(request, placesList, itSheetRow, itPlaces, *placeToSearch, i, pedestrianMode);
 
-							ptime lastDateTime(curET.getArrivalDateTime());
+							ptime lastDateTime(leg.getArrivalDateTime());
 							lastDateTime += it->getContinuousServiceRange();
 
 							_displayScheduleCell(
@@ -2166,7 +2126,7 @@ namespace synthese
 								request,
 								i,
 								pedestrianMode,
-								curET.getArrivalDateTime().time_of_day(),
+								leg.getArrivalDateTime().time_of_day(),
 								lastDateTime.time_of_day(),
 								it->getContinuousServiceRange().total_seconds() > 0,
 								true,

@@ -101,6 +101,17 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Indexation of the places used by the journeys.
 				/// Run it after each every update of _journeys (segfault issue)
+				/// <pre>
+				/// Stops D---a---a---S---S---S---S---S---a---A
+				/// Edges  X-o o-o o-o X-X o-o X-X o-X o-o o-X
+				///	first?  1   0   0   0   0   0   0   0   0
+				///	last?   0   0   0   0   0   0   0   0   1
+				///	ped.?   1   1   1   0   1   0   0   1   1  
+				///	pr.pe.? 0   1   1   1   0   1   0   0   1
+				///
+				/// Dep : first || !ped && pr.ped
+				/// Arr : !ped || last
+				/// </pre>
 				void _createOrderedPlaces();
 			//@}
 
@@ -187,14 +198,34 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the named place from one of the
-			static const geography::NamedPlace* GetNamedPlaceFromLegs(
+			static const geography::NamedPlace* GetNamedPlaceForDeparture(
+				bool isPedestrian,
 				const graph::ServicePointer* arrivalLeg,
+				const graph::ServicePointer& departureLeg,
+				const geography::NamedPlace& defaultValue
+			);
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Reads the named place from one of the
+			static const geography::NamedPlace* GetNamedPlaceForArrival(
+				bool isPedestrian,
+				const graph::ServicePointer& arrivalLeg,
 				const graph::ServicePointer* departureLeg,
-				const geography::NamedPlace* defaultValue
+				const geography::NamedPlace& defaultValue
 			);
 
 			static const geography::NamedPlace* getNamedPlace(
 				const geography::Place* place
+			);
+
+			static bool HaveToDisplayDepartureStopOnGrid(
+				graph::Journey::ServiceUses::const_iterator itl,
+				const graph::Journey::ServiceUses& jl
+			);
+
+			static bool HaveToDisplayArrivalStopOnGrid(
+				graph::Journey::ServiceUses::const_iterator itl,
+				const graph::Journey::ServiceUses& jl
 			);
 		};
 	}
