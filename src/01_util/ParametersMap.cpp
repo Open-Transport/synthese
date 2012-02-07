@@ -348,22 +348,62 @@ namespace synthese
 
 
 		void ParametersMap::outputCSV(
-			std::ostream& os
+			std::ostream& os,
+			const string& tag,
+			string separator,
+			bool colNamesInFirstRow
 		) const {
-			bool firstItem(true);
-			BOOST_FOREACH(const Map::value_type& itMap, _map)
+
+			// Get sub maps
+			const ParametersMap::SubParametersMap::mapped_type& items(getSubMaps(tag));
+
+			// Building field names list
+			set<string> colNames;
+			BOOST_FOREACH(shared_ptr<ParametersMap> item, items)
 			{
-				if(firstItem)
+				BOOST_FOREACH(const Map::value_type& itMap, item->getMap())
 				{
-					firstItem = false;
+					colNames.insert(itMap.first);
 				}
-				else
-				{
-					os << ",";
-				}
-				os << "\"" << itMap.second << "\"";
 			}
-			os << endl;
+
+			// First row with col names
+			if(colNamesInFirstRow)
+			{
+				bool firstItem(true);
+				BOOST_FOREACH(const string& colName, colNames)
+				{
+					if(firstItem)
+					{
+						firstItem = false;
+					}
+					else
+					{
+						os << separator;
+					}
+					os << "\"" << colName << "\"";
+				}
+				os << endl;
+			}
+
+			// Data output
+			BOOST_FOREACH(shared_ptr<ParametersMap> item, items)
+			{
+				bool firstItem(true);
+				BOOST_FOREACH(const Map::value_type& itMap, item->getMap())
+				{
+					if(firstItem)
+					{
+						firstItem = false;
+					}
+					else
+					{
+						os << separator;
+					}
+					os << "\"" << itMap.second << "\"";
+				}
+				os << endl;
+			}
 		}
 
 

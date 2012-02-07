@@ -219,16 +219,20 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Outputs the content of the parameters map into a CSV row.
+				/// Note : the columns are sorted in alphabetical order.
+				//////////////////////////////////////////////////////////////////////////
 				/// @param os stream to write the result on
-				/// @param tag tag of the object
-				/// @param first first call of a recursion (never define this parameter)
+				/// @param tag tag of the objects to output (must specify a sub map)
+				/// @param separator column separator (default ,)
+				/// @param colNamesInFirstRow outputs the column names list on the first row
 				/// @author Hugues Romain
 				/// @date 2011
 				/// @since 3.3.0
-				//////////////////////////////////////////////////////////////////////////
-				/// Note : the columns are sorted in alphabetical order.
 				void outputCSV(
-					std::ostream& os
+					std::ostream& os,
+					const std::string& tag,
+					std::string separator = ",",
+					bool colNamesInFirstRow = true
 				) const;
 
 
