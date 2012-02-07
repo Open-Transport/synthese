@@ -109,10 +109,18 @@ namespace synthese
 			{
 				try
 				{
-					_parent = CalendarTemplateTableSync::GetEditable(
-						map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
-						*_env
-					);
+					if(map.get<RegistryKeyType>(PARAMETER_PARENT_ID) != 0)
+					{
+						_parent = CalendarTemplateTableSync::GetEditable(
+							map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
+							*_env
+						);		
+					}
+					else
+					{
+						// Calendars root
+						_parent = boost::optional<boost::shared_ptr<CalendarTemplate> >();
+					}
 				}
 				catch(ObjectNotFoundException<CalendarTemplate>& e)
 				{
