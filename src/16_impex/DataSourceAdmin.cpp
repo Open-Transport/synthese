@@ -157,6 +157,7 @@ namespace synthese
 				date yesterday(gregorian::day_clock::local_day());
 				yesterday -= days(1);
 				stream << cleanForm.open();
+				stream << cleanForm.title("Suppression des données obsolètes");
 				stream << cleanForm.cell("Premier jour à conserver", cleanForm.getForm().getCalendarInput(CleanObsoleteDataAction::PARAMETER_FIRST_DATE, yesterday));
 				stream << cleanForm.close();
 			}
