@@ -21,6 +21,13 @@ polipo/win/polipo.exe
 
 r_kiosk-0.9.0-fx.xpi:
   https://addons.mozilla.org/en-US/firefox/addon/r-kiosk/
+  install.rdf inside the .xpi was modified to replace:
+    <em:id>{4D498D0A-05AD-4fdb-97B5-8A0AABC1FC5B}</em:id>
+  with:
+    <em:id>rkiosk@rkiosk.org/em:id>
+  See http://code.google.com/p/selenium/issues/detail?id=3339
+
+  Repackaging the .xpi also happens to fix: http://code.google.com/p/selenium/issues/detail?id=3204
 
 virtualenv.py:
   Version 1.7
