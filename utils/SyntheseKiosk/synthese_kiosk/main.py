@@ -28,7 +28,7 @@ import time
 import traceback
 
 from synthese_kiosk import SyntheseKiosk
-import system_config
+import system_install
 import utils
 
 log = logging.getLogger(__name__)
@@ -42,15 +42,23 @@ def main():
         '-v', '--verbose', action='store_true',
         help='Show logs on standard output')
     parser.add_argument(
-        '--system-config', action='store_true',
-        help='Integrate Synthese Kiosk on the system')
+        '--system-install', action='store_true',
+        help='Install Synthese Kiosk on the system')
+    parser.add_argument(
+        '--system-uninstall', action='store_true',
+        help='Uninstall Synthese Kiosk on the system')
 
     args = parser.parse_args()
     kiosk = SyntheseKiosk(args.config_dir, args.verbose)
 
-    if args.system_config:
-        system_config.install()
+    if args.system_install:
+        system_install.install(args.config_dir)
         return
+
+    if args.system_uninstall:
+        system_install.install(args.config_dir, True)
+        return
+
 
     try:
         kiosk.start()
