@@ -142,8 +142,7 @@ namespace synthese
 		private:
 			void _displayClass(
 				std::ostream& stream,
-				const std::string& className,
-				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
+				const util::ParametersMap & result,
 				const server::Request& request
 			) const;
 

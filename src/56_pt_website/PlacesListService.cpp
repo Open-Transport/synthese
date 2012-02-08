@@ -75,7 +75,6 @@ namespace synthese
 		const string PlacesListService::DATA_CITIES = "cities";
 		const string PlacesListService::DATA_CITY = "city";
 		const string PlacesListService::DATA_CLASS = "class";
-		const string PlacesListService::DATA_CONTENT = "content";
 		const string PlacesListService::DATA_KEY = "key";
 		const string PlacesListService::DATA_LEVENSHTEIN = "levenshtein";
 		const string PlacesListService::DATA_PHONETIC_SCORE = "phonetic_score";
@@ -621,56 +620,11 @@ namespace synthese
 				{
 					if(_classPage.get())
 					{
-						if(	result.hasSubMaps(DATA_CITIES) &&
-							(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
-						){
-							_displayClass(
-								stream,
-								DATA_CITY,
-								(*result.getSubMaps(DATA_CITIES).begin())->getSubMaps(DATA_CITY),
-								request
-							);
-						}
-						if(	result.hasSubMaps(DATA_STOPS) &&
-							(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
-						){
-							_displayClass(
-								stream,
-								DATA_STOP,
-								(*result.getSubMaps(DATA_STOPS).begin())->getSubMaps(DATA_STOP),
-								request
-							);
-						}
-						if(	result.hasSubMaps(DATA_ADDRESSES) &&
-							(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
-						){
-							_displayClass(
-								stream,
-								DATA_ADDRESS,
-								(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
-								request
-							);
-						}
-						if(	result.hasSubMaps(DATA_ROADS) &&
-							(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
-						){
-							_displayClass(
-								stream,
-								DATA_ROAD,
-								(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
-								request
-							);
-						}
-						if(	result.hasSubMaps(DATA_PUBLIC_PLACES) &&
-							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_ADDRESS)
-						){
-							_displayClass(
-								stream,
-								DATA_PUBLIC_PLACE,
-								(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE),
-								request
-							);
-						}
+						_displayClass(
+							stream,
+							result,
+							request
+						);
 					}
 					else
 					{
@@ -896,26 +850,74 @@ namespace synthese
 
 		void PlacesListService::_displayClass(
 			std::ostream& stream,
-			const std::string& className,
-			const std::vector<boost::shared_ptr<util::ParametersMap> >& maps,
+			const util::ParametersMap & result,
 			const server::Request& request
-		) const	{
+		) const {
 			ParametersMap classMap(getTemplateParameters());
 
-			// Content
-			stringstream content;
-			_displayItems(
-				stream,
-				className,
-				maps,
-				request
-			);
-			classMap.insert(DATA_CONTENT, content.str());
-
+			if(result.hasSubMaps(DATA_CITIES) &&
+				(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
+			){
+				stringstream cities;
+				_displayItems(
+					cities,
+					DATA_CITY,
+					(*result.getSubMaps(DATA_CITIES).begin())->getSubMaps(DATA_CITY),
+					request
+				);
+				classMap.insert(DATA_CITIES, cities.str());
+			}
+			if(result.hasSubMaps(DATA_STOPS) &&
+				(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
+			){
+				stringstream stops;
+				_displayItems(
+					stops,
+					DATA_STOP,
+					(*result.getSubMaps(DATA_STOPS).begin())->getSubMaps(DATA_STOP),
+					request
+				);
+				classMap.insert(DATA_STOPS, stops.str());
+			}
+			if(result.hasSubMaps(DATA_ADDRESSES) &&
+				(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
+			){
+				stringstream adresses;
+				_displayItems(
+					adresses,
+					DATA_ADDRESS,
+					(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
+					request
+				);
+				classMap.insert(DATA_ADDRESSES, adresses.str());
+			}
+			if(result.hasSubMaps(DATA_ROADS) &&
+				(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
+			){
+				stringstream roads;
+				_displayItems(
+					roads,
+					DATA_ROAD,
+					(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
+					request
+				);
+				classMap.insert(DATA_ROADS, roads.str());
+			}
+			if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
+				(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_PUBLIC_PLACE)
+			){
+				stringstream publicPlaces;
+				_displayItems(
+					publicPlaces,
+					DATA_PUBLIC_PLACE,
+					(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE),
+					request
+				);
+				classMap.insert(DATA_PUBLIC_PLACES, publicPlaces.str());
+			}
 			// Display
 			_classPage->display(stream, request, classMap);
 		}
-
 
 
 		PlacesListService::PlaceResult PlacesListService::getPlaceFromBestResult(
