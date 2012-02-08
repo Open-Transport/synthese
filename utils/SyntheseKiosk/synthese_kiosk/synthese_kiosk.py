@@ -467,7 +467,7 @@ class SyntheseKiosk(object):
 
         return {
             'online': self.online,
-            'logs': logs,
+            'logs': unicode(logs, errors='ignore'),
         }
 
     def refresh_displays(self, poll_if_offline=False, force_reload=False):
