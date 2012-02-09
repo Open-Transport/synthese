@@ -396,7 +396,7 @@ def tail(f, window=20):
 
 _mail_conn = None
 
-def send_mail(config, recipients, subject, body):
+def send_mail(config, recipients, subject, body, first_try=True):
     if not recipients:
         return
 
@@ -424,7 +424,14 @@ def send_mail(config, recipients, subject, body):
     msg['From'] = config.mail_sender
     msg['To'] = ', '.join(recipients)
 
-    _mail_conn.sendmail(config.mail_sender, recipients, msg.as_string())
+    try:
+        _mail_conn.sendmail(config.mail_sender, recipients, msg.as_string())
+    except smtplib.SMTPServerDisconnected, e:
+        log.warn('SMTP server disconnected: %s', e)
+        if first_try:
+            log.info('Retrying...')
+            _mail_conn = None
+            send_mail(config, recipients, subject, body, False)
 
 
 class SVNInfo(object):
