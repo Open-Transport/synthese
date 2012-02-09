@@ -2266,14 +2266,18 @@ namespace synthese
 			if(_durationPage.get())
 			{
 				stringstream durations;
+
+				size_t n(1);
 				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
 				{
-					DateTimeInterfacePage::Display(
-						durations,
-						_durationPage,
-						request,
+					ParametersMap pm(request.getFunction()->getTemplateParameters());
+					DateTimeInterfacePage::fillParametersMap(
+						pm,
 						journey.getDuration()
 					);
+					pm.insert(DATA_COLUMN_NUMBER, n);
+					++n;
+					_durationPage->display(durations, request, pm);
 				}
 				pm.insert(DATA_DURATIONS, durations.str());
 			}

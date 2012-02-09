@@ -25,6 +25,9 @@
 #ifndef SYNTHESE_DateTimeInterfacePage_H__
 #define SYNTHESE_DateTimeInterfacePage_H__
 
+#include "Request.h"
+#include "Webpage.h"
+
 #include <string>
 #include <ostream>
 #include <boost/shared_ptr.hpp>
@@ -32,15 +35,8 @@
 
 namespace synthese
 {
-	namespace server
-	{
-		class Request;
-	}
-
 	namespace cms
 	{
-		class Webpage;
-
 		/** DateTimeInterfacePage Interface Page Class.
 			@ingroup m56Pages refPages
 
@@ -64,6 +60,13 @@ namespace synthese
 			static const std::string DATA_TOTAL_MINUTES;
 
 			//////////////////////////////////////////////////////////////////////////
+			/// Date time fill params.
+			static void fillParametersMap(
+				util::ParametersMap& pm,
+				const boost::posix_time::ptime& dateTime
+			);
+
+			//////////////////////////////////////////////////////////////////////////
 			/// Date time display.
 			static void Display(
 				std::ostream& stream,
@@ -72,6 +75,12 @@ namespace synthese
 				const boost::posix_time::ptime& dateTime
 			);
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Date fill params.
+			static void fillParametersMap(
+				util::ParametersMap& pm,
+				const boost::gregorian::date& date
+			);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Date display.
@@ -82,6 +91,12 @@ namespace synthese
 				const boost::gregorian::date& date
 			);
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Time or duration fill params.
+			static void fillParametersMap(
+				util::ParametersMap& pm,
+				const boost::posix_time::time_duration& duration
+			);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Time or duration display.
@@ -91,6 +106,21 @@ namespace synthese
 				const server::Request& request,
 				const boost::posix_time::time_duration& duration
 			);
+
+		private:
+			template<class T>
+			static void Display(
+				std::ostream& stream,
+				boost::shared_ptr<const cms::Webpage> page,
+				const server::Request& request,
+				const T& dateTimeType
+			){
+				util::ParametersMap pm(request.getFunction()->getTemplateParameters());
+
+				fillParametersMap(pm,dateTimeType);
+
+				page->display(stream, request, pm);
+			}
 		};
 	}
 }
