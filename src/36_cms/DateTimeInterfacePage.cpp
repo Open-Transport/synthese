@@ -21,8 +21,6 @@
 */
 
 #include "DateTimeInterfacePage.h"
-#include "Webpage.h"
-#include "Request.h"
 
 using namespace std;
 using namespace boost;
@@ -44,25 +42,45 @@ namespace synthese
 		const string DateTimeInterfacePage::DATA_YEAR("year");
 		const string DateTimeInterfacePage::DATA_TOTAL_MINUTES("total_minutes");
 
-		void DateTimeInterfacePage::Display(
-			std::ostream& stream,
-			boost::shared_ptr<const cms::Webpage> page,
-			const server::Request& request,
+		void DateTimeInterfacePage::fillParametersMap(
+			ParametersMap& pm,
 			const boost::posix_time::ptime& dateTime
 		){
-			ParametersMap pm(request.getFunction()->getTemplateParameters());
-
 			pm.insert(DATA_YEAR, dateTime.date().year());
 			pm.insert(DATA_MONTH, dateTime.date().month());
 			pm.insert(DATA_DAY, dateTime.date().day());
 			pm.insert(DATA_HOURS, dateTime.time_of_day().hours());
 			pm.insert(DATA_MINUTES, dateTime.time_of_day().minutes());
 			pm.insert(DATA_DAY_OF_WEEK, dateTime.date().day_of_week());
-
-			page->display(stream, request, pm);
 		}
 
+		void DateTimeInterfacePage::fillParametersMap(
+			ParametersMap& pm,
+			const boost::gregorian::date& date
+		){
+			pm.insert(DATA_YEAR, date.year());
+			pm.insert(DATA_MONTH, date.month());
+			pm.insert(DATA_DAY, date.day());
+			pm.insert(DATA_DAY_OF_WEEK, date.day_of_week());
+		}
 
+		void DateTimeInterfacePage::fillParametersMap(
+			ParametersMap& pm,
+			const boost::posix_time::time_duration& duration
+		){
+			pm.insert(DATA_HOURS, duration.hours());
+			pm.insert(DATA_MINUTES, duration.minutes());
+			pm.insert(DATA_TOTAL_MINUTES, duration.total_seconds() / 60);
+		}
+
+		void DateTimeInterfacePage::Display(
+			std::ostream& stream,
+			boost::shared_ptr<const cms::Webpage> page,
+			const server::Request& request,
+			const boost::posix_time::ptime& dateTime
+		){
+			Display<boost::posix_time::ptime>(stream,page,request,dateTime);
+		}
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
@@ -70,17 +88,8 @@ namespace synthese
 			const server::Request& request,
 			const boost::gregorian::date& date
 		){
-			ParametersMap pm(request.getFunction()->getTemplateParameters());
-
-			pm.insert(DATA_YEAR, date.year());
-			pm.insert(DATA_MONTH, date.month());
-			pm.insert(DATA_DAY, date.day());
-			pm.insert(DATA_DAY_OF_WEEK, date.day_of_week());
-
-			page->display(stream, request, pm);
+			Display<boost::gregorian::date>(stream,page,request,date);
 		}
-
-
 
 		void DateTimeInterfacePage::Display(
 			std::ostream& stream,
@@ -88,12 +97,6 @@ namespace synthese
 			const server::Request& request,
 			const boost::posix_time::time_duration& duration
 		){
-			ParametersMap pm(request.getFunction()->getTemplateParameters());
-
-			pm.insert(DATA_HOURS, duration.hours());
-			pm.insert(DATA_MINUTES, duration.minutes());
-			pm.insert(DATA_TOTAL_MINUTES, duration.total_seconds() / 60);
-
-			page->display(stream, request, pm);
+			Display<boost::posix_time::time_duration>(stream,page,request,duration);
 		}
 }	}
