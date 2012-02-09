@@ -644,7 +644,7 @@ class Project(object):
 
         log.info('Sending restart mail')
         hostname = socket.gethostname()
-        LINE_COUNT = 1000
+        LINE_COUNT = 500
         try:
             last_log = utils.tail(open(self.config.log_file, 'rb'), LINE_COUNT)
         except IOError:
