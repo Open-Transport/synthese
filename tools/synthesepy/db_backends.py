@@ -183,7 +183,7 @@ class SQLiteBackend(DBBackend):
             elif self.env.platform == 'win':
                 builder = synthesepy.build.get_builder(self.env)
                 builder.update_path_for_libspatialite()
-                module_path = 'libspatialite-1.dll'
+                module_path = 'libspatialite-2.dll'
             else:
                 assert False
 
