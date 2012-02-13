@@ -67,6 +67,7 @@ set_source_files_properties(SecurityModule.gen.cpp SecurityModule.inc.cpp PROPER
 add_library(12_security ${security_SRCS})
 
 target_link_libraries(12_security
+  01_util
   05_html
   10_db
   11_interfaces

@@ -28,6 +28,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include "StringUtils.hpp"
 #include "Registry.h"
 #include "User.h"
 #include "UserException.h"
@@ -212,33 +213,7 @@ namespace synthese
 
 		void User::setRandomPassword()
 		{
-			vector<char> characters;
-			for(char c='a'; c<='z'; ++c)
-			{
-				characters.push_back(c);
-			}
-			for(char c='A'; c<='Z'; ++c)
-			{
-				characters.push_back(c);
-			}
-			for(char c='0'; c<='9'; ++c)
-			{
-				characters.push_back(c);
-			}
-
-			mt19937 rng;                 // produces randomness out of thin air
-			rng.seed(getKey() * posix_time::microsec_clock::local_time().time_of_day().total_microseconds());
-			uniform_int<> six(0,61);      // distribution that maps to 1..6
-			variate_generator<mt19937&, uniform_int<> >	die(rng, six); // glues randomness with mapping
-
-			string password;
-
-			for(int i=0; i<8; ++i)
-			{
-				password += characters[die()];
-			}
-
-			setPassword(password);
+			setPassword(StringUtils::GenerateRandomString(8));
 		}
 	}
 }

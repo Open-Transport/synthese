@@ -35,7 +35,7 @@ from . import manager
 def _get_imports_manager():
     imports_manager = flask.current_app.project.imports_manager
     # TODO: this forces a reload of all objects on every access. There should
-    # be something more efficient 
+    # be something more efficient
     imports_manager.templates = None
     return imports_manager
 

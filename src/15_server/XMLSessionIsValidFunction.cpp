@@ -103,7 +103,7 @@ namespace synthese
 			bool value (sit != ServerModule::getSessions().end());
 			if(value) try
 			{
-				sit->second->controlAndRefresh(request.getIP());
+				sit->second->checkAndRefresh(request.getIP());
 			}
 			catch(SessionException)
 			{

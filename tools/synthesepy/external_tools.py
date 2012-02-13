@@ -84,7 +84,7 @@ redirect_stderr=true
 stdout_logfile={stdout_logfile}
 stdout_logfile_maxbytes={stdout_logfile_maxbytes}
 stdout_logfile_backups={stdout_logfile_backups}
-"""         
+"""
             format_config['stdout_logfile'] = os.path.abspath(log_file)
             format_config.setdefault('stdout_logfile_maxbytes', '500MB')
             format_config.setdefault('stdout_logfile_backups', '4')
@@ -128,8 +128,8 @@ class UDFProxySupervisor(Supervisor):
     def get_log_file(self):
         return None
 
-    def get_command(self): 
-        config = self.project.config 
+    def get_command(self):
+        config = self.project.config
         return ('python {script} -ns -p {udf_proxy_port} --log-path={log_path} '
             '-t http://localhost:{synthese_port} start'.format(
             script=join(

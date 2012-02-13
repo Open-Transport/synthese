@@ -106,7 +106,7 @@ namespace synthese
 				/// Edges  X-o o-o o-o X-X o-o X-X o-X o-o o-X
 				///	first?  1   0   0   0   0   0   0   0   0
 				///	last?   0   0   0   0   0   0   0   0   1
-				///	ped.?   1   1   1   0   1   0   0   1   1  
+				///	ped.?   1   1   1   0   1   0   0   1   1
 				///	pr.pe.? 0   1   1   1   0   1   0   0   1
 				///
 				/// Dep : first || !ped && pr.ped
