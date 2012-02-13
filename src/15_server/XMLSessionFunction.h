@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace cms
+	{
+		class Webpage;
+	}
+
 	namespace server
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -43,6 +48,11 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,XMLSessionFunction>
 		{
 		public:
+			static const std::string PARAMETER_CMS_TEMPLATE_ID;
+
+		private:
+			static const std::string ATTR_SESSION_ID;
+			boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 
 		protected:
 
