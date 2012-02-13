@@ -25,58 +25,91 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "XMLSessionFunction.h"
+#include "Webpage.h"
 
 using namespace std;
+using namespace boost;
 
 namespace synthese
 {
 	using namespace util;
 	using namespace server;
 	using namespace security;
+	using namespace cms;
 
 	template<> const string util::FactorableTemplate<Function,server::XMLSessionFunction>::FACTORY_KEY("XMLSessionFunction");
 
 	namespace server
 	{
+		const string XMLSessionFunction::PARAMETER_CMS_TEMPLATE_ID("ti");
+
+		const string XMLSessionFunction::ATTR_SESSION_ID("session_id");
+
 		ParametersMap XMLSessionFunction::_getParametersMap() const
 		{
 			ParametersMap map;
+
+			if(_cmsTemplate.get())
+			{
+				map.insert(PARAMETER_CMS_TEMPLATE_ID, _cmsTemplate->getKey());
+			}
+
 			return map;
 		}
 
 		void XMLSessionFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// CMS template
+			optional<RegistryKeyType> tid(map.getOptional<RegistryKeyType>(PARAMETER_CMS_TEMPLATE_ID));
+			if(tid) try
+			{
+				_cmsTemplate = Env::GetOfficialEnv().get<Webpage>(*tid);
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such main page");
+			}
 		}
 
 
 
 		ParametersMap XMLSessionFunction::run( std::ostream& stream, const Request& request ) const
 		{
-			ParametersMap result;
+			ParametersMap pm;
 
-			stream <<
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-				"<login xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_Session_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
-				"<session>"
-			;
-			if (request.getSession())
-				stream << request.getSession()->getKey();
-
-			stream << "</session>";
-
-			if (request.getSession())
+			// CMS response
+			if(_cmsTemplate.get())
+			{
+				if (request.getSession())
+					pm.insert(ATTR_SESSION_ID, request.getSession()->getKey());
+				_cmsTemplate->display(stream, request, pm);
+			}
+			else // XML response
 			{
 				stream <<
-					"<name>" <<	request.getUser()->getFullName() << "</name>" <<
-					"<phone>" << request.getUser()->getPhone() << "</phone>" <<
-					"<email>" << request.getUser()->getEMail() << "</email>" <<
-					"<user_id>" << request.getUser()->getKey() << "</user_id>"
+					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+					"<login xsi:noNamespaceSchemaLocation=\"http://rcsmobility.com/xsd/xml_Session_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">" <<
+					"<session>"
 				;
+				if (request.getSession())
+					stream << request.getSession()->getKey();
+
+				stream << "</session>";
+
+				if (request.getSession())
+				{
+					stream <<
+						"<name>" <<	request.getUser()->getFullName() << "</name>" <<
+						"<phone>" << request.getUser()->getPhone() << "</phone>" <<
+						"<email>" << request.getUser()->getEMail() << "</email>" <<
+						"<user_id>" << request.getUser()->getKey() << "</user_id>"
+					;
+				}
+
+				stream << "</login>";
 			}
 
-			stream << "</login>";
-
-			return result;
+			return pm;
 		}
 
 
@@ -90,7 +123,7 @@ namespace synthese
 
 		std::string XMLSessionFunction::getOutputMimeType() const
 		{
-			return "text/xml";
+			return _cmsTemplate.get() ? _cmsTemplate->getMimeType() : "text/xml";
 		}
 	}
 }
