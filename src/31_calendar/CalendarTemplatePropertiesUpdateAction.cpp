@@ -114,7 +114,7 @@ namespace synthese
 						_parent = CalendarTemplateTableSync::GetEditable(
 							map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
 							*_env
-						);		
+						);
 					}
 					else
 					{

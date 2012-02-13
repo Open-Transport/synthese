@@ -316,7 +316,7 @@ class ImportRun(object):
                 continue
             level_upper = level.upper()
             lines.append(i18n.import_level_section.format(level=level_upper))
-            for message in self.messages[level]: 
+            for message in self.messages[level]:
                 lines.append(u'{0}: {1}\n'.format(
                     level_upper, unicode(message, 'utf-8', 'replace')))
 

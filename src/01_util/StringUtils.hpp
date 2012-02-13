@@ -1,6 +1,7 @@
 
-/** MimeTypes class implementation.
-	@file MimeTypes.cpp
+/** StringUtils class header.
+	@file StringUtils.hpp
+	@author Sylvain Pasche
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,16 +21,23 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MimeTypes.hpp"
+#ifndef SYNTHESE_util_StringUtils_hpp__
+#define SYNTHESE_util_StringUtils_hpp__
 
-using namespace std;
+#include <string>
 
 namespace synthese
 {
 	namespace util
 	{
-		const string MimeTypes::CSV = "text/csv";
-		const string MimeTypes::HTML = "text/html";
-		const string MimeTypes::JSON = "application/json";
-		const string MimeTypes::XML = "text/xml";
+		/** StringUtils class.
+			@ingroup m01
+		*/
+		class StringUtils
+		{
+		public:
+			static std::string GenerateRandomString(int length);
+		};
 }	}
+
+#endif // SYNTHESE_util_StringUtils_hpp__

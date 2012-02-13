@@ -1,6 +1,7 @@
 
-/** MimeTypes class implementation.
-	@file MimeTypes.cpp
+/** StringUtils class implementation.
+	@file StringUtils.cpp
+	@author Sylvain Pasche
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,16 +21,31 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "MimeTypes.hpp"
+#include "StringUtils.hpp"
 
+#include <boost/nondet_random.hpp>
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
-		const string MimeTypes::CSV = "text/csv";
-		const string MimeTypes::HTML = "text/html";
-		const string MimeTypes::JSON = "application/json";
-		const string MimeTypes::XML = "text/xml";
+		std::string StringUtils::GenerateRandomString(int length)
+		{
+			boost::random_device rng;
+
+			static const char alphanum[] =
+				"0123456789"
+				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+				"abcdefghijklmnopqrstuvwxyz";
+
+			std::string key;
+			for(int i = 0; i < length; ++i)
+			{
+				key += alphanum[rng() % (sizeof(alphanum) - 1)];
+			}
+			return key;
+		}
 }	}

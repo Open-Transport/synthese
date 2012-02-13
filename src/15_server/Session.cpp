@@ -25,8 +25,8 @@
 
 #include <stdlib.h>
 #include <boost/lexical_cast.hpp>
-#include <boost/nondet_random.hpp>
 
+#include "StringUtils.hpp"
 #include "Request.h"
 #include "Session.h"
 #include "SessionException.h"
@@ -50,7 +50,7 @@ namespace synthese
 
 		Session::Session(const std::string& ip)
 			: _ip(ip)
-			, _key(generateKey())
+			, _key(StringUtils::GenerateRandomString(Session::KEY_LENGTH))
 			, _lastUse(second_clock::local_time())
 		{
 			ServerModule::getSessions().insert(make_pair(_key, this));
@@ -58,7 +58,7 @@ namespace synthese
 
 
 
-		void Session::controlAndRefresh(const std::string& ip)
+		void Session::checkAndRefresh(const std::string& ip)
 		{
 			if (ip != _ip)
 				throw SessionException("IP has changed during the session.");
@@ -70,25 +70,6 @@ namespace synthese
 			}
 
 			_lastUse = now;
-		}
-
-
-
-		std::string Session::generateKey()
-		{
-			boost::random_device rng;
-
-			static const char alphanum[] =
-				"0123456789"
-				"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-				"abcdefghijklmnopqrstuvwxyz";
-
-			std::string key;
-			for(size_t i = 0; i < Session::KEY_LENGTH; ++i)
-			{
-				key += alphanum[rng() % (sizeof(alphanum) - 1)];
-			}
-			return key;
 		}
 
 

@@ -32,7 +32,7 @@ def install_kde(config_dir, uninstall):
     script_path = sys.argv[0]
     if 'synthese-kiosk' not in script_path:
         raise Exception('Please run script script using the synthese-kiosk executable')
-    
+
     script_path = os.path.abspath(script_path)
     script_path = os.path.normpath(script_path)
 

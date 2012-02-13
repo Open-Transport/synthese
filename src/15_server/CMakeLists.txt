@@ -40,7 +40,6 @@ ModuleClassTemplate.hpp
 ModuleException.h
 QuitAction.cpp
 QuitAction.hpp
-random_device.cpp
 Request.cpp
 Request.h
 RequestException.cpp
@@ -81,10 +80,6 @@ XMLSessionIsValidFunction.h
 )
 
 set_source_files_properties(ServerModule.gen.cpp ServerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
-
-# For compiling Boost random_device.cpp, this define has to be set.
-# To be removed once migrated to Boost 1.45.
-add_definitions(-DBOOST_RANDOM_DECL=)
 
 add_library(15_server ${server_SRCS})
 
