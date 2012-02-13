@@ -46,7 +46,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Rows list query public function.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Rows_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Rows_list
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		/// @author Gaël Sauvanet
@@ -77,13 +77,13 @@ namespace synthese
 			DBTableSync::TableId _table;
 
 		protected:
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap _getParametersMap() const;
 
 
 
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const util::ParametersMap& map);
 
@@ -96,7 +96,7 @@ namespace synthese
 			) const;
 
 		public:
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Rows_list#Response
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Rows_list#Response
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap run(
 				std::ostream& stream,

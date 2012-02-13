@@ -49,7 +49,7 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Lines list public Function class.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Lines_list
 		//////////////////////////////////////////////////////////////////////////
 		/// @author Hugues Romain
 		///	@date 2008 2011
@@ -114,7 +114,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
+			/// https://extranet.rcsmobility.com/projects/synthese/wiki/Lines_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
 			util::ParametersMap _getParametersMap() const;
@@ -123,7 +123,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Request
+			/// https://extranet.rcsmobility.com/projects/synthese/wiki/Lines_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to read
 			void _setFromParametersMap(const util::ParametersMap& map);
@@ -133,7 +133,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Output.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_list#Response
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Lines_list#Response
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap run(
 				std::ostream& stream,

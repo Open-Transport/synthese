@@ -32,7 +32,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Logs the current user out of the system.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Logout
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m15Actions refActions
 		/// @author Hugues Romain
@@ -42,12 +42,12 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Logout#Request
 			util::ParametersMap getParametersMap() const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Logout#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Logout#Request
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:

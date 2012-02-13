@@ -380,7 +380,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Exports the object into a parameters map.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_in_CMS
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_in_CMS
 				//////////////////////////////////////////////////////////////////////////
 				/// @retval the parameters map to populate
 				/// @param prefix prefix to add to the field names

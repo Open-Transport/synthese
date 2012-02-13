@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Logs a user in the system.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Login
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m15Actions refActions
 		/// @author Hugues Romain
@@ -52,14 +52,14 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Login#Request
 			util::ParametersMap getParametersMap() const;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Login#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Login#Request
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:

@@ -300,7 +300,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// PT Use rule CMS exporter.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/
 				/// TODO Wiki page
 				//////////////////////////////////////////////////////////////////////////
 				/// @param pm parameters map to populate

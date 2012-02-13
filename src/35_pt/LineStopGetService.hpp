@@ -41,7 +41,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : LineStopGetService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_stop_information
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Line_stop_information
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
@@ -71,7 +71,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -83,7 +83,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Line_stop_information#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain

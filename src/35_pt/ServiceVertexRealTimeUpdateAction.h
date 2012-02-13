@@ -42,7 +42,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// ServiceVertexRealTimeUpdateAction action class.
-		/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service
+		/// https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service
 		///	@ingroup m35Actions refActions
 		class ServiceVertexRealTimeUpdateAction:
 			public util::FactorableTemplate<server::Action, ServiceVertexRealTimeUpdateAction>
@@ -69,14 +69,14 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
-			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
+			/// https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
 			util::ParametersMap getParametersMap() const;
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
+			/// https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_vertex_served_by_a_service#Request
 			///	Removes the used parameters from the map.
 			///	@param map Parameters map to interpret
 			///	@exception ActionException Occurs when some parameters are missing or incorrect.

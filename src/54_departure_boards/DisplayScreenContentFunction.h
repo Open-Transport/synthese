@@ -51,7 +51,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Arrival/departures table generator function.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m54Functions refFunctions
 		///	@author Hugues Romain, Xavier Raffin
@@ -93,7 +93,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap _getParametersMap() const;
 
@@ -101,7 +101,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Request
 			//////////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const util::ParametersMap& map);
 
@@ -124,7 +124,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Launches the display.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response
 			//////////////////////////////////////////////////////////////////////////
 			///	@param stream stream to write the output on
 			///	@param request request which has launched the function
@@ -162,7 +162,7 @@ namespace synthese
 		public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a departure board.
-				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -207,7 +207,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.
-				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -245,7 +245,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of an intermediate or ending destination of a departure board.
-				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -285,7 +285,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a transfer destination from an intermediate stop.
-				///	https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				void _displayDepartureBoardTrandferDestination(
 					std::ostream& stream,
@@ -304,7 +304,7 @@ namespace synthese
 			public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a route planning board.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Journey-planner-based-departure-board-main-page
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Journey-planner-based-departure-board-main-page
 				void _displayRoutePlanningBoard(
 					std::ostream& stream,
 					const server::Request& request,
@@ -327,7 +327,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a route planning board.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				void _displayRoutePlanningBoardRow(
 					std::ostream& stream,
@@ -342,7 +342,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Variables sent to the cms :
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Destination-of-journey-planner-based-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				void _displayRoutePlanningBoardDestination(
 					std::ostream& stream,

@@ -41,7 +41,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	39.15 Function : WFSService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/WFS
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/WFS
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m39Functions refFunctions
 		///	@author Hugues Romain
@@ -87,7 +87,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/WFS#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/WFS#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -99,7 +99,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/https://extranet-rcsmobility.com/projects/synthese/wiki/WFS#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/WFS#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain

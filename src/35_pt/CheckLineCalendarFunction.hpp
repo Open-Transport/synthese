@@ -40,7 +40,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Checks if the specified commercial line runs every day of its calendar template.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Line_calendar_check
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Line_calendar_check
 		//////////////////////////////////////////////////////////////////////////
 		///	@author Hugues Romain
 		///	@date 2010
