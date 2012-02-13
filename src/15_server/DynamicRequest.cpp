@@ -186,7 +186,7 @@ namespace synthese
 				{
 					try
 					{
-						sit->second->controlAndRefresh(_ip);
+						sit->second->checkAndRefresh(_ip);
 						_session = sit->second;
 						_session->setSessionIdCookie(*this);
 					}

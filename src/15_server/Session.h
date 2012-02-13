@@ -58,7 +58,6 @@ namespace synthese
 
 			static const size_t KEY_LENGTH;
 			static const std::string COOKIE_SESSIONID;
-			static std::string generateKey();
 
 
 		public:
@@ -73,15 +72,15 @@ namespace synthese
 
 			//! \name Modifiers
 			//@{
-				/** Refresh the last use date after several controls.
+				/** Refresh the last use date after several checks.
 
-					The controls are :
+					The checks are :
 						- expiration of the session
 						- ip must not have changed
 
-					If a control fails, then a SessionException is thrown
+					If a check fails, then a SessionException is thrown
 				*/
-				void controlAndRefresh(const std::string& ip);
+				void checkAndRefresh(const std::string& ip);
 			//@}
 
 			//! \name Setters

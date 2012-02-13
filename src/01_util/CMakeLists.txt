@@ -34,6 +34,7 @@ ObjectNotFoundInRegistryException.h
 ParametersMap.cpp
 ParametersMap.h
 PlainCharFilter.h
+random_device.cpp
 Registrable.cpp
 Registrable.h
 Registry.h
@@ -44,6 +45,8 @@ RegistryKeyException.h
 RGBColor.cpp
 RGBColor.h
 shared_recursive_mutex.hpp
+StringUtils.cpp
+StringUtils.hpp
 T9Filter.h
 UniqueStringsSet.cpp
 UniqueStringsSet.h
@@ -62,6 +65,10 @@ ZipWriter.cpp
 ZipWriter.hpp
 concurrent/SynchronizedQueue.h
 )
+
+# For compiling Boost random_device.cpp, this define has to be set.
+# To be removed once migrated to Boost 1.45.
+add_definitions(-DBOOST_RANDOM_DECL=)
 
 if(WIN32)
   include_directories("${ICONV_INCLUDE_DIRS}")
