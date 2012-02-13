@@ -28,6 +28,7 @@
 #include <boost/random/variate_generator.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+#include "MD5Wrapper.h"
 #include "StringUtils.hpp"
 #include "Registry.h"
 #include "User.h"
@@ -45,6 +46,11 @@ namespace synthese
 	namespace util
 	{
 		template<> const string Registry<security::User>::KEY("User");
+	}
+
+
+	namespace {
+		const int SALT_LENGTH = 32;
 	}
 
 
@@ -76,6 +82,20 @@ namespace synthese
 		void User::setPassword( const std::string& password )
 		{
 			_password = password;
+
+			// Hashing the passwords with MD5 is not the best security wise.
+			// See https://extranet.rcsmobility.com/issues/15854 for discussions.
+			MD5Wrapper md5;
+			string salt(StringUtils::GenerateRandomString(SALT_LENGTH));
+			string md5Hash = md5.getHashFromString(salt + password);
+			string hash = salt + md5Hash;
+
+			setPasswordHash(hash);
+		}
+
+		void User::setPasswordHash( const std::string& passwordHash )
+		{
+			_passwordHash = passwordHash;
 		}
 
 		void User::setName( const std::string& name )
@@ -103,6 +123,11 @@ namespace synthese
 			return _password;
 		}
 
+		const std::string& User::getPasswordHash() const
+		{
+			return _passwordHash;
+		}
+
 		const std::string& User::getName() const
 		{
 			return _name;
@@ -115,7 +140,20 @@ namespace synthese
 
 		void User::verifyPassword( const std::string& password ) const
 		{
-			if (_password != password)
+			// Backward compatibility: password used to be stored unhashed.
+			if(_passwordHash == password)
+				return;
+
+			const int MD5_LENGTH = 32;
+			if(_passwordHash.length() != SALT_LENGTH + MD5_LENGTH)
+				throw UserException("Bad password");
+			string salt = _passwordHash.substr(0, SALT_LENGTH);
+
+			MD5Wrapper md5;
+			string expectedMd5Hash = md5.getHashFromString(salt + password);
+			string md5Hash(_passwordHash.substr(SALT_LENGTH, MD5_LENGTH));
+
+			if (md5Hash != expectedMd5Hash)
 				throw UserException("Bad password");
 		}
 
