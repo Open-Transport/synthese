@@ -61,6 +61,7 @@ namespace synthese
 			const Profile*	_profile;
 			std::string		_login;
 			std::string		_password;
+			std::string		_passwordHash;
 			std::string		_name;
 			std::string		_surname;
 			std::string		_address;
@@ -82,10 +83,8 @@ namespace synthese
 				void setProfile(const Profile* profile);
 				void setLogin(const std::string& login);
 
-				/** Password setter.
-					@todo handle encryption
-				*/
 				void setPassword(const std::string& password);
+				void setPasswordHash(const std::string& passwordHash);
 				void setName(const std::string& name);
 				void setSurname(const std::string& surname);
 				void setAddress(const std::string& address);
@@ -107,9 +106,11 @@ namespace synthese
 				const std::string&	getLogin() const;
 
 				/** Password getter.
-					@todo handle encryption (create a getEncryptedPassword instead)
+					The password is only available if setPassword() was called.
+					When loaded from the database, only the password hash is available.
 				*/
 				const std::string&	getPassword()			const;
+				const std::string&	getPasswordHash()		const;
 				const std::string&	getName()				const;
 				const std::string&	getSurname()			const;
 				const std::string&	getAddress()			const;

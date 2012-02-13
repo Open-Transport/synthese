@@ -45,7 +45,7 @@ namespace synthese
 			static const std::string TABLE_COL_LOGIN;
 			static const std::string TABLE_COL_NAME;
 			static const std::string TABLE_COL_SURNAME;
-			static const std::string TABLE_COL_PASSWORD;
+			static const std::string TABLE_COL_PASSWORD_HASH;
 			static const std::string TABLE_COL_PROFILE_ID;
 			static const std::string TABLE_COL_ADDRESS;
 			static const std::string TABLE_COL_POST_CODE;

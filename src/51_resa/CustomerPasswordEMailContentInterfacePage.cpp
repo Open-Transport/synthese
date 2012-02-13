@@ -64,7 +64,15 @@ namespace synthese
 			pv.push_back(user.getPhone());
 			pv.push_back(user.getEMail());
 			pv.push_back(user.getLogin());
-			pv.push_back(user.getPassword());
+			if(!user.getPassword().empty())
+			{
+				pv.push_back(user.getPassword());
+			}
+			else
+			{
+				pv.push_back("Mot de passe inchangé");
+			}
+
 
 			InterfacePage::_display(
 				stream
