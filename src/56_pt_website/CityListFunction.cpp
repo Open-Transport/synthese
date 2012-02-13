@@ -169,7 +169,7 @@ namespace synthese
 				{
 					stream <<
 						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-						"<options xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+						"<options xsi:noNamespaceSchemaLocation=\"https://extranet.rcsmobility.com/projects/synthese/repository/raw/doc/include/56_transport_website/places_list.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
 					;
 					size_t nbmatches(0);
 					BOOST_FOREACH(LexicalMatcher<shared_ptr<City> >::MatchHit it, matches)

@@ -97,7 +97,7 @@ namespace synthese
 		///	@ingroup m53Functions refFunctions
 		/// @author Hugues Romain
 		///
-		/// Usage : https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner
+		/// Usage : https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner
 		///
 		class RoutePlannerFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<false>, RoutePlannerFunction>
@@ -398,7 +398,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			///	@return Generated parameters map
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_request
 			virtual util::ParametersMap _getParametersMap() const;
 
 
@@ -406,7 +406,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			///	@param map Parameters map to interpret
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_request
 			virtual void _setFromParametersMap(const util::ParametersMap& map);
 
 
@@ -434,7 +434,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a result on a webpage.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Main-page
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Main-page
 			//////////////////////////////////////////////////////////////////////////
 			/// @author Hugues Romain
 			/// @date 2010
@@ -488,7 +488,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display a row on a web page.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Schedules-sheet-row
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Schedules-sheet-row
 			//////////////////////////////////////////////////////////////////////////
 			/// @param stream Stream to write on
 			/// @param request current request
@@ -513,7 +513,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of schedule sheet cell.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Schedules-sheet-cell
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Schedules-sheet-cell
 			//////////////////////////////////////////////////////////////////////////
 			/// @param stream Stream to write on
 			/// @param request current request
@@ -559,7 +559,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of schedule sheet lines list cell.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Line-cell
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Line-cell
 			//////////////////////////////////////////////////////////////////////////
 			///	@param stream Stream to write on
 			///	@param request current request
@@ -577,7 +577,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of schedule sheet lines warning cell.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Warning-cell
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Warning-cell
 			//////////////////////////////////////////////////////////////////////////
 			///	@param stream Stream to write on
 			///	@param request current request
@@ -595,7 +595,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Journey display.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey
 			//////////////////////////////////////////////////////////////////////////
 			/// @param stream Stream to write on
 			///	@param page page to use to display
@@ -621,7 +621,7 @@ namespace synthese
 
 
 			/** Display of stop cell.
-				See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-stop
+				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-stop
 				@param stream Stream to write on
 				@param isItArrival (0) true if the stop is used as an arrival, false else
 				@param alarm (1/2) Alert (1=message, 2=level)
@@ -650,7 +650,7 @@ namespace synthese
 
 
 			/** Display of junction cell.
-				See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
+				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-pedestrian-chunk
 				@param stream Stream to display on
 				@param page page to use to display
 				@param request current request
@@ -676,7 +676,7 @@ namespace synthese
 
 
 			/** Display of service cell.
-				See https://extranet-rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-service-use
+				See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Journey-service-use
 				@param stream Stream to write on
 				@param page page to use to display
 				@param request current request

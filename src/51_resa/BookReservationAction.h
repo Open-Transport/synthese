@@ -64,7 +64,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Reservation booking action.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservation_booking
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m51Actions refActions
 		class BookReservationAction:
@@ -135,7 +135,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservation_booking
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
 			util::ParametersMap getParametersMap() const;
@@ -145,7 +145,7 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			///	Conversion from generic parameters map to attributes.
 			///	Removes the used parameters from the map.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservation_booking
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			///	@exception ActionException Occurs when some parameters are missing or incorrect.
@@ -156,7 +156,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Action to run, defined by each subclass.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Reservation_booking
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservation_booking
 			//////////////////////////////////////////////////////////////////////////
 			/// @param request the request which launched the action
 			void run(server::Request& request);

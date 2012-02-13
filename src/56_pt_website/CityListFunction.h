@@ -47,7 +47,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// City list query public function.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		/// @author Hugues Romain
@@ -81,13 +81,13 @@ namespace synthese
 			const CoordinatesSystem* _coordinatesSystem;
 
 		protected:
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap _getParametersMap() const;
 
 
 
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			void _setFromParametersMap(const util::ParametersMap& map);
 
@@ -102,7 +102,7 @@ namespace synthese
 		public:
 			CityListFunction(): _atLeastAStop(false) {}
 
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Cities_list#Response
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Response
 			//////////////////////////////////////////////////////////////////////////
 			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 

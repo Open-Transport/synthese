@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : StrLenFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/String_manipulation#String-length
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/String_manipulation#String-length
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2010

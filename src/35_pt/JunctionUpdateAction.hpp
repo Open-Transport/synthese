@@ -39,7 +39,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : JunctionUpdateAction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Junction_update
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
@@ -67,7 +67,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Junction_update#Request
 			/// @return The generated parameters map
 			util::ParametersMap getParametersMap() const;
 
@@ -75,7 +75,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Junction_update#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Junction_update#Request
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
 			void _setFromParametersMap(const util::ParametersMap& map);

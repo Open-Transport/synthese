@@ -36,7 +36,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageFormFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Form
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
@@ -66,7 +66,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Form#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -77,7 +77,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Form#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Form#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain

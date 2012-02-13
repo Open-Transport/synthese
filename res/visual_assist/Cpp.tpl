@@ -2529,7 +2529,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	$Module_number$.15 Function : $FILE_BASE$.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/$Wiki_page$
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m$Module_number$Functions refFunctions
 		///	@author %USERNAME%
@@ -2553,7 +2553,7 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author %USERNAME%
@@ -2565,7 +2565,7 @@ namespace synthese
 			
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/$Wiki_page$#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author %USERNAME%

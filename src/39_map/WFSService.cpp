@@ -271,12 +271,12 @@ namespace synthese
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<wfs:FeatureCollection	" <<
-						"xmlns=\"https://extranet-rcsmobility.com/projects/synthese\" " <<
-						"xmlns:synthese=\"https://extranet-rcsmobility.com/projects/synthese\" " <<
+						"xmlns=\"https://extranet.rcsmobility.com/projects/synthese\" " <<
+						"xmlns:synthese=\"https://extranet.rcsmobility.com/projects/synthese\" " <<
 						"xmlns:wfs=\"http://www.opengis.net/wfs\" " <<
 						"xmlns:gml=\"http://www.opengis.net/gml\" " <<
 						"xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " <<
-						"xsi:schemaLocation=\"https://extranet-rcsmobility.com/projects/synthese http://" << request.getHostName() << request.getClientURL() << "?" << Request::PARAMETER_SERVICE << "=" << FACTORY_KEY << "&amp;" << PARAMETER_REQUEST << "=" << VALUE_REQUEST_DescribeFeatureType << "&amp;" << PARAMETER_TYPENAME << "=";
+						"xsi:schemaLocation=\"https://extranet.rcsmobility.com/projects/synthese http://" << request.getHostName() << request.getClientURL() << "?" << Request::PARAMETER_SERVICE << "=" << FACTORY_KEY << "&amp;" << PARAMETER_REQUEST << "=" << VALUE_REQUEST_DescribeFeatureType << "&amp;" << PARAMETER_TYPENAME << "=";
 				bool first(true);
 				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
@@ -311,7 +311,7 @@ namespace synthese
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<schema " <<
-						"xmlns:synthese=\"https://extranet-rcsmobility.com/projects/synthese\" " <<
+						"xmlns:synthese=\"https://extranet.rcsmobility.com/projects/synthese\" " <<
 						"xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" " <<
 						"xmlns=\"http://www.w3.org/2001/XMLSchema\" " <<
 						"xmlns:gml=\"http://www.opengis.net/gml\" " <<
@@ -444,7 +444,7 @@ namespace synthese
 				BOOST_FOREACH(const shared_ptr<WFSType>& type, _types)
 				{
 					stream <<
-						"<wfs:FeatureType xmlns:synthese=\"https://extranet-rcsmobility.com/projects/synthese\">" <<
+						"<wfs:FeatureType xmlns:synthese=\"https://extranet.rcsmobility.com/projects/synthese\">" <<
 						"<wfs:Name>synthese:" << type->getFactoryKey() << "Type</wfs:Name>" <<
 						"<wfs:Title>" << type->getFactoryKey() << "</wfs:Title>" <<
 						"<wfs:Abstract>" << type->getFactoryKey() << "</wfs:Abstract>" <<

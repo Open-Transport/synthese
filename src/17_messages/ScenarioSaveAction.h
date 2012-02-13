@@ -49,7 +49,7 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////
 		/// Scenario parameters update action class.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Updating_a_scenario
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Actions refActions
 		/// @author Hugues Romain
@@ -115,7 +115,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @author Hugues Romain
 			util::ParametersMap getParametersMap() const;
@@ -124,7 +124,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Updating_a_scenario#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @author Hugues Romain
 			///	@exception ActionException Occurs when some parameters are missing or incorrect.

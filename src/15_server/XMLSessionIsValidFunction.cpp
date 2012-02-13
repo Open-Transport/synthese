@@ -122,7 +122,7 @@ namespace synthese
 			{
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<" << TAG_VALID_SESSION << " xsi:noNamespaceSchemaLocation=\"https://extranet-rcsmobility.com/projects/synthese/repository/raw/src/15_server/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
+					"<" << TAG_VALID_SESSION << " xsi:noNamespaceSchemaLocation=\"https://extranet.rcsmobility.com/projects/synthese/repository/raw/src/15_server/xml_session_is_valid_function.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"" <<
 					" " << ATTR_ID << "=\"" << _sessionIdToCheck << "\" " << ATTR_VALID << "=\"" << (value ? "true" : "false") << "\" />"
 				;
 			}

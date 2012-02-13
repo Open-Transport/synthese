@@ -43,7 +43,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	17.15 Function : ScenariosListFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m17Functions refFunctions
 		///	@author Hugues Romain
@@ -70,7 +70,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -81,7 +81,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
@@ -98,7 +98,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a sent scenario.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Sent-scenario
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Sent-scenario
 			void _displaySentScenario(
 				std::ostream& stream,
 				const server::Request& request,
@@ -110,7 +110,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display of a sent scenario.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Scenarii_list#Scenario-template
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Scenarii_list#Scenario-template
 			void _displayScenarioTemplate(
 				std::ostream& stream,
 				const server::Request& request,

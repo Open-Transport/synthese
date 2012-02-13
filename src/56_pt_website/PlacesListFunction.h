@@ -47,7 +47,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Places list query public function.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Places_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Places_list
 		//////////////////////////////////////////////////////////////////////////
 		/// @author Hugues Romain
 		///	@date 2007

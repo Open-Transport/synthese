@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	32.15 Function : GetMapOpenLayersConstructorService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m32Functions refFunctions
 		///	@author Hugues Romain
@@ -49,7 +49,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -61,7 +61,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Get_OpenLayers_Constructor#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain

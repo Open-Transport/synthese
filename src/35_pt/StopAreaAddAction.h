@@ -64,7 +64,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_area_creation
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_area_creation
 			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			util::ParametersMap getParametersMap() const;
@@ -73,7 +73,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_area_creation
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_area_creation
 			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.

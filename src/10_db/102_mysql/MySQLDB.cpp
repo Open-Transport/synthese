@@ -245,7 +245,7 @@ namespace synthese
 				Log::GetInstance().warn(
 					"Couldn't find the notify_synthese_http function. Direct "
 					"database modifications won't be supported (and could "
-					"corrupt data). See https://extranet-rcsmobility.com/projects/synthese/wiki/MySQL_Installation "
+					"corrupt data). See https://extranet.rcsmobility.com/projects/synthese/wiki/MySQL_Installation "
 					"for instructions."
 				);
 			}

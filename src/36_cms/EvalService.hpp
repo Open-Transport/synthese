@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : EvalService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/EvalService
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/EvalService
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m36Functions refFunctions
 		///	@author Hugues Romain
@@ -55,7 +55,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/EvalService#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/EvalService#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -67,7 +67,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/EvalService#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/EvalService#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
