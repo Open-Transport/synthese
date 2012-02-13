@@ -38,7 +38,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 16.15 Import service.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Import
 		//////////////////////////////////////////////////////////////////////////
 		/// @author Hugues Romain
 		///	@date 2009
@@ -68,7 +68,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Import#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
 			util::ParametersMap _getParametersMap() const;
@@ -77,7 +77,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads each parameter and run the parsing of the input files.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Import#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Import#Request
 			/// At the end of the parsing, the temporary environment used by the function
 			/// is cleaned in order to avoid memory overload.
 			//////////////////////////////////////////////////////////////////////////

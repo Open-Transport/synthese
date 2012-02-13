@@ -44,7 +44,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	54.15 Function : GetDepartureBoardsService.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure_boards_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_boards_list
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m54Functions refFunctions
 		///	@author Hugues Romain
@@ -71,7 +71,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure boards list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure boards list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -83,7 +83,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Departure boards list#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure boards list#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain

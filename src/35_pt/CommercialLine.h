@@ -221,7 +221,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Line CMS exporter.
-				/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Lines_in_CMS
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Lines_in_CMS
 				//////////////////////////////////////////////////////////////////////////
 				/// @param pm parameters map to populate
 				/// @param prefix prefix to add to the field names

@@ -52,7 +52,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : Physical stop creation.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_creation
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
@@ -90,7 +90,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Generates a generic parameters map from the action parameters.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_creation
 			//////////////////////////////////////////////////////////////////////////
 			/// @return The generated parameters map
 			util::ParametersMap getParametersMap() const;
@@ -99,7 +99,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Reads the parameters of the action on a generic parameters map.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_creation
 			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.
@@ -110,7 +110,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
-			/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_creation
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_creation
 			//////////////////////////////////////////////////////////////////////////
 			/// @param request the request which has launched the action
 			void run(server::Request& request);

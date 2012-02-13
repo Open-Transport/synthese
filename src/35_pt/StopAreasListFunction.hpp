@@ -51,7 +51,7 @@ namespace synthese
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Stop Area list public Function class.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Stop_areas_list
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Stop_areas_list
 		//////////////////////////////////////////////////////////////////////////
 		/// @author Xavier Raffin, Hugues Romain
 		///	@date 2008

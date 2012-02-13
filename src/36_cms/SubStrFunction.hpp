@@ -34,7 +34,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : SubStrFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/String_manipulation#Substring
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/String_manipulation#Substring
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain

@@ -46,7 +46,7 @@ namespace synthese
 	{
 		//////////////////////////////////////////////////////////////////////////
 		///	Action class : real time update of service schedules.
-		///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service
+		///	See https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35Actions refActions
 		class RealTimeVehicleUpdateAction:
@@ -81,7 +81,7 @@ namespace synthese
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
+			///	See https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @return Generated parameters map
 			util::ParametersMap getParametersMap() const;
@@ -90,7 +90,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			///	See https://extranet-rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
+			///	See https://extranet.rcsmobility.com/projects/synthese/wiki/Real_time_update_of_scheduled_service#Request
 			//////////////////////////////////////////////////////////////////////////
 			/// @param map Parameters map to interpret
 			/// @exception ActionException Occurs when some parameters are missing or incorrect.

@@ -44,7 +44,7 @@ namespace synthese
 			@date 2010
 			@ingroup m35Functions refFunctions
 
-			See https://extranet-rcsmobility.com/projects/synthese/wiki/Networks_list
+			See https://extranet.rcsmobility.com/projects/synthese/wiki/Networks_list
 		*/
 		class PTNetworksListFunction:
 			public util::FactorableTemplate<server::Function,PTNetworksListFunction>

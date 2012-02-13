@@ -37,7 +37,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	36.15 Function : WebPageLinkFunction.
-		/// See https://extranet-rcsmobility.com/projects/synthese/wiki/Links
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Links
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m56Functions refFunctions
 		///	@author Hugues Romain
