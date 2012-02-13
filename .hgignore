@@ -1,3 +1,4 @@
+^.*\kpf$
 ^\.project$
 ^\.cproject$
 ^\.pydevproject$
