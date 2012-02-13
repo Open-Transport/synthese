@@ -2590,7 +2590,7 @@ namespace synthese
 			/// @param request the current request
 			/// @author %USERNAME%
 			/// @date $YEAR$
-			virtual void run(std::ostream& stream, const server::Request& request) const;
+			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
 			
 			
 			
@@ -2678,11 +2678,13 @@ namespace synthese
 			// 	optional<string> c = map.getOptional<string>(PARAM_SEARCH_XXX);
 		}
 
-		void $FILE_BASE$::run(
+		ParametersMap $FILE_BASE$::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
+			ParametersMap map;
 			/// @todo Fill it
+			return map;
 		}
 		
 		
