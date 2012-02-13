@@ -42,7 +42,6 @@
 #include "Env.h"
 #include "PlainCharFilter.h"
 #include "AlphanumericFilter.h"
-#include "MD5Wrapper.h"
 #include "DisplayScreenContentFunction.h"
 #include "URI.hpp"
 
@@ -213,7 +212,6 @@ namespace synthese
 				}
 
 				// Insertion of the users
-				MD5Wrapper md5;
 				UserTableSync::SearchResult users(
 					UserTableSync::Search(env)
 				);
@@ -232,7 +230,7 @@ namespace synthese
 							decodeObjectId(user->getKey()) << ",1,1," <<
 							Conversion::ToDBString(_ConvertToNagiosName(user->getFullName())) << "," <<
 							Conversion::ToDBString(user->getLogin()) << "," <<
-							Conversion::ToDBString(md5.getHashFromString(user->getPassword())) << "," <<
+							Conversion::ToDBString(user->getPasswordHash()) << "," <<
 							"'fr_FR','n','n'," <<
 							Conversion::ToDBString(user->getEMail()) << "," << GENERATED_BY_SYNTHESE << ",'1','0'," <<
 							"'txt','1','local'" <<

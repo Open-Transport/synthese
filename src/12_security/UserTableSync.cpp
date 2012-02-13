@@ -54,7 +54,8 @@ namespace synthese
 		const string UserTableSync::TABLE_COL_NAME = "name";
 		const string UserTableSync::TABLE_COL_SURNAME = "surname";
 		const string UserTableSync::TABLE_COL_LOGIN = "login";
-		const string UserTableSync::TABLE_COL_PASSWORD = "password";
+		// TODO: rename column to password_hash, once schema migration is possible.
+		const string UserTableSync::TABLE_COL_PASSWORD_HASH = "password";
 		const string UserTableSync::TABLE_COL_PROFILE_ID = "profile_id";
 		const string UserTableSync::TABLE_COL_ADDRESS = "address";
 		const string UserTableSync::TABLE_COL_POST_CODE = "post_code";
@@ -80,7 +81,7 @@ namespace synthese
 			DBTableSync::Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_PASSWORD, SQL_TEXT),
+			DBTableSync::Field(UserTableSync::TABLE_COL_PASSWORD_HASH, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
 			DBTableSync::Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
 			DBTableSync::Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
@@ -109,7 +110,7 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			user->setPassword(rows->getText ( UserTableSync::TABLE_COL_PASSWORD));
+			user->setPasswordHash(rows->getText ( UserTableSync::TABLE_COL_PASSWORD_HASH));
 			user->setName(rows->getText ( UserTableSync::TABLE_COL_NAME));
 			user->setSurname(rows->getText ( UserTableSync::TABLE_COL_SURNAME));
 			user->setLogin(rows->getText ( UserTableSync::TABLE_COL_LOGIN));
@@ -162,7 +163,7 @@ namespace synthese
 			query.addField(user->getName());
 			query.addField(user->getSurname());
 			query.addField(user->getLogin());
-			query.addField(user->getPassword());
+			query.addField(user->getPasswordHash());
 			query.addField(user->getProfile() ? user->getProfile()->getKey() : RegistryKeyType(0));
 			query.addField(user->getAddress());
 			query.addField(user->getPostCode());
