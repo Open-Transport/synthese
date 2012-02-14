@@ -339,8 +339,9 @@ namespace synthese
 		){
 			return
 				itl == jl.begin() ||
-				(	!itl->getService()->getPath()->isPedestrianMode() &&
-					(itl-1)->getService()->getPath()->isPedestrianMode()
+				!itl->getService()->getPath()->isPedestrianMode() ||
+				(	itl->getService()->getPath()->isPedestrianMode() &&
+					!(itl-1)->getService()->getPath()->isPedestrianMode()
 				)
 			;
 		}
@@ -353,7 +354,10 @@ namespace synthese
 		){
 			return
 				!itl->getService()->getPath()->isPedestrianMode() ||
-				itl+1 == jl.end()
+				itl+1 == jl.end() ||
+				(	itl->getService()->getPath()->isPedestrianMode() &&
+					!(itl+1)->getService()->getPath()->isPedestrianMode()
+				)
 			;
 		}
 
