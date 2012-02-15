@@ -158,6 +158,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_STOP_PAGE("map_stop_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
+		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -176,6 +177,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_STOP = "max_warning_level_on_stop";
 		const string RoutePlannerFunction::DATA_MAX_WARNING_LEVEL_ON_LINE = "max_warning_level_on_line";
 		const string RoutePlannerFunction::DATA_HAS_RESERVATION = "has_reservation";
+		const string RoutePlannerFunction::DATA_RESULT_ROWS = "result_rows";
 
 		const string RoutePlannerFunction::DATA_INTERNAL_DATE("internal_date");
 		const string RoutePlannerFunction::DATA_ORIGIN_CITY_TEXT("origin_city_text");
@@ -206,6 +208,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_IS_FIRST_ROW = "is_first_row";
 		const string RoutePlannerFunction::DATA_IS_LAST_ROW = "is_last_row";
 		const string RoutePlannerFunction::DATA_COLUMN_NUMBER("column_number");
+		const string RoutePlannerFunction::DATA_ROW_NUMBER("row_number");
 		const string RoutePlannerFunction::DATA_IS_FOOT("is_foot");
 		const string RoutePlannerFunction::DATA_FIRST_TIME("first_time");
 		const string RoutePlannerFunction::DATA_LAST_TIME("last_time");
@@ -284,8 +287,7 @@ namespace synthese
 		const string RoutePlannerFunction::DATA_BIKE_FILTER_STATUS("bike_filter_status");
 		const string RoutePlannerFunction::DATA_BIKE_PLACES_NUMBER("bike_places_number");
 		const string RoutePlannerFunction::DATA_WKT("wkt");
-
-
+		const string RoutePlannerFunction::DATA_LINE_MARKERS("line_markers");
 
 		RoutePlannerFunction::RoutePlannerFunction(
 		):	_startDate(not_a_date_time),
@@ -910,6 +912,20 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such warning check page : "+ e.getMessage());
+			}
+
+			// Result row page
+			try
+			{
+				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_RESULT_ROW_PAGE));
+				if(id)
+				{
+					_resultRowPage = Env::GetOfficialEnv().get<Webpage>(*id);
+				}
+			}
+			catch (ObjectNotFoundException<Webpage>& e)
+			{
+				throw RequestException("No such result row page : "+ e.getMessage());
 			}
 		}
 
@@ -2257,6 +2273,40 @@ namespace synthese
 				pm.insert(DATA_WARNINGS, warnings.str());
 			}
 
+			// Result row
+			if(_resultRowPage.get())
+			{
+				stringstream resultRows;
+
+				size_t n(1);
+				BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, object.getJourneys())
+				{
+					// Loop on each leg
+					const Journey::ServiceUses& jl(journey.getServiceUses());
+
+					ptime lastDateArrivalTime((jl.end()-1)->getArrivalDateTime());
+					lastDateArrivalTime += journey.getContinuousServiceRange();
+
+					ptime lastDateDepartureTime(jl.begin()->getDepartureDateTime());
+					lastDateDepartureTime += journey.getContinuousServiceRange();
+
+					_displayResultRow(
+						resultRows,
+						request,
+						n,
+						journey,
+						(jl.end()-1)->getArrivalDateTime().time_of_day(),
+						lastDateArrivalTime.time_of_day(),
+						jl.begin()->getDepartureDateTime().time_of_day(),
+						lastDateDepartureTime.time_of_day(),
+						journey.getContinuousServiceRange().total_seconds() > 0
+					);
+					++n;
+				}
+
+				pm.insert(DATA_RESULT_ROWS, resultRows.str());
+			}
+
 			// Warning levels
 			PTRoutePlannerResult::MaxAlarmLevels alarmLevels(object.getMaxAlarmLevels());
 			pm.insert(DATA_MAX_WARNING_LEVEL_ON_LINE, alarmLevels.lineLevel);
@@ -2517,6 +2567,85 @@ namespace synthese
 		}
 
 
+		void RoutePlannerFunction::_displayResultRow(
+			std::ostream& stream,
+			const server::Request& request,
+			std::size_t rowNumber,
+			const graph::Journey& journey,
+			const boost::posix_time::time_duration& firstArrivalTime,
+			const boost::posix_time::time_duration& lastArrivalTime,
+			const boost::posix_time::time_duration& firstDepartureTime,
+			const boost::posix_time::time_duration& lastDepartureTime,
+			bool isItContinuousService
+		) const {
+
+			// Precondition check
+			assert(_resultRowPage.get());
+
+			// Declarations
+			ParametersMap pm(getTemplateParameters());
+
+			// Display Lines used
+			if(_lineMarkerPage.get())
+			{
+				stringstream lineMarkers;
+
+				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
+				{
+					if(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
+					){
+						LineMarkerInterfacePage::Display(
+							lineMarkers,
+							_lineMarkerPage,
+							request,
+							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
+						);
+					}
+				}
+
+				pm.insert(DATA_LINE_MARKERS, lineMarkers.str());
+			}
+			{
+				stringstream s;
+				if(!firstArrivalTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << firstArrivalTime.hours() << ":" << setfill('0') << setw(2) << firstArrivalTime.minutes();
+				}
+				pm.insert(DATA_FIRST_ARRIVAL_TIME, s.str());
+			}{
+				stringstream s;
+				if(!lastArrivalTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << lastArrivalTime.hours() << ":" << setfill('0') << setw(2) << lastArrivalTime.minutes();
+				}
+				pm.insert(DATA_LAST_ARRIVAL_TIME, s.str());
+			}
+			{
+				stringstream s;
+				if(!firstDepartureTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << firstDepartureTime.hours() << ":" << setfill('0') << setw(2) << firstDepartureTime.minutes();
+				}
+				pm.insert(DATA_FIRST_DEPARTURE_TIME, s.str());
+			}{
+				stringstream s;
+				if(!lastDepartureTime.is_not_a_date_time())
+				{
+					s << setfill('0') << setw(2) << lastDepartureTime.hours() << ":" << setfill('0') << setw(2) << lastDepartureTime.minutes();
+				}
+				pm.insert(DATA_LAST_DEPARTURE_TIME, s.str());
+			}
+			pm.insert(DATA_IS_CONTINUOUS_SERVICE, isItContinuousService);
+			pm.insert(DATA_ROW_NUMBER, rowNumber);
+
+			// Insert HOURS and MINUTES duration
+			DateTimeInterfacePage::fillParametersMap(
+						pm,
+						journey.getDuration()
+			);
+
+			_resultRowPage->display(stream ,request, pm);
+		}
 
 		void RoutePlannerFunction::_displayWarningCell(
 			std::ostream& stream,
