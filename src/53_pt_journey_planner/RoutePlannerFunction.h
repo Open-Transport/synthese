@@ -156,6 +156,7 @@ namespace synthese
 			static const std::string PARAMETER_MAP_SERVICE_PAGE;
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
+			static const std::string PARAMETER_RESULT_ROW_PAGE;
 
 		private:
 			static const std::string DATA_LINES;
@@ -171,6 +172,7 @@ namespace synthese
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_STOP;
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_LINE;
 			static const std::string DATA_HAS_RESERVATION;
+			static const std::string DATA_RESULT_ROWS;
 
 			//! @name Cells
 			//@{
@@ -294,6 +296,12 @@ namespace synthese
 				static const std::string DATA_WKT;
 			//@}
 
+			//! @name Result row
+			//@{
+				static const std::string DATA_LINE_MARKERS;
+				static const std::string DATA_ROW_NUMBER;
+			//@}
+
 			typedef std::vector<boost::shared_ptr<std::ostringstream> > PlacesContentVector;
 
 		private:
@@ -350,6 +358,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _mapStopCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapServiceCellPage;
 				boost::shared_ptr<const cms::Webpage> _mapJunctionPage;
+				boost::shared_ptr<const cms::Webpage> _resultRowPage;
 			//@}
 
 			/// @name Result
@@ -591,6 +600,33 @@ namespace synthese
 				const graph::Journey& journey
 			) const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Display of route planning result row.
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner_CMS_response#Result-row
+			//////////////////////////////////////////////////////////////////////////
+			///	@param stream Stream to write on
+			///	@param request current request
+			///	@param rowNumber Row rank from top to bottom
+			///	@param journey The journey to describe
+			/// @param firstArrivalTime first arrival time of journey
+			/// @param lastArrivalTime last arrival time of journey (if not continuous same value than firstArrivalTime)
+			/// @param firstDepartureTime first departure time of journey
+			/// @param lastDepartureTime last departure time of journey (if not continuous same value than firstArrivalTime)
+			/// @param isItContinuousService Is the journey contains only continuous services ?
+			/// @pre _resultRowPage is not null
+			void _displayResultRow(
+				std::ostream& stream,
+				const server::Request& request,
+				std::size_t rowNumber,
+				const graph::Journey& journey,
+				const boost::posix_time::time_duration& firstArrivalTime,
+				const boost::posix_time::time_duration& lastArrivalTime,
+				const boost::posix_time::time_duration& firstDepartureTime,
+				const boost::posix_time::time_duration& lastDepartureTime,
+				bool isItContinuousService
+			) const;
 
 
 			//////////////////////////////////////////////////////////////////////////
