@@ -25,6 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "TransportNetworkRight.h"
 #include "Request.h"
 #include "ScheduledService.h"
 #include "StopPoint.hpp"
@@ -229,7 +230,11 @@ namespace synthese
 
 		bool ServiceVertexRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
+#if 1
 			return true;
+#else // See https://extranet.rcsmobility.com/issues/16043
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+#endif
 		}
 
 
