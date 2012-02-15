@@ -30,6 +30,7 @@
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
 #include "DBTransaction.hpp"
+#include "EdgeProjector.hpp"
 #include "ImportFunction.h"
 #include "PropertiesHTMLTable.h"
 #include "PublicPlaceTableSync.h"
@@ -54,6 +55,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace algorithm;
 	using namespace road;
 	using namespace util;
 	using namespace impex;
@@ -447,26 +449,36 @@ namespace synthese
 					}
 					MainRoadChunk* roadChunk = itRoadChunk->second;
 
-					// Metric offset + check of house number consistency
-					MetricOffset metricOffset(
-						houseNumber	?
-						roadChunk->getHouseNumberMetricOffset(*houseNumber) :
-						roadChunk->getMetricOffset()
-					);
+					EdgeProjector<MainRoadChunk*>::From paths;
+					paths.push_back(roadChunk);
+					EdgeProjector<MainRoadChunk*> projector(paths, 10000);
+					try
+					{
+						EdgeProjector<MainRoadChunk*>::PathNearby projection(
+							projector.projectEdge(*geometry->getCoordinate())
+						);
 
-					// Import
-					RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
-						publicPlaceEntrances,
-						code,
-						optional<const string&>(),
-						metricOffset,
-						houseNumber,
-						*roadChunk,
-						*publicPlace,
-						_dataSource,
-						_env,
-						os
-					);
+						MetricOffset metricOffset(
+							projection.get<2>()
+						);
+
+						// Import
+						RoadFileFormat::CreateOrUpdatePublicPlaceEntrance(
+							publicPlaceEntrances,
+							code,
+							optional<const string&>(),
+							metricOffset,
+							houseNumber,
+							*roadChunk,
+							*publicPlace,
+							_dataSource,
+							_env,
+							os
+						);
+					}
+					catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+					{
+					}
 				}
 			}
 
