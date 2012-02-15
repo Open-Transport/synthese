@@ -90,6 +90,43 @@ namespace synthese
 
 
 
+		void DynamicRequest::_setupSession()
+		{
+			string sid(_parametersMap.getDefault<string>(Request::PARAMETER_SESSION));
+			if(sid.empty())
+			{
+				_session = NULL;
+				return;
+			}
+
+			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(sid);
+			if(sit != ServerModule::getSessions().end())
+			{
+				_session = sit->second;
+			}
+			else
+			{
+				// Try to create a session from a "user:password" sid.
+				_session = Session::MaybeCreateFromUserPassword(sid, _ip);
+				if(!_session)
+				{
+					return;
+				}
+			}
+
+			try
+			{
+				_session->checkAndRefresh(_ip);
+				_session->setSessionIdCookie(*this);
+			}
+			catch (SessionException e)
+			{
+				deleteSession();
+			}
+		}
+
+
+
 		DynamicRequest::DynamicRequest( const HTTPRequest& httpRequest ):
 			Request()
 		{
@@ -170,32 +207,7 @@ namespace synthese
 			}
 
 			// Session
-			string sid(_parametersMap.getDefault<string>(Request::PARAMETER_SESSION));
-			if (sid.empty())
-			{
-				_session = NULL;
-			}
-			else
-			{
-				ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(sid);
-				if (sit == ServerModule::getSessions().end())
-				{
-					_session = NULL;
-				}
-				else
-				{
-					try
-					{
-						sit->second->checkAndRefresh(_ip);
-						_session = sit->second;
-						_session->setSessionIdCookie(*this);
-					}
-					catch (SessionException e)
-					{
-						deleteSession();
-					}
-				}
-			}
+			_setupSession();
 
 			// Action name
 			std::string actionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_ACTION));

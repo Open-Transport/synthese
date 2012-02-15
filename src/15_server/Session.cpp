@@ -32,6 +32,8 @@
 #include "SessionException.h"
 #include "ServerModule.h"
 #include "User.h"
+#include "UserTableSync.h"
+#include "UserException.h"
 
 using namespace boost;
 using namespace std;
@@ -48,9 +50,9 @@ namespace synthese
 		const string Session::COOKIE_SESSIONID = "sid";
 
 
-		Session::Session(const std::string& ip)
+		Session::Session(const string& ip, const string& key)
 			: _ip(ip)
-			, _key(StringUtils::GenerateRandomString(Session::KEY_LENGTH))
+			, _key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key)
 			, _lastUse(second_clock::local_time())
 		{
 			ServerModule::getSessions().insert(make_pair(_key, this));
@@ -112,6 +114,45 @@ namespace synthese
 				_user != NULL &&
 				_user->getProfile() != NULL
 			;
+		}
+
+
+
+		Session* Session::MaybeCreateFromUserPassword(const string& sid, const string& ip)
+		{
+			size_t colonIndex = sid.find(":");
+			if(colonIndex == string::npos)
+				return NULL;
+
+			string login(sid.substr(0, colonIndex));
+			string password(sid.substr(colonIndex + 1));
+			if(login.empty() || password.empty())
+			{
+				return NULL;
+			}
+
+			try
+			{
+				shared_ptr<User> user = UserTableSync::getUserFromLogin(login);
+				user->verifyPassword(password);
+
+				if(!user->getConnectionAllowed()) {
+					Log::GetInstance().warn("Connection not allowed");
+					return NULL;
+				}
+
+				return new Session(ip, sid);
+			}
+			catch(UserException e)
+			{
+				Log::GetInstance().warn("Wrong password");
+			}
+			catch(...)
+			{
+				Log::GetInstance().warn("User not found");
+			}
+
+			return NULL;
 		}
 
 
