@@ -146,6 +146,15 @@ Alias /synthese3 "{admin_files_path}/admin/"
         RewriteEngine on
         RewriteBase /
 
+        # Backward compatibility redirects to the new admin location.
+        RewriteRule ^synthese3/admin/$ /admin/ [R=301,L]
+        RewriteCond %{{QUERY_STRING}} fonction=admin
+        RewriteRule ^synthese3/admin$ /admin/synthese [R=301,L]
+
+        # Backward compatibility: the path /synthese3/admin is sometimes used to
+        # access the synthese daemon (instead of the now recommended /synthese).
+        RewriteRule ^synthese3/admin$ synthese [L]
+
         {rewrite_directives}
     </Directory>
 
@@ -250,10 +259,6 @@ Alias /{package_name} {package_files_path}/{package_name}
             if os.path.isfile(package_custom_config):
                 package_pre_config += open(package_custom_config).read()
             if package.name == 'admin':
-                package_pre_config += '''
-# Backward compatibility redirect
-Redirect /synthese3/admin /admin
-'''
                 rewrite_directives += '''
     RewriteEngine on
     RewriteBase /
