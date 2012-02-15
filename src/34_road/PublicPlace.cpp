@@ -97,24 +97,7 @@ namespace synthese
 				{
 					continue;
 				}
-				result.insert(
-					it->getRoadChunk()->getFromCrossing(),
-					VertexAccess(
-						minutes(
-							static_cast<long>(
-								it->getMetricOffset() / 50
-						)	),
-						it->getMetricOffset()
-				)	);
-				result.insert(
-					it->getRoadChunk()->getReverseRoadChunk()->getFromCrossing(),
-					VertexAccess(
-						minutes(
-							static_cast<long>(
-								(it->getRoadChunk()->getEndMetricOffset() - it->getRoadChunk()->getMetricOffset() - it->getMetricOffset()) / 50
-						)	),
-						it->getRoadChunk()->getEndMetricOffset() - it->getRoadChunk()->getMetricOffset() - it->getMetricOffset()
-				)	);
+				it->getVertexAccessMap(result, accessParameters, whatToSearch);
 			}
 		}
 
