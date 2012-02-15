@@ -76,7 +76,7 @@ namespace synthese
 				result.insert(
 					_roadChunk->getFromVertex(),
 					VertexAccess(
-						seconds(static_cast<long>((_metricOffset - _roadChunk->getMetricOffset()) / accessParameters.getApproachSpeed())),
+						seconds(static_cast<long>(_metricOffset / accessParameters.getApproachSpeed())),
 						_metricOffset
 				)	);
 
@@ -85,7 +85,7 @@ namespace synthese
 				{
 					assert(static_cast<MainRoadChunk*>(_roadChunk->getNext())->getReverseRoadChunk());
 
-					double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
+					double distance(_roadChunk->getEndMetricOffset() - _roadChunk->getMetricOffset() - _metricOffset);
 					result.insert(
 						static_cast<MainRoadChunk*>(_roadChunk->getNext())->getReverseRoadChunk()->getFromVertex(),
 						VertexAccess(
