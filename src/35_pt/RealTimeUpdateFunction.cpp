@@ -165,7 +165,11 @@ namespace synthese
 
 		bool RealTimeUpdateFunction::isAuthorized(const server::Session* session) const
 		{
+#if 1
 			return true;
+#else // See https://extranet.rcsmobility.com/issues/16043
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+#endif
 		}
 
 
