@@ -25,6 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "ScheduleRealTimeUpdateAction.h"
+#include "TransportNetworkRight.h"
 #include "Request.h"
 #include "Env.h"
 #include "ScheduledService.h"
@@ -221,7 +222,11 @@ namespace synthese
 
 		bool ScheduleRealTimeUpdateAction::isAuthorized(const Session* session
 		) const {
+#if 1
 			return true;
+#else // See https://extranet.rcsmobility.com/issues/16043
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportNetworkRight>(WRITE);
+#endif
 		}
 
 
