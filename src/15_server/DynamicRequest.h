@@ -120,6 +120,8 @@ namespace synthese
 				return boost::static_pointer_cast<const ActionT, Action>(_action);
 			}
 */
+		private:
+			void _setupSession();
 		};
 
 	}

@@ -63,7 +63,7 @@ namespace synthese
 		public:
 			//!	\name Constructor and destructor
 			//@{
-				Session(const std::string& ip);
+				Session(const std::string& ip, const std::string& key = "");
 
 				/** Unregisters the session in the global session map.
 				*/
@@ -101,6 +101,21 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				////////////////////////////////////////////////////////////////////
+				/// Try to create a session from the given sid, if it matches
+				/// the format "username:password" and if the given username
+				/// and password pair matches a user.
+				/// @param sid session identifier.
+				/// @param ip IP address of the request, that will be saved in the
+				/// create session.
+				/// @return the newly created session, or NULL if the user/password
+				/// doesn't match a user.
+				/// @author Sylvain Pasche
+				/// @date 2012
+				/// @since 3.3.0
+				static Session* MaybeCreateFromUserPassword(const std::string& sid, const std::string& ip);
+
+
 				////////////////////////////////////////////////////////////////////
 				/// Adds a cookie to the given request with this session identifier.
 				/// This method doesn't check if the session is still valid, it has
