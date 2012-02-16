@@ -38,6 +38,7 @@ import threading
 import time
 import traceback
 
+import tempita
 from werkzeug import wsgi
 from werkzeug.serving import run_simple
 
@@ -966,7 +967,7 @@ The synthese.py wrapper script.
             remote_conn_string = remote_conn_info.conn_string
             log.info('Remote connection string: %r', remote_conn_string)
             remote_backend = db_backends.create_backend(self.env, remote_conn_string)
-            return self.db_dump(remote_backend, 'remote_')
+            return self.db_dump(remote_backend, self.config.remote_dump_prefix)
 
     @command()
     def db_remote_restore(self):
@@ -1020,26 +1021,66 @@ The synthese.py wrapper script.
 
         return tools
 
+    def _process_dot_in_file(self, content, vars, template_dir):
+        def get_template(name, from_template):
+            path = join(template_dir, name)
+            return from_template.__class__.from_filename(
+                path, namespace=from_template.namespace,
+                get_template=from_template.get_template)
+
+        tmpl = tempita.Template(content, get_template=get_template)
+        return tmpl.substitute(vars)
+
+    def _replace_dot_in_files(self):
+        for path, dirlist, filelist in os.walk(self.path):
+            for exclude in ['db', 'logs', 'imports', 'deploy', '.git', '.hg', '.svn']:
+                if exclude in dirlist:
+                    dirlist.remove(exclude)
+            for name in filelist:
+                if not name.endswith('.in'):
+                    continue
+                source = join(path, name)
+                target = source[:-len('.in')]
+
+                log.debug('Generating file: %r -> %r', source, target)
+
+                with open(target, 'wb') as f:
+                    content = open(source).read()
+                    vars = {
+                        'project': self,
+                        'p': self,
+                        'config': self.config,
+                        'c': self.config,
+                    }
+                    content = self._process_dot_in_file(content, vars, path)
+                    f.write(content)
+                try:
+                    shutil.copymode(source, target)
+                except OSError, e:
+                    # This might happen if the user is not the owner.
+                    log.warn('Error while updating mode: %s', e)
+
     @command()
-    def system_install_prepare(self, tools=None):
+    def system_install_prepare(self):
         tools = self._get_tools()
 
         for tool in tools:
             tool.generate_config()
+
+        self._replace_dot_in_files()
+
+        return tools
 
     @command(root_required=True)
     def system_install(self):
         if self.env.platform == 'win':
             raise Exception('Windows is not supported')
 
-        tools = self._get_tools()
-
         import pwd
         os.setegid(pwd.getpwnam(self.config.synthese_user).pw_gid)
         os.seteuid(pwd.getpwnam(self.config.synthese_group).pw_uid)
 
-        for tool in tools:
-            tool.generate_config()
+        tools = self.system_install_prepare()
 
         os.seteuid(0)
         os.setegid(0)
