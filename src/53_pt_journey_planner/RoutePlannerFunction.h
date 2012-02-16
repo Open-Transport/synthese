@@ -469,29 +469,29 @@ namespace synthese
 
 
 		private:
-			void _XMLDisplayConnectionPlace(
+			void _xmlDisplayConnectionPlace(
 				std::ostream& stream,
 				const geography::NamedPlace& place,
 				bool showCoords
 			) const;
-			void _XMLDisplayPhysicalStop(
+			void _xmlDisplayPhysicalStop(
 				std::ostream& stream,
 				const std::string& tag,
 				const pt::StopPoint& place,
 				bool showCoords
 			) const;
-			void _XMLDisplayAddress(
+			void _xmlDisplayAddress(
 				std::ostream& stream,
 				const geography::NamedPlace& place,
 				bool showCoords
 			) const;
-			void _XMLDisplayAddress(
+			void _xmlDisplayAddress(
 				std::ostream& stream,
 				const road::Crossing& place,
 				const road::RoadPlace& roadPlace,
 				bool showCoords
 			) const;
-			void _XMLDisplayRoadPlace(
+			void _xmlDisplayRoadPlace(
 				std::ostream& stream,
 				const road::RoadPlace& roadPlace,
 				bool showCoords
