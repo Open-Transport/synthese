@@ -133,6 +133,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_FARE_CALCULATION = "fc";
 		const string RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION = "max_transfer_duration";
 		const string RoutePlannerFunction::PARAMETER_LOG_PATH = "log_path";
+		const string RoutePlannerFunction::PARAMETER_SRID = "srid";
 
 		const string RoutePlannerFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string RoutePlannerFunction::VALUE_ADMIN_HTML = "admin";
@@ -420,6 +421,12 @@ namespace synthese
 					new AlgorithmLogger(map.get<string>(PARAMETER_LOG_PATH))
 				);
 			}
+
+			// Set coordinate system if provided else 4326 (WGS84)
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, 4326)
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			// Max transfer duration
 			if(map.isDefined(PARAMETER_MAX_TRANSFER_DURATION))
@@ -1769,14 +1776,14 @@ namespace synthese
 			std::ostream& stream,
 			const NamedPlace& np,
 			bool showCoords
-		){
+		) const {
 			shared_ptr<Point> gp;
 
 			showCoords &= (np.getPoint().get() != NULL && !np.getPoint()->isEmpty());
 
 			if(showCoords)
 			{
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*np.getPoint()
 				);
 
@@ -1821,17 +1828,17 @@ namespace synthese
 			const std::string& tag,
 			const pt::StopPoint& stop,
 			bool showCoords
-		){
+		) const {
 			shared_ptr<Point> gp;
 			if(stop.getGeometry().get() && !stop.getGeometry()->isEmpty())
 			{
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*stop.getGeometry()
 				);
 			}
 			else if(stop.getConnectionPlace()->getPoint().get() && !stop.getConnectionPlace()->getPoint()->isEmpty())
 			{
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*stop.getConnectionPlace()->getPoint()
 				);
 			}
@@ -1868,13 +1875,13 @@ namespace synthese
 					std::ostream& stream,
 					const NamedPlace& np,
 					bool showCoords
-		){
+		) const {
 			shared_ptr<Point> gp;
 
 			if(	np.getPoint().get() &&
 				!np.getPoint()->isEmpty()
 			){
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*np.getPoint()
 				);
 			}
@@ -1910,13 +1917,13 @@ namespace synthese
 			const road::Crossing& address,
 			const road::RoadPlace& roadPlace,
 			bool showCoords
-		){
+		) const {
 			shared_ptr<Point> gp;
 
 			if(	address.getGeometry().get() &&
 				!address.getGeometry()->isEmpty()
 			){
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*address.getGeometry()
 				);
 			}
@@ -1951,13 +1958,13 @@ namespace synthese
 			std::ostream& stream,
 			const road::RoadPlace& roadPlace,
 			bool showCoords
-		){
+		) const {
 			shared_ptr<Point> gp;
 
 			if(	roadPlace.getPoint().get() &&
 				!roadPlace.getPoint()->isEmpty()
 			){
-				gp = CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+				gp = _coordinatesSystem->convertPoint(
 					*roadPlace.getPoint()
 				);
 			}
@@ -2938,7 +2945,7 @@ namespace synthese
 			if(departurePlace.getPoint())
 			{
 				shared_ptr<Point> departurePoint(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					_coordinatesSystem->convertPoint(
 						*departurePlace.getPoint()
 				)	);
 				pm.insert(DATA_DEPARTURE_PLACE_LONGITUDE, departurePoint->getX());
@@ -2977,7 +2984,7 @@ namespace synthese
 			if(arrivalPlace.getPoint())
 			{
 				shared_ptr<Point> arrivalPoint(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					_coordinatesSystem->convertPoint(
 						*arrivalPlace.getPoint()
 				)	);
 				pm.insert(DATA_ARRIVAL_PLACE_LONGITUDE, arrivalPoint->getX());
@@ -3149,17 +3156,17 @@ namespace synthese
 							shared_ptr<LineString> geometry(it->getGeometry());
 							if(geometry.get())
 							{
-								shared_ptr<Geometry> geometry4326(
-									CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+								shared_ptr<Geometry> geometryProjected(
+									_coordinatesSystem->convertGeometry(
 										*static_cast<Geometry*>(geometry.get())
 								)	);
-								geometriesSPtr.push_back(geometry4326);
-								geometries.push_back(geometry4326.get());
+								geometriesSPtr.push_back(geometryProjected);
+								geometries.push_back(geometryProjected.get());
 							}
 						}
 
 						shared_ptr<MultiLineString> multiLineString(
-							CoordinatesSystem::GetCoordinatesSystem(4326).getGeometryFactory().createMultiLineString(
+							_coordinatesSystem->getGeometryFactory().createMultiLineString(
 								geometries
 						)	);
 
@@ -3227,7 +3234,7 @@ namespace synthese
 				!place.getPoint()->isEmpty()
 			){
 				shared_ptr<Point> point(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					_coordinatesSystem->convertPoint(
 						*place.getPoint()
 				)	);
 				pm.insert(DATA_LONGITUDE, point->getX());
@@ -3235,7 +3242,7 @@ namespace synthese
 			}
 			if(dynamic_cast<const StopArea*>(&place))
 			{
-				dynamic_cast<const StopArea&>(place).toParametersMap(pm, &CoordinatesSystem::GetCoordinatesSystem(4326), "STOP_AREA_");
+				dynamic_cast<const StopArea&>(place).toParametersMap(pm, _coordinatesSystem, "STOP_AREA_");
 			}
 
 			// Arrival stop
@@ -3247,7 +3254,7 @@ namespace synthese
 					!arrivalPhysicalStop->getGeometry()->isEmpty()
 				){
 					shared_ptr<Point> point(
-						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						_coordinatesSystem->convertPoint(
 							*arrivalPhysicalStop->getGeometry()
 					)	);
 					pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
@@ -3264,7 +3271,7 @@ namespace synthese
 					!departurePhysicalStop->getGeometry()->isEmpty()
 				){
 					shared_ptr<Point> point(
-						CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						_coordinatesSystem->convertPoint(
 							*departurePhysicalStop->getGeometry()
 					)	);
 					pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
@@ -3319,7 +3326,7 @@ namespace synthese
 				!departureVertex.getGeometry()->isEmpty()
 			){
 				shared_ptr<Point> point(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					_coordinatesSystem->convertPoint(
 						*departureVertex.getGeometry()
 				)	);
 				pm.insert(DATA_DEPARTURE_LONGITUDE, point->getX());
@@ -3330,7 +3337,7 @@ namespace synthese
 				!arrivalVertex.getGeometry()->isEmpty()
 			){
 				shared_ptr<Point> point(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+					_coordinatesSystem->convertPoint(
 						*arrivalVertex.getGeometry()
 				)	);
 				pm.insert(DATA_ARRIVAL_LONGITUDE, point->getX());
@@ -3351,15 +3358,15 @@ namespace synthese
 			// WKT
 			if(geometry)
 			{
-				shared_ptr<Geometry> geometry4326(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+				shared_ptr<Geometry> geometryProjected(
+					_coordinatesSystem->convertGeometry(
 						*geometry
 				)	);
 
 				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
-				if(geometry4326.get() && !geometry4326->isEmpty())
+				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
-					pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
 				}
 			}
 
@@ -3466,15 +3473,15 @@ namespace synthese
 			shared_ptr<LineString> geometry(serviceUse.getGeometry());
 			if(geometry.get())
 			{
-				shared_ptr<Geometry> geometry4326(
-					CoordinatesSystem::GetCoordinatesSystem(4326).convertGeometry(
+				shared_ptr<Geometry> geometryProjected(
+					_coordinatesSystem->convertGeometry(
 						*static_cast<Geometry*>(geometry.get())
 				)	);
 
 				shared_ptr<WKTWriter> wktWriter(new WKTWriter);
-				if(geometry4326.get() && !geometry4326->isEmpty())
+				if(geometryProjected.get() && !geometryProjected->isEmpty())
 				{
-					pm.insert(DATA_WKT, wktWriter->write(geometry4326.get()));
+					pm.insert(DATA_WKT, wktWriter->write(geometryProjected.get()));
 				}
 			}
 

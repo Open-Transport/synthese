@@ -38,6 +38,8 @@
 
 namespace synthese
 {
+	class CoordinatesSystem;
+
 	namespace algorithm
 	{
 		class AlgorithmLogger;
@@ -123,6 +125,7 @@ namespace synthese
 			static const std::string PARAMETER_HIGHEST_ARRIVAL_TIME;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_LOG_PATH;
+			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
@@ -327,6 +330,7 @@ namespace synthese
 				bool										_outputRoadApproachDetail;
 				bool _showResTab;
 				bool _showCoords;
+				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
 				boost::optional<boost::posix_time::time_duration> _minWaitingTimeFilter;
@@ -465,33 +469,33 @@ namespace synthese
 
 
 		private:
-			static void _XMLDisplayConnectionPlace(
+			void _XMLDisplayConnectionPlace(
 				std::ostream& stream,
 				const geography::NamedPlace& place,
 				bool showCoords
-			);
-			static void _XMLDisplayPhysicalStop(
+			) const;
+			void _XMLDisplayPhysicalStop(
 				std::ostream& stream,
 				const std::string& tag,
 				const pt::StopPoint& place,
 				bool showCoords
-			);
-			static void _XMLDisplayAddress(
+			) const;
+			void _XMLDisplayAddress(
 				std::ostream& stream,
 				const geography::NamedPlace& place,
 				bool showCoords
-			);
-			static void _XMLDisplayAddress(
+			) const;
+			void _XMLDisplayAddress(
 				std::ostream& stream,
 				const road::Crossing& place,
 				const road::RoadPlace& roadPlace,
 				bool showCoords
-			);
-			static void _XMLDisplayRoadPlace(
+			) const;
+			void _XMLDisplayRoadPlace(
 				std::ostream& stream,
 				const road::RoadPlace& roadPlace,
 				bool showCoords
-			);
+			) const;
 
 
 
