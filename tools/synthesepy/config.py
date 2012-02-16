@@ -100,6 +100,7 @@ DEFAULTS = {
     # If dealing with an old-style project, use this instead:
     # '/srv/data/s3-server/config.db3',
     'remote_db_path': None,
+    'remote_dump_prefix': 'remote_',
 
     'ssh_global_opts': '',
     'ssh_opts': '',

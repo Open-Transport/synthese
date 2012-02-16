@@ -7,4 +7,5 @@ mechanize
 Paste
 requests
 static
+tempita
 unittest2
