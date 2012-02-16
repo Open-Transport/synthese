@@ -102,14 +102,22 @@ namespace synthese
 				/// Indexation of the places used by the journeys.
 				/// Run it after each every update of _journeys (segfault issue)
 				/// <pre>
-				/// Stops D---a---a---S---S---S---S---S---a---A
-				/// Edges  X-o o-o o-o X-X o-o X-X o-X o-o o-X
-				///	first?  1   0   0   0   0   0   0   0   0
-				///	last?   0   0   0   0   0   0   0   0   1
-				///	ped.?   1   1   1   0   1   0   0   1   1
-				///	pr.pe.? 0   1   1   1   0   1   0   0   1
-				///
-				/// Dep : first || !ped && pr.ped
+				/// Stops D---a---a---S---S---a---S---S---S---a---A
+				/// Ped.?   1   1   1   0   1   1   0   0   1   1
+				///	pr.pe.? 0   1   1   1   0   1   1   0   0   1
+				///	nx.pe.? 1   1   0   1   1   0   0   1   1   0
+				///	first?  1   0   0   0   0   0   0   0   0   0
+				///	last?   0   0   0   0   0   0   0   0   0   1
+				/// avoidDoubles = false :
+				/// Edges  X-o o-o o-X X-X X-o o-X X-X X-X X-o o-X
+				/// DEP     1   0   0   1   1   0   1   1   1   0
+				/// ARR     0   0   1   1   0   1   1   1   0   1
+				/// avoidDoubles = true :
+				/// Edges  X-o o-o o-X o-X o-o o-X o-X o-X o-o o-X
+				/// DEP     1   0   0   0   0   0   0   0   0   0
+				/// ARR     0   0   1   1   0   1   1   1   0   1
+				/// Formula :
+				/// Dep = first || !avoidDoubles && (!ped || pr.ped)
 				/// Arr : !ped || last
 				/// </pre>
 				void _createOrderedPlaces();
@@ -220,7 +228,8 @@ namespace synthese
 
 			static bool HaveToDisplayDepartureStopOnGrid(
 				graph::Journey::ServiceUses::const_iterator itl,
-				const graph::Journey::ServiceUses& jl
+				const graph::Journey::ServiceUses& jl,
+				bool avoidDoubles
 			);
 
 			static bool HaveToDisplayArrivalStopOnGrid(

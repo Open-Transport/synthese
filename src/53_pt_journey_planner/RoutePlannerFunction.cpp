@@ -1274,7 +1274,7 @@ namespace synthese
 					{
 						const ServicePointer& leg(*itl);
 
-						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl)
+						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl, false)
 						){
 							const NamedPlace* placeToSearch(
 								PTRoutePlannerResult::GetNamedPlaceForDeparture(
@@ -2093,7 +2093,7 @@ namespace synthese
 					{
 						const ServicePointer& leg(*itl);
 
-						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl)
+						if(	PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(itl, jl, false)
 						){
 							const NamedPlace* placeToSearch(
 								PTRoutePlannerResult::GetNamedPlaceForDeparture(
