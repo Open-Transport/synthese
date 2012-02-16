@@ -335,14 +335,15 @@ namespace synthese
 
 		bool PTRoutePlannerResult::HaveToDisplayDepartureStopOnGrid(
 			Journey::ServiceUses::const_iterator itl,
-			const Journey::ServiceUses& jl
+			const Journey::ServiceUses& jl,
+			bool avoidDoubles
 		){
 			return
 				itl == jl.begin() ||
-				!itl->getService()->getPath()->isPedestrianMode() ||
-				(	itl->getService()->getPath()->isPedestrianMode() &&
-					!(itl-1)->getService()->getPath()->isPedestrianMode()
-				)
+				(	!avoidDoubles &&
+					(	!itl->getService()->getPath()->isPedestrianMode() ||
+						!(itl-1)->getService()->getPath()->isPedestrianMode()
+				)	)
 			;
 		}
 
@@ -353,11 +354,9 @@ namespace synthese
 			const Journey::ServiceUses& jl
 		){
 			return
-				!itl->getService()->getPath()->isPedestrianMode() ||
 				itl+1 == jl.end() ||
-				(	itl->getService()->getPath()->isPedestrianMode() &&
-					!(itl+1)->getService()->getPath()->isPedestrianMode()
-				)
+				!itl->getService()->getPath()->isPedestrianMode() ||
+				!(itl+1)->getService()->getPath()->isPedestrianMode()
 			;
 		}
 
@@ -375,7 +374,7 @@ namespace synthese
 				{
 					const ServicePointer& leg(*itl);
 
-					if(	HaveToDisplayDepartureStopOnGrid(itl, jl)
+					if(	HaveToDisplayDepartureStopOnGrid(itl, jl, true)
 					){
 						PlacesListConfiguration::PlaceInformation item(
 							GetNamedPlaceForDeparture(
