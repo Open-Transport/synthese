@@ -52,7 +52,8 @@ set(MODULES
 56_pt_website
 #57_accounting
 58_hiking
-59_road_journey_planner)
+59_road_journey_planner
+60_analysis)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)
