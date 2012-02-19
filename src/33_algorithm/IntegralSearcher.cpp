@@ -680,7 +680,7 @@ sqrt(
 			}
 			else
 			{
-				if(_totalDistance > distanceToEnd)
+				if(_totalDistance && (_totalDistance > distanceToEnd))
 				{
 					// Part 1 : 25% projected speed
 					score = ((_totalDistance - distanceToEnd) * 250) / (_vmax * journeyDuration.total_seconds());
