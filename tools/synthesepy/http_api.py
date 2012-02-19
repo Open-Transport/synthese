@@ -194,6 +194,17 @@ class HTTPApi(object):
         if r.status_code != 200:
             raise HTTPApiException('call_synthese didn\'t return a 200 status')
 
+        # Workaround for https://github.com/kennethreitz/requests/issues/434
+        # Remove once fixed.
+        if not use_get:
+            try:
+                r.content
+            except RuntimeError:
+                log.warn('Workaround for '
+                    'https://github.com/kennethreitz/requests/issues/434. '
+                    'Assuming response is empty')
+                r._content = ''
+
         return r
 
     def call_action2(self, action, params, send_sid=False, use_get=False):
