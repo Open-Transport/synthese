@@ -269,6 +269,7 @@ namespace synthese
 			_journeyPlanner._setFromParametersMap(jpMap);
 			_journeyPlanner.setMaxSolutions(1);
 			_journeyPlanner.setEndDepartureDate(_journeyPlanner.getStartDepartureDate());
+			_journeyPlanner.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 
 			// Extraction of parameters from journey planner for other methods
 			_departurePlace = _journeyPlanner.getDeparturePlace().placeResult.value;

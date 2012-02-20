@@ -60,6 +60,8 @@ namespace synthese
 		public:
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
 
 			/// Chosen registry class.
 			typedef util::Registry<RoadPlace> Registry;
@@ -95,6 +97,12 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const CoordinatesSystem* coordinatesSystem,
+					const std::string& prefix = std::string()
+				) const;
+
 				void toParametersMap(
 					util::ParametersMap& pm,
 					const std::string& prefix

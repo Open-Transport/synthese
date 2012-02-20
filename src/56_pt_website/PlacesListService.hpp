@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_CLASS_PAGE_ID;
 			static const std::string PARAMETER_MIN_SCORE;
 			static const std::string PARAMETER_CLASS_FILTER;
+			static const std::string PARAMETER_SRID;
 
 			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
@@ -110,8 +111,8 @@ namespace synthese
 				boost::optional<std::size_t> _number;
 				double _minScore;
 				std::string _classFilter;
+				const CoordinatesSystem* _coordinatesSystem;
 			//@}
-
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -180,6 +181,7 @@ namespace synthese
 				void setSorted(bool value){ _sorted = value; }
 				void setNumber(boost::optional<std::size_t> value){ _number = value; }
 				void setText(const std::string& value){ _text = value; }
+				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
 			//@}
 
 
@@ -288,7 +290,7 @@ namespace synthese
 				);
 				if(obj)
 				{
-					obj->toParametersMap(*itemMap);
+					obj->toParametersMap(*itemMap,_coordinatesSystem);
 					mainMap.insert(className, itemMap);
 				}
 			}

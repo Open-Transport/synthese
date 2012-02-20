@@ -59,6 +59,8 @@ namespace synthese
 		public:
 			static const std::string DATA_ID;
 			static const std::string DATA_NAME;
+			static const std::string DATA_X;
+			static const std::string DATA_Y;
 
 			typedef std::set<PublicPlaceEntrance*> Entrances;
 
@@ -106,6 +108,12 @@ namespace synthese
 
 			/// @name Services
 			//@{
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const CoordinatesSystem* coordinatesSystem,
+					const std::string& prefix = std::string()
+				) const;
+
 				void toParametersMap(
 					util::ParametersMap& pm,
 					const std::string& prefix

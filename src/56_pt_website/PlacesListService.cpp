@@ -68,6 +68,7 @@ namespace synthese
 		const string PlacesListService::PARAMETER_SITE_ID = "site_id";
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
+		const string PlacesListService::PARAMETER_SRID = "srid";
 
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
@@ -213,6 +214,12 @@ namespace synthese
 
 			// Class filter
 			_classFilter = map.getDefault<string>(PARAMETER_CLASS_FILTER);
+
+			// Set coordinate system if provided else default SRID is used
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			// Output
 			if(map.isDefined(PARAMETER_ITEM_PAGE_ID))
