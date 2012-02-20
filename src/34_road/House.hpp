@@ -126,7 +126,13 @@ namespace synthese
 					std::string text = std::string()
 				) const;
 
-
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of house into parameters map.
+				void toParametersMap(
+					util::ParametersMap& pm,
+					const CoordinatesSystem* coordinatesSystem,
+					const std::string& prefix = std::string()
+				) const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Export of house into parameters map.

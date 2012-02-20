@@ -496,6 +496,7 @@ namespace synthese
 			){
 				PlacesListService placesListService;
 				placesListService.setNumber(1);
+				placesListService.setCoordinatesSystem(_coordinatesSystem);
 
 				// Departure
 				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_DEPARTURE_CLASS_FILTER));

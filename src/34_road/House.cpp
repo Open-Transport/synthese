@@ -135,10 +135,9 @@ namespace synthese
 			return text;
 		}
 
-
-
 		void House::toParametersMap(
 			util::ParametersMap& pm,
+			const CoordinatesSystem* coordinatesSystem,
 			const std::string& prefix
 		) const	{
 
@@ -154,9 +153,19 @@ namespace synthese
 			// Location
 			if(getGeometry().get())
 			{
-				pm.insert(DATA_X, getGeometry()->getX());
-				pm.insert(DATA_Y, getGeometry()->getY());
+				shared_ptr<Geometry> center(
+					coordinatesSystem->convertPoint(*getGeometry())
+				);
+				pm.insert(DATA_X, center->getX());
+				pm.insert(DATA_Y, center->getY());
 			}
+		}
+
+		void House::toParametersMap(
+			util::ParametersMap& pm,
+			const std::string& prefix
+		) const	{
+			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
 		}
 
 

@@ -31,8 +31,10 @@
 #include "VertexAccessMap.h"
 
 #include <geos/geom/Point.h>
+#include <boost/shared_ptr.hpp>
 
 using namespace std;
+using namespace boost;
 using namespace boost::posix_time;
 using namespace geos::geom;
 
@@ -52,6 +54,8 @@ namespace synthese
 	{
 		const string PublicPlace::DATA_ID = "id";
 		const string PublicPlace::DATA_NAME = "name";
+		const string PublicPlace::DATA_X = "x";
+		const string PublicPlace::DATA_Y = "y";
 
 
 
@@ -108,10 +112,11 @@ namespace synthese
 			return getGeometry();
 		}
 
-
-
-		void PublicPlace::toParametersMap( util::ParametersMap& pm, const std::string& prefix ) const
-		{
+		void PublicPlace::toParametersMap(
+			util::ParametersMap& pm,
+			const CoordinatesSystem* coordinatesSystem,
+			const std::string& prefix
+		) const {
 
 			// ID
 			pm.insert(prefix + DATA_ID, getKey());
@@ -124,6 +129,29 @@ namespace synthese
 			{
 				getCity()->toParametersMap(pm, NULL, prefix);
 			}
+
+			// Coordinates
+			if(coordinatesSystem && getPoint())
+			{
+				shared_ptr<Point> pg(
+					coordinatesSystem->convertPoint(*getPoint())
+				);
+				{
+					stringstream s;
+					s << std::fixed << pg->getX();
+					pm.insert(prefix + DATA_X, s.str());
+				}
+				{
+					stringstream s;
+					s << std::fixed << pg->getY();
+					pm.insert(prefix + DATA_Y, s.str());
+				}
+			}
+		}
+
+		void PublicPlace::toParametersMap( util::ParametersMap& pm, const std::string& prefix ) const
+		{
+			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
 		}
 
 
