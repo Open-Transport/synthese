@@ -398,6 +398,7 @@ namespace synthese
 				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
 				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
+				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
 			//@}
 
 			/// @name Modifiers

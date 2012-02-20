@@ -54,6 +54,8 @@ namespace synthese
 	{
 		const string RoadPlace::DATA_ID = "id";
 		const string RoadPlace::DATA_NAME = "name";
+		const string RoadPlace::DATA_X = "x";
+		const string RoadPlace::DATA_Y = "y";
 
 
 
@@ -310,9 +312,9 @@ namespace synthese
 		}
 
 
-
 		void RoadPlace::toParametersMap(
 			util::ParametersMap& pm,
+			const CoordinatesSystem* coordinatesSystem,
 			const std::string& prefix
 		) const	{
 
@@ -327,6 +329,31 @@ namespace synthese
 			{
 				getCity()->toParametersMap(pm, NULL, prefix);
 			}
+
+			// Coordinates
+			if(coordinatesSystem && getPoint())
+			{
+				shared_ptr<Point> pg(
+					coordinatesSystem->convertPoint(*getPoint())
+				);
+				{
+					stringstream s;
+					s << std::fixed << pg->getX();
+					pm.insert(prefix + DATA_X, s.str());
+				}
+				{
+					stringstream s;
+					s << std::fixed << pg->getY();
+					pm.insert(prefix + DATA_Y, s.str());
+				}
+			}
+		}
+
+		void RoadPlace::toParametersMap(
+			util::ParametersMap& pm,
+			const std::string& prefix
+		) const	{
+			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
 		}
 
 
