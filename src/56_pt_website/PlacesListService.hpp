@@ -144,7 +144,9 @@ namespace synthese
 			void _displayClass(
 				std::ostream& stream,
 				const util::ParametersMap & result,
-				const server::Request& request
+				const server::Request& request,				
+				boost::shared_ptr<util::ParametersMap> bestPlace,
+				const std::string& bestPlaceClassName
 			) const;
 
 			void _displayItems(

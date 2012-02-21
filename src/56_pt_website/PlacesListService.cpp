@@ -528,10 +528,11 @@ namespace synthese
 			}
 
 			// Best place
+			shared_ptr<ParametersMap> bestMap;
+			string className;
 			if(_sorted)
 			{
-				shared_ptr<ParametersMap> bestMap;
-				string className;
+				shared_ptr<ParametersMap> bestPlace(new ParametersMap);
 
 				// Stop areas
 				if(	result.hasSubMaps(DATA_STOPS) &&
@@ -610,7 +611,6 @@ namespace synthese
 				}
 
 				// Registration on the result
-				shared_ptr<ParametersMap> bestPlace(new ParametersMap);
 				if(bestMap.get())
 				{
 					bestPlace->insert(className, bestMap);
@@ -630,7 +630,9 @@ namespace synthese
 						_displayClass(
 							stream,
 							result,
-							request
+							request,
+							bestMap,
+							className
 						);
 					}
 					else
@@ -858,10 +860,24 @@ namespace synthese
 		void PlacesListService::_displayClass(
 			std::ostream& stream,
 			const util::ParametersMap & result,
-			const server::Request& request
+			const server::Request& request,
+			shared_ptr<ParametersMap> bestPlace,
+			const string& bestPlaceClassName
 		) const {
 			ParametersMap classMap(getTemplateParameters());
-
+			
+			//Insert best place
+			stringstream bestPlaceStream;
+			vector<shared_ptr<ParametersMap> > bestPlaceMap;
+			bestPlaceMap.push_back(bestPlace);
+			_displayItems(
+				bestPlaceStream,
+				bestPlaceClassName,
+				bestPlaceMap,
+				request
+			);
+			classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
+			
 			if(result.hasSubMaps(DATA_CITIES) &&
 				(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 			){
