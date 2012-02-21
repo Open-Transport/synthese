@@ -867,16 +867,19 @@ namespace synthese
 			ParametersMap classMap(getTemplateParameters());
 			
 			//Insert best place
-			stringstream bestPlaceStream;
-			vector<shared_ptr<ParametersMap> > bestPlaceMap;
-			bestPlaceMap.push_back(bestPlace);
-			_displayItems(
-				bestPlaceStream,
-				bestPlaceClassName,
-				bestPlaceMap,
-				request
-			);
-			classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
+			if(bestPlace.get())
+			{
+				stringstream bestPlaceStream;
+				vector<shared_ptr<ParametersMap> > bestPlaceMap;
+				bestPlaceMap.push_back(bestPlace);
+				_displayItems(
+					bestPlaceStream,
+					bestPlaceClassName,
+					bestPlaceMap,
+					request
+				);
+				classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
+			}
 			
 			if(result.hasSubMaps(DATA_CITIES) &&
 				(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
