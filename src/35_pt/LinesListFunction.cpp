@@ -612,6 +612,10 @@ namespace synthese
 					// Rank
 					pmLine->insert(DATA_RANK, rank++);
 
+					//Add Rolling stock information with a prefix
+					if(!pmLine->getSubMaps(DATA_TRANSPORT_MODE).empty())
+					pmLine->merge(*pmLine->getSubMaps(DATA_TRANSPORT_MODE)[0].get(),string("rs_"));
+
 					// Display
 					_page->display(stream, request, *pmLine);
 				}
