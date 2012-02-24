@@ -62,6 +62,7 @@ namespace synthese
 			MySQLDB();
 			virtual ~MySQLDB();
 
+			virtual void initForStandaloneUse();
 			virtual void preInit();
 			virtual void init();
 

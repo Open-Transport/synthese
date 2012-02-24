@@ -68,6 +68,7 @@ namespace synthese
 			SQLiteDB();
 			virtual ~SQLiteDB();
 
+			virtual void initForStandaloneUse();
 			virtual void preInit();
 
 			virtual DBResultSPtr execQuery(const SQLData& sql);

@@ -154,7 +154,9 @@ namespace synthese
 		// It can be changed using a parameter.
 		const CoordinatesSystem::SRID DB::_DEFAULT_INSTANCE_COORD_SYSTEM_SRID(27572);
 
-		DB::DB() : _schemaUpdated(false)
+		DB::DB() :
+			_schemaUpdated(false),
+			_standalone(false)
 		{
 		}
 
@@ -162,6 +164,9 @@ namespace synthese
 
 		DB::~DB()
 		{
+			if(_standalone)
+				return;
+
 			CoordinatesSystem::ClearCoordinatesSystems();
 			DBModule::ClearStorageCoordinatesSystem();
 			// FIXME : the next line caused a double free
@@ -173,6 +178,13 @@ namespace synthese
 		void DB::setConnectionInfo(boost::shared_ptr<ConnectionInfo> connInfo)
 		{
 			_connInfo = connInfo;
+		}
+
+
+
+		void DB::setStandaloneUse(bool standalone)
+		{
+			_standalone = standalone;
 		}
 
 
