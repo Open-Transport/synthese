@@ -112,7 +112,8 @@ namespace synthese
 
 			try
 			{
-				execUpdate("TRUNCATE trigger_metadata;");
+				if(_connection && !_standalone)
+					execUpdate("TRUNCATE trigger_metadata;");
 			}
 			catch (MySQLException&)
 			{
@@ -125,7 +126,7 @@ namespace synthese
 
 
 
-		void MySQLDB::preInit()
+		void MySQLDB::initForStandaloneUse()
 		{
 			Log::GetInstance().info("Using MySQL client library version " + std::string(mysql_get_client_info()));
 
@@ -135,6 +136,13 @@ namespace synthese
 			}
 
 			_initConnection(false);
+		}
+
+
+
+		void MySQLDB::preInit()
+		{
+			initForStandaloneUse();
 
 			// TODO: is the thread deleted properly on module unload?
 
@@ -153,7 +161,7 @@ namespace synthese
 
 		void MySQLDB::init()
 		{
-			// Filling of the trigger_metadata table needs to be done in init because the port paramter
+			// Filling of the trigger_metadata table needs to be done in init because the port parameter
 			// might not be available earlier.
 			_initTriggerMetadata();
 

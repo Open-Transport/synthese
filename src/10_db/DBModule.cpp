@@ -88,7 +88,7 @@ namespace synthese
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync;
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
 			}
-	    }
+		}
 
 
 
@@ -136,6 +136,27 @@ namespace synthese
 		{
 			assert(_Db.get());
 			return _Db.get();
+		}
+
+
+
+		shared_ptr<DB> DBModule::GetDBSPtr()
+		{
+			assert(_Db.get());
+			return _Db;
+		}
+
+
+		boost::shared_ptr<DB> DBModule::GetDBForStandaloneUse(const string& connectionString)
+		{
+			shared_ptr<DB::ConnectionInfo> ci(new DB::ConnectionInfo(connectionString));
+
+			shared_ptr<DB> db(util::Factory<DB>::create(ci->backend));
+			db->setStandaloneUse(true);
+			db->setConnectionInfo(ci);
+			db->initForStandaloneUse();
+
+			return db;
 		}
 
 

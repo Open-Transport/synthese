@@ -90,6 +90,18 @@ namespace synthese
 			static void SetConnectionString(const std::string& connectionString);
 
 			static DB* GetDB();
+			static boost::shared_ptr<DB> GetDBSPtr();
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Returns a database object that can be used to access a non-Synthese
+			/// database. The database object won't execute Synthese specific tasks,
+			/// such as setting up the projection table.
+			/// @param connectionString Database connection string.
+			/// @return boost::shared_ptr<DB> Database object.
+			/// @author Sylvain Pasche
+			/// @date 2012
+			/// @since 3.3.0
+			static boost::shared_ptr<DB> GetDBForStandaloneUse(const std::string& connectionString);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the table sync by table name.
@@ -117,10 +129,10 @@ namespace synthese
 			/// @since 3.2.0
 			static const TablesByNameMap& GetTablesByName(){ return _tableSyncMap; }
 
-		    /** Called whenever a parameter registered by this module is changed
-		     */
-		    static void ParameterCallback (const std::string& name,
-						   const std::string& value);
+			/** Called whenever a parameter registered by this module is changed
+			*/
+			static void ParameterCallback (const std::string& name,
+							const std::string& value);
 
 			static void AddSubClass(util::RegistryKeyType, const std::string&);
 			static std::string GetSubClass(util::RegistryKeyType id);
