@@ -121,6 +121,7 @@ namespace synthese
 			boost::shared_ptr<ConnectionInfo> _connInfo;
 			// XXX does it need to be recursive?
 			boost::recursive_mutex _tableSynchronizersMutex;
+			bool _standalone;
 
 		private:
 
@@ -136,7 +137,14 @@ namespace synthese
 			virtual ~DB();
 
 			void setConnectionInfo(boost::shared_ptr<ConnectionInfo> connInfo);
+			void setStandaloneUse(bool standalone);
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Initialize the database to be used in standalone mode (See DBModule::GetDBForStandaloneUse())
+			/// @author Sylvain Pasche
+			/// @date 2012
+			/// @since 3.3.0
+			virtual void initForStandaloneUse() = 0;
 			virtual void preInit();
 			virtual void init();
 

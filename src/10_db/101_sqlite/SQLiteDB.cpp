@@ -121,7 +121,7 @@ namespace synthese
 
 
 
-		void SQLiteDB::preInit()
+		void SQLiteDB::initForStandaloneUse()
 		{
 			if (_connInfo->path.empty())
 				_connInfo->path = "config.db3";
@@ -129,7 +129,13 @@ namespace synthese
 
 			spatialite_init(1);
 			Log::GetInstance().info("Using lib SQLite version " + std::string(sqlite3_libversion()));
+		}
 
+
+
+		void SQLiteDB::preInit()
+		{
+			initForStandaloneUse();
 			DB::preInit();
 		}
 
