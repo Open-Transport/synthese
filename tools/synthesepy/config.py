@@ -27,7 +27,6 @@ import os
 from os.path import join
 import socket
 
-from synthesepy import db_backends
 from synthesepy import utils
 
 log = logging.getLogger(__name__)
@@ -231,6 +230,8 @@ class Config(object):
         self.remote_project_path = self.remote_project_path.format(
             project_name=self.project_name)
 
+        # import here to prevent import cycle errors
+        from synthesepy import db_backends
         self.ineo_db = None
         if self.ineo_conn_string:
             self.ineo_db = db_backends.create_backend(env, self.ineo_conn_string)
