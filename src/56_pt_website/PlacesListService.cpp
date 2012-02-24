@@ -865,7 +865,7 @@ namespace synthese
 			const string& bestPlaceClassName
 		) const {
 			ParametersMap classMap(getTemplateParameters());
-			
+
 			//Insert best place
 			if(bestPlace.get())
 			{
@@ -880,7 +880,7 @@ namespace synthese
 				);
 				classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
 			}
-			
+
 			if(result.hasSubMaps(DATA_CITIES) &&
 				(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 			){

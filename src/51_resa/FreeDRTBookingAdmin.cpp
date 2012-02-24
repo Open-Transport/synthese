@@ -106,7 +106,7 @@ namespace synthese
 			// Departure place
 			PlacesListService placesListService;
 			placesListService.setNumber(1);
-			placesListService.setText(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE));			
+			placesListService.setText(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE));
 			placesListService.setCoordinatesSystem(&CoordinatesSystem::GetInstanceCoordinatesSystem());
 			_departurePlace = dynamic_pointer_cast<NamedPlace, Place>(
 				placesListService.getPlaceFromBestResult(
