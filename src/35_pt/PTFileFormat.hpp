@@ -324,7 +324,8 @@ namespace synthese
 			static std::set<JourneyPattern*> GetRoutes(
 				pt::CommercialLine& line,
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
-				const impex::DataSource& source
+				const impex::DataSource& source,
+				std::ostream& logStream	
 			);
 
 
