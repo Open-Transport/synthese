@@ -69,6 +69,7 @@ class DBBackend(object):
         # Hack for MySQL
         if self.paramstyle == 'format':
             query = query.replace('?', '%s')
+        log.debug('Running query: %s', query)
         with self.get_cursor() as cursor:
             cursor.execute(query, args)
             rv = [dict((cursor.description[idx][0], value)

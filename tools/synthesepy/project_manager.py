@@ -935,6 +935,8 @@ The synthese.py wrapper script.
         def remote_transaction_mysql(conn_info):
             MYSQL_FORWARDED_PORT = 33000
 
+            utils.kill_listening_processes(MYSQL_FORWARDED_PORT)
+
             if utils.can_connect(MYSQL_FORWARDED_PORT):
                 raise Exception('MySQL tunnel port (%s) is not '
                     'available' % MYSQL_FORWARDED_PORT)
@@ -1047,6 +1049,8 @@ The synthese.py wrapper script.
                 with open(target, 'wb') as f:
                     content = open(source).read()
                     vars = {
+                        'generated_warning': 'WARNING: THIS FILE IS GENERATED, '
+                            'DO NOT EDIT!!',
                         'project': self,
                         'p': self,
                         'config': self.config,
@@ -1306,6 +1310,21 @@ The synthese.py wrapper script.
     @commands_result()
     def deploy_remote_restore(self):
         return self.deployer.deploy_remote_restore()
+
+    # Ineo realtime
+
+    @command()
+    def ineo_install_triggers(self):
+        triggers_file = join(
+            self.path, 'impex', 'ineo-triggers', 'triggers.sql')
+        if not os.path.isfile(triggers_file + '.in'):
+            raise Exception('Can\'t find triggers file at %r' % triggers_file)
+
+        utils.maybe_remove(triggers_file)
+        self._replace_dot_in_files()
+        assert os.path.isfile(triggers_file)
+
+        self.config.ineo_db.shell(open(triggers_file, 'rb').read())
 
 
 def create_project(env, path, system_packages=None, conn_string=None,
