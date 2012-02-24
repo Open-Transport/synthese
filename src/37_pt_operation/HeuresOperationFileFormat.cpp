@@ -338,7 +338,8 @@ namespace synthese
 							PTFileFormat::GetRoutes(
 								*cline,
 								servedStops,
-								*_ptDataSource
+								*_ptDataSource,
+								logStream
 						)	);
 						if(routeSet.empty())
 						{

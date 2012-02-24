@@ -52,6 +52,7 @@ namespace synthese
 	using namespace impex;
 	using namespace db;
 	using namespace graph;
+	using namespace util;
 
 	namespace util
 	{
@@ -62,12 +63,25 @@ namespace synthese
 	{
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID("ps");
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_COURSE_ID("ci");
+		const string IneoRealTimeFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
+		const string IneoRealTimeFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX("stop_code_prefix");
 
 		bool IneoRealTimeFileFormat::Importer_::_read( std::ostream& os, boost::optional<const admin::AdminRequest&> adminRequest ) const
 		{
 			if(_database.empty() || !_plannedDataSource.get())
 			{
 				return false;
+			}
+
+			shared_ptr<DB> db;
+
+			if(_dbConnString)
+			{
+				db = DBModule::GetDBForStandaloneUse(*_dbConnString);
+			}
+			else
+			{
+				db = DBModule::GetDBSPtr();
 			}
 
 			date today(day_clock::local_day());
@@ -115,17 +129,22 @@ namespace synthese
 
 			// 2 : loop on the services present in the database and link to existing or new services
 			stringstream query;
-			query << "SELECT ref, chainage, ligne FROM " << _database << ".COURSE WHERE jour=" << todayStr << " AND type='C'";
+			query << "SELECT c.ref, c.chainage, c.ligne, l.mnemo as ligne_ref FROM " << _database << ".COURSE c " <<
+				"INNER JOIN " << _database << ".LIGNE l on c.ligne=l.ref AND l.jour=c.jour " <<
+				"WHERE c.jour=" << todayStr << " AND c.type='C'";
 			if(_courseId)
 			{
 				query << " AND ref=" << *_courseId;
 			}
-			DBResultSPtr result(DBModule::GetDB()->execQuery(query.str()));
+			DBResultSPtr result(db->execQuery(query.str()));
 			while(result->next())
 			{
 				string serviceRef(result->getText("ref"));
 				string chainage(result->getText("chainage"));
-				string ligneRef(result->getText("ligne"));
+				string ligneRef(result->getText("ligne_ref"));
+
+				os << "INFO : Processing serviceRef=" << serviceRef << " chainage=" <<
+					chainage << " ligneRef=" << ligneRef << "<br />";
 
 				CommercialLine* line(
 					PTFileFormat::GetLine(
@@ -149,7 +168,7 @@ namespace synthese
 					"INNER JOIN " << _database << ".HORAIRE h ON h.arretchn=c.ref AND h.jour=a.jour " <<
 					"INNER JOIN " << _database << ".COURSE o ON o.chainage=c.chainage AND o.ref=h.course AND c.jour=o.jour " <<
 					"WHERE h.course='" << serviceRef << "' AND h.jour=" << todayStr << " ORDER BY c.pos";
-				DBResultSPtr chainageResult(DBModule::GetDB()->execQuery(chainageQuery.str()));
+				DBResultSPtr chainageResult(db->execQuery(chainageQuery.str()));
 
 				JourneyPattern::StopsWithDepartureArrivalAuthorization servedStops;
 				SchedulesBasedService::Schedules departureSchedules;
@@ -167,7 +186,7 @@ namespace synthese
 					std::set<StopPoint*> stopsSet(
 						PTFileFormat::GetStopPoints(
 							stops,
-							stopCode,
+							_stopCodePrefix + stopCode,
 							boost::optional<const std::string&>(),
 							os
 					)	);
@@ -211,7 +230,8 @@ namespace synthese
 					PTFileFormat::GetRoutes(
 						*line,
 						servedStops,
-						*_plannedDataSource
+						*_plannedDataSource,
+						os
 				)	);
 
 				if(routes.empty())
@@ -219,13 +239,13 @@ namespace synthese
 					stringstream routeQuery;
 					routeQuery << "SELECT * FROM " << _database << ".CHAINAGE c " <<
 						"WHERE c.ref='" << chainage << "' AND c.jour=" << todayStr;
-					DBResultSPtr routeResult(DBModule::GetDB()->execQuery(routeQuery.str()));
+					DBResultSPtr routeResult(db->execQuery(routeQuery.str()));
 					if(routeResult->next())
 					{
 						string routeName(routeResult->getText("nom"));
 						bool wayBack(routeResult->getText("sens") != "A");
 
-						os << "CREA : Creation of route<br />";
+						os << "CREA : Creation of route " << routeName << "<br />";
 
 						JourneyPattern* result = new JourneyPattern(
 							JourneyPatternTableSync::getId()
@@ -341,6 +361,9 @@ namespace synthese
 								!sservice->hasLinkWithSource(_dataSource)
 							){
 								const_cast<ScheduledService*>(sservice)->setInactive(today);
+								os << "INFO : Deactivating unlinked service " << sservice->getKey() <<
+									" on route " << sservice->getRoute()->getKey() << " (" <<
+									sservice->getRoute()->getName() << ")<br />";
 							}
 						}
 					}
@@ -369,6 +392,7 @@ namespace synthese
 			os << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			os << t.title("Bases de données");
 			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter<IneoRealTimeFileFormat>::PARAMETER_DATABASE, _database));
+			os << t.cell("Chaîne de connexion base de donnée", t.getForm().getTextInput(PARAMETER_DB_CONN_STRING, *_dbConnString));
 			os << t.title("Paramètres");
 			os << t.cell("Source de données théorique liée", t.getForm().getTextInput(PARAMETER_PLANNED_DATASOURCE_ID, _plannedDataSource.get() ? lexical_cast<string>(_plannedDataSource->getKey()) : string()));
 			os << t.close();
@@ -404,6 +428,8 @@ namespace synthese
 				throw Exception("No such planned data source");
 			}
 			_courseId = map.getOptional<string>(PARAMETER_COURSE_ID);
+			_dbConnString = map.getOptional<string>(PARAMETER_DB_CONN_STRING);
+			_stopCodePrefix = map.getDefault<string>(PARAMETER_STOP_CODE_PREFIX, "");
 		}
 
 

@@ -121,7 +121,7 @@ namespace synthese
 					logStream << "WARN : more than one network with key " << id << "<br />";
 				}
 				network = *loadedNetworks.begin();
-				logStream << "LOAD : use of existing network " << network->getKey() << " (" << network->getName() << ")<br />";
+				logStream << "LOAD : Use of existing network " << network->getKey() << " (" << network->getName() << ")<br />";
 			}
 			else
 			{
@@ -153,7 +153,7 @@ namespace synthese
 				set<StopArea*> loadedStopAreas(stopAreas.get(id));
 
 				logStream
-					<< "LOAD : link between stop areas " << id;
+					<< "LOAD : Link between stop areas " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
@@ -283,7 +283,7 @@ namespace synthese
 				set<StopPoint*> loadedStopPoints(stopPoints.get(id));
 
 				logStream
-					<< "LOAD : link between stops " << id;
+					<< "LOAD : Link between stops " << id;
 				if(name)
 				{
 					logStream << " (" << *name << ")";
@@ -1250,7 +1250,7 @@ namespace synthese
 					logStream << "WARN : more than one destination with key " << id << "<br />";
 				}
 				destination = *loadedDestination.begin();
-				logStream << "LOAD : use of existing destination " << destination->getKey() << " (" << destination->getDisplayedText() << ")<br />";
+				logStream << "LOAD : Use of existing destination " << destination->getKey() << " (" << destination->getDisplayedText() << ")<br />";
 			}
 			else
 			{
@@ -1299,7 +1299,7 @@ namespace synthese
 					}
 				}
 
-				logStream << "LOAD : use of existing commercial line" << line->getKey() << " (" << line->getName() << ")<br />";
+				logStream << "LOAD : Use of existing commercial line " << line->getKey() << " (" << line->getName() << ")<br />";
 			}
 			return line;
 		}
@@ -1309,7 +1309,8 @@ namespace synthese
 		std::set<JourneyPattern*> PTFileFormat::GetRoutes(
 			pt::CommercialLine& line,
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
-			const impex::DataSource& source
+			const impex::DataSource& source,
+			std::ostream& logStream
 		){
 			// Attempting to find an existing route by value comparison
 			set<JourneyPattern*> result;
@@ -1331,6 +1332,8 @@ namespace synthese
 				if(	*jp == servedStops
 				){
 					result.insert(jp);
+					logStream << "LOAD : Use of existing route " << jp->getKey() <<
+						" (" << jp->getName() << ")<br />";
 				}
 			}
 			return result;
