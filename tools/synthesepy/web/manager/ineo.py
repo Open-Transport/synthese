@@ -65,6 +65,8 @@ def _build_ineo_tables(project, jour, service_id, template_args):
         ARRET.nom arretNom,
         ARRET.mnemoc,
         ARRETCHN.pos,
+        HORAIRE.hta,
+        HORAIRE.htd,
         HORAIRE.hra,
         HORAIRE.hrd,
         HORAIRE.type,
@@ -89,7 +91,7 @@ def _build_ineo_tables(project, jour, service_id, template_args):
     template_args['chainage'] = result[0]['chainage']
     template_args['ineo_result'] = (
         result,
-        ('mnemoc', 'arretNom', 'pos', 'hra', 'hrd', 'type', 'deviation'))
+        ('mnemoc', 'arretNom', 'pos', 'hta', 'htd', 'hra', 'hrd', 'type', 'deviation'))
 
     # Synthese data
 
@@ -100,7 +102,6 @@ def _build_ineo_tables(project, jour, service_id, template_args):
         datasource_links='{config.ineo_realtime_data_source}|{service_id}'
     LIMIT 10
     """.format(**locals()))
-    pprint.pprint(services)
 
     stops_tables = []
     services_tables = []
