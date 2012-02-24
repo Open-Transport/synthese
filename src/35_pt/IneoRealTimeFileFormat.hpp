@@ -49,6 +49,8 @@ namespace synthese
 			public:
 				static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 				static const std::string PARAMETER_COURSE_ID;
+				static const std::string PARAMETER_DB_CONN_STRING;	//!< Connection string for accessing the real-time db.
+				static const std::string PARAMETER_STOP_CODE_PREFIX;
 
 			private:
 				//! @name Parameters
@@ -56,6 +58,8 @@ namespace synthese
 					boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 					boost::optional<std::string> _courseId;
 					mutable std::set<ScheduledService*> _services;
+					boost::optional<std::string> _dbConnString;
+					std::string _stopCodePrefix;
 				//@}
 
 			protected:
