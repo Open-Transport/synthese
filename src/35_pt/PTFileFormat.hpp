@@ -325,7 +325,7 @@ namespace synthese
 				pt::CommercialLine& line,
 				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
-				std::ostream& logStream	
+				std::ostream& logStream
 			);
 
 
