@@ -276,3 +276,5 @@ def db_clean_datasource():
 
 # Imports management
 import imports
+# Ineo
+import ineo

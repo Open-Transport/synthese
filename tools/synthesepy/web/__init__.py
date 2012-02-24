@@ -50,7 +50,7 @@ def get_application(bootstrap_config={}, project=None):
 
         project = project_manager.Project(bootstrap_config['project_path'], env=env)
 
-        config.update_finished()
+        config.update_finished(env)
 
     app = Flask(__name__)
     app.project = project
