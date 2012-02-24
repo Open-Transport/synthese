@@ -392,11 +392,10 @@ namespace synthese
 			os << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			os << t.title("Bases de données");
 			os << t.cell("Base de données SIV", t.getForm().getTextInput(DatabaseReadImporter<IneoRealTimeFileFormat>::PARAMETER_DATABASE, _database));
-			os << t.cell("Chaîne de connexion base de donnée", t.getForm().getTextInput(PARAMETER_DB_CONN_STRING, *_dbConnString));
+			os << t.cell("Chaîne de connexion base de donnée", t.getForm().getTextInput(PARAMETER_DB_CONN_STRING, _dbConnString ? *_dbConnString : ""));
 			os << t.title("Paramètres");
 			os << t.cell("Source de données théorique liée", t.getForm().getTextInput(PARAMETER_PLANNED_DATASOURCE_ID, _plannedDataSource.get() ? lexical_cast<string>(_plannedDataSource->getKey()) : string()));
 			os << t.close();
-
 		}
 
 
@@ -411,6 +410,14 @@ namespace synthese
 			if(_courseId)
 			{
 				map.insert(PARAMETER_COURSE_ID, *_courseId);
+			}
+			if(_dbConnString)
+			{
+				map.insert(PARAMETER_DB_CONN_STRING, *_dbConnString);
+			}
+			if(!_stopCodePrefix.empty())
+			{
+				map.insert(PARAMETER_STOP_CODE_PREFIX, _stopCodePrefix);
 			}
 			return map;
 		}
