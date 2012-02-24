@@ -27,6 +27,7 @@ import os
 from os.path import join
 import socket
 
+from synthesepy import db_backends
 from synthesepy import utils
 
 log = logging.getLogger(__name__)
@@ -138,6 +139,12 @@ DEFAULTS = {
     # system_install
     'synthese_user': 'synthese',
     'synthese_group': 'synthese',
+
+    # ineo realtime
+    'ineo_conn_string': None,
+    'ineo_ver': 1,
+    'ineo_planned_data_source': '16607027920896001',
+    'ineo_realtime_data_source': '16607027920896002',
 }
 
 
@@ -193,7 +200,7 @@ class Config(object):
     def update_from_dict(self, dict):
         self.__dict__.update(dict)
 
-    def update_finished(self):
+    def update_finished(self, env):
         """Should be called once the config object is finished being updated"""
         # Hack to avoid passing arguments to all invocations.
         if self.netstat_cmd:
@@ -223,6 +230,10 @@ class Config(object):
 
         self.remote_project_path = self.remote_project_path.format(
             project_name=self.project_name)
+
+        self.ineo_db = None
+        if self.ineo_conn_string:
+            self.ineo_db = db_backends.create_backend(env, self.ineo_conn_string)
 
     def __repr__(self):
         return '<Config %s>' % self.__dict__

@@ -97,6 +97,11 @@
       <div class="fill">
         <div class="container">
           <a class="brand" href="{{ url_for('.index') }}">Synthese Manager ({{ project_name }})</a>
+          <ul class="nav">
+            <li><a href="/admin/">admin</a></li>
+            <li><a href="/">website</a></li>
+          </ul>
+
           <div class="pull-right login-info">
             {% if not session.logged_in %}
               <a href="{{ url_for('.login') }}">{{ i18n.login }}</a>

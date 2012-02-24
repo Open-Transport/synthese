@@ -56,6 +56,8 @@ Import à blanc: {dummy}
 
 Appels syntheses:
 {synthese_calls}
+
+Durée de l'import (s): {duration}
 """
 
     # Web Manager

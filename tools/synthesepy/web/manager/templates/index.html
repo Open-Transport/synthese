@@ -187,6 +187,12 @@
 
     <p><a href="{{ url_for('.db') }}">Database Administration Page</a></p>
 
+    {% if config.ineo_conn_string %}
+      <h1>Ineo Realtime</h1>
+  
+      <p><a href="{{ url_for('.ineo') }}">Ineo Realtime Debug Page</a></p>
+    {% endif %}
+
   {% endif %}
 
   <h1>Gestion des imports</h1>

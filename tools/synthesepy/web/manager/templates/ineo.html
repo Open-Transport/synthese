@@ -1,0 +1,83 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  <style>
+    .container {
+      width: 95%;
+    }
+    .span14 {
+      width: 90%;
+    }
+
+    * {
+      -moz-box-sizing: border-box;
+      -webkit-box-sizing: border-box;
+      box-sizing: border-box;
+    }
+
+    table.half {
+      width: 48%;
+      float: left;
+      margin: 5px;
+      border: thin solid lightGray;
+    }
+    table > caption {
+      font-size: larger;
+    }
+  </style>
+{% endblock %}
+
+{% block breadcrumb %}
+  <li>Ineo Realtime Debug</li>
+{% endblock %}
+
+{% macro table(rows_and_columns, caption='', class='') -%}
+  <table class="condensed-table {{class}}">
+    <caption>{{ caption }}</caption>
+    <tr>
+      {% for col in rows_and_columns[1] %}
+        <th>{{ col }}</th>
+      {% endfor %}
+    </tr>
+    {% for row in rows_and_columns[0] %}
+      <tr>
+      {% for col in rows_and_columns[1] %}
+        <td>{{ row[col]|safe }}</td>
+      {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+{%- endmacro %}
+
+{% block body %}
+
+{% if services %}
+
+  {{ table(services, 'Service list') }}
+
+  <a href="{{next_page}}">Next Page</a> (services count: {{ services_count }})
+
+{% else %}
+
+  service_id: {{ service_id }}<br>
+  line_name: {{ line_name }}<br>
+  chainage: {{ chainage }}<br>
+  jour: {{ jour }}<br>
+  
+  {{ table(ineo_result, 'Inéo data', 'half') }}
+  
+  {% for stops_table in stops_tables %}
+    {{ table(stops_table, 'Synthese data', 'half') }}
+  {% endfor %}
+  
+  {% for services_table in services_tables %}
+    {{ table(services_table, 'Synthese service data') }}
+    {% if services_table[0] %}
+      <a href="/admin/synthese?SERVICE=admin&mt=177329235327713281&pt=177329235327713283&roid={{services_table[0][0]['id']}}&rub=ServiceAdmin&tab=&tt=177329235327713282">
+      Synthese service admin page</a>
+    {% endif %}
+  {% endfor %}
+
+{% endif %}
+
+{% endblock %}

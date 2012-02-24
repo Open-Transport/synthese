@@ -208,6 +208,7 @@ def add_project_subparsers(subparsers):
     parser.add_argument('--no-mail', action='store_true', default=False)
     add_parser('deploy_remote_prepare')
     add_parser('deploy_remote_restore')
+    add_parser('ineo_install_triggers')
 
 
 def add_default_subparsers(subparsers):
@@ -459,13 +460,13 @@ def main():
 
     config.update_from_dict(args.__dict__)
 
-    config.update_finished()
-
     config.wsgi_proxy = not args.no_proxy
     config.wsgi_proxy_port = config.port + 1
 
     env = synthesepy.env.create_env(
         args.env_type, args.env_path, args.mode, config)
+
+    config.update_finished(env)
 
     try:
         if project:

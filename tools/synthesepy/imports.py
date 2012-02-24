@@ -52,7 +52,10 @@ class ImportsManager(object):
 
         self.templates = OrderedDict()
         config_path = join(self.project.path, 'manager', 'imports_config.py')
-        config = {}
+        config = {
+            # Give access to the project
+            'project': self.project,
+        }
         if os.path.isfile(config_path):
             execfile(config_path, {
                 'project': self.project,
@@ -193,6 +196,7 @@ class ImportRun(object):
         self.execution_time = -1
         self.dummy = False
         self.messages = None
+        self.duration = -1
         self.synthese_calls = []
 
     def __repr__(self):
@@ -280,7 +284,7 @@ class ImportRun(object):
 
     def finish(self):
         state_keys = ('successful', 'date', 'execution_time', 'messages',
-            'dummy', 'synthese_calls')
+            'dummy', 'synthese_calls', 'duration')
         state = dict((k, getattr(self, k)) for k in state_keys)
         json.dump(
             state, open(self.state_path, 'wb'),
@@ -324,7 +328,8 @@ class ImportRun(object):
 
         lines.append(i18n.technical_infos.format(
             dummy=self.dummy,
-            synthese_calls='\n\n'.join(self.synthese_calls)))
+            synthese_calls='\n\n'.join(self.synthese_calls),
+            duration=self.duration))
 
         return ''.join(lines)
     summary = property(get_summary)
@@ -555,6 +560,7 @@ class Import(utils.DirObjectLoader):
         run = self._create_run()
         run.dummy = dummy
         try:
+            start = time.time()
             if self.template.do_import:
                 self.template.do_import(self, run)
             else:
@@ -563,6 +569,7 @@ class Import(utils.DirObjectLoader):
             log.warn('Import exception: %s', traceback.format_exc(e))
             run.add_failure(e)
         finally:
+            run.duration = time.time() - start
             run.finish()
             event = Event()
             event.type = 'run'
