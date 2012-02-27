@@ -84,7 +84,7 @@ namespace synthese
 			const GraphTypes& whatToSearch
 		) const {
 
-			IncludingPlace::getVertexAccessMap(
+			IncludingPlace<NamedPlace>::getVertexAccessMap(
 				result,
 				accessParameters,
 				whatToSearch
