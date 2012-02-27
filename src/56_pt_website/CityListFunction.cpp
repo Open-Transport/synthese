@@ -132,7 +132,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
 			GeographyModule::CitiesMatcher matcher;
 			if(!site)

@@ -69,24 +69,24 @@ namespace synthese
 		CMSModule::SitesByClientURL CMSModule::_sitesByClientURL;
 
 
-		boost::shared_ptr<const Website> CMSModule::GetSite(
+		const Website* CMSModule::GetSite(
 			const server::Request& request,
 			const ParametersMap& pm
 		){
 			RegistryKeyType id(pm.getDefault<RegistryKeyType>(FunctionWithSiteBase::PARAMETER_SITE, 0));
 			if(id)
 			{
-				return Fetcher<Website>::Fetch(id, Env::GetOfficialEnv());
+				return Fetcher<Website>::Fetch(id, Env::GetOfficialEnv()).get();
 			}
 
 			{
 				shared_ptr<const WebPageDisplayFunction> function(
 					dynamic_pointer_cast<const WebPageDisplayFunction>(
-					request.getFunction()
-					)	);
+						request.getFunction()
+				)	);
 				if(function.get() && function->getPage())
 				{
-					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv());
+					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv()).get();
 				}
 			}
 
@@ -101,7 +101,7 @@ namespace synthese
 				}
 			}
 
-			return shared_ptr<const Website>();
+			return NULL;
 		}
 
 

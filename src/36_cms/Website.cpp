@@ -21,16 +21,25 @@
 */
 
 #include "Website.hpp"
+
+#include "Env.h"
 #include "Webpage.h"
+
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
 
 namespace synthese
 {
+	using namespace util;
+	
 	namespace cms
 	{
 		void Website::addPage( Webpage& page )
 		{
 			if(!page.getSmartURLPath().empty())
 			{
+				mutex::scoped_lock lock (_smartURLMutex);
 				_webpagesBySmartURL.insert(make_pair(page.getSmartURLPath(), &page));
 			}
 		}
@@ -41,6 +50,7 @@ namespace synthese
 		{
 			if(!page.empty())
 			{
+				mutex::scoped_lock lock (_smartURLMutex);
 				_webpagesBySmartURL.erase(page);
 			}
 		}
@@ -53,6 +63,7 @@ namespace synthese
 			{
 				return NULL;
 			}
+			boost::mutex::scoped_lock lock (_smartURLMutex);
 			WebpagesBySmartURL::const_iterator it(_webpagesBySmartURL.find(key));
 			if(it == _webpagesBySmartURL.end())
 			{
@@ -63,10 +74,41 @@ namespace synthese
 
 
 
-		bool Website::dateControl() const
+		bool Website::dateCheck() const
 		{
 			boost::gregorian::date tempDate(boost::gregorian::day_clock::local_day());
 			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
 		}
-	}
-}
+
+
+
+		Webpage* Website::getPageByIdOrSmartURL( const std::string& key ) const
+		{
+			if(key.empty())
+			{
+				return NULL;
+			}
+
+			Webpage* result(NULL);
+			if(isdigit(key[0]))
+			{	// Load by id
+				try
+				{
+					result = Env::GetOfficialEnv().getEditable<Webpage>(
+						lexical_cast<RegistryKeyType>(key)
+					).get();
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
+			}
+			if(!result)
+			{
+				result = getPageBySmartURL("!" + key);
+			}
+			return result;
+		}
+}	}

@@ -47,7 +47,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const Website>	_site;
+				const Website*	_site;
 			//@}
 
 
@@ -65,14 +65,15 @@ namespace synthese
 		public:
 			//! @name Getters
 			//@{
-				boost::shared_ptr<const Website> getSite() const {	return _site; }
+				const Website* getSite() const {	return _site; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setSite(boost::shared_ptr<const Website> value) {	_site = value; }
+				void setSite(const Website* value) {	_site = value; }
 			//@}
 
+			FunctionWithSiteBase();
 		};
 	}
 }

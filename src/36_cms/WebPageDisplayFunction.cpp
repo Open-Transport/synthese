@@ -101,7 +101,7 @@ namespace synthese
 			else
 			{
 				_smartURL = map.get<string>(PARAMETER_SMART_URL);
-				if(_smartURL.empty() || !getSite().get())
+				if(_smartURL.empty() || !getSite())
 				{
 					throw RequestException("Smart URL and site, or page ID must be specified");
 				}

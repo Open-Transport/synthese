@@ -65,7 +65,7 @@ namespace synthese
 
 			Webpage p;
 			p.setContent(_text);
-			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, getTemplateParameters()).get()));
+			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, getTemplateParameters())));
 			p.display(stream, request, getTemplateParameters());
 
 			return util::ParametersMap();

@@ -33,10 +33,16 @@ namespace synthese
 
 
 
+		FunctionWithSiteBase::FunctionWithSiteBase():
+			_site(NULL)
+		{}
+
+
+
 		util::ParametersMap FunctionWithSiteBase::_getParametersMap() const
 		{
 			util::ParametersMap map;
-			if(_site.get())
+			if(_site)
 			{
 				map.insert(PARAMETER_SITE, _site->getKey());
 			}
