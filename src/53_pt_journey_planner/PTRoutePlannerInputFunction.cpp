@@ -105,11 +105,11 @@ namespace synthese
 
 			ParametersMap requestParametersMap(getTemplateParameters());
 
-			shared_ptr<const TransportWebsite> site(
-				dynamic_pointer_cast<const TransportWebsite, const Website>(
+			const TransportWebsite* site(
+				dynamic_cast<const TransportWebsite*>(
 					CMSModule::GetSite(request, getTemplateParameters())
 			)	);
-			if(!site.get())
+			if(!site)
 			{
 				return ParametersMap();
 			}

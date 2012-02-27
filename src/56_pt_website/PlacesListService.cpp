@@ -97,7 +97,8 @@ namespace synthese
 		PlacesListService::PlacesListService():
 			_sorted(true),
 			_citiesWithAtLeastAStop(true),
-			_minScore(0)
+			_minScore(0),
+			_coordinatesSystem(NULL)
 		{}
 
 

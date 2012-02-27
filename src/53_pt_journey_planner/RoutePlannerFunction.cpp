@@ -406,7 +406,7 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
 			_outputRoadApproachDetail =
 				site ?
@@ -951,7 +951,7 @@ namespace synthese
 			}
 
 			// Declarations
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -1111,7 +1111,7 @@ namespace synthese
 				{
 					stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
 				}
-				if(_site.get())
+				if(_site)
 				{
 					stream << " siteId=\"" << _site->getKey() << "\">";
 				}

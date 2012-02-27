@@ -192,6 +192,25 @@ namespace synthese
 				) const;
 			};
 
+			class ForeachNode : public Node
+			{
+				static const std::string DATA_RANK;
+				static const std::string DATA_ITEMS_COUNT;
+
+			public:
+				std::string arrayCode;
+				Nodes pageCode;
+				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
+				Parameters parameters;
+
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const util::ParametersMap& additionalParametersMap,
+					const Webpage& page
+				) const;
+			};
+
 			class ValueNode : public Node
 			{
 			public:
