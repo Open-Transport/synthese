@@ -41,9 +41,8 @@ namespace synthese
 		PlaceAlias::PlaceAlias(
 			RegistryKeyType id
 		):	Registrable(id),
-			IncludingPlace()
-		{
-		}
+			IncludingPlace<NamedPlace>()
+		{}
 
 
 
