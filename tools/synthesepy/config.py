@@ -85,6 +85,7 @@ DEFAULTS = {
     'mail_tls': False,
     'use_udf_proxy': False,
     'udf_proxy_port': 9080,
+    'udf_proxy_options': '',
     'send_mail_on_restart': False,
     'apache_conf_suffix': '',
     # web frontend configuration
