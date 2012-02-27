@@ -190,11 +190,11 @@ namespace synthese
 					bool isCityMainConnection (	rows->getBool (StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION));
 					if (isCityMainConnection)
 					{
-						city->addIncludedPlace (cp);
+						city->addIncludedPlace(*cp);
 					}
 					else
 					{
-						city->removeIncludedPlace(cp);
+						city->removeIncludedPlace(*cp);
 					}
 					city->addPlaceToMatcher(env.getEditableSPtr(cp));
 				}
@@ -260,7 +260,7 @@ namespace synthese
 			query.addField(object->getAllowedConnection());
 
 			// Is a main stop of the city
-			query.addField(object->getCity() ? object->getCity()->includes(object) : false);
+			query.addField(object->getCity() ? object->getCity()->includes(*object) : false);
 
 			// Default transfer delay
 			query.addField(object->getDefaultTransferDelay().total_seconds() / 60);
@@ -322,7 +322,7 @@ namespace synthese
 			if (city != NULL)
 			{
 				city->removePlaceFromMatcher(*cp);
-				city->removeIncludedPlace(cp);
+				city->removeIncludedPlace(*cp);
 			}
 
 			if(Env::GetOfficialEnv().contains(*cp))

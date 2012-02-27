@@ -38,8 +38,6 @@ namespace synthese
 
 	namespace geography
 	{
-
-
 		PlaceAlias::PlaceAlias(
 			RegistryKeyType id
 		):	Registrable(id),
@@ -51,30 +49,33 @@ namespace synthese
 
 		PlaceAlias::~PlaceAlias ()
 		{
-
 		}
 
 
 
 		const NamedPlace*
-		PlaceAlias::getAliasedPlace () const
+		PlaceAlias::getAliasedPlace() const
 		{
-			assert(!_includedPlaces.empty());
+			assert(!getIncludedPlaces().empty());
 
-			return dynamic_cast<const NamedPlace*>(*_includedPlaces.begin());
+			return *getIncludedPlaces().begin();
 		}
 
 
-		const std::string&
-		PlaceAlias::getOfficialName () const
+
+		const std::string& PlaceAlias::getOfficialName () const
 		{
 			return getAliasedPlace()->getOfficialName ();
 		}
 
+
+
 		void PlaceAlias::setAliasedPlace( const NamedPlace* place )
 		{
-			_includedPlaces.clear();
-			addIncludedPlace(place);
+			assert(place);
+
+			clearIncludedPlaces();
+			addIncludedPlace(*place);
 		}
 
 

@@ -23,9 +23,14 @@
 #ifndef SYNTHESE_ENV_INCLUDINGPLACE_H
 #define SYNTHESE_ENV_INCLUDINGPLACE_H
 
-#include <set>
-
 #include "Place.h"
+
+#include "CoordinatesSystem.hpp"
+
+#include <set>
+#include <boost/foreach.hpp>
+#include <geos/geom/Envelope.h>
+#include <geos/geom/Point.h>
 
 #pragma warning( disable : 4250 )
 
@@ -37,21 +42,22 @@ namespace synthese
 
 			@ingroup m32
 		*/
+		template<class Included>
 		class IncludingPlace:
 			public virtual Place
 		{
 		public:
-			typedef std::set<const Place*> IncludedPlaces;
+			typedef std::set<const Included*> IncludedPlaces;
 
-		protected:
+		private:
 			IncludedPlaces _includedPlaces;
 
-			IncludingPlace(
-			);
+		protected:
+			IncludingPlace(): Place() {}
 
 		public:
 
-			virtual ~IncludingPlace ();
+			virtual ~IncludingPlace() {}
 
 
 			//! @name Getters/Setters
@@ -59,8 +65,7 @@ namespace synthese
 
 				/** Gets included places.
 				 */
-				const IncludedPlaces& getIncludedPlaces () const;
-
+				const IncludedPlaces& getIncludedPlaces() const { return _includedPlaces; }
 			//@}
 
 
@@ -75,34 +80,130 @@ namespace synthese
 
 				virtual const boost::shared_ptr<geos::geom::Point>& getPoint() const;
 
-				virtual bool includes(const Place* place) const;
-
+				virtual bool includes(const Included& place) const;
 			//@}
-
 
 			//! @name Update methods.
 			//@{
-
-				/** Adds an included place to this place.
-					@param place Place to include
-					This methods cancels the caching of the isobarycentre.
-				 */
-				void addIncludedPlace (const Place* place);
+				//////////////////////////////////////////////////////////////////////////
+				/// Adds a place to the included places list.
+				/// @param place Place to include
+				///	This methods cancels the caching of the centroid.
+				void addIncludedPlace (const Included& place);
 
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Removes an included place to the current one.
+				/// Removes a place to the included places list.
 				/// @param place place to remove
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.1.16
-				/// This methods cancels the caching of the isobarycentre.
+				/// This methods cancels the caching of the centroid.
 				/// If the place was not included, the method do nothing.
-				void removeIncludedPlace(const Place* place);
+				void removeIncludedPlace(const Included& place);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Removes all places to the included places list.
+				/// @author Hugues Romain
+				/// @date 2012
+				/// @since 3.3.0
+				/// This methods cancels the caching of the centroid.
+				void clearIncludedPlaces();
 			//@}
 		};
-	}
-}
+
+
+
+		template<class Included>
+		void IncludingPlace<Included>::getVertexAccessMap(
+			graph::VertexAccessMap& result,
+			const graph::AccessParameters& accessParameters,
+			const GraphTypes& whatToSearch
+		) const	{
+			BOOST_FOREACH(const Included* place, _includedPlaces)
+			{
+				place->getVertexAccessMap(
+					result,
+					accessParameters,
+					whatToSearch
+				);
+			}
+		}
+
+
+
+		template<class Included>
+		const boost::shared_ptr<geos::geom::Point>& IncludingPlace<Included>::getPoint() const
+		{
+			if (!_isoBarycentre.get())
+			{
+				geos::geom::Envelope e;
+				BOOST_FOREACH(const Included* place, _includedPlaces)
+				{
+					if(place->getPoint().get() && !place->getPoint()->isEmpty())
+					{
+						e.expandToInclude(*place->getPoint()->getCoordinate());
+					}
+				}
+				geos::geom::Coordinate c;
+				e.centre(c);
+				_isoBarycentre.reset(CoordinatesSystem::GetInstanceCoordinatesSystem().getGeometryFactory().createPoint(c));
+			}
+			return _isoBarycentre;
+		}
+
+
+
+		template<class Included>
+		bool IncludingPlace<Included>::includes( const Included& place ) const
+		{
+			// A place always includes itself
+			if(	dynamic_cast<const Included*>(this) &&
+				&place == dynamic_cast<const Included*>(this)
+			){
+				return true;
+			}
+
+			// Tests if the place is present in the included places list
+			BOOST_FOREACH(const Included* testedPlace, _includedPlaces)
+			{
+				if (testedPlace == &place)
+				{
+					return true;
+			}	}
+
+			return false;
+		}
+
+
+
+		template<class Included>
+		void IncludingPlace<Included>::addIncludedPlace( const Included& place )
+		{
+			_isoBarycentre.reset();
+			_includedPlaces.insert(&place);
+		}
+
+
+
+		template<class Included>
+		void synthese::geography::IncludingPlace<Included>::removeIncludedPlace( const Included& place )
+		{
+			_isoBarycentre.reset();
+			_includedPlaces.erase(&place);
+		}
+
+
+
+		template<class Included>
+		void synthese::geography::IncludingPlace<Included>::clearIncludedPlaces()
+		{
+			_isoBarycentre.reset();
+			_includedPlaces.clear();
+		}
+}	}
 
 #endif

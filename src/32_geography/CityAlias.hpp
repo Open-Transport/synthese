@@ -46,7 +46,7 @@ namespace synthese
 		/// @date 2010
 		/// @since 3.1.16
 		class CityAlias:
-			public IncludingPlace,
+			public IncludingPlace<City>,
 			public util::Registrable
 		{
 		public:
