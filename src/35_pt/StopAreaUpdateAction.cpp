@@ -194,13 +194,13 @@ namespace synthese
 				_place->setCity(_city.get());
 				if(_isMain)
 				{
-					if(*_isMain && !_city->includes(_place.get()))
+					if(*_isMain && !_city->includes(*_place))
 					{
-						_city->addIncludedPlace(_place.get());
+						_city->addIncludedPlace(*_place);
 					}
-					if(!*_isMain && _city->includes(_place.get()))
+					if(!*_isMain && _city->includes(*_place))
 					{
-						_city->removeIncludedPlace(_place.get());
+						_city->removeIncludedPlace(*_place);
 					}
 				}
 			}

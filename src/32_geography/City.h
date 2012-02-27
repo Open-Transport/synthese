@@ -54,7 +54,7 @@ namespace synthese
 			@ingroup m32
 		*/
 		class City:
-			public IncludingPlace,
+			public IncludingPlace<NamedPlace>,
 			public virtual util::Registrable
 		{
 		public:

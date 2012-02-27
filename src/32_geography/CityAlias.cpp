@@ -41,9 +41,7 @@ namespace synthese
 	{
 		CityAlias::CityAlias( util::RegistryKeyType id)
 			: Registrable(id)
-		{
-
-		}
+		{}
 
 
 
@@ -91,18 +89,19 @@ namespace synthese
 
 		const City* CityAlias::getCity() const
 		{
-			assert(_includedPlaces.size() == 1);
-			assert(dynamic_cast<const City*>(*_includedPlaces.begin()));
+			assert(getIncludedPlaces().size() == 1);
+			assert(dynamic_cast<const City*>(*getIncludedPlaces().begin()));
 
-			return dynamic_cast<const City*>(*_includedPlaces.begin());
+			return dynamic_cast<const City*>(*getIncludedPlaces().begin());
 		}
 
 
 
 		void CityAlias::setCity( const City* value )
 		{
-			_includedPlaces.clear();
-			_includedPlaces.insert(static_cast<const Place*>(value));
+			assert(value);
+
+			clearIncludedPlaces();
+			addIncludedPlace(*value);
 		}
-	}
-}
+}	}
