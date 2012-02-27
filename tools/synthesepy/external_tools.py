@@ -131,14 +131,15 @@ class UDFProxySupervisor(Supervisor):
     def get_command(self):
         config = self.project.config
         return ('python {script} -ns -p {udf_proxy_port} --log-path={log_path} '
-            '-t http://localhost:{synthese_port} start'.format(
+            '-t http://localhost:{synthese_port} {udf_proxy_options} start'.format(
             script=join(
                 self.project.env.source_path, 'utils',
                 'udf_proxy', 'udf_proxy.py'),
             udf_proxy_port=config.udf_proxy_port,
             log_path=join(self.project.config.project_path,
                 'logs', 'udf_proxy.log'),
-            synthese_port=config.port))
+            synthese_port=config.port,
+            udf_proxy_options=config.udf_proxy_options))
 
 
 class WSGI(ExternalTool):
