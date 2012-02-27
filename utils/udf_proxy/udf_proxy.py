@@ -51,6 +51,7 @@ TARGET_URL = None
 TIMEOUT = 10
 VERBOSE = False
 LOG_PATH = None
+LOG_SIZE_MB = 10
 
 
 class Request(object):
@@ -70,18 +71,21 @@ class Dispatcher(object):
 
     def loop(self):
         while not self.stop:
-            request = queue.get()
-            log.info('Dispatching request: %s (%i left)', request, queue.qsize())
-            if request == 'stop':
-                log.info('Stop request, exiting dispatcher')
-                break
             try:
-                res = urllib2.urlopen(TARGET_URL + request.path, request.data, TIMEOUT)
-            except urllib2.URLError, e:
-                log.warn('Exception while dispatching request %s: %s', request, e)
-                continue
-            if res.code != 200:
-                log.warn('Didn\'t get 200 code reply to request: %s', request)
+                request = queue.get()
+                log.info('Dispatching request: %s (%i left)', request, queue.qsize())
+                if request == 'stop':
+                    log.info('Stop request, exiting dispatcher')
+                    break
+                try:
+                    res = urllib2.urlopen(TARGET_URL + request.path, request.data, TIMEOUT)
+                except urllib2.URLError, e:
+                    log.warn('Exception while dispatching request %s: %s', request, e)
+                    continue
+                if res.code != 200:
+                    log.warn('Didn\'t get 200 code reply to request: %s', request)
+            except Exception, e:
+                log.exception('Unexpected exception during dispatch:')
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -132,7 +136,7 @@ def main():
         with open(LOG_PATH, 'wb') as f:
             f.write('')
         handler = logging.handlers.RotatingFileHandler(
-            LOG_PATH, maxBytes=10 * 1024 * 1024, backupCount=3)
+            LOG_PATH, maxBytes=LOG_SIZE_MB * 1024 * 1024, backupCount=3)
         handler.setFormatter(logging.Formatter(
             '%(asctime)s %(levelname)-10s %(message)s'))
         handler.setLevel(logging.INFO)
@@ -184,6 +188,9 @@ if __name__ == '__main__':
     parser.add_option('--log-path',
         default=join(thisdir, 'logs.txt'),
         help='Location of log file (or "no" to disable)')
+    parser.add_option('--log-size-mb',
+        default=10,
+        help='Maximum log size before rotaiton (in MB)')
     parser.add_option('--pid-path',
         default=join(thisdir, 'udf_proxy.pid'),
         help='Location of pid file')
@@ -198,6 +205,7 @@ if __name__ == '__main__':
     VERBOSE = options.verbose
     if options.log_path != 'no':
         LOG_PATH = options.log_path
+    LOG_SIZE_MB = options.log_size_mb
 
     if options.no_daemon and not options.silent:
         logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)
