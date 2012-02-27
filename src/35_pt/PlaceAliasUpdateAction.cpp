@@ -159,13 +159,13 @@ namespace synthese
 
 			if(_isCityMainPlace && _alias->getCity())
 			{
-				if(*_isCityMainPlace && !_alias->getCity()->includes(_alias.get()))
+				if(*_isCityMainPlace && !_alias->getCity()->includes(*_alias))
 				{
-					const_cast<City*>(_alias->getCity())->addIncludedPlace(_alias.get());
+					const_cast<City*>(_alias->getCity())->addIncludedPlace(*_alias);
 				}
-				if(!*_isCityMainPlace && _alias->getCity()->includes(_alias.get()))
+				if(!*_isCityMainPlace && _alias->getCity()->includes(*_alias))
 				{
-					const_cast<City*>(_alias->getCity())->removeIncludedPlace(_alias.get());
+					const_cast<City*>(_alias->getCity())->removeIncludedPlace(*_alias);
 				}
 			}
 

@@ -208,7 +208,7 @@ namespace synthese
 			stopArea->setName(name);
 			if(mainStopArea)
 			{
-				city.addIncludedPlace(stopArea);
+				city.addIncludedPlace(*stopArea);
 			}
 			env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(stopArea));
 			stopAreas.add(*stopArea);

@@ -239,7 +239,12 @@ namespace synthese
 							false, true, true, true
 					)	);
 
-					stream << t.cell("Arrêt principal", t.getForm().getOuiNonRadioInput(StopAreaUpdateAction::PARAMETER_IS_MAIN, _connectionPlace->getCity()->includes(_connectionPlace.get())));
+					stream << t.cell(
+						"Arrêt principal",
+						t.getForm().getOuiNonRadioInput(
+							StopAreaUpdateAction::PARAMETER_IS_MAIN,
+							_connectionPlace->getCity()->includes(*_connectionPlace)
+					)	);
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
 					stream << t.cell("Nom court", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_SHORT_NAME, _connectionPlace->getName13()));
@@ -614,7 +619,7 @@ namespace synthese
 					stream << t.row();
 					stream << t.col() << alias->getCity()->getName();
 					stream << t.col() << alias->getName();
-					stream << t.col() << (alias->getCity()->includes(alias.get()) ? "OUI" : "NON");
+					stream << t.col() << (alias->getCity()->includes(*alias) ? "OUI" : "NON");
 					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'alias ?");
 				}
 

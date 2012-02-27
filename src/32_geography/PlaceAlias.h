@@ -35,60 +35,51 @@ namespace synthese
 {
 	namespace geography
 	{
-
-
 		/** Place alias.
 
 			@ingroup m32
 		*/
 		class PlaceAlias:
-			public IncludingPlace,
+			public IncludingPlace<NamedPlace>,
 			public NamedPlaceTemplate<PlaceAlias>
 		{
 		public:
-
 			/// Chosen registry class.
 			typedef util::Registry<PlaceAlias>	Registry;
 
 
-		private:
-
-
-		public:
 
 			PlaceAlias(
 				util::RegistryKeyType id = 0
 			);
+
+
 
 			virtual ~PlaceAlias ();
 
 
 			//! @name Getters/Setters
 			//@{
-
-			/** Gets official name of this place.
-
-				@return aliased place official name.
-			 */
-			const std::string& getOfficialName () const;
-
-
-			/** Gets aliased place.
-			 */
-			const NamedPlace* getAliasedPlace () const;
-
-
-			void setAliasedPlace(const NamedPlace* place);
+				/** Gets official name of this place.
+	
+					@return aliased place official name.
+				 */
+				const std::string& getOfficialName () const;
+	
+	
+				/** Gets aliased place.
+				 */
+				const NamedPlace* getAliasedPlace () const;
+	
+	
+				void setAliasedPlace(const NamedPlace* place);
 			//@}
 
 
 			virtual std::string getNameForAllPlacesMatcher(
 				std::string text = std::string()
 			) const;
-
 		};
-
-
 	}
 }
 

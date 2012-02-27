@@ -278,7 +278,7 @@ namespace synthese
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << t.open();
 
-					BOOST_FOREACH(const IncludingPlace::IncludedPlaces::value_type it, _city->getIncludedPlaces())
+					BOOST_FOREACH(const City::IncludedPlaces::value_type it, _city->getIncludedPlaces())
 					{
 						stream << t.row();
 

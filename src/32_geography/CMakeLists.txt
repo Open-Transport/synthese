@@ -24,7 +24,6 @@ GetMapOpenLayersConstructorService.cpp
 GetMapOpenLayersConstructorService.hpp
 HTMLMap.cpp
 HTMLMap.hpp
-IncludingPlace.cpp
 IncludingPlace.h
 MapSource.cpp
 MapSource.hpp
