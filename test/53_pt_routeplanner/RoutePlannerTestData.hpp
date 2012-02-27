@@ -297,7 +297,7 @@ StopArea place93(1970324837184593ULL,true,minutes(8));
 place93.setName("93");
 place93.setCity(&city54);
 place93.setAllowedConnection(true);
-city54.addIncludedPlace(&place93);
+city54.addIncludedPlace(place93);
 place93.addTransferDelay(562949953421389ULL,3377699720880573ULL,minutes(0));
 
 Coordinate cops73(521000.0,1847000.0);
@@ -374,7 +374,7 @@ StopArea place97(1970324837184597ULL,true,minutes(8));
 place97.setName("97");
 place97.setCity(&city38);
 place97.setAllowedConnection(true);
-city38.addIncludedPlace(&place97);
+city38.addIncludedPlace(place97);
 place97.addTransferDelay(562949953421396ULL,3377699720880580ULL,minutes(0));
 place97.addTransferDelay(562949953421399ULL,3377699720880579ULL,minutes(0));
 place97.addTransferDelay(3377699720880580ULL,562949953421396ULL,minutes(0));
@@ -424,7 +424,7 @@ StopArea place99(1970324837184599ULL,true,minutes(8));
 place99.setName("99");
 place99.setCity(&city38);
 // connection type 5
-city38.addIncludedPlace(&place99);
+city38.addIncludedPlace(place99);
 place99.addTransferDelay(3377699720880585ULL,562949953421390ULL,minutes(0));
 place99.addTransferDelay(562949953421390ULL,3377699720880585ULL,minutes(0));
 
