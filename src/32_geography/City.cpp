@@ -57,7 +57,7 @@ namespace synthese
 			RegistryKeyType key,
 			std::string name,
 			std::string code
-		):	IncludingPlace(),
+		):	IncludingPlace<NamedPlace>(),
 			_code (code),
 			_name(name),
 			Registrable(key)
