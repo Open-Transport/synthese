@@ -27,6 +27,7 @@
 #include "Registrable.h"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace synthese
 {
@@ -56,6 +57,8 @@ namespace synthese
 				WebpagesBySmartURL			_webpagesBySmartURL;
 			//@}
 
+			mutable boost::mutex _smartURLMutex; //!< For thread safety.
+
 		public:
 			Website():
 			  _startValidityDate(boost::gregorian::not_a_date_time),
@@ -81,7 +84,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				bool dateControl() const;
+				bool dateCheck() const;
 			//@}
 
 			//! @name Modifiers
@@ -90,8 +93,8 @@ namespace synthese
 
 				void removePage(const std::string& page);
 
-				/// Non thread safe
 				Webpage* getPageBySmartURL(const std::string& key) const;
+				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
 			//@}
 		};
 	}

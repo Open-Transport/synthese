@@ -144,7 +144,7 @@ namespace synthese
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
 
 			// Journey planner
-			_journeyPlanner.setSite(_site);
+			_journeyPlanner.setSite(_site.get());
 			_journeyPlanner._setFromParametersMap(map);
 			_journeyPlanner.setOutputFormat(RoutePlannerFunction::VALUE_ADMIN_HTML);
 
@@ -187,7 +187,7 @@ namespace synthese
 				updateRequest.getAction()->setSiteId(_site->getKey());
 
 				StaticFunctionRequest<RoutePlannerFunction> rpHomeRequest(_request, true);
-				rpHomeRequest.getFunction()->setSite(_site);
+				rpHomeRequest.getFunction()->setSite(_site.get());
 
 				// Display
 				stream << "<h1>Liens</h1>";

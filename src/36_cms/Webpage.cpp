@@ -54,6 +54,9 @@ namespace synthese
 		const string Webpage::DATA_FORUM("forum");
 		const string Webpage::DATA_DEPTH("depth");
 
+		const string Webpage::ForeachNode::DATA_RANK = "rank";
+		const string Webpage::ForeachNode::DATA_ITEMS_COUNT = "items_count";
+
 		const string Webpage::PARAMETER_VAR = "VAR";
 		synthese::util::shared_recursive_mutex Webpage::_SharedMutex;
 
@@ -204,6 +207,71 @@ namespace synthese
 					valueNode->name = parameter.str();
 
 					nodes.push_back(static_pointer_cast<Node,ValueNode>(valueNode));
+
+				} // Foreach
+				else if(*it == '<' && it+1 != end && *(it+1)=='{' && it+2 != end)
+				{
+					++it;
+					++it;
+
+					// Handle current text node
+					if(currentTextNode.get())
+					{
+						nodes.push_back(currentTextNode);
+						currentTextNode.reset();
+					}
+
+					// Function node
+					shared_ptr<ForeachNode> node(new ForeachNode);
+
+					// function name
+					for(;it != end && *it != '&' && *it != '}'; ++it)
+					{
+						node->arrayCode.push_back(*it);
+					}
+
+					// parameters
+					if(it != end && *it == '}')
+					{
+						it += 2;
+					}
+					else
+					{
+						set<string> functionTermination;
+						functionTermination.insert("&");
+						functionTermination.insert("}>");
+						while(it != end && *it == '&')
+						{
+							stringstream parameterName;
+							it = _parseText(parameterName, it+1, end, "=");
+
+							if(it != end)
+							{
+								Nodes parameterNodes;
+								it = _parse(parameterNodes, it, end, functionTermination);
+
+								if(parameterName.str() == WebPageDisplayFunction::PARAMETER_PAGE_ID)
+								{
+									node->pageCode = parameterNodes;
+								}
+								else
+								{
+									node->parameters.push_back(
+										make_pair(
+											ParametersMap::Trim(parameterName.str()),
+											parameterNodes
+									)	);
+								}
+
+								if(*(it-1) != '&')
+								{
+									break;
+								}
+								--it;
+							}
+					}	}
+
+					nodes.push_back(static_pointer_cast<Node, ForeachNode>(node));
 
 				} // Shortcut to WebPageDisplayFunction
 				else if(*it == '<' && it+1 != end && *(it+1)=='#' && it+2 != end)
@@ -518,6 +586,10 @@ namespace synthese
 			shared_ptr<Function> function(functionCreator->create());
 			try
 			{
+				if(dynamic_cast<FunctionWithSiteBase*>(function.get()))
+				{
+					static_cast<FunctionWithSiteBase*>(function.get())->setSite(page.getRoot());
+				}
 				function->setTemplateParameters(templateParametersMap);
 				function->_setFromParametersMap(serviceParametersMap);
 				if (function->isAuthorized(request.getSession()))
@@ -638,5 +710,73 @@ namespace synthese
 			const Webpage& page
 		) const {
 			stream << text;
+		}
+
+
+
+		void Webpage::ForeachNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const util::ParametersMap& additionalParametersMap,
+			const Webpage& page
+		) const	{
+
+			if(	!additionalParametersMap.hasSubMaps(arrayCode)
+			){
+				return;
+			}
+
+			// Page load
+			stringstream pageCodeStream;
+			BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, pageCode)
+			{
+				node->display(pageCodeStream, request, additionalParametersMap, page);
+			}
+
+			string pageCodeStr(pageCodeStream.str());
+
+			if(pageCodeStr.empty())
+			{
+				return;
+			}
+
+			const Webpage* templatePage(
+				page.getRoot()->getPageByIdOrSmartURL(pageCodeStr)
+			);
+			if(!templatePage)
+			{
+				return;
+			}
+
+			// Base parameters map
+			ParametersMap baseParametersMap(additionalParametersMap);
+			BOOST_FOREACH(const Parameters::value_type& param, parameters)
+			{
+				stringstream s;
+				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
+				{
+					node->display(s, request, additionalParametersMap, page);
+				}
+				baseParametersMap.insert(param.first, s.str());
+			}
+
+			// Items read
+			const ParametersMap::SubParametersMap::mapped_type& items(
+				additionalParametersMap.getSubMaps(arrayCode)
+			);
+
+			size_t rank(0);
+			size_t itemsCount(items.size());
+
+			BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+			{
+				ParametersMap pm(*item);
+				pm.merge(baseParametersMap);
+				pm.insert(DATA_RANK, rank++);
+				pm.insert(DATA_ITEMS_COUNT, itemsCount);
+
+				templatePage->display(stream, request, pm);
+			}
+
 		}
 }	}

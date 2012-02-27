@@ -177,7 +177,7 @@ namespace synthese
 				_cityText = map.get<string>(PARAMETER_CITY_TEXT);
 				if(!_cityText.empty())
 				{
-					const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+					const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 					GeographyModule::CitiesMatcher matcher;
 					if(!site)
 						matcher = (GeographyModule::GetCitiesMatcher());
@@ -216,7 +216,7 @@ namespace synthese
 
 			if(!_input.empty())
 			{
-				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site.get()));
+				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
 				GeographyModule::CitiesMatcher matcher;
 				if(!site)
