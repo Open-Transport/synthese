@@ -23,16 +23,24 @@
 #ifndef SYNTHESE_Reservation_h__
 #define SYNTHESE_Reservation_h__
 
-#include <boost/date_time/posix_time/ptime.hpp>
-#include <string>
+#include "Registrable.h"
 
 #include "ResaTypes.h"
-
-#include "Registrable.h"
 #include "Registry.h"
+
+#include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/optional.hpp>
+#include <string>
 
 namespace synthese
 {
+	class Language;
+
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace pt_operation
 	{
 		class Vehicle;
@@ -58,6 +66,23 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
+			static const std::string DATA_NAME;
+			static const std::string DATA_LANGUAGE;
+			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_PLACE_NAME;
+			static const std::string DATA_DEPARTURE_PLACE_ID;
+			static const std::string DATA_ARRIVAL_PLACE_ID;
+			static const std::string DATA_RANK;
+			static const std::string DATA_TRANSACTION_ID;
+			static const std::string DATA_SEATS_NUMBER;
+			static const std::string DATA_VEHICLE_ID;
+			static const std::string DATA_RESERVATION_ID;
+			static const std::string DATA_SEAT;
+			static const std::string DATA_SERVICE_NUMBER;
+			static const std::string DATA_SERVICE_ID;
+			static const std::string DATA_DEPARTURE_TIME;
+			static const std::string DATA_ARRIVAL_TIME;
+			static const std::string DATA_CANCELLATION_TIME;
 
 			/// Chosen registry class.
 			typedef util::Registry<Reservation>	Registry;
@@ -163,6 +188,21 @@ namespace synthese
 			//@{
 				ReservationStatus	getStatus()			const;
 				std::string			getFullStatusText()	const;
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Reservation exporter
+				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservations_in_CMS
+				//////////////////////////////////////////////////////////////////////////
+				/// @param pm parameters map to populate
+				/// @param prefix prefix to add to the field names
+				/// @author Hugues Romain
+				/// @since 3.3.0
+				/// @date 2011
+				void toParametersMap(
+					util::ParametersMap& pm,
+					boost::optional<Language> language,
+					std::string prefix = std::string()
+				) const;
 			//@}
 		};
 	}
