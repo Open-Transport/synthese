@@ -90,6 +90,7 @@ namespace synthese
 				int port;
 				bool debug;
 				bool triggerCheck;
+				bool noTrigger;
 
 				ConnectionInfo(const std::string& connectionString);
 			};
