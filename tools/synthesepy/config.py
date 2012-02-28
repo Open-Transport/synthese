@@ -40,7 +40,7 @@ DEFAULTS = {
     'beep_when_done': False,
     'env_configs': {},
     'env_config_names': '',
-    'mysqldump_opts': '',
+    'mysqldump_opts': '--skip-triggers',
 
     # bgstart/bgstop
     # One of: supervisor, initd, python, dummy
@@ -142,6 +142,7 @@ DEFAULTS = {
 
     # ineo realtime
     'ineo_conn_string': None,
+    'ineo_stop_code_prefix': '',
     'ineo_ver': 1,
     'ineo_planned_data_source': '16607027920896001',
     'ineo_realtime_data_source': '16607027920896002',
