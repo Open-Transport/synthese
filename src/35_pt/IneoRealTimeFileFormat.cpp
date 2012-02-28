@@ -134,7 +134,7 @@ namespace synthese
 				"WHERE c.jour=" << todayStr << " AND c.type='C'";
 			if(_courseId)
 			{
-				query << " AND ref=" << *_courseId;
+				query << " AND c.ref=" << *_courseId;
 			}
 			DBResultSPtr result(db->execQuery(query.str()));
 			while(result->next())
