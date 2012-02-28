@@ -867,6 +867,8 @@ namespace synthese
 		) const {
 			ParametersMap classMap(getTemplateParameters());
 
+			size_t rank(0);
+
 			//Insert best place
 			if(bestPlace.get())
 			{
@@ -877,7 +879,8 @@ namespace synthese
 					bestPlaceStream,
 					bestPlaceClassName,
 					bestPlaceMap,
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
 			}
@@ -890,7 +893,8 @@ namespace synthese
 					cities,
 					DATA_CITY,
 					(*result.getSubMaps(DATA_CITIES).begin())->getSubMaps(DATA_CITY),
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_CITIES, cities.str());
 			}
@@ -902,7 +906,8 @@ namespace synthese
 					stops,
 					DATA_STOP,
 					(*result.getSubMaps(DATA_STOPS).begin())->getSubMaps(DATA_STOP),
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_STOPS, stops.str());
 			}
@@ -914,7 +919,8 @@ namespace synthese
 					adresses,
 					DATA_ADDRESS,
 					(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_ADDRESSES, adresses.str());
 			}
@@ -926,7 +932,8 @@ namespace synthese
 					roads,
 					DATA_ROAD,
 					(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_ROADS, roads.str());
 			}
@@ -938,7 +945,8 @@ namespace synthese
 					publicPlaces,
 					DATA_PUBLIC_PLACE,
 					(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE),
-					request
+					request,
+					rank
 				);
 				classMap.insert(DATA_PUBLIC_PLACES, publicPlaces.str());
 			}
