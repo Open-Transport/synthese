@@ -859,7 +859,7 @@ namespace synthese
 						string tbatStr(_getValue("TBAT"));
 						if(!tbatStr.empty())
 						{
-							td += minutes(lexical_cast<long>(tbatStr));
+							td += minutes(lexical_cast<double>(tbatStr));
 						}
 						departureSchedules.push_back(td - seconds(td.seconds()));
 
@@ -1126,6 +1126,9 @@ namespace synthese
 
 			// Line short name field
 			map.insert(PARAMETER_LINE_SHORT_NAME_FIELD, _lineShortNameField);
+
+			// Stop area id field
+			map.insert(PARAMETER_STOP_AREA_ID_FIELD, _stopAreaIdField);
 
 			// Stop id field
 			map.insert(PARAMETER_STOP_ID_FIELD, _stopIdField);
