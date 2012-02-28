@@ -27,6 +27,7 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
+
 #include "Language.hpp"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -72,24 +73,11 @@ namespace synthese
 			static const std::string PARAMETER_MAXIMAL_ARRIVAL_RANK;
 			static const std::string PARAMETER_LINKED_WITH_VEHICLE_ONLY;
 			static const std::string PARAMETER_USE_CACHE;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 
-			static const std::string DATA_NAME;
-			static const std::string DATA_LANGUAGE;
-			static const std::string DATA_DEPARTURE_PLACE_NAME;
-			static const std::string DATA_ARRIVAL_PLACE_NAME;
-			static const std::string DATA_DEPARTURE_PLACE_ID;
-			static const std::string DATA_ARRIVAL_PLACE_ID;
+			static const std::string DATA_RESERVATIONS;
+			static const std::string DATA_RESERVATION;
 			static const std::string DATA_RANK;
-			static const std::string DATA_TRANSACTION_ID;
-			static const std::string DATA_SEATS_NUMBER;
-			static const std::string DATA_VEHICLE_ID;
-			static const std::string DATA_RESERVATION_ID;
-			static const std::string DATA_SEAT;
-			static const std::string DATA_SERVICE_NUMBER;
-			static const std::string DATA_SERVICE_ID;
-			static const std::string DATA_DEPARTURE_TIME;
-			static const std::string DATA_ARRIVAL_TIME;
-			static const std::string DATA_CANCELLATION_TIME;
 
 		protected:
 			//! \name Page parameters
@@ -107,6 +95,7 @@ namespace synthese
 				boost::optional<std::size_t> _maxArrivalRank;
 				bool _linkedWithVehicleOnly;
 				bool _useCache;
+				std::string _outputFormat;
 			//@}
 
 
