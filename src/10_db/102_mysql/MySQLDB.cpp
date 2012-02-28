@@ -243,19 +243,26 @@ namespace synthese
 
 		void MySQLDB::initDatabase()
 		{
-			try
-			{
-				execUpdate("SELECT notify_synthese_http('', '');");
-			}
-			catch (const MySQLException&)
+			if(_connInfo->noTrigger)
 			{
 				_hasNotifyHTTPFunction = false;
-				Log::GetInstance().warn(
-					"Couldn't find the notify_synthese_http function. Direct "
-					"database modifications won't be supported (and could "
-					"corrupt data). See https://extranet.rcsmobility.com/projects/synthese/wiki/MySQL_Installation "
-					"for instructions."
-				);
+			}
+			else
+			{
+				try
+				{
+					execUpdate("SELECT notify_synthese_http('', '');");
+				}
+				catch (const MySQLException&)
+				{
+					_hasNotifyHTTPFunction = false;
+					Log::GetInstance().warn(
+						"Couldn't find the notify_synthese_http function. Direct "
+						"database modifications won't be supported (and could "
+						"corrupt data). See https://extranet.rcsmobility.com/projects/synthese/wiki/MySQL_Installation "
+						"for instructions."
+					);
+				}
 			}
 
 			std::stringstream sql;
