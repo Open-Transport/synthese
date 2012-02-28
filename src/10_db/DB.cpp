@@ -51,7 +51,7 @@ namespace synthese
 	namespace db
 	{
 		DB::ConnectionInfo::ConnectionInfo(const string& connectionString) :
-			port(0), debug(false), triggerCheck(true)
+			port(0), debug(false), triggerCheck(true), noTrigger(false)
 		{
 			string::const_iterator it = connectionString.begin(),
 				end = connectionString.end();
@@ -99,6 +99,7 @@ namespace synthese
 				else if (param == "port") { this->port = boost::lexical_cast<int>(value); }
 				else if (param == "debug") { this->debug = boost::lexical_cast<bool>(value); }
 				else if (param == "triggerCheck") { this->triggerCheck = boost::lexical_cast<bool>(value); }
+				else if (param == "noTrigger") { this->noTrigger = boost::lexical_cast<bool>(value); }
 				else
 				{
 					throw InvalidConnectionStringException("Unknown parameter " + param);
