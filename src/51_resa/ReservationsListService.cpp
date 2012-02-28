@@ -22,45 +22,30 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RequestException.h"
-#include "Request.h"
 #include "ReservationsListService.hpp"
+
+#include "AdvancedSelectTableSync.h"
+#include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-#include "JourneyPatternTableSync.hpp"
-#include "LineStopTableSync.h"
-#include "UserTableSync.h"
-#include "ResaModule.h"
-#include "ServiceReservations.h"
-#include "ReservationTransactionTableSync.h"
-#include "ReservationTableSync.h"
-#include "ReservationTransaction.h"
-#include "Reservation.h"
-#include "CancelReservationAction.h"
-#include "ResaCustomerAdmin.h"
-#include "ResaRight.h"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStop.h"
 #include "LineStopTableSync.h"
-#include "SearchFormHTMLTable.h"
-#include "CommercialLine.h"
-#include "AdvancedSelectTableSync.h"
-#include "CommercialLineTableSync.h"
+#include "MimeTypes.hpp"
+#include "RequestException.h"
+#include "Request.h"
+#include "ResaModule.h"
+#include "ResaRight.h"
+#include "Reservation.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "ReservationTransactionTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-#include "AdminActionFunctionRequest.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "RequestException.h"
-#include "StaticActionFunctionRequest.h"
-#include "Profile.h"
-#include "AdminParametersException.h"
-#include "ModuleAdmin.h"
-#include "AdminInterfaceElement.h"
+#include "ServiceReservations.h"
+#include "StopPoint.hpp"
 #include "UserTableSync.h"
 #include "Webpage.h"
-#include "Language.hpp"
-#include "Vehicle.hpp"
-#include "StopPoint.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -97,24 +82,11 @@ namespace synthese
 		const string ReservationsListService::PARAMETER_MAXIMAL_ARRIVAL_RANK("max_arr_rank");
 		const string ReservationsListService::PARAMETER_LINKED_WITH_VEHICLE_ONLY("linked_with_vehicle_only");
 		const string ReservationsListService::PARAMETER_USE_CACHE = "use_cache";
+		const string ReservationsListService::PARAMETER_OUTPUT_FORMAT = "output_format";
 
-		const string ReservationsListService::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
-		const string ReservationsListService::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
-		const string ReservationsListService::DATA_ARRIVAL_PLACE_ID("arrival_place_id");
-		const string ReservationsListService::DATA_DEPARTURE_PLACE_ID("departure_place_id");
-		const string ReservationsListService::DATA_LANGUAGE("language");
-		const string ReservationsListService::DATA_NAME("name");
-		const string ReservationsListService::DATA_RANK("rank");
-		const string ReservationsListService::DATA_TRANSACTION_ID("transaction_id");
-		const string ReservationsListService::DATA_SEATS_NUMBER("seats_number");
-		const string ReservationsListService::DATA_VEHICLE_ID("vehicle_id");
-		const string ReservationsListService::DATA_RESERVATION_ID("reservation_id");
-		const string ReservationsListService::DATA_SEAT("seat");
-		const string ReservationsListService::DATA_SERVICE_NUMBER("service_number");
-		const string ReservationsListService::DATA_SERVICE_ID("service_id");
-		const string ReservationsListService::DATA_DEPARTURE_TIME("departure_time");
-		const string ReservationsListService::DATA_ARRIVAL_TIME("arrival_time");
-		const string ReservationsListService::DATA_CANCELLATION_TIME("cancellation_time");
+		const string ReservationsListService::DATA_RANK = "rank";
+		const string ReservationsListService::DATA_RESERVATION = "reservation";
+		const string ReservationsListService::DATA_RESERVATIONS = "reservations";
 
 		ParametersMap ReservationsListService::_getParametersMap() const
 		{
@@ -142,6 +114,10 @@ namespace synthese
 			if(_reservationPage.get())
 			{
 				map.insert(PARAMETER_RESERVATION_PAGE_ID, _reservationPage->getKey());
+			}
+			if(!_outputFormat.empty())
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 
 			if(_language)
@@ -301,6 +277,8 @@ namespace synthese
 			_minArrivalRank = map.getOptional<size_t>(PARAMETER_MINIMAL_ARRIVAL_RANK);
 			_maxArrivalRank = map.getOptional<size_t>(PARAMETER_MAXIMAL_ARRIVAL_RANK);
 			_linkedWithVehicleOnly = map.getDefault<bool>(PARAMETER_LINKED_WITH_VEHICLE_ONLY, false);
+
+			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 		}
 
 
@@ -395,7 +373,7 @@ namespace synthese
 			}
 
 			// Display of services
-			size_t rank(0);
+			ParametersMap pm;
 			int seatsNumber(0);
 			set<string> serviceNumbers;
 			BOOST_FOREACH(const Service* service, services)
@@ -406,7 +384,6 @@ namespace synthese
 			{
 				const ServiceReservations::ReservationsList& serviceReservations (reservations[serviceNumber].getReservations());
 				int serviceSeatsNumber(reservations[serviceNumber].getSeatsNumber());
-				string plural((serviceSeatsNumber > 1) ? "s" : "");
 				seatsNumber += serviceSeatsNumber;
 
 				if(_reservationPage.get())
@@ -491,17 +468,42 @@ namespace synthese
 							continue;
 						}
 
-						_displayReservation(
-							stream,
-							request,
-							*reservation,
-							rank++
-						);
+						shared_ptr<ParametersMap> resaPM(new ParametersMap);
+						reservation->toParametersMap(*resaPM, _language);
+						pm.insert(DATA_RESERVATION, resaPM);
 					}
 				}
 			} // End services loop
 
-			return util::ParametersMap();
+			// Output
+			if(_reservationPage.get())
+			{
+				size_t rank(0);
+				BOOST_FOREACH(shared_ptr<ParametersMap> resaPM, pm.getSubMaps(DATA_RESERVATION))
+				{
+					resaPM->merge(getTemplateParameters());
+					resaPM->insert(DATA_RANK, rank++);
+					_reservationPage->display(stream, request, *resaPM);
+				}
+			}
+			else if(_outputFormat == MimeTypes::XML)
+			{
+				pm.outputXML(
+					stream,
+					DATA_RESERVATIONS,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/51_resa/ReservationsListService.xsd"
+				);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				pm.outputJSON(stream, DATA_RESERVATIONS);
+			}
+			else if(_outputFormat == MimeTypes::CSV)
+			{
+				pm.outputCSV(stream, DATA_RESERVATIONS);
+			}
+
+			return pm;
 		}
 
 
@@ -516,55 +518,7 @@ namespace synthese
 
 		std::string ReservationsListService::getOutputMimeType() const
 		{
-			return "text/html";
-		}
-
-
-
-		void ReservationsListService::_displayReservation(
-			ostream& stream,
-			const server::Request& request,
-			const Reservation& reservation,
-			std::size_t rank
-		) const {
-
-			ParametersMap pm(getTemplateParameters());
-
-			pm.insert(DATA_NAME, reservation.getTransaction()->getCustomerName());
-			pm.insert(DATA_DEPARTURE_PLACE_NAME, reservation.getDeparturePlaceName());
-			pm.insert(DATA_ARRIVAL_PLACE_NAME, reservation.getArrivalPlaceName());
-			pm.insert(DATA_DEPARTURE_PLACE_ID, reservation.getDeparturePlaceId());
-			pm.insert(DATA_ARRIVAL_PLACE_ID, reservation.getArrivalPlaceId());
-			pm.insert(DATA_RANK, rank);
-			pm.insert(DATA_RESERVATION_ID, reservation.getKey());
-			pm.insert(DATA_TRANSACTION_ID, reservation.getTransaction()->getKey());
-			pm.insert(DATA_SEATS_NUMBER, reservation.getTransaction()->getSeats());
-			pm.insert(DATA_SERVICE_NUMBER, reservation.getServiceCode());
-			pm.insert(DATA_SERVICE_ID, reservation.getServiceId());
-			pm.insert(DATA_DEPARTURE_TIME, reservation.getDepartureTime());
-			pm.insert(DATA_ARRIVAL_TIME, reservation.getArrivalTime());
-			if(!reservation.getTransaction()->getCancellationTime().is_not_a_date_time())
-			{
-				pm.insert(DATA_CANCELLATION_TIME, reservation.getTransaction()->getCancellationTime());
-			}
-
-			// Vehicle
-			if(reservation.getVehicle())
-			{
-				pm.insert(DATA_VEHICLE_ID, reservation.getVehicle()->getKey());
-			}
-			pm.insert(DATA_SEAT, reservation.getSeatNumber());
-
-			// Language
-			shared_ptr<const User> user(UserTableSync::Get(reservation.getTransaction()->getCustomerUserId(), *_env));
-
-			if(_language && user->getLanguage())
-			{
-				pm.insert(DATA_LANGUAGE, user->getLanguage()->getName(*_language));
-			}
-
-			// Launch of the display
-			_reservationPage->display(stream, request, pm);
+			return _reservationPage.get() ? _reservationPage->getMimeType() : _outputFormat;
 		}
 
 
@@ -579,5 +533,4 @@ namespace synthese
 				setEnv(shared_ptr<Env>(new Env));
 			}
 		}
-	}
-}
+}	}

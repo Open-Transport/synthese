@@ -34,6 +34,11 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
 		class Reservation;
@@ -64,7 +69,8 @@ namespace synthese
 
 			//!	\name Personnes
 			//@{
-				util::RegistryKeyType		_customerUserId;
+				util::RegistryKeyType	_customerUserId;
+				security::User*			_customer;
 				std::string			_customerName;
 				std::string			_customerPhone;
 				std::string			_customerEMail;
@@ -90,7 +96,8 @@ namespace synthese
 			void setSeats			(int seats);
 			void setBookingTime		(const boost::posix_time::ptime& time);
 			void setCancellationTime(const boost::posix_time::ptime& time);
-			void setCustomerUserId	(util::RegistryKeyType id) { _customerUserId = id; }
+			void setCustomerUserId	(util::RegistryKeyType id){ _customerUserId = id; }
+			void setCustomer		(security::User* value){ _customer = value; }
 			void setCustomerName	(const std::string& name);
 			void setCustomerPhone	(const std::string& phone);
 			void setBookingUserId	(util::RegistryKeyType id) { _bookingUserId = id; }
@@ -102,6 +109,7 @@ namespace synthese
 			const boost::posix_time::ptime&	getBookingTime()		const;
 			const boost::posix_time::ptime&	getCancellationTime()	const;
 			util::RegistryKeyType	getCustomerUserId()		const { return _customerUserId; }
+			security::User*			getCustomer()			const { return _customer; }
 			const std::string&		getCustomerName()		const;
 			const std::string&		getCustomerPhone()		const;
 			util::RegistryKeyType	getBookingUserId()		const { return _bookingUserId; }
@@ -147,7 +155,6 @@ namespace synthese
 				boost::posix_time::ptime getReservationDeadLine() const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_resa_ReservationTransaction_h__

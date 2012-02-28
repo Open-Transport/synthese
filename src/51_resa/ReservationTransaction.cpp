@@ -42,8 +42,6 @@ namespace synthese
 
 	namespace resa
 	{
-
-
 		ReservationTransaction::ReservationTransaction(
 			RegistryKeyType key
 		):	Registrable(key)
@@ -53,11 +51,13 @@ namespace synthese
 			, _destinationDateTime(not_a_date_time)
 			, _cancelUserId(0)
 			, _bookingUserId(0)
-			, _customerUserId(0)
-			, _lastReservation(0)
+			, _customerUserId(0),
+			_customer(NULL),
+			_lastReservation(0)
 		{
-
 		}
+
+
 
 		void ReservationTransaction::setSeats( int seats )
 		{

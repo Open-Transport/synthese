@@ -20,19 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "ReservationTransactionTableSync.h"
-#include "ReservationTransaction.h"
-#include "ReservationTableSync.h"
-#include "ResaModule.h"
-#include "ReplaceQuery.h"
-#include "Service.h"
 
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
+#include "ReplaceQuery.h"
+#include "ResaModule.h"
+#include "ReservationTableSync.h"
+#include "ReservationTransaction.h"
+#include "Service.h"
+#include "UserTableSync.h"
 
+#include <sstream>
 #include <boost/foreach.hpp>
 
 using namespace std;
@@ -45,6 +45,8 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace resa;
+	using namespace security;
+	
 
 	namespace util
 	{
@@ -70,6 +72,7 @@ namespace synthese
 		template<> const DBTableSync::Format DBTableSyncTemplate<ReservationTransactionTableSync>::TABLE(
 			"t046_reservation_transactions", true
 		);
+
 		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
 		{
 			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
@@ -86,10 +89,14 @@ namespace synthese
 			DBTableSync::Field()
 		};
 
+		
+		
 		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTransactionTableSync>::_INDEXES[]=
 		{
 			DBTableSync::Index()
 		};
+
+
 
 		template<> void DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
 			ReservationTransaction* object
@@ -101,13 +108,30 @@ namespace synthese
 			object->setSeats(rows->getInt( ReservationTransactionTableSync::COL_SEATS));
 			object->setBookingTime(rows->getDateTime( ReservationTransactionTableSync::COL_BOOKING_TIME));
 			object->setCancellationTime(rows->getDateTime( ReservationTransactionTableSync::COL_CANCELLATION_TIME));
+
+			// Customer user
 			object->setCustomerUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CUSTOMER_ID));
+			object->setCustomer(NULL);
+			if(	linkLevel > FIELDS_ONLY_LOAD_LEVEL &&
+				object->getCustomerUserId()
+			) try {
+				object->setCustomer(
+					UserTableSync::GetEditable(object->getCustomerUserId(), env, linkLevel).get()
+				);				
+			}
+			catch(ObjectNotFoundException<User>&)
+			{
+				// Not bad if the user does not exist anymore
+			}
+
 			object->setCustomerName(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_NAME));
 			object->setCustomerPhone(rows->getText ( ReservationTransactionTableSync::COL_CUSTOMER_PHONE));
 			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
 			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
 		}
+
+
 
 		template<> void DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Save(
 			ReservationTransaction* object,
@@ -126,6 +150,8 @@ namespace synthese
 			query.addField(object->getCancelUserId());
 			query.execute(transaction);
 		}
+
+
 
 		template<> void  DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Unlink(
 			ReservationTransaction* obj

@@ -21,17 +21,22 @@
 */
 
 #include "Reservation.h"
-#include "ReservationTransaction.h"
+
+#include "Language.hpp"
 #include "ResaModule.h"
-#include "Registry.h"
+#include "ReservationTransaction.h"
+#include "UserTableSync.h"
+#include "Vehicle.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
+using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace security;
 	using namespace util;
 
 	namespace util
@@ -41,6 +46,25 @@ namespace synthese
 
 	namespace resa
 	{
+		const string Reservation::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
+		const string Reservation::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
+		const string Reservation::DATA_ARRIVAL_PLACE_ID("arrival_place_id");
+		const string Reservation::DATA_DEPARTURE_PLACE_ID("departure_place_id");
+		const string Reservation::DATA_LANGUAGE("language");
+		const string Reservation::DATA_NAME("name");
+		const string Reservation::DATA_TRANSACTION_ID("transaction_id");
+		const string Reservation::DATA_SEATS_NUMBER("seats_number");
+		const string Reservation::DATA_VEHICLE_ID("vehicle_id");
+		const string Reservation::DATA_RESERVATION_ID("reservation_id");
+		const string Reservation::DATA_SEAT("seat");
+		const string Reservation::DATA_SERVICE_NUMBER("service_number");
+		const string Reservation::DATA_SERVICE_ID("service_id");
+		const string Reservation::DATA_DEPARTURE_TIME("departure_time");
+		const string Reservation::DATA_ARRIVAL_TIME("arrival_time");
+		const string Reservation::DATA_CANCELLATION_TIME("cancellation_time");
+
+
+
 		Reservation::Reservation(
 			RegistryKeyType key
 		):	Registrable(key),
@@ -157,5 +181,46 @@ namespace synthese
 			}
 
 			return statusText;
+		}
+
+
+
+		void Reservation::toParametersMap(
+			util::ParametersMap& pm,
+			boost::optional<Language> language,
+			std::string prefix /*= std::string() */
+		) const	{
+
+			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
+			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
+			pm.insert(DATA_ARRIVAL_PLACE_NAME, getArrivalPlaceName());
+			pm.insert(DATA_DEPARTURE_PLACE_ID, getDeparturePlaceId());
+			pm.insert(DATA_ARRIVAL_PLACE_ID, getArrivalPlaceId());
+			pm.insert(DATA_RESERVATION_ID, getKey());
+			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
+			pm.insert(DATA_SEATS_NUMBER, getTransaction()->getSeats());
+			pm.insert(DATA_SERVICE_NUMBER, getServiceCode());
+			pm.insert(DATA_SERVICE_ID, getServiceId());
+			pm.insert(DATA_DEPARTURE_TIME, getDepartureTime());
+			pm.insert(DATA_ARRIVAL_TIME, getArrivalTime());
+			if(!getTransaction()->getCancellationTime().is_not_a_date_time())
+			{
+				pm.insert(DATA_CANCELLATION_TIME, getTransaction()->getCancellationTime());
+			}
+
+			// Vehicle
+			if(getVehicle())
+			{
+				pm.insert(DATA_VEHICLE_ID, getVehicle()->getKey());
+			}
+			pm.insert(DATA_SEAT, getSeatNumber());
+
+			// Language
+			const User* user(getTransaction()->getCustomer());
+
+			if(language && user && user->getLanguage())
+			{
+				pm.insert(DATA_LANGUAGE, user->getLanguage()->getName(*language));
+			}
 		}
 }	}
