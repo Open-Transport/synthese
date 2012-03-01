@@ -61,10 +61,6 @@ namespace synthese
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_CMS_TEMPLATE_ID;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
-
-			static const std::string FORMAT_XML;
-			static const std::string FORMAT_JSON;
 
 		protected:
 			static const std::string DATA_MESSAGES;
@@ -73,7 +69,6 @@ namespace synthese
 
 			//! \name Page parameters
 			//@{
-				std::string _outputFormat;
 				util::RegistryKeyType _recipientId;
 				boost::optional<std::size_t> _maxMessagesNumber;
 				bool _bestPriorityOnly;

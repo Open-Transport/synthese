@@ -36,6 +36,7 @@
 #include "Destination.hpp"
 #include "CalendarTemplate.h"
 #include "JourneyPatternCopy.hpp"
+#include "MimeTypes.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -76,6 +77,7 @@ namespace synthese
 		const std::string PTRoutesListFunction::DATA_RANK("rank");
 		const std::string PTRoutesListFunction::DATA_RANK_IS_ODD("rank_is_odd");
 		const std::string PTRoutesListFunction::DATA_IS_MAIN("is_main");
+		const std::string PTRoutesListFunction::DATA_ROUTES("routes");
 
 
 
@@ -85,6 +87,10 @@ namespace synthese
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
+			else
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT_COMPAT, _outputFormat);
 			}
 			map.insert(PARAMETER_MERGE_INCLUDING_ROUTES, _mergeIncludingRoutes);
 			map.insert(PARAMETER_MERGE_SAME_ROUTES, _mergeSameRoutes);
@@ -115,6 +121,10 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such page");
+			}
+			if(!_page.get())
+			{
+				setOutputFormatFromMap(map, "");
 			}
 			_mergeIncludingRoutes = map.isTrue(PARAMETER_MERGE_INCLUDING_ROUTES);
 
@@ -271,7 +281,8 @@ namespace synthese
 			}
 
 
-			if(!_page.get())
+			bool isOutputXML = !_page.get() && _outputFormat.empty();
+			if(isOutputXML)
 			{
 				// XML header
 				stream <<
@@ -281,19 +292,21 @@ namespace synthese
 					"\">";
 			}
 
+			ParametersMap result;
+
 			size_t rank(0);
 			BOOST_FOREACH(const JourneyPattern* route, routes)
 			{
-				if(_page.get())
+				if(!isOutputXML)
 				{
-					ParametersMap pm(getTemplateParameters());
+					shared_ptr<ParametersMap> pm(new ParametersMap());
 
-					pm.insert(Request::PARAMETER_OBJECT_ID, route->getKey());
-					pm.insert(DATA_NAME, route->getName());
-					pm.insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0));
-					pm.insert(DATA_STOPS_NUMBER, route->getEdges().size());
-					pm.insert(DATA_IS_MAIN, route->getMain());
-					pm.insert(DATA_DIRECTION,
+					pm->insert(Request::PARAMETER_OBJECT_ID, route->getKey());
+					pm->insert(DATA_NAME, route->getName());
+					pm->insert(DATA_LENGTH, route->getLastEdge() ? route->getLastEdge()->getMetricOffset() : double(0));
+					pm->insert(DATA_STOPS_NUMBER, route->getEdges().size());
+					pm->insert(DATA_IS_MAIN, route->getMain());
+					pm->insert(DATA_DIRECTION,
 						route->getDirection().empty() && route->getDirectionObj() ?
 						route->getDirectionObj()->getDisplayedText() :
 						route->getDirection()
@@ -302,26 +315,33 @@ namespace synthese
 						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().begin()));
 						if(lineStop)
 						{
-							pm.insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
-							pm.insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
+							pm->insert(DATA_ORIGIN_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
+							pm->insert(DATA_ORIGIN_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
 						}
 					}
 					{
 						const LinePhysicalStop* lineStop(dynamic_cast<const LinePhysicalStop*>(*route->getAllEdges().rbegin()));
 						if(lineStop)
 						{
-							pm.insert(DATA_DESTINATION_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
-							pm.insert(DATA_DESTINATION_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
+							pm->insert(DATA_DESTINATION_CITY_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName());
+							pm->insert(DATA_DESTINATION_STOP_NAME, lineStop->getPhysicalStop()->getConnectionPlace()->getName());
 						}
 					}
-					pm.insert(DATA_RANK, rank);
-					pm.insert(DATA_RANK_IS_ODD, rank % 2);
+					pm->insert(DATA_RANK, rank);
+					pm->insert(DATA_RANK_IS_ODD, rank % 2);
 
-					_page->display(stream, request, pm);
+					if(_page.get())
+					{
+						_page->display(stream, request, *pm);
+					}
+					else
+					{
+						result.insert(DATA_ROUTES, pm);
+					}
 				}
 				else // XML
 				{
-					//Ignore auto-generated routes
+					// Ignore auto-generated routes
 					if(route->getKey()==0 || route->getEdges().empty())
 						continue;
 
@@ -358,13 +378,22 @@ namespace synthese
 				}
 			}
 
-			if(!_page.get())
+			if(isOutputXML)
 			{
 				// XML footer
 				stream << "</directions>";
 			}
+			else if(!_page.get())
+			{
+				outputParametersMap(
+					result,
+					stream,
+					DATA_ROUTES,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/PTRoutesListFunction.xsd"
+				);
+			}
 
-			return util::ParametersMap();
+			return result;
 		}
 
 
@@ -379,7 +408,7 @@ namespace synthese
 
 		std::string PTRoutesListFunction::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat(MimeTypes::XML);
 		}
 	}
 }

@@ -491,6 +491,7 @@ namespace synthese
 				pm.outputXML(
 					stream,
 					DATA_RESERVATIONS,
+					true,
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/51_resa/ReservationsListService.xsd"
 				);
 			}

@@ -23,6 +23,7 @@
 #include "Function.h"
 
 #include "Request.h"
+#include "MimeTypes.hpp"
 
 #include <sstream>
 
@@ -30,12 +31,122 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
+	namespace util
+	{
+		class ParametersMap;
+	}
+
+
+
 	namespace server
 	{
+		const string Function::PARAMETER_OUTPUT_FORMAT_COMPAT = "of";
+		const string Function::PARAMETER_OUTPUT_FORMAT = "output_format";
+
 		util::ParametersMap Function::runWithoutOutput() const
 		{
 			stringstream fakeStream;
 			Request fakeRequest;
 			return run(fakeStream, fakeRequest);
+		}
+
+
+
+		void Function::setOutputFormatFromMap(const ParametersMap& pm, const string& defaultFormat)
+		{
+			_outputFormat = pm.getDefault<string>(PARAMETER_OUTPUT_FORMAT, defaultFormat);
+
+			// Backward compatibility parameter name.
+			if(!pm.isDefined(PARAMETER_OUTPUT_FORMAT) && pm.isDefined(PARAMETER_OUTPUT_FORMAT_COMPAT))
+			{
+				_outputFormat = pm.getDefault<string>(PARAMETER_OUTPUT_FORMAT_COMPAT, defaultFormat);
+			}
+
+			// Shortcuts
+			if(_outputFormat == "json")
+			{
+				_outputFormat = MimeTypes::JSON;
+			}
+			if(_outputFormat == "xml")
+			{
+				_outputFormat = MimeTypes::XML;
+			}
+		}
+
+
+
+		bool Function::outputParametersMap(
+			const ParametersMap& pm,
+			ostream& stream,
+			const string& tag,
+			const string& xmlSchemaLocation,
+			bool sorted,/* = true */
+			const string& xmlUnsortedSchemaLocation /* = "" */
+		) const {
+
+			if(_outputFormat == MimeTypes::JSON)
+			{
+				if(sorted)
+				{
+					pm.outputJSON(
+						stream,
+						tag
+					);
+				}
+				else
+				{
+					(*pm.getSubMaps(tag).begin())->outputJSON(
+						stream,
+						tag
+					);
+				}
+			}
+			else if(_outputFormat == MimeTypes::XML)
+			{
+				if(sorted)
+				{
+					pm.outputXML(
+						stream,
+						tag,
+						true,
+						xmlSchemaLocation
+					);
+				}
+				else
+				{
+					(*pm.getSubMaps(tag).begin())->outputXML(
+						stream,
+						tag,
+						true,
+						xmlUnsortedSchemaLocation
+					);
+				}
+			}
+			else if(_outputFormat == MimeTypes::CSV)
+			{
+				pm.outputCSV(
+					stream,
+					tag
+				);
+			}
+			else
+			{
+				return false;
+			}
+
+			return true;
+		}
+
+
+
+		const string Function::getOutputMimeTypeFromOutputFormat(const string& defaultMime /* = "" */) const
+		{
+			if(_outputFormat.empty())
+			{
+				return defaultMime;
+			}
+			return _outputFormat;
 		}
 }	}

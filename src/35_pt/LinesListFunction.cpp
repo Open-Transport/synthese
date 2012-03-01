@@ -37,6 +37,7 @@
 #include "Vertex.h"
 #include "StopArea.hpp"
 #include "GetMessagesFunction.hpp"
+#include "MimeTypes.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -69,7 +70,6 @@ namespace synthese
 
 	namespace pt
 	{
-		const string LinesListFunction::PARAMETER_OUTPUT_FORMAT("of");
 		const string LinesListFunction::PARAMETER_NETWORK_ID("ni");
 		const string LinesListFunction::PARAMETER_PAGE_ID("pi");
 		const string LinesListFunction::PARAMETER_SRID("srid");
@@ -85,8 +85,6 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
-		const string LinesListFunction::FORMAT_JSON("json");
-		const string LinesListFunction::FORMAT_XML("xml");
 
 		const string LinesListFunction::DATA_LINE("line");
 		const string LinesListFunction::DATA_LINES("lines");
@@ -131,8 +129,12 @@ namespace synthese
 			// Output messages
 			result.insert(PARAMETER_OUTPUT_MESSAGES, _outputMessages);
 
-			// Output format
-			if(!_outputFormat.empty())
+			// Page or output format
+			if(_page.get())
+			{
+				result.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
+			else
 			{
 				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
@@ -239,7 +241,10 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+			if(!_page.get())
+			{
+				setOutputFormatFromMap(map, MimeTypes::CSV);
+			}
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
 			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
 			CoordinatesSystem::SRID srid(
@@ -620,30 +625,23 @@ namespace synthese
 					_page->display(stream, request, *pmLine);
 				}
 			}
-			else if(_outputFormat == FORMAT_XML) // XML output
+			else if(_outputFormat == MimeTypes::CSV)
 			{
-				pm.outputXML(
-					stream,
-					DATA_LINES,
-					true,
-					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/LinesListFunction.xsd"
-				);
-			}
-			else if(_outputFormat == FORMAT_JSON) // JSON output
-			{
-				pm.outputJSON(
-					stream,
-					DATA_LINES
-				);
-			}
-			else // CSV format
-			{
+				// Hand made formatting for CSV.
 				BOOST_FOREACH(ParametersMap::SubParametersMap::mapped_type::value_type pmLine, pm.getSubMaps(DATA_LINE))
 				{
 					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
 				}
 			}
-
+			else
+			{
+				outputParametersMap(
+					pm,
+					stream,
+					DATA_LINES,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/LinesListFunction.xsd"
+				);
+			}
 			return pm;
 		}
 
@@ -659,24 +657,7 @@ namespace synthese
 
 		std::string LinesListFunction::getOutputMimeType() const
 		{
-			std::string mimeType;
-			if(_page.get())
-			{
-				mimeType = _page->getMimeType();
-			}
-			else if(_outputFormat == FORMAT_XML)
-			{
-				mimeType = "text/xml";
-			}
-			else if(_outputFormat == FORMAT_JSON)
-			{
-				mimeType = "application/json";
-			}
-			else // default case : csv outputFormat
-			{
-				mimeType = "text/csv";
-			}
-			return mimeType;
+			return _page.get() ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 
 

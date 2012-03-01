@@ -53,7 +53,6 @@ namespace synthese
 		const string CityListFunction::PARAMETER_PAGE("page_id");
 		const string CityListFunction::PARAMETER_ITEM_PAGE("item_page_id");
 		const string CityListFunction::PARAMETER_AT_LEAST_A_STOP("at_least_a_stop");
-		const string CityListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string CityListFunction::PARAMETER_SRID("srid");
 
 		const std::string CityListFunction::DATA_RESULTS_SIZE("size");
@@ -78,11 +77,11 @@ namespace synthese
 			{
 				pm.insert(PARAMETER_ITEM_PAGE, _itemPage->getKey());
 			}
-			pm.insert(PARAMETER_AT_LEAST_A_STOP, _atLeastAStop);
-			if(!_outputFormat.empty())
+			else
 			{
 				pm.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
+			pm.insert(PARAMETER_AT_LEAST_A_STOP, _atLeastAStop);
 			if(_coordinatesSystem)
 			{
 				pm.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
@@ -100,6 +99,10 @@ namespace synthese
 			{
 				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE));
 			}
+			else
+			{
+				setOutputFormatFromMap(map, "");
+			}
 			if(map.getOptional<RegistryKeyType>(PARAMETER_ITEM_PAGE))
 			{
 				_itemPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_ITEM_PAGE));
@@ -112,7 +115,6 @@ namespace synthese
 			{
 				throw RequestException("Number of result must be limited");
 			}
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 
 			CoordinatesSystem::SRID srid(
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
@@ -224,13 +226,7 @@ namespace synthese
 				pm.insert(DATA_CITY, cityPm);
 			}
 
-
-			// TODO: Factor ParametersMap constant
-			if(_outputFormat == "json")
-			{
-				pm.outputJSON(stream, DATA_CITIES);
-			}
-			else if(_page.get())
+			if(_page.get())
 			{
 				// Size
 				pm.insert(DATA_RESULTS_SIZE, citiesList.size());
@@ -249,6 +245,15 @@ namespace synthese
 			{
 				_displayItems(stream, pm, request);
 			}
+			else
+			{
+				outputParametersMap(
+					pm,
+					stream,
+					DATA_CITIES,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/city_list.xsd"
+				);
+			}
 
 			return pm;
 		}
@@ -264,20 +269,7 @@ namespace synthese
 
 		std::string CityListFunction::getOutputMimeType() const
 		{
-			if(_page.get())
-			{
-				return _page->getMimeType();
-			}
-			if(_itemPage.get())
-			{
-				return _itemPage->getMimeType();
-			}
-			// TODO: refactor this in ParametersMap
-			else if(_outputFormat == "json")
-			{
-				return "application/json";
-			}
-			return "text/xml";
+			return _page.get() ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat("text/xml");
 		}
 
 

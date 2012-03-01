@@ -64,7 +64,6 @@ namespace synthese
 		const string PlacesListService::PARAMETER_ITEM_PAGE_ID = "item_page_id";
 		const string PlacesListService::PARAMETER_MIN_SCORE = "min_score";
 		const string PlacesListService::PARAMETER_NUMBER = "number";
-		const string PlacesListService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PlacesListService::PARAMETER_SITE_ID = "site_id";
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
@@ -88,9 +87,6 @@ namespace synthese
 		const string PlacesListService::DATA_ROADS = "roads";
 		const string PlacesListService::DATA_STOP = "stop";
 		const string PlacesListService::DATA_STOPS = "stops";
-
-		const string PlacesListService::VALUE_JSON = "json";
-		const string PlacesListService::VALUE_XML = "xml";
 
 
 
@@ -253,16 +249,7 @@ namespace synthese
 			}
 			else
 			{
-				// Output format
-				_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT, MimeTypes::XML);
-				if(_outputFormat == VALUE_JSON)
-				{
-					_outputFormat = MimeTypes::JSON;
-				}
-				if(_outputFormat == VALUE_XML)
-				{
-					_outputFormat = MimeTypes::XML;
-				}
+				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 		}
 
@@ -380,7 +367,7 @@ namespace synthese
 				}
 				else if(_site.get())
 				{
-					 /// TODO implement it
+					/// TODO implement it
 				}
 				else
 				{
@@ -754,49 +741,15 @@ namespace synthese
 					}
 				}
 			}
-			else if(_outputFormat == MimeTypes::JSON)
+			else
 			{
-				if(_sorted)
-				{
-					result.outputJSON(
-						stream,
-						DATA_PLACES
-					);
-				}
-				else
-				{
-					(*result.getSubMaps(DATA_PLACES).begin())->outputJSON(
-						stream,
-						DATA_PLACES
-					);
-				}
-			}
-			else if(_outputFormat == MimeTypes::XML)
-			{
-				if(_sorted)
-				{
-					result.outputXML(
-						stream,
-						DATA_PLACES,
-						true,
-						"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/sorted_places_list.xsd"
-					);
-				}
-				else
-				{
-					(*result.getSubMaps(DATA_PLACES).begin())->outputXML(
-						stream,
-						DATA_PLACES,
-						true,
-						"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/unsorted_places_list.xsd"
-					);
-				}
-			}
-			else if(_outputFormat == MimeTypes::CSV)
-			{
-				result.outputCSV(
+				outputParametersMap(
+					result,
 					stream,
-					DATA_PLACES
+					DATA_PLACES,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/sorted_places_list.xsd",
+					_sorted,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/unsorted_places_list.xsd"
 				);
 			}
 
@@ -815,7 +768,7 @@ namespace synthese
 
 		std::string PlacesListService::getOutputMimeType() const
 		{
-			return _itemPage.get() ? _itemPage->getMimeType() : _outputFormat;
+			return _itemPage.get() ? _itemPage->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 
 

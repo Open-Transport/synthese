@@ -115,6 +115,18 @@ namespace synthese
 				const pt::StopPoint* stop
 			)const;
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Add journey information to the given parameters map.
+			/// @author Sylvain Pasche
+			void addJourneyToParametersMap(
+				util::ParametersMap& pm,
+				graph::ServicePointer& servicePointer,
+				const pt::StopPoint* stop
+			) const;
+
+
 		public:
 			DisplayScreenContentFunction():
 				_wayIsBackward(false)
@@ -158,6 +170,8 @@ namespace synthese
 				static const std::string DATA_DATE;
 				static const std::string DATA_MAC;
 				static const std::string DATA_SUBSCREEN_;
+
+				static const std::string DATA_JOURNEYS;
 
 		public:
 				//////////////////////////////////////////////////////////////////////////

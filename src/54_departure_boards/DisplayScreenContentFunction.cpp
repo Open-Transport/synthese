@@ -48,6 +48,7 @@
 #include "RoutePlanningTableGenerator.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "InterfacePageException.h"
+#include "MimeTypes.hpp"
 
 #include <sstream>
 
@@ -98,6 +99,8 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_DATE("date");
 		const string DisplayScreenContentFunction::DATA_SUBSCREEN_("subscreen_");
 
+		const string DisplayScreenContentFunction::DATA_JOURNEYS("journeys");
+
 		const string DisplayScreenContentFunction::DATA_ROW_RANK("row_rank");
 		const string DisplayScreenContentFunction::DATA_PAGE_NUMBER("page_number");
 		const string DisplayScreenContentFunction::DATA_BLINKS("blinks");
@@ -136,10 +139,10 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_SECOND_TRANSPORT_MODE("second_transport_mode");
 		const string DisplayScreenContentFunction::DATA_TRANSFER_STOP_NAME("transfer_stop_name");
 
-		const std::string DisplayScreenContentFunction::PARAMETER_MAIN_PAGE_ID("main_page_id");
-		const std::string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
-		const std::string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
-		const std::string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
+		const string DisplayScreenContentFunction::PARAMETER_MAIN_PAGE_ID("main_page_id");
+		const string DisplayScreenContentFunction::PARAMETER_ROW_PAGE_ID("row_page_id");
+		const string DisplayScreenContentFunction::PARAMETER_DESTINATION_PAGE_ID("destination_page_id");
+		const string DisplayScreenContentFunction::PARAMETER_TRANSFER_DESTINATION_PAGE_ID("transfer_destination_page_id");
 
 		ParametersMap DisplayScreenContentFunction::_getParametersMap() const
 		{
@@ -149,6 +152,10 @@ namespace synthese
 			if(_mainPage.get())
 			{
 				map.insert(PARAMETER_MAIN_PAGE_ID, _mainPage->getKey());
+			}
+			else
+			{
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 			if(_rowPage.get())
 			{
@@ -189,6 +196,10 @@ namespace synthese
 				catch (ObjectNotFoundException<Webpage>&)
 				{
 					throw RequestException("No such main page");
+				}
+				if(!_mainPage.get())
+				{
+					setOutputFormatFromMap(map, "");
 				}
 
 				optional<RegistryKeyType> rid(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
@@ -379,9 +390,9 @@ namespace synthese
 			std::ostream& stream,
 			ServicePointer& servicePointer,
 			const StopPoint* stop
-			)const
-		{
-			const SchedulesBasedService * service = static_cast<const SchedulesBasedService *>(servicePointer.getService());
+		) const {
+
+			const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
 			//Here we got our service !
@@ -395,7 +406,7 @@ namespace synthese
 				"\" name=\""        << stop->getName() <<
 				"\" />";
 
-			RollingStock * rs = journeyPattern->getRollingStock();
+			RollingStock* rs = journeyPattern->getRollingStock();
 			if(rs)
 			{
 				stream <<"<transportMode id=\""<< rs->getKey() <<
@@ -404,7 +415,7 @@ namespace synthese
 					"\" />";
 			}
 
-			const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+			const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
 
 			if(commercialLine)
 			{
@@ -429,7 +440,7 @@ namespace synthese
 					"\" />";
 			}
 
-			const StopArea & origin(
+			const StopArea& origin(
 					*journeyPattern->getOrigin()->getConnectionPlace()
 			);
 			stream << "<origin id=\""  << origin.getKey() <<
@@ -437,7 +448,7 @@ namespace synthese
 					"\" cityName=\""       << origin.getCity()->getName() <<
 					"\" />";
 
-			const StopArea & destination(
+			const StopArea& destination(
 					*journeyPattern->getDestination()->getConnectionPlace()
 			);
 			stream << "<destination id=\"" << destination.getKey() <<
@@ -445,7 +456,7 @@ namespace synthese
 					"\" cityName=\""       << destination.getCity()->getName() <<
 					"\" />";
 
-			const StopArea * connPlace(stop->getConnectionPlace());
+			const StopArea* connPlace(stop->getConnectionPlace());
 
 			stream << "<stopArea id=\""<< connPlace->getKey()<<
 				"\" name=\""           << connPlace->getName() <<
@@ -455,6 +466,65 @@ namespace synthese
 				"\" />";
 
 			stream << "</journey>";
+		}
+
+
+
+		void DisplayScreenContentFunction::addJourneyToParametersMap(
+			ParametersMap& pm,
+			ServicePointer& servicePointer,
+			const StopPoint* stop
+		) const {
+
+			const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
+			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
+
+			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
+			journeyPm->insert("route_id", journeyPattern->getKey());
+			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
+
+			shared_ptr<ParametersMap> stopPM(new ParametersMap);
+			stop->toParametersMap(*stopPM, false);
+			journeyPm->insert("stop", stopPM);
+
+			RollingStock* rs = journeyPattern->getRollingStock();
+			if(rs)
+			{
+				shared_ptr<ParametersMap> rsPM(new ParametersMap);
+				rs->toParametersMap(*rsPM);
+				journeyPm->insert("rollingStock", rsPM);
+			}
+
+			const CommercialLine* commercialLine(journeyPattern->getCommercialLine());
+
+			if(commercialLine)
+			{
+				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				commercialLine->toParametersMap(*linePM);
+				journeyPm->insert("line", linePM);
+			}
+
+			const StopArea& origin(
+				*journeyPattern->getOrigin()->getConnectionPlace()
+			);
+			shared_ptr<ParametersMap> originPM(new ParametersMap);
+			origin.toParametersMap(*originPM);
+			journeyPm->insert("origin", originPM);
+
+
+			const StopArea& destination(
+				*journeyPattern->getDestination()->getConnectionPlace()
+			);
+			shared_ptr<ParametersMap> destinationPM(new ParametersMap);
+			destination.toParametersMap(*destinationPM);
+			journeyPm->insert("destination", destinationPM);
+
+			const StopArea* connPlace(stop->getConnectionPlace());
+			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
+			connPlace->toParametersMap(*connPlacePM);
+			journeyPm->insert("stopArea", connPlacePM);
+
+			pm.insert("journey", journeyPm);
 		}
 
 
@@ -586,12 +656,17 @@ namespace synthese
 			}
 			else
 			{
+				ParametersMap result;
+				bool isOutputXML = _outputFormat.empty();
 
-				// XML header
-				stream <<
-					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
-					"<timeTable xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/54_departures_table/DisplayScreenContentFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" type=\"departure\">"
-					;
+				if(isOutputXML)
+				{
+					// XML header
+					stream <<
+						"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
+						"<timeTable xsi:noNamespaceSchemaLocation=\"http://synthese.rcsmobility.com/include/54_departures_table/DisplayScreenContentFunction.xsd\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" type=\"departure\">"
+						;
+				}
 
 				BOOST_FOREACH(const ArrivalDepartureTableGenerator::PhysicalStops::value_type& it, _screen->getPhysicalStops())
 				{
@@ -705,11 +780,18 @@ namespace synthese
 							{
 								for(size_t i(0); i<it->second.size(); ++i)//For each service at this minute
 								{
-									concatXMLResult(
+									if(isOutputXML)
+									{
+										concatXMLResult(
 											stream,
 											it->second[i],
 											stop
-									);
+										);
+									}
+									else
+									{
+										addJourneyToParametersMap(result, it->second[i], stop);
+									}
 								}
 							}
 							++minutesCounter;
@@ -726,18 +808,40 @@ namespace synthese
 							minutesCounter++;
 							for(size_t i(0); i<it->second.size(); ++i)//For each service at this minute
 							{
-								concatXMLResult(
+								if(isOutputXML)
+								{
+									concatXMLResult(
 										stream,
 										it->second[i],
 										stop
-								);
+									);
+								}
+								else
+								{
+									addJourneyToParametersMap(result, it->second[i], stop);
+								}
 							}
 						}
 					}
 				}
 
-				// XML footer
-				stream << "</timeTable>";
+				if(isOutputXML)
+				{
+					// XML footer
+					stream << "</timeTable>";
+				}
+				else
+				{
+					outputParametersMap(
+						result,
+						stream,
+						DATA_JOURNEYS,
+						"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/54_departure_boards/DisplayScreenContentFunction.xsd"
+					);
+				}
+
+
+				return result;
 			}
 
 			return util::ParametersMap();
@@ -776,7 +880,7 @@ namespace synthese
 			{
 				return _screen->getType()->getDisplayMainPage()->getMimeType();
 			}
-			return "text/xml";
+			return getOutputMimeTypeFromOutputFormat(MimeTypes::XML);
 		}
 
 

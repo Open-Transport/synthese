@@ -63,7 +63,6 @@ namespace synthese
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_SRID;
 
 			static const std::string DATA_RESULTS_SIZE;
@@ -85,7 +84,6 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage>		_page;
 				boost::shared_ptr<const cms::Webpage>		_itemPage;
 				boost::shared_ptr<geography::City>	_city;
-				std::string _outputFormat;
 				const CoordinatesSystem* _coordinatesSystem;
 			//@}
 
