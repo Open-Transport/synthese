@@ -55,7 +55,7 @@ namespace synthese
 			, _key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key)
 			, _lastUse(second_clock::local_time())
 		{
-			ServerModule::getSessions().insert(make_pair(_key, this));
+			ServerModule::GetSessions().insert(make_pair(_key, this));
 		}
 
 
@@ -78,10 +78,10 @@ namespace synthese
 
 		Session::~Session()
 		{
-			ServerModule::SessionMap::iterator it = ServerModule::getSessions().find(_key);
-			if (it != ServerModule::getSessions().end())
+			ServerModule::SessionMap::iterator it = ServerModule::GetSessions().find(_key);
+			if (it != ServerModule::GetSessions().end())
 			{
-				ServerModule::getSessions().erase(it);
+				ServerModule::GetSessions().erase(it);
 			}
 		}
 
@@ -141,7 +141,9 @@ namespace synthese
 					return NULL;
 				}
 
-				return new Session(ip, sid);
+				Session* session = new Session(ip, sid);
+				session->setUser(user);
+				return session;
 			}
 			catch(UserException e)
 			{
