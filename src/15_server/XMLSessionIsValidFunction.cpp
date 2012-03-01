@@ -99,8 +99,8 @@ namespace synthese
 			ParametersMap pm;
 
 			// Service
-			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(_sessionIdToCheck);
-			bool value (sit != ServerModule::getSessions().end());
+			ServerModule::SessionMap::iterator sit = ServerModule::GetSessions().find(_sessionIdToCheck);
+			bool value (sit != ServerModule::GetSessions().end());
 			if(value) try
 			{
 				sit->second->checkAndRefresh(request.getIP());
