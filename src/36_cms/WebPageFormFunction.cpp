@@ -48,6 +48,7 @@ namespace synthese
 		const string WebPageFormFunction::PARAMETER_NAME("name");
 		const string WebPageFormFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPageFormFunction::PARAMETER_SCRIPT("script");
+		const string WebPageFormFunction::PARAMETER_CLASS("class");
 		const string WebPageFormFunction::PARAMETER_IDEM("idem");
 
 		ParametersMap WebPageFormFunction::_getParametersMap() const
@@ -55,6 +56,7 @@ namespace synthese
 			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
 			map.insert(PARAMETER_SCRIPT, _script);
+			map.insert(PARAMETER_CLASS, _class);
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
@@ -69,6 +71,7 @@ namespace synthese
 		{
 			_name = map.get<string>(PARAMETER_NAME);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
+			_class = map.getDefault<string>(PARAMETER_CLASS);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
 			if(!_idem)
 			{
@@ -86,6 +89,7 @@ namespace synthese
 			_parameters = map;
 			_parameters.remove(PARAMETER_NAME);
 			_parameters.remove(PARAMETER_SCRIPT);
+			_parameters.remove(PARAMETER_CLASS);
 			_parameters.remove(PARAMETER_IDEM);
 			_parameters.remove(PARAMETER_PAGE_ID);
 		}
@@ -97,10 +101,20 @@ namespace synthese
 			const Request& request
 		) const {
 
+			std::string htmlComplement;
+			if(!_script.empty())
+			{
+				htmlComplement += "onsubmit=\"return "+ _script +"\"";
+			}
+			if(!_class.empty())
+			{
+				htmlComplement += " class=\""+ _class +"\"";
+			}
+
 			if(_idem)
 			{
 				HTMLForm form(request.getHTMLForm(_name));
-				stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
+				stream << form.open(htmlComplement);
 				stream << form.getHiddenFields();
 			}
 			else
@@ -126,7 +140,7 @@ namespace synthese
 					{
 						form.addHiddenField(parameter.first, ParametersMap::Trim(parameter.second));
 					}
-					stream << form.open(_script.empty() ? string() : ("onsubmit=\"return "+ _script +"\""));
+					stream << form.open(htmlComplement);
 					stream << form.getHiddenFields();
 				}
 				catch(ObjectNotFoundException<Webpage>&)
