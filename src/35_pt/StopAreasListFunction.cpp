@@ -38,6 +38,7 @@
 #include "Webpage.h"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
+#include "MimeTypes.hpp"
 
 #include <map>
 #include <boost/foreach.hpp>
@@ -71,7 +72,6 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES = "ol";
 		const string StopAreasListFunction::PARAMETER_STOP_PAGE_ID = "stop_page_id";
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
-		const string StopAreasListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 
 		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
@@ -99,13 +99,13 @@ namespace synthese
 			{
 				result.insert(PARAMETER_STOP_PAGE_ID, _stopPage->getKey());
 			}
+			else
+			{
+				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
 			if(_linePage.get())
 			{
 				result.insert(PARAMETER_LINE_PAGE_ID, _linePage->getKey());
-			}
-			if(!_outputFormat.empty())
-			{
-				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 			if(_city.get())
 			{
@@ -188,6 +188,10 @@ namespace synthese
 			{
 				throw RequestException("No such stop page");
 			}
+			if(!_stopPage.get())
+			{
+				setOutputFormatFromMap(map, MimeTypes::XML);
+			}
 
 			// Load of line page
 			if(map.getDefault<RegistryKeyType>(PARAMETER_LINE_PAGE_ID, 0)) try
@@ -198,9 +202,6 @@ namespace synthese
 			{
 				throw RequestException("No such line page");
 			}
-
-			// Output format
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 		}
 
 
@@ -326,12 +327,7 @@ namespace synthese
 			}
 
 
-			// JSON output
-			if(_outputFormat == "json")
-			{
-				pm.outputJSON(stream, DATA_STOP_AREAS);
-			}
-			else if(_stopPage.get()) // CMS output
+			if(_stopPage.get()) // CMS output
 			{
 				size_t stopRank(0);
 
@@ -362,9 +358,14 @@ namespace synthese
 					_stopPage->display(stream, request, *pmStop);
 				}
 			}
-			else // XML output
+			else
 			{
-				pm.outputXML(stream, DATA_STOP_AREAS, true, "http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd");
+				outputParametersMap(
+					pm,
+					stream,
+					DATA_STOP_AREAS,
+					"http://synthese.rcsmobility.com/include/35_pt/StopAreasListFunction.xsd"
+				);
 			}
 
 			return pm;
@@ -380,15 +381,7 @@ namespace synthese
 
 		std::string StopAreasListFunction::getOutputMimeType() const
 		{
-			if(_outputFormat == "json")
-			{
-				return "application/json";
-			}
-			else if(_stopPage.get())
-			{
-				return _stopPage->getMimeType();
-			}
-			return "text/xml";
+			return _stopPage.get() ? _stopPage->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 	}
 }

@@ -56,7 +56,6 @@ namespace synthese
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_TABLE;
 			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_SRID;
 
 			static const std::string DATA_RESULTS_SIZE;
@@ -72,7 +71,6 @@ namespace synthese
 			boost::optional<std::size_t> _n;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
-			std::string _outputFormat;
 			DBTableSync::TableId _table;
 
 		protected:

@@ -37,6 +37,7 @@
 #include "ContinuousServiceTableSync.h"
 #include "JourneyPatternCopy.hpp"
 #include "Destination.hpp"
+#include "MimeTypes.hpp"
 
 using namespace std;
 using namespace boost;
@@ -112,6 +113,10 @@ namespace synthese
 			{
 				result.insert(PARAMETER_MAIN_PAGE_ID, _mainPage->getKey());
 			}
+			else
+			{
+				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
 			if(_stopPage.get())
 			{
 				result.insert(PARAMETER_STOP_PAGE_ID, _stopPage->getKey());
@@ -172,6 +177,10 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such main page");
+			}
+			if(!_mainPage.get())
+			{
+				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 
 			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_STOP_PAGE_ID));
@@ -280,10 +289,10 @@ namespace synthese
 			}
 			else
 			{
-				m.outputXML(
+				outputParametersMap(
+					m,
 					stream,
 					TAG_ROUTE,
-					true,
 					"https://extranet.rcsmobility.com/attachments/download/14018/PTRouteDetailFunction.xsd"
 				);
 			}
@@ -302,6 +311,6 @@ namespace synthese
 
 		string PTRouteDetailFunction::getOutputMimeType() const
 		{
-			return _mainPage.get() ? _mainPage->getMimeType() : "text/xml";
+			return _mainPage.get() ? _mainPage->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 }	}

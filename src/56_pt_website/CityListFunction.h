@@ -60,7 +60,6 @@ namespace synthese
 			static const std::string PARAMETER_PAGE;
 			static const std::string PARAMETER_ITEM_PAGE;
 			static const std::string PARAMETER_AT_LEAST_A_STOP;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_SRID;
 
 			static const std::string DATA_RESULTS_SIZE;
@@ -77,7 +76,6 @@ namespace synthese
 			bool _atLeastAStop;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
-			std::string _outputFormat;
 			const CoordinatesSystem* _coordinatesSystem;
 
 		protected:

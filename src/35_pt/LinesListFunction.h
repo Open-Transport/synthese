@@ -63,7 +63,6 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
 			static const std::string PARAMETER_LETTERS_BEFORE_NUMBERS;
 			static const std::string PARAMETER_NETWORK_ID;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
 			static const std::string PARAMETER_OUTPUT_MESSAGES;
 			static const std::string PARAMETER_OUTPUT_STOPS;
@@ -73,8 +72,6 @@ namespace synthese
 			static const std::string PARAMETER_RIGHT_CLASS;
 			static const std::string PARAMETER_RIGHT_LEVEL;
 
-			static const std::string FORMAT_XML;
-			static const std::string FORMAT_JSON;
 			static const std::string FORMAT_WKT;
 
 			static const std::string DATA_LINE;
@@ -97,7 +94,6 @@ namespace synthese
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
 				const CoordinatesSystem* _coordinatesSystem;
-				std::string _outputFormat;
 				bool _outputStops;
 				bool _ignoreTimetableExcludedLines;
 				bool _ignoreJourneyPlannerExcludedLines;

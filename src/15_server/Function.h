@@ -76,10 +76,13 @@ namespace synthese
 			public util::FactoryBase<Function>
 		{
 		public:
+			static const std::string PARAMETER_OUTPUT_FORMAT_COMPAT;
+			static const std::string PARAMETER_OUTPUT_FORMAT;
 
 		protected:
 			util::ParametersMap _templateParameters;
 			boost::shared_ptr<util::Env>	_env;
+			std::string _outputFormat;
 
 			//////////////////////////////////////////////////////////////////////////
 			///	Constructor.
@@ -183,6 +186,42 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.3.0
 			util::ParametersMap runWithoutOutput() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Extract the output format from the given ParamtersMap and store it
+			/// as an instance variable.
+			/// @author Sylvain Pasche
+			/// @date 2012
+			/// @since 3.3.0
+			void setOutputFormatFromMap(const util::ParametersMap& pm, const std::string& defaultFormat);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Call the relevant method on the given ParametersMap object to produce
+			/// an output in the current output format type.
+			/// @author Sylvain Pasche
+			/// @date 2012
+			/// @since 3.3.0
+			bool outputParametersMap(
+				const util::ParametersMap& pm,
+				std::ostream& stream,
+				const std::string& tag,
+				const std::string& xmlSchemaLocation,
+				bool sorted = true,
+				const std::string& xmlUnsortedSchemaLocation = ""
+			) const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Return the current output format mime type.
+			/// @author Sylvain Pasche
+			/// @date 2012
+			/// @since 3.3.0
+			const std::string getOutputMimeTypeFromOutputFormat(const std::string& defaultMime = "") const;
 		};
 }	}
 

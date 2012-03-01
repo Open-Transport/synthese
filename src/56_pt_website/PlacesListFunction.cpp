@@ -35,6 +35,7 @@
 #include "StopArea.hpp"
 #include "Webpage.h"
 #include "Website.hpp"
+#include "MimeTypes.hpp"
 #include <geos/geom/Point.h>
 
 #include <boost/foreach.hpp>
@@ -59,23 +60,22 @@ namespace synthese
 
 	namespace pt_website
 	{
-		const std::string PlacesListFunction::PARAMETER_OLD_INPUT("i");
-		const std::string PlacesListFunction::PARAMETER_INPUT("t");
-		const std::string PlacesListFunction::PARAMETER_CITY_TEXT("ct");
-		const std::string PlacesListFunction::PARAMETER_CITY_ID("city_id");
-		const std::string PlacesListFunction::PARAMETER_NUMBER("n");
-		const std::string PlacesListFunction::PARAMETER_PAGE("page_id");
+		const string PlacesListFunction::PARAMETER_OLD_INPUT("i");
+		const string PlacesListFunction::PARAMETER_INPUT("t");
+		const string PlacesListFunction::PARAMETER_CITY_TEXT("ct");
+		const string PlacesListFunction::PARAMETER_CITY_ID("city_id");
+		const string PlacesListFunction::PARAMETER_NUMBER("n");
+		const string PlacesListFunction::PARAMETER_PAGE("page_id");
 		const string PlacesListFunction::PARAMETER_ITEM_PAGE("item_page_id");
-		const string PlacesListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 
 		const string PlacesListFunction::PARAMETER_SRID("srid");
 
-		const std::string PlacesListFunction::DATA_CITY_ID("city_id");
-		const std::string PlacesListFunction::DATA_CITY_NAME("city_name");
-		const std::string PlacesListFunction::DATA_RESULTS_SIZE("size");
-		const std::string PlacesListFunction::DATA_CONTENT("content");
-		const std::string PlacesListFunction::DATA_PLACES("places");
-		const std::string PlacesListFunction::DATA_PLACE("place");
+		const string PlacesListFunction::DATA_CITY_ID("city_id");
+		const string PlacesListFunction::DATA_CITY_NAME("city_name");
+		const string PlacesListFunction::DATA_RESULTS_SIZE("size");
+		const string PlacesListFunction::DATA_CONTENT("content");
+		const string PlacesListFunction::DATA_PLACES("places");
+		const string PlacesListFunction::DATA_PLACE("place");
 
 		const string PlacesListFunction::DATA_NAME("name");
 		const string PlacesListFunction::DATA_RANK("rank");
@@ -146,6 +146,10 @@ namespace synthese
 			catch(ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such web page");
+			}
+			if(!_page.get())
+			{
+				setOutputFormatFromMap(map, "");
 			}
 
 			_input =
@@ -370,23 +374,7 @@ namespace synthese
 
 			ParametersMap pm(getTemplateParameters());
 
-			// TODO: Factor ParametesrMap constant
-			if(_outputFormat == "json")
-			{
-				size_t i(0);
-				BOOST_FOREACH(const PlacesList::value_type& it, placesList)
-				{
-					shared_ptr<ParametersMap> placePm(new ParametersMap());
-
-					placePm->insert(DATA_RANK, i);
-					placePm->insert(DATA_NAME, it.second);
-					placePm->insert(Request::PARAMETER_OBJECT_ID, it.first);
-					pm.insert(DATA_PLACE, placePm);
-					++i;
-				}
-				pm.outputJSON(stream, DATA_PLACES);
-			}
-			else if(_page.get())
+			if(_page.get())
 			{
 				pm.insert(DATA_RESULTS_SIZE, placesList.size());
 				if(_city.get())
@@ -407,6 +395,26 @@ namespace synthese
 			else if(_itemPage.get())
 			{
 				_displayItems(stream, placesList, request);
+			}
+			else if(!_outputFormat.empty())
+			{
+				size_t i(0);
+				BOOST_FOREACH(const PlacesList::value_type& it, placesList)
+				{
+					shared_ptr<ParametersMap> placePm(new ParametersMap());
+
+					placePm->insert(DATA_RANK, i);
+					placePm->insert(DATA_NAME, it.second);
+					placePm->insert(Request::PARAMETER_OBJECT_ID, it.first);
+					pm.insert(DATA_PLACE, placePm);
+					++i;
+				}
+				outputParametersMap(
+					pm,
+					stream,
+					DATA_PLACES,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/56_pt_website/places_list.xsd"
+				);
 			}
 
 			return pm;
@@ -439,20 +447,7 @@ namespace synthese
 
 		std::string PlacesListFunction::getOutputMimeType() const
 		{
-			if(_page.get())
-			{
-				return _page->getMimeType();
-			}
-			if(_itemPage.get())
-			{
-				return _itemPage->getMimeType();
-			}
-			// TODO: refactor this in ParametersMap
-			else if(_outputFormat == "json")
-			{
-				return "application/json";
-			}
-			return "text/xml";
+			return _page.get() ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat(MimeTypes::XML);
 		}
 
 

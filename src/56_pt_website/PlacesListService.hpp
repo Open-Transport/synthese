@@ -68,9 +68,6 @@ namespace synthese
 			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_CITIES_WITH_AT_LEAST_A_STOP;
 			static const std::string PARAMETER_SORTED;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
-			static const std::string VALUE_XML;
-			static const std::string VALUE_JSON;
 			static const std::string PARAMETER_ITEM_PAGE_ID;
 			static const std::string PARAMETER_CLASS_PAGE_ID;
 			static const std::string PARAMETER_MIN_SCORE;
@@ -105,7 +102,6 @@ namespace synthese
 				boost::shared_ptr<const geography::City> _city;
 				bool _sorted;
 				bool _citiesWithAtLeastAStop;
-				std::string _outputFormat;
 				boost::shared_ptr<const cms::Webpage> _itemPage;
 				boost::shared_ptr<const cms::Webpage> _classPage;
 				boost::optional<std::size_t> _number;
