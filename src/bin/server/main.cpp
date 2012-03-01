@@ -71,11 +71,11 @@ void quit(bool doExit = true);
 
 void sig_INT_handler(int sig)
 {
-    // Catch INT signal and close server properly with exit.
-    // This allows profiling info to be dumped.
-    Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
+	// Catch INT signal and close server properly with exit.
+	// This allows profiling info to be dumped.
+	Log::GetInstance ().info ("Caught signal no. " + lexical_cast<string>(sig));
 
-    quit();
+	quit();
 }
 
 
@@ -83,25 +83,25 @@ void sig_INT_handler(int sig)
 
 void sig_PIPE_handler(int sig)
 {
-    // Catch SIGPIPE and ignore it. We do not want the program to
-    // die on a broken pipe error, which is well detected at socket level.
-    Log::GetInstance ().info ("Ignoring broken pipe.");
+	// Catch SIGPIPE and ignore it. We do not want the program to
+	// die on a broken pipe error, which is well detected at socket level.
+	Log::GetInstance ().info ("Ignoring broken pipe.");
 }
 
 
 
 pid_t daemonize ()
 {
-    pid_t pid;
-    if (getppid () == 1) return getpid();
-    pid = fork ();
-    if (pid < 0)
-    {
+	pid_t pid;
+	if (getppid () == 1) return getpid();
+	pid = fork ();
+	if (pid < 0)
+	{
 		Log::GetInstance ().fatal ("fork() failed !");
 		exit (1);
-    }
-    if (pid > 0)
-    {
+	}
+	if (pid > 0)
+	{
 		// Wait for PID file to exist
 		while ((pidFile == 0) || boost::filesystem::exists (*pidFile) == false)
 		{
@@ -110,44 +110,44 @@ pid_t daemonize ()
 		exit(0);
 	}
 
-    umask(022);
-    if (setsid () < 0)
-    {
-	Log::GetInstance ().fatal ("setsid() failed !");
-	exit (1);
-    }
+	umask(022);
+	if (setsid () < 0)
+	{
+		Log::GetInstance ().fatal ("setsid() failed !");
+		exit (1);
+	}
 
-    if (chdir ("/") < 0)
-    {
-	Log::GetInstance ().fatal ("chdir(\"/\") failed !");
-	exit (1);
-    }
+	if (chdir ("/") < 0)
+	{
+		Log::GetInstance ().fatal ("chdir(\"/\") failed !");
+		exit (1);
+	}
 
-    return getpid();
+	return getpid();
 }
 
 #endif
 
 void ensureWritablePath (const boost::filesystem::path& path, bool removeOnSuccess)
 {
-    std::ofstream tos (path.string ().c_str (), std::ios_base::app);
-    if (tos.good () == false)
-    {
-	std::cerr << "Cannot open " << path.string () << " for writing." << std::endl;
-	exit (1);
-    }
-    else
-    {
-	tos.close ();
-	if (removeOnSuccess) boost::filesystem::remove (*pidFile);
-    }
+	std::ofstream tos (path.string ().c_str (), std::ios_base::app);
+	if (tos.good () == false)
+	{
+		std::cerr << "Cannot open " << path.string () << " for writing." << std::endl;
+		exit (1);
+	}
+	else
+	{
+		tos.close ();
+		if (removeOnSuccess) boost::filesystem::remove (*pidFile);
+	}
 }
 
 
 filesystem::path createCompletePath (const std::string& s)
 {
-    boost::filesystem::path path (s, boost::filesystem::native);
-    return boost::filesystem::complete (path, boost::filesystem::initial_path());
+	boost::filesystem::path path (s, boost::filesystem::native);
+	return boost::filesystem::complete (path, boost::filesystem::initial_path());
 }
 
 
@@ -164,12 +164,12 @@ void quit(bool doExit)
 		module->end();
 	}
 
-    // Last chance cleaning actions can be added here as well ...
-    // Delete PID file
+	// Last chance cleaning actions can be added here as well ...
+	// Delete PID file
 	if(pidFile)
-	    boost::filesystem::remove (*pidFile);
+		boost::filesystem::remove (*pidFile);
 
-    Log::GetInstance ().info ("Exit!");
+	Log::GetInstance ().info ("Exit!");
 
 	if(doExit)
 	{
@@ -184,8 +184,8 @@ int main( int argc, char **argv )
 	VLDDisable();
 #endif
 	std::signal (SIGINT, sig_INT_handler);
-    std::signal (SIGTERM, sig_INT_handler);
-    std::signal (SIGSEGV, sig_INT_handler);
+	std::signal (SIGTERM, sig_INT_handler);
+	std::signal (SIGSEGV, sig_INT_handler);
 	std::signal (SIGILL, sig_INT_handler);
 
 #ifndef WIN32
@@ -198,8 +198,8 @@ int main( int argc, char **argv )
 		::system("pause");
 #endif
 
-    try
-    {
+	try
+	{
 		{
 			std::string dbConnString;
 			std::string pidf;
@@ -358,13 +358,13 @@ int main( int argc, char **argv )
 		}
 
 		exit(0);
-    }
-    catch (std::exception& e)
-    {
+	}
+	catch (std::exception& e)
+	{
 		Log::GetInstance ().fatal (std::string ("Fatal error : ") + e.what ());
-    }
-    catch (...)
-    {
+	}
+	catch (...)
+	{
 		Log::GetInstance ().fatal ("Unexpected exception.");
-    }
+	}
 }

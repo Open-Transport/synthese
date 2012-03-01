@@ -124,6 +124,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_SMTP_SERVER;
 			static const std::string MODULE_PARAM_SMTP_PORT;
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
+			static const std::string MODULE_PARAM_AUTO_LOGIN_USER;
 
 			static const std::string VERSION;
 			static const std::string VERSION_INFO;
@@ -148,6 +149,7 @@ namespace synthese
 			static std::size_t _waitingThreads;
 			static boost::recursive_mutex _threadManagementMutex;
 			static boost::posix_time::time_duration _sessionMaxDuration;
+			static std::string _autoLoginUser;
 
 
 		public:
@@ -171,7 +173,8 @@ namespace synthese
 			static void RunHTTPServer();
 			static util::EMail GetEMailSender();
 			static boost::posix_time::time_duration GetSessionMaxDuration();
-			static SessionMap& getSessions();
+			static const std::string& GetAutoLoginUser() { return _autoLoginUser; }
+			static SessionMap& GetSessions();
 
 			/** Called whenever a parameter registered by this module is changed
 			 */

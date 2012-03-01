@@ -29,6 +29,8 @@
 #include "Action.h"
 #include "Function.h"
 #include "SessionException.h"
+#include "User.h"
+#include "UserTableSync.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -40,6 +42,7 @@ namespace synthese
 	namespace server
 	{
 		using namespace util;
+		using namespace security;
 
 
 
@@ -99,8 +102,8 @@ namespace synthese
 				return;
 			}
 
-			ServerModule::SessionMap::iterator sit = ServerModule::getSessions().find(sid);
-			if(sit != ServerModule::getSessions().end())
+			ServerModule::SessionMap::iterator sit = ServerModule::GetSessions().find(sid);
+			if(sit != ServerModule::GetSessions().end())
 			{
 				_session = sit->second;
 			}
@@ -112,16 +115,6 @@ namespace synthese
 				{
 					return;
 				}
-			}
-
-			try
-			{
-				_session->checkAndRefresh(_ip);
-				_session->setSessionIdCookie(*this);
-			}
-			catch (SessionException e)
-			{
-				deleteSession();
 			}
 		}
 
@@ -208,6 +201,24 @@ namespace synthese
 
 			// Session
 			_setupSession();
+			if(!_session && !ServerModule::GetAutoLoginUser().empty())
+			{
+				shared_ptr<User> user = UserTableSync::getUserFromLogin(ServerModule::GetAutoLoginUser());
+				_session = new Session(_ip);
+				_session->setUser(user);
+			}
+			if(_session)
+			{
+				try
+				{
+					_session->checkAndRefresh(_ip);
+					_session->setSessionIdCookie(*this);
+				}
+				catch (SessionException e)
+				{
+					deleteSession();
+				}
+			}
 
 			// Action name
 			std::string actionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_ACTION));

@@ -60,8 +60,8 @@ namespace synthese
 
 	template<> const std::string util::FactorableTemplate<ModuleClass, ServerModule>::FACTORY_KEY("15_server");
 
-    namespace server
-    {
+	namespace server
+	{
 		ServerModule::SessionMap	ServerModule::_sessionMap;
 		boost::asio::io_service ServerModule::_io_service;
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
@@ -70,6 +70,7 @@ namespace synthese
 		size_t ServerModule::_waitingThreads(0);
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
+		string ServerModule::_autoLoginUser("");
 
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
@@ -78,6 +79,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_SERVER ("smtp_server");
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
+		const string ServerModule::MODULE_PARAM_AUTO_LOGIN_USER("auto_login_user");
 
 		// TODO: inline once scons is removed.
 #ifdef CMAKE
@@ -99,6 +101,7 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER, "smtp", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_AUTO_LOGIN_USER, "", &ServerModule::ParameterCallback);
 		}
 
 
@@ -161,7 +164,7 @@ namespace synthese
 		}
 
 
-		ServerModule::SessionMap& ServerModule::getSessions()
+		ServerModule::SessionMap& ServerModule::GetSessions()
 		{
 			return _sessionMap;
 		}
@@ -186,6 +189,10 @@ namespace synthese
 			if(name == MODULE_PARAM_SESSION_MAX_DURATION)
 			{
 				_sessionMaxDuration = minutes(lexical_cast<int>(value));
+			}
+			if(name == MODULE_PARAM_AUTO_LOGIN_USER)
+			{
+				_autoLoginUser = value;
 			}
 		}
 
