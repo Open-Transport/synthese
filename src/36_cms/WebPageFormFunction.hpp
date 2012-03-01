@@ -49,6 +49,7 @@ namespace synthese
 			static const std::string PARAMETER_NAME;
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_SCRIPT;
+			static const std::string PARAMETER_CLASS;
 			static const std::string PARAMETER_IDEM;
 			static const std::string PARAMETER_USE_SMART_URL;
 
@@ -58,6 +59,7 @@ namespace synthese
 				std::string _name;
 				boost::shared_ptr<const Webpage> _page;
 				std::string _script;
+				std::string _class;
 				bool _idem;
 				bool _useSmartURL;
 				util::ParametersMap _parameters;
