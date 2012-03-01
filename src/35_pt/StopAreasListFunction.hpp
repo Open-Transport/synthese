@@ -65,7 +65,6 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LINES;
 			static const std::string PARAMETER_STOP_PAGE_ID;
 			static const std::string PARAMETER_LINE_PAGE_ID;
-			static const std::string PARAMETER_OUTPUT_FORMAT;
 
 		private:
 			static const std::string DATA_LINE;

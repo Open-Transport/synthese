@@ -26,6 +26,7 @@
 #include "HTMLModule.h"
 #include "Types.h"
 #include "RequestException.h"
+#include "MimeTypes.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -47,7 +48,6 @@ namespace synthese
 		const string RowsListFunction::PARAMETER_INPUT("t");
 		const string RowsListFunction::PARAMETER_TABLE("table");
 		const string RowsListFunction::PARAMETER_NUMBER("n");
-		const string RowsListFunction::PARAMETER_OUTPUT_FORMAT = "output_format";
 
 		const std::string RowsListFunction::DATA_RESULTS_SIZE("size");
 		const std::string RowsListFunction::DATA_CONTENT("content");
@@ -83,7 +83,7 @@ namespace synthese
 			{
 				throw RequestException("Number of result must be limited");
 			}
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+			setOutputFormatFromMap(map, "");
 		}
 
 
@@ -110,11 +110,12 @@ namespace synthese
 				pm.insert(DATA_ROW, rowPm);
 			}
 
-			// TODO: Factor ParametesrMap constant
-			if(_outputFormat == "json")
-			{
-				pm.outputJSON(stream, DATA_ROWS);
-			}
+			outputParametersMap(
+				pm,
+				stream,
+				DATA_ROWS,
+				"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/36_cms/RowsListFunction.xsd"
+			);
 
 			return pm;
 		}
@@ -130,11 +131,6 @@ namespace synthese
 
 		std::string RowsListFunction::getOutputMimeType() const
 		{
-			// TODO: refactor this in ParametersMap
-			if(_outputFormat == "json")
-			{
-				return "application/json";
-			}
-			return "text/xml";
+			return getOutputMimeTypeFromOutputFormat(MimeTypes::XML);
 		}
 }	}

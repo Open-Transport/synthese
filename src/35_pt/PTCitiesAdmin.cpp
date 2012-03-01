@@ -43,6 +43,7 @@
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "TransportNetworkRight.h"
+#include "MimeTypes.hpp"
 
 using namespace std;
 using namespace boost;
@@ -152,11 +153,11 @@ namespace synthese
 				// XML response
 				StaticFunctionRequest<PlacesListService> testRequest;
 				testRequest.getFunction()->_setFromParametersMap(_placesListService._getParametersMap());
-				testRequest.getFunction()->setOutputFormat(PlacesListService::VALUE_XML);
+				testRequest.getFunction()->setOutputFormat(MimeTypes::XML);
 				stream << HTMLModule::getLinkButton(testRequest.getURL(), "Réponse XML");
 
 				// JSON response
-				testRequest.getFunction()->setOutputFormat(PlacesListService::VALUE_JSON);
+				testRequest.getFunction()->setOutputFormat(MimeTypes::JSON);
 				stream << HTMLModule::getLinkButton(testRequest.getURL(), "Réponse JSON");
 
 				// Best match
