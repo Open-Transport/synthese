@@ -75,8 +75,6 @@ namespace synthese
 
 		void RowsListFunction::_setFromParametersMap( const util::ParametersMap& map )
 		{
-//			_FunctionWithSite::_setFromParametersMap(map);
-
 			_input = map.getDefault<string>(PARAMETER_INPUT);
 			_table = map.getDefault<DBTableSync::TableId>(PARAMETER_TABLE);
 
@@ -96,12 +94,12 @@ namespace synthese
 		) const {
 			boost::shared_ptr<DBTableSync> tableSync = DBModule::GetTableSync(_table);
 
-			RowsList resultat = tableSync->SearchForAutoComplete(_input,_n);
+			RowsList result = tableSync->SearchForAutoComplete(_input,_n);
 
 			ParametersMap pm;
 
 			size_t i(0);
-			for (RowsList::const_iterator it = resultat.begin(); it != resultat.end(); ++it)
+			for (RowsList::const_iterator it = result.begin(); it != result.end(); ++it)
 			{
 				shared_ptr<ParametersMap> rowPm(new ParametersMap());
 
