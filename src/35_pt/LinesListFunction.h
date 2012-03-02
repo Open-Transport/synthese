@@ -40,7 +40,7 @@ namespace synthese
 	{
 		class Webpage;
 	}
-	
+
 	namespace pt_website
 	{
 		class RollingStockFilter;
