@@ -146,7 +146,7 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
-			
+
 			// Rolling stock filter
 			if(_rollingStockFilter.get() != NULL)
 			{
@@ -268,10 +268,9 @@ namespace synthese
 			
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
-			
 			if(rs_id) try
 			{
-				_rollingStockFilter	= Env::GetOfficialEnv().get<RollingStockFilter>(*rs_id);	
+				_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(*rs_id);
 			}
 			catch (ObjectNotFoundException<RollingStockFilter>)
 			{
@@ -466,7 +465,7 @@ namespace synthese
 									break;
 								}
 							}
-							
+
 							// If the line doesn't respect the filter, skip it
 							if(!atLeastOneMode)
 							{
