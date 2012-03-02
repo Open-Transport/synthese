@@ -40,6 +40,11 @@ namespace synthese
 	{
 		class Webpage;
 	}
+	
+	namespace pt_website
+	{
+		class RollingStockFilter;
+	}
 
 	namespace pt
 	{
@@ -67,6 +72,7 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_MESSAGES;
 			static const std::string PARAMETER_OUTPUT_STOPS;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_SORT_BY_TRANSPORT_MODE;
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_RIGHT_CLASS;
@@ -101,6 +107,7 @@ namespace synthese
 				bool _outputMessages;
 				bool _lettersBeforeNumbers;
 				std::string _outputGeometry;
+				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 				typedef std::vector<boost::shared_ptr<const RollingStock> > TransportModeSorting;
 				TransportModeSorting _sortByTransportMode;
 				std::string _rightClass;
