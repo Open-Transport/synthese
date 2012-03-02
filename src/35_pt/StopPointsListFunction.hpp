@@ -43,6 +43,11 @@ namespace synthese
 		class Webpage;
 	}
 
+	namespace pt_website
+	{
+		class RollingStockFilter;
+	}
+
 	namespace pt
 	{
 		class StopArea;
@@ -66,6 +71,7 @@ namespace synthese
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_BBOX;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
@@ -83,6 +89,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _page;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
+				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 			//@}
 
 
