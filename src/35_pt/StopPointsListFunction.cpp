@@ -29,6 +29,7 @@
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "RollingStock.hpp"
+#include "RollingStockFilter.h"
 #include "Edge.h"
 #include "LineStop.h"
 #include "SchedulesBasedService.h"
@@ -53,6 +54,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace cms;
+	using namespace pt_website;
 
 	template<> const string util::FactorableTemplate<Function,pt::StopPointsListFunction>::FACTORY_KEY("StopPointsListFunction");
 
@@ -63,6 +65,7 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_PAGE_ID = "page_id";
 		const string StopPointsListFunction::PARAMETER_BBOX = "bbox";
 		const string StopPointsListFunction::PARAMETER_SRID = "srid";
+		const string StopPointsListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
 		const string StopPointsListFunction::TAG_DESTINATION = "destination";
@@ -90,6 +93,10 @@ namespace synthese
 			if(_coordinatesSystem)
 			{
 				map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
+			}
+			if(_rollingStockFilter.get() != NULL)
+			{
+				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
 			}
 			return map;
 		}
@@ -167,6 +174,17 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such page");
+			}
+
+			// Rolling stock filter
+			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+			if(rs_id) try
+			{
+				_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(*rs_id);
+			}
+			catch (ObjectNotFoundException<RollingStockFilter>)
+			{
+				throw RequestException("No such RollingStockFilter");
 			}
 		}
 
@@ -371,6 +389,28 @@ namespace synthese
 					const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
 					if(_commercialLineID && (commercialLine->getKey() != _commercialLineID))// only physicalStop used by the commercial line will be displayed
 						continue;
+
+					// Filter by Rolling stock id
+					if(_rollingStockFilter.get())
+					{
+						// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+						bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+						set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+						BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+						{
+							if(commercialLine->usesTransportMode(*rollingStock))
+							{
+								atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+								break;
+							}
+						}
+
+						// If the line doesn't respect the filter, skip it
+						if(!atLeastOneMode)
+						{
+							continue;
+						}
+					}
 
 					const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
 
