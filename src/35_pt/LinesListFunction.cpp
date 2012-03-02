@@ -29,6 +29,7 @@
 #include "CommercialLine.h"
 #include "Webpage.h"
 #include "RollingStock.hpp"
+#include "RollingStockFilter.h"
 #include "Path.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLineTableSync.h"
@@ -63,6 +64,7 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace messages;
+	using namespace pt_website;
 
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -79,6 +81,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
 		const string LinesListFunction::PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES = "idbd";
 		const string LinesListFunction::PARAMETER_LETTERS_BEFORE_NUMBERS = "letters_before_numbers";
+		const string LinesListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string LinesListFunction::PARAMETER_SORT_BY_TRANSPORT_MODE = "sort_by_transport_mode";
 		const string LinesListFunction::PARAMETER_OUTPUT_MESSAGES = "output_messages";
 		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
@@ -143,6 +146,12 @@ namespace synthese
 			result.insert(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES, _ignoreDeparturesBoardExcludedLines);
 			result.insert(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES, _ignoreJourneyPlannerExcludedLines);
 			result.insert(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES, _ignoreTimetableExcludedLines);
+			
+			// Rolling stock filter
+			if(_rollingStockFilter.get() != NULL)
+			{
+				result.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
+			}
 
 			// Transport mode sorting
 			if(_sortByTransportMode.size() > 1)
@@ -256,6 +265,18 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
 			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
 			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
+			
+			// Rolling stock filter
+			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+			
+			if(rs_id) try
+			{
+				_rollingStockFilter	= Env::GetOfficialEnv().get<RollingStockFilter>(*rs_id);	
+			}
+			catch (ObjectNotFoundException<RollingStockFilter>)
+			{
+				throw RequestException("No such RollingStockFilter");
+			}
 
 			// Transport mode sorting
 			_sortByTransportMode.clear();
@@ -429,6 +450,28 @@ namespace synthese
 						if(alreadyShownLines.find(line.get()) != alreadyShownLines.end())
 						{
 							continue;
+						}
+						
+						// Filter by Rolling stock id
+						if(_rollingStockFilter.get())
+						{
+							// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+							bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+							set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+							BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+							{
+								if(line->usesTransportMode(*rollingStock))
+								{
+									atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+									break;
+								}
+							}
+							
+							// If the line doesn't respect the filter, skip it
+							if(!atLeastOneMode)
+							{
+								continue;
+							}
 						}
 
 						// Use rule tests
