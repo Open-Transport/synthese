@@ -44,14 +44,21 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,DateService>
 		{
 		public:
-			static const std::string PARAMETER_DAY;
+			static const std::string PARAMETER_OFFSET;
 			static const std::string PARAMETER_WITH_TIME;
+			static const std::string PARAMETER_BASE;
+			static const std::string PARAMETER_UNIT;
+			static const std::string PARAMETER_STRFTIME_FORMAT;
 
 		protected:
 			//! \name Page parameters
 			//@{
+				enum OffsetUnit {SECOND, MINUTE, HOUR, DAY};
 				boost::posix_time::ptime _time;
+				std::string _offset;
 				bool _withTime;
+				OffsetUnit _unit;
+				std::string _strftimeFormat;
 			//@}
 
 
