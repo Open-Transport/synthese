@@ -162,7 +162,6 @@ namespace synthese
 			{
 				throw RequestException("Number of result must be limited");
 			}
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
 
 			if(map.isDefined(PARAMETER_CITY_ID))
 			{
