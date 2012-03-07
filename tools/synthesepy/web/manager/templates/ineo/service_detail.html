@@ -1,0 +1,33 @@
+{% extends "ineo/ineo_common.html" %}
+
+{% block breadcrumb %}
+  {{ breadcrumb_entry(url_for('.ineo_routes', jour=jour),
+    "Routes") }}
+
+  {{ breadcrumb_entry(url_for('.ineo_route', route_id=chainage, jour=jour),
+    "Route {0}".format(chainage_nom)) }}
+
+  <li>Service {{ service_id }}</li>
+{% endblock %}
+
+{% block ineo_body %}
+  service_id: {{ service_id }}<br>
+  line_name: {{ line_name }}<br>
+  chainage: {{ chainage }}<br>
+  jour: {{ jour }}<br>
+  
+  {{ table(ineo_result, 'Inéo data', 'half') }}
+  
+  {% for stops_table in stops_tables %}
+    {{ table(stops_table, 'Synthese data', 'half') }}
+  {% endfor %}
+  
+  {% for services_table in services_tables %}
+    {{ table(services_table, 'Synthese service data') }}
+    {% if services_table[0] %}
+      <a href="/admin/synthese?SERVICE=admin&mt=177329235327713281&pt=177329235327713283&roid={{services_table[0][0]['id']}}&rub=ServiceAdmin&tab=&tt=177329235327713282">
+      Synthese service admin page</a>
+    {% endif %}
+  {% endfor %}
+
+{% endblock %}
