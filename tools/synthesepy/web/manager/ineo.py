@@ -20,6 +20,8 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import datetime
+from functools import wraps
+import itertools
 import pprint
 
 import flask
@@ -29,69 +31,182 @@ import werkzeug
 from synthesepy import db_backends
 from . import manager
 
-def _build_service_list(project, jour, template_args):
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('.login', next=request.url))
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+def _get_jour():
+    jour = datetime.date.today().strftime('%Y-%m-%d')
+    if 'jour' in request.args:
+        jour = request.args['jour']
+    return jour
+
+
+@manager.route('/ineo/routes')
+@login_required
+def ineo_routes():
+    project = flask.current_app.project
     config = project.config
     db = config.ineo_db
 
-    limit = int(request.args.get('limit', 500))
-    offset = int(request.args.get('offset', 0))
+    jour = _get_jour()
 
+    query = """SELECT 
+        l.ref as ligne_ref,
+        l.mnemo as ligne_mnemo,
+        l.nom as ligne_nom,
+        d.nom as dest_nom,
+        ch.ref as chainage_ref,
+        ch.sens as chainage_sens,
+        ch.nom as chainage_nom
+    FROM CHAINAGE ch
+        JOIN LIGNE l ON l.ref = ch.ligne and l.jour = '{jour}'
+        JOIN DEST d ON d.ref = ch.dest and d.jour = '{jour}'
+    WHERE
+        ch.jour = '{jour}' AND ch.type ='C'
+    ORDER BY
+        l.mnemo, ch.sens, ch.nom
+    """.format(**locals())
+
+    result = db.query(query)
+
+    for route in result:
+        route['chainage_nom'] = u'<a href={0}>{1}</a>'.format(
+            url_for('.ineo_route', route_id=route['chainage_ref'], jour=jour),
+            route['chainage_nom'])
+
+    routes = (
+        result,
+        ('ligne_ref', 'ligne_mnemo', 'ligne_nom', 'dest_nom', 'chainage_ref',
+         'chainage_sens', 'chainage_nom'))
+
+    return render_template('ineo/routes.html', **locals())
+
+
+@manager.route('/ineo/route/<route_id>')
+@login_required
+def ineo_route(route_id):
+    project = flask.current_app.project
+    config = project.config
+    db = config.ineo_db
+
+    jour = _get_jour()
+
+    result = db.query("""SELECT
+        ch.ref,
+        ch.nom as chainage_nom,
+        l.ref as ligne_ref,
+        l.nom as ligne_nom
+    FROM
+        CHAINAGE ch 
+        JOIN LIGNE l ON l.ref = ch.ligne and l.jour = '{jour}'
+    WHERE
+        ch.ref = {route_id} AND ch.jour = '{jour}'
+    """.format(**locals()), one=True)
+    chainage_nom = result['chainage_nom']
+    ligne_nom = result['ligne_nom']
+
+    query = """SELECT
+        c.ref as course_ref,
+        h.htd, ach.pos,
+        a.ref as arret_ref, a.nom as arret_nom 
+    FROM
+        CHAINAGE ch
+        JOIN COURSE c ON c.chainage = ch.ref AND c.jour = '{jour}'
+        JOIN HORAIRE h ON h.course = c.ref AND h.jour = '{jour}'
+        JOIN ARRETCHN ach ON ach.ref = h.arretchn AND ach.jour = '{jour}'
+        JOIN ARRET a ON a.ref = ach.arret AND a.jour = '{jour}'
+    WHERE
+        ch.ref = {route_id} AND ch.jour = '{jour}'
+    ORDER BY
+        c.ref, ach.pos
+    """.format(**locals())
+    
+    
+    result = db.query(query)
+
+    def service_grouper(service):
+        KEEP_KEYS = set(['course_ref'])
+        key = dict((k, v) for (k, v) in service.iteritems() if k in KEEP_KEYS)
+        return key
     services = []
-    for service in db.query("""SELECT *, l.nom as ligne_nom from COURSE c
-            JOIN LIGNE l on l.ref = c.ligne
-            LIMIT {limit}
-            OFFSET {offset}
-        """.format(**locals())):
-        service['link'] = '<a href="{0}">Service {1}</a>'.format(
-            url_for('.ineo', service_id=service['ref']), service['ref'])
+    for service, horaires in itertools.groupby(result, service_grouper):
+        horaires = list(horaires)
+        begin = horaires[0]
+        end = horaires[-1]
+        service['beg_htd'] = begin['htd']
+        service['end_htd'] = end['htd']
+        service['course_ref'] = '<a href={0}>{1}</a>'.format(
+            url_for('.ineo_service_detail', service_id=service['course_ref'], jour=jour),
+            service['course_ref'])
+
         services.append(service)
-    template_args['services'] = (services, ('ref', 'link', 'sv', 'ligne', 'ligne_nom'))
 
-    template_args['next_page'] = url_for('.ineo', offset=offset + limit)
-    template_args['services_count'] = db.query("SELECT count(1) as c from COURSE", one=True)['c']
+    services.sort(key=lambda s: s['beg_htd'])
+
+    services = (
+        services,
+        ('course_ref', 'beg_htd', 'end_htd'))
+
+    return render_template('ineo/route.html', **locals())
 
 
-def _build_ineo_tables(project, jour, service_id, template_args):
+@manager.route('/ineo/service/<service_id>')
+@login_required
+def ineo_service_detail(service_id):
+    project = flask.current_app.project
     config = project.config
     db = config.ineo_db
+
+    jour = _get_jour()
 
     # Ineo data
 
     deviation = ''
     if config.ineo_ver >= 1.07:
-        deviation = 'HORAIRE.deviation,'
+        deviation = 'h.deviation,'
 
     query = """SELECT
-        ARRET.nom arretNom,
-        ARRET.mnemoc,
-        ARRETCHN.pos,
-        HORAIRE.hta,
-        HORAIRE.htd,
-        HORAIRE.hra,
-        HORAIRE.hrd,
-        HORAIRE.type,
+        a.nom arret_nom,
+        a.mnemoc,
+        ch.nom as chainage_nom,
+        ach.pos,
+        h.hta,
+        h.htd,
+        h.hra,
+        h.hrd,
+        h.type,
         {deviation}
-        LIGNE.mnemo ligneNom,
-        COURSE.chainage
-    FROM COURSE, ARRETCHN, HORAIRE, ARRET, LIGNE
+        l.mnemo ligne_nom,
+        c.chainage
+    FROM
+        COURSE c
+        JOIN CHAINAGE ch ON ch.ref = c.chainage AND ch.jour = '{jour}'
+        JOIN LIGNE l ON l.ref = c.ligne AND l.jour = '{jour}'
+        JOIN HORAIRE h ON h.course = c.ref AND h.jour = '{jour}'
+        JOIN ARRETCHN ach ON ach.ref = h.arretchn AND ach.jour = '{jour}'
+        JOIN ARRET a ON a.ref = ach.arret AND a.jour = '{jour}'
     WHERE
-        COURSE.ref={service_id} AND COURSE.jour='{jour}' AND
-        HORAIRE.course=COURSE.ref AND HORAIRE.jour=COURSE.jour AND
-        ARRETCHN.chainage=COURSE.chainage AND HORAIRE.arretchn=ARRETCHN.ref AND ARRETCHN.jour=HORAIRE.jour AND
-        ARRET.ref=ARRETCHN.arret AND ARRET.jour=ARRETCHN.jour AND
-        LIGNE.ref=COURSE.ligne AND LIGNE.jour=COURSE.jour
+        c.ref = {service_id} AND c.jour = '{jour}'
     ORDER BY
-        ARRETCHN.pos
+        ach.pos
     """.format(**locals())
 
     result = db.query(query)
     if not result:
-        return 'Can\'d find any COURSE with given service_id'
-    template_args['line_name'] = result[0]['ligneNom']
-    template_args['chainage'] = result[0]['chainage']
-    template_args['ineo_result'] = (
+        flask.abort(404)
+    line_name = result[0]['ligne_nom']
+    chainage = result[0]['chainage']
+    chainage_nom = result[0]['chainage_nom']
+    ineo_result = (
         result,
-        ('mnemoc', 'arretNom', 'pos', 'hta', 'htd', 'hra', 'hrd', 'type', 'deviation'))
+        ('mnemoc', 'arret_nom', 'pos', 'hta', 'htd', 'hra', 'hrd', 'type', 'deviation'))
 
     # Synthese data
 
@@ -112,10 +227,11 @@ def _build_ineo_tables(project, jour, service_id, template_args):
             t012_physical_stops.name,
             t010_line_stops.schedule_input,
             t010_line_stops.metric_offset
-        FROM t010_line_stops, t012_physical_stops
+        FROM
+            t010_line_stops, t012_physical_stops
         WHERE
-            line_id={line_id} AND
-            t012_physical_stops.id=t010_line_stops.physical_stop_id
+            line_id = {line_id} AND
+            t012_physical_stops.id = t010_line_stops.physical_stop_id
         """.format(**locals()))
 
         i = 0
@@ -126,31 +242,9 @@ def _build_ineo_tables(project, jour, service_id, template_args):
 
         stops_tables.append((stops, ('name', 'metric_offset', 'schedule')))
 
-    template_args['stops_tables'] = stops_tables
+    stops_tables = stops_tables
 
     services_tables.append((services, ('id', 'path_id', 'schedules')))
-    template_args['services_tables'] = services_tables
+    services_tables = services_tables
 
-@manager.route('/ineo/', defaults={'service_id': -1})
-@manager.route('/ineo/<service_id>')
-def ineo(service_id):
-    if not session.get('logged_in'):
-        return redirect(url_for('.login', next=url_for('.ineo')))
-    project = flask.current_app.project
-
-    config = project.config
-    db = config.ineo_db
-
-    template_args = {}
-
-    jour = datetime.date.today().strftime('%Y-%m-%d')
-    if 'jour' in request.args:
-        jour = request.args['jour']
-    template_args['jour'] = jour
-
-    if service_id >= 0:
-        _build_ineo_tables(project, jour, service_id, template_args)
-    else:
-        _build_service_list(project, jour, template_args)
-
-    return render_template('ineo.html', **template_args)
+    return render_template('ineo/service_detail.html', **locals())
