@@ -1,0 +1,11 @@
+{% extends "ineo/ineo_common.html" %}
+
+{% block breadcrumb %}
+  <li>Routes</li>
+{% endblock %}
+
+{% block ineo_body %}
+
+  {{ table(routes, 'Routes') }}
+
+{% endblock %}

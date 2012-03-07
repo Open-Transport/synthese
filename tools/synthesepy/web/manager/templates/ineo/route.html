@@ -1,0 +1,17 @@
+{% extends "ineo/ineo_common.html" %}
+
+{% block breadcrumb %}
+  {{ breadcrumb_entry(url_for('.ineo_routes', jour=jour),
+    "Routes") }}
+
+  <li>Route {{ chainage_nom }}</li>
+{% endblock %}
+
+{% block ineo_body %}
+
+  ligne: {{ ligne_nom }}<br>
+  route: {{ chainage_nom }}<br>
+
+  {{ table(services, 'Route Services') }}
+
+{% endblock %}
