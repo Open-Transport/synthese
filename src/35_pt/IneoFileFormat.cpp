@@ -22,10 +22,14 @@
 
 #include "IneoFileFormat.hpp"
 
+#include "DriverAllocationTableSync.hpp"
+#include "DriverServiceTableSync.hpp"
 #include "PTModule.h"
+#include "PTOperationFileFormat.hpp"
 #include "PTUseRule.h"
 #include "PTUseRuleTableSync.h"
 #include "TransportNetwork.h"
+#include "UserTableSync.h"
 #include "StopArea.hpp"
 #include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
@@ -78,17 +82,19 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace impex;
-	using namespace pt;
-	using namespace util;
-	using namespace db;
+	using namespace admin;
 	using namespace calendar;
+	using namespace db;
+	using namespace geography;
 	using namespace graph;
 	using namespace html;
-	using namespace admin;
+	using namespace impex;
+	using namespace pt;
+	using namespace pt_operation;
+	using namespace security;
 	using namespace server;
-	using namespace geography;
-
+	using namespace util;
+	
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY("Ineo");
@@ -96,15 +102,17 @@ namespace synthese
 
 	namespace pt
 	{
-		const string IneoFileFormat::Importer_::FILE_PTF("ptf");
-		const string IneoFileFormat::Importer_::FILE_PNT("pnt");
-		const string IneoFileFormat::Importer_::FILE_DIS("dis");
-		const string IneoFileFormat::Importer_::FILE_DST("dst");
-		const string IneoFileFormat::Importer_::FILE_LIG("lig");
-		const string IneoFileFormat::Importer_::FILE_CJV("cjv");
-		const string IneoFileFormat::Importer_::FILE_HOR("hor");
-		const string IneoFileFormat::Importer_::FILE_CAL("cal");
-		const string IneoFileFormat::Importer_::SEP(";");
+		const string IneoFileFormat::Importer_::FILE_PTF = "ptf";
+		const string IneoFileFormat::Importer_::FILE_PNT = "pnt";
+		const string IneoFileFormat::Importer_::FILE_DIS = "dis";
+		const string IneoFileFormat::Importer_::FILE_DST = "dst";
+		const string IneoFileFormat::Importer_::FILE_LIG = "lig";
+		const string IneoFileFormat::Importer_::FILE_CJV = "cjv";
+		const string IneoFileFormat::Importer_::FILE_HOR = "hor";
+		const string IneoFileFormat::Importer_::FILE_CAL = "cal";
+		const string IneoFileFormat::Importer_::FILE_AFA = "afa";
+		const string IneoFileFormat::Importer_::FILE_SAB = "sab";
+		const string IneoFileFormat::Importer_::SEP = ";";
 
 		const string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID = "net";
 		const string IneoFileFormat::Importer_::PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK = "transport_mode_type_lg_mask";
@@ -147,6 +155,8 @@ namespace synthese
 			IneoFileFormat::Importer_::FILE_CAL.c_str(),
 			IneoFileFormat::Importer_::FILE_CJV.c_str(),
 			IneoFileFormat::Importer_::FILE_HOR.c_str(),
+			IneoFileFormat::Importer_::FILE_AFA.c_str(),
+			IneoFileFormat::Importer_::FILE_SAB.c_str(),
 		"");
 	}
 
@@ -186,7 +196,8 @@ namespace synthese
 			_stopPoints(_dataSource, _env),
 			_lines(_dataSource, _env),
 			_destinations(_dataSource, _env),
-			_addWaybackToJourneyPatternCode(false)
+			_addWaybackToJourneyPatternCode(false),
+			_vehicleServices(_dataSource, _env)
 		{}
 
 
@@ -752,6 +763,7 @@ namespace synthese
 			{
 				bool active(true);
 				JourneyPattern* route(NULL);
+				VehicleService* vehicleService(NULL);
 				ScheduledService::Schedules departureSchedules;
 				ScheduledService::Schedules arrivalSchedules;
 				int ph(0);
@@ -780,6 +792,10 @@ namespace synthese
 							{
 								service->setActive(dat);
 							}
+							if(vehicleService)
+							{
+								vehicleService->insert(*service);
+							}
 						}
 					}
 					if(_section.empty())
@@ -793,15 +809,22 @@ namespace synthese
 					}
 					else if(_section == "SV")
 					{
+						string mnesv(_getValue("MNESV"));
 						if(_lineReadMethod == VALUE_SV)
 						{
 							lineNum.clear();
-							string mnesv(_getValue("MNESV"));
 							if(mnesv.length() >= 3)
 							{
 								lineNum = mnesv.substr(0, mnesv.size() - 2);
 							}
 						}
+						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
+							_vehicleServices,
+							mnesv,
+							_dataSource,
+							_env,
+							stream
+						);
 					}
 					else if(_section == "C")
 					{
@@ -871,6 +894,126 @@ namespace synthese
 					}
 				}
 			}
+			else if(key == FILE_AFA)
+			{
+				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
+				do
+				{
+					// File read
+					_readLine(inFile);
+					if(_section == "AFF")
+					{
+						string key(_getValue("SA"));
+						string userKey(_getValue("MAT"));
+					
+						// User
+						User* user(
+							FileFormat::LoadOrCreateObject<UserTableSync>(
+								users,
+								userKey,
+								_dataSource,
+								_env,
+								stream,
+								"conducteur"
+						)	);
+
+						// Registration
+						_allocations[key] = user;
+					}
+
+				} while(!_section.empty());
+			}
+			else if(key == FILE_SAB)
+			{
+				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+				string lastKey;
+				DriverService* ds(NULL);
+				do
+				{
+					// File read
+					_readLine(inFile);
+					if(_section == "SASB")
+					{
+						string tpstra(_getValue("tpstra"));
+						string ampli(_getValue("ampli"));
+						string onBoardTicketing(_getValue("VAB"));
+						string activity(_getValue("ACT"));
+
+						// Load 
+						string key(_getValue("SA"));
+						if(key != lastKey)
+						{
+							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
+								driverServices,
+								key,
+								_dataSource,
+								_env,
+								stream,
+								"journée"
+							);
+							lastKey = key;
+							DriverService::Chunks emptyChunks;
+							ds->setChunks(emptyChunks);
+
+							// Amount
+/*							double amount(lexical_cast<double>(_getValue("frs")));
+							da->set<Amount>(amount);
+
+							// Boni amount
+							da->set<BoniAmount>(lexical_cast<double>(_getValue("bonifATTfrs")));
+
+							{	// Boni time
+								vector<string> parts;
+								split(parts, _getValue("bonifATTtps"), is_any_of("h"));
+								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
+							}
+*/							{	// Date
+								vector<string> parts;
+								split(parts, _getValue("DATE"), is_any_of("/"));
+								ds->setActive(
+									date(
+										lexical_cast<long>(parts[2]),
+										lexical_cast<long>(parts[1]),
+										lexical_cast<long>(parts[0])
+								)	);
+							}
+
+							// Journey
+							string hdebstr(_getValue("HDEB"));
+							time_duration hdeb(
+								hours(lexical_cast<long>(hdebstr.substr(0,2))) +
+								minutes(lexical_cast<long>(hdebstr.substr(2,2)))
+							);
+							string hfinstr(_getValue("HFIN"));
+							time_duration hfin(
+								hours(lexical_cast<long>(hdebstr.substr(0,2))) +
+								minutes(lexical_cast<long>(hdebstr.substr(2,2)))
+							);
+
+							// Vehicle service
+							string vsKey(_getValue("SB"));
+							replace_all(vsKey, "-", "");
+							set<VehicleService*> lvs(_vehicleServices.get(vsKey));
+							if(lvs.empty())
+							{
+								continue;
+							}
+							
+							DriverService::Chunks chunks(ds->getChunks());
+							chunks.push_back(
+								DriverService::Chunk(
+									ds,
+									**lvs.begin(),
+									hdeb,
+									hfin
+							)	);
+							ds->setChunks(chunks);
+						}
+					}
+
+				} while(!_section.empty());
+			}
 			return true;
 		}
 
@@ -896,6 +1039,8 @@ namespace synthese
 			stream << t.cell("Fichier CJV (dates)", t.getForm().getTextInput(_getFileParameterName(FILE_CJV), _pathsMap[FILE_CJV].file_string()));
 			stream << t.cell("Fichier CAL (calendriers)", t.getForm().getTextInput(_getFileParameterName(FILE_CAL), _pathsMap[FILE_CAL].file_string()));
 			stream << t.cell("Fichier HOR (horaires)", t.getForm().getTextInput(_getFileParameterName(FILE_HOR), _pathsMap[FILE_HOR].file_string()));
+			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
+			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
@@ -1020,6 +1165,18 @@ namespace synthese
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<VehicleService>::value_type& vservice, _env.getRegistry<VehicleService>())
+			{
+				VehicleServiceTableSync::Save(vservice.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<DriverService>::value_type& dservice, _env.getRegistry<DriverService>())
+			{
+				DriverServiceTableSync::Save(dservice.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& driverAllocation, _env.getRegistry<DriverAllocation>())
+			{
+				DriverAllocationTableSync::Save(driverAllocation.second.get(), transaction);
 			}
 			return transaction;
 		}
