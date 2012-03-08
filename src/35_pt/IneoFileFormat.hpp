@@ -24,16 +24,17 @@
 #define SYNTHESE_IneoFileFormat_H__
 
 #include "FileFormatTemplate.h"
+
 #include "Calendar.h"
+#include "CommercialLineTableSync.h"
+#include "DestinationTableSync.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
+#include "PTDataCleanerFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
-#include "CommercialLineTableSync.h"
-#include "Calendar.h"
-#include "DestinationTableSync.hpp"
-#include "PTDataCleanerFileFormat.hpp"
+#include "VehicleServiceTableSync.hpp"
 
 #include <iostream>
 #include <map>
@@ -85,6 +86,8 @@ namespace synthese
 				static const std::string FILE_CJV; // Validity dates
 				static const std::string FILE_HOR; // Schedules
 				static const std::string FILE_CAL; // Calendars
+				static const std::string FILE_SAB; // Driver services
+				static const std::string FILE_AFA; // Driver allocations
 
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK;
@@ -197,6 +200,8 @@ namespace synthese
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
 				mutable std::map<std::string, std::vector<int> > _calendars;
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
+				mutable std::map<std::string, security::User*> _allocations;
 
 				struct Trip
 				{
