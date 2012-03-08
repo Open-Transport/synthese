@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_pt_operation_DriverService_hpp__
 #define SYNTHESE_pt_operation_DriverService_hpp__
 
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Calendar.h"
 #include "Named.h"
+#include "StandardFields.hpp"
 
 namespace synthese
 {
@@ -45,9 +46,18 @@ namespace synthese
 			public util::Named,
 			public impex::ImportableTemplate<DriverService>,
 			public calendar::Calendar,
-			public virtual util::Registrable
+			public virtual util::Registrable,
+			public ObjectField<DriverService, boost::optional<DriverService&> >
 		{
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Auto generated object vector field (will be defined by Object in the future)
+			class Vector:
+				public ObjectField<Vector, std::vector<DriverService*> >
+			{
+			};
+
+
 			struct Chunk
 			{
 				struct Element
@@ -72,6 +82,13 @@ namespace synthese
 				):	driverService(NULL),
 					vehicleService(_vehicleService)
 				{}
+
+				Chunk(
+					DriverService* _driverService,
+					VehicleService& _vehicleService,
+					const boost::posix_time::time_duration& startTime,
+					const boost::posix_time::time_duration& endTime
+				);
 			};
 
 			typedef std::vector<Chunk> Chunks;
