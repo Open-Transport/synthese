@@ -22,13 +22,20 @@
 
 #include "DriverService.hpp"
 
+#include "SchedulesBasedService.h"
+#include "VehicleService.hpp"
+
 namespace synthese
 {
+	using namespace pt_operation;
+	
 	namespace util
 	{
 		template<>
 		const std::string Registry<pt_operation::DriverService>::KEY("DriverService");
 	}
+
+	FIELD_DEFINITION_OF_OBJECT(DriverService, "driver_service_id", "driver_service_ids")
 
 	namespace pt_operation
 	{
@@ -46,6 +53,51 @@ namespace synthese
 			BOOST_FOREACH(Chunk& chunk, _chunks)
 			{
 				chunk.driverService = this;
+			}
+		}
+
+
+
+		DriverService::Chunk::Chunk(
+			DriverService* _driverService,
+			VehicleService& _vehicleService,
+			const boost::posix_time::time_duration& startTime,
+			const boost::posix_time::time_duration& endTime
+		):	driverService(_driverService),
+			vehicleService(&_vehicleService)
+		{
+			const VehicleService::Services& services(_vehicleService.getServices());
+			BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
+			{
+				if(service->getLastArrivalSchedule(false) < startTime)
+				{
+					continue;
+				}
+				if(service->getDepartureSchedule(false, 0) > endTime)
+				{
+					break;
+				}
+
+				// Add service to chunk
+				Chunk::Element element;
+				element.service = service;
+				for(size_t i(0); i<service->getDepartureSchedules(false).size(); ++i)
+				{
+					if(service->getDepartureSchedule(false, i) >= startTime)
+					{
+						element.startRank = i;
+						break;
+					}
+				}
+				for(size_t i(service->getArrivalSchedules(false).size()-1); i<=0; --i)
+				{
+					if(service->getArrivalSchedule(false, i) <= endTime)
+					{
+						element.endRank = i;
+						break;
+					}
+				}
+				elements.push_back(element);
 			}
 		}
 }	}
