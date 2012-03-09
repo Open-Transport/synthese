@@ -1,6 +1,6 @@
 
-/** TransportSiteAdmin class implementation.
-	@file TransportSiteAdmin.cpp
+/** WebsiteAdmin class implementation.
+	@file WebsiteAdmin.cpp
 	@author Hugues Romain
 	@date 2008
 
@@ -24,11 +24,10 @@
 
 #include "WebsiteAdmin.hpp"
 
-#include "AlgorithmLogger.hpp"
+#include "CMSModule.hpp"
 #include "WebsiteTableSync.hpp"
 #include "Website.hpp"
-#include "SiteUpdateAction.h"
-#include "RoutePlannerFunction.h"
+#include "WebsiteUpdateAction.hpp"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -39,25 +38,14 @@
 #include "InterfaceTableSync.h"
 #include "StaticFunctionRequest.h"
 #include "Profile.h"
-#include "JourneyPattern.hpp"
-#include "PTTimeSlotRoutePlanner.h"
 #include "SearchFormHTMLTable.h"
 #include "HTMLForm.h"
-#include "PTRoutePlannerResult.h"
 #include "WebPageAdmin.h"
 #include "ActionResultHTMLTable.h"
 #include "WebPageAddAction.h"
 #include "AdminFunctionRequest.hpp"
 #include "WebPageDisplayFunction.h"
-#include "City.h"
-#include "CityTableSync.h"
-#include "PTPlacesAdmin.h"
-#include "ObjectSiteLink.h"
-#include "ObjectSiteLinkTableSync.h"
 #include "WebPageMoveAction.hpp"
-#include "SiteCityAddAction.hpp"
-#include "RoadJourneyPlanner.h"
-#include "RoadModule.h"
 #include "RemoveObjectAction.hpp"
 
 #include <geos/geom/Point.h>
@@ -72,55 +60,42 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
-	using namespace pt_website;
 	using namespace html;
 	using namespace security;
-	using namespace pt_journey_planner;
-	using namespace algorithm;
 	using namespace html;
-	using namespace pt;
-	using namespace graph;
-	using namespace geography;
-	using namespace road;
 	using namespace cms;
-	using namespace road_journey_planner;
 	using namespace db;
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<AdminInterfaceElement, TransportSiteAdmin>::FACTORY_KEY("TransportSiteAdmin");
+		template<> const string FactorableTemplate<AdminInterfaceElement, WebsiteAdmin>::FACTORY_KEY("Website");
 	}
 
 	namespace admin
 	{
-		template<> const string AdminInterfaceElementTemplate<TransportSiteAdmin>::ICON("layout.png");
-		template<> const string AdminInterfaceElementTemplate<TransportSiteAdmin>::DEFAULT_TITLE("Site inconnu");
+		template<> const string AdminInterfaceElementTemplate<WebsiteAdmin>::ICON("layout.png");
+		template<> const string AdminInterfaceElementTemplate<WebsiteAdmin>::DEFAULT_TITLE("Site inconnu");
 	}
 
-	namespace pt_website
+	namespace cms
 	{
-		const string TransportSiteAdmin::PARAMETER_SEARCH_PAGE = "pp";
-		const string TransportSiteAdmin::PARAMETER_SEARCH_RANK = "pr";
-		const string TransportSiteAdmin::PARAMETER_JOURNEY_PLANNING_ALGORITHM = "ja";
+		const string WebsiteAdmin::PARAMETER_SEARCH_PAGE = "pp";
+		const string WebsiteAdmin::PARAMETER_SEARCH_RANK = "pr";
 
-		const string TransportSiteAdmin::TAB_PROPERTIES("pr");
-		const string TransportSiteAdmin::TAB_PERIMETER("pe");
-		const string TransportSiteAdmin::TAB_ROUTE_PLANNING("rp");
-		const string TransportSiteAdmin::TAB_WEB_PAGES("wp");
+		const string WebsiteAdmin::TAB_PROPERTIES("pr");
+		const string WebsiteAdmin::TAB_WEB_PAGES("wp");
 
 
 
-		TransportSiteAdmin::TransportSiteAdmin():
-			AdminInterfaceElementTemplate<TransportSiteAdmin>(),
-			_pt_journey_planning(true)
+		WebsiteAdmin::WebsiteAdmin():
+			AdminInterfaceElementTemplate<WebsiteAdmin>()
 		{}
 
 
 
-		void TransportSiteAdmin::setFromParametersMap(
+		void WebsiteAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
 			// Site
@@ -140,25 +115,15 @@ namespace synthese
 			// Search page
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
-
-			// Journey planner
-			_journeyPlanner.setSite(_site.get());
-			_journeyPlanner._setFromParametersMap(map);
-			_journeyPlanner.setOutputFormat(RoutePlannerFunction::VALUE_ADMIN_HTML);
-
-			// Use PT algorithm
-			_pt_journey_planning = map.getDefault<bool>(PARAMETER_JOURNEY_PLANNING_ALGORITHM, true);
 		}
 
 
 
-		util::ParametersMap TransportSiteAdmin::getParametersMap() const
+		util::ParametersMap WebsiteAdmin::getParametersMap() const
 		{
 			ParametersMap m(_pageSearchParameter.getParametersMap());
 
-			m.merge(_journeyPlanner._getParametersMap());
 			m.insert(PARAMETER_SEARCH_PAGE, _searchPage);
-			m.insert(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning);
 			if(_site.get())
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
@@ -168,7 +133,7 @@ namespace synthese
 
 
 
-		void TransportSiteAdmin::display(
+		void WebsiteAdmin::display(
 			ostream& stream,
 			const admin::AdminRequest& _request
 		) const	{
@@ -179,241 +144,45 @@ namespace synthese
 			{
 
 				// Requests
-				AdminActionFunctionRequest<SiteUpdateAction,TransportSiteAdmin> updateRequest(
+				AdminActionFunctionRequest<WebsiteUpdateAction, WebsiteAdmin> updateRequest(
 					_request
 				);
 				updateRequest.getAction()->setSiteId(_site->getKey());
 
-				StaticFunctionRequest<RoutePlannerFunction> rpHomeRequest(_request, true);
-				rpHomeRequest.getFunction()->setSite(_site.get());
-
 				// Display
-				stream << "<h1>Liens</h1>";
-				stream << "<p>";
-				stream << HTMLModule::getLinkButton(rpHomeRequest.getURL(), "Calcul d'itinéraires (home client)", string(), "arrow_switch.png");
-				stream << "</p>";
-
 				stream << "<h1>Propriétés</h1>";
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.title("Identification");
-				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->get<Name>()));
-				stream << pt.cell("Début validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_START_DATE, _site->getStartDate()));
-				stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(SiteUpdateAction::PARAMETER_END_DATE, _site->getEndDate()));
-				stream << pt.cell("URL", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_CLIENT_URL, _site->getClientURL()));
+				stream << pt.cell("Nom", pt.getForm().getTextInput(WebsiteUpdateAction::PARAMETER_NAME, _site->get<Name>()));
+				stream << pt.cell("Début validité", pt.getForm().getCalendarInput(WebsiteUpdateAction::PARAMETER_START_DATE, _site->get<StartDate>()));
+				stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(WebsiteUpdateAction::PARAMETER_END_DATE, _site->get<EndDate>()));
+				stream << pt.cell("URL", pt.getForm().getTextInput(WebsiteUpdateAction::PARAMETER_CLIENT_URL, _site->get<ClientURL>()));
 				stream << pt.cell(
 					"Modèle de page par défaut",
 					pt.getForm().getTextInput(
-						SiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID,
-						lexical_cast<string>(_site->getDefaultTemplate() ? _site->getDefaultTemplate()->getKey() : RegistryKeyType(0))
+						WebsiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID,
+						lexical_cast<string>(_site->get<DefaultTemplate>() ? _site->get<DefaultTemplate>()->getKey() : RegistryKeyType(0))
 				)	);
-				stream << pt.title("Recherche d'itinéraires");
-				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->getMaxTransportConnectionsCount(), 1, "illimité"));
-				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->getOnlineBookingAllowed()));
-				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->getPastSolutionsDisplayed()));
-				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->getUseDatesRange().days(), 1, "illimité"));
-				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _site->getDisplayRoadApproachDetail()));
 				stream << pt.close();
-
-				stream << "<h1>Périodes de recherche d'itinéraire</h1>";
-				HTMLTable::ColsVector cv;
-				cv.push_back("Nom");
-				cv.push_back("Heure début");
-				cv.push_back("Heure fin");
-				HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
-				stream << ct.open();
-				const Website::Periods& periods(_site->getPeriods());
-				for (Website::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
-				{
-					stream << ct.row();
-					stream << ct.col() << it->getCaption();
-					stream << ct.col() << it->getBeginHour();
-					stream << ct.col() << it->getEndHour();
-				}
-				stream << ct.close();
 			}
 
-			////////////////////////////////////////////////////////////////////
-			// TAB PERIMETER
-			if (openTabContent(stream, TAB_PERIMETER))
-			{
-				stream << "<h1>Communes autorisées</h1>";
-
-				ObjectSiteLinkTableSync::SearchResult cities(
-					ObjectSiteLinkTableSync::Search(
-						_getEnv(),
-						_site->getKey(),
-						optional<RegistryKeyType>(),
-						CityTableSync::TABLE.ID
-				)	);
-
-				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
-
-				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request);
-				cityAddRequest.getAction()->setSite(_site);
-
-				AdminActionFunctionRequest<RemoveObjectAction,TransportSiteAdmin> cityRemoveRequest(_request);
-
-				HTMLForm f(cityAddRequest.getHTMLForm("add_city"));
-				HTMLTable::ColsVector v;
-				v.push_back("Localité");
-				v.push_back("Actions");
-				v.push_back("Actions");
-				HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
-				stream << f.open() << t.open();
-				BOOST_FOREACH(const shared_ptr<ObjectSiteLink>& link, cities)
-				{
-					cityRemoveRequest.getAction()->setObjectId(link->getKey());
-
-					stream << t.row();
-					if(Env::GetOfficialEnv().getRegistry<City>().contains(link->getObjectId()))
-					{
-						shared_ptr<const City> city(Env::GetOfficialEnv().get<City>(link->getObjectId()));
-
-						openCityRequest.getPage()->setCity(city);
-
-						stream << t.col() << city->getName();
-						stream << t.col() << HTMLModule::getLinkButton(openCityRequest.getURL(), "Ouvrir", string(), PTPlacesAdmin::ICON);
-					}
-					else
-					{
-						stream << t.col() << "Unconsistent city " << link->getObjectId();
-						stream << t.col();
-					}
-					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûe de vouloir supprimer le lien ?");
-				}
-				stream << t.row();
-				stream << t.col(2) << f.getTextInput(SiteCityAddAction::PARAMETER_CITY_NAME, string());
-				stream << t.col() << f.getSubmitButton("Ajouter");
-
-				stream << t.close() << f.close();
-			}
 
 			////////////////////////////////////////////////////////////////////
 			// TAB WEB PAGES
 			if (openTabContent(stream, TAB_WEB_PAGES))
 			{
 				stream << "<h1>Pages</h1>";
-				AdminActionFunctionRequest<WebPageAddAction, TransportSiteAdmin> addRequest(_request);
+				AdminActionFunctionRequest<WebPageAddAction, WebsiteAdmin> addRequest(_request);
 				addRequest.getAction()->setSite(const_pointer_cast<Website>(_site));
 
-				AdminActionFunctionRequest<RemoveObjectAction, TransportSiteAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, WebsiteAdmin> deleteRequest(_request);
 
-				AdminActionFunctionRequest<WebPageMoveAction, TransportSiteAdmin> moveRequest(_request);
+				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(_request);
 
 				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, _request);
 			}
 
-
-			////////////////////////////////////////////////////////////////////
-			// TAB ROUTE PLANNER
-			if (openTabContent(stream, TAB_ROUTE_PLANNING))
-			{
-				AdminFunctionRequest<TransportSiteAdmin> searchRequest(_request);
-
-				// Search form
-				stream << "<h1>Recherche</h1>";
-
-				SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
-				stream << st.open();
-				stream << st.cell("Commune départ", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_DEPARTURE_CITY_TEXT, _journeyPlanner.getDeparturePlace().cityResult.key.getSource()));
-				stream << st.cell("Arrêt départ", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_DEPARTURE_PLACE_TEXT, dynamic_cast<NamedPlace*>(_journeyPlanner.getDeparturePlace().placeResult.value.get()) ? _journeyPlanner.getDeparturePlace().placeResult.key.getSource() : string()));
-				stream << st.cell("Commune arrivée", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_ARRIVAL_CITY_TEXT, _journeyPlanner.getArrivalPlace().cityResult.key.getSource()));
-				stream << st.cell("Arrêt arrivée", st.getForm().getTextInput(RoutePlannerFunction::PARAMETER_ARRIVAL_PLACE_TEXT, dynamic_cast<NamedPlace*>(_journeyPlanner.getArrivalPlace().placeResult.value.get()) ? _journeyPlanner.getArrivalPlace().placeResult.key.getSource() : string()));
-				stream << st.cell("Date/Heure", st.getForm().getCalendarInput(RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME, _journeyPlanner.getStartDepartureDate()));
-				stream << st.cell(
-					"Nombre réponses",
-					st.getForm().getSelectNumberInput(
-						RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER,
-						1, 99,
-						_journeyPlanner.getMaxSolutionsNumber() ? *_journeyPlanner.getMaxSolutionsNumber() : UNKNOWN_VALUE,
-						1,
-						"(illimité)"
-				)	);
-				stream << st.cell(
-					"Accessibilité",
-					st.getForm().getSelectInput(
-						RoutePlannerFunction::PARAMETER_ACCESSIBILITY,
-						WebsiteModule::GetAccessibilityNames(),
-						optional<UserClassCode>(_journeyPlanner.getAccessParameters().getUserClass())
-				)	);
-				stream << st.cell(
-					"Trace",
-					st.getForm().getTextInput(
-						RoutePlannerFunction::PARAMETER_LOG_PATH,
-						_journeyPlanner.getLogger().getDirectory().file_string()
-				)	);
-				if(!_site->getRollingStockFilters().empty())
-				{
-					stream << st.cell(
-						"Modes de transport",
-						st.getForm().getSelectInput(
-							RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID,
-							_site->getRollingStockFiltersList(),
-							_journeyPlanner.getTransportModeFilter() ? optional<size_t>(_journeyPlanner.getTransportModeFilter()->getRank()) : optional<size_t>()
-					)	);
-				}
-				stream << st.cell("Transport public", st.getForm().getOuiNonRadioInput(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning));
-				stream << st.cell(
-					"Durée max correspondance",
-					st.getForm().getSelectNumberInput(
-						RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION,
-						1, 99,
-						_journeyPlanner.getMaxTransferDuration() ? (_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) : 60,
-						1,
-						"(illimité)"
-				)	);
-				stream << st.cell(
-					"Vitesse d'approche",
-					st.getForm().getTextInput(
-						RoutePlannerFunction::PARAMETER_APPROACH_SPEED,
-						lexical_cast<string>(_journeyPlanner.getAccessParameters().getApproachSpeed())
-				)	);
-				stream << st.close();
-
-				stream << "<h1>Résultats</h1>";
-
-				if(_pt_journey_planning)
-				{
-					_journeyPlanner.run(stream, _request);
-				}
-				else
-				{
-					// Route planning
-					AccessParameters ap(
-						USER_PEDESTRIAN,
-						false, false, 30000, posix_time::hours(5), 1.111,
-						1000
-					);
-					RoadJourneyPlanner r(
-						_journeyPlanner.getDeparturePlace().placeResult.value.get(),
-						_journeyPlanner.getArrivalPlace().placeResult.value.get(),
-						_journeyPlanner.getStartDepartureDate(),
-						_journeyPlanner.getStartDepartureDate(),
-						_journeyPlanner.getStartDepartureDate(),
-						_journeyPlanner.getStartDepartureDate() + hours(24),
-						1,
-						ap,
-						DEPARTURE_FIRST,
-						_journeyPlanner.getLogger()
-					);
-					RoadJourneyPlannerResult jv(r.run());
-
-					jv.displayHTMLTable(stream);
-
-					if(jv.getJourneys().size())
-					{
-						stream << "<h2>Carte</h2><div id=\"olmap\"></div>" << std::endl;
-						stream << HTMLModule::GetHTMLJavascriptOpen();
-						stream << "var tripWKT=\"" << jv.getTripWKT() << "\";";
-						stream << HTMLModule::GetHTMLJavascriptClose();
-						stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
-						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
-						stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
-						stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
-					}
-				}
-			}
 
 			////////////////////////////////////////////////////////////////////
 			/// END TABS
@@ -422,7 +191,7 @@ namespace synthese
 
 
 
-		bool TransportSiteAdmin::isAuthorized(
+		bool WebsiteAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 return true;
@@ -431,14 +200,14 @@ return true;
 
 
 
-		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
+		AdminInterfaceElement::PageLinks WebsiteAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
-			if(	dynamic_cast<const WebsiteModule*>(&module) &&
+			if(	dynamic_cast<const CMSModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
@@ -448,8 +217,8 @@ return true;
 				);
 				BOOST_FOREACH(const shared_ptr<Website>& site, sites)
 				{
-					shared_ptr<TransportSiteAdmin> p(
-						getNewPage<TransportSiteAdmin>()
+					shared_ptr<WebsiteAdmin> p(
+						getNewPage<WebsiteAdmin>()
 					);
 					p->_site = const_pointer_cast<const Website>(site);
 					links.push_back(p);
@@ -459,7 +228,7 @@ return true;
 		}
 
 
-		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
+		AdminInterfaceElement::PageLinks WebsiteAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
@@ -483,7 +252,7 @@ return true;
 
 
 
-		std::string TransportSiteAdmin::getTitle() const
+		std::string WebsiteAdmin::getTitle() const
 		{
 			return _site.get() ? _site->getName() : DEFAULT_TITLE;
 		}
@@ -491,21 +260,19 @@ return true;
 
 
 
-		bool TransportSiteAdmin::_hasSameContent(const AdminInterfaceElement& other) const
+		bool WebsiteAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _site->getKey() == static_cast<const TransportSiteAdmin&>(other)._site->getKey();
+			return _site->getKey() == static_cast<const WebsiteAdmin&>(other)._site->getKey();
 		}
 
 
 
-		void TransportSiteAdmin::_buildTabs( const security::Profile& profile ) const
+		void WebsiteAdmin::_buildTabs( const security::Profile& profile ) const
 		{
 			_tabs.clear();
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
-			_tabs.push_back(Tab("Périmètre base transport", TAB_PERIMETER, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
-			_tabs.push_back(Tab("Calcul d'itinéraires", TAB_ROUTE_PLANNING, true));
 
 			_tabBuilded = true;
 		}

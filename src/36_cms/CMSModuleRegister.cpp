@@ -57,6 +57,7 @@ void synthese::cms::moduleRegister()
 
 	// 36 CMS
 	synthese::cms::WebPageAdmin::integrate();
+	synthese::cms::WebsiteAdmin::integrate();
 
 	synthese::cms::WebPageTableSync::integrate();
 	synthese::cms::WebsiteTableSync::integrate();
