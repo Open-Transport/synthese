@@ -39,6 +39,9 @@ else()
   add_definitions(-DBOOST_ALL_DYN_LINK)
 endif()
 
+add_definitions(-DFUSION_MAX_VECTOR_SIZE=30)
+add_definitions(-DFUSION_MAX_MAP_SIZE=30)
+
 if(NOT DEFINED BOOST_VERSION)
   set(BOOST_VERSION 1.39)
 endif()
@@ -94,6 +97,14 @@ if(WIN32)
   # This is to avoid:
   # warning C4290: C++ exception specification ignored except to indicate a function is not __declspec(nothrow)
   add_definitions(/wd4290)
+
+  # This is to avoid:
+  # warning C4996: warning C4996: 'std::copy': Function call with parameters that may be unsafe
+  add_definitions(/wd4996)
+
+  # This is to avoid:
+  # warning C4503: decorated name length exceeded, name was truncated
+  add_definitions(/wd4503)
 
   # This is to avoid:
   # warning C4250: 'xxx' : inherits 'yyy' via dominance
