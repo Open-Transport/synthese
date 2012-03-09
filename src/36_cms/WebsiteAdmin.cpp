@@ -25,11 +25,9 @@
 #include "WebsiteAdmin.hpp"
 
 #include "AlgorithmLogger.hpp"
-#include "WebsiteModule.h"
-#include "WebsiteTableSync.h"
-#include "Website.h"
+#include "WebsiteTableSync.hpp"
+#include "Website.hpp"
 #include "SiteUpdateAction.h"
-#include "WebsiteRight.h"
 #include "RoutePlannerFunction.h"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
@@ -427,7 +425,8 @@ namespace synthese
 		bool TransportSiteAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return user.getProfile()->isAuthorized<WebsiteRight>(READ);
+return true;
+//			return user.getProfile()->isAuthorized<WebsiteRight>(READ);
 		}
 
 
