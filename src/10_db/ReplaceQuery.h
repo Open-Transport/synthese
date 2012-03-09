@@ -75,7 +75,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
 				{
-					addField(map.get<string>(field.name));
+					addField(map.getDefault<std::string>(field.name));
 				}
 			}
 
