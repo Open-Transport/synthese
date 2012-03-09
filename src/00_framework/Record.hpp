@@ -216,7 +216,7 @@ namespace synthese
 			std::string value(
 				trim ?
 				Trim(getValue(parameterName)) :
-				parameterName
+				getValue(parameterName)
 			);
 			if(value.empty())
 			{
