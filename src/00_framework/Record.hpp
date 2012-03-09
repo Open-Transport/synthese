@@ -51,6 +51,8 @@ namespace synthese
 				_field(field)
 			{}
 
+			virtual ~MissingParameterException() throw() {}
+
 			const std::string& getField() const { return _field; }
 		};
 
