@@ -21,4 +21,4 @@ set(DEPS
   59_road_journey_planner # from 56_pt_website
 )
 
-boost_test(Projection "${DEPS}")
+#boost_test(Projection "${DEPS}")
