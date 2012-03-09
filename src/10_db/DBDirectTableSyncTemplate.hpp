@@ -84,7 +84,7 @@ namespace synthese
 		public:
 			static FieldsList GetFieldsList()
 			{
-				if(_FIELDS[0].empty())
+				if(DBTableSyncTemplate<K>::_FIELDS[0].empty())
 				{
 					T object;
 					return object.getFields();
@@ -92,9 +92,9 @@ namespace synthese
 				else
 				{
 					FieldsList l;
-					for(size_t i(0); !_FIELDS[i].empty(); ++i)
+					for(size_t i(0); !DBTableSyncTemplate<K>::_FIELDS[i].empty(); ++i)
 					{
-						l.push_back(_FIELDS[i]);
+						l.push_back(DBTableSyncTemplate<K>::_FIELDS[i]);
 					}
 					return l;
 				}
