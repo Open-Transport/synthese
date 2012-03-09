@@ -167,6 +167,7 @@ elif (env['_PLATFORM']=='win32'):
       env.Append ( CPPDEFINES = ['DEBUG', '_DEBUG'] )
    else:
       env.Append ( CPPDEFINES = ['NDEBUG'] )
+env.Append ( CPPDEFINES = ['FUSION_MAX_VECTOR_SIZE=30', 'FUSION_MAX_MAP_SIZE=30'] )
 
 
 
