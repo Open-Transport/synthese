@@ -27,6 +27,7 @@
 #include "UtilTypes.h"
 #include "ObjectBase.hpp"
 #include "ParametersMap.h"
+#include "SchemaMacros.hpp"
 
 #include <string>
 #include <boost/fusion/container/map.hpp>
