@@ -896,6 +896,10 @@ namespace synthese
 			}
 			else if(key == FILE_AFA)
 			{
+				string filename(filePath.filename());
+				filename = filename.substr(0, filename.length() - filePath.extension().size() - 1);
+				date day(from_string(filename));
+
 				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
 				do
 				{
@@ -918,7 +922,7 @@ namespace synthese
 						)	);
 
 						// Registration
-						_allocations[key] = user;
+						_allocations[make_pair(key, day)] = user;
 					}
 
 				} while(!_section.empty());
@@ -942,11 +946,23 @@ namespace synthese
 
 						// Load 
 						string key(_getValue("SA"));
+
+						// Date
+						string dateStr(_getValue("DATE"));
+						date vsDate;
+						vector<string> parts;
+						split(parts, dateStr, is_any_of("/"));
+						vsDate = date(
+							lexical_cast<long>(parts[2]),
+							lexical_cast<long>(parts[1]),
+							lexical_cast<long>(parts[0])
+						);
+
 						if(key != lastKey)
 						{
 							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
 								driverServices,
-								key,
+								key+"/"+dateStr,
 								_dataSource,
 								_env,
 								stream,
@@ -955,6 +971,7 @@ namespace synthese
 							lastKey = key;
 							DriverService::Chunks emptyChunks;
 							ds->setChunks(emptyChunks);
+							ds->setActive(vsDate);
 
 							// Amount
 /*							double amount(lexical_cast<double>(_getValue("frs")));
@@ -968,17 +985,7 @@ namespace synthese
 								split(parts, _getValue("bonifATTtps"), is_any_of("h"));
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
-*/							{	// Date
-								vector<string> parts;
-								string dateStr(_getValue("DATE"));
-								split(parts, dateStr, is_any_of("/"));
-								ds->setActive(
-									date(
-										lexical_cast<long>(parts[2]),
-										lexical_cast<long>(parts[1]),
-										lexical_cast<long>(parts[0])
-								)	);
-							}
+							*/
 
 							// Journey
 							string hdebstr(_getValue("HDEB"));
@@ -1010,6 +1017,21 @@ namespace synthese
 									hfin
 							)	);
 							ds->setChunks(chunks);
+
+							// Allocation
+							Allocations::iterator itAlloc(_allocations.find(make_pair(vsKey, vsDate)));
+							if(itAlloc != _allocations.end())
+							{
+								DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
+									driverAllocations,
+									key+"/"+dateStr,
+									_dataSource,
+									_env,
+									stream,
+									"allocation"
+								);
+								da->set<Driver>(optional<User&>(*itAlloc->second));
+							}
 						}
 					}
 
@@ -1178,6 +1200,10 @@ namespace synthese
 			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& driverAllocation, _env.getRegistry<DriverAllocation>())
 			{
 				DriverAllocationTableSync::Save(driverAllocation.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<User>::value_type& driver, _env.getRegistry<User>())
+			{
+				UserTableSync::Save(driver.second.get(), transaction);
 			}
 			return transaction;
 		}
