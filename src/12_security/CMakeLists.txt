@@ -71,6 +71,7 @@ target_link_libraries(12_security
   05_html
   10_db
   11_interfaces
+  16_impex
   # Forward dependencies:
   #13_dblog
   #14_admin
