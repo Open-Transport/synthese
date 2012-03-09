@@ -161,7 +161,7 @@ namespace synthese
 
 				// Sub-objects
 				if(	is_directory(filePath) &&
-					filename == lexical_cast<string>(key)
+					fileName == lexical_cast<string>(key)
 				){
 					// Dumps
 					for(directory_iterator it2(attFilePath); it2 != directory_iterator(); ++it2)
@@ -178,14 +178,14 @@ namespace synthese
 				}
 				else if(
 					!is_directory(attFilePath) &&
-					filename.size() >= filePath.filename().size()-3 &&
-					filename.substr(0, lexical_cast<string>(key).size()+1) == lexical_cast<string>(key) +"_" &&
-					filename.substr(attFilePath.filename().size() - 5) != ".dump" &&
-					filename.substr(attFilePath.filename().size() - 5) != ".name"
+					fileName.size() >= filePath.filename().size()-3 &&
+					fileName.substr(0, lexical_cast<string>(key).size()+1) == lexical_cast<string>(key) +"_" &&
+					fileName.substr(attFilePath.filename().size() - 5) != ".dump" &&
+					fileName.substr(attFilePath.filename().size() - 5) != ".name"
 				){
 					// Field id
 					vector<string> parts;
-					split(parts, filename, is_any_of("_."), token_compress_on);
+					split(parts, fileName, is_any_of("_."), token_compress_on);
 
 					// File content
 					stringstream fileContent;
