@@ -28,7 +28,7 @@ namespace synthese
 	// Simple types
 	FIELD_DEFINITION_OF_TYPE(Key, "id", SQL_INTEGER)
 
-		void ObjectField<Key, util::RegistryKeyType>::UnSerialize(
+/*		void ObjectField<Key, util::RegistryKeyType>::UnSerialize(
 		util::RegistryKeyType& fieldObject,
 		const std::string& text,
 		const util::Env& env
@@ -54,5 +54,5 @@ namespace synthese
 		LinkedObjectsIds& list,
 		const std::string& text
 		){}
-
+*/
 }
