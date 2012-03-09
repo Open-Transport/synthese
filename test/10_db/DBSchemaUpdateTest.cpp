@@ -48,12 +48,12 @@ namespace synthese
 			"t100_testschema", false, false
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestSchemaTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestSchemaTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestSchemaTableSync::COL_COLUMN0, SQL_TEXT),
-			DBTableSync::Field(TestSchemaTableSync::COL_COLUMN1, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestSchemaTableSync::COL_COLUMN0, SQL_TEXT),
+			Field(TestSchemaTableSync::COL_COLUMN1, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchemaTableSync>::_INDEXES[]=
@@ -96,13 +96,13 @@ namespace synthese
 			"t100_testschema", false, false
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestSchema2TableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestSchema2TableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestSchema2TableSync::COL_COLUMN0, SQL_TEXT),
-			DBTableSync::Field(TestSchema2TableSync::COL_COLUMN1, SQL_INTEGER),
-			DBTableSync::Field(TestSchema2TableSync::COL_COLUMN2, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestSchema2TableSync::COL_COLUMN0, SQL_TEXT),
+			Field(TestSchema2TableSync::COL_COLUMN1, SQL_INTEGER),
+			Field(TestSchema2TableSync::COL_COLUMN2, SQL_GEOM_POINT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema2TableSync>::_INDEXES[]=
@@ -146,13 +146,13 @@ namespace synthese
 			"t101_testschema3", false, false
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestSchema3TableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestSchema3TableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestSchema3TableSync::COL_COLUMN_SELECT, SQL_TEXT),
-			DBTableSync::Field(TestSchema3TableSync::COL_COLUMN1, SQL_DOUBLE),
-			DBTableSync::Field(TestSchema3TableSync::COL_COLUMN2, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestSchema3TableSync::COL_COLUMN_SELECT, SQL_TEXT),
+			Field(TestSchema3TableSync::COL_COLUMN1, SQL_DOUBLE),
+			Field(TestSchema3TableSync::COL_COLUMN2, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema3TableSync>::_INDEXES[]=
