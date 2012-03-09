@@ -15,6 +15,7 @@ set(DEPS
   56_pt_website # from cms
   36_cms # from admin
   15_server # from db
+  16_impex
   10_db
   00_framework
 )
