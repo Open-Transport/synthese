@@ -26,7 +26,6 @@
 #include "ObjectField.hpp"
 #include "Env.h"
 #include "Log.h"
-#include "Record.hpp"
 #include "SchemaMacros.hpp"
 
 #include <boost/algorithm/string.hpp>
