@@ -970,7 +970,8 @@ namespace synthese
 							}
 */							{	// Date
 								vector<string> parts;
-								split(parts, _getValue("DATE"), is_any_of("/"));
+								string dateStr(_getValue("DATE"));
+								split(parts, dateStr, is_any_of("/"));
 								ds->setActive(
 									date(
 										lexical_cast<long>(parts[2]),
