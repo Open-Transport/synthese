@@ -23,6 +23,7 @@
 #ifndef SYNTHESE__Field_hpp__
 #define SYNTHESE__Field_hpp__
 
+#include <string>
 #include <vector>
 
 namespace synthese
