@@ -142,33 +142,33 @@ namespace synthese
 			"t100_testtypes", false, false
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestTypesTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestTypesTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestTypesTableSync::COL_INTEGER32, SQL_INTEGER),
-			DBTableSync::Field(TestTypesTableSync::COL_INTEGER32_2, SQL_INTEGER),
-			DBTableSync::Field(TestTypesTableSync::COL_INTEGER64, SQL_INTEGER),
-			DBTableSync::Field(TestTypesTableSync::COL_DOUBLE, SQL_DOUBLE),
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestTypesTableSync::COL_INTEGER32, SQL_INTEGER),
+			Field(TestTypesTableSync::COL_INTEGER32_2, SQL_INTEGER),
+			Field(TestTypesTableSync::COL_INTEGER64, SQL_INTEGER),
+			Field(TestTypesTableSync::COL_DOUBLE, SQL_DOUBLE),
 
-			DBTableSync::Field(TestTypesTableSync::COL_TEXT, SQL_TEXT),
-			DBTableSync::Field(TestTypesTableSync::COL_BOOLEAN, SQL_BOOLEAN),
-			DBTableSync::Field(TestTypesTableSync::COL_TRIBOOLEAN, SQL_BOOLEAN),
-			DBTableSync::Field(TestTypesTableSync::COL_TIME, SQL_TIME),
-			DBTableSync::Field(TestTypesTableSync::COL_DATE, SQL_DATE),
-			DBTableSync::Field(TestTypesTableSync::COL_TIMESTAMP, SQL_DATETIME),
+			Field(TestTypesTableSync::COL_TEXT, SQL_TEXT),
+			Field(TestTypesTableSync::COL_BOOLEAN, SQL_BOOLEAN),
+			Field(TestTypesTableSync::COL_TRIBOOLEAN, SQL_BOOLEAN),
+			Field(TestTypesTableSync::COL_TIME, SQL_TIME),
+			Field(TestTypesTableSync::COL_DATE, SQL_DATE),
+			Field(TestTypesTableSync::COL_TIMESTAMP, SQL_DATETIME),
 
-			DBTableSync::Field(TestTypesTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
+			Field(TestTypesTableSync::COL_GEOMETRY, SQL_GEOM_POINT),
 			// TODO: other geometry types not tested yet, see above
 			/*
-			DBTableSync::Field(TestTypesTableSync::COL_POINT, SQL_GEOM_POINT),
-			DBTableSync::Field(TestTypesTableSync::COL_LINESTRING, SQL_GEOM_LINESTRING),
-			DBTableSync::Field(TestTypesTableSync::COL_POLYGON, SQL_GEOM_POLYGON),
-			DBTableSync::Field(TestTypesTableSync::COL_MULTIPOINT, SQL_GEOM_MULTIPOINT),
-			DBTableSync::Field(TestTypesTableSync::COL_MULTILINESTRING, SQL_GEOM_MULTILINESTRING),
-			DBTableSync::Field(TestTypesTableSync::COL_MULTIPOLYGON, SQL_GEOM_MULTIPOLYGON),
-			DBTableSync::Field(TestTypesTableSync::COL_GEOMETRYCOLLECTION, SQL_GEOM_GEOMETRYCOLLECTION),
+			Field(TestTypesTableSync::COL_POINT, SQL_GEOM_POINT),
+			Field(TestTypesTableSync::COL_LINESTRING, SQL_GEOM_LINESTRING),
+			Field(TestTypesTableSync::COL_POLYGON, SQL_GEOM_POLYGON),
+			Field(TestTypesTableSync::COL_MULTIPOINT, SQL_GEOM_MULTIPOINT),
+			Field(TestTypesTableSync::COL_MULTILINESTRING, SQL_GEOM_MULTILINESTRING),
+			Field(TestTypesTableSync::COL_MULTIPOLYGON, SQL_GEOM_MULTIPOLYGON),
+			Field(TestTypesTableSync::COL_GEOMETRYCOLLECTION, SQL_GEOM_GEOMETRYCOLLECTION),
 			*/
-			DBTableSync::Field()
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestTypesTableSync>::_INDEXES[]=
