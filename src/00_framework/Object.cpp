@@ -27,4 +27,32 @@ namespace synthese
 	//////////////////////////////////////////////////////////////////////////
 	// Simple types
 	FIELD_DEFINITION_OF_TYPE(Key, "id", SQL_INTEGER)
+
+		void ObjectField<Key, util::RegistryKeyType>::UnSerialize(
+		util::RegistryKeyType& fieldObject,
+		const std::string& text,
+		const util::Env& env
+		){
+			if(!text.empty())
+			{
+				fieldObject = boost::lexical_cast<util::RegistryKeyType>(text);
+			}
+			else
+			{
+				fieldObject = static_cast<util::RegistryKeyType>(0);
+			}
+	}
+	std::string ObjectField<Key, util::RegistryKeyType>::Serialize(
+		const util::RegistryKeyType& fieldObject,
+		SerializationFormat format
+		){
+			return boost::lexical_cast<std::string>(fieldObject);
+	}
+
+
+	void ObjectField<Key, util::RegistryKeyType>::GetLinkedObjectsIdsFromText(
+		LinkedObjectsIds& list,
+		const std::string& text
+		){}
+
 }
