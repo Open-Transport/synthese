@@ -25,6 +25,7 @@
 
 #include "Field.hpp"
 #include "FrameworkTypes.hpp"
+#include "ParametersMap.h"
 #include "Record.hpp"
 
 namespace synthese
