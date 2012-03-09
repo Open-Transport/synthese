@@ -55,9 +55,9 @@ namespace synthese
 			static FieldsList GetFieldsList()
 			{
 				FieldsList l;
-				for(size_t i(0); !_FIELDS[i].empty(); ++i)
+				for(size_t i(0); !DBTableSyncTemplate<K>::_FIELDS[i].empty(); ++i)
 				{
-					l.push_back(_FIELDS[i]);
+					l.push_back(DBTableSyncTemplate<K>::_FIELDS[i]);
 				}
 				return l;
 			}
