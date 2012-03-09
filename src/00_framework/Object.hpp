@@ -47,7 +47,8 @@ namespace synthese
 	}
 
 	struct GetLinkedObjectsIdsOperator;
-		
+
+	FIELD_TYPE(Key, util::RegistryKeyType)
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Object template designed for all operations on the schema.

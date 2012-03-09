@@ -457,7 +457,6 @@ namespace synthese
 	FIELD_TYPE(Date, boost::gregorian::date)
 	FIELD_TYPE(EndDate, boost::gregorian::date)
 	FIELD_TYPE(EndTime, boost::posix_time::ptime)
-	FIELD_TYPE(Key, util::RegistryKeyType)
 	FIELD_TYPE(MimeType, std::string)
 	FIELD_TYPE(Rank, size_t)
 	FIELD_TYPE(StartDate, boost::gregorian::date)
