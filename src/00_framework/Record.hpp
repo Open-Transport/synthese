@@ -25,6 +25,7 @@
 
 #include "Exception.h"
 
+#include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 
 namespace synthese
