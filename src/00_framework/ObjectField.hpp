@@ -36,7 +36,6 @@ namespace synthese
 		class ParametersMap;
 	}
 
-	class ObjectBase;
 	class Record;
 
 
