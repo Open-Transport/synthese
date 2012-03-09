@@ -117,7 +117,7 @@ namespace synthese
 				}
 				return *loadedObjects.begin();
 			}
-			shared_ptr<typename T::ObjectType> o(new typename T::ObjectType(T::getId()));
+			boost::shared_ptr<typename T::ObjectType> o(new typename T::ObjectType(T::getId()));
 
 			Importable::DataSourceLinks links;
 			links.insert(make_pair(&source, id));
