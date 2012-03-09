@@ -48,12 +48,12 @@ namespace synthese
 			"t102_testindex", false, false
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestIndexTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestIndexTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestIndexTableSync::COL_COLUMN0, SQL_TEXT),
-			DBTableSync::Field(TestIndexTableSync::COL_COLUMN1, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestIndexTableSync::COL_COLUMN0, SQL_TEXT),
+			Field(TestIndexTableSync::COL_COLUMN1, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndexTableSync>::_INDEXES[]=
@@ -93,12 +93,12 @@ namespace synthese
 			"t102_testindex", false, false
 			);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestIndex2TableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestIndex2TableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestIndex2TableSync::COL_COLUMN0, SQL_TEXT),
-			DBTableSync::Field(TestIndex2TableSync::COL_COLUMN1, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestIndex2TableSync::COL_COLUMN0, SQL_TEXT),
+			Field(TestIndex2TableSync::COL_COLUMN1, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[]=

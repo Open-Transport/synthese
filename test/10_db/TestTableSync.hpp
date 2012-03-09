@@ -118,13 +118,13 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TestTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TestTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TestTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			DBTableSync::Field(TestTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(TestTableSync::COL_SHORT_NAME, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TestTableSync::COL_NETWORK_ID, SQL_INTEGER),
+			Field(TestTableSync::COL_NAME, SQL_TEXT),
+			Field(TestTableSync::COL_SHORT_NAME, SQL_TEXT),
+			Field()
 		};
 
 
