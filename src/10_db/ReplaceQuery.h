@@ -71,7 +71,7 @@ namespace synthese
 
 
 
-			void ReplaceQuery::setValues(util::ParametersMap& map)
+			void setValues(util::ParametersMap& map)
 			{
 				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
 				{
