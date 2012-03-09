@@ -28,6 +28,7 @@
 #include "ObjectBase.hpp"
 #include "ParametersMap.h"
 #include "SchemaMacros.hpp"
+#include "StandardFields.hpp"
 
 #include <string>
 #include <boost/fusion/container/map.hpp>
@@ -65,7 +66,7 @@ namespace synthese
 		}
 	};
 
-	FIELD_TYPE(Key, util::RegistryKeyType)
+
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Object template designed for all operations on the schema.

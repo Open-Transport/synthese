@@ -16,6 +16,7 @@ set(DEPS
   36_cms # from admin
   15_server # from db
   10_db
+  00_framework
 )
 
 if(SYNTHESE_MYSQL_PARAMS)
