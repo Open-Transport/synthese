@@ -103,7 +103,7 @@ namespace synthese
 			std::ostream& logStream,
 			const std::string& logName
 		){
-			set<typename T::ObjectType*> loadedObjects(objects.get(id));
+			std::set<typename T::ObjectType*> loadedObjects(objects.get(id));
 			if(!loadedObjects.empty())
 			{
 				if(!logName.empty())
