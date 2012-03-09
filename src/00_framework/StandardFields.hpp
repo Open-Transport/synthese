@@ -24,6 +24,8 @@
 #define SYNTHESE__StandardFields_hpp__
 
 #include "ObjectField.hpp"
+
+#include "ObjectBase.hpp"
 #include "Env.h"
 #include "Log.h"
 #include "SchemaMacros.hpp"
@@ -221,7 +223,7 @@ namespace synthese
 		{
 			ObjectField<C, T>::UnSerialize(
 				fieldObject,
-				record.getDefault<std::string>(FIELD.name),
+				record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name),
 				env
 			);
 		}
@@ -229,7 +231,7 @@ namespace synthese
 		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
 		{
 			map.insert(
-				prefix + FIELD.name,
+				prefix + ObjectFieldDefinition<C>::FIELD.name,
 				ObjectField<C, T>::Serialize(fieldObject)
 			);
 		}
@@ -300,7 +302,7 @@ namespace synthese
 			fieldObject = boost::none;
 			try
 			{
-				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(FIELD.name, 0));
+				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(ObjectFieldDefinition<C>::FIELD.name, 0));
 				if(id > 0)
 				{
 					fieldObject = *env.getEditable<P>(id);
@@ -309,17 +311,17 @@ namespace synthese
 			catch(boost::bad_lexical_cast&)
 			{
 				util::Log::GetInstance().warn(
-					"Data corrupted in the "+ FIELD.name +" field at the load of the "+
+					"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-					record.getValue(FIELD.name) + " is not a valid id."
+					record.getValue(ObjectFieldDefinition<C>::FIELD.name) + " is not a valid id."
 				);
 			}
 			catch(util::ObjectNotFoundException<P>&)
 			{
 				util::Log::GetInstance().warn(
-					"Data corrupted in the "+ FIELD.name +" field at the load of the "+
+					"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-					record.getValue(FIELD.name) + " object was not found."
+					record.getValue(ObjectFieldDefinition<C>::FIELD.name) + " object was not found."
 				);
 			}
 		}
@@ -331,14 +333,14 @@ namespace synthese
 
 		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
 		{
-			map.insert(prefix + FIELD.name, Serialize(fieldObject));
+			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
 		}
 
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
 		{
 			try
 			{
-				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(FIELD.name, 0));
+				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(ObjectFieldDefinition<C>::FIELD.name, 0));
 				if(id > 0)
 				{
 					list.push_back(id);
@@ -365,7 +367,7 @@ namespace synthese
 		static void LoadFromRecord(std::vector<P*>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
 			fieldObject.clear();
-			std::string text(record.get<std::string>(FIELD.name));
+			std::string text(record.get<std::string>(ObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())
 			{
 				return;
@@ -383,7 +385,7 @@ namespace synthese
 				catch(boost::bad_lexical_cast&)
 				{
 					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ FIELD.name +" field at the load of the "+
+						"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
 						item + " is not a valid id."
 					);
@@ -391,7 +393,7 @@ namespace synthese
 				catch(util::ObjectNotFoundException<P>&)
 				{
 					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ FIELD.name +" field at the load of the "+
+						"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
 						item + " was not found."
 					);
@@ -428,12 +430,12 @@ namespace synthese
 
 		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
 		{
-			map.insert(prefix + FIELD.name, Serialize(fieldObject));
+			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
 		}
 
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
 		{
-			std::string text(record.get<std::string>(FIELD.name));
+			std::string text(record.get<std::string>(ObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())
 			{
 				return;
