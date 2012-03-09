@@ -23,8 +23,12 @@
 #ifndef SYNTHESE_cms_Website_hpp__
 #define SYNTHESE_cms_Website_hpp__
 
-#include "Named.h"
-#include "Registrable.h"
+#include "Object.hpp"
+#include "TreeRoot.hpp"
+#include "TreeRankOrderingPolicy.hpp"
+#include "Webpage.h"
+
+#include "StandardFields.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/thread/mutex.hpp>
@@ -33,7 +37,17 @@ namespace synthese
 {
 	namespace cms
 	{
-		class Webpage;
+		FIELD_TYPE(ClientURL, std::string)
+		FIELD_TYPE(DefaultTemplate, boost::optional<Webpage&>)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(StartDate),
+			FIELD(EndDate),
+			FIELD(ClientURL),
+			FIELD(DefaultTemplate)
+		> WebsiteRecord;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Website class.
@@ -41,46 +55,21 @@ namespace synthese
 		/// @author Hugues Romain
 		/// @since 3.2.0
 		class Website:
-			public util::Named,
-			public virtual util::Registrable
+			public tree::TreeRoot<Webpage, tree::TreeRankOrderingPolicy>,
+			public Object<Website, WebsiteRecord>
 		{
 		public:
 			typedef std::map<std::string, Webpage*> WebpagesBySmartURL;
 
-		private:
-			//! \name Properties
-			//@{
-				boost::gregorian::date		_startValidityDate;
-				boost::gregorian::date		_endValidityDate;
-				std::string					_clientURL;
-				Webpage*					_defaultTemplate;
-				WebpagesBySmartURL			_webpagesBySmartURL;
-			//@}
+			/// Chosen registry class.
+			typedef util::Registry<Website>	Registry;
 
+		private:
+			WebpagesBySmartURL			_webpagesBySmartURL;
 			mutable boost::mutex _smartURLMutex; //!< For thread safety.
 
 		public:
-			Website():
-			  _startValidityDate(boost::gregorian::not_a_date_time),
-			  _endValidityDate(boost::gregorian::not_a_date_time),
-			  _defaultTemplate(NULL)
-			{}
-
-			//! @name Setters
-			//@{
-				void setStartDate ( const boost::gregorian::date& value){ _startValidityDate = value; }
-				void setEndDate ( const boost::gregorian::date& value){ _endValidityDate = value; }
-				void setClientURL(const std::string& value) { _clientURL = value; }
-				void setDefaultTemplate(Webpage* value){ _defaultTemplate = value; }
-			//@}
-
-			//! @name Getters
-			//@{
-				const boost::gregorian::date& getStartDate() const { return _startValidityDate; }
-				const boost::gregorian::date& getEndDate() const { return _endValidityDate; }
-				const std::string& getClientURL() const { return _clientURL; }
-				Webpage* getDefaultTemplate() const { return _defaultTemplate; }
-			//@}
+			Website(util::RegistryKeyType id = 0);
 
 			//! @name Services
 			//@{
@@ -95,6 +84,11 @@ namespace synthese
 
 				Webpage* getPageBySmartURL(const std::string& key) const;
 				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
+
+				virtual std::string getName() const { return get<Name>(); }
+				virtual SubObjects getSubObjects() const;
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 		};
 	}

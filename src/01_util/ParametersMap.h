@@ -26,12 +26,13 @@
 #ifndef SYNTHESE_server_ParametersMap_h__
 #define SYNTHESE_server_ParametersMap_h__
 
-#include <string>
-#include <map>
-#include <set>
+#include "Record.hpp"
 
 #include "Registry.h"
 
+#include <string>
+#include <map>
+#include <set>
 #include <boost/optional.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -53,30 +54,10 @@ namespace synthese
 		/// Request parameters map.
 		///	@ingroup m01
 		/// @author Hugues Romain
-		class ParametersMap
+		class ParametersMap:
+			public Record
 		{
 		public:
-			//////////////////////////////////////////////////////////////////////////
-			/// Missing parameter at parsing exception.
-			/// @ingroup m01Exception refException
-			class MissingParameterException:
-				public std::exception
-			{
-			private:
-				const std::string _field;
-				const std::string _message;
-
-			public:
-				MissingParameterException(
-					const std::string& field
-				);
-				~MissingParameterException() throw();
-
-				virtual const char* what() const throw();
-
-				const std::string& getField() const;
-			};
-
 			typedef std::map<std::string, std::string> Map;
 			typedef std::map<std::string, std::vector<boost::shared_ptr<ParametersMap> > > SubParametersMap;
 
@@ -156,14 +137,6 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Trims a string considering spaces, tabs, and carriage returns as blank characters.
-				/// @param value the string to trim
-				/// @return the trimmed string
-				static std::string Trim(const std::string& value);
-
-
-
-				//////////////////////////////////////////////////////////////////////////
 				/// Outputs the content of the parameters map as an URI.
 				/// @param os stream to write the result on
 				/// @param prefix text to add at the beginning of each parameter name
@@ -236,26 +209,6 @@ namespace synthese
 				) const;
 
 
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets the value of an optional parameter and converts it into C type if
-				/// available.
-				/// @param parameterName key of the parameter to get
-				/// @return the parameter value converted into the C type, undefined if
-				/// impossible.
-				/// @author Hugues Romain
-				//////////////////////////////////////////////////////////////////////////
-				/// If the parameter does not exist, is empty, or cannot be converted into the type
-				/// specified by the template parameter C, then an undefined object is
-				/// returned
-				template<class C>
-				boost::optional<C> getOptional(
-					const std::string& parameterName,
-					bool trim = true
-				) const;
-
-
-
 				//////////////////////////////////////////////////////////////////////////
 				/// Tests if the specified parameter is defined in the map.
 				/// @param parameterName key of the parameter to test
@@ -264,72 +217,12 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.2.0
 				/// @date 2010
-				bool isDefined(
+				virtual bool isDefined(
 					const std::string& parameterName
 				) const;
 
 
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Tests if the specified parameter is defined, non empty and non equal to 0.
-				/// @param parameterName key of the parameter to test
-				/// @return true if the parameter is present in the map, non empty, and non equal to 0
-				/// @author Hugues Romain
-				/// @since 3.3.0
-				/// @date 2011
-				bool isTrue(const std::string& parameterName) const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets the value of a compulsory parameter and converts it into C type.
-				/// @param parameterName key of the parameter to get
-				/// @return the parameter value converted into the C type
-				/// @author Hugues Romain
-				/// @throws MissingParameterException if the parameter does not exist or
-				/// cannot be converted into the type specified by the template parameter C.
-				template<class C>
-				C get(
-					const std::string& parameterName,
-					bool trim = true
-				) const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets the value of an optional parameter and converts it into C type if
-				/// available.
-				/// @param parameterName key of the parameter to get
-				/// @param defaultValue value to return if the parameter is undefined
-				/// @return the parameter value converted into the C type, a default value
-				/// if impossible.
-				/// @author Hugues Romain
-				//////////////////////////////////////////////////////////////////////////
-				/// If the parameter does not exist, is empty, or cannot be converted into
-				/// the type specified by the template parameter C, then a default value
-				/// is returned
-				template<class C>
-				C getDefault(
-					const std::string& parameterName,
-					const C defaultValue,
-					bool trim = true
-				) const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Gets the value of an optional parameter and converts it into C type if
-				/// available.
-				/// @param parameterName key of the parameter to get
-				/// @return the parameter value converted into the C type, a default value
-				/// if impossible. The value will be trimmed.
-				/// @author Hugues Romain
-				//////////////////////////////////////////////////////////////////////////
-				/// If the parameter does not exist, is empty, or cannot be converted into
-				/// the type specified by the template parameter C, then a the object
-				/// constructed by default constructor returned.
-				template<class C>
-				C getDefault(
+				virtual std::string getValue(
 					const std::string& parameterName
 				) const;
 			//@}
@@ -376,105 +269,6 @@ namespace synthese
 				void clear();
 			//@}
 		};
-
-
-
-		template<class C>
-		boost::optional<C> ParametersMap::getOptional(
-			const std::string& parameterName,
-			bool trim
-		) const {
-			try
-			{
-				Map::const_iterator it(_map.find(parameterName));
-				if(it == _map.end())
-				{
-					return boost::optional<C>();
-				}
-				std::string value(
-					trim ?
-					Trim(it->second) :
-					it->second
-				);
-				if(value.empty())
-				{
-					return boost::optional<C>();
-				}
-				return boost::lexical_cast<C>(value);
-			}
-			catch(boost::bad_lexical_cast&)
-			{
-				return boost::optional<C>();
-			}
-		}
-
-
-
-		template<class C>
-		C ParametersMap::getDefault(
-			const std::string& parameterName,
-			const C defaultValue,
-			bool trim
-		) const {
-			try
-			{
-				Map::const_iterator it(_map.find(parameterName));
-				if(it == _map.end())
-				{
-					return defaultValue;
-				}
-				std::string value(
-					trim ?
-					Trim(it->second) :
-					it->second
-				);
-				if(value.empty())
-				{
-					return defaultValue;
-				}
-				return boost::lexical_cast<C>(value);
-			}
-			catch(boost::bad_lexical_cast&)
-			{
-				return defaultValue;
-			}
-		}
-
-
-
-		template<class C>
-		C ParametersMap::getDefault(
-			const std::string& parameterName
-		) const {
-			return getDefault(parameterName, C(), true);
-		}
-
-
-
-		template<class C>
-		C ParametersMap::get(
-			const std::string& parameterName,
-			bool trim
-		) const {
-			try
-			{
-				Map::const_iterator it(_map.find(parameterName));
-				if (it == _map.end())
-				{
-					throw ParametersMap::MissingParameterException(parameterName);
-				}
-				std::string value(
-					trim ?
-					Trim(it->second) :
-					it->second
-				);
-				return boost::lexical_cast<C>(value);
-			}
-			catch(boost::bad_lexical_cast&)
-			{
-				throw ParametersMap::MissingParameterException(parameterName);
-			}
-		}
 }	}
 
 #endif // SYNTHESE_server_ParametersMap_h__

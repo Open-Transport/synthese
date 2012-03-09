@@ -61,6 +61,7 @@ namespace synthese
 	{
 		class HourPeriod;
 		class RollingStockFilter;
+		class TransportWebsite;
 	}
 
 	namespace geography
@@ -132,6 +133,7 @@ namespace synthese
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
+			static const std::string PARAMETER_CONFIGURATION_ID;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
@@ -314,6 +316,7 @@ namespace synthese
 				bool _fareCalculation;
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
+				boost::shared_ptr<const pt_website::TransportWebsite>	_configuration;
 			//@}
 
 			//! @name Pages
@@ -354,6 +357,7 @@ namespace synthese
 				void setOriginPlaceText(const std::string& value){ _originPlaceText = value; }
 				void setDestinationCityText(const std::string& value){ _destinationCityText = value; }
 				void setDestinationPlaceText(const std::string& value){ _destinationPlaceText = value; }
+				void setConfiguration(const boost::shared_ptr<const pt_website::TransportWebsite>& value){ _configuration = value; }
 			//@}
 
 			/// @name Modifiers

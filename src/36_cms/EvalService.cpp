@@ -22,11 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RequestException.h"
-#include "Request.h"
 #include "EvalService.hpp"
-#include "Webpage.h"
+
 #include "CMSModule.hpp"
+#include "Request.h"
+#include "RequestException.h"
+#include "Webpage.h"
+#include "WebpageContent.hpp"
 
 using namespace std;
 
@@ -64,7 +66,7 @@ namespace synthese
 		) const {
 
 			Webpage p;
-			p.setContent(_text);
+			p.set<WebpageContent>(WebpageContent(_text));
 			p.setRoot(const_cast<Website*>(CMSModule::GetSite(request, getTemplateParameters())));
 			p.display(stream, request, getTemplateParameters());
 
@@ -85,5 +87,4 @@ namespace synthese
 		{
 			return "text/html";
 		}
-	}
-}
+}	}

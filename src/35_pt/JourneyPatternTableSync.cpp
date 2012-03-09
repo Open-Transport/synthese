@@ -77,23 +77,23 @@ namespace synthese
 		template<> const DBTableSync::Format DBTableSyncTemplate<JourneyPatternTableSync>::TABLE(
 			"t009_lines"
 		);
-		template<> const DBTableSync::Field DBTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<JourneyPatternTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
-			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
-			DBTableSync::Field(JourneyPatternTableSync::COL_DIRECTION_ID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
-			DBTableSync::Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
-			DBTableSync::Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_NAME, SQL_TEXT),
+			Field(JourneyPatternTableSync::COL_TIMETABLENAME, SQL_TEXT),
+			Field(JourneyPatternTableSync::COL_DIRECTION, SQL_TEXT),
+			Field(JourneyPatternTableSync::COL_DIRECTION_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_ISWALKINGLINE, SQL_BOOLEAN),
+			Field(JourneyPatternTableSync::COL_ROLLINGSTOCKID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<JourneyPatternTableSync>::_INDEXES[]=
@@ -246,7 +246,7 @@ namespace synthese
 			);
 			query.addField(object->getWayBack());
 			query.addField(
-				ImportableTableSync::SerializeDataSourceLinks(
+				DataSourceLinks::Serialize(
 					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getMain());

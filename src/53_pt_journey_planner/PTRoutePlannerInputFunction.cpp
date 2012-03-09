@@ -116,7 +116,7 @@ namespace synthese
 
 			if(_field == FIELD_PERIOD)
 			{
-				const TransportWebsite::Periods& periods(site->getPeriods());
+				const Periods::Type& periods(site->get<Periods>());
 
 				size_t current(
 					_value.empty() ?

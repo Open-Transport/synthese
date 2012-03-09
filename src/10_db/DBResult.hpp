@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_db_DBResult_hpp__
 #define SYNTHESE_db_DBResult_hpp__
 
+#include "Record.hpp"
+
 #include "UtilTypes.h"
 
 #include <boost/date_time/posix_time/posix_time_types.hpp>
@@ -54,7 +56,8 @@ namespace synthese
 		/// Interface for access to a database query result.
 		/// @ingroup m10
 		/// @author Marc Jambert
-		class DBResult
+		class DBResult:
+			public Record
 		{
 		private:
 			mutable int _pos;
@@ -86,6 +89,9 @@ namespace synthese
 
 			virtual std::string getColumnName (int column) const = 0;
 			int getColumnIndex (const std::string& columnName) const;
+
+			virtual std::string getValue(const std::string& fieldName) const;
+			virtual bool isDefined(const std::string& fieldName) const;
 
 			virtual std::string getText (int column) const = 0;
 			std::string getText (const std::string& name) const;

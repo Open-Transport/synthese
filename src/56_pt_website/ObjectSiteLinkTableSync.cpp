@@ -59,12 +59,12 @@ namespace synthese
 		);
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ObjectSiteLinkTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			DBTableSync::Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ObjectSiteLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			Field(ObjectSiteLinkTableSync::COL_SITE_ID, SQL_INTEGER),
+			Field()
 		};
 
 

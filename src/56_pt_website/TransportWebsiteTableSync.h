@@ -25,7 +25,6 @@
 
 #include "DBRegistryTableSyncTemplate.hpp"
 #include "TransportWebsite.h"
-#include "FetcherTemplate.h"
 
 #include <string>
 #include <iostream>
@@ -39,26 +38,11 @@ namespace synthese
 		///	@ingroup m56LS refLS
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
-		/// Table name : t025_sites
+		/// Table name : t086_pt_services_configurations
 		class TransportWebsiteTableSync:
-			public db::DBRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>,
-			public db::FetcherTemplate<cms::Website, TransportWebsiteTableSync>
+			public db::DBRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>
 		{
 		public:
-			static const std::string TABLE_COL_NAME;
-			static const std::string TABLE_COL_START_DATE;
-			static const std::string TABLE_COL_END_DATE;
-			static const std::string TABLE_COL_ONLINE_BOOKING;
-			static const std::string TABLE_COL_USE_OLD_DATA;
-			static const std::string COL_MAX_CONNECTIONS;
-			static const std::string COL_USE_DATES_RANGE;
-			static const std::string COL_PERIODS;
-			static const std::string COL_DISPLAY_ROAD_APPROACH_DETAILS;
-			static const std::string COL_CLIENT_URL;
-			static const std::string COL_DEFAULT_PAGE_TEMPLATE_ID;
-
-
-
 			/** TransportWebsite search.
 				(other search parameters)
 				@param first First TransportWebsite object to answer

@@ -28,6 +28,7 @@
 #include "HourPeriod.h"
 #include "MimeTypes.hpp"
 #include "ObjectNotFoundException.h"
+#include "TransportWebsiteTableSync.h"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"
@@ -112,6 +113,7 @@ namespace synthese
 	{
 		const string PTJourneyPlannerService::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string PTJourneyPlannerService::PARAMETER_MAX_DEPTH = "md";
+		const string PTJourneyPlannerService::PARAMETER_CONFIGURATION_ID = "config_id";
 		const string PTJourneyPlannerService::PARAMETER_APPROACH_SPEED = "apsp";
 		const string PTJourneyPlannerService::PARAMETER_DAY = "dy";
 		const string PTJourneyPlannerService::PARAMETER_PERIOD_ID = "pi";
@@ -279,6 +281,12 @@ namespace synthese
 		{
 			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
 
+			// Configuration
+			if(_configuration.get())
+			{
+				map.insert(PARAMETER_CONFIGURATION_ID, _configuration->getKey());
+			}
+
 			// Max transfer duration
 			if(_maxTransferDuration)
 			{
@@ -374,11 +382,21 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
+			// Configuration
+			RegistryKeyType configurationId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIGURATION_ID));
+			if(configurationId) try
+			{
+				_configuration = TransportWebsiteTableSync::Get(configurationId, *_env);
+			}
+			catch (ObjectNotFoundException<TransportWebsite>&)
+			{
+				throw RequestException("No such configuration id");
+			}
 
+			// Road approach detail
 			_outputRoadApproachDetail =
-				site ?
-				site->getDisplayRoadApproachDetail() :
+				_configuration.get() ?
+				_configuration->get<DisplayRoadApproachDetails>() :
 				true
 			;
 
@@ -436,8 +454,8 @@ namespace synthese
 					}	}
 					else
 					{
-						_departure_place = site ?
-							site->extendedFetchPlace(_originCityText, _originPlaceText) :
+						_departure_place = _configuration.get() ?
+							_configuration->extendedFetchPlace(_originCityText, _originPlaceText) :
 							RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 						;
 					}
@@ -450,8 +468,8 @@ namespace synthese
 					}	}
 					else
 					{
-						_arrival_place = site ?
-							site->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
+						_arrival_place = _configuration.get() ?
+							_configuration->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 							RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 						;
 					}
@@ -487,9 +505,9 @@ namespace synthese
 				if(!map.getDefault<string>(PARAMETER_DAY).empty())
 				{
 					// Site check
-					if(!site)
+					if(!_configuration.get())
 					{
-						throw RequestException("A site must be defined to use this date specification method.");
+						throw RequestException("A configuration id must be defined to use this date specification method.");
 					}
 
 					// Day
@@ -497,11 +515,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= site->getPeriods().size())
+					if (_periodId >= _configuration->get<Periods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &site->getPeriods().at(_periodId);
+					_period = &_configuration->get<Periods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else
@@ -560,9 +578,9 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			if(site)
+			if(_configuration.get())
 			{
-				_accessParameters = site->getAccessParameters(
+				_accessParameters = _configuration->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
 					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 				);
@@ -647,9 +665,6 @@ namespace synthese
 				return ParametersMap();
 			}
 
-			// Declarations
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
-
 
 			//////////////////////////////////////////////////////////////////////////
 			// Time bounds generation
@@ -683,7 +698,7 @@ namespace synthese
 			{
 				startDate = ptime(_day, time_duration(0, 0, 0));
 				endDate = startDate;
-				site->applyPeriod(*_period, startDate, endDate);
+				_configuration->applyPeriod(*_period, startDate, endDate);
 
 				startArrivalDate = startDate;
 				endArrivalDate = endDate + maxRunTime;

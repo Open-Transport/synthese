@@ -65,13 +65,14 @@ namespace synthese
 			static const DBTableSync::Format TABLE;
 
 
+		
 			////////////////////////////////////////////////////////////////////
 			/// Fields of the table.
 			/// To allow to loop on the table without knowing its size,
 			/// the last element of the _FIELDS array must be an empty Field
 			/// object.
 			/// The first field must be the primary key of the table.
-			static const DBTableSync::Field _FIELDS[];
+			static const Field _FIELDS[];
 
 
 
@@ -170,6 +171,8 @@ namespace synthese
 					" LIMIT 1";
 				return DBModule::GetDB()->execQuery(query.str());
 			}
+
+
 
 		protected:
 
@@ -326,6 +329,11 @@ namespace synthese
 				return encodeUId(retval);
 			}
 
+			virtual util::RegistryKeyType getNewId() const
+			{
+				return getId();
+			}
+
 
 
 			static std::string GetFieldValue(
@@ -374,6 +382,7 @@ namespace synthese
 
 
 
+
 // IMPLEMENTATIONS ==============================================================================
 
 
@@ -386,10 +395,13 @@ namespace synthese
 		bool DBTableSyncTemplate<K>::_HasField(
 			const std::string& name
 		){
-			for(size_t i(0); !_FIELDS[i].empty(); ++i)
+			FieldsList l(K::GetFieldsList());
+			BOOST_FOREACH(const FieldsList::value_type& f, l)
 			{
-				if(_FIELDS[i].name == name) return true;
-			}
+				if(f.name == name)
+				{
+					return true;
+			}	}
 			return false;
 		}
 
@@ -435,7 +447,7 @@ namespace synthese
 				"DROP TABLE " << TABLE.NAME << "; " <<
 
 				// Creation of the table with the new schema
-				db->getCreateTableSQL(TABLE.NAME, _FIELDS) <<
+				db->getCreateTableSQL(TABLE.NAME, K::GetFieldsList()) <<
 
 				// Restoration of the data in the table
 				"INSERT INTO " << TABLE.NAME << " (" << filteredColsStr.str () << ")" <<
@@ -456,6 +468,8 @@ namespace synthese
 		void synthese::db::DBTableSyncTemplate<K>::_UpdateSchema(
 			DB* db
 		){
+			FieldsList fieldsList(K::GetFieldsList());
+
 			// reset statistics
 			TABLE.CreatedTable = false;
 			TABLE.MigratedSchema = false;
@@ -463,19 +477,24 @@ namespace synthese
 
 			// * Fields getter
 			std::stringstream fieldsGetter;
-			for(size_t i(0); !_FIELDS[i].empty(); ++i)
+			bool first(true);
+			BOOST_FOREACH(const FieldsList::value_type& field, fieldsList)
 			{
-				if(i>0)
+				if(first)
 				{
-					fieldsGetter << ",";
-				}
-				if(_FIELDS[i].isGeometry())
-				{
-					fieldsGetter << "AsText(" << TABLE.NAME << ".\"" << _FIELDS[i].name << "\") AS \"" << _FIELDS[i].name << '"';
+					first = false;
 				}
 				else
 				{
-					fieldsGetter << TABLE.NAME << ".\"" << _FIELDS[i].name << "\"";
+					fieldsGetter << ",";
+				}
+				if(field.isGeometry())
+				{
+					fieldsGetter << "AsText(" << TABLE.NAME << ".\"" << field.name << "\") AS \"" << field.name << '"';
+				}
+				else
+				{
+					fieldsGetter << TABLE.NAME << ".\"" << field.name << "\"";
 				}
 			}
 			_fieldsGetter = fieldsGetter.str();
@@ -485,10 +504,10 @@ namespace synthese
 			if (!db->doesTableExists(TABLE.NAME))
 			{
 				// Create the table if it does not already exist.
-				db->execUpdate(db->getCreateTableSQL(TABLE.NAME, _FIELDS));
+				db->execUpdate(db->getCreateTableSQL(TABLE.NAME, fieldsList));
 				TABLE.CreatedTable = true;
 			}
-			else if (!db->isTableSchemaUpToDate(TABLE.NAME, _FIELDS))
+			else if (!db->isTableSchemaUpToDate(TABLE.NAME, fieldsList))
 			{
 				_MigrateTableData(db);
 				TABLE.MigratedSchema = true;
@@ -504,11 +523,11 @@ namespace synthese
 					// backends use an index named from the list of its columns (which all backends do now).
 					continue;
 				}
-				db->createIndex(TABLE.NAME, _INDEXES[i], _FIELDS);
+				db->createIndex(TABLE.NAME, _INDEXES[i], fieldsList);
 				TABLE.CreatedIndexes++;
 			}
 
-			db->afterUpdateSchema(TABLE.NAME, _FIELDS);
+			db->afterUpdateSchema(TABLE.NAME, fieldsList);
 		}
 
 

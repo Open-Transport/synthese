@@ -24,7 +24,7 @@
 #define SYNTHESE_pt_operations_VehicleService_hpp__
 
 #include "Named.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "DriverService.hpp"

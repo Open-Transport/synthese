@@ -24,7 +24,7 @@
 #define SYNTHESE_road_PUBLICPLACE_H
 
 #include "NamedPlaceTemplate.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "WithGeometry.hpp"
 
 #include "Registry.h"

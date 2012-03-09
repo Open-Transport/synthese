@@ -208,7 +208,7 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :
-				ImportableTableSync::SerializeDataSourceLinks(getDataSourceLinks())
+				impex::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 			if(getColor())
 			{

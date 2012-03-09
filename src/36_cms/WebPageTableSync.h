@@ -45,26 +45,6 @@ namespace synthese
 			public db::DBRegistryTableSyncTemplate<WebPageTableSync,Webpage>
 		{
 		public:
-			static const std::string COL_TITLE;
-			static const std::string COL_SITE_ID;
-			static const std::string COL_UP_ID;
-			static const std::string COL_RANK;
-			static const std::string COL_CONTENT1;
-			static const std::string COL_START_TIME;
-			static const std::string COL_END_TIME;
-			static const std::string COL_MIME_TYPE;
-			static const std::string COL_ABSTRACT;
-			static const std::string COL_IMAGE;
-			static const std::string COL_LINKS;
-			static const std::string COL_DO_NOT_USE_TEMPLATE;
-			static const std::string COL_HAS_FORUM;
-			static const std::string COL_SMART_URL_PATH;
-			static const std::string COL_SMART_URL_DEFAULT_PARAMETER_NAME;
-			static const std::string COL_IGNORE_WHITE_CHARS;
-			static const std::string COL_RAW_EDITOR;
-
-
-
 			//////////////////////////////////////////////////////////////////////////
 			/// Web page search.
 			/// @param env Environment to use and populate by the search

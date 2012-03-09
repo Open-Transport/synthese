@@ -120,14 +120,14 @@ namespace synthese
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
 					"<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">" <<
 					"<channel>" <<
-					"<title>" << _root->getName() << "</title>" <<
-					"<description><![CDATA[" << _root->getAbstract() << "]]></description>" <<
+					"<title>" << _root->get<Title>() << "</title>" <<
+					"<description><![CDATA[" << _root->get<Abstract>() << "]]></description>" <<
 					"<link>" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link>" <<
 					"<generator>SYNTHESE " << ServerModule::VERSION << "</generator>";
-				if(_root.get() && !_root->getImage().empty())
+				if(_root.get() && !_root->get<ImageURL>().empty())
 				{
-					stream << "<image><url>" << _root->getImage() << "</url><title>" <<
-						_root->getName() << "</title><link>" <<
+					stream << "<image><url>" << _root->get<ImageURL>() << "</url><title>" <<
+						_root->get<Title>() << "</title><link>" <<
 						HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link></image>";
 				}
 
@@ -146,7 +146,7 @@ namespace synthese
 				if(_displayPage.get())
 				{
 					ParametersMap pm(getTemplateParameters());
-					page->toParametersMap(pm, string());
+					page->toParametersMap(pm, true);
 					_displayPage->display(stream, request, pm);
 				}
 				else if(_root.get())
@@ -155,23 +155,23 @@ namespace synthese
 
 					stream <<
 						"<item>" <<
-						"<title>" << page->getName() << "</title>" <<
-						"<description><![CDATA[" << page->getAbstract() << "]]></description>" <<
+						"<title>" << page->get<Title>() << "</title>" <<
+						"<description><![CDATA[" << page->get<Abstract>() << "]]></description>" <<
 						"<link>" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link>" <<
 						"<guid isPermaLink=\"true\">" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</guid>"
 						;
-					if(!page->getStartDate().is_not_a_date_time())
+					if(!page->get<StartTime>().is_not_a_date_time())
 					{
 						stream <<
 							"<pubDate>" <<
-							page->getStartDate().date().day_of_week() << ", " <<
-							page->getStartDate().date().day() << " " <<
-							page->getStartDate().date().month() << " " <<
-							page->getStartDate().date().year() << " " <<
-							page->getStartDate().time_of_day() << " " <<
+							page->get<StartTime>().date().day_of_week() << ", " <<
+							page->get<StartTime>().date().day() << " " <<
+							page->get<StartTime>().date().month() << " " <<
+							page->get<StartTime>().date().year() << " " <<
+							page->get<StartTime>().time_of_day() << " " <<
 							"+0100" <<
 							"</pubDate>"
-							;
+						;
 					}
 					stream << "</item>";
 				}

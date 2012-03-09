@@ -23,16 +23,18 @@
 #ifndef SYNTHESE_CSITE_H
 #define SYNTHESE_CSITE_H
 
+#include "Website.hpp"
+
+#include "AccessParameters.h"
+#include "City.h"
+#include "GeographyModule.h"
+#include "GraphTypes.h"
 #include "HourPeriod.h"
 #include "LexicalMatcher.h"
-#include "UtilConstants.h"
-#include "GraphTypes.h"
-#include "City.h"
-#include "AccessParameters.h"
-#include "RollingStockFilter.h"
-#include "Website.hpp"
-#include "GeographyModule.h"
 #include "RoadModule.h"
+#include "RollingStockFilter.h"
+#include "StandardFields.hpp"
+#include "UtilConstants.h"
 
 #include <set>
 #include <boost/date_time/gregorian/greg_duration.hpp>
@@ -56,6 +58,26 @@ namespace synthese
 
 	namespace pt_website
 	{
+		FIELD_TYPE(OnlineBookingActivated, bool)
+		FIELD_TYPE(UseOldData, bool)
+		FIELD_TYPE(MaxConnections, size_t)
+		FIELD_TYPE(UseDatesRange, boost::gregorian::date_duration)
+		FIELD_TYPE(Periods, std::vector<HourPeriod>)
+		FIELD_TYPE(DisplayRoadApproachDetails, bool)
+
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(OnlineBookingActivated),
+			FIELD(UseOldData),
+			FIELD(MaxConnections),
+			FIELD(UseDatesRange),
+			FIELD(Periods),
+			FIELD(DisplayRoadApproachDetails)
+		> TransportWebsiteSchema;
+
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Transport website.
 		///	@ingroup m56
@@ -67,10 +89,11 @@ namespace synthese
 		///  - transport objects selection
 		///  - algorithms parameters
 		class TransportWebsite:
-			public virtual util::Registrable,
-			public cms::Website
+			public Object<TransportWebsite, TransportWebsiteSchema>
 		{
 		public:
+			typedef util::Registry<TransportWebsite> Registry;
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Exception to throw when a route planning cannot be launched at the
@@ -83,10 +106,6 @@ namespace synthese
 				ForbiddenDateException();
 			};
 
-			/// Chosen registry class.
-			typedef util::Registry<TransportWebsite>	Registry;
-
-			typedef std::vector<HourPeriod> Periods;
 
 			typedef std::map<std::size_t,RollingStockFilter*> RollingStockFilters;
 
@@ -124,30 +143,8 @@ namespace synthese
 				TransportWebsite(util::RegistryKeyType id = 0);
 			//@}
 
-			//! \name Setters
-			//@{
-				void setOnlineBookingAllowed(const bool value){ _onlineBookingAllowed = value; }
-				void setPastSolutionsDisplayed(bool value){ _pastSolutionsDisplayed = value; }
-				void setMaxTransportConnectionsCount(int value){ _maxTransportConnectionsCount = value; }
-				void setUseDateRange(boost::gregorian::date_duration value) { _useDateRange = value; }
-				void setDisplayRoadApproachDetail(bool value) { _displayRoadApproachDetail = value; }
-			//@}
-
-			//! \name Getters
-			//@{
-				bool							getOnlineBookingAllowed() const { return _onlineBookingAllowed; }
-				bool							getPastSolutionsDisplayed() const { return _pastSolutionsDisplayed; }
-				int								getMaxTransportConnectionsCount() const { return _maxTransportConnectionsCount; }
-				const Periods&					getPeriods() const { return _periods; }
-				boost::gregorian::date_duration	getUseDatesRange() const { return _useDateRange; }
-				const RollingStockFilters&		getRollingStockFilters() const { return _rollingStockFilters; }
-				bool							getDisplayRoadApproachDetail() const { return _displayRoadApproachDetail; }
-			//@}
-
 			// \name Modifiers
 			//@{
-				void addHourPeriod(const HourPeriod& hourPeriod);
-				void clearHourPeriods();
 				void addCity(boost::shared_ptr<geography::City> value);
 				void addRollingStockFilter(RollingStockFilter& value);
 				void removeRollingStockFilter(RollingStockFilter& value);
@@ -156,6 +153,8 @@ namespace synthese
 
 			//! \name Services
 			//@{
+				const RollingStockFilters& getRollingStockFilters() const { return _rollingStockFilters; }
+
 				/** Access parameter generator.
 					@param parameter Access profile
 					@return AccessParameters
@@ -255,9 +254,7 @@ namespace synthese
 				typedef std::map<boost::optional<std::size_t>, std::string> Labels;
 				Labels getRollingStockFiltersList() const;
 			//@}
-
 		};
-	}
-}
+}	}
 
 #endif

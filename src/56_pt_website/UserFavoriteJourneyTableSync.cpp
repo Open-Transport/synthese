@@ -61,16 +61,16 @@ namespace synthese
 				"t048_user_favorite_journey"
 				);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
-			DBTableSync::Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(UserFavoriteJourneyTableSync::COL_USER_ID, SQL_INTEGER),
+			Field(UserFavoriteJourneyTableSync::COL_RANK, SQL_INTEGER),
+			Field(UserFavoriteJourneyTableSync::COL_ORIGIN_CITY_NAME, SQL_TEXT),
+			Field(UserFavoriteJourneyTableSync::COL_ORIGIN_PLACE_NAME, SQL_TEXT),
+			Field(UserFavoriteJourneyTableSync::COL_DESTINATION_CITY_NAME, SQL_TEXT),
+			Field(UserFavoriteJourneyTableSync::COL_DESTINATION_PLACE_NAME, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=

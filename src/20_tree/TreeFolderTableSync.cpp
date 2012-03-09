@@ -57,12 +57,12 @@ namespace synthese
 			"t051_scenario_folder"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TreeFolderTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(TreeFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TreeFolderTableSync::COL_NAME, SQL_TEXT),
+			Field(TreeFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TreeFolderTableSync>::_INDEXES[]=

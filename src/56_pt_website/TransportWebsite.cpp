@@ -21,7 +21,8 @@
 */
 
 #include "TransportWebsite.h"
-#include "Registry.h"
+
+#include "CMSModule.hpp"
 #include "PTConstants.h"
 #include "PTModule.h"
 #include "City.h"
@@ -33,6 +34,7 @@
 #include "RoadPlace.h"
 #include "House.hpp"
 #include "Env.h"
+#include "Webpage.h"
 
 #include "Exception.h"
 
@@ -47,30 +49,127 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
-	using namespace std;
+	using namespace cms;
 	using namespace util;
 	using namespace geography;
 	using namespace lexical_matcher;
 	using namespace pt;
 	using namespace graph;
 	using namespace road;
+	using namespace pt_website;
 
-	namespace util
-	{
-		template<> const string Registry<pt_website::TransportWebsite>::KEY("TransportWebsite");
+	CLASS_DEFINITION(TransportWebsite, "t086_pt_services_configurations", 86)
+	FIELD_DEFINITION_OF_TYPE(OnlineBookingActivated, "online_booking", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(UseOldData, "use_old_data", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(MaxConnections, "max_connections", SQL_INTEGER)
+
+	// Use dates range
+	FIELD_DEFINITION_OF_TYPE(UseDatesRange, "use_dates_range", SQL_INTEGER)
+	FIELD_NO_LINKED_OBJECT_ID(UseDatesRange)
+	
+	template<>
+	void ObjectField<UseDatesRange, UseDatesRange::Type>::UnSerialize(
+		UseDatesRange::Type& fieldObject,
+		const std::string& text,
+		const Env& env
+	){
+		fieldObject = days(lexical_cast<int>(text));
 	}
+
+	template<>
+	std::string ObjectField<UseDatesRange, UseDatesRange::Type>::Serialize(
+		const UseDatesRange::Type& fieldObject,
+		SerializationFormat format
+	){
+		return boost::lexical_cast<std::string>(static_cast<int>(fieldObject.days()));
+	}
+
+
+	// Periods
+	FIELD_DEFINITION_OF_TYPE(Periods, "periods", SQL_TEXT)
+	FIELD_NO_LINKED_OBJECT_ID(Periods)
+	
+	template<>
+	void ObjectField<Periods, Periods::Type>::UnSerialize(
+		Periods::Type& fieldObject,
+		const std::string& text,
+		const Env& env
+	){
+		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
+
+		boost::char_separator<char> sep1 (",");
+		boost::char_separator<char> sep2 ("|");
+		tokenizer tripletTokens(text, sep1);
+		fieldObject.clear();
+		for (tokenizer::iterator tripletIter = tripletTokens.begin();
+			tripletIter != tripletTokens.end (); ++tripletIter)
+		{
+			tokenizer valueTokens (*tripletIter, sep2);
+			tokenizer::iterator valueIter = valueTokens.begin();
+
+			// (beginHour|endHour|Caption)
+			time_duration beginHour(duration_from_string(*valueIter));
+			time_duration endHour(duration_from_string(*(++valueIter)));
+			HourPeriod period(*(++valueIter), beginHour, endHour);
+
+			fieldObject.push_back(period);
+		}
+	}
+	
+	template<>
+	std::string ObjectField<Periods, Periods::Type>::Serialize(
+		const Periods::Type& fieldObject,
+		SerializationFormat format
+	){
+		stringstream periodstr;
+		if(format == FORMAT_SQL)
+		{
+			periodstr << "\"";
+		}
+		for(Periods::Type::const_iterator it(fieldObject.begin()); it != fieldObject.end(); ++it)
+		{
+			if (it != fieldObject.begin())
+			{
+				periodstr << ",";
+			}
+			periodstr <<
+				to_simple_string(it->getBeginHour()) <<
+				"|" << to_simple_string(it->getEndHour()) <<
+				"|" << it->getCaption()
+			;
+		}
+		if(format == FORMAT_SQL)
+		{
+			periodstr << "\"";
+		}
+		return periodstr.str();
+	}
+
+	// Display road approach detail
+	FIELD_DEFINITION_OF_TYPE(DisplayRoadApproachDetails, "display_road_approach_detail", SQL_BOOLEAN)
 
 	namespace pt_website
 	{
 		const string TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
 		const string TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");
 
+
+
 		TransportWebsite::TransportWebsite(
 			RegistryKeyType id
 		):	Registrable(id),
-			_displayRoadApproachDetail(true)
-		{
-		}
+			Object<TransportWebsite, TransportWebsiteSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(OnlineBookingActivated, true),
+					FIELD_VALUE_CONSTRUCTOR(UseOldData, false),
+					FIELD_VALUE_CONSTRUCTOR(MaxConnections, 10),
+					FIELD_VALUE_CONSTRUCTOR(UseDatesRange, 365),
+					FIELD_DEFAULT_CONSTRUCTOR(Periods),
+					FIELD_VALUE_CONSTRUCTOR(DisplayRoadApproachDetails, true)
+			)	)
+		{}
 
 
 
@@ -164,11 +263,6 @@ namespace synthese
 					startTime = now;
 				}
 			}
-		}
-
-		void TransportWebsite::addHourPeriod( const HourPeriod& hourPeriod )
-		{
-			_periods.push_back(hourPeriod);
 		}
 
 
@@ -273,16 +367,8 @@ namespace synthese
 
 
 
-		void TransportWebsite::clearHourPeriods()
-		{
-			_periods.clear();
-		}
-
-
-
 		TransportWebsite::ForbiddenDateException::ForbiddenDateException():
 		Exception("Forbidden date")
 		{
-
 		}
 }	}

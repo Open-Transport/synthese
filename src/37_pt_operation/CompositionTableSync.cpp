@@ -78,15 +78,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CompositionTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CompositionTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CompositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(CompositionTableSync::COL_VEHICLE_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(CompositionTableSync::COL_VEHICLES, SQL_TEXT),
-			DBTableSync::Field(CompositionTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field(CompositionTableSync::COL_SERVED_VERTICES, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CompositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			Field(CompositionTableSync::COL_VEHICLE_SERVICE_ID, SQL_INTEGER),
+			Field(CompositionTableSync::COL_VEHICLES, SQL_TEXT),
+			Field(CompositionTableSync::COL_DATES, SQL_TEXT),
+			Field(CompositionTableSync::COL_SERVED_VERTICES, SQL_TEXT),
+			Field()
 		};
 
 

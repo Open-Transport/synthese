@@ -95,8 +95,8 @@ namespace synthese
 //			stringstream text;
 //			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
 
-			Webpage::Links links(_page->getLinks());
-			BOOST_FOREACH(const Webpage::Links::value_type& link, links)
+			WebpageLinks::Type links(_page->get<WebpageLinks>());
+			BOOST_FOREACH(const WebpageLinks::Type::value_type& link, links)
 			{
 				if(link == _destinationPage.get())
 				{
@@ -104,7 +104,7 @@ namespace synthese
 				}
 			}
 			links.push_back(_destinationPage.get());
-			_page->setLinks(links);
+			_page->set<WebpageLinks>(links);
 
 			WebPageTableSync::Save(_page.get());
 

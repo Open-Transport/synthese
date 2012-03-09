@@ -28,7 +28,6 @@
 #include "Request.h"
 #include "WebPageTableSync.h"
 #include "DBTransaction.hpp"
-#include "TransportWebsiteRight.h"
 
 using namespace std;
 using namespace boost;
@@ -40,7 +39,6 @@ namespace synthese
 	using namespace security;
 	using namespace util;
 	using namespace db;
-	using namespace pt_website;
 
 	namespace util
 	{
@@ -303,65 +301,66 @@ namespace synthese
 
 			if(_content1)
 			{
+				bool ignoreWhiteChars(
+					_ignoreWhiteChars ?
+					*_ignoreWhiteChars :
+					_page->get<WebpageContent>().getIgnoreWhiteChars()
+				);
 				string content(*_content1);
 				if(_decodeXMLEntitiesInContent)
 				{
 					boost::algorithm::replace_all(content,"&lt;?", "<?");
 					boost::algorithm::replace_all(content,"?&gt;", "?>");
 				}
-				_page->setContent(content);
+				_page->set<WebpageContent>(WebpageContent(content, ignoreWhiteChars));
 			}
 			if(_abstract)
 			{
-				_page->setAbstract(*_abstract);
+				_page->set<Abstract>(*_abstract);
 			}
 			if(_image)
 			{
-				_page->setImage(*_image);
+				_page->set<ImageURL>(*_image);
 			}
 			if(_title)
 			{
-				_page->setName(*_title);
-			}
-			if(_ignoreWhiteChars)
-			{
-				_page->setIgnoreWhiteChars(*_ignoreWhiteChars);
+				_page->set<Title>(*_title);
 			}
 			if(_startDate)
 			{
-				_page->setStartDate(*_startDate);
+				_page->set<StartTime>(*_startDate);
 			}
 			if(_endDate)
 			{
-				_page->setEndDate(*_endDate);
+				_page->set<EndTime>(*_endDate);
 			}
 			if(_mimeType)
 			{
-				_page->setMimeType(*_mimeType);
+				_page->set<MimeType>(*_mimeType);
 			}
 			if(_template)
 			{
-				_page->setTemplate(_template->get());
+				_page->set<SpecificTemplate>(optional<Webpage&>(**_template));
 			}
 			if(_doNotUseTemplate)
 			{
-				_page->setDoNotUseTemplate(*_doNotUseTemplate);
+				_page->set<DoNotUseTemplate>(*_doNotUseTemplate);
 			}
 			if(_hasForum)
 			{
-				_page->setHasForum(*_hasForum);
+				_page->set<HasForum>(*_hasForum);
 			}
 			if(_smartURLPath)
 			{
-				_page->setSmartURLPath(*_smartURLPath);
+				_page->set<SmartURLPath>(*_smartURLPath);
 			}
 			if(_smartURLDefaultParameterName)
 			{
-				_page->setSmartURLDefaultParameterName(*_smartURLDefaultParameterName);
+				_page->set<SmartURLDefaultParameterName>(*_smartURLDefaultParameterName);
 			}
 			if(_rawEditor)
 			{
-				_page->setRawEditor(*_rawEditor);
+				_page->set<RawEditor>(*_rawEditor);
 			}
 
 			WebPageTableSync::Save(_page.get(), transaction);
@@ -375,9 +374,7 @@ namespace synthese
 		bool WebPageUpdateAction::isAuthorized(
 			const Session* session
 		) const {
-			return session &&
-				session->hasProfile() &&
-				session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+			return true;
 		}
 
 

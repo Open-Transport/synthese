@@ -66,6 +66,7 @@ namespace synthese
 		{
 		public:
 			typedef util::Registry<DataSource> Registry;
+			static const util::RegistryTableType CLASS_NUMBER;
 
 			// Typedefs
 			typedef std::map<

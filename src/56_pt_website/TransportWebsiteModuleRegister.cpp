@@ -40,7 +40,6 @@ void synthese::pt_website::moduleRegister()
 	synthese::pt_website::TransportSiteAdmin::integrate();
 
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt_website::TransportWebsiteTableSync>::integrate();
-	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::cms::Website>, synthese::pt_website::TransportWebsiteTableSync>::integrate();
 
 	synthese::pt_website::ObjectSiteLinkTableSync::integrate();
 	synthese::pt_website::RollingStockFilterTableSync::integrate();

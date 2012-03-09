@@ -54,12 +54,12 @@ namespace synthese
 			"t006_cities"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CityTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CityTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CityTableSync::TABLE_COL_NAME, SQL_TEXT),
+			Field(CityTableSync::TABLE_COL_CODE, SQL_TEXT),
+			Field()
 
 		};
 

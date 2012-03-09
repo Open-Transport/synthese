@@ -62,14 +62,14 @@ namespace synthese
 		);
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CalendarTemplateTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
-			DBTableSync::Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(CalendarTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CalendarTemplateTableSync::COL_TEXT, SQL_TEXT),
+			Field(CalendarTemplateTableSync::COL_CATEGORY, SQL_INTEGER),
+			Field(CalendarTemplateTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(CalendarTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
+			Field()
 		};
 
 
@@ -148,7 +148,7 @@ namespace synthese
 			ReplaceQuery<CalendarTemplateTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(static_cast<int>(object->getCategory()));
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(object->getParent() ? object->getParent()->getKey() : 0);
 			query.execute(transaction);
 		}

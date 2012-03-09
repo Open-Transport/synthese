@@ -61,14 +61,14 @@ namespace synthese
 			"t011_place_aliases"
 			);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<PlaceAliasTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<PlaceAliasTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER),
-			DBTableSync::Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER),
-			DBTableSync::Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(PlaceAliasTableSync::COL_NAME, SQL_TEXT),
+			Field(PlaceAliasTableSync::COL_ALIASEDPLACEID, SQL_INTEGER),
+			Field(PlaceAliasTableSync::COL_CITYID, SQL_INTEGER),
+			Field(PlaceAliasTableSync::COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<PlaceAliasTableSync>::_INDEXES[]=

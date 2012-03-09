@@ -48,8 +48,11 @@ namespace synthese
 
 		void LogoutAction::run(Request& request)
 		{
-			request.getSession()->removeSessionIdCookie(request);
-			request.deleteSession();
+			if(request.getSession())
+			{
+				request.getSession()->removeSessionIdCookie(request);
+				request.deleteSession();
+			}
 		}
 
 

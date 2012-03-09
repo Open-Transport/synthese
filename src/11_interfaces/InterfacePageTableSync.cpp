@@ -63,16 +63,16 @@ namespace synthese
 			"t023_interface_pages"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<InterfacePageTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER),
-			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT),
-			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT),
-			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
-			DBTableSync::Field(InterfacePageTableSync::COL_MIME_TYPE, SQL_TEXT),
-			DBTableSync::Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(InterfacePageTableSync::TABLE_COL_INTERFACE, SQL_INTEGER),
+			Field(InterfacePageTableSync::TABLE_COL_CLASS, SQL_TEXT),
+			Field(InterfacePageTableSync::TABLE_COL_PAGE, SQL_TEXT),
+			Field(InterfacePageTableSync::TABLE_COL_DIRECT_DISPLAY_ALLOWED, SQL_INTEGER),
+			Field(InterfacePageTableSync::COL_MIME_TYPE, SQL_TEXT),
+			Field(InterfacePageTableSync::TABLE_COL_CONTENT, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<InterfacePageTableSync>::_INDEXES[]=

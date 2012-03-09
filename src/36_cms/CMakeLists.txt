@@ -51,6 +51,8 @@ WebPageAddAction.cpp
 WebPageAddAction.h
 WebPageAdmin.cpp
 WebPageAdmin.h
+WebpageContent.cpp
+WebpageContent.hpp
 WebPageDisplayFunction.cpp
 WebPageDisplayFunction.h
 WebPageFormFunction.cpp
@@ -81,6 +83,10 @@ WebPageUpdateAction.cpp
 WebPageUpdateAction.h
 Website.cpp
 Website.hpp
+WebsiteTableSync.cpp
+WebsiteTableSync.hpp
+WebsiteUpdateAction.cpp
+WebsiteUpdateAction.hpp
 )
 
 set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

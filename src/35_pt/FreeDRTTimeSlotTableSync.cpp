@@ -78,19 +78,19 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_AREA_ID, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE, SQL_TEXT),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL, SQL_TEXT),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED, SQL_DOUBLE),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_MAX_SPEED, SQL_DOUBLE),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_USE_RULES, SQL_TEXT),
-			DBTableSync::Field(FreeDRTTimeSlotTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(FreeDRTTimeSlotTableSync::COL_AREA_ID, SQL_INTEGER),
+			Field(FreeDRTTimeSlotTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
+			Field(FreeDRTTimeSlotTableSync::COL_FIRST_DEPARTURE, SQL_TEXT),
+			Field(FreeDRTTimeSlotTableSync::COL_LAST_ARRIVAL, SQL_TEXT),
+			Field(FreeDRTTimeSlotTableSync::COL_MAX_CAPACITY, SQL_INTEGER),
+			Field(FreeDRTTimeSlotTableSync::COL_COMMERCIAL_SPEED, SQL_DOUBLE),
+			Field(FreeDRTTimeSlotTableSync::COL_MAX_SPEED, SQL_DOUBLE),
+			Field(FreeDRTTimeSlotTableSync::COL_USE_RULES, SQL_TEXT),
+			Field(FreeDRTTimeSlotTableSync::COL_DATES, SQL_TEXT),
+			Field()
 		};
 
 

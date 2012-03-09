@@ -21,7 +21,9 @@
 */
 
 #include "HeuresOperationFileFormat.hpp"
+
 #include "DataSource.h"
+#include "PTOperationFileFormat.hpp"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "DBTransaction.hpp"
@@ -445,32 +447,14 @@ namespace synthese
 							lexical_cast<int>(fullCodeVec[0])*100+lexical_cast<int>(fullCodeVec[1])
 					)	);
 
-					set<VehicleService*> loadedVehicleServices(vehicleServices.get(vehicleServiceCode));
-					if(!loadedVehicleServices.empty())
-					{
-						logStream << "LOAD : link between vehicle services " << vehicleServiceCode << " and ";
-						BOOST_FOREACH(VehicleService* vs, loadedVehicleServices)
-						{
-							logStream << vs->getKey();
-						}
-						logStream << "<br />";
-					}
-					else
-					{
-						shared_ptr<VehicleService> vs(new VehicleService(VehicleServiceTableSync::getId()));
-
-						Importable::DataSourceLinks links;
-						links.insert(make_pair(&_dataSource, vehicleServiceCode));
-						vs->setDataSourceLinksWithoutRegistration(links);
-						_env.getEditableRegistry<VehicleService>().add(vs);
-						vehicleServices.add(*vs);
-						loadedVehicleServices.insert(vs.get());
-
-						logStream << "CREA : Creation of the vehicle service with key " << vehicleServiceCode << "<br />";
-					}
 					VehicleService* vehicleService(
-						*loadedVehicleServices.begin()
-					);
+						PTOperationFileFormat::CreateOrUpdateVehicleService(
+							vehicleServices,
+							vehicleServiceCode,
+							_dataSource,
+							_env,
+							logStream
+					)	);
 
 					Troncons::mapped_type troncon(new DriverService::Chunk(vehicleService));
 

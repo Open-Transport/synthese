@@ -58,6 +58,18 @@ namespace synthese
 			void setSameRoot(const TreeMultiClassRootPolicy<C1, C2>& value){ _root1 = value._root1; _root2 = value._root2; }
 
 			void setNullRoot(){ _root1 = NULL; _root2 = NULL; }
+
+			template<class C>
+			void registerChildToRoot(C& child)
+			{
+				// TODO
+			}
+
+			template<class C>
+			void unregisterChildFromRoot(C& child)
+			{
+				// TODO
+			}
 		};
 	}
 }

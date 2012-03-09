@@ -67,14 +67,14 @@ namespace synthese
 			"t078_houses"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<HouseTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<HouseTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(HouseTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(HouseTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(HouseTableSync::COL_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(HouseTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
+			Field(HouseTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
+			Field(HouseTableSync::COL_NUMBER, SQL_INTEGER),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<HouseTableSync>::_INDEXES[] =
@@ -128,7 +128,7 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<HouseTableSync> query(*object);
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->getRoadPlace()->getKey() : RegistryKeyType(0));
 			query.addField(object->getHouseNumber());
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));

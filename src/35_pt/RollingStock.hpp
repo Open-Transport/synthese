@@ -27,7 +27,7 @@
 #include "Registry.h"
 #include "PathClass.h"
 #include "Named.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 #include <string>
 

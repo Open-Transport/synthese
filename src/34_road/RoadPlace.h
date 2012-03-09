@@ -32,7 +32,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "MainRoadChunk.hpp"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {

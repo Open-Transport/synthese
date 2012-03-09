@@ -77,19 +77,19 @@ namespace synthese
 			"t016_scheduled_services"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ScheduledServiceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ScheduledServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_PATHID, SQL_INTEGER),
+			Field(ScheduledServiceTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			Field(ScheduledServiceTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ScheduledServiceTableSync>::_INDEXES[]=
@@ -273,7 +273,7 @@ namespace synthese
 			);
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

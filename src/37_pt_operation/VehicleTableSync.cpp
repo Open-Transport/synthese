@@ -72,18 +72,18 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<VehicleTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<VehicleTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(VehicleTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_NUMBER, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_ALLOWED_LINES, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_SEATS, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_PICTURE, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_AVAILABLE, SQL_BOOLEAN),
-			DBTableSync::Field(VehicleTableSync::COL_URL, SQL_TEXT),
-			DBTableSync::Field(VehicleTableSync::COL_REGISTRATION_NUMBERS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(VehicleTableSync::COL_NAME, SQL_TEXT),
+			Field(VehicleTableSync::COL_NUMBER, SQL_TEXT),
+			Field(VehicleTableSync::COL_ALLOWED_LINES, SQL_TEXT),
+			Field(VehicleTableSync::COL_SEATS, SQL_TEXT),
+			Field(VehicleTableSync::COL_PICTURE, SQL_TEXT),
+			Field(VehicleTableSync::COL_AVAILABLE, SQL_BOOLEAN),
+			Field(VehicleTableSync::COL_URL, SQL_TEXT),
+			Field(VehicleTableSync::COL_REGISTRATION_NUMBERS, SQL_TEXT),
+			Field()
 		};
 
 

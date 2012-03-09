@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_ENV_SCHEDULEDSERVICE_H
 #define SYNTHESE_ENV_SCHEDULEDSERVICE_H
 
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "ReservableService.hpp"
 #include "SchedulesBasedService.h"
 

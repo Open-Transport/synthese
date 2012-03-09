@@ -321,6 +321,20 @@ namespace synthese
 
 
 
+		std::string DBResult::getValue( const std::string& name ) const
+		{
+			return getText(name);
+		}
+
+
+
+		bool DBResult::isDefined( const std::string& fieldName ) const
+		{
+			return getColumnIndex(fieldName) != -1;
+		}
+
+
+
 		std::ostream& operator<< ( std::ostream& os, const DBResult& op )
 		{
 			std::vector<int> widths (op.computeMaxColWidths ());

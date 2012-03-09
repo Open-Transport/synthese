@@ -44,6 +44,8 @@ namespace synthese
 
 	namespace impex
 	{
+		const util::RegistryTableType DataSource::CLASS_NUMBER = 59;
+
 		DataSource::DataSource(
 			RegistryKeyType id
 		):	Registrable(id),

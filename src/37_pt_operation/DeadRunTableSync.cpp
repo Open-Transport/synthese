@@ -74,19 +74,19 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DeadRunTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DeadRunTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DeadRunTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			DBTableSync::Field(DeadRunTableSync::COL_DEPOT_ID, SQL_INTEGER),
-			DBTableSync::Field(DeadRunTableSync::COL_STOP_ID, SQL_INTEGER),
-			DBTableSync::Field(DeadRunTableSync::COL_DIRECTION, SQL_BOOLEAN),
-			DBTableSync::Field(DeadRunTableSync::COL_SCHEDULES, SQL_TEXT),
-			DBTableSync::Field(DeadRunTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field(DeadRunTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
-			DBTableSync::Field(DeadRunTableSync::COL_LENGTH, SQL_DOUBLE),
-			DBTableSync::Field(DeadRunTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DeadRunTableSync::COL_NETWORK_ID, SQL_INTEGER),
+			Field(DeadRunTableSync::COL_DEPOT_ID, SQL_INTEGER),
+			Field(DeadRunTableSync::COL_STOP_ID, SQL_INTEGER),
+			Field(DeadRunTableSync::COL_DIRECTION, SQL_BOOLEAN),
+			Field(DeadRunTableSync::COL_SCHEDULES, SQL_TEXT),
+			Field(DeadRunTableSync::COL_DATES, SQL_TEXT),
+			Field(DeadRunTableSync::COL_SERVICE_NUMBER, SQL_TEXT),
+			Field(DeadRunTableSync::COL_LENGTH, SQL_DOUBLE),
+			Field(DeadRunTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 
@@ -213,7 +213,7 @@ namespace synthese
 
 			// Data source links
 			query.addField(
-				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
+				DataSourceLinks::Serialize(object->getDataSourceLinks())
 			);
 
 			query.execute(transaction);

@@ -72,20 +72,20 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<VehiclePositionTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<VehiclePositionTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_STATUS, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_VEHICLE_ID, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_TIME, SQL_TEXT),
-			DBTableSync::Field(VehiclePositionTableSync::COL_METER_OFFSET, SQL_DOUBLE),
-			DBTableSync::Field(VehiclePositionTableSync::COL_STOP_POINT_ID, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
-			DBTableSync::Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
-			DBTableSync::Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_STATUS, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_VEHICLE_ID, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_TIME, SQL_TEXT),
+			Field(VehiclePositionTableSync::COL_METER_OFFSET, SQL_DOUBLE),
+			Field(VehiclePositionTableSync::COL_STOP_POINT_ID, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_COMMENT, SQL_TEXT),
+			Field(VehiclePositionTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_RANK_IN_PATH, SQL_INTEGER),
+			Field(VehiclePositionTableSync::COL_PASSENGERS, SQL_INTEGER),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 

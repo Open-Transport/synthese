@@ -44,10 +44,6 @@ namespace synthese
 		/// @since 3.2.1
 		class ImportableTableSync
 		{
-		private:
-			static const std::string SOURCES_SEPARATOR;
-			static const std::string FIELDS_SEPARATOR;
-
 		public:
 			// Don't attempt to define such a constant : it will be not initialized
 			// at calls in _FIELDS initialization
@@ -83,32 +79,6 @@ namespace synthese
 
 
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds storage string.
-			/// Each couple datasource/id is separated by , . The source and the id are
-			/// separated by | . If a datasource does not define any id then the , is
-			/// omitted
-			//////////////////////////////////////////////////////////////////////////
-			/// @param object the object to serialize
-			/// @return the serialized string corresponding to the object
-			/// @author Hugues Romain
-			/// @since 3.2.1
-			/// @date 2010
-			static std::string SerializeDataSourceLinks(
-				const Importable::DataSourceLinks& object
-			);
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Reads storage string.
-			//////////////////////////////////////////////////////////////////////////
-			/// @param object the object to update
-			/// @param serializedString string to read
-			/// @param env environment to populate when loading data sources
-			/// @author Hugues Romain
-			/// @since 3.2.1
-			/// @date 2010
 			static Importable::DataSourceLinks GetDataSourceLinksFromSerializedString(
 				const std::string& serializedString,
 				util::Env& env
@@ -127,7 +97,7 @@ namespace synthese
 			_map.clear();
 			boost::shared_ptr<const DataSource> psource(DataSourceTableSync::Get(source.getKey(), env));
 			typename T::SearchResult objects(T::Search(env));
-			BOOST_FOREACH(typename T::SearchResult::value_type v, objects)
+			BOOST_FOREACH(const typename T::SearchResult::value_type& v, objects)
 			{
 				if(!v->hasLinkWithSource(*psource))
 				{

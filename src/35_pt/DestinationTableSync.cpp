@@ -62,14 +62,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DestinationTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DestinationTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DestinationTableSync::COL_DISPLAYED_TEXT, SQL_TEXT),
-			DBTableSync::Field(DestinationTableSync::COL_TTS_TEXT, SQL_TEXT),
-			DBTableSync::Field(DestinationTableSync::COL_COMMENT, SQL_TEXT),
-			DBTableSync::Field(DestinationTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DestinationTableSync::COL_DISPLAYED_TEXT, SQL_TEXT),
+			Field(DestinationTableSync::COL_TTS_TEXT, SQL_TEXT),
+			Field(DestinationTableSync::COL_COMMENT, SQL_TEXT),
+			Field(DestinationTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 
@@ -111,7 +111,7 @@ namespace synthese
 			query.addField(object->getDisplayedText());
 			query.addField(object->getTTSText());
 			query.addField(object->getComment());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

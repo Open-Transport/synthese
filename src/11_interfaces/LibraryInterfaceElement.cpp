@@ -38,11 +38,6 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<interfaces::LibraryInterfaceElement>::KEY("LibraryInterfaceElement");
-	}
-
 	namespace interfaces
 	{
 		shared_ptr<LibraryInterfaceElement> LibraryInterfaceElement::create( const std::string & text, const InterfacePage* page )

@@ -61,9 +61,9 @@ namespace synthese
 		protected:
 			VehicleLinks _vehicles;
 
+		public:
 			Composition(util::RegistryKeyType id=0);
 
-		public:
 
 			//! @name Setters
 			//@{

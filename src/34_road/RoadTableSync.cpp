@@ -63,15 +63,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<RoadTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<RoadTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
-			DBTableSync::Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
-			DBTableSync::Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(RoadTableSync::COL_ROADTYPE, SQL_INTEGER),
+			Field(RoadTableSync::COL_BIKECOMPLIANCEID, SQL_INTEGER),
+			Field(RoadTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
+			Field(RoadTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
+			Field(RoadTableSync::COL_ROAD_PLACE_ID, SQL_INTEGER),
+			Field()
 		};
 
 

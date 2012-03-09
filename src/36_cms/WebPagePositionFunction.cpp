@@ -127,7 +127,7 @@ namespace synthese
 				if(_displayPage.get())
 				{
 					ParametersMap pm(getTemplateParameters());
-					curPage->toParametersMap(pm, string());
+					curPage->toParametersMap(pm, true, false);
 					_displayPage->display(stream, request, pm);
 				}
 				else

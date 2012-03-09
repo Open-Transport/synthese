@@ -410,7 +410,7 @@ namespace synthese
 
 			_outputRoadApproachDetail =
 				site ?
-				site->getDisplayRoadApproachDetail() :
+				site->get<DisplayRoadApproachDetails>() :
 				true
 			;
 
@@ -530,11 +530,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= site->getPeriods().size())
+					if (_periodId >= site->get<Periods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &site->getPeriods().at(_periodId);
+					_period = &site->get<Periods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else
