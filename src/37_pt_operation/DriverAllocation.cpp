@@ -45,7 +45,7 @@ namespace synthese
 		DriverAllocation::DriverAllocation(
 			RegistryKeyType id
 		):	Registrable(id),
-			Object(
+			Object<DriverAllocation, DriverAllocationSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Driver),
