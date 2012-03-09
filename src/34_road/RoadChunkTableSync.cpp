@@ -69,21 +69,21 @@ namespace synthese
 			"t014_road_chunks"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<RoadChunkTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			DBTableSync::Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_CROSSING_ID, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_RANKINPATH, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_ROADID, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			Field(RoadChunkTableSync::COL_LEFT_START_HOUSE_NUMBER, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_LEFT_END_HOUSE_NUMBER, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_RIGHT_START_HOUSE_NUMBER, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_RIGHT_END_HOUSE_NUMBER, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_LEFT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			Field(RoadChunkTableSync::COL_RIGHT_HOUSE_NUMBERING_POLICY, SQL_INTEGER),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<RoadChunkTableSync>::_INDEXES[]=

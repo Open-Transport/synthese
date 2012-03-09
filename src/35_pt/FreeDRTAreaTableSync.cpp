@@ -73,16 +73,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<FreeDRTAreaTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<FreeDRTAreaTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID, SQL_INTEGER),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_CITIES, SQL_TEXT),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_STOP_AREAS, SQL_TEXT),
-			DBTableSync::Field(FreeDRTAreaTableSync::COL_USE_RULES, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID, SQL_INTEGER),
+			Field(FreeDRTAreaTableSync::COL_TRANSPORT_MODE_ID, SQL_INTEGER),
+			Field(FreeDRTAreaTableSync::COL_NAME, SQL_TEXT),
+			Field(FreeDRTAreaTableSync::COL_CITIES, SQL_TEXT),
+			Field(FreeDRTAreaTableSync::COL_STOP_AREAS, SQL_TEXT),
+			Field(FreeDRTAreaTableSync::COL_USE_RULES, SQL_TEXT),
+			Field()
 		};
 
 

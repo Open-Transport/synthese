@@ -73,15 +73,15 @@ namespace synthese
 			"t062_rolling_stock_filters"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<RollingStockFilterTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<RollingStockFilterTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(RollingStockFilterTableSync::COL_SITE_ID, SQL_INTEGER),
-			DBTableSync::Field(RollingStockFilterTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(RollingStockFilterTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(RollingStockFilterTableSync::COL_AUTHORIZED_ONLY, SQL_INTEGER),
-			DBTableSync::Field(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(RollingStockFilterTableSync::COL_SITE_ID, SQL_INTEGER),
+			Field(RollingStockFilterTableSync::COL_RANK, SQL_INTEGER),
+			Field(RollingStockFilterTableSync::COL_NAME, SQL_TEXT),
+			Field(RollingStockFilterTableSync::COL_AUTHORIZED_ONLY, SQL_INTEGER),
+			Field(RollingStockFilterTableSync::COL_ROLLING_STOCK_IDS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockFilterTableSync>::_INDEXES[] =

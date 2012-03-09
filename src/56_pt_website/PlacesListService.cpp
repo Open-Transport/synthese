@@ -974,7 +974,7 @@ namespace synthese
 					)	)	);
 					placeResult.value = static_pointer_cast<Place, House>(
 						roadPlace->getHouse(
-							itemMap->get<RegistryKeyType>(
+						itemMap->get<MainRoadChunk::HouseNumber>(
 								House::DATA_NUMBER
 					)	)	);
 				}

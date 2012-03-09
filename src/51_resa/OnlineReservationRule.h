@@ -172,7 +172,7 @@ namespace synthese
 
 			//! \name Constructeurs et destructeurs
 			//@{
-				OnlineReservationRule(util::RegistryKeyType key);
+				OnlineReservationRule(util::RegistryKeyType key = 0);
 				~OnlineReservationRule();
 			//@}
 

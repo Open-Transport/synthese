@@ -74,23 +74,23 @@ namespace synthese
 				"t047_online_reservation_rules"
 				);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL, SQL_TEXT),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, SQL_TEXT),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_PHONE, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, SQL_INTEGER),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_TEXT),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
-			DBTableSync::Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_EMAIL, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_COPY_EMAIL, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_NEEDS_SURNAME, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_NEEDS_PHONE, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_MAX_SEATS, SQL_INTEGER),
+			Field(OnlineReservationRuleTableSync::COL_THRESHOLDS, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_SENDER_EMAIL, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_SENDER_NAME, SQL_TEXT),
+			Field(OnlineReservationRuleTableSync::COL_EMAIL_INTERFACE_ID, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<OnlineReservationRuleTableSync>::_INDEXES[]=

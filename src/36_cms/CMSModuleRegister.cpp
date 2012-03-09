@@ -8,6 +8,7 @@
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
+#include "WebsiteUpdateAction.hpp"
 
 #include "AddService.hpp"
 #include "BitAndFunction.hpp"
@@ -36,8 +37,10 @@
 #include "RowsListFunction.hpp"
 
 #include "WebPageAdmin.h"
+#include "WebsiteAdmin.hpp"
 
 #include "WebPageTableSync.h"
+#include "WebsiteTableSync.hpp"
 
 // Registries
 
@@ -48,11 +51,15 @@
 
 void synthese::cms::moduleRegister()
 {
+	// Registries
+	synthese::util::Env::Integrate<synthese::cms::Website>();
+	synthese::util::Env::Integrate<synthese::cms::Webpage>();
 
 	// 36 CMS
 	synthese::cms::WebPageAdmin::integrate();
 
 	synthese::cms::WebPageTableSync::integrate();
+	synthese::cms::WebsiteTableSync::integrate();
 
 	synthese::cms::CMSModule::integrate();
 
@@ -87,8 +94,5 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
-
-
-	// Registries
-	synthese::util::Env::Integrate<synthese::cms::Webpage>();
+	synthese::cms::WebsiteUpdateAction::integrate();
 }

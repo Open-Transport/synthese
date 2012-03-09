@@ -23,19 +23,22 @@
 #ifndef SYNTHESE_cms_WebPage_h__
 #define SYNTHESE_cms_WebPage_h__
 
+#include "Object.hpp"
 #include "Registrable.h"
 #include "Registry.h"
 #include "TreeNode.hpp"
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
+
+#include "WebpageContent.hpp"
 #include "Website.hpp"
 #include "Function.h"
 #include "Factory.h"
+#include "StandardFields.hpp"
 #include "shared_recursive_mutex.hpp"
 
 #include <ostream>
-#include <boost/date_time/posix_time/posix_time.hpp>
 
 namespace synthese
 {
@@ -51,6 +54,40 @@ namespace synthese
 
 	namespace cms
 	{
+		class Website;
+		class Webpage;
+
+		FIELD_COMPLEX_TYPE_EXTERNAL_DATA(WebpageTreeNode)
+		FIELD_TYPE(Abstract, std::string)
+		FIELD_TYPE(ImageURL, std::string)
+		FIELD_TYPE(WebpageLinks, std::vector<Webpage*>)
+		FIELD_TYPE(DoNotUseTemplate, bool)
+		FIELD_TYPE(HasForum, bool)
+		FIELD_TYPE(SmartURLPath, std::string)
+		FIELD_TYPE(SmartURLDefaultParameterName, std::string)
+		FIELD_TYPE(RawEditor, bool)
+		FIELD_TYPE(SpecificTemplate, boost::optional<Webpage&>)
+
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(WebpageTreeNode),
+			FIELD(Title),
+			FIELD(WebpageContent),
+			FIELD(StartTime),
+			FIELD(EndTime),
+			FIELD(MimeType),
+			FIELD(Abstract),
+			FIELD(ImageURL),
+			FIELD(WebpageLinks),
+			FIELD(DoNotUseTemplate),
+			FIELD(HasForum),
+			FIELD(SmartURLPath),
+			FIELD(SmartURLDefaultParameterName),
+			FIELD(RawEditor),
+			FIELD(SpecificTemplate)
+		> WebpageRecord;
+
+
 		/** Web page class (CMS).
 			@ingroup m36
 
@@ -104,259 +141,23 @@ namespace synthese
 			Pages without smart path are accessible only by their id.
 		*/
 		class Webpage:
-			public util::Registrable,
 			public tree::TreeNode<
 				Webpage,
 				tree::TreeRankOrderingPolicy,
 				tree::TreeOtherClassRootPolicy<Website>
 			>,
-			public util::Named
+			public Object<Webpage, WebpageRecord>
 		{
 		private:
-			static const std::string DATA_PAGE_;
-			static const std::string DATA_TITLE;
-			static const std::string DATA_ABSTRACT;
-			static const std::string DATA_IMAGE;
 			static const std::string DATA_PUBLICATION_DATE;
 			static const std::string DATA_FORUM;
 			static const std::string DATA_DEPTH;
-
-
-			// Precompiled webpage
-
-			class Node
-			{
-			public:
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const = 0;
-			};
-
-			typedef std::vector<boost::shared_ptr<Node> > Nodes;
-
-			class TextNode : public Node
-			{
-			public:
-				std::string text;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class ServiceNode : public Node
-			{
-			public:
-				const util::Factory<server::Function>::CreatorInterface* functionCreator;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters serviceParameters;
-				Parameters templateParameters;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class LabelNode : public Node
-			{
-			public:
-				std::string label;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class GotoNode : public Node
-			{
-			public:
-				Nodes direction;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class ForeachNode : public Node
-			{
-				static const std::string DATA_RANK;
-				static const std::string DATA_ITEMS_COUNT;
-
-			public:
-				std::string arrayCode;
-				Nodes pageCode;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters parameters;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class ValueNode : public Node
-			{
-			public:
-				std::string name;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
-
-			class IncludeNode : public Node
-			{
-			public:
-				std::string pageName;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters parameters;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
-				) const;
-			};
 
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<Webpage>	Registry;
 
-			typedef std::vector<Webpage*> Links;
-
-		private:
-			static const std::string PARAMETER_VAR;
-
-			mutable Nodes _nodes;
-
-			std::string _smartURLPath;
-			std::string _smartURLDefaultParameterName;
-
-			Webpage* _template;
-			std::string _content;
-			boost::posix_time::ptime _startDate;
-			boost::posix_time::ptime _endDate;
-			std::string _mimeType;
-			std::string _abstract;
-			std::string _image;
-			Links _links;
-			bool _doNotUseTemplate;
-			bool _hasForum;
-			bool _ignoreWhiteChars;
-			bool _rawEditor; //!< if false the editor is WYSIWYG editor
-			static synthese::util::shared_recursive_mutex _SharedMutex;
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses the content and put it in the nodes cache.
-			/// @retval nodes object to write the result on
-			/// @param it iterator on the beginning of the string to parse
-			/// @param end iterator on the end of the string to parse
-			/// @param termination termination string to detect to interrupt the parsing
-			/// @return iterator on the end of the parsing
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
-			///	a lower level of recursion.
-			/// If the level of recursion is superior than 0, then the output is encoded
-			/// as an url to avoid mistake when the result of parsing is considered as
-			/// a single parameter of a function call.
-			std::string::const_iterator _parse(
-				Nodes& nodes,
-				std::string::const_iterator it,
-				std::string::const_iterator end,
-				std::set<std::string> termination
-			) const;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses the content and put it in a stream.
-			/// @retval stream stream to write the result on
-			/// @param it iterator on the beginning of the string to parse
-			/// @param end iterator on the end of the string to parse
-			/// @param termination termination string to detect to interrupt the parsing
-			/// @return iterator on the end of the parsing
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
-			///	a lower level of recursion.
-			/// If the level of recursion is superior than 0, then the output is encoded
-			/// as an url to avoid mistake when the result of parsing is considered as
-			/// a single parameter of a function call.
-			std::string::const_iterator _parseText(
-				std::ostream& stream,
-				std::string::const_iterator it,
-				std::string::const_iterator end,
-				std::string termination
-			) const;
-
-		public:
 			Webpage(util::RegistryKeyType id = 0);
-
-			//! @name Getters
-			//@{
-				const std::string& getContent() const { return _content; }
-				const boost::posix_time::ptime& getStartDate() const { return _startDate; }
-				const boost::posix_time::ptime& getEndDate() const { return _endDate; }
-				const std::string& _getMimeType() const { return _mimeType; }
-				Webpage* _getTemplate() const { return _template;}
-				const std::string& getAbstract() const { return _abstract; }
-				const std::string& getImage() const { return _image; }
-				const Links& getLinks() const { return _links; }
-				bool getDoNotUseTemplate() const { return _doNotUseTemplate; }
-				bool getHasForum() const { return _hasForum; }
-				const std::string& getSmartURLPath() const { return _smartURLPath; }
-				const std::string& getSmartURLDefaultParameterName() const { return _smartURLDefaultParameterName; }
-				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
-				bool getRawEditor() const { return _rawEditor; }
-			//@}
-
-			//! @name Setters
-			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Content setter with nodes cache update.
-				/// The parsing is done only if the content has changed.
-				/// @param value new value for the content
-				/// @param noUpdate avoid the nodes cache to be updated (optional, default is not to avoid)
-				/// @author Hugues Romain
-				void setContent(const std::string& value);
-
-				void setStartDate(const boost::posix_time::ptime& value) { _startDate = value; }
-				void setEndDate(const boost::posix_time::ptime& value) { _endDate = value; }
-				void setMimeType(const std::string& value){ _mimeType = value; }
-				void setTemplate(Webpage* value){ _template = value; }
-				void setAbstract(const std::string& value){ _abstract = value; }
-				void setImage(const std::string& value){ _image = value; }
-				void setLinks(const Links& value){ _links = value; }
-				void setDoNotUseTemplate(bool value){ _doNotUseTemplate = value; }
-				void setHasForum(bool value){ _hasForum = value; }
-				void setSmartURLPath(const std::string& value){ _smartURLPath = value; }
-				void setSmartURLDefaultParameterName(const std::string& value){ _smartURLDefaultParameterName = value; }
-				void setIgnoreWhiteChars(bool value){ _ignoreWhiteChars = value; }
-				void setRawEditor(bool value){ _rawEditor = value; }
-			//@}
 
 			//! @name Services
 			//@{
@@ -371,6 +172,7 @@ namespace synthese
 				/// http://en.wikipedia.org/wiki/Internet_media_type
 				//////////////////////////////////////////////////////////////////////////
 				std::string getMimeType() const;
+
 
 
 				//////////////////////////////////////////////////////////////////////////
@@ -432,6 +234,7 @@ namespace synthese
 				std::string getFullName() const;
 
 
+
 				//////////////////////////////////////////////////////////////////////////
 				/// CMS exporter.
 				//////////////////////////////////////////////////////////////////////////
@@ -440,13 +243,20 @@ namespace synthese
 				/// @author Hugues Romain
 				/// @since 3.3.0
 				/// @date 2011
-				void toParametersMap(
+				virtual void addAdditionalParameters(
 					util::ParametersMap& pm,
-					std::string prefix = DATA_PAGE_
+					const std::string& prefix
 				) const;
+
+
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
+
+
+				virtual std::string getName() const { return get<Title>(); }
+				virtual SubObjects getSubObjects() const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_cms_WebPage_h__

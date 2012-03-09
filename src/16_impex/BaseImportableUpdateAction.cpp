@@ -44,7 +44,7 @@ namespace synthese
 			{
 				map.insert(
 					PARAMETER_DATA_SOURCE_LINKS,
-					ImportableTableSync::SerializeDataSourceLinks(*_dataSourceLinks)
+					DataSourceLinks::Serialize(*_dataSourceLinks)
 				);
 			}
 		}

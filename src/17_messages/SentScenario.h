@@ -28,7 +28,7 @@
 #include "MessagesTypes.h"
 #include "Registry.h"
 #include "Scenario.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 #include <map>
 #include <string>

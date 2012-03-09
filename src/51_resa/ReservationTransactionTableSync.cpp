@@ -28,7 +28,6 @@
 #include "ReplaceQuery.h"
 #include "ResaModule.h"
 #include "ReservationTableSync.h"
-#include "ReservationTransaction.h"
 #include "Service.h"
 #include "UserTableSync.h"
 
@@ -73,20 +72,20 @@ namespace synthese
 			"t046_reservation_transactions", true
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ReservationTransactionTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_LAST_RESERVATION_ID, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_SEATS, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_BOOKING_TIME, SQL_DATETIME),
+			Field(ReservationTransactionTableSync::COL_CANCELLATION_TIME, SQL_DATETIME),
+			Field(ReservationTransactionTableSync::COL_CUSTOMER_ID, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_CUSTOMER_NAME, SQL_TEXT),
+			Field(ReservationTransactionTableSync::COL_CUSTOMER_PHONE, SQL_TEXT),
+			Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
+			Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
+			Field()
 		};
 
 		

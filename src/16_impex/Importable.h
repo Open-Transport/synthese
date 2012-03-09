@@ -27,8 +27,10 @@
 #define SYNTHESE_Importable_h__
 
 #include "Registrable.h"
+
 #include "Exception.h"
-#include "DataSource.h"
+#include "ObjectField.hpp"
+#include "SchemaMacros.hpp"
 
 #include <string>
 #include <map>
@@ -56,6 +58,9 @@ namespace synthese
 			virtual public util::Registrable
 		{
 		public:
+			static const std::string SOURCES_SEPARATOR;
+			static const std::string FIELDS_SEPARATOR;
+			
 			typedef std::multimap<const DataSource*, std::string> DataSourceLinks;
 
 			class NotLinkedWithSourceException : public synthese::Exception
@@ -96,6 +101,8 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 				void setDataSourceLinksWithoutRegistration(const DataSourceLinks& value){ _dataSourceLinks = value; }
+				virtual void setDataSourceLinksWithRegistration(const DataSourceLinks& value) = 0;
+
 			//@}
 
 			//! @name Services
@@ -134,114 +141,29 @@ namespace synthese
 		};
 
 
-		template<class T>
-		class ImportableTemplate:
-			public Importable
-		{
-		public:
-			void cleanDataSourceLinks(bool updateDataSource = false)
-			{
-				if(updateDataSource)
-				{
-					BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-					{
-						link.first->removeLinks(static_cast<T&>(*this));
-				}	}
-				_dataSourceLinks.clear();
-			}
+		struct DataSourceLinks;
+	}
 
+	//////////////////////////////////////////////////////////////////////////
+	/// Pointers vector specialization
+	template<>
+	class ObjectField<impex::DataSourceLinks, void*>:
+		public ObjectFieldDefinition<impex::DataSourceLinks>
+	{
+	public:
+		typedef void* Type;
 
-			void removeSourceLink(const DataSource& source, const std::string& code, bool updateDataSource = false)
-			{
-				//TODO protect this code by a mutex
-				std::pair<DataSourceLinks::iterator, DataSourceLinks::iterator> range(
-					_dataSourceLinks.equal_range(&source)
-				);
-				for(DataSourceLinks::iterator it(range.first); it != range.second; ++it)
-				{
-					if(it->second == code)
-					{
-						if(updateDataSource)
-						{
-							source.removeLink(static_cast<T&>(*this), code);
-						}
-						_dataSourceLinks.erase(it);
-						return;
-					}
-				}
-			}
+		static void UnSerialize(impex::Importable::DataSourceLinks& fieldObject, const std::string& text,	const util::Env& env);
+		static void LoadFromRecord(void*& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
+		static std::string Serialize(const impex::Importable::DataSourceLinks& fieldObject, SerializationFormat format = FORMAT_INTERNAL);
+		static void SaveToParametersMap(void*& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
+		static void GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& text);
+		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
+	};
 
-
-
-			void removeSourceLinks(const DataSource& source, bool updateDataSource = false)
-			{
-				//TODO protect this code by a mutex
-				std::pair<DataSourceLinks::iterator, DataSourceLinks::iterator> range(
-					_dataSourceLinks.equal_range(&source)
-				);
-				std::vector<DataSourceLinks::iterator> iterators;
-				for(DataSourceLinks::iterator it(range.first); it != range.second; ++it)
-				{
-					iterators.push_back(it);
-				}
-				BOOST_FOREACH(DataSourceLinks::iterator it, iterators)
-				{
-					if(updateDataSource)
-					{
-						source.removeLink(static_cast<T&>(*this), it->second);
-					}
-					_dataSourceLinks.erase(it);
-				}
-			}
-
-
-
-			void setDataSourceLinksWithRegistration(
-				const DataSourceLinks& value
-			){
-				// Unregister old links
-				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-				{
-					link.first->removeLink(static_cast<T&>(*this), link.second);
-				}
-
-				// Saving new links
-				setDataSourceLinksWithoutRegistration(value);
-
-				// Registering new links
-				BOOST_FOREACH(const DataSourceLinks::value_type& link, _dataSourceLinks)
-				{
-					link.first->addLink(static_cast<T&>(*this), link.second);
-				}
-			}
-
-
-
-			void addCodeBySource(
-				const DataSource& source,
-				const std::string& code,
-				bool storeLinkInDataSource = false
-			){
-				// Check if the code is not already registered
-				std::pair<DataSourceLinks::const_iterator, DataSourceLinks::const_iterator> range(
-					_dataSourceLinks.equal_range(&source)
-				);
-				for(DataSourceLinks::const_iterator it(range.first); it != range.second; ++it)
-				{
-					if(it->second == code)
-					{
-						return;
-					}
-				}
-
-				// Registration of the code
-				_dataSourceLinks.insert(make_pair(&source, code));
-				if(storeLinkInDataSource)
-				{
-					source.addLink(static_cast<T&>(*this), code);
-				}
-			}
-		};
+	namespace impex
+	{
+		FIELD_TYPE_EXTERNAL_DATA(DataSourceLinks);
 }	}
 
 #endif // SYNTHESE_Importable_h__

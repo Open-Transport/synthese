@@ -60,13 +60,13 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DepotTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DepotTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DepotTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DepotTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DepotTableSync::COL_NAME, SQL_TEXT),
+			Field(DepotTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 
@@ -120,7 +120,7 @@ namespace synthese
 			ReplaceQuery<DepotTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(
-				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
+				DataSourceLinks::Serialize(object->getDataSourceLinks())
 			);
 			if(object->hasGeometry())
 			{

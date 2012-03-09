@@ -67,20 +67,20 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ForumTopicTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ForumTopicTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ForumTopicTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(ForumTopicTableSync::COL_NODE_ID, SQL_INTEGER),
-			DBTableSync::Field(ForumTopicTableSync::COL_NODE_EXTENSION, SQL_TEXT),
-			DBTableSync::Field(ForumTopicTableSync::COL_USER_EMAIL, SQL_TEXT),
-			DBTableSync::Field(ForumTopicTableSync::COL_USER_NAME, SQL_TEXT),
-			DBTableSync::Field(ForumTopicTableSync::COL_USER_ID, SQL_INTEGER),
-			DBTableSync::Field(ForumTopicTableSync::COL_DATE, SQL_DATETIME),
-			DBTableSync::Field(ForumTopicTableSync::COL_PUBLISHED, SQL_BOOLEAN),
-			DBTableSync::Field(ForumTopicTableSync::COL_CLOSED, SQL_BOOLEAN),
-			DBTableSync::Field(ForumTopicTableSync::COL_IP, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ForumTopicTableSync::COL_NAME, SQL_TEXT),
+			Field(ForumTopicTableSync::COL_NODE_ID, SQL_INTEGER),
+			Field(ForumTopicTableSync::COL_NODE_EXTENSION, SQL_TEXT),
+			Field(ForumTopicTableSync::COL_USER_EMAIL, SQL_TEXT),
+			Field(ForumTopicTableSync::COL_USER_NAME, SQL_TEXT),
+			Field(ForumTopicTableSync::COL_USER_ID, SQL_INTEGER),
+			Field(ForumTopicTableSync::COL_DATE, SQL_DATETIME),
+			Field(ForumTopicTableSync::COL_PUBLISHED, SQL_BOOLEAN),
+			Field(ForumTopicTableSync::COL_CLOSED, SQL_BOOLEAN),
+			Field(ForumTopicTableSync::COL_IP, SQL_TEXT),
+			Field()
 		};
 
 

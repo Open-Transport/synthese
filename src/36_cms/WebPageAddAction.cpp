@@ -164,14 +164,14 @@ namespace synthese
 			DBTransaction transaction;
 
 			Webpage object;
-			object.setName(_title);
+			object.set<Title>(_title);
 			object.setRoot(_site.get());
-			object.setStartDate(second_clock::local_time());
+			object.set<StartTime>(second_clock::local_time());
 			object.setRank(_rank);
 
 			if(_template.get())
 			{
-				object.setContent(_template->getContent());
+				object.set<WebpageContent>(WebpageContent(_template->get<WebpageContent>().getCode()));
 				object.setParent(_template->getParent());
 			}
 

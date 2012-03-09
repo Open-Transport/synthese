@@ -64,16 +64,16 @@ namespace synthese
 		);
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TimetableRowTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
-			DBTableSync::Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_RANK, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_PLACE_ID, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_IS_DEPARTURE, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_IS_ARRIVAL, SQL_INTEGER),
+			Field(TimetableRowTableSync::COL_IS_COMPULSORY, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableRowTableSync>::_INDEXES[]=

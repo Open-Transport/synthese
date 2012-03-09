@@ -54,44 +54,8 @@ namespace synthese
 
 		DBTableSync::~DBTableSync ()
 		{
-
 		}
 
-
-
-		DBTableSync::Field::Field(
-			const std::string nameA, // std::string()
-			const FieldType typeA // SQL_TEXT
-		):	name(nameA),
-			type(typeA)
-		{
-		}
-
-
-
-		bool DBTableSync::Field::empty(
-		) const {
-			return name.empty();
-		}
-
-
-
-		bool DBTableSync::Field::isGeometry() const
-		{
-			switch(type)
-			{
-				case SQL_GEOM_GEOMETRYCOLLECTION:
-				case SQL_GEOM_LINESTRING:
-				case SQL_GEOM_MULTILINESTRING:
-				case SQL_GEOM_MULTIPOINT:
-				case SQL_GEOM_MULTIPOLYGON:
-				case SQL_GEOM_POINT:
-				case SQL_GEOM_POLYGON:
-					return true;
-				default:
-					return false;
-			}
-		}
 
 
 
@@ -136,7 +100,7 @@ namespace synthese
 				throw DBException("Inconsistent table name in parse table id");
 			}
 
-			ID = lexical_cast<TableId>(name.substr(1, 3));
+			ID = lexical_cast<RegistryTableType>(name.substr(1, 3));
 
 			if (ID == 0)
 			{

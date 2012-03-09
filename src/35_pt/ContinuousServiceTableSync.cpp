@@ -82,19 +82,19 @@ namespace synthese
 			"t017_continuous_services"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ContinuousServiceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ContinuousServiceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_SERVICENUMBER, SQL_TEXT),
+			Field(ContinuousServiceTableSync::COL_SCHEDULES, SQL_TEXT),
+			Field(ContinuousServiceTableSync::COL_PATHID, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_RANGE, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_MAXWAITINGTIME, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			Field(ContinuousServiceTableSync::COL_DATES, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=

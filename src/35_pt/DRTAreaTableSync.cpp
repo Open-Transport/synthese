@@ -62,12 +62,12 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DRTAreaTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DRTAreaTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DRTAreaTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DRTAreaTableSync::COL_STOPS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DRTAreaTableSync::COL_NAME, SQL_TEXT),
+			Field(DRTAreaTableSync::COL_STOPS, SQL_TEXT),
+			Field()
 		};
 
 

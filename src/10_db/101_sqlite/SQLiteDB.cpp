@@ -341,8 +341,10 @@ namespace synthese
 
 
 
-		bool SQLiteDB::isTableSchemaUpToDate(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		bool SQLiteDB::isTableSchemaUpToDate(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			// In the SQLite backend, the check to see if the schema is up to date is made by comparing the
 			// "CREATE TABLE" SQL returned by SQLite with a "CREATE TABLE" string that we build ourselves and
 			// that should match the value returned by SQLite if the schema is up to date.
@@ -353,7 +355,7 @@ namespace synthese
 				fields[0].name << "\" " << getSQLType(fields[0].type) <<
 				" UNIQUE PRIMARY KEY ON CONFLICT ROLLBACK";
 
-			for(size_t i(1); !fields[i].empty(); ++i)
+			for(size_t i(1); i!=fields.size(); ++i)
 			{
 				sql << ", \"";
 				sql << fields[i].name;
@@ -403,8 +405,10 @@ namespace synthese
 
 
 
-		std::string SQLiteDB::getCreateTableSQL(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		std::string SQLiteDB::getCreateTableSQL(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			std::stringstream sql;
 
 			// Init and primary key
@@ -414,7 +418,7 @@ namespace synthese
 
 			// Non geometry columns
 			size_t i(1);
-			for(; !fields[i].empty() && !fields[i].isGeometry(); ++i)
+			for(; i!=fields.size() && !fields[i].isGeometry(); ++i)
 			{
 				sql << ", \"";
 				sql << fields[i].name;
@@ -423,7 +427,7 @@ namespace synthese
 			sql << ");";
 
 			// Geometry columns
-			for(; !fields[i].empty() && fields[i].isGeometry(); ++i)
+			for(; i!=fields.size() && fields[i].isGeometry(); ++i)
 			{
 				sql << "SELECT AddGeometryColumn('" << tableName << "','" <<
 					fields[i].name << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() <<
@@ -434,7 +438,7 @@ namespace synthese
 			}
 
 			// Safety check
-			if(!fields[i].empty())
+			if(i!=fields.size())
 			{
 				util::Log::GetInstance().error(
 					"Fields are present after geometry column and will be ignored (possible data loss)."
@@ -444,11 +448,13 @@ namespace synthese
 			return sql.str();
 		}
 
-		void SQLiteDB::afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		void SQLiteDB::afterUpdateSchema(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			// Fix of the Spatialite bug
 			bool hasGeometryCol(false);
-			for(std::size_t i(0); !fields[i].empty(); ++i)
+			for(std::size_t i(0); i!=fields.size(); ++i)
 			{
 				if(fields[i].isGeometry())
 				{
@@ -490,8 +496,11 @@ namespace synthese
 
 
 
-		void SQLiteDB::createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[])
-		{
+		void SQLiteDB::createIndex(
+			const std::string& tableName,
+			const DBTableSync::Index& index,
+			const FieldsList& fields
+		){
 			std::stringstream s;
 			s	<< "CREATE INDEX " << _getIndexName(tableName, index)
 				<< " ON " << tableName << "(";

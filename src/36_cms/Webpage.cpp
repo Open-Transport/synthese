@@ -21,12 +21,14 @@
 */
 
 #include "Webpage.h"
+
 #include "ParametersMap.h"
 #include "DynamicRequest.h"
 #include "FunctionWithSite.h"
 #include "ServerModule.h"
 #include "WebPageDisplayFunction.h"
 #include "CMSModule.hpp"
+#include "Website.hpp"
 
 #include <boost/algorithm/string.hpp>
 
@@ -36,359 +38,146 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace cms;
+	using namespace db;
 	using namespace util;
 	using namespace server;
 
-	namespace util
-	{
-		template<> const string Registry<cms::Webpage>::KEY("Webpage");
+	CLASS_DEFINITION(Webpage, "t063_web_pages", 63)
+	FIELD_DEFINITION_OF_TYPE(SpecificTemplate, "specific_template_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(Abstract, "abstract", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ImageURL, "image", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(WebpageLinks, "links", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DoNotUseTemplate, "do_not_use_template", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(HasForum, "has_forum", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SmartURLPath, "smart_url_path", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SmartURLDefaultParameterName, "smart_url_default_parameter_name", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(RawEditor, "raw_editor", SQL_BOOLEAN)
+
+	template<> const Field ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[] = { Field("site_id", SQL_INTEGER), Field("up_id", SQL_INTEGER), Field("rank", SQL_INTEGER), Field() };
+	template<> const bool ComplexObjectFieldDefinition<WebpageTreeNode>::EXPORT_CONTENT_AS_FILE = false;
+
+	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::GetLinkedObjectsIds(
+		LinkedObjectsIds& list,
+		const Record& record
+	){
+		RegistryKeyType id(record.get<RegistryKeyType>(FIELDS[0].name));
+		if (id > 0)
+		{
+			list.push_back(id);
+		}
+
+		RegistryKeyType up_id(record.get<RegistryKeyType>(FIELDS[1].name));
+		if (up_id > 0)
+		{
+			list.push_back(up_id);
+		}
+	}
+
+	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::LoadFromRecord(
+		WebpageTreeNode::Type& fieldObject,
+		ObjectBase& object,
+		const Record& record,
+		const Env& env
+	){
+		assert(dynamic_cast<Webpage*>(&object));
+		Webpage& webpage(static_cast<Webpage&>(object));
+
+		webpage.setRank(record.get<size_t>(FIELDS[2].name));
+
+		RegistryKeyType id(record.get<RegistryKeyType>(FIELDS[0].name));
+		if (id > 0)
+		{
+			try
+			{
+				webpage.setRoot(env.getEditable<Website>(id).get());
+				webpage.getRoot()->addPage(webpage);
+			}
+			catch(ObjectNotFoundException<Website>&)
+			{
+				Log::GetInstance().warn(
+					"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
+					lexical_cast<string>(id) + " not found"
+				);
+			}
+		}
+
+		RegistryKeyType up_id(record.get<RegistryKeyType>(FIELDS[1].name));
+		if (up_id > 0)
+		{
+			try
+			{
+				Webpage::TreeNodeType::SetParent(webpage, env.getEditable<Webpage>(up_id).get());
+			}
+			catch(ObjectNotFoundException<Webpage>&)
+			{
+				Log::GetInstance().warn(
+					"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : up web page " +
+					lexical_cast<string>(up_id) + " not found"
+				);
+			}
+		}
+		else
+		{
+			Webpage::TreeNodeType::SetParent(webpage, NULL);
+		}
+	}
+
+	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::SaveToParametersMap(
+		const WebpageTreeNode::Type& fieldObject,
+		const ObjectBase& object,
+		util::ParametersMap& map,
+		const std::string& prefix
+	){
+		assert(dynamic_cast<const Webpage*>(&object));
+		const Webpage& webpage(static_cast<const Webpage&>(object));
+
+		map.insert(prefix + FIELDS[0].name, webpage.getRoot() ? webpage.getRoot()->getKey() : RegistryKeyType(0));	
+		map.insert(prefix + FIELDS[1].name, webpage.getParent() ? webpage.getParent()->getKey() : RegistryKeyType(0));
+		map.insert(prefix + FIELDS[2].name, webpage.getRank());
 	}
 
 	namespace cms
 	{
-		const string Webpage::DATA_PAGE_ = "page_";
-		const string Webpage::DATA_TITLE("title");
-		const string Webpage::DATA_ABSTRACT("abstract");
-		const string Webpage::DATA_IMAGE("image");
 		const string Webpage::DATA_PUBLICATION_DATE("date");
 		const string Webpage::DATA_FORUM("forum");
 		const string Webpage::DATA_DEPTH("depth");
+	}
 
-		const string Webpage::ForeachNode::DATA_RANK = "rank";
-		const string Webpage::ForeachNode::DATA_ITEMS_COUNT = "items_count";
-
-		const string Webpage::PARAMETER_VAR = "VAR";
-		synthese::util::shared_recursive_mutex Webpage::_SharedMutex;
-
-
-
+	namespace cms
+	{
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
-			_startDate(posix_time::not_a_date_time),
-			_endDate(posix_time::not_a_date_time),
-			_template(NULL),
-			_doNotUseTemplate(false),
-			_hasForum(false),
-			_ignoreWhiteChars(false),
-			_rawEditor(false)
-		{}
+			Object<Webpage, WebpageRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(WebpageTreeNode),
+					FIELD_DEFAULT_CONSTRUCTOR(Title),
+					FIELD_DEFAULT_CONSTRUCTOR(WebpageContent),
+					FIELD_VALUE_CONSTRUCTOR(StartTime, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(EndTime, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(MimeType, "text/html"),
+					FIELD_DEFAULT_CONSTRUCTOR(Abstract),
+					FIELD_DEFAULT_CONSTRUCTOR(ImageURL),
+					FIELD_DEFAULT_CONSTRUCTOR(WebpageLinks),
+					FIELD_VALUE_CONSTRUCTOR(DoNotUseTemplate, false),
+					FIELD_VALUE_CONSTRUCTOR(HasForum, false),
+					FIELD_DEFAULT_CONSTRUCTOR(SmartURLPath),
+					FIELD_DEFAULT_CONSTRUCTOR(SmartURLDefaultParameterName),
+					FIELD_VALUE_CONSTRUCTOR(RawEditor, false),
+					FIELD_DEFAULT_CONSTRUCTOR(SpecificTemplate)
+			)	)
+		{
+		}
 
 
 
 		bool Webpage::mustBeDisplayed( boost::posix_time::ptime now /*= boost::posix_time::second_clock::local_time()*/ ) const
 		{
 			return
-				(_startDate.is_not_a_date_time() || _startDate <= now) &&
-				(_endDate.is_not_a_date_time() || _endDate >= now)
+				(get<StartTime>().is_not_a_date_time() || get<StartTime>() <= now) &&
+				(get<EndTime>().is_not_a_date_time() || get<EndTime>() >= now)
 			;
-		}
-
-
-
-		std::string::const_iterator Webpage::_parse(
-			Webpage::Nodes& nodes,
-			std::string::const_iterator it,
-			std::string::const_iterator end,
-			std::set<std::string> termination
-		) const {
-
-			shared_ptr<TextNode> currentTextNode;
-
-			while(it != end)
-			{
-				// Ignore white chars
-				if(	_ignoreWhiteChars &&
-					(*it == ' ' || *it == '\r' || *it == '\n')
-				){
-					++it;
-					continue;
-				}
-
-				// Special characters
-				if(*it == '\\' && it+1 != end)
-				{
-					if(!currentTextNode.get())
-					{
-						currentTextNode.reset(new TextNode);
-					}
-					++it;
-					currentTextNode->text.push_back(*it);
-					++it;
-				} // Call to a public function
-				else if(*it == '<' && it+1 != end && *(it+1)=='?' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-
-					// Function node
-					shared_ptr<ServiceNode> node(new ServiceNode);
-
-					// function name
-					string functionName;
-					for(;it != end && *it != '&' && *it != '?'; ++it)
-					{
-						functionName.push_back(*it);
-					}
-					try
-					{
-						node->functionCreator = Factory<Function>::GetCreator(ParametersMap::Trim(functionName));
-
-						// parameters
-						if(it != end && *it == '?')
-						{
-							it += 2;
-						}
-						else
-						{
-							set<string> functionTermination;
-							functionTermination.insert("&");
-							functionTermination.insert("?>");
-							while(it != end && *it == '&')
-							{
-								stringstream parameterName;
-								it = _parseText(parameterName, it+1, end, "=");
-
-								if(it != end)
-								{
-									Nodes parameterNodes;
-									it = _parse(parameterNodes, it, end, functionTermination);
-
-									// Storage in template parameters if begins with VAR else in service parameters
-									string parameterNameStr(ParametersMap::Trim(parameterName.str()));
-									if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
-									{
-										node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
-									}
-									else
-									{
-										node->templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
-									}
-
-									if(*(it-1) != '&')
-									{
-										break;
-									}
-									--it;
-								}
-						}	}
-
-						nodes.push_back(static_pointer_cast<Node, ServiceNode>(node));
-					}
-					catch(FactoryException<Function>&)
-					{
-						for(; it != end && it+1 != end && *it != '?' && *(it+1) != '>' ; ++it) ;
-						if(it != end && *it == '?')
-						{
-							++it;
-							if(it != end && *it == '>')
-							{
-								++it;
-						}	}
-					}
-				} // Shortcut to GetValueFunction
-				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
-				{
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-
-					stringstream parameter;
-					it = _parseText(parameter, it+2, end, "@>");
-					shared_ptr<ValueNode> valueNode(new ValueNode);
-					valueNode->name = parameter.str();
-
-					nodes.push_back(static_pointer_cast<Node,ValueNode>(valueNode));
-
-				} // Foreach
-				else if(*it == '<' && it+1 != end && *(it+1)=='{' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-
-					// Function node
-					shared_ptr<ForeachNode> node(new ForeachNode);
-
-					// function name
-					for(;it != end && *it != '&' && *it != '}'; ++it)
-					{
-						node->arrayCode.push_back(*it);
-					}
-
-					// parameters
-					if(it != end && *it == '}')
-					{
-						it += 2;
-					}
-					else
-					{
-						set<string> functionTermination;
-						functionTermination.insert("&");
-						functionTermination.insert("}>");
-						while(it != end && *it == '&')
-						{
-							stringstream parameterName;
-							it = _parseText(parameterName, it+1, end, "=");
-
-							if(it != end)
-							{
-								Nodes parameterNodes;
-								it = _parse(parameterNodes, it, end, functionTermination);
-
-								if(parameterName.str() == WebPageDisplayFunction::PARAMETER_PAGE_ID)
-								{
-									node->pageCode = parameterNodes;
-								}
-								else
-								{
-									node->parameters.push_back(
-										make_pair(
-											ParametersMap::Trim(parameterName.str()),
-											parameterNodes
-									)	);
-								}
-
-								if(*(it-1) != '&')
-								{
-									break;
-								}
-								--it;
-							}
-					}	}
-
-					nodes.push_back(static_pointer_cast<Node, ForeachNode>(node));
-
-				} // Shortcut to WebPageDisplayFunction
-				else if(*it == '<' && it+1 != end && *(it+1)=='#' && it+2 != end)
-				{
-					++it;
-					++it;
-
-					// Handle current text node
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-
-					// Page node
-					shared_ptr<IncludeNode> node(new IncludeNode);
-
-					// page name
-					node->pageName = "!";
-					for(;it != end && *it != '&' && *it != '#'; ++it)
-					{
-						node->pageName.push_back(*it);
-					}
-					// parameters
-					if(it != end && *it == '#')
-					{
-						it += 2;
-					}
-					else
-					{
-						set<string> functionTermination;
-						functionTermination.insert("&");
-						functionTermination.insert("#>");
-						while(it != end && *it == '&')
-						{
-							stringstream parameterName;
-							it = _parseText(parameterName, it+1, end, "=");
-
-							if(it != end)
-							{
-								Nodes parameterNodes;
-								it = _parse(parameterNodes, it, end, functionTermination);
-								node->parameters.push_back(make_pair(ParametersMap::Trim(parameterName.str()), parameterNodes));
-								if(*(it-1) != '&')
-								{
-									break;
-								}
-								--it;
-							}
-						}
-					}
-
-					nodes.push_back(static_pointer_cast<Node,IncludeNode>(node));
-				} // Goto
-				else if(*it == '<' && it+1 != end && *(it+1)=='%' && it+2 != end)
-				{
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-					shared_ptr<GotoNode> node(new GotoNode);
-					set<string> gotoEnding;
-					gotoEnding.insert("%>");
-					it = _parse(node->direction, it+2, end, gotoEnding);
-					nodes.push_back(static_pointer_cast<Node,GotoNode>(node));
-
-				} // Label
-				else if(*it == '<' && it+1 != end && *(it+1)=='<' && it+2 != end)
-				{
-					if(currentTextNode.get())
-					{
-						nodes.push_back(currentTextNode);
-						currentTextNode.reset();
-					}
-					shared_ptr<LabelNode> node(new LabelNode);
-					stringstream s;
-					it = _parseText(s, it+2, end, ">>");
-					node->label = s.str();
-
-					nodes.push_back(static_pointer_cast<Node,LabelNode>(node));
-				} // Reached the end of a recursion level
-				else
-				{
-					BOOST_FOREACH(const string& test, termination)
-					{
-						if(size_t(end - it) >= test.size())
-						{
-							string testIt;
-							for(size_t i(0); i< test.size(); ++i)
-							{
-								testIt.push_back(*(it+i));
-							}
-							if(testIt == test)
-							{
-								if(currentTextNode.get())
-								{
-									nodes.push_back(static_pointer_cast<Node,TextNode>(currentTextNode));
-								}
-								return it+test.size();
-							}
-						}
-					}
-					if(!currentTextNode.get())
-					{
-						currentTextNode.reset(new TextNode);
-					}
-					currentTextNode->text.push_back(*it);
-					++it;
-				}
-			}
-
-			if(currentTextNode.get())
-			{
-				nodes.push_back(static_pointer_cast<Node,TextNode>(currentTextNode));
-			}
-			return it;
 		}
 
 
@@ -398,74 +187,31 @@ namespace synthese
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap
 		) const	{
-			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
-
-			Nodes::const_iterator itNode(_nodes.begin());
-			while(itNode != _nodes.end())
-			{
-				// Goto
-				if(dynamic_cast<GotoNode*>(itNode->get()))
-				{
-					// Search of label
-					stringstream label;
-					BOOST_FOREACH(const shared_ptr<Node>& node, static_cast<GotoNode*>(itNode->get())->direction)
-					{
-						node->display(label, request, additionalParametersMap, *this);
-					}
-					if(!label.str().empty())
-					{
-						Nodes::const_iterator itGotoNode(itNode+1);
-						for(; itGotoNode != _nodes.end(); ++itGotoNode)
-						{
-							if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
-							{
-								itNode = itGotoNode;
-								break;
-							}
-						}
-						if(itGotoNode == _nodes.end())
-						{
-							for(itGotoNode = _nodes.begin(); itGotoNode != itNode; ++itGotoNode)
-							{
-								if(dynamic_cast<LabelNode*>(itGotoNode->get()) && static_cast<LabelNode*>(itGotoNode->get())->label == label.str())
-								{
-									itNode = itGotoNode;
-									break;
-								}
-							}
-						}
-					}
-				}
-				else
-				{
-					(*itNode)->display(stream, request, additionalParametersMap,*this);
-				}
-				++itNode;
-			}
+			get<WebpageContent>().display(stream, request, additionalParametersMap, *this);
 		}
 
 
 
 		std::string Webpage::getMimeType() const
 		{
-			return _mimeType.empty() ? "text/html" : _mimeType;
+			return get<MimeType>().empty() ? "text/html" : get<MimeType>();
 		}
 
 
 
 		Webpage* Webpage::getTemplate() const
 		{
-			if(_doNotUseTemplate)
+			if(get<DoNotUseTemplate>())
 			{
 				return NULL;
 			}
-			if(_template && _template != this)
+			if(get<SpecificTemplate>() && get<SpecificTemplate>().get_ptr() != this)
 			{
-				return _template;
+				return this->get<SpecificTemplate>().get_ptr();
 			}
-			if(getRoot()->getDefaultTemplate() != this)
+			if(getRoot()->get<DefaultTemplate>().get_ptr() != this)
 			{
-				return getRoot()->getDefaultTemplate();
+				return getRoot()->get<DefaultTemplate>().get_ptr();
 			}
 			return NULL;
 		}
@@ -489,7 +235,7 @@ namespace synthese
 			string result;
 			for(const Webpage* page(this); page; page = page->getParent())
 			{
-				result = page->getName() + (result.empty() ? "/" : string()) + result;
+				result = page->get<Title>() + (result.empty() ? "/" : string()) + result;
 			}
 			if(getRoot())
 			{
@@ -500,283 +246,55 @@ namespace synthese
 
 
 
-		void Webpage::setContent( const std::string& value )
-		{
-			if(value != _content)
-			{
-				boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
-				_nodes.clear();
-				_parse(_nodes, value.begin(), value.end(), set<string>());
-			}
-			_content = value;
-		}
-
-
-
-		std::string::const_iterator Webpage::_parseText(
-			std::ostream& stream,
-			std::string::const_iterator it,
-			std::string::const_iterator end,
-			std::string termination
-		) const	{
-			std::string::const_iterator newEnd(search(it, end, termination.begin(), termination.end()));
-			for(; it != newEnd; ++it)
-			{
-				stream.put(*it);
-			}
-			return it == end ? end : newEnd + termination.size();
-		}
-
-
-
-		void Webpage::toParametersMap(
+		void Webpage::addAdditionalParameters(
 			util::ParametersMap& pm,
-			std::string prefix /*= std::string() */
+			const std::string& prefix
 		) const {
-			pm.insert(prefix + DATA_TITLE, getName());
 
-			pm.insert(prefix + DATA_ABSTRACT, getAbstract());
-			pm.insert(prefix + DATA_IMAGE, getImage());
-
+			// Deprecated : for backward compatibility, use start_time instead
 			pm.insert(
 				prefix + DATA_PUBLICATION_DATE,
-				getStartDate().is_not_a_date_time() ? string() : lexical_cast<string>(getStartDate())
+				get<StartTime>().is_not_a_date_time() ? string() : lexical_cast<string>(get<StartTime>())
 			);
 
-			pm.insert(prefix + Request::PARAMETER_OBJECT_ID, getKey());
-			pm.insert(prefix + DATA_FORUM, getHasForum());
+			// Deprecated : for backward compatibility, use id instead
+			pm.insert(prefix + Request::PARAMETER_OBJECT_ID, get<Key>());
 
+			// Deprecated : for backward compatibility, use has_forum instead
+			pm.insert(prefix + DATA_FORUM, get<HasForum>());
+
+			// Depth in the pages tree
 			pm.insert(prefix + DATA_DEPTH, getDepth());
 		}
 
 
 
-		void Webpage::ServiceNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const	{
-
-			// Service parameters evaluation
-			ParametersMap serviceParametersMap;
-			BOOST_FOREACH(const Parameters::value_type& param, serviceParameters)
+		SubObjects Webpage::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(const ChildrenType::value_type& page, getChildren())
 			{
-				stringstream s;
-				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
-				{
-					node->display(s, request, additionalParametersMap, page);
-				}
-				serviceParametersMap.insert(param.first, s.str());
+				r.push_back(page.second);
 			}
+			return r;
+		}
 
-			// Template parameters evaluation
-			ParametersMap templateParametersMap(request.getFunction()->getTemplateParameters());
-			BOOST_FOREACH(const Parameters::value_type& param, templateParameters)
-			{
-				stringstream s;
-				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
-				{
-					node->display(s, request, additionalParametersMap, page);
-				}
-				templateParametersMap.insert(param.first, s.str());
-			}
 
-			// Function
-			shared_ptr<Function> function(functionCreator->create());
-			try
+		void Webpage::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations
+		){
+			if(withAlgorithmOptimizations)
 			{
-				if(dynamic_cast<FunctionWithSiteBase*>(function.get()))
-				{
-					static_cast<FunctionWithSiteBase*>(function.get())->setSite(page.getRoot());
-				}
-				function->setTemplateParameters(templateParametersMap);
-				function->_setFromParametersMap(serviceParametersMap);
-				if (function->isAuthorized(request.getSession()))
-				{
-					function->run(stream, request);
-				}
-			}
-			catch(RequestException&)
-			{
-
-			}
-			catch(Request::RedirectException& e)
-			{
-				throw e;
-			}
-			catch(...)
-			{
-
+				getRoot()->addPage(*this);
 			}
 		}
 
 
 
-		void Webpage::LabelNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const {
-		}
-
-
-
-		void Webpage::GotoNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const {
-		}
-
-
-
-		void Webpage::ValueNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const	{
-
-			if(name == "client_url")
-			{
-				stream << request.getClientURL();
-			}
-			else if(name == "host_name")
-			{
-				stream << request.getHostName();
-			}
-			else if(name == "site")
-			{
-				const Website* site(page.getRoot());
-				if(site)
-				{
-					stream << site->getKey();
-				}
-			}
-			else
-			{
-				string value(additionalParametersMap.getDefault<string>(name));
-				if(value.empty())
-				{
-					value = request.getParametersMap().getDefault<string>(name);
-				}
-				else
-				{
-					stream << value;
-				}
-			}
-
-		}
-
-
-
-		void Webpage::IncludeNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const	{
-
-			// Parameters
-			ParametersMap pm;
-			BOOST_FOREACH(const Parameters::value_type& param, parameters)
-			{
-				stringstream s;
-				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
-				{
-					node->display(s, request, additionalParametersMap, page);
-				}
-				pm.insert(param.first, s.str());
-			}
-			pm.merge(additionalParametersMap);
-
-			Webpage* includedPage(page.getRoot()->getPageBySmartURL(pageName));
-			if(includedPage)
-			{
-				includedPage->display(stream, request, pm);
-			}
-
-		}
-
-
-
-		void Webpage::TextNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const {
-			stream << text;
-		}
-
-
-
-		void Webpage::ForeachNode::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
-		) const	{
-
-			if(	!additionalParametersMap.hasSubMaps(arrayCode)
-			){
-				return;
-			}
-
-			// Page load
-			stringstream pageCodeStream;
-			BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, pageCode)
-			{
-				node->display(pageCodeStream, request, additionalParametersMap, page);
-			}
-
-			string pageCodeStr(pageCodeStream.str());
-
-			if(pageCodeStr.empty())
-			{
-				return;
-			}
-
-			const Webpage* templatePage(
-				page.getRoot()->getPageByIdOrSmartURL(pageCodeStr)
-			);
-			if(!templatePage)
-			{
-				return;
-			}
-
-			// Base parameters map
-			ParametersMap baseParametersMap(additionalParametersMap);
-			BOOST_FOREACH(const Parameters::value_type& param, parameters)
-			{
-				stringstream s;
-				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
-				{
-					node->display(s, request, additionalParametersMap, page);
-				}
-				baseParametersMap.insert(param.first, s.str());
-			}
-
-			// Items read
-			const ParametersMap::SubParametersMap::mapped_type& items(
-				additionalParametersMap.getSubMaps(arrayCode)
-			);
-
-			size_t rank(0);
-			size_t itemsCount(items.size());
-
-			BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
-			{
-				ParametersMap pm(*item);
-				pm.merge(baseParametersMap);
-				pm.insert(DATA_RANK, rank++);
-				pm.insert(DATA_ITEMS_COUNT, itemsCount);
-
-				templatePage->display(stream, request, pm);
-			}
-
+		void Webpage::unlink()
+		{
+			getRoot()->removePage(get<SmartURLPath>());
+			Webpage::SetParent(*this, NULL);
 		}
 }	}

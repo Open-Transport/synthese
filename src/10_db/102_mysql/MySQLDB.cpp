@@ -376,16 +376,17 @@ namespace synthese
 
 
 
-		bool MySQLDB::isTableSchemaUpToDate(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		bool MySQLDB::isTableSchemaUpToDate(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			std::stringstream expectedSchema;
-			for(size_t i(1); !fields[i].empty(); ++i)
+			for(size_t i(1); i!=fields.size(); ++i)
 			{
 				expectedSchema << ", ";
 				expectedSchema << fields[i].name;
 				expectedSchema << " " << getSQLType(fields[i].type);
 			}
-
 			std::stringstream actualSchema;
 			std::vector<DB::ColumnInfo> columnInfos = getTableColumns(tableName);
 			size_t index(0);
@@ -439,8 +440,10 @@ namespace synthese
 
 
 
-		std::string MySQLDB::getCreateTableSQL(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		std::string MySQLDB::getCreateTableSQL(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			std::stringstream sql;
 
 			sql <<
@@ -448,7 +451,7 @@ namespace synthese
 				fields[0].name << "\" " << getSQLType(fields[0].type) <<
 				" PRIMARY KEY";
 
-			for(size_t i(1); !fields[i].empty(); ++i)
+			for(size_t i(1); i!=fields.size(); ++i)
 			{
 				sql << ", \"";
 				sql << fields[i].name;
@@ -474,8 +477,10 @@ namespace synthese
 
 
 
-		void MySQLDB::afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[])
-		{
+		void MySQLDB::afterUpdateSchema(
+			const std::string& tableName,
+			const FieldsList& fields
+		){
 			// Ignore tables without an identifier column.
 			if (fields[0].name != TABLE_COL_ID)
 			{
@@ -539,8 +544,11 @@ namespace synthese
 
 
 
-		void MySQLDB::createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[])
-		{
+		void MySQLDB::createIndex(
+			const std::string& tableName,
+			const DBTableSync::Index& index,
+			const FieldsList& fields
+		){
 			// MySQL requires a length to be specified in the index for types BLOB and TEXT.
 			// The code below checks the type of the column index and adds a length if needed.
 
@@ -548,7 +556,7 @@ namespace synthese
 			// between performance and index size.
 			const int TEXT_OR_BLOB_INDEX_LENGTH = 20;
 			std::map<std::string, std::string> fieldToType;
-			for(size_t i(1); !fields[i].empty(); ++i)
+			for(size_t i(1); i!=fields.size(); ++i)
 			{
 				fieldToType[fields[i].name] = getSQLType(fields[i].type);
 			}

@@ -26,7 +26,7 @@
 #include "NamedPlaceTemplate.h"
 #include "Hub.h"
 #include "Registry.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "CoordinatesSystem.hpp"
 
 #include <map>

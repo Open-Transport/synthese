@@ -79,20 +79,20 @@ namespace synthese
 			"t003_alarms"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<AlarmTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
-			DBTableSync::Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
-			DBTableSync::Field(AlarmTableSync::COL_PERIODSTART, SQL_DATETIME),
-			DBTableSync::Field(AlarmTableSync::COL_PERIODEND, SQL_DATETIME),
-			DBTableSync::Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
-			DBTableSync::Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(AlarmTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			Field(AlarmTableSync::COL_ENABLED, SQL_INTEGER),
+			Field(AlarmTableSync::COL_LEVEL, SQL_INTEGER),
+			Field(AlarmTableSync::COL_SHORT_MESSAGE, SQL_TEXT),
+			Field(AlarmTableSync::COL_LONG_MESSAGE, SQL_TEXT),
+			Field(AlarmTableSync::COL_PERIODSTART, SQL_DATETIME),
+			Field(AlarmTableSync::COL_PERIODEND, SQL_DATETIME),
+			Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
+			Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
+			Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmTableSync>::_INDEXES[]=

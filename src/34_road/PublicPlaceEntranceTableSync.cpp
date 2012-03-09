@@ -67,16 +67,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<PublicPlaceEntranceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<PublicPlaceEntranceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_ROAD_CHUNK_ID, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_METRIC_OFFSET, SQL_DOUBLE),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID, SQL_INTEGER),
+			Field(PublicPlaceEntranceTableSync::COL_NAME, SQL_TEXT),
+			Field(PublicPlaceEntranceTableSync::COL_ROAD_CHUNK_ID, SQL_INTEGER),
+			Field(PublicPlaceEntranceTableSync::COL_METRIC_OFFSET, SQL_DOUBLE),
+			Field(PublicPlaceEntranceTableSync::COL_NUMBER, SQL_INTEGER),
+			Field(PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 
@@ -168,7 +168,7 @@ namespace synthese
 			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMetricOffset());
 			query.addField(object->getHouseNumber() ? lexical_cast<string>(*object->getHouseNumber()) : string());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

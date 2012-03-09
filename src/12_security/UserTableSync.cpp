@@ -19,19 +19,21 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
+#include "UserTableSync.h"
 
+#include "ImportableTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "Language.hpp"
 #include "Profile.h"
-#include "UserTableSync.h"
 #include "ProfileTableSync.h"
 #include "User.h"
 #include "SecurityRight.h"
 #include "SecurityLog.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -41,6 +43,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace db;
+	using namespace impex;
 	using namespace util;
 	using namespace security;
 
@@ -67,6 +70,7 @@ namespace synthese
 		const string UserTableSync::COL_LOGIN_AUTHORIZED = "auth";
 		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
 		const string UserTableSync::COL_LANGUAGE = "language";
+		const string UserTableSync::COL_DATA_SOURCE_LINKS = "data_source_links";
 	}
 
 	namespace db
@@ -75,25 +79,26 @@ namespace synthese
 			"t026_users", true
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<UserTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<UserTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_PASSWORD_HASH, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
-			DBTableSync::Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_CITY_TEXT, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_CITY_ID, SQL_INTEGER),
-			DBTableSync::Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
-			DBTableSync::Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
-			DBTableSync::Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
-			DBTableSync::Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(UserTableSync::TABLE_COL_NAME, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_SURNAME, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_LOGIN, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_PASSWORD_HASH, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_PROFILE_ID, SQL_INTEGER),
+			Field(UserTableSync::TABLE_COL_ADDRESS, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_POST_CODE, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_CITY_TEXT, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_CITY_ID, SQL_INTEGER),
+			Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
+			Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
+			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
+			Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
+			Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
+			Field(UserTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<UserTableSync>::_INDEXES[]=
@@ -142,6 +147,23 @@ namespace synthese
 					env,
 					linkLevel
 				).get());
+
+				if(&env == &Env::GetOfficialEnv())
+				{
+					user->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(UserTableSync::COL_DATA_SOURCE_LINKS),
+							env
+					)	);
+				}
+				else
+				{
+					user->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(UserTableSync::COL_DATA_SOURCE_LINKS),
+							env
+					)	);
+				}
 			}
 		}
 
@@ -175,6 +197,7 @@ namespace synthese
 			query.addField(user->getConnectionAllowed());
 			query.addField(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
+			query.addField(DataSourceLinks::Serialize(user->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

@@ -74,17 +74,17 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CalendarTemplateElementTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
-			DBTableSync::Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CalendarTemplateElementTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			Field(CalendarTemplateElementTableSync::COL_RANK, SQL_INTEGER),
+			Field(CalendarTemplateElementTableSync::COL_MIN_DATE, SQL_DATE),
+			Field(CalendarTemplateElementTableSync::COL_MAX_DATE, SQL_DATE),
+			Field(CalendarTemplateElementTableSync::COL_INTERVAL, SQL_INTEGER),
+			Field(CalendarTemplateElementTableSync::COL_POSITIVE, SQL_INTEGER),
+			Field(CalendarTemplateElementTableSync::COL_INCLUDE_ID, SQL_INTEGER),
+			Field()
 		};
 
 

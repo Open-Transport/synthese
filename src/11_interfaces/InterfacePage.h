@@ -134,6 +134,11 @@ namespace synthese
 				, const void* object = NULL
 				, const server::Request* request = NULL
 			) const;
+
+			std::string _fakeFactoryKey;
+			virtual const std::string& getFactoryKey() const { return _fakeFactoryKey; }
+			InterfacePage* clone() const { return NULL; }
+
 		};
 	}
 }

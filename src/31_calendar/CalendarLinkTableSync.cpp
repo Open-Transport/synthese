@@ -62,15 +62,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CalendarLinkTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CalendarLinkTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarLinkTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarLinkTableSync::COL_START_DATE, SQL_TEXT),
-			DBTableSync::Field(CalendarLinkTableSync::COL_END_DATE, SQL_TEXT),
-			DBTableSync::Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
-			DBTableSync::Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CalendarLinkTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			Field(CalendarLinkTableSync::COL_START_DATE, SQL_TEXT),
+			Field(CalendarLinkTableSync::COL_END_DATE, SQL_TEXT),
+			Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			Field(CalendarLinkTableSync::COL_CALENDAR_TEMPLATE_ID2, SQL_INTEGER),
+			Field()
 		};
 
 

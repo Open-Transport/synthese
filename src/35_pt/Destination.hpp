@@ -25,7 +25,7 @@
 
 #include "Registrable.h"
 #include "Registry.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {

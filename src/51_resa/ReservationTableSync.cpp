@@ -89,31 +89,31 @@ namespace synthese
 			"t044_reservations", true
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ReservationTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_TRANSACTION_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_LINE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_LINE_CODE, SQL_TEXT),
-			DBTableSync::Field(ReservationTableSync::COL_SERVICE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_SERVICE_CODE, SQL_TEXT),
-			DBTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, SQL_TEXT),
-			DBTableSync::Field(ReservationTableSync::COL_DEPARTURE_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, SQL_TEXT),
-			DBTableSync::Field(ReservationTableSync::COL_ARRIVAL_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_DATETIME),
-			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_SEAT_NUMBER, SQL_TEXT),
-			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL, SQL_INTEGER),
-			DBTableSync::Field(ReservationTableSync::COL_CANCELLED_BY_OPERATOR, SQL_BOOLEAN),
-			DBTableSync::Field(ReservationTableSync::COL_ACKNOWLEDGE_TIME, SQL_DATETIME),
-			DBTableSync::Field(ReservationTableSync::COL_ACKNOWLEDGE_USER_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_TRANSACTION_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_LINE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_LINE_CODE, SQL_TEXT),
+			Field(ReservationTableSync::COL_SERVICE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_SERVICE_CODE, SQL_TEXT),
+			Field(ReservationTableSync::COL_DEPARTURE_PLACE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_DEPARTURE_PLACE_NAME, SQL_TEXT),
+			Field(ReservationTableSync::COL_DEPARTURE_TIME, SQL_DATETIME),
+			Field(ReservationTableSync::COL_ARRIVAL_PLACE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_ARRIVAL_PLACE_NAME, SQL_TEXT),
+			Field(ReservationTableSync::COL_ARRIVAL_TIME, SQL_DATETIME),
+			Field(ReservationTableSync::COL_RESERVATION_RULE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_ORIGIN_DATE_TIME, SQL_DATETIME),
+			Field(ReservationTableSync::COL_RESERVATION_DEAD_LINE, SQL_DATETIME),
+			Field(ReservationTableSync::COL_VEHICLE_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_SEAT_NUMBER, SQL_TEXT),
+			Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_DEPARTURE, SQL_INTEGER),
+			Field(ReservationTableSync::COL_VEHICLE_POSITION_ID_AT_ARRIVAL, SQL_INTEGER),
+			Field(ReservationTableSync::COL_CANCELLED_BY_OPERATOR, SQL_BOOLEAN),
+			Field(ReservationTableSync::COL_ACKNOWLEDGE_TIME, SQL_DATETIME),
+			Field(ReservationTableSync::COL_ACKNOWLEDGE_USER_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTableSync>::_INDEXES[]=

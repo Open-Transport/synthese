@@ -24,7 +24,7 @@
 #define SYNTHESE_road_PublicPlaceEntrance_hpp__
 
 #include "Address.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Named.h"
 #include "Registrable.h"
 
@@ -41,7 +41,7 @@ namespace synthese
 		*/
 		class PublicPlaceEntrance:
 			public Address,
-			public impex::Importable,
+			public impex::ImportableTemplate<PublicPlaceEntrance>,
 			public util::Named
 		{
 		public:

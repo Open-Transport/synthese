@@ -76,22 +76,22 @@ namespace synthese
 			"t036_display_types"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<DisplayTypeTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_NAME, SQL_TEXT),
+			Field(DisplayTypeTableSync::COL_DISPLAY_INTERFACE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_AUDIO_INTERFACE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_MONITORING_INTERFACE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_ROWS_NUMBER, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_DISPLAY_MAIN_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_DISPLAY_ROW_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_DISPLAY_DESTINATION_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_DISPLAY_TRANSFER_DESTINATION_PAGE_ID, SQL_INTEGER),
+			Field(DisplayTypeTableSync::COL_MONITORING_PARSER_PAGE_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayTypeTableSync>::_INDEXES[] =

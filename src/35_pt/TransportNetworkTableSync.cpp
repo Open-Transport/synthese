@@ -65,14 +65,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TransportNetworkTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
-			DBTableSync::Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_NAME, SQL_TEXT),
+			Field(TransportNetworkTableSync::COL_CREATOR_ID, SQL_TEXT),
+			Field(TransportNetworkTableSync::COL_DAYS_CALENDARS_PARENT_ID, SQL_INTEGER),
+			Field(TransportNetworkTableSync::COL_PERIODS_CALENDARS_PARENT_ID, SQL_INTEGER),
+			Field()
 		};
 
 
@@ -141,7 +141,7 @@ namespace synthese
 		){
 			ReplaceQuery<TransportNetworkTableSync> query(*object);
 			query.addField(object->getName());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(object->getDaysCalendarsParent() ? object->getDaysCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.addField(object->getPeriodsCalendarsParent() ? object->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);

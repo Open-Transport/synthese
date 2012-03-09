@@ -68,29 +68,21 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_NAME;
-			static const std::string PARAMETER_START_DATE;
-			static const std::string PARAMETER_END_DATE;
 			static const std::string PARAMETER_ONLINE_BOOKING;
 			static const std::string PARAMETER_USE_OLD_DATA;
 			static const std::string PARAMETER_MAX_CONNECTIONS;
 			static const std::string PARAMETER_USE_DATES_RANGE;
 			static const std::string PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL;
-			static const std::string PARAMETER_CLIENT_URL;
-			static const std::string PARAMETER_DEFAULT_PAGE_TEMPLATE_ID;
-
+			
 		private:
 			boost::shared_ptr<TransportWebsite>							_site;
 			std::string										_name;
-			boost::gregorian::date										_startDate;
-			boost::gregorian::date										_endDate;
 			bool											_onlineBooking;
 			bool											_useOldData;
-			int												_maxConnections;
+			size_t												_maxConnections;
 			boost::gregorian::date_duration							_useDatesRange;
 			bool											_displayRoadApproachDetail;
-			std::string							_clientURL;
-			boost::shared_ptr<cms::Webpage>			_defaultPageTemplate;
-
+			
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map

@@ -26,7 +26,9 @@
 #include <string>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
+#include "ImportableTemplate.hpp"
 #include "Registrable.h"
+
 #include "Registry.h"
 
 namespace synthese
@@ -49,8 +51,9 @@ namespace synthese
 				- des paramètres de personnalisation (demandes favorites...)
 
 		*/
-		class User
-		:	public virtual util::Registrable
+		class User:
+			public virtual util::Registrable,
+			public impex::ImportableTemplate<User>
 		{
 		public:
 

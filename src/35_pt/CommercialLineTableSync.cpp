@@ -103,27 +103,27 @@ namespace synthese
 			"t042_commercial_lines"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
-			DBTableSync::Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
-			DBTableSync::Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_NAME, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_SHORT_NAME, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_LONG_NAME, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_COLOR, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_STYLE, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_IMAGE, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_OPTIONAL_RESERVATION_PLACES, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_CREATOR_ID, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_BIKE_USE_RULE, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_HANDICAPPED_USE_RULE, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_PEDESTRIAN_USE_RULE, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_RESERVATION_CONTACT_ID, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_CALENDAR_TEMPLATE_ID, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
+			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
@@ -313,7 +313,7 @@ namespace synthese
 			query.addField(object->getStyle());
 			query.addField(object->getImage());
 			query.addField(optionalReservationPlaces.str());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :

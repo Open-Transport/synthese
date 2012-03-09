@@ -102,9 +102,9 @@ namespace synthese
 			)	);
 
 			if(	_useSmartURL &&
-				!_target->getSmartURLPath().empty()
+				!_target->get<SmartURLPath>().empty()
 			){	// URL is smart URL
-				url = _target->getSmartURLPath();
+				url = _target->get<SmartURLPath>();
 
 				// Parameters
 				if(!_parameters.getMap().empty())
@@ -119,9 +119,9 @@ namespace synthese
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
 				openRequest.getFunction()->setPage(_target);
 				openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
-				if(!_target->getRoot()->getClientURL().empty())
+				if(!_target->getRoot()->get<ClientURL>().empty())
 				{
-					openRequest.setClientURL(_target->getRoot()->getClientURL());
+					openRequest.setClientURL(_target->getRoot()->get<ClientURL>());
 				}
 				url = openRequest.getURL();
 

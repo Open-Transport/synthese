@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Named.h"
 #include "Registrable.h"
 #include "TreeNode.hpp"

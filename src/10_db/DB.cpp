@@ -356,9 +356,10 @@ namespace synthese
 
 
 
-		void DB::afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[])
-		{
-		}
+		void DB::afterUpdateSchema(
+			const std::string& tableName,
+			const FieldsList& fields
+		){}
 
 
 

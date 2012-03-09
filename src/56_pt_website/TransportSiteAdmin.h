@@ -31,7 +31,7 @@
 #include "WebPageTableSync.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "RoutePlannerFunction.h"
+#include "PTJourneyPlannerService.hpp"
 
 namespace synthese
 {
@@ -63,20 +63,16 @@ namespace synthese
 			public admin::AdminInterfaceElementTemplate<TransportSiteAdmin>
 		{
 		public:
-			static const std::string PARAMETER_SEARCH_PAGE;
 			static const std::string PARAMETER_SEARCH_RANK;
 			static const std::string PARAMETER_JOURNEY_PLANNING_ALGORITHM;
 
 			static const std::string TAB_PROPERTIES;
 			static const std::string TAB_PERIMETER;
-			static const std::string TAB_WEB_PAGES;
 			static const std::string TAB_ROUTE_PLANNING;
 
 		private:
 			boost::shared_ptr<const TransportWebsite>	_site;
-			pt_journey_planner::RoutePlannerFunction	_journeyPlanner;
-			std::string						_searchPage;
-			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
+			pt_journey_planner::PTJourneyPlannerService	_journeyPlanner;
 			bool							_pt_journey_planning;
 
 		public:

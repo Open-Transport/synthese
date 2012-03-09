@@ -158,19 +158,19 @@ namespace synthese
 			// Dates
 			_beginningDay = from_string(map.get<string>(PARAMETER_BEGINNING_DAY));
 			_beginningPeriodId = map.get<size_t>(PARAMETER_BEGINNING_PERIOD);
-			if (_beginningPeriodId >= _site->getPeriods().size())
+			if (_beginningPeriodId >= _site->get<Periods>().size())
 			{
 				throw RequestException("Bad value for beginning period id");
 			}
-			_beginningPeriod = &_site->getPeriods().at(_beginningPeriodId);
+			_beginningPeriod = &_site->get<Periods>().at(_beginningPeriodId);
 
 			_endingDay = from_string(map.get<string>(PARAMETER_ENDING_DAY));
 			_endingPeriodId = map.get<size_t>(PARAMETER_ENDING_PERIOD);
-			if (_endingPeriodId >= _site->getPeriods().size())
+			if (_endingPeriodId >= _site->get<Periods>().size())
 			{
 				throw RequestException("Bad value for ending period id");
 			}
-			_endingPeriod = &_site->getPeriods().at(_endingPeriodId);
+			_endingPeriod = &_site->get<Periods>().at(_endingPeriodId);
 
 			// Pages
 			try

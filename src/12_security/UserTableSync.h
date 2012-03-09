@@ -57,6 +57,7 @@ namespace synthese
 			static const std::string COL_LOGIN_AUTHORIZED;
 			static const std::string COL_BIRTH_DATE;
 			static const std::string COL_LANGUAGE;
+			static const std::string COL_DATA_SOURCE_LINKS;
 
 
 

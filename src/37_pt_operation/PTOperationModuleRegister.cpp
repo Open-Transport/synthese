@@ -3,13 +3,15 @@
 #include "PTOperationModule.hpp"
 
 #include "CompositionTableSync.hpp"
+#include "DeadRunTableSync.hpp"
 #include "DepotTableSync.hpp"
+#include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "VehicleTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
-#include "DeadRunTableSync.hpp"
 
+#include "DriverServicesListService.hpp"
 #include "GetCompositionsService.hpp"
 #include "GetVehiclesService.hpp"
 
@@ -37,6 +39,7 @@
 #include "Depot.hpp"
 #include "DeadRun.hpp"
 #include "DeadRunEdge.hpp"
+#include "DriverAllocation.hpp"
 #include "DriverService.hpp"
 #include "Vehicle.hpp"
 #include "VehiclePosition.hpp"
@@ -52,6 +55,7 @@ void synthese::pt_operation::moduleRegister()
 	// 37 PT Operation
 	synthese::pt_operation::DeadRunTableSync::integrate();
 	synthese::pt_operation::DepotTableSync::integrate();
+	synthese::pt_operation::DriverAllocationTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::pt_operation::CompositionTableSync::integrate();
@@ -67,6 +71,7 @@ void synthese::pt_operation::moduleRegister()
 
 	synthese::pt_operation::GetCompositionsService::integrate();
 	synthese::pt_operation::GetVehiclesService::integrate();
+	synthese::pt_operation::DriverServicesListService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
 
@@ -94,6 +99,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::Depot>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
+	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocation>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
 	synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehiclePosition>();

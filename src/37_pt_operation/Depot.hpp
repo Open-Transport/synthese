@@ -28,7 +28,7 @@
 #include "Registry.h"
 #include "Vertex.h"
 #include "Hub.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {

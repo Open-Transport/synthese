@@ -68,15 +68,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<JunctionTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<JunctionTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, SQL_INTEGER),
-			DBTableSync::Field(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, SQL_INTEGER),
-			DBTableSync::Field(JunctionTableSync::COL_LENGTH, SQL_INTEGER),
-			DBTableSync::Field(JunctionTableSync::COL_DURATION, SQL_INTEGER),
-			DBTableSync::Field(JunctionTableSync::COL_BIDIRECTIONAL, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(JunctionTableSync::COL_START_PHYSICAL_STOP_ID, SQL_INTEGER),
+			Field(JunctionTableSync::COL_END_PHYSICAL_STOP_ID, SQL_INTEGER),
+			Field(JunctionTableSync::COL_LENGTH, SQL_INTEGER),
+			Field(JunctionTableSync::COL_DURATION, SQL_INTEGER),
+			Field(JunctionTableSync::COL_BIDIRECTIONAL, SQL_INTEGER),
+			Field()
 		};
 
 

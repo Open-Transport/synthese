@@ -89,7 +89,7 @@ namespace synthese
 		) const {
 
 			size_t number(0);
-			BOOST_FOREACH(const Webpage::Links::value_type& link, _page->getLinks())
+			BOOST_FOREACH(const WebpageLinks::Type::value_type& link, _page->get<WebpageLinks>())
 			{
 				if(!link->mustBeDisplayed())
 				{
@@ -99,7 +99,7 @@ namespace synthese
 				if(_displayPage.get())
 				{
 					ParametersMap pm(getTemplateParameters());
-					link->toParametersMap(pm, string());
+					link->toParametersMap(pm, true);
 					_displayPage->display(stream, request, pm);
 				}
 				++number;
@@ -127,5 +127,4 @@ namespace synthese
 		{
 			return _displayPage.get() ? _displayPage->getMimeType() : "text/plain";
 		}
-	}
-}
+}	}

@@ -23,10 +23,15 @@
 #ifndef SYNTHESE_util_RegistryBase_h__
 #define SYNTHESE_util_RegistryBase_h__
 
+#include <vector>
+#include <boost/shared_ptr.hpp>
+
 namespace synthese
 {
 	namespace util
 	{
+		class Registrable;
+
 		/** RegistryBase class.
 			@ingroup m01
 		*/
@@ -37,6 +42,8 @@ namespace synthese
 
 			virtual ~RegistryBase() {}
 
+			typedef std::vector<boost::shared_ptr<Registrable> > RegistrablesVector;
+			virtual RegistrablesVector getRegistrablesVector() const = 0;
 		};
 	}
 }

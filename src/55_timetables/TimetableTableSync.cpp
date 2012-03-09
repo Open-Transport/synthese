@@ -81,20 +81,20 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
 		{
 
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_TITLE, SQL_TEXT),
-			DBTableSync::Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
-			DBTableSync::Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
-			DBTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
-			DBTableSync::Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
+			Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
+			Field(TimetableTableSync::COL_TITLE, SQL_TEXT),
+			Field(TimetableTableSync::COL_CALENDAR_ID, SQL_INTEGER),
+			Field(TimetableTableSync::COL_FORMAT, SQL_INTEGER),
+			Field(TimetableTableSync::COL_AUTHORIZED_LINES, SQL_TEXT),
+			Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
+			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
+			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
+			Field()
 		};
 
 

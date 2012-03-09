@@ -70,24 +70,24 @@ namespace synthese
 			"t061_pt_use_rules"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<PTUseRuleTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
-			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
-			DBTableSync::Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
-			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME, SQL_TIME),
-			DBTableSync::Field(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS, SQL_TEXT),
-			DBTableSync::Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
-			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, SQL_BOOLEAN),
-			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, SQL_BOOLEAN),
-			DBTableSync::Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_NAME, SQL_TEXT),
+			Field(PTUseRuleTableSync::COL_CAPACITY, SQL_TEXT),
+			Field(PTUseRuleTableSync::COL_RESERVATION_TYPE, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_ORIGINISREFERENCE, SQL_BOOLEAN),
+			Field(PTUseRuleTableSync::COL_MINDELAYMINUTES, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_MINDELAYDAYS, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_MAXDELAYDAYS, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_HOURDEADLINE, SQL_TIME),
+			Field(PTUseRuleTableSync::COL_RESERVATION_MIN_DEPARTURE_TIME, SQL_TIME),
+			Field(PTUseRuleTableSync::COL_RESERVATION_FORBIDDEN_DAYS, SQL_TEXT),
+			Field(PTUseRuleTableSync::COL_DEFAULT_FARE, SQL_INTEGER),
+			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_DEPARTURE_BOARDS, SQL_BOOLEAN),
+			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_TIMETABLES, SQL_BOOLEAN),
+			Field(PTUseRuleTableSync::COL_FORBIDDEN_IN_JOURNEY_PLANNING, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<PTUseRuleTableSync>::_INDEXES[]=

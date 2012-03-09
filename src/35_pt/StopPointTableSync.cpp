@@ -71,19 +71,19 @@ namespace synthese
 			"t012_physical_stops"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<StopPointTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(StopPointTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER),
-			DBTableSync::Field(StopPointTableSync::COL_X, SQL_DOUBLE),
-			DBTableSync::Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
-			DBTableSync::Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
-			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
-			DBTableSync::Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
-			DBTableSync::Field(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(StopPointTableSync::COL_NAME, SQL_TEXT),
+			Field(StopPointTableSync::COL_PLACEID, SQL_INTEGER),
+			Field(StopPointTableSync::COL_X, SQL_DOUBLE),
+			Field(StopPointTableSync::COL_Y, SQL_DOUBLE),
+			Field(StopPointTableSync::COL_OPERATOR_CODE, SQL_TEXT),
+			Field(StopPointTableSync::COL_PROJECTED_ROAD_CHUNK_ID, SQL_INTEGER),
+			Field(StopPointTableSync::COL_PROJECTED_METRIC_OFFSET, SQL_DOUBLE),
+			Field(StopPointTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<StopPointTableSync>::_INDEXES[]=
@@ -239,7 +239,7 @@ namespace synthese
 
 			// Data source links
 			query.addField(
-				ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks())
+				DataSourceLinks::Serialize(object->getDataSourceLinks())
 			);
 
 			// Projected point

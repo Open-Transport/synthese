@@ -28,7 +28,7 @@
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
 #include "Calendar.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "TreeNode.hpp"
 #include "Named.h"
 #include "TreeAlphabeticalOrderingPolicy.hpp"

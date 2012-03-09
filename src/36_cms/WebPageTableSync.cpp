@@ -24,10 +24,8 @@
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
 #include "DBResult.hpp"
-#include "Fetcher.h"
 #include "Website.hpp"
 #include "SelectQuery.hpp"
-#include "Conversion.h"
 
 #include <boost/foreach.hpp>
 
@@ -45,60 +43,21 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,WebPageTableSync>::FACTORY_KEY("36.10 Web pages");
 	}
 
-	namespace cms
-	{
-		const string WebPageTableSync::COL_TITLE = "title";
-		const string WebPageTableSync::COL_SITE_ID = "site_id";
-		const string WebPageTableSync::COL_UP_ID = "up_id";
-		const string WebPageTableSync::COL_RANK = "rank";
-		const string WebPageTableSync::COL_CONTENT1 = "content1";
-		const string WebPageTableSync::COL_START_TIME = "start_time";
-		const string WebPageTableSync::COL_END_TIME = "end_time";
-		const string WebPageTableSync::COL_MIME_TYPE = "mime_type";
-		const string WebPageTableSync::COL_ABSTRACT = "abstract";
-		const string WebPageTableSync::COL_IMAGE = "image";
-		const string WebPageTableSync::COL_LINKS = "links";
-		const string WebPageTableSync::COL_DO_NOT_USE_TEMPLATE = "do_not_use_template";
-		const string WebPageTableSync::COL_HAS_FORUM = "has_forum";
-		const string WebPageTableSync::COL_SMART_URL_PATH("smart_url_path");
-		const string WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME("smart_url_default_parameter_name");
-		const string WebPageTableSync::COL_IGNORE_WHITE_CHARS("ignore_white_chars");
-		const string WebPageTableSync::COL_RAW_EDITOR("raw_editor");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<WebPageTableSync>::TABLE(
 			"t063_web_pages"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<WebPageTableSync>::_FIELDS[] =
-		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(WebPageTableSync::COL_SITE_ID, SQL_INTEGER),
-			DBTableSync::Field(WebPageTableSync::COL_UP_ID, SQL_INTEGER),
-			DBTableSync::Field(WebPageTableSync::COL_RANK, SQL_INTEGER),
-			DBTableSync::Field(WebPageTableSync::COL_TITLE, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_CONTENT1, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_START_TIME, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_END_TIME, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_MIME_TYPE, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_ABSTRACT, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_IMAGE, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_LINKS, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE, SQL_BOOLEAN),
-			DBTableSync::Field(WebPageTableSync::COL_HAS_FORUM, SQL_BOOLEAN),
-			DBTableSync::Field(WebPageTableSync::COL_SMART_URL_PATH, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME, SQL_TEXT),
-			DBTableSync::Field(WebPageTableSync::COL_IGNORE_WHITE_CHARS, SQL_BOOLEAN),
-			DBTableSync::Field(WebPageTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
-			DBTableSync::Field()
-		};
+		template<> const Field DBTableSyncTemplate<WebPageTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<WebPageTableSync>::_INDEXES[] =
 		{
-			DBTableSync::Index(WebPageTableSync::COL_SITE_ID.c_str(), ""),
-			DBTableSync::Index(WebPageTableSync::COL_UP_ID.c_str(), WebPageTableSync::COL_RANK.c_str(), ""),
+			DBTableSync::Index(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[0].name.c_str(), ""),
+			DBTableSync::Index(
+				ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name.c_str(),
+				ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name.c_str(),
+			""),
 			DBTableSync::Index()
 		};
 
@@ -109,91 +68,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			webpage->setParent(NULL);
-			webpage->setNullRoot();
-			webpage->setName(rows->getText(WebPageTableSync::COL_TITLE));
-			webpage->setContent(rows->getText(WebPageTableSync::COL_CONTENT1));
-			webpage->setRank(rows->getInt(WebPageTableSync::COL_RANK));
-			webpage->setMimeType(rows->getText(WebPageTableSync::COL_MIME_TYPE));
-			webpage->setAbstract(rows->getText(WebPageTableSync::COL_ABSTRACT));
-			webpage->setImage(rows->getText(WebPageTableSync::COL_IMAGE));
-			webpage->setDoNotUseTemplate(rows->getBool(WebPageTableSync::COL_DO_NOT_USE_TEMPLATE));
-			webpage->setHasForum(rows->getBool(WebPageTableSync::COL_HAS_FORUM));
-			webpage->setSmartURLPath(rows->getText(WebPageTableSync::COL_SMART_URL_PATH));
-			webpage->setSmartURLDefaultParameterName(rows->getText(WebPageTableSync::COL_SMART_URL_DEFAULT_PARAMETER_NAME));
-			webpage->setIgnoreWhiteChars(rows->getBool(WebPageTableSync::COL_IGNORE_WHITE_CHARS));
-			webpage->setRawEditor(rows->getBool(WebPageTableSync::COL_RAW_EDITOR));
-
-			if(!rows->getText(WebPageTableSync::COL_START_TIME).empty())
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				webpage->setStartDate(rows->getDateTime(WebPageTableSync::COL_START_TIME));
+				DBModule::LoadObjects(webpage->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-			if(!rows->getText(WebPageTableSync::COL_END_TIME).empty())
+			webpage->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				webpage->setEndDate(rows->getDateTime(WebPageTableSync::COL_END_TIME));
-			}
-
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				RegistryKeyType id(rows->getLongLong(WebPageTableSync::COL_SITE_ID));
-				if (id > 0)
-				{
-					try
-					{
-						webpage->setRoot(Fetcher<Website>::FetchEditable(id, env, linkLevel).get());
-						webpage->getRoot()->addPage(*webpage);
-					}
-					catch(ObjectNotFoundException<Website>&)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : website " +
-							lexical_cast<string>(id) + " not found"
-						);
-					}
-				}
-
-				RegistryKeyType up_id(rows->getLongLong(WebPageTableSync::COL_UP_ID));
-				if (up_id > 0)
-				{
-					try
-					{
-						Webpage::SetParent(*webpage, WebPageTableSync::GetEditable(up_id, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<Webpage>&)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : up web page " +
-							lexical_cast<string>(up_id) + " not found"
-						);
-					}
-				}
-
-				vector<string> links(Conversion::ToStringVector(rows->getText(WebPageTableSync::COL_LINKS)));
-				Webpage::Links pageLinks;
-				BOOST_FOREACH(const string& link, links)
-				{
-					try
-					{
-						pageLinks.push_back(
-							WebPageTableSync::GetEditable(lexical_cast<RegistryKeyType>(link), env, linkLevel).get()
-						);
-					}
-					catch(bad_lexical_cast&)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : link " +
-							link + " is not a page id"
-						);
-					}
-					catch(ObjectNotFoundException<Webpage>&)
-					{
-						Log::GetInstance().warn(
-							"Data corrupted in "+ TABLE.NAME + " on web page " + lexical_cast<string>(webpage->getKey()) +" : link " +
-							link + " not found"
-						);
-					}
-				}
-				webpage->setLinks(pageLinks);
+				webpage->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -202,53 +84,20 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Unlink(
 			Webpage* obj
 		){
-			if(obj->getRoot())
-			{
-				obj->getRoot()->removePage(obj->getSmartURLPath());
-			}
-			Webpage::SetParent(*obj, NULL);
+			obj->unlink();
 		}
+
 
 
 		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
 			Webpage* webPage,
 			optional<DBTransaction&> transaction
 		){
-			// Links preparation
-			stringstream linksStream;
-			bool first(true);
-			BOOST_FOREACH(const Webpage::Links::value_type& link, webPage->getLinks())
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					linksStream << ",";
-				}
-				linksStream << link->getKey();
-			}
-
 			// Query
 			ReplaceQuery<WebPageTableSync> query(*webPage);
-			query.addField(webPage->getRoot() ? webPage->getRoot()->getKey() : RegistryKeyType(0));
-			query.addField(webPage->getParent() ? webPage->getParent()->getKey() : RegistryKeyType(0));
-			query.addField(static_cast<int>(webPage->getRank()));
-			query.addField(webPage->getName());
-			query.addField(webPage->getContent());
-			query.addField(webPage->getStartDate());
-			query.addField(webPage->getEndDate());
-			query.addField(webPage->_getMimeType());
-			query.addField(webPage->getAbstract());
-			query.addField(webPage->getImage());
-			query.addField(linksStream.str());
-			query.addField(webPage->getDoNotUseTemplate());
-			query.addField(webPage->getHasForum());
-			query.addField(webPage->getSmartURLPath());
-			query.addField(webPage->getSmartURLDefaultParameterName());
-			query.addField(webPage->getIgnoreWhiteChars());
-			query.addField(webPage->getRawEditor());
+			ParametersMap map;
+			webPage->toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
@@ -270,19 +119,23 @@ namespace synthese
 		){
 			SelectQuery<WebPageTableSync> query;
 			Env env;
-			query.addWhereField(WebPageTableSync::COL_LINKS, "%"+ lexical_cast<string>(id) +"%", ComposedExpression::OP_LIKE);
+			query.addWhereField(
+				ObjectFieldDefinition<WebpageLinks>::FIELD.name,
+				"%"+ lexical_cast<string>(id) +"%",
+				ComposedExpression::OP_LIKE
+			);
 			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
 			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
 			{
-				Webpage::Links newLinks;
-				BOOST_FOREACH(Webpage* linkedPage, page->getLinks())
+				WebpageLinks::Type newLinks;
+				BOOST_FOREACH(Webpage* linkedPage, page->get<WebpageLinks>())
 				{
 					if(linkedPage->getKey() != id)
 					{
 						newLinks.push_back(linkedPage);
 					}
 				}
-				page->setLinks(newLinks);
+				page->set<WebpageLinks>(newLinks);
 				WebPageTableSync::Save(page.get(), transaction);
 			}
 		}
@@ -331,7 +184,7 @@ namespace synthese
 			SelectQuery<WebPageTableSync> query;
 			if (siteId)
 			{
-				query.addWhereField(COL_SITE_ID, *siteId);
+				query.addWhereField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[0].name, *siteId);
 			}
 			if(parentId)
 			{
@@ -339,27 +192,31 @@ namespace synthese
 				{
 					query.addWhere(
 						ComposedExpression::Get(
-							ComposedExpression::Get(FieldExpression::Get(TABLE.NAME, COL_UP_ID), ComposedExpression::OP_EQ, ValueExpression<RegistryKeyType>::Get(0)),
+							ComposedExpression::Get(
+								FieldExpression::Get(TABLE.NAME, ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name),
+								ComposedExpression::OP_EQ,
+								ValueExpression<RegistryKeyType>::Get(0)
+							),
 							ComposedExpression::OP_OR,
-							IsNullExpression::Get(FieldExpression::Get(TABLE.NAME, COL_UP_ID))
+							IsNullExpression::Get(FieldExpression::Get(TABLE.NAME, ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name))
 					)	);
 				}
 				else
 				{
-					query.addWhereField(COL_UP_ID, *parentId);
+					query.addWhereField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name, *parentId);
 				}
 			}
 			if(rank)
 			{
-				query.addWhereField(COL_RANK, *rank);
+				query.addWhereField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name, *rank);
 			}
 			if(orderByRank)
 			{
-				query.addOrderField(COL_RANK, raisingOrder);
+				query.addOrderField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name, raisingOrder);
 			}
 			else if (orderByTitle)
 			{
-				query.addOrderField(COL_TITLE, raisingOrder);
+				query.addOrderField(ObjectFieldDefinition<Title>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -404,28 +261,34 @@ namespace synthese
 			bool add,
 			db::DBTransaction& transaction
 		){
-			RankUpdateQuery<WebPageTableSync> query(COL_RANK, add ? 1 : -1, rank);
-			query.addWhereField(COL_SITE_ID, siteId);
-			query.addWhereField(COL_UP_ID, parentId);
+			RankUpdateQuery<WebPageTableSync> query(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name, add ? 1 : -1, rank);
+			query.addWhereField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[0].name, siteId);
+			query.addWhereField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name, parentId);
 			query.execute(transaction);
 		}
 
 		db::RowsList WebPageTableSync::SearchForAutoComplete(
 				const boost::optional<std::string> prefix,
 				const boost::optional<std::size_t> limit
-			) const {
-				RowsList result;
+		) const {
+			RowsList result;
 
-				SelectQuery<WebPageTableSync> query;
-				Env env;
-				if(prefix) query.addWhereField(WebPageTableSync::COL_TITLE, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
-				if(limit) query.setNumber(*limit);
-				query.addOrderField(COL_RANK,true);
-				WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
-				BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
-				{
-					result.push_back(std::make_pair(page->getKey(), page->getName()));
-				}
-				return result;
+			SelectQuery<WebPageTableSync> query;
+			Env env;
+			if(prefix)
+			{
+				query.addWhereField(ObjectFieldDefinition<Title>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+			}
+			if(limit)
+			{
+				query.setNumber(*limit);
+			}
+			query.addOrderField(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name,true);
+			WebPageTableSync::SearchResult pages(WebPageTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+			BOOST_FOREACH(const shared_ptr<Webpage>& page, pages)
+			{
+				result.push_back(std::make_pair(page->getKey(), page->getName()));
+			}
+			return result;
 		} ;
 }	}

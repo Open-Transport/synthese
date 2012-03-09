@@ -61,14 +61,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CityAliasTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<CityAliasTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CityAliasTableSync::COL_ALIASED_CITY_ID, SQL_INTEGER),
-			DBTableSync::Field(CityAliasTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(CityAliasTableSync::COL_CODE, SQL_TEXT),
-			DBTableSync::Field(CityAliasTableSync::COL_VISIBLE, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CityAliasTableSync::COL_ALIASED_CITY_ID, SQL_INTEGER),
+			Field(CityAliasTableSync::COL_NAME, SQL_TEXT),
+			Field(CityAliasTableSync::COL_CODE, SQL_TEXT),
+			Field(CityAliasTableSync::COL_VISIBLE, SQL_INTEGER),
+			Field()
 		};
 
 

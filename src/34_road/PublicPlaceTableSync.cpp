@@ -62,14 +62,14 @@ namespace synthese
 			"t013_public_places"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER),
-			DBTableSync::Field(PublicPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
+			Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			Field(PublicPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<PublicPlaceTableSync>::_INDEXES[]=
@@ -177,7 +177,7 @@ namespace synthese
 			ReplaceQuery<PublicPlaceTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry())); // Must stay at last position
 			query.execute(transaction);
 		}

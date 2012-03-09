@@ -24,7 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayMonitoringStatusTableSync.h"
-#include "DisplayMonitoringStatus.h"
+
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
@@ -79,27 +79,27 @@ namespace synthese
 		);
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_DATETIME),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_EEPROM_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMP_SENSOR_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_LIGHT_DETAIL, SQL_TEXT),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_DETAIL, SQL_TEXT),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_SOUND_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_SOUND_DETAIL, SQL_TEXT),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_VALUE, SQL_DOUBLE),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_COMMUNICATION_STATUS, SQL_INTEGER),
-			DBTableSync::Field(DisplayMonitoringStatusTableSync::COL_LOCALIZATION_STATUS, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_SCREEN_ID, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_TIME, SQL_DATETIME),
+			Field(DisplayMonitoringStatusTableSync::COL_GENERAL_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_MEMORY_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_CLOCK_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_EEPROM_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_TEMP_SENSOR_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_LIGHT_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_LIGHT_DETAIL, SQL_TEXT),
+			Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_DISPLAY_DETAIL, SQL_TEXT),
+			Field(DisplayMonitoringStatusTableSync::COL_SOUND_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_SOUND_DETAIL, SQL_TEXT),
+			Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_TEMPERATURE_VALUE, SQL_DOUBLE),
+			Field(DisplayMonitoringStatusTableSync::COL_COMMUNICATION_STATUS, SQL_INTEGER),
+			Field(DisplayMonitoringStatusTableSync::COL_LOCALIZATION_STATUS, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::_INDEXES[] =

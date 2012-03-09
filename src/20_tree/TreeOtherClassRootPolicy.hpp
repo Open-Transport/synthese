@@ -49,6 +49,28 @@ namespace synthese
 			void setSameRoot(const TreeOtherClassRootPolicy<O>& value){ _root = value._root; }
 
 			void setNullRoot(){ _root = NULL; }
+
+			template<class C>
+			void registerChildToRoot(C& child)
+			{
+				if(_root)
+				{
+					_root->getChildren().insert(
+						std::make_pair(child.getTreeOrderingKey(), &child)
+					);
+				}
+			}
+
+			template<class C>
+			void unregisterChildFromRoot(C& child)
+			{
+				if(_root)
+				{
+					_root->getChildren().erase(
+						child.getTreeOrderingKey()
+					);
+				}
+			}
 		};
 	}
 }

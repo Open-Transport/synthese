@@ -26,7 +26,7 @@
 #include "Address.h"
 #include "NamedPlaceTemplate.h"
 #include "RoadPlace.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {

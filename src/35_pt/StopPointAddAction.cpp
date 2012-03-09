@@ -83,7 +83,7 @@ namespace synthese
 			}
 			map.insert(
 				PARAMETER_OPERATOR_CODE,
-				ImportableTableSync::SerializeDataSourceLinks(_operatorCode)
+				DataSourceLinks::Serialize(_operatorCode)
 			);
 			if(_point.get() && !_point->isEmpty())
 			{

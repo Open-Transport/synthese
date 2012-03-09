@@ -40,6 +40,8 @@ namespace synthese
 			OrderingKeyType _rank;
 
 		public:
+			TreeRankOrderingPolicy() : _rank(0) {}
+
 			//! @name Getters
 			//@{
 				OrderingKeyType getRank() const { return _rank; }

@@ -25,10 +25,11 @@
 #ifndef SYNTHESE_db_DBDirectTableSyncTemplate_hpp__
 #define SYNTHESE_db_DBDirectTableSyncTemplate_hpp__
 
+#include "DBDirectTableSync.hpp"
+#include "DBTableSyncTemplate.hpp"
 
 #include "DBTypes.h"
 #include "DB.hpp"
-#include "DBTableSyncTemplate.hpp"
 #include "DBResult.hpp"
 #include "DBEmptyResultException.h"
 #include "DBException.hpp"
@@ -70,7 +71,9 @@ namespace synthese
 		///	@ingroup m10
 		////////////////////////////////////////////////////////////////////////
 		template <class K, class T>
-		class DBDirectTableSyncTemplate : public DBTableSyncTemplate<K>
+		class DBDirectTableSyncTemplate:
+			public DBTableSyncTemplate<K>,
+			public DBDirectTableSync
 		{
 		public:
 			typedef K		TableSync;
@@ -79,6 +82,24 @@ namespace synthese
 
 
 		public:
+			static FieldsList GetFieldsList()
+			{
+				if(_FIELDS[0].empty())
+				{
+					T object;
+					return object.getFields();
+				}
+				else
+				{
+					FieldsList l;
+					for(size_t i(0); !_FIELDS[i].empty(); ++i)
+					{
+						l.push_back(_FIELDS[i]);
+					}
+					return l;
+				}
+			}
+
 			////////////////////////////////////////////////////////////////////
 			/// Object fetcher, with read/write permissions.
 			///	@param key UID of the object
@@ -124,6 +145,14 @@ namespace synthese
 				return object;
 			}
 
+			virtual boost::shared_ptr<util::Registrable> getEditableRegistrable(
+				util::RegistryKeyType key,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			) const {
+				return boost::dynamic_pointer_cast<util::Registrable, T>(GetEditable(key, environment, linkLevel, autoCreate));
+			}
 
 
 			/** Object fetcher, with read only permissions.
@@ -147,6 +176,19 @@ namespace synthese
 				return boost::const_pointer_cast<const T>(GetEditable(key,environment,linkLevel,autoCreate));
 			}
 
+
+
+			virtual boost::shared_ptr<const util::Registrable> getRegistrable(
+				util::RegistryKeyType key,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			) const {
+				return boost::dynamic_pointer_cast<const util::Registrable, const T>(Get(key, environment, linkLevel, autoCreate));
+			}
+
+
+
 			/** Object properties loader from the database.
 				@param obj Pointer to the object to load from the database
 				@param rows Row to read
@@ -163,6 +205,14 @@ namespace synthese
 			);
 
 
+			virtual void loadRegistrable(
+				util::Registrable& obj,
+				const DBResultSPtr& rows,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			) const {
+				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
+			}
 
 			static void Unlink(
 				T* obj
@@ -184,6 +234,14 @@ namespace synthese
 			);
 
 
+			virtual void saveRegistrable(
+				util::Registrable& obj,
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
+			) const {
+				Save(&dynamic_cast<T&>(obj), transaction);
+			}
+
+
 
 			////////////////////////////////////////////////////////////////////
 			///	Object creator helper.
@@ -197,6 +255,14 @@ namespace synthese
 				const DBResultSPtr& row
 			){
 				return boost::shared_ptr<T>(new T(row->getKey()));
+			}
+
+
+
+			virtual boost::shared_ptr<util::Registrable> createRegistrable(
+				const DBResultSPtr& row
+			) const	{
+				return boost::dynamic_pointer_cast<util::Registrable, T>(GetNewObject(row));
 			}
 
 
