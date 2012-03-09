@@ -106,7 +106,7 @@ namespace synthese
 	{
 		ObjectField<C, T>::UnSerialize(
 			fieldObject,
-			record.getDefault<std::string>(FIELD.name),
+			record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name),
 			env
 		);
 	}
@@ -115,7 +115,7 @@ namespace synthese
 	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
 	{
 		map.insert(
-			prefix + FIELD.name,
+			prefix + ObjectFieldDefinition<C>::FIELD.name,
 			ObjectField<C, T>::Serialize(fieldObject)
 		);
 	}
@@ -124,7 +124,7 @@ namespace synthese
 	template<class C, class T>
 	void SimpleObjectField<C, T>::GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
 	{
-		ObjectField<C, T>::GetLinkedObjectsIdsFromText(list, record.getDefault<std::string>(FIELD.name));
+		ObjectField<C, T>::GetLinkedObjectsIdsFromText(list, record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name));
 	}
 }
 
