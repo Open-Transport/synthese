@@ -11,6 +11,7 @@ Field.hpp
 FrameworkTypes.hpp	
 Language.cpp
 Language.hpp
+Object.cpp
 Object.hpp
 ObjectBase.hpp
 ObjectField.hpp
