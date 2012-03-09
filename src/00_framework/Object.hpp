@@ -23,9 +23,6 @@
 #ifndef SYNTHESE__Object_hpp__
 #define SYNTHESE__Object_hpp__
 
-#define FUSION_MAX_VECTOR_SIZE 30
-#define FUSION_MAX_MAP_SIZE 30
-
 #include "ObjectField.hpp"
 #include "UtilTypes.h"
 #include "ObjectBase.hpp"
