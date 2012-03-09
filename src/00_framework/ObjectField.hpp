@@ -27,6 +27,7 @@
 #include "FrameworkTypes.hpp"
 #include "ParametersMap.h"
 #include "Record.hpp"
+#include "ObjectBase.hpp"
 
 namespace synthese
 {
