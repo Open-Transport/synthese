@@ -26,12 +26,10 @@
 #define SYNTHESE_WebsiteAdmin_H__
 
 #include "AdminInterfaceElementTemplate.h"
-#include "GraphTypes.h"
 #include "ResultHTMLTable.h"
 #include "WebPageTableSync.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "RoutePlannerFunction.h"
 
 namespace synthese
 {
@@ -46,12 +44,7 @@ namespace synthese
 		class WebPageDisplayFunction;
 		class WebPageRemoveAction;
 		class WebPageAddAction;
-	}
-
-	namespace pt_website
-	{
 		class Website;
-		class RollingStockFilter;
 
 
 		/** Transport web site administration page class.
@@ -65,19 +58,14 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_SEARCH_PAGE;
 			static const std::string PARAMETER_SEARCH_RANK;
-			static const std::string PARAMETER_JOURNEY_PLANNING_ALGORITHM;
 
 			static const std::string TAB_PROPERTIES;
-			static const std::string TAB_PERIMETER;
 			static const std::string TAB_WEB_PAGES;
-			static const std::string TAB_ROUTE_PLANNING;
 
 		private:
 			boost::shared_ptr<const Website>	_site;
-			pt_journey_planner::RoutePlannerFunction	_journeyPlanner;
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
-			bool							_pt_journey_planning;
 
 		public:
 			WebsiteAdmin();
