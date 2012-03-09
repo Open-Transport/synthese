@@ -49,6 +49,22 @@ namespace synthese
 
 	struct GetLinkedObjectsIdsOperator;
 
+	struct GetFieldsOperator
+	{
+		FieldsList& _list;
+
+		GetFieldsOperator(
+			FieldsList& list
+		):	_list(list)
+		{}
+
+		template <typename Pair>
+		void operator()(Pair& data) const
+		{
+			Pair::first_type::AddFields(_list);
+		}
+	};
+
 	FIELD_TYPE(Key, util::RegistryKeyType)
 
 	//////////////////////////////////////////////////////////////////////////
@@ -350,23 +366,6 @@ namespace synthese
 		}
 	}
 
-
-
-	struct GetFieldsOperator
-	{
-		FieldsList& _list;
-
-		GetFieldsOperator(
-			FieldsList& list
-		):	_list(list)
-		{}
-
-		template <typename Pair>
-		void operator()(Pair& data) const
-		{
-			Pair::first_type::AddFields(_list);
-		}
-	};
 
 
 
