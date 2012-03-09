@@ -200,14 +200,14 @@ namespace synthese
 					"<rss version=\"2.0\" xmlns:atom=\"http://www.w3.org/2005/Atom\">" <<
 					"<channel>" <<
 					"<title>" << rootPage->getName() << "</title>" <<
-					"<description><![CDATA[" << rootPage->getAbstract() << "]]></description>" <<
+					"<description><![CDATA[" << rootPage->get<Abstract>() << "]]></description>" <<
 					"<link>" << HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link>" <<
 					"<generator>SYNTHESE " << ServerModule::VERSION << "</generator>"
 				;
-				if(!rootPage->getImage().empty())
+				if(!rootPage->get<ImageURL>().empty())
 				{
-					stream << "<image><url>" << rootPage->getImage() << "</url><title>" <<
-						rootPage->getName() << "</title><link>" <<
+					stream << "<image><url>" << rootPage->get<ImageURL>() << "</url><title>" <<
+						rootPage->get<Title>() << "</title><link>" <<
 						HTMLModule::HTMLEncode(openRequest.getURL(true, true)) << "</link></image>"
 					;
 				}
@@ -343,20 +343,20 @@ namespace synthese
 				{
 					stream <<
 						"<item>" <<
-						"<title>" << root->getName() << "</title>" <<
-						"<description><![CDATA[" << root->getAbstract() << "]]></description>" <<
+						"<title>" << root->get<Title>() << "</title>" <<
+						"<description><![CDATA[" << root->get<Abstract>() << "]]></description>" <<
 						"<link>" << HTMLModule::HTMLEncode(subPageRequest.getURL(true, true)) << "</link>" <<
 						"<guid isPermaLink=\"true\">" << HTMLModule::HTMLEncode(subPageRequest.getURL(true, true)) << "</guid>"
 					;
-					if(!root->getStartDate().is_not_a_date_time())
+					if(!root->get<StartTime>().is_not_a_date_time())
 					{
 						stream <<
 							"<pubDate>" <<
-							root->getStartDate().date().day_of_week() << ", " <<
-							root->getStartDate().date().day() << " " <<
-							root->getStartDate().date().month() << " " <<
-							root->getStartDate().date().year() << " " <<
-							root->getStartDate().time_of_day() << " " <<
+							root->get<StartTime>().date().day_of_week() << ", " <<
+							root->get<StartTime>().date().day() << " " <<
+							root->get<StartTime>().date().month() << " " <<
+							root->get<StartTime>().date().year() << " " <<
+							root->get<StartTime>().time_of_day() << " " <<
 							"+0100" <<
 							"</pubDate>"
 						;
@@ -372,7 +372,11 @@ namespace synthese
 						)
 					;
 
-					stream << HTMLModule::getHTMLLink(root->getSmartURLPath().empty() ? subPageRequest.getURL() : root->getSmartURLPath(), root->getName());
+					stream <<
+						HTMLModule::getHTMLLink(
+							root->get<SmartURLPath>().empty() ? subPageRequest.getURL() : root->get<SmartURLPath>(), root->get<Title>()
+						)
+					;
 
 					stream <<
 						(	(root == currentPage || returned_page_in_branch) ?

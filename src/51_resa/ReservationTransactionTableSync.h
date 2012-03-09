@@ -25,15 +25,15 @@
 #ifndef SYNTHESE_ReservationTransactionTableSync_H__
 #define SYNTHESE_ReservationTransactionTableSync_H__
 
+#include "DBNoSyncTableSyncTemplate.hpp"
+
+#include "ReservationTransaction.h"
 
 #include <vector>
 #include <string>
 #include <iostream>
-
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
-
-#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -44,13 +44,11 @@ namespace synthese
 
 	namespace resa
 	{
-		class ReservationTransaction;
-
 		/** ReservationTransaction table synchronizer.
 			@ingroup m51LS refLS
 		*/
 		class ReservationTransactionTableSync:
-			public db::DBNoSyncTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>
+			public db::DBNoSyncTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>
 		{
 		public:
 			static const std::string COL_LAST_RESERVATION_ID;

@@ -25,7 +25,7 @@
 
 #include "UtilConstants.h"
 #include "Vertex.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Named.h"
 #include "Address.h"
 #include "ReachableFromCrossing.hpp"

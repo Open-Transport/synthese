@@ -24,6 +24,8 @@
 #define SYNTHESE_db_DBInheritanceTableSyncTemplate_hpp__
 
 #include "DBTableSyncTemplate.hpp"
+#include "DBDirectTableSync.hpp"
+
 #include "DBTypes.h"
 
 namespace synthese
@@ -41,14 +43,24 @@ namespace synthese
 		@ingroup m10
 		*/
 		template<class K, class T>
-		class DBInheritanceTableSyncTemplate
-			: public DBTableSyncTemplate<K>
+		class DBInheritanceTableSyncTemplate:
+			public DBTableSyncTemplate<K>,
+			public DBDirectTableSync
 		{
 		public:
 			typedef T		ObjectType;
 			typedef K		FactoryClass;
 			typedef std::vector<boost::shared_ptr<T> > SearchResult;
 
+			static FieldsList GetFieldsList()
+			{
+				FieldsList l;
+				for(size_t i(0); !_FIELDS[i].empty(); ++i)
+				{
+					l.push_back(_FIELDS[i]);
+				}
+				return l;
+			}
 
 		protected:
 			//! \name Static methods to implement by each derived class
@@ -284,6 +296,58 @@ namespace synthese
 					}
 				}
 				return result;
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// DBDirectTableSync interface
+			virtual boost::shared_ptr<const util::Registrable> getRegistrable(
+				util::RegistryKeyType key,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			) const {
+				return boost::dynamic_pointer_cast<const util::Registrable, const T>(Get(key, environment, linkLevel, autoCreate));
+			}
+
+
+
+			virtual boost::shared_ptr<util::Registrable> getEditableRegistrable(
+				util::RegistryKeyType key,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				AutoCreation autoCreate = NEVER_CREATE
+			) const {
+				return boost::dynamic_pointer_cast<util::Registrable, T>(GetEditable(key, environment, linkLevel, autoCreate));
+			}
+
+
+
+			virtual boost::shared_ptr<util::Registrable> createRegistrable(
+				const DBResultSPtr& row
+			) const {
+				assert(false);
+				return boost::shared_ptr<util::Registrable>();
+			}
+
+
+
+			virtual void saveRegistrable(
+				util::Registrable& obj,
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
+			) const {
+				Save(&dynamic_cast<T&>(obj), transaction);
+			}
+
+
+
+			virtual void loadRegistrable(
+				util::Registrable& obj,
+				const DBResultSPtr& rows,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			) const {
+				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
 			}
 		};
 	}

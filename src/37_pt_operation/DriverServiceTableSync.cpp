@@ -72,14 +72,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DriverServiceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DriverServiceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DriverServiceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DriverServiceTableSync::COL_SERVICES, SQL_TEXT),
-			DBTableSync::Field(DriverServiceTableSync::COL_DATES, SQL_TEXT),
-			DBTableSync::Field(DriverServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DriverServiceTableSync::COL_NAME, SQL_TEXT),
+			Field(DriverServiceTableSync::COL_SERVICES, SQL_TEXT),
+			Field(DriverServiceTableSync::COL_DATES, SQL_TEXT),
+			Field(DriverServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 
@@ -143,7 +143,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(DriverServiceTableSync::SerializeServices(object->getChunks()));
 			query.addField(datesStr.str());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

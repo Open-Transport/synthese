@@ -26,6 +26,7 @@ TreeMultiClassRootPolicy.hpp
 TreeNode.hpp
 TreeOtherClassRootPolicy.hpp
 TreeRankOrderingPolicy.hpp
+TreeRoot.hpp
 TreeUniqueRootPolicy.hpp
 )
 

@@ -54,13 +54,13 @@ namespace synthese
 			"t024_interfaces"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<InterfaceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
-			DBTableSync::Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(InterfaceTableSync::COL_DEFAULT_CLIENT_URL, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(InterfaceTableSync::TABLE_COL_NO_SESSION_DEFAULT_PAGE, SQL_TEXT),
+			Field(InterfaceTableSync::TABLE_COL_NAME, SQL_TEXT),
+			Field(InterfaceTableSync::COL_DEFAULT_CLIENT_URL, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<InterfaceTableSync>::_INDEXES[]=

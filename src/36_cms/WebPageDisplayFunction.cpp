@@ -123,12 +123,12 @@ namespace synthese
 
 					_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(paths[0]));
 
-					if(!_page.get() || _page->getSmartURLDefaultParameterName().empty())
+					if(!_page.get() || _page->get<SmartURLDefaultParameterName>().empty())
 					{
 						throw Request::NotFoundException();
 					}
 
-					_templateParameters.insert(_page->getSmartURLDefaultParameterName(), paths[1]);
+					_templateParameters.insert(_page->get<SmartURLDefaultParameterName>(), paths[1]);
 				}
 				_templateParameters.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
@@ -153,11 +153,11 @@ namespace synthese
 			{
 				// If page has been fetched by its id and its smart URL is defined, then
 				// redirect permanently to the smart url, unless it starts with a colon (used for aliases).
-				if(!_dontRedirectIfSmartURL && _smartURL.empty() && !_page->getSmartURLPath().empty() && _page->getSmartURLPath()[0] != ':')
+				if(!_dontRedirectIfSmartURL && _smartURL.empty() && !_page->get<SmartURLPath>().empty() && _page->get<SmartURLPath>()[0] != ':')
 				{
 					/// @todo handle default parameter of smart url
 					stringstream url;
-					url << "http://" << request.getHostName() << _page->getSmartURLPath();
+					url << "http://" << request.getHostName() << _page->get<SmartURLPath>();
 
 					ParametersMap pm(getTemplateParameters());
 					pm.remove(PARAMETER_PAGE_ID);

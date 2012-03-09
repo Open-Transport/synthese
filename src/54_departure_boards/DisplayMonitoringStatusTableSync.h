@@ -26,15 +26,12 @@
 #ifndef SYNTHESE_DisplayMonitoringStatusTableSync_H__
 #define SYNTHESE_DisplayMonitoringStatusTableSync_H__
 
-// Std
+#include "DisplayMonitoringStatus.h"
+#include "DBNoSyncTableSyncTemplate.hpp"
+
 #include <vector>
 #include <string>
 #include <iostream>
-
-// Db
-#include "DBNoSyncTableSyncTemplate.hpp"
-
-// Boost
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
@@ -42,7 +39,6 @@ namespace synthese
 {
 	namespace departure_boards
 	{
-		class DisplayMonitoringStatus;
 		class DisplayScreen;
 		class DisplayScreenCPU;
 
@@ -50,8 +46,8 @@ namespace synthese
 		/// DisplayMonitoringStatus table synchronizer class.
 		///	@ingroup m54LS refLS
 		////////////////////////////////////////////////////////////////////////
-		class DisplayMonitoringStatusTableSync
-		: public db::DBNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync,DisplayMonitoringStatus>
+		class DisplayMonitoringStatusTableSync:
+			public db::DBNoSyncTableSyncTemplate<DisplayMonitoringStatusTableSync, DisplayMonitoringStatus>
 		{
 		public:
 			static const std::string COL_SCREEN_ID;

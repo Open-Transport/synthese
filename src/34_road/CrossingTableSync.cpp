@@ -63,12 +63,12 @@ namespace synthese
 			"t043_crossings"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<CrossingTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<CrossingTableSync>::_INDEXES[] =
@@ -116,7 +116,7 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

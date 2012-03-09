@@ -74,19 +74,19 @@ namespace synthese
 			"t039_scenarios"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ScenarioTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
-			DBTableSync::Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
-			DBTableSync::Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(ScenarioTableSync::COL_PERIODSTART, SQL_DATETIME),
-			DBTableSync::Field(ScenarioTableSync::COL_PERIODEND, SQL_DATETIME),
-			DBTableSync::Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
-			DBTableSync::Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
-			DBTableSync::Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
-			DBTableSync::Field(ScenarioTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ScenarioTableSync::COL_IS_TEMPLATE, SQL_INTEGER),
+			Field(ScenarioTableSync::COL_ENABLED, SQL_INTEGER),
+			Field(ScenarioTableSync::COL_NAME, SQL_TEXT),
+			Field(ScenarioTableSync::COL_PERIODSTART, SQL_DATETIME),
+			Field(ScenarioTableSync::COL_PERIODEND, SQL_DATETIME),
+			Field(ScenarioTableSync::COL_FOLDER_ID, SQL_INTEGER),
+			Field(ScenarioTableSync::COL_VARIABLES, SQL_TEXT),
+			Field(ScenarioTableSync::COL_TEMPLATE, SQL_INTEGER),
+			Field(ScenarioTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=

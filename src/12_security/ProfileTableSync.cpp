@@ -68,13 +68,13 @@ namespace synthese
 				"t027_profiles"
 				);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ProfileTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ProfileTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ProfileTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(ProfileTableSync::TABLE_COL_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ProfileTableSync::TABLE_COL_NAME, SQL_TEXT),
+			Field(ProfileTableSync::TABLE_COL_PARENT_ID, SQL_INTEGER),
+			Field(ProfileTableSync::TABLE_COL_RIGHTS_STRING, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<ProfileTableSync>::_INDEXES[]=

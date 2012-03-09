@@ -78,7 +78,7 @@ namespace synthese
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 			map.insert(
 				PARAMETER_DATA_SOURCE_LINKS,
-				ImportableTableSync::SerializeDataSourceLinks(_dataSourceLinks)
+				DataSourceLinks::Serialize(_dataSourceLinks)
 			);
 			return map;
 		}

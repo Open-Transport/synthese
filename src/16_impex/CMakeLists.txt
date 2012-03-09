@@ -15,6 +15,8 @@ DataSourceTableSync.cpp
 DataSourceTableSync.h
 DataSourceUpdateAction.cpp
 DataSourceUpdateAction.hpp
+DumpFileFormat.cpp
+DumpFileFormat.hpp
 Exporter.hpp
 ExportFunction.cpp
 ExportFunction.hpp
@@ -31,6 +33,7 @@ ImportableAdmin.cpp
 ImportableAdmin.hpp
 ImportableTableSync.cpp
 ImportableTableSync.hpp
+ImportableTemplate.hpp
 Importer.cpp
 Importer.hpp
 ImportFunction.cpp

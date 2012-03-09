@@ -46,7 +46,7 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "DataSource.h"
 
 #include <geos/geom/LineString.h>

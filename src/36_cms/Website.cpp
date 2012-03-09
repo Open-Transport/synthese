@@ -22,25 +22,48 @@
 
 #include "Website.hpp"
 
+#include "CMSModule.hpp"
 #include "Env.h"
-#include "Webpage.h"
 
 #include <boost/lexical_cast.hpp>
 
+using namespace std;
 using namespace boost;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace util;
-	
+	using namespace cms;
+
+	CLASS_DEFINITION(Website, "t025_sites", 25)
+	FIELD_DEFINITION_OF_TYPE(ClientURL, "client_url", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DefaultTemplate, "default_template_id", SQL_INTEGER)
+
 	namespace cms
 	{
+		Website::Website(RegistryKeyType id):
+			Registrable(id),
+			Object<Website, WebsiteRecord>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_VALUE_CONSTRUCTOR(StartDate, neg_infin),
+					FIELD_VALUE_CONSTRUCTOR(EndDate, pos_infin),
+					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
+					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate)
+			)	)
+		{
+		}
+
+
+
 		void Website::addPage( Webpage& page )
 		{
-			if(!page.getSmartURLPath().empty())
+			if(!page.get<SmartURLPath>().empty())
 			{
 				mutex::scoped_lock lock (_smartURLMutex);
-				_webpagesBySmartURL.insert(make_pair(page.getSmartURLPath(), &page));
+				_webpagesBySmartURL.insert(make_pair(page.get<SmartURLPath>(), &page));
 			}
 		}
 
@@ -77,7 +100,7 @@ namespace synthese
 		bool Website::dateCheck() const
 		{
 			boost::gregorian::date tempDate(boost::gregorian::day_clock::local_day());
-			return tempDate >= _startValidityDate && tempDate <= _endValidityDate;
+			return tempDate >= get<StartDate>() && tempDate <= get<EndDate>();
 		}
 
 
@@ -110,5 +133,36 @@ namespace synthese
 				result = getPageBySmartURL("!" + key);
 			}
 			return result;
+		}
+
+
+
+		synthese::SubObjects Website::getSubObjects() const
+		{
+			SubObjects r;
+			BOOST_FOREACH(const ChildrenType::value_type& page, getChildren())
+			{
+				r.push_back(page.second);
+			}
+			return r;
+		}
+
+
+
+		void Website::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			// Registration of the site if loaded in official env
+			if(&env == &Env::GetOfficialEnv())
+			{
+				CMSModule::AddSite(*this);
+			}
+
+		}
+
+
+
+		void Website::unlink()
+		{
+			CMSModule::RemoveSite(get<ClientURL>());
 		}
 }	}

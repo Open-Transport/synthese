@@ -21,10 +21,10 @@
 */
 
 #include "TransportWebsiteTableSync.h"
+
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "WebPageTableSync.h"
-#include "CMSModule.hpp"
 #include "ObjectSiteLinkTableSync.h"
 #include "RollingStockFilterTableSync.h"
 #include "TransportWebsiteRight.h"
@@ -49,48 +49,16 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 TransportWebsite");
-		template<> const string FactorableTemplate<Fetcher<Website>, TransportWebsiteTableSync>::FACTORY_KEY("25");
-	}
-
-	namespace pt_website
-	{
-		const string TransportWebsiteTableSync::TABLE_COL_NAME = "name";
-		const string TransportWebsiteTableSync::TABLE_COL_START_DATE = "start_date";
-		const string TransportWebsiteTableSync::TABLE_COL_END_DATE = "end_date";
-		const string TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING = "online_booking";
-		const string TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA = "use_old_data";
-		const string TransportWebsiteTableSync::COL_MAX_CONNECTIONS = "max_connections";
-		const string TransportWebsiteTableSync::COL_USE_DATES_RANGE("use_dates_range");
-		const string TransportWebsiteTableSync::COL_PERIODS("periods");
-		const string TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS("display_road_approach_detail");
-		// TODO: rename to client_url once complex schema updates are in place (issue #9453).
-		const string TransportWebsiteTableSync::COL_CLIENT_URL("cient_url");
-		const string TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID("default_page_template_id");
+		template<> const string FactorableTemplate<DBTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 PT Services configurations");
 	}
 
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
-			"t025_sites"
+			"t086_pt_services_configurations"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] =
-		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_START_DATE, SQL_DATE),
-			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_END_DATE, SQL_DATE),
-			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_MAX_CONNECTIONS, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_USE_DATES_RANGE, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_PERIODS, SQL_TEXT),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS, SQL_INTEGER),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_CLIENT_URL, SQL_TEXT),
-			DBTableSync::Field(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID, SQL_TEXT),
-			DBTableSync::Field()
-		};
+		template<> const Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TransportWebsiteTableSync>::_INDEXES[] =
 		{
@@ -104,61 +72,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			string clientURL(site->getClientURL());
-
-		    site->setName(rows->getText (TransportWebsiteTableSync::TABLE_COL_NAME));
-		    site->setStartDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_START_DATE));
-		    site->setEndDate(rows->getDate(TransportWebsiteTableSync::TABLE_COL_END_DATE));
-		    site->setOnlineBookingAllowed(rows->getBool(TransportWebsiteTableSync::TABLE_COL_ONLINE_BOOKING));
-		    site->setPastSolutionsDisplayed(rows->getBool(TransportWebsiteTableSync::TABLE_COL_USE_OLD_DATA));
-		    site->setMaxTransportConnectionsCount(rows->getInt(TransportWebsiteTableSync::COL_MAX_CONNECTIONS));
-		    site->setUseDateRange(days(rows->getInt(TransportWebsiteTableSync::COL_USE_DATES_RANGE)));
-			site->setDisplayRoadApproachDetail(rows->getBool(TransportWebsiteTableSync::COL_DISPLAY_ROAD_APPROACH_DETAILS));
-			site->setClientURL(rows->getText(TransportWebsiteTableSync::COL_CLIENT_URL));
-
-		    string periodsStr(rows->getText(TransportWebsiteTableSync::COL_PERIODS));
-
-			typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-			boost::char_separator<char> sep1 (",");
-			boost::char_separator<char> sep2 ("|");
-			tokenizer tripletTokens (periodsStr, sep1);
-			site->clearHourPeriods();
-			for (tokenizer::iterator tripletIter = tripletTokens.begin();
-				tripletIter != tripletTokens.end (); ++tripletIter)
-			{
-				tokenizer valueTokens (*tripletIter, sep2);
-				tokenizer::iterator valueIter = valueTokens.begin();
-
-				// (beginHour|endHour|Caption)
-				time_duration beginHour(duration_from_string(*valueIter));
-				time_duration endHour(duration_from_string(*(++valueIter)));
-				HourPeriod period(*(++valueIter), beginHour, endHour);
-
-				site->addHourPeriod(period);
-			}
-
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				RegistryKeyType templateId(rows->getLongLong(TransportWebsiteTableSync::COL_DEFAULT_PAGE_TEMPLATE_ID));
-				try
-				{
-					site->setDefaultTemplate(
-						templateId == 0 ? NULL :
-						WebPageTableSync::GetEditable(templateId, env, linkLevel).get()
-					);
-				}
-				catch(ObjectNotFoundException<Webpage>& e)
-				{
-					Log::GetInstance().warn("No such webpage in site", e);
-				}
+				DBModule::LoadObjects(site->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-
-			// Registration of the site if loaded in official env
-			if(&env == &Env::GetOfficialEnv())
+			site->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				CMSModule::RemoveSite(clientURL);
-				CMSModule::AddSite(*site);
+				site->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -167,7 +88,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
 			TransportWebsite* obj
 		){
-			CMSModule::RemoveSite(obj->getClientURL());
+			obj->unlink();
 		}
 
 
@@ -175,31 +96,11 @@ namespace synthese
 			TransportWebsite* site,
 			optional<DBTransaction&> transaction
 		){
-			// Preparation
-			stringstream periodstr;
-			const TransportWebsite::Periods& periods(site->getPeriods());
-			for(TransportWebsite::Periods::const_iterator it(periods.begin()); it != periods.end(); ++it)
-			{
-				if (it != periods.begin())
-					periodstr << ",";
-				periodstr << to_simple_string(it->getBeginHour())
-					<< "|" << to_simple_string(it->getEndHour())
-					<< "|" << it->getCaption();
-			}
-
 			// Query
 			ReplaceQuery<TransportWebsiteTableSync> query(*site);
-			query.addField(site->getName());
-			query.addField(site->getStartDate());
-			query.addField(site->getEndDate());
-			query.addField(site->getOnlineBookingAllowed());
-			query.addField(site->getPastSolutionsDisplayed());
-			query.addField(site->getMaxTransportConnectionsCount());
-			query.addField(static_cast<int>(site->getUseDatesRange().days()));
-			query.addField(periodstr.str());
-			query.addField(site->getDisplayRoadApproachDetail());
-			query.addField(site->getClientURL());
-			query.addField(site->getDefaultTemplate() ? site->getDefaultTemplate()->getKey() : RegistryKeyType(0));
+			ParametersMap map;
+			site->toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
@@ -263,11 +164,11 @@ namespace synthese
 			SelectQuery<TransportWebsiteTableSync> query;
 			if (!name.empty())
 			{
-				query.addWhereField(TABLE_COL_NAME, name, ComposedExpression::OP_LIKE);
+				query.addWhereField(ObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
 			}
 			if (orderByName)
 			{
-				query.addOrderField(TABLE_COL_NAME, raisingOrder);
+				query.addOrderField(ObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -280,5 +181,4 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}

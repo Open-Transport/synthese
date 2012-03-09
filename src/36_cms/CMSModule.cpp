@@ -143,12 +143,12 @@ namespace synthese
 
 		void CMSModule::AddSite( Website& value )
 		{
-			if(value.getClientURL().empty())
+			if(value.get<ClientURL>().empty())
 			{
 				return;
 			}
 
-			_sitesByClientURL.insert(make_pair(value.getClientURL(), &value));
+			_sitesByClientURL.insert(make_pair(value.get<ClientURL>(), &value));
 		}
 
 

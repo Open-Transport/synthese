@@ -29,7 +29,7 @@
 #include <boost/logic/tribool.hpp>
 
 #include "Path.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "Registry.h"
 #include "Named.h"
 #include "Calendar.h"

@@ -26,7 +26,7 @@
 #include "SchedulesBasedService.h"
 #include "Path.h"
 #include "WithGeometry.hpp"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 namespace synthese
 {

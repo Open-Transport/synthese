@@ -72,16 +72,16 @@ namespace synthese
 			"t058_display_screen_cpu"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<DisplayScreenCPUTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DisplayScreenCPUTableSync::COL_NAME, SQL_TEXT),
+			Field(DisplayScreenCPUTableSync::COL_PLACE_ID, SQL_INTEGER),
+			Field(DisplayScreenCPUTableSync::COL_MAC_ADDRESS, SQL_TEXT),
+			Field(DisplayScreenCPUTableSync::COL_MONITORING_DELAY, SQL_INTEGER),
+			Field(DisplayScreenCPUTableSync::COL_IS_ONLINE, SQL_INTEGER),
+			Field(DisplayScreenCPUTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+			Field()
 		};
 
 		template<>  const DBTableSync::Index DBTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =

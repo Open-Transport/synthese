@@ -76,7 +76,7 @@ namespace synthese
 		void RowsListFunction::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			_input = map.getDefault<string>(PARAMETER_INPUT);
-			_table = map.getDefault<DBTableSync::TableId>(PARAMETER_TABLE);
+			_table = map.getDefault<RegistryTableType>(PARAMETER_TABLE);
 
 			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
 			if (!_input.empty() && !_n)

@@ -25,11 +25,14 @@
 #ifndef SYNTHESE_DBModule_H__
 #define SYNTHESE_DBModule_H__
 
-#include "DB.hpp"
 #include "ModuleClassTemplate.hpp"
+
+#include "DB.hpp"
 #include "DBConstants.h"
 #include "DBTypes.h"
+#include "ObjectField.hpp"
 #include "Registry.h"
+#include "UtilTypes.h"
 
 #include <map>
 #include <boost/filesystem/path.hpp>
@@ -55,6 +58,7 @@ namespace synthese
 	namespace db
 	{
 		class DBTableSync;
+		class DBTransaction;
 
 		//////////////////////////////////////////////////////////////
 		/// Database handling module class.
@@ -140,6 +144,17 @@ namespace synthese
 			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
 			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
 			static void ClearStorageCoordinatesSystem() { _storageCoordinatesSystem = 0; }
+
+			static void LoadObjects(
+				const LinkedObjectsIds& ids,
+				util::Env& env,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+			static void SaveEntireEnv(
+				const util::Env& env,
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
+			);
 		};
 	}
 

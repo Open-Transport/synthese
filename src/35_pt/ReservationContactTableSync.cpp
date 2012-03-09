@@ -62,15 +62,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<ReservationContactTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(ReservationContactTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
-			DBTableSync::Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
-			DBTableSync::Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
-			DBTableSync::Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(ReservationContactTableSync::COL_NAME, SQL_TEXT),
+			Field(ReservationContactTableSync::COL_PHONEEXCHANGENUMBER, SQL_TEXT),
+			Field(ReservationContactTableSync::COL_PHONEEXCHANGEOPENINGHOURS, SQL_TEXT),
+			Field(ReservationContactTableSync::COL_DESCRIPTION, SQL_TEXT),
+			Field(ReservationContactTableSync::COL_WEBSITEURL, SQL_TEXT),
+			Field()
 		};
 
 

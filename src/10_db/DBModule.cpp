@@ -20,8 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DB.hpp"
 #include "DBModule.h"
+
+#include "DB.hpp"
+#include "DBDirectTableSync.hpp"
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
 #include "DBTransaction.hpp"
@@ -79,8 +81,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DBModule>::Init()
 		{
-			DBModule::GetDB()->init();
-
+			// Table sync registration
 			DBModule::_tableSyncMap.clear();
 			vector<shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
 			BOOST_FOREACH(const shared_ptr<DBTableSync>& sync, tableSyncs)
@@ -88,6 +89,9 @@ namespace synthese
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync;
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
 			}
+
+			// DB initialization
+			DBModule::GetDB()->init();
 		}
 
 
@@ -172,5 +176,45 @@ namespace synthese
 		{
 			SubClassMap::const_iterator it(_subClassMap.find(id));
 			return (it == _subClassMap.end()) ? string() : it->second;
+		}
+
+
+
+		void DBModule::LoadObjects( const LinkedObjectsIds& ids, util::Env& env, LinkLevel linkLevel )
+		{
+			BOOST_FOREACH(RegistryKeyType id, ids)
+			{
+				shared_ptr<DBTableSync> tableSync(GetTableSync(decodeTableId(id)));
+				if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+				{
+					continue;
+				}
+				dynamic_cast<DBDirectTableSync&>(*tableSync).getRegistrable(id, env, linkLevel);
+			}
+		}
+
+
+
+		void DBModule::SaveEntireEnv(
+			const util::Env& env,
+			boost::optional<DBTransaction&> transaction
+		){
+			BOOST_FOREACH(const Env::RegistryMap::value_type& registry, env.getMap())
+			{
+				DBDirectTableSync* tableSync(NULL);
+				BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& item, registry.second->getRegistrablesVector())
+				{
+					if(!tableSync)
+					{
+						shared_ptr<DBTableSync> tableSyncR(GetTableSync(decodeTableId(item->getKey())));
+						tableSync = dynamic_cast<DBDirectTableSync*>(tableSyncR.get());
+						if(!tableSync)
+						{
+							break;
+						}
+					}
+					tableSync->saveRegistrable(*item, transaction);
+				}
+			}
 		}
 }	}

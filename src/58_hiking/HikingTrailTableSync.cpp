@@ -65,16 +65,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<HikingTrailTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<HikingTrailTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(HikingTrailTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(HikingTrailTableSync::COL_DURATION, SQL_TEXT),
-			DBTableSync::Field(HikingTrailTableSync::COL_MAP, SQL_TEXT),
-			DBTableSync::Field(HikingTrailTableSync::COL_PROFILE, SQL_TEXT),
-			DBTableSync::Field(HikingTrailTableSync::COL_URL, SQL_TEXT),
-			DBTableSync::Field(HikingTrailTableSync::COL_STOPS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(HikingTrailTableSync::COL_NAME, SQL_TEXT),
+			Field(HikingTrailTableSync::COL_DURATION, SQL_TEXT),
+			Field(HikingTrailTableSync::COL_MAP, SQL_TEXT),
+			Field(HikingTrailTableSync::COL_PROFILE, SQL_TEXT),
+			Field(HikingTrailTableSync::COL_URL, SQL_TEXT),
+			Field(HikingTrailTableSync::COL_STOPS, SQL_TEXT),
+			Field()
 		};
 
 

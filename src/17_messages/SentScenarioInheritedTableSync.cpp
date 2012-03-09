@@ -151,7 +151,7 @@ namespace synthese
 			query.addField(UNKNOWN_VALUE);
 			query.addField(vars.str());
 			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(obj->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(obj->getDataSourceLinks()));
 			query.execute(transaction);
 
 			// Alarms query

@@ -65,13 +65,13 @@ namespace synthese
 			"t056_non_concurrency_rules"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER),
-			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER),
-			DBTableSync::Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(NonConcurrencyRuleTableSync::COL_PRIORITY_LINE_ID, SQL_INTEGER),
+			Field(NonConcurrencyRuleTableSync::COL_HIDDEN_LINE_ID, SQL_INTEGER),
+			Field(NonConcurrencyRuleTableSync::COL_DELAY, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<NonConcurrencyRuleTableSync>::_INDEXES[]=

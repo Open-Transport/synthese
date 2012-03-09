@@ -70,6 +70,16 @@ namespace synthese
 			}
 
 
+
+			void ReplaceQuery::setValues(util::ParametersMap& map)
+			{
+				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
+				{
+					addField(map.get<string>(field.name));
+				}
+			}
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds a value field to the query
 			/// @param value value to add, handled by ValueExpression

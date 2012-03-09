@@ -67,13 +67,13 @@ namespace synthese
 			"t060_road_places"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<RoadPlaceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
-			DBTableSync::Field(RoadPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
+			Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
+			Field(RoadPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<RoadPlaceTableSync>::_INDEXES[]=
@@ -157,7 +157,7 @@ namespace synthese
 			ReplaceQuery<RoadPlaceTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

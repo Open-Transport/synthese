@@ -75,12 +75,12 @@ namespace synthese
 			virtual void initSpatialRefSysTable();
 			virtual std::string getSQLType(FieldType fieldType);
 			virtual bool doesTableExists(const std::string& tableName);
-			virtual bool isTableSchemaUpToDate(const std::string& tableName, const DBTableSync::Field fields[]);
+			virtual bool isTableSchemaUpToDate(const std::string& tableName, const FieldsList& fields);
 			virtual std::vector<ColumnInfo> getTableColumns(const std::string& tableName);
-			virtual std::string getCreateTableSQL(const std::string& tableName, const DBTableSync::Field fields[]);
-			virtual void afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[]);
+			virtual std::string getCreateTableSQL(const std::string& tableName, const FieldsList& fields);
+			virtual void afterUpdateSchema(const std::string& tableName, const FieldsList& fields);
 			virtual bool doesIndexExist(const std::string& tableName, const DBTableSync::Index& index);
-			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[]);
+			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const FieldsList& fields);
 			virtual const std::string getSQLDateFormat(const std::string& format, const std::string& expr);
 			virtual const std::string getSQLConvertInteger(const std::string& expr);
 			virtual bool isBackend(Backend backend);

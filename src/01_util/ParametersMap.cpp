@@ -488,39 +488,6 @@ namespace synthese
 
 
 
-		std::string ParametersMap::Trim( const std::string& value )
-		{
-			return trim_copy_if(value, is_any_of(" \r\n\t"));
-		}
-
-
-
-		bool ParametersMap::isTrue( const std::string& parameterName ) const
-		{
-			Map::const_iterator it(_map.find(parameterName));
-
-			if(it == _map.end())
-			{
-				return false;
-			}
-
-			string value(Trim(it->second));
-
-			if(value.empty())
-			{
-				return false;
-			}
-
-			if(value == "0")
-			{
-				return false;
-			}
-
-			return true;
-		}
-
-
-
 		ParametersMap::SubMapsKeys ParametersMap::getSubMapsKeys() const
 		{
 			SubMapsKeys result;
@@ -533,29 +500,13 @@ namespace synthese
 
 
 
-		ParametersMap::MissingParameterException::MissingParameterException( const std::string& field ):
-			_field(field),
-			_message("Missing parameter in request parsing : " + _field)
+		std::string ParametersMap::getValue( const std::string& parameterName ) const
 		{
-		}
-
-
-
-		ParametersMap::MissingParameterException::~MissingParameterException() throw()
-		{
-		}
-
-
-
-		const char* ParametersMap::MissingParameterException::what() const throw()
-		{
-			return _message.c_str();
-		}
-
-
-
-		const std::string& ParametersMap::MissingParameterException::getField() const
-		{
-			return _field;
+			Map::const_iterator it(_map.find(parameterName));
+			if(it == _map.end())
+			{
+				throw MissingParameterException(parameterName);
+			}
+			return it->second;
 		}
 }	}

@@ -64,18 +64,18 @@ namespace synthese
 			"t049_rolling_stock"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<RollingStockTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
-			DBTableSync::Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
-			DBTableSync::Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
-			DBTableSync::Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
-			DBTableSync::Field(RollingStockTableSync::COL_CO2_EMISSIONS, SQL_DOUBLE),
-			DBTableSync::Field(RollingStockTableSync::COL_ENERGY_CONSUMPTION, SQL_DOUBLE),
-			DBTableSync::Field(RollingStockTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(RollingStockTableSync::COL_NAME, SQL_TEXT),
+			Field(RollingStockTableSync::COL_ARTICLE, SQL_TEXT),
+			Field(RollingStockTableSync::COL_INDICATOR, SQL_TEXT),
+			Field(RollingStockTableSync::COL_TRIDENT, SQL_TEXT),
+			Field(RollingStockTableSync::COL_IS_TRIDENT_REFERENCE, SQL_INTEGER),
+			Field(RollingStockTableSync::COL_CO2_EMISSIONS, SQL_DOUBLE),
+			Field(RollingStockTableSync::COL_ENERGY_CONSUMPTION, SQL_DOUBLE),
+			Field(RollingStockTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
@@ -133,7 +133,7 @@ namespace synthese
 			query.addField(object->getIsTridentKeyReference());
 			query.addField(object->getCO2Emissions());
 			query.addField(object->getEnergyConsumption());
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.execute(transaction);
 		}
 

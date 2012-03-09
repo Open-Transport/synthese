@@ -60,14 +60,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<MapSourceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<MapSourceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(MapSourceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(MapSourceTableSync::COL_URL, SQL_TEXT),
-			DBTableSync::Field(MapSourceTableSync::COL_SRID, SQL_INTEGER),
-			DBTableSync::Field(MapSourceTableSync::COL_TYPE, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(MapSourceTableSync::COL_NAME, SQL_TEXT),
+			Field(MapSourceTableSync::COL_URL, SQL_TEXT),
+			Field(MapSourceTableSync::COL_SRID, SQL_INTEGER),
+			Field(MapSourceTableSync::COL_TYPE, SQL_INTEGER),
+			Field()
 		};
 
 

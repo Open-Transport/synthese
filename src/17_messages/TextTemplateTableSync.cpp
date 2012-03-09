@@ -64,15 +64,15 @@ namespace synthese
 			"t038_text_templates"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<TextTemplateTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
-			DBTableSync::Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
-			DBTableSync::Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
-			DBTableSync::Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(TextTemplateTableSync::COL_NAME, SQL_TEXT),
+			Field(TextTemplateTableSync::COL_SHORT_TEXT, SQL_TEXT),
+			Field(TextTemplateTableSync::COL_LONG_TEXT, SQL_TEXT),
+			Field(TextTemplateTableSync::COL_IS_FOLDER, SQL_INTEGER),
+			Field(TextTemplateTableSync::COL_PARENT_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=

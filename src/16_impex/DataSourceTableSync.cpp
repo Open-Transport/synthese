@@ -59,16 +59,16 @@ namespace synthese
 			"t059_data_sources"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DataSourceTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DataSourceTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
-			DBTableSync::Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
-			DBTableSync::Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
-			DBTableSync::Field(DataSourceTableSync::COL_SRID, SQL_INTEGER),
-			DBTableSync::Field(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST, SQL_TEXT),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DataSourceTableSync::COL_NAME, SQL_TEXT),
+			Field(DataSourceTableSync::COL_FORMAT, SQL_TEXT),
+			Field(DataSourceTableSync::COL_ICON, SQL_TEXT),
+			Field(DataSourceTableSync::COL_CHARSET, SQL_TEXT),
+			Field(DataSourceTableSync::COL_SRID, SQL_INTEGER),
+			Field(DataSourceTableSync::COL_DEFAULT_IMPORT_REQUEST, SQL_TEXT),
+			Field()
 		};
 
 

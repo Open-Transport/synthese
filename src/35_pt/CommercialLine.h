@@ -31,7 +31,7 @@
 #include "GraphTypes.h"
 #include "Calendar.h"
 #include "Named.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/optional.hpp>

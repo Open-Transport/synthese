@@ -26,16 +26,16 @@
 #ifndef SYNTHESE_UTIL_REGISTRY_H
 #define SYNTHESE_UTIL_REGISTRY_H
 
-#include <map>
-
-#include <boost/shared_ptr.hpp>
+#include "RegistryBase.h"
 
 #include "UtilTypes.h"
-#include "RegistryBase.h"
 #include "UtilConstants.h"
 #include "RegistryKeyException.h"
 #include "ObjectNotFoundInRegistryException.h"
 #include "ObjectNotFoundException.h"
+
+#include <map>
+#include <boost/foreach.hpp>
 
 namespace synthese
 {
@@ -193,11 +193,26 @@ namespace synthese
 			//@}
 
 
+			virtual RegistrablesVector getRegistrablesVector() const ;
+
 		 private:
 
 			Registry ( const Registry& ref );
 			Registry& operator= ( const Registry& rhs );
 		};
+
+
+
+		template<class T>
+		RegistryBase::RegistrablesVector Registry<T>::getRegistrablesVector() const
+		{
+			RegistrablesVector r;
+			BOOST_FOREACH(const typename Registry<T>::Map::value_type& item, _registry)
+			{
+				r.push_back(boost::static_pointer_cast<Registrable, T>(item.second));
+			}
+			return r;
+		}
 
 		/** @} */
 

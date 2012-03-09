@@ -74,19 +74,19 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<LineStopTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER),
-			DBTableSync::Field(LineStopTableSync::COL_LINEID, SQL_INTEGER),
-			DBTableSync::Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
-			DBTableSync::Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
-			DBTableSync::Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
-			DBTableSync::Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
-			DBTableSync::Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
-			DBTableSync::Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
-			DBTableSync::Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(LineStopTableSync::COL_PHYSICALSTOPID, SQL_INTEGER),
+			Field(LineStopTableSync::COL_LINEID, SQL_INTEGER),
+			Field(LineStopTableSync::COL_RANKINPATH, SQL_INTEGER),
+			Field(LineStopTableSync::COL_ISDEPARTURE, SQL_BOOLEAN),
+			Field(LineStopTableSync::COL_ISARRIVAL, SQL_BOOLEAN),
+			Field(LineStopTableSync::COL_METRICOFFSET, SQL_DOUBLE),
+			Field(LineStopTableSync::COL_SCHEDULEINPUT, SQL_BOOLEAN),
+			Field(LineStopTableSync::COL_INTERNAL_SERVICE, SQL_BOOLEAN),
+			Field(TABLE_COL_GEOMETRY, SQL_GEOM_LINESTRING),
+			Field()
 		};
 
 

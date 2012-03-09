@@ -73,22 +73,22 @@ namespace synthese
 			"t008_fares"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<FareTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<FareTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(FareTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
-			DBTableSync::Field(FareTableSync::COL_CURRENCY, SQL_TEXT),
-			DBTableSync::Field(FareTableSync::COL_PERMITTED_CONNECTIONS_NUMBER, SQL_INTEGER),
-			DBTableSync::Field(FareTableSync::COL_REQUIRED_CONTINUITY, SQL_BOOLEAN),
-			DBTableSync::Field(FareTableSync::COL_VALIDITY_PERIOD, SQL_INTEGER),
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(FareTableSync::COL_NAME, SQL_TEXT),
+			Field(FareTableSync::COL_FARETYPE, SQL_INTEGER),
+			Field(FareTableSync::COL_CURRENCY, SQL_TEXT),
+			Field(FareTableSync::COL_PERMITTED_CONNECTIONS_NUMBER, SQL_INTEGER),
+			Field(FareTableSync::COL_REQUIRED_CONTINUITY, SQL_BOOLEAN),
+			Field(FareTableSync::COL_VALIDITY_PERIOD, SQL_INTEGER),
 
-			DBTableSync::Field(FareTableSync::COL_ACCESS, SQL_DOUBLE),
-			DBTableSync::Field(FareTableSync::COL_SLICES, SQL_TEXT),
-			DBTableSync::Field(FareTableSync::COL_UNIT_PRICE, SQL_DOUBLE),
-			DBTableSync::Field(FareTableSync::COL_MATRIX, SQL_TEXT),
-			DBTableSync::Field(FareTableSync::COL_SUB_FARES, SQL_TEXT),
-			DBTableSync::Field()
+			Field(FareTableSync::COL_ACCESS, SQL_DOUBLE),
+			Field(FareTableSync::COL_SLICES, SQL_TEXT),
+			Field(FareTableSync::COL_UNIT_PRICE, SQL_DOUBLE),
+			Field(FareTableSync::COL_MATRIX, SQL_TEXT),
+			Field(FareTableSync::COL_SUB_FARES, SQL_TEXT),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<FareTableSync>::_INDEXES[]=

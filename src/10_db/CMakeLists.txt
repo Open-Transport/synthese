@@ -6,6 +6,7 @@ DB.hpp
 DBAutoRegisterTableSyncTemplate.hpp
 DBConditionalRegistryTableSyncTemplate.hpp
 DBConstants.h
+DBDirectTableSync.hpp
 DBDirectTableSyncTemplate.hpp
 DBEmptyResultException.h
 DBException.cpp

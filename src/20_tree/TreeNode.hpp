@@ -89,17 +89,26 @@ namespace synthese
 
 				static void SetParent(ObjectType& child, ObjectType* parent)
 				{
-					if(child._parent != parent)
+					TreeNodeType& childNode(child);
+					if(childNode._parent != parent)
 					{
-						if(child._parent)
+						if(childNode._parent)
 						{
-							child._parent->_children.erase(child.getTreeOrderingKey());
+							childNode._parent->_children.erase(childNode.getTreeOrderingKey());
 						}
-						child.setParent(parent);
+						else
+						{
+							childNode.unregisterChildFromRoot(child);
+						}
+						childNode.setParent(parent);
 						if(parent)
 						{
-							parent->_children.insert(std::make_pair(child.getTreeOrderingKey(), &child));
-							child.setSameRoot(*parent);
+							parent->_children.insert(std::make_pair(childNode.getTreeOrderingKey(), &child));
+							childNode.setSameRoot(*parent);
+						}
+						else
+						{
+							childNode.registerChildToRoot(child);
 						}
 					}
 				}

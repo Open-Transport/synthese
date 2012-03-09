@@ -62,17 +62,17 @@ namespace synthese
 			"t045_log_entries", true
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<DBLogEntryTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
-			DBTableSync::Field(DBLogEntryTableSync::COL_DATE, SQL_DATETIME),
-			DBTableSync::Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
-			DBTableSync::Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
-			DBTableSync::Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
-			DBTableSync::Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			DBTableSync::Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DBLogEntryTableSync::COL_LOG_KEY, SQL_TEXT),
+			Field(DBLogEntryTableSync::COL_DATE, SQL_DATETIME),
+			Field(DBLogEntryTableSync::COL_USER_ID, SQL_INTEGER),
+			Field(DBLogEntryTableSync::COL_LEVEL, SQL_INTEGER),
+			Field(DBLogEntryTableSync::COL_CONTENT, SQL_TEXT),
+			Field(DBLogEntryTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			Field(DBLogEntryTableSync::COL_OBJECT2_ID, SQL_INTEGER),
+			Field()
 
 		};
 

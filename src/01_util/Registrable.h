@@ -27,6 +27,7 @@
 #define SYNTHESE_UTIL_REGISTRABLE_H
 
 #include "UtilTypes.h"
+#include "Field.hpp"
 #include "UtilConstants.h"
 
 namespace synthese
@@ -81,7 +82,10 @@ namespace synthese
 				/// ID of the object getter.
 				///	@return the ID of the object.
 				////////////////////////////////////////////////////////////////////
-				RegistryKeyType getKey() const;
+				virtual RegistryKeyType getKey() const;
+
+
+				virtual FieldsList getFields() const { return FieldsList(); }
 			//@}
 
 			//! \name Setters
@@ -90,7 +94,7 @@ namespace synthese
 				/// ID of the object setter.
 				///	@param key the ID of the object to set
 				////////////////////////////////////////////////////////////////////
-				void setKey(RegistryKeyType key);
+				virtual void setKey(RegistryKeyType key);
 			//@}
 		};
 	}

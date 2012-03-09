@@ -65,52 +65,6 @@ namespace synthese
 		{
 		public:
 			////////////////////////////////////////////////////////////////////
-			/// ID of a table
-			typedef unsigned int	TableId;
-
-
-			////////////////////////////////////////////////////////////////////
-			/// Field of a table
-			struct Field
-			{
-				std::string	name;
-				FieldType	type;
-
-
-				////////////////////////////////////////////////////////////////////
-				///	Field constructor.
-				///	@param nameA name of the field
-				///	@param typeA type of the field
-				///	@author Hugues Romain
-				///	@date 2008
-				Field(
-					const std::string nameA = std::string(),
-					const FieldType typeA = SQL_TEXT
-				);
-
-
-
-				////////////////////////////////////////////////////////////////////
-				///	Tests if the field is empty.
-				///	@return bool true if the field is empty
-				///	@author Hugues Romain
-				///	@date 2008
-				bool empty() const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Tests if the field type corresponds to a geometry.
-				/// @return true if the field corresponds to a geometry
-				/// @author Hugues Romain
-				/// @date 2010
-				/// @since 3.2.0
-				bool isGeometry() const;
-			};
-
-
-
-			////////////////////////////////////////////////////////////////////
 			/// Index of a table.
 			struct Index
 			{
@@ -166,7 +120,7 @@ namespace synthese
 			struct Format
 			{
 				std::string					NAME;
-				TableId						ID;
+				util::RegistryTableType		ID;
 				bool						HAS_AUTO_INCREMENT;
 				bool						IGNORE_CALLBACKS_ON_FIRST_SYNC;
 
@@ -300,6 +254,8 @@ namespace synthese
 				DB* db,
 				const RowIdList& rowIds
 			) = 0;
+
+			virtual util::RegistryKeyType getNewId() const = 0;
 
 
 			////////////////////////////////////////////////////////////////////

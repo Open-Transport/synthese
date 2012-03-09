@@ -49,11 +49,11 @@ namespace synthese
 			"t999_config", false, false
 			);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
-			DBTableSync::Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_DATETIME),
-			DBTableSync::Field()
+			Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
+			Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_DATETIME),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<DbModuleConfigTableSync>::_INDEXES[]=

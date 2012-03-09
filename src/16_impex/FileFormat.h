@@ -24,6 +24,9 @@
 
 #include "FactoryBase.h"
 
+#include "Importable.h"
+#include "ImportableTableSync.hpp"
+
 #include <boost/filesystem/path.hpp>
 #include <set>
 #include <map>
@@ -77,8 +80,57 @@ namespace synthese
 			virtual boost::shared_ptr<Exporter> getExporter(
 			) const	= 0;
 
+
+			template<class T>
+			static typename T::ObjectType* LoadOrCreateObject(
+				impex::ImportableTableSync::ObjectBySource<T>& objects,
+				const std::string& id,
+				const impex::DataSource& source,
+				util::Env& env,
+				std::ostream& logStream,
+				const std::string& logName
+			);
 		};
-	}
-}
+
+
+
+		template<class T>
+		typename T::ObjectType* FileFormat::LoadOrCreateObject(
+			impex::ImportableTableSync::ObjectBySource<T>& objects,
+			const std::string& id,
+			const impex::DataSource& source,
+			util::Env& env,
+			std::ostream& logStream,
+			const std::string& logName
+		){
+			set<typename T::ObjectType*> loadedObjects(objects.get(id));
+			if(!loadedObjects.empty())
+			{
+				if(!logName.empty())
+				{
+					logStream << "LOAD : link between " << logName << " " << id << " and ";
+					BOOST_FOREACH(typename T::ObjectType* o, loadedObjects)
+					{
+						logStream << o->getKey();
+					}
+					logStream << "<br />";
+				}
+				return *loadedObjects.begin();
+			}
+			shared_ptr<typename T::ObjectType> o(new typename T::ObjectType(T::getId()));
+
+			Importable::DataSourceLinks links;
+			links.insert(make_pair(&source, id));
+			o->setDataSourceLinksWithoutRegistration(links);
+			env.getEditableRegistry<typename T::ObjectType>().add(o);
+			objects.add(*o);
+			
+			if(!logName.empty())
+			{
+				logStream << "CREA : Creation of the " << logName << "  with key " << id << "<br />";
+			}
+			return o.get();
+		}
+}	}
 
 #endif // SYNTHESE_impex_Import_h__

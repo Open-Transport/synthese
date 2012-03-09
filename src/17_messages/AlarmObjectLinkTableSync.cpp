@@ -68,13 +68,13 @@ namespace synthese
 			"t040_alarm_object_links"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
+		template<> const Field DBTableSyncTemplate<AlarmObjectLinkTableSync>::_FIELDS[]=
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
-			DBTableSync::Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
-			DBTableSync::Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, SQL_TEXT),
+			Field(AlarmObjectLinkTableSync::COL_OBJECT_ID, SQL_INTEGER),
+			Field(AlarmObjectLinkTableSync::COL_ALARM_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmObjectLinkTableSync>::_INDEXES[]=

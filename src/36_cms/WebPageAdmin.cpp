@@ -131,9 +131,9 @@ namespace synthese
 		) const	{
 
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
-			if(	!_page->getRoot()->getClientURL().empty()
+			if(	!_page->getRoot()->get<ClientURL>().empty()
 			){
-				viewRequest.setClientURL(_page->getRoot()->getClientURL());
+				viewRequest.setClientURL(_page->getRoot()->get<ClientURL>());
 			}
 			viewRequest.getFunction()->setPage(_page);
 
@@ -142,10 +142,11 @@ namespace synthese
 			if (openTabContent(stream, TAB_CONTENT))
 			{
 				bool canBeWYSIWYG(
-					!boost::algorithm::find_first(_page->getContent(), "<?") &&
-					!boost::algorithm::find_first(_page->getContent(), "<#") &&
-					!boost::algorithm::find_first(_page->getContent(), "<@") &&
-					!boost::algorithm::find_first(_page->getContent(), "<%")
+					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<?") &&
+					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<#") &&
+					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<@") &&
+					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<{") &&
+					!boost::algorithm::find_first(_page->get<WebpageContent>().getCode(), "<%")
 				);
 
 				stream << "<h1>Visualisation</h1>";
@@ -160,11 +161,11 @@ namespace synthese
 				{
 					AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request);
 					rawEditorUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
-					rawEditorUpdateRequest.getAction()->setRawEditor(!_page->getRawEditor());
+					rawEditorUpdateRequest.getAction()->setRawEditor(!_page->get<RawEditor>());
 					stream <<
 						HTMLModule::getLinkButton(
 							rawEditorUpdateRequest.getHTMLForm().getURL(),
-							"Passer à l'éditeur "+ string(_page->getRawEditor() ? "WYSIWYG" : "technique")
+							"Passer à l'éditeur "+ string(_page->get<RawEditor>() ? "WYSIWYG" : "technique")
 						);
 				}
 				else
@@ -180,30 +181,30 @@ namespace synthese
 				tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
 				stream << tinyMCE.open();
 
-				if(canBeWYSIWYG && !_page->getRawEditor())
+				if(canBeWYSIWYG && !_page->get<RawEditor>())
 				{
-					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent());
+					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode());
 				}
 				else
 				{
 					AjaxForm f(contentUpdateRequest.getAjaxForm("update_content"));
 					stream << f.open();
 					EditArea editArea(stream);
-					editArea.getAjaxForm(stream, contentUpdateRequest.getURL(), WebPageUpdateAction::PARAMETER_CONTENT1, _page->getContent(), 20, 80);
+					editArea.getAjaxForm(stream, contentUpdateRequest.getURL(), WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode(), 20, 80);
 					stream << f.getSubmitButton("Sauvegarder");
 					stream << f.close();
 				}
 
 				stream << "<h1>Résumé</h1>";
-				if(canBeWYSIWYG && !_page->getRawEditor())
+				if(canBeWYSIWYG && !_page->get<RawEditor>())
 				{
-					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract());
+					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->get<Abstract>());
 				}
 				else
 				{
 					AjaxForm f(contentUpdateRequest.getAjaxForm("update_abstract"));
 					stream << f.open();
-					stream << f.getTextAreaInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->getAbstract(), 20, 40, false);
+					stream << f.getTextAreaInput(WebPageUpdateAction::PARAMETER_ABSTRACT, _page->get<Abstract>(), 20, 40, false);
 					stream << f.getSubmitButton("Sauvegarder");
 					stream << f.close();
 				}
@@ -223,13 +224,13 @@ namespace synthese
 					contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 					stream << t.open();
-					stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->getName()));
-					stream << t.cell("Image", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_IMAGE, _page->getImage()));
-					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->_getTemplate() ? lexical_cast<string>(_page->_getTemplate()->getKey()) : "0"));
-					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->getDoNotUseTemplate()));
-					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->getHasForum()));
-					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->getIgnoreWhiteChars()));
-					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->_getMimeType()));
+					stream << t.cell("Titre", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TITLE, _page->get<Title>()));
+					stream << t.cell("Image", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_IMAGE, _page->get<ImageURL>()));
+					stream << t.cell("Modèle (défaut : modèle du site)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_TEMPLATE_ID, _page->get<SpecificTemplate>() ? lexical_cast<string>(_page->get<SpecificTemplate>()->getKey()) : "0"));
+					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->get<DoNotUseTemplate>()));
+					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->get<HasForum>()));
+					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->get<WebpageContent>().getIgnoreWhiteChars()));
+					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->get<MimeType>()));
 					stream << t.close();
 				}
 			}
@@ -245,8 +246,8 @@ namespace synthese
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_page->getKey()));
-					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->getStartDate()));
-					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->getEndDate()));
+					stream << t.cell("Début publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_START_DATE, _page->get<StartTime>()));
+					stream << t.cell("Fin publication", t.getForm().getCalendarInput(WebPageUpdateAction::PARAMETER_END_DATE, _page->get<EndTime>()));
 					stream << t.cell(
 						"Page supérieure",
 						t.getForm().getSelectInput(
@@ -254,8 +255,8 @@ namespace synthese
 							WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"),
 							optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
 					)	);
-					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->getSmartURLPath()));
-					stream << t.cell("Champ par défaut paramètre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->getSmartURLDefaultParameterName()));
+					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->get<SmartURLPath>()));
+					stream << t.cell("Champ par défaut paramètre (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_DEFAULT_PARAMETER_NAME, _page->get<SmartURLDefaultParameterName>()));
 					stream << t.close();
 				}
 
@@ -296,14 +297,14 @@ namespace synthese
 				h.push_back("Actions");
 				HTMLTable t(h, ResultHTMLTable::CSS_CLASS);
 				stream << t.open();
-				BOOST_FOREACH(const Webpage::Links::value_type& link, _page->getLinks())
+				BOOST_FOREACH(const WebpageLinks::Type::value_type& link, _page->get<WebpageLinks>())
 				{
 					openRequest.getPage()->setPage(Env::GetOfficialEnv().getEditableSPtr(link));
 					removeRequest.getAction()->setDestinationPage(Env::GetOfficialEnv().getEditableSPtr(link));
 
 					stream << t.row();
 					stream << t.col() << link->getKey();
-					stream << t.col() << link->getName();
+					stream << t.col() << link->get<Title>();
 					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), ICON);
 					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lien ?", "page_delete.png");
 				}
@@ -427,9 +428,9 @@ namespace synthese
 				viewRequest.getFunction()->setPage(const_pointer_cast<const Webpage>(page));
 				moveRequest.getAction()->setPage(page);
 
-				if(	!page->getRoot()->getClientURL().empty()
+				if(	!page->getRoot()->get<ClientURL>().empty()
 				){
-					viewRequest.setClientURL(page->getRoot()->getClientURL());
+					viewRequest.setClientURL(page->getRoot()->get<ClientURL>());
 				}
 				deleteRequest.getAction()->setObjectId(page->getKey());
 
@@ -528,5 +529,4 @@ namespace synthese
 			stream << t.close();
 			stream << f.close();
 		}
-	}
-}
+}	}

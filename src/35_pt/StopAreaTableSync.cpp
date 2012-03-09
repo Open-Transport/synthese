@@ -81,21 +81,21 @@ namespace synthese
 			"t007_connection_places"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<StopAreaTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
-			DBTableSync::Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
-			DBTableSync::Field(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(StopAreaTableSync::TABLE_COL_NAME, SQL_TEXT),
+			Field(StopAreaTableSync::TABLE_COL_CITYID, SQL_INTEGER),
+			Field(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE, SQL_INTEGER),
+			Field(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION, SQL_BOOLEAN),
+			Field(StopAreaTableSync::TABLE_COL_DEFAULTTRANSFERDELAY, SQL_INTEGER),
+			Field(StopAreaTableSync::TABLE_COL_TRANSFERDELAYS, SQL_TEXT),
+			Field(StopAreaTableSync::COL_NAME13, SQL_TEXT),
+			Field(StopAreaTableSync::COL_NAME26, SQL_TEXT),
+			Field(StopAreaTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			Field(StopAreaTableSync::COL_TIMETABLE_NAME, SQL_TEXT),
+			Field(StopAreaTableSync::COL_HANDICAPPED_COMPLIANCE_ID, SQL_INTEGER),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<StopAreaTableSync>::_INDEXES[] =
@@ -291,7 +291,7 @@ namespace synthese
 			query.addField(object->getName26());
 
 			// Data source links
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 
 			// Timetable name
 			query.addField(object->getTimetableName());

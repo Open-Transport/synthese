@@ -71,7 +71,7 @@ namespace synthese
 			boost::optional<std::size_t> _n;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
-			DBTableSync::TableId _table;
+			util::RegistryTableType _table;
 
 		protected:
 			util::ParametersMap _getParametersMap() const;
@@ -98,7 +98,7 @@ namespace synthese
 
 			void setTextInput(const std::string& text){ _input = text; }
 			void setNumber(boost::optional<std::size_t> number){ _n = number; }
-			void setTable(db::DBTableSync::TableId table){ _table = table; }
+			void setTable(util::RegistryTableType table){ _table = table; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 

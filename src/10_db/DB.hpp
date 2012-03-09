@@ -28,6 +28,7 @@
 #include "FactoryBase.h"
 #include "DBResult.hpp"
 #include "DBTableSync.hpp"
+#include "Field.hpp"
 
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
@@ -197,13 +198,18 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Checks if a table with its list of fields match the schema of the same table in the database.
 			/// @param tableName Table name to check for schema match
-			/// @param fields List of table fields
+			/// @param fieldsList List of table fields
 			/// @return bool True if the table schema matches the given fields
 			/// @pre The table to check for schema match must exist in the database
 			/// @author Sylvain Pasche
 			/// @date 2011
 			/// @since 3.3.0
-			virtual bool isTableSchemaUpToDate(const std::string& tableName, const DBTableSync::Field fields[]) = 0;
+			virtual bool isTableSchemaUpToDate(
+				const std::string& tableName,
+				const FieldsList& fields
+			) = 0;
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Retrieves a list of columns with their types for a given table.
@@ -214,6 +220,8 @@ namespace synthese
 			/// @since 3.3.0
 			virtual std::vector<ColumnInfo> getTableColumns(const std::string& tableName) = 0;
 
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the SQL code to execute to create the table in the database.
 			/// @param tableName Table name to create
@@ -222,7 +230,12 @@ namespace synthese
 			/// @author Hugues Romain, Sylvain Pasche
 			/// @date 2011
 			/// @since 3.3.0
-			virtual std::string getCreateTableSQL(const std::string& tableName, const DBTableSync::Field fields[]) = 0;
+			virtual std::string getCreateTableSQL(
+				const std::string& tableName,
+				const FieldsList& fields
+			) = 0;
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Called as the last step of the schema update/creation process of a table. Can be overridden
@@ -232,7 +245,12 @@ namespace synthese
 			/// @author Sylvain Pasche
 			/// @date 2011
 			/// @since 3.3.0
-			virtual void afterUpdateSchema(const std::string& tableName, const DBTableSync::Field fields[]);
+			virtual void afterUpdateSchema(
+				const std::string& tableName,
+				const FieldsList& fields
+			);
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Checks if an index already exists.
@@ -244,6 +262,8 @@ namespace synthese
 			/// @since 3.3.0
 			virtual bool doesIndexExist(const std::string& tableName, const DBTableSync::Index& index) = 0;
 
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Creates an index in the database given a certain format.
 			/// @param tableName Table to create an index for
@@ -251,7 +271,11 @@ namespace synthese
 			/// @author Hugues Romain, Sylvain Pasche
 			/// @date 2011
 			/// @since 3.3.0
-			virtual void createIndex(const std::string& tableName, const DBTableSync::Index& index, const DBTableSync::Field fields[]) = 0;
+			virtual void createIndex(
+				const std::string& tableName,
+				const DBTableSync::Index& index,
+				const FieldsList& fields
+			) = 0;
 
 
 			//////////////////////////////////////////////////////////////////////////

@@ -27,7 +27,7 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-#include "Importable.h"
+#include "ImportableTemplate.hpp"
 #include "BaseImportableUpdateAction.hpp"
 
 namespace synthese

@@ -27,12 +27,18 @@ DepotTableSync.cpp
 DepotTableSync.hpp
 DepotUpdateAction.cpp
 DepotUpdateAction.hpp
+DriverAllocation.cpp
+DriverAllocation.hpp
+DriverAllocationTableSync.cpp
+DriverAllocationTableSync.hpp
 DriverService.cpp
 DriverService.hpp
 DriverServiceAdmin.cpp
 DriverServiceAdmin.hpp
 DriverServicesAdmin.cpp
 DriverServicesAdmin.hpp
+DriverServicesListService.cpp
+DriverServicesListService.hpp
 DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
 DriverServiceUpdateAction.cpp
@@ -43,6 +49,8 @@ GetVehiclesService.cpp
 GetVehiclesService.hpp
 HeuresOperationFileFormat.cpp
 HeuresOperationFileFormat.hpp
+PTOperationFileFormat.cpp
+PTOperationFileFormat.hpp
 PTOperationModule.cpp
 PTOperationModule.gen.cpp
 PTOperationModuleRegister.cpp

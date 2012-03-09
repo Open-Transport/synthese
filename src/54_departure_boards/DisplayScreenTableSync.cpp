@@ -123,45 +123,45 @@ namespace synthese
 			"t041_display_screens"
 		);
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
+		template<> const Field DBTableSyncTemplate<DisplayScreenTableSync>::_FIELDS[] =
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_ALLOWED_LINES_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
-			DBTableSync::Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
-			DBTableSync::Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			DBTableSync::Field(DisplayScreenTableSync::COL_ALLOW_CANCELED, SQL_BOOLEAN),
-			DBTableSync::Field()
+			Field(TABLE_COL_ID, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_PLACE_ID, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_NAME, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_TYPE_ID, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_WIRING_CODE, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_TITLE, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_BLINKING_DELAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_TRACK_NUMBER_DISPLAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_SERVICE_NUMBER_DISPLAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_DISPLAY_TEAM, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_PHYSICAL_STOPS_IDS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_ALL_PHYSICAL_DISPLAYED, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_FORBIDDEN_ARRIVAL_PLACES_IDS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_ALLOWED_LINES_IDS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_DIRECTION, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_ORIGINS_ONLY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_DISPLAYED_PLACES_IDS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_MAX_DELAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_CLEARING_DELAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_FIRST_ROW, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_GENERATION_METHOD, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_FORCED_DESTINATIONS_IDS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_DESTINATION_FORCE_DELAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_MAINTENANCE_CHECKS_PER_DAY, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_MAINTENANCE_IS_ONLINE, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_MAINTENANCE_MESSAGE, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_DISPLAY_CLOCK, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_COM_PORT, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_CPU_HOST_ID, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_MAC_ADDRESS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_ROUTE_PLANNING_WITH_TRANSFER, SQL_BOOLEAN),
+			Field(DisplayScreenTableSync::COL_TRANSFER_DESTINATIONS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_UP_ID, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_SUB_SCREEN_TYPE, SQL_INTEGER),
+			Field(DisplayScreenTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(DisplayScreenTableSync::COL_ALLOW_CANCELED, SQL_BOOLEAN),
+			Field()
 		};
 
 		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayScreenTableSync>::_INDEXES[] =
@@ -505,7 +505,7 @@ namespace synthese
 			query.addField(tdstream.str());
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
-			query.addField(ImportableTableSync::SerializeDataSourceLinks(object->getDataSourceLinks()));
+			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
 			query.addField(object->getAllowCanceled());
 			query.execute(transaction);
 		}
