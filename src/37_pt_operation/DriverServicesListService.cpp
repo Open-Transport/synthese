@@ -30,7 +30,6 @@
 #include "SchedulesBasedService.h"
 #include "Webpage.h"
 #include "PTOperationModule.hpp"
-#include "StopPoint.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -48,7 +47,7 @@ namespace synthese
 	using namespace graph;
 
 
-	template<> const string util::FactorableTemplate<Function,pt_operation::DriverServicesListService>::FACTORY_KEY("DriverServicesListService");
+	template<> const string util::FactorableTemplate<Function,pt_operation::DriverServicesListService>::FACTORY_KEY("DriverServicesList");
 
 	namespace pt_operation
 	{
@@ -111,51 +110,7 @@ namespace synthese
 				}
 
 				shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				servicePM->insert("id", service.second->getKey());
-			
-				BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, service.second->getChunks())
-				{
-					if(chunk.elements.empty())
-					{
-						continue;
-					}
-
-					shared_ptr<ParametersMap> chunkPM(new ParametersMap);
-					chunkPM->insert("start_time", chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank));
-					chunkPM->insert("end_time", chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank));
-					const StopPoint* startStopPoint(dynamic_cast<StopPoint*>(chunk.elements.begin()->service->getPath()->getEdge(chunk.elements.begin()->startRank)->getFromVertex()));
-					if(startStopPoint)
-					{
-						chunkPM->insert("start_stop", startStopPoint->getCodeBySources());
-					}
-					const StopPoint* endStopPoint(dynamic_cast<StopPoint*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.begin()->endRank)->getFromVertex()));
-					if(endStopPoint)
-					{
-						chunkPM->insert("end_stop", endStopPoint->getCodeBySources());
-					}
-					
-					BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
-					{
-						shared_ptr<ParametersMap> elementPM(new ParametersMap);
-						elementPM->insert("service_id", element.service->getKey());
-						elementPM->insert("start_time", element.service->getDepartureSchedule(false, element.startRank));
-						elementPM->insert("end_time", element.service->getArrivalSchedule(false, element.endRank));
-
-						const StopPoint* startStopPoint(dynamic_cast<StopPoint*>(element.service->getPath()->getEdge(element.startRank)->getFromVertex()));
-						if(startStopPoint)
-						{
-							elementPM->insert("start_stop", startStopPoint->getCodeBySources());
-						}
-						const StopPoint* endStopPoint(dynamic_cast<StopPoint*>(element.service->getPath()->getEdge(element.endRank)->getFromVertex()));
-						if(endStopPoint)
-						{
-							elementPM->insert("end_stop", endStopPoint->getCodeBySources());
-						}
-					}
-
-					servicePM->insert("chunk", chunkPM);
-				}
-
+				service.second->toParametersMap(*servicePM);
 				map.insert(TAG_SERVICE, servicePM);
 			}
 
