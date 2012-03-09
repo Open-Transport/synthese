@@ -109,6 +109,8 @@ namespace synthese
 			//@{
 				void setChunks(const Chunks& value);
 			//@}
+
+			void toParametersMap(util::ParametersMap& map) const;
 		};
 }	}
 

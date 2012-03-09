@@ -11,6 +11,7 @@
 #include "VehiclePositionTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
 
+#include "DriverAllocationsListService.hpp"
 #include "DriverServicesListService.hpp"
 #include "GetCompositionsService.hpp"
 #include "GetVehiclesService.hpp"
@@ -72,6 +73,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::GetCompositionsService::integrate();
 	synthese::pt_operation::GetVehiclesService::integrate();
 	synthese::pt_operation::DriverServicesListService::integrate();
+	synthese::pt_operation::DriverAllocationsListService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
 
