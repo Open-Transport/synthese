@@ -83,6 +83,8 @@ WebPageUpdateAction.cpp
 WebPageUpdateAction.h
 Website.cpp
 Website.hpp
+WebsiteAdmin.cpp
+WebsiteAdmin.hpp
 WebsiteTableSync.cpp
 WebsiteTableSync.hpp
 WebsiteUpdateAction.cpp
