@@ -10,6 +10,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/10_db")
 include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
+include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/18_graph")
 include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 
@@ -21,4 +22,4 @@ set(DEPS
   59_road_journey_planner # from 56_pt_website
 )
 
-#boost_test(Projection "${DEPS}")
+boost_test(Projection "${DEPS}")

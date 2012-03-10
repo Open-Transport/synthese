@@ -129,14 +129,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TestTableSync::COL_NETWORK_ID.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TestTableSync::COL_NETWORK_ID.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

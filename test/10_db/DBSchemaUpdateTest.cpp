@@ -56,10 +56,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchemaTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestSchemaTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 
@@ -105,10 +106,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema2TableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestSchema2TableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 
@@ -155,10 +157,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestSchema3TableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestSchema3TableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 
