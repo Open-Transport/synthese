@@ -25,9 +25,9 @@
 #include "WebsiteAdmin.hpp"
 
 #include "CMSModule.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "WebsiteTableSync.hpp"
 #include "Website.hpp"
-#include "WebsiteUpdateAction.hpp"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
@@ -144,24 +144,36 @@ namespace synthese
 			{
 
 				// Requests
-				AdminActionFunctionRequest<WebsiteUpdateAction, WebsiteAdmin> updateRequest(
+				AdminActionFunctionRequest<ObjectUpdateAction, WebsiteAdmin> updateRequest(
 					_request
 				);
-				updateRequest.getAction()->setSiteId(_site->getKey());
+				updateRequest.getAction()->setObject(*_site);
 
 				// Display
-				stream << "<h1>Propriétés</h1>";
+				stream << "<h1>PropriÃ©tÃ©s</h1>";
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.title("Identification");
-				stream << pt.cell("Nom", pt.getForm().getTextInput(WebsiteUpdateAction::PARAMETER_NAME, _site->get<Name>()));
-				stream << pt.cell("Début validité", pt.getForm().getCalendarInput(WebsiteUpdateAction::PARAMETER_START_DATE, _site->get<StartDate>()));
-				stream << pt.cell("Fin validité", pt.getForm().getCalendarInput(WebsiteUpdateAction::PARAMETER_END_DATE, _site->get<EndDate>()));
-				stream << pt.cell("URL", pt.getForm().getTextInput(WebsiteUpdateAction::PARAMETER_CLIENT_URL, _site->get<ClientURL>()));
 				stream << pt.cell(
-					"Modèle de page par défaut",
+					"Nom",
+					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _site->get<Name>())
+				);
+				stream << pt.cell(
+					"DÃ©but validitÃ©",
+					pt.getForm().getCalendarInput(ObjectUpdateAction::GetInputName<StartDate>(), _site->get<StartDate>())
+				);
+				stream << pt.cell(
+					"Fin validitÃ©",
+					pt.getForm().getCalendarInput(ObjectUpdateAction::GetInputName<EndDate>(), _site->get<EndDate>())
+				);
+				stream << pt.cell(
+					"URL",
+					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<ClientURL>(), _site->get<ClientURL>())
+				);
+				stream << pt.cell(
+					"ModÃ¨le de page par dÃ©faut",
 					pt.getForm().getTextInput(
-						WebsiteUpdateAction::PARAMETER_DEFAULT_PAGE_TEMPLATE_ID,
+						ObjectUpdateAction::GetInputName<DefaultTemplate>(),
 						lexical_cast<string>(_site->get<DefaultTemplate>() ? _site->get<DefaultTemplate>()->getKey() : RegistryKeyType(0))
 				)	);
 				stream << pt.close();
@@ -271,7 +283,7 @@ return true;
 		{
 			_tabs.clear();
 
-			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
+			_tabs.push_back(Tab("PropriÃ©tÃ©s", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
 
 			_tabBuilded = true;

@@ -36,7 +36,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const Field ComplexObjectFieldDefinition<WebpageContent>::FIELDS[] = { Field("content1", SQL_TEXT), Field("ignore_white_chars", SQL_BOOLEAN), Field() };
-	template<> const bool ComplexObjectFieldDefinition<WebpageContent>::EXPORT_CONTENT_AS_FILE = true;
+	template<> const bool ComplexObjectFieldDefinition<WebpageContent>::EXPORT_CONTENT_AS_FILE = false;
 	FIELD_COMPLEX_NO_LINKED_OBJECT_ID(WebpageContent)
 
 	template<>

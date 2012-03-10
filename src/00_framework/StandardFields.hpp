@@ -198,7 +198,7 @@ namespace synthese
 		typedef T Type;
 
 		static void UnSerialize(
-			T fieldObject,
+			T& fieldObject,
 			const std::string& text,
 			const util::Env& env
 		){
@@ -228,12 +228,30 @@ namespace synthese
 			);
 		}
 
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix)
 		{
 			map.insert(
 				prefix + ObjectFieldDefinition<C>::FIELD.name,
 				ObjectField<C, T>::Serialize(fieldObject)
 			);
+		}
+
+		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		{
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+	
+		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map)
+		{
+			map.insert(
+				ObjectFieldDefinition<C>::FIELD.name,
+				ObjectField<C, T>::Serialize(fieldObject)
+			);
+		}
+
+		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map)
+		{
+			SaveToParametersMap(fieldObject, map);
 		}
 
 		/// Do nothing
@@ -331,9 +349,24 @@ namespace synthese
 			return fieldObject ? boost::lexical_cast<std::string>(fieldObject->getKey()) : std::string("0");
 		}
 
-		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, util::ParametersMap& map, const std::string& prefix)
 		{
 			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+		}
+
+		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		{
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+
+		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, util::ParametersMap& map)
+		{
+			map.insert(ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+		}
+
+		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map)
+		{
+			SaveToParametersMap(fieldObject, map);
 		}
 
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
@@ -428,9 +461,24 @@ namespace synthese
 			return s.str();
 		}
 
-		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		static void SaveToParametersMap(const std::vector<P*>& fieldObject, util::ParametersMap& map, const std::string& prefix)
 		{
 			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+		}
+
+		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
+		{
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+
+		static void SaveToParametersMap(const std::vector<P*>& fieldObject, util::ParametersMap& map)
+		{
+			map.insert(ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+		}
+
+		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map)
+		{
+			SaveToParametersMap(fieldObject, map);
 		}
 
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)

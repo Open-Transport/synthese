@@ -897,7 +897,7 @@ namespace synthese
 			else if(key == FILE_AFA)
 			{
 				string filename(filePath.filename());
-				filename = filename.substr(0, filename.length() - filePath.extension().size() - 1);
+				filename = filename.substr(0, filename.length() - filePath.extension().size());
 				date day(from_string(filename));
 
 				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);

@@ -241,6 +241,13 @@ namespace synthese
 		virtual void setKey(util::RegistryKeyType value){ set<Key>(value); }
 
 
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Constructs a new copy of the current object.
+		/// @warning only the record is copied : the created object will probably
+		/// be not usable as is. Use standard = operator for real object copy.
+		virtual boost::shared_ptr<ObjectBase> copy() const;
+
 	private:
 		//////////////////////////////////////////////////////////////////////////
 		/// Operators for fusion::foreach purpose
@@ -293,14 +300,24 @@ namespace synthese
 			template <typename Pair>
 			void operator()(Pair& data) const
 			{
-				if(	Pair::first_type::EXPORT_CONTENT_AS_FILE && _withFiles != false ||
-					!Pair::first_type::EXPORT_CONTENT_AS_FILE && _withFiles != true
+				if(	boost::logic::indeterminate(_withFiles) ||
+					Pair::first_type::EXPORT_CONTENT_AS_FILE == _withFiles
 				){
 					Pair::first_type::SaveToParametersMap(data.second, static_cast<const ObjectBase&>(_object), _map, _prefix);
 				}
 			}
 		};
 	};
+
+
+
+	template<class ObjectClass_, class Schema_>
+	boost::shared_ptr<ObjectBase> synthese::Object<ObjectClass_, Schema_>::copy() const
+	{
+		boost::shared_ptr<ObjectClass_> object(new ObjectClass_);
+		object->_schema = _schema;
+		return boost::static_pointer_cast<ObjectBase, ObjectClass_>(object);
+	}
 
 
 

@@ -27,13 +27,12 @@
 
 #include "Action.h"
 #include "FactorableTemplate.h"
+#include "Webpage.h"
 
 namespace synthese
 {
 	namespace cms
 	{
-		class Webpage;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Action : Web page properties update.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Item_update
@@ -71,7 +70,7 @@ namespace synthese
 			boost::optional<std::string> _title;
 			boost::optional<bool> _ignoreWhiteChars;
 			boost::optional<boost::shared_ptr<Webpage> > _up;
-			boost::optional<boost::shared_ptr<Webpage> > _template;
+			boost::optional<SpecificTemplate::Type> _template;
 			boost::optional<boost::posix_time::ptime> _startDate;
 			boost::optional<boost::posix_time::ptime> _endDate;
 			boost::optional<std::string> _mimeType;
