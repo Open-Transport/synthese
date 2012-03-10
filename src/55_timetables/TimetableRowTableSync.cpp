@@ -76,14 +76,16 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableRowTableSync>::_INDEXES[]=
+		template<> DBTableSync::Indexes DBTableSyncTemplate<TimetableRowTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TimetableRowTableSync::COL_TIMETABLE_ID.c_str()
-				, TimetableRowTableSync::COL_RANK.c_str()
-			, ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TimetableRowTableSync::COL_TIMETABLE_ID.c_str(),
+					TimetableRowTableSync::COL_RANK.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

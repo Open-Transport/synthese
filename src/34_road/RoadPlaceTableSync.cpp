@@ -76,13 +76,16 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<RoadPlaceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<RoadPlaceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				RoadPlaceTableSync::COL_CITYID.c_str()
-				, ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					RoadPlaceTableSync::COL_CITYID.c_str()
+			, "")	);
+			return r;
+		}
 
 
 

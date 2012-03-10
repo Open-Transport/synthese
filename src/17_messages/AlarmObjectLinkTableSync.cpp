@@ -77,12 +77,14 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmObjectLinkTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<AlarmObjectLinkTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(AlarmObjectLinkTableSync::COL_OBJECT_ID.c_str(),	AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
-			DBTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(AlarmObjectLinkTableSync::COL_OBJECT_ID.c_str(),	AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(AlarmObjectLinkTableSync::COL_ALARM_ID.c_str(), ""));
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::Load(
 			AlarmObjectLink* object,

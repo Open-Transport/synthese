@@ -72,10 +72,11 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<MapSourceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<MapSourceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

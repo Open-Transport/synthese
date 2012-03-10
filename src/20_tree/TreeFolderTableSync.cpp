@@ -65,14 +65,17 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TreeFolderTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TreeFolderTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TreeFolderTableSync::COL_PARENT_ID.c_str(),
-				TreeFolderTableSync::COL_NAME.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TreeFolderTableSync::COL_PARENT_ID.c_str(),
+					TreeFolderTableSync::COL_NAME.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

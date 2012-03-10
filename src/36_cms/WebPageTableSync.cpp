@@ -51,15 +51,18 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<WebPageTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<WebPageTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<WebPageTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[0].name.c_str(), ""),
-			DBTableSync::Index(
-				ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name.c_str(),
-				ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[0].name.c_str(), ""));
+			r.push_back(
+				DBTableSync::Index(
+					ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name.c_str(),
+					ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[2].name.c_str(),
+			"")	);
+			return r;
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Load(

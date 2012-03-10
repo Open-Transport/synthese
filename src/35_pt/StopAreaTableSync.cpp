@@ -98,12 +98,14 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<StopAreaTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<StopAreaTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""),
-			DBTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(StopAreaTableSync::TABLE_COL_CITYID.c_str(), StopAreaTableSync::TABLE_COL_NAME.c_str(), ""));
+			r.push_back(DBTableSync::Index(StopAreaTableSync::COL_CODE_BY_SOURCE.c_str(), ""));
+			return r;
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<StopAreaTableSync,StopArea>::Load(

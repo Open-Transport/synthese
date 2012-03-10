@@ -84,12 +84,18 @@ namespace synthese
 			Field()
 		};
 
-		template<>  const DBTableSync::Index DBTableSyncTemplate<DisplayScreenCPUTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DisplayScreenCPUTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), ""),
-			DBTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(DisplayScreenCPUTableSync::COL_PLACE_ID.c_str(), "")
+			);
+			r.push_back(
+				DBTableSync::Index(DisplayScreenCPUTableSync::COL_MAC_ADDRESS.c_str(), "")
+			);
+			return r;
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<DisplayScreenCPUTableSync,DisplayScreenCPU>::Load(

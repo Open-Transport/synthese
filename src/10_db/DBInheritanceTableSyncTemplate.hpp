@@ -332,6 +332,14 @@ namespace synthese
 
 
 
+			virtual boost::shared_ptr<util::Registrable> newObject(
+			) const {
+				assert(false); // this method can not choose an implementation at this time
+				return boost::shared_ptr<T>();
+			}
+
+
+
 			virtual void saveRegistrable(
 				util::Registrable& obj,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()

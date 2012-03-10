@@ -82,18 +82,22 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ForumMessageTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ForumMessageTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				ForumMessageTableSync::COL_TOPIC_ID.c_str(),
-				ForumMessageTableSync::COL_DATE.c_str(),
-			""),
-			DBTableSync::Index(
-				ForumMessageTableSync::COL_USER_ID.c_str(),
-				ForumMessageTableSync::COL_DATE.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					ForumMessageTableSync::COL_TOPIC_ID.c_str(),
+					ForumMessageTableSync::COL_DATE.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					ForumMessageTableSync::COL_USER_ID.c_str(),
+					ForumMessageTableSync::COL_DATE.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

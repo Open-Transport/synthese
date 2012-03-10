@@ -258,6 +258,13 @@ namespace synthese
 			}
 
 
+			virtual boost::shared_ptr<util::Registrable> newObject(
+			) const {
+				return boost::dynamic_pointer_cast<util::Registrable, T>(
+					boost::shared_ptr<T>(new T)
+				);
+			}
+
 
 			virtual boost::shared_ptr<util::Registrable> createRegistrable(
 				const DBResultSPtr& row

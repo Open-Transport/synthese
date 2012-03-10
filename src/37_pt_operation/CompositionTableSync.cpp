@@ -91,18 +91,22 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CompositionTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CompositionTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				CompositionTableSync::COL_SERVICE_ID.c_str(),
-				""
-			),
-			DBTableSync::Index(
-				CompositionTableSync::COL_VEHICLE_SERVICE_ID.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					CompositionTableSync::COL_SERVICE_ID.c_str(),
+					""
+			)	);
+			r.push_back(
+				DBTableSync::Index(
+					CompositionTableSync::COL_VEHICLE_SERVICE_ID.c_str(),
+					""
+			)	);
+			return r;
+		}
 
 
 

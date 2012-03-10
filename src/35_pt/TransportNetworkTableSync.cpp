@@ -77,11 +77,13 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TransportNetworkTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TransportNetworkTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""),
-			DBTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(TransportNetworkTableSync::COL_CREATOR_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(TransportNetworkTableSync::COL_NAME.c_str(), ""));
+			return r;
 		};
 
 

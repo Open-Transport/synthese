@@ -75,11 +75,13 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TextTemplateTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TextTemplateTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(TextTemplateTableSync::COL_PARENT_ID.c_str(), ""));
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<TextTemplateTableSync,TextTemplate>::Load(
 			TextTemplate* object,

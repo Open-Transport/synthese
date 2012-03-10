@@ -127,7 +127,18 @@ namespace synthese
 			/// @date 2010
 			/// @since 3.1.16
 			/// @throws DBException if the table was not found
-			static boost::shared_ptr<DBTableSync> GetTableSync(int tableId);
+			static boost::shared_ptr<DBTableSync> GetTableSync(util::RegistryTableType tableId);
+
+
+
+			static boost::shared_ptr<const util::Registrable> GetObject(
+				util::RegistryKeyType id,
+				util::Env& env
+			);
+			static boost::shared_ptr<util::Registrable> GetEditableObject(
+				util::RegistryKeyType id,
+				util::Env& env
+			);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @since 3.2.0

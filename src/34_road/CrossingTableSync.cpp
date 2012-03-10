@@ -71,10 +71,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CrossingTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CrossingTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

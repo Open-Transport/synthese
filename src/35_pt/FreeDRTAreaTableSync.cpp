@@ -87,12 +87,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<FreeDRTAreaTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<FreeDRTAreaTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID.c_str(),
-			""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID.c_str(),
+			"")	);
+			return r;
 		};
 
 

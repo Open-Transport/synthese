@@ -81,7 +81,7 @@ namespace synthese
 			/// To allow to loop on the table without knowing its size,
 			/// the last element of the _INDEXES array must be an empty Index
 			/// object.
-			static const DBTableSync::Index _INDEXES[];
+			static DBTableSync::Indexes GetIndexes();
 
 
 
@@ -490,11 +490,11 @@ namespace synthese
 				}
 				if(field.isGeometry())
 				{
-					fieldsGetter << "AsText(" << TABLE.NAME << ".\"" << field.name << "\") AS \"" << field.name << '"';
+					fieldsGetter << "AsText(" << TABLE.NAME << "." << field.name << ") AS " << field.name;
 				}
 				else
 				{
-					fieldsGetter << TABLE.NAME << ".\"" << field.name << "\"";
+					fieldsGetter << TABLE.NAME << "." << field.name;
 				}
 			}
 			_fieldsGetter = fieldsGetter.str();
@@ -515,15 +515,16 @@ namespace synthese
 
 
 			// Indexes
-			for(size_t i(0); !_INDEXES[i].empty(); ++i)
+			DBTableSync::Indexes indexes(GetIndexes());
+			BOOST_FOREACH(const DBTableSync::Indexes::value_type& index, indexes)
 			{
-				if (db->doesIndexExist(TABLE.NAME, _INDEXES[i]))
+				if (db->doesIndexExist(TABLE.NAME, index))
 				{
 					// We assume that if the index exists, it is correct. That should be a rather safe bet if
 					// backends use an index named from the list of its columns (which all backends do now).
 					continue;
 				}
-				db->createIndex(TABLE.NAME, _INDEXES[i], fieldsList);
+				db->createIndex(TABLE.NAME, index, fieldsList);
 				TABLE.CreatedIndexes++;
 			}
 

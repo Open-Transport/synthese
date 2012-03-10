@@ -84,10 +84,10 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockFilterTableSync>::_INDEXES[] =
+		template<> DBTableSync::Indexes DBTableSyncTemplate<RollingStockFilterTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

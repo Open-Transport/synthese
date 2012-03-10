@@ -63,12 +63,14 @@ namespace synthese
 
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CityTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CityTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(CityTableSync::TABLE_COL_NAME.c_str(), ""),
-			DBTableSync::Index(CityTableSync::TABLE_COL_CODE.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(CityTableSync::TABLE_COL_NAME.c_str(), ""));
+			r.push_back(DBTableSync::Index(CityTableSync::TABLE_COL_CODE.c_str(), ""));
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<CityTableSync,City>::Load(
 			City* object,

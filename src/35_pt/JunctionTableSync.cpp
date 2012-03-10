@@ -81,18 +81,22 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<JunctionTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<JunctionTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
-				JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
-			""),
-			DBTableSync::Index(
-				JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
-				JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
+					JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					JunctionTableSync::COL_END_PHYSICAL_STOP_ID.c_str(),
+					JunctionTableSync::COL_START_PHYSICAL_STOP_ID.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

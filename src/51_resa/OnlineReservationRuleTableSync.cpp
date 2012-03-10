@@ -71,8 +71,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<OnlineReservationRuleTableSync>::TABLE(
-				"t047_online_reservation_rules"
-				);
+			"t047_online_reservation_rules"
+		);
 
 		template<> const Field DBTableSyncTemplate<OnlineReservationRuleTableSync>::_FIELDS[]=
 		{
@@ -93,11 +93,13 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<OnlineReservationRuleTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<OnlineReservationRuleTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(OnlineReservationRuleTableSync::COL_RESERVATION_CONTACT_ID.c_str(), ""));
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<OnlineReservationRuleTableSync,OnlineReservationRule>::Load(
 			OnlineReservationRule* object,

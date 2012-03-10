@@ -73,17 +73,21 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CityAliasTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CityAliasTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				CityAliasTableSync::COL_CODE.c_str(),
-			""),
-			DBTableSync::Index(
-				CityAliasTableSync::COL_ALIASED_CITY_ID.c_str(),
-				CityAliasTableSync::COL_NAME.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					CityAliasTableSync::COL_CODE.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					CityAliasTableSync::COL_ALIASED_CITY_ID.c_str(),
+					CityAliasTableSync::COL_NAME.c_str(),
+			"")	);
+			return r;
+		}
 
 
 
