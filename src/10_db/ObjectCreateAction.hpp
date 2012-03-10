@@ -110,7 +110,7 @@ namespace synthese
 				template<class C>
 				void set(const typename C::Type& value)
 				{
-					T::SaveToParametersMap(value, _value, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX);
 				}
 
 				/// All parameters version
@@ -119,7 +119,7 @@ namespace synthese
 					const typename C::Type& value,
 					const ObjectBase& object
 				){
-					T::SaveToParametersMap(value, object, _value, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX);
 				}
 			//@}
 
