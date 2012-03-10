@@ -869,321 +869,11 @@ $end$$SymbolType$ $SymbolContext$( $ParameterList$ )
 {
 	$MethodBody$
 }
-
-a:Interface Page Header::
-
-/** $FILE_BASE$ class header.
-	@file $FILE_BASE$.$FILE_EXT$
-	@author %USERNAME%
-	@date $YEAR$
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#ifndef SYNTHESE_$FILE_BASE$_H__
-#define SYNTHESE_$FILE_BASE$_H__
-
-#include "InterfacePage.h"
-#include "FactorableTemplate.h"
-
-namespace synthese
-{
-	namespace server
-	{
-		class Request;
-	}
-	
-	namespace $ObjectNamespace$
-	{
-		class $ObjectClass$;
-	}
-
-	namespace $namespace$
-	{
-		/** $FILE_BASE$ Interface Page Class.
-			@ingroup m$module_number$Pages refPages
-			@author %USERNAME%
-			@date $YEAR$
-
-			@code $Factory_key$ @endcode
-
-			Parameters :
-				- 0 :
-				- 1 :
-
-			Object : $ObjectClass$
-		*/
-		class $FILE_BASE$
-			: public util::FactorableTemplate<interfaces::InterfacePage, $FILE_BASE$>
-		{
-		public:
-			/** Overloaded display method for specific parameter conversion.
-				This function converts the parameters into a single ParametersVector object.
-				@param stream Stream to write on
-				@param ...	
-				@param variables Execution variables
-				@param request Source request
-			*/
-			void display(
-				std::ostream& stream,
-				const $ObjectNamespace$::$ObjectClass$& object,
-				interfaces::VariablesMap& variables,
-				const server::Request* request = NULL
-			) const;
-			
-			$FILE_BASE$();
-		};
-	}
-}
-
-#endif // SYNTHESE_$FILE_BASE$_H__
-
-
-a:Interface Page Implementation::
-
-/** $FILE_BASE$ class implementation.
-	@file $FILE_BASE$.$FILE_EXT$
-	@author %USERNAME%
-	@date $YEAR$
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "$FILE_BASE$.h"
-#include "$ObjectClass$.h"
-
-using namespace std;
-
-namespace synthese
-{
-	using namespace interfaces;
-	using namespace util;
-	using namespace $ObjectNamespace$;
-
-	namespace util
-	{
-		template<> const string FactorableTemplate<InterfacePage, $Module$::$FILE_BASE$>::FACTORY_KEY("$Factory_key$");
-	}
-
-	namespace $Module$
-	{
-		$FILE_BASE$::$FILE_BASE$()
-			: FactorableTemplate<interfaces::InterfacePage, $FILE_BASE$>(),
-			Registrable(UNKNOWN_VALUE)
-		{
-		}
-		
-		
-
-		void $FILE_BASE$::display(
-			std::ostream& stream,
-			const $ObjectClass$& object,
-			VariablesMap& variables,
-			const server::Request* request /*= NULL*/
-		) const	{
-			ParametersVector pv;
-		
-			/// @todo Implement the building of the parameter vector with parameters of the function
-
-			InterfacePage::_display(
-				stream
-				, pv
-				, variables
-				, static_cast<const void*>(&object)
-				, request
-			);
-		}
-	}
-}
-
-
-a:Interface Library Element Header::
-
-/** $FILE_BASE$ class header.
-	@file $FILE_BASE$.$FILE_EXT$
-	@author %USERNAME%
-	@date $YEAR$
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#ifndef SYNTHESE_$FILE_BASE$_H__
-#define SYNTHESE_$FILE_BASE$_H__
-
-#include "11_interfaces/LibraryInterfaceElement.h"
-
-#include "01_util/FactorableTemplate.h"
-
-namespace synthese
-{
-	namespace $Module$
-	{
-		/** $FILE_BASE$ Library Interface Element Class.
-			@author %USERNAME%
-			@date $YEAR$
-			@ingroup m$Module_Number$Library refLibrary
-
-			@code $Factory_key$ @endcode
-
-			Parameters :
-				- 0 :
-				- 1 :
-
-			Object : $ObjectClass$
-
-		*/
-		class $FILE_BASE$
-			: public util::FactorableTemplate<interfaces::LibraryInterfaceElement, $FILE_BASE$>
-		{
-			// List of parameters to store
-			boost::shared_ptr<interfaces::LibraryInterfaceElement> _parameter1;
-			//...
-
-		public:
-			/** Checks and store the internals parameters.
-				@param vel Parameters list to read
-			*/
-			void storeParameters(interfaces::ValueElementList& vel);
-			
-			/* Displays the object.
-				@param stream Stream to write on
-				@param parameters Runtime parameters used in the internal parameters reading
-				@param variables Runtime variables
-				@param object Object to read at the display
-				@param request Source request
-			*/
-			std::string display(
-				std::ostream& stream
-				, const interfaces::ParametersVector& parameters
-				, interfaces::VariablesMap& variables
-				, const void* object = NULL
-				, const server::Request* request = NULL
-				) const;
-				
-			~$FILE_BASE$();
-		};
-	}
-}
-
-#endif // SYNTHESE_$FILE_BASE$_H__
-
-
-a:Interface Library Element Implementation::
-
-/** $FILE_BASE$ class implementation.
-	@file $FILE_BASE$.$FILE_EXT$
-	@author %USERNAME%
-	@date $YEAR$
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
-
-#include "$FILE_BASE$.h"
-
-#include "11_interfaces/ValueElementList.h"
-
-using namespace std;
-
-namespace synthese
-{
-	using namespace interfaces;
-	
-	namespace util
-	{
-		template<> const string FactorableTemplate<LibraryInterfaceElement, $Module$::$FILE_BASE$>::FACTORY_KEY("$Factory_key$");
-	}
-
-	namespace $Module$
-	{
-		void $FILE_BASE$::storeParameters(ValueElementList& vel)
-		{
-			_parameter1 = vel.front();
-			/// @todo check and Fill the parameters init
-		}
-
-		string $FILE_BASE$::display(
-			ostream& stream
-			, const ParametersVector& parameters
-			, VariablesMap& variables
-			, const void* object /*= NULL*/
-			, const server::Request* request /*= NULL*/
-		) const {
-			/// @todo output on the stream. Read the parameters like this :
-			stream << _parameter1->getValue(parameters,variables,object,request);
-
-			return string();
-		}
-
-		$FILE_BASE$::~$FILE_BASE$()
-		{
-		}
-	}
-}
 
 
 a:Right Header::
 
-/** $FILE_BASE$ class header.
+/**	$FILE_BASE$ class header.
 	@file $FILE_BASE$.$FILE_EXT$
 	@author %USERNAME%
 	@date $YEAR$
@@ -1209,7 +899,7 @@ a:Right Header::
 #ifndef SYNTHESE_$Module$_$FILE_BASE$_H__
 #define SYNTHESE_$Module$_$FILE_BASE$_H__
 
-#include "12_security/RightTemplate.h"
+#include "RightTemplate.h"
 
 namespace synthese
 {
@@ -1250,15 +940,13 @@ namespace synthese
 			*/
 			bool perimeterIncludes(const std::string& perimeter, util::Env& env) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_$Module$_$FILE_BASE$_H__
-
 
 a:Right Implementation::
 
-/** $FILE_BASE$ class implementation.
+/**	$FILE_BASE$ class implementation.
 	@file $FILE_BASE$.$FILE_EXT$
 	@author %USERNAME%
 	@date $YEAR$
@@ -1281,15 +969,16 @@ a:Right Implementation::
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "$FILE_BASE$.h"
+#include "$FILE_BASE$.hpp"
+
 #include "Env.h"
-#include "12_security/Constants.h"
+#include "SecurityConstants.hpp"
 
 using namespace std;
 
 namespace synthese
 {
-	using namespace $Module$;
+	using namespace $namespace$;
 	using namespace security;
 	using namespace util;
 
@@ -1313,7 +1002,7 @@ namespace synthese
 		}
 	}
 
-	namespace $Module$
+	namespace $namespace$
 	{
 		string $FILE_BASE$::displayParameter(Env& env) const
 		{
@@ -1323,6 +1012,8 @@ namespace synthese
 			return _parameter;
 		}
 
+
+
 		bool $FILE_BASE$::perimeterIncludes(const string& perimeter, Env& env) const
 		{
 			if (_parameter == GLOBAL_PERIMETER)
@@ -1330,9 +1021,7 @@ namespace synthese
 
 			return false;
 		}
-	}
-}
-
+}	}
 
 a:Exception Implementation:EXC:
 
@@ -1462,8 +1151,9 @@ a:Admin Page header::
 #ifndef SYNTHESE_$FILE_BASE$_H__
 #define SYNTHESE_$FILE_BASE$_H__
 
-#include "ResultHTMLTable.h"
 #include "AdminInterfaceElementTemplate.h"
+
+#include "ResultHTMLTable.h"
 
 namespace synthese
 {
@@ -1619,8 +1309,7 @@ namespace synthese
 			///       REMOVE THIS METHOD OVERLOAD IF IT IS NOT NECESSARY.
 			virtual std::string getTitle() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_$FILE_BASE$_H__
 
@@ -1651,6 +1340,7 @@ a:Admin Page Implementation::
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "$FILE_BASE$.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "$ModuleClass$.h"
@@ -1806,16 +1496,14 @@ namespace synthese
 		) const	{
 			_tabs.clear();
 
-			// _tabs.push_back(Tab("Propri�t�s", TAB_PROPERTIES, profile.isAuthorized<$RightClass$>(WRITE, UNKNOWN_RIGHT_LEVEL)));
+			// _tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, profile.isAuthorized<$RightClass$>(WRITE, UNKNOWN_RIGHT_LEVEL)));
 
 			_tabBuilded = true;
 		}
-	}
-}
+}	}
 
 
 a:Action Header::
-
 //////////////////////////////////////////////////////////////////////////
 /// $FILE_BASE$ class header.
 ///	@file $FILE_BASE$.$FILE_EXT$
@@ -1914,7 +1602,6 @@ namespace synthese
 
 
 a:Action Implementation::
-
 //////////////////////////////////////////////////////////////////////////
 /// $FILE_BASE$ class implementation.
 /// @file $FILE_BASE$.$FILE_EXT$
@@ -1938,11 +1625,12 @@ a:Action Implementation::
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "$FILE_BASE$.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "$FILE_BASE$.hpp"
-#include "$RightClass$.h"
 #include "Request.h"
+#include "$RightClass$.h"
 #include "$LogClass$.h"
 
 using namespace std;
@@ -1997,26 +1685,7 @@ namespace synthese
 		void $FILE_BASE$::run(
 			Request& request
 		){
-/*			UPDATE EXAMPLE
-			stringstream text;
-			$LogClass$::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _newValue);
-			_object->setAttribute(_value);
-			ObjectTableSync::Save(_object.get());
-			$LogClass$::AddUpdateEntry(*_object, text.str(), request.getUser().get());
-*/
 
-/*			CREATION EXAMPLE
-			Object object;
-			object.setAttribute(_value);
-			ObjectTableSync::Save(&object);
-			$LogClass$::AddCreationEntry(object, *request.getUser());
-			request.setActionCreatedId(object.getKey());
-*/
-
-/*			DELETION EXAMPLE
-			ObjectTableSync::Remove(_object->getKey());
-			$LogClass$::AddDeleteEntry(*_object, *request.getUser());
-*/
 		}
 		
 		
@@ -2026,12 +1695,10 @@ namespace synthese
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<$RightClass$>($NeededRightLevel$);
 		}
-	}
-}
+}	}
 
 
 a:10 Table Sync Header::
-
 //////////////////////////////////////////////////////////////////////////
 ///	$FILE_BASE$ class header.
 ///	@file $FILE_BASE$.$FILE_EXT$
@@ -2059,6 +1726,7 @@ a:10 Table Sync Header::
 #define SYNTHESE_$FILE_BASE$_$FILE_EXT$__
 
 #include "$ObjectClass$.hpp"
+
 #include "DB$NoSync_Registry$TableSyncTemplate.hpp"
 
 namespace synthese
@@ -2075,12 +1743,6 @@ namespace synthese
 			public db::DB$NoSync_Registry$TableSyncTemplate<$FILE_BASE$,$ObjectClass$>
 		{
 		public:
-			//! @name Field names
-			//@{
-				// static const std::string COL_NAME;
-			//@}
-			
-
 			//! @name Services
 			//@{		
 				//////////////////////////////////////////////////////////////////////////
@@ -2103,12 +1765,11 @@ namespace synthese
 					boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 					bool orderByName = true,
 					bool raisingOrder = true,
-					util::LinkLevel linkLevel = util::FIELDS_ONLY_LOAD_LEVEL
+					util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 				);
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_$FILE_BASE$_$FILE_EXT$__
 
@@ -2159,11 +1820,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,$FILE_BASE$>::FACTORY_KEY("$Table_factory_key$");
 	}
 
-	namespace $namespace$
-	{
-		// const string $FILE_BASE$::COL_NAME ("name");
-	}
-	
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<$FILE_BASE$>::TABLE(
@@ -2172,22 +1828,20 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Field DBTableSyncTemplate<$FILE_BASE$>::_FIELDS[]=
+		template<> const DBTableSync::Field DBTableSyncTemplate<$FILE_BASE$>::_FIELDS[] = { Field() }; // Defined by the record
+
+
+
+		template<>
+		const DBTableSync::Indexes DBTableSyncTemplate<$FILE_BASE$>::GetIndexes()
 		{
-			DBTableSync::Field(TABLE_COL_ID, SQL_INTEGER),
-			// DBTableSync::Field($FILE_BASE$::COL_NAME, SQL_TEXT),
-			DBTableSync::Field()
-		};
-
-
-
-		template<> const DBTableSync::Index DBTableSyncTemplate<$FILE_BASE$>::_INDEXES[]=
-		{
-			// DBTableSync::Index(
-			//	$FILE_BASE$::COL_NAME.c_str(),
-			// ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			// r.push_back(
+			//	DBTableSync::Index(
+			//		$FILE_BASE$::COL_NAME.c_str(),
+			// "")	);
+			return r;
+		}
 
 
 
@@ -2197,23 +1851,15 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// object->setName(rows->getText($FILE_BASE$::COL_NAME));
-
-			// if(linkLevel >= UP_LINKS_LOAD_LEVEL)
-			// {
-			//	RegistryKeyType pid(rows->getLongLong($FILE_BASE$::COL_PARENT_ID));
-			//	if(pid > 0)
-			//	{
-			//		try
-			//		{
-			//			object->setParent(GetEditable(pid, env, linkLevel).get());
-			//		}
-			//		catch(ObjectNotFoundException<xxx>& e)
-			//		{
-			//			Log::GetInstance().warn("No such parent "+ lexical_cast<string>(pid) +" in $ObjectClass$ "+ lexical_cast<string>(object->getKey()));
-			//		}
-			//	}
-			// }
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+			}
 		}
 
 
@@ -2222,9 +1868,11 @@ namespace synthese
 			$ObjectClass$* object,
 			optional<DBTransaction&> transaction
 		){
+			// Query
 			ReplaceQuery<$FILE_BASE$> query(*object);
-			// query.addField(object->getName());
-			// query.addField(object->_getParent() ? object->_getParent()->getKey() : RegistryKeyType(0));
+			ParametersMap map;
+			object->toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
@@ -2233,6 +1881,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<$FILE_BASE$,$ObjectClass$>::Unlink(
 			$ObjectClass$* obj
 		){
+			obj->unlink();
 		}
 
 
@@ -2281,7 +1930,7 @@ namespace synthese
 			optional<size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByName,
 			bool raisingOrder,
-			util::LinkLevel linkLevel /*= util::FIELDS_ONLY_LOAD_LEVEL */
+			util::LinkLevel linkLevel
 		){
 			SelectQuery<$FILE_BASE$> query;
 			// if(parameterId)
@@ -2303,8 +1952,7 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}
 
 
 a:Inherited Table Sync Header::
@@ -2492,10 +2140,10 @@ namespace synthese
 }	}
 
 
-a:Function Header::
+a:Service Header::
 
 //////////////////////////////////////////////////////////////////////////////////////////
-/// $FILE_BASE$ class header.
+///	$FILE_BASE$ class header.
 ///	@file $FILE_BASE$.$FILE_EXT$
 ///	@author %USERNAME%
 ///	@date $YEAR$
@@ -2611,36 +2259,35 @@ namespace synthese
 			/// @date $YEAR$
 			virtual std::string getOutputMimeType() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_$FILE_BASE$_H__
 
 
-a:Function Implementation::
+a:Service Implementation::
 
-/** $FILE_BASE$ class implementation.
-	@file $FILE_BASE$.$FILE_EXT$
-	@author %USERNAME%
-	@date $YEAR$
-
-	This file belongs to the SYNTHESE project (public transportation specialized software)
-	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
-
-	This program is free software; you can redistribute it and/or
-	modify it under the terms of the GNU General Public License
-	as published by the Free Software Foundation; either version 2
-	of the License, or (at your option) any later version.
-
-	This program is distributed in the hope that it will be useful,
-	but WITHOUT ANY WARRANTY; without even the implied warranty of
-	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-	GNU General Public License for more details.
-
-	You should have received a copy of the GNU General Public License
-	along with this program; if not, write to the Free Software
-	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-*/
+//////////////////////////////////////////////////////////////////////////////////////////
+///	$FILE_BASE$ class implementation.
+///	@file $FILE_BASE$.$FILE_EXT$
+///	@author %USERNAME%
+///	@date $YEAR$
+///
+///	This file belongs to the SYNTHESE project (public transportation specialized software)
+///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+///
+///	This program is free software; you can redistribute it and/or
+///	modify it under the terms of the GNU General Public License
+///	as published by the Free Software Foundation; either version 2
+///	of the License, or (at your option) any later version.
+///
+///	This program is distributed in the hope that it will be useful,
+///	but WITHOUT ANY WARRANTY; without even the implied warranty of
+///	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+///	GNU General Public License for more details.
+///
+///	You should have received a copy of the GNU General Public License
+///	along with this program; if not, write to the Free Software
+///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "RequestException.h"
 #include "Request.h"
@@ -2660,8 +2307,10 @@ namespace synthese
 	namespace $module$
 	{
 		/// @todo Parameter names declarations
-		//const string $FILE_BASE$::PARAMETER_PAGE("rub");
+		//const string $FILE_BASE$::PARAMETER_PAGE = "p";
 		
+
+
 		ParametersMap $FILE_BASE$::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -2669,6 +2318,8 @@ namespace synthese
 			// eg : map.insert(PARAMETER_PAGE, _page->getFactoryKey());
 			return map;
 		}
+
+
 
 		void $FILE_BASE$::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -2701,9 +2352,7 @@ namespace synthese
 		{
 			return "text/html";
 		}
-	}
-}
-
+}	}
 
 a:CPP implementation::
 
@@ -2728,15 +2377,14 @@ a:CPP implementation::
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "$FILE_BASE$.h"
+#include "$FILE_BASE$.hpp"
 
 namespace synthese
 {
 	namespace $Module$
 	{
 
-	}
-}
+}	}
 
 
 a:GNU GPL Licence for header:GPLH:
