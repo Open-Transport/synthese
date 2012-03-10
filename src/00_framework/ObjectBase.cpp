@@ -1,6 +1,6 @@
 
-/** StandardFieldNames class implementation.
-	@file StandardFieldNames.cpp
+/** ObjectBase class implementation.
+	@file ObjectBase.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,21 +20,36 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "StandardFields.hpp"
+#include "ObjectBase.hpp"
+
+#include <boost/lexical_cast.hpp>
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
-	//////////////////////////////////////////////////////////////////////////
-	// Simple types
-	FIELD_DEFINITION_OF_TYPE(Date, "date", SQL_DATE)
-	FIELD_DEFINITION_OF_TYPE(EndTime, "end_time", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(EndDate, "end_date", SQL_DATE)
-	FIELD_DEFINITION_OF_TYPE(Key, "id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(MimeType, "mime_type", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(Name, "name", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(Rank, "rank", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(StartTime, "start_time", SQL_DATETIME)
-	FIELD_DEFINITION_OF_TYPE(StartDate, "start_date", SQL_DATE)
-	FIELD_DEFINITION_OF_TYPE(Title, "title", SQL_TEXT)
+	ObjectBase::IntegrityException::IntegrityException(
+		const ObjectBase& object,
+		const std::string& field,
+		const std::string& value,
+		const std::string& problem
+	):	Exception(
+			"Object integrity check failed : object "+ object.getName() +
+			" ("+ lexical_cast<string>(object.getKey()) + ") has bad value for field " +
+			field + " (" + value +") : " + problem
+		)
+	{}
+
+
+
+	ObjectBase::IntegrityException::IntegrityException(
+		const ObjectBase& object,
+		const std::string& problem
+	):	Exception(
+			"Object integrity check failed : object " + object.getName() +
+			" ("+ lexical_cast<string>(object.getKey()) + ") : " + problem
+		)
+	{}
 }
 

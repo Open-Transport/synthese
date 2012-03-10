@@ -25,13 +25,33 @@
 
 #include "Registrable.h"
 
+#include "Exception.h"
 #include "FrameworkTypes.hpp"
 
 #include <string>
 #include <boost/logic/tribool.hpp>
+#include <boost/optional.hpp>
+#include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
+	// For allowCreate and allowUpdate possible overloads only :
+	// not used in the default implementation so the server module is not
+	// linked with the framework module
+	namespace server
+	{
+		class Session;
+	}
+
+	// For beforeUpdate and afterUpdate possible overloads only :
+	// not used in the default implementation so the db module is not
+	// linked with the framework module
+	namespace db
+	{
+		class DBTransaction;
+	}
+
+	// TODO migrate these classes into the framework module
 	namespace util
 	{
 		class Env;
@@ -43,9 +63,15 @@ namespace synthese
 
 	typedef std::vector<ObjectBase*> SubObjects;
 
-	/** ObjectBase class.
-		@ingroup m
-	*/
+	//////////////////////////////////////////////////////////////////////////
+	/// Object base interface.
+	/// Base class of every object using the definition by record.
+	//////////////////////////////////////////////////////////////////////////
+	/// @author Hugues Romain
+	/// @date 2012
+	/// @ingroup m00
+	/// @todo merge it with Registrable when all existing classes will be migrated
+	/// as ObjectBase implementations
 	class ObjectBase:
 		public virtual util::Registrable
 	{
@@ -56,14 +82,36 @@ namespace synthese
 		{}
 
 
+		class IntegrityException:
+			public Exception
+		{
+			IntegrityException(
+				const ObjectBase& object,
+				const std::string& field,
+				const std::string& value,
+				const std::string& problem
+			);
+			IntegrityException(
+				const ObjectBase& object,
+				const std::string& problem
+			);
+		};
+
+
 		/// @name Methods to overload if necessary
 		//@{
 			virtual std::string getName() const { return std::string(); }
 			virtual SubObjects getSubObjects() const { return SubObjects(); }
 			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false) {}
 			virtual void unlink() {}
+			virtual void checkIntegrity() const throw(IntegrityException) {}
+			virtual bool allowUpdate(const server::Session* session) const { return true; }
+			virtual void beforeUpdate(const ObjectBase& existingObject, boost::optional<db::DBTransaction&> transaction) const { }
+			virtual void afterUpdate(const ObjectBase& existingObject, boost::optional<db::DBTransaction&> transaction) const { }
+			virtual bool allowCreate(const server::Session* session) const { return true; }
+			virtual void beforeCreate(boost::optional<db::DBTransaction&> transaction) const { }
+			virtual void afterCreate(boost::optional<db::DBTransaction&> transaction) const { }
 
-			
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds parameters that are not intended to be saved (i.e. generated content).
 			/// The default implementation adds nothing. This method may be overloaded
@@ -119,6 +167,14 @@ namespace synthese
 			virtual LinkedObjectsIds getLinkedObjectsIds(
 				const Record& record
 			) const = 0;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructs a new copy of the current object.
+			/// @warning only the record is copied : the created object will probably
+			/// be not usable as is. Use standard = operator for real object copy.
+			virtual boost::shared_ptr<ObjectBase> copy() const = 0;
 		//@}
 	};
 }

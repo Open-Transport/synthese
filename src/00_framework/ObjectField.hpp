@@ -64,6 +64,9 @@ namespace synthese
 
 		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
 		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
+		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map);
+		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix);
+		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map);
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
 	};
 
@@ -115,12 +118,34 @@ namespace synthese
 	template<class C, class T>
 	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
 	{
+		SaveToParametersMap(fieldObject, map, prefix);
+	}
+
+
+	template<class C, class T>
+	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix)
+	{
 		map.insert(
 			prefix + ObjectFieldDefinition<C>::FIELD.name,
 			ObjectField<C, T>::Serialize(fieldObject)
 		);
 	}
 
+	template<class C, class T>
+	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map)
+	{
+		SaveToParametersMap(fieldObject, map);
+	}
+
+
+	template<class C, class T>
+	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, util::ParametersMap& map)
+	{
+		map.insert(
+			ObjectFieldDefinition<C>::FIELD.name,
+			ObjectField<C, T>::Serialize(fieldObject)
+		);
+	}
 
 	template<class C, class T>
 	void SimpleObjectField<C, T>::GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)

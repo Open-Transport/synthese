@@ -8,7 +8,6 @@
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
-#include "WebsiteUpdateAction.hpp"
 
 #include "AddService.hpp"
 #include "BitAndFunction.hpp"
@@ -95,5 +94,4 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
-	synthese::cms::WebsiteUpdateAction::integrate();
 }
