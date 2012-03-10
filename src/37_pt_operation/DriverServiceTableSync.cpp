@@ -84,10 +84,11 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DriverServiceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DriverServiceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

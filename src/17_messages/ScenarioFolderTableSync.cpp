@@ -72,11 +72,13 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioFolderTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ScenarioFolderTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(ScenarioFolderTableSync::COL_PARENT_ID.c_str(), ""));
+			return r;
+		}
 
 
 

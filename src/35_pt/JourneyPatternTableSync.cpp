@@ -96,12 +96,14 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<JourneyPatternTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<JourneyPatternTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""),
-			DBTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(JourneyPatternTableSync::COL_COMMERCIAL_LINE_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(JourneyPatternTableSync::COL_DATASOURCE_ID.c_str(), ""));
+			return r;
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<JourneyPatternTableSync,JourneyPattern>::Load(

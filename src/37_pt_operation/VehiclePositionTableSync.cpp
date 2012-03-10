@@ -90,14 +90,17 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<VehiclePositionTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<VehiclePositionTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				VehiclePositionTableSync::COL_VEHICLE_ID.c_str(),
-				VehiclePositionTableSync::COL_TIME.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					VehiclePositionTableSync::COL_VEHICLE_ID.c_str(),
+					VehiclePositionTableSync::COL_TIME.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

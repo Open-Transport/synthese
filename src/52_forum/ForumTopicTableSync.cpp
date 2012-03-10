@@ -85,19 +85,23 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ForumTopicTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ForumTopicTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				ForumTopicTableSync::COL_NODE_ID.c_str(),
-				ForumTopicTableSync::COL_NODE_EXTENSION.c_str(),
-				ForumTopicTableSync::COL_DATE.c_str(),
-			""),
-			DBTableSync::Index(
-				ForumTopicTableSync::COL_USER_ID.c_str(),
-				ForumTopicTableSync::COL_DATE.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					ForumTopicTableSync::COL_NODE_ID.c_str(),
+					ForumTopicTableSync::COL_NODE_EXTENSION.c_str(),
+					ForumTopicTableSync::COL_DATE.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					ForumTopicTableSync::COL_USER_ID.c_str(),
+					ForumTopicTableSync::COL_DATE.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

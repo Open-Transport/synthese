@@ -124,8 +124,9 @@ namespace synthese
 
 
 
-		boost::shared_ptr<DBTableSync> DBModule::GetTableSync(int tableId)
-		{
+		boost::shared_ptr<DBTableSync> DBModule::GetTableSync(
+			util::RegistryTableType tableId
+		){
 			TablesByIdMap::const_iterator it(_idTableSyncMap.find(tableId));
 			if (it == _idTableSyncMap.end())
 			{
@@ -216,5 +217,30 @@ namespace synthese
 					tableSync->saveRegistrable(*item, transaction);
 				}
 			}
+		}
+
+
+
+		boost::shared_ptr<const util::Registrable> DBModule::GetObject(
+			util::RegistryKeyType id,
+			util::Env& env
+		){
+			return const_pointer_cast<const util::Registrable>(GetEditableObject(id, env));
+		}
+
+
+
+		boost::shared_ptr<util::Registrable> DBModule::GetEditableObject( util::RegistryKeyType id, util::Env& env )
+		{
+			RegistryTableType tableId(decodeTableId(id));
+			shared_ptr<DBDirectTableSync> tableSync(
+				dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
+				GetTableSync(tableId)
+				)	);
+			if(!tableSync.get())
+			{
+				throw Exception("Incompatible table");
+			}
+			return tableSync->getEditableRegistrable(id, env);
 		}
 }	}

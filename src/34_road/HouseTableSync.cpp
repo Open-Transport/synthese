@@ -77,10 +77,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<HouseTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<HouseTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 		template<> void DBDirectTableSyncTemplate<HouseTableSync, House>::Load(
 			House* object,

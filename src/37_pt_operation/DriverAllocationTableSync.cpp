@@ -56,11 +56,13 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<DriverAllocationTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DriverAllocationTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DriverAllocationTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(ObjectFieldDefinition<Date>::FIELD.name.c_str(), ""),
-			DBTableSync::Index(ObjectFieldDefinition<Driver>::FIELD.name.c_str(), ""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(ObjectFieldDefinition<Date>::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(ObjectFieldDefinition<Driver>::FIELD.name.c_str(), ""));
+			return r;
 		};
 
 

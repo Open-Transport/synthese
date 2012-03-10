@@ -99,14 +99,17 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TimetableTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TimetableTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TimetableTableSync::COL_BOOK_ID.c_str(),
-				TimetableTableSync::COL_RANK.c_str(),
-				""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TimetableTableSync::COL_BOOK_ID.c_str(),
+					TimetableTableSync::COL_RANK.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

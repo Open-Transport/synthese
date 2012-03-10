@@ -58,8 +58,8 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<UserFavoriteJourneyTableSync>::TABLE(
-				"t048_user_favorite_journey"
-				);
+			"t048_user_favorite_journey"
+		);
 
 		template<> const Field DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_FIELDS[]=
 		{
@@ -73,10 +73,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<UserFavoriteJourneyTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<UserFavoriteJourneyTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

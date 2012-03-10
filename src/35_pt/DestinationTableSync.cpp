@@ -74,13 +74,11 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DestinationTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DestinationTableSync>::GetIndexes()
 		{
-			// DBTableSync::Index(
-			//	DestinationTableSync::COL_NAME.c_str(),
-			// ""),
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

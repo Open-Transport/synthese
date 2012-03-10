@@ -73,8 +73,13 @@ namespace synthese
 
 			void setValues(util::ParametersMap& map)
 			{
+				_id = map.get<util::RegistryKeyType>(TABLE_COL_ID);
 				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
 				{
+					if(field.name == TABLE_COL_ID)
+					{
+						continue;
+					}
 					addField(map.getDefault<std::string>(field.name));
 				}
 			}

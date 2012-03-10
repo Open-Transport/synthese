@@ -76,27 +76,32 @@ namespace synthese
 
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DBLogEntryTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DBLogEntryTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-				DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
-				DBLogEntryTableSync::COL_DATE.c_str(),
-				""
-			),
-			DBTableSync::Index(
-				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-				DBLogEntryTableSync::COL_OBJECT2_ID.c_str(),
-				DBLogEntryTableSync::COL_DATE.c_str(),
-				""
-			),
-			DBTableSync::Index(
-				DBLogEntryTableSync::COL_LOG_KEY.c_str(),
-				DBLogEntryTableSync::COL_DATE.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
+					DBLogEntryTableSync::COL_OBJECT_ID.c_str(),
+					DBLogEntryTableSync::COL_DATE.c_str(),
+					""
+			)	);
+			r.push_back(
+				DBTableSync::Index(
+					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
+					DBLogEntryTableSync::COL_OBJECT2_ID.c_str(),
+					DBLogEntryTableSync::COL_DATE.c_str(),
+					""
+			)	);
+			r.push_back(
+				DBTableSync::Index(
+					DBLogEntryTableSync::COL_LOG_KEY.c_str(),
+					DBLogEntryTableSync::COL_DATE.c_str(),
+					""
+			)	);
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<DBLogEntryTableSync,DBLogEntry>::Load(
 			DBLogEntry* object,

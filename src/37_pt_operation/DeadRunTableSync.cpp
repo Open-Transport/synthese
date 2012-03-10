@@ -91,13 +91,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DeadRunTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DeadRunTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				DeadRunTableSync::COL_NETWORK_ID.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					DeadRunTableSync::COL_NETWORK_ID.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

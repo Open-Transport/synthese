@@ -86,12 +86,14 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<StopPointTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<StopPointTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""),
-			DBTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(StopPointTableSync::COL_PLACEID.c_str(), ""));
+			r.push_back(DBTableSync::Index(StopPointTableSync::COL_OPERATOR_CODE.c_str(), ""));
+			return r;
+		}
 
 
 		/** Does not update the place */

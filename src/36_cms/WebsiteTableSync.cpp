@@ -51,10 +51,11 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<WebsiteTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<WebsiteTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<WebsiteTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

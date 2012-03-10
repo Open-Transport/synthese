@@ -36,6 +36,10 @@ FetcherTemplate.h
 LinkException.h
 LoadException.h
 RankUpdateQuery.hpp
+ObjectCreateAction.cpp
+ObjectCreateAction.hpp
+ObjectUpdateAction.cpp
+ObjectUpdateAction.hpp
 RemoveObjectAction.cpp
 RemoveObjectAction.hpp
 ReplaceQuery.h

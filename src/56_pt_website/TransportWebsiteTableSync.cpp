@@ -60,10 +60,11 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TransportWebsiteTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TransportWebsiteTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Load(

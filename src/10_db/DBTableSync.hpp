@@ -112,6 +112,10 @@ namespace synthese
 				bool empty() const;
 			};
 
+			typedef std::vector<DBTableSync::Index> Indexes;
+
+
+
 
 
 			////////////////////////////////////////////////////////////////////////

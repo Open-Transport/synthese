@@ -116,22 +116,27 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ReservationTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				ReservationTableSync::COL_LINE_ID.c_str(),
-				ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
-			""),
-			DBTableSync::Index(
-				ReservationTableSync::COL_SERVICE_ID.c_str(),
-				ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
-			""),
-			DBTableSync::Index(
-				ReservationTableSync::COL_TRANSACTION_ID.c_str(),
-				ReservationTableSync::COL_DEPARTURE_TIME.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					ReservationTableSync::COL_LINE_ID.c_str(),
+					ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					ReservationTableSync::COL_SERVICE_ID.c_str(),
+					ReservationTableSync::COL_ORIGIN_DATE_TIME.c_str(),
+			"")	);
+			r.push_back(
+				DBTableSync::Index(
+					ReservationTableSync::COL_TRANSACTION_ID.c_str(),
+					ReservationTableSync::COL_DEPARTURE_TIME.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

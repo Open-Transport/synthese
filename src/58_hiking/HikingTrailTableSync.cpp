@@ -79,13 +79,11 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<HikingTrailTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<HikingTrailTableSync>::GetIndexes()
 		{
-			// DBTableSync::Index(
-			//	HikingTrailTableSync::COL_NAME.c_str(),
-			// ""),
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

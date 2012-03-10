@@ -102,11 +102,13 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::_INDEXES[] =
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DisplayMonitoringStatusTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(DisplayMonitoringStatusTableSync::COL_SCREEN_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(DisplayMonitoringStatusTableSync::COL_SCREEN_ID.c_str(), ""));
+			return r;
+		}
 
 
 
