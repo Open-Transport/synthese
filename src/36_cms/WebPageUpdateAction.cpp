@@ -22,9 +22,10 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "WebPageUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "WebPageUpdateAction.h"
 #include "Request.h"
 #include "WebPageTableSync.h"
 #include "DBTransaction.hpp"
@@ -80,7 +81,7 @@ namespace synthese
 			}
 			if(_template)
 			{
-				map.insert(PARAMETER_TEMPLATE_ID, _template->get() ? (*_template)->getKey() : RegistryKeyType(0));
+				map.insert(PARAMETER_TEMPLATE_ID, *_template ? (*_template)->getKey() : RegistryKeyType(0));
 			}
 			if(_mimeType)
 			{
@@ -169,12 +170,12 @@ namespace synthese
 			// Template id
 			if(map.isDefined(PARAMETER_TEMPLATE_ID))
 			{
-				_template = shared_ptr<Webpage>();
+				_template = SpecificTemplate::Type();
 				RegistryKeyType templateId(map.getDefault<RegistryKeyType>(PARAMETER_TEMPLATE_ID, 0));
 				if(templateId > 0)
 				try
 				{
-					_template = WebPageTableSync::GetEditable(templateId, *_env);
+					_template = SpecificTemplate::Type(*WebPageTableSync::GetEditable(templateId, *_env));
 				}
 				catch(ObjectNotFoundException<Webpage>&)
 				{
@@ -340,7 +341,7 @@ namespace synthese
 			}
 			if(_template)
 			{
-				_page->set<SpecificTemplate>(optional<Webpage&>(**_template));
+				_page->set<SpecificTemplate>(*_template);
 			}
 			if(_doNotUseTemplate)
 			{
