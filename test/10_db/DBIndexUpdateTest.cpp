@@ -56,14 +56,16 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndexTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestIndexTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TestIndexTableSync::COL_COLUMN0.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TestIndexTableSync::COL_COLUMN0.c_str(),
+			"")	);
+			return r;
+		}
 
 
 		DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TestIndexTableSync)
@@ -101,19 +103,21 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<TestIndex2TableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				TestIndex2TableSync::COL_COLUMN0.c_str(),
-				""
-			),
-			DBTableSync::Index(
-				TestIndex2TableSync::COL_COLUMN0.c_str(),
-				TestIndex2TableSync::COL_COLUMN1.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					TestIndex2TableSync::COL_COLUMN0.c_str(),
+			"")	);
+			r.push_back(
+					DBTableSync::Index(
+					TestIndex2TableSync::COL_COLUMN0.c_str(),
+					TestIndex2TableSync::COL_COLUMN1.c_str(),
+			"")	);
+			return r;
+		}
 
 
 
@@ -137,13 +141,14 @@ void testIndexUpdate(const TestBackend& testBackend)
 		BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestIndexTableSync>::TABLE.MigratedSchema);
 		BOOST_CHECK_EQUAL(1, DBTableSyncTemplate<TestIndexTableSync>::TABLE.CreatedIndexes);
 
+		DBTableSync::Indexes indexes(DBTableSyncTemplate<TestIndexTableSync>::GetIndexes());
 		BOOST_CHECK(DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndexTableSync>::_INDEXES[0]
+			indexes[0]
 		));
 		BOOST_CHECK(!DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[1]
+			indexes[1]
 		));
 	}
 	{
@@ -158,13 +163,14 @@ void testIndexUpdate(const TestBackend& testBackend)
 		BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestIndexTableSync>::TABLE.MigratedSchema);
 		BOOST_CHECK_EQUAL(0, DBTableSyncTemplate<TestIndexTableSync>::TABLE.CreatedIndexes);
 
+		DBTableSync::Indexes indexes(DBTableSyncTemplate<TestIndexTableSync>::GetIndexes());
 		BOOST_CHECK(DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndexTableSync>::_INDEXES[0]
+			indexes[0]
 		));
 		BOOST_CHECK(!DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[1]
+			indexes[1]
 		));
 	}
 	{
@@ -179,13 +185,14 @@ void testIndexUpdate(const TestBackend& testBackend)
 		BOOST_CHECK_EQUAL(false, DBTableSyncTemplate<TestIndex2TableSync>::TABLE.MigratedSchema);
 		BOOST_CHECK_EQUAL(1, DBTableSyncTemplate<TestIndex2TableSync>::TABLE.CreatedIndexes);
 
+		DBTableSync::Indexes indexes(DBTableSyncTemplate<TestIndex2TableSync>::GetIndexes());
 		BOOST_CHECK(DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[0]
+			indexes[0]
 		));
 		BOOST_CHECK(DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
-			DBTableSyncTemplate<TestIndex2TableSync>::_INDEXES[1]
+			indexes[1]
 		));
 	}
 }

@@ -9,6 +9,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/10_db")
 include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
+include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 
 set(DEPS
   59_road_journey_planner # from 56_pt_website
@@ -26,16 +27,16 @@ endif()
 
 set(DB_TEST_UTILS "../common/TestUtils.hpp;DBTestUtils.hpp")
 
-#boost_test(ConnectionInfo "${DEPS}")
-#boost_test(DBIndexUpdate "${DEPS}" "${DB_TEST_UTILS}")
-#boost_test(DBQuery "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
-#boost_test(DBRegistryTableSync "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
-#boost_test(DBSchemaUpdate "${DEPS}" "${DB_TEST_UTILS}")
-#boost_test(DBTypes "${DEPS}" "${DB_TEST_UTILS}")
+boost_test(ConnectionInfo "${DEPS}")
+boost_test(DBIndexUpdate "${DEPS}" "${DB_TEST_UTILS}")
+boost_test(DBQuery "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
+boost_test(DBRegistryTableSync "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
+boost_test(DBSchemaUpdate "${DEPS}" "${DB_TEST_UTILS}")
+boost_test(DBTypes "${DEPS}" "${DB_TEST_UTILS}")
 if(WITH_MYSQL)
   include_directories(${MYSQL_INCLUDE_DIR})
-#  boost_test(MySQLTrigger "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
-#  boost_test(MySQLReconnect "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
+  boost_test(MySQLTrigger "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
+  boost_test(MySQLReconnect "${DEPS}" "${DB_TEST_UTILS};TestTableSync.hpp")
 endif(WITH_MYSQL)
 
 unset(TESTS_ENV)
