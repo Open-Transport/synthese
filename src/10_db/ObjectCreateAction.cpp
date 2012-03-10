@@ -58,7 +58,7 @@ namespace synthese
 			ParametersMap map(_values);
 			if(_tableSync.get())
 			{
-				map.insert(PARAMETER_TABLE_ID, dynamic_cast<DBTableSync&>(*_tableSync).getFormat().ID);
+				map.insert(PARAMETER_TABLE_ID, static_cast<size_t>(dynamic_cast<DBTableSync&>(*_tableSync).getFormat().ID));
 			}
 			return map;
 		}
