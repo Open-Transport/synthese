@@ -223,6 +223,16 @@ public:
 		db::DB* db,
 		const db::RowIdList& rowIds
 	) {};
+
+	static FieldsList GetFieldsList()
+	{
+		FieldsList l;
+		for(size_t i(0); !K::_FIELDS[i].empty(); ++i)
+		{
+			l.push_back(K::_FIELDS[i]);
+		}
+		return l;
+	}
 };
 
 #define DEFINE_EMPTY_TABLESYNC_DELETE_METHODS(TABLE) \
