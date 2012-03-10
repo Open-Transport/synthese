@@ -146,10 +146,6 @@ void testIndexUpdate(const TestBackend& testBackend)
 			"t102_testindex",
 			indexes[0]
 		));
-		BOOST_CHECK(!DBModule::GetDB()->doesIndexExist(
-			"t102_testindex",
-			indexes[1]
-		));
 	}
 	{
 		cout << "____No index update" << endl;
@@ -167,10 +163,6 @@ void testIndexUpdate(const TestBackend& testBackend)
 		BOOST_CHECK(DBModule::GetDB()->doesIndexExist(
 			"t102_testindex",
 			indexes[0]
-		));
-		BOOST_CHECK(!DBModule::GetDB()->doesIndexExist(
-			"t102_testindex",
-			indexes[1]
 		));
 	}
 	{
