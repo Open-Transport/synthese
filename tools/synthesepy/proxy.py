@@ -122,7 +122,7 @@ class WSGIProxy(object):
 
     SYNTHESE_SUFFIXES = ['/synthese', '/synthese3', '/admin']
 
-    ADMIN_URL = '/admin/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283'
+    ADMIN_URL = '/admin/synthese?fonction=admin&mt=17732923532771328&tt=17732923532771329&pt=17732923532771330'
 
     def __init__(self, env, project):
         self.env = env
