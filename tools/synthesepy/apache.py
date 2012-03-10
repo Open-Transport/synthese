@@ -65,7 +65,7 @@ SetEnv proxy-nokeepalive 1
         ADMIN_TEMPLATE = '''
 # Admin site for backward compatibility.
 <Location /synthese3/admin>
-    Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283
+    Redirect /synthese3/admin/ /synthese3/admin?fonction=admin&mt=17732923532771328&tt=17732923532771329&pt=17732923532771330
     {synthese_proxy}
 </Location>
 # TODO: we should use /admin in the URLs used by Synthese to follow package conventions.
@@ -262,7 +262,7 @@ Alias /{package_name} {package_files_path}/{package_name}
                 rewrite_directives += '''
     RewriteEngine on
     RewriteBase /
-    RewriteRule ^admin/$ /admin/synthese?fonction=admin&mt=177329235327713281&tt=177329235327713282&pt=177329235327713283 [L,QSA]
+    RewriteRule ^admin/$ /admin/synthese?fonction=admin&mt=17732923532771328&tt=17732923532771329&pt=17732923532771330 [L,QSA]
                 '''
             package_aliases += PACKAGE_ALIAS_TEMPLATE.format(
                 package_name=package.name,
