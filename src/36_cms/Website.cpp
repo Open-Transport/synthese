@@ -37,8 +37,9 @@ namespace synthese
 	using namespace cms;
 
 	CLASS_DEFINITION(Website, "t025_sites", 25)
-	FIELD_DEFINITION_OF_TYPE(ClientURL, "client_url", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(DefaultTemplate, "default_template_id", SQL_INTEGER)
+	// TODO: rename to client_url once complex schema updates are in place (issue #9453).
+	FIELD_DEFINITION_OF_TYPE(ClientURL, "cient_url", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DefaultTemplate, "default_page_template_id", SQL_INTEGER)
 
 	namespace cms
 	{
