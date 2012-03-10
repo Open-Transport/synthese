@@ -32,8 +32,8 @@ def get_journey(url, sid, branch, trace=False):
         'fonction': 'admin',
         'ja': '1',
         'lo': '1' if trace else '0',
-        'mt': '177329235327713281',
-        #'pt': '177329235327713283',
+        'mt': '17732923532771328',
+        #'pt': '17732923532771330',
         'rhtf': '0',
         'rhto': 'pr',
         'rhtr': '1',
@@ -45,7 +45,7 @@ def get_journey(url, sid, branch, trace=False):
         'sid': sid,
         'sp': 'Les Planches',
         'tab': 'rp',
-        #'tt': '177329235327713282'
+        #'tt': '17732923532771329'
     }
 
     out_file = ('/home/spasche/rcs/mysql/synthese3/s3-admin/deb/opt/rcs/'

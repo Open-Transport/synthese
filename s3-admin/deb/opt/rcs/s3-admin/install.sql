@@ -8,7 +8,7 @@
 
 	Used IDs :
 		- site : 7036874417766401 (1)
-		- pages : 177329235327713281 (1) to 177329235327713283 (3)
+		- pages : 17732923532771328 (1) to 17732923532771330 (3)
 */
 
 /* MySQL and SQLite differ in the way they handle backslashes */
@@ -22,7 +22,7 @@ REPLACE INTO t025_sites(id,name,start_date,end_date,cient_url) VALUES(7036874417
 
 /* Pages */
 
-REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713281, 7036874417766401, 0, 0, 'Admin',NULL,NULL,'text/html',1,'
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(17732923532771328, 7036874417766401, 0, 0, 'Admin',NULL,NULL,'text/html',1,'
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="fr" xml:lang="fr">
 <head>
@@ -87,7 +87,7 @@ SYNTHESE v<@version@> - &copy; 2003-2010 - SYNTHESE est un produit sous <a href=
 
 
 
-REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713282, 7036874417766401, 177329235327713281, 0, 'Tree node',NULL,NULL,'text/html',1,'
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(17732923532771329, 7036874417766401, 17732923532771328, 0, 'Tree node',NULL,NULL,'text/html',1,'
 <div class="<?if&cond=<@is_last@>&then=lastblock&else=notlastblock?>">
 <div class="tree_icon<?if&cond=<@depth@>&then=s?>"><?if&cond=<@depth@>&then=<?if&cond=<@subtree@>&then=<img class="node" src="<?if&cond=<@is_opened@>&then=ftv2mlastnode&else=ftv2plastnode?>.png" />&else=<img src="ftv2lastnode.png" />?>?><img src="<@icon@>" class="icon" /></div>
 
@@ -98,6 +98,6 @@ REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime
 
 
 
-REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(177329235327713283, 7036874417766401, 177329235327713281, 1, 'Position element',NULL,NULL,'text/html',1,'
+REPLACE INTO t063_web_pages(id,site_id,up_id,rank,title,start_time,end_time,mime_type,do_not_use_template,content1) VALUES(17732923532771330, 7036874417766401, 17732923532771328, 1, 'Position element',NULL,NULL,'text/html',1,'
 <?if&cond=<@is_last@>&else=<?if&cond=<@depth@>&then=\&nbsp;/\&nbsp;?><a href="<@url@>"><img src="<@icon@>" /> <@title@></a>?>
 ');

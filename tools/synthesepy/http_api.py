@@ -82,7 +82,7 @@ class HTTPApi(object):
 
         br.open(self.admin_base_url)
         # Keep this in sync with the :admin_main page in admin package.
-        MT_PAGE_ID = 177329235327713281
+        MT_PAGE_ID = 17732923532771328
         self.admin_base_params['mt'] = MT_PAGE_ID
         return br
 
