@@ -108,10 +108,20 @@ namespace synthese
 					_setObject(static_cast<const ObjectBase&>(value));
 				}
 
-				template<class T, class F>
-				void set(const typename F::Type& value)
+				/// Simple parameters only
+				template<class C>
+				void set(const typename C::Type& value)
 				{
-					static_cast<T&>(*_value)->set<F>(value);
+					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX);
+				}
+
+				/// All parameters version
+				template<class C>
+				void set(
+					const typename C::Type& value,
+					const ObjectBase& object
+				){
+					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX);
 				}
 			//@}
 
