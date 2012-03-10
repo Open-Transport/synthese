@@ -91,10 +91,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<FareTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<FareTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 		template<> void DBDirectTableSyncTemplate<FareTableSync,Fare>::Load(
 			Fare* fare,

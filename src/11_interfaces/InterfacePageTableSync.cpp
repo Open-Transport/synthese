@@ -75,9 +75,10 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<InterfacePageTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<InterfacePageTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
+			return DBTableSync::Indexes();
 		};
 
 

@@ -89,12 +89,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CalendarTemplateElementTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CalendarTemplateElementTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""),
-			DBTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(CalendarTemplateElementTableSync::COL_CALENDAR_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(CalendarTemplateElementTableSync::COL_INCLUDE_ID.c_str(), ""));
+			return r;
+		}
 
 
 

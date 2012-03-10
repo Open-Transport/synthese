@@ -89,15 +89,18 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ScenarioTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ScenarioTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				ScenarioTableSync::COL_IS_TEMPLATE.c_str(),
-				ScenarioTableSync::COL_PERIODSTART.c_str(),
-			""),
-			DBTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					ScenarioTableSync::COL_IS_TEMPLATE.c_str(),
+					ScenarioTableSync::COL_PERIODSTART.c_str(),
+			"")	);
+			r.push_back(DBTableSync::Index(ScenarioTableSync::COL_FOLDER_ID.c_str(), ""));
+			return r;
+		}
 
 
 		template<>

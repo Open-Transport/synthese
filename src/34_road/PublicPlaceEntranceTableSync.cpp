@@ -81,12 +81,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<PublicPlaceEntranceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<PublicPlaceEntranceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID.c_str(),
-			""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID.c_str(),
+			"")	);
+			return r;
 		};
 
 

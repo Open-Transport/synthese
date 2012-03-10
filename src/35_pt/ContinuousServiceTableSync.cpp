@@ -97,10 +97,16 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ContinuousServiceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ContinuousServiceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(ContinuousServiceTableSync::COL_PATHID.c_str(), ContinuousServiceTableSync::COL_SCHEDULES.c_str(), ""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					ContinuousServiceTableSync::COL_PATHID.c_str(),
+					ContinuousServiceTableSync::COL_SCHEDULES.c_str(),
+			"")	);
+			return r;
 		};
 
 		template<> void DBDirectTableSyncTemplate<ContinuousServiceTableSync,ContinuousService>::Load(

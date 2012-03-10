@@ -94,10 +94,10 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DisplayTypeTableSync>::_INDEXES[] =
+		template<> DBTableSync::Indexes DBTableSyncTemplate<DisplayTypeTableSync>::GetIndexes()
 		{
-			DBTableSyncTemplate::Index()
-		};
+			return DBTableSyncTemplate::Indexes();
+		}
 
 		template<> void DBDirectTableSyncTemplate<DisplayTypeTableSync,DisplayType>::Load(
 			DisplayType* object,

@@ -90,10 +90,11 @@ namespace synthese
 
 		
 		
-		template<> const DBTableSync::Index DBTableSyncTemplate<ReservationTransactionTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ReservationTransactionTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 

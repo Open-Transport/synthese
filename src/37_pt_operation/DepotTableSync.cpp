@@ -71,13 +71,16 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<DepotTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<DepotTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				DepotTableSync::COL_NAME.c_str(),
-			""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					DepotTableSync::COL_NAME.c_str(),
+			"")	);
+			return r;
+		}
 
 
 

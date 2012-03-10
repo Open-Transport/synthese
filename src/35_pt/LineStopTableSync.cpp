@@ -91,16 +91,21 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<LineStopTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<LineStopTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				LineStopTableSync::COL_LINEID.c_str(),
-				LineStopTableSync::COL_RANKINPATH.c_str(),
-				""
-			),
-			DBTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					LineStopTableSync::COL_LINEID.c_str(),
+					LineStopTableSync::COL_RANKINPATH.c_str(),
+					""
+			)	);
+			r.push_back(
+				DBTableSync::Index(LineStopTableSync::COL_PHYSICALSTOPID.c_str(), "")
+			);
+			return r;
+		}
 
 
 

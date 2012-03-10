@@ -126,15 +126,18 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<CommercialLineTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<CommercialLineTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				CommercialLineTableSync::COL_NETWORK_ID.c_str(),
-				CommercialLineTableSync::COL_CREATOR_ID.c_str(),
-				""
-			),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					CommercialLineTableSync::COL_NETWORK_ID.c_str(),
+					CommercialLineTableSync::COL_CREATOR_ID.c_str(),
+					""
+			)	);
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
 			CommercialLine* object,

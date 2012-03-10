@@ -86,14 +86,17 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<RoadChunkTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<RoadChunkTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				RoadChunkTableSync::COL_ROADID.c_str(),
-				RoadChunkTableSync::COL_RANKINPATH.c_str(),
-				""
-			),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					RoadChunkTableSync::COL_ROADID.c_str(),
+					RoadChunkTableSync::COL_RANKINPATH.c_str(),
+					""
+			)	);
+			return r;
 		};
 
 		template<> void DBDirectTableSyncTemplate<RoadChunkTableSync,MainRoadChunk>::Load(

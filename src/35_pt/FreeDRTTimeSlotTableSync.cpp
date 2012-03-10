@@ -95,12 +95,15 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<FreeDRTTimeSlotTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(
-				FreeDRTTimeSlotTableSync::COL_AREA_ID.c_str(),
-			""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(
+				DBTableSync::Index(
+					FreeDRTTimeSlotTableSync::COL_AREA_ID.c_str(),
+			"")	);
+			return r;
 		};
 
 

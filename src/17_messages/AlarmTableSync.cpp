@@ -95,10 +95,12 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<AlarmTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<AlarmTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""),
-			DBTableSync::Index()
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(AlarmTableSync::COL_SCENARIO_ID.c_str(),	AlarmTableSync::COL_PERIODSTART.c_str(), ""));
+			return r;
 		};
 
 		template<>

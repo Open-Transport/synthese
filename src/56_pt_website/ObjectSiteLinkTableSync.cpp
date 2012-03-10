@@ -69,12 +69,14 @@ namespace synthese
 
 
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<ObjectSiteLinkTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<ObjectSiteLinkTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""),
-			DBTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(ObjectSiteLinkTableSync::COL_SITE_ID.c_str(), ""));
+			r.push_back(DBTableSync::Index(ObjectSiteLinkTableSync::COL_OBJECT_ID.c_str(), ""));
+			return r;
+		}
 
 
 

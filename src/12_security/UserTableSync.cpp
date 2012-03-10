@@ -101,13 +101,15 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<UserTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<UserTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(UserTableSync::TABLE_COL_NAME.c_str(), ""),
-			DBTableSync::Index(UserTableSync::TABLE_COL_LOGIN.c_str(), ""),
-			DBTableSync::Index(UserTableSync::TABLE_COL_PROFILE_ID.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(UserTableSync::TABLE_COL_NAME.c_str(), ""));
+			r.push_back(DBTableSync::Index(UserTableSync::TABLE_COL_LOGIN.c_str(), ""));
+			r.push_back(DBTableSync::Index(UserTableSync::TABLE_COL_PROFILE_ID.c_str(), ""));
+			return r;
+		}
 
 		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Load(
 			User* user,

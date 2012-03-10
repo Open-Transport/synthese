@@ -78,11 +78,13 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<RollingStockTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<RollingStockTableSync>::GetIndexes()
 		{
-			DBTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""),
-			DBTableSync::Index()
-		};
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(RollingStockTableSync::COL_TRIDENT.c_str(), RollingStockTableSync::COL_IS_TRIDENT_REFERENCE.c_str(), ""));
+			return r;
+		}
 
 
 		template<> void DBDirectTableSyncTemplate<RollingStockTableSync,RollingStock>::Load(

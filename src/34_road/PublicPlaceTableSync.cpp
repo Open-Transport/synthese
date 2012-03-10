@@ -72,10 +72,11 @@ namespace synthese
 			Field()
 		};
 
-		template<> const DBTableSync::Index DBTableSyncTemplate<PublicPlaceTableSync>::_INDEXES[]=
+		template<>
+		DBTableSync::Indexes DBTableSyncTemplate<PublicPlaceTableSync>::GetIndexes()
 		{
-			DBTableSync::Index()
-		};
+			return DBTableSync::Indexes();
+		}
 
 
 
