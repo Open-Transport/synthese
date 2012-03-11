@@ -22,55 +22,45 @@
 
 #include "IneoFileFormat.hpp"
 
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "AllowedUseRule.h"
+#include "CityTableSync.h"
+#include "DataSource.h"
+#include "DataSourceAdmin.h"
+#include "DBModule.h"
+#include "DeadRunTableSync.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
-#include "PTModule.h"
-#include "PTOperationFileFormat.hpp"
-#include "PTUseRule.h"
-#include "PTUseRuleTableSync.h"
-#include "TransportNetwork.h"
-#include "UserTableSync.h"
-#include "StopArea.hpp"
-#include "PTFileFormat.hpp"
+#include "ForbiddenUseRule.h"
+#include "HTMLForm.h"
+#include "HTMLModule.h"
+#include "IConv.hpp"
+#include "ImpExModule.h"
+#include "Importer.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
-#include "ScheduledServiceTableSync.h"
-#include "ImpExModule.h"
 #include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "PropertiesHTMLTable.h"
-#include "DataSourceAdmin.h"
-#include "AdminFunctionRequest.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "StopAreaTableSync.hpp"
-#include "StopPointTableSync.hpp"
-#include "PTPlaceAdmin.h"
-#include "StopPointAdmin.hpp"
-#include "StopAreaAddAction.h"
-#include "StopArea.hpp"
-#include "DataSource.h"
-#include "IConv.hpp"
-#include "Importer.hpp"
-#include "AdminActionFunctionRequest.hpp"
-#include "HTMLModule.h"
-#include "HTMLForm.h"
-#include "DBModule.h"
-#include "IneoFileFormat.hpp"
-#include "City.h"
 #include "PTFileFormat.hpp"
-#include "CityTableSync.h"
-#include "Junction.hpp"
-#include "JunctionTableSync.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "AllowedUseRule.h"
-#include "ForbiddenUseRule.h"
+#include "PTModule.h"
+#include "PTOperationFileFormat.hpp"
+#include "PTPlaceAdmin.h"
+#include "PTUseRule.h"
+#include "PTUseRuleTableSync.h"
+#include "ScheduledServiceTableSync.h"
+#include "StopArea.hpp"
+#include "StopAreaAddAction.h"
+#include "StopAreaTableSync.hpp"
+#include "StopPointAdmin.hpp"
+#include "TransportNetwork.h"
+#include "UserTableSync.h"
 
 #include <fstream>
-#include <geos/geom/CoordinateSequenceFactory.h>
-#include <geos/geom/LineString.h>
 #include <boost/algorithm/string.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <geos/geom/CoordinateSequenceFactory.h>
+#include <geos/geom/LineString.h>
 
 using namespace std;
 using namespace boost;
@@ -197,7 +187,8 @@ namespace synthese
 			_lines(_dataSource, _env),
 			_destinations(_dataSource, _env),
 			_addWaybackToJourneyPatternCode(false),
-			_vehicleServices(_dataSource, _env)
+			_vehicleServices(_dataSource, _env),
+			_depots(_dataSource, _env)
 		{}
 
 
@@ -221,6 +212,7 @@ namespace synthese
 			if(key == FILE_PNT)
 			{
 				ImportableTableSync::ObjectBySource<StopAreaTableSync> stopAreas(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DepotTableSync> depots(_dataSource, _env);
 
 				// 1.1 Stop areas
 				if(_importStopAreas)
@@ -232,6 +224,18 @@ namespace synthese
 						{
 							continue;
 						}
+
+						//////////////////////////////////////////////////////////////////////////
+						// Depots
+
+						// Avoid existing depots
+						if(depots.contains(_mnlp_prefix + _getValue(VALUE_MNLP)))
+						{
+							continue;
+						}
+
+						//////////////////////////////////////////////////////////////////////////
+						// Fields
 
 						// Code field
 						string stopAreaCode(_getValue(_stopAreaIdField));
@@ -290,8 +294,14 @@ namespace synthese
 						continue;
 					}
 
+					//////////////////////////////////////////////////////////////////////////
+					// Fields reading
+
 					// MNLP code
 					string mnlp(_getValue(VALUE_MNLP));
+
+					// Name field
+					string name(_getValue(_stopNameField));
 
 					// Code field
 					string id(_getValue(_stopIdField));
@@ -328,6 +338,29 @@ namespace synthese
 						}
 					}
 
+					//////////////////////////////////////////////////////////////////////////
+					// Depots
+					
+					// Search for existing depots.
+					// Depots are not created here because they cannot be distinguished from stops
+					// with the informations present in the file
+					if(depots.contains(_mnlp_prefix + mnlp))
+					{
+						// Gets the depot
+						Depot* depot = *depots.get(_mnlp_prefix + mnlp).begin();
+
+						// Properties update
+						depot->setName(name);
+						depot->setGeometry(geometry);
+
+						// Jump to next record
+						continue;
+					}
+
+
+					//////////////////////////////////////////////////////////////////////////
+					// Stops
+
 					// Search for already defined stop
 					StopsMap::iterator it(stops.find(id));
 					if(it != stops.end())
@@ -342,7 +375,7 @@ namespace synthese
 					stop.geometry = geometry;
 
 					// Name field
-					stop.name = _getValue(_stopNameField);
+					stop.name = name;
 
 					// Handicapped
 					if(!_stopHandicappedAccessibilityField.empty())
@@ -702,6 +735,7 @@ namespace synthese
 						)	);
 						if(linkedStops.empty())
 						{
+							// Probably a dead run
 							atLeastAnInexistantStop = true;
 						}
 						else
@@ -761,7 +795,8 @@ namespace synthese
 			}
 			else if(key == FILE_HOR)
 			{
-				bool active(true);
+				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(_dataSource, _env);
+				TCOUValues tcou;
 				JourneyPattern* route(NULL);
 				VehicleService* vehicleService(NULL);
 				ScheduledService::Schedules departureSchedules;
@@ -770,14 +805,21 @@ namespace synthese
 				vector<date> dates;
 				time_duration lastTd(minutes(0));
 				string lineNum;
+				vector<string> deadRunStops;
+				string cidx;
+				bool afterMidnight(false);
 				while(true)
 				{
 					_readLine(inFile);
 
-					if((_section == "C" || _section.empty() || _section == "SV") && !departureSchedules.empty() && route)
-					{
-						ScheduledService* service(
-							PTFileFormat::CreateOrUpdateService(
+					if(	(_section == "C" || _section.empty() || _section == "SV") &&
+						!departureSchedules.empty()
+					){
+						SchedulesBasedService* service(NULL);
+						if(	route &&
+							(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+						){
+							service = PTFileFormat::CreateOrUpdateService(
 								*route,
 								departureSchedules,
 								arrivalSchedules,
@@ -785,7 +827,73 @@ namespace synthese
 								_dataSource,
 								_env,
 								stream
-						)	);
+							);
+						}
+						else if(
+							(tcou == TCOU_DepotToStop || tcou == TCOU_StopToDepot) &&
+							deadRunStops.size() == 2
+						){
+							// Load or creation of the object
+							DeadRun* deadRun(
+								FileFormat::LoadOrCreateObject(
+									deadRuns,
+									cidx,
+									_dataSource,
+									_env,
+									stream,
+									"haut le pied"
+							)	);
+
+							// Depot code
+							string depotCode(_mnlp_prefix + deadRunStops[tcou == TCOU_DepotToStop ? 0 : 1]);
+							set<Depot*> linkedDepots(
+								_depots.get(
+									depotCode
+							)	);
+
+							// Stop code
+							string stopCode(_mnlp_prefix + deadRunStops[tcou == TCOU_DepotToStop ? 1 : 0]);
+							set<StopPoint*> linkedStops(
+								_stopPoints.get(
+									stopCode
+							)	);
+
+							if(!linkedDepots.empty() && !linkedStops.empty())
+							{
+								// Distance
+								graph::MetricOffset dst(0);
+								std::map<std::pair<string, string>, graph::MetricOffset>::const_iterator it(
+									_distances.find(
+										make_pair(
+											_mnlp_prefix + deadRunStops[0],
+											_mnlp_prefix + deadRunStops[1]
+								)	)	);
+								if(it != _distances.end())
+								{
+									dst = it->second;
+								}
+
+								// Route
+								deadRun->setRoute(
+									**linkedDepots.begin(),
+									**linkedStops.begin(),
+									dst,
+									tcou == TCOU_DepotToStop
+								);
+
+								// Schedules
+								deadRun->setSchedules(
+									departureSchedules,
+									arrivalSchedules,
+									false
+								);
+
+								// Network
+								deadRun->setTransportNetwork(_network.get());
+
+								service = deadRun;
+							}
+						}
 						if(service)
 						{
 							BOOST_FOREACH(const date& dat, dates)
@@ -818,43 +926,57 @@ namespace synthese
 								lineNum = mnesv.substr(0, mnesv.size() - 2);
 							}
 						}
+					}
+					else if(_section == "C")
+					{
+						tcou = static_cast<TCOUValues>(
+							lexical_cast<int>(
+								_getValue("TCOU")
+						)	);
+						route = NULL;
+
+						// Line
+						if(tcou == TCOU_Commercial || tcou == TCOU_HLP)
+						{
+							if(_lineReadMethod == VALUE_CIDX)
+							{
+								lineNum = lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2)));
+							}
+
+							// Journey pattern
+							string jpNum(
+								_addWaybackToJourneyPatternCode ?
+								_getValue("SENS") + _getValue("ORD") :
+								_getValue("ORD")
+							);
+							if(!lineNum.empty() && !jpNum.empty())
+							{
+								route = _journeyPatterns[make_pair(lineNum, jpNum)];
+							}
+						}
+						else
+						{
+							deadRunStops.clear();
+							cidx = _getValue("CIDX");
+						}
+
+						// Vehicle service
 						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
 							_vehicleServices,
-							mnesv,
+							_getValue("SB"),
 							_dataSource,
 							_env,
 							stream
 						);
-					}
-					else if(_section == "C")
-					{
-						if(_getValue("TCOU") != "0")
-						{
-							active = false;
-							continue;
-						}
-						active = true;
-						if(_lineReadMethod == VALUE_CIDX)
-						{
-							lineNum = lexical_cast<string>(lexical_cast<int>(_getValue("CIDX").substr(5,2)));
-						}
-						string jpNum(
-							_addWaybackToJourneyPatternCode ?
-							_getValue("SENS") + _getValue("ORD") :
-							_getValue("ORD")
-						);
 
-						route = NULL;
-						if(!lineNum.empty() && !jpNum.empty())
-						{
-							route = _journeyPatterns[make_pair(lineNum,jpNum)];
-						}
-
+						// Schedules initialization
 						departureSchedules.clear();
 						arrivalSchedules.clear();
 						dates.clear();
 						lastTd = minutes(0);
+						afterMidnight = (_getValue("APM") == "O");
 
+						// Calendar
 						BOOST_FOREACH(int day, _calendars[_getValue("CJDV")])
 						{
 							BOOST_FOREACH(const date& dat, _dates[make_pair(ph, day)])
@@ -863,7 +985,7 @@ namespace synthese
 							}
 						}
 					}
-					else if(active && _section == "H")
+					else if(_section == "H")
 					{
 						string timeStr(_getValue("HOR"));
 						time_duration td(
@@ -871,6 +993,10 @@ namespace synthese
 							lexical_cast<int>(timeStr.substr(2,2)),
 							(timeStr.size() >= 6) ? lexical_cast<int>(timeStr.substr(4,2)) : 0
 						);
+						if(afterMidnight)
+						{
+							td += hours(24);
+						}
 						if(td < lastTd)
 						{
 							td += hours(24);
@@ -887,6 +1013,12 @@ namespace synthese
 						departureSchedules.push_back(td - seconds(td.seconds()));
 
 						lastTd = td;
+
+						// Pick up the points for dead runs 
+						if(tcou == TCOU_DepotToStop || tcou == TCOU_StopToDepot)
+						{
+							deadRunStops.push_back(_getValue("MNL"));
+						}
 					}
 					if(_section.empty())
 					{
@@ -946,9 +1078,11 @@ namespace synthese
 
 						// Load 
 						string key(_getValue("SA"));
+						string vsKey(_getValue("SB"));
+						string dateStr(_getValue("DATE"));
+						string fullKey(key+"/"+dateStr);
 
 						// Date
-						string dateStr(_getValue("DATE"));
 						date vsDate;
 						vector<string> parts;
 						split(parts, dateStr, is_any_of("/"));
@@ -958,20 +1092,35 @@ namespace synthese
 							lexical_cast<long>(parts[0])
 						);
 
-						if(key != lastKey)
+						if(fullKey != lastKey)
 						{
 							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
 								driverServices,
-								key+"/"+dateStr,
+								fullKey,
 								_dataSource,
 								_env,
 								stream,
 								"journée"
 							);
-							lastKey = key;
+							lastKey = fullKey;
 							DriverService::Chunks emptyChunks;
 							ds->setChunks(emptyChunks);
 							ds->setActive(vsDate);
+
+							// Allocation
+							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
+								driverAllocations,
+								fullKey,
+								_dataSource,
+								_env,
+								stream,
+								"allocation"
+							);
+							Allocations::iterator itAlloc(_allocations.find(make_pair(key, vsDate)));
+							if(itAlloc != _allocations.end())
+							{
+								da->set<Driver>(optional<User&>(*itAlloc->second));
+							}
 
 							// Amount
 /*							double amount(lexical_cast<double>(_getValue("frs")));
@@ -986,53 +1135,47 @@ namespace synthese
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
 							*/
-
-							// Journey
-							string hdebstr(_getValue("HDEB"));
-							time_duration hdeb(
-								hours(lexical_cast<long>(hdebstr.substr(0,2))) +
-								minutes(lexical_cast<long>(hdebstr.substr(2,2)))
-							);
-							string hfinstr(_getValue("HFIN"));
-							time_duration hfin(
-								hours(lexical_cast<long>(hdebstr.substr(0,2))) +
-								minutes(lexical_cast<long>(hdebstr.substr(2,2)))
-							);
-
-							// Vehicle service
-							string vsKey(_getValue("SB"));
-							replace_all(vsKey, "-", "");
-							set<VehicleService*> lvs(_vehicleServices.get(vsKey));
-							if(lvs.empty())
-							{
-								continue;
-							}
-							
-							DriverService::Chunks chunks(ds->getChunks());
-							chunks.push_back(
-								DriverService::Chunk(
-									ds,
-									**lvs.begin(),
-									hdeb,
-									hfin
-							)	);
-							ds->setChunks(chunks);
-
-							// Allocation
-							Allocations::iterator itAlloc(_allocations.find(make_pair(vsKey, vsDate)));
-							if(itAlloc != _allocations.end())
-							{
-								DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
-									driverAllocations,
-									key+"/"+dateStr,
-									_dataSource,
-									_env,
-									stream,
-									"allocation"
-								);
-								da->set<Driver>(optional<User&>(*itAlloc->second));
-							}
 						}
+
+						// Journey
+						bool afterMidnight(_getValue("DAPM")=="O");
+						string hdebstr(_getValue("HDEB"));
+						time_duration hdeb(
+							hours(lexical_cast<long>(hdebstr.substr(0,2))) +
+							minutes(lexical_cast<long>(hdebstr.substr(2,2)))
+						);
+						string hfinstr(_getValue("HFIN"));
+						time_duration hfin(
+							hours(lexical_cast<long>(hfinstr.substr(0,2))) +
+							minutes(lexical_cast<long>(hfinstr.substr(2,2)))
+						);
+						if(hfin < hdeb)
+						{
+							hfin += hours(24);
+						}
+						if(afterMidnight)
+						{
+							hdeb += hours(24);
+							hfin += hours(24);
+						}
+
+						// Vehicle service
+						set<VehicleService*> lvs(_vehicleServices.get(vsKey));
+						if(lvs.empty())
+						{
+							continue;
+						}
+						
+						DriverService::Chunks chunks(ds->getChunks());
+						chunks.push_back(
+							DriverService::Chunk(
+								ds,
+								**lvs.begin(),
+								vsDate,
+								hdeb,
+								hfin
+						)	);
+						ds->setChunks(chunks);
 					}
 
 				} while(!_section.empty());
@@ -1165,10 +1308,6 @@ namespace synthese
 			{
 				DestinationTableSync::Save(destination.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<Junction>::value_type& junction, _env.getRegistry<Junction>())
-			{
-				JunctionTableSync::Save(junction.second.get(), transaction);
-			}
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type network, _env.getRegistry<TransportNetwork>())
 			{
 				TransportNetworkTableSync::Save(network.second.get(), transaction);
@@ -1204,6 +1343,14 @@ namespace synthese
 			BOOST_FOREACH(const Registry<User>::value_type& driver, _env.getRegistry<User>())
 			{
 				UserTableSync::Save(driver.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<Depot>::value_type& depot, _env.getRegistry<Depot>())
+			{
+				DepotTableSync::Save(depot.second.get(), transaction);
+			}
+			BOOST_FOREACH(const Registry<DeadRun>::value_type& deadRun, _env.getRegistry<DeadRun>())
+			{
+				DeadRunTableSync::Save(deadRun.second.get(), transaction);
 			}
 			return transaction;
 		}

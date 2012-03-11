@@ -26,13 +26,12 @@
 #define SYNTHESE_DeadRunTableSync_hpp__
 
 #include "DBRegistryTableSyncTemplate.hpp"
+#include "DeadRun.hpp"
 
 namespace synthese
 {
 	namespace pt_operation
 	{
-		class DeadRun;
-
 		//////////////////////////////////////////////////////////////////////////
 		///	Dead run table synchronizer.
 		///	@ingroup m37LS refLS

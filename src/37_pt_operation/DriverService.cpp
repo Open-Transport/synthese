@@ -116,6 +116,7 @@ namespace synthese
 		DriverService::Chunk::Chunk(
 			DriverService* _driverService,
 			VehicleService& _vehicleService,
+			const boost::gregorian::date& date,
 			const boost::posix_time::time_duration& startTime,
 			const boost::posix_time::time_duration& endTime
 		):	driverService(_driverService),
@@ -124,8 +125,9 @@ namespace synthese
 			const VehicleService::Services& services(_vehicleService.getServices());
 			BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
 			{
-				if(service->getLastArrivalSchedule(false) < startTime)
-				{
+				if(	!service->isActive(date) ||
+					service->getLastArrivalSchedule(false) < startTime
+				){
 					continue;
 				}
 				if(service->getDepartureSchedule(false, 0) > endTime)
@@ -144,7 +146,7 @@ namespace synthese
 						break;
 					}
 				}
-				for(size_t i(service->getArrivalSchedules(false).size()-1); i<=0; --i)
+				for(size_t i(service->getArrivalSchedules(false).size()-1); i>=0; --i)
 				{
 					if(service->getArrivalSchedule(false, i) <= endTime)
 					{
