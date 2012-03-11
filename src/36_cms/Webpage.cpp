@@ -61,13 +61,13 @@ namespace synthese
 		LinkedObjectsIds& list,
 		const Record& record
 	){
-		RegistryKeyType id(record.get<RegistryKeyType>(FIELDS[0].name));
+		RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
 		if (id > 0)
 		{
 			list.push_back(id);
 		}
 
-		RegistryKeyType up_id(record.get<RegistryKeyType>(FIELDS[1].name));
+		RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
 		if (up_id > 0)
 		{
 			list.push_back(up_id);
@@ -83,9 +83,9 @@ namespace synthese
 		assert(dynamic_cast<Webpage*>(&object));
 		Webpage& webpage(static_cast<Webpage&>(object));
 
-		webpage.setRank(record.get<size_t>(FIELDS[2].name));
+		webpage.setRank(record.getDefault<size_t>(FIELDS[2].name, 0));
 
-		RegistryKeyType id(record.get<RegistryKeyType>(FIELDS[0].name));
+		RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
 		if (id > 0)
 		{
 			try
@@ -102,7 +102,7 @@ namespace synthese
 			}
 		}
 
-		RegistryKeyType up_id(record.get<RegistryKeyType>(FIELDS[1].name));
+		RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
 		if (up_id > 0)
 		{
 			try
