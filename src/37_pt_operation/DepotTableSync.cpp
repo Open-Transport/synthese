@@ -104,7 +104,7 @@ namespace synthese
 			}
 
 			// Datasource links
-			if(linkLevel > UP_LINKS_LOAD_LEVEL)
+			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				object->setDataSourceLinksWithoutRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(

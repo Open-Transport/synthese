@@ -27,6 +27,7 @@
 
 #include "Calendar.h"
 #include "CommercialLineTableSync.h"
+#include "DepotTableSync.hpp"
 #include "DestinationTableSync.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
@@ -195,6 +196,7 @@ namespace synthese
 
 				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
@@ -224,6 +226,13 @@ namespace synthese
 				};
 				typedef std::vector<TripDetail> TripDetailVector;
 
+				typedef enum
+				{
+					TCOU_Commercial = 0,
+					TCOU_DepotToStop = 3,
+					TCOU_StopToDepot = 4,
+					TCOU_HLP = 5
+				} TCOUValues;
 
 			protected:
 
