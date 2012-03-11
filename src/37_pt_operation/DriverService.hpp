@@ -86,6 +86,7 @@ namespace synthese
 				Chunk(
 					DriverService* _driverService,
 					VehicleService& _vehicleService,
+					const boost::gregorian::date& date,
 					const boost::posix_time::time_duration& startTime,
 					const boost::posix_time::time_duration& endTime
 				);
