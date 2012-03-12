@@ -1152,7 +1152,8 @@ namespace synthese
 
 							{	// Boni time
 								vector<string> parts;
-								split(parts, _getValue("bonifATTtps"), is_any_of("h"));
+								string bonifStr(_getValue("bonifATTtps"));
+								split(parts, bonifStr, is_any_of("h"));
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
 						}
