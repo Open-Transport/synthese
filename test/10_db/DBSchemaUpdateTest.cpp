@@ -125,13 +125,12 @@ class TestSchema3TableSync:
 	public DBDummyTableSyncTemplate<TestSchema3TableSync>
 {
  public:
-	static const std::string COL_COLUMN_SELECT;
+	static const std::string COL_COLUMN0;
 	static const std::string COL_COLUMN1;
 	static const std::string COL_COLUMN2;
 };
 
-// select is a reserved keyword. This checks that escaping is done properly.
-const string TestSchema3TableSync::COL_COLUMN_SELECT("select");
+const string TestSchema3TableSync::COL_COLUMN0("column0");
 const string TestSchema3TableSync::COL_COLUMN1("column1");
 const string TestSchema3TableSync::COL_COLUMN2("column2");
 
@@ -151,7 +150,7 @@ namespace synthese
 		template<> const Field DBTableSyncTemplate<TestSchema3TableSync>::_FIELDS[]=
 		{
 			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(TestSchema3TableSync::COL_COLUMN_SELECT, SQL_TEXT),
+			Field(TestSchema3TableSync::COL_COLUMN0, SQL_TEXT),
 			Field(TestSchema3TableSync::COL_COLUMN1, SQL_DOUBLE),
 			Field(TestSchema3TableSync::COL_COLUMN2, SQL_BOOLEAN),
 			Field()
@@ -282,11 +281,11 @@ void testSchemaUpdate(const TestBackend& testBackend)
 
 		DBResultSPtr rows = DBModule::GetDB()->execQuery("SELECT * FROM t101_testschema3");
 		BOOST_REQUIRE(rows->next());
-		BOOST_CHECK_EQUAL("foo'\\", rows->getText("select"));
+		BOOST_CHECK_EQUAL("foo'\\", rows->getText("column0"));
 		BOOST_CHECK_EQUAL(-400.5, rows->getDouble("column1"));
 		BOOST_CHECK_EQUAL(true, rows->getBool("column2"));
 		BOOST_REQUIRE(rows->next());
-		BOOST_CHECK_EQUAL("bar", rows->getText("select"));
+		BOOST_CHECK_EQUAL("bar", rows->getText("column0"));
 		BOOST_CHECK_EQUAL(12345.78, rows->getDouble("column1"));
 		BOOST_CHECK_EQUAL(false, rows->getBool("column2"));
 		BOOST_CHECK(!rows->next());
