@@ -47,6 +47,7 @@ namespace synthese
 	{
 		const std::string DriverService::TAG_CHUNK = "chunk";
 		const std::string DriverService::TAG_ELEMENT = "element";
+		const std::string DriverService::TAG_VEHICLE_SERVICE = "vehicle_service";
 		const std::string DriverService::ATTR_START_TIME = "start_time";
 		const std::string DriverService::ATTR_END_TIME = "end_time";
 		const std::string DriverService::ATTR_START_STOP = "start_stop";
@@ -82,7 +83,8 @@ namespace synthese
 
 		void DriverService::toParametersMap(
 			ParametersMap& map,
-			bool recursive
+			bool recursive,
+			VehicleService* vehicleServiceFilter
 		) const	{
 			Key::SaveToParametersMap(getKey(), map);
 			Name::SaveToParametersMap(getName(), map);
@@ -101,6 +103,12 @@ namespace synthese
 					continue;
 				}
 
+				// Vehicle service filter
+				if(vehicleServiceFilter && chunk.vehicleService != vehicleServiceFilter)
+				{
+					continue;
+				}
+
 				// Declarations
 				shared_ptr<ParametersMap> chunkPM(new ParametersMap);
 
@@ -111,7 +119,9 @@ namespace synthese
 				// Vehicle service
 				if(recursive && chunk.vehicleService)
 				{
-					chunk.vehicleService->toParametersMap(map, false);
+					shared_ptr<ParametersMap> vsPM(new ParametersMap);
+					chunk.vehicleService->toParametersMap(*vsPM, false);
+					chunkPM->insert(TAG_VEHICLE_SERVICE, vsPM);
 				}
 
 				// Stops
@@ -120,7 +130,7 @@ namespace synthese
 				{
 					chunkPM->insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
 				}
-				const Importable* endStopPoint(dynamic_cast<Importable*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.begin()->endRank)->getFromVertex()));
+				const Importable* endStopPoint(dynamic_cast<Importable*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.rbegin()->endRank)->getFromVertex()));
 				if(endStopPoint)
 				{
 					chunkPM->insert(ATTR_END_STOP, endStopPoint->getCodeBySources());

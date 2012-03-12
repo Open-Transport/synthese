@@ -39,6 +39,8 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		class VehicleService;
+
 		//////////////////////////////////////////////////////////////////////////
 		///	37.15 Function : DriverServicesListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Compositions list
@@ -53,6 +55,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_VEHICLE_SERVICE_ID;
 
 			static const std::string TAG_SERVICE;
 			static const std::string TAG_SERVICES;
@@ -63,6 +66,7 @@ namespace synthese
 				boost::gregorian::date _date;
 				const cms::Webpage* _page;
 				MimeType::Type _mimeType;
+				const VehicleService* _vehicleService;
 			//@}
 
 
