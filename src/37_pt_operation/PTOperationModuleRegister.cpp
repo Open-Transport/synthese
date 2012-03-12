@@ -15,6 +15,7 @@
 #include "DriverServicesListService.hpp"
 #include "GetCompositionsService.hpp"
 #include "GetVehiclesService.hpp"
+#include "VehicleServicesListService.hpp"
 
 #include "DepotAdmin.hpp"
 #include "DepotsAdmin.hpp"
@@ -74,6 +75,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::GetVehiclesService::integrate();
 	synthese::pt_operation::DriverServicesListService::integrate();
 	synthese::pt_operation::DriverAllocationsListService::integrate();
+	synthese::pt_operation::VehicleServicesListService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
 

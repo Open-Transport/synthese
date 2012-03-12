@@ -21,12 +21,12 @@
 */
 
 #include "CMSModule.hpp"
-#include "Website.hpp"
-#include "Webpage.h"
+
 #include "FunctionWithSiteBase.hpp"
-#include "WebPageDisplayFunction.h"
 #include "Request.h"
-#include "Fetcher.h"
+#include "WebsiteTableSync.hpp"
+#include "Webpage.h"
+#include "WebPageDisplayFunction.h"
 
 #include <boost/algorithm/string/trim.hpp>
 
@@ -76,7 +76,7 @@ namespace synthese
 			RegistryKeyType id(pm.getDefault<RegistryKeyType>(FunctionWithSiteBase::PARAMETER_SITE, 0));
 			if(id)
 			{
-				return Fetcher<Website>::Fetch(id, Env::GetOfficialEnv()).get();
+				return Env::GetOfficialEnv().get<Website>(id).get();
 			}
 
 			{
@@ -86,7 +86,7 @@ namespace synthese
 				)	);
 				if(function.get() && function->getPage())
 				{
-					return Fetcher<Website>::Fetch(function->getPage()->getRoot()->getKey(), Env::GetOfficialEnv()).get();
+					return Env::GetOfficialEnv().get<Website>(function->getPage()->getRoot()->getKey()).get();
 				}
 			}
 

@@ -21,12 +21,17 @@
 */
 
 #include "FunctionWithSiteBase.hpp"
-#include "Website.hpp"
 
+#include "Website.hpp"
+#include "WebPageTableSync.h"
+
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace cms
 	{
 		const string FunctionWithSiteBase::PARAMETER_SITE("si");
@@ -57,6 +62,27 @@ namespace synthese
 			if(fws)
 			{
 				_site = fws->_site;
+			}
+		}
+
+
+
+		const Webpage* FunctionWithSiteBase::getPage(
+			const std::string& idOrSmartURL
+		) const	{
+			if(_site)
+			{
+				return _site->getPageByIdOrSmartURL(idOrSmartURL);
+			}
+			else
+			{
+				try
+				{
+					return WebPageTableSync::Get(lexical_cast<RegistryKeyType>(idOrSmartURL), *_env).get();
+				}
+				catch(...)
+				{
+				}
 			}
 		}
 }	}

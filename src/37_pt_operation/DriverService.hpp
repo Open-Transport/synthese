@@ -50,6 +50,19 @@ namespace synthese
 			public ObjectField<DriverService, boost::optional<DriverService&> >
 		{
 		public:
+			static const std::string TAG_CHUNK;
+			static const std::string TAG_ELEMENT;
+			static const std::string ATTR_START_TIME;
+			static const std::string ATTR_END_TIME;
+			static const std::string ATTR_START_STOP;
+			static const std::string ATTR_END_STOP;
+			static const std::string ATTR_WORK_DURATION;
+			static const std::string ATTR_WORK_RANGE;
+			static const std::string ATTR_SERVICE_ID;
+			static const std::string ATTR_CLASS;
+			static const std::string VALUE_DEAD_RUN;
+			static const std::string VALUE_COMMERCIAL;
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Auto generated object vector field (will be defined by Object in the future)
 			class Vector:
@@ -96,7 +109,9 @@ namespace synthese
 			typedef util::Registry<DriverService> Registry;
 
 		private:
+			boost::posix_time::time_duration _serviceBeginning;
 			Chunks _chunks;
+			boost::posix_time::time_duration _serviceEnd;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);
@@ -111,7 +126,14 @@ namespace synthese
 				void setChunks(const Chunks& value);
 			//@}
 
-			void toParametersMap(util::ParametersMap& map) const;
+			/// @name Services
+			//@{
+				void toParametersMap(util::ParametersMap& map, bool recursive = true) const;
+				boost::posix_time::time_duration getWorkRange() const;
+				boost::posix_time::time_duration getWorkDuration() const;
+				boost::posix_time::time_duration getServiceBeginning() const;
+				boost::posix_time::time_duration getServiceEnd() const;
+			//@}
 		};
 }	}
 

@@ -46,12 +46,19 @@ namespace synthese
 	public:
 		static void UnSerialize(
 			boost::gregorian::date& fieldObject,
-			const std::string& text,
-			const util::Env& env
+			const std::string& text
 		){
 			fieldObject = text.empty() ?
 				boost::gregorian::date(boost::gregorian::not_a_date_time) :
 				boost::gregorian::from_string(text);
+		}
+
+		static void UnSerialize(
+			boost::gregorian::date& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		){
+			UnSerialize(fieldObject, text);
 		}
 
 		static std::string Serialize(
@@ -86,12 +93,19 @@ namespace synthese
 	public:
 		static void UnSerialize(
 			boost::posix_time::ptime& fieldObject,
-			const std::string& text,
-			const util::Env& env
+			const std::string& text
 		){
 			fieldObject = text.empty() ?
 				boost::posix_time::ptime(boost::posix_time::not_a_date_time) :
 				boost::posix_time::time_from_string(text);
+		}
+
+		static void UnSerialize(
+			boost::posix_time::ptime& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		){
+			UnSerialize(fieldObject, text);
 		}
 
 		static std::string Serialize(
@@ -126,12 +140,19 @@ namespace synthese
 	public:
 		static void UnSerialize(
 			boost::posix_time::time_duration& fieldObject,
-			const std::string& text,
-			const util::Env& env
+			const std::string& text
 		){
 			fieldObject = text.empty() ?
 				boost::posix_time::time_duration(boost::posix_time::not_a_date_time) :
 				boost::posix_time::minutes(boost::lexical_cast<int>(text));
+		}
+
+		static void UnSerialize(
+			boost::posix_time::time_duration& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		){
+			UnSerialize(fieldObject, text);
 		}
 
 		static std::string Serialize(
@@ -165,10 +186,17 @@ namespace synthese
 	public:
 		static void UnSerialize(
 			std::string& fieldObject,
+			const std::string& text
+		){
+			fieldObject = text;
+		}
+
+		static void UnSerialize(
+			std::string& fieldObject,
 			const std::string& text,
 			const util::Env& env
 		){
-			fieldObject = text;
+			UnSerialize(fieldObject, text);
 		}
 
 		static std::string Serialize(
@@ -199,8 +227,7 @@ namespace synthese
 
 		static void UnSerialize(
 			T& fieldObject,
-			const std::string& text,
-			const util::Env& env
+			const std::string& text
 		){
 			if(!text.empty())
 			{
@@ -212,6 +239,14 @@ namespace synthese
 			}
 		}
 
+		static void UnSerialize(
+			T& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		){
+			UnSerialize(fieldObject, text);
+		}
+
 		static std::string Serialize(
 			const T& fieldObject,
 			SerializationFormat format = FORMAT_INTERNAL
@@ -219,13 +254,22 @@ namespace synthese
 			return boost::lexical_cast<std::string>(fieldObject);
 		}
 
-		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+		static void LoadFromRecord(T& fieldObject, const Record& record)
 		{
 			ObjectField<C, T>::UnSerialize(
 				fieldObject,
-				record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name),
-				env
+				record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name)
 			);
+		}
+
+		static void LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env)
+		{
+			LoadFromRecord(fieldObject, record);
+		}
+
+		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+		{
+			LoadFromRecord(fieldObject, record);
 		}
 
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix)

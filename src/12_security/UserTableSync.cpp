@@ -132,6 +132,7 @@ namespace synthese
 			user->setBirthDate(rows->getDate(UserTableSync::COL_BIRTH_DATE));
 
 			// Language
+			user->setLanguage(NULL);
 			string langStr(rows->getText(UserTableSync::COL_LANGUAGE));
 			if(!langStr.empty()) try
 			{
@@ -142,14 +143,28 @@ namespace synthese
 				Log::GetInstance().warn("Language error in user "+ lexical_cast<string>(user->getKey()), e);
 			}
 
+			// Profile
+			user->setProfile(NULL);
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				user->setProfile(ProfileTableSync::Get(
-					rows->getLongLong(UserTableSync::TABLE_COL_PROFILE_ID),
-					env,
-					linkLevel
-				).get());
+				RegistryKeyType profileId(
+					rows->getDefault<RegistryKeyType>(UserTableSync::TABLE_COL_PROFILE_ID, 0)
+				);
+				if(profileId)
+				{
+					user->setProfile(
+						ProfileTableSync::Get(
+							profileId,
+							env,
+							linkLevel
+						).get()
+					);
+				}
+			}
 
+			// Data source links
+			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
 				if(&env == &Env::GetOfficialEnv())
 				{
 					user->setDataSourceLinksWithRegistration(
@@ -173,8 +188,6 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Unlink(
 			User* obj
 		){
-			obj->setProfile(NULL);
-			obj->setLanguage(NULL);
 		}
 
 

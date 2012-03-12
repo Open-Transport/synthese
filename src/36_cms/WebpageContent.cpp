@@ -22,6 +22,7 @@
 
 #include "WebpageContent.hpp"
 
+#include "HTMLTable.h"
 #include "Request.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -31,6 +32,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace html;
 	using namespace server;
 	using namespace util;
 	using namespace cms;
@@ -530,7 +532,42 @@ namespace synthese
 			const Webpage& page
 		) const	{
 
-			if(name == "client_url")
+			if(name.empty())
+			{
+				HTMLTable::ColsVector c;
+				c.push_back("name");
+				c.push_back("value");
+				HTMLTable t(c, "table table-striped table-condensed sortable");
+				stream << t.open();
+				t.body(stream);
+				BOOST_FOREACH(const ParametersMap::Map::value_type& item, additionalParametersMap.getMap())
+				{
+					stream << t.row();
+					stream << t.col() << item.first;
+					stream << t.col() << item.second;
+				}
+				stream << t.row();
+				stream << t.col() << "host_name";
+				stream << t.col() << request.getHostName();
+				stream << t.row();
+				stream << t.col() << "client_url";
+				stream << t.col() << request.getClientURL();
+				const Website* site(page.getRoot());
+				if(site)
+				{
+					stream << t.row();
+					stream << t.col() << "site";
+					stream << t.col() << site->getKey();
+				}
+				BOOST_FOREACH(const ParametersMap::SubMapsKeys::value_type& item, additionalParametersMap.getSubMapsKeys())
+				{
+					stream << t.row();
+					stream << t.col() << item;
+					stream << t.col() << "(submap)";
+				}
+				stream << t.close();
+			}
+			else if(name == "client_url")
 			{
 				stream << request.getClientURL();
 			}
@@ -558,7 +595,6 @@ namespace synthese
 					stream << value;
 				}
 			}
-
 		}
 
 
