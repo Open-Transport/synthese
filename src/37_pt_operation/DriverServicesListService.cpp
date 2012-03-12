@@ -67,7 +67,8 @@ namespace synthese
 
 		DriverServicesListService::DriverServicesListService():
 			_page(NULL),
-			_vehicleService(NULL)
+			_vehicleService(NULL),
+			_key(0)
 		{}
 
 
@@ -90,6 +91,10 @@ namespace synthese
 			if(_vehicleService)
 			{
 				map.insert(PARAMETER_VEHICLE_SERVICE_ID, _vehicleService->getKey());
+			}
+			if(_key)
+			{
+				map.insert(Request::PARAMETER_OBJECT_ID, _key);
 			}
 			return map;
 		}
@@ -124,6 +129,8 @@ namespace synthese
 					throw RequestException("No such vehicle service");
 				}
 			}
+
+			_key = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0);
 		}
 
 
@@ -143,6 +150,11 @@ namespace synthese
 
 				// Date filter
 				if(!service.isActive(_date))
+				{
+					continue;
+				}
+
+				if(_key && service.getKey() != _key)
 				{
 					continue;
 				}
