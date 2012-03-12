@@ -163,7 +163,7 @@ namespace synthese
 				}
 
 				shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				service.toParametersMap(*servicePM);
+				service.toParametersMap(*servicePM, true, _vehicleService);
 				map.insert(TAG_SERVICE, servicePM);
 			}
 
