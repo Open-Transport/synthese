@@ -618,11 +618,21 @@ namespace synthese
 				}
 
 				IConv iconv(_dataSource.getCharset(), "UTF-8");
+				string shortName(trim_copy(parser.getCell("PA_NOM_COURT")));
+				// Somtimes, the short name is truncated. This tries to look
+				// at the long name (which also contains the city as a prefix)
+				// to see if it can complete a potentially truncated short name.
+				string longName(trim_copy(parser.getCell("PA_NOM_LONG")));
+				size_t shortPosInLong = longName.find(shortName);
+				if(shortPosInLong != string::npos)
+				{
+					shortName = longName.substr(shortPosInLong);
+				}
 
 				PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 					_stopPoints,
 					stopCode,
-					iconv.convert(parser.getCell("PA_NOM_COURT")),
+					iconv.convert(shortName),
 					point.get(),
 					*cityForStopAreaAutoGeneration.get(),
 					optional<time_duration>(),
@@ -783,13 +793,21 @@ namespace synthese
 				}
 				runningDays[0] = runningDaysString[6] != '-';
 
-				if (cal.empty())
+				if(cal.empty())
 				{
 					os << "WARN : calendar id: " << calendarId << " from service " << serviceKey << " is empty<br />";
 					continue;
 				}
 
-				assert(cal.getFirstActiveDate() >= cal.getLastActiveDate());
+				if(cal.getFirstActiveDate() > cal.getLastActiveDate())
+				{
+					os << "WARN : calendar id: " << calendarId << " from service " << serviceKey <<
+						" has a last active date (" << cal.getLastActiveDate() <<
+						") lower than its first active date (" << cal.getFirstActiveDate() <<
+						")<br />";
+					continue;
+				}
+				assert(cal.getFirstActiveDate() <= cal.getLastActiveDate());
 
 				date lastActiveDate(cal.getLastActiveDate());
 				for(date d(cal.getFirstActiveDate()); d <= lastActiveDate; d += days(1))
