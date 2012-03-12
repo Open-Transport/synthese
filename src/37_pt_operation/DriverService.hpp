@@ -132,7 +132,7 @@ namespace synthese
 				void toParametersMap(
 					util::ParametersMap& map,
 					bool recursive = true,
-					VehicleService* vehicleServiceFilter = NULL
+					const VehicleService* vehicleServiceFilter = NULL
 				) const;
 				boost::posix_time::time_duration getWorkRange() const;
 				boost::posix_time::time_duration getWorkDuration() const;
