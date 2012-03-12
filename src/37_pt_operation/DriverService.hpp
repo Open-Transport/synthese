@@ -52,6 +52,7 @@ namespace synthese
 		public:
 			static const std::string TAG_CHUNK;
 			static const std::string TAG_ELEMENT;
+			static const std::string TAG_VEHICLE_SERVICE;
 			static const std::string ATTR_START_TIME;
 			static const std::string ATTR_END_TIME;
 			static const std::string ATTR_START_STOP;
@@ -128,7 +129,11 @@ namespace synthese
 
 			/// @name Services
 			//@{
-				void toParametersMap(util::ParametersMap& map, bool recursive = true) const;
+				void toParametersMap(
+					util::ParametersMap& map,
+					bool recursive = true,
+					VehicleService* vehicleServiceFilter = NULL
+				) const;
 				boost::posix_time::time_duration getWorkRange() const;
 				boost::posix_time::time_duration getWorkDuration() const;
 				boost::posix_time::time_duration getServiceBeginning() const;
