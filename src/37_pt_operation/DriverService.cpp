@@ -64,7 +64,7 @@ namespace synthese
 			impex::ImportableTemplate<DriverService>(),
 			util::Registrable(id),
 			_serviceBeginning(not_a_date_time),
-			_serviceEnd(not_a_date_time),
+			_serviceEnd(not_a_date_time)
 		{}
 
 
