@@ -25,11 +25,12 @@
 #include "DriverServicesListService.hpp"
 
 #include "DriverService.hpp"
+#include "MimeTypes.hpp"
+#include "PTOperationModule.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
 #include "Webpage.h"
-#include "PTOperationModule.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -45,23 +46,42 @@ namespace synthese
 	using namespace cms;
 	using namespace pt;
 	using namespace graph;
+	using namespace pt_operation;
+	
 
-
-	template<> const string util::FactorableTemplate<Function,pt_operation::DriverServicesListService>::FACTORY_KEY("DriverServicesList");
+	template<>
+	const string FactorableTemplate<FunctionWithSite<false>, DriverServicesListService>::FACTORY_KEY = "DriverServicesList";
 
 	namespace pt_operation
 	{
-		const string DriverServicesListService::PARAMETER_DATE("da");
-		const string DriverServicesListService::PARAMETER_PAGE_ID("pa");
+		const string DriverServicesListService::PARAMETER_DATE = "date";
+		const string DriverServicesListService::PARAMETER_PAGE_ID = "p";
+		
+		const string DriverServicesListService::TAG_SERVICE = "vehicleService";
+		const string DriverServicesListService::TAG_SERVICES = "vehicleServices";
 
-		const string DriverServicesListService::TAG_SERVICE("vehicleService");
+
+
+		DriverServicesListService::DriverServicesListService():
+			_page(NULL)
+		{}
+
+
 
 		ParametersMap DriverServicesListService::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(_page.get())
+			if(_page)
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
+			else if(!_mimeType.empty())
+			{
+				MimeType::SaveToParametersMap(_mimeType, map);
+			}
+			if(!_date.is_not_a_date())
+			{
+				map.insert(PARAMETER_DATE, _date);
 			}
 			return map;
 		}
@@ -78,18 +98,10 @@ namespace synthese
 				_date = from_simple_string(map.get<string>(PARAMETER_DATE));
 			}
 
-			// Composition display page
-			try
+			_page = getPage(map.getDefault<string>(PARAMETER_PAGE_ID));
+			if(!_page)
 			{
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PAGE_ID, 0));
-				if(id > 0)
-				{
-					_page = Env::GetOfficialEnv().get<Webpage>(id);
-				}
-			}
-			catch(ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such composition page");
+				MimeType::LoadFromRecord(_mimeType, map);
 			}
 		}
 
@@ -114,10 +126,21 @@ namespace synthese
 				map.insert(TAG_SERVICE, servicePM);
 			}
 
-			if(_page.get())
+			if(_page)
 			{
-				BOOST_FOREACH(const shared_ptr<ParametersMap>& servicePM, map.getSubMaps(TAG_SERVICE))
-				_page->display(stream, request, *servicePM);
+				if(map.hasSubMaps(TAG_SERVICE))
+				{
+					BOOST_FOREACH(const shared_ptr<ParametersMap>& servicePM, map.getSubMaps(TAG_SERVICE))
+					{
+						_page->display(stream, request, *servicePM);
+			}	}	}
+			else if(_mimeType == MimeTypes::XML)
+			{
+				map.outputXML(stream, TAG_SERVICES, true);
+			}
+			else if(_mimeType == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_SERVICES);
 			}
 
 			return map;
@@ -135,6 +158,6 @@ namespace synthese
 
 		std::string DriverServicesListService::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/html";
+			return _page ? _page->getMimeType() : _mimeType;
 		}
 }	}

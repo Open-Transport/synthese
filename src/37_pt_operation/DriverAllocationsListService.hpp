@@ -26,7 +26,8 @@
 #define SYNTHESE_DriverAllocationsListService_H__
 
 #include "FactorableTemplate.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
+#include "StandardFields.hpp"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -58,7 +59,7 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class DriverAllocationsListService:
-			public util::FactorableTemplate<server::Function,DriverAllocationsListService>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>, DriverAllocationsListService>
 		{
 		public:
 			static const std::string PARAMETER_DRIVER_ID;
@@ -67,14 +68,16 @@ namespace synthese
 			static const std::string PARAMETER_PAGE_ID;
 
 			static const std::string TAG_ALLOCATION;
+			static const std::string TAG_ALLOCATIONS;
 
 		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const impex::DataSource> _dataSource;
-				boost::shared_ptr<const security::User>	_driver;
+				const impex::DataSource* _dataSource;
+				const security::User*	_driver;
 				boost::gregorian::date _minDate;
-				boost::shared_ptr<const cms::Webpage> _page;
+				const cms::Webpage* _page;
+				MimeType::Type _mimeType;
 			//@}
 
 
@@ -104,6 +107,8 @@ namespace synthese
 
 
 		public:
+			DriverAllocationsListService();
+
 			//! @name Setters
 			//@{
 			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }

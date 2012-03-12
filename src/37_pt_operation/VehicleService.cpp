@@ -21,8 +21,11 @@
 */
 
 #include "VehicleService.hpp"
-#include "SchedulesBasedService.h"
 
+#include "ScheduledService.h"
+
+using namespace boost;
+using namespace std;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -38,6 +41,11 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		const string VehicleService::TAG_SERVICE = "service";
+		const string VehicleService::ATTR_CLASS = "class";
+		const string VehicleService::VALUE_COMMERCIAL = "commercial";
+		const string VehicleService::VALUE_DEAD_RUN = "deadRun";
+
 		VehicleService::VehicleService(RegistryKeyType id):
 			Registrable(id)
 		{}
@@ -100,6 +108,31 @@ namespace synthese
 			const DriverService::Chunk& value
 		){
 			_driverServiceChunks.erase(&value);
+		}
+
+
+
+		void VehicleService::toParametersMap(
+			ParametersMap& map,
+			bool recursive
+		) const	{
+			Key::SaveToParametersMap(getKey(), map);
+			Name::SaveToParametersMap(getName(), map);
+
+			if(!recursive)
+			{
+				return;
+			}
+
+			BOOST_FOREACH(const Services::value_type& service, _services)
+			{
+				shared_ptr<ParametersMap> serviceMap(new ParametersMap);
+
+				serviceMap->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
+				service->toParametersMap(*serviceMap);
+
+				map.insert(TAG_SERVICE, serviceMap);
+			}
 		}
 
 

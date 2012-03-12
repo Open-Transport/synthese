@@ -31,6 +31,7 @@ namespace synthese
 {
 	namespace cms
 	{
+		class Webpage;
 		class Website;
 
 		/** Function With website class.
@@ -74,6 +75,8 @@ namespace synthese
 			//@}
 
 			FunctionWithSiteBase();
+
+			const Webpage* getPage(const std::string& idOrSmartURL) const;
 		};
 	}
 }

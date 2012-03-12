@@ -90,6 +90,8 @@ VehicleServiceUpdateAction.cpp
 VehicleServiceUpdateAction.hpp
 VehicleServicesAdmin.cpp
 VehicleServicesAdmin.hpp
+VehicleServicesListService.cpp
+VehicleServicesListService.hpp
 VehicleTableSync.cpp
 VehicleTableSync.hpp
 VehicleUpdateAction.cpp

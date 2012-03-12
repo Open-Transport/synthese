@@ -26,7 +26,7 @@
 #define SYNTHESE_DriverServicesListService_H__
 
 #include "FactorableTemplate.h"
-#include "Function.h"
+#include "FunctionWithSite.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -48,19 +48,21 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class DriverServicesListService:
-			public util::FactorableTemplate<server::Function,DriverServicesListService>
+			public util::FactorableTemplate<cms::FunctionWithSite<false>, DriverServicesListService>
 		{
 		public:
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_PAGE_ID;
 
 			static const std::string TAG_SERVICE;
+			static const std::string TAG_SERVICES;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::gregorian::date _date;
-				boost::shared_ptr<const cms::Webpage> _page;
+				const cms::Webpage* _page;
+				MimeType::Type _mimeType;
 			//@}
 
 
@@ -90,6 +92,8 @@ namespace synthese
 
 
 		public:
+			DriverServicesListService();
+
 			//! @name Setters
 			//@{
 			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
