@@ -22,11 +22,12 @@
 
 #include "DriverService.hpp"
 
-#include "SchedulesBasedService.h"
+#include "ScheduledService.h"
 #include "StopPoint.hpp"
 #include "VehicleService.hpp"
 
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -44,11 +45,27 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		const std::string DriverService::TAG_CHUNK = "chunk";
+		const std::string DriverService::TAG_ELEMENT = "element";
+		const std::string DriverService::ATTR_START_TIME = "start_time";
+		const std::string DriverService::ATTR_END_TIME = "end_time";
+		const std::string DriverService::ATTR_START_STOP = "start_stop";
+		const std::string DriverService::ATTR_END_STOP = "end_stop";
+		const std::string DriverService::ATTR_WORK_DURATION = "work_duration";
+		const std::string DriverService::ATTR_WORK_RANGE = "work_range";
+		const std::string DriverService::ATTR_SERVICE_ID = "service_id";
+		const std::string DriverService::ATTR_CLASS = "class";
+		const std::string DriverService::VALUE_DEAD_RUN = "dead_run";
+		const std::string DriverService::VALUE_COMMERCIAL = "commercial";
+
+
+
 		DriverService::DriverService(util::RegistryKeyType id):
 			impex::ImportableTemplate<DriverService>(),
-			util::Registrable(id)
-		{
-		}
+			util::Registrable(id),
+			_serviceBeginning(not_a_date_time),
+			_serviceEnd(not_a_date_time),
+		{}
 
 
 
@@ -63,51 +80,138 @@ namespace synthese
 
 
 
-		void DriverService::toParametersMap( util::ParametersMap& map ) const
-		{
-			map.insert("id", getKey());
+		void DriverService::toParametersMap(
+			ParametersMap& map,
+			bool recursive
+		) const	{
+			Key::SaveToParametersMap(getKey(), map);
+			Name::SaveToParametersMap(getName(), map);
+
+			// Service times
+			map.insert(ATTR_WORK_DURATION, getWorkDuration());
+			map.insert(ATTR_WORK_RANGE, getWorkRange());
+			map.insert(ATTR_START_TIME, getServiceBeginning());
+			map.insert(ATTR_END_TIME, getServiceEnd());
 
 			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
 			{
+				// Avoid empty chunks (abnormal situation)
 				if(chunk.elements.empty())
 				{
 					continue;
 				}
 
+				// Declarations
 				shared_ptr<ParametersMap> chunkPM(new ParametersMap);
-				chunkPM->insert("start_time", chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank));
-				chunkPM->insert("end_time", chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank));
-				const StopPoint* startStopPoint(dynamic_cast<StopPoint*>(chunk.elements.begin()->service->getPath()->getEdge(chunk.elements.begin()->startRank)->getFromVertex()));
+
+				// Times
+				chunkPM->insert(ATTR_START_TIME, chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank));
+				chunkPM->insert(ATTR_END_TIME, chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank));
+
+				// Vehicle service
+				if(recursive && chunk.vehicleService)
+				{
+					chunk.vehicleService->toParametersMap(map, false);
+				}
+
+				// Stops
+				const Importable* startStopPoint(dynamic_cast<Importable*>(chunk.elements.begin()->service->getPath()->getEdge(chunk.elements.begin()->startRank)->getFromVertex()));
 				if(startStopPoint)
 				{
-					chunkPM->insert("start_stop", startStopPoint->getCodeBySources());
+					chunkPM->insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
 				}
-				const StopPoint* endStopPoint(dynamic_cast<StopPoint*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.begin()->endRank)->getFromVertex()));
+				const Importable* endStopPoint(dynamic_cast<Importable*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.begin()->endRank)->getFromVertex()));
 				if(endStopPoint)
 				{
-					chunkPM->insert("end_stop", endStopPoint->getCodeBySources());
+					chunkPM->insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
 				}
 
+				// Elements
 				BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
 				{
+					// Declaration
 					shared_ptr<ParametersMap> elementPM(new ParametersMap);
-					elementPM->insert("service_id", element.service->getKey());
-					elementPM->insert("start_time", element.service->getDepartureSchedule(false, element.startRank));
-					elementPM->insert("end_time", element.service->getArrivalSchedule(false, element.endRank));
 
-					const StopPoint* startStopPoint(dynamic_cast<StopPoint*>(element.service->getPath()->getEdge(element.startRank)->getFromVertex()));
+					// Service
+					elementPM->insert(ATTR_SERVICE_ID, element.service->getKey());
+					elementPM->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(element.service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
+					elementPM->insert(ATTR_START_TIME, element.service->getDepartureSchedule(false, element.startRank));
+					elementPM->insert(ATTR_END_TIME, element.service->getArrivalSchedule(false, element.endRank));
+					
+					const Importable* startStopPoint(dynamic_cast<Importable*>(element.service->getPath()->getEdge(element.startRank)->getFromVertex()));
 					if(startStopPoint)
 					{
-						elementPM->insert("start_stop", startStopPoint->getCodeBySources());
+						elementPM->insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
 					}
-					const StopPoint* endStopPoint(dynamic_cast<StopPoint*>(element.service->getPath()->getEdge(element.endRank)->getFromVertex()));
+					const Importable* endStopPoint(dynamic_cast<Importable*>(element.service->getPath()->getEdge(element.endRank)->getFromVertex()));
 					if(endStopPoint)
 					{
-						elementPM->insert("end_stop", endStopPoint->getCodeBySources());
+						elementPM->insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
 					}
+
+					// Storage in chunk map
+					chunkPM->insert(TAG_ELEMENT, elementPM);
 				}
 
-				map.insert("chunk", chunkPM);
+				map.insert(TAG_CHUNK, chunkPM);
+			}
+		}
+
+
+
+		boost::posix_time::time_duration DriverService::getWorkRange() const
+		{
+			return getServiceEnd() - getServiceBeginning();
+		}
+
+
+
+		boost::posix_time::time_duration DriverService::getWorkDuration() const
+		{
+			time_duration result(minutes(0));
+			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
+			{
+				BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
+				{
+					result +=
+						element.service->getArrivalSchedule(false, element.endRank) -
+						element.service->getDepartureSchedule(false, element.startRank)
+					;
+			}	}
+			return result;
+		}
+
+
+
+		time_duration DriverService::getServiceBeginning() const
+		{
+			if(	_serviceBeginning.is_not_a_date_time() &&
+				!_chunks.empty() &&
+				!_chunks.begin()->elements.empty()
+			){
+				const Chunk& chunk(*_chunks.begin());
+				return chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank);
+			}
+			else
+			{
+				return _serviceEnd;
+			}
+		}
+
+
+
+		time_duration DriverService::getServiceEnd() const
+		{
+			if(	_serviceEnd.is_not_a_date_time() &&
+				!_chunks.empty() &&
+				!_chunks.rbegin()->elements.empty()
+			){
+				const Chunk& chunk(*_chunks.rbegin());
+				return chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank);
+			}
+			else
+			{
+				return _serviceEnd;
 			}
 		}
 

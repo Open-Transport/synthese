@@ -22,14 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "WebPageAddAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "WebPageAddAction.h"
 #include "Request.h"
-#include "Webpage.h"
 #include "WebPageTableSync.h"
-#include "Website.hpp"
-#include "Fetcher.h"
+#include "WebsiteTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -90,7 +89,7 @@ namespace synthese
 						*_env
 					);
 					_rank = _template->getRank();
-					_site = Fetcher<Website>::FetchEditable(_template->getRoot()->getKey(), *_env);
+					_site = WebsiteTableSync::GetEditable(_template->getRoot()->getKey(), *_env);
 				}
 				catch(ObjectNotFoundException<Webpage>&)
 				{
@@ -105,7 +104,7 @@ namespace synthese
 						map.get<RegistryKeyType>(PARAMETER_PARENT_ID),
 						*_env
 					);
-					_site = Fetcher<Website>::FetchEditable(_parent->getRoot()->getKey(), *_env);
+					_site = WebsiteTableSync::GetEditable(_parent->getRoot()->getKey(), *_env);
 
 					WebPageTableSync::SearchResult result(
 						WebPageTableSync::Search(
@@ -130,7 +129,7 @@ namespace synthese
 			{
 				try
 				{
-					_site = Fetcher<Website>::FetchEditable(
+					_site = WebsiteTableSync::GetEditable(
 						map.get<RegistryKeyType>(PARAMETER_SITE_ID),
 						*_env
 					);

@@ -26,10 +26,10 @@
 #define SYNTHESE_FunctionWithSite_H__
 
 #include "FunctionWithSiteBase.hpp"
-#include "RequestException.h"
-#include "Website.hpp"
+
 #include "Env.h"
-#include "Fetcher.h"
+#include "RequestException.h"
+#include "WebsiteTableSync.hpp"
 
 namespace synthese
 {
@@ -67,7 +67,7 @@ namespace synthese
 				{
 					try
 					{
-						_site = db::Fetcher<Website>::Fetch(id, *_env).get();
+						_site = WebsiteTableSync::Get(id, *_env).get();
 					}
 					catch (util::ObjectNotFoundException<Website>&)
 					{

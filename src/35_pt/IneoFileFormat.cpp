@@ -961,13 +961,15 @@ namespace synthese
 						}
 
 						// Vehicle service
+						string sb(_getValue("SB"));
 						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
 							_vehicleServices,
-							_getValue("SB"),
+							sb,
 							_dataSource,
 							_env,
 							stream
 						);
+						vehicleService->setName(sb);
 
 						// Schedules initialization
 						departureSchedules.clear();
@@ -1028,10 +1030,6 @@ namespace synthese
 			}
 			else if(key == FILE_AFA)
 			{
-				string filename(filePath.filename());
-				filename = filename.substr(0, filename.length() - filePath.extension().size());
-				date day(from_string(filename));
-
 				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
 				do
 				{
@@ -1039,10 +1037,22 @@ namespace synthese
 					_readLine(inFile);
 					if(_section == "AFF")
 					{
+						// Driver service
 						string key(_getValue("SA"));
-						string userKey(_getValue("MAT"));
-					
+
+						// Date
+						string dateStr(_getValue("DATE"));
+						date vsDate;
+						vector<string> parts;
+						split(parts, dateStr, is_any_of("/"));
+						vsDate = date(
+							lexical_cast<int>(parts[2]),
+							lexical_cast<int>(parts[1]),
+							lexical_cast<int>(parts[0])
+						);
+
 						// User
+						string userKey(_getValue("MAT"));
 						User* user(
 							FileFormat::LoadOrCreateObject<UserTableSync>(
 								users,
@@ -1054,7 +1064,7 @@ namespace synthese
 						)	);
 
 						// Registration
-						_allocations[make_pair(key, day)] = user;
+						_allocations[make_pair(key, vsDate)] = user;
 					}
 
 				} while(!_section.empty());
@@ -1087,9 +1097,9 @@ namespace synthese
 						vector<string> parts;
 						split(parts, dateStr, is_any_of("/"));
 						vsDate = date(
-							lexical_cast<long>(parts[2]),
-							lexical_cast<long>(parts[1]),
-							lexical_cast<long>(parts[0])
+							lexical_cast<int>(parts[2]),
+							lexical_cast<int>(parts[1]),
+							lexical_cast<int>(parts[0])
 						);
 
 						if(fullKey != lastKey)
@@ -1107,6 +1117,9 @@ namespace synthese
 							ds->setChunks(emptyChunks);
 							ds->setActive(vsDate);
 
+							// Name
+							ds->setName(key);
+
 							// Allocation
 							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
 								driverAllocations,
@@ -1122,8 +1135,16 @@ namespace synthese
 								da->set<Driver>(optional<User&>(*itAlloc->second));
 							}
 
+							// Driver service link
+							DriverService::Vector::Type driverServices;
+							driverServices.push_back(ds);
+							da->set<DriverService::Vector>(driverServices);
+
+							// Date
+							da->set<Date>(vsDate);
+
 							// Amount
-/*							double amount(lexical_cast<double>(_getValue("frs")));
+							double amount(lexical_cast<double>(_getValue("frs")));
 							da->set<Amount>(amount);
 
 							// Boni amount
@@ -1134,7 +1155,6 @@ namespace synthese
 								split(parts, _getValue("bonifATTtps"), is_any_of("h"));
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
-							*/
 						}
 
 						// Journey

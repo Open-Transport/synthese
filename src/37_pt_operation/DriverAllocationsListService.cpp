@@ -28,6 +28,7 @@
 #include "DriverAllocation.hpp"
 #include "DriverService.hpp"
 #include "ImportableTableSync.hpp"
+#include "MimeTypes.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
@@ -49,27 +50,43 @@ namespace synthese
 	using namespace cms;
 	using namespace pt;
 	using namespace graph;
+	using namespace pt_operation;
 
-
-	template<> const string util::FactorableTemplate<Function,pt_operation::DriverAllocationsListService>::FACTORY_KEY("DriverAllocationsList");
+	template<>
+	const string FactorableTemplate<FunctionWithSite<false>, DriverAllocationsListService>::FACTORY_KEY = "DriverAllocationsList";
 
 	namespace pt_operation
 	{
 		const string DriverAllocationsListService::PARAMETER_DRIVER_ID = "driver_id";
 		const string DriverAllocationsListService::PARAMETER_DATA_SOURCE_ID = "data_source_id";
 		const string DriverAllocationsListService::PARAMETER_MIN_DATE = "min_date";
-		const string DriverAllocationsListService::PARAMETER_PAGE_ID = "pa";
+		const string DriverAllocationsListService::PARAMETER_PAGE_ID = "p";
 
 		const string DriverAllocationsListService::TAG_ALLOCATION = "allocation";
+		const string DriverAllocationsListService::TAG_ALLOCATIONS = "allocations";
+
+
+
+		DriverAllocationsListService::DriverAllocationsListService():
+			_dataSource(NULL),
+			_driver(NULL),
+			_page(NULL)
+		{}
+
+
 
 		ParametersMap DriverAllocationsListService::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(_page.get())
+			if(_page)
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
-			if(_driver.get())
+			else if(!_mimeType.empty())
+			{
+				MimeType::SaveToParametersMap(_mimeType, map);
+			}
+			if(_driver)
 			{
 				map.insert(PARAMETER_DRIVER_ID, _driver->getKey());
 			}
@@ -89,65 +106,64 @@ namespace synthese
 			}
 
 			// Display page
-			try
+			_page = getPage(map.getDefault<string>(PARAMETER_PAGE_ID));
+
+			// Mime type
+			if(!_page)
 			{
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_PAGE_ID, 0));
-				if(id > 0)
-				{
-					_page = Env::GetOfficialEnv().get<Webpage>(id);
-				}
-			}
-			catch(ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such composition page");
+				MimeType::LoadFromRecord(_mimeType, map);
 			}
 
-			// Data source
-			try
+			// Driver
+			string driverStr(map.getDefault<string>(PARAMETER_DRIVER_ID));
+			if(!driverStr.empty())
 			{
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_DATA_SOURCE_ID, 0));
-				if(id > 0)
+				// Data source + code
+				try
 				{
-					_dataSource = DataSourceTableSync::Get(id, *_env);
-				}
-			}
-			catch (ObjectNotFoundException<DataSource>&)
-			{
-				throw RequestException("No such data source");
-			}
-
-			// Driver id
-			try
-			{
-				if(_dataSource.get())
-				{
-					string code(map.getDefault<string>(PARAMETER_DRIVER_ID));
-					ImportableTableSync::ObjectBySource<UserTableSync> users(*_dataSource, *_env);
-					ImportableTableSync::ObjectBySource<UserTableSync>::Set obj(users.get(code));
-					if(obj.empty())
-					{
-						throw RequestException("No such driver");
-					}
-					_driver = _env->getSPtr<User>(*obj.begin());
-				}
-				else
-				{
-					RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_DRIVER_ID, 0));
+					RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_DATA_SOURCE_ID, 0));
 					if(id > 0)
 					{
-						_driver = UserTableSync::Get(id, *_env);
+						_dataSource = DataSourceTableSync::Get(id, *_env).get();
+					}
+				}
+				catch (ObjectNotFoundException<DataSource>&)
+				{
+					throw RequestException("No such data source");
+				}
+
+				// Driver id
+				try
+				{
+					if(_dataSource)
+					{
+						string code(map.getDefault<string>(PARAMETER_DRIVER_ID));
+						ImportableTableSync::ObjectBySource<UserTableSync> users(*_dataSource, *_env);
+						ImportableTableSync::ObjectBySource<UserTableSync>::Set obj(users.get(code));
+						if(obj.empty())
+						{
+							throw RequestException("No such driver");
+						}
+						_driver = *obj.begin();
 					}
 					else
 					{
-						throw RequestException("A driver must be specified");
+						RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_DRIVER_ID, 0));
+						if(id > 0)
+						{
+							_driver = UserTableSync::Get(id, *_env).get();
+						}
+						else
+						{
+							throw RequestException("A driver must be specified");
+						}
 					}
 				}
+				catch(ObjectNotFoundException<User>&)
+				{
+					throw RequestException("No such driver");
+				}
 			}
-			catch(ObjectNotFoundException<User>&)
-			{
-				throw RequestException("No such driver");
-			}
-			
 		}
 
 
@@ -159,17 +175,49 @@ namespace synthese
 
 			ParametersMap map;
 			size_t rank(0);
-			BOOST_FOREACH(const DriverAllocation::Registry::value_type& alloc, Env::GetOfficialEnv().getRegistry<DriverAllocation>())
+			typedef std::map<date, const DriverAllocation*> Result;
+			Result result;
+			BOOST_FOREACH(const DriverAllocation::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DriverAllocation>())
 			{
-				if(!_minDate.is_not_a_date() && alloc.second->get<Date>() < _minDate)
+				// Init
+				const DriverAllocation& alloc(*it.second);
+
+				//////////////////////////////////////////////////////////////////////////
+				// Checks
+
+				// Date check
+				if(!_minDate.is_not_a_date() && alloc.get<Date>() < _minDate)
 				{
 					continue;
 				}
 
+				// Defined driver : return only allocations for this driver
+				if(_driver && (!alloc.get<Driver>() || &*alloc.get<Driver>() != _driver))
+				{
+					continue;
+				}
+
+				// Undefined driver : return only non linked allocations
+				if(!_driver && alloc.get<Driver>())
+				{
+					continue;
+				}
+
+				result.insert(make_pair(alloc.get<Date>(), &alloc));
+			}
+
+			BOOST_FOREACH(const Result::value_type& item, result)
+			{
+				// Init
+				const DriverAllocation& alloc(*item.second);
+
+				//////////////////////////////////////////////////////////////////////////
+				// Output preparation
+
 				shared_ptr<ParametersMap> allocPM(new ParametersMap);
-				allocPM->insert("id", alloc.second->getKey());
+				alloc.toParametersMap(*allocPM);
 			
-				BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.second->get<DriverService::Vector>())
+				BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
 				{
 					shared_ptr<ParametersMap> servicePM(new ParametersMap);
 					service->toParametersMap(*servicePM);
@@ -179,10 +227,21 @@ namespace synthese
 				map.insert(TAG_ALLOCATION, allocPM);
 			}
 
-			if(_page.get())
+			if(_page)
 			{
-				BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
-				_page->display(stream, request, *allocPM);
+				if(map.hasSubMaps(TAG_ALLOCATION))
+				{
+					BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
+					{
+						_page->display(stream, request, *allocPM);
+			}	}	}
+			else if(_mimeType == MimeTypes::XML)
+			{
+				map.outputXML(stream, TAG_ALLOCATIONS, true);
+			}
+			else if(_mimeType == MimeTypes::JSON)
+			{
+				map.outputJSON(stream, TAG_ALLOCATIONS);
 			}
 
 			return map;
@@ -200,6 +259,6 @@ namespace synthese
 
 		std::string DriverAllocationsListService::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/html";
+			return _page ? _page->getMimeType() : _mimeType;
 		}
 }	}

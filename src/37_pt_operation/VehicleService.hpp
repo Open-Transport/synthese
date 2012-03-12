@@ -52,6 +52,11 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		public:
+			static const std::string TAG_SERVICE;
+			static const std::string ATTR_CLASS;
+			static const std::string VALUE_DEAD_RUN;
+			static const std::string VALUE_COMMERCIAL;
+
 			class DriverServiceChunkCompare
 			{
 			public:
@@ -96,6 +101,9 @@ namespace synthese
 				/// @param rank the rank of the service in the vehicle service
 				/// @return the nth service of the vehicle service, NULL if non existent
 				pt::SchedulesBasedService* getService(std::size_t rank) const;
+
+
+				void toParametersMap(util::ParametersMap& map, bool recursive = true) const;
 			//@}
 		};
 }	}

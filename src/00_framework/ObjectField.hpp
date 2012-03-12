@@ -62,6 +62,8 @@ namespace synthese
 	public:
 		typedef T Type;
 
+		static void LoadFromRecord(T& fieldObject, const Record& record);
+		static void LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env);
 		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
 		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
 		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map);
@@ -104,15 +106,29 @@ namespace synthese
 	};
 
 
+	template<class C, class T>
+	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, const Record& record)
+	{
+		ObjectField<C, T>::UnSerialize(
+			fieldObject,
+			record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name)
+		);
+	}
 
 	template<class C, class T>
-	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env)
 	{
 		ObjectField<C, T>::UnSerialize(
 			fieldObject,
 			record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name),
 			env
 		);
+	}
+
+	template<class C, class T>
+	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+	{
+		LoadFromRecord(fieldObject, record, env);
 	}
 
 	template<class C, class T>
