@@ -79,7 +79,6 @@ NO_DEPLOY_TABLES = set([
 
     # pt operation
     't072_vehicle_positions',
-    't077_vehicle_services', # (not sure?)
 
     # config
     't999_config',
