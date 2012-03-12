@@ -84,7 +84,7 @@ namespace synthese
 		void DriverService::toParametersMap(
 			ParametersMap& map,
 			bool recursive,
-			VehicleService* vehicleServiceFilter
+			const VehicleService* vehicleServiceFilter
 		) const	{
 			Key::SaveToParametersMap(getKey(), map);
 			Name::SaveToParametersMap(getName(), map);
