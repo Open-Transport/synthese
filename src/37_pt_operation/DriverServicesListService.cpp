@@ -38,6 +38,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -134,6 +135,8 @@ namespace synthese
 
 			ParametersMap map;
 			size_t rank(0);
+			typedef set<pair<time_duration, const DriverService*> > Result;
+			Result r;
 			BOOST_FOREACH(const DriverService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<DriverService>())
 			{
 				const DriverService& service(*item.second);
@@ -144,6 +147,9 @@ namespace synthese
 					continue;
 				}
 
+				// Schedule
+				time_duration resultTime(service.getServiceBeginning());
+
 				// Vehicle service filter
 				if(_vehicleService)
 				{
@@ -153,6 +159,7 @@ namespace synthese
 						if(chunk.vehicleService == _vehicleService)
 						{
 							result = true;
+							resultTime = chunk.elements.begin()->service->getDepartureSchedule(chunk.elements.begin()->startRank, false);
 							break;
 						}
 					}
@@ -162,8 +169,13 @@ namespace synthese
 					}
 				}
 
+				r.insert(make_pair(resultTime, &service));
+			}
+
+			BOOST_FOREACH(const Result::value_type& item, r)
+			{
 				shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				service.toParametersMap(*servicePM, true, _vehicleService);
+				item.second->toParametersMap(*servicePM, true, _vehicleService);
 				map.insert(TAG_SERVICE, servicePM);
 			}
 
