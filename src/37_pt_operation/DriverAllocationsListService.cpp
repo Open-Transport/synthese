@@ -175,7 +175,7 @@ namespace synthese
 
 			ParametersMap map;
 			size_t rank(0);
-			typedef std::map<date, const DriverAllocation*> Result;
+			typedef std::set<std::pair<date, const DriverAllocation*> > Result;
 			Result result;
 			BOOST_FOREACH(const DriverAllocation::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<DriverAllocation>())
 			{

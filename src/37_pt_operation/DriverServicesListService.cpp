@@ -30,6 +30,7 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "SchedulesBasedService.h"
+#include "VehicleService.hpp"
 #include "Webpage.h"
 
 #include <boost/foreach.hpp>
@@ -56,14 +57,16 @@ namespace synthese
 	{
 		const string DriverServicesListService::PARAMETER_DATE = "date";
 		const string DriverServicesListService::PARAMETER_PAGE_ID = "p";
-		
+		const string DriverServicesListService::PARAMETER_VEHICLE_SERVICE_ID = "vehicle_service";
+
 		const string DriverServicesListService::TAG_SERVICE = "vehicleService";
 		const string DriverServicesListService::TAG_SERVICES = "vehicleServices";
 
 
 
 		DriverServicesListService::DriverServicesListService():
-			_page(NULL)
+			_page(NULL),
+			_vehicleService(NULL)
 		{}
 
 
@@ -82,6 +85,10 @@ namespace synthese
 			if(!_date.is_not_a_date())
 			{
 				map.insert(PARAMETER_DATE, _date);
+			}
+			if(_vehicleService)
+			{
+				map.insert(PARAMETER_VEHICLE_SERVICE_ID, _vehicleService->getKey());
 			}
 			return map;
 		}
@@ -103,6 +110,19 @@ namespace synthese
 			{
 				MimeType::LoadFromRecord(_mimeType, map);
 			}
+
+			RegistryKeyType vsId(map.getDefault<RegistryKeyType>(PARAMETER_VEHICLE_SERVICE_ID, 0));
+			if(vsId)
+			{
+				try
+				{
+					_vehicleService = _env->get<VehicleService>(vsId).get();
+				}
+				catch(ObjectNotFoundException<VehicleService>&)
+				{
+					throw RequestException("No such vehicle service");
+				}
+			}
 		}
 
 
@@ -114,15 +134,36 @@ namespace synthese
 
 			ParametersMap map;
 			size_t rank(0);
-			BOOST_FOREACH(const DriverService::Registry::value_type& service, Env::GetOfficialEnv().getRegistry<DriverService>())
+			BOOST_FOREACH(const DriverService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<DriverService>())
 			{
-				if(!service.second->isActive(_date))
+				const DriverService& service(*item.second);
+
+				// Date filter
+				if(!service.isActive(_date))
 				{
 					continue;
 				}
 
+				// Vehicle service filter
+				if(_vehicleService)
+				{
+					bool result(false);
+					BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, service.getChunks())
+					{
+						if(chunk.vehicleService == _vehicleService)
+						{
+							result = true;
+							break;
+						}
+					}
+					if(!result)
+					{
+						continue;
+					}
+				}
+
 				shared_ptr<ParametersMap> servicePM(new ParametersMap);
-				service.second->toParametersMap(*servicePM);
+				service.toParametersMap(*servicePM);
 				map.insert(TAG_SERVICE, servicePM);
 			}
 
