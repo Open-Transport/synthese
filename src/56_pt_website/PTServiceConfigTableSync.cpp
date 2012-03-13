@@ -1,6 +1,6 @@
 
-/** TransportWebsiteTableSync class implementation.
-	@file TransportWebsiteTableSync.cpp
+/** PTServiceConfigTableSync class implementation.
+	@file PTServiceConfigTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "TransportWebsiteTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
 
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -49,26 +49,26 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,TransportWebsiteTableSync>::FACTORY_KEY("56.01 PT Services configurations");
+		template<> const string FactorableTemplate<DBTableSync,PTServiceConfigTableSync>::FACTORY_KEY("56.01 PT Services configurations");
 	}
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<TransportWebsiteTableSync>::TABLE(
+		template<> const DBTableSync::Format DBTableSyncTemplate<PTServiceConfigTableSync>::TABLE(
 			"t086_pt_services_configurations"
 		);
 
-		template<> const Field DBTableSyncTemplate<TransportWebsiteTableSync>::_FIELDS[] = { Field() }; // Defined by the record
+		template<> const Field DBTableSyncTemplate<PTServiceConfigTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<>
-		DBTableSync::Indexes DBTableSyncTemplate<TransportWebsiteTableSync>::GetIndexes()
+		DBTableSync::Indexes DBTableSyncTemplate<PTServiceConfigTableSync>::GetIndexes()
 		{
 			return DBTableSync::Indexes();
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Load(
-			TransportWebsite* site,
+		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Load(
+			PTServiceConfig* site,
 			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -86,19 +86,19 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Unlink(
-			TransportWebsite* obj
+		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Unlink(
+			PTServiceConfig* obj
 		){
 			obj->unlink();
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>::Save(
-			TransportWebsite* site,
+		template<> void DBDirectTableSyncTemplate<PTServiceConfigTableSync,PTServiceConfig>::Save(
+			PTServiceConfig* site,
 			optional<DBTransaction&> transaction
 		){
 			// Query
-			ReplaceQuery<TransportWebsiteTableSync> query(*site);
+			ReplaceQuery<PTServiceConfigTableSync> query(*site);
 			ParametersMap map;
 			site->toParametersMap(map);
 			query.setValues(map);
@@ -107,7 +107,7 @@ namespace synthese
 
 
 
-		template<> bool DBTableSyncTemplate<TransportWebsiteTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<PTServiceConfigTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -116,7 +116,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TransportWebsiteTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<PTServiceConfigTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -135,7 +135,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TransportWebsiteTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<PTServiceConfigTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -143,7 +143,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<TransportWebsiteTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<PTServiceConfigTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -153,7 +153,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		TransportWebsiteTableSync::SearchResult TransportWebsiteTableSync::Search(
+		PTServiceConfigTableSync::SearchResult PTServiceConfigTableSync::Search(
 			Env& env,
 			std::string name
 			, int first /*= 0*/,
@@ -162,7 +162,7 @@ namespace synthese
 			, bool raisingOrder,
 			LinkLevel linkLevel
 		){
-			SelectQuery<TransportWebsiteTableSync> query;
+			SelectQuery<PTServiceConfigTableSync> query;
 			if (!name.empty())
 			{
 				query.addWhereField(ObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);

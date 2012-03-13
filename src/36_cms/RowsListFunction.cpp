@@ -37,7 +37,6 @@ namespace synthese
 {
 	using namespace server;
 	using namespace util;
-	using namespace pt_website;
 	using namespace cms;
 	using namespace db;
 

@@ -44,6 +44,7 @@ namespace synthese
 	namespace pt_website
 	{
 		class PlacesListInterfacePage;
+		class PTServiceConfig;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// City list query public function.
@@ -61,6 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_ITEM_PAGE;
 			static const std::string PARAMETER_AT_LEAST_A_STOP;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_CONFIG_ID;
 
 			static const std::string DATA_RESULTS_SIZE;
 			static const std::string DATA_CONTENT;
@@ -77,6 +79,7 @@ namespace synthese
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
 			const CoordinatesSystem* _coordinatesSystem;
+			const PTServiceConfig* _config;
 
 		protected:
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Request
@@ -98,7 +101,7 @@ namespace synthese
 			) const;
 
 		public:
-			CityListFunction(): _atLeastAStop(false) {}
+			CityListFunction(): _atLeastAStop(false), _config(NULL) {}
 
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Cities_list#Response
 			//////////////////////////////////////////////////////////////////////////

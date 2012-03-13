@@ -81,8 +81,11 @@ namespace synthese
 				shared_ptr<User> user = UserTableSync::getUserFromLogin(_login);
 				user->verifyPassword(_password);
 
-				if (!user->getConnectionAllowed())
+				// Disallow deactivated users and users without profile
+				if (!user->getConnectionAllowed() || !user->getProfile())
+				{
 					throw ActionException("Connexion impossible");
+				}
 
 				Session* session = new Session(request.getIP());
 				session->setUser(user);

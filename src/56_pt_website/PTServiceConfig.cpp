@@ -1,6 +1,6 @@
-
-/** TransportWebsite class implementation.
-	@file TransportWebsite.cpp
+//////////////////////////////////////////////////////////////////////////
+/** PTServiceConfig class implementation.
+	@file PTServiceConfig.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,21 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "TransportWebsite.h"
+#include "PTServiceConfig.hpp"
 
-#include "CMSModule.hpp"
+#include "AccessParameters.h"
 #include "PTConstants.h"
 #include "PTModule.h"
 #include "City.h"
 #include "StopArea.hpp"
-#include "AccessParameters.h"
 #include "GeographyModule.h"
 #include "LexicalMatcher.h"
 #include "RoadChunk.h"
 #include "RoadPlace.h"
 #include "House.hpp"
 #include "Env.h"
-#include "Webpage.h"
 
 #include "Exception.h"
 
@@ -49,7 +47,6 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
-	using namespace cms;
 	using namespace util;
 	using namespace geography;
 	using namespace lexical_matcher;
@@ -58,7 +55,7 @@ namespace synthese
 	using namespace road;
 	using namespace pt_website;
 
-	CLASS_DEFINITION(TransportWebsite, "t086_pt_services_configurations", 86)
+	CLASS_DEFINITION(PTServiceConfig, "t086_pt_services_configurations", 86)
 	FIELD_DEFINITION_OF_TYPE(OnlineBookingActivated, "online_booking", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(UseOldData, "use_old_data", SQL_BOOLEAN)
 	FIELD_DEFINITION_OF_TYPE(MaxConnections, "max_connections", SQL_INTEGER)
@@ -150,15 +147,15 @@ namespace synthese
 
 	namespace pt_website
 	{
-		const string TransportWebsite::TEMPS_MIN_CIRCULATIONS ("r");
-		const string TransportWebsite::TEMPS_MAX_CIRCULATIONS ("R");
+		const string PTServiceConfig::TEMPS_MIN_CIRCULATIONS ("r");
+		const string PTServiceConfig::TEMPS_MAX_CIRCULATIONS ("R");
 
 
 
-		TransportWebsite::TransportWebsite(
+		PTServiceConfig::PTServiceConfig(
 			RegistryKeyType id
 		):	Registrable(id),
-			Object<TransportWebsite, TransportWebsiteSchema>(
+			Object<PTServiceConfig, PTServiceConfigSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
@@ -173,14 +170,14 @@ namespace synthese
 
 
 
-		const date TransportWebsite::getMinUseDate() const
+		const date PTServiceConfig::getMinUseDate() const
 		{
 			return day_clock::local_day();
 		}
 
 
 
-		const date TransportWebsite::getMaxUseDate() const
+		const date PTServiceConfig::getMaxUseDate() const
 		{
 			date date(day_clock::local_day());
 			date += _useDateRange;
@@ -189,7 +186,7 @@ namespace synthese
 
 
 
-		date TransportWebsite::interpretDate( const std::string& text ) const
+		date PTServiceConfig::interpretDate( const std::string& text ) const
 		{
 			if ( text.empty() )
 				return date(not_a_date_time);
@@ -208,7 +205,7 @@ namespace synthese
 
 
 
-		graph::AccessParameters TransportWebsite::getAccessParameters(
+		graph::AccessParameters PTServiceConfig::getAccessParameters(
 			UserClassCode parameter,
 			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
 		) const	{
@@ -234,7 +231,7 @@ namespace synthese
 
 
 
-		void TransportWebsite::applyPeriod(
+		void PTServiceConfig::applyPeriod(
 			const HourPeriod& period
 			, ptime& startTime
 			, ptime& endTime
@@ -267,14 +264,14 @@ namespace synthese
 
 
 
-		const GeographyModule::CitiesMatcher& TransportWebsite::getCitiesMatcher () const
+		const GeographyModule::CitiesMatcher& PTServiceConfig::getCitiesMatcher () const
 		{
 			return _citiesMatcher.size() ? _citiesMatcher : GeographyModule::GetCitiesMatcher();
 		}
 
 
 
-		void TransportWebsite::addCity(shared_ptr<City> city)
+		void PTServiceConfig::addCity(shared_ptr<City> city)
 		{
 			if(!city) return;
 
@@ -308,7 +305,7 @@ namespace synthese
 
 
 
-		const shared_ptr<Place> TransportWebsite::fetchPlace(
+		const shared_ptr<Place> PTServiceConfig::fetchPlace(
 			const string& cityName,
 			const string& placeName
 		) const {
@@ -317,7 +314,7 @@ namespace synthese
 
 
 
-		RoadModule::ExtendedFetchPlaceResult TransportWebsite::extendedFetchPlace(
+		RoadModule::ExtendedFetchPlaceResult PTServiceConfig::extendedFetchPlace(
 			const std::string& cityName,
 			const std::string& placeName
 		) const	{
@@ -330,14 +327,14 @@ namespace synthese
 
 
 
-		void TransportWebsite::addRollingStockFilter( RollingStockFilter& value )
+		void PTServiceConfig::addRollingStockFilter( RollingStockFilter& value )
 		{
 			_rollingStockFilters[value.getRank()] = &value;
 		}
 
 
 
-		void TransportWebsite::removeRollingStockFilter( RollingStockFilter& value )
+		void PTServiceConfig::removeRollingStockFilter( RollingStockFilter& value )
 		{
 			RollingStockFilters::iterator it(_rollingStockFilters.find(value.getRank()));
 			if(it != _rollingStockFilters.end())
@@ -348,14 +345,14 @@ namespace synthese
 
 
 
-		void TransportWebsite::clearRollingStockFilters()
+		void PTServiceConfig::clearRollingStockFilters()
 		{
 			_rollingStockFilters.clear();
 		}
 
 
 
-		TransportWebsite::Labels TransportWebsite::getRollingStockFiltersList(
+		PTServiceConfig::Labels PTServiceConfig::getRollingStockFiltersList(
 		) const {
 			Labels result;
 			BOOST_FOREACH(const RollingStockFilters::value_type& it, _rollingStockFilters)
@@ -367,7 +364,7 @@ namespace synthese
 
 
 
-		TransportWebsite::ForbiddenDateException::ForbiddenDateException():
+		PTServiceConfig::ForbiddenDateException::ForbiddenDateException():
 		Exception("Forbidden date")
 		{
 		}

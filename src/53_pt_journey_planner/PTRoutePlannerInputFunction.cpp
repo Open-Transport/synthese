@@ -26,7 +26,7 @@
 #include "Request.h"
 #include "PTRoutePlannerInputFunction.hpp"
 #include "DynamicRequest.h"
-#include "TransportWebsite.h"
+#include "PTServiceConfig.hpp"
 #include "RoutePlannerFunction.h"
 #include "CMSModule.hpp"
 #include "Webpage.h"
@@ -53,6 +53,7 @@ namespace synthese
 		const string PTRoutePlannerInputFunction::PARAMETER_VALUE("value");
 		const string PTRoutePlannerInputFunction::PARAMETER_HTML("html");
 		const string PTRoutePlannerInputFunction::PARAMETER_DATE_DISPLAY_TEMPLATE("date_display_template");
+		const string PTRoutePlannerInputFunction::PARAMETER_CONFIG_ID = "config_id";
 
 		const string PTRoutePlannerInputFunction::FIELD_ORIGIN_CITY("origin_city");
 		const string PTRoutePlannerInputFunction::FIELD_DESTINATION_CITY("destination_city");
@@ -60,6 +61,12 @@ namespace synthese
 		const string PTRoutePlannerInputFunction::FIELD_DESTINATION_PLACE("destination_place");
 		const string PTRoutePlannerInputFunction::FIELD_DATE_LIST("date_list");
 		const string PTRoutePlannerInputFunction::FIELD_PERIOD("period");
+
+
+
+		PTRoutePlannerInputFunction::PTRoutePlannerInputFunction():
+			_config(NULL)
+		{}
 
 
 
@@ -72,6 +79,10 @@ namespace synthese
 			if(_dateDisplayTemplate.get())
 			{
 				map.insert(PARAMETER_DATE_DISPLAY_TEMPLATE, _dateDisplayTemplate->getKey());
+			}
+			if(_config)
+			{
+				map.insert(PARAMETER_CONFIG_ID, _config->getKey());
 			}
 			return map;
 		}
@@ -94,6 +105,17 @@ namespace synthese
 					throw RequestException("No such date display template");
 				}
 			}
+
+			// Config
+			RegistryKeyType configId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
+			if(configId) try
+			{
+				_config = Env::GetOfficialEnv().get<PTServiceConfig>(configId).get();
+			}
+			catch(ObjectNotFoundException<PTServiceConfig>&)
+			{
+				throw RequestException("No such PT service config");
+			}
 		}
 
 
@@ -105,18 +127,14 @@ namespace synthese
 
 			ParametersMap requestParametersMap(getTemplateParameters());
 
-			const TransportWebsite* site(
-				dynamic_cast<const TransportWebsite*>(
-					CMSModule::GetSite(request, getTemplateParameters())
-			)	);
-			if(!site)
+			if(!_config)
 			{
 				return ParametersMap();
 			}
 
 			if(_field == FIELD_PERIOD)
 			{
-				const Periods::Type& periods(site->get<Periods>());
+				const Periods::Type& periods(_config->get<Periods>());
 
 				size_t current(
 					_value.empty() ?
@@ -146,8 +164,8 @@ namespace synthese
 					dateDefaut = from_string(requestParametersMap.get<string>(RoutePlannerFunction::PARAMETER_DAY));
 				}
 
-				date minDate(site->getMinUseDate());
-				date maxDate(site->getMaxUseDate());
+				date minDate(_config->getMinUseDate());
+				date maxDate(_config->getMaxUseDate());
 
 				//				const DateTimeInterfacePage* datePage(_page->getInterface()->getPage<DateTimeInterfacePage>(style));
 

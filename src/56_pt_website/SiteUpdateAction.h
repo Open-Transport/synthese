@@ -45,7 +45,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : Transport web site update.
@@ -75,7 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL;
 			
 		private:
-			boost::shared_ptr<TransportWebsite>							_site;
+			boost::shared_ptr<PTServiceConfig>							_site;
 			std::string										_name;
 			bool											_onlineBooking;
 			bool											_useOldData;
@@ -103,7 +103,7 @@ namespace synthese
 
 			SiteUpdateAction();
 
-			void setSiteId(util::RegistryKeyType id);
+			void setSite(boost::shared_ptr<PTServiceConfig> value){ _site = value; }
 
 			virtual bool isAuthorized(const server::Session* session) const;
 		};

@@ -23,26 +23,27 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "WebPageAdmin.h"
-#include "AdminParametersException.h"
-#include "ParametersMap.h"
-#include "WebPageTableSync.h"
-#include "PropertiesHTMLTable.h"
-#include "WebPageUpdateAction.h"
-#include "WebPageDisplayFunction.h"
+
 #include "AdminActionFunctionRequest.hpp"
-#include "Interface.h"
-#include "ResultHTMLTable.h"
+#include "AdminFunctionRequest.hpp"
+#include "AdminParametersException.h"
+#include "AjaxForm.hpp"
+#include "CMSRight.hpp"
+#include "EditArea.hpp"
 #include "HTMLModule.h"
-#include "WebPageAddAction.h"
+#include "ParametersMap.h"
+#include "PropertiesHTMLTable.h"
 #include "RemoveObjectAction.hpp"
+#include "ResultHTMLTable.h"
+#include "StaticActionRequest.h"
+#include "TinyMCE.hpp"
+#include "WebPageAddAction.h"
+#include "WebPageDisplayFunction.h"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
 #include "WebPageMoveAction.hpp"
-#include "AdminFunctionRequest.hpp"
-#include "TinyMCE.hpp"
-#include "StaticActionRequest.h"
-#include "AjaxForm.hpp"
-#include "EditArea.hpp"
+#include "WebPageTableSync.h"
+#include "WebPageUpdateAction.h"
 
 #include <boost/algorithm/string/find.hpp>
 
@@ -119,8 +120,7 @@ namespace synthese
 		bool WebPageAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return true;
-			//return user.getProfile()->isAuthorized<TransportWebsiteRight>(READ);
+			return user.getProfile()->isAuthorized<CMSRight>(READ);
 		}
 
 

@@ -22,14 +22,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "RollingStockFilterTableSync.h"
-#include "RollingStockFilter.h"
+
 #include "RollingStockTableSync.hpp"
-#include "RollingStock.hpp"
-#include "TransportWebsite.h"
-#include "TransportWebsiteTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
@@ -109,8 +105,8 @@ namespace synthese
 			{
 				try
 				{
-					shared_ptr<TransportWebsite> site(
-						TransportWebsiteTableSync::GetEditable(
+					shared_ptr<PTServiceConfig> site(
+						PTServiceConfigTableSync::GetEditable(
 							rows->getLongLong(RollingStockFilterTableSync::COL_SITE_ID),
 							environment,
 							linkLevel
@@ -118,7 +114,7 @@ namespace synthese
 					object->setSite(site.get());
 					site->addRollingStockFilter(*object);
 				}
-				catch (ObjectNotFoundException<TransportWebsite> e)
+				catch (ObjectNotFoundException<PTServiceConfig> e)
 				{
 					Log::GetInstance().warn("Website not found in rolling stock filter "+ lexical_cast<string>(object->getKey()));
 				}
@@ -184,7 +180,7 @@ namespace synthese
 		){
 			if(obj->getSite())
 			{
-				const_cast<TransportWebsite*>(obj->getSite())->removeRollingStockFilter(*obj);
+				const_cast<PTServiceConfig*>(obj->getSite())->removeRollingStockFilter(*obj);
 			}
 		}
 

@@ -22,13 +22,14 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "SiteCityAddAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "SiteCityAddAction.hpp"
 #include "TransportWebsiteRight.h"
 #include "Request.h"
 #include "GeographyModule.h"
-#include "TransportWebsite.h"
+#include "PTServiceConfig.hpp"
 #include "City.h"
 #include "ObjectSiteLinkTableSync.h"
 
@@ -56,9 +57,9 @@ namespace synthese
 		ParametersMap SiteCityAddAction::getParametersMap() const
 		{
 			ParametersMap map;
-			if(_site.get())
+			if(_config.get())
 			{
-				map.insert(PARAMETER_SITE_ID, _site->getKey());
+				map.insert(PARAMETER_SITE_ID, _config->getKey());
 			}
 			if(_city)
 			{
@@ -73,11 +74,11 @@ namespace synthese
 		{
 			try
 			{
-				_site = Env::GetOfficialEnv().get<TransportWebsite>(
+				_config = Env::GetOfficialEnv().get<PTServiceConfig>(
 					map.get<RegistryKeyType>(PARAMETER_SITE_ID)
 				);
 			}
-			catch(ObjectNotFoundException<TransportWebsite>&)
+			catch(ObjectNotFoundException<PTServiceConfig>&)
 			{
 				throw ActionException("No such site");
 			}
@@ -100,7 +101,7 @@ namespace synthese
 			Request& request
 		){
 			ObjectSiteLink link;
-			link.setSite(_site.get());
+			link.setSite(_config.get());
 			link.setObjectId(_city->getKey());
 			ObjectSiteLinkTableSync::Save(&link);
 

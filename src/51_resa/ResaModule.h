@@ -39,7 +39,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 	}
 
 	namespace pt
@@ -186,7 +186,7 @@ namespace synthese
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
 			static boost::shared_ptr<OnlineReservationRule> _reservationContact;
-			static boost::shared_ptr<pt_website::TransportWebsite> _journeyPlannerWebsite;
+			static boost::shared_ptr<pt_website::PTServiceConfig> _journeyPlannerConfig;
 
 		public:
 			typedef std::map<const graph::Service*, std::set<const Reservation*> > ReservationsByService;
@@ -230,7 +230,7 @@ namespace synthese
 			static std::string GetStatusText(ReservationStatus status);
 
 			static OnlineReservationRule* GetReservationContact();
-			static pt_website::TransportWebsite* GetJourneyPlannerWebsite();
+			static pt_website::PTServiceConfig* GetJourneyPlannerWebsite();
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds parameters to send to the display template for admin pages.

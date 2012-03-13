@@ -1,6 +1,6 @@
 
-/** TransportWebsiteTableSync class header.
-	@file TransportWebsiteTableSync.h
+/** PTServiceConfigTableSync class header.
+	@file PTServiceConfigTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -24,7 +24,7 @@
 #define SYNTHESE_SiteTableSync_H__
 
 #include "DBRegistryTableSyncTemplate.hpp"
-#include "TransportWebsite.h"
+#include "PTServiceConfig.hpp"
 
 #include <string>
 #include <iostream>
@@ -39,15 +39,15 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t086_pt_services_configurations
-		class TransportWebsiteTableSync:
-			public db::DBRegistryTableSyncTemplate<TransportWebsiteTableSync,TransportWebsite>
+		class PTServiceConfigTableSync:
+			public db::DBRegistryTableSyncTemplate<PTServiceConfigTableSync, PTServiceConfig>
 		{
 		public:
-			/** TransportWebsite search.
+			/** PT Service config search.
 				(other search parameters)
-				@param first First TransportWebsite object to answer
-				@param number Number of TransportWebsite objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found TransportWebsite objects.
+				@param first First object to answer
+				@param number Number of objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
+				@return Found objects.
 				@author Hugues Romain
 				@date 2006
 			*/

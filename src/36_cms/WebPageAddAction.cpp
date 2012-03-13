@@ -25,6 +25,7 @@
 #include "WebPageAddAction.h"
 
 #include "ActionException.h"
+#include "CMSRight.hpp"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "WebPageTableSync.h"
@@ -199,8 +200,7 @@ namespace synthese
 		bool WebPageAddAction::isAuthorized(
 			const Session* session
 		) const {
-			return true;
-			//return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CMSRight>(WRITE);
 		}
 	}
 }
