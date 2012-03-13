@@ -30,7 +30,6 @@
 #include "TransportWebsiteTypes.hpp"
 #include "CoordinatesSystem.hpp"
 
-
 namespace synthese
 {
 	namespace geography
@@ -45,6 +44,8 @@ namespace synthese
 
 	namespace pt_website
 	{
+		class PTServiceConfig;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Places list query public function.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Places_list
@@ -56,6 +57,7 @@ namespace synthese
 			public util::FactorableTemplate<cms::FunctionWithSite<false>,PlacesListFunction>
 		{
 		public:
+			static const std::string PARAMETER_CONFIG_ID;
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_OLD_INPUT;
 			static const std::string PARAMETER_CITY_TEXT;
@@ -78,6 +80,7 @@ namespace synthese
 		protected:
 			//! \name Page parameters
 			//@{
+				const PTServiceConfig*						_config;
 				std::string									_input;
 				std::string									_cityText;
 				boost::optional<std::size_t>				_n;

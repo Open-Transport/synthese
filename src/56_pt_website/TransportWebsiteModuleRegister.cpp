@@ -13,7 +13,7 @@
 #include "ServiceInformationsFunction.hpp"
 #include "UserBookmarksService.hpp"
 
-#include "TransportWebsiteTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "ObjectSiteLinkTableSync.h"
 #include "RollingStockFilterTableSync.h"
 #include "UserFavoriteJourneyTableSync.h"
@@ -26,7 +26,7 @@
 
 // Registries
 #include "ObjectSiteLink.h"
-#include "TransportWebsite.h"
+#include "PTServiceConfig.hpp"
 #include "SiteCommercialLineLink.h"
 #include "RollingStockFilter.h"
 #include "UserFavoriteJourney.h"
@@ -39,7 +39,7 @@ void synthese::pt_website::moduleRegister()
 
 	synthese::pt_website::TransportSiteAdmin::integrate();
 
-	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt_website::TransportWebsiteTableSync>::integrate();
+	synthese::util::FactorableTemplate<synthese::db::DBTableSync,synthese::pt_website::PTServiceConfigTableSync>::integrate();
 
 	synthese::pt_website::ObjectSiteLinkTableSync::integrate();
 	synthese::pt_website::RollingStockFilterTableSync::integrate();
@@ -61,7 +61,7 @@ void synthese::pt_website::moduleRegister()
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::pt_website::ObjectSiteLink>();
-	synthese::util::Env::Integrate<synthese::pt_website::TransportWebsite>();
+	synthese::util::Env::Integrate<synthese::pt_website::PTServiceConfig>();
 	synthese::util::Env::Integrate<synthese::pt_website::SiteCommercialLineLink>();
 	synthese::util::Env::Integrate<synthese::pt_website::RollingStockFilter>();
 	synthese::util::Env::Integrate<synthese::pt_website::UserFavoriteJourney>();

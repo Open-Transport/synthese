@@ -30,10 +30,10 @@
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "PTTimeSlotRoutePlanner.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "TransportWebsite.h"
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "Road.h"
@@ -106,10 +106,12 @@ namespace synthese
 	using namespace cms;
 	using namespace messages;
 
-	template<> const string util::FactorableTemplate<pt_journey_planner::RoutePlannerFunction::_FunctionWithSite,pt_journey_planner::RoutePlannerFunction>::FACTORY_KEY("rp");
+	template<>
+	const string FactorableTemplate<server::Function, RoutePlannerFunction>::FACTORY_KEY= "rp";
 
 	namespace pt_journey_planner
 	{
+		const string RoutePlannerFunction::PARAMETER_CONFIG_ID = "config_id";
 		const string RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string RoutePlannerFunction::PARAMETER_MAX_DEPTH = "md";
 		const string RoutePlannerFunction::PARAMETER_APPROACH_SPEED = "apsp";
@@ -296,14 +298,21 @@ namespace synthese
 			_period(NULL),
 			_startArrivalDate(not_a_date_time),
 			_endArrivalDate(not_a_date_time),
-			_logger(new AlgorithmLogger())
+			_logger(new AlgorithmLogger()),
+			_config(NULL)
 		{}
 
 
 
 		ParametersMap RoutePlannerFunction::_getParametersMap() const
 		{
-			ParametersMap map(FunctionWithSiteBase::_getParametersMap());
+			ParametersMap map;
+
+			// Config
+			if(_config)
+			{
+				map.insert(PARAMETER_CONFIG_ID, _config->getKey());
+			}
 
 			// Max transfer duration
 			if(_maxTransferDuration)
@@ -404,13 +413,20 @@ namespace synthese
 
 		void RoutePlannerFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_FunctionWithSite::_setFromParametersMap(map);
-
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
+			// Config
+			RegistryKeyType configId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
+			if(configId) try
+			{
+				_config = PTServiceConfigTableSync::Get(configId, *_env).get();
+			}
+			catch (ObjectNotFoundException<PTServiceConfig>&)
+			{
+				throw RequestException("No such config");
+			}
 
 			_outputRoadApproachDetail =
-				site ?
-				site->get<DisplayRoadApproachDetails>() :
+				_config ?
+				_config->get<DisplayRoadApproachDetails>() :
 				true
 			;
 
@@ -468,8 +484,8 @@ namespace synthese
 					}	}
 					else
 					{
-						_departure_place = site ?
-							site->extendedFetchPlace(_originCityText, _originPlaceText) :
+						_departure_place = _config ?
+							_config->extendedFetchPlace(_originCityText, _originPlaceText) :
 							RoadModule::ExtendedFetchPlace(_originCityText, _originPlaceText)
 						;
 					}
@@ -482,8 +498,8 @@ namespace synthese
 					}	}
 					else
 					{
-						_arrival_place = site ?
-							site->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
+						_arrival_place = _config ?
+							_config->extendedFetchPlace(_destinationCityText, _destinationPlaceText) :
 							RoadModule::ExtendedFetchPlace(_destinationCityText, _destinationPlaceText)
 						;
 					}
@@ -519,10 +535,10 @@ namespace synthese
 				// 1a : by day and time period
 				if(!map.getDefault<string>(PARAMETER_DAY).empty())
 				{
-					// Site check
-					if(!site)
+					// Config check
+					if(!_config)
 					{
-						throw RequestException("A site must be defined to use this date specification method.");
+						throw RequestException("A config must be defined to use this date specification method.");
 					}
 
 					// Day
@@ -530,11 +546,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= site->get<Periods>().size())
+					if (_periodId >= _config->get<Periods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &site->get<Periods>().at(_periodId);
+					_period = &_config->get<Periods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else
@@ -564,7 +580,7 @@ namespace synthese
 					}
 				}
 			}
-			catch(TransportWebsite::ForbiddenDateException)
+			catch(PTServiceConfig::ForbiddenDateException)
 			{
 				throw RequestException("Date in the past is forbidden");
 			}
@@ -593,9 +609,9 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			if(site)
+			if(_config)
 			{
-				_accessParameters = site->getAccessParameters(
+				_accessParameters = _config->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
 					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
 				);
@@ -950,8 +966,6 @@ namespace synthese
 				return ParametersMap();
 			}
 
-			// Declarations
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -986,7 +1000,7 @@ namespace synthese
 			{
 				startDate = ptime(_day, time_duration(0, 0, 0));
 				endDate = startDate;
-				site->applyPeriod(*_period, startDate, endDate);
+				_config->applyPeriod(*_period, startDate, endDate);
 
 				startArrivalDate = startDate;
 				endArrivalDate = endDate + maxRunTime;
@@ -1111,9 +1125,9 @@ namespace synthese
 				{
 					stream << " sessionId=\"" << request.getSession()->getKey() << "\"";
 				}
-				if(_site)
+				if(_config)
 				{
-					stream << " siteId=\"" << _site->getKey() << "\">";
+					stream << " siteId=\"" << _config->getKey() << "\">";
 				}
 				stream <<
 					"<timeBounds" <<

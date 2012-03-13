@@ -22,9 +22,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "SelectQuery.hpp"
 #include "ObjectSiteLinkTableSync.h"
-#include "TransportWebsiteTableSync.h"
+
+#include "SelectQuery.hpp"
+#include "PTServiceConfigTableSync.hpp"
 #include "CityTableSync.h"
 #include "ReplaceQuery.h"
 #include "UtilTypes.h"
@@ -90,7 +91,7 @@ namespace synthese
 			RegistryKeyType id(rows->getLongLong(ObjectSiteLinkTableSync::COL_SITE_ID));
 			try
 			{
-				object->setSite(TransportWebsiteTableSync::Get(id, env, linkLevel).get());
+				object->setSite(PTServiceConfigTableSync::Get(id, env, linkLevel).get());
 			}
 			catch(Exception e)
 			{
@@ -100,7 +101,7 @@ namespace synthese
 			{
 				if(decodeTableId(object->getObjectId()) == CityTableSync::TABLE.ID)
 				{
-					shared_ptr<TransportWebsite> site(TransportWebsiteTableSync::GetEditable(id, env, linkLevel));
+					shared_ptr<PTServiceConfig> site(PTServiceConfigTableSync::GetEditable(id, env, linkLevel));
 					shared_ptr<City> city(CityTableSync::GetEditable(object->getObjectId(), env, linkLevel));
 					site->addCity(city);
 				}

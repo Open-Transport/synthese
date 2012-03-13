@@ -37,7 +37,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 56.15 Action : SiteCityAddAction.
@@ -61,7 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 
 		private:
-			boost::shared_ptr<const TransportWebsite> _site;
+			boost::shared_ptr<const PTServiceConfig> _config;
 			geography::City* _city;
 
 		protected:
@@ -98,7 +98,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setSite(boost::shared_ptr<const TransportWebsite> value) { _site = value; }
+				void setConfig(boost::shared_ptr<const PTServiceConfig> value) { _config = value; }
 			//@}
 		};
 	}

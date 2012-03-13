@@ -26,8 +26,7 @@
 
 #include "AlgorithmLogger.hpp"
 #include "TransportWebsiteModule.h"
-#include "TransportWebsiteTableSync.h"
-#include "TransportWebsite.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "SiteUpdateAction.h"
 #include "TransportWebsiteRight.h"
 #include "RoutePlannerFunction.h"
@@ -118,22 +117,20 @@ namespace synthese
 		void TransportSiteAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
-			// Site
+			// Config
 			try
 			{
-				_site = TransportWebsiteTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					Env::GetOfficialEnv(),
-					UP_LINKS_LOAD_LEVEL
+				_config = Env::GetOfficialEnv().get<PTServiceConfig>(
+					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
 				);
 			}
-			catch (...)
+			catch (ObjectNotFoundException<PTServiceConfig>&)
 			{
 				throw AdminParametersException("No such site");
 			}
 
 			// Journey planner
-			_journeyPlanner.setConfiguration(_site);
+			_journeyPlanner.setConfiguration(_config);
 			_journeyPlanner._setFromParametersMap(map);
 			_journeyPlanner.setOutputFormat(RoutePlannerFunction::VALUE_ADMIN_HTML);
 
@@ -148,9 +145,9 @@ namespace synthese
 			ParametersMap m(_journeyPlanner._getParametersMap());
 
 			m.insert(PARAMETER_JOURNEY_PLANNING_ALGORITHM, _pt_journey_planning);
-			if(_site.get())
+			if(_config.get())
 			{
-				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
+				m.insert(Request::PARAMETER_OBJECT_ID, _config->getKey());
 			}
 			return m;
 		}
@@ -168,22 +165,22 @@ namespace synthese
 			{
 
 				// Requests
-				AdminActionFunctionRequest<SiteUpdateAction,TransportSiteAdmin> updateRequest(
+				AdminActionFunctionRequest<SiteUpdateAction, TransportSiteAdmin> updateRequest(
 					_request
 				);
-				updateRequest.getAction()->setSiteId(_site->getKey());
+				updateRequest.getAction()->setSite(const_pointer_cast<PTServiceConfig>(_config));
 
 				stream << "<h1>Propriétés</h1>";
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
 				stream << pt.open();
 				stream << pt.title("Identification");
-				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _site->get<Name>()));
+				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _config->get<Name>()));
 				stream << pt.title("Recherche d'itinéraires");
-				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _site->get<MaxConnections>(), 1, "illimité"));
-				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _site->get<OnlineBookingActivated>()));
-				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _site->get<UseOldData>()));
-				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _site->get<UseDatesRange>().days(), 1, "illimité"));
-				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _site->get<DisplayRoadApproachDetails>()));
+				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _config->get<MaxConnections>(), 1, "illimité"));
+				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _config->get<OnlineBookingActivated>()));
+				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _config->get<UseOldData>()));
+				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _config->get<UseDatesRange>().days(), 1, "illimité"));
+				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _config->get<DisplayRoadApproachDetails>()));
 				stream << pt.close();
 
 				stream << "<h1>Périodes de recherche d'itinéraire</h1>";
@@ -193,7 +190,7 @@ namespace synthese
 				cv.push_back("Heure fin");
 				HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
 				stream << ct.open();
-				const Periods::Type& periods(_site->get<Periods>());
+				const Periods::Type& periods(_config->get<Periods>());
 				BOOST_FOREACH(const Periods::Type::value_type& period, periods)
 				{
 					stream << ct.row();
@@ -213,7 +210,7 @@ namespace synthese
 				ObjectSiteLinkTableSync::SearchResult cities(
 					ObjectSiteLinkTableSync::Search(
 						_getEnv(),
-						_site->getKey(),
+						_config->getKey(),
 						optional<RegistryKeyType>(),
 						CityTableSync::TABLE.ID
 				)	);
@@ -221,7 +218,7 @@ namespace synthese
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 
 				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request);
-				cityAddRequest.getAction()->setSite(_site);
+				cityAddRequest.getAction()->setConfig(_config);
 
 				AdminActionFunctionRequest<RemoveObjectAction,TransportSiteAdmin> cityRemoveRequest(_request);
 
@@ -300,13 +297,13 @@ namespace synthese
 						RoutePlannerFunction::PARAMETER_LOG_PATH,
 						_journeyPlanner.getLogger().getDirectory().file_string()
 				)	);
-				if(!_site->getRollingStockFilters().empty())
+				if(!_config->getRollingStockFilters().empty())
 				{
 					stream << st.cell(
 						"Modes de transport",
 						st.getForm().getSelectInput(
 							RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID,
-							_site->getRollingStockFiltersList(),
+							_config->getRollingStockFiltersList(),
 							_journeyPlanner.getTransportModeFilter() ? optional<size_t>(_journeyPlanner.getTransportModeFilter()->getRank()) : optional<size_t>()
 					)	);
 				}
@@ -399,15 +396,15 @@ namespace synthese
 				request.getUser()->getProfile() &&
 				isAuthorized(*request.getUser()))
 			{
-				TransportWebsiteTableSync::SearchResult sites(
-					TransportWebsiteTableSync::Search(Env::GetOfficialEnv())
+				PTServiceConfigTableSync::SearchResult sites(
+					PTServiceConfigTableSync::Search(Env::GetOfficialEnv())
 				);
-				BOOST_FOREACH(const shared_ptr<TransportWebsite>& site, sites)
+				BOOST_FOREACH(const shared_ptr<PTServiceConfig>& site, sites)
 				{
 					shared_ptr<TransportSiteAdmin> p(
 						getNewPage<TransportSiteAdmin>()
 					);
-					p->_site = const_pointer_cast<const TransportWebsite>(site);
+					p->_config = const_pointer_cast<const PTServiceConfig>(site);
 					links.push_back(p);
 				}
 			}
@@ -429,7 +426,7 @@ namespace synthese
 
 		std::string TransportSiteAdmin::getTitle() const
 		{
-			return _site.get() ? _site->getName() : DEFAULT_TITLE;
+			return _config.get() ? _config->getName() : DEFAULT_TITLE;
 		}
 
 
@@ -437,7 +434,7 @@ namespace synthese
 
 		bool TransportSiteAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _site->getKey() == static_cast<const TransportSiteAdmin&>(other)._site->getKey();
+			return _config->getKey() == static_cast<const TransportSiteAdmin&>(other)._config->getKey();
 		}
 
 

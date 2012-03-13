@@ -35,7 +35,7 @@
 #include "RequestException.h"
 #include "RoadPlace.h"
 #include "StopArea.hpp"
-#include "TransportWebsite.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "Webpage.h"
 
 using namespace std;
@@ -57,6 +57,7 @@ namespace synthese
 
 	namespace pt_website
 	{
+		const string PlacesListService::PARAMETER_CONFIG_ID = "config_id";
 		const string PlacesListService::PARAMETER_CITY_ID = "city_id";
 		const string PlacesListService::PARAMETER_CITIES_WITH_AT_LEAST_A_STOP = "cities_with_at_least_a_stop";
 		const string PlacesListService::PARAMETER_CLASS_FILTER = "class_filter";
@@ -64,7 +65,6 @@ namespace synthese
 		const string PlacesListService::PARAMETER_ITEM_PAGE_ID = "item_page_id";
 		const string PlacesListService::PARAMETER_MIN_SCORE = "min_score";
 		const string PlacesListService::PARAMETER_NUMBER = "number";
-		const string PlacesListService::PARAMETER_SITE_ID = "site_id";
 		const string PlacesListService::PARAMETER_SORTED = "sorted";
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
@@ -94,7 +94,8 @@ namespace synthese
 			_sorted(true),
 			_citiesWithAtLeastAStop(true),
 			_minScore(0),
-			_coordinatesSystem(NULL)
+			_coordinatesSystem(NULL),
+			_config(NULL)
 		{}
 
 
@@ -116,9 +117,9 @@ namespace synthese
 			}
 
 			// Site filter
-			if(_site.get())
+			if(_config)
 			{
-				map.insert(PARAMETER_SITE_ID, _site->getKey());
+				map.insert(PARAMETER_CONFIG_ID, _config->getKey());
 			}
 
 			// City filter
@@ -179,12 +180,12 @@ namespace synthese
 			_number = map.getOptional<size_t>(PARAMETER_NUMBER);
 
 			// Site filter
-			RegistryKeyType siteId(map.getDefault<RegistryKeyType>(PARAMETER_SITE_ID, 0));
-			if(siteId > 0) try
+			RegistryKeyType configId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
+			if(configId > 0) try
 			{
-				_site = Env::GetOfficialEnv().get<TransportWebsite>(siteId);
+				_config = Env::GetOfficialEnv().get<PTServiceConfig>(configId).get();
 			}
-			catch(ObjectNotFoundException<TransportWebsite>&)
+			catch(ObjectNotFoundException<PTServiceConfig>&)
 			{
 				throw RequestException("No such site");
 			}
@@ -365,7 +366,7 @@ namespace synthese
 						result.insert(DATA_PUBLIC_PLACES, pm);
 					}
 				}
-				else if(_site.get())
+				else if(_config)
 				{
 					/// TODO implement it
 				}
@@ -498,7 +499,7 @@ namespace synthese
 							_minScore
 					)	);
 				}
-				else if(_site.get())
+				else if(_config)
 				{
 					 /// TODO
 				}

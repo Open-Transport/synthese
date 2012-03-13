@@ -21,9 +21,11 @@
 */
 
 #include "ResaModule.h"
+
 #include "HTMLModule.h"
 #include "Profile.h"
 #include "ProfileTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "User.h"
 #include "UserTableSync.h"
 #include "DBLogEntry.h"
@@ -48,8 +50,6 @@
 #include "AdminActionFunctionRequest.hpp"
 #include "OnlineReservationRule.h"
 #include "OnlineReservationRuleTableSync.h"
-#include "TransportWebsite.h"
-#include "TransportWebsiteTableSync.h"
 #include "Language.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "FreeDRTTimeSlotTableSync.hpp"
@@ -97,7 +97,7 @@ namespace synthese
 		shared_ptr<Profile> ResaModule::_adminProfile;
 		recursive_mutex ResaModule::_sessionsCallIdsMutex;
 		shared_ptr<OnlineReservationRule> ResaModule::_reservationContact;
-		shared_ptr<TransportWebsite> ResaModule::_journeyPlannerWebsite;
+		shared_ptr<PTServiceConfig> ResaModule::_journeyPlannerConfig;
 		ResaModule::ReservationsByService ResaModule::_reservationsByService;
 		boost::recursive_mutex ResaModule::_reservationsByServiceMutex;
 	}
@@ -338,11 +338,11 @@ namespace synthese
 
 				if(id > 0)
 				{
-					_journeyPlannerWebsite = TransportWebsiteTableSync::GetEditable(id, Env::GetOfficialEnv());
+					_journeyPlannerConfig = PTServiceConfigTableSync::GetEditable(id, Env::GetOfficialEnv());
 				}
 				else
 				{
-					_journeyPlannerWebsite.reset();
+					_journeyPlannerConfig.reset();
 				}
 			}
 		}
@@ -395,9 +395,9 @@ namespace synthese
 
 
 
-		pt_website::TransportWebsite* ResaModule::GetJourneyPlannerWebsite()
+		pt_website::PTServiceConfig* ResaModule::GetJourneyPlannerWebsite()
 		{
-			return _journeyPlannerWebsite.get();
+			return _journeyPlannerConfig.get();
 		}
 
 

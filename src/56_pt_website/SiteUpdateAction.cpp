@@ -22,20 +22,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SiteUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "SiteUpdateAction.h"
-#include "TransportWebsite.h"
-#include "TransportWebsiteTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
+#include "TransportWebsiteRight.h"
 
 using namespace std;
 using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace security;
 	using namespace server;
 	using namespace util;
-	using namespace cms;
 
 	namespace util
 	{
@@ -77,7 +78,19 @@ namespace synthese
 
 		void SiteUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
-			setSiteId(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
+			// Site
+			try
+			{
+				_site = PTServiceConfigTableSync::GetEditable(
+					map.get<RegistryKeyType>(PARAMETER_SITE_ID),
+					*_env
+				);
+			}
+			catch(ObjectNotFoundException<PTServiceConfig>&)
+			{
+				throw ActionException("No such site");
+			}
+
 			_name = map.get<string>(PARAMETER_NAME);
 			_onlineBooking = map.get<bool>(PARAMETER_ONLINE_BOOKING);
 			_useOldData = map.get<bool>(PARAMETER_USE_OLD_DATA);
@@ -97,28 +110,13 @@ namespace synthese
 			_site->set<MaxConnections>(_maxConnections);
 			_site->set<DisplayRoadApproachDetails>(_displayRoadApproachDetail);
 
-			TransportWebsiteTableSync::Save(_site.get());
-		}
-
-
-
-		void SiteUpdateAction::setSiteId( RegistryKeyType id )
-		{
-			try
-			{
-				_site = TransportWebsiteTableSync::GetEditable(id, *_env);
-			}
-			catch(...)
-			{
-				throw ActionException("No such site");
-			}
+			PTServiceConfigTableSync::Save(_site.get());
 		}
 
 
 
 		bool SiteUpdateAction::isAuthorized(const Session* session
 		) const {
-			return true;
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
 		}
-	}
-}
+}	}

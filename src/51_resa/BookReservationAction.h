@@ -44,7 +44,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 		class RollingStockFilter;
 	}
 
@@ -127,7 +127,7 @@ namespace synthese
 			//@{
 				pt_journey_planner::RoutePlannerFunction _journeyPlanner;
 				graph::Journey _journey;
-				boost::shared_ptr<const pt_website::TransportWebsite> _site;
+				boost::shared_ptr<const pt_website::PTServiceConfig> _site;
 				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
 			//@}
 
@@ -167,7 +167,7 @@ namespace synthese
 			//@{
 				void setJourney(const graph::Journey& journey){ _journey = journey;	}
 				void setAccessParameters(const graph::AccessParameters& value){ _accessParameters = value; }
-				void setSite(boost::shared_ptr<const pt_website::TransportWebsite> value){ _site = value; }
+				void setSite(boost::shared_ptr<const pt_website::PTServiceConfig> value){ _site = value; }
 				void setCreateCustomer(bool value){ _createCustomer = value; }
 				void setIgnoreReservationRules(bool value){ _ignoreReservation = value; }
 				void setFreeDRTTimeSlot(boost::shared_ptr<const pt::FreeDRTTimeSlot> value){ _freeDRTTimeSlot = value; }
