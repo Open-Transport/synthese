@@ -41,6 +41,8 @@
 #include "WebPageTableSync.h"
 #include "WebsiteTableSync.hpp"
 
+#include "CMSRight.hpp"
+
 // Registries
 
 #include "Webpage.h"
@@ -94,4 +96,6 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
+
+	synthese::cms::CMSRight::integrate();
 }

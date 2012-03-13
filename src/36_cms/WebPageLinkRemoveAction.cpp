@@ -22,9 +22,11 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "WebPageLinkRemoveAction.hpp"
+
+#include "ActionException.h"
+#include "CMSRight.hpp"
+#include "ParametersMap.h"
 #include "Request.h"
 #include "WebPageTableSync.h"
 
@@ -115,8 +117,6 @@ namespace synthese
 		bool WebPageLinkRemoveAction::isAuthorized(
 			const Session* session
 		) const {
-			return true;
-			//return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<TransportWebsiteRight>(WRITE);
+			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<CMSRight>(WRITE);
 		}
-	}
-}
+}	}

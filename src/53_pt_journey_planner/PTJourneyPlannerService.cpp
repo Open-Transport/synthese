@@ -28,14 +28,13 @@
 #include "HourPeriod.h"
 #include "MimeTypes.hpp"
 #include "ObjectNotFoundException.h"
-#include "TransportWebsiteTableSync.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "TransportWebsite.h"
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "Road.h"
@@ -113,7 +112,7 @@ namespace synthese
 	{
 		const string PTJourneyPlannerService::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string PTJourneyPlannerService::PARAMETER_MAX_DEPTH = "md";
-		const string PTJourneyPlannerService::PARAMETER_CONFIGURATION_ID = "config_id";
+		const string PTJourneyPlannerService::PARAMETER_CONFIG_ID = "config_id";
 		const string PTJourneyPlannerService::PARAMETER_APPROACH_SPEED = "apsp";
 		const string PTJourneyPlannerService::PARAMETER_DAY = "dy";
 		const string PTJourneyPlannerService::PARAMETER_PERIOD_ID = "pi";
@@ -272,7 +271,8 @@ namespace synthese
 			_period(NULL),
 			_startArrivalDate(not_a_date_time),
 			_endArrivalDate(not_a_date_time),
-			_logger(new AlgorithmLogger())
+			_logger(new AlgorithmLogger()),
+			_page(NULL)
 		{}
 
 
@@ -284,7 +284,13 @@ namespace synthese
 			// Configuration
 			if(_configuration.get())
 			{
-				map.insert(PARAMETER_CONFIGURATION_ID, _configuration->getKey());
+				map.insert(PARAMETER_CONFIG_ID, _configuration->getKey());
+			}
+
+			// Page
+			if(_page)
+			{
+				map.insert(PARAMETER_PAGE, _page->getKey());
 			}
 
 			// Max transfer duration
@@ -383,12 +389,12 @@ namespace synthese
 			_FunctionWithSite::_setFromParametersMap(map);
 
 			// Configuration
-			RegistryKeyType configurationId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIGURATION_ID));
+			RegistryKeyType configurationId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID));
 			if(configurationId) try
 			{
-				_configuration = TransportWebsiteTableSync::Get(configurationId, *_env);
+				_configuration = PTServiceConfigTableSync::Get(configurationId, *_env);
 			}
-			catch (ObjectNotFoundException<TransportWebsite>&)
+			catch (ObjectNotFoundException<PTServiceConfig>&)
 			{
 				throw RequestException("No such configuration id");
 			}
@@ -549,7 +555,7 @@ namespace synthese
 					}
 				}
 			}
-			catch(TransportWebsite::ForbiddenDateException)
+			catch(PTServiceConfig::ForbiddenDateException)
 			{
 				throw RequestException("Date in the past is forbidden");
 			}

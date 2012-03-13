@@ -25,6 +25,7 @@
 #include "HikingTrailMultipleRoutePlannerFunction.hpp"
 
 #include "AlgorithmLogger.hpp"
+#include "PTServiceConfig.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "NamedPlace.h"
@@ -130,14 +131,14 @@ namespace synthese
 				throw RequestException("No such trail");
 			}
 
-			// TransportWebsite
+			// Config
 			try
 			{
-				_site = Env::GetOfficialEnv().get<TransportWebsite>(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
+				_site = Env::GetOfficialEnv().get<PTServiceConfig>(map.get<RegistryKeyType>(PARAMETER_SITE_ID));
 			}
-			catch(ObjectNotFoundException<TransportWebsite>&)
+			catch(ObjectNotFoundException<PTServiceConfig>&)
 			{
-				throw RequestException("No such site");
+				throw RequestException("No such config");
 			}
 
 			// Place

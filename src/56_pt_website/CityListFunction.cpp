@@ -21,9 +21,10 @@
 */
 
 #include "CityListFunction.h"
+
 #include "Webpage.h"
 #include "Types.h"
-#include "TransportWebsite.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "RequestException.h"
 #include "City.h"
 #include "StopArea.hpp"
@@ -54,6 +55,7 @@ namespace synthese
 		const string CityListFunction::PARAMETER_ITEM_PAGE("item_page_id");
 		const string CityListFunction::PARAMETER_AT_LEAST_A_STOP("at_least_a_stop");
 		const string CityListFunction::PARAMETER_SRID("srid");
+		const string CityListFunction::PARAMETER_CONFIG_ID = "config_id";
 
 		const std::string CityListFunction::DATA_RESULTS_SIZE("size");
 		const std::string CityListFunction::DATA_CONTENT("content");
@@ -86,6 +88,10 @@ namespace synthese
 			{
 				pm.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
+			if(_config)
+			{
+				pm.insert(PARAMETER_CONFIG_ID, _config->getKey());
+			}
 			return pm;
 		}
 
@@ -95,6 +101,18 @@ namespace synthese
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
 
+			// Config
+			RegistryKeyType configId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
+			if(configId) try
+			{
+				_config = PTServiceConfigTableSync::Get(configId, *_env).get();
+			}
+			catch (ObjectNotFoundException<PTServiceConfig>&)
+			{
+				throw RequestException("No such config");
+			}
+		
+			// Page
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE))
 			{
 				_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE));
@@ -134,16 +152,20 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 
+			// Choosing the matcher
 			GeographyModule::CitiesMatcher matcher;
-			if(!site)
-				matcher = (GeographyModule::GetCitiesMatcher());
+			if(_config)
+			{
+				matcher = _config->getCitiesMatcher();
+			}
 			else
-				matcher = site->getCitiesMatcher();
+			{
+				matcher = (GeographyModule::GetCitiesMatcher());
+			}
+				
 
 			GeographyModule::CityList citiesList;
-
 			if(!_input.empty())
 			{
 				GeographyModule::CitiesMatcher::MatchResult matches(

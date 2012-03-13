@@ -44,9 +44,6 @@ namespace synthese
 		{
 		public:
 			/** Driver allocation search.
-				@param first First TransportWebsite object to answer
-				@param number Number of TransportWebsite objects to answer (0 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others accounts to show. Test it to know if the situation needs a "click for more" button.
-				@return Found TransportWebsite objects.
 				@author Hugues Romain
 				@date 2012
 			*/

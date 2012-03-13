@@ -27,7 +27,6 @@
 
 #include "FactorableTemplate.h"
 #include "Function.h"
-#include "TransportWebsite.h"
 #include "RoadModule.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
@@ -42,6 +41,12 @@ namespace synthese
 	namespace cms
 	{
 		class Webpage;
+	}
+
+	namespace pt_website
+	{
+		class HourPeriod;
+		class PTServiceConfig;
 	}
 
 	namespace hiking
@@ -118,7 +123,7 @@ namespace synthese
 				boost::shared_ptr<const HikingTrail> _trail;
 				std::size_t _beginningRank;
 				std::vector<std::size_t> _endingRanks;
-				boost::shared_ptr<const pt_website::TransportWebsite> _site;
+				boost::shared_ptr<const pt_website::PTServiceConfig> _site;
 				boost::gregorian::date					_beginningDay;
 				std::size_t								_beginningPeriodId;
 				const pt_website::HourPeriod*		_beginningPeriod;

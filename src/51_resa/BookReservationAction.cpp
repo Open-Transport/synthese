@@ -40,6 +40,7 @@
 #include "Place.h"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"
+#include "PTServiceConfig.hpp"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTUseRule.h"
 #include "Request.h"
@@ -57,7 +58,6 @@
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
-#include "TransportWebsite.h"
 #include "UseRule.h"
 #include "User.h"
 #include "UserTableSync.h"
@@ -291,7 +291,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<ScheduledService>&)
 					{
-						throw RequestException("No such service");
+						throw ActionException("No such service");
 					}
 
 					gregorian::date date(_departureDateTime.date());
@@ -300,12 +300,12 @@ namespace synthese
 					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
 					if(departureRank >= _service->getPath()->getEdges().size())
 					{
-						throw RequestException("Invalid departure rank");
+						throw ActionException("Invalid departure rank");
 					}
 					if(	arrivalRank >= _service->getPath()->getEdges().size() ||
 						arrivalRank <= departureRank
 					){
-						throw RequestException("Invalid arrival rank");
+						throw ActionException("Invalid arrival rank");
 					}
 
 					ServicePointer sp(
@@ -329,7 +329,7 @@ namespace synthese
 					}
 					catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
 					{
-						throw RequestException("No such service");
+						throw ActionException("No such service");
 					}
 
 					/// TODO check if the user class code is allowed on this service

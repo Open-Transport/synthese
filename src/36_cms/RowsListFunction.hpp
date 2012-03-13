@@ -30,8 +30,6 @@
 #include "FunctionWithSite.h"
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
-#include "TransportWebsite.h"
-#include "TransportWebsiteTypes.hpp"
 #include "GeographyModule.h"
 
 #include <string>
@@ -40,10 +38,6 @@ namespace synthese
 {
 	namespace cms
 	{
-		using namespace db;
-		using namespace pt_website;
-		using namespace geography;
-
 		//////////////////////////////////////////////////////////////////////////
 		/// Rows list query public function.
 		//////////////////////////////////////////////////////////////////////////

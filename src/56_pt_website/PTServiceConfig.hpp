@@ -1,6 +1,6 @@
-
-/** TransportWebsiteclass header.
-	@file TransportWebsite.h
+//////////////////////////////////////////////////////////////////////////
+/** PTServiceConfig class header.
+	@file PTServiceConfig.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,10 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_CSITE_H
-#define SYNTHESE_CSITE_H
-
-#include "Website.hpp"
+#ifndef SYNTHESE_PTServiceConfig_H
+#define SYNTHESE_PTServiceConfig_H
 
 #include "AccessParameters.h"
 #include "City.h"
@@ -31,6 +29,7 @@
 #include "GraphTypes.h"
 #include "HourPeriod.h"
 #include "LexicalMatcher.h"
+#include "Object.hpp"
 #include "RoadModule.h"
 #include "RollingStockFilter.h"
 #include "StandardFields.hpp"
@@ -38,6 +37,7 @@
 
 #include <set>
 #include <boost/date_time/gregorian/greg_duration.hpp>
+#include <boost/fusion/include/map.hpp>
 
 namespace synthese
 {
@@ -75,7 +75,7 @@ namespace synthese
 			FIELD(UseDatesRange),
 			FIELD(Periods),
 			FIELD(DisplayRoadApproachDetails)
-		> TransportWebsiteSchema;
+		> PTServiceConfigSchema;
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -88,11 +88,11 @@ namespace synthese
 		///  - content management system
 		///  - transport objects selection
 		///  - algorithms parameters
-		class TransportWebsite:
-			public Object<TransportWebsite, TransportWebsiteSchema>
+		class PTServiceConfig:
+			public Object<PTServiceConfig, PTServiceConfigSchema>
 		{
 		public:
-			typedef util::Registry<TransportWebsite> Registry;
+			typedef util::Registry<PTServiceConfig> Registry;
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ namespace synthese
 
 			//! \name Constructeur
 			//@{
-				TransportWebsite(util::RegistryKeyType id = 0);
+				PTServiceConfig(util::RegistryKeyType id = 0);
 			//@}
 
 			// \name Modifiers

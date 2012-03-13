@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 
 		/** RollingStockFilter class.
 			@ingroup m56
@@ -57,7 +57,7 @@ namespace synthese
 		private:
 
 			std::string _name;
-			const TransportWebsite* _site;
+			const PTServiceConfig* _site;
 			std::size_t _rank;
 			List _list;
 			bool _authorized_only;
@@ -73,7 +73,7 @@ namespace synthese
 				const std::string& getName() const { return _name; }
 				bool getAuthorizedOnly() const { return _authorized_only; }
 				const List& getList() const { return _list; }
-				const TransportWebsite* getSite() const { return _site; }
+				const PTServiceConfig* getSite() const { return _site; }
 				std::size_t getRank() const { return _rank; }
 			//@}
 
@@ -81,7 +81,7 @@ namespace synthese
 			//@{
 				void setName(const std::string& value) { _name=value; }
 				void setAuthorizedOnly(bool value) { _authorized_only = value; }
-				void setSite(const TransportWebsite* value) { _site = value; }
+				void setSite(const PTServiceConfig* value) { _site = value; }
 				void setRank(std::size_t value) { _rank = value; }
 			//@}
 

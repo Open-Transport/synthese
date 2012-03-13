@@ -149,7 +149,9 @@ namespace synthese
 						t.getForm().getSelectInput(
 							UserUpdateAction::PARAMETER_PROFILE_ID,
 							SecurityModule::getProfileLabels(),
-							optional<RegistryKeyType>(_user->getProfile()->getKey())
+							_user->getProfile() ?
+								optional<RegistryKeyType>(_user->getProfile()->getKey()) :
+								optional<RegistryKeyType>()
 					)	);
 				}
 				stream << t.close();

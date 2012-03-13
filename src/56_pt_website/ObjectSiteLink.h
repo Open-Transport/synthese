@@ -30,7 +30,7 @@ namespace synthese
 {
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 
 		/** ObjectSiteLink class.
 			@ingroup m56
@@ -45,16 +45,16 @@ namespace synthese
 
 		protected:
 			util::RegistryKeyType			_objectId;
-			const TransportWebsite*	_site;
+			const PTServiceConfig*	_site;
 
 		public:
 			ObjectSiteLink(util::RegistryKeyType id = 0);
 
 			util::RegistryKeyType			getObjectId()	const { return _objectId; }
-			const TransportWebsite*	getSite()		const { return _site; }
+			const PTServiceConfig*	getSite()		const { return _site; }
 
 			void setObjectId(util::RegistryKeyType value) { _objectId = value; }
-			void setSite(const TransportWebsite* site) { _site = site; }
+			void setSite(const PTServiceConfig* site) { _site = site; }
 		};
 	}
 }

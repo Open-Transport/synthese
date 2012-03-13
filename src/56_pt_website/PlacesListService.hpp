@@ -48,7 +48,7 @@ namespace synthese
 
 	namespace pt_website
 	{
-		class TransportWebsite;
+		class PTServiceConfig;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	56.15 Function : PlacesListService.
@@ -62,9 +62,9 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,PlacesListService>
 		{
 		public:
+			static const std::string PARAMETER_CONFIG_ID;
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_CITY_ID;
 			static const std::string PARAMETER_CITIES_WITH_AT_LEAST_A_STOP;
 			static const std::string PARAMETER_SORTED;
@@ -98,7 +98,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				std::string _text;
-				boost::shared_ptr<const TransportWebsite> _site;
+				const PTServiceConfig* _config;
 				boost::shared_ptr<const geography::City> _city;
 				bool _sorted;
 				bool _citiesWithAtLeastAStop;

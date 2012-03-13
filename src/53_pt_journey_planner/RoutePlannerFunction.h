@@ -26,12 +26,12 @@
 #define SYNTHESE_RoutePlannerFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 #include "AccessParameters.h"
 #include "AlgorithmTypes.h"
 #include "PTRoutePlannerResult.h"
-#include "TransportWebsite.h"
+#include "RoadModule.h"
 
 #include <boost/optional.hpp>
 #include <boost/filesystem/path.hpp>
@@ -61,6 +61,7 @@ namespace synthese
 	{
 		class HourPeriod;
 		class RollingStockFilter;
+		class PTServiceConfig;
 	}
 
 	namespace geography
@@ -98,14 +99,15 @@ namespace synthese
 		/// 53.15 Function : public transportation route planner.
 		///	@ingroup m53Functions refFunctions
 		/// @author Hugues Romain
+		/// @deprecated
 		///
 		/// Usage : https://extranet.rcsmobility.com/projects/synthese/wiki/Journey_planner
 		///
 		class RoutePlannerFunction:
-			public util::FactorableTemplate<cms::FunctionWithSite<false>, RoutePlannerFunction>
+			public util::FactorableTemplate<server::Function, RoutePlannerFunction>
 		{
 		public:
-			static const std::string PARAMETER_SITE;
+			static const std::string PARAMETER_CONFIG_ID;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			static const std::string PARAMETER_APPROACH_SPEED;
 			static const std::string PARAMETER_MAX_DEPTH;
@@ -337,6 +339,7 @@ namespace synthese
 				bool _fareCalculation;
 				boost::shared_ptr<algorithm::AlgorithmLogger> _logger;
 				std::string									_outputFormat;
+				const pt_website::PTServiceConfig*				_config;
 			//@}
 
 			//! @name Pages

@@ -29,8 +29,10 @@ SiteUpdateAction.cpp
 SiteUpdateAction.h
 TransportSiteAdmin.cpp
 TransportSiteAdmin.h
-TransportWebsite.cpp
-TransportWebsite.h
+PTServiceConfig.cpp
+PTServiceConfig.hpp
+PTServiceConfigTableSync.cpp
+PTServiceConfigTableSync.hpp
 TransportWebsiteModule.cpp
 TransportWebsiteModule.gen.cpp
 TransportWebsiteModuleRegister.cpp
@@ -38,8 +40,6 @@ TransportWebsiteModule.h
 TransportWebsiteModule.inc.cpp
 TransportWebsiteRight.cpp
 TransportWebsiteRight.h
-TransportWebsiteTableSync.cpp
-TransportWebsiteTableSync.h
 TransportWebsiteTypes.hpp
 UserBookmarksService.cpp
 UserBookmarksService.hpp

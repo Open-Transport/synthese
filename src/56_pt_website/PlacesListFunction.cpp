@@ -23,7 +23,7 @@
 #include "PlacesListFunction.h"
 
 #include "TransportWebsiteTypes.hpp"
-#include "TransportWebsite.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "TransportWebsiteModule.h"
 #include "PlaceAlias.h"
 #include "RequestException.h"
@@ -36,14 +36,13 @@
 #include "Webpage.h"
 #include "Website.hpp"
 #include "MimeTypes.hpp"
-#include <geos/geom/Point.h>
 
 #include <boost/foreach.hpp>
+#include <geos/geom/Point.h>
 
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
-
 
 namespace synthese
 {
@@ -60,6 +59,7 @@ namespace synthese
 
 	namespace pt_website
 	{
+		const string PlacesListFunction::PARAMETER_CONFIG_ID = "config_id";
 		const string PlacesListFunction::PARAMETER_OLD_INPUT("i");
 		const string PlacesListFunction::PARAMETER_INPUT("t");
 		const string PlacesListFunction::PARAMETER_CITY_TEXT("ct");
@@ -82,9 +82,9 @@ namespace synthese
 
 
 
-		PlacesListFunction::PlacesListFunction()
-		{
-		}
+		PlacesListFunction::PlacesListFunction():
+			_config(NULL)
+		{}
 
 
 
@@ -120,6 +120,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_SRID, static_cast<int>(_coordinatesSystem->getSRID()));
 			}
+			if(_config)
+			{
+				map.insert(PARAMETER_CONFIG_ID, _config->getKey());
+			}
 
 			return map;
 		}
@@ -129,6 +133,18 @@ namespace synthese
 		void PlacesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_FunctionWithSite::_setFromParametersMap(map);
+
+			// Config
+			RegistryKeyType configId(map.getDefault<RegistryKeyType>(PARAMETER_CONFIG_ID, 0));
+			if(configId) try
+			{
+				_config = PTServiceConfigTableSync::Get(configId, *_env).get();
+			}
+			catch (ObjectNotFoundException<PTServiceConfig>&)
+			{
+				throw RequestException("No such config");
+			}
+
 			optional<RegistryKeyType> pageId(map.getOptional<RegistryKeyType>(PARAMETER_PAGE));
 			if (pageId) try
 			{
@@ -180,15 +196,19 @@ namespace synthese
 				_cityText = map.get<string>(PARAMETER_CITY_TEXT);
 				if(!_cityText.empty())
 				{
-					const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
 					GeographyModule::CitiesMatcher matcher;
-					if(!site)
-						matcher = (GeographyModule::GetCitiesMatcher());
+					if(_config)
+					{
+						matcher = _config->getCitiesMatcher();
+					}
 					else
-						matcher = site->getCitiesMatcher();
+					{
+						matcher = (GeographyModule::GetCitiesMatcher());
+					}
+
 					GeographyModule::CitiesMatcher::MatchResult cities(
 						matcher.bestMatches(_cityText,1)
-						);
+					);
 					if(cities.empty())
 					{
 						throw RequestException("No city was found");
@@ -219,14 +239,16 @@ namespace synthese
 
 			if(!_input.empty())
 			{
-				const TransportWebsite* site(dynamic_cast<const TransportWebsite*>(_site));
-
 				GeographyModule::CitiesMatcher matcher;
-				if(!site)
-						matcher = (GeographyModule::GetCitiesMatcher());
-					else
-						matcher = site->getCitiesMatcher();
-
+				if(_config)
+				{
+					matcher = _config->getCitiesMatcher();
+				}
+				else
+				{
+					matcher = (GeographyModule::GetCitiesMatcher());
+				}
+				
 				RoadModule::ExtendedFetchPlacesResult places(
 					_city.get() ?
 					RoadModule::ExtendedFetchPlaces(_city, _input, *_n) :(
