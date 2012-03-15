@@ -125,6 +125,8 @@ namespace synthese
 			static const std::string MODULE_PARAM_SMTP_PORT;
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
 			static const std::string MODULE_PARAM_AUTO_LOGIN_USER;
+			static const std::string MODULE_PARAM_PYTHON_PATH;
+			static const std::string MODULE_PARAM_SITES_STORAGE_PATH;
 
 			static const std::string VERSION;
 			static const std::string VERSION_INFO;
@@ -150,6 +152,8 @@ namespace synthese
 			static boost::recursive_mutex _threadManagementMutex;
 			static boost::posix_time::time_duration _sessionMaxDuration;
 			static std::string _autoLoginUser;
+			static std::string _pythonPath;
+			static std::string _sitesStoragePath;
 
 
 		public:
@@ -174,6 +178,8 @@ namespace synthese
 			static util::EMail GetEMailSender();
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 			static const std::string& GetAutoLoginUser() { return _autoLoginUser; }
+			static const std::string& GetPythonPath() { return _pythonPath; }
+			static const std::string& GetSitesStoragePath() { return _sitesStoragePath; }
 			static SessionMap& GetSessions();
 
 			/** Called whenever a parameter registered by this module is changed

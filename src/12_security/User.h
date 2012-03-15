@@ -77,6 +77,8 @@ namespace synthese
 			bool			_isConnectionAllowed;
 			boost::gregorian::date	_birthDate;
 			const Language*	_language;
+			std::string		_svnUsername;
+			std::string		_svnPassword;
 
 		public:
 			User(util::RegistryKeyType id = 0);
@@ -101,6 +103,8 @@ namespace synthese
 				void setBirthDate(const boost::gregorian::date& date);
 				void setRandomPassword();
 				void setLanguage(const Language* value){ _language = value; }
+				void setSVNUsername(const std::string& svnUsername) { _svnUsername = svnUsername; }
+				void setSVNPassword(const std::string& svnPassword) { _svnPassword = svnPassword; }
 			//@}
 
 			//! \name Getters
@@ -126,6 +130,8 @@ namespace synthese
 				bool				getConnectionAllowed()	const;
 				const boost::gregorian::date&	getBirthDate()			const;
 				const Language*		getLanguage() const { return _language; }
+				const std::string&	getSVNUsername() const { return _svnUsername; }
+				const std::string&	getSVNPassword() const { return _svnPassword; }
 			//@}
 
 			//! \name Services
