@@ -153,7 +153,7 @@ namespace synthese
 			// Attachments and sub objects
 			SubObjects subObjects;
 
-			path directory(filePath.directory_string());
+			path directory(filePath.parent_path());
 			for(directory_iterator it(directory); it != directory_iterator(); ++it)
 			{
 				path attFilePath(*it);
@@ -247,7 +247,7 @@ namespace synthese
 
 		util::ParametersMap DumpFileFormat::Importer_::_getParametersMap() const
 		{
-			return impex::OneFileTypeImporter<Importer_>::getParametersMap();
+			return ParametersMap();
 		}
 
 

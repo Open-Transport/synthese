@@ -39,6 +39,7 @@ namespace synthese
 	{
 		FIELD_TYPE(ClientURL, std::string)
 		FIELD_TYPE(DefaultTemplate, boost::optional<Webpage&>)
+		FIELD_TYPE(SVNURL, std::string)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -46,7 +47,8 @@ namespace synthese
 			FIELD(StartDate),
 			FIELD(EndDate),
 			FIELD(ClientURL),
-			FIELD(DefaultTemplate)
+			FIELD(DefaultTemplate),
+			FIELD(SVNURL)
 		> WebsiteRecord;
 
 		//////////////////////////////////////////////////////////////////////////

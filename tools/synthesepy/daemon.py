@@ -142,9 +142,13 @@ class Daemon(object):
             pid_path = self._clean_pid_file()
             args.extend(['--pidfile', pid_path])
 
+        sites_storage_path = join(self.env.c.project_path, 'sites_storage')
+        utils.maybe_makedirs(sites_storage_path)
         params = {
             'log_level': str(self.env.c.log_level),
             'port': str(self.env.c.port),
+            'python_path': sys.executable,
+            'sites_storage_path': sites_storage_path,
         }
         if self.env.c.extra_params:
             for p in self.env.c.extra_params.split():
@@ -152,7 +156,7 @@ class Daemon(object):
                 params[name] = value
 
         for name, value in params.iteritems():
-            args.extend(['--param', name + "=" + value])
+            args.extend(['--param', name + '=' + value])
         log.debug('Args: %r\n%s', args, ' '.join(args))
 
         if self.env.c.log_stdout:

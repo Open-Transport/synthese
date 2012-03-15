@@ -71,6 +71,8 @@ namespace synthese
 		const string UserTableSync::COL_BIRTH_DATE = "birth_date";
 		const string UserTableSync::COL_LANGUAGE = "language";
 		const string UserTableSync::COL_DATA_SOURCE_LINKS = "data_source_links";
+		const string UserTableSync::COL_SVN_USERNAME = "svn_username";
+		const string UserTableSync::COL_SVN_PASSWORD = "svn_password";
 	}
 
 	namespace db
@@ -98,6 +100,8 @@ namespace synthese
 			Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
 			Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			Field(UserTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
+			Field(UserTableSync::COL_SVN_USERNAME, SQL_TEXT),
+			Field(UserTableSync::COL_SVN_PASSWORD, SQL_TEXT),
 			Field()
 		};
 
@@ -182,6 +186,8 @@ namespace synthese
 					)	);
 				}
 			}
+			user->setSVNUsername(rows->getText(UserTableSync::COL_SVN_USERNAME));
+			user->setSVNPassword(rows->getText(UserTableSync::COL_SVN_PASSWORD));
 		}
 
 
@@ -213,6 +219,8 @@ namespace synthese
 			query.addField(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
 			query.addField(DataSourceLinks::Serialize(user->getDataSourceLinks()));
+			query.addField(user->getSVNUsername());
+			query.addField(user->getSVNPassword());
 			query.execute(transaction);
 		}
 

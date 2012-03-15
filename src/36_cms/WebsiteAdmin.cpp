@@ -47,6 +47,7 @@
 #include "WebPageDisplayFunction.h"
 #include "WebPageMoveAction.hpp"
 #include "RemoveObjectAction.hpp"
+#include "ServerModule.h"
 
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -63,6 +64,7 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace html;
+	using namespace impex;
 	using namespace security;
 	using namespace html;
 	using namespace cms;
@@ -86,6 +88,7 @@ namespace synthese
 
 		const string WebsiteAdmin::TAB_PROPERTIES("pr");
 		const string WebsiteAdmin::TAB_WEB_PAGES("wp");
+		const string WebsiteAdmin::TAB_SVN_STORAGE("sr");
 
 
 
@@ -115,6 +118,9 @@ namespace synthese
 			// Search page
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
+
+			// SVN storage
+			_svnStorage._setFromParametersMap(map);
 		}
 
 
@@ -128,6 +134,8 @@ namespace synthese
 			{
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
 			}
+
+			m.merge(_svnStorage._getParametersMap());
 			return m;
 		}
 
@@ -176,6 +184,11 @@ namespace synthese
 						ObjectUpdateAction::GetInputName<DefaultTemplate>(),
 						lexical_cast<string>(_site->get<DefaultTemplate>() ? _site->get<DefaultTemplate>()->getKey() : RegistryKeyType(0))
 				)	);
+				stream << pt.title("SVN");
+				stream << pt.cell(
+					"URL",
+					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<SVNURL>(), _site->get<SVNURL>())
+				);
 				stream << pt.close();
 			}
 
@@ -193,6 +206,62 @@ namespace synthese
 				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(_request);
 
 				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, _request);
+			}
+
+
+			////////////////////////////////////////////////////////////////////
+			// TAB SVN STORAGE
+			if (openTabContent(stream, TAB_SVN_STORAGE))
+			{
+				AdminFunctionRequest<WebsiteAdmin> svnStorageRequest(_request);
+
+				stream << "<h1>SVN Storage</h1>";
+				HTMLForm svnStorageForm = svnStorageRequest.getHTMLForm("svnStorage");
+				
+				PropertiesHTMLTable pt(svnStorageForm);
+				stream << pt.open();
+				stream << pt.title("SVN update ou commit");
+
+				stream << pt.cell("ID datasource import", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_DATASOURCE_ID, ""));
+				stream << pt.cell("ID d'objet", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_OBJECT_ID, lexical_cast<string>(_site->getKey())));
+
+				string exportPath("");
+				if(!ServerModule::GetSitesStoragePath().empty())
+				{
+					exportPath = ServerModule::GetSitesStoragePath() + "/" + lexical_cast<string>(_site->getKey());
+				}
+
+				stream << pt.cell("Chemin d'export", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_EXPORT_PATH, exportPath));
+				stream << pt.cell("URL", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_URL, _site->get<SVNURL>()));
+				stream << pt.cell("Utilisateur", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_USERNAME, _request.getUser()->getSVNUsername()));
+				stream << pt.cell("Mot de passe", pt.getForm().getPasswordInput(SVNStorageFunction::PARAMETER_PASSWORD, _request.getUser()->getSVNPassword()));
+
+				stream << pt.cell("Update", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_UPDATE, false));
+				stream << pt.cell("Commit", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_COMMIT, false));
+				stream << pt.cell("Message (si commit)", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_COMMIT_MESSAGE, ""));
+				stream << pt.cell("Verbeux", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_VERBOSE, false));
+
+				stream << pt.close();
+
+				stream << "<h1>Résultat de la commande</h1>";
+
+				stream << "<h2>Sortie</h2>";
+				stream << "<pre style='font-size: 1.2em'>";
+				ParametersMap result = _svnStorage.run(stream, _request);
+				stream << "</pre>";
+
+				if(result.isDefined(SVNStorageFunction::VALUE_SUCCESS))
+				{
+					stream << "<h2>Etat</h2>";
+					if(result.get<bool>(SVNStorageFunction::VALUE_SUCCESS))
+					{
+						stream << "<p style='color: green'>Succès</p>";
+					}
+					else
+					{
+						stream << "<p style='color: red'>Echec</p>";
+					}
+				}
 			}
 
 
@@ -285,6 +354,7 @@ return true;
 
 			_tabs.push_back(Tab("Propriétés", TAB_PROPERTIES, true));
 			_tabs.push_back(Tab("Pages web", TAB_WEB_PAGES, true));
+			_tabs.push_back(Tab("SVN", TAB_SVN_STORAGE, true));
 
 			_tabBuilded = true;
 		}

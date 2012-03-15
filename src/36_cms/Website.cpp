@@ -40,6 +40,7 @@ namespace synthese
 	// TODO: rename to client_url once complex schema updates are in place (issue #9453).
 	FIELD_DEFINITION_OF_TYPE(ClientURL, "cient_url", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultTemplate, "default_page_template_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(SVNURL, "svn_url", SQL_TEXT)
 
 	namespace cms
 	{
@@ -52,7 +53,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(StartDate, neg_infin),
 					FIELD_VALUE_CONSTRUCTOR(EndDate, pos_infin),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
-					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate)
+					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
+					FIELD_DEFAULT_CONSTRUCTOR(SVNURL)
 			)	)
 		{
 		}
