@@ -254,6 +254,8 @@ namespace synthese
 				typedef std::map<boost::optional<std::size_t>, std::string> Labels;
 				Labels getRollingStockFiltersList() const;
 			//@}
+
+			virtual std::string getName() const { return get<Name>(); }
 		};
 }	}
 
