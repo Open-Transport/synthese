@@ -30,6 +30,7 @@
 #include "Webpage.h"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
+#include "SortableLineNumber.hpp"
 #include "Path.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLineTableSync.h"
@@ -302,99 +303,6 @@ namespace synthese
 			_sortByTransportMode.push_back(shared_ptr<RollingStock>()); // NULL pointer at end
 		}
 
-		// Class used for trim:
-		class SortableNumber
-		{
-		private:
-			string _value;
-			string _begin; // = _value except for 12s it is 12
-			string _end; // = "" except for 12s it is  s
-			long int _numericalValue; // = 12 for 12 and 12s, = -1 for A
-			bool _lettersBeforeNumbers;
-
-			typedef enum {
-				isAnInteger, // example : 12
-				beginIsInteger, // example : 12s
-				beginIsNotInteger // example : A, or T1
-			} numberType;
-			numberType _numberType;
-
-		public:
-			SortableNumber(string str, bool lettersBeforeNumbers):
-				_lettersBeforeNumbers(lettersBeforeNumbers)
-			{
-				_numericalValue = -1;
-				_value = str;
-
-				char * buffer = strdup(_value.c_str());
-				char * pEnd;
-
-				errno = 0;
-
-				_numericalValue = strtol (buffer, &pEnd, 10);
-				if (errno != 0 || pEnd == buffer) // Is A form
-				{
-					_numberType = beginIsNotInteger;
-					_begin = _value;
-					_end = "";
-				}
-				else
-				{
-					if(*pEnd != 0 ) // Is 12s form so pEnd is "s";
-					{
-						_numberType = beginIsInteger;
-						_end = string(pEnd);
-						*pEnd = '\0';
-						_begin = string(buffer);
-					}
-					else // Is 12 form
-					{
-						_numberType = isAnInteger;
-						_begin = _value;
-						_end = "";
-					}
-				}
-			}
-
-			bool operator<(SortableNumber const &otherNumber) const
-			{
-				if((_numberType != beginIsInteger)
-						&& (otherNumber._numberType != beginIsInteger)) // No number have form "12S"
-				{
-					if((_numberType == beginIsNotInteger)
-							&& (otherNumber._numberType == beginIsNotInteger)) // They have both form "A"
-					{
-						return _value < otherNumber._value;
-					}
-					else if((_numberType == beginIsNotInteger)
-							&& (otherNumber._numberType == beginIsNotInteger)) // One is "A" form, other is "23" form
-					{
-						return _lettersBeforeNumbers;
-					}
-					else // The two numbers have form 12
-					{
-						return _numericalValue < otherNumber._numericalValue;
-					}
-				}
-				else if(_begin != otherNumber._begin) // At least one number have form 12S, and the other one have a different begin (eg. 13)
-				{
-					if((_numberType == isAnInteger)
-							|| (otherNumber._numberType == isAnInteger)) // here is a "13" type and an "12s" form
-					{
-						return _numericalValue < otherNumber._numericalValue;
-					}
-					else // There is a "A" type and an "12s" form
-					{
-						return _lettersBeforeNumbers;
-					}
-				}
-				else // Case 12/12s or 12s/12k : sort based on end
-				{
-					return _end < otherNumber._end;
-				}
-			}
-		};
-
 
 
 		util::ParametersMap LinesListFunction::run(
@@ -416,7 +324,7 @@ namespace synthese
 
 			typedef std::map<
 				const RollingStock*,
-				map<SortableNumber, shared_ptr<const CommercialLine> >
+				map<SortableLineNumber, shared_ptr<const CommercialLine> >
 			> LinesMapType;
 			LinesMapType linesMap;
 
@@ -487,14 +395,14 @@ namespace synthese
 						if(!tm.get() || line->usesTransportMode(*tm))
 						{
 							// Insert respecting order described up there
-							linesMap[tm.get()][SortableNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
+							linesMap[tm.get()][SortableLineNumber(line->getShortName(), _lettersBeforeNumbers)] = const_pointer_cast<const CommercialLine>(line);
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
 			}
 			else if(_line.get())
 			{
-				linesMap[NULL][SortableNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
+				linesMap[NULL][SortableLineNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
 			}
 
 			// Populating the parameters map
