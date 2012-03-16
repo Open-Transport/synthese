@@ -28,6 +28,7 @@
 #include "UtilTypes.h"
 #include "FactorableTemplate.h"
 #include "Function.h"
+#include "SortableLineNumber.hpp"
 
 #include <boost/optional.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -69,17 +70,24 @@ namespace synthese
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_DESTINATION_PAGE_ID;
+			static const std::string PARAMETER_LINE_PAGE_ID;
 			static const std::string PARAMETER_BBOX;
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
+			static const std::string PARAMETER_SORT_BY_LINE_NAME;
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
 			static const std::string TAG_DESTINATION;
+			static const std::string TAG_LINE;
 			static const std::string DATA_STOP_AREA_PREFIX;
 
 			static const std::string DATA_STOPAREA_NAME;
 			static const std::string DATA_STOPAREA_CITY_NAME;
+			static const std::string DATA_DESTINATIONS;
+			static const std::string DATA_DESTINATIONS_NUMBER;
+			static const std::string DATA_LINES;
 
 			//! \name Page parameters
 			//@{
@@ -87,9 +95,12 @@ namespace synthese
 				boost::optional<boost::shared_ptr<const pt::StopArea> > _stopArea;
 				boost::optional<util::RegistryKeyType> _commercialLineID;
 				boost::shared_ptr<const cms::Webpage> _page;
+				boost::shared_ptr<const cms::Webpage> _destinationPage;
+				boost::shared_ptr<const cms::Webpage> _linePage;
 				boost::optional<geos::geom::Envelope> _bbox;
 				const CoordinatesSystem* _coordinatesSystem;
-				boost::shared_ptr<const pt_website::RollingStockFilter>	_rollingStockFilter;
+				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
+				bool _sortByLineName;
 			//@}
 
 
@@ -154,14 +165,50 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 		private:
+			class SortableLineKey
+			{
+			private:
+				util::RegistryKeyType _key;
+				SortableLineNumber _lineShortName;
+
+			public:
+				SortableLineKey(util::RegistryKeyType key, std::string lineShortName);
+				bool operator<(SortableLineKey const &otherLineKey) const;
+				SortableLineNumber getShortName() const;
+			};
+
+			class SortableStopPoint
+			{
+			private:
+				const StopPoint * _sp;
+				SortableLineNumber _opCode;
+			public:
+				SortableStopPoint(const StopPoint * sp);
+				bool operator<(SortableStopPoint const &otherStopPoint) const;
+				const StopPoint * getStopPoint() const;
+				SortableLineNumber getOpCode() const;
+			};
+
+			class SortableStopArea
+			{
+			private:
+				util::RegistryKeyType _key;
+				std::string _destinationName;
+			public:
+				SortableStopArea(util::RegistryKeyType key, std::string destinationName);
+				bool operator<(SortableStopArea const &otherStopArea) const;
+				std::string getDestinationName() const;
+				util::RegistryKeyType getKey() const;
+			};
+
 			//////////////////////////////////////////////////////////////////////////
 			/// StopPoints are stored in a map as key
 			/// Value is another map containing StopArea Destination deserved from this StopPoint
 			/// For each destination, there is a map containing all lines
 			/// (several lines could reach the same destination from the same stopPoint)
-			typedef std::map<util::RegistryKeyType, const CommercialLine *> CommercialLineMapType;
-			typedef std::map<util::RegistryKeyType, std::pair<const StopArea *, CommercialLineMapType > > StopAreaDestinationMapType;
-			typedef std::map<const StopPoint *, StopAreaDestinationMapType > StopPointMapType;
+			typedef std::map<const SortableLineKey, const CommercialLine *> CommercialLineMapType;
+			typedef std::map<const SortableStopArea, std::pair<const StopArea *, CommercialLineMapType > > StopAreaDestinationMapType;
+			typedef std::map<const SortableStopPoint, StopAreaDestinationMapType > StopPointMapType;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Add the StopPoint to the stopPoint map
@@ -172,6 +219,20 @@ namespace synthese
 				const StopPoint & sp,
 				boost::posix_time::ptime & startDateTime,
 				boost::posix_time::ptime & endDateTime
+			) const;
+
+			void _displayLines(
+				std::ostream& stream,
+				const std::vector<boost::shared_ptr<util::ParametersMap> >& lines,
+				const std::string destinationName,
+				const std::string destinationCityName,
+				const server::Request& request
+			) const;
+
+			void _displayDestinations(
+				std::ostream& stream,
+				const std::vector<boost::shared_ptr<util::ParametersMap> >& destinations,
+				const server::Request& request
 			) const;
 		};
 	}

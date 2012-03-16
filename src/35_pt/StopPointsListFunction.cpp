@@ -63,15 +63,22 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_LINE_ID = "lineid";
 		const string StopPointsListFunction::PARAMETER_DATE = "date";
 		const string StopPointsListFunction::PARAMETER_PAGE_ID = "page_id";
+		const string StopPointsListFunction::PARAMETER_DESTINATION_PAGE_ID = "destination_page_id";
+		const string StopPointsListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
 		const string StopPointsListFunction::PARAMETER_BBOX = "bbox";
 		const string StopPointsListFunction::PARAMETER_SRID = "srid";
 		const string StopPointsListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
+		const string StopPointsListFunction::PARAMETER_SORT_BY_LINE_NAME = "sln";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
 		const string StopPointsListFunction::TAG_DESTINATION = "destination";
+		const string StopPointsListFunction::TAG_LINE = "line";
 		const string StopPointsListFunction::DATA_STOP_AREA_PREFIX = "stopArea_";
 		const string StopPointsListFunction::DATA_STOPAREA_NAME = "stopAreaName";
 		const string StopPointsListFunction::DATA_STOPAREA_CITY_NAME = "stopAreaCityName";
+		const string StopPointsListFunction::DATA_DESTINATIONS = "destinations";
+		const string StopPointsListFunction::DATA_DESTINATIONS_NUMBER = "destinationsNumber";
+		const string StopPointsListFunction::DATA_LINES = "lines";
 
 
 
@@ -82,6 +89,14 @@ namespace synthese
 			if(_page.get())
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
+			}
+			if(_destinationPage.get())
+			{
+				map.insert(PARAMETER_DESTINATION_PAGE_ID, _destinationPage->getKey());
+			}
+			if(_linePage.get())
+			{
+				map.insert(PARAMETER_LINE_PAGE_ID, _linePage->getKey());
 			}
 			if(_bbox)
 			{
@@ -98,6 +113,7 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
 			}
+			map.insert(PARAMETER_SORT_BY_LINE_NAME, _sortByLineName);
 			return map;
 		}
 
@@ -176,6 +192,24 @@ namespace synthese
 				throw RequestException("No such page");
 			}
 
+			if(map.getOptional<RegistryKeyType>(PARAMETER_DESTINATION_PAGE_ID)) try
+			{
+				_destinationPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_DESTINATION_PAGE_ID));
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such page");
+			}
+
+			if(map.getOptional<RegistryKeyType>(PARAMETER_LINE_PAGE_ID)) try
+			{
+				_linePage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_LINE_PAGE_ID));
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such page");
+			}
+
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
 			if(rs_id) try
@@ -186,9 +220,10 @@ namespace synthese
 			{
 				throw RequestException("No such RollingStockFilter");
 			}
+			_sortByLineName = map.getDefault<bool>(PARAMETER_SORT_BY_LINE_NAME, false);
 		}
 
-
+		
 
 		util::ParametersMap StopPointsListFunction::run(
 			std::ostream& stream,
@@ -237,7 +272,7 @@ namespace synthese
 				shared_ptr<ParametersMap> stopPM(new ParametersMap);
 
 				// Main attributes
-				sp.first->toParametersMap(
+				sp.first.getStopPoint()->toParametersMap(
 					*stopPM,
 					!_stopArea,
 					*_coordinatesSystem
@@ -248,7 +283,7 @@ namespace synthese
 				{
 					// Main parameters
 					shared_ptr<ParametersMap> destinationPM(new ParametersMap);
-					destinationPM->insert("id", destination.first);
+					destinationPM->insert("id", destination.first.getKey());
 					destinationPM->insert("name", destination.second.first->getName());
 					destinationPM->insert("cityName", destination.second.first->getCity()->getName());
 
@@ -284,7 +319,7 @@ namespace synthese
 								linePM->insert("transportMode", transportModePM);
 							}
 
-							destinationPM->insert("line", linePM);
+							destinationPM->insert(TAG_LINE, linePM);
 						}
 					}
 
@@ -311,6 +346,49 @@ namespace synthese
 					{
 						vector<shared_ptr<ParametersMap> > stopAreaMap(subMap->getSubMaps(StopPoint::TAG_STOP_AREA));
 						subMap->merge(**stopAreaMap.begin(), DATA_STOP_AREA_PREFIX);
+					}
+					
+					if(_destinationPage.get())
+					{
+						if(subMap->hasSubMaps(TAG_DESTINATION))
+						{
+							vector<shared_ptr<ParametersMap> > destinationVect = subMap->getSubMaps(TAG_DESTINATION);
+							vector<shared_ptr<ParametersMap> > sortedDestinationVect;
+
+							if(_sortByLineName)
+							{
+								typedef multimap <SortableLineNumber, shared_ptr<ParametersMap> > sortedMapType;
+								sortedMapType sortedMap;
+								BOOST_FOREACH(const shared_ptr<ParametersMap>& destination, destinationVect)
+								{
+									if(destination->hasSubMaps(TAG_LINE))
+									{
+										BOOST_FOREACH(const shared_ptr<ParametersMap>& line, destination->getSubMaps(TAG_LINE))
+										{
+											//Create a new Destination with only one line
+											shared_ptr<ParametersMap> newDestination(new ParametersMap);
+											newDestination->merge(*destination);
+											newDestination->insert(TAG_LINE, line);
+											sortedMap.insert(make_pair(SortableLineNumber(line->get<string>("line_short_name"), false), newDestination));
+										}
+									}
+								}
+
+								BOOST_FOREACH(sortedMapType::value_type it, sortedMap)
+								{
+									sortedDestinationVect.push_back(it.second);
+								}
+							}
+
+							stringstream destinationsStream;
+							_displayDestinations(
+								destinationsStream,
+								(_sortByLineName ? sortedDestinationVect : destinationVect),
+								request
+							);
+							subMap->insert(DATA_DESTINATIONS_NUMBER, (_sortByLineName ? sortedDestinationVect.size() : destinationVect.size()));
+							subMap->insert(DATA_DESTINATIONS, destinationsStream.str());
+						}
 					}
 
 					// Add rank data
@@ -345,6 +423,69 @@ namespace synthese
 			}
 
 			return pm;
+		}
+
+
+
+		StopPointsListFunction::SortableStopPoint::SortableStopPoint(const StopPoint * sp):
+			_sp(sp),
+			_opCode(_sp->getCodeBySources(), false)
+		{
+		}
+
+		bool StopPointsListFunction::SortableStopPoint::operator<(SortableStopPoint const &otherStopPoint) const
+		{
+			return _opCode < otherStopPoint.getOpCode();
+		}
+		
+		SortableLineNumber StopPointsListFunction::SortableStopPoint::getOpCode() const
+		{
+			return _opCode;
+		}
+		
+		const StopPoint* StopPointsListFunction::SortableStopPoint::getStopPoint() const
+		{
+			return _sp;
+		}
+
+
+
+		StopPointsListFunction::SortableLineKey::SortableLineKey(RegistryKeyType key, string lineShortName):
+			_key(key),
+			_lineShortName(lineShortName, false)
+		{
+		}
+
+		bool StopPointsListFunction::SortableLineKey::operator<(SortableLineKey const &otherLineKey) const
+		{
+			return _lineShortName < otherLineKey.getShortName();
+		}
+		
+		SortableLineNumber StopPointsListFunction::SortableLineKey::getShortName() const
+		{
+			return _lineShortName;
+		}
+
+
+		StopPointsListFunction::SortableStopArea::SortableStopArea(RegistryKeyType key, string destinationName):
+			_key(key),
+			_destinationName(destinationName)
+		{
+		}
+
+		bool StopPointsListFunction::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
+		{
+			return _destinationName < otherStopArea.getDestinationName();
+		}
+		
+		string StopPointsListFunction::SortableStopArea::getDestinationName() const
+		{
+			return _destinationName;
+		}
+
+		RegistryKeyType StopPointsListFunction::SortableStopArea::getKey() const
+		{
+			return _key;
 		}
 
 
@@ -421,27 +562,80 @@ namespace synthese
 							continue;
 					}
 
+					SortableStopPoint keySP(&sp);
+					SortableStopArea keySA(destination->getKey(), destination->getName());
+					SortableLineKey keyL(commercialLine->getKey(), commercialLine->getShortName());
 					if(spHaveZeroDestination)
 					{
 						StopAreaDestinationMapType stopAreaMap;
-						stopPointMap[&sp] = stopAreaMap;
+						stopPointMap[keySP] = stopAreaMap;
 						spHaveZeroDestination = false;
 					}
 
-					StopAreaDestinationMapType::iterator it = stopPointMap[&sp].find(destination->getKey());
-					if(it == stopPointMap[&sp].end()) // test if destination stop already in the map
+					StopAreaDestinationMapType::iterator it = stopPointMap[keySP].find(keySA);
+					if(it == stopPointMap[keySP].end()) // test if destination stop already in the map
 					{
 						CommercialLineMapType lineMap;
-						lineMap[commercialLine->getKey()] = commercialLine;
-						stopPointMap[&sp][destination->getKey()] = make_pair(destination, lineMap);
+						lineMap[keyL] = commercialLine;
+						stopPointMap[keySP][keySA] = make_pair(destination, lineMap);
 					}
 					else // destination stop is already in the map
 					{
-						CommercialLineMapType::iterator lineIt = stopPointMap[&sp][destination->getKey()].second.find(commercialLine->getKey());
-						if(lineIt == stopPointMap[&sp][destination->getKey()].second.end()) // test if commercialLine already in the sub map
-							stopPointMap[&sp][destination->getKey()].second[commercialLine->getKey()] = commercialLine;
+						CommercialLineMapType::iterator lineIt = stopPointMap[keySP][keySA].second.find(keyL);
+						if(lineIt == stopPointMap[keySP][keySA].second.end()) // test if commercialLine already in the sub map
+							stopPointMap[keySP][keySA].second[keyL] = commercialLine;
 					}
 				}
+			}
+		}
+
+
+
+		void StopPointsListFunction::_displayLines(
+			std::ostream& stream,
+			const std::vector<boost::shared_ptr<util::ParametersMap> >& lines,
+			const std::string destinationName,
+			const std::string destinationCityName,
+			const server::Request& request
+		) const {
+			BOOST_FOREACH(const shared_ptr<ParametersMap>& line, lines)
+			{
+				line->merge(getTemplateParameters());
+				line->insert("destinationName", destinationName),
+				line->insert("destinationCityName", destinationCityName),
+				_linePage->display(stream, request, *line);
+			}
+		}
+
+
+
+		void StopPointsListFunction::_displayDestinations(
+			std::ostream& stream,
+			const std::vector<boost::shared_ptr<util::ParametersMap> >& destinations,
+			const server::Request& request
+		) const {
+			bool isFirst = true;
+			BOOST_FOREACH(const shared_ptr<ParametersMap>& destination, destinations)
+			{
+				destination->merge(getTemplateParameters());
+				destination->insert("isFirstDestination", isFirst);
+				isFirst = false;
+				if(_linePage.get())
+				{
+					if(destination->hasSubMaps(TAG_LINE))
+					{
+						stringstream linesStream;
+						_displayLines(
+							linesStream,
+							destination->getSubMaps(TAG_LINE),
+							destination->get<string>("name"),
+							destination->get<string>("cityName"),
+							request
+						);
+						destination->insert(DATA_LINES, linesStream.str());
+					}
+				}
+				_destinationPage->display(stream, request, *destination);
 			}
 		}
 
