@@ -49,6 +49,7 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_INPUT;
 			static const std::string PARAMETER_TABLE;
+			static const std::string PARAMETER_OPTIONAL;
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_SRID;
 
@@ -63,6 +64,7 @@ namespace synthese
 		private:
 			std::string _input;
 			boost::optional<std::size_t> _n;
+			boost::optional<std::string> _optional;
 			boost::shared_ptr<const cms::Webpage>	_page;
 			boost::shared_ptr<const cms::Webpage>	_itemPage;
 			util::RegistryTableType _table;
@@ -92,6 +94,7 @@ namespace synthese
 
 			void setTextInput(const std::string& text){ _input = text; }
 			void setNumber(boost::optional<std::size_t> number){ _n = number; }
+			void setOptional(boost::optional<std::string> optional){ _optional = optional; }
 			void setTable(util::RegistryTableType table){ _table = table; }
 
 			virtual bool isAuthorized(const server::Session* session) const;

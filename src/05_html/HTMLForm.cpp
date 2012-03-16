@@ -226,7 +226,7 @@ namespace synthese
 					<< "service:'lr',"
 					<< "rows:'rows',"
 					<< "row:'row',"
-					<< "extraParamName:'" << extraParamName << "',"
+					<< "extraParamName:'o',"
 					<< "extraParamInputName:'" << extraParamInputName << "',"
 					<< "bottomButton:" << bottomButton << ","
 					<< "idButton:" << idButton << ","

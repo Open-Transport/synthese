@@ -85,7 +85,8 @@ namespace synthese
 			*/
 			db::RowsList SearchForAutoComplete(
 				const boost::optional<std::string> prefix,
-				const boost::optional<std::size_t> limit) const;
+				const boost::optional<std::size_t> limit,
+				const boost::optional<std::string> optionalParameter) const;
 		};
 	}
 }
