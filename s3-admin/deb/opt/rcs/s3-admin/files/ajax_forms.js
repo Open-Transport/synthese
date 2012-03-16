@@ -11,7 +11,7 @@ function addTextInputAutoComplete(params) {
   var content;
 
   // Add divs
-  content = "<div id=\"div" + params.fieldId + "Selection\">";
+  content = "<div id=\"div" + params.fieldId + "Selection\" style=\"min-width:170px\">";
   content = content + "<input type=\"text\" name=\"" + (params.useId ? params.name + "Selection": params.name) + "\" value=\"" + params.valueName + "\" id=\"" + fieldIdAutoComplete + "\" style=\"width:144px; margin-right:0px;\"/>";
   if (params.bottomButton) {
     content = content + "<input type=\"button\" value=\"v\" onclick=\"if ($('.ui-autocomplete').is(':visible')) $('#" + fieldIdAutoComplete + "').autocomplete('close','');else {$('#" + fieldIdAutoComplete + "').autocomplete('search','');$('#" + fieldIdAutoComplete + "').focus();}\" style=\"margin-left:0px;margin-right:0px;\"/> ";
