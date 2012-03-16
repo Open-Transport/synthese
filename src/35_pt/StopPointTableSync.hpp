@@ -98,6 +98,22 @@ namespace synthese
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
+
+
+
+			/** StopPoint search for AutoComplete.
+			@param prefix Part of the name of the StopPoint
+			@param limit Number of results to answer. The size of the vector is less
+			or equal to number
+			@return Found stopoints (object id and name).
+			@author Gaël Sauvanet
+			@date 2012
+			*/
+			db::RowsList SearchForAutoComplete(
+				const boost::optional<std::string> prefix,
+				const boost::optional<std::size_t> limit,
+				const boost::optional<std::string> optionalParameter) const;
+
 		};
 	}
 }

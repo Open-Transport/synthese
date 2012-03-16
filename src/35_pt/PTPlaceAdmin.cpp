@@ -41,6 +41,7 @@
 #include "ParametersMap.h"
 #include "PlaceAliasUpdateAction.hpp"
 #include "PlaceAliasTableSync.h"
+#include "PlacesListFunction.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "PTModule.h"
@@ -58,6 +59,7 @@
 #include "StopPoint.hpp"
 #include "StopPointAddAction.hpp"
 #include "StopPointAdmin.hpp"
+#include "StopPointTableSync.hpp"
 #include "StopPointUpdateAction.hpp"
 #include "TransportNetworkRight.h"
 
@@ -480,12 +482,13 @@ namespace synthese
 					c.push_back("Quai");
 					c.push_back("Longueur");
 					c.push_back("Durée");
+					c.push_back("Bidirectionnel");
 					c.push_back("Action");
 
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 					stream << t.open();
 					stream << t.row();
-					stream << t.col(6, string(), true) << "Jonctions bidirectionnelles";
+					stream << t.col(7, string(), true) << "Jonctions bidirectionnelles";
 					BOOST_FOREACH(const shared_ptr<Junction>& junction, allJunctions)
 					{
 						if(!junction->getBack())
@@ -507,6 +510,7 @@ namespace synthese
 						stream << t.col() << junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "oui";
 						stream << t.col() << HTMLModule::getLinkButton(
 							removeJunctionRequest.getURL(),
 							"Supprimer",
@@ -516,7 +520,7 @@ namespace synthese
 					}
 
 					stream << t.row();
-					stream << t.col(6, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
+					stream << t.col(7, string(), true) << "Jonctions au départ de " << _connectionPlace->getFullName();
 					BOOST_FOREACH(const shared_ptr<Junction>& junction, startings)
 					{
 						if(junction->getBack())
@@ -537,6 +541,7 @@ namespace synthese
 						stream << t.col() << junction->getEnd()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "non";
 						stream << t.col() << HTMLModule::getLinkButton(
 							removeJunctionRequest.getURL(),
 							"Supprimer",
@@ -545,7 +550,7 @@ namespace synthese
 					}
 
 					stream << t.row();
-					stream << t.col(6, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
+					stream << t.col(7, string(), true) << "Jonctions vers " << _connectionPlace->getFullName();
 					BOOST_FOREACH(const shared_ptr<Junction>& junction, endings)
 					{
 						if(junction->getBack())
@@ -567,6 +572,7 @@ namespace synthese
 						stream << t.col() << junction->getStart()->getName();
 						stream << t.col() << junction->getLength() << " m";
 						stream << t.col() << (junction->getDuration().total_seconds() / 60) << " min";
+						stream << t.col() << "non";
 						stream << t.col() << HTMLModule::getLinkButton(
 							removeJunctionRequest.getURL(),
 							"Supprimer",
@@ -576,11 +582,30 @@ namespace synthese
 
 					stream << t.row();
 					stream << t.col() << f.getSelectInput(JunctionUpdateAction::PARAMETER_FROM_ID, _connectionPlace->getPhysicalStopLabels(), optional<RegistryKeyType>());
-					stream << t.col(2) << f.getTextInput(JunctionUpdateAction::PARAMETER_TO_ID, string());
+					stream << t.col() << f.getTextInputAutoCompleteFromService(
+						string("place_id"),
+						string(),
+						string(),
+						pt_website::PlacesListFunction::FACTORY_KEY,
+						pt_website::PlacesListFunction::DATA_PLACES,
+						pt_website::PlacesListFunction::DATA_PLACE,
+						string("ct"),string(),
+						false, false, true
+						);
+
+					stream << t.col() << f.getTextInputAutoCompleteFromTableSync(
+						JunctionUpdateAction::PARAMETER_TO_ID,
+						string(),
+						string(),
+						lexical_cast<string>(StopPointTableSync::TABLE.ID),
+						string(),string("place_id"),
+						true, false, true
+						);
+
 					stream << t.col() << f.getTextInput(JunctionUpdateAction::PARAMETER_LENGTH, string());
 					stream << t.col() << f.getTextInput(JunctionUpdateAction::PARAMETER_TIME, string());
 					stream << t.col() << f.getOuiNonRadioInput(JunctionUpdateAction::PARAMETER_BIDIRECTIONAL,true);
-					stream << f.getSubmitButton("Ajouter");
+					stream << t.col() << f.getSubmitButton("Ajouter");
 
 					stream << t.close();
 					stream << f.close();
