@@ -70,8 +70,12 @@ function addTextInputAutoComplete(params) {
           + "$('#" + params.fieldId + "').val(ui.item.id);"
         + "},";
       }
-      jscode = jscode + "minLength: 3,"
-      + "autoFocus: false,"
+      if (params.bottomButton) {
+        jscode = jscode + "minLength: 0,";
+      } else {
+        jscode = jscode + "minLength: 3,";
+      }
+      jscode = jscode + "autoFocus: false,"
       + "delay: 150,"
       + "open: function() {"
         + "$(this).removeClass('ui-corner-all').addClass('ui-corner-top');"
