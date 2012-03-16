@@ -359,4 +359,36 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
+
+
+
+		db::RowsList StopPointTableSync::SearchForAutoComplete(
+			const boost::optional<std::string> prefix,
+			const boost::optional<std::size_t> limit,
+			const boost::optional<std::string> optionalParameter
+			) const {
+				RowsList result;
+
+				SelectQuery<StopPointTableSync> query;
+				Env env;
+				if(prefix)
+				{
+					query.addWhereField(StopPointTableSync::COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				}
+				if(optionalParameter)
+				{
+					query.addWhereField(StopPointTableSync::COL_PLACEID, *optionalParameter);
+				}
+				if(limit)
+				{
+					query.setNumber(*limit);
+				}
+				query.addOrderField(StopPointTableSync::COL_NAME,true);
+				StopPointTableSync::SearchResult stops(StopPointTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+				BOOST_FOREACH(const shared_ptr<StopPoint>& stop, stops)
+				{
+					result.push_back(std::make_pair(stop->getKey(), stop->getName()));
+				}
+				return result;
+		} ;
 }	}
