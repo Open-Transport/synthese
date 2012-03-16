@@ -272,7 +272,8 @@ namespace synthese
 
 		db::RowsList WebPageTableSync::SearchForAutoComplete(
 				const boost::optional<std::string> prefix,
-				const boost::optional<std::size_t> limit
+				const boost::optional<std::size_t> limit,
+				const boost::optional<std::string> optionalParameter
 		) const {
 			RowsList result;
 

@@ -46,6 +46,7 @@ namespace synthese
 	{
 		const string RowsListFunction::PARAMETER_INPUT("t");
 		const string RowsListFunction::PARAMETER_TABLE("table");
+		const string RowsListFunction::PARAMETER_OPTIONAL("o");
 		const string RowsListFunction::PARAMETER_NUMBER("n");
 
 		const std::string RowsListFunction::DATA_RESULTS_SIZE("size");
@@ -76,7 +77,7 @@ namespace synthese
 		{
 			_input = map.getDefault<string>(PARAMETER_INPUT);
 			_table = map.getDefault<RegistryTableType>(PARAMETER_TABLE);
-
+			_optional = map.getOptional<string>(PARAMETER_OPTIONAL);
 			_n = map.getOptional<size_t>(PARAMETER_NUMBER);
 			if (!_input.empty() && !_n)
 			{
@@ -93,7 +94,7 @@ namespace synthese
 		) const {
 			boost::shared_ptr<DBTableSync> tableSync = DBModule::GetTableSync(_table);
 
-			RowsList result = tableSync->SearchForAutoComplete(_input,_n);
+			RowsList result = tableSync->SearchForAutoComplete(_input, _n, _optional);
 
 			ParametersMap pm;
 
