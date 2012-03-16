@@ -1144,15 +1144,21 @@ namespace synthese
 							da->set<Date>(vsDate);
 
 							// Amount
-							double amount(lexical_cast<double>(_getValue("frs")));
+							double amount(_getValue("frs").empty() ? 0 : lexical_cast<double>(_getValue("frs")));
 							da->set<Amount>(amount);
 
 							// Boni amount
-							da->set<BoniAmount>(lexical_cast<double>(_getValue("bonifATTfrs")));
+							da->set<BoniAmount>(_getValue("bonifATTfrs").empty() ? 0 : lexical_cast<double>(_getValue("bonifATTfrs")));
 
-							{	// Boni time
+							// Boni time
+							string bonifStr(_getValue("bonifATTtps"));
+							if(bonifStr.empty())
+							{
+								da->set<BoniTime>(minutes(0));
+							}
+							else
+							{
 								vector<string> parts;
-								string bonifStr(_getValue("bonifATTtps"));
 								split(parts, bonifStr, is_any_of("h"));
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
