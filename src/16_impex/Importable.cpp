@@ -49,6 +49,11 @@ namespace synthese
 		const Record& record,
 		const util::Env& env
 	){
+		if(!record.isDefined(FIELD.name))
+		{
+			return;
+		}
+
 		impex::Importable& impObject(dynamic_cast<impex::Importable&>(object));
 		impex::Importable::DataSourceLinks l;
 		UnSerialize(l, record.getValue(FIELD.name), env);

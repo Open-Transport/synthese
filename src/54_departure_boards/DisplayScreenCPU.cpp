@@ -120,6 +120,8 @@ namespace synthese
 			_maintenance_message = value;
 		}
 
+
+
 		void DisplayScreenCPU::copy( const DisplayScreenCPU& e )
 		{
 			_mac_address = e._mac_address;
@@ -127,6 +129,8 @@ namespace synthese
 			_place = e._place;
 			_monitoring_delay = e._monitoring_delay;
 		}
+
+
 
 		std::string DisplayScreenCPU::getFullName() const
 		{
@@ -144,25 +148,14 @@ namespace synthese
 			}
 		}
 
-		void DisplayScreenCPU::addWiredScreen( const DisplayScreen* value )
-		{
-			_wiredScreens.insert(value);
-		}
 
-		const DisplayScreenCPU::WiredScreens& DisplayScreenCPU::getWiredScreens() const
-		{
-			return _wiredScreens;
-		}
-
-		void DisplayScreenCPU::removeWiredScreen( const DisplayScreen* value )
-		{
-			_wiredScreens.erase(value);
-		}
 
 		bool DisplayScreenCPU::isMonitored() const
 		{
 			return _is_online && (_monitoring_delay.minutes() > 0);
 		}
+
+
 
 		bool DisplayScreenCPU::isDown(
 			const ptime& lastContact
@@ -180,5 +173,4 @@ namespace synthese
 			}
 			return true;
 		}
-	}
-}
+}	}

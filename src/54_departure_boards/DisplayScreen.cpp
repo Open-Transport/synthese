@@ -768,9 +768,9 @@ namespace synthese
 
 		const geography::NamedPlace* DisplayScreen::getLocation() const
 		{
-			if(getRoot<NamedPlace>())
+			if(getRoot<PlaceWithDisplayBoards>())
 			{
-				return getRoot<NamedPlace>();
+				return getRoot<PlaceWithDisplayBoards>()->getPlace();
 			}
 			if(getRoot<DisplayScreenCPU>())
 			{
@@ -814,9 +814,9 @@ namespace synthese
 		) const {
 
 			pm.insert(prefix + DATA_IS_ONLINE, _maintenanceIsOnline);
-			if(getRoot<NamedPlace>())
+			if(getRoot<PlaceWithDisplayBoards>() && getRoot<PlaceWithDisplayBoards>()->getPlace())
 			{
-				pm.insert(prefix + DATA_LOCATION_ID, getRoot<NamedPlace>()->getKey());
+				pm.insert(prefix + DATA_LOCATION_ID, getRoot<PlaceWithDisplayBoards>()->getPlace()->getKey());
 			}
 			if(getRoot<DisplayScreenCPU>())
 			{

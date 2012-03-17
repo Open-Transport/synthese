@@ -202,7 +202,7 @@ namespace synthese
 				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
-					createDisplayRequest.getAction()->setPlace(*_place);
+					createDisplayRequest.getAction()->setPlace(_place->get());
 				}
 				createDisplayRequest.setActionWillCreateObject();
 
@@ -596,7 +596,7 @@ namespace synthese
 
 			if( _place &&
 				(	sa && sa->_place == _place ||
-					da && da->getScreen()->getRoot<NamedPlace>() == _place->get() ||
+					da && da->getScreen()->getRoot<PlaceWithDisplayBoards>() && da->getScreen()->getRoot<PlaceWithDisplayBoards>()->getPlace() == _place->get() ||
 					ca && ca->getCPU()->getPlace() == _place->get()
 			)	){
 				DisplayScreenCPUTableSync::SearchResult cpus(

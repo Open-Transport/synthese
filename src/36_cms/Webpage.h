@@ -54,7 +54,6 @@ namespace synthese
 
 	namespace cms
 	{
-		class Website;
 		class Webpage;
 
 		FIELD_COMPLEX_TYPE_EXTERNAL_DATA(WebpageTreeNode)
@@ -156,6 +155,7 @@ namespace synthese
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<Webpage>	Registry;
+			typedef Website TreeRoot;
 
 			Webpage(util::RegistryKeyType id = 0);
 

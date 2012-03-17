@@ -44,7 +44,7 @@ namespace synthese
 
 			//! @name Getters
 			//@{
-				OrderingKeyType getRank() const { return _rank; }
+				virtual OrderingKeyType getRank() const { return _rank; }
 				OrderingKeyType getTreeOrderingKey() const { return getRank(); }
 			//@}
 

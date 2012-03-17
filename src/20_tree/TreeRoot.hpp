@@ -36,8 +36,7 @@ namespace synthese
 			class ChildType_,
 			template<class> class OrderingPolicy_
 		>
-		class TreeRoot:
-			public OrderingPolicy_<ChildType_>
+		class TreeRoot
 		{
 		public:
 			typedef ChildType_ ChildType;

@@ -99,13 +99,28 @@ namespace synthese
 				throw ActionException("No such object");
 			}
 
-			// Parameters map read
-			LinkedObjectsIds linkedObjects(_value->getLinkedObjectsIds(map));
+			// Record extraction
+			ParametersMap record;
+			BOOST_FOREACH(const ParametersMap::Map::value_type& item, map.getMap())
+			{
+				if(	item.first.size() <= PARAMETER_FIELD_PREFIX.size() ||
+					item.first.substr(0, PARAMETER_FIELD_PREFIX.size()) != PARAMETER_FIELD_PREFIX
+				){
+					continue;
+				}
+				record.insert(
+					item.first.substr(PARAMETER_FIELD_PREFIX.size()),
+					item.second
+				);
+			}
+
+			// Record read
+			LinkedObjectsIds linkedObjects(_value->getLinkedObjectsIds(record));
 			BOOST_FOREACH(RegistryKeyType linkedId, linkedObjects)
 			{
 				DBModule::GetObject(linkedId, *_env);
 			}
-			_value->loadFromRecord(map, *_env);
+			_value->loadFromRecord(record, *_env);
 
 			// Value check
 			try

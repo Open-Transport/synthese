@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_tree_TreeUniqueRootPolicy_hpp__
 #define SYNTHESE_tree_TreeUniqueRootPolicy_hpp__
 
+#include "TreeRoot.hpp"
+
 #include <boost/thread/detail/singleton.hpp>
 
 namespace synthese
@@ -32,8 +34,12 @@ namespace synthese
 		/** TreeUniqueRootPolicy class.
 			@ingroup m20
 		*/
-		template<class T>
-		class TreeUniqueRootPolicy
+		template<
+			template<class> class OrderingPolicy_,
+			class T
+		>
+		class TreeUniqueRootPolicy:
+			public TreeRoot<T, OrderingPolicy_>
 		{
 		public:
 			typedef T* RootType;
@@ -42,7 +48,25 @@ namespace synthese
 
 			static T* getRoot() { return &boost::detail::thread::singleton<T>::instance(); }
 
-			void setSameRoot(const TreeUniqueRootPolicy<T>&){ }
+			bool hasRoot() const { return true; }
+
+			void setSameRoot(const TreeUniqueRootPolicy<OrderingPolicy_, T>&){ }
+
+			const typename TreeRoot<T, OrderingPolicy_>::ChildrenType& getRootChildren() const { return getRoot()->getChildren(); }
+
+			void registerChildToRoot(typename T& child)
+			{
+				getRoot()->getChildren().insert(
+					std::make_pair(child.getTreeOrderingKey(), &child)
+				);
+			}
+
+			void unregisterChildFromRoot(typename T& child)
+			{
+				getRoot()->getChildren().erase(
+					child.getTreeOrderingKey()
+				);
+			}
 		};
 	}
 }

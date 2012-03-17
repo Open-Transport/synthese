@@ -23,10 +23,13 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "DisplayScreenTableSync.h"
+
+#include "DeparturesTableModule.h"
+#include "PlaceWithDisplayBoards.hpp"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
 #include "SQLExpression.hpp"
-#include "DisplayScreenTableSync.h"
 #include "DisplayTypeTableSync.h"
 #include "DisplayType.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -249,7 +252,7 @@ namespace synthese
 				RegistryKeyType upId(rows->getLongLong(DisplayScreenTableSync::COL_UP_ID));
 				if(upId > 0) try
 				{
-					DisplayScreen::SetParent(*object, DisplayScreenTableSync::GetEditable(upId, env, linkLevel).get());
+					object->setParent(DisplayScreenTableSync::GetEditable(upId, env, linkLevel).get());
 				}
 				catch(ObjectNotFoundException<DisplayScreen>&)
 				{
@@ -265,7 +268,7 @@ namespace synthese
 					if (cpuId > 0) try
 					{
 						object->setRoot(DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel).get());
-						DisplayScreenCPUTableSync::GetEditable(cpuId, env, linkLevel)->addWiredScreen(object);
+						object->setParent(NULL);
 					}
 					catch(ObjectNotFoundException<StopArea>&)
 					{
@@ -276,7 +279,12 @@ namespace synthese
 					}
 					else
 					{
-						object->setRoot(static_cast<NamedPlace*>(const_cast<StopArea*>(object->getDisplayedPlace())));
+						object->setRoot(
+							DeparturesTableModule::GetPlaceWithDisplayBoards(
+								object->getDisplayedPlace(),
+								env
+						)	);
+						object->setParent(NULL);
 					}
 				}
 
@@ -388,11 +396,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<DisplayScreenTableSync,DisplayScreen>::Unlink(
 			DisplayScreen* object
 		){
-			if(object->getRoot<DisplayScreenCPU>() && !object->getParent())
-			{
-				const_cast<DisplayScreenCPU*>(object->getRoot<DisplayScreenCPU>())->removeWiredScreen(object);
-			}
-			DisplayScreen::SetParent(*object, NULL);
+			object->setParent(NULL);
 		}
 
 

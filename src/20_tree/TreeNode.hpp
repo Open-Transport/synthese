@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_util_TreeNode_hpp__
 #define SYNTHESE_util_TreeNode_hpp__
 
+#include "UnconsistentTreeException.hpp"
+
 #include <map>
 #include <deque>
 #include <assert.h>
@@ -65,53 +67,21 @@ namespace synthese
 		private:
 			//! @name Tree node informations
 			//@{
-				ObjectType*	_parent;
+				boost::optional<ObjectType*> _parent;
 				ChildrenType _children;
 			//@}
 
 		public:
-
-			TreeNode() : _parent(NULL) { }
-			~TreeNode() {}
-
 			//! @name Getters
 			//@{
 				const ChildrenType& getChildren() const { return _children; }
-				ObjectType* getParent() const { return _parent; }
+				ChildrenType& getChildren() { return _children; }
+				ObjectType* getParent() const;
 			//@}
 
 			//! @name Setters
 			//@{
-				void setParent(ObjectType* parent)
-				{
-					_parent = parent;
-				}
-
-				static void SetParent(ObjectType& child, ObjectType* parent)
-				{
-					TreeNodeType& childNode(child);
-					if(childNode._parent != parent)
-					{
-						if(childNode._parent)
-						{
-							childNode._parent->_children.erase(childNode.getTreeOrderingKey());
-						}
-						else
-						{
-							childNode.unregisterChildFromRoot(child);
-						}
-						childNode.setParent(parent);
-						if(parent)
-						{
-							parent->_children.insert(std::make_pair(childNode.getTreeOrderingKey(), &child));
-							childNode.setSameRoot(*parent);
-						}
-						else
-						{
-							childNode.registerChildToRoot(child);
-						}
-					}
-				}
+				void setParent(ObjectType* parent);
 			//@}
 
 			//! @name Services
@@ -123,8 +93,8 @@ namespace synthese
 				/// @date 2010
 				std::size_t getDepth() const
 				{
-					std::size_t result(0);
-					for(ObjectType* parent(_parent); parent; parent = parent->_parent, ++result) ;
+					std::size_t result(1);
+					for(ObjectType* parent(getParent()); parent; parent = parent->getParent(), ++result) ;
 					return result;
 				}
 
@@ -139,7 +109,7 @@ namespace synthese
 				/// @since 3.2.0
 				bool isChildOf(const ObjectType& other) const
 				{
-					for(ObjectType* parent(_parent); parent; parent = parent->_parent)
+					for(ObjectType* parent(getParent()); parent; parent = parent->getParent())
 					{
 						if(parent == &other)
 						{
@@ -162,17 +132,35 @@ namespace synthese
 				{
 					if(!_parent)
 					{
-						return NULL;
+						throw UnconsistentTreeException();
 					}
-					typename ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
-					if(it == _parent->_children.end())
+
+					typename ChildrenType::const_iterator it;
+					if(*_parent)
 					{
-						return NULL;
+						it = (*_parent)->_children.find(this->getTreeOrderingKey());
+						if(it == (*_parent)->_children.end())
+						{
+							throw UnconsistentTreeException();
+						}
+						++it;
+						if(it == (*_parent)->_children.end())
+						{
+							return NULL;
+						}
 					}
-					++it;
-					if(it == _parent->_children.end())
+					else
 					{
-						return NULL;
+						it = getRootChildren().find(this->getTreeOrderingKey());
+						if(it == getRootChildren().end())
+						{
+							throw UnconsistentTreeException();
+						}
+						++it;
+						if(it == getRootChildren().end())
+						{
+							return NULL;
+						}
 					}
 					return it->second;
 				}
@@ -190,12 +178,32 @@ namespace synthese
 				{
 					if(!_parent)
 					{
-						return NULL;
+						throw UnconsistentTreeException();
 					}
-					typename ChildrenType::const_iterator it(_parent->_children.find(this->getTreeOrderingKey()));
-					if(it == _parent->_children.end() || it == _parent->_children.begin())
+					typename ChildrenType::const_iterator it;
+					if(*_parent)
 					{
-						return NULL;
+						it = (*_parent)->_children.find(this->getTreeOrderingKey());
+						if(it == (*_parent)->_children.end())
+						{
+							throw UnconsistentTreeException();
+						}
+						if(it == (*_parent)->_children.begin())
+						{
+							return NULL;
+						}
+					}
+					else
+					{
+						it = getRootChildren().find(this->getTreeOrderingKey());
+						if(it == getRootChildren().end())
+						{
+							throw UnconsistentTreeException();
+						}
+						if(it == getRootChildren().begin())
+						{
+							return NULL;
+						}
 					}
 					--it;
 					return it->second;
@@ -203,7 +211,66 @@ namespace synthese
 
 			//@}
 		};
-	}
-}
+
+
+
+		template<
+			class ObjectType_,
+			template<class> class OrderingPolicy_,
+			class RootPolicy_
+		>
+		ObjectType_* TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::getParent() const
+		{
+			if(!_parent)
+			{
+				throw UnconsistentTreeException();
+			}
+			return *_parent;
+		}
+
+
+
+		template<
+			class ObjectType_,
+			template<class> class OrderingPolicy_,
+			class RootPolicy_
+		>
+		void TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::setParent(
+			ObjectType_* parent
+		){
+			if(!_parent || *_parent != parent)
+			{
+				if(_parent)
+				{
+					if(*_parent)
+					{
+						(*_parent)->_children.erase(OrderingPolicy::getTreeOrderingKey());
+					}
+					else
+					{
+						if(!hasRoot())
+						{
+							throw UnconsistentTreeException();
+						}
+						unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
+					}
+				}
+				_parent = parent;
+				if(parent)
+				{
+					parent->_children.insert(std::make_pair(OrderingPolicy::getTreeOrderingKey(), static_cast<ObjectType*>(this)));
+					this->setSameRoot(*parent);
+				}
+				else
+				{
+					if(!hasRoot())
+					{
+						throw UnconsistentTreeException();
+					}
+					this->registerChildToRoot(static_cast<ObjectType_&>(*this));
+				}
+			}
+		}
+}	}
 
 #endif // SYNTHESE_util_TreeNode_hpp__

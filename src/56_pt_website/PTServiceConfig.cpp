@@ -180,7 +180,7 @@ namespace synthese
 		const date PTServiceConfig::getMaxUseDate() const
 		{
 			date date(day_clock::local_day());
-			date += _useDateRange;
+			date += get<UseDatesRange>();
 			return date;
 		}
 
@@ -213,18 +213,18 @@ namespace synthese
 			{
 			case USER_HANDICAPPED:
 				return AccessParameters(
-					parameter, false, false, 300, posix_time::minutes(23), 0.556, _maxTransportConnectionsCount, allowedPathClasses
+					parameter, false, false, 300, posix_time::minutes(23), 0.556, get<MaxConnections>(), allowedPathClasses
 				);
 
 			case USER_BIKE:
 				return AccessParameters(
-					parameter, false, false, 3000, posix_time::minutes(23), 4.167, _maxTransportConnectionsCount, allowedPathClasses
+					parameter, false, false, 3000, posix_time::minutes(23), 4.167, get<MaxConnections>(), allowedPathClasses
 				);
 
 			case USER_PEDESTRIAN:
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, _maxTransportConnectionsCount, allowedPathClasses
+					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, get<MaxConnections>(), allowedPathClasses
 				);
 			}
 		}
@@ -247,7 +247,7 @@ namespace synthese
 			startTime = ptime(startTime.date(), period.getBeginHour());
 
 			// Checks
-			if (_pastSolutionsDisplayed == false )
+			if (get<UseOldData>() == false )
 			{
 				ptime now(second_clock::local_time());
 				if (endTime < now)

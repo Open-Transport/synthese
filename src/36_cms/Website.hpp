@@ -26,7 +26,6 @@
 #include "Object.hpp"
 #include "TreeRoot.hpp"
 #include "TreeRankOrderingPolicy.hpp"
-#include "Webpage.h"
 
 #include "StandardFields.hpp"
 
@@ -37,6 +36,8 @@ namespace synthese
 {
 	namespace cms
 	{
+		class Webpage;
+
 		FIELD_TYPE(ClientURL, std::string)
 		FIELD_TYPE(DefaultTemplate, boost::optional<Webpage&>)
 		FIELD_TYPE(SVNURL, std::string)

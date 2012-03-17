@@ -34,37 +34,13 @@ namespace synthese
 {
 	namespace util
 	{
-		Registrable::Registrable( RegistryKeyType key )
-		:	_key(key)
-		{
-
-		}
-
-
-
 		Registrable::Registrable(
-		){
-			assert(false);
-		}
-
-
-		void Registrable::setKey( RegistryKeyType key )
-		{
-			_key = key;
-		}
-
-
-
-		synthese::util::RegistryKeyType Registrable::getKey() const
-		{
-			return _key;
-		}
+			RegistryKeyType key
+		):	_key(key)
+		{}
 
 
 
 		Registrable::~Registrable()
-		{
-
-		}
-	}
-}
+		{}
+}	}

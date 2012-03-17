@@ -41,6 +41,13 @@ namespace synthese
 	namespace calendar
 	{
 		CalendarTemplate::CalendarTemplate(
+		):	util::Registrable(0),
+			_category(OTHER_CALENDAR)
+		{}
+
+
+
+		CalendarTemplate::CalendarTemplate(
 			RegistryKeyType id
 		):	util::Registrable(id),
 			_category(OTHER_CALENDAR)
