@@ -32,25 +32,23 @@
 using namespace synthese::tree;
 using namespace boost;
 
+class TR;
+class TN;
+
+class TR:
+	public TreeRoot<TN, TreeRankOrderingPolicy>
+{
+
+};
+
+class TN:
+	public TreeNode<TN, TreeRankOrderingPolicy, TreeOtherClassRootPolicy<TR> >
+{
+
+};
 
 BOOST_AUTO_TEST_CASE(Tree_Rank_OtherClassRoot)
 {
-	class TR;
-	class TN;
-
-	class TR:
-		public TreeRoot<TN, TreeRankOrderingPolicy>
-	{
-
-	};
-
-	class TN:
-		public TreeNode<TN, TreeRankOrderingPolicy, TreeOtherClassRootPolicy<TR> >
-	{
-
-	};
-
-
 	TR root;
 	BOOST_CHECK(root.getChildren().empty());
 
@@ -165,18 +163,15 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_OtherClassRoot)
 }
 
 
+class TU:
+	public TreeNode<TU, TreeRankOrderingPolicy, TreeUniqueRootPolicy<TreeRankOrderingPolicy, TU> >
+{
+
+};
+
 BOOST_AUTO_TEST_CASE(Tree_Rank_UniqueRoot)
 {
-	class TN;
-
-	class TN:
-		public TreeNode<TN, TreeRankOrderingPolicy, TreeUniqueRootPolicy<TreeRankOrderingPolicy, TN> >
-	{
-
-	};
-
-
-	TN node1;
+	TU node1;
 	BOOST_CHECK(node1.getRoot()->getChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
@@ -199,7 +194,7 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_UniqueRoot)
 	BOOST_CHECK(node1.getPreviousSibling() == NULL);
 	BOOST_CHECK(node1.getNextSibling() == NULL);
 
-	TN node2;
+	TU node2;
 	node2.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(node1.getRoot()->getChildren().size(), 1);
 	BOOST_CHECK_EQUAL(node1.getRoot()->getChildren().begin()->second, &node1);
@@ -218,13 +213,13 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_UniqueRoot)
 	BOOST_CHECK(node2.getPreviousSibling() == NULL);
 	BOOST_CHECK(node2.getNextSibling() == NULL);
 
-	TN node3;
+	TU node3;
 	node3.setRank(1);
 	node3.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(node1.getRoot()->getChildren().size(), 1);
 	BOOST_CHECK_EQUAL(node1.getRoot()->getChildren().begin()->second, &node1);
 	BOOST_REQUIRE_EQUAL(node1.getChildren().size(), 2);
-	TN::ChildrenType::const_iterator it(node1.getChildren().begin());
+	TU::ChildrenType::const_iterator it(node1.getChildren().begin());
 	BOOST_CHECK_EQUAL(it->second, &node2);
 	++it;
 	BOOST_CHECK_EQUAL(it->second, &node3);
@@ -249,35 +244,30 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_UniqueRoot)
 	BOOST_CHECK(node3.getNextSibling() == NULL);
 }
 
+class TN1;
+
+class TR1:
+	public TreeRoot<TN1, TreeRankOrderingPolicy>
+{
+};
+
+class TR2:
+	public TreeRoot<TN1, TreeRankOrderingPolicy>
+{
+};
+
+class TN1:
+	public TreeNode<TN1, TreeRankOrderingPolicy, TreeMultiClassRootPolicy<TR1, TR2> >
+{
+};
+
+
 BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 {
-	class TR1;
-	class TR2;
-	class TN;
-
-	class TR1:
-		public TreeRoot<TN, TreeRankOrderingPolicy>
-	{
-
-	};
-
-	class TR2:
-		public TreeRoot<TN, TreeRankOrderingPolicy>
-	{
-
-	};
-
-	class TN:
-		public TreeNode<TN, TreeRankOrderingPolicy, TreeMultiClassRootPolicy<TR1, TR2> >
-	{
-
-	};
-
-
 	TR1 root;
 	BOOST_CHECK(root.getChildren().empty());
 
-	TN node1;
+	TN1 node1;
 	BOOST_CHECK(root.getChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(!node1.hasRoot());
@@ -321,7 +311,7 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK(node1.getPreviousSibling() == NULL);
 	BOOST_CHECK(node1.getNextSibling() == NULL);
 
-	TN node2;
+	TN1 node2;
 	node2.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
 	BOOST_CHECK_EQUAL(node1.getRootChildren().size(), 1);
@@ -349,7 +339,7 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK(node2.getPreviousSibling() == NULL);
 	BOOST_CHECK(node2.getNextSibling() == NULL);
 
-	TN node3;
+	TN1 node3;
 	node3.setRank(1);
 	node3.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
@@ -359,7 +349,7 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK_EQUAL(node1.getRootChildren().begin()->first, node1.getRank());
 	BOOST_CHECK_EQUAL(node1.getRootChildren().begin()->second, &node1);
 	BOOST_REQUIRE_EQUAL(node1.getChildren().size(), 2);
-	TN::ChildrenType::const_iterator it(node1.getChildren().begin());
+	TN1::ChildrenType::const_iterator it(node1.getChildren().begin());
 	BOOST_CHECK_EQUAL(it->second, &node2);
 	++it;
 	BOOST_CHECK_EQUAL(it->second, &node3);
@@ -391,40 +381,34 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK(node3.getNextSibling() == NULL);
 }
 
+class TN2;
+
+class TR21:
+	public TreeRoot<TN2, TreeRankOrderingPolicy>
+{
+};
+
+class TR22:
+	public TreeRoot<TN2, TreeRankOrderingPolicy>
+{
+};
+
+class TN2:
+	public TreeNode<TN2, TreeRankOrderingPolicy, TreeMultiClassRootPolicy<TR21, TR22> >
+{
+};
+
 BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 {
-	class TR1;
-	class TR2;
-	class TN;
-
-	class TR1:
-		public TreeRoot<TN, TreeRankOrderingPolicy>
-	{
-
-	};
-
-	class TR2:
-		public TreeRoot<TN, TreeRankOrderingPolicy>
-	{
-
-	};
-
-	class TN:
-		public TreeNode<TN, TreeRankOrderingPolicy, TreeMultiClassRootPolicy<TR1, TR2> >
-	{
-
-	};
-
-
-	TR2 root;
+	TR22 root;
 	BOOST_CHECK(root.getChildren().empty());
 
-	TN node1;
+	TN2 node1;
 	BOOST_CHECK(root.getChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(!node1.hasRoot());
-	BOOST_CHECK(node1.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node1.getRoot<TR2>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR22>() == NULL);
 
 	//	TODO
 	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
@@ -438,8 +422,8 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node1.getRootChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(node1.hasRoot());
-	BOOST_CHECK(node1.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node1.getRoot<TR2>() == &root);
+	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR22>() == &root);
 	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
 	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
 	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
@@ -455,15 +439,15 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK_EQUAL(node1.getRootChildren().begin()->second, &node1);
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(node1.hasRoot());
-	BOOST_CHECK(node1.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node1.getRoot<TR2>() == &root);
+	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR22>() == &root);
 	BOOST_CHECK(node1.getParent() == NULL);
 	BOOST_CHECK_EQUAL(node1.getRank(), 0);
 	BOOST_CHECK_EQUAL(node1.getDepth(), 1);
 	BOOST_CHECK(node1.getPreviousSibling() == NULL);
 	BOOST_CHECK(node1.getNextSibling() == NULL);
 
-	TN node2;
+	TN2 node2;
 	node2.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
 	BOOST_CHECK_EQUAL(node1.getRootChildren().size(), 1);
@@ -474,8 +458,8 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_REQUIRE_EQUAL(node1.getChildren().size(), 1);
 	BOOST_CHECK_EQUAL(node1.getChildren().begin()->second, &node2);
 	BOOST_CHECK(node1.hasRoot());
-	BOOST_CHECK(node1.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node1.getRoot<TR2>() == &root);
+	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR22>() == &root);
 	BOOST_CHECK(node1.getParent() == NULL);
 	BOOST_CHECK_EQUAL(node1.getRank(), 0);
 	BOOST_CHECK_EQUAL(node1.getDepth(), 1);
@@ -483,15 +467,15 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node1.getNextSibling() == NULL);
 	BOOST_CHECK(node2.getChildren().empty());
 	BOOST_CHECK(node2.hasRoot());
-	BOOST_CHECK(node2.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node2.getRoot<TR2>() == &root);
+	BOOST_CHECK(node2.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node2.getRoot<TR22>() == &root);
 	BOOST_CHECK(node2.getParent() == &node1);
 	BOOST_CHECK_EQUAL(node2.getRank(), 0);
 	BOOST_CHECK_EQUAL(node2.getDepth(), 2);
 	BOOST_CHECK(node2.getPreviousSibling() == NULL);
 	BOOST_CHECK(node2.getNextSibling() == NULL);
 
-	TN node3;
+	TN2 node3;
 	node3.setRank(1);
 	node3.setParent(&node1);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
@@ -501,13 +485,13 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK_EQUAL(node1.getRootChildren().begin()->first, node1.getRank());
 	BOOST_CHECK_EQUAL(node1.getRootChildren().begin()->second, &node1);
 	BOOST_REQUIRE_EQUAL(node1.getChildren().size(), 2);
-	TN::ChildrenType::const_iterator it(node1.getChildren().begin());
+	TN2::ChildrenType::const_iterator it(node1.getChildren().begin());
 	BOOST_CHECK_EQUAL(it->second, &node2);
 	++it;
 	BOOST_CHECK_EQUAL(it->second, &node3);
 	BOOST_CHECK(node1.hasRoot());
-	BOOST_CHECK(node1.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node1.getRoot<TR2>() == &root);
+	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node1.getRoot<TR22>() == &root);
 	BOOST_CHECK(node1.getParent() == NULL);
 	BOOST_CHECK_EQUAL(node1.getRank(), 0);
 	BOOST_CHECK_EQUAL(node1.getDepth(), 1);
@@ -515,8 +499,8 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node1.getNextSibling() == NULL);
 	BOOST_CHECK(node2.getChildren().empty());
 	BOOST_CHECK(node2.hasRoot());
-	BOOST_CHECK(node2.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node2.getRoot<TR2>() == &root);
+	BOOST_CHECK(node2.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node2.getRoot<TR22>() == &root);
 	BOOST_CHECK(node2.getParent() == &node1);
 	BOOST_CHECK_EQUAL(node2.getRank(), 0);
 	BOOST_CHECK_EQUAL(node2.getDepth(), 2);
@@ -524,8 +508,8 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node2.getNextSibling() == &node3);
 	BOOST_CHECK(node3.getChildren().empty());
 	BOOST_CHECK(node3.hasRoot());
-	BOOST_CHECK(node3.getRoot<TR1>() == NULL);
-	BOOST_CHECK(node3.getRoot<TR2>() == &root);
+	BOOST_CHECK(node3.getRoot<TR21>() == NULL);
+	BOOST_CHECK(node3.getRoot<TR22>() == &root);
 	BOOST_CHECK(node3.getParent() == &node1);
 	BOOST_CHECK_EQUAL(node3.getRank(), 1);
 	BOOST_CHECK_EQUAL(node3.getDepth(), 2);
