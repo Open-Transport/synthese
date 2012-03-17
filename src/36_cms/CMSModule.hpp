@@ -162,6 +162,13 @@ namespace synthese
 			/// @since 3.2.0
 			/// @warning Non thread safe
 			static Website* GetSiteByClientURL(const std::string& key);
+
+
+
+			virtual void displayAdmin(
+				std::ostream& stream,
+				const admin::AdminRequest& request
+			) const;
 		};
 	}
 	/** @} */

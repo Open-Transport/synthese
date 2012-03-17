@@ -64,9 +64,10 @@ namespace synthese
 		void ModuleAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
+			// Module class
 			try
 			{
-				setModuleClass(shared_ptr<const ModuleClass>(
+				setModuleClass(shared_ptr<ModuleClass>(
 						Factory<ModuleClass>::create(map.get<string>(PARAMETER_MODULE))
 				)	);
 			}
@@ -74,6 +75,13 @@ namespace synthese
 			{
 				throw AdminParametersException("Invalid Module Key");
 			}
+			if(!_moduleClass.get())
+			{
+				throw AdminParametersException("The module class must be specified");
+			}
+
+			// Parameters
+			_moduleClass->setAdminFromParametersMap(map);
 		}
 
 
@@ -81,7 +89,14 @@ namespace synthese
 		util::ParametersMap ModuleAdmin::getParametersMap() const
 		{
 			ParametersMap m;
-			if(_moduleClass.get()) m.insert(PARAMETER_MODULE, _moduleClass->getFactoryKey());
+			if(_moduleClass.get())
+			{
+				// Parameters
+				m.merge(_moduleClass->getAdminParametersMap());
+
+				// Module class
+				m.insert(PARAMETER_MODULE, _moduleClass->getFactoryKey());
+			}
 			return m;
 		}
 
@@ -89,38 +104,20 @@ namespace synthese
 
 		void ModuleAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const admin::AdminRequest& request
 		) const	{
-			stream << "<h1>Informations sur le module</h1>";
-
-			stream << "<ul>";
-			stream << "<li>Code : " << _moduleClass->getFactoryKey() << "</li>";
-			stream << "<li>Nom : " << _moduleClass->getName() << "</li>";
-			stream << "</ul>";
-
-			stream << "<h1>Pages d'administration</h1>";
-
-			stream << "Les liens suivants donnent accès aux pages d'administration du module " << _moduleClass->getName() << ".</p>";
-
-			stream << "<ul>";
-
-			AdminRequest r(_request, true);
-			AdminInterfaceElement::PageLinks links(getSubPages(*this, _request));
-			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
-			{
-				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
-				stream << "<li>" << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
-				stream << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
-				stream << "</li>";
-			}
-			stream << "</ul>";
+			_moduleClass->displayAdmin(stream, request);
 		}
+
+
 
 		bool ModuleAdmin::isAuthorized(
 			const security::User& user
 		) const	{
 			return true;
 		}
+
+
 
 		AdminInterfaceElement::PageLinks ModuleAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
@@ -144,10 +141,14 @@ namespace synthese
 			return links;
 		}
 
+
+
 		std::string ModuleAdmin::getTitle() const
 		{
 			return _moduleClass.get() ? _moduleClass->getName() : DEFAULT_TITLE;
 		}
+
+
 
 		bool ModuleAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
@@ -156,20 +157,10 @@ namespace synthese
 			return true;
 		}
 
-		boost::shared_ptr<const server::ModuleClass> ModuleAdmin::getModuleClass() const
-		{
-			return _moduleClass;
-		}
 
-		void ModuleAdmin::setModuleClass(boost::shared_ptr<const server::ModuleClass> value)
-		{
-			_moduleClass = value;
-		}
-
-
+	
 		bool ModuleAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
 			return _moduleClass->getFactoryKey() == static_cast<const ModuleAdmin&>(other)._moduleClass->getFactoryKey();
 		}
-	}
-}
+}	}

@@ -23,15 +23,15 @@
 #ifndef SYNTHESE_timetables_CalendarTemplate_h__
 #define SYNTHESE_timetables_CalendarTemplate_h__
 
-#include "Registrable.h"
-#include "Registry.h"
+#include "Calendar.h"
 #include "CalendarTemplateElement.h"
 #include "Exception.h"
-#include "Calendar.h"
 #include "ImportableTemplate.hpp"
-#include "TreeNode.hpp"
 #include "Named.h"
+#include "Registrable.h"
+#include "Registry.h"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "TreeNode.hpp"
 #include "TreeUniqueRootPolicy.hpp"
 
 #include <map>
@@ -56,8 +56,10 @@ namespace synthese
 			public tree::TreeNode<
 				CalendarTemplate,
 				tree::TreeAlphabeticalOrderingPolicy,
-				tree::TreeUniqueRootPolicy<CalendarTemplate>
-			>
+				tree::TreeUniqueRootPolicy<
+					tree::TreeAlphabeticalOrderingPolicy,
+					CalendarTemplate
+			>	>
 		{
 		public:
 			/// Chosen registry class.
@@ -127,8 +129,10 @@ namespace synthese
 			Category								_category;
 
 		public:
+			CalendarTemplate();
+
 			CalendarTemplate(
-				util::RegistryKeyType id = 0
+				util::RegistryKeyType id
 			);
 
 			CalendarTemplate(

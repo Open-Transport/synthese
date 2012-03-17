@@ -26,14 +26,12 @@
 #define SYNTHESE_FunctionWithSiteBase_H__
 
 #include "Function.h"
+#include "Webpage.h"
 
 namespace synthese
 {
 	namespace cms
 	{
-		class Webpage;
-		class Website;
-
 		/** Function With website class.
 			@author Hugues Romain
 			@date 2007

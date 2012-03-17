@@ -23,10 +23,19 @@
 */
 
 #include "ModuleClass.h"
+
+#include "AdminFunction.h"
+#include "AdminInterfaceElement.h"
+#include "HTMLModule.h"
 #include "Log.h"
+
+using namespace boost;
+using namespace std;
 
 namespace synthese
 {
+	using namespace admin;
+	using namespace html;
 	using namespace util;
 
 	namespace server
@@ -122,5 +131,51 @@ namespace synthese
 			ParametersMap& map,
 			const admin::AdminRequest& request
 		) const	{
+		}
+
+
+
+		void ModuleClass::setAdminFromParametersMap( const util::ParametersMap& map )
+		{
+		}
+
+
+
+		util::ParametersMap ModuleClass::getAdminParametersMap() const
+		{
+			return ParametersMap();
+		}
+
+
+
+		void ModuleClass::displayAdmin(
+			ostream& stream,
+			const AdminRequest& request
+		) const	{
+			stream << "<h1>Informations sur le module</h1>";
+
+			stream << "<ul>";
+			stream << "<li>Code : " << getFactoryKey() << "</li>";
+			stream << "<li>Nom : " << getName() << "</li>";
+			stream << "</ul>";
+
+			stream << "<h1>Pages d'administration</h1>";
+
+			stream << "Les liens suivants donnent accès aux pages d'administration du module " << getName() << ".</p>";
+
+			stream << "<ul>";
+
+			AdminRequest r(request, true);
+			AdminInterfaceElement::PageLinks links(
+				request.getFunction()->getPage()->getSubPages(*request.getFunction()->getPage(), request)
+			);
+			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
+			{
+				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
+				stream << "<li>" << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
+				stream << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
+				stream << "</li>";
+			}
+			stream << "</ul>";
 		}
 }	}

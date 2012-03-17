@@ -24,6 +24,7 @@
 
 #include "CMSModule.hpp"
 #include "Env.h"
+#include "Webpage.h"
 
 #include <boost/lexical_cast.hpp>
 
@@ -50,14 +51,13 @@ namespace synthese
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
-					FIELD_VALUE_CONSTRUCTOR(StartDate, neg_infin),
-					FIELD_VALUE_CONSTRUCTOR(EndDate, pos_infin),
+					FIELD_VALUE_CONSTRUCTOR(StartDate, posix_time::not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(EndDate, posix_time::not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
 					FIELD_DEFAULT_CONSTRUCTOR(SVNURL)
 			)	)
-		{
-		}
+		{}
 
 
 

@@ -121,7 +121,9 @@ namespace synthese
 						id = map.getDefault<RegistryKeyType>(PARAMETER_LOCALIZATION_ID);
 						if (id > 0)
 						{
-							_place = Fetcher<NamedPlace>::Fetch(id, *_env);
+							setPlace(
+								Fetcher<NamedPlace>::Fetch(id, *_env).get()
+							);
 						}
 				}	}
 			}
@@ -151,7 +153,7 @@ namespace synthese
 			}
 			if(_up.get())
 			{
-				DisplayScreen::SetParent(screen, const_cast<DisplayScreen*>(_up.get()));
+				screen.setParent(const_cast<DisplayScreen*>(_up.get()));
 				screen.setSubScreenType(_subScreenType);
 			}
 			else if(_cpu.get())
@@ -160,7 +162,9 @@ namespace synthese
 			}
 			else
 			{
-				screen.setRoot(const_cast<NamedPlace*>(_place.get()));
+				screen.setRoot(
+					const_cast<PlaceWithDisplayBoards*>(_place.get())
+				);
 			}
 
 			if(dynamic_cast<const StopArea*>(screen.getLocation()))
@@ -184,7 +188,11 @@ namespace synthese
 
 		bool CreateDisplayScreenAction::isAuthorized(const Session* session
 		) const {
-			const NamedPlace* place(_place.get());
+			if(!_place.get())
+			{
+				return false;
+			}
+			const NamedPlace* place(_place->getPlace());
 			if(!place && _cpu.get())
 			{
 				place = _cpu->getPlace();
@@ -199,5 +207,15 @@ namespace synthese
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(place->getKey())) :
 				session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE)
 			;
+		}
+
+
+
+		void CreateDisplayScreenAction::setPlace( const geography::NamedPlace* value )
+		{
+			_place.reset(
+				new PlaceWithDisplayBoards(
+					value
+			)	);
 		}
 }	}

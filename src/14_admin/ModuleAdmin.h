@@ -48,20 +48,22 @@ namespace synthese
 			static const std::string PARAMETER_MODULE;
 
 		private:
-			boost::shared_ptr<const server::ModuleClass>	_moduleClass;
+			boost::shared_ptr<server::ModuleClass>	_moduleClass;
 
 		public:
 			ModuleAdmin();
 
 			//! @name Getters
 			//@{
-				boost::shared_ptr<const server::ModuleClass>	getModuleClass() const;
+				boost::shared_ptr<server::ModuleClass> getModuleClass() const { return _moduleClass; }
 			//@}
 
 			//! @name Setters
 			//@{
-				void setModuleClass(boost::shared_ptr<const server::ModuleClass> value);
+				void setModuleClass(boost::shared_ptr<server::ModuleClass> value){ _moduleClass = value; }
 			//@}
+
+
 
 			/** Initialization of the parameters from a parameters map.
 				@param map The parameters map to use for the initialization.
@@ -94,7 +96,9 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 
-			/** Authorization control.
+
+
+			/** Authorization check.
 				@return bool True if the displayed page can be displayed
 				@author Hugues Romain
 				@date 2008
@@ -102,6 +106,8 @@ namespace synthese
 			bool isAuthorized(
 				const security::User& user
 			) const;
+
+
 
 			/** Gets sub page of the designed parent page, which are from the current class.
 				@param factoryKey Key of the parent class
@@ -114,7 +120,11 @@ namespace synthese
 				const admin::AdminRequest& _request
 			) const;
 
+
+
 			virtual std::string getTitle() const;
+
+
 
 			/** Gets the opening position of the node in the tree view.
 				@return A module page is always visible in the tree
@@ -126,7 +136,13 @@ namespace synthese
 				const admin::AdminRequest& request
 			) const;
 
-			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
+
+
+			/// @param other other admin page
+			/// @warning does not take into account of module specific parameters
+			virtual bool _hasSameContent(
+				const AdminInterfaceElement& other
+			) const;
 		};
 	}
 }

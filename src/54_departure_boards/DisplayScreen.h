@@ -25,8 +25,10 @@
 #ifndef SYNTHESE_CTABLEAUAFFICHAGE_H
 #define SYNTHESE_CTABLEAUAFFICHAGE_H
 
+#include "DisplayScreenCPU.h"
 #include "ImportableTemplate.hpp"
 #include "Named.h"
+#include "PlaceWithDisplayBoards.hpp"
 #include "Registrable.h"
 #include "TreeNode.hpp"
 #include "TreeAlphabeticalOrderingPolicy.hpp"
@@ -50,11 +52,6 @@ namespace synthese
 		class Request;
 	}
 
-	namespace geography
-	{
-		class NamedPlace;
-	}
-
 	namespace graph
 	{
 		class Journey;
@@ -69,7 +66,6 @@ namespace synthese
 	namespace departure_boards
 	{
 		class DisplayType;
-		class DisplayScreenCPU;
 		class DisplayMonitoringStatus;
 
 		/** Terminal d'affichage.
@@ -100,8 +96,10 @@ namespace synthese
 			public tree::TreeNode<
 				DisplayScreen,
 				tree::TreeAlphabeticalOrderingPolicy,
-				tree::TreeMultiClassRootPolicy<geography::NamedPlace, DisplayScreenCPU>
-			>,
+				tree::TreeMultiClassRootPolicy<
+					PlaceWithDisplayBoards,
+					DisplayScreenCPU
+			>	>,
 			public util::Named,
 			public impex::ImportableTemplate<DisplayScreen>
 		{

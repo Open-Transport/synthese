@@ -256,6 +256,11 @@ namespace synthese
 
 		static void LoadFromRecord(T& fieldObject, const Record& record)
 		{
+			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			{
+				return;
+			}
+
 			ObjectField<C, T>::UnSerialize(
 				fieldObject,
 				record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name)
@@ -361,6 +366,11 @@ namespace synthese
 
 		static void LoadFromRecord(boost::optional<P&>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
+			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			{
+				return;
+			}
+
 			fieldObject = boost::none;
 			try
 			{
@@ -443,6 +453,11 @@ namespace synthese
 
 		static void LoadFromRecord(std::vector<P*>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
+			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			{
+				return;
+			}
+
 			fieldObject.clear();
 			std::string text(record.get<std::string>(ObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())

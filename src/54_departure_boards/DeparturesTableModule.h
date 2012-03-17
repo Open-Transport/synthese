@@ -28,6 +28,7 @@
 
 #include "ModuleClassTemplate.hpp"
 
+#include "PlaceWithDisplayBoards.hpp"
 #include "SecurityTypes.hpp"
 
 namespace synthese
@@ -92,11 +93,25 @@ namespace synthese
 	*/
 	namespace departure_boards
 	{
+		//////////////////////////////////////////////////////////////////////////
+		/// Departure boards module.
 		class DeparturesTableModule:
 			public server::ModuleClassTemplate<DeparturesTableModule>
 		{
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
+
+			typedef std::map<util::Env*, boost::shared_ptr<util::Registry<PlaceWithDisplayBoards> > > PlacesWithDisplayBoards;
+			static PlacesWithDisplayBoards _placesWithDisplayBoards;
+
+			static PlaceWithDisplayBoards* GetPlaceWithDisplayBoards(
+				const geography::NamedPlace* place,
+				util::Env& env
+			);
+
+			static void RemoveEnvFromPlacesWithDisplayBoards(
+				util::Env& env
+			);
 
 			static Labels getDisplayTypeLabels(
 				bool withAll = false,

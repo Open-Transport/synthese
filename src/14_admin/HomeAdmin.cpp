@@ -120,9 +120,7 @@ namespace synthese
 				shared_ptr<ModuleAdmin> link(
 					getNewPage<ModuleAdmin>()
 				);
-				link->setModuleClass(
-					const_pointer_cast<const ModuleClass, ModuleClass>(*it)
-				);
+				link->setModuleClass(*it);
 				if (!link->getSubPages(currentPage, request).empty())
 				{
 					links.push_back(link);

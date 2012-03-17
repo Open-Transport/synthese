@@ -1,6 +1,7 @@
 
 #include "DBModule.h"
 
+#include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
 
@@ -10,6 +11,7 @@ void synthese::db::moduleRegister()
 {
 	synthese::db::DBModule::integrate();
 
+	synthese::db::ObjectCreateAction::integrate();
 	synthese::db::ObjectUpdateAction::integrate();
 	synthese::db::RemoveObjectAction::integrate();
 }

@@ -44,14 +44,17 @@ namespace synthese
 
 			TreeRootType* getRoot() const { return _root; }
 
+			bool hasRoot() const { return _root != NULL; }
+
+			const typename O::ChildrenType& getRootChildren() const { return getRoot()->getChildren(); }
+
 			void setRoot(TreeRootType* value) { _root=value; }
 
 			void setSameRoot(const TreeOtherClassRootPolicy<O>& value){ _root = value._root; }
 
 			void setNullRoot(){ _root = NULL; }
 
-			template<class C>
-			void registerChildToRoot(C& child)
+			void registerChildToRoot(typename O::ChildType& child)
 			{
 				if(_root)
 				{
@@ -61,8 +64,7 @@ namespace synthese
 				}
 			}
 
-			template<class C>
-			void unregisterChildFromRoot(C& child)
+			void unregisterChildFromRoot(typename O::ChildType& child)
 			{
 				if(_root)
 				{
