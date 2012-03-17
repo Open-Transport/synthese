@@ -171,7 +171,7 @@ namespace synthese
 						if(chunk.vehicleService == _vehicleService)
 						{
 							result = true;
-							resultTime = chunk.elements.begin()->service->getDepartureSchedule(chunk.elements.begin()->startRank, false);
+							resultTime = chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank);
 							break;
 						}
 					}

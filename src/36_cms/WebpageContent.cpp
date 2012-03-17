@@ -48,10 +48,16 @@ namespace synthese
 		const Record& record,
 		const util::Env& env
 	){
-		fieldObject._ignoreWhiteChars = record.getDefault<bool>(FIELDS[1].name, false);
+		if(record.isDefined(FIELDS[1].name))
+		{
+			fieldObject._ignoreWhiteChars = record.getDefault<bool>(FIELDS[1].name, false);
+		}
 
-		// At end because nodes generation needs the value of the other parameters to be updated
-		fieldObject.setCode(record.getDefault<string>(FIELDS[0].name));
+		if(record.isDefined(FIELDS[0].name))
+		{
+			// At end because nodes generation needs the value of the other parameters to be updated
+			fieldObject.setCode(record.getDefault<string>(FIELDS[0].name));
+		}
 	}
 
 

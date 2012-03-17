@@ -84,5 +84,6 @@ namespace synthese
 				{
 				}
 			}
+			return NULL;
 		}
 }	}

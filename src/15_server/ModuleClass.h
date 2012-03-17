@@ -111,7 +111,20 @@ namespace synthese
 				util::ParametersMap& map,
 				const admin::AdminRequest& request
 			) const;
+
+
+
+			virtual void setAdminFromParametersMap(
+				const util::ParametersMap& map
+			);
+
+			virtual util::ParametersMap getAdminParametersMap(
+			) const;
+
+			virtual void displayAdmin(
+				std::ostream& stream,
+				const admin::AdminRequest& request
+			) const;
 		};
-	}
-}
+}	}
 #endif // SYNTHESE_ModuleClass_H__

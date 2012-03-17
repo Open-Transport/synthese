@@ -26,9 +26,11 @@
 #ifndef SYNTHESE_departurestable_DisplayScreenCPU_h__
 #define SYNTHESE_departurestable_DisplayScreenCPU_h__
 
+#include "Named.h"
 #include "Registrable.h"
 #include "Registry.h"
-#include "Named.h"
+#include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "TreeRoot.hpp"
 
 #include <string>
 #include <set>
@@ -55,22 +57,19 @@ namespace synthese
 		////////////////////////////////////////////////////////////////////////
 		class DisplayScreenCPU:
 			public util::Registrable,
-			public util::Named
+			public util::Named,
+			public tree::TreeRoot<DisplayScreen, tree::TreeAlphabeticalOrderingPolicy>
 		{
 		public:
 			typedef util::Registry<DisplayScreenCPU> Registry;
-			typedef std::set<const DisplayScreen*> WiredScreens;
 
 		protected:
 			// Attributes
-			const geography::NamedPlace*	_place;
+			const geography::NamedPlace*		_place;
 			std::string											_mac_address;
 			boost::posix_time::time_duration					_monitoring_delay;
 			bool												_is_online;
 			std::string											_maintenance_message;
-
-			// Linked objects
-			WiredScreens										_wiredScreens;
 
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -94,7 +93,6 @@ namespace synthese
 				boost::posix_time::time_duration					getMonitoringDelay()	const;
 				bool												getIsOnline()			const;
 				const std::string&									getMaintenanceMessage()	const;
-				const WiredScreens&									getWiredScreens()		const;
 			//@}
 
 			//! @name Setters
@@ -104,8 +102,6 @@ namespace synthese
 				void setMonitoringDelay(const boost::posix_time::time_duration value);
 				void setIsOnline(const bool value);
 				void setMaintenanceMessage(const std::string& value);
-				void addWiredScreen(const DisplayScreen* value);
-				void removeWiredScreen(const DisplayScreen* value);
 			//@}
 
 			//! @name Queries
@@ -128,7 +124,6 @@ namespace synthese
 				void copy(const DisplayScreenCPU& e);
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_departurestable_DisplayScreenCPU_h__

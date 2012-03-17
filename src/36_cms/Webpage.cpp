@@ -83,43 +83,52 @@ namespace synthese
 		assert(dynamic_cast<Webpage*>(&object));
 		Webpage& webpage(static_cast<Webpage&>(object));
 
-		webpage.setRank(record.getDefault<size_t>(FIELDS[2].name, 0));
-
-		RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
-		if (id > 0)
+		if(record.isDefined(FIELDS[2].name))
 		{
-			try
+			webpage.setRank(record.getDefault<size_t>(FIELDS[2].name, 0));
+		}
+
+		if(record.isDefined(FIELDS[2].name))
+		{
+			RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
+			if (id > 0)
 			{
-				webpage.setRoot(env.getEditable<Website>(id).get());
-				webpage.getRoot()->addPage(webpage);
-			}
-			catch(ObjectNotFoundException<Website>&)
-			{
-				Log::GetInstance().warn(
-					"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
-					lexical_cast<string>(id) + " not found"
-				);
+				try
+				{
+					webpage.setRoot(env.getEditable<Website>(id).get());
+					webpage.getRoot()->addPage(webpage);
+				}
+				catch(ObjectNotFoundException<Website>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
+						lexical_cast<string>(id) + " not found"
+					);
+				}
 			}
 		}
 
-		RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
-		if (up_id > 0)
+		if(record.isDefined(FIELDS[1].name))
 		{
-			try
+			RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
+			if (up_id > 0)
 			{
-				Webpage::TreeNodeType::SetParent(webpage, env.getEditable<Webpage>(up_id).get());
+				try
+				{
+					webpage.setParent(env.getEditable<Webpage>(up_id).get());
+				}
+				catch(ObjectNotFoundException<Webpage>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : up web page " +
+						lexical_cast<string>(up_id) + " not found"
+					);
+				}
 			}
-			catch(ObjectNotFoundException<Webpage>&)
+			else
 			{
-				Log::GetInstance().warn(
-					"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : up web page " +
-					lexical_cast<string>(up_id) + " not found"
-				);
+				webpage.setParent(NULL);
 			}
-		}
-		else
-		{
-			Webpage::TreeNodeType::SetParent(webpage, NULL);
 		}
 	}
 
@@ -295,6 +304,6 @@ namespace synthese
 		void Webpage::unlink()
 		{
 			getRoot()->removePage(get<SmartURLPath>());
-			Webpage::SetParent(*this, NULL);
+			this->setParent(NULL);
 		}
 }	}

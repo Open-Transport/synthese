@@ -76,7 +76,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const DisplayScreen>			_template;
-			boost::shared_ptr<const geography::NamedPlace>	_place;
+			boost::shared_ptr<const PlaceWithDisplayBoards>	_place;
 			boost::shared_ptr<const DisplayScreenCPU>		_cpu;
 			boost::shared_ptr<const DisplayScreen>			_up;
 			std::string										_name;
@@ -97,7 +97,7 @@ namespace synthese
 			*/
 			void run(server::Request& request);
 
-			void setPlace(boost::shared_ptr<const geography::NamedPlace> value){ _place = value; }
+			void setPlace(const geography::NamedPlace* value);
 			void setCPU(boost::shared_ptr<const DisplayScreenCPU> value){ _cpu = value; }
 			void setUp(boost::shared_ptr<const DisplayScreen> value){ _up = value; }
 

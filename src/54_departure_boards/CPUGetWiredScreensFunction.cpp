@@ -114,16 +114,18 @@ namespace synthese
 
 			// Output generation
 			util::ParametersMap pm;
-			BOOST_FOREACH(const DisplayScreen* screen, _cpu->getWiredScreens())
+			BOOST_FOREACH(const DisplayScreenCPU::ChildrenType::value_type& item, _cpu->getChildren())
 			{
-				if(!screen->getIsOnline())
+				const DisplayScreen& screen(*item.second);
+
+				if(!screen.getIsOnline())
 				{
 					continue;
 				}
 
 				shared_ptr<util::ParametersMap> screenPM(new ParametersMap);
-				screenPM->insert(DISPLAY_SCREEN_ID_XML_FIELD, screen->getKey());
-				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen->getComPort());
+				screenPM->insert(DISPLAY_SCREEN_ID_XML_FIELD, screen.getKey());
+				screenPM->insert(DISPLAY_SCREEN_COMPORT_XML_FIELD, screen.getComPort());
 
 				pm.insert(DISPLAY_SCREEN_XML_TAG, screenPM);
 			}

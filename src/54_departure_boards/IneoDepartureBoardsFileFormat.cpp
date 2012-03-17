@@ -21,6 +21,7 @@
 */
 
 #include "IneoDepartureBoardsFileFormat.hpp"
+
 #include "PropertiesHTMLTable.h"
 #include "DataSource.h"
 #include "AdminFunctionRequest.hpp"
@@ -191,8 +192,14 @@ namespace synthese
 				if(!pstops.empty())
 				{
 					const StopPoint* stop(pstops.begin()->second);
-					screen->setRoot(const_cast<StopArea*>(stop->getConnectionPlace()));
+
 					screen->setDisplayedPlace(stop->getConnectionPlace());
+					screen->setRoot(
+						DeparturesTableModule::GetPlaceWithDisplayBoards(
+							stop->getConnectionPlace(),
+							_env
+					)	);
+					screen->setParent(NULL);
 				}
 
 				// Screen activation

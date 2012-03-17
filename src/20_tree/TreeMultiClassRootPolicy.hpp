@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 #define SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 
+#include <memory>
 #include <boost/static_assert.hpp>
 
 namespace synthese
@@ -50,25 +51,68 @@ namespace synthese
 			TreeMultiClassRootPolicy() : _root1(NULL), _root2(NULL) {}
 
 			template<class C>
-			C* getRoot() const { return _getRoot(std::auto_ptr<C>()); }
+			C* getRoot() const { return static_cast<C*>(_getRoot(std::auto_ptr<C>())); }
+
+			bool hasRoot() const { return _root1 || _root2; }
 
 			void setRoot(C1* value){ _root1 = value; _root2 = NULL; }
 			void setRoot(C2* value){ _root2 = value; _root1 = NULL; }
+
+			const typename C1::ChildrenType& getRootChildren() const
+			{
+				if(_root1)
+				{
+					return _root1->getChildren();
+				}
+				if(_root2)
+				{
+					return _root2->getChildren();
+				}
+				throw UnconsistentTreeException();
+			}
 
 			void setSameRoot(const TreeMultiClassRootPolicy<C1, C2>& value){ _root1 = value._root1; _root2 = value._root2; }
 
 			void setNullRoot(){ _root1 = NULL; _root2 = NULL; }
 
-			template<class C>
-			void registerChildToRoot(C& child)
+			void registerChildToRoot(typename C1::ChildType& child)
 			{
-				// TODO
+				if(_root1)
+				{
+					_root1->getChildren().insert(
+						std::make_pair(child.getTreeOrderingKey(), &child)
+					);
+				}
+				else if(_root2)
+				{
+					_root2->getChildren().insert(
+						std::make_pair(child.getTreeOrderingKey(), &child)
+					);
+				}
+				else
+				{
+					throw UnconsistentTreeException();
+				}
 			}
 
-			template<class C>
-			void unregisterChildFromRoot(C& child)
+			void unregisterChildFromRoot(typename C1::ChildType& child)
 			{
-				// TODO
+				if(_root1)
+				{
+					_root1->getChildren().erase(
+						child.getTreeOrderingKey()
+					);
+				}
+				else if(_root2)
+				{
+					_root2->getChildren().erase(
+						child.getTreeOrderingKey()
+					);
+				}
+				else
+				{
+					throw UnconsistentTreeException();
+				}
 			}
 		};
 	}

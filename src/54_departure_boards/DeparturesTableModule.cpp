@@ -66,6 +66,10 @@ namespace synthese
 
 	namespace departure_boards
 	{
+		DeparturesTableModule::PlacesWithDisplayBoards DeparturesTableModule::_placesWithDisplayBoards;
+
+
+
 		DeparturesTableModule::Labels DeparturesTableModule::getDisplayTypeLabels(
 			bool withAll, /*= false*/
 			bool withNone
@@ -131,5 +135,55 @@ namespace synthese
 			}
 			return m;
 		}
-	}
-}
+
+
+
+		PlaceWithDisplayBoards* DeparturesTableModule::GetPlaceWithDisplayBoards(
+			const geography::NamedPlace* place,
+			Env& env
+		){
+			PlacesWithDisplayBoards::iterator it(
+				_placesWithDisplayBoards.find(&env)
+			);
+			if(it == _placesWithDisplayBoards.end())
+			{
+				it = _placesWithDisplayBoards.insert(
+					make_pair(
+						&env,
+						shared_ptr<Registry<PlaceWithDisplayBoards> >(
+							new Registry<PlaceWithDisplayBoards>
+				)	)	).first;
+			}
+			Registry<PlaceWithDisplayBoards>& registry(*it->second);
+			if(place)
+			{
+				if(!registry.contains(place->getKey()))
+				{
+					shared_ptr<PlaceWithDisplayBoards> result(
+						new PlaceWithDisplayBoards(place)
+					);
+					registry.add(
+						result
+					);
+					return result.get();
+				}
+				else
+				{
+					return registry.getEditable(
+						place->getKey()
+					).get();
+				}
+			}
+			else
+			{
+				return NULL;
+			}
+		}
+
+
+
+		void DeparturesTableModule::RemoveEnvFromPlacesWithDisplayBoards( util::Env& env )
+		{
+			_placesWithDisplayBoards.erase(&env);
+		}
+}	}

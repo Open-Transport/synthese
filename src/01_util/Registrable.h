@@ -54,24 +54,14 @@ namespace synthese
 			RegistryKeyType _key;	//!< ID of the object
 
 		protected:
-
 			////////////////////////////////////////////////////////////////////
 			///	Registrable constructor.
 			///	@param key ID of the object (use 0 if not determined)
 			///	@author Hugues Romain
 			///	@date 2008
 			////////////////////////////////////////////////////////////////////
-			explicit Registrable(RegistryKeyType key);
+			explicit Registrable(RegistryKeyType key = 0);
 
-
-
-			////////////////////////////////////////////////////////////////////
-			///	Registrable default constructor for building purpose only.
-			///	@throws RegistryException<void> always (should not be used)
-			///	@author Hugues Romain
-			///	@date 2008
-			////////////////////////////////////////////////////////////////////
-			Registrable();
 
 		public:
 			virtual ~Registrable();
@@ -82,7 +72,7 @@ namespace synthese
 				/// ID of the object getter.
 				///	@return the ID of the object.
 				////////////////////////////////////////////////////////////////////
-				virtual RegistryKeyType getKey() const;
+				virtual RegistryKeyType getKey() const { return _key; }
 
 
 				virtual FieldsList getFields() const { return FieldsList(); }
@@ -94,10 +84,9 @@ namespace synthese
 				/// ID of the object setter.
 				///	@param key the ID of the object to set
 				////////////////////////////////////////////////////////////////////
-				virtual void setKey(RegistryKeyType key);
+				virtual void setKey(RegistryKeyType key){ _key = key; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif

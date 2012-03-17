@@ -22,8 +22,17 @@
 
 #include "CMSModule.hpp"
 
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "FunctionWithSiteBase.hpp"
+#include "HTMLForm.h"
+#include "HTMLModule.h"
+#include "HTMLTable.h"
+#include "ModuleAdmin.h"
+#include "ObjectCreateAction.hpp"
+#include "RemoveObjectAction.hpp"
 #include "Request.h"
+#include "WebsiteAdmin.hpp"
 #include "WebsiteTableSync.hpp"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -36,8 +45,10 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
-	using namespace server;
+	using namespace admin;
 	using namespace cms;
+	using namespace server;
+	using namespace html;
 	using namespace util;
 	using namespace db;
 
@@ -166,5 +177,64 @@ namespace synthese
 				return NULL;
 			}
 			return it->second;
+		}
+
+
+
+		void CMSModule::displayAdmin(
+			std::ostream& stream,
+			const admin::AdminRequest& request
+		) const	{
+
+			// New site request
+			AdminActionFunctionRequest<ObjectCreateAction, WebsiteAdmin> createRequest(request);
+			createRequest.setActionFailedPage<ModuleAdmin>();
+			static_cast<ModuleAdmin*>(createRequest.getActionFailedPage().get())->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+			createRequest.getAction()->setTable<Website>();
+			createRequest.setActionWillCreateObject();
+
+			// Open site request
+			AdminFunctionRequest<WebsiteAdmin> openRequest(request);
+
+			// Remove site request
+			AdminActionFunctionRequest<RemoveObjectAction, ModuleAdmin> removeRequest(request);
+			removeRequest.getPage()->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+
+			// Form and table
+			HTMLForm f(createRequest.getHTMLForm("new"));
+			HTMLTable::ColsVector c;
+			c.push_back(string());
+			c.push_back("Nom");
+			c.push_back("URL");
+			c.push_back(string());
+			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+			stream << "<h1>Sites</h1>";
+			stream << f.open() << t.open();
+			BOOST_FOREACH(const Website::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<Website>())
+			{
+				// Declarations
+				const Website& site(*item.second);
+				openRequest.getPage()->setSite(item.second);
+				removeRequest.getAction()->setObjectId(site.getKey());
+
+				// Output of the row
+				stream << t.row();
+				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir");
+				stream << t.col() << site.get<Name>();
+				stream << t.col() << site.get<ClientURL>();
+
+				// Remove button
+				stream << t.col();
+				if(site.getChildren().empty())
+				{
+					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le site "+ site.get<Name>() +" ?");
+				}
+			}
+			stream << t.row();
+			stream << t.col();
+			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom)");
+			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<ClientURL>(), string(), "(URL)");
+			stream << t.col() << f.getSubmitButton("Ajouter");
+			stream << t.close() << f.close();
 		}
 }	}

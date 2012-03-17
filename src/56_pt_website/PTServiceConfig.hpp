@@ -117,28 +117,12 @@ namespace synthese
 				RollingStockFilters _rollingStockFilters;
 			//@}
 
-			//! \name Parameters
-			//@{
-				bool _onlineBookingAllowed;
-				bool _pastSolutionsDisplayed;
-				int		_maxTransportConnectionsCount;
-				bool _displayRoadApproachDetail;
-			//@}
-
-			//! \name Cached used days
-			//@{
-				bool	_useOldData;
-				boost::gregorian::date_duration		_useDateRange;
-				Periods	_periods;
-			//@}
-
-
 		public:
 			static const std::string TEMPS_MIN_CIRCULATIONS;
 			static const std::string TEMPS_MAX_CIRCULATIONS;
 
 
-			//! \name Constructeur
+			//! \name Constructor
 			//@{
 				PTServiceConfig(util::RegistryKeyType id = 0);
 			//@}
