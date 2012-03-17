@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 #define SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 
+#include "UnconsistentTreeException.hpp"
+
 #include <memory>
 #include <boost/static_assert.hpp>
 

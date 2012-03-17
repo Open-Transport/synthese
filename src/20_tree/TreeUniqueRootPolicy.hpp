@@ -54,14 +54,14 @@ namespace synthese
 
 			const typename TreeRoot<T, OrderingPolicy_>::ChildrenType& getRootChildren() const { return getRoot()->getChildren(); }
 
-			void registerChildToRoot(typename T& child)
+			void registerChildToRoot(T& child)
 			{
 				getRoot()->getChildren().insert(
 					std::make_pair(child.getTreeOrderingKey(), &child)
 				);
 			}
 
-			void unregisterChildFromRoot(typename T& child)
+			void unregisterChildFromRoot(T& child)
 			{
 				getRoot()->getChildren().erase(
 					child.getTreeOrderingKey()
