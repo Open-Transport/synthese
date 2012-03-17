@@ -151,13 +151,13 @@ namespace synthese
 					}
 					else
 					{
-						it = getRootChildren().find(this->getTreeOrderingKey());
-						if(it == getRootChildren().end())
+						it = this->getRootChildren().find(this->getTreeOrderingKey());
+						if(it == this->getRootChildren().end())
 						{
 							throw UnconsistentTreeException();
 						}
 						++it;
-						if(it == getRootChildren().end())
+						if(it == this->getRootChildren().end())
 						{
 							return NULL;
 						}
@@ -195,12 +195,12 @@ namespace synthese
 					}
 					else
 					{
-						it = getRootChildren().find(this->getTreeOrderingKey());
-						if(it == getRootChildren().end())
+						it = this->getRootChildren().find(this->getTreeOrderingKey());
+						if(it == this->getRootChildren().end())
 						{
 							throw UnconsistentTreeException();
 						}
-						if(it == getRootChildren().begin())
+						if(it == this->getRootChildren().begin())
 						{
 							return NULL;
 						}
@@ -248,7 +248,7 @@ namespace synthese
 					}
 					else
 					{
-						if(!hasRoot())
+						if(!this->hasRoot())
 						{
 							throw UnconsistentTreeException();
 						}
@@ -263,7 +263,7 @@ namespace synthese
 				}
 				else
 				{
-					if(!hasRoot())
+					if(!this->hasRoot())
 					{
 						throw UnconsistentTreeException();
 					}
