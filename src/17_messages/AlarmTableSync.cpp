@@ -37,8 +37,6 @@
 #include "MessagesRight.h"
 #include "MessagesLog.h"
 
-#include "Conversion.h"
-
 #include "DBResult.hpp"
 
 using namespace std;

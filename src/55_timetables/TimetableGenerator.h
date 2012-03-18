@@ -79,7 +79,6 @@ namespace synthese
 
 			//! @name Rendering parameters
 			//@{
-				int				_maxColumnsNumber;
 			//@}
 
 			//! @name Algorithms

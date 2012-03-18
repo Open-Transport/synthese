@@ -42,9 +42,8 @@ namespace synthese
 			_isDeparture(true),
 			_place(NULL),
 			_compulsory(PassageFacultatif),
-			_rank(UNKNOWN_VALUE),
+			_rank(0),
 			_timetableId(0)
 		{
 		}
-	}
-}
+}	}

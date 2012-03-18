@@ -29,7 +29,6 @@
 #include <algorithm>
 #include <iostream>
 
-#include "Conversion.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
 #include "StopPoint.hpp"

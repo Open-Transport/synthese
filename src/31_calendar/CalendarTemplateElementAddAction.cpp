@@ -104,8 +104,17 @@ namespace synthese
 			;
 			_interval = days(map.getDefault<int>(PARAMETER_INTERVAL, 1));
 			_positive = static_cast<CalendarTemplateElement::Operation>(map.get<int>(PARAMETER_POSITIVE));
-			_rank = map.getDefault<size_t>(PARAMETER_RANK, CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey()) + 1);
 
+			// Rank
+			optional<size_t> existingMaxRank(
+				CalendarTemplateElementTableSync::GetMaxRank(_calendar->getKey())
+			);
+			_rank = map.getDefault<size_t>(
+				PARAMETER_RANK,
+				existingMaxRank ? *existingMaxRank + 1 : 0
+			);
+
+			// Include
 			if(map.getDefault<RegistryKeyType>(PARAMETER_INCLUDE_ID, RegistryKeyType(0)))
 			{
 				try

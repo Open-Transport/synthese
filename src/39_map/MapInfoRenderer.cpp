@@ -29,7 +29,6 @@
 #include "Map.h"
 
 #include "Log.h"
-#include "Conversion.h"
 #include "StopPoint.hpp"
 
 #include <boost/algorithm/string/replace.hpp>

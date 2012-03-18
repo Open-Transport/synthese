@@ -34,7 +34,6 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-#include "Conversion.h"
 
 #include <boost/foreach.hpp>
 

@@ -138,7 +138,7 @@ namespace synthese
 				lineStop.setPhysicalStop(ps);
 				ptime d(second_clock::local_time());
 
-				for (int i(0); i<_type->getRowNumber(); ++i)
+				for (size_t i(0); i<_type->getRowNumber(); ++i)
 				{
 					ServicePointer sp(false, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET, s, d);
 					sp.setDepartureInformations(lineStop, d, d, ps);

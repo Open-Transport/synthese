@@ -216,7 +216,6 @@ namespace synthese
 			_displayStatus(DISPLAY_MONITORING_UNKNOWN),
 			_soundStatus(DISPLAY_MONITORING_UNKNOWN),
 			_temperatureStatus(DISPLAY_MONITORING_UNKNOWN),
-			_temperatureValue(static_cast<double>(UNKNOWN_VALUE)),
 			_communicationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_localizationStatus(DISPLAY_MONITORING_UNKNOWN),
 			_cpu(cpu),

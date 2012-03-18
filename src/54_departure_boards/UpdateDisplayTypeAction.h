@@ -25,7 +25,9 @@
 
 #include "FactorableTemplate.h"
 #include "Action.h"
+
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -69,8 +71,8 @@ namespace synthese
 			boost::shared_ptr<const interfaces::Interface>	_interface;
 			boost::shared_ptr<const interfaces::Interface>	_monitoringInterface;
 			boost::shared_ptr<const interfaces::Interface>	_audioInterface;
-			int	_rows_number;
-			int	_max_stops_number;
+			size_t	_rows_number;
+			boost::optional<size_t>	_max_stops_number;
 			boost::posix_time::time_duration	_timeBetweenChecks;
 			boost::shared_ptr<const cms::Webpage> _displayMainPage;
 			boost::shared_ptr<const cms::Webpage> _displayRowPage;

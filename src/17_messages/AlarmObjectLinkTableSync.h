@@ -102,7 +102,7 @@ namespace synthese
 
 			/** Remove a link between an alarm and an object specified by their id.
 				@param alarmId ID of the alarm
-				@param objectId ID of the object. UNKNOWN_VALUE = Removes all links of the alarm
+				@param objectId ID of the object. Undefined = Removes all links of the alarm
 				@author Hugues Romain
 				@date 2007
 			*/

@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_DeparturesTableRoutePlanningInterfaceElement_H__
 #define SYNTHESE_DeparturesTableRoutePlanningInterfaceElement_H__
 
-#include <string>
-
+#include "FactorableTemplate.h"
 #include "LibraryInterfaceElement.h"
+
+#include <string>
 
 namespace synthese
 {

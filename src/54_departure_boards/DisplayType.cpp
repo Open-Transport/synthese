@@ -38,13 +38,6 @@ namespace synthese
 
 	namespace departure_boards
 	{
-
-
-		int DisplayType::getRowNumber() const
-		{
-			return _rowNumber;
-		}
-
 		const Interface* DisplayType::getDisplayInterface() const
 		{
 			return _displayInterface;
@@ -62,7 +55,6 @@ namespace synthese
 			_monitoringInterface(NULL),
 			_timeBetweenChecks(minutes(1)),
 			_rowNumber(1),
-			_maxStopsNumber(UNKNOWN_VALUE),
 			_displayMainPage(NULL),
 			_displayRowPage(NULL),
 			_displayDestinationPage(NULL),
@@ -71,11 +63,6 @@ namespace synthese
 		{}
 
 
-
-		void DisplayType::setRowNumber( int number )
-		{
-			_rowNumber = number;
-		}
 
 		void DisplayType::setDisplayInterface(const Interface* interf )
 		{
@@ -87,21 +74,11 @@ namespace synthese
 			_name = name;
 		}
 
-		void DisplayType::setMaxStopsNumber( int number )
-		{
-			_maxStopsNumber = number;
-		}
-
-		int DisplayType::getMaxStopsNumber() const
-		{
-			return _maxStopsNumber;
-		}
-
 
 
 		void DisplayType::setMonitoringInterface(
 			const interfaces::Interface* value
-			) {
+		) {
 			_monitoringInterface = value;
 		}
 
@@ -109,23 +86,21 @@ namespace synthese
 
 		void DisplayType::setAudioInterface(
 			const interfaces::Interface* value
-			) {
+		) {
 			_audioInterface = value;
 		}
 
 
 
 		const interfaces::Interface* DisplayType::getMonitoringInterface(
-
-			) const {
+		) const {
 			return _monitoringInterface;
 		}
 
 
 
 		const interfaces::Interface* DisplayType::getAudioInterface(
-
-			) const {
+		) const {
 			return _audioInterface;
 		}
 
@@ -143,5 +118,4 @@ namespace synthese
 		) const {
 			return _timeBetweenChecks;
 		}
-	}
-}
+}	}

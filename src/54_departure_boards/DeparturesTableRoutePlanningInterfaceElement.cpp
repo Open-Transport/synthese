@@ -20,20 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <vector>
+#include "DeparturesTableRoutePlanningInterfaceElement.h"
 
-#include "Conversion.h"
 #include "Interface.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "Request.h"
 #include "DeparturesTableTypes.h"
-#include "DeparturesTableRoutePlanningInterfaceElement.h"
 #include "DeparturesTableRoutePlanningRowInterfacePage.h"
 #include "DeparturesTableRoutePlanningRowKeyInterfacePage.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 
+#include <vector>
 #include <boost/lexical_cast.hpp>
 
 using namespace std;
@@ -88,7 +87,7 @@ namespace synthese
 			int departuresToHide(_departuresToHide ? lexical_cast<int>(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
 			bool displayServiceNumber(_displayServiceNumber ? lexical_cast<bool>(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
 			bool displayQuai(_displayQuai ? lexical_cast<bool>(_displayQuai->getValue(parameters, variables, object, request)) : false);
-			int withtransfer(_withTransfer ? lexical_cast<bool>(_withTransfer->getValue(parameters, variables, object, request)) : false);
+			bool withtransfer(_withTransfer ? lexical_cast<bool>(_withTransfer->getValue(parameters, variables, object, request)) : false);
 			int blinkingDelay(_blinkingDelay? lexical_cast<int>(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
 			shared_ptr<const StopArea> place(StopAreaTableSync::Get(lexical_cast<RegistryKeyType>(_originId->getValue(parameters, variables, object, request)), Env::GetOfficialEnv()));
 			int departuresNumber = ptds.size() - departuresToHide;
@@ -128,7 +127,7 @@ namespace synthese
 			}
 
 			// Boucle sur les rangees
-			int rank(0);
+			size_t rank(0);
 			for (SortedRows::const_iterator it = sortedRows.begin(); it != sortedRows.end(); ++it, ++rank)
 			{
 				page->display(

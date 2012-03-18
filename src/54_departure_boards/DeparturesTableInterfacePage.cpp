@@ -56,8 +56,8 @@ namespace synthese
 			, int wiringCode
 			, bool displayServiceNumber
 			, bool displayTrackNumber
-			, bool displayTeam
-			, int intermediatesStopsToDisplay,
+			, bool displayTeam,
+			optional<size_t> intermediatesStopsToDisplay,
 			int blinkingDelay,
 			bool displayClock
 			, const pt::StopArea* place
@@ -69,7 +69,7 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(wiringCode));
 			pv.push_back(lexical_cast<string>(displayServiceNumber));
 			pv.push_back(lexical_cast<string>(displayTrackNumber));
-			pv.push_back(lexical_cast<string>(intermediatesStopsToDisplay));
+			pv.push_back(intermediatesStopsToDisplay ? lexical_cast<string>(*intermediatesStopsToDisplay) : string());
 			pv.push_back(lexical_cast<string>(displayTeam));
 			pv.push_back(place->getFullName());
 			pv.push_back(lexical_cast<string>(blinkingDelay));

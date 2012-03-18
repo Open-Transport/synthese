@@ -28,7 +28,6 @@
 #include "DBConstants.h"
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
-#include "Conversion.h"
 
 #include <sstream>
 #include <boost/thread/mutex.hpp>

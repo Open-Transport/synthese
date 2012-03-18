@@ -21,6 +21,7 @@
 
 #include "UserTableSync.h"
 
+#include "Conversion.h"
 #include "ImportableTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"

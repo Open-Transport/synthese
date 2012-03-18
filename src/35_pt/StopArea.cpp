@@ -81,8 +81,7 @@ namespace synthese
 		):	Registrable(id),
 			NamedPlaceTemplate<StopArea>(),
 			_allowedConnection(allowedConnection),
-			_defaultTransferDelay(defaultTransferDelay),
-			_score(UNKNOWN_VALUE)
+			_defaultTransferDelay(defaultTransferDelay)
 		{
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
@@ -147,12 +146,13 @@ namespace synthese
 		{
 			typedef map<const CommercialLine*, int> ScoresMap;
 
-			if (_score == UNKNOWN_VALUE)
+			if(	!_score)
 			{
-				if(!_allowedConnection)
+				// Default value
+				_score = NO_TRANSFER_HUB_SCORE;
+				
+				if(_allowedConnection)
 				{
-					_score = NO_TRANSFER_HUB_SCORE;
-				} else {
 					ScoresMap scores;
 					BOOST_FOREACH(PhysicalStops::value_type its, _physicalStops)
 					{
@@ -165,7 +165,9 @@ namespace synthese
 							if (itl == scores.end())
 							{
 								scores.insert(make_pair(route->getCommercialLine(), route->getServices().size()));
-							} else {
+							}
+							else
+							{
 								itl->second += route->getServices().size();
 							}
 						}
@@ -174,26 +176,30 @@ namespace synthese
 					BOOST_FOREACH(ScoresMap::value_type itc, scores)
 					{
 						if (itc.second <= 10)
-							_score += 1;
+						{
+							*_score += 1;
+						}
 						else if (itc.second <= 50)
-							_score += 2;
+						{
+							*_score += 2;
+						}
 						else if (itc.second <= 100)
-							_score += 3;
+						{
+							*_score += 3;
+						}
 						else
-							_score += 4;
-						if (_score > MAX_HUB_SCORE)
+						{
+							*_score += 4;
+						}
+						if (*_score > MAX_HUB_SCORE)
 						{
 							_score = MAX_HUB_SCORE;
 							break;
 						}
 					}
-					if(_score < NO_TRANSFER_HUB_SCORE)
-					{
-						_score = NO_TRANSFER_HUB_SCORE;
-					}
 				}
 			}
-			return _score;
+			return *_score;
 		}
 
 

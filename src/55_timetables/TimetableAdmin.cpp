@@ -235,8 +235,10 @@ namespace synthese
 						TimetableAddAction::PARAMETER_RANK
 						);
 					stream << t3.open();
-					int lastRank(UNKNOWN_VALUE);
-					int maxRank(TimetableTableSync::GetMaxRank(_timetable.get() ? _timetable->getKey() : 0));
+					optional<size_t> lastRank;
+					optional<size_t> maxRank(
+						TimetableTableSync::GetMaxRank(_timetable.get() ? _timetable->getKey() : 0)
+					);
 
 					// Links to folders or timetable edition
 					AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request);
@@ -248,15 +250,15 @@ namespace synthese
 
 						lastRank = tt->getRank();
 
-						stream << t3.row(lexical_cast<string>(lastRank));
-						stream << t3.col() << lastRank;
+						stream << t3.row(lexical_cast<string>(*lastRank));
+						stream << t3.col() << *lastRank;
 						stream << t3.col();
-						if (lastRank > 1)
+						if (*lastRank > 1)
 						{
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
 						}
 						stream << t3.col();
-						if (lastRank < maxRank)
+						if (maxRank && *lastRank < *maxRank)
 						{
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));
 						}
@@ -265,7 +267,7 @@ namespace synthese
 							HTMLModule::getHTMLImage(
 							Timetable::GetIcon(tt->getContentType()),
 							Timetable::GetFormatName(tt->getContentType())
-							);
+						);
 						stream << t3.col() << tt->getTitle();
 						stream <<
 							t3.col() <<
@@ -291,11 +293,12 @@ namespace synthese
 								"Etes-vous sûr de vouloir supprimer la fiche horaire "+ tt->getTitle() +" ?", "table_delete.png"
 							);
 					}
-					stream << t3.row(lexical_cast<string>(++lastRank));
+					lastRank = lastRank ? *lastRank + 1 : 0;
+					stream << t3.row(lexical_cast<string>(*lastRank));
 					vector<pair<optional<bool>, string> > booknotbook;
 					booknotbook.push_back(make_pair(true, HTMLModule::getHTMLImage("table_multiple.png","Document")));
 					booknotbook.push_back(make_pair(false, HTMLModule::getHTMLImage("table.png","Fiche horaire")));
-					stream << t3.col() << lastRank;
+					stream << t3.col() << *lastRank;
 					stream << t3.col(3) << t3.getActionForm().getRadioInputCollection(TimetableAddAction::PARAMETER_IS_BOOK, booknotbook, optional<bool>(false));
 					stream << t3.col() << t3.getActionForm().getTextInput(TimetableAddAction::PARAMETER_TITLE, string(), "(titre de la nouvelle fiche horaire)");
 					stream << t3.col(4) << t3.getActionForm().getSubmitButton("Créer");
@@ -379,8 +382,8 @@ namespace synthese
 
 					stream << t.open();
 
-					int maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
-					int lastRank(UNKNOWN_VALUE);
+					optional<size_t> maxRank(TimetableRowTableSync::GetMaxRank(_timetable->getKey()));
+					optional<size_t> lastRank;
 					set<const CommercialLine*> lines;
 					BOOST_FOREACH(const shared_ptr<TimetableRow>& row, rows)
 					{
@@ -402,14 +405,14 @@ namespace synthese
 							}
 						}
 
-						stream << t.row(lexical_cast<string>(lastRank));
+						stream << t.row(lexical_cast<string>(*lastRank));
 						stream << t.col();
-						if (lastRank > 0)
+						if (*lastRank > 0)
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_up.png", "^"));
 						stream << t.col();
-						if (lastRank < maxRank)
+						if (maxRank && *lastRank < *maxRank)
 							stream << HTMLModule::getHTMLLink(string(), HTMLModule::getHTMLImage("arrow_down.png", "V"));;
-						stream << t.col() << lastRank;
+						stream << t.col() << *lastRank;
 						if(row->getPlace())
 						{
 							stream << t.col() << row->getPlace()->getCity()->getName();
@@ -456,10 +459,11 @@ namespace synthese
 						;
 						stream << t.col() << HTMLModule::getLinkButton(deleteRowRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
 					}
+					lastRank = lastRank ? *lastRank + 1 : 0;
 					stream << t.row(string("0"));
 					stream << t.col();
 					stream << t.col();
-					stream << t.col() << ++lastRank;
+					stream << t.col() << *lastRank;
 					stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_CITY_NAME, string(), "(commune)");
 					stream << t.col() << t.getActionForm().getTextInput(TimetableRowAddAction::PARAMETER_PLACE_NAME, string(), "(arrêt)");
 					stream << t.col() << t.getActionForm().getCheckBox(TimetableRowAddAction::PARAMETER_IS_ARRIVAL, string(), true);

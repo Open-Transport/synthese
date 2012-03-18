@@ -662,22 +662,23 @@ namespace synthese
 					@param name Name of the field
 					@param mini Minimal number of the suite
 					@param maxi Maximal number of the suite
-					@param value Default value (optional / default = UNKNOWN_VALUE)
+					@param value Default value (optional / default = undefined)
 					@param step Step between each number (optional / default = 1). If step is a negative number, the choices are sorted descending.
-					@param unknownValueText Additional choice for UNKNOWN_VALUE, placed at the top of the list :
-						- if empty (default) : no UNKNOWN_VALUE choice
-						- if non empty : UNKNOWN_VALUE choice, designed by the provided text in the list
+					@param unknownValueText Additional choice for undefined value, placed at the top of the list :
+						- if empty (default) : no undefined value choice
+						- if non empty : undefined choice, designed by the provided text in the list
+					@pre mini <= maxi
 					@return std::string Select HTML Tag containing all options elements as defined above
 					@author Hugues Romain
 					@date 2008
 				*/
 				std::string getSelectNumberInput(
-					const std::string& name
-					, int mini
-					, int maxi
-					, int value=UNKNOWN_VALUE
-					, int step=1,
-					std::string unknownValueText = std::string("-1"),
+					const std::string& name,
+					size_t mini,
+					size_t maxi,
+					boost::optional<size_t> value = boost::optional<size_t>(),
+					int step = 1,
+					std::string unknownValueText = std::string(),
 					std::string nulValueText = std::string("0")
 				);
 

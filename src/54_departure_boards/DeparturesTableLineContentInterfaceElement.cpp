@@ -20,9 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <vector>
+#include "DeparturesTableLineContentInterfaceElement.h"
 
-#include "Conversion.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "Interface.h"
@@ -32,8 +31,9 @@
 #include "Request.h"
 #include "DeparturesTableTypes.h"
 #include "DeparturesTableInterfaceElement.h"
-#include "DeparturesTableLineContentInterfaceElement.h"
 #include "Service.h"
+
+#include <vector>
 
 using namespace std;
 using namespace boost;

@@ -176,10 +176,20 @@ namespace synthese
 				stream << pt.title("Identification");
 				stream << pt.cell("Nom", pt.getForm().getTextInput(SiteUpdateAction::PARAMETER_NAME, _config->get<Name>()));
 				stream << pt.title("Recherche d'itinéraires");
-				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _config->get<MaxConnections>(), 1, "illimité"));
+				stream << pt.cell("Max correspondances", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_MAX_CONNECTIONS, 0, 99, _config->get<MaxConnections>(), 1));
 				stream << pt.cell("Réservation en ligne", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_ONLINE_BOOKING, _config->get<OnlineBookingActivated>()));
 				stream << pt.cell("Affichage données passées", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_USE_OLD_DATA, _config->get<UseOldData>()));
-				stream << pt.cell("Nombre de jours chargés", pt.getForm().getSelectNumberInput(SiteUpdateAction::PARAMETER_USE_DATES_RANGE, 0, 365, _config->get<UseDatesRange>().days(), 1, "illimité"));
+				stream << pt.cell(
+					"Nombre de jours chargés",
+					pt.getForm().getSelectNumberInput(
+						SiteUpdateAction::PARAMETER_USE_DATES_RANGE,
+						1, 365,
+						_config->get<UseDatesRange>().is_special() ?
+							optional<size_t>() :
+							optional<size_t>(_config->get<UseDatesRange>().days()),
+						1,
+						"illimité"
+				)	);
 				stream << pt.cell("Affichage détail approche routière", pt.getForm().getOuiNonRadioInput(SiteUpdateAction::PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL, _config->get<DisplayRoadApproachDetails>()));
 				stream << pt.close();
 
@@ -280,7 +290,7 @@ namespace synthese
 					st.getForm().getSelectNumberInput(
 						RoutePlannerFunction::PARAMETER_MAX_SOLUTIONS_NUMBER,
 						1, 99,
-						_journeyPlanner.getMaxSolutionsNumber() ? *_journeyPlanner.getMaxSolutionsNumber() : UNKNOWN_VALUE,
+						_journeyPlanner.getMaxSolutionsNumber(),
 						1,
 						"(illimité)"
 				)	);
@@ -313,7 +323,9 @@ namespace synthese
 					st.getForm().getSelectNumberInput(
 						RoutePlannerFunction::PARAMETER_MAX_TRANSFER_DURATION,
 						1, 99,
-						_journeyPlanner.getMaxTransferDuration() ? (_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) : 60,
+						_journeyPlanner.getMaxTransferDuration() ?
+							optional<size_t>(_journeyPlanner.getMaxTransferDuration()->total_seconds() / 60) :
+							optional<size_t>(),
 						1,
 						"(illimité)"
 				)	);

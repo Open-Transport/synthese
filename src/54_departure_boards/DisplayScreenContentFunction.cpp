@@ -800,7 +800,7 @@ namespace synthese
 					else//If forward : normal display
 					{
 						map<long long,vector<ServicePointer> >::iterator it = servicePointerMap.begin();
-						int minutesCounter=0;
+						size_t minutesCounter=0;
 						for(;it!=servicePointerMap.end();it++)//For each minute
 						{
 							if(minutesCounter >= _screen->getType()->getRowNumber())

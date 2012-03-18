@@ -299,7 +299,7 @@ namespace synthese
 				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_METER_OFFSET, lexical_cast<string>(meters));
 				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STATUS, VehiclePosition::GetStatusList(), optional<VehiclePosition::Status>());
 				stream << t.col() << t.getActionForm().getSelectInput(VehiclePositionUpdateAction::PARAMETER_STOP_POINT_ID, placesList, optional<RegistryKeyType>(0));
-				stream << t.col() << t.getActionForm().getSelectNumberInput(VehiclePositionUpdateAction::PARAMETER_PASSENGERS, 0, 99, 0);
+				stream << t.col() << t.getActionForm().getSelectNumberInput(VehiclePositionUpdateAction::PARAMETER_PASSENGERS, 0, 99);
 				stream << t.col() << t.getActionForm().getTextInput(VehiclePositionUpdateAction::PARAMETER_COMMENT, string());
 				stream << t.col() << t.getActionForm().getSubmitButton("Ajouter");
 				stream << t.close();

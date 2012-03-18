@@ -27,7 +27,6 @@
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayScreenTableSync.h"
 #include "StopPointTableSync.hpp"
-#include "Conversion.h"
 #include "ArrivalDepartureTableLog.h"
 #include "StopPoint.hpp"
 

@@ -23,7 +23,6 @@
 #include "Thread.h"
 #include "ThreadException.h"
 #include "Log.h"
-#include "Conversion.h"
 
 #include <boost/thread/xtime.hpp>
 #include <boost/lexical_cast.hpp>

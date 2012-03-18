@@ -57,8 +57,8 @@ namespace synthese
 			static const std::string PARAMETER_IS_DISPLAYED;
 
 		private:
-			boost::shared_ptr<const Timetable>					_timetable;
-			int													_rank;
+			boost::shared_ptr<const Timetable>		_timetable;
+			size_t									_rank;
 			const pt::StopArea*	_place;
 			bool												_isDeparture;
 			bool												_isArrival;

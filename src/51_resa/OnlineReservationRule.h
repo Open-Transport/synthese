@@ -26,10 +26,10 @@
 #include "Registrable.h"
 #include "Registry.h"
 
-#include <boost/logic/tribool.hpp>
-
-#include <set>
 #include <map>
+#include <set>
+#include <boost/logic/tribool.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -65,7 +65,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<OnlineReservationRule>	Registry;
 
-			typedef std::set<int> CapacityThresholds;
+			typedef std::set<size_t> CapacityThresholds;
 			typedef std::map<util::RegistryKeyType, const OnlineReservationRule*> OnlineReservationRuleMap;
 
 		private:
@@ -99,7 +99,7 @@ namespace synthese
 
 			//! \name Capacity
 			//@{
-				int					_maxSeats;				//!< Nombre maximal de réservations par service (UNKNOWN_VALUE = unlimited capacity)
+				boost::optional<size_t>		_maxSeats;				//!< Nombre maximal de réservations par service (undefined = unlimited capacity)
 				CapacityThresholds	_thresholds;				//!< Paliers de nombre de réservations générant un envoi de mail d'alerte
 			//@}
 
@@ -117,7 +117,7 @@ namespace synthese
 				boost::logic::tribool			getNeedsPhone()				const;
 				boost::logic::tribool			getNeedsCustomerNumber()	const;
 				boost::logic::tribool			getNeedsEMail()				const;
-				int								getMaxSeats()				const;
+				const boost::optional<size_t>&	getMaxSeats()				const { return _maxSeats; }
 				const CapacityThresholds&		getThresholds()				const;
 				const std::string&				getSenderEMail()			const;
 				const std::string&				getSenderName()				const;
@@ -134,7 +134,7 @@ namespace synthese
 				void	setNeedsPhone(boost::logic::tribool value);
 				void	setNeedsCustomerNumber(boost::logic::tribool value);
 				void	setNeedsEMail(boost::logic::tribool value);
-				void	setMaxSeats(int value);
+				void	setMaxSeats(const boost::optional<size_t>& value){ _maxSeats = value; }
 				void	setThresholds(const CapacityThresholds& thresholds);
 				void	setSenderEMail(const std::string& value);
 				void	setSenderName(const std::string& value);
