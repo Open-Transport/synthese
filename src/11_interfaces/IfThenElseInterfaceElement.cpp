@@ -26,8 +26,6 @@
 #include "11_interfaces/StaticValueInterfaceElement.h"
 #include "11_interfaces/InterfacePageException.h"
 
-#include "01_util/Conversion.h"
-
 using namespace boost;
 using namespace std;
 

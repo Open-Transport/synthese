@@ -33,7 +33,6 @@
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
-#include "Conversion.h"
 #include "DBLogModule.h"
 #include "ScenarioFolder.h"
 #include "ScenarioFolderTableSync.h"

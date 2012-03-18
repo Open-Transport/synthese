@@ -109,7 +109,7 @@ namespace synthese
 		){
 			object->setEMail(rows->getText(OnlineReservationRuleTableSync::COL_EMAIL));
 			object->setCopyEMail(rows->getText(OnlineReservationRuleTableSync::COL_COPY_EMAIL));
-			object->setMaxSeats(rows->getInt(OnlineReservationRuleTableSync::COL_MAX_SEATS));
+			object->setMaxSeats(rows->getOptionalUnsignedInt(OnlineReservationRuleTableSync::COL_MAX_SEATS));
 			object->setNeedsAddress(rows->getTribool(OnlineReservationRuleTableSync::COL_NEEDS_ADDRESS));
 			object->setNeedsCustomerNumber(rows->getTribool(OnlineReservationRuleTableSync::COL_NEEDS_CUSTOMER_NUMBER));
 			object->setNeedsEMail(rows->getTribool(OnlineReservationRuleTableSync::COL_NEEDS_EMAIL));
@@ -173,7 +173,7 @@ namespace synthese
 			query.addField(object->getNeedsPhone());
 			query.addField(object->getNeedsEMail());
 			query.addField(object->getNeedsCustomerNumber());
-			query.addField(object->getMaxSeats());
+			query.addField(object->getMaxSeats() ? lexical_cast<string>(*object->getMaxSeats()) : string());
 			// FIXME: set<int> serialization is not correct with MySQL.
 			// thresholds is not used at the moment. This needs to be fixed once we start using it.
 			//query.addField(object->getThresholds());

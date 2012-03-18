@@ -31,7 +31,6 @@
 #include "Request.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "Conversion.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
 #include "Fetcher.h"

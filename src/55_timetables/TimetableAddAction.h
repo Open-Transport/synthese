@@ -60,7 +60,7 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<const Timetable>	_book;
-			int									_rank;
+			size_t								_rank;
 			std::string							_title;
 			bool								_isBook;
 			boost::shared_ptr<const Timetable>	_template;

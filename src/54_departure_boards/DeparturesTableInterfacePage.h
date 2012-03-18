@@ -86,9 +86,9 @@ namespace synthese
 				, int wiringCode
 				, bool displayServiceNumber
 				, bool displayTrackNumber
-				, bool displayTeam
-				, int intermediatesStopsToDisplay
-				, int blinkingDelay,
+				, bool displayTeam,
+				boost::optional<size_t> intermediatesStopsToDisplay,
+				int blinkingDelay,
 				bool displayClock
 				, const pt::StopArea* place
 				, const ArrivalDepartureListWithAlarm& rows

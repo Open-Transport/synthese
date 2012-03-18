@@ -20,9 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "InterfaceTableSync.h"
+
+#include "Conversion.h"
 #include "DBResult.hpp"
 #include "ReplaceQuery.h"
-#include "InterfaceTableSync.h"
 #include "InterfacePageTableSync.h"
 
 #include <sstream>

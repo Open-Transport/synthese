@@ -20,9 +20,10 @@
 */
 
 #include "ProfileTableSync.h"
+
+#include "Conversion.h"
 #include "Right.h"
 #include "Profile.h"
-
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"

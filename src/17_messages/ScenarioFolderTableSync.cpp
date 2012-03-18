@@ -34,8 +34,6 @@
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "MessagesLibraryRight.h"
 
-#include "Conversion.h"
-
 using namespace std;
 using namespace boost;
 

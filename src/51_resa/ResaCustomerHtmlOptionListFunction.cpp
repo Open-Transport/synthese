@@ -22,11 +22,11 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Conversion.h"
+#include "ResaCustomerHtmlOptionListFunction.h"
+
 #include "Request.h"
 #include "RequestException.h"
 #include "ResaRight.h"
-#include "ResaCustomerHtmlOptionListFunction.h"
 #include "User.h"
 #include "UserTableSync.h"
 #include "Env.h"

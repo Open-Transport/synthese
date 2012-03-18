@@ -33,7 +33,6 @@
 #include "BroadcastPointsAdmin.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayMonitoringStatusTableSync.h"
-#include "Conversion.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
 #include "AdminFunctionRequest.hpp"

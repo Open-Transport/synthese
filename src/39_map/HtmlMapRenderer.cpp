@@ -30,7 +30,6 @@
 #include "Map.h"
 
 #include "Log.h"
-#include "Conversion.h"
 #include "JourneyPattern.hpp"
 #include "LineStop.h"
 

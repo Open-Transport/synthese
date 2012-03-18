@@ -375,7 +375,7 @@ namespace synthese
 
 
 
-		int TimetableTableSync::GetMaxRank( util::RegistryKeyType bookId )
+		optional<size_t> TimetableTableSync::GetMaxRank( util::RegistryKeyType bookId )
 		{
 			DB* db = DBModule::GetDB();
 
@@ -393,9 +393,9 @@ namespace synthese
 				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
-					return rows->getInt("mr");
+					return rows->getOptionalUnsignedInt("mr");
 				}
-				return UNKNOWN_VALUE;
+				return optional<size_t>();
 			}
 			catch(DBException& e)
 			{

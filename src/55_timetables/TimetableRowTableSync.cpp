@@ -233,7 +233,7 @@ namespace synthese
 
 
 
-		int TimetableRowTableSync::GetMaxRank( util::RegistryKeyType timetableId )
+		optional<size_t> TimetableRowTableSync::GetMaxRank( util::RegistryKeyType timetableId )
 		{
 			DB* db = DBModule::GetDB();
 
@@ -244,16 +244,16 @@ namespace synthese
 				<< "SELECT MAX(" << COL_RANK << ") AS mr "
 				<< " FROM " << TABLE.NAME
 				<< " WHERE " << COL_TIMETABLE_ID << "=" << timetableId
-				;
+			;
 
 			try
 			{
 				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
-					return rows->getText("mr").empty() ? UNKNOWN_VALUE : rows->getInt("mr");
+					return rows->getOptionalUnsignedInt("mr");
 				}
-				return UNKNOWN_VALUE;
+				return optional<size_t>();
 			}
 			catch(DBException& e)
 			{

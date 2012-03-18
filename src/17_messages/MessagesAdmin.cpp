@@ -111,10 +111,13 @@ namespace synthese
 //				if (num)
 //					_searchConflict = static_cast<AlarmConflict>(*num);
 
-				int num = map.getDefault<int>(PARAMETER_SEARCH_STATUS, UNKNOWN_VALUE);
-
-				if (num != UNKNOWN_VALUE)
-					_searchStatus = static_cast<SentScenarioInheritedTableSync::StatusSearch>(num);
+				optional<int> num(
+					map.getOptional<int>(PARAMETER_SEARCH_STATUS)
+				);
+				if(num)
+				{
+					_searchStatus = static_cast<SentScenarioInheritedTableSync::StatusSearch>(*num);
+				}
 
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_SEARCH_LEVEL));
 //				if(id > encodeUId(ScenarioTableSync::TABLE.ID, 0, 0))

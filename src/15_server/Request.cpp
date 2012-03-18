@@ -22,9 +22,10 @@
 
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
+
 #include "Request.h"
+
 #include "RequestException.h"
-#include "ActionException.h"
 #include "ActionException.h"
 #include "Session.h"
 #include "SessionException.h"
@@ -32,7 +33,6 @@
 #include "Function.h"
 #include "Exception.h"
 #include "FactoryException.h"
-#include "Conversion.h"
 #include "Log.h"
 
 using namespace std;

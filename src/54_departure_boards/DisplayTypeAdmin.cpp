@@ -199,7 +199,7 @@ namespace synthese
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_ROWS_NUMBER,
 						1, 99,
-						_type->getRowNumber()
+						optional<size_t>(_type->getRowNumber())
 				)	)
 			;
 			stream << t.cell(
@@ -233,7 +233,7 @@ namespace synthese
 					t.getForm().getSelectNumberInput(
 						UpdateDisplayTypeAction::PARAMETER_TIME_BETWEEN_CHECKS,
 						1, 120,
-						_type->getTimeBetweenChecks().total_seconds() / 60,
+						optional<size_t>(_type->getTimeBetweenChecks().total_seconds() / 60),
 						1
 					)+ " minutes"
 				);

@@ -22,14 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "TreeFolderTableSync.hpp"
+
+#include "Conversion.h"
 #include "TreeFolderRoot.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

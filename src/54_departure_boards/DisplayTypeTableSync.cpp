@@ -107,7 +107,7 @@ namespace synthese
 		){
 			object->setName(rows->getText ( DisplayTypeTableSync::COL_NAME));
 			object->setRowNumber(rows->getInt ( DisplayTypeTableSync::COL_ROWS_NUMBER));
-			object->setMaxStopsNumber(rows->getInt ( DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
+			object->setMaxStopsNumber(rows->getOptionalUnsignedInt(DisplayTypeTableSync::COL_MAX_STOPS_NUMBER));
 			object->setTimeBetweenChecks(minutes(rows->getInt(DisplayTypeTableSync::COL_TIME_BETWEEN_CHECKS)));
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
@@ -243,7 +243,7 @@ namespace synthese
 			query.addField(object->getAudioInterface() ? object->getAudioInterface()->getKey() : RegistryKeyType(0));
 			query.addField(object->getMonitoringInterface() ? object->getMonitoringInterface()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRowNumber());
-			query.addField(object->getMaxStopsNumber());
+			query.addField(object->getMaxStopsNumber() ? lexical_cast<string>(*object->getMaxStopsNumber()) : string());
 			query.addField(object->getTimeBetweenChecks().total_seconds() / 60);
 			query.addField(object->getDisplayMainPage() ? object->getDisplayMainPage()->getKey() : RegistryKeyType(0));
 			query.addField(object->getDisplayRowPage() ? object->getDisplayRowPage()->getKey() : RegistryKeyType(0));

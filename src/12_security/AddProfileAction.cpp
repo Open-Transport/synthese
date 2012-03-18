@@ -70,7 +70,7 @@ namespace synthese
 					_templateProfile = ProfileTableSync::Get(*id, *_env);
 				}
 
-				// Name unicity
+				// Name uniqueness
 				Env env;
 				ProfileTableSync::Search(env, _name, string(),0,1);
 				if (!env.getRegistry<Profile>().empty())

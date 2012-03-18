@@ -25,11 +25,12 @@
 #ifndef SYNTHESE_DisplayType_H__
 #define SYNTHESE_DisplayType_H__
 
-#include <string>
-
 #include "Registrable.h"
 #include "Registry.h"
+
+#include <string>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
+#include <boost/optional.hpp>
 
 namespace synthese
 {
@@ -68,8 +69,8 @@ namespace synthese
 			const interfaces::Interface*	_displayInterface;				//!< On screen display Interface
 			const interfaces::Interface*	_audioInterface;		//!< Interface providing exchange with a vocal reading system
 			const interfaces::Interface*	_monitoringInterface;	//!< Interface used to parse monitoring outputs (see DisplayMonitoringStatus)
-			int								_rowNumber;
-			int								_maxStopsNumber;
+			size_t								_rowNumber;
+			boost::optional<size_t>				_maxStopsNumber;
 			boost::posix_time::time_duration	_timeBetweenChecks;		//!< Time between monitoring checks (0 = no value)
 
 			const cms::Webpage*	_displayMainPage;
@@ -97,8 +98,8 @@ namespace synthese
 				const interfaces::Interface*	getDisplayInterface()		const;
 				const interfaces::Interface*	getAudioInterface()			const;
 				const interfaces::Interface*	getMonitoringInterface()	const;
-				int								getRowNumber()				const;
-				int								getMaxStopsNumber()			const;
+				size_t								getRowNumber()				const { return _rowNumber; }
+				const boost::optional<size_t>&			getMaxStopsNumber()			const { return _maxStopsNumber; }
 				const boost::posix_time::time_duration&	getTimeBetweenChecks()		const;
 				const cms::Webpage*	getDisplayMainPage() const { return _displayMainPage; }
 				const cms::Webpage* getDisplayRowPage() const { return _displayRowPage; }
@@ -113,8 +114,8 @@ namespace synthese
 				void setDisplayInterface(const interfaces::Interface* interf);
 				void setAudioInterface(const interfaces::Interface* value);
 				void setMonitoringInterface(const interfaces::Interface* value);
-				void setRowNumber(int number);
-				void setMaxStopsNumber(int number);
+				void setRowNumber(size_t number){ _rowNumber = number; }
+				void setMaxStopsNumber(const boost::optional<size_t>& number){ _maxStopsNumber = number; }
 				void setTimeBetweenChecks(const boost::posix_time::time_duration& value);
 				void setDisplayMainPage(const cms::Webpage* value){ _displayMainPage = value; }
 				void setDisplayRowPage(const cms::Webpage* value){ _displayRowPage = value; }

@@ -45,15 +45,7 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<SentAlarm>	Registry;
 
-//			struct Complements
-//			{
-//				AlarmConflict	conflictStatus;
-//				int				recipientsNumber;
-//				Complements() : conflictStatus(ALARM_CONFLICT_UNKNOWN), recipientsNumber(UNKNOWN_VALUE) {}
-//			};
-
 		private:
-//			Complements					_complements;
 			const AlarmTemplate*	_template;
 
 		public:
@@ -93,9 +85,6 @@ namespace synthese
 			);
 
 			~SentAlarm();
-//			void setComplements(const Complements& complements);
-
-//			Complements						getComplements()	const;
 
 			//! @name Getters
 			//@{

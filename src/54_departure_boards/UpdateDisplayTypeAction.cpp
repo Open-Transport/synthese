@@ -128,11 +128,7 @@ namespace synthese
 				}
 
 				// Rows number
-				_rows_number = map.get<int>(PARAMETER_ROWS_NUMBER);
-				if (_rows_number < 0)
-				{
-					throw ActionException("Un nombre positif de rangées doit être choisi");
-				}
+				_rows_number = map.get<size_t>(PARAMETER_ROWS_NUMBER);
 
 				// Interface
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
@@ -218,7 +214,7 @@ namespace synthese
 				}
 
 				// Max stops number
-				_max_stops_number = map.get<int>(PARAMETER_MAX_STOPS_NUMBER);
+				_max_stops_number = map.getOptional<size_t>(PARAMETER_MAX_STOPS_NUMBER);
 				if (_max_stops_number < 0)
 				{
 					throw ActionException("Un nombre positif d'arrêts intermédiaires doit être choisi");
@@ -245,8 +241,18 @@ namespace synthese
 			DBLogModule::appendToLogIfChange(log, "Interface d'affichage", (_dt->getDisplayInterface() != NULL) ? _dt->getDisplayInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Interface de supervision", (_dt->getMonitoringInterface() != NULL) ? _dt->getMonitoringInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
 			DBLogModule::appendToLogIfChange(log, "Interface audio", (_dt->getAudioInterface() != NULL) ? _dt->getAudioInterface()->getName() : "(aucune)", (_interface.get() != NULL) ? _interface->getName() : "(aucune)");
-			DBLogModule::appendToLogIfChange(log, "Nombre de lignes", _dt->getRowNumber(), _rows_number);
-			DBLogModule::appendToLogIfChange(log, "Nombre d'arrêts intermédiaires", _dt->getMaxStopsNumber(), _max_stops_number);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Nombre de lignes",
+				lexical_cast<string>(_dt->getRowNumber()),
+				lexical_cast<string>(_rows_number)
+			);
+			DBLogModule::appendToLogIfChange(
+				log,
+				"Nombre d'arrêts intermédiaires",
+				_dt->getMaxStopsNumber() ? lexical_cast<string>(*_dt->getMaxStopsNumber()) : string(),
+				_max_stops_number ? lexical_cast<string>(*_max_stops_number) : string()
+			);
 			DBLogModule::appendToLogIfChange(log, "Temps entre les contrôles de supervision", to_simple_string(_dt->getTimeBetweenChecks()), to_simple_string(_timeBetweenChecks));
 			DBLogModule::appendToLogIfChange(
 				log,

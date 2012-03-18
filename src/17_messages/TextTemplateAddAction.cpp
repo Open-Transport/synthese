@@ -31,7 +31,6 @@
 #include "ParametersMap.h"
 #include "Request.h"
 
-#include "Conversion.h"
 #include "Env.h"
 
 using namespace std;

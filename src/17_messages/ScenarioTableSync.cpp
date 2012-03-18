@@ -26,7 +26,6 @@
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "AlarmTableSync.h"
-#include "Conversion.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"

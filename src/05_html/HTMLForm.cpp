@@ -62,49 +62,52 @@ namespace synthese
 
 
 
-		std::string HTMLForm::getSelectNumberInput(
-			const std::string& name
-			, int mini
-			, int maxi
-			, int value
-			, int step
-			, std::string unknownValueText,
+		string HTMLForm::getSelectNumberInput(
+			const std::string& name,
+			size_t mini,
+			size_t maxi,
+			optional<size_t> value,
+			int step,
+			string unknownValueText,
 			string nulValueText
 		){
-			// Right control
+			// Right check
 			if (!_updateRight)
 			{
 				return
-					(	value == 0 ?
-						nulValueText :
-						(	value == UNKNOWN_VALUE ?
-							unknownValueText :
+					value ?
+						(	*value == 0 ?
+							nulValueText :
 							lexical_cast<string>(value)
-					)	)
+						):
+						unknownValueText
 				;
 			}
 
 			// Init
-			std::vector<pair<optional<int>, string> > m;
+			std::vector<pair<optional<size_t>, string> > m;
+
+			// Undefined choice
+			if(!unknownValueText.empty())
+			{
+				m.push_back(make_pair(optional<size_t>(), unknownValueText));
+			}
 
 			// Generation of the suite
-			for(int i((step > 0) ? mini : maxi);
+			assert(mini <= maxi);
+			for(size_t i((step > 0) ? mini : maxi);
 				(step > 0) ? (i <= maxi) : (i >= mini);
 				i += step
 			){
 				m.push_back(
 					make_pair(
 						i,
-						(	i==0 ?
-							nulValueText :
-							(	i == UNKNOWN_VALUE ?
-								unknownValueText :
-								lexical_cast<string>(i)
-				)	)	)	);
+						i==0 ? nulValueText : lexical_cast<string>(i)
+				)	);
 			}
 
 			// HTML Code
-			return getSelectInput(name, m, optional<int>(value));
+			return getSelectInput(name, m, value);
 		}
 
 

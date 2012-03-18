@@ -43,7 +43,6 @@
 #include "StopPoint.hpp"
 
 #include "Log.h"
-#include "Conversion.h"
 #include "RGBColor.h"
 
 #include <geos/geom/Coordinate.h>

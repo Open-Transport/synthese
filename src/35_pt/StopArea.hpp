@@ -201,7 +201,7 @@ namespace synthese
 
 			//! @name Caching
 			//@{
-				mutable int _score;
+				mutable boost::optional<graph::HubScore> _score;
 				mutable boost::posix_time::time_duration _minTransferDelay;
 			//@}
 
@@ -209,9 +209,9 @@ namespace synthese
 		public:
 
 			StopArea(
-				util::RegistryKeyType id = 0
-				, bool allowedConnection = false
-				, boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
+				util::RegistryKeyType id = 0,
+				bool allowedConnection = false,
+				boost::posix_time::time_duration defaultTransferDelay = boost::posix_time::time_duration()
 			);
 
 			//! @name Getters

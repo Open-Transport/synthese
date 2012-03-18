@@ -31,8 +31,6 @@
 #include "DBException.hpp"
 #include "ReplaceQuery.h"
 
-#include "Conversion.h"
-
 using namespace std;
 using namespace boost;
 
