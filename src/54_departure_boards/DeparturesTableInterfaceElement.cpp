@@ -20,16 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <vector>
+#include "DeparturesTableInterfaceElement.h"
 
-#include "Conversion.h"
 #include "Interface.h"
 #include "ValueElementList.h"
 #include "InterfacePageException.h"
 #include "Request.h"
 #include "DeparturesTableTypes.h"
-#include "DeparturesTableInterfaceElement.h"
 #include "DepartureTableRowInterfacePage.h"
+
+#include <vector>
 
 using namespace std;
 using namespace boost;
@@ -107,7 +107,7 @@ namespace synthese
 			}
 
 			// Gestion des pages
-			int __NombrePages(1);
+			size_t __NombrePages(1);
 			if (__Pages != 0)
 			{
 				int departuresNumber = ptds.size() - departuresToHide;
@@ -122,7 +122,7 @@ namespace synthese
 			}
 
 			// Boucle sur les pages
-			for ( int __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
+			for ( size_t __NumeroPage = 1; __NumeroPage <= __NombrePages; __NumeroPage++ )
 			{
 				// Separateur de page
 				if ( __NumeroPage > 1 )

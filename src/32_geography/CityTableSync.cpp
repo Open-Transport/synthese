@@ -22,7 +22,7 @@
 
 #include "CityTableSync.h"
 
-#include "City.h"
+#include "Conversion.h"
 #include "GeographyModule.h"
 #include "ReplaceQuery.h"
 

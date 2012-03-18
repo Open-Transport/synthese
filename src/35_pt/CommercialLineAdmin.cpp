@@ -458,9 +458,10 @@ namespace synthese
 				);
 				stream << t.col() <<
 					t.getActionForm().getSelectNumberInput(
-					NonConcurrencyRuleAddAction::PARAMETER_DURATION,
-					0, 120
-				);
+						NonConcurrencyRuleAddAction::PARAMETER_DURATION,
+						0, 120
+					)
+				;
 
 				stream << t.col() <<
 					t.getActionForm().getSubmitButton("Ajouter");

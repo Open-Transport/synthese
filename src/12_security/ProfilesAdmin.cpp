@@ -155,10 +155,6 @@ namespace synthese
 				addProfileRequest.getHTMLForm("add"),
 				AddProfileAction::PARAMETER_TEMPLATE_ID
 			);
-			t.getActionForm().addHiddenField(
-				AddProfileAction::PARAMETER_TEMPLATE_ID,
-				lexical_cast<string>(UNKNOWN_VALUE)
-			);
 
 			stream << t.open();
 

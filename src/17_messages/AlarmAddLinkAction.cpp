@@ -33,7 +33,6 @@
 #include "MessagesLog.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
-#include "Conversion.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"

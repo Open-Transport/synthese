@@ -24,15 +24,14 @@
 
 #include "XmlBuilder.h"
 
-#include <assert.h>
-
-#include "Conversion.h"
 #include "XmlToolkit.h"
 #include "UtilTypes.h"
 #include "Log.h"
 #include "DrawableLine.h"
 #include "Map.h"
 #include "MapBackgroundManager.h"
+
+#include <assert.h>
 
 using namespace std;
 using namespace boost;

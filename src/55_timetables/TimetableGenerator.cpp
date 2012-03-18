@@ -52,7 +52,6 @@ namespace synthese
 			_transferTimetableAfter(NULL),
 			_withContinuousServices(true),
 			_env(env)
-			, _maxColumnsNumber(UNKNOWN_VALUE)
 		{}
 
 

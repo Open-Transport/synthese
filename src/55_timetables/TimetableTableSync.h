@@ -82,7 +82,7 @@ namespace synthese
 				, int delta
 			);
 
-			static int GetMaxRank(util::RegistryKeyType bookId);
+			static boost::optional<size_t> GetMaxRank(util::RegistryKeyType bookId);
 		};
 	}
 }

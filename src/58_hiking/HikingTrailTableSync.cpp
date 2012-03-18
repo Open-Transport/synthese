@@ -22,14 +22,16 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "HikingTrailTableSync.h"
+
+#include "Conversion.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
 #include "HikingRight.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

@@ -586,7 +586,7 @@ namespace synthese
 				stream << ts.col() << "S" << i;
 				stream << ts.col() << ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_NUMBER, string());
 				stream << ts.col() << ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_START_DEPARTURE_TIME, string());
-				stream << ts.col(3) << "cadence : " << ts.getActionForm().getSelectNumberInput(ServiceAddAction::PARAMETER_PERIOD, 0, 120, 0, 1, string(), "non") << " " <<
+				stream << ts.col(3) << "cadence : " << ts.getActionForm().getSelectNumberInput(ServiceAddAction::PARAMETER_PERIOD, 0, 120, optional<size_t>(0), 1, string(), "non") << " " <<
 					ts.getActionForm().getTextInput(ServiceAddAction::PARAMETER_END_DEPARTURE_TIME, string(), "(fin cadence)");
 				stream << ts.col(2) << ts.getActionForm().getSubmitButton("Créer");
 

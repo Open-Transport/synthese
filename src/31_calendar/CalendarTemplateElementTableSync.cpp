@@ -291,8 +291,9 @@ namespace synthese
 
 
 
-		int CalendarTemplateElementTableSync::GetMaxRank( RegistryKeyType calendarId )
-		{
+		optional<size_t> CalendarTemplateElementTableSync::GetMaxRank(
+			RegistryKeyType calendarId
+		){
 			DB* db = DBModule::GetDB();
 
 			stringstream query;
@@ -309,9 +310,9 @@ namespace synthese
 				DBResultSPtr rows = db->execQuery(query.str());
 				while (rows->next ())
 				{
-					return rows->getText("mr").empty() ? UNKNOWN_VALUE : rows->getInt("mr");
+					return rows->getOptionalUnsignedInt("mr");
 				}
-				return UNKNOWN_VALUE;
+				return optional<size_t>();
 			}
 			catch(DBException& e)
 			{

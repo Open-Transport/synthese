@@ -25,6 +25,7 @@
 #include "RoadPlaceTableSync.h"
 
 #include "CityTableSync.h"
+#include "Conversion.h"
 #include "GeographyModule.h"
 #include "DBModule.h"
 #include "DBResult.hpp"

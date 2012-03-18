@@ -20,10 +20,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "CentreonConfigExportFunction.h"
 
+#include "Conversion.h"
 #include "RequestException.h"
 #include "StaticFunctionRequest.h"
 #include "UniqueStringsSet.h"
@@ -44,6 +43,8 @@
 #include "AlphanumericFilter.h"
 #include "DisplayScreenContentFunction.h"
 #include "URI.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

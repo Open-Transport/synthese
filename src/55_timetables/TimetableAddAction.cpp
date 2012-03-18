@@ -35,6 +35,7 @@
 
 #include <boost/foreach.hpp>
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -129,7 +130,17 @@ namespace synthese
 						throw ActionException("No such book");
 					}
 				}
-				_rank = map.getDefault<int>(PARAMETER_RANK, TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0) + 1);
+
+				// Rank
+				optional<size_t> existingRank(
+					TimetableTableSync::GetMaxRank(_book.get() ? _book->getKey() : 0)
+				);
+				_rank = map.getDefault<size_t>(
+					PARAMETER_RANK,
+					existingRank ? *existingRank + 1 : 0
+				);
+
+				// Title
 				_title = map.getDefault<string>(PARAMETER_TITLE);
 				_isBook = map.get<bool>(PARAMETER_IS_BOOK);
 			}

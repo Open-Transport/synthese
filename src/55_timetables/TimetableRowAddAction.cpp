@@ -36,6 +36,7 @@
 #include "RoadModule.h"
 #include "StopArea.hpp"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -93,7 +94,14 @@ namespace synthese
 				throw ActionException("No such timetable");
 			}
 
-			_rank = map.getDefault<int>(PARAMETER_RANK, TimetableRowTableSync::GetMaxRank(_timetable->getKey())+1);
+			// Rank
+			optional<size_t> existingRank(
+				TimetableRowTableSync::GetMaxRank(_timetable->getKey())
+			);
+			_rank = map.getDefault<size_t>(
+				PARAMETER_RANK,
+				existingRank ? *existingRank + 1 : 0
+			);
 
 			_isArrival = map.getDefault<bool>(PARAMETER_IS_ARRIVAL, false);
 			_isDeparture = map.getDefault<bool>(PARAMETER_IS_DEPARTURE, false);

@@ -23,9 +23,10 @@
 #ifndef SYNTHESE_DeparturesTableInterfaceElement_H__
 #define SYNTHESE_DeparturesTableInterfaceElement_H__
 
-#include <string>
+#include "FactorableTemplate.h"
+#include "LibraryInterfaceElement.h"
 
-#include "11_interfaces/LibraryInterfaceElement.h"
+#include <string>
 
 namespace synthese
 {

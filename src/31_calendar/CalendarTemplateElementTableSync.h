@@ -86,7 +86,7 @@ namespace synthese
 				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);
 
-			static int GetMaxRank(util::RegistryKeyType calendarId);
+			static boost::optional<size_t> GetMaxRank(util::RegistryKeyType calendarId);
 
 			static void Clean(
 				util::RegistryKeyType calendarId,

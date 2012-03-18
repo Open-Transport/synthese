@@ -21,7 +21,6 @@
 */
 #include "MapRequest.h"
 
-#include "Conversion.h"
 #include "01_util/XmlToolkit.h"
 
 #include "35_pt/XmlBuilder.h"

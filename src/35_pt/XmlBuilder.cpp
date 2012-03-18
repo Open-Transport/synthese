@@ -26,7 +26,6 @@
 #include <assert.h>
 
 #include "StopArea.hpp"
-#include "Conversion.h"
 #include "XmlToolkit.h"
 #include "DesignatedLinePhysicalStop.hpp"
 

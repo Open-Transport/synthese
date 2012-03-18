@@ -63,7 +63,6 @@ namespace synthese
 		OnlineReservationRule::OnlineReservationRule(
 			RegistryKeyType key
 		):	Registrable(key),
-			_maxSeats(UNKNOWN_VALUE),
 			_reservationRule(NULL),
 			_eMailInterface(NULL)
 		{
@@ -104,10 +103,7 @@ namespace synthese
 			return _needsEMail;
 		}
 
-		int OnlineReservationRule::getMaxSeats() const
-		{
-			return _maxSeats;
-		}
+
 
 		const OnlineReservationRule::CapacityThresholds& OnlineReservationRule::getThresholds() const
 		{
@@ -161,10 +157,7 @@ namespace synthese
 			_needsEMail = value;
 		}
 
-		void OnlineReservationRule::setMaxSeats( int value )
-		{
-			_maxSeats = value;
-		}
+
 
 		void OnlineReservationRule::setThresholds( const CapacityThresholds& thresholds )
 		{

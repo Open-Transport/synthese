@@ -42,7 +42,6 @@
 #include "PTUseRule.h"
 #include "PTConstants.h"
 #include "CoordinatesSystem.hpp"
-#include "Conversion.h"
 #include "XmlToolkit.h"
 #include "DBTransaction.hpp"
 #include "CityAliasTableSync.hpp"

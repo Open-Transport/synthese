@@ -78,7 +78,7 @@ namespace synthese
 				@param name name to search : use LIKE syntax
 				@param surname name to search : use LIKE syntax
 				@param phone phone to search (LIKE syntax)
-				@param profileId Profile ID which user must belong (UNKNOWN_VALUE = filter deactivated)
+				@param profileId Profile ID which user must belong
 				@param emptyLogin User without login acceptation (true = user must have a login, false = user must not have a login, indeterminate = filter deactivated)
 				@param first First user to answer
 				@param number Number of users to answer (-1 = all) The size of the vector is less or equal to number, then all users were returned despite of the number limit. If the size is greater than number (actually equal to number + 1) then there is others users to show. Test it to know if the situation needs a "click for more" button.
