@@ -6,7 +6,6 @@ set(DEPS
   01_util
 )
 
-boost_test(Conversion "${DEPS}")
 boost_test(Log "${DEPS}")
 boost_test(Registrable "${DEPS}")
 boost_test(UId "${DEPS}")
