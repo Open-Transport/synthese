@@ -232,9 +232,13 @@ namespace synthese
 			VehicleService& _vehicleService,
 			const boost::gregorian::date& date,
 			const boost::posix_time::time_duration& startTime,
-			const boost::posix_time::time_duration& endTime
+			const boost::posix_time::time_duration& endTime,
+			const boost::posix_time::time_duration& startTimeD,
+			const boost::posix_time::time_duration& endTimeD
 		):	driverService(_driverService),
-			vehicleService(&_vehicleService)
+			vehicleService(&_vehicleService),
+			driverStartTime(startTimeD),
+			driverEndTime(driverEndTime)
 		{
 			const VehicleService::Services& services(_vehicleService.getServices());
 			BOOST_FOREACH(const VehicleService::Services::value_type& service, services)

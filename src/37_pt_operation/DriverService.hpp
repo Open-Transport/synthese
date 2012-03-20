@@ -90,6 +90,8 @@ namespace synthese
 				DriverService* driverService;
 				VehicleService* vehicleService;
 				std::vector<Element> elements;
+				boost::posix_time::time_duration driverStartTime;
+				boost::posix_time::time_duration driverEndTime;
 
 				Chunk(
 					VehicleService* _vehicleService = NULL
@@ -102,7 +104,9 @@ namespace synthese
 					VehicleService& _vehicleService,
 					const boost::gregorian::date& date,
 					const boost::posix_time::time_duration& startTime,
-					const boost::posix_time::time_duration& endTime
+					const boost::posix_time::time_duration& endTime,
+					const boost::posix_time::time_duration& startTimeD,
+					const boost::posix_time::time_duration& endTimeD
 				);
 			};
 
