@@ -39,6 +39,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -261,6 +262,12 @@ namespace synthese
 						if(chunk.vehicleService)
 						{
 							servicesStr << ":" << chunk.vehicleService->getKey();
+							if(	!chunk.driverStartTime.is_not_a_date_time() &&
+								!chunk.driverEndTime.is_not_a_date_time()
+							){
+								servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+								servicesStr << ":" << to_simple_string(chunk.driverEndTime);
+							}
 						}
 					}
 			}	}
@@ -298,12 +305,17 @@ namespace synthese
 					continue;
 				}
 
-				if(elementStrs.size() == 4 || itServices == services.rend())
+				if(elementStrs.size() >= 4 || itServices == services.rend())
 				{
 					DriverService::Chunk chunk;
-					if(elementStrs.size() == 4)
+					if(elementStrs.size() >= 4)
 					{
 						chunk.vehicleService = VehicleServiceTableSync::GetEditable(lexical_cast<RegistryKeyType>(elementStrs[3]), env, linkLevel).get();
+					}
+					if(elementStrs.size() >= 6)
+					{
+						chunk.driverStartTime = duration_from_string(elementStrs[4]);
+						chunk.driverEndTime = duration_from_string(elementStrs[5]);
 					}
 					services.push_back(chunk);
 					itServices = services.rbegin();
