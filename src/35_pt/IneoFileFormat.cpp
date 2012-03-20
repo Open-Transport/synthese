@@ -1186,6 +1186,27 @@ namespace synthese
 							hfin += hours(24);
 						}
 
+						// Service start and end
+						string hdebpStr(_getValue("HDEBP"));
+						time_duration hdebp(
+							hours(lexical_cast<long>(hdebpStr.substr(0,2))) +
+							minutes(lexical_cast<long>(hdebpStr.substr(2,2)))
+						);
+						string hfinpStr(_getValue("HDEBP"));
+						time_duration hfinp(
+							hours(lexical_cast<long>(hfinpStr.substr(0,2))) +
+							minutes(lexical_cast<long>(hfinpStr.substr(2,2)))
+						);
+						if(hfinp < hdebp)
+						{
+							hfinp += hours(24);
+						}
+						if(afterMidnight)
+						{
+							hdebp += hours(24);
+							hfinp += hours(24);
+						}
+
 						// Vehicle service
 						set<VehicleService*> lvs(_vehicleServices.get(vsKey));
 						if(lvs.empty())
@@ -1200,7 +1221,9 @@ namespace synthese
 								**lvs.begin(),
 								vsDate,
 								hdeb,
-								hfin
+								hfin,
+								hdebp,
+								hfinp
 						)	);
 						ds->setChunks(chunks);
 					}
