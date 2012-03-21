@@ -77,7 +77,13 @@ namespace synthese
 		DriverAllocationsListService::DriverAllocationsListService():
 			_dataSource(NULL),
 			_driver(NULL),
+			_minDate(not_a_date_time),
+			_date(not_a_date_time),
 			_page(NULL),
+			_minWorkDuration(not_a_date_time),
+			_maxWorkDuration(not_a_date_time),
+			_minWorkRange(not_a_date_time),
+			_maxWorkRange(not_a_date_time),
 			_lineFilter(NULL)
 		{}
 
