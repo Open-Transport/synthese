@@ -23,6 +23,7 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import BaseHTTPServer
+import cProfile
 import logging
 import logging.handlers
 import optparse
@@ -52,6 +53,7 @@ TIMEOUT = 10
 VERBOSE = False
 LOG_PATH = None
 LOG_SIZE_MB = 10
+PROFILING = False
 
 
 class Request(object):
@@ -67,7 +69,12 @@ class Request(object):
 class Dispatcher(object):
     def __init__(self):
         self.stop = False
-        threading.Thread(target=self.loop).start()
+        def loop():
+            if PROFILING:
+                cProfile.runctx('self.loop()', locals(), globals(), 'dispatcher.prof')
+            else:
+                self.loop()
+        threading.Thread(target=loop).start()
 
     def loop(self):
         while not self.stop:
@@ -120,18 +127,19 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if VERBOSE:
             BaseHTTPServer.BaseHTTPRequestHandler.log_message(self, format, *args)
 
+
 class StoppableHTTPServer(BaseHTTPServer.HTTPServer):
-  """This is a specialization of of BaseHTTPServer to allow it
-  to be exited cleanly (by setting its "stop" member to True).
+    """This is a specialization of of BaseHTTPServer to allow it
+    to be exited cleanly (by setting its "stop" member to True).
 
-  Stolen from http://src.chromium.org/git/chromium.git/net/tools/testserver/testserver.py
-  """
+    Stolen from http://src.chromium.org/git/chromium.git/net/tools/testserver/testserver.py
+    """
+    def serve_forever(self):
+        self.stop = False
+        while not self.stop:
+            self.handle_request()
+        self.socket.close()
 
-  def serve_forever(self):
-    self.stop = False
-    while not self.stop:
-        self.handle_request()
-    self.socket.close()
 
 def main():
     if LOG_PATH:
@@ -149,7 +157,13 @@ def main():
     dispatcher = Dispatcher()
     server_address = ('', LISTENING_PORT)
     httpd = StoppableHTTPServer(server_address, RequestHandler)
-    threading.Thread(target=httpd.serve_forever).start()
+    def httpd_serve():
+        if PROFILING:
+            cProfile.runctx('httpd.serve_forever()', locals(), globals(), 'httpd.prof')
+        else:
+            httpd.serve_forever()
+
+    threading.Thread(target=httpd_serve).start()
     log.info('Dispatcher and http server started on port %i', LISTENING_PORT)
     try:
         while True:
