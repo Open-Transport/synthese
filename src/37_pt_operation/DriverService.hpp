@@ -54,7 +54,9 @@ namespace synthese
 			static const std::string TAG_ELEMENT;
 			static const std::string TAG_VEHICLE_SERVICE;
 			static const std::string ATTR_START_TIME;
+			static const std::string ATTR_DRIVER_START_TIME;
 			static const std::string ATTR_END_TIME;
+			static const std::string ATTR_DRIVER_END_TIME;
 			static const std::string ATTR_START_STOP;
 			static const std::string ATTR_END_STOP;
 			static const std::string ATTR_WORK_DURATION;
@@ -108,15 +110,16 @@ namespace synthese
 					const boost::posix_time::time_duration& startTimeD,
 					const boost::posix_time::time_duration& endTimeD
 				);
+
+				boost::posix_time::time_duration getDriverStartTime() const;
+				boost::posix_time::time_duration getDriverEndTime() const;
 			};
 
 			typedef std::vector<Chunk> Chunks;
 			typedef util::Registry<DriverService> Registry;
 
 		private:
-			boost::posix_time::time_duration _serviceBeginning;
 			Chunks _chunks;
-			boost::posix_time::time_duration _serviceEnd;
 
 		public:
 			DriverService(util::RegistryKeyType id = 0);

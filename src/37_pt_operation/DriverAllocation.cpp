@@ -57,5 +57,46 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
 			)	)
 		{}
+
+
+
+		boost::posix_time::time_duration DriverAllocation::getWorkRange() const
+		{
+			return getServiceEnd() - getServiceBeginning();
+		}
+
+
+
+		boost::posix_time::time_duration DriverAllocation::getWorkDuration() const
+		{
+			time_duration r(minutes(0));
+			BOOST_FOREACH(const DriverService::Vector::Type::value_type& item, get<DriverService::Vector>())
+			{
+				r += item->getWorkDuration();
+			}
+			return r;
+		}
+
+
+
+		boost::posix_time::time_duration DriverAllocation::getServiceBeginning() const
+		{
+			if(!get<DriverService::Vector>().empty())
+			{
+				return (*get<DriverService::Vector>().begin())->getServiceBeginning();
+			}
+			return time_duration(not_a_date_time);
+		}
+
+
+
+		boost::posix_time::time_duration DriverAllocation::getServiceEnd() const
+		{
+			if(!get<DriverService::Vector>().empty())
+			{
+				return (*get<DriverService::Vector>().rbegin())->getServiceEnd();
+			}
+			return time_duration(not_a_date_time);
+		}
 }	}
 
