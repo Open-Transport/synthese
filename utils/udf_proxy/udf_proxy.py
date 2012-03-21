@@ -45,7 +45,7 @@ log = logging.getLogger(__name__)
 
 # New requests will be dropped once the queue is full.
 MAX_QUEUE_SIZE = 50000
-queue = Queue.LifoQueue(MAX_QUEUE_SIZE)
+dispatchers = []
 
 LISTENING_PORT = None
 TARGET_URL = None
@@ -67,8 +67,10 @@ class Request(object):
 
 
 class Dispatcher(object):
-    def __init__(self):
+    def __init__(self, target_url):
+        self.target_url = target_url
         self.stop = False
+        self.queue = Queue.LifoQueue(MAX_QUEUE_SIZE)
         def loop():
             if PROFILING:
                 cProfile.runctx('self.loop()', locals(), globals(), 'dispatcher.prof')
@@ -79,14 +81,14 @@ class Dispatcher(object):
     def loop(self):
         while not self.stop:
             try:
-                request = queue.get()
+                request = self.queue.get()
                 if VERBOSE:
-                    log.info('Dispatching request: %s (%i left)', request, queue.qsize())
+                    log.info('Dispatching request: %s (%i left)', request, self.queue.qsize())
                 if request == 'stop':
                     log.info('Stop request, exiting dispatcher')
                     break
                 try:
-                    res = urllib2.urlopen(TARGET_URL + request.path, request.data, TIMEOUT)
+                    res = urllib2.urlopen(self.target_url + request.path, request.data, TIMEOUT)
                 except urllib2.URLError, e:
                     log.warn('Exception while dispatching request %s: %s', request, e)
                     continue
@@ -94,6 +96,15 @@ class Dispatcher(object):
                     log.warn('Didn\'t get 200 code reply to request: %s', request)
             except Exception, e:
                 log.exception('Unexpected exception during dispatch:')
+
+    def status(self):
+        return 'Queue size: %i\n' % self.queue.qsize()
+
+    def add_request(self, request):
+        if self.queue.full():
+            log.warn("Queue is full, not saving request")
+        else:
+            self.queue.put(request)
 
 
 class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
@@ -106,18 +117,18 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def _handle_request(self, post_data=None):
         if VERBOSE:
-            log.info('Got request %s %s %s (queue size: %i)',
-                self.command, self.path, post_data, queue.qsize())
+            log.info('Got request %s %s %s (queue sizes: %s)',
+                self.command, self.path, post_data,
+                [d.queue.qsize() for d in dispatchers])
 
         response = 'Dummy response\n'
 
         if self.path == '/status':
-            response = 'Queue size: %i\n' % queue.qsize()
+            response = 'Queue sizes: %s\n'.format(
+                [d.queue.qsize() for d in dispatchers])
         else:
-            if queue.full():
-                log.warn("Queue is full, not saving request")
-            else:
-                queue.put(Request(self.command, self.path, post_data))
+            for dispatcher in dispatchers:
+                dispatcher.add_request(Request(self.command, self.path, post_data))
 
         self.send_response(200)
         self.end_headers()
@@ -154,7 +165,9 @@ def main():
     # XXX why is this needed?
     log.setLevel(logging.DEBUG if VERBOSE else logging.INFO)
 
-    dispatcher = Dispatcher()
+    for target_url in TARGET_URLS:
+        dispatchers.append(Dispatcher(target_url))
+    
     server_address = ('', LISTENING_PORT)
     httpd = StoppableHTTPServer(server_address, RequestHandler)
     def httpd_serve():
@@ -171,14 +184,16 @@ def main():
     except KeyboardInterrupt, e:
         log.info('Keyboard interrupt, terminating...')
         httpd.stop = True
-        dispatcher.stop = True
+        for dispatcher in dispatchers:
+            dispatcher.stop = True
         try:
             urllib2.urlopen('http://localhost:%i' % LISTENING_PORT, None, 2)
         except Exception, e:
             pass
-        while not queue.empty():
-            queue.get_nowait()
-        queue.put('stop')
+        for dispatcher in dispatchers:
+            while not dispatcher.queue.empty():
+                dispatcher.queue.get_nowait()
+            dispatcher.queue.put('stop')
 
 
 class UDFProxyDaemon(daemon.Daemon):
@@ -198,15 +213,15 @@ if __name__ == '__main__':
          default=False, help='Don\'t print logs to stderr (if not daemonized)')
     parser.add_option('-p', '--port', type='int',
          default=9080, help='Proxy listening port')
-    parser.add_option('-t', '--target-url',
+    parser.add_option('-t', '--target-urls',
          default='http://localhost:8080',
-         help='URL where to forward requests')
+         help='URLs where to forward requests (semi-colon separated)')
     parser.add_option('--log-path',
         default=join(thisdir, 'logs.txt'),
         help='Location of log file (or "no" to disable)')
     parser.add_option('--log-size-mb',
         default=10,
-        help='Maximum log size before rotaiton (in MB)')
+        help='Maximum log size before rotation (in MB)')
     parser.add_option('--pid-path',
         default=join(thisdir, 'udf_proxy.pid'),
         help='Location of pid file')
@@ -217,7 +232,7 @@ if __name__ == '__main__':
         sys.exit(1)
 
     LISTENING_PORT = options.port
-    TARGET_URL = options.target_url
+    TARGET_URLS = options.target_urls.split(';')
     VERBOSE = options.verbose
     if options.log_path != 'no':
         LOG_PATH = options.log_path
