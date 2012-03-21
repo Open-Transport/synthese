@@ -26,11 +26,14 @@
 
 #include "AdminInterfaceElementTemplate.h"
 
+#include "JourneysResult.h"
+#include "PTRoutePlannerResult.h"
 #include "ResultHTMLTable.h"
 #include "StopArea.hpp"
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/shared_ptr.hpp>
+#include <list>
 
 namespace synthese
 {
@@ -63,47 +66,60 @@ namespace synthese
 			//@}
 
 		private:
+
 			/// @name Search parameters
 			//@{
-				boost::shared_ptr<const pt::StopArea> _startPlace;
-				int _maxDistance;
+			boost::shared_ptr<const pt::StopArea> _startPlace;
+			int _maxDistance;
 
-				boost::gregorian::date _date;
-				int _beginTimeSlot;
-				int _endTimeSlot;
-				int _maxConnections;
+			boost::gregorian::date _date;
+			int _beginTimeSlot;
+			int _endTimeSlot;
+			int _maxConnections;
 
-				int _curvesStep;
-				int _maxDuration;
-				int _durationType;
-				int _frequencyType;
-				int _speed;
+			int _curvesStep;
+			int _maxDuration;
+			int _durationType;
+			int _frequencyType;
+			int _speed;
 			//@}
 
-				typedef enum {
-					DURATION_TYPE_FIXED_DATETIME = 0,
-					DURATION_TYPE_BEST = 1,
-					DURATION_TYPE_AVERAGE = 2,
-					DURATION_TYPE_MEDIAN = 3,
-					DURATION_TYPE_WORST = 4
-				} DurationType;
+			typedef enum {
+				DURATION_TYPE_FIXED_DATETIME = 0,
+				DURATION_TYPE_BEST = 1,
+				DURATION_TYPE_AVERAGE = 2,
+				DURATION_TYPE_MEDIAN = 3,
+				DURATION_TYPE_WORST = 4
+			} DurationType;
 
-				typedef enum {
-					FREQUENCY_TYPE_NO = 0,
-					FREQUENCY_TYPE_HALF_FREQUENCY_AVERAGE = 1,
-					FREQUENCY_TYPE_HALF_FREQUENCY_MEDIAN = 2,
-					FREQUENCY_TYPE_HALF_FREQUENCY_WORST = 3,
-					FREQUENCY_TYPE_AVERAGE = 4,
-					FREQUENCY_TYPE_MEDIAN = 5,
-					FREQUENCY_TYPE_WORST = 6
-				} FrequencyType;
+			typedef enum {
+				FREQUENCY_TYPE_NO = 0,
+				FREQUENCY_TYPE_HALF_FREQUENCY_AVERAGE = 1,
+				FREQUENCY_TYPE_HALF_FREQUENCY_MEDIAN = 2,
+				FREQUENCY_TYPE_HALF_FREQUENCY_WORST = 3,
+				FREQUENCY_TYPE_AVERAGE = 4,
+				FREQUENCY_TYPE_MEDIAN = 5,
+				FREQUENCY_TYPE_WORST = 6
+			} FrequencyType;
 
-				typedef struct {
-					const pt::StopArea* stop;
-					int nbSolutions;
-					int duration;
-					int distance;
-				} StopStruct;
+			typedef struct {
+				const pt::StopArea* stop;
+				int nbSolutions;
+				int duration;
+				int distance;
+				boost::posix_time::ptime lastDepartureTime;
+				std::list<boost::posix_time::ptime> timeDepartureList;
+			} StopStruct;
+
+			// Best result for each StopArea and on one IntegralSearcher iteration
+			typedef std::map<util::RegistryKeyType, algorithm::JourneysResult::ResultSet::const_iterator> BestResultsMap;
+
+			// Results by duration
+			typedef std::multimap<int, StopStruct> ResultsMap;
+
+			// ResultsMap access by StopArea
+			typedef std::map<util::RegistryKeyType, ResultsMap::iterator> ResultsMapAccess;
+
 		protected:
 
 		public:

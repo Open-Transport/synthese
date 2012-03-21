@@ -28,8 +28,8 @@
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
 #include "AnalysisModule.hpp"
-#include "GlobalRight.h"
 #include "IntegralSearcher.h"
+#include "GlobalRight.h"
 #include "ParametersMap.h"
 #include "PlacesListFunction.h"
 #include "PropertiesHTMLTable.h"
@@ -43,6 +43,7 @@
 #include "Edge.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/foreach.hpp>
 #include <queue>
 
 using namespace std;
@@ -95,8 +96,8 @@ namespace synthese
 		:	AdminInterfaceElementTemplate<IsochronAdmin>(),
 			_maxDistance(50),
 			_date(day_clock::local_day()),
-			_beginTimeSlot(3),
-			_endTimeSlot(27),
+			_beginTimeSlot(7),
+			_endTimeSlot(9),
 			_maxConnections(1),
 			_curvesStep(5),
 			_maxDuration(60),
@@ -190,7 +191,7 @@ namespace synthese
 					"ct",string(),
 					false, false, true
 			)	);
-			stream << t.cell("Distance maximale", t.getForm().getSelectNumberInput(PARAMETER_MAX_DISTANCE, 0, 200, _maxDistance, 10));
+			stream << t.cell("Distance maximale (km)", t.getForm().getSelectNumberInput(PARAMETER_MAX_DISTANCE, 0, 200, _maxDistance, 10));
 
 			stream << t.title("Paramètres du calcul d'itinéraire");
 			stream << t.cell("Date du calcul", t.getForm().getCalendarInput(PARAMETER_DATE, _date));
@@ -201,20 +202,22 @@ namespace synthese
 			stream << t.title("Paramètres de l'extraction des données");
 			stream << t.cell("Pas des courbes (min)", t.getForm().getSelectNumberInput(PARAMETER_CURVES_STEP, 1, 60, _curvesStep, 1));
 			stream << t.cell("Durée maximale (min)", t.getForm().getSelectNumberInput(PARAMETER_MAX_DURATION, 10, 300, _maxDuration, 10));
-/*
+
 			std::vector<std::pair<boost::optional<DurationType>, std::string> > durationTypesList;
-			durationTypesList.push_back(make_pair(DURATION_TYPE_FIXED_DATETIME, "Date/Heure fixée"));
-			durationTypesList.push_back(make_pair(DURATION_TYPE_BEST, "Meilleure"));
-			durationTypesList.push_back(make_pair(DURATION_TYPE_AVERAGE, "Moyenne"));
-			durationTypesList.push_back(make_pair(DURATION_TYPE_MEDIAN, "Médiane"));
-			durationTypesList.push_back(make_pair(DURATION_TYPE_WORST, "Pire"));
+			//durationTypesList.push_back(make_pair(static_cast<DurationType>(DURATION_TYPE_FIXED_DATETIME), "Date/Heure fixée"));
+			durationTypesList.push_back(make_pair(boost::optional<DurationType>(DURATION_TYPE_BEST), "Meilleure"));
+			//durationTypesList.push_back(make_pair(DURATION_TYPE_AVERAGE, "Moyenne"));
+			//durationTypesList.push_back(make_pair(DURATION_TYPE_MEDIAN, "Médiane"));
+			//durationTypesList.push_back(make_pair(DURATION_TYPE_WORST, "Pire"));
+
 			stream << t.cell(
 				"Durée de trajet prise en compte",
 				t.getForm().getSelectInput(
 					PARAMETER_DURATION_TYPE,
 					durationTypesList,
-					optional<DurationType>(_durationType)
+					optional<DurationType>(static_cast<DurationType>(_durationType))
 			)	);
+/*
 			std::vector<std::pair<boost::optional<FrequencyType>, std::string> > frequencyTypesList;
 			frequencyTypesList.push_back(make_pair(FREQUENCY_TYPE_NO, "non"));
 			frequencyTypesList.push_back(make_pair(FREQUENCY_TYPE_HALF_FREQUENCY_AVERAGE, "Demi-fréquence moyenne"));
@@ -230,8 +233,9 @@ namespace synthese
 					frequencyTypesList,
 					optional<FrequencyType>(_frequencyType)
 			)	);
-			stream << t.cell("Vitesse approche (par défaut: 4km/h)", t.getForm().getSelectNumberInput(PARAMETER_SPEED, 1, 60, _speed, 1));
 */
+			stream << t.cell("Vitesse approche (par défaut: 4km/h)", t.getForm().getSelectNumberInput(PARAMETER_SPEED, 1, 60, _speed, 1));
+
 			stream << t.close();
 
 			if(_startPlace.get())
@@ -253,83 +257,199 @@ namespace synthese
 				graphType.insert(PTModule::GRAPH_ID);
 				_startPlace->getVertexAccessMap(ovam, accessParameter, graphType);
 
-				const ptime minMaxDateTimeAtOrigin = ptime(_date,time_duration(hours(_beginTimeSlot)));
-				ptime minMaxDateTimeAtDestination = ptime(_date,time_duration(hours(_endTimeSlot)));
-
-				JourneysResult result(minMaxDateTimeAtOrigin, DEPARTURE_TO_ARRIVAL);
-				BestVertexReachesMap bestVertexReachesMap(DEPARTURE_TO_ARRIVAL, ovam, dvam, Vertex::GetMaxIndex());
 				GraphIdType graphId = PTModule::GRAPH_ID;
 
-				// Initialization of the integral searcher
-				IntegralSearcher is(
-					DEPARTURE_TO_ARRIVAL,
-					accessParameter,
-					graphId,
-					false,
-					graphId,
-					result,
-					bestVertexReachesMap,
-					ovam,
-					minMaxDateTimeAtOrigin,
-					minMaxDateTimeAtDestination,
-					minMaxDateTimeAtDestination,
-					false,
-					false,
-					boost::optional<boost::posix_time::time_duration>(),
-					70.0,
-					false,
-					logger,
-					0,
-					boost::optional<const JourneyTemplates&>()
-				);
-
-				is.integralSearch(
-					ovam,
-					optional<size_t>(_maxConnections),
-					optional<posix_time::time_duration>()
-				);
-
-				typedef multimap<int, StopStruct> ResultsMap;
 				ResultsMap resultsMap;
+				ResultsMapAccess resultsMapAccess;
+				int nbMinutes = (_endTimeSlot - _beginTimeSlot) * 60;
 
-				for(JourneysResult::ResultSet::const_iterator it(result.getJourneys().begin());
-					it != result.getJourneys().end(); it++
-				){
-					const RoutePlanningIntermediateJourney& journey(*it->first);
-					const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
-					if(!reachedVertex || !dynamic_cast<const StopArea*>(reachedVertex->getHub()))
+				// Launch IntergralSearcher for each minute of the slot [_beginTimeSlot;_endTimeSlot]
+				for(int minute=0; minute <= nbMinutes; ++minute)
+				{
+					BestVertexReachesMap bestVertexReachesMap(DEPARTURE_TO_ARRIVAL, ovam, dvam, Vertex::GetMaxIndex());
+					const ptime minMaxDateTimeAtOrigin = ptime(_date,time_duration(hours(_beginTimeSlot) + minutes(minute)));
+					ptime minMaxDateTimeAtDestination = ptime(_date,time_duration(hours(_endTimeSlot)));
+					JourneysResult result(minMaxDateTimeAtOrigin, DEPARTURE_TO_ARRIVAL);
+
+					// Initialization of the IntegralSearcher
+					IntegralSearcher is(
+						DEPARTURE_TO_ARRIVAL,
+						accessParameter,
+						graphId,
+						false,
+						graphId,
+						result,
+						bestVertexReachesMap,
+						ovam,
+						minMaxDateTimeAtOrigin,
+						minMaxDateTimeAtDestination,
+						minMaxDateTimeAtDestination,
+						false,
+						false,
+						boost::optional<boost::posix_time::time_duration>(),
+						70.0,
+						false,
+						logger,
+						0,
+						boost::optional<const JourneyTemplates&>()
+					);
+
+					// Launch IntegralSearcher
+					is.integralSearch(
+						ovam,
+						optional<size_t>(_maxConnections),
+						optional<posix_time::time_duration>()
+					);
+
+					// Fill bestResultsMap (results of this iteration)
+					BestResultsMap bestResultsMap;
+					for(JourneysResult::ResultSet::const_iterator it(result.getJourneys().begin());
+						it != result.getJourneys().end(); it++)
 					{
-						continue;
+						const RoutePlanningIntermediateJourney& journey(*it->first);
+						const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
+						if(!reachedVertex || !dynamic_cast<const StopArea*>(reachedVertex->getHub()))
+						{
+							continue;
+						}
+						const StopArea* reachedPlace = dynamic_cast<const StopArea*>(reachedVertex->getHub());
+
+						if(bestResultsMap.count(reachedPlace->getKey()) == 1)
+						{
+							if(journey.getEffectiveDuration() < (*bestResultsMap[reachedPlace->getKey()]).first->getEffectiveDuration())
+							{
+								bestResultsMap.erase(reachedPlace->getKey());
+								bestResultsMap.insert(pair<RegistryKeyType,JourneysResult::ResultSet::const_iterator>(reachedPlace->getKey(),it));
+							}
+						}
+						else
+						{
+							bestResultsMap.insert(pair<RegistryKeyType,JourneysResult::ResultSet::const_iterator>(reachedPlace->getKey(),it));
+						}
 					}
-					const StopArea* reachedPlace = dynamic_cast<const StopArea*>(reachedVertex->getHub());
-					if(!reachedPlace->getPoint())
+
+					// Fill resultsMap (results of all iterations)
+					BOOST_FOREACH(BestResultsMap::value_type it, bestResultsMap)
 					{
-						continue;
+						const RoutePlanningIntermediateJourney& journey(*(*it.second).first);
+						const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
+						if(!reachedVertex || !dynamic_cast<const StopArea*>(reachedVertex->getHub()))
+						{
+							continue;
+						}
+						const StopArea* reachedPlace = dynamic_cast<const StopArea*>(reachedVertex->getHub());
+
+						// Ignore StopArea without geometry
+						if(!reachedPlace->getPoint())
+						{
+							continue;
+						}
+
+						int distance = (int) (_startPlace->getPoint()->distance(reachedPlace->getPoint().get()) / 1000);
+						int duration = journey.getEffectiveDuration().hours() * 60 + journey.getEffectiveDuration().minutes();
+
+						// Tests time and length constraints 
+						if((distance > _maxDistance) || (duration > _maxDuration))
+						{
+							continue;
+						}
+
+						if(resultsMapAccess.count(reachedPlace->getKey()) == 1)	// Update a result in ResultsMap
+						{
+							ResultsMap::iterator itMap = resultsMapAccess[reachedPlace->getKey()];
+
+							if((minMaxDateTimeAtOrigin.time_of_day() > journey.getFirstDepartureTime(false).time_of_day()) ||
+								(journey.getFirstDepartureTime(false).time_of_day() == (*itMap).second.lastDepartureTime.time_of_day())
+							)
+							{
+								continue;
+							}
+
+							(*itMap).second.nbSolutions++;
+							(*itMap).second.lastDepartureTime = journey.getFirstDepartureTime(false);
+							(*itMap).second.timeDepartureList.push_back(journey.getFirstDepartureTime(false));
+							if((*itMap).second.duration > duration)
+							{
+								(*itMap).second.duration = duration;
+							}
+						}
+						else	// Add new a result in ResultsMap
+						{
+							StopStruct stop;
+							stop.stop = reachedPlace;
+							stop.nbSolutions = 1;
+							stop.duration = duration;
+							stop.distance = distance;
+							stop.lastDepartureTime = journey.getFirstDepartureTime();
+							stop.timeDepartureList.push_back(journey.getFirstDepartureTime(false));
+							ResultsMap::iterator itMap = resultsMap.insert(pair<int,StopStruct>(duration,stop));
+							resultsMapAccess.insert(pair<RegistryKeyType,ResultsMap::iterator>(reachedPlace->getKey(),itMap));
+						}
 					}
-
-					int distance = (int) (_startPlace->getPoint()->distance(reachedPlace->getPoint().get()) / 1000);
-					int duration = journey.getEffectiveDuration().hours() * 60 + journey.getEffectiveDuration().minutes();
-
-					if((distance > _maxDistance) || (duration > _maxDuration))
-					{
-						continue;
-					}
-
-					StopStruct stop;
-					stop.stop = reachedPlace;
-					stop.nbSolutions = 1;
-					stop.duration = duration;
-					stop.distance = distance;
-
-					resultsMap.insert(pair<int,StopStruct>(duration,stop));
 				}
-
 				stream << "<h1>Résultats</h1>";
+
+				// Draw OpenLayers map
+				stream << "<div id=\"map\" style=\"height:600px; width:800px;\" class=\"olMap\"></div>";
+//				stream << "<!--[if IE]><script src=\"/map/js/excanvas.js\"></script><![endif]-->";
+				stream << "<script src=\"/map/vendor/OpenLayers/OpenLayers.js\" type=\"text/javascript\"></script>";
+				stream << "<script src=\"/map/js/IsochronLayer.js\" type=\"text/javascript\"></script>";
+				stream << "<script type=\"text/javascript\">";
+				stream << "var map;" << endl;
+
+				stream << "map = new OpenLayers.Map('map', {projection: new OpenLayers.Projection(\"EPSG:900913\"), displayProjection: new OpenLayers.Projection(\"EPSG:4326\"), ";
+				stream << "controls: [new OpenLayers.Control.Navigation(), new OpenLayers.Control.PanZoomBar(), new OpenLayers.Control.LayerSwitcher({'ascending':false}), new OpenLayers.Control.MousePosition()]}); ";
+
+				stream << "var isochron = new Isochron.Layer(\"Isochrone\"); ";
+
+				stream << "var stops = [";
+				bool first = true;
+				for(ResultsMap::const_iterator it(resultsMap.begin()); it != resultsMap.end(); it++)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << ",";
+					}
+					shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
+						*(*it).second.stop->getPoint()
+					)	);
+					stream << "[ ";
+					stream << wgs84Point->getY();
+					stream << ", ";
+					stream << wgs84Point->getX();
+					stream << ", ";
+					stream << ((*it).second.duration);	// duration
+					stream << " ]";
+				}
+				stream << "];";
+
+				stream << "for (var stop in stops) {";
+				stream << "var coord = new OpenLayers.LonLat(stops[stop][1], stops[stop][0]);";
+				stream << "var coord2 = new Isochron.Stop(coord.transform(new OpenLayers.Projection(\"EPSG:4326\"),new OpenLayers.Projection(\"EPSG:900913\")), stops[stop][2]);";
+				stream << "isochron.addStop(coord2);";
+				stream << "}";
+
+				stream << "isochron.setOpacity(0.7);";
+				stream << "isochron.setSpeed(" << _speed << ");";
+				stream << "isochron.initSteps(" << _curvesStep << "," << _maxDuration << ",'#303030','#c0c0c0');";
+				stream << "var osm = new OpenLayers.Layer.OSM();";
+
+				stream << "map.addLayers([osm, isochron]);";
+				stream << "map.zoomToExtent(isochron.getDataExtent());";
+				stream << endl;
+				stream << "</script>";
+
+				// Display results table
 				HTMLTable::ColsVector vs;
-				vs.push_back("Commune");
-				vs.push_back("Nom arrêt");
+				vs.push_back("Arrêt");
+				vs.push_back("Nombre de solution (départs)");
 				vs.push_back("Durée (min)");
 				vs.push_back("Distance à vol d'oiseau (km)");
+				vs.push_back("Vitesse (km/h)");
 				HTMLTable tc(vs, ResultHTMLTable::CSS_CLASS);
 				stream << tc.open();
 				int step = -_curvesStep;
@@ -340,15 +460,22 @@ namespace synthese
 					{
 						step = (*it).second.duration - ((*it).second.duration % _curvesStep);
 						stream << tc.row();
-						stream << tc.col(4, string(), true);
+						stream << tc.col(5, string(), true);
 						stream << "Arrêts atteignables en " << step;
 						stream << " à " << (step + _curvesStep - 1) << " min";
 					}
 					stream << tc.row();
-					stream << tc.col() << (*it).second.stop->getCity()->getName();
-					stream << tc.col() << (*it).second.stop->getName();
+					stream << tc.col() << (*it).second.stop->getCity()->getName() << " " << (*it).second.stop->getName();
+					stream << tc.col() << (*it).second.nbSolutions;
+					stream << " (";
+					BOOST_FOREACH(const ptime time, (*it).second.timeDepartureList)
+					{
+						stream << " " << time.time_of_day();
+					}
+					stream << " )";
 					stream << tc.col() << (*it).second.duration;
 					stream << tc.col() << (*it).second.distance;
+					stream << tc.col() << ((*it).second.distance / ((float)(*it).second.duration / 60));
 				}
 				stream << tc.close();
 			}
