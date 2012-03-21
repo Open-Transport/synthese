@@ -509,3 +509,21 @@ class DirObjectLoader(object):
         object = class_(*ctor_args)
         objects[object.id] = object
         return object
+
+
+# Equivalent to synthese::util::RegistryKeyType::encodeUId (UtilTypes.cpp)
+def encode_uid(table_id, object_id, grid_node_id=1):
+    id = object_id
+    id |= (grid_node_id << 32)
+    id |= (table_id << 48)
+    return id
+
+def decode_uid(uid):
+    class UIDInfo(object):
+        def __str__(self):
+            return str(self.__dict__)
+    uid_info = UIDInfo()
+    uid_info.table_id = (uid & 0xFFFF000000000000) >> 48
+    uid_info.grid_node_id = (uid & 0x0000FFFF00000000) >> 32
+    uid_info.object_id = uid & 0x00000000FFFFFFFF
+    return uid_info
