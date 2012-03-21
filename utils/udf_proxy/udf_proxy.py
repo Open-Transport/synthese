@@ -73,7 +73,8 @@ class Dispatcher(object):
         while not self.stop:
             try:
                 request = queue.get()
-                log.info('Dispatching request: %s (%i left)', request, queue.qsize())
+                if VERBOSE:
+                    log.info('Dispatching request: %s (%i left)', request, queue.qsize())
                 if request == 'stop':
                     log.info('Stop request, exiting dispatcher')
                     break
@@ -97,8 +98,9 @@ class RequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self._handle_request(post_data)
 
     def _handle_request(self, post_data=None):
-        log.info('Got request %s %s %s (queue size: %i)',
-            self.command, self.path, post_data, queue.qsize())
+        if VERBOSE:
+            log.info('Got request %s %s %s (queue size: %i)',
+                self.command, self.path, post_data, queue.qsize())
 
         response = 'Dummy response\n'
 
@@ -208,7 +210,7 @@ if __name__ == '__main__':
     LOG_SIZE_MB = options.log_size_mb
 
     if options.no_daemon and not options.silent:
-        logging.basicConfig(level=logging.DEBUG if options.verbose else logging.INFO)
+        logging.basicConfig(level=logging.DEBUG if options.verbose else logging.WARN)
     command = args[0]
 
     if options.no_daemon or sys.platform == 'win32':
