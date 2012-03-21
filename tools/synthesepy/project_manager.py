@@ -1164,7 +1164,7 @@ The synthese.py wrapper script.
             supervisor_command = 'start' if command == 'start_supervisor' else 'stop'
             utils.call([
                 self.config.supervisorctl_path, supervisor_command,
-                'synthese-{0}'.format(self.config.project_name)])
+                'synthese-{0}'.format(self.config.project_name.replace('_', '-'))])
         elif command in ('start_initd', 'stop_initd'):
             initd_command = 'start' if command == 'start_initd' else 'stop'
             utils.call(['/etc/init.d/s3-server', initd_command])

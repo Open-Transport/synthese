@@ -269,6 +269,6 @@ class Deployer(utils.DirObjectLoader):
         self.project.bgstop()
         # TODO: this should wait until we are sure the daemon is stopped
         log.debug("Sleeping a while to let the daemon stop.")
-        ##XXX time.sleep(10)
+        time.sleep(10)
         self._restore_tables()
         self.project.bgstart()
