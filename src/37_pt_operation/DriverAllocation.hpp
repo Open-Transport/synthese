@@ -70,6 +70,10 @@ namespace synthese
 
 			DriverAllocation(util::RegistryKeyType id = 0);
 
+			boost::posix_time::time_duration getWorkRange() const;
+			boost::posix_time::time_duration getWorkDuration() const;
+			boost::posix_time::time_duration getServiceBeginning() const;
+			boost::posix_time::time_duration getServiceEnd() const;
 		};
 	}
 }

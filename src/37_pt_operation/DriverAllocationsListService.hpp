@@ -48,6 +48,11 @@ namespace synthese
 		class User;
 	}
 
+	namespace pt
+	{
+		class CommercialLine;
+	}
+
 	namespace pt_operation
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -66,18 +71,27 @@ namespace synthese
 			static const std::string PARAMETER_DATA_SOURCE_ID;
 			static const std::string PARAMETER_MIN_DATE;
 			static const std::string PARAMETER_PAGE_ID;
+			static const std::string PARAMETER_WORK_RANGE_FILTER;
+			static const std::string PARAMETER_WORK_DURATION_FILTER;
+			static const std::string PARAMETER_LINE_FILTER;
 
 			static const std::string TAG_ALLOCATION;
 			static const std::string TAG_ALLOCATIONS;
 
 		protected:
-			//! \name Page parameters
+			//! \name Parameters
 			//@{
 				const impex::DataSource* _dataSource;
 				const security::User*	_driver;
 				boost::gregorian::date _minDate;
+				boost::gregorian::date _date;
 				const cms::Webpage* _page;
 				MimeType::Type _mimeType;
+				boost::posix_time::time_duration _minWorkRange;
+				boost::posix_time::time_duration _maxWorkRange;
+				boost::posix_time::time_duration _minWorkDuration;
+				boost::posix_time::time_duration _maxWorkDuration;
+				const pt::CommercialLine* _lineFilter;
 			//@}
 
 
@@ -111,7 +125,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -143,7 +156,6 @@ namespace synthese
 			/// @date 2011
 			virtual std::string getOutputMimeType() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_DriverAllocationsListService_H__

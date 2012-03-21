@@ -24,14 +24,16 @@
 
 #include "DriverAllocationsListService.hpp"
 
+#include "CommercialLine.h"
 #include "DataSourceTableSync.h"
 #include "DriverAllocation.hpp"
 #include "DriverService.hpp"
 #include "ImportableTableSync.hpp"
+#include "JourneyPattern.hpp"
 #include "MimeTypes.hpp"
 #include "RequestException.h"
 #include "Request.h"
-#include "SchedulesBasedService.h"
+#include "ScheduledService.h"
 #include "UserTableSync.h"
 #include "Webpage.h"
 
@@ -39,7 +41,9 @@
 
 using namespace std;
 using namespace boost;
+using namespace algorithm;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -61,6 +65,9 @@ namespace synthese
 		const string DriverAllocationsListService::PARAMETER_DATA_SOURCE_ID = "data_source_id";
 		const string DriverAllocationsListService::PARAMETER_MIN_DATE = "min_date";
 		const string DriverAllocationsListService::PARAMETER_PAGE_ID = "p";
+		const string DriverAllocationsListService::PARAMETER_WORK_DURATION_FILTER = "work_duration_filter";
+		const string DriverAllocationsListService::PARAMETER_WORK_RANGE_FILTER = "work_range_filter";
+		const string DriverAllocationsListService::PARAMETER_LINE_FILTER = "line_filter";
 
 		const string DriverAllocationsListService::TAG_ALLOCATION = "allocation";
 		const string DriverAllocationsListService::TAG_ALLOCATIONS = "allocations";
@@ -70,7 +77,8 @@ namespace synthese
 		DriverAllocationsListService::DriverAllocationsListService():
 			_dataSource(NULL),
 			_driver(NULL),
-			_page(NULL)
+			_page(NULL),
+			_lineFilter(NULL)
 		{}
 
 
@@ -95,7 +103,7 @@ namespace synthese
 
 		void DriverAllocationsListService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Date
+			// Min Date
 			if(map.getDefault<string>(PARAMETER_MIN_DATE).empty())
 			{
 				_minDate = day_clock::local_day();
@@ -103,6 +111,44 @@ namespace synthese
 			else
 			{
 				_minDate = from_simple_string(map.get<string>(PARAMETER_MIN_DATE));
+			}
+
+			// Date
+			if(!map.getDefault<string>(Date::FIELD.name).empty())
+			{
+				Date::LoadFromRecord(_date, map);
+			}
+
+			// Work range filter
+			if(!map.getDefault<string>(PARAMETER_WORK_RANGE_FILTER).empty())
+			{
+				vector<string> bounds;
+				split(bounds, map.get<string>(PARAMETER_WORK_RANGE_FILTER), is_any_of(","));
+				if(bounds.size() == 2)
+				{
+					_minWorkRange = hours(lexical_cast<long>(bounds[0]));
+					_maxWorkRange = hours(lexical_cast<long>(bounds[1]));
+				}
+			}
+
+			// Work duration filter
+			if(!map.getDefault<string>(PARAMETER_WORK_DURATION_FILTER).empty())
+			{
+				vector<string> bounds;
+				split(bounds, map.get<string>(PARAMETER_WORK_DURATION_FILTER), is_any_of(","));
+				if(bounds.size() == 2)
+				{
+					_minWorkDuration = hours(lexical_cast<long>(bounds[0]));
+					_maxWorkDuration = hours(lexical_cast<long>(bounds[1]));
+				}
+			}
+
+			// Line filter
+			if(map.getDefault<RegistryKeyType>(PARAMETER_LINE_FILTER, 0))
+			{
+				_lineFilter = Env::GetOfficialEnv().get<CommercialLine>(
+					map.get<RegistryKeyType>(PARAMETER_LINE_FILTER)
+				).get();
 			}
 
 			// Display page
@@ -185,8 +231,67 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				// Checks
 
-				// Date check
+				// Min date check
 				if(!_minDate.is_not_a_date() && alloc.get<Date>() < _minDate)
+				{
+					continue;
+				}
+
+				// Date check
+				if(!_date.is_not_a_date() && alloc.get<Date>() != _date)
+				{
+					continue;
+				}
+
+				// Line filter check
+				if(_lineFilter)
+				{
+					bool ok(false);
+					BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
+					{
+						BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, service->getChunks())
+						{
+							BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
+							{
+								if(	dynamic_cast<ScheduledService*>(element.service) &&
+									dynamic_cast<JourneyPattern*>(element.service->getPath())->getCommercialLine() == _lineFilter
+								){
+									ok = true;
+									break;
+								}
+							}
+							if(ok)
+							{
+								break;
+							}
+						}
+						if(ok)
+						{
+							break;
+						}
+					}
+					if(!ok)
+					{
+						continue;
+					}
+				}
+
+				// Work range
+				if(!_minWorkRange.is_not_a_date_time() && alloc.getWorkRange() < _minWorkRange)
+				{
+					continue;
+				}
+				if(!_maxWorkRange.is_not_a_date_time() && alloc.getWorkRange() > _maxWorkRange)
+				{
+					continue;
+				}
+
+				// Work duration
+				if(!_minWorkDuration.is_not_a_date_time() && alloc.getWorkDuration() < _minWorkDuration)
+				{
+					continue;
+				}
+				if(!_maxWorkDuration.is_not_a_date_time() && alloc.getWorkDuration() > _maxWorkDuration)
 				{
 					continue;
 				}
@@ -233,6 +338,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
 					{
+						allocPM->merge(request.getFunction()->getTemplateParameters());
 						_page->display(stream, request, *allocPM);
 			}	}	}
 			else if(_mimeType == MimeTypes::XML)
