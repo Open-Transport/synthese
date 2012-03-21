@@ -120,10 +120,12 @@ namespace synthese
 			}
 
 			// Work range filter
-			if(!map.getDefault<string>(PARAMETER_WORK_RANGE_FILTER).empty())
+			string workRangeFilter(map.getDefault<string>(PARAMETER_WORK_RANGE_FILTER));
+			if(!workRangeFilter.empty())
 			{
 				vector<string> bounds;
-				split(bounds, map.get<string>(PARAMETER_WORK_RANGE_FILTER), is_any_of(","));
+
+				split(bounds, workRangeFilter, is_any_of(","));
 				if(bounds.size() == 2)
 				{
 					_minWorkRange = hours(lexical_cast<long>(bounds[0]));
@@ -132,10 +134,11 @@ namespace synthese
 			}
 
 			// Work duration filter
-			if(!map.getDefault<string>(PARAMETER_WORK_DURATION_FILTER).empty())
+			string workDurationFilter(map.getDefault<string>(PARAMETER_WORK_DURATION_FILTER));
+			if(!workDurationFilter.empty())
 			{
 				vector<string> bounds;
-				split(bounds, map.get<string>(PARAMETER_WORK_DURATION_FILTER), is_any_of(","));
+				split(bounds, workDurationFilter, is_any_of(","));
 				if(bounds.size() == 2)
 				{
 					_minWorkDuration = hours(lexical_cast<long>(bounds[0]));
