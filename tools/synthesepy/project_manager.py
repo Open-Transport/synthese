@@ -50,6 +50,7 @@ from synthesepy import db_sync
 from synthesepy import deploy
 from synthesepy import external_tools
 from synthesepy import imports
+from synthesepy import migration
 from synthesepy import proxy
 from synthesepy import utils
 
@@ -97,18 +98,11 @@ class Package(object):
         if not os.path.isdir(pages_dir):
             return
 
-        # Equivalent to synthese::util::RegistryKeyType::encodeUId (UtilTypes.cpp)
-        def encode_uid(table_id, object_id, grid_node_id=1):
-            id = object_id
-            id |= (grid_node_id << 32)
-            id |= (table_id << 48)
-            return id
-
         WEB_PAGES_TABLE_ID = 63
         SITES_TABLE_ID = 25
         # Maybe 127 would have been better for this.
         SHARED_PAGES_SITE_LOCAL_ID = 100
-        SHARED_PAGES_SITE_ID = encode_uid(
+        SHARED_PAGES_SITE_ID = utils.encode_uid(
             SITES_TABLE_ID, SHARED_PAGES_SITE_LOCAL_ID)
 
         # id structure:
@@ -146,7 +140,7 @@ class Package(object):
             assert local_site_id <= 0xff
             page_id |= local_site_id << 16
 
-            return encode_uid(WEB_PAGES_TABLE_ID, page_id)
+            return utils.encode_uid(WEB_PAGES_TABLE_ID, page_id)
 
         pages_config = {}
         execfile(join(pages_dir, 'pages.py'), {
@@ -679,6 +673,9 @@ The synthese.py wrapper script.
     @command()
     def rundaemon(self, block=True):
         """Run Synthese daemon"""
+
+        migration.maybe_migrate_schema(self)
+
         self.daemon.start()
         if not block:
             return
