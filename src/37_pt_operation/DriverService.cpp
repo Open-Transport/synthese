@@ -49,7 +49,9 @@ namespace synthese
 		const std::string DriverService::TAG_ELEMENT = "element";
 		const std::string DriverService::TAG_VEHICLE_SERVICE = "vehicle_service";
 		const std::string DriverService::ATTR_START_TIME = "start_time";
+		const std::string DriverService::ATTR_DRIVER_START_TIME = "driver_start_time";
 		const std::string DriverService::ATTR_END_TIME = "end_time";
+		const std::string DriverService::ATTR_DRIVER_END_TIME = "driver_end_time";
 		const std::string DriverService::ATTR_START_STOP = "start_stop";
 		const std::string DriverService::ATTR_END_STOP = "end_stop";
 		const std::string DriverService::ATTR_WORK_DURATION = "work_duration";
@@ -63,9 +65,7 @@ namespace synthese
 
 		DriverService::DriverService(util::RegistryKeyType id):
 			impex::ImportableTemplate<DriverService>(),
-			util::Registrable(id),
-			_serviceBeginning(not_a_date_time),
-			_serviceEnd(not_a_date_time)
+			util::Registrable(id)
 		{}
 
 
@@ -92,8 +92,8 @@ namespace synthese
 			// Service times
 			map.insert(ATTR_WORK_DURATION, getWorkDuration());
 			map.insert(ATTR_WORK_RANGE, getWorkRange());
-			map.insert(ATTR_START_TIME, getServiceBeginning());
-			map.insert(ATTR_END_TIME, getServiceEnd());
+			map.insert(ATTR_DRIVER_START_TIME, getServiceBeginning());
+			map.insert(ATTR_DRIVER_END_TIME, getServiceEnd());
 
 			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
 			{
@@ -115,6 +115,8 @@ namespace synthese
 				// Times
 				chunkPM->insert(ATTR_START_TIME, chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank));
 				chunkPM->insert(ATTR_END_TIME, chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank));
+				chunkPM->insert(ATTR_DRIVER_START_TIME, chunk.getDriverStartTime());
+				chunkPM->insert(ATTR_DRIVER_END_TIME, chunk.getDriverEndTime());
 
 				// Vehicle service
 				if(recursive && chunk.vehicleService)
@@ -169,7 +171,7 @@ namespace synthese
 
 
 
-		boost::posix_time::time_duration DriverService::getWorkRange() const
+		time_duration DriverService::getWorkRange() const
 		{
 			return getServiceEnd() - getServiceBeginning();
 		}
@@ -195,34 +197,22 @@ namespace synthese
 
 		time_duration DriverService::getServiceBeginning() const
 		{
-			if(	_serviceBeginning.is_not_a_date_time() &&
-				!_chunks.empty() &&
-				!_chunks.begin()->elements.empty()
-			){
-				const Chunk& chunk(*_chunks.begin());
-				return chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank);
-			}
-			else
+			if(_chunks.empty())
 			{
-				return _serviceEnd;
+				return time_duration(not_a_date_time);
 			}
+			return _chunks.begin()->getDriverStartTime();
 		}
 
 
 
 		time_duration DriverService::getServiceEnd() const
 		{
-			if(	_serviceEnd.is_not_a_date_time() &&
-				!_chunks.empty() &&
-				!_chunks.rbegin()->elements.empty()
-			){
-				const Chunk& chunk(*_chunks.rbegin());
-				return chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank);
-			}
-			else
+			if(_chunks.empty())
 			{
-				return _serviceEnd;
+				return time_duration(not_a_date_time);
 			}
+			return _chunks.rbegin()->getDriverEndTime();
 		}
 
 
@@ -274,5 +264,35 @@ namespace synthese
 				}
 				elements.push_back(element);
 			}
+		}
+
+
+
+		boost::posix_time::time_duration DriverService::Chunk::getDriverStartTime() const
+		{
+			if(!driverStartTime.is_not_a_date_time())
+			{
+				return driverStartTime;
+			}
+			if(!elements.empty())
+			{
+				return elements.begin()->service->getDepartureSchedule(false, elements.begin()->startRank);
+			}
+			return time_duration(not_a_date_time);
+		}
+
+
+
+		boost::posix_time::time_duration DriverService::Chunk::getDriverEndTime() const
+		{
+			if(!driverEndTime.is_not_a_date_time())
+			{
+				return driverEndTime;
+			}
+			if(!elements.empty())
+			{
+				return elements.rbegin()->service->getArrivalSchedule(false, elements.rbegin()->endRank);
+			}
+			return time_duration(not_a_date_time);
 		}
 }	}

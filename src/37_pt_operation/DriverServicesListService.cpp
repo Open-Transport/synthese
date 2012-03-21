@@ -130,7 +130,7 @@ namespace synthese
 				}
 			}
 
-			_key = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0);
+			_key = map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0);
 		}
 
 
