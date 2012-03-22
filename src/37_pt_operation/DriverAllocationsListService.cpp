@@ -311,12 +311,6 @@ namespace synthese
 					continue;
 				}
 
-				// Undefined driver : return only non linked allocations
-				if(!_driver && alloc.get<Driver>())
-				{
-					continue;
-				}
-
 				result.insert(make_pair(alloc.get<Date>(), &alloc));
 			}
 
@@ -347,7 +341,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
 					{
-						allocPM->merge(request.getFunction()->getTemplateParameters());
+						allocPM->merge(getTemplateParameters());
 						_page->display(stream, request, *allocPM);
 			}	}	}
 			else if(_mimeType == MimeTypes::XML)

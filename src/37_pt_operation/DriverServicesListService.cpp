@@ -197,7 +197,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const shared_ptr<ParametersMap>& servicePM, map.getSubMaps(TAG_SERVICE))
 					{
-						servicePM->merge(request.getFunction()->getTemplateParameters());
+						servicePM->merge(getTemplateParameters());
 						_page->display(stream, request, *servicePM);
 			}	}	}
 			else if(_mimeType == MimeTypes::XML)

@@ -94,6 +94,30 @@ namespace synthese
 			map.insert(ATTR_WORK_RANGE, getWorkRange());
 			map.insert(ATTR_DRIVER_START_TIME, getServiceBeginning());
 			map.insert(ATTR_DRIVER_END_TIME, getServiceEnd());
+			if(!getChunks().empty())
+			{
+				// Stops
+				const Importable* startStopPoint(
+					dynamic_cast<Importable*>(
+						getChunks().begin()->elements.begin()->service->getPath()->getEdge(
+							getChunks().begin()->elements.begin()->startRank
+						)->getFromVertex()
+				)	);
+				if(startStopPoint)
+				{
+					map.insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
+				}
+				const Importable* endStopPoint(
+					dynamic_cast<Importable*>(
+						getChunks().rbegin()->elements.rbegin()->service->getPath()->getEdge(
+							getChunks().rbegin()->elements.rbegin()->endRank
+						)->getFromVertex()
+				)	);
+				if(endStopPoint)
+				{
+					map.insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
+				}
+			}
 
 			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
 			{
@@ -265,6 +289,16 @@ namespace synthese
 				elements.push_back(element);
 			}
 		}
+
+
+
+		DriverService::Chunk::Chunk(
+			VehicleService* _vehicleService
+		):	driverService(NULL),
+			vehicleService(_vehicleService),
+			driverStartTime(not_a_date_time),
+			driverEndTime(not_a_date_time)
+		{}
 
 
 
