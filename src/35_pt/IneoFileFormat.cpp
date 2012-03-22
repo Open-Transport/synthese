@@ -1192,7 +1192,7 @@ namespace synthese
 							hours(lexical_cast<long>(hdebpStr.substr(0,2))) +
 							minutes(lexical_cast<long>(hdebpStr.substr(2,2)))
 						);
-						string hfinpStr(_getValue("HDEBP"));
+						string hfinpStr(_getValue("HFINP"));
 						time_duration hfinp(
 							hours(lexical_cast<long>(hfinpStr.substr(0,2))) +
 							minutes(lexical_cast<long>(hfinpStr.substr(2,2)))

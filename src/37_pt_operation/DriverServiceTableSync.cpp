@@ -312,10 +312,14 @@ namespace synthese
 					{
 						chunk.vehicleService = VehicleServiceTableSync::GetEditable(lexical_cast<RegistryKeyType>(elementStrs[3]), env, linkLevel).get();
 					}
-					if(elementStrs.size() >= 6)
+					if(elementStrs.size() >= 10)
 					{
-						chunk.driverStartTime = duration_from_string(elementStrs[4]);
-						chunk.driverEndTime = duration_from_string(elementStrs[5]);
+						chunk.driverStartTime =
+							hours(lexical_cast<long>(elementStrs[4])) +
+							minutes(lexical_cast<long>(elementStrs[5]));
+						chunk.driverEndTime =
+							hours(lexical_cast<long>(elementStrs[7])) +
+							minutes(lexical_cast<long>(elementStrs[8]));
 					}
 					services.push_back(chunk);
 					itServices = services.rbegin();
