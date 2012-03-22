@@ -157,7 +157,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(const shared_ptr<ParametersMap>& vsMap, map.getSubMaps(TAG_VEHICLE_SERVICE))
 					{
-						vsMap->merge(request.getFunction()->getTemplateParameters());
+						vsMap->merge(getTemplateParameters());
 						_page->display(stream, request, *vsMap);
 					}
 				}
