@@ -278,11 +278,11 @@ namespace synthese
 						break;
 					}
 				}
-				for(size_t i(service->getArrivalSchedules(false).size()-1); i>=0; --i)
+				for(size_t i(service->getArrivalSchedules(false).size()); i>0; --i)
 				{
-					if(service->getArrivalSchedule(false, i) <= endTime)
+					if(service->getArrivalSchedule(false, i-1) <= endTime)
 					{
-						element.endRank = i;
+						element.endRank = i-1;
 						break;
 					}
 				}
