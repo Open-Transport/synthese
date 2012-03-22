@@ -252,7 +252,7 @@ namespace synthese
 		):	driverService(_driverService),
 			vehicleService(&_vehicleService),
 			driverStartTime(startTimeD),
-			driverEndTime(driverEndTime)
+			driverEndTime(endTimeD)
 		{
 			const VehicleService::Services& services(_vehicleService.getServices());
 			BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
