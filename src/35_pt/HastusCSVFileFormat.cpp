@@ -311,6 +311,7 @@ namespace synthese
 					// Object change
 					if(lastCode != code)
 					{
+						lastCode = code;
 						distance = 0;
 					}
 
