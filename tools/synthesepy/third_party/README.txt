@@ -9,5 +9,5 @@ distribute-0.6.24.tar.gz:
   http://pypi.python.org/packages/source/d/distribute/distribute-0.6.24.tar.gz
   Note: the distribute version should match what is required in virtualenv.py
 
-pip-1.0.2.tar.gz:
-  http://pypi.python.org/packages/source/p/pip/pip-1.0.2.tar.gz#md5=47ec6ff3f6d962696fe08d4c8264ad49
+pip-1.1.tar.gz:
+  http://pypi.python.org/packages/source/p/pip/pip-1.1.tar.gz#md5=62a9f08dd5dc69d76734568a6c040508
