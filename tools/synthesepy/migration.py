@@ -35,6 +35,7 @@ def migrate_0_to_1(project, db):
     """
 
     # Update admin page ids
+    # TODO: delete old pages if there is both the new and old in the database.
     db.query('UPDATE t063_web_pages SET id=17732923532771328 WHERE id=177329235327713281;')
     db.query('UPDATE t063_web_pages SET id=17732923532771329 WHERE id=177329235327713282;')
     db.query('UPDATE t063_web_pages SET id=17732923532771330 WHERE id=177329235327713283;')
