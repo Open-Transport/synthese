@@ -58,8 +58,8 @@ namespace synthese
 				const cms::Webpage* _page;
 				MimeType::Type _mimeType;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Vehicle services list#Request
@@ -69,9 +69,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.4.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Vehicle services list#Request
@@ -83,8 +83,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			VehicleServicesListService();
 
@@ -103,9 +103,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

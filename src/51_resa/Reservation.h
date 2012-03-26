@@ -188,7 +188,7 @@ namespace synthese
 			//@{
 				ReservationStatus	getStatus()			const;
 				std::string			getFullStatusText()	const;
-				
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Reservation exporter
 				/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Reservations_in_CMS

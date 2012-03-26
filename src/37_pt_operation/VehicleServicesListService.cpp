@@ -46,13 +46,13 @@ namespace synthese
 
 	template<>
 	const string FactorableTemplate<FunctionWithSite<false>, VehicleServicesListService>::FACTORY_KEY = "VehicleServicesList";
-	
+
 	namespace pt_operation
 	{
 		const string VehicleServicesListService::PARAMETER_PAGE = "p";
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICE = "vehicleService";
 		const string VehicleServicesListService::TAG_VEHICLE_SERVICES = "vehicleServices";
-		
+
 
 
 		VehicleServicesListService::VehicleServicesListService():
@@ -112,7 +112,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			
+
 			ParametersMap map;
 
 			BOOST_FOREACH(const VehicleService::Registry::value_type& item, _env->getRegistry<VehicleService>())
@@ -170,12 +170,12 @@ namespace synthese
 			{
 				map.outputJSON(stream, TAG_VEHICLE_SERVICES);
 			}
-			
+
 			return map;
 		}
-		
-		
-		
+
+
+
 		bool VehicleServicesListService::isAuthorized(
 			const Session* session
 		) const {

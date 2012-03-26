@@ -52,7 +52,7 @@ namespace synthese
 	using namespace security;
 
 	template<> const string util::FactorableTemplate<Function,impex::SVNStorageFunction>::FACTORY_KEY("SVNStorageFunction");
-	
+
 	namespace
 	{
 		string escapeCommandLineParameter(const string& input)
@@ -268,9 +268,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		bool SVNStorageFunction::isAuthorized(
 			const Session* session
 		) const {

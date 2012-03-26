@@ -41,7 +41,7 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace security;
 	using namespace util;
-	
+
 
 	namespace util
 	{

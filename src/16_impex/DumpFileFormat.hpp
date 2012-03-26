@@ -153,7 +153,7 @@ namespace synthese
 
 				virtual void setFromParametersMap(const util::ParametersMap& map);
 
-				/** 
+				/**
 				 */
 				virtual void build(std::ostream& os) const;
 

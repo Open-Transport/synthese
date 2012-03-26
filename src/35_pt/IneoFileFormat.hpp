@@ -203,7 +203,7 @@ namespace synthese
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
 				mutable std::map<std::string, std::vector<int> > _calendars;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
-				
+
 				typedef std::map<std::pair<std::string, boost::gregorian::date>, security::User*> Allocations;
 				mutable Allocations _allocations;
 

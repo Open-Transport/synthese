@@ -40,7 +40,7 @@ namespace synthese
 {
 	using namespace impex;
 	using namespace util;
-	
+
 	FIELD_DEFINITION_OF_TYPE(DataSourceLinks, "data_source_links", SQL_TEXT)
 
 	void ObjectField<DataSourceLinks, void*>::LoadFromRecord(
@@ -79,7 +79,7 @@ namespace synthese
 		string s(Serialize(impObject.getDataSourceLinks()));
 		map.insert(prefix + FIELD.name, s);
 	}
-	
+
 
 
 	void ObjectField<DataSourceLinks, DataSourceLinks::Type>::GetLinkedObjectsIds(

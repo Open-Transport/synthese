@@ -63,7 +63,7 @@ namespace synthese
 	// Use dates range
 	FIELD_DEFINITION_OF_TYPE(UseDatesRange, "use_dates_range", SQL_INTEGER)
 	FIELD_NO_LINKED_OBJECT_ID(UseDatesRange)
-	
+
 	template<>
 	void ObjectField<UseDatesRange, UseDatesRange::Type>::UnSerialize(
 		UseDatesRange::Type& fieldObject,
@@ -90,7 +90,7 @@ namespace synthese
 	// Periods
 	FIELD_DEFINITION_OF_TYPE(Periods, "periods", SQL_TEXT)
 	FIELD_NO_LINKED_OBJECT_ID(Periods)
-	
+
 	template<>
 	void ObjectField<Periods, Periods::Type>::UnSerialize(
 		Periods::Type& fieldObject,
@@ -117,7 +117,7 @@ namespace synthese
 			fieldObject.push_back(period);
 		}
 	}
-	
+
 	template<>
 	std::string ObjectField<Periods, Periods::Type>::Serialize(
 		const Periods::Type& fieldObject,

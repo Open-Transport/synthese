@@ -143,7 +143,7 @@ namespace synthese
 		/// The name of the table corresponding to the template instantiation (must be unique within SYNTHESE)
 		static const std::string TABLE_NAME;
 
-		
+
 	private:
 		/// Mutable to allow references to the object for the get method (boost::fusion does not handle const references)
 		mutable Schema _schema;
@@ -285,7 +285,7 @@ namespace synthese
 			const Object<ObjectClass_, Schema_>& _object;
 			const boost::logic::tribool _withFiles;
 			const std::string& _prefix;
-			
+
 			SaveOperator(
 				util::ParametersMap& map,
 				const Object<ObjectClass_, Schema_>& object,

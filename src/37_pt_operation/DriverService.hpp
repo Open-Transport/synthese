@@ -98,7 +98,7 @@ namespace synthese
 				Chunk(
 					VehicleService* _vehicleService = NULL
 				);
-				
+
 				Chunk(
 					DriverService* _driverService,
 					VehicleService& _vehicleService,

@@ -45,7 +45,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace security;
-	
+
 
 	namespace util
 	{
@@ -88,8 +88,8 @@ namespace synthese
 			Field()
 		};
 
-		
-		
+
+
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<ReservationTransactionTableSync>::GetIndexes()
 		{
@@ -117,7 +117,7 @@ namespace synthese
 			) try {
 				object->setCustomer(
 					UserTableSync::GetEditable(object->getCustomerUserId(), env, linkLevel).get()
-				);				
+				);
 			}
 			catch(ObjectNotFoundException<User>&)
 			{

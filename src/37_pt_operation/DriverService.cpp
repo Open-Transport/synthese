@@ -34,7 +34,7 @@ namespace synthese
 	using namespace pt;
 	using namespace pt_operation;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<>
@@ -173,7 +173,7 @@ namespace synthese
 					elementPM->insert(ATTR_CLASS, dynamic_cast<ScheduledService*>(element.service) ? VALUE_COMMERCIAL : VALUE_DEAD_RUN);
 					elementPM->insert(ATTR_START_TIME, element.service->getDepartureSchedule(false, element.startRank));
 					elementPM->insert(ATTR_END_TIME, element.service->getArrivalSchedule(false, element.endRank));
-					
+
 					const Importable* startStopPoint(dynamic_cast<Importable*>(element.service->getPath()->getEdge(element.startRank)->getFromVertex()));
 					if(startStopPoint)
 					{

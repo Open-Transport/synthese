@@ -61,17 +61,17 @@ namespace synthese
 			//! @name Getters/Setters
 			//@{
 				/** Gets official name of this place.
-	
+
 					@return aliased place official name.
 				 */
 				const std::string& getOfficialName () const;
-	
-	
+
+
 				/** Gets aliased place.
 				 */
 				const NamedPlace* getAliasedPlace () const;
-	
-	
+
+
 				void setAliasedPlace(const NamedPlace* place);
 			//@}
 

@@ -5,7 +5,7 @@ def generate_stats(stat_name):
     p = pstats.Stats('{0}.prof'.format(stat_name), stream=stream)
     #kind = 'cumulative'
     kind = 'time'
-    p.sort_stats(kind).print_stats() 
+    p.sort_stats(kind).print_stats()
 
 for stat_name in ('httpd', 'dispatcher'):
     generate_stats(stat_name)
