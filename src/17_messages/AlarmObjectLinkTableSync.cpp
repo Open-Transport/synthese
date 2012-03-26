@@ -118,7 +118,7 @@ namespace synthese
 			}
 			catch(FactoryException<AlarmRecipient> e)
 			{
-				throw LoadException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, "Unconsistent recipient type");
+				throw LoadException<AlarmObjectLinkTableSync>(rows, AlarmObjectLinkTableSync::COL_RECIPIENT_KEY, "Inconsistent recipient type");
 			}
 			catch(ObjectNotFoundException<Alarm> e)
 			{
