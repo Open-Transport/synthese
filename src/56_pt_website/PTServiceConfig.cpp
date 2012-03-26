@@ -70,6 +70,11 @@ namespace synthese
 		const std::string& text,
 		const Env& env
 	){
+		if(text.empty())
+		{
+			fieldObject = days(0);
+			return;
+		}
 		fieldObject = days(lexical_cast<int>(text));
 	}
 
