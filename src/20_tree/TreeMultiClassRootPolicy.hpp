@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 #define SYNTHESE_tree_TreeMultiClassRootPolicy_hpp__
 
-#include "UnconsistentTreeException.hpp"
+#include "InconsistentTreeException.hpp"
 
 #include <memory>
 #include <boost/static_assert.hpp>
@@ -70,7 +70,7 @@ namespace synthese
 				{
 					return _root2->getChildren();
 				}
-				throw UnconsistentTreeException();
+				throw InconsistentTreeException();
 			}
 
 			void setSameRoot(const TreeMultiClassRootPolicy<C1, C2>& value){ _root1 = value._root1; _root2 = value._root2; }
@@ -93,7 +93,7 @@ namespace synthese
 				}
 				else
 				{
-					throw UnconsistentTreeException();
+					throw InconsistentTreeException();
 				}
 			}
 
@@ -113,7 +113,7 @@ namespace synthese
 				}
 				else
 				{
-					throw UnconsistentTreeException();
+					throw InconsistentTreeException();
 				}
 			}
 		};

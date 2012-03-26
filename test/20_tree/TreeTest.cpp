@@ -57,21 +57,21 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_OtherClassRoot)
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(node1.getRoot() == NULL);
 //	TODO
-//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setRoot(&root);
 	BOOST_CHECK(root.getChildren().empty());
 	BOOST_CHECK(node1.getChildren().empty());
 	BOOST_CHECK(node1.getRoot() == &root);
-//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setParent(NULL);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
@@ -177,11 +177,11 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_UniqueRoot)
 	BOOST_CHECK(node1.getChildren().empty());
 
 	//	TODO
-	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setParent(NULL);
 	BOOST_REQUIRE_EQUAL(node1.getRoot()->getChildren().size(), 1);
@@ -275,11 +275,11 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK(node1.getRoot<TR2>() == NULL);
 
 	//	TODO
-	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setRoot(&root);
 	BOOST_CHECK(root.getChildren().empty());
@@ -288,11 +288,11 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot1)
 	BOOST_CHECK(node1.hasRoot());
 	BOOST_CHECK(node1.getRoot<TR1>() == &root);
 	BOOST_CHECK(node1.getRoot<TR2>() == NULL);
-	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setParent(NULL);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);
@@ -411,11 +411,11 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node1.getRoot<TR22>() == NULL);
 
 	//	TODO
-	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setRoot(&root);
 	BOOST_CHECK(root.getChildren().empty());
@@ -424,11 +424,11 @@ BOOST_AUTO_TEST_CASE(Tree_Rank_MultiClassRoot2)
 	BOOST_CHECK(node1.hasRoot());
 	BOOST_CHECK(node1.getRoot<TR21>() == NULL);
 	BOOST_CHECK(node1.getRoot<TR22>() == &root);
-	//	BOOST_CHECK_THROW(node1.getParent(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getRank(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getDepth(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), UnconsistentTreeException);
-	//	BOOST_CHECK_THROW(node1.getNextSibling(), UnconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getParent(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getRank(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getDepth(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getPreviousSibling(), InconsistentTreeException);
+	//	BOOST_CHECK_THROW(node1.getNextSibling(), InconsistentTreeException);
 
 	node1.setParent(NULL);
 	BOOST_REQUIRE_EQUAL(root.getChildren().size(), 1);

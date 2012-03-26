@@ -255,7 +255,7 @@ namespace synthese
 					}
 					else
 					{
-						stream << t.col() << "Unconsistent city " << link->getObjectId();
+						stream << t.col() << "Inconsistent city " << link->getObjectId();
 						stream << t.col();
 					}
 					stream << t.col() << HTMLModule::getLinkButton(cityRemoveRequest.getHTMLForm().getURL(), "Supprimer", "Etes-vous sûe de vouloir supprimer le lien ?");

@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_util_TreeNode_hpp__
 #define SYNTHESE_util_TreeNode_hpp__
 
-#include "UnconsistentTreeException.hpp"
+#include "InconsistentTreeException.hpp"
 
 #include <map>
 #include <deque>
@@ -132,7 +132,7 @@ namespace synthese
 				{
 					if(!_parent)
 					{
-						throw UnconsistentTreeException();
+						throw InconsistentTreeException();
 					}
 
 					typename ChildrenType::const_iterator it;
@@ -141,7 +141,7 @@ namespace synthese
 						it = (*_parent)->_children.find(this->getTreeOrderingKey());
 						if(it == (*_parent)->_children.end())
 						{
-							throw UnconsistentTreeException();
+							throw InconsistentTreeException();
 						}
 						++it;
 						if(it == (*_parent)->_children.end())
@@ -154,7 +154,7 @@ namespace synthese
 						it = this->getRootChildren().find(this->getTreeOrderingKey());
 						if(it == this->getRootChildren().end())
 						{
-							throw UnconsistentTreeException();
+							throw InconsistentTreeException();
 						}
 						++it;
 						if(it == this->getRootChildren().end())
@@ -178,7 +178,7 @@ namespace synthese
 				{
 					if(!_parent)
 					{
-						throw UnconsistentTreeException();
+						throw InconsistentTreeException();
 					}
 					typename ChildrenType::const_iterator it;
 					if(*_parent)
@@ -186,7 +186,7 @@ namespace synthese
 						it = (*_parent)->_children.find(this->getTreeOrderingKey());
 						if(it == (*_parent)->_children.end())
 						{
-							throw UnconsistentTreeException();
+							throw InconsistentTreeException();
 						}
 						if(it == (*_parent)->_children.begin())
 						{
@@ -198,7 +198,7 @@ namespace synthese
 						it = this->getRootChildren().find(this->getTreeOrderingKey());
 						if(it == this->getRootChildren().end())
 						{
-							throw UnconsistentTreeException();
+							throw InconsistentTreeException();
 						}
 						if(it == this->getRootChildren().begin())
 						{
@@ -227,7 +227,7 @@ namespace synthese
 				{
 					return NULL;
 				}
-				throw UnconsistentTreeException();
+				throw InconsistentTreeException();
 			}
 			return *_parent;
 		}
@@ -254,7 +254,7 @@ namespace synthese
 					{
 						if(!this->hasRoot())
 						{
-							throw UnconsistentTreeException();
+							throw InconsistentTreeException();
 						}
 						unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
 					}
@@ -269,7 +269,7 @@ namespace synthese
 				{
 					if(!this->hasRoot())
 					{
-						throw UnconsistentTreeException();
+						throw InconsistentTreeException();
 					}
 					this->registerChildToRoot(static_cast<ObjectType_&>(*this));
 				}

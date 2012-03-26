@@ -1,6 +1,6 @@
 
-/** UnconsistentTreeException class header.
-	@file UnconsistentTreeException.hpp
+/** InconsistentTreeException class header.
+	@file InconsistentTreeException.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_tree_UnconsistentTreeException_hpp__
-#define SYNTHESE_tree_UnconsistentTreeException_hpp__
+#ifndef SYNTHESE_tree_InconsistentTreeException_hpp__
+#define SYNTHESE_tree_InconsistentTreeException_hpp__
 
 #include "Exception.h"
 
@@ -29,18 +29,18 @@ namespace synthese
 {
 	namespace tree
 	{
-		/** UnconsistentTreeException class.
+		/** InconsistentTreeException class.
 			@ingroup m20
 		*/
-		class UnconsistentTreeException:
+		class InconsistentTreeException:
 			public synthese::Exception
 		{
 		public:
-			UnconsistentTreeException():
+			InconsistentTreeException():
 				synthese::Exception("Tree object is inconsistent.")
 				{}
 		};
 }	}
 
-#endif // SYNTHESE_tree_UnconsistentTreeException_hpp__
+#endif // SYNTHESE_tree_InconsistentTreeException_hpp__
 
