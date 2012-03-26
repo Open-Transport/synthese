@@ -182,7 +182,7 @@ namespace synthese
 
 			WebPageTableSync::ShiftRank(
 				_site->getKey(),
-				object.getParent() ? object.getParent()->getKey() : 0,
+				object.getParent(true) ? object.getParent()->getKey() : 0,
 				_rank,
 				true,
 				transaction
