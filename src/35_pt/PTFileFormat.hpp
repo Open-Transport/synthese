@@ -337,7 +337,8 @@ namespace synthese
 				const std::string& number,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				boost::optional<const std::string&> team = boost::optional<const std::string&>()
 			);
 
 
