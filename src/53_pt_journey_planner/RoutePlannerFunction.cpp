@@ -1127,10 +1127,10 @@ namespace synthese
 				}
 				if(_config)
 				{
-					stream << " siteId=\"" << _config->getKey() << "\">";
+					stream << " siteId=\"" << _config->getKey() << "\"";
 				}
 				stream <<
-					"<timeBounds" <<
+					"><timeBounds" <<
 						" minDepartureHour=\"" << posix_time::to_iso_extended_string(r.getLowestDepartureTime()) << "\"" <<
 						" minArrivalHour=\"" << posix_time::to_iso_extended_string(r.getLowestArrivalTime()) << "\"" <<
 						" maxArrivalHour=\"" << posix_time::to_iso_extended_string(r.getHighestArrivalTime()) << "\"" <<
