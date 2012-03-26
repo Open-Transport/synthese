@@ -111,7 +111,7 @@ namespace synthese
 			{
 				throw RequestException("No such config");
 			}
-		
+
 			// Page
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE))
 			{
@@ -163,7 +163,7 @@ namespace synthese
 			{
 				matcher = (GeographyModule::GetCitiesMatcher());
 			}
-				
+
 
 			GeographyModule::CityList citiesList;
 			if(!_input.empty())

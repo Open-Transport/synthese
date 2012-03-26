@@ -57,7 +57,7 @@ def ineo_routes():
 
     jour = _get_jour()
 
-    query = """SELECT 
+    query = """SELECT
         l.ref as ligne_ref,
         l.mnemo as ligne_mnemo,
         l.nom as ligne_nom,
@@ -104,7 +104,7 @@ def ineo_route(route_id):
         l.ref as ligne_ref,
         l.nom as ligne_nom
     FROM
-        CHAINAGE ch 
+        CHAINAGE ch
         JOIN LIGNE l ON l.ref = ch.ligne and l.jour = '{jour}'
     WHERE
         ch.ref = {route_id} AND ch.jour = '{jour}'
@@ -115,7 +115,7 @@ def ineo_route(route_id):
     query = """SELECT
         c.ref as course_ref,
         h.htd, ach.pos,
-        a.ref as arret_ref, a.nom as arret_nom 
+        a.ref as arret_ref, a.nom as arret_nom
     FROM
         CHAINAGE ch
         JOIN COURSE c ON c.chainage = ch.ref AND c.jour = '{jour}'
@@ -127,8 +127,8 @@ def ineo_route(route_id):
     ORDER BY
         c.ref, ach.pos
     """.format(**locals())
-    
-    
+
+
     result = db.query(query)
 
     def service_grouper(service):

@@ -266,7 +266,7 @@ namespace synthese
 			_ignoreDeparturesBoardExcludedLines = map.isTrue(PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES);
 			_ignoreJourneyPlannerExcludedLines = map.isTrue(PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES);
 			_ignoreTimetableExcludedLines = map.isTrue(PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES);
-			
+
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
 			if(rs_id) try
@@ -358,7 +358,7 @@ namespace synthese
 						{
 							continue;
 						}
-						
+
 						// Filter by Rolling stock id
 						if(_rollingStockFilter.get())
 						{

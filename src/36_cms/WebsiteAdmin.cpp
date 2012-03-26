@@ -217,7 +217,7 @@ namespace synthese
 
 				stream << "<h1>SVN Storage</h1>";
 				HTMLForm svnStorageForm = svnStorageRequest.getHTMLForm("svnStorage");
-				
+
 				PropertiesHTMLTable pt(svnStorageForm);
 				stream << pt.open();
 				stream << pt.title("SVN update ou commit");

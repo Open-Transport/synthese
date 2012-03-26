@@ -141,7 +141,7 @@ namespace synthese
 		assert(dynamic_cast<const Webpage*>(&object));
 		const Webpage& webpage(static_cast<const Webpage&>(object));
 
-		map.insert(prefix + FIELDS[0].name, webpage.getRoot() ? webpage.getRoot()->getKey() : RegistryKeyType(0));	
+		map.insert(prefix + FIELDS[0].name, webpage.getRoot() ? webpage.getRoot()->getKey() : RegistryKeyType(0));
 		map.insert(prefix + FIELDS[1].name, webpage.getParent(true) ? webpage.getParent()->getKey() : RegistryKeyType(0));
 		map.insert(prefix + FIELDS[2].name, webpage.getRank());
 	}

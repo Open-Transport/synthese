@@ -57,7 +57,7 @@ namespace synthese
 			static const std::string PARAMETER_VERBOSE;
 
 			static const std::string VALUE_SUCCESS;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -85,9 +85,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.3.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/SVN_Storage#Request
@@ -107,9 +107,9 @@ namespace synthese
 			/// @author Sylvain Pasche
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

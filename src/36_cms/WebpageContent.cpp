@@ -446,7 +446,7 @@ namespace synthese
 			return it;
 		}
 
-		
+
 
 
 		void WebpageContent::ServiceNode::display(

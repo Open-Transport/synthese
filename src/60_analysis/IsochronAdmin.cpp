@@ -348,7 +348,7 @@ namespace synthese
 						int distance = (int) (_startPlace->getPoint()->distance(reachedPlace->getPoint().get()) / 1000);
 						int duration = journey.getEffectiveDuration().hours() * 60 + journey.getEffectiveDuration().minutes();
 
-						// Tests time and length constraints 
+						// Tests time and length constraints
 						if((distance > _maxDistance) || (duration > _maxDuration))
 						{
 							continue;

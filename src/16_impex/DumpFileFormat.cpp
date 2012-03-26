@@ -109,7 +109,7 @@ namespace synthese
 			{
 				vector<string> parts;
 				split(parts, line, is_any_of("(,)"), token_compress_on);
-			
+
 				for(size_t i(1); i<parts.size()-1; ++i)
 				{
 					fieldNames.push_back(parts[i]);
@@ -256,7 +256,7 @@ namespace synthese
 			std::ostream& stream,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			stream << "<h1>Fichiers</h1>";
 
 			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
@@ -314,7 +314,7 @@ namespace synthese
 
 			RegistryKeyType key(object.getKey());
 
-			
+
 			//////////////////////////////////////////////////////////////////////////
 			// Files
 
