@@ -76,7 +76,7 @@ namespace synthese
 			//@{
 				const ChildrenType& getChildren() const { return _children; }
 				ChildrenType& getChildren() { return _children; }
-				ObjectType* getParent() const;
+				ObjectType* getParent(bool allowNULL = false) const;
 			//@}
 
 			//! @name Setters
@@ -219,10 +219,14 @@ namespace synthese
 			template<class> class OrderingPolicy_,
 			class RootPolicy_
 		>
-		ObjectType_* TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::getParent() const
+		ObjectType_* TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::getParent(bool allowNULL) const
 		{
 			if(!_parent)
 			{
+				if(allowNULL)
+				{
+					return NULL;
+				}
 				throw UnconsistentTreeException();
 			}
 			return *_parent;
