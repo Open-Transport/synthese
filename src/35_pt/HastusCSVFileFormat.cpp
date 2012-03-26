@@ -270,6 +270,12 @@ namespace synthese
 					trip.team = _getValue(6);
 					trip.handicapped = (_getValue(13) == "X");
 
+					size_t pos = trip.team.rfind('-');
+					if(pos != string::npos && pos + 1 < trip.team.length())
+					{
+						trip.team = trim_left_copy(trip.team.substr(pos + 1));
+					}
+
 					// Storage
 					Trips::iterator itTrip(
 						_trips.find(trip)
@@ -320,9 +326,6 @@ namespace synthese
 					{
 						TripValues& trip(_trips[itTrip]);
 
-						// Distance
-						distance += delta;
-
 						// Schedule if necessary
 						if(withSchedules)
 						{
@@ -332,13 +335,16 @@ namespace synthese
 						// Stop
 						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
 							_stopPoints.get(stopCode),
-							distance,
+							distance + delta,
 							true,
 							true,
 							withSchedules
 						);
 						trip.stops.push_back(stop);
 					}
+
+					// Distance
+					distance += delta;
 				}
 
 				// SYNTHESE object construction
@@ -392,7 +398,8 @@ namespace synthese
 							trip.code,
 							_dataSource,
 							_env,
-							stream
+							stream,
+							optional<const string&>(trip.team)
 					)	);
 					if(service)
 					{

@@ -733,6 +733,8 @@ namespace synthese
 				result->setName(*name);
 			}
 
+			result->setTimetableName(line.getShortName());
+
 			// Destination text
 			if(destination)
 			{
@@ -775,7 +777,8 @@ namespace synthese
 			const std::string& number,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			boost::optional<const std::string&> team
 		){
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -812,7 +815,8 @@ namespace synthese
 				if(!curService) continue;
 
 				if(	curService->getServiceNumber() == number &&
-					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules)
+					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
+					(team ? curService->getTeam() == *team : true)
 				){
 					result = curService;
 					break;
@@ -829,6 +833,12 @@ namespace synthese
 				);
 				result->setSchedules(departureSchedules, arrivalSchedules, true);
 				result->setPath(&route);
+
+				if(team)
+				{
+					result->setTeam(*team);
+				}
+
 				route.addService(*result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
 
