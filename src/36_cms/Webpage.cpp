@@ -88,10 +88,10 @@ namespace synthese
 			webpage.setRank(record.getDefault<size_t>(FIELDS[2].name, 0));
 		}
 
-		if(record.isDefined(FIELDS[2].name))
+		if(record.isDefined(FIELDS[0].name))
 		{
 			RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
-			if (id > 0)
+			if(id > 0)
 			{
 				try
 				{
@@ -111,7 +111,7 @@ namespace synthese
 		if(record.isDefined(FIELDS[1].name))
 		{
 			RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
-			if (up_id > 0)
+			if(up_id > 0)
 			{
 				try
 				{
