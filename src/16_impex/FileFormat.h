@@ -124,7 +124,7 @@ namespace synthese
 			o->setDataSourceLinksWithoutRegistration(links);
 			env.getEditableRegistry<typename T::ObjectType>().add(o);
 			objects.add(*o);
-			
+
 			if(!logName.empty())
 			{
 				logStream << "CREA : Creation of the " << logName << "  with key " << id << "<br />";

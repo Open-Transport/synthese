@@ -167,7 +167,7 @@ def main():
 
     for target_url in TARGET_URLS:
         dispatchers.append(Dispatcher(target_url))
-    
+
     server_address = ('', LISTENING_PORT)
     httpd = StoppableHTTPServer(server_address, RequestHandler)
     def httpd_serve():

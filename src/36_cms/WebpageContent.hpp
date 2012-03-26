@@ -71,7 +71,7 @@ namespace synthese
 			};
 
 			typedef std::vector<boost::shared_ptr<Node> > Nodes;
-		
+
 		protected:
 			std::string _code;
 			bool _ignoreWhiteChars;

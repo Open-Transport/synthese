@@ -248,7 +248,7 @@ namespace synthese
 				{
 					matcher = (GeographyModule::GetCitiesMatcher());
 				}
-				
+
 				RoadModule::ExtendedFetchPlacesResult places(
 					_city.get() ?
 					RoadModule::ExtendedFetchPlaces(_city, _input, *_n) :(

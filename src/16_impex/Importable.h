@@ -60,7 +60,7 @@ namespace synthese
 		public:
 			static const std::string SOURCES_SEPARATOR;
 			static const std::string FIELDS_SEPARATOR;
-			
+
 			typedef std::multimap<const DataSource*, std::string> DataSourceLinks;
 
 			class NotLinkedWithSourceException : public synthese::Exception

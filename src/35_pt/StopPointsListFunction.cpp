@@ -223,7 +223,7 @@ namespace synthese
 			_sortByLineName = map.getDefault<bool>(PARAMETER_SORT_BY_LINE_NAME, false);
 		}
 
-		
+
 
 		util::ParametersMap StopPointsListFunction::run(
 			std::ostream& stream,
@@ -347,7 +347,7 @@ namespace synthese
 						vector<shared_ptr<ParametersMap> > stopAreaMap(subMap->getSubMaps(StopPoint::TAG_STOP_AREA));
 						subMap->merge(**stopAreaMap.begin(), DATA_STOP_AREA_PREFIX);
 					}
-					
+
 					if(_destinationPage.get())
 					{
 						if(subMap->hasSubMaps(TAG_DESTINATION))
@@ -437,12 +437,12 @@ namespace synthese
 		{
 			return _opCode < otherStopPoint.getOpCode();
 		}
-		
+
 		SortableLineNumber StopPointsListFunction::SortableStopPoint::getOpCode() const
 		{
 			return _opCode;
 		}
-		
+
 		const StopPoint* StopPointsListFunction::SortableStopPoint::getStopPoint() const
 		{
 			return _sp;
@@ -460,7 +460,7 @@ namespace synthese
 		{
 			return _lineShortName < otherLineKey.getShortName();
 		}
-		
+
 		SortableLineNumber StopPointsListFunction::SortableLineKey::getShortName() const
 		{
 			return _lineShortName;
@@ -477,7 +477,7 @@ namespace synthese
 		{
 			return _destinationName < otherStopArea.getDestinationName();
 		}
-		
+
 		string StopPointsListFunction::SortableStopArea::getDestinationName() const
 		{
 			return _destinationName;

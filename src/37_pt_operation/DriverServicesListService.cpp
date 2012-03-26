@@ -49,7 +49,7 @@ namespace synthese
 	using namespace pt;
 	using namespace graph;
 	using namespace pt_operation;
-	
+
 
 	template<>
 	const string FactorableTemplate<FunctionWithSite<false>, DriverServicesListService>::FACTORY_KEY = "DriverServicesList";

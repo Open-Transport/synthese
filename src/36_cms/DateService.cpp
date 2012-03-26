@@ -71,7 +71,7 @@ namespace synthese
 		{
 			_offset = map.getDefault<string>(PARAMETER_OFFSET);
 			string base = map.getDefault<string>(PARAMETER_BASE);
-			
+
 			if(!base.empty())
 			{
 				try
@@ -96,7 +96,7 @@ namespace synthese
 			}
 			_withTime = map.getDefault<bool>(PARAMETER_WITH_TIME, false);
 			string stringUnit = map.getDefault<string>(PARAMETER_UNIT, "day");
-			
+
 			if(stringUnit == "second")
 				_unit = SECOND;
 			else if(stringUnit == "minute")

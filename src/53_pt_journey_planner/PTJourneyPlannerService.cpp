@@ -1147,7 +1147,7 @@ namespace synthese
 			bool isOriginRow,
 			bool isDestinationRow
 		) const {
-			
+
 			pm.insert(DATA_IS_DESTINATION_ROW, isDestinationRow);
 			pm.insert(DATA_IS_ORIGIN_ROW, isOriginRow);
 			pm.insert(DATA_COLUMN_NUMBER, columnNumber);
@@ -1292,7 +1292,7 @@ namespace synthese
 					minPrice = solution.second;
 				}
 			}
-		
+
 			BOOST_FOREACH(const FareTicket& ticket, ticketsList)
 			{
 				shared_ptr<ParametersMap> pmTicket(new ParametersMap);
@@ -1303,7 +1303,7 @@ namespace synthese
 			}
 			ticketsList.clear();
 			solutions.clear();
-			
+
 			// Departure time
 			{
 				stringstream s;
@@ -1399,7 +1399,7 @@ namespace synthese
 				pm.insert(DATA_DURATION, durationPM);
 			}
 			pm.insert(DATA_DURATION, journey.getDuration());
-			
+
 			// Reservation
 			ptime now(second_clock::local_time());
 			ptime resaDeadLine(journey.getReservationDeadLine());
@@ -1486,7 +1486,7 @@ namespace synthese
 
 					lastPlace = leg.getDepartureEdge()->getHub();
 					__Couleur = !__Couleur;
-				
+
 					// Service
 					_displayServiceCell(
 						*legPM,

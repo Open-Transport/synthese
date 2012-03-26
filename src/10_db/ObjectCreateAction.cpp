@@ -40,7 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, db::ObjectCreateAction>::FACTORY_KEY("ObjectCreate");
@@ -62,9 +62,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ObjectCreateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Table sync
@@ -103,9 +103,9 @@ namespace synthese
 				throw ActionException(e.getMessage());
 			}
 		}
-		
-		
-		
+
+
+
 		void ObjectCreateAction::run(
 			Request& request
 		){
@@ -113,7 +113,7 @@ namespace synthese
 			{
 //				Log Object creation
 			}
-			
+
 			DBTransaction transaction;
 			_value->beforeCreate(transaction);
 			_tableSync->saveRegistrable(*_value, transaction);
@@ -127,9 +127,9 @@ namespace synthese
 				request.setActionCreatedId(_value->getKey());
 			}
 		}
-		
-		
-		
+
+
+
 		bool ObjectCreateAction::isAuthorized(
 			const Session* session
 		) const {

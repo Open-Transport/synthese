@@ -148,7 +148,7 @@ namespace synthese
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_STOP;
 			static const std::string DATA_MAX_WARNING_LEVEL_ON_LINE;
 			static const std::string DATA_HAS_RESERVATION;
-			
+
 			//! @name Cells
 			//@{
 			static const std::string DATA_COLUMN_NUMBER;

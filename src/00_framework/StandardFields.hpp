@@ -289,7 +289,7 @@ namespace synthese
 		{
 			SaveToParametersMap(fieldObject, map, prefix);
 		}
-	
+
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map)
 		{
 			map.insert(

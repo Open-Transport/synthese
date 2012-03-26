@@ -36,7 +36,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, pt::GenerateContinuousServiceAction>::FACTORY_KEY("GenerateContinuousServiceAction");
@@ -48,9 +48,9 @@ namespace synthese
 		const string GenerateContinuousServiceAction::PARAMETER_MIN_NUMBER = Action_PARAMETER_PREFIX + "_min_number";
 		const string GenerateContinuousServiceAction::PARAMETER_MIN_WAITING_DIFFERENCE = Action_PARAMETER_PREFIX + "_min_waiting_difference";
 		const string GenerateContinuousServiceAction::PARAMETER_WAITING_TIME = Action_PARAMETER_PREFIX + "_waiting_time";
-		
-		
-		
+
+
+
 		ParametersMap GenerateContinuousServiceAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -60,9 +60,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void GenerateContinuousServiceAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			try
@@ -77,9 +77,9 @@ namespace synthese
 			_waitingTime = minutes(map.get<int>(PARAMETER_WAITING_TIME));
 			_minNumber = map.get<size_t>(PARAMETER_MIN_NUMBER);
 		}
-		
-		
-		
+
+
+
 		void GenerateContinuousServiceAction::run(
 			Request& request
 		){
@@ -104,9 +104,9 @@ namespace synthese
 			::AddDeleteEntry(*_object, *request.getUser());
 */
 		}
-		
-		
-		
+
+
+
 		bool GenerateContinuousServiceAction::isAuthorized(
 			const Session* session
 		) const {

@@ -150,7 +150,7 @@ namespace synthese
 			{
 				// Default value
 				_score = NO_TRANSFER_HUB_SCORE;
-				
+
 				if(_allowedConnection)
 				{
 					ScoresMap scores;

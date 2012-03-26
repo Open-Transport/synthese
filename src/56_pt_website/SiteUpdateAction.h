@@ -73,7 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_MAX_CONNECTIONS;
 			static const std::string PARAMETER_USE_DATES_RANGE;
 			static const std::string PARAMETER_DISPLAY_ROAD_APPROACH_DETAIL;
-			
+
 		private:
 			boost::shared_ptr<PTServiceConfig>							_site;
 			std::string										_name;
@@ -82,7 +82,7 @@ namespace synthese
 			size_t												_maxConnections;
 			boost::gregorian::date_duration							_useDatesRange;
 			bool											_displayRoadApproachDetail;
-			
+
 		protected:
 			/** Conversion from attributes to generic parameter maps.
 				@return Generated parameters map

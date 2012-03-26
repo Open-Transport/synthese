@@ -40,7 +40,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<Action, db::ObjectUpdateAction>::FACTORY_KEY("ObjectUpdate");
@@ -57,8 +57,8 @@ namespace synthese
 			_object(NULL)
 		{}
 
-		
-		
+
+
 		ParametersMap ObjectUpdateAction::getParametersMap() const
 		{
 			ParametersMap map(_values);
@@ -68,9 +68,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ObjectUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Object id
@@ -132,16 +132,16 @@ namespace synthese
 				throw ActionException(e.getMessage());
 			}
 		}
-		
-		
-		
+
+
+
 		void ObjectUpdateAction::run(
 			Request& request
 		){
 			stringstream logText;
 			// Loop on updated fields
 			//			::appendToLogIfChange(text, "Parameter ", _object->getAttribute(), _value->getAttribute());
-			
+
 			DBTransaction transaction;
 			_value->beforeUpdate(*_object, transaction);
 			_tableSync->saveRegistrable(*_value, transaction);
@@ -150,9 +150,9 @@ namespace synthese
 
 //			::AddUpdateEntry(*_value, text.str(), request.getUser().get());
 		}
-		
-		
-		
+
+
+
 		bool ObjectUpdateAction::isAuthorized(
 			const Session* session
 		) const {

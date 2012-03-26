@@ -65,7 +65,7 @@ namespace synthese
 			static const DBTableSync::Format TABLE;
 
 
-		
+
 			////////////////////////////////////////////////////////////////////
 			/// Fields of the table.
 			/// To allow to loop on the table without knowing its size,

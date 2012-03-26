@@ -84,7 +84,7 @@ namespace synthese
 	using namespace security;
 	using namespace server;
 	using namespace util;
-	
+
 	namespace util
 	{
 		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY("Ineo");
@@ -340,7 +340,7 @@ namespace synthese
 
 					//////////////////////////////////////////////////////////////////////////
 					// Depots
-					
+
 					// Search for existing depots.
 					// Depots are not created here because they cannot be distinguished from stops
 					// with the informations present in the file
@@ -1016,7 +1016,7 @@ namespace synthese
 
 						lastTd = td;
 
-						// Pick up the points for dead runs 
+						// Pick up the points for dead runs
 						if(tcou == TCOU_DepotToStop || tcou == TCOU_StopToDepot)
 						{
 							deadRunStops.push_back(_getValue("MNL"));
@@ -1086,7 +1086,7 @@ namespace synthese
 						string onBoardTicketing(_getValue("VAB"));
 						string activity(_getValue("ACT"));
 
-						// Load 
+						// Load
 						string key(_getValue("SA"));
 						string vsKey(_getValue("SB"));
 						string dateStr(_getValue("DATE"));
@@ -1213,7 +1213,7 @@ namespace synthese
 						{
 							continue;
 						}
-						
+
 						DriverService::Chunks chunks(ds->getChunks());
 						chunks.push_back(
 							DriverService::Chunk(
