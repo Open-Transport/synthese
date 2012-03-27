@@ -207,13 +207,8 @@ namespace synthese
 			time_duration result(minutes(0));
 			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
 			{
-				BOOST_FOREACH(const DriverService::Chunk::Element& element, chunk.elements)
-				{
-					result +=
-						element.service->getArrivalSchedule(false, element.endRank) -
-						element.service->getDepartureSchedule(false, element.startRank)
-					;
-			}	}
+				result += (chunk.getDriverEndTime() - chunk.getDriverStartTime());
+			}
 			return result;
 		}
 
