@@ -321,16 +321,19 @@ namespace synthese
 				// Free DRT services
 				FreeDRTAreaTableSync::SearchResult areas(
 					FreeDRTAreaTableSync::Search(
-						Env::GetOfficialEnv(),
+						*_env,
 						_line->getKey()
 				)	);
 				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
 				{
-					FreeDRTTimeSlotTableSync::SearchResult freeDRTs(
-						FreeDRTTimeSlotTableSync::Search(
-							Env::GetOfficialEnv(),
-							area->getKey()
-					)	);
+					FreeDRTTimeSlotTableSync::Search(
+						*_env,
+						area->getKey(),
+						0,
+						optional<size_t>(),
+						true, true,
+						ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+					);
 				}
 			}
 
@@ -376,16 +379,7 @@ namespace synthese
 				// Sort reservations
 				BOOST_FOREACH(const shared_ptr<const Reservation>& resa, sqlreservations)
 				{
-					if(!_env->getRegistry<ScheduledService>().contains(resa->getServiceId())) continue;
-
-					const ScheduledService* service(
-						_env->getRegistry<ScheduledService>().get(resa->getServiceId()).get()
-					);
-					if(reservations.find(service->getServiceNumber()) == reservations.end())
-					{
-						reservations.insert(make_pair(service->getServiceNumber(), ServiceReservations()));
-					}
-					reservations[service->getServiceNumber()].addReservation(resa.get());
+					reservations[resa->getServiceCode()].addReservation(resa.get());
 				}
 			}
 
@@ -403,92 +397,89 @@ namespace synthese
 				int serviceSeatsNumber(reservations[serviceNumber].getSeatsNumber());
 				seatsNumber += serviceSeatsNumber;
 
-				if(_reservationPage.get())
+				BOOST_FOREACH(const Reservation* reservation, serviceReservations)
 				{
-					BOOST_FOREACH(const Reservation* reservation, serviceReservations)
-					{
-						// Departure rank check
-						if(	(_minDepartureRank || _maxDepartureRank) &&
-							decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
-						){
-							bool result(true);
-							shared_ptr<const ScheduledService> service(
-								Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
-							);
-							shared_ptr<const StopArea> stopArea(
-								Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
-							);
-							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
+					// Departure rank check
+					if(	(_minDepartureRank || _maxDepartureRank) &&
+						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+					){
+						bool result(true);
+						shared_ptr<const ScheduledService> service(
+							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+						);
+						shared_ptr<const StopArea> stopArea(
+							Env::GetOfficialEnv().get<StopArea>(reservation->getDeparturePlaceId())
+						);
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
+						{
+							try
 							{
-								try
-								{
-									const Edge& edge(
-										Env::GetOfficialEnv().get<JourneyPattern>(
-											service->getPath()->getKey()
-										)->findEdgeByVertex(itStop.second)
-									);
-									if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
-										_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
-									){
-										result = false;
-										break;
-									}
-								}
-								catch (Path::VertexNotFoundException&)
-								{
+								const Edge& edge(
+									Env::GetOfficialEnv().get<JourneyPattern>(
+										service->getPath()->getKey()
+									)->findEdgeByVertex(itStop.second)
+								);
+								if( _minDepartureRank && edge.getRankInPath() < *_minDepartureRank ||
+									_maxDepartureRank && edge.getRankInPath() > *_maxDepartureRank
+								){
+									result = false;
+									break;
 								}
 							}
-							if(!result)
+							catch (Path::VertexNotFoundException&)
 							{
-								continue;
 							}
 						}
-
-						// Arrival rank check
-						if(	(_minArrivalRank || _maxArrivalRank) &&
-							decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
-						){
-							bool result(true);
-							shared_ptr<const ScheduledService> service(
-								Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
-							);
-							shared_ptr<const StopArea> stopArea(
-								Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
-							);
-							BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
-							{
-								try
-								{
-									const Edge& edge(
-										Env::GetOfficialEnv().get<JourneyPattern>(service->getPath()->getKey())->findEdgeByVertex(itStop.second)
-									);
-									if( _minArrivalRank && edge.getRankInPath() < *_minArrivalRank ||
-										_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank
-									){
-										result = false;
-										break;
-									}
-								}
-								catch (Path::VertexNotFoundException&)
-								{
-								}
-							}
-							if(!result)
-							{
-								continue;
-							}
-						}
-
-						// Check of link with vehicle
-						if(_linkedWithVehicleOnly && !reservation->getVehicle())
+						if(!result)
 						{
 							continue;
 						}
-
-						shared_ptr<ParametersMap> resaPM(new ParametersMap);
-						reservation->toParametersMap(*resaPM, _language);
-						pm.insert(DATA_RESERVATION, resaPM);
 					}
+
+					// Arrival rank check
+					if(	(_minArrivalRank || _maxArrivalRank) &&
+						decodeTableId(reservation->getServiceId()) == ScheduledServiceTableSync::TABLE.ID
+					){
+						bool result(true);
+						shared_ptr<const ScheduledService> service(
+							Env::GetOfficialEnv().get<ScheduledService>(reservation->getServiceId())
+						);
+						shared_ptr<const StopArea> stopArea(
+							Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
+						);
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
+						{
+							try
+							{
+								const Edge& edge(
+									Env::GetOfficialEnv().get<JourneyPattern>(service->getPath()->getKey())->findEdgeByVertex(itStop.second)
+								);
+								if( _minArrivalRank && edge.getRankInPath() < *_minArrivalRank ||
+									_maxArrivalRank && edge.getRankInPath() > *_maxArrivalRank
+								){
+									result = false;
+									break;
+								}
+							}
+							catch (Path::VertexNotFoundException&)
+							{
+							}
+						}
+						if(!result)
+						{
+							continue;
+						}
+					}
+
+					// Check of link with vehicle
+					if(_linkedWithVehicleOnly && !reservation->getVehicle())
+					{
+						continue;
+					}
+
+					shared_ptr<ParametersMap> resaPM(new ParametersMap);
+					reservation->toParametersMap(*resaPM, _language);
+					pm.insert(DATA_RESERVATION, resaPM);
 				}
 			} // End services loop
 
