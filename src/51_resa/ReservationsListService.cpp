@@ -27,6 +27,8 @@
 #include "AdvancedSelectTableSync.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
+#include "FreeDRTAreaTableSync.hpp"
+#include "FreeDRTTimeSlotTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStop.h"
@@ -315,6 +317,21 @@ namespace synthese
 					optional<size_t>(),
 					true, true, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
+
+				// Free DRT services
+				FreeDRTAreaTableSync::SearchResult areas(
+					FreeDRTAreaTableSync::Search(
+						Env::GetOfficialEnv(),
+						_line->getKey()
+				)	);
+				BOOST_FOREACH(const shared_ptr<FreeDRTArea>& area, areas)
+				{
+					FreeDRTTimeSlotTableSync::SearchResult freeDRTs(
+						FreeDRTTimeSlotTableSync::Search(
+							Env::GetOfficialEnv(),
+							area->getKey()
+					)	);
+				}
 			}
 
 			// Get the services sorted by number
