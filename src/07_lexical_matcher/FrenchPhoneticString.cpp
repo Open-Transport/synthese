@@ -23,7 +23,7 @@ namespace synthese
 		std::string FrenchPhoneticString::ACCENTUATED_O(IConv::IConv("UTF-8","CP1252").convert("òóôÒÓÔ"));
 		std::string FrenchPhoneticString::ACCENTUATED_U(IConv::IConv("UTF-8","CP1252").convert("ùúûÙÚÛ"));
 		std::string FrenchPhoneticString::VOWELS(IConv::IConv("UTF-8","CP1252").convert("aàäáâeèëéêiìïíîoòöóôuùüúûy"));
-		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP1252").convert("aàäáâeèëéêiìïíîy"));
+		std::string FrenchPhoneticString::C_VOWELS(IConv::IConv("UTF-8","CP1252").convert("eèëéêiìïíîy"));
 
 		mutex FrenchPhoneticString::_IConvMutex;
 
