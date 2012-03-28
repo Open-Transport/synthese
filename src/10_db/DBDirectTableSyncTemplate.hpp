@@ -150,7 +150,16 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			) const {
-				return boost::dynamic_pointer_cast<util::Registrable, T>(GetEditable(key, environment, linkLevel, autoCreate));
+				try
+				{
+					return boost::dynamic_pointer_cast<util::Registrable, T>(
+						GetEditable(key, environment, linkLevel, autoCreate)
+					);
+				}
+				catch(util::ObjectNotFoundException<T>& e)
+				{
+					throw util::ObjectNotFoundException<util::Registrable>(e.getKey(), e.getMessage());
+				}
 			}
 
 
@@ -183,7 +192,16 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				AutoCreation autoCreate = NEVER_CREATE
 			) const {
-				return boost::dynamic_pointer_cast<const util::Registrable, const T>(Get(key, environment, linkLevel, autoCreate));
+				try
+				{
+					return boost::dynamic_pointer_cast<const util::Registrable, const T>(
+						Get(key, environment, linkLevel, autoCreate)
+					);
+				}
+				catch(util::ObjectNotFoundException<T>& e)
+				{
+					throw util::ObjectNotFoundException<util::Registrable>(e.getKey(), e.getMessage());
+				}
 			}
 
 

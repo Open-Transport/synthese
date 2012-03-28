@@ -190,7 +190,14 @@ namespace synthese
 				{
 					continue;
 				}
-				dynamic_cast<DBDirectTableSync&>(*tableSync).getRegistrable(id, env, linkLevel);
+				try
+				{
+					dynamic_cast<DBDirectTableSync&>(*tableSync).getRegistrable(id, env, linkLevel);
+				}
+				catch(ObjectNotFoundException<Registrable>& e)
+				{
+					Log::GetInstance().warn("Skipped load of object "+ lexical_cast<string>(e.getKey()), e);
+				}
 			}
 		}
 
