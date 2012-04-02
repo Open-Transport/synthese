@@ -356,6 +356,11 @@ namespace synthese
 					);
 				}
 			}
+			else
+			{
+				map.insert(PARAMETER_DEPARTURE_CITY_TEXT, _originCityText);
+				map.insert(PARAMETER_DEPARTURE_PLACE_TEXT, _originPlaceText);
+			}
 
 			// Arrival place
 			if(_arrival_place.placeResult.value.get())
@@ -374,6 +379,11 @@ namespace synthese
 						dynamic_cast<City*>(_arrival_place.placeResult.value.get())->getName()
 					);
 				}
+			}
+			else
+			{
+				map.insert(PARAMETER_ARRIVAL_CITY_TEXT, _destinationCityText);
+				map.insert(PARAMETER_ARRIVAL_PLACE_TEXT, _destinationPlaceText);
 			}
 
 			// Start Date
@@ -988,7 +998,7 @@ namespace synthese
 				!_arrival_place.placeResult.value->getPoint()->isEmpty()
 			){
 				maxRunTime = minutes(
-					2 * static_cast<int>(
+					12 * static_cast<int>(
 						_departure_place.placeResult.value->getPoint()->distance(
 							_arrival_place.placeResult.value->getPoint().get()
 						) / 1000
