@@ -229,5 +229,31 @@ namespace synthese
 			}
 			return result;
 		}
+
+		db::RowsList DRTAreaTableSync::SearchForAutoComplete(
+			const boost::optional<std::string> prefix,
+			const boost::optional<std::size_t> limit,
+			const boost::optional<std::string> optionalParameter
+			) const {
+				RowsList result;
+
+				SelectQuery<DRTAreaTableSync> query;
+				Env env;
+				if(prefix)
+				{
+					query.addWhereField(COL_NAME, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				}
+				if(limit)
+				{
+					query.setNumber(*limit);
+				}
+				query.addOrderField(COL_NAME,true);
+				DRTAreaTableSync::SearchResult areas(DRTAreaTableSync::LoadFromQuery(query, env, UP_LINKS_LOAD_LEVEL));
+				BOOST_FOREACH(const shared_ptr<DRTArea>& area, areas)
+				{
+					result.push_back(std::make_pair(area->getKey(), area->getName()));
+				}
+				return result;
+		} 
 	}
 }
