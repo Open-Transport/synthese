@@ -69,6 +69,9 @@
 #include "Destination.hpp"
 #include "DestinationTableSync.hpp"
 #include "MapSource.hpp"
+#include "CityListFunction.h"
+#include "PlacesListFunction.h"
+#include "DRTAreaTableSync.hpp"
 
 #include <geos/geom/Envelope.h>
 #include <boost/foreach.hpp>
@@ -421,8 +424,29 @@ namespace synthese
 				stream << t.row();
 				stream << t.col(1,string(),false,string(),2) << f.getRadioInput(LineStopAddAction::PARAMETER_RANK, optional<size_t>(_line->getEdges().size()), optional<size_t>());
 				stream << t.col(1,string(),false,string(),2) << _line->getEdges().size();
-				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_CITY_NAME, string(), "(localité)");
-				stream << t.col() << f.getTextInput(LineStopAddAction::PARAMETER_STOP_NAME, string(), "(arrêt)");
+
+				stream << t.col() << f.getTextInputAutoCompleteFromService(
+					LineStopAddAction::PARAMETER_CITY_NAME,
+					string(),
+					string(),
+					pt_website::CityListFunction::FACTORY_KEY,
+					pt_website::CityListFunction::DATA_CITIES,
+					pt_website::CityListFunction::DATA_CITY,
+					string(),string(),
+					false, false, false
+				);
+
+				stream << t.col() << f.getTextInputAutoCompleteFromService(
+					LineStopAddAction::PARAMETER_STOP_NAME,
+					string(),
+					string(),
+					pt_website::PlacesListFunction::FACTORY_KEY,
+					pt_website::PlacesListFunction::DATA_PLACES,
+					pt_website::PlacesListFunction::DATA_PLACE,
+					"ct",LineStopAddAction::PARAMETER_CITY_NAME,
+					false, false, false
+				);
+
 				stream << t.col(1,string(),false,string(),2);
 				stream << t.col(1,string(),false,string(),2);
 				stream << t.col(1,string(),false,string(),2);
@@ -430,8 +454,16 @@ namespace synthese
 				stream << t.col(1,string(),false,string(),2);
 				stream << t.col(1,string(),false,string(),2) << f.getSubmitButton("Ajouter");
 				stream << t.row();
-				stream << t.col(2) << "ou zone TAD n°" << f.getTextInput(LineStopAddAction::PARAMETER_AREA, string());
-
+				stream << t.col(2) << "ou zone TAD ";
+				stream << f.getTextInputAutoCompleteFromTableSync(
+					LineStopAddAction::PARAMETER_AREA,
+					string(),
+					string(),
+					lexical_cast<string>(DRTAreaTableSync::TABLE.ID),
+					string(),string(),
+					false, false, true, false
+				);
+			
 				stream << t.close();
 				stream << f.close();
 
