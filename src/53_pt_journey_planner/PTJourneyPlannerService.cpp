@@ -692,7 +692,7 @@ namespace synthese
 				!_arrival_place.placeResult.value->getPoint()->isEmpty()
 			){
 				maxRunTime = minutes(
-					2 * static_cast<int>(
+					12 * static_cast<int>(
 						_departure_place.placeResult.value->getPoint()->distance(
 							_arrival_place.placeResult.value->getPoint().get()
 						) / 1000
