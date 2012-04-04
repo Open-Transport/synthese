@@ -42,23 +42,23 @@ BOOST_AUTO_TEST_CASE (testStopsWithoutSchedules)
 
 	JourneyPattern l(5678);
 
-	StopArea p1(UNKNOWN_VALUE, true);
-	StopArea p2(UNKNOWN_VALUE, false);
-	StopArea p3(UNKNOWN_VALUE, false);
-	StopArea p4(UNKNOWN_VALUE, false);
-	StopArea p5(UNKNOWN_VALUE, true);
-	StopArea p6(UNKNOWN_VALUE, true);
-	StopArea p7(UNKNOWN_VALUE, false);
-	StopArea p8(UNKNOWN_VALUE, false);
+	StopArea p1(0, true);
+	StopArea p2(0, false);
+	StopArea p3(0, false);
+	StopArea p4(0, false);
+	StopArea p5(0, true);
+	StopArea p6(0, true);
+	StopArea p7(0, false);
+	StopArea p8(0, false);
 
-	StopPoint s1(UNKNOWN_VALUE, "s1", &p1);
-	StopPoint s2(UNKNOWN_VALUE, "s1", &p2);
-	StopPoint s3(UNKNOWN_VALUE, "s1", &p3);
-	StopPoint s4(UNKNOWN_VALUE, "s1", &p4);
-	StopPoint s5(UNKNOWN_VALUE, "s1", &p5);
-	StopPoint s6(UNKNOWN_VALUE, "s1", &p6);
-	StopPoint s7(UNKNOWN_VALUE, "s1", &p7);
-	StopPoint s8(UNKNOWN_VALUE, "s1", &p8);
+	StopPoint s1(0, "s1", &p1);
+	StopPoint s2(0, "s1", &p2);
+	StopPoint s3(0, "s1", &p3);
+	StopPoint s4(0, "s1", &p4);
+	StopPoint s5(0, "s1", &p5);
+	StopPoint s6(0, "s1", &p6);
+	StopPoint s7(0, "s1", &p7);
+	StopPoint s8(0, "s1", &p8);
 
 	DesignatedLinePhysicalStop l1D(0, &l, 0, true, false,0,&s1, true);
 	DesignatedLinePhysicalStop l2D(0, &l, 1, true, false,50,&s2, false);
