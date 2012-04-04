@@ -20,10 +20,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "StandardArrivalDepartureTableGenerator.h"
+
+#include "AccessParameters.h"
 #include "LinePhysicalStop.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "StandardArrivalDepartureTableGenerator.h"
 #include "GraphConstants.h"
 
 #include <boost/foreach.hpp>
@@ -68,6 +70,8 @@ namespace synthese
 				return _result;
 			}
 
+			AccessParameters ap;
+
 			// Loop on the stops of the current stop area
 			const StopArea::PhysicalStops& physicalStops(_physicalStops.begin()->second->getConnectionPlace()->getPhysicalStops());
 			BOOST_FOREACH(PhysicalStops::value_type it, physicalStops)
@@ -96,7 +100,7 @@ namespace synthese
 						// Tells to the journey pattern for a next service
 						ServicePointer servicePointer(
 							ls.getNextService(
-								USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+								ap,
 								departureDateTime,
 								_endDateTime,
 								false,

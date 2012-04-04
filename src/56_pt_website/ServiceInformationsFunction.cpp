@@ -117,9 +117,9 @@ namespace synthese
 			const Request& request
 		) const {
 
-			ServicePointer ptr(_service->getDeparturePosition(true, USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,_date));
 			AccessParameters ap;
-
+			ServicePointer ptr(_service->getDeparturePosition(true, ap, _date));
+			
 			if(_stopPage.get())
 			{
 				_displayStop(stream, true, ptr, request);
