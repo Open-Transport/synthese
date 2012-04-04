@@ -399,11 +399,11 @@ namespace synthese
 						{
 							const Edge& startEdge(*its->second);
 							// Search a service at the time of the possible
-
+							AccessParameters ap(userClass+ USER_CLASS_CODE_OFFSET);
 							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
 							ServicePointer serviceInstance(
 								startEdge.getNextService(
-									userClass,
+									ap,
 									minStartTime,
 									maxStartTime,
 									true,
