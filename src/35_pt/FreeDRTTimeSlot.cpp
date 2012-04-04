@@ -151,9 +151,9 @@ namespace synthese
 
 
 		ServicePointer FreeDRTTimeSlot::getFromPresenceTime(
+			const AccessParameters& accessParameters,
 			bool RTData,
 			bool getDeparture,
-			std::size_t userClassRank,
 			const graph::Edge& edge,
 			const boost::posix_time::ptime& presenceDateTime,
 			bool checkIfTheServiceIsReachable,

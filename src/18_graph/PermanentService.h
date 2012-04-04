@@ -76,15 +76,16 @@ namespace synthese
 					- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 					- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 				@param allowCanceled ignored parameter
+				@param accessParameters access parameters to check for compatibility
 				@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 				@author Hugues Romain
 				@date 2007
 				@warning The service index is unknown in the generated ServicePointer.
 			*/
 			virtual graph::ServicePointer getFromPresenceTime(
+				const AccessParameters& accessParameters,
 				bool RTData,
 				bool getDeparture,
-				std::size_t userClassRank,
 				const graph::Edge& edge,
 				const boost::posix_time::ptime& presenceDateTime,
 				bool controlIfTheServiceIsReachable,

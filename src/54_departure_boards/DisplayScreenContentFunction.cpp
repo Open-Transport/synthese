@@ -20,11 +20,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DisplayScreenContentFunction.h"
+
+#include "AccessParameters.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
 #include "ServicePointer.h"
-#include "DisplayScreenContentFunction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
@@ -658,6 +660,7 @@ namespace synthese
 			{
 				ParametersMap result;
 				bool isOutputXML = _outputFormat.empty();
+				AccessParameters ap;
 
 				if(isOutputXML)
 				{
@@ -713,7 +716,7 @@ namespace synthese
 						{
 							ServicePointer servicePointer(
 								ls->getNextService(
-									USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+									ap,
 									departureDateTime,
 									endDateTime,
 									false,

@@ -38,11 +38,10 @@ namespace synthese
 
 	namespace graph
 	{
-
 		ServicePointer PermanentService::getFromPresenceTime(
+			const AccessParameters& accessParameters,
 			bool RTData,
 			bool getDeparture,
-			size_t userClass,
 			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool controlIfTheServiceIsReachable,
@@ -51,7 +50,13 @@ namespace synthese
 			bool canceled
 		) const	{
 
-			ServicePointer sp(RTData, userClass, *this, presenceDateTime);
+			// Access parameters check
+			if(!isCompatibleWith(accessParameters))
+			{
+				return ServicePointer();
+			}
+
+			ServicePointer sp(RTData, accessParameters.getUserClassRank(), *this, presenceDateTime);
 			if(getDeparture)
 			{
 				sp.setDepartureInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());

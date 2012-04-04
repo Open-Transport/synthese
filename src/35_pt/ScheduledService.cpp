@@ -21,16 +21,17 @@
 */
 
 #include "ScheduledService.h"
-#include "Path.h"
+
+#include "AccessParameters.h"
+#include "CommercialLine.h"
 #include "Edge.h"
+#include "Path.h"
 #include "Registry.h"
 #include "GraphConstants.h"
-
 #include "JourneyPattern.hpp"
-#include "CommercialLine.h"
-#include "StopPoint.hpp"
 #include "NonConcurrencyRule.h"
 #include "StopArea.hpp"
+#include "StopPoint.hpp"
 
 using namespace std;
 using namespace boost;
@@ -87,9 +88,9 @@ namespace synthese
 
 
 		ServicePointer ScheduledService::getFromPresenceTime(
+			const AccessParameters& accessParameters,
 			bool RTData,
 			bool getDeparture,
-			size_t userClass,
 			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool checkIfTheServiceIsReachable,
@@ -97,6 +98,12 @@ namespace synthese
 			bool ignoreReservation,
 			bool allowCanceled
 		) const {
+
+			// Check of access parameters
+			if(!isCompatibleWith(accessParameters))
+			{
+				return ServicePointer();
+			}
 
 			// Initializations
 			size_t edgeIndex(edge.getRankInPath());
@@ -136,7 +143,7 @@ namespace synthese
 			}
 
 			// Saving dates
-			ServicePointer ptr(RTData, userClass, *this, originDateTime);
+			ServicePointer ptr(RTData, accessParameters.getUserClassRank(), *this, originDateTime);
 
 			if(getDeparture)
 			{
@@ -462,7 +469,7 @@ namespace synthese
 
 		ServicePointer ScheduledService::getDeparturePosition(
 			bool RTdata,
-			size_t userClass,
+			const AccessParameters& accessParameters,
 			const boost::posix_time::ptime& date
 		) const	{
 
@@ -471,9 +478,9 @@ namespace synthese
 
 			ServicePointer originPtr(
 				getFromPresenceTime(
+					accessParameters,
 					RTdata,
 					true,
-					userClass,
 					*edge,
 					originTime,
 					false,
@@ -501,7 +508,7 @@ namespace synthese
 				if(arrivalTime > date)
 				{
 					edge = edge->getPreviousDepartureForFineSteppingOnly();
-					ServicePointer result(RTdata, userClass, *this, originPtr.getOriginDateTime());
+					ServicePointer result(RTdata, accessParameters.getUserClassRank(), *this, originPtr.getOriginDateTime());
 					result.setDepartureInformations(
 						*edge,
 						originPtr.getOriginDateTime() + (_RTDepartureSchedules[edge->getRankInPath()] - _departureSchedules[0]),
