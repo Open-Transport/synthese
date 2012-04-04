@@ -185,14 +185,18 @@ namespace synthese
 		{
 			BOOST_FOREACH(RegistryKeyType id, ids)
 			{
-				shared_ptr<DBTableSync> tableSync(GetTableSync(decodeTableId(id)));
-				if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
-				{
-					continue;
-				}
 				try
 				{
+					shared_ptr<DBTableSync> tableSync(GetTableSync(decodeTableId(id)));
+					if(!dynamic_cast<DBDirectTableSync*>(tableSync.get()))
+					{
+						continue;
+					}
 					dynamic_cast<DBDirectTableSync&>(*tableSync).getRegistrable(id, env, linkLevel);
+				}
+				catch(DBException& e)
+				{
+					Log::GetInstance().warn("Invalid table id in key "+ lexical_cast<string>(id), e);
 				}
 				catch(ObjectNotFoundException<Registrable>& e)
 				{

@@ -331,7 +331,7 @@ namespace synthese
 							ServicePointer serviceInstance(
 								(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
 								edge.getNextService(
-									_accessParameters.getUserClassRank(),
+									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
 									true,
@@ -340,7 +340,7 @@ namespace synthese
 									_ignoreReservation
 								):
 								edge.getPreviousService(
-									_accessParameters.getUserClassRank(),
+									_accessParameters,
 									departureMoment,
 									correctedMinMaxDateTimeAtOrigin,
 									true,

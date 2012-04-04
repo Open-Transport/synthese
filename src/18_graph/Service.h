@@ -176,23 +176,24 @@ namespace synthese
 					@param getDeparture
 					@param edge Edge
 					@param presenceDateTime Goal  time
-					@param controlIfTheServiceIsReachable service selection method :
+					@param checkIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param inverted : indicates if the range computing must follow the same rules as method says (false) or the inverted ones (true)
-					@param returns the service even if it is canceled at the specified edge. In this case, the _canceled attribute of the returned pointer is set to true.
+					@param allowCanceled returns the service even if it is canceled at the specified edge. In this case, the _canceled attribute of the returned pointer is set to true.
+					@param accessParameters access parameters to check for compatibility
 					@return A full ServicePointer to the service. If the service cannot be used at the specified date/time, then the ServicePointer points to a NULL service.
 					@author Hugues Romain
 					@date 2007
 					@warning The service index is unknown in the generated ServicePointer.
 				*/
 				virtual ServicePointer getFromPresenceTime(
+					const AccessParameters& accessParameters,
 					bool RTData,
 					bool getDeparture,
-					std::size_t userClassRank,
 					const Edge& edge,
 					const boost::posix_time::ptime& presenceDateTime,
-					bool controlIfTheServiceIsReachable,
+					bool checkIfTheServiceIsReachable,
 					bool inverted,
 					bool ignoreReservation,
 					bool allowCanceled

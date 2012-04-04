@@ -277,7 +277,7 @@ namespace synthese
 				/** Provides next departure service number (method 1)
 					@param departureMoment Presence hour at departure place
 					@param maxDepartureMoment Maximum departure hour
-					@param controlIfTheServiceIsReachable service selection method :
+					@param checkIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param minNextServiceIndex First index to scan in the services list (optimization)
@@ -288,10 +288,10 @@ namespace synthese
 					@param allowCanceledService returns real time canceled services too. The _canceled attribute of the service pointer would be set to true.
 				*/
 				ServicePointer getNextService(
-					std::size_t userClassRank,
+					const AccessParameters& accessParameters,
 					boost::posix_time::ptime departureMoment,
 					const boost::posix_time::ptime& maxDepartureMoment,
-					bool controlIfTheServiceIsReachable,
+					bool checkIfTheServiceIsReachable,
 					boost::optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 					bool inverted = false,
 					bool ignoreReservation = false,
@@ -303,7 +303,7 @@ namespace synthese
 				/** Provides previous arrival service number
 					@param arrivalMoment Presence hour at arrival place
 					@param minArrivalMoment Minimum arrival hour
-					@param controlIfTheServiceIsReachable service selection method :
+					@param checkIfTheServiceIsReachable service selection method :
 						- true : the result is a usable service : its departure time must be in the future, and the reservation rules must be followed
 						- false : the result is a runnable service : if the reservation on it is compulsory, then there must bu at least one reservation for the service
 					@param maxPreviousServiceIndex First index to scan in the services list (optimization)
@@ -313,10 +313,10 @@ namespace synthese
 					@retval maxPreviousServiceIndex Index corresponding to the returned service
 				*/
 				ServicePointer getPreviousService(
-					std::size_t userClassRank,
+					const AccessParameters& accessParameters,
 					boost::posix_time::ptime arrivalMoment,
 					const boost::posix_time::ptime& minArrivalMoment,
-					bool controlIfTheServiceIsReachable,
+					bool checkIfTheServiceIsReachable,
 					boost::optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 					bool inverted = false,
 					bool ignoreReservation = false,

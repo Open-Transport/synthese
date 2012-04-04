@@ -164,7 +164,7 @@ namespace synthese
 
 
 
-		graph::ServicePointer DeadRun::getFromPresenceTime(bool,bool,size_t,const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool) const
+		graph::ServicePointer DeadRun::getFromPresenceTime(const AccessParameters&, bool,bool, const synthese::graph::Edge &,const boost::posix_time::ptime &,bool,bool,bool,bool) const
 		{
 			return ServicePointer();
 		}

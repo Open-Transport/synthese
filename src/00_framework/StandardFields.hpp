@@ -553,7 +553,13 @@ namespace synthese
 			{
 				try
 				{
-					list.push_back(boost::lexical_cast<util::RegistryKeyType>(item));
+					util::RegistryKeyType id(
+						boost::lexical_cast<util::RegistryKeyType>(item)
+					);
+					if(id > 0)
+					{
+						list.push_back(id);
+					}
 				}
 				catch(boost::bad_lexical_cast&)
 				{

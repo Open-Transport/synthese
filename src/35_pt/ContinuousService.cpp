@@ -22,10 +22,12 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "Registry.h"
 #include "ContinuousService.h"
+
+#include "AccessParameters.h"
 #include "Edge.h"
 #include "JourneyPattern.hpp"
+#include "Registry.h"
 
 using namespace std;
 using namespace boost;
@@ -103,9 +105,9 @@ namespace synthese
 
 
 		ServicePointer ContinuousService::getFromPresenceTime(
+			const AccessParameters& accessParameters,
 			bool RTData,
 			bool getDeparture,
-			size_t userClassRank,
 			const Edge& edge,
 			const ptime& presenceDateTime,
 			bool checkIfTheServiceIsReachable,
@@ -113,6 +115,12 @@ namespace synthese
 			bool ignoreReservation,
 			bool allowCanceled
 		) const	{
+
+			// Check of access parameters
+			if(!isCompatibleWith(accessParameters))
+			{
+				return ServicePointer();
+			}
 
 			// Check of real time vertex
 			if(	RTData && !_RTVertices[edge.getRankInPath()])
@@ -199,7 +207,7 @@ namespace synthese
 			}
 
 			// Saving of the result
-			ServicePointer ptr(RTData, userClassRank, *this, originDateTime);
+			ServicePointer ptr(RTData, accessParameters.getUserClassRank(), *this, originDateTime);
 			if(getDeparture)
 			{
 				ptr.setDepartureInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());

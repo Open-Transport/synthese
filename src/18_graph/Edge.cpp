@@ -148,10 +148,10 @@ namespace synthese
 
 
 		ServicePointer Edge::getNextService(
-			size_t userClassRank,
+			const AccessParameters& accessParameters,
 			ptime departureMoment,
 			const ptime& maxDepartureMoment,
-			bool controlIfTheServiceIsReachable,
+			bool checkIfTheServiceIsReachable,
 			optional<DepartureServiceIndex::Value>& minNextServiceIndex,
 			bool inverted,
 			bool ignoreReservation,
@@ -186,12 +186,12 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							(*next)->getFromPresenceTime(
+								accessParameters,
 								RTData,
 								true,
-								userClassRank,
 								*this,
 								departureMoment,
-								controlIfTheServiceIsReachable,
+								checkIfTheServiceIsReachable,
 								inverted,
 								ignoreReservation,
 								allowCanceled
@@ -223,10 +223,10 @@ namespace synthese
 
 
 		ServicePointer Edge::getPreviousService(
-			size_t userClassRank,
+			const AccessParameters& accessParameters,
 			ptime arrivalMoment,
 			const ptime& minArrivalMoment,
-			bool controlIfTheServiceIsReachable,
+			bool checkIfTheServiceIsReachable,
 			optional<ArrivalServiceIndex::Value>& maxPreviousServiceIndex,
 			bool inverted,
 			bool ignoreReservation,
@@ -259,12 +259,12 @@ namespace synthese
 						// Saving of the used service
 						ServicePointer servicePointer(
 							(*previous)->getFromPresenceTime(
+								accessParameters,
 								RTData,
 								false,
-								userClassRank,
 								*this,
 								arrivalMoment,
-								controlIfTheServiceIsReachable,
+								checkIfTheServiceIsReachable,
 								inverted,
 								ignoreReservation,
 								allowCanceled

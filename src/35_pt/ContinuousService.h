@@ -96,9 +96,9 @@ namespace synthese
 					@warning The service index is unknown in the generated ServicePointer.
 				*/
 				virtual graph::ServicePointer getFromPresenceTime(
+					const graph::AccessParameters& accessParameters,
 					bool RTData,
 					bool getDeparture,
-					std::size_t userClassRank,
 					const graph::Edge& edge,
 					const boost::posix_time::ptime& presenceDateTime,
 					bool checkIfTheServiceIsReachable,

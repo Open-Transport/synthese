@@ -421,7 +421,7 @@ namespace synthese
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
 			// Max transfer duration
-			if(map.isDefined(PARAMETER_MAX_TRANSFER_DURATION))
+			if(map.getOptional<int>(PARAMETER_MAX_TRANSFER_DURATION))
 			{
 				_maxTransferDuration = minutes(map.get<int>(PARAMETER_MAX_TRANSFER_DURATION));
 			}
