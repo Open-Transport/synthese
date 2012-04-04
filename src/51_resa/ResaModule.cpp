@@ -433,13 +433,22 @@ namespace synthese
 			recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
 
 			RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
-			if(tableId == ScheduledServiceTableSync::TABLE.ID)
+			try
 			{
-				_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].erase(&reservation);
+				if(tableId == ScheduledServiceTableSync::TABLE.ID)
+				{
+					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].erase(&reservation);
+				}
+				else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+				{
+					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].erase(&reservation);
+				}
 			}
-			else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+			catch(ObjectNotFoundException<ScheduledService>&)
 			{
-				_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].erase(&reservation);
+			}
+			catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
+			{
 			}
 		}
 
@@ -473,7 +482,7 @@ namespace synthese
 					ptime now(second_clock::local_time());
 					ReservationTableSync::SearchResult reservations(
 						ReservationTableSync::Search(
-						Env::GetOfficialEnv(),
+							Env::GetOfficialEnv(),
 							now - BEFORE_RESERVATION_INDEXATION_DURATION,
 							now + AFTER_RESERVATION_INDEXATION_DURATION
 					)	);
