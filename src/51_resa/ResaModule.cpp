@@ -406,14 +406,23 @@ namespace synthese
 		{
 			recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
 
-			RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
-			if(tableId == ScheduledServiceTableSync::TABLE.ID)
+			try
 			{
-				_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].insert(&reservation);
+				RegistryTableType tableId(decodeTableId(reservation.getServiceId()));
+				if(tableId == ScheduledServiceTableSync::TABLE.ID)
+				{
+					_reservationsByService[Env::GetOfficialEnv().get<ScheduledService>(reservation.getServiceId()).get()].insert(&reservation);
+				}
+				else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+				{
+					_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].insert(&reservation);
+				}
 			}
-			else if(tableId == FreeDRTTimeSlotTableSync::TABLE.ID)
+			catch(ObjectNotFoundException<ScheduledService>&)
 			{
-				_reservationsByService[Env::GetOfficialEnv().get<FreeDRTTimeSlot>(reservation.getServiceId()).get()].insert(&reservation);
+			}
+			catch(ObjectNotFoundException<FreeDRTTimeSlot>&)
+			{
 			}
 		}
 
