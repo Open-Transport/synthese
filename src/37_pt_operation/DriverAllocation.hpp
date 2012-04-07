@@ -46,6 +46,8 @@ namespace synthese
 		FIELD_TYPE(Amount, double)
 		FIELD_TYPE(BoniAmount, double)
 		FIELD_TYPE(BoniTime, boost::posix_time::time_duration)
+		FIELD_TYPE(WorkRange, boost::posix_time::time_duration)
+		FIELD_TYPE(WorkDuration, boost::posix_time::time_duration)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -55,7 +57,9 @@ namespace synthese
 			FIELD(Amount),
 			FIELD(BoniAmount),
 			FIELD(BoniTime),
-			FIELD(impex::DataSourceLinks)
+			FIELD(impex::DataSourceLinks),
+			FIELD(WorkRange),
+			FIELD(WorkDuration)
 		> DriverAllocationSchema;
 
 		/** DriverAllocation class.
