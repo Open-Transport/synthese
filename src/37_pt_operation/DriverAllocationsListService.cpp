@@ -68,6 +68,7 @@ namespace synthese
 		const string DriverAllocationsListService::PARAMETER_WORK_DURATION_FILTER = "work_duration_filter";
 		const string DriverAllocationsListService::PARAMETER_WORK_RANGE_FILTER = "work_range_filter";
 		const string DriverAllocationsListService::PARAMETER_LINE_FILTER = "line_filter";
+		const string DriverAllocationsListService::PARAMETER_HOURS_FILTER = "hours_filter";
 
 		const string DriverAllocationsListService::TAG_ALLOCATION = "allocation";
 		const string DriverAllocationsListService::TAG_ALLOCATIONS = "allocations";
@@ -84,7 +85,9 @@ namespace synthese
 			_maxWorkDuration(not_a_date_time),
 			_minWorkRange(not_a_date_time),
 			_maxWorkRange(not_a_date_time),
-			_lineFilter(NULL)
+			_lineFilter(NULL),
+			_minHourFilter(not_a_date_time),
+			_maxHourFilter(not_a_date_time)
 		{}
 
 
@@ -107,6 +110,8 @@ namespace synthese
 			return map;
 		}
 
+
+
 		void DriverAllocationsListService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Min Date
@@ -123,6 +128,22 @@ namespace synthese
 			if(!map.getDefault<string>(Date::FIELD.name).empty())
 			{
 				Date::LoadFromRecord(_date, map);
+			}
+
+			// Hours filter
+			string hoursFilter(map.getDefault<string>(PARAMETER_HOURS_FILTER));
+			if(!hoursFilter.empty())
+			{
+				vector<string> bounds;
+				split(bounds, hoursFilter, is_any_of(","));
+				if(bounds.size() >= 1)
+				{
+					_minHourFilter = hours(lexical_cast<long>(bounds[0]));
+				}
+				else if(bounds.size() >= 2)
+				{
+					_maxHourFilter = hours(lexical_cast<long>(bounds[1]));
+				}
 			}
 
 			// Work range filter
@@ -307,6 +328,18 @@ namespace synthese
 
 				// Defined driver : return only allocations for this driver
 				if(_driver && (!alloc.get<Driver>() || &*alloc.get<Driver>() != _driver))
+				{
+					continue;
+				}
+
+				// Min hour filter
+				if(!_minHourFilter.is_not_a_date_time() && alloc.getServiceBeginning() < _minHourFilter)
+				{
+					continue;
+				}
+
+				// Max hour filter
+				if(!_maxHourFilter.is_not_a_date_time() && alloc.getServiceBeginning() > _maxHourFilter)
 				{
 					continue;
 				}

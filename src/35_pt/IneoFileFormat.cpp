@@ -1162,6 +1162,32 @@ namespace synthese
 								split(parts, bonifStr, is_any_of("h"));
 								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
+
+							// Work range
+							string workRangeStr(_getValue("ampli"));
+							if(workRangeStr.empty())
+							{
+								da->set<WorkRange>(time_duration(not_a_date_time));
+							}
+							else
+							{
+								vector<string> parts;
+								split(parts, workRangeStr, is_any_of("h"));
+								da->set<WorkRange>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
+							}
+
+							// Work duration
+							string workDurationStr(_getValue("tpstra"));
+							if(workDurationStr.empty())
+							{
+								da->set<WorkDuration>(time_duration(not_a_date_time));
+							}
+							else
+							{
+								vector<string> parts;
+								split(parts, workDurationStr, is_any_of("h"));
+								da->set<WorkDuration>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
+							}
 						}
 
 						// Journey
