@@ -181,7 +181,7 @@ namespace synthese
 				for (RoadJourneyPlannerResult::Journeys::const_iterator it(_journeys.begin()); it != _journeys.end(); ++it) {
 					geos::geom::CoordinateSequence *coords(gf.getCoordinateSequenceFactory()->create(0,2));
 
-					BOOST_FOREACH(graph::ServicePointer su,it->getServiceUses()) {
+					BOOST_FOREACH(const graph::ServicePointer& su,it->getServiceUses()) {
 						const graph::Edge *e = su.getDepartureEdge();
 						while(true)
 						{
