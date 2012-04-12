@@ -305,6 +305,7 @@ namespace synthese
 			//@{
 				static const std::string DATA_LINE_MARKERS;
 				static const std::string DATA_ROW_NUMBER;
+				static const std::string DATA_JUNCTIONS_NUMBER;
 			//@}
 
 			typedef std::vector<boost::shared_ptr<std::ostringstream> > PlacesContentVector;
@@ -500,8 +501,26 @@ namespace synthese
 				const road::RoadPlace& roadPlace,
 				bool showCoords
 			) const;
+			
+			void displayTime(
+				const std::string & datafieldName,
+				const boost::posix_time::ptime & time,
+				util::ParametersMap & pm,
+				bool displayBlankField = false
+			) const;
+			
+			void displayFullDate(
+				const std::string & datafieldName,
+				const boost::posix_time::ptime & time,
+				util::ParametersMap & pm
+			) const;
 
-
+			void fillTimeParameters(
+				const boost::posix_time::ptime & firstArrivalDateTime,
+				const boost::posix_time::ptime & firstDepartureDateTime,		
+				const boost::posix_time::time_duration & rangeDuration,
+				util::ParametersMap & pm
+			) const;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Display a row on a web page.
@@ -622,18 +641,16 @@ namespace synthese
 			/// @param lastArrivalTime last arrival time of journey (if not continuous same value than firstArrivalTime)
 			/// @param firstDepartureTime first departure time of journey
 			/// @param lastDepartureTime last departure time of journey (if not continuous same value than firstArrivalTime)
-			/// @param isItContinuousService Is the journey contains only continuous services ?
+			/// @param rangeDuration 0 if service is not continious
 			/// @pre _resultRowPage is not null
 			void _displayResultRow(
 				std::ostream& stream,
 				const server::Request& request,
 				std::size_t rowNumber,
 				const graph::Journey& journey,
-				const boost::posix_time::time_duration& firstArrivalTime,
-				const boost::posix_time::time_duration& lastArrivalTime,
-				const boost::posix_time::time_duration& firstDepartureTime,
-				const boost::posix_time::time_duration& lastDepartureTime,
-				bool isItContinuousService
+				const boost::posix_time::ptime& firstArrivalTime,
+				const boost::posix_time::ptime& firstDepartureTime,
+				const boost::posix_time::time_duration& rangeDuration
 			) const;
 
 

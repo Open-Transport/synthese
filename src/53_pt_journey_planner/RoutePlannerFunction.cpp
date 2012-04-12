@@ -222,6 +222,7 @@ namespace synthese
 
 		const string RoutePlannerFunction::DATA_CONTENT("content");
 		const string RoutePlannerFunction::DATA_RANK("rank");
+		const string RoutePlannerFunction::DATA_JUNCTIONS_NUMBER("junctions_number");
 
 		const string RoutePlannerFunction::DATA_START_DATE = "start_date";
 		const string RoutePlannerFunction::DATA_END_DATE = "end_date";
@@ -2307,6 +2308,28 @@ namespace synthese
 				pm.insert(DATA_WARNINGS, warnings.str());
 			}
 
+			// Route Planner fisrt arrival is the arrival of the first service
+			if(!object.getJourneys().empty() && !object.getJourneys().begin()->getServiceUses().empty())
+			{
+				ptime firstDateArrivalTime = (object.getJourneys().begin()->getServiceUses().end() - 1)->getArrivalDateTime();
+				displayFullDate(
+					DATA_FIRST_ARRIVAL_TIME,
+					firstDateArrivalTime,
+					pm
+				);
+			}
+
+			// Route Planner last departure is the departure of the last service
+			if(!object.getJourneys().empty() && !(object.getJourneys().end() - 1)->getServiceUses().empty())
+			{
+				ptime lastDateDepartureTime = (object.getJourneys().end() - 1)->getServiceUses().begin()->getDepartureDateTime();
+				displayFullDate(
+					DATA_LAST_DEPARTURE_TIME,
+					lastDateDepartureTime + (object.getJourneys().end() - 1)->getContinuousServiceRange(), // If last service is continious, add range
+					pm
+				);
+			}
+			
 			// Result row
 			if(_resultRowPage.get())
 			{
@@ -2318,22 +2341,14 @@ namespace synthese
 					// Loop on each leg
 					const Journey::ServiceUses& jl(journey.getServiceUses());
 
-					ptime lastDateArrivalTime((jl.end()-1)->getArrivalDateTime());
-					lastDateArrivalTime += journey.getContinuousServiceRange();
-
-					ptime lastDateDepartureTime(jl.begin()->getDepartureDateTime());
-					lastDateDepartureTime += journey.getContinuousServiceRange();
-
 					_displayResultRow(
 						resultRows,
 						request,
 						n,
 						journey,
-						(jl.end()-1)->getArrivalDateTime().time_of_day(),
-						lastDateArrivalTime.time_of_day(),
-						jl.begin()->getDepartureDateTime().time_of_day(),
-						lastDateDepartureTime.time_of_day(),
-						journey.getContinuousServiceRange().total_seconds() > 0
+						(jl.end() - 1)->getArrivalDateTime(),
+						jl.begin()->getDepartureDateTime(),
+						journey.getContinuousServiceRange()
 					);
 					++n;
 				}
@@ -2603,14 +2618,12 @@ namespace synthese
 
 		void RoutePlannerFunction::_displayResultRow(
 			std::ostream& stream,
-			const server::Request& request,
+			const Request& request,
 			std::size_t rowNumber,
-			const graph::Journey& journey,
-			const boost::posix_time::time_duration& firstArrivalTime,
-			const boost::posix_time::time_duration& lastArrivalTime,
-			const boost::posix_time::time_duration& firstDepartureTime,
-			const boost::posix_time::time_duration& lastDepartureTime,
-			bool isItContinuousService
+			const Journey& journey,
+			const ptime& firstArrivalTime,
+			const ptime& firstDepartureTime,
+			const time_duration& rangeDuration
 		) const {
 
 			// Precondition check
@@ -2620,6 +2633,7 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			// Display Lines used
+			int junctionsNumber = -1; // junctionsNumber is legNumber -1
 			if(_lineMarkerPage.get())
 			{
 				stringstream lineMarkers;
@@ -2633,44 +2647,27 @@ namespace synthese
 							_lineMarkerPage,
 							request,
 							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
-						);
+						);						
+						junctionsNumber++;
 					}
 				}
-
 				pm.insert(DATA_LINE_MARKERS, lineMarkers.str());
 			}
-			{
-				stringstream s;
-				if(!firstArrivalTime.is_not_a_date_time())
-				{
-					s << setfill('0') << setw(2) << firstArrivalTime.hours() << ":" << setfill('0') << setw(2) << firstArrivalTime.minutes();
-				}
-				pm.insert(DATA_FIRST_ARRIVAL_TIME, s.str());
-			}{
-				stringstream s;
-				if(!lastArrivalTime.is_not_a_date_time())
-				{
-					s << setfill('0') << setw(2) << lastArrivalTime.hours() << ":" << setfill('0') << setw(2) << lastArrivalTime.minutes();
-				}
-				pm.insert(DATA_LAST_ARRIVAL_TIME, s.str());
-			}
-			{
-				stringstream s;
-				if(!firstDepartureTime.is_not_a_date_time())
-				{
-					s << setfill('0') << setw(2) << firstDepartureTime.hours() << ":" << setfill('0') << setw(2) << firstDepartureTime.minutes();
-				}
-				pm.insert(DATA_FIRST_DEPARTURE_TIME, s.str());
-			}{
-				stringstream s;
-				if(!lastDepartureTime.is_not_a_date_time())
-				{
-					s << setfill('0') << setw(2) << lastDepartureTime.hours() << ":" << setfill('0') << setw(2) << lastDepartureTime.minutes();
-				}
-				pm.insert(DATA_LAST_DEPARTURE_TIME, s.str());
-			}
-			pm.insert(DATA_IS_CONTINUOUS_SERVICE, isItContinuousService);
+
+			fillTimeParameters(
+				firstArrivalTime,
+				firstDepartureTime,
+				rangeDuration,
+				pm
+			);
+	
+			pm.insert(DATA_JUNCTIONS_NUMBER,junctionsNumber);
+			pm.insert(DATA_IS_CONTINUOUS_SERVICE, rangeDuration.total_seconds() > 0);
 			pm.insert(DATA_ROW_NUMBER, rowNumber);
+			
+			// Register the reservation availability
+			bool hasReservation = bool(journey.getReservationCompliance(false) != false);
+			pm.insert(DATA_HAS_RESERVATION, hasReservation);
 
 			// Insert HOURS and MINUTES duration
 			DateTimeInterfacePage::fillParametersMap(
@@ -3400,7 +3397,49 @@ namespace synthese
 			page->display(stream, request, pm);
 		}
 
+		void RoutePlannerFunction::displayTime(
+			const string & datafieldName,
+			const ptime & time,
+			ParametersMap & pm,
+			bool displayBlankField
+		) const {
+			stringstream s;
+			if(!displayBlankField)
+				s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
+			pm.insert(datafieldName, s.str());			
+		}
+		
+		void RoutePlannerFunction::displayFullDate(
+			const string & datafieldName,
+			const ptime & time,
+			ParametersMap & pm
+		) const {
+			stringstream s;
+			s << to_iso_extended_string(time.date()) << ' ';
+			s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
+			pm.insert(datafieldName, s.str());		
+		}
+		
 
+		void RoutePlannerFunction::fillTimeParameters(
+			const ptime & firstArrivalDateTime,
+			const ptime & firstDepartureDateTime,		
+			const time_duration & rangeDuration,
+			ParametersMap & pm
+		) const {
+			ptime lastArrivalDateTime = firstArrivalDateTime;
+			ptime lastDepartureDateTime = firstDepartureDateTime;
+			if(rangeDuration.total_seconds() > 0)
+			{
+				lastDepartureDateTime += rangeDuration;
+				lastArrivalDateTime += rangeDuration;
+			}
+					
+			displayTime(DATA_FIRST_DEPARTURE_TIME, firstDepartureDateTime, pm);
+			displayTime(DATA_LAST_DEPARTURE_TIME, lastDepartureDateTime, pm,(rangeDuration.total_seconds() == 0));
+			displayTime(DATA_FIRST_ARRIVAL_TIME, firstArrivalDateTime, pm);
+			displayTime(DATA_LAST_ARRIVAL_TIME, lastArrivalDateTime, pm,(rangeDuration.total_seconds() == 0));
+		}
 
 		void RoutePlannerFunction::_displayServiceCell(
 			std::ostream& stream,
@@ -3417,13 +3456,8 @@ namespace synthese
 			ParametersMap pm(getTemplateParameters());
 
 			// Continuous service
-			ptime lastDepartureDateTime(serviceUse.getDepartureDateTime());
-			ptime lastArrivalDateTime(serviceUse.getArrivalDateTime());
-			if (continuousServiceRange.total_seconds())
-			{
-				lastArrivalDateTime += continuousServiceRange;
-				lastDepartureDateTime += continuousServiceRange;
-			}
+			ptime firstDepartureDateTime(serviceUse.getDepartureDateTime());
+			ptime firstArrivalDateTime(serviceUse.getArrivalDateTime());
 
 			// JourneyPattern extraction
 			const JourneyPattern* line(static_cast<const JourneyPattern*>(serviceUse.getService()->getPath()));
@@ -3431,32 +3465,13 @@ namespace synthese
 			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>(serviceUse.getService()));
 
 			// Build of the parameters vector
-			{
-				stringstream s;
-				s << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getDepartureDateTime().time_of_day().minutes();
-				pm.insert(DATA_FIRST_DEPARTURE_TIME, s.str()); // 0
-			}
-			{
-				stringstream s;
-				if(continuousServiceRange.total_seconds() > 0)
-				{
-					s << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastDepartureDateTime.time_of_day().minutes();
-				}
-				pm.insert(DATA_LAST_DEPARTURE_TIME, s.str()); // 1
-			}
-			{
-				stringstream s;
-				s << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().hours() << ":" << setw(2) << setfill('0') << serviceUse.getArrivalDateTime().time_of_day().minutes();
-				pm.insert(DATA_FIRST_ARRIVAL_TIME, s.str()); // 2
-			}
-			{
-				stringstream s;
-				if(continuousServiceRange.total_seconds() > 0)
-				{
-					s << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().hours() << ":" << setw(2) << setfill('0') << lastArrivalDateTime.time_of_day().minutes();
-				}
-				pm.insert(DATA_LAST_ARRIVAL_TIME, s.str()); // 3
-			}
+			fillTimeParameters(
+				firstArrivalDateTime,
+				firstDepartureDateTime,
+				continuousServiceRange,
+				pm
+			);
+
 			if(line->getRollingStock())
 			{
 				pm.insert(DATA_ROLLINGSTOCK_ID, line->getRollingStock()->getKey()); // 4
