@@ -187,8 +187,8 @@ namespace synthese
 				}
 
 				// Range
-				ptime validityEndTime(presenceDateTime.date(), endSchedule);
-				range = validityEndTime - actualDateTime;
+				ptime validityBeginTime(presenceDateTime.date(), schedule);
+				range = actualDateTime - validityBeginTime;
 			}
 
 			// Origin departure time
@@ -214,7 +214,9 @@ namespace synthese
 			}
 			else
 			{
-				ptr.setArrivalInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
+				ptime dateTime(actualDateTime);
+				dateTime -= range;
+				ptr.setArrivalInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
 
 			// Reservation check
