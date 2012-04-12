@@ -457,18 +457,34 @@ namespace synthese
 				)	);
 				if(stopAreas.empty())
 				{
-					curStop = new StopArea(StopAreaTableSync::getId(), true);
-					Importable::DataSourceLinks links;
-					links.insert(make_pair(&source, string()));
-					curStop->setDataSourceLinksWithoutRegistration(links);
-					if(defaultTransferDuration)
+					BOOST_FOREACH(Registry<StopArea>::value_type stopArea, env.getRegistry<StopArea>())
 					{
-						curStop->setDefaultTransferDelay(*defaultTransferDuration);
+						if(stopArea.second->getName() == name)
+						{
+							curStop = stopArea.second.get();
+							break;
+						}
 					}
-					curStop->setName(name);
-					curStop->setCity(&cityForStopAreaAutoGeneration);
-					env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
-					logStream << "CREA : Auto generation of the commercial stop for stop " << code << " (" << name <<  ")<br />";
+
+					if(!curStop)
+					{
+						curStop = new StopArea(StopAreaTableSync::getId(), true);
+						Importable::DataSourceLinks links;
+						links.insert(make_pair(&source, string()));
+						curStop->setDataSourceLinksWithoutRegistration(links);
+						if(defaultTransferDuration)
+						{
+							curStop->setDefaultTransferDelay(*defaultTransferDuration);
+						}
+						curStop->setName(name);
+						curStop->setCity(&cityForStopAreaAutoGeneration);
+						env.getEditableRegistry<StopArea>().add(shared_ptr<StopArea>(curStop));
+						logStream << "CREA : Auto generation of the commercial stop for stop " << code << " (" << name <<  ")<br />";
+					}
+					else
+					{
+						logStream << "LOAD : Link with existing commercial stop " << curStop->getFullName() << " for stop " << code << " (" << name <<  ")<br />";
+					}
 				}
 				else
 				{
@@ -496,7 +512,11 @@ namespace synthese
 			// Update
 			BOOST_FOREACH(StopPoint* stop, result)
 			{
-				stop->setName(name);
+				if(stop->getName() != name)
+				{
+					logStream << "INFO : Stop " << code << " (" << stop->getName() << ") rename to " << name << "<br />";
+					stop->setName(name);
+				}
 				if(geometry && *geometry)
 				{
 					stop->setGeometry(
