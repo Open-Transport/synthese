@@ -57,15 +57,18 @@ namespace synthese
 			}
 
 			ServicePointer sp(RTData, accessParameters.getUserClassRank(), *this, presenceDateTime);
+			time_duration range(hours(24));
 			if(getDeparture)
 			{
 				sp.setDepartureInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());
 			}
 			else
 			{
-				sp.setArrivalInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());
+				ptime dateTime(presenceDateTime);
+				dateTime -= range;
+				sp.setArrivalInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
-			sp.setServiceRange(posix_time::hours(24));
+			sp.setServiceRange(range);
 			return sp;
 		}
 
