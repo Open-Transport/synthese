@@ -138,8 +138,9 @@ namespace synthese
 					while(true)
 					{
 						// Next service
+						AccessParameters ap(USER_PEDESTRIAN);
 						serviceInstance = ls.getNextService(
-							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+							ap,
 							minTimeForForcedDestination,
 							maxTimeForForcedDestination,
 							false,
