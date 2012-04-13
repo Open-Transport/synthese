@@ -336,7 +336,7 @@ namespace synthese
 			const date& date,
 			const Edge& departureEdge,
 			const Edge& arrivalEdge,
-			size_t userClass
+			size_t userClassRank
 		) const {
 			const CommercialLine* line(getRoute()->getCommercialLine());
 			if(line->getNonConcurrencyRules().empty()) return true;
@@ -348,7 +348,7 @@ namespace synthese
 					_NonConcurrencyCache::key_type(
 						&departureEdge,
 						&arrivalEdge,
-						userClass,
+						userClassRank,
 						date
 			)	)	);
 			if(it != _nonConcurrencyCache.end()) return it->second;
@@ -399,7 +399,7 @@ namespace synthese
 						{
 							const Edge& startEdge(*its->second);
 							// Search a service at the time of the possible
-							AccessParameters ap(userClass+ USER_CLASS_CODE_OFFSET);
+							AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 							optional<Edge::DepartureServiceIndex::Value> minServiceIndex;
 							ServicePointer serviceInstance(
 								startEdge.getNextService(
