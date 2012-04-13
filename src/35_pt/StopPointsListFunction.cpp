@@ -506,9 +506,10 @@ namespace synthese
 				optional<Edge::DepartureServiceIndex::Value> index;
 				while(true)
 				{
+					AccessParameters ap(USER_PEDESTRIAN);
 					ServicePointer servicePointer(
 						ls->getNextService(
-							USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET,
+							ap,
 							departureDateTime,
 							endDateTime,
 							false,
