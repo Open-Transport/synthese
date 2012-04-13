@@ -164,7 +164,7 @@ namespace synthese
 			}
 			else
 			{
-				schedule = (RTData ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex);
+				schedule = (RTData ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex) + _maxWaitingTime;
 				time_duration endSchedule(schedule + _range);
 				if (GetTimeOfDay(schedule) <= GetTimeOfDay(endSchedule))
 				{
@@ -194,6 +194,10 @@ namespace synthese
 			// Origin departure time
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
+			if(!getDeparture)
+			{
+				originDateTime -= range;
+			}
 
 			// Date check
 			ptime calendarDateTime(originDateTime);
@@ -244,10 +248,11 @@ namespace synthese
 				time_duration schedule(
 					(servicePointer.getRTData() ? _RTArrivalSchedules : _arrivalSchedules).at(edgeIndex)
 				);
+				schedule += _maxWaitingTime;
 				servicePointer.setArrivalInformations(
 					edge,
 					servicePointer.getOriginDateTime() + (schedule - getDepartureSchedule(servicePointer.getRTData(), 0)),
-					servicePointer.getOriginDateTime() + (_arrivalSchedules[edgeIndex] - getDepartureSchedule(servicePointer.getRTData(), 0)),
+					servicePointer.getOriginDateTime() + (_arrivalSchedules[edgeIndex] + _maxWaitingTime - getDepartureSchedule(servicePointer.getRTData(), 0)),
 					*edge.getFromVertex()
 				);
 			}
@@ -288,7 +293,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return _arrivalSchedules.at(rankInPath);
+			return _arrivalSchedules.at(rankInPath) + _maxWaitingTime;
 		}
 
 
@@ -297,7 +302,7 @@ namespace synthese
 			bool RTData,
 			std::size_t rankInPath
 		) const	{
-			return _arrivalSchedules.at(rankInPath) + _range;
+			return _arrivalSchedules.at(rankInPath) + _range + _maxWaitingTime;
 		}
 
 
