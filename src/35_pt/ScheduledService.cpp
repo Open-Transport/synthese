@@ -426,7 +426,7 @@ namespace synthese
 											_NonConcurrencyCache::key_type(
 												&departureEdge,
 												&arrivalEdge,
-												userClass,
+												userClassRank,
 												date
 											), false
 									)	);
@@ -443,7 +443,7 @@ namespace synthese
 					_NonConcurrencyCache::key_type(
 						&departureEdge,
 						&arrivalEdge,
-						userClass,
+						userClassRank,
 						date
 					), true
 			)	);
