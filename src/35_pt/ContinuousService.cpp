@@ -159,8 +159,16 @@ namespace synthese
 				}
 
 				// Range
-				ptime validityEndTime(presenceDateTime.date(), endSchedule);
-				range = validityEndTime - actualDateTime;
+				if(inverted)
+				{
+					ptime validityBeginTime(presenceDateTime.date(), schedule);
+					range = actualDateTime - validityBeginTime;
+				}
+				else
+				{
+					ptime validityEndTime(presenceDateTime.date(), endSchedule);
+					range = validityEndTime - actualDateTime;
+				}
 			}
 			else
 			{
@@ -187,15 +195,24 @@ namespace synthese
 				}
 
 				// Range
-				ptime validityBeginTime(presenceDateTime.date(), schedule);
-				range = actualDateTime - validityBeginTime;
+				if(inverted)
+				{
+					ptime validityEndTime(presenceDateTime.date(), endSchedule);
+					range = validityEndTime - actualDateTime;
+				}
+				else
+				{
+					ptime validityBeginTime(presenceDateTime.date(), schedule);
+					range = actualDateTime - validityBeginTime;
+				}
 			}
 
 			// Origin departure time
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
-			if(!getDeparture)
-			{
+			if(	!getDeparture && !inverted ||
+				getDeparture && inverted
+			){
 				originDateTime -= range;
 			}
 
@@ -214,12 +231,20 @@ namespace synthese
 			ServicePointer ptr(RTData, accessParameters.getUserClassRank(), *this, originDateTime);
 			if(getDeparture)
 			{
-				ptr.setDepartureInformations(edge, actualDateTime, actualDateTime, *edge.getFromVertex());
+				ptime dateTime(actualDateTime);
+				if(inverted)
+				{
+					dateTime -= range;
+				}
+				ptr.setDepartureInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
 			else
 			{
 				ptime dateTime(actualDateTime);
-				dateTime -= range;
+				if(!inverted)
+				{
+					dateTime -= range;
+				}
 				ptr.setArrivalInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
 
