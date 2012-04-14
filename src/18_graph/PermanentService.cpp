@@ -56,16 +56,55 @@ namespace synthese
 				return ServicePointer();
 			}
 
-			ServicePointer sp(RTData, accessParameters.getUserClassRank(), *this, presenceDateTime);
 			time_duration range(hours(24));
+			posix_time::time_duration duration(minutes(0));
+			if(_duration)
+			{
+				if(!getDeparture)
+				{
+					duration = *_duration;
+				}
+			}
+			else
+			{
+				double distance(
+					edge.getMetricOffset() - edge.getParentPath()->getEdge(0)->getMetricOffset()
+				);
+				if(distance < 0)
+				{
+					distance = -distance;
+				}
+				duration = posix_time::seconds(distance > 0 ? static_cast<long>(ceil(distance / accessParameters.getApproachSpeed())) : 1);
+			}
+
+			ptime originDateTime(presenceDateTime - duration);
+			if(	!getDeparture && !inverted ||
+				getDeparture && inverted
+			){
+				originDateTime -= range;
+			}
+			ServicePointer sp(
+				RTData,
+				accessParameters.getUserClassRank(),
+				*this,
+				originDateTime
+			);
 			if(getDeparture)
 			{
-				sp.setDepartureInformations(edge, presenceDateTime, presenceDateTime, *edge.getFromVertex());
+				ptime dateTime(presenceDateTime);
+				if(inverted)
+				{
+					dateTime -= range;
+				}
+				sp.setDepartureInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
 			else
 			{
 				ptime dateTime(presenceDateTime);
-				dateTime -= range;
+				if(!inverted)
+				{
+					dateTime -= range;
+				}
 				sp.setArrivalInformations(edge, dateTime, dateTime, *edge.getFromVertex());
 			}
 			sp.setServiceRange(range);
