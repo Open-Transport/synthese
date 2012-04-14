@@ -75,7 +75,18 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 
 		Journey j(r.run());
 
-		BOOST_REQUIRE_EQUAL(j.size(), 1);
+		BOOST_CHECK_EQUAL(j.size(), 1);
+		if(j.size() >= 1)
+		{
+			BOOST_CHECK_EQUAL(
+				boost::posix_time::to_simple_string(j.getJourneyLeg(0).getDepartureDateTime()),
+				boost::posix_time::to_simple_string(ptime(tomorrow.date(), time_duration(7,0,0)))
+			);
+			BOOST_CHECK_EQUAL(
+				boost::posix_time::to_simple_string(j.getJourneyLeg(0).getArrivalDateTime()),
+				boost::posix_time::to_simple_string(ptime(tomorrow.date(), time_duration(7,15,0)))
+			);
+		}
 	}
 
 	{ // 93 -> 99
@@ -263,6 +274,141 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		PTRoutePlannerResult result(r.run());
 
 		BOOST_CHECK_EQUAL(result.getJourneys().size(), 5);
+
+		if(result.getJourneys().size() >= 1)
+		{
+			const Journey& journey(result.getJourneys().at(0));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(10) - minutes(12)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(10) - seconds(44)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(10)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(15)); 
+			}
+		}
+
+		if(result.getJourneys().size() >= 2)
+		{
+			const Journey& journey(result.getJourneys().at(1));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(10) + minutes(5) - minutes(12)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(10) + minutes(5) - seconds(44)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li95.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(10) + minutes(5)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps84.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li95.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(10) + minutes(20)); 
+			}
+		}
+
+		if(result.getJourneys().size() >= 3)
+		{
+			const Journey& journey(result.getJourneys().at(2));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(12) + minutes(5) - minutes(12)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(12) + minutes(5) - seconds(44)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li95.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(12) + minutes(5)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps84.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li95.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(12) + minutes(10)); 
+			}
+		}
+
+		if(result.getJourneys().size() >= 4)
+		{
+			const Journey& journey(result.getJourneys().at(3));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(60));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(30) - minutes(12)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(30) - seconds(44)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(30)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(54)); 
+			}
+		}
+
+		if(result.getJourneys().size() >= 5)
+		{
+			const Journey& journey(result.getJourneys().at(4));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c88.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(10) - minutes(12)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c74.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), ro41.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(10) - seconds(44)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(10)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(25)); 
+			}
+		}
 	}
 
 	{ // 94 -> 99
