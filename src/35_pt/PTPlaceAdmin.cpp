@@ -256,7 +256,7 @@ namespace synthese
 				}
 
 				// Accessibility admin
-				PTRuleUserAdmin<StopArea, PTPlaceAdmin>::Display(stream, _connectionPlace, request);
+				PTRuleUserAdmin<StopArea, PTPlaceAdmin>::Display(stream, _connectionPlace, request, false, true, false);
 
 				// Importable admin
 				StaticActionRequest<StopAreaUpdateAction> updateOnlyRequest(request);
