@@ -211,7 +211,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_CAPACITY))
 			{
-				_capacity = map.getOptional<size_t>(PARAMETER_NAME);
+				_capacity = map.getOptional<size_t>(PARAMETER_CAPACITY);
 				if(_capacity && *_capacity == 0)
 				{
 					_capacity = UseRule::AccessCapacity();
@@ -305,7 +305,7 @@ namespace synthese
 
 			if(map.isDefined(PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER))
 			{
-				_forbiddenInJourneyPlanner = map.get<bool>(PARAMETER_FORBIDDEN_IN_TIMETABLES);
+				_forbiddenInJourneyPlanner = map.get<bool>(PARAMETER_FORBIDDEN_IN_JOURNEY_PLANNER);
 			}
 		}
 
