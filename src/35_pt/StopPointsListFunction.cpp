@@ -69,6 +69,7 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_SRID = "srid";
 		const string StopPointsListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string StopPointsListFunction::PARAMETER_SORT_BY_LINE_NAME = "sln";
+		const string StopPointsListFunction::PARAMETER_OMIT_SAME_AREA_DESTINATIONS = "omitSameAreaDestinations";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
 		const string StopPointsListFunction::TAG_DESTINATION = "destination";
@@ -209,6 +210,7 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
+			_omitSameAreaDestinations = map.getDefault<bool>(PARAMETER_OMIT_SAME_AREA_DESTINATIONS, false);
 
 			// Rolling stock filter
 			optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
@@ -556,11 +558,13 @@ namespace synthese
 
 					const StopArea * destination = journeyPattern->getDestination()->getConnectionPlace();
 
-					if(_stopArea)
+					if(_omitSameAreaDestinations && _stopArea)
 					{
 						//Ignore if destination is the _stopArea himself
 						if(destination->getKey() == _stopArea->get()->getKey())
+						{
 							continue;
+						}
 					}
 
 					SortableStopPoint keySP(&sp);
