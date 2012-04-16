@@ -76,6 +76,7 @@ namespace synthese
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_SORT_BY_LINE_NAME;
+			static const std::string PARAMETER_OMIT_SAME_AREA_DESTINATIONS;
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
@@ -101,6 +102,7 @@ namespace synthese
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _sortByLineName;
+				bool _omitSameAreaDestinations;
 			//@}
 
 
