@@ -1366,16 +1366,16 @@ namespace synthese
 			stringstream transfersTxt;
 
 			// Add header line to each file
-			agencyTxt << "﻿agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang" << endl;
+			agencyTxt << "agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang" << endl;
 			stopsTxt << "stop_id,stop_code,stop_name,stop_lat,stop_lon,location_type,parent_station" << endl;
 			routesTxt << "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color" << endl;
 			tripsTxt << "trip_id,service_id,route_id,trip_headsign,shape_id" << endl;
-			stopTimesTxt << "﻿trip_id,stop_id,stop_sequence,arrival_time,departure_time,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled" << endl;
-			calendarTxt << "﻿service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date" << endl;
+			stopTimesTxt << "trip_id,stop_id,stop_sequence,arrival_time,departure_time,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled" << endl;
+			calendarTxt << "service_id,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date" << endl;
 			calendarDatesTxt << "﻿service_id,date,exception_type" << endl;
-			shapesTxt << "﻿﻿shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence" << endl;
+			shapesTxt << "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence" << endl;
 			frequenciesTxt << "trip_id,start_time,end_time,headway_secs" << endl;
-			transfersTxt << "﻿﻿.::. NOT YET .::." <<endl;
+			transfersTxt << ".::. NOT YET .::." <<endl;
 
 			// BEGIN AGENCY.TXT
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type myAgency, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
