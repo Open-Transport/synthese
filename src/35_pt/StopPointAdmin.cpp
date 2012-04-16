@@ -219,7 +219,7 @@ namespace synthese
 				stream << t.close();
 
 				// Accessibility admin
-				PTRuleUserAdmin<StopPoint, StopPointAdmin>::Display(stream, _stop, request);
+				PTRuleUserAdmin<StopPoint, StopPointAdmin>::Display(stream, _stop, request, false, true, false);
 			}
 
 
