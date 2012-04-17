@@ -140,8 +140,9 @@ namespace synthese
 				// Name filter
 				if(!_name.empty())
 				{
-					if(vs.getName().find(_name) == string::npos)
-					{
+					if(	vs.getName().size() < _name.size() ||
+						vs.getName().substr(0, _name.size()) != _name
+					){
 						continue;
 					}
 				}
