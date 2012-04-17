@@ -273,22 +273,24 @@ namespace synthese
 			const date& date,
 			std::size_t userClassRank
 		) const {
-			// Pedestrian
+			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
+			
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
 			{
 				if((*it)->isDeparture())
 				{
-					ServicePointer p(getFromPresenceTime(
-						false,
-						true,
-						USER_PEDESTRIAN,
-						**it,
-						ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
-						false,
-						false,
-						false,
-						false
+					ServicePointer p(
+						getFromPresenceTime(
+							ap,
+							false,
+							true,
+							**it,
+							ptime(date, GetTimeOfDay(getDepartureSchedule(false, (*it)->getRankInPath()))),
+							false,
+							false,
+							false,
+							false
 					)	);
 					if(!p.getService()) return UseRule::RESERVATION_FORBIDDEN;
 					return getUseRule(userClassRank).getReservationAvailability(p, false);
