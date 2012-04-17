@@ -62,9 +62,11 @@ namespace synthese
 				chunk,
 				chunk.getHouseNumberMetricOffset(houseNumber),
 				houseNumber
-			), Registrable(0)
+			), Registrable(0),
+			_numberAtBeginning(numberAtBeginning)
 		{
-			setName(string(
+			setName(
+				string(
 					(numberAtBeginning ? lexical_cast<string>(houseNumber) : chunk.getRoad()->getRoadPlace()->getName()) +
 					separator +
 					(numberAtBeginning ? chunk.getRoad()->getRoadPlace()->getName() : lexical_cast<string>(houseNumber))
@@ -76,10 +78,9 @@ namespace synthese
 
 		House::House(
 			util::RegistryKeyType key
-		):
-			Registrable(key)
+		):	Registrable(key),
+			_numberAtBeginning(true)
 		{
-
 		}
 
 
@@ -135,6 +136,8 @@ namespace synthese
 			return text;
 		}
 
+
+
 		void House::toParametersMap(
 			util::ParametersMap& pm,
 			const CoordinatesSystem* coordinatesSystem,
@@ -161,6 +164,8 @@ namespace synthese
 			}
 		}
 
+
+
 		void House::toParametersMap(
 			util::ParametersMap& pm,
 			const std::string& prefix
@@ -174,5 +179,12 @@ namespace synthese
 		{
 			string emptyPrefix;
 			toParametersMap(pm, emptyPrefix);
+		}
+
+
+
+		bool House::_getCityNameBeforePlaceName() const
+		{
+			return !_numberAtBeginning;
 		}
 }	}
