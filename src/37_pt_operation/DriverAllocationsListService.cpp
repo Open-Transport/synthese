@@ -140,7 +140,7 @@ namespace synthese
 				{
 					_minHourFilter = hours(lexical_cast<long>(bounds[0]));
 				}
-				else if(bounds.size() >= 2)
+				if(bounds.size() >= 2)
 				{
 					_maxHourFilter = hours(lexical_cast<long>(bounds[1]));
 				}
