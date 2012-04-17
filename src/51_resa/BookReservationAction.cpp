@@ -30,6 +30,7 @@
 #include "FreeDRTTimeSlot.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
 #include "GeographyModule.h"
+#include "House.hpp"
 #include "Journey.h"
 #include "JourneyPattern.hpp"
 #include "JourneysResult.h"
@@ -421,8 +422,12 @@ namespace synthese
 			if(!_journey.empty())
 			{
 				// New reservation for each journey leg
-				BOOST_FOREACH(const ServicePointer& su, _journey.getServiceUses())
-				{
+				for(Journey::ServiceUses::const_iterator itSu(_journey.getServiceUses().begin());
+					itSu != _journey.getServiceUses().end();
+					++itSu
+				){
+					const ServicePointer& su(*itSu);
+				
 					assert(su.getService() != NULL);
 					assert(su.getDepartureEdge() != NULL);
 					assert(su.getDepartureEdge()->getHub() != NULL);
@@ -433,11 +438,28 @@ namespace synthese
 					r->setKey(ReservationTableSync::getId());
 					_env->getEditableRegistry<Reservation>().add(r);
 
-					r->setDeparturePlaceId(
-						dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()) ?
-						dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey() :
-						RegistryKeyType(0)
-					);
+					if(dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub()))
+					{
+						r->setDeparturePlaceId(
+							dynamic_cast<const Registrable*>(su.getDepartureEdge()->getHub())->getKey()
+						);
+					}
+					else if(
+						itSu == _journey.getServiceUses().begin()
+					){
+						if(dynamic_cast<const Registrable*>(_departurePlace.get()))
+						{
+							r->setDeparturePlaceId(
+								dynamic_cast<const Registrable*>(_departurePlace.get())->getKey()
+							);
+						}
+						else if(dynamic_cast<const House*>(_departurePlace.get()))
+						{
+							r->setDeparturePlaceId(
+								dynamic_cast<const House*>(_departurePlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+							);
+						}
+					}
 					if(dynamic_cast<const NamedPlace*>(su.getDepartureEdge()->getHub()))
 					{
 						r->setDeparturePlaceName(
@@ -446,11 +468,28 @@ namespace synthese
 					}
 					r->setDepartureTime(su.getDepartureDateTime());
 					r->setOriginDateTime(su.getOriginDateTime());
-					r->setArrivalPlaceId(
-						dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()) ?
-						dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey() :
-						RegistryKeyType(0)
-					);
+					if(dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub()))
+					{
+						r->setArrivalPlaceId(
+							dynamic_cast<const Registrable*>(su.getArrivalEdge()->getHub())->getKey()
+						);
+					}
+					else if(
+						itSu + 1 == _journey.getServiceUses().end()
+					){
+						if(dynamic_cast<const Registrable*>(_arrivalPlace.get()))
+						{
+							r->setDeparturePlaceId(
+								dynamic_cast<const Registrable*>(_arrivalPlace.get())->getKey()
+							);
+						}
+						else if(dynamic_cast<const House*>(_arrivalPlace.get()))
+						{
+							r->setDeparturePlaceId(
+								dynamic_cast<const House*>(_arrivalPlace.get())->getRoadChunk()->getRoad()->getRoadPlace()->getKey()
+							);
+						}
+					}
 					if(dynamic_cast<const NamedPlace*>(su.getArrivalEdge()->getHub()))
 					{
 						r->setArrivalPlaceName(
