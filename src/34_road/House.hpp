@@ -57,6 +57,8 @@ namespace synthese
 
 			typedef util::Registry<House>	Registry;
 
+			bool _numberAtBeginning;
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor from parameter values.
 			///	@param chunk the road chunk where the house is attached
@@ -148,6 +150,10 @@ namespace synthese
 				void toParametersMap(
 					util::ParametersMap& pm
 				) const;
+
+
+
+				virtual bool _getCityNameBeforePlaceName() const;
 			//@}
 		};
 }	}

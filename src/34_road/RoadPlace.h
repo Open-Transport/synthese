@@ -134,12 +134,14 @@ namespace synthese
 				///	</ul>
 				//////////////////////////////////////////////////////////////////////////
 				/// @param houseNumber the number of the house to get
+				/// @param numberAtBeginning the number is before the street name
 				/// @return auto generated House object corresponding to the point
 				/// @author Hugues Romain
 				/// @date 2010
 				/// @since 3.2.0
 				boost::shared_ptr<House> getHouse(
-					MainRoadChunk::HouseNumber houseNumber
+					MainRoadChunk::HouseNumber houseNumber,
+					bool numberAtBeginning = true
 				) const;
 			//@}
 

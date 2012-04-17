@@ -156,7 +156,8 @@ namespace synthese
 
 
 		boost::shared_ptr<House> RoadPlace::getHouse(
-			MainRoadChunk::HouseNumber houseNumber
+			MainRoadChunk::HouseNumber houseNumber,
+			bool numberAtBeginning
 		) const	{
 			MainRoadChunk* nearestChunk(NULL);
 			MainRoadChunk::HouseNumber difference(MainRoadChunk::HouseNumber_MAX);
@@ -181,7 +182,8 @@ namespace synthese
 						return shared_ptr<House>(
 							new House(
 								chunk,
-								houseNumber
+								houseNumber,
+								numberAtBeginning
 						)	);
 					}
 					else
@@ -302,7 +304,8 @@ namespace synthese
 				return boost::shared_ptr<House>(
 					new House(
 						*nearestChunk,
-						bestNumber
+						bestNumber,
+						numberAtBeginning
 				)	);
 			}
 
@@ -310,6 +313,7 @@ namespace synthese
 			// No return
 			return shared_ptr<House>();
 		}
+
 
 
 		void RoadPlace::toParametersMap(

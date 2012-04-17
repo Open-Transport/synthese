@@ -50,7 +50,18 @@ namespace synthese
 
 		std::string NamedPlace::getFullName() const
 		{
-			return ((_city != NULL) ? (_city->getName() + " ") : "") + getName();
+			if(_city == NULL)
+			{
+				return getName();
+			}
+			else if(_getCityNameBeforePlaceName())
+			{
+				return _city->getName() + " " + getName();
+			}
+			else
+			{
+				return getName() + " " + _city->getName();
+			}
 		}
 
 

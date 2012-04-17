@@ -192,10 +192,27 @@ namespace synthese
 			split(words, placeName, is_any_of(", "));
 			if(words.size() > 1)
 			{	// Text points to an address
+				bool numberAtBeginning(true);
+				MainRoadChunk::HouseNumber number(0);
 				try
 				{
-					MainRoadChunk::HouseNumber number(lexical_cast<MainRoadChunk::HouseNumber>(words[0]));
-
+					number = lexical_cast<MainRoadChunk::HouseNumber>(words[0]);
+				}
+				catch(bad_lexical_cast)
+				{
+					try
+					{
+						number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size()-1]);
+						numberAtBeginning = false;
+					}
+					catch(bad_lexical_cast)
+					{
+						
+					}
+					
+				}
+				if(number > 0)
+				{
 					string roadName(placeName.substr(words[0].size() + 1));
 
 					City::PlacesMatcher::MatchResult places(
@@ -208,7 +225,7 @@ namespace synthese
 							dynamic_cast<const RoadPlace&>(*place.value)
 						);
 
-						shared_ptr<House> house(roadPlace.getHouse(number));
+						shared_ptr<House> house(roadPlace.getHouse(number, numberAtBeginning));
 
 						ExtendedFetchPlaceResult placeResult;
 						placeResult.cityResult = cityResult;
@@ -220,9 +237,6 @@ namespace synthese
 					}
 
 					return result;
-				}
-				catch (bad_lexical_cast)
-				{
 				}
 			}
 
