@@ -647,9 +647,13 @@ namespace synthese
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{
-			return (s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))
-				|| (s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0)
-				&& s1 < s2)
+			return
+				(	(	s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0) ||
+						s1->getDepartureSchedule (false,0).is_not_a_date_time() ||
+						s2->getDepartureSchedule (false,0).is_not_a_date_time()
+					) && s1 < s2
+				) ||
+				(s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0))
 			;
 		}
 
