@@ -151,7 +151,7 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(static_cast<int>(object->getCategory()));
 			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
-			query.addField(object->getParent() ? object->getParent()->getKey() : 0);
+			query.addField(object->getParent(true) ? object->getParent()->getKey() : 0);
 			query.execute(transaction);
 		}
 
