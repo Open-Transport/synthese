@@ -2654,6 +2654,12 @@ namespace synthese
 				pm.insert(DATA_LINE_MARKERS, lineMarkers.str());
 			}
 
+			const ContinuousService* continuousService(dynamic_cast<const ContinuousService*>((*journey.getServiceUses().begin()).getService()));
+			if(continuousService)
+			{
+				pm.insert(DATA_CONTINUOUS_SERVICE_WAITING, continuousService->getMaxWaitingTime().total_seconds() / 60);
+			}
+
 			fillTimeParameters(
 				firstArrivalTime,
 				firstDepartureTime,
