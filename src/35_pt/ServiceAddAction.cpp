@@ -240,7 +240,6 @@ namespace synthese
 
 				ScheduledServiceTableSync::Save(&object, transaction);
 
-
 				// Copy of calendar template elements
 				if(_template.get() && !_template->getCalendarLinks().empty())
 				{
@@ -252,8 +251,10 @@ namespace synthese
 						newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
 						newLink.setStartDate(calendarLink->getStartDate());
 						newLink.setEndDate(calendarLink->getEndDate());
+						object.addCalendarLink(newLink,true);
 						CalendarLinkTableSync::Save(&newLink, transaction);
 					}
+					object.setCalendarFromLinks();
 				}
 
 				request.setActionCreatedId(object.getKey());
@@ -283,6 +284,8 @@ namespace synthese
 						object2.setSchedulesFromOther(object, departureTime - object.getDepartureSchedule(false, 0));
 						object2.copyDates(object);
 
+						ScheduledServiceTableSync::Save(&object2, transaction);
+
 						// Copy of calendar template elements
 						if(_template.get() && !_template->getCalendarLinks().empty())
 						{
@@ -294,11 +297,11 @@ namespace synthese
 								newLink.setCalendarTemplate2(calendarLink->getCalendarTemplate2());
 								newLink.setStartDate(calendarLink->getStartDate());
 								newLink.setEndDate(calendarLink->getEndDate());
+								object2.addCalendarLink(newLink,true);
 								CalendarLinkTableSync::Save(&newLink, transaction);
 							}
+							object2.setCalendarFromLinks();
 						}
-
-						ScheduledServiceTableSync::Save(&object2, transaction);
 					}
 				}
 			}
