@@ -54,7 +54,12 @@ namespace synthese
 				string aliasedWord(_ConvertAlias(word));
 				if(aliasedWord.empty()) continue;
 
-				_words.push_back(FrenchPhoneticString(aliasedWord));
+				FrenchPhoneticString phoneticWord(aliasedWord);
+
+				if(!phoneticWord.getPhonetic().empty())
+				{
+					_words.push_back(phoneticWord);
+				}
 			}
 		}
 
