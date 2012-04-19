@@ -620,11 +620,12 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
+			AccessParameters::AllowedPathClasses allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
 			if(_config)
 			{
 				_accessParameters = _config->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+					allowedPathClasses
 				);
 			}
 			else
@@ -632,19 +633,19 @@ namespace synthese
 				if(acint && *acint == USER_HANDICAPPED)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 300, posix_time::minutes(23), 0.556
+						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses
 					);
 				}
 				else if(acint && *acint == USER_BIKE)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 3000, posix_time::minutes(23), 4.167
+						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses
 					);
 				}
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833
+						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses
 					);
 				}
 			}
