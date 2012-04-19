@@ -137,6 +137,10 @@ namespace synthese
 				try
 				{
 					_area = DRTAreaTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_AREA), *_env);
+					if(_area->getStops().empty())
+					{
+						throw ActionException("The DRT area can not be empty");
+					}
 				}
 				catch(ObjectNotFoundException<DRTArea>&)
 				{

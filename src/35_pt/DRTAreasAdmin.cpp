@@ -35,6 +35,7 @@
 #include "RemoveObjectAction.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "DRTAreaUpdateAction.hpp"
+#include "LineArea.hpp"
 
 using namespace std;
 using namespace boost;
@@ -147,8 +148,26 @@ namespace synthese
 				stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), DRTAreaAdmin::ICON);
 
 				stream << t.col();
-				deleteRequest.getAction()->setObjectId(it.first);
-				stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "delete.png");
+
+				bool hasLine = false;
+				BOOST_FOREACH(Registry<LineArea>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineArea>())
+				{
+					if(lineArea.second->getArea()->getKey() == it.first && lineArea.second->getLine())
+					{
+						hasLine = true;
+						break;
+					}
+				}
+				// Remove button only if the DRT area is not used by any route
+				if(!hasLine)
+				{
+					deleteRequest.getAction()->setObjectId(it.first);
+					stream << HTMLModule::getLinkButton(deleteRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone ?", "delete.png");
+				}
+				else
+				{
+					stream << HTMLModule::getLinkButton("alert('Impossible, zone utilisée dans un itinéraire.');", "Supprimer", string(), "delete.png", true);
+				}
 			}
 
 			stream << t.row();
