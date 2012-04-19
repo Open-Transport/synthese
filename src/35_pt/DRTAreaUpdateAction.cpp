@@ -25,6 +25,7 @@
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "DRTAreaUpdateAction.hpp"
+#include "LineArea.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "DRTAreaTableSync.hpp"
@@ -91,6 +92,23 @@ namespace synthese
 			if(map.isDefined(PARAMETER_STOPS))
 			{
 				_stops = DRTAreaTableSync::UnserializeStops(map.get<string>(PARAMETER_STOPS), *_env);
+				if(_stops->empty())
+				{
+					bool hasLine = false;
+					BOOST_FOREACH(Registry<LineArea>::value_type lineArea, Env::GetOfficialEnv().getRegistry<LineArea>())
+					{
+						if(lineArea.second->getArea()->getKey() == _area->getKey() && lineArea.second->getLine())
+						{
+							hasLine = true;
+							break;
+						}
+					}
+
+					if(hasLine)
+					{
+						throw ActionException("Can not empty a DRT area which is used in a line");
+					}
+				}
 			}
 		}
 
