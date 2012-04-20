@@ -301,6 +301,21 @@ namespace synthese
 				ptime endTime(_dateTime);
 				endTime += hours(3);
 
+				// The form
+				AdminActionFunctionRequest<BookReservationAction, FreeDRTBookingAdmin> bookRequest(request);
+				bookRequest.setActionWillCreateObject();
+				bookRequest.getAction()->getJourneyPlanner().setDeparturePlace(
+					const_pointer_cast<Place, const Place>(
+						_departurePlace
+				)	);
+				bookRequest.getAction()->getJourneyPlanner().setArrivalPlace(
+					const_pointer_cast<Place, const Place>(
+						_arrivalPlace)
+				)	;
+				HTMLForm f(bookRequest.getHTMLForm("book"));
+				stream << f.open();
+				f.addHiddenField(BookReservationAction::PARAMETER_SERVICE_ID, string());
+
 				// Time slots
 				BOOST_FOREACH(const Service* itServ, _area->getServices())
 				{
@@ -361,24 +376,6 @@ namespace synthese
 						)	);
 					}
 
-					// The form
-					AdminActionFunctionRequest<BookReservationAction, FreeDRTBookingAdmin> bookRequest(request);
-					bookRequest.setActionWillCreateObject();
-					bookRequest.getAction()->setFreeDRTTimeSlot(
-						const_pointer_cast<FreeDRTTimeSlot>(
-							Env::GetOfficialEnv().getSPtr(&timeSlot)
-					)	);
-					bookRequest.getAction()->getJourneyPlanner().setDeparturePlace(
-						const_pointer_cast<Place, const Place>(
-							_departurePlace
-					)	);
-					bookRequest.getAction()->getJourneyPlanner().setArrivalPlace(
-						const_pointer_cast<Place, const Place>(
-							_arrivalPlace)
-					)	;
-					HTMLForm f(bookRequest.getHTMLForm("book"));
-					stream << f.open();
-
 					// The table
 					HTMLTable::ColsVector c;
 					c.push_back(string());
@@ -400,7 +397,10 @@ namespace synthese
 									to_iso_extended_string(result.first.date()) + " " +
 										to_simple_string(result.first.time_of_day())
 								),
-								optional<string>()
+								optional<string>(),
+								string(),
+								false,
+								"document.getElementById('" + f.getFieldId(BookReservationAction::PARAMETER_SERVICE_ID) + "').value='" + lexical_cast<string>(timeSlot.getKey()) + "';"
 							);
 
 						// Departure time
@@ -413,23 +413,24 @@ namespace synthese
 						stream << t.col() << to_simple_string(result.second - result.first);
 					}
 					stream << t.close();
-					stream <<
-						f.setFocus(
-							Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
-							0
-						)
-					;
+				}
+				stream <<
+					f.setFocus(
+						Action_PARAMETER_PREFIX + RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME,
+						0
+					)
+				;
 
-					// Reservation form
-					displayReservationForm(
-						stream,
-						f,
-						request
-					);
+				// Reservation form
+				displayReservationForm(
+					stream,
+					f,
+					request
+				);
 
-					// Form is closed too
-					stream << f.close();
-			}	}
+				// Form is closed too
+				stream << f.close();
+			}
 		}
 
 
