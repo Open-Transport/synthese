@@ -93,6 +93,7 @@ namespace synthese
 	namespace resa
 	{
 		const string BookReservationAction::PARAMETER_CREATE_CUSTOMER = Action_PARAMETER_PREFIX + "cc";
+		const string BookReservationAction::PARAMETER_COMMENT = Action_PARAMETER_PREFIX + "comment";
 		const string BookReservationAction::PARAMETER_CUSTOMER_ID = Action_PARAMETER_PREFIX + "cuid";
 		const string BookReservationAction::PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME = Action_PARAMETER_PREFIX + "csn";
 		const string BookReservationAction::PARAMETER_CUSTOMER_NAME = Action_PARAMETER_PREFIX + "cuna";
