@@ -151,6 +151,7 @@ namespace synthese
 			query.addField(object->getCustomerEMail());
 			query.addField(object->getBookingUserId());
 			query.addField(object->getCancelUserId());
+			query.addField(object->getComment());
 			query.execute(transaction);
 		}
 
