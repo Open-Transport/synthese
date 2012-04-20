@@ -378,7 +378,8 @@ namespace synthese
 					boost::optional<K> valueIfSelected,
 					boost::optional<K> valueToSelect,
 					const std::string label = std::string(),
-					bool disabled = false
+					bool disabled = false,
+					const std::string onclick = std::string()
 				);
 
 
@@ -892,7 +893,8 @@ namespace synthese
 			boost::optional<K> valueIfSelected,
 			boost::optional<K> valueToSelect,
 			const std::string label,
-			bool disabled
+			bool disabled,
+			const std::string onclick
 		){
 			if (!_updateRight)
 			{
@@ -914,6 +916,10 @@ namespace synthese
 			if (disabled)
 			{
 				s << " disabled=\"disabled\"";
+			}
+			if(!onclick.empty())
+			{
+				s << " onclick=\"" << onclick << "\"";
 			}
 			s << " /><label for=\"" << id << "\">" << label << "</label>";
 			removeHiddenFieldIfExists(name, valueToSelect ? boost::lexical_cast<std::string>(*valueToSelect) : std::string());
