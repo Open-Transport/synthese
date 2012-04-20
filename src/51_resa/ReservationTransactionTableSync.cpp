@@ -64,6 +64,7 @@ namespace synthese
 		const string ReservationTransactionTableSync::COL_CUSTOMER_EMAIL = "customer_email";
 		const string ReservationTransactionTableSync::COL_BOOKING_USER_ID = "booking_user_id";
 		const string ReservationTransactionTableSync::COL_CANCEL_USER_ID = "cancel_user_id";
+		const string ReservationTransactionTableSync::COL_COMMENT = "comment";
 	}
 
 	namespace db
@@ -85,6 +86,7 @@ namespace synthese
 			Field(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL, SQL_TEXT),
 			Field(ReservationTransactionTableSync::COL_BOOKING_USER_ID, SQL_INTEGER),
 			Field(ReservationTransactionTableSync::COL_CANCEL_USER_ID, SQL_INTEGER),
+			Field(ReservationTransactionTableSync::COL_COMMENT, SQL_TEXT),
 			Field()
 		};
 
@@ -108,6 +110,7 @@ namespace synthese
 			object->setSeats(rows->getInt( ReservationTransactionTableSync::COL_SEATS));
 			object->setBookingTime(rows->getDateTime( ReservationTransactionTableSync::COL_BOOKING_TIME));
 			object->setCancellationTime(rows->getDateTime( ReservationTransactionTableSync::COL_CANCELLATION_TIME));
+			object->setComment(rows->getText(ReservationTransactionTableSync::COL_COMMENT));
 
 			// Customer user
 			object->setCustomerUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CUSTOMER_ID));

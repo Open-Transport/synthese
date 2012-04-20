@@ -211,6 +211,10 @@ namespace synthese
 			;
 
 			stream << rt.row();
+			stream << rt.col() << "Commentaire";
+			stream << rt.col() << rf.getTextInput(BookReservationAction::PARAMETER_COMMENT, string());
+
+			stream << rt.row();
 			stream << rt.col(2, string(), true) << rf.getSubmitButton("Réserver");
 
 			stream << rt.close();

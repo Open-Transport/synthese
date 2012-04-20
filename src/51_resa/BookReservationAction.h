@@ -88,6 +88,7 @@ namespace synthese
 
 			// Reservation information
 			static const std::string PARAMETER_SEATS_NUMBER;
+			static const std::string PARAMETER_COMMENT;
 
 			// Reservation by service
 			static const std::string PARAMETER_SERVICE_ID;
@@ -107,6 +108,7 @@ namespace synthese
 			graph::AccessParameters				_accessParameters;
 			std::size_t							_seatsNumber;
 			bool								_ignoreReservation;
+			std::string _comment;
 
 			//! @name Reservation on a scheduled service
 			//@{

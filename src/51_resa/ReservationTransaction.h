@@ -65,6 +65,7 @@ namespace synthese
 				int					_seats;			//!< Nombre de places
 				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
 				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
+				std::string _comment;
 			//@}
 
 			//!	\name Personnes
@@ -103,6 +104,7 @@ namespace synthese
 			void setBookingUserId	(util::RegistryKeyType id) { _bookingUserId = id; }
 			void setCancelUserId	(util::RegistryKeyType id) { _cancelUserId = id; }
 			void setCustomerEMail	(const std::string& email);
+			void setComment(const std::string& value){ _comment = value; }
 
 			util::RegistryKeyType					getLastReservation()	const { return _lastReservation; }
 			int						getSeats()				const;
@@ -116,6 +118,7 @@ namespace synthese
 			util::RegistryKeyType	getCancelUserId()		const { return _cancelUserId; }
 			const std::string&		getCustomerEMail()		const;
 			const Reservations&		getReservations()		const;
+			const std::string& getComment() const { return _comment; }
 
 			/** Creation of a child reservation.
 				@return boost::shared_ptr<Reservation> The created reservation

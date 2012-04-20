@@ -164,6 +164,7 @@ namespace synthese
 		{
 			_createCustomer = map.getDefault<bool>(PARAMETER_CREATE_CUSTOMER, false);
 			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
+			_comment = map.getDefault<string>(PARAMETER_COMMENT);
 
 			if(map.getDefault<bool>(PARAMETER_SEARCH_CUSTOMER_BY_EXACT_NAME, false))
 			{
@@ -413,6 +414,7 @@ namespace synthese
 			rt.setCustomerEMail(_customer->getEMail());
 			rt.setCustomerUserId(_customer->getKey());
 			rt.setSeats(_seatsNumber);
+			rt.setComment(_comment);
 			ReservationTransactionTableSync::Save(&rt);
 
 			// Contact center

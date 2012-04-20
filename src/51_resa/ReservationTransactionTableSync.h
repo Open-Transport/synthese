@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string COL_BOOKING_USER_ID;
 			static const std::string COL_CANCEL_USER_ID;
 			static const std::string COL_CUSTOMER_EMAIL;
+			static const std::string COL_COMMENT;
 
 
 
@@ -97,7 +98,6 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ReservationTransactionTableSync_H__
