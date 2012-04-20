@@ -171,7 +171,7 @@ namespace synthese
 					string
 				> departementCodes;
 				typedef map<
-					pair<string, string>,
+					string,
 					City*
 				> CityCodes;
 				CityCodes cityCodes;
@@ -247,7 +247,7 @@ namespace synthese
 								city.get()
 						)	);
 						cityCodes.insert(make_pair(
-								make_pair(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3), rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4)),
+								string(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_2) + "_" + rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3 )+ "_" + rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4)),
 								city.get()
 						)	);
 				}	}
@@ -262,7 +262,7 @@ namespace synthese
 						int cityID(rows->getInt(NavstreetsFileFormat::_FIELD_AREA_ID));
 						City* city = NULL;
 						CityCodes::const_iterator it(cityCodes.find(
-								make_pair(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3), rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4))
+								string(rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_2) + "_" + rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_3) + "_" + rows->getText(NavstreetsFileFormat::_FIELD_AREACODE_4))
 						)	);
 
 						if(it == cityCodes.end())
