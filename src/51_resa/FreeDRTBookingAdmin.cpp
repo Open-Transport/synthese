@@ -361,6 +361,7 @@ namespace synthese
 					/// TODO
 
 					// Time loop
+					results.clear();
 					for(ptime curTime(lowerBound);
 						curTime <= upperBound;
 						curTime = curTime + minutes(5)
