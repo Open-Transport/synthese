@@ -604,7 +604,7 @@ namespace synthese
 								// Cancel link
 								if (globalDeleteRight)
 								{
-									stream << t.col();
+									stream << t.col(1, string(), false, string(), reservation->getTransaction()->getComment().empty() ? 1 : 2);
 									switch(status)
 									{
 									case OPTION:
