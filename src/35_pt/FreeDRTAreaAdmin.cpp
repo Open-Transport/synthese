@@ -264,7 +264,8 @@ namespace synthese
 				ResultHTMLTable::HeaderVector cols;
 				cols.push_back(make_pair(string(), string()));
 				cols.push_back(make_pair(string(), "Num"));
-				cols.push_back(make_pair(string(), "Périmètre"));
+				cols.push_back(make_pair(string(), "Heure début"));
+				cols.push_back(make_pair(string(), "Heure fin"));
 				cols.push_back(make_pair(string(), string()));
 				ResultHTMLTable t(
 					cols,
@@ -291,6 +292,14 @@ namespace synthese
 					stream << t.col();
 					stream << service.getServiceNumber();
 
+					// First departure cell
+					stream << t.col();
+					stream << service.getFirstDeparture();
+
+					// Last arrival cell
+					stream << t.col();
+					stream << service.getLastArrival();
+
 					// Remove cell
 					stream << t.col();
 					stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la zone "+ service.getServiceNumber() + " ?");
@@ -304,6 +313,12 @@ namespace synthese
 
 				// Name field
 				stream << t.col() << addForm.getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_SERVICE_NUMBER, string(), "(numéro)");
+
+				// First departure field
+				stream << t.col() << addForm.getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_FIRST_DEPARTURE, string());
+
+				// Last arrival field
+				stream << t.col() << addForm.getTextInput(FreeDRTTimeSlotUpdateAction::PARAMETER_LAST_ARRIVAL, string());
 
 				// Add button
 				stream << t.col() << addForm.getSubmitButton("Ajouter");
