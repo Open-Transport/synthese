@@ -564,7 +564,9 @@ namespace synthese
 							)	);
 
 							stream << t.row();
-							stream << t.col() << HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
+							stream <<
+								t.col(1, string(), false, string(), reservation->getTransaction()->getComment().empty() ? 1 : 2) <<
+								HTMLModule::getHTMLImage(ResaModule::GetStatusIcon(status), reservation->getFullStatusText());
 							stream <<
 								t.col() <<
 								(	reservation->getDepartureTime().date() != _date ?
@@ -630,6 +632,13 @@ namespace synthese
 								);
 								stream << uv.getSubmitButton("Enregistrer");
 								stream << uv.close();
+							}
+
+							// Comment
+							if(!reservation->getTransaction()->getComment().empty())
+							{
+								stream << t.row();
+								stream << t.col(6) << reservation->getTransaction()->getComment();
 							}
 						}
 					}
