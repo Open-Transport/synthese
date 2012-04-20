@@ -46,6 +46,7 @@ namespace synthese
 
 	namespace resa
 	{
+		const string Reservation::DATA_COMMENT = "comment";
 		const string Reservation::DATA_ARRIVAL_PLACE_NAME("arrival_place_name");
 		const string Reservation::DATA_DEPARTURE_PLACE_NAME("departure_place_name");
 		const string Reservation::DATA_ARRIVAL_PLACE_ID("arrival_place_id");
@@ -195,6 +196,7 @@ namespace synthese
 			std::string prefix /*= std::string() */
 		) const	{
 
+			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, getArrivalPlaceName());
