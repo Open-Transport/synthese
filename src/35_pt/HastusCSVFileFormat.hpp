@@ -32,6 +32,7 @@
 #include "PTDataCleanerFileFormat.hpp"
 #include "ScheduledService.h"
 #include "JourneyPattern.hpp"
+#include "RollingStock.hpp"
 
 #include <iostream>
 #include <map>
@@ -49,7 +50,6 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
-		class RollingStock;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Hastus CSV file format.
@@ -73,16 +73,20 @@ namespace synthese
 				static const std::string FILE_VOYAGES;
 
 				static const std::string PARAMETER_NETWORK_ID;
-				static const std::string PARAMETER_ROLLING_STOCK_ID;
+				static const std::string PARAMETER_ROLLING_STOCK_ID_A;
+				static const std::string PARAMETER_ROLLING_STOCK_ID_T;
+				static const std::string PARAMETER_ROLLING_STOCK_ID_DEFAULT;
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 
 			private:
+				typedef std::map<std::string, boost::shared_ptr<RollingStock> > RollingStockMap;
 				static const std::string SEP;
 
 				boost::shared_ptr<const TransportNetwork> _network;
-				boost::shared_ptr<RollingStock> _rollingStock;
+				RollingStockMap _rollingStocks;
+				boost::shared_ptr<RollingStock> _defaultRollingStock;
 				bool _importStopArea;
 				bool _interactive;
 				bool _displayLinkedStops;
@@ -113,6 +117,7 @@ namespace synthese
 					ScheduledService::Schedules schedules;
 					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 					calendar::Calendar calendar;
+					RollingStock* rollingStock;
 				};
 				typedef std::map<TripIndex, TripValues> Trips;
 				mutable Trips _trips;

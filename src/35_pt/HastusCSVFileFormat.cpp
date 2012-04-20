@@ -98,7 +98,9 @@ namespace synthese
 		const std::string HastusCSVFileFormat::Importer_::SEP(";");
 
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
-		const std::string HastusCSVFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID("rolling_stock_id");
+		const std::string HastusCSVFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_A("rolling_stock_id_a");
+		const std::string HastusCSVFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_T("rolling_stock_id_t");
+		const std::string HastusCSVFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_DEFAULT("rolling_stock_id_default");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
@@ -289,6 +291,7 @@ namespace synthese
 					itTrip->second.calendar.setActive(day);
 					itTrip->second.routeName = _getValue(10);
 					itTrip->second.wayBack = (_getValue(12) == "Retour");
+					itTrip->second.rollingStock = (_rollingStocks.find(_getValue(3)) == _rollingStocks.end()) ? _defaultRollingStock.get() : _rollingStocks.find(_getValue(3))->second.get();
 					_tripsByCode[trip.code].insert(trip);
 				}
 			}
@@ -374,7 +377,7 @@ namespace synthese
 							optional<Destination*>(),
 							optional<const RuleUser::Rules&>(),
 							tripValues.wayBack,
-							_rollingStock.get(),
+							tripValues.rollingStock,
 							tripValues.stops,
 							_dataSource,
 							_env,
@@ -434,7 +437,17 @@ namespace synthese
 			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
 			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
 			stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			stream << t.cell("Mode de transport (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID, _rollingStock.get() ? lexical_cast<string>(_rollingStock->getKey()) : string()));
+			string rollingStockA;
+			if((_rollingStocks.find("A") != _rollingStocks.end()) && _rollingStocks.find("A")->second.get())
+				rollingStockA = lexical_cast<string>(_rollingStocks.find("A")->second->getKey());
+			stream << t.cell("Mode de transport Bus (A) (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_A, rollingStockA));
+
+			string rollingStockT;
+			if((_rollingStocks.find("T") != _rollingStocks.end()) && _rollingStocks.find("T")->second.get())
+				rollingStockT = lexical_cast<string>(_rollingStocks.find("T")->second->getKey());
+			stream << t.cell("Mode de transport Tram (T) (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_T, rollingStockT));
+
+			stream << t.cell("Mode de transport par défaut (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_DEFAULT, _defaultRollingStock.get() ? lexical_cast<string>(_defaultRollingStock->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
 			stream << t.close();
 		}
@@ -514,9 +527,17 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
 			}
-			if(_rollingStock.get())
+			if(_defaultRollingStock.get())
 			{
-				map.insert(PARAMETER_ROLLING_STOCK_ID, _rollingStock->getKey());
+				map.insert(PARAMETER_ROLLING_STOCK_ID_DEFAULT, _defaultRollingStock->getKey());
+			}
+			if((_rollingStocks.find("A") != _rollingStocks.end()) && _rollingStocks.find("A")->second.get())
+			{
+				map.insert(PARAMETER_ROLLING_STOCK_ID_A, _rollingStocks.find("A")->second->getKey());
+			}
+			if((_rollingStocks.find("T") != _rollingStocks.end()) && _rollingStocks.find("T")->second.get())
+			{
+				map.insert(PARAMETER_ROLLING_STOCK_ID_T, _rollingStocks.find("T")->second->getKey());
 			}
 			return map;
 		}
@@ -535,9 +556,19 @@ namespace synthese
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
 			}
 
-			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID, 0))
+			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A, 0))
 			{
-				_rollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID), _env);
+				_rollingStocks.insert(make_pair("A", RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A), _env)));
+			}
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_T, 0))
+			{
+				_rollingStocks.insert(make_pair("T", RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_T), _env)));
+			}
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_DEFAULT, 0))
+			{
+				_defaultRollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A), _env);
 			}
 		}
 }	}
