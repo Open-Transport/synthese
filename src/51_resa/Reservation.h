@@ -83,6 +83,7 @@ namespace synthese
 			static const std::string DATA_DEPARTURE_TIME;
 			static const std::string DATA_ARRIVAL_TIME;
 			static const std::string DATA_CANCELLATION_TIME;
+			static const std::string DATA_COMMENT;
 
 			/// Chosen registry class.
 			typedef util::Registry<Reservation>	Registry;
