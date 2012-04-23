@@ -1,4 +1,4 @@
-#include "07_lex_matcher/LexicalMatcher.h"
+#include "07_lexical_matcher/LexicalMatcher.h"
 
 #include "01_util/Conversion.h"
 #include "Exception.h"
@@ -19,8 +19,16 @@ using namespace synthese::lexical_matcher;
 
 namespace po = boost::program_options;
 
+/* Compilation and launch command example :
 
-int old_main( int argc, char **argv )
+gcc -o complete old_main.cpp -I 01_util -I 00_framework -L /usr/local/boost_1_42_0/stage/lib/ -lstdc++  -lboost_filesystem -lboost_system -L../build_cmake/debug/src/07_lexical_matcher/ -l07_lexical_matcher -lboost_program_options -I/usr/local/boost_1_42_0      
+export LD_LIBRARY_PATH="/usr/local/boost_1_42_0/stage/lib/;../build_cmake/debug/src/07_lexical_matcher/;../build_cmake/debug/src/01_util/;../build_cmake/debug/src/00_framework/"
+
+*/
+
+
+
+int main( int argc, char **argv )
 {
     std::string txtfile;
 
@@ -50,16 +58,11 @@ int old_main( int argc, char **argv )
     bool ignoreCase (true);
     bool ignoreWordOrder (true);
     bool ignoreWordSpacing (true);
-    TranslationMap translationMap = FrenchTranslationMap ();
     std::string separatorCharacters ("-,;.' &()");
 
     int nbMatches (10);
 
-    LexicalMatcher<int> matcher (ignoreCase,
-				 ignoreWordOrder,
-				 ignoreWordSpacing,
-				 translationMap,
-				 separatorCharacters);
+    LexicalMatcher<int> matcher;
 
     // Parse txt file and initialize lexical matcher
     // ...
@@ -69,7 +72,7 @@ int old_main( int argc, char **argv )
     while (ifs)
     {
         ifs.getline (buf, 4096);
-	matcher.add (buf, 0);
+        matcher.add (buf, 0);
     }
 
     Log::GetInstance ().info ("Initialization done");
@@ -88,7 +91,7 @@ int old_main( int argc, char **argv )
 	    for (LexicalMatcher<int>::MatchResult::iterator it = result.begin ();
 		 it != result.end (); ++it)
 	    {
-		std::cout << it->score << "\t" << it->key << std::endl;
+		std::cout << it->score.levenshtein << "\t" << it->score.phoneticScore << "\t" << it->key.getSource() << std::endl;
 	    }
 	    std::cout << std::endl;
 	    std::cout << "? ";
