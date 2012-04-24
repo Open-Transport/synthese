@@ -194,6 +194,7 @@ namespace synthese
 				if(_words[i].getPhonetic().empty()) continue;
 
 				double bestScore(0);
+				size_t bestIndex = 0;
 
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
@@ -205,16 +206,28 @@ namespace synthese
 					double score(
 						1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
 					);
+
 					assert(score >= 0 && score <= 1);
+
+					//Add StartWith Bonus
+					if(score > 0 && _words[i].startsWith(s._words[j]))
+					{
+						score += (1 - score) * score;
+					}
+
 					if(score > bestScore)
 					{
 						if(	othersToThis.find(j) == othersToThis.end() ||
 							othersToThis[j].second < score
 						)
-							othersToThis[j] = make_pair(i, score);
-
+						{
+							bestScore = score;
+							bestIndex = j;
+						}
 					}
 				}
+				if(	bestScore > 0 )
+					othersToThis[bestIndex] = make_pair(i, bestScore);
 			}
 
 
@@ -230,12 +243,12 @@ namespace synthese
 			totalScores /= s._words.size();
 
 			// Order
-			size_t lastIndex(othersToThis.size());
+			size_t lastIndex(_words.size());
 			size_t penalties(0);
 			BOOST_FOREACH(Relations::value_type s, othersToThis)
 			{
-				if(s.first < lastIndex) ++penalties;
-				lastIndex = s.first;
+				if(s.second.first < lastIndex) ++penalties;
+				lastIndex = s.second.first;
 			}
 			if(penalties) totalScores /= penalties;
 

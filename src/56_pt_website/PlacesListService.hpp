@@ -255,11 +255,18 @@ namespace synthese
 					pm->insert(DATA_KEY, item.key.getSource());
 					pm->insert(DATA_PHONETIC_STRING, item.key.getPhoneticString());
 					pm->insert(DATA_LEVENSHTEIN, item.score.levenshtein);
-					pm->insert(DATA_PHONETIC_SCORE, item.score.phoneticScore);
 
 					// Business object export and registration
 					_attemptToRead<T, geography::City>(*item.value, pm, map, DATA_CITY);
-					_attemptToRead<T, pt::StopArea>(*item.value, pm, map, DATA_STOP);
+					// Stops are favorised
+					if(_attemptToRead<T, pt::StopArea>(*item.value, pm, map, DATA_STOP))
+					{
+						pm->insert(DATA_PHONETIC_SCORE, item.score.phoneticScore + (1 - item.score.phoneticScore) * item.score.phoneticScore);
+					}
+					else
+					{
+						pm->insert(DATA_PHONETIC_SCORE, item.score.phoneticScore);
+					}
 					_attemptToRead<T, road::RoadPlace>(*item.value, pm, map, DATA_ROAD);
 					_attemptToRead<T, road::House>(*item.value, pm, map, DATA_ADDRESS);
 					_attemptToRead<T, road::PublicPlace>(*item.value, pm, map, DATA_PUBLIC_PLACE);
@@ -277,12 +284,13 @@ namespace synthese
 
 
 			template<class BaseClass, class ObjectClass>
-			void _attemptToRead(
+			bool _attemptToRead(
 				const BaseClass& object,
 				boost::shared_ptr<util::ParametersMap> itemMap,
 				util::ParametersMap& mainMap,
 				const std::string& className
 			) const {
+				bool isAClassObject = false;
 				const ObjectClass* obj(
 					dynamic_cast<const ObjectClass*>(&object)
 				);
@@ -290,7 +298,9 @@ namespace synthese
 				{
 					obj->toParametersMap(*itemMap,_coordinatesSystem);
 					mainMap.insert(className, itemMap);
+					isAClassObject = true;
 				}
+				return isAClassObject;
 			}
 		};
 }	}

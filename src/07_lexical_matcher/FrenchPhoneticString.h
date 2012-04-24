@@ -108,6 +108,7 @@ namespace synthese
 			FrenchPhoneticString();
 			FrenchPhoneticString(const std::string& source);
 
+			bool startsWith(const FrenchPhoneticString& s) const;
 			void setSource(const std::string& source);
 			const std::string& getSource() const;
 			const PhoneticString& getPhonetic() const;
