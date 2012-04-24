@@ -3,6 +3,7 @@
 #include "01_util/Conversion.h"
 #include "Exception.h"
 #include "01_util/Log.h"
+#include "01_util/IConv.hpp"
 
 #include <iostream>
 #include <fstream>
@@ -14,6 +15,7 @@
 
 using synthese::util::Log;
 using synthese::util::Conversion;
+using synthese::util::IConv;
 using namespace synthese::lexical_matcher;
 
 
@@ -85,13 +87,23 @@ int main( int argc, char **argv )
 	{
 	    std::string input (buf);
 	    if (input.empty ()) break;
+	    std::string inputUTF8 (IConv("CP1252","UTF-8").convert(input));
+	    FrenchSentence phon(inputUTF8);
+		std::cout << phon.getPhoneticString() << std::endl;
 
-	    LexicalMatcher<int>::MatchResult result = matcher.bestMatches (input, nbMatches);
+	    LexicalMatcher<int>::MatchResult result = matcher.bestMatches (inputUTF8, nbMatches);
 	    std::cout << std::endl;
+		std::cout << "levenshtein\t" 
+			<< "phoneticScore\t"
+			<< "string\t\t"
+			<< "PhoneticString" << std::endl;
 	    for (LexicalMatcher<int>::MatchResult::iterator it = result.begin ();
 		 it != result.end (); ++it)
 	    {
-		std::cout << it->score.levenshtein << "\t" << it->score.phoneticScore << "\t" << it->key.getSource() << std::endl;
+		std::cout << it->score.levenshtein << "\t\t" 
+			<< it->score.phoneticScore << "\t\t"
+			<< IConv("UTF-8","CP1252").convert(it->key.getSource()) <<  "\t\t"
+			<< it->key.getPhoneticString() << std::endl;
 	    }
 	    std::cout << std::endl;
 	    std::cout << "? ";
