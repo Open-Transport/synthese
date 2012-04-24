@@ -234,7 +234,8 @@ class ImportRun(object):
             level = line[:4].strip().lower()
             if level not in self.LEVEL_NAMES:
                 level = 'unknown'
-            line = line[4:]
+            else:
+                line = line[4:]
             if line.startswith(' : '):
                 line = line[3:]
             if not line:
