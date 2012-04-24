@@ -98,7 +98,7 @@ namespace synthese
 			GeographyModule::CitiesMatcher::Content city
 		){
 			// Declarations
-			const string key(city->getName() +" "+ city->getCode());
+			const string key(city->getName());
 
 			_citiesMatcher.add(key, city);
 			_generalAllPlacesMatcher.add(key, city);
@@ -117,7 +117,7 @@ namespace synthese
 		void GeographyModule::RemoveFromCitiesMatchers(
 			GeographyModule::CitiesMatcher::Content city
 		){
-			_citiesMatcher.remove(city->getName() +" "+ city->getCode());
+			_citiesMatcher.remove(city->getName());
 
 			stringstream ss;
 			boost::iostreams::filtering_ostream out;

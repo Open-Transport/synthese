@@ -159,20 +159,17 @@ namespace synthese
 			{
 				MatchHit hit;
 				hit.score = value.first.compare(ppkey);
-				if(hit.score.phoneticScore == 1)
+				if(value.first.startsWith(ppkey))
 				{
-					hit.score.phoneticScore = 2;
+					hit.score.phoneticScore += ((1 - hit.score.phoneticScore) * hit.score.phoneticScore ) / 2;
 				}
 				else
 				{
-					if(value.first.startsWith(ppkey))
-					{
-						++hit.score.phoneticScore;
-					}
+					hit.score.phoneticScore *= 0.9;
 				}
+
 				if (hit.score.phoneticScore >= minScore)
 				{
-					hit.score.phoneticScore /= double(2);	// ensure that score value is between 0 and 1
 					hit.key = value.first;
 					hit.value = value.second;
 					result.push_back(hit);

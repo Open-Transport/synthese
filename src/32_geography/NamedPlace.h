@@ -58,7 +58,7 @@ namespace synthese
 			NamedPlace();
 
 
-			virtual bool _getCityNameBeforePlaceName() const { return true; }
+			virtual bool _getCityNameBeforePlaceName() const { return false; }
 
 		public:
 			//! @name Getters

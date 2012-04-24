@@ -312,7 +312,10 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS) ||
+					if(	_IsFollowedBy(source, pos, "n") && 
+						(	!_IsAnyOf(source, pos+2, VOWELS) ||
+							_IsAnyOf(source, pos, ACCENTUATED_E)
+						) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
 					){
@@ -405,6 +408,7 @@ namespace synthese
 					){
 						++pos;
 						result.push_back(I);
+						result.push_back(L);
 						break;
 					}
 
@@ -750,7 +754,18 @@ namespace synthese
 			return Levenshtein(_phonetic, s._phonetic);
 		}
 
+		bool FrenchPhoneticString::startsWith(
+			const FrenchPhoneticString& s
+		) const {
+			if(s._phonetic.size() > _phonetic.size()) return false;
 
+			size_t pos(0);
+			for(;pos < s._phonetic.size();pos++)
+				if(s._phonetic[pos] != _phonetic[pos])
+					return false;
+
+			return true;
+		}
 
 		string FrenchPhoneticString::getPhoneticString() const
 		{
