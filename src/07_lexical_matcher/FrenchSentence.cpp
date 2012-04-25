@@ -195,6 +195,7 @@ namespace synthese
 
 				double bestScore(0);
 				size_t bestIndex = 0;
+				string lowerI = FrenchPhoneticString::to_plain_lower_copy(_words[i].getSource());
 
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
@@ -213,6 +214,15 @@ namespace synthese
 					if(score > 0 && _words[i].startsWith(s._words[j]))
 					{
 						score += (1 - score) * score;
+					}
+					string lowerJ = FrenchPhoneticString::to_plain_lower_copy(s._words[j].getSource());
+					if(FrenchPhoneticString::startsWithExact(lowerJ, lowerI))
+					{
+						double minScore = 0.1 * lowerJ.size();
+						if(0.9 < minScore)
+							minScore = 0.9;
+						if(score < minScore)
+							score = minScore;
 					}
 
 					if(score > bestScore)
