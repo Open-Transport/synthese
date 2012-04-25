@@ -232,7 +232,9 @@ namespace synthese
 				void insert(const std::string& parameterName, const std::string& value);
 				void insert(const std::string& parameterName, int value);
 				void insert(const std::string& parameterName, double value);
-				void insert(const std::string& parameterName, std::size_t value);
+#ifndef _WIN64
+				void insert(const std::string& parameterName, size_t value);
+#endif
 				void insert(const std::string& parameterName, util::RegistryKeyType value);
 				void insert(const std::string& parameterName, bool value);
 				void insert(const std::string& parameterName, const boost::posix_time::ptime& value);

@@ -13,21 +13,11 @@
 
    You should have received a copy of the GNU Library General Public License
    along with the GNU CHARSET Library; see the file COPYING.LIB.  If not,
-   write to the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-   Boston, MA 02111-1307, USA.  */
+   write to the Free Software Foundation, Inc., 51 Franklin Street,
+   Fifth Floor, Boston, MA 02110-1301, USA.  */
 
 #ifndef _LIBCHARSET_H
 #define _LIBCHARSET_H
-
-#ifdef LIBCHARSET_STATIC
-#define LIBCHARSET_DLL_EXPORTED 
-#else /* LIBCHARSET_STATIC */
-#ifdef BUILDING_LIBCHARSET
-#define LIBCHARSET_DLL_EXPORTED __declspec(dllexport)
-#else
-#define LIBCHARSET_DLL_EXPORTED __declspec(dllimport)
-#endif
-#endif /* LIBCHARSET_STATIC */
 
 #include <localcharset.h>
 
@@ -44,7 +34,7 @@ extern "C" {
    by the corresponding pathname with the current prefix instead.  Both
    prefixes should be directory names without trailing slash (i.e. use ""
    instead of "/").  */
-extern LIBCHARSET_DLL_EXPORTED void libcharset_set_relocation_prefix (const char *orig_prefix,
+extern void libcharset_set_relocation_prefix (const char *orig_prefix,
 					      const char *curr_prefix);
 
 
