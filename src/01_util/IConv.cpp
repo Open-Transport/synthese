@@ -53,12 +53,7 @@ namespace synthese
 				return string();
 			}
 
-			// FIXME: on Linux, the system iconv header might be included which has a different signature.
-#ifdef UNIX
 			char *pBuf;
-#else
-			const char *pBuf;
-#endif
 			size_t len;
 			size_t utf8len;
 			len = text.length();

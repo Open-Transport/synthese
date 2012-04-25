@@ -22,3 +22,7 @@ spatialite:
   src/headers/spatialite/sqlite3ext.h
     These source files come from:
     http://www.gaia-gis.it/spatialite-2.4.0-4/libspatialite-amalgamation-2.4.0.zip
+
+iconv:
+  Built from http://ftp.gnu.org/pub/gnu/libiconv/libiconv-1.13.1.tar.gz
+  See http://www.gaia-gis.it/spatialite-3.0.0-BETA/mingw64_how_to.html for instructions.
