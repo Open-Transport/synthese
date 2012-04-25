@@ -42,7 +42,7 @@ REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']
 
-MYSQL_VER = '5.5.22'
+MYSQL_VER = '5.5.23'
 
 class Builder(object):
     def __init__(self, env):
@@ -208,12 +208,15 @@ class SconsBuilder(Builder):
         utils.call(args, **kwargs)
 
 
-class CMakeBuilder(Builder):
-    LIBSPATIALITE_DLLS = (
-        ('libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
-        ('proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
-        ('geos-win-x86-3.1.0', '86b9af2a1d900139323d8c053981a220'),
-        ('libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
+class CMakeBuilder(Builder): 
+    LIBSPATIALITE_DLLS_X32 = (
+        ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
+        ('spatialite-2.3.0/proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
+        ('spatialite-2.3.0/geos-win-x86-3.1.0', '86b9af2a1d900139323d8c053981a220'),
+        ('spatialite-2.3.0/libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
+    )
+    LIBSPATIALITE_DLLS_X64 = (
+        ('gaia-sins/windows-bin-amd64/spatialite-3.0.1-DLL-win-amd64', 'f9221ba687e758f7f4c4193749ec739e'),
     )
 
     def __init__(self, env):
@@ -324,9 +327,10 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
+        
         url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
-            'mysql-{mysql_ver}-win32.zip'.format(mysql_ver=MYSQL_VER))
-        self._download(url, 'c4cf7fcf6726ab1526d9de383355b086')
+            'mysql-{mysql_ver}-win{arch}.zip'.format(mysql_ver=MYSQL_VER, arch='x64' if self.env.c.x64 else '32'))
+        self._download(url, '4b9e91a7dd7236a471fdb5728e4150a8' if self.env.c.x64 else 'todo')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
@@ -355,7 +359,7 @@ class CMakeBuilder(Builder):
         self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
 
-        CURRENT_BOOST_BUILD_VER = 1
+        CURRENT_BOOST_BUILD_VER = 2
         boost_build_ver_path = join(
             self.env.c.thirdparty_dir, 'boost_build_ver.txt')
         try:
@@ -377,8 +381,10 @@ class CMakeBuilder(Builder):
         # TODO: have an option to specify the vs version.
         toolset = 'msvc-9.0'
         args.extend(
-            'toolset={toolset} release debug link=static runtime-link=static '
-            'threading=multi'.format(toolset=toolset).split(' '))
+            'toolset={toolset} {x64} release debug link=static runtime-link=static '
+            'threading=multi'.format(
+                toolset=toolset, x64='address-model=64' if self.env.c.x64 else ''
+            ).split(' '))
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
         args.append('-sBZIP2_SOURCE={}'.format(
             join(self.env.c.thirdparty_dir, BZIP2_ARCHIVE)))
@@ -386,25 +392,13 @@ class CMakeBuilder(Builder):
         utils.call(args, cwd=self.boost_dir)
         open(boost_build_ver_path, 'wb').write(str(CURRENT_BOOST_BUILD_VER))
 
-    def install_iconv(self):
-        if self.env.platform != 'win':
-            return
-
-        url = 'http://94.23.28.171/~spasche/libiconv2.dll'
-        self._download(url, 'fd1dc6c680299a2ed1eedcc3eabda601')
-        target = join(self.env.c.thirdparty_dir, 'iconv', 'libiconv2.dll')
-        utils.maybe_makedirs(os.path.dirname(target))
-        if os.path.isfile(target):
-            return
-        fname = url.split('/')[-1]
-        shutil.copy(join(self.download_cache_dir, fname), target)
-
     def _install_libspatialite(self):
         if self.env.platform != 'win':
             return
 
-        for filename, hash in self.LIBSPATIALITE_DLLS:
-            url = 'http://www.gaia-gis.it/spatialite-2.3.0/%s.zip' % filename
+        libs = self.LIBSPATIALITE_DLLS_X64 if self.env.c.x64 else self.LIBSPATIALITE_DLLS_X32
+        for filename, hash in libs:
+            url = 'http://www.gaia-gis.it/%s.zip' % filename
             self._download(url, hash)
             self._extract(url, self.env.c.thirdparty_dir)
 
@@ -424,7 +418,6 @@ class CMakeBuilder(Builder):
         log.info('Mysql support: %s, dir: %s', self.with_mysql, self.mysql_dir)
 
         self._install_boost()
-        self.install_iconv()
         self._install_libspatialite()
 
     def get_cmake_tool_path(self, tool):
@@ -447,7 +440,7 @@ class CMakeBuilder(Builder):
 
         if self.env.platform == 'win':
             # TODO: This shouldn't be hardcoded.
-            args.extend(['-G', 'Visual Studio 9 2008'])
+            args.extend(['-G', 'Visual Studio 9 2008' + (' Win64' if self.env.c.x64 else '')])
 
         if self.with_mysql:
             args.append('-DWITH_MYSQL=1')

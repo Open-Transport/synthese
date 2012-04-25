@@ -116,6 +116,7 @@ DEFAULTS = {
     'mysql_dir': None,
     'boost_dir': None,
     'parallel_build': multiprocessing.cpu_count(),
+    'x64': True,
     'kill_daemons_when_building': False,
     'build_only': None,
     'clear_cmake_cache': False,

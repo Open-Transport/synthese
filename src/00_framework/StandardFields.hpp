@@ -327,12 +327,14 @@ namespace synthese
 
 
 
+#ifndef _WIN64
 	//////////////////////////////////////////////////////////////////////////
 	/// size_t partial specialization
 	template<class C>
 	class ObjectField<C, size_t>:
 		public SerializationByLexicalCast<C, size_t>
 	{};
+#endif
 
 
 

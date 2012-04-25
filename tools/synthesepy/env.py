@@ -119,10 +119,9 @@ class Env(object):
             self.testdata_importer_relative_path, 'ImportRoutePlannerTestData')
 
     def _prepare_for_launch_win(self):
-        builder = build.get_builder(self)
-        builder.install_iconv()
+        # FIXME: this won't work if installed
+        iconv_path = join(self.source_path, '3rd', 'dev', 'iconv', 'bin')
 
-        iconv_path = join(self.c.thirdparty_dir, 'iconv')
         utils.append_paths_to_environment('PATH', [iconv_path])
 
     def _prepare_for_launch_lin(self):
