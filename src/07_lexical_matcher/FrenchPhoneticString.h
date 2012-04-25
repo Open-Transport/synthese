@@ -61,6 +61,7 @@ namespace synthese
 				M,
 				N,
 				O,
+				ON,
 				P,
 				R,
 				S,
@@ -116,6 +117,19 @@ namespace synthese
 			static std::string to_plain_lower_copy(const std::string& text);
 
 			LevenshteinDistance levenshtein(const FrenchPhoneticString& s) const;
+
+			template<class T>
+			static bool startsWithExact(const T& s1, const T& s2)
+			{
+				if(s1.size() > s2.size()) return false;
+
+				size_t pos(0);
+				for(;pos < s1.size();pos++)
+					if(s1[pos] != s2[pos])
+						return false;
+
+				return true;
+			}
 
 			template<class T>
 			static LevenshteinDistance Levenshtein(const T& s1, const T& s2)

@@ -484,7 +484,7 @@ namespace synthese
 						_IsFollowedBy(source, pos, "mb")
 					){
 						++pos;
-						result.push_back(AN);
+						result.push_back(ON);
 						break;
 					}
 
@@ -791,6 +791,7 @@ namespace synthese
 				case M: s << "M"; break;
 				case N: s << "N"; break;
 				case O: s << "O"; break;
+				case ON: s << "ON"; break;
 				case P: s << "P"; break;
 				case R: s << "R"; break;
 				case S: s << "S"; break;
