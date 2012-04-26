@@ -150,7 +150,9 @@ namespace synthese
 					itDA->set<DriverService::Vector>(emptyAllocation);
 					if(_autoPurge && itDA->get<Date>() < now)
 					{
-						_driverAllocationsToRemove.insert(itDA);
+						_driverAllocationsToRemove.insert(
+							_env.getRegistry<DriverAllocation>().get(itDA->getKey())
+						);
 					}
 			}	}
 			
@@ -249,36 +251,72 @@ namespace synthese
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
 			}
 
-			// Driver allocations without services
-			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
+			// Vehicle services without services
+			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
 			{
-				if(itDriverAllocation.second->hasLinkWithSource(_dataSource) && itDriverAllocation.second->get<DriverService::Vector>().empty())
-				{
-					_driverAllocationsToRemove.insert(itDriverAllocation.second.get());
+				if(	itVehicleService.second->hasLinkWithSource(_dataSource) &&
+					itVehicleService.second->getServices().empty()
+					){
+						_vehicleServicesToRemove.insert(itVehicleService.second);
 				}
 			}
 
 			// Driver services without services
 			BOOST_FOREACH(const Registry<DriverService>::value_type& itDriverService, _env.getRegistry<DriverService>())
 			{
-				if(itDriverService.second->hasLinkWithSource(_dataSource) && itDriverService.second->getChunks().empty())
+				if(!itDriverService.second->hasLinkWithSource(_dataSource))
+				{
+					continue;
+				}
+
+				DriverService::Chunks chunks;
+				BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, itDriverService.second->getChunks())
+				{
+					if(_vehicleServicesToRemove.find(_env.getRegistry<VehicleService>().get(chunk.vehicleService->getKey())) == _vehicleServicesToRemove.end())
+					{
+						chunks.push_back(chunk);
+					}
+				}
+
+				if(chunks.empty())
 				{
 					_driverServicesToRemove.insert(itDriverService.second);
 				}
-			}
-
-			// Vehicle services without services
-			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
-			{
-				if(	itVehicleService.second->hasLinkWithSource(_dataSource) &&
-					itVehicleService.second->getServices().empty() &&
-					itVehicleService.second->getDriverServiceChunks().empty()
-				){
-					_vehicleServicesToRemove.insert(itVehicleService.second);
+				else
+				{
+					itDriverService.second->setChunks(chunks);
 				}
 			}
 
-			BOOST_FOREACH(const DriverAllocation* driverAllocation, _driverAllocationsToRemove)
+			// Driver allocations without services
+			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
+			{
+				if(!itDriverAllocation.second->hasLinkWithSource(_dataSource))
+				{
+					continue;
+				}
+
+				DriverService::Vector::Type chunks;
+				BOOST_FOREACH(const DriverService::Vector::Type::value_type& chunk, itDriverAllocation.second->get<DriverService::Vector>())
+				{
+					if(_driverServicesToRemove.find(_env.getRegistry<DriverService>().get(chunk->getKey())) == _driverServicesToRemove.end())
+					{
+						chunks.push_back(chunk);
+					}
+				}
+
+				if(chunks.empty())
+				{
+					_driverAllocationsToRemove.insert(itDriverAllocation.second);
+				}
+				else
+				{
+					itDriverAllocation.second->set<DriverService::Vector>(chunks);
+				}
+			}
+
+
+			BOOST_FOREACH(const shared_ptr<const DriverAllocation>& driverAllocation, _driverAllocationsToRemove)
 			{
 				_env.getEditableRegistry<DriverAllocation>().remove(driverAllocation->getKey());
 			}
@@ -400,7 +438,7 @@ namespace synthese
 			{
 				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
 			}
-			BOOST_FOREACH(const DriverAllocation* driverAllocation, _driverAllocationsToRemove)
+			BOOST_FOREACH(const shared_ptr<const DriverAllocation>& driverAllocation, _driverAllocationsToRemove)
 			{
 				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
 			}
