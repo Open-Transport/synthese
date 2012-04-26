@@ -41,6 +41,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(BoniTime, "boni_time", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WorkRange, "work_range", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WorkDuration, "work_duration", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(WithTicketSales, "with_ticket_sales", SQL_BOOLEAN)
 
 	namespace pt_operation
 	{
@@ -58,7 +59,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(BoniTime, not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_VALUE_CONSTRUCTOR(WorkRange, not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(WorkDuration, not_a_date_time)
+					FIELD_VALUE_CONSTRUCTOR(WorkDuration, not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(WithTicketSales, false)
 			)	)
 		{}
 
