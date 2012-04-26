@@ -92,7 +92,7 @@ namespace synthese
 			mutable std::set<boost::shared_ptr<StopPoint> > _stopsToRemove;
 			mutable std::set<boost::shared_ptr<StopArea> > _stopAreasToRemove;
 			mutable std::set<boost::shared_ptr<const LineStop> > _edgesToRemove;
-			mutable std::set<const pt_operation::DriverAllocation*> _driverAllocationsToRemove;
+			mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocation> > _driverAllocationsToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverService> > _driverServicesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::VehicleService> > _vehicleServicesToRemove;
 
