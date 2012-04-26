@@ -278,6 +278,19 @@ namespace synthese
 				}
 			}
 
+			BOOST_FOREACH(const DriverAllocation* driverAllocation, _driverAllocationsToRemove)
+			{
+				_env.getEditableRegistry<DriverAllocation>().remove(driverAllocation->getKey());
+			}
+			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				_env.getEditableRegistry<DriverService>().remove(driverService->getKey());
+			}
+			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
+			{
+				_env.getEditableRegistry<VehicleService>().remove(vehicleService->getKey());
+			}
+
 			if(_cleanUnusedStops)
 			{
 				// Stops without Journey patterns without any service
