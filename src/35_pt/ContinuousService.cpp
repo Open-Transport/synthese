@@ -207,6 +207,12 @@ namespace synthese
 				}
 			}
 
+			//Continious Service pass over midnight
+			if(range >= hours(24))
+			{
+				range -= hours(24);
+			}
+
 			// Origin departure time
 			const time_duration& departureSchedule(_departureSchedules.at(0));
 			ptime originDateTime(actualDateTime - (schedule - departureSchedule));
