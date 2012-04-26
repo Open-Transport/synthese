@@ -21,19 +21,23 @@
 */
 
 #include "PTDataCleanerFileFormat.hpp"
-#include "JourneyPatternTableSync.hpp"
-#include "ImportableTableSync.hpp"
-#include "ScheduledServiceTableSync.h"
+
+#include "CalendarTemplateTableSync.h"
 #include "ContinuousServiceTableSync.h"
+#include "DBTransaction.hpp"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "DriverAllocationTableSync.hpp"
+#include "DriverServiceTableSync.hpp"
+#include "DRTAreaTableSync.hpp"
+#include "ImportableTableSync.hpp"
+#include "JourneyPatternTableSync.hpp"
+#include "LineArea.hpp"
 #include "LineStopTableSync.h"
+#include "RequestException.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopPointTableSync.hpp"
 #include "StopAreaTableSync.hpp"
-#include "CalendarTemplateTableSync.h"
-#include "RequestException.h"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "LineArea.hpp"
-#include "DBTransaction.hpp"
-#include "DRTAreaTableSync.hpp"
+#include "VehicleServiceTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -42,12 +46,13 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace calendar;
+	using namespace db;
 	using namespace impex;
 	using namespace graph;
-	using namespace util;
+	using namespace pt_operation;
 	using namespace server;
-	using namespace db;
-
+	using namespace util;
+	
 	namespace pt
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
@@ -79,9 +84,10 @@ namespace synthese
 				return;
 			}
 
-			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
-
 			date now(gregorian::day_clock::local_day());
+
+			// PT data
+			ImportableTableSync::ObjectBySource<JourneyPatternTableSync> journeyPatterns(_dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::value_type& itPathSet, journeyPatterns.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<JourneyPatternTableSync>::Map::mapped_type::value_type& itPath, itPathSet.second)
@@ -128,6 +134,47 @@ namespace synthese
 					}
 				}
 			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// PT Operation
+			
+			// Driver allocations
+			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+			DriverService::Vector::Type emptyAllocation;
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
+				{
+					itDA->set<Driver>(NULL);
+					itDA->set<DriverService::Vector>(emptyAllocation);
+					if(_autoPurge && itDA->get<Date>() < now)
+					{
+						_driverAllocationsToRemove.insert(itDA);
+					}
+			}	}
+			
+			// Driver services
+			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+			DriverService::Chunks emptyChunks;
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& itDSSet, driverServices.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::mapped_type::value_type& itDS, itDSSet.second)
+				{
+					itDS->setChunks(emptyChunks);
+			}	}
+
+			// Vehicle services
+			ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(_dataSource, _env);
+			VehicleService::DriverServiceChunks emptyVSChunks;
+			VehicleService::Services emptyVSServices;
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::value_type& itVSSet, vehicleServices.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<VehicleServiceTableSync>::Map::mapped_type::value_type& itVS, itVSSet.second)
+				{
+					itVS->setServices(emptyVSServices);
+					itVS->setDriverServices(emptyVSChunks);
+			}	}
 		}
 
 
@@ -200,6 +247,35 @@ namespace synthese
 					}
 				}
 				_env.getEditableRegistry<JourneyPattern>().remove(journeyPattern->getKey());
+			}
+
+			// Driver allocations without services
+			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
+			{
+				if(itDriverAllocation.second->hasLinkWithSource(_dataSource) && itDriverAllocation.second->get<DriverService::Vector>().empty())
+				{
+					_driverAllocationsToRemove.insert(itDriverAllocation.second.get());
+				}
+			}
+
+			// Driver services without services
+			BOOST_FOREACH(const Registry<DriverService>::value_type& itDriverService, _env.getRegistry<DriverService>())
+			{
+				if(itDriverService.second->hasLinkWithSource(_dataSource) && itDriverService.second->getChunks().empty())
+				{
+					_driverServicesToRemove.insert(itDriverService.second);
+				}
+			}
+
+			// Vehicle services without services
+			BOOST_FOREACH(const Registry<VehicleService>::value_type& itVehicleService, _env.getRegistry<VehicleService>())
+			{
+				if(	itVehicleService.second->hasLinkWithSource(_dataSource) &&
+					itVehicleService.second->getServices().empty() &&
+					itVehicleService.second->getDriverServiceChunks().empty()
+				){
+					_vehicleServicesToRemove.insert(itVehicleService.second);
+				}
 			}
 
 			if(_cleanUnusedStops)
@@ -310,6 +386,18 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 			{
 				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
+			}
+			BOOST_FOREACH(const DriverAllocation* driverAllocation, _driverAllocationsToRemove)
+			{
+				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+			}
+			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
+			}
+			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
+			{
+				VehicleServiceTableSync::RemoveRow(vehicleService->getKey(), transaction);
 			}
 		}
 
