@@ -15,6 +15,8 @@
 #include "EvalService.hpp"
 #include "LanguageSelectorService.hpp"
 #include "NotService.hpp"
+#include "PrecisionService.hpp"
+#include "TimeDurationService.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLastNewsFunction.hpp"
 #include "IfFunction.hpp"
@@ -71,6 +73,8 @@ void synthese::cms::moduleRegister()
 	synthese::cms::EvalService::integrate();
 	synthese::cms::LanguageSelectorService::integrate();
 	synthese::cms::NotService::integrate();
+	synthese::cms::PrecisionService::integrate();
+	synthese::cms::TimeDurationService::integrate();
 	synthese::cms::WebPageDisplayFunction::integrate();
 	synthese::cms::WebPageLastNewsFunction::integrate();
 	synthese::cms::IfFunction::integrate();
