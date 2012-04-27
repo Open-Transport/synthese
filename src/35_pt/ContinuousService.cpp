@@ -154,7 +154,11 @@ namespace synthese
 					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule)
 						&& presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
 					){
-						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(schedule));
+						//If waiting time > 2hours, we are after the endSchedule and not before the schedule
+						if (GetTimeOfDay(schedule) - presenceDateTime.time_of_day() < hours(2))
+							actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(schedule));
+						else
+							return ServicePointer();
 					}
 				}
 
@@ -166,8 +170,16 @@ namespace synthese
 				}
 				else
 				{
-					ptime validityEndTime(presenceDateTime.date(), endSchedule);
-					range = validityEndTime - actualDateTime;
+					if(actualDateTime.time_of_day() <= GetTimeOfDay(endSchedule))
+					{
+						range = GetTimeOfDay(endSchedule) - actualDateTime.time_of_day();
+					}
+					else
+					{
+						time_duration beforeMidnight = hours(24) - actualDateTime.time_of_day();
+						time_duration afterMidnight = GetTimeOfDay(endSchedule);
+						range = beforeMidnight + afterMidnight;
+					}
 				}
 			}
 			else
@@ -187,30 +199,44 @@ namespace synthese
 				}
 				else
 				{
-					if (presenceDateTime.time_of_day() < GetTimeOfDay(endSchedule)
-						&& presenceDateTime.time_of_day() > GetTimeOfDay(schedule)
+					if (presenceDateTime.time_of_day() > GetTimeOfDay(endSchedule)
+						&& presenceDateTime.time_of_day() < GetTimeOfDay(schedule)
 					){
-						actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(endSchedule));
+						// If (reversed) waiting time > 2hours, we are before schedule and not after endSchedule
+						if(presenceDateTime.time_of_day() - GetTimeOfDay(endSchedule) > hours(2))
+							return ServicePointer();
+						else
+							actualDateTime = ptime(presenceDateTime.date(), GetTimeOfDay(endSchedule));
 					}
 				}
 
 				// Range
 				if(inverted)
 				{
-					ptime validityEndTime(presenceDateTime.date(), endSchedule);
-					range = validityEndTime - actualDateTime;
+					if(actualDateTime.time_of_day() <= GetTimeOfDay(endSchedule))
+					{
+						if (GetTimeOfDay(schedule) > GetTimeOfDay(endSchedule))
+						{
+							time_duration beforeMidnight = hours(24) - GetTimeOfDay(schedule);
+							time_duration afterMidnight = actualDateTime.time_of_day();
+							range = beforeMidnight + afterMidnight;
+						}
+						else
+						{
+							range = actualDateTime.time_of_day() - GetTimeOfDay(schedule);
+						}
+					}
+					else
+					{
+						range = actualDateTime.time_of_day() - GetTimeOfDay(schedule);
+					}
+					range = _range - range;
 				}
 				else
 				{
 					ptime validityBeginTime(presenceDateTime.date(), schedule);
 					range = actualDateTime - validityBeginTime;
 				}
-			}
-
-			//Continious Service pass over midnight
-			if(range >= hours(24))
-			{
-				range -= hours(24);
 			}
 
 			// Origin departure time
