@@ -1144,7 +1144,7 @@ namespace synthese
 							da->set<Date>(vsDate);
 
 							// On board ticketing
-							da->set<WithTicketSales>(lexical_cast<bool>(onBoardTicketing));
+							da->set<WithTicketSales>(onBoardTicketing == "O");
 
 							// Amount
 							double amount(_getValue("frs").empty() ? 0 : lexical_cast<double>(_getValue("frs")));
