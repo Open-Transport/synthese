@@ -45,13 +45,13 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_NUMBER;
-			static const std::string PARAMETER_PRECISION;
+			static const std::string PARAMETER_FORMAT;
 			
 		protected:
 			//! \name Page parameters
 			//@{
 				double _value;
-				int _precision;
+				std::string _format;
 			//@}
 			
 			
@@ -81,7 +81,7 @@ namespace synthese
 			
 			
 		public:
-			PrecisionService(): _value(0.0), _precision(10) {}
+			PrecisionService(): _value(0.0) {}
 
 
 

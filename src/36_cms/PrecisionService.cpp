@@ -27,6 +27,8 @@
 #include "RequestException.h"
 #include "Request.h"
 
+#include <boost/format.hpp>
+
 using namespace std;
 
 namespace synthese
@@ -36,12 +38,12 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,cms::PrecisionService>::FACTORY_KEY = "precision";
+	const string FactorableTemplate<Function,cms::PrecisionService>::FACTORY_KEY = "format";
 	
 	namespace cms
 	{
 		const string PrecisionService::PARAMETER_NUMBER = "n";
-		const string PrecisionService::PARAMETER_PRECISION = "p";
+		const string PrecisionService::PARAMETER_FORMAT = "f";
 		
 
 
@@ -49,7 +51,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_NUMBER, _value);
-			map.insert(PARAMETER_PRECISION, _precision);
+			map.insert(PARAMETER_FORMAT, _format);
 			return map;
 		}
 
@@ -58,7 +60,7 @@ namespace synthese
 		void PrecisionService::_setFromParametersMap(const ParametersMap& map)
 		{
 			_value = map.getDefault<double>(PARAMETER_NUMBER, 0.0);
-			_precision = map.getDefault<int>(PARAMETER_PRECISION, 10);
+			_format = map.getDefault<string>(PARAMETER_FORMAT, "1%");
 		}
 
 
@@ -68,8 +70,7 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap map;
-			stream.precision(_precision);
-			stream << _value;
+			stream << boost::format("%"+ _format) % _value;
 			return map;
 		}
 		
