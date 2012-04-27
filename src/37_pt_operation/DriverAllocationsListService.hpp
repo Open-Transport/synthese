@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_WORK_DURATION_FILTER;
 			static const std::string PARAMETER_LINE_FILTER;
 			static const std::string PARAMETER_HOURS_FILTER;
+			static const std::string PARAMETER_WITH_TICKET_SALES_FILTER;
 
 			static const std::string TAG_ALLOCATION;
 			static const std::string TAG_ALLOCATIONS;
@@ -95,6 +96,7 @@ namespace synthese
 				const pt::CommercialLine* _lineFilter;
 				boost::posix_time::time_duration _minHourFilter;
 				boost::posix_time::time_duration _maxHourFilter;
+				boost::logic::tribool _withTicketSalesFilter;
 			//@}
 
 
