@@ -69,6 +69,7 @@ namespace synthese
 		const string DriverAllocationsListService::PARAMETER_WORK_RANGE_FILTER = "work_range_filter";
 		const string DriverAllocationsListService::PARAMETER_LINE_FILTER = "line_filter";
 		const string DriverAllocationsListService::PARAMETER_HOURS_FILTER = "hours_filter";
+		const string DriverAllocationsListService::PARAMETER_WITH_TICKET_SALES_FILTER = "with_ticket_sales_filter";
 
 		const string DriverAllocationsListService::TAG_ALLOCATION = "allocation";
 		const string DriverAllocationsListService::TAG_ALLOCATIONS = "allocations";
@@ -87,7 +88,8 @@ namespace synthese
 			_maxWorkRange(not_a_date_time),
 			_lineFilter(NULL),
 			_minHourFilter(not_a_date_time),
-			_maxHourFilter(not_a_date_time)
+			_maxHourFilter(not_a_date_time),
+			_withTicketSalesFilter(logic::indeterminate)
 		{}
 
 
@@ -181,6 +183,12 @@ namespace synthese
 				).get();
 			}
 
+			// With ticket sales filter
+			if(!map.getDefault<string>(PARAMETER_WITH_TICKET_SALES_FILTER).empty())
+			{
+				_withTicketSalesFilter = map.get<bool>(PARAMETER_WITH_TICKET_SALES_FILTER);
+			}
+
 			// Display page
 			_page = getPage(map.getDefault<string>(PARAMETER_PAGE_ID));
 
@@ -269,6 +277,12 @@ namespace synthese
 
 				// Date check
 				if(!_date.is_not_a_date() && alloc.get<Date>() != _date)
+				{
+					continue;
+				}
+
+				// Ticket sales filter
+				if(!logic::indeterminate(_withTicketSalesFilter) && alloc.get<WithTicketSales>() != _withTicketSalesFilter)
 				{
 					continue;
 				}

@@ -36,7 +36,7 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,cms::PrecisionService>::FACTORY_KEY = "PrecisionService";
+	const string FactorableTemplate<Function,cms::PrecisionService>::FACTORY_KEY = "precision";
 	
 	namespace cms
 	{
