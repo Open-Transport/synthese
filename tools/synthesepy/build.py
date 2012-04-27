@@ -209,14 +209,11 @@ class SconsBuilder(Builder):
 
 
 class CMakeBuilder(Builder): 
-    LIBSPATIALITE_DLLS_X32 = (
+    LIBSPATIALITE_DLLS = (
         ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
         ('spatialite-2.3.0/proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
         ('spatialite-2.3.0/geos-win-x86-3.1.0', '86b9af2a1d900139323d8c053981a220'),
         ('spatialite-2.3.0/libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
-    )
-    LIBSPATIALITE_DLLS_X64 = (
-        ('gaia-sins/windows-bin-amd64/spatialite-3.0.1-DLL-win-amd64', 'f9221ba687e758f7f4c4193749ec739e'),
     )
 
     def __init__(self, env):
@@ -396,16 +393,23 @@ class CMakeBuilder(Builder):
         if self.env.platform != 'win':
             return
 
-        libs = self.LIBSPATIALITE_DLLS_X64 if self.env.c.x64 else self.LIBSPATIALITE_DLLS_X32
-        for filename, hash in libs:
+        for filename, hash in self.LIBSPATIALITE_DLLS:
             url = 'http://www.gaia-gis.it/%s.zip' % filename
             self._download(url, hash)
             self._extract(url, self.env.c.thirdparty_dir)
 
     def update_path_for_libspatialite(self):
         self._install_libspatialite()
-        dll_paths = [join(self.env.c.thirdparty_dir, filename, 'bin') for
-            filename, _ in self.LIBSPATIALITE_DLLS]
+
+        spatialite_dirs = [filename.split('/')[-1] for filename, _ in self.LIBSPATIALITE_DLLS]
+        dll_paths = []
+        for d in spatialite_dirs:
+            d = join(self.env.c.thirdparty_dir, d)
+            if os.path.isdir(join(d, 'bin')):
+                dll_paths.append(join(d, 'bin'))
+            else:
+                dll_paths.append(d)
+
         utils.append_paths_to_environment('PATH', dll_paths)
 
     def install_prerequisites(self):
