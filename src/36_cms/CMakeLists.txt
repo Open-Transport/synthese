@@ -35,6 +35,8 @@ NotService.cpp
 NotService.hpp
 OrService.cpp
 OrService.hpp
+PrecisionService.cpp
+PrecisionService.hpp
 RowsListFunction.cpp
 RowsListFunction.hpp
 StrLenFunction.cpp
@@ -45,6 +47,8 @@ SubStrFunction.cpp
 SubStrFunction.hpp
 SuperiorFunction.cpp
 SuperiorFunction.hpp
+TimeDurationService.cpp
+TimeDurationService.hpp
 Webpage.cpp
 Webpage.h
 WebPageAddAction.cpp
