@@ -702,6 +702,10 @@ namespace synthese
 				removeRequest.getAction()->setObjectId(line->getKey());
 				stream << t.row(lexical_cast<string>(line->getKey()));
 
+				// Open button
+				stream << t.col();
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+
 				// Name
 				stream << t.col();
 				stream << line->getName();
@@ -759,7 +763,7 @@ namespace synthese
 
 					// Length
 					stream << t.col();
-					stream << line->getLineStop(line->getEdges().size()-1)->getMetricOffset();
+					stream << line->getLastEdge()->getMetricOffset();
 				}
 
 				// Services number
@@ -798,10 +802,6 @@ namespace synthese
 						stream << HTMLModule::getHTMLImage(DataSourceAdmin::ICON, "Source importée automatiquement, ne pas effectuer d'édition manuelle sur cet itinéraire");
 					}
 				}
-
-				// Open button
-				stream << t.col();
-				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
 
 				// Remove button
 				stream << t.col();
