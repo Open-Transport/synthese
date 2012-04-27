@@ -253,14 +253,18 @@ namespace synthese
 					lineStopRemoveAction.getAction()->setObjectId(lineStop->getKey());
 					lineStopUpdateAction.getAction()->setLineStop(const_pointer_cast<LineStop>(lineStop));
 
-					if(linePhysicalStop.get())
-					{
+					if(	linePhysicalStop.get() &&
+						linePhysicalStop->getPhysicalStop()->getConnectionPlace()
+					){
 						openPlaceRequest.getPage()->setConnectionPlace(
 							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace())
 						);
-						openCityRequest.getPage()->setCity(
-							Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
-						);
+						if(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
+						{
+							openCityRequest.getPage()->setCity(
+								Env::GetOfficialEnv().getSPtr(linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity())
+							);
+						}
 					}
 
 					if(lineArea.get())
@@ -280,15 +284,34 @@ namespace synthese
 
 					if(linePhysicalStop.get())
 					{
-						stream << t.col() << HTMLModule::getHTMLLink(
-							openCityRequest.getURL(),
-							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
-						);
+						// City
+						stream << t.col();
+						if(	linePhysicalStop->getPhysicalStop()->getConnectionPlace() &&
+							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()
+						){
+							stream << HTMLModule::getHTMLLink(
+								openCityRequest.getURL(),
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getCity()->getName()
+							);
+						}
+						else
+						{
+							stream << "Commune inconnue";
+						}
 
-						stream << t.col() << HTMLModule::getHTMLLink(
-							openPlaceRequest.getURL(),
-							linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getName()
-						);
+						// Stop area
+						stream << t.col();
+						if(	linePhysicalStop->getPhysicalStop()->getConnectionPlace()
+						){
+							stream << HTMLModule::getHTMLLink(
+								openPlaceRequest.getURL(),
+								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getName()
+							);
+						}
+						else
+						{
+							stream << "Zone d'arrêt inconnue";
+						}
 
 						// Physical stop
 						stream << t.col();
@@ -342,15 +365,22 @@ namespace synthese
 					// DRT area
 					if(lineArea.get())
 					{
+						// Area
 						stream << t.col();
-
 						stream << HTMLModule::getHTMLImage(DRTAreaAdmin::ICON, "Zone TAD");
+						if(lineArea->getArea())
+						{
+							stream << HTMLModule::getHTMLLink(
+								openDRTAreaRequest.getURL(),
+								lineArea->getArea()->getName()
+							);
+						}
+						else
+						{
+							stream << "Zone inconnue";
+						}
 
-						stream << HTMLModule::getHTMLLink(
-							openDRTAreaRequest.getURL(),
-							lineArea->getArea()->getName()
-						);
-
+						// Internal service
 						stream << t.col(2);
 						stream << "Desserte interne : ";
 						AdminActionFunctionRequest<LineStopUpdateAction,JourneyPatternAdmin> internalUpdateRequest(_request);
