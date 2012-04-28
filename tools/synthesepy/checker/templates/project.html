@@ -1,0 +1,159 @@
+{% extends "layout.html" %}
+
+{% block head %}
+  <style>
+    .form-inline {
+      display: inline;
+    }
+
+    td.same {
+      background-color: lime !important;
+    }
+    td.different, td.different a {
+      color: white;
+      background-color: red !important;
+    }
+    td.different a {
+      text-decoration: underline;
+    }
+    .running {
+      color: green;
+    }
+    .stopped {
+      color: red;
+    }
+  </style>
+{% endblock %}
+
+{% block body %}
+
+<h1>Project {{ project.name }}</h1>
+
+<h2>Information</h2>
+
+<div class="row">
+  <div class="span12">
+
+    <dl>
+      <dt>Reference host</dt>
+        <dd>{{ project.reference_host }}
+          (<a href=//{{ project.reference_host }}/ target=ref>web</a> -
+           <a href=//{{ project.reference_host }}/admin/ target=ref>admin</a> -
+           <a href=//{{ project.reference_host }}/w/manager/ target=ref>manager</a>)</dd>
+      <dt>Reference host</dt>
+        <dd>{{ project.test_host }}
+          (<a href=//{{ project.test_host }}/ target=test>web</a> -
+           <a href=//{{ project.test_host }}/admin/ target=test>admin</a> -
+           <a href=//{{ project.test_host }}/w/manager/ target=test>manager</a>)</dd>
+    </dl>
+
+  </div>
+</div>
+
+<h2>Project Management</h2>
+
+<div class="well">
+
+  {% if not project.synthese_project %}
+    <div class="label label-warning">Warning: Project not checked out yet</div><br>
+  {% endif %}
+
+  <form class="form-inline" action="{{ url_for('project_checkout', project_name=project.name) }}" method=post>
+    SVN username:<input class="input-small" type="text" name="svn_username">
+    SVN password:<input class="input-small" type="password" name="svn_password">
+    <button type="submit" class="btn btn-primary">Checkout/Update Project</button>
+  </form>
+
+  <br><br>
+
+  <form class="form-inline" action="{{ url_for('project_fetch_db', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Fetch db</button>
+  </form>
+
+  <form class="form-inline" action="{{ url_for('project_start', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Start</button>
+  </form>
+
+  <form class="form-inline" action="{{ url_for('project_stop', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Stop</button>
+  </form>
+
+  Running status:
+  {% if project.running %}
+    <span class=running>Running</span>
+  {% else %}
+    <span class="stopped">Not running</span>
+  {% endif %}
+
+  <a href="{{ url_for('project_logs', project_name=project.name) }}">View Logs</a>
+
+</div>
+
+<h2>Url Checks</h2>
+
+
+<div class="well">
+
+  <form class="form-inline" action="{{ url_for('run_checks', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary">Run Checks</button>
+  </form>
+
+  <form class="form-inline" action="{{ url_for('clear_results', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary">Clear Results</button>
+  </form>
+
+</div>
+
+{#
+todo
+<dl>
+  <dt>Launched at:</dt>
+    <dd>yyyy mm dd, hh:mm</dd>
+</dl>
+#}
+
+<div class="row">
+  <div class="span12">
+
+      <table class="table table-bordered table-striped">
+        <thead>
+          <tr>
+            <th>Path</th>
+            <th>Links</th>
+            <th>Results</th>
+            <th>Comparison</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          {% for url in project.urls %}
+          <tr>
+            <td>{{ url.path }}</td>
+            <td>
+              <a href="{{ url.ref_url }}" target=ref>reference url</a> /
+              <a href="{{ url.test_url }}" target=test>test url</a>
+            </td>
+            <td>
+              <a href="{{ url.get_result_url('ref') }}" target=ref>reference result</a> /
+              <a href="{{ url.get_result_url('test') }}" target=test>test result</a>
+            </td>
+            {% if url.result_status == None %}
+              <td>N/A</td>
+            {% elif url.result_status == True %}
+            <td class="same">
+              Same
+            </td>
+            {% else %}
+            <td class="different">
+              <a href="{{ url.get_result_url('diff') }}" target=diff>Different</a>
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+
+        </tbody>
+      </table>
+  </div>
+</div>
+
+{% endblock %}

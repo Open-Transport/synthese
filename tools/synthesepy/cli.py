@@ -30,6 +30,7 @@ import time
 
 import synthesepy
 import synthesepy.build
+import synthesepy.checker
 import synthesepy.config
 import synthesepy.continuous_integration
 import synthesepy.daemon
@@ -116,6 +117,10 @@ system_install.root_required = True
 
 def package(args, env):
     synthesepy.package.run(env, args)
+
+
+def checker(args, env):
+    synthesepy.checker.run(env, args)
 
 
 # End of commands
@@ -343,6 +348,14 @@ def add_default_subparsers(subparsers):
     parser_package.add_argument(
         '--no-package-overwrite', action='store_true',
         help='Don\'t overwrite existing package.')
+
+    parser_checker = subparsers.add_parser(
+        'checker',
+        help='Synthese checker interface for finding regressions')
+    parser_checker.set_defaults(func=checker)
+    parser_checker.add_argument(
+        '--debug', action='store_true',
+        help='Run in debug mode')
 
 
 def main():

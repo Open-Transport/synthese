@@ -1,0 +1,44 @@
+{% extends "layout.html" %}
+
+{% block head %}
+
+<style>
+  .CodeMirror {
+    border: 1px solid black;
+  }
+  .CodeMirror-scroll {
+    height: 700px !important;
+    overflow-y: hidden;
+    overflow-x: auto;
+    width: 100%
+  }
+</style>
+
+<script src="{{ url_for('.static', filename='vendor/CodeMirror-2.24/lib/codemirror.js') }}"></script>
+<script src="{{ url_for('.static', filename='vendor/CodeMirror-2.24/mode/python/python.js') }}"></script>
+
+<link href="{{ url_for('.static', filename='vendor/CodeMirror-2.24/lib/codemirror.css') }}" rel="stylesheet">
+
+<script>
+$(function() {
+  var myCodeMirror = CodeMirror.fromTextArea($("textarea").get(0), {
+    mode: "python",
+    lineNumbers: true,
+    tabMode: "spaces", // FIXME: doesn't work
+    autofocus: true,
+  });
+});
+</script>
+
+{% endblock %}
+
+{% block body %}
+
+<h1>Config Editor</h1>
+
+<form action="{{ url_for('config_update') }}" method=post>
+  <textarea name=config>{{ config }}</textarea>
+  <button type=submit>Save</button>
+</form>
+
+{% endblock %}
