@@ -252,7 +252,7 @@ class Project(object):
 def load_conf(env):
     global conf, projects, name_to_project
 
-    conf_path = join(env.c.config_path, 'checker_config.py')
+    conf_path = join(env.c.conf_dir, 'checker_config.py')
     mtime = os.path.getmtime(conf_path)
 
     if conf.get('mtime') == mtime and len(projects) > 0:
