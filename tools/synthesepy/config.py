@@ -157,6 +157,7 @@ class Config(object):
 
         self.thirdparty_dir = os.environ.get(
             'SYNTHESE_THIRDPARTY_DIR', os.path.expanduser('~/.synthese'))
+        self.conf_dir = join(self.thirdparty_dir, 'config')
 
     def _get_config_globals(self, path):
         return {
@@ -165,7 +166,7 @@ class Config(object):
         }
 
     def update_from_files(self, config_names, config_path):
-        conf_dir = config_path if config_path else join(
+        self.conf_dir = config_path if config_path else join(
             self.thirdparty_dir, 'config')
 
         all_configs = {}
@@ -181,7 +182,7 @@ class Config(object):
 
         for suffix in suffixes:
             path = join(
-                conf_dir, 'config{suffix}.py'.format(suffix=suffix))
+                self.conf_dir, 'config{suffix}.py'.format(suffix=suffix))
             log.debug('Trying to read config file: %r', path)
             if os.path.isfile(path):
                 log.debug('Reading config file: %r', path)
