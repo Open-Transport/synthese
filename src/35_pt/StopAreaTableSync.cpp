@@ -121,17 +121,11 @@ namespace synthese
 
 			// Name 13
 			string name13(rows->getText(StopAreaTableSync::COL_NAME13));
-			if (!name13.empty())
-			{
-				cp->setName13(name13);
-			}
+			cp->setName13(name13);
 
 			// Name 26
 			string name26(rows->getText(StopAreaTableSync::COL_NAME26));
-			if (!name26.empty())
-			{
-				cp->setName26(name26);
-			}
+			cp->setName26(name26);
 
 			// Transfer is allowed
 			bool connectionType(rows->getBool(StopAreaTableSync::TABLE_COL_CONNECTIONTYPE));
