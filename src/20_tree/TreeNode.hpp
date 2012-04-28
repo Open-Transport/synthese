@@ -81,11 +81,22 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setParent(ObjectType* parent);
+				void setParent(ObjectType* parent)
+				{
+					_parent = parent;
+					if(parent)
+					{
+						this->setSameRoot(*parent);
+					}
+				}
 			//@}
 
 			//! @name Services
 			//@{
+				void registerInParentOrRoot();
+				void unregisterInParentOrRoot();
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// Gets the depth of the node position in the tree.
 				/// @return the depth of the node position in the tree (0 if the node is at the root)
@@ -239,31 +250,43 @@ namespace synthese
 			template<class> class OrderingPolicy_,
 			class RootPolicy_
 		>
-		void TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::setParent(
-			ObjectType_* parent
+		void TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::unregisterInParentOrRoot(
 		){
-			if(!_parent || *_parent != parent)
+			if(_parent)
 			{
-				if(_parent)
+				if(*_parent)
 				{
-					if(*_parent)
-					{
-						(*_parent)->_children.erase(OrderingPolicy::getTreeOrderingKey());
-					}
-					else
-					{
-						if(!this->hasRoot())
-						{
-							throw InconsistentTreeException();
-						}
-						unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
-					}
+					(*_parent)->_children.erase(OrderingPolicy::getTreeOrderingKey());
 				}
-				_parent = parent;
-				if(parent)
+				else
 				{
-					parent->_children.insert(std::make_pair(OrderingPolicy::getTreeOrderingKey(), static_cast<ObjectType*>(this)));
-					this->setSameRoot(*parent);
+					if(!this->hasRoot())
+					{
+						throw InconsistentTreeException();
+					}
+					unregisterChildFromRoot(static_cast<ObjectType_&>(*this));
+				}
+			}
+		}
+		
+
+
+		template<
+			class ObjectType_,
+			template<class> class OrderingPolicy_,
+			class RootPolicy_
+		>
+		void TreeNode<ObjectType_, OrderingPolicy_, RootPolicy_>::registerInParentOrRoot(
+		){
+			if(_parent)
+			{
+				if(*_parent)
+				{
+					(*_parent)->_children.insert(
+						std::make_pair(
+							OrderingPolicy::getTreeOrderingKey(),
+							static_cast<ObjectType*>(this)
+					)	);
 				}
 				else
 				{

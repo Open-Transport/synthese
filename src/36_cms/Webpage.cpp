@@ -88,26 +88,6 @@ namespace synthese
 			webpage.setRank(record.getDefault<size_t>(FIELDS[2].name, 0));
 		}
 
-		if(record.isDefined(FIELDS[0].name))
-		{
-			RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
-			if(id > 0)
-			{
-				try
-				{
-					webpage.setRoot(env.getEditable<Website>(id).get());
-					webpage.getRoot()->addPage(webpage);
-				}
-				catch(ObjectNotFoundException<Website>&)
-				{
-					Log::GetInstance().warn(
-						"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
-						lexical_cast<string>(id) + " not found"
-					);
-				}
-			}
-		}
-
 		if(record.isDefined(FIELDS[1].name))
 		{
 			RegistryKeyType up_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
@@ -128,6 +108,25 @@ namespace synthese
 			else
 			{
 				webpage.setParent(NULL);
+			}
+		}
+
+		if(record.isDefined(FIELDS[0].name))
+		{
+			RegistryKeyType id(record.getDefault<RegistryKeyType>(FIELDS[0].name, 0));
+			if(id > 0)
+			{
+				try
+				{
+					webpage.setRoot(env.getEditable<Website>(id).get());
+				}
+				catch(ObjectNotFoundException<Website>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
+						lexical_cast<string>(id) + " not found"
+						);
+				}
 			}
 		}
 	}
@@ -295,6 +294,7 @@ namespace synthese
 		){
 			if(withAlgorithmOptimizations)
 			{
+				registerInParentOrRoot();
 				getRoot()->addPage(*this);
 			}
 		}
@@ -303,6 +303,7 @@ namespace synthese
 
 		void Webpage::unlink()
 		{
+			unregisterInParentOrRoot();
 			getRoot()->removePage(get<SmartURLPath>());
 			this->setParent(NULL);
 		}
