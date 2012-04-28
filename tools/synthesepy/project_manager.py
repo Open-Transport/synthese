@@ -1180,7 +1180,7 @@ The synthese.py wrapper script.
         log.info('Starting Synthese in the background')
         if self.config.bg_process_manager == 'python':
             if self.env.platform == 'lin' and os.geteuid() == 0:
-                raise Exception('You can\'t run this command root')
+                raise Exception('You can\'t run this command as root')
 
             cmd = self.build_command_line('rundaemon', ['-s'])
             log.debug('Synthese command line: %s', ' '.join(cmd))
