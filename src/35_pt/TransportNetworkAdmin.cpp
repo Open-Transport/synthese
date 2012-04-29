@@ -23,9 +23,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "TransportNetworkAdmin.h"
+
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
 #include "PTModule.h"
 #include "Profile.h"
-#include "AdminFunctionRequest.hpp"
+#include "RemoveObjectAction.hpp"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "CommercialLine.h"
@@ -37,7 +40,6 @@
 #include "AdminParametersException.h"
 #include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
-#include "AdminActionFunctionRequest.hpp"
 #include "CommercialLineUpdateAction.h"
 #include "ImportableAdmin.hpp"
 #include "TransportNetworkUpdateAction.hpp"
@@ -53,6 +55,7 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
+	using namespace db;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
@@ -143,33 +146,58 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
-			ResultHTMLTable::HeaderVector h;
-			h.push_back(make_pair(string(), "N°"));
-			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
-			h.push_back(make_pair(string(), "Actions"));
-			ResultHTMLTable t(h,sortedForm,_requestParameters, lines);
-
-			stream << t.open();
+			// Requests
 			AdminFunctionRequest<CommercialLineAdmin> lineOpenRequest(_request);
-			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
-			{
-				lineOpenRequest.getPage()->setCommercialLine(line);
-				stream << t.row();
-				stream << t.col(1, line->getStyle(), true);
-				stream << line->getShortName();
-				stream << t.col();
-				stream << line->getName();
-				stream << t.col();
-				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
-			}
-
-			AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> creationRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, TransportNetworkAdmin> lineRemoveRequest(_request);
+			AdminActionFunctionRequest<CommercialLineUpdateAction, CommercialLineAdmin> creationRequest(_request);
 			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
 			creationRequest.getAction()->setNetwork(_network);
 
+			// Table
+			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), string()));
+			h.push_back(make_pair(string(), "N°"));
+			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
+			h.push_back(make_pair(string(), string()));
+			ResultHTMLTable t(h,sortedForm,_requestParameters, lines);
+			stream << t.open();
+
+			// Rows
+			BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+			{
+				// Row opening
+				stream << t.row();
+
+				// Open button
+				stream << t.col();
+				lineOpenRequest.getPage()->setCommercialLine(line);
+				stream << HTMLModule::getLinkButton(lineOpenRequest.getURL(), "Ouvrir", string(), "chart_line_edit.png");
+
+				// Short name
+				stream << t.col(1, line->getStyle(), true);
+				stream << line->getShortName();
+
+				// Long name
+				stream << t.col();
+				stream << line->getName();
+
+				// Remove action
+				stream << t.col();
+				if(line->getPaths().empty())
+				{
+					lineRemoveRequest.getAction()->setObjectId(line->getKey());
+					stream << HTMLModule::getLinkButton(
+						lineRemoveRequest.getURL(),
+						"Supprimer",
+						"Etes-vous sûr de vouloir supprimer la ligne "+ line->getShortName() +" ?"
+					);
+				}
+			}
+
+			// Creation row
 			stream << t.row();
-			stream << t.col(2) << "Création de ligne";
+			stream << t.col(3) << "Création de ligne";
 			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
 			stream << t.close();
 

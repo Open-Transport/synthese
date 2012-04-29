@@ -134,29 +134,37 @@ namespace synthese
 					_requestParameters.raisingOrder
 			)	);
 
+			// Requests
 			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> newRequest(request);
 			newRequest.getFunction()->setActionFailedPage<PTNetworksAdmin>();
 			newRequest.setActionWillCreateObject();
+			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
 
+			// Table
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(PARAM_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
 			ActionResultHTMLTable t(h,sortedForm,_requestParameters, networks, newRequest.getHTMLForm());
-
 			stream << t.open();
-			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
-			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
+
+			// Rows
 			BOOST_FOREACH(const shared_ptr<TransportNetwork>& network, networks)
 			{
 				if(request.getUser()->getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey())))
 				{
-					openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					// Row opening
 					stream << t.row();
+
+					// Open button
+					stream << t.col();
+					openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
+
+					// Name
 					stream << t.col();
 					stream << network->getName();
-					stream << t.col();
-					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
 
 					// Remove button
 					stream << t.col();
@@ -166,7 +174,11 @@ namespace synthese
 					if(lines.empty())
 					{
 						removeRequest.getAction()->setObjectId(network->getKey());
-						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le réseau "+ network->getName() +" ?");
+						stream << HTMLModule::getLinkButton(
+							removeRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer le réseau "+ network->getName() +" ?"
+						);
 					}
 				}
 			}
