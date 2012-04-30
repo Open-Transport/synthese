@@ -514,7 +514,11 @@ namespace synthese
 			query.addField(tdstream.str());
 			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(object->getAllowCanceled());
 			query.execute(transaction);
 		}

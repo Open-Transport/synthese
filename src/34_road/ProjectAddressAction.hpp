@@ -1,9 +1,9 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// LineStopUpdateAction class header.
-///	@file LineStopUpdateAction.hpp
+/// ProjectAddressAction class header.
+///	@file ProjectAddressAction.hpp
 ///	@author Hugues Romain
-///	@date 2010
+///	@date 2012
 ///
 ///	This file belongs to the SYNTHESE project (public transportation specialized software)
 ///	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -22,69 +22,53 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_LineStopUpdateAction_H__
-#define SYNTHESE_LineStopUpdateAction_H__
+#ifndef SYNTHESE_ProjectAddressAction_H__
+#define SYNTHESE_ProjectAddressAction_H__
 
 #include "Action.h"
 #include "FactorableTemplate.h"
-
-#include <boost/optional.hpp>
 
 namespace geos
 {
 	namespace geom
 	{
-		class LineString;
-	};
+		class Point;
+	}
 }
 
 namespace synthese
 {
-	namespace pt
+	namespace util
 	{
-		class LineStop;
-		class StopPoint;
-		class DesignatedLinePhysicalStop;
+		class Registrable;
+	}
 
+	namespace road
+	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 35.15 Action : LineStopUpdateAction.
-		/// @ingroup m35Actions refActions
+		/// 34.15 Action : ProjectAddressAction.
+		/// @ingroup m34Actions refActions
 		///	@author Hugues Romain
-		///	@date 2010
-		/// @since 3.1.18
+		///	@date 2012
+		/// @since 3.4.0
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : LineStopUpdateAction
+		/// Key : ProjectAddressAction
 		///
 		/// Parameters :
-		///	<ul>
-		///		<li>actionParamid : id of the object to update</li>
-		///		<li>actionParamps (optional) : id of the physical stop to use. No change if undefined</li>
-		///		<li>actionParamad (optional) : departure is allowed. No change if undefined</li>
-		///		<li>actionParamaa (optional) : arrival is allowed. No change if undefined</li>
-		///	</ul>
-		class LineStopUpdateAction:
-			public util::FactorableTemplate<server::Action, LineStopUpdateAction>
+		///	<dl>
+		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
+		///	</dl>
+		class ProjectAddressAction:
+			public util::FactorableTemplate<server::Action, ProjectAddressAction>
 		{
 		public:
-			static const std::string PARAMETER_LINE_STOP_ID;
-			static const std::string PARAMETER_PHYSICAL_STOP_ID;
-			static const std::string PARAMETER_ALLOWED_DEPARTURE;
-			static const std::string PARAMETER_ALLOWED_ARRIVAL;
-			static const std::string PARAMETER_ALLOWED_INTERNAL;
-			static const std::string PARAMETER_WITH_SCHEDULES;
-			static const std::string PARAMETER_READ_LENGTH_FROM_GEOMETRY;
+			static const std::string PARAMETER_ADDRESS_ID;
+			static const std::string PARAMETER_MAX_DISTANCE;
 
 		private:
-			boost::shared_ptr<LineStop> _lineStop;
-			boost::shared_ptr<StopPoint> _physicalStop;
-			boost::optional<bool> _allowedDeparture;
-			boost::optional<bool> _allowedArrival;
-			boost::optional<bool> _allowedInternal;
-			boost::optional<bool> _withSchedules;
-			boost::optional<boost::shared_ptr<geos::geom::LineString> > _geometry;
-			DesignatedLinePhysicalStop* _nextLineStop;
-			DesignatedLinePhysicalStop* _prevLineStop;
-			bool _readLengthFromGeometry;
+			boost::shared_ptr<util::Registrable> _address;
+			boost::shared_ptr<geos::geom::Point> _point;
+			double _maxDistance;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -101,13 +85,11 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
-			LineStopUpdateAction();
-
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-
+			
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -120,16 +102,16 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setLineStop(boost::shared_ptr<LineStop> value) { _lineStop = value; }
-				void setAllowedDeparture(boost::optional<bool>(value)){ _allowedDeparture = value; }
-				void setAllowedArrival(boost::optional<bool>(value)){ _allowedArrival = value; }
-				void setAllowedInternal(boost::optional<bool>(value)){ _allowedInternal = value; }
-				void setWithSchedules(boost::optional<bool>(value)){ _withSchedules = value; }
-				void setPhysicalStop(boost::shared_ptr<StopPoint> value){ _physicalStop = value; }
-				void setReadLengthFromGeometry(bool value){ _readLengthFromGeometry = value; }
+				template<class T>
+				void setAddress(boost::shared_ptr<T> value) { _address = dynamic_pointer_cast<util::Registrable, T>(value); }
+
+				void setMaxDistance(double value){ _maxDistance = value; }
 			//@}
+
+			ProjectAddressAction();
 		};
 	}
 }
 
-#endif // SYNTHESE_LineStopUpdateAction_H__
+#endif // SYNTHESE_ProjectAddressAction_H__
+

@@ -55,8 +55,6 @@ namespace synthese
 		boost::shared_ptr<ConnectionInfo> DBModule::_ConnectionInfo;
 		boost::shared_ptr<DB> DBModule::_Db;
 		DBModule::SubClassMap DBModule::_subClassMap;
-
-		const CoordinatesSystem* DBModule::_storageCoordinatesSystem(NULL);
 	}
 
 	namespace server
@@ -246,12 +244,33 @@ namespace synthese
 			RegistryTableType tableId(decodeTableId(id));
 			shared_ptr<DBDirectTableSync> tableSync(
 				dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
-				GetTableSync(tableId)
-				)	);
+					GetTableSync(tableId)
+			)	);
 			if(!tableSync.get())
 			{
 				throw Exception("Incompatible table");
 			}
 			return tableSync->getEditableRegistrable(id, env);
+		}
+
+
+
+		void DBModule::SaveObject(
+			const util::Registrable& object,
+			boost::optional<DBTransaction&> transaction /*= boost::optional<DBTransaction&>() */
+		){
+			RegistryTableType tableId(decodeTableId(object.getKey())); // If the key is not defined, the table is not decoded
+			shared_ptr<DBDirectTableSync> tableSync(
+				dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
+					GetTableSync(tableId)
+			)	);
+			if(!tableSync.get())
+			{
+				throw Exception("Incompatible table");
+			}
+			return tableSync->saveRegistrable(
+				const_cast<util::Registrable&>(object), // Will not be updated because the key is already defined
+				transaction
+			);
 		}
 }	}

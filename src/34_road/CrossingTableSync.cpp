@@ -117,7 +117,11 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<CrossingTableSync> query(*object);
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}

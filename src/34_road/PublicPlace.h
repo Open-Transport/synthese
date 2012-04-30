@@ -24,6 +24,7 @@
 #define SYNTHESE_road_PUBLICPLACE_H
 
 #include "NamedPlaceTemplate.h"
+#include "Object.hpp"
 #include "ImportableTemplate.hpp"
 #include "WithGeometry.hpp"
 
@@ -43,6 +44,13 @@ namespace synthese
 	{
 		class PublicPlaceEntrance;
 
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(geography::NamedPlaceData),
+			FIELD(impex::DataSourceLinks),
+			FIELD(PointGeometry)
+		> PublicPlaceSchema;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// Public place.
 		///	@ingroup m34
@@ -52,9 +60,9 @@ namespace synthese
 		/// @image html uml_public_place.png
 		///
 		class PublicPlace:
+			public Object<PublicPlace, PublicPlaceSchema>,
 			public geography::NamedPlaceTemplate<PublicPlace>,
-			public impex::ImportableTemplate<PublicPlace>,
-			public WithGeometry<geos::geom::Point>
+			public impex::ImportableTemplate<PublicPlace>
 		{
 		public:
 			static const std::string DATA_ID;
@@ -89,11 +97,15 @@ namespace synthese
 			//@{
 				void addEntrance(PublicPlaceEntrance& entrance);
 				void removeEntrance(PublicPlaceEntrance& entrance);
+				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+				virtual void unlink();
 			//@}
 
 			virtual std::string getNameForAllPlacesMatcher(
 				std::string text = std::string()
 			) const;
+
+			virtual std::string getName() const;
 
 			//! @name Virtual queries for geography::Place interface
 			//@{

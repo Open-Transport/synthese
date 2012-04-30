@@ -73,6 +73,8 @@ namespace synthese
 
 			void setValues(util::ParametersMap& map)
 			{
+				assert(map.getFormat() == util::ParametersMap::FORMAT_SQL);
+
 				_id = map.get<util::RegistryKeyType>(TABLE_COL_ID);
 				BOOST_FOREACH(const FieldsList::value_type& field, TableSync::GetFieldsList())
 				{
@@ -80,7 +82,17 @@ namespace synthese
 					{
 						continue;
 					}
-					addField(map.getDefault<std::string>(field.name));
+					if(map.isDefined(field.name))
+					{
+						_fields.push_back(
+							ValueExpression<RawSQL>::Get(
+								map.getValue(field.name)
+						)	);
+					}
+					else
+					{
+						addFieldNull();
+					}
 				}
 			}
 

@@ -45,7 +45,9 @@ namespace synthese
 {
 	namespace util
 	{
-		ParametersMap::ParametersMap( const std::string& text )
+		ParametersMap::ParametersMap(
+			const std::string& text
+		):	_format(FORMAT_INTERNAL)
 		{
 			typedef tokenizer<char_separator<char> > _tokenizer;
 			char_separator<char> sep(URI::PARAMETER_SEPARATOR.c_str ());
@@ -68,14 +70,18 @@ namespace synthese
 
 
 
-		ParametersMap::ParametersMap()
+		ParametersMap::ParametersMap(
+			SerializationFormat format
+		):	_format(format)
 		{}
 
 
 
 		ParametersMap::ParametersMap(
-			const Map& source
-		):	_map(source)
+			const Map& source,
+			SerializationFormat format
+		):	_map(source),
+			_format(format)
 		{}
 
 
@@ -414,6 +420,8 @@ namespace synthese
 			const ParametersMap& other,
 			string prefix
 		){
+			assert(_format == other._format);
+
 			BOOST_FOREACH(ParametersMap::Map::value_type it, other._map)
 			{
 				// Declaration
@@ -440,9 +448,10 @@ namespace synthese
 
 
 
-		ParametersMap ParametersMap::getExtract( const std::string& keyBegin ) const
-		{
-			ParametersMap result;
+		ParametersMap ParametersMap::getExtract(
+			const std::string& keyBegin
+		) const	{
+			ParametersMap result(_format);
 			BOOST_FOREACH(const Map::value_type& element, _map)
 			{
 				if(element.first.substr(0, keyBegin.size()) == keyBegin)
@@ -502,13 +511,33 @@ namespace synthese
 
 
 
-		std::string ParametersMap::getValue( const std::string& parameterName ) const
-		{
+		std::string ParametersMap::getValue(
+			const std::string& parameterName,
+			bool exceptionIfMissing
+		) const	{
 			Map::const_iterator it(_map.find(parameterName));
 			if(it == _map.end())
 			{
-				throw MissingParameterException(parameterName);
+				if(exceptionIfMissing)
+				{
+					throw MissingParameterException(parameterName);
+				}
+				else
+				{
+					return string();
+				}
 			}
 			return it->second;
+		}
+
+
+
+		void ParametersMap::operator=( const ParametersMap& other )
+		{
+			assert(_format == other._format);
+
+			_map = other._map;
+			_subMap = other._subMap;
+			_geometry = other._geometry;
 		}
 }	}

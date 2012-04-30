@@ -405,13 +405,13 @@ namespace synthese
 				}
 
 				boost::shared_ptr<geos::geom::Point> minPoint(
-					DBModule::GetStorageCoordinatesSystem().convertPoint(
+					CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(
 						*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
 							point.getX() - distanceLimit,
 							point.getY() - distanceLimit
 				)	)	);
 				boost::shared_ptr<geos::geom::Point> maxPoint(
-					DBModule::GetStorageCoordinatesSystem().convertPoint(
+					CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(
 						*CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(
 							point.getX() + distanceLimit,
 							point.getY() + distanceLimit

@@ -90,7 +90,17 @@ namespace synthese
 			virtual std::string getColumnName (int column) const = 0;
 			int getColumnIndex (const std::string& columnName) const;
 
-			virtual std::string getValue(const std::string& fieldName) const;
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the value of a field
+			/// @param fieldName name of the parameter to read
+			/// @param exceptionIfMissing throws an exception if the parameter is undefined, else returns an empty string
+			/// @return the value of the parameter
+			virtual std::string getValue(
+				const std::string& fieldName,
+				bool exceptionIfMissing = true
+			) const;
+
 			virtual bool isDefined(const std::string& fieldName) const;
 
 			virtual std::string getText (int column) const = 0;
@@ -125,22 +135,6 @@ namespace synthese
 			std::vector<int> computeMaxColWidths () const;
 
 			util::RegistryKeyType getKey() const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Reads a WKT column and transform it into geometry.
-			/// @param col the colume to read
-			/// @return the geometry object corresponding to the WKT data
-			/// @pre the column must store WKB data
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.2.0
-			boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKT(
-				const std::string& col,
-				boost::optional<const geos::geom::GeometryFactory&> factory =
-					boost::optional<const geos::geom::GeometryFactory&>()
-			) const;
 		};
 
 

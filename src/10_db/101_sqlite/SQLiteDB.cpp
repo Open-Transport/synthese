@@ -430,7 +430,7 @@ namespace synthese
 			for(; i!=fields.size() && fields[i].isGeometry(); ++i)
 			{
 				sql << "SELECT AddGeometryColumn('" << tableName << "','" <<
-					fields[i].name << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() <<
+					fields[i].name << "'," << CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() <<
 					",'" << getSQLType(fields[i].type) << "',2);" <<
 					"SELECT CreateSpatialIndex('" << tableName << "','" <<
 					fields[i].name << "');"

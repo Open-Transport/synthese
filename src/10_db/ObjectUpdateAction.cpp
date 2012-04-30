@@ -113,6 +113,9 @@ namespace synthese
 					item.second
 				);
 			}
+			ParametersMap existingMap;
+			_object->toParametersMap(existingMap);
+			record.merge(existingMap);
 
 			// Record read
 			LinkedObjectsIds linkedObjects(_value->getLinkedObjectsIds(record));

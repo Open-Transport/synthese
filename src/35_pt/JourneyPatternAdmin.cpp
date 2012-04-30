@@ -24,33 +24,35 @@
 
 #include "JourneyPatternAdmin.hpp"
 
+#include "ActionResultHTMLTable.h"
+#include "AdminActionFunctionRequest.hpp"
+#include "AdminFunctionRequest.hpp"
+#include "AdminParametersException.h"
 #include "BaseCalendarAdmin.hpp"
 #include "CommercialLine.h"
 #include "CommercialLineAdmin.h"
-#include "JourneyPatternRankContinuityRestoreAction.hpp"
-#include "PTModule.h"
-#include "Profile.h"
-#include "HTMLModule.h"
-#include "StopPoint.hpp"
-#include "JourneyPattern.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
-#include "LineArea.hpp"
-#include "LineStopTableSync.h"
-#include "ScheduledService.h"
-#include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
-#include "StopArea.hpp"
-#include "TransportNetworkRight.h"
-#include "ServiceAdmin.h"
-#include "Request.h"
-#include "AdminFunctionRequest.hpp"
-#include "ActionResultHTMLTable.h"
-#include "AdminParametersException.h"
-#include "ServiceAddAction.h"
-#include "AdminActionFunctionRequest.hpp"
-#include "PTPlaceAdmin.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "HTMLModule.h"
+#include "JourneyPattern.hpp"
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JourneyPatternUpdateAction.hpp"
+#include "LineArea.hpp"
+#include "LineStopTableSync.h"
+#include "ObjectUpdateAction.hpp"
+#include "Profile.h"
+#include "PTModule.h"
+#include "PTPlaceAdmin.h"
+#include "Request.h"
+#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
+#include "ServiceAddAction.h"
+#include "ServiceAdmin.h"
+#include "StandardFields.hpp"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
+#include "TransportNetworkRight.h"
 #include "PTRuleUserAdmin.hpp"
 #include "PropertiesHTMLTable.h"
 #include "RollingStockTableSync.hpp"
@@ -531,7 +533,14 @@ namespace synthese
 				if(center.get())
 				{
 					stream << "<h1>Carte</h1>";
-					HTMLMap map(*center, 12, true, false, false, false);
+					HTMLMap map(
+						*center,
+						12,
+						ObjectUpdateAction::GetInputName<LineStringGeometry>(),
+						false,
+						false,
+						false
+					);
 					map.setMapSource(MapSource::GetSessionMapSource(*_request.getSession()));
 
 					StaticActionRequest<LineStopUpdateAction> lineStopUpdateRequest(_request);

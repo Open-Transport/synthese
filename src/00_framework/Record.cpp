@@ -22,10 +22,19 @@
 
 #include "Record.hpp"
 
-#include <boost/algorithm/string.hpp>
+#include "CoordinatesSystem.hpp"
 
+#include <boost/shared_ptr.hpp>
+#include <boost/algorithm/string.hpp>
+#include <geos/io/WKTReader.h>
+#include <geos/geom/Geometry.h>
+#include <geos/io/ParseException.h>
+
+using namespace boost;
 using namespace boost::algorithm;
 using namespace std;
+using namespace geos::geom;
+using namespace geos::io;
 
 namespace synthese
 {
@@ -62,7 +71,42 @@ namespace synthese
 		}
 
 		return true;
-
 	}
-}
+
+
+
+	boost::shared_ptr<geos::geom::Geometry> Record::getGeometryFromWKT(
+		const std::string& col,
+		boost::optional<const geos::geom::GeometryFactory&> factory
+	) const	{
+		string colStr(getDefault<string>(col));
+
+		if(colStr.empty())
+		{
+			return shared_ptr<Geometry>();
+		}
+
+		const geos::geom::GeometryFactory* factoryPtr;
+		if(!factory)
+		{
+			factoryPtr = &CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory();
+		}
+		else
+		{
+			factoryPtr = factory.get_ptr();
+		}
+		WKTReader reader(factoryPtr);
+
+		try
+		{
+			return
+				CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+					*shared_ptr<Geometry>(reader.read(colStr))
+			);
+		}
+		catch(geos::io::ParseException&)
+		{
+			return shared_ptr<Geometry>();
+		}
+}	}
 

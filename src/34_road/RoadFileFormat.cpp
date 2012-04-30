@@ -130,7 +130,7 @@ namespace synthese
 			publicPlace->setCity(&city);
 			if(geometry)
 			{
-				publicPlace->setGeometry(*geometry);
+				publicPlace->set<PointGeometry>(*geometry);
 			}
 
 			return publicPlace;
@@ -438,9 +438,9 @@ namespace synthese
 			// Properties update
 			if(name)
 			{
-				publicPlaceEntrance->setName(*name);
+				publicPlaceEntrance->set<Name>(*name);
 			}
-			publicPlaceEntrance->setPublicPlace(&publicPlace);
+			publicPlaceEntrance->set<PublicPlace>(publicPlace);
 			publicPlaceEntrance->setRoadChunk(&roadChunk);
 			publicPlaceEntrance->setHouseNumber(number);
 			publicPlaceEntrance->setMetricOffset(metricOffset);

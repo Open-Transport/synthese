@@ -32,7 +32,7 @@ namespace synthese
 
 	namespace impex
 	{
-		const string BaseImportableUpdateAction::PARAMETER_DATA_SOURCE_LINKS = Action_PARAMETER_PREFIX + "biu_data_source_links";
+		const string BaseImportableUpdateAction::PARAMETER_DATA_SOURCE_LINKS = Action_PARAMETER_PREFIX + "_field_data_source_links";
 
 
 
@@ -44,7 +44,7 @@ namespace synthese
 			{
 				map.insert(
 					PARAMETER_DATA_SOURCE_LINKS,
-					DataSourceLinks::Serialize(*_dataSourceLinks)
+					DataSourceLinks::Serialize(*_dataSourceLinks, map.getFormat())
 				);
 			}
 		}

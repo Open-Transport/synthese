@@ -24,8 +24,10 @@
 #define SYNTHESE_road_PublicPlaceEntrance_hpp__
 
 #include "Address.h"
+#include "Object.hpp"
+#include "PublicPlace.h"
+
 #include "ImportableTemplate.hpp"
-#include "Named.h"
 #include "Registrable.h"
 
 #include "Registry.h"
@@ -34,15 +36,23 @@ namespace synthese
 {
 	namespace road
 	{
-		class PublicPlace;
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(PublicPlace),
+			FIELD(Name),
+			FIELD(AddressData),
+			FIELD(impex::DataSourceLinks)
+		> PublicPlaceEntranceSchema;
 
-		/** Public placee entrance.
+
+
+		/** Public place entrance.
 			@ingroup m34
 		*/
 		class PublicPlaceEntrance:
+			public Object<PublicPlaceEntrance, PublicPlaceEntranceSchema>,
 			public Address,
-			public impex::ImportableTemplate<PublicPlaceEntrance>,
-			public util::Named
+			public impex::ImportableTemplate<PublicPlaceEntrance>
 		{
 		public:
 			typedef util::Registry<PublicPlaceEntrance> Registry;
@@ -51,33 +61,9 @@ namespace synthese
 				util::RegistryKeyType id = 0
 			);
 
-
-		private:
-			/// @name Data
-			//@{
-			//@}
-
-			/// @name Links
-			//@{
-				PublicPlace* _publicPlace;
-			//@}
-
-		public:
-			/// @name Getters
-			//@{
-				PublicPlace* getPublicPlace() const { return _publicPlace; }
-			//@}
-
-			/// @name Setters
-			//@{
-				void setPublicPlace(PublicPlace* value){ _publicPlace = value; }
-			//@}
-
-			/// @name Virtual services
-			//@{
-			//@}
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_road_PublicPlaceEntrance_hpp__

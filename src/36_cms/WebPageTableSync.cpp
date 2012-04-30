@@ -98,7 +98,7 @@ namespace synthese
 		){
 			// Query
 			ReplaceQuery<WebPageTableSync> query(*webPage);
-			ParametersMap map;
+			ParametersMap map(ParametersMap::FORMAT_SQL);
 			webPage->toParametersMap(map);
 			query.setValues(map);
 			query.execute(transaction);
@@ -123,7 +123,7 @@ namespace synthese
 			SelectQuery<WebPageTableSync> query;
 			Env env;
 			query.addWhereField(
-				ObjectFieldDefinition<WebpageLinks>::FIELD.name,
+				SimpleObjectFieldDefinition<WebpageLinks>::FIELD.name,
 				"%"+ lexical_cast<string>(id) +"%",
 				ComposedExpression::OP_LIKE
 			);
@@ -219,7 +219,7 @@ namespace synthese
 			}
 			else if (orderByTitle)
 			{
-				query.addOrderField(ObjectFieldDefinition<Title>::FIELD.name, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Title>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{
@@ -281,7 +281,7 @@ namespace synthese
 			Env env;
 			if(prefix)
 			{
-				query.addWhereField(ObjectFieldDefinition<Title>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
+				query.addWhereField(SimpleObjectFieldDefinition<Title>::FIELD.name, "%"+ *prefix +"%", ComposedExpression::OP_LIKE);
 			}
 			if(limit)
 			{

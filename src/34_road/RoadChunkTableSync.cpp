@@ -21,7 +21,10 @@
 */
 
 #include "RoadChunkTableSync.h"
+
+#include "Address.h"
 #include "CrossingTableSync.hpp"
+#include "EdgeProjector.hpp"
 #include "RoadTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -39,6 +42,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace algorithm;
 	using namespace db;
 	using namespace util;
 	using namespace road;
@@ -271,4 +275,44 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 	    }
+
+
+
+		void RoadChunkTableSync::ProjectAddress(
+			const Point& point,
+			double maxDistance,
+			Address& address
+		){
+			EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
+				SearchByMaxDistance(
+					point,
+					500 * maxDistance,
+					Env::GetOfficialEnv(),
+					UP_LINKS_LOAD_LEVEL
+			)	);
+
+			if(!paths.empty())
+			{
+				EdgeProjector<shared_ptr<MainRoadChunk> > projector(paths, maxDistance);
+
+				try
+				{
+					EdgeProjector<shared_ptr<MainRoadChunk> >::PathNearby projection(
+						projector.projectEdge(
+							*point.getCoordinate()
+					)	);
+
+					address.setGeometry(
+						shared_ptr<Point>(
+							CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory().createPoint(
+								projection.get<0>()
+					)	)	);
+					address.setRoadChunk(projection.get<1>().get());
+					address.setMetricOffset(projection.get<2>());
+				}
+				catch(EdgeProjector<shared_ptr<MainRoadChunk> >::NotFoundException)
+				{
+				}
+			}
+		}
 }	}

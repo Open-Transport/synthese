@@ -49,16 +49,6 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,PublicPlaceEntranceTableSync>::FACTORY_KEY("34.50 Public place entrances");
 	}
 
-	namespace road
-	{
-		const string PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID = "public_place_id";
-		const string PublicPlaceEntranceTableSync::COL_NAME = "name";
-		const string PublicPlaceEntranceTableSync::COL_ROAD_CHUNK_ID = "road_chunk_id";
-		const string PublicPlaceEntranceTableSync::COL_METRIC_OFFSET = "metric_offset";
-		const string PublicPlaceEntranceTableSync::COL_NUMBER = "number";
-		const string PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<PublicPlaceEntranceTableSync>::TABLE(
@@ -67,17 +57,7 @@ namespace synthese
 
 
 
-		template<> const Field DBTableSyncTemplate<PublicPlaceEntranceTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID, SQL_INTEGER),
-			Field(PublicPlaceEntranceTableSync::COL_NAME, SQL_TEXT),
-			Field(PublicPlaceEntranceTableSync::COL_ROAD_CHUNK_ID, SQL_INTEGER),
-			Field(PublicPlaceEntranceTableSync::COL_METRIC_OFFSET, SQL_DOUBLE),
-			Field(PublicPlaceEntranceTableSync::COL_NUMBER, SQL_INTEGER),
-			Field(PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field()
-		};
+		template<> const Field DBTableSyncTemplate<PublicPlaceEntranceTableSync>::_FIELDS[]={ Field() };
 
 
 
@@ -87,7 +67,7 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID.c_str(),
+					SimpleObjectFieldDefinition<PublicPlace>::FIELD.name.c_str(),
 			"")	);
 			return r;
 		};
@@ -100,62 +80,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Public place
-			object->setPublicPlace(NULL);
-			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				shared_ptr<PublicPlace> publicPlace(
-					PublicPlaceTableSync::GetEditable(
-						rows->getLongLong(PublicPlaceEntranceTableSync::COL_PUBLIC_PLACE_ID),
-						env,
-						linkLevel
-				)	);
-				object->setPublicPlace(publicPlace.get());
-
-				publicPlace->addEntrance(*object);
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-
-			// Name
-			object->setName(rows->getText(PublicPlaceEntranceTableSync::COL_NAME));
-
-			// Address
-			RegistryKeyType chunkId(rows->getLongLong(PublicPlaceEntranceTableSync::COL_ROAD_CHUNK_ID));
-			object->setRoadChunk(NULL);
-			object->setMetricOffset(0);
-			if(chunkId > 0)
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				// Road chunk
-				try
-				{
-					object->setRoadChunk(
-						RoadChunkTableSync::GetEditable(chunkId, env, linkLevel).get()
-					);
-				}
-				catch (ObjectNotFoundException<MainRoadChunk>&)
-				{
-					Log::GetInstance().warn("Bad value " + lexical_cast<string>(chunkId) + " for projected chunk in stop " + lexical_cast<string>(object->getKey()));
-				}
-
-				// Metric offset
-				object->setMetricOffset(rows->getDouble(PublicPlaceEntranceTableSync::COL_METRIC_OFFSET));
-			}
-
-			// House number
-			MainRoadChunk::HouseNumber houseNumber = rows->getInt(PublicPlaceEntranceTableSync::COL_NUMBER);
-			object->setHouseNumber(
-				houseNumber ?
-				optional<MainRoadChunk::HouseNumber>(houseNumber) :
-				optional<MainRoadChunk::HouseNumber>()
-			);
-
-			// Datasource links
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(PublicPlaceEntranceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
+				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -165,13 +97,11 @@ namespace synthese
 			PublicPlaceEntrance* object,
 			optional<DBTransaction&> transaction
 		){
+			// Query
 			ReplaceQuery<PublicPlaceEntranceTableSync> query(*object);
-			query.addField(object->getPublicPlace() ? object->getPublicPlace()->getKey() : RegistryKeyType(0));
-			query.addField(object->getName());
-			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getKey() : RegistryKeyType(0));
-			query.addField(object->getMetricOffset());
-			query.addField(object->getHouseNumber() ? lexical_cast<string>(*object->getHouseNumber()) : string());
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			ParametersMap map(ParametersMap::FORMAT_SQL);
+			object->toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
@@ -180,11 +110,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<PublicPlaceEntranceTableSync,PublicPlaceEntrance>::Unlink(
 			PublicPlaceEntrance* obj
 		){
-			// Public place link
-			if(obj->getPublicPlace())
-			{
-				obj->getPublicPlace()->removeEntrance(*obj);
-			}
+			obj->unlink();
 		}
 
 

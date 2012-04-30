@@ -819,7 +819,7 @@ namespace synthese
 						Importable::DataSourceLinks links;
 						links.insert(make_pair(&_dataSource, bahnhof.first));
 						addRequest.getAction()->setDataSourceLinks(links);
-						addRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.point));
+						addRequest.getAction()->setPoint(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.point));
 						os << HTMLModule::getLinkButton(addRequest.getURL(), "Ajouter");
 					}
 					else
@@ -953,7 +953,7 @@ namespace synthese
 						{
 							AdminActionFunctionRequest<StopPointUpdateAction, DataSourceAdmin> moveRequest(*adminRequest);
 							moveRequest.getAction()->setStop(_env.getEditableSPtr(*bahnhof.second.stops.begin()));
-							moveRequest.getAction()->setPoint(DBModule::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.point));
+							moveRequest.getAction()->setPoint(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*bahnhof.second.point));
 							os << HTMLModule::getLinkButton(moveRequest.getHTMLForm().getURL(), "Mettre à jour coordonnées");
 						}
 					}

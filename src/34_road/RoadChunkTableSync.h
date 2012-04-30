@@ -43,6 +43,8 @@ namespace synthese
 {
 	namespace road
 	{
+		class Address;
+
 		//////////////////////////////////////////////////////////////////////////
 		/// 34.10 Road chunk table.
 		///	@ingroup m35LS refLS
@@ -107,6 +109,22 @@ namespace synthese
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Projection of a point on a road chunk.
+			//////////////////////////////////////////////////////////////////////////
+			/// @param point the point to project on the nearest roadchunk
+			/// @param maxDistance maximal distance between the point and the road chunk
+			/// @retval address the projected point
+			/// @pre point must be a valid geometry
+			/// @author Hugues Romain
+			static void ProjectAddress(
+				const geos::geom::Point& point,
+				double maxDistance,
+				Address& address
 			);
 		};
 }	}

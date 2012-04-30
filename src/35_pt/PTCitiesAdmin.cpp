@@ -38,6 +38,8 @@
 #include "PTPlaceAdmin.h"
 #include "PTPlacesAdmin.h"
 #include "PTRoadsAdmin.h"
+#include "PublicPlace.h"
+#include "PublicPlaceAdmin.hpp"
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
 #include "RoadPlace.h"
@@ -322,6 +324,79 @@ namespace synthese
 								removeRequest.getURL(),
 								"Supprimer",
 								"Etes-vous sûr de vouloir supprimer la zone d'arrêt "+ stopArea->getFullName() +" ?"
+							);
+						}
+				}	}
+
+				// Table and form closing
+				stream << t.close();
+			}
+
+
+			//////////////////////////////////////////////////////////////////////////
+			// Public places
+			{
+				stream << "<h1>Lieux publics</h1>";
+
+				// Requests
+				AdminFunctionRequest<PublicPlaceAdmin> openPPRequest(request);
+
+				// The table
+				HTMLTable::ColsVector c;
+				c.push_back(string());
+				c.push_back("Localité");
+				c.push_back("Lieu public");
+				c.push_back("Phonétique");
+				c.push_back("Score");
+				c.push_back("Levenshtein");
+				c.push_back(string());
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+				const ParametersMap& ppPM(
+					**pm.getSubMaps(PlacesListService::DATA_PUBLIC_PLACES).begin()
+				);
+				if(ppPM.hasSubMaps(PlacesListService::DATA_PUBLIC_PLACE))
+				{
+					BOOST_FOREACH(
+						shared_ptr<ParametersMap> item,
+						ppPM.getSubMaps(PlacesListService::DATA_PUBLIC_PLACE)
+					){
+						// New row
+						stream << t.row();
+
+						// Load of the public place
+						shared_ptr<const PublicPlace> pp(
+							Env::GetOfficialEnv().get<PublicPlace>(
+								item->get<RegistryKeyType>(PublicPlace::DATA_ID)
+						)	);
+
+						// Open button
+						openPPRequest.getPage()->setPlace(pp);
+						stream << t.col() <<
+							HTMLModule::getLinkButton(
+								openPPRequest.getURL(),
+								"Ouvrir",
+								string(),
+								PublicPlaceAdmin::ICON
+							)
+						;
+
+						// Key
+						stream << t.col() << item->get<string>(City::DATA_CITY_NAME);
+						stream << t.col() << item->get<string>(PublicPlace::DATA_NAME);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_STRING);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_PHONETIC_SCORE);
+						stream << t.col() << item->get<string>(PlacesListService::DATA_LEVENSHTEIN);
+
+						// Remove button only if no entrances inside
+						stream << t.col();
+						if(pp->getEntrances().empty())
+						{
+							removeRequest.getAction()->setObjectId(pp->get<Key>());
+							stream << HTMLModule::getLinkButton(
+								removeRequest.getURL(),
+								"Supprimer",
+								"Etes-vous sûr de vouloir supprimer le lieu public "+ pp->getFullName() +" ?"
 							);
 						}
 				}	}

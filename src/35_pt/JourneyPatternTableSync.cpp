@@ -249,7 +249,8 @@ namespace synthese
 			query.addField(object->getWayBack());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
 			query.addField(object->getMain());
 			query.execute(transaction);

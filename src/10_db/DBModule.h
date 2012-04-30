@@ -42,8 +42,6 @@
 
 namespace synthese
 {
-	class CoordinatesSystem;
-
 	/** @defgroup m10Exceptions 10 Exceptions
 		@ingroup m10
 
@@ -83,7 +81,6 @@ namespace synthese
 			static SubClassMap		_subClassMap;
 			static TablesByNameMap	_tableSyncMap;
 			static TablesByIdMap	_idTableSyncMap;
-			static const CoordinatesSystem* _storageCoordinatesSystem;
 
 
 		public:
@@ -135,10 +132,30 @@ namespace synthese
 				util::RegistryKeyType id,
 				util::Env& env
 			);
+
+
+
 			static boost::shared_ptr<util::Registrable> GetEditableObject(
 				util::RegistryKeyType id,
 				util::Env& env
 			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Saves an object into the database without specifying which table sync to use.
+			/// @param object the object to save
+			/// @param transaction the transaction to populate (undefined = direct save)
+			/// @pre the object must have its key defined : auto increment is not available
+			/// @author Hugues Romain
+			/// @date 2012
+			/// @since 3.4.0
+			static void SaveObject(
+				const util::Registrable& object,
+				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
+			);
+
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// @since 3.2.0
@@ -152,9 +169,7 @@ namespace synthese
 			static void AddSubClass(util::RegistryKeyType, const std::string&);
 			static std::string GetSubClass(util::RegistryKeyType id);
 
-			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
-			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
-			static void ClearStorageCoordinatesSystem() { _storageCoordinatesSystem = 0; }
+
 
 			static void LoadObjects(
 				const LinkedObjectsIds& ids,

@@ -151,7 +151,11 @@ namespace synthese
 			query.addField(UNKNOWN_VALUE);
 			query.addField(vars.str());
 			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
-			query.addField(DataSourceLinks::Serialize(obj->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					obj->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.execute(transaction);
 
 			// Alarms query

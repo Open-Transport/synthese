@@ -60,8 +60,8 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<DriverAllocationTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(ObjectFieldDefinition<Date>::FIELD.name.c_str(), ""));
-			r.push_back(DBTableSync::Index(ObjectFieldDefinition<Driver>::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Date>::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Driver>::FIELD.name.c_str(), ""));
 			return r;
 		};
 
@@ -98,7 +98,7 @@ namespace synthese
 		){
 			// Query
 			ReplaceQuery<DriverAllocationTableSync> query(*object);
-			ParametersMap map;
+			ParametersMap map(ParametersMap::FORMAT_SQL);
 			object->toParametersMap(map);
 			query.setValues(map);
 			query.execute(transaction);
@@ -154,15 +154,15 @@ namespace synthese
 			SelectQuery<DriverAllocationTableSync> query;
 			if (!date.is_not_a_date())
 			{
-				query.addWhereField(ObjectFieldDefinition<Date>::FIELD.name, to_iso_extended_string(date));
+				query.addWhereField(SimpleObjectFieldDefinition<Date>::FIELD.name, to_iso_extended_string(date));
 			}
 			if (driverId)
 			{
-				query.addWhereField(ObjectFieldDefinition<Driver>::FIELD.name, *driverId);
+				query.addWhereField(SimpleObjectFieldDefinition<Driver>::FIELD.name, *driverId);
 			}
 			if (orderByTime)
 			{
-//				query.addOrderField(ObjectFieldDefinition<Name>::FIELDS[0].name, raisingOrder);
+//				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELDS[0].name, raisingOrder);
 			}
 			if (number)
 			{

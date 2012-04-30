@@ -169,7 +169,6 @@ namespace synthese
 				return;
 
 			CoordinatesSystem::ClearCoordinatesSystems();
-			DBModule::ClearStorageCoordinatesSystem();
 			// FIXME : the next line caused a double free
 			// DBModule::UnregisterParameter(CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM);
 		}
@@ -213,7 +212,9 @@ namespace synthese
 				);
 			}
 
-			DBModule::SetStorageCoordinatesSystem(CoordinatesSystem::GetCoordinatesSystem(_STORAGE_COORD_SYSTEM_SRID));
+			CoordinatesSystem::SetStorageCoordinatesSystem(
+				CoordinatesSystem::GetCoordinatesSystem(_STORAGE_COORD_SYSTEM_SRID)
+			);
 			DBModule::RegisterParameter(
 				CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM,
 				boost::lexical_cast<std::string>(_DEFAULT_INSTANCE_COORD_SYSTEM_SRID),

@@ -42,17 +42,6 @@ namespace synthese
 			public db::DBRegistryTableSyncTemplate<PublicPlaceEntranceTableSync,PublicPlaceEntrance>
 		{
 		public:
-			//! @name Field names
-			//@{
-				static const std::string COL_PUBLIC_PLACE_ID;
-				static const std::string COL_NAME;
-				static const std::string COL_ROAD_CHUNK_ID;
-				static const std::string COL_METRIC_OFFSET;
-				static const std::string COL_NUMBER;
-				static const std::string COL_DATASOURCE_LINKS;
-			//@}
-
-
 			//! @name Services
 			//@{
 				//////////////////////////////////////////////////////////////////////////

@@ -287,7 +287,11 @@ namespace synthese
 			query.addField(object->getName26());
 
 			// Data source links
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 
 			// Timetable name
 			query.addField(object->getTimetableName());

@@ -22,9 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "LineStopUpdateAction.hpp"
+
+#include "ActionException.h"
+#include "ObjectUpdateAction.hpp"
+#include "ParametersMap.h"
+#include "StandardFields.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "LineStopTableSync.h"
@@ -32,7 +35,6 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "LineArea.hpp"
 #include "DBModule.h"
-#include "HTMLMap.hpp"
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 
@@ -109,7 +111,10 @@ namespace synthese
 			if(_geometry)
 			{
 				WKTWriter writer;
-				map.insert(HTMLMap::PARAMETER_ACTION_WKT, _geometry->get() ? writer.write(static_cast<const Geometry*>(_geometry->get())) : string());
+				map.insert(
+					ObjectUpdateAction::GetInputName<LineStringGeometry>(),
+					_geometry->get() ? writer.write(static_cast<const Geometry*>(_geometry->get())) : string()
+				);
 			}
 			map.insert(PARAMETER_READ_LENGTH_FROM_GEOMETRY, _readLengthFromGeometry);
 			return map;
@@ -192,12 +197,12 @@ namespace synthese
 			}
 
 			// Geometry
-			if(map.isDefined(HTMLMap::PARAMETER_ACTION_WKT))
+			if(map.isDefined(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 			{
-				WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
+				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
 				_geometry = shared_ptr<LineString>(
 					static_cast<LineString*>(
-						reader.read(map.get<string>(HTMLMap::PARAMETER_ACTION_WKT))
+						reader.read(map.get<string>(ObjectUpdateAction::GetInputName<LineStringGeometry>()))
 				)	);
 			}
 
