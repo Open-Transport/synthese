@@ -208,7 +208,7 @@ class SconsBuilder(Builder):
         utils.call(args, **kwargs)
 
 
-class CMakeBuilder(Builder): 
+class CMakeBuilder(Builder):
     LIBSPATIALITE_DLLS = (
         ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
         ('spatialite-2.3.0/proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
@@ -324,7 +324,7 @@ class CMakeBuilder(Builder):
             # Assume we'll use the system version
             return
 
-        
+
         url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
             'mysql-{mysql_ver}-win{arch}.zip'.format(mysql_ver=MYSQL_VER, arch='x64' if self.env.c.x64 else '32'))
         self._download(url, '4b9e91a7dd7236a471fdb5728e4150a8' if self.env.c.x64 else 'todo')
