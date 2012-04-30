@@ -48,8 +48,8 @@
       <div class="row">
         <div class="span14">
 
-          {% for message in get_flashed_messages() %}
-            <div class="alert alert-success">
+          {% for category, message in get_flashed_messages(with_categories=True) %}
+            <div class="alert {% if category == 'error' %}alert-error{% else %}alert-info{% endif %}">
               <a class="close" data-dismiss="alert">×</a>
               {{ message }}
             </div>
