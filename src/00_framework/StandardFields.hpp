@@ -23,8 +23,9 @@
 #ifndef SYNTHESE__StandardFields_hpp__
 #define SYNTHESE__StandardFields_hpp__
 
-#include "ObjectField.hpp"
+#include "SimpleObjectField.hpp"
 
+#include "CoordinatesSystem.hpp"
 #include "ObjectBase.hpp"
 #include "Env.h"
 #include "Log.h"

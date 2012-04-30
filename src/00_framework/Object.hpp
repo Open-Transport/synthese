@@ -23,7 +23,7 @@
 #ifndef SYNTHESE__Object_hpp__
 #define SYNTHESE__Object_hpp__
 
-#include "ObjectField.hpp"
+#include "SimpleObjectField.hpp"
 #include "UtilTypes.h"
 #include "ObjectBase.hpp"
 #include "ParametersMap.h"

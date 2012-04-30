@@ -103,7 +103,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				template<class T>
-				void setAddress(boost::shared_ptr<T> value) { _address = dynamic_pointer_cast<util::Registrable, T>(value); }
+				void setAddress(boost::shared_ptr<T> value) { _address = boost::dynamic_pointer_cast<util::Registrable, T>(value); }
 
 				void setMaxDistance(double value){ _maxDistance = value; }
 			//@}
