@@ -99,10 +99,8 @@ class Url(object):
             smart_url=path_only,
         ))
 
-        # TODO: change to /synthese once old projects are migrated.
-        #base = "/synthese"
-        base = "/synthese3/admin"
-        return '{base}?{qs}'.format(base=base, qs=urllib.urlencode(qs))
+        return '{alias_path}?{qs}'.format(
+            alias_path=self.project.alias_path, qs=urllib.urlencode(qs))
 
     @property
     def ref_url(self):
@@ -201,6 +199,7 @@ class Project(object):
         self._synthese_project = None
         self.remote_db_path = None
         self.requests_session = requests.session()
+        self.alias_path = None
 
     def __repr__(self):
         return '<Project %s>' % self.__dict__
@@ -222,6 +221,9 @@ class Project(object):
         if not self.remote_db_path:
             self.remote_db_path = '/srv/synthese/{project_name}/db/config.db3'.format(
                 project_name=self.name)
+
+        if not self.alias_path:
+            self.alias_path = '/synthese'
 
         self.urls = [Url(self, u) for u in self.urls]
         self._load_result()
