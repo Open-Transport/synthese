@@ -501,14 +501,14 @@ namespace synthese
 				const road::RoadPlace& roadPlace,
 				bool showCoords
 			) const;
-			
+
 			void displayTime(
 				const std::string & datafieldName,
 				const boost::posix_time::ptime & time,
 				util::ParametersMap & pm,
 				bool displayBlankField = false
 			) const;
-			
+
 			void displayFullDate(
 				const std::string & datafieldName,
 				const boost::posix_time::ptime & time,
@@ -517,7 +517,7 @@ namespace synthese
 
 			void fillTimeParameters(
 				const boost::posix_time::ptime & firstArrivalDateTime,
-				const boost::posix_time::ptime & firstDepartureDateTime,		
+				const boost::posix_time::ptime & firstDepartureDateTime,
 				const boost::posix_time::time_duration & rangeDuration,
 				util::ParametersMap & pm
 			) const;

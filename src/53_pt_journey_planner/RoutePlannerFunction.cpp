@@ -2330,7 +2330,7 @@ namespace synthese
 					pm
 				);
 			}
-			
+
 			// Result row
 			if(_resultRowPage.get())
 			{
@@ -2648,7 +2648,7 @@ namespace synthese
 							_lineMarkerPage,
 							request,
 							*static_cast<const JourneyPattern*>(leg.getService()->getPath ())->getCommercialLine()
-						);						
+						);
 						junctionsNumber++;
 					}
 				}
@@ -2667,11 +2667,11 @@ namespace synthese
 				rangeDuration,
 				pm
 			);
-	
+
 			pm.insert(DATA_JUNCTIONS_NUMBER,junctionsNumber);
 			pm.insert(DATA_IS_CONTINUOUS_SERVICE, rangeDuration.total_seconds() > 0);
 			pm.insert(DATA_ROW_NUMBER, rowNumber);
-			
+
 			// Register the reservation availability
 			bool hasReservation = bool(journey.getReservationCompliance(false) != false);
 			pm.insert(DATA_HAS_RESERVATION, hasReservation);
@@ -3413,9 +3413,9 @@ namespace synthese
 			stringstream s;
 			if(!displayBlankField)
 				s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
-			pm.insert(datafieldName, s.str());			
+			pm.insert(datafieldName, s.str());
 		}
-		
+
 		void RoutePlannerFunction::displayFullDate(
 			const string & datafieldName,
 			const ptime & time,
@@ -3424,13 +3424,13 @@ namespace synthese
 			stringstream s;
 			s << to_iso_extended_string(time.date()) << ' ';
 			s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
-			pm.insert(datafieldName, s.str());		
+			pm.insert(datafieldName, s.str());
 		}
-		
+
 
 		void RoutePlannerFunction::fillTimeParameters(
 			const ptime & firstArrivalDateTime,
-			const ptime & firstDepartureDateTime,		
+			const ptime & firstDepartureDateTime,
 			const time_duration & rangeDuration,
 			ParametersMap & pm
 		) const {
@@ -3441,7 +3441,7 @@ namespace synthese
 				lastDepartureDateTime += rangeDuration;
 				lastArrivalDateTime += rangeDuration;
 			}
-					
+
 			displayTime(DATA_FIRST_DEPARTURE_TIME, firstDepartureDateTime, pm);
 			displayTime(DATA_LAST_DEPARTURE_TIME, lastDepartureDateTime, pm,(rangeDuration.total_seconds() == 0));
 			displayTime(DATA_FIRST_ARRIVAL_TIME, firstArrivalDateTime, pm);

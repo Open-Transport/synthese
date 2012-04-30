@@ -119,7 +119,7 @@ namespace synthese
 
 			AccessParameters ap;
 			ServicePointer ptr(_service->getDeparturePosition(true, ap, _date));
-			
+
 			if(_stopPage.get())
 			{
 				_displayStop(stream, true, ptr, request);

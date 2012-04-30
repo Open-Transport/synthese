@@ -312,7 +312,7 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "n") && 
+					if(	_IsFollowedBy(source, pos, "n") &&
 						(	!_IsAnyOf(source, pos+2, VOWELS) ||
 							_IsAnyOf(source, pos, ACCENTUATED_E)
 						) ||

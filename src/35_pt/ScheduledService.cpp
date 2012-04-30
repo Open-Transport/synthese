@@ -274,7 +274,7 @@ namespace synthese
 			std::size_t userClassRank
 		) const {
 			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
-			
+
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
 			{

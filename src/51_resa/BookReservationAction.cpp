@@ -430,7 +430,7 @@ namespace synthese
 					++itSu
 				){
 					const ServicePointer& su(*itSu);
-				
+
 					assert(su.getService() != NULL);
 					assert(su.getDepartureEdge() != NULL);
 					assert(su.getDepartureEdge()->getHub() != NULL);

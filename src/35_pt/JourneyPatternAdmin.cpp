@@ -493,7 +493,7 @@ namespace synthese
 					string(),string(),
 					false, false, true, false
 				);
-			
+
 				stream << t.close();
 				stream << f.close();
 

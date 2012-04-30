@@ -52,7 +52,7 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace server;
 	using namespace util;
-	
+
 	namespace pt
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
@@ -138,7 +138,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			// PT Operation
-			
+
 			// Driver allocations
 			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
 			DriverService::Vector::Type emptyAllocation;
@@ -155,7 +155,7 @@ namespace synthese
 						);
 					}
 			}	}
-			
+
 			// Driver services
 			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
 			DriverService::Chunks emptyChunks;

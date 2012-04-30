@@ -39,12 +39,12 @@ namespace synthese
 
 	template<>
 	const string FactorableTemplate<Function,cms::PrecisionService>::FACTORY_KEY = "format";
-	
+
 	namespace cms
 	{
 		const string PrecisionService::PARAMETER_NUMBER = "n";
 		const string PrecisionService::PARAMETER_FORMAT = "f";
-		
+
 
 
 		ParametersMap PrecisionService::_getParametersMap() const
@@ -73,9 +73,9 @@ namespace synthese
 			stream << boost::format("%"+ _format) % _value;
 			return map;
 		}
-		
-		
-		
+
+
+
 		bool PrecisionService::isAuthorized(
 			const Session* session
 		) const {
