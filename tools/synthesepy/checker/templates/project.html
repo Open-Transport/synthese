@@ -119,6 +119,7 @@ todo
         <thead>
           <tr>
             <th>Path</th>
+            <th>Site</th>
             <th>Links</th>
             <th>Results</th>
             <th>Comparison</th>
@@ -129,6 +130,7 @@ todo
           {% for url in project.urls %}
           <tr>
             <td>{{ url.path }}</td>
+            <td>{{ url.site_name }}</td>
             <td>
               <a href="{{ url.ref_url }}" target=ref>reference url</a> /
               <a href="{{ url.test_url }}" target=test>test url</a>
