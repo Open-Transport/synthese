@@ -34,6 +34,11 @@
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <geos/geom/Point.h>
+#include <geos/geom/LineString.h>
+#include <geos/io/WKTReader.h>
+#include <geos/io/WKTWriter.h>
+#include <geos/io/ParseException.h>
 
 namespace synthese
 {
@@ -63,11 +68,11 @@ namespace synthese
 
 		static std::string Serialize(
 			const boost::gregorian::date& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		){
 			switch(format)
 			{
-			case FORMAT_SQL:
+			case util::ParametersMap::FORMAT_SQL:
 				return fieldObject.is_not_a_date() ?
 					"NULL" :
 					"\""+ boost::gregorian::to_iso_extended_string(fieldObject) +"\"";
@@ -110,11 +115,11 @@ namespace synthese
 
 		static std::string Serialize(
 			const boost::posix_time::ptime& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		){
 			switch(format)
 			{
-			case FORMAT_SQL:
+			case util::ParametersMap::FORMAT_SQL:
 				return fieldObject.is_not_a_date_time() ?
 					"NULL" :
 					"\""+ boost::gregorian::to_iso_extended_string(fieldObject.date()) +" "+ boost::posix_time::to_simple_string(fieldObject.time_of_day()) +"\"";
@@ -157,11 +162,11 @@ namespace synthese
 
 		static std::string Serialize(
 			const boost::posix_time::time_duration& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		){
 			switch(format)
 			{
-			case FORMAT_SQL:
+			case util::ParametersMap::FORMAT_SQL:
 				return fieldObject.is_not_a_date_time() ?
 					"NULL" :
 					boost::lexical_cast<std::string>(fieldObject.total_seconds() / 60);
@@ -201,11 +206,11 @@ namespace synthese
 
 		static std::string Serialize(
 			const std::string& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		){
 			switch(format)
 			{
-			case FORMAT_SQL:
+			case util::ParametersMap::FORMAT_SQL:
 				return "\""+ boost::algorithm::replace_all_copy(fieldObject, "\"", "\\\"") + "\"";
 
 			default:
@@ -220,7 +225,7 @@ namespace synthese
 
 	template<class C, class T>
 	class SerializationByLexicalCast:
-		public ObjectFieldDefinition<C>
+		public SimpleObjectFieldDefinition<C>
 	{
 	public:
 		typedef T Type;
@@ -247,23 +252,25 @@ namespace synthese
 			UnSerialize(fieldObject, text);
 		}
 
+
+
 		static std::string Serialize(
 			const T& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		){
 			return boost::lexical_cast<std::string>(fieldObject);
 		}
 
 		static void LoadFromRecord(T& fieldObject, const Record& record)
 		{
-			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				return;
 			}
 
 			ObjectField<C, T>::UnSerialize(
 				fieldObject,
-				record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name)
+				record.getDefault<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name)
 			);
 		}
 
@@ -277,24 +284,39 @@ namespace synthese
 			LoadFromRecord(fieldObject, record);
 		}
 
-		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix)
-		{
+
+
+		static void SaveToParametersMap(
+			const T& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
 			map.insert(
-				prefix + ObjectFieldDefinition<C>::FIELD.name,
-				ObjectField<C, T>::Serialize(fieldObject)
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				ObjectField<C, T>::Serialize(fieldObject, map.getFormat())
 			);
 		}
 
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
-		{
+
+
+		static void SaveToParametersMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
 			SaveToParametersMap(fieldObject, map, prefix);
 		}
 
-		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map)
-		{
+
+
+		static void SaveToParametersMap(
+			const T& fieldObject,
+			util::ParametersMap& map
+		){
 			map.insert(
-				ObjectFieldDefinition<C>::FIELD.name,
-				ObjectField<C, T>::Serialize(fieldObject)
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				ObjectField<C, T>::Serialize(fieldObject, map.getFormat())
 			);
 		}
 
@@ -306,6 +328,180 @@ namespace synthese
 		/// Do nothing
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record) {}
 	};
+
+
+
+	template<class C, class T>
+	class GeometrySerialization:
+		public SimpleObjectFieldDefinition<C>
+	{
+	public:
+		typedef boost::shared_ptr<T> Type;
+
+		static void UnSerialize(
+			Type& fieldObject,
+			const std::string& text
+		){
+			fieldObject = Type();
+			if(text.empty())
+			{
+				return;
+			}
+
+			geos::io::WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
+
+			try
+			{
+				fieldObject = boost::static_pointer_cast<T, geos::geom::Geometry>(
+					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
+						*boost::shared_ptr<geos::geom::Geometry>(reader.read(text))
+				)	);
+			}
+			catch(geos::io::ParseException&)
+			{
+			}
+		}
+
+
+
+		static void UnSerialize(
+			Type& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		){
+			UnSerialize(fieldObject, text);
+		}
+
+
+
+		static std::string Serialize(
+			const Type& fieldObject,
+			util::ParametersMap::SerializationFormat format
+		){
+			if(!fieldObject.get() || fieldObject->isEmpty())
+			{
+				return std::string();
+			}
+
+			boost::shared_ptr<geos::geom::Geometry> projected(fieldObject);
+			if(CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
+				static_cast<CoordinatesSystem::SRID>(fieldObject->getSRID()))
+			{
+				projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*fieldObject);
+			}
+
+			std::stringstream str;
+			if(format == util::ParametersMap::FORMAT_SQL)
+			{
+				str << "GeomFromText('";
+			}
+			geos::io::WKTWriter writer;
+			str << writer.write(projected.get());
+			if(format == util::ParametersMap::FORMAT_SQL)
+			{
+				str << "'," << CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() << ")";
+			}
+			return str.str();
+		}
+
+
+
+		static void LoadFromRecord(Type& fieldObject, const Record& record)
+		{
+			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				return;
+			}
+
+			GeometrySerialization<C, T>::UnSerialize(
+				fieldObject,
+				record.getDefault<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name)
+			);
+		}
+
+
+
+		static void LoadFromRecord(Type& fieldObject, const Record& record, const util::Env& env)
+		{
+			LoadFromRecord(fieldObject, record);
+		}
+
+
+
+		static void LoadFromRecord(Type& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+		{
+			LoadFromRecord(fieldObject, record);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			map.insert(
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				GeometrySerialization<C, T>::Serialize(fieldObject, map.getFormat())
+			);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const Type& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const Type& fieldObject,
+			util::ParametersMap& map
+		){
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				GeometrySerialization<C, T>::Serialize(fieldObject, map.getFormat())
+			);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const Type& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map
+		){
+			SaveToParametersMap(fieldObject, map);
+		}
+
+
+
+		/// Do nothing
+		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record) {}
+	};
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Point partial specialization
+	template<class C>
+	class ObjectField<C, boost::shared_ptr<geos::geom::Point> >:
+		public GeometrySerialization<C, geos::geom::Point>
+	{};
+
+
+
+	//////////////////////////////////////////////////////////////////////////
+	/// LineString partial specialization
+	template<class C>
+	class ObjectField<C, boost::shared_ptr<geos::geom::LineString> >:
+		public GeometrySerialization<C, geos::geom::LineString>
+	{};
 
 
 
@@ -361,14 +557,14 @@ namespace synthese
 	/// default constructor of boost::optional
 	template<class C, class P>
 	class ObjectField<C, boost::optional<P&> >:
-		public ObjectFieldDefinition<C>
+		public SimpleObjectFieldDefinition<C>
 	{
 	public:
 		typedef boost::optional<P&> Type;
 
 		static void LoadFromRecord(boost::optional<P&>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
-			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				return;
 			}
@@ -376,7 +572,7 @@ namespace synthese
 			fieldObject = boost::none;
 			try
 			{
-				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(ObjectFieldDefinition<C>::FIELD.name, 0));
+				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(SimpleObjectFieldDefinition<C>::FIELD.name, 0));
 				if(id > 0)
 				{
 					fieldObject = *env.getEditable<P>(id);
@@ -385,51 +581,83 @@ namespace synthese
 			catch(boost::bad_lexical_cast&)
 			{
 				util::Log::GetInstance().warn(
-					"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+					"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-					record.getValue(ObjectFieldDefinition<C>::FIELD.name) + " is not a valid id."
+					record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name) + " is not a valid id."
 				);
 			}
 			catch(util::ObjectNotFoundException<P>&)
 			{
 				util::Log::GetInstance().warn(
-					"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+					"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 					object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
-					record.getValue(ObjectFieldDefinition<C>::FIELD.name) + " object was not found."
+					record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name) + " object was not found."
 				);
 			}
 		}
 
-		static std::string Serialize(const boost::optional<P&>& fieldObject, SerializationFormat format = FORMAT_INTERNAL)
-		{
+
+
+		static std::string Serialize(
+			const boost::optional<P&>& fieldObject,
+			util::ParametersMap::SerializationFormat format
+		){
 			return fieldObject ? boost::lexical_cast<std::string>(fieldObject->getKey()) : std::string("0");
 		}
 
-		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, util::ParametersMap& map, const std::string& prefix)
-		{
-			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+
+
+		static void SaveToParametersMap(
+			const boost::optional<P&> & fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			map.insert(
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
-		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
-		{
+
+
+		static void SaveToParametersMap(
+			const boost::optional<P&> & fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
 			SaveToParametersMap(fieldObject, map, prefix);
 		}
 
-		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, util::ParametersMap& map)
-		{
-			map.insert(ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+
+
+		static void SaveToParametersMap(
+			const boost::optional<P&> & fieldObject,
+			util::ParametersMap& map
+		){
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
-		static void SaveToParametersMap(const boost::optional<P&> & fieldObject, const ObjectBase& object, util::ParametersMap& map)
-		{
+
+
+		static void SaveToParametersMap(
+			const boost::optional<P&> & fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map
+		){
 			SaveToParametersMap(fieldObject, map);
 		}
+
+
 
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
 		{
 			try
 			{
-				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(ObjectFieldDefinition<C>::FIELD.name, 0));
+				util::RegistryKeyType id(record.getDefault<util::RegistryKeyType>(SimpleObjectFieldDefinition<C>::FIELD.name, 0));
 				if(id > 0)
 				{
 					list.push_back(id);
@@ -448,20 +676,20 @@ namespace synthese
 	/// Pointers vector specialization
 	template<class C, class P>
 	class ObjectField<C, std::vector<P*> >:
-		public ObjectFieldDefinition<C>
+		public SimpleObjectFieldDefinition<C>
 	{
 	public:
 		typedef std::vector<P*> Type;
 
 		static void LoadFromRecord(std::vector<P*>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
-			if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
+			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				return;
 			}
 
 			fieldObject.clear();
-			std::string text(record.get<std::string>(ObjectFieldDefinition<C>::FIELD.name));
+			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())
 			{
 				return;
@@ -479,7 +707,7 @@ namespace synthese
 				catch(boost::bad_lexical_cast&)
 				{
 					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : " +
 						item + " is not a valid id."
 					);
@@ -487,7 +715,7 @@ namespace synthese
 				catch(util::ObjectNotFoundException<P>&)
 				{
 					util::Log::GetInstance().warn(
-						"Data corrupted in the "+ ObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
 						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey()) +" : item " +
 						item + " was not found."
 					);
@@ -495,10 +723,14 @@ namespace synthese
 			}
 		}
 
-		static std::string Serialize(const std::vector<P*>& fieldObject, SerializationFormat format = FORMAT_INTERNAL)
-		{
+
+
+		static std::string Serialize(
+			const std::vector<P*>& fieldObject,
+			util::ParametersMap::SerializationFormat format
+		){
 			std::stringstream s;
-			if(format == FORMAT_SQL)
+			if(format == util::ParametersMap::FORMAT_SQL)
 			{
 				s << "\"";
 			}
@@ -515,36 +747,66 @@ namespace synthese
 				}
 				s << ptr->getKey();
 			}
-			if(format == FORMAT_SQL)
+			if(format == util::ParametersMap::FORMAT_SQL)
 			{
 				s << "\"";
 			}
 			return s.str();
 		}
 
-		static void SaveToParametersMap(const std::vector<P*>& fieldObject, util::ParametersMap& map, const std::string& prefix)
-		{
-			map.insert(prefix + ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+
+
+		static void SaveToParametersMap(
+			const std::vector<P*>& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			map.insert(
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
-		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
-		{
+
+
+		static void SaveToParametersMap(
+			const std::vector<P*>& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
 			SaveToParametersMap(fieldObject, map, prefix);
 		}
 
-		static void SaveToParametersMap(const std::vector<P*>& fieldObject, util::ParametersMap& map)
-		{
-			map.insert(ObjectFieldDefinition<C>::FIELD.name, Serialize(fieldObject));
+
+
+		static void SaveToParametersMap(
+			const std::vector<P*>& fieldObject,
+			util::ParametersMap& map
+		){
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
-		static void SaveToParametersMap(const std::vector<P*>& fieldObject, const ObjectBase& object, util::ParametersMap& map)
-		{
+
+
+		static void SaveToParametersMap(
+			const std::vector<P*>& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map
+		){
 			SaveToParametersMap(fieldObject, map);
 		}
 
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
-		{
-			std::string text(record.get<std::string>(ObjectFieldDefinition<C>::FIELD.name));
+
+
+		static void GetLinkedObjectsIds(
+			LinkedObjectsIds& list,
+			const Record& record
+		){
+			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			if(text.empty())
 			{
 				return;
@@ -569,6 +831,8 @@ namespace synthese
 		}	}
 	};
 
+
+
 	FIELD_TYPE(Date, boost::gregorian::date)
 	FIELD_TYPE(EndDate, boost::gregorian::date)
 	FIELD_TYPE(EndTime, boost::posix_time::ptime)
@@ -579,6 +843,8 @@ namespace synthese
 	FIELD_TYPE(StartTime, boost::posix_time::ptime)
 	FIELD_TYPE(Title, std::string)
 	FIELD_TYPE(Name, std::string)
+	FIELD_TYPE(PointGeometry, boost::shared_ptr<geos::geom::Point>)
+	FIELD_TYPE(LineStringGeometry, boost::shared_ptr<geos::geom::LineString>)
 }
 
 #endif // SYNTHESE__StandardFieldNames_hpp__

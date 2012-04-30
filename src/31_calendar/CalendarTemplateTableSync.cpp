@@ -150,7 +150,11 @@ namespace synthese
 			ReplaceQuery<CalendarTemplateTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(static_cast<int>(object->getCategory()));
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(object->getParent(true) ? object->getParent()->getKey() : 0);
 			query.execute(transaction);
 		}

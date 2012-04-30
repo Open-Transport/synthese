@@ -2,6 +2,7 @@ set_source_groups()
 
 set(framework_SRCS
 ComplexObjectField.hpp
+ComplexObjectFieldDefinition.hpp
 CoordinatesSystem.cpp
 CoordinatesSystem.hpp
 Exception.cpp
@@ -18,6 +19,8 @@ ObjectField.hpp
 Record.cpp
 Record.hpp
 SchemaMacros.hpp
+SimpleObjectField.hpp
+SimpleObjectFieldDefinition.hpp
 StandardFields.cpp
 StandardFields.hpp
 WithGeometry.hpp

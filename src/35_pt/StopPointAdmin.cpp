@@ -38,11 +38,13 @@
 #include "JourneyPatternCopy.hpp"
 #include "LineStop.h"
 #include "MapSource.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "PropertiesHTMLTable.h"
 #include "PTModule.h"
 #include "PTPlaceAdmin.h"
 #include "PTRuleUserAdmin.hpp"
+#include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "StopPointUpdateAction.hpp"
@@ -57,8 +59,9 @@ using namespace geos::geom;
 
 namespace synthese
 {
-	using namespace html;
 	using namespace admin;
+	using namespace db;
+	using namespace html;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -157,7 +160,14 @@ namespace synthese
 					mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 				}
 
-				HTMLMap map(*mapCenter, 18, true, true, false, true);
+				HTMLMap map(
+					*mapCenter,
+					18,
+					ObjectUpdateAction::GetInputName<PointGeometry>(),
+					ObjectUpdateAction::GetInputName<PointGeometry>(),
+					false,
+					true
+				);
 				map.setMapSource(MapSource::GetSessionMapSource(*request.getSession()));
 
 				StaticActionRequest<StopPointUpdateAction> moveAction(request);

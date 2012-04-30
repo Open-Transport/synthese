@@ -24,6 +24,7 @@
 #define SYNTHESE_html_HTMLMap_hpp__
 
 #include <vector>
+#include <boost/optional.hpp>
 #include <boost/shared_ptr.hpp>
 #include <geos/geom/Point.h>
 #include <geos/geom/LineString.h>
@@ -54,11 +55,11 @@ namespace synthese
 		///		<li>Add objects to it with the update methods</li>
 		///		<li>Generate the HTML code and flush it onto a stream with the draw() method</li>
 		///	</ol>
+		///
+		/// If _editFieldName is undefined, the the map is considered as uneditable.
 		class HTMLMap
 		{
 		public:
-			static const std::string PARAMETER_ACTION_WKT;
-
 			struct MapPoint
 			{
 				boost::shared_ptr<geos::geom::Point> point;
@@ -147,7 +148,8 @@ namespace synthese
 			Points _points;
 			LineStrings _lineStrings;
 			Controls _controls;
-			const bool _editable;
+			const boost::optional<std::string> _editFieldName;
+			const boost::optional<std::string> _addFieldName;
 			const bool _highlight;
 			const bool _mousePosition;
 			const MapSource* _mapSource;
@@ -160,13 +162,18 @@ namespace synthese
 			/// @date 2010
 			/// @since 3.1.18
 			/// @param center point in the middle of the map at opening (instance coordinates system)
-			/// @param horizontalDistance ditance between left and right bounds at map opening (unit : instance coordinates system unit)
+			/// @param horizontalDistance distance between left and right bounds at map opening (unit : instance coordinates system unit)
+			/// @param editFieldName name of the geometry field to send to the action when the icon is moved
+			///	       by the user by drag and drop (if undefined, then the map is considered as read only).
+			/// @param addable allow the user to add a point in the map
+			/// @param highlight activates the highlight control
+			/// @param mousePosition activates the mouse position window
 			/// @param id id of the div in the DOM
 			HTMLMap(
 				const geos::geom::Point& center,
 				double horizontalDistance,
-				bool editable,
-				bool addable,
+				boost::optional<const std::string&> editFieldName,
+				boost::optional<const std::string&> addFieldName,
 				bool highlight,
 				bool mousePosition,
 				const std::string id = "map"

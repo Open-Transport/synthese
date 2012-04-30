@@ -152,7 +152,9 @@ namespace synthese
 		//! @name Static services
 		//@{
 			static const std::string _INSTANCE_COORDINATES_SYSTEM;
-			static const CoordinatesSystem* _InstanceCoordinatesSystem;
+			static const CoordinatesSystem* _instanceCoordinatesSystem;
+			static const CoordinatesSystem* _storageCoordinatesSystem;
+
 
 			typedef std::map<SRID, boost::shared_ptr<CoordinatesSystem> > CoordinatesSystemsMap;
 
@@ -169,11 +171,18 @@ namespace synthese
 				  {}
 			};
 
+
+
 			static void ChangeInstanceCoordinatesSystem(
 				const std::string&,
 				const std::string& value
 			);
 
+
+
+			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
+			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
+			
 
 
 			static void AddCoordinatesSystem(
@@ -198,7 +207,7 @@ namespace synthese
 			static const CoordinatesSystem& GetCoordinatesSystem(SRID srid);
 
 			static void SetDefaultCoordinatesSystems(SRID instanceSRID);
-			static const CoordinatesSystem& GetInstanceCoordinatesSystem() { return *_InstanceCoordinatesSystem; }
+			static const CoordinatesSystem& GetInstanceCoordinatesSystem() { return *_instanceCoordinatesSystem; }
 
 			static const geos::geom::GeometryFactory& GetDefaultGeometryFactory() { return GetInstanceCoordinatesSystem().getGeometryFactory(); }
 

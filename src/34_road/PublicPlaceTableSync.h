@@ -60,6 +60,8 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
+				boost::optional<util::RegistryKeyType> cityId = boost::optional<util::RegistryKeyType>(),
+				boost::optional<std::string> name = boost::optional<std::string>(),
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL

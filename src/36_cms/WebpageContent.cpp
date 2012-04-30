@@ -69,8 +69,19 @@ namespace synthese
 		util::ParametersMap& map,
 		const std::string& prefix
 	){
-		map.insert(prefix + FIELDS[0].name, fieldObject._code);
-		map.insert(prefix + FIELDS[1].name, fieldObject._ignoreWhiteChars);
+		// Content
+		map.insert(
+			prefix + FIELDS[0].name,
+			ObjectField<void, string>::Serialize(
+				fieldObject._code,
+				map.getFormat()
+		)	);
+
+		// Ignore white chars
+		map.insert(
+			prefix + FIELDS[1].name,
+			fieldObject._ignoreWhiteChars
+		);
 	}
 
 

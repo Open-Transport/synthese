@@ -124,7 +124,8 @@ namespace synthese
 			query.addField(VehicleServiceTableSync::SerializeServices(object->getServices()));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks()
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
 			query.execute(transaction);
 		}

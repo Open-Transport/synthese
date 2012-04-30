@@ -22,23 +22,28 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "StopPointAddAction.hpp"
-#include "TransportNetworkRight.h"
+
+#include "ActionException.h"
+#include "CityTableSync.h"
+#include "DBModule.h"
+#include "GeographyModule.h"
+#include "ImportableTableSync.hpp"
+#include "ObjectUpdateAction.hpp"
+#include "ParametersMap.h"
 #include "Request.h"
-#include "StopPointTableSync.hpp"
+#include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
-#include "DBModule.h"
-#include "ImportableTableSync.hpp"
-#include "CityTableSync.h"
-#include "GeographyModule.h"
+#include "StopPointTableSync.hpp"
+#include "TransportNetworkRight.h"
 
 #include <geos/geom/Point.h>
+#include <geos/io/WKTReader.h>
 
 using namespace std;
 using namespace geos::geom;
+using namespace geos::io;
 using namespace boost;
 using namespace boost::posix_time;
 
@@ -83,7 +88,7 @@ namespace synthese
 			}
 			map.insert(
 				PARAMETER_OPERATOR_CODE,
-				DataSourceLinks::Serialize(_operatorCode)
+				DataSourceLinks::Serialize(_operatorCode, map.getFormat())
 			);
 			if(_point.get() && !_point->isEmpty())
 			{
@@ -188,10 +193,21 @@ namespace synthese
 			else if(map.getDefault<double>(PARAMETER_LONGITUDE, 0) && map.getDefault<double>(PARAMETER_LATITUDE, 0))
 			{
 				_point = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-					*DBModule::GetStorageCoordinatesSystem().createPoint(
+					*CoordinatesSystem::GetStorageCoordinatesSystem().createPoint(
 						map.get<double>(PARAMETER_LONGITUDE),
 						map.get<double>(PARAMETER_LATITUDE)
 				)	);
+			}
+			// WKT
+			else if(map.isDefined(ObjectUpdateAction::GetInputName<PointGeometry>()))
+			{
+				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
+				_point.reset(
+					static_cast<Point*>(
+						reader.read(
+							map.get<string>(
+								ObjectUpdateAction::GetInputName<PointGeometry>()
+				)	)	)	);
 			}
 		}
 

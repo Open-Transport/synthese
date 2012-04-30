@@ -63,18 +63,14 @@ namespace synthese
 		);
 
 		template<> const Field DBTableSyncTemplate<PublicPlaceTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(PublicPlaceTableSync::COL_NAME, SQL_TEXT),
-			Field(PublicPlaceTableSync::COL_CITYID, SQL_INTEGER),
-			Field(PublicPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
-			Field()
+		{	Field()
 		};
 
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<PublicPlaceTableSync>::GetIndexes()
 		{
+			DBTableSync::Indexes r;
+			r.push_back(DBTableSync::Index(ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[1].name.c_str(), ""));
 			return DBTableSync::Indexes();
 		}
 
@@ -86,59 +82,14 @@ namespace synthese
 			Env& env,
 			LinkLevel linkLevel
 		){
-			// Name
-			string name (rows->getText (PublicPlaceTableSync::COL_NAME));
-			object->setName(name);
-
-			// Geometry
-			shared_ptr<Point> point(
-				static_pointer_cast<Point, Geometry>(
-					rows->getGeometryFromWKT(TABLE_COL_GEOMETRY)
-			)	);
-			if(point.get())
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				object->setGeometry(point);
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
 			}
-
-			// City
-			object->setCity(NULL);
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				City* city(CityTableSync::GetEditable(rows->getLongLong (PublicPlaceTableSync::COL_CITYID), env, linkLevel).get());
-				object->setCity(city);
-
-				// Registration to city matcher
-				city->addPlaceToMatcher(env.getEditableSPtr(object));
-			}
-
-			// Datasource links
-			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
-			{
-				object->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(PublicPlaceTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
-			}
-
-			// Registration to all places matcher
-			if(	&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				GeographyModule::GetGeneralAllPlacesMatcher().add(
-					object->getFullName(),
-					env.getEditableSPtr(object)
-				);
-			}
-
-			// Registration to public places matcher
-			if(	&env == &Env::GetOfficialEnv() &&
-				linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				RoadModule::GetGeneralPublicPlacesMatcher().add(
-					object->getFullName(),
-					env.getEditableSPtr(object)
-				);
+				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
@@ -147,26 +98,7 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<PublicPlaceTableSync,PublicPlace>::Unlink(
 			PublicPlace* obj
 		){
-			// City matcher
-			City* city(const_cast<City*>(obj->getCity()));
-			if (city != NULL)
-			{
-				city->removePlaceFromMatcher(*obj);
-			}
-
-			if(Env::GetOfficialEnv().contains(*obj))
-			{
-				// General all places
-				GeographyModule::GetGeneralAllPlacesMatcher().remove(
-					obj->getFullName()
-				);
-
-				// General public places
-				RoadModule::GetGeneralPublicPlacesMatcher().remove(
-					obj->getFullName()
-				);
-			}
-
+			obj->unlink();
 		}
 
 
@@ -175,11 +107,11 @@ namespace synthese
 			PublicPlace* object,
 			optional<DBTransaction&> transaction
 		){
+			// Query
 			ReplaceQuery<PublicPlaceTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->getCity() ? object->getCity()->getKey() : RegistryKeyType(0));
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
-			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry())); // Must stay at last position
+			ParametersMap map(ParametersMap::FORMAT_SQL);
+			static_cast<ObjectBase&>(*object).toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
@@ -223,11 +155,22 @@ namespace synthese
 	{
 		PublicPlaceTableSync::SearchResult PublicPlaceTableSync::Search(
 			Env& env,
+			optional<RegistryKeyType> cityId,
+			optional<string> name,
 			int first /*= 0*/,
-			boost::optional<std::size_t> number  /*= 0*/,
+			optional<std::size_t> number  /*= 0*/,
 			LinkLevel linkLevel
 		){
 			SelectQuery<PublicPlaceTableSync> query;
+			if(cityId)
+			{
+				query.addWhereField(COL_CITYID, *cityId);
+			}
+			if(name)
+			{
+				query.addWhereField(COL_NAME, *name, ComposedExpression::OP_LIKE);
+			}
+
 			if (number)
 				query.setNumber(*number + 1);
 			if (first > 0)
@@ -235,5 +178,4 @@ namespace synthese
 
 			return LoadFromQuery(query, env, linkLevel);
 		}
-	}
-}
+}	}

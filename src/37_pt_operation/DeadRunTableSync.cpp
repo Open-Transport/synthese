@@ -216,8 +216,10 @@ namespace synthese
 
 			// Data source links
 			query.addField(
-				DataSourceLinks::Serialize(object->getDataSourceLinks())
-			);
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 
 			query.execute(transaction);
 		}

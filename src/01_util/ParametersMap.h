@@ -61,22 +61,39 @@ namespace synthese
 			typedef std::map<std::string, std::string> Map;
 			typedef std::map<std::string, std::vector<boost::shared_ptr<ParametersMap> > > SubParametersMap;
 
+
+			//////////////////////////////////////////////////////////////////////////
+			///  - FORMAT_INTERNAL : in most of cases the result of streaming
+			///  - FORMAT_SQL : SQL values (eg : values in semicolons)
+			///  - FORMAT_XML : standard XML conventions
+			typedef enum
+			{
+				FORMAT_INTERNAL,
+				FORMAT_SQL,
+				FORMAT_XML
+			} SerializationFormat;
+
 		private:
 			Map _map;
 			SubParametersMap _subMap;
 			boost::shared_ptr<geos::geom::Geometry> _geometry;
+			const SerializationFormat _format;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Default constructor.
 			/// Builds an empty parameters map.
-			ParametersMap();
+			/// @param format format of storage of values. See SerializationFormat.
+			ParametersMap(
+				SerializationFormat format = FORMAT_INTERNAL
+			);
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor from a query string.
 			/// @param text the query string : key=value&key=value...
+			/// Serialization format is FORMAT_INTERNAL
 			ParametersMap(const std::string& text);
 
 
@@ -84,11 +101,16 @@ namespace synthese
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor from a map.
 			/// @param source map to copy
-			ParametersMap(const Map& source);
+			/// @param format format of storage of values. See SerializationFormat.
+			ParametersMap(
+				const Map& source,
+				SerializationFormat format = FORMAT_INTERNAL
+			);
 
 			//! \name Getters
 			//@{
 				const Map& getMap() const { return _map; }
+				SerializationFormat getFormat() const { return _format; }
 			//@}
 
 			//! \name Queries
@@ -222,8 +244,15 @@ namespace synthese
 				) const;
 
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Gets the value of a field
+				/// @param parameterName name of the parameter to read
+				/// @param exceptionIfMissing throws an exception if the parameter is undefined, else returns an empty string
+				/// @return the value of the parameter
 				virtual std::string getValue(
-					const std::string& parameterName
+					const std::string& parameterName,
+					bool exceptionIfMissing = true
 				) const;
 			//@}
 
@@ -249,9 +278,21 @@ namespace synthese
 				/// @param other map to read and integrate into the current one
 				/// @param prefix prefix to add before the keys coming from the map to read
 				/// @author Hugues Romain
+				/// @pre the format of the other parameters map is the same as the current one
 				void merge(
 					const ParametersMap& other,
 					std::string prefix = std::string()
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Copy operator.
+				/// @param other map to copy
+				/// @author Hugues Romain
+				/// @pre the format of the other parameters map is the same as the current one
+				void operator=(
+					const ParametersMap& other
 				);
 
 

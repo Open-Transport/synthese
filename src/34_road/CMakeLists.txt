@@ -21,10 +21,16 @@ NavstreetsFileFormat.cpp
 NavstreetsFileFormat.hpp
 OSMFileFormat.cpp
 OSMFileFormat.hpp
+ProjectAddressAction.cpp
+ProjectAddressAction.hpp
 PublicPlace.cpp
 PublicPlace.h
+PublicPlaceAdmin.cpp
+PublicPlaceAdmin.hpp
 PublicPlaceEntrance.cpp
 PublicPlaceEntrance.hpp
+PublicPlaceEntranceCreationAction.cpp
+PublicPlaceEntranceCreationAction.hpp
 PublicPlaceEntranceTableSync.cpp
 PublicPlaceEntranceTableSync.hpp
 PublicPlaceTableSync.cpp

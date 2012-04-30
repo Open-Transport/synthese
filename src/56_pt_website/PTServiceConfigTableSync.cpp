@@ -99,7 +99,7 @@ namespace synthese
 		){
 			// Query
 			ReplaceQuery<PTServiceConfigTableSync> query(*site);
-			ParametersMap map;
+			ParametersMap map(ParametersMap::FORMAT_SQL);
 			site->toParametersMap(map);
 			query.setValues(map);
 			query.execute(transaction);
@@ -165,11 +165,11 @@ namespace synthese
 			SelectQuery<PTServiceConfigTableSync> query;
 			if (!name.empty())
 			{
-				query.addWhereField(ObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
+				query.addWhereField(SimpleObjectFieldDefinition<Name>::FIELD.name, name, ComposedExpression::OP_LIKE);
 			}
 			if (orderByName)
 			{
-				query.addOrderField(ObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
+				query.addOrderField(SimpleObjectFieldDefinition<Name>::FIELD.name, raisingOrder);
 			}
 			if (number)
 			{

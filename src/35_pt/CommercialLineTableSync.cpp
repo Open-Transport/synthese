@@ -316,7 +316,11 @@ namespace synthese
 			query.addField(object->getStyle());
 			query.addField(object->getImage());
 			query.addField(optionalReservationPlaces.str());
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?
 				static_cast<const PTUseRule*>(object->getRule(USER_BIKE))->getKey() :

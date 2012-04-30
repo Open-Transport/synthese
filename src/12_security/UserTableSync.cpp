@@ -219,7 +219,11 @@ namespace synthese
 			query.addField(user->getConnectionAllowed());
 			query.addField(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
-			query.addField(DataSourceLinks::Serialize(user->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					user->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(user->getSVNUsername());
 			query.addField(user->getSVNPassword());
 			query.execute(transaction);

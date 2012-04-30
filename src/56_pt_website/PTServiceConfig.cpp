@@ -64,6 +64,8 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(UseDatesRange, "use_dates_range", SQL_INTEGER)
 	FIELD_NO_LINKED_OBJECT_ID(UseDatesRange)
 
+
+
 	template<>
 	void ObjectField<UseDatesRange, UseDatesRange::Type>::UnSerialize(
 		UseDatesRange::Type& fieldObject,
@@ -78,13 +80,16 @@ namespace synthese
 		fieldObject = days(lexical_cast<int>(text));
 	}
 
+
+
 	template<>
 	std::string ObjectField<UseDatesRange, UseDatesRange::Type>::Serialize(
 		const UseDatesRange::Type& fieldObject,
-		SerializationFormat format
+		ParametersMap::SerializationFormat format
 	){
 		return boost::lexical_cast<std::string>(static_cast<int>(fieldObject.days()));
 	}
+
 
 
 	// Periods
@@ -121,10 +126,10 @@ namespace synthese
 	template<>
 	std::string ObjectField<Periods, Periods::Type>::Serialize(
 		const Periods::Type& fieldObject,
-		SerializationFormat format
+		ParametersMap::SerializationFormat format
 	){
 		stringstream periodstr;
-		if(format == FORMAT_SQL)
+		if(format == ParametersMap::FORMAT_SQL)
 		{
 			periodstr << "\"";
 		}
@@ -140,7 +145,7 @@ namespace synthese
 				"|" << it->getCaption()
 			;
 		}
-		if(format == FORMAT_SQL)
+		if(format == ParametersMap::FORMAT_SQL)
 		{
 			periodstr << "\"";
 		}

@@ -24,31 +24,23 @@
 #include "DBException.hpp"
 #include "DBConstants.h"
 #include "DBModule.h"
-#include "CoordinatesSystem.hpp"
 #include "Conversion.h"
 
 #include <iomanip>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/lexical_cast.hpp>
-#include <geos/io/WKBReader.h>
-#include <geos/io/WKTReader.h>
-#include <geos/geom/Geometry.h>
-#include <geos/io/ParseException.h>
 
 using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
 using namespace geos::geom;
-using namespace geos::io;
 
 namespace synthese
 {
 	using namespace util;
 	namespace db
 	{
-
-
 		DBResult::DBResult ()
 		{
 			resetPosition();
@@ -263,43 +255,6 @@ namespace synthese
 
 
 
-		boost::shared_ptr<geos::geom::Geometry> DBResult::getGeometryFromWKT(
-			const std::string& col,
-			boost::optional<const geos::geom::GeometryFactory&> factory
-		) const	{
-			string colStr(getText(col));
-
-			if(colStr.empty())
-			{
-				return shared_ptr<Geometry>();
-			}
-
-			const geos::geom::GeometryFactory* factoryPtr;
-			if(!factory)
-			{
-				factoryPtr = &DBModule::GetStorageCoordinatesSystem().getGeometryFactory();
-			}
-			else
-			{
-				factoryPtr = factory.get_ptr();
-			}
-			WKTReader reader(factoryPtr);
-
-			try
-			{
-				return
-					CoordinatesSystem::GetInstanceCoordinatesSystem().convertGeometry(
-						*shared_ptr<Geometry>(reader.read(colStr))
-				);
-			}
-			catch(geos::io::ParseException&)
-			{
-				return shared_ptr<Geometry>();
-			}
-		}
-
-
-
 		void DBResult::resetPosition() const
 		{
 			_pos = -1;
@@ -321,9 +276,22 @@ namespace synthese
 
 
 
-		std::string DBResult::getValue( const std::string& name ) const
-		{
-			return getText(name);
+		std::string DBResult::getValue(
+			const std::string& name,
+			bool exceptionIfMissing
+		) const	{
+			try
+			{
+				return getText(name);
+			}
+			catch (DBException& e)
+			{
+				if(exceptionIfMissing)
+				{
+					throw e;
+				}
+				return string();
+			}
 		}
 
 

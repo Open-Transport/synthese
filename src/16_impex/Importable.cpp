@@ -43,6 +43,8 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(DataSourceLinks, "data_source_links", SQL_TEXT)
 
+
+
 	void ObjectField<DataSourceLinks, void*>::LoadFromRecord(
 		void*& fieldObject,
 		ObjectBase& object,
@@ -76,7 +78,7 @@ namespace synthese
 		const std::string& prefix
 	){
 		const Importable& impObject(dynamic_cast<const Importable&>(object));
-		string s(Serialize(impObject.getDataSourceLinks()));
+		string s(Serialize(impObject.getDataSourceLinks(), map.getFormat()));
 		map.insert(prefix + FIELD.name, s);
 	}
 
@@ -86,7 +88,7 @@ namespace synthese
 		LinkedObjectsIds& list,
 		const Record& record
 	){
-		GetLinkedObjectsIdsFromText(list, record.getValue(FIELD.name));
+		GetLinkedObjectsIdsFromText(list, record.getValue(FIELD.name, false));
 	}
 
 
@@ -232,9 +234,13 @@ namespace synthese
 	/// @date 2010
 	string ObjectField<DataSourceLinks, DataSourceLinks::Type>::Serialize(
 		const impex::Importable::DataSourceLinks& fieldObject,
-		SerializationFormat format
+		ParametersMap::SerializationFormat format
 	){
 		stringstream s;
+		if(format == ParametersMap::FORMAT_SQL)
+		{
+			s << "\"";
+		}
 		bool first(true);
 		BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, fieldObject)
 		{
@@ -259,6 +265,10 @@ namespace synthese
 			{
 				s << it.second;
 			}
+		}
+		if(format == ParametersMap::FORMAT_SQL)
+		{
+			s << "\"";
 		}
 		return s.str();
 	}

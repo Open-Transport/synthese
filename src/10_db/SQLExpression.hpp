@@ -312,17 +312,17 @@ namespace synthese
 				if(value.get() && !value->isEmpty())
 				{
 					boost::shared_ptr<geos::geom::Geometry> projected(value);
-					if(DBModule::GetStorageCoordinatesSystem().getSRID() !=
+					if(CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() !=
 						static_cast<CoordinatesSystem::SRID>(value->getSRID()))
 					{
-						projected = DBModule::GetStorageCoordinatesSystem().convertGeometry(*value);
+						projected = CoordinatesSystem::GetStorageCoordinatesSystem().convertGeometry(*value);
 					}
 
 					std::stringstream str;
 					str << "GeomFromText('";
 					geos::io::WKTWriter writer;
 					str << writer.write(projected.get());
-					str << "'," << DBModule::GetStorageCoordinatesSystem().getSRID() << ")";
+					str << "'," << CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() << ")";
 					_value = str.str();
 				}
 				else

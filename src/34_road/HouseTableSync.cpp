@@ -129,7 +129,11 @@ namespace synthese
 			optional<DBTransaction&> transaction
 		){
 			ReplaceQuery<HouseTableSync> query(*object);
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.addField(object->getRoadChunk() ? object->getRoadChunk()->getRoad()->getRoadPlace()->getKey() : RegistryKeyType(0));
 			query.addField(object->getHouseNumber());
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));

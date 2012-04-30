@@ -23,7 +23,8 @@
 #ifndef SYNTHESE__ComplexObjectField_hpp__
 #define SYNTHESE__ComplexObjectField_hpp__
 
-#include "Field.hpp"
+#include "ComplexObjectFieldDefinition.hpp"
+
 #include "FrameworkTypes.hpp"
 
 namespace synthese
@@ -36,23 +37,6 @@ namespace synthese
 
 	class ObjectBase;
 	class Record;
-
-
-
-	template<class C>
-	class ComplexObjectFieldDefinition
-	{
-	public:
-		static const bool EXPORT_CONTENT_AS_FILE;
-		static const Field FIELDS[];
-		static void AddFields(FieldsList& l)
-		{
-			for(size_t i(0); !FIELDS[i].empty(); ++i)
-			{
-				l.push_back(FIELDS[i]);
-			}
-		}
-	};
 
 
 

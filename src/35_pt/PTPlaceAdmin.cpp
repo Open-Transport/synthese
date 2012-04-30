@@ -38,6 +38,7 @@
 #include "JunctionUpdateAction.hpp"
 #include "LineStop.h"
 #include "MapSource.hpp"
+#include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "PlaceAliasUpdateAction.hpp"
 #include "PlaceAliasTableSync.h"
@@ -50,6 +51,7 @@
 #include "PublicPlaceTableSync.h"
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
+#include "StandardFields.hpp"
 #include "StaticActionRequest.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
@@ -183,19 +185,37 @@ namespace synthese
 					{
 						mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 					}
-					HTMLMap map(*mapCenter, 200, true, true, true, true);
+					HTMLMap map(
+						*mapCenter, 
+						200,
+						ObjectUpdateAction::GetInputName<PointGeometry>(),
+						ObjectUpdateAction::GetInputName<PointGeometry>(),
+						true,
+						true
+					);
 					map.setMapSource(MapSource::GetSessionMapSource(*request.getSession()));
 
 					BOOST_FOREACH(const StopArea::PhysicalStops::value_type& it, _connectionPlace->getPhysicalStops())
 					{
+						// Jump over not located stops
 						if(!it.second->getGeometry().get())
 						{
 							continue;
 						}
 
+						// Request
 						moveAction.getAction()->setStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(it.second)));
 
+						// Popup of the stop : name, operator code, lines calling at the stop
 						stringstream popupcontent;
+						if(!it.second->getName().empty())
+						{
+							popupcontent << it.second->getName() + "<br />";
+						}
+						if(!it.second->getCodeBySources().empty())
+						{
+							popupcontent << it.second->getCodeBySources() << "<br />";
+						}
 						BOOST_FOREACH(const CommercialLine* line, it.second->getCommercialLines())
 						{
 							popupcontent <<
@@ -204,7 +224,18 @@ namespace synthese
 								"</span>"
 							;
 						}
-						map.addPoint(HTMLMap::MapPoint(*it.second->getGeometry(), "marker-blue.png", "marker.png", "marker-gold.png", moveAction.getURL(), it.second->getName() + "<br />" + popupcontent.str(), 21, 25));
+
+						// Integration of the stop on the map
+						map.addPoint(
+							HTMLMap::MapPoint(
+								*it.second->getGeometry(),
+								"marker-blue.png",
+								"marker.png",
+								"marker-gold.png",
+								moveAction.getURL(),
+								popupcontent.str(),
+								21, 25
+						)	);
 					}
 					/*
 					BOOST_FOREACH(const AddressablePlace::Addresses::value_type& address, _addressablePlace->getAddresses())
@@ -229,11 +260,18 @@ namespace synthese
 					stream << t.open();
 					stream << t.cell("ID", lexical_cast<string>(_connectionPlace->getKey()));
 					stream << t.title("Localisation");
-					stream << t.cell("Localité", _connectionPlace->getCity()->getName());
+					if(_connectionPlace->getCity())
+					{
+						stream << t.cell("Localité", _connectionPlace->getCity()->getName());
+					}
 					stream << t.cell("Localité", t.getForm().getTextInputAutoCompleteFromService(
 							StopAreaUpdateAction::PARAMETER_CITY_ID,
-							lexical_cast<string>(_connectionPlace->getCity()->getKey()),
-							lexical_cast<string>(_connectionPlace->getCity()->getName()),
+							_connectionPlace->getCity() ?
+								lexical_cast<string>(_connectionPlace->getCity()->getKey()) :
+								RegistryKeyType(0),
+							_connectionPlace->getCity() ?
+								_connectionPlace->getCity()->getName() :
+								string(),
 							pt_website::CityListFunction::FACTORY_KEY,
 							pt_website::CityListFunction::DATA_CITIES,
 							pt_website::CityListFunction::DATA_CITY,
@@ -245,7 +283,9 @@ namespace synthese
 						"Arrêt principal",
 						t.getForm().getOuiNonRadioInput(
 							StopAreaUpdateAction::PARAMETER_IS_MAIN,
-							_connectionPlace->getCity()->includes(*_connectionPlace)
+							_connectionPlace->getCity() ?
+								_connectionPlace->getCity()->includes(*_connectionPlace) :
+								false
 					)	);
 					stream << t.cell("Nom", t.getForm().getTextInput(StopAreaUpdateAction::PARAMETER_NAME, _connectionPlace->getName()));
 					stream << t.title("Destination sur afficheur");
@@ -307,7 +347,7 @@ namespace synthese
 
 					if(stop->getGeometry().get())
 					{
-						shared_ptr<Point> pt(DBModule::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
+						shared_ptr<Point> pt(CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*stop->getGeometry()));
 						stream << t.col() << pt->getX();
 						stream << t.col() << pt->getY();
 						stream << t.col() << stop->getGeometry()->getX();
@@ -640,19 +680,47 @@ namespace synthese
 				)	);
 				BOOST_FOREACH(const shared_ptr<PlaceAlias>& alias, aliases)
 				{
-					removeRequest.getAction()->setObjectId(alias->getKey());
+					// Row opening
 					stream << t.row();
-					stream << t.col() << alias->getCity()->getName();
+
+					// City name
+					stream << t.col();
+					if(alias->getCity())
+					{
+						stream << alias->getCity()->getName();	
+					}
+					else
+					{
+						stream << "Commune inconnue";
+					}
+
+					// Alias name
 					stream << t.col() << alias->getName();
-					stream << t.col() << (alias->getCity()->includes(*alias) ? "OUI" : "NON");
-					stream << t.col() << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'alias ?");
+
+					// Alias is city main stop
+					stream << t.col() << (alias->getCity() && alias->getCity()->includes(*alias) ? "OUI" : "NON");
+
+					// Remove button
+					removeRequest.getAction()->setObjectId(alias->getKey());
+					stream <<
+						t.col() <<
+						HTMLModule::getLinkButton(
+							removeRequest.getURL(),
+							"Supprimer",
+							"Etes-vous sûr de vouloir supprimer l'alias ?"
+						)
+					;
 				}
 
 				stream << t.row();
 				stream << t.col() << f.getTextInputAutoCompleteFromService(
 					PlaceAliasUpdateAction::PARAMETER_CITY_ID,
-					lexical_cast<string>(_connectionPlace->getCity()->getKey()),
-					lexical_cast<string>(_connectionPlace->getCity()->getName()),
+					_connectionPlace->getCity() ?
+						lexical_cast<string>(_connectionPlace->getCity()->getKey()) :
+						RegistryKeyType(0),
+					_connectionPlace->getCity() ?
+						_connectionPlace->getCity()->getName() :
+						string(),
 					pt_website::CityListFunction::FACTORY_KEY,
 					pt_website::CityListFunction::DATA_CITIES,
 					pt_website::CityListFunction::DATA_CITY,

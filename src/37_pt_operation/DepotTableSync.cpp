@@ -123,8 +123,10 @@ namespace synthese
 			ReplaceQuery<DepotTableSync> query(*object);
 			query.addField(object->getName());
 			query.addField(
-				DataSourceLinks::Serialize(object->getDataSourceLinks())
-			);
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			if(object->hasGeometry())
 			{
 				query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));

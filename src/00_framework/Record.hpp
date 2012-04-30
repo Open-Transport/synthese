@@ -28,6 +28,15 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
 
+namespace geos
+{
+	namespace geom
+	{
+		class Geometry;
+		class GeometryFactory;
+	}
+}
+
 namespace synthese
 {
 	/** Record class.
@@ -60,7 +69,15 @@ namespace synthese
 		Record();
 
 
-		virtual std::string getValue(const std::string& fieldName) const = 0;
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the value of a field
+		/// @param fieldName name of the parameter to read
+		/// @param exceptionIfMissing throws an exception if the parameter is undefined, else returns an empty string
+		/// @return the value of the parameter
+		virtual std::string getValue(
+			const std::string& fieldName,
+			bool exceptionIfMissing = true
+		) const = 0;
 
 
 
@@ -168,6 +185,22 @@ namespace synthese
 		/// @param value the string to trim
 		/// @return the trimmed string
 		static std::string Trim(const std::string& value);
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Reads a WKT column and transform it into geometry.
+		/// @param col the column to read
+		/// @return the geometry object corresponding to the WKT data
+		/// @pre the column must store WKT data
+		/// @author Hugues Romain
+		/// @date 2010
+		/// @since 3.2.0
+		boost::shared_ptr<geos::geom::Geometry> getGeometryFromWKT(
+			const std::string& col,
+			boost::optional<const geos::geom::GeometryFactory&> factory =
+				boost::optional<const geos::geom::GeometryFactory&>()
+		) const;
 	};
 
 
