@@ -19,6 +19,7 @@
 #    along with this program; if not, write to the Free Software
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+import copy
 import hashlib
 import logging
 import os
@@ -193,7 +194,10 @@ class Project(object):
         if self._synthese_project:
             return self._synthese_project
         try:
-            self._synthese_project = project_manager.Project(self.path, env=env)
+            # Note: copy the env to avoid sharing the same config, which is
+            # modified by projects.
+            self._synthese_project = project_manager.Project(
+                self.path, env=copy.deepcopy(env))
         except Exception, e:
             log.warn('Unable to retrieve synthese project: %s', e)
             self._synthese_project = None
@@ -271,7 +275,7 @@ def load_conf(env):
         except Exception, e:
             # FIXME: this shouldn't depend on web stuff.
             try:
-                flash('Error in configuration: %s' % e)
+                flash('Error in configuration: %s' % e, 'error')
             except:
                 pass
             log.warn("Error while reading config: %s", e)
