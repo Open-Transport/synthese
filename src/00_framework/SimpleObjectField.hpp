@@ -25,18 +25,18 @@
 
 #include "SimpleObjectFieldDefinition.hpp"
 
+#include "Record.hpp"
 #include "FrameworkTypes.hpp"
+#include "ParametersMap.h"
 
 namespace synthese
 {
 	namespace util
 	{
 		class Env;
-		class ParametersMap;
 	}
 
 	class ObjectBase;
-	class Record;
 
 
 
@@ -58,6 +58,41 @@ namespace synthese
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix);
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map);
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Field of standard object using various database fields.
+	/// ComplexObjectField are part of schemes of Object classes.
+	/// Partial and total template specializations are present in StandardFields.hpp
+	///	@ingroup m00
+	/// @author Hugues Romain
+	/// @date 2012
+	template<class C, class T>
+	class ObjectField:
+		public SimpleObjectField<C, T>
+	{
+	public:
+		typedef T Type;
+
+		static void UnSerialize(
+			T& fieldObject,
+			const std::string& text,
+			const util::Env& env
+		);
+
+
+
+		static std::string Serialize(
+			const T& fieldObject,
+			util::ParametersMap::SerializationFormat format
+		);
+
+
+
+		static void GetLinkedObjectsIdsFromText(
+			LinkedObjectsIds& list,
+			const std::string& text
+		);
 	};
 
 	// Implementations ///////////////////////////////////////////////////////////////////////

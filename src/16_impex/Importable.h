@@ -29,7 +29,7 @@
 #include "Registrable.h"
 
 #include "Exception.h"
-#include "ObjectField.hpp"
+#include "SimpleObjectField.hpp"
 #include "SchemaMacros.hpp"
 
 #include <string>

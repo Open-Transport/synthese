@@ -21,6 +21,8 @@
 */
 
 #include "Address.h"
+
+#include "ObjectBase.hpp"
 #include "Road.h"
 #include "AccessParameters.h"
 #include "RoadModule.h"
