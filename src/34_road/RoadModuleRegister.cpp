@@ -11,6 +11,11 @@
 #include "RoadPlaceTableSync.h"
 #include "RoadTableSync.h"
 
+#include "ProjectAddressAction.hpp"
+#include "PublicPlaceEntranceCreationAction.hpp"
+
+#include "PublicPlaceAdmin.hpp"
+
 #include "RoadModule.h"
 
 #include "IGNstreetsFileFormat.hpp"
@@ -49,6 +54,11 @@ void synthese::road::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::road::PublicPlaceTableSync>::integrate();
 	synthese::road::RoadPlace::integrate();
 	synthese::road::PublicPlace::integrate();
+
+	synthese::road::ProjectAddressAction::integrate();
+	synthese::road::PublicPlaceEntranceCreationAction::integrate();
+
+	synthese::road::PublicPlaceAdmin::integrate();
 
 	synthese::road::NavstreetsFileFormat::integrate();
 	synthese::road::OSMFileFormat::integrate();

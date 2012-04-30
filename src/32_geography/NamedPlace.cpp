@@ -21,34 +21,37 @@
 */
 
 #include "NamedPlace.h"
+
 #include "City.h"
+#include "Env.h"
+#include "GeographyModule.h"
+#include "ObjectBase.hpp"
+#include "ParametersMap.h"
 
 using namespace std;
 using namespace boost;
 
 namespace synthese
 {
+	using namespace geography;
 	using namespace util;
 
 	namespace geography
 	{
 		NamedPlace::NamedPlace(
 		):	_city(NULL)
-		{
+		{}
 
+
+
+		const std::string& NamedPlace::getOfficialName() const
+		{
+			return getName();
 		}
 
 
 
-		const std::string&
-			NamedPlace::getOfficialName () const
-		{
-			return getName ();
-		}
-
-
-
-		std::string NamedPlace::getFullName() const
+		string NamedPlace::getFullName() const
 		{
 			if(_city == NULL)
 			{
@@ -73,9 +76,89 @@ namespace synthese
 
 
 
-		std::string NamedPlace::getName26OrName() const
+		string NamedPlace::getName26OrName() const
 		{
 			return _name26.empty() ? _name.substr(0, 26) : _name26;
 		}
+	}
+
+	template<> const Field ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[] = { Field("name", SQL_TEXT), Field("city_id", SQL_INTEGER), Field() };
+	template<> const bool ComplexObjectFieldDefinition<NamedPlaceData>::EXPORT_CONTENT_AS_FILE = false;
+
+
+
+	template<> void ComplexObjectField<NamedPlaceData, NamedPlaceData::Type>::GetLinkedObjectsIds(
+		LinkedObjectsIds& list,
+		const Record& record
+	){
+		RegistryKeyType city_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
+		if(city_id > 0)
+		{
+			list.push_back(city_id);
+		}
+	}
+
+
+
+	template<>
+	void ComplexObjectField<NamedPlaceData, NamedPlaceData::Type>::LoadFromRecord(
+		NamedPlaceData::Type& fieldObject,
+		ObjectBase& object,
+		const Record& record,
+		const Env& env
+	){
+		assert(dynamic_cast<NamedPlace*>(&object));
+		NamedPlace& place(dynamic_cast<NamedPlace&>(object));
+
+		if(record.isDefined(FIELDS[0].name))
+		{
+			// Name
+			place.setName(record.getDefault<string>(FIELDS[0].name));
+		}
+
+		if(record.isDefined(FIELDS[1].name))
+		{
+			RegistryKeyType city_id(record.getDefault<RegistryKeyType>(FIELDS[1].name, 0));
+			place.setCity(NULL);
+			if(city_id > 0)
+			{
+				try
+				{
+					City* city(env.getEditable<City>(city_id).get());
+					place.setCity(city);
+				}
+				catch(ObjectNotFoundException<City>&)
+				{
+					Log::GetInstance().warn(
+						"Data corrupted in on place " + lexical_cast<string>(place.getKey()) +" : city " +
+						lexical_cast<string>(city_id) + " not found"
+					);
+				}
+			}
+		}
+	}
+
+	template<> void ComplexObjectField<NamedPlaceData, NamedPlaceData::Type>::SaveToParametersMap(
+		const NamedPlaceData::Type& fieldObject,
+		const ObjectBase& object,
+		util::ParametersMap& map,
+		const std::string& prefix
+	){
+		assert(dynamic_cast<const NamedPlace*>(&object));
+		const NamedPlace& place(dynamic_cast<const NamedPlace&>(object));
+
+		// Name
+		map.insert(
+			prefix + FIELDS[0].name,
+			ObjectField<void, string>::Serialize(
+				place.getName(),
+				map.getFormat()
+		)	);
+
+		// City id
+		map.insert(
+			prefix + FIELDS[1].name,
+			place.getCity() ? place.getCity()->getKey() : RegistryKeyType(0)
+		);
 	}
 }

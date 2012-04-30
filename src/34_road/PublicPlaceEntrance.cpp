@@ -25,8 +25,8 @@
 #include "ReverseRoadChunk.hpp"
 #include "RoadModule.h"
 
+using namespace boost;
 using namespace std;
-using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -34,16 +34,49 @@ namespace synthese
 	using namespace road;
 	using namespace util;
 
-	namespace util
-	{
-		template<> const string Registry<PublicPlaceEntrance>::KEY("PublicPlaceEntrance");
-	}
+	CLASS_DEFINITION(PublicPlaceEntrance, "t084_public_place_entrances", 84)
+	FIELD_DEFINITION_OF_OBJECT(PublicPlaceEntrance, "public_place_entrance_id", "public_place_entrance_ids")
 
 	namespace road
 	{
 		PublicPlaceEntrance::PublicPlaceEntrance(
 			util::RegistryKeyType id /*= 0 */
 		):	Registrable(id),
-			_publicPlace(NULL)
+			Object<PublicPlaceEntrance, PublicPlaceEntranceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(PublicPlace),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(AddressData),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
+			)	)
 		{}
+
+
+
+		void PublicPlaceEntrance::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
+		{
+			// Public place link
+			optional<PublicPlace&> publicPlace(
+				get<PublicPlace>()
+			);
+			if(publicPlace)
+			{
+				publicPlace->addEntrance(*this);
+			}
+		}
+
+
+
+		void PublicPlaceEntrance::unlink()
+		{
+			// Public place link
+			optional<PublicPlace&> publicPlace(
+				get<PublicPlace>()
+			);
+			if(publicPlace)
+			{
+				publicPlace->removeEntrance(*this);
+			}
+		}
 }	}

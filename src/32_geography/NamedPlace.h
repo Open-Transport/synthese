@@ -26,6 +26,9 @@
 #include "FactoryBase.h"
 #include "Place.h"
 
+#include "ComplexObjectField.hpp"
+#include "SchemaMacros.hpp"
+
 namespace synthese
 {
 	namespace geography
@@ -123,7 +126,8 @@ namespace synthese
 				virtual const std::string& getOfficialName () const;
 			//@}
 		};
-	}
-}
+
+		FIELD_COMPLEX_TYPE_EXTERNAL_DATA(NamedPlaceData)
+}	}
 
 #endif // SYNTHESE_geography_NamedPlace_h__

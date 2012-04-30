@@ -145,7 +145,11 @@ namespace synthese
 			query.addField(object->getName());
 			query.addField(DriverServiceTableSync::SerializeServices(object->getChunks()));
 			query.addField(datesStr.str());
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.execute(transaction);
 		}
 

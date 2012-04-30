@@ -29,15 +29,7 @@
 
 namespace synthese
 {
-	typedef enum
-	{
-		FORMAT_INTERNAL,
-		FORMAT_SQL,
-		FORMAT_XML
-	} SerializationFormat;
-
 	typedef std::vector<util::RegistryKeyType> LinkedObjectsIds;
-
 }
 
 #endif // SYNTHESE__FrameworkTypes_hpp__

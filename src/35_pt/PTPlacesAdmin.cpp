@@ -23,9 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "PTPlacesAdmin.h"
+
 #include "AdminParametersException.h"
+#include "ObjectCreateAction.hpp"
 #include "ParametersMap.h"
 #include "PTModule.h"
+#include "PublicPlaceAdmin.hpp"
+#include "PublicPlaceTableSync.h"
 #include "TransportNetworkRight.h"
 #include "City.h"
 #include "AdminFunctionRequest.hpp"
@@ -153,6 +157,7 @@ namespace synthese
 
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
+				AdminFunctionRequest<PublicPlaceAdmin> openPPRequest(request);
 
 				stream << "<h1>Recherche phonétique</h1>";
 
@@ -236,10 +241,10 @@ namespace synthese
 								stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 							}
 						}
-/*						else if(dynamic_cast<const PublicPlace*>(it.value))
+						else if(dynamic_cast<const PublicPlace*>(it.value.get()))
 						{
-							const PublicPlace* publicPlace(static_cast<const PublicPlace*>(it.value));
-							openPlaceRequest.getPage()->setPublicPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
+							const PublicPlace* publicPlace(static_cast<const PublicPlace*>(it.value.get()));
+							openPPRequest.getPage()->setPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
 
 							stream << t.col();
 							stream << t.col() << "Lieu public";
@@ -248,9 +253,9 @@ namespace synthese
 							stream << t.col() << it.key.getPhoneticString();
 							stream << t.col() << it.score.phoneticScore;
 							stream << t.col() << it.score.levenshtein;
-							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-*/						else
+						else
 						{
 							stream << t.col();
 							stream << t.col() << "???";
@@ -302,17 +307,17 @@ namespace synthese
 							stream << t.col() << connectionPlace->getName();
 							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-/*						else if(dynamic_cast<const PublicPlace*>(it))
+						else if(dynamic_cast<const PublicPlace*>(it))
 						{
 							const PublicPlace* publicPlace(dynamic_cast<const PublicPlace*>(it));
-							openPlaceRequest.getPage()->setPublicPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
+							openPPRequest.getPage()->setPlace(Env::GetOfficialEnv().getSPtr(publicPlace));
 
 							stream << t.col();
 							stream << t.col() << "Lieu public";
 							stream << t.col() << publicPlace->getName();
-							stream << t.col() << HTMLModule::getLinkButton(openPlaceRequest.getURL(), "Ouvrir", string(), "building.png");
+							stream << t.col() << HTMLModule::getLinkButton(openPPRequest.getURL(), "Ouvrir", string(), "building.png");
 						}
-*/						else
+						else
 						{
 							stream << t.col();
 							stream << t.col() << "???";
@@ -434,6 +439,98 @@ namespace synthese
 			// TAB PUBLIC PLACES
 			if (openTabContent(stream, TAB_PUBLIC_PLACES))
 			{
+				stream << "<h1>Recherche</h1>";
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
+				searchRequest.getPage()->setCity(_city);
+				getHTMLStopAreaSearchForm(
+					stream,
+					searchRequest.getHTMLForm("ppsearch"),
+					_city.get() ? optional<const string&>() : optional<const string&>(_searchCity),
+					_searchName
+				);
+
+				stream << "<h1>Résultats</h1>";
+
+				PublicPlaceTableSync::SearchResult places(
+					PublicPlaceTableSync::Search(
+						Env::GetOfficialEnv(),
+						_city.get() ? _city->getKey() : optional<RegistryKeyType>(),
+						_searchName.empty() ? optional<string>() : ("%"+ _searchName +"%"),
+						0
+				)	);
+
+				AdminActionFunctionRequest<ObjectCreateAction, PublicPlaceAdmin> publicPlaceAddRequest(request);
+				publicPlaceAddRequest.getAction()->setTable<PublicPlace>();
+				PublicPlace ppTemplate;
+				ppTemplate.setCity(const_pointer_cast<City>(_city).get());
+				publicPlaceAddRequest.getAction()->set<NamedPlaceData>(NULL, ppTemplate);
+				publicPlaceAddRequest.setActionWillCreateObject();
+				publicPlaceAddRequest.setActionFailedPage<PTPlacesAdmin>();
+				static_pointer_cast<PTPlacesAdmin>(publicPlaceAddRequest.getActionFailedPage())->setCity(_city);
+
+				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request);
+
+				AdminFunctionRequest<PublicPlaceAdmin> openRequest(request);
+
+				HTMLForm f(publicPlaceAddRequest.getHTMLForm());
+				stream << f.open();
+
+				HTMLTable::ColsVector c;
+				c.push_back("id");
+				if(!_city.get())
+				{
+					c.push_back("Localité");
+				}
+				c.push_back("ID");
+				c.push_back("Nom");
+				c.push_back("X");
+				c.push_back("Y");
+				c.push_back("Actions");
+				c.push_back("Actions");
+				HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+				stream << t.open();
+
+				BOOST_FOREACH(const PublicPlaceTableSync::SearchResult::value_type& place, places)
+				{
+					stream << t.row();
+					openRequest.getPage()->setPlace(const_pointer_cast<const PublicPlace>(place));
+					stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), PublicPlaceAdmin::ICON);
+
+					stream << t.col() << place->getKey();
+					if(!_city.get())
+					{
+						stream << t.col() << place->getCity()->getName();
+					}
+					stream << t.col() << place->getName();
+					if(place->getPoint().get())
+					{
+						stream << t.col() << fixed << place->getPoint()->getX();
+						stream << t.col() << fixed << place->getPoint()->getY();
+					}
+					else
+					{
+						stream << t.col(2) << "Non localisé";
+					}
+
+					// Remove button only if no stops inside
+					stream << t.col();
+					if(place->getEntrances().empty())
+					{
+						removeRequest.getAction()->setObjectId(place->getKey());
+						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le lieu public ?");
+					}
+				}
+
+				stream << t.row();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col();
+				stream << t.col() << f.getSubmitButton("Ajouter");
+				stream << t.col();
+
+				stream << t.close();
+				stream << f.close();
 			}
 
 			////////////////////////////////////////////////////////////////////

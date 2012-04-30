@@ -275,7 +275,11 @@ namespace synthese
 			);
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
-			query.addField(DataSourceLinks::Serialize(object->getDataSourceLinks()));
+			query.addField(
+				DataSourceLinks::Serialize(
+					object->getDataSourceLinks(),
+					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+			)	);
 			query.execute(transaction);
 		}
 

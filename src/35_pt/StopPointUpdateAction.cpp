@@ -22,9 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "StopPointUpdateAction.hpp"
+
+#include "ActionException.h"
+#include "ObjectUpdateAction.hpp"
+#include "ParametersMap.h"
+#include "StandardFields.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "StopPointTableSync.hpp"
@@ -137,10 +140,15 @@ namespace synthese
 				);
 			}
 
-			if(map.isDefined(HTMLMap::PARAMETER_ACTION_WKT))
+			if(map.isDefined(ObjectUpdateAction::GetInputName<PointGeometry>()))
 			{
-				WKTReader reader(&DBModule::GetStorageCoordinatesSystem().getGeometryFactory());
-				_point.reset(static_cast<Point*>(reader.read(map.get<string>(HTMLMap::PARAMETER_ACTION_WKT))));
+				WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
+				_point.reset(
+					static_cast<Point*>(
+						reader.read(
+							map.get<string>(
+								ObjectUpdateAction::GetInputName<PointGeometry>()
+				)	)	)	);
 			}
 
 			if(map.isDefined(PARAMETER_NAME))

@@ -76,7 +76,7 @@ namespace synthese
 			_request(VALUE_REQUEST_GetCapabilities),
 			_outputFormat(VALUE_OUTPUTFORMAT_GML_3_1_1),
 			_outputResults(true),
-			_srs(&DBModule::GetStorageCoordinatesSystem())
+			_srs(&CoordinatesSystem::GetStorageCoordinatesSystem())
 		{}
 
 
@@ -116,10 +116,10 @@ namespace synthese
 			if(_envelope && _srs)
 			{
 				shared_ptr<Point> minPoint(
-					DBModule::GetStorageCoordinatesSystem().createPoint(_envelope->getMinX(), _envelope->getMinY())
+					CoordinatesSystem::GetStorageCoordinatesSystem().createPoint(_envelope->getMinX(), _envelope->getMinY())
 				);
 				shared_ptr<Point> maxPoint(
-					DBModule::GetStorageCoordinatesSystem().createPoint(_envelope->getMaxX(), _envelope->getMaxY())
+					CoordinatesSystem::GetStorageCoordinatesSystem().createPoint(_envelope->getMaxX(), _envelope->getMaxY())
 				);
 
 				shared_ptr<Point> convMinPoint(
@@ -237,10 +237,10 @@ namespace synthese
 					)	)	);
 
 					shared_ptr<Point> wgsMinPoint(
-						DBModule::GetStorageCoordinatesSystem().convertPoint(*minPoint)
+						CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*minPoint)
 					);
 					shared_ptr<Point> wgsMaxPoint(
-						DBModule::GetStorageCoordinatesSystem().convertPoint(*maxPoint)
+						CoordinatesSystem::GetStorageCoordinatesSystem().convertPoint(*maxPoint)
 					);
 
 					_envelope = Envelope(
@@ -448,7 +448,7 @@ namespace synthese
 						"<wfs:Name>synthese:" << type->getFactoryKey() << "Type</wfs:Name>" <<
 						"<wfs:Title>" << type->getFactoryKey() << "</wfs:Title>" <<
 						"<wfs:Abstract>" << type->getFactoryKey() << "</wfs:Abstract>" <<
-						"<wfs:DefaultSRS>EPSG:" << DBModule::GetStorageCoordinatesSystem().getSRID() << "</wfs:DefaultSRS>" <<
+						"<wfs:DefaultSRS>EPSG:" << CoordinatesSystem::GetStorageCoordinatesSystem().getSRID() << "</wfs:DefaultSRS>" <<
 						"<wfs:OutputFormats><wfs:Format>" << VALUE_OUTPUTFORMAT_GML_3_1_1 << "</wfs:Format></wfs:OutputFormats>" <<
 						"<ows:WGS84BoundingBox>"
 						"<ows:LowerCorner>-180 -90</ows:LowerCorner>"

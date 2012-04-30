@@ -37,7 +37,8 @@ using namespace geos::algorithm;
 namespace synthese
 {
 	const string CoordinatesSystem::_INSTANCE_COORDINATES_SYSTEM("instance_coordinates_system");
-	const CoordinatesSystem* CoordinatesSystem::_InstanceCoordinatesSystem(NULL);
+	const CoordinatesSystem* CoordinatesSystem::_instanceCoordinatesSystem(NULL);
+	const CoordinatesSystem* CoordinatesSystem::_storageCoordinatesSystem(NULL);
 	CoordinatesSystem::CoordinatesSystemsMap CoordinatesSystem::_CoordinatesSystems;
 
 
@@ -95,14 +96,16 @@ namespace synthese
 
 	void CoordinatesSystem::ClearCoordinatesSystems()
 	{
+		_instanceCoordinatesSystem = NULL;
+		_storageCoordinatesSystem = NULL;
 		_CoordinatesSystems.clear();
-	};
+	}
 
 
 
 	void CoordinatesSystem::SetDefaultCoordinatesSystems( SRID instanceSRID )
 	{
-		_InstanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
+		_instanceCoordinatesSystem = &GetCoordinatesSystem(instanceSRID);
 	}
 
 

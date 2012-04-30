@@ -36,5 +36,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(StartTime, "start_time", SQL_DATETIME)
 	FIELD_DEFINITION_OF_TYPE(StartDate, "start_date", SQL_DATE)
 	FIELD_DEFINITION_OF_TYPE(Title, "title", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(PointGeometry, "geometry", SQL_GEOM_POINT)
+	FIELD_DEFINITION_OF_TYPE(LineStringGeometry, "geometry", SQL_GEOM_LINESTRING)
 }
 

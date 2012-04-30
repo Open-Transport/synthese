@@ -43,12 +43,16 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace road;
+	using namespace impex;
+	using namespace util;	
 
 	namespace util
 	{
-		template<> const string Registry<PublicPlace>::KEY("PublicPlace");
 		template<> const string FactorableTemplate<NamedPlace, PublicPlace>::FACTORY_KEY("PublicPlace");
 	}
+
+	CLASS_DEFINITION(PublicPlace, "t013_public_places", 13)
+	FIELD_DEFINITION_OF_OBJECT(PublicPlace, "public_place_id", "public_place_ids")
 
 	namespace road
 	{
@@ -62,7 +66,14 @@ namespace synthese
 		PublicPlace::PublicPlace (
 			util::RegistryKeyType id
 		):	Registrable(id),
-			NamedPlaceTemplate<PublicPlace>()
+			NamedPlaceTemplate<PublicPlace>(),
+			Object<PublicPlace, PublicPlaceSchema>(
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(NamedPlaceData),
+					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
+					FIELD_DEFAULT_CONSTRUCTOR(PointGeometry)
+			)	)
 		{}
 
 
@@ -75,7 +86,7 @@ namespace synthese
 		std::string PublicPlace::getNameForAllPlacesMatcher(
 			std::string text
 		) const	{
-			return (text.empty() ? getName() : text);
+			return (text.empty() ? NamedPlace::getName() : text);
 		}
 
 
@@ -107,10 +118,12 @@ namespace synthese
 
 
 
-		const boost::shared_ptr<Point>& PublicPlace::getPoint() const
+		const shared_ptr<Point>& PublicPlace::getPoint() const
 		{
-			return getGeometry();
+			return get<PointGeometry>();
 		}
+
+
 
 		void PublicPlace::toParametersMap(
 			util::ParametersMap& pm,
@@ -119,10 +132,10 @@ namespace synthese
 		) const {
 
 			// ID
-			pm.insert(prefix + DATA_ID, getKey());
+			pm.insert(prefix + DATA_ID, get<Key>());
 
 			// Name
-			pm.insert(prefix + DATA_NAME, getName());
+			pm.insert(prefix + DATA_NAME, NamedPlace::getName());
 
 			// City
 			if(getCity())
@@ -149,6 +162,8 @@ namespace synthese
 			}
 		}
 
+
+
 		void PublicPlace::toParametersMap( util::ParametersMap& pm, const std::string& prefix ) const
 		{
 			toParametersMap(pm,&CoordinatesSystem::GetInstanceCoordinatesSystem(),prefix);
@@ -174,5 +189,73 @@ namespace synthese
 		void PublicPlace::removeEntrance( PublicPlaceEntrance& entrance )
 		{
 			_entrances.erase(&entrance);
+		}
+
+
+
+		std::string PublicPlace::getName() const
+		{
+			return NamedPlace::getName();
+		}
+
+
+
+		void PublicPlace::link(
+			util::Env& env,
+			bool withAlgorithmOptimizations /*= false*/
+		){
+			// Registration to city matcher
+			if(getCity())
+			{
+				const_cast<City*>(getCity())->addPlaceToMatcher(env.getEditableSPtr(this));
+			}
+
+			// Registration to all places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				GeographyModule::GetGeneralAllPlacesMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
+				);
+			}
+
+			// Registration to public places matcher
+			if(	&env == &Env::GetOfficialEnv() &&
+				withAlgorithmOptimizations
+			){
+				RoadModule::GetGeneralPublicPlacesMatcher().add(
+					getFullName(),
+					env.getEditableSPtr(this)
+				);
+			}
+		}
+
+
+
+		void PublicPlace::unlink()
+		{
+			// City matcher
+			City* city(const_cast<City*>(getCity()));
+			if (city != NULL)
+			{
+				city->removePlaceFromMatcher(*this);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General all places
+				GeographyModule::GetGeneralAllPlacesMatcher().remove(
+					getFullName()
+				);
+			}
+
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				// General public places
+				RoadModule::GetGeneralPublicPlacesMatcher().remove(
+					getFullName()
+				);
+			}
 		}
 }	}

@@ -23,61 +23,18 @@
 #ifndef SYNTHESE__ObjectField_hpp__
 #define SYNTHESE__ObjectField_hpp__
 
-#include "Field.hpp"
-#include "FrameworkTypes.hpp"
+#include "SimpleObjectField.hpp"
+
 #include "ParametersMap.h"
 #include "Record.hpp"
 #include "ObjectBase.hpp"
 
 namespace synthese
 {
-	namespace util
-	{
-		class Env;
-		class ParametersMap;
-	}
-
-	class Record;
-
-
-
-	template<class C>
-	class ObjectFieldDefinition
-	{
-	public:
-		static const bool EXPORT_CONTENT_AS_FILE;
-		static const Field FIELD;
-		static void AddFields(FieldsList& l)
-		{
-			l.push_back(FIELD);
-		}
-	};
-
-
-
-	template<class C, class T>
-	class SimpleObjectField:
-		public ObjectFieldDefinition<C>
-	{
-	public:
-		typedef T Type;
-
-		static void LoadFromRecord(T& fieldObject, const Record& record);
-		static void LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env);
-		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map);
-		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix);
-		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map);
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
-	};
-
-
-
 	//////////////////////////////////////////////////////////////////////////
 	/// Field of standard object using various database fields.
-	/// ComplexObjectField are part of schemas of Object classes.
-	/// Partial and total template specialzations are present in StandardFields.hpp
+	/// ComplexObjectField are part of schemes of Object classes.
+	/// Partial and total template specializations are present in StandardFields.hpp
 	///	@ingroup m00
 	/// @author Hugues Romain
 	/// @date 2012
@@ -94,90 +51,20 @@ namespace synthese
 			const util::Env& env
 		);
 
+
+
 		static std::string Serialize(
 			const T& fieldObject,
-			SerializationFormat format = FORMAT_INTERNAL
+			util::ParametersMap::SerializationFormat format
 		);
+
+
 
 		static void GetLinkedObjectsIdsFromText(
 			LinkedObjectsIds& list,
 			const std::string& text
 		);
 	};
-
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, const Record& record)
-	{
-		if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
-		{
-			return;
-		}
-
-		ObjectField<C, T>::UnSerialize(
-			fieldObject,
-			record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name)
-		);
-	}
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env)
-	{
-		if(!record.isDefined(ObjectFieldDefinition<C>::FIELD.name))
-		{
-			return;
-		}
-
-		ObjectField<C, T>::UnSerialize(
-			fieldObject,
-			record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name),
-			env
-		);
-	}
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
-	{
-		LoadFromRecord(fieldObject, record, env);
-	}
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix)
-	{
-		SaveToParametersMap(fieldObject, map, prefix);
-	}
-
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix)
-	{
-		map.insert(
-			prefix + ObjectFieldDefinition<C>::FIELD.name,
-			ObjectField<C, T>::Serialize(fieldObject)
-		);
-	}
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map)
-	{
-		SaveToParametersMap(fieldObject, map);
-	}
-
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::SaveToParametersMap(const T& fieldObject, util::ParametersMap& map)
-	{
-		map.insert(
-			ObjectFieldDefinition<C>::FIELD.name,
-			ObjectField<C, T>::Serialize(fieldObject)
-		);
-	}
-
-	template<class C, class T>
-	void SimpleObjectField<C, T>::GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
-	{
-		ObjectField<C, T>::GetLinkedObjectsIdsFromText(list, record.getDefault<std::string>(ObjectFieldDefinition<C>::FIELD.name));
-	}
 }
 
 #endif

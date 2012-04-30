@@ -44,21 +44,18 @@ namespace synthese
 
 	namespace geography
 	{
-		const string HTMLMap::PARAMETER_ACTION_WKT("actionParamwkt");
-
-
-
 		HTMLMap::HTMLMap(
 			const Point& center,
 			double horizontalDistance,
-			bool editable,
-			bool addable,
+			optional<const string&> editFieldName,
+			optional<const string&> addFieldName,
 			bool highlight,
 			bool mousePosition,
 			const string id /*= "map" */
 		):	_center(static_cast<Point*>(center.clone())),
 			_horizontalDistance(horizontalDistance),
-			_editable(editable),
+			_editFieldName(editFieldName),
+			_addFieldName(addFieldName),
 			_highlight(highlight),
 			_id(id),
 			_mapSource(NULL),
@@ -69,11 +66,11 @@ namespace synthese
 			{
 				_controls.push_back(Control(Control::HIGHLIGHT, "highlight", true));
 			}
-			if(editable)
+			if(_editFieldName)
 			{
 				_controls.push_back(Control(Control::DRAG, "modify", true));
 			}
-			if(addable)
+			if(_addFieldName)
 			{
 				_controls.push_back(Control(Control::DRAW_POINT, "point", false));
 			}
@@ -295,12 +292,15 @@ namespace synthese
 				}
 			}
 
+			if(_editFieldName || _addFieldName)
+			{
+				stream << "vectorLayer.events.on({";
+			}
 
 			// Moving by drag and drop
-			if(_editable)
+			if(_editFieldName)
 			{
 				stream <<
-					"vectorLayer.events.on({" <<
 						"'beforefeaturemodified': function(evt) {" <<
 							"if(controls['highlight']) controls['highlight'].deactivate();" <<
 							"if(evt.feature.data.editionGraphic) evt.feature.style.externalGraphic = evt.feature.data.editionGraphic;" <<
@@ -319,7 +319,7 @@ namespace synthese
 							");" <<
 							"var writer = new OpenLayers.Format.WKT();" <<
 							"var wkt = writer.write(feat);" <<
-							"new OpenLayers.Ajax.Request(evt.feature.data.requestURL + '&" << PARAMETER_ACTION_WKT << "='+ wkt," <<
+							"new OpenLayers.Ajax.Request(evt.feature.data.requestURL + '&" << *_editFieldName << "='+ wkt," <<
 							"{	method: 'get'," <<
 								"onComplete: function(transport) {" <<
 									"if(evt.feature.data.graphic) evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
@@ -327,14 +327,25 @@ namespace synthese
 									"vectorLayer.redraw();" <<
 								"}" <<
 							"});" <<
-						"}," <<
+						"}"
+					;
+			}
+			if(_addFieldName)
+			{
+				if(_editFieldName)
+				{
+					stream << ",";
+				}
+				stream <<
 						"'featureadded': function(evt) {" <<
-							"var newpoint = evt.feature.geometry.clone();" <<
-							"newpoint.transform(" <<
+							"var newpoint = evt.feature.clone();" <<
+							"newpoint.geometry.transform(" <<
 								"mapProjection," << // from map projection
 								"new OpenLayers.Projection(\"EPSG:4326\")" << // to WGS 1984
 							");" <<
-							"new OpenLayers.Ajax.Request(addURL + '&actionParamsrid=4326&actionParamx='+ newpoint.x +'&actionParamy=' + newpoint.y," <<
+							"var writer = new OpenLayers.Format.WKT();" <<
+							"var wkt = writer.write(newpoint);" <<
+							"new OpenLayers.Ajax.Request(addURL + '&" << *_addFieldName << "='+ wkt," <<
 							"{   method: 'get'," <<
 								"onComplete: function(transport) {" <<
 //									"evt.feature.style.externalGraphic = evt.feature.data.graphic;" <<
@@ -342,9 +353,12 @@ namespace synthese
 								"}" <<
 							"});" <<
 							"controls['point'].deactivate();" <<
-						"}" <<
-					"});"
-				;
+						"}"
+					;
+			}
+			if(_addFieldName || _editFieldName)
+			{
+				stream << "});";
 			}
 			stream <<
 				"return vectorLayer;" <<
