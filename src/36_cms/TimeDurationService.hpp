@@ -49,14 +49,14 @@ namespace synthese
 			static const std::string PARAMETER_HOURS;
 			static const std::string PARAMETER_MINUTES;
 			static const std::string PARAMETER_SECONDS;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::posix_time::time_duration _value;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Time_Duration#Request
@@ -66,9 +66,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.4.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Time_Duration#Request
@@ -80,8 +80,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			//! @name Setters
 			//@{
@@ -97,9 +97,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

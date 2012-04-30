@@ -254,6 +254,6 @@ namespace synthese
 					result.push_back(std::make_pair(area->getKey(), area->getName()));
 				}
 				return result;
-		} 
+		}
 	}
 }

@@ -207,9 +207,9 @@ namespace synthese
 					}
 					catch(bad_lexical_cast)
 					{
-						
+
 					}
-					
+
 				}
 				if(number > 0)
 				{

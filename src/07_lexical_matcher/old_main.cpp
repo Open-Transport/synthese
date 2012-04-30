@@ -23,7 +23,7 @@ namespace po = boost::program_options;
 
 /* Compilation and launch command example :
 
-gcc -o complete old_main.cpp -I 01_util -I 00_framework -L /usr/local/boost_1_42_0/stage/lib/ -lstdc++  -lboost_filesystem -lboost_system -L../build_cmake/debug/src/07_lexical_matcher/ -l07_lexical_matcher -lboost_program_options -I/usr/local/boost_1_42_0      
+gcc -o complete old_main.cpp -I 01_util -I 00_framework -L /usr/local/boost_1_42_0/stage/lib/ -lstdc++  -lboost_filesystem -lboost_system -L../build_cmake/debug/src/07_lexical_matcher/ -l07_lexical_matcher -lboost_program_options -I/usr/local/boost_1_42_0
 export LD_LIBRARY_PATH="/usr/local/boost_1_42_0/stage/lib/;../build_cmake/debug/src/07_lexical_matcher/;../build_cmake/debug/src/01_util/;../build_cmake/debug/src/00_framework/"
 
 */
@@ -93,14 +93,14 @@ int main( int argc, char **argv )
 
 	    LexicalMatcher<int>::MatchResult result = matcher.bestMatches (inputUTF8, nbMatches);
 	    std::cout << std::endl;
-		std::cout << "levenshtein\t" 
+		std::cout << "levenshtein\t"
 			<< "phoneticScore\t"
 			<< "string\t\t"
 			<< "PhoneticString" << std::endl;
 	    for (LexicalMatcher<int>::MatchResult::iterator it = result.begin ();
 		 it != result.end (); ++it)
 	    {
-		std::cout << it->score.levenshtein << "\t\t" 
+		std::cout << it->score.levenshtein << "\t\t"
 			<< it->score.phoneticScore << "\t\t"
 			<< IConv("UTF-8","CP1252").convert(it->key.getSource()) <<  "\t\t"
 			<< it->key.getPhoneticString() << std::endl;

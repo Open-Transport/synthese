@@ -46,15 +46,15 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_NUMBER;
 			static const std::string PARAMETER_FORMAT;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
 				double _value;
 				std::string _format;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Precision#Request
@@ -64,9 +64,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.4.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Precision#Request
@@ -78,8 +78,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			PrecisionService(): _value(0.0) {}
 
@@ -92,9 +92,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session
