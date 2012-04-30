@@ -200,6 +200,7 @@ class Project(object):
         self.remote_db_path = None
         self.requests_session = requests.session()
         self.alias_path = None
+        self.common_project_config = {}
 
     def __repr__(self):
         return '<Project %s>' % self.__dict__
@@ -243,11 +244,16 @@ class Project(object):
         try:
             # Note: copy the env to avoid sharing the same config, which is
             # modified by projects.
+            env_copy = copy.deepcopy(env)
             self._synthese_project = project_manager.Project(
-                self.path, env=copy.deepcopy(env))
+                self.path, env=env_copy)
+            env_copy.config.__dict__.update(
+                conf.get('common_project_config', {}))
+            env_copy.config.update_finished(env_copy)
         except Exception, e:
             log.warn('Unable to retrieve synthese project: %s', e)
             self._synthese_project = None
+
         return self._synthese_project
 
     def fetch_db(self):
