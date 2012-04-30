@@ -25,9 +25,12 @@ import logging
 import os
 from os.path import join
 import pdb
+import re
 import socket
 import subprocess
 import time
+import urllib
+import urlparse
 
 import flask
 from flask import Flask
@@ -56,18 +59,50 @@ name_to_project = {}
 
 class Url(object):
     def __init__(self, project, path):
-        self.path = self._convert_path(path)
         self.project = project
         self.result = None
         self.same = None
         self._diff_name = None
+        self._site_to_id = None
+        self.path = self._convert_path(path)
 
     def __repr__(self):
         return '<Url %s>' % self.__dict__
 
+    def _get_site_id(self, site_name):
+        if self._site_to_id is not None:
+            return self._site_to_id.get(site_name)
+
+        self._site_to_id = {}
+        if self.project.synthese_project:
+            for site in self.project.synthese_project.sites:
+                self._site_to_id[site.name] = site.id
+        return self._site_to_id.get(site_name)
+
     def _convert_path(self, path):
-        # TODO
-        return path
+        site_name, path = re.match("(?:\[([^\]]+)\])?(.*)", path).groups()
+
+        self.site_name = site_name if site_name else "N/A"
+
+        if not site_name:
+            return path
+
+        site_id = self._get_site_id(site_name)
+        if not site_id:
+            return "Check out project first!"
+
+        path_only = urlparse.urlparse(path).path
+        qs = dict(urlparse.parse_qsl(urlparse.urlparse(path).query))
+        qs.update(dict(
+            SERVICE='page',
+            si=site_id,
+            smart_url=path_only,
+        ))
+
+        # TODO: change to /synthese once old projects are migrated.
+        #base = "/synthese"
+        base = "/synthese3/admin"
+        return '{base}?{qs}'.format(base=base, qs=urllib.urlencode(qs))
 
     @property
     def ref_url(self):
@@ -108,12 +143,22 @@ class Result(object):
         else:
             return join(self.path, path_hash)
 
-    def save_url_result(self, url, ref_content, test_content):
+    def save_url_result(self, url, ref_result, test_result):
         results_path = self._get_result_path(url)
         utils.maybe_makedirs(results_path)
 
-        open(self._get_result_path(url, 'ref'), 'wb').write(ref_content)
-        open(self._get_result_path(url, 'test'), 'wb').write(test_content)
+        def save(result, kind):
+            content = ''
+            # Make the test result different in case of HTTP error so that
+            # it shows as different.
+            if kind == 'test' and result.status_code != 200:
+                content += 'WARNING: http status is not 200\n'
+            content += 'http status: {0}\n'.format(result.status_code)
+            content += result.content
+            open(self._get_result_path(url, kind), 'wb').write(content)
+
+        save(ref_result, 'ref')
+        save(test_result, 'test')
 
         utils.call('diff -u ref test > diff || true', shell=True, cwd=results_path)
 
@@ -237,9 +282,9 @@ class Project(object):
 
     def _compare_urls(self, url):
         log.info("Comparing urls: %s", url)
-        ref_content = self.requests_session.get(url.ref_url, prefetch=True).content
-        test_content = self.requests_session.get(url.test_url, prefetch=True).content
-        self.result.save_url_result(url, ref_content, test_content)
+        ref_result = self.requests_session.get(url.ref_url, prefetch=True)
+        test_result = self.requests_session.get(url.test_url, prefetch=True)
+        self.result.save_url_result(url, ref_result, test_result)
 
     def run_checks(self):
         self.result.start_time = time.time()
