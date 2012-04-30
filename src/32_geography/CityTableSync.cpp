@@ -98,6 +98,21 @@ namespace synthese
 		{
 			// Remove from cities matcher
 			GeographyModule::RemoveFromCitiesMatchers(Env::GetOfficialEnv().getEditableSPtr(obj));
+
+			// Adds a city with same name if necessary
+			CityTableSync::SearchResult others(
+				CityTableSync::Search(
+					Env::GetOfficialEnv(),
+					obj->getName()
+			)	);
+			BOOST_FOREACH(shared_ptr<City> other, others)
+			{
+				if(other->getKey() != obj->getKey())
+				{
+					GeographyModule::AddToCitiesMatchers(other);
+					break;
+				}
+			}
 		}
 
 
