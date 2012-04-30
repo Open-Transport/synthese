@@ -38,13 +38,13 @@ namespace synthese
 
 	template<>
 	const string FactorableTemplate<Function,cms::TimeDurationService>::FACTORY_KEY = "time_duration";
-	
+
 	namespace cms
 	{
 		const string TimeDurationService::PARAMETER_HOURS = "h";
 		const string TimeDurationService::PARAMETER_MINUTES = "m";
 		const string TimeDurationService::PARAMETER_SECONDS = "s";
-		
+
 
 
 		ParametersMap TimeDurationService::_getParametersMap() const
@@ -78,9 +78,9 @@ namespace synthese
 			stream << _value;
 			return map;
 		}
-		
-		
-		
+
+
+
 		bool TimeDurationService::isAuthorized(
 			const Session* session
 		) const {
