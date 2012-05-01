@@ -90,15 +90,53 @@ namespace synthese
 				? 1
 				: lexical_cast<int>(_multiplicateurRangeeVIE->getValue(parameters, variables, object, request))
 			);
-			int __Pages = lexical_cast<int>(_pagesVIE->getValue(parameters, variables, object, request));
+			int __Pages(0);
+			if(_pagesVIE) try
+			{
+				__Pages = lexical_cast<int>(_pagesVIE->getValue(parameters, variables, object, request));
+			}
+			catch(bad_lexical_cast&)
+			{
+			}
+
 			const string& __SeparateurPage = _pageSeparator->getValue(parameters, variables, object, request);
-			int departuresToHide(_departuresToHide ? lexical_cast<int>(_departuresToHide->getValue(parameters, variables, object, request)) : 0);
-			const string message (_message ? _message->getValue(parameters, variables, object, request) : string());
-			bool displayServiceNumber(_displayServiceNumber ? lexical_cast<bool>(_displayServiceNumber->getValue(parameters, variables, object, request)) : false);
-			bool displayQuai(_displayQuai ? lexical_cast<bool>(_displayQuai->getValue(parameters, variables, object, request)) : false);
-			bool displayTeam(_displayTeam ? lexical_cast<bool>(_displayTeam->getValue(parameters, variables, object, request)) : false);
-			int numberOfIntermediatesStops(_numberOfIntermediatesStops ? lexical_cast<int>(_numberOfIntermediatesStops->getValue(parameters, variables, object, request)) : UNKNOWN_VALUE);
-			int blinkingDelay(_blinkingDelay? lexical_cast<int>(_blinkingDelay->getValue(parameters, variables, object, request)) : 0);
+			int departuresToHide(
+				_departuresToHide && !_departuresToHide->getValue(parameters, variables, object, request).empty() ?
+				lexical_cast<int>(_departuresToHide->getValue(parameters, variables, object, request)) :
+				0
+			);
+			const string message(
+				_message ?
+				_message->getValue(parameters, variables, object, request) :
+				string()
+			);
+			bool displayServiceNumber(
+				_displayServiceNumber && !_displayServiceNumber->isFalse(parameters, variables, object, request)
+			);
+			bool displayQuai(
+				_displayQuai && !_displayQuai->isFalse(parameters, variables, object, request)
+			);
+			bool displayTeam(
+				_displayTeam && !_displayTeam->isFalse(parameters, variables, object, request)
+			);
+
+			int numberOfIntermediatesStops(UNKNOWN_VALUE);
+			if(_numberOfIntermediatesStops) try
+			{
+				numberOfIntermediatesStops = lexical_cast<int>(_numberOfIntermediatesStops->getValue(parameters, variables, object, request));
+			}
+			catch(bad_lexical_cast&)
+			{
+			}
+
+			int blinkingDelay(0);
+			if(_blinkingDelay) try
+			{
+				blinkingDelay = lexical_cast<int>(_blinkingDelay->getValue(parameters, variables, object, request));
+			}
+			catch(bad_lexical_cast&)
+			{
+			}
 
 			const DepartureTableRowInterfacePage* page(_page->getInterface()->getPage<DepartureTableRowInterfacePage>());
 			if(page == NULL)
