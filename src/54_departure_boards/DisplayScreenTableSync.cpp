@@ -288,6 +288,7 @@ namespace synthese
 					}
 				}
 
+				object->registerInParentOrRoot();
 
 				// Type
 				RegistryKeyType typeId(rows->getLongLong ( DisplayScreenTableSync::COL_TYPE_ID));
