@@ -148,10 +148,19 @@ namespace synthese
 		const NamedPlace& place(dynamic_cast<const NamedPlace&>(object));
 
 		// Name
+		string escapedName;
+		switch(format)
+		{
+		case util::ParametersMap::FORMAT_SQL:
+			escapedName = "\""+ boost::algorithm::replace_all_copy(place.getName(), "\"", "\\\"") + "\"";
+
+		default:
+			escapedName = place.getName();
+		}
 		map.insert(
 			prefix + FIELDS[0].name,
 			ObjectField<void, string>::Serialize(
-				place.getName(),
+				escapedName,
 				map.getFormat()
 		)	);
 
