@@ -16,6 +16,12 @@
     td.different a {
       text-decoration: underline;
     }
+    td.category {
+      font-weight: bold;
+      font-size: 150%;
+      padding-left: 5em;
+      background-color: lightGray !important;
+    }
     .running {
       color: green;
     }
@@ -118,7 +124,7 @@ todo
       <table class="table table-bordered table-striped">
         <thead>
           <tr>
-            <th>Path</th>
+            <th>Label</th>
             <th>Site</th>
             <th>Links</th>
             <th>Results</th>
@@ -126,33 +132,40 @@ todo
           </tr>
         </thead>
         <tbody>
-
           {% for url in project.urls %}
-          <tr>
-            <td>{{ url.path }}</td>
-            <td>{{ url.site_name }}</td>
-            <td>
-              <a href="{{ url.ref_url }}" target=ref>reference url</a> /
-              <a href="{{ url.test_url }}" target=test>test url</a>
-            </td>
-            <td>
-              <a href="{{ url.get_result_url('ref') }}" target=ref>reference result</a> /
-              <a href="{{ url.get_result_url('test') }}" target=test>test result</a>
-            </td>
-            {% if url.result_status == None %}
-              <td>N/A</td>
-            {% elif url.result_status == True %}
-            <td class="same">
-              Same
-            </td>
+            <tr>
+            {% if url.kind == 'category' %}
+              <td colspan=5 class="category">{{ url.label }}</td>
             {% else %}
-            <td class="different">
-              <a href="{{ url.get_result_url('diff') }}" target=diff>Different</a>
-            </td>
+              <td>{{ url.label if url.label else url.path }}</td>
+              <td>{{ url.site_name }}</td>
+              <td>
+                <a href="{{ url.ref_url }}" target=ref>ref url</a> /
+                <a href="{{ url.test_url }}" target=test>test url</a> / 
+                <a href="http://localhost/{{ url.path }}" target=lo>local</a> / 
+                <a href="{{ url.localhost_url }}" target=lo>local+port</a>
+              </td>
+              {% if url.result_status == None %}
+                <td>N/A</td>
+                <td>N/A</td>
+              {% else %}
+                <td>
+                  <a href="{{ url.get_result_url('ref') }}" target=ref>ref result</a> /
+                  <a href="{{ url.get_result_url('test') }}" target=test>test result</a>
+                </td>
+                {% if url.result_status == True %}
+                  <td class="same">
+                    Same
+                  </td>
+                {% else %}
+                  <td class="different">
+                    <a href="{{ url.get_result_url('diff') }}" target=diff>Different</a>
+                  </td>
+                {% endif %}
+              {% endif %}
             {% endif %}
-          </tr>
+            </tr>
           {% endfor %}
-
         </tbody>
       </table>
   </div>
