@@ -149,7 +149,7 @@ namespace synthese
 
 		// Name
 		string escapedName;
-		switch(format)
+		switch(map.getFormat())
 		{
 		case util::ParametersMap::FORMAT_SQL:
 			escapedName = "\""+ boost::algorithm::replace_all_copy(place.getName(), "\"", "\\\"") + "\"";
