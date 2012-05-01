@@ -76,7 +76,7 @@ namespace synthese
 			case util::ParametersMap::FORMAT_SQL:
 				return fieldObject.is_not_a_date() ?
 					"NULL" :
-					"\""+ boost::gregorian::to_iso_extended_string(fieldObject) +"\"";
+					"'"+ boost::gregorian::to_iso_extended_string(fieldObject) +"'";
 
 			default:
 				return fieldObject.is_not_a_date() ?
@@ -123,7 +123,7 @@ namespace synthese
 			case util::ParametersMap::FORMAT_SQL:
 				return fieldObject.is_not_a_date_time() ?
 					"NULL" :
-					"\""+ boost::gregorian::to_iso_extended_string(fieldObject.date()) +" "+ boost::posix_time::to_simple_string(fieldObject.time_of_day()) +"\"";
+					"'"+ boost::gregorian::to_iso_extended_string(fieldObject.date()) +" "+ boost::posix_time::to_simple_string(fieldObject.time_of_day()) +"'";
 
 			default:
 				return fieldObject.is_not_a_date_time() ?
@@ -212,7 +212,7 @@ namespace synthese
 			switch(format)
 			{
 			case util::ParametersMap::FORMAT_SQL:
-				return "\""+ boost::algorithm::replace_all_copy(fieldObject, "\"", "\\\"") + "\"";
+				return "'"+ boost::algorithm::replace_all_copy(fieldObject, "'", "''") + "'";
 
 			default:
 				return fieldObject;
@@ -733,7 +733,7 @@ namespace synthese
 			std::stringstream s;
 			if(format == util::ParametersMap::FORMAT_SQL)
 			{
-				s << "\"";
+				s << "'";
 			}
 			bool first(true);
 			BOOST_FOREACH(P* ptr, fieldObject)
@@ -750,7 +750,7 @@ namespace synthese
 			}
 			if(format == util::ParametersMap::FORMAT_SQL)
 			{
-				s << "\"";
+				s << "'";
 			}
 			return s.str();
 		}

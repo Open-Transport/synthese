@@ -239,7 +239,7 @@ namespace synthese
 		stringstream s;
 		if(format == ParametersMap::FORMAT_SQL)
 		{
-			s << "\"";
+			s << "'";
 		}
 		bool first(true);
 		BOOST_FOREACH(const Importable::DataSourceLinks::value_type& it, fieldObject)
@@ -258,17 +258,17 @@ namespace synthese
 				s << it.first->getKey();
 				if(!it.second.empty())
 				{
-					s << Importable::FIELDS_SEPARATOR << it.second;
+					s << Importable::FIELDS_SEPARATOR << boost::algorithm::replace_all_copy(it.second, "'", "''");
 				}
 			}
 			else
 			{
-				s << it.second;
+				s << boost::algorithm::replace_all_copy(it.second, "'", "''");
 			}
 		}
 		if(format == ParametersMap::FORMAT_SQL)
 		{
-			s << "\"";
+			s << "'";
 		}
 		return s.str();
 	}
