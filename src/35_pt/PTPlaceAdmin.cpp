@@ -51,6 +51,7 @@
 #include "PublicPlaceTableSync.h"
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
+#include "RoadPlaceTableSync.h"
 #include "StandardFields.hpp"
 #include "StaticActionRequest.h"
 #include "StopArea.hpp"
@@ -169,6 +170,59 @@ namespace synthese
 					shared_ptr<Point> mapCenter(_connectionPlace->getPoint());
 
 					// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+					if(!mapCenter.get() || mapCenter->isEmpty())
+					{
+						// Last created stop in the city
+						if(_connectionPlace->getCity())
+						{
+							Env newEnv;
+							StopAreaTableSync::SearchResult stops(
+								StopAreaTableSync::Search(
+									newEnv,
+									_connectionPlace->getCity()->getKey()
+							)	);
+							const Registry<StopArea>& registry(newEnv.getRegistry<StopArea>());
+							BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
+							{
+								shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
+								if(envStopArea->getPoint() && !envStopArea->getPoint()->isEmpty())
+								{
+									mapCenter = envStopArea->getPoint();
+									break;
+								}
+							}
+						}
+					}
+
+					// Envelope defined by the roads of the city
+					if(!mapCenter.get() || mapCenter->isEmpty())
+					{
+						if(_connectionPlace->getCity())
+						{
+							RoadPlaceTableSync::SearchResult roads(
+								RoadPlaceTableSync::Search(
+									Env::GetOfficialEnv(),
+									_connectionPlace->getCity()->getKey()
+							)	);
+							const Registry<RoadPlace>& registry(Env::GetOfficialEnv().getRegistry<RoadPlace>());
+							Envelope e;
+							BOOST_FOREACH(Registry<RoadPlace>::value_type roadPlace, registry)
+							{
+								if(roadPlace.second->getPoint() && !roadPlace.second->getPoint()->isEmpty())
+								{
+									e.expandToInclude(*roadPlace.second->getPoint()->getCoordinate());
+								}
+							}
+							if(e.getArea() > 0)
+							{
+								Coordinate c;
+								e.centre(c);
+								mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(c.x, c.y);
+							}
+						}
+					}
+					
+					// Last created stop in the database
 					if(!mapCenter.get() || mapCenter->isEmpty())
 					{
 						const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
@@ -717,9 +771,11 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << f.getTextInputAutoCompleteFromService(
 					PlaceAliasUpdateAction::PARAMETER_CITY_ID,
-					_connectionPlace->getCity() ?
-						lexical_cast<string>(_connectionPlace->getCity()->getKey()) :
-						RegistryKeyType(0),
+					lexical_cast<string>(
+						_connectionPlace->getCity() ?
+						_connectionPlace->getCity()->getKey() :
+						RegistryKeyType(0)
+					),
 					_connectionPlace->getCity() ?
 						_connectionPlace->getCity()->getName() :
 						string(),

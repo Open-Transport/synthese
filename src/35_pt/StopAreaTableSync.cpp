@@ -25,7 +25,6 @@
 #include "StopAreaTableSync.hpp"
 
 #include "ReplaceQuery.h"
-#include "LinkException.h"
 #include "CityTableSync.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
@@ -176,14 +175,19 @@ namespace synthese
 
 				// City
 				cp->setCity(NULL);
-				util::RegistryKeyType cityId (rows->getLongLong (StopAreaTableSync::TABLE_COL_CITYID));
+				RegistryKeyType cityId(
+					rows->getLongLong(StopAreaTableSync::TABLE_COL_CITYID)
+				);
 				try
 				{
-					cp->setCity(CityTableSync::Get(cityId, env, linkLevel).get());
+					shared_ptr<City> city(
+						CityTableSync::GetEditable(cityId, env, linkLevel)
+					);
+					cp->setCity(const_cast<City*>(city.get()));
 
-					shared_ptr<City> city = CityTableSync::GetEditable (cp->getCity ()->getKey (), env, linkLevel);
-
-					bool isCityMainConnection (	rows->getBool (StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION));
+					bool isCityMainConnection(
+						rows->getBool(StopAreaTableSync::TABLE_COL_ISCITYMAINCONNECTION)
+					);
 					if (isCityMainConnection)
 					{
 						city->addIncludedPlace(*cp);
@@ -194,9 +198,9 @@ namespace synthese
 					}
 					city->addPlaceToMatcher(env.getEditableSPtr(cp));
 				}
-				catch(ObjectNotFoundException<City>& e)
+				catch(ObjectNotFoundException<City>&)
 				{
-					throw LinkException<StopAreaTableSync>(rows, StopAreaTableSync::TABLE_COL_CITYID, e);
+					Log::GetInstance().warn("Bad value " + lexical_cast<string>(cityId) + " for city in stop area " + lexical_cast<string>(cp->getKey()));
 				}
 
 				// Handicapped compliance
@@ -216,8 +220,9 @@ namespace synthese
 				}	}
 				cp->setRules(rules);
 
-			// Registration to all places matcher
+				// Registration to all places matcher
 				if(	&env == &Env::GetOfficialEnv() &&
+					cp->getCity() &&
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				){
 					GeographyModule::GetGeneralAllPlacesMatcher().add(
@@ -227,7 +232,8 @@ namespace synthese
 				}
 
 				// Registration to road places matcher
-				if(&env == &Env::GetOfficialEnv() &&
+				if(	&env == &Env::GetOfficialEnv() &&
+					cp->getCity() &&
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				){
 					PTModule::GetGeneralStopsMatcher().add(
