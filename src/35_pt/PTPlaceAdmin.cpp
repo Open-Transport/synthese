@@ -266,9 +266,11 @@ namespace synthese
 					}
 					stream << t.cell("Localité", t.getForm().getTextInputAutoCompleteFromService(
 							StopAreaUpdateAction::PARAMETER_CITY_ID,
-							_connectionPlace->getCity() ?
-								lexical_cast<string>(_connectionPlace->getCity()->getKey()) :
-								RegistryKeyType(0),
+							lexical_cast<string>(
+								_connectionPlace->getCity() ?
+								_connectionPlace->getCity()->getKey() :
+								RegistryKeyType(0)
+							),
 							_connectionPlace->getCity() ?
 								_connectionPlace->getCity()->getName() :
 								string(),
