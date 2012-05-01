@@ -159,10 +159,9 @@ namespace synthese
 		}
 		map.insert(
 			prefix + FIELDS[0].name,
-			ObjectField<void, string>::Serialize(
-				escapedName,
-				map.getFormat()
-		)	);
+			escapedName,
+			map.getFormat()
+		);
 
 		// City id
 		map.insert(
