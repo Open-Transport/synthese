@@ -159,8 +159,7 @@ namespace synthese
 		}
 		map.insert(
 			prefix + FIELDS[0].name,
-			escapedName,
-			map.getFormat()
+			escapedName
 		);
 
 		// City id
