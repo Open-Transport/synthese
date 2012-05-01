@@ -58,12 +58,21 @@ name_to_project = {}
 
 
 class Url(object):
-    def __init__(self, project, path):
+    def __init__(self, project, data):
+        self.kind = 'url'
         self.project = project
         self.result = None
         self.same = None
         self._diff_name = None
         self._site_to_id = None
+
+        self.label = None
+        path = data
+        if isinstance(data, (list, tuple)):
+            self.label, path = data
+        if path.startswith('**'):
+            self.kind = 'category'
+            self.label = path[2:]
         self.path = self._convert_path(path)
 
     def __repr__(self):
@@ -110,6 +119,10 @@ class Url(object):
     def test_url(self):
         return 'http://' + self.project.test_host + self.path
 
+    @property
+    def localhost_url(self):
+        return 'http://' + self.project.localhost_host + self.path
+        
     @property
     def result_status(self):
         return self.project.result.get_result_status(self)
@@ -210,6 +223,7 @@ class Project(object):
             self.reference_host = conf['reference_host_template'].format(
                 project_name=self.name)
         self.test_host = self.test_host.format(local_domain=socket.gethostname())
+        self.localhost_host = self.test_host.format(local_domain='localhost')
         if not self.svn_project_name:
             self.svn_project_name = self.name
         if not self.svn_url:
@@ -298,6 +312,8 @@ class Project(object):
         self.result.start_time = time.time()
 
         for url in self.urls:
+            if url.kind != 'url':
+                continue
             self._compare_urls(url)
 
         self.result.end_time = time.time()
