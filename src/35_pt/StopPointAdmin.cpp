@@ -44,6 +44,7 @@
 #include "PTModule.h"
 #include "PTPlaceAdmin.h"
 #include "PTRuleUserAdmin.hpp"
+#include "RoadPlaceTableSync.h"
 #include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
@@ -61,15 +62,15 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace db;
-	using namespace html;
-	using namespace server;
-	using namespace util;
-	using namespace security;
-	using namespace pt;
-	using namespace impex;
 	using namespace geography;
 	using namespace graph;
-
+	using namespace html;
+	using namespace impex;
+	using namespace pt;
+	using namespace road;
+	using namespace security;
+	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -143,6 +144,60 @@ namespace synthese
 				stream << "<h1>Carte</h1>";
 
 				shared_ptr<Point> mapCenter(_stop->getConnectionPlace()->getPoint());
+
+				// If the place does not contain any point, it has no coordinate : search the last created place with coordinates
+				if(!mapCenter.get() || mapCenter->isEmpty())
+				{
+					// Last created stop in the city
+					if(_stop->getConnectionPlace()->getCity())
+					{
+						Env newEnv;
+						StopAreaTableSync::SearchResult stops(
+							StopAreaTableSync::Search(
+								newEnv,
+								_stop->getConnectionPlace()->getCity()->getKey()
+						)	);
+						const Registry<StopArea>& registry(newEnv.getRegistry<StopArea>());
+						BOOST_REVERSE_FOREACH(Registry<StopArea>::value_type stopArea, registry)
+						{
+							shared_ptr<const StopArea> envStopArea(Env::GetOfficialEnv().get<StopArea>(stopArea.first));
+							if(envStopArea->getPoint() && !envStopArea->getPoint()->isEmpty())
+							{
+								mapCenter = envStopArea->getPoint();
+								break;
+							}
+						}
+					}
+				}
+
+				// Envelope defined by the roads of the city
+				if(!mapCenter.get() || mapCenter->isEmpty())
+				{
+					if(_stop->getConnectionPlace()->getCity())
+					{
+						RoadPlaceTableSync::SearchResult roads(
+							RoadPlaceTableSync::Search(
+								Env::GetOfficialEnv(),
+								_stop->getConnectionPlace()->getCity()->getKey()
+						)	);
+						const Registry<RoadPlace>& registry(Env::GetOfficialEnv().getRegistry<RoadPlace>());
+						Envelope e;
+						BOOST_FOREACH(Registry<RoadPlace>::value_type roadPlace, registry)
+						{
+							if(roadPlace.second->getPoint() && !roadPlace.second->getPoint()->isEmpty())
+							{
+								e.expandToInclude(*roadPlace.second->getPoint()->getCoordinate());
+							}
+						}
+						if(e.getArea() > 0)
+						{
+							Coordinate c;
+							e.centre(c);
+							mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(c.x, c.y);
+						}
+					}
+				}
+
 				if(!mapCenter.get() || mapCenter->isEmpty()) // If the place does not contain any point, it has no coordinate : search the last created place with coordinates
 				{
 					const Registry<StopArea>& registry(Env::GetOfficialEnv().getRegistry<StopArea>());
