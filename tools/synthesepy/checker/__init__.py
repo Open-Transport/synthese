@@ -418,7 +418,7 @@ def index():
 
 @app.route('/config')
 def config():
-    config = open(conf['conf_path'], 'rb').read()
+    config = unicode(open(conf['conf_path'], 'rb').read(), "utf-8")
 
     return render_template('config.html', config=config)
 
@@ -426,7 +426,10 @@ def config():
 def config_update():
     config = request.form.get('config')
 
-    open(conf['conf_path'], 'wb').write(config)
+    if not config:
+        abort(500)
+
+    open(conf['conf_path'], 'wb').write(config.encode("utf-8"))
 
     flash("Config updated")
     return redirect(url_for('config'))
