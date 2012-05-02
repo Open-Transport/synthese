@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Synthese Dashboard</title>
+    <link rel=icon href="{{ url_for('.static', filename='img/icon.png') }}" type="image/png">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Sylvain Pasche">
+
+    <link href="{{ url_for('.static_core', filename='core/vendor/bootstrap/css/bootstrap.css') }}" rel="stylesheet">
+
+    <style>
+    body {
+      padding-top: 40px;
+    }
+    .navbar-fixed-top .container {
+      min-height: 40px;
+    }
+    .navbar-fixed-top select {
+      width: 150px;
+    }
+    .selected {
+      background-color: lime;
+    }
+    #frameContainer {
+      position: absolute;
+      top: 110px;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      border-top: 1px solid black;
+      overflow: hidden;
+    }
+    iframe {
+      border: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+    </style>
+
+    {% if initial_state %}
+    <script>
+      window.initialState = JSON.parse('{{ initial_state|safe }}');
+    </script>
+    {% endif %}
+
+    <script src="{{ url_for('.static_core', filename='core/vendor/jquery-1.7.1.min.js') }}"></script>
+    <script src="{{ url_for('.static', filename='vendor/underscore.js') }}"></script>
+    {#<script src="{{ url_for('.static', filename='vendor/knockout-2.0.0.js') }}"></script>#}
+    <script src="{{ url_for('.static', filename='vendor/knockout-2.0.0.debug.js') }}"></script>
+    <script src="{{ url_for('.static', filename='vendor/jsuri-1.1.1.js') }}"></script>
+
+    <script>
+      {{ config|safe }}
+    </script>
+
+    <script src="{{ url_for('.static', filename='js/dashboard.js') }}"></script>
+  </head>
+  <body>
+
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <form class="navbar-search pull-left" action="">
+            Project
+            <select name="projects" autofocus tabindex=2
+              data-bind="options: projects, optionsCaption: 'Select a project...',
+                         optionsText: 'name', value: activeProject"
+              >
+            </select>
+
+            Server
+            <select id=servers name="servers" tabindex=3
+              data-bind="options: activeServers, optionsCaption: 'Select a server...',
+                         optionsText: 'name', value: activeServer"
+              >
+            </select>
+
+            Link
+            <select id=servers name="servers" tabindex=4
+              data-bind="options: activeLinks, optionsCaption: 'Select a link...',
+                         optionsText: 'name', value: activeLink, event: { change: linkOptionsChanged }"
+              >
+            </select>
+
+            <input type=submit>
+          </form>
+
+          <ul class="nav pull-right" data-bind="if: activeLink">
+            <li><a href="#" data-bind="click: removeFrame">Remove frame</a></li>
+            <li><a href="#" data-bind="attr: {href: activeLink().url()}">frame link</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- ko if: activeLink() -->
+    <div style="border: thin blue solid; padding: 5px;" data-bind="with: activeLink()">
+
+      <div>
+        <input type=text data-bind="value: url(), valueUpdate: 'afterkeydown', event: {change: onURLChange }" style="width: 80%;">
+        <button data-bind="visible: typedURL(), click: function() { typedURL(null) }">reset</button>
+      </div>
+
+      <div>
+        URL infos:<span data-bind="if: note">note: <span data-bind="text: note"></span></span>
+      </div>
+
+    </div>
+    <!-- /ko -->
+
+    <div id="frameContainer" data-bind="if: activeLink(), visible: activeLink()">
+      <iframe data-bind="attr: {src: activeLink().url()}"></iframe>
+    </div>
+
+    <div class="container" data-bind="visible: !activeLink()">
+
+      <section data-bind="foreach: projects">
+        <div class="page-header" data-bind="attr: { name: $data.name }">
+          <h1 data-bind="text: name, css: { selected: $data == $root.activeProject() }"></h1>
+        </div>
+
+        <div data-bind="foreach: servers">
+          <h2 class=offset1 data-bind="text: name,
+                css: { selected: $data == $root.activeServer() }"></h2>
+
+          <div class=offset2>
+            <ul class="nav nav-pills" data-bind="foreach: links">
+              <li data-bind="css: { active: $data == $root.activeLink() }">
+                <a data-bind="text: name,
+                   attr: {href: url()},
+                   click: $root.selectLink" href=#></a></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+    </div>
+  </body>
+</html>
