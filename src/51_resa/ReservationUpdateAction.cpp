@@ -35,6 +35,7 @@
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
+#include "UserTableSync.h"
 #include "VehiclePosition.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "ReservationTransaction.h"
@@ -69,6 +70,8 @@ namespace synthese
 		const string ReservationUpdateAction::PARAMETER_REAL_ARRIVAL_TIME(Action_PARAMETER_PREFIX + "ra");
 		const string ReservationUpdateAction::PARAMETER_CANCELLED_BY_OPERATOR(Action_PARAMETER_PREFIX + "co");
 		const string ReservationUpdateAction::PARAMETER_DEPARTURE_METER_OFFSET(Action_PARAMETER_PREFIX + "dm");
+		const string ReservationUpdateAction::PARAMETER_ACKNOWLEDGE_TIME = Action_PARAMETER_PREFIX + "_acknowledge_time";
+		const string ReservationUpdateAction::PARAMETER_ACKNOWLEDGE_USER_ID = Action_PARAMETER_PREFIX + "_acknowledge_user_id";
 		const string ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET(Action_PARAMETER_PREFIX + "am");
 
 
@@ -160,6 +163,24 @@ namespace synthese
 				}
 			}
 
+			if(map.isDefined(PARAMETER_ACKNOWLEDGE_TIME))
+			{
+				_acknowledgeTime = time_from_string(map.get<string>(PARAMETER_ACKNOWLEDGE_TIME));
+			}
+
+			if(map.isDefined(PARAMETER_ACKNOWLEDGE_USER_ID))
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_ACKNOWLEDGE_USER_ID));
+				if(id > 0)
+				{
+					_acknowledgeUser = UserTableSync::GetEditable(id, *_env);
+				}
+				else
+				{
+					_acknowledgeUser = shared_ptr<User>();
+				}
+			}
+
 			if(map.isDefined(PARAMETER_CANCELLED_BY_OPERATOR))
 			{
 				_cancelledByOperator = map.get<bool>(PARAMETER_CANCELLED_BY_OPERATOR);
@@ -225,6 +246,20 @@ namespace synthese
 					_vehicle->get() ? (*_vehicle)->getName() : "(undefined)"
 				);
 				_reservation->setVehicle(_vehicle->get());
+			}
+
+			if(_acknowledgeUser)
+			{
+				_reservation->setAcknowledgeUser(_acknowledgeUser->get());
+			}
+			if(_acknowledgeTime)
+			{
+				_reservation->setAcknowledgeTime(*_acknowledgeTime);
+			}
+			if(_acknowledgeUser && !_acknowledgeTime)
+			{
+				ptime now(second_clock::local_time());
+				_reservation->setAcknowledgeTime(now);
 			}
 
 			if(_seatNumber && _reservation->getSeatNumber() != *_seatNumber)

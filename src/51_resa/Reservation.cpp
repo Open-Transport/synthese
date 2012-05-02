@@ -64,6 +64,8 @@ namespace synthese
 		const string Reservation::DATA_DEPARTURE_TIME("departure_time");
 		const string Reservation::DATA_ARRIVAL_TIME("arrival_time");
 		const string Reservation::DATA_CANCELLATION_TIME("cancellation_time");
+		const string Reservation::DATA_ACKNOWLEDGE_TIME = "acknowledge_time";
+		const string Reservation::DATA_ACKNOWLEDGE_USER = "acknowledge_user";
 
 
 
@@ -211,6 +213,13 @@ namespace synthese
 			pm.insert(DATA_SERVICE_ID, getServiceId());
 			pm.insert(DATA_DEPARTURE_TIME, getDepartureTime());
 			pm.insert(DATA_ARRIVAL_TIME, getArrivalTime());
+			pm.insert(DATA_ACKNOWLEDGE_TIME, getAcknowledgeTime());
+			if(_acknowledgeUser)
+			{
+				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				_acknowledgeUser->toParametersMap(*userPM);
+				pm.insert(DATA_ACKNOWLEDGE_USER, userPM);
+			}
 			if(!getTransaction()->getCancellationTime().is_not_a_date_time())
 			{
 				pm.insert(DATA_CANCELLATION_TIME, getTransaction()->getCancellationTime());
