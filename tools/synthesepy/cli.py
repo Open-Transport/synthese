@@ -34,6 +34,7 @@ import synthesepy.checker
 import synthesepy.config
 import synthesepy.continuous_integration
 import synthesepy.daemon
+import synthesepy.dashboard
 import synthesepy.db_backends
 import synthesepy.doxygen
 import synthesepy.env
@@ -121,6 +122,10 @@ def package(args, env):
 
 def checker(args, env):
     synthesepy.checker.run(env, args)
+
+
+def dashboard(args, env):
+    synthesepy.dashboard.run(env, args)
 
 
 # End of commands
@@ -357,6 +362,14 @@ def add_default_subparsers(subparsers):
         '--debug', action='store_true',
         help='Run in debug mode')
 
+    parser_dashboard = subparsers.add_parser(
+        'dashboard', aliases=('d',),
+        help='Run the Synthese Dashboard Web server for managing projects')
+    parser_dashboard.set_defaults(func=dashboard)
+    parser_dashboard.add_argument(
+        '--debug', action='store_true',
+        help='Run in debug mode')
+
 
 def main():
 
@@ -378,6 +391,8 @@ def main():
         format='%(asctime)s:%(levelname)s:%(name)s:%(message)s')
 
     config = synthesepy.config.Config()
+    if config_args.config_path:
+        config.config_path = config_args.config_path
 
     config.update_from_files(
         [c for c in config_args.config_names.split(',') if c],
