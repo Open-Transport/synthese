@@ -168,11 +168,8 @@ namespace synthese
 			// Load object linked to the datasource
 			impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendars(_dataSource, _env);
 
-			_file.open(filePath.file_string().c_str());
-			if(!_file)
-			{
-				throw Exception("Could no open the file " + filePath.file_string());
-			}
+			// File opening
+			_openFile(filePath);
 
 			// Record 1.1 Lines number
 			vector<string> lineNumbers(
@@ -613,6 +610,20 @@ namespace synthese
 		bool HastusInterfaceFileFormat::Importer_::_eof() const
 		{
 			return _record && _record->recordNumber == 0;
+		}
+
+
+
+		void HastusInterfaceFileFormat::Importer_::_openFile(
+			const boost::filesystem::path& filePath
+		) const	{
+			_file.clear();
+			_file.open(filePath.file_string().c_str());
+			_record.reset();
+			if(!_file)
+			{
+				throw Exception("Could no open the file " + filePath.file_string());
+			}
 		}
 
 

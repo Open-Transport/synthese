@@ -87,6 +87,9 @@ namespace synthese
 				void _loadNextRecord(
 				) const;
 
+				void _openFile(
+					const boost::filesystem::path& filePath
+				) const;
 
 
 				//////////////////////////////////////////////////////////////////////////
