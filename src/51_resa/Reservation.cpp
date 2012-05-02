@@ -53,6 +53,7 @@ namespace synthese
 		const string Reservation::DATA_DEPARTURE_PLACE_ID("departure_place_id");
 		const string Reservation::DATA_LANGUAGE("language");
 		const string Reservation::DATA_NAME("name");
+		const string Reservation::DATA_PHONE = "phone";
 		const string Reservation::DATA_TRANSACTION_ID("transaction_id");
 		const string Reservation::DATA_SEATS_NUMBER("seats_number");
 		const string Reservation::DATA_VEHICLE_ID("vehicle_id");
@@ -198,6 +199,7 @@ namespace synthese
 
 			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
+			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, getArrivalPlaceName());
 			pm.insert(DATA_DEPARTURE_PLACE_ID, getDeparturePlaceId());
