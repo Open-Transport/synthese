@@ -122,7 +122,7 @@ class Url(object):
     @property
     def localhost_url(self):
         return 'http://' + self.project.localhost_host + self.path
-        
+
     @property
     def result_status(self):
         return self.project.result.get_result_status(self)
@@ -141,7 +141,7 @@ class Result(object):
         pass
 
     def _check_kind(self, kind):
-        assert kind in ('ref', 'test', 'diff', 'diff_space')
+        assert kind in ('ref', 'test', 'diff', 'diff_space', 'rerun')
 
     def _get_path_hash(self, url):
         return hashlib.md5(url.path).hexdigest()
@@ -153,25 +153,37 @@ class Result(object):
         else:
             return join(self.path, path_hash)
 
-    def save_url_result(self, url, ref_result, test_result):
+    def check_url(self, url):
         results_path = self._get_result_path(url)
         utils.maybe_makedirs(results_path)
 
-        def save(result, kind):
+        def save(u, kind):
+            result = None
             content = ''
-            # Make the test result different in case of HTTP error so that
-            # it shows as different.
-            if kind == 'test' and result.status_code != 200:
-                content += 'WARNING: http status is not 200\n'
-            content += 'http status: {0}\n'.format(result.status_code)
-            content += result.content
+            try:
+                result = self.project.requests_session.get(u, prefetch=True)
+            except requests.exceptions.RequestException, e:
+                content += 'Exception while fetching {0}:\n\n{1}\n'.format(u, e)
+            if result:
+                if result.status_code != 200:
+                    content += 'WARNING: http status for {0} is not 200\n'.format(u)
+                content += 'http status: {0}\n'.format(result.status_code)
+                content += result.content
             open(self._get_result_path(url, kind), 'wb').write(content)
+            return content
 
-        save(ref_result, 'ref')
-        save(test_result, 'test')
+        ref_content = save(url.ref_url, 'ref')
+        test_content = save(url.test_url, 'test')
 
         utils.call('diff -u ref test > diff || true', shell=True, cwd=results_path)
-        utils.call('diff -u -EbwB ref test > diff_space || true', shell=True, cwd=results_path)
+        # Diff with options to ignore space doesn't ignore changes spread
+        # accross several lines. Thus, they are compared manually here.
+        utils.call("touch diff_space", shell=True, cwd=results_path)
+        ref_content_nospace = re.sub("\s", "", ref_content)
+        test_content_nospace = re.sub("\s", "", test_content)
+        if ref_content_nospace != test_content_nospace:
+            utils.call('diff -u -EbwB ref test > diff_space || true', shell=True, cwd=results_path)
+
 
     def save(self, urls):
         # todo
@@ -184,7 +196,7 @@ class Result(object):
         """
         'not_avail': not available
         'same': same content
-        'diff_space': differs by space only 
+        'diff_space': differs by space only
         'diff: differs not only by space
         """
 
@@ -208,6 +220,12 @@ class Result(object):
     def get_result_path_from_hash(self, path_hash, kind):
         self._check_kind(kind)
         return join(self.path, path_hash, kind)
+
+    def get_url_from_hash(self, path_hash):
+        for url in self.project.urls:
+            if self._get_path_hash(url) == path_hash:
+                return url
+        return None
 
 
 class Project(object):
@@ -311,19 +329,13 @@ class Project(object):
     def _save_result(self):
         self.result.save(self.urls)
 
-    def _compare_urls(self, url):
-        log.info("Comparing urls: %s", url)
-        ref_result = self.requests_session.get(url.ref_url, prefetch=True)
-        test_result = self.requests_session.get(url.test_url, prefetch=True)
-        self.result.save_url_result(url, ref_result, test_result)
-
     def run_checks(self):
         self.result.start_time = time.time()
 
         for url in self.urls:
             if url.kind != 'url':
                 continue
-            self._compare_urls(url)
+            self.result.check_url(url)
 
         self.result.end_time = time.time()
 
@@ -481,6 +493,21 @@ def project_result(project_name, path_hash, kind):
         open(result_path, 'rb').read())
     response.mimetype =  'text/html' if 'html' in request.values else 'text/plain'
     return response
+
+@app.route('/p/<project_name>/result/<path_hash>/rerun', methods=['POST'])
+def project_result_rerun(project_name, path_hash):
+    project = name_to_project.get(project_name)
+    if not project or not project.synthese_project:
+        abort(404)
+
+    url = project.result.get_url_from_hash(path_hash)
+    if not url:
+        abort(404)
+
+    project.result.check_url(url)
+
+    flash('Result reexecuted')
+    return redirect(url_for('project', project_name=project.name))
 
 def _project_command(project_name, method, message, args=[]):
     project = name_to_project.get(project_name)
