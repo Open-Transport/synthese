@@ -60,6 +60,10 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<User>	Registry;
 
+			static const std::string DATA_NAME;
+			static const std::string DATA_SURNAME;
+			static const std::string DATA_LOGIN;
+
 		private:
 			const Profile*	_profile;
 			std::string		_login;
@@ -138,6 +142,9 @@ namespace synthese
 			//@{
 				void verifyPassword(const std::string& password) const;
 				std::string	getFullName()	const;
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
 	}

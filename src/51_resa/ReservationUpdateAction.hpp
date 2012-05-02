@@ -36,6 +36,11 @@ namespace synthese
 		class Vehicle;
 	}
 
+	namespace security
+	{
+		class User;
+	}
+
 	namespace resa
 	{
 		class Reservation;
@@ -65,6 +70,8 @@ namespace synthese
 			static const std::string PARAMETER_REAL_ARRIVAL_TIME;
 			static const std::string PARAMETER_DEPARTURE_METER_OFFSET;
 			static const std::string PARAMETER_ARRIVAL_METER_OFFSET;
+			static const std::string PARAMETER_ACKNOWLEDGE_TIME;
+			static const std::string PARAMETER_ACKNOWLEDGE_USER_ID;
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
@@ -75,6 +82,8 @@ namespace synthese
 			boost::optional<bool> _cancelledByOperator;
 			boost::optional<pt_operation::VehiclePosition::Meters> _departureMeterOffset;
 			boost::optional<pt_operation::VehiclePosition::Meters> _arrivalMeterOffset;
+			boost::optional<boost::posix_time::ptime> _acknowledgeTime;
+			boost::optional<boost::shared_ptr<security::User> > _acknowledgeUser;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -111,7 +120,6 @@ namespace synthese
 				void setReservation(boost::shared_ptr<Reservation> value) { _reservation = value; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_ReservationUpdateAction_H__

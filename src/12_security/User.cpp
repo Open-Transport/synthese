@@ -56,6 +56,12 @@ namespace synthese
 
 	namespace security
 	{
+		const string User::DATA_LOGIN = "login";
+		const string User::DATA_NAME = "name";
+		const string User::DATA_SURNAME = "surname";
+
+
+
 		User::User(
 			util::RegistryKeyType id
 		):	Registrable(id),
@@ -252,6 +258,15 @@ namespace synthese
 		void User::setRandomPassword()
 		{
 			setPassword(StringUtils::GenerateRandomString(8));
+		}
+
+
+
+		void User::toParametersMap( util::ParametersMap& pm ) const
+		{
+			pm.insert(DATA_NAME, _name);
+			pm.insert(DATA_SURNAME, _surname);
+			pm.insert(DATA_LOGIN, _login);
 		}
 	}
 }
