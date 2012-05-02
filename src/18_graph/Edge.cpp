@@ -201,9 +201,18 @@ namespace synthese
 						if (!servicePointer.getService())
 							continue;
 
-						// Control of validity of departure date time
+						// Check of validity of departure date time
 						if (servicePointer.getDepartureDateTime() > maxDepartureMoment )
+						{
 							return ServicePointer();
+						}
+
+						// Limitation of the continuous service range at the specified bounds
+						if(servicePointer.getDepartureDateTime() + servicePointer.getServiceRange() > maxDepartureMoment)
+						{
+							time_duration toShift(maxDepartureMoment - servicePointer.getArrivalDateTime() - servicePointer.getServiceRange());
+							servicePointer.setServiceRange(servicePointer.getServiceRange() - toShift);
+						}
 
 						// Store the service rank in edge
 						minNextServiceIndex = next;
@@ -274,9 +283,19 @@ namespace synthese
 						if (!servicePointer.getService())
 							continue;
 
-						// Control of validity of departure date time
-						if (servicePointer.getArrivalDateTime() < minArrivalMoment)
+						// Check of validity of departure date time
+						if (servicePointer.getArrivalDateTime() + servicePointer.getServiceRange() < minArrivalMoment)
+						{
 							return ServicePointer();
+						}
+
+						// Limitation of the continuous service range at the specified bounds
+						if(servicePointer.getArrivalDateTime() < minArrivalMoment)
+						{
+							time_duration toShift(minArrivalMoment - servicePointer.getArrivalDateTime());
+							servicePointer.shift(toShift);
+							servicePointer.setServiceRange(servicePointer.getServiceRange() - toShift);
+						}
 
 						// Store service rank in edge
 						maxPreviousServiceIndex = previous;

@@ -251,15 +251,19 @@ namespace synthese
 		void ServicePointer::shift( boost::posix_time::time_duration duration )
 		{
 			if (duration.total_seconds() == 0)
+			{
 				return;
+			}
 
 			if(_departureEdge)
 			{
 				_departureTime += duration;
+				_theoreticalDepartureTime += duration;
 			}
 			if(_arrivalEdge)
 			{
 				_arrivalTime += duration;
+				_theoreticalArrivalTime += duration;
 			}
 			_originDateTime += duration;
 		}

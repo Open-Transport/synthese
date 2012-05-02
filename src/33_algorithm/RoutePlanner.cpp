@@ -130,6 +130,11 @@ namespace synthese
 
 				ptime beginBound(result2.getBeginTime());
 				ptime endBound(result2.getEndTime());
+				if(_planningOrder == ARRIVAL_FIRST)
+				{
+					beginBound += result2.getContinuousServiceRange();
+					endBound += result2.getContinuousServiceRange();
+				}
 				if(	_maxDuration &&
 					result2.getDuration() > _maxDuration
 				){
