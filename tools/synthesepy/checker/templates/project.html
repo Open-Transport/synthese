@@ -133,13 +133,14 @@ todo
             <th>Links</th>
             <th>Results</th>
             <th>Comparison</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for url in project.urls %}
             <tr>
             {% if url.kind == 'category' %}
-              <td colspan=5 class="category">{{ url.label }}</td>
+              <td colspan=6 class="category">{{ url.label }}</td>
             {% else %}
               <td>{{ url.label if url.label else url.path }}</td>
               <td>{{ url.site_name }}</td>
@@ -172,6 +173,11 @@ todo
                   </td>
                 {% endif %}
               {% endif %}
+              <td>
+                <form class="form-inline" action="{{  url.get_result_url('rerun') }}" method=post>
+                  <button type="submit" class="btn btn-mini btn-primary">Rerun</button>
+                </form>
+              </td>
             {% endif %}
             </tr>
           {% endfor %}
