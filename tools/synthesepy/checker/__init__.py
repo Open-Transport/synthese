@@ -141,13 +141,12 @@ class Result(object):
         pass
 
     def _check_kind(self, kind):
-        assert kind in ('ref', 'test', 'diff')
+        assert kind in ('ref', 'test', 'diff', 'diff_space')
 
     def _get_path_hash(self, url):
         return hashlib.md5(url.path).hexdigest()
 
     def _get_result_path(self, url, kind=None):
-
         path_hash = self._get_path_hash(url)
         if kind:
             return join(self.path, path_hash, kind)
@@ -172,6 +171,7 @@ class Result(object):
         save(test_result, 'test')
 
         utils.call('diff -u ref test > diff || true', shell=True, cwd=results_path)
+        utils.call('diff -u -EbwB ref test > diff_space || true', shell=True, cwd=results_path)
 
     def save(self, urls):
         # todo
@@ -182,14 +182,23 @@ class Result(object):
 
     def get_result_status(self, url):
         """
-        None: no result available
-        True: same content
-        False: different content
+        'not_avail': not available
+        'same': same content
+        'diff_space': differs by space only 
+        'diff: differs not only by space
         """
+
+        diff_space_path = self._get_result_path(url, "diff_space")
+        if not os.path.isfile(diff_space_path):
+            return 'not_avail'
+        if os.path.getsize(diff_space_path) > 0:
+            return 'diff'
         diff_path = self._get_result_path(url, "diff")
         if not os.path.isfile(diff_path):
-            return None
-        return os.path.getsize(diff_path) == 0
+            return 'not_avail'
+        if os.path.getsize(diff_path) > 0:
+            return 'diff_space'
+        return 'same'
 
     def get_result_url(self, url, kind):
         self._check_kind(kind)
