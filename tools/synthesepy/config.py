@@ -41,6 +41,8 @@ DEFAULTS = {
     'env_configs': {},
     'env_config_names': '',
     'mysqldump_opts': '--skip-triggers',
+    'conf_dir': None,
+    'dashboard_listen_address': '127.0.0.1',
 
     # bgstart/bgstop
     # One of: supervisor, initd, python, dummy

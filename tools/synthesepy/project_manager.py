@@ -195,7 +195,6 @@ class Package(object):
 class PackagesLoader(object):
     def __init__(self, project):
         self.project = project
-        # XXX does it work with installed packages?
         system_packages_dir = join(project.env.source_path, 'packages')
         self.system_packages = self._load_from_dir(system_packages_dir)
         # _compute_dependencies call here is just for sanity check.
