@@ -52,6 +52,7 @@ namespace synthese
 
 		private:
 			static const std::string ATTR_SESSION_ID;
+			static const std::string TAG_USER;
 			boost::shared_ptr<const cms::Webpage> _cmsTemplate;
 
 		protected:
