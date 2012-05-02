@@ -9,12 +9,16 @@
     td.same {
       background-color: lime !important;
     }
-    td.different, td.different a {
+    td.result_links a {
+      text-decoration: underline;
+    }
+    td.diff_space, td.diff_space a {
+      color: black;
+      background-color: orange !important;
+    }
+    td.diff, td.diff a {
       color: white;
       background-color: red !important;
-    }
-    td.different a {
-      text-decoration: underline;
     }
     td.category {
       font-weight: bold;
@@ -145,7 +149,7 @@ todo
                 <a href="http://localhost/{{ url.path }}" target=lo>local</a> / 
                 <a href="{{ url.localhost_url }}" target=lo>local+port</a>
               </td>
-              {% if url.result_status == None %}
+              {% if url.result_status == 'not_avail' %}
                 <td>N/A</td>
                 <td>N/A</td>
               {% else %}
@@ -153,13 +157,18 @@ todo
                   <a href="{{ url.get_result_url('ref') }}" target=ref>ref result</a> /
                   <a href="{{ url.get_result_url('test') }}" target=test>test result</a>
                 </td>
-                {% if url.result_status == True %}
+                {% if url.result_status == 'same' %}
                   <td class="same">
-                    Same
+                    same
+                  </td>
+                {% elif url.result_status == 'diff_space' %}
+                  <td class="result_links diff_space">
+                    <a href="{{ url.get_result_url('diff') }}" target=diff>diff</a>
                   </td>
                 {% else %}
-                  <td class="different">
-                    <a href="{{ url.get_result_url('diff') }}" target=diff>Different</a>
+                  <td class="result_links diff">
+                    <a href="{{ url.get_result_url('diff') }}" target=diff>diff</a> /
+                    <a href="{{ url.get_result_url('diff_space') }}" target=diff>diff (ignoring space)</a>
                   </td>
                 {% endif %}
               {% endif %}
