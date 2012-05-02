@@ -47,14 +47,14 @@
     <dl>
       <dt>Reference host</dt>
         <dd>{{ project.reference_host }}
-          (<a href=//{{ project.reference_host }}/ target=ref>web</a> -
-           <a href=//{{ project.reference_host }}/admin/ target=ref>admin</a> -
-           <a href=//{{ project.reference_host }}/w/manager/ target=ref>manager</a>)</dd>
+          (<a href="//{{ project.reference_host }}/">web</a> -
+           <a href="//{{ project.reference_host }}/admin/">admin</a> -
+           <a href="//{{ project.reference_host }}/w/manager/">manager</a>)</dd>
       <dt>Reference host</dt>
         <dd>{{ project.test_host }}
-          (<a href=//{{ project.test_host }}/ target=test>web</a> -
-           <a href=//{{ project.test_host }}/admin/ target=test>admin</a> -
-           <a href=//{{ project.test_host }}/w/manager/ target=test>manager</a>)</dd>
+          (<a href="//{{ project.test_host }}/">web</a> -
+           <a href="//{{ project.test_host }}/admin/">admin</a> -
+           <a href="//{{ project.test_host }}/w/manager/">manager</a>)</dd>
     </dl>
 
   </div>
@@ -144,18 +144,18 @@ todo
               <td>{{ url.label if url.label else url.path }}</td>
               <td>{{ url.site_name }}</td>
               <td>
-                <a href="{{ url.ref_url }}" target=ref>ref url</a> /
-                <a href="{{ url.test_url }}" target=test>test url</a> / 
-                <a href="http://localhost/{{ url.path }}" target=lo>local</a> / 
-                <a href="{{ url.localhost_url }}" target=lo>local+port</a>
+                <a href="{{ url.ref_url }}">ref url</a> /
+                <a href="{{ url.test_url }}">test url</a> / 
+                <a href="http://localhost/{{ url.path }}">local</a> / 
+                <a href="{{ url.localhost_url }}">local+port</a>
               </td>
               {% if url.result_status == 'not_avail' %}
                 <td>N/A</td>
                 <td>N/A</td>
               {% else %}
                 <td>
-                  <a href="{{ url.get_result_url('ref') }}" target=ref>ref result</a> /
-                  <a href="{{ url.get_result_url('test') }}" target=test>test result</a>
+                  <a href="{{ url.get_result_url('ref') }}">ref result</a> /
+                  <a href="{{ url.get_result_url('test') }}">test result</a>
                 </td>
                 {% if url.result_status == 'same' %}
                   <td class="same">
@@ -163,12 +163,12 @@ todo
                   </td>
                 {% elif url.result_status == 'diff_space' %}
                   <td class="result_links diff_space">
-                    <a href="{{ url.get_result_url('diff') }}" target=diff>diff</a>
+                    <a href="{{ url.get_result_url('diff') }}">diff</a>
                   </td>
                 {% else %}
                   <td class="result_links diff">
-                    <a href="{{ url.get_result_url('diff') }}" target=diff>diff</a> /
-                    <a href="{{ url.get_result_url('diff_space') }}" target=diff>diff (ignoring space)</a>
+                    <a href="{{ url.get_result_url('diff') }}">diff</a> /
+                    <a href="{{ url.get_result_url('diff_space') }}">diff (ignoring space)</a>
                   </td>
                 {% endif %}
               {% endif %}
