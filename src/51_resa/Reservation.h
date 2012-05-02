@@ -67,6 +67,7 @@ namespace synthese
 		{
 		public:
 			static const std::string DATA_NAME;
+			static const std::string DATA_PHONE;
 			static const std::string DATA_LANGUAGE;
 			static const std::string DATA_DEPARTURE_PLACE_NAME;
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
