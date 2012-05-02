@@ -44,6 +44,7 @@ namespace synthese
 		const string XMLSessionFunction::PARAMETER_CMS_TEMPLATE_ID("ti");
 
 		const string XMLSessionFunction::ATTR_SESSION_ID("session_id");
+		const string XMLSessionFunction::TAG_USER("user");
 
 		ParametersMap XMLSessionFunction::_getParametersMap() const
 		{
@@ -81,7 +82,15 @@ namespace synthese
 			if(_cmsTemplate.get())
 			{
 				if (request.getSession())
+				{
 					pm.insert(ATTR_SESSION_ID, request.getSession()->getKey());
+					if(request.getSession()->getUser())
+					{
+						shared_ptr<ParametersMap> userPM(new ParametersMap);
+						request.getSession()->getUser()->toParametersMap(*userPM);
+						pm.insert(TAG_USER, userPM);
+					}
+				}
 				_cmsTemplate->display(stream, request, pm);
 			}
 			else // XML response
