@@ -213,7 +213,10 @@ namespace synthese
 			pm.insert(DATA_SERVICE_ID, getServiceId());
 			pm.insert(DATA_DEPARTURE_TIME, getDepartureTime());
 			pm.insert(DATA_ARRIVAL_TIME, getArrivalTime());
-			pm.insert(DATA_ACKNOWLEDGE_TIME, getAcknowledgeTime());
+			if(!_acknowledgeTime.is_not_a_date_time())
+			{
+				pm.insert(DATA_ACKNOWLEDGE_TIME, getAcknowledgeTime());
+			}
 			if(_acknowledgeUser)
 			{
 				shared_ptr<ParametersMap> userPM(new ParametersMap);

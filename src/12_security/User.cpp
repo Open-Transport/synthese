@@ -264,6 +264,7 @@ namespace synthese
 
 		void User::toParametersMap( util::ParametersMap& pm ) const
 		{
+			pm.insert("id", getKey());
 			pm.insert(DATA_NAME, _name);
 			pm.insert(DATA_SURNAME, _surname);
 			pm.insert(DATA_LOGIN, _login);
