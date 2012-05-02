@@ -130,7 +130,7 @@ namespace synthese
 				direction == DEPARTURE_TO_ARRIVAL ? getLowestDepartureTime() : getHighestArrivalTime(),
 				direction == DEPARTURE_TO_ARRIVAL ? getHighestDepartureTime() : getLowestArrivalTime(),
 				highestArrivalTime,
-				false,
+				direction == DEPARTURE_TO_ARRIVAL ? false : true,
 				false,
 				_accessParameters.getMaxApproachTime(),
 				_accessParameters.getApproachSpeed(),
