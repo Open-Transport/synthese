@@ -357,18 +357,11 @@ function traiteXmlPublicPlace(pp) {
     'public_place'];
 }
 
-function initStyle() {
-  $("<link>").attr({
-    "rel": "stylesheet",
-    "href": requireJSConfig.baseUrl + "routePlanner/css/legacy/autocomplete.css"
-  }).appendTo($("head"));
-}
-
-function setStyleForElement(c, name) {
+function setClassForElement(c, name) {
   c.className = name;
 }
 
-function getStyleForElement(c) {
+function getClassForElement(c) {
   return c.className;
 }
 
@@ -405,25 +398,12 @@ function setCompleteDivSize(i) {
 }
 
 function creeAutocompletionDiv() {
-  initStyle();
   _completeDiv = document.createElement("DIV");
   _completeDiv.id = "completeDiv";
   var borderLeftRight = 1;
   var borderTopBottom = 1;
-  _completeDiv.style.borderRight = "black " + borderLeftRight + "px solid";
-  _completeDiv.style.borderLeft = "black " + borderLeftRight + "px solid";
-  _completeDiv.style.borderTop = "black " + borderTopBottom + "px solid";
-  _completeDiv.style.borderBottom = "black " + borderTopBottom + "px solid";
-  _completeDiv.style.zIndex = "1";
-  _completeDiv.style.paddingRight = "0";
-  _completeDiv.style.paddingLeft = "0";
-  _completeDiv.style.paddingTop = "0";
-  _completeDiv.style.paddingBottom = "0";
-  _completeDiv.style.display = "none";
-  _completeDiv.style.position = "absolute";
-  _completeDiv.style.backgroundColor = "white";
   document.body.appendChild(_completeDiv);
-  setStyleForElement(_completeDiv, "autoCompleteDivListeStyle");
+  setClassForElement(_completeDiv, "autoCompleteDivListeStyle");
 }
 
 var currentList;
@@ -442,9 +422,9 @@ function drawList(i, valeur, liste) {
       nouveauDiv.onmousedown = divOnMouseDown;
       nouveauDiv.onmouseover = divOnMouseOver;
       nouveauDiv.onmouseout = divOnMouseOut;
-      setStyleForElement(nouveauDiv, "autoCompleteDiv");
+      setClassForElement(nouveauDiv, "autoCompleteDiv");
     } else {
-       setStyleForElement(nouveauDiv, "autoCompleteDivTitle");
+       setClassForElement(nouveauDiv, "autoCompleteDivTitle");
     }
     var nouveauSpan = document.createElement("SPAN");
     nouveauSpan.innerHTML = liste[f][0]; // le texte de la suggestion
@@ -579,11 +559,11 @@ function highlight(n) {
   _highlightedSuggestionDiv = suggestionList.item(_highlightedSuggestionIndex);
   var suggestionLongueur = suggestionList.length;
   for (var l = 0; l < suggestionLongueur; ++l) {
-    if (getStyleForElement(suggestionList.item(l)) != "autoCompleteDivTitle")
-      setStyleForElement(suggestionList.item(l), "autoCompleteDiv");
+    if (getClassForElement(suggestionList.item(l)) != "autoCompleteDivTitle")
+      setClassForElement(suggestionList.item(l), "autoCompleteDiv");
   }
-  if ((_highlightedSuggestionDiv) && (getStyleForElement(_highlightedSuggestionDiv) != "autoCompleteDivTitle"))
-    setStyleForElement(_highlightedSuggestionDiv, "autoCompleteDivAct");
+  if ((_highlightedSuggestionDiv) && (getClassForElement(_highlightedSuggestionDiv) != "autoCompleteDivTitle"))
+    setClassForElement(_highlightedSuggestionDiv, "autoCompleteDivAct");
 }
 
 
@@ -715,7 +695,7 @@ function divOnMouseOver() {
 
 // declenchee quand la sourie quitte une div de possiblite. La div repasse a l'etat normal
 function divOnMouseOut() {
-  setStyleForElement(this, "autoCompleteDiv");
+  setClassForElement(this, "autoCompleteDiv");
 };
 
 
