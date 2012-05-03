@@ -52,13 +52,8 @@ namespace synthese
 			};
 		}
 
-
-
-		std::string FrenchPhoneticString::to_plain_lower_copy(const std::string& text)
+		std::string FrenchPhoneticString::_to_plain_lower_copy_8bit(const std::string& source)
 		{
-			mutex::scoped_lock lock(_IConvMutex);
-
-			string source(_convertTo8bits(text));
 			stringstream result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{
@@ -72,6 +67,12 @@ namespace synthese
 			return result.str();
 		}
 
+		std::string FrenchPhoneticString::to_plain_lower_copy(const std::string& text)
+		{
+			mutex::scoped_lock lock(_IConvMutex);
+			return _to_plain_lower_copy_8bit(_convertTo8bits(text));
+		}
+
 
 
 
@@ -80,8 +81,9 @@ namespace synthese
 			mutex::scoped_lock lock(_IConvMutex);
 
 			_source = ssource;
-
 			string source(_convertTo8bits(ssource));
+			_plainLowerSource = _to_plain_lower_copy_8bit(source);
+
 			PhoneticString result;
 			for(size_t pos(0); pos < source.size(); ++pos)
 			{
