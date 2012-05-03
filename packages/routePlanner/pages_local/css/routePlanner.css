@@ -12,3 +12,35 @@ form .mapLink {
 .placeholder {
   color: #aaa;
 }
+
+/* autocomplete popup */
+#completeDiv .autoCompleteDivListeStyle {
+  font-size: 13px;
+  word-wrap: break-word;
+}
+
+#completeDiv .autoCompleteDiv {
+  display: block;
+  padding-left: 3;
+  padding-right: 3;
+  height: 16px;
+  overflow: hidden;
+  background-color: white;
+  cursor: pointer;
+  text-align: left;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+#completeDiv .autoCompleteDivAct {
+  background-color: #3366cc;
+  color: white !important;
+  cursor: pointer;
+  text-align: left;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+#completeDiv .autoCompleteDivTitle {
+  font-weight: bold;
+}
