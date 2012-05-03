@@ -47,6 +47,7 @@ namespace synthese
 		private:
 			typedef std::vector<FrenchPhoneticString> _Words;
 			std::string		_source;
+			std::string		_lowerSource;
 			_Words			_words;
 
 			static std::string	_ConvertAlias(const std::string& source);
