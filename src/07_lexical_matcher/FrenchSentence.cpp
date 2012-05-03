@@ -188,6 +188,12 @@ namespace synthese
 			Relations othersToThis;
 			Relations thisToOthers;
 
+			vector<string> lowerJ;
+			for(size_t j(0); j<s._words.size(); ++j)
+			{
+				lowerJ.push_back(s._words[j].getPlainLowerSource());
+			}
+
 			// Storage of scores by words
 			for(size_t i(0); i<_words.size(); ++i)
 			{
@@ -195,7 +201,6 @@ namespace synthese
 
 				double bestScore(0);
 				size_t bestIndex = 0;
-				string lowerI = FrenchPhoneticString::to_plain_lower_copy(_words[i].getSource());
 
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
@@ -215,10 +220,9 @@ namespace synthese
 					{
 						score += (1 - score) * score;
 					}
-					string lowerJ = FrenchPhoneticString::to_plain_lower_copy(s._words[j].getSource());
-					if(FrenchPhoneticString::startsWithExact(lowerJ, lowerI))
+					if(FrenchPhoneticString::startsWithExact(lowerJ[j], _words[i].getPlainLowerSource()))
 					{
-						double minScore = 0.1 * lowerJ.size();
+						double minScore = 0.1 * lowerJ[j].size();
 						if(0.9 < minScore)
 							minScore = 0.9;
 						if(score < minScore)
