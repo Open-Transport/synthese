@@ -61,6 +61,7 @@ namespace synthese
 					_words.push_back(phoneticWord);
 				}
 			}
+			_lowerSource = to_lower_copy(source);
 		}
 
 
@@ -267,7 +268,7 @@ namespace synthese
 			if(penalties) totalScores /= penalties;
 
 			ComparisonScore score;
-			score.levenshtein = FrenchPhoneticString::Levenshtein(to_lower_copy(_source), to_lower_copy(s._source));
+			score.levenshtein = FrenchPhoneticString::Levenshtein(_lowerSource, s._lowerSource);
 			score.phoneticScore = totalScores;
 			return score;
 		}
