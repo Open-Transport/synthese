@@ -85,6 +85,7 @@ namespace synthese
 			static std::string C_VOWELS;
 
 			std::string	_source;
+			std::string _plainLowerSource;
 			PhoneticString _phonetic;
 
 			static boost::mutex _IConvMutex;
@@ -94,7 +95,7 @@ namespace synthese
 			static bool _IsPrecededBy(const std::string& source, size_t pos, const std::string& text);
 			static bool _IsAnyOf(const std::string& source, size_t pos, const std::string& chars);
 
-
+			static std::string _to_plain_lower_copy_8bit(const std::string& source);
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Try to convert the given string in UTF-8 to internal 8-bit enconding
@@ -112,6 +113,7 @@ namespace synthese
 			bool startsWith(const FrenchPhoneticString& s) const;
 			void setSource(const std::string& source);
 			const std::string& getSource() const;
+			const std::string& getPlainLowerSource() const { return _plainLowerSource; };
 			const PhoneticString& getPhonetic() const;
 			std::string getPhoneticString() const;
 			static std::string to_plain_lower_copy(const std::string& text);
