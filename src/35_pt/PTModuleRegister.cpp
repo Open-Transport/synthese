@@ -101,6 +101,7 @@
 #include "NonConcurrencyRuleAddAction.h"
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceAddAction.h"
+#include "ServiceVertexUpdateAction.hpp"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopAreaUpdateAction.h"
 #include "StopAreaTransferRemoveAction.hpp"
@@ -270,6 +271,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ServiceTimetableUpdateAction::integrate();
 	synthese::pt::ServiceUpdateAction::integrate();
 	synthese::pt::ServiceVertexRealTimeUpdateAction::integrate();
+	synthese::pt::ServiceVertexUpdateAction::integrate();
 	synthese::pt::StopAreaUpdateAction::integrate();
 	synthese::pt::StopAreaTransferRemoveAction::integrate();
 	synthese::pt::TransportNetworkUpdateAction::integrate();
