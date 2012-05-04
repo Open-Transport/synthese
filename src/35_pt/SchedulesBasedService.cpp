@@ -47,6 +47,7 @@ namespace synthese
 		):
 			NonPermanentService(serviceNumber, path)
 		{
+			clearStops();
 			clearRTData();
 		}
 
