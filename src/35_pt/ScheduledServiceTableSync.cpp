@@ -147,7 +147,7 @@ namespace synthese
 					);
 
 					size_t i(0);
-					BOOST_FOREACH(const const Vertex* vertex, _vertices)
+					BOOST_FOREACH(const Vertex* vertex, _vertices)
 					{
 						ss->setVertex(i, vertex);
 						++i;
