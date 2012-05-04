@@ -159,15 +159,15 @@ class Result(object):
 
         def save(u, kind):
             result = None
-            content = ''
+            content = '<!--'
             try:
                 result = self.project.requests_session.get(u, prefetch=True)
             except requests.exceptions.RequestException, e:
-                content += 'Exception while fetching {0}:\n\n{1}\n'.format(u, e)
+                content += 'Exception while fetching {0}:\n\n{1}\n-->\n'.format(u, e)
             if result:
                 if result.status_code != 200:
                     content += 'WARNING: http status for {0} is not 200\n'.format(u)
-                content += 'http status: {0}\n'.format(result.status_code)
+                content += 'http status: {0}-->'.format(result.status_code)
                 content += result.content
             open(self._get_result_path(url, kind), 'wb').write(content)
             return content
@@ -491,7 +491,9 @@ def project_result(project_name, path_hash, kind):
 
     response = flask.current_app.make_response(
         open(result_path, 'rb').read())
-    response.mimetype =  'text/html' if 'html' in request.values else 'text/plain'
+    response.mimetype =  'text/plain' if kind.startswith('diff') else 'text/html'
+    if 'plain' in request.values:
+        response.mimetype =  'text/plain'
     return response
 
 @app.route('/p/<project_name>/result/<path_hash>/rerun', methods=['POST'])
