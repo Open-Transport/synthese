@@ -83,6 +83,7 @@ namespace synthese
 			Path*					_path;
 
 			boost::posix_time::ptime _nextRTUpdate;
+			ServedVertices	_vertices;		//!< Edges
 			ServedVertices	_RTVertices;	//!< Real time edges
 
 			virtual void _computeNextRTUpdate() = 0;
@@ -234,6 +235,16 @@ namespace synthese
 				const graph::Vertex* getRealTimeVertex(
 					std::size_t rank
 				) const;
+
+
+				const graph::Vertex* getVertex(
+					std::size_t rank
+					) const;
+
+				const ServedVertices& getVertices() const
+				{
+					return _vertices;
+				}
 			//@}
 
 
@@ -250,11 +261,23 @@ namespace synthese
 					const graph::Vertex* value
 				);
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Update a served edge.
+				/// @param rank Rank of the edge to update
+				/// @param value Served edge
+				void setVertex(
+					std::size_t rank,
+					const graph::Vertex* value
+					);
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Restores real time data to theoretical value.
 				/// Sets the next update into the next day.
 				virtual void clearRTData();
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Clears stops data.
+				void clearStops();
 			//@}
 
 

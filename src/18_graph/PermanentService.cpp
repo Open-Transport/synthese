@@ -191,6 +191,7 @@ namespace synthese
 			Service(string(), path),
 			_duration(duration)
 		{
+			clearStops();
 			clearRTData();
 		}
 
