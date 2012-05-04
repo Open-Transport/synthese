@@ -53,6 +53,7 @@
 #include "ScheduleRealTimeUpdateAction.h"
 #include "ServiceTimetableUpdateAction.h"
 #include "ServiceUpdateAction.h"
+#include "ServiceVertexUpdateAction.hpp"
 #include "ServiceVertexRealTimeUpdateAction.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
@@ -179,6 +180,17 @@ namespace synthese
 				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request);
 				timetableUpdateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
 
+				AdminActionFunctionRequest<ServiceVertexUpdateAction,ServiceAdmin> serviceVertexUpdateAction(request);
+				if(_scheduledService.get())
+				{
+					serviceVertexUpdateAction.getPage()->setService(_scheduledService);
+				}
+				else
+				{
+					serviceVertexUpdateAction.getPage()->setService(_continuousService);
+				}
+				serviceVertexUpdateAction.getAction()->setService(const_pointer_cast<ScheduledService>(_scheduledService));
+
 				stream << "<h1>Horaires</h1>";
 
 				HTMLTable::ColsVector vs;
@@ -222,7 +234,38 @@ namespace synthese
 								linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getFullName()
 							);
 						stream << ts.col();
-						stream << linePhysicalStop->getPhysicalStop()->getName();
+
+						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& ps, linePhysicalStop->getPhysicalStop()->getConnectionPlace()->getPhysicalStops())
+						{
+							if(ps.second == _service->getVertex(edge->getRankInPath()))
+							{
+								stream << "[";
+							}
+
+							if(ps.second == linePhysicalStop->getPhysicalStop())
+							{
+								stream << "<b>";
+							}
+
+							serviceVertexUpdateAction.getAction()->setPhysicalStop(Env::GetOfficialEnv().getEditableSPtr(const_cast<StopPoint*>(ps.second)));
+							serviceVertexUpdateAction.getAction()->setLineStopRank(linePhysicalStop->getRankInPath());
+							stream << HTMLModule::getHTMLLink(
+								serviceVertexUpdateAction.getHTMLForm().getURL(),
+								ps.second->getName().empty() ? lexical_cast<string>(ps.second->getKey()) : ps.second->getName()
+								);
+							serviceVertexUpdateAction.getAction()->setPhysicalStop(shared_ptr<StopPoint>());
+
+							if(ps.second == linePhysicalStop->getPhysicalStop())
+							{
+								stream << "</b>";
+							}
+
+							if(ps.second == _service->getVertex(edge->getRankInPath()))
+							{
+								stream << "]";
+							}
+							stream << " ";
+						}
 					}
 					if(lineArea)
 					{
