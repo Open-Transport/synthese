@@ -35,8 +35,11 @@
 #include "ImportableTableSync.hpp"
 #include "CalendarLinkTableSync.hpp"
 #include "CalendarLink.hpp"
+#include "Vertex.h"
+#include "StopPointTableSync.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
@@ -68,7 +71,10 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID ("pedestrian_compliance_id");
 		const string ScheduledServiceTableSync::COL_TEAM("team");
 		const string ScheduledServiceTableSync::COL_DATES("dates");
+		const string ScheduledServiceTableSync::COL_STOPS("stops");
 		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
+
+		const string ScheduledServiceTableSync::STOP_SEPARATOR(",");
 	}
 
 	namespace db
@@ -88,6 +94,7 @@ namespace synthese
 			Field(ScheduledServiceTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			Field(ScheduledServiceTableSync::COL_TEAM, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_STOPS, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
 			Field()
 		};
@@ -128,6 +135,27 @@ namespace synthese
 				if(path->getEdges().empty())
 				{
 					LineStopTableSync::Search(env, pathId);
+				}
+
+				ss->clearStops();
+				// Physical stops
+				try
+				{
+					Service::ServedVertices _vertices = ScheduledServiceTableSync::UnserializeStops(
+						rows->getText(ScheduledServiceTableSync::COL_STOPS)
+						, env
+					);
+
+					size_t i(0);
+					BOOST_FOREACH(const const Vertex* vertex, _vertices)
+					{
+						ss->setVertex(i, vertex);
+						++i;
+					}
+				}
+				catch(synthese::Exception& e)
+				{
+					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_STOPS, e.getMessage());
 				}
 
 				// Use rules
@@ -275,6 +303,7 @@ namespace synthese
 			);
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
+			query.addField(ScheduledServiceTableSync::SerializeStops(object->getVertices()));
 			query.addField(
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks(),
@@ -383,5 +412,60 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+
+
+		std::string ScheduledServiceTableSync::SerializeStops(const Service::ServedVertices& value)
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const Service::ServedVertices::value_type& stop, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << (stop ? lexical_cast<string>(stop->getKey()) : string());
+			}
+			return s.str();
+		}
+
+
+
+		Service::ServedVertices ScheduledServiceTableSync::UnserializeStops(const std::string& value, util::Env& env)
+		{
+			Service::ServedVertices result;
+			if(!value.empty())
+			{
+				vector<string> stops;
+				split(stops, value, is_any_of(","));
+				BOOST_FOREACH(const string& stop, stops)
+				{
+					if(!stop.empty())
+					{
+						try
+						{
+							RegistryKeyType stopId(lexical_cast<RegistryKeyType>(stop));
+							result.push_back(
+								StopPointTableSync::GetEditable(stopId, env).get()
+								);
+						}
+						catch(ObjectNotFoundException<StopPoint>&)
+						{
+
+						}
+					}
+					else
+					{
+						result.push_back(NULL);
+					}
+				}
+			}
+			return result;
 		}
 }	}
