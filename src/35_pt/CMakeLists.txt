@@ -257,6 +257,8 @@ ServiceTimetableUpdateAction.cpp
 ServiceTimetableUpdateAction.h
 ServiceUpdateAction.cpp
 ServiceUpdateAction.h
+ServiceVertexUpdateAction.cpp
+ServiceVertexUpdateAction.hpp
 ServiceVertexRealTimeUpdateAction.cpp
 ServiceVertexRealTimeUpdateAction.h
 SortableLineNumber.cpp
