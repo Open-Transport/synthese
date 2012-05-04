@@ -155,6 +155,7 @@ class Result(object):
 
     def check_url(self, url):
         results_path = self._get_result_path(url)
+        utils.RemoveDirectory(results_path)
         utils.maybe_makedirs(results_path)
 
         def save(u, kind):
