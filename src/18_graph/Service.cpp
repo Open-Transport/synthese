@@ -108,6 +108,7 @@ namespace synthese
 		void Service::setPath( Path* path )
 		{
 			_path = path;
+			clearStops();
 			clearRTData();
 		}
 
@@ -240,17 +241,62 @@ namespace synthese
 
 
 
+		void Service::setVertex( std::size_t rank, const graph::Vertex* value )
+		{
+			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
+			if(value != _path->getEdge(rank)->getFromVertex())
+			{
+				_vertices[rank] = value;
+			}
+			else
+			{
+				_vertices[rank] = NULL;
+			}
+		}
+
+
+
+		const graph::Vertex* Service::getVertex( std::size_t rank ) const
+		{
+			return _vertices[rank];
+		}
+
+
+
 		void Service::clearRTData()
 		{
 			if(getPath())
 			{
 				_RTVertices.clear();
+				size_t i(0);
 				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
 				{
-					_RTVertices.push_back(edge->getFromVertex());
+					if(_vertices[i])
+					{
+						_RTVertices.push_back(_vertices[i]);
+					}
+					else
+					{
+						_RTVertices.push_back(edge->getFromVertex());
+					}
+					++i;
 				}
 			}
 			_computeNextRTUpdate();
+		}
+
+
+
+		void Service::clearStops()
+		{
+			if(getPath())
+			{
+				_vertices.clear();
+				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
+				{
+					_vertices.push_back(NULL);
+				}
+			}
 		}
 
 
