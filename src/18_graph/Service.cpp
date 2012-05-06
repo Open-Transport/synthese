@@ -107,8 +107,12 @@ namespace synthese
 
 		void Service::setPath( Path* path )
 		{
+			if(path && (_path != path))
+			{
+				_path = path;
+				clearStops();
+			}
 			_path = path;
-			clearStops();
 			clearRTData();
 		}
 
@@ -289,9 +293,9 @@ namespace synthese
 
 		void Service::clearStops()
 		{
+			_vertices.clear();
 			if(getPath())
 			{
-				_vertices.clear();
 				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
 				{
 					_vertices.push_back(NULL);
