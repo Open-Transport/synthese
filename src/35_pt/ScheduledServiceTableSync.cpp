@@ -136,27 +136,7 @@ namespace synthese
 				{
 					LineStopTableSync::Search(env, pathId);
 				}
-
 				ss->clearStops();
-				// Physical stops
-				try
-				{
-					Service::ServedVertices _vertices = ScheduledServiceTableSync::UnserializeStops(
-						rows->getText(ScheduledServiceTableSync::COL_STOPS)
-						, env
-					);
-
-					size_t i(0);
-					BOOST_FOREACH(const Vertex* vertex, _vertices)
-					{
-						ss->setVertex(i, vertex);
-						++i;
-					}
-				}
-				catch(synthese::Exception& e)
-				{
-					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_STOPS, e.getMessage());
-				}
 
 				// Use rules
 				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
@@ -248,6 +228,27 @@ namespace synthese
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
 				);
 				ss->updatePathCalendar();
+
+				// Physical stops
+				ss->clearStops();		
+				try
+				{
+					Service::ServedVertices _vertices = ScheduledServiceTableSync::UnserializeStops(
+						rows->getText(ScheduledServiceTableSync::COL_STOPS)
+						, env
+						);
+
+					size_t i(0);
+					BOOST_FOREACH(const Vertex* vertex, _vertices)
+					{
+						ss->setVertex(i, vertex);
+						++i;
+					}
+				}
+				catch(synthese::Exception& e)
+				{
+					throw LoadException<ScheduledServiceTableSync>(rows, ScheduledServiceTableSync::COL_STOPS, e.getMessage());
+				}
 			}
 
 			// Registration in the line
