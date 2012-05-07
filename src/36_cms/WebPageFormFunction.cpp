@@ -46,6 +46,7 @@ namespace synthese
 	namespace cms
 	{
 		const string WebPageFormFunction::PARAMETER_NAME("name");
+		const string WebPageFormFunction::PARAMETER_FORM_ID("form_id");
 		const string WebPageFormFunction::PARAMETER_PAGE_ID("page_id");
 		const string WebPageFormFunction::PARAMETER_SCRIPT("script");
 		const string WebPageFormFunction::PARAMETER_CLASS("class");
@@ -55,6 +56,7 @@ namespace synthese
 		{
 			ParametersMap map;
 			map.insert(PARAMETER_NAME, _name);
+			map.insert(PARAMETER_FORM_ID, _formId);
 			map.insert(PARAMETER_SCRIPT, _script);
 			map.insert(PARAMETER_CLASS, _class);
 			if(_page.get())
@@ -70,6 +72,7 @@ namespace synthese
 		void WebPageFormFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_name = map.get<string>(PARAMETER_NAME);
+			_formId = map.getDefault<string>(PARAMETER_FORM_ID);
 			_script = map.getDefault<string>(PARAMETER_SCRIPT);
 			_class = map.getDefault<string>(PARAMETER_CLASS);
 			_idem = map.getDefault<bool>(PARAMETER_IDEM, false);
@@ -88,6 +91,7 @@ namespace synthese
 			// Additional parameters
 			_parameters = map;
 			_parameters.remove(PARAMETER_NAME);
+			_parameters.remove(PARAMETER_FORM_ID);
 			_parameters.remove(PARAMETER_SCRIPT);
 			_parameters.remove(PARAMETER_CLASS);
 			_parameters.remove(PARAMETER_IDEM);
@@ -109,6 +113,10 @@ namespace synthese
 			if(!_class.empty())
 			{
 				htmlComplement += " class=\""+ _class +"\"";
+			}
+			if(!_formId.empty())
+			{
+				htmlComplement += " id=\""+ _formId +"\"";
 			}
 
 			if(_idem)
