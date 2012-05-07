@@ -73,6 +73,10 @@ namespace synthese
 			{
 				_outputFormat = MimeTypes::XML;
 			}
+			if(_outputFormat == "csv")
+			{
+				_outputFormat = MimeTypes::CSV;
+			}
 		}
 
 
