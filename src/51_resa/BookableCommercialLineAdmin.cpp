@@ -824,9 +824,13 @@ namespace synthese
 
 		bool BookableCommercialLineAdmin::isPageVisibleInTree( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
 		{
+			if(!_line.get())
+			{
+				return false;
+			}
+
 			return
-				!request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL) &&
-				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, string())
+				request.isAuthorized<ResaRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_line->getKey()))
 			;
 		}
 
