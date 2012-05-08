@@ -516,23 +516,29 @@ namespace synthese
 
 			for (RightsOfSameClassMap::const_iterator it = rights.begin(); it != rights.end(); ++it)
 			{
-				if(it->first.empty())
+				if(it->first.empty() || it->first == GLOBAL_PERIMETER)
 				{
 					continue;
 				}
-				if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == TransportNetworkTableSync::TABLE.ID)
+				try
 				{
-					if (it->second->getPublicRightLevel() < neededLevel)
-						forbiddenNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
-					else
-						allowedNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
+					if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == TransportNetworkTableSync::TABLE.ID)
+					{
+						if (it->second->getPublicRightLevel() < neededLevel)
+							forbiddenNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
+						else
+							allowedNetworks.insert(lexical_cast<RegistryKeyType>(it->first));
+					}
+					else if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == CommercialLineTableSync::TABLE.ID)
+					{
+						if (it->second->getPublicRightLevel() < neededLevel)
+							forbiddenLines.insert(lexical_cast<RegistryKeyType>(it->first));
+						else
+							allowedLines.insert(lexical_cast<RegistryKeyType>(it->first));
+					}
 				}
-				else if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == CommercialLineTableSync::TABLE.ID)
+				catch(bad_lexical_cast&)
 				{
-					if (it->second->getPublicRightLevel() < neededLevel)
-						forbiddenLines.insert(lexical_cast<RegistryKeyType>(it->first));
-					else
-						allowedLines.insert(lexical_cast<RegistryKeyType>(it->first));
 				}
 			}
 
