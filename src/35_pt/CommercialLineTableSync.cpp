@@ -516,6 +516,10 @@ namespace synthese
 
 			for (RightsOfSameClassMap::const_iterator it = rights.begin(); it != rights.end(); ++it)
 			{
+				if(it->first.empty())
+				{
+					continue;
+				}
 				if (decodeTableId(lexical_cast<RegistryKeyType>(it->first)) == TransportNetworkTableSync::TABLE.ID)
 				{
 					if (it->second->getPublicRightLevel() < neededLevel)
