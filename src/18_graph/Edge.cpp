@@ -210,7 +210,7 @@ namespace synthese
 						// Limitation of the continuous service range at the specified bounds
 						if(servicePointer.getDepartureDateTime() + servicePointer.getServiceRange() > maxDepartureMoment)
 						{
-							time_duration toShift(maxDepartureMoment - servicePointer.getArrivalDateTime() - servicePointer.getServiceRange());
+							time_duration toShift(servicePointer.getServiceRange() - (maxDepartureMoment - servicePointer.getDepartureDateTime()));
 							servicePointer.setServiceRange(servicePointer.getServiceRange() - toShift);
 						}
 
