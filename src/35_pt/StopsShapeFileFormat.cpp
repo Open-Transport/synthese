@@ -97,6 +97,7 @@ namespace synthese
 		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_DIRECTION("value_forward_direction");
 		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_BACKWARD_DIRECTION("value_backward_direction");
 		const std::string StopsShapeFileFormat::Importer_::PARAMETER_VALUE_FORWARD_BACKWARD_DIRECTION("value_forward_backward_direction");
+		const std::string StopsShapeFileFormat::Importer_::PARAMETER_UPDATE_ONLY("update_only");
 		const std::string StopsShapeFileFormat::Importer_::_FIELD_GEOMETRY("Geometry");
 	}
 
@@ -277,17 +278,34 @@ namespace synthese
 					continue;
 				}
 
-				PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
-					_stopPoints,
-					stopOperatorCode,
-					stopPointName,
-					geometry.get(),
-					*cityForStopAreaAutoGeneration,
-					_stopAreaDefaultTransferDuration,
-					_dataSource,
-					_env,
-					stream
-				);
+				if(_updateOnly)
+				{
+					PTFileFormat::CreateOrUpdateStop(
+						_stopPoints,
+						stopOperatorCode,
+						stopPointName,
+						optional<const graph::RuleUser::Rules&>(),
+						optional<const StopArea*>(),
+						geometry.get(),
+						_dataSource,
+						_env,
+						stream
+					);
+				}
+				else
+				{
+					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
+						_stopPoints,
+						stopOperatorCode,
+						stopPointName,
+						geometry.get(),
+						*cityForStopAreaAutoGeneration,
+						_stopAreaDefaultTransferDuration,
+						_dataSource,
+						_env,
+						stream
+					);
+				}
 			}
 
 			if(request)
@@ -329,6 +347,7 @@ namespace synthese
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, false));
 			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
+			stream << t.cell("Uniquement mise à jour des arrêts existants", t.getForm().getOuiNonRadioInput(PARAMETER_UPDATE_ONLY, _updateOnly));
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier ShapeFile (arrêts)", t.getForm().getTextInput(_getFileParameterName(FILE_SHAPE), _pathsMap[FILE_SHAPE].file_string()));
 			stream << t.title("Paramètres Généraux");
@@ -376,6 +395,7 @@ namespace synthese
 		util::ParametersMap StopsShapeFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
+			map.insert(PARAMETER_UPDATE_ONLY, _updateOnly);
 			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
 			map.insert(PARAMETER_USE_DIRECTION, _useDirection);
 			if(_defaultCity.get())
@@ -421,6 +441,7 @@ namespace synthese
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 
 			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 5));
+			_updateOnly = map.getDefault<bool>(PARAMETER_UPDATE_ONLY, false);
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
 
 			_useDirection = map.getDefault<bool>(PARAMETER_USE_DIRECTION, false);
