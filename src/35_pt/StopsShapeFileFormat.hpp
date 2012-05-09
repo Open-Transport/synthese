@@ -73,6 +73,7 @@ namespace synthese
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
 				static const std::string PARAMETER_USE_DIRECTION;
+				static const std::string PARAMETER_UPDATE_ONLY;
 
 				static const std::string PARAMETER_FIELD_STOP_NAME1;
 				static const std::string PARAMETER_FIELD_STOP_DIRECTION;
@@ -87,6 +88,7 @@ namespace synthese
 			private:
 				//! @name Parameters
 				//@{
+					bool _updateOnly;
 					bool _displayLinkedStops;
 					boost::shared_ptr<const geography::City> _defaultCity;
 					boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
