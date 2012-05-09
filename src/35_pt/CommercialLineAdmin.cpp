@@ -674,6 +674,7 @@ namespace synthese
 			creationRequest.getAction()->setCommercialLine(const_pointer_cast<CommercialLine>(_cline));
 
 			ResultHTMLTable::HeaderVector h;
+			h.push_back(make_pair(string(), ""));
 			h.push_back(make_pair(PARAMETER_SEARCH_NAME, "Nom"));
 			h.push_back(make_pair(string(), "Origne"));
 			h.push_back(make_pair(string(), "Destination"));
@@ -681,7 +682,6 @@ namespace synthese
 			h.push_back(make_pair(string(), "Long."));
 			h.push_back(make_pair(string(), HTMLModule::getHTMLImage("car.png", "Services")));
 			h.push_back(make_pair(string(), "Source"));
-			h.push_back(make_pair(string(), "Actions"));
 			h.push_back(make_pair(string(), "Actions"));
 
 			ActionResultHTMLTable t(
