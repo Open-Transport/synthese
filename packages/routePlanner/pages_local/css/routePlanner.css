@@ -14,6 +14,15 @@ form .mapLink {
 }
 
 /* autocomplete popup */
+#completeDiv {
+  border: 1px solid black;
+  padding: 0;
+  z-index: 1;
+  display: none;
+  position: absolute;
+  background-color: white;
+}
+
 #completeDiv .autoCompleteDivListeStyle {
   font-size: 13px;
   word-wrap: break-word;
