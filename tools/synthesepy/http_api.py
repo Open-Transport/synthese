@@ -159,14 +159,14 @@ class HTTPApi(object):
     # New API using requests module.
     # TODO: migrate above code to use this new API.
 
-    def _get_sid2(self):
+    def get_sid2(self):
         # TODO: handle expired sid's properly.
         if self.sid2:
             return self.sid2
 
         r = self.call_action2('login', {
-            'actionParamlogin': 'root',
-            'actionParampwd': 'root'
+            'actionParamlogin': self.username,
+            'actionParampwd': self.password
         })
         if 'sid' not in r.cookies:
             raise HTTPApiException('Authentication failure')
@@ -175,7 +175,7 @@ class HTTPApi(object):
 
     def call_synthese2(self, params, send_sid=False, use_get=False):
         if send_sid:
-            params['sid'] = self._get_sid2()
+            params['sid'] = self.get_sid2()
 
         # TODO: allow non-localhost?
         url = 'http://localhost:%s/synthese' % self.env.config.port

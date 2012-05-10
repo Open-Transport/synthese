@@ -130,6 +130,7 @@ todo
           <tr>
             <th>Label</th>
             <th>Site</th>
+            <th>Username</th>
             <th>Links</th>
             <th>Results</th>
             <th>Comparison</th>
@@ -144,6 +145,7 @@ todo
             {% else %}
               <td>{{ url.label if url.label else url.path }}</td>
               <td>{{ url.site_name }}</td>
+              <td>{{ url.username or '' }}</td>
               <td>
                 <a href="{{ url.ref_url }}">ref url</a> /
                 <a href="{{ url.test_url }}">test url</a> / 
