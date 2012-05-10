@@ -116,7 +116,7 @@ function XMLParse(text) {
 function initAutoCompleteForm(form, submit) {
   _documentForm = form;
   _submitButton = submit;
-  creeAutocompletionDiv();
+  createAutocompletionDiv();
   cacheResults("", []);
   window.onresize = onResizeHandler;
 }
@@ -397,11 +397,10 @@ function setCompleteDivSize(i) {
   }
 }
 
-function creeAutocompletionDiv() {
+function createAutocompletionDiv() {
   _completeDiv = document.createElement("DIV");
   _completeDiv.id = "completeDiv";
-  var borderLeftRight = 1;
-  var borderTopBottom = 1;
+
   document.body.appendChild(_completeDiv);
   setClassForElement(_completeDiv, "autoCompleteDivListeStyle");
 }
