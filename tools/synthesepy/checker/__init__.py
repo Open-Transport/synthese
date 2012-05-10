@@ -66,6 +66,8 @@ class Url(object):
         self.same = None
         self._diff_name = None
         self._site_to_id = None
+        self.username = None
+        self.password = None
 
         self.label = None
         path = data
@@ -74,7 +76,8 @@ class Url(object):
         if path.startswith('**'):
             self.kind = 'category'
             self.label = path[2:]
-        self.path = self._convert_path(path)
+
+        self._parse_path(path)
 
     def __repr__(self):
         return '<Url %s>' % self.__dict__
@@ -89,8 +92,11 @@ class Url(object):
                 self._site_to_id[site.name] = site.id
         return self._site_to_id.get(site_name)
 
-    def _convert_path(self, path):
-        site_name, path = re.match('(?:\[([^\]]+)\])?(.*)', path).groups()
+    def _parse_path(self, path):
+        username, site_name, path = re.match('(?:<([^>]+)>)?(?:\[([^\]]+)\])?(.*)', path).groups()
+        if username:
+            self.username = username
+            self.password = self.project.passwords.get(username, '')
 
         self.site_name = site_name if site_name else 'N/A'
 
@@ -100,11 +106,13 @@ class Url(object):
         path = path.format(today=today)
 
         if not site_name:
-            return path
+            self.path = path
+            return
 
         site_id = self._get_site_id(site_name)
         if not site_id:
-            return 'Check out project first!'
+            self.path = 'Check out project first!'
+            return
 
         path_only = urlparse.urlparse(path).path
         qs = dict(urlparse.parse_qsl(urlparse.urlparse(path).query))
@@ -114,7 +122,7 @@ class Url(object):
             smart_url=path_only,
         ))
 
-        return '{alias_path}?{qs}'.format(
+        self.path = '{alias_path}?{qs}'.format(
             alias_path=self.project.alias_path, qs=urllib.urlencode(qs))
 
     @property
@@ -159,29 +167,65 @@ class Result(object):
         else:
             return join(self.path, path_hash)
 
-    def check_url(self, url):
+    def check_url(self, url, sid_cache={}):
         results_path = self._get_result_path(url)
         utils.RemoveDirectory(results_path)
         utils.maybe_makedirs(results_path)
 
-        def save(u, kind):
+        def get_sid(url, host, u):
+            key = '{0}:{1}'.format(host, url.username)
+            if key in sid_cache:
+                return sid_cache[key]
+
+            login_url = 'http://' + host + self.project.alias_path
+            r = requests.post(login_url, data={
+                'a': 'login',
+                'actionParamlogin': url.username,
+                'actionParampwd': url.password
+            }, prefetch=True)
+            
+            if 'sid' not in r.cookies:
+                raise Exception('Authentication failure')
+            sid = r.cookies['sid']
+            sid_cache[key] = sid
+            return sid_cache[key]
+
+        def fetch(url, host, u):
+            sid = None
+            if url.username:
+                sid = get_sid(url, host, u)
+                u_parts = urlparse.urlparse(u)
+                qs = dict(urlparse.parse_qsl(u_parts.query))
+                qs['sid'] = sid
+                u_parts = list(u_parts)
+                u_parts[4] = urllib.urlencode(qs)
+                u = urlparse.urlunparse(u_parts)
+
+            return self.project.requests_session.get(u, prefetch=True), sid
+
+        def save(url, host, u, kind):
             result = None
             content = ''
             try:
-                result = self.project.requests_session.get(u, prefetch=True)
-            except requests.exceptions.RequestException, e:
+                result, sid = fetch(url, host, u)
+            except Excetion, e:
                 content = '<pre>Exception while fetching {0}:\n\n{1}\n</pre>\n'.format(u, e)
             if result:
                 content = '<!--'
                 if result.status_code != 200:
                     content += 'WARNING: http status for {0} is not 200\n'.format(u)
                 content += 'http status: {0}-->'.format(result.status_code)
-                content += result.content
+                # The session identifier (sid) might be different, so it is
+                # replaced to something common.
+                c = result.content
+                if sid:
+                    c = c.replace(sid, '__SID__')
+                content += c
             open(self._get_result_path(url, kind), 'wb').write(content)
             return content
 
-        ref_content = save(url.ref_url, 'ref')
-        test_content = save(url.test_url, 'test')
+        ref_content = save(url, url.project.reference_host, url.ref_url, 'ref')
+        test_content = save(url, url.project.test_host, url.test_url, 'test')
 
         utils.call('diff -u ref test > diff || true', shell=True, cwd=results_path)
         # Diff with options to ignore space doesn't ignore changes spread
@@ -249,6 +293,7 @@ class Project(object):
         self.requests_session = requests.session()
         self.alias_path = None
         self.common_project_config = {}
+        self.passwords = {}
 
     def __repr__(self):
         return '<Project %s>' % self.__dict__
@@ -340,10 +385,11 @@ class Project(object):
     def run_checks(self):
         self.result.start_time = time.time()
 
+        sid_cache = {}
         for url in self.urls:
             if url.kind != 'url':
                 continue
-            self.result.check_url(url)
+            self.result.check_url(url, sid_cache)
 
         self.result.end_time = time.time()
 
