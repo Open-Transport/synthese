@@ -112,6 +112,7 @@ if(WIN32)
   
   # To prevent "LINK : fatal error LNK1210: exceeded internal ILK size limit; link with /INCREMENTAL:NO"
   SET(CMAKE_EXE_LINKER_FLAGS_DEBUG "/INCREMENTAL:NO")
+  SET(CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO "/INCREMENTAL:NO")
 
   # iconv
   add_library(iconv STATIC IMPORTED)
