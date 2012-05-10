@@ -20,6 +20,7 @@
 #    Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 import copy
+import datetime
 import hashlib
 import logging
 import os
@@ -89,16 +90,21 @@ class Url(object):
         return self._site_to_id.get(site_name)
 
     def _convert_path(self, path):
-        site_name, path = re.match("(?:\[([^\]]+)\])?(.*)", path).groups()
+        site_name, path = re.match('(?:\[([^\]]+)\])?(.*)', path).groups()
 
-        self.site_name = site_name if site_name else "N/A"
+        self.site_name = site_name if site_name else 'N/A'
+
+        # Variables expansion
+        dt = datetime.datetime
+        today = dt.strftime(dt.today(), '%Y-%m-%d')
+        path = path.format(today=today)
 
         if not site_name:
             return path
 
         site_id = self._get_site_id(site_name)
         if not site_id:
-            return "Check out project first!"
+            return 'Check out project first!'
 
         path_only = urlparse.urlparse(path).path
         qs = dict(urlparse.parse_qsl(urlparse.urlparse(path).query))
@@ -160,12 +166,13 @@ class Result(object):
 
         def save(u, kind):
             result = None
-            content = '<!--'
+            content = ''
             try:
                 result = self.project.requests_session.get(u, prefetch=True)
             except requests.exceptions.RequestException, e:
-                content += 'Exception while fetching {0}:\n\n{1}\n-->\n'.format(u, e)
+                content = '<pre>Exception while fetching {0}:\n\n{1}\n</pre>\n'.format(u, e)
             if result:
+                content = '<!--'
                 if result.status_code != 200:
                     content += 'WARNING: http status for {0} is not 200\n'.format(u)
                 content += 'http status: {0}-->'.format(result.status_code)
@@ -179,12 +186,12 @@ class Result(object):
         utils.call('diff -u ref test > diff || true', shell=True, cwd=results_path)
         # Diff with options to ignore space doesn't ignore changes spread
         # accross several lines. Thus, they are compared manually here.
-        utils.call("touch diff_space", shell=True, cwd=results_path)
-        ref_content_nospace = re.sub("\s", "", ref_content)
-        test_content_nospace = re.sub("\s", "", test_content)
+        utils.call('touch diff_space', shell=True, cwd=results_path)
+        ref_content_nospace = re.sub('\s', '', ref_content)
+        test_content_nospace = re.sub('\s', '', test_content)
         if ref_content_nospace != test_content_nospace:
-            utils.call('diff -u -EbwB ref test > diff_space || true', shell=True, cwd=results_path)
-
+            utils.call('diff -u -EbwB ref test > diff_space || true',
+                shell=True, cwd=results_path)
 
     def save(self, urls):
         # todo
@@ -201,12 +208,12 @@ class Result(object):
         'diff: differs not only by space
         """
 
-        diff_space_path = self._get_result_path(url, "diff_space")
+        diff_space_path = self._get_result_path(url, 'diff_space')
         if not os.path.isfile(diff_space_path):
             return 'not_avail'
         if os.path.getsize(diff_space_path) > 0:
             return 'diff'
-        diff_path = self._get_result_path(url, "diff")
+        diff_path = self._get_result_path(url, 'diff')
         if not os.path.isfile(diff_path):
             return 'not_avail'
         if os.path.getsize(diff_path) > 0:
@@ -369,7 +376,7 @@ def load_conf(env):
                 flash('Error in configuration: %s' % e, 'error')
             except:
                 pass
-            log.warn("Error while reading config: %s", e)
+            log.warn('Error while reading config: %s', e)
     log.debug('Checker config: %s', conf)
 
     for project_config in conf.get('projects', []):
@@ -407,11 +414,11 @@ add_package_static_rule('core')
 
 @app.before_request
 def before_request():
-    if request.endpoint and not request.endpoint.startswith("static"):
+    if request.endpoint and not request.endpoint.startswith('static'):
         load_conf(env)
 
-    if ((request.endpoint and not request.endpoint.startswith("static")) and
-        not request.endpoint == "login" and
+    if ((request.endpoint and not request.endpoint.startswith('static')) and
+        not request.endpoint == 'login' and
         not session.get('logged_in')):
         return redirect(url_for('login'))
 
@@ -440,7 +447,7 @@ def index():
 
 @app.route('/config')
 def config():
-    config = unicode(open(conf['conf_path'], 'rb').read(), "utf-8")
+    config = unicode(open(conf['conf_path'], 'rb').read(), 'utf-8')
 
     return render_template('config.html', config=config)
 
@@ -451,9 +458,9 @@ def config_update():
     if not config:
         abort(500)
 
-    open(conf['conf_path'], 'wb').write(config.encode("utf-8"))
+    open(conf['conf_path'], 'wb').write(config.encode('utf-8'))
 
-    flash("Config updated")
+    flash('Config updated')
     return redirect(url_for('config'))
 
 
