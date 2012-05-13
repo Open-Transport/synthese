@@ -56,6 +56,8 @@ UserPrefPanel.h
 UserPrefPanelTemplate.h
 UsersAdmin.cpp
 UsersAdmin.h
+UsersListService.cpp
+UsersListService.hpp
 UserTableSync.cpp
 UserTableSync.h
 UserUpdateAction.cpp

@@ -24,6 +24,8 @@
 
 #include "12_security/SecurityLog.h"
 
+#include "UsersListService.hpp"
+
 // Registries
 #include "User.h"
 #include "Profile.h"
@@ -61,6 +63,8 @@ void synthese::security::moduleRegister()
 	synthese::security::SecurityRight::integrate();
 
 	synthese::security::SecurityLog::integrate();
+
+	synthese::security::UsersListService::integrate();
 
 	// Registries
 	synthese::util::Env::Integrate<synthese::security::User>();
