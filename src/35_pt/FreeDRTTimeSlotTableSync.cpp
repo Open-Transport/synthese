@@ -123,7 +123,6 @@ namespace synthese
 				{
 					FreeDRTArea* area(FreeDRTAreaTableSync::GetEditable(areaId, env, linkLevel).get());
 					object->setArea(area);
-					area->addService(*object, false);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
 				{
@@ -196,10 +195,18 @@ namespace synthese
 			}
 
 
-			// Registration in the line
-			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
-			{
-				object->getArea()->getLine()->registerService(*object);
+			// Registration in the line and in the path
+			if(	linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
+				object->getArea()
+			){
+				// Registration in the path
+				object->getArea()->addService(*object, false);
+
+				// Registration in the line
+				if(object->getArea()->getLine())
+				{
+					object->getArea()->getLine()->registerService(*object);
+				}
 			}
 		}
 
