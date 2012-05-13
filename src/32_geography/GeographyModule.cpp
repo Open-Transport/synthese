@@ -49,16 +49,20 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<ModuleClass,GeographyModule>::FACTORY_KEY("32_geography");
+		template<> const string FactorableTemplate<ModuleClass, GeographyModule>::FACTORY_KEY = "32_geography";
 	}
 
 	namespace server
 	{
-		template<> const string ModuleClassTemplate<GeographyModule>::NAME("Géographie");
+		template<> const string ModuleClassTemplate<GeographyModule>::NAME = "Géographie";
+
 
 		template<> void ModuleClassTemplate<GeographyModule>::PreInit()
 		{
+			RegisterParameter(GeographyModule::MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME, "1", &GeographyModule::ParameterCallback);
 		}
+
+
 
 		template<> void ModuleClassTemplate<GeographyModule>::Init()
 		{
@@ -82,12 +86,16 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<GeographyModule>::End()
 		{
+			UnregisterParameter(GeographyModule::MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME);
 		}
 	}
 
 
 	namespace geography
 	{
+		const string GeographyModule::MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME = "city_name_before_place_name";
+
+		bool GeographyModule::_cityNameBeforePlaceName = true;
 		GeographyModule::GeneralAllPlacesMatcher GeographyModule::_generalAllPlacesMatcher;
 		GeographyModule::CitiesMatcher GeographyModule::_citiesMatcher;
 		GeographyModule::CitiesMatcher GeographyModule::_citiesT9Matcher;
@@ -142,5 +150,17 @@ namespace synthese
 				result.push_back(it.value);
 			}
 			return result;
+		}
+
+
+
+		void GeographyModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME)
+			{
+				_cityNameBeforePlaceName = !value.empty() && lexical_cast<bool>(value);
+			}
 		}
 }	}
