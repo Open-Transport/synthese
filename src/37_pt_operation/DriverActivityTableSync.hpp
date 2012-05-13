@@ -1,6 +1,6 @@
 
-/** DriverAllocationTableSync class header.
-	@file DriverAllocationTableSync.h
+/** DriverActivityTableSync class header.
+	@file DriverActivityTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,11 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AllocationTableSync_H__
-#define SYNTHESE_AllocationTableSync_H__
+#ifndef SYNTHESE_DriverActivityTableSync_H__
+#define SYNTHESE_DriverActivityTableSync_H__
 
 #include "DBRegistryTableSyncTemplate.hpp"
-#include "DriverAllocation.hpp"
+#include "DriverActivity.hpp"
 
 #include <string>
 #include <iostream>
@@ -39,8 +39,8 @@ namespace synthese
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t085_driver_allocations
-		class DriverAllocationTableSync:
-			public db::DBRegistryTableSyncTemplate<DriverAllocationTableSync, DriverAllocation>
+		class DriverActivityTableSync:
+			public db::DBRegistryTableSyncTemplate<DriverActivityTableSync, DriverActivity>
 		{
 		public:
 			/** Driver allocation search.
@@ -49,8 +49,6 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				boost::gregorian::date date = boost::gregorian::date(boost::gregorian::not_a_date_time),
-				boost::optional<util::RegistryKeyType> driverId = boost::optional<util::RegistryKeyType>(),
 				size_t first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByTime = true,

@@ -29,6 +29,8 @@
 #include "CommercialLineTableSync.h"
 #include "DepotTableSync.hpp"
 #include "DestinationTableSync.hpp"
+#include "DriverActivityTableSync.hpp"
+#include "DriverAllocationTableSync.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "PTDataCleanerFileFormat.hpp"
@@ -194,10 +196,12 @@ namespace synthese
 					bool _addWaybackToJourneyPatternCode;
 				//@}
 
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverActivityTableSync> _activities;
 				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverAllocationTableSync> _driverAllocations;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
@@ -205,7 +209,9 @@ namespace synthese
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
 
 				typedef std::map<std::pair<std::string, boost::gregorian::date>, security::User*> Allocations;
+				typedef std::map<std::pair<security::User*, boost::gregorian::date>, pt_operation::DriverActivity*> Activities;
 				mutable Allocations _allocations;
+				mutable Activities _activityAllocations;
 
 				struct Trip
 				{

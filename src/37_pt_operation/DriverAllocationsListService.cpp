@@ -372,11 +372,20 @@ namespace synthese
 				shared_ptr<ParametersMap> allocPM(new ParametersMap);
 				alloc.toParametersMap(*allocPM);
 
-				BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
+				if(alloc.get<DriverActivity>())
 				{
-					shared_ptr<ParametersMap> servicePM(new ParametersMap);
-					service->toParametersMap(*servicePM);
-					allocPM->insert("service", servicePM);
+					shared_ptr<ParametersMap> activityPM(new ParametersMap);
+					alloc.get<DriverActivity>()->toParametersMap(*activityPM);
+					allocPM->insert("activity", allocPM);
+				}
+				else
+				{
+					BOOST_FOREACH(const DriverService::Vector::Type::value_type& service, alloc.get<DriverService::Vector>())
+					{
+						shared_ptr<ParametersMap> servicePM(new ParametersMap);
+						service->toParametersMap(*servicePM);
+						allocPM->insert("service", servicePM);
+					}
 				}
 
 				map.insert(TAG_ALLOCATION, allocPM);
