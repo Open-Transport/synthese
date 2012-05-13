@@ -272,7 +272,8 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Generates the SQL expression filtering the record to load.
-		boost::shared_ptr<db::SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
+		template<>
+		shared_ptr<SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
 		{
 			// Getting current time
 			ptime now(second_clock::local_time());
