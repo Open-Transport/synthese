@@ -27,6 +27,7 @@
 
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "SQLSingleOperatorExpression.hpp"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
 #include "ImportableTableSync.hpp"
@@ -256,7 +257,8 @@ namespace synthese
 								ValueExpression<int>::Get(0)
 							),
 							ComposedExpression::OP_OR,
-							IsNullExpression::Get(
+							SQLSingleOperatorExpression::Get(
+								SQLSingleOperatorExpression::OP_IS_NULL,
 								FieldExpression::Get(TABLE.NAME, COL_PARENT_ID)
 					)	)	);
 				}

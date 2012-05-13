@@ -29,25 +29,6 @@ namespace synthese
 {
 	namespace db
 	{
-		const string ComposedExpression::OP_AND("AND");
-		const string ComposedExpression::OP_BITAND("&");
-		const string ComposedExpression::OP_BITOR("|");
-		const string ComposedExpression::OP_EQ("=");
-		const string ComposedExpression::OP_INF("<");
-		const string ComposedExpression::OP_INFEQ("<=");
-		const string ComposedExpression::OP_LIKE("LIKE");
-		const string ComposedExpression::OP_OR("OR");
-		const string ComposedExpression::OP_SUP(">");
-		const string ComposedExpression::OP_SUPEQ(">=");
-		const string ComposedExpression::OP_IN("IN");
-		const string ComposedExpression::OP_NOTIN("NOT IN");
-		const string ComposedExpression::OP_DIFF("!=");
-		const string ComposedExpression::OP_ADD("+");
-		const string ComposedExpression::OP_SUB("-");
-		const string ComposedExpression::OP_MUL("*");
-		const string ComposedExpression::OP_DIV("/");
-
-
 		string FieldExpression::toString() const
 		{
 			stringstream s;
@@ -81,62 +62,6 @@ namespace synthese
 		{
 			return shared_ptr<SQLExpression>(
 				static_cast<SQLExpression*>(new SubQueryExpression(subQuery))
-			);
-		}
-
-
-		std::string NotExpression::toString() const
-		{
-			stringstream s;
-			s << "NOT " << _expression->toString();
-			return s.str();
-		}
-
-
-
-		boost::shared_ptr<SQLExpression> NotExpression::Get(
-			shared_ptr<SQLExpression> expression
-		){
-			return boost::shared_ptr<SQLExpression>(
-				static_cast<SQLExpression*>(new NotExpression(expression))
-			);
-		}
-
-
-		std::string ComposedExpression::toString() const
-		{
-			stringstream s;
-			s << "(" << _expr1->toString() << " " << _op << " " << _expr2->toString() << ")";
-			return s.str();
-		}
-
-
-
-		boost::shared_ptr<SQLExpression> ComposedExpression::Get(
-			shared_ptr<SQLExpression> expr1,
-			std::string op,
-			boost::shared_ptr<SQLExpression> expr2
-		){
-			return boost::shared_ptr<SQLExpression>(
-				static_cast<SQLExpression*>(new ComposedExpression(expr1, op, expr2))
-			);
-		}
-
-
-		std::string IsNullExpression::toString() const
-		{
-			stringstream s;
-			s << _expression->toString() << " IS NULL";
-			return s.str();
-		}
-
-
-
-		shared_ptr<SQLExpression> IsNullExpression::Get(
-			shared_ptr<SQLExpression> expression
-		){
-			return boost::shared_ptr<SQLExpression>(
-				static_cast<SQLExpression*>(new IsNullExpression(expression))
 			);
 		}
 

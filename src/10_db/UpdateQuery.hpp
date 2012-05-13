@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_db_UpdateQuery_hpp__
 #define SYNTHESE_db_UpdateQuery_hpp__
 
-#include "SQLExpression.hpp"
+#include "ComposedExpression.hpp"
 
 #include <vector>
 #include <utility>
@@ -36,6 +36,8 @@ namespace synthese
 {
 	namespace db
 	{
+		class DBTransaction;
+
 		/** UpdateQuery class.
 			@ingroup m10
 		*/
