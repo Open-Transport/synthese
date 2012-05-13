@@ -1275,7 +1275,7 @@ namespace synthese
 						chunks.push_back(
 							DriverService::Chunk(
 								ds,
-								lvs.empty() ? NULL : **lvs.begin(),
+								lvs.empty() ? NULL : *lvs.begin(),
 								vsDate,
 								hdeb,
 								hfin,
