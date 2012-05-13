@@ -100,7 +100,7 @@ namespace synthese
 			// Template
 			if(map.isDefined(PARAMETER_PAGE_ID))
 			{
-				_page = FunctionWithSite::getPage(PARAMETER_PAGE_ID);
+				_page = FunctionWithSite<false>::getPage(PARAMETER_PAGE_ID);
 			}
 		}
 
