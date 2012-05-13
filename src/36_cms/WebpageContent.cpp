@@ -88,6 +88,7 @@ namespace synthese
 	namespace cms
 	{
 		const string WebpageContent::PARAMETER_VAR = "VAR";
+		const string WebpageContent::PARAMETER_TEMPLATE = "template";
 		const string WebpageContent::ForeachNode::DATA_RANK = "rank";
 		const string WebpageContent::ForeachNode::DATA_ITEMS_COUNT = "items_count";
 
@@ -223,18 +224,27 @@ namespace synthese
 
 								if(it != end)
 								{
+									// Parsing of the nodes
 									Nodes parameterNodes;
 									it = _parse(parameterNodes, it, end, functionTermination);
 
-									// Storage in template parameters if begins with VAR else in service parameters
-									string parameterNameStr(ParametersMap::Trim(parameterName.str()));
-									if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
+									// Special template parameter
+									if(parameterName.str() == PARAMETER_TEMPLATE)
 									{
-										node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
+										node->inlineTemplate = parameterNodes;
 									}
 									else
 									{
-										node->templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
+										// Storage in template parameters if begins with VAR else in service parameters
+										string parameterNameStr(ParametersMap::Trim(parameterName.str()));
+										if(parameterNameStr.size() < PARAMETER_VAR.size() || parameterNameStr.substr(0, PARAMETER_VAR.size()) != PARAMETER_VAR)
+										{
+											node->serviceParameters.push_back(make_pair(parameterNameStr, parameterNodes));
+										}
+										else
+										{
+											node->templateParameters.push_back(make_pair(parameterNameStr.substr(PARAMETER_VAR.size()), parameterNodes));
+										}
 									}
 
 									if(*(it-1) != '&')
@@ -258,7 +268,7 @@ namespace synthese
 								++it;
 						}	}
 					}
-				} // Shortcut to GetValueFunction
+				} // Variable getter or setter
 				else if(*it == '<' && it+1 != end && *(it+1)=='@' && it+2 != end)
 				{
 					if(currentTextNode.get())
@@ -267,13 +277,45 @@ namespace synthese
 						currentTextNode.reset();
 					}
 
-					stringstream parameter;
-					it = _parseText(parameter, it+2, end, "@>");
-					shared_ptr<ValueNode> valueNode(new ValueNode);
-					valueNode->name = parameter.str();
+					// variable name
+					string parameter;
+					for(it = it+2; it != end && *it != '=' && *it != '@'; ++it)
+					{
+						parameter.push_back(*it);
+					}
 
-					nodes.push_back(static_pointer_cast<Node,ValueNode>(valueNode));
+					// Is it a get or a set ?
+					if(it != end && *it == '=')
+					{
+						// Node creation
+						shared_ptr<VariableUpdateNode> node(new VariableUpdateNode);
+						node->variable = parameter;
 
+						// Termination definition
+						set<string> termination;
+						termination.insert("@>");
+
+						// Load of the value definition
+						it = _parse(node->value, it+1, end, termination);
+
+						// Storage
+						nodes.push_back(static_pointer_cast<Node, VariableUpdateNode>(node));
+					}
+					else
+					{
+						// Node creation
+						shared_ptr<ValueNode> valueNode(new ValueNode);
+						valueNode->name = parameter;
+
+						// Storage
+						nodes.push_back(static_pointer_cast<Node, ValueNode>(valueNode));
+					}
+
+					// Jump over termination sequence
+					if(it != end && *it == '@')
+					{
+						it += 2;
+					}
 				} // Foreach
 				else if(*it == '<' && it+1 != end && *(it+1)=='{' && it+2 != end)
 				{
@@ -319,6 +361,10 @@ namespace synthese
 								if(parameterName.str() == WebPageDisplayFunction::PARAMETER_PAGE_ID)
 								{
 									node->pageCode = parameterNodes;
+								}
+								else if(parameterName.str() == PARAMETER_TEMPLATE)
+								{
+									node->inlineTemplate = parameterNodes;
 								}
 								else
 								{
@@ -503,7 +549,25 @@ namespace synthese
 				function->_setFromParametersMap(serviceParametersMap);
 				if (function->isAuthorized(request.getSession()))
 				{
-					function->run(stream, request);
+					// Run of the service
+					ParametersMap result(
+						function->run(
+							stream,
+							request
+					)	);
+
+					// Display of the result if inline template defined
+					if(!inlineTemplate.empty())
+					{
+						// Merge page parameters in result map
+						result.merge(additionalParametersMap);
+
+						// Display of each inline defined node
+						BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
+						{
+							node->display(stream, request, result, page);
+						}
+					}
 				}
 			}
 			catch(RequestException&)
@@ -549,6 +613,7 @@ namespace synthese
 			const Webpage& page
 		) const	{
 
+			// Variables list (debugging purpose)
 			if(name.empty())
 			{
 				HTMLTable::ColsVector c;
@@ -670,25 +735,29 @@ namespace synthese
 			}
 
 			// Page load
-			stringstream pageCodeStream;
-			BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, pageCode)
+			const Webpage* templatePage(NULL);
+			if(inlineTemplate.empty())
 			{
-				node->display(pageCodeStream, request, additionalParametersMap, page);
-			}
+				stringstream pageCodeStream;
+				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, pageCode)
+				{
+					node->display(pageCodeStream, request, additionalParametersMap, page);
+				}
 
-			string pageCodeStr(pageCodeStream.str());
+				string pageCodeStr(pageCodeStream.str());
 
-			if(pageCodeStr.empty())
-			{
-				return;
-			}
+				if(pageCodeStr.empty())
+				{
+					return;
+				}
 
-			const Webpage* templatePage(
-				page.getRoot()->getPageByIdOrSmartURL(pageCodeStr)
-			);
-			if(!templatePage)
-			{
-				return;
+				const Webpage* templatePage(
+					page.getRoot()->getPageByIdOrSmartURL(pageCodeStr)
+				);
+				if(!templatePage)
+				{
+					return;
+				}
 			}
 
 			// Base parameters map
@@ -718,7 +787,19 @@ namespace synthese
 				pm.insert(DATA_RANK, rank++);
 				pm.insert(DATA_ITEMS_COUNT, itemsCount);
 
-				templatePage->display(stream, request, pm);
+				// Display by a template page
+				if(templatePage)
+				{
+					templatePage->display(stream, request, pm);
+				}
+				else // Display by an inline defined template
+				{
+					// Display of each inline defined node
+					BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
+					{
+						node->display(stream, request, pm, page);
+					}
+				}
 			}
 
 		}
@@ -775,6 +856,29 @@ namespace synthese
 				}
 				++itNode;
 			}
+		}
+
+
+
+		void WebpageContent::VariableUpdateNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const util::ParametersMap& additionalParametersMap,
+			const Webpage& page
+		) const {
+
+			// Evaluation of the value
+			stringstream valueStr;
+			BOOST_FOREACH(const Nodes::value_type& node, value)
+			{
+				node->display(valueStr, request, additionalParametersMap, page);
+			}
+
+			// Storage in the variables map
+			const_cast<ParametersMap&>(additionalParametersMap).insert(
+				variable,
+				valueStr.str()
+			);
 		}
 }	}
 
