@@ -49,6 +49,9 @@ namespace synthese
 		const string WebPageLinkFunction::PARAMETER_TEXT("text");
 		const string WebPageLinkFunction::PARAMETER_USE_SMART_URL("use_smart_url");
 		const string WebPageLinkFunction::PARAMETER_CONFIRM("confirm");
+		const string WebPageLinkFunction::PARAMETER_CLASS = "class";
+
+
 
 		ParametersMap WebPageLinkFunction::_getParametersMap() const
 		{
@@ -80,6 +83,9 @@ namespace synthese
 			_useSmartURL = map.getDefault<bool>(PARAMETER_USE_SMART_URL, true);
 
 			_confirm = map.getDefault<string>(PARAMETER_CONFIRM, string(), false);
+
+			// Class
+			_class = map.getDefault<string>(PARAMETER_CLASS);
 
 			// Additional parameters
 			_parameters = map;
@@ -133,7 +139,7 @@ namespace synthese
 					url += URI::PARAMETER_SEPARATOR + uri.str();
 				}
 			}
-			stream << HTMLModule::getHTMLLink(url, _text, _confirm);
+			stream << HTMLModule::getHTMLLink(url, _text, _confirm, false, string(), _class);
 
 			return util::ParametersMap();
 		}

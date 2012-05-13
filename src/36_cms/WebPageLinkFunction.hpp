@@ -51,6 +51,7 @@ namespace synthese
 			static const std::string PARAMETER_TEXT;
 			static const std::string PARAMETER_USE_SMART_URL;
 			static const std::string PARAMETER_CONFIRM;
+			static const std::string PARAMETER_CLASS;
 
 		protected:
 			//! \name Page parameters
@@ -59,6 +60,7 @@ namespace synthese
 				std::string _text;
 				bool _useSmartURL;
 				std::string _confirm;
+				std::string _class;
 				util::ParametersMap _parameters;
 			//@}
 
