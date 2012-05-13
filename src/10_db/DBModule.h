@@ -55,6 +55,7 @@ namespace synthese
 	*/
 	namespace db
 	{
+		class DBConditionalRegistryTableSync;
 		class DBTableSync;
 		class DBTransaction;
 
@@ -73,14 +74,19 @@ namespace synthese
 			typedef std::map<util::RegistryKeyType, std::string> SubClassMap;
 			typedef std::map<std::string, boost::shared_ptr<DBTableSync> > TablesByNameMap;
 			typedef std::map<int, boost::shared_ptr<DBTableSync> > TablesByIdMap;
+			typedef std::set<boost::shared_ptr<DBConditionalRegistryTableSync> > ConditionalTableSyncsToReload;
 
 
 		private:
+			static boost::posix_time::time_duration DURATION_BETWEEN_CONDITONAL_SYNCS;
+
 			static boost::shared_ptr<DB::ConnectionInfo> _ConnectionInfo;
 			static boost::shared_ptr<DB> _Db;
 			static SubClassMap		_subClassMap;
 			static TablesByNameMap	_tableSyncMap;
 			static TablesByIdMap	_idTableSyncMap;
+			static ConditionalTableSyncsToReload _conditionalTableSyncsToReload;
+
 
 
 		public:
@@ -93,6 +99,8 @@ namespace synthese
 			static DB* GetDB();
 			static boost::shared_ptr<DB> GetDBSPtr();
 
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Returns a database object that can be used to access a non-Synthese
 			/// database. The database object won't execute Synthese specific tasks,
@@ -104,6 +112,8 @@ namespace synthese
 			/// @since 3.3.0
 			static boost::shared_ptr<DB> GetDBForStandaloneUse(const std::string& connectionString);
 
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the table sync by table name.
 			/// @param tableName name of the table
@@ -113,6 +123,12 @@ namespace synthese
 			/// @since 3.1.16
 			/// @throws DBException if the table was not found
 			static boost::shared_ptr<DBTableSync> GetTableSync(const std::string& tableName);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the list of the table to reload massively every minute.
+			static ConditionalTableSyncsToReload GetConditionalTableSyncsToReload(){ return _conditionalTableSyncsToReload; }
 
 
 
@@ -181,6 +197,9 @@ namespace synthese
 				const util::Env& env,
 				boost::optional<DBTransaction&> transaction = boost::optional<DBTransaction&>()
 			);
+
+
+			static void UpdateConditionalTableSyncEnv();
 		};
 	}
 

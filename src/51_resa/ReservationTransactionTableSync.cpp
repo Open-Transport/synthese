@@ -29,6 +29,7 @@
 #include "ResaModule.h"
 #include "ReservationTableSync.h"
 #include "Service.h"
+#include "SQLSingleOperatorExpression.hpp"
 #include "UserTableSync.h"
 
 #include <sstream>
@@ -49,11 +50,15 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync, ReservationTransactionTableSync>::FACTORY_KEY("31.2 Reservation Transaction Table Sync");
+		template<>
+		const string FactorableTemplate<DBTableSync, ReservationTransactionTableSync>::FACTORY_KEY = "31.2 Reservation Transaction Table Sync";
 	}
 
 	namespace resa
 	{
+		const time_duration ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION = hours(1);
+		const time_duration ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION = hours(6);
+
 		const string ReservationTransactionTableSync::COL_LAST_RESERVATION_ID = "last_reservation_id";
 		const string ReservationTransactionTableSync::COL_SEATS = "seats";
 		const string ReservationTransactionTableSync::COL_BOOKING_TIME = "booking_time";
@@ -101,8 +106,8 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<ReservationTransactionTableSync,ReservationTransaction>::Load(
-			ReservationTransaction* object
-			, const db::DBResultSPtr& rows,
+			ReservationTransaction* object,
+			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
@@ -132,6 +137,12 @@ namespace synthese
 			object->setBookingUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_BOOKING_USER_ID));
 			object->setCancelUserId(rows->getLongLong ( ReservationTransactionTableSync::COL_CANCEL_USER_ID));
 			object->setCustomerEMail(rows->getText(ReservationTransactionTableSync::COL_CUSTOMER_EMAIL));
+
+			// Indexation
+			if( linkLevel == DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			{
+				ReservationTableSync::Search(env, object->getKey());
+			}
 		}
 
 
@@ -194,17 +205,157 @@ namespace synthese
 			util::RegistryKeyType id
 		){
 		}
+
+
+		template<>
+		const bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::NEEDS_AUTO_RELOAD = true;
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::IsLoaded(
+			const DBResultSPtr& row
+		){
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Loading the reservations in a temporary environment
+			Env env;
+			ReservationTableSync::SearchResult resas(
+				ReservationTableSync::Search(
+					env,
+					row->get<RegistryKeyType>(TABLE_COL_ID)
+			)	);
+
+			// Empty transaction can not be cached
+			if(resas.empty())
+			{
+				return false;
+			}
+
+			// Checking if all reservations are too old to be cached
+			if((*resas.rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
+			{
+				return false;
+			}
+
+			// Checking if all reservations are too late to be cached
+			return (*resas.begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+		}
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::IsLoaded(
+			const ReservationTransaction& transaction
+		){
+			// Empty transaction is not loaded
+			if(transaction.getReservations().empty())
+			{
+				return false;
+			}
+
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Checking if all reservations are too old to be cached
+			if((*transaction.getReservations().rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
+			{
+				return false;
+			}
+
+			// Checking if all reservations are too late to be cached
+			return (*transaction.getReservations().begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Generates the SQL expression filtering the record to load.
+		boost::shared_ptr<db::SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
+		{
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Bounds
+			ptime minBound(now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION);
+			ptime maxBound(now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+
+			// Min bound subquery
+			SelectQuery<ReservationTableSync> minBoundSubQuery;
+			minBoundSubQuery.addField(
+				SQLSingleOperatorExpression::Get(
+					SQLSingleOperatorExpression::OP_MAX,
+					FieldExpression::Get(
+						ReservationTableSync::TABLE.NAME,
+						ReservationTableSync::COL_ARRIVAL_TIME
+			)	)	);
+			minBoundSubQuery.addWhere(
+				ComposedExpression::Get(
+					FieldExpression::Get(
+						ReservationTableSync::TABLE.NAME,
+						ReservationTableSync::COL_TRANSACTION_ID
+					),
+					ComposedExpression::OP_EQ,
+					FieldExpression::Get(
+						ReservationTransactionTableSync::TABLE.NAME,
+						TABLE_COL_ID
+					)
+			)	);
+
+			// Max bound subquery
+			SelectQuery<ReservationTableSync> maxBoundSubQuery;
+			maxBoundSubQuery.addField(
+				SQLSingleOperatorExpression::Get(
+					SQLSingleOperatorExpression::OP_MIN,
+					FieldExpression::Get(
+						ReservationTableSync::TABLE.NAME,
+						ReservationTableSync::COL_TRANSACTION_ID
+			)	)	);
+			maxBoundSubQuery.addWhere(
+				ComposedExpression::Get(
+					FieldExpression::Get(
+						ReservationTableSync::TABLE.NAME,
+						ReservationTableSync::COL_TRANSACTION_ID
+					),
+					ComposedExpression::OP_EQ,
+					FieldExpression::Get(
+						ReservationTransactionTableSync::TABLE.NAME,
+						TABLE_COL_ID
+					)
+			)	);
+
+			// The expression
+			return 
+				ComposedExpression::Get(
+					ComposedExpression::Get(
+						SubQueryExpression::Get(
+							minBoundSubQuery.toString()
+						),
+						ComposedExpression::OP_SUPEQ,
+						ValueExpression<ptime>::Get(minBound)
+					),
+					ComposedExpression::OP_EQ,
+					ComposedExpression::Get(
+						SubQueryExpression::Get(
+							maxBoundSubQuery.toString()
+						),
+						ComposedExpression::OP_INFEQ,
+						ValueExpression<ptime>::Get(maxBound)
+				)	)
+			;
+		}
 	}
 
 	namespace resa
 	{
 		ReservationTransactionTableSync::SearchResult ReservationTransactionTableSync::Search(
 			Env& env,
-			util::RegistryKeyType serviceId
-			, const date& originDate
-			, bool withCancelled
-			, int first /*= 0*/
-			, boost::optional<std::size_t> number, /*= 0*/
+			util::RegistryKeyType serviceId,
+			const date& originDate,
+			bool withCancelled,
+			int first, /*= 0*/
+			boost::optional<std::size_t> number, /*= 0*/
 			LinkLevel linkLevel
 		){
 			stringstream query;

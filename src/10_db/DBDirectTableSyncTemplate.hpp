@@ -34,6 +34,7 @@
 #include "DBEmptyResultException.h"
 #include "DBException.hpp"
 #include "Exception.h"
+#include "RegistryBase.h"
 #include "SelectQuery.hpp"
 
 #include <sstream>
@@ -144,6 +145,8 @@ namespace synthese
 				return object;
 			}
 
+
+
 			virtual boost::shared_ptr<util::Registrable> getEditableRegistrable(
 				util::RegistryKeyType key,
 				util::Env& environment,
@@ -161,6 +164,7 @@ namespace synthese
 					throw util::ObjectNotFoundException<util::Registrable>(e.getKey(), e.getMessage());
 				}
 			}
+
 
 
 			/** Object fetcher, with read only permissions.
@@ -422,7 +426,6 @@ namespace synthese
 				return SearchByEnvelope(envelope, env, linkLevel);
 			}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_DBDirectTableSyncTemplate_hpp__

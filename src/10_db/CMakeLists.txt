@@ -1,9 +1,10 @@
 set_source_groups()
 
 set(db_SRCS
+ComposedExpression.cpp
+ComposedExpression.hpp
 DB.cpp
 DB.hpp
-DBAutoRegisterTableSyncTemplate.hpp
 DBConditionalRegistryTableSyncTemplate.hpp
 DBConstants.h
 DBDirectTableSync.hpp
@@ -47,6 +48,8 @@ SelectQuery.hpp
 spatial_ref_sys_sql.inc.h
 SQLExpression.cpp
 SQLExpression.hpp
+SQLSingleOperatorExpression.cpp
+SQLSingleOperatorExpression.hpp
 UpdateQuery.cpp
 UpdateQuery.hpp
 )

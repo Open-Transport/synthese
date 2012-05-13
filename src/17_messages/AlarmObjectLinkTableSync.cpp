@@ -162,8 +162,17 @@ namespace synthese
 			query.execute(transaction);
 		}
 
-		template<> bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded( const DBResultSPtr& row )
-		{
+
+
+		template<>
+		const bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::NEEDS_AUTO_RELOAD = false;
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded(
+			const DBResultSPtr& row
+		){
 			shared_ptr<Alarm> alarm(AlarmTableSync::GetEditable(
 				row->getLongLong(AlarmObjectLinkTableSync::COL_ALARM_ID),
 				Env::GetOfficialEnv(),
@@ -173,6 +182,63 @@ namespace synthese
 				dynamic_cast<SentAlarm*>(alarm.get()) &&
 				Factory<AlarmRecipient>::contains(row->getText(AlarmObjectLinkTableSync::COL_RECIPIENT_KEY))
 			;
+		}
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::IsLoaded(
+			const AlarmObjectLink& object
+		){
+			return
+				dynamic_cast<SentAlarm*>(object.getAlarm()) &&
+				Factory<AlarmRecipient>::contains(object.getRecipientKey())
+			;
+		}
+
+
+
+		boost::shared_ptr<db::SQLExpression> DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::GetWhereLoaded()
+		{
+			// The subquery
+			SelectQuery<AlarmTableSync> subQuery;
+			subQuery.addTableField(AlarmTableSync::COL_IS_TEMPLATE);
+			subQuery.addWhere(
+				ComposedExpression::Get(
+					FieldExpression::Get(
+						AlarmTableSync::TABLE.NAME,
+						TABLE_COL_ID
+					),
+					ComposedExpression::OP_EQ,
+					FieldExpression::Get(
+						AlarmObjectLinkTableSync::TABLE.NAME,
+						AlarmObjectLinkTableSync::COL_ALARM_ID
+					)
+			)	);
+
+			// The expression
+			return 
+				ComposedExpression::Get(
+					SubQueryExpression::Get(
+						subQuery.toString()
+					),
+					ComposedExpression::OP_EQ,
+					ValueExpression<bool>::Get(false)
+				)
+			;
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Generates the SQL expression filtering the record to load.
+		boost::shared_ptr<db::SQLExpression> GetWhereLoaded()
+		{
+			return db::SubQueryExpression::Get(
+				"SELECT !"+ AlarmTableSync::TABLE.NAME +"."+ AlarmTableSync::COL_IS_TEMPLATE +" WHERE "
+				+ AlarmTableSync::TABLE.NAME +"."+ TABLE_COL_ID +"="+ AlarmObjectLinkTableSync::TABLE.NAME +"."+
+				AlarmObjectLinkTableSync::COL_ALARM_ID
+			);
 		}
 
 

@@ -32,6 +32,7 @@ namespace synthese
 	namespace util
 	{
 		class Env;
+		class RegistryBase;
 	}
 
 	namespace db

@@ -25,7 +25,7 @@
 #ifndef SYNTHESE_ReservationTransactionTableSync_H__
 #define SYNTHESE_ReservationTransactionTableSync_H__
 
-#include "DBNoSyncTableSyncTemplate.hpp"
+#include "DBConditionalRegistryTableSyncTemplate.hpp"
 
 #include "ReservationTransaction.h"
 
@@ -48,9 +48,12 @@ namespace synthese
 			@ingroup m51LS refLS
 		*/
 		class ReservationTransactionTableSync:
-			public db::DBNoSyncTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>
+			public db::DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>
 		{
 		public:
+			static const boost::posix_time::time_duration BEFORE_RESERVATION_INDEXATION_DURATION;
+			static const boost::posix_time::time_duration AFTER_RESERVATION_INDEXATION_DURATION;
+
 			static const std::string COL_LAST_RESERVATION_ID;
 			static const std::string COL_SEATS;
 			static const std::string COL_BOOKING_TIME;
@@ -78,23 +81,23 @@ namespace synthese
 			*/
 			static SearchResult Search(
 				util::Env& env,
-				const util::RegistryKeyType serviceId
-				, const boost::gregorian::date& originDate
-				, bool withCancelled
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				const util::RegistryKeyType serviceId,
+				const boost::gregorian::date& originDate,
+				bool withCancelled,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 
 
 			static SearchResult Search(
 				util::Env& env,
-				boost::optional<util::RegistryKeyType> userId
-				, const boost::posix_time::ptime& minDate
-				, const boost::posix_time::ptime& maxDate
-				, bool withCancelled = false
-				, int first = 0
-				, boost::optional<std::size_t> number = boost::optional<std::size_t>(),
+				boost::optional<util::RegistryKeyType> userId,
+				const boost::posix_time::ptime& minDate,
+				const boost::posix_time::ptime& maxDate,
+				bool withCancelled = false,
+				int first = 0,
+				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
