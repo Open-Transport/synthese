@@ -65,6 +65,8 @@ namespace synthese
 			static const std::string COL_CANCELLED_BY_OPERATOR;
 			static const std::string COL_ACKNOWLEDGE_TIME;
 			static const std::string COL_ACKNOWLEDGE_USER_ID;
+			static const std::string COL_CANCELLATION_ACKNOWLEDGE_TIME;
+			static const std::string COL_CANCELLATION_ACKNOWLEDGE_USER_ID;
 
 
 

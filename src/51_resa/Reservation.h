@@ -87,6 +87,8 @@ namespace synthese
 			static const std::string DATA_COMMENT;
 			static const std::string DATA_ACKNOWLEDGE_TIME;
 			static const std::string DATA_ACKNOWLEDGE_USER;
+			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_TIME;
+			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_USER;
 
 			/// Chosen registry class.
 			typedef util::Registry<Reservation>	Registry;
@@ -122,6 +124,8 @@ namespace synthese
 				bool							_cancelledByOperator;
 				boost::posix_time::ptime		_acknowledgeTime;
 				security::User*					_acknowledgeUser;
+				boost::posix_time::ptime		_cancellationAcknowledgeTime;
+				security::User*					_cancellationAcknowledgeUser;
 			//@}
 
 		public:
@@ -149,6 +153,8 @@ namespace synthese
 				void setCancelledByOperator(bool value){ _cancelledByOperator = value; }
 				void setAcknowledgeTime(const boost::posix_time::ptime& value){ _acknowledgeTime = value; }
 				void setAcknowledgeUser(security::User* value){ _acknowledgeUser = value; }
+				void setCancellationAcknowledgeTime(const boost::posix_time::ptime& value){ _cancellationAcknowledgeTime = value; }
+				void setCancellationAcknowledgeUser(security::User* value){ _cancellationAcknowledgeUser = value; }
 
 				/** Transaction setter.
 					@param transaction the transaction which the reservation belongs
@@ -184,6 +190,8 @@ namespace synthese
 				bool							getCancelledByOperator()	const { return _cancelledByOperator; }
 				const boost::posix_time::ptime& getAcknowledgeTime() const { return _acknowledgeTime; }
 				security::User* getAcknowledgeUser() const { return _acknowledgeUser; }
+				const boost::posix_time::ptime& getCancellationAcknowledgeTime() const { return _cancellationAcknowledgeTime; }
+				security::User* getCancellationAcknowledgeUser() const { return _cancellationAcknowledgeUser; }
 			//@}
 
 

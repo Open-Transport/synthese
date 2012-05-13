@@ -188,16 +188,68 @@ namespace synthese
 
 
 
-		void ReservationTransaction::addReservation(Reservation* resa )
-		{
-			BOOST_FOREACH(const Reservations::value_type& existingReservation, _reservations)
-			{
-				if(existingReservation == resa)
-				{
-					return;
-				}
-			}
-			_reservations.push_back(resa);
+		void ReservationTransaction::addReservation(
+			Reservation& resa
+		){
+			// Check of the precondition
+			assert(resa.getTransaction() == this);
+
+			// Adds the reservation to the transaction
+			_reservations.insert(&resa);
 		}
-	}
-}
+
+
+
+		void ReservationTransaction::removeReservation( Reservation& resa )
+		{
+			_reservations.erase(&resa);
+		}
+
+
+
+		bool ReservationTransaction::ReservationComparator::operator()( Reservation* op1, Reservation* op2 )
+		{
+			// Same objects
+			if(op1 == op2)
+			{
+				return true;
+			}
+
+			// NULL after all
+			if(!op1)
+			{
+				assert(false); // This should not happen
+				return false;
+			}
+
+			// all before NULL
+			if(!op2)
+			{
+				assert(false); // This should not happen
+				return true;
+			}
+
+			// Identical departure time objects : sort by address
+			if(op1->getDepartureTime() == op2->getDepartureTime())
+			{
+				return op1 < op2;
+			}
+
+			// Undefined departure time after all
+			if(op1->getDepartureTime().is_not_a_date_time())
+			{
+				assert(false); // This should not happen
+				return false;
+			}
+
+			// All before undefined departure time
+			if(op2->getDepartureTime().is_not_a_date_time())
+			{
+				assert(false); // This should not happen
+				return true;
+			}
+
+			// Comparison on valid departure times
+			return op1->getDepartureTime() < op2->getDepartureTime();
+		}
+}	}
