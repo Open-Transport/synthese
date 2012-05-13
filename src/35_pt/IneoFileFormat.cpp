@@ -184,6 +184,8 @@ namespace synthese
 			_interactive(false),
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
+			_activities(_dataSource, _env),
+			_driverAllocations(_dataSource, _env),
 			_lines(_dataSource, _env),
 			_destinations(_dataSource, _env),
 			_addWaybackToJourneyPatternCode(false),
@@ -1040,13 +1042,18 @@ namespace synthese
 						// Driver service
 						string key(_getValue("SA"));
 
+						// Search for an activity
+						set<DriverActivity*> activities(
+							_activities.get(key)
+						);
+
 						// Date
 						string dateStr(_getValue("DATE"));
 						date vsDate;
 						vector<string> parts;
-						split(parts, dateStr, is_any_of("/"));
+						split(parts, dateStr, is_any_of("/.-"));
 						vsDate = date(
-							lexical_cast<int>(parts[2]),
+							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
 							lexical_cast<int>(parts[1]),
 							lexical_cast<int>(parts[0])
 						);
@@ -1064,14 +1071,30 @@ namespace synthese
 						)	);
 
 						// Registration
-						_allocations[make_pair(key, vsDate)] = user;
+						if(activities.empty())
+						{
+							_allocations[make_pair(key, vsDate)] = user;
+						}
+						else
+						{
+							string fullKey("U-"+ userKey +"-"+ dateStr);
+							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
+								_driverAllocations,
+								fullKey,
+								_dataSource,
+								_env,
+								stream,
+								"allocation"
+							);
+							da->set<DriverActivity>(**activities.begin());
+							da->set<Driver>(*user);
+						}
 					}
 
 				} while(!_section.empty());
 			}
 			else if(key == FILE_SAB)
 			{
-				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
 				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
 				string lastKey;
 				DriverService* ds(NULL);
@@ -1095,9 +1118,9 @@ namespace synthese
 						// Date
 						date vsDate;
 						vector<string> parts;
-						split(parts, dateStr, is_any_of("/"));
+						split(parts, dateStr, is_any_of("/.-"));
 						vsDate = date(
-							lexical_cast<int>(parts[2]),
+							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
 							lexical_cast<int>(parts[1]),
 							lexical_cast<int>(parts[0])
 						);
@@ -1122,7 +1145,7 @@ namespace synthese
 
 							// Allocation
 							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
-								driverAllocations,
+								_driverAllocations,
 								fullKey,
 								_dataSource,
 								_env,
@@ -1237,17 +1260,22 @@ namespace synthese
 						}
 
 						// Vehicle service
-						set<VehicleService*> lvs(_vehicleServices.get(vsKey));
-						if(lvs.empty())
+						set<VehicleService*> lvs;
+						if(vsKey.empty())
 						{
-							continue;
+							lvs = _vehicleServices.get(vsKey);
+							if(lvs.empty())
+							{
+								stream << "WARN : vehicle service " << vsKey << " not foud in driver service " << key << ".<br />";
+								continue;
+							}
 						}
 
 						DriverService::Chunks chunks(ds->getChunks());
 						chunks.push_back(
 							DriverService::Chunk(
 								ds,
-								**lvs.begin(),
+								lvs.empty() ? NULL : **lvs.begin(),
 								vsDate,
 								hdeb,
 								hfin,

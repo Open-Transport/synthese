@@ -166,7 +166,7 @@ namespace synthese
 
 				if(_firstQuay.get())
 				{
-					Service::ServedVertices vertices;
+					SchedulesBasedService::ServedVertices vertices;
 					size_t rank(0);
 					BOOST_FOREACH(const Path::Edges::value_type& edge, serviceComposition.getService()->getPath()->getEdges())
 					{

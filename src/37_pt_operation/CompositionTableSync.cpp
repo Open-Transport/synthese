@@ -213,7 +213,7 @@ namespace synthese
 				}
 
 				// Vertices
-				Service::ServedVertices vertices;
+				SchedulesBasedService::ServedVertices vertices;
 				if(rows->getText(CompositionTableSync::COL_SERVED_VERTICES).empty())
 				{
 					BOOST_FOREACH(const Path::Edges::value_type& edge, object->getService()->getPath()->getEdges())
@@ -279,7 +279,7 @@ namespace synthese
 			PTOperationModule::UnregisterComposition(*obj);
 			obj->setService(NULL);
 			obj->setVehicles(Composition::VehicleLinks());
-			obj->setServedVertices(Service::ServedVertices());
+			obj->setServedVertices(SchedulesBasedService::ServedVertices());
 		}
 
 
@@ -307,7 +307,7 @@ namespace synthese
 			// Vertices
 			stringstream verticesString;
 			bool firstVertex(true);
-			BOOST_FOREACH(const Service::ServedVertices::value_type& vertex, object->getServedVertices())
+			BOOST_FOREACH(const SchedulesBasedService::ServedVertices::value_type& vertex, object->getServedVertices())
 			{
 				if(firstVertex)
 				{
