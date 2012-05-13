@@ -58,6 +58,7 @@ namespace synthese
 
 		private:
 			static const std::string PARAMETER_VAR;
+			static const std::string PARAMETER_TEMPLATE;
 
 			class Node
 			{
@@ -95,6 +96,22 @@ namespace synthese
 				) const;
 			};
 
+			class VariableUpdateNode : public Node
+			{
+			public:
+				std::string variable;
+				Nodes value;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// No display : updates the additionnalParametersMap
+				virtual void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const util::ParametersMap& additionalParametersMap,
+					const Webpage& page
+				) const;
+			};
+
 			class ServiceNode : public Node
 			{
 			public:
@@ -102,6 +119,7 @@ namespace synthese
 				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
 				Parameters serviceParameters;
 				Parameters templateParameters;
+				WebpageContent::Nodes inlineTemplate;
 
 				virtual void display(
 					std::ostream& stream,
@@ -145,6 +163,7 @@ namespace synthese
 			public:
 				std::string arrayCode;
 				Nodes pageCode;
+				Nodes inlineTemplate;
 				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
 				Parameters parameters;
 
