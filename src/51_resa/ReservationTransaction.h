@@ -28,7 +28,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 
-#include <vector>
+#include <set>
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
 
@@ -51,14 +51,19 @@ namespace synthese
 		{
 		public:
 
+			struct ReservationComparator
+			{
+				bool operator()(Reservation* op1, Reservation* op2);
+			};
+
 			/// Chosen registry class.
 			typedef util::Registry<ReservationTransaction>	Registry;
 
-			typedef std::vector<Reservation*> Reservations;
+			typedef std::set<Reservation*, ReservationComparator> Reservations;
 
 		private:
 
-			//!	\name Caractéristiques de la réservation
+			//!	\name Reservation attributes
 			//@{
 				Reservations		_reservations;
 				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
@@ -68,7 +73,7 @@ namespace synthese
 				std::string _comment;
 			//@}
 
-			//!	\name Personnes
+			//!	\name Customer
 			//@{
 				util::RegistryKeyType	_customerUserId;
 				security::User*			_customer;
@@ -128,7 +133,18 @@ namespace synthese
 			Reservation* newReservation();
 
 
-			void addReservation(Reservation* resa);
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds a reservation in the transaction.
+			/// @param resa the reservation to add
+			/// @pre the reservation to add must belong to the current transaction
+			void addReservation(Reservation& resa);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Removes a reservation from the transaction.
+			/// @param resa the reservation to remove
+			void removeReservation(Reservation& resa);
 
 			//! @name Queries
 			//@{

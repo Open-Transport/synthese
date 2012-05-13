@@ -74,6 +74,9 @@ namespace synthese
 			static const std::string PARAMETER_LINKED_WITH_VEHICLE_ONLY;
 			static const std::string PARAMETER_USE_CACHE;
 			static const std::string PARAMETER_OUTPUT_FORMAT;
+			static const std::string PARAMETER_WITH_CANCELLATIONS;
+			static const std::string PARAMETER_WITH_NOT_ACKNOWLEDGED_CANCELLATIONS;
+			static const std::string PARAMETER_ONLY_NOT_ACKNOWLEDGED_RESERVATIONS;
 
 			static const std::string DATA_RESERVATIONS;
 			static const std::string DATA_RESERVATION;
@@ -87,7 +90,6 @@ namespace synthese
 				boost::shared_ptr<const pt::ScheduledService> _service;
 				boost::gregorian::date _date;
 				boost::shared_ptr<const cms::Webpage> _reservationPage;
-				std::size_t _seatsNumber;
 				boost::optional<Language> _language;
 				boost::optional<std::size_t> _minDepartureRank;
 				boost::optional<std::size_t> _maxDepartureRank;
@@ -96,6 +98,9 @@ namespace synthese
 				bool _linkedWithVehicleOnly;
 				bool _useCache;
 				std::string _outputFormat;
+				bool _withCancellations;
+				bool _withNotAcknowledgedCancellations;
+				bool _onlyNotAcknowledgedReservations;
 			//@}
 
 

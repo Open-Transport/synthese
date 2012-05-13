@@ -66,6 +66,8 @@ namespace synthese
 		const string Reservation::DATA_CANCELLATION_TIME("cancellation_time");
 		const string Reservation::DATA_ACKNOWLEDGE_TIME = "acknowledge_time";
 		const string Reservation::DATA_ACKNOWLEDGE_USER = "acknowledge_user";
+		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_TIME = "cancellation_acknowledge_time";
+		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_USER = "cancellation_acknowledge_user";
 
 
 
@@ -87,7 +89,9 @@ namespace synthese
 			_vehiclePositionAtArrival(NULL),
 			_cancelledByOperator(false),
 			_acknowledgeTime(not_a_date_time),
-			_acknowledgeUser(NULL)
+			_acknowledgeUser(NULL),
+			_cancellationAcknowledgeTime(not_a_date_time),
+			_cancellationAcknowledgeUser(NULL)
 		{}
 
 
@@ -97,7 +101,7 @@ namespace synthese
 			_transaction = transaction;
 			if(transaction)
 			{
-				transaction->addReservation(this);
+				transaction->addReservation(*this);
 			}
 		}
 
@@ -199,20 +203,33 @@ namespace synthese
 			std::string prefix /*= std::string() */
 		) const	{
 
+			// ID
+			pm.insert(DATA_RESERVATION_ID, getKey());
+
+			// Customer
 			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
+			
+			// Transaction
+			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
+			pm.insert(DATA_SEATS_NUMBER, getTransaction()->getSeats());
+
+			// Places
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
 			pm.insert(DATA_ARRIVAL_PLACE_NAME, getArrivalPlaceName());
 			pm.insert(DATA_DEPARTURE_PLACE_ID, getDeparturePlaceId());
 			pm.insert(DATA_ARRIVAL_PLACE_ID, getArrivalPlaceId());
-			pm.insert(DATA_RESERVATION_ID, getKey());
-			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
-			pm.insert(DATA_SEATS_NUMBER, getTransaction()->getSeats());
+
+			// Service
 			pm.insert(DATA_SERVICE_NUMBER, getServiceCode());
 			pm.insert(DATA_SERVICE_ID, getServiceId());
+
+			// Time
 			pm.insert(DATA_DEPARTURE_TIME, getDepartureTime());
 			pm.insert(DATA_ARRIVAL_TIME, getArrivalTime());
+
+			// Driver acknowledge
 			if(!_acknowledgeTime.is_not_a_date_time())
 			{
 				pm.insert(DATA_ACKNOWLEDGE_TIME, getAcknowledgeTime());
@@ -223,9 +240,23 @@ namespace synthese
 				_acknowledgeUser->toParametersMap(*userPM);
 				pm.insert(DATA_ACKNOWLEDGE_USER, userPM);
 			}
+
+			// Cancellation time
 			if(!getTransaction()->getCancellationTime().is_not_a_date_time())
 			{
 				pm.insert(DATA_CANCELLATION_TIME, getTransaction()->getCancellationTime());
+			}
+
+			// Cancellation acknowledge
+			if(!_cancellationAcknowledgeTime.is_not_a_date_time())
+			{
+				pm.insert(DATA_CANCELLATION_ACKNOWLEDGE_TIME, getCancellationAcknowledgeTime());
+			}
+			if(_cancellationAcknowledgeUser)
+			{
+				shared_ptr<ParametersMap> userPM(new ParametersMap);
+				_cancellationAcknowledgeUser->toParametersMap(*userPM);
+				pm.insert(DATA_CANCELLATION_ACKNOWLEDGE_USER, userPM);
 			}
 
 			// Vehicle
@@ -237,7 +268,6 @@ namespace synthese
 
 			// Language
 			const User* user(getTransaction()->getCustomer());
-
 			if(language && user && user->getLanguage())
 			{
 				pm.insert(DATA_LANGUAGE, user->getLanguage()->getName(*language));
