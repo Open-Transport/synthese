@@ -24,7 +24,7 @@
 #define SYNTHESE_pt_operations_ServiceComposition_hpp__
 
 #include "Composition.hpp"
-#include "Service.h"
+#include "SchedulesBasedService.h"
 
 namespace synthese
 {
@@ -47,7 +47,7 @@ namespace synthese
 		{
 		private:
 			const pt::ScheduledService* _service;
-			graph::Service::ServedVertices _servedVertices;
+			pt::SchedulesBasedService::ServedVertices _servedVertices;
 
 		public:
 			ServiceComposition(util::RegistryKeyType id=0);
@@ -55,13 +55,13 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setService(const pt::ScheduledService* value){ _service = value; }
-				void setServedVertices(const graph::Service::ServedVertices& value){ _servedVertices = value; }
+				void setServedVertices(const pt::SchedulesBasedService::ServedVertices& value){ _servedVertices = value; }
 			//@}
 
 			//! @name Getters
 			//@{
 				const pt::ScheduledService* getService() const { return _service; }
-				const graph::Service::ServedVertices& getServedVertices() const { return _servedVertices; }
+				const pt::SchedulesBasedService::ServedVertices& getServedVertices() const { return _servedVertices; }
 			//@}
 		};
 	}

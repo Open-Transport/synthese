@@ -50,6 +50,8 @@ namespace synthese
 			_network(NULL)
 		{
 			setPath(this);
+			_vertices.push_back(NULL);
+			_vertices.push_back(NULL);
 
 			// Default use rules
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
