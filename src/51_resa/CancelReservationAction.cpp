@@ -30,6 +30,7 @@
 #include "ReservationTableSync.h"
 #include "ResaRight.h"
 #include "ResaDBLog.h"
+#include "ResaModule.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "OnlineReservationRule.h"

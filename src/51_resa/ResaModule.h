@@ -178,10 +178,6 @@ namespace synthese
 			static const std::string DATA_CURRENT_CALL_ID;
 			static const std::string DATA_CURRENT_CALL_TIMESTAMP;
 
-			static const boost::posix_time::time_duration BEFORE_RESERVATION_INDEXATION_DURATION;
-			static const boost::posix_time::time_duration AFTER_RESERVATION_INDEXATION_DURATION;
-			static const boost::posix_time::time_duration DURATION_BETWEEN_RESERVATIONS_REINDEX;
-
 			static boost::shared_ptr<security::Profile>	_basicProfile;
 			static boost::shared_ptr<security::Profile>	_autoresaProfile;
 			static boost::shared_ptr<security::Profile>	_adminProfile;
@@ -193,15 +189,12 @@ namespace synthese
 
 		private:
 			/// Stores the reservations for services with arrival max 1 hour before now and departure to 6 hours after now
-			/// Updated every 10 minutes by UpdateReservationsByService and at reservations updates for the reservation already present in the map
 			static ReservationsByService _reservationsByService;
 			static boost::recursive_mutex _reservationsByServiceMutex;
 
 		public:
-			static void UpdateReservationsByService();
 			static void AddReservationByService(const Reservation& reservation);
 			static void RemoveReservationByService(const Reservation& reservation);
-			static bool MustBeIndexed(const ReservationTransaction& transaction);
 			static const ReservationsByService::mapped_type& GetReservationsByService(const graph::Service& service);
 			static boost::recursive_mutex& GetReservationsByServiceMutex() { return _reservationsByServiceMutex; }
 
