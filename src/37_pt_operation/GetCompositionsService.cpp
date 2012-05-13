@@ -245,7 +245,7 @@ namespace synthese
 				stringstream s;
 				size_t rank(0);
 
-				BOOST_FOREACH(const Service::ServedVertices::value_type& quay, serviceComposition.getServedVertices())
+				BOOST_FOREACH(const ScheduledService::ServedVertices::value_type& quay, serviceComposition.getServedVertices())
 				{
 					displayQuay(
 						s,
