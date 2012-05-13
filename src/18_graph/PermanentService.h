@@ -38,8 +38,6 @@ namespace synthese
 		:	public graph::Service
 		{
 		private:
-			virtual void _computeNextRTUpdate();
-
 			boost::optional<boost::posix_time::time_duration> _duration;
 
 		public:
@@ -101,7 +99,6 @@ namespace synthese
 			) const;
 
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_env_PermanentService_h__

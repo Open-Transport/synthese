@@ -191,15 +191,6 @@ namespace synthese
 			Service(string(), path),
 			_duration(duration)
 		{
-			clearStops();
-			clearRTData();
-		}
-
-
-
-		void PermanentService::_computeNextRTUpdate()
-		{
-			_nextRTUpdate = second_clock::local_time() + gregorian::days(1);
 		}
 
 
@@ -208,5 +199,4 @@ namespace synthese
 		{
 			return _duration;
 		}
-	}
-}
+}	}

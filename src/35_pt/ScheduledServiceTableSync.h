@@ -61,10 +61,7 @@ namespace synthese
 			static const std::string COL_STOPS;
 			static const std::string COL_DATASOURCE_LINKS;
 
-			static const std::string STOP_SEPARATOR;
 
-			static std::string SerializeStops(const graph::Service::ServedVertices& value);
-			static graph::Service::ServedVertices UnserializeStops(const std::string& value, util::Env& env);
 
 			/** ScheduledService search.
 				@param line JourneyPattern which the service must belong to
