@@ -26,12 +26,11 @@
 #include "DisplayScreenTableSync.h"
 
 #include "DeparturesTableModule.h"
-#include "PlaceWithDisplayBoards.hpp"
-#include "SelectQuery.hpp"
-#include "ReplaceQuery.h"
-#include "SQLExpression.hpp"
 #include "DisplayTypeTableSync.h"
-#include "DisplayType.h"
+#include "PlaceWithDisplayBoards.hpp"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "SQLSingleOperatorExpression.hpp"
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
 #include "LineStopTableSync.h"
@@ -759,13 +758,15 @@ namespace synthese
 			query.addWhereField(AlarmObjectLinkTableSync::COL_OBJECT_ID, screenId);
 			query.addWhereFieldOther<ScenarioTableSync>(ScenarioTableSync::COL_ENABLED, 1);
 			query.addWhere(
-				NotExpression::Get(
+				SQLSingleOperatorExpression::Get(
+					SQLSingleOperatorExpression::OP_NOT,
 					FieldExpression::Get(
 						ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_IS_TEMPLATE
 			)	)	);
 			query.addWhere(
 				ComposedExpression::Get(
-					IsNullExpression::Get(
+					SQLSingleOperatorExpression::Get(
+						SQLSingleOperatorExpression::OP_IS_NULL,
 						FieldExpression::Get(
 							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODSTART
 					)	),
@@ -780,7 +781,8 @@ namespace synthese
 			)	);
 			query.addWhere(
 				ComposedExpression::Get(
-					IsNullExpression::Get(
+					SQLSingleOperatorExpression::Get(
+					SQLSingleOperatorExpression::OP_IS_NULL,
 						FieldExpression::Get(
 							ScenarioTableSync::TABLE.NAME, ScenarioTableSync::COL_PERIODEND
 					)	),
