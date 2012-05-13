@@ -93,8 +93,11 @@ namespace synthese
 			}
 			else if(_begin != otherNumber._begin) // At least one number have form 12S, and the other one have a different begin (eg. 13)
 			{
-				if((_numberType == isAnInteger)
-						|| (otherNumber._numberType == isAnInteger)) // here is a "13" type and an "12s" form
+				if(	_numberType == isAnInteger ||
+					otherNumber._numberType == isAnInteger ||
+					_numberType == beginIsInteger ||
+					otherNumber._numberType == beginIsInteger
+				) // here is a "13" type and an "12s" form
 				{
 					return _numericalValue < otherNumber._numericalValue;
 				}
