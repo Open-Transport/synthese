@@ -249,8 +249,8 @@ namespace synthese
 
 				// The query
 				std::stringstream ss;
-				ss << "SELECT " << GetFieldsGetter() <<
-					" FROM " << TABLE.NAME <<
+				ss << "SELECT " << DBTableSyncTemplate<K>::GetFieldsGetter() <<
+					" FROM " << DBTableSyncTemplate<K>::TABLE.NAME <<
 					" WHERE " << GetWhereLoaded()->toString();
 
 				// Runs the query
