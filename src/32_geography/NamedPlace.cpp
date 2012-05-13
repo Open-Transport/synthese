@@ -80,6 +80,13 @@ namespace synthese
 		{
 			return _name26.empty() ? _name.substr(0, 26) : _name26;
 		}
+
+
+
+		bool NamedPlace::_getCityNameBeforePlaceName() const
+		{
+			return GeographyModule::GetCityNameBeforePlaceName();
+		}
 	}
 
 	template<> const Field ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[] = { Field("name", SQL_TEXT), Field("city_id", SQL_INTEGER), Field() };

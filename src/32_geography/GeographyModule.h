@@ -97,6 +97,8 @@ namespace synthese
 			public server::ModuleClassTemplate<GeographyModule>
 		{
 		public:
+			static const std::string MODULE_PARAM_CITY_NAME_BEFORE_PLACE_NAME;
+
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<City> > CitiesMatcher;
 			typedef lexical_matcher::LexicalMatcher<boost::shared_ptr<geography::Place> > GeneralAllPlacesMatcher;
 			typedef std::vector<CitiesMatcher::Content> CityList;
@@ -105,10 +107,12 @@ namespace synthese
 			static GeneralAllPlacesMatcher _generalAllPlacesMatcher;
 			static CitiesMatcher _citiesMatcher;
 			static CitiesMatcher _citiesT9Matcher;
+			static bool _cityNameBeforePlaceName;
 
 		public:
 			static GeneralAllPlacesMatcher& GetGeneralAllPlacesMatcher(){ return _generalAllPlacesMatcher; }
 			static const CitiesMatcher& GetCitiesMatcher(){ return _citiesMatcher; }
+			static bool GetCityNameBeforePlaceName(){ return _cityNameBeforePlaceName; }
 
 
 
@@ -132,6 +136,15 @@ namespace synthese
 
 			static void RemoveFromCitiesMatchers(
 				CitiesMatcher::Content city
+			);
+
+
+
+			/** Called whenever a parameter registered by this module is changed.
+			*/
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
 			);
 		};
 	}
