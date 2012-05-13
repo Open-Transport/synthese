@@ -238,51 +238,53 @@ namespace synthese
 
 		DriverService::Chunk::Chunk(
 			DriverService* _driverService,
-			VehicleService& _vehicleService,
+			VehicleService* _vehicleService,
 			const boost::gregorian::date& date,
 			const boost::posix_time::time_duration& startTime,
 			const boost::posix_time::time_duration& endTime,
 			const boost::posix_time::time_duration& startTimeD,
 			const boost::posix_time::time_duration& endTimeD
 		):	driverService(_driverService),
-			vehicleService(&_vehicleService),
+			vehicleService(_vehicleService),
 			driverStartTime(startTimeD),
 			driverEndTime(endTimeD)
 		{
-			const VehicleService::Services& services(_vehicleService.getServices());
-			BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
+			if(_vehicleService)
 			{
-				if(	!service->isActive(date) ||
-					service->getLastArrivalSchedule(false) < startTime
-				){
-					continue;
-				}
-				if(service->getDepartureSchedule(false, 0) > endTime)
+				const VehicleService::Services& services(_vehicleService->getServices());
+				BOOST_FOREACH(const VehicleService::Services::value_type& service, services)
 				{
-					break;
-				}
-
-				// Add service to chunk
-				Chunk::Element element;
-				element.service = service;
-				for(size_t i(0); i<service->getDepartureSchedules(false).size(); ++i)
-				{
-					if(service->getDepartureSchedule(false, i) >= startTime)
+					if(	!service->isActive(date) ||
+						service->getLastArrivalSchedule(false) < startTime
+					){
+						continue;
+					}
+					if(service->getDepartureSchedule(false, 0) > endTime)
 					{
-						element.startRank = i;
 						break;
 					}
-				}
-				for(size_t i(service->getArrivalSchedules(false).size()); i>0; --i)
-				{
-					if(service->getArrivalSchedule(false, i-1) <= endTime)
+	
+					// Add service to chunk
+					Chunk::Element element;
+					element.service = service;
+					for(size_t i(0); i<service->getDepartureSchedules(false).size(); ++i)
 					{
-						element.endRank = i-1;
-						break;
+						if(service->getDepartureSchedule(false, i) >= startTime)
+						{
+							element.startRank = i;
+							break;
+						}
 					}
-				}
-				elements.push_back(element);
-			}
+					for(size_t i(service->getArrivalSchedules(false).size()); i>0; --i)
+					{
+						if(service->getArrivalSchedule(false, i-1) <= endTime)
+						{
+							element.endRank = i-1;
+							break;
+						}
+					}
+					elements.push_back(element);
+			}	}
 		}
 
 
