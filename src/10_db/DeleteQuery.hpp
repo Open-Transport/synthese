@@ -23,7 +23,7 @@
 #ifndef SYNTHESE_db_DeleteQuery_hpp__
 #define SYNTHESE_db_DeleteQuery_hpp__
 
-#include "SQLExpression.hpp"
+#include "ComposedExpression.hpp"
 #include "DBTransaction.hpp"
 #include "DB.hpp"
 #include "DBModule.h"

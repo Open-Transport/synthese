@@ -21,11 +21,13 @@
 */
 
 #include "WebPageTableSync.h"
+
+#include "DBResult.hpp"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
-#include "DBResult.hpp"
-#include "Website.hpp"
 #include "SelectQuery.hpp"
+#include "SQLSingleOperatorExpression.hpp"
+#include "Website.hpp"
 
 #include <boost/foreach.hpp>
 
@@ -201,7 +203,10 @@ namespace synthese
 								ValueExpression<RegistryKeyType>::Get(0)
 							),
 							ComposedExpression::OP_OR,
-							IsNullExpression::Get(FieldExpression::Get(TABLE.NAME, ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name))
+							SQLSingleOperatorExpression::Get(
+								SQLSingleOperatorExpression::OP_IS_NULL,
+								FieldExpression::Get(TABLE.NAME, ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[1].name)
+							)
 					)	);
 				}
 				else
