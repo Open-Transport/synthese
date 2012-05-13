@@ -72,6 +72,8 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_METER_OFFSET;
 			static const std::string PARAMETER_ACKNOWLEDGE_TIME;
 			static const std::string PARAMETER_ACKNOWLEDGE_USER_ID;
+			static const std::string PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME;
+			static const std::string PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID;
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
@@ -84,6 +86,8 @@ namespace synthese
 			boost::optional<pt_operation::VehiclePosition::Meters> _arrivalMeterOffset;
 			boost::optional<boost::posix_time::ptime> _acknowledgeTime;
 			boost::optional<boost::shared_ptr<security::User> > _acknowledgeUser;
+			boost::optional<boost::posix_time::ptime> _cancellationAcknowledgeTime;
+			boost::optional<boost::shared_ptr<security::User> > _cancellationAcknowledgeUser;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////

@@ -31,6 +31,7 @@
 #include "Vehicle.hpp"
 #include "VehicleTableSync.hpp"
 #include "ResaDBLog.h"
+#include "ResaModule.h"
 #include "DBLogModule.h"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
@@ -73,6 +74,8 @@ namespace synthese
 		const string ReservationUpdateAction::PARAMETER_ACKNOWLEDGE_TIME = Action_PARAMETER_PREFIX + "_acknowledge_time";
 		const string ReservationUpdateAction::PARAMETER_ACKNOWLEDGE_USER_ID = Action_PARAMETER_PREFIX + "_acknowledge_user_id";
 		const string ReservationUpdateAction::PARAMETER_ARRIVAL_METER_OFFSET(Action_PARAMETER_PREFIX + "am");
+		const string ReservationUpdateAction::PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME = Action_PARAMETER_PREFIX + "_cancellation_acknowledge_time";
+		const string ReservationUpdateAction::PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID = Action_PARAMETER_PREFIX + "_cancellation_acknowledge_user_id";
 
 
 
@@ -163,11 +166,13 @@ namespace synthese
 				}
 			}
 
+			// Acknowledge time
 			if(map.isDefined(PARAMETER_ACKNOWLEDGE_TIME))
 			{
 				_acknowledgeTime = time_from_string(map.get<string>(PARAMETER_ACKNOWLEDGE_TIME));
 			}
 
+			// Acknowledge user
 			if(map.isDefined(PARAMETER_ACKNOWLEDGE_USER_ID))
 			{
 				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_ACKNOWLEDGE_USER_ID));
@@ -178,6 +183,26 @@ namespace synthese
 				else
 				{
 					_acknowledgeUser = shared_ptr<User>();
+				}
+			}
+
+			// Cancellation acknowledge time
+			if(map.isDefined(PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME))
+			{
+				_cancellationAcknowledgeTime = time_from_string(map.get<string>(PARAMETER_CANCELLATION_ACKNOWLEDGE_TIME));
+			}
+
+			// Cancellation acknowledge user
+			if(map.isDefined(PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID))
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CANCELLATION_ACKNOWLEDGE_USER_ID));
+				if(id > 0)
+				{
+					_cancellationAcknowledgeUser = UserTableSync::GetEditable(id, *_env);
+				}
+				else
+				{
+					_cancellationAcknowledgeUser = shared_ptr<User>();
 				}
 			}
 
@@ -248,10 +273,13 @@ namespace synthese
 				_reservation->setVehicle(_vehicle->get());
 			}
 
+			// Acknowledge user
 			if(_acknowledgeUser)
 			{
 				_reservation->setAcknowledgeUser(_acknowledgeUser->get());
 			}
+
+			// Acknowledge time
 			if(_acknowledgeTime)
 			{
 				_reservation->setAcknowledgeTime(*_acknowledgeTime);
@@ -260,6 +288,27 @@ namespace synthese
 			{
 				ptime now(second_clock::local_time());
 				_reservation->setAcknowledgeTime(now);
+			}
+
+			// Cancellation acknowledge user
+			if(_cancellationAcknowledgeUser)
+			{
+				_reservation->setCancellationAcknowledgeUser(
+					_cancellationAcknowledgeUser->get()
+				);
+			}
+
+			// Cancellation acknowledge time
+			if(_cancellationAcknowledgeTime)
+			{
+				_reservation->setCancellationAcknowledgeTime(
+					*_cancellationAcknowledgeTime
+				);
+			}
+			if(_cancellationAcknowledgeUser && !_cancellationAcknowledgeTime)
+			{
+				ptime now(second_clock::local_time());
+				_reservation->setCancellationAcknowledgeTime(now);
 			}
 
 			if(_seatNumber && _reservation->getSeatNumber() != *_seatNumber)

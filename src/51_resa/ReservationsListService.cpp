@@ -68,27 +68,33 @@ namespace synthese
 	using namespace cms;
 	using namespace graph;
 
-	template<> const string util::FactorableTemplate<Function, resa::ReservationsListService>::FACTORY_KEY("ReservationsListService");
+	template<>
+	const string util::FactorableTemplate<Function, resa::ReservationsListService>::FACTORY_KEY = "ReservationsListService";
 
 	namespace resa
 	{
-		const string ReservationsListService::PARAMETER_LINE_ID("li");
-		const string ReservationsListService::PARAMETER_DATE("da");
-		const string ReservationsListService::PARAMETER_SERVICE_NUMBER("sn");
-		const string ReservationsListService::PARAMETER_RESERVATION_PAGE_ID("rp");
-		const string ReservationsListService::PARAMETER_SERVICE_ID("se");
-		const string ReservationsListService::PARAMETER_LANGUAGE("la");
-		const string ReservationsListService::PARAMETER_MINIMAL_DEPARTURE_RANK("min_dp_rank");
-		const string ReservationsListService::PARAMETER_MAXIMAL_DEPARTURE_RANK("max_dp_rank");
-		const string ReservationsListService::PARAMETER_MINIMAL_ARRIVAL_RANK("min_arr_rank");
-		const string ReservationsListService::PARAMETER_MAXIMAL_ARRIVAL_RANK("max_arr_rank");
-		const string ReservationsListService::PARAMETER_LINKED_WITH_VEHICLE_ONLY("linked_with_vehicle_only");
+		const string ReservationsListService::PARAMETER_LINE_ID = "li";
+		const string ReservationsListService::PARAMETER_DATE = "da";
+		const string ReservationsListService::PARAMETER_SERVICE_NUMBER = "sn";
+		const string ReservationsListService::PARAMETER_RESERVATION_PAGE_ID = "rp";
+		const string ReservationsListService::PARAMETER_SERVICE_ID = "se";
+		const string ReservationsListService::PARAMETER_LANGUAGE = "la";
+		const string ReservationsListService::PARAMETER_MINIMAL_DEPARTURE_RANK = "min_dp_rank";
+		const string ReservationsListService::PARAMETER_MAXIMAL_DEPARTURE_RANK = "max_dp_rank";
+		const string ReservationsListService::PARAMETER_MINIMAL_ARRIVAL_RANK = "min_arr_rank";
+		const string ReservationsListService::PARAMETER_MAXIMAL_ARRIVAL_RANK = "max_arr_rank";
+		const string ReservationsListService::PARAMETER_LINKED_WITH_VEHICLE_ONLY = "linked_with_vehicle_only";
 		const string ReservationsListService::PARAMETER_USE_CACHE = "use_cache";
 		const string ReservationsListService::PARAMETER_OUTPUT_FORMAT = "output_format";
+		const string ReservationsListService::PARAMETER_WITH_CANCELLATIONS = "with_cancellations";
+		const string ReservationsListService::PARAMETER_WITH_NOT_ACKNOWLEDGED_CANCELLATIONS = "with_not_acknowledged_cancellations";
+		const string ReservationsListService::PARAMETER_ONLY_NOT_ACKNOWLEDGED_RESERVATIONS = "only_not_acknowledged_reservations";
 
 		const string ReservationsListService::DATA_RANK = "rank";
 		const string ReservationsListService::DATA_RESERVATION = "reservation";
 		const string ReservationsListService::DATA_RESERVATIONS = "reservations";
+
+
 
 		ParametersMap ReservationsListService::_getParametersMap() const
 		{
@@ -281,6 +287,10 @@ namespace synthese
 			_linkedWithVehicleOnly = map.getDefault<bool>(PARAMETER_LINKED_WITH_VEHICLE_ONLY, false);
 
 			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
+
+			_withCancellations = map.getDefault<bool>(PARAMETER_WITH_CANCELLATIONS, false);
+			_withNotAcknowledgedCancellations = map.getDefault<bool>(PARAMETER_WITH_NOT_ACKNOWLEDGED_CANCELLATIONS, false);
+			_onlyNotAcknowledgedReservations = map.getDefault<bool>(PARAMETER_ONLY_NOT_ACKNOWLEDGED_RESERVATIONS, false);
 		}
 
 
@@ -477,6 +487,8 @@ namespace synthese
 						continue;
 					}
 
+					// 
+
 					shared_ptr<ParametersMap> resaPM(new ParametersMap);
 					reservation->toParametersMap(*resaPM, _language);
 					pm.insert(DATA_RESERVATION, resaPM);
@@ -535,7 +547,10 @@ namespace synthese
 		ReservationsListService::ReservationsListService():
 			FactorableTemplate<server::Function,ReservationsListService>(),
 			_linkedWithVehicleOnly(false),
-			_useCache(false)
+			_useCache(false),
+			_withCancellations(false),
+			_withNotAcknowledgedCancellations(false),
+			_onlyNotAcknowledgedReservations(false)
 		{
 			if(!_useCache)
 			{

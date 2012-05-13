@@ -81,6 +81,8 @@ namespace synthese
 		const string ReservationTableSync::COL_CANCELLED_BY_OPERATOR = "cancelled_by_operator";
 		const string ReservationTableSync::COL_ACKNOWLEDGE_TIME = "acknowledge_time";
 		const string ReservationTableSync::COL_ACKNOWLEDGE_USER_ID = "acknowledge_user_id";
+		const string ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_TIME = "cancellation_acknowledge_time";
+		const string ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_USER_ID = "cancellation_acknowledge_user_id";
 	}
 
 	namespace db
@@ -113,6 +115,8 @@ namespace synthese
 			Field(ReservationTableSync::COL_CANCELLED_BY_OPERATOR, SQL_BOOLEAN),
 			Field(ReservationTableSync::COL_ACKNOWLEDGE_TIME, SQL_DATETIME),
 			Field(ReservationTableSync::COL_ACKNOWLEDGE_USER_ID, SQL_INTEGER),
+			Field(ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_TIME, SQL_DATETIME),
+			Field(ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_USER_ID, SQL_INTEGER),
 			Field()
 		};
 
@@ -251,17 +255,40 @@ namespace synthese
 			{
 			}
 
+			// Cancellation acknowledge time
+			object->setCancellationAcknowledgeTime(
+				rows->getDateTime(
+					ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_TIME
+			)	);
+
+			// Acknowledge user
+			RegistryKeyType cancellationUserId(
+				rows->getLongLong(
+					ReservationTableSync::COL_CANCELLATION_ACKNOWLEDGE_USER_ID
+			)	);
+			object->setCancellationAcknowledgeUser(NULL);
+			if(	linkLevel >= UP_LINKS_LOAD_LEVEL &&
+				id
+			) try {
+				object->setCancellationAcknowledgeUser(
+					UserTableSync::GetEditable(
+						cancellationUserId,
+						env,
+						linkLevel
+					).get()
+				);
+			}
+			catch(ObjectNotFoundException<User>&)
+			{
+			}
+
 			// Indexation
-			if(linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
+			if(&env == &Env::GetOfficialEnv())
 			{
 				recursive_mutex::scoped_lock lock(ResaModule::GetReservationsByServiceMutex());
-				if(object->getTransaction() && ResaModule::MustBeIndexed(*object->getTransaction()))
+				if(object->getTransaction())
 				{
 					ResaModule::AddReservationByService(*object);
-				}
-				else
-				{
-					ResaModule::RemoveReservationByService(*object);
 				}
 			}
 		}
@@ -270,7 +297,11 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
-			// TODO : update transaction
+			// Clean up transaction
+			if(object->getTransaction())
+			{
+				const_cast<ReservationTransaction*>(object->getTransaction())->removeReservation(*object);
+			}
 
 			// Indexation
 			ResaModule::RemoveReservationByService(*object);
@@ -304,6 +335,12 @@ namespace synthese
 			query.addField(object->getCancelledByOperator());
 			query.addField(object->getAcknowledgeTime());
 			query.addField(object->getAcknowledgeUser() ? object->getAcknowledgeUser()->getKey() : RegistryKeyType(0));
+			query.addField(object->getCancellationAcknowledgeTime());
+			query.addField(
+				object->getCancellationAcknowledgeUser() ?
+				object->getCancellationAcknowledgeUser()->getKey() :
+				RegistryKeyType(0)
+			);
 			query.execute(transaction);
 		}
 
