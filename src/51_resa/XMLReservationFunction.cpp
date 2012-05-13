@@ -93,7 +93,7 @@ namespace synthese
 			{
 				departurePlaceName = (*resa->getReservations().begin())->getDeparturePlaceName();
 				travelDate = (*resa->getReservations().begin())->getDepartureTime();
-				arrivalPlaceName = (*(resa->getReservations().end() - 1))->getArrivalPlaceName();
+				arrivalPlaceName = (*resa->getReservations().rbegin())->getArrivalPlaceName();
 			}
 
 			stream <<

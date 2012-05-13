@@ -87,10 +87,6 @@ namespace synthese
 		const std::string ResaModule::DATA_CURRENT_CALL_ID("current_call_id");
 		const std::string ResaModule::DATA_CURRENT_CALL_TIMESTAMP("current_call_timestamp");
 
-		const boost::posix_time::time_duration ResaModule::BEFORE_RESERVATION_INDEXATION_DURATION = hours(1);
-		const boost::posix_time::time_duration ResaModule::AFTER_RESERVATION_INDEXATION_DURATION = hours(6);
-		const boost::posix_time::time_duration ResaModule::DURATION_BETWEEN_RESERVATIONS_REINDEX = minutes(10);
-
 		ResaModule::_SessionsCallIdMap ResaModule::_sessionsCallIds;
 		shared_ptr<Profile> ResaModule::_basicProfile;
 		shared_ptr<Profile> ResaModule::_autoresaProfile;
@@ -160,13 +156,6 @@ namespace synthese
 				ResaModule::_autoresaProfile->addRight(r3);
 				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
 			}
-
-			// Reservation loader
-			shared_ptr<thread> theThread(
-				new thread(
-					&ResaModule::UpdateReservationsByService
-			)	);
-			ServerModule::AddThread(theThread, "Reservations indexer");
 		}
 
 
@@ -458,67 +447,5 @@ namespace synthese
 			const graph::Service& service
 		){
 			return _reservationsByService[&service];
-		}
-
-
-
-		void ResaModule::UpdateReservationsByService()
-		{
-			while(true)
-			{
-				// Thread status update
-				ServerModule::SetCurrentThreadRunningAction();
-
-				{
-					// Mutex lock
-					recursive_mutex::scoped_lock lock(_reservationsByServiceMutex);
-
-					// Clear already loaded objects
-					_reservationsByService.clear();
-					Env::GetOfficialEnv().getEditableRegistry<ReservationTransaction>().clear();
-					Env::GetOfficialEnv().getEditableRegistry<Reservation>().clear();
-
-					// Reservations load
-					ptime now(second_clock::local_time());
-					ReservationTableSync::SearchResult reservations(
-						ReservationTableSync::Search(
-							Env::GetOfficialEnv(),
-							now - BEFORE_RESERVATION_INDEXATION_DURATION,
-							now + AFTER_RESERVATION_INDEXATION_DURATION
-					)	);
-
-					// Populating the map
-					BOOST_FOREACH(const shared_ptr<Reservation>& reservation, reservations)
-					{
-						AddReservationByService(*reservation);
-					}
-				}
-
-				// Thread status update
-				ServerModule::SetCurrentThreadWaiting();
-
-				// Next load in 10 minutes
-				this_thread::sleep(DURATION_BETWEEN_RESERVATIONS_REINDEX);
-			}
-		}
-
-
-
-		bool ResaModule::MustBeIndexed( const ReservationTransaction& transaction )
-		{
-			ptime now(second_clock::local_time());
-
-			if(	!transaction.getCancellationTime().is_not_a_date_time() ||
-				transaction.getReservations().empty()
-			){
-				return false;
-			}
-
-			if((*transaction.getReservations().begin())->getArrivalTime() < (now - BEFORE_RESERVATION_INDEXATION_DURATION))
-			{
-				return false;
-			}
-
-			return (*transaction.getReservations().rbegin())->getDepartureTime() < (now + AFTER_RESERVATION_INDEXATION_DURATION);
 		}
 }	}
