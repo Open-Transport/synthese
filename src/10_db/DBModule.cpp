@@ -22,21 +22,26 @@
 
 #include "DBModule.h"
 
+#include "CoordinatesSystem.hpp"
 #include "DB.hpp"
+#include "DBConditionalRegistryTableSync.hpp"
 #include "DBDirectTableSync.hpp"
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
 #include "DBTransaction.hpp"
-#include "Log.h"
 #include "Factory.h"
-#include "CoordinatesSystem.hpp"
+#include "Log.h"
+#include "ServerModule.h"
 
 #include <iostream>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/thread.hpp>
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
+
 
 namespace synthese
 {
@@ -51,10 +56,13 @@ namespace synthese
 	{
 		DBModule::TablesByNameMap	DBModule::_tableSyncMap;
 		DBModule::TablesByIdMap	DBModule::_idTableSyncMap;
+		DBModule::ConditionalTableSyncsToReload DBModule::_conditionalTableSyncsToReload;
 
 		boost::shared_ptr<ConnectionInfo> DBModule::_ConnectionInfo;
 		boost::shared_ptr<DB> DBModule::_Db;
 		DBModule::SubClassMap DBModule::_subClassMap;
+
+		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
 	}
 
 	namespace server
@@ -82,14 +90,28 @@ namespace synthese
 			// Table sync registration
 			DBModule::_tableSyncMap.clear();
 			vector<shared_ptr<DBTableSync> > tableSyncs(Factory<DBTableSync>::GetNewCollection());
-			BOOST_FOREACH(const shared_ptr<DBTableSync>& sync, tableSyncs)
+			BOOST_FOREACH(shared_ptr<DBTableSync> sync, tableSyncs)
 			{
 				DBModule::_tableSyncMap[sync->getFormat().NAME] = sync;
 				DBModule::_idTableSyncMap[sync->getFormat().ID] = sync;
+				if(	sync->getNeedsToReload() &&
+					dynamic_cast<DBConditionalRegistryTableSync*>(sync.get())
+				){
+					DBModule::_conditionalTableSyncsToReload.insert(
+						dynamic_pointer_cast<DBConditionalRegistryTableSync, DBTableSync>(sync)
+					);
+				}
 			}
 
 			// DB initialization
 			DBModule::GetDB()->init();
+
+			// Conditional tables load maintainer
+			shared_ptr<thread> theThread(
+				new thread(
+					&DBModule::UpdateConditionalTableSyncEnv
+			)	);
+			ServerModule::AddThread(theThread, "Conditional tables load maintainer");
 		}
 
 
@@ -230,7 +252,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<const util::Registrable> DBModule::GetObject(
+		shared_ptr<const Registrable> DBModule::GetObject(
 			util::RegistryKeyType id,
 			util::Env& env
 		){
@@ -272,5 +294,39 @@ namespace synthese
 				const_cast<util::Registrable&>(object), // Will not be updated because the key is already defined
 				transaction
 			);
+		}
+
+
+
+		void DBModule::UpdateConditionalTableSyncEnv()
+		{
+			while(true)
+			{
+				// Thread status update
+				ServerModule::SetCurrentThreadRunningAction();
+
+				// Loop on each conditional synchronized table
+				BOOST_FOREACH(shared_ptr<DBConditionalRegistryTableSync> sync, _conditionalTableSyncsToReload)
+				{
+					// Cleaning up the env with obsolete data
+					RegistryBase& registry(sync->getEditableRegistry(Env::GetOfficialEnv()));
+					BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& it, registry.getRegistrablesVector())
+					{
+						if(!sync->isLoaded(*it))
+						{
+							registry.remove(it->getKey());
+						}
+					}
+
+					// Load new data
+					sync->loadCurrentData();
+				}
+
+				// Thread status update
+				ServerModule::SetCurrentThreadWaiting();
+
+				// Next load in 1 minutes
+				this_thread::sleep(DURATION_BETWEEN_CONDITONAL_SYNCS);
+			}
 		}
 }	}

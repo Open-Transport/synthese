@@ -189,7 +189,7 @@ namespace synthese
 					@throws ObjectNotFoundInRegistryException if the key is not found in the registry
 					This method cleans the ordered vector.
 				*/
-				void remove (const RegistryKeyType& key);
+				virtual void remove(RegistryKeyType key);
 			//@}
 
 
@@ -280,7 +280,7 @@ namespace synthese
 
 
 		template<class T>
-		void Registry<T>::remove (const RegistryKeyType& key)
+		void Registry<T>::remove (RegistryKeyType key)
 		{
 			if (key == 0)
 				throw typename util::RegistryKeyException<T>("Neutral object cannot be removed at execution time", 0);

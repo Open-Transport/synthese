@@ -358,7 +358,6 @@ namespace synthese
 				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
 			}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_DBInheritanceTableSyncTemplate_hpp__

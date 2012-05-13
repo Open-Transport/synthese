@@ -26,6 +26,7 @@
 #ifndef SYNTHESE_db_DBConditionalRegistryTableSyncTemplate_hpp__
 #define SYNTHESE_db_DBConditionalRegistryTableSyncTemplate_hpp__
 
+#include "DBConditionalRegistryTableSync.hpp"
 #include "DBDirectTableSyncTemplate.hpp"
 
 #include "Exception.h"
@@ -43,7 +44,8 @@ namespace synthese
 		///	@ingroup m10
 		template<class K, class T>
 		class DBConditionalRegistryTableSyncTemplate:
-			public DBDirectTableSyncTemplate<K,T>
+			public DBDirectTableSyncTemplate<K,T>,
+			public DBConditionalRegistryTableSync
 		{
 		public:
 			DBConditionalRegistryTableSyncTemplate() : DBDirectTableSyncTemplate<K,T>() {}
@@ -51,13 +53,59 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Static method to be implemented by template instantiation
-			/// determinating if a row corresponds to an object that must be
+			/// determinates if a row corresponds to an object that must be
 			/// loaded into physical memory or not.
 			/// @param row row to read
 			/// @result true if the object mest be loaded into the physical memory
 			static bool IsLoaded(
 				const DBResultSPtr& row
 			);
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Static method to be implemented by template instantiation
+			/// determinates if a row corresponds to an object that must be
+			/// loaded into physical memory or not.
+			/// @result true if the object mest be loaded into the physical memory
+			static bool IsLoaded(
+				const T& object
+			);
+			
+			
+			
+			virtual bool isLoaded(const util::Registrable& object) const {
+				return IsLoaded(dynamic_cast<const T&>(object));
+			}
+
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Static method to be implemented by template instantiation
+			/// Generates the SQL expression filtering the record to load
+			static boost::shared_ptr<SQLExpression> GetWhereLoaded();
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// If true, the table is massively reloaded every minute into the environment.
+			/// If false, only the first massive load is done at the boot of the process.
+			static const bool NEEDS_AUTO_RELOAD;
+
+
+			virtual bool getNeedsToReload() const { return NEEDS_AUTO_RELOAD; }
+
+
+
+			virtual util::RegistryBase& getEditableRegistry(
+				util::Env& env
+			) const	{
+				return static_cast<util::RegistryBase&>(
+					env.getEditableRegistry<T>()
+				);
+			}
 
 
 
@@ -75,21 +123,27 @@ namespace synthese
 					util::RegistryKeyType key(rows->getKey());
 					try
 					{
-						if(!IsLoaded(rows))
-						{
-							continue;
-						}
 						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							boost::shared_ptr<T> address(registry.getEditable(key));
-							DBDirectTableSyncTemplate<K,T>::Unlink(address.get());
-							Load (address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							boost::shared_ptr<T> object(registry.getEditable(key));
+							DBDirectTableSyncTemplate<K,T>::Unlink(object.get());
+							if(IsLoaded(rows))
+							{
+								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							}
+							else
+							{
+								registry.remove(key);
+							}
 						}
 						else
 						{
-							boost::shared_ptr<T> object(K::GetNewObject(rows));
-							registry.add(object);
-							Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							if(IsLoaded(rows))
+							{
+								boost::shared_ptr<T> object(K::GetNewObject(rows));
+								registry.add(object);
+								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							}
 						}
 					}
 					catch(Exception& e)
@@ -118,17 +172,38 @@ namespace synthese
 				util::Registry<T>& registry(env.getEditableRegistry<T>());
 				while (rows->next ())
 				{
+					util::RegistryKeyType key(rows->getKey());
 					try
 					{
-						if (registry.contains(rows->getKey()))
+						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
-							boost::shared_ptr<T> address(registry.getEditable(rows->getKey()));
-							Unlink(address.get());
-							Load(address.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							boost::shared_ptr<T> object(registry.getEditable(key));
+							DBDirectTableSyncTemplate<K,T>::Unlink(object.get());
+							if(IsLoaded(rows))
+							{
+								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							}
+							else
+							{
+								registry.remove(key);
+							}
+						}
+						else
+						{
+							if(IsLoaded(rows))
+							{
+								boost::shared_ptr<T> object(K::GetNewObject(rows));
+								registry.add(object);
+								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
+							}
 						}
 					}
 					catch (Exception& e)
 					{
+						if(registry.contains(key))
+						{
+							registry.remove(key);
+						}
 						util::Log::GetInstance().warn("Error on load after row update : ", e);
 					}
 				}
@@ -161,6 +236,38 @@ namespace synthese
 						util::Log::GetInstance().warn("Error on unload after row deletion : ", e);
 					}
 				}
+			}
+
+
+
+			static void LoadCurrentData(
+			){
+				// The db
+				DB* db(
+					DBModule::GetDB()
+				);
+
+				// The query
+				std::stringstream ss;
+				ss << "SELECT " << GetFieldsGetter() <<
+					" FROM " << TABLE.NAME <<
+					" WHERE " << GetWhereLoaded()->toString();
+
+				// Runs the query
+				DBResultSPtr result(
+					db->execQuery(
+						ss.str()
+				)	);
+
+				// Loads the object
+				K().rowsAdded(db, result);
+			}
+
+
+
+			virtual void loadCurrentData() const
+			{
+				LoadCurrentData();
 			}
 		};
 	}
