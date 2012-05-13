@@ -60,8 +60,8 @@ namespace synthese
 		///	followed by a unique 3 digits integer (some databases do not allow ids starting with number).
 		///
 		///	@ingroup m10
-		class DBTableSync
-		:	public util::FactoryBase<DBTableSync>
+		class DBTableSync:
+			public util::FactoryBase<DBTableSync>
 		{
 		public:
 			////////////////////////////////////////////////////////////////////
@@ -260,6 +260,8 @@ namespace synthese
 			) = 0;
 
 			virtual util::RegistryKeyType getNewId() const = 0;
+
+			virtual bool getNeedsToReload() const { return false; }
 
 
 			////////////////////////////////////////////////////////////////////

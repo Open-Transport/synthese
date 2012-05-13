@@ -26,6 +26,8 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
+#include "UtilTypes.h"
+
 namespace synthese
 {
 	namespace util
@@ -44,6 +46,8 @@ namespace synthese
 
 			typedef std::vector<boost::shared_ptr<Registrable> > RegistrablesVector;
 			virtual RegistrablesVector getRegistrablesVector() const = 0;
+
+			virtual void remove(util::RegistryKeyType id) = 0;
 		};
 	}
 }
