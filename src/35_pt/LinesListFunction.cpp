@@ -258,7 +258,7 @@ namespace synthese
 			}
 			if(!_page.get())
 			{
-				setOutputFormatFromMap(map, MimeTypes::CSV);
+				setOutputFormatFromMap(map, string());
 			}
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
 			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
