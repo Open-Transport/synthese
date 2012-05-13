@@ -39,7 +39,6 @@
 #include "StopPointTableSync.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
-#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
@@ -73,8 +72,6 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_DATES("dates");
 		const string ScheduledServiceTableSync::COL_STOPS("stops");
 		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
-
-		const string ScheduledServiceTableSync::STOP_SEPARATOR(",");
 	}
 
 	namespace db
@@ -136,7 +133,11 @@ namespace synthese
 				{
 					LineStopTableSync::Search(env, pathId);
 				}
-				ss->clearStops();
+				// Physical stops
+				ss->decodeStops(
+					rows->getText(ScheduledServiceTableSync::COL_STOPS),
+					env
+				);
 
 				// Use rules
 				util::RegistryKeyType bikeComplianceId (rows->getLongLong (ScheduledServiceTableSync::COL_BIKECOMPLIANCEID));
@@ -233,17 +234,10 @@ namespace synthese
 				ss->clearStops();		
 				try
 				{
-					Service::ServedVertices _vertices = ScheduledServiceTableSync::UnserializeStops(
-						rows->getText(ScheduledServiceTableSync::COL_STOPS)
-						, env
-						);
-
-					size_t i(0);
-					BOOST_FOREACH(const Vertex* vertex, _vertices)
-					{
-						ss->setVertex(i, vertex);
-						++i;
-					}
+					ss->decodeStops(
+						rows->getText(ScheduledServiceTableSync::COL_STOPS),
+						env
+					);
 				}
 				catch(synthese::Exception& e)
 				{
@@ -304,7 +298,7 @@ namespace synthese
 			);
 			query.addField(object->getTeam());
 			query.addField(datesStr.str());
-			query.addField(ScheduledServiceTableSync::SerializeStops(object->getVertices()));
+			query.addField(object->encodeStops());
 			query.addField(
 				DataSourceLinks::Serialize(
 					object->getDataSourceLinks(),
@@ -413,60 +407,5 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query, env, linkLevel);
-		}
-
-
-
-		std::string ScheduledServiceTableSync::SerializeStops(const Service::ServedVertices& value)
-		{
-			stringstream s;
-			bool first(true);
-			BOOST_FOREACH(const Service::ServedVertices::value_type& stop, value)
-			{
-				if(first)
-				{
-					first = false;
-				}
-				else
-				{
-					s << ",";
-				}
-				s << (stop ? lexical_cast<string>(stop->getKey()) : string());
-			}
-			return s.str();
-		}
-
-
-
-		Service::ServedVertices ScheduledServiceTableSync::UnserializeStops(const std::string& value, util::Env& env)
-		{
-			Service::ServedVertices result;
-			if(!value.empty())
-			{
-				vector<string> stops;
-				split(stops, value, is_any_of(","));
-				BOOST_FOREACH(const string& stop, stops)
-				{
-					if(!stop.empty())
-					{
-						try
-						{
-							RegistryKeyType stopId(lexical_cast<RegistryKeyType>(stop));
-							result.push_back(
-								StopPointTableSync::GetEditable(stopId, env).get()
-								);
-						}
-						catch(ObjectNotFoundException<StopPoint>&)
-						{
-
-						}
-					}
-					else
-					{
-						result.push_back(NULL);
-					}
-				}
-			}
-			return result;
 		}
 }	}

@@ -52,8 +52,7 @@ namespace synthese
 			Path* path
 		):	RuleUser(),
 			_serviceNumber (serviceNumber),
-			_path (path),
-			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
+			_path (path)
 		{}
 
 
@@ -61,8 +60,7 @@ namespace synthese
 			RegistryKeyType id
 		):	RuleUser(),
 			_path(NULL),
-			Registrable(id),
-			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
+			Registrable(id)
 		{}
 
 
@@ -107,13 +105,7 @@ namespace synthese
 
 		void Service::setPath( Path* path )
 		{
-			if(path && (_path != path))
-			{
-				_path = path;
-				clearStops();
-			}
 			_path = path;
-			clearRTData();
 		}
 
 
@@ -148,7 +140,7 @@ namespace synthese
 			const Path::Edges& edges(_path->getEdges());
 			for (Path::Edges::const_iterator it(edges.begin()); it != edges.end(); ++it)
 			{
-				const int i((*it)->getRankInPath());
+				const size_t i((*it)->getRankInPath());
 
 				if ((*it)->isDeparture())
 				{
@@ -223,84 +215,8 @@ namespace synthese
 
 
 
-		const boost::posix_time::ptime& Service::getNextRTUpdate() const
-		{
-			return _nextRTUpdate;
-		}
-
-
-
-		void Service::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
-		{
-			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
-			_RTVertices[rank] = value;
-		}
-
-
-
-		const graph::Vertex* Service::getRealTimeVertex( std::size_t rank ) const
-		{
-			return _RTVertices[rank];
-		}
-
-
-
-		void Service::setVertex( std::size_t rank, const graph::Vertex* value )
-		{
-			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
-			if(value != _path->getEdge(rank)->getFromVertex())
-			{
-				_vertices[rank] = value;
-			}
-			else
-			{
-				_vertices[rank] = NULL;
-			}
-		}
-
-
-
-		const graph::Vertex* Service::getVertex( std::size_t rank ) const
-		{
-			return _vertices[rank];
-		}
-
-
-
 		void Service::clearRTData()
 		{
-			if(getPath())
-			{
-				_RTVertices.clear();
-				size_t i(0);
-				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
-				{
-					if(_vertices[i])
-					{
-						_RTVertices.push_back(_vertices[i]);
-					}
-					else
-					{
-						_RTVertices.push_back(edge->getFromVertex());
-					}
-					++i;
-				}
-			}
-			_computeNextRTUpdate();
-		}
-
-
-
-		void Service::clearStops()
-		{
-			_vertices.clear();
-			if(getPath())
-			{
-				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
-				{
-					_vertices.push_back(NULL);
-				}
-			}
 		}
 
 
