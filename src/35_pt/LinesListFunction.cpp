@@ -23,15 +23,17 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "RequestException.h"
 #include "LinesListFunction.h"
-#include "TransportNetwork.h"
+
 #include "CommercialLine.h"
-#include "Webpage.h"
+#include "Path.h"
+#include "RequestException.h"
+#include "ReservationContact.h"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
 #include "SortableLineNumber.hpp"
-#include "Path.h"
+#include "TransportNetwork.h"
+#include "Webpage.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLineTableSync.h"
 #include "ImportableTableSync.hpp"
@@ -87,6 +89,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_OUTPUT_MESSAGES = "output_messages";
 		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
 		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
+		const string LinesListFunction::PARAMETER_CONTACT_CENTER_ID = "contact_center_id";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -197,28 +200,30 @@ namespace synthese
 
 		void LinesListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			{ // Object(s) selection
-				RegistryKeyType id(map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID));
-				if(id) try
-				{
-					_network = Env::GetOfficialEnv().get<TransportNetwork>(id);
-				}
-				catch(ObjectNotFoundException<TransportNetwork>&)
-				{
-					throw RequestException("Transport network " + lexical_cast<string>(id) + " not found");
-				}
-				else
-				{
-					id = map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID);
-					try
-					{
-						_line = Env::GetOfficialEnv().get<CommercialLine>(id);
-					}
-					catch(ObjectNotFoundException<CommercialLine>&)
-					{
-						throw RequestException("Line " + lexical_cast<string>(id) + " not found");
-					}
-				}
+			// Selection by line id
+			RegistryKeyType lineId(
+				map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID, 0)
+			);
+			if(lineId > 0 && decodeTableId(lineId) == CommercialLineTableSync::TABLE.ID) try
+			{
+				_line = Env::GetOfficialEnv().get<CommercialLine>(lineId);
+			}
+			catch(ObjectNotFoundException<CommercialLine>&)
+			{
+				throw RequestException("Line " + lexical_cast<string>(lineId) + " not found");
+			}
+
+			// Network filter
+			RegistryKeyType networkId(
+				map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0)
+			);
+			if(networkId > 0) try
+			{
+				_network = Env::GetOfficialEnv().get<TransportNetwork>(networkId);
+			}
+			catch(ObjectNotFoundException<TransportNetwork>&)
+			{
+				throw RequestException("Transport network " + lexical_cast<string>(networkId) + " not found");
 			}
 
 			// Letters before numbers
@@ -301,6 +306,25 @@ namespace synthese
 				}
 			}
 			_sortByTransportMode.push_back(shared_ptr<RollingStock>()); // NULL pointer at end
+
+			// Contact center filter
+			_contactCenterFilter.reset();
+			if(!map.getDefault<string>(PARAMETER_CONTACT_CENTER_ID).empty())
+			{
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_CONTACT_CENTER_ID));
+				if(id > 0) try
+				{
+					_contactCenterFilter = Env::GetOfficialEnv().get<ReservationContact>(id);
+				}
+				catch(ObjectNotFoundException<ReservationContact>&)
+				{
+					throw RequestException("No such contact center");
+				}
+				else
+				{
+					_contactCenterFilter = shared_ptr<ReservationContact>();
+				}
+			}
 		}
 
 
@@ -328,13 +352,19 @@ namespace synthese
 			> LinesMapType;
 			LinesMapType linesMap;
 
-			// Get CommercialLine Global Registry
-			if(_network.get())
+			// Specified line ID
+			if(_line.get())
+			{
+				linesMap[NULL][SortableLineNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
+			}
+			else
 			{
 				CommercialLineTableSync::SearchResult lines(
 					CommercialLineTableSync::Search(
 						Env::GetOfficialEnv(),
-						_network->getKey(),
+						_network.get() ?
+							optional<RegistryKeyType>(_network->getKey()) :
+							optional<RegistryKeyType>(),
 						optional<string>(),
 						optional<string>(),
 						0,
@@ -346,7 +376,10 @@ namespace synthese
 						((_rightClass.empty() && _rightLevel) || !request.getUser()) ?
 							optional<const RightsOfSameClassMap&>() :
 							request.getUser()->getProfile()->getRights(_rightClass),
-						_rightLevel ? *_rightLevel : FORBIDDEN
+						_rightLevel ? *_rightLevel : FORBIDDEN,
+						_contactCenterFilter ?
+							(_contactCenterFilter->get() ? (*_contactCenterFilter)->getKey() : 0) :
+							optional<RegistryKeyType>()
 				)	);
 				set<CommercialLine*> alreadyShownLines;
 				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
@@ -399,10 +432,6 @@ namespace synthese
 							alreadyShownLines.insert(line.get());
 						}
 				}	}
-			}
-			else if(_line.get())
-			{
-				linesMap[NULL][SortableLineNumber(_line->getShortName(), _lettersBeforeNumbers)] = _line;
 			}
 
 			// Populating the parameters map
@@ -585,7 +614,7 @@ namespace synthese
 					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
 				}
 			}
-			else
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				outputParametersMap(
 					pm,

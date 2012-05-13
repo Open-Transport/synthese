@@ -92,7 +92,8 @@ namespace synthese
 				bool raisingOrder = true,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
 				boost::optional<const security::RightsOfSameClassMap&> rights = boost::optional<const security::RightsOfSameClassMap&>(),
-				security::RightLevel neededLevel = security::FORBIDDEN
+				security::RightLevel neededLevel = security::FORBIDDEN,
+				boost::optional<util::RegistryKeyType> contactCenterId = boost::optional<util::RegistryKeyType>()
 			);
 
 

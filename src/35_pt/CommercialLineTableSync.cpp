@@ -103,7 +103,8 @@ namespace synthese
 			"t042_commercial_lines"
 		);
 
-		template<> const Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
+		template<>
+		const Field DBTableSyncTemplate<CommercialLineTableSync>::_FIELDS[]=
 		{
 			Field(TABLE_COL_ID, SQL_INTEGER),
 			Field(CommercialLineTableSync::COL_NETWORK_ID, SQL_INTEGER),
@@ -126,6 +127,8 @@ namespace synthese
 			Field()
 		};
 
+
+
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<CommercialLineTableSync>::GetIndexes()
 		{
@@ -136,10 +139,18 @@ namespace synthese
 					CommercialLineTableSync::COL_CREATOR_ID.c_str(),
 					""
 			)	);
+			r.push_back(
+				DBTableSync::Index(
+					CommercialLineTableSync::COL_RESERVATION_CONTACT_ID.c_str(),
+					""
+			)	);
 			return r;
 		}
 
-		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Load(
+
+
+		template<>
+		void DBDirectTableSyncTemplate<CommercialLineTableSync, CommercialLine>::Load(
 			CommercialLine* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
@@ -279,14 +290,16 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
+		template<>
+		void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
 			CommercialLine* obj
 		){
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(
+		template<>
+		void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Save(
 			CommercialLine* object,
 			optional<DBTransaction&> transaction
 		){
@@ -350,7 +363,8 @@ namespace synthese
 
 
 
-		template<> bool DBTableSyncTemplate<CommercialLineTableSync>::CanDelete(
+		template<>
+		bool DBTableSyncTemplate<CommercialLineTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -360,7 +374,8 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<CommercialLineTableSync>::BeforeDelete(
+		template<>
+		void DBTableSyncTemplate<CommercialLineTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -374,7 +389,8 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<CommercialLineTableSync>::AfterDelete(
+		template<>
+		void DBTableSyncTemplate<CommercialLineTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -382,7 +398,8 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<CommercialLineTableSync>::LogRemoval(
+		template<>
+		void DBTableSyncTemplate<CommercialLineTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -404,7 +421,8 @@ namespace synthese
 			bool raisingOrder,
 			LinkLevel linkLevel,
 			boost::optional<const security::RightsOfSameClassMap&> rights,
-			security::RightLevel neededLevel
+			security::RightLevel neededLevel,
+			boost::optional<util::RegistryKeyType> contactCenterId
 		){
 			stringstream query;
 			query
@@ -443,6 +461,13 @@ namespace synthese
 			}
 			if (networkId)
 				query << " AND l." << COL_NETWORK_ID << "=" << *networkId;
+
+			// Contact center filter
+			if(contactCenterId)
+			{
+				query << " AND l." << COL_RESERVATION_CONTACT_ID << "=" << *contactCenterId;
+			}
+
 			if (orderByNetwork)
 				query << " ORDER BY "
 					<< "(SELECT n." << TransportNetworkTableSync::COL_NAME << " FROM " << TransportNetworkTableSync::TABLE.NAME << " AS n WHERE n." << TABLE_COL_ID << "=l." << COL_NETWORK_ID << ")" << (raisingOrder ? " ASC" : " DESC")
@@ -463,15 +488,15 @@ namespace synthese
 
 		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
-			const security::RightsOfSameClassMap& rights
-			, bool totalControl
-			, RightLevel neededLevel,
-			int first
-			, boost::optional<std::size_t> number
-			, bool orderByNetwork /*= true */
-			, bool orderByName /*= false */
-			, bool raisingOrder /*= true */
-			, bool mustBeBookable,
+			const security::RightsOfSameClassMap& rights,
+			bool totalControl,
+			RightLevel neededLevel,
+			int first,
+			boost::optional<std::size_t> number,
+			bool orderByNetwork, /*= true */
+			bool orderByName, /*= false */
+			bool raisingOrder, /*= true */
+			bool mustBeBookable,
 			LinkLevel linkLevel
 		){
 			stringstream query;
@@ -494,11 +519,11 @@ namespace synthese
 
 
 		std::string CommercialLineTableSync::getSQLLinesList(
-			const security::RightsOfSameClassMap& rights
-			, bool totalControl
-			, RightLevel neededLevel
-			, bool mustBeBookable
-			, std::string selectedColumns
+			const security::RightsOfSameClassMap& rights,
+			bool totalControl,
+			RightLevel neededLevel,
+			bool mustBeBookable,
+			std::string selectedColumns
 		){
 			RightsOfSameClassMap::const_iterator it;
 			bool all(totalControl);

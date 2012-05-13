@@ -51,6 +51,7 @@ namespace synthese
 		class CommercialLine;
 		class TransportNetwork;
 		class RollingStock;
+		class ReservationContact;
 
 		////////////////////////////////////////////////////////////////////
 		/// 35.15 Function : Lines list public Function class.
@@ -77,6 +78,7 @@ namespace synthese
 			static const std::string PARAMETER_SRID;
 			static const std::string PARAMETER_RIGHT_CLASS;
 			static const std::string PARAMETER_RIGHT_LEVEL;
+			static const std::string PARAMETER_CONTACT_CENTER_ID;
 
 			static const std::string FORMAT_WKT;
 
@@ -112,6 +114,7 @@ namespace synthese
 				TransportModeSorting _sortByTransportMode;
 				std::string _rightClass;
 				boost::optional<security::RightLevel> _rightLevel;
+				boost::optional<boost::shared_ptr<const ReservationContact> > _contactCenterFilter;
 			//@}
 
 
