@@ -16,6 +16,7 @@
 #include "PTRouteDetailFunction.hpp"
 #include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
+#include "ServicesListService.hpp"
 
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
@@ -243,6 +244,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::PTRouteDetailFunction::integrate();
 	synthese::pt::CheckLineCalendarFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
+	synthese::pt::ServicesListService::integrate();
 
 	synthese::pt::LineMarkerInterfacePage::integrate();
 	synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
