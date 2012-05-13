@@ -23,7 +23,6 @@
 #ifndef SYNTHESE_db_SQLExpression_hpp__
 #define SYNTHESE_db_SQLExpression_hpp__
 
-#include "DBModule.h"
 #include "CoordinatesSystem.hpp"
 
 #include <set>
@@ -86,40 +85,6 @@ namespace synthese
 		};
 
 
-		class ComposedExpression:
-			public SQLExpression
-		{
-		public:
-			static const std::string OP_AND;
-			static const std::string OP_OR;
-			static const std::string OP_EQ;
-			static const std::string OP_LIKE;
-			static const std::string OP_SUP;
-			static const std::string OP_SUPEQ;
-			static const std::string OP_INF;
-			static const std::string OP_INFEQ;
-			static const std::string OP_BITAND;
-			static const std::string OP_BITOR;
-			static const std::string OP_IN;
-			static const std::string OP_NOTIN;
-			static const std::string OP_EXISTS;
-			static const std::string OP_DIFF;
-			static const std::string OP_ADD;
-			static const std::string OP_SUB;
-			static const std::string OP_MUL;
-			static const std::string OP_DIV;
-
-		private:
-			boost::shared_ptr<SQLExpression> _expr1;
-			std::string _op;
-			boost::shared_ptr<SQLExpression> _expr2;
-
-		public:
-			ComposedExpression(boost::shared_ptr<SQLExpression> expr1, std::string op, boost::shared_ptr<SQLExpression> expr2) : _expr1(expr1), _op(op), _expr2(expr2) {}
-			virtual std::string toString() const;
-			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expr1, std::string op, boost::shared_ptr<SQLExpression> expr2);
-		};
-
 		class RawSQL
 		{
 			const std::string _sql;
@@ -137,32 +102,6 @@ namespace synthese
 			ValueExpression(const T& value) : _value(boost::lexical_cast<std::string>(value)) {}
 			virtual std::string toString() const { return _value; }
 			static boost::shared_ptr<SQLExpression> Get(const T& value);
-		};
-
-		class NotExpression:
-			public SQLExpression
-		{
-			boost::shared_ptr<SQLExpression> _expression;
-
-		public:
-			NotExpression(boost::shared_ptr<SQLExpression> expression) : _expression(expression) {}
-
-			virtual std::string toString() const;
-
-			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expression);
-		};
-
-		class IsNullExpression:
-			public SQLExpression
-		{
-			boost::shared_ptr<SQLExpression> _expression;
-
-		public:
-			IsNullExpression(boost::shared_ptr<SQLExpression> expression) : _expression(expression) {}
-
-			virtual std::string toString() const;
-
-			static boost::shared_ptr<SQLExpression> Get(boost::shared_ptr<SQLExpression> expression);
 		};
 
 

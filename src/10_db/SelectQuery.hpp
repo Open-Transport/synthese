@@ -23,9 +23,9 @@
 #ifndef SYNTHESE_db_SelectQuery_hpp__
 #define SYNTHESE_db_SelectQuery_hpp__
 
+#include "ComposedExpression.hpp"
 #include "DBResult.hpp"
 #include "DBModule.h"
-#include "SQLExpression.hpp"
 #include "DB.hpp"
 
 #include <boost/foreach.hpp>
@@ -74,10 +74,35 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
-				void addTableField(const std::string& field, std::string alias = std::string());
+				//////////////////////////////////////////////////////////////////////////
+				/// Basic field generator.
+				/// @param expression expression of the field
+				/// @param alias alias of the field
+				void addField(
+					boost::shared_ptr<SQLExpression> expression,
+					std::string alias = std::string()
+				);
 
+				//////////////////////////////////////////////////////////////////////////
+				/// Shortcut to add a simple field of the queried table.
+				/// @param field the name of the field in the table
+				/// @param alias alias of the field
+				void addTableField(
+					const std::string& field,
+					std::string alias = std::string()
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Shortcut to add a static value as a field.
+				/// @param value the value
+				/// @param alias alias of the field
 				template<class T>
-				void addValueField(const T& value, std::string alias = std::string());
+				void addValueField(
+					const T& value,
+					std::string alias = std::string()
+				);
 
 
 				template<class Table2>
@@ -131,26 +156,40 @@ namespace synthese
 
 
 		template<class Table>
-		void SelectQuery<Table>::addTableField( const std::string& field, std::string alias /*= std::string()*/ )
+		void synthese::db::SelectQuery<Table>::addField( boost::shared_ptr<SQLExpression> expression, std::string alias /*= std::string() */ )
 		{
 			_fields.push_back(
 				std::make_pair(
-					FieldExpression::Get(Table::TABLE.NAME, field),
+					expression,
 					alias
 			)	);
 		}
 
 
 
+		template<class Table>
+		void SelectQuery<Table>::addTableField(
+			const std::string& field,
+			std::string alias /*= std::string()*/
+		){
+			addField(
+				FieldExpression::Get(Table::TABLE.NAME, field),
+				alias
+			);
+		}
+
+
+
 
 		template<class Table> template <class T>
-		void SelectQuery<Table>::addValueField( const T& value, std::string alias /*= std::string()*/ )
-		{
-			_fields.push_back(
-				std::make_pair(
+		void SelectQuery<Table>::addValueField(
+			const T& value,
+			std::string alias /*= std::string()*/
+		){
+			addField(
 				ValueExpression<T>::Get(value),
-					alias
-			)	);
+				alias
+			);
 		}
 
 
