@@ -198,7 +198,8 @@ namespace synthese
 
 
 
-		boost::shared_ptr<db::SQLExpression> DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync,AlarmObjectLink>::GetWhereLoaded()
+		template<>
+		shared_ptr<SQLExpression> DBConditionalRegistryTableSyncTemplate<AlarmObjectLinkTableSync, AlarmObjectLink>::GetWhereLoaded()
 		{
 			// The subquery
 			SelectQuery<AlarmTableSync> subQuery;

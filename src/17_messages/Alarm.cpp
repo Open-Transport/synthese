@@ -46,7 +46,8 @@ namespace synthese
 		Alarm::Alarm(
 			util::RegistryKeyType key,
 			const Scenario* scenario
-		):	_level(ALARM_LEVEL_INFO),
+		):	Registrable(key),
+			_level(ALARM_LEVEL_INFO),
 			_scenario(scenario),
 			_rawEditor(false)
 		{}
@@ -55,7 +56,8 @@ namespace synthese
 
 		Alarm::Alarm(
 			const Alarm& source
-		):	_level(source._level),
+		):	Registrable(0),
+			_level(source._level),
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
 			_scenario(source._scenario),
@@ -67,7 +69,8 @@ namespace synthese
 		Alarm::Alarm(
 			const Alarm& source,
 			const Scenario* scenario
-		):	_level(source._level),
+		):	Registrable(0),
+			_level(source._level),
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
 			_scenario(scenario),
