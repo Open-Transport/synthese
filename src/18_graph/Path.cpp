@@ -44,6 +44,7 @@
 using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
+using namespace boost::posix_time;
 using namespace geos::geom;
 
 namespace synthese
@@ -368,7 +369,7 @@ namespace synthese
 			Edge* lastEdge(*getLastEdge()->getSubEdges().rbegin());
 			Vertex* vertex(const_cast<Vertex*>(lastEdge->getFromVertex()));
 			double metricOffset(lastEdge->getMetricOffset());
-			int rankInPath(lastEdge->getRankInPath());
+			size_t rankInPath(lastEdge->getRankInPath());
 
 			_edges.pop_back();
 			vertex->removeArrivalEdge(lastEdge);
@@ -647,16 +648,54 @@ namespace synthese
 
 		bool cmpService::operator ()(const Service *s1, const Service *s2) const
 		{
-			if(	s1->getDepartureSchedule (false,0) == s2->getDepartureSchedule (false,0) ||
-				s1->getDepartureSchedule (false,0).is_not_a_date_time() ||
-				s2->getDepartureSchedule (false,0).is_not_a_date_time()
-			){
+			// Same objects
+			if(s1 == s2)
+			{
+				return true;
+			}
+
+			// NULL after all
+			if(!s1)
+			{
+				assert(false); // This should not happen
+				return false;
+			}
+
+			// All before NULL
+			if(!s2)
+			{
+				assert(false); // This should not happen
+				return true;
+			}
+
+			// Services are not null : now comparison on schedule
+			const time_duration departureSchedule1(
+				s1->getDepartureSchedule(false, 0)
+			);
+			const time_duration departureSchedule2(
+				s2->getDepartureSchedule(false, 0)
+			);
+
+			// Identical schedule objects : comparison on address
+			if(departureSchedule1 == departureSchedule2)
+			{
 				return s1 < s2;
 			}
-			else
-			{
-				return s1->getDepartureSchedule (false,0) < s2->getDepartureSchedule (false,0);
+
+			// Undefined departure schedule after all
+			if(	departureSchedule1.is_not_a_date_time()
+			){
+				return false;
 			}
+
+			// All before undefined departure schedule
+			if(	departureSchedule2.is_not_a_date_time()
+			){
+				return true;
+			}
+
+			// Comparison on valid departure schedules
+			return departureSchedule1 < departureSchedule2;
 		}
 
 
