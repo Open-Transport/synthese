@@ -20,20 +20,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "User.h"
+
+#include "MD5Wrapper.h"
+#include "Profile.h"
+#include "Registry.h"
+#include "StringUtils.hpp"
+#include "UserException.h"
+
 #include <sstream>
 #include <vector>
-
 #include <boost/random/uniform_int.hpp>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/variate_generator.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-
-#include "MD5Wrapper.h"
-#include "StringUtils.hpp"
-#include "Registry.h"
-#include "User.h"
-#include "UserException.h"
-
 
 using namespace std;
 using namespace boost;
@@ -268,6 +268,16 @@ namespace synthese
 			pm.insert(DATA_NAME, _name);
 			pm.insert(DATA_SURNAME, _surname);
 			pm.insert(DATA_LOGIN, _login);
+			pm.insert("phone", _phone);
+			pm.insert("email", _email);
+			pm.insert("address", _address);
+			pm.insert("postcode", _postCode);
+			pm.insert("cityText", _cityText);
+			pm.insert("is_connection_allowed", _isConnectionAllowed);
+			if(_profile)
+			{
+				pm.insert("profile_id", _profile->getKey());
+			}
 		}
 	}
 }
