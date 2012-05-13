@@ -25,6 +25,7 @@
 
 #include "Object.hpp"
 
+#include "DriverActivity.hpp"
 #include "DriverService.hpp"
 #include "ImportableTemplate.hpp"
 #include "StandardFields.hpp"
@@ -61,7 +62,8 @@ namespace synthese
 			FIELD(impex::DataSourceLinks),
 			FIELD(WorkRange),
 			FIELD(WorkDuration),
-			FIELD(WithTicketSales)
+			FIELD(WithTicketSales),
+			FIELD(DriverActivity)
 		> DriverAllocationSchema;
 
 		/** DriverAllocation class.

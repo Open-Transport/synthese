@@ -5,6 +5,7 @@
 #include "CompositionTableSync.hpp"
 #include "DeadRunTableSync.hpp"
 #include "DepotTableSync.hpp"
+#include "DriverActivityTableSync.hpp"
 #include "DriverAllocationTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "VehicleTableSync.hpp"
@@ -19,6 +20,8 @@
 
 #include "DepotAdmin.hpp"
 #include "DepotsAdmin.hpp"
+#include "DriverActivitiesAdmin.hpp"
+#include "DriverActivityAdmin.hpp"
 #include "DriverServiceAdmin.hpp"
 #include "DriverServicesAdmin.hpp"
 #include "VehicleAdmin.hpp"
@@ -41,6 +44,7 @@
 #include "Depot.hpp"
 #include "DeadRun.hpp"
 #include "DeadRunEdge.hpp"
+#include "DriverActivity.hpp"
 #include "DriverAllocation.hpp"
 #include "DriverService.hpp"
 #include "Vehicle.hpp"
@@ -57,6 +61,7 @@ void synthese::pt_operation::moduleRegister()
 	// 37 PT Operation
 	synthese::pt_operation::DeadRunTableSync::integrate();
 	synthese::pt_operation::DepotTableSync::integrate();
+	synthese::pt_operation::DriverActivityTableSync::integrate();
 	synthese::pt_operation::DriverAllocationTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::DriverServiceTableSync>::integrate();
@@ -91,6 +96,8 @@ void synthese::pt_operation::moduleRegister()
 
 	synthese::pt_operation::DepotAdmin::integrate();
 	synthese::pt_operation::DepotsAdmin::integrate();
+	synthese::pt_operation::DriverActivitiesAdmin::integrate();
+	synthese::pt_operation::DriverActivityAdmin::integrate();
 	synthese::pt_operation::DriverServiceAdmin::integrate();
 	synthese::pt_operation::DriverServicesAdmin::integrate();
 	synthese::pt_operation::VehicleAdmin::integrate();
@@ -103,6 +110,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::Depot>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRun>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
+	synthese::util::Env::Integrate<synthese::pt_operation::DriverActivity>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocation>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
 	synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();

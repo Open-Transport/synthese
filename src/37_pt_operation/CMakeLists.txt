@@ -27,6 +27,14 @@ DepotTableSync.cpp
 DepotTableSync.hpp
 DepotUpdateAction.cpp
 DepotUpdateAction.hpp
+DriverActivitiesAdmin.cpp
+DriverActivitiesAdmin.hpp
+DriverActivity.cpp
+DriverActivity.hpp
+DriverActivityAdmin.cpp
+DriverActivityAdmin.hpp
+DriverActivityTableSync.cpp
+DriverActivityTableSync.hpp
 DriverAllocation.cpp
 DriverAllocation.hpp
 DriverAllocationsListService.cpp
