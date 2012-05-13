@@ -75,21 +75,13 @@ namespace synthese
 			static const std::string DATA_SERVICE_NUMBER;
 
 		public:
-			typedef std::vector<const Vertex*> ServedVertices;
 			static const boost::posix_time::time_duration DAY_DURATION;
 
 		protected:
 			std::string				_serviceNumber;
 			Path*					_path;
 
-			boost::posix_time::ptime _nextRTUpdate;
-			ServedVertices	_vertices;		//!< Edges
-			ServedVertices	_RTVertices;	//!< Real time edges
-
-			virtual void _computeNextRTUpdate() = 0;
-
 		public:
-
 			Service(
 				const std::string& serviceNumber,
 				Path* path
@@ -106,7 +98,6 @@ namespace synthese
 				const Path*			getPath () const;
 				Path*				getPath ();
 				const std::string&	getServiceNumber()	const;
-				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
 
 			//! @name Setters
@@ -230,55 +221,14 @@ namespace synthese
 					bool RTData,
 					size_t rank
 				) const = 0;
-
-
-				const graph::Vertex* getRealTimeVertex(
-					std::size_t rank
-				) const;
-
-
-				const graph::Vertex* getVertex(
-					std::size_t rank
-					) const;
-
-				const ServedVertices& getVertices() const
-				{
-					return _vertices;
-				}
 			//@}
 
 
+			//////////////////////////////////////////////////////////////////////////
+			/// Restores real time data to theoretical value.
+			/// Sets the next update into the next day.
+			virtual void clearRTData();
 
-
-			//! @name Update methods
-			//@{
-				//////////////////////////////////////////////////////////////////////////
-				/// Update a served edge at real time.
-				/// @param rank Rank of the edge to update
-				/// @param value Served edge
-				void setRealTimeVertex(
-					std::size_t rank,
-					const graph::Vertex* value
-				);
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Update a served edge.
-				/// @param rank Rank of the edge to update
-				/// @param value Served edge
-				void setVertex(
-					std::size_t rank,
-					const graph::Vertex* value
-					);
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Restores real time data to theoretical value.
-				/// Sets the next update into the next day.
-				virtual void clearRTData();
-
-				//////////////////////////////////////////////////////////////////////////
-				/// Clears stops data.
-				void clearStops();
-			//@}
 
 
 			//////////////////////////////////////////////////////////////////////////

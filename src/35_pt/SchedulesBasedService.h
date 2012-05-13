@@ -27,6 +27,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	namespace pt
 	{
 		/** SchedulesBasedService class.
@@ -50,17 +55,25 @@ namespace synthese
 				PathBeginsWithUnscheduledStopException(const graph::Path& path);
 			};
 
+			typedef std::vector<const graph::Vertex*> ServedVertices;
+
+			static const std::string STOP_SEPARATOR;
+
 		protected:
+
 			//! @name Theoretical data
 			//@{
 				Schedules	_departureSchedules;	//!< Departure schedules
 				Schedules	_arrivalSchedules;		//!< Arrival schedules
+				ServedVertices	_vertices;			//!< Edges
 			//@}
 
 			//! @name Real time data
 			//@{
 				Schedules	_RTDepartureSchedules;
 				Schedules	_RTArrivalSchedules;
+				ServedVertices	_RTVertices;		//!< Real time edges
+				boost::posix_time::ptime _nextRTUpdate;
 			//@}
 
 		public:
@@ -74,6 +87,7 @@ namespace synthese
 			//@{
 				const Schedules& getDepartureSchedules(bool RTData) const;
 				const Schedules& getArrivalSchedules(bool RTData) const;
+				const boost::posix_time::ptime& getNextRTUpdate() const;
 			//@}
 
 			//! @name Setters
@@ -91,7 +105,21 @@ namespace synthese
 					const Schedules& arrivalSchedules,
 					bool onlyScheduledEdges
 				);
+
+
+				virtual void setPath(graph::Path* path);
 			//@}
+
+
+				const graph::Vertex* getRealTimeVertex(
+					std::size_t rank
+				) const;
+
+
+				const graph::Vertex* getVertex(
+					std::size_t rank
+				) const;
+
 
 
 
@@ -139,16 +167,38 @@ namespace synthese
 				);
 
 
-				virtual void clearRTData();
-
-				virtual void _computeNextRTUpdate();
+				void _computeNextRTUpdate();
 
 				void setSchedulesFromOther(const SchedulesBasedService& other, boost::posix_time::time_duration shift);
 				void generateIncrementalSchedules(boost::posix_time::time_duration firstSchedule);
 
 				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
-			//@}
 
+				
+			//! @name Update methods
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Update a served edge at real time.
+				/// @param rank Rank of the edge to update
+				/// @param value Served edge
+				void setRealTimeVertex(
+					std::size_t rank,
+					const graph::Vertex* value
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Restores real time data to theoretical value.
+				/// Sets the next update into the next day.
+				virtual void clearRTData();
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Clears stops data.
+				void clearStops();
+			//@}
 
 			//! @name Encoding / decoding
 			//@{
@@ -177,6 +227,17 @@ namespace synthese
 					const std::string value,
 					boost::posix_time::time_duration shiftArrivals = boost::posix_time::minutes(0)
 				);
+
+
+				std::string encodeStops() const;
+				void decodeStops(const std::string& value, util::Env& env);
+
+
+				void setVertex(
+					size_t rank,
+					const graph::Vertex* value
+				);
+
 			//@}
 		};
 	}

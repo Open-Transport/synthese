@@ -21,13 +21,16 @@
 */
 
 #include "SchedulesBasedService.h"
-#include "Path.h"
+
 #include "LineStop.h"
+#include "Path.h"
+#include "StopPointTableSync.hpp"
 #include "Vertex.h"
 
 #include <sstream>
 #include <iomanip>
 #include <boost/tokenizer.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
 
@@ -38,14 +41,19 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace graph;
+	using namespace util;
+	
 
 	namespace pt
 	{
+		const string SchedulesBasedService::STOP_SEPARATOR = ",";
+
+
 		SchedulesBasedService::SchedulesBasedService(
 			std::string serviceNumber,
 			graph::Path* path
-		):
-			NonPermanentService(serviceNumber, path)
+		):	NonPermanentService(serviceNumber, path),
+			_nextRTUpdate(posix_time::second_clock::local_time() + gregorian::days(1))
 		{
 			clearStops();
 			clearRTData();
@@ -171,6 +179,38 @@ namespace synthese
 
 
 
+
+
+		const boost::posix_time::ptime& SchedulesBasedService::getNextRTUpdate() const
+		{
+			return _nextRTUpdate;
+		}
+
+
+
+		void SchedulesBasedService::setRealTimeVertex( std::size_t rank, const graph::Vertex* value )
+		{
+			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
+			_RTVertices[rank] = value;
+		}
+
+
+
+		const graph::Vertex* SchedulesBasedService::getRealTimeVertex( std::size_t rank ) const
+		{
+			return _RTVertices[rank];
+		}
+
+
+
+		const graph::Vertex* SchedulesBasedService::getVertex(
+			std::size_t rank
+		) const	{
+			return _vertices[rank];
+		}
+
+
+
 		boost::posix_time::time_duration SchedulesBasedService::getDepartureSchedule( bool RTData, std::size_t rank ) const
 		{
 			return getDepartureSchedules(RTData).at(rank);
@@ -252,7 +292,25 @@ namespace synthese
 		{
 			_RTDepartureSchedules = _departureSchedules;
 			_RTArrivalSchedules = _arrivalSchedules;
-			Service::clearRTData();
+
+			if(getPath())
+			{
+				_RTVertices.clear();
+				size_t i(0);
+				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
+				{
+					if(_vertices[i])
+					{
+						_RTVertices.push_back(_vertices[i]);
+					}
+					else
+					{
+						_RTVertices.push_back(edge->getFromVertex());
+					}
+					++i;
+				}
+			}
+			_computeNextRTUpdate();
 		}
 
 
@@ -493,9 +551,130 @@ namespace synthese
 
 
 
+		void SchedulesBasedService::clearStops()
+		{
+			if(getPath())
+			{
+				_vertices.clear();
+				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
+				{
+					_vertices.push_back(NULL);
+				}
+			}
+		}
+
+
+
+		void SchedulesBasedService::setPath( Path* path )
+		{
+			NonPermanentService::setPath(path);
+			clearStops();
+			clearRTData();
+		}
+
+
+
+		string SchedulesBasedService::encodeStops() const
+		{
+			stringstream s;
+			bool first(true);
+			BOOST_FOREACH(const SchedulesBasedService::ServedVertices::value_type& stop, _vertices)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					s << ",";
+				}
+				s << (stop ? lexical_cast<string>(stop->getKey()) : string());
+			}
+			return s.str();
+		}
+
+
+
+		void SchedulesBasedService::decodeStops(
+			const std::string& value,
+			util::Env& env
+		){
+			_vertices.clear();
+			if(!value.empty())
+			{
+				vector<string> stops;
+				split(stops, value, is_any_of(","));
+				size_t rank(0);
+				BOOST_FOREACH(const string& stop, stops)
+				{
+					if(!stop.empty())
+					{
+						try
+						{
+							RegistryKeyType stopId(lexical_cast<RegistryKeyType>(stop));
+							StopPoint* stop(StopPointTableSync::GetEditable(stopId, env).get());
+							if(stop->getHub() == _path->getEdge(rank)->getHub())
+							{
+								_vertices.push_back(stop);
+							}
+							else
+							{
+								_vertices.push_back(NULL);
+							}
+						}
+						catch(ObjectNotFoundException<StopPoint>&)
+						{
+							_vertices.push_back(NULL);
+						}
+					}
+					else
+					{
+						_vertices.push_back(NULL);
+					}
+					++rank;
+				}
+
+				// Size check
+				if(rank < _path->getEdges().size())
+				{
+					Log::GetInstance().warn("Inconsistent vertices size in service "+ lexical_cast<string>(getKey()));
+					for(; rank<_path->getEdges().size(); ++rank)
+					{
+						_vertices.push_back(NULL);
+					}
+				}
+			}
+			else
+			{
+				for(size_t rank(0); rank<_path->getEdges().size(); ++rank)
+				{
+					_vertices.push_back(NULL);
+				}
+			}
+		}
+
+
+
 		SchedulesBasedService::PathBeginsWithUnscheduledStopException::PathBeginsWithUnscheduledStopException(
 			const graph::Path& path
 		):	Exception(
 			"The path "+ boost::lexical_cast<std::string>(path.getKey()) +" begins with an unscheduled stop."
 		) {}
+
+
+
+		void SchedulesBasedService::setVertex(
+			size_t rank,
+			const graph::Vertex* value
+		){
+			assert(!value || value->getHub() == _path->getEdge(rank)->getHub());
+			if(value != _path->getEdge(rank)->getFromVertex())
+			{
+				_vertices[rank] = value;
+			}
+			else
+			{
+				_vertices[rank] = NULL;
+			}
+		}
 }	}
