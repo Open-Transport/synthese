@@ -408,6 +408,7 @@ namespace synthese
 
 			// New ReservationTransaction
 			ReservationTransaction rt;
+			rt.setKey(ReservationTransactionTableSync::getId());
 			rt.setBookingTime(second_clock::local_time());
 			rt.setBookingUserId(request.getUser()->getKey());
 			rt.setCustomerName(_customer->getName() + " " + _customer->getSurname());
@@ -416,7 +417,6 @@ namespace synthese
 			rt.setCustomerUserId(_customer->getKey());
 			rt.setSeats(_seatsNumber);
 			rt.setComment(_comment);
-			ReservationTransactionTableSync::Save(&rt);
 
 			// Contact center
 			const OnlineReservationRule* reservationContact(NULL);
@@ -601,6 +601,12 @@ namespace synthese
 
 				ReservationTableSync::Save(r.get());
 			}
+
+			// Saving the transaction
+			// After reservations saving because of the conditional env sync based on
+			// transaction table sync, which needs that reservations are present in the
+			// database
+			ReservationTransactionTableSync::Save(&rt);
 
 			// Log
 			ResaDBLog::AddBookReservationEntry(request.getSession(), rt);

@@ -82,7 +82,7 @@ namespace synthese
 			pv.push_back(to_simple_string(resa.getReservationDeadLine().time_of_day())); // 4
 
 			pv.push_back((*resa.getReservations().begin())->getDeparturePlaceName()); // 5
-			pv.push_back((*(resa.getReservations().end()-1))->getArrivalPlaceName()); // 6
+			pv.push_back((*resa.getReservations().rbegin())->getArrivalPlaceName()); // 6
 
 			pv.push_back(to_simple_string((*resa.getReservations().begin())->getDepartureTime().date())); // 7
 

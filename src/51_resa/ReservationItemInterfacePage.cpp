@@ -65,8 +65,8 @@ namespace synthese
 
 			pv.push_back((*transaction.getReservations().begin())->getDeparturePlaceName());
 			pv.push_back(to_simple_string((*transaction.getReservations().begin())->getDepartureTime()));
-			pv.push_back((*(transaction.getReservations().end() - 1))->getArrivalPlaceName());
-			pv.push_back(to_simple_string((*(transaction.getReservations().end() - 1))->getArrivalTime()));
+			pv.push_back((*transaction.getReservations().rbegin())->getArrivalPlaceName());
+			pv.push_back(to_simple_string((*transaction.getReservations().rbegin())->getArrivalTime()));
 			pv.push_back(lexical_cast<string>(transaction.getSeats()));
 			if (transaction.getCancellationTime().is_not_a_date_time() && now <= transaction.getReservationDeadLine())
 				pv.push_back(lexical_cast<string>(transaction.getKey()));
