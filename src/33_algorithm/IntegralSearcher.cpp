@@ -502,7 +502,7 @@ sqrt(
 
 								// Analyze of the utility of the edge
 								// If the edge is useless, the path is not traversed anymore
-								_JourneyUsefulness evaluationResult(evaluateJourney(resultJourney));
+								_JourneyUsefulness evaluationResult(evaluateJourney(resultJourney,isGoalReached));
 								if (!evaluationResult.canBeAResultPart)
 								{
 									if (!evaluationResult.continueToTraverseThePath)
@@ -586,7 +586,8 @@ sqrt(
 // ------------------------------------------------------------------------- Utilities
 
 		IntegralSearcher::_JourneyUsefulness IntegralSearcher::evaluateJourney(
-			const shared_ptr<RoutePlanningIntermediateJourney>& journeysptr
+			const shared_ptr<RoutePlanningIntermediateJourney>& journeysptr,
+			bool isGoalReached
 		) const {
 
 			const RoutePlanningIntermediateJourney& journey(*journeysptr);
@@ -624,13 +625,26 @@ sqrt(
 				serviceUse.getArrivalDateTime() :
 				serviceUse.getDepartureDateTime()
 			);
-			if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
-				&&	(reachDateTime < _minMaxDateTimeAtDestination)
-				)
-			||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
-				&&	(reachDateTime > _minMaxDateTimeAtDestination)
-				)
-			)	return _JourneyUsefulness(false, false);
+			if(isGoalReached)
+			{
+				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
+					&&	(reachDateTime - _destinationVam.getVertexAccess(reachedVertex).approachTime < _minMaxDateTimeAtDestination)
+					)
+				||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
+					&&	(reachDateTime + _destinationVam.getVertexAccess(reachedVertex).approachTime > _minMaxDateTimeAtDestination)
+					)
+				)	return _JourneyUsefulness(false, false);
+			}
+			else
+			{
+				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
+					&&	(reachDateTime < _minMaxDateTimeAtDestination)
+					)
+				||	(	(_accessDirection == DEPARTURE_TO_ARRIVAL)
+					&&	(reachDateTime > _minMaxDateTimeAtDestination)
+					)
+				)	return _JourneyUsefulness(false, false);
+			}
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate
 				if there is any chance to reach the goal more efficiently by using this path
@@ -641,7 +655,7 @@ sqrt(
 			*/
 			assert(journey.getDistanceToEnd());
 
-			if(	!_destinationVam.contains(reachedVertex) &&
+			if(	!isGoalReached &&
 				reachedVertex->getHub()->isConnectionPossible() &&
 				_searchOnlyNodes &&
 				*journey.getDistanceToEnd() > 5000

@@ -210,7 +210,8 @@ namespace synthese
 				@date 2007
 			*/
 			_JourneyUsefulness evaluateJourney(
-				const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey
+				const boost::shared_ptr<RoutePlanningIntermediateJourney>& journey,
+				bool isGoalReached
 			) const;
 
 
