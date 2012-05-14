@@ -2595,12 +2595,16 @@ namespace synthese
 			// Content
 			if(_lineMarkerPage.get())
 			{
+				// Declarations
 				stringstream content;
+				size_t number(0);
 
+				// Loop on lines
 				BOOST_FOREACH(const ServicePointer& leg, journey.getServiceUses())
 				{
 					if(	dynamic_cast<const JourneyPattern*>(leg.getService()->getPath())
 					){
+						++number;
 						LineMarkerInterfacePage::Display(
 							content,
 							_lineMarkerPage,
@@ -2610,7 +2614,9 @@ namespace synthese
 					}
 				}
 
+				// Output
 				pm.insert(DATA_CONTENT, content.str());
+				pm.insert("number", number);
 			}
 
 			_linesRowPage->display(stream ,request, pm);
