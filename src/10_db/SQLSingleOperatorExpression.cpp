@@ -29,7 +29,7 @@ namespace synthese
 {
 	namespace db
 	{
-		const string SQLSingleOperatorExpression::OP_NOT = "NOT";
+		const string SQLSingleOperatorExpression::OP_NOT = "NOT ";
 		const string SQLSingleOperatorExpression::OP_MAX = "MAX";
 		const string SQLSingleOperatorExpression::OP_MIN = "MIN";
 		const string SQLSingleOperatorExpression::OP_ABS = "ABS";
@@ -57,7 +57,7 @@ namespace synthese
 			}
 			else // General case
 			{
-				s << _op << " (" << _expr->toString() << ")";
+				s << _op << "(" << _expr->toString() << ")";
 			}
 
 			return s.str();
