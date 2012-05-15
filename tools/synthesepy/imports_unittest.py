@@ -185,7 +185,7 @@ class TestImports(unittest.TestCase):
             'info': ['some info'],
             'load': [],
             'noti': ['a notification'],
-            'unknown': ['an invalid level'],
+            'unknown': ['XXXX : an invalid level'],
             'warn': ['a warning']})
 
         self.assertEqual(len(self.emails), 2)
