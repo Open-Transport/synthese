@@ -56,7 +56,7 @@ namespace synthese
 		const string AdminInterfaceElementTemplate<DriverActivitiesAdmin>::ICON = "building.png";
 
 		template<>
-		const string AdminInterfaceElementTemplate<DriverActivitiesAdmin>::DEFAULT_TITLE = "Activités";
+		const string AdminInterfaceElementTemplate<DriverActivitiesAdmin>::DEFAULT_TITLE = "ActivitÃ©s";
 	}
 
 	namespace pt_operation
@@ -137,7 +137,7 @@ namespace synthese
 				// Remove
 				stream << t.col();
 				removeRequest.getAction()->setObjectId(activity.get<Key>());
-				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'activité "+ activity.get<Name>() + " ?");
+				stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sÃ»r de vouloir supprimer l'activitÃ© "+ activity.get<Name>() + " ?");
 			}
 
 			stream << t.row(string());
