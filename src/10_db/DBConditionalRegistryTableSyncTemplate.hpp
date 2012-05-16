@@ -72,9 +72,9 @@ namespace synthese
 			static bool IsLoaded(
 				const T& object
 			);
-			
-			
-			
+
+
+
 			virtual bool isLoaded(const util::Registrable& object) const {
 				return IsLoaded(dynamic_cast<const T&>(object));
 			}

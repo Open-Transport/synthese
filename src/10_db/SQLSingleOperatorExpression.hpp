@@ -63,7 +63,7 @@ namespace synthese
 			/// SQL expression generator.
 			/// @return the expression in SQL language
 			virtual std::string toString() const;
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

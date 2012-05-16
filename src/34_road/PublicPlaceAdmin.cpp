@@ -86,7 +86,7 @@ namespace synthese
 		{}
 
 
-		
+
 		void PublicPlaceAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -118,7 +118,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool PublicPlaceAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -166,7 +166,7 @@ namespace synthese
 					200,
 					ObjectUpdateAction::GetInputName<PointGeometry>(),
 					ObjectUpdateAction::GetInputName<PointGeometry>(),
-					true, 
+					true,
 					true
 				);
 				map.setMapSource(MapSource::GetSessionMapSource(*request.getSession()));
@@ -348,9 +348,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const RoadModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -361,7 +361,7 @@ namespace synthese
 				page->setPlace(dynamic_cast<const PublicPlaceAdmin&>(currentPage)._place);
 				links.push_back(page);
 			}
-			
+
 			return links;
 		}
 

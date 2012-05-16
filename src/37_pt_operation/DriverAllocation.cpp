@@ -42,7 +42,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(WorkRange, "work_range", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WorkDuration, "work_duration", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WithTicketSales, "with_ticket_sales", SQL_BOOLEAN)
-	
+
 	namespace pt_operation
 	{
 		DriverAllocation::DriverAllocation(

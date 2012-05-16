@@ -218,7 +218,7 @@ namespace synthese
 			)	);
 
 			// The expression
-			return 
+			return
 				ComposedExpression::Get(
 					SubQueryExpression::Get(
 						subQuery.toString()

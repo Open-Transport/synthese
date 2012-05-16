@@ -487,7 +487,7 @@ namespace synthese
 						continue;
 					}
 
-					// 
+					//
 
 					shared_ptr<ParametersMap> resaPM(new ParametersMap);
 					reservation->toParametersMap(*resaPM, _language);

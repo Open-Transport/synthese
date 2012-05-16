@@ -46,7 +46,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	template<>
 	const string FactorableTemplate<Action, road::ProjectAddressAction>::FACTORY_KEY = "ProjectAddress";
 
@@ -72,9 +72,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		void ProjectAddressAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Address
@@ -111,9 +111,9 @@ namespace synthese
 				throw ActionException("Max distance must be positive");
 			}
 		}
-		
-		
-		
+
+
+
 		void ProjectAddressAction::run(
 			Request& request
 		){
@@ -126,13 +126,13 @@ namespace synthese
 				_maxDistance,
 				address
 			);
-			
+
 			// Saving
 			DBModule::SaveObject(*_address);
 		}
-		
-		
-		
+
+
+
 		bool ProjectAddressAction::isAuthorized(
 			const Session* session
 		) const {
