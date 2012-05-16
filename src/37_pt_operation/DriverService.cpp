@@ -265,7 +265,7 @@ namespace synthese
 					{
 						break;
 					}
-	
+
 					// Add service to chunk
 					Chunk::Element element;
 					element.service = service;

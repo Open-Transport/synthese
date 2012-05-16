@@ -182,7 +182,7 @@ namespace synthese
 
 			static const CoordinatesSystem& GetStorageCoordinatesSystem() { return *_storageCoordinatesSystem; }
 			static void SetStorageCoordinatesSystem(const CoordinatesSystem& value) { _storageCoordinatesSystem = &value; }
-			
+
 
 
 			static void AddCoordinatesSystem(

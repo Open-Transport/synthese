@@ -49,12 +49,12 @@ namespace synthese
 
 	template<>
 	const string FactorableTemplate<FunctionWithSite<false>,pt::ServicesListService>::FACTORY_KEY = "services_list";
-	
+
 	namespace pt
 	{
 		const string ServicesListService::PARAMETER_PAGE_ID = "p";
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
-		
+
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
 		const string ServicesListService::DATA_DEPARTURE_PLACE_NAME = "departure_place_name";
@@ -194,9 +194,9 @@ namespace synthese
 
 			return map;
 		}
-		
-		
-		
+
+
+
 		bool ServicesListService::isAuthorized(
 			const Session* session
 		) const {

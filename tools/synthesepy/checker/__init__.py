@@ -183,7 +183,7 @@ class Result(object):
                 'actionParamlogin': url.username,
                 'actionParampwd': url.password
             }, prefetch=True)
-            
+
             if 'sid' not in r.cookies:
                 raise Exception('Authentication failure')
             sid = r.cookies['sid']

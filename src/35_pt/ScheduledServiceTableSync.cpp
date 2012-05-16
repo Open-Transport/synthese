@@ -231,7 +231,7 @@ namespace synthese
 				ss->updatePathCalendar();
 
 				// Physical stops
-				ss->clearStops();		
+				ss->clearStops();
 				try
 				{
 					ss->decodeStops(

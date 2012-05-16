@@ -327,7 +327,7 @@ namespace synthese
 			)	);
 
 			// The expression
-			return 
+			return
 				ComposedExpression::Get(
 					ComposedExpression::Get(
 						SubQueryExpression::Get(

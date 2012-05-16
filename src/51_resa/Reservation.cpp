@@ -210,7 +210,7 @@ namespace synthese
 			pm.insert(DATA_COMMENT, getTransaction()->getComment());
 			pm.insert(DATA_NAME, getTransaction()->getCustomerName());
 			pm.insert(DATA_PHONE, getTransaction()->getCustomerPhone());
-			
+
 			// Transaction
 			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
 			pm.insert(DATA_SEATS_NUMBER, getTransaction()->getSeats());

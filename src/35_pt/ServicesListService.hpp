@@ -56,7 +56,7 @@ namespace synthese
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_RUNS_AT_DATE;
 			static const std::string DATA_SERVICE;
-			
+
 		protected:
 			//! \name Page parameters
 			//@{
@@ -65,8 +65,8 @@ namespace synthese
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::gregorian::date _displayDate;
 			//@}
-			
-			
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services List#Request
@@ -76,9 +76,9 @@ namespace synthese
 			/// @date 2012
 			/// @since 3.4.0
 			util::ParametersMap _getParametersMap() const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services List#Request
@@ -90,8 +90,8 @@ namespace synthese
 			virtual void _setFromParametersMap(
 				const util::ParametersMap& map
 			);
-			
-			
+
+
 		public:
 			ServicesListService();
 
@@ -109,9 +109,9 @@ namespace synthese
 			/// @author Hugues Romain
 			/// @date 2012
 			virtual util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
-			
-			
-			
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets if the function can be run according to the user of the session.
 			/// @param session the current session

@@ -40,7 +40,7 @@ namespace synthese
 
 	template<>
 	const string FactorableTemplate<Function,security::UsersListService>::FACTORY_KEY = "UsersListService";
-	
+
 	namespace security
 	{
 		const string UsersListService::PARAMETER_LOGIN = "login";
@@ -50,7 +50,7 @@ namespace synthese
 		const string UsersListService::PARAMETER_SURNAME = "surname";
 
 		const string UsersListService::TAG_USER = "user";
-		
+
 
 
 		ParametersMap UsersListService::_getParametersMap() const
@@ -144,9 +144,9 @@ namespace synthese
 
 			return result;
 		}
-		
-		
-		
+
+
+
 		bool UsersListService::isAuthorized(
 			const Session* session
 		) const {
