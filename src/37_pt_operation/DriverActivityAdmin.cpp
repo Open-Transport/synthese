@@ -117,7 +117,7 @@ namespace synthese
 			stream << t.cell("ID", lexical_cast<string>(_activity->get<Key>()));
 			stream << t.cell(
 				"Nom",
-				t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _activity->getName())
+				t.getForm().getTextInput(ObjectUpdateAction::GetInputName<Name>(), _activity->get<Name>())
 			);
 			stream << t.close();
 

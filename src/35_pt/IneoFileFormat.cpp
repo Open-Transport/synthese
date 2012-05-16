@@ -1534,12 +1534,24 @@ namespace synthese
 			if (trim_line[0] == ';')
 				trim_line = trim_line.substr(1);
 			split(parts, trim_line, is_any_of(":"));
+			bool shifted(false);
 			if(parts.size() < 2 || parts[0].empty() || parts[1].empty())
 			{
-				_section = "#";
-				return;
+				if(_fieldsMap.size() == 1)
+				{
+					_section = _fieldsMap.begin()->first;
+					shifted = true;
+				}
+				else
+				{
+					_section = "#";
+					return;
+				}
 			}
-			_section = parts[0];
+			else
+			{
+				_section = parts[0];
+			}
 			if(_section == "F")
 			{
 				string code(trim_copy(parts[1]));
@@ -1562,9 +1574,9 @@ namespace synthese
 				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(parts[1]));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
-				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)
+				for(size_t i=0; i<fields.size() && (shifted ? i+1 : i)<cols.size(); ++i)
 				{
-					_line[cols[i]] = trim_copy(fields[i]);
+					_line[cols[shifted ? i+1 : i]] = trim_copy(fields[i]);
 				}
 			}
 		}
