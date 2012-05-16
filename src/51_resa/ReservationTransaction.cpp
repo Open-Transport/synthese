@@ -212,7 +212,7 @@ namespace synthese
 			// Same objects
 			if(op1 == op2)
 			{
-				return true;
+				return false;
 			}
 
 			// NULL after all

@@ -1037,7 +1037,7 @@ namespace synthese
 				{
 					// File read
 					_readLine(inFile);
-					if(_section == "AFF")
+					if(_section == "AFF" || _section == "#")
 					{
 						// Driver service
 						string key(_getValue("SA"));
@@ -1070,10 +1070,27 @@ namespace synthese
 								"conducteur"
 						)	);
 
+						// Bonif amount
+						double bonifAmount(
+							_getValue("bonifATTfrs").empty() ?
+							0 :
+							lexical_cast<double>(_getValue("bonifATTfrs"))
+						);
+
+						// Bonif time
+						string bonifStr(_getValue("bonifATTtps"));
+						time_duration bonifTime(minutes(0));
+						if(!bonifStr.empty())
+						{
+							vector<string> parts;
+							split(parts, bonifStr, is_any_of("h"));
+							bonifTime = hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1]));
+						}
+
 						// Registration
 						if(activities.empty())
 						{
-							_allocations[make_pair(key, vsDate)] = user;
+							_allocations[make_pair(key, vsDate)] = make_tuple(user, bonifAmount, bonifTime);
 						}
 						else
 						{
@@ -1102,12 +1119,12 @@ namespace synthese
 				{
 					// File read
 					_readLine(inFile);
-					if(_section == "SASB")
+					if(_section == "SASB" || _section == "#")
 					{
-						string tpstra(_getValue("tpstra"));
-						string ampli(_getValue("ampli"));
-						string onBoardTicketing(_getValue("VAB"));
-						string activity(_getValue("ACT"));
+						string tpstra(_getValue("TpsTra"));
+						string ampli(_getValue("Ampli"));
+						string onBoardTicketing(_getValue("VaB"));
+						string activity(_getValue("Act"));
 
 						// Load
 						string key(_getValue("SA"));
@@ -1155,7 +1172,9 @@ namespace synthese
 							Allocations::iterator itAlloc(_allocations.find(make_pair(key, vsDate)));
 							if(itAlloc != _allocations.end())
 							{
-								da->set<Driver>(optional<User&>(*itAlloc->second));
+								da->set<Driver>(optional<User&>(*itAlloc->second.get<0>()));
+								da->set<BoniAmount>(itAlloc->second.get<1>());
+								da->set<BoniTime>(itAlloc->second.get<2>());
 							}
 
 							// Driver service link
@@ -1170,14 +1189,28 @@ namespace synthese
 							da->set<WithTicketSales>(onBoardTicketing == "O");
 
 							// Amount
-							double amount(_getValue("frs").empty() ? 0 : lexical_cast<double>(_getValue("frs")));
+							double amount(_getValue("Frs").empty() ? 0 : lexical_cast<double>(_getValue("Frs")));
 							da->set<Amount>(amount);
 
 							// Boni amount
-							da->set<BoniAmount>(_getValue("bonifATTfrs").empty() ? 0 : lexical_cast<double>(_getValue("bonifATTfrs")));
+							da->set<BoniAmount>(_getValue("ATTmaxfrs").empty() ? 0 : lexical_cast<double>(_getValue("ATTmaxfrs")));
+
+							// Activity
+							string actStr(_getValue("ACT"));
+							if(!actStr.empty() && actStr != "vide")
+							{
+								// Search for an activity
+								set<DriverActivity*> activities(
+									_activities.get(actStr)
+								);
+								if(!activities.empty())
+								{
+									da->set<DriverActivity>(**activities.begin());
+								}
+							}
 
 							// Boni time
-							string bonifStr(_getValue("bonifATTtps"));
+							string bonifStr(_getValue("ATTmaxtps"));
 							if(bonifStr.empty())
 							{
 								da->set<BoniTime>(minutes(0));
@@ -1190,7 +1223,7 @@ namespace synthese
 							}
 
 							// Work range
-							string workRangeStr(_getValue("ampli"));
+							string workRangeStr(_getValue("Ampli"));
 							if(workRangeStr.empty())
 							{
 								da->set<WorkRange>(time_duration(not_a_date_time));
@@ -1203,7 +1236,7 @@ namespace synthese
 							}
 
 							// Work duration
-							string workDurationStr(_getValue("tpstra"));
+							string workDurationStr(_getValue("TpsTra"));
 							if(workDurationStr.empty())
 							{
 								da->set<WorkDuration>(time_duration(not_a_date_time));
@@ -1218,12 +1251,12 @@ namespace synthese
 
 						// Journey
 						bool afterMidnight(_getValue("DAPM")=="O");
-						string hdebstr(_getValue("HDEB"));
+						string hdebstr(_getValue("HDeb"));
 						time_duration hdeb(
 							hours(lexical_cast<long>(hdebstr.substr(0,2))) +
 							minutes(lexical_cast<long>(hdebstr.substr(2,2)))
 						);
-						string hfinstr(_getValue("HFIN"));
+						string hfinstr(_getValue("HFin"));
 						time_duration hfin(
 							hours(lexical_cast<long>(hfinstr.substr(0,2))) +
 							minutes(lexical_cast<long>(hfinstr.substr(2,2)))
@@ -1239,12 +1272,12 @@ namespace synthese
 						}
 
 						// Service start and end
-						string hdebpStr(_getValue("HDEBP"));
+						string hdebpStr(_getValue("HDebP"));
 						time_duration hdebp(
 							hours(lexical_cast<long>(hdebpStr.substr(0,2))) +
 							minutes(lexical_cast<long>(hdebpStr.substr(2,2)))
 						);
-						string hfinpStr(_getValue("HFINP"));
+						string hfinpStr(_getValue("HFinP"));
 						time_duration hfinp(
 							hours(lexical_cast<long>(hfinpStr.substr(0,2))) +
 							minutes(lexical_cast<long>(hfinpStr.substr(2,2)))

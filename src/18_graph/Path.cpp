@@ -651,7 +651,7 @@ namespace synthese
 			// Same objects
 			if(s1 == s2)
 			{
-				return true;
+				return false;
 			}
 
 			// NULL after all
