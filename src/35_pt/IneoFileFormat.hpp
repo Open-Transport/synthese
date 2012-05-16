@@ -43,6 +43,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <boost/tuple/tuple.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
@@ -208,7 +209,13 @@ namespace synthese
 				mutable std::map<std::string, std::vector<int> > _calendars;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
 
-				typedef std::map<std::pair<std::string, boost::gregorian::date>, security::User*> Allocations;
+				typedef std::map<
+					std::pair<std::string, boost::gregorian::date>,
+					boost::tuple<
+						security::User*,
+						double,
+						boost::posix_time::time_duration
+					>	> Allocations;
 				typedef std::map<std::pair<security::User*, boost::gregorian::date>, pt_operation::DriverActivity*> Activities;
 				mutable Allocations _allocations;
 				mutable Activities _activityAllocations;
