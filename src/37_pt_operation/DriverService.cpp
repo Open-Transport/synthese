@@ -65,7 +65,9 @@ namespace synthese
 
 		DriverService::DriverService(util::RegistryKeyType id):
 			impex::ImportableTemplate<DriverService>(),
-			util::Registrable(id)
+			util::Registrable(id),
+			_maxBoniAmount(0),
+			_maxBoniTime(not_a_date_time)
 		{}
 
 
