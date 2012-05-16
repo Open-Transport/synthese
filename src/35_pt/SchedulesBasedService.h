@@ -174,7 +174,7 @@ namespace synthese
 
 				bool comparePlannedSchedules(const Schedules& departure, const Schedules& arrival) const;
 
-				
+
 			//! @name Update methods
 			//@{
 				//////////////////////////////////////////////////////////////////////////

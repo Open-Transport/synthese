@@ -142,7 +142,7 @@ namespace synthese
 		void ServiceVertexUpdateAction::run(Request& request)
 		{
 			_service->setVertex(_lineStopRank, _physicalStop.get());
-			
+
 			ScheduledServiceTableSync::Save(_service.get());
 		}
 

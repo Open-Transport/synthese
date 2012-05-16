@@ -268,7 +268,7 @@ namespace synthese
 				}
 			}
 		}
-		
+
 
 
 		template<

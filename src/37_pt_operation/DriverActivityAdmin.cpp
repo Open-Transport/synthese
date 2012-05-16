@@ -64,7 +64,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DriverActivityAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -93,7 +93,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DriverActivityAdmin::isAuthorized(
 			const security::User& user
 		) const	{

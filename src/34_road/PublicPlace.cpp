@@ -44,7 +44,7 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace impex;
-	using namespace util;	
+	using namespace util;
 
 	namespace util
 	{

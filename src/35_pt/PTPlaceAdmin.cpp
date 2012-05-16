@@ -221,7 +221,7 @@ namespace synthese
 							}
 						}
 					}
-					
+
 					// Last created stop in the database
 					if(!mapCenter.get() || mapCenter->isEmpty())
 					{
@@ -240,7 +240,7 @@ namespace synthese
 						mapCenter = CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(0,0);
 					}
 					HTMLMap map(
-						*mapCenter, 
+						*mapCenter,
 						200,
 						ObjectUpdateAction::GetInputName<PointGeometry>(),
 						ObjectUpdateAction::GetInputName<PointGeometry>(),
@@ -743,7 +743,7 @@ namespace synthese
 					stream << t.col();
 					if(alias->getCity())
 					{
-						stream << alias->getCity()->getName();	
+						stream << alias->getCity()->getName();
 					}
 					else
 					{

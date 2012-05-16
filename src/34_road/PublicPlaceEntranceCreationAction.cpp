@@ -46,7 +46,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	
+
 	template<>
 	const string FactorableTemplate<Action, road::PublicPlaceEntranceCreationAction>::FACTORY_KEY = "PublicPlaceEntranceCreation";
 
@@ -54,9 +54,9 @@ namespace synthese
 	{
 		const string PublicPlaceEntranceCreationAction::PARAMETER_PUBLIC_PLACE_ID = Action_PARAMETER_PREFIX + "_public_place_id";
 		const string PublicPlaceEntranceCreationAction::PARAMETER_MAX_DISTANCE = Action_PARAMETER_PREFIX + "_max_distance";
-		
-		
-		
+
+
+
 		ParametersMap PublicPlaceEntranceCreationAction::getParametersMap() const
 		{
 			ParametersMap map;
@@ -67,9 +67,9 @@ namespace synthese
 			}
 			return map;
 		}
-		
-		
-		
+
+
+
 		void PublicPlaceEntranceCreationAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Public place
@@ -102,9 +102,9 @@ namespace synthese
 				throw ActionException("Max distance must be positive");
 			}
 		}
-		
-		
-		
+
+
+
 		void PublicPlaceEntranceCreationAction::run(
 			Request& request
 		){
@@ -128,9 +128,9 @@ namespace synthese
 				request.setActionCreatedId(entrance.get<Key>());
 			}
 		}
-		
-		
-		
+
+
+
 		bool PublicPlaceEntranceCreationAction::isAuthorized(
 			const Session* session
 		) const {

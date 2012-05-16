@@ -67,7 +67,7 @@ namespace synthese
 		{ }
 
 
-		
+
 		void DriverActivitiesAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
@@ -82,7 +82,7 @@ namespace synthese
 		}
 
 
-		
+
 		bool DriverActivitiesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
@@ -98,7 +98,7 @@ namespace synthese
 
 			AdminActionFunctionRequest<ObjectCreateAction, DriverActivitiesAdmin> createRequest(request);
 			createRequest.getAction()->setTable<DriverActivity>();
-			
+
 			AdminFunctionRequest<DriverActivityAdmin> openRequest(request);
 
 			AdminActionFunctionRequest<RemoveObjectAction, DriverActivitiesAdmin> removeRequest(request);
@@ -156,9 +156,9 @@ namespace synthese
 			const AdminInterfaceElement& currentPage,
 			const admin::AdminRequest& request
 		) const	{
-			
+
 			AdminInterfaceElement::PageLinks links;
-			
+
 			if(	dynamic_cast<const PTOperationModule*>(&module) &&
 				request.getUser() &&
 				request.getUser()->getProfile() &&
@@ -166,7 +166,7 @@ namespace synthese
 			){
 				links.push_back(getNewCopiedPage());
 			}
-			
+
 			return links;
 		}
 

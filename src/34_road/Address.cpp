@@ -40,7 +40,7 @@ namespace synthese
 	using namespace graph;
 	using namespace road;
 	using namespace util;
-	
+
 	namespace road
 	{
 		Address::Address (

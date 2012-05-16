@@ -121,7 +121,7 @@ namespace synthese
 
 			// Max boni amount
 			object->setMaxBoniAmount(
-				rows->getDouble(DriverServiceTableSync::COL_MAX_BONI_AMOUNT)	
+				rows->getDouble(DriverServiceTableSync::COL_MAX_BONI_AMOUNT)
 			);
 
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)

@@ -89,7 +89,7 @@ namespace synthese
 			/// The action execution code.
 			/// @param request the request which has launched the action
 			void run(server::Request& request);
-			
+
 
 
 			//////////////////////////////////////////////////////////////////////////

@@ -35,7 +35,7 @@ namespace synthese
 
 	CLASS_DEFINITION(DriverActivity, "t087_driver_activites", 87)
 	FIELD_DEFINITION_OF_OBJECT(DriverActivity, "driver_activity_id", "driver_activity_ids")
-	
+
 	namespace pt_operation
 	{
 		DriverActivity::DriverActivity(
