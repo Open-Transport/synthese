@@ -1071,8 +1071,9 @@ namespace synthese
 						)	);
 
 						// Bonif amount
+						string bonifAmountStr(_getValue("bonifATTfrs"));
 						double bonifAmount(
-							_getValue("bonifATTfrs").empty() ?
+							bonifAmountStr.empty() || bonifAmountStr == "vide" ?
 							0 :
 							lexical_cast<double>(_getValue("bonifATTfrs"))
 						);
@@ -1080,7 +1081,7 @@ namespace synthese
 						// Bonif time
 						string bonifStr(_getValue("bonifATTtps"));
 						time_duration bonifTime(minutes(0));
-						if(!bonifStr.empty())
+						if(!bonifStr.empty() && bonifStr != "vide")
 						{
 							vector<string> parts;
 							split(parts, bonifStr, is_any_of("h"));
@@ -1189,11 +1190,21 @@ namespace synthese
 							da->set<WithTicketSales>(onBoardTicketing == "O");
 
 							// Amount
-							double amount(_getValue("Frs").empty() ? 0 : lexical_cast<double>(_getValue("Frs")));
+							string amountStr(_getValue("Frs"));
+							double amount(
+								amountStr.empty() || amountStr == "vide" ?
+								0 :
+								lexical_cast<double>(amountStr)
+							);
 							da->set<Amount>(amount);
 
 							// Boni amount
-							da->set<BoniAmount>(_getValue("ATTmaxfrs").empty() ? 0 : lexical_cast<double>(_getValue("ATTmaxfrs")));
+							string boniAmountStr(_getValue("ATTmaxfrs"));
+							da->set<BoniAmount>(
+								boniAmountStr.empty() || boniAmountStr == "vide" ?
+								0 :
+								lexical_cast<double>(boniAmountStr)
+							);
 
 							// Activity
 							string actStr(_getValue("ACT"));
@@ -1211,7 +1222,7 @@ namespace synthese
 
 							// Boni time
 							string bonifStr(_getValue("ATTmaxtps"));
-							if(bonifStr.empty())
+							if(bonifStr.empty() || bonifStr == "vide")
 							{
 								da->set<BoniTime>(minutes(0));
 							}
@@ -1224,7 +1235,7 @@ namespace synthese
 
 							// Work range
 							string workRangeStr(_getValue("Ampli"));
-							if(workRangeStr.empty())
+							if(workRangeStr.empty() || workRangeStr == "vide")
 							{
 								da->set<WorkRange>(time_duration(not_a_date_time));
 							}
@@ -1237,7 +1248,7 @@ namespace synthese
 
 							// Work duration
 							string workDurationStr(_getValue("TpsTra"));
-							if(workDurationStr.empty())
+							if(workDurationStr.empty() || workDurationStr == "vide")
 							{
 								da->set<WorkDuration>(time_duration(not_a_date_time));
 							}
@@ -1252,14 +1263,18 @@ namespace synthese
 						// Journey
 						bool afterMidnight(_getValue("DAPM")=="O");
 						string hdebstr(_getValue("HDeb"));
+						vector<string> hdebParts;
+						split(hdebParts, hdebstr, is_any_of("h:"));
 						time_duration hdeb(
-							hours(lexical_cast<long>(hdebstr.substr(0,2))) +
-							minutes(lexical_cast<long>(hdebstr.substr(2,2)))
+							hours(lexical_cast<long>(hdebParts[0])) +
+							minutes(lexical_cast<long>(hdebParts[1]))
 						);
 						string hfinstr(_getValue("HFin"));
+						vector<string> hfinParts;
+						split(hfinParts, hfinstr, is_any_of("h:"));
 						time_duration hfin(
-							hours(lexical_cast<long>(hfinstr.substr(0,2))) +
-							minutes(lexical_cast<long>(hfinstr.substr(2,2)))
+							hours(lexical_cast<long>(hfinParts[0])) +
+							minutes(lexical_cast<long>(hfinParts[1]))
 						);
 						if(hfin < hdeb)
 						{
@@ -1273,14 +1288,18 @@ namespace synthese
 
 						// Service start and end
 						string hdebpStr(_getValue("HDebP"));
+						vector<string> hdebpParts;
+						split(hdebpParts, hdebpStr, is_any_of("h:"));
 						time_duration hdebp(
-							hours(lexical_cast<long>(hdebpStr.substr(0,2))) +
-							minutes(lexical_cast<long>(hdebpStr.substr(2,2)))
+							hours(lexical_cast<long>(hdebpParts[0])) +
+							minutes(lexical_cast<long>(hdebpParts[1]))
 						);
 						string hfinpStr(_getValue("HFinP"));
+						vector<string> hfinpParts;
+						split(hfinpParts, hfinpStr, is_any_of("h:"));
 						time_duration hfinp(
-							hours(lexical_cast<long>(hfinpStr.substr(0,2))) +
-							minutes(lexical_cast<long>(hfinpStr.substr(2,2)))
+							hours(lexical_cast<long>(hfinpParts[0])) +
+							minutes(lexical_cast<long>(hfinpParts[1]))
 						);
 						if(hfinp < hdebp)
 						{
@@ -1529,34 +1548,26 @@ namespace synthese
 		{
 			_line.clear();
 
-			vector<string> parts;
 			string trim_line(trim_copy(line));
 			if (trim_line[0] == ';')
 				trim_line = trim_line.substr(1);
-			split(parts, trim_line, is_any_of(":"));
-			bool shifted(false);
-			if(parts.size() < 2 || parts[0].empty() || parts[1].empty())
+
+			size_t separator(trim_line.find_first_of(":"));
+			if(separator == string::npos || separator == 0 || separator == trim_line.size()-1)
 			{
-				if(_fieldsMap.size() == 1)
-				{
-					_section = _fieldsMap.begin()->first;
-					shifted = true;
-				}
-				else
-				{
-					_section = "#";
-					return;
-				}
+				_section = "#";
+				return;
 			}
-			else
-			{
-				_section = parts[0];
-			}
+
+			_section = trim_line.substr(0, separator);
 			if(_section == "F")
 			{
-				string code(trim_copy(parts[1]));
+				string content(trim_line.substr(separator+1));
+				vector<string> parts;
+				split(parts, content, is_any_of(":"));
+				string code(trim_copy(parts[0]));
 				vector<string> fields;
-				split(fields, parts[2], is_any_of(SEP));
+				split(fields, parts[1], is_any_of(SEP));
 				BOOST_FOREACH(const string& field, fields)
 				{
 					_fieldsMap[code].push_back(trim_copy(field));
@@ -1571,12 +1582,12 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(parts[1]));
+				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
-				for(size_t i=0; i<fields.size() && (shifted ? i+1 : i)<cols.size(); ++i)
+				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)
 				{
-					_line[cols[shifted ? i+1 : i]] = trim_copy(fields[i]);
+					_line[cols[i]] = trim_copy(fields[i]);
 				}
 			}
 		}
