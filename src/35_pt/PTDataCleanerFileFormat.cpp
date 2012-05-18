@@ -272,12 +272,11 @@ namespace synthese
 				DriverService::Chunks chunks;
 				BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, itDriverService.second->getChunks())
 				{
-					if(!chunk.vehicleService)
-					{
-						continue;
-					}
-					if(_vehicleServicesToRemove.find(_env.getRegistry<VehicleService>().get(chunk.vehicleService->getKey())) == _vehicleServicesToRemove.end())
-					{
+					if( !chunk.vehicleService ||
+						_vehicleServicesToRemove.find(
+							_env.getRegistry<VehicleService>().get(chunk.vehicleService->getKey())
+						) == _vehicleServicesToRemove.end()
+					){
 						chunks.push_back(chunk);
 					}
 				}
@@ -295,8 +294,9 @@ namespace synthese
 			// Driver allocations without services
 			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
 			{
-				if(!itDriverAllocation.second->hasLinkWithSource(_dataSource))
-				{
+				if(!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
+					itDriverAllocation.second->get<DriverActivity>()
+				){
 					continue;
 				}
 
