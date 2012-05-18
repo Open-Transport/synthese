@@ -272,6 +272,10 @@ namespace synthese
 				DriverService::Chunks chunks;
 				BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, itDriverService.second->getChunks())
 				{
+					if(!chunk.vehicleService)
+					{
+						continue;
+					}
 					if(_vehicleServicesToRemove.find(_env.getRegistry<VehicleService>().get(chunk.vehicleService->getKey())) == _vehicleServicesToRemove.end())
 					{
 						chunks.push_back(chunk);
