@@ -96,6 +96,8 @@ namespace synthese
 			map.insert(ATTR_WORK_RANGE, getWorkRange());
 			map.insert(ATTR_DRIVER_START_TIME, getServiceBeginning());
 			map.insert(ATTR_DRIVER_END_TIME, getServiceEnd());
+			map.insert("max_boni_amount", getMaxBoniAmount());
+			map.insert("max_boni_time", getMaxBoniTime());
 			if(!getChunks().empty())
 			{
 				// Stops
