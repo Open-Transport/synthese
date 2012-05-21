@@ -552,6 +552,6 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		BOOST_CHECK_MESSAGE(result.getJourneys().size() == 3, displayJourneyDifferences("Result size from 98 to 99 is not 3 !",result));
+		BOOST_CHECK_MESSAGE(result.getJourneys().size() == 7, displayJourneyDifferences("Result size from 98 to 99 is not 7 !",result));
 	}
 }
