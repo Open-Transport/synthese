@@ -210,7 +210,7 @@ class Result(object):
                 result, sid = fetch(url, host, u)
             except Excetion, e:
                 content = '<pre>Exception while fetching {0}:\n\n{1}\n</pre>\n'.format(u, e)
-            if result:
+            if result is not None:
                 content = '<!--'
                 if result.status_code != 200:
                     content += 'WARNING: http status for {0} is not 200\n'.format(u)
