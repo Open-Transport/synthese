@@ -294,7 +294,7 @@ namespace synthese
 			// Driver allocations without services
 			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
 			{
-				if(!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
+				if(	!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
 					itDriverAllocation.second->get<DriverActivity>()
 				){
 					continue;
