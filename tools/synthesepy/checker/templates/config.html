@@ -36,6 +36,8 @@ $(function() {
 
 <h1>Config Editor</h1>
 
+<a href="https://extranet.rcsmobility.com/projects/synthese/wiki/Synthese_Checker_Tool" target=doc>Syntax documentation</a>
+
 <form action="{{ url_for('config_update') }}" method=post>
   <textarea name=config>{{ config }}</textarea>
   <button type=submit>Save</button>
