@@ -48,7 +48,7 @@ using namespace boost::posix_time;
 void _xmlDisplayConnectionPlace(ostream& stream, const NamedPlace& np)
 {
 	stream <<
-		"     connectionPlace : " <<
+		"     connectionPlace :" <<
 		" name = " << np.getName() <<
 		" city = " << np.getCity()->getName() << endl;	
 }
@@ -72,7 +72,7 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 
 		if(journey.getContinuousServiceRange().total_seconds() > 0)
 		{
-			stream << "continuousServiceDuration = " << journey.getContinuousServiceRange() << endl;
+			stream << "is a continuous solution, range = " << journey.getContinuousServiceRange() << endl;
 		}
 
 		// Loop on each leg
@@ -85,9 +85,13 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()));
 			if(line != NULL)
 			{
-				stream << (line->isPedestrianMode() ? "   connection :" : "   transport :") <<
-					" length = " << ceil(leg.getDistance()) <<
-					" departureTime = " << leg.getDepartureDateTime() <<
+				stream << (line->isPedestrianMode() ? "   do a connection :" : "   take a transport :");
+				if(!line->isPedestrianMode())
+				{
+					stream << " lineNumber = " << line->getCommercialLine()->getShortName();
+				}
+
+				stream << " departureTime = " << leg.getDepartureDateTime() <<
 					" arrivalTime = " << leg.getArrivalDateTime();
 
 				if(journey.getContinuousServiceRange().total_seconds() > 0)
@@ -102,14 +106,14 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 				}
 				stream << endl;
 
-				_xmlDisplayPhysicalStop(stream, "   startStop :", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()));
-				_xmlDisplayPhysicalStop(stream, "   endStop :", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()));
-				_xmlDisplayPhysicalStop(stream, "   destinationStop : ", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()));
+				_xmlDisplayPhysicalStop(stream, "   destinationStop of this line :", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()));
+				_xmlDisplayPhysicalStop(stream, "   start at stop :", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()));
+				_xmlDisplayPhysicalStop(stream, "   end as stop :", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()));
 			}
 			const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
 			if(road != NULL)
 			{
-				stream << "   street : " <<
+				stream << "   take a street :" <<
 					" name = " << road->getRoadPlace()->getName() <<
 					" city = " << road->getRoadPlace()->getCity()->getName() << 
 					" length = " << ceil(leg.getDistance()) <<
