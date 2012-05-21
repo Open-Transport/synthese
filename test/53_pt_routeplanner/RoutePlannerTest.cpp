@@ -68,12 +68,14 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 	int i = 1;
 	BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
 	{
-		stream << endl << "Journey number " << i << ":" << endl;
+		stream << endl << "Journey number " << i << ":" <<
+			" duration " << journey.getDuration();
 
 		if(journey.getContinuousServiceRange().total_seconds() > 0)
 		{
-			stream << "is a continuous solution, range = " << journey.getContinuousServiceRange() << endl;
+			stream << " range (continuous journey) = " << journey.getContinuousServiceRange();
 		}
+		stream << endl;
 
 		// Loop on each leg
 		const Journey::ServiceUses& jl(journey.getServiceUses());
