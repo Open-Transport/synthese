@@ -170,7 +170,9 @@ namespace synthese
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
 			query.addField(object->getMaxBoniAmount());
-			query.addField(object->getMaxBoniTime());
+			query.addField(
+				object->getMaxBoniTime().is_not_a_date_time() ? string() : to_simple_string(object->getMaxBoniTime())
+			);
 			query.execute(transaction);
 		}
 

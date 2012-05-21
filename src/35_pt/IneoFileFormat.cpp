@@ -1200,7 +1200,7 @@ namespace synthese
 
 							// Boni amount
 							string boniAmountStr(_getValue("ATTmaxfrs"));
-							da->set<BoniAmount>(
+							ds->setMaxBoniAmount(
 								boniAmountStr.empty() || boniAmountStr == "vide" ?
 								0 :
 								lexical_cast<double>(boniAmountStr)
@@ -1224,13 +1224,13 @@ namespace synthese
 							string bonifStr(_getValue("ATTmaxtps"));
 							if(bonifStr.empty() || bonifStr == "vide")
 							{
-								da->set<BoniTime>(minutes(0));
+								ds->setMaxBoniTime(minutes(0));
 							}
 							else
 							{
 								vector<string> parts;
 								split(parts, bonifStr, is_any_of("h"));
-								da->set<BoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
+								ds->setMaxBoniTime(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
 
 							// Work range
