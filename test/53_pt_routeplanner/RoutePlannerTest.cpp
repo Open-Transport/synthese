@@ -25,16 +25,114 @@
 #include "AlgorithmLogger.hpp"
 #include "PTTimeSlotRoutePlanner.h"
 #include "RoutePlanner.h"
+#include "Road.h"
+#include "RoadPlace.h"
 #include "PTModule.h"
 #include "FreeDRTArea.hpp"
+#include "StopPoint.hpp"
 
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::pt_journey_planner;
 using namespace synthese::algorithm;
 using namespace synthese::graph;
+using namespace synthese::geography;
+using namespace synthese::road;
 using namespace synthese::util;
 using namespace synthese::pt;
+
+using namespace std;
+using namespace boost;
+using namespace boost::posix_time;
+
+void _xmlDisplayConnectionPlace(ostream& stream, const NamedPlace& np)
+{
+	stream <<
+		"     connectionPlace : " <<
+		" name = " << np.getName() <<
+		" city = " << np.getCity()->getName() << endl;	
+}
+
+void _xmlDisplayPhysicalStop(ostream& stream, const string& tag, const StopPoint& stop)
+{
+	stream << tag <<
+		" name = " << stop.getName() << endl;
+		_xmlDisplayConnectionPlace(stream, dynamic_cast<const NamedPlace&>(*stop.getHub()));
+}
+
+string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
+{
+	stringstream stream;
+	stream << message << endl << "Here it is solutions found : (see https://extranet.rcsmobility.com/projects/synthese/wiki/53_Journey_planner_module_tests)" << endl;
+
+	int i = 1;
+	BOOST_FOREACH(const PTRoutePlannerResult::Journeys::value_type& journey, result.getJourneys())
+	{
+		stream << endl << "Journey number " << i << ":" << endl;
+
+		if(journey.getContinuousServiceRange().total_seconds() > 0)
+		{
+			stream << "continuousServiceDuration = " << journey.getContinuousServiceRange() << endl;
+		}
+
+		// Loop on each leg
+		const Journey::ServiceUses& jl(journey.getServiceUses());
+		for (Journey::ServiceUses::const_iterator itl(jl.begin()); itl != jl.end(); ++itl)
+		{
+			const ServicePointer& leg(*itl);
+			stream << " leg departureDateTime = " << leg.getDepartureDateTime() << endl;
+
+			const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(leg.getService()->getPath()));
+			if(line != NULL)
+			{
+				stream << (line->isPedestrianMode() ? "   connection :" : "   transport :") <<
+					" length = " << ceil(leg.getDistance()) <<
+					" departureTime = " << leg.getDepartureDateTime() <<
+					" arrivalTime = " << leg.getArrivalDateTime();
+
+				if(journey.getContinuousServiceRange().total_seconds() > 0)
+				{
+					ptime edTime(leg.getDepartureDateTime());
+					edTime += journey.getContinuousServiceRange();
+					ptime eaTime(leg.getArrivalDateTime());
+					eaTime += journey.getContinuousServiceRange();
+
+					stream << " endDepartureTime=\"" << edTime <<
+						" endArrivalTime=\"" << eaTime;
+				}
+				stream << endl;
+
+				_xmlDisplayPhysicalStop(stream, "   startStop :", dynamic_cast<const StopPoint&>(*leg.getDepartureEdge()->getFromVertex()));
+				_xmlDisplayPhysicalStop(stream, "   endStop :", dynamic_cast<const StopPoint&>(*leg.getArrivalEdge()->getFromVertex()));
+				_xmlDisplayPhysicalStop(stream, "   destinationStop : ", dynamic_cast<const StopPoint&>(*line->getLastEdge()->getFromVertex()));
+			}
+			const Road* road(dynamic_cast<const Road*> (leg.getService()->getPath ()));
+			if(road != NULL)
+			{
+				stream << "   street : " <<
+					" name = " << road->getRoadPlace()->getName() <<
+					" city = " << road->getRoadPlace()->getCity()->getName() << 
+					" length = " << ceil(leg.getDistance()) <<
+					" departureTime = " << leg.getDepartureDateTime() << 
+					" arrivalTime = " << leg.getArrivalDateTime() ;
+
+				if(journey.getContinuousServiceRange().total_seconds() > 0)
+				{
+					ptime edTime(leg.getDepartureDateTime());
+					edTime += journey.getContinuousServiceRange();
+					ptime eaTime(leg.getArrivalDateTime());
+					eaTime += journey.getContinuousServiceRange();
+
+					stream << " endDepartureTime = " << edTime << 
+						" endArrivalTime = " << eaTime ;
+				}
+				stream << endl;
+			}
+		}
+	i++;
+	}
+    return stream.str();
+}
 
 BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 {
@@ -428,7 +526,7 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		BOOST_CHECK_EQUAL(result.getJourneys().size(), 5);
+		BOOST_CHECK_MESSAGE(result.getJourneys().size() == 5, displayJourneyDifferences("Result size from 94 to 99 is not 5 !",result));
 	}
 
 	{ // 98 -> 99
@@ -448,6 +546,6 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		);
 		PTRoutePlannerResult result(r.run());
 
-		BOOST_CHECK_EQUAL(result.getJourneys().size(), 3);
+		BOOST_CHECK_MESSAGE(result.getJourneys().size() == 3, displayJourneyDifferences("Result size from 98 to 99 is not 3 !",result));
 	}
 }
