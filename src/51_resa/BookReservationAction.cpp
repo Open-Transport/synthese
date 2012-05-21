@@ -297,7 +297,9 @@ namespace synthese
 						throw ActionException("No such service");
 					}
 
-					gregorian::date date(_departureDateTime.date());
+					gregorian::date date = from_string(map.get<string>(
+						Action_PARAMETER_PREFIX + pt_journey_planner::RoutePlannerFunction::PARAMETER_LOWEST_DEPARTURE_TIME
+					));
 
 					size_t departureRank(map.get<size_t>(PARAMETER_DEPARTURE_RANK));
 					size_t arrivalRank(map.get<size_t>(PARAMETER_ARRIVAL_RANK));
