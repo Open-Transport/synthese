@@ -63,8 +63,6 @@ namespace synthese
 		const string DriverServiceTableSync::COL_SERVICES = "services";
 		const string DriverServiceTableSync::COL_DATES = "dates";
 		const string DriverServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
-		const string DriverServiceTableSync::COL_MAX_BONI_AMOUNT = "max_boni_amount";
-		const string DriverServiceTableSync::COL_MAX_BONI_TIME = "max_boni_time";
 	}
 
 	namespace db
@@ -82,8 +80,6 @@ namespace synthese
 			Field(DriverServiceTableSync::COL_SERVICES, SQL_TEXT),
 			Field(DriverServiceTableSync::COL_DATES, SQL_TEXT),
 			Field(DriverServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
-			Field(DriverServiceTableSync::COL_MAX_BONI_AMOUNT, SQL_DOUBLE),
-			Field(DriverServiceTableSync::COL_MAX_BONI_TIME, SQL_TEXT),
 			Field()
 		};
 
@@ -108,21 +104,6 @@ namespace synthese
 
 			// Name
 			object->setName(rows->getText(DriverServiceTableSync::COL_NAME));
-
-			// Max boni time
-			string timeStr(
-				rows->getText(DriverServiceTableSync::COL_MAX_BONI_TIME)
-			);
-			object->setMaxBoniTime(
-				timeStr.empty() ?
-				minutes(0) :
-				duration_from_string(timeStr)
-			);
-
-			// Max boni amount
-			object->setMaxBoniAmount(
-				rows->getDouble(DriverServiceTableSync::COL_MAX_BONI_AMOUNT)
-			);
 
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
@@ -169,10 +150,6 @@ namespace synthese
 					object->getDataSourceLinks(),
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
-			query.addField(object->getMaxBoniAmount());
-			query.addField(
-				object->getMaxBoniTime().is_not_a_date_time() ? string() : to_simple_string(object->getMaxBoniTime())
-			);
 			query.execute(transaction);
 		}
 

@@ -1106,6 +1106,9 @@ namespace synthese
 							);
 							da->set<DriverActivity>(**activities.begin());
 							da->set<Driver>(*user);
+							da->set<Date>(vsDate);
+							da->set<BoniAmount>(bonifAmount);
+							da->set<BoniTime>(bonifTime);
 						}
 					}
 
@@ -1200,7 +1203,7 @@ namespace synthese
 
 							// Boni amount
 							string boniAmountStr(_getValue("ATTmaxfrs"));
-							ds->setMaxBoniAmount(
+							da->set<MaxBoniAmount>(
 								boniAmountStr.empty() || boniAmountStr == "vide" ?
 								0 :
 								lexical_cast<double>(boniAmountStr)
@@ -1224,13 +1227,13 @@ namespace synthese
 							string bonifStr(_getValue("ATTmaxtps"));
 							if(bonifStr.empty() || bonifStr == "vide")
 							{
-								ds->setMaxBoniTime(minutes(0));
+								da->set<MaxBoniTime>(minutes(0));
 							}
 							else
 							{
 								vector<string> parts;
 								split(parts, bonifStr, is_any_of("h"));
-								ds->setMaxBoniTime(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
+								da->set<MaxBoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
 
 							// Work range
@@ -1313,7 +1316,7 @@ namespace synthese
 
 						// Vehicle service
 						set<VehicleService*> lvs;
-						if(vsKey.empty())
+						if(!vsKey.empty())
 						{
 							lvs = _vehicleServices.get(vsKey);
 							if(lvs.empty())
