@@ -59,6 +59,7 @@ namespace synthese
 		private:
 			static const std::string PARAMETER_VAR;
 			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_EMPTY;
 
 			class Node
 			{
@@ -164,6 +165,7 @@ namespace synthese
 				std::string arrayCode;
 				Nodes pageCode;
 				Nodes inlineTemplate;
+				Nodes emptyTemplate;
 				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
 				Parameters parameters;
 
