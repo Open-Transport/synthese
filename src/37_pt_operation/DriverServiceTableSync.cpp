@@ -263,15 +263,15 @@ namespace synthese
 					if(firstElement)
 					{
 						firstElement = false;
-						if(chunk.vehicleService)
-						{
-							servicesStr << ":" << chunk.vehicleService->getKey();
-							if(	!chunk.driverStartTime.is_not_a_date_time() &&
-								!chunk.driverEndTime.is_not_a_date_time()
-							){
-								servicesStr << ":" << to_simple_string(chunk.driverStartTime);
-								servicesStr << ":" << to_simple_string(chunk.driverEndTime);
-							}
+						servicesStr <<
+							":" <<
+							chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0)
+						;
+						if(	!chunk.driverStartTime.is_not_a_date_time() &&
+							!chunk.driverEndTime.is_not_a_date_time()
+						){
+							servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+							servicesStr << ":" << to_simple_string(chunk.driverEndTime);
 						}
 					}
 			}	}
@@ -312,9 +312,14 @@ namespace synthese
 				if(elementStrs.size() >= 4 || itServices == services.rend())
 				{
 					DriverService::Chunk chunk;
-					if(elementStrs.size() >= 4)
-					{
-						chunk.vehicleService = VehicleServiceTableSync::GetEditable(lexical_cast<RegistryKeyType>(elementStrs[3]), env, linkLevel).get();
+					if(	elementStrs.size() >= 4 &&
+						lexical_cast<RegistryKeyType>(elementStrs[3]) > 0
+					){
+						chunk.vehicleService = VehicleServiceTableSync::GetEditable(
+							lexical_cast<RegistryKeyType>(elementStrs[3]),
+							env,
+							linkLevel
+						).get();
 					}
 					if(elementStrs.size() >= 10)
 					{
