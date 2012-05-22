@@ -50,8 +50,6 @@ namespace synthese
 				static const std::string COL_SERVICES;
 				static const std::string COL_DATES;
 				static const std::string COL_DATASOURCE_LINKS;
-				static const std::string COL_MAX_BONI_TIME;
-				static const std::string COL_MAX_BONI_AMOUNT;
 			//@}
 
 

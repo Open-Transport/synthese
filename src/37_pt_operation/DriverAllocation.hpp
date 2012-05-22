@@ -47,6 +47,8 @@ namespace synthese
 		FIELD_TYPE(Amount, double)
 		FIELD_TYPE(BoniAmount, double)
 		FIELD_TYPE(BoniTime, boost::posix_time::time_duration)
+		FIELD_TYPE(MaxBoniAmount, double)
+		FIELD_TYPE(MaxBoniTime, boost::posix_time::time_duration)
 		FIELD_TYPE(WorkRange, boost::posix_time::time_duration)
 		FIELD_TYPE(WorkDuration, boost::posix_time::time_duration)
 		FIELD_TYPE(WithTicketSales, bool)
@@ -59,6 +61,8 @@ namespace synthese
 			FIELD(Amount),
 			FIELD(BoniAmount),
 			FIELD(BoniTime),
+			FIELD(MaxBoniAmount),
+			FIELD(MaxBoniTime),
 			FIELD(impex::DataSourceLinks),
 			FIELD(WorkRange),
 			FIELD(WorkDuration),

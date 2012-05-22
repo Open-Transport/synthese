@@ -39,6 +39,8 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(Driver, "driver_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(BoniAmount, "boni_amount", SQL_DOUBLE)
 	FIELD_DEFINITION_OF_TYPE(BoniTime, "boni_time", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(MaxBoniAmount, "max_boni_amount", SQL_DOUBLE)
+	FIELD_DEFINITION_OF_TYPE(MaxBoniTime, "max_boni_time", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WorkRange, "work_range", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WorkDuration, "work_duration", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(WithTicketSales, "with_ticket_sales", SQL_BOOLEAN)
@@ -57,6 +59,8 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Amount, 0.0),
 					FIELD_VALUE_CONSTRUCTOR(BoniAmount, 0.0),
 					FIELD_VALUE_CONSTRUCTOR(BoniTime, not_a_date_time),
+					FIELD_VALUE_CONSTRUCTOR(MaxBoniAmount, 0.0),
+					FIELD_VALUE_CONSTRUCTOR(MaxBoniTime, not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
 					FIELD_VALUE_CONSTRUCTOR(WorkRange, not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(WorkDuration, not_a_date_time),
