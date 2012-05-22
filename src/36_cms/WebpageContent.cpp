@@ -734,11 +734,6 @@ namespace synthese
 			const Webpage& page
 		) const	{
 
-			if(	!additionalParametersMap.hasSubMaps(arrayCode)
-			){
-				return;
-			}
-
 			// Page load
 			const Webpage* templatePage(NULL);
 			if(inlineTemplate.empty())
@@ -777,6 +772,16 @@ namespace synthese
 				baseParametersMap.insert(param.first, s.str());
 			}
 
+			// No items to display
+			if(	!additionalParametersMap.hasSubMaps(arrayCode)
+			){
+				BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, emptyTemplate)
+				{
+					node->display(stream, request, baseParametersMap, page);
+				}
+				return;
+			}
+
 			// Items read
 			const ParametersMap::SubParametersMap::mapped_type& items(
 				additionalParametersMap.getSubMaps(arrayCode)
@@ -785,38 +790,27 @@ namespace synthese
 			size_t rank(0);
 			size_t itemsCount(items.size());
 
-			if(items.empty())
+			BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 			{
-				BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, emptyTemplate)
-				{
-					node->display(stream, request, baseParametersMap, page);
-				}
-			}
-			else
-			{
-				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
-				{
-					ParametersMap pm(*item);
-					pm.merge(baseParametersMap);
-					pm.insert(DATA_RANK, rank++);
-					pm.insert(DATA_ITEMS_COUNT, itemsCount);
+				ParametersMap pm(*item);
+				pm.merge(baseParametersMap);
+				pm.insert(DATA_RANK, rank++);
+				pm.insert(DATA_ITEMS_COUNT, itemsCount);
 
-					// Display by a template page
-					if(templatePage)
+				// Display by a template page
+				if(templatePage)
+				{
+					templatePage->display(stream, request, pm);
+				}
+				else // Display by an inline defined template
+				{
+					// Display of each inline defined node
+					BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
 					{
-						templatePage->display(stream, request, pm);
-					}
-					else // Display by an inline defined template
-					{
-						// Display of each inline defined node
-						BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
-						{
-							node->display(stream, request, pm, page);
-						}
+						node->display(stream, request, pm, page);
 					}
 				}
 			}
-
 		}
 
 
