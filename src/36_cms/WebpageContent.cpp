@@ -89,6 +89,7 @@ namespace synthese
 	{
 		const string WebpageContent::PARAMETER_VAR = "VAR";
 		const string WebpageContent::PARAMETER_TEMPLATE = "template";
+		const string WebpageContent::PARAMETER_EMPTY = "empty";
 		const string WebpageContent::ForeachNode::DATA_RANK = "rank";
 		const string WebpageContent::ForeachNode::DATA_ITEMS_COUNT = "items_count";
 
@@ -365,6 +366,10 @@ namespace synthese
 								else if(parameterName.str() == PARAMETER_TEMPLATE)
 								{
 									node->inlineTemplate = parameterNodes;
+								}
+								else if(parameterName.str() == PARAMETER_EMPTY)
+								{
+									node->emptyTemplate = parameterNodes;
 								}
 								else
 								{
@@ -780,24 +785,34 @@ namespace synthese
 			size_t rank(0);
 			size_t itemsCount(items.size());
 
-			BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+			if(items.empty())
 			{
-				ParametersMap pm(*item);
-				pm.merge(baseParametersMap);
-				pm.insert(DATA_RANK, rank++);
-				pm.insert(DATA_ITEMS_COUNT, itemsCount);
-
-				// Display by a template page
-				if(templatePage)
+				BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, emptyTemplate)
 				{
-					templatePage->display(stream, request, pm);
+					node->display(stream, request, baseParametersMap, page);
 				}
-				else // Display by an inline defined template
+			}
+			else
+			{
+				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 				{
-					// Display of each inline defined node
-					BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
+					ParametersMap pm(*item);
+					pm.merge(baseParametersMap);
+					pm.insert(DATA_RANK, rank++);
+					pm.insert(DATA_ITEMS_COUNT, itemsCount);
+
+					// Display by a template page
+					if(templatePage)
 					{
-						node->display(stream, request, pm, page);
+						templatePage->display(stream, request, pm);
+					}
+					else // Display by an inline defined template
+					{
+						// Display of each inline defined node
+						BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
+						{
+							node->display(stream, request, pm, page);
+						}
 					}
 				}
 			}
