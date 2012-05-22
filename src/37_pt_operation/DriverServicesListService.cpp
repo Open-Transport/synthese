@@ -60,8 +60,8 @@ namespace synthese
 		const string DriverServicesListService::PARAMETER_PAGE_ID = "p";
 		const string DriverServicesListService::PARAMETER_VEHICLE_SERVICE_ID = "vehicle_service";
 
-		const string DriverServicesListService::TAG_SERVICE = "vehicleService";
-		const string DriverServicesListService::TAG_SERVICES = "vehicleServices";
+		const string DriverServicesListService::TAG_SERVICE = "driverService";
+		const string DriverServicesListService::TAG_SERVICES = "driverServices";
 
 
 

@@ -117,8 +117,6 @@ namespace synthese
 			typedef util::Registry<DriverService> Registry;
 
 		private:
-			double _maxBoniAmount;
-			boost::posix_time::time_duration _maxBoniTime;
 			Chunks _chunks;
 
 		public:
@@ -127,15 +125,11 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const Chunks& getChunks() const { return _chunks; }
-				const boost::posix_time::time_duration& getMaxBoniTime() const { return _maxBoniTime; }
-				double getMaxBoniAmount() const { return _maxBoniAmount; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setChunks(const Chunks& value);
-				void setMaxBoniTime(const boost::posix_time::time_duration& value){ _maxBoniTime = value; }
-				void setMaxBoniAmount(double value){ _maxBoniAmount = value; }
 			//@}
 
 			/// @name Services
