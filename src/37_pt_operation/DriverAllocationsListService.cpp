@@ -376,7 +376,7 @@ namespace synthese
 				{
 					shared_ptr<ParametersMap> activityPM(new ParametersMap);
 					alloc.get<DriverActivity>()->toParametersMap(*activityPM);
-					allocPM->insert("activity", allocPM);
+					allocPM->insert("activity", activityPM);
 				}
 				else
 				{

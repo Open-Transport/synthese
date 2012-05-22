@@ -1190,7 +1190,7 @@ namespace synthese
 							da->set<Date>(vsDate);
 
 							// On board ticketing
-							da->set<WithTicketSales>(onBoardTicketing == "O");
+							da->set<WithTicketSales>(!onBoardTicketing.empty());
 
 							// Amount
 							string amountStr(_getValue("Frs"));
@@ -1210,7 +1210,7 @@ namespace synthese
 							);
 
 							// Activity
-							string actStr(_getValue("ACT"));
+							string actStr(_getValue("Act"));
 							if(!actStr.empty() && actStr != "vide")
 							{
 								// Search for an activity
