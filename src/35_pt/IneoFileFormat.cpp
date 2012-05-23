@@ -1060,6 +1060,11 @@ namespace synthese
 
 						// User
 						string userKey(_getValue("MAT"));
+						if(userKey.empty())
+						{
+							stream << "WARN : undefined driver in allocation " << key << "/" << dateStr << ".<br />";
+							continue;
+						}
 						User* user(
 							FileFormat::LoadOrCreateObject<UserTableSync>(
 								users,
