@@ -245,7 +245,7 @@ namespace synthese
 			BOOST_FOREACH(const DriverService::Chunk& chunk, services)
 			{
 				bool firstElement(true);
-				BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
+				if(chunk.elements.empty())
 				{
 					if(firstService)
 					{
@@ -255,26 +255,46 @@ namespace synthese
 					{
 						servicesStr << ",";
 					}
-					servicesStr <<
-						service.service->getKey() << ":" <<
-						service.startRank << ":" <<
-						service.endRank
-					;
-					if(firstElement)
-					{
-						firstElement = false;
-						servicesStr <<
-							":" <<
-							(chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0))
-						;
-						if(	!chunk.driverStartTime.is_not_a_date_time() &&
-							!chunk.driverEndTime.is_not_a_date_time()
-						){
-							servicesStr << ":" << to_simple_string(chunk.driverStartTime);
-							servicesStr << ":" << to_simple_string(chunk.driverEndTime);
-						}
+					servicesStr << "0:0:0:0";
+					if(	!chunk.driverStartTime.is_not_a_date_time() &&
+						!chunk.driverEndTime.is_not_a_date_time()
+					){
+						servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+						servicesStr << ":" << to_simple_string(chunk.driverEndTime);
 					}
-			}	}
+				}
+				else
+				{
+					BOOST_FOREACH(const DriverService::Chunk::Element& service, chunk.elements)
+					{
+						if(firstService)
+						{
+							firstService = false;
+						}
+						else
+						{
+							servicesStr << ",";
+						}
+						servicesStr <<
+							service.service->getKey() << ":" <<
+							service.startRank << ":" <<
+							service.endRank
+						;
+						if(firstElement)
+						{
+							firstElement = false;
+							servicesStr <<
+								":" <<
+								(chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0))
+							;
+							if(	!chunk.driverStartTime.is_not_a_date_time() &&
+								!chunk.driverEndTime.is_not_a_date_time()
+							){
+								servicesStr << ":" << to_simple_string(chunk.driverStartTime);
+								servicesStr << ":" << to_simple_string(chunk.driverEndTime);
+							}
+						}
+			}	}	}
 			return servicesStr.str();
 		}
 
@@ -315,13 +335,20 @@ namespace synthese
 					if(	elementStrs.size() >= 4 &&
 						lexical_cast<RegistryKeyType>(elementStrs[3]) > 0
 					){
-						chunk.vehicleService = VehicleServiceTableSync::GetEditable(
-							lexical_cast<RegistryKeyType>(elementStrs[3]),
-							env,
-							linkLevel
-						).get();
+						try
+						{
+							chunk.vehicleService = VehicleServiceTableSync::GetEditable(
+								lexical_cast<RegistryKeyType>(elementStrs[3]),
+								env,
+								linkLevel
+							).get();
+						}
+						catch (ObjectNotFoundException<VehicleService>&)
+						{
+							Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+						}
 					}
-					if(elementStrs.size() >= 10)
+					if(elementStrs.size() >= 9)
 					{
 						chunk.driverStartTime =
 							hours(lexical_cast<long>(elementStrs[4])) +
@@ -336,22 +363,24 @@ namespace synthese
 
 				try
 				{
-					DriverService::Chunk::Element element;
-
-					RegistryKeyType id(lexical_cast<RegistryKeyType>(elementStrs[0]));
-					if(decodeTableId(id) == ScheduledServiceTableSync::TABLE.ID)
+					if(lexical_cast<RegistryKeyType>(elementStrs[0]) > 0)
 					{
-						element.service = ScheduledServiceTableSync::GetEditable(id, env, linkLevel).get();
-					}
-					else if(decodeTableId(id) == DeadRunTableSync::TABLE.ID)
-					{
-						element.service = DeadRunTableSync::GetEditable(id, env, linkLevel).get();
-					}
-					element.startRank = lexical_cast<size_t>(elementStrs[1]);
-					element.endRank = lexical_cast<size_t>(elementStrs[2]);
+						DriverService::Chunk::Element element;
 
-					itServices->elements.push_back(element);
-				}
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(elementStrs[0]));
+						if(decodeTableId(id) == ScheduledServiceTableSync::TABLE.ID)
+						{
+							element.service = ScheduledServiceTableSync::GetEditable(id, env, linkLevel).get();
+						}
+						else if(decodeTableId(id) == DeadRunTableSync::TABLE.ID)
+						{
+							element.service = DeadRunTableSync::GetEditable(id, env, linkLevel).get();
+						}
+						element.startRank = lexical_cast<size_t>(elementStrs[1]);
+						element.endRank = lexical_cast<size_t>(elementStrs[2]);
+
+						itServices->elements.push_back(element);
+				}	}
 				catch(ObjectNotFoundException<ScheduledService>&)
 				{
 					Log::GetInstance().warn("No such service "+ elementStrs[0]);
@@ -360,9 +389,9 @@ namespace synthese
 				{
 					Log::GetInstance().warn("No such dead run "+ elementStrs[0]);
 				}
-				catch (ObjectNotFoundException<VehicleService>&)
+				catch(bad_lexical_cast&)
 				{
-					Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+					Log::GetInstance().warn("Inconsistent service id "+ elementStrs[0]);
 				}
 			}
 

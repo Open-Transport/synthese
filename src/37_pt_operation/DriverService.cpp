@@ -94,39 +94,39 @@ namespace synthese
 			map.insert(ATTR_WORK_RANGE, getWorkRange());
 			map.insert(ATTR_DRIVER_START_TIME, getServiceBeginning());
 			map.insert(ATTR_DRIVER_END_TIME, getServiceEnd());
-			if(!getChunks().empty())
-			{
+			if(	!getChunks().empty()
+			){
 				// Stops
-				const Importable* startStopPoint(
-					dynamic_cast<Importable*>(
-						getChunks().begin()->elements.begin()->service->getPath()->getEdge(
-							getChunks().begin()->elements.begin()->startRank
-						)->getFromVertex()
-				)	);
-				if(startStopPoint)
+				if(!getChunks().begin()->elements.empty())
 				{
-					map.insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
+					const Importable* startStopPoint(
+						dynamic_cast<Importable*>(
+							getChunks().begin()->elements.begin()->service->getPath()->getEdge(
+								getChunks().begin()->elements.begin()->startRank
+							)->getFromVertex()
+					)	);
+					if(startStopPoint)
+					{
+						map.insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
+					}
 				}
-				const Importable* endStopPoint(
-					dynamic_cast<Importable*>(
-						getChunks().rbegin()->elements.rbegin()->service->getPath()->getEdge(
-							getChunks().rbegin()->elements.rbegin()->endRank
-						)->getFromVertex()
-				)	);
-				if(endStopPoint)
+				if(!getChunks().rbegin()->elements.empty())
 				{
-					map.insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
+					const Importable* endStopPoint(
+						dynamic_cast<Importable*>(
+							getChunks().rbegin()->elements.rbegin()->service->getPath()->getEdge(
+								getChunks().rbegin()->elements.rbegin()->endRank
+							)->getFromVertex()
+					)	);
+					if(endStopPoint)
+					{
+						map.insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
+					}
 				}
 			}
 
 			BOOST_FOREACH(const DriverService::Chunks::value_type& chunk, getChunks())
 			{
-				// Avoid empty chunks (abnormal situation)
-				if(chunk.elements.empty())
-				{
-					continue;
-				}
-
 				// Vehicle service filter
 				if(vehicleServiceFilter && chunk.vehicleService != vehicleServiceFilter)
 				{
@@ -137,8 +137,17 @@ namespace synthese
 				shared_ptr<ParametersMap> chunkPM(new ParametersMap);
 
 				// Times
-				chunkPM->insert(ATTR_START_TIME, chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank));
-				chunkPM->insert(ATTR_END_TIME, chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank));
+				if(!chunk.elements.empty())
+				{
+					chunkPM->insert(
+						ATTR_START_TIME,
+						chunk.elements.begin()->service->getDepartureSchedule(false, chunk.elements.begin()->startRank)
+					);
+					chunkPM->insert(
+						ATTR_END_TIME,
+						chunk.elements.rbegin()->service->getArrivalSchedule(false, chunk.elements.rbegin()->endRank)
+					);
+				}
 				chunkPM->insert(ATTR_DRIVER_START_TIME, chunk.getDriverStartTime());
 				chunkPM->insert(ATTR_DRIVER_END_TIME, chunk.getDriverEndTime());
 
@@ -151,15 +160,18 @@ namespace synthese
 				}
 
 				// Stops
-				const Importable* startStopPoint(dynamic_cast<Importable*>(chunk.elements.begin()->service->getPath()->getEdge(chunk.elements.begin()->startRank)->getFromVertex()));
-				if(startStopPoint)
+				if(!chunk.elements.empty())
 				{
-					chunkPM->insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
-				}
-				const Importable* endStopPoint(dynamic_cast<Importable*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.rbegin()->endRank)->getFromVertex()));
-				if(endStopPoint)
-				{
-					chunkPM->insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
+					const Importable* startStopPoint(dynamic_cast<Importable*>(chunk.elements.begin()->service->getPath()->getEdge(chunk.elements.begin()->startRank)->getFromVertex()));
+					if(startStopPoint)
+					{
+						chunkPM->insert(ATTR_START_STOP, startStopPoint->getCodeBySources());
+					}
+					const Importable* endStopPoint(dynamic_cast<Importable*>(chunk.elements.rbegin()->service->getPath()->getEdge(chunk.elements.rbegin()->endRank)->getFromVertex()));
+					if(endStopPoint)
+					{
+						chunkPM->insert(ATTR_END_STOP, endStopPoint->getCodeBySources());
+					}
 				}
 
 				// Elements
