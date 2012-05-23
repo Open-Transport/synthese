@@ -91,6 +91,10 @@ class Env(object):
         return self.get_executable_path(self.daemon_relative_path, 's3-server')
 
     @property
+    def s3_proxy_path(self):
+        return self.get_executable_path(self.daemon_relative_path, 's3-proxy')
+
+    @property
     def testdata_importer_relative_path(self):
         return join('test', '53_pt_routeplanner')
 

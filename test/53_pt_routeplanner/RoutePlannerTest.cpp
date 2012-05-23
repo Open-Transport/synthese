@@ -50,7 +50,7 @@ void _xmlDisplayConnectionPlace(ostream& stream, const NamedPlace& np)
 	stream <<
 		"     connectionPlace :" <<
 		" name = " << np.getName() <<
-		" city = " << np.getCity()->getName() << endl;	
+		" city = " << np.getCity()->getName() << endl;
 }
 
 void _xmlDisplayPhysicalStop(ostream& stream, const string& tag, const StopPoint& stop)
@@ -117,9 +117,9 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 			{
 				stream << "   take a street :" <<
 					" name = " << road->getRoadPlace()->getName() <<
-					" city = " << road->getRoadPlace()->getCity()->getName() << 
+					" city = " << road->getRoadPlace()->getCity()->getName() <<
 					" length = " << ceil(leg.getDistance()) <<
-					" departureTime = " << leg.getDepartureDateTime() << 
+					" departureTime = " << leg.getDepartureDateTime() <<
 					" arrivalTime = " << leg.getArrivalDateTime() ;
 
 				if(journey.getContinuousServiceRange().total_seconds() > 0)
@@ -129,7 +129,7 @@ string displayJourneyDifferences(string message, PTRoutePlannerResult& result)
 					ptime eaTime(leg.getArrivalDateTime());
 					eaTime += journey.getContinuousServiceRange();
 
-					stream << " endDepartureTime = " << edTime << 
+					stream << " endDepartureTime = " << edTime <<
 						" endArrivalTime = " << eaTime ;
 				}
 				stream << endl;

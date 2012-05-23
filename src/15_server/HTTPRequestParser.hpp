@@ -100,7 +100,7 @@ namespace synthese
 		  } state_;
 		};
 
-	} // namespace server3
+	} // namespace server
 } // namespace http
 
 #endif // HTTP_SERVER3_REQUEST_PARSER_HPP

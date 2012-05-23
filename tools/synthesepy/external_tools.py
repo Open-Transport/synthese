@@ -148,6 +148,24 @@ class UDFProxySupervisor(Supervisor):
             udf_proxy_options=config.udf_proxy_options))
 
 
+class S3ProxySupervisor(Supervisor):
+    def get_config_name(self):
+        return 's3_proxy_{0}'.format(self.project.config.project_name)
+
+    def get_log_file(self):
+        return join(self.project.config.project_path, 'logs', 's3_proxy.log')
+
+    def get_command(self):
+        config = self.project.config
+        dispatch_url = 'http://localhost:{0}'.format(config.port)
+        return ('{s3_proxy} --port {s3_proxy_port} --target {dispatch_url} '
+            '--password {s3_proxy_password}'.format(
+            s3_proxy=self.project.env.s3_proxy_path,
+            s3_proxy_port=config.s3_proxy_port,
+            dispatch_url=dispatch_url,
+            s3_proxy_password=config.s3_proxy_password))
+
+
 class WSGI(ExternalTool):
     def __init__(self, project):
         super(WSGI, self).__init__(project)

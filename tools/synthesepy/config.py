@@ -89,6 +89,10 @@ DEFAULTS = {
     'udf_proxy_port': 9080,
     'udf_proxy_options': '',
     'udf_proxy_dispatch_ports': None,
+    'use_s3_proxy': False,
+    's3_proxy_port': 9080,
+    's3_proxy_password': 'changeme',
+
     'send_mail_on_restart': False,
     'apache_conf_suffix': '',
     # web frontend configuration

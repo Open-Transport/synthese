@@ -356,5 +356,5 @@ namespace synthese
 		  return c >= '0' && c <= '9';
 		}
 
-	} // namespace server3
+	} // namespace server
 } // namespace http

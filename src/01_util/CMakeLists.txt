@@ -63,6 +63,7 @@ XmlToolkit.cpp
 XmlToolkit.h
 ZipWriter.cpp
 ZipWriter.hpp
+concurrent/locking_queue.hpp
 concurrent/SynchronizedQueue.h
 )
 
