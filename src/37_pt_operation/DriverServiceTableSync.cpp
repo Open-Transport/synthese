@@ -265,7 +265,7 @@ namespace synthese
 						firstElement = false;
 						servicesStr <<
 							":" <<
-							chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0)
+							(chunk.vehicleService ? chunk.vehicleService->getKey() : RegistryKeyType(0))
 						;
 						if(	!chunk.driverStartTime.is_not_a_date_time() &&
 							!chunk.driverEndTime.is_not_a_date_time()
