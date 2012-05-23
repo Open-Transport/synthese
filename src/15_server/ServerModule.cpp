@@ -65,7 +65,7 @@ namespace synthese
 		ServerModule::SessionMap	ServerModule::_sessionMap;
 		boost::asio::io_service ServerModule::_io_service;
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
-		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service));
+		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service, &ServerModule::HandleRequest));
 		ServerModule::Threads ServerModule::_threads;
 		size_t ServerModule::_waitingThreads(0);
 		recursive_mutex ServerModule::_threadManagementMutex;
@@ -217,7 +217,7 @@ namespace synthese
 			if (!e)
 			{
 				_new_connection->start();
-				_new_connection.reset(new HTTPConnection(_io_service));
+				_new_connection.reset(new HTTPConnection(_io_service, &ServerModule::HandleRequest));
 				_acceptor.async_accept(
 					_new_connection->socket(),
 					boost::bind(

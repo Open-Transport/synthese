@@ -253,5 +253,5 @@ namespace synthese
 		  return rep;
 		}
 
-	} // namespace server3
+	} // namespace server
 } // namespace http
