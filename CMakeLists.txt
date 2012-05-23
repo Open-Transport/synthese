@@ -71,15 +71,15 @@ if(WITH_MYSQL)
   add_definitions(-DWITH_MYSQL)
 endif(WITH_MYSQL)
 
-if(WITH_MYSQL)
-  # Curl is used in the mysql UDF library
-  include(FindCURL)
-  # TODO: win32 support not implemented yet.
-  if(NOT CURL_FOUND AND NOT WIN32)
-    message(FATAL_ERROR "CURL library/headers not found")
-  endif()
+# Curl is used in the mysql UDF library and the s3-proxy.
+include(FindCURL)
+# TODO: win32 support not implemented yet.
+if(NOT CURL_FOUND AND NOT WIN32)
+  message(FATAL_ERROR "CURL library/headers not found")
 endif()
-
+if(CURL_FOUND)
+  add_definitions(-DHAVE_CURL)
+endif()
 
 if(WIN32)
   # NOTE: _MBCS WIN32 _WINDOWS are already set by cmake

@@ -1016,6 +1016,8 @@ The synthese.py wrapper script.
         ]
         if self.config.use_udf_proxy:
             tools.append(external_tools.UDFProxySupervisor(self))
+        if self.config.use_s3_proxy:
+            tools.append(external_tools.S3ProxySupervisor(self))
 
         return tools
 

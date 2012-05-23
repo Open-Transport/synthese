@@ -37,7 +37,8 @@ namespace synthese
 			public:
 			/// Construct a connection with the given io_service.
 			explicit HTTPConnection(
-				boost::asio::io_service& io_service
+				boost::asio::io_service& io_service,
+				void (*handler)(const HTTPRequest& request, HTTPReply& reply)
 			);
 
 			/// Get the socket associated with the connection.
@@ -71,11 +72,13 @@ namespace synthese
 
 			/// The reply to be sent back to the client.
 			HTTPReply reply_;
+
+			void (*handler_)(const HTTPRequest& request, HTTPReply& reply);
 		};
 
 		typedef boost::shared_ptr<HTTPConnection> connection_ptr;
 
-	} // namespace server3
+	} // namespace server
 } // namespace http
 
 #endif // HTTP_SERVER3_CONNECTION_HPP

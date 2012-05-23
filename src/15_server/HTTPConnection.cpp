@@ -9,7 +9,6 @@
 //
 
 #include "HTTPConnection.hpp"
-#include "ServerModule.h"
 
 #include <vector>
 #include <boost/bind.hpp>
@@ -20,9 +19,11 @@ namespace synthese
 	{
 
 		HTTPConnection::HTTPConnection(
-			boost::asio::io_service& io_service
+			boost::asio::io_service& io_service,
+			void (*handler)(const HTTPRequest& request, HTTPReply& reply)
 		):	strand_(io_service),
-			socket_(io_service)
+			socket_(io_service),
+			handler_(handler)
 		{
 		}
 
@@ -59,7 +60,7 @@ namespace synthese
 				if (result)
 				{
 					request_.ipaddr = socket_.remote_endpoint().address().to_string();
-					ServerModule::HandleRequest(request_, reply_);
+					(*handler_)(request_, reply_);
 					boost::asio::async_write(socket_, reply_.to_buffers(),
 						strand_.wrap(
 							boost::bind(&HTTPConnection::handle_write, shared_from_this(),
@@ -106,5 +107,5 @@ namespace synthese
 			// destructor closes the socket.
 		}
 
-	} // namespace server3
+	} // namespace server
 } // namespace http
