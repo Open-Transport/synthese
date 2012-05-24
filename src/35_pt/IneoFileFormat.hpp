@@ -30,7 +30,7 @@
 #include "DepotTableSync.hpp"
 #include "DestinationTableSync.hpp"
 #include "DriverActivityTableSync.hpp"
-#include "DriverAllocationTableSync.hpp"
+#include "DriverAllocationTemplateTableSync.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "PTDataCleanerFileFormat.hpp"
@@ -202,22 +202,14 @@ namespace synthese
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
-				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverAllocationTableSync> _driverAllocations;
+				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverAllocationTemplateTableSync> _driverAllocationTemplates;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
 				mutable std::map<std::string, std::vector<int> > _calendars;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
 
-				typedef std::map<
-					std::pair<std::string, boost::gregorian::date>,
-					boost::tuple<
-						security::User*,
-						double,
-						boost::posix_time::time_duration
-					>	> Allocations;
 				typedef std::map<std::pair<security::User*, boost::gregorian::date>, pt_operation::DriverActivity*> Activities;
-				mutable Allocations _allocations;
 				mutable Activities _activityAllocations;
 
 				struct Trip

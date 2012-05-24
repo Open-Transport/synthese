@@ -145,8 +145,8 @@ namespace synthese
 			IneoFileFormat::Importer_::FILE_CAL.c_str(),
 			IneoFileFormat::Importer_::FILE_CJV.c_str(),
 			IneoFileFormat::Importer_::FILE_HOR.c_str(),
-			IneoFileFormat::Importer_::FILE_AFA.c_str(),
 			IneoFileFormat::Importer_::FILE_SAB.c_str(),
+			IneoFileFormat::Importer_::FILE_AFA.c_str(),
 		"");
 	}
 
@@ -185,7 +185,7 @@ namespace synthese
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
 			_activities(_dataSource, _env),
-			_driverAllocations(_dataSource, _env),
+			_driverAllocationTemplates(_dataSource, _env),
 			_lines(_dataSource, _env),
 			_destinations(_dataSource, _env),
 			_addWaybackToJourneyPatternCode(false),
@@ -1030,95 +1030,6 @@ namespace synthese
 					}
 				}
 			}
-			else if(key == FILE_AFA)
-			{
-				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
-				do
-				{
-					// File read
-					_readLine(inFile);
-					if(_section == "AFF" || _section == "#")
-					{
-						// Driver service
-						string key(_getValue("SA"));
-
-						// Search for an activity
-						set<DriverActivity*> activities(
-							_activities.get(key)
-						);
-
-						// Date
-						string dateStr(_getValue("DATE"));
-						date vsDate;
-						vector<string> parts;
-						split(parts, dateStr, is_any_of("/.-"));
-						vsDate = date(
-							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
-							lexical_cast<int>(parts[1]),
-							lexical_cast<int>(parts[0])
-						);
-
-						// User
-						string userKey(_getValue("MAT"));
-						if(userKey.empty())
-						{
-							stream << "WARN : undefined driver in allocation " << key << "/" << dateStr << ".<br />";
-							continue;
-						}
-						User* user(
-							FileFormat::LoadOrCreateObject<UserTableSync>(
-								users,
-								userKey,
-								_dataSource,
-								_env,
-								stream,
-								"conducteur"
-						)	);
-
-						// Bonif amount
-						string bonifAmountStr(_getValue("bonifATTfrs"));
-						double bonifAmount(
-							bonifAmountStr.empty() || bonifAmountStr == "vide" ?
-							0 :
-							lexical_cast<double>(_getValue("bonifATTfrs"))
-						);
-
-						// Bonif time
-						string bonifStr(_getValue("bonifATTtps"));
-						time_duration bonifTime(minutes(0));
-						if(!bonifStr.empty() && bonifStr != "vide")
-						{
-							vector<string> parts;
-							split(parts, bonifStr, is_any_of("h"));
-							bonifTime = hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1]));
-						}
-
-						// Registration
-						if(activities.empty())
-						{
-							_allocations[make_pair(key, vsDate)] = make_tuple(user, bonifAmount, bonifTime);
-						}
-						else
-						{
-							string fullKey("U-"+ userKey +"-"+ dateStr);
-							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
-								_driverAllocations,
-								fullKey,
-								_dataSource,
-								_env,
-								stream,
-								"allocation"
-							);
-							da->set<DriverActivity>(**activities.begin());
-							da->set<Driver>(*user);
-							da->set<Date>(vsDate);
-							da->set<BoniAmount>(bonifAmount);
-							da->set<BoniTime>(bonifTime);
-						}
-					}
-
-				} while(!_section.empty());
-			}
 			else if(key == FILE_SAB)
 			{
 				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
@@ -1133,7 +1044,6 @@ namespace synthese
 						string tpstra(_getValue("TpsTra"));
 						string ampli(_getValue("Ampli"));
 						string onBoardTicketing(_getValue("VaB"));
-						string activity(_getValue("Act"));
 
 						// Load
 						string key(_getValue("SA"));
@@ -1159,7 +1069,7 @@ namespace synthese
 								_dataSource,
 								_env,
 								stream,
-								"journée"
+								"driver service"
 							);
 							lastKey = fullKey;
 							DriverService::Chunks emptyChunks;
@@ -1169,22 +1079,16 @@ namespace synthese
 							// Name
 							ds->setName(key);
 
-							// Allocation
-							DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
-								_driverAllocations,
-								fullKey,
-								_dataSource,
-								_env,
-								stream,
-								"allocation"
-							);
-							Allocations::iterator itAlloc(_allocations.find(make_pair(key, vsDate)));
-							if(itAlloc != _allocations.end())
-							{
-								da->set<Driver>(optional<User&>(*itAlloc->second.get<0>()));
-								da->set<BoniAmount>(itAlloc->second.get<1>());
-								da->set<BoniTime>(itAlloc->second.get<2>());
-							}
+							// Allocation template
+							DriverAllocationTemplate* da(
+								FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
+									_driverAllocationTemplates,
+									fullKey,
+									_dataSource,
+									_env,
+									stream,
+									"driver allocation template"
+							)	);
 
 							// Driver service link
 							DriverService::Vector::Type driverServices;
@@ -1206,27 +1110,13 @@ namespace synthese
 							);
 							da->set<Amount>(amount);
 
-							// Boni amount
+							// Max Boni amount
 							string boniAmountStr(_getValue("ATTmaxfrs"));
 							da->set<MaxBoniAmount>(
 								boniAmountStr.empty() || boniAmountStr == "vide" ?
 								0 :
 								lexical_cast<double>(boniAmountStr)
 							);
-
-							// Activity
-							string actStr(_getValue("Act"));
-							if(!actStr.empty() && actStr != "vide")
-							{
-								// Search for an activity
-								set<DriverActivity*> activities(
-									_activities.get(actStr)
-								);
-								if(!activities.empty())
-								{
-									da->set<DriverActivity>(**activities.begin());
-								}
-							}
 
 							// Boni time
 							string bonifStr(_getValue("ATTmaxtps"));
@@ -1331,11 +1221,21 @@ namespace synthese
 							}
 						}
 
+						// Activity
+						string activityStr(_getValue("Act"));
+						set<DriverActivity*> activities;
+						if(!activityStr.empty() && activityStr != "vide")
+						{
+							// Search for an activity
+							activities = _activities.get(activityStr);
+						}
+
 						DriverService::Chunks chunks(ds->getChunks());
 						chunks.push_back(
 							DriverService::Chunk(
 								ds,
 								lvs.empty() ? NULL : *lvs.begin(),
+								activities.empty() ? NULL : *activities.begin(),
 								vsDate,
 								hdeb,
 								hfin,
@@ -1343,6 +1243,109 @@ namespace synthese
 								hfinp
 						)	);
 						ds->setChunks(chunks);
+					}
+
+				} while(!_section.empty());
+			}
+			else if(key == FILE_AFA)
+			{
+				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+				do
+				{
+					// File read
+					_readLine(inFile);
+					if(_section == "AFF" || _section == "#")
+					{
+						// Primary key
+						string userKey(_getValue("MAT"));
+						string dateStr(_getValue("DATE"));
+						if(userKey.empty() || dateStr.empty())
+						{
+							continue;
+						}
+						string fullKey(userKey +"/"+ dateStr);
+
+						// Object creation
+						DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
+							driverAllocations,
+							fullKey,
+							_dataSource,
+							_env,
+							stream,
+							"allocation"
+						);
+
+						// Date
+						date vsDate;
+						vector<string> parts;
+						split(parts, dateStr, is_any_of("/.-"));
+						vsDate = date(
+							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
+							lexical_cast<int>(parts[1]),
+							lexical_cast<int>(parts[0])
+						);
+						da->set<Date>(vsDate);
+
+						// User
+						User* user(
+							FileFormat::LoadOrCreateObject<UserTableSync>(
+								users,
+								userKey,
+								_dataSource,
+								_env,
+								stream,
+								"conducteur"
+						)	);
+						da->set<Driver>(*user);
+
+						// Search for an activity
+						string key(_getValue("SA"));
+						set<DriverActivity*> activities(
+							_activities.get(key)
+						);
+						if(activities.empty())
+						{
+							// Driver service
+							string templateFullKey(
+								key + "/" + dateStr
+							);
+							set<DriverAllocationTemplate*> templates(
+								_driverAllocationTemplates.get(templateFullKey)
+							);
+							if(templates.empty())
+							{
+								stream << "WARN : undefined allocation template " << templateFullKey << ".<br />";
+								continue;
+							}
+							da->set<DriverAllocationTemplate>(
+								**templates.begin()
+							);
+						}
+						else
+						{
+							// Standalone activity
+							da->set<DriverActivity>(**activities.begin());
+						}
+
+						// Bonif amount
+						string bonifAmountStr(_getValue("bonifATTfrs"));
+						da->set<BoniAmount>(
+							bonifAmountStr.empty() || bonifAmountStr == "vide" ?
+							0 :
+							lexical_cast<double>(_getValue("bonifATTfrs"))
+						);
+
+						// Bonif time
+						string bonifStr(_getValue("bonifATTtps"));
+						time_duration bonifTime(minutes(0));
+						if(!bonifStr.empty() && bonifStr != "vide")
+						{
+							vector<string> parts;
+							split(parts, bonifStr, is_any_of("h"));
+							bonifTime = hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1]));
+						}
+						da->set<BoniTime>(bonifTime);
 					}
 
 				} while(!_section.empty());
