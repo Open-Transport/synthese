@@ -37,6 +37,7 @@ namespace synthese
 
 	namespace pt_operation
 	{
+		class DriverActivity;
 		class VehicleService;
 
 		/** DriverService class.
@@ -53,6 +54,7 @@ namespace synthese
 			static const std::string TAG_CHUNK;
 			static const std::string TAG_ELEMENT;
 			static const std::string TAG_VEHICLE_SERVICE;
+			static const std::string TAG_ACTIVITY;
 			static const std::string ATTR_START_TIME;
 			static const std::string ATTR_DRIVER_START_TIME;
 			static const std::string ATTR_END_TIME;
@@ -91,6 +93,7 @@ namespace synthese
 
 				DriverService* driverService;
 				VehicleService* vehicleService;
+				DriverActivity* activity;
 				std::vector<Element> elements;
 				boost::posix_time::time_duration driverStartTime;
 				boost::posix_time::time_duration driverEndTime;
@@ -102,6 +105,7 @@ namespace synthese
 				Chunk(
 					DriverService* _driverService,
 					VehicleService* _vehicleService,
+					DriverActivity* _activity,
 					const boost::gregorian::date& date,
 					const boost::posix_time::time_duration& startTime,
 					const boost::posix_time::time_duration& endTime,

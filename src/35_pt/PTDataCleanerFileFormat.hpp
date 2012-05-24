@@ -38,6 +38,7 @@ namespace synthese
 	namespace pt_operation
 	{
 		class DriverAllocation;
+		class DriverAllocationTemplate;
 		class DriverService;
 		class VehicleService;
 	}
@@ -93,6 +94,7 @@ namespace synthese
 			mutable std::set<boost::shared_ptr<StopArea> > _stopAreasToRemove;
 			mutable std::set<boost::shared_ptr<const LineStop> > _edgesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocation> > _driverAllocationsToRemove;
+			mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocationTemplate> > _driverAllocationTemplatesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverService> > _driverServicesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::VehicleService> > _vehicleServicesToRemove;
 

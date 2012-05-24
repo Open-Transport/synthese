@@ -37,10 +37,16 @@ DriverActivityTableSync.cpp
 DriverActivityTableSync.hpp
 DriverAllocation.cpp
 DriverAllocation.hpp
+DriverAllocationTemplate.cpp
+DriverAllocationTemplate.hpp
 DriverAllocationsListService.cpp
 DriverAllocationsListService.hpp
 DriverAllocationTableSync.cpp
 DriverAllocationTableSync.hpp
+DriverAllocationTemplatesListService.cpp
+DriverAllocationTemplatesListService.hpp
+DriverAllocationTemplateTableSync.cpp
+DriverAllocationTemplateTableSync.hpp
 DriverService.cpp
 DriverService.hpp
 DriverServiceAdmin.cpp

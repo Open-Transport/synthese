@@ -1,6 +1,6 @@
 
-/** DriverAllocationTableSync class implementation.
-	@file DriverAllocationTableSync.cpp
+/** DriverAllocationTemplateTableSync class implementation.
+	@file DriverAllocationTemplateTableSync.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,7 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "DriverAllocationTableSync.hpp"
+#include "DriverAllocationTemplateTableSync.hpp"
 
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -45,29 +45,28 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,DriverAllocationTableSync>::FACTORY_KEY("37.41 Driver allocations");
+		template<> const string FactorableTemplate<DBTableSync,DriverAllocationTemplateTableSync>::FACTORY_KEY("37.40 Driver allocation templates");
 	}
 
 	namespace db
 	{
-		template<> const DBTableSync::Format DBTableSyncTemplate<DriverAllocationTableSync>::TABLE(
-			"t085_driver_allocations"
+		template<> const DBTableSync::Format DBTableSyncTemplate<DriverAllocationTemplateTableSync>::TABLE(
+			"t088_driver_allocation_templates"
 		);
 
-		template<> const Field DBTableSyncTemplate<DriverAllocationTableSync>::_FIELDS[] = { Field() }; // Defined by the record
+		template<> const Field DBTableSyncTemplate<DriverAllocationTemplateTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<>
-		DBTableSync::Indexes DBTableSyncTemplate<DriverAllocationTableSync>::GetIndexes()
+		DBTableSync::Indexes DBTableSyncTemplate<DriverAllocationTemplateTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
 			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Date>::FIELD.name.c_str(), ""));
-			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Driver>::FIELD.name.c_str(), ""));
 			return r;
 		};
 
 
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Load(
-			DriverAllocation* object,
+		template<> void DBDirectTableSyncTemplate<DriverAllocationTemplateTableSync, DriverAllocationTemplate>::Load(
+			DriverAllocationTemplate* object,
 			const DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
@@ -85,19 +84,19 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Unlink(
-			DriverAllocation* obj
+		template<> void DBDirectTableSyncTemplate<DriverAllocationTemplateTableSync, DriverAllocationTemplate>::Unlink(
+			DriverAllocationTemplate* obj
 		){
 			obj->unlink();
 		}
 
 
-		template<> void DBDirectTableSyncTemplate<DriverAllocationTableSync,DriverAllocation>::Save(
-			DriverAllocation* object,
+		template<> void DBDirectTableSyncTemplate<DriverAllocationTemplateTableSync, DriverAllocationTemplate>::Save(
+			DriverAllocationTemplate* object,
 			optional<DBTransaction&> transaction
 		){
 			// Query
-			ReplaceQuery<DriverAllocationTableSync> query(*object);
+			ReplaceQuery<DriverAllocationTemplateTableSync> query(*object);
 			ParametersMap map(ParametersMap::FORMAT_SQL);
 			object->toParametersMap(map);
 			query.setValues(map);
@@ -106,7 +105,7 @@ namespace synthese
 
 
 
-		template<> bool DBTableSyncTemplate<DriverAllocationTableSync>::CanDelete(
+		template<> bool DBTableSyncTemplate<DriverAllocationTemplateTableSync>::CanDelete(
 			const server::Session* session,
 			util::RegistryKeyType object_id
 		){
@@ -115,7 +114,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<DriverAllocationTableSync>::BeforeDelete(
+		template<> void DBTableSyncTemplate<DriverAllocationTemplateTableSync>::BeforeDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -123,7 +122,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<DriverAllocationTableSync>::AfterDelete(
+		template<> void DBTableSyncTemplate<DriverAllocationTemplateTableSync>::AfterDelete(
 			util::RegistryKeyType id,
 			db::DBTransaction& transaction
 		){
@@ -131,7 +130,7 @@ namespace synthese
 
 
 
-		template<> void DBTableSyncTemplate<DriverAllocationTableSync>::LogRemoval(
+		template<> void DBTableSyncTemplate<DriverAllocationTemplateTableSync>::LogRemoval(
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
@@ -141,33 +140,19 @@ namespace synthese
 
 	namespace pt_operation
 	{
-		DriverAllocationTableSync::SearchResult DriverAllocationTableSync::Search(
+		DriverAllocationTemplateTableSync::SearchResult DriverAllocationTemplateTableSync::Search(
 			util::Env& env,
 			boost::gregorian::date date /*= boost::gregorian::date(not_a_date_time)*/,
-			boost::gregorian::date minDate /*= boost::gregorian::date(not_a_date_time)*/,
-			boost::optional<util::RegistryKeyType> driverId /*= boost::optional<util::RegistryKeyType>()*/,
 			size_t first /*= 0*/,
 			boost::optional<std::size_t> number /*= boost::optional<std::size_t>()*/,
 			bool orderByDate /*= true*/,
 			bool raisingOrder /*= true*/,
 			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
 		){
-			SelectQuery<DriverAllocationTableSync> query;
+			SelectQuery<DriverAllocationTemplateTableSync> query;
 			if (!date.is_not_a_date())
 			{
 				query.addWhereField(SimpleObjectFieldDefinition<Date>::FIELD.name, to_iso_extended_string(date));
-			}
-			if (!minDate.is_not_a_date())
-			{
-				query.addWhereField(
-					SimpleObjectFieldDefinition<Date>::FIELD.name,
-					to_iso_extended_string(date),
-					ComposedExpression::OP_SUPEQ
-				);
-			}
-			if (driverId)
-			{
-				query.addWhereField(SimpleObjectFieldDefinition<Driver>::FIELD.name, *driverId);
 			}
 			if (orderByDate)
 			{

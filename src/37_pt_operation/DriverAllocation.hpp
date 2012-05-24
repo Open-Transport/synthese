@@ -26,9 +26,7 @@
 #include "Object.hpp"
 
 #include "DriverActivity.hpp"
-#include "DriverService.hpp"
-#include "ImportableTemplate.hpp"
-#include "StandardFields.hpp"
+#include "DriverAllocationTemplate.hpp"
 
 #include <vector>
 #include <boost/optional.hpp>
@@ -44,29 +42,17 @@ namespace synthese
 	namespace pt_operation
 	{
 		FIELD_TYPE(Driver, boost::optional<security::User&>)
-		FIELD_TYPE(Amount, double)
 		FIELD_TYPE(BoniAmount, double)
 		FIELD_TYPE(BoniTime, boost::posix_time::time_duration)
-		FIELD_TYPE(MaxBoniAmount, double)
-		FIELD_TYPE(MaxBoniTime, boost::posix_time::time_duration)
-		FIELD_TYPE(WorkRange, boost::posix_time::time_duration)
-		FIELD_TYPE(WorkDuration, boost::posix_time::time_duration)
-		FIELD_TYPE(WithTicketSales, bool)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
+			FIELD(DriverAllocationTemplate),
 			FIELD(Driver),
-			FIELD(DriverService::Vector),
 			FIELD(Date),
-			FIELD(Amount),
 			FIELD(BoniAmount),
 			FIELD(BoniTime),
-			FIELD(MaxBoniAmount),
-			FIELD(MaxBoniTime),
 			FIELD(impex::DataSourceLinks),
-			FIELD(WorkRange),
-			FIELD(WorkDuration),
-			FIELD(WithTicketSales),
 			FIELD(DriverActivity)
 		> DriverAllocationSchema;
 
@@ -81,14 +67,8 @@ namespace synthese
 			typedef util::Registry<DriverAllocation> Registry;
 
 			DriverAllocation(util::RegistryKeyType id = 0);
-
-			boost::posix_time::time_duration getWorkRange() const;
-			boost::posix_time::time_duration getWorkDuration() const;
-			boost::posix_time::time_duration getServiceBeginning() const;
-			boost::posix_time::time_duration getServiceEnd() const;
 		};
 	}
 }
 
 #endif // SYNTHESE_37_DriverAllocation_hpp__
-
