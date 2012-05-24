@@ -59,7 +59,16 @@ namespace
 	boost::asio::ip::tcp::acceptor _acceptor(_io_service);
 	connection_ptr _new_connection(new HTTPConnection(_io_service, &requestHandler));
 
-	typedef string Request;
+	struct Request
+	{
+		Request(string path_, string postData_) : path(path_), postData(postData_)
+		{
+		}
+		string path;
+		// if postData is empty -> GET, else POST with the given data.
+		string postData;
+	};
+
 	locking_queue<Request> queue;
 	deque<string> messages;
 	const unsigned int MAX_MESSAGES = 1000;
@@ -106,7 +115,7 @@ namespace
 			output_ << "<span style='color: red'>Paused</span>";
 		output_ << "</p><form method=post action=/action>" <<
 			"<label>Password:<input type=password name=password></label>" <<
-			"<input type=submit name=clear_queue value='Clear Queue'>" << 
+			"<input type=submit name=clear_queue value='Clear Queue'>" <<
 			"<input type=submit name=toggle value='Toggle Dispatching Status'></form>"<<
 			"<h3>Last messages</h3><ul class=messages>";
 
@@ -239,7 +248,7 @@ namespace
 				return;
 			}
 
-			Request r(httpRequest.uri);
+			Request r(httpRequest.uri, httpRequest.postData);
 #ifdef DEBUG
 			addMessage("Adding request " + r);
 #endif
@@ -321,12 +330,20 @@ namespace
 					continue;
 				}
 				Request r = queue.pop(true);
-				string targetUrl = target + r;
+				string targetUrl = target + r.path;
 #ifdef DEBUG
 				cout << "Dispatching to target:" << targetUrl << endl;
 #endif
 #ifdef HAVE_CURL
 				curl_easy_setopt(curl, CURLOPT_URL, targetUrl.c_str());
+				if(!r.postData.empty())
+				{
+					curl_easy_setopt(curl, CURLOPT_POSTFIELDS, r.postData.c_str());
+				}
+				else
+				{
+					curl_easy_setopt(curl, CURLOPT_HTTPGET, 1);
+				}
 				res = curl_easy_perform(curl);
 				if(res)
 				{

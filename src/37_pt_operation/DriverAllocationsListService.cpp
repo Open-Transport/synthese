@@ -196,7 +196,7 @@ namespace synthese
 					_date,
 					_minDate,
 					_driver ? optional<RegistryKeyType>(_driver->getKey()) : optional<RegistryKeyType>()
-			)	); 
+			)	);
 			BOOST_FOREACH(const shared_ptr<DriverAllocation>& it, allocations)
 			{
 				// Init
@@ -218,7 +218,7 @@ namespace synthese
 				{
 					// Adds template attributes to the map
 					alloc.get<DriverAllocationTemplate>()->toParametersMap(*allocPM);
-				
+
 					// Adds services to the map
 					BOOST_FOREACH(
 						const DriverService::Vector::Type::value_type& service,
