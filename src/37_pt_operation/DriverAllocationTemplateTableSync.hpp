@@ -1,6 +1,6 @@
 
-/** DriverAllocationTableSync class header.
-	@file DriverAllocationTableSync.h
+/** DriverAllocationTemplateTableSync class header.
+	@file DriverAllocationTemplateTableSync.h
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,11 +20,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_AllocationTableSync_H__
-#define SYNTHESE_AllocationTableSync_H__
+#ifndef SYNTHESE_AllocationTemplateTableSync_H__
+#define SYNTHESE_AllocationTemplateTableSync_H__
 
 #include "DBRegistryTableSyncTemplate.hpp"
-#include "DriverAllocation.hpp"
+#include "DriverAllocationTemplate.hpp"
 
 #include <string>
 #include <iostream>
@@ -34,24 +34,22 @@ namespace synthese
 	namespace pt_operation
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 37.10 Table : Driver allocation
+		/// 37.10 Table : Driver allocation templates.
 		///	@ingroup m37LS refLS
 		/// @author Hugues Romain
 		//////////////////////////////////////////////////////////////////////////
 		/// Table name : t085_driver_allocations
-		class DriverAllocationTableSync:
-			public db::DBRegistryTableSyncTemplate<DriverAllocationTableSync, DriverAllocation>
+		class DriverAllocationTemplateTableSync:
+			public db::DBRegistryTableSyncTemplate<DriverAllocationTemplateTableSync, DriverAllocationTemplate>
 		{
 		public:
-			/** Driver allocation search.
+			/** Driver allocation template search.
 				@author Hugues Romain
 				@date 2012
 			*/
 			static SearchResult Search(
 				util::Env& env,
 				boost::gregorian::date date = boost::gregorian::date(boost::gregorian::not_a_date_time),
-				boost::gregorian::date minDate = boost::gregorian::date(boost::gregorian::not_a_date_time),
-				boost::optional<util::RegistryKeyType> driverId = boost::optional<util::RegistryKeyType>(),
 				size_t first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				bool orderByDate = true,
@@ -59,7 +57,6 @@ namespace synthese
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			);
 		};
-	}
-}
+}	}
 
 #endif

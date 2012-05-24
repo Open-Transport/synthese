@@ -22,6 +22,7 @@
 
 #include "DriverService.hpp"
 
+#include "DriverActivity.hpp"
 #include "ScheduledService.h"
 #include "StopPoint.hpp"
 #include "VehicleService.hpp"
@@ -48,6 +49,7 @@ namespace synthese
 		const std::string DriverService::TAG_CHUNK = "chunk";
 		const std::string DriverService::TAG_ELEMENT = "element";
 		const std::string DriverService::TAG_VEHICLE_SERVICE = "vehicle_service";
+		const std::string DriverService::TAG_ACTIVITY = "activity";
 		const std::string DriverService::ATTR_START_TIME = "start_time";
 		const std::string DriverService::ATTR_DRIVER_START_TIME = "driver_start_time";
 		const std::string DriverService::ATTR_END_TIME = "end_time";
@@ -159,6 +161,14 @@ namespace synthese
 					chunkPM->insert(TAG_VEHICLE_SERVICE, vsPM);
 				}
 
+				// Activity
+				if(recursive && chunk.activity)
+				{
+					shared_ptr<ParametersMap> activityPM(new ParametersMap);
+					chunk.activity->toParametersMap(*activityPM, false);
+					chunkPM->insert(TAG_ACTIVITY, activityPM);
+				}
+
 				// Stops
 				if(!chunk.elements.empty())
 				{
@@ -251,6 +261,7 @@ namespace synthese
 		DriverService::Chunk::Chunk(
 			DriverService* _driverService,
 			VehicleService* _vehicleService,
+			DriverActivity* _activity,
 			const boost::gregorian::date& date,
 			const boost::posix_time::time_duration& startTime,
 			const boost::posix_time::time_duration& endTime,
@@ -258,6 +269,7 @@ namespace synthese
 			const boost::posix_time::time_duration& endTimeD
 		):	driverService(_driverService),
 			vehicleService(_vehicleService),
+			activity(_activity),
 			driverStartTime(startTimeD),
 			driverEndTime(endTimeD)
 		{
@@ -305,6 +317,7 @@ namespace synthese
 			VehicleService* _vehicleService
 		):	driverService(NULL),
 			vehicleService(_vehicleService),
+			activity(NULL),
 			driverStartTime(not_a_date_time),
 			driverEndTime(not_a_date_time)
 		{}

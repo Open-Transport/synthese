@@ -35,15 +35,9 @@ namespace synthese
 
 	CLASS_DEFINITION(DriverAllocation, "t085_driver_allocations", 85)
 	FIELD_DEFINITION_OF_OBJECT(DriverAllocation, "driver_allocation_id", "driver_allocation_ids")
-	FIELD_DEFINITION_OF_TYPE(Amount, "amount", SQL_DOUBLE)
 	FIELD_DEFINITION_OF_TYPE(Driver, "driver_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(BoniAmount, "boni_amount", SQL_DOUBLE)
 	FIELD_DEFINITION_OF_TYPE(BoniTime, "boni_time", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(MaxBoniAmount, "max_boni_amount", SQL_DOUBLE)
-	FIELD_DEFINITION_OF_TYPE(MaxBoniTime, "max_boni_time", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(WorkRange, "work_range", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(WorkDuration, "work_duration", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(WithTicketSales, "with_ticket_sales", SQL_BOOLEAN)
 
 	namespace pt_operation
 	{
@@ -53,68 +47,13 @@ namespace synthese
 			Object<DriverAllocation, DriverAllocationSchema>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(DriverAllocationTemplate),
 					FIELD_DEFAULT_CONSTRUCTOR(Driver),
-					FIELD_DEFAULT_CONSTRUCTOR(DriverService::Vector),
 					FIELD_VALUE_CONSTRUCTOR(Date, not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(Amount, 0.0),
 					FIELD_VALUE_CONSTRUCTOR(BoniAmount, 0.0),
 					FIELD_VALUE_CONSTRUCTOR(BoniTime, not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(MaxBoniAmount, 0.0),
-					FIELD_VALUE_CONSTRUCTOR(MaxBoniTime, not_a_date_time),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks),
-					FIELD_VALUE_CONSTRUCTOR(WorkRange, not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(WorkDuration, not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(WithTicketSales, false),
 					FIELD_DEFAULT_CONSTRUCTOR(DriverActivity)
 			)	)
 		{}
-
-
-
-		boost::posix_time::time_duration DriverAllocation::getWorkRange() const
-		{
-			if(get<WorkRange>().is_not_a_date_time())
-			{
-				return getServiceEnd() - getServiceBeginning();
-			}
-			return get<WorkRange>();
-		}
-
-
-
-		boost::posix_time::time_duration DriverAllocation::getWorkDuration() const
-		{
-			if(get<WorkDuration>().is_not_a_date_time())
-			{
-				time_duration r(minutes(0));
-				BOOST_FOREACH(const DriverService::Vector::Type::value_type& item, get<DriverService::Vector>())
-				{
-					r += item->getWorkDuration();
-				}
-				return r;
-			}
-			return get<WorkDuration>();
-		}
-
-
-
-		boost::posix_time::time_duration DriverAllocation::getServiceBeginning() const
-		{
-			if(!get<DriverService::Vector>().empty())
-			{
-				return (*get<DriverService::Vector>().begin())->getServiceBeginning();
-			}
-			return time_duration(not_a_date_time);
-		}
-
-
-
-		boost::posix_time::time_duration DriverAllocation::getServiceEnd() const
-		{
-			if(!get<DriverService::Vector>().empty())
-			{
-				return (*get<DriverService::Vector>().rbegin())->getServiceEnd();
-			}
-			return time_duration(not_a_date_time);
-		}
 }	}

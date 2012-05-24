@@ -7,12 +7,14 @@
 #include "DepotTableSync.hpp"
 #include "DriverActivityTableSync.hpp"
 #include "DriverAllocationTableSync.hpp"
+#include "DriverAllocationTemplateTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "VehicleTableSync.hpp"
 #include "VehiclePositionTableSync.hpp"
 #include "VehicleServiceTableSync.hpp"
 
 #include "DriverAllocationsListService.hpp"
+#include "DriverAllocationTemplatesListService.hpp"
 #include "DriverServicesListService.hpp"
 #include "GetCompositionsService.hpp"
 #include "GetVehiclesService.hpp"
@@ -46,6 +48,7 @@
 #include "DeadRunEdge.hpp"
 #include "DriverActivity.hpp"
 #include "DriverAllocation.hpp"
+#include "DriverAllocationTemplate.hpp"
 #include "DriverService.hpp"
 #include "Vehicle.hpp"
 #include "VehiclePosition.hpp"
@@ -63,6 +66,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::DepotTableSync::integrate();
 	synthese::pt_operation::DriverActivityTableSync::integrate();
 	synthese::pt_operation::DriverAllocationTableSync::integrate();
+	synthese::pt_operation::DriverAllocationTemplateTableSync::integrate();
 	synthese::util::FactorableTemplate<synthese::db::DBTableSync, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::calendar::Calendar>, synthese::pt_operation::DriverServiceTableSync>::integrate();
 	synthese::pt_operation::CompositionTableSync::integrate();
@@ -80,6 +84,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::GetVehiclesService::integrate();
 	synthese::pt_operation::DriverServicesListService::integrate();
 	synthese::pt_operation::DriverAllocationsListService::integrate();
+	synthese::pt_operation::DriverAllocationTemplatesListService::integrate();
 	synthese::pt_operation::VehicleServicesListService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
@@ -112,9 +117,9 @@ void synthese::pt_operation::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt_operation::DeadRunEdge>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverActivity>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocation>();
+	synthese::util::Env::Integrate<synthese::pt_operation::DriverAllocationTemplate>();
 	synthese::util::Env::Integrate<synthese::pt_operation::DriverService>();
 	synthese::util::Env::Integrate<synthese::pt_operation::Vehicle>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehiclePosition>();
 	synthese::util::Env::Integrate<synthese::pt_operation::VehicleService>();
-
 }

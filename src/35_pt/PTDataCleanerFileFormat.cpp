@@ -27,6 +27,7 @@
 #include "DBTransaction.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DriverAllocationTableSync.hpp"
+#include "DriverAllocationTemplateTableSync.hpp"
 #include "DriverServiceTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
 #include "ImportableTableSync.hpp"
@@ -141,17 +142,32 @@ namespace synthese
 
 			// Driver allocations
 			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
-			DriverService::Vector::Type emptyAllocation;
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
 			{
 				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
 				{
-					itDA->set<Driver>(NULL);
-					itDA->set<DriverService::Vector>(emptyAllocation);
-					if(_autoPurge && itDA->get<Date>() < now)
-					{
+					if(	_autoPurge ||
+						(_fromToday && now <= itDA->get<Date>()) ||
+						_calendar.isActive(itDA->get<Date>())
+					){
 						_driverAllocationsToRemove.insert(
 							_env.getRegistry<DriverAllocation>().get(itDA->getKey())
+						);
+					}
+			}	}
+
+			// Driver allocation templates
+			ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync> driverAllocationTemplates(_dataSource, _env);
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::value_type& itDASet, driverAllocationTemplates.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
+				{
+					if(	_autoPurge ||
+						(_fromToday && now <= itDA->get<Date>()) ||
+						_calendar.isActive(itDA->get<Date>())
+					){
+						_driverAllocationTemplatesToRemove.insert(
+							_env.getRegistry<DriverAllocationTemplate>().get(itDA->getKey())
 						);
 					}
 			}	}
@@ -256,8 +272,8 @@ namespace synthese
 			{
 				if(	itVehicleService.second->hasLinkWithSource(_dataSource) &&
 					itVehicleService.second->getServices().empty()
-					){
-						_vehicleServicesToRemove.insert(itVehicleService.second);
+				){
+					_vehicleServicesToRemove.insert(itVehicleService.second);
 				}
 			}
 
@@ -291,43 +307,33 @@ namespace synthese
 				}
 			}
 
-			// Driver allocations without services
-			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& itDriverAllocation, _env.getRegistry<DriverAllocation>())
-			{
-				if(	!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
-					itDriverAllocation.second->get<DriverActivity>()
-				){
-					continue;
-				}
-
-				DriverService::Vector::Type chunks;
-				BOOST_FOREACH(const DriverService::Vector::Type::value_type& chunk, itDriverAllocation.second->get<DriverService::Vector>())
-				{
-					if(_driverServicesToRemove.find(_env.getRegistry<DriverService>().get(chunk->getKey())) == _driverServicesToRemove.end())
-					{
-						chunks.push_back(chunk);
-					}
-				}
-
-				if(chunks.empty())
-				{
-					_driverAllocationsToRemove.insert(itDriverAllocation.second);
-				}
-				else
-				{
-					itDriverAllocation.second->set<DriverService::Vector>(chunks);
-				}
+			// Driver allocations
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocation>& driverAllocation,
+				_driverAllocationsToRemove
+			){
+				_env.getEditableRegistry<DriverAllocation>().remove(
+					driverAllocation->getKey()
+				);
 			}
 
-
-			BOOST_FOREACH(const shared_ptr<const DriverAllocation>& driverAllocation, _driverAllocationsToRemove)
-			{
-				_env.getEditableRegistry<DriverAllocation>().remove(driverAllocation->getKey());
+			// Driver allocation templates
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocationTemplate>& driverAllocationTemplate,
+				_driverAllocationTemplatesToRemove
+			){
+				_env.getEditableRegistry<DriverAllocationTemplate>().remove(
+					driverAllocationTemplate->getKey()
+				);
 			}
+
+			// Driver services
 			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
 			{
 				_env.getEditableRegistry<DriverService>().remove(driverService->getKey());
 			}
+
+			// Vehicle services
 			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
 			{
 				_env.getEditableRegistry<VehicleService>().remove(vehicleService->getKey());
@@ -442,14 +448,30 @@ namespace synthese
 			{
 				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
 			}
-			BOOST_FOREACH(const shared_ptr<const DriverAllocation>& driverAllocation, _driverAllocationsToRemove)
-			{
+
+			// Driver allocation templates
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
+				_driverAllocationTemplatesToRemove
+			){
+				DriverAllocationTemplateTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+			}
+
+			// Driver allocations
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocation>& driverAllocation,
+				_driverAllocationsToRemove
+			){
 				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
 			}
+
+			// Driver services
 			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
 			{
 				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
 			}
+
+			// Vehicle services
 			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
 			{
 				VehicleServiceTableSync::RemoveRow(vehicleService->getKey(), transaction);
