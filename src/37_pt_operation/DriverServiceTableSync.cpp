@@ -333,48 +333,53 @@ namespace synthese
 					continue;
 				}
 
-				RegistryKeyType activityVehicleServiceId(
-					lexical_cast<RegistryKeyType>(elementStrs[3])
-				);
-				DriverService::Chunk chunk;
-				if(	activityVehicleServiceId > 0
-				){
-					if(decodeTableId(activityVehicleServiceId) == VehicleServiceTableSync::TABLE.ID) try
-					{
-						chunk.vehicleService = VehicleServiceTableSync::GetEditable(
-							activityVehicleServiceId,
-							env,
-							linkLevel
-						).get();
-					}
-					catch (ObjectNotFoundException<VehicleService>&)
-					{
-						Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
-					}
-					else if(decodeTableId(activityVehicleServiceId) == DriverActivityTableSync::TABLE.ID) try
-					{
-						chunk.activity = DriverActivityTableSync::GetEditable(
-							activityVehicleServiceId,
-							env,
-							linkLevel
-						).get();
-					}
-					catch (ObjectNotFoundException<DriverActivity>&)
-					{
-						Log::GetInstance().warn("No such activity "+ elementStrs[3]);
-					}
-				}
-				if(elementStrs.size() >= 9)
+				if(elementStrs.size() >= 4 || itServices == services.rend())
 				{
-					chunk.driverStartTime =
-						hours(lexical_cast<long>(elementStrs[4])) +
-						minutes(lexical_cast<long>(elementStrs[5]));
-					chunk.driverEndTime =
-						hours(lexical_cast<long>(elementStrs[7])) +
-						minutes(lexical_cast<long>(elementStrs[8]));
+					DriverService::Chunk chunk;
+					if(	elementStrs.size() >= 4)
+					{
+						RegistryKeyType activityVehicleServiceId(
+							lexical_cast<RegistryKeyType>(elementStrs[3])
+						);
+						if(activityVehicleServiceId > 0)
+						{
+							if(decodeTableId(activityVehicleServiceId) == VehicleServiceTableSync::TABLE.ID) try
+							{
+								chunk.vehicleService = VehicleServiceTableSync::GetEditable(
+									activityVehicleServiceId,
+									env,
+									linkLevel
+								).get();
+							}
+							catch (ObjectNotFoundException<VehicleService>&)
+							{
+								Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+							}
+							else if(decodeTableId(activityVehicleServiceId) == DriverActivityTableSync::TABLE.ID) try
+							{
+								chunk.activity = DriverActivityTableSync::GetEditable(
+									activityVehicleServiceId,
+									env,
+									linkLevel
+								).get();
+							}
+							catch (ObjectNotFoundException<DriverActivity>&)
+							{
+								Log::GetInstance().warn("No such activity "+ elementStrs[3]);
+							}
+					}	}
+					if(elementStrs.size() >= 9)
+					{
+						chunk.driverStartTime =
+							hours(lexical_cast<long>(elementStrs[4])) +
+							minutes(lexical_cast<long>(elementStrs[5]));
+						chunk.driverEndTime =
+							hours(lexical_cast<long>(elementStrs[7])) +
+							minutes(lexical_cast<long>(elementStrs[8]));
+					}
+					services.push_back(chunk);
+					itServices = services.rbegin();
 				}
-				services.push_back(chunk);
-				itServices = services.rbegin();
 
 				try
 				{
