@@ -1506,9 +1506,17 @@ namespace synthese
 			{
 				DriverServiceTableSync::Save(dservice.second.get(), transaction);
 			}
-			BOOST_FOREACH(const Registry<DriverAllocation>::value_type& driverAllocation, _env.getRegistry<DriverAllocation>())
-			{
+			BOOST_FOREACH(
+				const Registry<DriverAllocation>::value_type& driverAllocation,
+				_env.getRegistry<DriverAllocation>()
+			){
 				DriverAllocationTableSync::Save(driverAllocation.second.get(), transaction);
+			}
+			BOOST_FOREACH(
+				const Registry<DriverAllocationTemplate>::value_type& driverAllocationTemplate,
+				_env.getRegistry<DriverAllocationTemplate>()
+			){
+				DriverAllocationTemplateTableSync::Save(driverAllocationTemplate.second.get(), transaction);
 			}
 			BOOST_FOREACH(const Registry<User>::value_type& driver, _env.getRegistry<User>())
 			{

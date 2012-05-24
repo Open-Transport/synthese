@@ -22,9 +22,9 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "DriverServiceTableSync.hpp"
+
+#include "DriverActivityTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"
@@ -33,6 +33,7 @@
 #include "DeadRun.hpp"
 #include "VehicleServiceTableSync.hpp"
 
+#include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string/split.hpp>
 
@@ -255,7 +256,10 @@ namespace synthese
 					{
 						servicesStr << ",";
 					}
-					servicesStr << "0:0:0:0";
+					servicesStr <<
+						"0:0:0:" <<
+						(chunk.activity ? chunk.activity->getKey() : RegistryKeyType(0))
+					;
 					if(	!chunk.driverStartTime.is_not_a_date_time() &&
 						!chunk.driverEndTime.is_not_a_date_time()
 					){
@@ -329,37 +333,48 @@ namespace synthese
 					continue;
 				}
 
-				if(elementStrs.size() >= 4 || itServices == services.rend())
-				{
-					DriverService::Chunk chunk;
-					if(	elementStrs.size() >= 4 &&
-						lexical_cast<RegistryKeyType>(elementStrs[3]) > 0
-					){
-						try
-						{
-							chunk.vehicleService = VehicleServiceTableSync::GetEditable(
-								lexical_cast<RegistryKeyType>(elementStrs[3]),
-								env,
-								linkLevel
-							).get();
-						}
-						catch (ObjectNotFoundException<VehicleService>&)
-						{
-							Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
-						}
-					}
-					if(elementStrs.size() >= 9)
+				RegistryKeyType activityVehicleServiceId(
+					lexical_cast<RegistryKeyType>(elementStrs[3])
+				);
+				DriverService::Chunk chunk;
+				if(	activityVehicleServiceId > 0
+				){
+					if(decodeTableId(activityVehicleServiceId) == VehicleServiceTableSync::TABLE.ID) try
 					{
-						chunk.driverStartTime =
-							hours(lexical_cast<long>(elementStrs[4])) +
-							minutes(lexical_cast<long>(elementStrs[5]));
-						chunk.driverEndTime =
-							hours(lexical_cast<long>(elementStrs[7])) +
-							minutes(lexical_cast<long>(elementStrs[8]));
+						chunk.vehicleService = VehicleServiceTableSync::GetEditable(
+							activityVehicleServiceId,
+							env,
+							linkLevel
+						).get();
 					}
-					services.push_back(chunk);
-					itServices = services.rbegin();
+					catch (ObjectNotFoundException<VehicleService>&)
+					{
+						Log::GetInstance().warn("No such vehicle service "+ elementStrs[3]);
+					}
+					else if(decodeTableId(activityVehicleServiceId) == DriverActivityTableSync::TABLE.ID) try
+					{
+						chunk.activity = DriverActivityTableSync::GetEditable(
+							activityVehicleServiceId,
+							env,
+							linkLevel
+						).get();
+					}
+					catch (ObjectNotFoundException<DriverActivity>&)
+					{
+						Log::GetInstance().warn("No such activity "+ elementStrs[3]);
+					}
 				}
+				if(elementStrs.size() >= 9)
+				{
+					chunk.driverStartTime =
+						hours(lexical_cast<long>(elementStrs[4])) +
+						minutes(lexical_cast<long>(elementStrs[5]));
+					chunk.driverEndTime =
+						hours(lexical_cast<long>(elementStrs[7])) +
+						minutes(lexical_cast<long>(elementStrs[8]));
+				}
+				services.push_back(chunk);
+				itServices = services.rbegin();
 
 				try
 				{
