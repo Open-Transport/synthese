@@ -77,7 +77,11 @@
   <br><br>
 
   <form class="form-inline" action="{{ url_for('project_fetch_db', project_name=project.name) }}" method=post>
-    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Fetch db</button>
+    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Fetch db and restart</button>
+  </form>
+
+  <form class="form-inline" action="{{ url_for('project_run_after_fetch_sql', project_name=project.name) }}" method=post>
+    <button type="submit" class="btn btn-primary" {% if not project.synthese_project %}disabled{% endif %}>Run after fetch SQL</button>
   </form>
 
   <form class="form-inline" action="{{ url_for('project_start', project_name=project.name) }}" method=post>
