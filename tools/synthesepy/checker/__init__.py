@@ -618,6 +618,19 @@ def project_start(project_name):
 def project_stop(project_name):
     return _project_command(project_name, 'stop', 'Project stopped')
 
+@app.route('/p/<project_name>/run_sql', methods=['POST'])
+def project_run_sql(project_name):
+    project = name_to_project.get(project_name)
+    if not project or not project.synthese_project:
+        abort(404)
+
+    sql = request.form.get('sql')
+
+    try:
+        return unicode(project.synthese_project.db_backend.shell(sql), 'utf-8')
+    except Exception, e:
+        return unicode(e)
+
 @app.route('/p/<project_name>/run_checks', methods=['POST'])
 def run_checks(project_name):
     return _project_command(project_name, 'run_checks', 'Checks Run')
