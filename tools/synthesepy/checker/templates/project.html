@@ -33,6 +33,19 @@
       color: red;
     }
   </style>
+  <script>
+  $(function() {
+    $("#runSQLButton").click(function(e) {
+      $.post('{{ url_for('project_run_sql', project_name=project.name) }}', {sql: $("#sqlInput").val()})
+      .success(function(result) {
+        $("#sqlResult").text(result);
+      })
+      .error(function(xhr) {
+        $("#sqlResult").text("ERROR: " + xhr.responseText);
+      });
+    });
+  });
+  </script>
 {% endblock %}
 
 {% block body %}
@@ -103,8 +116,35 @@
 
 </div>
 
-<h2>Url Checks</h2>
+<div class="row">
+  <div class="span12">
+    <div class="accordion" id="accordion">
+      <div class="accordion-group">
+        <div class="accordion-heading">
+          <a class="accordion-toggle" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+            Run SQL &raquo;&raquo;
+          </a>
+        </div>
+        <div id="collapseOne" class="accordion-body collapse">
+          <div class="accordion-inner">
+            <textarea class="input-xxlarge" id=sqlInput></textarea>
+            <br>
+            <button id=runSQLButton>Run</button>
+            <hr>
+            <div>
+              <h3>Results</h3>
+              <pre id="sqlResult"></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
+<hr>
+
+<h2>Url Checks</h2>
 
 <div class="well">
 
@@ -152,8 +192,8 @@ todo
               <td>{{ url.username or '' }}</td>
               <td>
                 <a href="{{ url.ref_url }}">ref url</a> /
-                <a href="{{ url.test_url }}">test url</a> / 
-                <a href="http://localhost/{{ url.path }}">local</a> / 
+                <a href="{{ url.test_url }}">test url</a> /
+                <a href="http://localhost/{{ url.path }}">local</a> /
                 <a href="{{ url.localhost_url }}">local+port</a>
               </td>
               {% if url.result_status == 'not_avail' %}
