@@ -292,6 +292,7 @@ class Project(object):
         self.remote_db_path = None
         self.requests_session = requests.session()
         self.alias_path = None
+        self.after_fetch_sql = None
         self.common_project_config = {}
         self.passwords = {}
 
@@ -584,7 +585,30 @@ def project_checkout(project_name):
 
 @app.route('/p/<project_name>/fetch_db', methods=['POST'])
 def project_fetch_db(project_name):
-    return _project_command(project_name, 'fetch_db', 'Database fetched')
+    project = name_to_project.get(project_name)
+    if not project or not project.synthese_project:
+        abort(404)
+
+    project.fetch_db()
+    if project.after_fetch_sql:
+        project.synthese_project.db_backend.import_sql(project.after_fetch_sql)
+    project.stop()
+    project.start()
+
+    flash('Database fetched. Project was restarted.')
+    return redirect(url_for('project', project_name=project.name))
+
+@app.route('/p/<project_name>/run_after_fetch_sql', methods=['POST'])
+def project_run_after_fetch_sql(project_name):
+    project = name_to_project.get(project_name)
+    if not project or not project.synthese_project:
+        abort(404)
+
+    if project.after_fetch_sql:
+        project.synthese_project.db_backend.import_sql(project.after_fetch_sql)
+
+    flash('SQL Executed. You may want to restart Synthese.')
+    return redirect(url_for('project', project_name=project.name))
 
 @app.route('/p/<project_name>/start', methods=['POST'])
 def project_start(project_name):
