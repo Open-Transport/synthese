@@ -161,7 +161,7 @@ namespace synthese
 			{
 				query.addWhereField(
 					SimpleObjectFieldDefinition<Date>::FIELD.name,
-					to_iso_extended_string(date),
+					to_iso_extended_string(minDate),
 					ComposedExpression::OP_SUPEQ
 				);
 			}
