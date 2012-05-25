@@ -222,6 +222,7 @@ class SQLiteBackend(DBBackend):
         output = self._call_spatialite([self.conn_info['path']], **kwargs)
         if output:
             print output
+        return output
 
     def dump(self, table=None):
         cmd = '.dump' if table is None else ('.dump %s' % table)
