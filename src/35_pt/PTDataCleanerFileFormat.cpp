@@ -116,12 +116,12 @@ namespace synthese
 							if(now <= service->getLastActiveDate())
 							{
 								Calendar dates(now, service->getLastActiveDate());
-								service->subDates(dates);
+								*service -= dates;
 							}
 						}
 						else
 						{
-							service->subDates(_calendar);
+							*service -= _calendar;
 						}
 
 						// If auto purge : delete all days before today
@@ -130,7 +130,7 @@ namespace synthese
 							date yesterday(now);
 							yesterday -= days(1);
 							Calendar dates(service->getFirstActiveDate(), yesterday);
-							service->subDates(dates);
+							*service -= dates;
 						}
 					}
 				}

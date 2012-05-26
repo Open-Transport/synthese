@@ -124,7 +124,7 @@ namespace synthese
 			);
 
 			// Days modulo
-			object->setInterval(days(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL)));
+			object->setStep(days(rows->getInt(CalendarTemplateElementTableSync::COL_INTERVAL)));
 
 			// Operation
 			object->setOperation(
@@ -177,7 +177,7 @@ namespace synthese
 			query.addField(object->getRank());
 			query.addField(object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate()));
 			query.addField(object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate()));
-			query.addField(object->getInterval().days());
+			query.addField(object->getStep().days());
 			query.addField(static_cast<int>(object->getOperation()));
 			query.addField(object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
@@ -280,7 +280,7 @@ namespace synthese
 
 		void CalendarTemplateElementTableSync::Shift(
 			RegistryKeyType calendarId,
-			int rank,
+			size_t rank,
 			int delta,
 			boost::optional<DBTransaction&> transaction
 		){

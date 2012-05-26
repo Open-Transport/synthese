@@ -69,9 +69,9 @@ namespace synthese
 			RankUpdateQuery(
 				const std::string& rankColumn,
 				int delta,
-				int rank,
+				size_t rank,
 				bool orEqual = true
-			) {
+			){
 				_updateQuery.reset(new UpdateQuery<Table>());
 
 				_updateQuery->addUpdateField(rankColumn, RawSQL(rankColumn + " + " + boost::lexical_cast<string>(delta)));

@@ -238,7 +238,7 @@ namespace synthese
 					}
 					else
 					{
-						object.subDates(mask);
+						object -= mask;
 					}
 				}
 			}

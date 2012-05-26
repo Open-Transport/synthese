@@ -60,14 +60,16 @@ namespace synthese
 		{
 			CalendarTemplateElement element;
 			element.setCalendar(this);
-			element.setInterval(days(1));
+			element.setStep(days(1));
 			element.setMinDate(day);
 			element.setMaxDate(day);
 			element.setOperation(CalendarTemplateElement::ADD);
 			element.setRank(0);
 			addElement(element);
 			setName(
-				lexical_cast<string>(day.day()) + "/" + lexical_cast<string>(static_cast<int>(day.month())) + "/" + lexical_cast<string>(day.year())
+				lexical_cast<string>(day.day()) + "/" +
+				lexical_cast<string>(static_cast<int>(day.month())) + "/" +
+				lexical_cast<string>(day.year())
 			);
 		}
 
@@ -79,22 +81,21 @@ namespace synthese
 			Calendar result;
 			BOOST_FOREACH(const Elements::value_type& element, _elements)
 			{
-				switch(element.second.getOperation())
-				{
-				case CalendarTemplateElement::ADD:
-					result |= element.second.getResult(mask);
-					break;
-
-				case CalendarTemplateElement::SUB:
-					result.subDates(element.second.getResult(mask));
-					break;
-
-				case CalendarTemplateElement::AND:
-					result &= element.second.getResult(mask);
-					break;
-				}
+				element.second.apply(result, mask);
 			}
 			return result;
+		}
+
+
+
+		void CalendarTemplate::apply(
+			Calendar& mask
+		) const {
+			Calendar maskCopy(mask);
+			BOOST_FOREACH(const Elements::value_type& element, _elements)
+			{
+				element.second.apply(mask, maskCopy);
+			}
 		}
 
 
@@ -238,8 +239,5 @@ namespace synthese
 
 		CalendarTemplate::InfiniteCalendarException::InfiniteCalendarException()
 			: Exception("The calendar template defines an infinite sized result.")
-		{
-
-		}
-	}
-}
+		{}
+}	}
