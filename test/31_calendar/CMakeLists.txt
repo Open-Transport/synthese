@@ -5,6 +5,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
 include_directories("${PROJECT_SOURCE_DIR}/src/31_calendar")
 
 set(DEPS
+  15_server # from db
   31_calendar
 )
 
