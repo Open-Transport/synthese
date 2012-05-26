@@ -231,7 +231,7 @@ namespace synthese
 
 					stream << t.col() << (ct->getMinDate().is_special() ? "-&infin;" : to_simple_string(ct->getMinDate()));
 					stream << t.col() << (ct->getMaxDate().is_special() ? "+&infin;" : to_simple_string(ct->getMaxDate()));
-					stream << t.col() << ct->getInterval().days();
+					stream << t.col() << ct->getStep().days();
 
 					stream << t.col();
 					if (ct->getInclude())

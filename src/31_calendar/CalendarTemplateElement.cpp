@@ -43,48 +43,68 @@ namespace synthese
 		):	Registrable(id),
 			_calendar(NULL),
 			_rank(0),
-			_interval(days(1)),
+			_step(days(1)),
 			_operation(ADD),
 			_minDate(neg_infin),
 			_maxDate(pos_infin),
 			_include(NULL)
-		{
-		}
+		{}
 
 
 
-		Calendar CalendarTemplateElement::getResult( const Calendar& mask ) const
-		{
-			Calendar result;
+		void CalendarTemplateElement::apply(
+			Calendar& result,
+			const Calendar& mask
+		) const	{
 
-			if (!_include)
+			// Empty mask : exit
+			if(mask.empty())
 			{
-				date minDate(_minDate);
-				if(minDate.is_neg_infinity())
-					minDate = mask.getFirstActiveDate();
-				date maxDate(_maxDate);
-				if (maxDate > mask.getLastActiveDate())
-					maxDate = mask.getLastActiveDate();
-
-				for (date d = minDate; d <= maxDate; d += _interval)
-					if (mask.isActive(d))
-						result.setActive(d);
+				return;
 			}
-			else
+
+			// Min and max dates of the update
+			date minDate(_minDate);
+			if(	minDate.is_neg_infinity() ||
+				(minDate < mask.getFirstActiveDate() && _step.days() == 1)
+			){
+				minDate = mask.getFirstActiveDate();
+			}
+			date maxDate(_maxDate);
+			if (maxDate > mask.getLastActiveDate())
 			{
-				Calendar included(_include->getResult(mask));
-				date minDate(_minDate);
-				if(minDate.is_neg_infinity())
-					minDate = mask.getFirstActiveDate();
-				date maxDate(_maxDate);
-				if (maxDate > mask.getLastActiveDate())
-					maxDate = mask.getLastActiveDate();
-
-				for (date d = minDate; d <= maxDate; d += _interval)
-					if (mask.isActive(d) && included.isActive(d))
-						result.setActive(d);
+				maxDate = mask.getLastActiveDate();
 			}
-			return result;
+
+			// Abort if no date
+			if(minDate > maxDate)
+			{
+				return;
+			}
+
+			// Base mask
+			Calendar elementMask(minDate, maxDate, _step);
+			elementMask &= mask;
+			if(_include)
+			{
+				elementMask = _include->getResult(elementMask);
+			}
+
+			// Applying the element on the result
+			switch(_operation)
+			{
+			case ADD:
+				result |= elementMask;
+				break;
+
+			case SUB:
+				result -= elementMask;
+				break;
+
+			case AND:
+				result &= elementMask;
+				break;
+			}
 		}
 
 
@@ -113,13 +133,6 @@ namespace synthese
 		const date& CalendarTemplateElement::getMaxDate() const
 		{
 			return _maxDate;
-		}
-
-
-
-		date_duration CalendarTemplateElement::getInterval() const
-		{
-			return _interval;
 		}
 
 
@@ -155,13 +168,6 @@ namespace synthese
 		void CalendarTemplateElement::setMaxDate( const date& d)
 		{
 			_maxDate = d;
-		}
-
-
-
-		void CalendarTemplateElement::setInterval( date_duration interval )
-		{
-			_interval = interval;
 		}
 
 

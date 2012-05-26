@@ -81,7 +81,7 @@ namespace synthese
 
 			static void Shift(
 				util::RegistryKeyType calendarId,
-				int rank,
+				size_t rank,
 				int delta,
 				boost::optional<db::DBTransaction&> transaction = boost::optional<db::DBTransaction&>()
 			);

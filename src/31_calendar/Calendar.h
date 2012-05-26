@@ -83,10 +83,24 @@ namespace synthese
 					util::RegistryKeyType id = 0
 				);
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Sets dates in a range with a specific step.
+				/// @param fistDate start of the range
+				/// @param lastDate end of the range
+				/// @param step step
+				/// @pre firstDate <= lastDate, and are all defined; step is positive days duration
 				Calendar(
 					const boost::gregorian::date& firstDate,
-					const boost::gregorian::date& lastDate
+					const boost::gregorian::date& lastDate,
+					boost::gregorian::date_duration step = boost::gregorian::days(1)
 				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Copy constructor.
 				Calendar(
 					const Calendar& other
 				);
@@ -169,6 +183,7 @@ namespace synthese
 				Calendar& operator<<= (std::size_t i);
 				Calendar operator<< (std::size_t i);
 				Calendar& operator&= (const Calendar& op);
+				Calendar& operator-= (const Calendar& op);
 				virtual Calendar& operator|= (const Calendar& op);
 				Calendar operator& (const Calendar& op2) const;
 				Calendar operator| (const Calendar& op2) const;
@@ -201,7 +216,6 @@ namespace synthese
 
 				virtual void setActive(const boost::gregorian::date& date);
 				virtual void setInactive(const boost::gregorian::date& date);
-				void subDates(const Calendar& calendar);
 				void clear();
 				void copyDates(const Calendar& calendar);
 

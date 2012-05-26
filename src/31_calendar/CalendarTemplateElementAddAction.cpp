@@ -134,7 +134,7 @@ namespace synthese
 		{
 			CalendarTemplateElement e;
 			e.setInclude(_include.get());
-			e.setInterval(_interval);
+			e.setStep(_interval);
 			e.setMaxDate(_maxDate);
 			e.setMinDate(_minDate);
 			e.setOperation(_positive);
