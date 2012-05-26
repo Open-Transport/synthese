@@ -77,11 +77,11 @@ namespace synthese
 			// Apply templates masks
 			if(_calendarTemplate)
 			{
-				result = _calendarTemplate->getResult(result);
+				_calendarTemplate->apply(result);
 			}
 			if(_calendarTemplate2)
 			{
-				result = _calendarTemplate2->getResult(result);
+				_calendarTemplate2->apply(result);
 			}
 
 			// Add dates to the retval

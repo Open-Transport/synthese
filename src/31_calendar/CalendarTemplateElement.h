@@ -45,8 +45,8 @@ namespace synthese
 				- the maxDate can be unknown date (unlimited range)
 
 		*/
-		class CalendarTemplateElement
-		:	public virtual util::Registrable
+		class CalendarTemplateElement:
+			public virtual util::Registrable
 		{
 		public:
 			/// Chosen registry class.
@@ -70,7 +70,7 @@ namespace synthese
 			//@{
 				boost::gregorian::date	_minDate;
 				boost::gregorian::date	_maxDate;
-				boost::gregorian::date_duration	_interval;
+				boost::gregorian::date_duration	_step;
 				Operation		_operation;
 				const CalendarTemplate* _include;
 			//@}
@@ -82,7 +82,13 @@ namespace synthese
 
 			//! @name Queries
 			//@{
-				Calendar	getResult(const Calendar& mask)	const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Applies the element definition on the result calendar according to the mask.
+				/// @param result the result calendar
+				/// @param mask the mask to apply
+				void apply(Calendar& result, const Calendar& mask) const;
+
+
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Min date getter which takes into account of included calendar.
@@ -99,7 +105,7 @@ namespace synthese
 				size_t					getRank()		const;
 				const boost::gregorian::date&	getMinDate()	const;
 				const boost::gregorian::date&	getMaxDate()	const;
-				boost::gregorian::date_duration	getInterval()	const;
+				const boost::gregorian::date_duration& getStep() const { return _step; }
 				Operation				getOperation()	const;
 				const CalendarTemplate* getInclude()	const;
 				const CalendarTemplate*	getCalendar() const;
@@ -111,7 +117,7 @@ namespace synthese
 				void setRank(size_t text);
 				void setMinDate(const boost::gregorian::date& date);
 				void setMaxDate(const boost::gregorian::date& date);
-				void setInterval(boost::gregorian::date_duration interval);
+				void setStep(const boost::gregorian::date_duration& value){ _step = value; }
 				void setOperation(Operation value);
 				void setInclude(const CalendarTemplate* value);
 			//@}
@@ -119,7 +125,6 @@ namespace synthese
 			//! @name Modifiers
 			//@{
 			//@}
-
 		};
 	}
 }

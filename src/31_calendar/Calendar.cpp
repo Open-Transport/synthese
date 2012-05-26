@@ -45,17 +45,76 @@ namespace synthese
 
 
 		Calendar::Calendar(
-			const boost::gregorian::date& firstDate,
-			const boost::gregorian::date& lastDate
+			const date& firstDate,
+			const date& lastDate,
+			date_duration step
 		):	Registrable(0),
-			_mutex(new recursive_mutex)
+			_mutex(new recursive_mutex),
+			_firstActiveDate(firstDate)
+			// last active date cannot be constructed at this time
 		{
+			// Check pre-conditions in debug mode
 			assert(!firstDate.is_not_a_date());
 			assert(!lastDate.is_not_a_date());
+			assert(firstDate <= lastDate);
+			assert(step.days() > 0);
 
-			for(date curDate(firstDate); curDate <= lastDate; curDate += days(1))
+			// Lock
+			recursive_mutex::scoped_lock lock(*_mutex);
+
+			// Optimized version for all days of the range calendars
+			if(step.days() == 1)
 			{
-				setActive(curDate);
+				// Loop on years
+				for(unsigned short y(firstDate.year()); y<=(lastDate.year()); ++y)
+				{
+					// Loop on days
+					_BitSets::mapped_type bits;
+					for(size_t i(y == firstDate.year() ? _BitPos(firstDate) : 0);
+						i <= (y == lastDate.year() ? _BitPos(lastDate) : (gregorian_calendar::is_leap_year(y) ? 365 : 364));
+						++i
+					){
+						bits.set(i);
+					}
+
+					// Storage
+					_BitSets::iterator it(
+						_markedDates.insert(
+							make_pair(y, bits)
+						).first
+					);
+				}
+
+				// Last active date
+				_lastActiveDate = lastDate;
+			}
+			else
+			{
+				// Locales
+				_BitSets::iterator it(_markedDates.end());
+				greg_year y(firstDate.year());
+				date d;
+
+				// Loop on days
+				for(d = firstDate;
+					d <= lastDate;
+					d += step
+				){
+					// Allocate the bitset if necessary
+					if(it == _markedDates.end() || d.year() != y)
+					{
+						it = _markedDates.insert(
+							make_pair(d.year(), _BitSets::mapped_type())
+						).first;
+						y = d.year();
+					}
+
+					// Sets the date
+					it->second.set(_BitPos(d));
+				}
+
+				// Last active date
+				_lastActiveDate = d - step;
 			}
 		}
 
@@ -65,7 +124,9 @@ namespace synthese
 			const Calendar& other
 		):	Registrable(0),
 			_markedDates(other._markedDates),
-			_mutex(new recursive_mutex)
+			_mutex(new recursive_mutex),
+			_firstActiveDate(other._firstActiveDate),
+			_lastActiveDate(other._lastActiveDate)
 		{}
 
 
@@ -97,7 +158,7 @@ namespace synthese
 					{
 						if(it->second.test(p))
 						{
-							_firstActiveDate = date(it->first, Jan, 1) + days(p);
+							_firstActiveDate = date(it->first, Jan, 1) + days(long(p));
 							break;
 						}
 					}
@@ -125,7 +186,7 @@ namespace synthese
 					{
 						if(it->second.test(p-1))
 						{
-							_lastActiveDate = date(it->first, Jan, 1) + days(p-1);
+							_lastActiveDate = date(it->first, Jan, 1) + days(long(p-1));
 							break;
 						}
 					}
@@ -143,11 +204,11 @@ namespace synthese
 			BOOST_FOREACH(const _BitSets::value_type& it, _markedDates)
 			{
 				date d(it.first, Jan, 1);
-				for(size_t p(0); p != 366; ++p)
+				for(size_t p(0); p != (gregorian_calendar::is_leap_year(it.first) ? 366 : 365); ++p)
 				{
 					if(it.second.test(p))
 					{
-						result.push_back(d + date_duration(p));
+						result.push_back(d + date_duration(long(p)));
 					}
 				}
 			}
@@ -325,7 +386,7 @@ namespace synthese
 
 
 
-		void Calendar::subDates( const Calendar& op )
+		Calendar& Calendar::operator-=( const Calendar& op )
 		{
 			recursive_mutex::scoped_lock lock(*_mutex);
 			set<_BitSets::key_type> toBeRemoved;
@@ -352,6 +413,8 @@ namespace synthese
 
 			_firstActiveDate.reset();
 			_lastActiveDate.reset();
+
+			return *this;
 		}
 
 
