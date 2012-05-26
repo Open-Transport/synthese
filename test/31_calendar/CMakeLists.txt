@@ -7,6 +7,8 @@ include_directories("${PROJECT_SOURCE_DIR}/src/31_calendar")
 set(DEPS
   15_server # from db
   31_calendar
+  36_cms # from admin
+  56_pt_website # from cms
 )
 
 boost_test(Calendar "${DEPS}")
