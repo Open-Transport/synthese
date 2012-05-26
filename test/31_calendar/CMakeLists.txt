@@ -9,6 +9,7 @@ set(DEPS
   31_calendar
   36_cms # from admin
   56_pt_website # from cms
+  59_road_journey_planner # from 56_pt_website
 )
 
 boost_test(Calendar "${DEPS}")
