@@ -211,6 +211,16 @@ namespace synthese
 						break;
 					}
 
+					if(	_IsFollowedBy(source, pos, "n") &&
+						_IsFollowedBy(source, pos+1, "n")
+					){
+						++pos;
+						++pos;
+						result.push_back(A);
+						result.push_back(N);
+						break;
+					}
+
 					if(	(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS)) ||
 						_IsFollowedBy(source, pos, "mb") ||
 						_IsFollowedBy(source, pos, "mp")
@@ -248,6 +258,12 @@ namespace synthese
 						break;
 					}
 
+					if(	_IsFollowedBy(source, pos, "k") ||
+						_IsFollowedBy(source, pos, "q")
+					){
+						break;
+					}
+
 					result.push_back(K);
 					break;
 
@@ -274,6 +290,17 @@ namespace synthese
 					if(	_IsFollowedBy(source, pos, "s") &&
 						_IsLast(source, pos, 2)
 					){
+						++pos;
+						break;
+					}
+
+					if(	_IsFollowedBy(source, pos, "r") &&
+						_IsFollowedBy(source, pos+1, "c") &&
+						_IsLast(source, pos, 3)
+					){
+						result.push_back(E);
+						result.push_back(R);
+						++pos;
 						++pos;
 						break;
 					}
@@ -311,6 +338,16 @@ namespace synthese
 					){
 						++pos;
 						result.push_back(E);
+						break;
+					}
+
+					if(	_IsFollowedBy(source, pos, "n") &&
+						_IsFollowedBy(source, pos+1, "n")
+					){
+						++pos;
+						++pos;
+						result.push_back(E);
+						result.push_back(N);
 						break;
 					}
 
@@ -354,6 +391,14 @@ namespace synthese
 					break;
 
 				case 'g':
+					if(	_IsFollowedBy(source, pos, "e") &&
+						_IsAnyOf(source, pos+2, "oau")
+					){
+						++pos;
+						result.push_back(J);
+						break;
+					}
+
 					if(	_IsFollowedBy(source, pos, "e") ||
 						_IsAnyOf(source, pos+1, ACCENTUATED_E) ||
 						_IsFollowedBy(source, pos, "i") ||
@@ -364,8 +409,10 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "u")
-					){
+					if(	_IsFollowedBy(source, pos, "u") &&
+						(	!_IsFollowedBy(source, pos+1, "y") ||
+							_IsLast(source, pos, 3)
+					)	){
 						++pos;
 						result.push_back(G);
 						break;
@@ -431,6 +478,12 @@ namespace synthese
 					break;
 
 				case 'j':
+					if(	_IsFollowedBy(source, pos, "e") &&
+						_IsAnyOf(source, pos+2, VOWELS)
+					){
+						++pos;
+					}
+
 					result.push_back(J);
 					break;
 
@@ -454,6 +507,18 @@ namespace synthese
 					){
 						++pos;
 						result.push_back(M);
+						break;
+					}
+
+					if(	_IsFollowedBy(source, pos, "e") &&
+						_IsFollowedBy(source, pos+1, "r") &&
+						_IsLast(source, pos, 3)
+					){
+						++pos;
+						++pos;
+						result.push_back(M);
+						result.push_back(E);
+						result.push_back(R);
 						break;
 					}
 
@@ -481,6 +546,16 @@ namespace synthese
 				case 243:
 				case 244:
 				case 245:
+					if(	_IsFollowedBy(source, pos, "n") &&
+						_IsFollowedBy(source, pos+1, "n")
+					){
+						++pos;
+						++pos;
+						result.push_back(O);
+						result.push_back(N);
+						break;
+					}
+
 					if(	_IsFollowedBy(source, pos, "n") && !_IsAnyOf(source, pos+2, VOWELS) ||
 						_IsFollowedBy(source, pos, "mp") ||
 						_IsFollowedBy(source, pos, "mb")
@@ -498,9 +573,10 @@ namespace synthese
 						break;
 					}
 
-					if(	_IsFollowedBy(source, pos, "i") ||
-						_IsAnyOf(source, pos+1, ACCENTUATED_I) ||
-						_IsFollowedBy(source, pos, "y")
+					if(	(	_IsFollowedBy(source, pos, "i") ||
+							_IsAnyOf(source, pos+1, ACCENTUATED_I) ||
+							_IsFollowedBy(source, pos, "y")
+						) && !_IsAnyOf(source, pos+2, "nm")
 					){
 						++pos;
 						result.push_back(O);
@@ -523,6 +599,13 @@ namespace synthese
 					){
 						++pos;
 						result.push_back(P);
+						break;
+					}
+
+					if(	_IsFollowedBy(source, pos, "h")
+					){
+						++pos;
+						result.push_back(F);
 						break;
 					}
 
@@ -583,6 +666,12 @@ namespace synthese
 					break;
 
 				case 't':
+					if(pos == 0)
+					{
+						result.push_back(T);
+						break;
+					}
+
 					if(	_IsFollowedBy(source, pos, "t")
 					){
 						++pos;
