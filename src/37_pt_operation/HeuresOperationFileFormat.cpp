@@ -745,8 +745,8 @@ namespace synthese
 					Calendar cal;
 					for(gregorian::date d(*_startDate); d<=*_endDate; d += gregorian::days(1))
 					{
-						if(	((day7.isActive(d) || d.day_of_week() == 6) && days[6]) ||
-							(!day7.isActive(d) && d.day_of_week() != 6 && days[d.day_of_week()])
+						if(	((day7.isActive(d) || d.day_of_week() == 0) && days[0]) ||
+							(!day7.isActive(d) && d.day_of_week() != 0 && days[d.day_of_week()])
 						){
 							cal.setActive(d);
 						}
