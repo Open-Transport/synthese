@@ -262,10 +262,17 @@ namespace synthese
 			size_t penalties(0);
 			BOOST_FOREACH(Relations::value_type s, othersToThis)
 			{
-				if(s.second.first < lastIndex) ++penalties;
+				if(	lastIndex != _words.size() &&
+					s.second.first < lastIndex)
+				{
+					++penalties;
+				}
 				lastIndex = s.second.first;
 			}
-			if(penalties) totalScores /= penalties;
+			if(penalties)
+			{
+				totalScores /= (1 + 0.25 * penalties);
+			}
 
 			ComparisonScore score;
 			score.levenshtein = FrenchPhoneticString::Levenshtein(_lowerSource, s._lowerSource);

@@ -247,7 +247,7 @@ BOOST_AUTO_TEST_CASE(comparison)
 	FrenchSentence mandailles("Mandailles-Saint-Julien 15113");
 
 	FrenchSentence::ComparisonScore sA_cE(sanAntonio.compare(cerneuxEtajes));
-	BOOST_CHECK_CLOSE(sA_cE.phoneticScore, 0.359, 1);
+	BOOST_CHECK_CLOSE(sA_cE.phoneticScore, 0.287, 1);
 	BOOST_CHECK_EQUAL(sA_cE.levenshtein, 29);
 
 	FrenchSentence::ComparisonScore sA_vM(sanAntonio.compare(valMorobbia));
@@ -255,11 +255,11 @@ BOOST_AUTO_TEST_CASE(comparison)
 	BOOST_CHECK_EQUAL(sA_vM.levenshtein, 20);
 
 	FrenchSentence::ComparisonScore sA_cEM(sanAntonio.compare(cerneuxEtagesWithMistake));
-	BOOST_CHECK_CLOSE(sA_cEM.phoneticScore, 0.359, 1);
+	BOOST_CHECK_CLOSE(sA_cEM.phoneticScore, 0.287, 1);
 	BOOST_CHECK_EQUAL(sA_cEM.levenshtein, 29);
 
 	FrenchSentence::ComparisonScore cEM_sA(cerneuxEtagesWithMistake.compare(sanAntonio));
-	BOOST_CHECK_CLOSE(cEM_sA.phoneticScore, 0.114, 1);
+	BOOST_CHECK_CLOSE(cEM_sA.phoneticScore, 0.083, 1);
 	BOOST_CHECK_EQUAL(cEM_sA.levenshtein, 29);
 
 	FrenchSentence::ComparisonScore cE_cEM(cerneuxEtajes.compare(cerneuxEtagesWithMistake));
@@ -283,7 +283,7 @@ BOOST_AUTO_TEST_CASE(comparison)
 	BOOST_CHECK_EQUAL(result.value, 2);
 
 	FrenchSentence::ComparisonScore lascelleTest(lascelle.compare(lascelleOK));
-	BOOST_CHECK_CLOSE(lascelleTest.phoneticScore, 0.536, 1);
+	BOOST_CHECK_CLOSE(lascelleTest.phoneticScore, 0.5, 1);
 	
 	FrenchSentence::ComparisonScore lascelleTest2(lascelleOK.compare(lascelle));
 	BOOST_CHECK_EQUAL(lascelleTest2.phoneticScore, 1);
