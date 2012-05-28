@@ -56,18 +56,18 @@ namespace synthese
 			assert(_calendar);
 
 			// Base calendar
-			Calendar result;
+			Calendar mask;
 			if(!_startDate.is_not_a_date() && !_endDate.is_not_a_date())
 			{
-				result = Calendar(_startDate, _endDate);
+				mask = Calendar(_startDate, _endDate);
 			}
 			else if(_calendarTemplate && _calendarTemplate->isLimited())
 			{
-				result = _calendarTemplate->getResult();
+				mask = _calendarTemplate->getResult();
 			}
 			else if(_calendarTemplate2 && _calendarTemplate2->isLimited())
 			{
-				result = _calendarTemplate2->getResult();
+				mask = _calendarTemplate2->getResult();
 			}
 			else
 			{
@@ -75,16 +75,21 @@ namespace synthese
 			}
 
 			// Apply templates masks
-			if(_calendarTemplate)
+			if(_calendarTemplate) 
 			{
-				_calendarTemplate->apply(result);
+				Calendar result(_calendarTemplate->getResult(mask));
+				if(_calendarTemplate2)
+				{
+					*_calendar |= _calendarTemplate2->getResult(result);
+				}
+				else
+				{
+					*_calendar |= result;
+				}
 			}
-			if(_calendarTemplate2)
+			else
 			{
-				_calendarTemplate2->apply(result);
+				*_calendar |= _calendarTemplate2->getResult(mask);
 			}
-
-			// Add dates to the retval
-			*_calendar |= result;
 		}
 }	}

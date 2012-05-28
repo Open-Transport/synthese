@@ -150,13 +150,6 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
-				/// Applies on a mask (equivalent to getResult AND mask).
-				/// @param mask the calendar to apply the template on
-				void apply(Calendar& mask) const;
-
-
-
-				//////////////////////////////////////////////////////////////////////////
 				/// Result calendar generation.
 				/// This method can compute the result calendar only if the object is
 				/// limited (see CalendarTemplate::isLimited())

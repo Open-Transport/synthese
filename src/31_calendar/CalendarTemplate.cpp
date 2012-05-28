@@ -88,18 +88,6 @@ namespace synthese
 
 
 
-		void CalendarTemplate::apply(
-			Calendar& mask
-		) const {
-			Calendar maskCopy(mask);
-			BOOST_FOREACH(const Elements::value_type& element, _elements)
-			{
-				element.second.apply(mask, maskCopy);
-			}
-		}
-
-
-
 		Calendar CalendarTemplate::getResult() const
 		{
 			if(!isLimited()) throw InfiniteCalendarException();
