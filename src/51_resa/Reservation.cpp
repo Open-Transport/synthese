@@ -98,6 +98,17 @@ namespace synthese
 
 		void Reservation::setTransaction(ReservationTransaction* transaction )
 		{
+			if(	_transaction)
+			{
+				if(transaction != transaction)
+				{
+					_transaction->removeReservation(*this);
+				}
+				else
+				{
+					return;
+				}
+			}
 			_transaction = transaction;
 			if(transaction)
 			{

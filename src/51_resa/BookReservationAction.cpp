@@ -439,7 +439,7 @@ namespace synthese
 					assert(su.getArrivalEdge() != NULL);
 					assert(su.getArrivalEdge()->getHub() != NULL);
 
-					shared_ptr<Reservation> r(rt.newReservation());
+					shared_ptr<Reservation> r(new Reservation);
 					r->setKey(ReservationTableSync::getId());
 					_env->getEditableRegistry<Reservation>().add(r);
 
@@ -546,6 +546,7 @@ namespace synthese
 					}
 					r->setServiceId(su.getService()->getKey());
 					r->setServiceCode(lexical_cast<string>(su.getService()->getServiceNumber()));
+					r->setTransaction(&rt);
 
 					ReservationTableSync::Save(r.get());
 			}	}
@@ -558,7 +559,7 @@ namespace synthese
 					return;
 				}
 
-				shared_ptr<Reservation> r(rt.newReservation());
+				shared_ptr<Reservation> r(new Reservation);
 				r->setKey(ReservationTableSync::getId());
 				_env->getEditableRegistry<Reservation>().add(r);
 
@@ -600,6 +601,7 @@ namespace synthese
 				)	);
 				r->setServiceId(_freeDRTTimeSlot->getKey());
 				r->setServiceCode(_freeDRTTimeSlot->getServiceNumber());
+				r->setTransaction(&rt);
 
 				ReservationTableSync::Save(r.get());
 			}

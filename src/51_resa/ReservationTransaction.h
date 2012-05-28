@@ -125,12 +125,6 @@ namespace synthese
 			const Reservations&		getReservations()		const;
 			const std::string& getComment() const { return _comment; }
 
-			/** Creation of a child reservation.
-				@return boost::shared_ptr<Reservation> The created reservation
-				@author Hugues Romain
-				@date 2007
-			*/
-			Reservation* newReservation();
 
 
 			//////////////////////////////////////////////////////////////////////////
