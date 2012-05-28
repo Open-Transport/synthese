@@ -98,7 +98,7 @@ namespace synthese
 
 		private:
 
-			const ReservationTransaction*		_transaction;
+			ReservationTransaction*		_transaction;
 
 			//!	\name Service réservé
 			//@{
@@ -161,8 +161,9 @@ namespace synthese
 					@author Hugues Romain
 					@date 2009
 					The reservation is also added to the transaction.
+					@pre the reservation must be fully defined
 				*/
-				void setTransaction			(ReservationTransaction* transaction);
+				void setTransaction(ReservationTransaction* transaction);
 			//@}
 
 			//!	\name Getters
@@ -180,7 +181,7 @@ namespace synthese
 				const std::string&				getArrivalAddress()			const { return _arrivalAddress; }
 				const boost::posix_time::ptime&	getDepartureTime()			const { return _departureTime; }
 				const boost::posix_time::ptime&	getArrivalTime()			const { return _arrivalTime; }
-				const ReservationTransaction*	getTransaction()			const { return _transaction; }
+				ReservationTransaction*	getTransaction()			const { return _transaction; }
 				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
 				const boost::posix_time::ptime&	getReservationDeadLine()	const { return _reservationDeadLine; }
 				const pt_operation::Vehicle*	getVehicle()				const { return _vehicle; }

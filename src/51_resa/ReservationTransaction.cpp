@@ -123,14 +123,6 @@ namespace synthese
 		}
 
 
-		Reservation* ReservationTransaction::newReservation()
-		{
-			Reservation* reservation(new Reservation);
-			reservation->setTransaction(this);
-			return reservation;
-		}
-
-
 
 		const ReservationTransaction::Reservations& ReservationTransaction::getReservations() const
 		{
