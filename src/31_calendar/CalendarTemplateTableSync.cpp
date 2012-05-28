@@ -134,6 +134,7 @@ namespace synthese
 					{
 						object->setParent(NULL);
 					}
+					object->registerInParentOrRoot();
 				}
 				catch (ObjectNotFoundException<CalendarTemplate> e)
 				{
