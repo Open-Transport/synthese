@@ -276,7 +276,7 @@ namespace synthese
 				// Main attributes
 				sp.first.getStopPoint()->toParametersMap(
 					*stopPM,
-					!_stopArea,
+					true,
 					*_coordinatesSystem
 				);
 
