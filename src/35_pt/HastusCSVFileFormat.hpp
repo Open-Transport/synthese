@@ -49,6 +49,7 @@ namespace synthese
 
 	namespace pt
 	{
+		class PTUseRule;
 		class TransportNetwork;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -79,6 +80,7 @@ namespace synthese
 				static const std::string PARAMETER_IMPORT_STOP_AREA;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
 				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
+				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
 
 			private:
 				typedef std::map<std::string, boost::shared_ptr<RollingStock> > RollingStockMap;
@@ -91,6 +93,7 @@ namespace synthese
 				bool _interactive;
 				bool _displayLinkedStops;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
+				boost::shared_ptr<PTUseRule> _handicappedAllowedUseRule;
 
 				mutable std::vector<std::string> _line;
 				std::string _getValue(std::size_t rank) const;
