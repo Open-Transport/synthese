@@ -638,7 +638,8 @@ namespace synthese
 					optional<time_duration>(),
 					_dataSource,
 					_env,
-					os
+					os,
+					boost::optional<const graph::RuleUser::Rules&>()
 				);
 			}
 
