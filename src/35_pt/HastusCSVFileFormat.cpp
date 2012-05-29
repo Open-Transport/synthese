@@ -106,6 +106,7 @@ namespace synthese
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
 		const std::string HastusCSVFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		const string HastusCSVFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
 	}
 
 	namespace impex
