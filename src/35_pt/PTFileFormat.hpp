@@ -273,7 +273,8 @@ namespace synthese
 				boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 				const impex::DataSource& source,
 				util::Env& env,
-				std::ostream& logStream
+				std::ostream& logStream,
+				boost::optional<const graph::RuleUser::Rules&> rules
 			);
 
 
@@ -338,7 +339,8 @@ namespace synthese
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream,
-				boost::optional<const std::string&> team = boost::optional<const std::string&>()
+				boost::optional<const std::string&> team = boost::optional<const std::string&>(),
+				boost::optional<const graph::RuleUser::Rules&> rules = boost::optional<const graph::RuleUser::Rules&>()
 			);
 
 

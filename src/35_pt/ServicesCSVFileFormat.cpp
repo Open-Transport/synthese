@@ -322,7 +322,8 @@ namespace synthese
 							optional<time_duration>(),
 							_dataSource,
 							_env,
-							stream
+							stream,
+							boost::optional<const graph::RuleUser::Rules&>()
 						);
 
 						if(stopPoints.empty())

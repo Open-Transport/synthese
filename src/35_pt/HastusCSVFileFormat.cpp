@@ -21,6 +21,8 @@
 */
 
 #include "HastusCSVFileFormat.hpp"
+
+#include "PTModule.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkTableSync.h"
 #include "StopArea.hpp"
@@ -240,6 +242,25 @@ namespace synthese
 						stream << "WARN : Stop " << code << " has invalid coordinate<br />";
 					}
 
+					// Handicapped rules
+					RuleUser::Rules handicappedRules;
+					handicappedRules.push_back(NULL);
+					handicappedRules.push_back(NULL);
+					handicappedRules.push_back(_handicappedAllowedUseRule.get());
+					handicappedRules.push_back(NULL);
+
+					RuleUser::Rules handicappedForbiddenRules;
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+
+					optional<const RuleUser::Rules&> handicappedUseRule(
+						handicapped ?
+						handicappedRules :
+						handicappedForbiddenRules
+					);
+					
 					// Stop creation // AJOUTER PRISE EN CHARGE _importStopArea
 					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
@@ -250,7 +271,8 @@ namespace synthese
 						_stopAreaDefaultTransferDuration,
 						_dataSource,
 						_env,
-						stream
+						stream,
+						handicappedUseRule
 					);
 				}
 			}
@@ -392,7 +414,25 @@ namespace synthese
 					}
 
 					// Service
-					// TODO handicapped
+					// Handicapped rules
+					RuleUser::Rules handicappedRules;
+					handicappedRules.push_back(NULL);
+					handicappedRules.push_back(NULL);
+					handicappedRules.push_back(_handicappedAllowedUseRule.get());
+					handicappedRules.push_back(NULL);
+
+					RuleUser::Rules handicappedForbiddenRules;
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+					handicappedForbiddenRules.push_back(NULL);
+
+					optional<const RuleUser::Rules&> handicappedUseRule(
+						trip.handicapped ?
+						handicappedRules :
+						handicappedForbiddenRules
+					);
+
 					ScheduledService* service(
 						PTFileFormat::CreateOrUpdateService(
 							*route,
@@ -402,7 +442,8 @@ namespace synthese
 							_dataSource,
 							_env,
 							stream,
-							optional<const string&>(trip.team)
+							optional<const string&>(trip.team),
+							handicappedUseRule
 					)	);
 					if(service)
 					{
@@ -449,6 +490,18 @@ namespace synthese
 
 			stream << t.cell("Mode de transport par défaut (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_DEFAULT, _defaultRollingStock.get() ? lexical_cast<string>(_defaultRollingStock->getKey()) : string()));
 			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
+
+			// Handicapped use rule
+			stream <<
+				t.cell(
+					"ID règle accessibilité arrêt",
+					t.getForm().getSelectInput(
+						PARAMETER_HANDICAPPED_ALLOWED_USE_RULE,
+						PTModule::GetPTUseRuleLabels(),
+						boost::optional<util::RegistryKeyType>()
+				)	)
+			;
+
 			stream << t.close();
 		}
 
@@ -539,6 +592,13 @@ namespace synthese
 			{
 				map.insert(PARAMETER_ROLLING_STOCK_ID_T, _rollingStocks.find("T")->second->getKey());
 			}
+
+			// Handicapped allowed use rule
+			if(_handicappedAllowedUseRule.get())
+			{
+				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
+			}
+
 			return map;
 		}
 
@@ -569,6 +629,19 @@ namespace synthese
 			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_DEFAULT, 0))
 			{
 				_defaultRollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A), _env);
+			}
+
+			// Handicapped PT use rule
+			RegistryKeyType handicappedPTUseRuleId(
+				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE)
+			);
+			if(handicappedPTUseRuleId) try
+			{
+				_handicappedAllowedUseRule = PTUseRuleTableSync::GetEditable(handicappedPTUseRuleId, _env);
+			}
+			catch(ObjectNotFoundException<PTUseRule>&)
+			{
+				throw Exception("No such handicapped use rule");
 			}
 		}
 }	}

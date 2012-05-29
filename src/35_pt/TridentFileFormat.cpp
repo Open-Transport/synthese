@@ -1458,7 +1458,8 @@ namespace synthese
 							_defaultTransferDuration,
 							_dataSource,
 							_env,
-							os
+							os,
+							boost::optional<const graph::RuleUser::Rules&>()
 						);
 					}
 					if(stopPoints.empty())

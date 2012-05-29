@@ -437,7 +437,8 @@ namespace synthese
 			boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 			const impex::DataSource& source,
 			util::Env& env,
-			std::ostream& logStream
+			std::ostream& logStream,
+			boost::optional<const graph::RuleUser::Rules&> rules
 		){
 			// Load if possible
 			set<StopPoint*> result(GetStopPoints(stops, code, name, logStream, false));
@@ -522,6 +523,11 @@ namespace synthese
 					stop->setGeometry(
 						CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(**geometry)
 					);
+				}
+
+				if(rules)
+				{
+					stop->setRules(*rules);
 				}
 			}
 			return result;
@@ -798,7 +804,8 @@ namespace synthese
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream,
-			boost::optional<const std::string&> team
+			boost::optional<const std::string&> team,
+			boost::optional<const graph::RuleUser::Rules&> rules
 		){
 			// Comparison of the size of schedules and the size of the route
 			if(	route.getScheduledStopsNumber() != departureSchedules.size() ||
@@ -836,7 +843,8 @@ namespace synthese
 
 				if(	curService->getServiceNumber() == number &&
 					curService->comparePlannedSchedules(departureSchedules, arrivalSchedules) &&
-					(team ? curService->getTeam() == *team : true)
+					(team ? curService->getTeam() == *team : true) &&
+					(rules ? curService->getRules() == *rules : true)
 				){
 					result = curService;
 					break;
@@ -859,6 +867,11 @@ namespace synthese
 					result->setTeam(*team);
 				}
 
+				if(rules)
+				{
+					result->setRules(*rules);
+				}
+
 				route.addService(*result, false);
 				env.getEditableRegistry<ScheduledService>().add(shared_ptr<ScheduledService>(result));
 
@@ -868,6 +881,7 @@ namespace synthese
 			{
 				logStream << "LOAD : Use of service " << result->getKey() << " (" << result->getServiceNumber() << ") for " << number << " (" << departureSchedules[0] << ") on route " << route.getKey() << " (" << route.getName() << ")<br />";
 			}
+
 			return result;
 		}
 

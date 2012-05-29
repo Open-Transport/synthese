@@ -303,7 +303,8 @@ namespace synthese
 						_stopAreaDefaultTransferDuration,
 						_dataSource,
 						_env,
-						stream
+						stream,
+						boost::optional<const graph::RuleUser::Rules&>()
 					);
 				}
 			}
