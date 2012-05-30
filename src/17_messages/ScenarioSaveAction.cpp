@@ -260,18 +260,25 @@ namespace synthese
 						_recipients = vector<RegistryKeyType>();
 						BOOST_FOREACH(const string& recipient, recipients)
 						{
-							if(_recipientDataSource.get())
+							try
 							{
-								_recipients->push_back(
-									recipientType->getObjectIdBySource(
-										*_recipientDataSource,
-										recipient,
-										*_env
-								)	);
+								if(_recipientDataSource.get())
+								{
+									_recipients->push_back(
+										recipientType->getObjectIdBySource(
+											*_recipientDataSource,
+											recipient,
+											*_env
+									)	);
+								}
+								else
+								{
+									_recipients->push_back(lexical_cast<RegistryKeyType>(recipient));
+								}
 							}
-							else
+							catch(...)
 							{
-								_recipients->push_back(lexical_cast<RegistryKeyType>(recipient));
+
 							}
 						}
 					}
