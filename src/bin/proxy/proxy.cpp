@@ -244,7 +244,8 @@ namespace
 		{
 			if(queue.size() >= MAX_QUEUE_SIZE)
 			{
-				addMessage("Queue is full, dropping " + httpRequest.uri);
+				addMessage("Queue is full, dropping " + httpRequest.uri +
+					" (POST:" + httpRequest.postData + ")");
 				return;
 			}
 
@@ -349,7 +350,7 @@ namespace
 				{
 					stringstream msg;
 					msg << "Error while dispatching to url " << targetUrl <<
-						". (code=" << res << ")";
+						". (POST:" << r.postData << " code=" << res << ")";
 					addMessage(msg.str());
 				}
 #endif
