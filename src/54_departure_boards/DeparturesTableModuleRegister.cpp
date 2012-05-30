@@ -6,6 +6,7 @@
 #include "DisplayScreen.h"
 #include "DisplayMonitoringStatus.h"
 #include "DisplayScreenCPU.h"
+#include "PlaceWithDisplayBoards.hpp"
 
 // Factories
 #include "DeparturesTableModule.h"
@@ -163,4 +164,5 @@ void synthese::departure_boards::moduleRegister()
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayType>();
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayMonitoringStatus>();
 	synthese::util::Env::Integrate<synthese::departure_boards::DisplayScreenCPU>();
+	synthese::util::Env::Integrate<synthese::departure_boards::PlaceWithDisplayBoards>();
 }
