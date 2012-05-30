@@ -192,6 +192,7 @@ namespace synthese
 					)	);
 					if(stopsSet.empty())
 					{
+						os << "WARN : Can't find stops for code " << _stopCodePrefix << stopCode << "<br />";
 						continue;
 					}
 
