@@ -55,6 +55,12 @@ namespace synthese
 		{
 			assert(_calendar);
 
+			// Do nothing if both calendar templates are null
+			if(!_calendarTemplate && !_calendarTemplate2)
+			{
+				return;
+			}
+
 			// Base calendar
 			Calendar mask;
 			if(!_startDate.is_not_a_date() && !_endDate.is_not_a_date())
