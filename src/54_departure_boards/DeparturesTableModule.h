@@ -101,15 +101,13 @@ namespace synthese
 		public:
 			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > Labels;
 
-			typedef std::map<util::Env*, boost::shared_ptr<util::Registry<PlaceWithDisplayBoards> > > PlacesWithDisplayBoards;
-			static PlacesWithDisplayBoards _placesWithDisplayBoards;
-
 			static PlaceWithDisplayBoards* GetPlaceWithDisplayBoards(
 				const geography::NamedPlace* place,
 				util::Env& env
 			);
 
-			static void RemoveEnvFromPlacesWithDisplayBoards(
+			static void RemovePlaceWithDisplayBoards(
+				const geography::NamedPlace* place,
 				util::Env& env
 			);
 

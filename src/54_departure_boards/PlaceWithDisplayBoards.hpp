@@ -28,6 +28,7 @@
 #include "TreeRoot.hpp"
 
 #include "NamedPlace.h"
+#include "Registry.h"
 
 namespace synthese
 {
@@ -42,6 +43,10 @@ namespace synthese
 			public virtual util::Registrable,
 			public tree::TreeRoot<DisplayScreen, tree::TreeAlphabeticalOrderingPolicy>
 		{
+		public:
+			/// Chosen registry class.
+			typedef util::Registry<PlaceWithDisplayBoards>	Registry;
+
 		private:
 			const geography::NamedPlace* _place;
 
