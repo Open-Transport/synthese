@@ -68,7 +68,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const = 0;
 			};
 
@@ -93,7 +94,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -109,7 +111,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -126,7 +129,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -139,7 +143,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -152,7 +157,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -173,7 +179,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -186,7 +193,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -201,7 +209,8 @@ namespace synthese
 					std::ostream& stream,
 					const server::Request& request,
 					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page
+					const Webpage& page,
+					util::ParametersMap& variables
 				) const;
 			};
 
@@ -281,7 +290,8 @@ namespace synthese
 				std::ostream& stream,
 				const server::Request& request,
 				const util::ParametersMap& additionalParametersMap,
-				const Webpage& page
+				const Webpage& page,
+				util::ParametersMap& variables
 			) const;
 		};
 	}

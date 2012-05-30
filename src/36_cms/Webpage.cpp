@@ -195,7 +195,25 @@ namespace synthese
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap
 		) const	{
-			get<WebpageContent>().display(stream, request, additionalParametersMap, *this);
+			ParametersMap variables;
+			display(stream, request, additionalParametersMap, variables);
+		}
+
+
+
+		void Webpage::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const util::ParametersMap& additionalParametersMap,
+			util::ParametersMap& variables
+		) const	{
+			get<WebpageContent>().display(
+				stream,
+				request,
+				additionalParametersMap,
+				*this,
+				variables
+			);
 		}
 
 
