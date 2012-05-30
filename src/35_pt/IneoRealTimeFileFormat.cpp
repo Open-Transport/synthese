@@ -190,6 +190,10 @@ namespace synthese
 							boost::optional<const std::string&>(),
 							os
 					)	);
+					if(stopsSet.empty())
+					{
+						continue;
+					}
 
 					servedStops.push_back(
 						JourneyPattern::StopWithDepartureArrivalAuthorization(
