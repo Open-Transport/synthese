@@ -216,6 +216,22 @@ namespace synthese
 
 
 				//////////////////////////////////////////////////////////////////////////
+				/// Parses the content and generates the result.
+				/// @param stream stream to write on
+				/// @param request current request
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.4.0
+				void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const util::ParametersMap& additionalParametersMap,
+					util::ParametersMap& variables
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
 				/// Computes the depth level of the page position in the tree.
 				/// @return the depth of the page
 				/// @author Hugues Romain
