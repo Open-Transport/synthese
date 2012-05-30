@@ -515,7 +515,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const	{
 
 			// Service parameters evaluation
@@ -525,7 +526,7 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, additionalParametersMap, page);
+					node->display(s, request, additionalParametersMap, page, variables);
 				}
 				serviceParametersMap.insert(param.first, s.str());
 			}
@@ -537,7 +538,7 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, additionalParametersMap, page);
+					node->display(s, request, additionalParametersMap, page, variables);
 				}
 				templateParametersMap.insert(param.first, s.str());
 			}
@@ -570,7 +571,7 @@ namespace synthese
 						// Display of each inline defined node
 						BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
 						{
-							node->display(stream, request, result, page);
+							node->display(stream, request, result, page, variables);
 						}
 					}
 				}
@@ -595,7 +596,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const {
 		}
 
@@ -605,7 +607,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const {
 		}
 
@@ -615,7 +618,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const	{
 
 			// Variables list (debugging purpose)
@@ -627,8 +631,37 @@ namespace synthese
 				HTMLTable t(c, "table table-striped table-condensed sortable");
 				stream << t.open();
 				t.body(stream);
+				BOOST_FOREACH(const ParametersMap::Map::value_type& item, variables.getMap())
+				{
+					stream << t.row();
+					stream << t.col() << item.first;
+					stream << t.col() << item.second;
+				}
 				BOOST_FOREACH(const ParametersMap::Map::value_type& item, additionalParametersMap.getMap())
 				{
+					// Variables first
+					if(variables.getMap().find(item.first) != variables.getMap().end())
+					{
+						continue;
+					}
+					stream << t.row();
+					stream << t.col() << item.first;
+					stream << t.col() << item.second;
+				}
+				BOOST_FOREACH(
+					const ParametersMap::Map::value_type& item,
+					request.getParametersMap().getMap()
+				){
+					// Variables first
+					if(variables.getMap().find(item.first) != variables.getMap().end())
+					{
+						continue;
+					}
+					// Parameters first
+					if(additionalParametersMap.getMap().find(item.first) != additionalParametersMap.getMap().end())
+					{
+						continue;
+					}
 					stream << t.row();
 					stream << t.col() << item.first;
 					stream << t.col() << item.second;
@@ -672,15 +705,16 @@ namespace synthese
 			}
 			else
 			{
-				string value(additionalParametersMap.getDefault<string>(name));
+				string value(variables.getDefault<string>(name));
+				if(value.empty())
+				{
+					value = additionalParametersMap.getDefault<string>(name);
+				}
 				if(value.empty())
 				{
 					value = request.getParametersMap().getDefault<string>(name);
 				}
-				else
-				{
-					stream << value;
-				}
+				stream << value;
 			}
 		}
 
@@ -690,7 +724,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const	{
 
 			// Parameters
@@ -700,7 +735,7 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, additionalParametersMap, page);
+					node->display(s, request, additionalParametersMap, page, variables);
 				}
 				pm.insert(param.first, s.str());
 			}
@@ -709,9 +744,8 @@ namespace synthese
 			Webpage* includedPage(page.getRoot()->getPageBySmartURL(pageName));
 			if(includedPage)
 			{
-				includedPage->display(stream, request, pm);
+				includedPage->display(stream, request, pm, variables);
 			}
-
 		}
 
 
@@ -720,7 +754,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const {
 			stream << text;
 		}
@@ -731,7 +766,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const	{
 
 			// Page load
@@ -741,7 +777,7 @@ namespace synthese
 				stringstream pageCodeStream;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, pageCode)
 				{
-					node->display(pageCodeStream, request, additionalParametersMap, page);
+					node->display(pageCodeStream, request, additionalParametersMap, page, variables);
 				}
 
 				string pageCodeStr(pageCodeStream.str());
@@ -767,7 +803,7 @@ namespace synthese
 				stringstream s;
 				BOOST_FOREACH(const Parameters::value_type::second_type::value_type& node, param.second)
 				{
-					node->display(s, request, additionalParametersMap, page);
+					node->display(s, request, additionalParametersMap, page, variables);
 				}
 				baseParametersMap.insert(param.first, s.str());
 			}
@@ -777,7 +813,7 @@ namespace synthese
 			){
 				BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, emptyTemplate)
 				{
-					node->display(stream, request, baseParametersMap, page);
+					node->display(stream, request, baseParametersMap, page, variables);
 				}
 				return;
 			}
@@ -800,14 +836,14 @@ namespace synthese
 				// Display by a template page
 				if(templatePage)
 				{
-					templatePage->display(stream, request, pm);
+					templatePage->display(stream, request, pm, variables);
 				}
 				else // Display by an inline defined template
 				{
 					// Display of each inline defined node
 					BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
 					{
-						node->display(stream, request, pm, page);
+						node->display(stream, request, pm, page, variables);
 					}
 				}
 			}
@@ -819,7 +855,8 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const	{
 			boost::shared_lock<shared_recursive_mutex> lock(_SharedMutex);
 
@@ -833,7 +870,7 @@ namespace synthese
 					stringstream label;
 					BOOST_FOREACH(const shared_ptr<Node>& node, static_cast<GotoNode*>(itNode->get())->direction)
 					{
-						node->display(label, request, additionalParametersMap, page);
+						node->display(label, request, additionalParametersMap, page, variables);
 					}
 					if(!label.str().empty())
 					{
@@ -861,7 +898,7 @@ namespace synthese
 				}
 				else
 				{
-					(*itNode)->display(stream, request, additionalParametersMap,page);
+					(*itNode)->display(stream, request, additionalParametersMap, page, variables);
 				}
 				++itNode;
 			}
@@ -873,21 +910,21 @@ namespace synthese
 			std::ostream& stream,
 			const server::Request& request,
 			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page
+			const Webpage& page,
+			util::ParametersMap& variables
 		) const {
 
 			// Evaluation of the value
 			stringstream valueStr;
 			BOOST_FOREACH(const Nodes::value_type& node, value)
 			{
-				node->display(valueStr, request, additionalParametersMap, page);
+				node->display(valueStr, request, additionalParametersMap, page, variables);
 			}
 
 			// Storage in the variables map
-			const_cast<ParametersMap&>(additionalParametersMap).insert(
+			variables.insert(
 				variable,
 				valueStr.str()
 			);
 		}
 }	}
-
