@@ -648,9 +648,10 @@ namespace synthese
 					stream << t.col() << item.first;
 					stream << t.col() << item.second;
 				}
+				ParametersMap requestMap(request.getParametersMap());
 				BOOST_FOREACH(
 					const ParametersMap::Map::value_type& item,
-					request.getParametersMap().getMap()
+					requestMap.getMap()
 				){
 					// Variables first
 					if(variables.getMap().find(item.first) != variables.getMap().end())
