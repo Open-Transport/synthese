@@ -131,6 +131,8 @@ ParseDisplayReturnInterfacePage.cpp
 ParseDisplayReturnInterfacePage.h
 PhysicalStopDepartureTableGenerator.cpp
 PhysicalStopDepartureTableGenerator.h
+PlaceWithDisplayBoards.cpp
+PlaceWithDisplayBoards.hpp
 RemovePreselectionPlaceFromDisplayScreenAction.cpp
 RemovePreselectionPlaceFromDisplayScreenAction.h
 RoutePlanningTableGenerator.cpp
