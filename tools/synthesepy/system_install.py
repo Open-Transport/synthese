@@ -59,8 +59,6 @@ def install_dependencies(env):
         return
 
     builder = synthesepy.build.get_builder(env)
-    if not isinstance(builder, synthesepy.build.CMakeBuilder):
-        raise Exception('system_install requires CMake')
 
     required_packages = 'apache2 supervisor'.split()
 
