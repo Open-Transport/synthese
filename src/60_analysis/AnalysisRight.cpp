@@ -40,7 +40,7 @@ namespace synthese
 
 	namespace security
 	{
-		template<> const string RightTemplate<AnalysisRight>::NAME("Analysis");
+		template<> const string RightTemplate<AnalysisRight>::NAME("Analyses");
 		template<> const bool RightTemplate<AnalysisRight>::USE_PRIVATE_RIGHTS(false);
 
 		template<>
