@@ -180,7 +180,6 @@ ENDIF("${isSystemDir}" STREQUAL "-1")
 include(global_vars.cmake)
 
 add_subdirectory(3rd)
-add_subdirectory(s3-admin)
 add_subdirectory(src)
 add_subdirectory(packages)
 add_subdirectory(projects)
