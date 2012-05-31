@@ -1,5 +1,0 @@
-#!/bin/bash
-
-
-ln -fs /srv/doc/s3-doc/html /var/www/s3-doc
-
