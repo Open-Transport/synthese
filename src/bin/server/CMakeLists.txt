@@ -1,5 +1,5 @@
 set_source_groups()
-# Build the generated_cmake.cpp.inc and includes_cmake.cpp.inc files.
+# Build the generated.cpp.inc and includes.cpp.inc files.
 
 set(gen_cpp_content "")
 set(inc_cpp_content "")
@@ -16,8 +16,8 @@ foreach(module ${MODULES})
   endif()
 endforeach(module)
 
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated_cmake.cpp.inc" "${gen_cpp_content}")
-file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/includes_cmake.cpp.inc" "${inc_cpp_content}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/generated.cpp.inc" "${gen_cpp_content}")
+file(WRITE "${CMAKE_CURRENT_BINARY_DIR}/includes.cpp.inc" "${inc_cpp_content}")
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
@@ -40,20 +40,3 @@ endforeach(module)
 target_link_libraries(s3-server ${Boost_LIBRARIES})
 
 install(TARGETS s3-server DESTINATION bin)
-
-install(
-  FILES deb/opt/rcs/bin/s3-server-wd.sh
-  DESTINATION bin
-  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
-)
-
-install(
-  FILES deb/etc/init.d/s3-server
-  DESTINATION ${ETC_PREFIX}etc/init.d
-  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
-)
-
-install(
-  FILES deb/etc/opt/rcs/s3-server.conf
-  DESTINATION ${ETC_PREFIX}etc/opt/rcs
-)
