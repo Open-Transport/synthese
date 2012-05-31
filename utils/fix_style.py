@@ -84,9 +84,9 @@ def fix_style_from_path(path):
 
 
 def main():
-    DIRS = ['site_scons', 'src', 'test', 'tools', 'utils']
+    DIRS = ['src', 'test', 'tools', 'utils']
     for d in DIRS:
-        for cpp_file in files_generator(d, ['py', 'cpp', 'h', 'hpp'], ['SConscript']):
+        for cpp_file in files_generator(d, ['py', 'cpp', 'h', 'hpp']):
             fix_style_from_path(cpp_file)
 
 

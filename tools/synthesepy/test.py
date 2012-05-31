@@ -176,53 +176,6 @@ class Tester(object):
     KNOWN_FAILURES = set([
     ])
 
-    def _run_cpp_tests_cmake(self, suite_args):
-        builder = synthesepy.build.get_builder(self.env)
-
-        args = [builder.get_cmake_tool_path('ctest')]
-        if self.env.c.verbose:
-            args.append('-V')
-
-        if self.KNOWN_FAILURES:
-            failing_tests = '|'.join(['test_{0}_{1}Test'.format(path, test) for
-                path, test in self.KNOWN_FAILURES])
-            args.extend(['-E', failing_tests])
-        utils.call(args, cwd=self.env.env_path)
-
-        return True
-
-    def _run_cpp_tests_scons(self, suite_args):
-        # FIXME: this wants elevation (because it contains update it its name) and fails.
-        # We should add a manifest to disable it.
-        failures = self.KNOWN_FAILURES.copy()
-        if self.env.platform == 'win':
-            failures.add('10_db/DBIndexUpdateTest')
-
-        failures = ['{0}/{1}Test'.format(path, test) for path, test in failures]
-
-        tests_path = os.path.join(self.env.env_path, 'test')
-        tests_suffix = 'Test' + self.env.platform_exe_suffix
-        test_executables = []
-        for path, dirlist, filelist in os.walk(tests_path):
-            for f in filelist:
-                if not f.endswith(tests_suffix):
-                    continue
-                test_executables.append(os.path.join(path, f))
-        test_executables.sort()
-
-        for test_executable in sorted(test_executables):
-            normalized_name = (
-                '/'.join(test_executable.split(os.sep)[-2:]).
-                    replace(self.env.platform_exe_suffix, ''))
-            if normalized_name in failures:
-                log.warn('Ignoring known failing test: %s', normalized_name)
-                continue
-
-            log.info('Running test: %s', normalized_name)
-            utils.call(test_executable)
-
-        return True
-
     def update_environment_for_cpp_tests(self):
         self.env.prepare_for_launch()
 
@@ -247,13 +200,19 @@ class Tester(object):
     def run_cpp_tests(self, suite_args):
         self.update_environment_for_cpp_tests()
 
-        if self.env.type == 'cmake':
-            return self._run_cpp_tests_cmake(suite_args)
+        builder = synthesepy.build.get_builder(self.env)
 
-        if self.env.type == 'scons':
-            return self._run_cpp_tests_scons(suite_args)
+        args = [builder.get_cmake_tool_path('ctest')]
+        if self.env.c.verbose:
+            args.append('-V')
 
-        raise Exception('Unsupported env type: %s' % self.env.type)
+        if self.KNOWN_FAILURES:
+            failing_tests = '|'.join(['test_{0}_{1}Test'.format(path, test) for
+                path, test in self.KNOWN_FAILURES])
+            args.extend(['-E', failing_tests])
+        utils.call(args, cwd=self.env.env_path)
+
+        return True
 
     def run_tests(self, suites):
         log.debug('run_tests: %s', suites)

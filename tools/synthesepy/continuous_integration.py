@@ -69,10 +69,6 @@ def run(env, args):
         synthesepy.build.build(env, 'clean')
         synthesepy.build.build(env, 'build')
 
-    # Don't bother with scons tests and package. It will be removed in the future.
-    if env.type == 'scons':
-        return
-
     if _should_build_package(env):
         log.info('Creating package')
         synthesepy.package.run(env, args)
