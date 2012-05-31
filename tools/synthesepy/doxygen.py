@@ -141,8 +141,6 @@ def _generate_doxyfile(env, doxyfile, target_dir):
 
 def run(env, args):
     builder = synthesepy.build.get_builder(env)
-    if not isinstance(builder, synthesepy.build.CMakeBuilder):
-        raise Exception('Doxygen only supported with CMake')
     builder.check_debian_package_requirements(['doxygen', 'graphviz'])
 
     target_dir = join(env.env_path, 'doc')

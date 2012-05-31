@@ -1,4 +1,4 @@
-#    Classes for modelling a Synthese environment (CMake, Scons, ...).
+#    Classes for modelling a Synthese environment.
 #    @file env.py
 #    @author Sylvain Pasche
 #
@@ -145,19 +145,6 @@ class Env(object):
             self._prepare_for_launch_lin()
 
 
-class SconsEnv(Env):
-    type = 'scons'
-
-    @property
-    def default_env_path(self):
-        return join(self.source_path, 'build', self.mode)
-
-    def _prepare_for_launch_lin(self):
-        utils.append_paths_to_environment(
-            'LD_LIBRARY_PATH', [join(self.env_path, 'repo', 'bin')])
-        super(SconsEnv, self)._prepare_for_launch_lin()
-
-
 class CMakeEnv(Env):
     type = 'cmake'
     MODE_TO_CMAKE_BUILD_TYPE = {
@@ -206,9 +193,7 @@ class InstalledEnv(Env):
 
 
 def create_env(env_type, env_path, mode, config):
-    if env_type == 'scons':
-        env_class = SconsEnv
-    elif env_type == 'cmake':
+    if env_type == 'cmake':
         env_class = CMakeEnv
     elif env_type == 'installed':
         env_class = InstalledEnv
