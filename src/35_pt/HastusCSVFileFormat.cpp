@@ -261,7 +261,7 @@ namespace synthese
 						handicappedRules :
 						handicappedForbiddenRules
 					);
-					
+
 					// Stop creation // AJOUTER PRISE EN CHARGE _importStopArea
 					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
