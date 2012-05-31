@@ -1,3 +1,0 @@
-Import ('env')
-
-DoxProject(env, 's3-doc', env.SrcFile('Doxyfile.doxyfile'), env['S3VERSION'])
