@@ -284,7 +284,7 @@ BOOST_AUTO_TEST_CASE(comparison)
 
 	FrenchSentence::ComparisonScore lascelleTest(lascelle.compare(lascelleOK));
 	BOOST_CHECK_CLOSE(lascelleTest.phoneticScore, 0.5, 1);
-	
+
 	FrenchSentence::ComparisonScore lascelleTest2(lascelleOK.compare(lascelle));
 	BOOST_CHECK_EQUAL(lascelleTest2.phoneticScore, 1);
 

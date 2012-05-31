@@ -81,7 +81,7 @@ namespace synthese
 			}
 
 			// Apply templates masks
-			if(_calendarTemplate) 
+			if(_calendarTemplate)
 			{
 				Calendar result(_calendarTemplate->getResult(mask));
 				if(_calendarTemplate2)
