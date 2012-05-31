@@ -44,6 +44,13 @@ REQUIRED_BOOST_MODULES = [
 
 MYSQL_VER = '5.5.23'
 
+LIBSPATIALITE_DLLS = (
+    ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
+    ('spatialite-2.3.0/proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
+    ('spatialite-2.3.0/geos-win-x86-3.1.0', '86b9af2a1d900139323d8c053981a220'),
+    ('spatialite-2.3.0/libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
+)
+
 class Builder(object):
     def __init__(self, env):
         self.env = env
@@ -52,6 +59,12 @@ class Builder(object):
         self.download_cache_dir = join(
             self.env.c.thirdparty_dir, 'download_cache')
         utils.maybe_makedirs(self.download_cache_dir)
+
+        PLATFORM_TO_TOOL = {
+            'win': 'vs',
+            'lin': 'make',
+        }
+        self.tool = PLATFORM_TO_TOOL[self.env.platform]
 
     def _download(self, url, md5=None):
         if 'SYNTHESE_CACHE_URL' in os.environ:
@@ -103,16 +116,6 @@ class Builder(object):
             tar.extractall(extract_dir)
         return created_dir
 
-    def install_prerequisites(self):
-        pass
-
-    def _build(self):
-        raise NotImplemented()
-
-    def build(self):
-        self.install_prerequisites()
-        self._build()
-
     def clean(self):
         if self.env.config.dummy:
             log.info('Dummy mode, not deleting: %r', self.env.env_path)
@@ -120,109 +123,6 @@ class Builder(object):
         log.info('Deleting: %r', self.env.env_path)
         if os.path.isdir(self.env.env_path):
             utils.RemoveDirectory(self.env.env_path)
-
-    def install(self):
-        raise NotImplemented()
-
-    def ide(self):
-        raise NotImplemented()
-
-
-class SconsBuilder(Builder):
-    # This should be populated automatically once all tests build.
-    TEST_TARGETS = [
-        # FIXME: commented targets don't compile.
-        'util',
-        'db',
-        #'html',
-        'lex-matcher',
-        'geography',
-        'graph',
-        'road',
-        'pt',
-        #'carto',
-        'pt-routeplanner',
-    ]
-
-    def _install_boost(self):
-        self.boost_dir = join(self.env.c.thirdparty_dir, 'boost')
-        if os.path.isdir(self.boost_dir):
-            return
-
-        utils.call(
-            'svn co --ignore-externals https://extranet.rcsmobility.com/svn/synthese3/trunk/3rd/dev/boost',
-            shell=True, cwd=join(self.env.c.thirdparty_dir))
-
-        # XXX duplicated with cmake
-        url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
-        self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
-        created_dir = self._extract(url, self.boost_dir)
-        os.rename(join(self.boost_dir, created_dir), join(self.boost_dir, 'src'))
-
-    def install_prerequisites(self):
-        self._install_boost()
-
-    def _build(self):
-        if not utils.find_executable('scons'):
-            raise Exception('Unable to find scons in PATH')
-
-        args = ['scons']
-
-        # Use ccache on Linux if available
-        if self.env.platform == 'lin' and utils.find_executable('ccache'):
-            args.append('CXX=ccache g++')
-            args.append('CC=ccache gcc')
-
-        if not self.config.without_mysql:
-            args.append('_WITH_MYSQL=True')
-            if self.config.mysql_dir:
-                args.append('_MYSQL_ROOT=' + self.config.mysql_dir)
-
-        if self.env.mode == 'debug':
-            args.append('_CPPMODE=debug')
-
-        # Don't run tests after they are built.
-        args.append('TESTBUILDONLY=True')
-
-        targets = (['s3-server.cppbin'] +
-            ['s3-%s-test.cpptest' % t for t in self.TEST_TARGETS])
-
-        args.extend(targets)
-
-        log.info('Build command line: %s', args)
-
-        env = os.environ.copy()
-        env['BOOST_SOURCE'] = self.boost_dir
-        env['SYNTHESE_BOOST_VERSION'] = BOOST_VER
-
-        kwargs = {
-            'env': env,
-            'cwd': self.env.source_path,
-        }
-        # Windows doesn't like it if launched without shell=True and
-        # Linux fails if it is.
-        if self.env.platform == 'win':
-            kwargs = {
-                'shell': True
-            }
-        utils.call(args, **kwargs)
-
-
-class CMakeBuilder(Builder):
-    LIBSPATIALITE_DLLS = (
-        ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
-        ('spatialite-2.3.0/proj-win-x86-4.6.1', 'e18aeb8f8acc0028a0f6aaaff2d16680'),
-        ('spatialite-2.3.0/geos-win-x86-3.1.0', '86b9af2a1d900139323d8c053981a220'),
-        ('spatialite-2.3.0/libiconv-win-x86-1.9.2', '3b026b241ad051b45695bd7a1e5a4697'),
-    )
-
-    def __init__(self, env):
-        super(CMakeBuilder, self).__init__(env)
-        PLATFORM_TO_TOOL = {
-            'win': 'vs',
-            'lin': 'make',
-        }
-        self.tool = PLATFORM_TO_TOOL[self.env.platform]
 
     def check_debian_package_requirements(self, required_packages,
             do_install=False):
@@ -393,7 +293,7 @@ class CMakeBuilder(Builder):
         if self.env.platform != 'win':
             return
 
-        for filename, hash in self.LIBSPATIALITE_DLLS:
+        for filename, hash in LIBSPATIALITE_DLLS:
             url = 'http://www.gaia-gis.it/%s.zip' % filename
             self._download(url, hash)
             self._extract(url, self.env.c.thirdparty_dir)
@@ -401,7 +301,7 @@ class CMakeBuilder(Builder):
     def update_path_for_libspatialite(self):
         self._install_libspatialite()
 
-        spatialite_dirs = [filename.split('/')[-1] for filename, _ in self.LIBSPATIALITE_DLLS]
+        spatialite_dirs = [filename.split('/')[-1] for filename, _ in LIBSPATIALITE_DLLS]
         dll_paths = []
         for d in spatialite_dirs:
             d = join(self.env.c.thirdparty_dir, d)
@@ -542,7 +442,8 @@ class CMakeBuilder(Builder):
         tool_method = getattr(self, '{0}_{1}'.format(method, self.tool))
         tool_method(*args, **kwargs)
 
-    def _build(self):
+    def build(self):
+        self.install_prerequisites()
         self._generate_build_system()
         if self.config.generate_only:
             return
@@ -587,14 +488,7 @@ def get_builder(env):
     global builder
     if builder:
         return builder
-
-    if env.type == 'scons':
-        builder_class = SconsBuilder
-    else:
-        # For cmake and installed env.
-        builder_class = CMakeBuilder
-
-    builder = builder_class(env)
+    builder = Builder(env)
     return builder
 
 def build(env, method):
