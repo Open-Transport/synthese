@@ -66,6 +66,11 @@ DEFAULTS = {
     'gdb': False,
     'netstat_cmd': None,
     'restart_if_crashed_or_hung': False,
+    # For fine tuning, you can set these options separately instead of the
+    # global one above (the global one takes precedence).
+    'restart_if_crashed': False,
+    'restart_if_hung': False,
+
     'no_root_check': False,
     'extra_params': None,
 
@@ -222,9 +227,6 @@ class Config(object):
         if (not self.send_mail_on_restart and
             hasattr(self, 'send_mail_on_crash')):
             self.send_mail_on_restart = self.send_mail_on_crash
-        if (not self.restart_if_crashed_or_hung and
-            hasattr(self, 'restart_if_crashed')):
-            self.restart_if_crashed_or_hung = self.restart_if_crashed
 
         # Convert log level to int
         try:

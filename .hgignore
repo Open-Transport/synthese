@@ -6,9 +6,7 @@ node_modules$
 ^.settings$
 ^.externalToolBuilders$
 ^build.*
-^Debug/
 \.svn/
-[^c][^m][^a][^k][^e]\.cpp\.inc$
 ^3rd/dev/geos/capi/geos_c.h$
 ^3rd/dev/geos/src/headers/geos/platform.h$
 ^3rd/dev/geos/src/headers/geos/version.h$

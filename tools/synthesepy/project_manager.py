@@ -708,7 +708,15 @@ The synthese.py wrapper script.
                     hang_detected_event.set()
                 time.sleep(HANG_CHECK_INTERVAL_S)
 
-        if self.config.restart_if_crashed_or_hung:
+        restart_if_crashed = (self.config.restart_if_crashed_or_hung or
+            self.config.restart_if_crashed)
+        restart_if_hung = (self.config.restart_if_crashed_or_hung or
+            self.config.restart_if_hung)
+        print self.config.restart_if_crashed_or_hung,            self.config.restart_if_hung
+        if restart_if_hung:
+            1/0
+
+        if restart_if_hung:
             hang_detector_thread = threading.Thread(target=hang_detector)
             hang_detector_thread.daemon = True
             hang_detector_thread.start()
@@ -734,7 +742,7 @@ The synthese.py wrapper script.
                     if crashed:
                         log.warn('Stop is unexpected, crash?')
                         restart_reason = 'Crash'
-                        if self.config.restart_if_crashed_or_hung:
+                        if restart_if_crashed:
                             restart = True
 
                 if not restart:
