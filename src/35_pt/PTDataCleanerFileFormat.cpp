@@ -424,6 +424,34 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
+			// Driver allocations
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocation>& driverAllocation,
+				_driverAllocationsToRemove
+			){
+				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+			}
+
+			// Driver allocation templates
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
+				_driverAllocationTemplatesToRemove
+			){
+				DriverAllocationTemplateTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+			}
+
+			// Driver services
+			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
+			{
+				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
+			}
+
+			// Vehicle services
+			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
+			{
+				VehicleServiceTableSync::RemoveRow(vehicleService->getKey(), transaction);
+			}
+
 			BOOST_FOREACH(const shared_ptr<ScheduledService>& sservice, _scheduledServicesToRemove)
 			{
 				ScheduledServiceTableSync::RemoveRow(sservice->getKey(), transaction);
@@ -447,34 +475,6 @@ namespace synthese
 			BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 			{
 				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
-			}
-
-			// Driver allocation templates
-			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
-				_driverAllocationTemplatesToRemove
-			){
-				DriverAllocationTemplateTableSync::RemoveRow(driverAllocation->getKey(), transaction);
-			}
-
-			// Driver allocations
-			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocation>& driverAllocation,
-				_driverAllocationsToRemove
-			){
-				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
-			}
-
-			// Driver services
-			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
-			{
-				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
-			}
-
-			// Vehicle services
-			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
-			{
-				VehicleServiceTableSync::RemoveRow(vehicleService->getKey(), transaction);
 			}
 		}
 
