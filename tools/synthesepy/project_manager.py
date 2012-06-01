@@ -712,9 +712,6 @@ The synthese.py wrapper script.
             self.config.restart_if_crashed)
         restart_if_hung = (self.config.restart_if_crashed_or_hung or
             self.config.restart_if_hung)
-        print self.config.restart_if_crashed_or_hung,            self.config.restart_if_hung
-        if restart_if_hung:
-            1/0
 
         if restart_if_hung:
             hang_detector_thread = threading.Thread(target=hang_detector)
