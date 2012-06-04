@@ -512,7 +512,7 @@ namespace synthese
 			query.addField(object->getMacAddress());
 			query.addField(object->getRoutePlanningWithTransfer());
 			query.addField(tdstream.str());
-			query.addField(object->getParent() ? object->getParent()->getKey() : RegistryKeyType(0));
+			query.addField(object->getParent(true) ? object->getParent()->getKey() : RegistryKeyType(0));
 			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.addField(
 				DataSourceLinks::Serialize(
