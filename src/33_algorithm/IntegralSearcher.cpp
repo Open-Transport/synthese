@@ -442,24 +442,6 @@ namespace synthese
 									continue;
 								}
 
-								// Limitation of the continuous service range if necessary
-								if(	_accessDirection == DEPARTURE_TO_ARRIVAL)
-								{
-									if(	serviceUse.getArrivalDateTime() <= _minMaxDateTimeAtDestination &&
-										serviceUse.getArrivalDateTime() + serviceUse.getServiceRange() > _minMaxDateTimeAtDestination
-									){
-										serviceUse.setServiceRange(_minMaxDateTimeAtDestination - serviceUse.getArrivalDateTime());
-									}
-								}
-								else
-								{
-									if(	serviceUse.getDepartureDateTime() + serviceUse.getServiceRange() >= _minMaxDateTimeAtDestination &&
-										serviceUse.getDepartureDateTime() < _minMaxDateTimeAtDestination
-									){
-										serviceUse.setServiceRange(serviceUse.getDepartureDateTime() + serviceUse.getServiceRange() - _minMaxDateTimeAtDestination);
-										serviceUse.shift(_minMaxDateTimeAtDestination - serviceUse.getDepartureDateTime());
-									}
-								}
 
 								// Result journey writing
 								graph::Journey::Distance distanceToEnd(
