@@ -454,6 +454,9 @@ class Project(object):
 
         # FIXME: older Pythons have an issue when overriding FileHandler
         if sys.version_info < (2, 6, 6):
+            if not os.path.isfile(self.admin_log_path):
+                utils.maybe_makedirs(os.path.dirname(self.admin_log_path))
+                open(self.admin_log_path, 'wb').write('')
             admin_handler = logging.FileHandler(self.admin_log_path)
         else:
             admin_handler = KeptClosedFileHandler(
