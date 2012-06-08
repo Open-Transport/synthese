@@ -40,7 +40,10 @@ from synthesepy.functional_test import http_testcase
 
 log = logging.getLogger(__name__)
 
-class Issue11210Test(http_testcase.HTTPTestCase):
+# FIXME: This test is currently disabled due to random failures.
+# See https://extranet.rcsmobility.com/issues/13724
+if False:
+  class Issue11210Test(http_testcase.HTTPTestCase):
     def test_responses_dont_vary(self):
         http_api = self.get_http_api()
 
