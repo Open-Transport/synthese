@@ -146,6 +146,8 @@ Alias /synthese3 "{admin_files_path}/admin/"
         RewriteEngine on
         RewriteBase /
 
+        {custom_root_config}
+
         # Backward compatibility redirects to the new admin location.
         RewriteRule ^synthese3/admin/$ /admin/ [R=301,L]
         RewriteCond %{{QUERY_STRING}} fonction=admin
@@ -247,6 +249,8 @@ Alias /{package_name} {package_files_path}/{package_name}
 
         format_config['custom_config'] = format_config.get(
             'apache_custom_config', '')
+        format_config['custom_root_config'] = format_config.get(
+            'apache_custom_root_config', '')
 
         packages = site.packages[:]
         if admin_package:
