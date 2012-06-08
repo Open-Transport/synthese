@@ -104,8 +104,11 @@ namespace synthese
 						address
 					);
 				}
-				stopPoint->setProjectedPoint(address);
-				StopPointTableSync::Save(stopPoint.get(), transaction);
+				if(address.getRoadChunk())
+				{
+					stopPoint->setProjectedPoint(address);
+					StopPointTableSync::Save(stopPoint.get(), transaction);
+				}
 			}
 
 			transaction.run();
