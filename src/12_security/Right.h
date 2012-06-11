@@ -129,6 +129,7 @@ namespace synthese
 
 
 			static std::string getLevelLabel(RightLevel level);
+			static RightLevel getRightLevel(const std::string level);
 
 			virtual const std::string& getName() const = 0;
 			virtual bool getUsePrivateRights() const = 0;
