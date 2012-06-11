@@ -36,46 +36,79 @@ namespace synthese
 			, _publicRightLevel(FORBIDDEN)
 		{	}
 
+
+
 		Right::~Right()
 		{	}
+
+
 
 		RightLevel Right::getPrivateRightLevel() const
 		{
 			return _privateRightLevel;
 		}
 
+
+
 		RightLevel Right::getPublicRightLevel() const
 		{
 			return _publicRightLevel;
 		}
 
+
 		std::string Right::getLevelLabel(RightLevel level)
 		{
 			switch (level)
 			{
-			case FORBIDDEN: return "Interdit";
-			case USE: return "Utilisation";
-			case READ: return "Lecture";
-			case WRITE: return "Lecture/Ecriture";
-			case DELETE_RIGHT: return "Contrôle total";
+				case FORBIDDEN: return "Interdit";
+				case USE: return "Utilisation";
+				case READ: return "Lecture";
+				case WRITE: return "Lecture/Ecriture";
+				case DELETE_RIGHT: return "Contrôle total";
 			}
 			return "";
 		}
+
+
+
+		RightLevel Right::getRightLevel(const std::string level)
+		{
+			if(level == "FORBIDDEN")
+				return FORBIDDEN;
+			else if(level == "USE")
+				return USE;
+			else if(level == "READ")
+				return READ;
+			else if(level == "WRITE")
+				return WRITE;
+			else if(level == "DELETE_RIGHT")
+				return DELETE_RIGHT;
+			else 
+				return UNKNOWN_RIGHT_LEVEL;
+		}
+
+
 
 		void Right::setPrivateLevel( const RightLevel& level )
 		{
 			_privateRightLevel = level;
 		}
 
+
+
 		void Right::setPublicLevel( const RightLevel& level )
 		{
 			_publicRightLevel = level;
 		}
 
+
+
 		void Right::setParameter( const std::string& parameter )
 		{
 			_parameter = parameter;
 		}
+
+
 
 		const std::string& Right::getParameter() const
 		{

@@ -24,6 +24,7 @@
 
 #include "12_security/SecurityLog.h"
 
+#include "CheckRightService.hpp"
 #include "UsersListService.hpp"
 
 // Registries
@@ -64,6 +65,7 @@ void synthese::security::moduleRegister()
 
 	synthese::security::SecurityLog::integrate();
 
+	synthese::security::CheckRightService::integrate();
 	synthese::security::UsersListService::integrate();
 
 	// Registries

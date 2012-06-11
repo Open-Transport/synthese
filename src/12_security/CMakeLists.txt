@@ -7,6 +7,8 @@ AddRightAction.cpp
 AddRightAction.h
 AddUserAction.cpp
 AddUserAction.h
+CheckRightService.cpp
+CheckRightService.hpp
 DefaultRight.h
 DeleteRightAction.cpp
 DeleteRightAction.h
