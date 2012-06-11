@@ -175,7 +175,7 @@ namespace synthese
 				);
 				Journey journey(r.run());
 
-				if(journey.empty()) continue;
+				if(journey.empty()) break;
 
 				//! <li> If the journey is continuous, attempt to break it. </li>
 				if(	journey.getContinuousServiceRange ().total_seconds() > 60)
