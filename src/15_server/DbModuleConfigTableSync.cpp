@@ -52,7 +52,7 @@ namespace synthese
 		template<> const Field DBTableSyncTemplate<DbModuleConfigTableSync>::_FIELDS[]=
 		{
 			Field(DbModuleConfigTableSync::COL_PARAMNAME, SQL_TEXT_FIXED),
-			Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_DATETIME),
+			Field(DbModuleConfigTableSync::COL_PARAMVALUE, SQL_TEXT_FIXED),
 			Field()
 		};
 
