@@ -1382,7 +1382,7 @@ namespace synthese
 			{
 				// ﻿agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang
 				agencyTxt << _key(myAgency.first) << "," // ﻿agency_id
-					<< _Str(myAgency.second->getRuleUserName()) << "," // agency_name
+					<< _Str(myAgency.second->getName()) << "," // agency_name
 					<< "," // agency_url
 					<< "," // agency_timezone
 					<< "," // agency_phone
