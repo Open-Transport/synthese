@@ -286,7 +286,7 @@ namespace synthese
 			EdgeProjector<shared_ptr<MainRoadChunk> >::From paths(
 				SearchByMaxDistance(
 					point,
-					500 * maxDistance,
+					maxDistance,
 					Env::GetOfficialEnv(),
 					UP_LINKS_LOAD_LEVEL
 			)	);
