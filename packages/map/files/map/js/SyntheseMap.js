@@ -106,7 +106,7 @@ var SyntheseMap = OpenLayers.Class({
 
     var self = this;
 
-    var select = new OpenLayers.Control.SelectFeature(this.stopsLayer, {
+    var select = new OpenLayers.Control.SelectFeature(this.stopsLayer, OpenLayers.Util.extend({
       hover: true,
       highlightOnly: true,
       onSelect: function() {
@@ -114,11 +114,12 @@ var SyntheseMap = OpenLayers.Class({
       },
       // Hack to get the onSelect callback to be called even if hover is true.
       clickFeature: function() {
+        var oldHover = this.hover;
         this.hover = false;
         OpenLayers.Control.SelectFeature.prototype.clickFeature.apply(this, arguments);
-        this.hover = true;
+        this.hover = oldHover;
       }
-    });
+    }, this.selectFeatureOptions || {}));
     this.map.addControl(select);
     select.activate();
 
