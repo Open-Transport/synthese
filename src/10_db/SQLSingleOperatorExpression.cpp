@@ -33,7 +33,7 @@ namespace synthese
 		const string SQLSingleOperatorExpression::OP_MAX = "MAX";
 		const string SQLSingleOperatorExpression::OP_MIN = "MIN";
 		const string SQLSingleOperatorExpression::OP_ABS = "ABS";
-		const string SQLSingleOperatorExpression::OP_IS_NULL = "IS NULL";
+		const string SQLSingleOperatorExpression::OP_IS_NULL = " IS NULL";
 
 
 
@@ -53,7 +53,7 @@ namespace synthese
 			// Special case for IS NULL operator
 			if(_op == OP_IS_NULL)
 			{
-				s << "(" << _expr->toString() << ") " << _op;
+				s << _expr->toString() << _op;
 			}
 			else // General case
 			{

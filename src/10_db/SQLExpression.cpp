@@ -52,7 +52,7 @@ namespace synthese
 		std::string SubQueryExpression::toString() const
 		{
 			stringstream s;
-			s << _subquery;
+			s << "(" << _subquery << ")";
 			return s.str();
 		}
 

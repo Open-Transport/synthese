@@ -63,7 +63,7 @@ namespace synthese
 		string ComposedExpression::toString() const
 		{
 			stringstream s;
-			s << "(" << _expr1->toString() << ") " << _op << " (" << _expr2->toString() << ")";
+			s << "(" << _expr1->toString() << " " << _op << " " << _expr2->toString() << ")";
 			return s.str();
 		}
 
