@@ -21,6 +21,7 @@
 
 #include "DbModuleConfigTableSync.h"
 
+#include "SessionService.hpp"
 #include "XMLSessionFunction.h"
 #include "XMLSessionIsValidFunction.h"
 
@@ -51,6 +52,7 @@ void synthese::server::moduleRegister()
 
 	synthese::server::ThreadsAdmin::integrate();
 
+	synthese::server::SessionService::integrate();
 	synthese::server::XMLSessionFunction::integrate();
 	synthese::server::XMLSessionIsValidFunction::integrate();
 }
