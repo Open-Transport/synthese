@@ -60,6 +60,8 @@ namespace synthese
 			static const std::string COL_DATES;
 			static const std::string COL_STOPS;
 			static const std::string COL_DATASOURCE_LINKS;
+			static const std::string COL_DATES_TO_FORCE;
+			static const std::string COL_DATES_TO_BYPASS;
 
 
 

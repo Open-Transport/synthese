@@ -57,6 +57,7 @@ namespace synthese
 		{
 		public:
 			typedef std::vector<boost::gregorian::date> DatesVector;
+			typedef std::set<boost::gregorian::date> DatesSet;
 			typedef std::set<CalendarLink*> CalendarLinks;
 
 		private:
@@ -67,9 +68,11 @@ namespace synthese
 			> _BitSets;
 
 			_BitSets _markedDates;
-
+			
 			mutable boost::optional<boost::gregorian::date> _firstActiveDate;
 			mutable boost::optional<boost::gregorian::date> _lastActiveDate;
+			DatesSet _datesToForce;
+			DatesSet _datesToBypass;
 
 			static size_t _BitPos(const boost::gregorian::date& d);
 
@@ -121,11 +124,15 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const CalendarLinks& getCalendarLinks() const { return _calendarLinks; }
+				const DatesSet& getDatesToForce() const { return _datesToForce; }
+				const DatesSet& getDatesToBypass() const { return _datesToBypass; }
 			//@}
 
 			//! @name Setters
 			//@{
 				void setCalendarLinks(const CalendarLinks& value){ _calendarLinks = value; }
+				void setDatesToForce(const DatesSet& value){ _datesToForce = value; }
+				void setDatesToBypass(const DatesSet& value){ _datesToBypass = value; }
 			//@}
 
 			//! @name Services
