@@ -417,7 +417,7 @@ namespace synthese
 					{
 						s << " AND ";
 					}
-					s << "(" << where->toString() << ")";
+					s << where->toString();
 					first = false;
 				}
 			}
