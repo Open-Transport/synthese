@@ -136,7 +136,16 @@ namespace synthese
 			HTTPRequest::Headers::const_iterator it(httpRequest.headers.find("X-Forwarded-Host"));
 			if(it != httpRequest.headers.end() && !it->second.empty())
 			{
-				_hostName = it->second;
+				// If there are multiple hosts in the x-forwarded-host chain, use the first one.
+				size_t commaPos = it->second.find(",");
+				if(commaPos != string::npos)
+				{
+					_hostName = it->second.substr(0, commaPos);
+				}
+				else
+				{
+					_hostName = it->second;
+				}
 			} else {
 				it = httpRequest.headers.find("Host");
 				if(it != httpRequest.headers.end())
