@@ -39,6 +39,7 @@
 #include "StopPointTableSync.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
@@ -72,6 +73,8 @@ namespace synthese
 		const string ScheduledServiceTableSync::COL_DATES("dates");
 		const string ScheduledServiceTableSync::COL_STOPS("stops");
 		const string ScheduledServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const string ScheduledServiceTableSync::COL_DATES_TO_FORCE = "dates_to_force";
+		const string ScheduledServiceTableSync::COL_DATES_TO_BYPASS = "dates_to_bypass";
 	}
 
 	namespace db
@@ -93,6 +96,8 @@ namespace synthese
 			Field(ScheduledServiceTableSync::COL_DATES, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_STOPS, SQL_TEXT),
 			Field(ScheduledServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_DATES_TO_FORCE, SQL_TEXT),
+			Field(ScheduledServiceTableSync::COL_DATES_TO_BYPASS, SQL_TEXT),
 			Field()
 		};
 
@@ -123,6 +128,40 @@ namespace synthese
 
 			// Use rules
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+
+			// Dates to force
+			{
+				string datesStr(rows->get<string>(ScheduledServiceTableSync::COL_DATES_TO_FORCE));
+				vector<string> datesVec;
+				split(datesVec, datesStr, is_any_of(","), token_compress_on);
+				Calendar::DatesSet dates;
+				BOOST_FOREACH(const string& dateStr, datesVec)
+				{
+					if(dateStr.empty())
+					{
+						continue;
+					}
+					dates.insert(from_string(dateStr));
+				}
+				ss->setDatesToForce(dates);
+			}
+
+			// Dates to bypass
+			{
+				string datesStr(rows->get<string>(ScheduledServiceTableSync::COL_DATES_TO_BYPASS));
+				vector<string> datesVec;
+				split(datesVec, datesStr, is_any_of(","), token_compress_on);
+				Calendar::DatesSet dates;
+				BOOST_FOREACH(const string& dateStr, datesVec)
+				{
+					if(dateStr.empty())
+					{
+						continue;
+					}
+					dates.insert(from_string(dateStr));
+				}
+				ss->setDatesToBypass(dates);
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -304,6 +343,45 @@ namespace synthese
 					object->getDataSourceLinks(),
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
+
+			// Dates to force
+			{
+				stringstream s;
+				bool first(true);
+				BOOST_FOREACH(const date& d, object->getDatesToForce())
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						s << ",";
+					}
+					s << to_iso_extended_string(d);
+				}
+				query.addField(s.str());
+			}
+
+			// Dates to bypass
+			{
+				stringstream s;
+				bool first(true);
+				BOOST_FOREACH(const date& d, object->getDatesToBypass())
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						s << ",";
+					}
+					s << to_iso_extended_string(d);
+				}
+				query.addField(s.str());
+			}
+
 			query.execute(transaction);
 		}
 
