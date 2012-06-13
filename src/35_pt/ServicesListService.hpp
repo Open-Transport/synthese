@@ -36,18 +36,17 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : ServicesListService.
-		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services List
+		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services_List
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m35Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2012
 		/// @since 3.4.0
 		class ServicesListService:
-			public util::FactorableTemplate<cms::FunctionWithSite<false>, ServicesListService>
+			public util::FactorableTemplate<server::Function, ServicesListService>
 		{
 		public:
 			static const std::string PARAMETER_WAYBACK;
-			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_DATE;
 
 			static const std::string DATA_ID;
@@ -56,12 +55,12 @@ namespace synthese
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_RUNS_AT_DATE;
 			static const std::string DATA_SERVICE;
+			static const std::string TAG_SERVICES;
 
 		protected:
 			//! \name Page parameters
 			//@{
 				boost::logic::tribool _wayBack;
-				const cms::Webpage* _page;
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::gregorian::date _displayDate;
 			//@}
@@ -69,7 +68,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services List#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services_List#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@return Generated parameters map
 			/// @author Hugues Romain
@@ -81,7 +80,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from generic parameters map to attributes.
-			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services List#Request
+			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Services_List#Request
 			//////////////////////////////////////////////////////////////////////////
 			///	@param map Parameters map to interpret
 			/// @author Hugues Romain
