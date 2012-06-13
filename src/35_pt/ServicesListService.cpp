@@ -53,6 +53,7 @@ namespace synthese
 	namespace pt
 	{
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
+		const string ServicesListService::PARAMETER_DISPLAY_DATE = "display_date";
 
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
@@ -90,6 +91,12 @@ namespace synthese
 			if(!map.getDefault<string>(PARAMETER_WAYBACK).empty())
 			{
 				_wayBack = map.getDefault<bool>(PARAMETER_WAYBACK, false);
+			}
+
+			// Display date
+			if(map.isDefined(PARAMETER_DISPLAY_DATE))
+			{
+				_displayDate = from_string(map.get<string>(PARAMETER_DISPLAY_DATE));
 			}
 		}
 
@@ -200,6 +207,6 @@ namespace synthese
 
 
 		ServicesListService::ServicesListService():
-			_displayDate(not_a_date_time)
+			_displayDate(day_clock::local_day())
 		{}
 }	}
