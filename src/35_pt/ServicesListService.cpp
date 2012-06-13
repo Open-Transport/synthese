@@ -151,7 +151,7 @@ namespace synthese
 				serviceMap->insert(DATA_ID, service->getKey());
 				if(!_displayDate.is_not_a_date() && dynamic_cast<NonPermanentService*>(service))
 				{
-					serviceMap.insert(
+					serviceMap->insert(
 						DATA_RUNS_AT_DATE,
 						dynamic_cast<NonPermanentService*>(service)->isActive(_displayDate)
 					);
