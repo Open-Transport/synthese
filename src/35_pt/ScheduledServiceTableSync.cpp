@@ -277,6 +277,7 @@ namespace synthese
 						rows->getText(ScheduledServiceTableSync::COL_STOPS),
 						env
 					);
+					ss->clearRTData();
 				}
 				catch(synthese::Exception& e)
 				{
