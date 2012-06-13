@@ -48,11 +48,10 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<FunctionWithSite<false>,pt::ServicesListService>::FACTORY_KEY = "services_list";
+	const string FactorableTemplate<Function, pt::ServicesListService>::FACTORY_KEY = "services_list";
 
 	namespace pt
 	{
-		const string ServicesListService::PARAMETER_PAGE_ID = "p";
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
 
 		const string ServicesListService::DATA_ID = "id";
@@ -61,13 +60,12 @@ namespace synthese
 		const string ServicesListService::DATA_ARRIVAL_PLACE_NAME = "arrival_place_name";
 		const string ServicesListService::DATA_RUNS_AT_DATE = "runs_at_date";
 		const string ServicesListService::DATA_SERVICE = "service";
+		const string ServicesListService::TAG_SERVICES = "services";
 
 
 		ParametersMap ServicesListService::_getParametersMap() const
 		{
-			ParametersMap map(
-				FunctionWithSite<false>::_getParametersMap()
-			);
+			ParametersMap map;
 			return map;
 		}
 
@@ -75,9 +73,6 @@ namespace synthese
 
 		void ServicesListService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// Site
-			FunctionWithSite<false>::_setFromParametersMap(map);
-
 			// Commercial line
 			try
 			{
@@ -95,12 +90,6 @@ namespace synthese
 			if(!map.getDefault<string>(PARAMETER_WAYBACK).empty())
 			{
 				_wayBack = map.getDefault<bool>(PARAMETER_WAYBACK, false);
-			}
-
-			// Template
-			if(map.isDefined(PARAMETER_PAGE_ID))
-			{
-				_page = FunctionWithSite<false>::getPage(PARAMETER_PAGE_ID);
 			}
 		}
 
@@ -183,14 +172,12 @@ namespace synthese
 				map.insert(DATA_SERVICE, serviceMap);
 			}
 
-			// CMS output
-			if(_page && map.hasSubMaps(DATA_SERVICE))
-			{
-				BOOST_FOREACH(shared_ptr<ParametersMap> smap, map.getSubMaps(DATA_SERVICE))
-				{
-					_page->display(stream, request, *smap);
-				}
-			}
+			outputParametersMap(
+				map,
+				stream,
+				TAG_SERVICES,
+				"https://extranet.rcsmobility.com/attachments/download/14018/ServicesListService.xsd"
+			);
 
 			return map;
 		}
@@ -207,13 +194,12 @@ namespace synthese
 
 		std::string ServicesListService::getOutputMimeType() const
 		{
-			return "text/html";
+			return getOutputMimeTypeFromOutputFormat();
 		}
 
 
 
 		ServicesListService::ServicesListService():
-			_page(NULL),
 			_displayDate(not_a_date_time)
 		{}
 }	}
