@@ -61,6 +61,8 @@ Session.cpp
 Session.h
 SessionException.cpp
 SessionException.h
+SessionService.cpp
+SessionService.hpp
 SetSessionVariableAction.cpp
 SetSessionVariableAction.hpp
 StaticActionFunctionRequest.h
