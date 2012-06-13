@@ -80,6 +80,10 @@ namespace synthese
 			static const std::string PARAMETER_ADD;
 			static const std::string PARAMETER_ADD_LINK;
 			static const std::string PARAMETER_LINK_TO_REMOVE;
+			static const std::string PARAMETER_ADD_DATE_TO_FORCE;
+			static const std::string PARAMETER_REMOVE_DATE_TO_FORCE;
+			static const std::string PARAMETER_ADD_DATE_TO_BYPASS;
+			static const std::string PARAMETER_REMOVE_DATE_TO_BYPASS;
 
 			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_START_DATE;
 			static const std::string SESSION_VARIABLE_SERVICE_ADMIN_END_DATE;
@@ -95,7 +99,10 @@ namespace synthese
 			bool _add;
 			bool _addLink;
 			boost::optional<util::RegistryKeyType> _linkToRemove;
-
+			boost::gregorian::date _dateToForceToAdd;
+			boost::gregorian::date _dateToForceToRemove;
+			boost::gregorian::date _dateToBypassToAdd;
+			boost::gregorian::date _dateToBypassToRemove;
 
 		protected:
 			BaseCalendarUpdateAction();
@@ -144,6 +151,10 @@ namespace synthese
 				void setAdd(bool value){ _add = value; }
 				void setAddLink(bool value){ _addLink = value; }
 				void setLinkToRemove(boost::optional<util::RegistryKeyType> value){ _linkToRemove = value; }
+				void setDateToForceToAdd(const boost::gregorian::date& value){ _dateToForceToAdd = value; }
+				void setDateToForceToRemove(const boost::gregorian::date& value){ _dateToForceToRemove = value; }
+				void setDateToBypassToAdd(const boost::gregorian::date& value){ _dateToBypassToAdd = value; }
+				void setDateToBypassToRemove(const boost::gregorian::date& value){ _dateToBypassToRemove = value; }
 			//@}
 
 			/// @name Modifiers

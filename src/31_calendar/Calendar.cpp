@@ -545,6 +545,18 @@ namespace synthese
 			{
 				link->addDatesToCalendar();
 			}
+
+			// Dates to force
+			BOOST_FOREACH(const DatesSet::value_type& d, _datesToForce)
+			{
+				setActive(d);
+			}
+
+			// Dates to bypass
+			BOOST_FOREACH(const DatesSet::value_type& d, _datesToBypass)
+			{
+				setInactive(d);
+			}
 		}
 
 

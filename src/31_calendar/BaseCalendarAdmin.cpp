@@ -40,7 +40,7 @@
 
 using namespace boost;
 using namespace std;
-
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -190,6 +190,98 @@ namespace synthese
 				stream << tc.col() << calendarLinkAddForm.getSubmitButton("Ajouter");
 				stream << tc.close();
 				stream << calendarLinkAddForm.close();
+
+				if(object.isLinked())
+				{
+					stream << "<h2>Dates forcées</h2>";
+
+					// Form
+					HTMLForm dateAdd(updateRequest->getHTMLForm("dateAdd"));
+					stream << dateAdd.open();
+
+					// Header
+					HTMLTable::ColsVector v;
+					v.push_back("Date");
+					v.push_back(string());
+					HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+
+					// Loop on dates
+					date nodate(not_a_date_time);
+					BOOST_FOREACH(const date& d, object.getDatesToForce())
+					{
+						stream << t.row();
+						stream << t.col() << d;
+
+						// Remove button
+						const_cast<BaseCalendarUpdateAction*>(
+							dynamic_cast<const BaseCalendarUpdateAction*>(
+								updateRequest->getAction().get()
+						)	)->setDateToForceToRemove(d);
+						stream << t.col() << HTMLModule::getLinkButton(updateRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la date ?");
+						const_cast<BaseCalendarUpdateAction*>(
+							dynamic_cast<const BaseCalendarUpdateAction*>(
+								updateRequest->getAction().get()
+						)	)->setDateToForceToRemove(nodate);
+					}
+
+					// Add form
+					stream << t.row();
+					stream << t.col();
+					date now(gregorian::day_clock::local_day());
+					stream << dateAdd.getCalendarInput(BaseCalendarUpdateAction::PARAMETER_ADD_DATE_TO_FORCE, now);
+					stream << t.col();
+					stream << dateAdd.getSubmitButton("Ajouter");
+
+					stream << t.close();
+					stream << dateAdd.close();
+				}
+
+				if(object.isLinked())
+				{
+					stream << "<h2>Dates bloquées</h2>";
+
+					// Form
+					HTMLForm dateAdd(updateRequest->getHTMLForm("bdateAdd"));
+					stream << dateAdd.open();
+
+					// Header
+					HTMLTable::ColsVector v;
+					v.push_back("Date");
+					v.push_back(string());
+					HTMLTable t(v, ResultHTMLTable::CSS_CLASS);
+					stream << t.open();
+
+					// Loop on dates
+					date nodate(not_a_date_time);
+					BOOST_FOREACH(const date& d, object.getDatesToBypass())
+					{
+						stream << t.row();
+						stream << t.col() << d;
+
+						// Remove button
+						const_cast<BaseCalendarUpdateAction*>(
+							dynamic_cast<const BaseCalendarUpdateAction*>(
+								updateRequest->getAction().get()
+						)	)->setDateToBypassToRemove(d);
+						stream << t.col() << HTMLModule::getLinkButton(updateRequest->getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer la date ?");
+						const_cast<BaseCalendarUpdateAction*>(
+							dynamic_cast<const BaseCalendarUpdateAction*>(
+								updateRequest->getAction().get()
+						)	)->setDateToBypassToRemove(nodate);
+					}
+
+					// Add form
+					stream << t.row();
+					stream << t.col();
+					date now(gregorian::day_clock::local_day());
+					stream << dateAdd.getCalendarInput(BaseCalendarUpdateAction::PARAMETER_ADD_DATE_TO_BYPASS, now);
+					stream << t.col();
+					stream << dateAdd.getSubmitButton("Ajouter");
+
+					stream << t.close();
+					stream << dateAdd.close();
+				}
 
 				if(!object.isLinked())
 				{

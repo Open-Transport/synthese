@@ -48,6 +48,10 @@ namespace synthese
 		const string BaseCalendarUpdateAction::PARAMETER_ADD = Action_PARAMETER_PREFIX + "bcu_add";
 		const string BaseCalendarUpdateAction::PARAMETER_ADD_LINK = Action_PARAMETER_PREFIX + "bcu_add_link";
 		const string BaseCalendarUpdateAction::PARAMETER_LINK_TO_REMOVE = Action_PARAMETER_PREFIX + "bcu_link_to_remove";
+		const string BaseCalendarUpdateAction::PARAMETER_ADD_DATE_TO_BYPASS = Action_PARAMETER_PREFIX + "_add_date_to_bypass";
+		const string BaseCalendarUpdateAction::PARAMETER_REMOVE_DATE_TO_BYPASS = Action_PARAMETER_PREFIX + "_remove_date_to_bypass";
+		const string BaseCalendarUpdateAction::PARAMETER_ADD_DATE_TO_FORCE = Action_PARAMETER_PREFIX + "_add_date_to_force";
+		const string BaseCalendarUpdateAction::PARAMETER_REMOVE_DATE_TO_FORCE = Action_PARAMETER_PREFIX + "_remove_date_to_force";
 
 		const string BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_START_DATE = "bcu_admin_start_date";
 		const string BaseCalendarUpdateAction::SESSION_VARIABLE_SERVICE_ADMIN_END_DATE = "bcu_admin_end_date";
@@ -57,9 +61,15 @@ namespace synthese
 
 
 		BaseCalendarUpdateAction::BaseCalendarUpdateAction():
+			_startDate(not_a_date_time),
+			_endDate(not_a_date_time),
 			_period(days(1)),
 			_add(true),
-			_addLink(false)
+			_addLink(false),
+			_dateToForceToAdd(not_a_date_time),
+			_dateToForceToRemove(not_a_date_time),
+			_dateToBypassToAdd(not_a_date_time),
+			_dateToBypassToRemove(not_a_date_time)
 		{}
 
 
@@ -114,6 +124,30 @@ namespace synthese
 			{
 				map.insert(PARAMETER_END_DATE, _endDate);
 			}
+
+			// Date to force to add
+			if(!_dateToForceToAdd.is_not_a_date())
+			{
+				map.insert(PARAMETER_ADD_DATE_TO_FORCE, _dateToForceToAdd);
+			}
+
+			// Date to force to remove
+			if(!_dateToForceToRemove.is_not_a_date())
+			{
+				map.insert(PARAMETER_REMOVE_DATE_TO_FORCE, _dateToForceToRemove);
+			}
+
+			// Date to force to add
+			if(!_dateToBypassToAdd.is_not_a_date())
+			{
+				map.insert(PARAMETER_ADD_DATE_TO_BYPASS, _dateToBypassToAdd);
+			}
+
+			// Date to force to remove
+			if(!_dateToBypassToRemove.is_not_a_date())
+			{
+				map.insert(PARAMETER_REMOVE_DATE_TO_BYPASS, _dateToBypassToRemove);
+			}
 		}
 
 
@@ -158,7 +192,7 @@ namespace synthese
 				}
 
 				// Period
-				_period = days(map.getDefault<size_t>(PARAMETER_PERIOD, 1));
+				_period = days(map.getDefault<long>(PARAMETER_PERIOD, 1));
 				if(_period.days() < 1)
 				{
 					throw ActionException("Period must be at least one day long");
@@ -173,6 +207,42 @@ namespace synthese
 
 			// Link to remove
 			_linkToRemove = map.getOptional<RegistryKeyType>(PARAMETER_LINK_TO_REMOVE);
+
+			// date to force to add
+			string addDateToForceStr(
+				map.getDefault<string>(PARAMETER_ADD_DATE_TO_FORCE)
+			);
+			if(!addDateToForceStr.empty())
+			{
+				_dateToForceToAdd = from_string(addDateToForceStr);
+			}
+
+			// date to force to remove
+			string removeDateToForceStr(
+				map.getDefault<string>(PARAMETER_REMOVE_DATE_TO_FORCE)
+			);
+			if(!removeDateToForceStr.empty())
+			{
+				_dateToForceToRemove = from_string(removeDateToForceStr);
+			}
+
+			// date to bypass to add
+			string addDateToBypassStr(
+				map.getDefault<string>(PARAMETER_ADD_DATE_TO_BYPASS)
+			);
+			if(!addDateToBypassStr.empty())
+			{
+				_dateToBypassToAdd = from_string(addDateToBypassStr);
+			}
+
+			// date to bypass to remove
+			string removeDateToBypassStr(
+				map.getDefault<string>(PARAMETER_REMOVE_DATE_TO_BYPASS)
+			);
+			if(!removeDateToBypassStr.empty())
+			{
+				_dateToBypassToRemove = from_string(removeDateToBypassStr);
+			}
 		}
 
 
@@ -287,6 +357,48 @@ namespace synthese
 					SESSION_VARIABLE_SERVICE_ADMIN_CALENDAR_TEMPLATE_ID2,
 					lexical_cast<string>(_calendarTemplate2->getKey())
 				);
+			}
+
+			// Dates to force to add
+			if(!_dateToForceToAdd.is_not_a_date())
+			{
+				Calendar::DatesSet dates(object.getDatesToForce());
+				dates.insert(_dateToForceToAdd);
+				object.setDatesToForce(dates);
+				object.setActive(_dateToForceToAdd);
+
+				// Add date if non linked calendar (linked calendar behavior emulation)
+				object.setActive(_dateToForceToAdd);
+			}
+
+			// Dates to force to remove
+			if(!_dateToForceToRemove.is_not_a_date())
+			{
+				Calendar::DatesSet dates(object.getDatesToForce());
+				dates.erase(_dateToForceToRemove);
+				object.setDatesToForce(dates);
+				object.setInactive(_dateToForceToRemove);
+			}
+
+			// Dates to bypass to add
+			if(!_dateToBypassToAdd.is_not_a_date())
+			{
+				// Add date to bypass
+				Calendar::DatesSet dates(object.getDatesToBypass());
+				dates.insert(_dateToBypassToAdd);
+				object.setDatesToBypass(dates);
+
+				// Remove date if non linked calendar (linked calendar behavior emulation)
+				object.setInactive(_dateToBypassToAdd);
+			}
+
+			// Dates to bypass to remove
+			if(!_dateToBypassToRemove.is_not_a_date())
+			{
+				Calendar::DatesSet dates(object.getDatesToBypass());
+				dates.erase(_dateToBypassToRemove);
+				object.setDatesToBypass(dates);
+				object.setActive(_dateToBypassToRemove);
 			}
 		}
 
