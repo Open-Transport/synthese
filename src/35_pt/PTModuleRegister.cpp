@@ -21,6 +21,7 @@
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
 #include "HastusCSVFileFormat.hpp"
+#include "RTMFileFormat.hpp"
 #include "HastusInterfaceFileFormat.hpp"
 #include "HeuresFileFormat.hpp"
 #include "IneoFileFormat.hpp"
@@ -195,6 +196,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::GTFSFileFormat::integrate();
 	synthese::pt::HafasFileFormat::integrate();
 	synthese::pt::HastusCSVFileFormat::integrate();
+	synthese::pt::RTMFileFormat::integrate();
 	synthese::pt::HastusInterfaceFileFormat::integrate();
 	synthese::pt::HeuresFileFormat::integrate();
 	synthese::pt::IneoFileFormat::integrate();
