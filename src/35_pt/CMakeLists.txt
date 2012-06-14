@@ -101,6 +101,8 @@ HafasFileFormat.cpp
 HafasFileFormat.hpp
 HastusCSVFileFormat.cpp
 HastusCSVFileFormat.hpp
+RTMFileFormat.cpp
+RTMFileFormat.hpp
 HastusInterfaceFileFormat.cpp
 HastusInterfaceFileFormat.hpp
 HeuresFileFormat.cpp
