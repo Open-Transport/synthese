@@ -60,7 +60,7 @@ namespace synthese
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
 		{
-			ParametersMap map;
+			ParametersMap map(getTemplateParameters());
 
 			// Page
 			if(_page.get())
