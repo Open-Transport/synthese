@@ -269,6 +269,8 @@ class Site(object):
         self.name = os.path.split(path)[1]
         self.base_path = ''
         self.rewrite_rules = []
+        self.root_page_id = -1
+        self.htdocs_path = None
         self.generate_apache_compat_config = False
         self.system_packages = []
 

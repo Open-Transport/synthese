@@ -94,8 +94,12 @@ Alias /synthese3 "{admin_files_path}/admin/"
         rewrite_rules = site.rewrite_rules[:]
 
         # Root page
-        rewrite_rules.insert(0,
-            ['^$', 'synthese?SERVICE=page&si={site_id}&smart_url=/'])
+        if site.root_page_id > 0:
+            rewrite_rules.insert(0,
+                ['^$', 'synthese?SERVICE=page&p={0}'.format(site.root_page_id)])
+        else:
+            rewrite_rules.insert(0,
+                ['^$', 'synthese?SERVICE=page&si={site_id}&smart_url=/'])
 
         # Fallback: call synthese with smart_url
         rewrite_rules.append(
@@ -222,6 +226,8 @@ Alias /{package_name} {package_files_path}/{package_name}
         if main_package:
             format_config['document_root'] = self._format_path(
                 main_package.files_path)
+        if site.htdocs_path:
+            format_config['document_root'] = site.htdocs_path
 
         format_config['rewrite_directives'] = self._get_rewrite_directives(site)
 
