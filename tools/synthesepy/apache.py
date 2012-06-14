@@ -255,8 +255,12 @@ Alias /{package_name} {package_files_path}/{package_name}
 
         format_config['custom_config'] = format_config.get(
             'apache_custom_config', '')
+        format_config['custom_config'] = \
+            format_config['custom_config'].format(**format_config)
         format_config['custom_root_config'] = format_config.get(
             'apache_custom_root_config', '')
+        format_config['custom_root_config'] = \
+            format_config['custom_root_config'].format(**format_config)
 
         packages = site.packages[:]
         if admin_package:
