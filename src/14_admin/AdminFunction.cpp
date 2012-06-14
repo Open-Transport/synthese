@@ -173,6 +173,11 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_MAIN_CMS_TEMPLATE));
 				if(id)
 				{
+					// Backward compatibility with old ids
+					if(*id == 177329235327713281)
+					{
+						*id = 17732923532771328;
+					}
 					_mainTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
@@ -186,6 +191,11 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_POSITION_ELEMENT_CMS_TEMPLATE));
 				if(id)
 				{
+					// Backward compatibility with old ids
+					if(*id == 177329235327713283)
+					{
+						*id = 17732923532771330;
+					}
 					_positionElementTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
@@ -199,6 +209,11 @@ namespace synthese
 				optional<RegistryKeyType> id(map.getOptional<RegistryKeyType>(PARAMETER_TREE_ELEMENT_CMS_TEMPLATE));
 				if(id)
 				{
+					// Backward compatibility with old ids
+					if(*id == 177329235327713282)
+					{
+						*id = 17732923532771329;
+					}
 					_treeNodeTemplate = Env::GetOfficialEnv().get<Webpage>(*id);
 				}
 			}
