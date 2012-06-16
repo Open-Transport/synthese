@@ -158,7 +158,7 @@ namespace synthese
 
 					// Ratio
 					stream << t.col();
-					stream << fixed << setprecision(2) << (double(100 * item.second.first) / double(numberSum)) << "%";
+					stream << fixed << setprecision(2) << (double(100 * item.second.second) / double(numberSum)) << "%";
 
 					// Memory
 					stream << t.col();
