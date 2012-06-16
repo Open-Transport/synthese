@@ -90,6 +90,7 @@ namespace synthese
 				}
 				catch(SessionException)
 				{
+					map.insert(ATTR_ID, 0);
 				}
 			}
 
