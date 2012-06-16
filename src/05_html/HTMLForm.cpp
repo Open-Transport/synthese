@@ -54,11 +54,11 @@ namespace synthese
 			return s.str();
 		}
 
+
+
 		HTMLForm::HTMLForm( const string& name, const string& action)
 			: _name(name), _action(action), _updateRight(true)
-		{
-
-		}
+		{}
 
 
 
@@ -743,17 +743,5 @@ namespace synthese
 		std::string HTMLForm::getFieldId( const std::string& name )
 		{
 			return _getFieldId(name, false);
-		}
-
-		const std::string& HTMLForm::getName() const
-		{
-			return _name;
-		}
-
-
-
-		bool HTMLForm::getUpdateRight() const
-		{
-			return _updateRight;
 		}
 }	}

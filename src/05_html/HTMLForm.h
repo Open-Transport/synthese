@@ -145,7 +145,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008
 				*/
-				const std::string& getName() const;
+				const std::string& getName() const { return _name; }
 
 
 
@@ -155,7 +155,7 @@ namespace synthese
 					@author Hugues Romain
 					@date 2008
 				*/
-				bool getUpdateRight() const;
+				bool getUpdateRight() const { return _updateRight; }
 			//@}
 
 
@@ -802,6 +802,7 @@ namespace synthese
 					s << ">" << HTMLModule::HTMLEncode(object->getName()) << "</option>";
 				}
 				s << "</select>";
+				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(value->getKey()) : std::string());
 			}
 			return s.str();
 		}
@@ -842,6 +843,7 @@ namespace synthese
 					s << ">" <<  HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
+				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(*value) : std::string());
 			}
 			return s.str();
 		}
@@ -881,6 +883,7 @@ namespace synthese
 					s << ">" << HTMLModule::HTMLEncode(boost::lexical_cast<std::string>(it->second)) << "</option>";
 				}
 				s << "</select>";
+				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(*value) : std::string());
 			}
 			return s.str();
 		}
