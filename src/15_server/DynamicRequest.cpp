@@ -50,7 +50,7 @@ namespace synthese
 		){
 			if(_action.get())
 			{
-				_action->_setFromParametersMap(_parametersMap);
+				_action->_setFromParametersMap(_allParametersMap);
 			}
 		}
 
@@ -63,20 +63,22 @@ namespace synthese
 			// Last action error
 			if(!errorMessage.empty())
 			{
-				_parametersMap.insert(Request::PARAMETER_ACTION_FAILED, true);
-				_parametersMap.insert(Request::PARAMETER_ERROR_MESSAGE, errorMessage);
+				_allParametersMap.insert(Request::PARAMETER_ACTION_FAILED, true);
+				_allParametersMap.insert(Request::PARAMETER_ERROR_MESSAGE, errorMessage);
 			}
 			if(actionCreatedId)
 			{
-				_parametersMap.insert(Request::PARAMETER_OBJECT_ID, *actionCreatedId);
+				_allParametersMap.insert(Request::PARAMETER_OBJECT_ID, *actionCreatedId);
+				_getPostParametersMap.insert(Request::PARAMETER_OBJECT_ID, *actionCreatedId);
 			}
-			_parametersMap.remove(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT);
+			_allParametersMap.remove(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT);
+			_getPostParametersMap.remove(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT);
 
 			// Function parameters
 			if(_function.get())
 			{
 				ParametersMap templateParametersMap;
-				BOOST_FOREACH(const ParametersMap::Map::value_type& it, _parametersMap.getMap())
+				BOOST_FOREACH(const ParametersMap::Map::value_type& it, _getPostParametersMap.getMap())
 				{
 					if(	it.first != Request::PARAMETER_FUNCTION &&
 						it.first != Request::PARAMETER_SERVICE &&
@@ -87,7 +89,7 @@ namespace synthese
 					}
 				}
 				_function->setTemplateParameters(templateParametersMap);
-				_function->_setFromParametersMap(_parametersMap);
+				_function->_setFromParametersMap(_allParametersMap);
 			}
 		}
 
@@ -95,7 +97,7 @@ namespace synthese
 
 		void DynamicRequest::_setupSession()
 		{
-			string sid(_parametersMap.getDefault<string>(Request::PARAMETER_SESSION));
+			string sid(_allParametersMap.getDefault<string>(Request::PARAMETER_SESSION));
 			if(sid.empty())
 			{
 				_session = NULL;
@@ -168,14 +170,15 @@ namespace synthese
 			}
 
 			// Parameters
-			_parametersMap = ParametersMap(httpRequest.postData);
+			_getPostParametersMap = ParametersMap(httpRequest.postData);
 			if(separator+1 < uri.length())
 			{
 				ParametersMap getMap(uri.substr(separator+1));
-				_parametersMap.merge(getMap);
+				_getPostParametersMap.merge(getMap);
 			}
 
 			// Cookies
+			_allParametersMap = _getPostParametersMap;
 			it = httpRequest.headers.find("Cookie");
 			if(it != httpRequest.headers.end())
 			{
@@ -189,23 +192,23 @@ namespace synthese
 					boost::algorithm::split(nameValue, trimmedCookie, is_any_of("="));
 
 					// Don't override existing parameters (GET and POST have precedence).
-					if (nameValue.size() != 2 || _parametersMap.isDefined(nameValue[0]))
+					if (nameValue.size() != 2 || _allParametersMap.isDefined(nameValue[0]))
 						continue;
 
 					// TODO: proper unescaping of cookie values
-					_parametersMap.insert(nameValue[0], nameValue[1]);
+					_allParametersMap.insert(nameValue[0], nameValue[1]);
 				}
 			}
 
 			// Action will create object
-			if(_parametersMap.getDefault<bool>(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, false))
+			if(_getPostParametersMap.getDefault<bool>(Request::PARAMETER_ACTION_WILL_CREATE_OBJECT, false))
 			{
 				_actionWillCreateObject = true;
 			}
 
-			if(_parametersMap.getOptional<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION))
+			if(_getPostParametersMap.getOptional<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION))
 			{
-				_redirectAfterAction = !_parametersMap.get<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION);
+				_redirectAfterAction = !_allParametersMap.get<bool>(Request::PARAMETER_NO_REDIRECT_AFTER_ACTION);
 			}
 
 			// Session
@@ -230,7 +233,7 @@ namespace synthese
 			}
 
 			// Action name
-			std::string actionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_ACTION));
+			std::string actionName(_getPostParametersMap.getDefault<std::string>(Request::PARAMETER_ACTION));
 			if (!actionName.empty())
 			{
 				if (!util::Factory<Action>::contains(actionName))
@@ -241,10 +244,12 @@ namespace synthese
 			}
 
 			// Function name
-			std::string functionName(_parametersMap.getDefault<std::string>(Request::PARAMETER_SERVICE));
+			std::string functionName(_getPostParametersMap.getDefault<std::string>(Request::PARAMETER_SERVICE));
 			if(functionName.empty())
 			{
-				functionName = _parametersMap.getDefault<std::string>(Request::PARAMETER_FUNCTION);
+				functionName = _getPostParametersMap.getDefault<std::string>(Request::PARAMETER_FUNCTION);
+				_getPostParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
+				_allParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
 			}
 			if(!functionName.empty())
 			{
@@ -260,7 +265,6 @@ namespace synthese
 
 		ParametersMap DynamicRequest::getParametersMap() const
 		{
-			return _parametersMap;
+			return _allParametersMap;
 		}
-	}
-}
+}	}
