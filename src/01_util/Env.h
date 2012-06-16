@@ -106,7 +106,7 @@ namespace synthese
 
 				virtual size_t getObjectSize() const
 				{
-					return sizeof(R::Registry::ObjectsClass);
+					return sizeof(typename R::Registry::ObjectsClass);
 				}
 
 			public:
