@@ -166,7 +166,7 @@ namespace synthese
 			object->setSeatNumber(rows->getText(ReservationTableSync::COL_SEAT_NUMBER));
 			object->setCancelledByOperator(rows->getBool(ReservationTableSync::COL_CANCELLED_BY_OPERATOR));
 
-			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL)
+			if(linkLevel == UP_LINKS_LOAD_LEVEL || linkLevel == UP_DOWN_LINKS_LOAD_LEVEL || linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 			{
 				// Vehicle
 				object->setVehicle(NULL);
@@ -375,6 +375,95 @@ namespace synthese
 			const server::Session* session,
 			util::RegistryKeyType id
 		){
+		}
+
+
+
+		template<>
+		const bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::NEEDS_AUTO_RELOAD = true;
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::IsLoaded(
+			const DBResultSPtr& row
+		){
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Loading the reservations in a temporary environment
+			Env env;
+			ReservationTableSync::SearchResult resas(
+				ReservationTableSync::Search(
+					env,
+					row->get<RegistryKeyType>(ReservationTableSync::COL_TRANSACTION_ID)
+			)	);
+
+			// Checking if all reservations are too old to be cached
+			if((*resas.rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
+			{
+				return false;
+			}
+
+			// Checking if all reservations are too late to be cached
+			return (*resas.begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+		}
+
+
+
+		template<>
+		bool DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::IsLoaded(
+			const Reservation& reservation
+		){
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Checking if all reservations are too old to be cached
+			if((*reservation.getTransaction()->getReservations().rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
+			{
+				return false;
+			}
+
+			// Checking if all reservations are too late to be cached
+			return (*reservation.getTransaction()->getReservations().begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+		}
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Generates the SQL expression filtering the record to load.
+		template<>
+		shared_ptr<SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTableSync, Reservation>::GetWhereLoaded()
+		{
+
+			// Getting current time
+			ptime now(second_clock::local_time());
+
+			// Bounds
+			ptime minBound(now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION);
+			ptime maxBound(now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+
+			// The expression
+			return
+				ComposedExpression::Get(
+					ComposedExpression::Get(
+						FieldExpression::Get(
+							ReservationTableSync::TABLE.NAME,
+							ReservationTableSync::COL_DEPARTURE_TIME
+						),
+						ComposedExpression::OP_SUPEQ,
+						ValueExpression<ptime>::Get(minBound)
+					),
+					ComposedExpression::OP_AND,
+					ComposedExpression::Get(
+						FieldExpression::Get(
+							ReservationTableSync::TABLE.NAME,
+							ReservationTableSync::COL_DEPARTURE_TIME
+						),
+						ComposedExpression::OP_INFEQ,
+						ValueExpression<ptime>::Get(maxBound)
+				)	)
+			;
 		}
 	}
 

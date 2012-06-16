@@ -100,14 +100,7 @@ namespace synthese
 		{
 			if(	_transaction)
 			{
-				if(transaction != transaction)
-				{
-					_transaction->removeReservation(*this);
-				}
-				else
-				{
-					return;
-				}
+				_transaction->removeReservation(*this);
 			}
 			_transaction = transaction;
 			if(transaction)

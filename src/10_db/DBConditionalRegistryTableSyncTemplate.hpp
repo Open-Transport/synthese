@@ -126,8 +126,9 @@ namespace synthese
 						if (registry.contains(rows->getLongLong (TABLE_COL_ID)))
 						{
 							boost::shared_ptr<T> object(registry.getEditable(key));
+							bool isLoaded(IsLoaded(rows));
 							DBDirectTableSyncTemplate<K,T>::Unlink(object.get());
-							if(IsLoaded(rows))
+							if(isLoaded)
 							{
 								Load(object.get(), rows, env, util::ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 							}

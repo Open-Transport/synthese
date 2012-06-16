@@ -208,7 +208,7 @@ namespace synthese
 
 
 		template<>
-		const bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::NEEDS_AUTO_RELOAD = true;
+		const bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::NEEDS_AUTO_RELOAD = false;
 
 
 
@@ -250,22 +250,7 @@ namespace synthese
 			const ReservationTransaction& transaction
 		){
 			// Empty transaction is not loaded
-			if(transaction.getReservations().empty())
-			{
-				return false;
-			}
-
-			// Getting current time
-			ptime now(second_clock::local_time());
-
-			// Checking if all reservations are too old to be cached
-			if((*transaction.getReservations().rbegin())->getArrivalTime() < (now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION))
-			{
-				return false;
-			}
-
-			// Checking if all reservations are too late to be cached
-			return (*transaction.getReservations().begin())->getDepartureTime() < (now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
+			return !transaction.getReservations().empty();
 		}
 
 
@@ -275,76 +260,8 @@ namespace synthese
 		template<>
 		shared_ptr<SQLExpression> DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::GetWhereLoaded()
 		{
-			// Getting current time
-			ptime now(second_clock::local_time());
-
-			// Bounds
-			ptime minBound(now - ReservationTransactionTableSync::BEFORE_RESERVATION_INDEXATION_DURATION);
-			ptime maxBound(now + ReservationTransactionTableSync::AFTER_RESERVATION_INDEXATION_DURATION);
-
-			// Min bound subquery
-			SelectQuery<ReservationTableSync> minBoundSubQuery;
-			minBoundSubQuery.addField(
-				SQLSingleOperatorExpression::Get(
-					SQLSingleOperatorExpression::OP_MAX,
-					FieldExpression::Get(
-						ReservationTableSync::TABLE.NAME,
-						ReservationTableSync::COL_ARRIVAL_TIME
-			)	)	);
-			minBoundSubQuery.addWhere(
-				ComposedExpression::Get(
-					FieldExpression::Get(
-						ReservationTableSync::TABLE.NAME,
-						ReservationTableSync::COL_TRANSACTION_ID
-					),
-					ComposedExpression::OP_EQ,
-					FieldExpression::Get(
-						ReservationTransactionTableSync::TABLE.NAME,
-						TABLE_COL_ID
-					)
-			)	);
-
-			// Max bound subquery
-			SelectQuery<ReservationTableSync> maxBoundSubQuery;
-			maxBoundSubQuery.addField(
-				SQLSingleOperatorExpression::Get(
-					SQLSingleOperatorExpression::OP_MIN,
-					FieldExpression::Get(
-						ReservationTableSync::TABLE.NAME,
-						ReservationTableSync::COL_TRANSACTION_ID
-			)	)	);
-			maxBoundSubQuery.addWhere(
-				ComposedExpression::Get(
-					FieldExpression::Get(
-						ReservationTableSync::TABLE.NAME,
-						ReservationTableSync::COL_TRANSACTION_ID
-					),
-					ComposedExpression::OP_EQ,
-					FieldExpression::Get(
-						ReservationTransactionTableSync::TABLE.NAME,
-						TABLE_COL_ID
-					)
-			)	);
-
-			// The expression
-			return
-				ComposedExpression::Get(
-					ComposedExpression::Get(
-						SubQueryExpression::Get(
-							minBoundSubQuery.toString()
-						),
-						ComposedExpression::OP_SUPEQ,
-						ValueExpression<ptime>::Get(minBound)
-					),
-					ComposedExpression::OP_EQ,
-					ComposedExpression::Get(
-						SubQueryExpression::Get(
-							maxBoundSubQuery.toString()
-						),
-						ComposedExpression::OP_INFEQ,
-						ValueExpression<ptime>::Get(maxBound)
-				)	)
-			;
+			// No massive load (reservation transactions are loaded on demand by their reservations)
+			return ValueExpression<int>::Get(0);
 		}
 	}
 
