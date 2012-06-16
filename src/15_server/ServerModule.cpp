@@ -544,7 +544,7 @@ namespace synthese
 					make_pair(
 						"Set-Cookie",
 						cookie.first + "=" + cookie.second.first +
-						"; Max-Age=" + lexical_cast<string>(cookie.second.second) + ";"
+						"; Max-Age=" + lexical_cast<string>(cookie.second.second) + "; Path=/; "
 					)
 				);
 			}
