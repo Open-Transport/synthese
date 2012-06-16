@@ -802,7 +802,7 @@ namespace synthese
 					s << ">" << HTMLModule::HTMLEncode(object->getName()) << "</option>";
 				}
 				s << "</select>";
-				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>(value->getKey()) : std::string());
+				removeHiddenFieldIfExists(name, value ? boost::lexical_cast<std::string>((*value)->getKey()) : std::string());
 			}
 			return s.str();
 		}
