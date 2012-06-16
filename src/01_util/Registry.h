@@ -140,7 +140,7 @@ namespace synthese
 
 
 
-				size_t size () const { return _registry.size(); }
+				virtual size_t size() const { return _registry.size(); }
 				bool empty() const { return _registry.empty(); }
 				iterator begin() { return _registry.begin(); }
 				const_iterator begin() const { return _registry.begin(); }

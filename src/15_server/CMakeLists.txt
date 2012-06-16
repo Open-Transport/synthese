@@ -34,6 +34,8 @@ LoginInterfacePage.cpp
 LoginInterfacePage.h
 LogoutAction.cpp
 LogoutAction.h
+MemoryStatisticsAdmin.cpp
+MemoryStatisticsAdmin.hpp
 ModuleClass.cpp
 ModuleClass.h
 ModuleClassTemplate.hpp
