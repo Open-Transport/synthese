@@ -55,7 +55,8 @@ namespace synthese
 
 
 		private:
-			util::ParametersMap _parametersMap;
+			util::ParametersMap _allParametersMap;
+			util::ParametersMap _getPostParametersMap;
 
 		public:
 			DynamicRequest(
