@@ -46,7 +46,7 @@ namespace synthese
 	{
 		const string SessionService::TAG_SESSION = "session";
 		const string SessionService::TAG_USER = "user";
-		const string SessionService::ATTR_ID = "id";
+		const string SessionService::ATTR_ID = "session_id";
 		
 
 
