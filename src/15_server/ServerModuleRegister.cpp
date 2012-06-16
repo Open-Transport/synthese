@@ -17,6 +17,7 @@
 
 #include "ServerAdminRight.h"
 
+#include "MemoryStatisticsAdmin.hpp"
 #include "ThreadsAdmin.h"
 
 #include "DbModuleConfigTableSync.h"
@@ -50,6 +51,7 @@ void synthese::server::moduleRegister()
 
 	synthese::server::ServerAdminRight::integrate();
 
+	synthese::server::MemoryStatisticsAdmin::integrate();
 	synthese::server::ThreadsAdmin::integrate();
 
 	synthese::server::SessionService::integrate();

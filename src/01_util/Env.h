@@ -76,7 +76,8 @@ namespace synthese
 			class RegistryCreatorInterface
 			{
 			private:
-				virtual boost::shared_ptr<RegistryBase> create() = 0;
+				virtual boost::shared_ptr<RegistryBase> create() const = 0;
+				virtual size_t getObjectSize() const = 0;
 				friend class Env;
 
 			public:
@@ -91,15 +92,21 @@ namespace synthese
 			///	@ingroup m01Registry
 			//////////////////////////////////////////////////////////////////////////
 			template<class R>
-			class RegistryCreator : public RegistryCreatorInterface
+			class RegistryCreator:
+				public RegistryCreatorInterface
 			{
 			private:
 
 				friend class Env;
 
-				boost::shared_ptr<RegistryBase> create ()
+				virtual boost::shared_ptr<RegistryBase> create() const
 				{
 					return boost::shared_ptr<RegistryBase>(new typename R::Registry);
+				}
+
+				virtual size_t getObjectSize() const
+				{
+					return sizeof(R::Registry::ObjectsClass);
 				}
 
 			public:
@@ -113,6 +120,31 @@ namespace synthese
 
 		public:
 			const RegistryMap& getMap() const { return _map; }
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Returns the size of the objects stored in a given registry.
+			/// The template version is not implemented because it is simpler to use
+			/// directly sizeof(T)
+			//////////////////////////////////////////////////////////////////////////
+			/// @param registryKey the key of the registry
+			/// @return the size of the objects stored in the specified registry
+			/// @author Hugues Romain
+			/// @version 3.4.1
+			/// @date 2012
+			static size_t GetObjectSize(
+				const std::string& registryKey
+			){
+				RegistryCreatorMap::const_iterator itc(_registryCreators.find(registryKey));
+				if (itc == _registryCreators.end())
+				{
+					throw util::EnvException(registryKey);
+				}
+
+				return itc->second->getObjectSize();
+			}
+
 
 
 			//////////////////////////////////////////////////////////////////////////

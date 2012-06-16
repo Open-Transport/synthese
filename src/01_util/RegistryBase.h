@@ -48,6 +48,7 @@ namespace synthese
 			virtual RegistrablesVector getRegistrablesVector() const = 0;
 
 			virtual void remove(util::RegistryKeyType id) = 0;
+			virtual size_t size() const = 0;
 		};
 	}
 }
