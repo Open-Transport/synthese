@@ -55,7 +55,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
-
+using namespace boost::logic;
 
 namespace synthese
 {
@@ -391,7 +391,7 @@ namespace synthese
 						_line->getKey(),
 						_date,
 						_serviceNumber,
-						logic::tribool(false)
+						tribool(indeterminate)
 				)	);
 
 				// Sort reservations
