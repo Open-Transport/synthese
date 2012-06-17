@@ -89,6 +89,8 @@ namespace synthese
 			static const std::string DATA_ACKNOWLEDGE_USER;
 			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_TIME;
 			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_USER;
+			static const std::string DATA_STATUS;
+			static const std::string DATA_FULL_TEXT;
 
 			/// Chosen registry class.
 			typedef util::Registry<Reservation>	Registry;
