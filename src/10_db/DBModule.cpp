@@ -310,13 +310,15 @@ namespace synthese
 				{
 					// Cleaning up the env with obsolete data
 					RegistryBase& registry(sync->getEditableRegistry(Env::GetOfficialEnv()));
+					RowIdList objectsToRemove;
 					BOOST_FOREACH(const RegistryBase::RegistrablesVector::value_type& it, registry.getRegistrablesVector())
 					{
 						if(!sync->isLoaded(*it))
 						{
-							registry.remove(it->getKey());
+							objectsToRemove.push_back(it->getKey());
 						}
 					}
+					sync->removeObjects(objectsToRemove);
 
 					// Load new data
 					sync->loadCurrentData();
