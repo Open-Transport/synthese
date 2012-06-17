@@ -207,8 +207,9 @@ namespace synthese
 		}
 
 
+
 		template<>
-		const bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::NEEDS_AUTO_RELOAD = false;
+		const bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::NEEDS_AUTO_RELOAD = true;
 
 
 
@@ -249,7 +250,7 @@ namespace synthese
 		bool DBConditionalRegistryTableSyncTemplate<ReservationTransactionTableSync, ReservationTransaction>::IsLoaded(
 			const ReservationTransaction& transaction
 		){
-			// Empty transaction is not loaded
+			// Non empty transactions are kept
 			return !transaction.getReservations().empty();
 		}
 

@@ -23,6 +23,8 @@
 #ifndef SYNTHESE_db_DBConditionalRegistryTableSync_hpp__
 #define SYNTHESE_db_DBConditionalRegistryTableSync_hpp__
 
+#include "DBTableSync.hpp"
+
 namespace synthese
 {
 	namespace util
@@ -43,7 +45,7 @@ namespace synthese
 			virtual bool isLoaded(const util::Registrable& object) const = 0;
 			virtual void loadCurrentData() const = 0;
 
-
+			virtual void removeObjects(const RowIdList& rowIds) const = 0;
 
 			virtual util::RegistryBase& getEditableRegistry(
 				util::Env& env

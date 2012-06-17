@@ -266,12 +266,24 @@ namespace synthese
 
 
 
+			virtual void removeObjects(const RowIdList& rowIds) const
+			{
+				// The db
+				DB* db(
+					DBModule::GetDB()
+				);
+
+				// Loads the object
+				K().rowsRemoved(db, rowIds);
+			}
+
+
+
 			virtual void loadCurrentData() const
 			{
 				LoadCurrentData();
 			}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_DBRegistryTableSyncTemplate_hpp__
