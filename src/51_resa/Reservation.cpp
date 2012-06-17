@@ -68,6 +68,8 @@ namespace synthese
 		const string Reservation::DATA_ACKNOWLEDGE_USER = "acknowledge_user";
 		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_TIME = "cancellation_acknowledge_time";
 		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_USER = "cancellation_acknowledge_user";
+		const string Reservation::DATA_STATUS = "status";
+		const string Reservation::DATA_FULL_TEXT = "full_text";
 
 
 
@@ -191,9 +193,24 @@ namespace synthese
 				}
 				break;
 
-			case CANCELLED: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
-			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(getTransaction()->getCancellationTime());
-			case NO_SHOW: return statusText + " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
+			case CANCELLED:
+			case CANCELLED_AFTER_DELAY:
+				statusText += " le " + to_simple_string(getTransaction()->getCancellationTime());
+				break;
+
+			case ACKNOWLEDGED_CANCELLED:
+			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY:
+				statusText += " le " + to_simple_string(getTransaction()->getCancellationTime()) + " confirmé le "
+					+ to_simple_string(_cancellationAcknowledgeTime);
+				if(_cancellationAcknowledgeUser)
+				{
+					statusText += " par " + _cancellationAcknowledgeUser->getFullName();
+				}
+				break;
+
+			case NO_SHOW:
+				statusText += " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
+				break;
 			}
 
 			return statusText;
@@ -269,6 +286,13 @@ namespace synthese
 				pm.insert(DATA_VEHICLE_ID, getVehicle()->getKey());
 			}
 			pm.insert(DATA_SEAT, getSeatNumber());
+
+			// Status
+			shared_ptr<ParametersMap> statusPM(new ParametersMap);
+			statusPM->insert(DATA_STATUS, static_cast<int>(getStatus()));
+			statusPM->insert(DATA_NAME, ResaModule::GetStatusText(getStatus()));
+			statusPM->insert(DATA_FULL_TEXT, getFullStatusText());
+			pm.insert(DATA_STATUS, statusPM);
 
 			// Language
 			const User* user(getTransaction()->getCustomer());
