@@ -297,14 +297,14 @@ namespace synthese
 
 		template<> void DBDirectTableSyncTemplate<ReservationTableSync,Reservation>::Unlink(Reservation* object)
 		{
+			// Indexation (at first to avoid use of incomplete reservations in other threads)
+			ResaModule::RemoveReservationByService(*object);
+
 			// Clean up transaction
 			if(object->getTransaction())
 			{
 				const_cast<ReservationTransaction*>(object->getTransaction())->removeReservation(*object);
 			}
-
-			// Indexation
-			ResaModule::RemoveReservationByService(*object);
 		}
 
 

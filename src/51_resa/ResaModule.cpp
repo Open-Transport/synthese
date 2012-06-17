@@ -262,10 +262,14 @@ namespace synthese
 			case ACKNOWLEDGED_OPTION: return "stop_blue.png";
 			case TO_BE_DONE: return "stop_green.png";
 			case ACKNOWLEDGED: return "stop_green.png";
+			case CANCELLATION_TO_ACK: return "cross.png";
 			case CANCELLED: return "cross.png";
 			case CANCELLED_AFTER_DELAY: return "asterisk_red.png";
+			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY: return "asterisk_red.png";
+			case SHOULD_BE_AT_WORK: return "car.png";
 			case AT_WORK: return "car.png";
 			case NO_SHOW: return "user_cross.png";
+			case SHOULD_BE_DONE: return "tick.png";
 			case DONE: return "tick.png";
 			}
 			return string();
@@ -281,10 +285,14 @@ namespace synthese
 			case ACKNOWLEDGED_OPTION: return "option confirmée";
 			case TO_BE_DONE: return "en attente";
 			case ACKNOWLEDGED: return "confirmé";
+			case CANCELLATION_TO_ACK: return "annulation à confirmer";
 			case CANCELLED: return "annulé";
 			case CANCELLED_AFTER_DELAY: return "annulé hors délai";
+			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY: return "annullation hors délai confirmée";
+			case SHOULD_BE_AT_WORK: return "prévu en cours";
 			case AT_WORK: return "en cours";
 			case NO_SHOW: return "absence";
+			case SHOULD_BE_DONE: return "prévu terminé";
 			case DONE: return "terminé";
 			}
 			return string();
