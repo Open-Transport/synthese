@@ -608,14 +608,16 @@ namespace synthese
 									switch(status)
 									{
 									case OPTION:
+									case ACKNOWLEDGED_OPTION:
 										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler", "Etes-vous sûr de vouloir annuler la réservation ?", ResaModule::GetStatusIcon(CANCELLED));
 										break;
 
 									case TO_BE_DONE:
+									case ACKNOWLEDGED:
 										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Annuler hors délai", "Etes-vous sûr de vouloir annuler la réservation (hors délai) ?", ResaModule::GetStatusIcon(CANCELLED_AFTER_DELAY));
 										break;
 
-									case AT_WORK:
+									case SHOULD_BE_AT_WORK:
 										stream << HTMLModule::getLinkButton(cancelRequest.getURL(), "Noter absence", "Etes-vous sûr de noter l'absence du client à l'arrêt ?", ResaModule::GetStatusIcon(NO_SHOW));
 										break;
 									}
