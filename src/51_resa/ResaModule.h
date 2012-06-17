@@ -195,7 +195,23 @@ namespace synthese
 		public:
 			static void AddReservationByService(const Reservation& reservation);
 			static void RemoveReservationByService(const Reservation& reservation);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the reservation on a service, present in the main environment.
+			/// @param service the service
+			/// @return the reservations
+			/// @warning The reservations can be deleted from the environment at any time :
+			/// lock the corresponding mutex to avoid crash as long as the obtained reservation are
+			/// used. Use GetReservationsByServiceMutex to get the corresponding mutex.
 			static const ReservationsByService::mapped_type& GetReservationsByService(const graph::Service& service);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the mutex that protects the reservations by service cache.
+			/// @return the mutex that protects the reservations by service cache.
 			static boost::recursive_mutex& GetReservationsByServiceMutex() { return _reservationsByServiceMutex; }
 
 

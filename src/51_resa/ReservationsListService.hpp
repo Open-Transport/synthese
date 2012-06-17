@@ -28,7 +28,9 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include "CommercialLine.h"
 #include "Language.hpp"
+#include "ServiceReservations.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
 
@@ -129,11 +131,12 @@ namespace synthese
 			);
 
 
-			void _displayReservation(
-				std::ostream& stream,
-				const server::Request& request,
-				const Reservation& reservation,
-				std::size_t rank
+			typedef std::map<std::string, ServiceReservations> ReservationsByServiceNumber;
+
+			void _fiterAndDisplayReservations(
+				util::ParametersMap& pm,
+				const pt::CommercialLine::ServicesVector& services,
+				const ReservationsByServiceNumber& reservations
 			) const;
 
 

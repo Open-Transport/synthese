@@ -54,15 +54,9 @@ namespace synthese
 			, _customerUserId(0),
 			_customer(NULL),
 			_lastReservation(0)
-		{
-		}
+		{}
 
 
-
-		void ReservationTransaction::setSeats( int seats )
-		{
-			_seats = seats;
-		}
 
 		void ReservationTransaction::setBookingTime( const ptime& time )
 		{
@@ -85,10 +79,7 @@ namespace synthese
 			_customerPhone = phone;
 		}
 
-		int ReservationTransaction::getSeats() const
-		{
-			return _seats;
-		}
+
 
 		const ptime& ReservationTransaction::getBookingTime() const
 		{
@@ -139,10 +130,14 @@ namespace synthese
 				ReservationStatus rs((*it)->getStatus());
 
 				if (rs == NO_SHOW)
+				{
 					return NO_SHOW;
+				}
 
 				if (rs < status)
+				{
 					status = rs;
+				}
 			}
 			return status;
 		}
@@ -156,10 +151,20 @@ namespace synthese
 
 			switch(status)
 			{
-			case OPTION: return statusText + " pouvant être annulée avant le " + to_simple_string(getReservationDeadLine());
-			case CANCELLED: return statusText + " le " + to_simple_string(_cancellationTime);
-			case CANCELLED_AFTER_DELAY: return statusText + " le " + to_simple_string(_cancellationTime);
-			case NO_SHOW: return statusText + " constatée le " + to_simple_string(_cancellationTime);
+			case OPTION:
+			case ACKNOWLEDGED_OPTION:
+				return statusText + " pouvant être annulée avant le " + to_simple_string(getReservationDeadLine());
+			
+			case CANCELLED:
+			case CANCELLATION_TO_ACK:
+				return statusText + " le " + to_simple_string(_cancellationTime);
+
+			case CANCELLED_AFTER_DELAY:
+			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY:
+				return statusText + " le " + to_simple_string(_cancellationTime);
+
+			case NO_SHOW:
+				return statusText + " constatée le " + to_simple_string(_cancellationTime);
 			}
 
 			return statusText;

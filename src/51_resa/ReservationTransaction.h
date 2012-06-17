@@ -67,7 +67,7 @@ namespace synthese
 			//@{
 				Reservations		_reservations;
 				util::RegistryKeyType		_lastReservation;		//!< Code de la réservation annulée en cas de modification
-				int					_seats;			//!< Nombre de places
+				size_t					_seats;			//!< Nombre de places
 				boost::posix_time::ptime		_bookingTime;		//!< Date de la réservation
 				boost::posix_time::ptime	_cancellationTime;		//!< Date de l'annulation (unknown = not cancelled)
 				std::string _comment;
@@ -99,7 +99,7 @@ namespace synthese
 			ReservationTransaction(util::RegistryKeyType key = 0);
 
 			void setLastReservation	(util::RegistryKeyType id) { _lastReservation = id; }
-			void setSeats			(int seats);
+			void setSeats			(size_t value){ _seats = value; }
 			void setBookingTime		(const boost::posix_time::ptime& time);
 			void setCancellationTime(const boost::posix_time::ptime& time);
 			void setCustomerUserId	(util::RegistryKeyType id){ _customerUserId = id; }
@@ -112,7 +112,7 @@ namespace synthese
 			void setComment(const std::string& value){ _comment = value; }
 
 			util::RegistryKeyType					getLastReservation()	const { return _lastReservation; }
-			int						getSeats()				const;
+			size_t						getSeats()				const { return _seats; }
 			const boost::posix_time::ptime&	getBookingTime()		const;
 			const boost::posix_time::ptime&	getCancellationTime()	const;
 			util::RegistryKeyType	getCustomerUserId()		const { return _customerUserId; }

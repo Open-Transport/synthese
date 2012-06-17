@@ -25,7 +25,6 @@
 #include "ReservationsListService.hpp"
 
 #include "AdvancedSelectTableSync.h"
-#include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
 #include "FreeDRTAreaTableSync.hpp"
 #include "FreeDRTTimeSlotTableSync.hpp"
@@ -44,7 +43,6 @@
 #include "ReservationTransactionTableSync.h"
 #include "ScheduledService.h"
 #include "ScheduledServiceTableSync.h"
-#include "ServiceReservations.h"
 #include "StopPoint.hpp"
 #include "UserTableSync.h"
 #include "Webpage.h"
@@ -354,12 +352,19 @@ namespace synthese
 				_line->getServices()
 			);
 
+			// Result parameters map allocation
+			ParametersMap pm;
+
 			// Reservations list
 			map<string, ServiceReservations> reservations;
+		
+			// Getting the reservations
 			if(_useCache)
 			{
-				// Lock the cached reservations list
-				recursive_mutex::scoped_lock lock(ResaModule::GetReservationsByServiceMutex());
+				// Lock the cache mutex
+				recursive_mutex::scoped_lock lock(
+					ResaModule::GetReservationsByServiceMutex()
+				);
 
 				// Loop on services
 				BOOST_FOREACH(const Service* service, services)
@@ -373,6 +378,9 @@ namespace synthese
 						reservations[service->getServiceNumber()].addReservation(resa);
 					}
 				}
+
+				// Gets the result
+				_fiterAndDisplayReservations(pm, services, reservations);
 			}
 			else
 			{
@@ -391,23 +399,109 @@ namespace synthese
 				{
 					reservations[resa->getServiceCode()].addReservation(resa.get());
 				}
+
+
+				// Gets the result
+				_fiterAndDisplayReservations(pm, services, reservations);
 			}
 
+			// Output
+			if(_reservationPage.get())
+			{
+				size_t rank(0);
+				BOOST_FOREACH(shared_ptr<ParametersMap> resaPM, pm.getSubMaps(DATA_RESERVATION))
+				{
+					resaPM->merge(getTemplateParameters());
+					resaPM->insert(DATA_RANK, rank++);
+					_reservationPage->display(stream, request, *resaPM);
+				}
+			}
+			else if(_outputFormat == MimeTypes::XML)
+			{
+				pm.outputXML(
+					stream,
+					DATA_RESERVATIONS,
+					true,
+					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/51_resa/ReservationsListService.xsd"
+				);
+			}
+			else if(_outputFormat == MimeTypes::JSON)
+			{
+				pm.outputJSON(stream, DATA_RESERVATIONS);
+			}
+			else if(_outputFormat == MimeTypes::CSV)
+			{
+				pm.outputCSV(stream, DATA_RESERVATIONS);
+			}
+
+			return pm;
+		}
+
+
+
+		bool ReservationsListService::isAuthorized(
+			const Session* session
+		) const {
+			return true;
+		}
+
+
+
+		std::string ReservationsListService::getOutputMimeType() const
+		{
+			return _reservationPage.get() ? _reservationPage->getMimeType() : _outputFormat;
+		}
+
+
+
+		ReservationsListService::ReservationsListService():
+			FactorableTemplate<server::Function,ReservationsListService>(),
+			_linkedWithVehicleOnly(false),
+			_useCache(false),
+			_withCancellations(false),
+			_withNotAcknowledgedCancellations(false),
+			_onlyNotAcknowledgedReservations(false)
+		{
+			if(!_useCache)
+			{
+				setEnv(shared_ptr<Env>(new Env));
+			}
+		}
+
+
+
+		void ReservationsListService::_fiterAndDisplayReservations(
+			ParametersMap& pm,
+			const CommercialLine::ServicesVector& services,
+			const ReservationsByServiceNumber& reservations
+		) const	{
+
 			// Display of services
-			ParametersMap pm;
-			int seatsNumber(0);
+			size_t seatsNumber(0);
 			set<string> serviceNumbers;
 			BOOST_FOREACH(const Service* service, services)
 			{
 				serviceNumbers.insert(service->getServiceNumber());
 			}
+
+			// Loop on service numbers
 			BOOST_FOREACH(const string& serviceNumber, serviceNumbers)
 			{
-				const ServiceReservations::ReservationsList& serviceReservations (reservations[serviceNumber].getReservations());
-				int serviceSeatsNumber(reservations[serviceNumber].getSeatsNumber());
+				// Gets reservation by the service number
+				ReservationsByServiceNumber::const_iterator itServiceReservations(
+					reservations.find(serviceNumber)
+				);
+				if(itServiceReservations == reservations.end())
+				{
+					continue;
+				}
+
+				// Counts used seats
+				size_t serviceSeatsNumber(itServiceReservations->second.getSeatsNumber());
 				seatsNumber += serviceSeatsNumber;
 
-				BOOST_FOREACH(const Reservation* reservation, serviceReservations)
+				// Loop on reservations
+				BOOST_FOREACH(const Reservation* reservation, itServiceReservations->second.getReservations())
 				{
 					// Departure rank check
 					if(	(_minDepartureRank || _maxDepartureRank) &&
@@ -493,68 +587,6 @@ namespace synthese
 					reservation->toParametersMap(*resaPM, _language);
 					pm.insert(DATA_RESERVATION, resaPM);
 				}
-			} // End services loop
-
-			// Output
-			if(_reservationPage.get())
-			{
-				size_t rank(0);
-				BOOST_FOREACH(shared_ptr<ParametersMap> resaPM, pm.getSubMaps(DATA_RESERVATION))
-				{
-					resaPM->merge(getTemplateParameters());
-					resaPM->insert(DATA_RANK, rank++);
-					_reservationPage->display(stream, request, *resaPM);
-				}
-			}
-			else if(_outputFormat == MimeTypes::XML)
-			{
-				pm.outputXML(
-					stream,
-					DATA_RESERVATIONS,
-					true,
-					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/51_resa/ReservationsListService.xsd"
-				);
-			}
-			else if(_outputFormat == MimeTypes::JSON)
-			{
-				pm.outputJSON(stream, DATA_RESERVATIONS);
-			}
-			else if(_outputFormat == MimeTypes::CSV)
-			{
-				pm.outputCSV(stream, DATA_RESERVATIONS);
-			}
-
-			return pm;
-		}
-
-
-
-		bool ReservationsListService::isAuthorized(
-			const Session* session
-		) const {
-			return true;
-		}
-
-
-
-		std::string ReservationsListService::getOutputMimeType() const
-		{
-			return _reservationPage.get() ? _reservationPage->getMimeType() : _outputFormat;
-		}
-
-
-
-		ReservationsListService::ReservationsListService():
-			FactorableTemplate<server::Function,ReservationsListService>(),
-			_linkedWithVehicleOnly(false),
-			_useCache(false),
-			_withCancellations(false),
-			_withNotAcknowledgedCancellations(false),
-			_onlyNotAcknowledgedReservations(false)
-		{
-			if(!_useCache)
-			{
-				setEnv(shared_ptr<Env>(new Env));
 			}
 		}
 }	}

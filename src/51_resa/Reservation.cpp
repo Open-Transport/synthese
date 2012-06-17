@@ -27,6 +27,7 @@
 #include "ReservationTransaction.h"
 #include "UserTableSync.h"
 #include "Vehicle.hpp"
+#include "VehiclePosition.hpp"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 
@@ -147,19 +148,47 @@ namespace synthese
 				}
 				if (now < _arrivalTime)
 				{
-					return AT_WORK;
+					if(_vehiclePositionAtDeparture)
+					{
+						return AT_WORK;
+					}
+					else
+					{
+						return SHOULD_BE_AT_WORK;
+					}
 				}
-				return DONE;
+				if(_vehiclePositionAtArrival)
+				{
+					return DONE;
+				}
+				else
+				{
+					return SHOULD_BE_DONE;
+				}
 			}
 			else
 			{
 				if (cancellationTime < _reservationDeadLine)
 				{
-					return CANCELLED;
+					if(!_acknowledgeTime.is_not_a_date_time() && _cancellationAcknowledgeTime.is_not_a_date_time())
+					{
+						return CANCELLATION_TO_ACK;
+					}
+					else
+					{
+						return CANCELLED;
+					}
 				}
 				if (cancellationTime < _departureTime)
 				{
-					return CANCELLED_AFTER_DELAY;
+					if(_cancellationAcknowledgeTime.is_not_a_date_time())
+					{
+						return CANCELLED_AFTER_DELAY;
+					}
+					else
+					{
+						return ACKNOWLEDGED_CANCELLED_AFTER_DELAY;
+					}
 				}
 				return NO_SHOW;
 			}
@@ -193,20 +222,31 @@ namespace synthese
 				}
 				break;
 
-			case CANCELLED:
+			case CANCELLATION_TO_ACK:
 			case CANCELLED_AFTER_DELAY:
 				statusText += " le " + to_simple_string(getTransaction()->getCancellationTime());
 				break;
 
-			case ACKNOWLEDGED_CANCELLED:
+			case CANCELLED:
 			case ACKNOWLEDGED_CANCELLED_AFTER_DELAY:
-				statusText += " le " + to_simple_string(getTransaction()->getCancellationTime()) + " confirmé le "
-					+ to_simple_string(_cancellationAcknowledgeTime);
-				if(_cancellationAcknowledgeUser)
+				statusText += " le " + to_simple_string(getTransaction()->getCancellationTime());
+				if(!_cancellationAcknowledgeTime.is_not_a_date_time())
 				{
-					statusText += " par " + _cancellationAcknowledgeUser->getFullName();
+					statusText + " confirmé le "
+						+ to_simple_string(_cancellationAcknowledgeTime);
+					if(_cancellationAcknowledgeUser)
+					{
+						statusText += " par " + _cancellationAcknowledgeUser->getFullName();
+					}
 				}
 				break;
+
+			case AT_WORK:
+				statusText += " depuis le " + to_simple_string(_vehiclePositionAtDeparture->getTime());
+				break;
+
+			case DONE:
+				statusText += " le " + to_simple_string(_vehiclePositionAtArrival->getTime());
 
 			case NO_SHOW:
 				statusText += " constatée le " + to_simple_string(getTransaction()->getCancellationTime());
