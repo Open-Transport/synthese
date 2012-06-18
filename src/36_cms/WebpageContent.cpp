@@ -92,8 +92,11 @@ namespace synthese
 		const string WebpageContent::PARAMETER_EMPTY = "empty";
 		const string WebpageContent::ForeachNode::DATA_RANK = "rank";
 		const string WebpageContent::ForeachNode::DATA_ITEMS_COUNT = "items_count";
+		const string WebpageContent::PARAMETER_SORT_UP = "sort_up";
+		const string WebpageContent::PARAMETER_SORT_DOWN = "sort_down";
 
 		shared_recursive_mutex WebpageContent::_SharedMutex;
+
 
 
 		WebpageContent::WebpageContent(
@@ -357,25 +360,34 @@ namespace synthese
 							if(it != end)
 							{
 								Nodes parameterNodes;
+								string parameterNameStr(ParametersMap::Trim(parameterName.str()));
 								it = _parse(parameterNodes, it, end, functionTermination);
 
-								if(parameterName.str() == WebPageDisplayFunction::PARAMETER_PAGE_ID)
+								if(parameterNameStr == WebPageDisplayFunction::PARAMETER_PAGE_ID)
 								{
 									node->pageCode = parameterNodes;
 								}
-								else if(parameterName.str() == PARAMETER_TEMPLATE)
+								else if(parameterNameStr == PARAMETER_TEMPLATE)
 								{
 									node->inlineTemplate = parameterNodes;
 								}
-								else if(parameterName.str() == PARAMETER_EMPTY)
+								else if(parameterNameStr == PARAMETER_EMPTY)
 								{
 									node->emptyTemplate = parameterNodes;
+								}
+								else if(parameterNameStr == PARAMETER_SORT_DOWN)
+								{
+									node->sortDownTemplate = parameterNodes;
+								}
+								else if(parameterNameStr == PARAMETER_SORT_UP)
+								{
+									node->sortUpTemplate = parameterNodes;
 								}
 								else
 								{
 									node->parameters.push_back(
 										make_pair(
-											ParametersMap::Trim(parameterName.str()),
+											parameterNameStr,
 											parameterNodes
 									)	);
 								}
@@ -823,33 +835,126 @@ namespace synthese
 			const ParametersMap::SubParametersMap::mapped_type& items(
 				additionalParametersMap.getSubMaps(arrayCode)
 			);
-
-			size_t rank(0);
 			size_t itemsCount(items.size());
 
-			BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+			// Sorting items : building the sorting key
+			typedef map<string, shared_ptr<ParametersMap> > SortedItems;
+			SortedItems sortedItems;
+			if(!sortUpTemplate.empty() || !sortDownTemplate.empty())
 			{
-				ParametersMap pm(*item);
-				pm.merge(baseParametersMap);
-				pm.insert(DATA_RANK, rank++);
-				pm.insert(DATA_ITEMS_COUNT, itemsCount);
+				// Loop on items
+				size_t rank(0);
+				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+				{
+					stringstream key;
 
-				// Display by a template page
-				if(templatePage)
-				{
-					templatePage->display(stream, request, pm, variables);
+					_displayItem(
+						key,
+						request,
+						page,
+						baseParametersMap,
+						*item,
+						variables,
+						templatePage,
+						rank,
+						itemsCount
+					);
+
+					// Insertion in the map
+					sortedItems.insert(make_pair(key.str(), item));
 				}
-				else // Display by an inline defined template
+			}
+
+			size_t rank(0);
+			
+			// Case items are sorted ascending
+			if(!sortUpTemplate.empty())
+			{
+				BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
 				{
-					// Display of each inline defined node
-					BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
-					{
-						node->display(stream, request, pm, page, variables);
-					}
+					_displayItem(
+						stream,
+						request,
+						page,
+						baseParametersMap,
+						*item.second,
+						variables,
+						templatePage,
+						rank,
+						itemsCount
+					);
+				}
+			}
+			// Case items are sorted descending
+			else if(!sortDownTemplate.empty())
+			{
+				BOOST_REVERSE_FOREACH(const SortedItems::value_type item, sortedItems)
+				{
+					_displayItem(
+						stream,
+						request,
+						page,
+						baseParametersMap,
+						*item.second,
+						variables,
+						templatePage,
+						rank,
+						itemsCount
+					);
+				}
+			}
+			// Case items are read in the same order as in the service result
+			else
+			{
+				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
+				{
+					_displayItem(
+						stream,
+						request,
+						page,
+						baseParametersMap,
+						*item,
+						variables,
+						templatePage,
+						rank,
+						itemsCount
+					);
 				}
 			}
 		}
 
+
+
+		void WebpageContent::ForeachNode::_displayItem(
+			std::ostream& stream,
+			const server::Request& request,
+			const Webpage& page,
+			const util::ParametersMap& baseParametersMap,
+			const util::ParametersMap& item,
+			util::ParametersMap& variables,
+			const Webpage* templatePage,
+			size_t& rank,
+			size_t itemsCount
+		) const {
+			ParametersMap pm(item);
+			pm.merge(baseParametersMap);
+			pm.insert(DATA_RANK, rank++);
+			pm.insert(DATA_ITEMS_COUNT, itemsCount);
+
+			// Display by a template page
+			if(templatePage)
+			{
+				templatePage->display(stream, request, pm, variables);
+			}
+			else // Display by an inline defined template
+			{
+				// Display of each inline defined node
+				BOOST_FOREACH(const WebpageContent::Nodes::value_type& node, inlineTemplate)
+				{
+					node->display(stream, request, pm, page, variables);
+				}
+			}
+		}
 
 
 		void WebpageContent::display(

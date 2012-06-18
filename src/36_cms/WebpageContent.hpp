@@ -60,6 +60,8 @@ namespace synthese
 			static const std::string PARAMETER_VAR;
 			static const std::string PARAMETER_TEMPLATE;
 			static const std::string PARAMETER_EMPTY;
+			static const std::string PARAMETER_SORT_UP;
+			static const std::string PARAMETER_SORT_DOWN;
 
 			class Node
 			{
@@ -172,6 +174,8 @@ namespace synthese
 				Nodes pageCode;
 				Nodes inlineTemplate;
 				Nodes emptyTemplate;
+				Nodes sortUpTemplate;
+				Nodes sortDownTemplate;
 				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
 				Parameters parameters;
 
@@ -181,6 +185,20 @@ namespace synthese
 					const util::ParametersMap& additionalParametersMap,
 					const Webpage& page,
 					util::ParametersMap& variables
+				) const;
+
+
+
+				void _displayItem(
+					std::ostream& stream,
+					const server::Request& request,
+					const Webpage& page,
+					const util::ParametersMap& baseParametersMap,
+					const util::ParametersMap& item,
+					util::ParametersMap& variables,
+					const Webpage* templatePage,
+					size_t& rank,
+					size_t itemsCount
 				) const;
 			};
 
