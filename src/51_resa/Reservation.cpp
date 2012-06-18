@@ -71,6 +71,10 @@ namespace synthese
 		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_USER = "cancellation_acknowledge_user";
 		const string Reservation::DATA_STATUS = "status";
 		const string Reservation::DATA_FULL_TEXT = "full_text";
+		const string Reservation::DATA_RESERVATION_DEAD_LINE = "reservation_dead_line";
+		const string Reservation::DATA_MINUTES_TO_DEAD_LINE = "minutes_to_dead_line";
+		const string Reservation::DATA_MINUTES_TO_DEPARTURE = "minutes_to_departure";
+		const string Reservation::DATA_MINUTES_DEAD_LINE_TO_DEPARTURE = "minutes_dead_line_to_departure";
 
 
 
@@ -287,8 +291,13 @@ namespace synthese
 			pm.insert(DATA_SERVICE_ID, getServiceId());
 
 			// Time
+			ptime now(second_clock::local_time());
 			pm.insert(DATA_DEPARTURE_TIME, getDepartureTime());
 			pm.insert(DATA_ARRIVAL_TIME, getArrivalTime());
+			pm.insert(DATA_RESERVATION_DEAD_LINE, _reservationDeadLine);
+			pm.insert(DATA_MINUTES_DEAD_LINE_TO_DEPARTURE, (_departureTime - _reservationDeadLine).total_seconds() / 60);
+			pm.insert(DATA_MINUTES_TO_DEAD_LINE, (_reservationDeadLine - now).total_seconds() / 60);
+			pm.insert(DATA_MINUTES_TO_DEPARTURE, (_departureTime - now).total_seconds() / 60);
 
 			// Driver acknowledge
 			if(!_acknowledgeTime.is_not_a_date_time())
