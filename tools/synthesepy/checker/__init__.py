@@ -208,7 +208,7 @@ class Result(object):
             content = ''
             try:
                 result, sid = fetch(url, host, u)
-            except Excetion, e:
+            except Exception, e:
                 content = '<pre>Exception while fetching {0}:\n\n{1}\n</pre>\n'.format(u, e)
             if result is not None:
                 content = '<!--'
