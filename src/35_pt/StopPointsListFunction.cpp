@@ -70,6 +70,8 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string StopPointsListFunction::PARAMETER_SORT_BY_LINE_NAME = "sln";
 		const string StopPointsListFunction::PARAMETER_OMIT_SAME_AREA_DESTINATIONS = "omitSameAreaDestinations";
+		const string StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER = "sortByDistance";
+		const string StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
 		const string StopPointsListFunction::TAG_DESTINATION = "destination";
@@ -80,6 +82,7 @@ namespace synthese
 		const string StopPointsListFunction::DATA_DESTINATIONS = "destinations";
 		const string StopPointsListFunction::DATA_DESTINATIONS_NUMBER = "destinationsNumber";
 		const string StopPointsListFunction::DATA_LINES = "lines";
+		const string StopPointsListFunction::DATA_DISTANCE_TO_BBOX_CENTER = "distanceToBboxCenter";
 
 
 
@@ -115,6 +118,13 @@ namespace synthese
 				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
 			}
 			map.insert(PARAMETER_SORT_BY_LINE_NAME, _sortByLineName);
+
+			// Max solutions number
+			if(_maxSolutionsNumber)
+			{
+				map.insert(PARAMETER_MAX_SOLUTIONS_NUMBER, *_maxSolutionsNumber);
+			}
+
 			return map;
 		}
 
@@ -122,6 +132,9 @@ namespace synthese
 
 		void StopPointsListFunction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Max solutions number
+			_maxSolutionsNumber = map.getOptional<size_t>(PARAMETER_MAX_SOLUTIONS_NUMBER);
+
 			// Coordinate system
 			CoordinatesSystem::SRID srid(
 				map.getDefault<CoordinatesSystem::SRID>(
@@ -223,6 +236,15 @@ namespace synthese
 				throw RequestException("No such RollingStockFilter");
 			}
 			_sortByLineName = map.getDefault<bool>(PARAMETER_SORT_BY_LINE_NAME, false);
+
+			// Sort by distance to bbox center
+			_isSortByDistanceToBboxCenter = false;
+			optional<string> sortValueStr(map.getOptional<string>(PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER));
+			if(sortValueStr && (*sortValueStr) == "1" && _bbox)
+			{
+				_isSortByDistanceToBboxCenter = true;
+			}
+		
 		}
 
 
@@ -268,6 +290,7 @@ namespace synthese
 
 			// Filling in the result parameters map
 			ParametersMap pm;
+			int nbStops =0;
 			BOOST_FOREACH(const StopPointMapType::value_type& sp, stopPointMap)
 			{
 				// Declarations
@@ -279,6 +302,13 @@ namespace synthese
 					true,
 					*_coordinatesSystem
 				);
+
+				// Distance to bbox center
+				if (_isSortByDistanceToBboxCenter)
+				{
+					int distanceToBboxCenter = sp.first.getDistanceToBboxCenter();
+					stopPM->insert(DATA_DISTANCE_TO_BBOX_CENTER, distanceToBboxCenter);
+				}
 
 				// Destinations
 				BOOST_FOREACH(const StopAreaDestinationMapType::value_type& destination, sp.second)
@@ -329,6 +359,12 @@ namespace synthese
 				}
 
 				pm.insert(TAG_PHYSICAL_STOP, stopPM);
+				nbStops++;
+
+				if (_maxSolutionsNumber && nbStops >= *_maxSolutionsNumber)
+				{
+					break;
+				}
 			}
 
 			// Output
@@ -429,20 +465,32 @@ namespace synthese
 
 
 
-		StopPointsListFunction::SortableStopPoint::SortableStopPoint(const StopPoint * sp):
+		//Sort stopPoint by distance to bbox,or by code operator.Sort by code operator is applied by default. 
+		StopPointsListFunction::SortableStopPoint::SortableStopPoint(const StopPoint * sp, int distanceToBboxCenter, bool isSortByDistanceToBboxCenter):
 			_sp(sp),
+			_distanceToBboxCenter(distanceToBboxCenter),
+			_isSortByDistanceToBboxCenter(isSortByDistanceToBboxCenter),
 			_opCode(_sp->getCodeBySources(), false)
 		{
 		}
 
 		bool StopPointsListFunction::SortableStopPoint::operator<(SortableStopPoint const &otherStopPoint) const
 		{
+			if(_isSortByDistanceToBboxCenter)
+			{
+				return _distanceToBboxCenter < otherStopPoint.getDistanceToBboxCenter();
+			}
 			return _opCode < otherStopPoint.getOpCode();
 		}
 
 		SortableLineNumber StopPointsListFunction::SortableStopPoint::getOpCode() const
 		{
 			return _opCode;
+		}
+
+		int StopPointsListFunction::SortableStopPoint::getDistanceToBboxCenter() const
+		{
+			return _distanceToBboxCenter;
 		}
 
 		const StopPoint* StopPointsListFunction::SortableStopPoint::getStopPoint() const
@@ -567,7 +615,8 @@ namespace synthese
 						}
 					}
 
-					SortableStopPoint keySP(&sp);
+					int distanceToBboxCenter = CalcDistanceToBboxCenter(sp);
+					SortableStopPoint keySP(&sp,distanceToBboxCenter,_isSortByDistanceToBboxCenter);
 					SortableStopArea keySA(destination->getKey(), destination->getName());
 					SortableLineKey keyL(commercialLine->getKey(), commercialLine->getShortName());
 					if(spHaveZeroDestination)
@@ -657,5 +706,30 @@ namespace synthese
 		string StopPointsListFunction::getOutputMimeType() const
 		{
 			return _page.get() ? _page->getMimeType() : "text/xml";
+		}
+
+
+
+		int StopPointsListFunction::CalcDistanceToBboxCenter(const StopPoint & stopPoint) const
+		{
+			//return value
+			int distanceToBboxCenter = 0;
+
+			if(_bbox)
+			{
+				shared_ptr<Point> gp = stopPoint.getGeometry();
+
+				//Coordonnates of bbox center
+				double xCenter = (_bbox->getMaxX() + _bbox->getMinX()) / 2.0; 
+				double yCenter = (_bbox->getMaxY() + _bbox->getMinY()) / 2.0; 
+
+				if(gp.get())
+				{
+					distanceToBboxCenter = sqrt((gp->getX() - xCenter) * (gp->getX() - xCenter)+(gp->getY() - yCenter) * (gp->getY() - yCenter));
+				}
+			}
+
+			//return value
+			return round(distanceToBboxCenter);
 		}
 }	}
