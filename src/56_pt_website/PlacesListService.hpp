@@ -31,6 +31,8 @@
 #include "City.h"
 #include "LexicalMatcher.h"
 #include "StopArea.hpp"
+#include "House.hpp"
+#include <geos/geom/Envelope.h>
 
 namespace synthese
 {
@@ -74,6 +76,9 @@ namespace synthese
 			static const std::string PARAMETER_CLASS_FILTER;
 			static const std::string PARAMETER_SRID;
 
+			static const std::string PARAMETER_COORDINATES_XY;
+			static const std::string PARAMETER_MAX_DISTANCE;
+
 			static const std::string DATA_BEST_PLACE;
 			static const std::string DATA_CLASS;
 			static const std::string DATA_PLACES;
@@ -93,6 +98,9 @@ namespace synthese
 			static const std::string DATA_LEVENSHTEIN;
 			static const std::string DATA_PHONETIC_SCORE;
 			static const std::string DATA_PHONETIC_STRING;
+			static const std::string DATA_ORIGIN_X;
+			static const std::string DATA_ORIGIN_Y;
+			static const std::string DATA_DISTANCE_TO_ORIGIN;
 
 		protected:
 			//! \name Page parameters
@@ -108,6 +116,9 @@ namespace synthese
 				double _minScore;
 				std::string _classFilter;
 				const CoordinatesSystem* _coordinatesSystem;
+				std::string _coordinatesXY;
+				double _maxDistance;
+				boost::shared_ptr<geos::geom::Point> _originPoint;
 			//@}
 
 		public:
@@ -142,14 +153,8 @@ namespace synthese
 				const util::ParametersMap & result,
 				const server::Request& request,
 				boost::shared_ptr<util::ParametersMap> bestPlace,
-				const std::string& bestPlaceClassName
-			) const;
-
-			void _displayItems(
-				std::ostream& stream,
-				const std::string& className,
-				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
-				const server::Request& request
+				const std::string& bestPlaceClassName,
+				int minDistanceToOrigin = 0
 			) const;
 
 			void _displayItems(
@@ -157,7 +162,16 @@ namespace synthese
 				const std::string& className,
 				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
 				const server::Request& request,
-				std::size_t& rank
+				int minDistanceToOrigin = 0
+			) const;
+
+			void _displayItems(
+				std::ostream& stream,
+				const std::string& className,
+				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
+				const server::Request& request,
+				std::size_t& rank,
+				int minDistanceToOrigin = 0
 			) const;
 
 
@@ -227,6 +241,29 @@ namespace synthese
 			PlaceResult getPlaceFromBestResult(
 				const util::ParametersMap& result
 			) const;
+			
+			// Sort house by distance to originPoint
+			class SortHouseByDistanceToOriginPoint
+			{
+				private:
+					const road::House * _house;
+					int _distanceToOriginPoint;
+				public:
+					SortHouseByDistanceToOriginPoint(const road::House * house, int distanceToOriginPoint);
+					bool operator<(SortHouseByDistanceToOriginPoint const &otherHouse) const;
+					const road::House * getHouse() const;
+					int getDistanceToOriginPoint() const;
+			};
+			
+			typedef std::map<const SortHouseByDistanceToOriginPoint, boost::shared_ptr<road::House> > HouseMapType;
+
+			// Add the house to the house map
+			void addHouse(
+				HouseMapType & houseMap,
+				const boost::shared_ptr<road::House> & house
+			) const;
+
+			int CalcDistanceToOriginPoint(const boost::shared_ptr<road::House> & house) const;
 
 		private:
 			template<class T>
