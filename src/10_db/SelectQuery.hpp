@@ -108,6 +108,8 @@ namespace synthese
 				template<class Table2>
 				void addTableAndEqualJoin(std::string field2 = TABLE_COL_ID, std::string field1 = TABLE_COL_ID, std::string alias = std::string());
 
+				void addTableAndEqualJoin(std::string field2, std::string field1, std::string table2Name, std::string alias = std::string());
+
 				template<class Table1, class Table2>
 				void addTableAndEqualOtherJoin(std::string field2 = TABLE_COL_ID, std::string field1 = TABLE_COL_ID, std::string alias2 = std::string());
 
@@ -222,6 +224,19 @@ namespace synthese
 			_tables.push_back(t);
 		}
 
+		template<class Table1>
+		void SelectQuery<Table1>::addTableAndEqualJoin( std::string field2, std::string field1, std::string table2Name, std::string alias )
+		{
+			JoinedTable t;
+			t.alias = alias;
+			t.table = table2Name;
+			t.on = ComposedExpression::Get(
+				FieldExpression::Get(Table1::TABLE.NAME, field1),
+				ComposedExpression::OP_EQ,
+				FieldExpression::Get(alias.empty() ? table2Name : alias, field2)
+			);
+			_tables.push_back(t);
+		}
 
 
 		template<class Table> template<class Table2, class Table1>
