@@ -366,19 +366,28 @@ namespace synthese
 				// TODO: MySQL support.
 
 				std::stringstream subQuery;
-				subQuery << "SELECT pkid FROM idx_" << K::TABLE.NAME << "_" << TABLE_COL_GEOMETRY << " WHERE " <<
-					"xmin > " << envelope.getMinX() << " AND xmax < " << envelope.getMaxX() <<
-					" AND ymin > " << envelope.getMinY() << " AND ymax < " << envelope.getMaxY()
+
+				string tableName = "idx_" + K::TABLE.NAME + "_" + TABLE_COL_GEOMETRY;
+
+				/* Spatial lequest on linestring (or other geometrical objects) enveloppes indexes :
+				 * The linestring must be retained if it does have an intersection with the "envelope" parameter
+				 * There is an intersection if (at least) one of the linestring envelope bound is contained in the "envelope" parameter
+				 */
+				subQuery << "( c.xmin > " << envelope.getMinX() << " AND c.xmin < " << envelope.getMaxX() <<
+							" AND c.ymin > " << envelope.getMinY() << " AND c.ymin < " << envelope.getMaxY() << " ) OR "
+							"( c.xmax > " << envelope.getMinX() << " AND c.xmax < " << envelope.getMaxX() <<
+							 " AND c.ymax > " << envelope.getMinY() << " AND c.ymax < " << envelope.getMaxY() << " ) "
 				;
 
+				/* WARNING :
+				 * sqlite crash (core dump) with this spatial request if join isn't explicit.
+				 * so please keep it explicit here
+				 */
 				SelectQuery<K> query;
-				query.addTableField(TABLE_COL_ID);
+				query.addTableAndEqualJoin("pkid", TABLE_COL_ID, tableName, "c");
 				query.addWhere(
-					ComposedExpression::Get(
-						FieldExpression::Get(K::TABLE.NAME, TABLE_COL_ID),
-						ComposedExpression::OP_IN,
-						SubQueryExpression::Get(subQuery.str())
-				)	);
+					SubQueryExpression::Get(subQuery.str())
+				);
 
 				return LoadFromQuery(query, env, linkLevel);
 			}
