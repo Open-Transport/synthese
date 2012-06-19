@@ -37,9 +37,11 @@
 #include "StopArea.hpp"
 #include "PTServiceConfigTableSync.hpp"
 #include "Webpage.h"
+#include "RoadChunkTableSync.h"
 
 using namespace std;
 using namespace boost;
+using namespace geos::geom;
 
 namespace synthese
 {
@@ -69,6 +71,9 @@ namespace synthese
 		const string PlacesListService::PARAMETER_TEXT = "text";
 		const string PlacesListService::PARAMETER_SRID = "srid";
 
+		const string PlacesListService::PARAMETER_COORDINATES_XY = "coordinates_xy";
+		const string PlacesListService::PARAMETER_MAX_DISTANCE = "maxDistance";
+
 		const string PlacesListService::DATA_ADDRESS = "address";
 		const string PlacesListService::DATA_ADDRESSES = "addresses";
 		const string PlacesListService::DATA_BEST_PLACE = "best_place";
@@ -87,6 +92,9 @@ namespace synthese
 		const string PlacesListService::DATA_ROADS = "roads";
 		const string PlacesListService::DATA_STOP = "stop";
 		const string PlacesListService::DATA_STOPS = "stops";
+		const string PlacesListService::DATA_ORIGIN_X = "origin_x";
+		const string PlacesListService::DATA_ORIGIN_Y = "origin_y";
+		const string PlacesListService::DATA_DISTANCE_TO_ORIGIN = "distance_to_origin";
 
 
 
@@ -95,7 +103,8 @@ namespace synthese
 			_citiesWithAtLeastAStop(true),
 			_minScore(0),
 			_coordinatesSystem(NULL),
-			_config(NULL)
+			_config(NULL),
+			_maxDistance(300)
 		{}
 
 
@@ -166,6 +175,18 @@ namespace synthese
 				map.insert(PARAMETER_CLASS_FILTER, _classFilter);
 			}
 
+			//Coordonates XY
+			if(!_coordinatesXY.empty())
+			{
+				map.insert(PARAMETER_COORDINATES_XY, _coordinatesXY);
+			}
+
+			//maxDistance
+			if(_maxDistance>0)
+			{
+				map.insert(PARAMETER_MAX_DISTANCE, _maxDistance);
+			}
+
 			return map;
 		}
 
@@ -219,6 +240,29 @@ namespace synthese
 			);
 			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);
 
+			// Build originPoint
+			_coordinatesXY = map.getDefault<string>(PARAMETER_COORDINATES_XY);
+
+			if(!_coordinatesXY.empty())
+			{
+				//default value of the maxDistance is 300
+				_maxDistance=map.getDefault<double>(PARAMETER_MAX_DISTANCE, _maxDistance);
+
+				vector< string > parsed_coordinatesXY;
+				split(parsed_coordinatesXY, _coordinatesXY, is_any_of(",; ") );
+
+				if(parsed_coordinatesXY.size() != 2)
+				{
+					throw RequestException("Malformed COORDINATES_XY.");
+				}
+
+				shared_ptr<Point> pt(
+					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]))
+				);
+
+				_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]));
+			}
+
 			// Output
 			if(map.isDefined(PARAMETER_ITEM_PAGE_ID))
 			{
@@ -263,7 +307,98 @@ namespace synthese
 
 			// ParametersMap populating
 			ParametersMap result;
-			if(_sorted || !_classFilter.empty())
+			int minDistanceToOrigin;
+
+			if(!_coordinatesXY.empty())
+			{
+				// House map
+				HouseMapType houseMap;
+
+				//Best place, which is near the originPoint
+				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
+				RoadChunkTableSync::SearchResult  roadChunks = RoadChunkTableSync::SearchByMaxDistance(
+					*originPoint.get(),
+					_maxDistance,//distance  to originPoint
+					Env::GetOfficialEnv(),
+					UP_LINKS_LOAD_LEVEL
+				);
+
+				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
+				{ 
+					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
+					MainRoadChunk::HouseNumber houseNumber(0);
+
+					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
+					{
+						houseNumber = chunk.getLeftHouseNumberBounds()->first;
+					}
+					else if (chunk.getRightHouseNumberBounds() && chunk.getRightHouseNumberBounds()->first != 0)
+					{
+						houseNumber = chunk.getRightHouseNumberBounds()->first;
+					}
+
+					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
+					addHouse(houseMap, house);
+				}
+
+				// Best place
+				if(!houseMap.empty())
+				{
+					const HouseMapType::const_iterator it = houseMap.begin();
+
+					shared_ptr<House> house = it->second;
+
+					PlacesListService*  placesListService = new PlacesListService();
+					minDistanceToOrigin = it->first.getDistanceToOriginPoint();
+
+					if(house.get())
+					{
+						if (*(house.get())->getHouseNumber() == 0)
+						{
+							shared_ptr<ParametersMap> pm(new ParametersMap);
+
+							const City* city = (house.get())->getCity();
+							if (city)
+							{
+								_registerItems<NamedPlace>(
+									*pm,
+									city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+										(house.get())->getName(),
+										1
+									)
+								);
+
+								result.insert(DATA_ROADS, pm);
+							}//*/
+						}
+						else
+						{
+							LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+							LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+
+							houseResult.key = (house.get())->getName();
+							FrenchSentence::ComparisonScore score;
+							score.levenshtein = 0;
+							score.phoneticScore = 1;
+							houseResult.score = score;
+							houseResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
+
+							newList.push_back(houseResult);
+
+							// Registration
+							shared_ptr<ParametersMap> pm(new ParametersMap);
+							_registerItems<NamedPlace>(
+								*pm,
+								newList
+							);
+
+							//adresses
+							result.insert(DATA_ADDRESSES, pm);
+						}
+					}
+				}
+			}
+			else if(_sorted || !_classFilter.empty())
 			{
 				if(_city.get())
 				{
@@ -524,7 +659,7 @@ namespace synthese
 				shared_ptr<ParametersMap> bestPlace(new ParametersMap);
 
 				// Stop areas
-				if(	result.hasSubMaps(DATA_STOPS) &&
+				if(result.hasSubMaps(DATA_STOPS) &&
 					(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
 				){
 					bestMap = *(*result.getSubMaps(DATA_STOPS).begin())->getSubMaps(DATA_STOP).begin();
@@ -532,13 +667,13 @@ namespace synthese
 				}
 
 				// Cities
-				if(	result.hasSubMaps(DATA_CITIES) &&
+				if(result.hasSubMaps(DATA_CITIES) &&
 					(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 				){
 					shared_ptr<ParametersMap> cityBestMap(
 						*(*result.getSubMaps(DATA_CITIES).begin())->getSubMaps(DATA_CITY).begin()
 					);
-					if(	!bestMap.get() ||
+					if(!bestMap.get() ||
 						cityBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
 						cityBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
 						cityBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
@@ -549,13 +684,13 @@ namespace synthese
 				}
 
 				// Public places
-				if(	result.hasSubMaps(DATA_PUBLIC_PLACES) &&
+				if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
 					(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_PUBLIC_PLACE)
 				){
 					shared_ptr<ParametersMap> ppBestMap(
 						*(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->getSubMaps(DATA_PUBLIC_PLACE).begin()
 					);
-					if(	!bestMap.get() ||
+					if(!bestMap.get() ||
 						ppBestMap->get<double>(DATA_PHONETIC_SCORE) > bestMap->get<double>(DATA_PHONETIC_SCORE) ||
 						ppBestMap->get<double>(DATA_PHONETIC_SCORE) == bestMap->get<double>(DATA_PHONETIC_SCORE) &&
 						ppBestMap->get<double>(DATA_LEVENSHTEIN) < bestMap->get<double>(DATA_LEVENSHTEIN)
@@ -621,13 +756,14 @@ namespace synthese
 							result,
 							request,
 							bestMap,
-							className
+							className,
+							minDistanceToOrigin
 						);
 					}
 					else
 					{
 						size_t rank(0);
-						if(	result.hasSubMaps(DATA_CITIES) &&
+						if(result.hasSubMaps(DATA_CITIES) &&
 							(*result.getSubMaps(DATA_CITIES).begin())->hasSubMaps(DATA_CITY)
 						){
 							_displayItems(
@@ -638,7 +774,7 @@ namespace synthese
 								rank
 							);
 						}
-						if(	result.hasSubMaps(DATA_STOPS) &&
+						if(result.hasSubMaps(DATA_STOPS) &&
 							(*result.getSubMaps(DATA_STOPS).begin())->hasSubMaps(DATA_STOP)
 						){
 							_displayItems(
@@ -649,7 +785,7 @@ namespace synthese
 								rank
 							);
 						}
-						if(	result.hasSubMaps(DATA_ADDRESSES) &&
+						if(result.hasSubMaps(DATA_ADDRESSES) &&
 							(*result.getSubMaps(DATA_ADDRESSES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayItems(
@@ -657,10 +793,11 @@ namespace synthese
 								DATA_ADDRESS,
 								(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
 								request,
-								rank
+								rank,
+								minDistanceToOrigin
 							);
 						}
-						if(	result.hasSubMaps(DATA_ROADS) &&
+						if(result.hasSubMaps(DATA_ROADS) &&
 							(*result.getSubMaps(DATA_ROADS).begin())->hasSubMaps(DATA_ROAD)
 						){
 							_displayItems(
@@ -668,10 +805,11 @@ namespace synthese
 								DATA_ROAD,
 								(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
 								request,
-								rank
+								rank,
+								minDistanceToOrigin
 							);
 						}
-						if(	result.hasSubMaps(DATA_PUBLIC_PLACES) &&
+						if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
 							(*result.getSubMaps(DATA_PUBLIC_PLACES).begin())->hasSubMaps(DATA_ADDRESS)
 						){
 							_displayItems(
@@ -717,7 +855,8 @@ namespace synthese
 							DATA_ADDRESS,
 							pm.getSubMaps(DATA_ADDRESS),
 							request,
-							rank
+							rank,
+							minDistanceToOrigin
 						);
 					}
 					if(pm.hasSubMaps(DATA_ROAD))
@@ -727,7 +866,8 @@ namespace synthese
 							DATA_ROAD,
 							pm.getSubMaps(DATA_ROAD),
 							request,
-							rank
+							rank,
+							minDistanceToOrigin
 						);
 					}
 					if(pm.hasSubMaps(DATA_PUBLIC_PLACE))
@@ -778,10 +918,11 @@ namespace synthese
 			std::ostream& stream,
 			const std::string& className,
 			const std::vector<boost::shared_ptr<util::ParametersMap> >& maps,
-			const server::Request& request
+			const server::Request& request,
+			int minDistanceToOrigin
 		) const {
 			size_t rank(0);
-			_displayItems(stream, className, maps, request, rank);
+			_displayItems(stream, className, maps, request, rank,minDistanceToOrigin);
 		}
 
 
@@ -791,8 +932,9 @@ namespace synthese
 			const std::string& className,
 			const std::vector<boost::shared_ptr<util::ParametersMap> >& maps,
 			const server::Request& request,
-			std::size_t& rank
-		) const	{
+			std::size_t& rank,
+			int minDistanceToOrigin
+		) const {
 
 			BOOST_FOREACH(const shared_ptr<ParametersMap>& item, maps)
 			{
@@ -804,6 +946,19 @@ namespace synthese
 
 				// Rank
 				item->insert(DATA_RANK, rank++);
+
+				//min distance to origin
+				if(!_coordinatesXY.empty())
+				{
+					item->insert(DATA_DISTANCE_TO_ORIGIN, minDistanceToOrigin);
+				}
+
+				if(_originPoint)
+				{
+					//origin
+					item->insert(DATA_ORIGIN_X, _originPoint->getX());
+					item->insert(DATA_ORIGIN_Y, _originPoint->getY());
+				}//*/
 
 				// Display
 				_itemPage->display(stream, request, *item);
@@ -817,7 +972,8 @@ namespace synthese
 			const util::ParametersMap & result,
 			const server::Request& request,
 			shared_ptr<ParametersMap> bestPlace,
-			const string& bestPlaceClassName
+			const string& bestPlaceClassName,
+			int minDistanceToOrigin
 		) const {
 			ParametersMap classMap(getTemplateParameters());
 
@@ -834,7 +990,8 @@ namespace synthese
 					bestPlaceClassName,
 					bestPlaceMap,
 					request,
-					rank
+					rank,
+					minDistanceToOrigin
 				);
 				classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
 			}
@@ -874,7 +1031,8 @@ namespace synthese
 					DATA_ADDRESS,
 					(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
 					request,
-					rank
+					rank,
+					minDistanceToOrigin
 				);
 				classMap.insert(DATA_ADDRESSES, adresses.str());
 			}
@@ -887,7 +1045,8 @@ namespace synthese
 					DATA_ROAD,
 					(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
 					request,
-					rank
+					rank,
+					minDistanceToOrigin
 				);
 				classMap.insert(DATA_ROADS, roads.str());
 			}
@@ -904,6 +1063,7 @@ namespace synthese
 				);
 				classMap.insert(DATA_PUBLIC_PLACES, publicPlaces.str());
 			}
+
 			// Display
 			_classPage->display(stream, request, classMap);
 		}
@@ -982,5 +1142,57 @@ namespace synthese
 			}
 
 			return placeResult;
+		}
+
+		//Sort house by distance to originPoint
+		PlacesListService::SortHouseByDistanceToOriginPoint::SortHouseByDistanceToOriginPoint(const House * house, int distanceToOriginPoint):
+			_house(house),
+			_distanceToOriginPoint(distanceToOriginPoint)
+		{
+		}
+
+		bool PlacesListService::SortHouseByDistanceToOriginPoint::operator<(SortHouseByDistanceToOriginPoint const &otherHouse) const
+		{
+			return _distanceToOriginPoint < otherHouse.getDistanceToOriginPoint();
+		}
+
+		int PlacesListService::SortHouseByDistanceToOriginPoint::getDistanceToOriginPoint() const
+		{
+			return _distanceToOriginPoint;
+		}
+
+		const House* PlacesListService::SortHouseByDistanceToOriginPoint::getHouse() const
+		{
+			return _house;
+		}
+
+		int PlacesListService::CalcDistanceToOriginPoint(const shared_ptr<House> & house) const
+		{
+			//return value
+			int distanceToOriginPoint = 0;
+
+			if(_originPoint && house.get())
+			{
+				shared_ptr<Point> gp = (house.get())->getGeometry();
+				shared_ptr<Point> originPoint = CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(*_originPoint);
+
+				if(gp.get())
+				{
+					distanceToOriginPoint = sqrt(pow((gp->getX()-originPoint->getX()), 2) + pow((gp->getY()-originPoint->getY()), 2));
+				}
+			}
+
+			//return value
+			return round(distanceToOriginPoint);
+		}
+
+		void PlacesListService::addHouse(
+				HouseMapType & houseMap,
+				const shared_ptr<House> & house
+			) const {
+
+			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
+			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint);
+			houseMap[keyHouse] = house;
 		}
 }	}
