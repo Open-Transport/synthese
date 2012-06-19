@@ -77,6 +77,8 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_SORT_BY_LINE_NAME;
 			static const std::string PARAMETER_OMIT_SAME_AREA_DESTINATIONS;
+			static const std::string PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER;
+			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER; 
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
@@ -89,6 +91,7 @@ namespace synthese
 			static const std::string DATA_DESTINATIONS;
 			static const std::string DATA_DESTINATIONS_NUMBER;
 			static const std::string DATA_LINES;
+			static const std::string DATA_DISTANCE_TO_BBOX_CENTER;
 
 			//! \name Page parameters
 			//@{
@@ -103,6 +106,7 @@ namespace synthese
 				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
 				bool _sortByLineName;
 				bool _omitSameAreaDestinations;
+				boost::optional<std::size_t> _maxSolutionsNumber;
 			//@}
 
 
@@ -167,6 +171,8 @@ namespace synthese
 			virtual std::string getOutputMimeType() const;
 
 		private:
+			bool _isSortByDistanceToBboxCenter;
+
 			class SortableLineKey
 			{
 			private:
@@ -184,10 +190,13 @@ namespace synthese
 			private:
 				const StopPoint * _sp;
 				SortableLineNumber _opCode;
+				int _distanceToBboxCenter;
+				bool _isSortByDistanceToBboxCenter;
 			public:
-				SortableStopPoint(const StopPoint * sp);
+				SortableStopPoint(const StopPoint * sp, int distanceToBboxCenter, bool isSortByDistanceToBboxCenter);
 				bool operator<(SortableStopPoint const &otherStopPoint) const;
 				const StopPoint * getStopPoint() const;
+				int getDistanceToBboxCenter() const;
 				SortableLineNumber getOpCode() const;
 			};
 
@@ -236,6 +245,8 @@ namespace synthese
 				const std::vector<boost::shared_ptr<util::ParametersMap> >& destinations,
 				const server::Request& request
 			) const;
+
+			int CalcDistanceToBboxCenter (const StopPoint & stopPoint) const;
 		};
 	}
 }
