@@ -121,7 +121,8 @@ namespace synthese
 			static SearchResult Search(
 				util::Env& env,
 				util::RegistryKeyType commercialLineId,
-				const boost::gregorian::date& day,
+				const boost::gregorian::date& minDate,
+				const boost::gregorian::date& maxDate,
 				boost::optional<std::string> serviceNumber = boost::optional<std::string>(),
 				boost::logic::tribool cancelled = false,
 				bool orderByService = true,

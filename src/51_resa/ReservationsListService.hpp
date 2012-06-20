@@ -66,6 +66,7 @@ namespace synthese
 			static const std::string PARAMETER_LINE_ID;
 			static const std::string PARAMETER_SERVICE_NUMBER;
 			static const std::string PARAMETER_DATE;
+			static const std::string PARAMETER_DATE2;
 			static const std::string PARAMETER_RESERVATION_PAGE_ID;
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_LANGUAGE;
@@ -91,6 +92,7 @@ namespace synthese
 				boost::optional<std::string> _serviceNumber;
 				boost::shared_ptr<const pt::ScheduledService> _service;
 				boost::gregorian::date _date;
+				boost::gregorian::date _date2;
 				boost::shared_ptr<const cms::Webpage> _reservationPage;
 				boost::optional<Language> _language;
 				boost::optional<std::size_t> _minDepartureRank;

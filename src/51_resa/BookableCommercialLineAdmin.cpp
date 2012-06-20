@@ -234,6 +234,7 @@ namespace synthese
 						_getEnv(),
 						_line->getKey(),
 						_date,
+						_date + days(1),
 						_serviceNumber,
 						_displayCancelled ? logic::indeterminate : logic::tribool(false)
 				)	);
