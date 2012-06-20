@@ -67,6 +67,7 @@ namespace synthese
 		const string Reservation::DATA_CANCELLATION_TIME("cancellation_time");
 		const string Reservation::DATA_ACKNOWLEDGE_TIME = "acknowledge_time";
 		const string Reservation::DATA_ACKNOWLEDGE_USER = "acknowledge_user";
+		const string Reservation::DATA_BOOKING_USER_ID = "booking_user_id";
 		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_TIME = "cancellation_acknowledge_time";
 		const string Reservation::DATA_CANCELLATION_ACKNOWLEDGE_USER = "cancellation_acknowledge_user";
 		const string Reservation::DATA_STATUS = "status";
@@ -279,6 +280,7 @@ namespace synthese
 			// Transaction
 			pm.insert(DATA_TRANSACTION_ID, getTransaction()->getKey());
 			pm.insert(DATA_SEATS_NUMBER, getTransaction()->getSeats());
+			pm.insert(DATA_BOOKING_USER_ID, getTransaction()->getBookingUserId());
 
 			// Places
 			pm.insert(DATA_DEPARTURE_PLACE_NAME, getDeparturePlaceName());
