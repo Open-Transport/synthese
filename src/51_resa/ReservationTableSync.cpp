@@ -497,7 +497,8 @@ namespace synthese
 		ReservationTableSync::SearchResult ReservationTableSync::Search(
 			util::Env& env,
 			util::RegistryKeyType commercialLineId,
-			const date& day,
+			const date& minDate,
+			const date& maxDate,
 			optional<string> serviceNumber,
 			logic::tribool cancellations,
 			bool orderByService,
@@ -515,14 +516,14 @@ namespace synthese
 			{
 				query << " INNER JOIN " << ReservationTransactionTableSync::TABLE.NAME << " t ON t." << TABLE_COL_ID << "=" << TABLE.NAME << "." << COL_TRANSACTION_ID;
 			}
+
 			query <<
 				" WHERE " <<
 				TABLE.NAME << "." << COL_LINE_ID << "=" << commercialLineId << " AND " <<
-				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(day) << " 03:00' ";
-			date dayp(day);
-			dayp += days(1);
+				TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << ">='" << to_iso_extended_string(minDate) << " 03:00' ";
+
 			query <<
-				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<'" << to_iso_extended_string(dayp) << " 03:00'"
+				" AND " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << "<'" << to_iso_extended_string(maxDate) << " 03:00'"
 			;
 			if(serviceNumber)
 			{
@@ -538,6 +539,12 @@ namespace synthese
 				query <<
 					" ORDER BY " << TABLE.NAME << "." << COL_SERVICE_CODE << " " << (raisingOrder ? "ASC" : "DESC");
 			}
+			else
+			{
+				query <<
+					" ORDER BY " << TABLE.NAME << "." << COL_ORIGIN_DATE_TIME << " " << (raisingOrder ? "ASC" : "DESC");
+			}
+
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
