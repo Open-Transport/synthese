@@ -87,6 +87,7 @@ namespace synthese
 			static const std::string DATA_COMMENT;
 			static const std::string DATA_ACKNOWLEDGE_TIME;
 			static const std::string DATA_ACKNOWLEDGE_USER;
+			static const std::string DATA_BOOKING_USER_ID;
 			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_TIME;
 			static const std::string DATA_CANCELLATION_ACKNOWLEDGE_USER;
 			static const std::string DATA_STATUS;
