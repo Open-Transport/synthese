@@ -73,6 +73,7 @@ namespace synthese
 	{
 		const string ReservationsListService::PARAMETER_LINE_ID = "li";
 		const string ReservationsListService::PARAMETER_DATE = "da";
+		const string ReservationsListService::PARAMETER_DATE2 = "da2";
 		const string ReservationsListService::PARAMETER_SERVICE_NUMBER = "sn";
 		const string ReservationsListService::PARAMETER_RESERVATION_PAGE_ID = "rp";
 		const string ReservationsListService::PARAMETER_SERVICE_ID = "se";
@@ -116,6 +117,7 @@ namespace synthese
 			}
 
 			map.insert(PARAMETER_DATE, to_iso_extended_string(_date));
+			map.insert(PARAMETER_DATE2, to_iso_extended_string(_date2));
 
 			if(_reservationPage.get())
 			{
@@ -191,6 +193,31 @@ namespace synthese
 				}
 			}
 
+			if(map.isDefined(PARAMETER_DATE2))
+			{
+				try
+				{
+					if(!map.getDefault<string>(PARAMETER_DATE2).empty())
+					{
+						_date2 = from_string(map.get<string>(PARAMETER_DATE2));
+					}
+					else
+					{
+						_date2 = _date;
+						_date2 += days(1);
+					}
+				}
+				catch (...)
+				{
+					throw RequestException("Bad value for date");
+				}
+			}
+			else
+			{
+				_date2 = _date;
+				_date2 += days(1);
+			}
+
 			if(map.isDefined(PARAMETER_SERVICE_ID))
 			{
 				// Service
@@ -200,7 +227,7 @@ namespace synthese
 					_service =
 						_useCache ?
 						Env::GetOfficialEnv().get<ScheduledService>(id) :
-						ScheduledServiceTableSync::Get(id, *_env)
+						ScheduledServiceTableSync::Get(id, *_env, ALGORITHMS_OPTIMIZATION_LOAD_LEVEL)
 					;
 					_line = (_useCache ? Env::GetOfficialEnv() : *_env).getSPtr(
 						static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())
@@ -390,6 +417,7 @@ namespace synthese
 						*_env,
 						_line->getKey(),
 						_date,
+						_date2,
 						_serviceNumber,
 						tribool(indeterminate)
 				)	);
@@ -551,6 +579,7 @@ namespace synthese
 						shared_ptr<const StopArea> stopArea(
 							Env::GetOfficialEnv().get<StopArea>(reservation->getArrivalPlaceId())
 						);
+
 						BOOST_FOREACH(const StopArea::PhysicalStops::value_type& itStop, stopArea->getPhysicalStops())
 						{
 							try
