@@ -344,58 +344,70 @@ namespace synthese
 				// Best place
 				if(!houseMap.empty())
 				{
-					const HouseMapType::const_iterator it = houseMap.begin();
-
-					shared_ptr<House> house = it->second;
-
-					PlacesListService*  placesListService = new PlacesListService();
-					minDistanceToOrigin = it->first.getDistanceToOriginPoint();
-
-					if(house.get())
+					int nbHouses = 0;
+					LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+					BOOST_FOREACH(const HouseMapType::value_type& it, houseMap)
 					{
-						if (*(house.get())->getHouseNumber() == 0)
-						{
-							shared_ptr<ParametersMap> pm(new ParametersMap);
+						shared_ptr<House> house = it.second;
 
-							const City* city = (house.get())->getCity();
-							if (city)
+						PlacesListService*  placesListService = new PlacesListService();
+						minDistanceToOrigin = it.first.getDistanceToOriginPoint();
+
+						if(house.get())
+						{
+							if(*(house.get())->getHouseNumber() == 0)
 							{
-								_registerItems<NamedPlace>(
-									*pm,
-									city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
-										(house.get())->getName(),
-										1
-									)
-								);
+								shared_ptr<ParametersMap> pm(new ParametersMap);
 
-								result.insert(DATA_ROADS, pm);
-							}//*/
+								const City* city = (house.get())->getCity();
+								if(city)
+								{
+									_registerItems<NamedPlace>(
+										*pm,
+										city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+											(house.get())->getName(),
+											1
+										)
+									);
+
+									result.insert(DATA_ROADS, pm);
+								}
+							}
+							else
+							{
+								LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+
+								houseResult.key = (house.get())->getName();
+								FrenchSentence::ComparisonScore score;
+								score.levenshtein = 0;
+								score.phoneticScore = 1;
+								houseResult.score = score;
+								houseResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
+
+								newList.push_back(houseResult);
+							}
 						}
-						else
+
+						nbHouses++;
+						if(_number && nbHouses >= *_number)
 						{
-							LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
-							LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
-
-							houseResult.key = (house.get())->getName();
-							FrenchSentence::ComparisonScore score;
-							score.levenshtein = 0;
-							score.phoneticScore = 1;
-							houseResult.score = score;
-							houseResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
-
-							newList.push_back(houseResult);
-
-							// Registration
-							shared_ptr<ParametersMap> pm(new ParametersMap);
-							_registerItems<NamedPlace>(
-								*pm,
-								newList
-							);
-
-							//adresses
-							result.insert(DATA_ADDRESSES, pm);
+							break;
 						}
 					}
+
+					if (!newList.empty())
+					{
+						// Registration
+						shared_ptr<ParametersMap> pm(new ParametersMap);
+						_registerItems<NamedPlace>(
+							*pm,
+							newList
+						);
+						
+						//adresses
+						result.insert(DATA_ADDRESSES, pm);
+					}
+
 				}
 			}
 			else if(_sorted || !_classFilter.empty())
@@ -958,7 +970,7 @@ namespace synthese
 					//origin
 					item->insert(DATA_ORIGIN_X, _originPoint->getX());
 					item->insert(DATA_ORIGIN_Y, _originPoint->getY());
-				}//*/
+				}
 
 				// Display
 				_itemPage->display(stream, request, *item);
