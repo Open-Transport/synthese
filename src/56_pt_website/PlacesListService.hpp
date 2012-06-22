@@ -153,8 +153,14 @@ namespace synthese
 				const util::ParametersMap & result,
 				const server::Request& request,
 				boost::shared_ptr<util::ParametersMap> bestPlace,
-				const std::string& bestPlaceClassName,
-				int minDistanceToOrigin = 0
+				const std::string& bestPlaceClassName
+			) const;
+
+			void _displayItems(
+				std::ostream& stream,
+				const std::string& className,
+				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
+				const server::Request& request
 			) const;
 
 			void _displayItems(
@@ -162,16 +168,7 @@ namespace synthese
 				const std::string& className,
 				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
 				const server::Request& request,
-				int minDistanceToOrigin = 0
-			) const;
-
-			void _displayItems(
-				std::ostream& stream,
-				const std::string& className,
-				const std::vector<boost::shared_ptr<util::ParametersMap> >& map,
-				const server::Request& request,
-				std::size_t& rank,
-				int minDistanceToOrigin = 0
+				std::size_t& rank
 			) const;
 
 
@@ -269,11 +266,18 @@ namespace synthese
 			template<class T>
 			void _registerItems(
 				util::ParametersMap& map,
-				const typename lexical_matcher::LexicalMatcher<boost::shared_ptr<T> >::MatchResult& items
+				const typename lexical_matcher::LexicalMatcher<boost::shared_ptr<T> >::MatchResult& items,
+				std::vector<int> * distanceVect = NULL
 			) const {
 
 				// Items count
 				size_t itemsNumber(0);
+				
+				std::vector<int>::iterator itDistVect;
+				if(distanceVect)
+				{
+					itDistVect = distanceVect->begin();
+				}
 
 				BOOST_FOREACH(const typename lexical_matcher::LexicalMatcher<boost::shared_ptr<T> >::MatchHit& item, items)
 				{
@@ -292,6 +296,12 @@ namespace synthese
 					pm->insert(DATA_KEY, item.key.getSource());
 					pm->insert(DATA_PHONETIC_STRING, item.key.getPhoneticString());
 					pm->insert(DATA_LEVENSHTEIN, item.score.levenshtein);
+
+					// DistanceToOrigin (if available)
+					if(distanceVect)
+					{
+						pm->insert(DATA_DISTANCE_TO_ORIGIN, *itDistVect);
+					}
 
 					// Business object export and registration
 					_attemptToRead<T, geography::City>(*item.value, pm, map, DATA_CITY);
@@ -315,6 +325,10 @@ namespace synthese
 						{
 							break;
 						}
+					}					
+					if(distanceVect)
+					{
+						itDistVect++;
 					}
 				}
 			}
