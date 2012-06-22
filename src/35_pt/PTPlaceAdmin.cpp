@@ -31,6 +31,7 @@
 #include "CityListFunction.h"
 #include "CommercialLine.h"
 #include "DBModule.h"
+#include "DesignatedLinePhysicalStop.hpp"
 #include "HTMLMap.hpp"
 #include "ImportableAdmin.hpp"
 #include "JourneyPattern.hpp"
@@ -430,7 +431,24 @@ namespace synthese
 
 					// Remove button only if the stop is not used by any route
 					stream << t.col();
-					if(stop->getDepartureEdges().empty() && stop->getArrivalEdges().empty())
+					bool usedStop(false);
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getDepartureEdges())
+					{
+						if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge.second))
+						{
+							usedStop = true;
+							break;
+						}
+					}
+					BOOST_FOREACH(const Vertex::Edges::value_type& edge, stop->getArrivalEdges())
+					{
+						if(dynamic_cast<const DesignatedLinePhysicalStop*>(edge.second))
+						{
+							usedStop = true;
+							break;
+						}
+					}
+					if(!usedStop)
 					{
 						removeRequest.getAction()->setObjectId(stop->getKey());
 						stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer l'arrêt ?");
