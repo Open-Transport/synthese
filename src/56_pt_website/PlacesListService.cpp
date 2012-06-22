@@ -307,7 +307,6 @@ namespace synthese
 
 			// ParametersMap populating
 			ParametersMap result;
-			int minDistanceToOrigin;
 
 			if(!_coordinatesXY.empty())
 			{
@@ -324,7 +323,7 @@ namespace synthese
 				);
 
 				BOOST_FOREACH(const RoadChunkTableSync::SearchResult::value_type& roadChunk, roadChunks)
-				{ 
+				{
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
 					MainRoadChunk::HouseNumber houseNumber(0);
 
@@ -339,69 +338,102 @@ namespace synthese
 
 					boost::shared_ptr<House> house(new House(*roadChunk, houseNumber, true));
 					addHouse(houseMap, house);
+
 				}
 
 				// Best place
 				if(!houseMap.empty())
 				{
-					int nbHouses = 0;
-					LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+					int nbResult = 0;
+					vector<lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit > houseList, roadList;
+					vector<int> distanceHouseList, distanceRoadList;
+					set<string> insertedRoadName;
+
 					BOOST_FOREACH(const HouseMapType::value_type& it, houseMap)
 					{
 						shared_ptr<House> house = it.second;
 
 						PlacesListService*  placesListService = new PlacesListService();
-						minDistanceToOrigin = it.first.getDistanceToOriginPoint();
 
 						if(house.get())
 						{
+							//house number not available, give road instead
 							if(*(house.get())->getHouseNumber() == 0)
 							{
-								shared_ptr<ParametersMap> pm(new ParametersMap);
-
-								const City* city = (house.get())->getCity();
-								if(city)
+								//Don't insert same road twice
+								set<string>::iterator frenchIt = insertedRoadName.find((house.get())->getName());
+								if(frenchIt == insertedRoadName.end())
 								{
-									_registerItems<NamedPlace>(
-										*pm,
-										city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+									shared_ptr<ParametersMap> pm(new ParametersMap);
+
+									const City* city = (house.get())->getCity();
+									if(city)
+									{
+										LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult roadResult;
+
+										roadResult = city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
 											(house.get())->getName(),
 											1
-										)
-									);
-
-									result.insert(DATA_ROADS, pm);
+										);
+										if(!roadResult.empty())
+										{										
+											insertedRoadName.insert((house.get())->getName());
+											distanceRoadList.push_back(it.first.getDistanceToOriginPoint());
+											//Hack : levenstein and score are used to order results, so we change them to order by distance										
+											roadResult[0].score.levenshtein = it.first.getDistanceToOriginPoint();
+											roadResult[0].score.phoneticScore = 1;
+											roadList.push_back(roadResult[0]);
+											nbResult++;
+										}
+									}
 								}
 							}
 							else
 							{
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
+								lexical_matcher::LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit houseResult;
 
 								houseResult.key = (house.get())->getName();
 								FrenchSentence::ComparisonScore score;
-								score.levenshtein = 0;
+								//Hack : levenstein and score are used to order results, so we change them to order by distance	
+								score.levenshtein = it.first.getDistanceToOriginPoint();
 								score.phoneticScore = 1;
 								houseResult.score = score;
 								houseResult.value = dynamic_pointer_cast<NamedPlace,House>(house);
 
-								newList.push_back(houseResult);
+								distanceHouseList.push_back(it.first.getDistanceToOriginPoint());
+								houseList.push_back(houseResult);
+
+								nbResult++;
 							}
 						}
 
-						nbHouses++;
-						if(_number && nbHouses >= *_number)
+						if(_number && nbResult >= *_number)
 						{
 							break;
 						}
 					}
 
-					if (!newList.empty())
+					if (!roadList.empty())
 					{
 						// Registration
 						shared_ptr<ParametersMap> pm(new ParametersMap);
 						_registerItems<NamedPlace>(
 							*pm,
-							newList
+							roadList,
+							&distanceRoadList
+						);
+						
+						//Roads
+						result.insert(DATA_ROADS, pm);
+					}
+					if (!houseList.empty())
+					{
+						// Registration
+						shared_ptr<ParametersMap> pm(new ParametersMap);
+						_registerItems<NamedPlace>(
+							*pm,
+							houseList,
+							&distanceHouseList
 						);
 						
 						//adresses
@@ -450,7 +482,7 @@ namespace synthese
 								)	);
 
 								// Transformation into house places list
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult houseList;
 								BOOST_FOREACH(const City::PlacesMatcher::MatchResult::value_type& place, places)
 								{
 									const RoadPlace& roadPlace(
@@ -467,14 +499,14 @@ namespace synthese
 										place.value
 									;
 
-									newList.push_back(houseResult);
+									houseList.push_back(houseResult);
 								}
 
 								// Registration
 								shared_ptr<ParametersMap> pm(new ParametersMap);
 								_registerItems<NamedPlace>(
 									*pm,
-									newList
+									houseList
 								);
 								result.insert(DATA_ADDRESSES, pm);
 								done = true;
@@ -569,7 +601,7 @@ namespace synthese
 								)	);
 
 								// Transformation into house places list
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult newList;
+								LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult houseList;
 								BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& place, places)
 								{
 									const RoadPlace& roadPlace(
@@ -586,14 +618,14 @@ namespace synthese
 										place.value
 									;
 
-									newList.push_back(houseResult);
+									houseList.push_back(houseResult);
 								}
 
 								// Registration
 								shared_ptr<ParametersMap> pm(new ParametersMap);
 								_registerItems<NamedPlace>(
 									*pm,
-									newList
+									houseList
 								);
 								result.insert(DATA_ADDRESSES, pm);
 								done = true;
@@ -768,8 +800,7 @@ namespace synthese
 							result,
 							request,
 							bestMap,
-							className,
-							minDistanceToOrigin
+							className
 						);
 					}
 					else
@@ -805,8 +836,7 @@ namespace synthese
 								DATA_ADDRESS,
 								(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
 								request,
-								rank,
-								minDistanceToOrigin
+								rank
 							);
 						}
 						if(result.hasSubMaps(DATA_ROADS) &&
@@ -817,8 +847,7 @@ namespace synthese
 								DATA_ROAD,
 								(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
 								request,
-								rank,
-								minDistanceToOrigin
+								rank
 							);
 						}
 						if(result.hasSubMaps(DATA_PUBLIC_PLACES) &&
@@ -867,8 +896,7 @@ namespace synthese
 							DATA_ADDRESS,
 							pm.getSubMaps(DATA_ADDRESS),
 							request,
-							rank,
-							minDistanceToOrigin
+							rank
 						);
 					}
 					if(pm.hasSubMaps(DATA_ROAD))
@@ -878,8 +906,7 @@ namespace synthese
 							DATA_ROAD,
 							pm.getSubMaps(DATA_ROAD),
 							request,
-							rank,
-							minDistanceToOrigin
+							rank
 						);
 					}
 					if(pm.hasSubMaps(DATA_PUBLIC_PLACE))
@@ -930,11 +957,10 @@ namespace synthese
 			std::ostream& stream,
 			const std::string& className,
 			const std::vector<boost::shared_ptr<util::ParametersMap> >& maps,
-			const server::Request& request,
-			int minDistanceToOrigin
+			const server::Request& request
 		) const {
 			size_t rank(0);
-			_displayItems(stream, className, maps, request, rank,minDistanceToOrigin);
+			_displayItems(stream, className, maps, request, rank);
 		}
 
 
@@ -944,8 +970,7 @@ namespace synthese
 			const std::string& className,
 			const std::vector<boost::shared_ptr<util::ParametersMap> >& maps,
 			const server::Request& request,
-			std::size_t& rank,
-			int minDistanceToOrigin
+			std::size_t& rank
 		) const {
 
 			BOOST_FOREACH(const shared_ptr<ParametersMap>& item, maps)
@@ -959,19 +984,6 @@ namespace synthese
 				// Rank
 				item->insert(DATA_RANK, rank++);
 
-				//min distance to origin
-				if(!_coordinatesXY.empty())
-				{
-					item->insert(DATA_DISTANCE_TO_ORIGIN, minDistanceToOrigin);
-				}
-
-				if(_originPoint)
-				{
-					//origin
-					item->insert(DATA_ORIGIN_X, _originPoint->getX());
-					item->insert(DATA_ORIGIN_Y, _originPoint->getY());
-				}
-
 				// Display
 				_itemPage->display(stream, request, *item);
 			}
@@ -984,12 +996,19 @@ namespace synthese
 			const util::ParametersMap & result,
 			const server::Request& request,
 			shared_ptr<ParametersMap> bestPlace,
-			const string& bestPlaceClassName,
-			int minDistanceToOrigin
+			const string& bestPlaceClassName
 		) const {
 			ParametersMap classMap(getTemplateParameters());
 
 			size_t rank(0);
+
+			//min distance to origin
+			if(_originPoint)
+			{
+					//origin
+					classMap.insert(DATA_ORIGIN_X, _originPoint->getX());
+					classMap.insert(DATA_ORIGIN_Y, _originPoint->getY());
+			}
 
 			//Insert best place
 			if(bestPlace.get())
@@ -1002,8 +1021,7 @@ namespace synthese
 					bestPlaceClassName,
 					bestPlaceMap,
 					request,
-					rank,
-					minDistanceToOrigin
+					rank
 				);
 				classMap.insert(DATA_BEST_PLACE, bestPlaceStream.str());
 			}
@@ -1043,8 +1061,7 @@ namespace synthese
 					DATA_ADDRESS,
 					(*result.getSubMaps(DATA_ADDRESSES).begin())->getSubMaps(DATA_ADDRESS),
 					request,
-					rank,
-					minDistanceToOrigin
+					rank
 				);
 				classMap.insert(DATA_ADDRESSES, adresses.str());
 			}
@@ -1057,8 +1074,7 @@ namespace synthese
 					DATA_ROAD,
 					(*result.getSubMaps(DATA_ROADS).begin())->getSubMaps(DATA_ROAD),
 					request,
-					rank,
-					minDistanceToOrigin
+					rank
 				);
 				classMap.insert(DATA_ROADS, roads.str());
 			}
