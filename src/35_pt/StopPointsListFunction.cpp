@@ -744,7 +744,7 @@ namespace synthese
 			{
 				shared_ptr<Point> gp = stopPoint.getGeometry();
 
-				//Coordonnates of bbox center
+				// Coordinates of bbox center
 				double xCenter = (_bbox->getMaxX() + _bbox->getMinX()) / 2.0; 
 				double yCenter = (_bbox->getMaxY() + _bbox->getMinY()) / 2.0; 
 
