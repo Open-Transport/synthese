@@ -49,6 +49,7 @@ namespace synthese
 		public:
 			SortableLineNumber(std::string str, bool lettersBeforeNumbers);
 			bool operator<(SortableLineNumber const &otherNumber) const;
+			bool operator!=(SortableLineNumber const &otherNumber) const;
 		};
 	}
 }

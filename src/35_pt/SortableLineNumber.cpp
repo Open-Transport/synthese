@@ -111,5 +111,12 @@ namespace synthese
 				return _end < otherNumber._end;
 			}
 		}
+
+
+
+		bool SortableLineNumber::operator!=( SortableLineNumber const &otherNumber ) const
+		{
+			return _value != otherNumber._value;
+		}
 	}
 }
