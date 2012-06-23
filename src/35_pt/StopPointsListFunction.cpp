@@ -474,24 +474,39 @@ namespace synthese
 		{
 		}
 
+
+
 		bool StopPointsListFunction::SortableStopPoint::operator<(SortableStopPoint const &otherStopPoint) const
 		{
-			if(_isSortByDistanceToBboxCenter)
-			{
+			if(	_isSortByDistanceToBboxCenter &&
+				_distanceToBboxCenter != otherStopPoint.getDistanceToBboxCenter()
+			){
 				return _distanceToBboxCenter < otherStopPoint.getDistanceToBboxCenter();
 			}
-			return _opCode < otherStopPoint.getOpCode();
+
+			if(	_opCode != otherStopPoint.getOpCode()
+			){
+				return _opCode < otherStopPoint.getOpCode(); 
+			}
+
+			return this < &otherStopPoint;
 		}
+
+
 
 		SortableLineNumber StopPointsListFunction::SortableStopPoint::getOpCode() const
 		{
 			return _opCode;
 		}
 
+
+
 		int StopPointsListFunction::SortableStopPoint::getDistanceToBboxCenter() const
 		{
 			return _distanceToBboxCenter;
 		}
+
+
 
 		const StopPoint* StopPointsListFunction::SortableStopPoint::getStopPoint() const
 		{
@@ -506,10 +521,17 @@ namespace synthese
 		{
 		}
 
+
+
 		bool StopPointsListFunction::SortableLineKey::operator<(SortableLineKey const &otherLineKey) const
 		{
-			return _lineShortName < otherLineKey.getShortName();
+			return
+				(_lineShortName != otherLineKey.getShortName() && _lineShortName < otherLineKey.getShortName()) ||
+				this < &otherLineKey
+			;
 		}
+
+
 
 		SortableLineNumber StopPointsListFunction::SortableLineKey::getShortName() const
 		{
@@ -525,7 +547,10 @@ namespace synthese
 
 		bool StopPointsListFunction::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
 		{
-			return _destinationName < otherStopArea.getDestinationName();
+			return
+				(_destinationName != otherStopArea.getDestinationName() && _destinationName < otherStopArea.getDestinationName()) ||
+				this < &otherStopArea
+			;
 		}
 
 		string StopPointsListFunction::SortableStopArea::getDestinationName() const

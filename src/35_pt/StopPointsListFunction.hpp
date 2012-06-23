@@ -182,6 +182,7 @@ namespace synthese
 			public:
 				SortableLineKey(util::RegistryKeyType key, std::string lineShortName);
 				bool operator<(SortableLineKey const &otherLineKey) const;
+				bool operator!=(SortableLineKey const &otherLineKey) const;
 				SortableLineNumber getShortName() const;
 			};
 
