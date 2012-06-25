@@ -489,7 +489,7 @@ namespace synthese
 				return _opCode < otherStopPoint.getOpCode(); 
 			}
 
-			return this < &otherStopPoint;
+			return _sp < otherStopPoint._sp;
 		}
 
 
