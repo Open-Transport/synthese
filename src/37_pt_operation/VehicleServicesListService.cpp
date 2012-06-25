@@ -120,21 +120,9 @@ namespace synthese
 				const VehicleService& vs(*item.second);
 
 				// Date filter
-				if(!_date.is_not_a_date())
+				if(!_date.is_not_a_date() && !vs.isActive(_date))
 				{
-					bool ok(false);
-					BOOST_FOREACH(const VehicleService::Services::value_type& service, vs.getServices())
-					{
-						if(service->isActive(_date))
-						{
-							ok = true;
-							break;
-						}
-					}
-					if(!ok)
-					{
-						continue;
-					}
+					continue;
 				}
 
 				// Name filter
