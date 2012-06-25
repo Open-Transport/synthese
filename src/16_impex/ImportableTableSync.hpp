@@ -70,6 +70,8 @@ namespace synthese
 
 				Set get(const std::string& code) const;
 
+				Set getBeginWith(const std::string& code) const;
+
 				void add(typename T::ObjectType& object);
 
 				void remove(const std::string& code, typename T::ObjectType& object);
@@ -128,6 +130,27 @@ namespace synthese
 				return it->second;
 			}
 			return typename ImportableTableSync::ObjectBySource<T>::Set();
+		}
+
+
+
+		template<class T>
+		typename ImportableTableSync::ObjectBySource<T>::Set ImportableTableSync::ObjectBySource<T>::getBeginWith(
+			const std::string& code
+		) const	{
+
+			typename ImportableTableSync::ObjectBySource<T>::Set result;
+
+			BOOST_FOREACH(const Map::value_type& item, _map)
+			{
+				if(	item.first.size() >= code.size() &&
+					item.first.substr(0, code.size()) == code
+				){
+					result.insert(item.second.begin(), item.second.end());
+				}
+			}
+
+			return result;
 		}
 
 

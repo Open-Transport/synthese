@@ -89,7 +89,7 @@ namespace synthese
 
 
 
-		void VehicleService::clear()
+		void VehicleService::clearServices()
 		{
 			_services.clear();
 		}
