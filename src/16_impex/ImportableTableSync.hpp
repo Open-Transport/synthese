@@ -141,7 +141,7 @@ namespace synthese
 
 			typename ImportableTableSync::ObjectBySource<T>::Set result;
 
-			BOOST_FOREACH(const Map::value_type& item, _map)
+			BOOST_FOREACH(const typename Map::value_type& item, _map)
 			{
 				if(	item.first.size() >= code.size() &&
 					item.first.substr(0, code.size()) == code
