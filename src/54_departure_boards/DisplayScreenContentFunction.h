@@ -45,6 +45,11 @@ namespace synthese
 		class StopArea;
 	}
 
+	namespace pt_website
+	{
+		class RollingStockFilter;
+	}
+
 	namespace departure_boards
 	{
 		class DisplayType;
@@ -54,8 +59,8 @@ namespace synthese
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator
 		//////////////////////////////////////////////////////////////////////////
 		/// @ingroup m54Functions refFunctions
-		///	@author Hugues Romain, Xavier Raffin
-		///	@date 2002
+		/// @author Hugues Romain, Xavier Raffin
+		/// @date 2002
 		class DisplayScreenContentFunction:
 			public util::FactorableTemplate<cms::FunctionWithSite<false>,DisplayScreenContentFunction>
 		{
@@ -70,25 +75,39 @@ namespace synthese
 			static const std::string PARAMETER_CITY_NAME;
 			static const std::string PARAMETER_STOP_NAME;
 			static const std::string PARAMETER_LINE_ID;
+			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
+			static const std::string PARAMETER_TISSEO_IS_REAL_TIME;
+
+			static const std::string DATA_FIRST_DEPARTURE_TIME;
+			static const std::string DATA_LAST_DEPARTURE_TIME;
 
 			static const std::string PARAMETER_MAIN_PAGE_ID;
 			static const std::string PARAMETER_ROW_PAGE_ID;
 			static const std::string PARAMETER_DESTINATION_PAGE_ID;
 			static const std::string PARAMETER_TRANSFER_DESTINATION_PAGE_ID;
 
+			static const std::string DATA_STOP_ID;
+			static const std::string DATA_OPERATOR_CODE;
+
+			static const std::string DATA_STOP_AREA_ID;
+			static const std::string DATA_STOP_AREA_NAME;
+			static const std::string DATA_STOP_AREA_CITY_NAME;
+			static const std::string DATA_STOP_AREA_CITY_ID;
+
 		private:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const DisplayScreen>	  _screen;
-				boost::shared_ptr<DisplayType>			  _type;
+				boost::shared_ptr<const DisplayScreen> _screen;
+				boost::shared_ptr<DisplayType> _type;
 				boost::optional<boost::posix_time::ptime> _date;
-				boost::optional<util::RegistryKeyType>    _lineToDisplay;
-				bool	_wayIsBackward;
+				boost::optional<util::RegistryKeyType> _lineToDisplay;
+				boost::shared_ptr<const pt_website::RollingStockFilter> _rollingStockFilter;
+				bool _wayIsBackward;
 
-				boost::shared_ptr<const cms::Webpage>	_mainPage;
-				boost::shared_ptr<const cms::Webpage>	_rowPage;
-				boost::shared_ptr<const cms::Webpage>	_destinationPage;
-				boost::shared_ptr<const cms::Webpage>	_transferDestinationPage;
+				boost::shared_ptr<const cms::Webpage> _mainPage;
+				boost::shared_ptr<const cms::Webpage> _rowPage;
+				boost::shared_ptr<const cms::Webpage> _destinationPage;
+				boost::shared_ptr<const cms::Webpage> _transferDestinationPage;
 			//@}
 
 			//////////////////////////////////////////////////////////////////////////
@@ -126,6 +145,11 @@ namespace synthese
 				const pt::StopPoint* stop
 			) const;
 
+			void displayFullDate(
+				const std::string & datafieldName,
+				const boost::posix_time::ptime & time,
+				util::ParametersMap & pm
+			) const;
 
 		public:
 			DisplayScreenContentFunction():
@@ -138,8 +162,8 @@ namespace synthese
 			/// Launches the display.
 			/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response
 			//////////////////////////////////////////////////////////////////////////
-			///	@param stream stream to write the output on
-			///	@param request request which has launched the function
+			/// @param stream stream to write the output on
+			/// @param request request which has launched the function
 			/// @pre _screen and _screen->getType() must be not null
 			/// @author Hugues Romain, Xavier Raffin
 			util::ParametersMap run(std::ostream& stream, const server::Request& request) const;
@@ -176,7 +200,7 @@ namespace synthese
 		public:
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a departure board.
-				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				/// https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -221,7 +245,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Displays a row of a departure board.
-				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				/// https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -259,7 +283,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of an intermediate or ending destination of a departure board.
-				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				/// https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				/// @param stream stream to write the result on
 				/// @param request request which has called the display
@@ -299,7 +323,7 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Display of a transfer destination from an intermediate stop.
-				///	https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
+				/// https://extranet.rcsmobility.com/projects/synthese/wiki/Departure_board_content_generator#Response-through-CMS-for-chronological-departure-board
 				//////////////////////////////////////////////////////////////////////////
 				void _displayDepartureBoardTrandferDestination(
 					std::ostream& stream,

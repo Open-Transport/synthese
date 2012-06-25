@@ -40,6 +40,7 @@
 #include "SchedulesBasedService.h"
 #include "JourneyPattern.hpp"
 #include "RollingStock.hpp"
+#include "RollingStockFilter.h"
 #include "CommercialLine.h"
 #include "City.h"
 #include "Alarm.h"
@@ -64,6 +65,7 @@ namespace synthese
 	using namespace graph;
 	using namespace server;
 	using namespace pt;
+	using namespace pt_website;
 	using namespace interfaces;
 	using namespace db;
 	using namespace geography;
@@ -85,6 +87,7 @@ namespace synthese
 		const string DisplayScreenContentFunction::PARAMETER_CITY_NAME("cn");
 		const string DisplayScreenContentFunction::PARAMETER_STOP_NAME("sn");
 		const string DisplayScreenContentFunction::PARAMETER_LINE_ID("lineid");
+		const string DisplayScreenContentFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 
 		const string DisplayScreenContentFunction::DATA_MAC("mac");
 		const string DisplayScreenContentFunction::DATA_DISPLAY_SERVICE_NUMBER("display_service_number");
@@ -100,6 +103,15 @@ namespace synthese
 		const string DisplayScreenContentFunction::DATA_MESSAGE_CONTENT("message_content");
 		const string DisplayScreenContentFunction::DATA_DATE("date");
 		const string DisplayScreenContentFunction::DATA_SUBSCREEN_("subscreen_");
+		const string DisplayScreenContentFunction::DATA_FIRST_DEPARTURE_TIME("first_departure_time");
+		const string DisplayScreenContentFunction::DATA_LAST_DEPARTURE_TIME("last_departure_time");
+
+		const string DisplayScreenContentFunction::DATA_STOP_ID("stop_id");
+		const string DisplayScreenContentFunction::DATA_OPERATOR_CODE("operatorCode");
+		const string DisplayScreenContentFunction::DATA_STOP_AREA_ID("stop_area_id");
+		const string DisplayScreenContentFunction::DATA_STOP_AREA_NAME("stop_area_name");
+		const string DisplayScreenContentFunction::DATA_STOP_AREA_CITY_NAME("stop_area_city_name");
+		const string DisplayScreenContentFunction::DATA_STOP_AREA_CITY_ID("stop_area_city_id");
 
 		const string DisplayScreenContentFunction::DATA_JOURNEYS("journeys");
 
@@ -170,6 +182,10 @@ namespace synthese
 			if(_transferDestinationPage.get())
 			{
 				map.insert(PARAMETER_TRANSFER_DESTINATION_PAGE_ID, _transferDestinationPage->getKey());
+			}
+			if(_rollingStockFilter.get() != NULL)
+			{
+				map.insert(PARAMETER_ROLLING_STOCK_FILTER_ID, _rollingStockFilter->getKey());
 			}
 			return map;
 		}
@@ -338,6 +354,17 @@ namespace synthese
 
 					_lineToDisplay = map.getOptional<RegistryKeyType>(PARAMETER_LINE_ID);
 
+					// Rolling stock filter
+					optional<RegistryKeyType> rs_id(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+					if(rs_id) try
+					{
+						_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(*rs_id);
+					}
+					catch (ObjectNotFoundException<RollingStockFilter>)
+					{
+						throw RequestException("No such RollingStockFilter");
+					}
+
 					screen->setType(_type.get());
 					//If request contains an interface : build a screen, else prepare custom xml answer
 					optional<RegistryKeyType> idReg(map.getOptional<RegistryKeyType>(PARAMETER_INTERFACE_ID));
@@ -358,6 +385,17 @@ namespace synthese
 						_type->setDisplayRowPage(_rowPage.get());
 						_type->setDisplayDestinationPage(_destinationPage.get());
 						_type->setDisplayTransferDestinationPage(_transferDestinationPage.get());
+
+						if(_lineToDisplay)
+						{
+							LineFilter lf;
+							lf.insert(
+								make_pair(
+									_env->getRegistry<CommercialLine>().get(*_lineToDisplay).get(),
+									false
+							)	);
+							screen->setAllowedLines(lf);
+						}
 					}
 					_screen.reset(screen);
 				}
@@ -481,6 +519,19 @@ namespace synthese
 			const SchedulesBasedService* service = static_cast<const SchedulesBasedService*>(servicePointer.getService());
 			const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(service->getPath());
 
+			//Stop Point
+			pm.insert(DATA_STOP_ID, stop->getKey());
+			pm.insert(DATA_STOP_NAME, stop->getName());
+			pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
+
+			//StopArea
+			const StopArea* connPlace(stop->getConnectionPlace());
+
+			pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
+			pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
+			pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
+			pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
+
 			shared_ptr<ParametersMap> journeyPm(new ParametersMap());
 			journeyPm->insert("route_id", journeyPattern->getKey());
 			journeyPm->insert("date_time", servicePointer.getDepartureDateTime());
@@ -521,7 +572,6 @@ namespace synthese
 			destination.toParametersMap(*destinationPM);
 			journeyPm->insert("destination", destinationPM);
 
-			const StopArea* connPlace(stop->getConnectionPlace());
 			shared_ptr<ParametersMap> connPlacePM(new ParametersMap);
 			connPlace->toParametersMap(*connPlacePM);
 			journeyPm->insert("stopArea", connPlacePM);
@@ -537,10 +587,10 @@ namespace synthese
 			{
 				return ParametersMap();
 			}
-			if(	_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage()
+			if(_screen->getType()->getDisplayInterface() || _screen->getType()->getDisplayMainPage()
 			){
 				ptime date(_date ? *_date : second_clock::local_time());
-				if(	!_screen->getIsOnline() ||
+				if(!_screen->getIsOnline() ||
 					!_screen->getDisplayedPlace()
 				){
 					return ParametersMap();
@@ -570,7 +620,7 @@ namespace synthese
 						displayedObject.map = generator.run();
 						displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(_screen.get(), date);
 
-						if(	_screen->getType()->getDisplayInterface() &&
+						if(_screen->getType()->getDisplayInterface() &&
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()
 						){
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableRoutePlanningInterfacePage>()->display(
@@ -614,7 +664,7 @@ namespace synthese
 						displayedObject.map = _screen->generateStandardScreen(realStartDateTime, endDateTime);
 						displayedObject.alarm = DisplayScreenAlarmRecipient::getAlarm(_screen.get(), date);
 
-						if(	_screen->getType()->getDisplayInterface() &&
+						if(_screen->getType()->getDisplayInterface() &&
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()
 						){
 							_screen->getType()->getDisplayInterface()->getPage<DeparturesTableInterfacePage>()->display(
@@ -740,9 +790,32 @@ namespace synthese
 									continue;
 							}
 
+							// Filter by Rolling stock id
+							if(_rollingStockFilter.get())
+							{
+								const JourneyPattern* journeyPattern = static_cast<const JourneyPattern*>(servicePointer.getService()->getPath());
+								const CommercialLine * commercialLine(journeyPattern->getCommercialLine());
+								// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+								bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
+								set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+								BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+								{
+									if(commercialLine->usesTransportMode(*rollingStock))
+									{
+										atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
+										break;
+									}
+								}
+
+								// If the line doesn't respect the filter, skip it
+								if(!atLeastOneMode)
+								{
+									continue;
+								}
+							}
 							long long mapKeyMinutes = departureDateTime.time_of_day().minutes()
-										+ departureDateTime.time_of_day().hours()*60 //Add hour *60
-										+ (departureDateTime.date().day_number()-startDateTime.date().day_number())*1440;//Add 0 or 1 day * 1440
+								+ departureDateTime.time_of_day().hours()*60 //Add hour *60
+								+ (departureDateTime.date().day_number()-startDateTime.date().day_number())*1440;// Add 0 or 1 day * 1440
 
 							map<long long,vector<ServicePointer> >::iterator it;
 							it=servicePointerMap.find(mapKeyMinutes);
@@ -923,11 +996,42 @@ namespace synthese
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 
+			const ArrivalDepartureTableGenerator::PhysicalStops::const_iterator it = screen.getPhysicalStops().begin();
+			const StopPoint * stop = it->second;
+
+			//Stop Point
+			pm.insert(DATA_STOP_ID, stop->getKey());
+			pm.insert(DATA_STOP_NAME, stop->getName());
+			pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
+
+			//StopArea
+			const StopArea* connPlace(stop->getConnectionPlace());
+
+			pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
+			pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
+			pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
+			pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
+
 			// Rows
 			if(rowPage.get())
 			{
 				stringstream rowStream;
 				const ArrivalDepartureList& ptds(rows.map);
+
+				if(!ptds.empty())
+				{
+					displayFullDate(
+						DATA_FIRST_DEPARTURE_TIME,
+						(*ptds.begin()).first.getDepartureDateTime(),
+						pm
+					);
+
+					displayFullDate(
+						DATA_LAST_DEPARTURE_TIME,
+						(*ptds.rbegin()).first.getDepartureDateTime(),
+						pm
+					);
+				}
 
 				/// @todo replace by parameters or something else
 				int __Pages(0);
@@ -1580,5 +1684,16 @@ namespace synthese
 
 			// Launch of the display
 			page->display(stream, request, pm);
+		}
+
+		void DisplayScreenContentFunction::displayFullDate(
+			const string & datafieldName,
+			const ptime & time,
+			ParametersMap & pm
+		) const {
+			stringstream s;
+			s << to_iso_extended_string(time.date()) << ' ';
+			s << setw(2) << setfill('0') << time.time_of_day().hours() << ":" << setw(2) << setfill('0') << time.time_of_day().minutes();
+			pm.insert(datafieldName, s.str());
 		}
 }	}
