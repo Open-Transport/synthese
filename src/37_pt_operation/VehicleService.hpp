@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_pt_operations_VehicleService_hpp__
 #define SYNTHESE_pt_operations_VehicleService_hpp__
 
+#include "Calendar.h"
 #include "Named.h"
 #include "ImportableTemplate.hpp"
 #include "Registrable.h"
@@ -48,6 +49,7 @@ namespace synthese
 		*/
 		class VehicleService:
 			public util::Named,
+			public calendar::Calendar,
 			public impex::ImportableTemplate<VehicleService>,
 			public virtual util::Registrable
 		{
@@ -91,7 +93,7 @@ namespace synthese
 				void addDriverServiceChunk(const DriverService::Chunk& value);
 				void removeDriverServiceChunk(const DriverService::Chunk& value);
 				void insert(pt::SchedulesBasedService& value);
-				void clear();
+				void clearServices();
 			//@}
 
 			//! @name Services

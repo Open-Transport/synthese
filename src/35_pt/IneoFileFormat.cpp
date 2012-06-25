@@ -901,6 +901,7 @@ namespace synthese
 							BOOST_FOREACH(const date& dat, dates)
 							{
 								service->setActive(dat);
+								vehicleService->setActive(dat);
 							}
 							if(vehicleService)
 							{
@@ -966,7 +967,7 @@ namespace synthese
 						string sb(_getValue("SB"));
 						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
 							_vehicleServices,
-							sb,
+							sb + "/" + lexical_cast<string>(ph),
 							_dataSource,
 							_env,
 							stream
@@ -1210,14 +1211,25 @@ namespace synthese
 						}
 
 						// Vehicle service
-						set<VehicleService*> lvs;
+						VehicleService* vs(NULL);
 						if(!vsKey.empty())
 						{
-							lvs = _vehicleServices.get(vsKey);
+							set<VehicleService*> lvs;
+							lvs = _vehicleServices.getBeginWith(vsKey);
 							if(lvs.empty())
 							{
 								stream << "WARN : vehicle service " << vsKey << " not foud in driver service " << key << ".<br />";
 								continue;
+							}
+
+							// Select the vehicle service which runs at the specified date
+							BOOST_FOREACH(VehicleService* item, lvs)
+							{
+								if(item->isActive(vsDate))
+								{
+									vs = item;
+									break;
+								}
 							}
 						}
 
@@ -1234,7 +1246,7 @@ namespace synthese
 						chunks.push_back(
 							DriverService::Chunk(
 								ds,
-								lvs.empty() ? NULL : *lvs.begin(),
+								vs,
 								activities.empty() ? NULL : *activities.begin(),
 								vsDate,
 								hdeb,

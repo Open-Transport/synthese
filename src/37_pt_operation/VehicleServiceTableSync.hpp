@@ -47,6 +47,7 @@ namespace synthese
 				static const std::string COL_NAME;
 				static const std::string COL_SERVICES;
 				static const std::string COL_DATASOURCE_LINKS;
+				static const std::string COL_DATES;
 			//@}
 
 			//! @name Services

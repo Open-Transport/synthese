@@ -58,9 +58,10 @@ namespace synthese
 
 	namespace pt_operation
 	{
-		const string VehicleServiceTableSync::COL_NAME("name");
-		const string VehicleServiceTableSync::COL_SERVICES("services");
-		const string VehicleServiceTableSync::COL_DATASOURCE_LINKS("datasource_links");
+		const string VehicleServiceTableSync::COL_NAME = "name";
+		const string VehicleServiceTableSync::COL_SERVICES = "services";
+		const string VehicleServiceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
+		const string VehicleServiceTableSync::COL_DATES = "dates";
 	}
 
 	namespace db
@@ -77,6 +78,7 @@ namespace synthese
 			Field(VehicleServiceTableSync::COL_NAME, SQL_TEXT),
 			Field(VehicleServiceTableSync::COL_SERVICES, SQL_TEXT),
 			Field(VehicleServiceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(VehicleServiceTableSync::COL_DATES, SQL_TEXT),
 			Field()
 		};
 
@@ -111,6 +113,9 @@ namespace synthese
 				// Services
 				object->setServices(VehicleServiceTableSync::UnserializeServices(rows->getText(VehicleServiceTableSync::COL_SERVICES), env, linkLevel));
 			}
+
+			// Dates
+			object->setFromSerializedString(rows->getText(VehicleServiceTableSync::COL_DATES));
 		}
 
 
@@ -127,6 +132,12 @@ namespace synthese
 					object->getDataSourceLinks(),
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
+
+			// Dates
+			stringstream datesStr;
+			object->serialize(datesStr);
+			query.addField(datesStr.str());
+
 			query.execute(transaction);
 		}
 
