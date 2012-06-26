@@ -93,14 +93,70 @@ function addTextInputAutoComplete(params) {
 }
 
 
+/**
+ * Function: setGeoRM
+ * Assign Geoportal's GeoRM token to an Object.
+ *
+ * Returns:
+ * {Object} the rightsManagement key
+ */
 function setGeoRM() {
-  return Geoportal.GeoRMHandler.addKey(
-    gGEOPORTALRIGHTSMANAGEMENT.apiKey,
-    gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.url,
-    gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.ttl,
-    map);
+    return Geoportal.GeoRMHandler.addKey(
+        gGEOPORTALRIGHTSMANAGEMENT.apiKey,
+        gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.url,
+        gGEOPORTALRIGHTSMANAGEMENT[gGEOPORTALRIGHTSMANAGEMENT.apiKey[0]].tokenServer.ttl,
+        map);
+}
+/*
+ * Copyright (c) 2008-2012 Institut National de l'information Geographique et forestiere France, released under the
+ * BSD license.
+ */
+
+if (window.__Geoportal$timer===undefined) {
+    var __Geoportal$timer= null;
 }
 
+/**
+ * Function: checkApiLoading
+ * Assess that needed classes have been loaded.
+ *
+ * Parameters:
+ * retryClbk - {Function} function to call if any of the expected classes
+ * is missing.
+ * clss - {Array({String})} list of classes to check.
+ *
+ * Returns:
+ * {Boolean} true when all needed classes have been loaded, false otherwise.
+ */
+function checkApiLoading(retryClbk,clss) {
+    if (__Geoportal$timer!=null) {
+        //clearTimeout: cancels the timer "__Geoportal$timer" before its end
+        //clearTimeout: annule le minuteur "__Geoportal$timer" avant sa fin
+        window.clearTimeout(__Geoportal$timer);
+         __Geoportal$timer= null;
+    }
+
+    /**
+    * It may happen that the init function is executed before the API is loaded
+    * Addition of a timer code that waits 300 ms before running the init function
+    *
+    * Il se peut que l'init soit exécuté avant que l'API ne soit chargée
+    * Ajout d'un code temporisateur qui attend 300 ms avant de relancer l'init
+    */
+    var f;
+    for (var i=0, l= clss.length; i<l; i++) {
+        try {
+            f= eval(clss[i]);
+        } catch (e) {
+            f= undefined;
+        }
+        if (typeof(f)==='undefined') {
+             __Geoportal$timer= window.setTimeout(retryClbk, 300);
+            return false;
+        }
+    }
+    return true;
+}
 
 function ajaxMapChange(obj) {
   var url=obj.action+'?';
