@@ -95,7 +95,7 @@ namespace synthese
 				"numZoomLevels: 21," <<
 				"projection: epsg4258," <<
 				"units: epsg4258.getUnits()," <<
-				"maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90)," <<
+				"maxExtent: new OpenLayers.Bounds(-180, -90, 180, 90)" <<
 				"}," <<
 				"gGEOPORTALRIGHTSMANAGEMENT));" <<
 
@@ -117,17 +117,19 @@ namespace synthese
 				"territory:'EUE'" <<
 				"})]);" <<
 
-				"var europeanMapOpts= cat.getLayerParameters(zon, 'GEOGRAPHICALGRIDSYSTEMS.MAPS:WMSC');" <<
+
+				"var europeanMapOpts= cat.getLayerParameters(zon, 'GEOGRAPHICALGRIDSYSTEMS.MAPS');" <<
 				"europeanMapOpts.options.opacity= 1.0;" <<
 				"europeanMapOpts.options['GeoRM']= setGeoRM();" <<
-				"europeanMapOpts.transitionEffect= 'resize';" <<
 				"var europeanMap= new europeanMapOpts.classLayer(" <<
-				"OpenLayers.i18n(europeanMapOpts.options.name)," <<
-				"europeanMapOpts.url," <<
-				"europeanMapOpts.params," <<
-				"europeanMapOpts.options);" <<
+					"OpenLayers.i18n(europeanMapOpts.options.name)," <<
+					"europeanMapOpts.url," <<
+					"europeanMapOpts.params," <<
+					"europeanMapOpts.options);" <<
 				"europeanMapOpts.options.maxExtent.transform(europeanMapOpts.options.projection, map.getProjection(), true);" <<
-				"map.addLayer(europeanMap);";
+
+				"map.addLayers([europeanMap]);";
+
 				return str.str();
 			}
 

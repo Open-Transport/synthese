@@ -123,7 +123,7 @@ namespace synthese
 				// TODO : add ajax call on click on the button (replace it by a link button)
 			}
 			stream << "<div id=\"" << _id << "\"></div>";
-			stream << HTMLModule::GetHTMLJavascriptOpen("http://openlayers.org/api/2.10/OpenLayers.js");
+			stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers/OpenLayers.js");
 
 			// For Geoportail
 			BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
@@ -131,19 +131,8 @@ namespace synthese
 				if(mapSource.second->getType() == MapSource::IGN)
 				{
 					stringstream streamTemp;
-					streamTemp << "http://api.ign.fr/geoportail/api?v=1.2-m&amp;key=" << mapSource.second->getURL() << "&amp;includeEngine=true&amp;";
+					streamTemp << "http://api.ign.fr/geoportail/api/js/1.3.0/GeoportalMin.js";
 					stream << HTMLModule::GetHTMLJavascriptOpen(streamTemp.str());
-
-					stream << HTMLModule::GetHTMLJavascriptOpen();
-					stream << "if (window.__Geoportal$timer===undefined) {" <<
-						"var __Geoportal$timer= null;" <<
-						"}" <<
-						"if (window.gGEOPORTALRIGHTSMANAGEMENT===undefined) {" <<
-						"var gGEOPORTALRIGHTSMANAGEMENT= {" <<
-						"apiKey:['"<< mapSource.second->getURL() <<"']" <<
-						"};" <<
-						"}";
-					stream << HTMLModule::GetHTMLJavascriptClose();
 				}
 			}
 
@@ -394,9 +383,19 @@ namespace synthese
 			   "bounds.extend(new OpenLayers.LonLat(" << fixed << firstPointProjected->getX() << "," << fixed << firstPointProjected->getY() << "));" <<
 			   "bounds.extend(new OpenLayers.LonLat(" << fixed << secondPointProjected->getX() << "," << fixed << secondPointProjected->getY() << "));" <<
 			   "map.zoomToExtent(bounds, true);" <<
-            "}" <<
+            "}";
 
-            "window.onload = loadMap;" <<
+			// For Geoportail
+			BOOST_FOREACH(const MapSource::Registry::value_type& mapSource, Env::GetOfficialEnv().getRegistry<MapSource>())
+			{
+				if(mapSource.second->getType() == MapSource::IGN)
+				{
+//					stream << "if (checkApiLoading('loadAPI();',['OpenLayers','Geoportal'])===false) {}";
+					stream << "Geoportal.GeoRMHandler.getConfig(['" << mapSource.second->getURL() << "'], null,null);";
+				}
+			}
+
+            stream << "window.onload = loadMap;" <<
 
 			"function activateAddPoint_" << _id << "(requestURL)" <<
 			"{" <<
