@@ -241,6 +241,10 @@ namespace synthese
 					break;
 
 				case 'b':
+					if(	_IsFollowedBy(source, pos, "b"))
+					{
+						++pos;
+					}
 					result.push_back(B);
 					break;
 
@@ -275,6 +279,10 @@ namespace synthese
 					if(	_IsLast(source, pos)
 					){
 						break;
+					}
+					if(	_IsFollowedBy(source, pos, "d"))
+					{
+						++pos;
 					}
 
 					result.push_back(D);
@@ -387,10 +395,20 @@ namespace synthese
 					break;
 
 				case 'f':
+					if(	_IsFollowedBy(source, pos, "f"))
+					{
+						++pos;
+					}
 					result.push_back(F);
 					break;
 
 				case 'g':
+					if(	_IsFollowedBy(source, pos, "g"))
+					{
+						++pos;
+						result.push_back(G);
+						break;
+					}
 					if(	_IsFollowedBy(source, pos, "e") &&
 						_IsAnyOf(source, pos+2, "oau")
 					){
