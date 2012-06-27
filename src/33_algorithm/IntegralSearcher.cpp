@@ -607,6 +607,9 @@ sqrt(
 				serviceUse.getArrivalDateTime() :
 				serviceUse.getDepartureDateTime()
 			);
+			/* TODO : solve memory errors that makes _destinationVam.getVertexAccess(reachedVertex).approachTime having a wrong vaule (40000 hours !)
+			 * See https://extranet.rcsmobility.com/issues/19961
+			 * When solved, this code cold be uncommented
 			if(isGoalReached)
 			{
 				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
@@ -618,7 +621,7 @@ sqrt(
 				)	return _JourneyUsefulness(false, false);
 			}
 			else
-			{
+			{*/
 				if(	(	(_accessDirection == ARRIVAL_TO_DEPARTURE)
 					&&	(reachDateTime < _minMaxDateTimeAtDestination)
 					)
@@ -626,7 +629,7 @@ sqrt(
 					&&	(reachDateTime > _minMaxDateTimeAtDestination)
 					)
 				)	return _JourneyUsefulness(false, false);
-			}
+			//}
 
 			/** - If the reached vertex does not belong to the goal, comparison with the known best time at the goal, to determinate
 				if there is any chance to reach the goal more efficiently by using this path
