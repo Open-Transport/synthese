@@ -87,11 +87,11 @@ namespace synthese
 					throw ActionException("Connexion impossible");
 				}
 
-				Session* session = new Session(request.getIP());
+				Session* session = Session::New(request.getIP());
+				request.setSession(session);
 				session->setUser(user);
 				session->setSessionIdCookie(request);
-				request.setSession(session);
-
+				
 				SecurityLog::addUserLogin(user.get());
 			}
 			catch (UserException e)

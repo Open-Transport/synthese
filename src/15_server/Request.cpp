@@ -82,8 +82,12 @@ namespace synthese
 
 		void Request::deleteSession()
 		{
-			delete _session;
-			_session = NULL;
+			if(_session)
+			{
+				Session* session(_session);
+				setSession(NULL);
+				Session::Delete(*session);
+			}
 		}
 
 
@@ -215,7 +219,9 @@ namespace synthese
 		boost::shared_ptr<const security::User> Request::getUser() const
 		{
 			if (_session)
+			{
 				return _session->getUser();
+			}
 			return boost::shared_ptr<User>();
 		}
 
@@ -250,7 +256,9 @@ namespace synthese
 			html::HTMLForm form(name, _clientURL);
 			ParametersMap::Map map(_getParametersMap().getMap());
 			for (ParametersMap::Map::const_iterator it = map.begin(); it != map.end(); ++it)
+			{
 				form.addHiddenField(it->first, it->second);
+			}
 			return form;
 		}
 
@@ -277,8 +285,7 @@ namespace synthese
 			const Request& request,
 			boost::shared_ptr<Action> action,
 			boost::shared_ptr<Function> function
-		):
-			_session(request._session),
+		):	_session(NULL),
 			_actionWillCreateObject(false),
 			_redirectAfterAction(request._redirectAfterAction),
 			_clientURL(request._clientURL),
@@ -287,12 +294,21 @@ namespace synthese
 			_action(action),
 			_function(function)
 		{
+			setSession(request._session);
 		}
 
 
 
 		void Request::setSession( Session* session )
 		{
+			if(_session)
+			{
+				_session->unregisterRequest(*this);
+			}
+			if(session)
+			{
+				session->registerRequest(*this);
+			}
 			_session = session;
 		}
 
@@ -310,5 +326,15 @@ namespace synthese
 				form.addHiddenField(it.first, it.second);
 			}
 			return form;
+		}
+
+
+
+		Request::~Request()
+		{
+			if(_session)
+			{
+				_session->unregisterRequest(*this);
+			}
 		}
 }	}

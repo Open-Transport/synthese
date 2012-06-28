@@ -25,6 +25,7 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 #include <boost/shared_ptr.hpp>
 #include <boost/date_time/posix_time/ptime.hpp>
@@ -48,50 +49,50 @@ namespace synthese
 		{
 		private:
 			typedef std::map<std::string, std::string> SessionVariables;
+			typedef std::map<std::string, Session*> SessionMap;
+			typedef std::set<const Request*> Requests;
+
+			static SessionMap _sessionMap;
+			static boost::mutex	_sessionMapMutex;
 
 			const std::string			_key;
 			const std::string			_ip;
 			boost::shared_ptr<const security::User>	_user;
 			boost::posix_time::ptime	_lastUse;
 			SessionVariables			_sessionVariables;
+
 			mutable boost::mutex		_mutex; //!< For thread safety in case of concurrent access with the same session.
+			mutable boost::mutex	_requestsListMutex;
+			Requests		_requests;
+
 
 			static const size_t KEY_LENGTH;
 			static const std::string COOKIE_SESSIONID;
 
 
-		public:
 			//!	\name Constructor and destructor
 			//@{
-				Session(const std::string& ip, const std::string& key = "");
-
-				/** Unregisters the session in the global session map.
-				*/
-				~Session();
+				//////////////////////////////////////////////////////////////////////////
+				/// Constructor.
+				/// @param ip IP address of the user
+				/// @param key forced key (empty = auto generated key)
+				/// The constructor is private : use Session::New to initiate a session
+				Session(
+					const std::string& ip,
+					std::string key = std::string()
+				);
 			//@}
 
-			//! \name Modifiers
-			//@{
-				/** Refresh the last use date after several checks.
-
-					The checks are :
-						- expiration of the session
-						- ip must not have changed
-
-					If a check fails, then a SessionException is thrown
-				*/
-				void checkAndRefresh(const std::string& ip);
-			//@}
-
+		public:
 			//! \name Setters
 			//@{
-				void setUser(boost::shared_ptr<const security::User> user);
+				void setUser(boost::shared_ptr<const security::User> user){ _user = user; }
 			//@}
 
 			//! \name Getters
 			//@{
-				const std::string getKey() const;
-				boost::shared_ptr<const security::User> getUser() const;
+				const std::string getKey() const { return _key; }
+				boost::shared_ptr<const security::User> getUser() const { return _user; }
 			//@}
 
 			//! @name Queries
@@ -101,21 +102,6 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				////////////////////////////////////////////////////////////////////
-				/// Try to create a session from the given sid, if it matches
-				/// the format "username:password" and if the given username
-				/// and password pair matches a user.
-				/// @param sid session identifier.
-				/// @param ip IP address of the request, that will be saved in the
-				/// create session.
-				/// @return the newly created session, or NULL if the user/password
-				/// doesn't match a user.
-				/// @author Sylvain Pasche
-				/// @date 2012
-				/// @since 3.3.0
-				static Session* MaybeCreateFromUserPassword(const std::string& sid, const std::string& ip);
-
-
 				////////////////////////////////////////////////////////////////////
 				/// Adds a cookie to the given request with this session identifier.
 				/// This method doesn't check if the session is still valid, it has
@@ -153,6 +139,51 @@ namespace synthese
 				/// @date 2011
 				/// @since 3.3.0
 				std::string getSessionVariable(const std::string& variable) const;
+
+
+
+				void registerRequest(const Request& request);
+				void unregisterRequest(const Request& request);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Session deletion helper.
+				/// @param session the session to delete
+				static void Delete(Session& session);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Session creation helper.
+				/// @param ip IP address of the user
+				/// @param request the request to register on the session
+				/// @param key session key to force (empty = auto generated key)
+				/// @return the newly created session
+				static Session* New(
+					const std::string& ip,
+					std::string key = std::string()
+				);
+
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Session fetcher.
+				/// @param key the key of the session
+				/// @param ip IP address of the user
+				/// @param request the request to register on the session
+				/// @param exceptionIfNotFound if false, a NULL pointer is returned instead
+				/// of an exception in case of a not found key.
+				/// If found, the session is checked and updated :
+				///  - check of the ip (must not have changed)
+				///  - check of the expiration time of the session
+				///  - refresh the last use time
+				/// @throw SessionException if the session does not exist or if a check fails
+				static Session* Get(
+					const std::string& key,
+					const std::string& ip,
+					bool exceptionIfNotFound = true
+				);
 			//@}
 		};
 	}
