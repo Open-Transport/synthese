@@ -60,7 +60,6 @@ namespace synthese
 
 	namespace server
 	{
-		ServerModule::SessionMap	ServerModule::_sessionMap;
 		boost::asio::io_service ServerModule::_io_service;
 		boost::asio::ip::tcp::acceptor ServerModule::_acceptor(ServerModule::_io_service);
 		connection_ptr ServerModule::_new_connection(new HTTPConnection(ServerModule::_io_service, &ServerModule::HandleRequest));
@@ -161,11 +160,6 @@ namespace synthese
 			ServerModule::_io_service.stop();
 		}
 
-
-		ServerModule::SessionMap& ServerModule::GetSessions()
-		{
-			return _sessionMap;
-		}
 
 
 		void ServerModule::ParameterCallback(
@@ -549,6 +543,4 @@ namespace synthese
 				);
 			}
 		}
-	}
-}
-
+}	}

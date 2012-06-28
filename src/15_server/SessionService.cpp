@@ -76,7 +76,6 @@ namespace synthese
 
 				try
 				{
-					session.checkAndRefresh(request.getIP());
 					// Id
 					map.insert(ATTR_ID, session.getKey());
 
