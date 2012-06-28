@@ -56,12 +56,17 @@ namespace synthese
 
 		void Function::setOutputFormatFromMap(const ParametersMap& pm, const string& defaultFormat)
 		{
-			_outputFormat = pm.getDefault<string>(PARAMETER_OUTPUT_FORMAT, defaultFormat);
-
-			// Backward compatibility parameter name.
-			if(!pm.isDefined(PARAMETER_OUTPUT_FORMAT) && pm.isDefined(PARAMETER_OUTPUT_FORMAT_COMPAT))
+			if(pm.isDefined(PARAMETER_OUTPUT_FORMAT))
 			{
-				_outputFormat = pm.getDefault<string>(PARAMETER_OUTPUT_FORMAT_COMPAT, defaultFormat);
+				_outputFormat = pm.get<string>(PARAMETER_OUTPUT_FORMAT);
+			}
+			else if(pm.isDefined(PARAMETER_OUTPUT_FORMAT_COMPAT))
+			{
+				_outputFormat = pm.get<string>(PARAMETER_OUTPUT_FORMAT_COMPAT);
+			}
+			else
+			{
+				_outputFormat = defaultFormat;
 			}
 
 			// Shortcuts

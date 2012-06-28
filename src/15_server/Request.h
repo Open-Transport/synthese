@@ -191,6 +191,7 @@ namespace synthese
 				boost::shared_ptr<Action> action = boost::shared_ptr<Action>(),
 				boost::shared_ptr<Function> function = boost::shared_ptr<Function>()
 			);
+			virtual ~Request();
 
 
 		private:

@@ -23,13 +23,14 @@
 // At first to avoid the Windows bug "WinSock.h has already been included"
 #include "ServerModule.h"
 
-#include "DynamicRequest.h"
-#include "RequestException.h"
-#include "HTTPRequest.hpp"
 #include "Action.h"
+#include "DynamicRequest.h"
+#include "HTTPRequest.hpp"
 #include "Function.h"
+#include "RequestException.h"
 #include "SessionException.h"
 #include "User.h"
+#include "UserException.h"
 #include "UserTableSync.h"
 
 #include <boost/algorithm/string.hpp>
@@ -97,26 +98,74 @@ namespace synthese
 
 		void DynamicRequest::_setupSession()
 		{
+			// Reinitialization of the session pointer (useless in standard situation)
+			if(_session)
+			{
+				setSession(NULL);
+			}
+
+			// Fetching of the session id 
 			string sid(_allParametersMap.getDefault<string>(Request::PARAMETER_SESSION));
 			if(sid.empty())
 			{
-				_session = NULL;
 				return;
 			}
 
-			ServerModule::SessionMap::iterator sit = ServerModule::GetSessions().find(sid);
-			if(sit != ServerModule::GetSessions().end())
+			try
 			{
-				_session = sit->second;
-			}
-			else
-			{
-				// Try to create a session from a "user:password" sid.
-				_session = Session::MaybeCreateFromUserPassword(sid, _ip);
-				if(!_session)
+				// Try to open an existing session
+				Session* session(Session::Get(sid, _ip, false));
+
+				if(session)
 				{
-					return;
+					setSession(session);
 				}
+				// If not found try to create a session from a "user:password" sid.
+				else
+				{
+					// Decode the string
+					size_t colonIndex = sid.find(":");
+					if(colonIndex == string::npos)
+					{
+						return;
+					}
+					string login(sid.substr(0, colonIndex));
+					string password(sid.substr(colonIndex + 1));
+
+					// Checks if the login and the password are not empty
+					if(login.empty() || password.empty())
+					{
+						return;
+					}
+
+					// Loading of the user from the table
+					try
+					{
+						shared_ptr<User> user = UserTableSync::getUserFromLogin(login);
+						user->verifyPassword(password);
+
+						if(!user->getConnectionAllowed())
+						{
+							Log::GetInstance().warn("Connection not allowed");
+							return;
+						}
+
+						setSession(Session::New(_ip, sid));
+						_session->setUser(user);
+					}
+					catch(UserException&)
+					{
+						Log::GetInstance().warn("Wrong password");
+					}
+					catch(...)
+					{
+						Log::GetInstance().warn("User not found");
+					}
+				}
+			}
+			catch(SessionException& e)
+			{
+				Log::GetInstance().debug("Session "+ sid +" rejected", e);
 			}
 		}
 
@@ -216,14 +265,13 @@ namespace synthese
 			if(!_session && !ServerModule::GetAutoLoginUser().empty())
 			{
 				shared_ptr<User> user = UserTableSync::getUserFromLogin(ServerModule::GetAutoLoginUser());
-				_session = new Session(_ip);
+				setSession(Session::New(_ip));
 				_session->setUser(user);
 			}
 			if(_session)
 			{
 				try
 				{
-					_session->checkAndRefresh(_ip);
 					_session->setSessionIdCookie(*this);
 				}
 				catch (SessionException e)

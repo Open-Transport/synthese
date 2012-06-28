@@ -32,8 +32,6 @@
 #include "SessionException.h"
 #include "ServerModule.h"
 #include "User.h"
-#include "UserTableSync.h"
-#include "UserException.h"
 
 using namespace boost;
 using namespace std;
@@ -46,70 +44,26 @@ namespace synthese
 
 	namespace server
 	{
+		Session::SessionMap	Session::_sessionMap;
+
 		const size_t Session::KEY_LENGTH = 20;
 		const string Session::COOKIE_SESSIONID = "sid";
 
 
-		Session::Session(const string& ip, const string& key)
-			: _ip(ip)
-			, _key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key)
-			, _lastUse(second_clock::local_time())
-		{
-			ServerModule::GetSessions().insert(make_pair(_key, this));
-		}
 
-
-
-		void Session::checkAndRefresh(const std::string& ip)
-		{
-			if (ip != _ip)
-				throw SessionException("IP has changed during the session.");
-
-			ptime now(second_clock::local_time());
-			if( (now - _lastUse) > ServerModule::GetSessionMaxDuration())
-			{
-				throw SessionException("Session is too old");
-			}
-
-			_lastUse = now;
-		}
-
-
-
-		Session::~Session()
-		{
-			ServerModule::SessionMap::iterator it = ServerModule::GetSessions().find(_key);
-			if (it != ServerModule::GetSessions().end())
-			{
-				ServerModule::GetSessions().erase(it);
-			}
-		}
-
-
-
-		void Session::setUser(shared_ptr<const User> user )
-		{
-			_user = user;
-		}
-
-
-
-		const std::string Session::getKey() const
-		{
-			return _key;
-		}
-
-
-
-		shared_ptr<const security::User> Session::getUser() const
-		{
-			return _user;
-		}
+		Session::Session(
+			const string& ip,
+			string key
+		):	_ip(ip),
+			_key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key),
+			_lastUse(second_clock::local_time())
+		{}
 
 
 
 		bool Session::hasProfile() const
 		{
+			mutex::scoped_lock lock(_mutex);
 			return
 				_user != NULL &&
 				_user->getProfile() != NULL
@@ -118,49 +72,9 @@ namespace synthese
 
 
 
-		Session* Session::MaybeCreateFromUserPassword(const string& sid, const string& ip)
-		{
-			size_t colonIndex = sid.find(":");
-			if(colonIndex == string::npos)
-				return NULL;
-
-			string login(sid.substr(0, colonIndex));
-			string password(sid.substr(colonIndex + 1));
-			if(login.empty() || password.empty())
-			{
-				return NULL;
-			}
-
-			try
-			{
-				shared_ptr<User> user = UserTableSync::getUserFromLogin(login);
-				user->verifyPassword(password);
-
-				if(!user->getConnectionAllowed()) {
-					Log::GetInstance().warn("Connection not allowed");
-					return NULL;
-				}
-
-				Session* session = new Session(ip, sid);
-				session->setUser(user);
-				return session;
-			}
-			catch(UserException e)
-			{
-				Log::GetInstance().warn("Wrong password");
-			}
-			catch(...)
-			{
-				Log::GetInstance().warn("User not found");
-			}
-
-			return NULL;
-		}
-
-
-
 		void Session::setSessionIdCookie(Request &request) const
 		{
+			mutex::scoped_lock lock(_mutex);
 			request.setCookie(
 				COOKIE_SESSIONID,
 				this->getKey(),
@@ -172,6 +86,7 @@ namespace synthese
 
 		void Session::removeSessionIdCookie( Request &request ) const
 		{
+			mutex::scoped_lock lock(_mutex);
 			request.removeCookie(COOKIE_SESSIONID);
 		}
 
@@ -201,5 +116,94 @@ namespace synthese
 			mutex::scoped_lock lock(_mutex);
 			SessionVariables::const_iterator it(_sessionVariables.find(variable));
 			return (it == _sessionVariables.end()) ? string() : it->second;
+		}
+
+
+
+		Session* Session::New(
+			const string& ip,
+			string key
+		){
+			mutex::scoped_lock(_sessionMapMutex);
+			Session* session(new Session(ip, key));
+			mutex::scoped_lock(session->_requestsListMutex);
+			_sessionMap.insert(make_pair(session->_key, session));
+			return session;
+		}
+
+
+
+		void Session::Delete( Session& session )
+		{
+			// Wait for all requests to be unregistered
+			while(!session._requests.empty());
+
+			mutex::scoped_lock(_sessionMapMutex);
+			mutex::scoped_lock(session._mutex);
+			SessionMap::iterator it(_sessionMap.find(session._key));
+			if(it != _sessionMap.end())
+			{
+				_sessionMap.erase(it);
+				delete &session;
+			}
+		}
+
+
+
+		Session* Session::Get(
+			const std::string& key,
+			const std::string& ip,
+			bool exceptionIfNotFound
+		){
+			mutex::scoped_lock(_sessionMapMutex);
+			Session* session(NULL);
+			SessionMap::iterator it(_sessionMap.find(key));
+			if(it != _sessionMap.end())
+			{
+				session = it->second;
+
+				mutex::scoped_lock lock(session->_mutex);
+				if (ip != session->_ip)
+				{
+					throw SessionException("IP has changed during the session.");
+				}
+
+				ptime now(second_clock::local_time());
+				if( (now - session->_lastUse) > ServerModule::GetSessionMaxDuration())
+				{
+					Delete(*session);
+					throw SessionException("Session is too old");
+				}
+
+				session->_lastUse = now;
+			}
+			else
+			{
+				if(exceptionIfNotFound)
+				{
+					throw SessionException("No such session");
+				}
+				else
+				{
+					return NULL;
+				}
+			}
+			return session;
+		}
+
+
+
+		void Session::registerRequest( const Request& request )
+		{
+			mutex::scoped_lock lock(_requestsListMutex);
+			_requests.insert(&request);
+		}
+
+
+
+		void Session::unregisterRequest( const Request& request )
+		{
+			mutex::scoped_lock lock(_requestsListMutex);
+			_requests.erase(&request);
 		}
 }	}

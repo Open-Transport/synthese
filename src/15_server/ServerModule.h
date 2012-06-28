@@ -133,11 +133,7 @@ namespace synthese
 			static const std::string VERSION;
 			static const std::string VERSION_INFO;
 
-			typedef std::map<std::string, Session*> SessionMap;
-
 		private:
-
-			static SessionMap _sessionMap;
 
 			/// The io_service used to perform asynchronous operations.
 			static boost::asio::io_service _io_service;
@@ -178,11 +174,11 @@ namespace synthese
 			static boost::recursive_mutex& GetThreadManagementMutex();
 			static void RunHTTPServer();
 			static util::EMail GetEMailSender();
-			static boost::posix_time::time_duration GetSessionMaxDuration();
 			static const std::string& GetAutoLoginUser() { return _autoLoginUser; }
 			static const std::string& GetPythonPath() { return _pythonPath; }
 			static const std::string& GetSitesStoragePath() { return _sitesStoragePath; }
-			static SessionMap& GetSessions();
+
+			static boost::posix_time::time_duration GetSessionMaxDuration();
 
 			/** Called whenever a parameter registered by this module is changed
 			 */

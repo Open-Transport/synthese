@@ -97,13 +97,12 @@ namespace synthese
 
 			// Declarations
 			ParametersMap pm;
+			bool value;
 
 			// Service
-			ServerModule::SessionMap::iterator sit = ServerModule::GetSessions().find(_sessionIdToCheck);
-			bool value (sit != ServerModule::GetSessions().end());
-			if(value) try
+			try
 			{
-				sit->second->checkAndRefresh(request.getIP());
+				Session* session(Session::Get(_sessionIdToCheck, request.getIP()));
 			}
 			catch(SessionException)
 			{
