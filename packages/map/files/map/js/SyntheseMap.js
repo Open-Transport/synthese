@@ -134,7 +134,7 @@ var SyntheseMap = OpenLayers.Class({
     if (el = document.getElementById("mousePosLatLon"))
       this.map.addControl(new OpenLayers.Control.MousePosition({
         element: el,
-        numDigits: 2,
+        numDigits: 3,
         displayProjection: new OpenLayers.Projection("EPSG:4326")
       }));
 
