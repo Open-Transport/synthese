@@ -25,6 +25,8 @@ CustomerPasswordEMailContentInterfacePage.cpp
 CustomerPasswordEMailContentInterfacePage.h
 CustomerPasswordEMailSubjectInterfacePage.cpp
 CustomerPasswordEMailSubjectInterfacePage.h
+FreeDRTAvailableSlotsService.cpp
+FreeDRTAvailableSlotsService.hpp
 FreeDRTBookingAdmin.cpp
 FreeDRTBookingAdmin.hpp
 OnlineReservationRule.cpp

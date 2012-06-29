@@ -55,6 +55,7 @@
 #include "VehicleService.hpp"
 
 #include "HeuresOperationFileFormat.hpp"
+#include "IneoOperationFileFormat.hpp"
 
 #include "PTOperationModule.inc.cpp"
 
@@ -88,6 +89,7 @@ void synthese::pt_operation::moduleRegister()
 	synthese::pt_operation::VehicleServicesListService::integrate();
 
 	synthese::pt_operation::HeuresOperationFileFormat::integrate();
+	synthese::pt_operation::IneoOperationFileFormat::integrate();
 
 	synthese::pt_operation::CompositionVehicleAddAction::integrate();
 	synthese::pt_operation::CompositionVehicleRemoveAction::integrate();
