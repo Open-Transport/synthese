@@ -21,7 +21,9 @@
 */
 
 #include "HeuresFileFormat.hpp"
+
 #include "DataSource.h"
+#include "NonConcurrencyRuleTableSync.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
@@ -61,6 +63,7 @@
 #include "CalendarTemplateTableSync.h"
 #include "DestinationTableSync.hpp"
 #include "DataSourceTableSync.h"
+#include "ZipWriter.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/trim.hpp>
@@ -104,6 +107,9 @@ namespace synthese
 		const std::string HeuresFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_DAY7_CALENDAR_ID("day7_calendar_id");
 		const std::string HeuresFileFormat::Importer_::PARAMETER_STOPS_DATASOURCE_ID("stops_datasource_id");
+
+		const std::string HeuresFileFormat::Exporter_::PARAMETER_DATASOURCE_ID = "datasource_id";
+		const std::string HeuresFileFormat::Exporter_::PARAMETER_NETWORK_ID = "network_id";
 	}
 
 	namespace impex
@@ -676,6 +682,314 @@ namespace synthese
 					throw RequestException("No such data source for stops");
 				}
 
+			}
+		}
+
+
+
+		void HeuresFileFormat::Exporter_::build(
+			std::ostream& os
+		) const	{
+
+			//////////////////////////////////////////////////////////////////////////
+			// Load
+
+			// Lines
+			CommercialLineTableSync::Search(
+				_env,
+				_network->getKey()
+			);
+			
+			// Journey patterns
+			BOOST_FOREACH(Registry<CommercialLine>::value_type itline, _env.getRegistry<CommercialLine>())
+			{
+				JourneyPatternTableSync::Search(
+					_env,
+					itline.second->getKey()
+				);
+
+				NonConcurrencyRuleTableSync::Search(
+					_env,
+					itline.second->getKey(),
+					itline.second->getKey(),
+					false
+				);
+			}
+
+			// Stops and services
+			const RollingStock* rollingStock(NULL);
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
+			{
+				const JourneyPattern& line(*itjp.second);
+				if (line.getRollingStock())
+					rollingStock = line.getRollingStock();
+				LineStopTableSync::Search(
+					_env,
+					line.getKey(),
+					optional<RegistryKeyType>(),
+					0,
+					optional<size_t>(),
+					true, true,
+					UP_LINKS_LOAD_LEVEL
+				);
+				ScheduledServiceTableSync::Search(
+					_env,
+					line.getKey(),
+					optional<RegistryKeyType>(),
+					optional<RegistryKeyType>(),
+					optional<string>(),
+					false,
+					0,
+					optional<size_t>(),
+					true, true,
+					UP_DOWN_LINKS_LOAD_LEVEL
+				);
+			}
+
+			//////////////////////////////////////////////////////////////////////////
+			// Output
+
+			// Pointsarrets
+			stringstream pointsarretsStream;
+			bool oneStopWithoutCode(false);
+			BOOST_FOREACH(Registry<StopPoint>::value_type itstop, _env.getRegistry<StopPoint>())
+			{
+				// Local variables
+				const StopPoint& stop(*itstop.second);
+
+				// Data source code
+				vector<string> codes(stop.getCodesBySource(*_dataSource));
+				if(codes.empty())
+				{
+					oneStopWithoutCode = true;
+					os << "ERR  : Stop " << stop.getConnectionPlace()->getFullName() << "/" << stop.getName() << " has no code for the datasource" << endl;
+					continue;
+				}
+
+				// Output
+				BOOST_FOREACH(const string& codeBySource, stop.getCodesBySource(*_dataSource))
+				{
+					pointsarretsStream << setw(4) << setfill(' ') << codeBySource;
+					pointsarretsStream << "0";
+					_writeTextAndSpaces(pointsarretsStream, stop.getName().empty() ? stop.getConnectionPlace()->getName() : stop.getName(), 50);
+					_writeTextAndSpaces(pointsarretsStream, string(), 9);
+					_writeTextAndSpaces(pointsarretsStream, stop.getConnectionPlace()->getCity()->getName(), 30);
+					_writeTextAndSpaces(pointsarretsStream, string(), 15);
+					pointsarretsStream << endl;
+				}
+			}
+
+			// Break if one stop without code
+			if(oneStopWithoutCode)
+			{
+				os << "STOP : Import broken, at least a stop without code for the datasource" << endl;
+				return;
+			}
+
+
+			// Itinerai
+			stringstream itineraiStream;
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type itjp, _env.getRegistry<JourneyPattern>())
+			{
+				bool hasArea(false);
+				BOOST_FOREACH(Edge* edge, itjp.second->getEdges())
+				{
+					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
+					{
+						hasArea = true;
+						continue;
+					}
+				}
+				if(hasArea)
+				{
+					continue;
+				}
+
+				const JourneyPattern& jp(*itjp.second);
+				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 4);
+				_writeTextAndSpaces(itineraiStream, jp.getCommercialLine()->getCodeBySources(), 3, false);
+				_writeTextAndSpaces(itineraiStream, jp.getName(), 2, false);
+				itineraiStream << jp.getWayBack();
+				Path::Edges::const_iterator itLastEdge(jp.getEdges().end());
+				for(Path::Edges::const_iterator itEdge(jp.getEdges().begin()); itEdge != jp.getEdges().end(); ++itEdge)
+				{
+					if(!dynamic_cast<DesignatedLinePhysicalStop*>(*itEdge))
+					{
+						continue;
+					}
+
+					const DesignatedLinePhysicalStop& ls(*static_cast<DesignatedLinePhysicalStop*>(*itEdge));
+					const StopPoint& stop(*ls.getPhysicalStop());
+					_writeTextAndSpaces(itineraiStream, *stop.getCodesBySource(*_dataSource).begin(), 4, false);
+					itineraiStream << ls.getScheduleInput();
+					if(itLastEdge == jp.getEdges().end())
+					{
+						itineraiStream << "    0";
+					}
+					else
+					{
+						itineraiStream << setw(5) << setfill(' ') << ((*itEdge)->getMetricOffset() - (*itLastEdge)->getMetricOffset());
+					}
+					itLastEdge = itEdge;
+				}
+				itineraiStream << endl;
+			}
+
+			// Troncons
+			stringstream tronconsStream;
+
+			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
+			{
+				bool hasArea(false);
+				BOOST_FOREACH(Edge* edge, itss.second->getPath()->getEdges())
+				{
+					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
+					{
+						hasArea = true;
+						continue;
+					}
+				}
+				if(hasArea)
+				{
+					continue;
+				}
+
+				const ScheduledService& ss(*itss.second);
+
+				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
+				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 3, false);
+				tronconsStream << "2";
+				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getEdge(0)->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+				_writeHour(tronconsStream, ss.getDepartureSchedule(false, 0));
+				_writeTextAndSpaces(tronconsStream, *static_cast<StopPoint*>(ss.getPath()->getLastEdge()->getFromVertex())->getCodesBySource(*_dataSource).begin(), 4, false);
+				_writeHour(tronconsStream, ss.getLastArrivalSchedule(false));
+				tronconsStream << "000000";
+				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getName(), 2, false);
+				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 4);
+				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
+				for(size_t i(0); i<ss.getDepartureSchedules(false).size(); ++i)
+				{
+					_writeHour(tronconsStream, ss.getArrivalSchedule(false, i));
+					_writeHour(tronconsStream, ss.getDepartureSchedule(false, i));
+				}
+				tronconsStream << ";" << endl;
+			}
+
+			// Services
+			stringstream servicesStream;
+
+			BOOST_FOREACH(Registry<ScheduledService>::value_type itss, _env.getRegistry<ScheduledService>())
+			{
+				bool hasArea(false);
+				BOOST_FOREACH(Edge* edge, itss.second->getPath()->getEdges())
+				{
+					if(!dynamic_cast<DesignatedLinePhysicalStop*>(edge))
+					{
+						hasArea = true;
+						continue;
+					}
+				}
+				if(hasArea)
+				{
+					continue;
+				}
+
+				const ScheduledService& ss(*itss.second);
+
+				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 6, false);
+				servicesStream << "1111111";
+				_writeTextAndSpaces(servicesStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 3, false);
+				_writeTextAndSpaces(servicesStream, ss.getServiceNumber(), 3, false);
+				servicesStream << "2";
+				servicesStream << "0000000000000000000000";
+				servicesStream << endl;
+			}
+
+			ZipWriter * zip = new ZipWriter(os);
+
+			zip->Write("pointsarrets.tmp", pointsarretsStream);
+			zip->Write("services.tmp", servicesStream);
+			zip->Write("itinerai.tmp", itineraiStream);
+			zip->Write("troncons.tmp", tronconsStream);
+
+			zip->WriteDirectory();
+
+			os << flush;
+		}
+
+
+
+		void HeuresFileFormat::Exporter_::setFromParametersMap(
+			const util::ParametersMap& map
+		){
+			// Network
+			try
+			{
+				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+			}
+			catch (...)
+			{
+				throw Exception("Transport network " + lexical_cast<string>(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID)) + " not found");
+			}
+
+			// Data source
+			try
+			{
+				_dataSource = DataSourceTableSync::Get(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID), _env);
+			}
+			catch (...)
+			{
+				throw Exception("Data source " + lexical_cast<string>(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID)) + " not found");
+			}
+		}
+
+
+
+		util::ParametersMap HeuresFileFormat::Exporter_::getParametersMap() const
+		{
+			ParametersMap map;
+			if(_network.get())
+			{
+				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+			if(_dataSource.get())
+			{
+				map.insert(PARAMETER_DATASOURCE_ID, _dataSource->getKey());
+			}
+			return map;
+		}
+
+
+
+		void HeuresFileFormat::Exporter_::_writeHour( std::ostream& os, const boost::posix_time::time_duration& duration )
+		{
+			os << setw(2) << setfill('0') << duration.hours();
+			os << setw(2) << setfill('0') << duration.minutes();
+		}
+
+
+
+		void HeuresFileFormat::Exporter_::_writeTextAndSpaces(
+			std::ostream& os,
+			const std::string& value,
+			size_t width,
+			bool spacesAtRight,
+			char spaceChar
+		){
+			if(!spacesAtRight)
+			{
+				for(size_t i(value.size()); i<width; ++i)
+				{
+					os << spaceChar;
+				}
+			}
+			os << (value.size() > width ? value.substr(0, width) : value);
+			if(spacesAtRight)
+			{
+				for(size_t i(value.size()); i<width; ++i)
+				{
+					os << spaceChar;
+				}
 			}
 		}
 }	}

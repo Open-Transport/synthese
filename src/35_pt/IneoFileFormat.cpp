@@ -55,6 +55,7 @@
 #include "StopPointAdmin.hpp"
 #include "TransportNetwork.h"
 #include "UserTableSync.h"
+#include "VehicleServiceTableSync.hpp"
 
 #include <fstream>
 #include <boost/algorithm/string.hpp>
@@ -100,8 +101,6 @@ namespace synthese
 		const string IneoFileFormat::Importer_::FILE_CJV = "cjv";
 		const string IneoFileFormat::Importer_::FILE_HOR = "hor";
 		const string IneoFileFormat::Importer_::FILE_CAL = "cal";
-		const string IneoFileFormat::Importer_::FILE_AFA = "afa";
-		const string IneoFileFormat::Importer_::FILE_SAB = "sab";
 		const string IneoFileFormat::Importer_::SEP = ";";
 
 		const string IneoFileFormat::Importer_::PARAMETER_NETWORK_ID = "net";
@@ -132,6 +131,7 @@ namespace synthese
 		const string IneoFileFormat::Importer_::VALUE_UFR = "UFR";
 		const string IneoFileFormat::Importer_::PARAMETER_JOURNEY_PATTERN_LINE_OVERLOAD_FIELD = "journey_pattern_line_overload_field";
 		const string IneoFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		const string IneoFileFormat::Importer_::PARAMETER_VEHICLE_SERVICE_SUFFIX = "vehicle_service_suffix";
 	}
 
 	namespace impex
@@ -145,8 +145,6 @@ namespace synthese
 			IneoFileFormat::Importer_::FILE_CAL.c_str(),
 			IneoFileFormat::Importer_::FILE_CJV.c_str(),
 			IneoFileFormat::Importer_::FILE_HOR.c_str(),
-			IneoFileFormat::Importer_::FILE_SAB.c_str(),
-			IneoFileFormat::Importer_::FILE_AFA.c_str(),
 		"");
 	}
 
@@ -184,12 +182,9 @@ namespace synthese
 			_interactive(false),
 			_displayLinkedStops(false),
 			_stopPoints(_dataSource, _env),
-			_activities(_dataSource, _env),
-			_driverAllocationTemplates(_dataSource, _env),
 			_lines(_dataSource, _env),
 			_destinations(_dataSource, _env),
 			_addWaybackToJourneyPatternCode(false),
-			_vehicleServices(_dataSource, _env),
 			_depots(_dataSource, _env)
 		{}
 
@@ -798,6 +793,7 @@ namespace synthese
 			else if(key == FILE_HOR)
 			{
 				ImportableTableSync::ObjectBySource<DeadRunTableSync> deadRuns(_dataSource, _env);
+				ImportableTableSync::ObjectBySource<VehicleServiceTableSync> vehicleServices(_dataSource, _env);
 				TCOUValues tcou;
 				JourneyPattern* route(NULL);
 				VehicleService* vehicleService(NULL);
@@ -901,7 +897,10 @@ namespace synthese
 							BOOST_FOREACH(const date& dat, dates)
 							{
 								service->setActive(dat);
-								vehicleService->setActive(dat);
+								if(vehicleService)
+								{
+									vehicleService->setActive(dat);
+								}
 							}
 							if(vehicleService)
 							{
@@ -966,8 +965,8 @@ namespace synthese
 						// Vehicle service
 						string sb(_getValue("SB"));
 						vehicleService = PTOperationFileFormat::CreateOrUpdateVehicleService(
-							_vehicleServices,
-							sb + "/" + lexical_cast<string>(ph),
+							vehicleServices,
+							sb + "/" + lexical_cast<string>(ph) + (_vehicleServiceSuffix.empty() ? string() : ("/"+ _vehicleServiceSuffix)),
 							_dataSource,
 							_env,
 							stream
@@ -1031,337 +1030,6 @@ namespace synthese
 					}
 				}
 			}
-			else if(key == FILE_SAB)
-			{
-				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
-				string lastKey;
-				DriverService* ds(NULL);
-				do
-				{
-					// File read
-					_readLine(inFile);
-					if(_section == "SASB" || _section == "#")
-					{
-						string tpstra(_getValue("TpsTra"));
-						string ampli(_getValue("Ampli"));
-						string onBoardTicketing(_getValue("VaB"));
-
-						// Load
-						string key(_getValue("SA"));
-						string vsKey(_getValue("SB"));
-						string dateStr(_getValue("DATE"));
-						string fullKey(key+"/"+dateStr);
-
-						// Date
-						date vsDate;
-						vector<string> parts;
-						split(parts, dateStr, is_any_of("/.-"));
-						vsDate = date(
-							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
-							lexical_cast<int>(parts[1]),
-							lexical_cast<int>(parts[0])
-						);
-
-						if(fullKey != lastKey)
-						{
-							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
-								driverServices,
-								fullKey,
-								_dataSource,
-								_env,
-								stream,
-								"driver service"
-							);
-							lastKey = fullKey;
-							DriverService::Chunks emptyChunks;
-							ds->setChunks(emptyChunks);
-							ds->setActive(vsDate);
-
-							// Name
-							ds->setName(key);
-
-							// Allocation template
-							DriverAllocationTemplate* da(
-								FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
-									_driverAllocationTemplates,
-									fullKey,
-									_dataSource,
-									_env,
-									stream,
-									"driver allocation template"
-							)	);
-
-							// Driver service link
-							DriverService::Vector::Type driverServices;
-							driverServices.push_back(ds);
-							da->set<DriverService::Vector>(driverServices);
-
-							// Date
-							da->set<Date>(vsDate);
-
-							// On board ticketing
-							da->set<WithTicketSales>(!onBoardTicketing.empty());
-
-							// Amount
-							string amountStr(_getValue("Frs"));
-							double amount(
-								amountStr.empty() || amountStr == "vide" ?
-								0 :
-								lexical_cast<double>(amountStr)
-							);
-							da->set<Amount>(amount);
-
-							// Max Boni amount
-							string boniAmountStr(_getValue("ATTmaxfrs"));
-							da->set<MaxBoniAmount>(
-								boniAmountStr.empty() || boniAmountStr == "vide" ?
-								0 :
-								lexical_cast<double>(boniAmountStr)
-							);
-
-							// Boni time
-							string bonifStr(_getValue("ATTmaxtps"));
-							if(bonifStr.empty() || bonifStr == "vide")
-							{
-								da->set<MaxBoniTime>(minutes(0));
-							}
-							else
-							{
-								vector<string> parts;
-								split(parts, bonifStr, is_any_of("h"));
-								da->set<MaxBoniTime>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
-							}
-
-							// Work range
-							string workRangeStr(_getValue("Ampli"));
-							if(workRangeStr.empty() || workRangeStr == "vide")
-							{
-								da->set<WorkRange>(time_duration(not_a_date_time));
-							}
-							else
-							{
-								vector<string> parts;
-								split(parts, workRangeStr, is_any_of("h"));
-								da->set<WorkRange>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
-							}
-
-							// Work duration
-							string workDurationStr(_getValue("TpsTra"));
-							if(workDurationStr.empty() || workDurationStr == "vide")
-							{
-								da->set<WorkDuration>(time_duration(not_a_date_time));
-							}
-							else
-							{
-								vector<string> parts;
-								split(parts, workDurationStr, is_any_of("h"));
-								da->set<WorkDuration>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
-							}
-						}
-
-						// Journey
-						bool afterMidnight(_getValue("DAPM")=="O");
-						string hdebstr(_getValue("HDeb"));
-						vector<string> hdebParts;
-						split(hdebParts, hdebstr, is_any_of("h:"));
-						time_duration hdeb(
-							hours(lexical_cast<long>(hdebParts[0])) +
-							minutes(lexical_cast<long>(hdebParts[1]))
-						);
-						string hfinstr(_getValue("HFin"));
-						vector<string> hfinParts;
-						split(hfinParts, hfinstr, is_any_of("h:"));
-						time_duration hfin(
-							hours(lexical_cast<long>(hfinParts[0])) +
-							minutes(lexical_cast<long>(hfinParts[1]))
-						);
-						if(hfin < hdeb)
-						{
-							hfin += hours(24);
-						}
-						if(afterMidnight)
-						{
-							hdeb += hours(24);
-							hfin += hours(24);
-						}
-
-						// Service start and end
-						string hdebpStr(_getValue("HDebP"));
-						vector<string> hdebpParts;
-						split(hdebpParts, hdebpStr, is_any_of("h:"));
-						time_duration hdebp(
-							hours(lexical_cast<long>(hdebpParts[0])) +
-							minutes(lexical_cast<long>(hdebpParts[1]))
-						);
-						string hfinpStr(_getValue("HFinP"));
-						vector<string> hfinpParts;
-						split(hfinpParts, hfinpStr, is_any_of("h:"));
-						time_duration hfinp(
-							hours(lexical_cast<long>(hfinpParts[0])) +
-							minutes(lexical_cast<long>(hfinpParts[1]))
-						);
-						if(hfinp < hdebp)
-						{
-							hfinp += hours(24);
-						}
-						if(afterMidnight)
-						{
-							hdebp += hours(24);
-							hfinp += hours(24);
-						}
-
-						// Vehicle service
-						VehicleService* vs(NULL);
-						if(!vsKey.empty())
-						{
-							set<VehicleService*> lvs;
-							lvs = _vehicleServices.getBeginWith(vsKey);
-							if(lvs.empty())
-							{
-								stream << "WARN : vehicle service " << vsKey << " not foud in driver service " << key << ".<br />";
-								continue;
-							}
-
-							// Select the vehicle service which runs at the specified date
-							BOOST_FOREACH(VehicleService* item, lvs)
-							{
-								if(item->isActive(vsDate))
-								{
-									vs = item;
-									break;
-								}
-							}
-						}
-
-						// Activity
-						string activityStr(_getValue("Act"));
-						set<DriverActivity*> activities;
-						if(!activityStr.empty() && activityStr != "vide")
-						{
-							// Search for an activity
-							activities = _activities.get(activityStr);
-						}
-
-						DriverService::Chunks chunks(ds->getChunks());
-						chunks.push_back(
-							DriverService::Chunk(
-								ds,
-								vs,
-								activities.empty() ? NULL : *activities.begin(),
-								vsDate,
-								hdeb,
-								hfin,
-								hdebp,
-								hfinp
-						)	);
-						ds->setChunks(chunks);
-					}
-
-				} while(!_section.empty());
-			}
-			else if(key == FILE_AFA)
-			{
-				ImportableTableSync::ObjectBySource<UserTableSync> users(_dataSource, _env);
-				ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
-				do
-				{
-					// File read
-					_readLine(inFile);
-					if(_section == "AFF" || _section == "#")
-					{
-						// Primary key
-						string userKey(_getValue("MAT"));
-						string dateStr(_getValue("DATE"));
-						if(userKey.empty() || dateStr.empty())
-						{
-							continue;
-						}
-						string fullKey(userKey +"/"+ dateStr);
-
-						// Object creation
-						DriverAllocation* da = FileFormat::LoadOrCreateObject<DriverAllocationTableSync>(
-							driverAllocations,
-							fullKey,
-							_dataSource,
-							_env,
-							stream,
-							"allocation"
-						);
-
-						// Date
-						date vsDate;
-						vector<string> parts;
-						split(parts, dateStr, is_any_of("/.-"));
-						vsDate = date(
-							(parts[2].size() == 2 ? 2000 : 0) + lexical_cast<int>(parts[2]),
-							lexical_cast<int>(parts[1]),
-							lexical_cast<int>(parts[0])
-						);
-						da->set<Date>(vsDate);
-
-						// User
-						User* user(
-							FileFormat::LoadOrCreateObject<UserTableSync>(
-								users,
-								userKey,
-								_dataSource,
-								_env,
-								stream,
-								"conducteur"
-						)	);
-						da->set<Driver>(*user);
-
-						// Search for an activity
-						string key(_getValue("SA"));
-						set<DriverActivity*> activities(
-							_activities.get(key)
-						);
-						if(activities.empty())
-						{
-							// Driver service
-							string templateFullKey(
-								key + "/" + dateStr
-							);
-							set<DriverAllocationTemplate*> templates(
-								_driverAllocationTemplates.get(templateFullKey)
-							);
-							if(templates.empty())
-							{
-								stream << "WARN : undefined allocation template " << templateFullKey << ".<br />";
-								continue;
-							}
-							da->set<DriverAllocationTemplate>(
-								**templates.begin()
-							);
-						}
-						else
-						{
-							// Standalone activity
-							da->set<DriverActivity>(**activities.begin());
-						}
-
-						// Bonif amount
-						string bonifAmountStr(_getValue("bonifATTfrs"));
-						da->set<BoniAmount>(
-							bonifAmountStr.empty() || bonifAmountStr == "vide" ?
-							0 :
-							lexical_cast<double>(_getValue("bonifATTfrs"))
-						);
-
-						// Bonif time
-						string bonifStr(_getValue("bonifATTtps"));
-						time_duration bonifTime(minutes(0));
-						if(!bonifStr.empty() && bonifStr != "vide")
-						{
-							vector<string> parts;
-							split(parts, bonifStr, is_any_of("h"));
-							bonifTime = hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1]));
-						}
-						da->set<BoniTime>(bonifTime);
-					}
-
-				} while(!_section.empty());
-			}
 			return true;
 		}
 
@@ -1387,8 +1055,6 @@ namespace synthese
 			stream << t.cell("Fichier CJV (dates)", t.getForm().getTextInput(_getFileParameterName(FILE_CJV), _pathsMap[FILE_CJV].file_string()));
 			stream << t.cell("Fichier CAL (calendriers)", t.getForm().getTextInput(_getFileParameterName(FILE_CAL), _pathsMap[FILE_CAL].file_string()));
 			stream << t.cell("Fichier HOR (horaires)", t.getForm().getTextInput(_getFileParameterName(FILE_HOR), _pathsMap[FILE_HOR].file_string()));
-			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
-			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Effacer données existantes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA, _cleanOldData));
 			stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
@@ -1416,6 +1082,12 @@ namespace synthese
 			sfields.push_back(make_pair(optional<string>(VALUE_MNLP), VALUE_MNLP));
 			sfields.push_back(make_pair(optional<string>(VALUE_IDENTSMS), VALUE_IDENTSMS));
 			stream << t.cell("Champ id arrêt", t.getForm().getSelectInput(PARAMETER_STOP_ID_FIELD, sfields, optional<string>(_stopIdField)));
+
+			// Stop area id field
+			vector<pair<optional<string>, string> > saifields;
+			saifields.push_back(make_pair(optional<string>(VALUE_MNCP), VALUE_MNCP));
+			saifields.push_back(make_pair(optional<string>(VALUE_LIBP), VALUE_LIBP));
+			stream << t.cell("Champ id arrêt commercial", t.getForm().getSelectInput(PARAMETER_STOP_AREA_ID_FIELD, saifields, optional<string>(_stopAreaIdField)));
 
 			// Stop name field
 			vector<pair<optional<string>, string> > snfields;
@@ -1462,6 +1134,10 @@ namespace synthese
 
 			// Auto-purge
 			stream << t.cell("Purge automatique des jours passés", t.getForm().getOuiNonRadioInput(PARAMETER_AUTO_PURGE, _autoPurge));
+
+			// Vehicle services suffix
+			stream << t.cell("Suffixe des services-voiture", t.getForm().getTextInput(PARAMETER_VEHICLE_SERVICE_SUFFIX, _vehicleServiceSuffix));
+
 			stream << t.close();
 		}
 
@@ -1513,26 +1189,6 @@ namespace synthese
 			BOOST_FOREACH(const Registry<VehicleService>::value_type& vservice, _env.getRegistry<VehicleService>())
 			{
 				VehicleServiceTableSync::Save(vservice.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<DriverService>::value_type& dservice, _env.getRegistry<DriverService>())
-			{
-				DriverServiceTableSync::Save(dservice.second.get(), transaction);
-			}
-			BOOST_FOREACH(
-				const Registry<DriverAllocationTemplate>::value_type& driverAllocationTemplate,
-				_env.getRegistry<DriverAllocationTemplate>()
-			){
-				DriverAllocationTemplateTableSync::Save(driverAllocationTemplate.second.get(), transaction);
-			}
-			BOOST_FOREACH(const Registry<User>::value_type& driver, _env.getRegistry<User>())
-			{
-				UserTableSync::Save(driver.second.get(), transaction);
-			}
-			BOOST_FOREACH(
-				const Registry<DriverAllocation>::value_type& driverAllocation,
-				_env.getRegistry<DriverAllocation>()
-			){
-				DriverAllocationTableSync::Save(driverAllocation.second.get(), transaction);
 			}
 			BOOST_FOREACH(const Registry<Depot>::value_type& depot, _env.getRegistry<Depot>())
 			{
@@ -1646,6 +1302,12 @@ namespace synthese
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
 
+			// Vehicle service suffix
+			if(!_vehicleServiceSuffix.empty())
+			{
+				map.insert(PARAMETER_VEHICLE_SERVICE_SUFFIX, _vehicleServiceSuffix);
+			}
+
 			// Line read method
 			map.insert(PARAMETER_LINE_READ_METHOD, _lineReadMethod);
 
@@ -1691,6 +1353,7 @@ namespace synthese
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 
+			// Network
 			if(map.isDefined(PARAMETER_NETWORK_ID)) try
 			{
 				_network = TransportNetworkTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
@@ -1707,6 +1370,9 @@ namespace synthese
 			{
 				_defaultCity = CityTableSync::Get(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY), _env);
 			}
+
+			// Vehicle service suffix
+			_vehicleServiceSuffix = map.getDefault<string>(PARAMETER_VEHICLE_SERVICE_SUFFIX);
 
 			// Line read method
 			_lineReadMethod = map.getDefault<string>(PARAMETER_LINE_READ_METHOD, VALUE_CIDX);

@@ -26,7 +26,7 @@
 #include "FileFormatTemplate.h"
 #include "Calendar.h"
 #include "MultipleFileTypesImporter.hpp"
-#include "NoExportPolicy.hpp"
+#include "OneFileExporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
 
 #include <iostream>
@@ -167,7 +167,37 @@ namespace synthese
 				virtual void _setFromParametersMap(const util::ParametersMap& map);
 			};
 
-			typedef impex::NoExportPolicy<HeuresFileFormat> Exporter_;
+			class Exporter_:
+				public impex::OneFileExporter<HeuresFileFormat>
+			{
+			private:
+				boost::shared_ptr<const pt::TransportNetwork> _network;
+				boost::shared_ptr<const impex::DataSource> _dataSource;
+
+			public:
+				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_DATASOURCE_ID;
+
+				Exporter_(){}
+
+				virtual util::ParametersMap getParametersMap() const;
+
+				virtual void setFromParametersMap(const util::ParametersMap& map);
+
+				virtual void build(std::ostream& os) const;
+
+				static void _writeHour(std::ostream& os, const boost::posix_time::time_duration& duration);
+				static void _writeTextAndSpaces(
+					std::ostream& os,
+					const std::string& value,
+					size_t width,
+					bool spacesAtRight = true,
+					char spaceChar = ' '
+				);
+
+				virtual std::string getOutputMimeType() const { return "application/zip"; }
+				virtual std::string getFileName() const { return "Heures.zip"; }
+			};
 		};
 	}
 }
