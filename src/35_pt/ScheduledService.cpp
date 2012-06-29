@@ -305,6 +305,7 @@ namespace synthese
 			const date& date,
 			std::size_t userClassRank
 		) const {
+			AccessParameters ap(userClassRank + USER_CLASS_CODE_OFFSET);
 			// Pedestrian
 			const Path::Edges& edges(getPath()->getEdges());
 			for(Path::Edges::const_reverse_iterator it(edges.rbegin()); it != edges.rend(); ++it)
@@ -312,9 +313,9 @@ namespace synthese
 				if((*it)->isDeparture())
 				{
 					ServicePointer p(getFromPresenceTime(
+						ap,
 						false,
 						true,
-						USER_PEDESTRIAN,
 						**it,
 						ptime(date, getDepartureSchedule(false, (*it)->getRankInPath())),
 						false,
