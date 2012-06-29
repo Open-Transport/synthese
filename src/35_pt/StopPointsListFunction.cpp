@@ -22,10 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "StopPointsListFunction.hpp"
+
+#include "MimeTypes.hpp"
 #include "RequestException.h"
 #include "Request.h"
 #include "ServicePointer.h"
-#include "StopPointsListFunction.hpp"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "RollingStock.hpp"
@@ -38,11 +40,13 @@
 #include "City.h"
 #include "Webpage.h"
 
+#include <geos/util/math.h>
 #include <sstream>
 #include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace geos::geom;
+using namespace geos::util;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::algorithm;
@@ -73,6 +77,7 @@ namespace synthese
 		const string StopPointsListFunction::PARAMETER_SORT_BY_DISTANCE_TO_BBOX_CENTER = "sortByDistance";
 		const string StopPointsListFunction::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 
+		const string StopPointsListFunction::TAG_PHYSICAL_STOPS = "physicalStops";
 		const string StopPointsListFunction::TAG_PHYSICAL_STOP = "physicalStop";
 		const string StopPointsListFunction::TAG_DESTINATION = "destination";
 		const string StopPointsListFunction::TAG_LINE = "line";
@@ -205,7 +210,6 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-
 			if(map.getOptional<RegistryKeyType>(PARAMETER_DESTINATION_PAGE_ID)) try
 			{
 				_destinationPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_DESTINATION_PAGE_ID));
@@ -214,7 +218,6 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
-
 			if(map.getOptional<RegistryKeyType>(PARAMETER_LINE_PAGE_ID)) try
 			{
 				_linePage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_LINE_PAGE_ID));
@@ -223,6 +226,14 @@ namespace synthese
 			{
 				throw RequestException("No such page");
 			}
+
+			// Other output
+			if(!_page.get())
+			{
+				setOutputFormatFromMap(map, MimeTypes::XML);
+			}
+
+			// Omit same area destinations
 			_omitSameAreaDestinations = map.getDefault<bool>(PARAMETER_OMIT_SAME_AREA_DESTINATIONS, false);
 
 			// Rolling stock filter
@@ -452,10 +463,10 @@ namespace synthese
 					pm.insert("lineStyle", Env::GetOfficialEnv().getRegistry<CommercialLine>().get(*_commercialLineID)->getStyle());
 				}
 
-				pm.outputXML(
+				outputParametersMap(
+					pm,
 					stream,
-					"physicalStops",
-					true,
+					TAG_PHYSICAL_STOPS,
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/StopPointsListFunction.xsd"
 				);
 			}

@@ -87,6 +87,7 @@ namespace synthese
 			static const std::string DATA_LINE_MAP_URL;
 			static const std::string DATA_LINE_DOC_URL;
 			static const std::string DATA_LINE_TIMETABLE_ID;
+			static const std::string DATA_LINE_NETWORK_ID;
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;

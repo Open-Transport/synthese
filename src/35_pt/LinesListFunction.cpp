@@ -614,7 +614,7 @@ namespace synthese
 					stream << pmLine->get<string>(CommercialLine::DATA_LINE_ID) << ";" << pmLine->get<string>(CommercialLine::DATA_LINE_SHORT_NAME) << "\n";
 				}
 			}
-			else if(_outputFormat == MimeTypes::XML)
+			else
 			{
 				outputParametersMap(
 					pm,

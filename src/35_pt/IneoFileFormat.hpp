@@ -29,15 +29,12 @@
 #include "CommercialLineTableSync.h"
 #include "DepotTableSync.hpp"
 #include "DestinationTableSync.hpp"
-#include "DriverActivityTableSync.hpp"
-#include "DriverAllocationTemplateTableSync.hpp"
 #include "MultipleFileTypesImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "PTDataCleanerFileFormat.hpp"
 #include "ImportableTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkTableSync.h"
-#include "VehicleServiceTableSync.hpp"
 
 #include <iostream>
 #include <map>
@@ -90,12 +87,11 @@ namespace synthese
 				static const std::string FILE_CJV; // Validity dates
 				static const std::string FILE_HOR; // Schedules
 				static const std::string FILE_CAL; // Calendars
-				static const std::string FILE_SAB; // Driver services
-				static const std::string FILE_AFA; // Driver allocations
 
 				static const std::string PARAMETER_NETWORK_ID;
 				static const std::string PARAMETER_TRANSPORT_MODE_TYPE_LG_MASK;
 
+				static const std::string PARAMETER_VEHICLE_SERVICE_SUFFIX;
 				static const std::string PARAMETER_AUTO_IMPORT_STOPS;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
@@ -171,6 +167,7 @@ namespace synthese
 					std::string _stopHandicappedAccessibilityField;
 					std::string _mnlp_prefix;
 					boost::shared_ptr<PTUseRule> _handicappedAllowedUseRule;
+					std::string _vehicleServiceSuffix;
 				//@}
 
 				static const std::string SEP;
@@ -197,20 +194,14 @@ namespace synthese
 					bool _addWaybackToJourneyPatternCode;
 				//@}
 
-				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverActivityTableSync> _activities;
 				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
-				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DriverAllocationTemplateTableSync> _driverAllocationTemplates;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
 				mutable std::map<std::string, std::vector<int> > _calendars;
-				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::VehicleServiceTableSync> _vehicleServices;
-
-				typedef std::map<std::pair<security::User*, boost::gregorian::date>, pt_operation::DriverActivity*> Activities;
-				mutable Activities _activityAllocations;
 
 				struct Trip
 				{

@@ -124,7 +124,7 @@ namespace synthese
 			}
 			if(!_page.get())
 			{
-				setOutputFormatFromMap(map, "");
+				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 			_mergeIncludingRoutes = map.isTrue(PARAMETER_MERGE_INCLUDING_ROUTES);
 
@@ -281,7 +281,7 @@ namespace synthese
 			}
 
 
-			bool isOutputXML = !_page.get() && _outputFormat.empty();
+			bool isOutputXML = !_page.get() && _outputFormat == MimeTypes::XML;
 			if(isOutputXML)
 			{
 				// XML header
