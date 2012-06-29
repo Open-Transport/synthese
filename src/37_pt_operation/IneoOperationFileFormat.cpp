@@ -485,6 +485,7 @@ namespace synthese
 			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
 			stream << t.title("Paramètres");
 			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
+			stream << t.close();
 		}
 
 
@@ -701,6 +702,11 @@ namespace synthese
 
 		bool IneoOperationFileFormat::Importer_::beforeParsing()
 		{
+			if(_startDate.is_not_a_date() || _endDate.is_not_a_date())
+			{
+				return false;
+			}
+
 			// Driver allocations
 			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
 			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
