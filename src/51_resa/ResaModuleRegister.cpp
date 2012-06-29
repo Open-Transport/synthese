@@ -19,6 +19,7 @@
 #include "SendPasswordAction.h"
 #include "ReservationUpdateAction.hpp"
 
+#include "FreeDRTAvailableSlotsService.hpp"
 #include "XMLReservationFunction.h"
 #include "ResaCustomerHtmlOptionListFunction.h"
 #include "ReservationEditFunction.h"
@@ -73,6 +74,7 @@ void synthese::resa::moduleRegister()
 	synthese::resa::SendPasswordAction::integrate();
 	synthese::resa::ReservationUpdateAction::integrate();
 
+	synthese::resa::FreeDRTAvailableSlotsService::integrate();
 	synthese::resa::XMLReservationFunction::integrate();
 	synthese::resa::ResaCustomerHtmlOptionListFunction::integrate();
 	synthese::resa::ReservationEditFunction::integrate();

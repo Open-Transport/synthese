@@ -65,6 +65,8 @@ GetVehiclesService.cpp
 GetVehiclesService.hpp
 HeuresOperationFileFormat.cpp
 HeuresOperationFileFormat.hpp
+IneoOperationFileFormat.cpp
+IneoOperationFileFormat.hpp
 PTOperationFileFormat.cpp
 PTOperationFileFormat.hpp
 PTOperationModule.cpp
