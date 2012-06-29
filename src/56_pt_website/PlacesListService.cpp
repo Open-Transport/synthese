@@ -39,8 +39,6 @@
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 
-#include <geos/util/math.h>
-
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
@@ -1214,7 +1212,7 @@ namespace synthese
 			}
 
 			//return value
-			return round(distanceToOriginPoint);
+			return geos::util::round(distanceToOriginPoint);
 		}
 
 		void PlacesListService::addHouse(
