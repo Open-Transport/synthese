@@ -169,6 +169,7 @@ namespace synthese
 				throw RequestException("No such Journey Pattern");
 			}
 
+			// CMS output
 			optional<RegistryKeyType> pid(map.getOptional<RegistryKeyType>(PARAMETER_MAIN_PAGE_ID));
 			if(pid) try
 			{
@@ -182,7 +183,6 @@ namespace synthese
 			{
 				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
-
 			optional<RegistryKeyType> sid(map.getOptional<RegistryKeyType>(PARAMETER_STOP_PAGE_ID));
 			if(sid) try
 			{
@@ -191,6 +191,12 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>&)
 			{
 				throw RequestException("No such stop page");
+			}
+
+			// Other format output
+			if(!_mainPage.get() && !_stopPage.get())
+			{
+				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 
 			_displayDepartureStops = map.getDefault<bool>(PARAMETER_DISPLAY_DEPARTURE_STOPS, true);

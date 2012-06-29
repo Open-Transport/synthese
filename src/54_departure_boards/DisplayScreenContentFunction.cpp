@@ -217,7 +217,7 @@ namespace synthese
 				}
 				if(!_mainPage.get())
 				{
-					setOutputFormatFromMap(map, "");
+					setOutputFormatFromMap(map, MimeTypes::XML);
 				}
 
 				optional<RegistryKeyType> rid(map.getOptional<RegistryKeyType>(PARAMETER_ROW_PAGE_ID));
@@ -709,7 +709,7 @@ namespace synthese
 			else
 			{
 				ParametersMap result;
-				bool isOutputXML = _outputFormat.empty();
+				bool isOutputXML = _outputFormat == MimeTypes::XML;
 				AccessParameters ap;
 
 				if(isOutputXML)

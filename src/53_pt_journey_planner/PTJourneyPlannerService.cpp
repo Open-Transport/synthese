@@ -636,9 +636,6 @@ namespace synthese
 				return;
 			}
 
-			// Output format
-			_outputFormat = map.getDefault<string>(PARAMETER_OUTPUT_FORMAT);
-
 			// Pages
 			if(getSite())
 			{
@@ -655,6 +652,11 @@ namespace synthese
 			catch (ObjectNotFoundException<Webpage>& e)
 			{
 				throw RequestException("No such main page : "+ e.getMessage());
+			}
+			// Other output format
+			if(!_page)
+			{
+				setOutputFormatFromMap(map, MimeTypes::XML);
 			}
 		}
 
@@ -1048,13 +1050,14 @@ namespace synthese
 			{
 				_result->displayHTMLTable(stream, optional<HTMLForm&>(), string(), false);
 			}
-			else if(_outputFormat == MimeTypes::XML)
+			else
 			{
-				pm.outputXML(stream, ITEM_JOURNEY_PLANNER_RESULT, true, "");
-			}
-			else if(_outputFormat == MimeTypes::JSON)
-			{
-				pm.outputJSON(stream, ITEM_JOURNEY_PLANNER_RESULT);
+				outputParametersMap(
+					pm,
+					stream,
+					ITEM_JOURNEY_PLANNER_RESULT,
+					""
+				);
 			}
 
 			return util::ParametersMap();

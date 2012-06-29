@@ -118,12 +118,12 @@ namespace synthese
 					_page->display(stream, request, *pmNetwork);
 				}
 			}
-			else // XML output
+			else
 			{
-				pm.outputXML(
+				outputParametersMap(
+					pm,
 					stream,
 					TAG_NETWORKS,
-					true,
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/35_pt/PTNetworksListFunction.xsd"
 				);
 			}

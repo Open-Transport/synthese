@@ -82,6 +82,7 @@ namespace synthese
 
 		protected:
 			static const std::string TAG_PHYSICAL_STOP;
+			static const std::string TAG_PHYSICAL_STOPS;
 			static const std::string TAG_DESTINATION;
 			static const std::string TAG_LINE;
 			static const std::string DATA_STOP_AREA_PREFIX;

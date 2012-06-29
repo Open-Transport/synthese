@@ -542,6 +542,10 @@ namespace synthese
 				}
 				serviceParametersMap.insert(param.first, s.str());
 			}
+			if(!inlineTemplate.empty())
+			{
+				serviceParametersMap.insert(Function::PARAMETER_OUTPUT_FORMAT, string());
+			}
 
 			// Template parameters evaluation
 			ParametersMap templateParametersMap(request.getFunction()->getTemplateParameters());
