@@ -40,6 +40,9 @@
 #include "City.h"
 #include "Webpage.h"
 
+#ifndef UNIX
+#include <geos/util/math.h>
+#endif
 #include <sstream>
 #include <boost/algorithm/string/split.hpp>
 
@@ -765,6 +768,6 @@ namespace synthese
 			}
 
 			//return value
-			return geos::util::round(distanceToBboxCenter);
+			return round(distanceToBboxCenter);
 		}
 }	}
