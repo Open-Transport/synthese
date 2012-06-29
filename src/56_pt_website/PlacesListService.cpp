@@ -39,9 +39,12 @@
 #include "Webpage.h"
 #include "RoadChunkTableSync.h"
 
+#include <geos/util/math.h>
+
 using namespace std;
 using namespace boost;
 using namespace geos::geom;
+using namespace geos::util;
 
 namespace synthese
 {

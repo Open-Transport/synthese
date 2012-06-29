@@ -21,6 +21,7 @@
 */
 
 #include "CommercialLine.h"
+
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
@@ -30,6 +31,7 @@
 #include "CalendarTemplate.h"
 #include "ImportableTableSync.hpp"
 #include "ParametersMap.h"
+#include "TransportNetwork.h"
 
 #include <boost/foreach.hpp>
 
@@ -63,6 +65,7 @@ namespace synthese
 		const string CommercialLine::DATA_LINE_MAP_URL("line_map_url");
 		const string CommercialLine::DATA_LINE_DOC_URL("line_doc_url");
 		const string CommercialLine::DATA_LINE_TIMETABLE_ID("line_timetable_id");
+		const string CommercialLine::DATA_LINE_NETWORK_ID = "network_id";
 
 
 
@@ -205,6 +208,10 @@ namespace synthese
 			pm.insert(prefix + "style", getStyle()); // For LinesListFunction/StopPointsListFunction compatibility
 			pm.insert(prefix + DATA_LINE_MAP_URL, getMapURL());
 			pm.insert(prefix + DATA_LINE_DOC_URL, getDocURL());
+			if(_network)
+			{
+				pm.insert(prefix + DATA_LINE_NETWORK_ID, _network->getKey());
+			}
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :
