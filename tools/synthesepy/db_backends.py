@@ -64,26 +64,26 @@ class DBBackend(object):
         conn.commit()
         cursor.close()
 
-    def query(self, query, args=(), one=False):
+    def query(self, query, query_args=(), one=False, *args, **kwargs):
         """Queries the database and returns a list of dictionaries."""
         # Hack for MySQL
         if self.paramstyle == 'format':
             query = query.replace('?', '%s')
         log.debug('Running query: %s', query)
-        with self.get_cursor() as cursor:
-            cursor.execute(query, args)
+        with self.get_cursor(*args, **kwargs) as cursor:
+            cursor.execute(query, query_args)
             rv = [dict((cursor.description[idx][0], value)
                        for idx, value in enumerate(row)) for row in cursor.fetchall()]
             return (rv[0] if rv else None) if one else rv
 
-    def replace_into(self, table, object):
+    def replace_into(self, table, object, *args, **kwargs):
         """Runs a REPLACE INTO query with the given object dict"""
         columns = object.keys()
         values = [object[c] for c in columns]
         self.query(
             'replace into %s(%s) values (%s)' % (
                 table, ','.join(columns), ','.join(['?'] * len(columns))
-            ), values)
+            ), values, *args, **kwargs)
 
     def get_tables(self):
         raise NotImplementedError()
