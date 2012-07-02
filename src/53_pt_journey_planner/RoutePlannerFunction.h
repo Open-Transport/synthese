@@ -162,6 +162,7 @@ namespace synthese
 			static const std::string PARAMETER_MAP_JUNCTION_PAGE;
 			static const std::string PARAMETER_SHOW_RESULT_TABLE;
 			static const std::string PARAMETER_RESULT_ROW_PAGE;
+			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
 
 		private:
 			static const std::string DATA_LINES;
@@ -333,6 +334,7 @@ namespace synthese
 				bool										_outputRoadApproachDetail;
 				bool _showResTab;
 				bool _showCoords;
+				bool _ignoreReservationRules;
 				const CoordinatesSystem* _coordinatesSystem;
 				boost::optional<boost::posix_time::time_duration> _maxTransferDuration;
 				boost::optional<double> _minMaxDurationRatioFilter;
