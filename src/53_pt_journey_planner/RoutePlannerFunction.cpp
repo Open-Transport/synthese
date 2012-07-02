@@ -162,6 +162,7 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_MAP_SERVICE_PAGE("map_service_page");
 		const string RoutePlannerFunction::PARAMETER_MAP_JUNCTION_PAGE("map_junction_page");
 		const string RoutePlannerFunction::PARAMETER_RESULT_ROW_PAGE("result_row_page");
+		const string RoutePlannerFunction::PARAMETER_IGNORE_RESERVATION_RULES("irr");
 
 		//XML output only:
 		const string RoutePlannerFunction::PARAMETER_SHOW_RESULT_TABLE("showResTab");
@@ -617,6 +618,9 @@ namespace synthese
 
 			// Fare Calculation
 			_fareCalculation = map.getDefault<bool>(PARAMETER_FARE_CALCULATION,false);
+
+			// Ignore Reservation Rules
+			_ignoreReservationRules = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION_RULES, false);
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
@@ -1080,7 +1084,7 @@ namespace synthese
 				_maxSolutionsNumber,
 				_accessParameters,
 				planningOrder,
-				false,
+				_ignoreReservationRules,
 				*_logger,
 				_maxTransferDuration
 			);
