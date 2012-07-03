@@ -124,12 +124,12 @@ namespace synthese
 				if(	&env == &Env::GetOfficialEnv() &&
 					obj->getCity() &&
 					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
-					dynamic_cast<const StopArea*>(obj->getAliasedPlace())
+					dynamic_cast<const pt::StopArea*>(obj->getAliasedPlace())
 				){
-					const StopArea* stopArea = static_cast<const StopArea*>(obj->getAliasedPlace());
+					const pt::StopArea* stopArea = static_cast<const pt::StopArea*>(obj->getAliasedPlace());
 					pt::PTModule::GetGeneralStopsMatcher().add(
 						obj->getFullName(),
-						env.getEditableSPtr(const_cast<StopArea*>(stopArea))
+						env.getEditableSPtr(const_cast<pt::StopArea*>(stopArea))
 					);
 				}
 			}
