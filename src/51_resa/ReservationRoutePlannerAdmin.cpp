@@ -223,6 +223,7 @@ namespace synthese
 				resaRequest.getAction()->setSite(Env::GetOfficialEnv().getSPtr(ResaModule::GetJourneyPlannerWebsite()));
 			}
 			resaRequest.getAction()->setIgnoreReservationRules(_ignoreReservation);
+			resaRequest.getAction()->setApproachSpeed(_effectiveApproachSpeed);
 
 			// Confirmation
 			if (_confirmedTransaction.get())
