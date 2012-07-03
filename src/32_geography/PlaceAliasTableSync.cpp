@@ -32,7 +32,7 @@
 #include "GeographyModule.h"
 #include "PTModule.h"
 #include "ReplaceQuery.h"
-#include "StopArea.cpp"
+#include "StopArea.hpp"
 
 using namespace std;
 using namespace boost;
