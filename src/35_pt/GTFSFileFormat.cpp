@@ -1034,6 +1034,8 @@ namespace synthese
 
 				shared_ptr<geos::geom::LineString> lineStr = edge->getRealGeometry();
 
+				if(!lineStr.get())continue;
+
 				shared_ptr<geos::geom::Geometry> prGeom(CoordinatesSystem::GetCoordinatesSystem(WGS84_SRID).convertGeometry(*lineStr));
 
 				size_t nb_Points = lineStr->getNumPoints();
@@ -1380,8 +1382,7 @@ namespace synthese
 			// BEGIN AGENCY.TXT
 			BOOST_FOREACH(Registry<TransportNetwork>::value_type myAgency, Env::GetOfficialEnv().getRegistry<TransportNetwork>())
 			{
-				// ﻿agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_lang
-				agencyTxt << _key(myAgency.first) << "," // ﻿agency_id
+				agencyTxt << _key(myAgency.first) << "," // agency_id
 					<< _Str(myAgency.second->getName()) << "," // agency_name
 					<< "," // agency_url
 					<< "," // agency_timezone
@@ -1456,8 +1457,9 @@ namespace synthese
 			// BEGIN ROUTES.TXT
 			BOOST_FOREACH(Registry<CommercialLine>::value_type  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
 			{
-				// ﻿route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
-				if((static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+				// route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+				if((myLine.second->getPaths().begin()) != (myLine.second->getPaths().end()) && 
+					(static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
 				{
 					string color;
 
