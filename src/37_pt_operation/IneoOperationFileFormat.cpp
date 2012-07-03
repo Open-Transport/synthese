@@ -117,6 +117,117 @@ namespace synthese
 
 
 
+		void IneoOperationFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
+		{
+			// Datasource of the services (scheduled services and dead runs)
+			try
+			{
+				_ptDatasource = DataSourceTableSync::Get(
+					map.get<RegistryKeyType>(PARAMETER_PT_DATASOURCE_ID),
+					_env
+				);
+			}
+			catch(ObjectNotFoundException<DataSource>&)
+			{
+				throw Exception("Data source not found");
+			}
+
+			// Determination of start and end dates from the content of SAB
+			// Calendar dates
+			FilePathsMap::const_iterator it(_pathsMap.find(FILE_SAB));
+			if(it == _pathsMap.end())
+			{
+				throw Exception("SAB file path not specified");
+			}
+
+			ifstream inFile;
+			inFile.open(it->second.file_string().c_str());
+			if(!inFile)
+			{
+				throw Exception("Could no open the calendar file.");
+			}
+			_clearFieldsMap();
+			while(_readLine(inFile))
+			{
+				if(_section != "SASB")
+				{
+					continue;
+				}
+
+				string dateStr(_getValue("DATE"));
+				date calDate(
+					lexical_cast<int>(dateStr.substr(6,4)),
+					lexical_cast<int>(dateStr.substr(3,2)),
+					lexical_cast<int>(dateStr.substr(0,2))
+				);
+				if(_startDate.is_not_a_date() || calDate < _startDate)
+				{
+					_startDate = calDate;
+				}
+				if(_endDate.is_not_a_date() || calDate > _endDate)
+				{
+					_endDate = calDate;
+				}
+			}
+		}
+
+
+
+		bool IneoOperationFileFormat::Importer_::beforeParsing()
+		{
+			if(_startDate.is_not_a_date() || _endDate.is_not_a_date())
+			{
+				return false;
+			}
+
+			// Driver allocations
+			date undefinedDate(not_a_date_time);
+			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
+				{
+					if(	_startDate <= itDA->get<Date>() &&
+						_endDate >= itDA->get<Date>()
+					){
+						itDA->set<Date>(undefinedDate);
+					}
+			}	}
+
+			// Driver allocation templates
+			DriverService::Vector::Type emptyDATChunks;
+			ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync> driverAllocationTemplates(_dataSource, _env);
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::value_type& itDASet, driverAllocationTemplates.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
+				{
+					if(	_startDate <= itDA->get<Date>() &&
+						_endDate >= itDA->get<Date>()
+					){
+						itDA->set<DriverService::Vector>(emptyDATChunks);
+					}
+			}	}
+
+			// Driver services
+			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
+			DriverService::Chunks emptyChunks;
+			Calendar importDate(_startDate, _endDate);
+			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& itDSSet, driverServices.getMap())
+			{
+				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::mapped_type::value_type& itDS, itDSSet.second)
+				{
+					if(!itDS->hasAtLeastOneCommonDateWith(importDate))
+					{
+						continue;
+					}
+					itDS->setChunks(emptyChunks);
+			}	}
+
+			return true;
+		}
+
+
+
 		bool IneoOperationFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
@@ -469,23 +580,81 @@ namespace synthese
 
 
 
-		void IneoOperationFileFormat::Importer_::displayAdmin(
-			std::ostream& stream,
-			const admin::AdminRequest& request
-		) const	{
-			stream << "<h1>Fichiers</h1>";
+		bool IneoOperationFileFormat::Importer_::afterParsing()
+		{
+			// Driver services without services
+			BOOST_FOREACH(
+				const Registry<DriverService>::value_type& itDriverService,
+				_env.getRegistry<DriverService>()
+			){
+				if(	!itDriverService.second->hasLinkWithSource(_dataSource) ||
+					!itDriverService.second->getChunks().empty()
+				){
+					continue;
+				}
 
-			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
-			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
-			stream << t.open();
-			stream << t.title("Mode");
-			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
-			stream << t.title("Fichiers");
-			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
-			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
-			stream << t.close();
+				_driverServicesToRemove.insert(itDriverService.second);
+			}
+
+			// Empty driver allocation template
+			BOOST_FOREACH(
+				const Registry<DriverAllocationTemplate>::value_type& itDriverAllocationTemplate,
+				_env.getRegistry<DriverAllocationTemplate>()
+			){
+				if(	!itDriverAllocationTemplate.second->hasLinkWithSource(_dataSource) ||
+					!itDriverAllocationTemplate.second->get<DriverService::Vector>().empty()
+				){
+					continue;
+				}
+
+				_driverAllocationTemplatesToRemove.insert(itDriverAllocationTemplate.second);
+			}
+
+			// Deleted driver allocations
+			BOOST_FOREACH(
+				const Registry<DriverAllocation>::value_type& itDriverAllocation,
+				_env.getRegistry<DriverAllocation>()
+			){
+				if(	!itDriverAllocation.second->hasLinkWithSource(_dataSource) ||
+					!itDriverAllocation.second->get<Date>().is_not_a_date()
+				){
+					continue;
+				}
+
+				_driverAllocationsToRemove.insert(itDriverAllocation.second);
+			}
+	
+			// Driver services
+			BOOST_FOREACH(
+				const shared_ptr<const DriverService>& driverService,
+				_driverServicesToRemove
+			){
+				_env.getEditableRegistry<DriverService>().remove(
+					driverService->getKey()
+				);
+			}
+
+			// Driver allocation
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocation>& driverAllocation,
+				_driverAllocationsToRemove
+			){
+				_env.getEditableRegistry<DriverAllocation>().remove(
+					driverAllocation->getKey()
+				);
+			}
+
+			// Driver allocation template
+			BOOST_FOREACH(
+				const shared_ptr<const DriverAllocationTemplate>& driverAllocationTemplate,
+				_driverAllocationTemplatesToRemove
+			){
+				_env.getEditableRegistry<DriverAllocationTemplate>().remove(
+					driverAllocationTemplate->getKey()
+				);
+			}
+
+			return true;
 		}
 
 
@@ -644,163 +813,22 @@ namespace synthese
 
 
 
-		void IneoOperationFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
-		{
-			// Datasource of the services (scheduled services and dead runs)
-			try
-			{
-				_ptDatasource = DataSourceTableSync::Get(
-					map.get<RegistryKeyType>(PARAMETER_PT_DATASOURCE_ID),
-					_env
-				);
-			}
-			catch(ObjectNotFoundException<DataSource>&)
-			{
-				throw Exception("Data source not found");
-			}
+		void IneoOperationFileFormat::Importer_::displayAdmin(
+			std::ostream& stream,
+			const admin::AdminRequest& request
+		) const	{
+			stream << "<h1>Fichiers</h1>";
 
-			// Determination of start and end dates from the content of SAB
-			// Calendar dates
-			FilePathsMap::const_iterator it(_pathsMap.find(FILE_SAB));
-			if(it == _pathsMap.end())
-			{
-				throw Exception("SAB file path not specified");
-			}
-
-			ifstream inFile;
-			inFile.open(it->second.file_string().c_str());
-			if(!inFile)
-			{
-				throw Exception("Could no open the calendar file.");
-			}
-			_clearFieldsMap();
-			while(_readLine(inFile))
-			{
-				if(_section != "SASB")
-				{
-					continue;
-				}
-
-				string dateStr(_getValue("DATE"));
-				date calDate(
-					lexical_cast<int>(dateStr.substr(6,4)),
-					lexical_cast<int>(dateStr.substr(3,2)),
-					lexical_cast<int>(dateStr.substr(0,2))
-				);
-				if(_startDate.is_not_a_date() || calDate < _startDate)
-				{
-					_startDate = calDate;
-				}
-				if(_endDate.is_not_a_date() || calDate > _endDate)
-				{
-					_endDate = calDate;
-				}
-			}
-		}
-
-
-
-		bool IneoOperationFileFormat::Importer_::beforeParsing()
-		{
-			if(_startDate.is_not_a_date() || _endDate.is_not_a_date())
-			{
-				return false;
-			}
-
-			// Driver allocations
-			ImportableTableSync::ObjectBySource<DriverAllocationTableSync> driverAllocations(_dataSource, _env);
-			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::value_type& itDASet, driverAllocations.getMap())
-			{
-				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
-				{
-					if(	_startDate <= itDA->get<Date>() &&
-						_endDate >= itDA->get<Date>()
-					){
-						_driverAllocationsToRemove.insert(
-							_env.getRegistry<DriverAllocation>().get(itDA->getKey())
-						);
-					}
-			}	}
-
-			// Driver allocation templates
-			ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync> driverAllocationTemplates(_dataSource, _env);
-			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::value_type& itDASet, driverAllocationTemplates.getMap())
-			{
-				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverAllocationTemplateTableSync>::Map::mapped_type::value_type& itDA, itDASet.second)
-				{
-					if(	_startDate <= itDA->get<Date>() &&
-						_endDate >= itDA->get<Date>()
-					){
-						_driverAllocationTemplatesToRemove.insert(
-							_env.getRegistry<DriverAllocationTemplate>().get(itDA->getKey())
-						);
-					}
-			}	}
-
-			// Driver services
-			ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
-			DriverService::Chunks emptyChunks;
-			Calendar importDate(_startDate, _endDate);
-			BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::value_type& itDSSet, driverServices.getMap())
-			{
-				BOOST_FOREACH(const ImportableTableSync::ObjectBySource<DriverServiceTableSync>::Map::mapped_type::value_type& itDS, itDSSet.second)
-				{
-					if(!itDS->hasAtLeastOneCommonDateWith(importDate))
-					{
-						continue;
-					}
-					itDS->setChunks(emptyChunks);
-			}	}
-
-			return true;
-		}
-
-
-
-		bool IneoOperationFileFormat::Importer_::afterParsing()
-		{
-			// Driver services without services
-			BOOST_FOREACH(const Registry<DriverService>::value_type& itDriverService, _env.getRegistry<DriverService>())
-			{
-				if(!itDriverService.second->hasLinkWithSource(_dataSource))
-				{
-					continue;
-				}
-
-				if(itDriverService.second->getChunks().empty())
-				{
-					_driverServicesToRemove.insert(itDriverService.second);
-				}
-			}
-
-			// Driver allocations
-			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocation>& driverAllocation,
-				_driverAllocationsToRemove
-			){
-				_env.getEditableRegistry<DriverAllocation>().remove(
-					driverAllocation->getKey()
-				);
-			}
-
-			// Driver allocation templates
-			BOOST_FOREACH(
-				const shared_ptr<const DriverAllocationTemplate>& driverAllocationTemplate,
-				_driverAllocationTemplatesToRemove
-			){
-				_env.getEditableRegistry<DriverAllocationTemplate>().remove(
-					driverAllocationTemplate->getKey()
-				);
-			}
-
-			// Driver services
-			BOOST_FOREACH(const shared_ptr<const DriverService>& driverService, _driverServicesToRemove)
-			{
-				_env.getEditableRegistry<DriverService>().remove(
-					driverService->getKey()
-				);
-			}
-
-			return true;
+			AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
+			PropertiesHTMLTable t(reloadRequest.getHTMLForm());
+			stream << t.open();
+			stream << t.title("Mode");
+			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
+			stream << t.title("Fichiers");
+			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
+			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
+			stream << t.title("Paramètres");
+			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
+			stream << t.close();
 		}
 }	}
