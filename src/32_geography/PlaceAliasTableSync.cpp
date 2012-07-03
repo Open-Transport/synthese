@@ -29,7 +29,10 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "GeographyModule.h"
+#include "PTModule.h"
 #include "ReplaceQuery.h"
+#include "StopArea.cpp"
 
 using namespace std;
 using namespace boost;
@@ -106,6 +109,29 @@ namespace synthese
 					city->addIncludedPlace(*obj);
 				}
 				city->addPlaceToMatcher(env.getEditableSPtr(obj));
+
+				// Registration to all places matcher
+				if(	&env == &Env::GetOfficialEnv() &&
+					obj->getCity() &&
+					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL
+				){
+					GeographyModule::GetGeneralAllPlacesMatcher().add(
+						obj->getFullName(),
+						env.getEditableSPtr(obj)
+					);
+				}
+
+				if(	&env == &Env::GetOfficialEnv() &&
+					obj->getCity() &&
+					linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL &&
+					dynamic_cast<const StopArea*>(obj->getAliasedPlace())
+				){
+					const StopArea* stopArea = static_cast<const StopArea*>(obj->getAliasedPlace());
+					pt::PTModule::GetGeneralStopsMatcher().add(
+						obj->getFullName(),
+						env.getEditableSPtr(const_cast<StopArea*>(stopArea))
+					);
+				}
 			}
 		}
 
