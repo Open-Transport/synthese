@@ -96,6 +96,7 @@ namespace synthese
 			static const std::string PARAMETER_ARRIVAL_RANK;
 
 			static const std::string PARAMETER_IGNORE_RESERVATION_RULES;
+			static const std::string PARAMETER_APPROACH_SPEED;
 
 		private:
 			void updatePlace();
@@ -108,6 +109,7 @@ namespace synthese
 			graph::AccessParameters				_accessParameters;
 			std::size_t							_seatsNumber;
 			bool								_ignoreReservation;
+			double								_approachSpeed;
 			std::string _comment;
 
 			//! @name Reservation on a scheduled service
@@ -172,6 +174,7 @@ namespace synthese
 				void setSite(boost::shared_ptr<const pt_website::PTServiceConfig> value){ _site = value; }
 				void setCreateCustomer(bool value){ _createCustomer = value; }
 				void setIgnoreReservationRules(bool value){ _ignoreReservation = value; }
+				void setApproachSpeed(double value){ _approachSpeed = value; }
 				void setFreeDRTTimeSlot(boost::shared_ptr<const pt::FreeDRTTimeSlot> value){ _freeDRTTimeSlot = value; }
 				void setDeparturePlace(boost::shared_ptr<const geography::Place> value){ _departurePlace = value; }
 				void setArrivalPlace(boost::shared_ptr<const geography::Place> value){ _arrivalPlace = value; }
