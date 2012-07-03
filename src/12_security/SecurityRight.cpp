@@ -78,11 +78,26 @@ namespace synthese
 
 			const Registry<Profile>& registry(env.getRegistry<Profile>());
 
-			if (registry.contains(lexical_cast<RegistryKeyType>(_parameter))
-				&& registry.contains(lexical_cast<RegistryKeyType>(perimeter))
+			RegistryKeyType parameterKey = -1, perimeterKey = -1;
+			try
+			{
+				parameterKey = lexical_cast<RegistryKeyType>(_parameter);
+			}
+			catch (bad_lexical_cast)
+			{
+			}
+			try
+			{
+				perimeterKey = lexical_cast<RegistryKeyType>(perimeter);
+			}
+			catch (bad_lexical_cast)
+			{
+			}
+
+			if (registry.contains(parameterKey) && registry.contains(perimeterKey)
 			){
-				const Profile* currentProfile(registry.get(lexical_cast<RegistryKeyType>(_parameter)).get());
-				for(const Profile* includedProfile(registry.get(lexical_cast<RegistryKeyType>(perimeter)).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
+				const Profile* currentProfile(registry.get(parameterKey).get());
+				for(const Profile* includedProfile(registry.get(perimeterKey).get()); includedProfile; includedProfile = includedProfile = includedProfile->getParent())
 				{
 					if (currentProfile == includedProfile)
 					{
