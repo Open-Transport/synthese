@@ -1219,6 +1219,60 @@ namespace synthese
 							cityCode = addressNode.getChildNode("countryCode", 0).getText();
 						}
 					}
+					else
+					{ // case city is on boarding position
+						int containsNumber(stopAreaNode.nChildNode("contains"));
+						for(int i(0); i<containsNumber; ++i)
+						{
+							string boardingPositionId(
+								stopAreaNode.getChildNode("contains", i).getText()
+							);
+
+							for(int j(0); j<stopsNumber; ++j)
+							{
+								XMLNode stopAreaNode2(chouetteAreaNode.getChildNode("StopArea", j));
+								if(!stopAreaNode2.nChildNode("objectId"))
+								{
+									continue;
+								}
+								string stopAreaKey(stopAreaNode2.getChildNode("objectId").getText());
+								if(stopAreaKey != boardingPositionId)
+								{
+									continue;
+								}
+								XMLNode areaNode(stopAreaNode2.getChildNode("centroidOfArea", 0));
+								if(areaNode.isEmpty())
+								{
+									continue;
+								}
+
+								// Place
+								map<string,XMLNode>::iterator itPlace(areaCentroids.find(areaNode.getText()));
+								if(itPlace == areaCentroids.end())
+								{
+									os << "ERR  : area centroid " << areaNode.getText() << " not found in CommercialStopPoint " << stopKey << " (" << name << ")<br />";
+									failure = true;
+									continue;
+								}
+								XMLNode& areaCentroid(itPlace->second);
+								XMLNode addressNode(areaCentroid.getChildNode("address", 0));
+								if(!addressNode.isEmpty() && addressNode.getChildNode("countryCode", 0).getText())
+								{
+									cityCode = addressNode.getChildNode("countryCode", 0).getText();
+								}
+
+								if(!cityCode.empty())
+								{
+									break;
+								}
+							}
+
+							if(!cityCode.empty())
+							{
+								break;
+							}
+						}
+					}
 
 					// Search of an existing connection place with the same code
 					StopArea* curStop(NULL);
@@ -1644,7 +1698,7 @@ namespace synthese
 				size_t ignoredStops(0);
 				for(size_t stopRank(0); stopRank < stopsNumber; ++stopRank)
 				{
-					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", stopRank));
+					XMLNode vjsNode(serviceNode.getChildNode("VehicleJourneyAtStop", static_cast<int>(stopRank)));
 					XMLNode depNode(vjsNode.getChildNode("departureTime"));
 					XMLNode arrNode(vjsNode.getChildNode("arrivalTime"));
 
@@ -1740,6 +1794,8 @@ namespace synthese
 				XMLNode calendarNode(allNode.getChildNode("Timetable", calendarRank));
 
 				int daysNumber(calendarNode.nChildNode("calendarDay"));
+				int periodsNumber(calendarNode.nChildNode("period"));
+				int dayTypesNumber(calendarNode.nChildNode("dayType"));
 				int servicesNumber(calendarNode.nChildNode("vehicleJourneyId"));
 
 				if(_importTimetablesAsTemplates)
@@ -1825,19 +1881,80 @@ namespace synthese
 					calendarServices.push_back(its->second);
 				}
 
-
+				// Result
 				vector<date> calendarDates;
-				for(int dayRank(0); dayRank < daysNumber; ++dayRank)
-				{
-					XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
-					date d(from_string(dayNode.getText()));
-					if(_fromToday && d < now)
+
+				if(daysNumber)
+				{	// Definition by dates list
+					for(int dayRank(0); dayRank < daysNumber; ++dayRank)
 					{
-						continue;
+						XMLNode dayNode(calendarNode.getChildNode("calendarDay", dayRank));
+						date d(from_string(dayNode.getText()));
+						if(_fromToday && d < now)
+						{
+							continue;
+						}
+						calendarDates.push_back(d);
 					}
-					calendarDates.push_back(d);
+				}
+				else if(periodsNumber)
+				{ // Definition by period / template
+
+					// Periods
+					vector<date_period> periods;
+					for(int periodRank(0); periodRank < periodsNumber; ++periodRank)
+					{
+						XMLNode periodNode(calendarNode.getChildNode("period", periodRank));
+						if(!periodNode.nChildNode("startOfPeriod") || !periodNode.nChildNode("endOfPeriod"))
+						{
+							continue;
+						}
+
+						date_period period(
+							from_string(periodNode.getChildNode("startOfPeriod").getText()),
+							from_string(periodNode.getChildNode("endOfPeriod").getText())
+						);
+						
+						periods.push_back(period);
+					}
+
+					// Templates
+					vector<CalendarTemplate*> calendarTemplates;
+					for(int dayTypeRank(0); dayTypeRank < dayTypesNumber; ++dayTypeRank)
+					{
+						string dayTypeKey(calendarNode.getChildNode("dayType", dayTypeRank).getText());
+						
+						if(!_calendarTemplates.contains(dayTypeKey))
+						{
+							os << "WARN : Calendar template " << dayTypeKey << " was not found.<br />";
+							continue;
+						}
+
+						ImportableTableSync::ObjectBySource<CalendarTemplateTableSync>::Set calendarTemplatesSet(
+							_calendarTemplates.get(dayTypeKey)
+						);
+
+						calendarTemplates.push_back(*calendarTemplatesSet.begin());
+					}
+
+					// Transformation into calendar dates
+					Calendar dates;
+					BOOST_FOREACH(const date_period& period, periods)
+					{
+						Calendar periodMask(
+							period.begin(),
+							period.last()
+						);
+
+						BOOST_FOREACH(CalendarTemplate* calendarTemplate, calendarTemplates)
+						{
+							dates |= calendarTemplate->getResult(periodMask);
+						}
+					}
+					calendarDates = dates.getActiveDates();
 				}
 
+				// Update of the calendar of the services
 				if(!calendarDates.empty())
 				{
 					BOOST_FOREACH(const date& d, calendarDates)
