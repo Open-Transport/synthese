@@ -185,6 +185,7 @@ class Display(object):
         chromedriver_path = get_thirdparty_binary('chromedriver')
 
         options = webdriver.ChromeOptions()
+        options.add_argument('--disable-translate')
         if not self._debug:
             options.add_argument('--kiosk')
 
