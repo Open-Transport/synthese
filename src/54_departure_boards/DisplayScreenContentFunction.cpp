@@ -996,21 +996,24 @@ namespace synthese
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 
-			const ArrivalDepartureTableGenerator::PhysicalStops::const_iterator it = screen.getPhysicalStops().begin();
-			const StopPoint * stop = it->second;
+			if(screen.getPhysicalStops().size() > 0)
+			{
+				const ArrivalDepartureTableGenerator::PhysicalStops::const_iterator it = screen.getPhysicalStops().begin();
+				const StopPoint * stop = it->second;
 
-			//Stop Point
-			pm.insert(DATA_STOP_ID, stop->getKey());
-			pm.insert(DATA_STOP_NAME, stop->getName());
-			pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
+				//Stop Point
+				pm.insert(DATA_STOP_ID, stop->getKey());
+				pm.insert(DATA_STOP_NAME, stop->getName());
+				pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
 
-			//StopArea
-			const StopArea* connPlace(stop->getConnectionPlace());
+				//StopArea
+				const StopArea* connPlace(stop->getConnectionPlace());
 
-			pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
-			pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
-			pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
-			pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
+				pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
+				pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
+				pm.insert(DATA_STOP_AREA_CITY_NAME, connPlace->getCity()->getName());
+				pm.insert(DATA_STOP_AREA_CITY_ID, connPlace->getCity()->getKey());
+			}
 
 			// Rows
 			if(rowPage.get())
