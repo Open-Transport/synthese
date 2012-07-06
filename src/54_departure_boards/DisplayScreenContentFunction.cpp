@@ -996,18 +996,21 @@ namespace synthese
 			pm.insert(DATA_STOP_NAME, screen.getDisplayedPlace() ? screen.getDisplayedPlace()->getFullName() : string());
 			pm.insert(DATA_DISPLAY_CLOCK, screen.getDisplayClock());
 
-			if(screen.getPhysicalStops().size() > 0)
+			// Stop Point
+			if(!screen.getAllPhysicalStopsDisplayed() && (screen.getPhysicalStops().size() == 1))
 			{
 				const ArrivalDepartureTableGenerator::PhysicalStops::const_iterator it = screen.getPhysicalStops().begin();
 				const StopPoint * stop = it->second;
 
-				//Stop Point
 				pm.insert(DATA_STOP_ID, stop->getKey());
 				pm.insert(DATA_STOP_NAME, stop->getName());
 				pm.insert(DATA_OPERATOR_CODE, stop->getCodeBySources());
+			}
 
-				//StopArea
-				const StopArea* connPlace(stop->getConnectionPlace());
+			// StopArea
+			if(screen.getDisplayedPlace())
+			{
+				const StopArea* connPlace(screen.getDisplayedPlace());
 
 				pm.insert(DATA_STOP_AREA_ID, connPlace->getKey());
 				pm.insert(DATA_STOP_AREA_NAME, connPlace->getName());
