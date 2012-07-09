@@ -839,7 +839,10 @@ namespace synthese
 			}
 			pm.insert(DATA_SOLUTIONS_NUMBER, _result->getJourneys().size());
 			pm.insert(DATA_ACCESSIBILITY_CODE, static_cast<int>(_accessParameters.getUserClass()));
-			pm.insert(DATA_SITE_ID, _page->getRoot()->getKey());
+			if(_page)
+			{
+				pm.insert(DATA_SITE_ID, _page->getRoot()->getKey());
+			}
 			pm.insert(DATA_IS_SAME_PLACES, _result->getSamePlaces());
 			if(request.getUser().get())
 			{
