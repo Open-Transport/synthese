@@ -374,7 +374,7 @@ namespace synthese
 						}
 
 						// On board ticketing
-						if(!onBoardTicketing.empty())
+						if(da && !onBoardTicketing.empty())
 						{
 							da->set<WithTicketSales>(true);
 						}
