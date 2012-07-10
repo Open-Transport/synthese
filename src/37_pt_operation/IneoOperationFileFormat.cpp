@@ -249,6 +249,7 @@ namespace synthese
 				ImportableTableSync::ObjectBySource<DriverServiceTableSync> driverServices(_dataSource, _env);
 				string lastKey;
 				DriverService* ds(NULL);
+				DriverAllocationTemplate* da(NULL);
 				do
 				{
 					// File read
@@ -274,8 +275,6 @@ namespace synthese
 							lexical_cast<int>(parts[1]),
 							lexical_cast<int>(parts[0])
 						);
-
-						DriverAllocationTemplate* da(NULL);
 
 						if(fullKey != lastKey)
 						{
