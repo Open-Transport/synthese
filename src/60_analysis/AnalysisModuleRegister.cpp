@@ -8,6 +8,8 @@
 
 #include "IsochronAdmin.hpp"
 
+#include "IsochronService.hpp"
+
 // Registries
 
 #include "AnalysisModule.inc.cpp"
@@ -23,5 +25,7 @@ void synthese::analysis::moduleRegister()
 	synthese::analysis::AnalysisRight::integrate();
 
 	synthese::analysis::IsochronAdmin::integrate();
+
+	synthese::analysis::IsochronService::integrate();
 
 }
