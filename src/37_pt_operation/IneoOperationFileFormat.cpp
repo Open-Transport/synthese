@@ -275,6 +275,8 @@ namespace synthese
 							lexical_cast<int>(parts[0])
 						);
 
+						DriverAllocationTemplate* da(NULL);
+
 						if(fullKey != lastKey)
 						{
 							ds = FileFormat::LoadOrCreateObject<DriverServiceTableSync>(
@@ -294,15 +296,14 @@ namespace synthese
 							ds->setName(key);
 
 							// Allocation template
-							DriverAllocationTemplate* da(
-								FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
-									_driverAllocationTemplates,
-									fullKey,
-									_dataSource,
-									_env,
-									stream,
-									"driver allocation template"
-							)	);
+							da = FileFormat::LoadOrCreateObject<DriverAllocationTemplateTableSync>(
+								_driverAllocationTemplates,
+								fullKey,
+								_dataSource,
+								_env,
+								stream,
+								"driver allocation template"
+							);
 
 							// Driver service link
 							DriverService::Vector::Type driverServices;
@@ -311,9 +312,6 @@ namespace synthese
 
 							// Date
 							da->set<Date>(vsDate);
-
-							// On board ticketing
-							da->set<WithTicketSales>(!onBoardTicketing.empty());
 
 							// Amount
 							string amountStr(_getValue("Frs"));
@@ -370,6 +368,15 @@ namespace synthese
 								split(parts, workDurationStr, is_any_of("h"));
 								da->set<WorkDuration>(hours(lexical_cast<long>(parts[0])) + minutes(lexical_cast<long>(parts[1])));
 							}
+
+							// Default value for ticket sales
+							da->set<WithTicketSales>(false);
+						}
+
+						// On board ticketing
+						if(!onBoardTicketing.empty())
+						{
+							da->set<WithTicketSales>(true);
 						}
 
 						// Journey
@@ -827,8 +834,8 @@ namespace synthese
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier SAB (services voiture)", t.getForm().getTextInput(_getFileParameterName(FILE_SAB), _pathsMap[FILE_SAB].file_string()));
 			stream << t.cell("Fichier AFA (affectations)", t.getForm().getTextInput(_getFileParameterName(FILE_AFA), _pathsMap[FILE_AFA].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Source de données offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
+			stream << t.title("ParamÃ¨tres");
+			stream << t.cell("Source de donnÃ©es offre de transport public", t.getForm().getTextInput(PARAMETER_PT_DATASOURCE_ID, _ptDatasource.get() ? lexical_cast<string>(_ptDatasource->getKey()) : string()));
 			stream << t.close();
 		}
 }	}
