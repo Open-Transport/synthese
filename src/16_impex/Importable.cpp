@@ -258,12 +258,27 @@ namespace synthese
 				s << it.first->getKey();
 				if(!it.second.empty())
 				{
-					s << Importable::FIELDS_SEPARATOR << boost::algorithm::replace_all_copy(it.second, "'", "''");
+					s << Importable::FIELDS_SEPARATOR;
+					if(format == ParametersMap::FORMAT_SQL)
+					{
+						s << boost::algorithm::replace_all_copy(it.second, "'", "''");
+					}
+					else
+					{
+						s << it.second;
+					}
 				}
 			}
 			else
 			{
-				s << boost::algorithm::replace_all_copy(it.second, "'", "''");
+				if(format == ParametersMap::FORMAT_SQL)
+				{
+					s << boost::algorithm::replace_all_copy(it.second, "'", "''");
+				}
+				else
+				{
+					s << it.second;
+				}
 			}
 		}
 		if(format == ParametersMap::FORMAT_SQL)
