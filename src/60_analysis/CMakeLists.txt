@@ -10,6 +10,8 @@ AnalysisRight.cpp
 AnalysisRight.hpp
 IsochronAdmin.cpp
 IsochronAdmin.hpp
+IsochronService.cpp
+IsochronService.hpp
 )
 
 set_source_files_properties(AnalysisModule.gen.cpp AnalysisModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
