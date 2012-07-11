@@ -109,6 +109,7 @@ namespace synthese
 			static const std::string DATA_RANK;
 			static const std::string DATA_SCENARIO;
 			static const std::string DATA_SCENARIO_ID;
+			static const std::string DATA_IS_TEMPLATE;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////

@@ -69,6 +69,7 @@ namespace synthese
 		const string AlarmTableSync::COL_SCENARIO_ID = "scenario_id";
 		const string AlarmTableSync::COL_TEMPLATE_ID("template_id");
 		const string AlarmTableSync::COL_RAW_EDITOR = "raw_editor";
+		const string AlarmTableSync::COL_DONE = "done";
 	}
 
 	namespace db
@@ -90,6 +91,7 @@ namespace synthese
 			Field(AlarmTableSync::COL_SCENARIO_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_TEMPLATE_ID, SQL_INTEGER),
 			Field(AlarmTableSync::COL_RAW_EDITOR, SQL_BOOLEAN),
+			Field(AlarmTableSync::COL_DONE, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -132,6 +134,7 @@ namespace synthese
 			alarm->setShortMessage (rows->getText (AlarmTableSync::COL_SHORT_MESSAGE));
 			alarm->setLongMessage (rows->getText (AlarmTableSync::COL_LONG_MESSAGE));
 			alarm->setRawEditor(rows->getBool(AlarmTableSync::COL_RAW_EDITOR));
+			alarm->setDone(rows->getBool(AlarmTableSync::COL_DONE));
 		}
 
 

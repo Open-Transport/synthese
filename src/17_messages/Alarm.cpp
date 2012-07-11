@@ -40,6 +40,7 @@ namespace synthese
 		const string Alarm::DATA_SCENARIO_ID("scenario_id");
 		const string Alarm::DATA_SCENARIO_NAME("scenario_name");
 		const string Alarm::DATA_TITLE("title");
+		const string Alarm::DATA_DONE = "done";
 
 
 
@@ -49,7 +50,8 @@ namespace synthese
 		):	Registrable(key),
 			_level(ALARM_LEVEL_INFO),
 			_scenario(scenario),
-			_rawEditor(false)
+			_rawEditor(false),
+			_done(true)
 		{}
 
 
@@ -61,7 +63,8 @@ namespace synthese
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
 			_scenario(source._scenario),
-			_rawEditor(source._rawEditor)
+			_rawEditor(source._rawEditor),
+			_done(source._done)
 		{}
 
 
@@ -74,7 +77,8 @@ namespace synthese
 			_shortMessage(source._shortMessage),
 			_longMessage(source._longMessage),
 			_scenario(scenario),
-			_rawEditor(source._rawEditor)
+			_rawEditor(source._rawEditor),
+			_done(source._done)
 		{}
 
 
@@ -141,6 +145,7 @@ namespace synthese
 			pm.insert(prefix + DATA_MESSAGE_ID, getKey());
 			pm.insert(prefix + DATA_TITLE, getShortMessage());
 			pm.insert(prefix + DATA_CONTENT, getLongMessage());
+			pm.insert(prefix + DATA_DONE, getDone());
 			pm.insert(prefix + DATA_PRIORITY, static_cast<int>(getLevel()));
 			if(withScenario && getScenario())
 			{

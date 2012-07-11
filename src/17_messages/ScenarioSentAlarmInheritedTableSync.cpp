@@ -104,6 +104,7 @@ namespace synthese
 			query.addField(object->getScenario() ? object->getScenario()->getKey() : RegistryKeyType(0));
 			query.addField(object->getTemplate() ? object->getTemplate()->getKey() : RegistryKeyType(0));
 			query.addField(object->getRawEditor());
+			query.addField(object->getDone());
 			query.execute(transaction);
 		}
 	}
