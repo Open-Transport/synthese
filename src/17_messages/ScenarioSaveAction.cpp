@@ -695,6 +695,11 @@ namespace synthese
 				_message->setLongMessage(*_messageToCreate);
 			}
 
+			if(_message.get())
+			{
+				AlarmTableSync::Save(_message.get());
+			}
+
 			if(_sscenario.get())
 			{
 				MessagesLog::addUpdateEntry(_sscenario.get(), text.str(), request.getUser().get());
