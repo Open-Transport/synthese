@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string DATA_SCENARIO_ID;
 			static const std::string DATA_SCENARIO_NAME;
 			static const std::string DATA_TITLE;
+			static const std::string DATA_DONE;
 
 		protected:
 			AlarmLevel			_level;
@@ -69,6 +70,7 @@ namespace synthese
 			std::string			_longMessage;  //!< Alarm message
 			const Scenario* 	_scenario;
 			bool				_rawEditor;
+			bool				_done;
 
 			Alarm(
 				util::RegistryKeyType key,
@@ -90,6 +92,7 @@ namespace synthese
 				const AlarmLevel&		getLevel()			const;
 				const Scenario*			getScenario()		const;
 				bool					getRawEditor() const { return _rawEditor; }
+				bool					getDone() const { return _done; }
 			//@}
 
 			//! @name Setters
@@ -99,6 +102,7 @@ namespace synthese
 				void setLongMessage( const std::string& message);
 				void setScenario(const Scenario* scenario);
 				void setRawEditor(bool value){ _rawEditor = value; }
+				void setDone(bool value){ _done = value; }
 			//@}
 
 			//! @name Services
