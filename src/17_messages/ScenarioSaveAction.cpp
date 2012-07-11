@@ -598,38 +598,35 @@ namespace synthese
 					ScenarioSentAlarmInheritedTableSync::Search(
 						*_env, _sscenario->getKey()
 				)	);
-				if(msgs.size() == 1 || _creation)
+				if(msgs.size() == 1)
 				{
-					if(msgs.size() == 1)
-					{
-						message = msgs.front();
-						if(_recipients)
-						{
-							AlarmObjectLinkTableSync::Remove(message->getKey());
-						}
-					}
-					else
-					{
-						message.reset(new SentAlarm);
-						message->setScenario(_scenario.get());
-						message->setTemplate(NULL);
-						message->setShortMessage("Unique message");
-					}
-
-					message->setLongMessage(*_messageToCreate);
-					message->setLevel(*_level);
-
-					AlarmTableSync::Save(message.get());
-
+					message = msgs.front();
 					if(_recipients)
 					{
-						BOOST_FOREACH(RegistryKeyType recipient, *_recipients)
-						{
-							AlarmObjectLink link;
-							link.setAlarm(message.get());
-							link.setObjectId(recipient);
-							AlarmObjectLinkTableSync::Save(&link);
-						}
+						AlarmObjectLinkTableSync::Remove(message->getKey());
+					}
+				}
+				else
+				{
+					message.reset(new SentAlarm);
+					message->setScenario(_scenario.get());
+					message->setTemplate(NULL);
+					message->setShortMessage("Unique message");
+				}
+
+				message->setLongMessage(*_messageToCreate);
+				message->setLevel(*_level);
+
+				AlarmTableSync::Save(message.get());
+
+				if(_recipients)
+				{
+					BOOST_FOREACH(RegistryKeyType recipient, *_recipients)
+					{
+						AlarmObjectLink link;
+						link.setAlarm(message.get());
+						link.setObjectId(recipient);
+						AlarmObjectLinkTableSync::Save(&link);
 					}
 				}
 			}
