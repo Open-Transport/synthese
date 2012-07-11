@@ -56,6 +56,7 @@ namespace synthese
 			static const std::string PARAMETER_LONG_MESSAGE;
 			static const std::string PARAMETER_ALARM_ID;
 			static const std::string PARAMETER_RAW_EDITOR;
+			static const std::string PARAMETER_DONE;
 
 		private:
 			boost::shared_ptr<Alarm>		_alarm;
@@ -63,6 +64,7 @@ namespace synthese
 			boost::optional<std::string> _shortMessage;
 			boost::optional<std::string> _longMessage;
 			boost::optional<bool> _rawEditor;
+			boost::optional<bool> _done;
 
 		protected:
 			/** Conversion from attributes to generic parameter maps.
