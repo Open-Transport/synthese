@@ -468,7 +468,6 @@ namespace synthese
 					// Roads
 					if(_classFilter.empty() || _classFilter == DATA_ROAD)
 					{
-						bool done(false);
 						vector<string> words;
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
@@ -514,7 +513,6 @@ namespace synthese
 									houseList
 								);
 								result.insert(DATA_ADDRESSES, pm);
-								done = true;
 							}
 							catch (bad_lexical_cast)
 							{
@@ -522,18 +520,15 @@ namespace synthese
 						}
 
 						// Roads if not address
-						if(!done)
-						{
-							shared_ptr<ParametersMap> pm(new ParametersMap);
-							_registerItems<NamedPlace>(
-								*pm,
-								_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
-									_text,
-									_number ? *_number : 0,
-									_minScore
-							)	);
-							result.insert(DATA_ROADS, pm);
-						}
+						shared_ptr<ParametersMap> pm(new ParametersMap);
+						_registerItems<NamedPlace>(
+							*pm,
+							_city->getLexicalMatcher(RoadPlace::FACTORY_KEY).bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
+						result.insert(DATA_ROADS, pm);
 					}
 
 					// Public places
