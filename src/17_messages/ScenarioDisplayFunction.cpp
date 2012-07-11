@@ -55,6 +55,7 @@ namespace synthese
 		const string ScenarioDisplayFunction::PARAMETER_OUTPUT_FORMAT("of");
 
 		const std::string ScenarioDisplayFunction::DATA_NAME("name");
+		const std::string ScenarioDisplayFunction::DATA_IS_TEMPLATE("is_template");
 		const std::string ScenarioDisplayFunction::DATA_RANK("rank");
 		const std::string ScenarioDisplayFunction::DATA_SCENARIO("scenario");
 		const std::string ScenarioDisplayFunction::DATA_SCENARIO_ID("scenario_id");
@@ -191,6 +192,9 @@ namespace synthese
 
 			// name
 			pm.insert(DATA_NAME, _scenario->getName());
+
+			// is template
+			pm.insert(DATA_IS_TEMPLATE, isTemplate);
 
 			// variables
 			if(	isTemplate ||
