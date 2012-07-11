@@ -59,6 +59,7 @@ namespace synthese
 		const string UpdateAlarmMessagesAction::PARAMETER_ALARM_ID(Action_PARAMETER_PREFIX + "id");
 		const string UpdateAlarmMessagesAction::PARAMETER_TYPE = Action_PARAMETER_PREFIX + "ty";
 		const string UpdateAlarmMessagesAction::PARAMETER_RAW_EDITOR = Action_PARAMETER_PREFIX + "raw_editor";
+		const string UpdateAlarmMessagesAction::PARAMETER_DONE = Action_PARAMETER_PREFIX + "done";
 
 
 
@@ -123,6 +124,12 @@ namespace synthese
 			{
 				_rawEditor = map.get<bool>(PARAMETER_RAW_EDITOR);
 			}
+
+			// Done
+			if(map.isDefined(PARAMETER_DONE))
+			{
+				_done = map.get<bool>(PARAMETER_DONE);
+			}
 		}
 
 
@@ -163,6 +170,13 @@ namespace synthese
 			{
 				DBLogModule::appendToLogIfChange(s, "éditeur technique", lexical_cast<string>(_alarm->getRawEditor()), lexical_cast<string>(*_rawEditor));
 				_alarm->setRawEditor(*_rawEditor);
+			}
+
+			// Done
+			if(_done)
+			{
+				DBLogModule::appendToLogIfChange(s, "tâche", lexical_cast<string>(_alarm->getDone()), lexical_cast<string>(*_done));
+				_alarm->setDone(*_done);
 			}
 
 			AlarmTableSync::Save(_alarm.get());
