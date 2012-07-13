@@ -583,7 +583,6 @@ namespace synthese
 					if(_classFilter.empty() || _classFilter == DATA_ROAD || _classFilter == DATA_ADDRESS)
 					{
 						LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult roadList;
-						bool done(false);
 						vector<string> words;
 						split(words, _text, is_any_of(", "));
 						if(words.size() > 1)
@@ -619,7 +618,6 @@ namespace synthese
 									{
 										houseResult.value = dynamic_pointer_cast<NamedPlace, House>(house);
 										houseList.push_back(houseResult);
-										done = true;
 									}
 									else
 									{
@@ -642,31 +640,29 @@ namespace synthese
 						}
 
 						// Roads if not address
-						if(!done)
+						shared_ptr<ParametersMap> pm(new ParametersMap);
+						RoadModule::GeneralRoadsMatcher::MatchResult roads(
+							RoadModule::GetGeneralRoadsMatcher().bestMatches(
+								_text,
+								_number ? *_number : 0,
+								_minScore
+						)	);
+						// We add road results to the roadList
+						BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
 						{
-							shared_ptr<ParametersMap> pm(new ParametersMap);
-							RoadModule::GeneralRoadsMatcher::MatchResult roads(
-								RoadModule::GetGeneralRoadsMatcher().bestMatches(
-									_text,
-									_number ? *_number : 0,
-									_minScore
-							)	);
-							// We add road results to the roadList
-							BOOST_FOREACH(const RoadModule::GeneralRoadsMatcher::MatchResult::value_type& road, roads)
-							{
-								LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit roadResult;
+							LexicalMatcher<shared_ptr<NamedPlace> >::MatchHit roadResult;
 
-								roadResult.key = road.key;
-								roadResult.score = road.score;
-								roadResult.value = road.value;
+							roadResult.key = road.key;
+							roadResult.score = road.score;
+							roadResult.value = road.value;
 
-								roadList.push_back(roadResult);
-							}
-							_registerItems<NamedPlace>(
-								*pm,
-								roadList
-							);
-							result.insert(DATA_ROADS, pm);
+							roadList.push_back(roadResult);
+						}
+						_registerItems<NamedPlace>(
+							*pm,
+							roadList
+						);
+						result.insert(DATA_ROADS, pm);
 						}
 					}
 
