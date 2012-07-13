@@ -84,6 +84,9 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_DATASOURCE_ID = Action_PARAMETER_PREFIX + "rs";
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
+		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
+
+
 
 		ParametersMap ScenarioSaveAction::getParametersMap() const
 		{
@@ -95,6 +98,8 @@ namespace synthese
 
 			return map;
 		}
+
+
 
 		void ScenarioSaveAction::_setFromParametersMap(const ParametersMap& map)
 		{
@@ -240,6 +245,7 @@ namespace synthese
 				if(	map.isDefined(PARAMETER_MESSAGE_TO_CREATE)
 				){
 					_messageToCreate = map.get<string>(PARAMETER_MESSAGE_TO_CREATE);
+					_messageToCreateTitle = map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE);
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
 
 					if(!map.getDefault<string>(PARAMETER_RECIPIENT_ID).empty())
@@ -611,7 +617,7 @@ namespace synthese
 					message.reset(new SentAlarm);
 					message->setScenario(_scenario.get());
 					message->setTemplate(NULL);
-					message->setShortMessage("Unique message");
+					message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				}
 
 				message->setLongMessage(*_messageToCreate);

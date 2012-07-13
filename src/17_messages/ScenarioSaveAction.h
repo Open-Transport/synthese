@@ -69,6 +69,7 @@ namespace synthese
 			static const std::string PARAMETER_TEMPLATE;
 			static const std::string PARAMETER_MESSAGE_TO_COPY;
 			static const std::string PARAMETER_MESSAGE_TO_CREATE;
+			static const std::string PARAMETER_CREATED_MESSAGE_TITLE;
 			static const std::string PARAMETER_RECIPIENT_ID;
 			static const std::string PARAMETER_LEVEL;
 			static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
@@ -98,6 +99,7 @@ namespace synthese
 				boost::optional<boost::posix_time::ptime>			_endDate;
 				SentScenario::VariablesMap							_variables;
 				boost::optional<std::string>						_messageToCreate;
+				boost::optional<std::string>						_messageToCreateTitle;
 				boost::optional<std::vector<util::RegistryKeyType> >	_recipients;
 				std::string											_recipientType;
 				boost::optional<AlarmLevel>							_level;
