@@ -623,9 +623,9 @@ namespace synthese
 					message.reset(new SentAlarm);
 					message->setScenario(_scenario.get());
 					message->setTemplate(NULL);
-					message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				}
 
+				message->setShortMessage(_messageToCreateTitle ? *_messageToCreateTitle : "Unique message");
 				message->setLongMessage(*_messageToCreate);
 				message->setLevel(*_level);
 
