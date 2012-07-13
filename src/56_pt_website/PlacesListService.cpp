@@ -580,7 +580,7 @@ namespace synthese
 					}
 
 					// Roads
-					if(_classFilter.empty() || _classFilter == DATA_ROAD)
+					if(_classFilter.empty() || _classFilter == DATA_ROAD || _classFilter == DATA_ADDRESS)
 					{
 						LexicalMatcher<shared_ptr<NamedPlace> >::MatchResult roadList;
 						bool done(false);
