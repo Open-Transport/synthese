@@ -663,7 +663,6 @@ namespace synthese
 							roadList
 						);
 						result.insert(DATA_ROADS, pm);
-						}
 					}
 
 					// Public places
