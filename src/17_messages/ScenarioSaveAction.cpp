@@ -23,6 +23,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "ScenarioSaveAction.h"
+
+#include "IConv.hpp"
 #include "MessagesModule.h"
 #include "ScenarioTableSync.h"
 #include "ScenarioTemplate.h"
@@ -85,6 +87,7 @@ namespace synthese
 		const string ScenarioSaveAction::PARAMETER_RECIPIENT_TYPE = Action_PARAMETER_PREFIX + "rt";
 		const string ScenarioSaveAction::PARAMETER_SCENARIO_DATASOURCE_ID = Action_PARAMETER_PREFIX + "is";
 		const string ScenarioSaveAction::PARAMETER_CREATED_MESSAGE_TITLE = Action_PARAMETER_PREFIX + "_created_message_title";
+		const string ScenarioSaveAction::PARAMETER_ENCODING = Action_PARAMETER_PREFIX + "_encoding";
 
 
 
@@ -103,6 +106,9 @@ namespace synthese
 
 		void ScenarioSaveAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Encoding
+			IConv iconv(map.getDefault<string>(PARAMETER_ENCODING, "UTF-8"), "UTF-8");
+
 			// Update or creation
 			try
 			{
@@ -244,8 +250,8 @@ namespace synthese
 				// Messages
 				if(	map.isDefined(PARAMETER_MESSAGE_TO_CREATE)
 				){
-					_messageToCreate = map.get<string>(PARAMETER_MESSAGE_TO_CREATE);
-					_messageToCreateTitle = map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE);
+					_messageToCreate = iconv.convert(map.get<string>(PARAMETER_MESSAGE_TO_CREATE));
+					_messageToCreateTitle = iconv.convert(map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE));
 					_level = static_cast<AlarmLevel>(map.getDefault<int>(PARAMETER_LEVEL, static_cast<int>(ALARM_LEVEL_WARNING)));
 
 					if(!map.getDefault<string>(PARAMETER_RECIPIENT_ID).empty())
@@ -296,7 +302,7 @@ namespace synthese
 				// Name
 				if(map.isDefined(PARAMETER_NAME))
 				{
-					_name = map.get<string>(PARAMETER_NAME);
+					_name = iconv.convert(map.get<string>(PARAMETER_NAME));
 				}
 
 				// Template scenario only
@@ -408,7 +414,7 @@ namespace synthese
 								continue;
 							}
 							string value(
-								map.get<string>(PARAMETER_VARIABLE + variable.second.code)
+								iconv.convert(map.get<string>(PARAMETER_VARIABLE + variable.second.code))
 							);
 							if(	variable.second.compulsory &&
 								(	_enabled && *_enabled ||

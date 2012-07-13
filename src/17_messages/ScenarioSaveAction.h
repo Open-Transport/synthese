@@ -75,6 +75,7 @@ namespace synthese
 			static const std::string PARAMETER_RECIPIENT_DATASOURCE_ID;
 			static const std::string PARAMETER_RECIPIENT_TYPE;
 			static const std::string PARAMETER_SCENARIO_DATASOURCE_ID;
+			static const std::string PARAMETER_ENCODING;
 
 		private:
 			//! @name Datasources
