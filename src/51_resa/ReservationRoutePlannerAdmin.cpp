@@ -115,7 +115,7 @@ namespace synthese
 			_withoutTransfer(false),
 			_dateTime(second_clock::local_time()),
 			_planningOrder(DEPARTURE_FIRST),
-			_enabledPedestrian(true),
+			_enabledPedestrian(false),
 			_approachSpeed(0.833),//0.833 = 3km/h, 1.111 = 4km/h
 			_ignoreReservation(false)
 		{
@@ -143,7 +143,7 @@ namespace synthese
 			}
 			_disabledPassenger = map.getDefault<bool>(PARAMETER_DISABLED_PASSENGER, false);
 			_withoutTransfer = map.getDefault<bool>(PARAMETER_WITHOUT_TRANSFER, false);
-			_enabledPedestrian = map.getDefault<bool>(PARAMETER_ENABLED_PEDESTRIAN, true);
+			_enabledPedestrian = map.getDefault<bool>(PARAMETER_ENABLED_PEDESTRIAN, false);
 			_ignoreReservation = map.getDefault<bool>(PARAMETER_IGNORE_RESERVATION, false);
 
 			if(map.getOptional<double>(PARAMETER_APPROACH_SPEED))
