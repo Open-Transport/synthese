@@ -23,6 +23,7 @@
 #include "GTFSFileFormat.hpp"
 #include "TransportNetwork.h"
 #include "StopArea.hpp"
+#include "Destination.hpp"
 #include "PTFileFormat.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
@@ -1252,7 +1253,14 @@ namespace synthese
 
 			routeId = _key(static_cast<const JourneyPattern *>(&(*service->getPath()))->getCommercialLine()->getKey());
 
-			tripHeadSign = _SubLine(_Str(static_cast<const JourneyPattern *>(&(*service->getPath()))->getName()));
+			const JourneyPattern * line = static_cast<const JourneyPattern *>(&(*service->getPath()));
+
+			string lineDirection(
+				line->getDirection().empty() && line->getDirectionObj() ?
+				line->getDirectionObj()->getDisplayedText() :
+				line->getDirection()
+			);
+			tripHeadSign = _Str(lineDirection.empty() ? line->getDestination()->getConnectionPlace()->getFullName() : lineDirection);
 
 			RegistryKeyType tripId = _key(service->getKey(), 1);
 			const Path * path = service->getPath();
