@@ -460,7 +460,7 @@ namespace synthese
 				{
 					BOOST_FOREACH(Registry<StopArea>::value_type stopArea, env.getRegistry<StopArea>())
 					{
-						if(stopArea.second->getName() == name)
+						if((stopArea.second->getName() == name) && (cityForStopAreaAutoGeneration.getKey() == stopArea.second->getCity()->getKey()))
 						{
 							curStop = stopArea.second.get();
 							break;
