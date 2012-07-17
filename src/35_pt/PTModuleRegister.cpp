@@ -17,6 +17,7 @@
 #include "CheckLineCalendarFunction.hpp"
 #include "PTObjectInformationFunction.hpp"
 #include "ServicesListService.hpp"
+#include "ServiceQuotasListService.hpp"
 
 #include "GTFSFileFormat.hpp"
 #include "HafasFileFormat.hpp"
@@ -52,6 +53,7 @@
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "DRTAreaTableSync.hpp"
+#include "ServiceQuotaTableSync.hpp"
 
 #include "ContactCenterAdmin.hpp"
 #include "ContactCentersAdmin.hpp"
@@ -122,6 +124,7 @@
 #include "ProjectAllStopPointsAction.hpp"
 #include "StopAreaTransferAddAction.h"
 #include "RollingStockUpdateAction.hpp"
+#include "ServiceQuotaUpdateAction.hpp"
 
 #include "LineAlarmRecipient.hpp"
 #include "StopAreaAlarmRecipient.hpp"
@@ -151,7 +154,7 @@
 #include "ContinuousService.h"
 #include "NonConcurrencyRule.h"
 #include "DRTArea.hpp"
-
+#include "ServiceQuota.hpp"
 
 #include "PTModule.inc.cpp"
 
@@ -190,6 +193,7 @@ void synthese::pt::moduleRegister()
 	synthese::util::FactorableTemplate<synthese::db::Fetcher<synthese::geography::NamedPlace>, synthese::pt::StopAreaTableSync>::integrate();
 	synthese::pt::LineStopTableSync::integrate();
 	synthese::pt::LineAreaInheritedTableSync::integrate();
+	synthese::pt::ServiceQuotaTableSync::integrate();
 
 	synthese::pt::PTModule::integrate();
 
@@ -247,6 +251,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::CheckLineCalendarFunction::integrate();
 	synthese::pt::PTObjectInformationFunction::integrate();
 	synthese::pt::ServicesListService::integrate();
+	synthese::pt::ServiceQuotasListService::integrate();
 
 	synthese::pt::LineMarkerInterfacePage::integrate();
 	synthese::pt::RealTimeUpdateScreenServiceInterfacePage::integrate();
@@ -287,6 +292,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::LineStopUpdateAction::integrate();
 	synthese::pt::ProjectAllStopPointsAction::integrate();
 	synthese::pt::StopAreaTransferAddAction::integrate();
+	synthese::pt::ServiceQuotaUpdateAction::integrate();
 
 	synthese::pt::TransportNetworkRight::integrate();
 
@@ -317,4 +323,6 @@ void synthese::pt::moduleRegister()
 	synthese::util::Env::Integrate<synthese::pt::Fare>();
 	synthese::util::Env::Integrate<synthese::pt::NonConcurrencyRule>();
 	synthese::util::Env::Integrate<synthese::pt::ReservationContact>();
+	synthese::util::Env::Integrate<synthese::pt::ServiceQuota>();
+
 }
