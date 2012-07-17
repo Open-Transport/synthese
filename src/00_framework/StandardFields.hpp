@@ -834,6 +834,139 @@ namespace synthese
 
 
 
+	//////////////////////////////////////////////////////////////////////////
+	/// map V1->V2 specialization
+	template<class C, class V1, class V2>
+	class ObjectField<C, std::map<V1, V2> >:
+		public SimpleObjectFieldDefinition<C>
+	{
+	public:
+		typedef std::map<V1, V2> Type;
+
+		static void LoadFromRecord(std::map<V1, V2>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+		{
+			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
+			{
+				return;
+			}
+
+			fieldObject.clear();
+			std::string text(record.get<std::string>(SimpleObjectFieldDefinition<C>::FIELD.name));
+			if(text.empty())
+			{
+				return;
+			}
+			std::vector<std::string> s;
+			boost::algorithm::split(s, text, boost::is_any_of("|"));
+			BOOST_FOREACH(const std::string& pair, s)
+			{
+				std::vector<std::string> v;
+				boost::algorithm::split(v, pair, boost::is_any_of(","));
+				try
+				{
+					fieldObject.insert(std::pair<V1, V2> (
+						boost::lexical_cast<V1>(v[0]),
+						boost::lexical_cast<V2>(v[1])
+						)	);
+				}
+				catch(boost::bad_lexical_cast&)
+				{
+					util::Log::GetInstance().warn(
+						"Data corrupted in the "+ SimpleObjectFieldDefinition<C>::FIELD.name +" field at the load of the "+
+						object.getClassName() +" object " + boost::lexical_cast<std::string>(object.getKey())
+						);
+				}
+			}
+		}
+
+
+
+		static std::string Serialize(
+			const std::map<V1, V2>& fieldObject,
+			util::ParametersMap::SerializationFormat format
+			){
+				std::stringstream s;
+				if(format == util::ParametersMap::FORMAT_SQL)
+				{
+					s << "'";
+				}
+				bool first(true);
+				BOOST_FOREACH(const Type::value_type& pair, fieldObject)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						s << "|";
+					}
+					s << pair.first << "," << pair.second;
+				}
+				if(format == util::ParametersMap::FORMAT_SQL)
+				{
+					s << "'";
+				}
+				return s.str();
+		}
+
+
+
+		static void SaveToParametersMap(
+			const std::map<V1, V2>& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+			){
+				map.insert(
+					prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+					Serialize(fieldObject, map.getFormat())
+					);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const std::map<V1, V2>& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+			){
+				SaveToParametersMap(fieldObject, map, prefix);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const std::map<V1, V2>& fieldObject,
+			util::ParametersMap& map
+			){
+				map.insert(
+					SimpleObjectFieldDefinition<C>::FIELD.name,
+					Serialize(fieldObject, map.getFormat())
+					);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const std::map<V1, V2>& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map
+			){
+				SaveToParametersMap(fieldObject, map);
+		}
+
+
+
+		static void GetLinkedObjectsIds(
+			LinkedObjectsIds& list,
+			const Record& record
+			){
+				return;
+		}
+	};
+
+
 	FIELD_TYPE(Date, boost::gregorian::date)
 	FIELD_TYPE(EndDate, boost::gregorian::date)
 	FIELD_TYPE(EndTime, boost::posix_time::ptime)
