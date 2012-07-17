@@ -206,14 +206,14 @@ namespace synthese
 		UpdateDisplayPreselectionParametersAction::DelaysList UpdateDisplayPreselectionParametersAction::GetClearDelaysList(
 		){
 			DelaysList clearDelayMap;
-			for (int i=-5; i<-1; ++i)
+			for (int i=-15; i<-1; ++i)
 			{
 				clearDelayMap.insert(make_pair(i, lexical_cast<string>(-i) + " minutes avant le départ"));
 			}
 			clearDelayMap.insert(make_pair(-1, "1 minute avant le départ"));
 			clearDelayMap.insert(make_pair(0, "heure du départ"));
 			clearDelayMap.insert(make_pair(1, "1 minute après le départ"));
-			for (int i=2; i<6; ++i)
+			for (int i=2; i<16; ++i)
 			{
 				clearDelayMap.insert(make_pair(i, lexical_cast<string>(i) + " minutes après le départ"));
 			}
