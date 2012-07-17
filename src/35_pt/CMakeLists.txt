@@ -253,6 +253,14 @@ ServiceAddAction.cpp
 ServiceAddAction.h
 ServiceAdmin.cpp
 ServiceAdmin.h
+ServiceQuota.cpp
+ServiceQuota.hpp
+ServiceQuotasListService.cpp
+ServiceQuotasListService.hpp
+ServiceQuotaTableSync.cpp
+ServiceQuotaTableSync.hpp
+ServiceQuotaUpdateAction.cpp
+ServiceQuotaUpdateAction.hpp
 ServicesCSVFileFormat.hpp
 ServicesCSVFileFormat.cpp
 ServiceTimetableUpdateAction.cpp
