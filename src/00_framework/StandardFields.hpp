@@ -891,7 +891,8 @@ namespace synthese
 					s << "'";
 				}
 				bool first(true);
-				BOOST_FOREACH(const Type::value_type& pair, fieldObject)
+				typedef std::pair<V1, V2> mpair; 
+				BOOST_FOREACH(const mpair& pair, fieldObject)
 				{
 					if(first)
 					{
