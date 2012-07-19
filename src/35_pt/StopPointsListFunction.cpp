@@ -538,10 +538,7 @@ namespace synthese
 
 		bool StopPointsListFunction::SortableLineKey::operator<(SortableLineKey const &otherLineKey) const
 		{
-			return
-				(_lineShortName != otherLineKey.getShortName() && _lineShortName < otherLineKey.getShortName()) ||
-				this < &otherLineKey
-			;
+			return _lineShortName < otherLineKey.getShortName();
 		}
 
 
@@ -560,10 +557,7 @@ namespace synthese
 
 		bool StopPointsListFunction::SortableStopArea::operator<(SortableStopArea const &otherStopArea) const
 		{
-			return
-				(_destinationName != otherStopArea.getDestinationName() && _destinationName < otherStopArea.getDestinationName()) ||
-				this < &otherStopArea
-			;
+			return _destinationName < otherStopArea.getDestinationName();
 		}
 
 		string StopPointsListFunction::SortableStopArea::getDestinationName() const
