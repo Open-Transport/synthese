@@ -541,7 +541,7 @@ namespace synthese
 			optional<const std::string&> name,
 			optional<const std::string&> shortName,
 			boost::optional<util::RGBColor> color,
-			const TransportNetwork& defaultNetwork,
+			TransportNetwork& defaultNetwork,
 			const impex::DataSource& source,
 			util::Env& env,
 			std::ostream& logStream
@@ -558,7 +558,7 @@ namespace synthese
 				}
 				logStream << "<br />";
 
-				line->setNetwork(&defaultNetwork);
+				line->setParent(defaultNetwork);
 				Importable::DataSourceLinks links;
 				links.insert(make_pair(&source, id));
 				line->setDataSourceLinksWithoutRegistration(links);
