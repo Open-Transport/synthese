@@ -563,6 +563,13 @@ namespace synthese
 	public:
 		typedef boost::optional<P&> Type;
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Auto generated object vector field
+		class Vector:
+			public ObjectField<Vector, std::vector<P*> >
+		{
+		};
+
 		static void LoadFromRecord(boost::optional<P&>& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
 			if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
