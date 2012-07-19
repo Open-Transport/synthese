@@ -48,6 +48,13 @@ namespace synthese
 			public DBDirectTableSync
 		{
 		public:
+			struct FakeRegistrable:
+				public util::Registrable
+			{
+
+			};
+			static util::Registry<FakeRegistrable> _fakeRegistry;
+
 			typedef T		ObjectType;
 			typedef K		FactoryClass;
 			typedef std::vector<boost::shared_ptr<T> > SearchResult;
@@ -357,7 +364,20 @@ namespace synthese
 			) const {
 				Load(&dynamic_cast<T&>(obj), rows, environment, linkLevel);
 			}
+
+
+			virtual const util::RegistryBase& getRegistry(
+				const util::Env& env
+			) const {
+				assert(false);
+				return static_cast<util::RegistryBase&>(_fakeRegistry);
+			}
 		};
+
+
+
+		template<class K, class T>
+		util::Registry<typename DBInheritanceTableSyncTemplate<K, T>::FakeRegistrable> DBInheritanceTableSyncTemplate<K, T>::_fakeRegistry;
 }	}
 
 #endif // SYNTHESE_db_DBInheritanceTableSyncTemplate_hpp__

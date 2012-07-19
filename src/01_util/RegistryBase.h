@@ -49,6 +49,11 @@ namespace synthese
 
 			virtual void remove(util::RegistryKeyType id) = 0;
 			virtual size_t size() const = 0;
+
+			virtual boost::shared_ptr<Registrable> getEditableObject(
+				RegistryKeyType key
+			) const = 0;
+
 		};
 	}
 }
