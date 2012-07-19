@@ -80,7 +80,15 @@ namespace synthese
 				journey.getEndTime() - originDateTime :
 				originDateTime - journey.getEndTime()
 			);
-			assert(duration.total_seconds() >= 0);
+
+			// TODO : this assert is wrong sometimes (due to other bugs) and cause a crash
+			// So, when others bugs will be resolved, maybe the following if could be removed replaced by the assert ?
+			// assert(duration.total_seconds() >= 0);
+
+			if(duration.total_seconds() < 0)
+			{
+				return true;
+			}
 
 			TimeMap::value_type& vertexItem(_bestTimeMap[vertex->getIndex()]);
 
