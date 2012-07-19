@@ -200,7 +200,7 @@ namespace synthese
 			{
 				ap = AccessParameters(
 					USER_CAR,
-					false, false, 300000, posix_time::hours(5), 50 / 3.6,
+					false, false, 300000, posix_time::hours(5), 1000,
 					1000
 				);
 			}

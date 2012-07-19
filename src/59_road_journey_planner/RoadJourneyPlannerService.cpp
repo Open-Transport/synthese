@@ -179,7 +179,7 @@ namespace synthese
 			_carTrip = map.getDefault<bool>(PARAMETER_CAR_TRIP, false);
 			if(_carTrip)
 			{
-				_accessParameters = AccessParameters(USER_CAR, false, false, 300000, boost::posix_time::hours(5), 50 / 3.6, 1000);
+				_accessParameters = AccessParameters(USER_CAR, false, false, 300000, boost::posix_time::hours(5), 1000, 1000);
 			}
 			else
 			{
