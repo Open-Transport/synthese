@@ -25,6 +25,7 @@
 #include "PTQualityControlAdmin.hpp"
 
 #include "DesignatedLinePhysicalStop.hpp"
+#include "DRTArea.hpp"
 #include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
@@ -90,6 +91,7 @@ namespace synthese
 		const string PTQualityControlAdmin::TAB_RANK_CONTINUITY = "rank_continuity";
 		const string PTQualityControlAdmin::TAB_DOUBLE_ROUTES = "double_routes";
 		const string PTQualityControlAdmin::TAB_SPEED = "speed";
+		const string PTQualityControlAdmin::TAB_ASCENDING_SCHEDULES = "ascending_schedules";
 
 
 
@@ -621,6 +623,127 @@ namespace synthese
 
 
 			////////////////////////////////////////////////////////////////////
+			// ASCENDING SCHEDULES
+			if (openTabContent(stream, TAB_ASCENDING_SCHEDULES))
+			{
+				if(_runControl && getCurrentTab() == getActiveTab())
+				{
+					AdminFunctionRequest<ServiceAdmin> openServiceRequest(request);
+					double maxSpeed(0);
+
+					HTMLTable::ColsVector c;
+					c.push_back("Réseau");
+					c.push_back("Ligne");
+					c.push_back("Service");
+					c.push_back("Lieu départ");
+					c.push_back("Heure départ");
+					c.push_back("Lieu arrivée");
+					c.push_back("Heure arrivée");
+					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
+
+					stream << t.open();
+
+					// Loop on scheduled services
+					BOOST_FOREACH(const ScheduledService::Registry::value_type& item, Env::GetOfficialEnv().getRegistry<ScheduledService>())
+					{
+						// Get the current service
+						const ScheduledService& service(*item.second);
+
+						// Loop on departure edges
+						BOOST_FOREACH(Edge* departureEdge, service.getPath()->getEdges())
+						{
+							// Avoid non departure edges
+							if(!departureEdge->isDepartureAllowed())
+							{
+								continue;
+							}
+
+							// Get departure schedule
+							time_duration departureSchedule(
+								service.getDepartureSchedule(false, departureEdge->getRankInPath())
+							);
+
+							// Loop on following arrival edges
+							for(Edge* arrivalEdge(departureEdge->getFollowingArrivalForFineSteppingOnly());
+								arrivalEdge != NULL;
+								arrivalEdge = arrivalEdge->getFollowingArrivalForFineSteppingOnly()
+							){
+								// Get arrival schedule
+								time_duration arrivalSchedule(
+									service.getArrivalSchedule(false, arrivalEdge->getRankInPath())
+								);
+
+								// Mistake detected
+								if(arrivalSchedule < departureSchedule)
+								{
+									// Row
+									stream << t.row();
+
+									// Network
+									stream << t.col() << service.getRoute()->getCommercialLine()->getNetwork()->getName();
+
+									// Line
+									stream << t.col() << service.getRoute()->getCommercialLine()->getShortName();
+
+									// Service cell
+									openServiceRequest.getPage()->setService(Env::GetOfficialEnv().getSPtr(&service));
+									stream << t.col() << HTMLModule::getLinkButton(openServiceRequest.getURL(), service.getServiceNumber());
+
+									// Departure place
+									stream << t.col();
+									if(dynamic_cast<const StopArea*>(departureEdge->getHub()))
+									{
+										stream << dynamic_cast<const StopArea*>(departureEdge->getHub())->getFullName();
+									}
+									else if(dynamic_cast<const DRTArea*>(departureEdge->getHub()))
+									{
+										stream << dynamic_cast<const DRTArea*>(departureEdge->getHub())->getName();
+									}
+
+									// Departure schedule
+									stream << t.col() << departureSchedule;
+
+									// Arrival place
+									stream << t.col();
+									if(dynamic_cast<const StopArea*>(arrivalEdge->getHub()))
+									{
+										stream << dynamic_cast<const StopArea*>(arrivalEdge->getHub())->getFullName();
+									}
+									else if(dynamic_cast<const DRTArea*>(arrivalEdge->getHub()))
+									{
+										stream << dynamic_cast<const DRTArea*>(arrivalEdge->getHub())->getName();
+									}
+
+									// Arrival schedule
+									stream << t.col() << arrivalSchedule;
+								}
+
+								// Break the loop if the edge is a later departure too
+								if(	arrivalEdge->isDepartureAllowed() &&
+									service.getDepartureSchedule(false, arrivalEdge->getRankInPath()) > departureSchedule
+								){
+									break;
+								}
+							}
+						}
+					}
+
+					stream << t.close();
+				}
+				else
+				{
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					runRequest.getPage()->setRunControl(true);
+
+					stream <<
+						"<p class=\"info\">Les contrôles qualité sont désactivés par défaut.<br /><br />" <<
+						HTMLModule::getLinkButton(runRequest.getURL(), "Activer ce contrôle", string(), ICON) <<
+						"</p>"
+					;
+			}	}
+
+
+			////////////////////////////////////////////////////////////////////
 			/// END TABS
 			closeTabContent(stream);
 		}
@@ -666,6 +789,7 @@ namespace synthese
 			_tabs.push_back(Tab("Continuité des rangs", TAB_RANK_CONTINUITY, false));
 			_tabs.push_back(Tab("Parcours en double", TAB_DOUBLE_ROUTES, false));
 			_tabs.push_back(Tab("Vitesse", TAB_SPEED, false));
+			_tabs.push_back(Tab("Chronologie des horaires", TAB_ASCENDING_SCHEDULES, false));
 			_tabBuilded = true;
 		}
 	}
