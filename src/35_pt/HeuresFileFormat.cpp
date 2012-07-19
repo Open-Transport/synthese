@@ -28,6 +28,8 @@
 #include "StopPointTableSync.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
+#include "TreeFolder.hpp"
+#include "TreeFolderTableSync.hpp"
 #include "City.h"
 #include "CityTableSync.h"
 #include "DBTransaction.hpp"
@@ -90,6 +92,7 @@ namespace synthese
 	using namespace calendar;
 	using namespace server;
 	using namespace html;
+	using namespace tree;
 
 	namespace util
 	{
@@ -656,9 +659,13 @@ namespace synthese
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
 			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
+
+			// Network or folder
 			if(map.getOptional<RegistryKeyType>(PARAMETER_NETWORK_ID))
 			{
-				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
+
+				_network = TransportNetworkTableSync::GetEditable(id, _env);
 			}
 			if(map.getDefault<RegistryKeyType>(PARAMETER_DAY7_CALENDAR_ID, 0))
 			{
@@ -697,7 +704,7 @@ namespace synthese
 			// Lines
 			CommercialLineTableSync::Search(
 				_env,
-				_network->getKey()
+				_network.get() ? _network->getKey() : _folder->getKey()
 			);
 			
 			// Journey patterns
@@ -767,13 +774,15 @@ namespace synthese
 				}
 
 				// Output
+				IConv iconv("UTF-8", "CP1252");
 				BOOST_FOREACH(const string& codeBySource, stop.getCodesBySource(*_dataSource))
 				{
 					pointsarretsStream << setw(4) << setfill(' ') << codeBySource;
 					pointsarretsStream << "0";
-					_writeTextAndSpaces(pointsarretsStream, stop.getName().empty() ? stop.getConnectionPlace()->getName() : stop.getName(), 50);
-					_writeTextAndSpaces(pointsarretsStream, string(), 9);
-					_writeTextAndSpaces(pointsarretsStream, stop.getConnectionPlace()->getCity()->getName(), 30);
+					_writeTextAndSpaces(pointsarretsStream, iconv.convert(stop.getName().empty() ? stop.getConnectionPlace()->getName() : stop.getName()), 50);
+					_writeTextAndSpaces(pointsarretsStream, iconv.convert(stop.getName().empty() ? stop.getConnectionPlace()->getName() : stop.getName()), 5);
+					_writeTextAndSpaces(pointsarretsStream, string(), 4);
+					_writeTextAndSpaces(pointsarretsStream, iconv.convert(stop.getConnectionPlace()->getCity()->getName()), 30);
 					_writeTextAndSpaces(pointsarretsStream, string(), 15);
 					pointsarretsStream << endl;
 				}
@@ -867,10 +876,21 @@ namespace synthese
 				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getName(), 2, false);
 				_writeTextAndSpaces(tronconsStream, static_cast<const JourneyPattern*>(ss.getPath())->getCommercialLine()->getCodeBySources(), 4);
 				_writeTextAndSpaces(tronconsStream, ss.getServiceNumber(), 5, false, '0');
-				for(size_t i(0); i<ss.getDepartureSchedules(false).size(); ++i)
+
+				// Schedules
+				size_t schedulesNumber(ss.getDepartureSchedules(false).size());
+				for(size_t i(0); i<schedulesNumber; ++i)
 				{
-					_writeHour(tronconsStream, ss.getArrivalSchedule(false, i));
-					_writeHour(tronconsStream, ss.getDepartureSchedule(false, i));
+					time_duration departureSchedule(ss.getDepartureSchedule(false, i));
+					time_duration arrivalSchedule(ss.getArrivalSchedule(false, i));
+					_writeHour(
+						tronconsStream,
+						(i== 0 || arrivalSchedule > departureSchedule) ? departureSchedule : arrivalSchedule
+					);
+					_writeHour(
+						tronconsStream,
+						(i+1 == schedulesNumber) ? arrivalSchedule : departureSchedule
+					);
 				}
 				tronconsStream << ";" << endl;
 			}
@@ -925,7 +945,16 @@ namespace synthese
 			// Network
 			try
 			{
-				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
+				RegistryKeyType id(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID));
+
+				if(decodeTableId(id) == TransportNetworkTableSync::TABLE.ID)
+				{
+					_network = TransportNetworkTableSync::GetEditable(id, _env);
+				}
+				else if(decodeTableId(id) == TreeFolder::CLASS_NUMBER)
+				{
+					_folder = TreeFolderTableSync::GetEditable(id, _env);
+				}
 			}
 			catch (...)
 			{

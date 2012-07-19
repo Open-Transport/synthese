@@ -119,7 +119,7 @@ namespace synthese
 				boost::optional<const std::string&> name,
 				boost::optional<const std::string&> shortName,
 				boost::optional<util::RGBColor> color,
-				const TransportNetwork& defaultNetwork,
+				TransportNetwork& defaultNetwork,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
