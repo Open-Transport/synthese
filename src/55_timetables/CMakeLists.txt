@@ -9,6 +9,8 @@ TimetableAddAction.cpp
 TimetableAddAction.h
 TimetableAdmin.cpp
 TimetableAdmin.h
+TimetableBuildService.cpp
+TimetableBuildService.hpp
 TimetableColumn.cpp
 TimetableColumn.h
 TimetableGenerateFunction.cpp
@@ -28,6 +30,16 @@ TimetableRow.cpp
 TimetableRow.h
 TimetableRowAddAction.cpp
 TimetableRowAddAction.h
+TimetableRowGroup.cpp
+TimetableRowGroup.hpp
+TimetableRowGroupItem.cpp
+TimetableRowGroupItem.hpp
+TimetableRowGroupItemAddAction.cpp
+TimetableRowGroupItemAddAction.hpp
+TimetableRowGroupItemTableSync.cpp
+TimetableRowGroupItemTableSync.hpp
+TimetableRowGroupTableSync.cpp
+TimetableRowGroupTableSync.hpp
 TimetableRowTableSync.cpp
 TimetableRowTableSync.h
 TimetableServiceRowInterfacePage.cpp

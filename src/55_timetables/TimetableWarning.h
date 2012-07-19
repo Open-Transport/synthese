@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class ParametersMap;
+	}
+
 	namespace timetables
 	{
 		/** TimetableWarning class.
@@ -50,6 +55,20 @@ namespace synthese
 			calendar::Calendar	_calendar;
 			std::string		_text;
 
+			static const std::string DATA_NUMBER;
+			static const std::string DATA_TEXT;
+			static const std::string DATA_FIRST_YEAR;
+			static const std::string DATA_FIRST_MONTH;
+			static const std::string DATA_FIRST_DAY;
+			static const std::string DATA_LAST_YEAR;
+			static const std::string DATA_LAST_MONTH;
+			static const std::string DATA_LAST_DAY;
+			static const std::string DATA_LAST_DATE;
+			static const std::string DATA_FIRST_DATE;
+			
+			static const std::string TAG_DAY;
+			static const std::string ATTR_DATE;
+
 		public:
 			/** Constructor.
 				@param calendar
@@ -63,16 +82,25 @@ namespace synthese
 				const std::string& text
 			);
 
-
-
 			//! @name Getters
 			//@{
 				std::size_t					getNumber()			const;
 				const calendar::Calendar&	getCalendar()		const;
 				const std::string& getText() const;
 			//@}
+
+			/// @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of the warning to a parameters map
+				/// @param pm the parameters map to populate
+				/// @param withDates Exports each date of the calendar supporting the warning
+				void toParametersMap(
+					util::ParametersMap& pm,
+					bool withDates
+				) const;
+			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_timetables_TimetableWarning_h__

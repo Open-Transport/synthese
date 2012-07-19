@@ -48,6 +48,7 @@ namespace synthese
 	namespace timetables
 	{
 		class TimetableResult;
+		class TimetableRowGroup;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Timetable generator.
@@ -61,13 +62,22 @@ namespace synthese
 			typedef std::set<const pt::CommercialLine*>	AuthorizedLines;
 			typedef std::set<const pt::StopPoint*>		AuthorizedPhysicalStops;
 
+			struct RowGroupsSort
+			{
+				bool operator()(
+					TimetableRowGroup* g1,
+					TimetableRowGroup* g2
+				) const;
+			};
+			typedef std::set<TimetableRowGroup*, RowGroupsSort> RowGroups;
+
 		private:
 
 			//! @name Content definition
 			//@{
 				std::auto_ptr<TimetableGenerator>	_transferTimetableBefore;
 				std::auto_ptr<TimetableGenerator>	_transferTimetableAfter;
-				Rows						_rows;
+				RowGroups					_rowGroups;
 				calendar::Calendar			_baseCalendar;
 				AuthorizedLines				_authorizedLines;
 				AuthorizedPhysicalStops		_authorizedPhysicalStops;
@@ -77,13 +87,25 @@ namespace synthese
 				boost::optional<std::size_t> _autoIntermediateStops;
 			//@}
 
+			/// @name Result
+			//@{
+				mutable Rows						_rows;
+			//@}
+
 			//! @name Rendering parameters
 			//@{
 			//@}
 
 			//! @name Algorithms
 			//@{
-				bool	_isLineSelected(const pt::JourneyPattern& line)	const;
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if a journey pattern should be present on the timetable according
+				/// to its definition.
+				/// @param journeyPattern the journey pattern to test
+				bool _isJourneyPatternSelected(const pt::JourneyPattern& journeyPattern) const;
+
+
+
 				void	_insert(TimetableResult& result, const TimetableColumn& col) const;
 				void	_buildWarnings(TimetableResult& result) const;
 				void	_scanServices(TimetableResult& result, const pt::JourneyPattern& line) const;
@@ -98,6 +120,7 @@ namespace synthese
 			//@{
 				const calendar::Calendar& getBaseCalendar() const { return _baseCalendar; }
 				const Rows&		getRows()		const { return _rows; }
+				const RowGroups& getRowGroups() const { return _rowGroups; }
 				const AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const { return _authorizedPhysicalStops; }
 				boost::optional<std::size_t> getAutoIntermediateStops() const { return _autoIntermediateStops; }
 			//@}
@@ -119,6 +142,7 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setRows(const Rows& rows) { _rows = rows; }
+				void setRowGroups(const RowGroups& value) { _rowGroups = value; }
 				void setBaseCalendar(const calendar::Calendar& value) { _baseCalendar = value; }
 				void setAuthorizedLines(const AuthorizedLines& value) { _authorizedLines = value; }
 				void setAuthorizedPhysicalStops(const AuthorizedPhysicalStops& value) { _authorizedPhysicalStops = value; }

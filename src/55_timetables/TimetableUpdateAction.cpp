@@ -56,13 +56,13 @@ namespace synthese
 		const string TimetableUpdateAction::PARAMETER_TITLE = Action_PARAMETER_PREFIX + "tt";
 		const string TimetableUpdateAction::PARAMETER_FORMAT = Action_PARAMETER_PREFIX + "fo";
 		const string TimetableUpdateAction::PARAMETER_CONTAINER_ID = Action_PARAMETER_PREFIX + "co";
+		const string TimetableUpdateAction::PARAMETER_IGNORE_EMPTY_ROWS = Action_PARAMETER_PREFIX + "_ignore_empty_rows";
 
 
 
-		TimetableUpdateAction::TimetableUpdateAction()
-			: util::FactorableTemplate<Action, TimetableUpdateAction>()
-		{
-		}
+		TimetableUpdateAction::TimetableUpdateAction():
+			FactorableTemplate<Action, TimetableUpdateAction>()
+		{}
 
 
 
@@ -119,6 +119,9 @@ namespace synthese
 
 			_title = map.get<string>(PARAMETER_TITLE);
 			_format = static_cast<Timetable::ContentType>(map.get<int>(PARAMETER_FORMAT));
+
+			// Ignore empty rows
+			_ignoreEmptyRows = map.getOptional<bool>(PARAMETER_IGNORE_EMPTY_ROWS);
 		}
 
 
@@ -129,9 +132,14 @@ namespace synthese
 			_timetable->setTitle(_title);
 			_timetable->setContentType(_format);
 			_timetable->setBookId(_container.get() ? _container->getKey() : RegistryKeyType(0));
+			if(_ignoreEmptyRows)
+			{
+				_timetable->setIgnoreEmptyRows(*_ignoreEmptyRows);
+			}
 
 			TimetableTableSync::Save(_timetable.get());
 		}
+
 
 
 		bool TimetableUpdateAction::isAuthorized(const server::Session* session) const
@@ -145,5 +153,4 @@ namespace synthese
 		{
 			_timetable = value;
 		}
-	}
-}
+}	}

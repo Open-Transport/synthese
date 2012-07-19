@@ -22,24 +22,24 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
-#include "Timetable.h"
 #include "TimetableTableSync.h"
-#include "TimetableRow.h"
-#include "TimetableRowTableSync.h"
+
 #include "CalendarTemplate.h"
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLine.h"
+#include "Conversion.h"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
-#include "Interface.h"
-#include "CommercialLine.h"
-#include "StopPoint.hpp"
 #include "RankUpdateQuery.hpp"
-#include "TimetableRight.h"
 #include "ReplaceQuery.h"
+#include "StopPoint.hpp"
+#include "Timetable.h"
+#include "TimetableRight.h"
+#include "TimetableRow.h"
+#include "TimetableRowTableSync.h"
 
-#include "01_util/Conversion.h"
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -50,7 +50,6 @@ namespace synthese
 	using namespace util;
 	using namespace timetables;
 	using namespace calendar;
-	using namespace interfaces;
 	using namespace pt;
 	using namespace security;
 
@@ -58,7 +57,6 @@ namespace synthese
 	{
 		template<> const string FactorableTemplate<DBTableSync,TimetableTableSync>::FACTORY_KEY("55.01 Timetables");
 	}
-
 
 	namespace timetables
 	{
@@ -71,6 +69,7 @@ namespace synthese
 		const std::string TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS("authorized_physical_stops");
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE("transfer_timetable_before");
 		const std::string TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER("transfer_timetable_after");
+		const std::string TimetableTableSync::COL_IGNORE_EMPTY_ROWS = "ignore_empty_rows";
 	}
 
 	namespace db
@@ -83,7 +82,6 @@ namespace synthese
 
 		template<> const Field DBTableSyncTemplate<TimetableTableSync>::_FIELDS[]=
 		{
-
 			Field(TABLE_COL_ID, SQL_INTEGER),
 			Field(TimetableTableSync::COL_BOOK_ID, SQL_INTEGER),
 			Field(TimetableTableSync::COL_RANK, SQL_INTEGER),
@@ -94,6 +92,7 @@ namespace synthese
 			Field(TimetableTableSync::COL_AUTHORIZED_PHYSICAL_STOPS, SQL_TEXT),
 			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_BEFORE, SQL_INTEGER),
 			Field(TimetableTableSync::COL_TRANSFER_TIMETABLE_AFTER, SQL_INTEGER),
+			Field(TimetableTableSync::COL_IGNORE_EMPTY_ROWS, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -125,6 +124,7 @@ namespace synthese
 			object->setRank(rows->getInt(TimetableTableSync::COL_RANK));
 			object->setTitle(rows->getText(TimetableTableSync::COL_TITLE));
 			object->setContentType(static_cast<Timetable::ContentType>(rows->getInt(TimetableTableSync::COL_FORMAT)));
+			object->setIgnoreEmptyRows(rows->getBool(TimetableTableSync::COL_IGNORE_EMPTY_ROWS));
 
 			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -175,7 +175,10 @@ namespace synthese
 					try
 					{
 						object->setBaseCalendar(
-							Env::GetOfficialEnv().get<CalendarTemplate>(rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID)).get()
+							CalendarTemplateTableSync::Get(
+								rows->getLongLong(TimetableTableSync::COL_CALENDAR_ID),
+								Env::GetOfficialEnv()
+							).get()
 						);
 					}
 					catch(ObjectNotFoundException<CalendarTemplate>)
@@ -263,6 +266,7 @@ namespace synthese
 			query.addField(authorizedPhysicalStops.str());
 			query.addField(object->getTransferTimetableBefore(1) ? object->getTransferTimetableBefore(1)->getKey() : RegistryKeyType(0));
 			query.addField(object->getTransferTimetableAfter(1) ? object->getTransferTimetableAfter(1)->getKey() : RegistryKeyType(0));
+			query.addField(object->getIgnoreEmptyRows());
 			query.execute(transaction);
 		}
 
@@ -317,10 +321,9 @@ namespace synthese
 
 	namespace timetables
 	{
-		TimetableTableSync::TimetableTableSync()
-			: DBNoSyncTableSyncTemplate<TimetableTableSync, Timetable>()
-		{
-		}
+		TimetableTableSync::TimetableTableSync():
+			DBRegistryTableSyncTemplate<TimetableTableSync, Timetable>()
+		{}
 
 
 
@@ -402,5 +405,4 @@ namespace synthese
 				throw Exception(e.getMessage());
 			}
 		}
-	}
-}
+}	}

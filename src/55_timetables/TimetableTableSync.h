@@ -25,12 +25,11 @@
 #ifndef SYNTHESE_TimetableTableSync_H__
 #define SYNTHESE_TimetableTableSync_H__
 
+#include "DBRegistryTableSyncTemplate.hpp"
 
 #include <vector>
 #include <string>
 #include <iostream>
-
-#include "DBNoSyncTableSyncTemplate.hpp"
 
 namespace synthese
 {
@@ -41,7 +40,8 @@ namespace synthese
 		/** Timetable table synchronizer.
 			@ingroup m55LS refLS
 		*/
-		class TimetableTableSync : public db::DBNoSyncTableSyncTemplate<TimetableTableSync,Timetable>
+		class TimetableTableSync:
+			public db::DBRegistryTableSyncTemplate<TimetableTableSync,Timetable>
 		{
 		public:
 			static const std::string COL_BOOK_ID;
@@ -53,6 +53,7 @@ namespace synthese
 			static const std::string COL_AUTHORIZED_PHYSICAL_STOPS;
 			static const std::string COL_TRANSFER_TIMETABLE_BEFORE;
 			static const std::string COL_TRANSFER_TIMETABLE_AFTER;
+			static const std::string COL_IGNORE_EMPTY_ROWS;
 
 			TimetableTableSync();
 
@@ -84,7 +85,6 @@ namespace synthese
 
 			static boost::optional<size_t> GetMaxRank(util::RegistryKeyType bookId);
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_TimetableTableSync_H__
