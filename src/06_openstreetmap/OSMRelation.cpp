@@ -174,6 +174,19 @@ std::list<WayPtr> Relation::getWays(std::string &role) {
    return ret;
 }
 
+std::list<NodePtr> Relation::getNodes(std::string &role) {
+   std::list<NodePtr> ret;
+   std::map<std::string, std::map<int, NodePtr> >::iterator it1 = nodes.find(role);
+   if (it1 != nodes.end()) {
+      std::map<int, NodePtr>::iterator it2 = it1->second.begin();
+      while (it2 != it1->second.end()) {
+         ret.push_back(it2->second);
+         it2++;
+      }
+   }
+   return ret;
+}
+
 /*
 std::list<WayPtr> Relation::getWays() {
    std::list<WayPtr> ret;
@@ -244,8 +257,11 @@ geos::geom::Geometry* Relation::extractBoundary() {
    static std::string sEmpty = "";
    static std::string sEnclave = "enclave";
    static std::string sExclave = "exclave";
+   static std::string sOuter = "outer";
    std::list<WayPtr> ways = getWays(sEmpty);
+   std::list<WayPtr> waysOuter = getWays(sOuter);
    std::list<WayPtr> exclaves = getWays(sExclave);
+   ways.splice(ways.end(), waysOuter);
    ways.splice(ways.end(), exclaves);
    std::list<WayPtr> enclaves = getWays(sEnclave);
 

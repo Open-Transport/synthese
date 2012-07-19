@@ -160,6 +160,7 @@ std::map<int,WayPtr> Network::getWalkableWays() {
    return ret;
 }
 
+
 std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkableWaysByAdminBoundary(int admin_level) {
    std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > ret;
    util::Log::GetInstance().info("extracting administrative boundaries");
@@ -240,6 +241,77 @@ std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > Network::getWalkabl
    util::Log::GetInstance().info("finished extracting ways by administrative boundaries");
    return ret;
 }
+
+
+std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > Network::getWaysByAdminBoundary(int admin_level)
+{
+	typedef std::map<int, WayPtr> WayMap;
+	typedef std::pair<int, WayPtr> WayType;
+	typedef std::map<int, RelationPtr> RelationMap;
+	typedef std::pair<RelationPtr, WayMap> RelationWayPair;
+	typedef std::map<int, RelationWayPair> GlobalMap;
+
+	GlobalMap ret;
+
+	util::Log::GetInstance().info("extracting administrative boundaries");
+	RelationMap adminBoundaries = getAdministrativeBoundaries(admin_level);
+	util::Log::GetInstance().info("finished extracting administrative boundaries");
+
+	WayMap waysList;
+	BOOST_FOREACH(WayType w, ways)
+	{
+		if(
+			w.second->getNodes()->size() > 1 &&
+			w.second->hasTag(Element::TAG_HIGHWAY) &&
+			Way::highwayTypes.find(w.second->getTag(Element::TAG_HIGHWAY)) != Way::highwayTypes.end()
+		)
+		{
+			waysList[w.second->getId()] = w.second;
+		}
+	}
+
+	util::Log::GetInstance().info("extracting ways by administrative boundaries");
+
+	RelationMap::iterator boundaryIterator = adminBoundaries.begin();
+	while(boundaryIterator != adminBoundaries.end())
+	{
+		RelationPtr boundary = boundaryIterator->second;
+		ret[boundaryIterator->first] = RelationWayPair(boundary, WayMap());
+		boundaryIterator++;
+	}
+
+	WayMap::iterator wayIterator = waysList.begin();
+	while(wayIterator != waysList.end())
+	{
+		WayPtr way = wayIterator->second;
+		boost::shared_ptr<const geos::geom::Geometry> wayGeom = way->toGeometry();
+
+		boundaryIterator = adminBoundaries.begin();
+		while(boundaryIterator != adminBoundaries.end())
+		{
+			RelationPtr boundary = boundaryIterator->second;
+			boost::shared_ptr<const geos::geom::prep::PreparedGeometry> boundaryPrepGeom = boundary->toPreparedGeometry();
+			if(boundaryPrepGeom->covers(wayGeom.get()) || boundaryPrepGeom->intersects(wayGeom.get()))
+			{
+				//the way is inside or intersected by the boundary, keep it
+				ret[boundaryIterator->first].second[wayIterator->first] = way;
+				//mark the nodes of this way for next step reference counting
+				way->referenceWithNodes();
+				break;
+			}
+			else //no interaction with current boundary
+				boundaryIterator++;
+		}
+		++wayIterator;
+	}
+
+   util::Log::GetInstance().info("finished extracting ways by administrative boundaries");
+
+   return ret;
+}
+
+
+
 
 std::map<int,RelationPtr> Network::getAdministrativeBoundaries(int admin_level) {
    std::map<int, RelationPtr> ret;

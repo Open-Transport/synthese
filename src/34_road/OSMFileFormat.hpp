@@ -27,6 +27,7 @@
 #include "OneFileTypeImporter.hpp"
 #include "NoExportPolicy.hpp"
 #include "OSMElements.h"
+#include "MainRoadChunk.hpp"
 
 #include <iostream>
 #include <map>
@@ -60,12 +61,22 @@ namespace synthese
 			{
 			private:
 
+				static const std::string PARAMETER_ADD_CENTRAL_CHUNK_REFERENCE;
+
+				typedef std::map<util::RegistryKeyType, std::vector<road::MainRoadChunk::HouseNumber> > ChunkHouseNumberList;
 				typedef std::map<int, boost::shared_ptr<road::Crossing> > _CrossingsMap;
 				typedef std::map<int, boost::shared_ptr<geography::City> > _CitiesMap;
 				typedef std::map<std::string, boost::shared_ptr<RoadPlace> > _RecentlyCreatedRoadPlaces;
+				typedef std::map<int, boost::shared_ptr<RoadPlace> > _LinkBetweenWayAndRoadPlaces;
+				typedef std::map<int, boost::shared_ptr<MainRoadPart> > _RecentlyCreatedRoadParts;
 
 				mutable _CrossingsMap _crossingsMap;
 				mutable _RecentlyCreatedRoadPlaces _recentlyCreatedRoadPlaces;
+				mutable _RecentlyCreatedRoadParts _recentlyCreatedRoadParts;
+				mutable _LinkBetweenWayAndRoadPlaces _linkBetweenWayAndRoadPlaces;
+				mutable ChunkHouseNumberList _chunkHouseNumberList;
+
+				bool _addCentralChunkReference;
 
 			protected:
 
@@ -76,6 +87,13 @@ namespace synthese
 				) const;
 
 			public:
+
+				typedef enum {
+					TWO_WAYS,
+					ONE_WAY,
+					REVERSED_ONE_WAY
+				} TraficDirection;
+
 				Importer_(
 					util::Env& env,
 					const impex::DataSource& dataSource
@@ -140,9 +158,21 @@ namespace synthese
 					const boost::shared_ptr<road::Crossing> crossing,
 					const boost::optional<boost::shared_ptr<geos::geom::LineString> > geometry,
 					std::size_t rank,
-					graph::MetricOffset metricOffset
+					graph::MetricOffset metricOffset,
+					TraficDirection traficDirection = TWO_WAYS,
+					double maxSpeed = 50 / 3.6,
+					bool isNonWalkable = false
 				) const;
 
+				void _projectHouseAndUpdateChunkHouseNumberBounds(
+					const osm::NodePtr& house,
+					std::vector<road::MainRoadChunk*>& refRoadChunks,
+					const bool autoUpdatePolicy = false
+				) const;
+
+				void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
+					road::MainRoadChunk* chunk
+				) const;
 			};
 
 			typedef impex::NoExportPolicy<OSMFileFormat> Exporter_;
