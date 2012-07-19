@@ -111,6 +111,9 @@ namespace synthese
 			virtual bool allowCreate(const server::Session* session) const { return true; }
 			virtual void beforeCreate(boost::optional<db::DBTransaction&> transaction) const { }
 			virtual void afterCreate(boost::optional<db::DBTransaction&> transaction) const { }
+			virtual bool allowDelete(const server::Session* session) const { return true; }
+			virtual void beforeDelete(boost::optional<db::DBTransaction&> transaction) const { }
+			virtual void afterDelete(boost::optional<db::DBTransaction&> transaction) const { }
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds parameters that are not intended to be saved (i.e. generated content).
