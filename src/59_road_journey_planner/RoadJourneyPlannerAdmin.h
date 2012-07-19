@@ -55,7 +55,8 @@ namespace synthese
 			std::string						_startPlace;
 			std::string						_endCity;
 			std::string						_endPlace;
-			algorithm::PlanningOrder					_planningOrder;
+			int 							_carTrip;
+			algorithm::PlanningOrder				_planningOrder;
 
 		public:
 			static const std::string PARAMETER_START_CITY;
@@ -63,7 +64,7 @@ namespace synthese
 			static const std::string PARAMETER_END_CITY;
 			static const std::string PARAMETER_END_PLACE;
 			static const std::string PARAMETER_PLANNING_ORDER;
-
+			static const std::string PARAMETER_CAR_TRIP;
 			RoadJourneyPlannerAdmin();
 
 

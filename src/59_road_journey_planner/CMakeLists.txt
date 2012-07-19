@@ -12,6 +12,8 @@ RoadJourneyPlannerModule.hpp
 RoadJourneyPlannerModule.inc.cpp
 RoadJourneyPlannerResult.cpp
 RoadJourneyPlannerResult.h
+RoadJourneyPlannerService.cpp
+RoadJourneyPlannerService.hpp
 )
 
 set_source_files_properties(RoadJourneyPlannerModule.gen.cpp RoadJourneyPlannerModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

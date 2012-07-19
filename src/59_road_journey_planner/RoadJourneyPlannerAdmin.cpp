@@ -50,6 +50,7 @@
 #include "RoadModule.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/lexical_cast.hpp>
 
 using namespace std;
 using namespace boost;
@@ -89,7 +90,7 @@ namespace synthese
 		const std::string RoadJourneyPlannerAdmin::PARAMETER_END_CITY("ec");
 		const std::string RoadJourneyPlannerAdmin::PARAMETER_END_PLACE("ep");
 		const std::string RoadJourneyPlannerAdmin::PARAMETER_PLANNING_ORDER("po");
-
+		const std::string RoadJourneyPlannerAdmin::PARAMETER_CAR_TRIP("ct");
 
 
 		RoadJourneyPlannerAdmin::RoadJourneyPlannerAdmin(
@@ -107,7 +108,7 @@ namespace synthese
 			_startPlace = map.getDefault<string>(PARAMETER_START_PLACE);
 			_endCity = map.getDefault<string>(PARAMETER_END_CITY);
 			_endPlace = map.getDefault<string>(PARAMETER_END_PLACE);
-
+			_carTrip = map.getDefault<int>(PARAMETER_CAR_TRIP, 0);
 		}
 
 
@@ -120,6 +121,7 @@ namespace synthese
 			m.insert(PARAMETER_END_CITY, _endCity);
 			m.insert(PARAMETER_END_PLACE, _endPlace);
 			m.insert(PARAMETER_PLANNING_ORDER, static_cast<int>(_planningOrder));
+			m.insert(PARAMETER_CAR_TRIP, lexical_cast<int>(_carTrip));
 			return m;
 		}
 
@@ -170,6 +172,8 @@ namespace synthese
 						(dynamic_cast<const City*>(endPlace.get()) ? string() : dynamic_cast<const NamedPlace*>(endPlace.get())->getName()) :
 						_endPlace
 				)	);
+			stream << st.row();
+			stream << st.cell("Trajet en voiture", st.getForm().getOuiNonRadioInput(PARAMETER_CAR_TRIP, (_carTrip == 1)));
 			stream << st.close();
 			stream << st.getForm().setFocus(PARAMETER_START_CITY);
 
@@ -190,12 +194,25 @@ namespace synthese
 				endDate -= days(1);
 			}
 
+			AccessParameters ap;
 			// Route planning
-			AccessParameters ap(
-				USER_PEDESTRIAN,
-				false, false, 30000, posix_time::hours(5), 1.111,
-				1000
-			);
+			if(_carTrip)
+			{
+				ap = AccessParameters(
+					USER_CAR,
+					false, false, 300000, posix_time::hours(5), 50 / 3.6,
+					1000
+				);
+			}
+			else
+			{
+				ap = AccessParameters(
+					USER_PEDESTRIAN,
+					false, false, 30000, posix_time::hours(5), 1.111,
+					1000
+				);
+			}
+
 			AlgorithmLogger logger;
 			RoadJourneyPlanner r(
 				startPlace.get(),
@@ -222,9 +239,13 @@ namespace synthese
 				stream << HTMLModule::GetHTMLJavascriptOpen();
 				stream << "var tripWKT=\"" << jv.getTripWKT() << "\";";
 				stream << HTMLModule::GetHTMLJavascriptClose();
-				stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
-				stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
-				stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("http://svn.osgeo.org/metacrs/proj4js/trunk/lib/proj4js-combined.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("http://svn.osgeo.org/metacrs/proj4js/trunk/lib/defs/EPSG900913.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("http://trac.osgeo.org/proj4js/raw-attachment/ticket/32/EPSG27572.js");
+				//stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
+				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
+				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers/OpenLayers.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
 			}
 		}

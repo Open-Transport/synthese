@@ -189,6 +189,8 @@ namespace synthese
 				void setOutputFormat(const std::string& value){ _outputFormat = value; }
 				void setSorted(bool value){ _sorted = value; }
 				void setNumber(boost::optional<std::size_t> value){ _number = value; }
+				void setMinScore(double value){ _minScore = value; }
+				void setCitiesWithAtLeastAStop(bool value){ _citiesWithAtLeastAStop = value; }
 				void setText(const std::string& value){ _text = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
 			//@}
