@@ -159,7 +159,7 @@ namespace synthese
 
 					// Open button
 					stream << t.col();
-					openRequest.getPage()->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					openRequest.getPage()->setNetwork(*network);
 					stream << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir", string(), TransportNetworkAdmin::ICON);
 
 					// Name
@@ -229,7 +229,7 @@ namespace synthese
 					shared_ptr<TransportNetworkAdmin> link(
 						getNewPage<TransportNetworkAdmin>()
 					);
-					link->setNetwork(const_pointer_cast<const TransportNetwork>(network));
+					link->setNetwork(*network);
 					links.push_back(link);
 				}
 			}

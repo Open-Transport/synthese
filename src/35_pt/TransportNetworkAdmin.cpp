@@ -26,24 +26,25 @@
 
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
-#include "PTModule.h"
-#include "Profile.h"
-#include "RemoveObjectAction.hpp"
-#include "TransportNetwork.h"
-#include "TransportNetworkTableSync.h"
+#include "AdminInterfaceElement.h"
+#include "AdminParametersException.h"
 #include "CommercialLine.h"
 #include "CommercialLineAdmin.h"
 #include "CommercialLineTableSync.h"
-#include "TransportNetworkRight.h"
-#include "AdminInterfaceElement.h"
 #include "ModuleAdmin.h"
-#include "AdminParametersException.h"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "PTModule.h"
+#include "PTNetworksAdmin.h"
+#include "RemoveObjectAction.hpp"
+#include "TransportNetwork.h"
+#include "TransportNetworkRight.h"
+#include "TreeFolder.hpp"
 #include "ScheduledService.h"
 #include "SearchFormHTMLTable.h"
 #include "CommercialLineUpdateAction.h"
 #include "ImportableAdmin.hpp"
 #include "TransportNetworkUpdateAction.hpp"
-#include "PropertiesHTMLTable.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 
@@ -63,6 +64,7 @@ namespace synthese
 	using namespace html;
 	using namespace impex;
 	using namespace calendar;
+	using namespace tree;
 
 	namespace util
 	{
@@ -84,21 +86,12 @@ namespace synthese
 		void TransportNetworkAdmin::setFromParametersMap(
 			const ParametersMap& map
 		){
+			// Search parameters
 			_searchName = map.getDefault<string>(PARAMETER_SEARCH_NAME);
 			_requestParameters.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_NAME, 100);
 
-			try
-			{
-				_network = TransportNetworkTableSync::Get(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID),
-					Env::GetOfficialEnv(),
-					UP_LINKS_LOAD_LEVEL
-				);
-			}
-			catch (...)
-			{
-				throw AdminParametersException("No such network");
-			}
+			// Node
+			_loadNodeFromMainEnv(map);
 		}
 
 
@@ -107,7 +100,10 @@ namespace synthese
 		{
 			ParametersMap m(_requestParameters.getParametersMap());
 			m.insert(PARAMETER_SEARCH_NAME,_searchName);
-			if(_network.get()) m.insert(Request::PARAMETER_OBJECT_ID, _network->getKey());
+
+			// Node
+			_getNodeParametersMap(m);
+
 			return m;
 		}
 
@@ -131,12 +127,22 @@ namespace synthese
 			);
 
 			// Results display
-			stream << "<h1>Lignes du réseau</h1>";
+			stream << "<h1>Lignes du ";
+			if(getRoot())
+			{
+				stream << "réseau";
+			}
+			if(getFolder())
+			{
+				stream << "répertoire";
+			}
+			stream << "</h1>";
 
+			// Lines search
 			CommercialLineTableSync::SearchResult lines(
 				CommercialLineTableSync::Search(
 					Env::GetOfficialEnv(),
-					_network->getKey(),
+					getNode()->getKey(),
 					string("%"+_searchName+"%"),
 					optional<string>(),
 					_requestParameters.first,
@@ -152,8 +158,10 @@ namespace synthese
 			AdminActionFunctionRequest<CommercialLineUpdateAction, CommercialLineAdmin> creationRequest(_request);
 			creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
 			creationRequest.setActionWillCreateObject();
-			creationRequest.getAction()->setNetwork(_network);
-
+			creationRequest.getAction()->setNetwork(
+				Env::GetOfficialEnv().getEditableSPtr(const_cast<TransportNetwork*>(getNodeRoot()))
+			);
+			
 			// Table
 			ResultHTMLTable::HeaderVector h;
 			h.push_back(make_pair(string(), string()));
@@ -201,53 +209,93 @@ namespace synthese
 			stream << t.col() << HTMLModule::getLinkButton(creationRequest.getURL(), "Créer");
 			stream << t.close();
 
-			// Properties
-			stream << "<h1>Propriétés</h1>";
-			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request);
-			updateRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
-			PropertiesHTMLTable p(updateRequest.getHTMLForm("update"));
-			stream << p.open();
-			stream << p.cell("ID", lexical_cast<string>(_network->getKey()));
-			stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, _network->getName()));
-			stream << p.cell(
-				"Parent des calendriers de jours",
-				p.getForm().getSelectInput(
-					TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
-					optional<RegistryKeyType>(
-						_network->getDaysCalendarsParent() ? _network->getDaysCalendarsParent()->getKey() : RegistryKeyType(0)
-					)
-			)	);
-			stream << p.cell(
-				"Parent des calendriers de périodes",
-				p.getForm().getSelectInput(
-					TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID,
-					CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
-					optional<RegistryKeyType>(
-						_network->getPeriodsCalendarsParent() ? _network->getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
-					)
-			)	);
+			// Network properties
+			if(getRoot())
+			{
+				const TransportNetwork& network(*getRoot());
 
-			stream << p.close();
+				// Update request
+				AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> updateRequest(_request);
+				updateRequest.getAction()->setNetwork(
+					Env::GetOfficialEnv().getEditableSPtr(const_cast<TransportNetwork*>(getRoot()))
+				);
 
-			// Source id
-			StaticActionRequest<TransportNetworkUpdateAction> updateOnlyRequest(_request);
-			updateOnlyRequest.getAction()->setNetwork(const_pointer_cast<TransportNetwork>(_network));
-			ImportableAdmin::DisplayDataSourcesTab(stream, *_network, updateOnlyRequest);
+				// Section title
+				stream << "<h1>Propriétés</h1>";
+
+				// The form
+				PropertiesHTMLTable p(updateRequest.getHTMLForm("update"));
+				stream << p.open();
+				stream << p.cell("ID", lexical_cast<string>(network.getKey()));
+				stream << p.cell("Nom", p.getForm().getTextInput(TransportNetworkUpdateAction::PARAMETER_NAME, network.getName()));
+				stream << p.cell(
+					"Parent des calendriers de jours",
+					p.getForm().getSelectInput(
+						TransportNetworkUpdateAction::PARAMETER_DAYS_CALENDARS_PARENT_ID,
+						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+						optional<RegistryKeyType>(
+							network.getDaysCalendarsParent() ? network.getDaysCalendarsParent()->getKey() : RegistryKeyType(0)
+						)
+				)	);
+				stream << p.cell(
+					"Parent des calendriers de périodes",
+					p.getForm().getSelectInput(
+						TransportNetworkUpdateAction::PARAMETER_PERIODS_CALENDARS_PARENT_ID,
+						CalendarTemplateTableSync::GetCalendarTemplatesList("(aucun)"),
+						optional<RegistryKeyType>(
+							network.getPeriodsCalendarsParent() ? network.getPeriodsCalendarsParent()->getKey() : RegistryKeyType(0)
+						)
+				)	);
+
+				stream << p.close();
+
+				// Source id
+				StaticActionRequest<TransportNetworkUpdateAction> updateOnlyRequest(_request);
+				updateOnlyRequest.getAction()->setNetwork(
+					Env::GetOfficialEnv().getEditableSPtr(const_cast<TransportNetwork*>(getRoot()))
+				);
+				ImportableAdmin::DisplayDataSourcesTab(stream, network, updateOnlyRequest);
+			}
+
+			// Sub-folders
+			_displaySubFoldersList(stream, _request);
+
+			// Folder properties
+			_displayFolderProperties(stream, _request);
 		}
+
+
 
 		bool TransportNetworkAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			if (_network.get() == NULL) return false;
-			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(_network->getKey()));
+
+			// Read network
+			const TransportNetwork* network(getNodeRoot());
+
+			// Reject page if no network is readable
+			if(!network)
+			{
+				return false;
+			}
+
+			// Network right
+			return user.getProfile()->isAuthorized<TransportNetworkRight>(READ, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(network->getKey()));
 		}
 
 
 
 		std::string TransportNetworkAdmin::getTitle() const
 		{
-			return _network.get() ? _network->getName() : DEFAULT_TITLE;
+			if(getRoot())
+			{
+				return getRoot()->getName(); 
+			}
+			if(getFolder())
+			{
+				return getFolder()->get<Name>();
+			}
+			return DEFAULT_TITLE;
 		}
 
 
@@ -261,23 +309,27 @@ namespace synthese
 			if(	currentPage == *this ||
 				currentPage.getCurrentTreeBranch().find(*this)
 			){
-				CommercialLineTableSync::SearchResult lines(
-					CommercialLineTableSync::Search(
-						Env::GetOfficialEnv(),
-						_network->getKey(),
-						optional<string>(),
-						optional<string>(),
-						0,
-						optional<size_t>(),
-						true, false, true,
-						UP_LINKS_LOAD_LEVEL
-				)	);
-				BOOST_FOREACH(const shared_ptr<CommercialLine>& line, lines)
+				const TreeFolderUpNode* node(getNode());
+
+				// Folders
+				vector<TreeFolder*> folders(node->getChildren<TreeFolder>());
+				BOOST_FOREACH(TreeFolder* folder, folders)
+				{
+					shared_ptr<TransportNetworkAdmin> p(
+						getNewPage<TransportNetworkAdmin>()
+					);
+					p->setFolder(*folder);
+					links.push_back(p);
+				}
+
+				// Lines
+				vector<CommercialLine*> lines(node->getChildren<CommercialLine>());
+				BOOST_FOREACH(CommercialLine* line, lines)
 				{
 					shared_ptr<CommercialLineAdmin> p(
 						getNewPage<CommercialLineAdmin>()
 					);
-					p->setCommercialLine(line);
+					p->setCommercialLine(Env::GetOfficialEnv().getSPtr(line));
 					links.push_back(p);
 				}
 			}
@@ -285,16 +337,13 @@ namespace synthese
 		}
 
 
+
 		bool TransportNetworkAdmin::_hasSameContent(const AdminInterfaceElement& other) const
 		{
-			return _network->getKey() == static_cast<const TransportNetworkAdmin&>(other)._network->getKey();
-		}
-
-
-
-		void TransportNetworkAdmin::setNetwork( boost::shared_ptr<const pt::TransportNetwork> value )
-		{
-			_network = value;
+			return
+				static_cast<const TransportNetworkAdmin&>(other).getNode() &&
+				getNode()->getKey() == static_cast<const TransportNetworkAdmin&>(other).getNode()->getKey()
+			;
 		}
 
 
@@ -318,7 +367,33 @@ namespace synthese
 			}
 			HTMLForm sortedForm(s.getForm());
 			stream << s.close();
-
 		}
-	}
-}
+
+
+
+		AdminInterfaceElement::PageLinks TransportNetworkAdmin::_getCurrentTreeBranch() const
+		{
+			if(getFolder())
+			{
+				shared_ptr<TransportNetworkAdmin> p(
+					getNewPage<TransportNetworkAdmin>()
+				);
+				p->setNode(*getFolder()->_getParent());
+
+				PageLinks links(p->_getCurrentTreeBranch());
+				links.push_back(getNewCopiedPage());
+				return links;
+			}
+			else
+			{
+				shared_ptr<PTNetworksAdmin> p(
+					getNewPage<PTNetworksAdmin>()
+				);
+				
+				PageLinks links(p->_getCurrentTreeBranch());
+				links.push_back(getNewCopiedPage());
+				return links;
+			}
+			return PageLinks();
+		}
+}	}

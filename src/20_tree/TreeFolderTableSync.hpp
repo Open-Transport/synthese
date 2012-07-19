@@ -30,8 +30,8 @@
 #include <string>
 #include <iostream>
 
-#include "DBNoSyncTableSyncTemplate.hpp"
-#include "TreeFolderRoot.hpp"
+#include "DBRegistryTableSyncTemplate.hpp"
+#include "TreeFolder.hpp"
 
 namespace synthese
 {
@@ -41,40 +41,10 @@ namespace synthese
 			@ingroup m20LS refLS
 		*/
 		class TreeFolderTableSync:
-			public db::DBNoSyncTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>
+			public db::DBRegistryTableSyncTemplate<TreeFolderTableSync, TreeFolder>
 		{
 		public:
-			static const std::string COL_PARENT_ID;
-			static const std::string COL_NAME;
-
 			TreeFolderTableSync();
-
-			template<class ObjectType_>
-			static boost::shared_ptr<typename ObjectType_::TreeFolderType> GetTreeFolder(
-				util::RegistryKeyType id,
-				util::Env& env,
-				util::LinkLevel linkLevel
-			){
-/*				if(env.getEditableRegistry<TreeFolderRoot>().contains(id))
-				{
-					return env.getEditable<TreeFolderRoot>(id);
-				}
-
-*/				boost::shared_ptr<typename ObjectType_::TreeFolderType> object;
-/*				try
-				{
-					db::DBResultSPtr rows(db::DBTableSyncTemplate<TreeFolderTableSync>::_GetRow(id));
-					object.reset(new typename ObjectType_::TreeFolderType(rows->getKey()));
-					Load(object.get(), rows, env, linkLevel);
-				}
-				catch (typename db::DBEmptyResultException<TreeFolderRoot>&)
-				{
-					throw util::ObjectNotFoundException<ObjectType_>(id, "Object not found in "+ TreeFolderTableSync::TABLE.NAME);
-				}
-
-				env.getEditableRegistry<TreeFolderRoot>().add(boost::static_pointer_cast<TreeFolderRoot, typename ObjectType_::TreeFolderType>(object));
-*/				return object;
-			}
 
 
 

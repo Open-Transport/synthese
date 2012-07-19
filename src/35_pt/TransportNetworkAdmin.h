@@ -25,26 +25,33 @@
 #ifndef SYNTHESE_TransportNetworkAdmin_H__
 #define SYNTHESE_TransportNetworkAdmin_H__
 
+#include "AdminInterfaceElementTemplate.h"
+#include "TreeFolderAdmin.hpp"
+
 #include "ResultHTMLTable.h"
 #include "StaticActionRequest.h"
-#include "AdminInterfaceElementTemplate.h"
 
 namespace synthese
 {
+	namespace tree
+	{
+		class TreeFolderUpNode;
+	}
+
 	namespace pt
 	{
 		class TransportNetwork;
 		class CommercialLineAddAction;
 
-		/** TransportNetworkAdmin Class.
-			@ingroup m35Admin refAdmin
-			@author Hugues Romain
-			@date 2008
-		*/
-		class TransportNetworkAdmin : public admin::AdminInterfaceElementTemplate<TransportNetworkAdmin>
+		//////////////////////////////////////////////////////////////////////////
+		/// Transport network administration panel.
+		///	@ingroup m35Admin refAdmin
+		///	@author Hugues Romain
+		///	@date 2008
+		class TransportNetworkAdmin:
+			public admin::AdminInterfaceElementTemplate<TransportNetworkAdmin>,
+			public tree::TreeFolderAdmin<TransportNetwork, TransportNetworkAdmin>
 		{
-			boost::shared_ptr<const pt::TransportNetwork>	_network;
-
 			std::string	_searchName;
 
 			html::ResultHTMLTable::RequestParameters	_requestParameters;
@@ -116,6 +123,8 @@ namespace synthese
 			virtual bool _hasSameContent(const AdminInterfaceElement& other) const;
 
 
+			virtual AdminInterfaceElement::PageLinks _getCurrentTreeBranch() const;
+
 			static void getHTMLLineSearchForm(
 				std::ostream& stream,
 				const html::HTMLForm& form,
@@ -125,7 +134,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setNetwork(boost::shared_ptr<const pt::TransportNetwork> value);
+				void setNetwork(const TransportNetwork& value){ setRoot(value); }
 			//@}
 		};
 	}

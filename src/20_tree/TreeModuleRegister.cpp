@@ -3,12 +3,12 @@
 
 // Factories
 
-//#include "TreeFolderTableSync.hpp"
+#include "TreeFolderTableSync.hpp"
 
 #include "TreeModule.h"
 
 // Registries
-//#include "TreeFolderRoot.hpp"
+#include "TreeFolder.hpp"
 
 
 #include "TreeModule.inc.cpp"
@@ -21,9 +21,9 @@ void synthese::tree::moduleRegister()
 	// Factories
 	synthese::tree::TreeModule::integrate();
 
-	//synthese::tree::TreeFolderTableSync::integrate();
+	synthese::tree::TreeFolderTableSync::integrate();
 
 
 	// Registries
-	//synthese::util::Env::Integrate<synthese::tree::TreeFolderRoot>();
+	synthese::util::Env::Integrate<synthese::tree::TreeFolder>();
 }

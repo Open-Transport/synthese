@@ -73,7 +73,6 @@ namespace synthese
 			RegistryKeyType key
 		):	util::Registrable(key),
 			graph::PathGroup(key),
-			_network(NULL),
 			_reservationContact(NULL),
 			_calendarTemplate(NULL),
 			_timetableId(0)
@@ -208,9 +207,9 @@ namespace synthese
 			pm.insert(prefix + "style", getStyle()); // For LinesListFunction/StopPointsListFunction compatibility
 			pm.insert(prefix + DATA_LINE_MAP_URL, getMapURL());
 			pm.insert(prefix + DATA_LINE_DOC_URL, getDocURL());
-			if(_network)
+			if(getNetwork())
 			{
-				pm.insert(prefix + DATA_LINE_NETWORK_ID, _network->getKey());
+				pm.insert(prefix + DATA_LINE_NETWORK_ID, getNetwork()->getKey());
 			}
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
@@ -293,5 +292,12 @@ namespace synthese
 				result.push_back(it.second);
 			}
 			return result;
+		}
+
+
+
+		TransportNetwork* CommercialLine::getNetwork() const
+		{
+			return getRoot();
 		}
 }	}
