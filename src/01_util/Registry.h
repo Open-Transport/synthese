@@ -123,7 +123,7 @@ namespace synthese
 					in the registry and autoCreate is false
 				*/
 				boost::shared_ptr<const T> get(
-					const RegistryKeyType key
+					RegistryKeyType key
 				) const;
 
 
@@ -135,8 +135,16 @@ namespace synthese
 					in the registry and autoCreate is false
 				*/
 				const boost::shared_ptr<T>& getEditable(
-					const RegistryKeyType key
-				);
+					RegistryKeyType key
+				) const;
+
+
+
+				virtual boost::shared_ptr<Registrable> getEditableObject(
+					RegistryKeyType key
+				) const {
+					return boost::static_pointer_cast<Registrable, T>(getEditable(key));
+				}
 
 
 
@@ -220,9 +228,9 @@ namespace synthese
 
 		template<class T>
 		const boost::shared_ptr<T>& Registry<T>::getEditable(
-			const RegistryKeyType key
-		){
-			typename Map::iterator it(_registry.find(key));
+			RegistryKeyType key
+		) const {
+			typename Map::const_iterator it(_registry.find(key));
 
 			if(it == _registry.end())
 			{
@@ -236,7 +244,7 @@ namespace synthese
 
 		template<class T>
 		boost::shared_ptr<const T> Registry<T>::get(
-			const RegistryKeyType key
+			RegistryKeyType key
 		) const	{
 			typename Map::const_iterator it(_registry.find(key));
 

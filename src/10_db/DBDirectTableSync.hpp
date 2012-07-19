@@ -90,6 +90,11 @@ namespace synthese
 				util::Env& environment,
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
 			) const = 0;
+
+
+			virtual const util::RegistryBase& getRegistry(
+				const util::Env& env
+			) const = 0;
 		};
 	}
 }
