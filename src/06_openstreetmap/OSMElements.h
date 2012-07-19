@@ -159,6 +159,8 @@ public:
 
    double distance(NodePtr &other);
 
+   std::list<Way*> getWays() { return ways; }
+
 protected:
    double lon,lat;
 
@@ -179,6 +181,8 @@ class Way: public Element {
 public:
 
    static std::map<std::string, road::Road::RoadType> highwayTypes;
+   static std::map<road::Road::RoadType, double> defaultSpeed;
+
    Way(AttributeMap &attrs) throw(Exception);
 
    /**
@@ -221,6 +225,10 @@ public:
    void referenceWithNodes();
 
    road::Road::RoadType getRoadType();
+
+   road::Road::RoadType getAssociatedRoadType();
+
+   double getAssociatedSpeed();
 
 
 
@@ -310,7 +318,8 @@ public:
     */
    std::map<int,std::pair<RelationPtr,std::map<int, WayPtr> > > getWalkableWaysByAdminBoundary(int admin_level);
 
-
+   // Return the valid ways of the network
+   std::map<int, std::pair<RelationPtr, std::map<int, WayPtr> > > getWaysByAdminBoundary(int admin_level);
 
 protected:
    std::map<int, NodePtr > nodes;
