@@ -26,6 +26,8 @@
 #include <string>
 #include <set>
 
+#include "TreeFolderDownNode.hpp"
+
 #include "PathGroup.h"
 #include "RGBColor.h"
 #include "GraphTypes.h"
@@ -73,7 +75,8 @@ namespace synthese
 		class CommercialLine:
 			public graph::PathGroup,
 			public util::Named,
-			public impex::ImportableTemplate<CommercialLine>
+			public impex::ImportableTemplate<CommercialLine>,
+			public tree::TreeFolderDownNode<TransportNetwork>
 		{
 		public:
 			static const std::string DATA_LINE_SHORT_NAME;
@@ -108,8 +111,6 @@ namespace synthese
 				std::string			_style;		//!< CSS style (cartouche)
 				std::string			_image;		//!< Display image (cartouche)
 
-				const pt::TransportNetwork*	_network;	//!< Network
-
 				const pt::ReservationContact*	_reservationContact;	//!< Reservation contact
 				PlacesSet	_optionalReservationPlaces;
 
@@ -143,7 +144,7 @@ namespace synthese
 			//! @name Getters
 			//@{
 				const std::string& getStyle () const { return _style; }
-				const pt::TransportNetwork* getNetwork () const { return _network; }
+				TransportNetwork* getNetwork () const;
 				const std::string& getShortName () const { return _shortName; }
 				const std::string& getLongName () const { return _longName; }
 				const std::string& getImage () const { return _image; }
@@ -161,7 +162,6 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setStyle (const std::string& value) { _style = value; }
-				void setNetwork (const pt::TransportNetwork* value) { _network = value; }
 				void setShortName (const std::string& shortName) { _shortName = shortName; }
 				void setLongName (const std::string& longName) { _longName = longName; }
 				void setImage (const std::string& image) { _image = image; }
@@ -267,7 +267,6 @@ namespace synthese
 				void removeConcurrencyRule( const pt::NonConcurrencyRule* rule );
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_CommercialLine_h__

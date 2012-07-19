@@ -23,9 +23,7 @@
 #ifndef SYNTHESE_tree_TreeFolderRoot_hpp__
 #define SYNTHESE_tree_TreeFolderRoot_hpp__
 
-#include "Named.h"
-#include "Registry.h"
-#include "Registrable.h"
+#include "TreeFolderUpNode.hpp"
 
 namespace synthese
 {
@@ -35,21 +33,11 @@ namespace synthese
 			@ingroup m20
 		*/
 		class TreeFolderRoot:
-			public virtual util::Registrable,
-			public util::Named
+			public TreeFolderUpNode
 		{
 		public:
-			/// Chosen registry class.
-			typedef util::Registry<TreeFolderRoot>	Registry;
+			virtual ~TreeFolderRoot() {}
 
-		private:
-			TreeFolderRoot* _parent;
-
-		public:
-			TreeFolderRoot(util::RegistryKeyType key = 0) : util::Registrable(key) {}
-
-			TreeFolderRoot* _getParent() const { return _parent; }
-			void _setParent(TreeFolderRoot* value) { _parent = value; }
 		};
 	}
 }

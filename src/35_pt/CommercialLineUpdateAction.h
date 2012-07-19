@@ -32,6 +32,11 @@
 
 namespace synthese
 {
+	namespace tree
+	{
+		class TreeFolder;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -84,7 +89,8 @@ namespace synthese
 			boost::optional<boost::optional<util::RGBColor> >		_color;		//!< JourneyPattern color
 			boost::optional<std::string>			_style;		//!< CSS style (cartouche)
 			boost::optional<std::string>			_image;		//!< Display image (cartouche)
-			boost::optional<boost::shared_ptr<const TransportNetwork> >	_network;	//!< Network
+			boost::optional<boost::shared_ptr<TransportNetwork> >	_network;	//!< Network
+			boost::optional<boost::shared_ptr<tree::TreeFolder> >	_folder;	//!< Folder
 			boost::optional<boost::shared_ptr<const pt::ReservationContact> >	_reservationContact;	//!< Reservation contact
 			boost::optional<std::string> _mapURL;
 			boost::optional<std::string> _docURL;
@@ -122,7 +128,8 @@ namespace synthese
 			//! @name Setters
 			//@{
 				void setLine(boost::shared_ptr<pt::CommercialLine> value) { _line = value; }
-				void setNetwork(boost::optional<boost::shared_ptr<const TransportNetwork> > value){ _network = value; }
+				void setNetwork(boost::optional<boost::shared_ptr<TransportNetwork> > value){ _network = value; }
+				void setFolder(boost::optional<boost::shared_ptr<tree::TreeFolder> > value){ _folder = value; }
 			//@}
 		};
 	}

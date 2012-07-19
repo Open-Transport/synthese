@@ -32,6 +32,8 @@
 #include "ReservationContactTableSync.h"
 #include "TransportNetworkRight.h"
 #include "TransportNetworkTableSync.h"
+#include "TreeFolder.hpp"
+#include "TreeFolderTableSync.hpp"
 
 using namespace std;
 using namespace boost;
@@ -43,6 +45,7 @@ namespace synthese
 	using namespace util;
 	using namespace pt;
 	using namespace impex;
+	using namespace tree;
 
 	namespace util
 	{
@@ -97,6 +100,10 @@ namespace synthese
 			{
 				map.insert(PARAMETER_NETWORK_ID, _network->get() ? (*_network)->getKey() : 0);
 			}
+			if(_folder)
+			{
+				map.insert(PARAMETER_NETWORK_ID, _folder->get() ? (*_folder)->getKey() : 0);
+			}
 			if(_reservationContact)
 			{
 				map.insert(PARAMETER_RESERVATION_CONTACT_ID, _reservationContact.get() ? (*_reservationContact)->getKey() : 0);
@@ -142,15 +149,27 @@ namespace synthese
 			// Network
 			if(map.isDefined(PARAMETER_NETWORK_ID))	try
 			{
-				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), *_env);
+				RegistryKeyType id(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID));
+				if(decodeTableId(id) == TransportNetworkTableSync::TABLE.ID)
+				{
+					_network = TransportNetworkTableSync::GetEditable(id, *_env);
+				}
+				else if(decodeTableId(id) == TreeFolder::CLASS_NUMBER)
+				{
+					_folder = TreeFolderTableSync::GetEditable(id, *_env);
+				}
 			}
 			catch(ObjectNotFoundException<TransportNetwork>&)
 			{
 				throw ActionException("No such network");
 			}
-			if(!_line.get() && (!_network || !_network->get()))
+			catch(ObjectNotFoundException<TreeFolder>&)
 			{
-				throw ActionException("A network must be defined");
+				throw ActionException("No such folder");
+			}
+			if(!_line.get() && (!_network || !_network->get()) && (!_folder || !_folder->get()))
+			{
+				throw ActionException("A network or a folder must be defined");
 			}
 
 			// Color
@@ -262,9 +281,13 @@ namespace synthese
 			{
 				_line->setName(*_name);
 			}
-			if(_network)
+			if(_network && _network->get())
 			{
-				_line->setNetwork(_network->get());
+				_line->setParent(**_network);
+			}
+			if(_folder && _folder->get())
+			{
+				_line->setParent(**_folder);
 			}
 			if(_reservationContact)
 			{

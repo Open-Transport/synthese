@@ -47,25 +47,13 @@ namespace synthese
 		template<> const string FactorableTemplate<DBTableSync,TreeFolderTableSync>::FACTORY_KEY("20 Tree folders");
 	}
 
-	namespace tree
-	{
-		const string TreeFolderTableSync::COL_PARENT_ID ("parent_id");
-		const string TreeFolderTableSync::COL_NAME ("name");
-	}
-
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TreeFolderTableSync>::TABLE(
-			"t051_scenario_folder"
+			"t089_tree_folders"
 		);
 
-		template<> const Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[]=
-		{
-			Field(TABLE_COL_ID, SQL_INTEGER),
-			Field(TreeFolderTableSync::COL_NAME, SQL_TEXT),
-			Field(TreeFolderTableSync::COL_PARENT_ID, SQL_INTEGER),
-			Field()
-		};
+		template<> const Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[] = { Field() }; // Defined by the record
 
 		template<>
 		DBTableSync::Indexes DBTableSyncTemplate<TreeFolderTableSync>::GetIndexes()
@@ -73,8 +61,8 @@ namespace synthese
 			DBTableSync::Indexes r;
 			r.push_back(
 				DBTableSync::Index(
-					TreeFolderTableSync::COL_PARENT_ID.c_str(),
-					TreeFolderTableSync::COL_NAME.c_str(),
+					Parent::FIELD.name.c_str(),
+					Name::FIELD.name.c_str(),
 			"")	);
 			return r;
 		}
@@ -82,48 +70,43 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Load(
-			TreeFolderRoot* object,
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolder>::Load(
+			TreeFolder* object,
 			const db::DBResultSPtr& rows,
 			Env& env,
 			LinkLevel linkLevel
 		){
-			object->setName(rows->getText(TreeFolderTableSync::COL_NAME));
-
-			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
-				RegistryKeyType pid(rows->getLongLong(TreeFolderTableSync::COL_PARENT_ID));
-				if(pid > 0)
-				{
-					try
-					{
-//						object->setParent(GetEditable(pid, env, linkLevel).get());
-					}
-					catch(ObjectNotFoundException<TreeFolderRoot>&)
-					{
-						Log::GetInstance().warn("No such parent "+ lexical_cast<string>(pid) +" in folder "+ lexical_cast<string>(object->getKey()));
-					}
-				}
+				DBModule::LoadObjects(object->getLinkedObjectsIds(*rows), env, linkLevel);
+			}
+			object->loadFromRecord(*rows, env);
+			if(linkLevel > FIELDS_ONLY_LOAD_LEVEL)
+			{
+				object->link(env, linkLevel == ALGORITHMS_OPTIMIZATION_LOAD_LEVEL);
 			}
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Save(
-			TreeFolderRoot* object,
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolder>::Save(
+			TreeFolder* object,
 			optional<DBTransaction&> transaction
 		){
+			// Query
 			ReplaceQuery<TreeFolderTableSync> query(*object);
-			query.addField(object->getName());
-			query.addField(object->_getParent() ? object->_getParent()->getKey() : RegistryKeyType(0));
+			ParametersMap map(ParametersMap::FORMAT_SQL);
+			object->toParametersMap(map);
+			query.setValues(map);
 			query.execute(transaction);
 		}
 
 
 
-		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolderRoot>::Unlink(
-			TreeFolderRoot* obj
+		template<> void DBDirectTableSyncTemplate<TreeFolderTableSync,TreeFolder>::Unlink(
+			TreeFolder* obj
 		){
+			obj->unlink();
 		}
 	}
 
@@ -147,13 +130,13 @@ namespace synthese
 				;
 			if(parentFolderId)
 			{
-				query << " AND " << COL_PARENT_ID << "=" << *parentFolderId;
+				query << " AND " << Parent::FIELD.name << "=" << *parentFolderId;
 			}
 			if(name)
 			{
-				query << " AND " << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
+				query << " AND " << Name::FIELD.name << " LIKE " << Conversion::ToDBString(*name);
 			}
-			query << " ORDER BY " << COL_NAME << " ASC";
+			query << " ORDER BY " << Name::FIELD.name << " ASC";
 			if (number)
 			{
 				query << " LIMIT " << (*number + 1);
@@ -162,6 +145,50 @@ namespace synthese
 			}
 
 			return LoadFromQuery(query.str(), env, linkLevel);
+		}
+
+
+
+		TreeFolderTableSync::TreeFolderTableSync()
+		{
+
+		}
+
+	}
+
+	namespace db
+	{
+		template<> bool DBTableSyncTemplate<TreeFolderTableSync>::CanDelete(
+			const server::Session* session,
+			util::RegistryKeyType object_id
+		){
+			//TODO Check user rights
+			return true;
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TreeFolderTableSync>::BeforeDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TreeFolderTableSync>::AfterDelete(
+			util::RegistryKeyType id,
+			db::DBTransaction& transaction
+		){
+		}
+
+
+
+		template<> void DBTableSyncTemplate<TreeFolderTableSync>::LogRemoval(
+			const server::Session* session,
+			util::RegistryKeyType id
+		){
+			//TODO Log the removal
 		}
 	}
 }
