@@ -22,14 +22,34 @@
 
 #include "TimetableWarning.h"
 
+#include "ParametersMap.h"
+
+using namespace boost;
 using namespace std;
+using namespace boost::gregorian;
 
 namespace synthese
 {
 	using namespace calendar;
+	using namespace util;
 
 	namespace timetables
 	{
+		const string TimetableWarning::DATA_NUMBER("number");
+		const string TimetableWarning::DATA_TEXT("text");
+		const string TimetableWarning::DATA_FIRST_YEAR("first_year");
+		const string TimetableWarning::DATA_FIRST_MONTH("first_month");
+		const string TimetableWarning::DATA_FIRST_DAY("first_day");
+		const string TimetableWarning::DATA_LAST_YEAR("last_year");
+		const string TimetableWarning::DATA_LAST_MONTH("last_month");
+		const string TimetableWarning::DATA_LAST_DAY("last_day");
+		const string TimetableWarning::DATA_FIRST_DATE = "first_date";
+		const string TimetableWarning::DATA_LAST_DATE = "last_date";
+		const string TimetableWarning::TAG_DAY = "day";
+		const string TimetableWarning::ATTR_DATE = "date";
+
+
+
 		TimetableWarning::TimetableWarning(
 			const Calendar& calendar,
 			size_t number,
@@ -37,8 +57,7 @@ namespace synthese
 		):	_calendar(calendar),
 			_number(number),
 			_text(text)
-		{
-		}
+		{}
 
 
 
@@ -60,5 +79,47 @@ namespace synthese
 		{
 			return _text;
 		}
-	}
-}
+
+
+
+		void TimetableWarning::toParametersMap(
+			ParametersMap& pm,
+			bool withDates
+		) const	{
+
+			pm.insert(DATA_NUMBER, getNumber());
+			pm.insert(DATA_TEXT, getText());
+
+			// Active days
+			const Calendar& calendar(getCalendar());
+			date firstDate(calendar.getFirstActiveDate());
+			date lastDate(calendar.getLastActiveDate());
+			if(withDates)
+			{
+				for(date day(firstDate); day <lastDate; day += days(1))
+				{
+					// Jump over inactive days
+					if(!calendar.isActive(day))
+					{
+						continue;
+					}
+
+					// Writing the active date to a sub map
+					shared_ptr<ParametersMap> datePM(new ParametersMap);
+					datePM->insert(ATTR_DATE, day);
+					pm.insert(TAG_DAY, datePM);
+			}	}
+
+			// Active days bounds
+			pm.insert(DATA_FIRST_DATE, firstDate);
+			pm.insert(DATA_LAST_DATE, firstDate);
+			
+			// Active days bounds (old schema - deprecated)
+			pm.insert(DATA_FIRST_DAY, firstDate.day());
+			pm.insert(DATA_FIRST_MONTH, firstDate.month());
+			pm.insert(DATA_FIRST_YEAR, firstDate.year());
+			pm.insert(DATA_LAST_DAY, lastDate.day());
+			pm.insert(DATA_LAST_MONTH, lastDate.month());
+			pm.insert(DATA_LAST_YEAR, lastDate.year());
+		}
+}	}

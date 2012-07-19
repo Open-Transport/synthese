@@ -21,11 +21,15 @@
 */
 
 #include "TimetableGenerator.h"
+
 #include "JourneyPattern.hpp"
-#include "LineStop.h"
+#include "LinePhysicalStop.hpp"
+#include "PlacesList.hpp"
 #include "StopPoint.hpp"
 #include "SchedulesBasedService.h"
 #include "StopArea.hpp"
+#include "TimetableRowGroup.hpp"
+#include "TimetableRowGroupItem.hpp"
 #include "Env.h"
 #include "CalendarModule.h"
 #include "JourneyPatternCopy.hpp"
@@ -39,11 +43,12 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
+	using namespace algorithm;
 	using namespace calendar;
-	using namespace util;
 	using namespace graph;
-
+	using namespace pt;
+	using namespace util;
+	
 	namespace timetables
 	{
 		TimetableGenerator::TimetableGenerator(
@@ -56,38 +61,358 @@ namespace synthese
 
 
 
+		bool TimetableGenerator::_isJourneyPatternSelected(
+			const JourneyPattern& journeyPattern
+		) const	{
+			const UseRule& useRule(
+				journeyPattern.getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+			);
+			if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+				static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables()
+			){
+				return false;
+			}
+
+			bool result(false);
+			bool passageOk(false);
+			Path::Edges::const_iterator itEdge;
+			const Path::Edges& edges(journeyPattern.getEdges());
+
+			// JourneyPattern is authorized according to :
+			//  - authorized lines
+			//  - wayback filter
+			//  - calendar filter
+			if(	(	!_authorizedLines.empty() &&
+					_authorizedLines.find(journeyPattern.getCommercialLine()) == _authorizedLines.end()
+				) || (
+					_wayBackFilter &&
+					journeyPattern.getWayBack() != *_wayBackFilter
+			)	){
+				return false;
+			}
+
+			// Old method
+			if(!_rows.empty())
+			{
+				// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
+				Rows::const_iterator itRow;
+				for (itRow = _rows.begin(); itRow != _rows.end(); ++itRow)
+				{
+					if (!itRow->getIsDeparture() || !itRow->getPlace())
+					{
+						continue;
+					}
+
+					for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
+					{
+						if(	(*itEdge)->isDeparture() &&
+							(itEdge+1) != edges.end() &&
+							(*itEdge)->getHub() &&
+							dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
+							(	_authorizedPhysicalStops.empty() ||
+								_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
+							)
+						){
+							result = true;
+							if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)
+								passageOk = true;
+							break;
+						}
+					}
+					if (result)
+					{
+						break;
+					}
+				}
+				if (!result)
+				{
+					return false;
+				}
+
+
+				// A2: JourneyPattern selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
+				// this test is ignored if the timetable is defined only by a departure stop
+				if(_rows.size() > 1)
+				{
+					result = false;
+					const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
+
+					for (++itRow; itRow != _rows.end(); ++itRow)
+					{
+						if(!itRow->getPlace())
+						{
+							continue;
+						}
+
+						if(	itRow->getIsArrival()
+	// 					if(	(	itRow->getIsArrival() &&
+	// 							(	passageOk ||
+	// 								itRow->getCompulsory() == TimetableRow::PassageSuffisant
+	// 						)	) ||
+	// 						(	itRow->getIsDeparture() &&
+	// 							itRow->getIsArrival()
+	// 						)
+						){
+							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
+								arrivalLinestop != NULL;
+								arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
+							){
+								if(	dynamic_cast<const StopArea*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
+								){
+									result = true;
+									break;
+								}
+							}
+							if (result)
+							{
+								break;
+							}
+						}
+					}
+				}
+			}
+			else if(!_rowGroups.empty()) // New method
+			{
+				// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
+				bool departureOK(false);
+				RowGroups::const_iterator itRowGroup;
+				for(itRowGroup = _rowGroups.begin(); itRowGroup != _rowGroups.end(); ++itRowGroup)
+				{
+					const TimetableRowGroup& rowGroup(**itRowGroup);
+
+					// Check if this row group is a departure filter
+					if(	!rowGroup.get<IsDeparture>() ||
+						rowGroup.get<TimetableRowRule>() == NeutralRow
+					){
+						continue;
+					}
+
+					// Search for a matching edge / row pair
+					BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
+					{
+						for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
+						{
+							if(	(*itEdge)->isDeparture() &&
+								(itEdge+1) != edges.end() &&
+								(*itEdge)->getHub() &&
+								dynamic_cast<const StopArea*>((*itEdge)->getHub()) == &(*item->get<StopArea>()) &&
+								(	_authorizedPhysicalStops.empty() ||
+									_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
+								)
+							){
+								departureOK = true;
+								if(rowGroup.get<TimetableRowRule>() == SufficientRow)
+								{
+									result = true;
+								}
+								break;
+							}
+						}
+
+						if(departureOK)
+						{
+							break;
+						}
+					}
+
+					if (result || departureOK)
+					{
+						break;
+					}
+				}
+
+				// Break if possible
+				if(!departureOK)
+				{
+					return false;
+				}
+				if(result)
+				{
+					return true;
+				}
+
+
+
+				// A2: JourneyPattern selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
+				// this test is ignored if the timetable is defined only by a departure stop
+				if(_rowGroups.size() > 1)
+				{
+					result = false;
+					const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
+
+					for (++itRowGroup; itRowGroup != _rowGroups.end(); ++itRowGroup)
+					{
+						const TimetableRowGroup& rowGroup(**itRowGroup);
+
+						// Check if this row group is an arrival filter
+						if(	!rowGroup.get<IsArrival>() ||
+							rowGroup.get<TimetableRowRule>() == NeutralRow
+						){
+							continue;
+						}
+
+						// Search for a matching edge / row pair
+						bool arrivalOK(false);
+						BOOST_FOREACH(const TimetableRowGroupItem* item, rowGroup.getItems())
+						{
+							for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
+								arrivalLinestop != NULL;
+								arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
+							){
+								if(	dynamic_cast<const StopArea*>(arrivalLinestop->getFromVertex()->getHub()) == &(*item->get<StopArea>())
+								){
+									arrivalOK = true;
+									break;
+								}
+							}
+
+							if (arrivalOK)
+							{
+								break;
+							}
+						}
+
+						if(arrivalOK)
+						{
+							result = true;
+							break;
+						}
+					}
+				}
+			}
+
+			return result;
+		}
+
+
+
 		TimetableResult TimetableGenerator::build(
 			bool withWarnings,
 			boost::shared_ptr<TimetableResult::Warnings> warnings
 		) const	{
 			TimetableResult result(warnings);
 
-			if(!_rows.empty())
+			// Journey patterns selection
+			typedef std::vector<const JourneyPattern*> JourneyPatterns;
+			JourneyPatterns	journeyPatterns;
+			BOOST_FOREACH(Registry<JourneyPattern>::value_type it, _env.getRegistry<JourneyPattern>())
 			{
-				// Loop on each line of the database
-				BOOST_FOREACH(Registry<JourneyPattern>::value_type it, _env.getRegistry<JourneyPattern>())
+				// JourneyPattern selection
+				const JourneyPattern& journeyPattern(*it.second);
+				if(!_isJourneyPatternSelected(journeyPattern))
 				{
-					// JourneyPattern selection
-					const JourneyPattern& line(*it.second);
-					if(!_isLineSelected(line))
+					continue;
+				}
+
+				// Insertion in the journey patterns list
+				if(_baseCalendar.hasAtLeastOneCommonDateWith(journeyPattern))
+				{
+					journeyPatterns.push_back(&journeyPattern);
+				}
+				BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, journeyPattern.getSubLines())
+				{
+					if (!_baseCalendar.hasAtLeastOneCommonDateWith(*subline))
 					{
 						continue;
 					}
+					journeyPatterns.push_back(subline);
+				}
+			}
 
-					// A0: JourneyPattern selection upon calendar
-					if (_baseCalendar.hasAtLeastOneCommonDateWith(line))
-					{
-						_scanServices(result, line);
-					}
+			// Rows list generation (new method)
+			if(!_rowGroups.empty())
+			{
+				_rows.clear();
+				size_t rank(0);
+				for(RowGroups::const_iterator itRowGroup(_rowGroups.begin()); itRowGroup != _rowGroups.end(); ++itRowGroup)
+				{
+					const TimetableRowGroup& rowGroup(**itRowGroup);
 
-					BOOST_FOREACH(const JourneyPattern::SubLines::value_type& subline, line.getSubLines())
+					if(rowGroup.get<AutoRowsOrder>())
 					{
-						if (!_baseCalendar.hasAtLeastOneCommonDateWith(*subline))
+						// Creation of the stops list
+						typedef PlacesList<const StopArea*, const JourneyPattern*> PlacesListConfiguration;
+						PlacesListConfiguration orderedPlaces;
+						BOOST_FOREACH(const JourneyPattern* jp, journeyPatterns)
 						{
-							continue;
+							PlacesListConfiguration::List jlist;
+
+							// Build of the places list of the route
+							bool beforeRowGroup(true);
+							BOOST_FOREACH(Edge* edge, jp->getAllEdges())
+							{
+								const LinePhysicalStop* ls(dynamic_cast<const LinePhysicalStop*>(edge));
+								const StopArea& stopArea(*ls->getPhysicalStop()->getConnectionPlace());
+
+								if(	!rowGroup.contains(stopArea)
+								){
+									// Jump over preceding row groups
+									if(beforeRowGroup)
+									{
+										continue;
+									}
+
+									// Check if a following row group has been reached
+									RowGroups::const_iterator itFollowingRowGroup(itRowGroup);
+									for(++itFollowingRowGroup;
+										itFollowingRowGroup != _rowGroups.end();
+										++itFollowingRowGroup
+									){
+										if((*itFollowingRowGroup)->contains(stopArea))
+										{
+											break;
+										}
+									}
+
+									continue;
+								}
+
+								beforeRowGroup = false;
+
+								PlacesListConfiguration::PlaceInformation item(
+									&stopArea,
+									false,
+									false
+								);
+								jlist.push_back(item);
+							}
+
+							orderedPlaces.addList(make_pair(jp, jlist));
 						}
-						_scanServices(result, *subline);
+
+						// Integration of the stops in the temporary timetable object
+						BOOST_FOREACH(const PlacesListConfiguration::List::value_type& place, orderedPlaces.getResult())
+						{
+							TimetableRow row;
+							row.setIsArrival(rowGroup.get<IsArrival>());
+							row.setIsDeparture(rowGroup.get<IsDeparture>());
+							row.setPlace(place.place);
+							row.setRank(rank++);
+							_rows.push_back(row);
+						}
 					}
+					else
+					{
+						BOOST_FOREACH(const TimetableRowGroup::Items::value_type& item, rowGroup.getItems())
+						{
+							TimetableRow row;
+							row.setIsDeparture(rowGroup.get<IsDeparture>());
+							row.setIsArrival(rowGroup.get<IsArrival>());
+							row.setPlace(&(*item->get<StopArea>()));
+							row.setRank(rank++);
+							_rows.push_back(row);
+						}
+					}
+				}
+				
+			}
+
+			if(!_rows.empty())
+			{
+				// Loop on each line of the database
+				BOOST_FOREACH(const JourneyPattern* journeyPattern, journeyPatterns)
+				{
+					_scanServices(result, *journeyPattern);
 				}
 
 				if(withWarnings)
@@ -332,103 +657,6 @@ namespace synthese
 
 
 
-		bool TimetableGenerator::_isLineSelected( const pt::JourneyPattern& line ) const
-		{
-			const UseRule& useRule(line.getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-			if(	dynamic_cast<const PTUseRule*>(&useRule) &&
-				static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables()
-			){
-				return false;
-			}
-
-			bool lineIsSelected(false);
-			bool passageOk(false);
-			Path::Edges::const_iterator itEdge;
-			const Path::Edges& edges(line.getEdges());
-
-			// JourneyPattern is authorized
-			if(	(!_authorizedLines.empty() && _authorizedLines.find(line.getCommercialLine()) == _authorizedLines.end()) ||
-				_wayBackFilter && line.getWayBack() != *_wayBackFilter
-			){
-				return false;
-			}
-
-			// A1: JourneyPattern selection : there must be at least a departure stop of the line in the departures rows
-			Rows::const_iterator itRow;
-			for (itRow = _rows.begin(); itRow != _rows.end(); ++itRow)
-			{
-				if (!itRow->getIsDeparture() || !itRow->getPlace())
-				{
-					continue;
-				}
-
-				for (itEdge = edges.begin(); itEdge != edges.end(); ++itEdge)
-				{
-					if(	(*itEdge)->isDeparture() &&
-						(itEdge+1) != edges.end() &&
-						(*itEdge)->getHub() &&
-						dynamic_cast<const StopArea*>((*itEdge)->getHub())->getKey() == itRow->getPlace()->getKey() &&
-						(	_authorizedPhysicalStops.empty() ||
-							_authorizedPhysicalStops.find(dynamic_cast<const StopPoint*>((*itEdge)->getFromVertex())) != _authorizedPhysicalStops.end()
-						)
-					){
-						lineIsSelected = true;
-						if (itRow->getIsArrival() || itRow->getCompulsory() == TimetableRow::PassageSuffisant)
-							passageOk = true;
-						break;
-					}
-				}
-				if (lineIsSelected)
-					break;
-			}
-			if (!lineIsSelected)
-				return false;
-
-
-			// A2: JourneyPattern selection : there must be at least an arrival stop of the line in the arrival rows, after the departure
-			// this test is ignored if the timetable is defined only by a departure stop
-			if(_rows.size() > 1)
-			{
-				lineIsSelected = false;
-				const LineStop* departureLinestop(static_cast<const LineStop*>(*itEdge));
-
-				for (++itRow; itRow != _rows.end(); ++itRow)
-				{
-					if(!itRow->getPlace())
-					{
-						continue;
-					}
-
-					if(	itRow->getIsArrival()
-// 					if(	(	itRow->getIsArrival() &&
-// 							(	passageOk ||
-// 								itRow->getCompulsory() == TimetableRow::PassageSuffisant
-// 						)	) ||
-// 						(	itRow->getIsDeparture() &&
-// 							itRow->getIsArrival()
-// 						)
-					){
-						for(const Edge* arrivalLinestop(departureLinestop->getFollowingArrivalForFineSteppingOnly());
-							arrivalLinestop != NULL;
-							arrivalLinestop = arrivalLinestop->getFollowingArrivalForFineSteppingOnly()
-						){
-							if(	dynamic_cast<const StopArea*>(arrivalLinestop->getFromVertex()->getHub())->getKey() == itRow->getPlace()->getKey()
-							){
-								lineIsSelected = true;
-								break;
-							}
-						}
-						if (lineIsSelected)
-							break;
-					}
-				}
-			}
-
-			return lineIsSelected;
-		}
-
-
-
 		const TimetableGenerator& TimetableGenerator::getBeforeTransferTimetable( std::size_t depth ) const
 		{
 			if(depth == 0 || !_transferTimetableBefore.get())
@@ -454,5 +682,23 @@ namespace synthese
 				return _transferTimetableAfter->getAfterTransferTimetable(depth - 1);
 			}
 		}
-	}
-}
+
+
+
+		bool TimetableGenerator::RowGroupsSort::operator()(
+			TimetableRowGroup* g1,
+			TimetableRowGroup* g2
+		) const	{
+			assert(g1);
+			assert(g2);
+
+			if(	g1 &&
+				g2 &&
+				g1->get<Rank>() != g2->get<Rank>()
+				){
+					return g1->get<Rank>() < g2->get<Rank>();
+			}
+
+			return g1 < g2;
+		}
+}	}

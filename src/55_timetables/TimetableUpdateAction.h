@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_TITLE;
 			static const std::string PARAMETER_FORMAT;
 			static const std::string PARAMETER_CONTAINER_ID;
+			static const std::string PARAMETER_IGNORE_EMPTY_ROWS;
 
 		private:
 			boost::shared_ptr<Timetable> _timetable;
@@ -68,6 +69,7 @@ namespace synthese
 			boost::shared_ptr<const calendar::CalendarTemplate> _calendarTemplate;
 			std::string _title;
 			Timetable::ContentType _format;
+			boost::optional<bool> _ignoreEmptyRows;
 
 
 		protected:

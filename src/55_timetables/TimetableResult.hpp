@@ -87,7 +87,8 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				RowTimesVector			getRowSchedules(std::size_t rank)	const;
+				RowTimesVector			getRowSchedules(size_t rank)	const;
+				bool					hasSchedules(size_t rank) const;
 				RowLinesVector			getRowLines()								const;
 				RowServicesVector		getRowServices()							const;
 				RowNotesVector			getRowNotes()								const;
@@ -103,7 +104,6 @@ namespace synthese
 			//@}
 
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_timetables_TimetableResult_hpp__

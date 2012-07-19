@@ -68,13 +68,6 @@ namespace synthese
 			static const std::string VALUE_DEAD_RUN;
 			static const std::string VALUE_COMMERCIAL;
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Auto generated object vector field (will be defined by Object in the future)
-			class Vector:
-				public ObjectField<Vector, std::vector<DriverService*> >
-			{
-			};
-
 
 			struct Chunk
 			{
