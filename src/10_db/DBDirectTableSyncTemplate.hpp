@@ -434,6 +434,14 @@ namespace synthese
 
 				return SearchByEnvelope(envelope, env, linkLevel);
 			}
+
+
+
+			virtual const util::RegistryBase& getRegistry(
+				const util::Env& env
+			) const {
+				return static_cast<const util::RegistryBase&>(env.getRegistry<T>());
+			}
 		};
 }	}
 
