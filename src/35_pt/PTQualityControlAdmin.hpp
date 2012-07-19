@@ -51,6 +51,7 @@ namespace synthese
 				static const std::string TAB_RANK_CONTINUITY;
 				static const std::string TAB_DOUBLE_ROUTES;
 				static const std::string TAB_SPEED;
+				static const std::string TAB_ASCENDING_SCHEDULES;
 			//@}
 
 		private:
