@@ -42,10 +42,13 @@ namespace synthese
 
 	namespace graph
 	{
-		const std::string Service::DATA_SERVICE_ID("service_id");
-		const std::string Service::DATA_SERVICE_NUMBER("service_number");
+		const string Service::ATTR_SERVICE_ID = "service_id";
+		const string Service::ATTR_SERVICE_NUMBER = "service_number";
+		const string Service::ATTR_JOURNEY_PATTERN_ID = "journey_pattern_id";
 
 		const time_duration Service::DAY_DURATION(hours(24));
+
+
 
 		Service::Service(
 			const string& serviceNumber,
@@ -54,6 +57,7 @@ namespace synthese
 			_serviceNumber (serviceNumber),
 			_path (path)
 		{}
+
 
 
 		Service::Service(
@@ -221,10 +225,21 @@ namespace synthese
 
 
 
-		void Service::toParametersMap( util::ParametersMap& pm, std::string prefix /*= std::string() */ ) const
-		{
-			pm.insert(prefix + DATA_SERVICE_ID, getKey());
-			pm.insert(prefix + DATA_SERVICE_NUMBER, getServiceNumber());
+		void Service::toParametersMap(
+			ParametersMap& pm,
+			string prefix /*= std::string() */
+		) const	{
+
+			// ID
+			pm.insert(prefix + ATTR_SERVICE_ID, getKey());
+
+			// Number
+			pm.insert(prefix + ATTR_SERVICE_NUMBER, getServiceNumber());
+
+			// Path id
+			if(_path)
+			{
+				pm.insert(prefix + ATTR_JOURNEY_PATTERN_ID, _path->getKey());
+			}
 		}
-	}
-}
+}	}

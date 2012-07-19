@@ -71,8 +71,9 @@ namespace synthese
 			public virtual util::Registrable
 		{
 		private:
-			static const std::string DATA_SERVICE_ID;
-			static const std::string DATA_SERVICE_NUMBER;
+			static const std::string ATTR_SERVICE_ID;
+			static const std::string ATTR_SERVICE_NUMBER;
+			static const std::string ATTR_JOURNEY_PATTERN_ID;
 
 		public:
 			static const boost::posix_time::time_duration DAY_DURATION;
