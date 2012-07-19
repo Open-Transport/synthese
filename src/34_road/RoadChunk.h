@@ -24,6 +24,7 @@
 #define SYNTHESE_ENV_ROADCHUNK_H
 
 #include "Edge.h"
+#include "Road.h"
 
 #include <utility>
 
@@ -38,7 +39,6 @@ namespace synthese
 {
 	namespace road
 	{
-		class Road;
 		class Crossing;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -55,6 +55,10 @@ namespace synthese
 		class RoadChunk:
 			public graph::Edge
 		{
+		public :
+			typedef std::map<Road::RoadType, double> CarSpeedDividers;
+			static const CarSpeedDividers CAR_SPEED_FACTORS;
+
 		protected:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
@@ -68,15 +72,19 @@ namespace synthese
 				Crossing* fromCrossing = NULL,
 				int rankInRoad = UNKNOWN_VALUE,
 				Road* road = NULL,
-				double metricOffset = UNKNOWN_VALUE
+				double metricOffset = UNKNOWN_VALUE,
+				double carSpeed = 50 / 3.6
 			);
 
 			virtual ~RoadChunk ();
+
+			double _carSpeed;
 
 		public:
 			//! @name Getters
 			//@{
 				Crossing* getFromCrossing() const;
+				double getCarSpeed(bool nominalSpeed = false) const;
 			//@}
 
 
@@ -85,6 +93,7 @@ namespace synthese
 			//@{
 				void setFromCrossing(Crossing* value);
 				void setRoad(Road* road);
+				void setCarSpeed(double& carSpeed);
 			//@}
 
 
@@ -93,6 +102,7 @@ namespace synthese
 			//@{
 				virtual bool isDepartureAllowed() const;
 				virtual bool isArrivalAllowed() const;
+				virtual bool isReversed() const = 0;
 
 				Road* getRoad() const;
 

@@ -39,13 +39,39 @@ namespace synthese
 
 	namespace road
 	{
+		RoadChunk::CarSpeedDividers get_speed_dividers() 
+		{
+			RoadChunk::CarSpeedDividers carSpeedDividers;
+
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_UNKNOWN, 0.9));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_MOTORWAY, 0.95));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_MEDIANSTRIPPEDROAD, 0.85));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PRINCIPLEAXIS, 0.9));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_SECONDARYAXIS, 0.85));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_BRIDGE, 0.8));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_STREET, 0.7));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PEDESTRIANSTREET, 0.5));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_ACCESSROAD, 0.8));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PRIVATEWAY, 0.4));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_PEDESTRIANPATH, 0.4));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_TUNNEL, 0.8));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_HIGHWAY, 0.8));
+			carSpeedDividers.insert(make_pair(Road::ROAD_TYPE_STEPS, 0.5));
+
+			return carSpeedDividers;
+		}
+
+		const RoadChunk::CarSpeedDividers RoadChunk::CAR_SPEED_FACTORS = get_speed_dividers();
+
 		RoadChunk::RoadChunk(
 			util::RegistryKeyType id,
 			Crossing* fromCrossing,
 			int rankInRoad,
 			Road* street,
-			double metricOffset
+			double metricOffset,
+			double carSpeed
 		):	util::Registrable(id),
+			_carSpeed(carSpeed),
 			Edge(
 				street,
 				rankInRoad,
@@ -91,6 +117,31 @@ namespace synthese
 		Crossing* RoadChunk::getFromCrossing() const
 		{
 			return static_cast<Crossing*>(_fromVertex);
+		}
+
+
+
+		double RoadChunk::getCarSpeed(bool nominalSpeed) const
+		{
+			if(nominalSpeed)
+			{
+				return _carSpeed;
+			}
+			else
+			{
+				if(CAR_SPEED_FACTORS.find(this->getRoad()->getType()) != CAR_SPEED_FACTORS.end())
+				{
+					return _carSpeed * CAR_SPEED_FACTORS.find(this->getRoad()->getType())->second;
+				}
+				return _carSpeed;
+			}
+		}
+
+
+
+		void RoadChunk::setCarSpeed(double& carSpeed)
+		{
+			_carSpeed = carSpeed;
 		}
 
 

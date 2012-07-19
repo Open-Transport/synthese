@@ -71,6 +71,7 @@ namespace synthese
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
 			Hub::setRules(rules);
 		}
 
@@ -151,6 +152,22 @@ namespace synthese
 					dynamic_cast<Vertex*>(vertex),
 					vertex->getVertexAccess(*this)
 				);
+			}
+		}
+
+
+
+		bool Crossing::isNonReachableRoad(
+			const Road* from,
+			const Road* to
+		) const {
+			if(_nonReachableRoadFromRoad.find(make_pair(from, to)) != _nonReachableRoadFromRoad.end())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
 			}
 		}
 

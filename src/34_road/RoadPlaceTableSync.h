@@ -45,11 +45,11 @@ namespace synthese
 		class RoadPlaceTableSync
 		:	public db::DBRegistryTableSyncTemplate<RoadPlaceTableSync,RoadPlace>
 		{
-		 public:
+		public:
 			static const std::string COL_NAME;
 			static const std::string COL_CITYID;
 			static const std::string COL_DATASOURCE_LINKS;
-
+			static const std::string COL_ISCITYMAINROAD;
 
 
 			/** RoadPlace search.

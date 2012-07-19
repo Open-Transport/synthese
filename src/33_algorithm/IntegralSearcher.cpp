@@ -36,6 +36,9 @@
 #include "JourneyTemplates.h"
 #include "Service.h"
 #include "Log.h"
+#include "Crossing.h"
+#include "ReverseRoadPart.hpp"
+#include "ReverseRoadChunk.hpp"
 
 #include <sstream>
 #include <limits>
@@ -283,6 +286,43 @@ namespace synthese
 						// Abort current path if the edge is at its end
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
+
+						// Check if the edge is authorized for the user class
+						if(!edge.isCompatibleWith(_accessParameters))
+						{
+							continue;
+						}
+
+						// If we are on a road journey planning
+						if(_graphToUse == RoadModule::GRAPH_ID)
+						{
+							// Specific car user class verification (turn restriction)
+							if(_accessParameters.getUserClass() == USER_CAR)
+							{
+								const Crossing* originCrossing = static_cast<const Crossing*>(origin);
+								if(originCrossing && !currentJourney.getServiceUses().empty())
+								{
+									const Road* from = static_cast<const Road*>(currentJourney.getEndEdge().getParentPath());
+									const Road* to = static_cast<const Road*>(&path);
+
+									if(from->isReversed())
+										from = static_cast<const ReverseRoadPart*>(from)->getMainRoad();
+
+									if(to->isReversed())
+										to = static_cast<const ReverseRoadPart*>(to)->getMainRoad();
+
+									if((_accessDirection == DEPARTURE_TO_ARRIVAL) && originCrossing->isNonReachableRoad(from, to))
+									{
+										continue;
+									}
+									else if((_accessDirection == ARRIVAL_TO_DEPARTURE) && originCrossing->isNonReachableRoad(to, from))
+									{
+										continue;
+									}
+								}
+							}
+						}
+
 						PtrEdgeStep fineStep(
 							(_accessDirection == DEPARTURE_TO_ARRIVAL) ?
 							(&Edge::getFollowingArrivalForFineSteppingOnly) :

@@ -84,7 +84,8 @@ namespace synthese
 						chunk.getFromCrossing(),
 						0,
 						_reverseRoad.get(),
-						-chunk.getMetricOffset()
+						-chunk.getMetricOffset(),
+						&chunk
 				)	);
 				shared_ptr<LineString> geometry(chunk.getGeometry());
 				if(geometry.get())
@@ -108,7 +109,8 @@ namespace synthese
 							chunk.getFromCrossing(),
 							0,
 							_reverseRoad.get(),
-							-chunk.getMetricOffset()
+							-chunk.getMetricOffset(),
+							&chunk
 					)	);
 					_reverseRoad->_insertRoadChunk(
 						*reverseChunk,
@@ -125,7 +127,8 @@ namespace synthese
 							chunk.getFromCrossing(),
 							lastEdge.getRankInPath() - chunk.getRankInPath(),
 							_reverseRoad.get(),
-							-chunk.getMetricOffset()
+							-chunk.getMetricOffset(),
+							&chunk
 					)	);
 					_reverseRoad->addEdge(
 						*reverseChunk
@@ -161,11 +164,21 @@ namespace synthese
 					chunk.getFromCrossing(),
 					lastEdge.getRankInPath() + rankShift,
 					_reverseRoad.get(),
-					0
+					0,
+					&chunk
 			)	);
 			_reverseRoad->addEdge(
 				*reverseChunk
 			);
 			chunk.setReverseRoadChunk(reverseChunk);
+		}
+
+		void MainRoadPart::setType (const RoadType& type)
+		{
+			Road::setType(type);
+			if(_reverseRoad.get())
+			{
+				_reverseRoad->setType(type);
+			}
 		}
 }	}
