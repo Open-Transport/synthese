@@ -27,6 +27,7 @@
 #include "Registry.h"
 #include "Named.h"
 #include "ImportableTemplate.hpp"
+#include "TreeFolderRoot.hpp"
 
 namespace synthese
 {
@@ -50,7 +51,8 @@ namespace synthese
 		class TransportNetwork:
 			virtual public util::Registrable,
 			public util::Named,
-			public impex::ImportableTemplate<TransportNetwork>
+			public impex::ImportableTemplate<TransportNetwork>,
+			public tree::TreeFolderRoot
 		{
 		public:
 			/// Chosen registry class.

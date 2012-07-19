@@ -23,56 +23,40 @@
 #ifndef SYNTHESE_tree_TreeFolder_hpp__
 #define SYNTHESE_tree_TreeFolder_hpp__
 
-#include "TreeFolderRoot.hpp"
-#include "TreeFolderChild.hpp"
-#include "TreeAlphabeticalOrderingPolicy.hpp"
+#include "Object.hpp"
+#include "Registrable.h"
+#include "Registry.h"
+#include "TreeFolderUpNode.hpp"
+#include "TreeFolderDownNodeInterface.hpp"
 
 namespace synthese
 {
 	namespace tree
 	{
+		typedef boost::fusion::map<
+			FIELD(Key),
+			FIELD(Name),
+			FIELD(Parent)
+		> TreeFolderRecord;
+
 		/** TreeFolder class.
 			@ingroup m20
 		*/
-		template<
-			class ObjectType_,
-			class RootPolicy_
-		>
 		class TreeFolder:
-			public TreeFolderRoot,
-			public RootPolicy_
+			public TreeFolderUpNode,
+			public TreeFolderDownNodeInterface,
+			public Object<TreeFolder, TreeFolderRecord>
 		{
 		public:
+			/// Chosen registry class.
+			typedef util::Registry<TreeFolder>	Registry;
 
-			typedef TreeFolder<ObjectType_, RootPolicy_> TreeFolderType;
-			typedef ObjectType_ ObjectType;
+			TreeFolder(
+				util::RegistryKeyType id = 0
+			);
 
-			typedef std::map<std::string, ObjectType*> ChildrenObjects;
-			typedef std::map<std::string, TreeFolderType*> ChildrenFolders;
-
-		private:
-			ChildrenObjects _childrenObjects;
-			ChildrenFolders _childrenFolders;
-
-		public:
-			TreeFolder(util::RegistryKeyType key = 0) : TreeFolderRoot(key) {}
-
-			void removeObject(ObjectType* object) { _childrenObjects.erase( object->getName()); }
-			void addObject(ObjectType* object) { _childrenObjects.insert(std::make_pair(object->getName(), object)); }
-			void removeFolder(TreeFolderType* object) { _childrenFolders.erase( object->getName()); }
-			void addFolder(TreeFolderType* object) { _childrenFolders.insert(std::make_pair(object->getName(), object)); }
-
-			void setParent(TreeFolderType* value)
-			{
-				if(getParent()) getParent()->removeFolder(this);
-				_setParent(static_cast<TreeFolderRoot*>(value));
-				if(value) value->addFolder(this);
-			}
-
-			TreeFolderType* getParent() const
-			{
-				return static_cast<TreeFolderType*>(_getParent());
-			}
+			virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
+			virtual void unlink();
 		};
 	}
 }

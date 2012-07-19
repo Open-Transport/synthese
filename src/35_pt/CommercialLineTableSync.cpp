@@ -26,6 +26,7 @@
 #include "TransportNetworkTableSync.h"
 #include "TransportNetwork.h"
 #include "JourneyPatternTableSync.hpp"
+#include "TreeFolderTableSync.hpp"
 #include "Place.h"
 #include "PTModule.h"
 #include "StopArea.hpp"
@@ -71,6 +72,8 @@ namespace synthese
 	using namespace graph;
 	using namespace calendar;
 	using namespace impex;
+	using namespace tree;
+	
 
 	namespace util
 	{
@@ -193,13 +196,29 @@ namespace synthese
 				// Transport network
 				try
 				{
-					object->setNetwork (
-						TransportNetworkTableSync::Get(rows->getLongLong(CommercialLineTableSync::COL_NETWORK_ID), env, linkLevel).get()
+					RegistryKeyType parentId(
+						rows->getLongLong(CommercialLineTableSync::COL_NETWORK_ID)
 					);
+					if(decodeTableId(parentId) == TransportNetworkTableSync::TABLE.ID)
+					{
+						object->setParent(
+							*TransportNetworkTableSync::GetEditable(parentId, env, linkLevel).get()
+						);
+					}
+					else if(decodeTableId(parentId) == TreeFolder::CLASS_NUMBER)
+					{
+						object->setParent(
+							*TreeFolderTableSync::GetEditable(parentId, env, linkLevel).get()
+						);
+					}
 				}
 				catch(ObjectNotFoundException<TransportNetwork>&)
 				{
 					Log::GetInstance().warn("No such network in commercial line "+ lexical_cast<string>(object->getKey()));
+				}
+				catch(ObjectNotFoundException<TreeFolderTableSync>&)
+				{
+					Log::GetInstance().warn("No such folder in commercial line "+ lexical_cast<string>(object->getKey()));
 				}
 
 				// Calendar template
@@ -411,7 +430,7 @@ namespace synthese
 	{
 		CommercialLineTableSync::SearchResult CommercialLineTableSync::Search(
 			Env& env,
-			optional<RegistryKeyType> networkId,
+			optional<RegistryKeyType> parentId,
 			optional<string> name,
 			optional<string> creatorId,
 			int first,
@@ -459,8 +478,10 @@ namespace synthese
 				else
 					query << " AND l." << COL_NAME << " LIKE " << Conversion::ToDBString(*name);
 			}
-			if (networkId)
-				query << " AND l." << COL_NETWORK_ID << "=" << *networkId;
+			if (parentId)
+			{
+				query << " AND l." << COL_NETWORK_ID << "=" << *parentId;
+			}
 
 			// Contact center filter
 			if(contactCenterId)

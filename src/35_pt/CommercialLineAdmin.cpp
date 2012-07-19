@@ -625,7 +625,7 @@ namespace synthese
 			shared_ptr<TransportNetworkAdmin> p(
 				getNewPage<TransportNetworkAdmin>()
 			);
-			p->setNetwork(Env::GetOfficialEnv().getSPtr(_cline->getNetwork()));
+			p->setNode(*_cline->_getParent());
 
 			PageLinks links(p->_getCurrentTreeBranch());
 			links.push_back(getNewCopiedPage());
