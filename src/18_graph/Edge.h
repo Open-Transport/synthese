@@ -25,6 +25,7 @@
 
 #include <vector>
 
+#include "RuleUser.h"
 #include "UtilConstants.h"
 #include "Registrable.h"
 #include "GraphTypes.h"
@@ -79,7 +80,8 @@ namespace synthese
 		*/
 		class Edge:
 			public virtual util::Registrable,
-			public WithGeometry<geos::geom::LineString>
+			public WithGeometry<geos::geom::LineString>,
+			public RuleUser
 		{
 		public:
 			template<class Iterator>
@@ -328,6 +330,14 @@ namespace synthese
 			//@{
 				void markServiceIndexUpdateNeeded(bool RTDataOnly) const;
 			//@}
+
+
+
+				virtual const RuleUser* _getParentRuleUser() const { return NULL; }
+
+
+
+				virtual std::string getRuleUserName() const { return "edge"; }
 		};
 	}
 }

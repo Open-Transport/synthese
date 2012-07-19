@@ -52,6 +52,8 @@ namespace synthese
 
 			bool isReversed() const {return false;};
 
+			void setType (const RoadType& type);
+
 			//! @name Getters
 			//@{
 				ReverseRoadPart* getReverseRoad() const { return _reverseRoad.get(); }

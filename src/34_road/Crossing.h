@@ -28,6 +28,7 @@
 #include "Registry.h"
 #include "Registrable.h"
 #include "ImportableTemplate.hpp"
+#include "RoadPlace.h"
 
 namespace synthese
 {
@@ -54,14 +55,16 @@ namespace synthese
 			public impex::ImportableTemplate<Crossing>
 		{
 		public:
-			  /// Chosen registry class.
-			  typedef util::Registry<Crossing>	Registry;
+			/// Chosen registry class.
+			typedef util::Registry<Crossing> Registry;
 
-			  typedef std::set<ReachableFromCrossing*> ReachableVertices;
+			typedef std::set<ReachableFromCrossing*> ReachableVertices;
+			typedef std::set<std::pair<const Road*, const Road*> > NonReachableRoadFromRoad;
 
 		private:
 
 			ReachableVertices _reachableVertices;
+			NonReachableRoadFromRoad _nonReachableRoadFromRoad;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -89,6 +92,13 @@ namespace synthese
 				void addReachableVertex(ReachableFromCrossing* value){ _reachableVertices.insert(value); }
 				void removeReachableVertex(ReachableFromCrossing* value){ _reachableVertices.erase(value); }
 			//@}
+
+				void addNonReachableRoad(const std::pair<const Road*, const Road*>& pair) { _nonReachableRoadFromRoad.insert(pair); }
+
+				const NonReachableRoadFromRoad getNonReachableRoads() const { return _nonReachableRoadFromRoad; }
+				void setNonReachableRoads(const NonReachableRoadFromRoad& value) { _nonReachableRoadFromRoad = value; }
+
+				bool isNonReachableRoad(const Road* from, const Road* to) const;
 
 
 

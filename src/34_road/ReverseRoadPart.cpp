@@ -21,7 +21,6 @@
 */
 
 #include "ReverseRoadPart.hpp"
-#include "MainRoadPart.hpp"
 #include "PermanentService.h"
 #include "Edge.h"
 
@@ -46,6 +45,7 @@ namespace synthese
 		):	Registrable(0),
 			Road(0, mainRoadPart.getType())
 		{
+			_mainRoad = &mainRoadPart;
 		}
 
 

@@ -26,6 +26,8 @@
 #include "Service.h"
 #include "Vertex.h"
 #include "DBModule.h"
+#include "AllowedUseRule.h"
+#include "ForbiddenUseRule.h"
 
 #include <boost/foreach.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -67,7 +69,15 @@ namespace synthese
 			_arrivalIndex(INDICES_NUMBER),
 			_serviceIndexUpdateNeeded (true),
 			_RTserviceIndexUpdateNeeded(true)
-		{}
+		{
+			// Default accessibility
+			RuleUser::Rules rules(RuleUser::GetEmptyRules());
+			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_BIKE - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_HANDICAPPED - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			rules[USER_CAR - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+			setRules(rules);
+		}
 
 
 		Edge::~Edge ()

@@ -113,8 +113,10 @@ namespace synthese
 				const HouseNumberBounds& getRightHouseNumberBounds() const { return _rightHouseNumberBounds; }
 				const HouseNumberingPolicy& getLeftHouseNumberingPolicy() const { return _leftHouseNumberingPolicy; }
 				const HouseNumberingPolicy& getRightHouseNumberingPolicy() const { return _rightHouseNumberingPolicy; }
-				const ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk; }
+				ReverseRoadChunk* getReverseRoadChunk() const { return _reverseRoadChunk; }
 				MainRoadPart* getMainRoadPart() const;
+
+				bool isReversed() const { return false; };
 
 			//@}
 

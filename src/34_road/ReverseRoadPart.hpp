@@ -25,13 +25,12 @@
 
 #include "Road.h"
 #include "Registry.h"
+#include "MainRoadPart.hpp"
 
 namespace synthese
 {
 	namespace road
 	{
-		class MainRoadPart;
-
 		/** ReverseRoadPart class.
 			@ingroup m34
 		*/
@@ -41,13 +40,17 @@ namespace synthese
 			friend class MainRoadPart;
 
 		public:
+			const MainRoadPart* _mainRoad;
+
 			ReverseRoadPart(const MainRoadPart& mainRoadPart);
 
 			virtual ~ReverseRoadPart();
 
+			const MainRoadPart* getMainRoad() const { return _mainRoad; }
+
 			bool isReversed() const {return true;};
 
-			typedef util::Registry<ReverseRoadPart>	Registry;
+			typedef util::Registry<ReverseRoadPart> Registry;
 		};
 	}
 }

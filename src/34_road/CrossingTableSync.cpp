@@ -22,6 +22,7 @@
 
 #include "CrossingTableSync.hpp"
 #include "RoadTableSync.h"
+#include "RoadPlaceTableSync.h"
 #include "Crossing.h"
 #include "DBModule.h"
 #include "LinkException.h"
@@ -33,6 +34,7 @@
 
 #include <sstream>
 #include <geos/geom/Point.h>
+#include <boost/algorithm/string/split.hpp>
 
 using namespace std;
 using namespace boost;
@@ -55,6 +57,7 @@ namespace synthese
 	namespace road
 	{
 		const std::string CrossingTableSync::COL_CODE_BY_SOURCE ("code_by_source");
+		const std::string CrossingTableSync::COL_NON_REACHABLE_ROADS ("non_reachable_roads");
 	}
 
 	namespace db
@@ -67,6 +70,7 @@ namespace synthese
 		{
 			Field(TABLE_COL_ID, SQL_INTEGER),
 			Field(CrossingTableSync::COL_CODE_BY_SOURCE, SQL_TEXT),
+			Field(CrossingTableSync::COL_NON_REACHABLE_ROADS, SQL_TEXT),
 			Field(TABLE_COL_GEOMETRY, SQL_GEOM_POINT),
 			Field()
 		};
@@ -101,6 +105,13 @@ namespace synthese
 					rows->getText(CrossingTableSync::COL_CODE_BY_SOURCE),
 					env
 			)	);
+
+			object->setNonReachableRoads(
+				CrossingTableSync::UnserializeNonReachableRoads(
+					rows->getText(CrossingTableSync::COL_NON_REACHABLE_ROADS),
+					env
+				)
+			);
 		}
 
 
@@ -122,6 +133,9 @@ namespace synthese
 					object->getDataSourceLinks(),
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
+			query.addField(
+				CrossingTableSync::SerializeNonReachableRoads(object->getNonReachableRoads())
+			);
 			query.addField(static_pointer_cast<Geometry,Point>(object->getGeometry()));
 			query.execute(transaction);
 		}
@@ -181,7 +195,7 @@ namespace synthese
 			LinkLevel linkLevel
 		){
 			SelectQuery<CrossingTableSync> query;
- 			if (number)
+			if (number)
 			{
 				query.setNumber(*number + 1);
 			}
@@ -190,6 +204,69 @@ namespace synthese
 				query.setFirst(first);
 			}
 			return LoadFromQuery(query, env, linkLevel);
+		}
+
+		std::string CrossingTableSync::SerializeNonReachableRoads(const Crossing::NonReachableRoadFromRoad& value)
+		{
+			bool first(true);
+			stringstream nonReachableRoads;
+			BOOST_FOREACH(const Crossing::NonReachableRoadFromRoad::value_type& roadPair, value)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					nonReachableRoads << ",";
+				}
+				nonReachableRoads << roadPair.first->getKey() << "|" << roadPair.second->getKey();
+			}
+			return nonReachableRoads.str();
+		}
+
+		Crossing::NonReachableRoadFromRoad CrossingTableSync::UnserializeNonReachableRoads(
+			const std::string& value,
+			Env& env
+		){
+			if(value.empty())
+			{
+				return Crossing::NonReachableRoadFromRoad();
+			}
+			else
+			{
+				Crossing::NonReachableRoadFromRoad nonReachableRoads;
+				vector<string> pairsVec;
+				split(pairsVec, value, is_any_of(","));
+				BOOST_FOREACH(const string& pairStr, pairsVec)
+				{
+					try
+					{
+						vector<string> roadsVec;
+						split(roadsVec, pairStr, is_any_of("|"));
+
+						Road* from(
+							RoadTableSync::GetEditable(
+								lexical_cast<RegistryKeyType>(roadsVec.at(0)),
+								 env
+							).get()
+						);
+
+						Road* to(
+							RoadTableSync::GetEditable(
+								lexical_cast<RegistryKeyType>(roadsVec.at(1)),
+								 env
+							).get()
+						);
+
+						nonReachableRoads.insert(make_pair(from, to));
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+				}
+				return nonReachableRoads;
+			}
 		}
 	}
 }
