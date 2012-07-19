@@ -24,6 +24,7 @@
 #define SYNTHESE_road_ReverseRoadChunk_hpp__
 
 #include "RoadChunk.h"
+#include "MainRoadChunk.hpp"
 #include "Registry.h"
 
 namespace synthese
@@ -41,6 +42,9 @@ namespace synthese
 		class ReverseRoadChunk:
 			public RoadChunk
 		{
+		private:
+			MainRoadChunk* _mainRoadChunk;
+
 		public:
 			//////////////////////////////////////////////////////////////////////////
 			/// Constructor.
@@ -54,14 +58,16 @@ namespace synthese
 				Crossing* fromCrossing = NULL,
 				int rankInRoad = UNKNOWN_VALUE,
 				ReverseRoadPart* road = NULL,
-				double metricOffset = UNKNOWN_VALUE
+				double metricOffset = UNKNOWN_VALUE,
+				MainRoadChunk* mainRoadChunk = NULL
 			);
 
+			bool isReversed() const { return true; };
+
+			MainRoadChunk* getMainRoadChunk() const { return _mainRoadChunk; }
 
 			/// Chosen registry class.
-			typedef util::Registry<ReverseRoadChunk>	Registry;
-
-		private:
+			typedef util::Registry<ReverseRoadChunk> Registry;
 		};
 	}
 }

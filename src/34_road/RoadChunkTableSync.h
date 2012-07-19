@@ -91,6 +91,9 @@ namespace synthese
 			static const std::string COL_RIGHT_END_HOUSE_NUMBER;
 			static const std::string COL_LEFT_HOUSE_NUMBERING_POLICY;
 			static const std::string COL_RIGHT_HOUSE_NUMBERING_POLICY;
+			static const std::string COL_ONE_WAY;
+			static const std::string COL_CAR_SPEED;
+			static const std::string COL_NON_WALKABLE;
 
 
 

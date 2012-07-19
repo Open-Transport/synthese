@@ -60,6 +60,7 @@ namespace synthese
 		const string RoadPlaceTableSync::COL_NAME = "name";
 		const string RoadPlaceTableSync::COL_CITYID = "city_id";
 		const string RoadPlaceTableSync::COL_DATASOURCE_LINKS = "datasource_links";
+		const string RoadPlaceTableSync::COL_ISCITYMAINROAD = "is_city_main_road";
 	}
 
 	namespace db
@@ -74,6 +75,7 @@ namespace synthese
 			Field(RoadPlaceTableSync::COL_NAME, SQL_TEXT),
 			Field(RoadPlaceTableSync::COL_CITYID, SQL_INTEGER),
 			Field(RoadPlaceTableSync::COL_DATASOURCE_LINKS, SQL_TEXT),
+			Field(RoadPlaceTableSync::COL_ISCITYMAINROAD, SQL_BOOLEAN),
 			Field()
 		};
 
@@ -116,6 +118,16 @@ namespace synthese
 				if(!object->getName().empty())
 				{
 					city->addPlaceToMatcher(env.getEditableSPtr(object));
+				}
+
+				bool isCityMainRoad(rows->getBool(RoadPlaceTableSync::COL_ISCITYMAINROAD));
+				if(isCityMainRoad)
+				{
+					city->addIncludedPlace(*object);
+				}
+				else
+				{
+					city->removeIncludedPlace(*object);
 				}
 			}
 
@@ -166,6 +178,7 @@ namespace synthese
 					object->getDataSourceLinks(),
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
+			query.addField(object->getCity() ? object->getCity()->includes(*object) : false);
 			query.execute(transaction);
 		}
 
@@ -179,6 +192,7 @@ namespace synthese
 			if (city != NULL)
 			{
 				city->removePlaceFromMatcher(*obj);
+				city->removeIncludedPlace(*obj);
 			}
 
 			if(Env::GetOfficialEnv().contains(*obj))

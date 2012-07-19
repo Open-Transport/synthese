@@ -66,6 +66,7 @@ namespace synthese
 		{
 		public:
 			static const std::string COL_CODE_BY_SOURCE;
+			static const std::string COL_NON_REACHABLE_ROADS;
 
 			CrossingTableSync();
 			~CrossingTableSync();
@@ -85,6 +86,15 @@ namespace synthese
 				int first = 0,
 				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
 				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			);
+
+			static std::string SerializeNonReachableRoads(
+				const Crossing::NonReachableRoadFromRoad& value
+			);
+
+			static Crossing::NonReachableRoadFromRoad UnserializeNonReachableRoads(
+				const std::string& value,
+				util::Env& env
 			);
 		};
 	}

@@ -24,6 +24,7 @@
 #include "Edge.h"
 #include "Path.h"
 #include "AccessParameters.h"
+#include "RoadChunk.h"
 
 #include <math.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -74,7 +75,18 @@ namespace synthese
 				{
 					distance = -distance;
 				}
-				duration = posix_time::seconds(distance > 0 ? static_cast<long>(ceil(distance / accessParameters.getApproachSpeed())) : 1);
+
+				double speed(accessParameters.getApproachSpeed());
+				if(accessParameters.getUserClass() == USER_CAR)
+				{
+					speed = static_cast<road::RoadChunk*>(const_cast<Edge*>(&edge))->getCarSpeed();
+					if(speed <= 0)
+					{
+						speed = accessParameters.getApproachSpeed();
+					}
+				}
+
+				duration = posix_time::seconds(distance > 0 ? static_cast<long>(ceil(distance / speed)) : 1);
 			}
 
 			ptime originDateTime(presenceDateTime - duration);
@@ -132,11 +144,22 @@ namespace synthese
 				distance = -distance;
 			}
 
+			double speed(accessParameters.getApproachSpeed());
+			if(accessParameters.getUserClass() == USER_CAR)
+			{
+				speed = static_cast<road::RoadChunk*>(const_cast<Edge*>(&edge))->getCarSpeed();
+				if(speed <= 0)
+				{
+					speed = accessParameters.getApproachSpeed();
+				}
+			}
+
 			posix_time::time_duration duration(
 				_duration ?
 				*_duration :
-				posix_time::seconds(distance > 0 ? static_cast<long>(ceil(distance / accessParameters.getApproachSpeed())) : 1)
+				posix_time::seconds(distance > 0 ? static_cast<long>(ceil(distance / speed)) : 1)
 			);
+
 			if(servicePointer.getArrivalEdge() == NULL)
 			{
 				posix_time::ptime dt(servicePointer.getDepartureDateTime());

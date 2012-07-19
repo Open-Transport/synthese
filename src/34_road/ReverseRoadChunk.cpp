@@ -39,7 +39,8 @@ namespace synthese
 			Crossing* fromCrossing /*= NULL*/,
 			int rankInRoad /*= UNKNOWN_VALUE*/,
 			ReverseRoadPart* road /*= NULL*/,
-			double metricOffset /*= UNKNOWN_VALUE */
+			double metricOffset /*= UNKNOWN_VALUE */,
+			MainRoadChunk* mainRoadChunk
 		):	Registrable(id),
 			RoadChunk(
 				id,
@@ -47,6 +48,7 @@ namespace synthese
 				rankInRoad,
 				road,
 				metricOffset
-			)
+			),
+			_mainRoadChunk(mainRoadChunk)
 		{}
 }	}
