@@ -200,6 +200,7 @@ namespace synthese
 				}
 				catch(bad_lexical_cast)
 				{
+					/* Trying to get an House number is a bad idea, because it breaks selection of stop whit a name like "terroir 3"
 					try
 					{
 						number = lexical_cast<MainRoadChunk::HouseNumber>(words[words.size()-1]);
@@ -208,7 +209,7 @@ namespace synthese
 					catch(bad_lexical_cast)
 					{
 
-					}
+					}*/
 
 				}
 				if(number > 0)
