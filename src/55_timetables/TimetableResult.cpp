@@ -21,6 +21,7 @@
 */
 
 #include "TimetableResult.hpp"
+
 #include "JourneyPattern.hpp"
 
 #include <boost/foreach.hpp>
@@ -41,6 +42,21 @@ namespace synthese
 				result.push_back((content.begin() + rank)->second);
 			}
 			return result;
+		}
+
+
+
+		bool TimetableResult::hasSchedules( size_t rank ) const
+		{
+			for (Columns::const_iterator it(_columns.begin()); it != _columns.end(); ++it)
+			{
+				const TimetableColumn::Content& content(it->getContent());
+				if(!(content.begin() + rank)->second.is_not_a_date_time())
+				{
+					return true;
+				}
+			}
+			return false;
 		}
 
 

@@ -21,30 +21,44 @@
 */
 
 #include "TimetableColumn.h"
+
+#include "CommercialLine.h"
+#include "Edge.h"
+#include "JourneyPattern.hpp"
+#include "ParametersMap.h"
+#include "Path.h"
+#include "PTUseRule.h"
+#include "RollingStock.hpp"
+#include "SchedulesBasedService.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 #include "TimetableRow.h"
 #include "TimetableGenerator.h"
-#include "SchedulesBasedService.h"
-#include "Path.h"
-#include "JourneyPattern.hpp"
-#include "Edge.h"
 #include "Vertex.h"
-#include "StopPoint.hpp"
-#include "StopArea.hpp"
 
 #include <list>
 
+using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace pt;
 	using namespace calendar;
 	using namespace graph;
 	using namespace pt;
+	using namespace util;
 
 	namespace timetables
 	{
+		const string TimetableColumn::TAG_NOTE = "note";
+		const string TimetableColumn::TAG_SERVICE = "service";
+		const string TimetableColumn::TAG_LINE = "line";
+		const string TimetableColumn::TAG_TRANSPORT_MODE = "transport_mode";
+		const string TimetableColumn::TAG_USE_RULE = "use_rule";
+
+
+
 		TimetableColumn::TimetableColumn(
 			const TimetableGenerator& timetablegenerator,
 			const SchedulesBasedService& service
@@ -441,5 +455,61 @@ namespace synthese
 				}
 			}
 			return true;
+		}
+
+
+
+		void TimetableColumn::toParametersMap(
+			ParametersMap& pm,
+			bool withSchedules
+		) const	{
+
+			// Note
+			if(_warning)
+			{
+				shared_ptr<ParametersMap> notePM(new ParametersMap);
+				_warning->toParametersMap(*notePM, false);
+				pm.insert(TAG_NOTE, notePM);
+			}
+
+			// Service
+			if(_service)
+			{
+				shared_ptr<ParametersMap> servicePM(new ParametersMap);
+				_service->toParametersMap(*servicePM);
+				pm.insert(TAG_SERVICE, servicePM);
+			}
+
+			// Line
+			if(_line && _line->getCommercialLine())
+			{
+				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				_line->getCommercialLine()->toParametersMap(*linePM);
+				pm.insert(TAG_LINE, linePM);
+			}
+
+			// Transport mode
+			if(_line && _line->getRollingStock())
+			{
+				shared_ptr<ParametersMap> transportModePM(new ParametersMap);
+				_line->getRollingStock()->toParametersMap(*transportModePM);
+				pm.insert(TAG_TRANSPORT_MODE, transportModePM);
+			}
+
+			// Use rule
+			if(_service)
+			{
+				const PTUseRule* ptUseRule(
+					dynamic_cast<const PTUseRule*>(
+						&_service->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET)
+				)	);
+				if(ptUseRule)
+				{
+					shared_ptr<ParametersMap> useRulePM(new ParametersMap);
+					ptUseRule->toParametersMap(*useRulePM);
+					pm.insert(TAG_USE_RULE, useRulePM);
+				}
+			}
+
 		}
 }	}

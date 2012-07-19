@@ -35,11 +35,12 @@ namespace synthese
 	{
 		class SchedulesBasedService;
 		class StopPoint;
+		class JourneyPattern;
 	}
 
-	namespace pt
+	namespace util
 	{
-		class JourneyPattern;
+		class ParametersMap;
 	}
 
 	namespace timetables
@@ -79,6 +80,12 @@ namespace synthese
 			tTypeOD							_originType;
 			tTypeOD							_destinationType;
 
+			static const std::string TAG_NOTE;
+			static const std::string TAG_SERVICE;
+			static const std::string TAG_LINE;
+			static const std::string TAG_TRANSPORT_MODE;
+			static const std::string TAG_USE_RULE;
+
 		public:
 			// Constructeur
 			TimetableColumn(
@@ -97,6 +104,16 @@ namespace synthese
 				int		operator <= (const TimetableColumn& op) const;
 				bool	operator == (const TimetableColumn& op) const;
 				bool	includes(const TimetableColumn& op) const;
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of the content of the column in a parameters map.
+				/// @param pm the parameters map to populate
+				/// @param withSchedules export the schedules in sub parameters maps
+				void toParametersMap(
+					util::ParametersMap& pm,
+					bool withSchedules
+				) const;
 			//@}
 
 			//! @name Modifiers

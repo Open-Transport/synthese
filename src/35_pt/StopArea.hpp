@@ -28,6 +28,7 @@
 #include "Registry.h"
 #include "ImportableTemplate.hpp"
 #include "CoordinatesSystem.hpp"
+#include "StandardFields.hpp"
 
 #include <map>
 #include <utility>
@@ -157,7 +158,8 @@ namespace synthese
 		class StopArea:
 			public graph::Hub,
 			public geography::NamedPlaceTemplate<StopArea>,
-			public impex::ImportableTemplate<StopArea>
+			public impex::ImportableTemplate<StopArea>,
+			public ObjectField<StopArea, boost::optional<StopArea&> >
 		{
 		public:
 			static const std::string DATA_STOP_ID;

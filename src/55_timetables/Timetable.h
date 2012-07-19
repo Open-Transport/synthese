@@ -24,6 +24,8 @@
 #define SYNTHESE_timetables_Timetable_h__
 
 #include "Registrable.h"
+#include "Object.hpp"
+
 #include "Registry.h"
 #include "TimetableGenerator.h"
 #include "Exception.h"
@@ -46,6 +48,7 @@ namespace synthese
 	namespace timetables
 	{
 		class TimetableRow;
+		class TimetableRowGroup;
 
 		/** Timetable class.
 			Tableau d'indicateur papier, caractérisée par:
@@ -57,14 +60,17 @@ namespace synthese
 			@date 2001-2010
 			@ingroup m55
 		*/
-		class Timetable
-		:	public virtual util::Registrable
+		class Timetable:
+			public virtual util::Registrable,
+			public ObjectField<Timetable, boost::optional<Timetable&> >
 		{
 		public:
-			typedef std::vector<TimetableRow>	Rows;
 
 			/// Chosen registry class.
 			typedef util::Registry<Timetable>	Registry;
+
+			typedef TimetableGenerator::Rows Rows;
+			typedef TimetableGenerator::RowGroups RowGroups;
 
 			class ImpossibleGenerationException:
 				public synthese::Exception
@@ -91,6 +97,12 @@ namespace synthese
 
 			static ContentTypesList GetFormatsList();
 
+			typedef boost::optional<Timetable&> Type;
+
+			static const std::string DATA_GENERATOR_TYPE;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_CALENDAR_NAME;
+
 		private:
 			//! @name Position
 			//@{
@@ -103,14 +115,27 @@ namespace synthese
 				ContentType					_contentType;
 				TimetableGenerator::AuthorizedLines			_authorizedLines;
 				TimetableGenerator::AuthorizedPhysicalStops	_authorizedPhysicalStops;
-				Rows					_rows;
+				TimetableGenerator::Rows					_rows;
+				TimetableGenerator::RowGroups				_rowGroups;
 				const calendar::CalendarTemplate*			_baseCalendar;
 				std::string				_title;
 				Timetable* 	_transferTimetableBefore;
 				Timetable*	_transferTimetableAfter;
 				boost::optional<bool>		_wayBackFilter;
 				boost::optional<std::size_t> _autoIntermediateStops;
+				bool _ignoreEmptyRows;
 			//@}
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Converts timetable type into text code.
+			/// @param value timetable type
+			/// @return text code (empty if the content type is not valid)
+			/// @author Hugues Romain
+			/// @date 2010
+			/// @since 3.1.16
+			static std::string GetTimetableTypeCode(Timetable::ContentType value);
 
 		public:
 			// Constructeur
@@ -120,12 +145,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void addAuthorizedLine(const pt::CommercialLine* line);
-				void removeAuthorizedLine(const pt::CommercialLine* line);
-				void clearAuthorizedLines();
-				void addAuthorizedPhysicalStop(const pt::StopPoint* stop);
-				void removeAuthorizedPhysicalStop(const pt::StopPoint* stop);
-				void clearAuthorizedPhysicalStops();
 				void setBookId(util::RegistryKeyType value) { _bookId = value; }
 				void setTitle(const std::string& value){ _title = value; }
 				void setBaseCalendar(const calendar::CalendarTemplate* value){ _baseCalendar = value; }
@@ -135,11 +154,24 @@ namespace synthese
 				void setTransferTimetableAfter(Timetable* value){ _transferTimetableAfter = value; }
 				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
 				void setAutoIntermediateStops(boost::optional<std::size_t> value){ _autoIntermediateStops = value; }
+				void setAuthorizedLines(const TimetableGenerator::AuthorizedLines& value){ _authorizedLines = value; }
+				void setAuthorizedPhysicalStops(const TimetableGenerator::AuthorizedPhysicalStops& value){ _authorizedPhysicalStops = value; }
+				void setRows(const Rows& value){ _rows = value; }
+				void setRows(const RowGroups& value){ _rowGroups = value; }
+				void setIgnoreEmptyRows(bool value){ _ignoreEmptyRows = value; }
 			//@}
 
 			//! @name Modifiers
 			//@{
+				void addAuthorizedLine(const pt::CommercialLine* line);
+				void addAuthorizedPhysicalStop(const pt::StopPoint* stop);
 				void addRow(const TimetableRow& row);
+				void removeAuthorizedLine(const pt::CommercialLine* line);
+				void removeAuthorizedPhysicalStop(const pt::StopPoint* stop);
+				void clearAuthorizedLines();
+				void clearAuthorizedPhysicalStops();
+				void addRowGroup(TimetableRowGroup& rowGroup);
+				void removeRowGroup(TimetableRowGroup& rowGroup);
 			//@}
 
 			//! @name Getters
@@ -148,10 +180,13 @@ namespace synthese
 				const TimetableGenerator::AuthorizedPhysicalStops& getAuthorizedPhysicalStops() const;
 				const calendar::CalendarTemplate*	getBaseCalendar()		const { return _baseCalendar; }
 				const std::string&		getTitle()				const { return _title; }
-				const Rows&				getRows()				const;
+				const Rows&				getRows()				const { return _rows; }
+				const RowGroups&		getRowGroups()			const { return _rowGroups; }
 				util::RegistryKeyType	getBookId()				const { return _bookId; }
 				std::size_t				getRank()				const { return _rank; }
 				ContentType				getContentType()		const { return _contentType; }
+				boost::optional<bool>	getWaybackFilter() const { return _wayBackFilter; }
+				bool getIgnoreEmptyRows() const { return _ignoreEmptyRows; }
 			//@}
 
 			//! @name Services
@@ -185,6 +220,13 @@ namespace synthese
 				std::size_t getBeforeTransferTimetablesNumber() const;
 				std::size_t getAfterTransferTimetablesNumber() const;
 
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Export of the object properties into a parameters map.
+				/// @param pm the parameters map to populate
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
 	}

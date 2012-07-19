@@ -54,6 +54,8 @@ namespace synthese
 	using namespace road;
 	using namespace geography;
 
+	FIELD_DEFINITION_OF_OBJECT(StopArea, "stop_area_id", "stop_area_ids")
+
 	namespace util
 	{
 		template<> const string Registry<pt::StopArea>::KEY("StopArea");

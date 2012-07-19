@@ -21,9 +21,10 @@
 */
 
 #include "Timetable.h"
-#include "TimetableRow.h"
+
 #include "CalendarTemplate.h"
-#include "Env.h"
+#include "Request.h"
+#include "TimetableRow.h"
 
 using namespace std;
 using namespace boost;
@@ -33,6 +34,10 @@ namespace synthese
 	using namespace util;
 	using namespace calendar;
 	using namespace pt;
+	using namespace server;
+	using namespace timetables;
+
+	FIELD_DEFINITION_OF_OBJECT(Timetable, "timetable_id", "timetable_ids")
 
 	namespace util
 	{
@@ -41,14 +46,21 @@ namespace synthese
 
 	namespace timetables
 	{
-		Timetable::Timetable(RegistryKeyType id)
-		:	Registrable(id),
+		const std::string Timetable::DATA_GENERATOR_TYPE("generator_type");
+		const std::string Timetable::DATA_TITLE("title");
+		const std::string Timetable::DATA_CALENDAR_NAME("calendar_name");
+
+
+
+		Timetable::Timetable(
+			RegistryKeyType id
+		):	Registrable(id),
 			_bookId(0),
 			_baseCalendar(NULL),
 			_transferTimetableBefore(NULL),
-			_transferTimetableAfter(NULL)
-		{
-		}
+			_transferTimetableAfter(NULL),
+			_ignoreEmptyRows(false)
+		{}
 
 
 
@@ -60,9 +72,13 @@ namespace synthese
 
 
 
-		const Timetable::Rows& Timetable::getRows() const
+		bool Timetable::isGenerable() const
 		{
-			return _rows;
+			return
+				_contentType == CONTAINER ||
+				getBaseCalendar() != NULL &&
+				getBaseCalendar()->isLimited()
+			;
 		}
 
 
@@ -79,7 +95,15 @@ namespace synthese
 			auto_ptr<TimetableGenerator> g(new TimetableGenerator(env));
 			if(_contentType != CONTAINER)
 			{
-				g->setRows(_rows);
+				// New rows definition
+				if(!_rowGroups.empty())
+				{
+					g->setRowGroups(_rowGroups);
+				}
+				else // Old rows definition
+				{
+					g->setRows(_rows);
+				}
 				g->setBaseCalendar(mask ? *mask : _baseCalendar->getResult());
 				g->setAuthorizedLines(_authorizedLines);
 				g->setAuthorizedPhysicalStops(_authorizedPhysicalStops);
@@ -95,17 +119,6 @@ namespace synthese
 				}
 			}
 			return g;
-		}
-
-
-
-		bool Timetable::isGenerable() const
-		{
-			return
-				_contentType == CONTAINER ||
-				getBaseCalendar() != NULL &&
-				getBaseCalendar()->isLimited()
-			;
 		}
 
 
@@ -286,10 +299,59 @@ namespace synthese
 
 
 
+		void Timetable::removeRowGroup( TimetableRowGroup& rowGroup )
+		{
+			_rowGroups.erase(&rowGroup);
+		}
+
+
+
 		Timetable::ImpossibleGenerationException::ImpossibleGenerationException():
 		synthese::Exception("Timetable generation is impossible.")
 		{
 
 		}
-	}
-}
+
+
+
+		void Timetable::addRowGroup( TimetableRowGroup& rowGroup )
+		{
+			_rowGroups.insert(&rowGroup);
+		}
+
+
+
+		void Timetable::toParametersMap(
+			util::ParametersMap& pm
+		) const	{
+			// Common parameters
+			pm.insert(DATA_GENERATOR_TYPE, GetTimetableTypeCode(getContentType()));
+			pm.insert(DATA_TITLE, getTitle());
+			pm.insert(Request::PARAMETER_OBJECT_ID, getKey());
+			
+			// Base calendar
+			if(getBaseCalendar())
+			{
+				pm.insert(DATA_CALENDAR_NAME, getBaseCalendar()->getName());
+			}
+		}
+
+
+
+		std::string Timetable::GetTimetableTypeCode(
+			Timetable::ContentType value
+		){
+			switch(value)
+			{
+			case Timetable::CONTAINER: return "container";
+			case Timetable::CALENDAR: return "calendar";
+			case Timetable::LINE_SCHEMA: return "line_schema";
+			case Timetable::TABLE_SERVICES_IN_COLS: return "services_in_cols";
+			case Timetable::TABLE_SERVICES_IN_ROWS: return "services_in_rows";
+			case Timetable::TIMES_IN_COLS: return "times_in_cols";
+			case Timetable::TIMES_IN_ROWS: return "times_in_rows";
+			}
+			assert(false);
+			return string();
+		}
+}	}
