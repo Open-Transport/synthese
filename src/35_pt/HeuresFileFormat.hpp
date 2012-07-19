@@ -52,6 +52,11 @@ namespace synthese
 		class City;
 	}
 
+	namespace tree
+	{
+		class TreeFolder;
+	}
+
 	namespace pt
 	{
 		class Destination;
@@ -96,7 +101,7 @@ namespace synthese
 			private:
 
 				bool _displayLinkedStops;
-				boost::shared_ptr<const TransportNetwork> _network;
+				boost::shared_ptr<TransportNetwork> _network;
 				boost::shared_ptr<const calendar::CalendarTemplate> _day7CalendarTemplate;
 				boost::shared_ptr<const impex::DataSource> _stopsDataSource;
 
@@ -172,6 +177,7 @@ namespace synthese
 			{
 			private:
 				boost::shared_ptr<const pt::TransportNetwork> _network;
+				boost::shared_ptr<tree::TreeFolder> _folder;
 				boost::shared_ptr<const impex::DataSource> _dataSource;
 
 			public:

@@ -421,7 +421,7 @@ namespace synthese
 					// Network
 					string networkId(_getValue("agency_id"));
 					string id(_getValue("route_id"));
-					const TransportNetwork* network;
+					TransportNetwork* network(NULL);
 					if(_networks.contains(networkId))
 					{
 						network = *_networks.get(networkId).begin();
