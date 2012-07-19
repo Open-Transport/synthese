@@ -287,15 +287,15 @@ namespace synthese
 						assert(itEdge.second);
 						const Edge& edge(*itEdge.second);
 
-						// Check if the edge is authorized for the user class
-						if(!edge.isCompatibleWith(_accessParameters))
-						{
-							continue;
-						}
-
 						// If we are on a road journey planning
 						if(_graphToUse == RoadModule::GRAPH_ID)
 						{
+							// Check if the edge is authorized for the user class
+							if(!edge.isCompatibleWith(_accessParameters))
+							{
+								continue;
+							}
+
 							// Specific car user class verification (turn restriction)
 							if(_accessParameters.getUserClass() == USER_CAR)
 							{
