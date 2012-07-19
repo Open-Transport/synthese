@@ -24,6 +24,7 @@
 #define SYNTHESE__RecordMacros_hpp__
 
 #define FIELD_TYPE(N, T) struct N : public ObjectField<N, T> {};
+#define FIELD_ENUM(N, T) struct N : public EnumObjectField<N, T> {};
 #define FIELD_TYPE_EXTERNAL_DATA(N) struct N : public ObjectField<N, void*> {};
 #define FIELD_COMPLEX_TYPE(N, T) struct N : public ComplexObjectField<N, T> {};
 #define FIELD_COMPLEX_TYPE_EXTERNAL_DATA(N) struct N : public ComplexObjectField<N, void*> {};

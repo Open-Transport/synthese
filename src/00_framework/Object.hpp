@@ -113,13 +113,6 @@ namespace synthese
 		/// @return the list of all fields defined by the schema
 		virtual FieldsList getFields() const;
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Auto generated object vector field
-		class Vector:
-			public ObjectField<Vector, std::vector<ObjectClass_*> >
-		{
-		};
-
 	private:
 		struct LoadOperator;
 		struct SaveOperator;

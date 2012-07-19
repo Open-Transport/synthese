@@ -95,6 +95,87 @@ namespace synthese
 		);
 	};
 
+
+	//////////////////////////////////////////////////////////////////////////
+	/// Enum specialization
+	template<class C, typename P>
+	class EnumObjectField:
+		public SimpleObjectFieldDefinition<C>
+	{
+	public:
+		typedef P Type;
+
+		static void LoadFromRecord(P& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
+		{
+			if(record.isDefined(FIELD.name))
+			{
+				fieldObject = static_cast<P>(record.get<int>(FIELD.name));
+			}
+		}
+
+
+
+		static std::string Serialize(
+			const P& fieldObject,
+			util::ParametersMap::SerializationFormat format
+		){
+			return boost::lexical_cast<std::string>(static_cast<int>(fieldObject));
+		}
+
+
+
+		static void SaveToParametersMap(
+			const P& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			map.insert(
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const P& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix
+		){
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const P& fieldObject,
+			util::ParametersMap& map
+		){
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const P& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map
+		){
+			SaveToParametersMap(fieldObject, map);
+		}
+
+
+
+		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
+		{
+		}
+	};
+
+
 	// Implementations ///////////////////////////////////////////////////////////////////////
 
 
