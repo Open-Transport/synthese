@@ -208,7 +208,7 @@ namespace synthese
 				// Folder creation form
 				stream << l.element("folder");
 				stream << f.getImageSubmitButton("add.png", "Ajouter");
-				stream << f.getTextInput(db::ObjectCreateAction::GetInputName<Name>(), string(), "(Entrez le nom du répertoire ici)");
+				stream << f.getTextInput(db::ObjectCreateAction::GetInputName<Name>(), std::string(), "(Entrez le nom du répertoire ici)");
 
 				// Form and list footer
 				stream << l.close() << f.close();
@@ -254,7 +254,7 @@ namespace synthese
 				}
 
 				// Update form request
-				typename AdminActionFunctionRequest<db::ObjectUpdateAction, AdminPageType> updateFolderRequest(request);
+				typename admin::AdminActionFunctionRequest<db::ObjectUpdateAction, AdminPageType> updateFolderRequest(request);
 				updateFolderRequest.getAction()->setObject(folder);
 
 				// The form
@@ -266,7 +266,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						db::ObjectUpdateAction::GetInputName<Parent>(),
 						folder._getRoot()->getSubFoldersLabels(),
-						boost::optional<RegistryKeyType>(folder._getParent()->getKey())
+						boost::optional<util::RegistryKeyType>(folder._getParent()->getKey())
 				)	);
 				stream << t.close();
 			}
