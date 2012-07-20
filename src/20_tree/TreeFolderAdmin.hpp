@@ -73,9 +73,9 @@ namespace synthese
 			/// Getters
 			//@{
 				const TreeFolder* getFolder() const { return dynamic_cast<const TreeFolder*>(_node); }
-				const RootType* getRoot() const { return dynamic_cast<const RootType*>(_node); }
+				const typename RootType* getRoot() const { return dynamic_cast<const typename RootType*>(_node); }
 				const TreeFolderUpNode* getNode() const { return _node; }
-				const RootType* getNodeRoot() const { return getRoot() ? getRoot() : getFolder()->getCastRoot<const RootType>(); }
+				const typename RootType* getNodeRoot() const { return getRoot() ? getRoot() : getFolder()->getCastRoot<const typename RootType>(); }
 			//@}
 
 
@@ -110,7 +110,7 @@ namespace synthese
 							util::Env::GetOfficialEnv().get<TreeFolder>(id).get()
 						);
 					}
-					catch(ObjectNotFoundException<TreeFolder>& e)
+					catch(util::ObjectNotFoundException<TreeFolder>& e)
 					{
 						throw AdminParametersException(e.getMessage());
 					}
@@ -123,7 +123,7 @@ namespace synthese
 							util::Env::GetOfficialEnv().get<RootType>(id).get()
 						);
 					}
-					catch(ObjectNotFoundException<RootType>& e)
+					catch(util::ObjectNotFoundException<RootType>& e)
 					{
 						throw AdminParametersException(e.getMessage());
 					}
@@ -150,8 +150,8 @@ namespace synthese
 				admin::AdminFunctionRequest<AdminPageType> goFolderRequest(request);
 
 				// Sub-folder creation request
-				admin::AdminActionFunctionRequest<db::ObjectCreateAction, AdminPageType> addFolderRequest(request);
-				addFolderRequest.getFunction()->setActionFailedPage<AdminPageType>();
+				admin::AdminActionFunctionRequest<db::ObjectCreateAction, typename AdminPageType> addFolderRequest(request);
+				addFolderRequest.getFunction()->setActionFailedPage<typename AdminPageType>();
 				addFolderRequest.getAction()->set<Parent>(const_cast<TreeFolderUpNode*>(_node));
 				addFolderRequest.getAction()->setTable<TreeFolder>();
 				addFolderRequest.setActionWillCreateObject();
@@ -208,7 +208,7 @@ namespace synthese
 				// Folder creation form
 				stream << l.element("folder");
 				stream << f.getImageSubmitButton("add.png", "Ajouter");
-				stream << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(Entrez le nom du répertoire ici)");
+				stream << f.getTextInput(db::ObjectCreateAction::GetInputName<Name>(), string(), "(Entrez le nom du répertoire ici)");
 
 				// Form and list footer
 				stream << l.close() << f.close();
@@ -244,7 +244,7 @@ namespace synthese
 
 					stream <<
 						"<p>" <<
-						HTMLModule::getLinkButton(
+						html::HTMLModule::getLinkButton(
 							removeFolderRequest.getURL(),
 							"Supprimer",
 							"Etes-vous sûr de vouloir supprimer le répertoire "+ folder.getName() +" ?",
@@ -254,7 +254,7 @@ namespace synthese
 				}
 
 				// Update form request
-				AdminActionFunctionRequest<db::ObjectUpdateAction, AdminPageType> updateFolderRequest(request);
+				AdminActionFunctionRequest<db::ObjectUpdateAction, typename AdminPageType> updateFolderRequest(request);
 				updateFolderRequest.getAction()->setObject(folder);
 
 				// The form
@@ -266,7 +266,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						db::ObjectUpdateAction::GetInputName<Parent>(),
 						folder._getRoot()->getSubFoldersLabels(),
-						optional<RegistryKeyType>(folder._getParent()->getKey())
+						boost::optional<RegistryKeyType>(folder._getParent()->getKey())
 				)	);
 				stream << t.close();
 			}
