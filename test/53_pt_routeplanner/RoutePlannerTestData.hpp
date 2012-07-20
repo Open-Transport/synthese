@@ -561,7 +561,7 @@ SAVE(RollingStock, rs57);
 // JourneyPattern 92
 
 CommercialLine cl92(11821949021891592ULL);
-cl92.setNetwork(&n34);
+cl92.setParent(n34);
 cl92.setShortName("92");
 cl92.setStyle("vertfonce");
 {
@@ -680,7 +680,7 @@ SAVE(JourneyPattern, li92);
 // JourneyPattern 93
 
 CommercialLine cl93(11821949021891593ULL);
-cl93.setNetwork(&n34);
+cl93.setParent(n34);
 cl93.setShortName("93");
 cl93.setStyle("bleuclair");
 {
@@ -777,7 +777,7 @@ SAVE(JourneyPattern, li93);
 // JourneyPattern 94
 
 CommercialLine cl94(11821949021891594ULL);
-cl94.setNetwork(&n34);
+cl94.setParent(n34);
 cl94.setShortName("94");
 cl94.setStyle("orange");
 {
@@ -878,7 +878,7 @@ SAVE(JourneyPattern, li94);
 // JourneyPattern 95
 
 CommercialLine cl95(11821949021891595ULL);
-cl95.setNetwork(&n34);
+cl95.setParent(n34);
 cl95.setShortName("95");
 cl95.setStyle("rouge");
 {
@@ -939,7 +939,7 @@ SAVE(JourneyPattern, li95);
 // JourneyPattern 96
 
 CommercialLine cl96(11821949021891596ULL);
-cl96.setNetwork(&n34);
+cl96.setParent(n34);
 cl96.setShortName("96");
 cl96.setStyle("jaune");
 {
@@ -1000,7 +1000,7 @@ SAVE(JourneyPattern, li96);
 // JourneyPattern 97
 
 CommercialLine cl97(11821949021891597ULL);
-cl97.setNetwork(&n34);
+cl97.setParent(n34);
 cl97.setShortName("97");
 cl97.setStyle("rose");
 {
@@ -1046,7 +1046,7 @@ SAVE(JourneyPattern, li97);
 // JourneyPattern 98
 
 CommercialLine cl98(11821949021891598ULL);
-cl98.setNetwork(&n34);
+cl98.setParent(n34);
 cl98.setShortName("98");
 cl98.setStyle("vertclair");
 {
