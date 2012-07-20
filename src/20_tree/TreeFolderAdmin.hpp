@@ -76,7 +76,7 @@ namespace synthese
 				const TreeFolder* getFolder() const { return dynamic_cast<const TreeFolder*>(_node); }
 				const RootType* getRoot() const { return dynamic_cast<const RootType*>(_node); }
 				const TreeFolderUpNode* getNode() const { return _node; }
-				const RootType* getNodeRoot() const { return getRoot() ? getRoot() : getFolder()->getCastRoot<const RootType>(); }
+				const RootType* getNodeRoot() const { return getRoot() ? getRoot() : dynamic_cast<const RootType*>(getFolder()->_getRoot()); }
 			//@}
 
 
@@ -152,7 +152,7 @@ namespace synthese
 
 				// Sub-folder creation request
 				typename admin::AdminActionFunctionRequest<db::ObjectCreateAction, AdminPageType> addFolderRequest(request);
-				addFolderRequest.getFunction()->setActionFailedPage<typename AdminPageType>();
+				//addFolderRequest.getFunction()->setActionFailedPage<AdminPageType>();
 				addFolderRequest.getAction()->set<Parent>(const_cast<TreeFolderUpNode*>(_node));
 				addFolderRequest.getAction()->setTable<TreeFolder>();
 				addFolderRequest.setActionWillCreateObject();
