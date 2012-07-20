@@ -107,9 +107,9 @@ namespace synthese
 
 		static void LoadFromRecord(P& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
-			if(record.isDefined(FIELD.name))
+			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
-				fieldObject = static_cast<P>(record.get<int>(FIELD.name));
+				fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
 			}
 		}
 
