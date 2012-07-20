@@ -150,8 +150,8 @@ namespace synthese
 				admin::AdminFunctionRequest<AdminPageType> goFolderRequest(request);
 
 				// Sub-folder creation request
-				admin::AdminActionFunctionRequest<db::ObjectCreateAction, typename AdminPageType> addFolderRequest(request);
-				addFolderRequest.getFunction()->setActionFailedPage<typename AdminPageType>();
+				typename admin::AdminActionFunctionRequest<db::ObjectCreateAction, AdminPageType> addFolderRequest(request);
+				addFolderRequest.getFunction()->setActionFailedPage<AdminPageType>();
 				addFolderRequest.getAction()->set<Parent>(const_cast<TreeFolderUpNode*>(_node));
 				addFolderRequest.getAction()->setTable<TreeFolder>();
 				addFolderRequest.setActionWillCreateObject();
