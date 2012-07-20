@@ -37,7 +37,6 @@
 #include "PTModule.h"
 #include "PTNetworksAdmin.h"
 #include "RemoveObjectAction.hpp"
-#include "TransportNetwork.h"
 #include "TransportNetworkRight.h"
 #include "TreeFolder.hpp"
 #include "ScheduledService.h"

@@ -27,6 +27,7 @@
 
 #include "AdminInterfaceElementTemplate.h"
 #include "TreeFolderAdmin.hpp"
+#include "TransportNetwork.h"
 
 #include "ResultHTMLTable.h"
 #include "StaticActionRequest.h"
@@ -40,7 +41,6 @@ namespace synthese
 
 	namespace pt
 	{
-		class TransportNetwork;
 		class CommercialLineAddAction;
 
 		//////////////////////////////////////////////////////////////////////////
