@@ -195,6 +195,9 @@ namespace synthese
 			// Ignore past dates
 			_ignorePastDates = map.getOptional<bool>(PARAMETER_IGNORE_PAST_DATES);
 
+			// Wayback filter
+			_waybackFilter = map.getOptional<bool>(PARAMETER_WAYBACK_FILTER);
+
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
 			{
@@ -391,8 +394,6 @@ namespace synthese
 					{
 						throw RequestException("No such line");
 					}
-
-					_waybackFilter = map.getOptional<bool>(PARAMETER_WAYBACK_FILTER);
 
 					if(_waybackFilter)
 					{ // Way 5 : line and wayback
