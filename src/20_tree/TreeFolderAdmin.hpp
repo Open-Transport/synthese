@@ -254,7 +254,7 @@ namespace synthese
 				}
 
 				// Update form request
-				AdminActionFunctionRequest<db::ObjectUpdateAction, typename AdminPageType> updateFolderRequest(request);
+				typename AdminActionFunctionRequest<db::ObjectUpdateAction, AdminPageType> updateFolderRequest(request);
 				updateFolderRequest.getAction()->setObject(folder);
 
 				// The form
