@@ -73,9 +73,9 @@ namespace synthese
 			/// Getters
 			//@{
 				const TreeFolder* getFolder() const { return dynamic_cast<const TreeFolder*>(_node); }
-				const typename RootType* getRoot() const { return dynamic_cast<const typename RootType*>(_node); }
+				const RootType* getRoot() const { return dynamic_cast<const RootType*>(_node); }
 				const TreeFolderUpNode* getNode() const { return _node; }
-				const typename RootType* getNodeRoot() const { return getRoot() ? getRoot() : getFolder()->getCastRoot<const typename RootType>(); }
+				const RootType* getNodeRoot() const { return getRoot() ? getRoot() : getFolder()->getCastRoot<const RootType>(); }
 			//@}
 
 
@@ -112,7 +112,7 @@ namespace synthese
 					}
 					catch(util::ObjectNotFoundException<TreeFolder>& e)
 					{
-						throw AdminParametersException(e.getMessage());
+						throw admin::AdminParametersException(e.getMessage());
 					}
 				}
 				else
@@ -125,7 +125,7 @@ namespace synthese
 					}
 					catch(util::ObjectNotFoundException<RootType>& e)
 					{
-						throw AdminParametersException(e.getMessage());
+						throw admin::AdminParametersException(e.getMessage());
 					}
 				}
 			}
