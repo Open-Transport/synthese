@@ -34,6 +34,7 @@
 #include "PropertiesHTMLTable.h"
 #include "RemoveObjectAction.hpp"
 #include "TreeFolder.hpp"
+#include "TreeFolderRoot.hpp"
 
 namespace synthese
 {
