@@ -530,6 +530,10 @@ namespace synthese
 							) :
 							optional<Calendar>()
 				)	)	);
+				if(_waybackFilter)
+				{
+					generator->setWaybackFilter(_waybackFilter);
+				}
 
 				// Timetable build
 				TimetableResult result(generator->build(true, _warnings));
