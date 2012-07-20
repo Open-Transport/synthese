@@ -338,6 +338,7 @@ target_link_libraries(35_pt
   16_impex
   17_messages
   18_graph
+  20_tree
   31_calendar
   32_geography
   33_algorithm
