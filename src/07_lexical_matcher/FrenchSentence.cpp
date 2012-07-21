@@ -184,94 +184,99 @@ namespace synthese
 		FrenchSentence::ComparisonScore FrenchSentence::compare(
 			const FrenchSentence& s
 		) const {
-			typedef map<size_t, pair<size_t, double> > Relations;
 
-			Relations othersToThis;
-			Relations thisToOthers;
+			double totalScores(0);
 
-			vector<string> lowerJ;
-			for(size_t j(0); j<s._words.size(); ++j)
+			if(!s.getPhoneticString().empty())
 			{
-				lowerJ.push_back(s._words[j].getPlainLowerSource());
-			}
+				typedef map<size_t, pair<size_t, double> > Relations;
 
-			// Storage of scores by words
-			for(size_t i(0); i<_words.size(); ++i)
-			{
-				if(_words[i].getPhonetic().empty()) continue;
+				Relations othersToThis;
+				Relations thisToOthers;
 
-				double bestScore(0);
-				size_t bestIndex = 0;
-
+				vector<string> lowerJ;
 				for(size_t j(0); j<s._words.size(); ++j)
 				{
-					if(s._words[j].getPhonetic().empty()) continue;
+					lowerJ.push_back(s._words[j].getPlainLowerSource());
+				}
 
-					FrenchPhoneticString::LevenshteinDistance distance(
-						_words[i].levenshtein(s._words[j])
-					);
-					double score(
-						1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
-					);
+				// Storage of scores by words
+				for(size_t i(0); i<_words.size(); ++i)
+				{
+					if(_words[i].getPhonetic().empty()) continue;
 
-					assert(score >= 0 && score <= 1);
+					double bestScore(0);
+					size_t bestIndex = 0;
 
-					//Add StartWith Bonus
-					if(score > 0 && _words[i].startsWith(s._words[j]))
+					for(size_t j(0); j<s._words.size(); ++j)
 					{
-						score += (1 - score) * score;
-					}
-					if(FrenchPhoneticString::startsWithExact(lowerJ[j], _words[i].getPlainLowerSource()))
-					{
-						double minScore = 0.1 * lowerJ[j].size();
-						if(0.9 < minScore)
-							minScore = 0.9;
-						if(score < minScore)
-							score = minScore;
-					}
+						if(s._words[j].getPhonetic().empty()) continue;
 
-					if(score > bestScore)
-					{
-						if(	othersToThis.find(j) == othersToThis.end() ||
-							othersToThis[j].second < score
-						)
+						FrenchPhoneticString::LevenshteinDistance distance(
+							_words[i].levenshtein(s._words[j])
+						);
+						double score(
+							1 - static_cast<double>(distance) / static_cast<double>(distance > s._words[j].getPhonetic().size() ? distance : s._words[j].getPhonetic().size())
+						);
+
+						assert(score >= 0 && score <= 1);
+
+						//Add StartWith Bonus
+						if(score > 0 && _words[i].startsWith(s._words[j]))
 						{
-							bestScore = score;
-							bestIndex = j;
+							score += (1 - score) * score;
+						}
+						if(FrenchPhoneticString::startsWithExact(lowerJ[j], _words[i].getPlainLowerSource()))
+						{
+							double minScore = 0.1 * lowerJ[j].size();
+							if(0.9 < minScore)
+								minScore = 0.9;
+							if(score < minScore)
+								score = minScore;
+						}
+
+						if(score > bestScore)
+						{
+							if(	othersToThis.find(j) == othersToThis.end() ||
+								othersToThis[j].second < score
+							)
+							{
+								bestScore = score;
+								bestIndex = j;
+							}
 						}
 					}
+					if(	bestScore > 0 )
+						othersToThis[bestIndex] = make_pair(i, bestScore);
 				}
-				if(	bestScore > 0 )
-					othersToThis[bestIndex] = make_pair(i, bestScore);
-			}
 
 
-			// Average score
-			double totalScores(0);
-			for(size_t j(0); j<s._words.size(); ++j)
-			{
-				if(	othersToThis.find(j) != othersToThis.end()
-				){
-					totalScores += othersToThis[j].second;
-				}
-			}
-			totalScores /= s._words.size();
-
-			// Order
-			size_t lastIndex(_words.size());
-			size_t penalties(0);
-			BOOST_FOREACH(Relations::value_type s, othersToThis)
-			{
-				if(	lastIndex != _words.size() &&
-					s.second.first < lastIndex)
+				// Average score
+				for(size_t j(0); j<s._words.size(); ++j)
 				{
-					++penalties;
+					if(	othersToThis.find(j) != othersToThis.end()
+					){
+						totalScores += othersToThis[j].second;
+					}
 				}
-				lastIndex = s.second.first;
-			}
-			if(penalties)
-			{
-				totalScores /= (1 + 0.25 * penalties);
+				totalScores /= s._words.size();
+
+				// Order
+				size_t lastIndex(_words.size());
+				size_t penalties(0);
+				BOOST_FOREACH(Relations::value_type s, othersToThis)
+				{
+					if(	lastIndex != _words.size() &&
+						s.second.first < lastIndex)
+					{
+						++penalties;
+					}
+					lastIndex = s.second.first;
+				}
+				if(penalties)
+				{
+					totalScores /= (1 + 0.25 * penalties);
+				}
 			}
 
 			ComparisonScore score;
