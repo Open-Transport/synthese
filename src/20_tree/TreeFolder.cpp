@@ -30,7 +30,7 @@ namespace synthese
 	using namespace tree;
 	
 
-	CLASS_DEFINITION(TreeFolder, "t089_tree_folders", 89)
+	CLASS_DEFINITION(TreeFolder, "t092_tree_folders", 92)
 
 
 	namespace tree
