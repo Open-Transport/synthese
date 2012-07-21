@@ -63,7 +63,7 @@ namespace synthese
 			// Adds the current item to the labels list
 			if(dynamic_cast<const TreeFolder*>(this))
 			{
-				labels.push_back(make_pair(getKey(), prefix + dynamic_cast<const TreeFolder*>(this)->getName()));
+				labels.push_back(make_pair(getKey(), prefix + dynamic_cast<const TreeFolder*>(this)->get<Name>()));
 			}
 			else
 			{
@@ -74,8 +74,9 @@ namespace synthese
 			string fullPrefix(prefix);
 			if(dynamic_cast<const TreeFolder*>(this))
 			{
-				fullPrefix += dynamic_cast<const TreeFolder*>(this)->getName() + "/";
+				fullPrefix += dynamic_cast<const TreeFolder*>(this)->get<Name>();
 			}
+			fullPrefix += "/";
 
 			// Recursion
 			BOOST_FOREACH(TreeFolder* folder, getSubFolders())
