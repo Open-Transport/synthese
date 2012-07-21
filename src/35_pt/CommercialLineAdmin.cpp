@@ -473,23 +473,22 @@ namespace synthese
 			// TAB PROPERTIES
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
-				stream << "<h1>Propriétés</h1>";
-
+				// The update request
 				AdminActionFunctionRequest<CommercialLineUpdateAction,CommercialLineAdmin> updateRequest(_request);
 				updateRequest.getAction()->setLine(const_pointer_cast<CommercialLine>(_cline));
 
+				stream << "<h1>Propriétés</h1>";
+
+				// Main properties update form
 				PropertiesHTMLTable t(updateRequest.getHTMLForm());
 				stream << t.open();
-				stream << t.title("Réseau");
+				stream << t.cell("Réseau", _cline->getNetwork()->getName());
 				stream << t.cell(
-					"Réseau",
-					t.getForm().getTextInputAutoCompleteFromTableSync(
+					"Parent",
+					t.getForm().getSelectInput(
 						CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
-						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string(),
-						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getName()) : string(),
-						lexical_cast<string>(TransportNetworkTableSync::TABLE.ID),
-						string(),string(),
-						false, true, true, true
+						_cline->getNetwork()->getSubFoldersLabels(),
+						boost::optional<util::RegistryKeyType>(_cline->getNetwork()->getKey())
 				)	);
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
@@ -513,6 +512,23 @@ namespace synthese
 				ImportableAdmin::DisplayDataSourcesTab(stream, *_cline, updateOnlyRequest);
 
 				PTRuleUserAdmin<CommercialLine,CommercialLineAdmin>::Display(stream, _cline, _request);
+
+				stream << "<h1>Changement de réseau</h1>";
+
+				PropertiesHTMLTable t1(updateRequest.getHTMLForm());
+				stream << t1.open();
+				stream << t1.title("Réseau");
+				stream << t1.cell(
+					"Réseau",
+					t1.getForm().getTextInputAutoCompleteFromTableSync(
+						CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
+						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getKey()) : string(),
+						_cline->getNetwork() ? lexical_cast<string>(_cline->getNetwork()->getName()) : string(),
+						lexical_cast<string>(TransportNetworkTableSync::TABLE.ID),
+						string(),string(),
+						false, true, true, true
+				)	);
+				stream << t1.close();
 			}
 
 			////////////////////////////////////////////////////////////////////
