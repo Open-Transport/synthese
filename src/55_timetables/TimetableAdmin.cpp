@@ -523,7 +523,7 @@ namespace synthese
 						c.push_back("Tri");
 						c.push_back(string());
 						c.push_back(string());
-						HTMLTable t(c);
+						HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 						stream << t.open();
 
 						// Loop on row groups
@@ -669,7 +669,6 @@ namespace synthese
 								stream << t.col();
 								removeRequest.getAction()->setObjectId(item->get<Key>());
 								stream << HTMLModule::getLinkButton(removeRequest.getURL(), "Supprimer", "Etes-vous sûr de vouloir supprimer le groupe ?");
-								stream << "Supprimer";
 							}
 
 							//////////////////////////////////////////////////////////////////////////
