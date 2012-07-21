@@ -50,7 +50,7 @@ namespace synthese
 	namespace db
 	{
 		template<> const DBTableSync::Format DBTableSyncTemplate<TreeFolderTableSync>::TABLE(
-			"t089_tree_folders"
+			"t092_tree_folders"
 		);
 
 		template<> const Field DBTableSyncTemplate<TreeFolderTableSync>::_FIELDS[] = { Field() }; // Defined by the record
