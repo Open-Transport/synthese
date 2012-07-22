@@ -26,6 +26,9 @@
 #include "Factory.h"
 #include "Function.h"
 #include "ComplexObjectField.hpp"
+
+#include "WebpageContentNode.hpp"
+
 #include "shared_recursive_mutex.hpp"
 
 #include <ostream>
@@ -57,180 +60,19 @@ namespace synthese
 			friend class ComplexObjectField<WebpageContent, WebpageContent>;
 
 		private:
-			static const std::string PARAMETER_VAR;
-			static const std::string PARAMETER_TEMPLATE;
-			static const std::string PARAMETER_EMPTY;
-			static const std::string PARAMETER_SORT_UP;
-			static const std::string PARAMETER_SORT_DOWN;
-
-			class Node
-			{
-			public:
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const = 0;
-			};
-
-			typedef std::vector<boost::shared_ptr<Node> > Nodes;
 
 		protected:
 			std::string _code;
 			bool _ignoreWhiteChars;
 
 		private:
+			typedef std::vector<boost::shared_ptr<WebpageContentNode> > Nodes;
 			mutable Nodes _nodes;
 			static synthese::util::shared_recursive_mutex _SharedMutex;
 
 			void _updateNodes();
 
-			class TextNode : public Node
-			{
-			public:
-				std::string text;
 
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class VariableUpdateNode : public Node
-			{
-			public:
-				std::string variable;
-				Nodes value;
-
-				//////////////////////////////////////////////////////////////////////////
-				/// No display : updates the additionnalParametersMap
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class ServiceNode : public Node
-			{
-			public:
-				const util::Factory<server::Function>::CreatorInterface* functionCreator;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters serviceParameters;
-				Parameters templateParameters;
-				WebpageContent::Nodes inlineTemplate;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class LabelNode : public Node
-			{
-			public:
-				std::string label;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class GotoNode : public Node
-			{
-			public:
-				Nodes direction;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class ForeachNode : public Node
-			{
-				static const std::string DATA_RANK;
-				static const std::string DATA_ITEMS_COUNT;
-
-			public:
-				std::string arrayCode;
-				Nodes pageCode;
-				Nodes inlineTemplate;
-				Nodes emptyTemplate;
-				Nodes sortUpTemplate;
-				Nodes sortDownTemplate;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters parameters;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-
-
-
-				void _displayItem(
-					std::ostream& stream,
-					const server::Request& request,
-					const Webpage& page,
-					const util::ParametersMap& baseParametersMap,
-					const util::ParametersMap& item,
-					util::ParametersMap& variables,
-					const Webpage* templatePage,
-					size_t& rank,
-					size_t itemsCount
-				) const;
-			};
-
-			class ValueNode : public Node
-			{
-			public:
-				std::string name;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
-
-			class IncludeNode : public Node
-			{
-			public:
-				std::string pageName;
-				typedef std::vector<std::pair<std::string, Nodes> > Parameters;
-				Parameters parameters;
-
-				virtual void display(
-					std::ostream& stream,
-					const server::Request& request,
-					const util::ParametersMap& additionalParametersMap,
-					const Webpage& page,
-					util::ParametersMap& variables
-				) const;
-			};
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Parses the content and put it in the nodes cache.
@@ -247,41 +89,34 @@ namespace synthese
 			/// If the level of recursion is superior than 0, then the output is encoded
 			/// as an url to avoid mistake when the result of parsing is considered as
 			/// a single parameter of a function call.
-			std::string::const_iterator _parse(
-				Nodes& nodes,
-				std::string::const_iterator it,
+			void _parse(
+				std::string::const_iterator& it,
 				std::string::const_iterator end,
 				std::set<std::string> termination
-			) const;
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Parses the content and put it in a stream.
-			/// @retval stream stream to write the result on
-			/// @param it iterator on the beginning of the string to parse
-			/// @param end iterator on the end of the string to parse
-			/// @param termination termination string to detect to interrupt the parsing
-			/// @return iterator on the end of the parsing
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			/// The parsing stops when the iterator has reached the end of the string, or if the ?> sequence has been found, indicating that the following text belongs to
-			///	a lower level of recursion.
-			/// If the level of recursion is superior than 0, then the output is encoded
-			/// as an url to avoid mistake when the result of parsing is considered as
-			/// a single parameter of a function call.
-			std::string::const_iterator _parseText(
-				std::ostream& stream,
-				std::string::const_iterator it,
-				std::string::const_iterator end,
-				std::string termination
-			) const;
+			);
 
 		public:
+			//////////////////////////////////////////////////////////////////////////
+			/// Default constructor.
 			WebpageContent();
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by entire string parsing.
 			WebpageContent(
 				const std::string& code,
 				bool ignoreWhiteChars = false
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor by string part parsing.
+			WebpageContent(
+				std::string::const_iterator& it,
+				std::string::const_iterator end,
+				std::set<std::string> termination
 			);
 
 			/// @name Getters
@@ -293,27 +128,50 @@ namespace synthese
 			/// @name Modifiers
 			//@{
 				//////////////////////////////////////////////////////////////////////////
-				/// Runs a nodes update if the valude has changed.
+				/// Runs a nodes update if the value has changed.
 				void setCode(const std::string& value);
 			//@}
 
-			//////////////////////////////////////////////////////////////////////////
-			/// Result generation.
-			/// @param stream stream to write on
-			/// @param request current request
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.16
-			void display(
-				std::ostream& stream,
-				const server::Request& request,
-				const util::ParametersMap& additionalParametersMap,
-				const Webpage& page,
-				util::ParametersMap& variables
-			) const;
+			/// @name Services
+			//@{
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the objects has at least a node to display.
+				bool empty() const { return _nodes.empty(); }
+			
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Evaluates the nodes on a stream.
+				/// @param stream stream to write on
+				/// @param request current request
+				/// @author Hugues Romain
+				/// @date 2010
+				/// @since 3.1.16
+				void display(
+					std::ostream& stream,
+					const server::Request& request,
+					const util::ParametersMap& additionalParametersMap,
+					const Webpage& page,
+					util::ParametersMap& variables
+				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Evaluates the nodes on a new string.
+				/// @param request current request
+				/// @author Hugues Romain
+				/// @date 2012
+				/// @since 3.4.0
+				std::string eval(
+					const server::Request& request,
+					const util::ParametersMap& additionalParametersMap,
+					const Webpage& page,
+					util::ParametersMap& variables
+				) const;
+			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_cms_WebpageContent_hpp__
 
