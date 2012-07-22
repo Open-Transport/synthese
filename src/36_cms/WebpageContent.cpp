@@ -133,9 +133,8 @@ namespace synthese
 		void WebpageContent::_updateNodes()
 		{
 			boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
-			set<string> emptySet;
 			string::const_iterator it(_code.begin());
-			_parse(it, _code.end(), emptySet);
+			_parse(it, _code.end(), set<string>());
 		}
 
 
