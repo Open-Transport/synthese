@@ -103,7 +103,7 @@ namespace synthese
 				{
 					stringstream parameterName;
 					++it;
-					ParseText(parameterName, it+1, end, "=");
+					ParseText(parameterName, it, end, "=");
 
 					if(it != end)
 					{
