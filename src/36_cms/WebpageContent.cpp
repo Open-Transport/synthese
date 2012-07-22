@@ -134,7 +134,8 @@ namespace synthese
 		{
 			boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
 			set<string> emptySet;
-			_parse(_code.begin(), _code.end(), emptySet);
+			string::const_iterator it(_code.begin());
+			_parse(it, _code.end(), emptySet);
 		}
 
 
