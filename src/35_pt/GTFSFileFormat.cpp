@@ -1462,38 +1462,44 @@ namespace synthese
 			}
 			// END STOPS.TXT
 
+			RollingStock * rs = NULL; 
+
 			// BEGIN ROUTES.TXT
 			BOOST_FOREACH(Registry<CommercialLine>::value_type  myLine,Env::GetOfficialEnv().getRegistry<CommercialLine>())
 			{
 				// route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
-				if((myLine.second->getPaths().begin()) != (myLine.second->getPaths().end()) && 
-					(static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+
+				if((myLine.second->getPaths().begin()) != (myLine.second->getPaths().end()))
 				{
-					string color;
-
-					if(!(myLine.second->getColor()))
+					rs = static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock();
+					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
 					{
-						color = "";
-					}
-					else
-					{
-						color = _Str(myLine.second->getColor()->toXMLColor());
+						string color;
 
-						if(color[0] == '#')
+						if(!(myLine.second->getColor()))
 						{
-							color = color.substr(1);
+							color = "";
 						}
+						else
+						{
+							color = _Str(myLine.second->getColor()->toXMLColor());
+
+							if(color[0] == '#')
+							{
+								color = color.substr(1);
+							}
+						}
+						routesTxt << _key(myLine.first) << "," //route_id
+							<< _key(myLine.second->getNetwork()->getKey()) << "," //agency_id
+							<< _Str(myLine.second->getShortName()) << "," //route_short_name
+							<< _Str(myLine.second->getLongName()) << "," //route_long_name
+							<< _Str(myLine.second->getRuleUserName()) << "," //route_desc
+							<< static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getGTFSKey() << "," //route_type
+							<< "," //route_url
+							<< (color != "" ? color : "000000") << "," //route_color
+							<< "FFFFFF" //route_text_color
+							<< endl;
 					}
-					routesTxt << _key(myLine.first) << "," //route_id
-						<< _key(myLine.second->getNetwork()->getKey()) << "," //agency_id
-						<< _Str(myLine.second->getShortName()) << "," //route_short_name
-						<< _Str(myLine.second->getLongName()) << "," //route_long_name
-						<< _Str(myLine.second->getRuleUserName()) << "," //route_desc
-						<< static_cast<const JourneyPattern *>(*myLine.second->getPaths().begin())->getRollingStock()->getGTFSKey() << "," //route_type
-						<< "," //route_url
-						<< (color != "" ? color : "000000") << "," //route_color
-						<< "FFFFFF" //route_text_color
-						<< endl;
 				}
 			}
 
@@ -1509,7 +1515,9 @@ namespace synthese
 
 				if(sdService)
 				{
-					if((static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+					rs = static_cast<const JourneyPattern *>(sdService->getPath())->getRollingStock();
+
+					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
 					{
 						_filesProvider(sdService,
 							stopTimesTxt,
@@ -1539,7 +1547,9 @@ namespace synthese
 
 				if(csService)
 				{
-					if((static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock()->getIndicator()).find(LABEL_TAD)==string::npos)
+					rs = static_cast<const JourneyPattern *>(csService->getPath())->getRollingStock();
+
+					if((rs != NULL) && (rs->getIndicator()).find(LABEL_TAD) == string::npos)
 					{
 						_filesProvider(csService,
 							stopTimesTxt,
