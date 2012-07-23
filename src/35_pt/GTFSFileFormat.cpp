@@ -966,7 +966,7 @@ namespace synthese
 			RegistryKeyType gtfsKey;
 			gtfsKey = 0;
 			if(suffix)
-				gtfsKey = suffix << 32;
+				gtfsKey = suffix << 48;
 			gtfsKey |= key & (RegistryKeyType)0xFFFFFFFF;
 			return gtfsKey;
 		}
