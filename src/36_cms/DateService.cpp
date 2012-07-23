@@ -157,6 +157,7 @@ namespace synthese
 			}
 			else
 			{
+				// Not new char(100), basic mistake !
 				char* str_date = new char[100];
 				const tm tm_time = to_tm(final_time);
 				if(strftime(str_date, 100, _strftimeFormat.c_str(), &tm_time))
