@@ -737,7 +737,7 @@ namespace synthese
 
 		string StopPointsListFunction::getOutputMimeType() const
 		{
-			return _page.get() ? _page->getMimeType() : "text/xml";
+			return _page.get() ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 
 
