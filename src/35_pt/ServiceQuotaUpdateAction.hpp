@@ -57,12 +57,14 @@ namespace synthese
 			static const std::string PARAMETER_SERVICE_ID;
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_QUOTA;
+			static const std::string PARAMETER_NB_QUOTAS;
 
 		private:
 			boost::shared_ptr<ScheduledService> _service;
 			boost::shared_ptr<ServiceQuota> _serviceQuota;
-			boost::gregorian::date _date;
-			int _quota;
+			int _nbQuotas;
+			std::map<boost::gregorian::date, int> _quotas;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
