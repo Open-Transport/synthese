@@ -34,6 +34,7 @@
 #include "ScheduledServiceTableSync.h"
 
 using namespace std;
+using namespace boost;
 using namespace boost::gregorian;
 
 namespace synthese
@@ -52,6 +53,7 @@ namespace synthese
 		const string ServiceQuotaUpdateAction::PARAMETER_SERVICE_ID = Action_PARAMETER_PREFIX + "service_id";
 		const string ServiceQuotaUpdateAction::PARAMETER_DATE = Action_PARAMETER_PREFIX + "date";
 		const string ServiceQuotaUpdateAction::PARAMETER_QUOTA = Action_PARAMETER_PREFIX + "quota";
+		const string ServiceQuotaUpdateAction::PARAMETER_NB_QUOTAS = Action_PARAMETER_PREFIX + "nb_quotas";
 
 
 		ParametersMap ServiceQuotaUpdateAction::getParametersMap() const
@@ -96,18 +98,27 @@ namespace synthese
 				_serviceQuota->set<Service>(*_service);
 			}
 
-			// Date
-			if(map.getDefault<string>(PARAMETER_DATE).empty())
-			{
-				throw RequestException("No date parameter");
-			}
-			else
-			{
-				_date = from_simple_string(map.get<string>(PARAMETER_DATE));
-			}
+			_nbQuotas = map.getDefault<int>(PARAMETER_NB_QUOTAS, 0);
 
-			// Quota
-			_quota = map.getDefault<int>(PARAMETER_QUOTA, 0);
+			for(int i = 1; i < _nbQuotas + 1; ++i)
+			{
+				boost::gregorian::date date;
+				int quota;
+				// Date
+				if(map.getDefault<string>(PARAMETER_DATE + lexical_cast<string>(i)).empty())
+				{
+					throw RequestException("No date parameter");
+				}
+				else
+				{
+					date = from_simple_string(map.get<string>(PARAMETER_DATE + lexical_cast<string>(i)));
+				}
+
+				// Quota
+				quota = map.getDefault<int>((PARAMETER_QUOTA + lexical_cast<string>(i)), 0);
+
+				_quotas.insert(pair<boost::gregorian::date,int>(date,quota));
+			}
 		}
 
 
@@ -115,7 +126,10 @@ namespace synthese
 		void ServiceQuotaUpdateAction::run(
 			Request& request
 		){
-			_serviceQuota->get<Quotas>()[_date] = _quota;
+			BOOST_FOREACH(const QuotasMap::value_type& quota, _quotas)
+			{
+				_serviceQuota->get<Quotas>()[quota.first] = quota.second;
+			}
 
 			ServiceQuotaTableSync::Save(_serviceQuota.get());
 		}
