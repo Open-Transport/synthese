@@ -36,4 +36,15 @@ namespace synthese
 			terminations.insert("%>");
 			_direction = WebpageContent(it, end, terminations);
 		}
+
+
+		void GotoNode::display(
+			std::ostream& stream,
+			const server::Request& request,
+			const util::ParametersMap& additionalParametersMap,
+			const Webpage& page,
+			util::ParametersMap& variables
+			) const {
+			_direction.display(stream, request, additionalParametersMap, page, variables);
+		}
 }	}
