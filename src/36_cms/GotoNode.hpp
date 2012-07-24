@@ -56,7 +56,7 @@ namespace synthese
 				const util::ParametersMap& additionalParametersMap,
 				const Webpage& page,
 				util::ParametersMap& variables
-			) const {}
+			) const;
 		};
 	}
 }
