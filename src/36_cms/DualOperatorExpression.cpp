@@ -115,6 +115,18 @@ namespace synthese
 
 					case POW:
 						return lexical_cast<string>(pow(leftDbl, rightDbl));
+
+					case SUP:
+						return lexical_cast<string>(leftDbl > rightDbl);
+
+					case SUP_EQ:
+						return lexical_cast<string>(leftDbl >= rightDbl);
+
+					case INF:
+						return lexical_cast<string>(leftDbl < rightDbl);
+
+					case INF_EQ:
+						return lexical_cast<string>(leftDbl <= rightDbl);
 					}
 				}
 				catch(bad_lexical_cast&)
@@ -147,12 +159,35 @@ namespace synthese
 				{
 					break;
 				}
+
+			// Strig operator
+			case EQ:
+				return lexical_cast<string>(left == right);
+
+			case DIFF:
+				return lexical_cast<string>(left != right);
 			}
 
 			// Admit + as concatenation operator
 			if(_operator == ADD)
 			{
 				return left + right;
+			}
+			else if(_operator == SUP)
+			{
+				return lexical_cast<string>(left > right);
+			}
+			else if(_operator == SUP_EQ)
+			{
+				return lexical_cast<string>(left >= right);
+			}
+			else if(_operator == INF)
+			{
+				return lexical_cast<string>(left < right);
+			}
+			else if(_operator == INF_EQ)
+			{
+				return lexical_cast<string>(left <= right);
 			}
 
 			return string();
@@ -203,6 +238,30 @@ namespace synthese
 			if(	CompareText(it, end, "^")
 			){
 				return POW;
+			}
+			if(	CompareText(it, end, "==")
+			){
+				return EQ;
+			}
+			if(	CompareText(it, end, "!=")
+			){
+				return DIFF;
+			}
+			if(	CompareText(it, end, ">=")
+			){
+				return SUP_EQ;
+			}
+			if(	CompareText(it, end, ">")
+			){
+				return SUP;
+			}
+			if(	CompareText(it, end, "<=")
+			){
+				return INF_EQ;
+			}
+			if(	CompareText(it, end, "<")
+			){
+				return INF;
 			}
 			return optional<Operator>();
 		}
