@@ -243,11 +243,15 @@ namespace synthese
 					}
 					else // Is an expression
 					{
+						shared_ptr<Expression> expr(
+							Expression::Parse(it, end, "@>")
+						);
+
 						// Storage
-						_nodes.push_back(
-							shared_ptr<Expression>(
-								Expression::Parse(it, end, "@>")
-						)	);
+						if(expr.get())
+						{
+							_nodes.push_back(expr);
+						}
 					}
 				} // Foreach
 				else if(*it == '<' && it+1 != end && *(it+1)=='{' && it+2 != end)
