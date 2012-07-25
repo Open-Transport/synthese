@@ -49,7 +49,13 @@ namespace synthese
 				AND,
 				BIT_AND,
 				BIT_OR,
-				POW
+				POW,
+				EQ,
+				DIFF,
+				SUP,
+				SUP_EQ,
+				INF,
+				INF_EQ
 			};
 
 		private:
