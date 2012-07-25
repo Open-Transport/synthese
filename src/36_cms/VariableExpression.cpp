@@ -22,19 +22,15 @@
 
 #include "VariableExpression.hpp"
 
-#include "HTMLTable.h"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "Webpage.h"
 
-#include <sstream>
-#include <boost/foreach.hpp>
-
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
-	using namespace html;
 	using namespace util;
 
 	namespace cms
@@ -52,107 +48,29 @@ namespace synthese
 			const Webpage& page,
 			util::ParametersMap& variables
 		) const	{
-			stringstream s;
-			display(s, request, additionalParametersMap, page, variables);
-			return s.str();
-		}
 
-
-
-		void VariableExpression::display(
-			std::ostream& stream,
-			const server::Request& request,
-			const util::ParametersMap& additionalParametersMap,
-			const Webpage& page,
-			util::ParametersMap& variables
-		) const {
-
-			// Variables list (debugging purpose)
-			if(_variable.empty())
+			if(_variable == "client_url")
 			{
-				HTMLTable::ColsVector c;
-				c.push_back("name");
-				c.push_back("value");
-				HTMLTable t(c, "table table-striped table-condensed sortable");
-				stream << t.open();
-				t.body(stream);
-				BOOST_FOREACH(const ParametersMap::Map::value_type& item, variables.getMap())
-				{
-					stream << t.row();
-					stream << t.col() << item.first;
-					stream << t.col() << item.second;
-				}
-				BOOST_FOREACH(const ParametersMap::Map::value_type& item, additionalParametersMap.getMap())
-				{
-					// Variables first
-					if(variables.getMap().find(item.first) != variables.getMap().end())
-					{
-						continue;
-					}
-					stream << t.row();
-					stream << t.col() << item.first;
-					stream << t.col() << item.second;
-				}
-				ParametersMap requestMap(request.getParametersMap());
-				BOOST_FOREACH(
-					const ParametersMap::Map::value_type& item,
-					requestMap.getMap()
-					){
-						// Variables first
-						if(variables.getMap().find(item.first) != variables.getMap().end())
-						{
-							continue;
-						}
-						// Parameters first
-						if(additionalParametersMap.getMap().find(item.first) != additionalParametersMap.getMap().end())
-						{
-							continue;
-						}
-						stream << t.row();
-						stream << t.col() << item.first;
-						stream << t.col() << item.second;
-				}
-				stream << t.row();
-				stream << t.col() << "host_name";
-				stream << t.col() << request.getHostName();
-				stream << t.row();
-				stream << t.col() << "client_url";
-				stream << t.col() << request.getClientURL();
-				const Website* site(page.getRoot());
-				if(site)
-				{
-					stream << t.row();
-					stream << t.col() << "site";
-					stream << t.col() << site->getKey();
-				}
-				BOOST_FOREACH(const ParametersMap::SubMapsKeys::value_type& item, additionalParametersMap.getSubMapsKeys())
-				{
-					stream << t.row();
-					stream << t.col() << item;
-					stream << t.col() << "(submap)";
-				}
-				stream << t.close();
-			}
-			else if(_variable == "client_url")
-			{
-				stream << request.getClientURL();
+				return request.getClientURL();
 			}
 			else if(_variable == "host_name")
 			{
-				stream << request.getHostName();
+				return request.getHostName();
 			}
-			else
+			if(page.getRoot() && _variable == "site")
 			{
-				string value(variables.getDefault<string>(_variable));
-				if(value.empty())
-				{
-					value = additionalParametersMap.getDefault<string>(_variable);
-				}
-				if(value.empty())
-				{
-					value = request.getParametersMap().getDefault<string>(_variable);
-				}
-				stream << value;
+				return lexical_cast<string>(page.getRoot()->getKey());
 			}
+
+			string value(variables.getDefault<string>(_variable));
+			if(value.empty())
+			{
+				value = additionalParametersMap.getDefault<string>(_variable);
+			}
+			if(value.empty())
+			{
+				value = request.getParametersMap().getDefault<string>(_variable);
+			}
+			return value;
 		}
 }	}
