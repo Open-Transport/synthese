@@ -313,6 +313,7 @@ namespace synthese
 		void DBDirectTableSyncTemplate<CommercialLineTableSync,CommercialLine>::Unlink(
 			CommercialLine* obj
 		){
+			obj->setNullParent();
 		}
 
 
@@ -340,7 +341,7 @@ namespace synthese
 
 			// The query
 			ReplaceQuery<CommercialLineTableSync> query(*object);
-			query.addField(object->getNetwork() ? object->getNetwork()->getKey() : RegistryKeyType(0));
+			query.addField(object->_getParent() ? object->_getParent()->getKey() : RegistryKeyType(0));
 			query.addField(object->getName());
 			query.addField(object->getShortName());
 			query.addField(object->getLongName());
