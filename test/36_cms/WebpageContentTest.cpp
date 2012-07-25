@@ -489,5 +489,25 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(variables.getMap().size(), 3);
 		BOOST_CHECK_EQUAL(variables.get<string>("variable"), "OK1OK2");
 	}
+
+	{ // Variable printer
+		string code("<@@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "<table class=\"table table-striped table-condensed sortable\"><thead><tr><th>name</th><th>value</th></tr></thead><tbody><tr class=\"r1\"><td>variable</td><td>OK1OK2</td></tr><tr class=\"r2\"><td>variable1</td><td>2</td></tr><tr class=\"r1\"><td>variable2</td><td>3</td></tr><tr class=\"r2\"><td>SERVICE</td><td>page</td></tr><tr class=\"r1\"><td>host_name</td><td></td></tr><tr class=\"r2\"><td>client_url</td><td></td></tr><tr class=\"r1\"><td>site</td><td>0</td></tr><tr class=\"r2\"><td>spm</td><td>(submap)</td></tr></tbody></table>");
+	}
+
+	{ // Empty expression
+		string code("<@ @>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), true);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "");
+	}
 }
 

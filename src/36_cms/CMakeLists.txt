@@ -71,6 +71,8 @@ TripleOperatorExpression.cpp
 TripleOperatorExpression.hpp
 VariableExpression.cpp
 VariableExpression.hpp
+VariablesDebugExpression.cpp
+VariablesDebugExpression.hpp
 VariableUpdateNode.cpp
 VariableUpdateNode.hpp
 Webpage.cpp

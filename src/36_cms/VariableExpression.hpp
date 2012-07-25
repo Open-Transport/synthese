@@ -47,17 +47,8 @@ namespace synthese
 				const Webpage& page,
 				util::ParametersMap& variables
 			) const;
-
-			virtual void display(
-				std::ostream& stream,
-				const server::Request& request,
-				const util::ParametersMap& additionalParametersMap,
-				const Webpage& page,
-				util::ParametersMap& variables
-			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_cms_VariableExpression_hpp__
 

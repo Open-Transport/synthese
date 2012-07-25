@@ -30,6 +30,7 @@
 #include "SingleOperatorExpression.hpp"
 #include "TripleOperatorExpression.hpp"
 #include "VariableExpression.hpp"
+#include "VariablesDebugExpression.hpp"
 
 using namespace boost;
 using namespace std;
@@ -62,6 +63,11 @@ namespace synthese
 			shared_ptr<Expression> expr1;
 			shared_ptr<Expression> expr2;
 			shared_ptr<Expression> expr;
+
+			if(	CompareText(it, end, termination))
+			{
+				return shared_ptr<Expression>(new VariablesDebugExpression);
+			}
 
 			ParserStatus status(UNDEFINED);
 			while(it != end)
