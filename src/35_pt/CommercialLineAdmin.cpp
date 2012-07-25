@@ -488,7 +488,7 @@ namespace synthese
 					t.getForm().getSelectInput(
 						CommercialLineUpdateAction::PARAMETER_NETWORK_ID,
 						_cline->getNetwork()->getSubFoldersLabels(),
-						boost::optional<util::RegistryKeyType>(_cline->getNetwork()->getKey())
+						boost::optional<util::RegistryKeyType>(_cline->_getParent()->getKey())
 				)	);
 				stream << t.title("Nom");
 				stream << t.cell("Nom (menu)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_NAME, _cline->getName()));
