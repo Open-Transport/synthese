@@ -1,12 +1,9 @@
 define([
   "core/js/Synthese",
-  "order!core/vendor/underscore-1.1.6.min",
-  "order!map/vendor/OpenLayers/OpenLayers",
-  // For the OpenLayers debug version: Put the following code in the html, and comment the line above.
-  // <script src="/map/vendor/OpenLayers_full/lib/OpenLayers.js"></script>
-  "order!map/vendor/OpenLayers/lib/OpenLayers/Lang/fr",
-  "order!map/vendor/OpenLayers_maptypepanel/MapType",
-  "order!map/vendor/OpenLayers_maptypepanel/MapTypePanel"
+  "underscore",
+  "OpenLayers_fr",
+  "map/vendor/OpenLayers_maptypepanel/MapType",
+  "map/vendor/OpenLayers_maptypepanel/MapTypePanel"
 ], function(Synthese) {
 
 /**

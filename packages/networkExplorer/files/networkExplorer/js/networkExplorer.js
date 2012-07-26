@@ -2,9 +2,10 @@ define([
   "core/js/Synthese",
   "map/js/SyntheseMap",
   // JQuery autcomplete
-  "order!core/vendor/jquery-1.6.2.min",
-  "order!networkExplorer/vendor/autocomplete/lib/jquery.bgiframe.min",
-  "order!networkExplorer/vendor/autocomplete/jquery.autocomplete"
+  "jquery",
+  // TODO: add to shim?
+  "networkExplorer/vendor/autocomplete/lib/jquery.bgiframe.min",
+  "networkExplorer/vendor/autocomplete/jquery.autocomplete"
 ], function(Synthese, SyntheseMap) {
 
 /* ************

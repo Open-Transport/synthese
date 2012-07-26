@@ -1,5 +1,5 @@
 define([
-  "core/js/backbone"
+  "backbone"
 ], function() {
 
 // Utils
