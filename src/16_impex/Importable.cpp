@@ -291,6 +291,11 @@ namespace synthese
 
 	namespace impex
 	{
+		const string Importable::TAG_DATA_SOURCE_LINK = "data_source_link";
+		const string Importable::ATTR_DATA_SOURCE_ID = "data_source_id";
+		const string Importable::ATTR_DATA_SOURCE_NAME = "data_source_name";
+		const string Importable::ATTR_ID = "id";
+
 		const string Importable::SOURCES_SEPARATOR = ",";
 		const string Importable::FIELDS_SEPARATOR = "|";
 
@@ -409,5 +414,19 @@ namespace synthese
 				}
 			}
 			return false;
+		}
+
+
+
+		void Importable::dataSourceLinksToParametersMap( util::ParametersMap& pm ) const
+		{
+			BOOST_FOREACH(const DataSourceLinks::value_type& l, _dataSourceLinks)
+			{
+				shared_ptr<ParametersMap> dsPM(new ParametersMap);
+				dsPM->insert(ATTR_DATA_SOURCE_ID, l.first->getKey());
+				dsPM->insert(ATTR_DATA_SOURCE_NAME, l.first->getName());
+				dsPM->insert(ATTR_ID, l.second);
+				pm.insert(TAG_DATA_SOURCE_LINK, dsPM);
+			}
 		}
 }	}
