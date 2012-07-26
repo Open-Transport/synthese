@@ -63,7 +63,7 @@ namespace synthese
 
 	namespace calendar
 	{
-		std::string CalendarModule::GetBestCalendarTitle(
+		CalendarModule::BaseCalendar CalendarModule::GetBestCalendarTitle(
 			const Calendar& calendar,
 			const Calendar& mask
 		){
@@ -89,12 +89,16 @@ namespace synthese
 
 
 
-		std::string CalendarModule::CalendarTitlesGenerator::getBestCalendarTitle( const Calendar& calendar )
-		{
+		CalendarModule::BaseCalendar CalendarModule::CalendarTitlesGenerator::getBestCalendarTitle(
+			const Calendar& calendar
+		){
 			Value::const_iterator result(_value.end());
 			for(Value::const_iterator itCal(_value.begin()); itCal != _value.end(); ++itCal)
 			{
-				if(itCal->first != calendar) continue;
+				if(itCal->first != calendar)
+				{
+					continue;
+				}
 
 				if(	result == _value.end() ||
 					itCal->second->getCategory() < result->second->getCategory() ||
@@ -107,7 +111,11 @@ namespace synthese
 
 			if(result != _value.end())
 			{
-				return result->second->getName();
+				return
+					make_pair(
+						result->second,
+						result->second->getName()
+					);
 			}
 
 			// If not template found, generation of a generic description text
@@ -119,6 +127,11 @@ namespace synthese
 				strresult << (first ? string() : ",") << to_simple_string(date);
 				first=false;
 			}
-			return strresult.str();
+			CalendarTemplate* nullCalendar(NULL);
+			return
+				make_pair(
+					nullCalendar,
+					strresult.str()
+				);
 		}
 }	}

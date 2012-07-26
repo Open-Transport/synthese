@@ -22,6 +22,7 @@
 
 #include "TimetableWarning.h"
 
+#include "CalendarTemplate.h"
 #include "ParametersMap.h"
 
 using namespace boost;
@@ -47,16 +48,19 @@ namespace synthese
 		const string TimetableWarning::DATA_LAST_DATE = "last_date";
 		const string TimetableWarning::TAG_DAY = "day";
 		const string TimetableWarning::ATTR_DATE = "date";
+		const string TimetableWarning::TAG_CALENDAR = "calendar";
 
 
 
 		TimetableWarning::TimetableWarning(
 			const Calendar& calendar,
 			size_t number,
-			const string& text
+			const string& text,
+			const CalendarTemplate* calendarTemplate
 		):	_calendar(calendar),
 			_number(number),
-			_text(text)
+			_text(text),
+			_calendarTemplate(calendarTemplate)
 		{}
 
 
@@ -121,5 +125,13 @@ namespace synthese
 			pm.insert(DATA_LAST_DAY, lastDate.day());
 			pm.insert(DATA_LAST_MONTH, lastDate.month());
 			pm.insert(DATA_LAST_YEAR, lastDate.year());
+
+			// Calendar template
+			if(_calendarTemplate)
+			{
+				shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+				_calendarTemplate->toParametersMap(*calendarPM);
+				pm.insert(TAG_CALENDAR, calendarPM);
+			}
 		}
 }	}

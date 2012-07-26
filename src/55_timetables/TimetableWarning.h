@@ -29,6 +29,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace util
 	{
 		class ParametersMap;
@@ -54,6 +59,7 @@ namespace synthese
 			std::size_t				_number;
 			calendar::Calendar	_calendar;
 			std::string		_text;
+			const calendar::CalendarTemplate*	_calendarTemplate;
 
 			static const std::string DATA_NUMBER;
 			static const std::string DATA_TEXT;
@@ -67,6 +73,7 @@ namespace synthese
 			static const std::string DATA_FIRST_DATE;
 			
 			static const std::string TAG_DAY;
+			static const std::string TAG_CALENDAR;
 			static const std::string ATTR_DATE;
 
 		public:
@@ -79,7 +86,8 @@ namespace synthese
 			TimetableWarning(
 				const calendar::Calendar& calendar,
 				std::size_t number,
-				const std::string& text
+				const std::string& text,
+				const calendar::CalendarTemplate* calendarTemplate
 			);
 
 			//! @name Getters
