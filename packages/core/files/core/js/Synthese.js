@@ -1,7 +1,5 @@
 define([
-  "order!core/vendor/jquery-1.7.1.min"
-  // Debug versions:
-  //"order!core/vendor/jquery-1.7.1"
+  "jquery"
 ], function() {
 
 // Dummy console.log for browsers without a console API.
