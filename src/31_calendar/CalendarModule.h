@@ -79,6 +79,8 @@ namespace synthese
 			public server::ModuleClassTemplate<CalendarModule>
 		{
 		public:
+			typedef std::pair<CalendarTemplate*, std::string> BaseCalendar;
+
 			class CalendarTitlesGenerator
 			{
 			private:
@@ -91,11 +93,11 @@ namespace synthese
 
 				//////////////////////////////////////////////////////////////////////////
 				/// @param calendar calendar to name (is supposed to be included by the mask)
-				std::string getBestCalendarTitle(const Calendar& calendar);
+				BaseCalendar getBestCalendarTitle(const Calendar& calendar);
 			};
 
 
-			static std::string GetBestCalendarTitle(
+			static BaseCalendar GetBestCalendarTitle(
 				const Calendar& calendar,
 				const Calendar& mask
 			);

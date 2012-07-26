@@ -640,13 +640,17 @@ namespace synthese
 
 				if (!warn.get())
 				{
+					CalendarModule::BaseCalendar baseCalendar(
+						calendarTitlesGenerator.getBestCalendarTitle(itCol->getCalendar())
+					);
 					warn = result.getWarnings().insert(
 						make_pair(
 							nextNumber,
 							shared_ptr<TimetableWarning>(new TimetableWarning(
 								itCol->getCalendar(),
 								nextNumber,
-								calendarTitlesGenerator.getBestCalendarTitle(itCol->getCalendar())
+								baseCalendar.second,
+								baseCalendar.first
 					)	)	)	).first->second;
 					++nextNumber;
 				}

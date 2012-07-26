@@ -40,6 +40,11 @@ namespace synthese
 
 	namespace calendar
 	{
+		const string CalendarTemplate::ATTR_NAME = "name";
+		const string CalendarTemplate::ATTR_PARENT_ID = "parent_id";
+
+
+
 		CalendarTemplate::CalendarTemplate(
 		):	util::Registrable(0),
 			_category(OTHER_CALENDAR)
@@ -222,6 +227,22 @@ namespace synthese
 			{
 				_elements.erase(it);
 			}
+		}
+
+
+
+		void CalendarTemplate::toParametersMap(
+			util::ParametersMap& pm
+		) const	{
+
+			pm.insert(ATTR_ID, getKey());
+			pm.insert(ATTR_NAME, getName());
+			if(getParent())
+			{
+				pm.insert(ATTR_PARENT_ID, getParent()->getKey());
+			}
+			dataSourceLinksToParametersMap(pm);
+
 		}
 
 

@@ -24,6 +24,8 @@ CalendarModule.h
 CalendarModule.inc.cpp
 CalendarRight.cpp
 CalendarRight.h
+CalendarsListService.cpp
+CalendarsListService.hpp
 CalendarTemplate.cpp
 CalendarTemplate.h
 CalendarTemplateAdmin.cpp
