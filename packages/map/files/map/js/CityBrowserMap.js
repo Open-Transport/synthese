@@ -1,6 +1,6 @@
 define([
   "map/js/SyntheseMap",
-  "core/js/backbone"
+  "backbone"
 ], function(SyntheseMap) {
 
 

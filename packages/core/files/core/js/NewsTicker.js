@@ -1,6 +1,6 @@
 define([
   "core/js/Synthese",
-  "core/js/backbone"
+  "backbone"
 ], function(Synthese) {
 
 var NewsTickerView = Backbone.View.extend({

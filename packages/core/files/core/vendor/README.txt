@@ -9,15 +9,7 @@ bootstrap:
   http://twitter.github.com/bootstrap/assets/bootstrap.zip
 
 jquery-1.7.1.min.js:
-  http://code.jquery.com/jquery-1.7.min.js
-
-# For backward compatibility. To remove once all projects are migrated.
-jquery-1.6.2.min.js:
-jquery-1.7.min.js:
-jquery-1.7.js:
-  http://code.jquery.com/jquery-1.7.min.js
-  http://code.jquery.com/jquery-1.7.js
-  http://code.jquery.com/jquery-1.6.2.min.js
+  http://code.jquery.com/jquery-1.7.1.min.js
 
 jquery.tmpl.beta1.min.js:
 jquery.tmpl.beta1.js:
@@ -45,10 +37,9 @@ jquery.ui.autocomplete.css
   http://jqueryui.com/themes/base/jquery.ui.autocomplete.css
 
 requirejs/*.js
-  Version: 0.27.1
-  http://requirejs.org/docs/release/0.27.1/minified/require.js
-  http://requirejs.org/docs/release/0.27.1/minified/text.js
-  http://requirejs.org/docs/release/0.27.1/minified/order.js
+  Version: 2.0.4
+  require.js: http://requirejs.org/docs/release/2.0.4/minified/require.js
+  require-dev.js http://requirejs.org/docs/release/2.0.4/comments/require.js
 
 underscore-1.1.6.min.js:
 underscore-1.1.6.js:
