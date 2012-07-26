@@ -25,23 +25,23 @@
 
 #include "LinesListFunction.h"
 
-#include "CommercialLine.h"
-#include "Path.h"
+#include "CityTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "GetMessagesFunction.hpp"
+#include "ImportableTableSync.hpp"
+#include "JourneyPattern.hpp"
+#include "MimeTypes.hpp"
+#include "PTUseRule.h"
 #include "RequestException.h"
 #include "ReservationContact.h"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
 #include "SortableLineNumber.hpp"
-#include "TransportNetwork.h"
-#include "Webpage.h"
-#include "JourneyPattern.hpp"
-#include "CommercialLineTableSync.h"
-#include "ImportableTableSync.hpp"
-#include "PTUseRule.h"
-#include "Vertex.h"
 #include "StopArea.hpp"
-#include "GetMessagesFunction.hpp"
-#include "MimeTypes.hpp"
+#include "TransportNetworkTableSync.h"
+#include "TreeFolder.hpp"
+#include "Vertex.h"
+#include "Webpage.h"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -59,15 +59,17 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace util;
-	using namespace server;
-	using namespace pt;
-	using namespace security;
 	using namespace cms;
+	using namespace geography;
 	using namespace graph;
 	using namespace impex;
 	using namespace messages;
+	using namespace pt;
 	using namespace pt_website;
+	using namespace util;
+	using namespace security;
+	using namespace server;
+	using namespace tree;
 
 	template<> const string util::FactorableTemplate<server::Function,pt::LinesListFunction>::FACTORY_KEY(
 		"LinesListFunction2"
@@ -90,6 +92,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_RIGHT_CLASS = "right_class";
 		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
 		const string LinesListFunction::PARAMETER_CONTACT_CENTER_ID = "contact_center_id";
+		const string LinesListFunction::PARAMETER_CITY_FILTER = "city_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -113,10 +116,21 @@ namespace synthese
 			ParametersMap result;
 
 			// Network
-			if (_network.get() != NULL)
+			stringstream networksStr;
+			bool first(true);
+			BOOST_FOREACH(const pt::TransportNetwork* network, _networks)
 			{
-				result.insert(PARAMETER_NETWORK_ID, _network->getKey());
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					networksStr << ",";
+				}
+				networksStr << network->getKey();
 			}
+			result.insert(PARAMETER_NETWORK_ID, networksStr.str());
 
 			// SRID
 			if(_coordinatesSystem)
@@ -213,17 +227,46 @@ namespace synthese
 				throw RequestException("Line " + lexical_cast<string>(lineId) + " not found");
 			}
 
-			// Network filter
-			RegistryKeyType networkId(
-				map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0)
+			// Networks and tree selectors
+			string networks(
+				map.getDefault<string>(PARAMETER_NETWORK_ID)
 			);
-			if(networkId > 0) try
+			_networks.clear();
+			if(!networks.empty())
 			{
-				_network = Env::GetOfficialEnv().get<TransportNetwork>(networkId);
-			}
-			catch(ObjectNotFoundException<TransportNetwork>&)
-			{
-				throw RequestException("Transport network " + lexical_cast<string>(networkId) + " not found");
+				vector<string> ids;
+				split(ids, networks, is_any_of(","));
+				BOOST_FOREACH(const string& idstr, ids)
+				{
+					try
+					{
+						RegistryKeyType id(lexical_cast<RegistryKeyType>(idstr));
+						if(decodeTableId(id) == TransportNetworkTableSync::TABLE.ID)
+						{
+							_networks.insert(
+								Env::GetOfficialEnv().get<TransportNetwork>(id).get()
+							);
+						}
+						else if(decodeTableId(id) == TreeFolder::CLASS_NUMBER)
+						{
+							_folders.insert(
+								Env::GetOfficialEnv().get<TreeFolder>(id).get()
+							);
+						}
+					}
+					catch(bad_lexical_cast)
+					{
+						throw RequestException("Bad network id : "+ idstr);
+					}
+					catch(ObjectNotFoundException<TransportNetwork>&)
+					{
+						throw RequestException("Transport network " + idstr + " not found");
+					}
+					catch(ObjectNotFoundException<TreeFolder>&)
+					{
+						throw RequestException("Folder " + idstr + " not found");
+					}
+				}
 			}
 
 			// Letters before numbers
@@ -299,6 +342,10 @@ namespace synthese
 						);
 						_sortByTransportMode.push_back(tm);
 					}
+					catch(bad_lexical_cast)
+					{
+						throw RequestException("Bad transport mode id");
+					}
 					catch (ObjectNotFoundException<RollingStock>&)
 					{
 						throw RequestException("No rolling stock");
@@ -325,6 +372,178 @@ namespace synthese
 					_contactCenterFilter = shared_ptr<ReservationContact>();
 				}
 			}
+
+			// Cities filter
+			string cities(
+				map.getDefault<string>(PARAMETER_CITY_FILTER)
+			);
+			_cities.clear();
+			if(!cities.empty())
+			{
+				vector<string> ids;
+				split(ids, cities, is_any_of(","));
+				BOOST_FOREACH(const string& id, ids)
+				{
+					try
+					{
+						_cities.insert(
+							Env::GetOfficialEnv().get<City>(
+								lexical_cast<RegistryKeyType>(id)
+							).get()
+						);
+					}
+					catch(bad_lexical_cast)
+					{
+						throw RequestException("Bad city id");
+					}
+					catch(ObjectNotFoundException<City>&)
+					{
+						throw RequestException("City " + lexical_cast<string>(id) + " not found");
+					}
+				}
+			}
+
+		}
+
+
+
+		bool LinesListFunction::_lineIsSelected(
+			const CommercialLine& line,
+			const server::Request& request
+		) const	{
+
+			// Network filter
+			if(!_networks.empty())
+			{
+				bool result(false);
+				BOOST_FOREACH(const TransportNetwork* network, _networks)
+				{
+					if(line.getNetwork() == network)
+					{
+						result = true;
+						break;
+					}
+				}
+				if(!result)
+				{
+					return false;
+				}
+			}
+
+			// Folder filter
+			if(!_folders.empty())
+			{
+				bool result(false);
+				BOOST_FOREACH(const TreeFolder* folder, _folders)
+				{
+					if(line.isChildOf(*folder))
+					{
+						result = true;
+						break;
+					}
+				}
+				if(!result)
+				{
+					return false;
+				}
+			}
+
+			// City filter
+			if(!_cities.empty())
+			{
+				bool result(false);
+				BOOST_FOREACH(const City* city, _cities)
+				{
+					if(line.callsAtCity(*city))
+					{
+						result = true;
+						break;
+					}
+				}
+				if(!result)
+				{
+					return false;
+				}
+			}
+
+			// Rights filter
+			if(_rightLevel && _rights && request.getUser())
+			{
+				// All ?
+				RightsOfSameClassMap::const_iterator it(
+					_rights->find(GLOBAL_PERIMETER)
+				);
+				if (it == _rights->end() ||
+					it->second->getPublicRightLevel() < *_rightLevel
+				){
+					bool result(false);
+					BOOST_FOREACH(const RightsOfSameClassMap::value_type& it, *_rights)
+					{
+						if(	!it.second->perimeterIncludes(
+								lexical_cast<string>(line.getKey()),
+								Env::GetOfficialEnv()
+							)
+						){
+							continue;
+						}
+
+						if (it.second->getPublicRightLevel() < *_rightLevel)
+						{
+							return false;
+						}
+						else
+						{
+							result = true;
+							break;
+						}
+					}
+					if(!result)
+					{
+						return false;
+					}
+			}	}
+
+			// Filter by Rolling stock id
+			if(_rollingStockFilter.get())
+			{
+				// Set the boolean to true or false depending on whether filter is inclusive or exclusive
+				bool result = !(_rollingStockFilter->getAuthorizedOnly());
+				set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
+				BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
+				{
+					if(line.usesTransportMode(*rollingStock))
+					{
+						result = _rollingStockFilter->getAuthorizedOnly();
+						break;
+					}
+				}
+
+				// If the line doesn't respect the filter, skip it
+				if(!result)
+				{
+					return false;
+				}
+			}
+
+			// Use rule tests
+			const UseRule& useRule(line.getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
+			if(	dynamic_cast<const PTUseRule*>(&useRule) &&
+				(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
+					_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
+					_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
+			)	){
+				return false;
+			}
+
+			// Contact center filter
+			if(	_contactCenterFilter &&
+				_contactCenterFilter->get() &&
+				_contactCenterFilter->get() != line.getReservationContact()
+			){
+				return false;
+			}
+
+			return true;
 		}
 
 
@@ -333,6 +552,13 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const	{
+
+			// Rights caching
+			if((!_rightClass.empty() || !_rightLevel) && request.getUser())
+			{
+				_rights = request.getUser()->getProfile()->getRights(_rightClass);
+			}
+
 			// Sorting is made on numerical order
 			//   (except for line number which doesn't begin by a number)
 			//   then alphabetic order.
@@ -359,28 +585,17 @@ namespace synthese
 			}
 			else
 			{
-				CommercialLineTableSync::SearchResult lines(
-					CommercialLineTableSync::Search(
-						Env::GetOfficialEnv(),
-						_network.get() ?
-							optional<RegistryKeyType>(_network->getKey()) :
-							optional<RegistryKeyType>(),
-						optional<string>(),
-						optional<string>(),
-						0,
-						optional<size_t>(),
-						true,
-						false,
-						true,
-						UP_LINKS_LOAD_LEVEL,
-						((_rightClass.empty() && _rightLevel) || !request.getUser()) ?
-							optional<const RightsOfSameClassMap&>() :
-							request.getUser()->getProfile()->getRights(_rightClass),
-						_rightLevel ? *_rightLevel : FORBIDDEN,
-						_contactCenterFilter ?
-							(_contactCenterFilter->get() ? (*_contactCenterFilter)->getKey() : 0) :
-							optional<RegistryKeyType>()
-				)	);
+				vector<shared_ptr<CommercialLine> > lines;
+				BOOST_FOREACH(const CommercialLine::Registry::value_type& it, Env::GetOfficialEnv().getRegistry<CommercialLine>())
+				{
+					if(!_lineIsSelected(*it.second, request))
+					{
+						continue;
+					}
+
+					lines.push_back(it.second);
+				}
+
 				set<CommercialLine*> alreadyShownLines;
 				BOOST_FOREACH(const shared_ptr<const RollingStock>& tm, _sortByTransportMode)
 				{
@@ -389,38 +604,6 @@ namespace synthese
 						// Avoid to return a line twice
 						if(alreadyShownLines.find(line.get()) != alreadyShownLines.end())
 						{
-							continue;
-						}
-
-						// Filter by Rolling stock id
-						if(_rollingStockFilter.get())
-						{
-							// Set the boolean to true or false depending on whether filter is inclusive or exclusive
-							bool atLeastOneMode = !(_rollingStockFilter->getAuthorizedOnly());
-							set<const RollingStock*> rollingStocksList = _rollingStockFilter->getList();
-							BOOST_FOREACH(const RollingStock* rollingStock, rollingStocksList)
-							{
-								if(line->usesTransportMode(*rollingStock))
-								{
-									atLeastOneMode = _rollingStockFilter->getAuthorizedOnly();
-									break;
-								}
-							}
-
-							// If the line doesn't respect the filter, skip it
-							if(!atLeastOneMode)
-							{
-								continue;
-							}
-						}
-
-						// Use rule tests
-						const UseRule& useRule(line->getUseRule(USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET));
-						if(	dynamic_cast<const PTUseRule*>(&useRule) &&
-							(	_ignoreJourneyPlannerExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInJourneyPlanning() ||
-								_ignoreTimetableExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInTimetables() ||
-								_ignoreDeparturesBoardExcludedLines && static_cast<const PTUseRule&>(useRule).getForbiddenInDepartureBoards()
-						)	){
 							continue;
 						}
 
@@ -651,4 +834,13 @@ namespace synthese
 			_outputMessages(false),
 			_lettersBeforeNumbers(true)
 		{}
+
+
+
+		void LinesListFunction::setNetwork(
+			const TransportNetwork* value
+		){
+			_networks.clear();
+			_networks.insert(value);
+		}
 }	}
