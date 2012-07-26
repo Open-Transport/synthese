@@ -281,24 +281,22 @@ var CitySelectorView = Backbone.View.extend({
 
     this.$('.cityList').replaceWith(this.cityList.el);
 
-    var self = this;
-
-    function pollUntilSized() {
-      var height = $(self.el).height();
-      // Firefox seems to return a height of 100 when not yet in the dom.
-      // This might cause issues if the real height is 100.
-      if (height == 0 || (jQuery.browser.mozilla && height == 100)) {
-        setTimeout(pollUntilSized, 500);
-        return;
-      }
-      self.setLettersSize();
-    }
-    pollUntilSized();
+    this.setLettersSize();
     $(window).resize(this.setLettersSize);
   },
 
   setLettersSize: function() {
     var height = $(this.el).height();
+
+    // If not visible or not rendered yet, wait for a bit.
+    var self = this;
+    if (height == 0 || height == 100) {
+      setTimeout(function() {
+        self.setLettersSize();
+      }, 500);
+      return;
+    }
+
     this.$(".letters").show().css("height", height);
     // Without the "+ 1", the last letter is not visible.
     var lineHeight = Math.floor(height / (this.letterCodes.length + 1));
