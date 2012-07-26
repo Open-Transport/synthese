@@ -62,6 +62,7 @@ namespace synthese
 			static const std::string COL_WAYBACK;
 			static const std::string COL_DATASOURCE_ID;
 			static const std::string COL_MAIN;
+			static const std::string COL_PLANNED_LENGTH;
 
 
 			/** JourneyPattern search.
