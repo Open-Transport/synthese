@@ -57,15 +57,29 @@ namespace synthese
 		public:
 			void setNullParent();
 			void _setParent(TreeFolderUpNode& value);
-			TreeFolderRoot* _getRoot() const {	return _root; }
-			TreeFolderUpNode* _getParent() const { return _parent; }
+
+			/// @name Getters
+			//@{
+				TreeFolderRoot* _getRoot() const {	return _root; }
+				TreeFolderUpNode* _getParent() const { return _parent; }
+			//@}
+
+			/// @name Services
+			//@{
+				template<class T>
+				T* getCastRoot() const
+				{
+					return dynamic_cast<T*>(_root);
+				}
 
 
-			template<class T>
-			T* getCastRoot() const
-			{
-				return dynamic_cast<T*>(_root);
-			}
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Check if the object is a child of a specified node.
+				/// @param upNode the node which should be a parent
+				/// @return true if the upNode is a parent of the current object
+				bool isChildOf(const TreeFolderUpNode& upNode) const;
+			//@}
 
 
 
