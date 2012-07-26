@@ -36,6 +36,16 @@ namespace synthese
 {
 	class CoordinatesSystem;
 
+	namespace geography
+	{
+		class City;
+	}
+
+	namespace tree
+	{
+		class TreeFolder;
+	}
+
 	namespace cms
 	{
 		class Webpage;
@@ -63,7 +73,7 @@ namespace synthese
 		class LinesListFunction:
 			public util::FactorableTemplate<server::Function,LinesListFunction>
 		{
-		 public:
+		 private:
 			static const std::string PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES;
 			static const std::string PARAMETER_IGNORE_DEPARTURES_BOARD_EXCLUDED_LINES;
@@ -79,7 +89,8 @@ namespace synthese
 			static const std::string PARAMETER_RIGHT_CLASS;
 			static const std::string PARAMETER_RIGHT_LEVEL;
 			static const std::string PARAMETER_CONTACT_CENTER_ID;
-
+			static const std::string PARAMETER_CITY_FILTER;
+			
 			static const std::string FORMAT_WKT;
 
 			static const std::string DATA_LINE;
@@ -95,10 +106,11 @@ namespace synthese
 			static const std::string DATA_Y;
 			static const std::string DATA_RANK;
 
-		protected:
 			//! \name Page parameters
 			//@{
-				boost::shared_ptr<const pt::TransportNetwork> _network;
+				std::set<const pt::TransportNetwork*> _networks;
+				std::set<const tree::TreeFolder*> _folders;
+				std::set<const geography::City*> _cities;
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
 				const CoordinatesSystem* _coordinatesSystem;
@@ -117,6 +129,8 @@ namespace synthese
 				boost::optional<boost::shared_ptr<const ReservationContact> > _contactCenterFilter;
 			//@}
 
+			mutable boost::optional<const security::RightsOfSameClassMap&> _rights;
+
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Conversion from attributes to generic parameter maps.
@@ -134,6 +148,25 @@ namespace synthese
 			///	@param map Parameters map to read
 			void _setFromParametersMap(const util::ParametersMap& map);
 
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Checks if the line must be selected according to the service parameters.
+			/// All filters must be passed :
+			///  - the line must be the child of a parent folder or network
+			///  - the line must call at a city of the filter list
+			///  - the user rights must allow the user to access to the line in read mode
+			///  - the line must not be ignored according to the use rules
+			///  - the line must use the transport mode specified in the filter
+			///  - the line must use the contact center specified in the filter
+			/// @param line the line to check
+			/// @param request the current request
+			/// @warning update the _rights cache before using _lineIsSelected
+			bool _lineIsSelected(
+				const CommercialLine& line,
+				const server::Request& request
+			) const;
+
 		public:
 			LinesListFunction();
 
@@ -149,7 +182,7 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-				void setNetwork(boost::shared_ptr<const TransportNetwork> value){ _network = value; }
+				void setNetwork(const TransportNetwork* value);
 			//@}
 
 			virtual bool isAuthorized(const server::Session* session) const;
