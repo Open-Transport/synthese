@@ -57,6 +57,12 @@ namespace synthese
 		class Importable:
 			virtual public util::Registrable
 		{
+		protected:
+			static const std::string TAG_DATA_SOURCE_LINK;
+			static const std::string ATTR_DATA_SOURCE_ID;
+			static const std::string ATTR_DATA_SOURCE_NAME;
+			static const std::string ATTR_ID;
+
 		public:
 			static const std::string SOURCES_SEPARATOR;
 			static const std::string FIELDS_SEPARATOR;
@@ -133,6 +139,12 @@ namespace synthese
 				const std::string& getACodeBySource() const;
 
 				std::string getCodeBySources() const;
+
+
+
+				void dataSourceLinksToParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 
 			//! @name Static algorithms
