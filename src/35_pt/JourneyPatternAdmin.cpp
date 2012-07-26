@@ -798,6 +798,12 @@ namespace synthese
 					"Itinéraire principal de ligne",
 					p.getForm().getOuiNonRadioInput(JourneyPatternUpdateAction::PARAMETER_MAIN, _line->getMain())
 				);
+				stream << p.cell(
+					"Longueur planification (TAD)",
+					p.getForm().getTextInput(
+						JourneyPatternUpdateAction::PARAMETER_PLANNED_LENGTH,
+						lexical_cast<string>(_line->getPlannedLength())
+				)	);
 				stream << p.close();
 
 				PTRuleUserAdmin<JourneyPattern,JourneyPatternAdmin>::Display(stream, _line, _request);

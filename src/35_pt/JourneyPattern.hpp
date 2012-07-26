@@ -37,6 +37,11 @@
 
 namespace synthese
 {
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace graph
 	{
 		class Service;
@@ -48,10 +53,6 @@ namespace synthese
 		class StopPoint;
 		class RollingStock;
 		class JourneyPatternCopy;
-	}
-
-	namespace pt
-	{
 		class Destination;
 		class LineStop;
 		class LineAlarmBroadcast;
@@ -106,6 +107,8 @@ namespace synthese
 			bool _wayBack;	//!< true if back route, false else (forward route or unknown)
 			bool _main; //!< can be considered as a main route of the line
 
+			graph::MetricOffset _plannedLength; //!< For DRT
+
 		public:
 
 			JourneyPattern(
@@ -128,6 +131,7 @@ namespace synthese
 				bool				getWayBack()				const { return _wayBack; }
 				Destination*		getDirectionObj()			const { return _directionObj; }
 				bool				getMain()					const { return _main; }
+				graph::MetricOffset	getPlannedLength()			const { return _plannedLength; }
 			//@}
 
 
@@ -141,6 +145,7 @@ namespace synthese
 				void setWayBack(bool value) { _wayBack = value; }
 				void setDirectionObj(Destination* value){ _directionObj = value; }
 				void setMain(bool value){ _main = value; }
+				void setPlannedLength(graph::MetricOffset value){ _plannedLength = value; }
 			//@}
 
 
@@ -250,6 +255,12 @@ namespace synthese
 				///	@param stops Array of physical stops with arrival/departure information
 				/// @return true if the line serves exactly the stops in the same order with the same arrival/departure authorizations
 				bool operator==(const JourneyPattern& other) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the journey pattern calls at the specified city
+				bool callsAtCity(const geography::City& city) const;
 			//@}
 		};
 	}

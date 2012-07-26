@@ -70,6 +70,7 @@ namespace synthese
 		const string JourneyPatternTableSync::COL_WAYBACK("wayback");
 		const string JourneyPatternTableSync::COL_DATASOURCE_ID("data_source");
 		const string JourneyPatternTableSync::COL_MAIN("main");
+		const string JourneyPatternTableSync::COL_PLANNED_LENGTH = "planned_length";
 	}
 
 	namespace db
@@ -93,6 +94,7 @@ namespace synthese
 			Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
+			Field(JourneyPatternTableSync::COL_PLANNED_LENGTH, SQL_DOUBLE),
 			Field()
 		};
 
@@ -130,6 +132,7 @@ namespace synthese
 			line->setCommercialLine(NULL);
 			line->cleanDataSourceLinks();
 			line->setMain(rows->getBool(JourneyPatternTableSync::COL_MAIN));
+			line->setPlannedLength(rows->getDouble(JourneyPatternTableSync::COL_PLANNED_LENGTH));
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 
 			if (linkLevel >= UP_LINKS_LOAD_LEVEL)
@@ -253,6 +256,7 @@ namespace synthese
 					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
 			)	);
 			query.addField(object->getMain());
+			query.addField(object->getPlannedLength());
 			query.execute(transaction);
 		}
 

@@ -21,15 +21,17 @@
 */
 
 #include "JourneyPattern.hpp"
+
+#include "CommercialLine.h"
+#include "DesignatedLinePhysicalStop.hpp"
+#include "JourneyPatternCopy.hpp"
+#include "LineArea.hpp"
+#include "Log.h"
 #include "Registry.h"
 #include "RollingStock.hpp"
 #include "Service.h"
-#include "LineArea.hpp"
-#include "DesignatedLinePhysicalStop.hpp"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
-#include "CommercialLine.h"
-#include "JourneyPatternCopy.hpp"
-#include "Log.h"
 
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -39,6 +41,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace geography;
 	using namespace graph;
 	using namespace util;
 	using namespace impex;
@@ -372,6 +375,20 @@ namespace synthese
 		std::string JourneyPattern::getRuleUserName() const
 		{
 			return "Parcours " + getName();
+		}
+
+
+
+		bool JourneyPattern::callsAtCity( const City& city ) const
+		{
+			BOOST_FOREACH(Edge* edge, getAllEdges())
+			{
+				if(	static_cast<StopPoint*>(edge->getFromVertex())->getConnectionPlace()->getCity() == &city
+				){
+					return true;
+				}
+			}
+			return false;
 		}
 
 

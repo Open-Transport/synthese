@@ -31,6 +31,8 @@
 #include "BaseImportableUpdateAction.hpp"
 #include "BaseCalendarUpdateAction.hpp"
 
+#include "GraphTypes.h"
+
 namespace synthese
 {
 	namespace pt
@@ -60,6 +62,7 @@ namespace synthese
 			static const std::string PARAMETER_DIRECTION_ID;
 			static const std::string PARAMETER_WAYBACK;
 			static const std::string PARAMETER_MAIN;
+			static const std::string PARAMETER_PLANNED_LENGTH;
 
 		private:
 			boost::shared_ptr<JourneyPattern> _route;
@@ -70,6 +73,7 @@ namespace synthese
 			boost::optional<std::string> _direction;
 			boost::optional<bool> _wayback;
 			boost::optional<bool> _main;
+			boost::optional<graph::MetricOffset> _plannedLength;
 
 
 		protected:
