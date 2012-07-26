@@ -61,6 +61,10 @@ namespace synthese
 					CalendarTemplate
 			>	>
 		{
+		private:
+			static const std::string ATTR_PARENT_ID;
+			static const std::string ATTR_NAME;
+
 		public:
 			/// Chosen registry class.
 			typedef util::Registry<CalendarTemplate>	Registry;
@@ -166,6 +170,10 @@ namespace synthese
 				/// Tests if the calendar template defines a limited time period.
 				/// @return true if the min and max dates are not infinite.
 				bool isLimited() const;
+
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 
 			//! @name Getters

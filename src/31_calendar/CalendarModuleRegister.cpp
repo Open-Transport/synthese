@@ -18,6 +18,7 @@
 #include "CalendarModule.h"
 #include "CalendarRight.h"
 
+#include "CalendarsListService.hpp"
 #include "CalendarTemplatesListFunction.hpp"
 
 
@@ -45,6 +46,7 @@ void synthese::calendar::moduleRegister()
 	synthese::calendar::CalendarModule::integrate();
 	synthese::calendar::CalendarRight::integrate();
 
+	synthese::calendar::CalendarsListService::integrate();
 	synthese::calendar::CalendarTemplatesListFunction::integrate();
 
 	// Registries
