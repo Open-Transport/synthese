@@ -50,6 +50,11 @@ namespace synthese
 		class CalendarTemplate;
 	}
 
+	namespace geography
+	{
+		class City;
+	}
+
 	namespace graph
 	{
 		class Service;
@@ -249,6 +254,11 @@ namespace synthese
 					const RollingStock& transportMode
 				) const;
 
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if a journey pattern calls at the specified city
+				bool callsAtCity(const geography::City& city) const;
 			//@}
 
 			//! @name Modifiers

@@ -300,4 +300,18 @@ namespace synthese
 		{
 			return getRoot();
 		}
+
+
+
+		bool CommercialLine::callsAtCity( const geography::City& city ) const
+		{
+			BOOST_FOREACH(Path* path, _paths)
+			{
+				if(static_cast<JourneyPattern*>(path)->callsAtCity(city))
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 }	}
