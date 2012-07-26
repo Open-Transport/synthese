@@ -58,6 +58,7 @@ namespace synthese
 		const string JourneyPatternUpdateAction::PARAMETER_DIRECTION_ID = Action_PARAMETER_PREFIX + "ii";
 		const string JourneyPatternUpdateAction::PARAMETER_WAYBACK = Action_PARAMETER_PREFIX + "wb";
 		const string JourneyPatternUpdateAction::PARAMETER_MAIN = Action_PARAMETER_PREFIX + "ma";
+		const string JourneyPatternUpdateAction::PARAMETER_PLANNED_LENGTH = Action_PARAMETER_PREFIX + "_planned_length";
 
 
 
@@ -128,6 +129,11 @@ namespace synthese
 			if(map.isDefined(PARAMETER_MAIN))
 			{
 				_main = map.get<bool>(PARAMETER_MAIN);
+			}
+
+			if(map.isDefined(PARAMETER_PLANNED_LENGTH))
+			{
+				_plannedLength = map.get<MetricOffset>(PARAMETER_PLANNED_LENGTH);
 			}
 
 			if(map.isDefined(PARAMETER_TRANSPORT_MODE_ID))
@@ -205,6 +211,10 @@ namespace synthese
 			if(_wayback)
 			{
 				_route->setWayBack(*_wayback);
+			}
+			if(_plannedLength)
+			{
+				_route->setPlannedLength(*_plannedLength);
 			}
 
 			// Importable
