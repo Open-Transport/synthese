@@ -230,8 +230,11 @@ namespace synthese
 					}
 
 					// Is a variable set ?
-					if(it2 != end && *it2 == '=')
-					{
+					if(	it2 != end &&
+						*it2 == '=' &&
+						(it2+1 == end || *(it2+1) != '=') &&
+						(*(it2-1) != '!')
+					){
 						it = it2;
 						++it;
 
