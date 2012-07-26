@@ -182,4 +182,20 @@ namespace synthese
 			_parent = NULL;
 			_root = NULL;
 		}
+
+
+
+		bool TreeFolderDownNodeInterface::isChildOf( const TreeFolderUpNode& upNode ) const
+		{
+			for(TreeFolderUpNode* parent(_parent);
+				parent;
+				parent = dynamic_cast<TreeFolderDownNodeInterface*>(parent) ? dynamic_cast<TreeFolderDownNodeInterface*>(parent)->_parent : NULL
+			){
+				if(parent == &upNode)
+				{
+					return true;
+				}
+			}
+			return false;
+		}
 }	}
