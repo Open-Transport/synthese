@@ -521,6 +521,16 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	}
 
 	{ // Modulo operator
+		string code("<@3%4@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "3");
+	}
+
+	{ // Modulo operator
 		string code("<@5%3@>");
 		WebpageContent wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
