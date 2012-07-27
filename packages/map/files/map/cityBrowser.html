@@ -100,6 +100,15 @@
       }
     });
 
+    cityBrowser.syntheseMap.bind("stopSelected", function(stopFeature) {
+      console.log("Stop selected", stopFeature);
+      console.log(("http://@@host@@/admin/synthese?SERVICE=admin&mt=177329235327713281&" +
+              "pt=177329235327713283&roid=@@roid@@&rub=PTPlaceAdmin&tab=&" +
+              "tt=177329235327713282")
+                .replace("@@host@@", location.host)
+                .replace("@@roid@@", stopFeature.attributes.id));
+    });
+
     $("#setActiveCity").click(function() {
       cityBrowser.setActiveCity($("#activeCity").val());
     });
