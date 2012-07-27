@@ -24,14 +24,17 @@
 
 #include "ServicesListService.hpp"
 
+#include "CalendarModule.h"
+#include "CalendarTemplate.h"
+#include "City.h"
 #include "CommercialLine.h"
-#include "Hub.h"
+#include "DRTArea.hpp"
 #include "JourneyPatternCopy.hpp"
-#include "NamedPlace.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledService.h"
-#include "Vertex.h"
+#include "StopArea.hpp"
+#include "StopPoint.hpp"
 
 using namespace boost;
 using namespace boost::gregorian;
@@ -40,6 +43,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace calendar;
 	using namespace cms;
 	using namespace geography;
 	using namespace graph;
@@ -58,6 +62,7 @@ namespace synthese
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
 		const string ServicesListService::DATA_DEPARTURE_PLACE_NAME = "departure_place_name";
+		const string ServicesListService::DATA_ARRIVAL_SCHEDULE = "arrival_schedule";
 		const string ServicesListService::DATA_ARRIVAL_PLACE_NAME = "arrival_place_name";
 		const string ServicesListService::DATA_RUNS_AT_DATE = "runs_at_date";
 		const string ServicesListService::DATA_SERVICE = "service";
@@ -84,6 +89,18 @@ namespace synthese
 			catch(ObjectNotFoundException<CommercialLine>&)
 			{
 				throw RequestException("No such line");
+			}
+
+			// Base calendar
+			try
+			{
+				_baseCalendar = Env::GetOfficialEnv().get<CalendarTemplate>(
+					map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
+				);
+			}
+			catch(ObjectNotFoundException<CalendarTemplate>&)
+			{
+				throw RequestException("No such calendar");
 			}
 
 			// Wayback
@@ -157,6 +174,7 @@ namespace synthese
 					);
 				}
 
+				// Departure schedule
 				if(dynamic_cast<SchedulesBasedService*>(service))
 				{
 					SchedulesBasedService& sservice(
@@ -164,18 +182,75 @@ namespace synthese
 					);
 					serviceMap->insert(DATA_DEPARTURE_SCHEDULE, to_simple_string(sservice.getDepartureSchedule(false, 0)));
 				}
+
+				// Departure place name
+				const Vertex* departureVertex(service->getPath()->getEdge(0)->getFromVertex());
 				serviceMap->insert(
 					DATA_DEPARTURE_PLACE_NAME,
-					dynamic_cast<const NamedPlace*>(
-						service->getPath()->getEdge(0)->getFromVertex()->getHub()
-					)->getFullName()
+					dynamic_cast<const StopPoint*>(departureVertex) ?
+					dynamic_cast<const StopPoint*>(departureVertex)->getConnectionPlace()->getFullName() :
+					dynamic_cast<const DRTArea*>(departureVertex)->getName()
 				);
+
+				// Arrival schedule
+				if(dynamic_cast<SchedulesBasedService*>(service))
+				{
+					SchedulesBasedService& sservice(
+						dynamic_cast<SchedulesBasedService&>(*service)
+					);
+					serviceMap->insert(DATA_ARRIVAL_SCHEDULE, to_simple_string(sservice.getLastArrivalSchedule(false)));
+				}
+
+				serviceMap->insert(ATTR_NUMBER, service->getServiceNumber());
+				serviceMap->insert(ATTR_PATH_ID, service->getPath()->getKey());
+
+				// Arrival place name
+				const Vertex* arrivalVertex(service->getPath()->getLastEdge()->getFromVertex());
 				serviceMap->insert(
 					DATA_ARRIVAL_PLACE_NAME,
-					dynamic_cast<const NamedPlace*>(
-						service->getPath()->getLastEdge()->getFromVertex()->getHub()
-					)->getFullName()
+					dynamic_cast<const StopPoint*>(arrivalVertex) ?
+					dynamic_cast<const StopPoint*>(arrivalVertex)->getConnectionPlace()->getFullName() :
+					dynamic_cast<const DRTArea*>(arrivalVertex)->getName()
 				);
+
+				if(dynamic_cast<SchedulesBasedService*>(service))
+				{
+					SchedulesBasedService& sservice(
+						dynamic_cast<SchedulesBasedService&>(*service)
+					);
+
+					// Calendar
+					if(_baseCalendar.get())
+					{
+						shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+
+						CalendarModule::BaseCalendar baseCalendar(
+							CalendarModule::GetBestCalendarTitle(sservice, _baseCalendar->getResult())
+						);
+						baseCalendar.first->toParametersMap(*calendarPM);
+						serviceMap->insert(TAG_CALENDAR, calendarPM);
+					}
+
+					// Stops
+					BOOST_FOREACH(const Path::Edges::value_type& edge, service->getPath()->getAllEdges())
+					{
+						shared_ptr<ParametersMap> stopPM(new ParametersMap);
+
+						const StopArea* stopArea(
+							dynamic_cast<const StopPoint*>(edge->getFromVertex())->getConnectionPlace()
+						);
+
+						stopPM->insert(ATTR_CITY_ID, stopArea->getCity()->getKey());
+						stopPM->insert(ATTR_CITY_NAME, stopArea->getCity()->getName());
+						stopPM->insert(ATTR_STOP_NAME, stopArea->getName());
+						stopPM->insert(ATTR_DEPARTURE_TIME, sservice.getDepartureSchedule(false, edge->getRankInPath()));
+						stopPM->insert(ATTR_ARRIVAL_TIME, sservice.getArrivalSchedule(false, edge->getRankInPath()));
+
+						serviceMap->insert(TAG_STOP, stopPM);
+					}
+				}
+
+
 				map.insert(DATA_SERVICE, serviceMap);
 			}
 

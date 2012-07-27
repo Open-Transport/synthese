@@ -30,6 +30,11 @@
 
 namespace synthese
 {
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
+
 	namespace pt
 	{
 		class CommercialLine;
@@ -48,14 +53,27 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_WAYBACK;
 			static const std::string PARAMETER_DISPLAY_DATE;
+			static const std::string PARAMETER_BASE_CALENDAR_ID;
 
 			static const std::string DATA_ID;
 			static const std::string DATA_DEPARTURE_SCHEDULE;
 			static const std::string DATA_DEPARTURE_PLACE_NAME;
+			static const std::string DATA_ARRIVAL_SCHEDULE;
 			static const std::string DATA_ARRIVAL_PLACE_NAME;
 			static const std::string DATA_RUNS_AT_DATE;
 			static const std::string DATA_SERVICE;
+			static const std::string ATTR_NUMBER;
+			static const std::string ATTR_PATH_ID;
 			static const std::string TAG_SERVICES;
+
+			static const std::string TAG_CALENDAR;
+
+			static const std::string TAG_STOP;
+			static const std::string ATTR_CITY_ID;
+			static const std::string ATTR_CITY_NAME;
+			static const std::string ATTR_STOP_NAME;
+			static const std::string ATTR_DEPARTURE_TIME;
+			static const std::string ATTR_ARRIVAL_TIME;
 
 		protected:
 			//! \name Page parameters
@@ -63,6 +81,7 @@ namespace synthese
 				boost::logic::tribool _wayBack;
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::gregorian::date _displayDate;
+				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;
 			//@}
 
 
