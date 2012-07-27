@@ -38,6 +38,7 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
+		class ScheduledService;
 
 		//////////////////////////////////////////////////////////////////////////
 		///	35.15 Function : ServicesListService.
@@ -79,6 +80,7 @@ namespace synthese
 			//! \name Page parameters
 			//@{
 				boost::logic::tribool _wayBack;
+				boost::shared_ptr<const ScheduledService> _service;
 				boost::shared_ptr<const CommercialLine> _line;
 				boost::gregorian::date _displayDate;
 				boost::shared_ptr<const calendar::CalendarTemplate> _baseCalendar;

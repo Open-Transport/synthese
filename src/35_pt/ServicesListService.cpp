@@ -27,12 +27,12 @@
 #include "CalendarModule.h"
 #include "CalendarTemplate.h"
 #include "City.h"
-#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
 #include "DRTArea.hpp"
 #include "JourneyPatternCopy.hpp"
 #include "RequestException.h"
 #include "Request.h"
-#include "ScheduledService.h"
+#include "ScheduledServiceTableSync.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
 
@@ -58,7 +58,8 @@ namespace synthese
 	{
 		const string ServicesListService::PARAMETER_WAYBACK = "wayback";
 		const string ServicesListService::PARAMETER_DISPLAY_DATE = "display_date";
-
+		const string ServicesListService::PARAMETER_BASE_CALENDAR_ID = "base_calendar_id";
+		
 		const string ServicesListService::DATA_ID = "id";
 		const string ServicesListService::DATA_DEPARTURE_SCHEDULE = "departure_schedule";
 		const string ServicesListService::DATA_DEPARTURE_PLACE_NAME = "departure_place_name";
@@ -67,6 +68,18 @@ namespace synthese
 		const string ServicesListService::DATA_RUNS_AT_DATE = "runs_at_date";
 		const string ServicesListService::DATA_SERVICE = "service";
 		const string ServicesListService::TAG_SERVICES = "services";
+
+		const string ServicesListService::ATTR_NUMBER = "number";
+		const string ServicesListService::ATTR_PATH_ID = "path_id";
+		
+		const string ServicesListService::TAG_CALENDAR = "calendar";
+
+		const string ServicesListService::TAG_STOP = "stop";
+		const string ServicesListService::ATTR_CITY_ID = "city_id";
+		const string ServicesListService::ATTR_CITY_NAME = "city_name";
+		const string ServicesListService::ATTR_STOP_NAME = "stop_name";
+		const string ServicesListService::ATTR_DEPARTURE_TIME = "departure_time";
+		const string ServicesListService::ATTR_ARRIVAL_TIME = "arrival_time";
 
 
 		ParametersMap ServicesListService::_getParametersMap() const
@@ -80,16 +93,34 @@ namespace synthese
 		void ServicesListService::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Commercial line
-			try
+			if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == CommercialLineTableSync::TABLE.ID)
 			{
-				_line = Env::GetOfficialEnv().get<CommercialLine>(
-					map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
-				);
+				try
+				{
+					_line = Env::GetOfficialEnv().get<CommercialLine>(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+					);
+				}
+				catch(ObjectNotFoundException<CommercialLine>&)
+				{
+					throw RequestException("No such line");
+				}
 			}
-			catch(ObjectNotFoundException<CommercialLine>&)
+
+			if(decodeTableId(map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == ScheduledServiceTableSync::TABLE.ID)
 			{
-				throw RequestException("No such line");
+				try
+				{
+					_service = Env::GetOfficialEnv().get<ScheduledService>(
+						map.get<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)
+					);
+				}
+				catch(ObjectNotFoundException<ScheduledService>&)
+				{
+					throw RequestException("No such service");
+				}
 			}
+
 
 			// Base calendar
 			try
@@ -126,37 +157,45 @@ namespace synthese
 			ParametersMap map;
 			ServiceSet result;
 
-			// Loop on routes
-			BOOST_FOREACH(Path* path, _line->getPaths())
+			if(_service.get())
 			{
-				// Jump over non regular paths
-				if(!dynamic_cast<JourneyPattern*>(path))
-				{
-					continue;
-				}
-				const JourneyPattern& journeyPattern(
-					static_cast<JourneyPattern&>(
-						*path
-				)	);
+				result.insert(const_cast<ScheduledService*>(_service.get()));
+			}
 
-				// Applies wayback filter
-				if(!indeterminate(_wayBack) && journeyPattern.getWayBack() != _wayBack)
+			// Loop on routes
+			if(_line.get())
+			{
+				BOOST_FOREACH(Path* path, _line->getPaths())
 				{
-					continue;
-				}
+					// Jump over non regular paths
+					if(!dynamic_cast<JourneyPattern*>(path))
+					{
+						continue;
+					}
+					const JourneyPattern& journeyPattern(
+						static_cast<JourneyPattern&>(
+							*path
+					)	);
 
-				// Gets all services
-				BOOST_FOREACH(Service* service, journeyPattern.getServices())
-				{
-					result.insert(service);
-				}
+					// Applies wayback filter
+					if(!indeterminate(_wayBack) && journeyPattern.getWayBack() != _wayBack)
+					{
+						continue;
+					}
 
-				// Sub journey pattern
-				BOOST_FOREACH(JourneyPatternCopy* subPath, journeyPattern.getSubLines())
-				{
-					BOOST_FOREACH(Service* service, subPath->getServices())
+					// Gets all services
+					BOOST_FOREACH(Service* service, journeyPattern.getServices())
 					{
 						result.insert(service);
+					}
+
+					// Sub journey pattern
+					BOOST_FOREACH(JourneyPatternCopy* subPath, journeyPattern.getSubLines())
+					{
+						BOOST_FOREACH(Service* service, subPath->getServices())
+						{
+							result.insert(service);
+						}
 					}
 				}
 			}
