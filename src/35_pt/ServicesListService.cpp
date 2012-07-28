@@ -123,15 +123,25 @@ namespace synthese
 
 
 			// Base calendar
-			try
+			if(map.isDefined(PARAMETER_BASE_CALENDAR_ID))
 			{
-				_baseCalendar = Env::GetOfficialEnv().get<CalendarTemplate>(
-					map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
-				);
-			}
-			catch(ObjectNotFoundException<CalendarTemplate>&)
-			{
-				throw RequestException("No such calendar");
+				// Load
+				try
+				{
+					_baseCalendar = Env::GetOfficialEnv().get<CalendarTemplate>(
+						map.get<RegistryKeyType>(PARAMETER_BASE_CALENDAR_ID)
+					);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("No such calendar");
+				}
+
+				// Check if the calendar is usable
+				if(!_baseCalendar->isLimited())
+				{
+					throw RequestException("This calendar is not usable as a base calendar");
+				}
 			}
 
 			// Wayback
@@ -261,12 +271,21 @@ namespace synthese
 					// Calendar
 					if(_baseCalendar.get())
 					{
-						shared_ptr<ParametersMap> calendarPM(new ParametersMap);
-
+						// Calendar analysis
 						CalendarModule::BaseCalendar baseCalendar(
 							CalendarModule::GetBestCalendarTitle(sservice, _baseCalendar->getResult())
 						);
-						baseCalendar.first->toParametersMap(*calendarPM);
+
+						// Output
+						shared_ptr<ParametersMap> calendarPM(new ParametersMap);
+						if(baseCalendar.first)
+						{
+							baseCalendar.first->toParametersMap(*calendarPM);
+						}
+						else
+						{
+							calendarPM->insert(CalendarTemplate::ATTR_NAME, baseCalendar.second);
+						}
 						serviceMap->insert(TAG_CALENDAR, calendarPM);
 					}
 
