@@ -61,11 +61,10 @@ namespace synthese
 					CalendarTemplate
 			>	>
 		{
-		private:
+		public:
 			static const std::string ATTR_PARENT_ID;
 			static const std::string ATTR_NAME;
 
-		public:
 			/// Chosen registry class.
 			typedef util::Registry<CalendarTemplate>	Registry;
 
