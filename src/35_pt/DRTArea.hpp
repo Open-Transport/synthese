@@ -66,6 +66,8 @@ namespace synthese
 			virtual graph::GraphIdType getGraphType() const;
 
 			virtual std::string getRuleUserName() const;
+
+			bool contains(const StopArea& stopArea) const;
 		};
 }	}
 
