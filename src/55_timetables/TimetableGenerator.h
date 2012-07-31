@@ -85,6 +85,7 @@ namespace synthese
 				boost::optional<bool>		_wayBackFilter;
 				const util::Env&			_env;
 				boost::optional<std::size_t> _autoIntermediateStops;
+				bool _mergeColsWithSameTimetables;
 			//@}
 
 			/// @name Result
@@ -150,6 +151,7 @@ namespace synthese
 				void setAfterTransferTimetable(std::auto_ptr<TimetableGenerator> value){ _transferTimetableAfter = value; }
 				void setWaybackFilter(boost::optional<bool> value){ _wayBackFilter = value; }
 				void setAutoIntermediateStops(boost::optional<std::size_t> value){ _autoIntermediateStops = value; }
+				void setMergeColsWithSameTimetables(bool value){ _mergeColsWithSameTimetables = value; }
 			//@}
 		};
 	}

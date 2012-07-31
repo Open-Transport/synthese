@@ -73,6 +73,7 @@ namespace synthese
 			static const std::string PARAMETER_ROWS_AFTER;
 			static const std::string PARAMETER_AUTO_SORT_ROWS_BEFORE;
 			static const std::string PARAMETER_AUTO_SORT_ROWS_AFTER;
+			static const std::string PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES;
 
 			static const std::string TAG_TIMETABLE;
 			static const std::string ATTR_TIMETABLE_RANK;
@@ -109,6 +110,7 @@ namespace synthese
 				boost::optional<bool> _ignorePastDates;
 				std::vector<boost::shared_ptr<Timetable> > _containerContent;
 				std::size_t _timetableRank;
+				boost::optional<bool> _mergeColsWithSameSchedules;
 			//@}
 
 			mutable std::vector<boost::shared_ptr<TimetableRowGroup> > _rowGroupsOwner;
