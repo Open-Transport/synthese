@@ -56,7 +56,8 @@ namespace synthese
 		):	_transferTimetableBefore(NULL),
 			_transferTimetableAfter(NULL),
 			_withContinuousServices(true),
-			_env(env)
+			_env(env),
+			_mergeColsWithSameTimetables(true)
 		{}
 
 
@@ -591,8 +592,11 @@ namespace synthese
 			TimetableResult::Columns::iterator itCol;
 			for (itCol = result.getColumns().begin(); itCol != result.getColumns().end(); ++itCol)
 			{
-				if (*itCol == col ||
-					(col.includes(*itCol) || itCol->includes(col)) && col.getCalendar() == itCol->getCalendar()
+				if(	(	*itCol == col ||
+						(	(col.includes(*itCol) || itCol->includes(col)) &&
+							col.getCalendar() == itCol->getCalendar()
+					)	) &&
+					_mergeColsWithSameTimetables
 				){
 					if(itCol->includes(col))
 					{

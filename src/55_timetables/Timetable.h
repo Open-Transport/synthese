@@ -124,6 +124,7 @@ namespace synthese
 				boost::optional<bool>		_wayBackFilter;
 				boost::optional<std::size_t> _autoIntermediateStops;
 				bool _ignoreEmptyRows;
+				bool _mergeColsWithSameTimetables;
 			//@}
 
 
@@ -159,6 +160,7 @@ namespace synthese
 				void setRows(const Rows& value){ _rows = value; }
 				void setRows(const RowGroups& value){ _rowGroups = value; }
 				void setIgnoreEmptyRows(bool value){ _ignoreEmptyRows = value; }
+				void setMergeColsWithSameTimetables(bool value){ _mergeColsWithSameTimetables = value; }
 			//@}
 
 			//! @name Modifiers
@@ -187,6 +189,7 @@ namespace synthese
 				ContentType				getContentType()		const { return _contentType; }
 				boost::optional<bool>	getWaybackFilter() const { return _wayBackFilter; }
 				bool getIgnoreEmptyRows() const { return _ignoreEmptyRows; }
+				bool getMergeColsWithSameTimetables() const { return _mergeColsWithSameTimetables; }
 			//@}
 
 			//! @name Services
