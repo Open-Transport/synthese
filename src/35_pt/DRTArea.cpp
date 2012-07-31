@@ -58,4 +58,11 @@ namespace synthese
 		{
 			return "Zone de TAD";
 		}
+
+
+
+		bool DRTArea::contains( const StopArea& stopArea ) const
+		{
+			return _stops.find(&const_cast<StopArea&>(stopArea)) != _stops.end();
+		}
 }	}
