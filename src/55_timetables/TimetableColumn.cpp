@@ -239,8 +239,8 @@ namespace synthese
 								Path::Edges::const_iterator itEdge3;
 								for(itEdge3 = itEdge; itEdge3 != itEdge2 && !exit; ++itEdge3)
 								{
-									if(	dynamic_cast<const StopArea*>((*itEdge3)->getFromVertex()->getHub())->getKey() == itRow4->getPlace()->getKey()
-										&&(	(*itEdge3)->isDeparture() && itRow4->getIsDeparture()
+									if(	dynamic_cast<const StopArea*>((*itEdge3)->getFromVertex()->getHub())->getKey() == itRow4->getPlace()->getKey() &&
+										(	((*itEdge3)->isDeparture() && itRow4->getIsDeparture()) || ((*itEdge3)->isArrival() && itRow4->getIsArrival())
 										) &&
 									(	!first ||
 										timetablegenerator.getAuthorizedPhysicalStops().empty() ||
@@ -259,7 +259,7 @@ namespace synthese
 										for(Path::Edges::const_iterator itEdge4 = itEdge3+1; itEdge4 != edges.end(); ++itEdge4)
 										{
 											if(	dynamic_cast<const StopArea*>((*itEdge4)->getFromVertex()->getHub())->getKey() == itRow5->getPlace()->getKey() &&
-												((*itEdge4)->isArrival() && itRow5->getIsArrival())
+												(((*itEdge4)->isArrival() && itRow5->getIsArrival()) || ((*itEdge4)->isDeparture() && itRow5->getIsDeparture()))
 											){
 												exit = true;
 												break;
