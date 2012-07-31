@@ -9,6 +9,7 @@
 #include "IsochronAdmin.hpp"
 
 #include "IsochronService.hpp"
+#include "ServiceLengthService.hpp"
 
 // Registries
 
@@ -27,5 +28,6 @@ void synthese::analysis::moduleRegister()
 	synthese::analysis::IsochronAdmin::integrate();
 
 	synthese::analysis::IsochronService::integrate();
+	synthese::analysis::ServiceLengthService::integrate();
 
 }
