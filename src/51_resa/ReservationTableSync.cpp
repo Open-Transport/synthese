@@ -505,7 +505,8 @@ namespace synthese
 			bool raisingOrder,
 			int first /*= 0 */,
 			boost::optional<std::size_t> number  /*= 0*/,
-			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */,
+			optional<RegistryKeyType> serviceId
 		){
 			stringstream query;
 			query <<
@@ -528,6 +529,10 @@ namespace synthese
 			if(serviceNumber)
 			{
 				query << " AND " << TABLE.NAME << "." << COL_SERVICE_CODE << "=\"" << *serviceNumber << "\"";
+			}
+			if(serviceId)
+			{
+				query << " AND " << TABLE.NAME << "." << COL_SERVICE_ID << "=" << *serviceId;
 			}
 			if(!indeterminate(cancellations))
 			{

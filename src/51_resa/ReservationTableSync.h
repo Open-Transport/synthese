@@ -128,8 +128,9 @@ namespace synthese
 				bool orderByService = true,
 				bool raisingOrder = true,
 				int first = 0,
-				boost::optional<std::size_t> number = boost::optional<std::size_t>(),
-				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+				boost::optional<size_t> number = boost::optional<size_t>(),
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL,
+				boost::optional<util::RegistryKeyType> serviceId = boost::optional<util::RegistryKeyType>()
 			);
 		};
 	}
