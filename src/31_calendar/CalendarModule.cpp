@@ -68,7 +68,8 @@ namespace synthese
 			const Calendar& mask
 		){
 			CalendarTitlesGenerator generator(mask);
-			return generator.getBestCalendarTitle(calendar);
+			Calendar maskedCalendar(calendar & mask);
+			return generator.getBestCalendarTitle(maskedCalendar);
 		}
 
 
