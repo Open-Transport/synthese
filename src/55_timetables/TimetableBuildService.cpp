@@ -76,6 +76,7 @@ namespace synthese
 		const string TimetableBuildService::PARAMETER_AUTO_SORT_ROWS_AFTER = "auto_sort_rows_after";
 		const string TimetableBuildService::PARAMETER_ROWS_BEFORE = "rows_before";
 		const string TimetableBuildService::PARAMETER_ROWS_AFTER = "rows_after";
+		const string TimetableBuildService::PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES = "merge_cols_with_same_schedules";
 
 		const string TimetableBuildService::TAG_TIMETABLE = "timetable";
 		const string TimetableBuildService::ATTR_TIMETABLE_RANK = "timetable_rank";
@@ -197,6 +198,9 @@ namespace synthese
 
 			// Wayback filter
 			_waybackFilter = map.getOptional<bool>(PARAMETER_WAYBACK_FILTER);
+
+			// Merge cols with same schedules
+			_mergeColsWithSameSchedules = map.getOptional<bool>(PARAMETER_MERGE_COLS_WITH_SAME_SCHEDULES);
 
 			// Way 1 : pre-configured timetable
 			if(decodeTableId(map.getDefault<RegistryKeyType>(Request::PARAMETER_OBJECT_ID)) == TimetableTableSync::TABLE.ID)
@@ -534,6 +538,10 @@ namespace synthese
 				if(_waybackFilter)
 				{
 					generator->setWaybackFilter(_waybackFilter);
+				}
+				if(_mergeColsWithSameSchedules)
+				{
+					generator->setMergeColsWithSameTimetables(*_mergeColsWithSameSchedules);
 				}
 
 				// Timetable build

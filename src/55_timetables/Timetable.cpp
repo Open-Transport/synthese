@@ -59,7 +59,8 @@ namespace synthese
 			_baseCalendar(NULL),
 			_transferTimetableBefore(NULL),
 			_transferTimetableAfter(NULL),
-			_ignoreEmptyRows(false)
+			_ignoreEmptyRows(false),
+			_mergeColsWithSameTimetables(true)
 		{}
 
 
@@ -117,6 +118,7 @@ namespace synthese
 				{
 					g->setAfterTransferTimetable(_transferTimetableAfter->getGenerator(env, mask));
 				}
+				g->setMergeColsWithSameTimetables(_mergeColsWithSameTimetables);
 			}
 			return g;
 		}
