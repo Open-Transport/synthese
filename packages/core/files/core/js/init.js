@@ -19,6 +19,7 @@ requireJSConfig.paths = {
   "jquery.placeholder": "core/vendor/jquery.placeholder.min",
   "underscore": "core/vendor/underscore-1.1.6.min",
   "backbone": "core/vendor/backbone-0.5.1.min",
+  "bootstrap": "core/vendor/bootstrap/js/bootstrap.min",
 
   // Debug versions:
   //"jquery": "core/vendor/jquery-1.7.1",
@@ -48,7 +49,8 @@ requireJSConfig.shim = {
   "backbone": {
     deps: ["underscore", "jquery.tmpl"],
     exports: "Backbone"
-  }
+  },
+  "bootstrap": ["jquery"]
 };
 
 var version = getVersion();
