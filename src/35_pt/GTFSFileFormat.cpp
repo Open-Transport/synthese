@@ -967,7 +967,7 @@ namespace synthese
 			gtfsKey = 0;
 			if(suffix)
 				gtfsKey = suffix << 48;
-			gtfsKey |= key & (RegistryKeyType)0xFFFFFFFF;
+			gtfsKey |= key & (RegistryKeyType)0xFFFFFFFFFFFF;
 			return gtfsKey;
 		}
 
@@ -1421,7 +1421,7 @@ namespace synthese
 						<< gp->getY() << "," // stop_lat
 						<< gp->getX() << "," // stop_lon
 						<< "0," // location_type
-						<< _key(stopPoint.getConnectionPlace()->getKey()) // parent_station
+						<< _key(stopPoint.getConnectionPlace()->getKey(),2) // parent_station
 						<< endl;
 				}
 			}
@@ -1451,7 +1451,7 @@ namespace synthese
 
 				if(gp.get())
 				{
-					stopsTxt << _key(connPlace->getKey()) << "," //stop_id
+					stopsTxt << _key(connPlace->getKey(),2) << "," //stop_id
 						<< "," //stop_code
 						<< _Str(connPlace->getName()) << "," //stop_name
 						<< gp->getY() << "," //stop_lat
