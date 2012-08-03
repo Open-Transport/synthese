@@ -98,14 +98,22 @@ namespace synthese
 		const std::string RTMFileFormat::Importer_::FILE_LIGNES_ITI_COURSES = "lepilote.txt";
 		const std::string RTMFileFormat::Importer_::SEP(";");
 
-		const std::string RTMFileFormat::Importer_::PARAMETER_NETWORK_ID("network_id");
-		const std::string RTMFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_A("rolling_stock_id_a");
-		const std::string RTMFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_T("rolling_stock_id_t");
-		const std::string RTMFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID_DEFAULT("rolling_stock_id_default");
-		const std::string RTMFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_IMPORT_STOP_AREA("isa");
 		const std::string RTMFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION("sadt");
-		const std::string RTMFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
-		const string RTMFileFormat::Importer_::PARAMETER_HANDICAPPED_ALLOWED_USE_RULE = "handicapped_allowed_use_rule";
+		//const std::string RTMFileFormat::Importer_::PARAMETER_DISPLAY_LINKED_STOPS("display_linked_stops");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_CREATE_LIGNE("#1");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_DESCRIPTION_LIGNE("#11");
+		const std::string RTMFileFormat::Importer_::PARAMETER_CREATE_ITI("#2");
+		const std::string RTMFileFormat::Importer_::PARAMETER_DESCRIPTION_ITI("#3");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_CREATE_TM("#4");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_TM_LIGNE("#5");
+		const std::string RTMFileFormat::Importer_::PARAMETER_CREATE_COURSE("#6");
+		const std::string RTMFileFormat::Importer_::PARAMETER_CREATE_TIMETABLE("#7");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_COURSE_TIMETABLE("#71");
+		const std::string RTMFileFormat::Importer_::PARAMETER_DATE_TM("#8");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_TYPICAL_DAY_COURSE("#9");
+		//const std::string RTMFileFormat::Importer_::PARAMETER_DATE_COURSE("#91");
+		const std::string RTMFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 	}
 
 	namespace impex
@@ -137,10 +145,14 @@ namespace synthese
 			{
 				return team < other.team;
 			}
-			if(handicapped != other.handicapped)
+			if(itiCode != other.itiCode)
 			{
-				return handicapped < other.handicapped;
-			}
+				return itiCode < other.itiCode;
+			}		
+			if(tmCode != other.tmCode)
+			{
+				return tmCode < other.tmCode;
+			}	
 			return false;
 		}
 
@@ -188,26 +200,26 @@ namespace synthese
 			// Stops
 			if(key == FILE_ARRETS)
 			{
+				cout << "test boucle arrêts" << endl;
 				// Loop
 				while(getline(inFile, line))
 				{
 					// Strings
 					_loadLine(line);
-					string code(_getValue(0));
-					string name(_getValue(1));
-					string x(_getValue(2));
-					string y(_getValue(3));
-					string cityCode(_getValue(6));
-					bool handicapped(_getValue(7) == "1");
+					string code(_getValue(6));
+					string name(_getValue(0));
+					string x(_getValue(3));
+					string y(_getValue(2));
 
 					// City
 					City* cityForStopAreaAutoGeneration(NULL);
 					CityTableSync::SearchResult cities(
-						CityTableSync::Search(_env, optional<string>(), optional<string>(), cityCode, 0, 1)
+						CityTableSync::Search(_env, optional<string>(), optional<string>(), string("13055"), 0, 1)
 					);
+		
 					if(cities.empty())
 					{
-						stream << "WARN : City " << cityCode << " not found<br />";
+						stream << "WARN : City " << "Marseille" << " not found<br />";
 					}
 					else
 					{
@@ -215,11 +227,21 @@ namespace synthese
 					}
 
 					// Point
-					shared_ptr<geos::geom::Point> point;
+					shared_ptr<geos::geom::Point> point;								
 					if(!x.empty() && !y.empty())
 					{
 						try
 						{
+							if(x.size()>1)
+							{
+								x.replace(1, 1, ".");
+							}
+
+							if(y.size()>1)
+							{
+								y.replace(2,1,".");
+							}
+						 
 							point = _dataSource.getActualCoordinateSystem().createPoint(
 								lexical_cast<double>(x),
 								lexical_cast<double>(y)
@@ -228,10 +250,11 @@ namespace synthese
 							{
 								point.reset();
 							}
+
 						}
 						catch(boost::bad_lexical_cast&)
 						{
-							stream << "WARN : Stop " << code << " has invalid coordinate<br />";
+							stream << "WARN : Stop " << code << " has invalid coordinate 1 <br />";
 						}
 					}
 					else
@@ -245,20 +268,10 @@ namespace synthese
 					handicappedRules.push_back(NULL);
 					handicappedRules.push_back(_handicappedAllowedUseRule.get());
 					handicappedRules.push_back(NULL);
-
-					RuleUser::Rules handicappedForbiddenRules;
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-
-					optional<const RuleUser::Rules&> handicappedUseRule(
-						handicapped ?
-						handicappedRules :
-						handicappedForbiddenRules
-					);
-
-					// Stop creation // AJOUTER PRISE EN CHARGE _importStopArea
+					
+					optional<const RuleUser::Rules&> handicappedUseRule(handicappedRules);
+					
+					// Stop creation
 					PTFileFormat::CreateOrUpdateStopWithStopAreaAutocreation(
 						_stopPoints,
 						code,
@@ -269,110 +282,177 @@ namespace synthese
 						_dataSource,
 						_env,
 						stream,
-						handicappedUseRule
+ 						handicappedUseRule
 					);
+					cout << "test arrets ok" << endl;
 				}
 			}
 			// Services
 			else if(key == FILE_LIGNES_ITI_COURSES)
 			{
-				while(getline(inFile, line))
-				{
-					// Strings
-					_loadLine(line);
-
-					date day(
-						from_string(_getValue(0))
-					);
-					TripIndex trip;
-					trip.lineCode = _getValue(1);
-					trip.routeCode = _getValue(4);
-					trip.code = _getValue(5);
-					trip.team = _getValue(6);
-					trip.handicapped = (_getValue(13) == "X");
-
-					size_t pos = trip.team.rfind('-');
-					if(pos != string::npos && pos + 1 < trip.team.length())
-					{
-						trip.team = trim_left_copy(trip.team.substr(pos + 1));
-					}
-
-					// Storage
-					Trips::iterator itTrip(
-						_trips.find(trip)
-					);
-					if(itTrip == _trips.end())
-					{
-						itTrip = _trips.insert(
-							make_pair(trip, TripValues())
-						).first;
-					}
-					itTrip->second.calendar.setActive(day);
-					itTrip->second.routeName = _getValue(10);
-					itTrip->second.wayBack = (_getValue(12) == "Retour");
-					itTrip->second.rollingStock = (_rollingStocks.find(_getValue(3)) == _rollingStocks.end()) ? _defaultRollingStock.get() : _rollingStocks.find(_getValue(3))->second.get();
-					_tripsByCode[trip.code].insert(trip);
-				}
-			}
-			// Routes
-/*			else if(key == FILE_ITINERAIRES)
-			{
-				string lastCode;
-				MetricOffset distance(0);
+				int i = 0;
+				int u = 0;
+				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 
 				while(getline(inFile, line))
 				{
 					// Strings
 					_loadLine(line);
-					string stopCode(_getValue(0));
-					MetricOffset delta(
-						lexical_cast<MetricOffset>(
-							_getValue(2)
-					)	);
-					time_duration schedule(
-						duration_from_string(
-							_getValue(3)
-					)	);
-					string code(_getValue(4));
-					bool withSchedules(_getValue(5) == "REGUL");
+					string typeObjet(_getValue(0));
 
-					// Object change
-					if(lastCode != code)
+//					shared_ptr<RollingStock> rollingStock(RollingStockTableSync::GetEditable(1, _env));
+					cout << i << endl;
+					i++; 
+					// LINES
+					if(typeObjet == PARAMETER_CREATE_ITI)
 					{
-						lastCode = code;
-						distance = 0;
-					}
+						TripIndex trip;
+						trip.lineCode = _getValue(1);
+						trip.code = _getValue(2);
 
-					// Storage
-					BOOST_FOREACH(const TripsByCode::mapped_type::value_type& itTrip, _tripsByCode[code])
-					{
-						TripValues& trip(_trips[itTrip]);
-
-						// Schedule if necessary
-						if(withSchedules)
+						cout << typeObjet << endl;	
+											
+						// Storage
+						Trips::iterator itTrip(
+							_trips.find(trip)
+						);
+						if(itTrip == _trips.end())
 						{
-							trip.schedules.push_back(schedule);
+							itTrip = _trips.insert(
+								make_pair(trip, TripValues())
+							).first;
+						}
+						cout << "test ligne ok" << endl;
+										
+					}
+			
+					// ITINERAIRES
+					else if(typeObjet == PARAMETER_DESCRIPTION_ITI)
+					{
+						// Strings
+						TripIndex trip;
+						trip.stopCode = _getValue(2);
+						trip.itiCode = _getValue(1);
+						
+						// Storage
+						Trips::iterator itTrip(
+							_trips.find(trip)
+						);
+						if(itTrip == _trips.end())
+						{
+							itTrip = _trips.insert(
+								make_pair(trip, TripValues())
+							).first;
+						}
+						cout << "test iti ok" << endl;
+					}
+
+					// COURSES
+					else if(typeObjet == PARAMETER_CREATE_COURSE)
+					{
+						// Strings
+						TripIndex trip;
+						trip.itiCode = _getValue(1);
+						trip.courseCode = _getValue(2);
+						trip.tmCode = _getValue(3);
+						
+						// Storage
+						Trips::iterator itTrip(
+							_trips.find(trip)
+						);
+						if(itTrip == _trips.end())
+						{
+							itTrip = _trips.insert(
+								make_pair(trip, TripValues())
+							).first;
+						}
+						cout << "test course ok" << endl;
+					}
+
+					//SCHEDULE
+					else if(typeObjet == PARAMETER_CREATE_TIMETABLE)
+					{
+						TripIndex trip;
+						trip.courseCode = _getValue(1);
+						string stopCode(_getValue(2));
+						
+						time_duration schedule(
+								duration_from_string(
+									_getValue(3)
+							)	);	
+							
+						bool withSchedules(1);
+											 
+
+						// Storage
+						BOOST_FOREACH(const TripsByCode::mapped_type::value_type& itTrip, _tripsByCode[trip.code])
+						{
+							TripValues& trip(_trips[itTrip]);
+
+							// Schedule if necessary
+							if(withSchedules)
+							{
+								trip.schedules.push_back(schedule);
+							}
+
+							// Stop
+							JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+								_stopPoints.get(stopCode),
+								boost::optional<MetricOffset>(),
+								//distance + delta,
+								true,
+								true,
+								withSchedules
+								);
+								trip.stops.push_back(stop);
 						}
 
-						// Stop
-						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-							_stopPoints.get(stopCode),
-							distance + delta,
-							true,
-							true,
-							withSchedules
-						);
-						trip.stops.push_back(stop);
+							// Distance
+//							distance += delta;		
+						cout << "test schedule ok" << endl;					
 					}
+					
+					//DATE
+					else if(typeObjet == PARAMETER_DATE_TM)
+					{
+						// Date format
+						string frdate(_getValue(2));
+						string year(frdate.substr(6,4));
+						string month(frdate.substr(2,4));
+						string jour(frdate.substr(0,2));
+						string dat=year+month+jour;
+						date day(
+							from_string(dat)
+						);	
+						
+						TripIndex trip;						
+						trip.tmCode = _getValue(1);	
+											
+						// Storage
+						Trips::iterator itTrip(
+							_trips.find(trip)
+						);
+						if(itTrip == _trips.end())
+						{
+							itTrip = _trips.insert(
+								make_pair(trip, TripValues())
+							).first;
+						}						
+						itTrip->second.calendar.setActive(day);
+						itTrip->second.wayBack = 0;
+//						itTrip->second.rollingStock = (_rollingStocks.find(_getValue(3)) == _rollingStocks.end()) ? _defaultRollingStock.get() : _rollingStocks.find(_getValue(3))->second.get();
+//						_tripsByCode[trip.code].insert(trip);	
 
-					// Distance
-					distance += delta;
+						cout << "test date ok" << endl;											
+					}
 				}
-
 				// SYNTHESE object construction
 				ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 				BOOST_FOREACH(const Trips::value_type& itTrip, _trips)
 				{
+					cout << "debut construction" << endl;
+					cout << u << endl;
+					u++;
 					const TripIndex& trip(itTrip.first);
 					const TripValues& tripValues(itTrip.second);
 
@@ -385,13 +465,14 @@ namespace synthese
 					CommercialLine& line(
 						**lines.get(trip.lineCode).begin()
 					);
-
+					cout << "test construction lignes" << endl;	
+/*						
 					// Route
 					JourneyPattern* route(
 						PTFileFormat::CreateOrUpdateRoute(
 							line,
-							trip.routeCode,
-							tripValues.routeName,
+							trip.courseCode,
+							optional<const string&>(),
 							optional<const string&>(),
 							optional<Destination*>(),
 							optional<const RuleUser::Rules&>(),
@@ -412,23 +493,14 @@ namespace synthese
 
 					// Service
 					// Handicapped rules
+				// Handicapped rules
 					RuleUser::Rules handicappedRules;
 					handicappedRules.push_back(NULL);
 					handicappedRules.push_back(NULL);
 					handicappedRules.push_back(_handicappedAllowedUseRule.get());
 					handicappedRules.push_back(NULL);
-
-					RuleUser::Rules handicappedForbiddenRules;
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-					handicappedForbiddenRules.push_back(NULL);
-
-					optional<const RuleUser::Rules&> handicappedUseRule(
-						trip.handicapped ?
-						handicappedRules :
-						handicappedForbiddenRules
-					);
+						
+					optional<const RuleUser::Rules&> handicappedUseRule(handicappedRules);
 
 					ScheduledService* service(
 						PTFileFormat::CreateOrUpdateService(
@@ -446,12 +518,10 @@ namespace synthese
 					{
 						*service |= tripValues.calendar;
 					}
-				}
-			}*/
+*/				}									
+			}
 			return true;
 		}
-
-
 
 		void RTMFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
@@ -466,42 +536,12 @@ namespace synthese
 			stream << t.title("Mode");
 			stream << t.cell("Effectuer import", t.getForm().getOuiNonRadioInput(DataSourceAdmin::PARAMETER_DO_IMPORT, false));
 			stream << t.cell("Effacer données anciennes", t.getForm().getOuiNonRadioInput(PARAMETER_CLEAN_OLD_DATA, false));
-			stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
+			//stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 			stream << t.title("Fichiers");
 			stream << t.cell("Fichier arrêts", t.getForm().getTextInput(_getFileParameterName(FILE_ARRETS), _pathsMap[FILE_ARRETS].file_string()));
 			stream << t.cell("Fichier pilote", t.getForm().getTextInput(_getFileParameterName(FILE_LIGNES_ITI_COURSES), _pathsMap[FILE_LIGNES_ITI_COURSES].file_string()));
-			stream << t.title("Paramètres");
-			stream << t.cell("Affichage arrêts liés", t.getForm().getOuiNonRadioInput(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops));
-			stream << t.cell("Import zones d'arrêt", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOP_AREA, _importStopArea));
-			stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
-			string rollingStockA;
-			if((_rollingStocks.find("A") != _rollingStocks.end()) && _rollingStocks.find("A")->second.get())
-				rollingStockA = lexical_cast<string>(_rollingStocks.find("A")->second->getKey());
-			stream << t.cell("Mode de transport Bus (A) (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_A, rollingStockA));
-
-			string rollingStockT;
-			if((_rollingStocks.find("T") != _rollingStocks.end()) && _rollingStocks.find("T")->second.get())
-				rollingStockT = lexical_cast<string>(_rollingStocks.find("T")->second->getKey());
-			stream << t.cell("Mode de transport Tram (T) (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_T, rollingStockT));
-
-			stream << t.cell("Mode de transport par défaut (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID_DEFAULT, _defaultRollingStock.get() ? lexical_cast<string>(_defaultRollingStock->getKey()) : string()));
-			stream << t.cell("Temps de transfert par défaut (min)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, lexical_cast<string>(_stopAreaDefaultTransferDuration.total_seconds() / 60)));
-
-			// Handicapped use rule
-			stream <<
-				t.cell(
-					"ID règle accessibilité arrêt",
-					t.getForm().getSelectInput(
-						PARAMETER_HANDICAPPED_ALLOWED_USE_RULE,
-						PTModule::GetPTUseRuleLabels(),
-						boost::optional<util::RegistryKeyType>()
-				)	)
-			;
-
 			stream << t.close();
 		}
-
-
 
 		db::DBTransaction RTMFileFormat::Importer_::_save() const
 		{
@@ -511,13 +551,6 @@ namespace synthese
 			PTDataCleanerFileFormat::_addRemoveQueries(transaction);
 
 			// Saving of each created or altered objects
-			if(_importStopArea)
-			{
-				BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
-				{
-					StopAreaTableSync::Save(cstop.second.get(), transaction);
-				}
-			}
 			BOOST_FOREACH(Registry<StopPoint>::value_type stop, _env.getRegistry<StopPoint>())
 			{
 				StopPointTableSync::Save(stop.second.get(), transaction);
@@ -533,6 +566,10 @@ namespace synthese
 			BOOST_FOREACH(const Registry<ScheduledService>::value_type& service, _env.getRegistry<ScheduledService>())
 			{
 				ScheduledServiceTableSync::Save(service.second.get(), transaction);
+			}
+			BOOST_FOREACH(Registry<StopArea>::value_type cstop, _env.getRegistry<StopArea>())
+			{
+				StopAreaTableSync::Save(cstop.second.get(), transaction);
 			}
 			return transaction;
 		}
@@ -566,35 +603,14 @@ namespace synthese
 		util::ParametersMap RTMFileFormat::Importer_::_getParametersMap() const
 		{
 			ParametersMap map(PTDataCleanerFileFormat::_getParametersMap());
-			map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);
-			map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
-			if(!_stopAreaDefaultTransferDuration.is_not_a_date_time())
+			//map.insert(PARAMETER_IMPORT_STOP_AREA, _importStopArea);			
+			//map.insert(PARAMETER_DISPLAY_LINKED_STOPS, _displayLinkedStops);
+			//exemple
+/*			if(!_stopAreaDefaultTransferDuration.is_not_a_date_time())
 			{
 				map.insert(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, _stopAreaDefaultTransferDuration.total_seconds() / 60);
 			}
-			if(_network.get())
-			{
-				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
-			}
-			if(_defaultRollingStock.get())
-			{
-				map.insert(PARAMETER_ROLLING_STOCK_ID_DEFAULT, _defaultRollingStock->getKey());
-			}
-			if((_rollingStocks.find("A") != _rollingStocks.end()) && _rollingStocks.find("A")->second.get())
-			{
-				map.insert(PARAMETER_ROLLING_STOCK_ID_A, _rollingStocks.find("A")->second->getKey());
-			}
-			if((_rollingStocks.find("T") != _rollingStocks.end()) && _rollingStocks.find("T")->second.get())
-			{
-				map.insert(PARAMETER_ROLLING_STOCK_ID_T, _rollingStocks.find("T")->second->getKey());
-			}
-
-			// Handicapped allowed use rule
-			if(_handicappedAllowedUseRule.get())
-			{
-				map.insert(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE, _handicappedAllowedUseRule->getKey());
-			}
-
+*/			
 			return map;
 		}
 
@@ -603,41 +619,15 @@ namespace synthese
 		void RTMFileFormat::Importer_::_setFromParametersMap( const util::ParametersMap& map )
 		{
 			PTDataCleanerFileFormat::_setFromParametersMap(map);
-			_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
-			_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
-			_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
-
-			if(map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0))
+			//_importStopArea = map.getDefault<bool>(PARAMETER_IMPORT_STOP_AREA, false);
+			//_stopAreaDefaultTransferDuration = minutes(map.getDefault<long>(PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION, 8));
+			//_displayLinkedStops = map.getDefault<bool>(PARAMETER_DISPLAY_LINKED_STOPS, false);
+			//exemple
+			/*if(map.getDefault<RegistryKeyType>(PARAMETER_NETWORK_ID, 0))
 			{
 				_network = TransportNetworkTableSync::Get(map.get<RegistryKeyType>(PARAMETER_NETWORK_ID), _env);
-			}
+			}*/
 
-			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A, 0))
-			{
-				_rollingStocks.insert(make_pair("A", RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A), _env)));
-			}
 
-			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_T, 0))
-			{
-				_rollingStocks.insert(make_pair("T", RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_T), _env)));
-			}
-
-			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_DEFAULT, 0))
-			{
-				_defaultRollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID_A), _env);
-			}
-
-			// Handicapped PT use rule
-			RegistryKeyType handicappedPTUseRuleId(
-				map.getDefault<RegistryKeyType>(PARAMETER_HANDICAPPED_ALLOWED_USE_RULE)
-			);
-			if(handicappedPTUseRuleId) try
-			{
-				_handicappedAllowedUseRule = PTUseRuleTableSync::GetEditable(handicappedPTUseRuleId, _env);
-			}
-			catch(ObjectNotFoundException<PTUseRule>&)
-			{
-				throw Exception("No such handicapped use rule");
-			}
 		}
 }	}
