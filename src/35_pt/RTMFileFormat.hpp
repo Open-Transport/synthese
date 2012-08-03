@@ -71,15 +71,21 @@ namespace synthese
 			public:
 				static const std::string FILE_ARRETS;
 				static const std::string FILE_LIGNES_ITI_COURSES;
-
-				static const std::string PARAMETER_NETWORK_ID;
-				static const std::string PARAMETER_ROLLING_STOCK_ID_A;
-				static const std::string PARAMETER_ROLLING_STOCK_ID_T;
-				static const std::string PARAMETER_ROLLING_STOCK_ID_DEFAULT;
-				static const std::string PARAMETER_IMPORT_STOP_AREA;
+	
+				static const std::string PARAMETER_CREATE_LIGNE;
+				static const std::string PARAMETER_DESCRIPTION_LIGNE;
+				static const std::string PARAMETER_CREATE_ITI;
+				static const std::string PARAMETER_DESCRIPTION_ITI;
+				static const std::string PARAMETER_CREATE_TM;
+				static const std::string PARAMETER_TM_LIGNE;
+				static const std::string PARAMETER_CREATE_COURSE;
+				static const std::string PARAMETER_CREATE_TIMETABLE;
+				static const std::string PARAMETER_COURSE_TIMETABLE;
+				static const std::string PARAMETER_DATE_TM;
+				static const std::string PARAMETER_TYPICAL_DAY_COURSE;
+				static const std::string PARAMETER_DATE_COURSE;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_TRANSFER_DURATION;
-				static const std::string PARAMETER_DISPLAY_LINKED_STOPS;
-				static const std::string PARAMETER_HANDICAPPED_ALLOWED_USE_RULE;
+				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 
 			private:
 				typedef std::map<std::string, boost::shared_ptr<RollingStock> > RollingStockMap;
@@ -93,6 +99,7 @@ namespace synthese
 				bool _displayLinkedStops;
 				boost::posix_time::time_duration _stopAreaDefaultTransferDuration;
 				boost::shared_ptr<PTUseRule> _handicappedAllowedUseRule;
+				boost::shared_ptr<const geography::City> _defaultCity;
 
 				mutable std::vector<std::string> _line;
 				std::string _getValue(std::size_t rank) const;
@@ -105,9 +112,12 @@ namespace synthese
 				{
 					std::string lineCode;
 					std::string routeCode;
+					std::string stopCode;
+					std::string courseCode;
+					std::string tmCode;
+					std::string itiCode;
 					std::string code;
 					std::string team;
-					bool handicapped;
 
 					bool operator <(const TripIndex& other) const;
 				};
