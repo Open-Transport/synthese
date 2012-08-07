@@ -99,6 +99,7 @@ namespace synthese
 			{
 			public:
 				static const std::string PARAMETER_NETWORK_ID;
+				static const std::string PARAMETER_ROLLING_STOCK_ID;
 				static const std::string PARAMETER_STOP_AREA_DEFAULT_CITY;
 				static const std::string PARAMETER_LINE_FILTER_MODE;
 				static const std::string FILTER_MODE1;
@@ -109,6 +110,7 @@ namespace synthese
 
 			private:
 				boost::shared_ptr<TransportNetwork> _network;
+				boost::shared_ptr<RollingStock> _rollingStock;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
