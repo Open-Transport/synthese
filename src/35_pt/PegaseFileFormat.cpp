@@ -37,6 +37,8 @@
 #include "CalendarTemplateTableSync.h"
 #include "IConv.hpp"
 #include "PTUseRuleTableSync.h"
+#include "RollingStock.hpp"
+#include "RollingStockTableSync.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/predicate.hpp>
@@ -320,6 +322,7 @@ namespace synthese
 
 
 		const std::string PegaseFileFormat::Importer_::PARAMETER_NETWORK_ID("net");
+		const std::string PegaseFileFormat::Importer_::PARAMETER_ROLLING_STOCK_ID("rolling_stock_id");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_STOP_AREA_DEFAULT_CITY("sadc");
 		const std::string PegaseFileFormat::Importer_::PARAMETER_LINE_FILTER_MODE("line_filter_mode");
 		const std::string PegaseFileFormat::Importer_::FILTER_MODE1("mode1");
@@ -821,6 +824,18 @@ namespace synthese
 				serviceToCalendar[serviceKey] = cal;
 			}
 
+			// RollingStock
+			RollingStock* rollingStock;
+			if(_rollingStock.get())
+			{
+				rollingStock = _rollingStock.get();
+			}
+			else
+			{
+				os << "WARN : rollingStock not defined <br />";
+				return false;
+			}
+
 			// Extract the JourneyPatterns
 
 			BOOST_FOREACH(const ServiceInfoMap::value_type& serviceKeyInfo, serviceInfos)
@@ -920,7 +935,7 @@ namespace synthese
 						optional<Destination*>(),
 						rules,
 						journeyPatternInfo.wayBack,
-						NULL,
+						rollingStock,
 						stops,
 						_dataSource,
 						_env,
@@ -986,6 +1001,7 @@ namespace synthese
 				stream << t.cell("Effacer arrêts inutilisés", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_CLEAN_UNUSED_STOPS, _cleanUnusedStops));
 				stream << t.cell("Réseau (ID)", t.getForm().getTextInput(PARAMETER_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 				stream << t.cell("Commune par défaut (ID)", t.getForm().getTextInput(PARAMETER_STOP_AREA_DEFAULT_CITY, _defaultCity.get() ? lexical_cast<string>(_defaultCity->getKey()) : string()));
+				stream << t.cell("Mode de transport (ID)", t.getForm().getTextInput(PARAMETER_ROLLING_STOCK_ID, _rollingStock.get() ? lexical_cast<string>(_rollingStock->getKey()) : string()));
 				stream << t.cell("Ne pas importer données anciennes", t.getForm().getOuiNonRadioInput(PTDataCleanerFileFormat::PARAMETER_FROM_TODAY, _fromToday));
 
 				vector<pair<optional<string>, string> > filterModes;
@@ -1008,6 +1024,11 @@ namespace synthese
 			if(_network.get())
 			{
 				map.insert(PARAMETER_NETWORK_ID, _network->getKey());
+			}
+
+			if(_rollingStock.get())
+			{
+				map.insert(PARAMETER_ROLLING_STOCK_ID, _rollingStock->getKey());
 			}
 
 			if(_defaultCity.get())
@@ -1040,6 +1061,11 @@ namespace synthese
 			}
 			catch (ObjectNotFoundException<TransportNetwork>&)
 			{
+			}
+
+			if(map.getDefault<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID, 0))
+			{
+				_rollingStock = RollingStockTableSync::GetEditable(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_ID), _env);
 			}
 
 			if(map.getDefault<RegistryKeyType>(PARAMETER_STOP_AREA_DEFAULT_CITY, 0))
