@@ -170,6 +170,7 @@ namespace synthese
 				void addRow(const TimetableRow& row);
 				void removeAuthorizedLine(const pt::CommercialLine* line);
 				void removeAuthorizedPhysicalStop(const pt::StopPoint* stop);
+				void clearRows();
 				void clearAuthorizedLines();
 				void clearAuthorizedPhysicalStops();
 				void addRowGroup(TimetableRowGroup& rowGroup);
