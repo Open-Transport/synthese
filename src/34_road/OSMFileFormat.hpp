@@ -173,6 +173,10 @@ namespace synthese
 				void _updateHouseNumberingPolicyAccordingToAssociatedHouseNumbers(
 					road::MainRoadChunk* chunk
 				) const;
+
+				std::string _toAlphanumericString(
+					const std::string& input
+				) const;
 			};
 
 			typedef impex::NoExportPolicy<OSMFileFormat> Exporter_;
