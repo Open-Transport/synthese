@@ -41,6 +41,7 @@
 #include "RoadChunk.h"
 #include "RoadChunkTableSync.h"
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/filter/bzip2.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -149,7 +150,7 @@ namespace synthese
 					cityId = boundary->getTag("ref:INSEE");
 				Geometry* centroid = boundary->toGeometry()->getCentroid();
 				std::string cityCode = cityId;
-				std::string cityName = boundary->getTag(Element::TAG_NAME);
+				std::string cityName = to_upper_copy(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(boundary->getTag(Element::TAG_NAME)));
 				util::Log::GetInstance().info("treating ways of boundary " + cityName);
 				CityTableSync::SearchResult cities = CityTableSync::Search(
 					_env,
@@ -311,7 +312,7 @@ namespace synthese
 						continue;
 					}
 
-					_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(cityName + string(" ") + lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(node->getTag("addr:street"))));
+					_RecentlyCreatedRoadPlaces::iterator it(_recentlyCreatedRoadPlaces.find(cityName + string(" ") + _toAlphanumericString(node->getTag("addr:street"))));
 					if(it != _recentlyCreatedRoadPlaces.end())
 					{
 						shared_ptr<RoadPlace> refRoadPlace;
@@ -570,7 +571,7 @@ namespace synthese
 			if(way->hasTag(Element::TAG_NAME))
 			{
 				roadName = way->getTag(Element::TAG_NAME);
-				plainRoadName = lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(roadName);
+				plainRoadName = _toAlphanumericString(roadName);
 			}
 
 			if(!roadName.empty())
@@ -780,6 +781,101 @@ namespace synthese
 				chunk->setLeftHouseNumberingPolicy(policy);
 				chunk->setRightHouseNumberingPolicy(policy);
 			}
+		}
+
+		std::string OSMFileFormat::Importer_::_toAlphanumericString(
+			const std::string& input
+		) const {
+			string lowerInput(lexical_matcher::FrenchPhoneticString::to_plain_lower_copy(input));
+			stringstream output;
+			bool first = true;
+
+			char_separator<char> sep(" :,;.-_|/\\¦'°");
+			tokenizer<char_separator<char> > words(lowerInput, sep);
+			BOOST_FOREACH(string source, words)
+			{
+				string curWord(source);
+
+				if(source == "10")
+					curWord = "dix";
+				else if(source == "11")
+					curWord = "onze";
+				else if(source == "12")
+					curWord = "douze";
+				else if(source == "13")
+					curWord = "treize";
+				else if(source == "14")
+					curWord = "quatorze";
+				else if(source == "15")
+					curWord = "quinze";
+				else if(source == "16")
+					curWord = "seize";
+				else if(source == "17")
+					curWord = "dix sept";
+				else if(source == "18")
+					curWord = "dix huit";
+				else if(source == "19")
+					curWord = "dix neuf";
+				else if(source == "20")
+					curWord = "vingt";
+				else if(source == "st")
+					curWord = "saint";
+				else if(source == "ste")
+					curWord = "sainte";
+				else if(source == "pl")
+					curWord = "place";
+				else if(source == "av")
+					curWord = "avenue";
+				else if(source == "imp")
+					curWord = "impasse";
+				else if(source == "bd")
+					curWord = "boulevard";
+				else if(source == "fg")
+					curWord = "faubourg";
+				else if(source == "che")
+					curWord = "chemin";
+				else if(source == "rte")
+					curWord = "route";
+				else if(source == "rpt")
+					curWord = "rond point";
+				else if(source == "dr")
+					curWord = "docteur";
+				else if(source == "pr")
+					curWord = "professeur";
+				else if(source == "cdt" || source == "cmdt")
+					curWord = "commandant";
+				else if(source == "chu" || source == "chr")
+					curWord = "hopital";
+				else if(source == "fac" || source == "faculte")
+					curWord = "universite";
+				else if(
+					source == "a" ||
+					source == "au" ||
+					source == "d" ||
+					source == "de" ||
+					source == "des" ||
+					source == "du" ||
+					source == "en" ||
+					source == "et" ||
+					source == "l" ||
+					source == "la" ||
+					source == "le" ||
+					source == "les" ||
+					source == "un"
+				)
+					curWord = string();
+
+				if(curWord.empty())
+					continue;
+				else
+				{
+					if(!output.str().empty())
+						output << " ";
+					output << curWord;
+				}
+			}
+
+			return output.str();
 		}
 	}
 }
