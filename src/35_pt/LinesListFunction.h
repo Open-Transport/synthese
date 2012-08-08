@@ -82,6 +82,7 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_GEOMETRY;
 			static const std::string PARAMETER_OUTPUT_MESSAGES;
 			static const std::string PARAMETER_OUTPUT_STOPS;
+			static const std::string PARAMETER_OUTPUT_TERMINUSES;
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_SORT_BY_TRANSPORT_MODE;
@@ -90,7 +91,8 @@ namespace synthese
 			static const std::string PARAMETER_RIGHT_LEVEL;
 			static const std::string PARAMETER_CONTACT_CENTER_ID;
 			static const std::string PARAMETER_CITY_FILTER;
-			
+			static const std::string PARAMETER_STOP_AREA_TERMINUS_PAGE_ID;
+
 			static const std::string FORMAT_WKT;
 
 			static const std::string DATA_LINE;
@@ -105,7 +107,10 @@ namespace synthese
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
 			static const std::string DATA_RANK;
+			static const std::string DATA_TERMINUS;
+			static const std::string DATA_STOP_AREA_TERMINUS;
 
+		protected:
 			//! \name Page parameters
 			//@{
 				std::set<const pt::TransportNetwork*> _networks;
@@ -113,8 +118,10 @@ namespace synthese
 				std::set<const geography::City*> _cities;
 				boost::shared_ptr<const pt::CommercialLine> _line;
 				boost::shared_ptr<const cms::Webpage> _page;
+				boost::shared_ptr<const cms::Webpage> _stopAreaTerminusPage;
 				const CoordinatesSystem* _coordinatesSystem;
 				bool _outputStops;
+				bool _outputTerminuses;
 				bool _ignoreTimetableExcludedLines;
 				bool _ignoreJourneyPlannerExcludedLines;
 				bool _ignoreDeparturesBoardExcludedLines;

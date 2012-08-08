@@ -45,6 +45,7 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
 
+
 using namespace std;
 using namespace boost;
 using namespace boost::algorithm;
@@ -72,6 +73,7 @@ namespace synthese
 		const string StopAreasListFunction::PARAMETER_OUTPUT_LINES = "ol";
 		const string StopAreasListFunction::PARAMETER_STOP_PAGE_ID = "stop_page_id";
 		const string StopAreasListFunction::PARAMETER_LINE_PAGE_ID = "line_page_id";
+		const string StopAreasListFunction::PARAMETER_TERMINUS_ID = "terminus_id";
 
 		const string StopAreasListFunction::DATA_LINE = "line";
 		const string StopAreasListFunction::DATA_LINES = "lines";
@@ -110,6 +112,11 @@ namespace synthese
 			if(_city.get())
 			{
 				result.insert(Request::PARAMETER_OBJECT_ID, _city->getKey());
+			}
+			// terminusId
+			if(_terminusId)
+			{
+				result.insert(PARAMETER_TERMINUS_ID, *_terminusId);
 			}
 			return result;
 		}
@@ -202,6 +209,11 @@ namespace synthese
 			{
 				throw RequestException("No such line page");
 			}
+
+			if(!map.getDefault<string>(PARAMETER_TERMINUS_ID).empty())
+			{
+				_terminusId = map.getOptional<RegistryKeyType>(PARAMETER_TERMINUS_ID);
+			}
 		}
 
 
@@ -241,12 +253,33 @@ namespace synthese
 				BOOST_FOREACH(const Path* path, _commercialLine->getPaths())
 				{
 					const JourneyPattern* journey = dynamic_cast<const JourneyPattern*>(path);
+					
+					//get stopArea terminus of line
+					bool isAreaOfTerminus= false;
+					if(_terminusId)
+					{
+						const StopArea * stopAreaTerminus = journey->getDestination()->getConnectionPlace();
+
+						if (stopAreaTerminus->getKey() == *_terminusId)
+						{
+							isAreaOfTerminus = true;
+						}
+					}
+
 					BOOST_FOREACH(const Edge* edge,journey->getEdges())
 					{
 						const StopPoint * stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 						const StopArea * connPlace(stopPoint->getConnectionPlace());
-
-						stopSet.insert(connPlace);
+						
+						//is Terminus
+						if (_terminusId && isAreaOfTerminus)
+						{
+							stopSet.insert(connPlace);
+						}
+						else if (!_terminusId)
+						{
+							stopSet.insert(connPlace);
+						}
 					}
 				}
 			}
@@ -267,7 +300,38 @@ namespace synthese
 						continue;
 					}
 
-					stopSet.insert(stopArea.second.get());
+					//Terminus
+					bool isAreaOfTerminus= false;
+					if(_terminusId)
+					{
+						BOOST_FOREACH(const StopArea::Lines::value_type& itLine, stopArea.second->getLines(false))
+						{
+							BOOST_FOREACH(Path* path, itLine->getPaths())
+							{
+								const JourneyPattern* journeyPattern = dynamic_cast<const JourneyPattern*>(path);
+
+								if(!journeyPattern)
+									continue;
+
+								//get stopArea terminus of line
+								const StopArea * stopAreaTerminus = journeyPattern->getDestination()->getConnectionPlace();
+
+								if (stopAreaTerminus->getKey() == *_terminusId)
+								{
+									isAreaOfTerminus = true;
+								}
+							}
+						}
+					}
+
+					if (_terminusId && isAreaOfTerminus)
+					{
+						stopSet.insert(stopArea.second.get());
+					}
+					else if (!_terminusId)
+					{
+						stopSet.insert(stopArea.second.get());
+					}
 				}
 			}
 
