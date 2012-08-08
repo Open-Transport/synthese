@@ -65,6 +65,7 @@ namespace synthese
 			static const std::string PARAMETER_OUTPUT_LINES;
 			static const std::string PARAMETER_STOP_PAGE_ID;
 			static const std::string PARAMETER_LINE_PAGE_ID;
+			static const std::string PARAMETER_TERMINUS_ID;
 
 		private:
 			static const std::string DATA_LINE;
@@ -84,6 +85,7 @@ namespace synthese
 				boost::shared_ptr<const cms::Webpage> _stopPage;
 				boost::shared_ptr<const cms::Webpage> _linePage;
 				std::string _outputFormat;
+				boost::optional<util::RegistryKeyType> _terminusId;
 			//@}
 
 			//! @name Setters
