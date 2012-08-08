@@ -14,6 +14,7 @@ function getVersion() {
 }
 
 requireJSConfig.paths = {
+  "text": "core/vendor/requirejs/text",
   "jquery": "core/vendor/jquery-1.7.1.min",
   "jquery.tmpl": "core/vendor/jquery.tmpl.beta1.min",
   "jquery.placeholder": "core/vendor/jquery.placeholder.min",
