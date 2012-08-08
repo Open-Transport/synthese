@@ -32,16 +32,20 @@
 #include "JourneyPattern.hpp"
 #include "MimeTypes.hpp"
 #include "PTUseRule.h"
+#include "CommercialLine.h"
+#include "Path.h"
 #include "RequestException.h"
 #include "ReservationContact.h"
 #include "RollingStock.hpp"
 #include "RollingStockFilter.h"
 #include "SortableLineNumber.hpp"
+#include "TransportNetwork.h"
 #include "StopArea.hpp"
 #include "TransportNetworkTableSync.h"
 #include "TreeFolder.hpp"
 #include "Vertex.h"
 #include "Webpage.h"
+#include "StopPoint.hpp"
 
 #include <geos/geom/LineString.h>
 #include <geos/geom/GeometryCollection.h>
@@ -59,6 +63,10 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace util;
+	using namespace server;
+	using namespace pt;
+	using namespace security;
 	using namespace cms;
 	using namespace geography;
 	using namespace graph;
@@ -81,6 +89,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_PAGE_ID("pi");
 		const string LinesListFunction::PARAMETER_SRID("srid");
 		const string LinesListFunction::PARAMETER_OUTPUT_STOPS("os");
+		const string LinesListFunction::PARAMETER_OUTPUT_TERMINUSES("ot");
 		const string LinesListFunction::PARAMETER_OUTPUT_GEOMETRY("og");
 		const string LinesListFunction::PARAMETER_IGNORE_TIMETABLE_EXCLUDED_LINES = "ittd";
 		const string LinesListFunction::PARAMETER_IGNORE_JOURNEY_PLANNER_EXCLUDED_LINES = "ijpd";
@@ -93,6 +102,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_RIGHT_LEVEL = "right_level";
 		const string LinesListFunction::PARAMETER_CONTACT_CENTER_ID = "contact_center_id";
 		const string LinesListFunction::PARAMETER_CITY_FILTER = "city_filter";
+		const string LinesListFunction::PARAMETER_STOP_AREA_TERMINUS_PAGE_ID ="terminus_page";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -108,6 +118,8 @@ namespace synthese
 		const string LinesListFunction::DATA_RANK("rank");
 		const string LinesListFunction::DATA_X("x");
 		const string LinesListFunction::DATA_Y("y");
+		const string LinesListFunction::DATA_TERMINUS("terminus");
+		const string LinesListFunction::DATA_STOP_AREA_TERMINUS("stopAreaTerminus");
 
 
 
@@ -147,6 +159,9 @@ namespace synthese
 			// Output stops
 			result.insert(PARAMETER_OUTPUT_STOPS, _outputStops);
 
+			// Output terminuses
+			result.insert(PARAMETER_OUTPUT_TERMINUSES, _outputTerminuses);
+
 			// Output messages
 			result.insert(PARAMETER_OUTPUT_MESSAGES, _outputMessages);
 
@@ -158,6 +173,11 @@ namespace synthese
 			else
 			{
 				result.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
+			}
+
+			if(_stopAreaTerminusPage.get())
+			{
+				result.insert(PARAMETER_STOP_AREA_TERMINUS_PAGE_ID, _stopAreaTerminusPage->getKey());
 			}
 
 			// Ignore excluded lines
@@ -303,8 +323,19 @@ namespace synthese
 			{
 				setOutputFormatFromMap(map, string());
 			}
+			
+			if(map.getOptional<RegistryKeyType>(PARAMETER_STOP_AREA_TERMINUS_PAGE_ID)) try
+			{
+				_stopAreaTerminusPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_STOP_AREA_TERMINUS_PAGE_ID));
+			}
+			catch (ObjectNotFoundException<Webpage>&)
+			{
+				throw RequestException("No such stopAreaTerminusPage");
+			}
+			
 			_outputGeometry = map.getDefault<string>(PARAMETER_OUTPUT_GEOMETRY);
 			_outputStops = map.isTrue(PARAMETER_OUTPUT_STOPS);
+			_outputTerminuses = map.isTrue(PARAMETER_OUTPUT_TERMINUSES);
 			CoordinatesSystem::SRID srid(
 				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, CoordinatesSystem::GetInstanceCoordinatesSystem().getSRID())
 			);
@@ -651,9 +682,10 @@ namespace synthese
 						linePM->insert(DATA_TRANSPORT_MODE, rsPM);
 					}
 
-					if(_outputStops)
+					if(_outputStops || _outputTerminuses)
 					{
 						set<const StopArea*> stopAreas;
+						set<const StopArea*> stopAreasTerminus;
 						BOOST_FOREACH(Path* path, line->getPaths())
 						{
 							if(!dynamic_cast<const JourneyPattern*>(path))
@@ -661,28 +693,52 @@ namespace synthese
 								continue;
 							}
 
-							BOOST_FOREACH(Edge* edge, path->getEdges())
+							if(_outputStops)
 							{
-								if(!edge->getFromVertex())
+								BOOST_FOREACH(Edge* edge, path->getEdges())
 								{
-									break;
+									if(!edge->getFromVertex())
+									{
+										break;
+									}
+									const StopArea* stopArea(
+										dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
+									);
+									if(stopArea)
+									{
+										stopAreas.insert(stopArea);
+									}
 								}
-								const StopArea* stopArea(
-									dynamic_cast<const StopArea*>(edge->getFromVertex()->getHub())
-								);
-								if(stopArea)
-								{
-									stopAreas.insert(stopArea);
-								}
-						}	}
-						shared_ptr<ParametersMap> stopAreasPM(new ParametersMap);
-						BOOST_FOREACH(const StopArea* stopArea, stopAreas)
-						{
-							shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
-							stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
-							stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
+							}
+
+							if(_outputTerminuses)
+							{
+								stopAreasTerminus.insert(static_cast<const JourneyPattern*>(path)->getDestination()->getConnectionPlace());
+							}
 						}
-						linePM->insert(DATA_STOP_AREAS, stopAreasPM);
+
+						if(_outputStops)
+						{
+							shared_ptr<ParametersMap> stopAreasPM(new ParametersMap);
+							BOOST_FOREACH(const StopArea* stopArea, stopAreas)
+							{
+								shared_ptr<ParametersMap> stopAreaPM(new ParametersMap);
+								stopArea->toParametersMap(*stopAreaPM, _coordinatesSystem);
+								stopAreasPM->insert(DATA_STOP_AREA, stopAreaPM);
+							}
+							linePM->insert(DATA_STOP_AREAS, stopAreasPM);
+						}
+
+						if(_outputTerminuses)
+						{
+							//Terminus
+							BOOST_FOREACH(const StopArea* stopArea, stopAreasTerminus)
+							{
+								shared_ptr<ParametersMap> stopAreaTerminusPM(new ParametersMap);
+								stopArea->toParametersMap(*stopAreaTerminusPM, _coordinatesSystem);
+								linePM->insert(DATA_STOP_AREA_TERMINUS, stopAreaTerminusPM);
+							}
+						}
 					}
 					if(!_outputGeometry.empty())
 					{
@@ -784,6 +840,20 @@ namespace synthese
 					{
 						pmLine->merge(*pmLine->getSubMaps(DATA_TRANSPORT_MODE)[0].get(),string("rs_"));
 					}
+					
+					//Add Terminus
+					if(_stopAreaTerminusPage.get() && pmLine->hasSubMaps(DATA_STOP_AREA_TERMINUS))
+					{
+						shared_ptr<ParametersMap> stopAreasTerminusPM(new ParametersMap);
+						stringstream stopAreasTerminusStream;
+
+						BOOST_FOREACH(const shared_ptr<ParametersMap>& stopAreaPM, pmLine->getSubMaps(DATA_STOP_AREA_TERMINUS))
+						{
+							stopAreaPM->merge(getTemplateParameters());
+							_stopAreaTerminusPage->display(stopAreasTerminusStream, request, *stopAreaPM);
+						}
+						pmLine->insert(DATA_TERMINUS, stopAreasTerminusStream.str());
+					}
 
 					// Display
 					_page->display(stream, request, *pmLine);
@@ -828,6 +898,7 @@ namespace synthese
 
 		LinesListFunction::LinesListFunction():
 			_outputStops(false),
+			_outputTerminuses(false),
 			_ignoreTimetableExcludedLines(false),
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
