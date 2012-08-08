@@ -41,6 +41,10 @@ requirejs/*.js
   require.js: http://requirejs.org/docs/release/2.0.4/minified/require.js
   require-dev.js http://requirejs.org/docs/release/2.0.4/comments/require.js
 
+requirejs/text.js
+  Version: 2.0.1
+  https://raw.github.com/requirejs/text/master/text.js
+
 underscore-1.1.6.min.js:
 underscore-1.1.6.js:
   Version: 1.1.6
