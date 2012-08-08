@@ -159,7 +159,7 @@ namespace synthese
 					}
 				}
 
-
+				object->clearRows();
 				{
 					TimetableRowTableSync::SearchResult rows(
 						TimetableRowTableSync::Search(env, object->getKey())

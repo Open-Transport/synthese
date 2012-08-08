@@ -73,6 +73,13 @@ namespace synthese
 
 
 
+		void Timetable::clearRows()
+		{
+			_rows.clear();
+		}
+
+
+
 		bool Timetable::isGenerable() const
 		{
 			return
