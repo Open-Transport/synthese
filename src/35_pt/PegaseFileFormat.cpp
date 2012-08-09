@@ -367,6 +367,7 @@ namespace synthese
 				string longName;
 				string shortName;
 				bool wayBack;
+				bool obsolete;
 			};
 
 			typedef unordered_map<JourneyPatternKey, JourneyPatternInfo> JourneyPatternInfoMap;
@@ -557,6 +558,16 @@ namespace synthese
 
 				throw Exception("Invalid line filter mode: " + mode);
 			}
+
+
+			date parseDate(const string& dateStr)
+			{
+				return date(
+					lexical_cast<int>(dateStr.substr(0, 4)),
+					lexical_cast<int>(dateStr.substr(4, 2)),
+					lexical_cast<int>(dateStr.substr(6, 2))
+				);
+			}
 		}
 
 
@@ -702,6 +713,7 @@ namespace synthese
 			}
 
 			JourneyPatternInfoMap journeyPatternInfos;
+			date now(day_clock::local_day());
 
 			os << "INFO : loading ITINERAIRE<br />";
 			parser.setTableToParse("ITINERAIRE");
@@ -709,6 +721,13 @@ namespace synthese
 			{
 				JourneyPatternKey journeyPatternKey(
 					parser.getCell("ITI_COD_ITINERAIR"), parser.getCell("ITI_DAT_DEBVALID"));
+
+				/* For debugging 
+				string prefix = "LR-Q-";
+				if(journeyPatternKey.name.substr(0, prefix.size()) != prefix)
+					continue;
+				*/
+
 				if(journeyPatternInfos.find(journeyPatternKey) == journeyPatternInfos.end())
 				{
 					journeyPatternInfos[journeyPatternKey] = JourneyPatternInfo();
@@ -718,13 +737,18 @@ namespace synthese
 				journeyPatternInfo.longName = parser.getCell("ITI_NOM_LONG");
 				journeyPatternInfo.shortName = parser.getCell("ITI_NOM_COURT");
 				journeyPatternInfo.wayBack = parser.getCell("ITI_SENS") == "R";
+				journeyPatternInfo.obsolete = false;
+				string endValidityDateStr = parser.getCell("ITI_DAT_FINVALID");
+				if(_fromToday && endValidityDateStr != "NULL")
+				{
+					journeyPatternInfo.obsolete = now > parseDate(endValidityDateStr);
+				}
 			}
 
 			CalendarMap calendars;
 
 			os << "INFO : loading CAL_DAT<br />";
 			parser.setTableToParse("CAL_DAT");
-			date now(day_clock::local_day());
 			while(parser.getRow())
 			{
 				CalendarId calendarId = parser.getCellInt("CAD_COD_CAL");
@@ -735,11 +759,7 @@ namespace synthese
 					os << "WARN : incorrect calendar date: " << dateStr << "<br />";
 					continue;
 				}
-				date activeDate(
-					lexical_cast<int>(dateStr.substr(0, 4)),
-					lexical_cast<int>(dateStr.substr(4, 2)),
-					lexical_cast<int>(dateStr.substr(6, 2))
-				);
+				date activeDate = parseDate(dateStr);
 				if(_fromToday && activeDate < now)
 				{
 					continue;
@@ -851,7 +871,10 @@ namespace synthese
 					continue;
 				}
 				JourneyPatternInfo& journeyPatternInfo = journeyPatternInfos[serviceKey.journeyPatternId];
-
+				if(journeyPatternInfo.obsolete)
+				{
+					continue;
+				}
 
 				LineInfo lineInfo = getLineInfo(_lineFilterMode, serviceKey.journeyPatternId.name);
 				if (lineInfo.ignored)
