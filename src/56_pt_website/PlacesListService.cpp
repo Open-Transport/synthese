@@ -247,25 +247,11 @@ namespace synthese
 
 			// Build originPoint
 			_coordinatesXY = map.getDefault<string>(PARAMETER_COORDINATES_XY);
+			_maxDistance=map.getDefault<double>(PARAMETER_MAX_DISTANCE, _maxDistance);
 
 			if(!_coordinatesXY.empty())
 			{
-				//default value of the maxDistance is 300
-				_maxDistance=map.getDefault<double>(PARAMETER_MAX_DISTANCE, _maxDistance);
-
-				vector< string > parsed_coordinatesXY;
-				split(parsed_coordinatesXY, _coordinatesXY, is_any_of(",; ") );
-
-				if(parsed_coordinatesXY.size() != 2)
-				{
-					throw RequestException("Malformed COORDINATES_XY.");
-				}
-
-				shared_ptr<Point> pt(
-					_coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]))
-				);
-
-				_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]));
+				_parseCoordinates();
 			}
 
 			// Output
@@ -1237,5 +1223,24 @@ namespace synthese
 			int distanceToOriginPoint = CalcDistanceToOriginPoint(house);
 			SortHouseByDistanceToOriginPoint keyHouse(house.get(), distanceToOriginPoint);
 			houseMap[keyHouse] = house;
+		}
+
+		void PlacesListService::_parseCoordinates() {
+			vector< string > parsed_coordinatesXY;
+			split(parsed_coordinatesXY, _coordinatesXY, is_any_of(",; ") );
+
+			if(parsed_coordinatesXY.size() != 2)
+			{
+				throw RequestException("Malformed COORDINATES_XY.");
+			}
+
+			try
+			{
+				_originPoint = _coordinatesSystem->createPoint(lexical_cast<double>(parsed_coordinatesXY[0]), lexical_cast<double>(parsed_coordinatesXY[1]));
+			}
+			catch(bad_lexical_cast)
+			{
+				throw RequestException("Malformed COORDINATES_XY.");
+			}
 		}
 }	}
