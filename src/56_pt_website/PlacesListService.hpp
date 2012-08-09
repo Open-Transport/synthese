@@ -193,6 +193,12 @@ namespace synthese
 				void setCitiesWithAtLeastAStop(bool value){ _citiesWithAtLeastAStop = value; }
 				void setText(const std::string& value){ _text = value; }
 				void setCoordinatesSystem(const CoordinatesSystem* coordinatesSystem ){ _coordinatesSystem = coordinatesSystem; }
+				void setCoordinatesXY(const std::string& coordinatesXY)
+				{
+					_coordinatesXY = coordinatesXY;
+					_parseCoordinates();
+				}
+
 			//@}
 
 
@@ -355,6 +361,8 @@ namespace synthese
 				}
 				return isAClassObject;
 			}
+
+			void _parseCoordinates();
 		};
 }	}
 
