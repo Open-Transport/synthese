@@ -30,20 +30,19 @@
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
 #include "AnalysisModule.hpp"
+#include "CoordinatesSystem.hpp"
+#include "Edge.h"
 #include "IntegralSearcher.h"
 #include "GlobalRight.h"
 #include "ParametersMap.h"
-#include "PlacesListFunction.h"
-#include "PropertiesHTMLTable.h"
+#include "Place.h"
+#include "PlacesListService.hpp"
 #include "PTModule.h"
 #include "PTTimeSlotRoutePlanner.h"
 #include "PTRoutePlannerResult.h"
 #include "RequestException.h"
 #include "RoadModule.h"
-#include "SearchFormHTMLTable.h"
 #include "Vertex.h"
-#include "Edge.h"
-
 
 using namespace std;
 using namespace boost;
@@ -56,17 +55,21 @@ namespace synthese
 	using namespace server;
 	using namespace util;
 	using namespace pt;
+	using namespace pt_website;
 	using namespace admin;
 	using namespace algorithm;
 	using namespace graph;
 	using namespace gregorian;
 	using namespace security;
+	using namespace road;
+	using namespace geography;
 
 	template<> const string util::FactorableTemplate<Function, analysis::IsochronService>::FACTORY_KEY("IsochronService");
 
 	namespace analysis
 	{
-		const std::string IsochronService::PARAMETER_START_PLACE("start_place");
+		const std::string IsochronService::PARAMETER_COORDINATES_XY("coordinates_XY");
+		const std::string IsochronService::PARAMETER_START_PLACE_NAME("start_place_name");
 		const std::string IsochronService::PARAMETER_MAX_DISTANCE("max_distance");
 
 		const std::string IsochronService::PARAMETER_DATE("date");
@@ -79,12 +82,14 @@ namespace synthese
 		const std::string IsochronService::PARAMETER_DURATION_TYPE("duration_type");
 		const std::string IsochronService::PARAMETER_FREQUENCY_TYPE("frequency_type");
 		const std::string IsochronService::PARAMETER_SPEED("speed");
+		const std::string IsochronService::PARAMETER_ONLY_WKT("only_wkt");
 
 		const std::string IsochronService::PARAMETER_PAGE("page");
 		const std::string IsochronService::PARAMETER_BOARD_PAGE("board_page");
 		const std::string IsochronService::PARAMETER_STOP_PAGE("stop_page");
 		const std::string IsochronService::PARAMETER_TIME_PAGE("time_page");
-		const std::string IsochronService::PARAMETER_WKT_PAGE("wkt_page");
+		const std::string IsochronService::PARAMETER_SRID = "srid";
+		const std::string IsochronService::PARAMETER_DEPARTURE_CLASS_FILTER = "departure_class_filter";
 
 
 
@@ -98,7 +103,8 @@ namespace synthese
 			_maxDuration(60),
 			_durationType(DURATION_TYPE_MEDIAN),
 			_frequencyType(FREQUENCY_TYPE_NO),
-			_speed(4)
+			_speed(4),
+			_onlyWKT(false)
 		{
 		}
 
@@ -108,7 +114,15 @@ namespace synthese
 		{
 			ParametersMap map;
 			
-			map.insert(PARAMETER_START_PLACE, (_startPlace.get() ? lexical_cast<string>(_startPlace->getKey()) : string()));
+			if(dynamic_cast<NamedPlace*>(_startPlace.get()))
+			{
+				map.insert(PARAMETER_START_PLACE_NAME, dynamic_cast<NamedPlace*>(_startPlace.get())->getFullName());
+			}
+			else if(dynamic_cast<City*>(_startPlace.get()))
+			{
+				map.insert(PARAMETER_START_PLACE_NAME, dynamic_cast<City*>(_startPlace.get())->getName());
+			}
+			
 			map.insert(PARAMETER_MAX_DISTANCE, lexical_cast<string>(_maxDistance));
 
 			map.insert(PARAMETER_DATE, lexical_cast<string>(_date));
@@ -120,6 +134,8 @@ namespace synthese
 			map.insert(PARAMETER_MAX_DURATION, lexical_cast<string>(_maxDuration));
 			map.insert(PARAMETER_DURATION_TYPE, lexical_cast<string>(_durationType));
 			map.insert(PARAMETER_FREQUENCY_TYPE, lexical_cast<string>(_frequencyType));
+
+			map.insert(PARAMETER_ONLY_WKT, (_onlyWKT ? 1 : 0));
 
 			if(_page.get())
 			{
@@ -137,28 +153,44 @@ namespace synthese
 			{
 				map.insert(PARAMETER_TIME_PAGE, _timePage->getKey());
 			}
-			if(_wktPage.get())
-			{
-				map.insert(PARAMETER_WKT_PAGE, _wktPage->getKey());
-			}
 
 			return map;
 		}
 
 
+
 		void IsochronService::_setFromParametersMap(const ParametersMap& map)
 		{
-			if(!map.getDefault<string>(PARAMETER_START_PLACE).empty())
+			// Set coordinate system if provided else 4326 (WGS84)
+			CoordinatesSystem::SRID srid(
+				map.getDefault<CoordinatesSystem::SRID>(PARAMETER_SRID, 4326)
+			);
+			_coordinatesSystem = &CoordinatesSystem::GetCoordinatesSystem(srid);	
+
+			string coordinatesXY = map.getDefault<string>(PARAMETER_COORDINATES_XY);
+			string startPlaceName = map.getDefault<string>(PARAMETER_START_PLACE_NAME);
+
+			if(coordinatesXY.empty() && startPlaceName.empty())
 			{
-				try
-				{
-					_startPlace = Env::GetOfficialEnv().get<StopArea>(map.get<RegistryKeyType>(PARAMETER_START_PLACE));
-				}
-				catch(ObjectNotFoundException<StopArea>&)
-				{
-					throw AdminParametersException("No such stop area");
-				}
+				throw RequestException("Neither start place name nor coordinates have been defined.");
 			}
+
+		    PlacesListService placesListService;
+		    placesListService.setNumber(1);
+		    placesListService.setCoordinatesSystem(_coordinatesSystem);
+
+			if(!coordinatesXY.empty())
+			{
+				placesListService.setCoordinatesXY(coordinatesXY);
+			}
+			else if(!startPlaceName.empty())
+			{
+				placesListService.setText(startPlaceName);
+			}
+
+		    PlacesListService::PlaceResult placeResult = placesListService.getPlaceFromBestResult(placesListService.runWithoutOutput());
+
+			_startPlace = placeResult.value;
 
 			// CMS output
 			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE)) try
@@ -193,14 +225,6 @@ namespace synthese
 			{
 				throw RequestException("No such timePage");
 			}
-			if(map.getOptional<RegistryKeyType>(PARAMETER_WKT_PAGE)) try
-			{
-				_wktPage = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_WKT_PAGE));
-			}
-			catch (ObjectNotFoundException<Webpage>&)
-			{
-				throw RequestException("No such wktPage");
-			}
 
 			_maxDistance = map.getDefault<int>(PARAMETER_MAX_DISTANCE, 50);
 
@@ -217,7 +241,9 @@ namespace synthese
 			_durationType = map.getDefault<int>(PARAMETER_DURATION_TYPE, DURATION_TYPE_MEDIAN);
 			_frequencyType = map.getDefault<int>(PARAMETER_FREQUENCY_TYPE, FREQUENCY_TYPE_NO);
 			_speed = map.getDefault<int>(PARAMETER_SPEED, 4);
+			_onlyWKT = map.getDefault<bool>(PARAMETER_ONLY_WKT, false);
 		}
+
 
 
 		util::ParametersMap IsochronService::run(
@@ -225,7 +251,7 @@ namespace synthese
 			const Request& request
 		) const {
 			ParametersMap result;
-			
+
 			if(_startPlace.get())
 			{
 				// Access Parameter
@@ -239,11 +265,24 @@ namespace synthese
 				AlgorithmLogger logger;
 
 				// VertexAccessMap definition
-				graph::VertexAccessMap ovam;
-				graph::VertexAccessMap dvam;
-				std::set<graph::GraphIdType> graphType;
-				graphType.insert(PTModule::GRAPH_ID);
-				_startPlace->getVertexAccessMap(ovam, accessParameter, graphType);
+				VertexAccessMap originVam, ovam, dvam;
+
+				set<graph::GraphIdType> graphTypes;
+				graphTypes.insert(PTModule::GRAPH_ID);
+				graphTypes.insert(RoadModule::GRAPH_ID);
+				_startPlace->getVertexAccessMap(originVam, accessParameter, graphTypes);
+
+				ovam = _extendToPhysicalStops(
+					originVam,
+					dvam,
+					DEPARTURE_TO_ARRIVAL,
+					ptime(_date, time_duration(hours(_beginTimeSlot))),
+					ptime(_date, time_duration(hours(_endTimeSlot))),
+					ptime(_date, time_duration(hours(_beginTimeSlot))),
+					ptime(_date, time_duration(hours(_endTimeSlot))),
+					accessParameter,
+					logger
+				);
 
 				GraphIdType graphId = PTModule::GRAPH_ID;
 
@@ -255,7 +294,7 @@ namespace synthese
 				for(int minute=0; minute <= nbMinutes; ++minute)
 				{
 					BestVertexReachesMap bestVertexReachesMap(DEPARTURE_TO_ARRIVAL, ovam, dvam, Vertex::GetMaxIndex());
-					const ptime minMaxDateTimeAtOrigin = ptime(_date,time_duration(hours(_beginTimeSlot) + minutes(minute)));
+					const ptime minMaxDateTimeAtOrigin = ptime(_date, time_duration(hours(_beginTimeSlot) + minutes(minute)));
 					ptime minMaxDateTimeAtDestination = ptime(_date, time_duration(hours(_endTimeSlot)));
 					JourneysResult result(minMaxDateTimeAtOrigin, DEPARTURE_TO_ARRIVAL);
 
@@ -291,10 +330,8 @@ namespace synthese
 
 					// Fill bestResultsMap (results of this iteration)
 					BestResultsMap bestResultsMap;
-					for(JourneysResult::ResultSet::const_iterator it(result.getJourneys().begin());
-						it != result.getJourneys().end(); it++)
+					for(JourneysResult::ResultSet::const_iterator it(result.getJourneys().begin()) ;	it != result.getJourneys().end() ; it++)
 					{
-
 						const RoutePlanningIntermediateJourney& journey(*it->first);
 						const Vertex* reachedVertex(journey.getEndEdge().getFromVertex());
 						if(!reachedVertex || !dynamic_cast<const StopArea*>(reachedVertex->getHub()))
@@ -380,95 +417,86 @@ namespace synthese
 				// // CMS output
 				if(_page.get()) 
 				{
-					int step = -_curvesStep;
-					shared_ptr<ParametersMap> pm(new ParametersMap);
-					pm->merge(getTemplateParameters());
-					shared_ptr<ParametersMap> pmBoard(new ParametersMap);
-					stringstream stopsStream;
+					int step = 0;
+					ParametersMap pm;
+					pm.merge(getTemplateParameters());
 					stringstream boardsStream;
-					bool isfirst = true;
-					for(ResultsMap::const_iterator it(resultsMap.begin());
-						it != resultsMap.end(); it++
-					){
-						pmBoard->merge(getTemplateParameters());
 
-						if((*it).second.duration >= (step + _curvesStep))
+					if(!_onlyWKT)
+					{
+						ParametersMap pmBoard;
+
+						stringstream stopsStream;
+
+						for(ResultsMap::const_iterator it(resultsMap.begin()) ; it != resultsMap.end() ; it++)
 						{
-
-							shared_ptr<ParametersMap> pmDuree(new ParametersMap);
-							pmDuree->merge(getTemplateParameters());
-
-							pmBoard->insert("duree_min", step);
-							pmBoard->insert("duree_max", (step + _curvesStep - 1));
-
-							if (isfirst)
+							// On change d'interval de courbe
+							if(((*it).second.duration >= (step + _curvesStep)))
 							{
-								isfirst = false;
-							}
-							else
-							{
-								pmBoard->insert("stops", stopsStream.str());
-								
-								//Output boards
-								if (_boardPage.get())
+								int newstep = (*it).second.duration - ((*it).second.duration % _curvesStep);
+
+								pmBoard.insert("duree_min", step);
+								pmBoard.insert("duree_max", newstep - 1);
+								pmBoard.insert("stops", stopsStream.str());
+
+								if(_boardPage.get())
 								{
-									_boardPage->display(boardsStream, request, *pmBoard);
+									_boardPage->display(boardsStream, request, pmBoard);
 								}
 
-								pmBoard->clear();
+								pmBoard.clear();
+								pmBoard.merge(getTemplateParameters());
 								stopsStream.str("");
+								step = newstep;
 							}
 
-							step = (*it).second.duration - ((*it).second.duration % _curvesStep);
-						}
-						
-						shared_ptr<ParametersMap> pmStop(new ParametersMap);
-						pmStop->merge(getTemplateParameters());
+							ParametersMap pmStop;
+							pmStop.merge(getTemplateParameters());
 
-						pmStop->insert("city_name", (*it).second.stop->getCity()->getName());
-						pmStop->insert("stop_name", (*it).second.stop->getName());
-						pmStop->insert("nb_solutions", (*it).second.nbSolutions);
-						pmStop->insert("duration", (*it).second.duration);
-						pmStop->insert("distance", (*it).second.distance);
-						pmStop->insert("speed", ((*it).second.distance / ((float)(*it).second.duration / 60)));
+							pmStop.insert("city_name", (*it).second.stop->getCity()->getName());
+							pmStop.insert("stop_name", (*it).second.stop->getName());
+							pmStop.insert("nb_solutions", (*it).second.nbSolutions);
+							pmStop.insert("duration", (*it).second.duration);
+							pmStop.insert("distance", (*it).second.distance);
+							pmStop.insert("speed", ((*it).second.distance / ((float)(*it).second.duration / 60)));
 
-						shared_ptr<ParametersMap> pmTimes(new ParametersMap);
-						pmTimes->merge(getTemplateParameters());
-						stringstream timesStream;
-						BOOST_FOREACH(const ptime time, (*it).second.timeDepartureList)
-						{
-							shared_ptr<ParametersMap> pmTime(new ParametersMap);
-							pmTime->merge(getTemplateParameters());
-							pmTime->insert("time",time.time_of_day());
-
-							//Output times
-							if (_timePage.get())
+							stringstream timesStream;
+							BOOST_FOREACH(const ptime time, (*it).second.timeDepartureList)
 							{
-								_timePage->display(timesStream, request, *pmTime);
-							}
-						}
+								ParametersMap pmTime;
+								pmTime.merge(getTemplateParameters());
+								pmTime.insert("time",time.time_of_day());
 
-						//Output times
-						pmStop->insert("times", timesStream.str());
-						if (_stopPage.get())
-						{
-							_stopPage->display(stopsStream, request, *pmStop);
+								if (_timePage.get())
+								{
+									_timePage->display(timesStream, request, pmTime);
+								}
+							}
+
+							pmStop.insert("times", timesStream.str());
+
+							if (_stopPage.get())
+							{
+								_stopPage->display(stopsStream, request, pmStop);
+							}
 						}
 					}
 
 					stringstream wktPointsStream;
-					bool first = true;
+					wktPointsStream << "[";
+					bool first(true);
 					for(ResultsMap::const_iterator it(resultsMap.begin()); it != resultsMap.end(); it++)
 					{
-						shared_ptr<ParametersMap> pmWktPoint(new ParametersMap);
-						pmWktPoint->merge(getTemplateParameters());
-
 						shared_ptr<geos::geom::Point> wgs84Point(CoordinatesSystem::GetCoordinatesSystem(4326).convertPoint(
 							*(*it).second.stop->getPoint()
-						) );
+						));
 
 						std::ostringstream streamPoint;
 
+						if(!first)
+							streamPoint << ",";
+						else
+							first = false;
 						streamPoint << "[ ";
 						streamPoint << wgs84Point->getY();
 						streamPoint << ", ";
@@ -477,30 +505,178 @@ namespace synthese
 						streamPoint << ((*it).second.duration); // duration
 						streamPoint << " ]";
 
-						pmWktPoint->insert("wktPoint",streamPoint.str());
-
-						//Output wkt
-						if (_wktPage.get())
-						{
-							_wktPage->display(wktPointsStream, request, *pmWktPoint);
-						}
+						wktPointsStream << streamPoint.str();
 					}
 
-					pm->insert("boards", boardsStream.str());
-					pm->insert("wktPoints", wktPointsStream.str());
-					_page->display(stream, request, *pm);
-				}
+					wktPointsStream << "]";
+					pm.insert("boards", boardsStream.str());
+					pm.insert("wktPoints", wktPointsStream.str());
 
+					_page->display(stream, request, pm);
+				}
 			}
 
 			return result;
 		}
-		
+
+
+
+		VertexAccessMap IsochronService::_extendToPhysicalStops(
+			const VertexAccessMap& vam,
+			const VertexAccessMap& destinationVam,
+			PlanningPhase direction,
+			const ptime& lowestDepartureTime,
+			const ptime& lowestArrivalTime,
+			const ptime& highestDepartureTime,
+			const ptime& highestArrivalTime,
+			const AccessParameters& ap,
+			const AlgorithmLogger& logger
+		) const {
+
+			VertexAccessMap result;
+
+			// Create origin vam from integral search on roads
+			JourneysResult resultJourneys(
+				direction == DEPARTURE_TO_ARRIVAL ?	lowestDepartureTime : highestArrivalTime ,
+				direction
+			);
+			VertexAccessMap emptyMap;
+			BestVertexReachesMap bvrmd(
+				direction,
+				vam,
+				emptyMap,
+				Vertex::GetMaxIndex()
+			);
+
+			ptime maxTime = (direction == DEPARTURE_TO_ARRIVAL ? highestArrivalTime : lowestDepartureTime);
+			IntegralSearcher iso(
+				direction,
+				ap,
+				PTModule::GRAPH_ID,
+				false,
+				RoadModule::GRAPH_ID,
+				resultJourneys,
+				bvrmd,
+				destinationVam,
+				direction == DEPARTURE_TO_ARRIVAL ? lowestDepartureTime : highestArrivalTime,
+				direction == DEPARTURE_TO_ARRIVAL ? highestDepartureTime : lowestArrivalTime,
+				maxTime,
+				direction == DEPARTURE_TO_ARRIVAL ? false : true,
+				false,
+				ap.getMaxApproachTime(),
+				ap.getApproachSpeed(),
+				false,
+				logger
+			);
+			iso.integralSearch(vam, optional<size_t>(), optional<posix_time::time_duration>());
+
+			// Include physical stops from originVam into result of integral search
+			// (cos not taken into account in returned journey vector).
+			BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& itps, vam.getMap())
+			{
+				const Vertex* vertex(itps.first);
+
+				if(	vertex->getGraphType() == PTModule::GRAPH_ID)
+				{
+					result.insert(vertex, itps.second);
+				}
+
+				VertexAccessMap vam2;
+				vertex->getHub()->getVertexAccessMap(
+					vam2,
+					PTModule::GRAPH_ID,
+					*vertex,
+					direction == DEPARTURE_TO_ARRIVAL
+				);
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
+				{
+					result.insert(
+						it.first,
+						VertexAccess(
+							itps.second.approachTime +
+							(	direction == DEPARTURE_TO_ARRIVAL ?
+								vertex->getHub()->getTransferDelay(*vertex, *it.first) :
+								vertex->getHub()->getTransferDelay(*it.first, *vertex)
+							),
+							itps.second.approachDistance,
+							itps.second.approachJourney
+					)	);
+				}
+			}
+
+
+			Journey candidate;
+			BOOST_FOREACH(const JourneysResult::ResultSet::value_type& it, resultJourneys.getJourneys())
+			{
+				JourneysResult::ResultSet::key_type oj(it.first);
+
+				// Store each reached physical stop with full approach time addition :
+				//	- approach time in departure place
+				//	- duration of the approach journey
+				//	- transfer delay between approach journey end address and physical stop
+				posix_time::time_duration commonApproachTime(
+					vam.getVertexAccess(
+						direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getOrigin()->getFromVertex() :
+						oj->getDestination()->getFromVertex()
+					).approachTime + minutes(static_cast<long>(ceil(oj->getDuration().total_seconds() / double(60))))
+				);
+				double commonApproachDistance(
+					vam.getVertexAccess(
+						direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getOrigin()->getFromVertex() :
+						oj->getDestination()->getFromVertex()
+					).approachDistance + oj->getDistance ()
+				);
+				VertexAccessMap vam2;
+				const Hub* cp(
+					(	direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getDestination() :
+						oj->getOrigin()
+					)->getHub()
+				);
+				const Vertex& v(
+					*(	direction == DEPARTURE_TO_ARRIVAL ?
+						oj->getDestination() :
+						oj->getOrigin()
+					)->getFromVertex()
+				);
+				cp->getVertexAccessMap(
+					vam2,
+					PTModule::GRAPH_ID,
+					v,
+					direction == DEPARTURE_TO_ARRIVAL
+				);
+				BOOST_FOREACH(const VertexAccessMap::VamMap::value_type& it, vam2.getMap())
+				{
+					result.insert(
+						it.first,
+						VertexAccess(
+							commonApproachTime + (
+								(&v == it.first) ?
+								posix_time::seconds(0) :
+								(
+									direction == DEPARTURE_TO_ARRIVAL ?
+									cp->getTransferDelay(v, *it.first) :
+									cp->getTransferDelay(*it.first, v)
+							)	),
+							commonApproachDistance,
+							*oj
+					)	);
+				}
+			}
+
+			return result;
+		}
+
+
+
 		bool IsochronService::isAuthorized(
 			const Session* session
 		) const {
 			return true;
 		}
+
 
 
 		std::string IsochronService::getOutputMimeType() const
