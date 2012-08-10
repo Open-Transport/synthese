@@ -299,15 +299,18 @@ namespace synthese
 				size_t i(0);
 				BOOST_FOREACH(const Edge* edge, getPath()->getEdges())
 				{
-					if(_vertices[i])
+					if(i < _vertices.size())
 					{
-						_RTVertices.push_back(_vertices[i]);
+						if(_vertices[i])
+						{
+							_RTVertices.push_back(_vertices[i]);
+						}
+						else
+						{
+							_RTVertices.push_back(edge->getFromVertex());
+						}
+						++i;
 					}
-					else
-					{
-						_RTVertices.push_back(edge->getFromVertex());
-					}
-					++i;
 				}
 			}
 			_computeNextRTUpdate();
