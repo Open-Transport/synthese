@@ -745,13 +745,24 @@ namespace synthese
 					)	);
 					if(services.empty()) return string();
 
+					string departureName;
+					const Edge* startEdge = static_cast<const JourneyPattern*>(services[0]->getPath())->getEdge(0);
+
+					if(dynamic_cast<const NamedPlace*>(startEdge->getHub()))
+					{
+						departureName = dynamic_cast<const NamedPlace*>(startEdge->getHub())->getFullName();
+					}
+					// Handle DRTArea as departure
+					else if(dynamic_cast<const Named*>(startEdge->getFromVertex()))
+					{
+						departureName = dynamic_cast<const Named*>(startEdge->getFromVertex())->getName();
+					}
+
 					ptime date(_date, services[0]->getDepartureSchedule(false, 0));
 					s <<
 						"Ligne " << _line->getShortName() <<
 						" - service " << services[0]->getServiceNumber() <<
-						" - départ de " << dynamic_cast<const NamedPlace*>(
-								static_cast<const JourneyPattern*>(services[0]->getPath())->getEdge(0)->getHub()
-							)->getFullName() <<
+						" - départ de " << departureName <<
 						" le " << date.date() <<
 						" à " << date.time_of_day()
 					;
