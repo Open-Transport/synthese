@@ -65,7 +65,8 @@ namespace synthese
 			_isWalkingLine (false),
 			_wayBack(false),
 			_directionObj(NULL),
-			_main(false)
+			_main(false),
+			_plannedLength(0)
 		{}
 
 
