@@ -36,6 +36,7 @@
 #include "SubstractFunction.hpp"
 #include "ChrFunction.hpp"
 #include "RowsListFunction.hpp"
+#include "MailService.hpp"
 
 #include "WebPageAdmin.h"
 #include "WebsiteAdmin.hpp"
@@ -94,6 +95,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::SubstractFunction::integrate();
 	synthese::cms::ChrFunction::integrate();
 	synthese::cms::RowsListFunction::integrate();
+	synthese::cms::MailService::integrate();
 
 	synthese::cms::WebPageAddAction::integrate();
 	synthese::cms::WebPageUpdateAction::integrate();
