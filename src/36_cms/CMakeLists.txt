@@ -45,6 +45,8 @@ LabelNode.cpp
 LabelNode.hpp
 LanguageSelectorService.cpp
 LanguageSelectorService.hpp
+MailService.cpp
+MailService.hpp
 NotService.cpp
 NotService.hpp
 OrService.cpp
