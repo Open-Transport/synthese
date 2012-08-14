@@ -204,7 +204,6 @@ namespace synthese
 					else
 					{
 						_date2 = _date;
-						_date2 += days(1);
 					}
 				}
 				catch (...)
@@ -215,8 +214,8 @@ namespace synthese
 			else
 			{
 				_date2 = _date;
-				_date2 += days(1);
 			}
+			_date2 += days(1);
 
 			if(map.isDefined(PARAMETER_SERVICE_ID))
 			{
