@@ -488,6 +488,11 @@ namespace synthese
 					{
 						lineInfo.ignored = true;
 					}
+					// Convert LSRxxx to LRxxx
+					if(starts_with(lineInfo.lineName, "LSR"))
+					{
+						lineInfo.lineName = "LR" + lineInfo.lineName.substr(3, len - 3);
+					}
 					return lineInfo;
 				}
 
@@ -562,6 +567,7 @@ namespace synthese
 
 			date parseDate(const string& dateStr)
 			{
+				assert(dateStr.length() == 8);
 				return date(
 					lexical_cast<int>(dateStr.substr(0, 4)),
 					lexical_cast<int>(dateStr.substr(4, 2)),
@@ -587,6 +593,7 @@ namespace synthese
 			SQLDumpParser parser(inFile);
 
 			os << "INFO : loading POINT_D_ARRET<br />";
+			cout << "INFO : loading POINT_D_ARRET" << endl;
 			parser.setTableToParse("POINT_D_ARRET");
 			while(parser.getRow())
 			{
@@ -660,6 +667,7 @@ namespace synthese
 			ServiceInfoMap serviceInfos;
 
 			os << "INFO : loading ARR_SER<br />";
+			cout << "INFO : loading ARR_SER" << endl;
 			parser.setTableToParse("ARR_SER");
 			while(parser.getRow())
 			{
@@ -716,13 +724,14 @@ namespace synthese
 			date now(day_clock::local_day());
 
 			os << "INFO : loading ITINERAIRE<br />";
+			cout << "INFO : loading ITINERAIRE" << endl;
 			parser.setTableToParse("ITINERAIRE");
 			while(parser.getRow())
 			{
 				JourneyPatternKey journeyPatternKey(
 					parser.getCell("ITI_COD_ITINERAIR"), parser.getCell("ITI_DAT_DEBVALID"));
 
-				/* For debugging 
+				/* For debugging
 				string prefix = "LR-Q-";
 				if(journeyPatternKey.name.substr(0, prefix.size()) != prefix)
 					continue;
@@ -748,6 +757,7 @@ namespace synthese
 			CalendarMap calendars;
 
 			os << "INFO : loading CAL_DAT<br />";
+			cout << "INFO : loading CAL_DAT" << endl;
 			parser.setTableToParse("CAL_DAT");
 			while(parser.getRow())
 			{
@@ -776,6 +786,7 @@ namespace synthese
 
 			ServiceToCalendarIdMap serviceToCalendarId;
 			os << "INFO : loading CAL_SER<br />";
+			cout << "INFO : loading CAL_SER" << endl;
 			parser.setTableToParse("CAL_SER");
 			while(parser.getRow())
 			{
@@ -787,6 +798,7 @@ namespace synthese
 
 			ServiceToCalendarMap serviceToCalendar;
 			os << "INFO : loading SERVICE<br />";
+			cout << "INFO : loading SERVICE" << endl;
 			parser.setTableToParse("SERVICE");
 			while(parser.getRow())
 			{
