@@ -482,17 +482,27 @@ namespace synthese
 
 				if(mode == PegaseFileFormat::Importer_::FILTER_MODE1)
 				{
-					// "LR{nnn}" || "LSR{nnn}"
+					// "LR{nnn}" or "LSR{nnn}"
 
 					if(!starts_with(lineInfo.lineName, "LR") && !starts_with(lineInfo.lineName, "LSR"))
 					{
 						lineInfo.ignored = true;
 					}
-					// Convert LSRxxx to LRxxx
-					if(starts_with(lineInfo.lineName, "LSR"))
+
+					// LR{nnn}
+					if(starts_with(lineInfo.lineName, "LR") && len >= 3)
 					{
-						lineInfo.lineName = "LR" + lineInfo.lineName.substr(3, len - 3);
+						lineInfo.needReservation = false;
+						lineInfo.lineName = lineInfo.lineName.substr(2, len - 2);
 					}
+
+					// LSR{nnn}
+					if(starts_with(lineInfo.lineName, "LSR") && len >= 4)
+					{
+						lineInfo.needReservation = true;
+						lineInfo.lineName = lineInfo.lineName.substr(3, len - 3);
+					}
+
 					return lineInfo;
 				}
 
