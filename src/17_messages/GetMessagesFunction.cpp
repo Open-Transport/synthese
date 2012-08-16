@@ -182,7 +182,7 @@ namespace synthese
 				bool foundMime = outputParametersMap(
 					pm,
 					stream,
-					DATA_MESSAGE,
+					DATA_MESSAGES,
 					"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/17_messages/GetMessagesFunction.xsd"
 				);
 				if (!foundMime)
