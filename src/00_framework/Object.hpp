@@ -409,7 +409,7 @@ namespace synthese
 				// Checks if the fields key corresponds to the request
 				if(	Pair::first_type::GetFieldKey() == _fieldKey
 				){
-					data.second = *((const Pair::second_type*) _value);
+					data.second = *((const typename Pair::second_type*) _value);
 				}
 			}
 		};
