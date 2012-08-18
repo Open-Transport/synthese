@@ -489,7 +489,7 @@ namespace synthese
 			boost::logic::tribool withFiles
 		){
 			if(	boost::logic::indeterminate(withFiles) ||
-				FIELD.exportOnFile == withFiles
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
 			){
 				SaveToParametersMap(fieldObject, map, prefix);
 			}
@@ -680,7 +680,7 @@ namespace synthese
 			boost::logic::tribool withFiles
 		){
 			if(	boost::logic::indeterminate(withFiles) ||
-				FIELD.exportOnFile == withFiles
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
 			){
 				SaveToParametersMap(fieldObject, map, prefix);
 			}
@@ -1003,7 +1003,7 @@ namespace synthese
 			boost::logic::tribool withFiles
 		){
 			if(	boost::logic::indeterminate(withFiles) ||
-				FIELD.exportOnFile == withFiles
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
 			){
 				SaveToParametersMap(fieldObject, map, prefix);
 			}
