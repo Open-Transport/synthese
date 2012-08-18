@@ -53,18 +53,24 @@ namespace synthese
 	using namespace db::svn;
 	using namespace server;
 
+
+
 	FIELD_DEFINITION_OF_TYPE(db::svn::SVNWorkingCopy, "svn_url", SQL_TEXT)
 
+
+
+	template<>
 	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::UnSerialize(
 		SVNWorkingCopy& fieldObject,
-		const std::string& text,
-		const util::Env& env
+		const string& text,
+		const Env& env
 	){
 		fieldObject.setRepoURL(text);
 	}
 
 
 
+	template<>
 	string ObjectField<SVNWorkingCopy, SVNWorkingCopy>::Serialize(
 		const SVNWorkingCopy& fieldObject,
 		util::ParametersMap::SerializationFormat format
@@ -85,11 +91,14 @@ namespace synthese
 
 
 
+	template<>
 	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::GetLinkedObjectsIdsFromText(
 		LinkedObjectsIds& list,
 		const std::string& text
 	){
 	}
+
+
 
 	namespace db
 	{
