@@ -47,8 +47,9 @@ namespace synthese
 			typedef std::vector<boost::shared_ptr<Registrable> > RegistrablesVector;
 			virtual RegistrablesVector getRegistrablesVector() const = 0;
 
-			virtual void remove(util::RegistryKeyType id) = 0;
+			virtual void remove(RegistryKeyType id) = 0;
 			virtual size_t size() const = 0;
+			virtual bool contains(RegistryKeyType id) const = 0;
 
 			virtual boost::shared_ptr<Registrable> getEditableObject(
 				RegistryKeyType key

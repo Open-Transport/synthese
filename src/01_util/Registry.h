@@ -111,7 +111,7 @@ namespace synthese
 
 			//! @name Query methods
 			//@{
-				bool contains (const RegistryKeyType& key) const
+				virtual bool contains (RegistryKeyType key) const
 				{
 					return _registry.find(key) != _registry.end();
 				}
