@@ -42,6 +42,7 @@ namespace synthese
 	{
 		const string ServiceExpression::PARAMETER_VAR = "VAR";
 		const string ServiceExpression::PARAMETER_TEMPLATE = "template";
+		const string ServiceExpression::VAR_EXCEPTION = "template";
 
 
 
@@ -97,37 +98,32 @@ namespace synthese
 
 			// Function
 			shared_ptr<Function> function(_functionCreator->create());
+			if(dynamic_cast<FunctionWithSiteBase*>(function.get()))
+			{
+				static_cast<FunctionWithSiteBase*>(function.get())->setSite(page.getRoot());
+			}
+			function->setTemplateParameters(templateParametersMap);
+
+			ParametersMap result;
 			try
 			{
-				if(dynamic_cast<FunctionWithSiteBase*>(function.get()))
-				{
-					static_cast<FunctionWithSiteBase*>(function.get())->setSite(page.getRoot());
-				}
-				function->setTemplateParameters(templateParametersMap);
+				// Service initialization
 				function->_setFromParametersMap(serviceParametersMap);
+
+				// Right check
 				if (function->isAuthorized(request.getSession()))
 				{
 					// Run of the service
-					ParametersMap result(
-						function->run(
-							stream,
-							request
-					)	);
-
-					// Display of the result if inline template defined
-					if(!_inlineTemplate.empty())
-					{
-						// Merge page parameters in result map
-						result.merge(additionalParametersMap);
-
-						// Display of each inline defined node
-						_inlineTemplate.display(stream, request, result, page, variables);
-					}
+					result = function->run(stream, request);
+				}
+				else
+				{
+					result.insert(VAR_EXCEPTION, "Forbidden");
 				}
 			}
-			catch(RequestException&)
+			catch(RequestException&e)
 			{
-
+				result.insert(VAR_EXCEPTION, e.getMessage());
 			}
 			catch(Request::RedirectException& e)
 			{
@@ -135,7 +131,17 @@ namespace synthese
 			}
 			catch(...)
 			{
+				result.insert(VAR_EXCEPTION, "Unhandled exception");
+			}
 
+			// Display of the result if inline template defined
+			if(!_inlineTemplate.empty())
+			{
+				// Merge page parameters in result map
+				result.merge(additionalParametersMap);
+
+				// Display of each inline defined node
+				_inlineTemplate.display(stream, request, result, page, variables);
 			}
 		}
 
