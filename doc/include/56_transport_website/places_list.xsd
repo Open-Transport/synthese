@@ -18,6 +18,7 @@
 		<xs:annotation>
 			<xs:documentation>Contains the informations about a returned item</xs:documentation>
 		</xs:annotation>
+		<xs:attribute name="id" type="xs:long" use="required"/>
 		<xs:attribute name="type" use="required">
 			<xs:simpleType>
 				<xs:restriction base="xs:string">
