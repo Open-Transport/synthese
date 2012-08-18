@@ -22,14 +22,56 @@
 
 #include "MimeTypes.hpp"
 
+#include "Exception.h"
+
+#include <boost/foreach.hpp>
+
 using namespace std;
 
 namespace synthese
 {
 	namespace util
 	{
-		const string MimeTypes::CSV = "text/csv";
-		const string MimeTypes::HTML = "text/html";
-		const string MimeTypes::JSON = "application/json";
-		const string MimeTypes::XML = "text/xml";
+		const MimeType MimeTypes::CSV("text", "csv", "csv", "");
+		const MimeType MimeTypes::HTML("text", "html", "html", "htm", "");
+		const MimeType MimeTypes::JSON("application", "json", "json", "");
+		const MimeType MimeTypes::XML("text", "xml", "xml", "");
+		const MimeType MimeTypes::JS("application", "javascript", "js", "");
+		const MimeType MimeTypes::PNG("image", "png", "png", "");
+		const MimeType MimeTypes::JPEG("image", "jpeg", "jpg", "jpeg", "");
+		const MimeType MimeTypes::TEXT("text", "plain", "txt", "");
+		const MimeType MimeTypes::GIF("image", "gif", "gif", "");
+		const MimeType MimeTypes::PDF("application", "pdf", "pdf", "");
+
+
+
+		const MimeType& MimeTypes::GetMimeTypeByExtension(
+			const std::string& extension
+		){
+			BOOST_FOREACH(const MimeType* mimeType, MimeType::_types)
+			{
+				BOOST_FOREACH(const std::string& ext, mimeType->getExtensions())
+				{
+					if(ext == extension)
+					{
+						return *mimeType;
+					}
+				}
+			}
+			throw Exception("Mime type not found");
+		}
+
+
+
+		const MimeType& MimeTypes::GetMimeTypeByString( const std::string& fullType )
+		{
+			BOOST_FOREACH(const MimeType* mimeType, MimeType::_types)
+			{
+				if(string(*mimeType) == fullType)
+				{
+					return *mimeType;
+				}
+			}
+			throw Exception("Mime type not found");
+		}
 }	}
