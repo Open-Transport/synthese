@@ -65,7 +65,6 @@ namespace synthese
 			//@{
 				boost::gregorian::date _date;
 				const cms::Webpage* _page;
-				MimeType::Type _mimeType;
 				const VehicleService* _vehicleService;
 				util::RegistryKeyType _key;
 			//@}

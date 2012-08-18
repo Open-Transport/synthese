@@ -88,9 +88,9 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
-			else if(!_mimeType.empty())
+			else if(!_outputFormat.empty())
 			{
-				MimeType::SaveToParametersMap(_mimeType, map);
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 			if(_driver)
 			{
@@ -125,7 +125,7 @@ namespace synthese
 			// Mime type
 			if(!_page)
 			{
-				MimeType::LoadFromRecord(_mimeType, map);
+				setOutputFormatFromMap(map, string());
 			}
 
 			// Driver
@@ -242,11 +242,11 @@ namespace synthese
 						allocPM->merge(getTemplateParameters());
 						_page->display(stream, request, *allocPM);
 			}	}	}
-			else if(_mimeType == MimeTypes::XML)
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				map.outputXML(stream, TAG_ALLOCATIONS, true);
 			}
-			else if(_mimeType == MimeTypes::JSON)
+			else if(_outputFormat == MimeTypes::JSON)
 			{
 				map.outputJSON(stream, TAG_ALLOCATIONS);
 			}
@@ -266,6 +266,6 @@ namespace synthese
 
 		std::string DriverAllocationsListService::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : _mimeType;
+			return _page ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 }	}

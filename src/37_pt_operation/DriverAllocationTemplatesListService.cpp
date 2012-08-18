@@ -34,7 +34,6 @@
 #include "RequestException.h"
 #include "Request.h"
 #include "ScheduledService.h"
-#include "Webpage.h"
 
 #include <boost/foreach.hpp>
 
@@ -50,19 +49,17 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace cms;
 	using namespace pt;
 	using namespace graph;
 	using namespace pt_operation;
 
 	template<>
-	const string FactorableTemplate<FunctionWithSite<false>, DriverAllocationTemplatesListService>::FACTORY_KEY = "driver_allocation_templates";
+	const string FactorableTemplate<Function, DriverAllocationTemplatesListService>::FACTORY_KEY = "driver_allocation_templates";
 
 	namespace pt_operation
 	{
 		const string DriverAllocationTemplatesListService::PARAMETER_DATA_SOURCE_ID = "data_source_id";
 		const string DriverAllocationTemplatesListService::PARAMETER_MIN_DATE = "min_date";
-		const string DriverAllocationTemplatesListService::PARAMETER_PAGE_ID = "p";
 		const string DriverAllocationTemplatesListService::PARAMETER_WORK_DURATION_FILTER = "work_duration_filter";
 		const string DriverAllocationTemplatesListService::PARAMETER_WORK_RANGE_FILTER = "work_range_filter";
 		const string DriverAllocationTemplatesListService::PARAMETER_LINE_FILTER = "line_filter";
@@ -78,7 +75,6 @@ namespace synthese
 			_dataSource(NULL),
 			_minDate(not_a_date_time),
 			_date(not_a_date_time),
-			_page(NULL),
 			_minWorkDuration(not_a_date_time),
 			_maxWorkDuration(not_a_date_time),
 			_minWorkRange(not_a_date_time),
@@ -94,13 +90,9 @@ namespace synthese
 		ParametersMap DriverAllocationTemplatesListService::_getParametersMap() const
 		{
 			ParametersMap map;
-			if(_page)
+			if(!_outputFormat.empty())
 			{
-				map.insert(PARAMETER_PAGE_ID, _page->getKey());
-			}
-			else if(!_mimeType.empty())
-			{
-				MimeType::SaveToParametersMap(_mimeType, map);
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
 			return map;
 		}
@@ -182,14 +174,8 @@ namespace synthese
 				_withTicketSalesFilter = map.get<bool>(PARAMETER_WITH_TICKET_SALES_FILTER);
 			}
 
-			// Display page
-			_page = getPage(map.getDefault<string>(PARAMETER_PAGE_ID));
-
-			// Mime type
-			if(!_page)
-			{
-				MimeType::LoadFromRecord(_mimeType, map);
-			}
+			// Output format
+			setOutputFormatFromMap(map, string());
 		}
 
 
@@ -322,20 +308,11 @@ namespace synthese
 				map.insert(TAG_ALLOCATION, allocPM);
 			}
 
-			if(_page)
-			{
-				if(map.hasSubMaps(TAG_ALLOCATION))
-				{
-					BOOST_FOREACH(const shared_ptr<ParametersMap>& allocPM, map.getSubMaps(TAG_ALLOCATION))
-					{
-						allocPM->merge(getTemplateParameters());
-						_page->display(stream, request, *allocPM);
-			}	}	}
-			else if(_mimeType == MimeTypes::XML)
+			if(_outputFormat == MimeTypes::XML)
 			{
 				map.outputXML(stream, TAG_ALLOCATIONS, true);
 			}
-			else if(_mimeType == MimeTypes::JSON)
+			else if(_outputFormat == MimeTypes::JSON)
 			{
 				map.outputJSON(stream, TAG_ALLOCATIONS);
 			}
@@ -355,6 +332,6 @@ namespace synthese
 
 		std::string DriverAllocationTemplatesListService::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : _mimeType;
+			return getOutputMimeTypeFromOutputFormat();
 		}
 }	}
