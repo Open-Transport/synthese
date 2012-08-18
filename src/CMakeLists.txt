@@ -27,6 +27,7 @@ set(MODULES
 #09_agi_client
 10_db
 10_db/101_sqlite
+10_db/103_svn
 11_interfaces
 12_security
 13_dblog

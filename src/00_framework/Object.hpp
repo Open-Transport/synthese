@@ -159,6 +159,26 @@ namespace synthese
 		void set(const typename Field::Type& value);
 
 
+		//////////////////////////////////////////////////////////////////////////
+		/// Dynamic field getter.
+		/// @warning do not use it directly. Use ObjectBase::dynamic_get instead.
+		/// @param fieldKey the key of the field (obtained through GetFieldKey)
+		/// @return a pointer to the field content
+		virtual const void* _dynamic_get(const std::string& fieldKey) const;
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Dynamic field setter.
+		/// @warning do not use it directly. Use ObjectBase::dynamic_set instead.
+		/// @param value pointer to the field value to set
+		/// @param fieldKey the key of the field (obtained through GetFieldKey)
+		virtual void _dynamic_set(
+			const void* value,
+			const std::string& fieldKey
+		);
+
+
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Dynamic class number getter.
@@ -205,8 +225,7 @@ namespace synthese
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Exports the content of the object into a ParametersMap object.
-		/// @param withFiles Exports fields according to their EXPORT_CONTENT_AS_FILE
-		/// attribute.
+		/// @param withFiles Exports fields as independent file
 		/// @param withAdditionalParameters if true the map is filled up by
 		/// addAdditionalParameters
 		/// @param map the generated ParametersMap
@@ -215,6 +234,15 @@ namespace synthese
 			bool withAdditionalParameters = false,
 			boost::logic::tribool withFiles = boost::logic::indeterminate,
 			std::string prefix = std::string()
+		) const;
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Exports the content of the object into a FilesMap object (fields to store as files only).
+		/// @param map the FilesMap to fill
+		virtual void toFilesMap(
+			FilesMap& map
 		) const;
 
 
@@ -293,14 +321,132 @@ namespace synthese
 			template <typename Pair>
 			void operator()(Pair& data) const
 			{
-				if(	boost::logic::indeterminate(_withFiles) ||
-					Pair::first_type::EXPORT_CONTENT_AS_FILE == _withFiles
+				Pair::first_type::SaveToParametersMap(
+					data.second,
+					static_cast<const ObjectBase&>(_object),
+					_map,
+					_prefix,
+					_withFiles
+				);
+			}
+		};
+
+
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Saves the object content into a parameters map
+		struct SaveFileOperator
+		{
+			FilesMap& _map;
+			const Object<ObjectClass_, Schema_>& _object;
+			
+			SaveFileOperator(
+				FilesMap& map,
+				const Object<ObjectClass_, Schema_>& object
+			):	_map(map),
+				_object(object)
+			{}
+
+			template <typename Pair>
+			void operator()(Pair& data) const
+			{
+				Pair::first_type::SaveToFilesMap(
+					data.second,
+					static_cast<const ObjectBase&>(_object),
+					_map
+				);
+			}
+		};
+
+
+
+		struct DynamicGetOperator
+		{
+			const std::string& _fieldKey;
+			mutable const void* & _result;
+
+			DynamicGetOperator(
+				const void* & result,
+				const std::string& fieldKey
+			):	_result(result),
+				_fieldKey(fieldKey)
+			{}
+
+			template <typename Pair>
+			void operator()(Pair& data) const
+			{
+				// A field was already found
+				if(_result)
+				{
+					return;
+				}
+
+				// Checks if the fields key corresponds to the request
+				if(	Pair::first_type::GetFieldKey() == _fieldKey
 				){
-					Pair::first_type::SaveToParametersMap(data.second, static_cast<const ObjectBase&>(_object), _map, _prefix);
+					_result = (void*) &data.second;
+				}
+			}
+		};
+
+
+
+		struct DynamicSetOperator
+		{
+			const std::string& _fieldKey;
+			const void* _value;
+
+			DynamicSetOperator(
+				const void* value,
+				const std::string& fieldKey
+			):	_value(value),
+				_fieldKey(fieldKey)
+			{}
+
+			template <typename Pair>
+			void operator()(Pair& data) const
+			{
+				// Checks if the fields key corresponds to the request
+				if(	Pair::first_type::GetFieldKey() == _fieldKey
+				){
+					data.second = *((const Pair::second_type*) _value);
 				}
 			}
 		};
 	};
+
+
+
+	template<class ObjectClass_, class Schema_>
+	void Object<ObjectClass_, Schema_>::toFilesMap(
+		FilesMap& map
+	) const {
+		SaveFileOperator op(map, *this);
+		boost::fusion::for_each(_schema, op);
+	}
+
+
+
+	template<class ObjectClass_, class Schema_>
+	const void* Object<ObjectClass_, Schema_>::_dynamic_get(
+		const std::string& fieldKey
+	) const {
+		const void* result(NULL);
+		DynamicGetOperator op(result, fieldKey);
+		boost::fusion::for_each(_schema, op);
+		return result;
+	}
+
+
+
+	template<class ObjectClass_, class Schema_>
+	void Object<ObjectClass_, Schema_>::_dynamic_set(
+		const void* value,
+		const std::string& fieldKey
+	){
+		DynamicSetOperator op(value, fieldKey);
+		boost::fusion::for_each(_schema, op);
+	}
 
 
 
@@ -318,7 +464,8 @@ namespace synthese
 	FieldsList synthese::Object<ObjectClass_, Schema_>::getFields() const
 	{
 		FieldsList l;
-		boost::fusion::for_each(_schema, GetFieldsOperator(l));
+		GetFieldsOperator op(l);
+		boost::fusion::for_each(_schema, op);
 		return l;
 	}
 
@@ -347,7 +494,8 @@ namespace synthese
 		const Record& record
 	) const {
 		LinkedObjectsIds r;
-		boost::fusion::for_each(_schema, GetLinkedObjectsIdsOperator(record, r));
+		GetLinkedObjectsIdsOperator op(record, r);
+		boost::fusion::for_each(_schema, op);
 		return r;
 	}
 
@@ -358,7 +506,8 @@ namespace synthese
 		const Record& record,
 		util::Env& env
 	){
-		boost::fusion::for_each(_schema, LoadOperator(record, *this, env));
+		LoadOperator op(record, *this, env);
+		boost::fusion::for_each(_schema, op);
 	}
 
 
@@ -370,7 +519,8 @@ namespace synthese
 		boost::logic::tribool withFiles,
 		std::string prefix
 	) const {
-		boost::fusion::for_each(_schema, SaveOperator(map, *this, withFiles, prefix));
+		SaveOperator op(map, *this, withFiles, prefix);
+		boost::fusion::for_each(_schema, op);
 		if(withAdditionalParameters)
 		{
 			addAdditionalParameters(map, prefix);

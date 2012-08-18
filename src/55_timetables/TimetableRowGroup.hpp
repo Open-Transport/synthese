@@ -27,6 +27,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include "EnumObjectField.hpp"
 #include "Timetable.h"
 
 namespace synthese

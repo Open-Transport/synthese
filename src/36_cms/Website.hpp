@@ -26,6 +26,7 @@
 #include "Object.hpp"
 #include "TreeRoot.hpp"
 #include "TreeRankOrderingPolicy.hpp"
+#include "SVNWorkingCopy.hpp"
 
 #include "StandardFields.hpp"
 
@@ -38,18 +39,19 @@ namespace synthese
 	{
 		class Webpage;
 
+		FIELD_TYPE(HostName, std::string)
 		FIELD_TYPE(ClientURL, std::string)
 		FIELD_TYPE(DefaultTemplate, boost::optional<Webpage&>)
-		FIELD_TYPE(SVNURL, std::string)
-
+		
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
 			FIELD(StartDate),
 			FIELD(EndDate),
+			FIELD(HostName),
 			FIELD(ClientURL),
 			FIELD(DefaultTemplate),
-			FIELD(SVNURL)
+			FIELD(db::svn::SVNWorkingCopy)
 		> WebsiteRecord;
 
 		//////////////////////////////////////////////////////////////////////////
@@ -68,7 +70,7 @@ namespace synthese
 			typedef util::Registry<Website>	Registry;
 
 		private:
-			WebpagesBySmartURL			_webpagesBySmartURL;
+			WebpagesBySmartURL _webpagesBySmartURL;
 			mutable boost::mutex _smartURLMutex; //!< For thread safety.
 
 		public:
@@ -77,24 +79,20 @@ namespace synthese
 			//! @name Services
 			//@{
 				bool dateCheck() const;
+				Webpage* getPageBySmartURL(const std::string& key) const;
+				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
+				virtual std::string getName() const { return get<Name>(); }
+				virtual SubObjects getSubObjects() const;
 			//@}
 
 			//! @name Modifiers
 			//@{
 				void addPage(Webpage& page);
-
 				void removePage(const std::string& page);
-
-				Webpage* getPageBySmartURL(const std::string& key) const;
-				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
-
-				virtual std::string getName() const { return get<Name>(); }
-				virtual SubObjects getSubObjects() const;
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_cms_Website_hpp__

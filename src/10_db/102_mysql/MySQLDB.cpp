@@ -360,6 +360,8 @@ namespace synthese
 				return "POINT";
 			case SQL_GEOM_POLYGON:
 				return "POLYGON";
+			case SQL_BLOB:
+				return "BLOB";
 			}
 			return string();
 		}

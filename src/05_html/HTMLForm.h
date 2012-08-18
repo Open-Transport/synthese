@@ -755,6 +755,33 @@ namespace synthese
 					std::string fieldId = std::string(),
 					std::string className = std::string()
 				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Generic File input generator.
+				/// @param name name of the field
+				/// @param fieldId unique ID of the field within the page (auto generated if not defined)
+				///	@param className CSS class to use for display
+				/// @return the HTML generated code
+				static std::string GetFileInput(
+					const std::string& name,
+					std::string fieldId = std::string(),
+					std::string className = std::string()
+				);
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// File input generator.
+				/// @param name name of the field
+				/// @param fieldId unique ID of the field within the page (auto generated if not defined)
+				///	@param className CSS class to use for display
+				/// @return the HTML generated code
+				std::string getFileInput(
+					const std::string& name,
+					std::string className = std::string()
+				);
 			//@}
 		};
 

@@ -17,6 +17,7 @@ macro(boost_test name deps)
 endmacro(boost_test)
 
 
+add_subdirectory(00_framework)
 add_subdirectory(01_util)
 add_subdirectory(05_html)
 add_subdirectory(07_lex_matcher)

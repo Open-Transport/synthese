@@ -155,8 +155,10 @@ namespace synthese
 					}
 
 					// Variable
-					if((*it >= 'a' && *it <= 'z') || (*it >= 'A' && *it <= 'Z'))
-					{
+					if(	(*it >= 'a' && *it <= 'z') ||
+						(*it >= 'A' && *it <= 'Z') ||
+						(*it == '_')
+					){
 						status = VARIABLE;
 						var = string();
 						var->push_back(*it);

@@ -34,11 +34,15 @@ namespace synthese
 	class SimpleObjectFieldDefinition
 	{
 	public:
-		static const bool EXPORT_CONTENT_AS_FILE;
 		static const Field FIELD;
 		static void AddFields(FieldsList& l)
 		{
 			l.push_back(FIELD);
+		}
+
+		static const std::string& GetFieldKey()
+		{
+			return FIELD.name;
 		}
 	};
 }

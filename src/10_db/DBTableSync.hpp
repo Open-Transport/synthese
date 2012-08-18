@@ -239,7 +239,8 @@ namespace synthese
 				virtual void deleteRecord(
 					const server::Session* session,
 					util::RegistryKeyType id,
-					DBTransaction& transaction
+					DBTransaction& transaction,
+					bool log = true
 				) const = 0;
 			//@}
 

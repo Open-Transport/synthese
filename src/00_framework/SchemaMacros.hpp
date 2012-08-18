@@ -37,11 +37,8 @@
 #define FIELD_NO_LINKED_OBJECT_ID(N)	template<> \
 	void ObjectField<N, N::Type>::GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& record) {}
 #define FIELD_DEFINITION_OF_OBJECT(N, F, VF) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, SQL_INTEGER); \
-	template<> const bool SimpleObjectFieldDefinition<N>::EXPORT_CONTENT_AS_FILE = false; \
-	template<> const Field SimpleObjectFieldDefinition<N::Vector>::FIELD = Field(VF, SQL_TEXT); \
-	template<> const bool SimpleObjectFieldDefinition<N::Vector>::EXPORT_CONTENT_AS_FILE = false;
-#define FIELD_DEFINITION_OF_TYPE(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T); \
-	template<> const bool SimpleObjectFieldDefinition<N>::EXPORT_CONTENT_AS_FILE = false;
+	template<> const Field SimpleObjectFieldDefinition<N::Vector>::FIELD = Field(VF, SQL_TEXT);
+#define FIELD_DEFINITION_OF_TYPE(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);
 #define CLASS_DEFINITION(N, T, NUM)	namespace util \
 	{ template<> const std::string util::Registry<N>::KEY(#N); } \
 	template<> const std::string Object<N, N::Schema>::CLASS_NAME = #N; \

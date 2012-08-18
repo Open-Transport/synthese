@@ -30,8 +30,10 @@
 #include "HTMLTable.h"
 #include "ModuleAdmin.h"
 #include "ObjectCreateAction.hpp"
+#include "PropertiesHTMLTable.h"
 #include "RemoveObjectAction.hpp"
 #include "Request.h"
+#include "SVNCheckoutAction.hpp"
 #include "WebsiteAdmin.hpp"
 #include "WebsiteTableSync.hpp"
 #include "Webpage.h"
@@ -47,10 +49,11 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace cms;
-	using namespace server;
 	using namespace html;
-	using namespace util;
 	using namespace db;
+	using namespace db::svn;
+	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -77,7 +80,8 @@ namespace synthese
 
 	namespace cms
 	{
-		CMSModule::SitesByClientURL CMSModule::_sitesByClientURL;
+		CMSModule::SitesByURL CMSModule::_sitesByURL;
+		mutex CMSModule::_sitesByURLMutex;
 
 
 		const Website* CMSModule::GetSite(
@@ -117,7 +121,7 @@ namespace synthese
 
 
 
-		boost::shared_ptr<const Webpage> CMSModule::GetWebPage(
+		const Webpage* CMSModule::GetWebPage(
 			const server::Request& request
 		){
 			shared_ptr<const WebPageDisplayFunction> function(
@@ -128,55 +132,138 @@ namespace synthese
 			{
 				if(function->getTemplateParameters().getDefault<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID, 0))
 				{
-					return Env::GetOfficialEnv().get<Webpage>(function->getTemplateParameters().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID));
+					return Env::GetOfficialEnv().get<Webpage>(
+						function->getTemplateParameters().get<RegistryKeyType>(WebPageDisplayFunction::PARAMETER_PAGE_ID)
+					).get();
 				}
 				else
 				{
 					return function->getPage();
 				}
 			}
-			return shared_ptr<const Webpage>();
+			return NULL;
 		}
 
 
 
-		void CMSModule::RemoveSite( const std::string& key )
-		{
-			if(key.empty())
-			{
+		void CMSModule::RemoveSite(
+			const Website& site
+		){
+			mutex::scoped_lock lock(_sitesByURLMutex);
+			_sitesByURL.erase(
+				make_pair(
+					site.get<HostName>(),
+					site.get<ClientURL>()
+			)	);
+		}
+
+
+
+		void CMSModule::AddSite(
+			Website& site
+		){
+			if(	site.get<HostName>().empty() &&
+				site.get<ClientURL>().empty()
+			){
 				return;
 			}
 
-			_sitesByClientURL.erase(key);
+			mutex::scoped_lock lock(_sitesByURLMutex);
+			_sitesByURL.insert(
+				make_pair(
+					make_pair(
+						site.get<HostName>(),
+						site.get<ClientURL>()
+					), &site
+			)	);
 		}
 
 
 
-		void CMSModule::AddSite( Website& value )
-		{
-			if(value.get<ClientURL>().empty())
-			{
-				return;
-			}
-
-			_sitesByClientURL.insert(make_pair(value.get<ClientURL>(), &value));
-		}
-
-
-
-		Website* CMSModule::GetSiteByClientURL( const std::string& key )
-		{
-			if(key.empty())
+		Website* CMSModule::GetSiteByURL(
+			const std::string& hostName,
+			const std::string& clientURL
+		){
+			// Avoid useless queries
+			if(hostName.empty() && clientURL.empty())
 			{
 				return NULL;
 			}
 
-			SitesByClientURL::const_iterator it(_sitesByClientURL.find(key));
-			if(it == _sitesByClientURL.end())
+			// Thread safety
+			mutex::scoped_lock lock(_sitesByURLMutex);
+
+			// Search for host + client URL
+			if(!clientURL.empty())
 			{
-				return NULL;
+				SitesByURL::const_iterator it(
+					_sitesByURL.find(
+						make_pair(
+							hostName,
+							clientURL
+				)	)	);
+				if(it != _sitesByURL.end())
+				{
+					return it->second;
+				}
+
+				// Search for host + client URL beginning
+				BOOST_FOREACH(const SitesByURL::value_type& it, _sitesByURL)
+				{
+					if(	!it.first.first.empty() &&
+						!it.first.second.empty() &&
+						it.first.first == hostName &&
+						it.first.second.size() + 1 < clientURL.size() &&
+						it.first.second + "/" == clientURL.substr(0, it.first.second.size() + 1)
+					){
+						return it.second;
+					}
+				}
 			}
-			return it->second;
+
+			// Search for host
+			if(!hostName.empty())
+			{
+				SitesByURL::const_iterator it(
+					_sitesByURL.find(
+					make_pair(
+						hostName,
+						string()
+				)	)	);
+				if(it != _sitesByURL.end())
+				{
+					return it->second;
+				}
+			}
+
+			// Search for client URL
+			if(!clientURL.empty())
+			{
+				SitesByURL::const_iterator it(
+					_sitesByURL.find(
+						make_pair(
+							string(),
+							clientURL
+				)	)	);
+				if(it != _sitesByURL.end())
+				{
+					return it->second;
+				}
+
+				// Search for client URL beginning
+				BOOST_FOREACH(const SitesByURL::value_type& it, _sitesByURL)
+				{
+					if(	it.first.first.empty() &&
+						!it.first.second.empty() &&
+						it.first.second.size() + 1 < clientURL.size() &&
+						it.first.second + "/" == clientURL.substr(0, it.first.second.size() + 1)
+					){
+						return it.second;
+					}
+				}
+			}
+
+			return NULL;
 		}
 
 
@@ -205,6 +292,7 @@ namespace synthese
 			HTMLTable::ColsVector c;
 			c.push_back(string());
 			c.push_back("Nom");
+			c.push_back("Host name");
 			c.push_back("URL");
 			c.push_back(string());
 			HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
@@ -221,6 +309,7 @@ namespace synthese
 				stream << t.row();
 				stream << t.col() << HTMLModule::getLinkButton(openRequest.getURL(), "Ouvrir");
 				stream << t.col() << site.get<Name>();
+				stream << t.col() << site.get<HostName>();
 				stream << t.col() << site.get<ClientURL>();
 
 				// Remove button
@@ -233,8 +322,22 @@ namespace synthese
 			stream << t.row();
 			stream << t.col();
 			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<Name>(), string(), "(nom)");
+			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<HostName>(), string(), "(Host name)");
 			stream << t.col() << f.getTextInput(ObjectCreateAction::GetInputName<ClientURL>(), string(), "(URL)");
 			stream << t.col() << f.getSubmitButton("Ajouter");
 			stream << t.close() << f.close();
+
+			// SVN Checkout
+			stream << "<h1>SVN Checkout</h1>";
+			AdminActionFunctionRequest<SVNCheckoutAction, WebsiteAdmin> svnRequest(request);
+			svnRequest.setActionFailedPage<ModuleAdmin>();
+			static_cast<ModuleAdmin*>(svnRequest.getActionFailedPage().get())->setModuleClass(shared_ptr<ModuleClass>(new CMSModule));
+			svnRequest.setActionWillCreateObject();
+			PropertiesHTMLTable pf(svnRequest.getHTMLForm("svn"));
+			stream << pf.open();
+			stream << pf.cell("URL", pf.getForm().getTextInput(SVNCheckoutAction::PARAMETER_REPO_URL, string()));
+			stream << pf.cell("Utilisateur", pf.getForm().getTextInput(SVNCheckoutAction::PARAMETER_USER, string()));
+			stream << pf.cell("Mot de passe", pf.getForm().getPasswordInput(SVNCheckoutAction::PARAMETER_PASSWORD, string()));
+			stream << pf.close();
 		}
 }	}

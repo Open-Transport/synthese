@@ -106,6 +106,10 @@ namespace synthese
 				{
 					DBResultSPtr rows(DBTableSyncTemplate<ParentTableSyncClass>::_GetRow(key));
 					object.reset(new ObjectClass(rows->getKey()));
+					env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>().add(
+						boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(
+							object
+					)	);
 					Load(object.get(), rows, env, linkLevel);
 				}
 				catch (typename db::DBEmptyResultException<TableSyncClass>&)
@@ -113,12 +117,12 @@ namespace synthese
 					if (autoCreate == NEVER_CREATE)
 						throw util::ObjectNotFoundException<ObjectClass>(key, "Object not found in "+ ParentTableSyncClass::TABLE.NAME);
 					object.reset(new ObjectClass(key));
+					env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>().add(
+						boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(
+							object
+					)	);
 				}
 
-				env.getEditableRegistry<typename ObjectClass::Registry::ObjectsClass>().add(
-					boost::static_pointer_cast<typename ObjectClass::Registry::ObjectsClass, ObjectClass>(
-						object
-				)	);
 
 				return object;
 			}

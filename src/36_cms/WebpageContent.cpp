@@ -45,10 +45,10 @@ namespace synthese
 	using namespace cms;
 
 	template<> const Field ComplexObjectFieldDefinition<WebpageContent>::FIELDS[] = {
-		Field("content1", SQL_TEXT),
+		Field("content1", SQL_BLOB, true),
 		Field("ignore_white_chars", SQL_BOOLEAN),
+		Field("mime_type", SQL_TEXT),
 	Field() };
-	template<> const bool ComplexObjectFieldDefinition<WebpageContent>::EXPORT_CONTENT_AS_FILE = false;
 	FIELD_COMPLEX_NO_LINKED_OBJECT_ID(WebpageContent)
 
 
@@ -60,6 +60,28 @@ namespace synthese
 		const Record& record,
 		const util::Env& env
 	){
+		if(record.isDefined(FIELDS[2].name))
+		{
+			string value(record.getDefault<string>(FIELDS[2].name));
+			try
+			{
+				fieldObject._mimeType = MimeTypes::GetMimeTypeByString(value);
+			}
+			catch(Exception&)
+			{
+				vector<string> parts;
+				split(parts, value, is_any_of("/"));
+				if(parts.size() >= 2)
+				{
+					fieldObject._mimeType = MimeType(parts[0], parts[1], "");
+				}
+				else
+				{
+					fieldObject._mimeType = MimeTypes::TEXT;
+				}
+			}
+		}
+
 		if(record.isDefined(FIELDS[1].name))
 		{
 			fieldObject._ignoreWhiteChars = record.getDefault<bool>(FIELDS[1].name, false);
@@ -79,22 +101,61 @@ namespace synthese
 		const WebpageContent& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
 		// Content
-		map.insert(
-			prefix + FIELDS[0].name,
-			ObjectField<void, string>::Serialize(
-				fieldObject._code,
-				map.getFormat()
-		)	);
+		if(	boost::logic::indeterminate(withFiles) ||
+			FIELDS[0].exportOnFile == withFiles
+		){
+			map.insert(
+				prefix + FIELDS[0].name,
+				ObjectField<void, string>::Serialize(
+					fieldObject._code,
+					map.getFormat()
+			)	);
+		}
 
 		// Ignore white chars
+		if(	boost::logic::indeterminate(withFiles) ||
+			FIELDS[1].exportOnFile == withFiles
+		){
+			map.insert(
+				prefix + FIELDS[1].name,
+				fieldObject._ignoreWhiteChars
+			);
+		}
+
+		// Mime type
+		if(	boost::logic::indeterminate(withFiles) ||
+			FIELDS[2].exportOnFile == withFiles
+		){
+			map.insert(
+				prefix + FIELDS[2].name,
+				ObjectField<void, string>::Serialize(
+					string(fieldObject._mimeType),
+					map.getFormat()
+			)	);
+		}
+	}
+
+
+
+	template<>
+	void ComplexObjectField<WebpageContent, WebpageContent>::SaveToFilesMap(
+		const WebpageContent& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
+		FilesMap::File item;
+		item.content = fieldObject._code;
+		item.mimeType = fieldObject._mimeType;
 		map.insert(
-			prefix + FIELDS[1].name,
-			fieldObject._ignoreWhiteChars
+			FIELDS[0].name,
+			item
 		);
 	}
+
 
 	namespace cms
 	{
@@ -110,9 +171,11 @@ namespace synthese
 
 		WebpageContent::WebpageContent(
 			const std::string& code,
-			bool ignoreWhiteChars
+			bool ignoreWhiteChars,
+			MimeType mimeType
 		):	_code(code),
-			_ignoreWhiteChars(ignoreWhiteChars)
+			_ignoreWhiteChars(ignoreWhiteChars),
+			_mimeType(mimeType)
 		{
 			_updateNodes();
 		}
@@ -237,6 +300,8 @@ namespace synthese
 					){
 						it = it2;
 						++it;
+
+						trim(parameter);
 
 						// Node creation
 						_nodes.push_back(

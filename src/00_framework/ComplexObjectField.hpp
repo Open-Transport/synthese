@@ -27,6 +27,8 @@
 
 #include "FrameworkTypes.hpp"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	namespace util
@@ -37,6 +39,7 @@ namespace synthese
 
 	class ObjectBase;
 	class Record;
+	class FilesMap;
 
 
 
@@ -46,10 +49,32 @@ namespace synthese
 	{
 	public:
 		typedef T Type;
-		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
+		
+		static void LoadFromRecord(
+			T& fieldObject,
+			ObjectBase& object,
+			const Record& record,
+			const util::Env& env
+		);
+		
+		static void SaveToParametersMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		);
 
+		static void SaveToFilesMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		);
+
+		static void GetLinkedObjectsIds(
+			LinkedObjectsIds& list,
+			const Record& record
+		);
 	};
 }
 

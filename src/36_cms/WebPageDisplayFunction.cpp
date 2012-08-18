@@ -55,6 +55,7 @@ namespace synthese
 
 		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
 		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
+		const string WebPageDisplayFunction::PARAMETER_HOST_NAME("host_name");
 		const string WebPageDisplayFunction::PARAMETER_SMART_URL("smart_url");
 		const string WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL = "dont_redirect_if_smart_url";
 
@@ -63,7 +64,7 @@ namespace synthese
 			ParametersMap map(getTemplateParameters());
 
 			// Page
-			if(_page.get())
+			if(_page)
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
@@ -87,7 +88,9 @@ namespace synthese
 			{
 				try
 				{
-					_page = Env::GetOfficialEnv().get<Webpage>(map.get<RegistryKeyType>(PARAMETER_PAGE_ID));
+					_page = Env::GetOfficialEnv().get<Webpage>(
+						map.get<RegistryKeyType>(PARAMETER_PAGE_ID)
+					).get();
 				}
 				catch (ObjectNotFoundException<Webpage>)
 				{
@@ -100,19 +103,48 @@ namespace synthese
 			}
 			else
 			{
-				_smartURL = map.get<string>(PARAMETER_SMART_URL);
-				if(_smartURL.empty() || !getSite())
+				// Local variables
+				const Website* site(NULL);
+				string hostName(map.getDefault<string>(PARAMETER_HOST_NAME));
+
+				// Case host name + client URL + smart URL
+				if(!hostName.empty())
 				{
-					throw RequestException("Smart URL and site, or page ID must be specified");
+					// Site
+					string clientURL = map.get<string>(PARAMETER_SMART_URL);
+					site = CMSModule::GetSiteByURL(hostName, clientURL);
+					if(!site)
+					{
+						throw RequestException("No such site");
+					}
+					
+					// Smart URL
+					_smartURL = clientURL.substr(site->get<ClientURL>().size());
 				}
-				_templateParameters.remove(PARAMETER_SMART_URL);
-				if(_smartURL[0] == ':')
+				else // Case no specified host name
 				{
-					throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
+					// Site
+					site = getSite();
+
+					// Smart URL
+					_smartURL = map.get<string>(PARAMETER_SMART_URL);
+					if(_smartURL.empty() || !site)
+					{
+						throw RequestException("Smart URL and site, or page ID must be specified");
+					}
+					if(_smartURL[0] == ':')
+					{
+						throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
+					}
 				}
 
-				_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(_smartURL));
-				if(!_page.get())
+				// Host name and smart URL must not be visible in CMS
+				_templateParameters.remove(PARAMETER_HOST_NAME);
+				_templateParameters.remove(PARAMETER_SMART_URL);
+
+				// Page
+				_page = site->getPageBySmartURL(_smartURL);
+				if(!_page)
 				{ // Attempt to find a page with a parameter
 					vector<string> paths;
 					iter_split(paths, _smartURL, last_finder("/"));
@@ -121,9 +153,9 @@ namespace synthese
 						throw Request::NotFoundException();
 					}
 
-					_page = Env::GetOfficialEnv().getSPtr(getSite()->getPageBySmartURL(paths[0]));
+					_page = site->getPageBySmartURL(paths[0]);
 
-					if(!_page.get() || _page->get<SmartURLDefaultParameterName>().empty())
+					if(!_page || _page->get<SmartURLDefaultParameterName>().empty())
 					{
 						throw Request::NotFoundException();
 					}
@@ -149,7 +181,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			if(_page.get())
+			if(_page)
 			{
 				// If page has been fetched by its id and its smart URL is defined, then
 				// redirect permanently to the smart url, unless it starts with a colon (used for aliases).
@@ -208,7 +240,7 @@ namespace synthese
 
 		std::string WebPageDisplayFunction::getOutputMimeType() const
 		{
-			if(_page.get())
+			if(_page)
 			{
 				if(_useTemplate && _page->getTemplate())
 				{

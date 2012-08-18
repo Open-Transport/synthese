@@ -186,8 +186,8 @@ namespace synthese
 		) const {
 
 			// Root page
-			shared_ptr<const Webpage> currentPage(CMSModule::GetWebPage(request));
-			shared_ptr<const Webpage> rootPage(_rootId ? _root : currentPage);
+			const Webpage* currentPage(CMSModule::GetWebPage(request));
+			const Webpage* rootPage(_rootId ? _root.get() : currentPage);
 
 			// RSS header
 			if(!_itemPage.get() && _outputFormat == VALUE_RSS)
@@ -262,14 +262,14 @@ namespace synthese
 		bool WebPageMenuFunction::_getMenuContentRecursive(
 			std::ostream& stream,
 			const server::Request& request /*= NULL*/,
-			boost::shared_ptr<const Webpage> root,
+			const Webpage* root,
 			std::size_t depth,
-			boost::shared_ptr<const Webpage> currentPage,
+			const Webpage* currentPage,
 			size_t rank,
 			bool isLastPage
 		) const	{
 			/** - Page in branch update */
-			bool returned_page_in_branch(currentPage.get() ? (root == currentPage) : false);
+			bool returned_page_in_branch(currentPage ? (root == currentPage) : false);
 
 			/** - Recursion attempting if :
 			- the max depth is not reached
@@ -281,8 +281,8 @@ namespace synthese
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(
 					Env::GetOfficialEnv(),
-					root.get() ? optional<RegistryKeyType>() : currentPage->getRoot()->getKey(),
-					root.get() ? root->getKey() : optional<RegistryKeyType>(0)
+					root ? optional<RegistryKeyType>() : currentPage->getRoot()->getKey(),
+					root ? root->getKey() : optional<RegistryKeyType>(0)
 			)	);
 			for(WebPageTableSync::SearchResult::const_iterator it(pages.begin()); it != pages.end(); ++it)
 			{
@@ -304,7 +304,7 @@ namespace synthese
 				returned_page_in_branch |= _getMenuContentRecursive(
 					submenu,
 					request,
-					const_pointer_cast<const Webpage>(page),
+					page.get(),
 					depth + 1,
 					currentPage,
 					number,
@@ -323,7 +323,7 @@ namespace synthese
 			MenuDefinition_ menuDefinition(it == _menuDefinition.end() ? MenuDefinition_() : it->second);
 
 			/** - Preparing the output of the current level if the min depth is reached */
-			if (root.get() && _minDepth <= depth)
+			if (root && _minDepth <= depth)
 			{
 				StaticFunctionRequest<WebPageDisplayFunction> subPageRequest(request, false);
 				subPageRequest.getFunction()->setPage(root);

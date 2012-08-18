@@ -119,7 +119,7 @@ namespace synthese
 					const typename C::Type& value,
 					const ObjectBase& object
 				){
-					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX);
+					C::SaveToParametersMap(value, object, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
 				}
 			//@}
 

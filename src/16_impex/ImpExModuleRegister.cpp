@@ -15,10 +15,6 @@
 #include "CleanObsoleteDataAction.hpp"
 #include "DataSourceUpdateAction.hpp"
 
-#include "DumpFileFormat.hpp"
-
-#include "SVNStorageFunction.hpp"
-
 // Registries
 
 #include "DataSource.h"
@@ -45,10 +41,6 @@ void synthese::impex::moduleRegister()
 
 	synthese::impex::CleanObsoleteDataAction::integrate();
 	synthese::impex::DataSourceUpdateAction::integrate();
-
-	synthese::impex::DumpFileFormat::integrate();
-
-	synthese::impex::SVNStorageFunction::integrate();
 
 	// Registries
 

@@ -26,6 +26,8 @@
 #include "SimpleObjectField.hpp"
 #include "SchemaMacros.hpp"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	struct Parent;
@@ -102,7 +104,20 @@ namespace synthese
 		typedef tree::TreeFolderUpNode* Type;
 
 		static void LoadFromRecord(tree::TreeFolderUpNode* fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static void SaveToParametersMap(tree::TreeFolderUpNode* fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
+		static void SaveToParametersMap(
+			tree::TreeFolderUpNode* fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		);
+
+		static void SaveToFilesMap(
+			tree::TreeFolderUpNode* fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		);
+
 		static void SaveToParametersMap(tree::TreeFolderUpNode* fieldObject, util::ParametersMap& map, const std::string& prefix);
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
 	};
