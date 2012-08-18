@@ -41,7 +41,7 @@ class TestObject:
 	public Object<TestObject, TestSchema>
 {
 public:
-	typedef Registry<TestObject> Registry;
+	typedef util::Registry<TestObject> Registry;
 
 	TestObject(
 		RegistryKeyType id = 0
