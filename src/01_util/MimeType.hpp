@@ -48,7 +48,7 @@ namespace synthese
 
 			static Types _types;
 
-			friend MimeTypes;
+			friend class MimeTypes;
 
 		public:
 			MimeType(
