@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
 
+#include "SimpleObjectField.hpp"
+
 namespace synthese
 {
 	class ObjectBase;
