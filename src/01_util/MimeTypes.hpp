@@ -25,6 +25,8 @@
 
 #include <string>
 
+#include "MimeType.hpp"
+
 namespace synthese
 {
 	namespace util
@@ -38,10 +40,24 @@ namespace synthese
 			MimeTypes();
 
 		public:
-			static const std::string CSV;
-			static const std::string HTML;
-			static const std::string JSON;
-			static const std::string XML;
+			static const MimeType CSV;
+			static const MimeType HTML;
+			static const MimeType JSON;
+			static const MimeType XML;
+			static const MimeType JS;
+			static const MimeType PNG;
+			static const MimeType JPEG;
+			static const MimeType TEXT;
+			static const MimeType GIF;
+			static const MimeType PDF;
+
+			static const MimeType& GetMimeTypeByExtension(
+				const std::string& extension
+			); 
+
+			static const MimeType& GetMimeTypeByString(
+				const std::string& fullType
+			); 
 		};
 }	}
 
