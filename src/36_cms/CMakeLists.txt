@@ -87,6 +87,8 @@ WebpageContent.cpp
 WebpageContent.hpp
 WebpageContentNode.cpp
 WebpageContentNode.hpp
+WebpageContentUploadAction.cpp
+WebpageContentUploadAction.hpp
 WebPageDisplayFunction.cpp
 WebPageDisplayFunction.h
 WebPageFormFunction.cpp
@@ -127,7 +129,9 @@ set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADE
 
 add_library(36_cms ${cms_SRCS})
 
-target_link_libraries(36_cms
+target_link_libraries(
+  36_cms
+  103_db_svn
   12_security
   15_server
   20_tree

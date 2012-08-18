@@ -140,6 +140,7 @@ namespace synthese
 						throw util::ObjectNotFoundException<T>(key, "Object not found in "+ K::TABLE.NAME);
 					}
 					object.reset(new T(key));
+					env.getEditableRegistry<T>().add(object);
 				}
 
 				return object;

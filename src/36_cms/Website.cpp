@@ -36,12 +36,13 @@ namespace synthese
 {
 	using namespace util;
 	using namespace cms;
-
+	using namespace db::svn;
+	
 	CLASS_DEFINITION(Website, "t025_sites", 25)
 	// TODO: rename to client_url once complex schema updates are in place (issue #9453).
+	FIELD_DEFINITION_OF_TYPE(HostName, "host_name", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ClientURL, "cient_url", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultTemplate, "default_page_template_id", SQL_INTEGER)
-	FIELD_DEFINITION_OF_TYPE(SVNURL, "svn_url", SQL_TEXT)
 
 	namespace cms
 	{
@@ -53,9 +54,10 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_VALUE_CONSTRUCTOR(StartDate, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(EndDate, posix_time::not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(HostName),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
-					FIELD_DEFAULT_CONSTRUCTOR(SVNURL)
+					FIELD_VALUE_CONSTRUCTOR(SVNWorkingCopy, this)
 			)	)
 		{}
 
@@ -166,6 +168,6 @@ namespace synthese
 
 		void Website::unlink()
 		{
-			CMSModule::RemoveSite(get<ClientURL>());
+			CMSModule::RemoveSite(*this);
 		}
 }	}

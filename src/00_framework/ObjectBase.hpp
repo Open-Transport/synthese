@@ -60,6 +60,7 @@ namespace synthese
 
 	class ObjectBase;
 	class Record;
+	class FilesMap;
 
 	typedef std::vector<ObjectBase*> SubObjects;
 
@@ -132,8 +133,9 @@ namespace synthese
 			virtual const std::string& getClassName() const = 0;
 			virtual const std::string& getTableName() const = 0;
 			virtual FieldsList getFields() const = 0;
-
-
+			virtual const void* _dynamic_get(const std::string& fieldKey) const = 0;
+			virtual void _dynamic_set(const void* value, const std::string& fieldKey) = 0;
+			
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Loads the content of a record into the current object.
@@ -149,8 +151,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Exports the content of the object into a ParametersMap object.
-			/// @param withFiles Exports fields according to their EXPORT_CONTENT_AS_FILE
-			/// attribute.
+			/// @param withFiles Exports fields as independant files
 			/// @param withAdditionalParameters if true the map is filled up by
 			/// addAdditionalParameters
 			/// @param map the generated ParametersMap
@@ -159,6 +160,15 @@ namespace synthese
 				bool withAdditionalParameters = false,
 				boost::logic::tribool withFiles = boost::logic::indeterminate,
 				std::string prefix = std::string()
+			) const = 0;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Exports the content of the object into a FilesMap object (fields to store as files only).
+			/// @param map the FilesMap to fill
+			virtual void toFilesMap(
+				FilesMap& map
 			) const = 0;
 
 
@@ -179,7 +189,71 @@ namespace synthese
 			/// be not usable as is. Use standard = operator for real object copy.
 			virtual boost::shared_ptr<ObjectBase> copy() const = 0;
 		//@}
+
+		/// @name Services
+		//@{
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets dynamically the value of a field.
+			/// @warning the performances of this method are poor : use the static get
+			/// method of the typed object whenever it is possible
+			/// @return the value of the field
+			template<class FieldClass>
+			const typename FieldClass::Type& dynamic_get() const;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Sets dynamically the value of a field.
+			/// @warning the performances of this method are poor : use the static set
+			/// method of the typed object whenever it is possible
+			/// @param value the new value for the field
+			template<class FieldClass>
+			void dynamic_set(const typename FieldClass::Type& value);
+
+			
+			
+			//////////////////////////////////////////////////////////////////////////
+			/// Checks dynamically if the object has a field according to its schema.
+			/// @warning the performances of this method are poor : use it only for
+			/// dynamic contexts
+			/// @return true if the field exists in the class of the object
+			template<class FieldClass>
+			bool hasField() const;
+		//@}
 	};
+
+
+
+	template<class FieldClass>
+	bool ObjectBase::hasField() const
+	{
+		return _dynamic_get(FieldClass::GetFieldKey()) != NULL;
+	}
+
+
+
+	template<class FieldClass>
+	const typename FieldClass::Type& ObjectBase::dynamic_get() const
+	{
+		const void* result(_dynamic_get(FieldClass::GetFieldKey()));
+		if(!result)
+		{
+			throw Exception("No such field");
+		}
+		return *( (const typename FieldClass::Type*) (result) );
+	}
+
+
+
+	template<class FieldClass>
+	void ObjectBase::dynamic_set(
+		const typename FieldClass::Type& value
+	){
+		_dynamic_set(
+			(const void*) &value,
+			FieldClass::GetFieldKey()
+		);
+	}
 }
 
 #endif // SYNTHESE__ObjectBase_hpp__

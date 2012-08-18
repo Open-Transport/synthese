@@ -38,6 +38,7 @@
 #include "StaticActionRequest.h"
 #include "TinyMCE.hpp"
 #include "WebPageAddAction.h"
+#include "WebpageContentUploadAction.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
@@ -135,7 +136,7 @@ namespace synthese
 			){
 				viewRequest.setClientURL(_page->getRoot()->get<ClientURL>());
 			}
-			viewRequest.getFunction()->setPage(_page);
+			viewRequest.getFunction()->setPage(_page.get());
 
 			////////////////////////////////////////////////////////////////////
 			// TAB CONTENT
@@ -181,9 +182,23 @@ namespace synthese
 				tinyMCE.setAjaxSaveURL(contentUpdateRequest.getURL());
 				stream << tinyMCE.open();
 
-				if(canBeWYSIWYG && !_page->get<RawEditor>())
-				{
-					stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode());
+				if(	canBeWYSIWYG &&
+					!_page->get<RawEditor>()
+				){
+					if(_page->get<WebpageContent>().getMimeType() == MimeTypes::HTML)
+					{
+						stream << TinyMCE::GetFakeFormWithInput(WebPageUpdateAction::PARAMETER_CONTENT1, _page->get<WebpageContent>().getCode());
+					}
+					else if(_page->get<WebpageContent>().getMimeType() == MimeTypes::PNG ||
+						_page->get<WebpageContent>().getMimeType() == MimeTypes::GIF ||
+						_page->get<WebpageContent>().getMimeType() == MimeTypes::JPEG
+					){
+						stream << "<p><img src=\"" << viewRequest.getURL() << "\" /></p>";
+					}
+					else
+					{
+						stream << "<iframe src=\"" << viewRequest.getURL() << "\"></iframe>";
+					}
 				}
 				else
 				{
@@ -195,6 +210,17 @@ namespace synthese
 					stream << f.close();
 				}
 
+				// File upload
+				AdminActionFunctionRequest<WebpageContentUploadAction, WebPageAdmin> uploadRequest(request);
+				uploadRequest.getAction()->setPage(_page);
+				HTMLForm uploadForm(uploadRequest.getHTMLForm("upload"));
+				stream << "<h1>Téléchargement de contenu</h1>";
+				stream << uploadForm.open();
+				stream << uploadForm.getFileInput(WebpageContentUploadAction::PARAMETER_CONTENT);
+				stream << uploadForm.getSubmitButton("Télécharger");
+				stream << uploadForm.close();
+
+				// Summary
 				stream << "<h1>Résumé</h1>";
 				if(canBeWYSIWYG && !_page->get<RawEditor>())
 				{
@@ -230,7 +256,7 @@ namespace synthese
 					stream << t.cell("Ne pas utiliser le modèle", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_USE_TEMPLATE, _page->get<DoNotUseTemplate>()));
 					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->get<HasForum>()));
 					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->get<WebpageContent>().getIgnoreWhiteChars()));
-					stream << t.cell("Type MIME (défaut : text/html)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->get<MimeType>()));
+					stream << t.cell("Type MIME", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->getMimeType()));
 					stream << t.close();
 				}
 			}
@@ -425,7 +451,7 @@ namespace synthese
 				shared_ptr<Webpage> page(*it);
 
 				openRequest.getPage()->setPage(const_pointer_cast<const Webpage>(page));
-				viewRequest.getFunction()->setPage(const_pointer_cast<const Webpage>(page));
+				viewRequest.getFunction()->setPage(page.get());
 				moveRequest.getAction()->setPage(page);
 
 				if(	!page->getRoot()->get<ClientURL>().empty()

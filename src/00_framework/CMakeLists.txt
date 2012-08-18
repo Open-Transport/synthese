@@ -5,10 +5,13 @@ ComplexObjectField.hpp
 ComplexObjectFieldDefinition.hpp
 CoordinatesSystem.cpp
 CoordinatesSystem.hpp
+EnumObjectField.hpp
 Exception.cpp
 Exception.h
 Field.cpp
 Field.hpp
+FilesMap.cpp
+FilesMap.hpp
 FrameworkTypes.hpp	
 Language.cpp
 Language.hpp

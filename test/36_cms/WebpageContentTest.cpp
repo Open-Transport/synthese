@@ -595,5 +595,31 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		string eval(wpc.eval(request, additionalParametersMap, page, variables));
 		BOOST_CHECK_EQUAL(eval, "3");
 	}
+
+	{ // Variable with _
+		string code("test<@_variable=4@><@_variable@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test4");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<string>("variable"), "OK1OK2");
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
+	{ // Variable with spaces before and after the name
+		string code("test<@    variable  =6@><@  variable   @>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test6");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 6);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
 }
 

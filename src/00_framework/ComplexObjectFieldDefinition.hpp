@@ -34,7 +34,6 @@ namespace synthese
 	class ComplexObjectFieldDefinition
 	{
 	public:
-		static const bool EXPORT_CONTENT_AS_FILE;
 		static const Field FIELDS[];
 		static void AddFields(FieldsList& l)
 		{
@@ -42,6 +41,11 @@ namespace synthese
 			{
 				l.push_back(FIELDS[i]);
 			}
+		}
+
+		static const std::string& GetFieldKey()
+		{
+			return FIELDS[0].name;
 		}
 	};
 }

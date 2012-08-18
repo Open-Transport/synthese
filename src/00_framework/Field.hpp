@@ -50,7 +50,8 @@ namespace synthese
 		SQL_GEOM_MULTIPOINT,
 		SQL_GEOM_MULTILINESTRING,
 		SQL_GEOM_MULTIPOLYGON,
-		SQL_GEOM_GEOMETRYCOLLECTION
+		SQL_GEOM_GEOMETRYCOLLECTION,
+		SQL_BLOB
 	} FieldType;
 
 
@@ -62,6 +63,7 @@ namespace synthese
 	public:
 		std::string	name;
 		FieldType	type;
+		bool		exportOnFile;
 
 
 		////////////////////////////////////////////////////////////////////
@@ -72,7 +74,8 @@ namespace synthese
 		///	@date 2008
 		Field(
 			const std::string nameA = std::string(),
-			const FieldType typeA = SQL_TEXT
+			const FieldType typeA = SQL_TEXT,
+			bool exportOnFile = false
 		);
 
 

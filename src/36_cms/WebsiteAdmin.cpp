@@ -24,30 +24,31 @@
 
 #include "WebsiteAdmin.hpp"
 
-#include "CMSModule.hpp"
-#include "ObjectUpdateAction.hpp"
-#include "WebsiteTableSync.hpp"
-#include "Website.hpp"
-#include "ModuleAdmin.h"
-#include "AdminParametersException.h"
-#include "AdminInterfaceElement.h"
-#include "ResultHTMLTable.h"
-#include "PropertiesHTMLTable.h"
-#include "HTMLModule.h"
-#include "Interface.h"
-#include "InterfaceTableSync.h"
-#include "StaticFunctionRequest.h"
-#include "Profile.h"
-#include "SearchFormHTMLTable.h"
-#include "HTMLForm.h"
-#include "WebPageAdmin.h"
 #include "ActionResultHTMLTable.h"
-#include "WebPageAddAction.h"
 #include "AdminFunctionRequest.hpp"
+#include "AdminInterfaceElement.h"
+#include "AdminParametersException.h"
+#include "CMSModule.hpp"
+#include "HTMLForm.h"
+#include "HTMLModule.h"
+#include "ModuleAdmin.h"
+#include "ObjectUpdateAction.hpp"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "RemoveObjectAction.hpp"
+#include "ResultHTMLTable.h"
+#include "SearchFormHTMLTable.h"
+#include "ServerModule.h"
+#include "StaticFunctionRequest.h"
+#include "SVNCommitAction.hpp"
+#include "SVNUpdateAction.hpp"
+#include "SVNWorkingCopyCreateAction.hpp"
+#include "WebPageAdmin.h"
+#include "WebPageAddAction.h"
+#include "Website.hpp"
+#include "WebsiteTableSync.hpp"
 #include "WebPageDisplayFunction.h"
 #include "WebPageMoveAction.hpp"
-#include "RemoveObjectAction.hpp"
-#include "ServerModule.h"
 
 #include <geos/geom/Point.h>
 #include <boost/date_time/posix_time/posix_time.hpp>
@@ -61,14 +62,14 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
-	using namespace server;
-	using namespace util;
+	using namespace cms;
+	using namespace db;
+	using namespace db::svn;
 	using namespace html;
 	using namespace impex;
 	using namespace security;
-	using namespace html;
-	using namespace cms;
-	using namespace db;
+	using namespace server;
+	using namespace util;
 
 	namespace util
 	{
@@ -118,9 +119,6 @@ namespace synthese
 			// Search page
 			_searchPage = map.getDefault<string>(PARAMETER_SEARCH_PAGE);
 			_pageSearchParameter.setFromParametersMap(map.getMap(), PARAMETER_SEARCH_RANK, optional<size_t>());
-
-			// SVN storage
-			_svnStorage._setFromParametersMap(map);
 		}
 
 
@@ -135,7 +133,6 @@ namespace synthese
 				m.insert(Request::PARAMETER_OBJECT_ID, _site->getKey());
 			}
 
-			m.merge(_svnStorage._getParametersMap());
 			return m;
 		}
 
@@ -143,7 +140,7 @@ namespace synthese
 
 		void WebsiteAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const admin::AdminRequest& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -153,7 +150,7 @@ namespace synthese
 
 				// Requests
 				AdminActionFunctionRequest<ObjectUpdateAction, WebsiteAdmin> updateRequest(
-					_request
+					request
 				);
 				updateRequest.getAction()->setObject(*_site);
 
@@ -175,6 +172,10 @@ namespace synthese
 					pt.getForm().getCalendarInput(ObjectUpdateAction::GetInputName<EndDate>(), _site->get<EndDate>())
 				);
 				stream << pt.cell(
+					"Host name",
+					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<HostName>(), _site->get<HostName>())
+				);
+				stream << pt.cell(
 					"URL",
 					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<ClientURL>(), _site->get<ClientURL>())
 				);
@@ -184,11 +185,6 @@ namespace synthese
 						ObjectUpdateAction::GetInputName<DefaultTemplate>(),
 						lexical_cast<string>(_site->get<DefaultTemplate>() ? _site->get<DefaultTemplate>()->getKey() : RegistryKeyType(0))
 				)	);
-				stream << pt.title("SVN");
-				stream << pt.cell(
-					"URL",
-					pt.getForm().getTextInput(ObjectUpdateAction::GetInputName<SVNURL>(), _site->get<SVNURL>())
-				);
 				stream << pt.close();
 			}
 
@@ -198,14 +194,14 @@ namespace synthese
 			if (openTabContent(stream, TAB_WEB_PAGES))
 			{
 				stream << "<h1>Pages</h1>";
-				AdminActionFunctionRequest<WebPageAddAction, WebsiteAdmin> addRequest(_request);
+				AdminActionFunctionRequest<WebPageAddAction, WebsiteAdmin> addRequest(request);
 				addRequest.getAction()->setSite(const_pointer_cast<Website>(_site));
 
-				AdminActionFunctionRequest<RemoveObjectAction, WebsiteAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction, WebsiteAdmin> deleteRequest(request);
 
-				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(_request);
+				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(request);
 
-				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, _request);
+				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, request);
 			}
 
 
@@ -213,53 +209,107 @@ namespace synthese
 			// TAB SVN STORAGE
 			if (openTabContent(stream, TAB_SVN_STORAGE))
 			{
-				AdminFunctionRequest<WebsiteAdmin> svnStorageRequest(_request);
+				if(_site->get<SVNWorkingCopy>().getRepoURL().empty())
+				{ // Not using SVN sotrage currently
 
-				stream << "<h1>SVN Storage</h1>";
-				HTMLForm svnStorageForm = svnStorageRequest.getHTMLForm("svnStorage");
+					stream << "<h1>Création d'un stockage Subversion</h1>";
 
-				PropertiesHTMLTable pt(svnStorageForm);
-				stream << pt.open();
-				stream << pt.title("SVN update ou commit");
+					stream << "<p class=\"info\">Ce site n'est pas stocké dans un dépôt subversion.<br />Utiliser le formulaire ci-dessous pour créer un nouveau stockage Subversion pour ce site.<br />ATTENTION : l'adresse fournie doit correspondre à un répertoire non existant sur le dépôt.</p>";
 
-				stream << pt.cell("ID datasource import", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_DATASOURCE_ID, ""));
-				stream << pt.cell("ID d'objet", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_OBJECT_ID, lexical_cast<string>(_site->getKey())));
+					AdminActionFunctionRequest<SVNWorkingCopyCreateAction, WebsiteAdmin> createRequest(request);
+					createRequest.getAction()->setObject(
+						static_pointer_cast<ObjectBase, Website>(
+							const_pointer_cast<Website>(
+								_site
+					)	)	);
 
-				string exportPath("");
-				if(!ServerModule::GetSitesStoragePath().empty())
-				{
-					exportPath = ServerModule::GetSitesStoragePath() + "/" + lexical_cast<string>(_site->getKey());
+					PropertiesHTMLTable pt(createRequest.getHTMLForm("svn"));
+					stream << pt.open();
+					stream << pt.cell(
+						"URL",
+						pt.getForm().getTextInput(
+							SVNWorkingCopyCreateAction::PARAMETER_REPO_URL,
+							string()
+					)	);
+					stream << pt.cell(
+						"Utilisateur",
+						pt.getForm().getTextInput(
+							SVNWorkingCopyCreateAction::PARAMETER_USER,
+							request.getSession()->getUser()->getLogin()
+					)	);
+					stream << pt.cell(
+						"Mot de passe",
+						pt.getForm().getPasswordInput(
+							SVNWorkingCopyCreateAction::PARAMETER_PASSWORD,
+							string()
+					)	);
+					stream << pt.close();
 				}
-
-				stream << pt.cell("Chemin d'export", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_EXPORT_PATH, exportPath));
-				stream << pt.cell("URL", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_URL, _site->get<SVNURL>()));
-				stream << pt.cell("Utilisateur", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_USERNAME, _request.getUser()->getSVNUsername()));
-				stream << pt.cell("Mot de passe", pt.getForm().getPasswordInput(SVNStorageFunction::PARAMETER_PASSWORD, _request.getUser()->getSVNPassword()));
-
-				stream << pt.cell("Update", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_UPDATE, false));
-				stream << pt.cell("Commit", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_COMMIT, false));
-				stream << pt.cell("Message (si commit)", pt.getForm().getTextInput(SVNStorageFunction::PARAMETER_COMMIT_MESSAGE, ""));
-				stream << pt.cell("Verbeux", pt.getForm().getOuiNonRadioInput(SVNStorageFunction::PARAMETER_VERBOSE, false));
-
-				stream << pt.close();
-
-				stream << "<h1>Résultat de la commande</h1>";
-
-				stream << "<h2>Sortie</h2>";
-				stream << "<pre style='font-size: 1.2em'>";
-				ParametersMap result = _svnStorage.run(stream, _request);
-				stream << "</pre>";
-
-				if(result.isDefined(SVNStorageFunction::VALUE_SUCCESS))
+				else
 				{
-					stream << "<h2>Etat</h2>";
-					if(result.get<bool>(SVNStorageFunction::VALUE_SUCCESS))
+					//////////////////////////////////////////////////////////////////////////
+					// Update
 					{
-						stream << "<p style='color: green'>Succès</p>";
+						stream << "<h1>SVN Update</h1>";
+
+						AdminActionFunctionRequest<SVNUpdateAction, WebsiteAdmin> updateRequest(request);
+						updateRequest.getAction()->setObject(
+							static_pointer_cast<ObjectBase, Website>(
+								const_pointer_cast<Website>(
+									_site
+						)	)	);
+
+						PropertiesHTMLTable pt(updateRequest.getHTMLForm("svn_up"));
+						stream << pt.open();
+						stream << pt.cell(
+							"Utilisateur",
+							pt.getForm().getTextInput(
+								SVNUpdateAction::PARAMETER_USER,
+								request.getSession()->getUser()->getLogin()
+						)	);
+						stream << pt.cell(
+							"Mot de passe",
+							pt.getForm().getPasswordInput(
+								SVNUpdateAction::PARAMETER_PASSWORD,
+								string()
+						)	);
+						stream << pt.close();
 					}
-					else
+
+
+					//////////////////////////////////////////////////////////////////////////
+					// Commit
 					{
-						stream << "<p style='color: red'>Echec</p>";
+						stream << "<h1>SVN Commit</h1>";
+
+						AdminActionFunctionRequest<SVNCommitAction, WebsiteAdmin> commitRequest(request);
+						commitRequest.getAction()->setObject(
+							static_pointer_cast<ObjectBase, Website>(
+								const_pointer_cast<Website>(
+									_site
+						)	)	);
+
+						PropertiesHTMLTable pt(commitRequest.getHTMLForm("svn_ci"));
+						stream << pt.open();
+						stream << pt.cell(
+							"Message",
+							pt.getForm().getTextInput(
+								SVNCommitAction::PARAMETER_MESSAGE,
+								string()
+						)	);
+						stream << pt.cell(
+							"Utilisateur",
+							pt.getForm().getTextInput(
+								SVNCommitAction::PARAMETER_USER,
+								request.getSession()->getUser()->getLogin()
+						)	);
+						stream << pt.cell(
+							"Mot de passe",
+							pt.getForm().getPasswordInput(
+								SVNCommitAction::PARAMETER_PASSWORD,
+								string()
+						)	);
+						stream << pt.close();
 					}
 				}
 			}

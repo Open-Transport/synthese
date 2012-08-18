@@ -75,11 +75,26 @@ namespace synthese
 		void*& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
+		if(	withFiles == true
+		){
+			return;
+		}
+
 		const Importable& impObject(dynamic_cast<const Importable&>(object));
 		string s(Serialize(impObject.getDataSourceLinks(), map.getFormat()));
 		map.insert(prefix + FIELD.name, s);
+	}
+
+
+
+	void ObjectField<DataSourceLinks, DataSourceLinks::Type>::SaveToFilesMap(
+		void*& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
 	}
 
 

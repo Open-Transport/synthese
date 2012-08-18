@@ -31,6 +31,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class MimeType;
+	}
+
 	namespace cms
 	{
 		//////////////////////////////////////////////////////////////////////////
@@ -73,7 +78,7 @@ namespace synthese
 			boost::optional<SpecificTemplate::Type> _template;
 			boost::optional<boost::posix_time::ptime> _startDate;
 			boost::optional<boost::posix_time::ptime> _endDate;
-			boost::optional<std::string> _mimeType;
+			boost::optional<util::MimeType> _mimeType;
 			boost::optional<bool> _doNotUseTemplate;
 			boost::optional<bool> _hasForum;
 			boost::optional<std::string> _smartURLPath;

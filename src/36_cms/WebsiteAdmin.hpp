@@ -30,7 +30,6 @@
 #include "WebPageTableSync.h"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "SVNStorageFunction.hpp"
 
 namespace synthese
 {
@@ -68,7 +67,6 @@ namespace synthese
 			boost::shared_ptr<const Website>	_site;
 			std::string						_searchPage;
 			html::ResultHTMLTable::RequestParameters	_pageSearchParameter;
-			impex::SVNStorageFunction		_svnStorage;
 
 		public:
 			WebsiteAdmin();

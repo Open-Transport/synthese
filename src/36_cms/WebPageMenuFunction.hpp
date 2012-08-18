@@ -125,9 +125,9 @@ namespace synthese
 			bool _getMenuContentRecursive(
 				std::ostream& stream,
 				const server::Request& request /*= NULL*/,
-				boost::shared_ptr<const Webpage> root,
+				const Webpage* root,
 				std::size_t depth,
-				boost::shared_ptr<const Webpage> currentPage,
+				const Webpage* currentPage,
 				std::size_t rank,
 				bool isLastPage
 			) const;

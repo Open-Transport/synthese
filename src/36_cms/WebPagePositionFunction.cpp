@@ -105,7 +105,6 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			shared_ptr<const Webpage> currentPage(CMSModule::GetWebPage(request));
 			deque<const Webpage*> pages;
 			for(const Webpage* page(_page.get()); page != NULL; page = page->getParent())
 			{

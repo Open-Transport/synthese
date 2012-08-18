@@ -55,7 +55,8 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(RawEditor, "raw_editor", SQL_BOOLEAN)
 
 	template<> const Field ComplexObjectFieldDefinition<WebpageTreeNode>::FIELDS[] = { Field("site_id", SQL_INTEGER), Field("up_id", SQL_INTEGER), Field("rank", SQL_INTEGER), Field() };
-	template<> const bool ComplexObjectFieldDefinition<WebpageTreeNode>::EXPORT_CONTENT_AS_FILE = false;
+	
+
 
 	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::GetLinkedObjectsIds(
 		LinkedObjectsIds& list,
@@ -73,6 +74,8 @@ namespace synthese
 			list.push_back(up_id);
 		}
 	}
+
+
 
 	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::LoadFromRecord(
 		WebpageTreeNode::Type& fieldObject,
@@ -125,18 +128,27 @@ namespace synthese
 					Log::GetInstance().warn(
 						"Data corrupted in on web page " + lexical_cast<string>(webpage.get<Key>()) +" : website " +
 						lexical_cast<string>(id) + " not found"
-						);
+					);
 				}
 			}
 		}
 	}
 
-	template<> void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::SaveToParametersMap(
+
+
+	template<>
+	void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::SaveToParametersMap(
 		const WebpageTreeNode::Type& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
+		if(withFiles == true)
+		{
+			return;
+		}
+
 		assert(dynamic_cast<const Webpage*>(&object));
 		const Webpage& webpage(static_cast<const Webpage&>(object));
 
@@ -144,6 +156,18 @@ namespace synthese
 		map.insert(prefix + FIELDS[1].name, webpage.getParent(true) ? webpage.getParent()->getKey() : RegistryKeyType(0));
 		map.insert(prefix + FIELDS[2].name, webpage.getRank());
 	}
+
+
+
+	template<>
+	void ComplexObjectField<WebpageTreeNode, WebpageTreeNode::Type>::SaveToFilesMap(
+		const WebpageTreeNode::Type& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
+	}
+
+
 
 	namespace cms
 	{
@@ -164,7 +188,6 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(WebpageContent),
 					FIELD_VALUE_CONSTRUCTOR(StartTime, posix_time::not_a_date_time),
 					FIELD_VALUE_CONSTRUCTOR(EndTime, posix_time::not_a_date_time),
-					FIELD_VALUE_CONSTRUCTOR(MimeType, "text/html"),
 					FIELD_DEFAULT_CONSTRUCTOR(Abstract),
 					FIELD_DEFAULT_CONSTRUCTOR(ImageURL),
 					FIELD_DEFAULT_CONSTRUCTOR(WebpageLinks),
@@ -220,7 +243,7 @@ namespace synthese
 
 		std::string Webpage::getMimeType() const
 		{
-			return get<MimeType>().empty() ? "text/html" : get<MimeType>();
+			return get<WebpageContent>().getMimeType();
 		}
 
 

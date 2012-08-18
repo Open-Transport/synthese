@@ -107,8 +107,14 @@ namespace synthese
 		tree::TreeFolderUpNode* fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
+		if(	withFiles == true
+		){
+			return;
+		}
+
 		assert(dynamic_cast<const TreeFolderDownNodeInterface*>(&object));
 		const TreeFolderDownNodeInterface& node(dynamic_cast<const TreeFolderDownNodeInterface&>(object));
 
@@ -134,6 +140,16 @@ namespace synthese
 			map.insert(prefix + FIELD.name, dynamic_cast<const Registrable*>(fieldObject)->getKey());
 		}
 	}
+
+
+
+	void ObjectField<Parent, Parent::Type>::SaveToFilesMap(
+		tree::TreeFolderUpNode* fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
+	}
+
 
 
 	namespace tree

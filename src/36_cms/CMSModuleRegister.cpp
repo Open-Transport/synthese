@@ -4,6 +4,7 @@
 #include "CMSModule.hpp"
 
 #include "WebPageAddAction.h"
+#include "WebpageContentUploadAction.hpp"
 #include "WebPageUpdateAction.h"
 #include "WebPageLinkAddAction.hpp"
 #include "WebPageLinkRemoveAction.hpp"
@@ -98,6 +99,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::MailService::integrate();
 
 	synthese::cms::WebPageAddAction::integrate();
+	synthese::cms::WebpageContentUploadAction::integrate();
 	synthese::cms::WebPageUpdateAction::integrate();
 	synthese::cms::WebPageLinkAddAction::integrate();
 	synthese::cms::WebPageLinkRemoveAction::integrate();

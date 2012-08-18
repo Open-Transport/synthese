@@ -74,7 +74,6 @@ namespace synthese
 			FIELD(WebpageContent),
 			FIELD(StartTime),
 			FIELD(EndTime),
-			FIELD(MimeType),
 			FIELD(Abstract),
 			FIELD(ImageURL),
 			FIELD(WebpageLinks),

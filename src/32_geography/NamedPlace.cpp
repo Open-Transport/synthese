@@ -89,9 +89,11 @@ namespace synthese
 		}
 	}
 
-	template<> const Field ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[] = { Field("name", SQL_TEXT), Field("city_id", SQL_INTEGER), Field() };
-	template<> const bool ComplexObjectFieldDefinition<NamedPlaceData>::EXPORT_CONTENT_AS_FILE = false;
-
+	template<> const Field ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[] = {
+		Field("name", SQL_TEXT),
+		Field("city_id", SQL_INTEGER),
+	Field() };
+	
 
 
 	template<> void ComplexObjectField<NamedPlaceData, NamedPlaceData::Type>::GetLinkedObjectsIds(
@@ -103,6 +105,15 @@ namespace synthese
 		{
 			list.push_back(city_id);
 		}
+	}
+
+
+	template<>
+	void ComplexObjectField<NamedPlaceData, NamedPlaceData::Type>::SaveToFilesMap(
+		const NamedPlaceData::Type& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
 	}
 
 
@@ -149,8 +160,14 @@ namespace synthese
 		const NamedPlaceData::Type& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
+		if(withFiles == true)
+		{
+			return;
+		}
+
 		assert(dynamic_cast<const NamedPlace*>(&object));
 		const NamedPlace& place(dynamic_cast<const NamedPlace&>(object));
 

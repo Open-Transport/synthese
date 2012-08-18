@@ -25,9 +25,12 @@
 
 #include "SimpleObjectFieldDefinition.hpp"
 
-#include "Record.hpp"
+#include "FilesMap.hpp"
 #include "FrameworkTypes.hpp"
 #include "ParametersMap.h"
+#include "MimeTypes.hpp"
+
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -53,12 +56,25 @@ namespace synthese
 		static void LoadFromRecord(T& fieldObject, const Record& record);
 		static void LoadFromRecord(T& fieldObject, const Record& record, const util::Env& env);
 		static void LoadFromRecord(T& fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map, const std::string& prefix);
+		static void SaveToFilesMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		);
+		static void SaveToParametersMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		);
 		static void SaveToParametersMap(const T& fieldObject, const ObjectBase& object, util::ParametersMap& map);
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map, const std::string& prefix);
 		static void SaveToParametersMap(const T& fieldObject, util::ParametersMap& map);
 		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
 	};
+
+
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Field of standard object using various database fields.
@@ -93,86 +109,6 @@ namespace synthese
 			LinkedObjectsIds& list,
 			const std::string& text
 		);
-	};
-
-
-	//////////////////////////////////////////////////////////////////////////
-	/// Enum specialization
-	template<class C, typename P>
-	class EnumObjectField:
-		public SimpleObjectFieldDefinition<C>
-	{
-	public:
-		typedef P Type;
-
-		static void LoadFromRecord(P& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
-		{
-			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
-			{
-				fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
-			}
-		}
-
-
-
-		static std::string Serialize(
-			const P& fieldObject,
-			util::ParametersMap::SerializationFormat format
-		){
-			return boost::lexical_cast<std::string>(static_cast<int>(fieldObject));
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			util::ParametersMap& map,
-			const std::string& prefix
-		){
-			map.insert(
-				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
-				Serialize(fieldObject, map.getFormat())
-			);
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			const ObjectBase& object,
-			util::ParametersMap& map,
-			const std::string& prefix
-		){
-			SaveToParametersMap(fieldObject, map, prefix);
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			util::ParametersMap& map
-		){
-			map.insert(
-				SimpleObjectFieldDefinition<C>::FIELD.name,
-				Serialize(fieldObject, map.getFormat())
-			);
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			const ObjectBase& object,
-			util::ParametersMap& map
-		){
-			SaveToParametersMap(fieldObject, map);
-		}
-
-
-
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record)
-		{
-		}
 	};
 
 
@@ -235,9 +171,34 @@ namespace synthese
 		const T& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
-		SaveToParametersMap(fieldObject, map, prefix);
+		if(	boost::logic::indeterminate(withFiles) ||
+			SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
+		){
+			SaveToParametersMap(fieldObject, map, prefix);
+		}
+	}
+
+
+
+	template<class C, class T>
+	void SimpleObjectField<C, T>::SaveToFilesMap(
+		const T& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
+		if(	SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == true
+		){
+			FilesMap::File item;
+			item.content = ObjectField<C, T>::Serialize(fieldObject, util::ParametersMap::FORMAT_INTERNAL);
+			item.mimeType = util::MimeTypes::TEXT;
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				item
+			);
+		}
 	}
 
 

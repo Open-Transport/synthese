@@ -26,6 +26,7 @@
 #include "ParametersMap.h"
 #include "Conversion.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/tokenizer.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
@@ -39,6 +40,7 @@ using namespace std;
 using namespace boost;
 using namespace boost::posix_time;
 using namespace boost::gregorian;
+using namespace boost::algorithm;
 using namespace geos::geom;
 
 namespace synthese
@@ -65,6 +67,153 @@ namespace synthese
 				{
 					_map.insert (make_pair (parameterName, parameterValue));
 				}
+			}
+		}
+
+
+
+		ParametersMap::ParametersMap(
+			const std::string& content,
+			const std::string& boundary
+		):	_format(FORMAT_INTERNAL)
+		{
+			typedef split_iterator<string::iterator> string_split_iterator;
+			const string fullBoundary("--"+boundary);
+			for(string_split_iterator its=make_split_iterator(const_cast<string&>(content), first_finder(fullBoundary, is_iequal()));
+				its != string_split_iterator();
+				++its
+			){
+				string param(copy_range<std::string>(*its));
+
+				enum State
+				{
+					undefined,
+					header,
+					rn1,
+					n1,
+					rn2,
+					in_content
+				};
+
+				State state(undefined);
+				string line;
+				string key;
+				string fieldContent;
+				string fileName;
+				MimeType mimeType;
+				for(string::const_iterator it(param.begin()); it != param.end(); ++it)
+				{
+					switch(state)
+					{
+					case undefined:
+						if(*it == 'C')
+						{
+							line.clear();
+							line.push_back(*it);
+							state = header;
+						}
+						break;
+
+					case header:
+						if(*it == '\r')
+						{
+							state = rn1;
+						}
+						else if(*it == '\n')
+						{
+							state = n1;
+						}
+						else
+						{
+							line.push_back(*it);
+						}
+						if(state != header)
+						{
+							vector<string> parts;
+							split(parts, line, is_any_of(":"));
+							if(parts[0] == "Content-Disposition")
+							{
+								vector<string> parts1;
+								split(parts1, parts[1], is_any_of(";"));
+								if(	parts1.size() >= 2 &&
+									parts1[1].size() > 8 &&
+									parts1[1].substr(0, 7) == " name=\""
+								){
+									key = parts1[1].substr(7, parts1[1].size() - 8);
+								}
+								if(	parts1.size() >= 3 &&
+									parts1[2].size() > 12 &&
+									parts1[2].substr(0, 11) == " filename=\""
+								){
+									fileName = parts1[2].substr(11, parts1[2].size() - 12);
+								}
+							}
+							else if(parts[0] == "Content-Type")
+							{
+								mimeType = MimeType(trim_copy(parts[1]));
+							}
+						}
+						break;
+
+					case rn1:
+						if(*it == '\n')
+						{
+							state = n1;
+						}
+						break;
+
+					case n1:
+						if(*it == '\r')
+						{
+							state = rn2;
+						}
+						else if(*it == '\n')
+						{
+							state = in_content;
+						}
+						else if(*it == 'C')
+						{
+							line.clear();
+							line.push_back(*it);
+							state = header;
+						}
+						break;
+
+					case rn2:
+						if(*it == '\n')
+						{
+							state = in_content;
+						}
+						break;
+
+					case in_content:
+						fieldContent.push_back(*it);
+						break;
+					}
+				}
+
+				if(!key.empty())
+				{
+					if(fieldContent[fieldContent.size()-1] == '\n')
+					{
+						fieldContent = fieldContent.substr(0, fieldContent.size() - 1);
+					}
+					if(fieldContent[fieldContent.size()-1] == '\r')
+					{
+						fieldContent = fieldContent.substr(0, fieldContent.size() - 1);
+					}
+					if(!fileName.empty())
+					{
+						File file;
+						file.content = fieldContent;
+						file.filename = fileName;
+						file.mimeType = mimeType;
+						insert(key, file);
+					}
+					else
+					{
+						insert(key, fieldContent);
+				}	}
 			}
 		}
 
@@ -169,16 +318,23 @@ namespace synthese
 
 
 
+		void ParametersMap::insert( const std::string& key, const File& file )
+		{
+			_files[key] = file;
+		}
+
+
+
 		void ParametersMap::outputURI(
 			ostream& os,
-			string prefix
+			string prefix	
 		) const {
 			// Values stored in the root
 			for (Map::const_iterator iter = _map.begin();
 				iter != _map.end();
 				++iter
 			){
-				if (iter != _map.begin ())
+				if (iter != _map.begin () || !prefix.empty())
 				{
 					os << URI::PARAMETER_SEPARATOR;
 				}
@@ -454,8 +610,9 @@ namespace synthese
 			ParametersMap result(_format);
 			BOOST_FOREACH(const Map::value_type& element, _map)
 			{
-				if(element.first.substr(0, keyBegin.size()) == keyBegin)
-				{
+				if(	element.first.size() > keyBegin.size() &&
+					element.first.substr(0, keyBegin.size()) == keyBegin
+				){
 					result.insert(element.first.substr(keyBegin.size()), element.second);
 				}
 			}
@@ -537,7 +694,21 @@ namespace synthese
 			assert(_format == other._format);
 
 			_map = other._map;
+			_files = other._files;
 			_subMap = other._subMap;
 			_geometry = other._geometry;
+		}
+
+
+
+		const ParametersMap::File& ParametersMap::getFile(
+			const std::string& key
+		) const {
+			Files::const_iterator it(_files.find(key));
+			if(it == _files.end())
+			{
+				throw MissingParameterException(key);
+			}
+			return it->second;
 		}
 }	}

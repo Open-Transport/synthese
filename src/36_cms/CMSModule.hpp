@@ -27,6 +27,8 @@
 
 #include "ModuleClassTemplate.hpp"
 
+#include <boost/thread/mutex.hpp>
+
 namespace synthese
 {
 	namespace server
@@ -97,10 +99,11 @@ namespace synthese
 			public server::ModuleClassTemplate<CMSModule>
 		{
 		public:
-			typedef std::map<std::string, Website*> SitesByClientURL;
+			typedef std::map<std::pair<std::string, std::string>, Website*> SitesByURL;
 
 		private:
-			static SitesByClientURL _sitesByClientURL;
+			static SitesByURL _sitesByURL;
+			static boost::mutex _sitesByURLMutex;
 
 		public:
 
@@ -129,39 +132,48 @@ namespace synthese
 			/// @version 3.1.16
 			//////////////////////////////////////////////////////////////////////////
 			/// The current function must be WebPageDisplayFunction
-			static boost::shared_ptr<const Webpage> GetWebPage(const server::Request& request);
+			static const Webpage* GetWebPage(
+				const server::Request& request
+			);
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Removes a site from the map of sites indexed by client URL.
-			/// @param key client URL of the site to remove
+			/// @param site the site to remove
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
-			static void RemoveSite(const std::string& key);
+			static void RemoveSite(
+				const Website& site
+			);
 
 
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Adds a site on the map of sites indexed by client URL.
-			/// @param value the site to add
+			/// @param site the site to add
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
-			static void AddSite(Website& value);
+			static void AddSite(
+				Website& site
+			);
 
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Finds a site by its client URL.
-			/// @param key client URL to search
+			/// Finds a site by its URL.
+			/// @param hostName host name
+			/// @param clientURL client URL to search
 			/// @return pointer to the site if found, NULL else
 			/// @author Hugues Romain
 			/// @date 2010
 			/// @since 3.2.0
-			/// @warning Non thread safe
-			static Website* GetSiteByClientURL(const std::string& key);
+			static Website* GetSiteByURL(
+				const std::string& hostName,
+				const std::string& clientURL
+			);
 
 
 
