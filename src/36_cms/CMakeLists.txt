@@ -22,6 +22,8 @@ DateService.cpp
 DateService.hpp
 DateTimeInterfacePage.cpp
 DateTimeInterfacePage.h
+DelayedEvaluationParametersMap.cpp
+DelayedEvaluationParametersMap.hpp
 DualOperatorExpression.cpp
 DualOperatorExpression.hpp
 EqualFunction.cpp

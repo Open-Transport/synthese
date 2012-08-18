@@ -56,8 +56,14 @@ namespace synthese
 		void IfFunction::_setFromParametersMap(const ParametersMap& map)
 		{
 			_condition = map.isTrue(PARAMETER_CONDITION);
-			_then = map.getDefault<string>(PARAMETER_THEN, string(), false);
-			_else = map.getDefault<string>(PARAMETER_ELSE, string(), false);
+			if(_condition)
+			{
+				_then = map.getDefault<string>(PARAMETER_THEN, string(), false);
+			}
+			else
+			{
+				_else = map.getDefault<string>(PARAMETER_ELSE, string(), false);
+			}
 		}
 
 

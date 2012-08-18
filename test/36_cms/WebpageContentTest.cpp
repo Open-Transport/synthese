@@ -20,6 +20,7 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "IfFunction.hpp"
 #include "ParametersMap.h"
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
@@ -37,6 +38,9 @@ using namespace synthese;
 
 BOOST_AUTO_TEST_CASE (WebpageContentTest)
 {
+	// Factory initialization
+	IfFunction::integrate();
+
 	StaticFunctionRequest<WebPageDisplayFunction> request;
 	ParametersMap additionalParametersMap;
 	ParametersMap variables;
@@ -620,6 +624,58 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
 		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 6);
 		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
+	{ // Service call
+		string code("test<?if&cond=1&then=2&else=3?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test2");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 6);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
+	{ // Service call
+		string code("test<?if&cond=0&then=2&else=3?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test3");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 6);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
+	{ // Delayed evaluation parameters
+		string code("test<?if&cond=1&then=<@variable=8@>&else=<@_variable=12@>?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 8);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 4);
+	}
+
+	{ // Delayed evaluation parameters
+		string code("test<?if&cond=0&then=<@variable=22@>&else=<@_variable=37@>?>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "test");
+		BOOST_CHECK_EQUAL(variables.getMap().size(), 4);
+		BOOST_CHECK_EQUAL(variables.get<int>("variable"), 8);
+		BOOST_CHECK_EQUAL(variables.get<int>("_variable"), 37);
 	}
 }
 
