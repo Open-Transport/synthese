@@ -123,7 +123,7 @@ namespace synthese
 			else
 			{	// Classic URL
 				StaticFunctionRequest<WebPageDisplayFunction> openRequest(request, false);
-				openRequest.getFunction()->setPage(_target);
+				openRequest.getFunction()->setPage(_target.get());
 				openRequest.getFunction()->setDontRedirectIfSmartURL(_templateParameters.getDefault<bool>(WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL, false));
 				if(!_target->getRoot()->get<ClientURL>().empty())
 				{

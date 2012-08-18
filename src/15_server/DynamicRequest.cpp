@@ -219,7 +219,31 @@ namespace synthese
 			}
 
 			// Parameters
-			_getPostParametersMap = ParametersMap(httpRequest.postData);
+			bool multipart(false);
+			it = httpRequest.headers.find("Content-Type");
+			if(it != httpRequest.headers.end())
+			{
+				vector<string> parts;
+				split(parts, it->second, is_any_of(";"));
+				if(	parts.size() >= 2 &&
+					trim_copy(parts[0]) == "multipart/form-data"
+				){
+					vector<string> parts1;
+					split(parts1, parts[1], is_any_of("="));
+					if(parts1.size() >= 2)
+					{
+						multipart = true;
+						_getPostParametersMap = ParametersMap(
+							httpRequest.postData,
+							parts1[1]
+						);
+					}
+				}
+			}
+			if(!multipart)
+			{
+				_getPostParametersMap = ParametersMap(httpRequest.postData);
+			}
 			if(separator+1 < uri.length())
 			{
 				ParametersMap getMap(uri.substr(separator+1));
@@ -298,6 +322,16 @@ namespace synthese
 				functionName = _getPostParametersMap.getDefault<std::string>(Request::PARAMETER_FUNCTION);
 				_getPostParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
 				_allParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
+			}
+			if(functionName.empty() && _redirectAfterAction && !_clientURL.empty())
+			{
+				functionName = "page";
+				_getPostParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
+				_allParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
+				_getPostParametersMap.insert("smart_url", _clientURL);
+				_getPostParametersMap.insert("host_name", _hostName);
+				_allParametersMap.insert("smart_url", _clientURL);
+				_allParametersMap.insert("host_name", _hostName);
 			}
 			if(!functionName.empty())
 			{

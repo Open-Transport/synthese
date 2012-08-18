@@ -272,6 +272,82 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		BOOST_CHECK_EQUAL(j.getContinuousServiceRange().total_seconds(), 0);
 	}
 
+	{ // 06 -> 07 21:00
+		VertexAccessMap ovam(static_cast<Place&>(place06).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
+		VertexAccessMap dvam(static_cast<Place&>(place07).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
+
+		ptime departure(tomorrow.date(), time_duration(22,0,0));
+
+		RoutePlanner r(
+			ovam,
+			dvam,
+			DEPARTURE_FIRST,
+			a,
+			boost::optional<boost::posix_time::time_duration>(),
+			departure,
+			next_day,
+			next_day,
+			PTModule::GRAPH_ID,
+			PTModule::GRAPH_ID,
+			100,
+			false,
+			logger
+		);
+
+		Journey j(r.run());
+
+		BOOST_CHECK_EQUAL(j.size(), 1);
+		BOOST_CHECK_EQUAL(j.getContinuousServiceRange(), minutes(20));
+		if(j.size() >= 1)
+		{
+			const ServicePointer& leg(j.getJourneyLeg(0));
+			BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps06.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li98.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(0)); 
+			BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps07.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li98.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(10)); 
+		}
+	}
+
+	{ // 06 -> 07 21:00 from arrival
+		VertexAccessMap ovam(static_cast<Place&>(place06).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
+		VertexAccessMap dvam(static_cast<Place&>(place07).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
+
+		ptime departure(tomorrow.date(), time_duration(22,0,0));
+
+		RoutePlanner r(
+			ovam,
+			dvam,
+			ARRIVAL_FIRST,
+			a,
+			boost::optional<boost::posix_time::time_duration>(),
+			next_day,
+			departure,
+			departure,
+			PTModule::GRAPH_ID,
+			PTModule::GRAPH_ID,
+			100,
+			false,
+			logger
+		);
+
+		Journey j(r.run());
+
+		BOOST_CHECK_EQUAL(j.size(), 1);
+		BOOST_CHECK_EQUAL(j.getContinuousServiceRange(), minutes(20));
+		if(j.size() >= 1)
+		{
+			const ServicePointer& leg(j.getJourneyLeg(0));
+			BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps06.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li98.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(0)); 
+			BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps07.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li98.getKey()); 
+			BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(10)); 
+		}
+	}
+
 	{ // 93 -> 07 21:00
 		VertexAccessMap ovam(static_cast<Place&>(place93).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
 		VertexAccessMap dvam(static_cast<Place&>(place07).getVertexAccessMap(a, PTModule::GRAPH_ID, 0));
@@ -553,5 +629,691 @@ BOOST_AUTO_TEST_CASE (RoutePlannerTest)
 		PTRoutePlannerResult result(r.run());
 
 		BOOST_CHECK_MESSAGE(result.getJourneys().size() == 7, displayJourneyDifferences("Result size from 98 to 99 is not 7 !",result));
+		BOOST_CHECK_EQUAL(result.getJourneys().size(), 8);
+
+		if(result.getJourneys().size() >= 1)
+		{
+			const Journey& journey(result.getJourneys().at(0));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(15));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(15));
+			}
+		}
+
+		if(result.getJourneys().size() >= 2)
+		{
+			const Journey& journey(result.getJourneys().at(1));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps81.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(9) + minutes(11)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(9) + minutes(11)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(9) + minutes(20)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(9) + minutes(20)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li95.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(10) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(10) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps84.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li95.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(10) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(10) + minutes(20));
+			}
+		}
+
+		if(result.getJourneys().size() >= 3)
+		{
+			const Journey& journey(result.getJourneys().at(2));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(10));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(54));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(54));
+			}
+		}
+
+		if(result.getJourneys().size() >= 4)
+		{
+			const Journey& journey(result.getJourneys().at(3));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(5));
+			}
+		}
+
+		if(result.getJourneys().size() >= 5)
+		{
+			const Journey& journey(result.getJourneys().at(4));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(15));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(9));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(9));
+			}
+		}
+
+		if(result.getJourneys().size() >= 6)
+		{
+			const Journey& journey(result.getJourneys().at(5));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(25));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(25));
+			}
+		}
+
+		if(result.getJourneys().size() >= 7)
+		{
+			const Journey& journey(result.getJourneys().at(6));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(20));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(34));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(34));
+			}
+		}
+
+		if(result.getJourneys().size() >= 8)
+		{
+			const Journey& journey(result.getJourneys().at(7));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(25));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(25));
+			}
+		}
+	}
+
+
+	{ // 98 -> 99 arrival to departure
+
+		PTTimeSlotRoutePlanner r(
+			&place98,
+			&place99,
+			tomorrow,
+			next_day,
+			tomorrow,
+			next_day,
+			boost::optional<std::size_t>(),
+			a,
+			ARRIVAL_FIRST,
+			false,
+			logger
+		);
+		PTRoutePlannerResult result(r.run());
+
+		BOOST_CHECK_EQUAL(result.getJourneys().size(), 8);
+
+		if(result.getJourneys().size() >= 1)
+		{
+			const Journey& journey(result.getJourneys().at(0));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(14) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(7) + minutes(14));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(7) + minutes(14));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(7) + minutes(15));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(7) + minutes(15));
+			}
+		}
+
+		if(result.getJourneys().size() >= 2)
+		{
+			const Journey& journey(result.getJourneys().at(1));
+			BOOST_CHECK_EQUAL(journey.size(), 2);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps81.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(9) + minutes(11)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(9) + minutes(11)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(9) + minutes(20)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(9) + minutes(20)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps75.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li95.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(10) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(10) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps84.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li95.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(10) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(10) + minutes(20));
+			}
+		}
+
+		if(result.getJourneys().size() >= 3)
+		{
+			const Journey& journey(result.getJourneys().at(2));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(10));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(41) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(41));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(41));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(54));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(54));
+			}
+		}
+
+		if(result.getJourneys().size() >= 4)
+		{
+			const Journey& journey(result.getJourneys().at(3));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(55) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(55));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(55));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(5));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(5));
+			}
+		}
+
+		if(result.getJourneys().size() >= 5)
+		{
+			const Journey& journey(result.getJourneys().at(4));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(15));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(19) + minutes(56) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(19) + minutes(56));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(19) + minutes(56));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(9));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(9));
+			}
+		}
+
+		if(result.getJourneys().size() >= 6)
+		{
+			const Journey& journey(result.getJourneys().at(5));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li96.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(25));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(25));
+			}
+		}
+
+		if(result.getJourneys().size() >= 7)
+		{
+			const Journey& journey(result.getJourneys().at(6));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(20));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(21) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(20) + minutes(21));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(20) + minutes(21));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(20) + minutes(34));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(20) + minutes(34));
+			}
+		}
+
+		if(result.getJourneys().size() >= 8)
+		{
+			const Journey& journey(result.getJourneys().at(7));
+			BOOST_CHECK_EQUAL(journey.size(), 3);
+			BOOST_CHECK_EQUAL(journey.getContinuousServiceRange(), minutes(0));
+			if(journey.size() >= 1)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(0));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c91.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9)); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp46.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1)); 
+			}
+			if(journey.size() >= 2)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(1));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), c93.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(6) + seconds(1));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), c99.getKey()); 
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getPathGroup()->getKey(), rp43.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(20) - minutes(9) + minutes(8) + seconds(17)); 
+			}
+			if(journey.size() >= 3)
+			{
+				const ServicePointer& leg(journey.getJourneyLeg(2));
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getFromVertex()->getKey(), ps79.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getDepartureDateTime(), tomorrow + hours(22) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalDepartureDateTime(), tomorrow + hours(22) + minutes(20));
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getFromVertex()->getKey(), ps85.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalEdge()->getParentPath()->getKey(), li92.getKey());
+				BOOST_CHECK_EQUAL(leg.getArrivalDateTime(), tomorrow + hours(22) + minutes(25));
+				BOOST_CHECK_EQUAL(leg.getTheoreticalArrivalDateTime(), tomorrow + hours(22) + minutes(25));
+			}
+		}
 	}
 }

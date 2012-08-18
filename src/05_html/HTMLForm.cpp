@@ -48,6 +48,7 @@ namespace synthese
 			s	<< "<form "
 				<< "name=\"" << _name << "\" "
 				<< "method=\"post\" "
+				<< "enctype=\"multipart/form-data\" "
 				<< "action=\"" << _action << "\" "
 				<< htmlComplement
 				<< ">";
@@ -160,6 +161,48 @@ namespace synthese
 			}
 			s << "/>";
 			return s.str();
+		}
+
+
+
+		std::string HTMLForm::GetFileInput(
+			const std::string& name,
+			std::string fieldId,
+			std::string className
+		){
+			if (fieldId.empty())
+			{
+				fieldId = name + "__ID";
+			}
+
+			stringstream s;
+			s	<< "<input "
+				<< "type=\"file\" "
+				<< "name=\"" << name << "\" "
+				<< "id=\"" << fieldId << "\" ";
+			if(!className.empty())
+			{
+				s << "class=\"" << className << "\" ";
+			}
+			s << "/>";
+			return s.str();
+		}
+
+
+
+		std::string HTMLForm::getFileInput(
+			const std::string& name,
+			std::string className /*= std::string() */
+		){
+			if (!_updateRight)
+			{
+				return string();
+			}
+
+			removeHiddenFieldIfExists(name, string());
+
+			return GetFileInput(name, _getFieldId(name), className);
+
 		}
 
 

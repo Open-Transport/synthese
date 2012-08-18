@@ -26,9 +26,11 @@ namespace synthese
 {
 	Field::Field(
 		const std::string nameA /*= std::string()*/,
-		const FieldType typeA /*= SQL_TEXT */
+		const FieldType typeA /*= SQL_TEXT */,
+		bool exportOnFilesA
 	):	name(nameA),
-		type(typeA)
+		type(typeA),
+		exportOnFile(exportOnFilesA)
 	{}
 
 
@@ -55,5 +57,4 @@ namespace synthese
 		default:
 			return false;
 		}
-	}
-}
+}	}

@@ -70,7 +70,7 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			shared_ptr<const Webpage> page(_webpage.get() ? _webpage : CMSModule::GetWebPage(request));
+			const Webpage* page(_webpage.get() ? _webpage.get() : CMSModule::GetWebPage(request));
 			Webpage* previous(page->getPreviousSibling());
 			if(previous)
 			{

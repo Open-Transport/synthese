@@ -26,9 +26,10 @@
 #include "SimpleObjectField.hpp"
 
 #include "CoordinatesSystem.hpp"
-#include "ObjectBase.hpp"
 #include "Env.h"
 #include "Log.h"
+#include "MimeTypes.hpp"
+#include "ObjectBase.hpp"
 #include "SchemaMacros.hpp"
 
 #include <boost/algorithm/string.hpp>
@@ -286,6 +287,24 @@ namespace synthese
 		}
 
 
+		static void SaveToFilesMap(
+			const T& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){
+			if(	SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == true
+			){
+				FilesMap::File item;
+				item.content = ObjectField<C, T>::Serialize(fieldObject, util::ParametersMap::FORMAT_INTERNAL);
+				item.mimeType = util::MimeTypes::TEXT;
+				map.insert(
+					SimpleObjectFieldDefinition<C>::FIELD.name,
+					item
+				);
+			}
+		}
+
+
 
 		static void SaveToParametersMap(
 			const T& fieldObject,
@@ -304,9 +323,14 @@ namespace synthese
 			const T& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
-			const std::string& prefix
+			const std::string& prefix,
+			boost::logic::tribool withFiles
 		){
-			SaveToParametersMap(fieldObject, map, prefix);
+			if(	boost::logic::indeterminate(withFiles) ||
+				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
+			){
+				SaveToParametersMap(fieldObject, map, prefix);
+			}
 		}
 
 
@@ -436,6 +460,14 @@ namespace synthese
 
 
 
+		static void SaveToFilesMap(
+			const Type& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){}
+
+
+
 		static void SaveToParametersMap(
 			const Type& fieldObject,
 			util::ParametersMap& map,
@@ -453,9 +485,14 @@ namespace synthese
 			const Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
-			const std::string& prefix
+			const std::string& prefix,
+			boost::logic::tribool withFiles
 		){
-			SaveToParametersMap(fieldObject, map, prefix);
+			if(	boost::logic::indeterminate(withFiles) ||
+				FIELD.exportOnFile == withFiles
+			){
+				SaveToParametersMap(fieldObject, map, prefix);
+			}
 		}
 
 
@@ -627,14 +664,26 @@ namespace synthese
 		}
 
 
+		static void SaveToFilesMap(
+			const boost::optional<P&> & fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){}
+
+
 
 		static void SaveToParametersMap(
 			const boost::optional<P&> & fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
-			const std::string& prefix
+			const std::string& prefix,
+			boost::logic::tribool withFiles
 		){
-			SaveToParametersMap(fieldObject, map, prefix);
+			if(	boost::logic::indeterminate(withFiles) ||
+				FIELD.exportOnFile == withFiles
+			){
+				SaveToParametersMap(fieldObject, map, prefix);
+			}
 		}
 
 
@@ -781,9 +830,14 @@ namespace synthese
 			const std::vector<P*>& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
-			const std::string& prefix
+			const std::string& prefix,
+			boost::logic::tribool withFiles
 		){
-			SaveToParametersMap(fieldObject, map, prefix);
+			if(	boost::logic::indeterminate(withFiles) ||
+				FIELD.exportOnFile == withFiles
+			){
+				SaveToParametersMap(fieldObject, map, prefix);
+			}
 		}
 
 
@@ -807,6 +861,14 @@ namespace synthese
 		){
 			SaveToParametersMap(fieldObject, map);
 		}
+
+
+
+		static void SaveToFilesMap(
+			const std::vector<P*>& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){}
 
 
 
@@ -891,31 +953,31 @@ namespace synthese
 		static std::string Serialize(
 			const std::map<V1, V2>& fieldObject,
 			util::ParametersMap::SerializationFormat format
-			){
-				std::stringstream s;
-				if(format == util::ParametersMap::FORMAT_SQL)
+		){
+			std::stringstream s;
+			if(format == util::ParametersMap::FORMAT_SQL)
+			{
+				s << "'";
+			}
+			bool first(true);
+			typedef std::pair<V1, V2> mpair; 
+			BOOST_FOREACH(const mpair& pair, fieldObject)
+			{
+				if(first)
 				{
-					s << "'";
+					first = false;
 				}
-				bool first(true);
-				typedef std::pair<V1, V2> mpair; 
-				BOOST_FOREACH(const mpair& pair, fieldObject)
+				else
 				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						s << "|";
-					}
-					s << pair.first << "," << pair.second;
+					s << "|";
 				}
-				if(format == util::ParametersMap::FORMAT_SQL)
-				{
-					s << "'";
-				}
-				return s.str();
+				s << pair.first << "," << pair.second;
+			}
+			if(format == util::ParametersMap::FORMAT_SQL)
+			{
+				s << "'";
+			}
+			return s.str();
 		}
 
 
@@ -924,11 +986,11 @@ namespace synthese
 			const std::map<V1, V2>& fieldObject,
 			util::ParametersMap& map,
 			const std::string& prefix
-			){
-				map.insert(
-					prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
-					Serialize(fieldObject, map.getFormat())
-					);
+		){
+			map.insert(
+				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
 
@@ -937,9 +999,14 @@ namespace synthese
 			const std::map<V1, V2>& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
-			const std::string& prefix
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			if(	boost::logic::indeterminate(withFiles) ||
+				FIELD.exportOnFile == withFiles
 			){
 				SaveToParametersMap(fieldObject, map, prefix);
+			}
 		}
 
 
@@ -947,11 +1014,11 @@ namespace synthese
 		static void SaveToParametersMap(
 			const std::map<V1, V2>& fieldObject,
 			util::ParametersMap& map
-			){
-				map.insert(
-					SimpleObjectFieldDefinition<C>::FIELD.name,
-					Serialize(fieldObject, map.getFormat())
-					);
+		){
+			map.insert(
+				SimpleObjectFieldDefinition<C>::FIELD.name,
+				Serialize(fieldObject, map.getFormat())
+			);
 		}
 
 
@@ -960,17 +1027,25 @@ namespace synthese
 			const std::map<V1, V2>& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map
-			){
-				SaveToParametersMap(fieldObject, map);
+		){
+			SaveToParametersMap(fieldObject, map);
 		}
+
+
+
+		static void SaveToFilesMap(
+			const std::map<V1, V2>& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){}
 
 
 
 		static void GetLinkedObjectsIds(
 			LinkedObjectsIds& list,
 			const Record& record
-			){
-				return;
+		){
+			return;
 		}
 	};
 
@@ -979,7 +1054,6 @@ namespace synthese
 	FIELD_TYPE(EndDate, boost::gregorian::date)
 	FIELD_TYPE(EndTime, boost::posix_time::ptime)
 	FIELD_TYPE(Key, util::RegistryKeyType)
-	FIELD_TYPE(MimeType, std::string)
 	FIELD_TYPE(Rank, size_t)
 	FIELD_TYPE(StartDate, boost::gregorian::date)
 	FIELD_TYPE(StartTime, boost::posix_time::ptime)

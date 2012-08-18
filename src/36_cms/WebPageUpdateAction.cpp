@@ -85,7 +85,7 @@ namespace synthese
 			}
 			if(_mimeType)
 			{
-				map.insert(PARAMETER_MIME_TYPE, *_mimeType);
+				map.insert(PARAMETER_MIME_TYPE, string(*_mimeType));
 			}
 			if(_doNotUseTemplate)
 			{
@@ -219,9 +219,27 @@ namespace synthese
 				_hasForum = map.getDefault<bool>(PARAMETER_HAS_FORUM, false);
 			}
 
+			// Mime type
 			if(map.isDefined(PARAMETER_MIME_TYPE))
 			{
-				_mimeType = map.get<string>(PARAMETER_MIME_TYPE);
+				string value(map.get<string>(PARAMETER_MIME_TYPE));
+				try
+				{
+					_mimeType = MimeTypes::GetMimeTypeByString(value);
+				}
+				catch(Exception&)
+				{
+					vector<string> parts;
+					split(parts, value, is_any_of("/"));
+					if(parts.size() >= 2)
+					{
+						_mimeType = MimeType(parts[0], parts[1], "");
+					}
+					else
+					{
+						throw ActionException("No such mime type");
+					}
+				}
 			}
 
 			if(map.isDefined(PARAMETER_SMART_URL_PATH))
@@ -307,13 +325,19 @@ namespace synthese
 					*_ignoreWhiteChars :
 					_page->get<WebpageContent>().getIgnoreWhiteChars()
 				);
+
+				MimeType mimeType(
+					_mimeType ?
+					*_mimeType :
+					_page->get<WebpageContent>().getMimeType()
+				);
 				string content(*_content1);
 				if(_decodeXMLEntitiesInContent)
 				{
 					boost::algorithm::replace_all(content,"&lt;?", "<?");
 					boost::algorithm::replace_all(content,"?&gt;", "?>");
 				}
-				_page->set<WebpageContent>(WebpageContent(content, ignoreWhiteChars));
+				_page->set<WebpageContent>(WebpageContent(content, ignoreWhiteChars, mimeType));
 			}
 			if(_abstract)
 			{
@@ -334,10 +358,6 @@ namespace synthese
 			if(_endDate)
 			{
 				_page->set<EndTime>(*_endDate);
-			}
-			if(_mimeType)
-			{
-				_page->set<MimeType>(*_mimeType);
 			}
 			if(_template)
 			{

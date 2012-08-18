@@ -28,6 +28,8 @@
 #include "ComplexObjectField.hpp"
 
 #include "WebpageContentNode.hpp"
+#include "MimeType.hpp"
+#include "MimeTypes.hpp"
 
 #include "shared_recursive_mutex.hpp"
 
@@ -64,6 +66,7 @@ namespace synthese
 		protected:
 			std::string _code;
 			bool _ignoreWhiteChars;
+			util::MimeType _mimeType;
 
 		private:
 			typedef std::vector<boost::shared_ptr<WebpageContentNode> > Nodes;
@@ -106,7 +109,8 @@ namespace synthese
 			/// Constructor by entire string parsing.
 			WebpageContent(
 				const std::string& code,
-				bool ignoreWhiteChars = false
+				bool ignoreWhiteChars = false,
+				util::MimeType mimeType = util::MimeTypes::HTML
 			);
 
 
@@ -123,6 +127,7 @@ namespace synthese
 			//@{
 				const std::string& getCode() const { return _code; }
 				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
+				const util::MimeType& getMimeType() const { return _mimeType; }
 			//@}
 
 			/// @name Modifiers

@@ -28,6 +28,7 @@
 
 #include "Record.hpp"
 
+#include "MimeType.hpp"
 #include "Registry.h"
 
 #include <string>
@@ -58,7 +59,15 @@ namespace synthese
 			public Record
 		{
 		public:
+			struct File
+			{
+				MimeType mimeType;
+				std::string filename;
+				std::string content;
+			};
+
 			typedef std::map<std::string, std::string> Map;
+			typedef std::map<std::string, File> Files;
 			typedef std::map<std::string, std::vector<boost::shared_ptr<ParametersMap> > > SubParametersMap;
 
 
@@ -75,6 +84,7 @@ namespace synthese
 
 		private:
 			Map _map;
+			Files _files;
 			SubParametersMap _subMap;
 			boost::shared_ptr<geos::geom::Geometry> _geometry;
 			const SerializationFormat _format;
@@ -94,7 +104,21 @@ namespace synthese
 			/// Constructor from a query string.
 			/// @param text the query string : key=value&key=value...
 			/// Serialization format is FORMAT_INTERNAL
-			ParametersMap(const std::string& text);
+			ParametersMap(
+				const std::string& text
+			);
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Constructor from a multipart/form-data content.
+			/// @param content the content to parse
+			/// @param boundary the separator between items
+			/// Serialization format is FORMAT_INTERNAL
+			ParametersMap(
+				const std::string& content,
+				const std::string& boundary
+			);
 
 
 
@@ -254,6 +278,16 @@ namespace synthese
 					const std::string& parameterName,
 					bool exceptionIfMissing = true
 				) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// File getter.
+				/// @param key the key of the file to get
+				/// @return the specified file
+				const File& getFile(
+					const std::string& key
+				) const;
 			//@}
 
 			//! \name Modifiers
@@ -270,6 +304,15 @@ namespace synthese
 				void insert(const std::string& parameterName, const boost::gregorian::date& value);
 				void insert(const std::string& parameterName, const boost::posix_time::time_duration& value);
 				void insert(const std::string& parameterName, const boost::shared_ptr<ParametersMap>& value);
+
+				//////////////////////////////////////////////////////////////////////////
+				/// File inserter.
+				/// @param key The key of the file
+				/// @param file The file (name and content)
+				void insert(
+					const std::string& key,
+					const File& file
+				);
 
 				void setGeometry(const boost::shared_ptr<geos::geom::Geometry>& value){ _geometry = value; }
 

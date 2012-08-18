@@ -11,14 +11,4 @@ install(
   PATTERN "*.pyc" EXCLUDE
 )
 
-install(
-  FILES synthese_svn.py
-  DESTINATION bin
-  PERMISSIONS OWNER_EXECUTE OWNER_WRITE OWNER_READ GROUP_EXECUTE GROUP_READ WORLD_EXECUTE WORLD_READ
-)
-configure_file(
-  "synthese_svn.py"
-  "${PROJECT_BINARY_DIR}/src/bin/server/synthese_svn.py"
-)
-
 install(CODE "EXECUTE_PROCESS(COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_INSTALL_PREFIX}/bin/synthese.py --create-pyenv-only)")

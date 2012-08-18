@@ -1,0 +1,1 @@
+synthese::db::svn::moduleRegister();

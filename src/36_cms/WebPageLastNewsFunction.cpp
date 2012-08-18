@@ -101,7 +101,7 @@ namespace synthese
 		) const {
 
 			const Website* site(CMSModule::GetSite(request, getTemplateParameters()));
-			shared_ptr<const Webpage> curPage(CMSModule::GetWebPage(request));
+			const Webpage* curPage(CMSModule::GetWebPage(request));
 
 			WebPageTableSync::SearchResult pages(
 				WebPageTableSync::Search(
@@ -114,7 +114,7 @@ namespace synthese
 
 			if(!_displayPage.get() && _root.get())
 			{ // RSS
-				openRequest.getFunction()->setPage(_root);
+				openRequest.getFunction()->setPage(_root.get());
 
 				stream <<
 					"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" <<
@@ -151,7 +151,7 @@ namespace synthese
 				}
 				else if(_root.get())
 				{
-					openRequest.getFunction()->setPage(page);
+					openRequest.getFunction()->setPage(page.get());
 
 					stream <<
 						"<item>" <<

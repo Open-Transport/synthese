@@ -15,8 +15,6 @@ DataSourceTableSync.cpp
 DataSourceTableSync.h
 DataSourceUpdateAction.cpp
 DataSourceUpdateAction.hpp
-DumpFileFormat.cpp
-DumpFileFormat.hpp
 Exporter.hpp
 ExportFunction.cpp
 ExportFunction.hpp
@@ -43,8 +41,6 @@ NoExportPolicy.hpp
 NoImportPolicy.hpp
 OneFileExporter.hpp
 OneFileTypeImporter.hpp
-SVNStorageFunction.cpp
-SVNStorageFunction.hpp
 )
 
 set_source_files_properties(ImpExModule.gen.cpp ImpExModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

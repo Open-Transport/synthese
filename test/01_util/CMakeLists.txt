@@ -7,6 +7,7 @@ set(DEPS
 )
 
 boost_test(Log "${DEPS}")
+boost_test(ParametersMap "${DEPS}")
 boost_test(Registrable "${DEPS}")
 boost_test(UId "${DEPS}")
 

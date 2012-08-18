@@ -107,7 +107,6 @@ namespace synthese
 		Field("number", SQL_INTEGER),
 		Field()
 	};
-	template<> const bool ComplexObjectFieldDefinition<AddressData>::EXPORT_CONTENT_AS_FILE = false;
 
 
 
@@ -120,6 +119,16 @@ namespace synthese
 		{
 			list.push_back(road_chunk_id);
 		}
+	}
+
+
+
+	template<>
+	void ComplexObjectField<AddressData, AddressData::Type>::SaveToFilesMap(
+		const AddressData::Type& fieldObject,
+		const ObjectBase& object,
+		FilesMap& map
+	){
 	}
 
 
@@ -195,12 +204,19 @@ namespace synthese
 
 
 
-	template<> void ComplexObjectField<AddressData, AddressData::Type>::SaveToParametersMap(
+	template<>
+	void ComplexObjectField<AddressData, AddressData::Type>::SaveToParametersMap(
 		const AddressData::Type& fieldObject,
 		const ObjectBase& object,
 		util::ParametersMap& map,
-		const std::string& prefix
+		const std::string& prefix,
+		boost::logic::tribool withFiles
 	){
+		if(withFiles == true)
+		{
+			return;
+		}
+
 		assert(dynamic_cast<const Address*>(&object));
 		const Address& address(dynamic_cast<const Address&>(object));
 
