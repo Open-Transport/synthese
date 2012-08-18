@@ -48,6 +48,7 @@ namespace synthese
 		private:
 			static const std::string PARAMETER_VAR;
 			static const std::string PARAMETER_TEMPLATE;
+			static const std::string VAR_EXCEPTION;
 
 
 
