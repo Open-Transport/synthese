@@ -161,6 +161,20 @@ ATL::CComBSTR{
 		stringview		([$e.m_str,sub])
 }
 
+; SYNTHESE
+; Registrable
+synthese::util::Registrable {
+	preview(
+		$e._key
+	)
+}
+
+; CalendarTemplate
+synthese::calendar::CalendarTemplate {
+	preview(
+		((*(synthese::util::Named*)(&$e)))._name
+	)
+}
 
 ;----------------------------------------
 ; BOOST_VISUALIZER_START boost::date_time
@@ -209,6 +223,23 @@ boost::posix_time::ptime {
 			)
 		)
 	)
+}
+
+boost::gregorian::date_duration {
+	preview(
+		#if($e.is_not_a_date())
+		(
+			"not_a_date"
+		)
+		#else(
+			#(
+				(((*(boost::date_time::date_duration<boost::date_time::duration_traits_adapted>*)(&$e))).days_).value_,
+				" days"
+			)
+		)
+	)
+
+
 }
 
 ; Date
@@ -281,7 +312,7 @@ boost::shared_ptr<*>{
 	children
 	( 
 		#( 
-			ptr: (*(($T1 *)$c.px)) ,
+			ptr: $c.px ,
 			count: $c.pn.pi_->use_count_ ,
 			weak_count: $c.pn.pi_->weak_count_
 		)
