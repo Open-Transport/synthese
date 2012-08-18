@@ -257,6 +257,7 @@ namespace synthese
 
 
 		WebPageDisplayFunction::WebPageDisplayFunction():
+			_page(NULL),
 			_useTemplate(true),
 			_dontRedirectIfSmartURL(false)
 		{}

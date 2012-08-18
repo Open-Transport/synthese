@@ -22,6 +22,7 @@
 
 #include "ServiceExpression.hpp"
 
+#include "DelayedEvaluationParametersMap.hpp"
 #include "FunctionWithSiteBase.hpp"
 #include "ParametersMap.h"
 #include "Request.h"
@@ -90,18 +91,30 @@ namespace synthese
 			}
 
 			// Service parameters evaluation
-			ParametersMap serviceParametersMap;
+			DelayedEvaluationParametersMap::Fields fields;
 			BOOST_FOREACH(const Parameters::value_type& param, _serviceParameters)
 			{
-				serviceParametersMap.insert(
-					param.first,
-					param.second.eval(request, additionalParametersMap, page, variables)
-				);
+				fields.insert(
+					make_pair(
+						param.first,
+						DelayedEvaluationParametersMap::Field(param.second)
+				)	);
 			}
 			if(!_inlineTemplate.empty())
 			{
-				serviceParametersMap.insert(Function::PARAMETER_OUTPUT_FORMAT, string());
+				fields.insert(
+					make_pair(
+						Function::PARAMETER_OUTPUT_FORMAT,
+						string()
+				)	);
 			}
+			DelayedEvaluationParametersMap serviceParametersMap(
+				fields,
+				request,
+				additionalParametersMap,
+				page,
+				variables
+			);
 
 			// Template parameters evaluation
 			ParametersMap templateParametersMap(request.getFunction()->getTemplateParameters());
