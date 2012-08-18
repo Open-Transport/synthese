@@ -56,7 +56,6 @@ namespace synthese
 				Date::Type _date;
 				Name::Type _name;
 				const cms::Webpage* _page;
-				MimeType::Type _mimeType;
 			//@}
 
 

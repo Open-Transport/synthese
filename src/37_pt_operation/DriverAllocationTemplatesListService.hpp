@@ -26,10 +26,10 @@
 #define SYNTHESE_DriverAllocationTemplatesListService_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
-#include "StandardFields.hpp"
+#include "Function.h"
 
 #include <boost/date_time/gregorian/greg_date.hpp>
+#include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
@@ -59,7 +59,7 @@ namespace synthese
 		///	@date 2011
 		/// @since 3.2.1
 		class DriverAllocationTemplatesListService:
-			public util::FactorableTemplate<cms::FunctionWithSite<false>, DriverAllocationTemplatesListService>
+			public util::FactorableTemplate<server::Function, DriverAllocationTemplatesListService>
 		{
 		public:
 			static const std::string PARAMETER_DATA_SOURCE_ID;
@@ -80,8 +80,6 @@ namespace synthese
 				const impex::DataSource* _dataSource;
 				boost::gregorian::date _minDate;
 				boost::gregorian::date _date;
-				const cms::Webpage* _page;
-				MimeType::Type _mimeType;
 				boost::posix_time::time_duration _minWorkRange;
 				boost::posix_time::time_duration _maxWorkRange;
 				boost::posix_time::time_duration _minWorkDuration;

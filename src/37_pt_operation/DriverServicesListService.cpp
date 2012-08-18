@@ -76,14 +76,17 @@ namespace synthese
 		ParametersMap DriverServicesListService::_getParametersMap() const
 		{
 			ParametersMap map;
+
+			// Page or output format
 			if(_page)
 			{
 				map.insert(PARAMETER_PAGE_ID, _page->getKey());
 			}
-			else if(!_mimeType.empty())
+			else
 			{
-				MimeType::SaveToParametersMap(_mimeType, map);
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
+
 			if(!_date.is_not_a_date())
 			{
 				map.insert(PARAMETER_DATE, _date);
@@ -114,7 +117,7 @@ namespace synthese
 			_page = getPage(map.getDefault<string>(PARAMETER_PAGE_ID));
 			if(!_page)
 			{
-				MimeType::LoadFromRecord(_mimeType, map);
+				setOutputFormatFromMap(map, string());
 			}
 
 			RegistryKeyType vsId(map.getDefault<RegistryKeyType>(PARAMETER_VEHICLE_SERVICE_ID, 0));
@@ -200,11 +203,11 @@ namespace synthese
 						servicePM->merge(getTemplateParameters());
 						_page->display(stream, request, *servicePM);
 			}	}	}
-			else if(_mimeType == MimeTypes::XML)
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				map.outputXML(stream, TAG_SERVICES, true);
 			}
-			else if(_mimeType == MimeTypes::JSON)
+			else if(_outputFormat == MimeTypes::JSON)
 			{
 				map.outputJSON(stream, TAG_SERVICES);
 			}
@@ -224,6 +227,6 @@ namespace synthese
 
 		std::string DriverServicesListService::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : _mimeType;
+			return _page ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 }	}
