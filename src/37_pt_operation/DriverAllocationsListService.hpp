@@ -88,7 +88,6 @@ namespace synthese
 				boost::gregorian::date _minDate;
 				boost::gregorian::date _date;
 				const cms::Webpage* _page;
-				MimeType::Type _mimeType;
 				boost::posix_time::time_duration _minWorkRange;
 				boost::posix_time::time_duration _maxWorkRange;
 				boost::posix_time::time_duration _minWorkDuration;

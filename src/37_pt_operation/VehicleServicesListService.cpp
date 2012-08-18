@@ -68,10 +68,11 @@ namespace synthese
 			{
 				map.insert(PARAMETER_PAGE, _page->getKey());
 			}
-			else if(!_mimeType.empty())
+			else
 			{
-				MimeType::SaveToParametersMap(_mimeType, map);
+				map.insert(PARAMETER_OUTPUT_FORMAT, _outputFormat);
 			}
+
 			if(!_date.is_not_a_date())
 			{
 				Date::SaveToParametersMap(_date, map);
@@ -96,11 +97,8 @@ namespace synthese
 			// Mime type
 			if(!_page)
 			{
-				MimeType::LoadFromRecord(_mimeType, map);
-				if(_mimeType.empty())
-				{
-					_mimeType = MimeTypes::XML;
-			}	}
+				setOutputFormatFromMap(map, MimeTypes::XML);
+			}
 
 			// Name
 			Name::LoadFromRecord(_name, map);
@@ -151,11 +149,11 @@ namespace synthese
 					}
 				}
 			}
-			else if(_mimeType == MimeTypes::XML)
+			else if(_outputFormat == MimeTypes::XML)
 			{
 				map.outputXML(stream, TAG_VEHICLE_SERVICES, true, "");
 			}
-			else if(_mimeType == MimeTypes::JSON)
+			else if(_outputFormat == MimeTypes::JSON)
 			{
 				map.outputJSON(stream, TAG_VEHICLE_SERVICES);
 			}
@@ -175,6 +173,6 @@ namespace synthese
 
 		std::string VehicleServicesListService::getOutputMimeType() const
 		{
-			return _page ? _page->getMimeType() : _mimeType;
+			return _page ? _page->getMimeType() : getOutputMimeTypeFromOutputFormat();
 		}
 }	}
