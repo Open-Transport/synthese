@@ -48,7 +48,7 @@ namespace synthese
 		private:
 			static const std::string PARAMETER_VAR;
 			static const std::string PARAMETER_TEMPLATE;
-			static const std::string VAR_EXCEPTION;
+			static const std::string VAR_EXCEPTIONS;
 
 
 
@@ -57,6 +57,19 @@ namespace synthese
 			Parameters _serviceParameters;
 			Parameters _templateParameters;
 			WebpageContent _inlineTemplate;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Adds exception message to the specific variable.
+			/// @param variables the variables to update
+			/// @param message the message to add
+			/// @param functionCode the code of the current function
+			static void _addExceptionToVariable(
+				util::ParametersMap& variables,
+				const std::string& message,
+				const std::string& functionCode
+			);
 
 		public:
 			const util::Factory<server::Function>::CreatorInterface* getFunctionCreator() const { return _functionCreator; }
