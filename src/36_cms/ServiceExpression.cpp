@@ -42,7 +42,7 @@ namespace synthese
 	{
 		const string ServiceExpression::PARAMETER_VAR = "VAR";
 		const string ServiceExpression::PARAMETER_TEMPLATE = "template";
-		const string ServiceExpression::VAR_EXCEPTION = "template";
+		const string ServiceExpression::VAR_EXCEPTIONS = "exceptions";
 
 
 
@@ -55,6 +55,23 @@ namespace synthese
 			stringstream s;
 			display(s, request, additionalParametersMap, page, variables);
 			return s.str();
+		}
+
+
+
+		void ServiceExpression::_addExceptionToVariable(
+			util::ParametersMap& variables,
+			const std::string& message,
+			const std::string& functionCode
+		){
+			string existingExceptions(variables.getDefault<string>(VAR_EXCEPTIONS));
+			stringstream s;
+			if(!existingExceptions.empty())
+			{
+				s << existingExceptions << "<br />";
+			}
+			s << "<b>" << functionCode << "</b> error : " << message;
+			variables.insert(VAR_EXCEPTIONS, s.str());
 		}
 
 
@@ -116,22 +133,22 @@ namespace synthese
 					// Run of the service
 					result = function->run(stream, request);
 				}
-				else
+				else // Output error message for forbidden service
 				{
-					result.insert(VAR_EXCEPTION, "Forbidden");
+					_addExceptionToVariable(variables, "Forbidden", function->getFactoryKey());
 				}
 			}
-			catch(RequestException&e)
+			catch(RequestException&e) // Output error message for initialization or run exception
 			{
-				result.insert(VAR_EXCEPTION, e.getMessage());
+				_addExceptionToVariable(variables, e.getMessage(), function->getFactoryKey());
 			}
-			catch(Request::RedirectException& e)
+			catch(Request::RedirectException& e) // Allow redirection
 			{
 				throw e;
 			}
-			catch(...)
+			catch(...) // Output error message for non specified exception
 			{
-				result.insert(VAR_EXCEPTION, "Unhandled exception");
+				_addExceptionToVariable(variables, "Unhandled exception", function->getFactoryKey());
 			}
 
 			// Display of the result if inline template defined
