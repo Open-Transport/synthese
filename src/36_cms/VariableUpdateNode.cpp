@@ -22,19 +22,28 @@
 
 #include "VariableUpdateNode.hpp"
 
+#include "Expression.hpp"
 #include "ParametersMap.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+	
 	namespace cms
 	{
+		const string VariableUpdateNode::FIELD_ID = "id";
+		const string VariableUpdateNode::FIELD_VALUE = "value";
+
+
+
 		VariableUpdateNode::VariableUpdateNode(
-			const std::string& variable,
+			const Items& variable,
 			std::string::const_iterator& it,
 			std::string::const_iterator end
 		):	_variable(variable)
@@ -61,11 +70,70 @@ namespace synthese
 			util::ParametersMap& variables
 		) const {
 
-			// Storage in the variables map
-			variables.insert(
-				_variable,
-				_value.eval(request, additionalParametersMap, page, variables)
-			);
+			ParametersMap* pm(&variables);
+
+			// Loop on items
+			for(size_t rank(0); rank<_variable.size(); ++rank)
+			{
+				const Item& item(_variable[rank]);
+
+				if(	rank+1 < _variable.size()||
+					item.index.get()
+				){
+					// Submap creation
+					if(!pm->hasSubMaps(item.key))
+					{
+						shared_ptr<ParametersMap> subMap(new ParametersMap);
+						if(item.index.get())
+						{
+							subMap->insert(
+								FIELD_ID,
+								item.index->eval(request, additionalParametersMap, page, variables)
+							);
+						}
+						pm->insert(item.key, subMap);
+						pm = subMap.get();
+					}
+					else if(item.index.get())
+					{
+						// Existing submap search
+						string idx(item.index->eval(request, additionalParametersMap, page, variables));
+						const ParametersMap::SubParametersMap::mapped_type& subMaps(
+							pm->getSubMaps(item.key)
+						);
+						pm = NULL;
+						BOOST_FOREACH(const shared_ptr<ParametersMap>& subMapItem, subMaps)
+						{
+							if(subMapItem->getDefault<string>(FIELD_ID) == idx)
+							{
+								pm = subMapItem.get();
+								break;
+							}
+						}
+
+						// Creation if necessary
+						if(!pm)
+						{
+							shared_ptr<ParametersMap> subMap(new ParametersMap);
+							subMap->insert(
+								FIELD_ID,
+								item.index->eval(request, additionalParametersMap, page, variables)
+							);
+							pm->insert(item.key, subMap);
+							pm = subMap.get();
+						}
+					}
+				}
+
+				if(rank+1 == _variable.size())
+				{
+					string fieldName(item.index.get() ? FIELD_VALUE : item.key);
+					pm->insert(
+						fieldName,
+						_value.eval(request, additionalParametersMap, page, variables)
+					);
+				}
+			}
 		}
 }	}
 

@@ -303,10 +303,45 @@ namespace synthese
 
 						trim(parameter);
 
+						VariableUpdateNode::Items items;
+						items.push_back(VariableUpdateNode::Item());
+						for(string::const_iterator it3(parameter.begin()); it3!=parameter.end(); )
+						{
+							// Alphanum chars
+							if( (*it3 >= 'a' && *it <= 'z') ||
+								(*it3 >= 'A' && *it <= 'Z') ||
+								(*it3 >= '0' && *it <= '9') ||
+								*it3 == '_'
+							){
+								items.rbegin()->key.push_back(*it3);
+								++it3;
+								continue;
+							}
+
+							// Index
+							if(	*it3 == '[')
+							{
+								++it3;
+								items.rbegin()->index = Expression::Parse(it3, parameter.end(), "]");
+								continue;
+							}
+
+							// Sub map
+							if(	*it3 == '.')
+							{
+								++it3;
+								items.push_back(VariableUpdateNode::Item());
+								continue;
+							}
+
+							// Ignored char
+							++it3;
+						}
+
 						// Node creation
 						_nodes.push_back(
 							shared_ptr<WebpageContentNode>(
-								new VariableUpdateNode(parameter, it, end)
+								new VariableUpdateNode(items, it, end)
 						)	);
 					}
 					else // Is an expression

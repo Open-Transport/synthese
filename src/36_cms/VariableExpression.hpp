@@ -24,6 +24,7 @@
 #define SYNTHESE_cms_VariableExpression_hpp__
 
 #include "Expression.hpp"
+#include "WebpageContent.hpp"
 
 namespace synthese
 {
@@ -35,11 +36,22 @@ namespace synthese
 		class VariableExpression:
 			public Expression
 		{
+		public:
+			static const std::string FIELD_VALUE;
+			static const std::string FIELD_ID;
+
+			struct Item
+			{
+				std::string key;
+				boost::shared_ptr<Expression> index;
+			};
+			typedef std::vector<Item> Items;
+
 		private:
-			std::string _variable;
+			Items _variable;
 		
 		public:
-			VariableExpression(const std::string& variable);
+			VariableExpression(const Items& variable);
 
 			virtual std::string eval(
 				const server::Request& request,

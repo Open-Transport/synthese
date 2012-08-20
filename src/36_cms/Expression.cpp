@@ -59,10 +59,10 @@ namespace synthese
 			optional<DualOperatorExpression::Operator> dualOperator;
 			optional<TripleOperatorExpression::Operator> tripleOperator;
 			optional<string> str;
-			optional<string> var;
 			shared_ptr<Expression> expr1;
 			shared_ptr<Expression> expr2;
 			shared_ptr<Expression> expr;
+			VariableExpression::Items variable;
 
 			if(	CompareText(it, end, termination))
 			{
@@ -99,14 +99,31 @@ namespace synthese
 						(*it >= '0' && *it <= '9') ||
 						*it == '_'
 					){
-						var->push_back(*it);
+						variable.rbegin()->key.push_back(*it);
 						++it;
 						break;
 					}
 
+					// Index
+					if(	*it == '[')
+					{
+						++it;
+						variable.rbegin()->index = Parse(it, end, "]");
+						break;
+					}
+
+					// Sub map
+					if(	*it == '.')
+					{
+						++it;
+						VariableExpression::Item item;
+						variable.push_back(item);
+						break;
+					}
+
 					// Other char
-					expr.reset(new VariableExpression(*var));
-					var.reset();
+					expr.reset(new VariableExpression(variable));
+					variable.clear();
 					status = UNDEFINED;
 					break;
 
@@ -160,8 +177,9 @@ namespace synthese
 						(*it == '_')
 					){
 						status = VARIABLE;
-						var = string();
-						var->push_back(*it);
+						VariableExpression::Item item;
+						item.key.push_back(*it);
+						variable.push_back(item);
 						++it;
 						break;
 					}
@@ -181,14 +199,6 @@ namespace synthese
 					{
 						++it;
 						expr = Parse(it, end, ")");
-						break;
-					}
-
-					// Parenthesis
-					if(	*it == '[')
-					{
-						++it;
-						expr = Parse(it, end, "]");
 						break;
 					}
 
