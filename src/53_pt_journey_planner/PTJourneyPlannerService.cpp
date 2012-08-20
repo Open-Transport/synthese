@@ -110,9 +110,9 @@ namespace synthese
 
 	namespace pt_journey_planner
 	{
+		const string PTJourneyPlannerService::PARAMETER_CONFIG_ID = "config_id";
 		const string PTJourneyPlannerService::PARAMETER_MAX_SOLUTIONS_NUMBER = "msn";
 		const string PTJourneyPlannerService::PARAMETER_MAX_DEPTH = "md";
-		const string PTJourneyPlannerService::PARAMETER_CONFIG_ID = "config_id";
 		const string PTJourneyPlannerService::PARAMETER_APPROACH_SPEED = "apsp";
 		const string PTJourneyPlannerService::PARAMETER_DAY = "dy";
 		const string PTJourneyPlannerService::PARAMETER_PERIOD_ID = "pi";
@@ -135,6 +135,8 @@ namespace synthese
 		const string PTJourneyPlannerService::PARAMETER_MAX_TRANSFER_DURATION = "max_transfer_duration";
 		const string PTJourneyPlannerService::PARAMETER_LOG_PATH = "log_path";
 		const string PTJourneyPlannerService::PARAMETER_SRID = "srid";
+		const string PTJourneyPlannerService::PARAMETER_DEPARTURE_PLACE_XY = "departure_place_XY";
+		const string PTJourneyPlannerService::PARAMETER_ARRIVAL_PLACE_XY = "arrival_place_XY";
 
 		const string PTJourneyPlannerService::PARAMETER_OUTPUT_FORMAT = "output_format";
 		const string PTJourneyPlannerService::VALUE_ADMIN_HTML = "admin";
@@ -499,6 +501,27 @@ namespace synthese
 				// Arrival
 				placesListService.setClassFilter(map.getDefault<string>(PARAMETER_ARRIVAL_CLASS_FILTER));
 				placesListService.setText(map.get<string>(PARAMETER_ARRIVAL_PLACE_TEXT));
+				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.runWithoutOutput()
+				);
+			}
+			// XY input
+			else if(
+				map.isDefined(PARAMETER_DEPARTURE_PLACE_XY) &&
+				map.isDefined(PARAMETER_ARRIVAL_PLACE_XY)
+			){
+				PlacesListService placesListService;
+				placesListService.setNumber(1);
+				placesListService.setCoordinatesSystem(_coordinatesSystem);
+
+				// Departure
+				placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_DEPARTURE_PLACE_XY));
+				_departure_place.placeResult = placesListService.getPlaceFromBestResult(
+					placesListService.runWithoutOutput()
+				);
+
+				// Arrival
+				placesListService.setCoordinatesXY(map.getDefault<string>(PARAMETER_ARRIVAL_PLACE_XY));
 				_arrival_place.placeResult = placesListService.getPlaceFromBestResult(
 					placesListService.runWithoutOutput()
 				);

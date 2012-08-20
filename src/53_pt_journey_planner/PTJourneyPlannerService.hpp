@@ -106,6 +106,7 @@ namespace synthese
 			public util::FactorableTemplate<cms::FunctionWithSite<false>, PTJourneyPlannerService>
 		{
 		public:
+			static const std::string PARAMETER_CONFIG_ID;
 			static const std::string PARAMETER_MAX_SOLUTIONS_NUMBER;
 			static const std::string PARAMETER_APPROACH_SPEED;
 			static const std::string PARAMETER_MAX_DEPTH;
@@ -126,13 +127,15 @@ namespace synthese
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_LOG_PATH;
 			static const std::string PARAMETER_SRID;
+			static const std::string PARAMETER_DEPARTURE_PLACE_XY;
+			static const std::string PARAMETER_ARRIVAL_PLACE_XY;
+			static const std::string PARAMETER_SHOW_COORDINATES;
 			static const std::string PARAMETER_MAX_TRANSFER_DURATION;
 			static const std::string PARAMETER_MIN_MAX_DURATION_RATIO_FILTER;
 			static const std::string PARAMETER_MIN_WAITING_TIME_FILTER;
 			static const std::string PARAMETER_SIMILAR_TIME_DELAY;
 			static const std::string PARAMETER_DURATION_RATIO_SIMILAR_TIME_FILTER;
 			static const std::string PARAMETER_FARE_CALCULATION;
-			static const std::string PARAMETER_CONFIG_ID;
 
 			static const std::string PARAMETER_OUTPUT_FORMAT;
 			static const std::string VALUE_ADMIN_HTML;
