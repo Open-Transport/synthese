@@ -31,19 +31,32 @@ namespace synthese
 {
 	namespace cms
 	{
+		class Expression;
+
 		/** VariableUpdateNode class.
 			@ingroup m36
 		*/
 		class VariableUpdateNode:
 			public WebpageContentNode
 		{
+		public:
+			static const std::string FIELD_ID;
+			static const std::string FIELD_VALUE;
+
+			struct Item
+			{
+				std::string key;
+				boost::shared_ptr<Expression> index;
+			};
+			typedef std::vector<Item> Items;
+
 		private:
-			std::string _variable;
+			Items _variable;
 			WebpageContent _value;
 
 		public:
 			VariableUpdateNode(
-				const std::string& variable,
+				const Items& variable,
 				std::string::const_iterator& it,
 				std::string::const_iterator end
 			);
