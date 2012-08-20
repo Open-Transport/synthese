@@ -35,8 +35,13 @@ namespace synthese
 
 	namespace cms
 	{
+		const string VariableExpression::FIELD_ID = "id";
+		const string VariableExpression::FIELD_VALUE = "value";
+
+
+
 		VariableExpression::VariableExpression(
-			const std::string& variable
+			const Items& variable
 		):	_variable(variable)
 		{}
 
@@ -49,28 +54,116 @@ namespace synthese
 			util::ParametersMap& variables
 		) const	{
 
-			if(_variable == "client_url")
+			// Special values
+			if(_variable.size() == 1 && !_variable.begin()->index.get())
 			{
-				return request.getClientURL();
-			}
-			else if(_variable == "host_name")
-			{
-				return request.getHostName();
-			}
-			if(page.getRoot() && _variable == "site")
-			{
-				return lexical_cast<string>(page.getRoot()->getKey());
+				if(_variable.begin()->key == "client_url")
+				{
+					return request.getClientURL();
+				}
+				else if(_variable.begin()->key == "host_name")
+				{
+					return request.getHostName();
+				}
+				if(page.getRoot() && _variable.begin()->key == "site")
+				{
+					return lexical_cast<string>(page.getRoot()->getKey());
+				}
 			}
 
-			string value(variables.getDefault<string>(_variable));
-			if(value.empty())
+			// Loop on items
+			const ParametersMap* pm(NULL);
+			for(size_t rank(0); rank < _variable.size(); ++rank)
 			{
-				value = additionalParametersMap.getDefault<string>(_variable);
+				const Item& item(_variable[rank]);
+
+				// Submap read
+				if(	rank+1 < _variable.size() ||
+					item.index.get()
+				){
+					// If first rank, select the source map
+					if(rank == 0)
+					{
+						// Variable first
+						if(variables.hasSubMaps(item.key))
+						{
+							pm = &variables;
+						} // Else parameters
+						else if(additionalParametersMap.hasSubMaps(item.key))
+						{
+							pm = &additionalParametersMap;
+						}
+						else // Sub map does not exist
+						{
+							return string();
+						}
+					}
+
+					// Submap check
+					if(!pm->hasSubMaps(item.key))
+					{
+						return string();
+					}
+
+					// If no index specified, take the first submap item
+					if(!item.index.get())
+					{
+						pm = pm->getSubMaps(item.key).begin()->get();
+					}
+					else // Else search for the specified item
+					{
+						string idx(
+							item.index->eval(request,additionalParametersMap,page,variables)
+						);
+						const ParametersMap::SubParametersMap::mapped_type& subMaps(
+							pm->getSubMaps(item.key)
+						);
+						pm = NULL;
+						BOOST_FOREACH(const shared_ptr<ParametersMap>& subMapItem, subMaps)
+						{
+							if(subMapItem->getDefault<string>(FIELD_ID) == idx)
+							{
+								pm = subMapItem.get();
+								break;
+							}
+						}
+
+						// Index was not found
+						if(!pm)
+						{
+							return string();
+						}
+					}
+				}
+
+				if(	rank+1 == _variable.size())
+				{
+					string toFind(item.index.get() ? FIELD_VALUE : item.key);
+					string value;
+					if(!pm)
+					{
+						value = variables.getDefault<string>(toFind);
+					}
+					if(value.empty())
+					{
+						if(pm)
+						{
+							value = pm->getDefault<string>(toFind);
+						}
+						else
+						{
+							value = additionalParametersMap.getDefault<string>(toFind);
+						}
+					}
+					if(value.empty() && !pm)
+					{
+						value = request.getParametersMap().getDefault<string>(toFind);
+					}
+					return value;
+				}
 			}
-			if(value.empty())
-			{
-				value = request.getParametersMap().getDefault<string>(_variable);
-			}
-			return value;
+
+			// Should never happen
+			return string();
 		}
 }	}
