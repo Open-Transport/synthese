@@ -105,15 +105,8 @@ namespace synthese
 		namespace svn
 		{
 			SVNWorkingCopy::SVNWorkingCopy(
-				ObjectBase* object
-			):	_object(object)
-			{
-				if(_object)
-				{
-					string keyStr(lexical_cast<string>(_object->getKey()));
-					_path = SVNModule::GetSVNWCRootPath() / keyStr;
-				}
-			}
+			):	_object(NULL)
+			{}
 
 
 
@@ -831,5 +824,17 @@ namespace synthese
 				LsResult files;
 				split(files, ls.second, is_any_of("\n\r"), token_compress_on);
 				return files;
+			}
+
+
+
+			void SVNWorkingCopy::setObject( ObjectBase* value )
+			{
+				_object = value;
+				if(_object)
+				{
+					string keyStr(lexical_cast<string>(_object->getKey()));
+					_path = SVNModule::GetSVNWCRootPath() / keyStr;
+				}
 			}
 }	}	}
