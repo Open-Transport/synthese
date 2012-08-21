@@ -164,7 +164,8 @@ namespace synthese
 
 
 		WebpageContent::WebpageContent(
-		):	_ignoreWhiteChars(false)
+		):	_ignoreWhiteChars(false),
+			_mimeType(MimeTypes::HTML)
 		{}
 
 
@@ -186,7 +187,8 @@ namespace synthese
 			std::string::const_iterator& it,
 			std::string::const_iterator end,
 			std::set<std::string> termination
-		):	_ignoreWhiteChars(false)
+		):	_ignoreWhiteChars(false),
+			_mimeType(MimeTypes::HTML)
 		{
 			_parse(it, end, termination);
 		}
