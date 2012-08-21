@@ -231,9 +231,7 @@ namespace synthese
 
 
 			public:
-				SVNWorkingCopy(
-					ObjectBase* object
-				);
+				SVNWorkingCopy();
 
 				/// @name Getters
 				//@{
@@ -244,7 +242,7 @@ namespace synthese
 
 				/// @name Setters
 				//@{
-					void setObject(ObjectBase* value){ _object = value; }
+					void setObject(ObjectBase* value);
 					void setPath(const boost::filesystem::path& value){ _path = value; }
 					void setRepoURL(const std::string& value){ _repoURL = value; }
 				//@}
