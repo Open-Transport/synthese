@@ -94,6 +94,7 @@ class WrongPassword(Exception):
 def synthese_login(username, password):
     http_api = synthesepy.http_api.HTTPApi(flask.current_app.project.env)
     res = http_api.call_action2('login', {
+        'SERVICE': 'admin',
         'actionParamlogin': username,
         'actionParampwd': password,
     }, send_sid=False)
