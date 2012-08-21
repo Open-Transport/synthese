@@ -57,9 +57,11 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(HostName),
 					FIELD_DEFAULT_CONSTRUCTOR(ClientURL),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultTemplate),
-					FIELD_VALUE_CONSTRUCTOR(SVNWorkingCopy, this)
+					FIELD_DEFAULT_CONSTRUCTOR(SVNWorkingCopy)
 			)	)
-		{}
+		{
+			get<SVNWorkingCopy>().setObject(this);
+		}
 
 
 
