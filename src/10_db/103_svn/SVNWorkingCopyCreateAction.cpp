@@ -121,9 +121,8 @@ namespace synthese
 				Request& request
 			){
 
-				SVNWorkingCopy wc(
-					_object.get()
-				);
+				SVNWorkingCopy wc;
+				wc.setObject(_object.get());
 				wc.setRepoURL(_repoURL);
 				_object->dynamic_set<SVNWorkingCopy>(wc);
 				wc.create(_user, _password);
