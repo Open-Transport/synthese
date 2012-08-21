@@ -106,9 +106,14 @@ namespace synthese
 		{
 			SVNWorkingCopy::SVNWorkingCopy(
 				ObjectBase* object
-			):	_object(object),
-				_path(object ? SVNModule::GetSVNWCRootPath() / lexical_cast<string>(object->getKey()) : path())
-			{}
+			):	_object(object)
+			{
+				if(_object)
+				{
+					string keyStr(lexical_cast<string>(_object->getKey()));
+					_path = SVNModule::GetSVNWCRootPath() / keyStr;
+				}
+			}
 
 
 
