@@ -77,7 +77,7 @@ namespace synthese
 				}
 				else
 				{
-					fieldObject._mimeType = MimeTypes::TEXT;
+					fieldObject._mimeType = MimeTypes::HTML;
 				}
 			}
 		}
