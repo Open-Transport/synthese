@@ -80,7 +80,7 @@ namespace synthese
 			void SVNCheckoutAction::run(
 				Request& request
 			){
-				SVNWorkingCopy wc(NULL);
+				SVNWorkingCopy wc;
 				wc.setRepoURL(_repoURL);
 				wc.checkout(_user, _password);
 
