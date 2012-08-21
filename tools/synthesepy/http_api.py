@@ -191,10 +191,8 @@ class HTTPApi(object):
         else:
             r = requests.post(url, data=params, **common_kwargs)
 
-        # FIXME: should we follow redirects?
-        if r.status_code not in (200, 302):
-            raise HTTPApiException('call_synthese didn\'t return a '
-                '200 or 302 status')
+        if r.status_code != 200:
+            raise HTTPApiException('call_synthese didn\'t return a 200 status')
 
         # Workaround for https://github.com/kennethreitz/requests/issues/434
         # Remove once fixed.
