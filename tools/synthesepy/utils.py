@@ -156,6 +156,9 @@ def can_connect(port, verbose=False, path=''):
         e = sys.exc_info()[1]
         if verbose:
             log.debug('Exception in _can_connect: %s', e)
+        # Consider a 400 HTTP error as being able to connect.
+        if isinstance(e, urllib2.HTTPError) and e.code == 400:
+            return True
         return False
     return True
 
