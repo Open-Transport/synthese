@@ -28,6 +28,7 @@ from os.path import join
 import shutil
 import subprocess
 import sys
+import urlparse
 
 log = logging.getLogger(__name__)
 
@@ -45,9 +46,14 @@ def download_and_replace():
         shutil.rmtree(temp_dir)
     os.makedirs(temp_dir)
 
-    log.info('Downloading archive %r to %r.', ARCHIVE_URL, temp_dir)
+    parse_res = list(urlparse.urlparse(ARCHIVE_URL))
+    if 'SYNTHESE_OVERRIDE_HOSTNAME' in os.environ:
+        parse_res[1] = os.environ['SYNTHESE_OVERRIDE_HOSTNAME']
+    archive_url = urlparse.urlunparse(parse_res)
+
+    log.info('Downloading archive %r to %r.', archive_url, temp_dir)
     subprocess.check_call(
-        'curl -s -o {0} {1}'.format(ARCHIVE_NAME, ARCHIVE_URL),
+        'curl -s -o {0} {1}'.format(ARCHIVE_NAME, archive_url),
         shell=True, cwd=temp_dir)
 
     log.info('Extracting %r.', ARCHIVE_NAME)
