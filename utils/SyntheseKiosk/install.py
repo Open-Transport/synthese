@@ -73,7 +73,7 @@ def main():
     # Linux chromedriver is quite large. Download it at installation time.
     if sys.platform == 'linux2' and platform.architecture()[0] == '64bit':
         download_and_extract(
-            "http://chromium.googlecode.com/files/chromedriver_linux64_17.0.963.0.zip",
+            "http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip",
             ("chromedriver", "lin64", "chromedriver"))
 
 if __name__ == '__main__':

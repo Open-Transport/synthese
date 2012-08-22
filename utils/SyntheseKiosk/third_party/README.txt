@@ -1,9 +1,9 @@
 chromedriver/lin64/chromedriver
-  # NOTE: downloaded at install time.
-  http://chromium.googlecode.com/files/chromedriver_linux64_17.0.963.0.zip
+  # NOTE: downloaded at install time. See install.py
+  http://chromedriver.googlecode.com/files/chromedriver_linux64_23.0.1240.0.zip
 
 chromedriver/win/chromedriver.exe
-  http://chromium.googlecode.com/files/chromedriver_win_18.0.995.0.zip
+  http://chromedriver.googlecode.com/files/chromedriver_win_23.0.1240.0.zip
 
 distribute-0.6.24.tar.gz:
   http://pypi.python.org/packages/source/d/distribute/distribute-0.6.24.tar.gz
