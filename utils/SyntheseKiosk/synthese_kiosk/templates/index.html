@@ -29,11 +29,6 @@
 
 {% block body %}
 
-  <!--
-  <div class="page-header">
-    <h1>Page name <small>Supporting text or tagline</small></h1>
-  </div>
-  -->
   <div class="row" id="configuration" data-bind="with: config">
     <div class="span14">
       <h1>Configuration</h1>
@@ -98,6 +93,18 @@
                      data-bind="value: displayNames" size="30" type="text">
               <span class="help-block">
                 Comma separated list of display names.
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
+            <label for="debug">Use Caching Proxy</label>
+            <div class="input">
+              <input id="caching_proxy" name="caching_proxy"
+                     data-bind="checked: cachingProxy" type="checkbox">
+              <span class="help-block">
+                The caching proxy is used to show the fallback page if Synthese
+                is unreachable and the Kiosk is restarted. 
               </span>
             </div>
           </div><!-- /clearfix -->
