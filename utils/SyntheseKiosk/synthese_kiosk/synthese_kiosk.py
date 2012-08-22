@@ -81,6 +81,7 @@ class Proxy(object):
     def __init__(self, config_dir):
         self._online = False
         self._running = False
+        self._enabled = True
         self._cache_dir = os.path.join(config_dir, 'polipo_cache')
         self._log_file = os.path.join(config_dir, 'polipo.log')
         utils.maybe_makedirs(self._cache_dir)
@@ -106,6 +107,9 @@ class Proxy(object):
         return os.path.splitdrive(path)[1].replace(os.sep, '/')
 
     def start(self):
+        if not self._enabled:
+            return
+
         self._ensure_stopped()
         self._running = True
 
@@ -143,6 +147,14 @@ class Proxy(object):
         self._online = value
         if not self._running or old_online != self._online:
             self.start()
+
+    @property
+    def enabled(self):
+        return self._enabled
+
+    @enabled.setter
+    def enabled(self, value):
+        self._enabled = value
 
     def clear_cache(self):
         self.stop()
@@ -185,12 +197,17 @@ class Display(object):
         chromedriver_path = get_thirdparty_binary('chromedriver')
 
         options = webdriver.ChromeOptions()
+        # webdriver shares arguments between instances :-/
+        options._arguments = []
+
         options.add_argument('--disable-translate')
         if not self._debug:
             options.add_argument('--kiosk')
 
-        options.add_argument(
-            '--proxy-server=http://{_host}:{_port}'.format(**self._proxy.__dict__))
+        if self._proxy.enabled:
+            options.add_argument(
+                '--proxy-server=http://{_host}:{_port}'.format(
+                    **self._proxy.__dict__))
 
         return webdriver.Chrome(
             executable_path=chromedriver_path,
@@ -199,9 +216,10 @@ class Display(object):
     def _create_firefox_browser(self):
         profile = webdriver.FirefoxProfile()
 
-        profile.set_preference('network.proxy.type', 1);
-        profile.set_preference('network.proxy.http', self._proxy._host)
-        profile.set_preference('network.proxy.http_port', self._proxy._port)
+        if self._proxy.enabled:
+            profile.set_preference('network.proxy.type', 1);
+            profile.set_preference('network.proxy.http', self._proxy._host)
+            profile.set_preference('network.proxy.http_port', self._proxy._port)
         xpi_path = os.path.join(
             thisdir, os.pardir, 'third_party', 'r_kiosk-0.9.0-fx.xpi')
         if not self._debug:
@@ -222,7 +240,9 @@ class Display(object):
                 'http://selenium.googlecode.com/files/selenium-server-standalone-2.18.0.jar '
                 'to %r' % selenium_jar)
 
-        # TODO: proxy.
+        if self._proxy.enabled:
+            # TODO: proxy.
+            pass
 
         return webdriver.Opera(executable_path=selenium_jar)
 
@@ -276,6 +296,7 @@ DEFAULT_CONFIG = {
     'browser': 'firefox',
     'browser_path': None,
     'displays': [],
+    'caching_proxy': True,
     'debug': False,
 }
 
@@ -449,6 +470,10 @@ class SyntheseKiosk(object):
 
         self._config = DEFAULT_CONFIG.copy()
         self._config.update(json.load(open(self._config_path)))
+
+        # Initialize state from config
+        self._proxy.enabled = self._config['caching_proxy']
+
         return self._config
 
     @config.setter
@@ -471,7 +496,7 @@ class SyntheseKiosk(object):
             'logs': unicode(logs, errors='ignore'),
         }
 
-    def refresh_displays(self, poll_if_offline=False, force_reload=False):
+    def refresh_displays(self, force_reload=False):
         if not self._displays:
             log.info('No displays configured. Open http://localhost:5000/'
                 ' to configure the application.')
@@ -485,10 +510,11 @@ class SyntheseKiosk(object):
             OFFLINE_POLL_INTERVAL_S = 10
 
             self._refresh_sched_event = self._sched.enter(
-                OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays, (True,))
+                OFFLINE_POLL_INTERVAL_S, 1, self.refresh_displays)
 
     def update_config(self, old_config):
         if (self.config['debug'] != old_config['debug'] or
+            self.config['caching_proxy'] != old_config['caching_proxy'] or
             self.config['browser'] != old_config['browser'] or
             self.config['browser_path'] != old_config['browser_path'] or
             self.config['synthese_url'] != old_config['synthese_url'] or
@@ -496,7 +522,7 @@ class SyntheseKiosk(object):
             for display in self._displays:
                 display.stop()
             self._init_displays()
-            self.refresh_displays(True)
+            self.refresh_displays()
             return
 
         for index, name in enumerate(self.config['displays']):
@@ -535,7 +561,7 @@ class SyntheseKiosk(object):
         for port in ports:
             utils.kill_listening_processes(port)
         self.start_admin_app()
-        self.refresh_displays(True)
+        self.refresh_displays()
 
         log.info('Starting scheduler')
         self._sched.run()
