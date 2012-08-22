@@ -14,8 +14,9 @@ function ConfigViewModel() {
   this.browser = ko.observable();
   this.browserPath = ko.observable();
   this.displayNames = ko.observable();
+  this.cachingProxy = ko.observable();
   this.debug = ko.observable();
-  
+
   var self = this;
 
   this.displayNamesArray = ko.computed(function() {
@@ -40,6 +41,7 @@ function ConfigViewModel() {
     self.browser(config.browser);
     self.browserPath(config.browser_path);
     self.displayNames(config.displays.join(","));
+    self.cachingProxy(config.caching_proxy);
     self.debug(config.debug);
   };
 
@@ -67,6 +69,7 @@ function ConfigViewModel() {
       displays: configObj.displayNames.split(",").filter(function(d) {
         return d;
       }),
+      caching_proxy: configObj.cachingProxy,
       debug: configObj.debug
     };
     $.post("/set_config", {
