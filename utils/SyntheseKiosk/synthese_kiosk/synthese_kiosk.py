@@ -512,7 +512,7 @@ class SyntheseKiosk(object):
     def start_admin_app(self):
         # In debug mode, the built-in server doesn't like to be run in a thread
         # when it tries to reload itself.
-        # This this to True when debugging the web app. In this case, other
+        # Set this to True when debugging the web app. In this case, other
         # things won't work.
         DEBUG_WEBAPP = False
 
@@ -520,12 +520,13 @@ class SyntheseKiosk(object):
         admin_app.secret_key = self.config['secret_key'].encode('utf-8')
         admin_app.kiosk = self
 
+        webapp_args = dict(host='0.0.0.0', port=self.WEBAPP_PORT, threaded=True)
         if self.config['debug'] and DEBUG_WEBAPP:
-            admin_app.run(host='0.0.0.0', port=self.WEBAPP_PORT)
+            admin_app.run(**webapp_args)
         else:
             t = threading.Thread(
                 target=admin_app.run,
-                kwargs=dict(host='0.0.0.0', port=self.WEBAPP_PORT))
+                kwargs=webapp_args)
             t.daemon = True
             t.start()
 
