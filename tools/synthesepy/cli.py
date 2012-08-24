@@ -309,18 +309,26 @@ def add_default_subparsers(subparsers):
     parser_sqlite_to_mysql = subparsers.add_parser(
         'sqlite_to_mysql', help='Convert a SQLite database to MySQL')
     parser_sqlite_to_mysql.set_defaults(func=sqlite_to_mysql)
-    parser_sqlite_to_mysql.add_argument('--sourceconn')
-    parser_sqlite_to_mysql.add_argument('--targetconn')
+    parser_sqlite_to_mysql.add_argument('--sourceconn',
+        help='SQLite database input connection string '
+        '(i.e. sqlite://path=/myproject/db/config.db3)')
+    parser_sqlite_to_mysql.add_argument('--targetconn',
+        help='MySQL database output connection string '
+        '(i.e. mysql://host=localhost,user=synthese,passwd=synthese,db=synthese)')
 
     parser_create_project = subparsers.add_parser(
         'create_project', help='Create a Synthese project')
     parser_create_project.set_defaults(func=create_project)
-    parser_create_project.add_argument('--path', required=True)
+    parser_create_project.add_argument('--path', required=True,
+        help='Path of the project to create')
     parser_create_project.add_argument(
-        '--system-packages', nargs='*')
-    parser_create_project.add_argument('--conn-string')
+        '--system-packages', nargs='*',
+        help='System packages to include in the created project')
+    parser_create_project.add_argument('--conn-string',
+        help='Database connection string of the created project')
     parser_create_project.add_argument(
-        '--overwrite', action='store_true', default=False)
+        '--overwrite', action='store_true', default=False,
+        help='Erase destination if it already exists')
 
     parser_continuous_integration = subparsers.add_parser(
         'continuous_integration', aliases=('ci',),
