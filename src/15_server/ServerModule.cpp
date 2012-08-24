@@ -68,8 +68,6 @@ namespace synthese
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
-		string ServerModule::_pythonPath("python");
-		string ServerModule::_sitesStoragePath("");
 
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
@@ -79,8 +77,6 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 		const string ServerModule::MODULE_PARAM_AUTO_LOGIN_USER("auto_login_user");
-		const string ServerModule::MODULE_PARAM_PYTHON_PATH("python_path");
-		const string ServerModule::MODULE_PARAM_SITES_STORAGE_PATH("sites_storage_path");
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
 		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
@@ -97,8 +93,6 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_AUTO_LOGIN_USER, "", &ServerModule::ParameterCallback);
-			RegisterParameter(ServerModule::MODULE_PARAM_PYTHON_PATH, "python", &ServerModule::ParameterCallback);
-			RegisterParameter(ServerModule::MODULE_PARAM_SITES_STORAGE_PATH, "", &ServerModule::ParameterCallback);
 		}
 
 
@@ -185,14 +179,6 @@ namespace synthese
 			if(name == MODULE_PARAM_AUTO_LOGIN_USER)
 			{
 				_autoLoginUser = value;
-			}
-			if(name == MODULE_PARAM_PYTHON_PATH)
-			{
-				_pythonPath = value;
-			}
-			if(name == MODULE_PARAM_SITES_STORAGE_PATH)
-			{
-				_sitesStoragePath = value;
 			}
 		}
 
