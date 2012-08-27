@@ -167,6 +167,34 @@ class Proxy(object):
         self.start()
 
 
+class MidoriBrowser(object):
+    """
+    webdriver doesn't support Midori yet.
+    This class replicates the webdriver API and launches the browser manually.
+    """
+    def __init__(self, browser_path):
+        self._path = browser_path if browser_path else "midori"
+        log.debug("Midori path %s", self._path)
+        self._proc = None
+
+    def quit(self):
+        log.debug("Quitting midori browser")
+        if self._proc:
+            self._proc.terminate()
+
+    def refresh(self):
+        log.debug("dummy refresh")
+
+    def get(self, url):
+        self.quit()
+        cmd_line = [self._path, "-a", url, "-e", "Fullscreen"]
+        log.debug("Launching Midori cmdline: %s", cmd_line)
+        try:
+            self._proc = subprocess.Popen(cmd_line)
+        except Exception, e:
+            log.error("Failed to launch midory browser: %s", e)
+
+
 class Display(object):
     def __init__(self, kiosk, index, name):
         config = kiosk.config
@@ -193,7 +221,7 @@ class Display(object):
 
     def _create_chrome_browser(self):
         if self._browser_path:
-            raise Exception('browser_path not yet supported for Chrome')
+            log.warn('browser_path not yet supported for Chrome')
         chromedriver_path = get_thirdparty_binary('chromedriver')
 
         options = webdriver.ChromeOptions()
@@ -246,6 +274,11 @@ class Display(object):
 
         return webdriver.Opera(executable_path=selenium_jar)
 
+    def _create_midori_browser(self):
+        if self._proxy.enabled:
+            console.warn("Proxy not supported with Midori browser")
+        return MidoriBrowser(self._browser_path)
+
     def _create_browser(self):
         if self._browser_name == 'chrome':
             return self._create_chrome_browser()
@@ -253,6 +286,8 @@ class Display(object):
             return self._create_firefox_browser()
         elif self._browser_name == 'opera':
             return self._create_opera_browser()
+        elif self._browser_name == 'midori':
+            return self._create_midori_browser()
         else:
             raise Exception('Unsupported browser: %s', self._browser_name)
 
