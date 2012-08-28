@@ -167,18 +167,19 @@ class Proxy(object):
         self.start()
 
 
-class MidoriBrowser(object):
+class CustomBrowser(object):
     """
-    webdriver doesn't support Midori yet.
+    Used for browsers that aren't supported by webdriver.
     This class replicates the webdriver API and launches the browser manually.
     """
-    def __init__(self, browser_path):
-        self._path = browser_path if browser_path else "midori"
-        log.debug("Midori path %s", self._path)
+    def __init__(self, browser_path, browser_args):
+        self._path = browser_path
+        self._args = browser_args
+        log.debug("Browser path %s", self._path)
         self._proc = None
 
     def quit(self):
-        log.debug("Quitting midori browser")
+        log.debug("Quitting browser")
         if self._proc:
             self._proc.terminate()
 
@@ -187,12 +188,13 @@ class MidoriBrowser(object):
 
     def get(self, url):
         self.quit()
-        cmd_line = [self._path, "-a", url, "-e", "Fullscreen"]
-        log.debug("Launching Midori cmdline: %s", cmd_line)
+        cmd_line = [url if a == "URL" else a for a in self._args]
+        cmd_line.insert(0, self._path)
+        log.debug("Launching browser with cmdline: %s", cmd_line)
         try:
             self._proc = subprocess.Popen(cmd_line)
         except Exception, e:
-            log.error("Failed to launch midory browser: %s", e)
+            log.error("Failed to launch browser: %s", e)
 
 
 class Display(object):
@@ -205,6 +207,7 @@ class Display(object):
         self._name = name
         self._browser_name = config['browser']
         self._browser_path = config['browser_path']
+        self._browser_args = config['browser_args']
         self._debug = config['debug']
         self._browser = None
         self._url = None
@@ -274,10 +277,10 @@ class Display(object):
 
         return webdriver.Opera(executable_path=selenium_jar)
 
-    def _create_midori_browser(self):
+    def _create_custom_browser(self):
         if self._proxy.enabled:
-            console.warn("Proxy not supported with Midori browser")
-        return MidoriBrowser(self._browser_path)
+            console.warn("Proxy not supported with custome browser")
+        return CustomBrowser(self._browser_path, self._browser_args)
 
     def _create_browser(self):
         if self._browser_name == 'chrome':
@@ -286,8 +289,8 @@ class Display(object):
             return self._create_firefox_browser()
         elif self._browser_name == 'opera':
             return self._create_opera_browser()
-        elif self._browser_name == 'midori':
-            return self._create_midori_browser()
+        elif self._browser_name == 'custom':
+            return self._create_custom_browser()
         else:
             raise Exception('Unsupported browser: %s', self._browser_name)
 
@@ -330,6 +333,7 @@ DEFAULT_CONFIG = {
     'secret_key': gen_password(),
     'browser': 'firefox',
     'browser_path': None,
+    'browser_args': ['URL'],
     'displays': [],
     'caching_proxy': True,
     'debug': False,
@@ -552,6 +556,7 @@ class SyntheseKiosk(object):
             self.config['caching_proxy'] != old_config['caching_proxy'] or
             self.config['browser'] != old_config['browser'] or
             self.config['browser_path'] != old_config['browser_path'] or
+            self.config['browser_args'] != old_config['browser_args'] or
             self.config['synthese_url'] != old_config['synthese_url'] or
             len(self.config['displays']) != len(old_config['displays'])):
             for display in self._displays:
