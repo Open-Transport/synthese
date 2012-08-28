@@ -87,6 +87,20 @@
           </div><!-- /clearfix -->
 
           <div class="clearfix">
+            <label for="browser_args">Browser Arguments (for custom browser)</label>
+            <div class="input">
+              <input class="xlarge" id="browser_args" name="browser_args"
+                     data-bind="value: browserArgs" size="30" type="text">
+              <span class="help-block">
+                Comma separated list of browser arguments.<br>
+                <b>You MUST include one argument with the "URL" value that
+                will be replaced with the url to load.</b><br>
+                For Midori, use <code>-a,URL,-e,Fullscreen</code>
+              </span>
+            </div>
+          </div><!-- /clearfix -->
+
+          <div class="clearfix">
             <label for="display_names">Display Names</label>
             <div class="input">
               <input class="xlarge" id="display_names" name="display_names"

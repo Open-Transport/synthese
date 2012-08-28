@@ -10,9 +10,10 @@ function ConfigViewModel() {
   this.syntheseUrl = ko.observable();
   this.adminPassword = ko.observable();
   this.secretKey = ko.observable();
-  this.availableBrowsers = ["firefox", "chrome", "opera", "midori"];
+  this.availableBrowsers = ["firefox", "chrome", "opera", "custom"];
   this.browser = ko.observable();
   this.browserPath = ko.observable();
+  this.browserArgs = ko.observable();
   this.displayNames = ko.observable();
   this.cachingProxy = ko.observable();
   this.debug = ko.observable();
@@ -40,6 +41,7 @@ function ConfigViewModel() {
     self.secretKey(config.secret_key);
     self.browser(config.browser);
     self.browserPath(config.browser_path);
+    self.browserArgs(config.browser_args.join(","));
     self.displayNames(config.displays.join(","));
     self.cachingProxy(config.caching_proxy);
     self.debug(config.debug);
@@ -66,6 +68,9 @@ function ConfigViewModel() {
       secret_key: configObj.secretKey,
       browser: configObj.browser,
       browser_path: configObj.browserPath,
+      browser_args: configObj.browserArgs.split(",").filter(function(d) {
+        return d;
+      }),
       displays: configObj.displayNames.split(",").filter(function(d) {
         return d;
       }),
