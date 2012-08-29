@@ -39,8 +39,11 @@ import time
 import flask
 from flask import g, request
 import requests
-from selenium import webdriver
-from selenium.webdriver.firefox import firefox_binary
+try:
+    from selenium import webdriver
+    from selenium.webdriver.firefox import firefox_binary
+except ImportError:
+    print "Warning: unable to import webdrive"
 
 import utils
 
@@ -49,7 +52,7 @@ thisdir = os.path.abspath(os.path.dirname(__file__))
 log = logging.getLogger(__name__)
 
 
-def get_thirdparty_binary(dir_name):
+def get_thirdparty_binary(dir_name, fatal=True):
     suffix = ''
     if sys.platform == 'win32':
         platform_dir = 'win'
@@ -70,8 +73,11 @@ def get_thirdparty_binary(dir_name):
             platform_dir, dir_name + suffix))
 
     if not os.path.isfile(binary_path):
-        raise Exception('No binary available for %r '
-            '(looked at %r)' % (dir_name, binary_path))
+        if fatal:
+            raise Exception('No binary available for %r '
+                '(looked at %r)' % (dir_name, binary_path))
+        else:
+            return None
     return binary_path
 
 
@@ -88,7 +94,7 @@ class Proxy(object):
         self._host = 'localhost'
         self._port = 8123
         self._proc = None
-        self._polipo_path = get_thirdparty_binary('polipo')
+        self._polipo_path = get_thirdparty_binary('polipo', fatal=False)
 
     def _ensure_stopped(self):
         if sys.platform == 'win32':
@@ -110,6 +116,10 @@ class Proxy(object):
         if not self._enabled:
             return
 
+        if not self._polipo_path:
+            log.error("Can't find polipo binary. Proxy cannot run")
+            return
+            
         self._ensure_stopped()
         self._running = True
 
