@@ -35,6 +35,9 @@ setup(
         'requests',
         'selenium',
     ],
+    package_data = {
+        'synthese_kiosk': ['static/css/*', 'static/img/*', 'static/js/*', 'templates/*'],
+    },
     entry_points="""\
         [console_scripts]
         synthese-kiosk = synthese_kiosk:main
