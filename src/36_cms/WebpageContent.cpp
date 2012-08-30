@@ -45,7 +45,7 @@ namespace synthese
 	using namespace cms;
 
 	template<> const Field ComplexObjectFieldDefinition<WebpageContent>::FIELDS[] = {
-		Field("content1", SQL_BLOB, true),
+		Field("content1", SQL_TEXT, true),
 		Field("ignore_white_chars", SQL_BOOLEAN),
 		Field("mime_type", SQL_TEXT),
 	Field() };
