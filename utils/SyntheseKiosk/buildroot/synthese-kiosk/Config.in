@@ -1,0 +1,8 @@
+config BR2_PACKAGE_SYNTHESE_KIOSK
+	bool "synthese-kiosk"
+	depends on BR2_PACKAGE_PYTHON
+	help
+	  The Synthese Kiosk is a set of software that can be used to display Web pages
+	  that should be refreshed regularly on computer connected displays.
+
+	  https://extranet.rcsmobility.com/projects/synthese/wiki/Synthese_Kiosk
