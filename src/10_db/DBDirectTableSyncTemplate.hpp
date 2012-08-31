@@ -364,31 +364,46 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				// TODO: MySQL support.
-
+				SelectQuery<K> query;
 				std::stringstream subQuery;
 
-				string tableName = "idx_" + K::TABLE.NAME + "_" + TABLE_COL_GEOMETRY;
+				if(DBModule::GetDB()->isBackend(DB::SQLITE_BACKEND))
+				{
+					string tableName = "idx_" + K::TABLE.NAME + "_" + TABLE_COL_GEOMETRY;
 
-				/* Spatial lequest on linestring (or other geometrical objects) enveloppes indexes :
-				 * The linestring must be retained if it does have an intersection with the "envelope" parameter
-				 * There is an intersection if (at least) one of the linestring envelope bound is contained in the "envelope" parameter
-				 */
-				subQuery << "( c.xmin > " << envelope.getMinX() << " AND c.xmin < " << envelope.getMaxX() <<
-							" AND c.ymin > " << envelope.getMinY() << " AND c.ymin < " << envelope.getMaxY() << " ) OR "
-							"( c.xmax > " << envelope.getMinX() << " AND c.xmax < " << envelope.getMaxX() <<
-							 " AND c.ymax > " << envelope.getMinY() << " AND c.ymax < " << envelope.getMaxY() << " ) "
-				;
+					/* Spatial lequest on linestring (or other geometrical objects) enveloppes indexes :
+					* The linestring must be retained if it does have an intersection with the "envelope" parameter
+					* There is an intersection if (at least) one of the linestring envelope bound is contained in the "envelope" parameter
+					*/
+					subQuery << "( c.xmin > " << envelope.getMinX() << " AND c.xmin < " << envelope.getMaxX() <<
+						" AND c.ymin > " << envelope.getMinY() << " AND c.ymin < " << envelope.getMaxY() << " ) OR "
+						"( c.xmax > " << envelope.getMinX() << " AND c.xmax < " << envelope.getMaxX() <<
+						" AND c.ymax > " << envelope.getMinY() << " AND c.ymax < " << envelope.getMaxY() << " ) "
+						;
 
-				/* WARNING :
-				 * sqlite crash (core dump) with this spatial request if join isn't explicit.
-				 * so please keep it explicit here
-				 */
-				SelectQuery<K> query;
-				query.addTableAndEqualJoin("pkid", TABLE_COL_ID, tableName, "c");
-				query.addWhere(
-					SubQueryExpression::Get(subQuery.str())
-				);
+					/* WARNING :
+					* sqlite crash (core dump) with this spatial request if join isn't explicit.
+					* so please keep it explicit here
+					*/
+
+					query.addTableAndEqualJoin("pkid", TABLE_COL_ID, tableName, "c");
+					query.addWhere(
+						SubQueryExpression::Get(subQuery.str())
+						);
+				}
+				else if(DBModule::GetDB()->isBackend(DB::MYSQL_BACKEND))
+				{
+					subQuery << "MBRContains(GeomFromText('Polygon((" <<
+						envelope.getMinX() << " " << envelope.getMinY() << "," <<
+						envelope.getMinX() << " " << envelope.getMaxY() << "," <<
+						envelope.getMaxX() << " " << envelope.getMaxY() << "," <<
+						envelope.getMaxX() << " " << envelope.getMinY() << "," <<
+						envelope.getMinX() << " " << envelope.getMinY() << "))'),geometry)";
+						
+					query.addWhere(
+						SubQueryExpression::Get(subQuery.str())
+						);
+				}
 
 				return LoadFromQuery(query, env, linkLevel);
 			}
@@ -411,8 +426,6 @@ namespace synthese
 				util::Env& env,
 				util::LinkLevel linkLevel
 			){
-				// TODO: MySQL support.
-
 				if(point.isEmpty())
 				{
 					return SearchResult();
