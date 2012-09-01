@@ -300,7 +300,7 @@ def add_default_subparsers(subparsers):
     parser_runtests.add_argument(
         '--test-daemon-only',
         help='When a HTTPTestCase is run, initialize the project and keep the '
-             'daemon running. Meant to be used in parallel iwth --no-init',
+             'daemon running. Meant to be used in parallel with --no-init',
         action='store_true')
     parser_runtests.add_argument(
         'suites', nargs='*',
