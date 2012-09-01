@@ -129,8 +129,9 @@ class Builder(object):
         if self.env.platform != 'lin':
             return
 
-        if not os.path.isfile('/etc/debian_version'):
-            log.info('Non Debian system, not checking required packages')
+        if (not os.path.isfile('/etc/debian_version') and not
+            open('/etc/debian_version').read().startswith('6.')):
+            log.info('Non Debian 6 system, not checking required packages')
             return
 
         to_install = [p for p in required_packages if
