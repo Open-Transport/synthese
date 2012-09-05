@@ -40,10 +40,12 @@ namespace synthese
 		private:
 			static const std::string DATA_ITEMS_COUNT;
 			static const std::string DATA_RANK;
+			static const std::string DATA_RECURSIVE_CONTENT;
 			static const std::string PARAMETER_EMPTY;
 			static const std::string PARAMETER_SORT_DOWN;
 			static const std::string PARAMETER_SORT_UP;
 			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_RECURSIVE;
 
 
 			std::string _arrayCode;
@@ -54,6 +56,7 @@ namespace synthese
 			WebpageContent _sortDownTemplate;
 			typedef std::vector<std::pair<std::string, WebpageContent> > Parameters;
 			Parameters _parameters;
+			bool _recursive;
 
 		public:
 			//////////////////////////////////////////////////////////////////////////
@@ -84,7 +87,8 @@ namespace synthese
 				util::ParametersMap& variables,
 				const Webpage* templatePage,
 				size_t& rank,
-				size_t itemsCount
+				size_t itemsCount,
+				const std::string& recursiveContent
 			) const;
 
 
