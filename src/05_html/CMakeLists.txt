@@ -16,6 +16,8 @@ HTMLList.cpp
 HTMLList.h
 HTMLModule.cpp
 HTMLModule.h
+HTMLPage.cpp
+HTMLPage.hpp
 HTMLTable.cpp
 HTMLTable.h
 PropertiesHTMLTable.cpp
