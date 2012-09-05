@@ -48,6 +48,7 @@ namespace synthese
 		private:
 			static const std::string PARAMETER_VAR;
 			static const std::string PARAMETER_TEMPLATE;
+			static const std::string PARAMETER_REPEAT_PARAMETERS;
 			static const std::string VAR_EXCEPTIONS;
 
 
@@ -57,6 +58,7 @@ namespace synthese
 			Parameters _serviceParameters;
 			Parameters _templateParameters;
 			WebpageContent _inlineTemplate;
+			bool _repeatParameters;
 
 
 
