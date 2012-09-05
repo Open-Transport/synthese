@@ -44,13 +44,16 @@ namespace synthese
 		const string ForEachExpression::PARAMETER_SORT_DOWN = "sort_down";
 		const string ForEachExpression::PARAMETER_SORT_UP = "sort_up";
 		const string ForEachExpression::PARAMETER_TEMPLATE = "template";
+		const string ForEachExpression::PARAMETER_RECURSIVE = "recursive";
+		const string ForEachExpression::DATA_RECURSIVE_CONTENT = "recursive_content";
 
 
 
 		ForEachExpression::ForEachExpression(
 			std::string::const_iterator& it,
 			std::string::const_iterator end
-		){
+		):	_recursive(false)
+		{
 			// function name
 			for(;it != end && *it != '&' && *it != '}'; ++it)
 			{
@@ -86,6 +89,10 @@ namespace synthese
 						else if(parameterNameStr == PARAMETER_TEMPLATE)
 						{
 							_inlineTemplate = parameterNodes;
+						}
+						else if(parameterNameStr == PARAMETER_RECURSIVE)
+						{
+							_recursive = true;
 						}
 						else if(parameterNameStr == PARAMETER_EMPTY)
 						{
@@ -179,6 +186,7 @@ namespace synthese
 			{
 				// Loop on items
 				size_t rank(0);
+				string noRecursive;
 				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 				{
 					stringstream key;
@@ -192,7 +200,8 @@ namespace synthese
 						variables,
 						templatePage,
 						rank,
-						itemsCount
+						itemsCount,
+						noRecursive
 					);
 
 					// Insertion in the map
@@ -207,6 +216,20 @@ namespace synthese
 			{
 				BOOST_FOREACH(const SortedItems::value_type item, sortedItems)
 				{
+					stringstream recursiveContent;
+
+					// Recursion
+					if(_recursive && item.second->hasSubMaps(_arrayCode))
+					{
+						display(
+							recursiveContent,
+							request,
+							*item.second,
+							page,
+							variables
+						);
+					}
+
 					_displayItem(
 						stream,
 						request,
@@ -216,7 +239,8 @@ namespace synthese
 						variables,
 						templatePage,
 						rank,
-						itemsCount
+						itemsCount,
+						recursiveContent.str()
 					);
 				}
 			}
@@ -225,6 +249,20 @@ namespace synthese
 			{
 				BOOST_REVERSE_FOREACH(const SortedItems::value_type item, sortedItems)
 				{
+					stringstream recursiveContent;
+
+					// Recursion
+					if(_recursive && item.second->hasSubMaps(_arrayCode))
+					{
+						display(
+							recursiveContent,
+							request,
+							*item.second,
+							page,
+							variables
+						);
+					}
+
 					_displayItem(
 						stream,
 						request,
@@ -234,7 +272,8 @@ namespace synthese
 						variables,
 						templatePage,
 						rank,
-						itemsCount
+						itemsCount,
+						recursiveContent.str()
 					);
 				}
 			}
@@ -243,6 +282,20 @@ namespace synthese
 			{
 				BOOST_FOREACH(const ParametersMap::SubParametersMap::mapped_type::value_type& item, items)
 				{
+					stringstream recursiveContent;
+
+					// Recursion
+					if(_recursive && item->hasSubMaps(_arrayCode))
+					{
+						display(
+							recursiveContent,
+							request,
+							*item,
+							page,
+							variables
+						);
+					}
+
 					_displayItem(
 						stream,
 						request,
@@ -252,7 +305,8 @@ namespace synthese
 						variables,
 						templatePage,
 						rank,
-						itemsCount
+						itemsCount,
+						recursiveContent.str()
 					);
 				}
 			}
@@ -269,12 +323,17 @@ namespace synthese
 			util::ParametersMap& variables,
 			const Webpage* templatePage,
 			size_t& rank,
-			size_t itemsCount
+			size_t itemsCount,
+			const std::string& recursiveContent
 		) const {
 			ParametersMap pm(item);
 			pm.merge(baseParametersMap);
 			pm.insert(DATA_RANK, rank++);
 			pm.insert(DATA_ITEMS_COUNT, itemsCount);
+			if(!recursiveContent.empty())
+			{
+				pm.insert(DATA_RECURSIVE_CONTENT, recursiveContent);
+			}
 
 			// Display by a template page
 			if(templatePage)
