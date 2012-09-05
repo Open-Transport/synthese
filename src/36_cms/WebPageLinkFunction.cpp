@@ -88,11 +88,20 @@ namespace synthese
 			_class = map.getDefault<string>(PARAMETER_CLASS);
 
 			// Additional parameters
-			_parameters = map;
-			_parameters.remove(PARAMETER_TEXT);
-			_parameters.remove(PARAMETER_TARGET);
-			_parameters.remove(PARAMETER_USE_SMART_URL);
-			_parameters.remove(PARAMETER_CONFIRM);
+			BOOST_FOREACH(const ParametersMap::Map::value_type& item, map.getMap())
+			{
+				if(item.first == PARAMETER_TEXT ||
+					item.first == PARAMETER_TARGET ||
+					item.first == PARAMETER_USE_SMART_URL ||
+					item.first == PARAMETER_CONFIRM ||
+					item.first == PARAMETER_CLASS
+				){
+					continue;
+				}
+
+				// Using the getValue virtual method instead of item.second in order to handle DelayedEvaluationParametersMap
+				_parameters.insert(item.first, map.getValue(item.first));
+			}
 		}
 
 

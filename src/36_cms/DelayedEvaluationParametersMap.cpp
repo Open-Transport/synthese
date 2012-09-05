@@ -22,6 +22,8 @@
 
 #include "DelayedEvaluationParametersMap.hpp"
 
+using namespace std;
+
 namespace synthese
 {
 	namespace cms
@@ -41,7 +43,13 @@ namespace synthese
 			_additionalParametersMap(additionalParametersMap),
 			_page(page),
 			_variables(variables)
-		{}
+		{
+			// Backward compatibility with ParametersMap
+			BOOST_FOREACH(const Fields::value_type& field, _fields)
+			{
+				insert(field.first, string());
+			}
+		}
 
 
 
