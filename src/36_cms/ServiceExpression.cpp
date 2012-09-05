@@ -43,6 +43,7 @@ namespace synthese
 	{
 		const string ServiceExpression::PARAMETER_VAR = "VAR";
 		const string ServiceExpression::PARAMETER_TEMPLATE = "template";
+		const string ServiceExpression::PARAMETER_REPEAT_PARAMETERS = "repeat_parameters";
 		const string ServiceExpression::VAR_EXCEPTIONS = "exceptions";
 
 
@@ -92,6 +93,21 @@ namespace synthese
 
 			// Service parameters evaluation
 			DelayedEvaluationParametersMap::Fields fields;
+
+			// Repeat parameters from URL
+			if(_repeatParameters)
+			{
+				BOOST_FOREACH(const ParametersMap::Map::value_type& param, additionalParametersMap.getMap())
+				{
+					fields.insert(
+						make_pair(
+							param.first,
+							DelayedEvaluationParametersMap::Field(param.second)
+					)	);
+				}
+			}
+
+			// Get parameters defined in the template (prior to URL parameters is both defined)
 			BOOST_FOREACH(const Parameters::value_type& param, _serviceParameters)
 			{
 				fields.insert(
@@ -100,6 +116,8 @@ namespace synthese
 						DelayedEvaluationParametersMap::Field(param.second)
 				)	);
 			}
+
+			// No output format if inline template is defined
 			if(!_inlineTemplate.empty())
 			{
 				fields.insert(
@@ -108,6 +126,7 @@ namespace synthese
 						string()
 				)	);
 			}
+
 			DelayedEvaluationParametersMap serviceParametersMap(
 				fields,
 				request,
@@ -180,7 +199,8 @@ namespace synthese
 		ServiceExpression::ServiceExpression(
 			std::string::const_iterator& it,
 			std::string::const_iterator end
-		):	_functionCreator(NULL)
+		):	_functionCreator(NULL),
+			_repeatParameters(false)
 		{
 			// function name
 			string functionName;
@@ -217,6 +237,10 @@ namespace synthese
 							if(parameterName.str() == PARAMETER_TEMPLATE)
 							{
 								_inlineTemplate = parameterNodes;
+							}
+							else if(parameterName.str() == PARAMETER_REPEAT_PARAMETERS)
+							{
+								_repeatParameters = true;
 							}
 							else
 							{
