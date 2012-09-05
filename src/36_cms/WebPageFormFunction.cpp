@@ -89,13 +89,21 @@ namespace synthese
 			}
 
 			// Additional parameters
-			_parameters = map;
-			_parameters.remove(PARAMETER_NAME);
-			_parameters.remove(PARAMETER_FORM_ID);
-			_parameters.remove(PARAMETER_SCRIPT);
-			_parameters.remove(PARAMETER_CLASS);
-			_parameters.remove(PARAMETER_IDEM);
-			_parameters.remove(PARAMETER_PAGE_ID);
+			BOOST_FOREACH(const ParametersMap::Map::value_type& item, map.getMap())
+			{
+				if(item.first == PARAMETER_NAME ||
+					item.first == PARAMETER_FORM_ID ||
+					item.first == PARAMETER_SCRIPT ||
+					item.first == PARAMETER_CLASS ||
+					item.first == PARAMETER_IDEM ||
+					item.first == PARAMETER_PAGE_ID
+				){
+					continue;
+				}
+
+				// Using the getValue virtual method instead of item.second in order to handle DelayedEvaluationParametersMap
+				_parameters.insert(item.first, map.getValue(item.first));
+			}
 		}
 
 

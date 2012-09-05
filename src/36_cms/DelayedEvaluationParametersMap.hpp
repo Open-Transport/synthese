@@ -93,9 +93,9 @@ namespace synthese
 			virtual bool isDefined(
 				const std::string& parameterName
 			) const;
+
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_cms_DelayedEvaluationParametersMap_hpp__
 
