@@ -176,7 +176,7 @@ namespace synthese
 				@author Hugues
 				@date 2009
 			*/
-			graph::Journey run();
+			graph::Journey run(bool ignoreDurationFilterFirstRun = true);
 		};
 }	}
 
