@@ -114,24 +114,41 @@ namespace synthese
 
 
 		const boost::shared_ptr<geos::geom::Point>& RoadPlace::getPoint() const
-		{
+		{		
 			if (!_isoBarycentre.get())
 			{
-				Envelope e;
+				int nbPoint = 0;
 				BOOST_FOREACH(const Path* road, _paths)
 				{
 					BOOST_FOREACH(const Edge* edge, road->getEdges())
 					{
 						if(edge->getFromVertex()->hasGeometry())
 						{
-							e.expandToInclude(*edge->getFromVertex()->getGeometry()->getCoordinate());
+							nbPoint++;
 						}
 					}
 				}
-				if(!e.isNull())
+				nbPoint = (nbPoint + 1 ) / 2; // We stop at the point in the middle
+				int nbCurPoint = 0;
+				BOOST_FOREACH(const Path* road, _paths)
+				{
+					BOOST_FOREACH(const Edge* edge, road->getEdges())
+					{
+						if(edge->getFromVertex()->hasGeometry())
+						{
+							nbCurPoint++;
+							if(nbCurPoint == nbPoint)
+							{
+								_isoBarycentre = edge->getFromVertex()->getGeometry();
+								break;
+							}
+						}
+					}
+					if(nbCurPoint == nbPoint)break;
+				}
+				if(!_isoBarycentre.get())
 				{
 					Coordinate c;
-					e.centre(c);
 					_isoBarycentre.reset(CoordinatesSystem::GetDefaultGeometryFactory().createPoint(c));
 				}
 			}
