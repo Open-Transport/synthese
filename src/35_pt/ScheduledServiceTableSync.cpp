@@ -471,7 +471,30 @@ namespace synthese
 				{
 					snow += hours(24);
 				}
-				query.addWhereField(ScheduledServiceTableSync::COL_SCHEDULES,"00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow), ComposedExpression::OP_SUPEQ);
+				//query.addWhereField(ScheduledServiceTableSync::COL_SCHEDULES,"00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow), ComposedExpression::OP_SUPEQ);
+				query.addWhere(
+					ComposedExpression::Get(
+						ComposedExpression::Get(
+							FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+							ComposedExpression::OP_SUPEQ,
+							ValueExpression<string>::Get(SchedulesBasedService::EncodeSchedule(snow))
+						),
+						ComposedExpression::OP_OR,
+						ComposedExpression::Get(
+							ComposedExpression::Get(
+								FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+								ComposedExpression::OP_LIKE,
+								ValueExpression<string>::Get("00:00:00#%")
+							),
+							ComposedExpression::OP_AND,
+							ComposedExpression::Get(
+								FieldExpression::Get(TABLE.NAME, COL_SCHEDULES),
+								ComposedExpression::OP_SUPEQ,
+								ValueExpression<string>::Get("00:00:00#"+ SchedulesBasedService::EncodeSchedule(snow))
+							)
+						)
+					)
+				);
 			}
 			if (orderByOriginTime)
 			{
