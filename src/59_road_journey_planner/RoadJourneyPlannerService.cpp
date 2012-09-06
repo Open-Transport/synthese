@@ -374,6 +374,7 @@ namespace synthese
 						e = e->getFollowingArrivalForFineSteppingOnly();
 					}
 					LineString* serviceLineString = gf.createLineString(coords);
+					boost::shared_ptr<geos::geom::Geometry> geometryProjected(_coordinatesSystem->convertGeometry(*serviceLineString));
 
 					if(!curDistance)
 					{
@@ -381,14 +382,14 @@ namespace synthese
 						departureTime = service.getDepartureDateTime();
 						arrivalTime = service.getArrivalDateTime();
 						curRoadPlace = road->getRoadPlace();
-						curGeom.push_back(serviceLineString->clone());
+						curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
 					}
 					else if(curRoadPlace->getName() == road->getRoadPlace()->getName())
 					{
 						curDistance += static_cast<int>(service.getDistance());
 						arrivalTime = service.getArrivalDateTime();
-						curGeom.push_back(serviceLineString->clone());
+						curGeom.push_back(geometryProjected.get()->clone());
 					}
 					else
 					{
@@ -411,7 +412,7 @@ namespace synthese
 						arrivalTime = service.getArrivalDateTime();
 						curRoadPlace = road->getRoadPlace();
 						curGeom.clear();
-						curGeom.push_back(serviceLineString->clone());
+                        			curGeom.push_back(geometryProjected.get()->clone());
 						rank++;
 					}
 
