@@ -78,7 +78,7 @@ namespace synthese
 			{
 				// Chunk linked with the house
 				{
-					double distance(_roadChunk->getEndMetricOffset() - _metricOffset);
+					double distance(_metricOffset - _roadChunk->getMetricOffset());
 					result.insert(
 						_roadChunk->getFromVertex(),
 						VertexAccess(
