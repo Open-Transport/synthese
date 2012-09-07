@@ -260,7 +260,7 @@ namespace synthese
 				__minMaxDateTimeAtDestination,
 				secondTime,
 				secondTime,
-				_maxDuration,
+				maxDuration,
 				_vmax,
 				_ignoreReservation,
 				_logger,
