@@ -359,6 +359,10 @@ namespace synthese
 		void RoutePlanningIntermediateJourney::clear()
 		{
 			_endReached = false;
+			_startApproachDuration = minutes(0);
+			_endApproachDuration = minutes(0);
+			_distanceToEnd = optional<Journey::Distance>();
+			_similarity = indeterminate;
 			Journey::clear();
 		}
 
