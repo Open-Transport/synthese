@@ -126,16 +126,23 @@ namespace synthese
 			ptime beginBound(result2.getBeginTime());
 			ptime endBound(result2.getEndTime());
 
-			// Check if the found result is compliant with the max transfer duration
-			if(!ignoreDurationFilterFirstRun && _maxTransferDuration && result2.getServiceUses().size() > 1)
+			// Check if the found result is compliant with the duration filters
+			if(ignoreDurationFilterFirstRun)
 			{
 				bool ok(true);
-				for(Result::ServiceUses::const_iterator it(result2.getServiceUses().begin()); it+1 != result2.getServiceUses().end(); ++it)
+				if(_maxDuration && result2.getDuration() > *_maxDuration)
 				{
-					if((it+1)->getDepartureDateTime() - it->getArrivalDateTime() > *_maxTransferDuration)
+					ok = false;
+				}
+				if(ok && _maxTransferDuration && result2.getServiceUses().size() > 1)
+				{
+					for(Result::ServiceUses::const_iterator it(result2.getServiceUses().begin()); it+1 != result2.getServiceUses().end(); ++it)
 					{
-						ok = false;
-						break;
+						if((it+1)->getDepartureDateTime() - it->getArrivalDateTime() > *_maxTransferDuration)
+						{
+							ok = false;
+							break;
+						}
 					}
 				}
 				if(!ok)

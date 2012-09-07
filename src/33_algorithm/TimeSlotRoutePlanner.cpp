@@ -180,13 +180,16 @@ namespace synthese
 				//! <li> If the journey is continuous, attempt to break it. </li>
 				if(	journey.getContinuousServiceRange ().total_seconds() > 60)
 				{
+					time_duration maxDuration(
+						journey.getDuration() - minutes(1)
+					);
 					TimeSlotRoutePlanner tsr(
 						_originVam,
 						_destinationVam,
 						journey,
 						_whatToSearch,
 						_graphToUse,
-						_maxDuration,
+						maxDuration,
 						_maxSolutionsNumber ? *_maxSolutionsNumber - result.size() : _maxSolutionsNumber,
 						_accessParameters,
 						_planningOrder,
