@@ -181,7 +181,8 @@ class Result(object):
             r = requests.post(login_url, data={
                 'a': 'login',
                 'actionParamlogin': url.username,
-                'actionParampwd': url.password
+                'actionParampwd': url.password,
+                'nr': '1',
             }, prefetch=True)
 
             if 'sid' not in r.cookies:
