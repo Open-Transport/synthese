@@ -250,7 +250,7 @@ namespace synthese
 				accessDirection,
 				_accessParameters,
 				_whatToSearch,
-				true,
+				false,
 				_graphToUse,
 				todo,
 				bestVertexReachesMap,
