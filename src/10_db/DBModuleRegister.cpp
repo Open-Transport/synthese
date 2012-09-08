@@ -5,6 +5,8 @@
 #include "ObjectUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
 
+#include "SQLService.hpp"
+
 #include "DBModule.inc.cpp"
 
 void synthese::db::moduleRegister()
@@ -14,4 +16,6 @@ void synthese::db::moduleRegister()
 	synthese::db::ObjectCreateAction::integrate();
 	synthese::db::ObjectUpdateAction::integrate();
 	synthese::db::RemoveObjectAction::integrate();
+
+	synthese::db::SQLService::integrate();
 }
