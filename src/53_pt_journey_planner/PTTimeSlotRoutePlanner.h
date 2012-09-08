@@ -90,24 +90,6 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
-			/// Search of all physical stops reachable from the departure or the
-			/// arrival place.
-			/// @param vam the points to start the search from
-			/// @param destinationVam the points to reach if possible
-			/// @param direction the search is for departure or arrival places
-			/// @return the list of reachable stops with the duration of approach,
-			/// containing the departure and arrival places with empty approach, and
-			/// other stops with non empty approach, using the road network to reach them.
-			/// @author Hugues Romain
-			graph::VertexAccessMap _extendToPhysicalStops(
-				const graph::VertexAccessMap& vam,
-				const graph::VertexAccessMap& destinationVam,
-				algorithm::PlanningPhase direction
-			) const;
-
-
-
-			//////////////////////////////////////////////////////////////////////////
 			/// Search of stops reachable from the departure or the
 			/// arrival place by free DRT.
 			/// Only destination and transfer stops are returned.
