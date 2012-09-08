@@ -27,6 +27,8 @@ RoutePlanningUserPrefPanel.cpp
 RoutePlanningUserPrefPanel.h
 TimeSlotRoutePlanner.cpp
 TimeSlotRoutePlanner.h
+VAMConverter.cpp
+VAMConverter.hpp
 )
 
 set_source_files_properties(AlgorithmModule.gen.cpp AlgorithmModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
