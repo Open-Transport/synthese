@@ -711,4 +711,16 @@ namespace synthese
 			}
 			return it->second;
 		}
+
+
+
+		Record::FieldNames ParametersMap::getFieldNames() const
+		{
+			FieldNames result;
+			BOOST_FOREACH(const Map::value_type& item, _map)
+			{
+				result.push_back(item.first);
+			}
+			return result;
+		}
 }	}
