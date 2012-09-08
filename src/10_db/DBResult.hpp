@@ -91,6 +91,13 @@ namespace synthese
 			int getColumnIndex (const std::string& columnName) const;
 
 
+
+			//////////////////////////////////////////////////////////////////////////
+			/// Gets the list of the available fields
+			virtual FieldNames getFieldNames() const;
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// Gets the value of a field
 			/// @param fieldName name of the parameter to read
