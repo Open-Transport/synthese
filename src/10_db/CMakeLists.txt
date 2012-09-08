@@ -48,6 +48,8 @@ SelectQuery.hpp
 spatial_ref_sys_sql.inc.h
 SQLExpression.cpp
 SQLExpression.hpp
+SQLService.cpp
+SQLService.hpp
 SQLSingleOperatorExpression.cpp
 SQLSingleOperatorExpression.hpp
 UpdateQuery.cpp
