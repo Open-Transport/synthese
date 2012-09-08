@@ -303,6 +303,19 @@ namespace synthese
 
 
 
+		Record::FieldNames DBResult::getFieldNames() const
+		{
+			FieldNames result;
+			size_t nbcol(getNbColumns());
+			for(size_t icol(0); icol<nbcol; ++icol)
+			{
+				result.push_back(getColumnName(icol));
+			}
+			return result;
+		}
+
+
+
 		std::ostream& operator<< ( std::ostream& os, const DBResult& op )
 		{
 			std::vector<int> widths (op.computeMaxColWidths ());

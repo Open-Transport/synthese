@@ -27,6 +27,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
+#include <vector>
 
 namespace geos
 {
@@ -78,6 +79,14 @@ namespace synthese
 			const std::string& fieldName,
 			bool exceptionIfMissing = true
 		) const = 0;
+
+
+
+		typedef std::vector<std::string> FieldNames;
+
+		//////////////////////////////////////////////////////////////////////////
+		/// Gets the list of the available fields
+		virtual FieldNames getFieldNames() const = 0;
 
 
 
