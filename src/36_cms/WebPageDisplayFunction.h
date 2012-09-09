@@ -26,13 +26,14 @@
 #define SYNTHESE_WebPageDisplayFunction_H__
 
 #include "FactorableTemplate.h"
-#include "FunctionWithSite.h"
+#include "Function.h"
 
 namespace synthese
 {
 	namespace cms
 	{
 		class Webpage;
+		class Website;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// 36.15 Function : display of a web page.
@@ -42,12 +43,13 @@ namespace synthese
 		///	@date 2010
 		///	@ingroup m56Functions refFunctions
 		class WebPageDisplayFunction:
-			public util::FactorableTemplate<FunctionWithSite<false>, WebPageDisplayFunction>
+			public util::FactorableTemplate<server::Function, WebPageDisplayFunction>
 		{
 		private:
 			static const std::string DATA_CONTENT;
 
 		public:
+			static const std::string PARAMETER_SITE_ID;
 			static const std::string PARAMETER_PAGE_ID;
 			static const std::string PARAMETER_USE_TEMPLATE;
 			static const std::string PARAMETER_HOST_NAME;

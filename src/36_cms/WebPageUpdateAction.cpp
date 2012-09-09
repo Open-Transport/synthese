@@ -318,7 +318,7 @@ namespace synthese
 				_page->setParent(_up->get());
 			}
 
-			if(_content1)
+			if(_content1 || _mimeType || _ignoreWhiteChars)
 			{
 				bool ignoreWhiteChars(
 					_ignoreWhiteChars ?
@@ -331,8 +331,14 @@ namespace synthese
 					*_mimeType :
 					_page->get<WebpageContent>().getMimeType()
 				);
-				string content(*_content1);
-				if(_decodeXMLEntitiesInContent)
+
+				string content(
+					_content1 ?
+					*_content1 :
+					_page->get<WebpageContent>().getCode()
+				);
+
+				if(_content1 && _decodeXMLEntitiesInContent)
 				{
 					boost::algorithm::replace_all(content,"&lt;?", "<?");
 					boost::algorithm::replace_all(content,"?&gt;", "?>");

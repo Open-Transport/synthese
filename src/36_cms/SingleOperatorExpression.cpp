@@ -98,7 +98,7 @@ namespace synthese
 			const std::string::const_iterator end
 		){
 			if(	CompareText(it, end, "!") ||
-				CompareText(it, end, "not")
+				CompareText(it, end, "~not")
 			){
 				return NOT;
 			}
@@ -106,7 +106,7 @@ namespace synthese
 			{
 				return NEG;
 			}
-			if(	CompareText(it, end, "sqrt"))
+			if(	CompareText(it, end, "~sqrt"))
 			{
 				return SQRT;
 			}

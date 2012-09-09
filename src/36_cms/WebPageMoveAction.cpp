@@ -28,7 +28,10 @@
 #include "CMSRight.hpp"
 #include "DBTransaction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "WebPageTableSync.h"
 
 using namespace std;

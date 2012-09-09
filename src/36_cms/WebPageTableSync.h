@@ -75,26 +75,6 @@ namespace synthese
 			);
 
 
-			typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > SiteWebPagesList;
-
-
-			//////////////////////////////////////////////////////////////////////////
-			/// Builds the list of the pages of a website, formatted to be used in a web form.
-			/// @param siteId id of the website
-			/// @param rootLabel text to write for the root page link. If empty, the root page is not put on the list.
-			/// @param prefix text prefix (used by the recursion)
-			/// @param upId id of the top parent page (used by the recursion)
-			/// @author Hugues Romain
-			/// @date 2010
-			/// @since 3.1.15
-			static SiteWebPagesList GetPagesList(
-				util::RegistryKeyType siteId,
-				const std::string& rootLabel,
-				std::string prefix = std::string(),
-				util::RegistryKeyType upId = 0
-			);
-
-
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Increase or decrease each rank of a siblings collection after a specific rank.
