@@ -228,6 +228,7 @@ namespace synthese
 		const string PTJourneyPlannerService::DATA_TICKET_NAME("ticket_name");
 		const string PTJourneyPlannerService::DATA_TICKET_PRICE("ticket_price");
 		const string PTJourneyPlannerService::DATA_TICKET_CURRENCY("ticket_currency");
+		const string PTJourneyPlannerService::DATA_DISTANCE = "distance";
 
 		// Cells
 		const string PTJourneyPlannerService::DATA_ODD_ROW("is_odd_row");
@@ -1224,9 +1225,10 @@ namespace synthese
 			pm.insert(DATA_HANDICAPPED_FILTER, handicappedFilter);
 			pm.insert(DATA_BIKE_FILTER, bikeFilter);
 
-			// CO2 Emissions and Energy consumption
+			// CO2 Emissions, Energy consumption and total distance computation
 			double co2Emissions = 0;
 			double energyConsumption = 0;
+			double totalDistance = 0;
 			BOOST_FOREACH(const ServicePointer& su, journey.getServiceUses())
 			{
 				const JourneyPattern* line(dynamic_cast<const JourneyPattern*>(su.getService()->getPath()));
@@ -1248,6 +1250,7 @@ namespace synthese
 				{
 					co2Emissions += distance * line->getRollingStock()->getCO2Emissions() / RollingStock::CO2_EMISSIONS_DISTANCE_UNIT_IN_METERS;
 					energyConsumption += distance * line->getRollingStock()->getEnergyConsumption() / RollingStock::ENERGY_CONSUMPTION_DISTANCE_UNIT_IN_METERS;
+					totalDistance += distance;
 				}
 			}
 			// TODO : set precision outside of PTJourneyPlannerService
@@ -1257,6 +1260,7 @@ namespace synthese
 			cout.unsetf(ios::fixed);
 			pm.insert(DATA_CO2_EMISSIONS, sCO2Emissions.str());
 			pm.insert(DATA_ENERGY_CONSUMPTION, sEnergyConsumption.str());
+			pm.insert(DATA_DISTANCE, totalDistance);
 
 			// Fare calculation
 			typedef pair<vector<FareTicket>,double> Solution;

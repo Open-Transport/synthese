@@ -228,6 +228,7 @@ namespace synthese
 				static const std::string DATA_TICKET_CURRENCY;
 				static const std::string DATA_START_DATE;
 				static const std::string DATA_END_DATE;
+				static const std::string DATA_DISTANCE;
 			//@}
 
 			//! @name Cells
