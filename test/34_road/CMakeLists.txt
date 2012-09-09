@@ -11,7 +11,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 set(DEPS
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from cms
-  36_cms # from road > graph > server
+  11_cms # from road > graph > server
   34_road
 )
 
