@@ -119,7 +119,7 @@ namespace synthese
 			if(	_useSmartURL &&
 				!_target->get<SmartURLPath>().empty()
 			){	// URL is smart URL
-				url = _target->get<SmartURLPath>();
+				url = _target->getRoot()->get<ClientURL>() + _target->get<SmartURLPath>();
 
 				// Parameters
 				if(!_parameters.getMap().empty())
