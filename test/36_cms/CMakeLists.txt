@@ -13,7 +13,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
-include_directories("${PROJECT_SOURCE_DIR}/src/36_cms")
+include_directories("${PROJECT_SOURCE_DIR}/src/11_cms")
 
 set(DEPS
   103_db_svn
