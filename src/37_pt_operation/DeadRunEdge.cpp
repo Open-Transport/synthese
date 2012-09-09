@@ -91,6 +91,8 @@ namespace synthese
 			return false;
 		}
 
+
+
 		bool DeadRunEdge::isArrivalAllowed() const
 		{
 			return false;
