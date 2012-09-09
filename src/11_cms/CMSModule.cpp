@@ -213,7 +213,7 @@ namespace synthese
 					if(	!it.first.first.empty() &&
 						!it.first.second.empty() &&
 						it.first.first == hostName &&
-						it.first.second.size() + 1 < clientURL.size() &&
+						it.first.second.size() < clientURL.size() &&
 						it.first.second + "/" == clientURL.substr(0, it.first.second.size() + 1)
 					){
 						return it.second;
@@ -255,7 +255,7 @@ namespace synthese
 				{
 					if(	it.first.first.empty() &&
 						!it.first.second.empty() &&
-						it.first.second.size() + 1 < clientURL.size() &&
+						it.first.second.size() < clientURL.size() &&
 						it.first.second + "/" == clientURL.substr(0, it.first.second.size() + 1)
 					){
 						return it.second;

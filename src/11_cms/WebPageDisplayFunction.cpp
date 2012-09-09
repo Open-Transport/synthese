@@ -107,7 +107,7 @@ namespace synthese
 				_smartURL = map.get<string>(PARAMETER_SMART_URL);
 				if(_smartURL.empty())
 				{
-					throw RequestException("Webpage not defined");
+					_smartURL = "/";
 				}
 
 				// Local variables
@@ -141,14 +141,22 @@ namespace synthese
 						
 					// Smart URL
 					_smartURL = _smartURL.substr(site->get<ClientURL>().size());
+
+					_templateParameters.remove(PARAMETER_HOST_NAME);
+					_templateParameters.remove(PARAMETER_SMART_URL);
 				}
 
 				// Page
-				if(_smartURL[0] == ':')
+				if(!_smartURL.empty() && _smartURL[0] == ':')
 				{
 					throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
 				}
 				_page = site->getPageBySmartURL(_smartURL);
+				if(!_page)
+				{
+					_smartURL = _smartURL + "/";
+					_page = site->getPageBySmartURL(_smartURL);
+				}
 
 				if(!_page)
 				{ // Attempt to find a page with a parameter
@@ -195,7 +203,7 @@ namespace synthese
 				{
 					/// @todo handle default parameter of smart url
 					stringstream url;
-					url << "http://" << request.getHostName() << _page->get<SmartURLPath>();
+					url << "http://" << request.getHostName() << _page->getRoot()->get<ClientURL>() << _page->get<SmartURLPath>();
 
 					ParametersMap pm(getTemplateParameters());
 					pm.remove(PARAMETER_PAGE_ID);
