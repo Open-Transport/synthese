@@ -1,6 +1,6 @@
 
-/** DumpFileFormat class implementation.
-	@file DumpFileFormat.cpp
+/** SVNWorkingCopy class implementation.
+	@file SVNWorkingCopy.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -661,3 +661,4 @@ namespace synthese
 				}
 			}
 }	}	}
+
