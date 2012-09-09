@@ -76,6 +76,7 @@ namespace synthese
 			typedef std::map<int, boost::shared_ptr<DBTableSync> > TablesByIdMap;
 			typedef std::set<boost::shared_ptr<DBConditionalRegistryTableSync> > ConditionalTableSyncsToReload;
 
+			static const std::string PARAMETER_NODE_ID;
 
 		private:
 			static boost::posix_time::time_duration DURATION_BETWEEN_CONDITONAL_SYNCS;
@@ -86,6 +87,7 @@ namespace synthese
 			static TablesByNameMap	_tableSyncMap;
 			static TablesByIdMap	_idTableSyncMap;
 			static ConditionalTableSyncsToReload _conditionalTableSyncsToReload;
+			static util::RegistryNodeType _nodeId;
 
 
 
@@ -95,6 +97,8 @@ namespace synthese
 			virtual ~DBModule() { };
 
 			static void SetConnectionString(const std::string& connectionString);
+			static util::RegistryNodeType GetNodeId(){ return _nodeId; }
+
 
 			static DB* GetDB();
 			static boost::shared_ptr<DB> GetDBSPtr();

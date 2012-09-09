@@ -64,6 +64,8 @@ namespace synthese
 		DBModule::SubClassMap DBModule::_subClassMap;
 
 		time_duration DBModule::DURATION_BETWEEN_CONDITONAL_SYNCS = minutes(1);
+		const string DBModule::PARAMETER_NODE_ID = "node_id";
+		RegistryNodeType DBModule::_nodeId = 1;
 	}
 
 	namespace server
@@ -79,6 +81,8 @@ namespace synthese
 				throw DBException("No ConnectionInfo. DBModule::SetConnectionString() must be called");
 			}
 			DBModule::_Db.reset(util::Factory<DB>::create(DBModule::_ConnectionInfo->backend));
+
+			RegisterParameter(DBModule::PARAMETER_NODE_ID, "1", &DBModule::ParameterCallback);
 
 			DBModule::GetDB()->setConnectionInfo(DBModule::_ConnectionInfo);
 			DBModule::GetDB()->preInit();
@@ -119,6 +123,7 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DBModule>::End()
 		{
+			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
 			DBModule::_ConnectionInfo.reset();
 			DBModule::_Db.reset();
 		}
@@ -330,6 +335,24 @@ namespace synthese
 
 				// Next load in 1 minutes
 				this_thread::sleep(DURATION_BETWEEN_CONDITONAL_SYNCS);
+			}
+		}
+
+
+
+		void DBModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			if(name == PARAMETER_NODE_ID)
+			{
+				try
+				{
+					_nodeId = lexical_cast<RegistryNodeType>(value);
+				}
+				catch(bad_lexical_cast&)
+				{
+				}
 			}
 		}
 }	}
