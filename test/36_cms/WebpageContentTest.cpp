@@ -525,6 +525,36 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 		BOOST_CHECK_EQUAL(eval, "1");
 	}
 
+	{ // & operator
+		string code("<@6&3@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "2");
+	}
+
+	{ // & operator with long long
+		string code("<@25769803776&12884901888@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "8589934592");
+	}
+
+	{ // & operator
+		string code("<@variable=6@><@variable&3@>");
+		WebpageContent wpc(code);
+		BOOST_CHECK_EQUAL(wpc.getCode(), code);
+		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
+		BOOST_CHECK_EQUAL(wpc.empty(), false);
+		string eval(wpc.eval(request, additionalParametersMap, page, variables));
+		BOOST_CHECK_EQUAL(eval, "2");
+	}
+
 	{ // Modulo operator
 		string code("<@3%4@>");
 		WebpageContent wpc(code);
@@ -556,7 +586,7 @@ BOOST_AUTO_TEST_CASE (WebpageContentTest)
 	}
 
 	{ // Equal test
-		string code("<@variable==\"OK1OK2\"@>");
+		string code("<@variable=OK1OK2@><@variable==\"OK1OK2\"@>");
 		WebpageContent wpc(code);
 		BOOST_CHECK_EQUAL(wpc.getCode(), code);
 		BOOST_CHECK_EQUAL(wpc.getIgnoreWhiteChars(), false);
