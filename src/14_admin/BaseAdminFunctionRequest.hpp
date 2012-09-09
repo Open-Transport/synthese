@@ -25,6 +25,7 @@
 
 #include "StaticFunctionRequest.h"
 
+#include "AdminInterfaceElement.h"
 #include "WebPageDisplayFunction.h"
 
 namespace synthese
