@@ -40,17 +40,18 @@ namespace synthese
 			MimeTypes();
 
 		public:
+			static const MimeType CSS;
 			static const MimeType CSV;
-			static const MimeType HTML;
-			static const MimeType JSON;
-			static const MimeType XML;
-			static const MimeType JS;
-			static const MimeType PNG;
-			static const MimeType JPEG;
-			static const MimeType TEXT;
 			static const MimeType GIF;
+			static const MimeType HTML;
+			static const MimeType JPEG;
+			static const MimeType JS;
+			static const MimeType JSON;
 			static const MimeType PDF;
-
+			static const MimeType PNG;
+			static const MimeType TEXT;
+			static const MimeType XML;
+			
 			static const MimeType& GetMimeTypeByExtension(
 				const std::string& extension
 			); 

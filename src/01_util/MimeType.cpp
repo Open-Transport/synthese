@@ -93,7 +93,7 @@ namespace synthese
 
 		const std::string& MimeType::getDefaultExtension() const
 		{
-			return *_extensions.begin();
+			return _extensions.empty() ? _subType : *_extensions.begin();
 		}
 
 
