@@ -188,12 +188,9 @@ namespace synthese
 				static util::RegistryKeyType encodeUId(
 					util::RegistryObjectType objectId
 				){
-					static int nodeId = boost::lexical_cast<util::RegistryNodeType>(
-						server::ModuleClass::GetParameter("dbring_node_id", "1")
-					);
 					return util::encodeUId(
 						K::TABLE.ID,
-						nodeId,
+						DBModule::GetNodeId(),
 						objectId
 					);
 				}
