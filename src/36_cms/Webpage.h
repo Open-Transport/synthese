@@ -270,6 +270,11 @@ namespace synthese
 
 				virtual std::string getName() const { return get<Title>(); }
 				virtual SubObjects getSubObjects() const;
+
+				void getPagesList(
+					Website::WebpagesList& result,
+					const std::string prefix
+				) const;
 			//@}
 		};
 }	}

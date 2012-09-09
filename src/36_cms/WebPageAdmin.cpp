@@ -32,11 +32,13 @@
 #include "EditArea.hpp"
 #include "HTMLModule.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
 #include "StaticActionRequest.h"
 #include "TinyMCE.hpp"
+#include "User.h"
 #include "WebPageAddAction.h"
 #include "WebpageContentUploadAction.hpp"
 #include "WebPageDisplayFunction.h"
@@ -128,7 +130,7 @@ namespace synthese
 
 		void WebPageAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			StaticFunctionRequest<WebPageDisplayFunction> viewRequest(request, false);
@@ -160,7 +162,7 @@ namespace synthese
 
 				if(canBeWYSIWYG)
 				{
-					AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request);
+					AdminActionFunctionRequest<WebPageUpdateAction,WebPageAdmin> rawEditorUpdateRequest(request, *this);
 					rawEditorUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					rawEditorUpdateRequest.getAction()->setRawEditor(!_page->get<RawEditor>());
 					stream <<
@@ -211,7 +213,7 @@ namespace synthese
 				}
 
 				// File upload
-				AdminActionFunctionRequest<WebpageContentUploadAction, WebPageAdmin> uploadRequest(request);
+				AdminActionFunctionRequest<WebpageContentUploadAction, WebPageAdmin> uploadRequest(request, *this);
 				uploadRequest.getAction()->setPage(_page);
 				HTMLForm uploadForm(uploadRequest.getHTMLForm("upload"));
 				stream << "<h1>Téléchargement de contenu</h1>";
@@ -246,7 +248,7 @@ namespace synthese
 				stream << "<h1>Propriétés</h1>";
 
 				{
-					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> contentUpdateRequest(request);
+					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> contentUpdateRequest(request, *this);
 					contentUpdateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(contentUpdateRequest.getHTMLForm());
 					stream << t.open();
@@ -267,7 +269,7 @@ namespace synthese
 			{
 				stream << "<h1>Paramètres de publication</h1>";
 				{
-					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(request);
+					AdminActionFunctionRequest<WebPageUpdateAction, WebPageAdmin> updateRequest(request, *this);
 					updateRequest.getAction()->setWebPage(const_pointer_cast<Webpage>(_page));
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
 					stream << t.open();
@@ -278,7 +280,7 @@ namespace synthese
 						"Page supérieure",
 						t.getForm().getSelectInput(
 							WebPageUpdateAction::PARAMETER_UP_ID,
-							WebPageTableSync::GetPagesList(_page->getRoot()->getKey(), "(racine)"),
+							_page->getRoot()->getPagesList("(racine)"),
 							optional<RegistryKeyType>(_page->getParent() ? _page->getParent()->getKey() : 0)
 					)	);
 					stream << t.cell("Chemin URL (facultatif)", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_SMART_URL_PATH, _page->get<SmartURLPath>()));
@@ -288,12 +290,12 @@ namespace synthese
 
 				stream << "<h1>Sous-pages</h1>";
 				{
-					AdminActionFunctionRequest<WebPageAddAction, WebPageAdmin> addRequest(request);
+					AdminActionFunctionRequest<WebPageAddAction, WebPageAdmin> addRequest(request, *this);
 					addRequest.getAction()->setParent(const_pointer_cast<Webpage>(_page));
 
-					AdminActionFunctionRequest<RemoveObjectAction, WebPageAdmin> deleteRequest(request);
+					AdminActionFunctionRequest<RemoveObjectAction, WebPageAdmin> deleteRequest(request, *this);
 
-					AdminActionFunctionRequest<WebPageMoveAction, WebPageAdmin> moveRequest(request);
+					AdminActionFunctionRequest<WebPageMoveAction, WebPageAdmin> moveRequest(request, *this);
 
 					WebPageAdmin::DisplaySubPages(stream, _page->getKey(), addRequest, deleteRequest, moveRequest, request);
 				}
@@ -305,12 +307,12 @@ namespace synthese
 			{
 				stream << "<h1>Liens</h1>";
 
-				AdminFunctionRequest<WebPageAdmin> openRequest(request);
+				AdminFunctionRequest<WebPageAdmin> openRequest(request, *this);
 
-				AdminActionFunctionRequest<WebPageLinkAddAction, WebPageAdmin> addRequest(request);
+				AdminActionFunctionRequest<WebPageLinkAddAction, WebPageAdmin> addRequest(request, *this);
 				addRequest.getAction()->setPage(const_pointer_cast<Webpage>(_page));
 
-				AdminActionFunctionRequest<WebPageLinkRemoveAction, WebPageAdmin> removeRequest(request);
+				AdminActionFunctionRequest<WebPageLinkRemoveAction, WebPageAdmin> removeRequest(request, *this);
 				removeRequest.getAction()->setPage(const_pointer_cast<Webpage>(_page));
 
 				HTMLForm f(addRequest.getHTMLForm());
@@ -374,7 +376,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks WebPageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
+		AdminInterfaceElement::PageLinks WebPageAdmin::getSubPages( const AdminInterfaceElement& currentPage, const server::Request& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
 
@@ -437,7 +439,7 @@ namespace synthese
 			const WebPageTableSync::SearchResult& pages,
 			StaticActionRequest<RemoveObjectAction>& deleteRequest,
 			StaticActionRequest<WebPageMoveAction>& moveRequest,
-			const admin::AdminRequest& request,
+			const server::Request& request,
 			HTMLTable& t,
 			HTMLForm& f,
 			size_t depth
@@ -519,7 +521,7 @@ namespace synthese
 			server::StaticActionRequest<WebPageAddAction>& createRequest,
 			server::StaticActionRequest<RemoveObjectAction>& deleteRequest,
 			server::StaticActionRequest<WebPageMoveAction>& moveRequest,
-			const admin::AdminRequest& request
+			const server::Request& request
 		){
 
 			WebPageTableSync::SearchResult result(

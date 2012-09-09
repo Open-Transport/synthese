@@ -172,4 +172,23 @@ namespace synthese
 		{
 			CMSModule::RemoveSite(*this);
 		}
+
+
+
+		Website::WebpagesList Website::getPagesList(
+			const std::string& rootLabel
+		) const {
+			WebpagesList result;
+			if(!rootLabel.empty())
+			{
+				result.push_back(make_pair(0, rootLabel));
+			}
+			BOOST_FOREACH(const SubObjects::value_type& so, getSubObjects())
+			{
+				const Webpage& page(static_cast<const Webpage&>(*so));
+				result.push_back(make_pair(page.getKey(), "   " + page.getName()));
+				page.getPagesList(result, "      ");
+			}
+			return result;
+		}
 }	}

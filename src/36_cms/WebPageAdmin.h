@@ -82,7 +82,7 @@ namespace synthese
 				const WebPageTableSync::SearchResult& pages,
 				server::StaticActionRequest<db::RemoveObjectAction>& deleteRequest,
 				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
-				const admin::AdminRequest& request,
+				const server::Request& request,
 				html::HTMLTable& t,
 				html::HTMLForm& f,
 				std::size_t depth = 0
@@ -140,7 +140,7 @@ namespace synthese
 			///	@date 2010
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				const server::Request& _request
 			) const;
 
 
@@ -169,7 +169,7 @@ namespace synthese
 			///	@date 2010
 			virtual AdminInterfaceElement::PageLinks getSubPages(
 				const AdminInterfaceElement& currentPage,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 
@@ -221,7 +221,7 @@ namespace synthese
 				server::StaticActionRequest<WebPageAddAction>& createRequest,
 				server::StaticActionRequest<db::RemoveObjectAction>& deleteRequest,
 				server::StaticActionRequest<WebPageMoveAction>& moveRequest,
-				const admin::AdminRequest& request
+				const server::Request& request
 			);
 		};
 	}
