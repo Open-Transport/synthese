@@ -42,6 +42,8 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace cms;
+	
 	namespace server
 	{
 		using namespace util;
