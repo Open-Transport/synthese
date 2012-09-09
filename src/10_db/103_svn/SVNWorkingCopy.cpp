@@ -31,6 +31,7 @@
 #include "SVNCommands.hpp"
 #include "SVNModule.hpp"
 
+#include <fstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
