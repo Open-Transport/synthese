@@ -256,7 +256,7 @@ window.app.Gis.prototype = {
                         strokeOpacity: 1,
                         strokeWidth: 6,
                         strokeLinecap: "round", // [butt | round | square]
-                        strokeDashstyle: "${strokeDashStyle}" // [dot | dash | dashdot | longdash | longdashdot | solid]
+                        strokeDashstyle: "solid" // [dot | dash | dashdot | longdash | longdashdot | solid]
                     })
                 })
             })
@@ -426,7 +426,12 @@ window.app.Gis.prototype = {
         var nbpoints = points.length;
 
         // pre-processing:
-        points[0].type = 'start';
+        if (!points[0]) {
+          points[1].type = 'start';
+        } else {
+          points[0].type = 'start';
+        }
+       
         points[nbpoints-1].type = 'stop';
 
         // draw points and lines according to map type:
@@ -534,7 +539,7 @@ window.app.Gis.prototype = {
      *   TODO: add styling
      */
     drawPoint: function(point) {
-
+        if (point) {
         var layer = this.getLayerNamed("Points");
 
         var p = this.positionToLonLat(point.position);
@@ -555,14 +560,17 @@ window.app.Gis.prototype = {
                 break;
         }
 
-        layer.addFeatures([
+        if (point.name != '') {
+          layer.addFeatures([
             new OpenLayers.Feature.Vector(p, {
                 picto: requireJSConfig.baseUrl + 'local/map/img/' + fileName,
                 name: name
             })
-        ]);
+          ]);
+        }
 
         return p;
+        }
     },
 
     /**
