@@ -22,10 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "JunctionTableSync.hpp"
+
+#include "Profile.h"
 #include "ReplaceQuery.h"
+#include "Session.h"
+#include "User.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
@@ -33,6 +35,8 @@
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "StopAreaTableSync.hpp"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

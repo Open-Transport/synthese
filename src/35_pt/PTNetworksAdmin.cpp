@@ -22,17 +22,18 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "PTNetworksAdmin.h"
+
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
-#include "PTNetworksAdmin.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
 #include "TransportNetwork.h"
 #include "TransportNetworkAdmin.h"
-#include "Profile.h"
-#include "AdminFunction.h"
+#include "User.h"
 #include "TransportNetworkTableSync.h"
 #include "HTMLModule.h"
 #include "SearchFormHTMLTable.h"
@@ -107,13 +108,13 @@ namespace synthese
 
 		void PTNetworksAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			// Search form
 			stream << "<h1>Recherche</h1>";
 
-			AdminFunctionRequest<PTNetworksAdmin> searchRequest(request);
+			AdminFunctionRequest<PTNetworksAdmin> searchRequest(request, *this);
 			SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 			stream << s.open();
 			stream << s.cell("Nom", s.getForm().getTextInput(PARAM_SEARCH_NAME, _searchName));
@@ -136,10 +137,10 @@ namespace synthese
 
 			// Requests
 			AdminActionFunctionRequest<TransportNetworkUpdateAction,TransportNetworkAdmin> newRequest(request);
-			newRequest.getFunction()->setActionFailedPage<PTNetworksAdmin>();
+			newRequest.setActionFailedPage<PTNetworksAdmin>();
 			newRequest.setActionWillCreateObject();
 			AdminFunctionRequest<TransportNetworkAdmin> openRequest(request);
-			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction,PTNetworksAdmin> removeRequest(request, *this);
 
 			// Table
 			ResultHTMLTable::HeaderVector h;
@@ -195,7 +196,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -215,7 +216,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTNetworksAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

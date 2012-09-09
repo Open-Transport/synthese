@@ -164,7 +164,7 @@ namespace synthese
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
 					const std::string& key,
-					boost::optional<const admin::AdminRequest&> adminRequest
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 
@@ -188,7 +188,7 @@ namespace synthese
 				/// @date 2010
 				virtual void displayAdmin(
 					std::ostream& os,
-					const admin::AdminRequest& request
+					const server::Request& request
 				) const;
 
 				virtual db::DBTransaction _save() const;

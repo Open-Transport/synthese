@@ -22,7 +22,10 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "MessagesAdmin.h"
+
 #include "SearchFormHTMLTable.h"
+#include "User.h"
 #include "ActionResultHTMLTable.h"
 #include "05_html/Constants.h"
 #include "StaticActionFunctionRequest.h"
@@ -30,7 +33,6 @@
 #include "AlarmRecipient.h"
 #include "AlarmTableSync.h"
 #include "ScenarioTableSync.h"
-#include "MessagesAdmin.h"
 #include "MessagesScenarioAdmin.h"
 #include "MessagesModule.h"
 #include "ScenarioStopAction.h"
@@ -154,19 +156,19 @@ namespace synthese
 
 		void MessagesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Requests
-			AdminFunctionRequest<MessagesAdmin> searchRequest(_request);
+			AdminFunctionRequest<MessagesAdmin> searchRequest(_request, *this);
 
 			AdminActionFunctionRequest<ScenarioSaveAction,MessagesScenarioAdmin> newScenarioRequest(_request);
-			newScenarioRequest.getFunction()->setActionFailedPage<MessagesAdmin>();
+			newScenarioRequest.setActionFailedPage<MessagesAdmin>();
 			newScenarioRequest.setActionWillCreateObject();
 
 			AdminFunctionRequest<MessagesScenarioAdmin> scenarioRequest(_request);
 
-			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request);
+			AdminActionFunctionRequest<ScenarioStopAction,MessagesAdmin> scenarioStopRequest(_request, *this);
 
 			vector<pair<optional<SentScenarioInheritedTableSync::StatusSearch>, string> > statusMap;
 			statusMap.push_back(make_pair(SentScenarioInheritedTableSync::BROADCAST_RUNNING, "En diffusion / prévu"));
@@ -384,7 +386,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -400,7 +402,7 @@ namespace synthese
 
 		bool MessagesAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			return true;
 		}
@@ -409,7 +411,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

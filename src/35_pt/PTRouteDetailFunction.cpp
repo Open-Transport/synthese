@@ -61,6 +61,7 @@ namespace synthese
 		const string PTRouteDetailFunction::PARAMETER_STOP_PAGE_ID("sp");
 		const string PTRouteDetailFunction::PARAMETER_DISPLAY_DEPARTURE_STOPS("dd");
 		const string PTRouteDetailFunction::PARAMETER_DISPLAY_ARRIVAL_STOPS("da");
+		const string PTRouteDetailFunction::PARAMETER_DISPLAY_SAME_STOP_AREA_ONCE = "display_same_stop_area_once";
 
 		const string PTRouteDetailFunction::TAG_ROUTE("route");
 		const string PTRouteDetailFunction::TAG_STOP("stop");
@@ -92,8 +93,9 @@ namespace synthese
 
 
 		PTRouteDetailFunction::PTRouteDetailFunction():
-		_displayDepartureStops(true),
-		_displayArrivalStops(true)
+			_displayDepartureStops(true),
+			_displayArrivalStops(true),
+			_displaySameStopAreaOnce(false)
 		{}
 
 
@@ -201,6 +203,7 @@ namespace synthese
 
 			_displayDepartureStops = map.getDefault<bool>(PARAMETER_DISPLAY_DEPARTURE_STOPS, true);
 			_displayArrivalStops = map.getDefault<bool>(PARAMETER_DISPLAY_ARRIVAL_STOPS, true);
+			_displaySameStopAreaOnce = map.getDefault<bool>(PARAMETER_DISPLAY_SAME_STOP_AREA_ONCE, false);
 		}
 
 
@@ -233,6 +236,7 @@ namespace synthese
 			);
 
 			// Edges
+			const StopArea* lastConnPlace(NULL);
 			BOOST_FOREACH(const Edge* edge, _journeyPattern->getAllEdges())
 			{
 				if(	(!edge->isDepartureAllowed() || !_displayDepartureStops) &&
@@ -243,6 +247,13 @@ namespace synthese
 
 				const StopPoint* stopPoint(static_cast<const StopPoint *>(edge->getFromVertex()));
 				const StopArea* connPlace(stopPoint->getConnectionPlace());
+
+				// Display same stop area once
+				if(_displaySameStopAreaOnce && connPlace == lastConnPlace)
+				{
+					continue;
+				}
+				lastConnPlace = connPlace;
 
 				shared_ptr<ParametersMap> sm(new ParametersMap);
 				sm->insert(DATA_ID, stopPoint->getKey());

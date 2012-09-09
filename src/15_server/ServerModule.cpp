@@ -208,7 +208,12 @@ namespace synthese
 			try
 			{
 				Log::GetInstance ().debug ("Received request : " +
-					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" + (req.postData.empty() ? string() : " + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+ req.postData.substr(0, 1000) ) );
+					req.uri + " (" + lexical_cast<string>(req.uri.size()) + " bytes)" +
+					(req.postData.empty() ?
+						string() :
+						" + "+ lexical_cast<string>(req.postData.size()) +" bytes of POST data : "+	replace_all_copy(req.postData.substr(0, 1000), "\r\n", string())
+					)
+				);
 
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
 				DynamicRequest request(req);
@@ -515,9 +520,9 @@ namespace synthese
 
 
 
-		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap)
+		void ServerModule::_SetCookieHeaders(HTTPReply& httpReply, const CookiesMap& cookiesMap)
 		{
-			BOOST_FOREACH(const Request::CookiesMap::value_type &cookie, cookiesMap)
+			BOOST_FOREACH(const CookiesMap::value_type &cookie, cookiesMap)
 			{
 				// TODO: proper escaping of cookie values
 				httpReply.headers.insert(

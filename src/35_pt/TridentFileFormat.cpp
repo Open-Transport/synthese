@@ -1042,7 +1042,7 @@ namespace synthese
 		bool TridentFileFormat::Importer_::_parse(
 			const path& filePath,
 			ostream& os,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const server::Request&> adminRequest
 		) const {
 			bool failure(false);
 
@@ -2279,7 +2279,7 @@ namespace synthese
 
 		void TridentFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());

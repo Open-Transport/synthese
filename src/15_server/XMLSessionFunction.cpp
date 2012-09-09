@@ -22,9 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RequestException.h"
-#include "Request.h"
 #include "XMLSessionFunction.h"
+
+#include "Request.h"
+#include "RequestException.h"
+#include "Session.h"
+#include "User.h"
 #include "Webpage.h"
 
 using namespace std;

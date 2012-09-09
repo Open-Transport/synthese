@@ -28,6 +28,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include "SVNRepository.hpp"
+
 namespace synthese
 {
 	class ObjectBase;
@@ -62,7 +64,7 @@ namespace synthese
 				boost::shared_ptr<ObjectBase> _object;
 				std::string _user;
 				std::string _password;
-				std::string _repoURL;
+				SVNRepository _repo;
 
 			protected:
 				//////////////////////////////////////////////////////////////////////////

@@ -591,7 +591,7 @@ namespace synthese
 		bool PegaseFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,
 			std::ostream& os,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const server::Request&> adminRequest
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -1032,7 +1032,7 @@ namespace synthese
 
 		void PegaseFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 				AdminFunctionRequest<DataSourceAdmin> reloadRequest(request);
 				PropertiesHTMLTable t(reloadRequest.getHTMLForm());

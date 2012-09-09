@@ -66,7 +66,7 @@ namespace synthese
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_DB_CONN_STRING("conn_string");
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_STOP_CODE_PREFIX("stop_code_prefix");
 
-		bool IneoRealTimeFileFormat::Importer_::_read( std::ostream& os, boost::optional<const admin::AdminRequest&> adminRequest ) const
+		bool IneoRealTimeFileFormat::Importer_::_read( std::ostream& os, boost::optional<const server::Request&> adminRequest ) const
 		{
 			if(_database.empty() || !_plannedDataSource.get())
 			{
@@ -386,7 +386,7 @@ namespace synthese
 
 
 
-		void IneoRealTimeFileFormat::Importer_::displayAdmin( std::ostream& os, const admin::AdminRequest& request ) const
+		void IneoRealTimeFileFormat::Importer_::displayAdmin( std::ostream& os, const server::Request& request ) const
 		{
 			os << "<h1>Paramètres</h1>";
 

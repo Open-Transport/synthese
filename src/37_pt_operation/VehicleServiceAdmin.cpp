@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "VehicleServiceAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "GlobalRight.h"
 #include "VehicleService.hpp"
 #include "DeadRun.hpp"
@@ -138,7 +141,7 @@ namespace synthese
 
 		void VehicleServiceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -147,7 +150,7 @@ namespace synthese
 			{
 				stream << "<h1>Date</h1>";
 
-				AdminFunctionRequest<VehicleServiceAdmin> openRequest(request);
+				AdminFunctionRequest<VehicleServiceAdmin> openRequest(request, *this);
 				SearchFormHTMLTable f(openRequest.getHTMLForm("date"));
 				stream << f.open();
 				stream << f.cell("Date (vide = pas de filtre)", f.getForm().getCalendarInput(PARAMETER_DATE, _date));
@@ -263,7 +266,7 @@ namespace synthese
 			{
 				stream << "<h1>Date</h1>";
 
-				AdminFunctionRequest<VehicleServiceAdmin> openRequest(request);
+				AdminFunctionRequest<VehicleServiceAdmin> openRequest(request, *this);
 				SearchFormHTMLTable f(openRequest.getHTMLForm("date"));
 				stream << f.open();
 				stream << f.cell("Date (vide = pas de filtre)", f.getForm().getCalendarInput(PARAMETER_DATE, _date));

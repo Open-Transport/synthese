@@ -23,11 +23,13 @@
 */
 
 #include "TestMapAdmin.h"
+
 #include "MapModule.h"
 #include "MapRequest.h"
 #include "JpegRenderer.h"
 #include "PostscriptRenderer.h"
 #include "PropertiesHTMLTable.h"
+#include "User.h"
 #include "AdminFunctionRequest.hpp"
 #include "ModuleAdmin.h"
 #include "AdminParametersException.h"
@@ -91,10 +93,10 @@ namespace synthese
 
 		void TestMapAdmin::display(
 			ostream& stream,
-			const AdminRequest& _request
+			const Request& _request
 		) const	{
 			// Requests
-			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request);
+			AdminFunctionRequest<TestMapAdmin> testMapRequest(_request, *this);
 
 
 			std::string _tempFileUrl;
@@ -158,7 +160,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks TestMapAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const MapModule*>(&module) &&

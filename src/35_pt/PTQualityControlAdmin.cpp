@@ -29,8 +29,10 @@
 #include "JourneyPatternAdmin.hpp"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
+#include "Profile.h"
 #include "ScheduledService.h"
 #include "ServiceAdmin.h"
+#include "User.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "PTModule.h"
@@ -129,7 +131,7 @@ namespace synthese
 
 		void PTQualityControlAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -164,7 +166,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -203,7 +205,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -303,7 +305,7 @@ namespace synthese
 					c.push_back("Action");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
-					AdminActionFunctionRequest<CopyGeometriesAction,PTQualityControlAdmin> copyRequest(request);
+					AdminActionFunctionRequest<CopyGeometriesAction,PTQualityControlAdmin> copyRequest(request, *this);
 
 					stream << t.open();
 					size_t r(0);
@@ -347,7 +349,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -371,7 +373,7 @@ namespace synthese
 					c.push_back("Action");
 					HTMLTable t(c, ResultHTMLTable::CSS_CLASS);
 
-					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction,PTQualityControlAdmin> fixRequest(request);
+					AdminActionFunctionRequest<JourneyPatternRankContinuityRestoreAction,PTQualityControlAdmin> fixRequest(request, *this);
 					AdminFunctionRequest<JourneyPatternAdmin> openRequest(request);
 
 					stream << t.open();
@@ -424,7 +426,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -506,7 +508,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -611,7 +613,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -732,7 +734,7 @@ namespace synthese
 				}
 				else
 				{
-					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request);
+					AdminFunctionRequest<PTQualityControlAdmin> runRequest(request, *this);
 					runRequest.getPage()->setRunControl(true);
 
 					stream <<
@@ -753,7 +755,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTQualityControlAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

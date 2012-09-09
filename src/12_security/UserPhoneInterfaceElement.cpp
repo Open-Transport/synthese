@@ -25,6 +25,7 @@
 #include "UserPhoneInterfaceElement.h"
 
 #include "Request.h"
+#include "User.h"
 #include "ValueElementList.h"
 
 using namespace std;

@@ -39,6 +39,7 @@
 
 #include "ModuleClassTemplate.hpp"
 #include "HTTPConnection.hpp"
+#include "ServerTypes.h"
 
 namespace synthese
 {
@@ -198,7 +199,10 @@ namespace synthese
 
 		private:
 			/// Sets headers in the given HTTPReply from the cookies stored in cookiesMap.
-			static void _SetCookieHeaders(HTTPReply& httpReply, const Request::CookiesMap& cookiesMap);
+			static void _SetCookieHeaders(
+				HTTPReply& httpReply,
+				const CookiesMap& cookiesMap
+			);
 		};
 	}
 	/** @} */

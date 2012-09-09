@@ -119,7 +119,7 @@ namespace synthese
 			const boost::filesystem::path& filePath,
 			std::ostream& os,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const server::Request&> adminRequest
 		) const {
 
 			// SRID
@@ -523,7 +523,7 @@ namespace synthese
 
 		void RoadShapeFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());

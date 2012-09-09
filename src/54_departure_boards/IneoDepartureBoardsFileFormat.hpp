@@ -61,7 +61,7 @@ namespace synthese
 
 				virtual bool _read(
 					std::ostream& os,
-					boost::optional<const admin::AdminRequest&> adminRequest
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 
@@ -79,7 +79,7 @@ namespace synthese
 				/// @date 2010
 				virtual void displayAdmin(
 					std::ostream& os,
-					const admin::AdminRequest& request
+					const server::Request& request
 				) const;
 
 

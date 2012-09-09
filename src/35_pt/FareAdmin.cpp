@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "FareAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "Fare.h"
 #include "FareType.hpp"
 #include "FareUpdateAction.hpp"
@@ -107,13 +110,13 @@ namespace synthese
 
 		void FareAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<FareUpdateAction, FareAdmin> updateRequest(request);
+				AdminActionFunctionRequest<FareUpdateAction, FareAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setFare(const_pointer_cast<Fare>(_fare));
 
 				// General properties

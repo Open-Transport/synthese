@@ -169,7 +169,7 @@ namespace synthese
 			const path& filePath,
 			std::ostream& logStream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			inFile.open(filePath.file_string().c_str());
@@ -810,7 +810,7 @@ namespace synthese
 
 		void HeuresOperationFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const {
 
 			stream << "<h1>Horaires</h1>";

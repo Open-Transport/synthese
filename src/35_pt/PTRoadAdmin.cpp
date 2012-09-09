@@ -27,6 +27,7 @@
 #include "ParametersMap.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "MainRoadPart.hpp"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
@@ -122,7 +123,7 @@ namespace synthese
 
 		void PTRoadAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -135,7 +136,7 @@ namespace synthese
 			// TAB DETAIL
 			if (openTabContent(stream, TAB_DETAIL))
 			{
-				AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
+				AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request, *this);
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 
 				HTMLTable::ColsVector c;

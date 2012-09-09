@@ -28,8 +28,10 @@
 #include "BaseCalendarAdmin.hpp"
 #include "CalendarTemplate.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "StaticActionRequest.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AjaxVectorFieldEditor.hpp"
@@ -118,7 +120,7 @@ namespace synthese
 
 		void FreeDRTTimeSlotAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -127,7 +129,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
+				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setTimeSlot(const_pointer_cast<FreeDRTTimeSlot>(_timeSlot));
 
 				// Properties editor
@@ -157,7 +159,7 @@ namespace synthese
 					static_cast<const CommercialLine*>(_timeSlot->getPath()->getPathGroup())->getNetwork()
 				);
 
-				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request);
+				AdminActionFunctionRequest<FreeDRTTimeSlotUpdateAction, FreeDRTTimeSlotAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setTimeSlot(
 					const_pointer_cast<FreeDRTTimeSlot>(_timeSlot)
 				);

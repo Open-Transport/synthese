@@ -53,7 +53,7 @@ namespace synthese
 			virtual bool _parse(
 				const boost::filesystem::path& filePath,
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const = 0;
 
 			FilePathsSet _pathsSet;
@@ -129,7 +129,7 @@ namespace synthese
 
 			bool parseFiles(
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const {
 
 				// Log stream selection

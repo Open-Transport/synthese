@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "InterfaceAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "InterfaceModule.h"
 #include "InterfaceRight.h"
 #include "Interface.h"
@@ -108,7 +111,7 @@ namespace synthese
 
 		void InterfaceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			HTMLTable::ColsVector c;
@@ -153,7 +156,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks InterfaceAdmin::getSubPagesOfModule(
 			const server::ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -180,7 +183,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks InterfaceAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

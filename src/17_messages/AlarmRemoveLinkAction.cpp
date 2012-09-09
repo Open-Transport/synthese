@@ -22,14 +22,18 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "AlarmRemoveLinkAction.h"
+
 #include "Alarm.h"
 #include "AlarmTableSync.h"
 #include "ActionException.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "ParametersMap.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
-#include "AlarmRemoveLinkAction.h"
 #include "AlarmObjectLinkTableSync.h"
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"

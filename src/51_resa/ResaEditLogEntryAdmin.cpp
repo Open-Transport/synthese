@@ -115,14 +115,14 @@ namespace synthese
 
 		void ResaEditLogEntryAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Requests
-			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<ResaLogEntryUpdateAction,ResaEditLogEntryAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setEntryId(_entry->getKey());
 
-			AdminFunctionRequest<ResaEditLogEntryAdmin> searchRequest(_request);
+			AdminFunctionRequest<ResaEditLogEntryAdmin> searchRequest(_request, *this);
 
 			// Display
 			DBLogEntry::Content content(_entry->getContent());

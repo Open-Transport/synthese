@@ -23,12 +23,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "NewMessageAction.h"
+
 #include "MessagesRight.h"
+#include "Profile.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "SentScenario.h"
 #include "SentScenarioInheritedTableSync.h"
 #include "SentAlarm.h"
+#include "Session.h"
+#include "User.h"
 #include "AlarmTemplate.h"
 #include "AlarmTableSync.h"
 #include "ScenarioTableSync.h"

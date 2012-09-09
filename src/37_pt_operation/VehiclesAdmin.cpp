@@ -23,9 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "VehiclesAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTOperationModule.hpp"
+#include "User.h"
 #include "VehicleAdmin.hpp"
 #include "ActionResultHTMLTable.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -112,18 +115,18 @@ namespace synthese
 
 		void VehiclesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<VehicleAdmin> openRequest(request);
 
-			AdminFunctionRequest<VehiclesAdmin> searchRequest(request);
+			AdminFunctionRequest<VehiclesAdmin> searchRequest(request, *this);
 
 			AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> createRequest(request);
 			createRequest.setActionFailedPage<VehiclesAdmin>();
 			createRequest.setActionWillCreateObject();
 
-			AdminActionFunctionRequest<RemoveObjectAction, VehiclesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, VehiclesAdmin> removeRequest(request, *this);
 
 			// Search
 			VehicleTableSync::SearchResult vehicles(
@@ -197,7 +200,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks VehiclesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -217,7 +220,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks VehiclesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

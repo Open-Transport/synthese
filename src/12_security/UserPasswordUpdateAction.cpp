@@ -21,6 +21,9 @@
 */
 
 #include "UserPasswordUpdateAction.h"
+
+#include "Profile.h"
+#include "Session.h"
 #include "UserTableSync.h"
 #include "SecurityRight.h"
 #include "SecurityLog.h"

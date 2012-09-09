@@ -20,8 +20,10 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "PropertiesHTMLTable.h"
 #include "UserAdmin.h"
+
+#include "PropertiesHTMLTable.h"
+#include "Profile.h"
 #include "UsersAdmin.h"
 #include "User.h"
 #include "UserTableSync.h"
@@ -29,7 +31,6 @@
 #include "UserUpdateAction.h"
 #include "UserPasswordUpdateAction.h"
 #include "AdminActionFunctionRequest.hpp"
-
 #include "AdminParametersException.h"
 #include "AdminInterfaceElement.h"
 #include "SecurityRight.h"
@@ -97,23 +98,23 @@ namespace synthese
 
 		void UserAdmin::display(
 			std::ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
-			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<UserUpdateAction, UserAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setUser(_user);
 
-			AdminActionFunctionRequest<UserPasswordUpdateAction, UserAdmin> userPasswordUpdateRequest(_request);
+			AdminActionFunctionRequest<UserPasswordUpdateAction, UserAdmin> userPasswordUpdateRequest(_request, *this);
 			userPasswordUpdateRequest.getAction()->setUserC(_user);
 
 			bool writeRights(
-				_request.isAuthorized<SecurityRight>(
+				_request.getUser()->getProfile()->isAuthorized<SecurityRight>(
 					WRITE,
 					UNKNOWN_RIGHT_LEVEL,
 					_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER
 				) ||
 				_user->getKey() == _request.getUser()->getKey() &&
-				_request.isAuthorized<SecurityRight>(
+				_request.getUser()->getProfile()->isAuthorized<SecurityRight>(
 					UNKNOWN_RIGHT_LEVEL,
 					WRITE,
 					string()
@@ -137,7 +138,7 @@ namespace synthese
 				stream << t.cell("Téléphone",t.getForm().getTextInput(UserUpdateAction::PARAMETER_PHONE, _user->getPhone()));
 				stream << t.cell("E-mail",t.getForm().getTextInput(UserUpdateAction::PARAMETER_EMAIL, _user->getEMail()));
 
-				if(	_request.isAuthorized<SecurityRight>(
+				if(	_request.getUser()->getProfile()->isAuthorized<SecurityRight>(
 						WRITE,
 						UNKNOWN_RIGHT_LEVEL,
 						_user->getProfile() ? lexical_cast<string>(_user->getProfile()->getKey()) : GLOBAL_PERIMETER

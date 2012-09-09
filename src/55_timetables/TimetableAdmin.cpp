@@ -35,6 +35,7 @@
 #include "TimetableModule.h"
 #include "TimetableGenerateFunction.h"
 #include "TimetableTableSync.h"
+#include "User.h"
 #include "Calendar.h"
 #include "JourneyPattern.hpp"
 #include "CommercialLine.h"
@@ -140,7 +141,7 @@ namespace synthese
 
 		void TimetableAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -148,7 +149,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_PROPERTIES))
 			{
 				// Requests
-				AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<TimetableUpdateAction,TimetableAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
 				// Display
@@ -217,15 +218,15 @@ namespace synthese
 							_requestParameters.raisingOrder
 					)	);
 
-					AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
-					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> addTimetableRequest(_request);
+					AdminFunctionRequest<TimetableAdmin> searchRequest(_request, *this);
+					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> addTimetableRequest(_request, *this);
 					addTimetableRequest.getAction()->setBook(_timetable);
 					addTimetableRequest.setActionWillCreateObject();
 
-					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> copyTimetableRequest(_request);
+					AdminActionFunctionRequest<TimetableAddAction,TimetableAdmin> copyTimetableRequest(_request, *this);
 					copyTimetableRequest.setActionWillCreateObject();
 
-					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> removeRequest(_request);
+					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> removeRequest(_request, *this);
 
 					ActionResultHTMLTable::HeaderVector h3;
 					h3.push_back(make_pair(PARAMETER_RANK, "Rang"));
@@ -252,7 +253,7 @@ namespace synthese
 					);
 
 					// Links to folders or timetable edition
-					AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request);
+					AdminFunctionRequest<TimetableAdmin> editTimetableRequest(_request, *this);
 					BOOST_FOREACH(const shared_ptr<Timetable>& tt, timetables)
 					{
 						editTimetableRequest.getPage()->setTimetable(tt);
@@ -330,14 +331,14 @@ namespace synthese
 					_timetable->getContentType() == Timetable::TIMES_IN_COLS ||
 					_timetable->getContentType() == Timetable::TIMES_IN_ROWS
 				){
-					AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request);
+					AdminActionFunctionRequest<TimetableRowAddAction,TimetableAdmin> addRowRequest(_request, *this);
 					addRowRequest.getAction()->setTimetable(_timetable);
 
-					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> deleteRowRequest(_request);
+					AdminActionFunctionRequest<RemoveObjectAction,TimetableAdmin> deleteRowRequest(_request, *this);
 
-					AdminFunctionRequest<TimetableAdmin> searchRequest(_request);
+					AdminFunctionRequest<TimetableAdmin> searchRequest(_request, *this);
 
-					AdminActionFunctionRequest<TimetableTransferUpdateAction, TimetableAdmin> transferRequest(_request);
+					AdminActionFunctionRequest<TimetableTransferUpdateAction, TimetableAdmin> transferRequest(_request, *this);
 					transferRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
 					stream << "<h1>Arrêts</h1>";
@@ -493,7 +494,7 @@ namespace synthese
 					else // New method
 					{
 						// Row group creation request
-						AdminActionFunctionRequest<ObjectCreateAction, TimetableAdmin> rowGroupCreationRequest(_request);
+						AdminActionFunctionRequest<ObjectCreateAction, TimetableAdmin> rowGroupCreationRequest(_request, *this);
 						rowGroupCreationRequest.getAction()->setTable<TimetableRowGroup>();
 						rowGroupCreationRequest.getAction()->set<Timetable>(const_cast<Timetable&>(*_timetable));
 						rowGroupCreationRequest.getAction()->set<TimetableRowRule>(NecessaryRow);
@@ -502,16 +503,16 @@ namespace synthese
 						rowGroupCreationRequest.getAction()->set<Display>(true);
 
 						// Row group update request
-						AdminActionFunctionRequest<ObjectUpdateAction, TimetableAdmin> rowGroupUpdateRequest(_request);
+						AdminActionFunctionRequest<ObjectUpdateAction, TimetableAdmin> rowGroupUpdateRequest(_request, *this);
 						
 						// Row group item creation request
-						AdminActionFunctionRequest<TimetableRowGroupItemAddAction, TimetableAdmin> rowGroupItemCreationRequest(_request);
+						AdminActionFunctionRequest<TimetableRowGroupItemAddAction, TimetableAdmin> rowGroupItemCreationRequest(_request, *this);
 						
 						// Row group item update request
-						AdminActionFunctionRequest<ObjectUpdateAction, TimetableAdmin> rowGroupItemUpdateRequest(_request);
+						AdminActionFunctionRequest<ObjectUpdateAction, TimetableAdmin> rowGroupItemUpdateRequest(_request, *this);
 
 						// Deletion request
-						AdminActionFunctionRequest<RemoveObjectAction, TimetableAdmin> removeRequest(_request);
+						AdminActionFunctionRequest<RemoveObjectAction, TimetableAdmin> removeRequest(_request, *this);
 
 						// Table header
 						HTMLTable::ColsVector c;
@@ -794,7 +795,7 @@ namespace synthese
 					HTMLTable t3(c3, ResultHTMLTable::CSS_CLASS);
 					stream << t3.open();
 
-					AdminActionFunctionRequest<TimetableSetLineAction,TimetableAdmin> setLineRequest(_request);
+					AdminActionFunctionRequest<TimetableSetLineAction,TimetableAdmin> setLineRequest(_request, *this);
 					setLineRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
 					BOOST_FOREACH(const CommercialLine* line, lines)
@@ -830,7 +831,7 @@ namespace synthese
 						HTMLTable t4(c4, ResultHTMLTable::CSS_CLASS);
 						stream << t4.open();
 
-						AdminActionFunctionRequest<TimetableSetPhysicalStopAction,TimetableAdmin> setStopRequest(_request);
+						AdminActionFunctionRequest<TimetableSetPhysicalStopAction,TimetableAdmin> setStopRequest(_request, *this);
 						setStopRequest.getAction()->setTimetable(const_pointer_cast<Timetable>(_timetable));
 
 						StopPointTableSync::SearchResult stops(
@@ -977,7 +978,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const admin::AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -993,7 +994,7 @@ namespace synthese
 
 
 
-		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages( const admin::AdminInterfaceElement& currentPage, const admin::AdminRequest& request ) const
+		AdminInterfaceElement::PageLinks TimetableAdmin::getSubPages( const admin::AdminInterfaceElement& currentPage, const server::Request& request ) const
 		{
 			AdminInterfaceElement::PageLinks links;
 

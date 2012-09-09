@@ -39,7 +39,6 @@ namespace synthese
 	using namespace db;
 	using namespace util;
 	using namespace calendar;
-	using namespace security;
 
 	template<> const string util::FactorableTemplate<DBTableSync, CalendarLinkTableSync>::FACTORY_KEY(
 		"90.01 Calendar links"

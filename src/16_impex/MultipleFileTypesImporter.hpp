@@ -101,7 +101,7 @@ namespace synthese
 				const boost::filesystem::path& filePath,
 				std::ostream& os,
 				const FileKey& fileKey,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const = 0;
 
 			virtual bool _checkPathsMap() const = 0;
@@ -147,7 +147,7 @@ namespace synthese
 
 			bool parseFiles(
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const {
 
 				// Log stream selection

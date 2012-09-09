@@ -22,8 +22,13 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "AlarmTestOnDisplayScreenFunction.h"
+
+#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "ArrivalDepartureTableRight.h"
 #include "SentAlarm.h"
 #include "AlarmTableSync.h"
@@ -40,7 +45,6 @@
 #include "DesignatedLinePhysicalStop.hpp"
 #include "City.h"
 #include "CommercialLine.h"
-#include "AlarmTestOnDisplayScreenFunction.h"
 #include "GraphConstants.h"
 #include "InterfacePageTableSync.h"
 #include "SentScenario.h"

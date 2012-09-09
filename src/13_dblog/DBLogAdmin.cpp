@@ -102,14 +102,14 @@ namespace synthese
 
 		void DBLogAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 			stream << "<h1>Journal</h1>";
 
 			// Requests
-			AdminFunctionRequest<DBLogAdmin> searchRequest(_request);
+			AdminFunctionRequest<DBLogAdmin> searchRequest(_request, *this);
 
-			AdminActionFunctionRequest<DBLogPurgeAction, DBLogAdmin> purgeRequest(_request);
+			AdminActionFunctionRequest<DBLogPurgeAction, DBLogAdmin> purgeRequest(_request, *this);
 			purgeRequest.getAction()->setDBLog(_viewer.getLogKey());
 
 			_viewer.display(
@@ -143,7 +143,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DBLogAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

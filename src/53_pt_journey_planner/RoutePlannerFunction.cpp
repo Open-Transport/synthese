@@ -27,6 +27,7 @@
 #include "Edge.h"
 #include "HourPeriod.h"
 #include "ObjectNotFoundException.h"
+#include "Session.h"
 #include "JourneyPattern.hpp"
 #include "PlacesListService.hpp"
 #include "PTRoutePlannerResult.h"

@@ -22,9 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "DRTAreaUpdateAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "DRTAreaUpdateAction.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "LineArea.hpp"
 #include "TransportNetworkRight.h"
 #include "Request.h"

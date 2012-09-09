@@ -21,8 +21,12 @@
 */
 
 #include "DisplayScreenAddDisplayedPlaceAction.h"
+
 #include "DisplayScreenTableSync.h"
+#include "Profile.h"
+#include "Session.h"
 #include "StopAreaTableSync.hpp"
+#include "User.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"

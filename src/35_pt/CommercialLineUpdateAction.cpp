@@ -27,13 +27,16 @@
 #include "ActionException.h"
 #include "CommercialLineTableSync.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
 #include "TransportNetworkTableSync.h"
 #include "TreeFolder.hpp"
 #include "TreeFolderTableSync.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

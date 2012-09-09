@@ -26,6 +26,7 @@
 #include "AlgorithmLogger.hpp"
 #include "Edge.h"
 #include "HourPeriod.h"
+#include "Session.h"
 #include "MimeTypes.hpp"
 #include "ObjectNotFoundException.h"
 #include "PTServiceConfigTableSync.hpp"

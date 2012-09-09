@@ -22,9 +22,12 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionResultHTMLTable.h"
-#include "PropertiesHTMLTable.h"
 #include "MessagesScenarioAdmin.h"
+
+#include "ActionResultHTMLTable.h"
+#include "Profile.h"
+#include "PropertiesHTMLTable.h"
+#include "User.h"
 #include "MessagesAdmin.h"
 #include "MessageAdmin.h"
 #include "Scenario.h"
@@ -49,7 +52,6 @@
 #include "MessagesLog.h"
 #include "MessagesLibraryLog.h"
 #include "ScenarioFolder.h"
-#include "Profile.h"
 #include "RemoveObjectAction.hpp"
 #include "ImportableAdmin.hpp"
 #include "StaticActionRequest.h"
@@ -129,7 +131,7 @@ namespace synthese
 
 		void MessagesScenarioAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			shared_ptr<const SentScenario> _sentScenario = dynamic_pointer_cast<const SentScenario>(_scenario);
@@ -140,7 +142,7 @@ namespace synthese
 			// TAB PARAMETERS
 			if (openTabContent(stream, TAB_PARAMETERS))
 			{
-				AdminActionFunctionRequest<ScenarioSaveAction, MessagesScenarioAdmin> updateDatesRequest(_request);
+				AdminActionFunctionRequest<ScenarioSaveAction, MessagesScenarioAdmin> updateDatesRequest(_request, *this);
 				updateDatesRequest.getAction()->setScenarioId(_scenario->getKey());
 
 				stream << "<h1>Paramètres</h1>";
@@ -194,7 +196,7 @@ namespace synthese
 			// TAB MESSAGES
 			if (openTabContent(stream, TAB_MESSAGES))
 			{
-				AdminActionFunctionRequest<RemoveObjectAction,MessagesScenarioAdmin> deleteRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,MessagesScenarioAdmin> deleteRequest(_request, *this);
 
 				AdminActionFunctionRequest<NewMessageAction,MessageAdmin> addRequest(_request);
 				addRequest.setActionWillCreateObject();
@@ -297,7 +299,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_LOG))
 			{
 				// Log search
-				_generalLogView.display(stream, AdminRequest(_request, true));
+				_generalLogView.display(stream, _request);
 			}
 
 			////////////////////////////////////////////////////////////////////
@@ -334,7 +336,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesScenarioAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

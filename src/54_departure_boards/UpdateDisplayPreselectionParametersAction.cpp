@@ -23,6 +23,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "UpdateDisplayPreselectionParametersAction.h"
+
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ActionException.h"

@@ -51,7 +51,7 @@ namespace synthese
 
 			virtual bool _read(
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const = 0;
 
 			virtual void _setFromParametersMap(const util::ParametersMap& map) {}
@@ -77,7 +77,7 @@ namespace synthese
 
 			bool parseFiles(
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const {
 				bool result(true);
 				result &= _read(os, request);

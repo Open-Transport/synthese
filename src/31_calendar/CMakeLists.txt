@@ -58,7 +58,7 @@ target_link_libraries(31_calendar
   14_admin
   15_server
   # Forward dependencies:
-  #36_cms
+  #11_cms
 )
 
 install(TARGETS 31_calendar DESTINATION lib)

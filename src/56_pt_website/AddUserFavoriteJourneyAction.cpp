@@ -22,16 +22,19 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "AddUserFavoriteJourneyAction.h"
+
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "GlobalRight.h"
 #include "UserTableSync.h"
 #include "User.h"
 #include "ObjectNotFoundException.h"
-#include "AddUserFavoriteJourneyAction.h"
 
 using namespace std;
 

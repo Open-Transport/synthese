@@ -22,13 +22,17 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "ActionException.h"
-#include "ParametersMap.h"
 #include "InterfacePageUpdateAction.h"
-#include "InterfaceRight.h"
-#include "Request.h"
+
+#include "ActionException.h"
 #include "InterfacePage.h"
 #include "InterfacePageTableSync.h"
+#include "InterfaceRight.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 

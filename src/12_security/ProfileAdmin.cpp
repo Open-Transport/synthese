@@ -22,11 +22,14 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "ProfileAdmin.h"
+
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "User.h"
 #include "HTMLTable.h"
 #include "HTMLForm.h"
 #include "Profile.h"
-#include "ProfileAdmin.h"
 #include "ProfileTableSync.h"
 #include "UpdateProfileAction.h"
 #include "UpdateRightAction.h"
@@ -106,19 +109,19 @@ namespace synthese
 
 		void ProfileAdmin::display(
 			std::ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
-			AdminActionFunctionRequest<UpdateProfileAction, ProfileAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<UpdateProfileAction, ProfileAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setProfile(_profile);
 
-			AdminActionFunctionRequest<UpdateRightAction, ProfileAdmin> updateRightRequest(_request);
+			AdminActionFunctionRequest<UpdateRightAction, ProfileAdmin> updateRightRequest(_request, *this);
 			updateRightRequest.getAction()->setProfile(_profile);
 
-			AdminActionFunctionRequest<DeleteRightAction,ProfileAdmin> deleteRightRequest(_request);
+			AdminActionFunctionRequest<DeleteRightAction, ProfileAdmin> deleteRightRequest(_request, *this);
 			deleteRightRequest.getAction()->setProfile(_profile);
 
-			AdminActionFunctionRequest<AddRightAction,ProfileAdmin> addRightRequest(_request);
+			AdminActionFunctionRequest<AddRightAction, ProfileAdmin> addRightRequest(_request, *this);
 			addRightRequest.getAction()->setProfile(_profile);
 
 			vector<pair<optional<int>, string> > privatePublicMap;
@@ -262,7 +265,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ProfileAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

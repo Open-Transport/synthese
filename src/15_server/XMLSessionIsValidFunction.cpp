@@ -22,10 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "XMLSessionIsValidFunction.h"
+
 #include "ServerModule.h"
+#include "Session.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "XMLSessionIsValidFunction.h"
 #include "SessionException.h"
 #include "Webpage.h"
 

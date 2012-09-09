@@ -25,13 +25,17 @@
 
 #include "UtilTypes.h"
 #include "StaticFunctionRequest.h"
-#include "AdminFunction.h"
 
 #include <ostream>
 #include <boost/optional.hpp>
 
 namespace synthese
 {
+	namespace admin
+	{
+		class BaseAdminFunctionRequest;
+	}
+
 	namespace server
 	{
 		class Request;
@@ -56,8 +60,7 @@ namespace synthese
 			static void Display(
 				std::ostream& stream,
 				const Calendar& object,
-				boost::optional<const server::StaticFunctionRequest<admin::AdminFunction>&> updateRequest =
-					boost::optional<const server::StaticFunctionRequest<admin::AdminFunction>&>(),
+				boost::optional<const admin::BaseAdminFunctionRequest&> updateRequest =	boost::optional<const admin::BaseAdminFunctionRequest&>(),
 				boost::optional<util::RegistryKeyType> parentTemplateId = boost::optional<util::RegistryKeyType>(),
 				boost::optional<util::RegistryKeyType> parentTemplateId2 = boost::optional<util::RegistryKeyType>()
 			);

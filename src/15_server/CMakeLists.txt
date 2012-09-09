@@ -91,12 +91,11 @@ target_link_libraries(15_server
   01_util
   05_html
   10_db
+  11_cms
   11_interfaces
   12_security
   13_dblog
   14_admin
-  # Forward dependencies:
-  #36_cms
 )
 
 install(TARGETS 15_server DESTINATION lib)

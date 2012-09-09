@@ -22,13 +22,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "TimetableUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "TimetableRight.h"
-#include "TimetableUpdateAction.h"
 #include "Timetable.h"
 #include "TimetableTableSync.h"
+#include "User.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
 #include "Interface.h"

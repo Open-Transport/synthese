@@ -259,6 +259,19 @@ namespace synthese
 				//////////////////////////////////////////////////////////////////////////
 				/// Checks if a journey pattern calls at the specified city
 				bool callsAtCity(const geography::City& city) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if at least one service runs at the specified date.
+				bool runsAtDate(const boost::gregorian::date& day) const;
+
+				
+				
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if at least one service runs at least at one of the active dates
+				/// of the specified calendar.
+				bool runsOnCalendar(const calendar::Calendar& cal) const;
 			//@}
 
 			//! @name Modifiers

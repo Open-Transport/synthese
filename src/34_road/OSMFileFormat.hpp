@@ -83,7 +83,7 @@ namespace synthese
 				virtual bool _parse(
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
-					boost::optional<const admin::AdminRequest&> adminRequest
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 			public:
@@ -108,7 +108,7 @@ namespace synthese
 				/// @since 3.3.0
 				virtual void displayAdmin(
 					std::ostream& os,
-					const admin::AdminRequest& request
+					const server::Request& request
 				) const;
 
 

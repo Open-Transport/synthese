@@ -22,13 +22,17 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "DisplayScreenRemovePhysicalStopAction.h"
+
+#include "Profile.h"
+#include "Session.h"
 #include "StopPoint.hpp"
 #include "StopPointTableSync.hpp"
+#include "User.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
 #include "ArrivalDepartureTableRight.h"
-#include "DisplayScreenRemovePhysicalStopAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"

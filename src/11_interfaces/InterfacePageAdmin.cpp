@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "InterfacePageAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "InterfaceRight.h"
 #include "InterfacePage.h"
 #include "Interface.h"
@@ -107,10 +110,10 @@ namespace synthese
 
 		void InterfacePageAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
-			AdminActionFunctionRequest<InterfacePageUpdateAction,InterfacePageAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<InterfacePageUpdateAction,InterfacePageAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setPage(const_pointer_cast<InterfacePage>(_page));
 
 			PropertiesHTMLTable p(updateRequest.getHTMLForm());

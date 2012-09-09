@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DataSourceAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "ImpExModule.h"
 #include "GlobalRight.h"
 #include "PropertiesHTMLTable.h"
@@ -44,7 +47,6 @@ namespace synthese
 {
 	using namespace html;
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace security;
@@ -123,14 +125,14 @@ namespace synthese
 
 		void DataSourceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
 			// PROPERTIES TAB
 			if(openTabContent(stream, TAB_PROPERTIES))
 			{
-				AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<DataSourceUpdateAction, DataSourceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setDataSource(const_pointer_cast<DataSource>(_dataSource));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("updateds"));
@@ -150,7 +152,7 @@ namespace synthese
 			// MAINTENANCE TAB
 			if(openTabContent(stream, TAB_MAINTENANCE))
 			{
-				AdminActionFunctionRequest<CleanObsoleteDataAction, DataSourceAdmin> cleanRequest(request);
+				AdminActionFunctionRequest<CleanObsoleteDataAction, DataSourceAdmin> cleanRequest(request, *this);
 				cleanRequest.getAction()->setEnv(_env);
 				cleanRequest.getAction()->setDataSource(*_dataSource);
 				PropertiesHTMLTable cleanForm(cleanRequest.getHTMLForm("clean"));

@@ -153,7 +153,7 @@ namespace synthese
 			/// @return true if it is allowed to save the data
 			virtual bool parseFiles(
 				std::ostream& os,
-				boost::optional<const admin::AdminRequest&> request
+				boost::optional<const server::Request&> request
 			) const = 0;
 
 
@@ -176,7 +176,7 @@ namespace synthese
 			/// @date 2010
 			virtual void displayAdmin(
 				std::ostream& os,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const = 0;
 		};
 }	}

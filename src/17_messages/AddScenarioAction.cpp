@@ -23,8 +23,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "AddScenarioAction.h"
+
+#include "Profile.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTemplateInheritedTableSync.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesLibraryLog.h"
 #include "AlarmObjectLink.h"
 #include "AlarmObjectLinkTableSync.h"

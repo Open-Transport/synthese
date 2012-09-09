@@ -31,12 +31,15 @@
 #include "ImportableTableSync.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "StandardFields.hpp"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
 #include "StopPointTableSync.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <geos/geom/Point.h>
 #include <geos/io/WKTReader.h>

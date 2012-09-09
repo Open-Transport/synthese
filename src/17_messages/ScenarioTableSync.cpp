@@ -36,6 +36,8 @@
 #include "MessagesLog.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
+#include "Session.h"
+#include "User.h"
 
 #include <sstream>
 

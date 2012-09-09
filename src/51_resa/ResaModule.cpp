@@ -348,7 +348,7 @@ namespace synthese
 
 		void ResaModule::addAdminPageParameters(
 			ParametersMap& map,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			bool buttonIsAllowed(

@@ -24,7 +24,10 @@
 
 #include "StopAreaTableSync.hpp"
 
+#include "Profile.h"
 #include "ReplaceQuery.h"
+#include "Session.h"
+#include "User.h"
 #include "CityTableSync.h"
 #include "SelectQuery.hpp"
 #include "ImportableTableSync.hpp"

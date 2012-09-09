@@ -61,6 +61,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_PAGE_ID;
 			static const std::string PARAMETER_DISPLAY_DEPARTURE_STOPS;
 			static const std::string PARAMETER_DISPLAY_ARRIVAL_STOPS;
+			static const std::string PARAMETER_DISPLAY_SAME_STOP_AREA_ONCE;
 
 		private:
 			static const std::string TAG_ROUTE;
@@ -97,6 +98,7 @@ namespace synthese
 				bool _displayArrivalStops;
 				boost::shared_ptr<const cms::Webpage> _mainPage;
 				boost::shared_ptr<const cms::Webpage> _stopPage;
+				bool _displaySameStopAreaOnce;
 			//@}
 
 
@@ -135,7 +137,6 @@ namespace synthese
 
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 

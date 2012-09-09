@@ -109,6 +109,8 @@ HeuresFileFormat.cpp
 HeuresFileFormat.hpp
 IneoFileFormat.cpp
 IneoFileFormat.hpp
+IneoNCEConnection.cpp
+IneoNCEConnection.hpp
 IneoRealTimeFileFormat.cpp
 IneoRealTimeFileFormat.hpp
 JourneyPattern.cpp
@@ -344,7 +346,7 @@ target_link_libraries(35_pt
   33_algorithm
   34_road
   # Forward dependencies:
-  #36_cms
+  #11_cms
   #39_map
   expat
 )

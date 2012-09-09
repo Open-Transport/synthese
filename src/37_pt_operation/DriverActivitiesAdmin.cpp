@@ -29,9 +29,12 @@
 #include "AdminParametersException.h"
 #include "DriverActivity.hpp"
 #include "DriverActivityAdmin.hpp"
+#include "GlobalRight.h"
 #include "ObjectCreateAction.hpp"
+#include "Profile.h"
 #include "RemoveObjectAction.hpp"
 #include "ResultHTMLTable.h"
+#include "User.h"
 #include "ParametersMap.h"
 #include "PTOperationModule.hpp"
 
@@ -86,22 +89,22 @@ namespace synthese
 		bool DriverActivitiesAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-			return true;
+			return user.getProfile()->isAuthorized<GlobalRight>(READ);
 		}
 
 
 
 		void DriverActivitiesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
-			AdminActionFunctionRequest<ObjectCreateAction, DriverActivitiesAdmin> createRequest(request);
+			AdminActionFunctionRequest<ObjectCreateAction, DriverActivitiesAdmin> createRequest(request, *this);
 			createRequest.getAction()->setTable<DriverActivity>();
 
 			AdminFunctionRequest<DriverActivityAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, DriverActivitiesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DriverActivitiesAdmin> removeRequest(request, *this);
 
 			HTMLTable::ColsVector h;
 			h.push_back(string());
@@ -154,7 +157,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DriverActivitiesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -174,7 +177,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DriverActivitiesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

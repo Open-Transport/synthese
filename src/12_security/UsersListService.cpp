@@ -24,7 +24,9 @@
 
 #include "UsersListService.hpp"
 
+#include "Profile.h"
 #include "SecurityRight.h"
+#include "Session.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "UserTableSync.h"

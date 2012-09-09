@@ -22,18 +22,21 @@
 
 #include "CreateDisplayScreenAction.h"
 
-#include "DisplayScreenTableSync.h"
-#include "DeparturesTableModule.h"
+#include "ActionException.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"
-#include "ActionException.h"
-#include "ParametersMap.h"
-#include "Request.h"
-#include "StopArea.hpp"
-#include "StopAreaTableSync.hpp"
+#include "DeparturesTableModule.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "DisplayScreenTableSync.h"
 #include "Fetcher.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
+#include "StopArea.hpp"
+#include "StopAreaTableSync.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DataSourcesAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "GlobalRight.h"
 #include "ImpExModule.h"
 #include "DataSource.h"
@@ -46,7 +49,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace impex;
@@ -109,12 +111,12 @@ namespace synthese
 
 		void DataSourcesAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			stream << "<h1>Sources de données</h1>";
 
-			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request);
+			AdminFunctionRequest<DataSourcesAdmin> searchRequest(request, *this);
 
 			AdminFunctionRequest<DataSourceAdmin> openRequest(request);
 
@@ -122,7 +124,7 @@ namespace synthese
 			addRequest.setActionWillCreateObject();
 			addRequest.setActionFailedPage<DataSourcesAdmin>();
 
-			AdminActionFunctionRequest<RemoveObjectAction, DataSourcesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DataSourcesAdmin> removeRequest(request, *this);
 
 			DataSourceTableSync::SearchResult dataSources(
 				DataSourceTableSync::Search(
@@ -175,7 +177,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -195,7 +197,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DataSourcesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

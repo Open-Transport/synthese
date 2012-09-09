@@ -39,7 +39,6 @@ namespace synthese
 	using namespace db;
 	using namespace pt;
 	using namespace pt_operation;
-	using namespace security;
 	using namespace util;
 
 

@@ -26,8 +26,7 @@
 #ifndef SYNTHESE_AdminFunctionRequest_h__
 #define SYNTHESE_AdminFunctionRequest_h__
 
-#include "StaticFunctionRequest.h"
-#include "AdminFunction.h"
+#include "BaseAdminFunctionRequest.hpp"
 
 namespace synthese
 {
@@ -38,42 +37,29 @@ namespace synthese
 		/// @ingroup m14
 		template<class P>
 		class AdminFunctionRequest:
-			public server::StaticFunctionRequest<AdminFunction>
+			public BaseAdminFunctionRequest
 		{
 		public:
 			AdminFunctionRequest(
-				const server::StaticFunctionRequest<AdminFunction>& request
+				const server::Request& request,
+				const P& currentPage
 			):	server::Request(request),
-				server::StaticFunctionRequest<AdminFunction>(request, true)
-			{
-				boost::shared_ptr<AdminInterfaceElement> page(request.getFunction()->getPage());
-				boost::shared_ptr<P> p;
-				if(page)
-				{
-					P* ppage(dynamic_cast<P*>(page.get()));
-					if(ppage)
-					{
-						p = ppage->getNewCopiedPage();
-					}
-					else
-					{
-						p = page->getNewPage<P>();
-					}
-				}
-				else
-				{
-					p.reset(new P);
-				}
-				this->getFunction()->setPage(p);
-			}
+				BaseAdminFunctionRequest(request, currentPage.getNewCopiedPage())
+			{}
+
+
+
+			AdminFunctionRequest(
+				const server::Request& request
+			):	server::Request(request),
+				BaseAdminFunctionRequest(request, boost::shared_ptr<P>(new P))
+			{}
 
 
 
 			boost::shared_ptr<P> getPage() const
 			{
-				return boost::static_pointer_cast<P, AdminInterfaceElement>(
-					this->getFunction()->getPage()
-				);
+				return boost::static_pointer_cast<P, AdminInterfaceElement>(_page);
 			}
 		};
 }	}

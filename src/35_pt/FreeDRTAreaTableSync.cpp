@@ -22,11 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "FreeDRTAreaTableSync.hpp"
+
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
+#include "User.h"
 #include "CommercialLineTableSync.h"
 #include "CityTableSync.h"
 #include "StopAreaTableSync.hpp"
@@ -35,6 +37,7 @@
 #include "TransportNetworkRight.h"
 #include "PTUseRuleTableSync.h"
 
+#include <sstream>
 #include <boost/algorithm/string/split.hpp>
 
 using namespace std;

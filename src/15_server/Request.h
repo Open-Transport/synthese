@@ -25,9 +25,7 @@
 #ifndef SYNTHESE_Request_H__
 #define SYNTHESE_Request_H__
 
-#include "Session.h"
-#include "User.h"
-#include "Profile.h"
+#include "ServerTypes.h"
 #include "SecurityTypes.hpp"
 #include "SecurityConstants.hpp"
 #include "ParametersMap.h"
@@ -35,10 +33,16 @@
 
 namespace synthese
 {
+	namespace security
+	{
+		class User;
+	}
+
 	namespace server
 	{
 		class Action;
 		class Function;
+		class Session;
 
 		/** Parsed request.
 			@ingroup m15
@@ -102,7 +106,6 @@ namespace synthese
 		class Request
 		{
 		public:
-			typedef std::map<std::string, std::pair<std::string, int> > CookiesMap;
 
 			/** Exception asking the server to redirect.
 				@ingroup m15
@@ -244,7 +247,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
-				util::ParametersMap _getParametersMap() const;
+				virtual util::ParametersMap _getParametersMap() const;
 				virtual util::ParametersMap getParametersMap() const { return _getParametersMap(); }
 
 				/** Run of the services.
@@ -253,13 +256,6 @@ namespace synthese
 					@date 2007
 				*/
 				void run(std::ostream& stream);
-
-				template<class R>
-				bool isAuthorized(
-					security::RightLevel publicr = security::USE,
-					security::RightLevel privater = security::UNKNOWN_RIGHT_LEVEL,
-					std::string parameter = security::GLOBAL_PERIMETER
-				) const;
 
 				bool isActionFunctionAuthorized() const;
 
@@ -294,24 +290,6 @@ namespace synthese
 				*/
 				std::string getURI() const;
 			//@}
-
 		};
-
-
-		template <class R>
-		bool Request::isAuthorized(
-			security::RightLevel publicr,
-			security::RightLevel privater,
-			std::string parameter /*= security::GLOBAL_PERIMETER*/
-		) const	{
-			if (_session == NULL ||
-				_session->getUser() == NULL ||
-				_session->getUser()->getProfile() == NULL
-			){
-				return false;
-			}
-			return _session->getUser()->getProfile()->isAuthorized<R>(publicr, privater, parameter);
-		}
-	}
-}
+}	}
 #endif // SYNTHESE_Request_H__

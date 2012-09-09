@@ -23,11 +23,14 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ReservationAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "ReservationTableSync.h"
+#include "User.h"
 #include "CommercialLine.h"
 #include "ReservationTransaction.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -118,13 +121,13 @@ namespace synthese
 
 		void ReservationAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
-			AdminActionFunctionRequest<ReservationUpdateAction, ReservationAdmin> updateRequest(request);
+			AdminActionFunctionRequest<ReservationUpdateAction, ReservationAdmin> updateRequest(request, *this);
 			updateRequest.getAction()->setReservation(const_pointer_cast<Reservation>(_resa));
 
-			AdminFunctionRequest<ReservationAdmin> openRequest(request);
+			AdminFunctionRequest<ReservationAdmin> openRequest(request, *this);
 
 			AdminFunctionRequest<ResaCustomerAdmin> openCustomer(request);
 			shared_ptr<const User> user(UserTableSync::Get(_resa->getTransaction()->getCustomerUserId(), *_env));

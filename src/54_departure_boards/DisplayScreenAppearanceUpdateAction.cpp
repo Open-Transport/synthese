@@ -22,12 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// Server
+#include "DisplayScreenAppearanceUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
-#include "DisplayScreenAppearanceUpdateAction.h"
 #include "ArrivalDepartureTableRight.h"
 #include "Request.h"
 #include "DBLogModule.h"

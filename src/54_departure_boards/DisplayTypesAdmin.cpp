@@ -20,14 +20,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DisplayTypesAdmin.h"
+
+#include "AdminInterfaceElement.h"
 #include "HTMLForm.h"
 #include "Interface.h"
+#include "Profile.h"
 #include "StaticActionFunctionRequest.h"
-#include "AdminInterfaceElement.h"
+#include "User.h"
 #include "ModuleAdmin.h"
 #include "DisplayType.h"
 #include "DeparturesTableModule.h"
-#include "DisplayTypesAdmin.h"
 #include "CreateDisplayTypeAction.h"
 #include "UpdateDisplayTypeAction.h"
 #include "DisplayTypeTableSync.h"
@@ -102,22 +105,23 @@ namespace synthese
 
 		void DisplayTypesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Right
-			bool writeRight(_request.isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
+			bool writeRight(_request.getUser()->getProfile()->isAuthorized<ArrivalDepartureTableRight>(WRITE, UNKNOWN_RIGHT_LEVEL, GLOBAL_PERIMETER));
 
-			AdminFunctionRequest<DisplayTypesAdmin> searchRequest(_request);
+			AdminFunctionRequest<DisplayTypesAdmin> searchRequest(_request, *this);
 
 			AdminActionFunctionRequest<CreateDisplayTypeAction,DisplayTypeAdmin> createRequest(
 				_request
 			);
 			createRequest.setActionWillCreateObject();
-			createRequest.getFunction()->setActionFailedPage<DisplayTypesAdmin>();
+			createRequest.setActionFailedPage<DisplayTypesAdmin>();
 
 			AdminActionFunctionRequest<RemoveObjectAction,DisplayTypesAdmin> deleteRequest(
-				_request
+				_request,
+				*this
 			);
 
 			AdminFunctionRequest<DisplayTypeAdmin> openRequest(_request);
@@ -266,7 +270,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -284,7 +288,7 @@ namespace synthese
 
 		bool DisplayTypesAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return true;
 		}
@@ -293,7 +297,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplayTypesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 
 			DisplayTypeTableSync::SearchResult types(

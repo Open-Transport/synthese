@@ -22,9 +22,13 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "CalendarTemplateCleanAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "CalendarTemplateCleanAction.hpp"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "CalendarRight.h"
 #include "Request.h"
 #include "CalendarTemplateTableSync.h"

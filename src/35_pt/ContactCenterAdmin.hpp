@@ -101,7 +101,7 @@ namespace synthese
 			///	@date 2012
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				const server::Request& _request
 			) const;
 
 
