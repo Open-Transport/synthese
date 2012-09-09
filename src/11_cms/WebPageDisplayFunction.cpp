@@ -22,15 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RequestException.h"
-#include "Request.h"
 #include "WebPageDisplayFunction.h"
-#include "Env.h"
-#include "Interface.h"
-#include "Webpage.h"
-#include "Website.hpp"
+
 #include "Action.h"
 #include "CMSModule.hpp"
+#include "Env.h"
+#include "Request.h"
+#include "RequestException.h"
+#include "Webpage.h"
+#include "Website.hpp"
 
 #include <boost/algorithm/string/split.hpp>
 
@@ -44,10 +44,9 @@ namespace synthese
 	using namespace util;
 	using namespace server;
 	using namespace security;
-	using namespace interfaces;
 	using namespace cms;
 
-	template<> const string util::FactorableTemplate<FunctionWithSite<false>,WebPageDisplayFunction>::FACTORY_KEY("page");
+	template<> const string util::FactorableTemplate<Function, WebPageDisplayFunction>::FACTORY_KEY("page");
 
 	namespace cms
 	{
@@ -200,7 +199,6 @@ namespace synthese
 
 					ParametersMap pm(getTemplateParameters());
 					pm.remove(PARAMETER_PAGE_ID);
-					pm.remove(FunctionWithSiteBase::PARAMETER_SITE);
 					stringstream uri;
 					pm.outputURI(uri);
 					string parameters(uri.str());
