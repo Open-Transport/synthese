@@ -4,7 +4,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
 
 set(DEPS
   20_tree
-  36_cms # from admin
+  11_cms # from admin
 )
 
 boost_test(Tree "${DEPS}")

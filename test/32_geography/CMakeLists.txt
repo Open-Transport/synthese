@@ -17,7 +17,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 set(DEPS
   32_geography
   56_pt_website # from cms
-  36_cms # from admin
+  11_cms # from admin
   15_server # from db
   59_road_journey_planner # from 56_pt_website
 )

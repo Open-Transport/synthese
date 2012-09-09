@@ -22,7 +22,7 @@ set(DEPS
   20_tree
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from cms
-  36_cms # from pt
+  11_cms # from pt
   35_pt
 )
 
