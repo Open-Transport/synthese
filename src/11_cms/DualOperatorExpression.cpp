@@ -140,8 +140,8 @@ namespace synthese
 			case BIT_OR:
 				try
 				{
-					int leftInt(lexical_cast<int>(left));
-					int rightInt(lexical_cast<int>(right));
+					long long int leftInt(lexical_cast<long long int>(left));
+					long long int rightInt(lexical_cast<long long int>(right));
 
 					switch(_operator)
 					{
