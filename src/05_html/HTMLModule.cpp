@@ -43,7 +43,7 @@ namespace synthese
 		){
 			return getHTMLLink(
 				url,
-				(icon.empty() ? string() : getHTMLImage(icon, caption)) + "&nbsp;" + caption,
+				(icon.empty() ? string() : getHTMLImage(icon, string(), caption)) + "&nbsp;" + caption,
 				confirm,
 				useOnclick,
 				string(),
