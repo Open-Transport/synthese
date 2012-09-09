@@ -125,7 +125,7 @@ namespace synthese
 
 		void ResaCustomerAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -135,12 +135,14 @@ namespace synthese
 
 				// Requests
 				AdminActionFunctionRequest<ReservationUserUpdateAction,ResaCustomerAdmin> updateRequest(
-					_request
+					_request,
+					*this
 				);
 				updateRequest.getAction()->setUser(_user);
 
 				AdminActionFunctionRequest<SendPasswordAction,ResaCustomerAdmin> sendPasswordRequest(
-					_request
+					_request,
+					*this
 				);
 				sendPasswordRequest.getAction()->setUser(_user);
 
@@ -212,7 +214,7 @@ namespace synthese
 				// Results
 				_log.display(
 					stream,
-					AdminRequest(_request, true),
+					_request,
 					true,
 					true
 				);
@@ -280,7 +282,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaCustomerAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			PageLinks result;
 			if(	dynamic_cast<const ResaModule*>(&module))

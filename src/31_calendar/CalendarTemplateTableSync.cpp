@@ -23,14 +23,17 @@
 */
 
 #include "CalendarTemplateTableSync.h"
-#include "CalendarTemplateElementTableSync.h"
 
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "SQLSingleOperatorExpression.hpp"
+#include "CalendarTemplateElementTableSync.h"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
 #include "ImportableTableSync.hpp"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
+#include "SQLSingleOperatorExpression.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

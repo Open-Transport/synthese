@@ -27,8 +27,10 @@
 #include "AdminParametersException.h"
 #include "MainRoadChunk.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "RoadPlace.h"
 #include "ResultHTMLTable.h"
 #include "MainRoadPart.hpp"
@@ -37,7 +39,6 @@
 #include "PTCitiesAdmin.h"
 #include "PTPlacesAdmin.h"
 #include "City.h"
-#include "Profile.h"
 
 using namespace std;
 using namespace boost;
@@ -111,7 +112,7 @@ namespace synthese
 
 		void PTRoadsAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminFunctionRequest<PTRoadAdmin> openRoadRequest(request);
@@ -203,7 +204,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTRoadsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

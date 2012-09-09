@@ -27,6 +27,8 @@
 #include "AdminParametersException.h"
 #include "BaseCalendarAdmin.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "DriverService.hpp"
 #include "HTMLTable.h"
 #include "SchedulesBasedService.h"
@@ -126,7 +128,7 @@ namespace synthese
 
 		void DriverServiceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -283,7 +285,7 @@ namespace synthese
 			if(openTabContent(stream, TAB_CALENDAR))
 			{
 				// Update request
-				AdminActionFunctionRequest<DriverServiceUpdateAction, DriverServiceAdmin> updateDateRequest(request);
+				AdminActionFunctionRequest<DriverServiceUpdateAction, DriverServiceAdmin> updateDateRequest(request, *this);
 				updateDateRequest.getAction()->setDriverService(const_pointer_cast<DriverService>(_driverService));
 
 				// Display

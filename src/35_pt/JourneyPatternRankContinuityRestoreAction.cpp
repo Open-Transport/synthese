@@ -22,10 +22,14 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "JourneyPatternRankContinuityRestoreAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "JourneyPatternRankContinuityRestoreAction.hpp"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "JourneyPatternTableSync.hpp"
 #include "LineStopTableSync.h"
 #include "TransportNetworkRight.h"

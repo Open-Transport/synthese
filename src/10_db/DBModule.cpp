@@ -29,6 +29,7 @@
 #include "DBTableSync.hpp"
 #include "DBException.hpp"
 #include "DBTransaction.hpp"
+#include "Env.h"
 #include "Factory.h"
 #include "Log.h"
 #include "ServerModule.h"

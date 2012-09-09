@@ -26,7 +26,10 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
+#include "User.h"
 #include "Request.h"
 #include "GeographyModule.h"
 #include "PTServiceConfig.hpp"

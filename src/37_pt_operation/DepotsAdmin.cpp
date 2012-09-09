@@ -23,9 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DepotsAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTOperationModule.hpp"
+#include "User.h"
 #include "GlobalRight.h"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminFunctionRequest.hpp"
@@ -107,18 +110,18 @@ namespace synthese
 
 		void DepotsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<DepotAdmin> openRequest(request);
 
-			AdminFunctionRequest<DepotsAdmin> searchRequest(request);
+			AdminFunctionRequest<DepotsAdmin> searchRequest(request, *this);
 
-			AdminActionFunctionRequest<DepotUpdateAction, DepotsAdmin> createRequest(request);
+			AdminActionFunctionRequest<DepotUpdateAction, DepotsAdmin> createRequest(request, *this);
 			createRequest.setActionFailedPage<DepotsAdmin>();
 			createRequest.setActionWillCreateObject();
 
-			AdminActionFunctionRequest<RemoveObjectAction, DepotsAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DepotsAdmin> removeRequest(request, *this);
 
 			// Search
 			DepotTableSync::SearchResult depots(
@@ -181,7 +184,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DepotsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -201,7 +204,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DepotsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

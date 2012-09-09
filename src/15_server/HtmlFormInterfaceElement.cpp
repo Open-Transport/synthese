@@ -23,11 +23,10 @@
 #include "HtmlFormInterfaceElement.h"
 
 #include "DynamicRequest.h"
+#include "Session.h"
 #include "HTTPRequest.hpp"
 #include "Action.h"
-
 #include "FactoryException.h"
-
 #include "HTMLForm.h"
 #include "URI.hpp"
 #include "ValueElementList.h"

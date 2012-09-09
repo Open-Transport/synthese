@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "HikingTrailsAdmin.h"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "HikingModule.h"
 #include "HikingRight.h"
 #include "HikingTrailTableSync.h"
@@ -106,12 +109,12 @@ namespace synthese
 
 		void HikingTrailsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			stream << "<h1>Recherche</h1>";
 
-			AdminFunctionRequest<HikingTrailsAdmin> searchRequest(_request);
+			AdminFunctionRequest<HikingTrailsAdmin> searchRequest(_request, *this);
 
 			SearchFormHTMLTable st(searchRequest.getHTMLForm());
 			stream << st.open();
@@ -124,7 +127,7 @@ namespace synthese
 
 			AdminFunctionRequest<HikingTrailAdmin> openRequest(_request);
 
-			AdminActionFunctionRequest<RemoveObjectAction,HikingTrailsAdmin> removeRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,HikingTrailsAdmin> removeRequest(_request, *this);
 
 			AdminActionFunctionRequest<HikingTrailAddAction,HikingTrailAdmin> addRequest(_request);
 			addRequest.setActionWillCreateObject();
@@ -162,7 +165,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks HikingTrailsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -182,7 +185,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks HikingTrailsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

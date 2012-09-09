@@ -22,15 +22,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "XMLReservationFunction.h"
+
+#include "Profile.h"
 #include "ResaRight.h"
 #include "RequestException.h"
-#include "XMLReservationFunction.h"
 #include "Request.h"
 #include "ReservationTableSync.h"
 #include "ReservationTransactionTableSync.h"
 #include "Reservation.h"
 #include "ReservationTransaction.h"
 #include "ResaModule.h"
+#include "Session.h"
+#include "User.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 

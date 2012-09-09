@@ -37,7 +37,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace security;
 	using namespace pt_operation;
 	using namespace impex;
 

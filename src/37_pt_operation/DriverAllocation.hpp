@@ -27,6 +27,7 @@
 
 #include "DriverActivity.hpp"
 #include "DriverAllocationTemplate.hpp"
+#include "User.h"
 
 #include <vector>
 #include <boost/optional.hpp>
@@ -34,11 +35,6 @@
 
 namespace synthese
 {
-	namespace security
-	{
-		class User;
-	}
-
 	namespace pt_operation
 	{
 		FIELD_TYPE(Driver, boost::optional<security::User&>)

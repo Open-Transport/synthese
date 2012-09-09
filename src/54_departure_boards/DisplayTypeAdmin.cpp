@@ -24,6 +24,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayTypeAdmin.h"
+
 #include "DisplayTypesAdmin.h"
 #include "DeparturesTableModule.h"
 #include "AdminActionFunctionRequest.hpp"
@@ -31,7 +32,9 @@
 #include "AdminParametersException.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "User.h"
 #include "UpdateDisplayTypeAction.h"
 #include "AdminInterfaceElement.h"
 #include "Interface.h"
@@ -39,7 +42,6 @@
 #include "DeparturesTableInterfacePage.h"
 #include "ParseDisplayReturnInterfacePage.h"
 #include "InterfaceTableSync.h"
-#include "Profile.h"
 #include "Webpage.h"
 #include "WebPageTableSync.h"
 #include "RemoveObjectAction.hpp"
@@ -108,10 +110,10 @@ namespace synthese
 
 		void DisplayTypeAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 			// Requests
-			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(_request);
+			AdminActionFunctionRequest<UpdateDisplayTypeAction,DisplayTypeAdmin> updateRequest(_request, *this);
 			updateRequest.getAction()->setTypeId(_type->getKey());
 
 			AdminActionFunctionRequest<RemoveObjectAction,DisplayTypesAdmin> deleteRequest(_request);

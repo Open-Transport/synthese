@@ -21,8 +21,6 @@
 */
 
 #include "AdminModule.h"
-#include "AdminInterfaceElement.h"
-#include "AdminFunction.h"
 
 using namespace boost;
 using namespace std;
@@ -60,25 +58,4 @@ namespace synthese
 		const std::string AdminModule::TABLE_COL_ID = "id";
 		const std::string AdminModule::CSS_TIME_INPUT = "time_input";
 		const std::string AdminModule::CSS_2DIGIT_INPUT = "two_digit_input";
-
-
-
-		void AdminModule::ChangePageInRequest(
-			server::Request& request,
-			const std::string& oldPage,
-			const std::string& newPage
-		){
-			AdminFunction* ar(dynamic_cast<AdminFunction*>(request.getFunction().get()));
-			if(ar != NULL)
-			{
-				if(ar->getPage()->getFactoryKey() == oldPage)
-				{
-					ar->setPage(
-						shared_ptr<AdminInterfaceElement>(Factory<AdminInterfaceElement>::create(newPage))
-					);
-				}
-			}
-		}
-	}
-}
-
+}	}

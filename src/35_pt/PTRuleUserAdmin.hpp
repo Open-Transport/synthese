@@ -49,7 +49,7 @@ namespace synthese
 			static void Display(
 				std::ostream& stream,
 				boost::shared_ptr<const ObjectType> object,
-				const admin::AdminRequest& request,
+				const server::Request& request,
 				bool pedestrian = true,
 				bool handicapped = true,
 				bool bikes = true
@@ -62,7 +62,7 @@ namespace synthese
 		void PTRuleUserAdmin<ObjectType,AdminPage>::Display(
 			std::ostream& stream,
 			boost::shared_ptr<const ObjectType> object,
-			const admin::AdminRequest& request,
+			const server::Request& request,
 			bool pedestrian,
 			bool handicapped,
 			bool bikes

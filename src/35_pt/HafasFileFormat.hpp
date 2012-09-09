@@ -162,10 +162,17 @@ namespace synthese
 
 				struct Zug
 				{
+					struct CalendarUse
+					{
+						std::size_t calendarNumber;
+						std::string startStopCode;
+						std::string endStopCode;
+					};
+
 					std::string number;
 					std::string lineNumber;
 					std::size_t version;
-					std::size_t calendarNumber;
+					std::vector<CalendarUse> calendars;
 					std::string transportModeCode;
 					boost::posix_time::time_duration continuousServiceRange;
 					boost::posix_time::time_duration continuousServiceWaitingTime;
@@ -243,7 +250,7 @@ namespace synthese
 
 				void _showBahnhofScreen(
 					std::ostream& os,
-					boost::optional<const admin::AdminRequest&> adminRequest
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 				bool _importObjects(std::ostream& os) const;
@@ -256,7 +263,7 @@ namespace synthese
 					const boost::filesystem::path& filePath,
 					std::ostream& os,
 					const std::string& key,
-					boost::optional<const admin::AdminRequest&> adminRequest
+					boost::optional<const server::Request&> adminRequest
 				) const;
 
 
@@ -283,7 +290,7 @@ namespace synthese
 				/// @date 2010
 				virtual void displayAdmin(
 					std::ostream& os,
-					const admin::AdminRequest& request
+					const server::Request& request
 				) const;
 
 

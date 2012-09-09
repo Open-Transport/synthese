@@ -20,11 +20,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "AddPreselectionPlaceToDisplayScreenAction.h"
+
 #include "ActionException.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "ParametersMap.h"
 #include "ArrivalDepartureTableRight.h"
-#include "AddPreselectionPlaceToDisplayScreenAction.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "StopAreaTableSync.hpp"

@@ -27,9 +27,12 @@
 #include "FreeDRTArea.hpp"
 #include "FreeDRTTimeSlot.hpp"
 #include "PlacesListService.hpp"
+#include "Profile.h"
 #include "ResaRight.h"
 #include "RequestException.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;

@@ -20,17 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "FareTableSync.h"
 
 #include "Conversion.h"
-
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
-#include "FareTableSync.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
+#include <sstream>
 #include <boost/foreach.hpp>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>

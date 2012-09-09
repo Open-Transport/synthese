@@ -111,7 +111,7 @@ add_library(17_messages ${messages_SRCS})
 target_link_libraries(17_messages
   12_security
   # Forward dependencies:
-  #36_cms
+  #11_cms
 )
 
 install(TARGETS 17_messages DESTINATION lib)

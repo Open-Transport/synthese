@@ -108,8 +108,8 @@ namespace synthese
 				_password = map.getDefault<string>(PARAMETER_PASSWORD);
 
 				// Repository URL
-				_repoURL = map.getDefault<string>(PARAMETER_REPO_URL);
-				if(_repoURL.empty())
+				_repo = SVNRepository(map.getDefault<string>(PARAMETER_REPO_URL));
+				if(_repo.getURL().empty())
 				{
 					throw ActionException("Repository URL must be non empty");
 				}
@@ -120,10 +120,10 @@ namespace synthese
 			void SVNWorkingCopyCreateAction::run(
 				Request& request
 			){
-
 				SVNWorkingCopy wc;
 				wc.setObject(_object.get());
-				wc.setRepoURL(_repoURL);
+
+				wc.setRepo(_repo);
 				_object->dynamic_set<SVNWorkingCopy>(wc);
 				wc.create(_user, _password);
 

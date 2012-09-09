@@ -971,7 +971,7 @@ namespace synthese
 
 		void PTFileFormat::DisplayStopAreaImportScreen(
 			const ImportableStopAreas& objects,
-			const admin::AdminRequest& request,
+			const server::Request& request,
 			bool createCityIfNecessary,
 			bool createPhysicalStop,
 			boost::shared_ptr<const geography::City> defaultCity,
@@ -1077,7 +1077,7 @@ namespace synthese
 
 		void PTFileFormat::DisplayStopPointImportScreen(
 			const ImportableStopPoints& objects,
-			const admin::AdminRequest& request,
+			const server::Request& request,
 			util::Env& env,
 			const impex::DataSource& source,
 			std::ostream& stream

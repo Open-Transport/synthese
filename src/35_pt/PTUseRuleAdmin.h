@@ -110,7 +110,7 @@ namespace synthese
 			///	@date 2010
 			void display(
 				std::ostream& stream,
-				const admin::AdminRequest& _request
+				const server::Request& _request
 			) const;
 
 

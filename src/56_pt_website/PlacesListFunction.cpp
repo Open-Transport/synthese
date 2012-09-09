@@ -22,6 +22,7 @@
 
 #include "PlacesListFunction.h"
 
+#include "Request.h"
 #include "TransportWebsiteTypes.hpp"
 #include "PTServiceConfigTableSync.hpp"
 #include "TransportWebsiteModule.h"

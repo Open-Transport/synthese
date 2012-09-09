@@ -28,10 +28,12 @@
 #include "HTTPRequest.hpp"
 #include "Function.h"
 #include "RequestException.h"
+#include "Session.h"
 #include "SessionException.h"
 #include "User.h"
 #include "UserException.h"
 #include "UserTableSync.h"
+#include "WebPageDisplayFunction.h"
 
 #include <boost/algorithm/string.hpp>
 
@@ -325,13 +327,13 @@ namespace synthese
 			}
 			if(functionName.empty() && _redirectAfterAction && !_clientURL.empty())
 			{
-				functionName = "page";
+				functionName = WebPageDisplayFunction::FACTORY_KEY;
 				_getPostParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
 				_allParametersMap.insert(Request::PARAMETER_SERVICE, functionName);
-				_getPostParametersMap.insert("smart_url", _clientURL);
-				_getPostParametersMap.insert("host_name", _hostName);
-				_allParametersMap.insert("smart_url", _clientURL);
-				_allParametersMap.insert("host_name", _hostName);
+				_getPostParametersMap.insert(WebPageDisplayFunction::PARAMETER_SMART_URL, _clientURL);
+				_getPostParametersMap.insert(WebPageDisplayFunction::PARAMETER_HOST_NAME, _hostName);
+				_allParametersMap.insert(WebPageDisplayFunction::PARAMETER_SMART_URL, _clientURL);
+				_allParametersMap.insert(WebPageDisplayFunction::PARAMETER_HOST_NAME, _hostName);
 			}
 			if(!functionName.empty())
 			{

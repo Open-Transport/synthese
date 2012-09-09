@@ -21,11 +21,15 @@
 */
 
 #include "DBLogPurgeAction.h"
-#include "DBLog.h"
-#include "DBLogRight.h"
-#include "Request.h"
-#include "DBLogEntryTableSync.h"
+
 #include "ActionException.h"
+#include "DBLog.h"
+#include "DBLogEntryTableSync.h"
+#include "DBLogRight.h"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

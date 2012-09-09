@@ -22,10 +22,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "CalendarTemplateElementAddAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "CalendarRight.h"
-#include "CalendarTemplateElementAddAction.h"
 #include "Request.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"

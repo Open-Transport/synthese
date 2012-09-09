@@ -21,8 +21,10 @@
 */
 
 #include "DisplaySearchAdmin.h"
+
 #include "AdvancedSelectTableSync.h"
 #include "DisplayScreenTableSync.h"
+#include "User.h"
 #include "CreateDisplayScreenAction.h"
 #include "DisplayAdmin.h"
 #include "DisplayScreenContentFunction.h"
@@ -149,7 +151,7 @@ namespace synthese
 
 		void DisplaySearchAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			DisplayScreenTableSync::SearchResult screens(
@@ -198,7 +200,7 @@ namespace synthese
 				AdminActionFunctionRequest<CreateDisplayScreenAction,DisplayAdmin> createDisplayRequest(
 					_request
 				);
-				createDisplayRequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
+				createDisplayRequest.setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
 					createDisplayRequest.getAction()->setPlace(_place->get());
@@ -206,7 +208,7 @@ namespace synthese
 				createDisplayRequest.setActionWillCreateObject();
 
 
-				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request);
+				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request, *this);
 
 				AdminFunctionRequest<DisplayAdmin> updateRequest(_request);
 
@@ -415,7 +417,7 @@ namespace synthese
 				AdminActionFunctionRequest<DisplayScreenCPUCreateAction,DisplayScreenCPUAdmin> createCPURequest(
 					_request
 				);
-				createCPURequest.getFunction()->setActionFailedPage<DisplaySearchAdmin>();
+				createCPURequest.setActionFailedPage<DisplaySearchAdmin>();
 				if(_place)
 				{
 					createCPURequest.getAction()->setPlace(*_place);
@@ -423,7 +425,7 @@ namespace synthese
 				createCPURequest.setActionWillCreateObject();
 
 
-				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request);
+				AdminFunctionRequest<DisplaySearchAdmin> searchRequest(_request, *this);
 
 				AdminFunctionRequest<DisplayScreenCPUAdmin> updateRequest(_request);
 
@@ -556,7 +558,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
@@ -584,7 +586,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DisplaySearchAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 
 			AdminInterfaceElement::PageLinks links;

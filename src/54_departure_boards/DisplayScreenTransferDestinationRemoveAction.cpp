@@ -22,13 +22,17 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DisplayScreenTransferDestinationRemoveAction.h"
+
+#include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "DisplayScreenTransferDestinationRemoveAction.h"
-#include "ArrivalDepartureTableRight.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "StopArea.hpp"
 #include "StopAreaTableSync.hpp"
+#include "User.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"

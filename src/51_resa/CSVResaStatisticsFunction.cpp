@@ -22,14 +22,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "CSVResaStatisticsFunction.h"
+
+#include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
 #include "ResaRight.h"
-#include "CSVResaStatisticsFunction.h"
 #include "ResaStatisticsTableSync.h"
-#include "CommercialLine.h"
-#include "CommercialLineTableSync.h"
 #include "ResaStatisticsAdmin.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

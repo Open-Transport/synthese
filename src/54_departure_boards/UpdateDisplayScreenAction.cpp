@@ -23,15 +23,19 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "UpdateDisplayScreenAction.h"
+
+#include "Profile.h"
+#include "Session.h"
 #include "StopArea.hpp"
 #include "StopPoint.hpp"
+#include "User.h"
 #include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
-#include "UpdateDisplayScreenAction.h"
 #include "DisplayScreenTableSync.h"
 #include "ArrivalDepartureTableLog.h"
 #include "DisplayType.h"

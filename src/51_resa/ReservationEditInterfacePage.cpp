@@ -23,15 +23,17 @@
 */
 
 #include "ReservationEditInterfacePage.h"
+
+#include "Interface.h"
+#include "ResaModule.h"
+#include "Profile.h"
 #include "ReservationTransaction.h"
 #include "Reservation.h"
 #include "ReservationConfirmationEMailItemInterfacePage.h"
 #include "Request.h"
-#include "Session.h"
 #include "ResaRight.h"
+#include "Session.h"
 #include "User.h"
-#include "Interface.h"
-#include "ResaModule.h"
 
 #include <sstream>
 #include <boost/foreach.hpp>
@@ -75,8 +77,10 @@ namespace synthese
 			pv.push_back(lexical_cast<string>(resa.getKey())); // 1
 
 			if(	request->getSession() &&
-				(	request->isAuthorized<ResaRight>(READ) ||
-					request->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, READ) && resa.getCustomerUserId() == request->getUser()->getKey()
+				request->getUser() &&
+				request->getUser()->getProfile() &&
+				(	request->getUser()->getProfile()->isAuthorized<ResaRight>(READ) ||
+					request->getUser()->getProfile()->isAuthorized<ResaRight>(UNKNOWN_RIGHT_LEVEL, READ) && resa.getCustomerUserId() == request->getUser()->getKey()
 			)	){
 
 				stringstream s;

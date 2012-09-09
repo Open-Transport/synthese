@@ -20,11 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ProfilesAdmin.h"
+
+#include "Profile.h"
+#include "User.h"
 #include "UtilConstants.h"
 #include "ActionResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
 #include "HTMLList.h"
-#include "ProfilesAdmin.h"
 #include "ProfileAdmin.h"
 #include "ProfileTableSync.h"
 #include "AddProfileAction.h"
@@ -98,18 +101,18 @@ namespace synthese
 
 		void ProfilesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Requests
-			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request);
+			AdminFunctionRequest<ProfilesAdmin> searchRequest(_request, *this);
 
 			AdminFunctionRequest<ProfileAdmin> profileRequest(_request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, ProfilesAdmin> deleteProfileRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, ProfilesAdmin> deleteProfileRequest(_request, *this);
 
 			AdminActionFunctionRequest<AddProfileAction, ProfileAdmin> addProfileRequest(_request);
-			addProfileRequest.getFunction()->setActionFailedPage<ProfilesAdmin>();
+			addProfileRequest.setActionFailedPage<ProfilesAdmin>();
 			addProfileRequest.setActionWillCreateObject();
 
 
@@ -137,7 +140,7 @@ namespace synthese
 			)	);
 
 			bool generalDeleteRight(
-				_request.isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, string())
+				_request.getUser()->getProfile()->isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, string())
 			);
 			ActionResultHTMLTable::HeaderVector v;
 			v.push_back(make_pair(PARAMETER_SEARCH_NAME, string("Nom")));
@@ -189,8 +192,11 @@ namespace synthese
 				if(generalDeleteRight)
 				{
 					stream << t.col();
-					if(_request.isAuthorized<SecurityRight>(DELETE_RIGHT, UNKNOWN_RIGHT_LEVEL, lexical_cast<string>(profile->getKey())))
-					{
+					if(	_request.getUser()->getProfile()->isAuthorized<SecurityRight>(
+							DELETE_RIGHT,
+							UNKNOWN_RIGHT_LEVEL,
+							lexical_cast<string>(profile->getKey())
+					)	){
 						stream << deleteProfileRequest.getHTMLForm().getLinkButton("Supprimer", "Etes-vous sûr de vouloir supprimer le profil " + profile->getName() + " ?", "group_delete.png");
 			}	}	}
 
@@ -212,7 +218,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -229,7 +235,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ProfilesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

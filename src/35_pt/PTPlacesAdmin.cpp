@@ -31,6 +31,7 @@
 #include "PublicPlaceAdmin.hpp"
 #include "PublicPlaceTableSync.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "City.h"
 #include "AdminFunctionRequest.hpp"
 #include "PropertiesHTMLTable.h"
@@ -145,14 +146,14 @@ namespace synthese
 
 		void PTPlacesAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
 			// TAB PHONETIC
 			if (openTabContent(stream, TAB_PHONETIC))
 			{
-				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request, *this);
 				searchRequest.getPage()->setCity(_city);
 
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
@@ -334,7 +335,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_CONNECTION_PLACES))
 			{
 				stream << "<h1>Recherche</h1>";
-				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request, *this);
 				searchRequest.getPage()->setCity(_city);
 				getHTMLStopAreaSearchForm(
 					stream,
@@ -365,7 +366,7 @@ namespace synthese
 				stopAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(stopAddRequest.getActionFailedPage())->setCity(_city);
 
-				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request, *this);
 
 				AdminFunctionRequest<PTPlaceAdmin> openRequest(request);
 
@@ -440,7 +441,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_PUBLIC_PLACES))
 			{
 				stream << "<h1>Recherche</h1>";
-				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request);
+				AdminFunctionRequest<PTPlacesAdmin> searchRequest(request, *this);
 				searchRequest.getPage()->setCity(_city);
 				getHTMLStopAreaSearchForm(
 					stream,
@@ -468,7 +469,7 @@ namespace synthese
 				publicPlaceAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(publicPlaceAddRequest.getActionFailedPage())->setCity(_city);
 
-				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, PTPlacesAdmin> removeRequest(request, *this);
 
 				AdminFunctionRequest<PublicPlaceAdmin> openRequest(request);
 
@@ -565,7 +566,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTPlacesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -585,7 +586,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks PTPlacesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

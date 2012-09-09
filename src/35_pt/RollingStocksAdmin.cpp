@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "RollingStocksAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "RollingStock.hpp"
 #include "RollingStockAdmin.hpp"
 #include "ResultHTMLTable.h"
@@ -96,12 +99,12 @@ namespace synthese
 
 		void RollingStocksAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<RollingStockAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, RollingStocksAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, RollingStocksAdmin> deleteRequest(request, *this);
 
 			AdminActionFunctionRequest<RollingStockUpdateAction, RollingStockAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -154,7 +157,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks RollingStocksAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -174,7 +177,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks RollingStocksAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

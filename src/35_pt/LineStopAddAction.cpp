@@ -22,10 +22,14 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "LineStopAddAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "LineStopAddAction.h"
+#include "Profile.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "Request.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"

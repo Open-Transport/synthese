@@ -23,6 +23,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "BroadcastPointsAdmin.h"
+
 #include "DisplaySearchAdmin.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DeparturesTableModule.h"
@@ -115,7 +116,7 @@ namespace synthese
 
 		void BroadcastPointsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request) const
+			const server::Request& _request) const
 		{
 			vector<pair<optional<int>, string> > m;
 			m.push_back(make_pair((int) WITH_OR_WITHOUT_ANY_BROADCASTPOINT, "(filtre désactivé)"));
@@ -124,7 +125,7 @@ namespace synthese
 
 			stream << "<h1>Recherche</h1>";
 
-			AdminFunctionRequest<BroadcastPointsAdmin> searchRequest(_request);
+			AdminFunctionRequest<BroadcastPointsAdmin> searchRequest(_request, *this);
 			SearchFormHTMLTable st(searchRequest.getHTMLForm("search"));
 			stream << st.open();
 			stream << st.cell("Commune", st.getForm().getTextInput(PARAMETER_CITY_NAME, _cityName));
@@ -241,7 +242,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const DeparturesTableModule*>(&module) &&
@@ -257,7 +258,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks BroadcastPointsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -308,7 +309,7 @@ namespace synthese
 
 		bool BroadcastPointsAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			return true;
 		}

@@ -21,7 +21,10 @@
 */
 
 #include "UpdateProfileAction.h"
+
 #include "SecurityModule.h"
+#include "Session.h"
+#include "User.h"
 #include "ProfileTableSync.h"
 #include "SecurityLog.h"
 #include "ActionException.h"
@@ -100,7 +103,7 @@ namespace synthese
 
 		bool UpdateProfileAction::isAuthorized(const Session* session
 		) const {
-			/// @todo add a control on the users profile
+			/// @todo add a check on the users profile
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
 		}
 

@@ -21,7 +21,11 @@
 */
 
 #include "PTUseRuleTableSync.h"
+
+#include "Profile.h"
 #include "PTUseRule.h"
+#include "Session.h"
+#include "User.h"
 #include "FareTableSync.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"

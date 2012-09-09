@@ -31,6 +31,7 @@
 #include "FrenchSentence.h"
 #include "GeographyModule.h"
 #include "House.hpp"
+#include "MimeTypes.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "PropertiesHTMLTable.h"
@@ -45,7 +46,7 @@
 #include "RoadPlace.h"
 #include "StopArea.hpp"
 #include "TransportNetworkRight.h"
-#include "MimeTypes.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -115,11 +116,11 @@ namespace synthese
 
 		void PTCitiesAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			// The search Form
-			AdminFunctionRequest<PTCitiesAdmin> searchRequest(request);
+			AdminFunctionRequest<PTCitiesAdmin> searchRequest(request, *this);
 			stream << "<h1>Recherche</h1>";
 			PropertiesHTMLTable t(searchRequest.getHTMLForm());
 			stream << t.open();
@@ -170,7 +171,7 @@ namespace synthese
 			}
 
 			// Remove request (common for place class)
-			AdminActionFunctionRequest<RemoveObjectAction, PTCitiesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, PTCitiesAdmin> removeRequest(request, *this);
 
 
 			//////////////////////////////////////////////////////////////////////////
@@ -182,7 +183,7 @@ namespace synthese
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(request);
 				AdminActionFunctionRequest<CityAddAction,PTPlacesAdmin> creationRequest(request);
 				creationRequest.setActionWillCreateObject();
-				creationRequest.getFunction()->setActionFailedPage(getNewCopiedPage());
+				creationRequest.setActionFailedPage(getNewCopiedPage());
 				HTMLForm creationForm(creationRequest.getHTMLForm("create_city"));
 
 				// The table
@@ -527,7 +528,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PTCitiesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

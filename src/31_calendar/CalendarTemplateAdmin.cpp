@@ -23,7 +23,9 @@
 */
 
 #include "CalendarTemplateAdmin.h"
+
 #include "CalendarTemplatesAdmin.h"
+#include "User.h"
 #include "CalendarModule.h"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
@@ -128,7 +130,7 @@ namespace synthese
 
 		void CalendarTemplateAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 
 			////////////////////////////////////////////////////////////////////
@@ -137,7 +139,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction, CalendarTemplateAdmin> updateRequest(_request);
+				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction, CalendarTemplateAdmin> updateRequest(_request, *this);
 				updateRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
 
 				PropertiesHTMLTable pt(updateRequest.getHTMLForm());
@@ -162,20 +164,20 @@ namespace synthese
 				stream << "<h1>Commandes</h1>";
 
 				// Requests
-				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request);
+				AdminActionFunctionRequest<CalendarTemplateElementAddAction,CalendarTemplateAdmin> addRequest(_request, *this);
 				addRequest.getAction()->setCalendar(const_pointer_cast<CalendarTemplate>(_calendar));
 
-				AdminActionFunctionRequest<CalendarTemplateCleanAction,CalendarTemplateAdmin> cleanRequest(_request);
+				AdminActionFunctionRequest<CalendarTemplateCleanAction,CalendarTemplateAdmin> cleanRequest(_request, *this);
 				cleanRequest.getAction()->setCalendar(_calendar);
 
 				AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request);
 				removeCalendar.getAction()->setObjectId(_calendar->getKey());
 
-				AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplateAdmin> delRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplateAdmin> delRequest(_request, *this);
 
-				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request);
+				AdminFunctionRequest<CalendarTemplateAdmin> searchRequest(_request, *this);
 
-				AdminFunctionRequest<CalendarTemplateAdmin> goRequest(_request);
+				AdminFunctionRequest<CalendarTemplateAdmin> goRequest(_request, *this);
 
 				stream <<
 					"<p>" <<
@@ -273,7 +275,7 @@ namespace synthese
 				stream << "<h1>Ajout de calendrier fils</h1>";
 
 				AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction,CalendarTemplateAdmin> addCalendar(_request);
-				addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
+				addCalendar.setActionFailedPage<CalendarTemplatesAdmin>();
 				addCalendar.getAction()->setParent(const_pointer_cast<CalendarTemplate>(_calendar));
 				addCalendar.setActionWillCreateObject();
 
@@ -288,7 +290,7 @@ namespace synthese
 			// TAB RESULT
 			if (openTabContent(stream, TAB_RESULT))
 			{
-				AdminFunctionRequest<CalendarTemplateAdmin> resultRequest(_request);
+				AdminFunctionRequest<CalendarTemplateAdmin> resultRequest(_request, *this);
 
 				stream << "<h1>Recherche</h1>";
 
@@ -360,7 +362,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CalendarTemplateAdmin::getSubPages(
 			const admin::AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

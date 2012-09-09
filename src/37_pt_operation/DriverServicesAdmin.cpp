@@ -23,9 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DriverServicesAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTOperationModule.hpp"
+#include "User.h"
 #include "GlobalRight.h"
 #include "RemoveObjectAction.hpp"
 #include "DriverServiceTableSync.hpp"
@@ -113,18 +116,18 @@ namespace synthese
 
 		void DriverServicesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<DriverServiceAdmin> openRequest(request);
 
-			AdminFunctionRequest<DriverServicesAdmin> searchRequest(request);
+			AdminFunctionRequest<DriverServicesAdmin> searchRequest(request, *this);
 
 			AdminActionFunctionRequest<DriverServiceUpdateAction, DriverServiceAdmin> createRequest(request);
 			createRequest.setActionFailedPage<DriverServicesAdmin>();
 			createRequest.setActionWillCreateObject();
 
-			AdminActionFunctionRequest<RemoveObjectAction, DriverServicesAdmin> removeRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DriverServicesAdmin> removeRequest(request, *this);
 
 			// Search
 			DriverServiceTableSync::SearchResult driverServices(
@@ -208,7 +211,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DriverServicesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -228,7 +231,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DriverServicesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

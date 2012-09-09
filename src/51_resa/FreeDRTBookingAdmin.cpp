@@ -34,12 +34,14 @@
 #include "Language.hpp"
 #include "ParametersMap.h"
 #include "PlacesListService.hpp"
+#include "Profile.h"
 #include "ResaModule.h"
 #include "ResaRight.h"
 #include "ReservationRoutePlannerAdmin.h"
 #include "ResultHTMLTable.h"
 #include "RoutePlannerFunction.h"
 #include "SearchFormHTMLTable.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -207,11 +209,11 @@ namespace synthese
 
 		void FreeDRTBookingAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			// Query form
-			AdminFunctionRequest<FreeDRTBookingAdmin> queryRequest(request);
+			AdminFunctionRequest<FreeDRTBookingAdmin> queryRequest(request, *this);
 			SearchFormHTMLTable t(queryRequest.getHTMLForm("query"));
 			stream << t.open();
 			stream << t.cell(
@@ -302,7 +304,7 @@ namespace synthese
 				endTime += hours(3);
 
 				// The form
-				AdminActionFunctionRequest<BookReservationAction, FreeDRTBookingAdmin> bookRequest(request);
+				AdminActionFunctionRequest<BookReservationAction, FreeDRTBookingAdmin> bookRequest(request, *this);
 				bookRequest.setActionWillCreateObject();
 				bookRequest.getAction()->getJourneyPlanner().setDeparturePlace(
 					const_pointer_cast<Place, const Place>(

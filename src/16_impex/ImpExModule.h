@@ -27,6 +27,8 @@
 
 #include "ModuleClassTemplate.hpp"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	/**	@defgroup m16Exceptions 16 Exceptions

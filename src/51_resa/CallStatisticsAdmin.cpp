@@ -31,6 +31,7 @@
 #include "RequestException.h"
 #include "SearchFormHTMLTable.h"
 #include "Profile.h"
+#include "User.h"
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/foreach.hpp>
@@ -132,10 +133,10 @@ namespace synthese
 
 		void CallStatisticsAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
-			AdminFunctionRequest<CallStatisticsAdmin> searchRequest(request);
+			AdminFunctionRequest<CallStatisticsAdmin> searchRequest(request, *this);
 
 			{
 				SearchFormHTMLTable t(searchRequest.getHTMLForm());

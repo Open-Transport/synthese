@@ -25,7 +25,9 @@
 #include "MemoryStatisticsAdmin.hpp"
 
 #include "AdminParametersException.h"
+#include "Profile.h"
 #include "ResultHTMLTable.h"
+#include "User.h"
 #include "ParametersMap.h"
 #include "ServerModule.h"
 #include "ServerAdminRight.h"
@@ -90,7 +92,7 @@ namespace synthese
 
 		void MemoryStatisticsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -192,7 +194,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MemoryStatisticsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			
 			AdminInterfaceElement::PageLinks links;

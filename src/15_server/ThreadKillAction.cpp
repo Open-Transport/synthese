@@ -22,10 +22,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "ThreadKillAction.h"
+
+#include "Profile.h"
 #include "ServerModule.h"
+#include "Session.h"
+#include "User.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "ThreadKillAction.h"
 #include "ServerAdminRight.h"
 #include "Request.h"
 

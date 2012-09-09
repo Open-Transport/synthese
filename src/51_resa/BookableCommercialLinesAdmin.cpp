@@ -28,9 +28,9 @@
 #include "BookableCommercialLineAdmin.h"
 #include "ResaRight.h"
 #include "Profile.h"
+#include "User.h"
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
-
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "AdminParametersException.h"
@@ -86,7 +86,7 @@ namespace synthese
 
 		void BookableCommercialLinesAdmin::display(
 			ostream& stream,
-			const AdminRequest& _request
+			const Request& _request
 		) const {
 			// Search
 			CommercialLineTableSync::SearchResult lines(
@@ -101,7 +101,7 @@ namespace synthese
 			)	);
 
 			// Requests
-			AdminFunctionRequest<BookableCommercialLinesAdmin> searchRequest(_request);
+			AdminFunctionRequest<BookableCommercialLinesAdmin> searchRequest(_request, *this);
 
 			AdminFunctionRequest<BookableCommercialLineAdmin> openRequest(_request);
 
@@ -141,7 +141,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const ResaModule*>(&module) &&
@@ -156,7 +156,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks BookableCommercialLinesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

@@ -22,10 +22,12 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "NonConcurrencyRuleTableSync.h"
+
 #include "NonConcurrencyRule.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "CommercialLineTableSync.h"
 #include "CommercialLine.h"
 #include "TransportNetworkTableSync.h"
@@ -35,6 +37,8 @@
 #include "LinkException.h"
 #include "ReplaceQuery.h"
 #include "TransportNetworkRight.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

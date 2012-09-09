@@ -26,6 +26,7 @@
 
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarTemplateElement.h"
+#include "CalendarRight.h"
 #include "Log.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
@@ -33,11 +34,13 @@
 #include "DBResult.hpp"
 #include "DBException.hpp"
 #include "DeleteQuery.hpp"
-#include "SelectQuery.hpp"
-#include "UpdateQuery.hpp"
+#include "Profile.h"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
-#include "CalendarRight.h"
+#include "Session.h"
+#include "SelectQuery.hpp"
+#include "UpdateQuery.hpp"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

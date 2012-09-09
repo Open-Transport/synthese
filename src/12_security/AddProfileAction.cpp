@@ -21,8 +21,11 @@
 */
 
 #include "AddProfileAction.h"
+
 #include "Profile.h"
 #include "ProfileTableSync.h"
+#include "Session.h"
+#include "User.h"
 #include "GlobalRight.h"
 #include "SecurityLog.h"
 #include "SecurityRight.h"
@@ -118,7 +121,7 @@ namespace synthese
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
-			/// @todo Add a control on the profile on the user who creates the new profile
+			/// @todo Add a check on the profile on the user who creates the new profile
 		}
 	}
 }

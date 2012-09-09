@@ -24,8 +24,9 @@
 
 #include "ModuleClass.h"
 
-#include "AdminFunction.h"
 #include "AdminInterfaceElement.h"
+#include "BaseAdminFunctionRequest.hpp"
+#include "HTMLList.h"
 #include "HTMLModule.h"
 #include "Log.h"
 
@@ -129,7 +130,7 @@ namespace synthese
 
 		void ModuleClass::addAdminPageParameters(
 			ParametersMap& map,
-			const admin::AdminRequest& request
+			const Request& request
 		) const	{
 		}
 
@@ -150,32 +151,36 @@ namespace synthese
 
 		void ModuleClass::displayAdmin(
 			ostream& stream,
-			const AdminRequest& request
+			const server::Request& request,
+			const AdminInterfaceElement& currentPage
 		) const	{
 			stream << "<h1>Informations sur le module</h1>";
 
-			stream << "<ul>";
-			stream << "<li>Code : " << getFactoryKey() << "</li>";
-			stream << "<li>Nom : " << getName() << "</li>";
-			stream << "</ul>";
+			{
+				HTMLList l;
+				stream << l.open();
+				stream << l.element() << "Code : " << getFactoryKey();
+				stream << l.element() << "Nom : " << getName();
+				stream << l.close();
+			}
 
 			stream << "<h1>Pages d'administration</h1>";
 
 			stream << "Les liens suivants donnent accès aux pages d'administration du module " << getName() << ".</p>";
 
-			stream << "<ul>";
+			HTMLList l;
+			stream << l.open();
 
-			AdminRequest r(request, true);
 			AdminInterfaceElement::PageLinks links(
-				request.getFunction()->getPage()->getSubPages(*request.getFunction()->getPage(), request)
+				currentPage.getSubPages(currentPage, request)
 			);
+			BaseAdminFunctionRequest r(request);
 			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& page, links)
 			{
-				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(page));
-				stream << "<li>" << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
+				r.setPage(const_pointer_cast<AdminInterfaceElement>(page));
+				stream << l.element() << HTMLModule::getHTMLImage(page->getIcon(), page->getTitle());
 				stream << HTMLModule::getHTMLLink(r.getURL(), page->getTitle());
-				stream << "</li>";
 			}
-			stream << "</ul>";
+			stream << l.close();
 		}
 }	}

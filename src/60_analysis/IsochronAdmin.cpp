@@ -28,10 +28,12 @@
 #include "AccessParameters.h"
 #include "AlgorithmLogger.hpp"
 #include "AnalysisModule.hpp"
+#include "Edge.h"
 #include "IntegralSearcher.h"
 #include "GlobalRight.h"
 #include "ParametersMap.h"
 #include "PlacesListFunction.h"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
 #include "PTModule.h"
 #include "PTTimeSlotRoutePlanner.h"
@@ -39,8 +41,8 @@
 #include "RequestException.h"
 #include "RoadModule.h"
 #include "SearchFormHTMLTable.h"
+#include "User.h"
 #include "Vertex.h"
-#include "Edge.h"
 
 #include <boost/date_time/posix_time/posix_time.hpp>
 #include <boost/foreach.hpp>
@@ -174,10 +176,10 @@ namespace synthese
 
 		void IsochronAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			stream << "<h1>Paramètres d'entrée</h1>";
-			AdminFunctionRequest<IsochronAdmin> searchRequest(request);
+			AdminFunctionRequest<IsochronAdmin> searchRequest(request, *this);
 			PropertiesHTMLTable t(searchRequest.getHTMLForm());
 			stream << t.open();
 			stream << t.title("Paramètres du périmètre d'étude");
@@ -486,7 +488,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks IsochronAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

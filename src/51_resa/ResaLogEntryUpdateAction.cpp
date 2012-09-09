@@ -22,11 +22,15 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "ResaLogEntryUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
-#include "ResaLogEntryUpdateAction.h"
 #include "ResaRight.h"
+#include "Session.h"
+#include "User.h"
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
 

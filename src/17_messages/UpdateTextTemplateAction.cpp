@@ -21,18 +21,18 @@
 */
 
 #include "UpdateTextTemplateAction.h"
+
+#include "Profile.h"
+#include "Session.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"
-
+#include "User.h"
 #include "DBLogModule.h"
-
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
-
 #include "ActionException.h"
 #include "ParametersMap.h"
 #include "Request.h"
-
 #include "Env.h"
 
 using namespace std;

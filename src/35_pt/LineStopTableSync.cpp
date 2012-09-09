@@ -23,9 +23,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "LineStopTableSync.h"
+
 #include "JourneyPatternCopy.hpp"
 #include "JourneyPatternTableSync.hpp"
+#include "Profile.h"
+#include "Session.h"
 #include "StopPointTableSync.hpp"
+#include "User.h"
 #include "LineAreaInheritedTableSync.hpp"
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "TransportNetworkRight.h"

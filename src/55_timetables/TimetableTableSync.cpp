@@ -31,13 +31,16 @@
 #include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
+#include "Profile.h"
 #include "RankUpdateQuery.hpp"
 #include "ReplaceQuery.h"
+#include "Session.h"
 #include "StopPoint.hpp"
 #include "Timetable.h"
 #include "TimetableRight.h"
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
+#include "User.h"
 
 #include <sstream>
 

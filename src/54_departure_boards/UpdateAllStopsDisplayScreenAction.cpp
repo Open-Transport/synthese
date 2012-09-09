@@ -21,8 +21,12 @@
 */
 
 #include "UpdateAllStopsDisplayScreenAction.h"
+
 #include "ArrivalDepartureTableLog.h"
 #include "DisplayScreenTableSync.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "ArrivalDepartureTableRight.h"
 #include "ActionException.h"
 #include "Request.h"

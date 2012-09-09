@@ -24,13 +24,16 @@
 
 #include "RollingStockFilterTableSync.h"
 
-#include "RollingStockTableSync.hpp"
-#include "PTServiceConfigTableSync.hpp"
+#include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
-#include "DBException.hpp"
+#include "Profile.h"
+#include "PTServiceConfigTableSync.hpp"
 #include "ReplaceQuery.h"
+#include "RollingStockTableSync.hpp"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
+#include "User.h"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string.hpp>

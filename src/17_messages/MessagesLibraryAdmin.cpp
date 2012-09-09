@@ -20,14 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "MessagesLibraryAdmin.h"
+
 #include "ActionResultHTMLTable.h"
 #include "HTMLForm.h"
 #include "HTMLList.h"
 #include "PropertiesHTMLTable.h"
 #include "Profile.h"
+#include "User.h"
 #include "ScenarioTemplate.h"
 #include "ScenarioTableSync.h"
-#include "MessagesLibraryAdmin.h"
 #include "MessagesScenarioAdmin.h"
 #include "AddScenarioAction.h"
 #include "MessagesAdmin.h"
@@ -119,7 +121,7 @@ namespace synthese
 
 		void MessagesLibraryAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 			if (_folder.get())
 			{
@@ -128,7 +130,7 @@ namespace synthese
 				if(	_getEnv().getRegistry<ScenarioTemplate>().empty() &&
 					_getEnv().getRegistry<ScenarioFolder>().empty()
 				){
-					AdminActionFunctionRequest<RemoveObjectAction,MessagesLibraryAdmin> removeFolderRequest(_request);
+					AdminActionFunctionRequest<RemoveObjectAction,MessagesLibraryAdmin> removeFolderRequest(_request, *this);
 					removeFolderRequest.getAction()->setObjectId(_folder->getKey());
 					removeFolderRequest.getPage()->setFolder(
 						_folder->getParent() ?
@@ -150,7 +152,7 @@ namespace synthese
 					;
 				}
 
-				AdminActionFunctionRequest<ScenarioFolderUpdateAction,MessagesLibraryAdmin> updateFolderRequest(_request);
+				AdminActionFunctionRequest<ScenarioFolderUpdateAction,MessagesLibraryAdmin> updateFolderRequest(_request, *this);
 				updateFolderRequest.getAction()->setFolder(_folder);
 
 				PropertiesHTMLTable t(updateFolderRequest.getHTMLForm());
@@ -169,15 +171,15 @@ namespace synthese
 			stream << "<h1>Scénarios</h1>";
 
 			// Requests
-			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request);
+			AdminFunctionRequest<MessagesLibraryAdmin> searchRequest(_request, *this);
 			searchRequest.getPage()->setFolder(_folder);
 
 			AdminFunctionRequest<MessagesScenarioAdmin> updateScenarioRequest(_request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, MessagesLibraryAdmin> deleteScenarioRequest(_request);
+			AdminActionFunctionRequest<RemoveObjectAction, MessagesLibraryAdmin> deleteScenarioRequest(_request, *this);
 
 			AdminActionFunctionRequest<AddScenarioAction,MessagesScenarioAdmin> addScenarioRequest(_request);
-			addScenarioRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
+			addScenarioRequest.setActionFailedPage<MessagesLibraryAdmin>();
 			addScenarioRequest.getAction()->setFolder(_folder);
 			addScenarioRequest.setActionWillCreateObject();
 
@@ -236,10 +238,10 @@ namespace synthese
 				stream << "<p>Aucun sous-répertoire.</p>";
 			}
 
-			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request);
+			AdminFunctionRequest<MessagesLibraryAdmin> goFolderRequest(_request, *this);
 
-			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request);
-			addFolderRequest.getFunction()->setActionFailedPage<MessagesLibraryAdmin>();
+			AdminActionFunctionRequest<ScenarioFolderAdd,MessagesLibraryAdmin> addFolderRequest(_request, *this);
+			addFolderRequest.setActionFailedPage<MessagesLibraryAdmin>();
 			addFolderRequest.getAction()->setParent(_folder);
 			addFolderRequest.setActionWillCreateObject();
 
@@ -284,7 +286,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -302,7 +304,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MessagesLibraryAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			PageLinks links;
 
@@ -358,7 +360,7 @@ namespace synthese
 
 		bool MessagesLibraryAdmin::isPageVisibleInTree(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			return !_folder.get();
 		}

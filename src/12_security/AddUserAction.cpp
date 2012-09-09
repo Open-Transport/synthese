@@ -21,7 +21,9 @@
 */
 
 #include "AddUserAction.h"
+
 #include "ProfileTableSync.h"
+#include "Session.h"
 #include "UserTableSync.h"
 #include "Profile.h"
 #include "SecurityRight.h"
@@ -102,7 +104,7 @@ namespace synthese
 		bool AddUserAction::isAuthorized(const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
-			/// @todo Add a control on the profile on the user who creates the new user, depending on the new user profile
+			/// @todo Add a check on the profile on the user who creates the new user, depending on the new user profile
 		}
 	}
 }

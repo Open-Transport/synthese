@@ -22,10 +22,14 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
+#include "TextTemplateFolderUpdateAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
-#include "TextTemplateFolderUpdateAction.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesLibraryLog.h"
 #include "TextTemplate.h"
 #include "TextTemplateTableSync.h"

@@ -55,9 +55,11 @@
 #include "ServiceUpdateAction.h"
 #include "ServiceVertexUpdateAction.hpp"
 #include "ServiceVertexRealTimeUpdateAction.h"
+#include "Session.h"
 #include "StopPoint.hpp"
 #include "StopArea.hpp"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;
@@ -167,7 +169,7 @@ namespace synthese
 
 		void ServiceAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -177,10 +179,10 @@ namespace synthese
 				AdminFunctionRequest<PTPlaceAdmin> openPlaceRequest(request);
 				AdminFunctionRequest<DRTAreaAdmin> openAreaRequest(request);
 
-				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request);
+				AdminActionFunctionRequest<ServiceTimetableUpdateAction,ServiceAdmin> timetableUpdateRequest(request, *this);
 				timetableUpdateRequest.getAction()->setService(const_pointer_cast<SchedulesBasedService>(_service));
 
-				AdminActionFunctionRequest<ServiceVertexUpdateAction,ServiceAdmin> serviceVertexUpdateAction(request);
+				AdminActionFunctionRequest<ServiceVertexUpdateAction,ServiceAdmin> serviceVertexUpdateAction(request, *this);
 				if(_scheduledService.get())
 				{
 					serviceVertexUpdateAction.getPage()->setService(_scheduledService);
@@ -367,7 +369,7 @@ namespace synthese
 				{
 					stream << "<h1>Service continu</h1>";
 
-					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request);
+					AdminActionFunctionRequest<ContinuousServiceUpdateAction,ServiceAdmin> updateRequest(request, *this);
 					updateRequest.getAction()->setService(const_pointer_cast<ContinuousService>(_continuousService));
 
 					PropertiesHTMLTable t(updateRequest.getHTMLForm());
@@ -382,7 +384,7 @@ namespace synthese
 			// TAB REAL TIME
 			if (openTabContent(stream, TAB_REAL_TIME))
 			{
-				AdminActionFunctionRequest<ScheduleRealTimeUpdateAction, ServiceAdmin> scheduleUpdateRequest(request);
+				AdminActionFunctionRequest<ScheduleRealTimeUpdateAction, ServiceAdmin> scheduleUpdateRequest(request, *this);
 				if(_scheduledService.get())
 				{
 					scheduleUpdateRequest.getPage()->setService(_scheduledService);
@@ -393,7 +395,7 @@ namespace synthese
 				}
 				scheduleUpdateRequest.getAction()->setService(_scheduledService);
 
-				AdminActionFunctionRequest<ServiceVertexRealTimeUpdateAction, ServiceAdmin> vertexUpdateRequest(request);
+				AdminActionFunctionRequest<ServiceVertexRealTimeUpdateAction, ServiceAdmin> vertexUpdateRequest(request, *this);
 				if(_scheduledService.get())
 				{
 					vertexUpdateRequest.getPage()->setService(_scheduledService);
@@ -539,7 +541,7 @@ namespace synthese
 					static_cast<const CommercialLine*>(_service->getPath()->getPathGroup())->getNetwork()
 				);
 
-				AdminActionFunctionRequest<ServiceUpdateAction, ServiceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<ServiceUpdateAction, ServiceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setService(
 					const_pointer_cast<SchedulesBasedService>(_service)
 				);
@@ -559,7 +561,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<ServiceUpdateAction,ServiceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<ServiceUpdateAction,ServiceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setService(
 					const_pointer_cast<SchedulesBasedService>(
 						_service

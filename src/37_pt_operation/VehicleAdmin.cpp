@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "VehicleAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
-#include "PTOperationModule.hpp"
+#include "Profile.h"
 #include "PropertiesHTMLTable.h"
+#include "PTOperationModule.hpp"
+#include "User.h"
 #include "Vehicle.hpp"
 #include "AdminActionFunctionRequest.hpp"
 #include "VehicleUpdateAction.hpp"
@@ -137,7 +140,7 @@ namespace synthese
 
 		void VehicleAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -146,7 +149,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request);
+				AdminActionFunctionRequest<VehicleUpdateAction, VehicleAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update_form"));
@@ -173,7 +176,7 @@ namespace synthese
 				stream << "<h1>Recherche</h1>";
 
 				ptime now(second_clock::local_time());
-				AdminFunctionRequest<VehicleAdmin> searchRequest(request);
+				AdminFunctionRequest<VehicleAdmin> searchRequest(request, *this);
 				SearchFormHTMLTable s(searchRequest.getHTMLForm("search"));
 				stream << s.open();
 				stream << s.cell("Date début", s.getForm().getCalendarInput(PARAMETER_SEARCH_START_DATE, _searchStartDate ? *_searchStartDate : now));
@@ -182,10 +185,10 @@ namespace synthese
 
 				stream << "<h1>Résultats</h1>";
 
-				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request);
+				AdminActionFunctionRequest<VehiclePositionUpdateAction,VehicleAdmin> addRequest(request, *this);
 				addRequest.getAction()->setVehicle(const_pointer_cast<Vehicle>(_vehicle));
 
-				AdminActionFunctionRequest<RemoveObjectAction, VehicleAdmin> removeRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, VehicleAdmin> removeRequest(request, *this);
 
 				// Search
 				VehiclePositionTableSync::SearchResult positions(

@@ -24,6 +24,7 @@
 #include "DateTimeInterfacePage.h"
 #include "ForumMessageTableSync.hpp"
 #include "ForumTopicTableSync.hpp"
+#include "User.h"
 #include "Webpage.h"
 
 #include <boost/foreach.hpp>
