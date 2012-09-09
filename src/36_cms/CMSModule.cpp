@@ -58,7 +58,7 @@ namespace synthese
 	namespace util
 	{
 		template<>
-		const string FactorableTemplate<ModuleClass,CMSModule>::FACTORY_KEY("36_cms");
+		const string FactorableTemplate<ModuleClass,CMSModule>::FACTORY_KEY("11_cms");
 	}
 
 	namespace server
@@ -269,8 +269,9 @@ namespace synthese
 
 
 		void CMSModule::displayAdmin(
-			std::ostream& stream,
-			const admin::AdminRequest& request
+			ostream& stream,
+			const Request& request,
+			const AdminInterfaceElement& currentPage
 		) const	{
 
 			// New site request

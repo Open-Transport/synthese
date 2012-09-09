@@ -53,10 +53,11 @@ namespace synthese
 	{
 		const string WebPageDisplayFunction::DATA_CONTENT = "content";
 
-		const string WebPageDisplayFunction::PARAMETER_PAGE_ID("p");
-		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE("use_template");
-		const string WebPageDisplayFunction::PARAMETER_HOST_NAME("host_name");
-		const string WebPageDisplayFunction::PARAMETER_SMART_URL("smart_url");
+		const string WebPageDisplayFunction::PARAMETER_PAGE_ID = "p";
+		const string WebPageDisplayFunction::PARAMETER_SITE_ID = "si";
+		const string WebPageDisplayFunction::PARAMETER_USE_TEMPLATE = "use_template";
+		const string WebPageDisplayFunction::PARAMETER_HOST_NAME = "host_name";
+		const string WebPageDisplayFunction::PARAMETER_SMART_URL = "smart_url";
 		const string WebPageDisplayFunction::PARAMETER_DONT_REDIRECT_IF_SMART_URL = "dont_redirect_if_smart_url";
 
 		ParametersMap WebPageDisplayFunction::_getParametersMap() const
@@ -82,68 +83,74 @@ namespace synthese
 
 		void WebPageDisplayFunction::_setFromParametersMap(const ParametersMap& map)
 		{
-			_FunctionWithSite::_setFromParametersMap(map);
-
-			if(map.getOptional<RegistryKeyType>(PARAMETER_PAGE_ID))
+			// Case page id
+			RegistryKeyType pageId(map.getDefault<RegistryKeyType>(PARAMETER_PAGE_ID, 0));
+			if(pageId)
 			{
 				try
 				{
 					_page = Env::GetOfficialEnv().get<Webpage>(
-						map.get<RegistryKeyType>(PARAMETER_PAGE_ID)
+						pageId
 					).get();
 				}
-				catch (ObjectNotFoundException<Webpage>)
+				catch (ObjectNotFoundException<Webpage>&)
 				{
-					throw RequestException("No such page");
+					throw RequestException("No such page : "+ lexical_cast<string>(pageId));
 				}
 				if(	!_page->mustBeDisplayed()
 				){
 					throw Request::ForbiddenRequestException();
 				}
 			}
-			else
+			else // Case Website + page name
 			{
+				// Smart URL
+				_smartURL = map.get<string>(PARAMETER_SMART_URL);
+				if(_smartURL.empty())
+				{
+					throw RequestException("Webpage not defined");
+				}
+
 				// Local variables
 				const Website* site(NULL);
-				string hostName(map.getDefault<string>(PARAMETER_HOST_NAME));
 
-				// Case host name + client URL + smart URL
-				if(!hostName.empty())
+				// Case site id
+				RegistryKeyType siteId(
+					map.getDefault<RegistryKeyType>(PARAMETER_SITE_ID, 0)
+				);
+				if(siteId)
 				{
+					try
+					{
+						site = Env::GetOfficialEnv().get<Website>(siteId).get();
+					}
+					catch(ObjectNotFoundException<Website>&)
+					{
+						throw RequestException("No such site : "+ lexical_cast<string>(siteId));
+					}
+				}
+				else 
+				{
+					string hostName(map.getDefault<string>(PARAMETER_HOST_NAME));
+
 					// Site
-					string clientURL = map.get<string>(PARAMETER_SMART_URL);
-					site = CMSModule::GetSiteByURL(hostName, clientURL);
+					site = CMSModule::GetSiteByURL(hostName, _smartURL);
 					if(!site)
 					{
 						throw RequestException("No such site");
 					}
-					
+						
 					// Smart URL
-					_smartURL = clientURL.substr(site->get<ClientURL>().size());
+					_smartURL = _smartURL.substr(site->get<ClientURL>().size());
 				}
-				else // Case no specified host name
-				{
-					// Site
-					site = getSite();
-
-					// Smart URL
-					_smartURL = map.get<string>(PARAMETER_SMART_URL);
-					if(_smartURL.empty() || !site)
-					{
-						throw RequestException("Smart URL and site, or page ID must be specified");
-					}
-					if(_smartURL[0] == ':')
-					{
-						throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
-					}
-				}
-
-				// Host name and smart URL must not be visible in CMS
-				_templateParameters.remove(PARAMETER_HOST_NAME);
-				_templateParameters.remove(PARAMETER_SMART_URL);
 
 				// Page
+				if(_smartURL[0] == ':')
+				{
+					throw RequestException("Smart URLs starting with a colon are not allowed for direct access");
+				}
 				_page = site->getPageBySmartURL(_smartURL);
+
 				if(!_page)
 				{ // Attempt to find a page with a parameter
 					vector<string> paths;

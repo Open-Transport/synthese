@@ -27,7 +27,10 @@
 #include "ActionException.h"
 #include "CMSRight.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "WebPageTableSync.h"
 #include "WebsiteTableSync.hpp"
 

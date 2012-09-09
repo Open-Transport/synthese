@@ -114,7 +114,7 @@ namespace synthese
 				pm,
 				stream,
 				DATA_ROWS,
-				"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/36_cms/RowsListFunction.xsd"
+				"https://extranet.rcsmobility.com/svn/synthese3/trunk/src/11_cms/RowsListFunction.xsd"
 			);
 
 			return pm;

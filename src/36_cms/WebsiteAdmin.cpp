@@ -29,6 +29,7 @@
 #include "AdminInterfaceElement.h"
 #include "AdminParametersException.h"
 #include "CMSModule.hpp"
+#include "CMSRight.hpp"
 #include "HTMLForm.h"
 #include "HTMLModule.h"
 #include "ModuleAdmin.h"
@@ -39,10 +40,12 @@
 #include "ResultHTMLTable.h"
 #include "SearchFormHTMLTable.h"
 #include "ServerModule.h"
+#include "Session.h"
 #include "StaticFunctionRequest.h"
 #include "SVNCommitAction.hpp"
 #include "SVNUpdateAction.hpp"
 #include "SVNWorkingCopyCreateAction.hpp"
+#include "User.h"
 #include "WebPageAdmin.h"
 #include "WebPageAddAction.h"
 #include "Website.hpp"
@@ -140,7 +143,7 @@ namespace synthese
 
 		void WebsiteAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -150,7 +153,8 @@ namespace synthese
 
 				// Requests
 				AdminActionFunctionRequest<ObjectUpdateAction, WebsiteAdmin> updateRequest(
-					request
+					request,
+					*this
 				);
 				updateRequest.getAction()->setObject(*_site);
 
@@ -194,12 +198,12 @@ namespace synthese
 			if (openTabContent(stream, TAB_WEB_PAGES))
 			{
 				stream << "<h1>Pages</h1>";
-				AdminActionFunctionRequest<WebPageAddAction, WebsiteAdmin> addRequest(request);
+				AdminActionFunctionRequest<WebPageAddAction, WebsiteAdmin> addRequest(request, *this);
 				addRequest.getAction()->setSite(const_pointer_cast<Website>(_site));
 
-				AdminActionFunctionRequest<RemoveObjectAction, WebsiteAdmin> deleteRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, WebsiteAdmin> deleteRequest(request, *this);
 
-				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(request);
+				AdminActionFunctionRequest<WebPageMoveAction, WebsiteAdmin> moveRequest(request, *this);
 
 				WebPageAdmin::DisplaySubPages(stream, _site->getKey(), addRequest, deleteRequest, moveRequest, request);
 			}
@@ -209,14 +213,14 @@ namespace synthese
 			// TAB SVN STORAGE
 			if (openTabContent(stream, TAB_SVN_STORAGE))
 			{
-				if(_site->get<SVNWorkingCopy>().getRepoURL().empty())
+				if(_site->get<SVNWorkingCopy>().getRepo().getURL().empty())
 				{ // Not using SVN sotrage currently
 
 					stream << "<h1>Création d'un stockage Subversion</h1>";
 
 					stream << "<p class=\"info\">Ce site n'est pas stocké dans un dépôt subversion.<br />Utiliser le formulaire ci-dessous pour créer un nouveau stockage Subversion pour ce site.<br />ATTENTION : l'adresse fournie doit correspondre à un répertoire non existant sur le dépôt.</p>";
 
-					AdminActionFunctionRequest<SVNWorkingCopyCreateAction, WebsiteAdmin> createRequest(request);
+					AdminActionFunctionRequest<SVNWorkingCopyCreateAction, WebsiteAdmin> createRequest(request, *this);
 					createRequest.getAction()->setObject(
 						static_pointer_cast<ObjectBase, Website>(
 							const_pointer_cast<Website>(
@@ -252,7 +256,7 @@ namespace synthese
 					{
 						stream << "<h1>SVN Update</h1>";
 
-						AdminActionFunctionRequest<SVNUpdateAction, WebsiteAdmin> updateRequest(request);
+						AdminActionFunctionRequest<SVNUpdateAction, WebsiteAdmin> updateRequest(request, *this);
 						updateRequest.getAction()->setObject(
 							static_pointer_cast<ObjectBase, Website>(
 								const_pointer_cast<Website>(
@@ -282,7 +286,7 @@ namespace synthese
 					{
 						stream << "<h1>SVN Commit</h1>";
 
-						AdminActionFunctionRequest<SVNCommitAction, WebsiteAdmin> commitRequest(request);
+						AdminActionFunctionRequest<SVNCommitAction, WebsiteAdmin> commitRequest(request, *this);
 						commitRequest.getAction()->setObject(
 							static_pointer_cast<ObjectBase, Website>(
 								const_pointer_cast<Website>(
@@ -325,8 +329,7 @@ namespace synthese
 		bool WebsiteAdmin::isAuthorized(
 			const security::User& user
 		) const	{
-return true;
-//			return user.getProfile()->isAuthorized<WebsiteRight>(READ);
+			return user.getProfile()->isAuthorized<CMSRight>(READ);
 		}
 
 
@@ -334,7 +337,7 @@ return true;
 		AdminInterfaceElement::PageLinks WebsiteAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -361,7 +364,7 @@ return true;
 
 		AdminInterfaceElement::PageLinks WebsiteAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

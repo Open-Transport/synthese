@@ -9,6 +9,8 @@ BitAndFunction.cpp
 BitAndFunction.hpp
 ChrFunction.cpp
 ChrFunction.hpp
+CMSInstallRight.cpp
+CMSInstallRight.hpp
 CMSModule.cpp
 CMSModule.gen.cpp
 CMSModuleRegister.cpp
@@ -53,6 +55,8 @@ NotService.cpp
 NotService.hpp
 OrService.cpp
 OrService.hpp
+PackagesService.cpp
+PackagesService.hpp
 PrecisionService.cpp
 PrecisionService.hpp
 RowsListFunction.cpp
@@ -129,10 +133,10 @@ WebsiteTableSync.hpp
 
 set_source_files_properties(CMSModule.gen.cpp CMSModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 
-add_library(36_cms ${cms_SRCS})
+add_library(11_cms ${cms_SRCS})
 
 target_link_libraries(
-  36_cms
+  11_cms
   103_db_svn
   12_security
   15_server
@@ -141,4 +145,4 @@ target_link_libraries(
   #56_pt_website
 )
 
-install(TARGETS 36_cms DESTINATION lib)
+install(TARGETS 11_cms DESTINATION lib)

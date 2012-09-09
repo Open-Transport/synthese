@@ -16,6 +16,7 @@
 #include "EvalService.hpp"
 #include "LanguageSelectorService.hpp"
 #include "NotService.hpp"
+#include "PackagesService.hpp"
 #include "PrecisionService.hpp"
 #include "TimeDurationService.hpp"
 #include "WebPageDisplayFunction.h"
@@ -45,6 +46,7 @@
 #include "WebPageTableSync.h"
 #include "WebsiteTableSync.hpp"
 
+#include "CMSInstallRight.hpp"
 #include "CMSRight.hpp"
 
 // Registries
@@ -75,6 +77,7 @@ void synthese::cms::moduleRegister()
 	synthese::cms::EvalService::integrate();
 	synthese::cms::LanguageSelectorService::integrate();
 	synthese::cms::NotService::integrate();
+	synthese::cms::PackagesService::integrate();
 	synthese::cms::PrecisionService::integrate();
 	synthese::cms::TimeDurationService::integrate();
 	synthese::cms::WebPageDisplayFunction::integrate();
@@ -105,5 +108,6 @@ void synthese::cms::moduleRegister()
 	synthese::cms::WebPageLinkRemoveAction::integrate();
 	synthese::cms::WebPageMoveAction::integrate();
 
+	synthese::cms::CMSInstallRight::integrate();
 	synthese::cms::CMSRight::integrate();
 }

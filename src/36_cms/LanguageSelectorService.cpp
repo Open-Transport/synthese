@@ -22,11 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "RequestException.h"
-#include "Request.h"
 #include "LanguageSelectorService.hpp"
-#include "Language.hpp"
+
 #include "HTMLForm.h"
+#include "Language.hpp"
+#include "Request.h"
+#include "RequestException.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

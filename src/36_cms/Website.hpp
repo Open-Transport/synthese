@@ -83,6 +83,12 @@ namespace synthese
 				Webpage* getPageByIdOrSmartURL(const std::string& key) const;
 				virtual std::string getName() const { return get<Name>(); }
 				virtual SubObjects getSubObjects() const;
+
+				typedef std::vector<std::pair<boost::optional<util::RegistryKeyType>, std::string> > WebpagesList;
+
+				WebpagesList getPagesList(
+					const std::string& rootLabel
+				) const;
 			//@}
 
 			//! @name Modifiers

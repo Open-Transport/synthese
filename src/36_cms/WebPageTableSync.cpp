@@ -238,30 +238,6 @@ namespace synthese
 
 
 
-		WebPageTableSync::SiteWebPagesList WebPageTableSync::GetPagesList(
-			util::RegistryKeyType siteId,
-			const std::string& rootLabel,
-			const std::string prefix,
-			const RegistryKeyType upId
-		){
-			SiteWebPagesList result;
-			if(!rootLabel.empty())
-			{
-				result.push_back(make_pair(0, rootLabel));
-			}
-			Env env;
-			SearchResult pages(Search(env, siteId, upId, optional<size_t>(), 0, optional<size_t>(), true));
-			BOOST_FOREACH(const SearchResult::value_type& page, pages)
-			{
-				result.push_back(make_pair(page->getKey(), prefix + page->getName()));
-				SiteWebPagesList subResult(GetPagesList(siteId, string(), prefix + "   ", page->getKey()));
-				result.insert(result.end(), subResult.begin(), subResult.end());
-			}
-			return result;
-		}
-
-
-
 		void WebPageTableSync::ShiftRank(
 			RegistryKeyType siteId,
 			util::RegistryKeyType parentId,

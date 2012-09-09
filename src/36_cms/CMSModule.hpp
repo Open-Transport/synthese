@@ -179,7 +179,8 @@ namespace synthese
 
 			virtual void displayAdmin(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request,
+				const admin::AdminInterfaceElement& currentPage
 			) const;
 		};
 	}

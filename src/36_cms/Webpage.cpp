@@ -174,10 +174,7 @@ namespace synthese
 		const string Webpage::DATA_PUBLICATION_DATE("date");
 		const string Webpage::DATA_FORUM("forum");
 		const string Webpage::DATA_DEPTH("depth");
-	}
 
-	namespace cms
-	{
 		Webpage::Webpage( util::RegistryKeyType id  ):
 			Registrable(id),
 			Object<Webpage, WebpageRecord>(
@@ -347,5 +344,19 @@ namespace synthese
 			unregisterInParentOrRoot();
 			getRoot()->removePage(get<SmartURLPath>());
 			this->setParent(NULL);
+		}
+
+
+
+		void Webpage::getPagesList(
+			Website::WebpagesList& result,
+			const std::string prefix
+		) const	{
+			BOOST_FOREACH(const SubObjects::value_type& so, getSubObjects())
+			{
+				const Webpage& page(static_cast<const Webpage&>(*so));
+				result.push_back(make_pair(page.getKey(), prefix + page.getName()));
+				page.getPagesList(result, prefix + "   ");
+			}
 		}
 }	}
