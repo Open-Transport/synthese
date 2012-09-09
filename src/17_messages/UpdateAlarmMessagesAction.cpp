@@ -22,9 +22,13 @@
 ///	Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 ////////////////////////////////////////////////////////////////////////////////
 
-#include "ActionException.h"
 #include "UpdateAlarmMessagesAction.h"
+
+#include "ActionException.h"
 #include "ObjectNotFoundException.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "MessagesModule.h"
 #include "Alarm.h"
 #include "AlarmTemplate.h"

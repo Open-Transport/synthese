@@ -134,7 +134,7 @@ namespace synthese
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			ifstream inFile;
 			string line;
@@ -460,7 +460,7 @@ namespace synthese
 
 		void ServicesCSVFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			stream << "<h1>Fichiers</h1>";
 

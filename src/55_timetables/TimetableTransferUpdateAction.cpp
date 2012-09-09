@@ -22,10 +22,14 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
+#include "TimetableTransferUpdateAction.hpp"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
-#include "TimetableTransferUpdateAction.hpp"
+#include "Profile.h"
+#include "Session.h"
 #include "TimetableRight.h"
+#include "User.h"
 #include "Request.h"
 #include "TimetableTableSync.h"
 #include "Timetable.h"

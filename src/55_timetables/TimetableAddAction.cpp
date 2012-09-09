@@ -22,16 +22,20 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ActionException.h"
-#include "ParametersMap.h"
-#include "Request.h"
-#include "DBTransaction.hpp"
 #include "TimetableAddAction.h"
+
+#include "ActionException.h"
+#include "DBTransaction.hpp"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Request.h"
+#include "Session.h"
 #include "TimetableRight.h"
 #include "TimetableRow.h"
 #include "Timetable.h"
 #include "TimetableTableSync.h"
 #include "TimetableRowTableSync.h"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 

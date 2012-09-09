@@ -30,6 +30,7 @@
 #include "DisplayScreenTableSync.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
+#include "Profile.h"
 #include "User.h"
 #include "UserTableSync.h"
 #include "SecurityModule.h"

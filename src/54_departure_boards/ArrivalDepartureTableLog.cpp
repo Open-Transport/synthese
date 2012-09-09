@@ -77,7 +77,7 @@ namespace synthese
 				if (decodeTableId(id) == DisplayScreenTableSync::TABLE.ID)
 				{
 					AdminFunctionRequest<DisplayAdmin> openRequest(
-						dynamic_cast<const AdminRequest& >(searchRequest)
+						dynamic_cast<const Request& >(searchRequest)
 					);
 					shared_ptr<const DisplayScreen> ds = DisplayScreenTableSync::Get(id, env);
 					openRequest.getPage()->setScreen(ds);
@@ -86,7 +86,7 @@ namespace synthese
 				else if (decodeTableId(id) == DisplayTypeTableSync::TABLE.ID)
 				{
 					AdminFunctionRequest<DisplayTypeAdmin> openRequest(
-						dynamic_cast<const AdminRequest& >(searchRequest)
+						dynamic_cast<const Request& >(searchRequest)
 					);
 					shared_ptr<const DisplayType> dt(DisplayTypeTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					openRequest.getPage()->setType(dt);
@@ -95,7 +95,7 @@ namespace synthese
 				else if(decodeTableId(id) == DisplayScreenCPUTableSync::TABLE.ID)
 				{
 					AdminFunctionRequest<DisplayScreenCPUAdmin> openRequest(
-						dynamic_cast<const AdminRequest& >(searchRequest)
+						dynamic_cast<const Request& >(searchRequest)
 					);
 					shared_ptr<const DisplayScreenCPU> cpu(DisplayScreenCPUTableSync::Get(id, env, FIELDS_ONLY_LOAD_LEVEL));
 					openRequest.getPage()->setCPU(cpu);

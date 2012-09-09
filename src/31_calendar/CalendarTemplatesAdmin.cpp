@@ -23,9 +23,11 @@
 */
 
 #include "CalendarTemplatesAdmin.h"
+
 #include "CalendarModule.h"
 #include "Profile.h"
 #include "ResultHTMLTable.h"
+#include "User.h"
 #include "HTMLModule.h"
 #include "HTMLForm.h"
 
@@ -92,15 +94,15 @@ namespace synthese
 
 		void CalendarTemplatesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const {
 			// Requests
 
 			AdminActionFunctionRequest<CalendarTemplatePropertiesUpdateAction,CalendarTemplateAdmin> addCalendar(_request);
-			addCalendar.getFunction()->setActionFailedPage<CalendarTemplatesAdmin>();
+			addCalendar.setActionFailedPage<CalendarTemplatesAdmin>();
 			addCalendar.setActionWillCreateObject();
 
-			AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request);
+			AdminActionFunctionRequest<RemoveObjectAction,CalendarTemplatesAdmin> removeCalendar(_request, *this);
 
 			// Display
 			stream << "<h1>Calendriers</h1>";
@@ -184,7 +186,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -202,7 +204,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks CalendarTemplatesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 

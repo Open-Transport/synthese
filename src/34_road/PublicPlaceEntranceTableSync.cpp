@@ -41,7 +41,6 @@ namespace synthese
 	using namespace db;
 	using namespace impex;
 	using namespace util;
-	using namespace security;
 	using namespace road;
 
 	namespace util

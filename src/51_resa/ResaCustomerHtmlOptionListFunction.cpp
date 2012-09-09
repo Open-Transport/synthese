@@ -24,9 +24,11 @@
 
 #include "ResaCustomerHtmlOptionListFunction.h"
 
+#include "Profile.h"
 #include "Request.h"
 #include "RequestException.h"
 #include "ResaRight.h"
+#include "Session.h"
 #include "User.h"
 #include "UserTableSync.h"
 #include "Env.h"

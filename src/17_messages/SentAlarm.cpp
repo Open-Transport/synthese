@@ -23,7 +23,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "SentAlarm.h"
+
 #include "AlarmRecipient.h"
+#include "Factory.h"
 #include "Registry.h"
 #include "SentScenario.h"
 #include "AlarmTemplate.h"

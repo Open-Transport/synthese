@@ -37,7 +37,9 @@
 #include "OnlineReservationRuleTableSync.h"
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
+#include "Session.h"
 #include "User.h"
 #include "UserTableSync.h"
 

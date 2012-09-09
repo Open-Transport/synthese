@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "MessagesTypes.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace server

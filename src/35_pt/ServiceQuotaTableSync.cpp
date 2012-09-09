@@ -41,7 +41,6 @@ namespace synthese
 	using namespace pt;
 	using namespace util;
 	using namespace db;
-	using namespace security;
 
 	namespace util
 	{

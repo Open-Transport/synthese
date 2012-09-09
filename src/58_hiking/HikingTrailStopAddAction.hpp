@@ -28,6 +28,8 @@
 #include "Action.h"
 #include "FactorableTemplate.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
 	namespace pt

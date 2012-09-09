@@ -21,13 +21,17 @@
 */
 
 #include "HomeAdmin.h"
+
+#include "BaseAdminFunctionRequest.hpp"
+#include "HTMLList.h"
+#include "HTMLModule.h"
 #include "ModuleAdmin.h"
 #include "ModuleClass.h"
-#include "UserAdmin.h"
+#include "Profile.h"
 #include "SecurityRight.h"
-#include "HTMLModule.h"
 #include "ServerModule.h"
-#include "AdminFunction.h"
+#include "User.h"
+#include "UserAdmin.h"
 
 #include <boost/foreach.hpp>
 
@@ -56,23 +60,24 @@ namespace synthese
 
 		void HomeAdmin::display(
 			std::ostream& stream,
-			const AdminRequest& request
+			const server::Request& request
 		) const	{
 			stream << "<p>Bienvenue sur le module d'administration de SYNTHESE " << ServerModule::VERSION_INFO << ".</p>";
 
 			stream << "<h1>Accès directs</h1>";
 
-			stream << "<ul>";
+			HTMLList l;
+			stream << l.open();
 
 			BOOST_FOREACH(const shared_ptr<const AdminInterfaceElement>& link, getSubPages(*this, request))
 			{
-				AdminRequest r(request, true);
-				r.getFunction()->setPage(const_pointer_cast<AdminInterfaceElement>(link));
+				BaseAdminFunctionRequest r(request);
+				r.setPage(const_pointer_cast<AdminInterfaceElement>(link));
 
-				stream << "<li>" << HTMLModule::getHTMLLink(r.getURL(), link->getTitle()) << "</li>";
+				stream << l.element() << HTMLModule::getHTMLLink(r.getURL(), link->getTitle());
 			}
 
-			stream << "</ul>";
+			stream << l.close();
 		}
 
 
@@ -108,7 +113,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks HomeAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const {
 			AdminInterfaceElement::PageLinks links;
 
@@ -127,7 +132,7 @@ namespace synthese
 				}
 			}
 
-			if(request.isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
+			if(request.getUser()->getProfile()->isAuthorized<SecurityRight>(UNKNOWN_RIGHT_LEVEL, READ, string()))
 			{
 				shared_ptr<UserAdmin> userPage(getNewPage<UserAdmin>());
 				userPage->setUserC(request.getUser());

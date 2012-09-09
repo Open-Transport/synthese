@@ -23,8 +23,11 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "ForumMessagesAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "User.h"
 #include "ForumModule.hpp"
 #include "ForumRight.hpp"
 #include "ForumTopic.hpp"
@@ -97,7 +100,7 @@ namespace synthese
 
 		void ForumMessagesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			ForumMessageTableSync::SearchResult result(
@@ -127,7 +130,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ForumMessagesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

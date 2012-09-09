@@ -25,11 +25,14 @@
 #include "HikingTrailTableSync.h"
 
 #include "Conversion.h"
+#include "HikingRight.h"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
 #include "StopAreaTableSync.hpp"
 #include "StopArea.hpp"
-#include "HikingRight.h"
+#include "User.h"
 
 #include <sstream>
 

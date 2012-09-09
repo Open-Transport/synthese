@@ -22,11 +22,15 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "NonConcurrencyRuleAddAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "NonConcurrencyRule.h"
 #include "NonConcurrencyRuleTableSync.h"
-#include "NonConcurrencyRuleAddAction.h"
 #include "TransportNetworkRight.h"
 #include "Request.h"
 #include "CommercialLine.h"

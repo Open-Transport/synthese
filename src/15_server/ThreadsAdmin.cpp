@@ -22,8 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ServerModule.h"
 #include "ThreadsAdmin.h"
+
+#include "Profile.h"
+#include "ServerModule.h"
+#include "User.h"
 #include "AdminParametersException.h"
 #include "ServerAdminRight.h"
 #include "ResultHTMLTable.h"
@@ -41,7 +44,6 @@ using namespace boost;
 namespace synthese
 {
 	using namespace admin;
-	using namespace interfaces;
 	using namespace server;
 	using namespace util;
 	using namespace html;
@@ -66,11 +68,11 @@ namespace synthese
 
 		void ThreadsAdmin::display(
 			ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const	{
 
-			bool killRight(request.isAuthorized<ServerAdminRight>(DELETE_RIGHT));
-			AdminActionFunctionRequest<ThreadKillAction,ThreadsAdmin> killRequest(request);
+			bool killRight(request.getUser()->getProfile()->isAuthorized<ServerAdminRight>(DELETE_RIGHT));
+			AdminActionFunctionRequest<ThreadKillAction,ThreadsAdmin> killRequest(request, *this);
 
 			const ServerModule::Threads& threads(ServerModule::GetThreads());
 			stream << "<h1>" << threads.size() << " threads</h1>";
@@ -153,7 +155,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ThreadsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			PageLinks links;
 

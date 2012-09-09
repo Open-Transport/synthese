@@ -23,10 +23,14 @@
 */
 
 #include "RollingStockTableSync.hpp"
+
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
+#include "Session.h"
 #include "TransportNetworkRight.h"
-#include "ImportableTableSync.hpp"
+#include "User.h"
 
 #include <boost/foreach.hpp>
 

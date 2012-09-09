@@ -188,7 +188,7 @@ namespace synthese
 			const path& filePath,
 			std::ostream& os,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const server::Request&> adminRequest
 		) const {
 			bool error(false);
 			if(!_openFile(filePath))
@@ -453,7 +453,11 @@ namespace synthese
 					{
 						if(itZug != _zugs.end())
 						{
-							itZug->calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							Zug::CalendarUse calendarUse;
+							calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
+							calendarUse.startStopCode = lexical_cast<size_t>(_getField(6, 6));
+							calendarUse.endStopCode = lexical_cast<size_t>(_getField(14, 6));
+							itZug->calendars.push_back(calendarUse);
 						}
 					}
 					else if(_getField(0, 2) == "*G") // Transport mode
@@ -543,7 +547,7 @@ namespace synthese
 
 		void HafasFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const AdminRequest& request
+			const Request& request
 		) const {
 
 			stream << "<h1>Horaires</h1>";
@@ -747,7 +751,7 @@ namespace synthese
 
 		void HafasFileFormat::Importer_::_showBahnhofScreen(
 			std::ostream& os,
-			boost::optional<const admin::AdminRequest&> adminRequest
+			boost::optional<const server::Request&> adminRequest
 		) const	{
 
 			// If at least a stop import has failed, no import but an admin screen if possible
@@ -1246,165 +1250,182 @@ namespace synthese
 			ImportableTableSync::ObjectBySource<RollingStockTableSync> transportModes(_dataSource, _env);
 			BOOST_FOREACH(const Zug& zug, _zugs)
 			{
-				// Line
-				CommercialLine* line(NULL);
-				if(_network.get()) // Auto creation if network is defined
+				BOOST_FOREACH(const Zug::CalendarUse& calendarUse, zug.calendars)
 				{
-					line = PTFileFormat::CreateOrUpdateLine(
-						lines,
-						zug.lineNumber,
-						optional<const string&>(),
-						optional<const string&>(),
-						optional<RGBColor>(),
-						*_network,
-						_dataSource,
-						_env,
-						os
-					);
-				}
-				else // Else only existing lines are imported
-				{
-					// Search for an existing line
-					line = PTFileFormat::GetLine(
-						lines,
-						zug.lineNumber,
-						_dataSource,
-						_env,
-						os
-					);
-
-					// If not found, zug is ignored
-					if(!line)
+					// Line
+					CommercialLine* line(NULL);
+					if(_network.get()) // Auto creation if network is defined
 					{
-						continue;
+						line = PTFileFormat::CreateOrUpdateLine(
+							lines,
+							zug.lineNumber,
+							optional<const string&>(),
+							optional<const string&>(),
+							optional<RGBColor>(),
+							*_network,
+							_dataSource,
+							_env,
+							os
+						);
 					}
-				}
-
-
-				// Update of the name with the code if nothing else is defined
-				if(line->getName().empty())
-				{
-					line->setName(zug.lineNumber);
-				}
-
-				// Wayback
-				int numericServiceNumber(0);
-				try
-				{
-					numericServiceNumber = lexical_cast<int>(zug.number.substr(zug.number.size() - 1 - _wayBackBitPosition, 1));
-				}
-				catch(bad_lexical_cast&)
-				{
-				}
-				bool wayBack = (numericServiceNumber % 2 == 1);
-
-				// Transport mode (can be NULL)
-				RollingStock* transportMode(
-					PTFileFormat::GetTransportMode(
-						transportModes,
-						zug.transportModeCode,
-						os
-				)	);
-
-				// Stops
-				JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
-				bool ignoreService(false);
-				BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
-				{
-					// Stop link
-					JourneyPattern::StopWithDepartureArrivalAuthorization stop(
-						zugStop.gleisCode.empty() ? stopPoints.get(zugStop.stopCode) : gleisStopPoint[make_pair(zugStop.stopCode, zugStop.gleisCode)],
-						boost::optional<graph::MetricOffset>(),
-						!zugStop.departureTime.is_not_a_date_time(),
-						!zugStop.arrivalTime.is_not_a_date_time()
-					);
-
-					// Check if at least a stop was found
-					if(stop._stop.empty())
+					else // Else only existing lines are imported
 					{
-						_logger.log(Logger::WARN, "The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored");
-						ignoreService = true;
-						break;
+						// Search for an existing line
+						line = PTFileFormat::GetLine(
+							lines,
+							zug.lineNumber,
+							_dataSource,
+							_env,
+							os
+						);
+
+						// If not found, zug is ignored
+						if(!line)
+						{
+							continue;
+						}
 					}
 
-					// Storage
-					stops.push_back(stop);
-				}
-				if(ignoreService)
-				{
-					if(_importFullServices)
+
+					// Update of the name with the code if nothing else is defined
+					if(line->getName().empty())
 					{
-						continue;
+						line->setName(zug.lineNumber);
+					}
+
+					// Wayback
+					int numericServiceNumber(0);
+					try
+					{
+						numericServiceNumber = lexical_cast<int>(zug.number.substr(zug.number.size() - 1 - _wayBackBitPosition, 1));
+					}
+					catch(bad_lexical_cast&)
+					{
+					}
+					bool wayBack = (numericServiceNumber % 2 == 1);
+
+					// Transport mode (can be NULL)
+					RollingStock* transportMode(
+						PTFileFormat::GetTransportMode(
+							transportModes,
+							zug.transportModeCode,
+							os
+					)	);
+
+					// Stops
+					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+					bool ignoreService(false);
+					bool inStop(false);
+					BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
+					{
+						if(zugStop.stopCode == calendarUse.startStopCode)
+						{
+							inStop = true;
+						}
+						if(!inStop)
+						{
+							continue;
+						}
+
+						// Stop link
+						JourneyPattern::StopWithDepartureArrivalAuthorization stop(
+							zugStop.gleisCode.empty() ? stopPoints.get(zugStop.stopCode) : gleisStopPoint[make_pair(zugStop.stopCode, zugStop.gleisCode)],
+							boost::optional<graph::MetricOffset>(),
+							!zugStop.departureTime.is_not_a_date_time(),
+							!zugStop.arrivalTime.is_not_a_date_time()
+						);
+
+						// Check if at least a stop was found
+						if(stop._stop.empty())
+						{
+							_logger.log(Logger::WARN, "The stop "+ zugStop.stopCode +"/"+ zugStop.gleisCode +" was not found : the service "+ zug.number +"/"+ zug.lineNumber +" is ignored");
+							ignoreService = true;
+							break;
+						}
+
+						// Storage
+						stops.push_back(stop);
+
+						if(zugStop.stopCode == calendarUse.endStopCode)
+						{
+							break;
+						}
+					}
+					if(ignoreService)
+					{
+						if(_importFullServices)
+						{
+							continue;
+						}
+						else
+						{
+							return false;
+						}
+					}
+
+					// Journey pattern
+					JourneyPattern* route(
+						PTFileFormat::CreateOrUpdateRoute(
+							*line,
+							optional<const string&>(),
+							optional<const string&>(),
+							optional<const string&>(),
+							optional<Destination*>(),
+							optional<const RuleUser::Rules&>(),
+							wayBack,
+							transportMode,
+							stops,
+							_dataSource,
+							_env,
+							os,
+							true,
+							true
+					)	);
+
+					// Schedules
+					ScheduledService::Schedules departures;
+					ScheduledService::Schedules arrivals;
+					BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
+					{
+						departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime );
+						arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
+					}
+
+					// Service
+					SchedulesBasedService* service(NULL);
+					if(zug.continuousServiceRange.is_not_a_date_time())
+					{
+						service = PTFileFormat::CreateOrUpdateService(
+							*route,
+							departures,
+							arrivals,
+							zug.number,
+							_dataSource,
+							_env,
+							os
+						);
 					}
 					else
 					{
-						return false;
+						service = PTFileFormat::CreateOrUpdateContinuousService(
+							*route,
+							departures,
+							arrivals,
+							zug.number,
+							zug.continuousServiceRange,
+							zug.continuousServiceWaitingTime,
+							_dataSource,
+							_env,
+							os
+						);
 					}
-				}
 
-				// Journey pattern
-				JourneyPattern* route(
-					PTFileFormat::CreateOrUpdateRoute(
-						*line,
-						optional<const string&>(),
-						optional<const string&>(),
-						optional<const string&>(),
-						optional<Destination*>(),
-						optional<const RuleUser::Rules&>(),
-						wayBack,
-						transportMode,
-						stops,
-						_dataSource,
-						_env,
-						os,
-						true,
-						true
-				)	);
-
-				// Schedules
-				ScheduledService::Schedules departures;
-				ScheduledService::Schedules arrivals;
-				BOOST_FOREACH(const Zug::Stop& zugStop, zug.stops)
-				{
-					departures.push_back(zugStop.departureTime.is_not_a_date_time() ? zugStop.arrivalTime : zugStop.departureTime );
-					arrivals.push_back(zugStop.arrivalTime.is_not_a_date_time() ? zugStop.departureTime : zugStop.arrivalTime);
-				}
-
-				// Service
-				SchedulesBasedService* service(NULL);
-				if(zug.continuousServiceRange.is_not_a_date_time())
-				{
-					service = PTFileFormat::CreateOrUpdateService(
-						*route,
-						departures,
-						arrivals,
-						zug.number,
-						_dataSource,
-						_env,
-						os
-					);
-				}
-				else
-				{
-					service = PTFileFormat::CreateOrUpdateContinuousService(
-						*route,
-						departures,
-						arrivals,
-						zug.number,
-						zug.continuousServiceRange,
-						zug.continuousServiceWaitingTime,
-						_dataSource,
-						_env,
-						os
-					);
-				}
-
-				// Calendar
-				if(service)
-				{
-					*service |= _calendarMap[zug.calendarNumber];
-				}
-			}
+					// Calendar
+					if(service)
+					{
+						*service |= _calendarMap[calendarUse.calendarNumber];
+					}
+			}	}
 
 			return true;
 		}

@@ -21,23 +21,24 @@
 
 #include "AlarmTableSync.h"
 
-#include "AlarmTemplate.h"
-#include "SentAlarm.h"
-#include "AlarmTemplate.h"
-#include "SentScenario.h"
-#include "SentScenarioInheritedTableSync.h"
-#include "ScenarioTemplate.h"
-#include "ScenarioTemplateInheritedTableSync.h"
-#include "MessagesTypes.h"
 #include "AlarmObjectLinkTableSync.h"
+#include "AlarmTemplate.h"
 #include "AlarmTemplateInheritedTableSync.h"
-#include "ScenarioSentAlarmInheritedTableSync.h"
+#include "DBResult.hpp"
 #include "MessagesLibraryLog.h"
 #include "MessagesLibraryRight.h"
 #include "MessagesRight.h"
 #include "MessagesLog.h"
-
-#include "DBResult.hpp"
+#include "MessagesTypes.h"
+#include "Profile.h"
+#include "ScenarioTemplate.h"
+#include "ScenarioTemplateInheritedTableSync.h"
+#include "ScenarioSentAlarmInheritedTableSync.h"
+#include "SentAlarm.h"
+#include "SentScenario.h"
+#include "SentScenarioInheritedTableSync.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

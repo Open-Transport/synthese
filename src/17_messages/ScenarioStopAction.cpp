@@ -22,9 +22,12 @@
 
 #include "ScenarioStopAction.h"
 
+#include "Profile.h"
 #include "ScenarioTableSync.h"
 #include "SentScenario.h"
 #include "SentScenarioInheritedTableSync.h"
+#include "Session.h"
+#include "User.h"
 #include "AlarmTableSync.h"
 #include "MessagesLog.h"
 #include "MessagesRight.h"

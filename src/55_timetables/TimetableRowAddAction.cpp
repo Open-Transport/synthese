@@ -22,19 +22,21 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ActionException.h"
-#include "ParametersMap.h"
-#include "Request.h"
 #include "TimetableRowAddAction.h"
 
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "Request.h"
+#include "RoadModule.h"
+#include "Session.h"
+#include "StopArea.hpp"
 #include "Timetable.h"
 #include "TimetableRight.h"
 #include "TimetableTableSync.h"
 #include "TimetableRow.h"
 #include "TimetableRowTableSync.h"
-
-#include "RoadModule.h"
-#include "StopArea.hpp"
+#include "User.h"
 
 using namespace boost;
 using namespace std;

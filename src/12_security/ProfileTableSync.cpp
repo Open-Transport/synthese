@@ -33,6 +33,7 @@
 #include "UserTableSync.h"
 #include "SecurityRight.h"
 #include "SecurityLog.h"
+#include "Session.h"
 
 #include <sstream>
 

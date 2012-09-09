@@ -36,7 +36,6 @@ namespace synthese
 {
 	using namespace db;
 	using namespace util;
-	using namespace security;
 	using namespace geography;
 
 	namespace util

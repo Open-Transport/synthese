@@ -29,10 +29,14 @@
 #include <string>
 
 #include "FactoryBase.h"
-#include "AdminInterfaceElement.h"
 
 namespace synthese
 {
+	namespace admin
+	{
+		class AdminInterfaceElement;
+	}
+
 	namespace util
 	{
 		class ParametersMap;
@@ -40,6 +44,8 @@ namespace synthese
 
 	namespace server
 	{
+		class Request;
+
 		////////////////////////////////////////////////////////////////////
 		/// Module class.
 		///	@ingroup m15
@@ -109,7 +115,7 @@ namespace synthese
 			/// @since 3.2.0
 			virtual void addAdminPageParameters(
 				util::ParametersMap& map,
-				const admin::AdminRequest& request
+				const server::Request& request
 			) const;
 
 
@@ -123,7 +129,8 @@ namespace synthese
 
 			virtual void displayAdmin(
 				std::ostream& stream,
-				const admin::AdminRequest& request
+				const server::Request& request,
+				const admin::AdminInterfaceElement& currentPage
 			) const;
 		};
 }	}

@@ -3,6 +3,8 @@ set_source_groups()
 set(svn_mysql_SRCS
 SVNCheckoutAction.cpp
 SVNCheckoutAction.hpp
+SVNCommands.cpp
+SVNCommands.hpp
 SVNCommitAction.cpp
 SVNCommitAction.hpp
 SVNModule.cpp
@@ -10,6 +12,8 @@ SVNModule.hpp
 SVNModule.gen.cpp
 SVNModule.inc.cpp
 SVNModuleRegister.cpp
+SVNRepository.cpp
+SVNRepository.hpp
 SVNUpdateAction.cpp
 SVNUpdateAction.hpp
 SVNWorkingCopy.cpp

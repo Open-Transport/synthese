@@ -23,9 +23,12 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "MapSourceAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
+#include "User.h"
 #include "GlobalRight.h"
 #include "MapSourceTableSync.hpp"
 #include "PropertiesHTMLTable.h"
@@ -101,13 +104,13 @@ namespace synthese
 
 		void MapSourceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<MapSourceUpdateAction, MapSourceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<MapSourceUpdateAction, MapSourceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setMapSource(const_pointer_cast<MapSource>(_mapSource));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));

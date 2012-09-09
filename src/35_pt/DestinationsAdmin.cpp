@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DestinationsAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "DestinationTableSync.hpp"
 #include "AdminFunctionRequest.hpp"
 #include "AdminActionFunctionRequest.hpp"
@@ -106,12 +109,12 @@ namespace synthese
 
 		void DestinationsAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<DestinationAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, DestinationsAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, DestinationsAdmin> deleteRequest(request, *this);
 
 			AdminActionFunctionRequest<DestinationUpdateAction, DestinationAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -175,7 +178,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks DestinationsAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -195,7 +198,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks DestinationsAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

@@ -21,13 +21,17 @@
 */
 
 #include "TransportNetworkTableSync.h"
+
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineTableSync.h"
+#include "ImportableTableSync.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
-#include "ImportableTableSync.hpp"
-#include "TransportNetworkRight.h"
-#include "CommercialLineTableSync.h"
-#include "CalendarTemplateTableSync.h"
+#include "Session.h"
 #include "TransportNetwork.h"
+#include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <boost/logic/tribool.hpp>
 #include <assert.h>

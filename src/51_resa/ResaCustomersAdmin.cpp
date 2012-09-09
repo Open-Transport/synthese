@@ -109,11 +109,11 @@ namespace synthese
 
 		void ResaCustomersAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			// Requests
-			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request);
+			AdminFunctionRequest<ResaCustomersAdmin> searchRequest(_request, *this);
 
 			AdminFunctionRequest<ResaCustomerAdmin> openRequest(_request);
 
@@ -195,7 +195,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -212,7 +212,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ResaCustomersAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

@@ -24,6 +24,7 @@
 
 #include "Calendar.h"
 #include "ResultHTMLTable.h"
+#include "Session.h"
 #include "HTMLModule.h"
 #include "StaticActionRequest.h"
 #include "BaseCalendarUpdateAction.hpp"
@@ -54,9 +55,9 @@ namespace synthese
 		void BaseCalendarAdmin::Display(
 			std::ostream& stream,
 			const Calendar& object,
-			boost::optional<const server::StaticFunctionRequest<AdminFunction>&> updateRequest,
-			boost::optional<util::RegistryKeyType> parentTemplateId,
-			boost::optional<util::RegistryKeyType> parentTemplateId2
+			boost::optional<const BaseAdminFunctionRequest&> updateRequest,
+			boost::optional<RegistryKeyType> parentTemplateId,
+			boost::optional<RegistryKeyType> parentTemplateId2
 		){
 			if(updateRequest)
 			{

@@ -23,10 +23,13 @@
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 #include "DRTAreaAdmin.hpp"
+
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "DRTArea.hpp"
 #include "DRTAreaUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
@@ -109,13 +112,13 @@ namespace synthese
 
 		void DRTAreaAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> updateRequest(request);
+				AdminActionFunctionRequest<DRTAreaUpdateAction, DRTAreaAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setArea(const_pointer_cast<DRTArea>(_area));
 
 				PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));

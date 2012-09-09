@@ -20,15 +20,19 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "CreateDisplayTypeAction.h"
+
 #include "Interface.h"
 #include "InterfaceTableSync.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "ActionException.h"
 #include "Request.h"
 #include "ParametersMap.h"
 #include "ArrivalDepartureTableRight.h"
 #include "DisplayType.h"
 #include "DisplayTypeTableSync.h"
-#include "CreateDisplayTypeAction.h"
 #include "ArrivalDepartureTableLog.h"
 
 using namespace std;

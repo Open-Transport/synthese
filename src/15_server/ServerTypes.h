@@ -23,12 +23,14 @@
 #ifndef SYNTHESE_server_ServerTypes_h__
 #define SYNTHESE_server_ServerTypes_h__
 
+#include <map>
+#include <string>
+
 namespace synthese
 {
 	namespace server
 	{
-
-
+		typedef std::map<std::string, std::pair<std::string, int> > CookiesMap;
 	}
 }
 

@@ -21,13 +21,17 @@
 */
 
 #include "DeleteRightAction.h"
+
+#include "ActionException.h"
+#include "ParametersMap.h"
+#include "Profile.h"
+#include "ProfileTableSync.h"
+#include "Request.h"
 #include "Right.h"
 #include "SecurityModule.h"
-#include "ProfileTableSync.h"
 #include "SecurityRight.h"
-#include "ActionException.h"
-#include "Request.h"
-#include "ParametersMap.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

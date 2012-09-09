@@ -22,10 +22,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "UserBookmarksService.hpp"
+
+#include "Profile.h"
 #include "RequestException.h"
 #include "Request.h"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
-#include "UserBookmarksService.hpp"
+#include "User.h"
 #include "UserFavoriteJourney.h"
 #include "UserFavoriteJourneyTableSync.h"
 #include "Webpage.h"

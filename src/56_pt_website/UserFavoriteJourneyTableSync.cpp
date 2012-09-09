@@ -22,13 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "UserFavoriteJourneyTableSync.h"
+
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "Session.h"
+#include "TransportWebsiteRight.h"
 #include "UserFavoriteJourney.h"
 #include "UserTableSync.h"
-#include "ReplaceQuery.h"
-#include "TransportWebsiteRight.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;

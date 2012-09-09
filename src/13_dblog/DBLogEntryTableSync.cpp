@@ -20,13 +20,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DBLogEntryTableSync.h"
+
 #include "DeleteQuery.hpp"
-#include "SelectQuery.hpp"
-#include "ReplaceQuery.h"
 #include "DBLog.h"
 #include "DBLogRight.h"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
 #include "UserTableSync.h"
-#include "DBLogEntryTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>

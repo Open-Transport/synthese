@@ -22,12 +22,15 @@
 
 #include "Address.h"
 
-#include "ObjectBase.hpp"
-#include "Road.h"
 #include "AccessParameters.h"
+#include "Env.h"
+#include "ObjectBase.hpp"
+#include "ParametersMap.h"
+#include "Record.hpp"
+#include "ReverseRoadChunk.hpp"
+#include "Road.h"
 #include "RoadModule.h"
 #include "VertexAccessMap.h"
-#include "ReverseRoadChunk.hpp"
 
 using namespace std;
 using namespace boost;
@@ -47,7 +50,11 @@ namespace synthese
 			MainRoadChunk& roadChunk,
 			double metricOffset,
 			optional<MainRoadChunk::HouseNumber> houseNumber
-		):	WithGeometry<Point>(roadChunk.getPointFromOffset(metricOffset)),
+		):	WithGeometry<Point>(
+				roadChunk.getGeometry().get() ?
+				roadChunk.getPointFromOffset(metricOffset) :
+				boost::shared_ptr<geos::geom::Point>()
+			),
 			_roadChunk(&roadChunk),
 			_metricOffset(metricOffset),
 			_houseNumber(houseNumber)

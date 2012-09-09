@@ -22,8 +22,11 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "GlobalRight.h"
 #include "MapSourcesAdmin.hpp"
+
+#include "GlobalRight.h"
+#include "Profile.h"
+#include "User.h"
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
 #include "GeographyModule.h"
@@ -107,12 +110,12 @@ namespace synthese
 
 		void MapSourcesAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminFunctionRequest<MapSourceAdmin> openRequest(request);
 
-			AdminActionFunctionRequest<RemoveObjectAction, MapSourcesAdmin> deleteRequest(request);
+			AdminActionFunctionRequest<RemoveObjectAction, MapSourcesAdmin> deleteRequest(request, *this);
 
 			AdminActionFunctionRequest<MapSourceUpdateAction, MapSourceAdmin> addRequest(request);
 			addRequest.setActionWillCreateObject();
@@ -195,7 +198,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks MapSourcesAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;
@@ -215,7 +218,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks MapSourcesAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

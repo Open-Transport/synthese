@@ -33,6 +33,8 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 #include "ObjectNotFoundException.h"
 #include "ActionException.h"
 #include "Request.h"
+#include "Session.h"
+#include "User.h"
 #include "ParametersMap.h"
 
 #include <sstream>

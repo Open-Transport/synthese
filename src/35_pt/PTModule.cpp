@@ -20,20 +20,22 @@
     Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "ServerModule.h"
 #include "PTModule.h"
-#include "ScheduledService.h"
-#include "Env.h"
-#include "ContinuousService.h"
-#include "Journey.h"
-#include "UtilConstants.h"
-#include "T9Filter.h"
-#include "SentAlarm.h"
-#include "MessagesTypes.h"
-#include "TransportNetworkTableSync.h"
-#include "TransportNetwork.h"
-#include "CommercialLineTableSync.h"
+
 #include "CommercialLine.h"
+#include "CommercialLineTableSync.h"
+#include "ContinuousService.h"
+#include "Env.h"
+#include "IneoNCEConnection.hpp"
+#include "Journey.h"
+#include "MessagesTypes.h"
+#include "ScheduledService.h"
+#include "SentAlarm.h"
+#include "ServerModule.h"
+#include "T9Filter.h"
+#include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
+#include "UtilConstants.h"
 #include "Crossing.h"
 #include "JourneyPattern.hpp"
 #include "StopArea.hpp"
@@ -99,6 +101,12 @@ namespace synthese
 					&PTModule::RTDataCleaner
 			)	);
 			ServerModule::AddThread(theThread, "Real time data cleaner");
+
+			// NCE Thread
+//			shared_ptr<thread> nceThread(
+//				new thread(
+//					&IneoNCEConnection::InitThread
+//			)	);
 
 			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
 			Env env;

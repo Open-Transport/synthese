@@ -28,6 +28,7 @@ set(MODULES
 10_db
 10_db/101_sqlite
 10_db/103_svn
+11_cms
 11_interfaces
 12_security
 13_dblog
@@ -42,7 +43,6 @@ set(MODULES
 33_algorithm
 34_road
 35_pt
-36_cms
 37_pt_operation
 39_map
 51_resa

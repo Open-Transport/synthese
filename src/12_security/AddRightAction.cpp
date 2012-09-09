@@ -21,7 +21,11 @@
 */
 
 #include "AddRightAction.h"
+
+#include "Profile.h"
 #include "SecurityModule.h"
+#include "Session.h"
+#include "User.h"
 #include "ProfileTableSync.h"
 #include "Right.h"
 #include "SecurityLog.h"
@@ -107,7 +111,7 @@ namespace synthese
 			const Session* session
 		) const {
 			return session && session->hasProfile() && session->getUser()->getProfile()->isAuthorized<SecurityRight>(WRITE);
-			/// @todo Add a control on the profile on the user who creates the new profile
+			/// @todo Add a check on the profile on the user who creates the new profile
 		}
 
 		void AddRightAction::setProfile(boost::shared_ptr<Profile> value)

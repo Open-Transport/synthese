@@ -23,7 +23,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "AlarmAddLinkAction.h"
+
+#include "Profile.h"
 #include "SentAlarm.h"
+#include "Session.h"
+#include "User.h"
 #include "AlarmTemplate.h"
 #include "AlarmRecipient.h"
 #include "AlarmObjectLink.h"

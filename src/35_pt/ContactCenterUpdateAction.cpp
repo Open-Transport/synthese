@@ -26,10 +26,13 @@
 
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
 #include "ReservationContact.h"
 #include "ReservationContactTableSync.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 using namespace std;
 

@@ -34,6 +34,7 @@
 #include "ObjectCreateAction.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "ProjectAddressAction.hpp"
 #include "PropertiesHTMLTable.h"
 #include "PTRoadsAdmin.h"
@@ -44,6 +45,7 @@
 #include "RoadModule.h"
 #include "RoadPlace.h"
 #include "StaticActionRequest.h"
+#include "User.h"
 
 using namespace boost;
 using namespace std;
@@ -129,7 +131,7 @@ namespace synthese
 
 		void PublicPlaceAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -232,7 +234,7 @@ namespace synthese
 			if (openTabContent(stream, TAB_ENTRANCES))
 			{
 				// Request
-				AdminActionFunctionRequest<RemoveObjectAction, PublicPlaceAdmin> removeEntranceRequest(request);
+				AdminActionFunctionRequest<RemoveObjectAction, PublicPlaceAdmin> removeEntranceRequest(request, *this);
 				AdminFunctionRequest<PTRoadsAdmin> openRoadRequest(request);
 
 				// Table
@@ -298,7 +300,7 @@ namespace synthese
 			{
 				stream << "<h1>Propriétés</h1>";
 
-				AdminActionFunctionRequest<ObjectUpdateAction, PublicPlaceAdmin> updateRequest(request);
+				AdminActionFunctionRequest<ObjectUpdateAction, PublicPlaceAdmin> updateRequest(request, *this);
 				updateRequest.getAction()->setObject(*_place);
 
 				// General properties
@@ -346,7 +348,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks PublicPlaceAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			AdminInterfaceElement::PageLinks links;

@@ -22,12 +22,16 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "CallEndAction.h"
+
 #include "ActionException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "Request.h"
-#include "CallEndAction.h"
 #include "ResaRight.h"
 #include "ResaModule.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 

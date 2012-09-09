@@ -20,11 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-// Env
 #include "CommercialLineTableSync.h"
+
 #include "CommercialLine.h"
-#include "TransportNetworkTableSync.h"
+#include "Profile.h"
+#include "Session.h"
 #include "TransportNetwork.h"
+#include "TransportNetworkTableSync.h"
+#include "User.h"
 #include "JourneyPatternTableSync.hpp"
 #include "TreeFolderTableSync.hpp"
 #include "Place.h"

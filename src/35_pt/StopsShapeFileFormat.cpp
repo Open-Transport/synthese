@@ -135,7 +135,7 @@ namespace synthese
 			const boost::filesystem::path& filePath,
 			std::ostream& stream,
 			const std::string& key,
-			boost::optional<const admin::AdminRequest&> request
+			boost::optional<const server::Request&> request
 		) const {
 			PTFileFormat::ImportableStopPoints linkedStopPoints;
 			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
@@ -336,7 +336,7 @@ namespace synthese
 
 		void StopsShapeFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			stream << "<h1>Fichiers</h1>";
 

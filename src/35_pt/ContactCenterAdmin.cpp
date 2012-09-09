@@ -26,8 +26,10 @@
 
 #include "AdminParametersException.h"
 #include "ParametersMap.h"
+#include "Profile.h"
 #include "PTModule.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 #include "ReservationContact.h"
 #include "ContactCenterUpdateAction.hpp"
 #include "PropertiesHTMLTable.h"
@@ -108,13 +110,13 @@ namespace synthese
 
 		void ContactCenterAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 
 			//////////////////////////////////////////////////////////////////////////
 			// Properties update form
 			stream << "<h1>Propriétés</h1>";
-			AdminActionFunctionRequest<ContactCenterUpdateAction, ContactCenterAdmin> updateRequest(request);
+			AdminActionFunctionRequest<ContactCenterUpdateAction, ContactCenterAdmin> updateRequest(request, *this);
 			updateRequest.getAction()->setContactCenter(const_pointer_cast<ReservationContact>(_contactCenter));
 			PropertiesHTMLTable t(updateRequest.getHTMLForm("update"));
 			stream << t.open();

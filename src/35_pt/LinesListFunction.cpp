@@ -25,15 +25,21 @@
 
 #include "LinesListFunction.h"
 
+#include "CalendarTemplate.h"
 #include "CityTableSync.h"
 #include "CommercialLineTableSync.h"
 #include "GetMessagesFunction.hpp"
 #include "ImportableTableSync.hpp"
 #include "JourneyPattern.hpp"
 #include "MimeTypes.hpp"
+#include "Profile.h"
 #include "PTUseRule.h"
+#include "Right.h"
+#include "Session.h"
+#include "User.h"
 #include "CommercialLine.h"
 #include "Path.h"
+#include "Request.h"
 #include "RequestException.h"
 #include "ReservationContact.h"
 #include "RollingStock.hpp"
@@ -53,6 +59,7 @@
 #include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/algorithm/string/split.hpp>
+#include <boost/date_time/gregorian/greg_date.hpp>
 
 using namespace std;
 using namespace boost;
@@ -60,9 +67,11 @@ using namespace geos::geom;
 using namespace geos::io;
 using namespace boost::algorithm;
 using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
+	using namespace calendar;
 	using namespace util;
 	using namespace server;
 	using namespace pt;
@@ -103,6 +112,8 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_CONTACT_CENTER_ID = "contact_center_id";
 		const string LinesListFunction::PARAMETER_CITY_FILTER = "city_filter";
 		const string LinesListFunction::PARAMETER_STOP_AREA_TERMINUS_PAGE_ID ="terminus_page";
+		const string LinesListFunction::PARAMETER_DATE_FILTER = "date_filter";
+		const string LinesListFunction::PARAMETER_CALENDAR_FILTER = "calendar_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -434,6 +445,35 @@ namespace synthese
 				}
 			}
 
+			// Date filter
+			string dateFilterStr(map.getDefault<string>(PARAMETER_DATE_FILTER));
+			if(!dateFilterStr.empty())
+			{
+				_dateFilter = from_string(dateFilterStr);
+			}
+
+			// Calendar template filter
+			RegistryKeyType calendarTemplateFilter(map.getDefault<RegistryKeyType>(PARAMETER_CALENDAR_FILTER, 0));
+			if(calendarTemplateFilter)
+			{
+				try
+				{
+					_calendarFilter = Env::GetOfficialEnv().get<CalendarTemplate>(calendarTemplateFilter);
+				}
+				catch(ObjectNotFoundException<CalendarTemplate>&)
+				{
+					throw RequestException("Calendar filter not found");
+				}
+				if((*_calendarFilter)->isLimited())
+				{
+					_calendarDaysFilter = (*_calendarFilter)->getResult();
+				}
+				else
+				{
+					throw RequestException("The calendar filter must be limited");
+				}
+
+			}
 		}
 
 
@@ -570,6 +610,20 @@ namespace synthese
 			if(	_contactCenterFilter &&
 				_contactCenterFilter->get() &&
 				_contactCenterFilter->get() != line.getReservationContact()
+			){
+				return false;
+			}
+
+			// Date filter
+			if(	_dateFilter &&
+				!line.runsAtDate(*_dateFilter)
+			){
+				return false;
+			}
+
+			// Calendar filter
+			if(	_calendarFilter &&
+				!line.runsOnCalendar(_calendarDaysFilter)
 			){
 				return false;
 			}

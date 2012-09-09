@@ -26,6 +26,7 @@
 
 #include "AlgorithmLogger.hpp"
 #include "TransportWebsiteModule.h"
+#include "User.h"
 #include "PTServiceConfigTableSync.hpp"
 #include "SiteUpdateAction.h"
 #include "TransportWebsiteRight.h"
@@ -156,7 +157,7 @@ namespace synthese
 
 		void TransportSiteAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			////////////////////////////////////////////////////////////////////
@@ -166,7 +167,8 @@ namespace synthese
 
 				// Requests
 				AdminActionFunctionRequest<SiteUpdateAction, TransportSiteAdmin> updateRequest(
-					_request
+					_request,
+					*this
 				);
 				updateRequest.getAction()->setSite(const_pointer_cast<PTServiceConfig>(_config));
 
@@ -227,10 +229,10 @@ namespace synthese
 
 				AdminFunctionRequest<PTPlacesAdmin> openCityRequest(_request);
 
-				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request);
+				AdminActionFunctionRequest<SiteCityAddAction,TransportSiteAdmin> cityAddRequest(_request, *this);
 				cityAddRequest.getAction()->setConfig(_config);
 
-				AdminActionFunctionRequest<RemoveObjectAction,TransportSiteAdmin> cityRemoveRequest(_request);
+				AdminActionFunctionRequest<RemoveObjectAction,TransportSiteAdmin> cityRemoveRequest(_request, *this);
 
 				HTMLForm f(cityAddRequest.getHTMLForm("add_city"));
 				HTMLTable::ColsVector v;
@@ -273,7 +275,7 @@ namespace synthese
 			// TAB ROUTE PLANNER
 			if (openTabContent(stream, TAB_ROUTE_PLANNING))
 			{
-				AdminFunctionRequest<TransportSiteAdmin> searchRequest(_request);
+				AdminFunctionRequest<TransportSiteAdmin> searchRequest(_request, *this);
 
 				// Search form
 				stream << "<h1>Recherche</h1>";
@@ -399,7 +401,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 
@@ -427,7 +429,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks TransportSiteAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

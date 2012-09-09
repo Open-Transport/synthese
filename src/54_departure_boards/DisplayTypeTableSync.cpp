@@ -23,16 +23,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "DisplayTypeTableSync.h"
+
+#include "ArrivalDepartureTableRight.h"
+#include "ArrivalDepartureTableLog.h"
+#include "Conversion.h"
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
-#include "InterfaceTableSync.h"
-#include "Conversion.h"
-#include "ReplaceQuery.h"
-#include "WebPageTableSync.h"
 #include "DisplayScreenTableSync.h"
-#include "ArrivalDepartureTableRight.h"
-#include "ArrivalDepartureTableLog.h"
+#include "InterfaceTableSync.h"
+#include "Profile.h"
+#include "ReplaceQuery.h"
+#include "Session.h"
+#include "User.h"
+#include "WebPageTableSync.h"
 
 #include <sstream>
 

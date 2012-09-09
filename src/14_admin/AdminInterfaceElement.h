@@ -51,8 +51,7 @@ namespace synthese
 
 	namespace admin
 	{
-		class AdminFunction;
-		typedef server::StaticFunctionRequest<AdminFunction> AdminRequest;
+		class AdminPageDisplayService;
 
 		////////////////////////////////////////////////////////////////////
 		/// Composant d'administration.
@@ -70,6 +69,9 @@ namespace synthese
 			public util::FactoryBase<AdminInterfaceElement>
 		{
 		public:
+			static const std::string DATA_ICON;
+			static const std::string DATA_TITLE;
+			static const std::string DATA_URL;
 
 			class PageLinks
 			{
@@ -238,7 +240,7 @@ namespace synthese
 			PageLinksTree	_buildTreeRecursion(
 				boost::shared_ptr<const AdminInterfaceElement> page,
 				const PageLinks position,
-				const AdminRequest& request
+				const server::Request& request
 			) const;
 
 			util::Env& _getEnv() const;
@@ -255,7 +257,7 @@ namespace synthese
 			/// This method has to be called by the current displayed admin page.
 			////////////////////////////////////////////////////////////////////
 			void _buildTree(
-				const AdminRequest& request
+				const server::Request& request
 			) const;
 
 
@@ -379,12 +381,14 @@ namespace synthese
 
 			//! \name Getters
 			//@{
-				const PageLinks&		getTreePosition(
-					const AdminRequest& request
+				const PageLinks& getTreePosition(
+					const server::Request& request
 				)	const;
-				const PageLinksTree&	getTree(
-					const AdminRequest& request
+
+				const PageLinksTree& getTree(
+					const server::Request& request
 				)	const;
+
 				const Tabs&				getTabs()			const;
 				std::string				getCurrentTab()		const;
 				const std::string&		getActiveTab()		const;
@@ -418,7 +422,7 @@ namespace synthese
 			////////////////////////////////////////////////////////////////////
 			void displayTabs(
 				std::ostream& stream,
-				const AdminRequest& request
+				const server::Request& request
 			) const;
 
 
@@ -462,7 +466,7 @@ namespace synthese
 				*/
 				virtual void display(
 					std::ostream& stream,
-					const AdminRequest& request
+					const server::Request& request
 				) const = 0;
 
 				virtual std::string getIcon() const = 0;
@@ -480,7 +484,7 @@ namespace synthese
 				*/
 				virtual PageLinks getSubPages(
 					const AdminInterfaceElement& currentPage,
-					const AdminRequest& _request
+					const server::Request& _request
 				) const;
 
 
@@ -488,7 +492,7 @@ namespace synthese
 				virtual PageLinks getSubPagesOfModule(
 					const server::ModuleClass& module,
 					const AdminInterfaceElement& currentPage,
-					const AdminRequest& _request
+					const server::Request& _request
 				) const;
 
 
@@ -500,13 +504,20 @@ namespace synthese
 				*/
 				virtual bool isPageVisibleInTree(
 					const AdminInterfaceElement& currentPage,
-					const AdminRequest& _request
+					const server::Request& _request
 				) const;
 
 				template<class N>
 				boost::shared_ptr<N> getNewPage() const;
 
 				virtual boost::shared_ptr<AdminInterfaceElement> getNewBaseCopiedPage() const = 0;
+			//@}
+
+			/// @name Services
+			//@{
+				void toParametersMap(
+					util::ParametersMap& pm
+				) const;
 			//@}
 		};
 

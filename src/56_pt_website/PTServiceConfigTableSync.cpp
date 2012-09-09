@@ -22,12 +22,15 @@
 
 #include "PTServiceConfigTableSync.hpp"
 
-#include "ReplaceQuery.h"
-#include "SelectQuery.hpp"
-#include "WebPageTableSync.h"
 #include "ObjectSiteLinkTableSync.h"
+#include "Profile.h"
+#include "ReplaceQuery.h"
 #include "RollingStockFilterTableSync.h"
+#include "SelectQuery.hpp"
+#include "Session.h"
 #include "TransportWebsiteRight.h"
+#include "User.h"
+#include "WebPageTableSync.h"
 
 #include <sstream>
 #include <boost/tokenizer.hpp>

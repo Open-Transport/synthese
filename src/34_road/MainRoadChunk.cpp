@@ -52,7 +52,8 @@ namespace synthese
 				rankInRoad,
 				road,
 				metricOffset
-			)
+			),
+			_reverseRoadChunk(NULL)
 		{}
 
 

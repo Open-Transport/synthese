@@ -21,9 +21,13 @@
 */
 
 #include "ScheduledServiceTableSync.h"
+
 #include "LoadException.h"
 #include "Path.h"
+#include "Profile.h"
 #include "PTModule.h"
+#include "Session.h"
+#include "User.h"
 #include "JourneyPatternTableSync.hpp"
 #include "PTUseRuleTableSync.h"
 #include "PTUseRule.h"

@@ -23,10 +23,12 @@
 */
 
 #include "ResaLogAdmin.h"
+
 #include "ResaEditLogEntryAdmin.h"
 #include "ResaModule.h"
 #include "ResaDBLog.h"
 #include "ResaRight.h"
+#include "User.h"
 #include "CancelReservationAction.h"
 #include "Request.h"
 #include "Profile.h"
@@ -36,7 +38,6 @@
 #include "SearchFormHTMLTable.h"
 #include "DBLogEntry.h"
 #include "DBLogEntryTableSync.h"
-#include "AdminFunction.h"
 
 using namespace std;
 using namespace boost;
@@ -89,7 +90,7 @@ namespace synthese
 
 		void ResaLogAdmin::display(
 			ostream& stream,
-			const admin::AdminRequest& _request
+			const server::Request& _request
 		) const	{
 
 			stream << "<h1>Journal</h1>";
@@ -97,7 +98,7 @@ namespace synthese
 			// Results
 			_log.display(
 				stream,
-				AdminRequest(_request, true),
+				_request,
 				true,
 				true
 			);
@@ -115,7 +116,7 @@ namespace synthese
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPagesOfModule(
 			const ModuleClass& module,
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 			if(	dynamic_cast<const ResaModule*>(&module) &&
@@ -132,7 +133,7 @@ namespace synthese
 
 		AdminInterfaceElement::PageLinks ResaLogAdmin::getSubPages(
 			const AdminInterfaceElement& currentPage,
-			const admin::AdminRequest& request
+			const server::Request& request
 		) const	{
 			AdminInterfaceElement::PageLinks links;
 

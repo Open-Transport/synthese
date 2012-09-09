@@ -21,8 +21,12 @@
 */
 
 #include "DisplayScreenCPUUpdateAction.h"
+
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "Profile.h"
+#include "Session.h"
+#include "User.h"
 #include "DeparturesTableModule.h"
 #include "ArrivalDepartureTableLog.h"
 #include "ArrivalDepartureTableRight.h"

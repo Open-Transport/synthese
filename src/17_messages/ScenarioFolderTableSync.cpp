@@ -30,9 +30,12 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "ScenarioTemplateInheritedTableSync.h"
 #include "MessagesLibraryRight.h"
+#include "Session.h"
+#include "User.h"
 
 using namespace std;
 using namespace boost;

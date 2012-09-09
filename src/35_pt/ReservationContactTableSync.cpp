@@ -27,9 +27,12 @@
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "Profile.h"
 #include "ReplaceQuery.h"
 #include "ReservationContact.h"
+#include "Session.h"
 #include "TransportNetworkRight.h"
+#include "User.h"
 
 #include <sstream>
 
