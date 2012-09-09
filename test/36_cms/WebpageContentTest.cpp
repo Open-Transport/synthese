@@ -31,6 +31,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace boost;
+using namespace std;
 using namespace synthese::util;
 using namespace synthese::cms;
 using namespace synthese::server;
