@@ -93,7 +93,7 @@ namespace synthese
 			return map;
 		}
 
-		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map) throw(ActionException)
+		void UpdateAlarmMessagesAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Alarm
 			try
@@ -140,7 +140,7 @@ namespace synthese
 
 		void UpdateAlarmMessagesAction::run(
 			Request& request
-		) throw(ActionException) {
+		){
 
 			stringstream s;
 
@@ -216,7 +216,7 @@ namespace synthese
 
 		void UpdateAlarmMessagesAction::setAlarmId(
 			util::RegistryKeyType id
-		) throw(server::ActionException) {
+		){
 			try
 			{
 				_alarm = AlarmTableSync::GetEditable(id, *_env);
