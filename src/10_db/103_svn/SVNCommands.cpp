@@ -62,9 +62,10 @@ namespace synthese
 						cmd << " --password " << password;
 					}
 					cmd << " " << parameters << " 2>&1";
+					string cmdStr(cmd.str());
 
 					stringstream response;
-					FILE* pipe = popen(cmd.str().c_str(), "r");
+					FILE* pipe = popen(cmdStr.c_str(), "r");
 					if(!pipe)
 					{
 						return result;
