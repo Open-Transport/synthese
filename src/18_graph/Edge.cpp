@@ -326,7 +326,7 @@ namespace synthese
 			bool RTData
 		) const {
 
-			boost::mutex::scoped_lock lock(_indexMutex);
+			boost::recursive_mutex::scoped_lock lock(_indexMutex);
 
 			const ServiceSet& services(getParentPath()->getServices());
 			size_t numHour;
