@@ -318,4 +318,34 @@ namespace synthese
 			}
 			return false;
 		}
+
+
+
+		bool CommercialLine::runsAtDate( const boost::gregorian::date& day ) const
+		{
+			BOOST_FOREACH(const ServicesByNumber::value_type& it, _servicesByNumber)
+			{
+				if(	!dynamic_cast<NonPermanentService*>(it.second) ||
+					static_cast<NonPermanentService*>(it.second)->isActive(day)
+				){
+					return true;
+				}
+			}
+			return false;
+		}
+
+
+
+		bool CommercialLine::runsOnCalendar( const calendar::Calendar& cal ) const
+		{
+			BOOST_FOREACH(const ServicesByNumber::value_type& it, _servicesByNumber)
+			{
+				if(	!dynamic_cast<NonPermanentService*>(it.second) ||
+					static_cast<NonPermanentService*>(it.second)->hasAtLeastOneCommonDateWith(cal)
+				){
+					return true;
+				}
+			}
+			return false;
+		}
 }	}

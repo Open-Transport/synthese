@@ -28,6 +28,7 @@
 #include "FactorableTemplate.h"
 #include "Function.h"
 
+#include "Calendar.h"
 #include "SecurityTypes.hpp"
 
 #include <boost/shared_ptr.hpp>
@@ -35,6 +36,11 @@
 namespace synthese
 {
 	class CoordinatesSystem;
+
+	namespace calendar
+	{
+		class CalendarTemplate;
+	}
 
 	namespace geography
 	{
@@ -92,6 +98,8 @@ namespace synthese
 			static const std::string PARAMETER_CONTACT_CENTER_ID;
 			static const std::string PARAMETER_CITY_FILTER;
 			static const std::string PARAMETER_STOP_AREA_TERMINUS_PAGE_ID;
+			static const std::string PARAMETER_DATE_FILTER;
+			static const std::string PARAMETER_CALENDAR_FILTER;
 
 			static const std::string FORMAT_WKT;
 
@@ -134,6 +142,9 @@ namespace synthese
 				std::string _rightClass;
 				boost::optional<security::RightLevel> _rightLevel;
 				boost::optional<boost::shared_ptr<const ReservationContact> > _contactCenterFilter;
+				boost::optional<boost::gregorian::date> _dateFilter;
+				boost::optional<boost::shared_ptr<const calendar::CalendarTemplate> > _calendarFilter;
+				calendar::Calendar _calendarDaysFilter;
 			//@}
 
 			mutable boost::optional<const security::RightsOfSameClassMap&> _rights;
