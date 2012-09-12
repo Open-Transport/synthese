@@ -449,7 +449,14 @@ namespace synthese
 			string dateFilterStr(map.getDefault<string>(PARAMETER_DATE_FILTER));
 			if(!dateFilterStr.empty())
 			{
-				_dateFilter = from_string(dateFilterStr);
+				if(dateFilterStr == "t")
+				{
+					_dateFilter = day_clock::local_day();
+				}
+				else
+				{
+					_dateFilter = from_string(dateFilterStr);
+				}
 			}
 
 			// Calendar template filter
