@@ -272,6 +272,13 @@ namespace synthese
 				/// Checks if at least one service runs at least at one of the active dates
 				/// of the specified calendar.
 				bool runsOnCalendar(const calendar::Calendar& cal) const;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if at least one service runs in the next minutes.
+				/// @param when duration to check
+				bool runsSoon(const boost::posix_time::time_duration& when) const;
 			//@}
 
 			//! @name Modifiers

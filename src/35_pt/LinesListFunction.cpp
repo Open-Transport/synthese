@@ -114,6 +114,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_STOP_AREA_TERMINUS_PAGE_ID ="terminus_page";
 		const string LinesListFunction::PARAMETER_DATE_FILTER = "date_filter";
 		const string LinesListFunction::PARAMETER_CALENDAR_FILTER = "calendar_filter";
+		const string LinesListFunction::PARAMETER_RUNS_SOON_FILTER = "runs_soon_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -481,6 +482,14 @@ namespace synthese
 				}
 
 			}
+
+
+			// Runs soon filter (TL specific default value)
+			long duration(map.getDefault<long>(PARAMETER_RUNS_SOON_FILTER, 180));
+			if(duration)
+			{
+				_runsSoonFilter = minutes(duration);
+			}
 		}
 
 
@@ -631,6 +640,13 @@ namespace synthese
 			// Calendar filter
 			if(	_calendarFilter &&
 				!line.runsOnCalendar(_calendarDaysFilter)
+			){
+				return false;
+			}
+
+			// Runs soon ?
+			if(	_runsSoonFilter &&
+				!line.runsSoon(*_runsSoonFilter)
 			){
 				return false;
 			}

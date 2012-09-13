@@ -100,6 +100,7 @@ namespace synthese
 			static const std::string PARAMETER_STOP_AREA_TERMINUS_PAGE_ID;
 			static const std::string PARAMETER_DATE_FILTER;
 			static const std::string PARAMETER_CALENDAR_FILTER;
+			static const std::string PARAMETER_RUNS_SOON_FILTER;
 
 			static const std::string FORMAT_WKT;
 
@@ -145,6 +146,7 @@ namespace synthese
 				boost::optional<boost::gregorian::date> _dateFilter;
 				boost::optional<boost::shared_ptr<const calendar::CalendarTemplate> > _calendarFilter;
 				calendar::Calendar _calendarDaysFilter;
+				boost::optional<boost::posix_time::time_duration> _runsSoonFilter;
 			//@}
 
 			mutable boost::optional<const security::RightsOfSameClassMap&> _rights;
