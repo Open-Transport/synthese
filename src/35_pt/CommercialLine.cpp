@@ -358,6 +358,7 @@ namespace synthese
 			AccessParameters ap;
 			ptime now(second_clock::local_time());
 			ptime maxTime(now + when);
+			boost::optional<Edge::DepartureServiceIndex::Value> fakeIndex;
 			BOOST_FOREACH(Path* path, _paths)
 			{
 				if(path->getEdges().empty())
@@ -372,7 +373,7 @@ namespace synthese
 						now,
 						maxTime,
 						false,
-						boost::optional<Edge::DepartureServiceIndex::Value>()
+						fakeIndex
 				)	);
 				if(nextService.getService())
 				{
@@ -388,7 +389,7 @@ namespace synthese
 							now,
 							maxTime,
 							false,
-							boost::optional<Edge::DepartureServiceIndex::Value>()
+							fakeIndex
 					)	);
 					if(nextService.getService())
 					{
