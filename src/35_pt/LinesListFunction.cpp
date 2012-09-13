@@ -646,6 +646,8 @@ namespace synthese
 
 			// Runs soon ?
 			if(	_runsSoonFilter &&
+				line.getShortName().size() > 1 &&
+				*line.getShortName().begin() == 'N' &&
 				!line.runsSoon(*_runsSoonFilter)
 			){
 				return false;
