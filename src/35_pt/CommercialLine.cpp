@@ -23,6 +23,7 @@
 #include "CommercialLine.h"
 
 #include "AccessParameters.h"
+#include "Edge.h"
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
