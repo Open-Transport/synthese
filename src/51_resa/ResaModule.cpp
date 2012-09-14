@@ -119,19 +119,28 @@ namespace synthese
 			{
 Log::GetInstance().debug("Basic resa profile check1");
 				Env env;
+				Log::GetInstance().debug("Basic resa profile check1");
 				ProfileTableSync::SearchResult profiles(
 					ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME)
 				);
+				Log::GetInstance().debug("Basic resa profile check2");
 				if (profiles.empty())
 					ResaModule::_basicProfile.reset(new Profile);
 				else
 					ResaModule::_basicProfile = profiles.front();
+				Log::GetInstance().debug("Basic resa profile check3");
 				ResaModule::_basicProfile->setName(ResaModule::_BASIC_PROFILE_NAME);
+				Log::GetInstance().debug("Basic resa profile check4");
 				shared_ptr<Right> r(new GlobalRight);
+				Log::GetInstance().debug("Basic resa profile check5");
 				r->setPrivateLevel(FORBIDDEN);
+				Log::GetInstance().debug("Basic resa profile check6");
 				r->setPublicLevel(FORBIDDEN);
+				Log::GetInstance().debug("Basic resa profile check7");
 				ResaModule::_basicProfile->cleanRights();
+				Log::GetInstance().debug("Basic resa profile check8");
 				ResaModule::_basicProfile->addRight(r);
+				Log::GetInstance().debug("Basic resa profile check9");
 				ProfileTableSync::Save(ResaModule::_basicProfile.get());
 				Log::GetInstance().debug("Basic resa profile checked");
 			}
