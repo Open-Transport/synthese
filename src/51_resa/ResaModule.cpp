@@ -132,6 +132,7 @@ namespace synthese
 				ResaModule::_basicProfile->cleanRights();
 				ResaModule::_basicProfile->addRight(r);
 				ProfileTableSync::Save(ResaModule::_basicProfile.get());
+				Log::GetInstance().debug("Basic resa profile checked");
 			}
 
 			// Autoresa profile
@@ -155,6 +156,7 @@ namespace synthese
 				r3->setPublicLevel(FORBIDDEN);
 				ResaModule::_autoresaProfile->addRight(r3);
 				ProfileTableSync::Save(ResaModule::_autoresaProfile.get());
+				Log::GetInstance().debug("Autoresa resa profile checked");
 			}
 		}
 
