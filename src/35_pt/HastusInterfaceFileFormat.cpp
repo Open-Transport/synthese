@@ -104,6 +104,7 @@ namespace synthese
 	namespace pt
 	{
 		const string HastusInterfaceFileFormat::Importer_::PARAMETER_TRANSPORT_NETWORK_ID = "network_id";
+		const string HastusInterfaceFileFormat::Importer_::PARAMETER_FILE_NAME_IS_A_CALENDAR = "file_name_is_a_calendar";
 
 
 		//////////////////////////////////////////////////////////////////////////
@@ -113,7 +114,8 @@ namespace synthese
 			const DataSource& dataSource
 		):	OneFileTypeImporter<Importer_>(env, dataSource),
 			Importer(env, dataSource),
-			PTDataCleanerFileFormat(env, dataSource)
+			PTDataCleanerFileFormat(env, dataSource),
+			_fileNameIsACalendar(false)
 		{}
 
 
@@ -128,6 +130,12 @@ namespace synthese
 			if(_network.get())
 			{
 				result.insert(PARAMETER_TRANSPORT_NETWORK_ID, _network->getKey());
+			}
+
+			// File name is a calendar
+			if(_fileNameIsACalendar)
+			{
+				result.insert(PARAMETER_FILE_NAME_IS_A_CALENDAR, _fileNameIsACalendar);
 			}
 
 			return result;
@@ -152,6 +160,9 @@ namespace synthese
 			{
 				throw RequestException("No such network");
 			}
+
+			// File name as calendar
+			_fileNameIsACalendar = map.getDefault<bool>(PARAMETER_FILE_NAME_IS_A_CALENDAR, false);
 		}
 
 
@@ -168,8 +179,32 @@ namespace synthese
 			// Load object linked to the datasource
 			impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendars(_dataSource, _env);
 
+			// Missing calendars
+			set<string> missingCalendars;
+
 			// File opening
 			_openFile(filePath);
+
+			// File name is a calendar
+			optional<Calendar> fileMask;
+			if(_fileNameIsACalendar)
+			{
+				string fileName(filePath.filename());
+				CalendarTemplate* fileCalendar(
+					CalendarFileFormat::GetCalendarTemplate(
+						calendars,
+						fileName,
+						os
+				)	);
+				if(fileCalendar)
+				{
+					fileMask = fileCalendar->getResult(_calendar);
+				}
+				else
+				{
+					missingCalendars.insert(fileName);
+				}
+			}
 
 			// Record 1.1 Lines number
 			vector<string> lineNumbers(
@@ -235,7 +270,6 @@ namespace synthese
 
 			// Record 5 : Main calendar
 			_loadNextRecord(5);
-			set<string> missingCalendars;
 			string mainCalendarCode(_getTextField(4, 9));
 			CalendarTemplate* mainCalendar(
 				CalendarFileFormat::GetCalendarTemplate(
@@ -247,6 +281,10 @@ namespace synthese
 			if(mainCalendar)
 			{
 				mainMask = mainCalendar->getResult(_calendar);
+				if(fileMask)
+				{
+					mainMask &= *fileMask;
+				}
 			}
 			else
 			{
