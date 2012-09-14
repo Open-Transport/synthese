@@ -53,6 +53,7 @@ namespace synthese
 				//! @name Import parameters
 				//@{
 					boost::shared_ptr<TransportNetwork> _network;
+					bool _fileNameIsACalendar;
 				//@}
 
 				struct Record
@@ -124,6 +125,7 @@ namespace synthese
 
 			public:
 				static const std::string PARAMETER_TRANSPORT_NETWORK_ID;
+				static const std::string PARAMETER_FILE_NAME_IS_A_CALENDAR;
 
 				Importer_(
 					util::Env& env,
