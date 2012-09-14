@@ -117,6 +117,7 @@ namespace synthese
 
 			// Basic resa profile
 			{
+Log::GetInstance().debug("Basic resa profile check1");
 				Env env;
 				ProfileTableSync::SearchResult profiles(
 					ProfileTableSync::Search(env, ResaModule::_BASIC_PROFILE_NAME)
