@@ -25,7 +25,6 @@
 #include "HastusInterfaceFileFormat.hpp"
 #include "GraphConstants.h"
 #include "StopPoint.hpp"
-#include "StopPointTableSync.hpp"
 #include "ScheduledServiceTableSync.h"
 #include "ContinuousService.h"
 #include "ContinuousServiceTableSync.h"
@@ -57,9 +56,7 @@
 #include "PTFileFormat.hpp"
 #include "ImpExModule.h"
 #include "DesignatedLinePhysicalStop.hpp"
-#include "CommercialLineTableSync.h"
 #include "TransportNetworkTableSync.h"
-#include "CalendarTemplateTableSync.h"
 #include "CalendarFileFormat.hpp"
 
 #include <algorithm>
@@ -115,6 +112,9 @@ namespace synthese
 		):	OneFileTypeImporter<Importer_>(env, dataSource),
 			Importer(env, dataSource),
 			PTDataCleanerFileFormat(env, dataSource),
+			_calendars(_dataSource, _env),
+			_lines(_dataSource, _env),
+			_stops(_dataSource, _env),
 			_fileNameIsACalendar(false)
 		{}
 
@@ -176,9 +176,6 @@ namespace synthese
 			boost::optional<const server::Request&> adminRequest
 		) const {
 
-			// Load object linked to the datasource
-			impex::ImportableTableSync::ObjectBySource<CalendarTemplateTableSync> calendars(_dataSource, _env);
-
 			// Missing calendars
 			set<string> missingCalendars;
 
@@ -192,7 +189,7 @@ namespace synthese
 				string fileName(filePath.filename());
 				CalendarTemplate* fileCalendar(
 					CalendarFileFormat::GetCalendarTemplate(
-						calendars,
+						_calendars,
 						fileName,
 						os
 				)	);
@@ -212,7 +209,6 @@ namespace synthese
 			);
 
 			// Record 2 : Lines
-			ImportableTableSync::ObjectBySource<CommercialLineTableSync> lines(_dataSource, _env);
 			typedef map<string, shared_ptr<RollingStock> > LineTransportModes;
 			LineTransportModes lineTransportModes;
 			for(size_t lineRank(0); lineRank < lineNumbers.size(); ++lineRank)
@@ -256,7 +252,7 @@ namespace synthese
 
 				// Line import
 				PTFileFormat::CreateOrUpdateLine(
-					lines,
+					_lines,
 					lineCode,
 					name,
 					lineCode,
@@ -273,7 +269,7 @@ namespace synthese
 			string mainCalendarCode(_getTextField(4, 9));
 			CalendarTemplate* mainCalendar(
 				CalendarFileFormat::GetCalendarTemplate(
-					calendars,
+					_calendars,
 					mainCalendarCode,
 					os
 			)	);
@@ -375,14 +371,13 @@ namespace synthese
 			_file.close();
 
 			// Loop on stops
-			ImportableTableSync::ObjectBySource<StopPointTableSync> stops(_dataSource, _env);
 			PTFileFormat::ImportableStopPoints nonLinkedStopPoints;
 			bool success(true);
 			BOOST_FOREACH(StopCodes::value_type& stopCode, stopCodes)
 			{
 				// Stop
 				stopCode.second = PTFileFormat::GetStopPoints(
-					stops,
+					_stops,
 					stopCode.first,
 					optional<const string&>(),
 					os,
@@ -417,7 +412,7 @@ namespace synthese
 				// Line
 				CommercialLine* line(
 					PTFileFormat::GetLine(
-						lines,
+						_lines,
 						service.lineCode,
 						_dataSource,
 						_env,
@@ -537,7 +532,7 @@ namespace synthese
 				// Calendar
 				CalendarTemplate* calendar(
 					CalendarFileFormat::GetCalendarTemplate(
-						calendars,
+						_calendars,
 						service.calendar,
 						os
 				)	);
