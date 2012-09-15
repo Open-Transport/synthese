@@ -28,8 +28,12 @@
 #include "OneFileTypeImporter.hpp"
 #include "PTDataCleanerFileFormat.hpp"
 #include "NoExportPolicy.hpp"
-#include "ScheduledService.h"
+
+#include "CalendarTemplateTableSync.h"
+#include "CommercialLineTableSync.h"
 #include "GraphTypes.h"
+#include "ScheduledService.h"
+#include "StopPointTableSync.hpp"
 
 namespace synthese
 {
@@ -64,6 +68,9 @@ namespace synthese
 
 				mutable std::ifstream _file;
 				mutable boost::optional<Record> _record;
+				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendars;
+				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stops;
 
 				struct TemporaryService
 				{
