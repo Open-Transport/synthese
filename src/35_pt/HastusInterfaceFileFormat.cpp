@@ -806,6 +806,7 @@ namespace synthese
 			stream << t.cell("Réseau", t.getForm().getTextInput(PARAMETER_TRANSPORT_NETWORK_ID, _network.get() ? lexical_cast<string>(_network->getKey()) : string()));
 			stream << t.cell("Date début", t.getForm().getCalendarInput(PARAMETER_START_DATE, _startDate ? *_startDate : date(not_a_date_time)));
 			stream << t.cell("Date fin", t.getForm().getCalendarInput(PARAMETER_END_DATE, _endDate ? *_endDate : date(not_a_date_time)));
+			stream << t.cell("Nom de fichier est un calendrier", t.getForm().getOuiNonRadioInput(PARAMETER_FILE_NAME_IS_A_CALENDAR, _fileNameIsACalendar));
 			stream << t.close();
 		}
 }	}
