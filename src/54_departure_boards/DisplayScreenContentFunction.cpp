@@ -1195,7 +1195,7 @@ namespace synthese
 				);
 				pm.insert(
 					DATA_DIRECTION,
-					lineDirection.empty() ? jp->getDestination()->getConnectionPlace()->getFullName() : lineDirection
+					lineDirection
 				);
 
 				pm.insert(
