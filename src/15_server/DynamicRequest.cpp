@@ -28,6 +28,7 @@
 #include "HTTPRequest.hpp"
 #include "Function.h"
 #include "RequestException.h"
+#include "ServerConstants.h"
 #include "Session.h"
 #include "SessionException.h"
 #include "User.h"
@@ -223,7 +224,6 @@ namespace synthese
 			}
 
 			// Parameters
-			bool multipart(false);
 			it = httpRequest.headers.find("Content-Type");
 			if(it != httpRequest.headers.end())
 			{
@@ -236,17 +236,39 @@ namespace synthese
 					split(parts1, parts[1], is_any_of("="));
 					if(parts1.size() >= 2)
 					{
-						multipart = true;
 						_getPostParametersMap = ParametersMap(
 							httpRequest.postData,
 							parts1[1]
 						);
 					}
 				}
-			}
-			if(!multipart)
-			{
-				_getPostParametersMap = ParametersMap(httpRequest.postData);
+				else if(
+					parts.size() >= 1 &&
+					trim_copy(parts[0]) == "application/x-www-form-urlencoded"
+				){
+					_getPostParametersMap = ParametersMap(httpRequest.postData);
+				}
+				else
+				{
+					if(parts.size() >= 2)
+					{
+						vector<string> parts1;
+						split(parts1, parts[1], is_any_of("="));
+						if(parts1.size() >= 2 &&
+							trim_copy(parts1[0]) == "charset"
+						){
+							_getPostParametersMap.insert(
+								PARAMETER_POST_DATA_CHARSET,
+								parts1[1]
+							);
+						}
+					}
+					_getPostParametersMap.insert(
+						PARAMETER_POST_DATA,
+						httpRequest.postData
+					);
+				}
+
 			}
 			if(separator+1 < uri.length())
 			{
