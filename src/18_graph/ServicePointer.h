@@ -186,6 +186,11 @@ namespace synthese
 
 			//! @name Queries
 			//@{
+				bool operator==(const ServicePointer& rhs) const;
+				bool operator!=(const ServicePointer& rhs) const;
+
+
+
 				//////////////////////////////////////////////////////////////////////////
 				/// @pre both departure edge and arrival edge must be defined
 				double getDistance() const;
