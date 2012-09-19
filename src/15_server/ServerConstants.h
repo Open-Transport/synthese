@@ -27,12 +27,8 @@ namespace synthese
 {
 	namespace server
 	{
-		/** Server Module constants.
-			@ingroup m15
-		*/
-		namespace constants
-		{
-		}
+		const std::string PARAMETER_POST_DATA = "post_data";
+		const std::string PARAMETER_POST_DATA_CHARSET = "post_data_charset";
 	}
 }
 
