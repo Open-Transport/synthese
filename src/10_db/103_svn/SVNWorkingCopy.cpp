@@ -75,12 +75,12 @@ namespace synthese
 		stringstream str;
 		if(format == ParametersMap::FORMAT_SQL)
 		{
-			str << "\"";
+			str << "'";
 		}
 		str << fieldObject.getRepo().getURL();
 		if(format == ParametersMap::FORMAT_SQL)
 		{
-			str << "\"";
+			str << "'";
 		}
 
 		return str.str();
