@@ -27,8 +27,10 @@ namespace synthese
 {
 	namespace server
 	{
+		const std::string PARAMETER_CLIENT_ADDRESS = "client_address";
 		const std::string PARAMETER_POST_DATA = "post_data";
 		const std::string PARAMETER_POST_DATA_CHARSET = "post_data_charset";
+		const std::string PARAMETER_POST_DATA_MIME_TYPE = "post_data_mime_type";
 	}
 }
 

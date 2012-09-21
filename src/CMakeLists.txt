@@ -14,6 +14,7 @@ macro(set_source_groups)
   source_group("15 Services" REGULAR_EXPRESSION ".*Service\\..*|.*Function\\..*|.*CMSExporters\\..*")
   source_group("16 File Formats" REGULAR_EXPRESSION ".*FileFormat\\..*")
   source_group("17 Alarm recipients" REGULAR_EXPRESSION ".*AlarmRecipient\\..*")
+  source_group("19 Inter-SYNTHESE" REGULAR_EXPRESSION ".*InterSYNTHESE\\..*")
   source_group("39 WFS Types" REGULAR_EXPRESSION ".*WFSType\\..*|WFSTypeTemplate\\.hpp")
 endmacro(set_source_groups)
 
@@ -37,6 +38,7 @@ set(MODULES
 16_impex
 17_messages
 18_graph
+#19_inter_synthese
 20_tree
 31_calendar
 32_geography
@@ -54,7 +56,8 @@ set(MODULES
 #57_accounting
 58_hiking
 59_road_journey_planner
-60_analysis)
+60_analysis
+61_data_exchange)
 
 if(WITH_MYSQL)
   list(APPEND MODULES 10_db/102_mysql)

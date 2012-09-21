@@ -250,6 +250,13 @@ namespace synthese
 				}
 				else
 				{
+					if(	parts.size() >= 1)
+					{
+						_getPostParametersMap.insert(
+							PARAMETER_POST_DATA_MIME_TYPE,
+							trim_copy(parts[0])
+						);
+					}
 					if(parts.size() >= 2)
 					{
 						vector<string> parts1;
@@ -268,13 +275,16 @@ namespace synthese
 						httpRequest.postData
 					);
 				}
-
 			}
 			if(separator+1 < uri.length())
 			{
 				ParametersMap getMap(uri.substr(separator+1));
 				_getPostParametersMap.merge(getMap);
 			}
+			_getPostParametersMap.insert(
+				PARAMETER_CLIENT_ADDRESS,
+				httpRequest.ipaddr
+			);
 
 			// Cookies
 			_allParametersMap = _getPostParametersMap;
