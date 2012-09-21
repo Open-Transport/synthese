@@ -21,14 +21,17 @@
 */
 
 #include "XmlToolkit.h"
-#include "XmlException.h"
-#include "Conversion.h"
 
+#include "Conversion.h"
+#include "XmlException.h"
+
+#include <iomanip>
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
 
 using namespace boost;
+using namespace std;
 
 namespace synthese
 {
@@ -248,5 +251,23 @@ namespace synthese
 			const char* attrValue = node.getAttribute (attrName.c_str ());
 			return (attrValue == 0)
 			? defaultValue : lexical_cast<double>(attrValue);
+		}
+
+
+
+		void XmlToolkit::ToXsdDateTime(
+			std::ostream& str,
+			const boost::posix_time::ptime& value
+		){
+			str <<
+				value.date().year() << "-" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				value.date().month() << "-" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				value.date().day() << "T" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				value.time_of_day().hours() << ":" <<
+				setw( 2 ) << setfill ( '0' ) <<
+				value.time_of_day().minutes () << ":00Z";
 		}
 }	}

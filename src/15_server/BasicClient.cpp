@@ -28,13 +28,30 @@ namespace synthese
 
 
 
-		void BasicClient::request(
+		void BasicClient::get(
 			std::ostream& out,
 			const std::string& url
-		){
+		) const {
+			string fakePostData;
+			_send(out, url, fakePostData);
+		}
+
+
+
+		void BasicClient::post(
+			std::ostream& out,
+			const std::string& url,
+			const std::string& data
+		) const	{
+			_send(out, url, data);
+		}
+
+
+
+		void BasicClient::_send( std::ostream& out, const std::string& url, const std::string& postData ) const
+		{
 			try
 			{
-
 				boost::asio::io_service io_service;
 
 				// Get a list of endpoints corresponding to the server name.
@@ -59,10 +76,26 @@ namespace synthese
 				// allow us to treat all data up until the EOF as the content.
 				boost::asio::streambuf request;
 				std::ostream request_stream(&request);
-				request_stream << "GET " << url << " HTTP/1.0\r\n";
+				if(postData.empty())
+				{
+					request_stream << "GET";
+				}
+				else
+				{
+					request_stream << "POST";
+				}
+				request_stream << " " << url << " HTTP/1.0\r\n";
 				request_stream << "Host: " << _serverHost << "\r\n";
 				request_stream << "Accept: */*\r\n";
+				if(!postData.empty())
+				{
+					request_stream << "Content-length: " << postData.size() << "\r\n";
+				}
 				request_stream << "Connection: close\r\n\r\n";
+				if(!postData.empty())
+				{
+					request_stream << postData;
+				}
 
 				// Send the request.
 				boost::asio::write(socket, request);
