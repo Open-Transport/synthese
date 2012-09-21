@@ -23,6 +23,13 @@ namespace synthese
 		    const int _timeOut;                 //!< TCP time out in milliseconds. 0 means no timeout.
 			const bool	_outputHTTPHeaders;
 
+
+			void _send(
+				std::ostream& out,
+				const std::string& url,
+				const std::string& postData
+			) const;
+
 		public:
 
 		    BasicClient (
@@ -50,11 +57,17 @@ namespace synthese
 
 
 		     */
-		    void request(
+		    void get(
 				std::ostream& out,
-				const std::string& request
-			);
+				const std::string& url
+			) const;
 
+
+			void post(
+				std::ostream& out,
+				const std::string& url,
+				const std::string& data
+			) const;
 
 		};
 	}
