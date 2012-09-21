@@ -149,6 +149,7 @@ namespace synthese
 			static boost::recursive_mutex _threadManagementMutex;
 			static boost::posix_time::time_duration _sessionMaxDuration;
 			static std::string _autoLoginUser;
+			static boost::posix_time::ptime _serverStartingTime;
 
 
 		public:
@@ -172,6 +173,8 @@ namespace synthese
 			static void RunHTTPServer();
 			static util::EMail GetEMailSender();
 			static const std::string& GetAutoLoginUser() { return _autoLoginUser; }
+			static void UpdateStartingTime();
+			static const boost::posix_time::ptime& GetStartingTime();
 
 			static boost::posix_time::time_duration GetSessionMaxDuration();
 

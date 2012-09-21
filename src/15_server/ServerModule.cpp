@@ -68,7 +68,7 @@ namespace synthese
 		recursive_mutex ServerModule::_threadManagementMutex;
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
-
+		boost::posix_time::ptime ServerModule::_serverStartingTime(not_a_date_time);
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
 		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
@@ -113,6 +113,7 @@ namespace synthese
 				ServerModule::_acceptor.set_option(asio::ip::tcp::acceptor::reuse_address(true));
 				ServerModule::_acceptor.bind(endpoint);
 				ServerModule::_acceptor.listen();
+				ServerModule::UpdateStartingTime();
 				ServerModule::_acceptor.async_accept(
 					ServerModule::_new_connection->socket(),
 					bind(&ServerModule::HandleAccept, asio::placeholders::error)
@@ -533,5 +534,19 @@ namespace synthese
 					)
 				);
 			}
+		}
+
+
+
+		void ServerModule::UpdateStartingTime()
+		{
+			_serverStartingTime = second_clock::local_time();
+		}
+
+
+
+		const boost::posix_time::ptime& ServerModule::GetStartingTime()
+		{
+			return _serverStartingTime;
 		}
 }	}
