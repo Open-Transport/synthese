@@ -171,6 +171,8 @@ namespace synthese
 			}
 			catch (Exception&)
 			{
+				_errorNumber = "200";
+				_errorText = "Invalid sender";
 				return;
 			}
 		}
@@ -200,17 +202,16 @@ namespace synthese
 				(_errorNumber.empty() ? "0" : _errorNumber) <<
 				"\" Zst=\"";
 			ToXsdDateTime(result, now);
-			result << "\"";
+			result <<
+				"\" Ergebnis=\"" <<
+				((!_errorNumber.empty() && _errorNumber != "0") ? "notok" : "ok") <<
+				"\">"
+			;
 			if(!_errorText.empty())
 			{
-				result << " FehlerText=\"" << _errorText << "\"";
+				result << "<FehlerText>" << _errorText << "</FehlerText>";
 			}
-			result <<
-				" Ergebnis=\"" <<
-				((!_errorNumber.empty() && _errorNumber != "0") ? "notok" : "ok") <<
-				"\" />" <<
-				"</vdv453:AboAntwort>"
-			;
+			result << "</Bestaetigung></vdv453:AboAntwort>";
 			map.insert(DATA_RESULT, result.str());
 
 			// Output the result (TODO cancel it if the service is called through the CMS)

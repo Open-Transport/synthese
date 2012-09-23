@@ -85,6 +85,8 @@ namespace synthese
 			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:DatenAbrufenAnfrage", &results);
 			if (results.error != eXMLErrorNone)
 			{
+				_errorNumber = "100";
+				_errorText = "Malformed XML";
 				return;
 			}
 
@@ -110,6 +112,8 @@ namespace synthese
 			}
 			catch (Exception&)
 			{
+				_errorNumber = "200";
+				_errorText = "Invalid sender";
 				return;
 			}
 		}
@@ -136,48 +140,59 @@ namespace synthese
 				"<Bestaetigung Zst=\"";
 			ToXsdDateTime(result, now);
 			result <<
-				"\" Ergebnis=\"ok\" Fehlernummer=\"0\">" <<
-				"<Fehlertext />" <<
-				"</Bestaetigung>";
-
-			BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
+				"\" Ergebnis=\"" <<
+				((!_errorNumber.empty() && _errorNumber != "0") ?
+				"notok" : "ok") <<
+				"\" Fehlernummer=\"" <<
+				(_errorNumber.empty() ? "0" : _errorNumber) <<
+				"\">"
+			;
+			if(!_errorText.empty())
 			{
-				BOOST_FOREACH(const ArrivalDepartureList::value_type& dep, it.second->getLastResult())
-				{
-					// Local variables
-					const ServicePointer& sp(dep.first);
-					const CommercialLine& line(
-						*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
-					);
-					const JourneyPattern& jp(
-						*static_cast<const JourneyPattern*>(sp.getService()->getPath())
-					);
-					ptime departureDateTime(sp.getDepartureDateTime());
-					departureDateTime -= diff_from_utc;
+				result << "<Fehlertext>" << _errorText << "</FehlerText>";
+			}
+			result << "</Bestaetigung>";
 
-					// XML generation
-					result <<
-						"<AZBNachricht AboID=\"" << it.second->getId() << "\">" <<
-						"<AZBFahrtLoeschen Zst=\"";
-					ToXsdDateTime(result, departureDateTime);
-					result <<
-						"\">" <<
-						"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
-						"<FahrtID>" <<
-						"<FahrtBezeichner>" << sp.getService()->getServiceNumber() << "</FahrtBezeichner>" <<
-						"<Betriebstag>" << to_simple_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-						"</FahrtID>" <<
-						"<HstSeqZaehler></HstSeqZaehler>" << // ?
-						"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
-						"<LinienText>" << line.getShortName() << "</LinienText>" <<
-						"<RichtungsID>" << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</RichtungsID>" <<
-						"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
-						"<VonRichtungsText></VonRichtungsText>" << //?
-						"<AbmeldeID></AbmeldeID>" << //?
-						"</AZBFahrtLoeschen>" <<
-						"</AZBNachricht>"
-					;
-			}	}
+			if(_vdvClient)
+			{
+				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
+				{
+					BOOST_FOREACH(const ArrivalDepartureList::value_type& dep, it.second->getLastResult())
+					{
+						// Local variables
+						const ServicePointer& sp(dep.first);
+						const CommercialLine& line(
+							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
+						);
+						const JourneyPattern& jp(
+							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
+						);
+						ptime departureDateTime(sp.getDepartureDateTime());
+						departureDateTime -= diff_from_utc;
+
+						// XML generation
+						result <<
+							"<AZBNachricht AboID=\"" << it.second->getId() << "\">" <<
+							"<AZBFahrtLoeschen Zst=\"";
+						ToXsdDateTime(result, departureDateTime);
+						result <<
+							"\">" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+							"<FahrtID>" <<
+							"<FahrtBezeichner>" << sp.getService()->getServiceNumber() << "</FahrtBezeichner>" <<
+							"<Betriebstag>" << to_simple_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+							"</FahrtID>" <<
+							"<HstSeqZaehler></HstSeqZaehler>" << // ?
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+							"<LinienText>" << line.getShortName() << "</LinienText>" <<
+							"<RichtungsID>" << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</RichtungsID>" <<
+							"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
+							"<VonRichtungsText></VonRichtungsText>" << //?
+							"<AbmeldeID></AbmeldeID>" << //?
+							"</AZBFahrtLoeschen>" <<
+							"</AZBNachricht>"
+						;
+			}	}	}
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			map.insert(DATA_RESULT, result.str());
