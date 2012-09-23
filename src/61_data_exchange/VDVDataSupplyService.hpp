@@ -53,6 +53,8 @@ namespace synthese
 			//@{
 				bool _withNonUpdatedContent;
 				const VDVClient* _vdvClient;
+				std::string _errorNumber;
+				std::string _errorText;
 			//@}
 			
 			
