@@ -41,7 +41,7 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<DBTableSync,TimetableRowGroupTableSync>::FACTORY_KEY("55.10 Timetable groups");
+		template<> const string FactorableTemplate<DBTableSync,TimetableRowGroupTableSync>::FACTORY_KEY("55.10 Timetable row groups");
 	}
 
 	namespace db
