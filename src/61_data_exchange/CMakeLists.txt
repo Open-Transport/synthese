@@ -14,6 +14,8 @@ set(data_exchange_SRCS
   VDVClientSubscription.hpp
   VDVClientTableSync.cpp
   VDVClientTableSync.hpp
+  VDVDataReadyService.cpp
+  VDVDataReadyService.hpp
   VDVServer.cpp
   VDVServer.hpp
   VDVServerSubscription.cpp
@@ -22,8 +24,8 @@ set(data_exchange_SRCS
   VDVServerSubscriptionTableSync.hpp
   VDVServerTableSync.cpp
   VDVServerTableSync.hpp
-  VDVServerUpdateService.cpp
-  VDVServerUpdateService.hpp
+  VDVStatusService.cpp
+  VDVStatusService.hpp
 )
 
 set_source_files_properties(DataExchangeModule.gen.cpp DataExchangeModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

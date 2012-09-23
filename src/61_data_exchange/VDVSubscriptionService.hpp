@@ -44,13 +44,13 @@ namespace synthese
 			public util::FactorableTemplate<server::Function,VDVSubscriptionService>
 		{
 		public:
+			static const std::string DATA_RESULT;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				std::string _errorNumber;
+				std::string _errorText;
 			//@}
 			
 			
@@ -82,7 +82,6 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 

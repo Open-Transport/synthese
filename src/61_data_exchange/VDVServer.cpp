@@ -23,9 +23,12 @@
 #include "VDVServer.hpp"
 
 #include "BasicClient.h"
+#include "DataExchangeModule.hpp"
 #include "VDVServerSubscription.hpp"
 #include "XmlToolkit.h"
 
+#include <boost/date_time/local_time_adjustor.hpp>
+#include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/thread.hpp>
 
 using namespace boost;
@@ -44,7 +47,8 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(data_exchange::ServerAddress, "address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(data_exchange::ServerPort, "port", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(ControlCentreCode, "control_centre_code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ServerControlCentreCode, "server_control_centre_code", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(ClientControlCentreCode, "client_control_centre_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DataSourcePointer, "data_source_id", SQL_INTEGER)
 	
@@ -59,26 +63,41 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(ServerAddress),
 					FIELD_DEFAULT_CONSTRUCTOR(ServerPort),
-					FIELD_DEFAULT_CONSTRUCTOR(ControlCentreCode),
+					FIELD_DEFAULT_CONSTRUCTOR(ServerControlCentreCode),
+					FIELD_VALUE_CONSTRUCTOR(ClientControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer)
 			)	),
-			_online(false)
+			_online(false),
+			_startServiceTimeStamp(not_a_date_time)
 		{
+		}
+
+
+
+		std::string VDVServer::_getURL( const std::string& request ) const
+		{
+			return "/" + get<ClientControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
 		}
 
 
 
 		void VDVServer::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-
+			if(&env == &Env::GetOfficialEnv())
+			{
+				DataExchangeModule::AddVDVServer(*this);
+			}
 		}
 
 
 
 		void VDVServer::unlink()
 		{
-
+			if(Env::GetOfficialEnv().contains(*this))
+			{
+				DataExchangeModule::RemoveVDVServer(get<Name>());
+			}
 		}
 
 
@@ -101,6 +120,9 @@ namespace synthese
 		void VDVServer::connect() const
 		{
 			ptime now(second_clock::local_time());
+			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
+			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
+			now -= diff_from_utc;
 			_online = false;
 			
 			BasicClient c(
@@ -111,7 +133,7 @@ namespace synthese
 			stringstream statusAnfrage;
 			statusAnfrage <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<vdv453:StatusAnfrage Sender=\"" << get<ControlCentreCode>() << "\" Zst=\"";
+				"<vdv453:StatusAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(statusAnfrage, now);
 			statusAnfrage <<
 				"\" xmlns:vdv453=\"vdv453ger\" />";
@@ -119,7 +141,7 @@ namespace synthese
 			stringstream out;
 			c.post(
 				out,
-				"/" + get<ControlCentreCode>() + "/" + get<ServiceCode>() + "/status.xml",
+				_getURL("status"),
 				statusAnfrage.str()
 			);
 
@@ -128,6 +150,7 @@ namespace synthese
 			XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:StatusAntwort", &results);
 			if (results.error != eXMLErrorNone)
 			{
+				_online = false;
 				return;
 			}
 			
@@ -135,15 +158,41 @@ namespace synthese
 			string ergebinsAttr(statusNode.getAttribute("Ergebnis"));
 			if(ergebinsAttr != "ok")
 			{
+				_online = false;
 				return;
 			}
 
-			// Send abo anfragen
-			now = second_clock::local_time();
+			// TODO Check the StartDienstZst attribute
+
+			if(_online) // TODO Check if the subscriptions have changed
+			{
+				return;
+			}
+
+			this_thread::sleep(seconds(1));
+
+			// Clean subscriptions
+			now = second_clock::local_time() - diff_from_utc;
+			stringstream cleanRequest;
+			cleanRequest <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
+			ToXsdDateTime(cleanRequest, now);
+			cleanRequest <<
+				"\" xmlns:vdv453=\"vdv453ger\">" <<
+				"<AboLoeschenAlle>true</AboLoeschenAlle>" <<
+				"</vdv453:AboAnfrage>"
+			;
+
+			this_thread::sleep(seconds(1));
+
+			// Send subscription request
+			now = second_clock::local_time() - diff_from_utc;
+
 			stringstream aboAnfrage;
 			aboAnfrage <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<vdv453:AboAnfrage Sender=\"" << get<ControlCentreCode>() << "\" Zst=\"";
+				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(aboAnfrage, now);
 			aboAnfrage << "\" xmlns:vdv453=\"vdv453ger\">";
 
@@ -177,8 +226,8 @@ namespace synthese
 
 			stringstream aboAntwort;
 			c.post(
-				aboAntwort, 
-				"/" + get<ControlCentreCode>() + "/" + get<ServiceCode>() + "/aboverwalten.xml",
+				aboAntwort,
+				_getURL("aboverwalten"),
 				aboAnfrage.str()
 			);
 
@@ -188,15 +237,58 @@ namespace synthese
 			if (aboAntwortResults.error != eXMLErrorNone ||
 				aboAntwortNode.isEmpty()
 			){
+				_online = false;
 				return;
 			}
 			XMLNode bestaetingungNode = aboAntwortNode.getChildNode("Bestaetigung");
 			ergebinsAttr = bestaetingungNode.getAttribute("Ergebnis");
 			if(ergebinsAttr != "ok")
 			{
+				_online = false;
 				return;
 			}
 
 			_online = true;
+		}
+
+
+
+		void VDVServer::updateSYNTHESEFromServer() const
+		{
+			this_thread::sleep(boost::posix_time::seconds(5));
+
+			// Local variables
+			ptime now(second_clock::local_time());
+			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
+			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
+			now -= diff_from_utc;
+
+			// The request
+			stringstream request;
+			request <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<vdv453:DatenAbrufenAnfrage xmlns:vdv453=\"vdv453ger\" Sender=\"" <<
+				get<ClientControlCentreCode>() <<
+				"\" Zst=\"";
+			ToXsdDateTime(request, now);
+			request <<
+				"<DatensatzAlle>0</DatensatzAlle>"
+				"</vdv453:DatenAbrufenAnfrage>"
+			;
+
+			// Sending the request
+			stringstream result;
+			BasicClient c(
+				get<ServerAddress>(),
+				get<ServerPort>()
+			);
+			c.post(
+				result,
+				_getURL("datenabrufen"),
+				request.str()
+			);
+
+			// TODO Read the result
+
 		}
 }	}
