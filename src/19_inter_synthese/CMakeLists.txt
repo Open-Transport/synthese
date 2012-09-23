@@ -34,7 +34,7 @@ add_library(19_inter_synthese ${inter_synthese_SRCS})
 
 target_link_libraries(19_inter_synthese
   01_util
-  15_server
+  # 15_server
 )
 
 install(TARGETS 19_inter_synthese DESTINATION lib)
