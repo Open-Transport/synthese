@@ -10,6 +10,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
+include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 
 set(DEPS
   59_road_journey_planner # from 56_pt_website
