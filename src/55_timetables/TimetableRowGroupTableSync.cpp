@@ -56,7 +56,7 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<TimetableRowGroupTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<TimetableRowGroup>::FIELD.name.c_str(), ""));
+			r.push_back(DBTableSync::Index(SimpleObjectFieldDefinition<Timetable>::FIELD.name.c_str(), ""));
 			return r;
 		}
 
