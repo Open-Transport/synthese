@@ -32,6 +32,9 @@
 #include "VDVClientSubscription.hpp"
 #include "XmlToolkit.h"
 
+#include <boost/date_time/local_time_adjustor.hpp>
+#include <boost/date_time/c_local_time_adjustor.hpp>
+
 using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
@@ -62,7 +65,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(ReplyAddress),
 					FIELD_DEFAULT_CONSTRUCTOR(ReplyPort),
-					FIELD_DEFAULT_CONSTRUCTOR(ControlCentreCode),
+					FIELD_DEFAULT_CONSTRUCTOR(ClientControlCentreCode),
+					FIELD_VALUE_CONSTRUCTOR(ServerControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer)
 			)	)
@@ -96,31 +100,35 @@ namespace synthese
 
 
 
-		VDVClient::UpdatedItems VDVClient::checkUpdate() const
+		bool VDVClient::checkUpdate() const
 		{
-			UpdatedItems updatedItems;
+			bool changed(false);
 
 			for(Subscriptions::const_iterator it(_subscriptions.begin()); it != _subscriptions.end(); ++it)
 			{
-				bool changed(it->second->checkUpdate());
-				if(!changed)
+				if(it->second->checkUpdate())
 				{
-					continue;
+					return true;
 				}
-				updatedItems.push_back(it);
 			}
 
-			return updatedItems;
+			return false;
 		}
+
 
 	
 		void VDVClient::sendUpdateSignal() const
 		{
+			// Local variables
 			ptime now(second_clock::local_time());
+			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
+			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
+			now -= diff_from_utc;
+
 			stringstream data;
 			data <<
 				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<vdv453:DatenBereitAnfrage Sender=\"synthese\" Zst=\"";
+				"<vdv453:DatenBereitAnfrage Sender=\"" << get<ServerControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(data, now);
 			data << "\" xmlns:vdv453=\"vdv453ger\" />";
 
@@ -131,65 +139,9 @@ namespace synthese
 
 
 
-		void VDVClient::sendUpdate(const UpdatedItems& items) const
-		{
-			ptime now(second_clock::local_time());
-			stringstream data;
-
-			data <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
-				"<vdv453:DatenAbrufenAntwort xmlns:vdv453=\"vdv453ger\">" <<
-				"<Bestaetigung Zst=\"";
-			ToXsdDateTime(data, now);
-			data <<
-				"\" Ergebnis=\"ok\" Fehlernummer=\"0\">" <<
-				"<Fehlertext />" <<
-				"</Bestaetigung>";
-
-			BOOST_FOREACH(Subscriptions::const_iterator it, items)
-			{
-				BOOST_FOREACH(const ArrivalDepartureList::value_type& dep, it->second->getLastResult())
-				{
-					const ServicePointer& sp(dep.first);
-					const CommercialLine& line(
-						*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
-					);
-					const JourneyPattern& jp(
-						*static_cast<const JourneyPattern*>(sp.getService()->getPath())
-					);
-					data <<
-						"<AZBNachricht AboID=\"" << it->second->getId() << "\">" <<
-						"<AZBFahrtLoeschen Zst=\"";
-					ToXsdDateTime(data, sp.getDepartureDateTime());
-					data <<
-						"\">" <<
-						"<AZBID>" << it->second->getStopArea()->getACodeBySource(*get<DataSourcePointer>()) << "</AZBID>" <<
-						"<FahrtID>" <<
-						"<FahrtBezeichner>" << sp.getService()->getServiceNumber() << "</FahrtBezeichner>" <<
-						"<Betriebstag>" << to_simple_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-						"</FahrtID>" <<
-						"<HstSeqZaehler></HstSeqZaehler>" << // ?
-						"<LinienID>" << line.getACodeBySource(*get<DataSourcePointer>())  << "</LinienID>" <<
-						"<LinienText>" << line.getShortName() << "</LinienText>" <<
-						"<RichtungsID>" << jp.getACodeBySource(*get<DataSourcePointer>()) << "</RichtungsID>" <<
-						"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
-						"<VonRichtungsText></VonRichtungsText>" << //?
-						"<AbmeldeID></AbmeldeID>" << //?
-						"</AZBFahrtLoeschen>" <<
-						"</AZBNachricht>"
-					;
-			}	}
-
-			BasicClient client(get<ReplyAddress>(), get<ReplyPort>());
-			stringstream out;
-			client.post(out, _getURL("datenabrufen"), data.str());
-		}
-
-
-
 		std::string VDVClient::_getURL( const std::string& request ) const
 		{
-			return "/" + get<ControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
+			return "/" + get<ServerControlCentreCode>() + "/" + get<ServiceCode>() + "/" + request + ".xml";
 		}
 
 
@@ -206,9 +158,16 @@ namespace synthese
 
 		void VDVClient::unlink()
 		{
-			if(Env::GetOfficialEnv().get<VDVClient>(get<Key>()).get() == this)
+			if(Env::GetOfficialEnv().contains(*this))
 			{
 				DataExchangeModule::RemoveVDVClient(get<Name>());
 			}
+		}
+
+
+
+		void VDVClient::cleanSubscriptions()
+		{
+			_subscriptions.clear();
 		}
 }	}

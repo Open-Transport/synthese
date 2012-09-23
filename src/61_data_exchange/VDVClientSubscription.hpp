@@ -41,18 +41,30 @@ namespace synthese
 		private:
 			std::string _id;
 			boost::posix_time::ptime _endTime;
-			boost::shared_ptr<pt::StopArea> _stopArea;
-			boost::shared_ptr<pt::CommercialLine> _line;
+			pt::StopArea* _stopArea;
+			pt::CommercialLine* _line;
 			boost::posix_time::time_duration _timeSpan;
-			boost::posix_time::time_duration _histeresis;
+			boost::posix_time::time_duration _hysteresis;
 
 			mutable ArrivalDepartureList _lastResult;
 			mutable boost::shared_ptr<departure_boards::StandardArrivalDepartureTableGenerator> _generator;
 
 		public:
-			const std::string& getId() const { return _id; }
-			const ArrivalDepartureList& getLastResult() const { return _lastResult; }
-			const boost::shared_ptr<pt::StopArea>& getStopArea() const { return _stopArea; }
+			/// @name Getters
+			//@{
+				const std::string& getId() const { return _id; }
+				const ArrivalDepartureList& getLastResult() const { return _lastResult; }
+				pt::StopArea* getStopArea() const { return _stopArea; }
+			//@}
+
+			/// @name Setters
+			//@{
+				void setStopArea(pt::StopArea* value){ _stopArea = value; }
+				void setLine(pt::CommercialLine* value){ _line = value; }
+				void setTimeSpan(const boost::posix_time::time_duration& value){ _timeSpan = value; }
+				void setHysteresis(const boost::posix_time::time_duration& value){ _hysteresis = value; }
+				void setLastResult(const ArrivalDepartureList& value){ _lastResult = value; }
+			//@}
 
 			void buildGenerator() const;
 			bool checkUpdate() const; 

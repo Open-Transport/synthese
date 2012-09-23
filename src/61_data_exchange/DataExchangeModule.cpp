@@ -54,6 +54,7 @@ namespace synthese
 	namespace data_exchange
 	{
 		DataExchangeModule::VDVClients DataExchangeModule::_vdvClients;
+		DataExchangeModule::VDVServers DataExchangeModule::_vdvServers;
 	}
 
 
@@ -74,7 +75,7 @@ namespace synthese
 			)	);
 			ServerModule::AddThread(pollerThread, "VDV clients poller");
 
-			// VDV Clients connector
+			// VDV Servers connector
 			shared_ptr<thread> serversThread(
 				new thread(
 					&DataExchangeModule::ServersConnector
@@ -100,9 +101,27 @@ namespace synthese
 
 
 
+		void DataExchangeModule::AddVDVServer( VDVServer& value )
+		{
+			_vdvServers.insert(
+				make_pair(
+					value.get<Name>(),
+					&value
+			)	);
+		}
+
+
+
 		void DataExchangeModule::RemoveVDVClient( const std::string& key )
 		{
 			_vdvClients.erase(key);
+		}
+
+
+
+		void DataExchangeModule::RemoveVDVServer( const std::string& key )
+		{
+			_vdvServers.erase(key);
 		}
 
 
@@ -119,6 +138,18 @@ namespace synthese
 
 
 
+		VDVServer& DataExchangeModule::GetVDVServer( const std::string& name )
+		{
+			VDVServers::const_iterator it(_vdvServers.find(name));
+			if(it == _vdvServers.end())
+			{
+				throw Exception("No such VDV server : "+ name);
+			}
+			return *it->second;
+		}
+
+
+
 		void DataExchangeModule::ClientsPoller()
 		{
 			while(true)
@@ -129,14 +160,11 @@ namespace synthese
 					VDVClient::Registry::value_type& client,
 					Env::GetOfficialEnv().getEditableRegistry<VDVClient>()
 				){
-					VDVClient::UpdatedItems items(
-						client.second->checkUpdate()
-					);
-					if(items.empty())
+					if(!client.second->checkUpdate())
 					{
 						continue;
 					}
-					client.second->sendUpdate(items);
+					client.second->sendUpdateSignal();
 				}
 
 				ServerModule::SetCurrentThreadWaiting();

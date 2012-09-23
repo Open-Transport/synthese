@@ -37,64 +37,71 @@
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
-	/// 36 Data exchange module namespace.
+	/// 61 Data exchange module namespace.
 	///	@author Hugues Romain
-	///	@ingroup m36
+	///	@ingroup m61
 	namespace data_exchange
 	{
 		class VDVClient;
+		class VDVServer;
 
-		/**	@defgroup m36Actions 35 Actions
-			@ingroup m36
+		/**	@defgroup m61Actions 61 Actions
+			@ingroup m61
 
-			@defgroup m36Pages 35 Pages
-			@ingroup m36
+			@defgroup m61Pages 61 Pages
+			@ingroup m61
 
-			@defgroup m36Library 35 Interface library
-			@ingroup m36
+			@defgroup m61Library 61 Interface library
+			@ingroup m61
 
-			@defgroup m36Functions 35 Functions
-			@ingroup m36
+			@defgroup m61Functions 61 Functions
+			@ingroup m61
 
-			@defgroup m36LS 35 Table synchronizers
-			@ingroup m36
+			@defgroup m61LS 61 Table synchronizers
+			@ingroup m61
 
-			@defgroup m36Admin 35 Administration pages
-			@ingroup m36
+			@defgroup m61Admin 61 Administration pages
+			@ingroup m61
 
-			@defgroup m36Rights 35 Rights
-			@ingroup m36
+			@defgroup m61Rights 61 Rights
+			@ingroup m61
 
-			@defgroup m36Logs 35 DB Logs
-			@ingroup m36
+			@defgroup m61Logs 61 DB Logs
+			@ingroup m61
 
-			@defgroup m36File 35.16 File formats
-			@ingroup m36
+			@defgroup m61File 61.16 File formats
+			@ingroup m61
 
-			@defgroup m36WFS 35.39 WFS types
-			@ingroup m36
+			@defgroup m61WFS 61.39 WFS types
+			@ingroup m61
 
-			@defgroup m36 35 Transport
-			@ingroup m3
+			@defgroup m61 61 Transport
+			@ingroup m5
 
 		@{
 		*/
 
-		/** 36 Data exchange module class.
+		/** 61 Data exchange module class.
 		*/
 		class DataExchangeModule:
 			public graph::GraphModuleTemplate<DataExchangeModule>
 		{
 		public:
 			typedef std::map<std::string, VDVClient*> VDVClients;
+			typedef std::map<std::string, VDVServer*> VDVServers;
 
 		private:
 			static VDVClients _vdvClients;
+			static VDVServers _vdvServers;
 
 		public:
 			static void AddVDVClient(VDVClient& value);
 			static void RemoveVDVClient(const std::string& key);
 			static VDVClient& GetVDVClient(const std::string& name);
+
+			static void AddVDVServer(VDVServer& value);
+			static void RemoveVDVServer(const std::string& key);
+			static VDVServer& GetVDVServer(const std::string& name);
 
 			static void ClientsPoller();
 			static void ServersConnector();

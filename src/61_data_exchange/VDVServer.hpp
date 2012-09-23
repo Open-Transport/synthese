@@ -44,15 +44,17 @@ namespace synthese
 		FIELD_TYPE(ServerAddress, std::string)
 		FIELD_TYPE(ServerPort, std::string)
 		FIELD_TYPE(DataSourcePointer, boost::optional<impex::DataSource&>)
-		FIELD_TYPE(ControlCentreCode, std::string)
+		FIELD_TYPE(ClientControlCentreCode, std::string)
+		FIELD_TYPE(ServerControlCentreCode, std::string)
 		FIELD_TYPE(ServiceCode, std::string)
-
+		
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
 			FIELD(ServerAddress),
 			FIELD(ServerPort),
-			FIELD(ControlCentreCode),
+			FIELD(ServerControlCentreCode),
+			FIELD(ClientControlCentreCode),
 			FIELD(ServiceCode),
 			FIELD(DataSourcePointer)
 		> VDVServerRecord;
@@ -76,7 +78,10 @@ namespace synthese
 
 		private:
 			Subscriptions _subscriptions;
+			boost::posix_time::ptime _startServiceTimeStamp;
 			mutable bool _online;
+
+			std::string _getURL( const std::string& request ) const;
 			
 		public:
 			VDVServer(util::RegistryKeyType id = 0);
@@ -88,6 +93,8 @@ namespace synthese
 				void removeSubscription(VDVServerSubscription* subscription);
 				void connect() const;
 				bool getOnline() const { return _online; }
+
+				void updateSYNTHESEFromServer() const;
 			//@}
 
 			//! @name Modifiers
