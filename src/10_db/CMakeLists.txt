@@ -71,6 +71,7 @@ target_link_libraries(10_db
   10_db_sqlite
   # Forward dependencies:
   #15_server
+  19_inter_synthese
   spatialite
 )
 
