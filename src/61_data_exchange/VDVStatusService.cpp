@@ -24,9 +24,12 @@
 
 #include "VDVStatusService.hpp"
 
+#include "DataExchangeModule.hpp"
 #include "Request.h"
 #include "RequestException.h"
+#include "ServerConstants.h"
 #include "ServerModule.h"
+#include "VDVClient.hpp"
 #include "XmlToolkit.h"
 
 #include <boost/date_time/local_time_adjustor.hpp>
@@ -48,6 +51,14 @@ namespace synthese
 	namespace data_exchange
 	{
 		const string VDVStatusService::DATA_RESULT = "result";
+
+
+
+		VDVStatusService::VDVStatusService():
+			FactorableTemplate<server::Function,VDVStatusService>(),
+			_ok(true)
+		{
+		}
 		
 
 
@@ -61,7 +72,33 @@ namespace synthese
 
 		void VDVStatusService::_setFromParametersMap(const ParametersMap& map)
 		{
-			// TODO search the partner code and reply ok only if the partner is registered
+			string request(map.getDefault<string>(PARAMETER_POST_DATA));
+
+			XMLResults results;
+			XMLNode allNode = XMLNode::parseString(request.c_str(), "vdv453:StatusAnfrage", &results);
+			if (results.error != eXMLErrorNone)
+			{
+				_ok = false;
+				return;
+			}
+
+			try
+			{
+				string sender(allNode.getAttribute("Sender"));
+				VDVClient& client(DataExchangeModule::GetVDVClient(sender));
+				if(!client.get<Active>())
+				{
+					_ok = false;
+					return;
+				}
+			}
+			catch (Exception&)
+			{
+				_ok = false;
+				return;
+			}
+
+			_ok = DataExchangeModule::GetVDVServerActive();
 		}
 
 		ParametersMap VDVStatusService::run(
@@ -88,8 +125,12 @@ namespace synthese
 				"<Status Zst=\"";
 			ToXsdDateTime(result, now);
 			result <<
-				"\" Ergebnis=\"ok\" />" <<
-				"<DatenBereit>1</DatenBereit>" <<
+				"\" Ergebnis=\"" <<
+				(_ok ? "ok" : "notok") <<
+				"\" />" <<
+				"<DatenBereit>" <<
+				(_ok ? "1" : "0")
+				<< "</DatenBereit>" <<
 				"<StartDienstZst>";
 			ToXsdDateTime(result, serverStartingTime);
 			result <<

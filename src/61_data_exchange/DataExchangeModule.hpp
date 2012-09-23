@@ -90,9 +90,15 @@ namespace synthese
 			typedef std::map<std::string, VDVClient*> VDVClients;
 			typedef std::map<std::string, VDVServer*> VDVServers;
 
+			static const std::string MODULE_PARAM_VDV_SERVER_ACTIVE;
+			static const std::string MODULE_PARAM_VDV_CLIENT_ACTIVE;
+
 		private:
 			static VDVClients _vdvClients;
 			static VDVServers _vdvServers;
+			static bool _vdvServerActive;
+			static bool _vdvClientActive;
+			static boost::posix_time::ptime _vdvStartingTime;
 
 		public:
 			static void AddVDVClient(VDVClient& value);
@@ -105,6 +111,14 @@ namespace synthese
 
 			static void ClientsPoller();
 			static void ServersConnector();
+
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
+			);
+
+			static bool GetVDVClientActive() { return _vdvClientActive; }
+			static bool GetVDVServerActive() { return _vdvServerActive; }
 		};
 	}
 	/** @} */
