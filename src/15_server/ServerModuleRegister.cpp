@@ -1,6 +1,7 @@
 
 #include "ServerModule.h"
 
+#include "GlobalVariableUpdateAction.hpp"
 #include "LoginAction.h"
 #include "LogoutAction.h"
 #include "QuitAction.hpp"
@@ -35,6 +36,7 @@ void synthese::server::moduleRegister()
 
 	synthese::server::LoginInterfacePage::integrate();
 
+	synthese::server::GlobalVariableUpdateAction::integrate();
 	synthese::server::LoginAction::integrate();
 	synthese::server::LogoutAction::integrate();
 	synthese::server::QuitAction::integrate();

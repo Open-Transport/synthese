@@ -42,7 +42,8 @@ namespace synthese
 			{
 				NOT,
 				SQRT,
-				NEG
+				NEG,
+				GLOBAL
 			};
 
 		private:
