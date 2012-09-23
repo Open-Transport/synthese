@@ -86,6 +86,14 @@ namespace synthese
 					DataExchangeModule::GetVDVClient(sender)
 				);
 
+				// Check if the client is declared as active
+				if(!client.get<Active>())
+				{
+					_errorNumber = "300";
+					_errorText = "Sender is forbidden right now";
+					return;
+				}
+
 				// Subscriptions cleaning
 				XMLNode cleanNode(allNode.getChildNode("AboLoeschenAlle"));
 				if(!cleanNode.isEmpty())
@@ -175,6 +183,14 @@ namespace synthese
 				_errorText = "Invalid sender";
 				return;
 			}
+
+			// Error if the VDV server is inactive
+			if(!DataExchangeModule::GetVDVServerActive())
+			{
+				_errorNumber = "400";
+				_errorText = "Service temporary unavailable";
+				return;
+			}
 		}
 
 
@@ -192,6 +208,7 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
+			bool error(!_errorNumber.empty() && _errorNumber != "0");
 			
 			// XML
 			stringstream result;
@@ -204,7 +221,7 @@ namespace synthese
 			ToXsdDateTime(result, now);
 			result <<
 				"\" Ergebnis=\"" <<
-				((!_errorNumber.empty() && _errorNumber != "0") ? "notok" : "ok") <<
+				(error ? "notok" : "ok") <<
 				"\">"
 			;
 			if(!_errorText.empty())

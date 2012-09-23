@@ -95,6 +95,14 @@ namespace synthese
 				string sender(allNode.getAttribute("Sender"));
 				_vdvClient = &DataExchangeModule::GetVDVClient(sender);
 
+				// Check if the client is declared as active
+				if(!_vdvClient->get<Active>())
+				{
+					_errorNumber = "300";
+					_errorText = "Sender is forbidden right now";
+					return;
+				}
+
 				XMLNode allDataNode(allNode.getChildNode("DatensatzAlle"));
 				if(!allDataNode.isEmpty())
 				{
@@ -116,6 +124,14 @@ namespace synthese
 				_errorText = "Invalid sender";
 				return;
 			}
+
+			// Error if the VDV server is inactive
+			if(!DataExchangeModule::GetVDVServerActive())
+			{
+				_errorNumber = "400";
+				_errorText = "Service temporary unavailable";
+				return;
+			}
 		}
 
 		ParametersMap VDVDataSupplyService::run(
@@ -131,6 +147,7 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
+			bool error(!_errorNumber.empty() && _errorNumber != "0");
 			
 			// XML
 			stringstream result;
@@ -141,8 +158,7 @@ namespace synthese
 			ToXsdDateTime(result, now);
 			result <<
 				"\" Ergebnis=\"" <<
-				((!_errorNumber.empty() && _errorNumber != "0") ?
-				"notok" : "ok") <<
+				(error ? "notok" : "ok") <<
 				"\" Fehlernummer=\"" <<
 				(_errorNumber.empty() ? "0" : _errorNumber) <<
 				"\">"
@@ -153,7 +169,7 @@ namespace synthese
 			}
 			result << "</Bestaetigung>";
 
-			if(_vdvClient)
+			if(!error)
 			{
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{

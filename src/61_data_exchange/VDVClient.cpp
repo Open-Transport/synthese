@@ -53,6 +53,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(ReplyAddress, "reply_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
 
 	namespace data_exchange
 	{
@@ -68,7 +69,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ClientControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ServerControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
-					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer)
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
+					FIELD_VALUE_CONSTRUCTOR(Active, true)
 			)	)
 		{
 		}
