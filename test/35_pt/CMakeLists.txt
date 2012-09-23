@@ -6,17 +6,21 @@ include_directories("${PROJECT_SOURCE_DIR}/src/01_util")
 include_directories("${PROJECT_SOURCE_DIR}/src/05_html")
 include_directories("${PROJECT_SOURCE_DIR}/src/07_lexical_matcher")
 include_directories("${PROJECT_SOURCE_DIR}/src/10_db")
+include_directories("${PROJECT_SOURCE_DIR}/src/10_db/103_svn")
+include_directories("${PROJECT_SOURCE_DIR}/src/11_cms")
 include_directories("${PROJECT_SOURCE_DIR}/src/11_interfaces")
 include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
 include_directories("${PROJECT_SOURCE_DIR}/src/18_graph")
+include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
 include_directories("${PROJECT_SOURCE_DIR}/src/31_calendar")
 include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 include_directories("${PROJECT_SOURCE_DIR}/src/35_pt")
+include_directories("${PROJECT_SOURCE_DIR}/src/37_pt_operation")
 
 set(DEPS
   20_tree
@@ -24,10 +28,13 @@ set(DEPS
   56_pt_website # from cms
   11_cms # from pt
   35_pt
+  37_pt_operation
 )
 
 boost_test(Edge "${DEPS}")
 boost_test(JourneyPatternCalendar "${DEPS}")
 add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_test.sql")
 boost_test(PegaseFileFormat "${DEPS}")
+add_definitions(-DINEO_FILE_PATTERN="${CMAKE_CURRENT_SOURCE_DIR}/test_data/ineo")
+boost_test(IneoFileFormat "${DEPS}")
 boost_test(Service "${DEPS}")
