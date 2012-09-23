@@ -27,6 +27,9 @@
 #include "DB.hpp"
 #include "SQLExpression.hpp"
 
+#include "DBInterSYNTHESE.hpp"
+#include "InterSYNTHESEModule.hpp"
+
 #include <vector>
 
 namespace synthese
@@ -182,6 +185,12 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			db->checkModificationEvents();
 #endif
+
+			// Synchro
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				DBInterSYNTHESE::FACTORY_KEY,
+				query.str()
+			);
 		}
 
 

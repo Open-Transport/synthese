@@ -1,0 +1,87 @@
+
+/** InterSYNTHESEModule class header.
+	@file InterSYNTHESEModule.hpp
+	@author Hugues Romain
+	@date 2012
+
+	This file belongs to the SYNTHESE project (public transportation specialized software)
+	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
+
+	This program is free software; you can redistribute it and/or
+	modify it under the terms of the GNU General Public License
+	as published by the Free Software Foundation; either version 2
+	of the License, or (at your option) any later version.
+
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU General Public License for more details.
+
+	You should have received a copy of the GNU General Public License
+	along with this program; if not, write to the Free Software
+	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+*/
+
+#ifndef SYNTHESE_InterSYNTHESEModule_H__
+#define SYNTHESE_InterSYNTHESEModule_H__
+
+#include "ModuleClassTemplate.hpp"
+
+namespace synthese
+{
+	//////////////////////////////////////////////////////////////////////////
+	/// 19 Inter-SYNTHESE Module namespace.
+	/// @author Hugues Romain
+	/// @ingroup m19
+	namespace inter_synthese
+	{
+		/**	@defgroup m19Actions 19.15 Actions
+			@ingroup m19
+
+			@defgroup m19Functions 19.15 Functions
+			@ingroup m19
+
+			@defgroup m19Exceptions 19.01 Exceptions
+			@ingroup m19
+
+			@defgroup m19Alarm 19.17 Messages recipient
+			@ingroup m19
+
+			@defgroup m19LS 19.10 Table synchronizers
+			@ingroup m19
+
+			@defgroup m19Rights 19.12 Rights
+			@ingroup m19
+
+			@defgroup m19Logs 19.13 DB Logs
+			@ingroup m19
+
+			@defgroup m19 19 Graph
+			@ingroup m1
+
+			@{
+		*/
+
+		//////////////////////////////////////////////////////////////////////////
+		/// 19 Graph Module class.
+		///	@author Hugues Romain
+		class InterSYNTHESEModule:
+			public server::ModuleClassTemplate<InterSYNTHESEModule>
+		{
+		private:
+			static boost::posix_time::time_duration _interSYNTHESEWaitingTime;
+
+		public:
+			static void InterSYNTHESE();
+
+			static void Enqueue(
+				const std::string& interSYNTHESEType,
+				const std::string& parameter
+			);
+		};
+
+		/** @} */
+	}
+}
+
+#endif // SYNTHESE_InterSYNTHESEModule_H__
