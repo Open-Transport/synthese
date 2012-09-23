@@ -22,6 +22,8 @@
 
 #include "SingleOperatorExpression.hpp"
 
+#include "ModuleClass.h"
+
 #include <cmath>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
@@ -32,6 +34,8 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace server;
+	
 	namespace cms
 	{
 		SingleOperatorExpression::SingleOperatorExpression(
@@ -86,6 +90,10 @@ namespace synthese
 				{
 					return "0";
 				}
+
+			case GLOBAL:
+				return ModuleClass::GetParameter(value);
+
 			}
 
 			return string();
@@ -109,6 +117,10 @@ namespace synthese
 			if(	CompareText(it, end, "~sqrt"))
 			{
 				return SQRT;
+			}
+			if(	CompareText(it, end, "~global"))
+			{
+				return GLOBAL;
 			}
 			return optional<Operator>();
 		}
