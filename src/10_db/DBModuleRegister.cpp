@@ -7,6 +7,8 @@
 
 #include "SQLService.hpp"
 
+#include "DBInterSYNTHESE.hpp"
+
 #include "DBModule.inc.cpp"
 
 void synthese::db::moduleRegister()
@@ -18,4 +20,6 @@ void synthese::db::moduleRegister()
 	synthese::db::RemoveObjectAction::integrate();
 
 	synthese::db::SQLService::integrate();
+
+	synthese::db::DBInterSYNTHESE::integrate();
 }

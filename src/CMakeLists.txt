@@ -38,7 +38,7 @@ set(MODULES
 16_impex
 17_messages
 18_graph
-#19_inter_synthese
+19_inter_synthese
 20_tree
 31_calendar
 32_geography
