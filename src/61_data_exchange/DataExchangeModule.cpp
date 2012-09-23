@@ -101,7 +101,7 @@ namespace synthese
 		{
 			_vdvClients.insert(
 				make_pair(
-					value.get<Name>(),
+					value.get<ClientControlCentreCode>(),
 					&value
 			)	);
 		}
@@ -112,7 +112,7 @@ namespace synthese
 		{
 			_vdvServers.insert(
 				make_pair(
-					value.get<Name>(),
+					value.get<ServerControlCentreCode>(),
 					&value
 			)	);
 		}

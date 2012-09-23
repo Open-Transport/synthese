@@ -114,7 +114,7 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
-			ptime serverStartingTime(ServerModule::GetStartingTime());
+			ptime serverStartingTime(DataExchangeModule::GetVDVStartingTime());
 			serverStartingTime -= diff_from_utc;
 			
 			// XML
