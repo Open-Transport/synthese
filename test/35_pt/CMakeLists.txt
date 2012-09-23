@@ -1,5 +1,6 @@
 include_directories(${PROJ_INCLUDE_DIRS})
 include_directories(${GEOS_INCLUDE_DIRS})
+include_directories(${EXPAT_INCLUDE_DIRS})
 
 include_directories("${PROJECT_SOURCE_DIR}/src/00_framework")
 include_directories("${PROJECT_SOURCE_DIR}/src/01_util")
@@ -13,6 +14,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/12_security")
 include_directories("${PROJECT_SOURCE_DIR}/src/14_admin")
 include_directories("${PROJECT_SOURCE_DIR}/src/15_server")
 include_directories("${PROJECT_SOURCE_DIR}/src/16_impex")
+include_directories("${PROJECT_SOURCE_DIR}/src/17_messages")
 include_directories("${PROJECT_SOURCE_DIR}/src/18_graph")
 include_directories("${PROJECT_SOURCE_DIR}/src/19_inter_synthese")
 include_directories("${PROJECT_SOURCE_DIR}/src/20_tree")
@@ -21,6 +23,8 @@ include_directories("${PROJECT_SOURCE_DIR}/src/32_geography")
 include_directories("${PROJECT_SOURCE_DIR}/src/34_road")
 include_directories("${PROJECT_SOURCE_DIR}/src/35_pt")
 include_directories("${PROJECT_SOURCE_DIR}/src/37_pt_operation")
+include_directories("${PROJECT_SOURCE_DIR}/src/39_map")
+include_directories("${PROJECT_SOURCE_DIR}/src/56_pt_website")
 
 set(DEPS
   20_tree
