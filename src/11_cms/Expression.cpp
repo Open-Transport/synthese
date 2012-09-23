@@ -184,16 +184,6 @@ namespace synthese
 						break;
 					}
 
-					// Single operator
-					if(!expr1.get())
-					{
-						singleOperator = SingleOperatorExpression::ParseOperator(it, end);
-						if(singleOperator)
-						{
-							break;
-						}
-					}
-
 					// Parenthesis
 					if(	*it == '(')
 					{
@@ -240,6 +230,16 @@ namespace synthese
 
 						expr.reset(new ForEachExpression(it, end));
 						break;
+					}
+
+					// Single operator
+					if(!expr1.get())
+					{
+						singleOperator = SingleOperatorExpression::ParseOperator(it, end);
+						if(singleOperator)
+						{
+							break;
+						}
 					}
 					
 					// Dual operator

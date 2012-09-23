@@ -21,6 +21,7 @@ set(DEPS
   59_road_journey_planner # from 56_pt_website
   56_pt_website # from cms
   11_cms # from pt
+  19_inter_synthese
 )
 
 boost_test(WebpageContent "${DEPS}")
