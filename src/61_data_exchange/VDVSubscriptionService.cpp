@@ -24,28 +24,40 @@
 
 #include "VDVSubscriptionService.hpp"
 
+#include "CommercialLine.h"
 #include "DataExchangeModule.hpp"
 #include "Request.h"
 #include "RequestException.h"
 #include "ServerConstants.h"
+#include "StopArea.hpp"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
-#include "XmlParser.h"
+#include "XmlToolkit.h"
+
+#include <boost/date_time/local_time_adjustor.hpp>
+#include <boost/date_time/c_local_time_adjustor.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
 
 namespace synthese
 {
-	using namespace util;
+	using namespace pt;
 	using namespace server;
 	using namespace security;
+	using namespace util;
+	using namespace util::XmlToolkit;
 
 	template<>
 	const string FactorableTemplate<Function,data_exchange::VDVSubscriptionService>::FACTORY_KEY = "VDVAboAnfrage";
 	
 	namespace data_exchange
 	{
+		const std::string VDVSubscriptionService::DATA_RESULT = "result";
+
+
+
 		ParametersMap VDVSubscriptionService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -62,22 +74,31 @@ namespace synthese
 			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:AboAnfrage", &results);
 			if (results.error != eXMLErrorNone)
 			{
+				_errorNumber = "100";
+				_errorText = "Malformed XML";
 				return;
 			}
 
-			size_t nbNodes(allNode.nChildNode("AboAZB"));
-			if(!nbNodes)
-			{
-				return;
-			}
-
-			string sender(allNode.getAttribute("Sender"));
 			try
 			{
+				string sender(allNode.getAttribute("Sender"));
 				VDVClient& client(
 					DataExchangeModule::GetVDVClient(sender)
 				);
 
+				// Subscriptions cleaning
+				XMLNode cleanNode(allNode.getChildNode("AboLoeschenAlle"));
+				if(!cleanNode.isEmpty())
+				{
+					if(	cleanNode.getText() == "true" ||
+						cleanNode.getText() == "1"
+					){
+						client.cleanSubscriptions();
+					}
+				}
+
+				// New subscriptions
+				size_t nbNodes(allNode.nChildNode("AboAZB"));
 				for(size_t i(0); i<nbNodes; ++i)
 				{
 					XMLNode aboAZBNode(allNode.getChildNode("AboAZB", i));
@@ -88,17 +109,62 @@ namespace synthese
 					if(aboAZBNode.nChildNode("AZBID"))
 					{
 						XMLNode azbidNode(aboAZBNode.getChildNode("AZBID"));
+						StopArea* stopArea(
+							client.get<DataSourcePointer>()->getObjectByCode<StopArea>(azbidNode.getText())
+						);
+						if(!stopArea)
+						{
+							continue;
+						}
+						subscription->setStopArea(stopArea);
 					}
 
+					if(aboAZBNode.nChildNode("LinienID"))
+					{
+						XMLNode linienNode(aboAZBNode.getChildNode("LinienID"));
+						CommercialLine* line(
+							client.get<DataSourcePointer>()->getObjectByCode<CommercialLine>(linienNode.getText())
+						);
+						if(line)
+						{
+							subscription->setLine(line);
+						}
+					}
 
-/*					<AboAZB AboID="12" VerfallZst="2007-08-14T00:00:00Z">
-						<AZBID>ZZVVHBHF06</AZBID>
-						<LinienID>ZVV105</LinienID>
-						<RichtungsID>ZVV105B</RichtungsID>
-						<Vorschauzeit>30</Vorschauzeit>
-						<Hysterese>60</Hysterese>
-						</AboAZB>
-*/
+					// TODO Handle directions
+
+					XMLNode durationNode(aboAZBNode.getChildNode("Vorschauzeit"));
+					if(!durationNode.isEmpty())
+					{
+						try
+						{
+							time_duration timeSpan(
+								minutes(
+									lexical_cast<long>(durationNode.getText())
+							)	);
+							subscription->setTimeSpan(timeSpan);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
+					}
+
+					XMLNode hysteresisNode(aboAZBNode.getChildNode("Hysterese"));
+					if(!hysteresisNode.isEmpty())
+					{
+						try
+						{
+							time_duration hysteresis(
+								minutes(
+									lexical_cast<long>(hysteresisNode.getText())
+							)	);
+							subscription->setHysteresis(hysteresis);
+						}
+						catch(bad_lexical_cast&)
+						{
+						}
+					}
+					
 					client.addSubscription(subscription);
 				}
 
@@ -115,8 +181,42 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
+
+			// Map creation
 			ParametersMap map;
-			/// @todo Fill it
+
+			// Local variables
+			ptime now(second_clock::local_time());
+			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
+			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
+			now -= diff_from_utc;
+			
+			// XML
+			stringstream result;
+			result << 
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<vdv453:AboAntwort xmlns:vdv453=\"vdv453ger\">" <<
+				"<Bestaetigung Fehlernummer=\"" <<
+				(_errorNumber.empty() ? "0" : _errorNumber) <<
+				"\" Zst=\"";
+			ToXsdDateTime(result, now);
+			result << "\"";
+			if(!_errorText.empty())
+			{
+				result << " FehlerText=\"" << _errorText << "\"";
+			}
+			result <<
+				" Ergebnis=\"" <<
+				((!_errorNumber.empty() && _errorNumber != "0") ? "notok" : "ok") <<
+				"\" />" <<
+				"</vdv453:AboAntwort>"
+			;
+			map.insert(DATA_RESULT, result.str());
+
+			// Output the result (TODO cancel it if the service is called through the CMS)
+			stream << result.str();
+
+			// Map return
 			return map;
 		}
 		

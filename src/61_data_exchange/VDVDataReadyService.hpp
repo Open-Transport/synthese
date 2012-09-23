@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///	VDVServerUpdateService class header.
-///	@file VDVServerUpdateService.hpp
+///	VDVDataReadyService class header.
+///	@file VDVDataReadyService.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VDVServerUpdateService_H__
-#define SYNTHESE_VDVServerUpdateService_H__
+#ifndef SYNTHESE_VDVDataReadyService_H__
+#define SYNTHESE_VDVDataReadyService_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
@@ -32,25 +32,26 @@ namespace synthese
 {
 	namespace data_exchange
 	{
+		class VDVServer;
+
 		//////////////////////////////////////////////////////////////////////////
-		///	36.15 Function : VDVServerUpdateService.
+		///	36.15 Function : VDVDataReadyService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/VDV
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m36Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2012
 		/// @since 3.5.0
-		class VDVServerUpdateService:
-			public util::FactorableTemplate<server::Function,VDVServerUpdateService>
+		class VDVDataReadyService:
+			public util::FactorableTemplate<server::Function,VDVDataReadyService>
 		{
 		public:
+			static const std::string DATA_RESULT;
 			
 		protected:
 			//! \name Page parameters
 			//@{
-				/// @todo Parsed parameters declaration
-				// eg : const void*	_object;
-				// eg : ParametersMap			_parameters;
+				const VDVServer* _vdvServer;
 			//@}
 			
 			
@@ -82,7 +83,6 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
-			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
 			//@}
 
 
@@ -116,5 +116,5 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_VDVServerUpdateService_H__
+#endif // SYNTHESE_VDVDataReadyService_H__
 

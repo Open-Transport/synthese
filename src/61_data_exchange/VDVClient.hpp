@@ -47,7 +47,8 @@ namespace synthese
 			FIELD(Name),
 			FIELD(ReplyAddress),
 			FIELD(ReplyPort),
-			FIELD(ControlCentreCode),
+			FIELD(ClientControlCentreCode),
+			FIELD(ServerControlCentreCode),
 			FIELD(ServiceCode),
 			FIELD(DataSourcePointer)
 		> VDVClientRecord;
@@ -63,8 +64,7 @@ namespace synthese
 			typedef util::Registry<VDVClient>	Registry;
 
 			typedef std::map<std::string, boost::shared_ptr<VDVClientSubscription> > Subscriptions;
-			typedef std::vector<Subscriptions::const_iterator> UpdatedItems;
-
+			
 		private:
 			Subscriptions _subscriptions;
 
@@ -76,11 +76,11 @@ namespace synthese
 			void addSubscription(boost::shared_ptr<VDVClientSubscription> subscription);
 			const Subscriptions& getSubscriptions() const { return _subscriptions; }
 			void removeSubscription(const std::string& key);
+			void cleanSubscriptions();
 
-			UpdatedItems checkUpdate() const;
+			bool checkUpdate() const;
 
 			void sendUpdateSignal() const;
-			void sendUpdate(const UpdatedItems& items) const;
 
 			//! @name Modifiers
 			//@{
