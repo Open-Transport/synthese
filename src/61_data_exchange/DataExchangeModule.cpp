@@ -55,6 +55,11 @@ namespace synthese
 	{
 		DataExchangeModule::VDVClients DataExchangeModule::_vdvClients;
 		DataExchangeModule::VDVServers DataExchangeModule::_vdvServers;
+		bool DataExchangeModule::_vdvClientActive = true;
+		bool DataExchangeModule::_vdvServerActive = true;
+		ptime DataExchangeModule::_vdvStartingTime = second_clock::local_time();
+		const string DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE = "vdv_server_active";
+		const string DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE = "vdv_client_active";
 	}
 
 
@@ -64,6 +69,8 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::PreInit()
 		{
+			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
+			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Init()
@@ -154,21 +161,23 @@ namespace synthese
 		{
 			while(true)
 			{
-				ServerModule::SetCurrentThreadRunningAction();
+				if(_vdvServerActive)
+				{
+					ServerModule::SetCurrentThreadRunningAction();
 
-				BOOST_FOREACH(
-					VDVClient::Registry::value_type& client,
-					Env::GetOfficialEnv().getEditableRegistry<VDVClient>()
-				){
-					if(!client.second->checkUpdate())
-					{
-						continue;
+					BOOST_FOREACH(
+						VDVClient::Registry::value_type& client,
+						Env::GetOfficialEnv().getEditableRegistry<VDVClient>()
+					){
+						if(!client.second->checkUpdate())
+						{
+							continue;
+						}
+						client.second->sendUpdateSignal();
 					}
-					client.second->sendUpdateSignal();
 				}
 
 				ServerModule::SetCurrentThreadWaiting();
-
 				this_thread::sleep(posix_time::seconds(10));
 			}
 		}
@@ -177,20 +186,84 @@ namespace synthese
 
 		void DataExchangeModule::ServersConnector()
 		{
-			ptime now(second_clock::local_time());
+			while(true)
+			{
+				// Checks all server if the client is active
+				if(_vdvClientActive)
+				{
+					ServerModule::SetCurrentThreadRunningAction();
 
-			BOOST_FOREACH(
-				VDVServer::Registry::value_type& server,
-				Env::GetOfficialEnv().getEditableRegistry<VDVServer>()
-			){
-				if(	server.second->getOnline() ||
-					server.second->getSubscriptions().empty()
-				){
-					continue;
+					BOOST_FOREACH(
+						VDVServer::Registry::value_type& server,
+						Env::GetOfficialEnv().getEditableRegistry<VDVServer>()
+					){
+						if(	server.second->getOnline() ||
+							server.second->getSubscriptions().empty()
+						){
+							continue;
+						}
+
+						server.second->connect();
+					}
 				}
-				server.second->connect();
 
-				this_thread::sleep(minutes(1));
+				// Wait 30 s
+				ServerModule::SetCurrentThreadWaiting();
+				this_thread::sleep(seconds(30));
+			}
+		}
+
+
+
+		void DataExchangeModule::ParameterCallback(
+			const std::string& name,
+			const std::string& value
+		){
+			// VDV client activation
+			if(name == MODULE_PARAM_VDV_CLIENT_ACTIVE)
+			{
+				try
+				{
+					bool bvalue(value.empty() ? false : lexical_cast<bool>(value));
+					if(bvalue && !_vdvClientActive)
+					{
+						_vdvClientActive = true;
+					}
+					else if(!bvalue && _vdvClientActive)
+					{
+						_vdvClientActive = false;
+					}
+				}
+				catch(bad_lexical_cast&)
+				{
+				
+				}
+			}
+
+			// VDV server activation
+			if(name == MODULE_PARAM_VDV_SERVER_ACTIVE)
+			{
+				try
+				{
+					bool bvalue(value.empty() ? false : lexical_cast<bool>(value));
+					if(bvalue && !_vdvServerActive)
+					{
+						_vdvServerActive = true;
+						_vdvStartingTime = second_clock::local_time();						
+					}
+					else if(!bvalue && _vdvServerActive)
+					{
+						_vdvServerActive = false;
+						BOOST_FOREACH(VDVClients::value_type& client, _vdvClients)
+						{
+							client.second->cleanSubscriptions();
+						}
+					}
+				}
+				catch(bad_lexical_cast&)
+				{
+
+				}
 			}
 		}
 }	}

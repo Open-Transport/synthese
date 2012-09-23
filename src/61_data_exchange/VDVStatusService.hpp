@@ -47,6 +47,7 @@ namespace synthese
 			static const std::string DATA_RESULT;
 			
 		protected:
+			bool _ok;
 			
 			
 			//////////////////////////////////////////////////////////////////////////
@@ -75,6 +76,9 @@ namespace synthese
 			
 			
 		public:
+			VDVStatusService();
+
+
 			//! @name Setters
 			//@{
 			//@}

@@ -41,6 +41,7 @@ namespace synthese
 
 		FIELD_TYPE(ReplyAddress, std::string)
 		FIELD_TYPE(ReplyPort, std::string)
+		FIELD_TYPE(Active, bool)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -50,7 +51,8 @@ namespace synthese
 			FIELD(ClientControlCentreCode),
 			FIELD(ServerControlCentreCode),
 			FIELD(ServiceCode),
-			FIELD(DataSourcePointer)
+			FIELD(DataSourcePointer),
+			FIELD(Active)
 		> VDVClientRecord;
 
 		/** VDV client.
