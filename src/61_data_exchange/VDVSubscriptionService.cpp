@@ -50,7 +50,7 @@ namespace synthese
 	using namespace util::XmlToolkit;
 
 	template<>
-	const string FactorableTemplate<Function,data_exchange::VDVSubscriptionService>::FACTORY_KEY = "VDVAboAnfrage";
+	const string FactorableTemplate<Function,data_exchange::VDVSubscriptionService>::FACTORY_KEY = "VDVSubscription";
 	
 	namespace data_exchange
 	{
