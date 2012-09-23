@@ -1,0 +1,18 @@
+#===================================================================================
+#Génération du fichier neutre par export des données avec la configuration suivante :
+#	- Date de génération : 20120618
+#	- Compte Oracle de génération : ref
+#	- Période topologique modèle : 3
+#	- Nouvelle période topologique : 3
+#===================================================================================
+
+F: PT: NPT;
+ PT:3;
+
+F:L:MNLG;LIBLG;NLG;H_S;TRA;TYP_LG;LNG;NLGIV;CSVL;LGTTS;S1_TVM;S2_TVM;S1_TVS;S2_TVS;DGIR;S_AV;S_RE;S1_AV;S2_AV;S1_RE;S2_RE;S1_IP;S1_IG;S2_IP;S2_IG;
+F:CH:LIBCH;SENS;NCH;NDST;LHLP;
+F:PC:TYPC;MNL;POS;NVIA;FACTPS;LIBITI;CNXTTS;DEV;
+L:1;Test 1;1;O; ;0;0;1; ;une;100;4000;120;600;-200;1;3;60;120;120;300;60;240;120;300;
+CH:iti 1;A;107;140; ;
+PC:R;STOP_1;1;;100; ; ;0;
+PC:N;STOP_3;2;;100; ; ;0;
