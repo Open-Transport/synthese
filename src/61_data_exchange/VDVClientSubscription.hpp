@@ -37,6 +37,12 @@ namespace synthese
 		class VDVClientSubscription
 		{
 		public:
+			static const std::string ATTR_ID;
+			static const std::string ATTR_END_TIME;
+			static const std::string TAG_STOP_AREA;
+			static const std::string TAG_LINE;
+			static const std::string ATTR_TIME_SPAN;
+			static const std::string ATTR_HYSTERESIS;
 
 		private:
 			std::string _id;
@@ -69,6 +75,7 @@ namespace synthese
 			void buildGenerator() const;
 			bool checkUpdate() const; 
 
+			void toParametersMap(util::ParametersMap& pm) const;
 
 		public:
 			VDVClientSubscription();

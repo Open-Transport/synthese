@@ -9,6 +9,7 @@
 #include "VDVDataReadyService.hpp"
 #include "VDVDataSupplyService.hpp"
 #include "VDVStatusService.hpp"
+#include "VDVClientsListService.hpp"
 
 #include "VDVClientTableSync.hpp"
 #include "VDVServerTableSync.hpp"
@@ -31,6 +32,7 @@ void synthese::data_exchange::moduleRegister()
 
 	synthese::data_exchange::DataExchangeModule::integrate();
 
+	synthese::data_exchange::VDVClientsListService::integrate();
 	synthese::data_exchange::VDVSubscriptionService::integrate();
 	synthese::data_exchange::VDVDataReadyService::integrate();
 	synthese::data_exchange::VDVDataSupplyService::integrate();
