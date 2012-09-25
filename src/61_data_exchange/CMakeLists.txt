@@ -10,6 +10,8 @@ set(data_exchange_SRCS
   VDVSubscriptionService.hpp
   VDVClient.cpp
   VDVClient.hpp
+  VDVClientsListService.cpp
+  VDVClientsListService.hpp
   VDVClientSubscription.cpp
   VDVClientSubscription.hpp
   VDVClientTableSync.cpp
