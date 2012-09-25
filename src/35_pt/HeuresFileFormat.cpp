@@ -206,7 +206,7 @@ namespace synthese
 				{
 					if(!_dataSource.getCharset().empty())
 					{
-						line = IConv::IConv(stopsDataSource.getCharset(), "UTF-8").convert(line);
+						line = IConv(stopsDataSource.getCharset(), "UTF-8").convert(line);
 					}
 
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));

@@ -103,7 +103,7 @@ namespace synthese
 			{}
 
 		protected:
-			mutable util::Env&						_env;
+			util::Env&						_env;
 			const DataSource&						_dataSource;
 			boost::optional<boost::filesystem::path> _logPath;
 			mutable Logger							_logger;

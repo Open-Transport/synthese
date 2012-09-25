@@ -52,6 +52,10 @@ namespace synthese
 					):	synthese::Exception("Error on SVN command : " + commandOutput.second),
 						_commandOutput(commandOutput)
 					{}
+					
+					
+					
+					~Exception() throw() {}
 
 
 

@@ -199,7 +199,7 @@ namespace synthese
 
 					// Extraction of values
 					string name(
-						IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(
+						IConv(_dataSource.getCharset(), "UTF-8").convert(
 							boost::algorithm::trim_copy(line.substr(5, 50))
 					)	);
 					string id(boost::algorithm::trim_copy(line.substr(0, 4)));
