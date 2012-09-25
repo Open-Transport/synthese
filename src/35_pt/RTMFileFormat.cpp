@@ -593,7 +593,7 @@ namespace synthese
 					line.substr(0, line.size() - 1) :
 					line
 				);
-				utfline = IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(line);
+				utfline = IConv(_dataSource.getCharset(), "UTF-8").convert(line);
 				split(_line, utfline, is_any_of(SEP));
 			}
 		}

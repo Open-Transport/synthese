@@ -792,7 +792,7 @@ namespace synthese
 					return;
 				}
 				vector<string> fields;
-				string utfLine(IConv::IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
+				string utfLine(IConv(_dataSource.getCharset(), "UTF-8").convert(trim_line.substr(separator+1)));
 				split(fields, utfLine, is_any_of(SEP));
 				const vector<string>& cols(itFieldsMap->second);
 				for(size_t i=0; i<fields.size() && i<cols.size(); ++i)

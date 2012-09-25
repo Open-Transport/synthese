@@ -363,7 +363,7 @@ namespace synthese
 		struct DynamicGetOperator
 		{
 			const std::string& _fieldKey;
-			mutable const void* & _result;
+			const void* & _result;
 
 			DynamicGetOperator(
 				const void* & result,
