@@ -129,7 +129,7 @@ namespace synthese
 				(_ok ? "ok" : "notok") <<
 				"\" />" <<
 				"<DatenBereit>" <<
-				(_ok ? "1" : "0")
+				(_ok ? "true" : "false")
 				<< "</DatenBereit>" <<
 				"<StartDienstZst>";
 			ToXsdDateTime(result, serverStartingTime);

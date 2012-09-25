@@ -104,6 +104,7 @@ namespace synthese
 			static void AddVDVClient(VDVClient& value);
 			static void RemoveVDVClient(const std::string& key);
 			static VDVClient& GetVDVClient(const std::string& name);
+			static const VDVClients& GetVDVClients(){ return _vdvClients; }
 
 			static void AddVDVServer(VDVServer& value);
 			static void RemoveVDVServer(const std::string& key);

@@ -22,6 +22,8 @@
 
 #include "VDVClientSubscription.hpp"
 
+#include "CommercialLine.h"
+
 using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
@@ -29,10 +31,21 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace departure_boards;
+	using namespace util;
+
 	
 
 	namespace data_exchange
 	{
+		const std::string VDVClientSubscription::ATTR_ID = "id";
+		const std::string VDVClientSubscription::ATTR_END_TIME = "end_time";
+		const std::string VDVClientSubscription::TAG_STOP_AREA = "stop_area";
+		const std::string VDVClientSubscription::TAG_LINE = "line";
+		const std::string VDVClientSubscription::ATTR_TIME_SPAN ="time_span";
+		const std::string VDVClientSubscription::ATTR_HYSTERESIS = "hysteresis";
+
+		
+		
 		void VDVClientSubscription::buildGenerator() const
 		{
 			ArrivalDepartureTableGenerator::PhysicalStops ps(_stopArea->getPhysicalStops());
@@ -97,6 +110,31 @@ namespace synthese
 		VDVClientSubscription::VDVClientSubscription()
 		{
 
+		}
+
+
+
+		void VDVClientSubscription::toParametersMap( util::ParametersMap& pm ) const
+		{
+			pm.insert(ATTR_ID, _id);
+			if(!_endTime.is_not_a_date_time())
+			{
+				pm.insert(ATTR_END_TIME, _endTime);
+			}
+			if(_stopArea)
+			{
+				shared_ptr<ParametersMap> stopPM(new ParametersMap);
+				_stopArea->toParametersMap(*stopPM);
+				pm.insert(TAG_STOP_AREA, stopPM);
+			}
+			if(_line)
+			{
+				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				_line->toParametersMap(*linePM);
+				pm.insert(TAG_LINE, linePM);
+			}
+			pm.insert(ATTR_TIME_SPAN, _timeSpan.total_seconds() / 60);
+			pm.insert(ATTR_HYSTERESIS, _hysteresis.total_seconds());
 		}
 }	}
 
