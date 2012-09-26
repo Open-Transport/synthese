@@ -183,7 +183,7 @@ namespace synthese
 					if (ita == itb)
 						continue;
 
-					AlarmConflict thisConflictStatus = (*ita)->wereInConflictWith(**itb);
+					AlarmConflict thisConflictStatus = (*ita)->getAlarm()->wereInConflictWith(**itb);
 					if (thisConflictStatus > conflictStatus)
 						conflictStatus = thisConflictStatus;
 					if (conflictStatus == ALARM_CONFLICT)
