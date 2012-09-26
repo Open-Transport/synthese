@@ -251,7 +251,7 @@ namespace synthese
 				if(map.isDefined(PARAMETER_MESSAGE_TO_CREATE)
 				){
 					_messageToCreate = iconv.convert(map.get<string>(PARAMETER_MESSAGE_TO_CREATE));
-					if(map.isDefined(PARAMETER_CREATED_MESSAGE_TITLE)
+					if(map.isDefined(PARAMETER_CREATED_MESSAGE_TITLE))
 					{
 						_messageToCreateTitle = iconv.convert(map.get<string>(PARAMETER_CREATED_MESSAGE_TITLE));
 					}
