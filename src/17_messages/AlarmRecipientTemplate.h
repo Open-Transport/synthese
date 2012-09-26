@@ -183,7 +183,7 @@ namespace synthese
 					if (ita == itb)
 						continue;
 
-					AlarmConflict thisConflictStatus = (*ita)->getAlarm()->wereInConflictWith(**itb);
+					AlarmConflict thisConflictStatus = static_cast<const SentAlarm*>((*ita)->getAlarm())->wereInConflictWith(**itb);
 					if (thisConflictStatus > conflictStatus)
 						conflictStatus = thisConflictStatus;
 					if (conflictStatus == ALARM_CONFLICT)
