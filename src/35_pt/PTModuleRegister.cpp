@@ -99,6 +99,7 @@
 #include "FareUpdateAction.hpp"
 #include "FreeDRTAreaUpdateAction.hpp"
 #include "FreeDRTTimeSlotUpdateAction.hpp"
+#include "IneoRealtimeUpdateAction.hpp"
 #include "JourneyPatternAddAction.hpp"
 #include "JourneyPatternRankContinuityRestoreAction.hpp"
 #include "JunctionUpdateAction.hpp"
@@ -269,6 +270,7 @@ void synthese::pt::moduleRegister()
 	synthese::pt::FreeDRTTimeSlotUpdateAction::integrate();
 	synthese::pt::RollingStockUpdateAction::integrate();
 	synthese::pt::FareUpdateAction::integrate();
+	synthese::pt::IneoRealtimeUpdateAction::integrate();
 	synthese::pt::JourneyPatternAddAction::integrate();
 	synthese::pt::JourneyPatternRankContinuityRestoreAction::integrate();
 	synthese::pt::JunctionUpdateAction::integrate();

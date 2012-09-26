@@ -60,6 +60,10 @@ namespace synthese
 						linkLevel
 					).get()
 				);
+				if(obj->getScenario())
+				{
+					obj->getScenario()->addMessage(*obj);
+				}
 				RegistryKeyType id(rows->getLongLong(AlarmTableSync::COL_TEMPLATE_ID));
 				if(id > 0)
 				{
@@ -82,7 +86,10 @@ namespace synthese
 		>::Unlink(
 			SentAlarm* obj
 		){
-			obj->setScenario(NULL);
+			if(obj->getScenario())
+			{
+				obj->getScenario()->removeMessage(*obj);
+			}
 		}
 
 

@@ -101,11 +101,22 @@ namespace synthese
 				}
 
 				// Data source links
-				obj->setDataSourceLinksWithoutRegistration(
-					ImportableTableSync::GetDataSourceLinksFromSerializedString(
-						rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
-						env
-				)	);
+				if(&env == &Env::GetOfficialEnv())
+				{
+					obj->setDataSourceLinksWithRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+				}
+				else
+				{
+					obj->setDataSourceLinksWithoutRegistration(
+						ImportableTableSync::GetDataSourceLinksFromSerializedString(
+							rows->getText(ScenarioTableSync::COL_DATASOURCE_LINKS),
+							env
+					)	);
+				}
 			}
 		}
 
@@ -115,6 +126,10 @@ namespace synthese
 		void DBInheritedTableSyncTemplate<ScenarioTableSync,SentScenarioInheritedTableSync,SentScenario>::Unlink(
 			SentScenario* obj
 		){
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				obj->cleanDataSourceLinks(true);
+			}
 		}
 
 

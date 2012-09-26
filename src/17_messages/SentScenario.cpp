@@ -178,5 +178,19 @@ namespace synthese
 		) {
 			_variables = value;
 		}
+
+
+
+		void SentScenario::addMessage( const SentAlarm& message ) const
+		{
+			_messages.insert(&message);
+		}
+
+
+
+		void SentScenario::removeMessage( const SentAlarm& message ) const
+		{
+			_messages.erase(&message);
+		}
 	}
 }

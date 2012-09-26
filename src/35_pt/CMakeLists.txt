@@ -101,6 +101,8 @@ HafasFileFormat.cpp
 HafasFileFormat.hpp
 HastusCSVFileFormat.cpp
 HastusCSVFileFormat.hpp
+IneoRealtimeUpdateAction.cpp
+IneoRealtimeUpdateAction.hpp
 RTMFileFormat.cpp
 RTMFileFormat.hpp
 HastusInterfaceFileFormat.cpp
