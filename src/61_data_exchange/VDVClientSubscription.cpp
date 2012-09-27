@@ -76,10 +76,7 @@ namespace synthese
 
 		bool VDVClientSubscription::checkUpdate() const
 		{
-			if(!_generator.get())
-			{
-				buildGenerator();
-			}
+			buildGenerator();
 
 			const ArrivalDepartureList& result(_generator->generate());
 
@@ -107,10 +104,15 @@ namespace synthese
 		}
 
 
-		VDVClientSubscription::VDVClientSubscription()
-		{
-
-		}
+		VDVClientSubscription::VDVClientSubscription(
+			const std::string& id
+		):	_id(id),
+			_endTime(not_a_date_time),
+			_stopArea(NULL),
+			_line(NULL),
+			_timeSpan(hours(1)),
+			_hysteresis(minutes(1))
+		{}
 
 
 

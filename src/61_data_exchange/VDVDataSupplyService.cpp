@@ -32,6 +32,7 @@
 #include "RequestException.h"
 #include "ServerConstants.h"
 #include "Service.h"
+#include "TransportNetwork.h"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
 #include "XmlToolkit.h"
@@ -152,7 +153,7 @@ namespace synthese
 			// XML
 			stringstream result;
 			result <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:DatenAbrufenAntwort xmlns:vdv453=\"vdv453ger\">" <<
 				"<Bestaetigung Zst=\"";
 			ToXsdDateTime(result, now);
@@ -173,6 +174,13 @@ namespace synthese
 			{
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{
+					if(it.second->getLastResult().empty())
+					{
+						continue;
+					}
+
+					result << "<AZBNachricht AboID=\"" << it.second->getId() << "\">";
+
 					BOOST_FOREACH(const ArrivalDepartureList::value_type& dep, it.second->getLastResult())
 					{
 						// Local variables
@@ -183,32 +191,86 @@ namespace synthese
 						const JourneyPattern& jp(
 							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
 						);
+						const TransportNetwork& network(
+							*line.getNetwork()
+						);
 						ptime departureDateTime(sp.getDepartureDateTime());
 						departureDateTime -= diff_from_utc;
-
+						string networkId(
+							network.getACodeBySource(
+								*_vdvClient->get<DataSourcePointer>()
+						)	);
+						string serviceNumber;
+						if(!networkId.empty())
+						{
+							serviceNumber = networkId + "-";
+						}
+						if(sp.getService()->getServiceNumber().empty())
+						{
+							serviceNumber += "00000";
+						}
+						else
+						{
+							serviceNumber += sp.getService()->getServiceNumber();
+						}
+						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+					
 						// XML generation
-						result <<
-							"<AZBNachricht AboID=\"" << it.second->getId() << "\">" <<
-							"<AZBFahrtLoeschen Zst=\"";
-						ToXsdDateTime(result, departureDateTime);
-						result <<
-							"\">" <<
-							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
-							"<FahrtID>" <<
-							"<FahrtBezeichner>" << sp.getService()->getServiceNumber() << "</FahrtBezeichner>" <<
-							"<Betriebstag>" << to_simple_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-							"</FahrtID>" <<
-							"<HstSeqZaehler></HstSeqZaehler>" << // ?
-							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
-							"<LinienText>" << line.getShortName() << "</LinienText>" <<
-							"<RichtungsID>" << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</RichtungsID>" <<
-							"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
-							"<VonRichtungsText></VonRichtungsText>" << //?
-							"<AbmeldeID></AbmeldeID>" << //?
-							"</AZBFahrtLoeschen>" <<
-							"</AZBNachricht>"
-						;
-			}	}	}
+						if(false) // Cancellation
+						{
+							result <<
+								"<AZBFahrtLoeschen Zst=\"";
+							ToXsdDateTime(result, departureDateTime);
+							result <<
+								"\">" <<
+								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+								"<FahrtID>" <<
+								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+								"</FahrtID>" <<
+								"<HstSeqZaehler>1</HstSeqZaehler>" <<
+								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+								"<LinienText>" << line.getShortName() << "</LinienText>" <<
+								"<RichtungsID>";
+							if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
+							{
+								result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
+							}
+							result <<
+								"</RichtungsID>" <<
+								"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
+								"</AZBFahrtLoeschen>"
+							;
+						}
+						if(true) // Running service
+						{
+							result << "<AZBFahrPlan Zst=\"";
+							ToXsdDateTime(result, departureDateTime);
+							result <<
+								"\">" <<
+								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+								"<FahrtID>" <<
+								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+								"</FahrtID>" <<
+								"<HstSeqZaehler>1</HstSeqZaehler>" <<
+								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+								"<LinienText>" << line.getShortName() << "</LinienText>" <<
+								"<RichtungsID>";
+							if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
+							{
+								result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
+							}
+							result <<
+								"</RichtungsID>" <<
+								"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
+								"</AZBFahrPlan>"
+							;
+						}
+					}
+					result << "</AZBNachricht>";
+			}	}
+			result << "</vdv453:DatenAbrufenAntwort>";
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			map.insert(DATA_RESULT, result.str());

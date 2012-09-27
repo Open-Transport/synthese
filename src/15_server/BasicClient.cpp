@@ -1,6 +1,8 @@
 
 #include "BasicClient.h"
+
 #include "Exception.h"
+#include "ServerModule.h"
 
 #include <iostream>
 #include <istream>
@@ -85,7 +87,8 @@ namespace synthese
 					request_stream << "POST";
 				}
 				request_stream << " " << url << " HTTP/1.0\r\n";
-				request_stream << "Host: " << _serverHost << "\r\n";
+				request_stream << "Host: " << _serverHost << ":" << _serverPort << "\r\n";
+				request_stream << "User-Agent: SYNTHESE/" << ServerModule::VERSION << "\r\n";
 				request_stream << "Accept: */*\r\n";
 				if(!postData.empty())
 				{

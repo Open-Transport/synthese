@@ -120,7 +120,7 @@ namespace synthese
 			// XML
 			stringstream result;
 			result << 
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:StatusAntwort xmlns:vdv453=\"vdv453ger\">" <<
 				"<Status Zst=\"";
 			ToXsdDateTime(result, now);
