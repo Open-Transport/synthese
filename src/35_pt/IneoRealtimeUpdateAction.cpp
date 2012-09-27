@@ -25,10 +25,12 @@
 #include "IneoRealtimeUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "AlarmObjectLinkTableSync.h"
 #include "AlarmRecipientTemplate.h"
 #include "DisplayScreen.h"
 #include "DisplayScreenAlarmRecipient.h"
 #include "DBModule.h"
+#include "DBTransaction.hpp"
 #include "ParametersMap.h"
 #include "Request.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
@@ -208,6 +210,8 @@ namespace synthese
 					}
 				}
 			}
+
+			set<RegistryKeyType> linksToRemove;
 			{ // Messages recipients
 
 				set<pair<string,string> > refs;
@@ -223,60 +227,100 @@ namespace synthese
 				;
 				DBResultSPtr result(db->execQuery(query.str()));
 				string ref_prog;
-				map<string, bool> recipients;
+				typedef map<string, map<string, bool> > RecipientsMap;
+				RecipientsMap recipients;
 				while(result->next())
 				{
-					// Fields reading
-					if(ref_prog.empty())
+					RecipientsMap::iterator it(
+						recipients.find(result->getText("ref_prog"))
+					);
+					if(it == recipients.end())
 					{
-						ref_prog = result->getText("ref_prog");
-					}
-
-					if(ref_prog == result->getText("ref_prog"))
-					{
-						recipients.insert(
+						it = recipients.insert(
 							make_pair(
-								result->getText("destinataire"),
-								false
-						)	);
+								result->getText("ref_prog"),
+								RecipientsMap::mapped_type()
+						)	).first;
+					}
+					it->second.insert(
+						make_pair(
+							result->getText("destinataire"),
+							false
+					)	);
+				}
+				
+				BOOST_FOREACH(RecipientsMap::value_type& it, recipients)
+				{
+					SentScenario* scenario(_dataSource->getObjectByCode<SentScenario>(it.first));
+					if(!scenario)
+					{
+						Log::GetInstance().warn("Corrupted message recipient : it should link to a valid scenario : " + it.first);
+					}
+					else if(scenario->getMessages().size() != 1)
+					{
+						Log::GetInstance().warn("Corrupted message : it should contain one message : " + lexical_cast<string>(scenario->getKey()));
 					}
 					else
 					{
-						SentScenario* scenario(_dataSource->getObjectByCode<SentScenario>(ref_prog));
-						if(!scenario)
-						{
-							Log::GetInstance().warn("Corrupted message recipient : it should link to a valid scenario : " + ref_prog);
-						}
-						else if(scenario->getMessages().size() != 1)
-						{
-							Log::GetInstance().warn("Corrupted message : it should contain one message : " + lexical_cast<string>(scenario->getKey()));
-						}
-						else
-						{
-							const SentAlarm& message(**scenario->getMessages().begin());
+						const SentAlarm& message(**scenario->getMessages().begin());
 
-							// Recipients to add
-							DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
-								DisplayScreenAlarmRecipient::getLinkedObjects(message)
-							);
-							BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
+						// Recipients to add
+						DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
+							DisplayScreenAlarmRecipient::getLinkedObjects(message)
+						);
+						BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
+						{
+							const DisplayScreen& ds(*dsit.first);
+							string code(ds.getACodeBySource(*_dataSource));
+							RecipientsMap::mapped_type::iterator it2(it.second.find(code));
+							if(it2 == it.second.end())
 							{
-								const DisplayScreen& ds(*dsit.first);
-								string code(ds.getACodeBySource(*_dataSource));
-								if(recipients.find(code) == recipients.end())
-								{
-									// delete
-								}
-
-
-
+								linksToRemove.insert(dsit.second->getKey());
+							}
+							else
+							{
+								it2->second = true;
 							}
 						}
-					}
+					
+						BOOST_FOREACH(const RecipientsMap::mapped_type::value_type& it2, it.second)
+						{
+							if(it2.second)
+							{
+								continue;
+							}
+							
+							DisplayScreen* ds(
+								_dataSource->getObjectByCode<DisplayScreen>(
+									it2.first
+							)	);
+							if(!ds)
+							{
+								Log::GetInstance().warn("No such display screen : " + it2.first);
+								continue;
+							}
 
-					// Loop on objects present in the environment (search for deletions)
+							shared_ptr<AlarmObjectLink> link;
+							link->setAlarm(const_cast<SentAlarm*>(&message));
+							link->setObjectId(ds->getKey());
+							updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
+						}
+					}
 				}
 			}
+			
+			// Savings
+			DBTransaction transaction;
+			DBModule::SaveEntireEnv(updatesEnv, transaction);
+			BOOST_FOREACH(RegistryKeyType id, linksToRemove)
+			{
+				AlarmObjectLinkTableSync::RemoveRow(id, transaction);
+			}
+			BOOST_FOREACH(RegistryKeyType id, scenariosToRemove)
+			{
+				ScenarioTableSync::RemoveRow(id, transaction);
+			}
+			transaction.run();
 		}
 		
 		
