@@ -45,7 +45,7 @@ namespace synthese
 			static const std::string ATTR_HYSTERESIS;
 
 		private:
-			std::string _id;
+			const std::string _id;
 			boost::posix_time::ptime _endTime;
 			pt::StopArea* _stopArea;
 			pt::CommercialLine* _line;
@@ -78,7 +78,9 @@ namespace synthese
 			void toParametersMap(util::ParametersMap& pm) const;
 
 		public:
-			VDVClientSubscription();
+			VDVClientSubscription(
+				const std::string& id
+			);
 		};
 }	}
 

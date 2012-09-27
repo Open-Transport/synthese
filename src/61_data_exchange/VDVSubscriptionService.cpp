@@ -98,8 +98,9 @@ namespace synthese
 				XMLNode cleanNode(allNode.getChildNode("AboLoeschenAlle"));
 				if(!cleanNode.isEmpty())
 				{
-					if(	cleanNode.getText() == "true" ||
-						cleanNode.getText() == "1"
+					string cleanNodeStr(cleanNode.getText());
+					if(	cleanNodeStr == "true" ||
+						cleanNodeStr == "1"
 					){
 						client.cleanSubscriptions();
 					}
@@ -110,9 +111,13 @@ namespace synthese
 				for(size_t i(0); i<nbNodes; ++i)
 				{
 					XMLNode aboAZBNode(allNode.getChildNode("AboAZB", i));
+					string id(aboAZBNode.getAttribute("AboID"));
+					if(id.empty())
+					{
+						continue;
+					}
 
-					shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription);
-
+					shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription(id));
 
 					if(aboAZBNode.nChildNode("AZBID"))
 					{
@@ -133,10 +138,11 @@ namespace synthese
 						CommercialLine* line(
 							client.get<DataSourcePointer>()->getObjectByCode<CommercialLine>(linienNode.getText())
 						);
-						if(line)
+						if(!line)
 						{
-							subscription->setLine(line);
+							continue;
 						}
+						subscription->setLine(line);
 					}
 
 					// TODO Handle directions
