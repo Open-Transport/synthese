@@ -132,42 +132,51 @@ namespace synthese
 
 			stringstream statusAnfrage;
 			statusAnfrage <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:StatusAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(statusAnfrage, now);
 			statusAnfrage <<
-				"\" xmlns:vdv453=\"vdv453ger\" />";
+				"\" xmlns:vdv453=\"vdv453ger\"/>";
 
-			stringstream out;
-			c.post(
-				out,
-				_getURL("status"),
-				statusAnfrage.str()
-			);
+			try
+			{
+				stringstream out;
+				c.post(
+					out,
+					_getURL("status"),
+					statusAnfrage.str()
+				);
 
-			string statusAntwortStr(out.str());
-			XMLResults results;
-			XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:StatusAntwort", &results);
-			if (results.error != eXMLErrorNone)
+				string statusAntwortStr(out.str());
+				XMLResults results;
+				XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:StatusAntwort", &results);
+				if (results.error != eXMLErrorNone)
+				{
+					_online = false;
+					return;
+				}
+				
+				XMLNode statusNode = allNode.getChildNode("Status");
+				string ergebinsAttr(statusNode.getAttribute("Ergebnis"));
+				if(ergebinsAttr != "ok")
+				{
+					_online = false;
+					return;
+				}
+
+				// TODO Check the StartDienstZst attribute
+
+				if(_online) // TODO Check if the subscriptions have changed
+				{
+					return;
+				}
+			}
+			catch(...)
 			{
 				_online = false;
 				return;
 			}
-			
-			XMLNode statusNode = allNode.getChildNode("Status");
-			string ergebinsAttr(statusNode.getAttribute("Ergebnis"));
-			if(ergebinsAttr != "ok")
-			{
-				_online = false;
-				return;
-			}
 
-			// TODO Check the StartDienstZst attribute
-
-			if(_online) // TODO Check if the subscriptions have changed
-			{
-				return;
-			}
 
 			this_thread::sleep(seconds(1));
 
@@ -175,7 +184,7 @@ namespace synthese
 			now = second_clock::local_time() - diff_from_utc;
 			stringstream cleanRequest;
 			cleanRequest <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(cleanRequest, now);
 			cleanRequest <<
@@ -191,7 +200,7 @@ namespace synthese
 
 			stringstream aboAnfrage;
 			aboAnfrage <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:AboAnfrage Sender=\"" << get<ClientControlCentreCode>() << "\" Zst=\"";
 			ToXsdDateTime(aboAnfrage, now);
 			aboAnfrage << "\" xmlns:vdv453=\"vdv453ger\">";
@@ -224,25 +233,33 @@ namespace synthese
 
 			aboAnfrage << "</vdv453:AboAnfrage>";
 
-			stringstream aboAntwort;
-			c.post(
-				aboAntwort,
-				_getURL("aboverwalten"),
-				aboAnfrage.str()
-			);
+			try
+			{
+				stringstream aboAntwort;
+				c.post(
+					aboAntwort,
+					_getURL("aboverwalten"),
+					aboAnfrage.str()
+				);
 
-			string aboAntwortStr(aboAntwort.str());
-			XMLResults aboAntwortResults;
-			XMLNode aboAntwortNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:AboAntwort", &aboAntwortResults);
-			if (aboAntwortResults.error != eXMLErrorNone ||
-				aboAntwortNode.isEmpty()
-			){
-				_online = false;
-				return;
+				string aboAntwortStr(aboAntwort.str());
+				XMLResults aboAntwortResults;
+				XMLNode aboAntwortNode = XMLNode::parseString(aboAntwortStr.c_str(), "vdv453:AboAntwort", &aboAntwortResults);
+				if (aboAntwortResults.error != eXMLErrorNone ||
+					aboAntwortNode.isEmpty()
+				){
+					_online = false;
+					return;
+				}
+				XMLNode bestaetingungNode = aboAntwortNode.getChildNode("Bestaetigung");
+				string ergebinsAttr(bestaetingungNode.getAttribute("Ergebnis"));
+				if(ergebinsAttr != "ok")
+				{
+					_online = false;
+					return;
+				}
 			}
-			XMLNode bestaetingungNode = aboAntwortNode.getChildNode("Bestaetigung");
-			ergebinsAttr = bestaetingungNode.getAttribute("Ergebnis");
-			if(ergebinsAttr != "ok")
+			catch(...)
 			{
 				_online = false;
 				return;
@@ -266,7 +283,7 @@ namespace synthese
 			// The request
 			stringstream request;
 			request <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:DatenAbrufenAnfrage xmlns:vdv453=\"vdv453ger\" Sender=\"" <<
 				get<ClientControlCentreCode>() <<
 				"\" Zst=\"";

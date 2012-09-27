@@ -98,7 +98,7 @@ namespace synthese
 
 			stringstream result;
 			result <<
-				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\" ?>" <<
+				"<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>" <<
 				"<vdv453:DatenBereitAntwort xmlns:vdv453=\"vdv453ger\">" <<
 				"<Bestaetigung Zst=\"";
 			ToXsdDateTime(result, now);
