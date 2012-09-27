@@ -181,13 +181,22 @@ namespace synthese
 				for (LinkedAlarmsSet::const_iterator itb = it->second.begin(); itb != it->second.end(); ++itb)
 				{
 					if (ita == itb)
+					{
 						continue;
+					}
 
-					AlarmConflict thisConflictStatus = static_cast<const SentAlarm*>((*ita)->getAlarm())->wereInConflictWith(*(*itb)->getAlarm());
+					AlarmConflict thisConflictStatus(
+						static_cast<const SentAlarm*>((*ita)->getAlarm())->wereInConflictWith(
+							*static_cast<const SentAlarm*>((*itb)->getAlarm())
+					)	);
 					if (thisConflictStatus > conflictStatus)
+					{
 						conflictStatus = thisConflictStatus;
+					}
 					if (conflictStatus == ALARM_CONFLICT)
+					{
 						return conflictStatus;
+					}
 				}
 			return conflictStatus;
 		}
