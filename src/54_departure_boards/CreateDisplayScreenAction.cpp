@@ -110,6 +110,7 @@ namespace synthese
 				{
 					_up = DisplayScreenTableSync::Get(id, *_env);
 					_subScreenType = static_cast<DisplayScreen::SubScreenType>(map.getDefault<int>(PARAMETER_SUB_SCREEN_TYPE));
+					setPlace(_up->getDisplayedPlace());
 				}
 				else
 				{
