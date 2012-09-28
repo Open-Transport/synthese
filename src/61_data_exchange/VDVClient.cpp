@@ -104,8 +104,6 @@ namespace synthese
 
 		bool VDVClient::checkUpdate() const
 		{
-			bool changed(false);
-
 			for(Subscriptions::const_iterator it(_subscriptions.begin()); it != _subscriptions.end(); ++it)
 			{
 				if(it->second->checkUpdate())
