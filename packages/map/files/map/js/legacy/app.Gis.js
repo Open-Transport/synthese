@@ -604,18 +604,22 @@ window.app.Gis.prototype = {
             new OpenLayers.Feature.Vector(line.clone(), attributes)
         ]);
 
-        var labelsLayer = this.getLayerNamed("Labels");
-        var ll = line.getBounds().getCenterLonLat();
-        var point = new OpenLayers.Geometry.Point(ll.lon, ll.lat);
-        labelsLayer.addFeatures([
-            new OpenLayers.Feature.Vector(point, attributes)
-        ]);
-
-        var iconsLayer = this.getLayerNamed("Icons");
-        iconsLayer.addFeatures([
-            new OpenLayers.Feature.Vector(point.clone(), attributes)
-        ]);
-
+        console.log(attributes);
+        if (attributes) {
+          var labelsLayer = this.getLayerNamed("Labels");
+          var ll = line.getBounds().getCenterLonLat();
+          var point = new OpenLayers.Geometry.Point(ll.lon, ll.lat);
+          labelsLayer.addFeatures([
+              new OpenLayers.Feature.Vector(point, attributes)
+          ]);
+          
+          if (attributes.meanIcon) {
+            var iconsLayer = this.getLayerNamed("Icons");
+            iconsLayer.addFeatures([
+                new OpenLayers.Feature.Vector(point.clone(), attributes)
+            ]);
+          }
+        }
         return line;
     },
 
