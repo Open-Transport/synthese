@@ -59,6 +59,7 @@ namespace synthese
 	namespace pt
 	{
 		const string IneoRealtimeUpdateAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "ds";
+		const string IneoRealtimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
 		
 		
 		
@@ -72,6 +73,7 @@ namespace synthese
 		
 		void IneoRealtimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
+			// Datasource
 			try
 			{
 				_dataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(PARAMETER_DATASOURCE_ID));
@@ -80,6 +82,9 @@ namespace synthese
 			{
 				throw ActionException("No such data source");
 			}
+
+			// Database
+			_database = map.get<string>(PARAMETER_DATABASE);
 		}
 		
 		
@@ -101,7 +106,7 @@ namespace synthese
 				// Loop on objects present in the database (search for creations and updates)
 				query <<
 					"SELECT *" <<
-					" FROM PROGRAMMATION " <<
+					" FROM " << _database << " PROGRAMMATION " <<
 					" WHERE nature_dst LIKE 'BORNE%'"
 				;
 				DBResultSPtr result(db->execQuery(query.str()));
@@ -220,9 +225,9 @@ namespace synthese
 				// Loop on objects present in the database (search for creations and updates)
 				query <<
 					"SELECT *" <<
-					" FROM DESTINATAIRE" <<
+					" FROM " << _database << " DESTINATAIRE" <<
 					" WHERE " <<
-					" EXISTS(SELECT id FROM PROGRAMMATION WHERE nature_dst LIKE 'BORNE%')" <<
+					" EXISTS(SELECT id FROM " << _database << " PROGRAMMATION WHERE nature_dst LIKE 'BORNE%')" <<
 					" ORDER BY ref_prog"
 				;
 				DBResultSPtr result(db->execQuery(query.str()));

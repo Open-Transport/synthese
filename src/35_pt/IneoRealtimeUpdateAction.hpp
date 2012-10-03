@@ -55,9 +55,11 @@ namespace synthese
 		{
 		public:
 			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_DATABASE;
 
 		private:
 			boost::shared_ptr<const impex::DataSource> _dataSource;
+			std::string _database;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
