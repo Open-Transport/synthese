@@ -123,8 +123,6 @@ namespace synthese
 
 			if(key == FILE_ADDRESS)
 			{
-				// Loading the file into SQLite as virtual table
-				VirtualShapeVirtualTable table(filePath, _dataSource.getCharset() , _dataSource.getCoordinatesSystem()->getSRID());
 				typedef set<pair<City*, string> > MissingStreets;
 				MissingStreets missingStreets;
 				size_t ok(0);
@@ -133,7 +131,6 @@ namespace synthese
 				size_t roadNotFound(0);
 				size_t emptyStreetName(0);
 				size_t badGeometry(0);
-
 
 				{
 					ifstream inFile;
@@ -246,12 +243,29 @@ namespace synthese
 						house->setGeometry(geometry);
 						house->setHouseNumber(number);
 						shared_ptr<City> city(CityTableSync::GetEditableFromCode(cityCode, _env));
-						// ToDo tester si le RoadPlace a été trouvé + City
+
 						if(!city.get())
 						{
-							++cityNotFound;
-							continue;
+							CityTableSync::SearchResult cities = CityTableSync::Search(
+								_env,
+								boost::optional<std::string>(), // exactname
+								boost::optional<std::string>(cityName), // likeName
+								boost::optional<std::string>(),
+								0, 0, true, true,
+								util::UP_LINKS_LOAD_LEVEL
+								);
+
+							if(cities.empty())
+							{
+								++cityNotFound;
+								continue;
+							}
+							else
+							{
+								city = cities.front();
+							}
 						}
+
 						boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditableFromCityAndName(city->getKey(),roadName,_env));
 						if(!roadPlace.get())
 						{
