@@ -18,6 +18,7 @@
 
 #include "RoadModule.h"
 
+#include "HousesCSVFileFormat.hpp"
 #include "IGNstreetsFileFormat.hpp"
 #include "NavstreetsFileFormat.hpp"
 #include "OSMFileFormat.hpp"
@@ -60,6 +61,7 @@ void synthese::road::moduleRegister()
 
 	synthese::road::PublicPlaceAdmin::integrate();
 
+	synthese::road::HousesCSVFileFormat::integrate();
 	synthese::road::NavstreetsFileFormat::integrate();
 	synthese::road::OSMFileFormat::integrate();
 	synthese::road::RoadShapeFileFormat::integrate();
