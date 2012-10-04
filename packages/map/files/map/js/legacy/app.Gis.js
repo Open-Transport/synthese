@@ -604,7 +604,6 @@ window.app.Gis.prototype = {
             new OpenLayers.Feature.Vector(line.clone(), attributes)
         ]);
 
-        console.log(attributes);
         if (attributes) {
           var labelsLayer = this.getLayerNamed("Labels");
           var ll = line.getBounds().getCenterLonLat();
