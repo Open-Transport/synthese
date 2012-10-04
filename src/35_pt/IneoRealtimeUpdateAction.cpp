@@ -262,7 +262,7 @@ namespace synthese
 					if(!scenario)
 					{
 						map<string, SentScenario*>::const_iterator it2(addedScenarios.find(it.first));
-						if(it != addedScenarios.end())
+						if(it2 != addedScenarios.end())
 						{
 							scenario = it2->second;
 						}
