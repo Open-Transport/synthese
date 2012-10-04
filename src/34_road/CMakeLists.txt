@@ -9,6 +9,8 @@ CrossingTableSync.cpp
 CrossingTableSync.hpp
 House.cpp
 House.hpp
+HousesCSVFileFormat.cpp
+HousesCSVFileFormat.hpp
 HouseTableSync.cpp
 HouseTableSync.hpp
 IGNstreetsFileFormat.cpp
