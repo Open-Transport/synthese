@@ -313,18 +313,18 @@ TransportNetworkUpdateAction.cpp
 TransportNetworkUpdateAction.hpp
 XmlBuilder.cpp
 XmlBuilder.h
+GTFSFileFormat.cpp
+GTFSFileFormat.hpp
+ObitiFileFormat.cpp
+ObitiFileFormat.hpp
+PegaseFileFormat.cpp
+PegaseFileFormat.hpp
+RTMFileFormat.cpp
+RTMFileFormat.hpp
+TridentFileFormat.cpp
+TridentFileFormat.h
 )
 
-#GTFSFileFormat.cpp
-#GTFSFileFormat.hpp
-#ObitiFileFormat.cpp
-#ObitiFileFormat.hpp
-#PegaseFileFormat.cpp
-#PegaseFileFormat.hpp
-#RTMFileFormat.cpp
-#RTMFileFormat.hpp
-#TridentFileFormat.cpp
-#TridentFileFormat.h
 
 
 set_source_files_properties(PTModule.gen.cpp PTModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
