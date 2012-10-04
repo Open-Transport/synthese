@@ -95,16 +95,12 @@ FreeDRTTimeSlotTableSync.cpp
 FreeDRTTimeSlotTableSync.hpp
 FreeDRTTimeSlotUpdateAction.cpp
 FreeDRTTimeSlotUpdateAction.hpp
-GTFSFileFormat.cpp
-GTFSFileFormat.hpp
 HafasFileFormat.cpp
 HafasFileFormat.hpp
 HastusCSVFileFormat.cpp
 HastusCSVFileFormat.hpp
 IneoRealtimeUpdateAction.cpp
 IneoRealtimeUpdateAction.hpp
-RTMFileFormat.cpp
-RTMFileFormat.hpp
 HastusInterfaceFileFormat.cpp
 HastusInterfaceFileFormat.hpp
 HeuresFileFormat.cpp
@@ -169,10 +165,6 @@ NonPermanentService.cpp
 NonPermanentService.h
 OGTFileFormat.cpp
 OGTFileFormat.hpp
-ObitiFileFormat.cpp
-ObitiFileFormat.hpp
-PegaseFileFormat.cpp
-PegaseFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
@@ -319,11 +311,21 @@ TransportNetworkTableSync.cpp
 TransportNetworkTableSync.h
 TransportNetworkUpdateAction.cpp
 TransportNetworkUpdateAction.hpp
-TridentFileFormat.cpp
-TridentFileFormat.h
 XmlBuilder.cpp
 XmlBuilder.h
 )
+
+#GTFSFileFormat.cpp
+#GTFSFileFormat.hpp
+#ObitiFileFormat.cpp
+#ObitiFileFormat.hpp
+#PegaseFileFormat.cpp
+#PegaseFileFormat.hpp
+#RTMFileFormat.cpp
+#RTMFileFormat.hpp
+#TridentFileFormat.cpp
+#TridentFileFormat.h
+
 
 set_source_files_properties(PTModule.gen.cpp PTModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)
 

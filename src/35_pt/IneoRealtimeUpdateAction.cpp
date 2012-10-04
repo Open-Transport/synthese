@@ -97,6 +97,7 @@ namespace synthese
 			// Objects to update in database
 			Env updatesEnv;
 			set<RegistryKeyType> scenariosToRemove;
+			map<string, SentScenario*> addedScenarios;
 
 			{ // Scenarios and messages
 
@@ -106,7 +107,7 @@ namespace synthese
 				// Loop on objects present in the database (search for creations and updates)
 				query <<
 					"SELECT *" <<
-					" FROM " << _database << " PROGRAMMATION " <<
+					" FROM " << _database << ".PROGRAMMATION " <<
 					" WHERE nature_dst LIKE 'BORNE%'"
 				;
 				DBResultSPtr result(db->execQuery(query.str()));
@@ -145,9 +146,10 @@ namespace synthese
 						)	);
 						updatedScenario->addCodeBySource(
 							*_dataSource,
-							ref,
-							true
+							ref
 						);
+						updatedScenario->setIsEnabled(true);
+						addedScenarios.insert(make_pair(ref, updatedScenario.get()));
 						updatesEnv.getEditableRegistry<SentScenario>().add(updatedScenario);
 
 						// Creation of the message
@@ -225,9 +227,9 @@ namespace synthese
 				// Loop on objects present in the database (search for creations and updates)
 				query <<
 					"SELECT *" <<
-					" FROM " << _database << " DESTINATAIRE" <<
+					" FROM " << _database << ".DESTINATAIRE" <<
 					" WHERE " <<
-					" EXISTS(SELECT id FROM " << _database << " PROGRAMMATION WHERE nature_dst LIKE 'BORNE%')" <<
+					" EXISTS(SELECT ref FROM " << _database << ".PROGRAMMATION WHERE nature_dst LIKE 'BORNE%')" <<
 					" ORDER BY ref_prog"
 				;
 				DBResultSPtr result(db->execQuery(query.str()));
@@ -257,6 +259,14 @@ namespace synthese
 				BOOST_FOREACH(RecipientsMap::value_type& it, recipients)
 				{
 					SentScenario* scenario(_dataSource->getObjectByCode<SentScenario>(it.first));
+					if(!scenario)
+					{
+						map<string, SentScenario*>::const_iterator it(addedScenarios.find(it.first));
+						if(it != addedScenarios.end())
+						{
+							scenario = it->second;
+						}
+					}
 					if(!scenario)
 					{
 						Log::GetInstance().warn("Corrupted message recipient : it should link to a valid scenario : " + it.first);

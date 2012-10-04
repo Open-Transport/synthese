@@ -58,7 +58,7 @@
 #include "DataSource.h"
 #include "DataSourceAdmin.h"
 #include "RemoveObjectAction.hpp"
-#include "TridentFileFormat.h"
+// #include "TridentFileFormat.h"
 #include "ExportFunction.hpp"
 #include "ImportableAdmin.hpp"
 #include "DRTArea.hpp"
@@ -535,7 +535,7 @@ namespace synthese
 			// TAB EXPORT
 			if (openTabContent(stream, TAB_EXPORT))
 			{
-				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
+/*				shared_ptr<TridentFileFormat::Exporter_> exporter(new TridentFileFormat::Exporter_);
 				exporter->setLine(_cline);
 
 				StaticFunctionRequest<ExportFunction> tridentExportFunction(_request, true);
@@ -548,7 +548,7 @@ namespace synthese
 				exporter->setWithTisseoExtension(true);
 				stream << HTMLModule::getLinkButton(tridentExportFunction.getURL(), "Export Trident Tisséo", string(), "page_white_go.png");
 				stream << "</p>";
-			}
+*/			}
 
 			////////////////////////////////////////////////////////////////////
 			// END TABS
