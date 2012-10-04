@@ -261,10 +261,10 @@ namespace synthese
 					SentScenario* scenario(_dataSource->getObjectByCode<SentScenario>(it.first));
 					if(!scenario)
 					{
-						map<string, SentScenario*>::const_iterator it(addedScenarios.find(it.first));
+						map<string, SentScenario*>::const_iterator it2(addedScenarios.find(it.first));
 						if(it != addedScenarios.end())
 						{
-							scenario = it->second;
+							scenario = it2->second;
 						}
 					}
 					if(!scenario)
