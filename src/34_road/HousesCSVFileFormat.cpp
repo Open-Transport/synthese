@@ -117,7 +117,7 @@ namespace synthese
 			const boost::filesystem::path& filePath,
 			std::ostream& os,
 			const std::string& key,
-			boost::optional<const server::Request&> adminRequest
+			boost::optional<const admin::AdminRequest&> adminRequest
 		) const {
 			// 1 : Administrative areas
 
@@ -376,7 +376,7 @@ namespace synthese
 
 		void HousesCSVFileFormat::Importer_::displayAdmin(
 			std::ostream& stream,
-			const server::Request& request
+			const admin::AdminRequest& request
 		) const	{
 			AdminFunctionRequest<DataSourceAdmin> importRequest(request);
 			PropertiesHTMLTable t(importRequest.getHTMLForm());
