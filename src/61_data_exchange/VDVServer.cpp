@@ -123,7 +123,8 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
-			_online = false;
+			_online = true;
+			const string contentType = "text/xml";
 			
 			BasicClient c(
 				get<ServerAddress>(),
@@ -144,7 +145,8 @@ namespace synthese
 				c.post(
 					out,
 					_getURL("status"),
-					statusAnfrage.str()
+					statusAnfrage.str(),
+					contentType
 				);
 
 				string statusAntwortStr(out.str());
@@ -193,6 +195,21 @@ namespace synthese
 				"</vdv453:AboAnfrage>"
 			;
 
+			try
+			{
+				stringstream cleanAntwort;
+				c.post(
+					cleanAntwort,
+					_getURL("aboverwalten"),
+					cleanRequest.str(),
+					contentType
+				);
+			}
+			catch(...)
+			{
+			}
+
+
 			this_thread::sleep(seconds(1));
 
 			// Send subscription request
@@ -214,7 +231,7 @@ namespace synthese
 
 				ptime expirationTime(now + subscription->get<SubscriptionDuration>());
 				aboAnfrage << 
-					"<AboAZB AboID=\"" << subscription->get<Name>() << " VerfallZst=\"";
+					"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
 				ToXsdDateTime(aboAnfrage, expirationTime);
 				aboAnfrage <<
 					"\">" <<
@@ -239,7 +256,8 @@ namespace synthese
 				c.post(
 					aboAntwort,
 					_getURL("aboverwalten"),
-					aboAnfrage.str()
+					aboAnfrage.str(),
+					contentType
 				);
 
 				string aboAntwortStr(aboAntwort.str());
@@ -279,6 +297,7 @@ namespace synthese
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
+			const string contentType = "text/xml";
 
 			// The request
 			stringstream request;
@@ -289,23 +308,30 @@ namespace synthese
 				"\" Zst=\"";
 			ToXsdDateTime(request, now);
 			request <<
-				"<DatensatzAlle>0</DatensatzAlle>"
+				"\">" <<
+				"<DatensatzAlle>0</DatensatzAlle>" <<
 				"</vdv453:DatenAbrufenAnfrage>"
 			;
 
 			// Sending the request
 			stringstream result;
-			BasicClient c(
-				get<ServerAddress>(),
-				get<ServerPort>()
-			);
-			c.post(
-				result,
-				_getURL("datenabrufen"),
-				request.str()
-			);
+			try
+			{
+				BasicClient c(
+					get<ServerAddress>(),
+					get<ServerPort>()
+				);
+				c.post(
+					result,
+					_getURL("datenabrufen"),
+					request.str(),
+					contentType
+				);
 
-			// TODO Read the result
-
+				// TODO Read the result
+			}
+			catch(...)
+			{
+			}
 		}
 }	}
