@@ -29,9 +29,13 @@
 #include <sstream>
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace boost;
 using namespace std;
+using namespace boost::posix_time;
+using namespace boost::gregorian;
 
 namespace synthese
 {
@@ -269,5 +273,23 @@ namespace synthese
 				value.time_of_day().hours() << ":" <<
 				setw( 2 ) << setfill ( '0' ) <<
 				value.time_of_day().minutes () << ":00Z";
+		}
+
+
+
+		boost::posix_time::ptime GetXsdDateTime(
+			const std::string& str
+		){
+			vector<string> parts;
+			split(parts, str, is_any_of("TZ"));
+			if(parts.size() < 2)
+			{
+				throw Exception("Malformed XSD date time");
+			}
+			ptime result(
+				from_string(parts[0]),
+				duration_from_string(parts[1])
+			);
+			return result;
 		}
 }	}

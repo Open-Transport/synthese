@@ -113,6 +113,11 @@ namespace synthese
 				std::ostream& str,
 				const boost::posix_time::ptime& value
 			);
+
+
+			boost::posix_time::ptime GetXsdDateTime(
+				const std::string& str
+			);
 }	}	}
 
 #endif

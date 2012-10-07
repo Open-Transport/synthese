@@ -49,7 +49,9 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(StopAreaPointer),
 					FIELD_VALUE_CONSTRUCTOR(SubscriptionDuration, hours(24)),
 					FIELD_VALUE_CONSTRUCTOR(TimeSpan, minutes(60))
-			)	)
+			)	),
+			_expiration(not_a_date_time),
+			_online(false)
 		{
 		}
 

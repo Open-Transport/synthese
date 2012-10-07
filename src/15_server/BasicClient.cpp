@@ -35,7 +35,8 @@ namespace synthese
 			const std::string& url
 		) const {
 			string fakePostData;
-			_send(out, url, fakePostData);
+			string fakeContentType;
+			_send(out, url, fakePostData, fakeContentType);
 		}
 
 
@@ -43,15 +44,20 @@ namespace synthese
 		void BasicClient::post(
 			std::ostream& out,
 			const std::string& url,
-			const std::string& data
+			const std::string& data,
+			string contentType
 		) const	{
-			_send(out, url, data);
+			_send(out, url, data, contentType);
 		}
 
 
 
-		void BasicClient::_send( std::ostream& out, const std::string& url, const std::string& postData ) const
-		{
+		void BasicClient::_send(
+			std::ostream& out,
+			const std::string& url,
+			const std::string& postData,
+			const string& contentType
+		) const	{
 			try
 			{
 				boost::asio::io_service io_service;
@@ -86,15 +92,19 @@ namespace synthese
 				{
 					request_stream << "POST";
 				}
-				request_stream << " " << url << " HTTP/1.0\r\n";
+				request_stream << " " << url << " HTTP/1.1\r\n";
 				request_stream << "Host: " << _serverHost << ":" << _serverPort << "\r\n";
 				request_stream << "User-Agent: SYNTHESE/" << ServerModule::VERSION << "\r\n";
 				request_stream << "Accept: */*\r\n";
 				if(!postData.empty())
 				{
-					request_stream << "Content-length: " << postData.size() << "\r\n";
+					request_stream << "Content-Length: " << postData.size() << "\r\n";
 				}
-				request_stream << "Connection: close\r\n\r\n";
+				if(!contentType.empty())
+				{
+					request_stream << "Content-Type: " << contentType << "\r\n";
+				}
+				request_stream << "Connection: keep-alive\r\n\r\n";
 				if(!postData.empty())
 				{
 					request_stream << postData;
