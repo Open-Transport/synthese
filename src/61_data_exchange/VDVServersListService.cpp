@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///	VDVClientsListService class implementation.
-///	@file VDVClientsListService.cpp
+///	VDVServersListService class implementation.
+///	@file VDVServersListService.cpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -22,13 +22,12 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "VDVClientsListService.hpp"
+#include "VDVServersListService.hpp"
 
 #include "DataExchangeModule.hpp"
 #include "Request.h"
 #include "RequestException.h"
-#include "VDVClient.hpp"
-#include "VDVClientSubscription.hpp"
+#include "VDVServer.hpp"
 
 using namespace boost;
 using namespace std;
@@ -40,15 +39,15 @@ namespace synthese
 	using namespace security;
 
 	template<>
-	const string FactorableTemplate<Function,data_exchange::VDVClientsListService>::FACTORY_KEY = "vdv_clients_list";
+	const string FactorableTemplate<Function,data_exchange::VDVServersListService>::FACTORY_KEY = "vdv_servers_list";
 	
 	namespace data_exchange
 	{
-		const string VDVClientsListService::TAG_CLIENT = "client";
+		const string VDVServersListService::TAG_SERVER = "server";
 		
 
 
-		ParametersMap VDVClientsListService::_getParametersMap() const
+		ParametersMap VDVServersListService::_getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
@@ -56,23 +55,25 @@ namespace synthese
 
 
 
-		void VDVClientsListService::_setFromParametersMap(const ParametersMap& map)
+		void VDVServersListService::_setFromParametersMap(const ParametersMap& map)
 		{
 		}
 
 
 
-		ParametersMap VDVClientsListService::run(
+		ParametersMap VDVServersListService::run(
 			std::ostream& stream,
 			const Request& request
 		) const {
 			ParametersMap map;
-			
-			BOOST_FOREACH(const DataExchangeModule::VDVClients::value_type& client, DataExchangeModule::GetVDVClients())
-			{
-				shared_ptr<ParametersMap> clientPM(new ParametersMap);
-				client.second->toParametersMap(*clientPM, true);
-				map.insert(TAG_CLIENT, clientPM);
+
+			BOOST_FOREACH(
+				const VDVServer::Registry::value_type& server,
+				Env::GetOfficialEnv().getRegistry<VDVServer>()
+			){
+				shared_ptr<ParametersMap> serverPM(new ParametersMap);
+				server.second->toParametersMap(*serverPM, true);
+				map.insert(TAG_SERVER, serverPM);
 			}
 
 			return map;
@@ -80,7 +81,7 @@ namespace synthese
 		
 		
 		
-		bool VDVClientsListService::isAuthorized(
+		bool VDVServersListService::isAuthorized(
 			const Session* session
 		) const {
 			return true;
@@ -88,7 +89,7 @@ namespace synthese
 
 
 
-		std::string VDVClientsListService::getOutputMimeType() const
+		std::string VDVServersListService::getOutputMimeType() const
 		{
 			return "text/html";
 		}

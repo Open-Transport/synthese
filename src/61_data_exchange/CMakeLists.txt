@@ -22,6 +22,8 @@ set(data_exchange_SRCS
   VDVDataSupplyService.hpp
   VDVServer.cpp
   VDVServer.hpp
+  VDVServersListService.cpp
+  VDVServersListService.hpp
   VDVServerSubscription.cpp
   VDVServerSubscription.hpp
   VDVServerSubscriptionTableSync.cpp

@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
-///	VDVClientsListService class header.
-///	@file VDVClientsListService.hpp
+///	VDVServersListService class header.
+///	@file VDVServersListService.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -22,8 +22,8 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#ifndef SYNTHESE_VDVClientsListService_H__
-#define SYNTHESE_VDVClientsListService_H__
+#ifndef SYNTHESE_VDVServersListService_H__
+#define SYNTHESE_VDVServersListService_H__
 
 #include "FactorableTemplate.h"
 #include "Function.h"
@@ -33,18 +33,18 @@ namespace synthese
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		///	61.15 Function : VDVClientsListService.
+		///	61.15 Function : VDVServersListService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/VDV
 		//////////////////////////////////////////////////////////////////////////
 		///	@ingroup m61Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2012
 		/// @since 3.5.0
-		class VDVClientsListService:
-			public util::FactorableTemplate<server::Function,VDVClientsListService>
+		class VDVServersListService:
+			public util::FactorableTemplate<server::Function,VDVServersListService>
 		{
 		public:
-			static const std::string TAG_CLIENT;
+			static const std::string TAG_SERVER;
 			
 		protected:
 			
@@ -75,6 +75,10 @@ namespace synthese
 			
 			
 		public:
+			//! @name Setters
+			//@{
+			//	void setObject(boost::shared_ptr<const Object> value) { _object = value; }
+			//@}
 
 
 
@@ -107,5 +111,5 @@ namespace synthese
 		};
 }	}
 
-#endif // SYNTHESE_VDVClientsListService_H__
+#endif // SYNTHESE_VDVServersListService_H__
 

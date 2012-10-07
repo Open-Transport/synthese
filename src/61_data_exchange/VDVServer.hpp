@@ -69,6 +69,9 @@ namespace synthese
 		class VDVServer:
 			public Object<VDVServer, VDVServerRecord>
 		{
+		private:
+			static const std::string TAG_SUBSCRIPTION;
+
 		public:
 		
 			/// Chosen registry class.
@@ -95,6 +98,16 @@ namespace synthese
 				bool getOnline() const { return _online; }
 
 				void updateSYNTHESEFromServer() const;
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Adds parameters that are not intended to be saved (i.e. generated content).
+				/// The default implementation adds nothing. This method may be overloaded
+				/// @param map the map to populate
+				/// @param prefix prefix to add to the keys of the map items
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
+				) const;
 			//@}
 
 			//! @name Modifiers
