@@ -277,7 +277,7 @@ namespace synthese
 
 
 
-		boost::posix_time::ptime GetXsdDateTime(
+		boost::posix_time::ptime XmlToolkit::GetXsdDateTime(
 			const std::string& str
 		){
 			vector<string> parts;

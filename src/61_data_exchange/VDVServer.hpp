@@ -81,7 +81,7 @@ namespace synthese
 
 		private:
 			Subscriptions _subscriptions;
-			boost::posix_time::ptime _startServiceTimeStamp;
+			mutable boost::posix_time::ptime _startServiceTimeStamp;
 			mutable bool _online;
 
 			std::string _getURL( const std::string& request ) const;
