@@ -57,6 +57,10 @@ namespace synthese
 
 	namespace data_exchange
 	{
+		const string VDVClient::TAG_SUBSCRIPTION = "subscription";
+
+
+
 		VDVClient::VDVClient(
 			util::RegistryKeyType id /*= 0*/
 		):	Registrable(id),
@@ -176,5 +180,22 @@ namespace synthese
 		void VDVClient::cleanSubscriptions()
 		{
 			_subscriptions.clear();
+		}
+
+
+
+		void VDVClient::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /*= std::string() */
+		) const	{
+
+			// Subscriptions
+			BOOST_FOREACH(const Subscriptions::value_type& subscription, _subscriptions)
+			{
+				shared_ptr<ParametersMap> subscriptionMap(new ParametersMap);
+				subscription.second->toParametersMap(*subscriptionMap);
+				map.insert(prefix + TAG_SUBSCRIPTION, subscriptionMap);
+			}
+
 		}
 }	}
