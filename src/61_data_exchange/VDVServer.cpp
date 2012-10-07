@@ -124,10 +124,10 @@ namespace synthese
 		void VDVServer::connect() const
 		{
 			ptime now(second_clock::local_time());
+			ptime localNow(now);
 			typedef boost::date_time::c_local_adjustor<ptime> local_adj;
 			time_duration diff_from_utc(local_adj::utc_to_local(now) - now);
 			now -= diff_from_utc;
-			_online = true;
 			const string contentType = "text/xml";
 			
 			BasicClient c(
@@ -143,6 +143,7 @@ namespace synthese
 			statusAnfrage <<
 				"\" xmlns:vdv453=\"vdv453ger\"/>";
 
+			bool reloadNeeded(!_online);
 			try
 			{
 				stringstream out;
@@ -170,11 +171,21 @@ namespace synthese
 					return;
 				}
 
-				// TODO Check the StartDienstZst attribute
-
-				if(_online) // TODO Check if the subscriptions have changed
+				// Check of the start time
+				XMLNode startServiceNode = allNode.getChildNode("StartDienstZst");
+				if(startServiceNode.isEmpty())
 				{
+					_online = false;
 					return;
+				}
+				ptime startServiceTime(
+					XmlToolkit::GetXsdDateTime(
+						startServiceNode.getText()
+				)	);
+				if(startServiceTime != _startServiceTimeStamp)
+				{
+					reloadNeeded = true;
+					_startServiceTimeStamp = startServiceTime;
 				}
 			}
 			catch(...)
@@ -183,7 +194,28 @@ namespace synthese
 				return;
 			}
 
+			// Check if at least one subscription has changed
+			if(!reloadNeeded)
+			{
+				BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
+				{
+					if(!subscription->get<StopAreaPointer>())
+					{
+						continue;
+					}
 
+					// If a subscription is offline, reload
+					// Check if the subscription has expired
+					if(!subscription->getOnline() ||
+						subscription->getExpiration().is_not_a_date_time() ||
+						subscription->getExpiration() < localNow
+					){
+						reloadNeeded = true;
+						break;
+					}
+				}
+			}
+			
 			this_thread::sleep(seconds(1));
 
 			// Clean subscriptions
@@ -232,6 +264,8 @@ namespace synthese
 				{
 					continue;
 				}
+				subscription->setOnline(false);
+				subscription->setExpiration(localNow + subscription->get<SubscriptionDuration>());
 
 				ptime expirationTime(now + subscription->get<SubscriptionDuration>());
 				aboAnfrage << 
@@ -288,6 +322,14 @@ namespace synthese
 			}
 
 			_online = true;
+			BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
+			{
+				if(!subscription->get<StopAreaPointer>())
+				{
+					continue;
+				}
+				subscription->setOnline(true);
+			}
 		}
 
 
