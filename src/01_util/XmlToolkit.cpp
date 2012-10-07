@@ -266,7 +266,7 @@ namespace synthese
 			str <<
 				value.date().year() << "-" <<
 				setw( 2 ) << setfill ( '0' ) <<
-				value.date().month() << "-" <<
+				static_cast<long>(value.date().month()) << "-" <<
 				setw( 2 ) << setfill ( '0' ) <<
 				value.date().day() << "T" <<
 				setw( 2 ) << setfill ( '0' ) <<
