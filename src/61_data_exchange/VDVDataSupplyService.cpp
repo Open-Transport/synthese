@@ -26,6 +26,7 @@
 
 #include "CommercialLine.h"
 #include "DataExchangeModule.hpp"
+#include "Destination.hpp"
 #include "JourneyPattern.hpp"
 #include "Path.h"
 #include "Request.h"
@@ -174,17 +175,18 @@ namespace synthese
 			{
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{
-					if(it.second->getLastResult().empty())
+					if(it.second->getDeletions().empty() && it.second->getAddings().empty())
 					{
 						continue;
 					}
 
 					result << "<AZBNachricht AboID=\"" << it.second->getId() << "\">";
 
-					BOOST_FOREACH(const ArrivalDepartureList::value_type& dep, it.second->getLastResult())
+					// Deletions
+					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getDeletions())
 					{
 						// Local variables
-						const ServicePointer& sp(dep.first);
+						const ServicePointer& sp(dep.second);
 						const CommercialLine& line(
 							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
 						);
@@ -194,8 +196,6 @@ namespace synthese
 						const TransportNetwork& network(
 							*line.getNetwork()
 						);
-						ptime departureDateTime(sp.getDepartureDateTime());
-						departureDateTime -= diff_from_utc;
 						string networkId(
 							network.getACodeBySource(
 								*_vdvClient->get<DataSourcePointer>()
@@ -216,59 +216,126 @@ namespace synthese
 						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
 					
 						// XML generation
-						if(false) // Cancellation
+						result <<
+							"<AZBFahrtLoeschen Zst=\"";
+						ToXsdDateTime(result, now);
+						result <<
+							"\">" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+							"<FahrtID>" <<
+							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+							"</FahrtID>" <<
+							"<HstSeqZaehler>1</HstSeqZaehler>" <<
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+							"<LinienText>" << line.getShortName() << "</LinienText>" <<
+							"<RichtungsID>";
+						if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
 						{
-							result <<
-								"<AZBFahrtLoeschen Zst=\"";
-							ToXsdDateTime(result, departureDateTime);
-							result <<
-								"\">" <<
-								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
-								"<FahrtID>" <<
-								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-								"</FahrtID>" <<
-								"<HstSeqZaehler>1</HstSeqZaehler>" <<
-								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
-								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>";
-							if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
-							{
-								result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
-							}
-							result <<
-								"</RichtungsID>" <<
-								"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
-								"</AZBFahrtLoeschen>"
-							;
+							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
 						}
-						if(true) // Running service
+						result <<
+							"</RichtungsID>" <<
+							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"</AZBFahrtLoeschen>"
+						;
+					}
+
+					// Addings
+					BOOST_FOREACH(const VDVClientSubscription::ServicesList::value_type& dep, it.second->getAddings())
+					{
+						// Local variables
+						const ServicePointer& sp(dep.second);
+						const CommercialLine& line(
+							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
+						);
+						const JourneyPattern& jp(
+							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
+						);
+						const TransportNetwork& network(
+							*line.getNetwork()
+						);
+						ptime departureDateTime(sp.getDepartureDateTime());
+						departureDateTime -= diff_from_utc;
+						ptime plannedDepartureDateTime(sp.getTheoreticalDepartureDateTime());
+						plannedDepartureDateTime -= diff_from_utc;
+						ptime arrivalDateTime(sp.getArrivalDateTime());
+						arrivalDateTime -= diff_from_utc;
+						ptime plannedArrivalDateTime(sp.getTheoreticalArrivalDateTime());
+						plannedArrivalDateTime -= diff_from_utc;
+						string networkId(
+							network.getACodeBySource(
+								*_vdvClient->get<DataSourcePointer>()
+						)	);
+						string serviceNumber;
+						if(!networkId.empty())
 						{
-							result << "<AZBFahrPlan Zst=\"";
-							ToXsdDateTime(result, departureDateTime);
-							result <<
-								"\">" <<
-								"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
-								"<FahrtID>" <<
-								"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
-								"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
-								"</FahrtID>" <<
-								"<HstSeqZaehler>1</HstSeqZaehler>" <<
-								"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
-								"<LinienText>" << line.getShortName() << "</LinienText>" <<
-								"<RichtungsID>";
-							if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
-							{
-								result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
-							}
-							result <<
-								"</RichtungsID>" <<
-								"<RichtungsText>" << jp.getDirection() << "</RichtungsText>" <<
-								"</AZBFahrPlan>"
-							;
+							serviceNumber = networkId + "-";
 						}
+						if(sp.getService()->getServiceNumber().empty())
+						{
+							serviceNumber += "00000";
+						}
+						else
+						{
+							serviceNumber += sp.getService()->getServiceNumber();
+						}
+						serviceNumber += "-" + lexical_cast<string>(sp.getService()->getKey());
+					
+						// XML generation
+						result << "<AZBFahrplanlage Zst=\"";
+						ToXsdDateTime(result, now);
+						result <<
+							"\">" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+							"<FahrtID>" <<
+							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
+							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
+							"</FahrtID>" <<
+							"<HstSeqZaehler>1</HstSeqZaehler>" <<
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+							"<LinienText>" << line.getShortName() << "</LinienText>" <<
+							"<RichtungsID>";
+						if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
+						{
+							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
+						}
+						result <<
+							"</RichtungsID>" <<
+							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<ZielHst>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>"
+						;
+						if(!plannedArrivalDateTime.is_not_a_date_time())
+						{
+							result << "<AnkunftszeitAZBPlan>";
+							ToXsdDateTime(result, plannedArrivalDateTime);
+							result << "</AnkunftszeitAZBPlan>";
+						}
+						if(!arrivalDateTime.is_not_a_date_time())
+						{
+							result << "<AnkunftszeitAZBPrognose>";
+							ToXsdDateTime(result, arrivalDateTime);
+							result << "</AnkunftszeitAZBPrognose>";
+						}
+						if(!plannedDepartureDateTime.is_not_a_date_time())
+						{
+							result << "<AbfahrtszeitAZBPlan>";
+							ToXsdDateTime(result, plannedDepartureDateTime);
+							result << "</AbfahrtszeitAZBPlan>";
+						}
+						if(!departureDateTime.is_not_a_date_time())
+						{
+							result << "<AbfahrtszeitAZBPrognose>";
+							ToXsdDateTime(result, departureDateTime);
+							result << "</AbfahrtszeitAZBPrognose>";
+						}
+						result << "<HaltepositionsText></HaltepositionsText>";
+						result << "<HaltID></HaltID>";
+						result << "</AZBFahrplanlage>";
 					}
 					result << "</AZBNachricht>";
+					
+					it.second->declareSending();
 			}	}
 			result << "</vdv453:DatenAbrufenAntwort>";
 

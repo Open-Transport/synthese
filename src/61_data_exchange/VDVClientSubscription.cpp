@@ -79,28 +79,46 @@ namespace synthese
 			buildGenerator();
 
 			const ArrivalDepartureList& result(_generator->generate());
-
-			if(result.size() == _lastResult.size())
+			_result.clear();
+			BOOST_FOREACH(const ArrivalDepartureList::value_type& it1, result)
 			{
-				ArrivalDepartureList::const_iterator it1(result.begin());
-				ArrivalDepartureList::const_iterator it2(_lastResult.begin());
-				bool identical(true);
-				for(; it1 != result.end(); ++it1, ++it2)
+				_result.insert(
+					make_pair(
+						it1.first.getService(),
+						it1.first
+				)	);
+			}
+
+			_addings.clear();
+			_deletions.clear();
+			
+			
+			// Addings or upddates
+			BOOST_FOREACH(const ServicesList::value_type& it1, _result)
+			{
+				ServicesList::const_iterator it(_lastResult.find(it1.first));
+				if(it == _lastResult.end())
 				{
-					if(it1->first != it2->first)
-					{
-						identical = false;
-						break;
-					}
+					_addings.insert(it1);
 				}
-				if(identical)
+				else if(it->second != it1.second)
 				{
-					return false;
+					_deletions.insert(*it);
+					_addings.insert(it1);
 				}
 			}
 
-			_lastResult = result;
-			return true;
+			// Deletions
+			BOOST_FOREACH(const ServicesList::value_type& it2, _lastResult)
+			{
+				ServicesList::const_iterator it(_result.find(it2.first));
+				if(it == _result.end())
+				{
+					_deletions.insert(it2);
+				}
+			}
+
+			return !_addings.empty() || !_deletions.empty();
 		}
 
 

@@ -65,18 +65,24 @@ namespace synthese
 
 
 		private:
+			mutable boost::posix_time::ptime _expiration;
+			mutable bool _online;
 		
 		public:
 			VDVServerSubscription(util::RegistryKeyType id = 0);
 
 			//! @name Services
 			//@{
+				bool getOnline() const { return _online; }
+				const boost::posix_time::ptime& getExpiration() const { return _expiration; }
 			//@}
 
 			//! @name Modifiers
 			//@{
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
+				void setOnline(bool value){ _online = value; }
+				void setExpiration(const boost::posix_time::ptime& value){ _expiration = value; }
 			//@}
 		};
 }	}

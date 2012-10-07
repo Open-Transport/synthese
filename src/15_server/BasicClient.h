@@ -27,7 +27,8 @@ namespace synthese
 			void _send(
 				std::ostream& out,
 				const std::string& url,
-				const std::string& postData
+				const std::string& postData,
+				const std::string& contentType
 			) const;
 
 		public:
@@ -66,7 +67,8 @@ namespace synthese
 			void post(
 				std::ostream& out,
 				const std::string& url,
-				const std::string& data
+				const std::string& data,
+				std::string contentType = std::string()
 			) const;
 
 		};

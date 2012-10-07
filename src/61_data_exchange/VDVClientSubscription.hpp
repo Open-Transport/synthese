@@ -44,6 +44,8 @@ namespace synthese
 			static const std::string ATTR_TIME_SPAN;
 			static const std::string ATTR_HYSTERESIS;
 
+			typedef std::map<const graph::Service*, graph::ServicePointer> ServicesList;
+
 		private:
 			const std::string _id;
 			boost::posix_time::ptime _endTime;
@@ -52,14 +54,18 @@ namespace synthese
 			boost::posix_time::time_duration _timeSpan;
 			boost::posix_time::time_duration _hysteresis;
 
-			mutable ArrivalDepartureList _lastResult;
+			mutable ServicesList _lastResult;
+			mutable ServicesList _result;
+			mutable ServicesList _addings;
+			mutable ServicesList _deletions;
 			mutable boost::shared_ptr<departure_boards::StandardArrivalDepartureTableGenerator> _generator;
 
 		public:
 			/// @name Getters
 			//@{
 				const std::string& getId() const { return _id; }
-				const ArrivalDepartureList& getLastResult() const { return _lastResult; }
+				const ServicesList& getAddings() const { return _addings; }
+				const ServicesList& getDeletions() const { return _deletions; }
 				pt::StopArea* getStopArea() const { return _stopArea; }
 			//@}
 
@@ -69,11 +75,11 @@ namespace synthese
 				void setLine(pt::CommercialLine* value){ _line = value; }
 				void setTimeSpan(const boost::posix_time::time_duration& value){ _timeSpan = value; }
 				void setHysteresis(const boost::posix_time::time_duration& value){ _hysteresis = value; }
-				void setLastResult(const ArrivalDepartureList& value){ _lastResult = value; }
 			//@}
 
 			void buildGenerator() const;
-			bool checkUpdate() const; 
+			bool checkUpdate() const;
+			void declareSending() const { _lastResult = _result; }
 
 			void toParametersMap(util::ParametersMap& pm) const;
 

@@ -197,8 +197,7 @@ namespace synthese
 						VDVServer::Registry::value_type& server,
 						Env::GetOfficialEnv().getEditableRegistry<VDVServer>()
 					){
-						if(	server.second->getOnline() ||
-							server.second->getSubscriptions().empty()
+						if(	server.second->getSubscriptions().empty()
 						){
 							continue;
 						}
