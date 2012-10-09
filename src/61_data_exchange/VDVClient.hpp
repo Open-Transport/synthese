@@ -41,6 +41,7 @@ namespace synthese
 
 		FIELD_TYPE(ReplyAddress, std::string)
 		FIELD_TYPE(ReplyPort, std::string)
+		FIELD_TYPE(DefaultDirection, std::string)
 		FIELD_TYPE(Active, bool)
 
 		typedef boost::fusion::map<
@@ -52,6 +53,7 @@ namespace synthese
 			FIELD(ServerControlCentreCode),
 			FIELD(ServiceCode),
 			FIELD(DataSourcePointer),
+			FIELD(DefaultDirection),
 			FIELD(Active)
 		> VDVClientRecord;
 
@@ -72,6 +74,7 @@ namespace synthese
 			
 		private:
 			Subscriptions _subscriptions;
+			mutable boost::posix_time::ptime _lastDataReady;
 
 			std::string _getURL(const std::string& request) const;
 
@@ -82,6 +85,9 @@ namespace synthese
 			const Subscriptions& getSubscriptions() const { return _subscriptions; }
 			void removeSubscription(const std::string& key);
 			void cleanSubscriptions();
+			const boost::posix_time::ptime& getLastDataReady() const { return _lastDataReady; }
+			void setLastDataReadyNow() const;
+			void clearLastDataReady() const;
 
 			bool checkUpdate() const;
 

@@ -31,6 +31,7 @@
 #include "Path.h"
 #include "Request.h"
 #include "RequestException.h"
+#include "ScheduledService.h"
 #include "ServerConstants.h"
 #include "Service.h"
 #include "TransportNetwork.h"
@@ -141,6 +142,9 @@ namespace synthese
 			const Request& request
 		) const {
 
+			// Client update
+			_vdvClient->clearLastDataReady();
+
 			// Map creation
 			ParametersMap map;
 
@@ -234,9 +238,15 @@ namespace synthese
 						{
 							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
 						}
+						else
+						{
+							result << _vdvClient->get<DefaultDirection>();
+						}
 						result <<
 							"</RichtungsID>" <<
 							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<AufAZB>false</AufAZB>" <<
+							"<FahrtStatus>Ist</FahrtStatus>" << 
 							"</AZBFahrtLoeschen>"
 						;
 					}
@@ -246,11 +256,19 @@ namespace synthese
 					{
 						// Local variables
 						const ServicePointer& sp(dep.second);
-						const CommercialLine& line(
-							*static_cast<CommercialLine*>(sp.getService()->getPath()->getPathGroup())
-						);
+						const ScheduledService* service(
+							dynamic_cast<const ScheduledService*>(
+								sp.getService()
+						)	);
+						if(!service)
+						{
+							continue;
+						}
 						const JourneyPattern& jp(
-							*static_cast<const JourneyPattern*>(sp.getService()->getPath())
+							*static_cast<const JourneyPattern*>(service->getPath())
+						);
+						const CommercialLine& line(
+							*static_cast<CommercialLine*>(jp.getPathGroup())
 						);
 						const TransportNetwork& network(
 							*line.getNetwork()
@@ -259,9 +277,28 @@ namespace synthese
 						departureDateTime -= diff_from_utc;
 						ptime plannedDepartureDateTime(sp.getTheoreticalDepartureDateTime());
 						plannedDepartureDateTime -= diff_from_utc;
-						ptime arrivalDateTime(sp.getArrivalDateTime());
+						
+						ptime arrivalDateTime(
+							(sp.getArrivalEdge() && sp.getArrivalEdge()->getRankInPath()) ?
+							ptime(
+								sp.getOriginDateTime().date(),
+								service->getArrivalSchedule(
+									true,
+									sp.getArrivalEdge()->getRankInPath()
+							)	):
+							ptime(not_a_date_time)
+						);
 						arrivalDateTime -= diff_from_utc;
-						ptime plannedArrivalDateTime(sp.getTheoreticalArrivalDateTime());
+						ptime plannedArrivalDateTime(
+							(sp.getArrivalEdge() && sp.getArrivalEdge()->getRankInPath()) ?
+							ptime(
+								sp.getOriginDateTime().date(),
+								service->getArrivalSchedule(
+									false,
+									sp.getArrivalEdge()->getRankInPath()
+							)	):
+							ptime(not_a_date_time)
+						);
 						plannedArrivalDateTime -= diff_from_utc;
 						string networkId(
 							network.getACodeBySource(
@@ -300,10 +337,16 @@ namespace synthese
 						{
 							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
 						}
+						else
+						{
+							result << _vdvClient->get<DefaultDirection>();
+						}
 						result <<
 							"</RichtungsID>" <<
 							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
-							"<ZielHst>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>"
+							"<ZielHst>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>" <<
+							"<AufAZB>false</AufAZB>" <<
+							"<FahrtStatus>Ist</FahrtStatus>"
 						;
 						if(!plannedArrivalDateTime.is_not_a_date_time())
 						{
