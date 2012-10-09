@@ -159,6 +159,7 @@ namespace synthese
 
 		void DataExchangeModule::ClientsPoller()
 		{
+			ptime now(second_clock::local_time());
 			while(true)
 			{
 				if(_vdvServerActive)
@@ -173,12 +174,17 @@ namespace synthese
 						{
 							continue;
 						}
-						client.second->sendUpdateSignal();
+						if(	client.second->getLastDataReady().is_not_a_date_time() ||
+							now - client.second->getLastDataReady() > minutes(2)
+						){
+							client.second->sendUpdateSignal();
+							client.second->setLastDataReadyNow();
+						}
 					}
 				}
 
 				ServerModule::SetCurrentThreadWaiting();
-				this_thread::sleep(posix_time::seconds(10));
+				this_thread::sleep(posix_time::seconds(30));
 			}
 		}
 

@@ -53,7 +53,7 @@ namespace synthese
 			pt::CommercialLine* _line;
 			boost::posix_time::time_duration _timeSpan;
 			boost::posix_time::time_duration _hysteresis;
-
+			
 			mutable ServicesList _lastResult;
 			mutable ServicesList _result;
 			mutable ServicesList _addings;
