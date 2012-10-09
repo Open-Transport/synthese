@@ -229,7 +229,8 @@ namespace synthese
 					"SELECT *" <<
 					" FROM " << _database << ".DESTINATAIRE" <<
 					" WHERE " <<
-					" EXISTS(SELECT ref FROM " << _database << ".PROGRAMMATION WHERE nature_dst LIKE 'BORNE%')" <<
+					" ref_prog IN (SELECT " << _database << ".PROGRAMMATION.ref FROM " << _database << ".PROGRAMMATION WHERE" <<
+					" nature_dst LIKE 'BORNE%')" <<
 					" ORDER BY ref_prog"
 				;
 				DBResultSPtr result(db->execQuery(query.str()));
