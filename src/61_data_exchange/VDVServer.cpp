@@ -33,6 +33,7 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::gregorian;
 using namespace boost::posix_time;
 
 namespace synthese
@@ -215,6 +216,11 @@ namespace synthese
 					}
 				}
 			}
+
+			if(!reloadNeeded)
+			{
+				return;
+			}
 			
 			this_thread::sleep(seconds(1));
 
@@ -265,14 +271,20 @@ namespace synthese
 					continue;
 				}
 				subscription->setOnline(false);
-				subscription->setExpiration(localNow + subscription->get<SubscriptionDuration>());
 
-				ptime expirationTime(now + subscription->get<SubscriptionDuration>());
+				// Expiration time
+				ptime expirationTime(
+					(localNow.time_of_day() <= time_duration(2, 30, 0)) ? localNow.date() : localNow.date() + days(1),
+					time_duration(2,30, 0)
+				);
+				subscription->setExpiration(expirationTime);
+				expirationTime -= diff_from_utc;
 				aboAnfrage << 
 					"<AboAZB AboID=\"" << subscription->get<Key>() << "\" VerfallZst=\"";
 				ToXsdDateTime(aboAnfrage, expirationTime);
-				aboAnfrage <<
-					"\">" <<
+				aboAnfrage << "\">";
+
+				aboAnfrage << 
 					"<AZBID>" << (
 						get<DataSourcePointer>() ?
 						subscription->get<StopAreaPointer>()->getACodeBySource(*get<DataSourcePointer>()) :

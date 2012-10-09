@@ -53,6 +53,7 @@ namespace synthese
 
 	FIELD_DEFINITION_OF_TYPE(ReplyAddress, "reply_address", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
 
 	namespace data_exchange
@@ -74,8 +75,10 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(ServerControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
+					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
 					FIELD_VALUE_CONSTRUCTOR(Active, true)
-			)	)
+			)	),
+			_lastDataReady(not_a_date_time)
 		{
 		}
 
@@ -180,6 +183,21 @@ namespace synthese
 		void VDVClient::cleanSubscriptions()
 		{
 			_subscriptions.clear();
+		}
+
+
+
+		void VDVClient::setLastDataReadyNow() const
+		{
+			ptime now(second_clock::local_time());
+			_lastDataReady = now;
+		}
+
+		
+		
+		void VDVClient::clearLastDataReady() const
+		{
+			_lastDataReady = ptime(not_a_date_time);
 		}
 
 
