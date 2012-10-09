@@ -60,6 +60,7 @@ namespace synthese
 	{
 		const string IneoRealtimeUpdateAction::PARAMETER_DATASOURCE_ID = Action_PARAMETER_PREFIX + "ds";
 		const string IneoRealtimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
+		const string IneoRealtimeUpdateAction::PARAMETER_CLEAN_DESTINATAIRE_TABLE_AFTER_ACTION = Action_PARAMETER_PREFIX + "_clean_destinataire";
 		
 		
 		
@@ -85,6 +86,9 @@ namespace synthese
 
 			// Database
 			_database = map.get<string>(PARAMETER_DATABASE);
+
+			// Clean destinataire after the action
+			_cleanDestinataireTableAfterAction = map.getDefault<bool>(PARAMETER_CLEAN_DESTINATAIRE_TABLE_AFTER_ACTION, false);
 		}
 		
 		
@@ -324,7 +328,7 @@ namespace synthese
 					}
 				}
 			}
-			
+
 			// Savings
 			DBTransaction transaction;
 			DBModule::SaveEntireEnv(updatesEnv, transaction);
@@ -337,6 +341,14 @@ namespace synthese
 				ScenarioTableSync::RemoveRow(id, transaction);
 			}
 			transaction.run();
+
+			// Clean after action
+			if(_cleanDestinataireTableAfterAction)
+			{
+				stringstream query;
+				query << "TRUNCATE TABLE " << _database << ".DESTINATAIRE";
+				db->execQuery(query.str());
+			}
 		}
 		
 		
@@ -345,6 +357,14 @@ namespace synthese
 			const Session* session
 		) const {
 			return true;
+		}
+
+
+
+		IneoRealtimeUpdateAction::IneoRealtimeUpdateAction():
+			_cleanDestinataireTableAfterAction(false)
+		{
+
 		}
 }	}
 

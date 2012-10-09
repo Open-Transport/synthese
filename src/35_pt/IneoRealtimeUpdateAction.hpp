@@ -56,10 +56,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_DATASOURCE_ID;
 			static const std::string PARAMETER_DATABASE;
+			static const std::string PARAMETER_CLEAN_DESTINATAIRE_TABLE_AFTER_ACTION;
 
 		private:
 			boost::shared_ptr<const impex::DataSource> _dataSource;
 			std::string _database;
+			bool _cleanDestinataireTableAfterAction;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -76,6 +78,10 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			IneoRealtimeUpdateAction();
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action
