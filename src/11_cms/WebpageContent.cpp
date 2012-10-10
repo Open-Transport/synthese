@@ -83,20 +83,33 @@ namespace synthese
 			}
 		}
 
+		bool toUpdate(false);
 		if(record.isDefined(FIELDS[1].name))
 		{
-			fieldObject._ignoreWhiteChars = record.getDefault<bool>(FIELDS[1].name, false);
+
+			bool newValue(record.getDefault<bool>(FIELDS[1].name, false));
+			toUpdate |= (fieldObject._ignoreWhiteChars != newValue);
+			fieldObject._ignoreWhiteChars = newValue;
 		}
 
 		if(record.isDefined(FIELDS[3].name))
 		{
-			fieldObject._doNotEvaluate = record.getDefault<bool>(FIELDS[3].name, false);
+			bool newValue(record.getDefault<bool>(FIELDS[3].name, false));
+			toUpdate |= (fieldObject._doNotEvaluate != newValue);
+			fieldObject._doNotEvaluate = newValue;
 		}
 
 		if(record.isDefined(FIELDS[0].name))
 		{
 			// At end because nodes generation needs the value of the other parameters to be updated
-			fieldObject.setCode(record.getDefault<string>(FIELDS[0].name));
+			string newValue(record.getDefault<string>(FIELDS[0].name));
+			bool toUpdate(newValue != fieldObject._code);
+			fieldObject._code = newValue;
+		}
+
+		if(toUpdate)
+		{
+			fieldObject._updateNodes();
 		}
 	}
 
@@ -181,7 +194,8 @@ namespace synthese
 
 		WebpageContent::WebpageContent(
 		):	_ignoreWhiteChars(false),
-			_mimeType(MimeTypes::HTML)
+			_mimeType(MimeTypes::HTML),
+			_doNotEvaluate(false)
 		{}
 
 
@@ -206,7 +220,8 @@ namespace synthese
 			std::string::const_iterator end,
 			std::set<std::string> termination
 		):	_ignoreWhiteChars(false),
-			_mimeType(MimeTypes::HTML)
+			_mimeType(MimeTypes::HTML),
+			_doNotEvaluate(false)
 		{
 			_parse(it, end, termination);
 		}
