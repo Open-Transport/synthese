@@ -64,6 +64,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -101,6 +102,7 @@ namespace synthese
 		const string CommercialLineTableSync::COL_MAP_URL("map_url");
 		const string CommercialLineTableSync::COL_DOC_URL("doc_url");
 		const string CommercialLineTableSync::COL_TIMETABLE_ID("timetable_id");
+		const string CommercialLineTableSync::COL_MAX_DISPLAY_DELAY("max_display_delay");
 	}
 
 	namespace db
@@ -130,6 +132,7 @@ namespace synthese
 			Field(CommercialLineTableSync::COL_MAP_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_DOC_URL, SQL_TEXT),
 			Field(CommercialLineTableSync::COL_TIMETABLE_ID, SQL_INTEGER),
+			Field(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY, SQL_INTEGER),
 			Field()
 		};
 
@@ -204,6 +207,13 @@ namespace synthese
 
 			RuleUser::Rules rules(RuleUser::GetEmptyRules());
 			rules[USER_PEDESTRIAN - USER_CLASS_CODE_OFFSET] = AllowedUseRule::INSTANCE.get();
+
+			// Max display delay
+			object->setMaxDisplayDelay(time_duration(not_a_date_time));
+			if(rows->getInt(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY) > 0)
+			{
+				object->setMaxDisplayDelay(minutes(rows->getInt(CommercialLineTableSync::COL_MAX_DISPLAY_DELAY)));
+			}
 
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
@@ -397,6 +407,7 @@ namespace synthese
 			query.addField(object->getMapURL());
 			query.addField(object->getDocURL());
 			query.addField(object->getTimetableId());
+			query.addField(object->getMaxDisplayDelay().is_not_a_date_time() ? string() : lexical_cast<string>(object->getMaxDisplayDelay().total_seconds()/60));
 			query.execute(transaction);
 		}
 

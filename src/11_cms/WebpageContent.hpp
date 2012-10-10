@@ -67,6 +67,7 @@ namespace synthese
 			std::string _code;
 			bool _ignoreWhiteChars;
 			util::MimeType _mimeType;
+			bool _doNotEvaluate;
 
 		private:
 			typedef std::vector<boost::shared_ptr<WebpageContentNode> > Nodes;
@@ -110,7 +111,8 @@ namespace synthese
 			WebpageContent(
 				const std::string& code,
 				bool ignoreWhiteChars = false,
-				util::MimeType mimeType = util::MimeTypes::HTML
+				util::MimeType mimeType = util::MimeTypes::HTML,
+				bool doNotEvaluate = false
 			);
 
 
@@ -128,6 +130,7 @@ namespace synthese
 				const std::string& getCode() const { return _code; }
 				bool getIgnoreWhiteChars() const { return _ignoreWhiteChars; }
 				const util::MimeType& getMimeType() const { return _mimeType; }
+				bool getDoNotEvaluate() const { return _doNotEvaluate; }
 			//@}
 
 			/// @name Modifiers

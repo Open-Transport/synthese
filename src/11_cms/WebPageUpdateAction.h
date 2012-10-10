@@ -65,6 +65,7 @@ namespace synthese
 			static const std::string PARAMETER_IGNORE_WHITE_CHARS;
 			static const std::string PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT;
 			static const std::string PARAMETER_RAW_EDITOR;
+			static const std::string PARAMETER_DO_NOT_EVALUATE;
 
 		private:
 			boost::shared_ptr<Webpage> _page;
@@ -84,6 +85,7 @@ namespace synthese
 			boost::optional<std::string> _smartURLPath;
 			boost::optional<bool> _rawEditor;
 			boost::optional<std::string> _smartURLDefaultParameterName;
+			boost::optional<bool> _doNotEvaluate;
 
 			bool _decodeXMLEntitiesInContent;
 

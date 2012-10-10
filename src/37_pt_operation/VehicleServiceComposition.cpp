@@ -26,7 +26,7 @@ namespace synthese
 {
 	using namespace util;
 
-	namespace pt_operation
+	namespace vehicle
 	{
 		VehicleServiceComposition::VehicleServiceComposition(RegistryKeyType id):
 			Registrable(id),

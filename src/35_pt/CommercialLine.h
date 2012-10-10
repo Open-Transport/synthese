@@ -96,6 +96,7 @@ namespace synthese
 			static const std::string DATA_LINE_DOC_URL;
 			static const std::string DATA_LINE_TIMETABLE_ID;
 			static const std::string DATA_LINE_NETWORK_ID;
+			static const std::string DATA_MAX_DISPLAY_DELAY;
 
 			/// Chosen registry class.
 			typedef util::Registry<CommercialLine>	Registry;
@@ -126,6 +127,8 @@ namespace synthese
 				std::string _mapURL;
 				std::string _docURL;
 				util::RegistryKeyType _timetableId;
+
+				boost::posix_time::time_duration _maxDisplayDelay;
 			//@}
 
 			/// @name Mutexes
@@ -162,6 +165,7 @@ namespace synthese
 				const std::string& getMapURL() const { return _mapURL; }
 				const std::string& getDocURL() const { return _docURL; }
 				util::RegistryKeyType getTimetableId() const { return _timetableId; }
+				const boost::posix_time::time_duration& getMaxDisplayDelay() const { return _maxDisplayDelay; }
 			//@}
 
 			//! @name Setters
@@ -178,6 +182,7 @@ namespace synthese
 				void setMapURL(const std::string& value){ _mapURL = value; }
 				void setDocURL(const std::string& value){ _docURL = value; }
 				void setTimetableId(util::RegistryKeyType value){ _timetableId = value; }
+				void setMaxDisplayDelay(const boost::posix_time::time_duration& value){ _maxDisplayDelay = value; }
 			//@}
 
 			/// @name Indices maintenance

@@ -41,7 +41,7 @@ namespace synthese
 		class ParametersMap;
 	}
 
-	namespace pt_operation
+	namespace vehicle
 	{
 		class Vehicle;
 		class VehiclePosition;
@@ -124,10 +124,10 @@ namespace synthese
 				boost::posix_time::ptime		_arrivalTime;			//!< Moment d'arrivée prévue
 				boost::posix_time::ptime		_originDateTime;
 				boost::posix_time::ptime		_reservationDeadLine;
-				const pt_operation::Vehicle*	_vehicle;
+				const vehicle::Vehicle*	_vehicle;
 				std::string						_seatNumber;
-				const pt_operation::VehiclePosition*	_vehiclePositionAtDeparture;
-				const pt_operation::VehiclePosition*	_vehiclePositionAtArrival;
+				const vehicle::VehiclePosition*	_vehiclePositionAtDeparture;
+				const vehicle::VehiclePosition*	_vehiclePositionAtArrival;
 				bool							_cancelledByOperator;
 				boost::posix_time::ptime		_acknowledgeTime;
 				security::User*					_acknowledgeUser;
@@ -151,12 +151,12 @@ namespace synthese
 				void setArrivalAddress		(const std::string& address){ _arrivalAddress = address; }
 				void setDepartureTime		(const boost::posix_time::ptime& time){ _departureTime = time; }
 				void setArrivalTime			(const boost::posix_time::ptime& time){ _arrivalTime = time; }
-				void setVehicle				(const pt_operation::Vehicle* value){ _vehicle = value; }
+				void setVehicle				(const vehicle::Vehicle* value){ _vehicle = value; }
 				void setSeatNumber			(const std::string& value){ _seatNumber = value; }
 				void setOriginDateTime		(const boost::posix_time::ptime& time){ _originDateTime = time; }
 				void setReservationDeadLine	(const boost::posix_time::ptime& time){ _reservationDeadLine = time; }
-				void setVehiclePositionAtDeparture	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtDeparture = value; }
-				void setVehiclePositionAtArrival	(const pt_operation::VehiclePosition* value){ _vehiclePositionAtArrival = value; }
+				void setVehiclePositionAtDeparture	(const vehicle::VehiclePosition* value){ _vehiclePositionAtDeparture = value; }
+				void setVehiclePositionAtArrival	(const vehicle::VehiclePosition* value){ _vehiclePositionAtArrival = value; }
 				void setCancelledByOperator(bool value){ _cancelledByOperator = value; }
 				void setAcknowledgeTime(const boost::posix_time::ptime& value){ _acknowledgeTime = value; }
 				void setAcknowledgeUser(security::User* value){ _acknowledgeUser = value; }
@@ -191,10 +191,10 @@ namespace synthese
 				ReservationTransaction*	getTransaction()			const { return _transaction; }
 				const boost::posix_time::ptime&	getOriginDateTime()			const { return _originDateTime; }
 				const boost::posix_time::ptime&	getReservationDeadLine()	const { return _reservationDeadLine; }
-				const pt_operation::Vehicle*	getVehicle()				const { return _vehicle; }
+				const vehicle::Vehicle*	getVehicle()				const { return _vehicle; }
 				const std::string&				getSeatNumber()				const { return _seatNumber; }
-				const pt_operation::VehiclePosition*	getVehiclePositionAtDeparture()	const { return _vehiclePositionAtDeparture; }
-				const pt_operation::VehiclePosition*	getVehiclePositionAtArrival()	const { return _vehiclePositionAtArrival; }
+				const vehicle::VehiclePosition*	getVehiclePositionAtDeparture()	const { return _vehiclePositionAtDeparture; }
+				const vehicle::VehiclePosition*	getVehiclePositionAtArrival()	const { return _vehiclePositionAtArrival; }
 				bool							getCancelledByOperator()	const { return _cancelledByOperator; }
 				const boost::posix_time::ptime& getAcknowledgeTime() const { return _acknowledgeTime; }
 				security::User* getAcknowledgeUser() const { return _acknowledgeUser; }
@@ -225,7 +225,6 @@ namespace synthese
 				) const;
 			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_Reservation_h__

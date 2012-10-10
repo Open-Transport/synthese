@@ -46,6 +46,7 @@ set(MODULES
 34_road
 35_pt
 37_pt_operation
+38_vehicle
 39_map
 51_resa
 52_forum

@@ -6,6 +6,8 @@ set(data_exchange_SRCS
   DataExchangeModule.inc.cpp
   DataExchangeModule.hpp
   DataExchangeModuleRegister.cpp
+  IneoNCEConnection.cpp
+  IneoNCEConnection.hpp
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
@@ -53,6 +55,7 @@ target_link_libraries(61_data_exchange
   31_calendar
   32_geography
   33_algorithm
+  38_vehicle
   expat
 )
 
