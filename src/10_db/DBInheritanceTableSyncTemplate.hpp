@@ -393,7 +393,7 @@ namespace synthese
 
 			std::stringstream query;
 			query <<
-				"SELECT " << GetFieldsGetter() <<
+				"SELECT " << DBTableSyncTemplate<K>::GetFieldsGetter() <<
 				" FROM " << K::TABLE.NAME;
 			if(!whereClause.empty())
 			{
