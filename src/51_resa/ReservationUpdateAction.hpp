@@ -31,7 +31,7 @@
 
 namespace synthese
 {
-	namespace pt_operation
+	namespace vehicle
 	{
 		class Vehicle;
 	}
@@ -77,13 +77,13 @@ namespace synthese
 
 		private:
 			boost::shared_ptr<Reservation> _reservation;
-			boost::optional<boost::shared_ptr<const pt_operation::Vehicle> > _vehicle;
+			boost::optional<boost::shared_ptr<const vehicle::Vehicle> > _vehicle;
 			boost::optional<std::string> _seatNumber;
 			boost::optional<boost::posix_time::ptime> _realDepartureTime;
 			boost::optional<boost::posix_time::ptime> _realArrivalTime;
 			boost::optional<bool> _cancelledByOperator;
-			boost::optional<pt_operation::VehiclePosition::Meters> _departureMeterOffset;
-			boost::optional<pt_operation::VehiclePosition::Meters> _arrivalMeterOffset;
+			boost::optional<vehicle::VehiclePosition::Meters> _departureMeterOffset;
+			boost::optional<vehicle::VehiclePosition::Meters> _arrivalMeterOffset;
 			boost::optional<boost::posix_time::ptime> _acknowledgeTime;
 			boost::optional<boost::shared_ptr<security::User> > _acknowledgeUser;
 			boost::optional<boost::posix_time::ptime> _cancellationAcknowledgeTime;

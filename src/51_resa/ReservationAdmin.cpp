@@ -56,7 +56,7 @@ namespace synthese
 	using namespace security;
 	using namespace resa;
 	using namespace html;
-	using namespace pt_operation;
+	using namespace vehicle;
 
 	namespace util
 	{

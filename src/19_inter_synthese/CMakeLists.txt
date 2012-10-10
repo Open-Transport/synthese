@@ -20,12 +20,16 @@ InterSYNTHESEQueueTableSync.cpp
 InterSYNTHESEQueueTableSync.hpp
 InterSYNTHESESlave.cpp
 InterSYNTHESESlave.hpp
+InterSYNTHESESlavesViewService.cpp
+InterSYNTHESESlavesViewService.hpp
 InterSYNTHESESlaveUpdateService.cpp
 InterSYNTHESESlaveUpdateService.hpp
 InterSYNTHESESlaveTableSync.cpp
 InterSYNTHESESlaveTableSync.hpp
 InterSYNTHESESyncTypeFactory.cpp
 InterSYNTHESESyncTypeFactory.hpp
+InterSYNTHESEUpdateAckService.cpp
+InterSYNTHESEUpdateAckService.hpp
 )
 
 set_source_files_properties(InterSYNTHESEModule.gen.cpp InterSYNTHESEModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

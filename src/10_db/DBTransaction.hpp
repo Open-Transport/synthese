@@ -56,6 +56,8 @@ namespace synthese
 			const Queries getQueries() const;
 			const DBModifEvents getDBModifEvents() const;
 			void run();
+
+			std::string getSQL() const;
 		};
 	}
 }

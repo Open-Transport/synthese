@@ -22,6 +22,7 @@
 
 #include "DataExchangeModule.hpp"
 
+#include "IneoNCEConnection.hpp"
 #include "ServerModule.h"
 #include "VDVClient.hpp"
 #include "VDVClientSubscription.hpp"
@@ -71,10 +72,15 @@ namespace synthese
 		{
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_SERVER_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
 			RegisterParameter(DataExchangeModule::MODULE_PARAM_VDV_CLIENT_ACTIVE, "1", &DataExchangeModule::ParameterCallback);
+			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_HOST, "", &IneoNCEConnection::ParameterCallback);
+			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_PORT, "", &IneoNCEConnection::ParameterCallback);
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::Init()
 		{
+			// In the init section in order to read this parameter after the data load (DBModule::Init)
+			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID, "", &IneoNCEConnection::ParameterCallback);
+
 			// VDV Server poller
 			shared_ptr<thread> pollerThread(
 				new thread(
@@ -88,6 +94,12 @@ namespace synthese
 					&DataExchangeModule::ServersConnector
 			)	);
 			ServerModule::AddThread(serversThread, "VDV servers connector");
+
+			// Ineo NCE connector
+			shared_ptr<thread> nceThread(
+				new thread(
+					&IneoNCEConnection::InitThread
+			)	);
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()

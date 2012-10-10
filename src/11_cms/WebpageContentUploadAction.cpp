@@ -92,7 +92,7 @@ namespace synthese
 			Request& request
 		){
 			// Update of the content
-			WebpageContent c(_file.content, false, _file.mimeType);
+			WebpageContent c(_file.content, false, _file.mimeType, false);
 			_page->set<WebpageContent>(c);
 
 			// Update of the smart URL

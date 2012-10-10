@@ -26,7 +26,6 @@
 #include "CommercialLineTableSync.h"
 #include "ContinuousService.h"
 #include "Env.h"
-#include "IneoNCEConnection.hpp"
 #include "Journey.h"
 #include "MessagesTypes.h"
 #include "ScheduledService.h"
@@ -101,12 +100,6 @@ namespace synthese
 					&PTModule::RTDataCleaner
 			)	);
 			ServerModule::AddThread(theThread, "Real time data cleaner");
-
-			// NCE Thread
-//			shared_ptr<thread> nceThread(
-//				new thread(
-//					&IneoNCEConnection::InitThread
-//			)	);
 
 			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
 			Env env;

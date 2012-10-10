@@ -259,6 +259,7 @@ namespace synthese
 					stream << t.cell("Inclure forum", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_HAS_FORUM, _page->get<HasForum>()));
 					stream << t.cell("Ignorer caractères invisibles", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS, _page->get<WebpageContent>().getIgnoreWhiteChars()));
 					stream << t.cell("Type MIME", t.getForm().getTextInput(WebPageUpdateAction::PARAMETER_MIME_TYPE, _page->getMimeType()));
+					stream << t.cell("Ne pas evaluer le code", t.getForm().getOuiNonRadioInput(WebPageUpdateAction::PARAMETER_DO_NOT_EVALUATE, _page->get<WebpageContent>().getDoNotEvaluate()));
 					stream << t.close();
 				}
 			}

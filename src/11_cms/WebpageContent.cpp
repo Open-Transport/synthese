@@ -48,6 +48,7 @@ namespace synthese
 		Field("content1", SQL_TEXT, true),
 		Field("ignore_white_chars", SQL_BOOLEAN),
 		Field("mime_type", SQL_TEXT),
+		Field("do_not_evaluate", SQL_BOOLEAN),
 	Field() };
 	FIELD_COMPLEX_NO_LINKED_OBJECT_ID(WebpageContent)
 
@@ -85,6 +86,11 @@ namespace synthese
 		if(record.isDefined(FIELDS[1].name))
 		{
 			fieldObject._ignoreWhiteChars = record.getDefault<bool>(FIELDS[1].name, false);
+		}
+
+		if(record.isDefined(FIELDS[3].name))
+		{
+			fieldObject._doNotEvaluate = record.getDefault<bool>(FIELDS[3].name, false);
 		}
 
 		if(record.isDefined(FIELDS[0].name))
@@ -137,6 +143,16 @@ namespace synthese
 					map.getFormat()
 			)	);
 		}
+
+		// Ignore white chars
+		if(	boost::logic::indeterminate(withFiles) ||
+			FIELDS[3].exportOnFile == withFiles
+		){
+			map.insert(
+				prefix + FIELDS[3].name,
+				fieldObject._doNotEvaluate
+			);
+		}
 	}
 
 
@@ -173,10 +189,12 @@ namespace synthese
 		WebpageContent::WebpageContent(
 			const std::string& code,
 			bool ignoreWhiteChars,
-			MimeType mimeType
+			MimeType mimeType,
+			bool doNotEvaluate
 		):	_code(code),
 			_ignoreWhiteChars(ignoreWhiteChars),
-			_mimeType(mimeType)
+			_mimeType(mimeType),
+			_doNotEvaluate(doNotEvaluate)
 		{
 			_updateNodes();
 		}
@@ -198,8 +216,19 @@ namespace synthese
 		void WebpageContent::_updateNodes()
 		{
 			boost::unique_lock<shared_recursive_mutex> lock(_SharedMutex);
-			string::const_iterator it(_code.begin());
-			_parse(it, _code.end(), set<string>());
+			if(_doNotEvaluate)
+			{
+				_nodes.clear();
+				_nodes.push_back(
+					shared_ptr<WebpageContentNode>(
+						new ConstantExpression(_code)
+				)	);
+			}
+			else
+			{
+				string::const_iterator it(_code.begin());
+				_parse(it, _code.end(), set<string>());
+			}
 		}
 
 

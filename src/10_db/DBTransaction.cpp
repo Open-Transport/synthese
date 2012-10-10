@@ -80,5 +80,17 @@ namespace synthese
 		{
 			return _modifEvents;
 		}
+
+
+
+		std::string DBTransaction::getSQL() const
+		{
+			stringstream str;
+			BOOST_FOREACH(const string& sql, _queries)
+			{
+				str << sql;
+			}
+			return str.str();
+		}
 	}
 }

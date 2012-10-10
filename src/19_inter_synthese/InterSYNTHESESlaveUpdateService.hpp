@@ -32,6 +32,8 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
+		class InterSYNTHESESlave;
+
 		//////////////////////////////////////////////////////////////////////////
 		///	19.15 Function : InterSYNTHESESlaveUpdateService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/Inter-SYNTHESE_Slave
@@ -45,17 +47,15 @@ namespace synthese
 		{
 		public:
 			static const std::string SYNCS_SEPARATOR;
+			static const std::string NO_CONTENT_TO_SYNC;
 			
-			typedef std::vector<
-				std::pair<
-					std::string,
-					std::string
-			>	> Content;
+			static const std::string PARAMETER_SLAVE_ID;
 
 		protected:
 			//! \name Page parameters
 			//@{
-				Content _content;
+				boost::optional<util::RegistryKeyType> _slaveId;
+				boost::shared_ptr<InterSYNTHESESlave> _slave;
 			//@}
 			
 			
@@ -87,6 +87,7 @@ namespace synthese
 		public:
 			//! @name Setters
 			//@{
+				void setSlaveId(util::RegistryKeyType value){ _slaveId = value; }
 			//@}
 
 

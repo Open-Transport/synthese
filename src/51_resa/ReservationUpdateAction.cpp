@@ -50,7 +50,7 @@ namespace synthese
 	using namespace server;
 	using namespace security;
 	using namespace util;
-	using namespace pt_operation;
+	using namespace vehicle;
 	using namespace dblog;
 	using namespace pt;
 	using namespace graph;

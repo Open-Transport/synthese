@@ -24,6 +24,8 @@
 
 #include "InterSYNTHESESlaveUpdateService.hpp"
 
+#include "InterSYNTHESEQueue.hpp"
+#include "InterSYNTHESESlave.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "RequestException.h"
 #include "Request.h"
@@ -46,12 +48,18 @@ namespace synthese
 	namespace inter_synthese
 	{
 		const string InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR = "!$$$$!$$$$!%%%!\r\n";
+		const string InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC = "no_content_to_sync!";
+		const string InterSYNTHESESlaveUpdateService::PARAMETER_SLAVE_ID = "slave_id";
 		
 
 
 		ParametersMap InterSYNTHESESlaveUpdateService::_getParametersMap() const
 		{
 			ParametersMap map;
+			if(_slaveId)
+			{
+				map.insert(PARAMETER_SLAVE_ID, *_slaveId);
+			}
 			return map;
 		}
 
@@ -59,38 +67,13 @@ namespace synthese
 
 		void InterSYNTHESESlaveUpdateService::_setFromParametersMap(const ParametersMap& map)
 		{
-			string contentStr = map.getDefault<string>(PARAMETER_POST_DATA);
-			trim(contentStr);
-			if(contentStr.empty())
+			try
 			{
-				return;
+				_slave = Env::GetOfficialEnv().getEditable<InterSYNTHESESlave>(map.get<RegistryKeyType>(PARAMETER_SLAVE_ID));
 			}
-			vector<string> rows;
-			typedef split_iterator<string::iterator> string_split_iterator;
-			for(string_split_iterator its=make_split_iterator(const_cast<string&>(contentStr), first_finder(SYNCS_SEPARATOR, is_iequal()));
-				its != string_split_iterator();
-				++its
-			){
-				string param(copy_range<std::string>(*its));
-				if(param.empty())
-				{
-					continue;
-				}
-
-				size_t i(0);
-				for(;i<param.size(); ++i)
-				{
-					if(param[i] == ':')
-					{
-						break;
-					}
-				}
-				if(i == param.size() || i == 0)
-				{
-					continue;
-				}
-
-				_content.push_back(make_pair(param.substr(0, i-1), param.substr(i+1)));
+			catch (ObjectNotFoundException<InterSYNTHESESlave>&)
+			{
+				throw RequestException("No such slave");
 			}
 		}
 
@@ -100,16 +83,41 @@ namespace synthese
 			std::ostream& stream,
 			const Request& request
 		) const {
-			ParametersMap map;
-			BOOST_FOREACH(const Content::value_type& content, _content)
+
+			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
+			if(range.first == _slave->getQueue().end())
 			{
-				auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE(
-					Factory<InterSYNTHESESyncTypeFactory>::create(content.first)
-				);
-				interSYNTHESE->sync(content.second);
+				stream << NO_CONTENT_TO_SYNC;
 			}
-			stream << "OK";
-			return map;
+			else
+			{
+				bool first(true);
+				for(InterSYNTHESESlave::Queue::iterator it(range.first); it != _slave->getQueue().end(); ++it)
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						stream << InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR;
+					}
+					stream <<
+						it->second->get<Key>() << ":" <<
+						it->second->get<SyncType>() << ":" <<
+						it->second->get<SyncContent>()
+					;
+
+					// Exit on last item
+					if(it == range.second)
+					{
+						break;
+					}
+				}
+			}
+			_slave->setLastSentRange(range);
+
+			return ParametersMap();
 		}
 		
 		

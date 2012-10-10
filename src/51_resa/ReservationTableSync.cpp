@@ -50,7 +50,7 @@ namespace synthese
 	using namespace util;
 	using namespace resa;
 	using namespace pt;
-	using namespace pt_operation;
+	using namespace vehicle;
 	using namespace security;
 
 	namespace util

@@ -22,6 +22,9 @@
 
 #include "InterSYNTHESEConfigItem.hpp"
 
+#include "Factory.h"
+#include "InterSYNTHESESyncTypeFactory.hpp"
+
 namespace synthese
 {
 	using namespace inter_synthese;
@@ -61,6 +64,20 @@ namespace synthese
 		void InterSYNTHESEConfigItem::unlink()
 		{
 
+		}
+
+
+
+		const InterSYNTHESESyncTypeFactory& InterSYNTHESEConfigItem::getInterSYNTHESE() const
+		{
+			if(	!_interSYNTHESE.get() ||
+				_interSYNTHESE->getFactoryKey() != get<SyncType>()
+			){
+				_interSYNTHESE.reset(
+					Factory<InterSYNTHESESyncTypeFactory>::create(get<SyncType>())
+				);
+			}
+			return *_interSYNTHESE;
 		}
 }	}
 
