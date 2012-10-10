@@ -196,6 +196,10 @@ namespace synthese
 		template<> void DBDirectTableSyncTemplate<UserTableSync,User>::Unlink(
 			User* obj
 		){
+			if(Env::GetOfficialEnv().contains(*obj))
+			{
+				obj->cleanDataSourceLinks(true);
+			}
 		}
 
 

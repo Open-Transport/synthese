@@ -65,6 +65,7 @@ namespace synthese
 		const string WebPageUpdateAction::PARAMETER_IGNORE_WHITE_CHARS = Action_PARAMETER_PREFIX + "iw";
 		const string WebPageUpdateAction::PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT(Action_PARAMETER_PREFIX + "dx");
 		const string WebPageUpdateAction::PARAMETER_RAW_EDITOR(Action_PARAMETER_PREFIX + "re");
+		const string WebPageUpdateAction::PARAMETER_DO_NOT_EVALUATE = Action_PARAMETER_PREFIX + "_do_not_evaluate";
 
 
 
@@ -277,6 +278,12 @@ namespace synthese
 				_rawEditor = map.getDefault<bool>(PARAMETER_RAW_EDITOR, false);
 			}
 			_decodeXMLEntitiesInContent = map.getDefault<bool>(PARAMETER_DECODE_XML_ENTITIES_IN_CONTENT, false);
+
+			// Do not use template
+			if(map.isDefined(PARAMETER_DO_NOT_EVALUATE))
+			{
+				_doNotEvaluate = map.get<bool>(PARAMETER_DO_NOT_EVALUATE);
+			}
 		}
 
 
@@ -318,7 +325,7 @@ namespace synthese
 				_page->setParent(_up->get());
 			}
 
-			if(_content1 || _mimeType || _ignoreWhiteChars)
+			if(_content1 || _mimeType || _ignoreWhiteChars || _doNotEvaluate)
 			{
 				bool ignoreWhiteChars(
 					_ignoreWhiteChars ?
@@ -336,6 +343,12 @@ namespace synthese
 					_content1 ?
 					*_content1 :
 					_page->get<WebpageContent>().getCode()
+				);
+
+				bool doNotEvaluate(
+					_doNotEvaluate ?
+					*_doNotEvaluate :
+					_page->get<WebpageContent>().getDoNotEvaluate()
 				);
 
 				if(_content1 && _decodeXMLEntitiesInContent)

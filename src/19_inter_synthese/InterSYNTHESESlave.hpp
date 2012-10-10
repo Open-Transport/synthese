@@ -61,6 +61,7 @@ namespace synthese
 		class InterSYNTHESESlave:
 			public Object<InterSYNTHESESlave, InterSYNTHESESlaveRecord>
 		{
+			static const std::string TAG_QUEUE_ITEM;
 		public:
 		
 			/// Chosen registry class.
@@ -71,15 +72,25 @@ namespace synthese
 				InterSYNTHESEQueue*
 			> Queue;
 
+			typedef std::pair<
+				Queue::iterator,
+				Queue::iterator
+			> QueueRange;
+
 		private:
 			mutable Queue _queue;
+			mutable QueueRange _lastSentRange;
+			mutable boost::mutex _queueMutex;
 		
 		public:
 			InterSYNTHESESlave(util::RegistryKeyType id = 0);
 
 			//! @name Services
 			//@{
-				void send() const;
+				bool isObsolete() const;
+
+				QueueRange getQueueRange() const;
+
 				void enqueue(
 					const std::string& interSYNTHESEType,
 					const std::string& parameter
@@ -90,10 +101,27 @@ namespace synthese
 				void removeFromQueue(
 					util::RegistryKeyType id
 				) const;
+				Queue& getQueue() const { return _queue; }
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Adds parameters that are not intended to be saved (i.e. generated content).
+				/// The default implementation adds nothing. This method may be overloaded
+				/// @param map the map to populate
+				/// @param prefix prefix to add to the keys of the map items
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
+				) const;
+
+				const QueueRange& getLastSentRange() const { return _lastSentRange; }
 			//@}
 
 			//! @name Modifiers
 			//@{
+				void setLastSentRange(const QueueRange& value) const { _lastSentRange = value; }
+
+				void clearLastSentRange() const;
+
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}

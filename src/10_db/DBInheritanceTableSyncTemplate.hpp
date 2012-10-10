@@ -372,7 +372,53 @@ namespace synthese
 				assert(false);
 				return static_cast<util::RegistryBase&>(_fakeRegistry);
 			}
+
+
+
+			virtual RegistrableSearchResult search(
+				const std::string& whereClause,
+				util::Env& environment,
+				util::LinkLevel linkLevel = util::UP_LINKS_LOAD_LEVEL
+			) const;
 		};
+
+
+
+		template<class K, class T>
+		DBDirectTableSync::RegistrableSearchResult DBInheritanceTableSyncTemplate<K, T>::search(
+			const std::string& whereClause,
+			util::Env& env,
+			util::LinkLevel linkLevel /*= util::UP_LINKS_LOAD_LEVEL */
+		) const	{
+
+			std::stringstream query;
+			query <<
+				"SELECT " << GetFieldsGetter() <<
+				" FROM " << K::TABLE.NAME;
+			if(!whereClause.empty())
+			{
+				query << " WHERE " << whereClause;
+			}
+			RegistrableSearchResult result;
+			DBResultSPtr rows = DBModule::GetDB()->execQuery(query.str());
+			while (rows->next ())
+			{
+				boost::shared_ptr<K> tablesync(util::Factory<K>::create(_GetSubClassKey(rows)));
+				boost::shared_ptr<ObjectType> o(
+					tablesync->_loadFromRow(
+						rows,
+						env,
+						linkLevel
+				)	);
+				if(o.get())
+				{
+					result.push_back(
+						boost::static_pointer_cast<util::Registrable, ObjectType>(o)
+					);
+				}
+			}
+			return result;
+		}
 
 
 

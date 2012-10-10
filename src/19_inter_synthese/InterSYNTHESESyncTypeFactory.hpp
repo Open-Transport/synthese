@@ -29,6 +29,10 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
+		class InterSYNTHESESlave;
+
+
+
 		/** InterSYNTHESESyncTypeFactory class.
 			@ingroup m19
 		*/
@@ -40,6 +44,11 @@ namespace synthese
 
 			virtual bool sync(
 				const std::string& parameter
+			) const = 0;
+
+			virtual void initQueue(
+				const InterSYNTHESESlave& slave,
+				const std::string& perimeter
 			) const = 0;
 		};
 	}

@@ -22,8 +22,14 @@
 
 #include "DBInterSYNTHESE.hpp"
 
+#include "DBException.hpp"
+#include "DBDirectTableSync.hpp"
 #include "DBModule.h"
+#include "DBTransaction.hpp"
+#include "Env.h"
+#include "InterSYNTHESESlave.hpp"
 
+using namespace boost;
 using namespace std;
 
 namespace synthese
@@ -55,6 +61,62 @@ namespace synthese
 				return false;
 			}
 			return true;
+		}
+
+
+
+		void DBInterSYNTHESE::initQueue(
+			const InterSYNTHESESlave& slave,
+			const std::string& perimeter
+		) const	{
+
+			try
+			{
+				// Detection of the table by id
+				RegistryTableType tableId(
+					lexical_cast<RegistryTableType>(perimeter)
+				);
+				shared_ptr<DBTableSync> tableSync(
+					DBModule::GetTableSync(
+						tableId
+				)	);
+
+				shared_ptr<DBDirectTableSync> directTableSync(
+					dynamic_pointer_cast<DBDirectTableSync, DBTableSync>(
+						tableSync
+				)	);
+				if(!directTableSync.get())
+				{
+					return;
+				}
+
+				// Getting all requests
+				Env env;
+				DBDirectTableSync::RegistrableSearchResult result(
+					directTableSync->search(
+						string(),
+						env
+				)	);
+
+				// Build the dump
+				DBTransaction transaction;
+				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& it, result)
+				{
+					directTableSync->saveRegistrable(*it, transaction);
+				}
+
+				// Enqueue
+				slave.enqueue(
+					DBInterSYNTHESE::FACTORY_KEY,
+					transaction.getSQL()
+				);
+			}
+			catch (bad_lexical_cast&)
+			{
+			}
+			catch(DBException&)
+			{
+			}
 		}
 }	}
 

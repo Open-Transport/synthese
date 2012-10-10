@@ -30,7 +30,10 @@ namespace synthese
 	namespace pt_operation
 	{
 		class VehicleService;
+	}
 
+	namespace vehicle
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Composition class.
 		/// Allocation of one or more vehicles (train) to a vehicle service
@@ -42,22 +45,21 @@ namespace synthese
 			public Composition
 		{
 		protected:
-			VehicleService* _vehicleService;
+			pt_operation::VehicleService* _vehicleService;
 
 		public:
 			VehicleServiceComposition(util::RegistryKeyType id=0);
 
 			//! @name Setters
 			//@{
-				void setVehicleService(VehicleService* value){ _vehicleService = value; }
+				void setVehicleService(pt_operation::VehicleService* value){ _vehicleService = value; }
 			//@}
 
 			//! @name Getters
 			//@{
-				VehicleService* getVehicleService() const { return _vehicleService; }
+				pt_operation::VehicleService* getVehicleService() const { return _vehicleService; }
 			//@}
 		};
-	}
-}
+}	}
 
 #endif

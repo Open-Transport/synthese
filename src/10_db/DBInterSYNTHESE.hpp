@@ -42,9 +42,13 @@ namespace synthese
 			virtual bool sync(
 				const std::string& parameter
 			) const;
+
+			virtual void initQueue(
+				const inter_synthese::InterSYNTHESESlave& slave,
+				const std::string& perimeter
+			) const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_InterSYNTHESEDB_hpp__
 

@@ -109,8 +109,6 @@ HeuresFileFormat.cpp
 HeuresFileFormat.hpp
 IneoFileFormat.cpp
 IneoFileFormat.hpp
-IneoNCEConnection.cpp
-IneoNCEConnection.hpp
 IneoRealTimeFileFormat.cpp
 IneoRealTimeFileFormat.hpp
 JourneyPattern.cpp

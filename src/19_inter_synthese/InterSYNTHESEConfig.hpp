@@ -27,6 +27,7 @@
 
 #include "StandardFields.hpp"
 
+#include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 
 namespace synthese
@@ -70,6 +71,7 @@ namespace synthese
 
 			//! @name Services
 			//@{
+				const Items& getItems() const { return _items; }
 			//@}
 
 			//! @name Modifiers

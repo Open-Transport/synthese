@@ -23,9 +23,11 @@
 #include "InterSYNTHESESlave.hpp"
 
 #include "BasicClient.h"
+#include "InterSYNTHESEConfigItem.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
+#include "InterSYNTHESESyncTypeFactory.hpp"
 
 using namespace boost;
 using namespace std;
@@ -33,6 +35,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace inter_synthese;
 	using namespace server;
 	using namespace util;
@@ -47,19 +50,24 @@ namespace synthese
 
 	namespace inter_synthese
 	{
+		const string InterSYNTHESESlave::TAG_QUEUE_ITEM = "queue_item";
+
+
+
 		InterSYNTHESESlave::InterSYNTHESESlave(
 			util::RegistryKeyType id /*= 0*/
 		):	Registrable(id),
 			Object<InterSYNTHESESlave, InterSYNTHESESlaveRecord>(
-			Schema(
-				FIELD_VALUE_CONSTRUCTOR(Key, id),
-				FIELD_DEFAULT_CONSTRUCTOR(Name),
-				FIELD_DEFAULT_CONSTRUCTOR(ServerAddress),
-				FIELD_VALUE_CONSTRUCTOR(ServerPort, "8080"),
-				FIELD_VALUE_CONSTRUCTOR(LastActivityReport, posix_time::not_a_date_time),
-				FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
-				FIELD_VALUE_CONSTRUCTOR(Active, false)
-		)	)
+				Schema(
+					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(Name),
+					FIELD_DEFAULT_CONSTRUCTOR(ServerAddress),
+					FIELD_VALUE_CONSTRUCTOR(ServerPort, "8080"),
+					FIELD_VALUE_CONSTRUCTOR(LastActivityReport, posix_time::not_a_date_time),
+					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
+					FIELD_VALUE_CONSTRUCTOR(Active, false)
+			)	),
+			_lastSentRange(make_pair(_queue.end(), _queue.end()))
 		{
 		}
 
@@ -77,56 +85,16 @@ namespace synthese
 
 
 
-		void InterSYNTHESESlave::send() const
-		{
-			try
-			{
-				stringstream content;
-				bool first(true);
-				BOOST_FOREACH(const Queue::value_type& item, _queue)
-				{
-					if(first)
-					{
-						first = false;
-					}
-					else
-					{
-						content << InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR;
-					}
-					content
-						<< item.second->get<SyncType>() << ":"
-						<< item.second->get<SyncContent>()
-					;
-				}
-
-				string url("?SERVICE="+ InterSYNTHESESlaveUpdateService::FACTORY_KEY);
-
-				BasicClient c(
-					get<ServerAddress>(),
-					get<ServerPort>(),
-					0,
-					true
-				);
-				stringstream out;
-				c.post(out, url, content.str());
-				string outStr(out.str());
-
-				if(outStr == "OK")
-				{
-					_queue.clear();
-				}
-			}
-			catch(...)
-			{
-
-			}
-		}
-
-
-
-		void InterSYNTHESESlave::enqueue( const std::string& interSYNTHESEType, const std::string& parameter ) const
-		{
+		void InterSYNTHESESlave::enqueue(
+			const std::string& interSYNTHESEType,
+			const std::string& parameter
+		) const	{
 			ptime now(microsec_clock::local_time());
+
+			if(	isObsolete()
+			){
+				return;
+			}
 
 			InterSYNTHESEQueue q;
 			q.set<InterSYNTHESESlave>(*const_cast<InterSYNTHESESlave*>(this));
@@ -148,6 +116,90 @@ namespace synthese
 		void InterSYNTHESESlave::removeFromQueue( util::RegistryKeyType id ) const
 		{
 			_queue.erase(id);
+		}
+
+
+
+		void InterSYNTHESESlave::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /*= std::string() */
+		) const	{
+			
+			BOOST_FOREACH(const Queue::value_type& it, _queue)
+			{
+				shared_ptr<ParametersMap> itemPM(new ParametersMap);
+
+				it.second->toParametersMap(*itemPM);
+
+				map.insert(prefix + TAG_QUEUE_ITEM, itemPM);
+			}
+		}
+
+
+
+		InterSYNTHESESlave::QueueRange InterSYNTHESESlave::getQueueRange() const
+		{
+			if(!get<InterSYNTHESEConfig>())
+			{
+				throw Exception("Inconsistent slave");
+			}
+
+			mutex::scoped_lock lock(_queueMutex);
+			if(isObsolete())
+			{
+				_queue.clear();
+				BOOST_FOREACH(
+					const InterSYNTHESEConfig::Items::value_type& it,
+					get<InterSYNTHESEConfig>()->getItems()
+				){
+					it->getInterSYNTHESE().initQueue(
+						*this,
+						it->get<SyncParameters>()
+					);
+				}
+			}
+
+			if(_queue.empty())
+			{
+				return make_pair(_queue.end(), _queue.end());
+			}
+
+			Queue::iterator itEnd(_queue.end());
+			--itEnd;
+			return make_pair(
+				_queue.begin(),
+				itEnd
+			);
+		}
+
+
+
+		bool InterSYNTHESESlave::isObsolete() const
+		{
+			ptime now(second_clock::local_time());
+			return
+				!get<LastActivityReport>().is_not_a_date_time() &&
+				get<InterSYNTHESEConfig>() &&
+				now - get<LastActivityReport>() < get<InterSYNTHESEConfig>()->get<LinkBreakMinutes>()
+			;
+		}
+
+
+
+		void InterSYNTHESESlave::clearLastSentRange() const
+		{
+			DBTransaction transaction;
+
+			for(Queue::iterator it(_lastSentRange.first);
+				it != _queue.end();
+				++it
+			){
+				InterSYNTHESEQueueTableSync::RemoveRow(it->first, transaction);
+			}
+
+			_lastSentRange = make_pair(_queue.end(), _queue.end());
+
+			transaction.run();
 		}
 }	}
 

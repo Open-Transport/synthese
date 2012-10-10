@@ -33,6 +33,8 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
+		class InterSYNTHESESyncTypeFactory;
+
 		FIELD_TYPE(SyncParameters, std::string)
 
 		typedef boost::fusion::map<
@@ -52,12 +54,17 @@ namespace synthese
 		public:
 			typedef util::Registry<InterSYNTHESEConfigItem> Registry;
 
+		private:
+			mutable boost::shared_ptr<InterSYNTHESESyncTypeFactory> _interSYNTHESE;
+
+		public:
 			InterSYNTHESEConfigItem(
 				util::RegistryKeyType id = 0
 			);
 
 			//! @name Services
 			//@{
+				const InterSYNTHESESyncTypeFactory& getInterSYNTHESE() const;
 			//@}
 
 			//! @name Modifiers

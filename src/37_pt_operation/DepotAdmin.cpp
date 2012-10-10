@@ -51,7 +51,6 @@ namespace synthese
 	using namespace pt_operation;
 	using namespace html;
 	using namespace db;
-	using namespace pt;
 	using namespace impex;
 
 	namespace util

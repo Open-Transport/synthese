@@ -34,6 +34,7 @@ namespace synthese
 {
 	using namespace db;
 	using namespace pt;
+	using namespace vehicle;
 
 	namespace pt_operation
 	{

@@ -1,16 +1,6 @@
 set_source_groups()
 
 set(pt_operation_SRCS
-Composition.cpp
-Composition.hpp
-CompositionTableSync.cpp
-CompositionTableSync.hpp
-CompositionUpdateAction.cpp
-CompositionUpdateAction.hpp
-CompositionVehicleAddAction.cpp
-CompositionVehicleAddAction.hpp
-CompositionVehicleRemoveAction.cpp
-CompositionVehicleRemoveAction.hpp
 DeadRun.cpp
 DeadRun.hpp
 DeadRunEdge.cpp
@@ -59,10 +49,6 @@ DriverServiceTableSync.cpp
 DriverServiceTableSync.hpp
 DriverServiceUpdateAction.cpp
 DriverServiceUpdateAction.hpp
-GetCompositionsService.cpp
-GetCompositionsService.hpp
-GetVehiclesService.cpp
-GetVehiclesService.hpp
 HeuresOperationFileFormat.cpp
 HeuresOperationFileFormat.hpp
 IneoOperationFileFormat.cpp
@@ -78,22 +64,6 @@ PTOperationStatisticsAdmin.cpp
 PTOperationStatisticsAdmin.hpp
 PTOperationStatisticsTableSync.cpp
 PTOperationStatisticsTableSync.hpp
-RealTimeVehicleUpdateAction.cpp
-RealTimeVehicleUpdateAction.hpp
-ServiceComposition.cpp
-ServiceComposition.hpp
-Vehicle.cpp
-Vehicle.hpp
-VehicleAdmin.cpp
-VehicleAdmin.hpp
-VehiclePosition.cpp
-VehiclePosition.hpp
-VehiclePositionTableSync.cpp
-VehiclePositionTableSync.hpp
-VehiclePositionUpdateAction.cpp
-VehiclePositionUpdateAction.hpp
-VehiclesAdmin.cpp
-VehiclesAdmin.hpp
 VehicleService.cpp
 VehicleService.hpp
 VehicleServiceAdmin.cpp
@@ -108,10 +78,6 @@ VehicleServicesAdmin.cpp
 VehicleServicesAdmin.hpp
 VehicleServicesListService.cpp
 VehicleServicesListService.hpp
-VehicleTableSync.cpp
-VehicleTableSync.hpp
-VehicleUpdateAction.cpp
-VehicleUpdateAction.hpp
 )
 
 set_source_files_properties(PTOperationModule.gen.cpp PTOperationModule.inc.cpp PROPERTIES HEADER_FILE_ONLY 1)

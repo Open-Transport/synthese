@@ -81,7 +81,7 @@ namespace synthese
 	using namespace graph;
 	using namespace geography;
 	using namespace pt;
-	using namespace pt_operation;
+	using namespace vehicle;
 
 	namespace util
 	{

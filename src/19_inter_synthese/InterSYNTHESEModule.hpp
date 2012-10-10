@@ -27,6 +27,8 @@
 
 #include "ModuleClassTemplate.hpp"
 
+#include "UtilTypes.h"
+
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
@@ -68,8 +70,19 @@ namespace synthese
 		class InterSYNTHESEModule:
 			public server::ModuleClassTemplate<InterSYNTHESEModule>
 		{
+		public:
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_MASTER_HOST;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_MASTER_PORT;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_WAITING_TIME;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ACTIVE;
+			static const std::string MODULE_PARAM_INTER_SYNTHESE_SLAVE_ID;
+
 		private:
-			static boost::posix_time::time_duration _interSYNTHESEWaitingTime;
+			static boost::posix_time::time_duration _syncWaitingTime;
+			static std::string _masterHost;
+			static std::string _masterPort;
+			static bool _slaveActive;
+			static util::RegistryKeyType _slaveId;
 
 		public:
 			static void InterSYNTHESE();
@@ -77,6 +90,11 @@ namespace synthese
 			static void Enqueue(
 				const std::string& interSYNTHESEType,
 				const std::string& parameter
+			);
+
+			static void ParameterCallback(
+				const std::string& name,
+				const std::string& value
 			);
 		};
 
