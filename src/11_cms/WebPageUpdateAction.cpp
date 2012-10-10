@@ -356,7 +356,7 @@ namespace synthese
 					boost::algorithm::replace_all(content,"&lt;?", "<?");
 					boost::algorithm::replace_all(content,"?&gt;", "?>");
 				}
-				_page->set<WebpageContent>(WebpageContent(content, ignoreWhiteChars, mimeType));
+				_page->set<WebpageContent>(WebpageContent(content, ignoreWhiteChars, mimeType,doNotEvaluate));
 			}
 			if(_abstract)
 			{
