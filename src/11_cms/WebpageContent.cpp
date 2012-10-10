@@ -103,7 +103,7 @@ namespace synthese
 		{
 			// At end because nodes generation needs the value of the other parameters to be updated
 			string newValue(record.getDefault<string>(FIELDS[0].name));
-			bool toUpdate(newValue != fieldObject._code);
+			toUpdate |= (newValue != fieldObject._code);
 			fieldObject._code = newValue;
 		}
 
