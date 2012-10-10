@@ -279,23 +279,23 @@ namespace synthese
 						plannedDepartureDateTime -= diff_from_utc;
 						
 						ptime arrivalDateTime(
-							(sp.getArrivalEdge() && sp.getArrivalEdge()->getRankInPath()) ?
+							(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
 							ptime(
 								sp.getOriginDateTime().date(),
 								service->getArrivalSchedule(
 									true,
-									sp.getArrivalEdge()->getRankInPath()
+									sp.getDepartureEdge()->getRankInPath()
 							)	):
 							ptime(not_a_date_time)
 						);
 						arrivalDateTime -= diff_from_utc;
 						ptime plannedArrivalDateTime(
-							(sp.getArrivalEdge() && sp.getArrivalEdge()->getRankInPath()) ?
+							(sp.getDepartureEdge() && sp.getDepartureEdge()->isArrival() && sp.getDepartureEdge()->getRankInPath()) ?
 							ptime(
 								sp.getOriginDateTime().date(),
 								service->getArrivalSchedule(
 									false,
-									sp.getArrivalEdge()->getRankInPath()
+									sp.getDepartureEdge()->getRankInPath()
 							)	):
 							ptime(not_a_date_time)
 						);
