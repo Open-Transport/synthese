@@ -177,7 +177,7 @@ namespace synthese
 		{
 		case util::ParametersMap::FORMAT_SQL:
 			escapedName = "'"+ boost::algorithm::replace_all_copy(place.getName(), "'", "''") + "'";
-
+            break;
 		default:
 			escapedName = place.getName();
 		}
