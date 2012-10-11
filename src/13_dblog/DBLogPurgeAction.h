@@ -71,4 +71,4 @@ namespace synthese
 	}
 }
 
-#endif // SYNTHESE_CreateDisplayScreenAction_H__
+#endif // SYNTHESE_DBLogPurgeAction_H__
