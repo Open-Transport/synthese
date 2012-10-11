@@ -32,6 +32,7 @@
 #include <boost/thread.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <fstream>
 
 using namespace boost;
 using namespace boost::filesystem;
