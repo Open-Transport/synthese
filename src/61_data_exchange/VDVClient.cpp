@@ -36,6 +36,7 @@
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <fstream>
 
 using namespace boost;
 using namespace boost::filesystem;
