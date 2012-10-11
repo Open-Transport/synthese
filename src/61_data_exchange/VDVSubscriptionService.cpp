@@ -58,6 +58,14 @@ namespace synthese
 
 
 
+		VDVSubscriptionService::VDVSubscriptionService():
+		FactorableTemplate<server::Function,VDVSubscriptionService>(),
+			_client(NULL)
+		{
+		}
+
+
+
 		ParametersMap VDVSubscriptionService::_getParametersMap() const
 		{
 			ParametersMap map;
@@ -82,12 +90,13 @@ namespace synthese
 			try
 			{
 				string sender(allNode.getAttribute("Sender"));
-				VDVClient& client(
-					DataExchangeModule::GetVDVClient(sender)
-				);
+				_client = &DataExchangeModule::GetVDVClient(sender);
+
+				// Trace
+				_client->trace("AboAnfrage", content);
 
 				// Check if the client is declared as active
-				if(!client.get<Active>())
+				if(!_client->get<Active>())
 				{
 					_errorNumber = "300";
 					_errorText = "Sender is forbidden right now";
@@ -102,7 +111,7 @@ namespace synthese
 					if(	cleanNodeStr == "true" ||
 						cleanNodeStr == "1"
 					){
-						client.cleanSubscriptions();
+						_client->cleanSubscriptions();
 					}
 				}
 
@@ -117,13 +126,13 @@ namespace synthese
 						continue;
 					}
 
-					shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription(id));
+					shared_ptr<VDVClientSubscription> subscription(new VDVClientSubscription(id, *_client));
 
 					if(aboAZBNode.nChildNode("AZBID"))
 					{
 						XMLNode azbidNode(aboAZBNode.getChildNode("AZBID"));
 						StopArea* stopArea(
-							client.get<DataSourcePointer>()->getObjectByCode<StopArea>(azbidNode.getText())
+							_client->get<DataSourcePointer>()->getObjectByCode<StopArea>(azbidNode.getText())
 						);
 						if(!stopArea)
 						{
@@ -136,7 +145,7 @@ namespace synthese
 					{
 						XMLNode linienNode(aboAZBNode.getChildNode("LinienID"));
 						CommercialLine* line(
-							client.get<DataSourcePointer>()->getObjectByCode<CommercialLine>(linienNode.getText())
+							_client->get<DataSourcePointer>()->getObjectByCode<CommercialLine>(linienNode.getText())
 						);
 						if(!line)
 						{
@@ -145,7 +154,12 @@ namespace synthese
 						subscription->setLine(line);
 					}
 
-					// TODO Handle directions
+					// Direction filter
+					if(aboAZBNode.nChildNode("RichtungsID"))
+					{
+						XMLNode linienNode(aboAZBNode.getChildNode("RichtungsID"));
+						subscription->setDirectionFilter(linienNode.getText());
+					}
 
 					XMLNode durationNode(aboAZBNode.getChildNode("Vorschauzeit"));
 					if(!durationNode.isEmpty())
@@ -179,7 +193,7 @@ namespace synthese
 						}
 					}
 					
-					client.addSubscription(subscription);
+					_client->addSubscription(subscription);
 				}
 
 			}
@@ -239,6 +253,9 @@ namespace synthese
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			stream << result.str();
+
+			// Trace
+			_client->trace("AboAntwort", result.str());
 
 			// Map return
 			return map;

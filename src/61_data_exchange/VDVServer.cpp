@@ -30,8 +30,11 @@
 #include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
 #include <boost/thread.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 using namespace boost;
+using namespace boost::filesystem;
 using namespace std;
 using namespace boost::gregorian;
 using namespace boost::posix_time;
@@ -52,6 +55,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ClientControlCentreCode, "client_control_centre_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DataSourcePointer, "data_source_id", SQL_INTEGER)
+	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
 	
 	namespace data_exchange
 	{
@@ -71,7 +75,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServerControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ClientControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
-					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer)
+					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
+					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
 			)	),
 			_online(false),
 			_startServiceTimeStamp(not_a_date_time)
@@ -154,6 +159,10 @@ namespace synthese
 					statusAnfrage.str(),
 					contentType
 				);
+
+				// Trace
+				trace("StatusAnfrage", statusAnfrage.str());
+				trace("StatusAntwort", out.str());
 
 				string statusAntwortStr(out.str());
 				XMLResults results;
@@ -246,6 +255,10 @@ namespace synthese
 					cleanRequest.str(),
 					contentType
 				);
+
+				// Trace
+				trace("AboAnfrage", cleanRequest.str());
+				trace("AboAntwort", cleanAntwort.str());
 			}
 			catch(...)
 			{
@@ -309,6 +322,10 @@ namespace synthese
 					aboAnfrage.str(),
 					contentType
 				);
+
+				// Trace
+				trace("AboAnfrage", aboAnfrage.str());
+				trace("AboAntwort", aboAntwort.str());
 
 				string aboAntwortStr(aboAntwort.str());
 				XMLResults aboAntwortResults;
@@ -386,6 +403,11 @@ namespace synthese
 					contentType
 				);
 
+				// Trace
+				trace("DatenAbrufenAnfrage", request.str());
+				trace("DatenAbrufenAntwort", result.str());
+
+
 				// TODO Read the result
 			}
 			catch(...)
@@ -406,6 +428,36 @@ namespace synthese
 				shared_ptr<ParametersMap> subscriptionMap(new ParametersMap);
 				subscription->toParametersMap(*subscriptionMap, true);
 				map.insert(prefix + TAG_SUBSCRIPTION, subscriptionMap);
+			}
+		}
+
+
+
+		void VDVServer::trace(
+			const std::string& tag,
+			const std::string& content
+		) const {
+
+			if(	!get<TracePath>().empty()
+			){
+				ptime now(second_clock::local_time());
+				stringstream dateDirName;
+				dateDirName <<
+					now.date().year() << "-" <<
+					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+					setw(2) << setfill('0') << now.date().day()
+				;
+				stringstream fileName;
+				fileName <<
+					now.time_of_day().hours() << "-" << now.time_of_day().minutes() << "-" << now.time_of_day().seconds() <<
+					"_" << tag << ".xml"
+				;
+				path p(get<TracePath>());
+				p = p / dateDirName.str() / "servers" / get<Name>();
+				create_directories(p);
+				p = p / fileName.str();
+				ofstream logFile(p.file_string().c_str());
+				logFile << content;
 			}
 		}
 }	}

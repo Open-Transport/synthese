@@ -32,11 +32,15 @@ namespace synthese
 {
 	namespace data_exchange
 	{
+		class VDVClient;
+
+
+
 		//////////////////////////////////////////////////////////////////////////
-		///	36.15 Function : VDVSubscriptionService.
+		///	61.15 Function : VDVSubscriptionService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/VDV
 		//////////////////////////////////////////////////////////////////////////
-		///	@ingroup m36Functions refFunctions
+		///	@ingroup m61Functions refFunctions
 		///	@author Hugues Romain
 		///	@date 2012
 		/// @since 3.5.0
@@ -51,6 +55,7 @@ namespace synthese
 			//@{
 				std::string _errorNumber;
 				std::string _errorText;
+				VDVClient* _client;
 			//@}
 			
 			
@@ -80,6 +85,10 @@ namespace synthese
 			
 			
 		public:
+			VDVSubscriptionService();
+
+
+
 			//! @name Setters
 			//@{
 			//@}

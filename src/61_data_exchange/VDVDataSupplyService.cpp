@@ -27,6 +27,7 @@
 #include "CommercialLine.h"
 #include "DataExchangeModule.hpp"
 #include "Destination.hpp"
+#include "IConv.hpp"
 #include "JourneyPattern.hpp"
 #include "Path.h"
 #include "Request.h"
@@ -97,6 +98,9 @@ namespace synthese
 			{
 				string sender(allNode.getAttribute("Sender"));
 				_vdvClient = &DataExchangeModule::GetVDVClient(sender);
+
+				// Trace
+				_vdvClient->trace("DatenAbrufenAnfrage", content);
 
 				// Check if the client is declared as active
 				if(!_vdvClient->get<Active>())
@@ -177,6 +181,8 @@ namespace synthese
 
 			if(!error)
 			{
+				IConv iconv("UTF-8", "ISO-8859-1");
+
 				BOOST_FOREACH(const VDVClient::Subscriptions::value_type& it, _vdvClient->getSubscriptions())
 				{
 					if(it.second->getDeletions().empty() && it.second->getAddings().empty())
@@ -233,18 +239,8 @@ namespace synthese
 							"<HstSeqZaehler>1</HstSeqZaehler>" <<
 							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
-							"<RichtungsID>";
-						if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
-						{
-							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
-						}
-						else
-						{
-							result << _vdvClient->get<DefaultDirection>();
-						}
-						result <<
-							"</RichtungsID>" <<
-							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>" << 
 							"</AZBFahrtLoeschen>"
@@ -260,10 +256,6 @@ namespace synthese
 							dynamic_cast<const ScheduledService*>(
 								sp.getService()
 						)	);
-						if(!service)
-						{
-							continue;
-						}
 						const JourneyPattern& jp(
 							*static_cast<const JourneyPattern*>(service->getPath())
 						);
@@ -332,19 +324,9 @@ namespace synthese
 							"<HstSeqZaehler>1</HstSeqZaehler>" <<
 							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
-							"<RichtungsID>";
-						if(jp.hasLinkWithSource(*_vdvClient->get<DataSourcePointer>()))
-						{
-							result << jp.getACodeBySource(*_vdvClient->get<DataSourcePointer>());
-						}
-						else
-						{
-							result << _vdvClient->get<DefaultDirection>();
-						}
-						result <<
-							"</RichtungsID>" <<
-							"<RichtungsText>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
-							"<ZielHst>" << (jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>" <<
+							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
+							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
+							"<ZielHst>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</ZielHst>" <<
 							"<AufAZB>false</AufAZB>" <<
 							"<FahrtStatus>Ist</FahrtStatus>"
 						;
@@ -385,6 +367,9 @@ namespace synthese
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			map.insert(DATA_RESULT, result.str());
 			stream << result.str();
+
+			// Trace
+			_vdvClient->trace("DatenAbrufenAntwort", result.str());
 
 			// Map return
 			return map;
