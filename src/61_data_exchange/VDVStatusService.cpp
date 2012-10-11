@@ -56,7 +56,8 @@ namespace synthese
 
 		VDVStatusService::VDVStatusService():
 			FactorableTemplate<server::Function,VDVStatusService>(),
-			_ok(true)
+			_ok(true),
+			_client(NULL)
 		{
 		}
 		
@@ -85,8 +86,12 @@ namespace synthese
 			try
 			{
 				string sender(allNode.getAttribute("Sender"));
-				VDVClient& client(DataExchangeModule::GetVDVClient(sender));
-				if(!client.get<Active>())
+				_client = &DataExchangeModule::GetVDVClient(sender);
+
+				// Trace
+				_client->trace("StatusAnfrage", request);
+
+				if(!_client->get<Active>())
 				{
 					_ok = false;
 					return;
@@ -100,6 +105,8 @@ namespace synthese
 
 			_ok = DataExchangeModule::GetVDVServerActive();
 		}
+
+
 
 		ParametersMap VDVStatusService::run(
 			std::ostream& stream,
@@ -141,6 +148,9 @@ namespace synthese
 
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			stream << result.str();
+
+			// Trace
+			_client->trace("StatusAntwort", result.str());
 
 			// Map return
 			return map;

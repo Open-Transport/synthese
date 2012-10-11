@@ -79,6 +79,9 @@ namespace synthese
 
 			string sender(allNode.getAttribute("Sender"));
 			_vdvServer = &DataExchangeModule::GetVDVServer(sender);
+
+			// Trace
+			_vdvServer->trace("DatenBereitAnfrage", content);
 		}
 
 
@@ -112,6 +115,9 @@ namespace synthese
 			// Output the result (TODO cancel it if the service is called through the CMS)
 			map.insert(DATA_RESULT, result.str());
 			stream << result.str();
+
+			// Trace
+			_vdvServer->trace("DatenBereitAntwort", result.str());
 
 			// Run the update in a separate thread
 			shared_ptr<thread> serversThread(

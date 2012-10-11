@@ -35,6 +35,11 @@
 
 namespace synthese
 {
+	namespace pt
+	{
+		class JourneyPattern;
+	}
+
 	namespace data_exchange
 	{
 		class VDVClientSubscription;
@@ -54,11 +59,12 @@ namespace synthese
 			FIELD(ServiceCode),
 			FIELD(DataSourcePointer),
 			FIELD(DefaultDirection),
-			FIELD(Active)
+			FIELD(Active),
+			FIELD(TracePath)
 		> VDVClientRecord;
 
 		/** VDV client.
-			@ingroup m36
+			@ingroup m61
 		*/
 		class VDVClient:
 			public Object<VDVClient, VDVClientRecord>
@@ -89,6 +95,10 @@ namespace synthese
 			void setLastDataReadyNow() const;
 			void clearLastDataReady() const;
 
+			const std::string& getDirectionID(
+				const pt::JourneyPattern& jp
+			) const;
+
 			bool checkUpdate() const;
 
 			void sendUpdateSignal() const;
@@ -101,6 +111,12 @@ namespace synthese
 			virtual void addAdditionalParameters(
 				util::ParametersMap& map,
 				std::string prefix = std::string()
+			) const;
+
+
+			void trace(
+				const std::string& tag,
+				const std::string& content
 			) const;
 
 			//! @name Modifiers

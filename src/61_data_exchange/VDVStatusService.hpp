@@ -32,6 +32,10 @@ namespace synthese
 {
 	namespace data_exchange
 	{
+		class VDVClient;
+
+
+
 		//////////////////////////////////////////////////////////////////////////
 		///	61.15 Function : VDVStatusService.
 		/// See https://extranet.rcsmobility.com/projects/synthese/wiki/VDV
@@ -48,6 +52,7 @@ namespace synthese
 			
 		protected:
 			bool _ok;
+			VDVClient* _client;
 			
 			
 			//////////////////////////////////////////////////////////////////////////

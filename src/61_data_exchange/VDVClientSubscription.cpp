@@ -23,6 +23,9 @@
 #include "VDVClientSubscription.hpp"
 
 #include "CommercialLine.h"
+#include "JourneyPattern.hpp"
+#include "ScheduledService.h"
+#include "VDVClient.hpp"
 
 using namespace boost;
 using namespace std;
@@ -31,6 +34,7 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace departure_boards;
+	using namespace pt;
 	using namespace util;
 
 	
@@ -43,6 +47,7 @@ namespace synthese
 		const std::string VDVClientSubscription::TAG_LINE = "line";
 		const std::string VDVClientSubscription::ATTR_TIME_SPAN ="time_span";
 		const std::string VDVClientSubscription::ATTR_HYSTERESIS = "hysteresis";
+		const std::string VDVClientSubscription::ATTR_DIRECTION_FILTER = "direction_filter";
 
 		
 		
@@ -82,6 +87,22 @@ namespace synthese
 			_result.clear();
 			BOOST_FOREACH(const ArrivalDepartureList::value_type& it1, result)
 			{
+				// Jump over non scheduled services
+				if(	!dynamic_cast<const ScheduledService*>(it1.first.getService())
+				){
+					continue;
+				}
+
+				// Jump over services filtered by direction
+				const JourneyPattern& jp(
+					*static_cast<const JourneyPattern*>(it1.first.getService()->getPath())
+				);
+				if(	!_directionFilter.empty() &&
+					_directionFilter == _vdvClient->getDirectionID(jp)
+				){
+					continue;
+				}
+
 				_result.insert(
 					make_pair(
 						it1.first.getService(),
@@ -123,13 +144,15 @@ namespace synthese
 
 
 		VDVClientSubscription::VDVClientSubscription(
-			const std::string& id
+			const std::string& id,
+			const VDVClient& vdvClient
 		):	_id(id),
 			_endTime(not_a_date_time),
 			_stopArea(NULL),
 			_line(NULL),
 			_timeSpan(hours(1)),
-			_hysteresis(minutes(1))
+			_hysteresis(minutes(1)),
+			_vdvClient(&vdvClient)
 		{}
 
 
@@ -155,6 +178,7 @@ namespace synthese
 			}
 			pm.insert(ATTR_TIME_SPAN, _timeSpan.total_seconds() / 60);
 			pm.insert(ATTR_HYSTERESIS, _hysteresis.total_seconds());
+			pm.insert(ATTR_DIRECTION_FILTER, _directionFilter);
 		}
 }	}
 
