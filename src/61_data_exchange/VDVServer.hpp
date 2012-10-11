@@ -47,6 +47,7 @@ namespace synthese
 		FIELD_TYPE(ClientControlCentreCode, std::string)
 		FIELD_TYPE(ServerControlCentreCode, std::string)
 		FIELD_TYPE(ServiceCode, std::string)
+		FIELD_TYPE(TracePath, std::string)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -56,7 +57,8 @@ namespace synthese
 			FIELD(ServerControlCentreCode),
 			FIELD(ClientControlCentreCode),
 			FIELD(ServiceCode),
-			FIELD(DataSourcePointer)
+			FIELD(DataSourcePointer),
+			FIELD(TracePath)
 		> VDVServerRecord;
 
 
@@ -115,6 +117,11 @@ namespace synthese
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}
+
+			void trace(
+				const std::string& tag,
+				const std::string& content
+			) const;
 		};
 }	}
 

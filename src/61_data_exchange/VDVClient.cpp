@@ -34,8 +34,11 @@
 
 #include <boost/date_time/local_time_adjustor.hpp>
 #include <boost/date_time/c_local_time_adjustor.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 using namespace boost;
+using namespace boost::filesystem;
 using namespace std;
 using namespace boost::posix_time;
 
@@ -55,7 +58,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
-
+	
 	namespace data_exchange
 	{
 		const string VDVClient::TAG_SUBSCRIPTION = "subscription";
@@ -76,7 +79,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
 					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
-					FIELD_VALUE_CONSTRUCTOR(Active, true)
+					FIELD_VALUE_CONSTRUCTOR(Active, true),
+					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
 			)	),
 			_lastDataReady(not_a_date_time)
 		{
@@ -149,6 +153,10 @@ namespace synthese
 			catch(...)
 			{
 			}
+
+			// Trace
+			trace("DatenBereitAnfrage", data.str());
+			trace("DatenBereitAntwort", out.str());
 		}
 
 
@@ -215,5 +223,52 @@ namespace synthese
 				map.insert(prefix + TAG_SUBSCRIPTION, subscriptionMap);
 			}
 
+		}
+
+
+
+		const string& VDVClient::getDirectionID(
+			const JourneyPattern& jp
+		) const {
+
+			if(	get<DataSourcePointer>() &&
+				jp.hasLinkWithSource(*get<DataSourcePointer>())
+			){
+				return jp.getACodeBySource(*get<DataSourcePointer>());
+			}
+			else
+			{
+				return get<DefaultDirection>();
+			}
+		}
+
+
+
+		void VDVClient::trace(
+			const std::string& tag,
+			const std::string& content
+		) const {
+
+			if(	!get<TracePath>().empty()
+			){
+				ptime now(second_clock::local_time());
+				stringstream dateDirName;
+				dateDirName <<
+					now.date().year() << "-" <<
+					setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+					setw(2) << setfill('0') << now.date().day()
+				;
+				stringstream fileName;
+				fileName <<
+					now.time_of_day().hours() << "-" << now.time_of_day().minutes() << "-" << now.time_of_day().seconds() <<
+					"_" << tag << ".xml"
+				;
+				path p(get<TracePath>());
+				p = p / dateDirName.str() / "clients" / get<Name>();
+				create_directories(p);
+				p = p / fileName.str();
+				ofstream logFile(p.file_string().c_str());
+				logFile << content;
+			}
 		}
 }	}

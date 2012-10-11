@@ -31,8 +31,12 @@ namespace synthese
 {
 	namespace data_exchange
 	{
-		/** VDVClientSubscription class.
-			@ingroup m36
+		class VDVClient;
+
+
+
+		/** Subscription to a VDV stream by a client.
+			@ingroup m61
 		*/
 		class VDVClientSubscription
 		{
@@ -43,6 +47,7 @@ namespace synthese
 			static const std::string TAG_LINE;
 			static const std::string ATTR_TIME_SPAN;
 			static const std::string ATTR_HYSTERESIS;
+			static const std::string ATTR_DIRECTION_FILTER;
 
 			typedef std::map<const graph::Service*, graph::ServicePointer> ServicesList;
 
@@ -51,8 +56,10 @@ namespace synthese
 			boost::posix_time::ptime _endTime;
 			pt::StopArea* _stopArea;
 			pt::CommercialLine* _line;
+			std::string _directionFilter;
 			boost::posix_time::time_duration _timeSpan;
 			boost::posix_time::time_duration _hysteresis;
+			const VDVClient* _vdvClient;
 			
 			mutable ServicesList _lastResult;
 			mutable ServicesList _result;
@@ -67,6 +74,7 @@ namespace synthese
 				const ServicesList& getAddings() const { return _addings; }
 				const ServicesList& getDeletions() const { return _deletions; }
 				pt::StopArea* getStopArea() const { return _stopArea; }
+				const std::string& getDirectionFilter() const { return _directionFilter; }
 			//@}
 
 			/// @name Setters
@@ -75,6 +83,7 @@ namespace synthese
 				void setLine(pt::CommercialLine* value){ _line = value; }
 				void setTimeSpan(const boost::posix_time::time_duration& value){ _timeSpan = value; }
 				void setHysteresis(const boost::posix_time::time_duration& value){ _hysteresis = value; }
+				void setDirectionFilter(const std::string& value){ _directionFilter = value; }
 			//@}
 
 			void buildGenerator() const;
@@ -85,7 +94,8 @@ namespace synthese
 
 		public:
 			VDVClientSubscription(
-				const std::string& id
+				const std::string& id,
+				const VDVClient& vdvClient
 			);
 		};
 }	}
