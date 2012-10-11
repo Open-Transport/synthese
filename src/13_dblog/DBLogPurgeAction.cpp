@@ -1,6 +1,6 @@
 
-/** CreateDisplayScreenAction class implementation.
-	@file CreateDisplayScreenAction.cpp
+/** DBLogPurgeAction class implementation.
+	@file DBLogPurgeAction.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
