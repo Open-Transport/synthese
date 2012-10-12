@@ -98,7 +98,7 @@ namespace synthese
 					*static_cast<const JourneyPattern*>(it1.first.getService()->getPath())
 				);
 				if(	!_directionFilter.empty() &&
-					_directionFilter == _vdvClient->getDirectionID(jp)
+					_directionFilter != _vdvClient->getDirectionID(jp)
 				){
 					continue;
 				}
