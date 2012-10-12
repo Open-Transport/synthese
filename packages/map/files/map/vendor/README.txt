@@ -1,6 +1,6 @@
 OpenLayers:
-  Version: 2.11
-  http://openlayers.org/download/OpenLayers-2.11.zip
+  Version: 2.12
+  http://openlayers.org/download/OpenLayers-2.12.zip
 
   Removed unneeded files:
   cd OpenLayers
@@ -11,12 +11,12 @@ OpenLayers:
   rm -rf lib_tmp
 
   # To develop OpenLayers, you may want to get the sources (not committed for size).
-  wget http://openlayers.org/download/OpenLayers-2.11.zip
-  unzip OpenLayers-2.11.zip
-  mv OpenLayers-2.11 OpenLayers_full
+  wget http://openlayers.org/download/OpenLayers-2.12.zip
+  unzip OpenLayers-2.12.zip
+  mv OpenLayers-2.12 OpenLayers_full
 
 OpenLayers_maptypepanel:
   The following files were retrieved From the maptypepanel camptocamp OpenLayers sandbox:
   http://svn.openlayers.org/sandbox/camptocamp/maptypepanel/openlayers/lib/OpenLayers/Control/MapTypePanel.js@10557
   http://svn.openlayers.org/sandbox/camptocamp/maptypepanel/openlayers/lib/OpenLayers/Control/MapType.js@10557
-  Patch in OpenLayers_maptypepanel/patch.diff applied to make it work with OpenLayers 2.11.
+  Patch in OpenLayers_maptypepanel/patch.diff applied to make it work with OpenLayers >= 2.11.
