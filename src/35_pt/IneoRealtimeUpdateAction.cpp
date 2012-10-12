@@ -321,6 +321,7 @@ namespace synthese
 							}
 
 							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
+							link->setKey(AlarmObjectLinkTableSync::getId());
 							link->setAlarm(const_cast<SentAlarm*>(&message));
 							link->setObjectId(ds->getKey());
 							updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
