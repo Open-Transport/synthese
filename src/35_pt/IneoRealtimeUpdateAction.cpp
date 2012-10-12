@@ -341,15 +341,16 @@ namespace synthese
 			{
 				ScenarioTableSync::RemoveRow(id, transaction);
 			}
-			transaction.run();
 
 			// Clean after action
 			if(_cleanDestinataireTableAfterAction)
 			{
 				stringstream query;
 				query << "TRUNCATE TABLE " << _database << ".DESTINATAIRE";
-				db->execQuery(query.str());
+				db->execUpdate(query.str(), transaction);
 			}
+
+			transaction.run();
 		}
 		
 		
