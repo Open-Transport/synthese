@@ -320,7 +320,7 @@ namespace synthese
 								continue;
 							}
 
-							shared_ptr<AlarmObjectLink> link;
+							shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 							link->setAlarm(const_cast<SentAlarm*>(&message));
 							link->setObjectId(ds->getKey());
 							updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
