@@ -42,7 +42,7 @@ REQUIRED_BOOST_MODULES = [
     'date_time', 'filesystem', 'iostreams', 'program_options',
     'regex', 'system', 'test', 'thread']
 
-MYSQL_VER = '5.5.25a'
+MYSQL_VER = '5.5.28'
 
 LIBSPATIALITE_DLLS = (
     ('spatialite-2.3.0/libspatialite-win-x86-2.3.0', 'c9c5513f7a8aeb3c028f9debbfc5d307'),
@@ -228,7 +228,7 @@ class Builder(object):
 
         url = ('http://mirror.switch.ch/ftp/mirror/mysql/Downloads/MySQL-5.5/'
             'mysql-{mysql_ver}-win{arch}.zip'.format(mysql_ver=MYSQL_VER, arch='x64' if self.env.c.x64 else '32'))
-        self._download(url, '80ad4487e09b9b6967c48188aafa888e' if self.env.c.x64 else 'todo')
+        self._download(url, '15b201507ab426a798f6e510d91708d9' if self.env.c.x64 else 'todo')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
         self.mysql_dir = join(self.env.c.thirdparty_dir, created_dir)
 
