@@ -125,6 +125,8 @@ namespace synthese
 			static const std::string PARAMETER_LOWEST_ARRIVAL_TIME;
 			static const std::string PARAMETER_HIGHEST_DEPARTURE_TIME;
 			static const std::string PARAMETER_HIGHEST_ARRIVAL_TIME;
+			static const std::string PARAMETER_NETWORK_LIST;
+			static const std::string PARAMETER_ROLLING_STOCK_LIST;
 			static const std::string PARAMETER_ROLLING_STOCK_FILTER_ID;
 			static const std::string PARAMETER_LOG_PATH;
 			static const std::string PARAMETER_SRID;

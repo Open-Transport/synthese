@@ -111,12 +111,14 @@ namespace synthese
 		){
 			// Commercial lines
 			object->setLine(NULL);
+			object->setNetwork(NULL);
 			if(linkLevel >= UP_LINKS_LOAD_LEVEL)
 			{
 				RegistryKeyType commercialLineId(rows->getLongLong (FreeDRTAreaTableSync::COL_COMMERCIAL_LINE_ID));
 				if(commercialLineId) try
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
+					object->setNetwork(cline->getNetwork());
 					object->setLine(cline);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)

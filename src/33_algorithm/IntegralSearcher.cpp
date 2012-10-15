@@ -335,7 +335,11 @@ namespace synthese
 
 						// Checks if the path properties are compliant with current filters
 						if(	!path.isCompatibleWith(_accessParameters) ||
-							!_accessParameters.isAllowedPathClass(path.getPathClass() ? path.getPathClass()->getIdentifier() : 0)
+							!_accessParameters.isAllowedPathClass
+							(
+								path.getPathClass() ? path.getPathClass()->getIdentifier() : 0,
+								path.getPathNetwork() ? path.getPathNetwork()->getIdentifier() : 0
+							)
 						){
 							continue;
 						}

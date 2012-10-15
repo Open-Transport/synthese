@@ -130,6 +130,8 @@ namespace synthese
 		const string RoutePlannerFunction::PARAMETER_LOWEST_ARRIVAL_TIME = "ii";
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_DEPARTURE_TIME = "ha";
 		const string RoutePlannerFunction::PARAMETER_HIGHEST_ARRIVAL_TIME = "ia";
+		const string RoutePlannerFunction::PARAMETER_NETWORK_LIST = "nwl";
+		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_LIST = "tml";
 		const string RoutePlannerFunction::PARAMETER_ROLLING_STOCK_FILTER_ID = "tm";
 		const string RoutePlannerFunction::PARAMETER_MIN_MAX_DURATION_RATIO_FILTER = "min_max_duration_ratio_filter";
 		const string RoutePlannerFunction::PARAMETER_MIN_WAITING_TIME_FILTER = "min_waiting_time_filter";
@@ -643,16 +645,57 @@ namespace synthese
 				throw RequestException(e.what());
 			}
 
+			AccessParameters::AllowedPathClasses allowedPathClasses;
 			try
 			{
 				// Rolling stock filter
 				if(map.getOptional<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID))
 				{
 					_rollingStockFilter = Env::GetOfficialEnv().get<RollingStockFilter>(map.get<RegistryKeyType>(PARAMETER_ROLLING_STOCK_FILTER_ID));
+					allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
 				}
 			}
 			catch(ObjectNotFoundException<RollingStockFilter>&)
 			{
+			}
+
+			string rsStr(map.getDefault<string>(PARAMETER_ROLLING_STOCK_LIST));
+			try
+			{
+				if(!rsStr.empty())
+				{
+					vector<string> rsVect;
+					split(rsVect, rsStr, is_any_of(",; "));
+					allowedPathClasses.insert(0);
+					BOOST_FOREACH(string& rsItem, rsVect)
+					{
+						allowedPathClasses.insert(lexical_cast<RegistryKeyType>(rsItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Rolling Stock List is unreadable");
+			}
+
+			AccessParameters::AllowedNetworks allowedNetworks;
+			string nwlStr(map.getDefault<string>(PARAMETER_NETWORK_LIST));
+			try
+			{
+				if(!nwlStr.empty())
+				{
+					vector<string> nwVect;
+					split(nwVect, nwlStr, is_any_of(",; "));
+					allowedNetworks.insert(0);
+					BOOST_FOREACH(string& nwItem, nwVect)
+					{
+						allowedNetworks.insert(lexical_cast<RegistryKeyType>(nwItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Network List is unreadable");
 			}
 
 			// Max solutions number
@@ -666,12 +709,12 @@ namespace synthese
 
 			// Accessibility
 			optional<unsigned int> acint(map.getOptional<unsigned int>(PARAMETER_ACCESSIBILITY));
-			AccessParameters::AllowedPathClasses allowedPathClasses = _rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses();
 			if(_config)
 			{
 				_accessParameters = _config->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					allowedPathClasses
+					allowedPathClasses,
+					allowedNetworks
 				);
 			}
 			else
@@ -679,19 +722,19 @@ namespace synthese
 				if(acint && *acint == USER_HANDICAPPED)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses
+						*acint, false, false, 300, posix_time::minutes(23), 0.556, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else if(acint && *acint == USER_BIKE)
 				{
 					_accessParameters = AccessParameters(
-						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses
+						*acint, false, false, 3000, posix_time::minutes(23), 4.167, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 				else
 				{
 					_accessParameters = AccessParameters(
-						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses
+						USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, boost::optional<size_t>(), allowedPathClasses, allowedNetworks
 					);
 				}
 			}

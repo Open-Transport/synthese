@@ -613,7 +613,8 @@ namespace synthese
 			{
 				_accessParameters = _configuration->getAccessParameters(
 					acint ? static_cast<UserClassCode>(*acint) : USER_PEDESTRIAN,
-					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses()
+					_rollingStockFilter.get() ? _rollingStockFilter->getAllowedPathClasses() : AccessParameters::AllowedPathClasses(),
+					AccessParameters::AllowedNetworks()
 				);
 			}
 			else

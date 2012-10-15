@@ -217,24 +217,25 @@ namespace synthese
 
 		graph::AccessParameters PTServiceConfig::getAccessParameters(
 			UserClassCode parameter,
-			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
+			const graph::AccessParameters::AllowedPathClasses& allowedPathClasses,
+			const graph::AccessParameters::AllowedNetworks& allowedNetworks
 		) const	{
 			switch(parameter)
 			{
 			case USER_HANDICAPPED:
 				return AccessParameters(
-					parameter, false, false, 300, posix_time::minutes(23), 0.556, get<MaxConnections>(), allowedPathClasses
+					parameter, false, false, 300, posix_time::minutes(23), 0.556, get<MaxConnections>(), allowedPathClasses, allowedNetworks
 				);
 
 			case USER_BIKE:
 				return AccessParameters(
-					parameter, false, false, 3000, posix_time::minutes(23), 4.167, get<MaxConnections>(), allowedPathClasses
+					parameter, false, false, 3000, posix_time::minutes(23), 4.167, get<MaxConnections>(), allowedPathClasses, allowedNetworks
 				);
 
 			case USER_PEDESTRIAN:
 			default:
 				return AccessParameters(
-					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, get<MaxConnections>(), allowedPathClasses
+					USER_PEDESTRIAN, false, false, 1000, posix_time::minutes(23), 0.833, get<MaxConnections>(), allowedPathClasses, allowedNetworks
 				);
 			}
 		}

@@ -25,6 +25,7 @@
 #include "NamedPlace.h"
 #include "CommercialLine.h"
 #include "RollingStock.hpp"
+#include "TransportNetwork.h"
 #include "PTModule.h"
 #include "City.h"
 #include "StopArea.hpp"
@@ -212,12 +213,19 @@ namespace synthese
 		{
 			_pathClass = static_cast<PathClass*>(value);
 		}
-
+		void FreeDRTArea::setNetwork( TransportNetwork* value)
+		{
+			_pathNetwork = static_cast<PathClass*>(value);
+		}
 
 
 		RollingStock* FreeDRTArea::getRollingStock() const
 		{
 			return static_cast<RollingStock*>(_pathClass);
+		}
+		TransportNetwork* FreeDRTArea::getNetwork() const
+		{
+			return static_cast<TransportNetwork*>(_pathNetwork);
 		}
 
 

@@ -50,6 +50,7 @@ namespace synthese
 
 			// Copy of the properties
 			setCommercialLine(const_cast<CommercialLine*>(line.getCommercialLine()));
+			setNetwork(line.getNetwork());
 			setRollingStock(line.getRollingStock());
 			setName(line.getName() + " (subline " + lexical_cast<string>(rank) + ")");
 			setTimetableName(line.getTimetableName());

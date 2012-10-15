@@ -393,7 +393,8 @@ namespace synthese
 				{
 					ap = ResaModule::GetJourneyPlannerWebsite()->getAccessParameters(
 						_disabledPassenger ? USER_HANDICAPPED : USER_PEDESTRIAN,
-						AccessParameters::AllowedPathClasses()
+						AccessParameters::AllowedPathClasses(),
+						AccessParameters::AllowedNetworks()
 					);
 				}
 				ap.setApproachSpeed(_effectiveApproachSpeed);

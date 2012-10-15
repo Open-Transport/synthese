@@ -50,6 +50,7 @@ namespace synthese
 		class FreeDRTTimeSlot;
 		class StopArea;
 		class RollingStock;
+		class TransportNetwork;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// Free DRT area.
@@ -122,6 +123,7 @@ namespace synthese
 			/// @name Modifiers
 			//@{
 				void setRollingStock(RollingStock* value);
+				void setNetwork(TransportNetwork* value);
 				void setLine(CommercialLine* value);
 				void addTimeSlot(FreeDRTTimeSlot& value);
 				void removeTimeSlot(FreeDRTTimeSlot& value);
@@ -145,7 +147,7 @@ namespace synthese
 
 				CommercialLine* getLine() const;
 				RollingStock*	getRollingStock()			const;
-
+				TransportNetwork* getNetwork() const;
 
 
 				//////////////////////////////////////////////////////////////////////////
