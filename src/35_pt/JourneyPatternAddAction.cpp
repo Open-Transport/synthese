@@ -128,6 +128,7 @@ namespace synthese
 			if(_template.get())
 			{
 				object.setCommercialLine(_template->getCommercialLine());
+				object.setNetwork(_template->getCommercialLine()->getNetwork());
 				object.setRollingStock(_template->getRollingStock());
 				if(_reverse)
 				{

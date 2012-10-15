@@ -26,6 +26,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "Named.h"
+#include "PathClass.h"
 #include "ImportableTemplate.hpp"
 #include "TreeFolderRoot.hpp"
 
@@ -50,6 +51,7 @@ namespace synthese
 		//////////////////////////////////////////////////////////////////////////
 		class TransportNetwork:
 			virtual public util::Registrable,
+			public graph::PathClass,
 			public util::Named,
 			public impex::ImportableTemplate<TransportNetwork>,
 			public tree::TreeFolderRoot
@@ -90,7 +92,7 @@ namespace synthese
 			//@{
 				virtual std::string getRuleUserName() const { return "Réseau " + getName(); }
 
-
+				virtual PathClass::Identifier getIdentifier() const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Exporter.

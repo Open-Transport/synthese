@@ -72,6 +72,9 @@ namespace synthese
 		const std::string IsochronService::PARAMETER_START_PLACE_NAME("start_place_name");
 		const std::string IsochronService::PARAMETER_MAX_DISTANCE("max_distance");
 
+		const std::string IsochronService::PARAMETER_NETWORK_LIST("nwl");
+		const std::string IsochronService::PARAMETER_ROLLING_STOCK_LIST("tml");
+
 		const std::string IsochronService::PARAMETER_DATE("date");
 		const std::string IsochronService::PARAMETER_BEGIN_TIME_SLOT("begin_time_slot");
 		const std::string IsochronService::PARAMETER_END_TIME_SLOT("end_time_slot");
@@ -242,6 +245,55 @@ namespace synthese
 			_frequencyType = map.getDefault<int>(PARAMETER_FREQUENCY_TYPE, FREQUENCY_TYPE_NO);
 			_speed = map.getDefault<int>(PARAMETER_SPEED, 4);
 			_onlyWKT = map.getDefault<bool>(PARAMETER_ONLY_WKT, false);
+
+			AccessParameters::AllowedPathClasses allowedPathClasses;
+			string rsStr(map.getDefault<string>(PARAMETER_ROLLING_STOCK_LIST));
+			try
+			{
+				if(!rsStr.empty())
+				{
+					vector<string> rsVect;
+					split(rsVect, rsStr, is_any_of(",; "));
+					allowedPathClasses.insert(0);
+					BOOST_FOREACH(string& rsItem, rsVect)
+					{
+						allowedPathClasses.insert(lexical_cast<RegistryKeyType>(rsItem));
+					}
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Rolling Stock List is unreadable");	
+			}
+
+			AccessParameters::AllowedNetworks allowedNetworks;
+			string nwlStr(map.getDefault<string>(PARAMETER_NETWORK_LIST));
+			try
+			{
+				if(!nwlStr.empty())
+				{
+					vector<string> nwVect;
+					split(nwVect, nwlStr, is_any_of(",; "));
+					allowedNetworks.insert(0);
+					BOOST_FOREACH(string& nwItem, nwVect)
+					{
+						allowedNetworks.insert(lexical_cast<RegistryKeyType>(nwItem));
+					}		
+				}
+			}
+			catch(bad_lexical_cast&)
+			{
+				throw RequestException("Network List is unreadable");
+			}
+
+			_accessParameters = AccessParameters(
+						USER_PEDESTRIAN,
+						false, false, 1000, posix_time::minutes(23), 1.111,
+						_maxConnections,
+						allowedPathClasses,
+						allowedNetworks
+					);
+
 		}
 
 
@@ -254,13 +306,6 @@ namespace synthese
 
 			if(_startPlace.get())
 			{
-				// Access Parameter
-				AccessParameters accessParameter(
-					USER_PEDESTRIAN,
-					false, false, 1000, posix_time::minutes(23), 1.111,
-					_maxConnections
-				);
-
 				// Logger
 				AlgorithmLogger logger;
 
@@ -270,7 +315,7 @@ namespace synthese
 				set<graph::GraphIdType> graphTypes;
 				graphTypes.insert(PTModule::GRAPH_ID);
 				graphTypes.insert(RoadModule::GRAPH_ID);
-				_startPlace->getVertexAccessMap(originVam, accessParameter, graphTypes);
+				_startPlace->getVertexAccessMap(originVam, _accessParameters, graphTypes);
 
 				ovam = _extendToPhysicalStops(
 					originVam,
@@ -280,7 +325,7 @@ namespace synthese
 					ptime(_date, time_duration(hours(_endTimeSlot))),
 					ptime(_date, time_duration(hours(_beginTimeSlot))),
 					ptime(_date, time_duration(hours(_endTimeSlot))),
-					accessParameter,
+					_accessParameters,
 					logger
 				);
 
@@ -301,7 +346,7 @@ namespace synthese
 					// Initialization of the IntegralSearcher
 					IntegralSearcher is(
 						DEPARTURE_TO_ARRIVAL,
-						accessParameter,
+						_accessParameters,
 						graphId,
 						false,
 						graphId,

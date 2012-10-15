@@ -125,6 +125,7 @@ namespace synthese
 				const std::string&	getDirection ()				const;
 				const std::string&	getTimetableName ()			const;
 				pt::RollingStock*	getRollingStock()			const;
+                                pt::TransportNetwork*	getNetwork()				const;
 				bool				getWalkingLine ()			const;
 				CommercialLine*		getCommercialLine()			const;
 				const SubLines		getSubLines()				const;
@@ -139,6 +140,7 @@ namespace synthese
 			//@{
 				void setWalkingLine (bool isWalkingLine);
 				void setRollingStock(pt::RollingStock*);
+				void setNetwork(pt::TransportNetwork*);
 				void setTimetableName (const std::string& timetableName);
 				void setDirection (const std::string& direction);
 				void setCommercialLine(CommercialLine* value);

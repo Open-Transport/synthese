@@ -30,6 +30,7 @@
 #include "Function.h"
 #include "JourneysResult.h"
 #include "StopArea.hpp"
+#include "AccessParameters.h"
 
 #include <boost/date_time/gregorian/gregorian_types.hpp>
 #include <boost/shared_ptr.hpp>
@@ -64,6 +65,9 @@ namespace synthese
 			static const std::string PARAMETER_START_PLACE_NAME;
 			static const std::string PARAMETER_MAX_DISTANCE;
 
+			static const std::string PARAMETER_NETWORK_LIST;
+			static const std::string PARAMETER_ROLLING_STOCK_LIST;
+
 			static const std::string PARAMETER_DATE;
 			static const std::string PARAMETER_BEGIN_TIME_SLOT;
 			static const std::string PARAMETER_END_TIME_SLOT;
@@ -85,7 +89,7 @@ namespace synthese
 
 		private:
 			static const std::string DATA_SOMETHING;
-
+			graph::AccessParameters _accessParameters;
 		private:
 			typedef enum {
 				DURATION_TYPE_FIXED_DATETIME = 0,

@@ -28,6 +28,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace util;
+	using namespace graph;
 
 	namespace util
 	{
@@ -44,7 +45,8 @@ namespace synthese
 		TransportNetwork::TransportNetwork(
 			util::RegistryKeyType id,
 			std::string name
-		):	util::Registrable(id),
+		):	graph::PathClass(),
+			util::Registrable(id),
 			Named(name),
 			_daysCalendarsParent(NULL),
 			_periodsCalendarsParent(NULL)
@@ -55,7 +57,10 @@ namespace synthese
 		TransportNetwork::~TransportNetwork()
 		{}
 
-
+                PathClass::Identifier TransportNetwork::getIdentifier() const
+                {
+                        return getKey();
+                }
 
 		void TransportNetwork::toParametersMap(
 			util::ParametersMap& pm,

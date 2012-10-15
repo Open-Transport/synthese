@@ -423,7 +423,8 @@ namespace synthese
 				graph::AccessParameters accessParameters(
 					_site->getAccessParameters(
 						USER_PEDESTRIAN,
-						AccessParameters::AllowedPathClasses()
+						AccessParameters::AllowedPathClasses(),
+						AccessParameters::AllowedNetworks()
 				)	);
 
 //				if(	_departure_place.placeResult.value &&
@@ -494,7 +495,8 @@ namespace synthese
 				graph::AccessParameters accessParameters(
 					_site->getAccessParameters(
 						USER_PEDESTRIAN,
-						AccessParameters::AllowedPathClasses()
+						AccessParameters::AllowedPathClasses(),
+						AccessParameters::AllowedNetworks()
 				)	);
 
 				// Initialisation

@@ -154,7 +154,8 @@ namespace synthese
 				*/
 				graph::AccessParameters	getAccessParameters(
 					graph::UserClassCode parameter,
-					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses
+					const graph::AccessParameters::AllowedPathClasses& allowedPathClasses,
+					const graph::AccessParameters::AllowedNetworks&  allowedNetworks
 				) const;
 
 				const geography::GeographyModule::CitiesMatcher&			getCitiesMatcher() const;

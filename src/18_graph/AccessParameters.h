@@ -61,7 +61,7 @@ namespace synthese
 		{
 		public:
 			typedef std::set<PathClass::Identifier> AllowedPathClasses;
-
+			typedef std::set<PathClass::Identifier> AllowedNetworks;
 		private:
 			double		_maxApproachDistance;
 			boost::posix_time::time_duration	_maxApproachTime;
@@ -72,6 +72,7 @@ namespace synthese
 			//const Fare*		_fare;
 			std::size_t	_userClassRank; // Rank of the user class in the RuleUser rules vector.
 			AllowedPathClasses	_allowedPathClasses;
+			AllowedNetworks	_allowedNetworks;
 
 		public:
 
@@ -95,7 +96,8 @@ namespace synthese
 				, boost::posix_time::time_duration maxApproachTime = boost::posix_time::minutes(23)
 				, double		approachSpeed = 1.111
 				, boost::optional<size_t>	maxTransportConnectionCount = boost::optional<size_t>(),
-				AllowedPathClasses allowedPathClasses = AllowedPathClasses()
+				AllowedPathClasses allowedPathClasses = AllowedPathClasses(),
+				AllowedNetworks allowedNetworks = AllowedNetworks()
 			):	_maxApproachDistance(maxApproachDistance)
 				, _maxApproachTime(maxApproachTime)
 				, _approachSpeed(approachSpeed)
@@ -103,7 +105,8 @@ namespace synthese
 				, _drtOnly(drtOnly)
 				, _withoutDrt(withoutDrt),
 				_userClassRank(userClass - USER_CLASS_CODE_OFFSET),
-				_allowedPathClasses(allowedPathClasses)
+				_allowedPathClasses(allowedPathClasses),
+				_allowedNetworks(allowedNetworks)
 			{
 
 			}
@@ -148,7 +151,20 @@ namespace synthese
 					}
 					_allowedPathClasses.insert(boost::lexical_cast<PathClass::Identifier>(element));
 				}
-
+				++it;
+				if(it != elements.end())// Backward compatibility test (allowed networks could not exists)
+				{
+					std::vector<std::string> elements3;
+					boost::algorithm::split(elements3, *it, boost::algorithm::is_any_of(ACCESSPARAMETERS_LIST_SEPARATOR));
+					BOOST_FOREACH(const std::string& element, elements3)
+					{
+						if(element.empty())
+						{
+							continue;
+						}
+						_allowedNetworks.insert(boost::lexical_cast<PathClass::Identifier>(element));
+					}
+				}
 				return *this;
 			}
 
@@ -174,7 +190,11 @@ namespace synthese
 				/// Controls if a path class is allowed by the object.
 				/// @param value the path class to control
 				/// @return true if the path class can be used
-				bool isAllowedPathClass(PathClass::Identifier value) const { return _allowedPathClasses.empty() || _allowedPathClasses.find(value) != _allowedPathClasses.end(); }
+				bool isAllowedPathClass(PathClass::Identifier pathClass, PathClass::Identifier pathNetworkClass) const
+				{
+					bool isNetworkAllowed = _allowedNetworks.empty() || _allowedNetworks.find(pathNetworkClass) != _allowedNetworks.end();
+					return isNetworkAllowed && (_allowedPathClasses.empty() || _allowedPathClasses.find(pathClass) != _allowedPathClasses.end());
+				}
 
 
 
@@ -198,6 +218,12 @@ namespace synthese
 					{
 						stream << (first ? std::string() : ACCESSPARAMETERS_LIST_SEPARATOR) << element;
 					}
+					stream << ACCESSPARAMETERS_SERIALIZATION_SEPARATOR;
+					first = true;
+                                        BOOST_FOREACH(const AllowedPathClasses::value_type& element, getAllowedNetworks())
+                                        {
+                                                stream << (first ? std::string() : ACCESSPARAMETERS_LIST_SEPARATOR) << element;
+                                        }
 					return stream.str();
 				}
 
@@ -221,6 +247,7 @@ namespace synthese
 				boost::posix_time::time_duration getMaxApproachTime() const {	return _maxApproachTime; }
 				double getMaxApproachDistance() const { return _maxApproachDistance; }
 				const AllowedPathClasses& getAllowedPathClasses() const { return _allowedPathClasses; }
+				const AllowedPathClasses& getAllowedNetworks() const { return _allowedNetworks; }
 			//@}
 
 			//! @name Setters
