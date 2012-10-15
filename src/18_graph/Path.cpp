@@ -57,7 +57,8 @@ namespace synthese
 		Path::Path():
 			RuleUser(),
 			_pathGroup(NULL),
-			_pathClass(NULL)
+			_pathClass(NULL),
+			_pathNetwork(NULL)
 		{}
 
 

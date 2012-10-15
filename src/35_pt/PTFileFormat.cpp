@@ -759,6 +759,7 @@ namespace synthese
 				result->setName(*name);
 			}
 
+			result->setNetwork(line.getNetwork());
 			result->setTimetableName(line.getShortName());
 
 			// Destination text

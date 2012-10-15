@@ -133,6 +133,7 @@ namespace synthese
 			line->setWalkingLine (isWalkingLine);
 			line->setWayBack(rows->getBool(JourneyPatternTableSync::COL_WAYBACK));
 			line->setRollingStock(NULL);
+			line->setNetwork(NULL);
 			line->setCommercialLine(NULL);
 			line->cleanDataSourceLinks();
 			line->setMain(rows->getBool(JourneyPatternTableSync::COL_MAIN));
@@ -146,6 +147,7 @@ namespace synthese
 				{
 					CommercialLine* cline(CommercialLineTableSync::GetEditable(commercialLineId, env, linkLevel).get());
 					line->setCommercialLine(cline);
+					line->setNetwork(cline->getNetwork());
 					cline->addPath(line);
 				}
 				catch(ObjectNotFoundException<CommercialLine>)
