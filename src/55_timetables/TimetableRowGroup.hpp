@@ -29,6 +29,7 @@
 #include "Registrable.h"
 #include "Registry.h"
 
+#include "SchemaMacros.hpp"
 #include "Timetable.h"
 
 namespace synthese
