@@ -58,11 +58,14 @@ namespace synthese
 		class TransportNetwork;
 		class PTUseRule;
 		class ServiceCalendarLink;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Obiti file format.
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class ObitiFileFormat:
 			public impex::FileFormatTemplate<ObitiFileFormat>
 		{
@@ -94,7 +97,7 @@ namespace synthese
 			private:
 				static const std::string SEP;
 
-				boost::shared_ptr<RollingStock> _rollingStock;
+				boost::shared_ptr<pt::RollingStock> _rollingStock;
 				std::string _periodCalendarField;
 				std::string _daysCalendarField;
 				size_t _numberOfOtherParameters;
@@ -110,7 +113,7 @@ namespace synthese
 
 				mutable std::vector<std::string> _line;
 
-				typedef std::map<std::string, const PTUseRule*> PTUseRuleBlockMasks;
+				typedef std::map<std::string, const pt::PTUseRule*> PTUseRuleBlockMasks;
 				PTUseRuleBlockMasks _ptUseRuleBlockMasks;
 				static std::string _serializePTUseRuleBlockMasks(const PTUseRuleBlockMasks& object);
 
@@ -129,9 +132,9 @@ namespace synthese
 				void _firstLine(std::ifstream& inFile, std::string& line, std::streampos pos) const;
 				bool _moveToField(std::ifstream& inFile, const std::string& field) const;
 
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
-				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 
 
 			protected:

@@ -58,19 +58,21 @@ namespace synthese
 		class DestinationTableSync;
 		class ScheduledService;
 		class ContinuousService;
+	}
 
-
+	namespace data_exchange
+	{
 		/** PTFileFormat class.
-			@ingroup m35
+			@ingroup m61
 		*/
 		class PTFileFormat
 		{
 		public:
 			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
-			static boost::shared_ptr<JourneyPattern> CreateJourneyPattern(
-				const JourneyPattern::StopsWithDepartureArrivalAuthorization& stops,
-				CommercialLine& line,
+			static boost::shared_ptr<pt::JourneyPattern> CreateJourneyPattern(
+				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& stops,
+				pt::CommercialLine& line,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
@@ -81,8 +83,8 @@ namespace synthese
 			/// @return the created network object.
 			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
-			static TransportNetwork* CreateOrUpdateNetwork(
-				impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync>& networks,
+			static pt::TransportNetwork* CreateOrUpdateNetwork(
+				impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync>& networks,
 				const std::string& id,
 				const std::string& name,
 				const impex::DataSource& source,
@@ -96,8 +98,8 @@ namespace synthese
 			/// @return the created network object.
 			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
-			static Destination* CreateOrUpdateDestination(
-				impex::ImportableTableSync::ObjectBySource<DestinationTableSync>& destinations,
+			static pt::Destination* CreateOrUpdateDestination(
+				impex::ImportableTableSync::ObjectBySource<pt::DestinationTableSync>& destinations,
 				const std::string& id,
 				const std::string& displayText,
 				const std::string& ttsText,
@@ -113,13 +115,13 @@ namespace synthese
 			/// The created object is owned by the environment (it is not required to
 			/// maintain the returned shared pointer)
 			/// The network of the line is never changed if an existing line is returned.
-			static CommercialLine* CreateOrUpdateLine(
-				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
+			static pt::CommercialLine* CreateOrUpdateLine(
+				impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync>& lines,
 				const std::string& id,
 				boost::optional<const std::string&> name,
 				boost::optional<const std::string&> shortName,
 				boost::optional<util::RGBColor> color,
-				TransportNetwork& defaultNetwork,
+				pt::TransportNetwork& defaultNetwork,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
@@ -127,8 +129,8 @@ namespace synthese
 
 
 
-			static CommercialLine* GetLine(
-				impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync>& lines,
+			static pt::CommercialLine* GetLine(
+				impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync>& lines,
 				const std::string& id,
 				const impex::DataSource& source,
 				util::Env& env,
@@ -137,8 +139,8 @@ namespace synthese
 
 
 
-			static std::set<StopArea*> CreateOrUpdateStopAreas(
-				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+			static std::set<pt::StopArea*> CreateOrUpdateStopAreas(
+				impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				const std::string& name,
 				const geography::City* city,
@@ -151,8 +153,8 @@ namespace synthese
 
 
 
-			static StopArea* CreateStopArea(
-				impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+			static pt::StopArea* CreateStopArea(
+				impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				const std::string& name,
 				geography::City& city,
@@ -165,8 +167,8 @@ namespace synthese
 
 
 
-			static std::set<StopArea*> GetStopAreas(
-				const impex::ImportableTableSync::ObjectBySource<StopAreaTableSync>& stopAreas,
+			static std::set<pt::StopArea*> GetStopAreas(
+				const impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync>& stopAreas,
 				const std::string& id,
 				boost::optional<const std::string&> name,
 				std::ostream& logStream,
@@ -181,7 +183,7 @@ namespace synthese
 				std::string cityName;
 				std::string name;
 				boost::shared_ptr<geos::geom::Point> coords;
-				std::set<StopArea*> linkedStopAreas;
+				std::set<pt::StopArea*> linkedStopAreas;
 			};
 			typedef std::vector<ImportableStopArea> ImportableStopAreas;
 
@@ -192,8 +194,8 @@ namespace synthese
 				std::string cityName;
 				std::string name;
 				boost::shared_ptr<geos::geom::Point> coords;
-				const StopArea* stopArea;
-				std::set<StopPoint*> linkedStopPoints;
+				const pt::StopArea* stopArea;
+				std::set<pt::StopPoint*> linkedStopPoints;
 
 				ImportableStopPoint(): stopArea(NULL) {}
 			};
@@ -236,13 +238,13 @@ namespace synthese
 			/// @param logStream the stream to write the logs on
 			/// @return the updated or created stops. Empty is no stop was neither found nor created in case
 			/// of the stop area parameter is not defined
-			static std::set<StopPoint*> CreateOrUpdateStop(
-				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			static std::set<pt::StopPoint*> CreateOrUpdateStop(
+				impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync>& stops,
 				const std::string& code,
 				boost::optional<const std::string&> name,
 				boost::optional<const graph::RuleUser::Rules&> useRules,
-				boost::optional<const StopArea*> stopArea,
-				boost::optional<const StopPoint::Geometry*> geometry,
+				boost::optional<const pt::StopArea*> stopArea,
+				boost::optional<const pt::StopPoint::Geometry*> geometry,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
@@ -250,11 +252,11 @@ namespace synthese
 
 
 
-			static StopPoint* CreateStop(
-				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			static pt::StopPoint* CreateStop(
+				impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync>& stops,
 				const std::string& code,
 				boost::optional<const std::string&> name,
-				const StopArea& stopArea,
+				const pt::StopArea& stopArea,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream
@@ -264,11 +266,11 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Stop creation or update with creation of a stop area based on the name if necessary.
-			static std::set<StopPoint*> CreateOrUpdateStopWithStopAreaAutocreation(
-				impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stops,
+			static std::set<pt::StopPoint*> CreateOrUpdateStopWithStopAreaAutocreation(
+				impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync>& stops,
 				const std::string& code,
 				const std::string& name,
-				boost::optional<const StopPoint::Geometry*> geometry,
+				boost::optional<const pt::StopPoint::Geometry*> geometry,
 				const geography::City& cityForStopAreaAutoGeneration,
 				boost::optional<boost::posix_time::time_duration> defaultTransferDuration,
 				const impex::DataSource& source,
@@ -279,8 +281,8 @@ namespace synthese
 
 
 
-			static std::set<StopPoint*> GetStopPoints(
-				const impex::ImportableTableSync::ObjectBySource<StopPointTableSync>& stopPoints,
+			static std::set<pt::StopPoint*> GetStopPoints(
+				const impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync>& stopPoints,
 				const std::string& id,
 				boost::optional<const std::string&> name,
 				std::ostream& logStream,
@@ -289,8 +291,8 @@ namespace synthese
 
 
 
-			static RollingStock* GetTransportMode(
-				const impex::ImportableTableSync::ObjectBySource<RollingStockTableSync>& transportModes,
+			static pt::RollingStock* GetTransportMode(
+				const impex::ImportableTableSync::ObjectBySource<pt::RollingStockTableSync>& transportModes,
 				const std::string& id,
 				std::ostream& logStream
 			);
@@ -303,16 +305,16 @@ namespace synthese
 			/// @param removeOldCodes Removes codes on similar routes with the same code for the data source (routes with different stops are not cleaned)
 			/// @pre The line object must link to all existing routes (use JourneyPatternTableSync::Search to populate the object)
 			/// @author Hugues Romain
-			static JourneyPattern* CreateOrUpdateRoute(
+			static pt::JourneyPattern* CreateOrUpdateRoute(
 				pt::CommercialLine& line,
 				boost::optional<const std::string&> id,
 				boost::optional<const std::string&> name,
 				boost::optional<const std::string&> destination,
-				boost::optional<Destination*> destinationObj,
+				boost::optional<pt::Destination*> destinationObj,
 				boost::optional<const graph::RuleUser::Rules&> useRule,
 				boost::optional<bool> wayBack,
 				pt::RollingStock* rollingStock,
-				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
+				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
 				util::Env& env,
 				std::ostream& logStream,
@@ -322,19 +324,19 @@ namespace synthese
 			);
 
 
-			static std::set<JourneyPattern*> GetRoutes(
+			static std::set<pt::JourneyPattern*> GetRoutes(
 				pt::CommercialLine& line,
-				const JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
+				const pt::JourneyPattern::StopsWithDepartureArrivalAuthorization& servedStops,
 				const impex::DataSource& source,
 				std::ostream& logStream
 			);
 
 
 
-			static ScheduledService* CreateOrUpdateService(
-				JourneyPattern& route,
-				const SchedulesBasedService::Schedules& departureSchedules,
-				const SchedulesBasedService::Schedules& arrivalSchedules,
+			static pt::ScheduledService* CreateOrUpdateService(
+				pt::JourneyPattern& route,
+				const pt::SchedulesBasedService::Schedules& departureSchedules,
+				const pt::SchedulesBasedService::Schedules& arrivalSchedules,
 				const std::string& number,
 				const impex::DataSource& source,
 				util::Env& env,
@@ -345,10 +347,10 @@ namespace synthese
 
 
 
-			static ContinuousService* CreateOrUpdateContinuousService(
-				JourneyPattern& route,
-				const SchedulesBasedService::Schedules& departureSchedules,
-				const SchedulesBasedService::Schedules& arrivalSchedules,
+			static pt::ContinuousService* CreateOrUpdateContinuousService(
+				pt::JourneyPattern& route,
+				const pt::SchedulesBasedService::Schedules& departureSchedules,
+				const pt::SchedulesBasedService::Schedules& arrivalSchedules,
 				const std::string& number,
 				const boost::posix_time::time_duration& range,
 				const boost::posix_time::time_duration& waitingTime,

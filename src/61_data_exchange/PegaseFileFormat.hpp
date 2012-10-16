@@ -43,12 +43,15 @@ namespace synthese
 	namespace pt
 	{
 		class PTUseRule;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Pegase file format.
 		//////////////////////////////////////////////////////////////////////////
 		/// @author Sylvain Pasche
-		/// @ingroup m35
+		/// @ingroup m61
 		class PegaseFileFormat:
 			public impex::FileFormatTemplate<PegaseFileFormat>
 		{
@@ -109,11 +112,11 @@ namespace synthese
 				static const std::string PARAMETER_RESERVATION_RULE_ID;
 
 			private:
-				boost::shared_ptr<TransportNetwork> _network;
-				boost::shared_ptr<RollingStock> _rollingStock;
+				boost::shared_ptr<pt::TransportNetwork> _network;
+				boost::shared_ptr<pt::RollingStock> _rollingStock;
 				boost::shared_ptr<const geography::City> _defaultCity;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 				std::string _lineFilterMode;
 				boost::shared_ptr<const pt::PTUseRule> _reservationUseRule;
 

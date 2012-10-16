@@ -149,12 +149,6 @@ NonConcurrencyRuleTableSync.cpp
 NonConcurrencyRuleTableSync.h
 NonPermanentService.cpp
 NonPermanentService.h
-OGTFileFormat.cpp
-OGTFileFormat.hpp
-ObitiFileFormat.cpp
-ObitiFileFormat.hpp
-PegaseFileFormat.cpp
-PegaseFileFormat.hpp
 PhysicalStopsCSVExportFunction.cpp
 PhysicalStopsCSVExportFunction.h
 PlaceAliasUpdateAction.cpp
@@ -164,8 +158,6 @@ ProjectAllStopPointsAction.hpp
 PTCitiesAdmin.cpp
 PTCitiesAdmin.h
 PTConstants.h
-PTFileFormat.cpp
-PTFileFormat.hpp
 PTModule.cpp
 PTModule.gen.cpp
 PTModule.h
@@ -243,8 +235,6 @@ ServiceQuotaTableSync.cpp
 ServiceQuotaTableSync.hpp
 ServiceQuotaUpdateAction.cpp
 ServiceQuotaUpdateAction.hpp
-ServicesCSVFileFormat.hpp
-ServicesCSVFileFormat.cpp
 ServiceTimetableUpdateAction.cpp
 ServiceTimetableUpdateAction.h
 ServiceUpdateAction.cpp
@@ -287,8 +277,6 @@ StopPointUpdateAction.cpp
 StopPointUpdateAction.hpp
 StopPointWFSType.cpp
 StopPointWFSType.hpp
-StopsShapeFileFormat.cpp
-StopsShapeFileFormat.hpp
 TransportNetwork.cpp
 TransportNetwork.h
 TransportNetworkAdmin.cpp
