@@ -27,6 +27,7 @@
 
 #include "Env.h"
 #include "FrameworkTypes.hpp"
+#include "ObjectBase.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/optional.hpp>
@@ -38,10 +39,9 @@ namespace synthese
 		class Env;
 	}
 
-	class ObjectBase;
-
 	//////////////////////////////////////////////////////////////////////////
-	/// date partial specialization
+	/// Pointer field
+	/// @ingroup m00
 	template<class C, class T>
 	class PointerField:
 		public SimpleObjectFieldDefinition<C>
@@ -54,7 +54,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _pointerToString(const typename Type& p)
+		static std::string _pointerToString(const typename PointerField<C, T>::Type& p)
 		{
 			return
 				p ?
@@ -66,7 +66,7 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename PointerField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -110,7 +110,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename PointerField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -124,13 +124,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename PointerField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -143,7 +143,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename PointerField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
