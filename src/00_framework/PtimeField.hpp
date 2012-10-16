@@ -55,7 +55,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _ptimeToString(const typename Type& d)
+		static std::string _ptimeToString(const typename PtimeField<C>::Type& d)
 		{
 			return 
 				d.is_not_a_date_time() ?
@@ -70,12 +70,12 @@ namespace synthese
 
 
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename PtimeField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<typename Type>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				boost::posix_time::time_from_string,
@@ -86,7 +86,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename PtimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -100,13 +100,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename PtimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -119,7 +119,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename PtimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
