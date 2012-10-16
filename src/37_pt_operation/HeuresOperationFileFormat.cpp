@@ -78,6 +78,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace util;
 	using namespace impex;
 	using namespace pt;

@@ -59,6 +59,7 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace calendar;
+	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
