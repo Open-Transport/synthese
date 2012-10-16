@@ -63,11 +63,14 @@ namespace synthese
 		class TransportNetwork;
 		class PTUseRule;
 		class ServiceCalendarLink;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		///	ServicesCSV file format.
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class ServicesCSVFileFormat:
 			public impex::FileFormatTemplate<ServicesCSVFileFormat>
 		{
@@ -94,7 +97,7 @@ namespace synthese
 			private:
 				static const std::string SEP;
 
-				boost::shared_ptr<RollingStock> _rollingStock;
+				boost::shared_ptr<pt::RollingStock> _rollingStock;
 				boost::shared_ptr<const geography::City> _defaultCity;
 				boost::optional<std::size_t> _serviceNumberField;
 				boost::optional<std::size_t> _stopCodeField;
@@ -113,13 +116,13 @@ namespace synthese
 				struct ServiceDetail
 				{
 					std::string serviceNumber;
-					ScheduledService::Schedules arrivalSchedules;
-					ScheduledService::Schedules departureSchedules;
-					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+					pt::ScheduledService::Schedules arrivalSchedules;
+					pt::ScheduledService::Schedules departureSchedules;
+					pt::JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 				};
 				typedef std::vector<ServiceDetail> ServiceDetailVector;
 
-				typedef std::map<std::string, const PTUseRule*> PTUseRuleBlockMasks;
+				typedef std::map<std::string, const pt::PTUseRule*> PTUseRuleBlockMasks;
 				PTUseRuleBlockMasks _ptUseRuleBlockMasks;
 				static std::string _serializePTUseRuleBlockMasks(const PTUseRuleBlockMasks& object);
 
@@ -127,9 +130,9 @@ namespace synthese
 				void _loadLine(const std::string& line) const;
 				std::string _replaceAllSubStrings(std::string result, const std::string& replaceWhat, const std::string& replaceWithWhat) const;
 
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
-				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 
 			protected:
 

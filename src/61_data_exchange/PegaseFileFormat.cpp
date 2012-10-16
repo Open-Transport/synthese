@@ -53,6 +53,7 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace calendar;
+	using namespace data_exchange;
 	using namespace geography;
 	using namespace graph;
 	using namespace impex;
@@ -63,12 +64,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat, pt::PegaseFileFormat>::FACTORY_KEY("Pégase");
+		template<> const string FactorableTemplate<FileFormat, PegaseFileFormat>::FACTORY_KEY("Pégase");
 	}
 
-
-
-	namespace pt
+	namespace data_exchange
 	{
 		void PegaseFileFormat::SQLDumpParser::setTableToParse(const string& tableToParse)
 		{

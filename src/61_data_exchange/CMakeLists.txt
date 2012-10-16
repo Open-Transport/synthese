@@ -22,10 +22,22 @@ set(data_exchange_SRCS
   IneoNCEConnection.hpp
   IneoRealTimeFileFormat.cpp
   IneoRealTimeFileFormat.hpp
+  OGTFileFormat.cpp
+  OGTFileFormat.hpp
+  ObitiFileFormat.cpp
+  ObitiFileFormat.hpp
+  PegaseFileFormat.cpp
+  PegaseFileFormat.hpp
   PTDataCleanerFileFormat.cpp
   PTDataCleanerFileFormat.hpp
+  PTFileFormat.cpp
+  PTFileFormat.hpp
   RTMFileFormat.cpp
   RTMFileFormat.hpp
+  ServicesCSVFileFormat.hpp
+  ServicesCSVFileFormat.cpp
+  StopsShapeFileFormat.cpp
+  StopsShapeFileFormat.hpp
   TridentFileFormat.cpp
   TridentFileFormat.h
   VDVSubscriptionService.cpp

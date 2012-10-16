@@ -57,13 +57,14 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace pt;
 	using namespace util;
 	using namespace impex;
 	using namespace graph;
 	using namespace admin;
 	using namespace html;
 
-	namespace pt
+	namespace data_exchange
 	{
 		boost::shared_ptr<JourneyPattern> PTFileFormat::CreateJourneyPattern(
 			const JourneyPattern::StopsWithDepartureArrivalAuthorization& stops,

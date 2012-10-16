@@ -65,6 +65,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -80,7 +81,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,StopsShapeFileFormat>::FACTORY_KEY("StopsShapefile");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string StopsShapeFileFormat::Importer_::FILE_SHAPE("shape");
 
@@ -108,7 +109,7 @@ namespace synthese
 		"");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool StopsShapeFileFormat::Importer_::_checkPathsMap() const
 		{
