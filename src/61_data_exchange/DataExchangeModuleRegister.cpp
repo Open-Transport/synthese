@@ -5,6 +5,21 @@
 
 #include "DataExchangeModule.hpp"
 
+#include "GTFSFileFormat.hpp"
+#include "HafasFileFormat.hpp"
+#include "HastusCSVFileFormat.hpp"
+#include "RTMFileFormat.hpp"
+#include "HastusInterfaceFileFormat.hpp"
+#include "HeuresFileFormat.hpp"
+#include "IneoFileFormat.hpp"
+#include "IneoRealTimeFileFormat.hpp"
+#include "OGTFileFormat.hpp"
+#include "ObitiFileFormat.hpp"
+#include "PegaseFileFormat.hpp"
+#include "TridentFileFormat.h"
+#include "StopsShapeFileFormat.hpp"
+#include "ServicesCSVFileFormat.hpp"
+
 #include "VDVSubscriptionService.hpp"
 #include "VDVDataReadyService.hpp"
 #include "VDVDataSupplyService.hpp"
@@ -43,6 +58,21 @@ void synthese::data_exchange::moduleRegister()
 	synthese::data_exchange::VDVClientTableSync::integrate();
 	synthese::data_exchange::VDVServerTableSync::integrate();
 	synthese::data_exchange::VDVServerSubscriptionTableSync::integrate();
+
+	synthese::data_exchange::GTFSFileFormat::integrate();
+	synthese::data_exchange::HafasFileFormat::integrate();
+	synthese::data_exchange::HastusCSVFileFormat::integrate();
+	synthese::data_exchange::RTMFileFormat::integrate();
+	synthese::data_exchange::HastusInterfaceFileFormat::integrate();
+	synthese::data_exchange::HeuresFileFormat::integrate();
+	synthese::data_exchange::IneoFileFormat::integrate();
+	synthese::data_exchange::IneoRealTimeFileFormat::integrate();
+	synthese::data_exchange::OGTFileFormat::integrate();
+	synthese::data_exchange::ObitiFileFormat::integrate();
+	synthese::data_exchange::PegaseFileFormat::integrate();
+	synthese::data_exchange::TridentFileFormat::integrate();
+	synthese::data_exchange::StopsShapeFileFormat::integrate();
+	synthese::data_exchange::ServicesCSVFileFormat::integrate();
 	
 
 
