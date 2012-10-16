@@ -43,6 +43,7 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace impex;
 	using namespace pt;
 	using namespace server;
 	using namespace security;
@@ -132,7 +133,7 @@ namespace synthese
 					{
 						XMLNode azbidNode(aboAZBNode.getChildNode("AZBID"));
 						StopArea* stopArea(
-							_client->get<DataSourcePointer>()->getObjectByCode<StopArea>(azbidNode.getText())
+							_client->get<DataSource>()->getObjectByCode<StopArea>(azbidNode.getText())
 						);
 						if(!stopArea)
 						{
@@ -145,7 +146,7 @@ namespace synthese
 					{
 						XMLNode linienNode(aboAZBNode.getChildNode("LinienID"));
 						CommercialLine* line(
-							_client->get<DataSourcePointer>()->getObjectByCode<CommercialLine>(linienNode.getText())
+							_client->get<DataSource>()->getObjectByCode<CommercialLine>(linienNode.getText())
 						);
 						if(!line)
 						{

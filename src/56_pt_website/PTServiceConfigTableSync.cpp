@@ -100,12 +100,7 @@ namespace synthese
 			PTServiceConfig* site,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<PTServiceConfigTableSync> query(*site);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			site->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*site, transaction);
 		}
 
 

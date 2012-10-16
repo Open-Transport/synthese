@@ -27,7 +27,7 @@
 
 #include "Object.hpp"
 
-#include "StandardFields.hpp"
+#include "StringField.hpp"
 
 namespace synthese
 {
@@ -35,7 +35,7 @@ namespace synthese
 	{
 		class InterSYNTHESESyncTypeFactory;
 
-		FIELD_TYPE(SyncParameters, std::string)
+		FIELD_STRING(SyncParameters)
 
 		typedef boost::fusion::map<
 			FIELD(Key),

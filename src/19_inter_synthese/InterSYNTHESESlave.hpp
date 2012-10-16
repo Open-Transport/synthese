@@ -25,21 +25,29 @@
 
 #include "Object.hpp"
 
+#include "NumericField.hpp"
 #include "InterSYNTHESEConfig.hpp"
-#include "StandardFields.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/thread/mutex.hpp>
 
 namespace synthese
 {
+	namespace db
+	{
+		class DBTransaction;
+	}
+
 	namespace inter_synthese
 	{
 		class InterSYNTHESEQueue;
 
-		FIELD_TYPE(ServerAddress, std::string)
-		FIELD_TYPE(ServerPort, std::string)
-		FIELD_TYPE(LastActivityReport, boost::posix_time::ptime)
-		FIELD_TYPE(Active, bool)
+		FIELD_STRING(ServerAddress)
+		FIELD_STRING(ServerPort)
+		FIELD_PTIME(LastActivityReport)
+		FIELD_BOOL(Active)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -93,7 +101,8 @@ namespace synthese
 
 				void enqueue(
 					const std::string& interSYNTHESEType,
-					const std::string& parameter
+					const std::string& parameter,
+					boost::optional<db::DBTransaction&> transaction
 				) const;
 				void queue(
 					InterSYNTHESEQueue& obj

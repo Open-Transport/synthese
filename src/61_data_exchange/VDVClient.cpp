@@ -47,6 +47,7 @@ namespace synthese
 {
 	using namespace data_exchange;
 	using namespace graph;
+	using namespace impex;
 	using namespace pt;
 	using namespace server;
 	using namespace util;
@@ -78,7 +79,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ClientControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ServerControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
-					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
@@ -232,10 +233,10 @@ namespace synthese
 			const JourneyPattern& jp
 		) const {
 
-			if(	get<DataSourcePointer>() &&
-				jp.hasLinkWithSource(*get<DataSourcePointer>())
+			if(	get<DataSource>() &&
+				jp.hasLinkWithSource(*get<DataSource>())
 			){
-				return jp.getACodeBySource(*get<DataSourcePointer>());
+				return jp.getACodeBySource(*get<DataSource>());
 			}
 			else
 			{

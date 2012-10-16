@@ -47,7 +47,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(PublicPlace),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
-					FIELD_DEFAULT_CONSTRUCTOR(AddressData),
+					FIELD_DEFAULT_CONSTRUCTOR(AddressField),
 					FIELD_DEFAULT_CONSTRUCTOR(impex::DataSourceLinks)
 			)	)
 		{}

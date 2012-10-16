@@ -23,7 +23,11 @@
 #ifndef SYNTHESE_road_PUBLICPLACE_H
 #define SYNTHESE_road_PUBLICPLACE_H
 
+#include "DataSourceLinksField.hpp"
+#include "GeometryField.hpp"
+#include "NamedPlaceField.hpp"
 #include "NamedPlaceTemplate.h"
+#include "NumericField.hpp"
 #include "Object.hpp"
 #include "ImportableTemplate.hpp"
 #include "WithGeometry.hpp"
@@ -46,7 +50,7 @@ namespace synthese
 
 		typedef boost::fusion::map<
 			FIELD(Key),
-			FIELD(geography::NamedPlaceData),
+			FIELD(geography::NamedPlaceField),
 			FIELD(impex::DataSourceLinks),
 			FIELD(PointGeometry)
 		> PublicPlaceSchema;

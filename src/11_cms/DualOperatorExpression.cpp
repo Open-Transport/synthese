@@ -94,6 +94,10 @@ namespace synthese
 			case MUL:
 			case DIV:
 			case POW:
+			case SUP:
+			case SUP_EQ:
+			case INF:
+			case INF_EQ:
 				try
 				{
 					double leftDbl(lexical_cast<double>(left));

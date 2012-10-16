@@ -27,15 +27,20 @@
 #include "Registrable.h"
 #include "Registry.h"
 #include "TreeNode.hpp"
+#include "TreeNodeField.hpp"
 #include "TreeRankOrderingPolicy.hpp"
 #include "TreeOtherClassRootPolicy.hpp"
 #include "Named.h"
 
+#include "NumericField.hpp"
+#include "PointerField.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
+#include "PointersVectorField.hpp"
 #include "WebpageContent.hpp"
 #include "Website.hpp"
 #include "Function.h"
 #include "Factory.h"
-#include "StandardFields.hpp"
 #include "shared_recursive_mutex.hpp"
 
 #include <ostream>
@@ -56,16 +61,16 @@ namespace synthese
 	{
 		class Webpage;
 
-		FIELD_COMPLEX_TYPE_EXTERNAL_DATA(WebpageTreeNode)
-		FIELD_TYPE(Abstract, std::string)
-		FIELD_TYPE(ImageURL, std::string)
-		FIELD_TYPE(WebpageLinks, std::vector<Webpage*>)
-		FIELD_TYPE(DoNotUseTemplate, bool)
-		FIELD_TYPE(HasForum, bool)
-		FIELD_TYPE(SmartURLPath, std::string)
-		FIELD_TYPE(SmartURLDefaultParameterName, std::string)
-		FIELD_TYPE(RawEditor, bool)
-		FIELD_TYPE(SpecificTemplate, boost::optional<Webpage&>)
+		FIELD_TREE_NODE(WebpageTreeNode, Webpage)
+		FIELD_STRING(Abstract)
+		FIELD_STRING(ImageURL)
+		FIELD_POINTERS_VECTOR(WebpageLinks, Webpage)
+		FIELD_BOOL(DoNotUseTemplate)
+		FIELD_BOOL(HasForum)
+		FIELD_STRING(SmartURLPath)
+		FIELD_STRING(SmartURLDefaultParameterName)
+		FIELD_BOOL(RawEditor)
+		FIELD_POINTER(SpecificTemplate, Webpage)
 
 		typedef boost::fusion::map<
 			FIELD(Key),

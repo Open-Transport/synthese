@@ -37,6 +37,8 @@ namespace synthese
 {
 	using namespace util;
 
+	FIELD_DEFINITION_OF_OBJECT(impex::DataSource, "data_source_id", "data_source_ids")
+
 	namespace util
 	{
 		template<> const string Registry<impex::DataSource>::KEY("DataSource");

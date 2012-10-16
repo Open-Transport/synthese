@@ -11,6 +11,8 @@ DataSourceAdmin.cpp
 DataSourceAdmin.h
 DataSourcesAdmin.cpp
 DataSourcesAdmin.h
+DataSourceLinksField.cpp
+DataSourceLinksField.hpp
 DataSourceTableSync.cpp
 DataSourceTableSync.h
 DataSourceUpdateAction.cpp

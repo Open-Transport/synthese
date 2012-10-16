@@ -26,7 +26,9 @@
 #include "Object.hpp"
 
 #include "InterSYNTHESESlave.hpp"
-#include "StandardFields.hpp"
+#include "NumericField.hpp"
+#include "PtimeField.hpp"
+#include "StringField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
@@ -34,10 +36,10 @@ namespace synthese
 {
 	namespace inter_synthese
 	{
-		FIELD_TYPE(RequestTime, boost::posix_time::ptime)
-		FIELD_TYPE(ExpirationTime, boost::posix_time::ptime)
-		FIELD_TYPE(SyncType, std::string)
-		FIELD_TYPE(SyncContent, std::string)
+		FIELD_PTIME(RequestTime)
+		FIELD_PTIME(ExpirationTime)
+		FIELD_STRING(SyncType)
+		FIELD_STRING(SyncContent)
 
 		typedef boost::fusion::map<
 			FIELD(Key),

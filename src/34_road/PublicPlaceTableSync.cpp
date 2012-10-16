@@ -70,7 +70,7 @@ namespace synthese
 		DBTableSync::Indexes DBTableSyncTemplate<PublicPlaceTableSync>::GetIndexes()
 		{
 			DBTableSync::Indexes r;
-			r.push_back(DBTableSync::Index(ComplexObjectFieldDefinition<NamedPlaceData>::FIELDS[1].name.c_str(), ""));
+			r.push_back(DBTableSync::Index(ComplexObjectFieldDefinition<NamedPlaceField>::FIELDS[1].name.c_str(), ""));
 			return DBTableSync::Indexes();
 		}
 
@@ -107,12 +107,7 @@ namespace synthese
 			PublicPlace* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<PublicPlaceTableSync> query(*object);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			static_cast<ObjectBase&>(*object).toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

@@ -25,11 +25,11 @@
 #include "StopPointUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "GeometryField.hpp"
 #include "ObjectUpdateAction.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
-#include "StandardFields.hpp"
 #include "TransportNetworkRight.h"
 #include "User.h"
 #include "Request.h"

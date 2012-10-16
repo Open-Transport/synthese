@@ -101,6 +101,7 @@ namespace synthese
 			static VehiclePosition _currentVehiclePosition;
 			static bool _stopRequested;
 			static NextStops _nextStops;
+			static pt::CommercialLine* _currentLine;
 
 		public:
 			static void RegisterVehicle(const Vehicle& vehicle);
@@ -118,6 +119,9 @@ namespace synthese
 
 			static const NextStops& GetNextStops(){ return _nextStops; }
 			static void SetNextStops(const NextStops& value){ _nextStops = value; }
+
+			static pt::CommercialLine* GetCurrentLine(){ return _currentLine; }
+			static void SetCurrentLine(pt::CommercialLine* value){ _currentLine = value; }
 		};
 	}
 	/** @} */

@@ -26,17 +26,39 @@
 #include "FactorableTemplate.h"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 
+#include "FrameworkTypes.hpp"
+
+#include <boost/variant.hpp>
+
 namespace synthese
 {
 	namespace db
 	{
-		/** InterSYNTHESEDB class.
-			@ingroup m10
-		*/
+		class DBRecord;
+
+		//////////////////////////////////////////////////////////////////////////
+		/// InterSYNTHESE DB class.
+		///	@ingroup m10
+		/// Messages schema :
+		///  - sql / rstmt = SQL query or replace prepared statement
+		///  If SQL :
+		///    - SQL query
+		///  If RSTMT : 
+		///    - table name
+		///    - each field :
+		///      - field name
+		///      - is null
+		///      - size of the content
+		///      - content
+		/// the data fields are separated by : 
 		class DBInterSYNTHESE:
 			public util::FactorableTemplate<inter_synthese::InterSYNTHESESyncTypeFactory, DBInterSYNTHESE>
 		{
 		public:
+			static const std::string TYPE_SQL;
+			static const std::string TYPE_REPLACE_STATEMENT;
+			static const std::string FIELD_SEPARATOR;
+
 			DBInterSYNTHESE();
 
 			virtual bool sync(
@@ -47,6 +69,45 @@ namespace synthese
 				const inter_synthese::InterSYNTHESESlave& slave,
 				const std::string& perimeter
 			) const;
+
+			static std::string GetSQLContent(
+				const std::string& sql
+			);
+
+			static std::string GetRStmtContent(
+				const DBRecord& r
+			);
+
+			class RequestEnqueue:
+				public boost::static_visitor<>
+			{
+				std::stringstream& _result;
+
+			public:
+				RequestEnqueue(
+					std::stringstream& result
+				);
+
+				void operator()(const std::string& sql);
+				void operator()(const DBRecord& r);
+			};
+
+			class ContentGetter:
+				public boost::static_visitor<>
+			{
+				std::stringstream& _result;
+
+			public:
+				ContentGetter(
+					std::stringstream& result
+				);
+
+				void operator()(const int& i) const;
+				void operator()(const double& d) const;
+				void operator()(const util::RegistryKeyType& id) const;
+				void operator()(const boost::optional<std::string>& str) const;
+				void operator()(const boost::optional<Blob>& blob) const;
+			};
 		};
 }	}
 

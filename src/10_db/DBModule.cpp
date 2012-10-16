@@ -110,6 +110,7 @@ namespace synthese
 
 			// DB initialization
 			DBModule::GetDB()->init();
+			DBModule::GetDB()->initPreparedStatements();
 
 			// Conditional tables load maintainer
 			shared_ptr<thread> theThread(

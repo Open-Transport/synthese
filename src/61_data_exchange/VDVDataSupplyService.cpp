@@ -50,6 +50,7 @@ using namespace std;
 namespace synthese
 {
 	using namespace graph;
+	using namespace impex;
 	using namespace pt;
 	using namespace security;
 	using namespace server;
@@ -208,7 +209,7 @@ namespace synthese
 						);
 						string networkId(
 							network.getACodeBySource(
-								*_vdvClient->get<DataSourcePointer>()
+								*_vdvClient->get<DataSource>()
 						)	);
 						string serviceNumber;
 						if(!networkId.empty())
@@ -231,13 +232,13 @@ namespace synthese
 						ToXsdDateTime(result, now);
 						result <<
 							"\">" <<
-							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
 							"<FahrtID>" <<
 							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
 							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
 							"</FahrtID>" <<
 							"<HstSeqZaehler>1</HstSeqZaehler>" <<
-							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<
@@ -294,7 +295,7 @@ namespace synthese
 						plannedArrivalDateTime -= diff_from_utc;
 						string networkId(
 							network.getACodeBySource(
-								*_vdvClient->get<DataSourcePointer>()
+								*_vdvClient->get<DataSource>()
 						)	);
 						string serviceNumber;
 						if(!networkId.empty())
@@ -316,13 +317,13 @@ namespace synthese
 						ToXsdDateTime(result, now);
 						result <<
 							"\">" <<
-							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSourcePointer>()) << "</AZBID>" <<
+							"<AZBID>" << it.second->getStopArea()->getACodeBySource(*_vdvClient->get<DataSource>()) << "</AZBID>" <<
 							"<FahrtID>" <<
 							"<FahrtBezeichner>" << serviceNumber << "</FahrtBezeichner>" <<
 							"<Betriebstag>" << to_iso_extended_string(sp.getOriginDateTime().date()) << "</Betriebstag>" << 
 							"</FahrtID>" <<
 							"<HstSeqZaehler>1</HstSeqZaehler>" <<
-							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSourcePointer>())  << "</LinienID>" <<
+							"<LinienID>" << line.getACodeBySource(*_vdvClient->get<DataSource>())  << "</LinienID>" <<
 							"<LinienText>" << line.getShortName() << "</LinienText>" <<
 							"<RichtungsID>" << _vdvClient->getDirectionID(jp) << "</RichtungsID>" <<
 							"<RichtungsText>" << iconv.convert(jp.getDirectionObj() ? jp.getDirectionObj()->getDisplayedText() : jp.getDirection()) << "</RichtungsText>" <<

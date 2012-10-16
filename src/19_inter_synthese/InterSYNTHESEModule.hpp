@@ -29,8 +29,15 @@
 
 #include "UtilTypes.h"
 
+#include <boost/optional.hpp>
+
 namespace synthese
 {
+	namespace db
+	{
+		class DBTransaction;
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	/// 19 Inter-SYNTHESE Module namespace.
 	/// @author Hugues Romain
@@ -89,7 +96,8 @@ namespace synthese
 
 			static void Enqueue(
 				const std::string& interSYNTHESEType,
-				const std::string& parameter
+				const std::string& parameter,
+				boost::optional<db::DBTransaction&> transaction
 			);
 
 			static void ParameterCallback(

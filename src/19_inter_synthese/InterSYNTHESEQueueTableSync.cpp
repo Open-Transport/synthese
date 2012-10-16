@@ -87,15 +87,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<InterSYNTHESEQueueTableSync,InterSYNTHESEQueue>::Save(
-			InterSYNTHESEQueue* website,
+			InterSYNTHESEQueue* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<InterSYNTHESEQueueTableSync> query(*website);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			website->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

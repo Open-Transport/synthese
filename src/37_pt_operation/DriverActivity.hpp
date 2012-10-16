@@ -25,9 +25,11 @@
 
 #include "Object.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "DriverService.hpp"
 #include "ImportableTemplate.hpp"
-#include "StandardFields.hpp"
+#include "NumericField.hpp"
+#include "StringField.hpp"
 
 #include <vector>
 #include <boost/optional.hpp>

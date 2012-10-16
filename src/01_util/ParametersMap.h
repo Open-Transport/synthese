@@ -73,13 +73,14 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			///  - FORMAT_INTERNAL : in most of cases the result of streaming
-			///  - FORMAT_SQL : SQL values (eg : values in semicolons)
+			///  - FORMAT_SQL : SQL values (eg : values in quotes)
 			///  - FORMAT_XML : standard XML conventions
 			typedef enum
 			{
 				FORMAT_INTERNAL,
 				FORMAT_SQL,
-				FORMAT_XML
+				FORMAT_XML,
+				FORMAT_SQL_WITHOUT_QUOTES
 			} SerializationFormat;
 
 		private:

@@ -24,6 +24,7 @@
 
 #include "DriverServiceTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "DriverActivityTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -148,8 +149,7 @@ namespace synthese
 			query.addField(datesStr.str());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 		}

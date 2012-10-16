@@ -114,7 +114,7 @@ namespace synthese
 			// Date
 			if(!map.getDefault<string>(Date::FIELD.name).empty())
 			{
-				Date::LoadFromRecord(_date, map);
+				_date = from_string(map.get<string>(Date::FIELD.name));
 			}
 
 			// Hours filter

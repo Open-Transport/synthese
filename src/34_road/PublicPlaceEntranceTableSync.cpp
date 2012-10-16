@@ -96,12 +96,7 @@ namespace synthese
 			PublicPlaceEntrance* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<PublicPlaceEntranceTableSync> query(*object);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			object->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

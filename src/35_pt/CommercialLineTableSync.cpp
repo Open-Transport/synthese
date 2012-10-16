@@ -23,6 +23,7 @@
 #include "CommercialLineTableSync.h"
 
 #include "CommercialLine.h"
+#include "DataSourceLinksField.hpp"
 #include "Profile.h"
 #include "Session.h"
 #include "TransportNetwork.h"
@@ -380,8 +381,7 @@ namespace synthese
 			query.addField(optionalReservationPlaces.str());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(
 				object->getRule(USER_BIKE) && dynamic_cast<const PTUseRule*>(object->getRule(USER_BIKE)) ?

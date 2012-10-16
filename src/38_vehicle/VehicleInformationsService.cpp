@@ -24,6 +24,7 @@
 
 #include "VehicleInformationsService.hpp"
 
+#include "CommercialLine.h"
 #include "Request.h"
 #include "RequestException.h"
 #include "StopPoint.hpp"
@@ -48,6 +49,7 @@ namespace synthese
 		const string VehicleInformationsService::TAG_POSITION = "position";
 		const string VehicleInformationsService::ATTR_STOP_REQUESTED = "stop_requested";
 		const string VehicleInformationsService::TAG_NEXT_STOP = "next_stop";
+		const string VehicleInformationsService::TAG_COMMERCIAL_LINE = "commercial_line";
 		
 
 
@@ -109,6 +111,14 @@ namespace synthese
 
 			// Stop requested
 			map.insert(ATTR_STOP_REQUESTED, VehicleModule::GetStopRequested());
+
+			// Line
+			if(VehicleModule::GetCurrentLine())
+			{
+				shared_ptr<ParametersMap> linePM(new ParametersMap);
+				VehicleModule::GetCurrentLine()->toParametersMap(*linePM);
+				map.insert(TAG_COMMERCIAL_LINE, linePM);
+			}
 
 			// Next stops
 			BOOST_FOREACH(const VehicleModule::NextStops::value_type& it, VehicleModule::GetNextStops())

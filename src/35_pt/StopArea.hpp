@@ -23,12 +23,13 @@
 #ifndef SYNTHESE_pt_StopArea_hpp__
 #define SYNTHESE_pt_StopArea_hpp__
 
-#include "NamedPlaceTemplate.h"
-#include "Hub.h"
-#include "Registry.h"
-#include "ImportableTemplate.hpp"
 #include "CoordinatesSystem.hpp"
-#include "StandardFields.hpp"
+#include "Hub.h"
+#include "ImportableTemplate.hpp"
+#include "NamedPlaceTemplate.h"
+#include "PointerField.hpp"
+#include "Registry.h"
+#include "PointersVectorField.hpp"
 
 #include <map>
 #include <utility>
@@ -159,7 +160,7 @@ namespace synthese
 			public graph::Hub,
 			public geography::NamedPlaceTemplate<StopArea>,
 			public impex::ImportableTemplate<StopArea>,
-			public ObjectField<StopArea, boost::optional<StopArea&> >
+			public PointerField<StopArea, StopArea>
 		{
 		public:
 			static const std::string DATA_STOP_ID;
@@ -171,6 +172,12 @@ namespace synthese
 			static const std::string DATA_STOP_NAME_FOR_TIMETABLES;
 			static const std::string DATA_X;
 			static const std::string DATA_Y;
+
+			struct Vector:
+				public PointersVectorField<Vector, StopArea>
+			{
+
+			};
 
 			/// Chosen registry class.
 			typedef util::Registry<StopArea>	Registry;

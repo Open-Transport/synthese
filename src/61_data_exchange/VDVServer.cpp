@@ -24,6 +24,7 @@
 
 #include "BasicClient.h"
 #include "DataExchangeModule.hpp"
+#include "Env.h"
 #include "VDVServerSubscription.hpp"
 #include "XmlToolkit.h"
 
@@ -43,6 +44,8 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace impex;
+	using namespace pt;
 	using namespace server;
 	using namespace util;
 	using namespace util::XmlToolkit;
@@ -55,7 +58,6 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ServerControlCentreCode, "server_control_centre_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ClientControlCentreCode, "client_control_centre_code", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(ServiceCode, "service_code", SQL_TEXT)
-	FIELD_DEFINITION_OF_TYPE(DataSourcePointer, "data_source_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(TracePath, "trace_path", SQL_TEXT)
 	
 	namespace data_exchange
@@ -76,7 +78,7 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(ServerControlCentreCode),
 					FIELD_VALUE_CONSTRUCTOR(ClientControlCentreCode, "synthese"),
 					FIELD_DEFAULT_CONSTRUCTOR(ServiceCode),
-					FIELD_DEFAULT_CONSTRUCTOR(DataSourcePointer),
+					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
 			)	),
 			_online(false),
@@ -210,7 +212,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 				{
-					if(!subscription->get<StopAreaPointer>())
+					if(!subscription->get<StopArea>())
 					{
 						continue;
 					}
@@ -280,7 +282,7 @@ namespace synthese
 
 			BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 			{
-				if(!subscription->get<StopAreaPointer>())
+				if(!subscription->get<StopArea>())
 				{
 					continue;
 				}
@@ -300,9 +302,9 @@ namespace synthese
 
 				aboAnfrage << 
 					"<AZBID>" << (
-						get<DataSourcePointer>() ?
-						subscription->get<StopAreaPointer>()->getACodeBySource(*get<DataSourcePointer>()) :
-						lexical_cast<string>(subscription->get<StopAreaPointer>()->getKey())
+						get<DataSource>() ?
+						subscription->get<StopArea>()->getACodeBySource(*get<DataSource>()) :
+						lexical_cast<string>(subscription->get<StopArea>()->getKey())
 					) << "</AZBID>" <<
 					//"<LinienID>" << "</LinienID>" <<
 					//"<RichtungsID>ZVV105B</RichtungsID>
@@ -354,7 +356,7 @@ namespace synthese
 			_online = true;
 			BOOST_FOREACH(VDVServerSubscription* subscription, _subscriptions)
 			{
-				if(!subscription->get<StopAreaPointer>())
+				if(!subscription->get<StopArea>())
 				{
 					continue;
 				}

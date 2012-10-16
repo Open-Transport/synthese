@@ -22,7 +22,11 @@
 
 #include "InterSYNTHESEConfig.hpp"
 
+#include "InterSYNTHESEConfigItem.hpp"
+
+using namespace boost;
 using namespace boost::posix_time;
+using namespace std;
 
 namespace synthese
 {
@@ -37,6 +41,10 @@ namespace synthese
 	
 	namespace inter_synthese
 	{
+		const string InterSYNTHESEConfig::TAG_ITEM = "item";
+
+
+
 		InterSYNTHESEConfig::InterSYNTHESEConfig(
 			util::RegistryKeyType id /*= 0*/
 		):	Registrable(id),
@@ -61,6 +69,24 @@ namespace synthese
 
 		void InterSYNTHESEConfig::unlink()
 		{
+
+		}
+
+
+
+		void InterSYNTHESEConfig::addAdditionalParameters(
+			util::ParametersMap& map,
+			std::string prefix /*= std::string() */
+		) const	{
+
+			BOOST_FOREACH(const Items::value_type& it, _items)
+			{
+				shared_ptr<ParametersMap> itemPM(new ParametersMap);
+
+				it->toParametersMap(*itemPM);
+
+				map.insert(prefix + TAG_ITEM, itemPM);
+			}
 
 		}
 }	}

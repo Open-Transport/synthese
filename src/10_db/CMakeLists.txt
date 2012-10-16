@@ -24,6 +24,8 @@ DBModuleRegister.cpp
 DBModule.h
 DBModule.inc.cpp
 DBNoSyncTableSyncTemplate.hpp
+DBRecord.cpp
+DBRecord.hpp
 DBRegistryTableSyncTemplate.hpp
 DBResult.cpp
 DBResult.hpp

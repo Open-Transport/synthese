@@ -26,6 +26,7 @@
 #include "CommercialLine.h"
 #include "Crossing.h"
 #include "Edge.h"
+#include "Env.h"
 #include "ForbiddenUseRule.h"
 #include "FreeDRTArea.hpp"
 #include "JourneyPattern.hpp"

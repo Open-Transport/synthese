@@ -62,95 +62,7 @@ namespace synthese
 
 	// Use dates range
 	FIELD_DEFINITION_OF_TYPE(UseDatesRange, "use_dates_range", SQL_INTEGER)
-	FIELD_NO_LINKED_OBJECT_ID(UseDatesRange)
-
-
-
-	template<>
-	void ObjectField<UseDatesRange, UseDatesRange::Type>::UnSerialize(
-		UseDatesRange::Type& fieldObject,
-		const std::string& text,
-		const Env& env
-	){
-		if(text.empty())
-		{
-			fieldObject = days(0);
-			return;
-		}
-		fieldObject = days(lexical_cast<int>(text));
-	}
-
-
-
-	template<>
-	std::string ObjectField<UseDatesRange, UseDatesRange::Type>::Serialize(
-		const UseDatesRange::Type& fieldObject,
-		ParametersMap::SerializationFormat format
-	){
-		return boost::lexical_cast<std::string>(static_cast<int>(fieldObject.days()));
-	}
-
-
-
-	// Periods
-	FIELD_DEFINITION_OF_TYPE(Periods, "periods", SQL_TEXT)
-	FIELD_NO_LINKED_OBJECT_ID(Periods)
-
-	template<>
-	void ObjectField<Periods, Periods::Type>::UnSerialize(
-		Periods::Type& fieldObject,
-		const std::string& text,
-		const Env& env
-	){
-		typedef boost::tokenizer<boost::char_separator<char> > tokenizer;
-
-		boost::char_separator<char> sep1 (",");
-		boost::char_separator<char> sep2 ("|");
-		tokenizer tripletTokens(text, sep1);
-		fieldObject.clear();
-		for (tokenizer::iterator tripletIter = tripletTokens.begin();
-			tripletIter != tripletTokens.end (); ++tripletIter)
-		{
-			tokenizer valueTokens (*tripletIter, sep2);
-			tokenizer::iterator valueIter = valueTokens.begin();
-
-			// (beginHour|endHour|Caption)
-			time_duration beginHour(duration_from_string(*valueIter));
-			time_duration endHour(duration_from_string(*(++valueIter)));
-			HourPeriod period(*(++valueIter), beginHour, endHour);
-
-			fieldObject.push_back(period);
-		}
-	}
-
-	template<>
-	std::string ObjectField<Periods, Periods::Type>::Serialize(
-		const Periods::Type& fieldObject,
-		ParametersMap::SerializationFormat format
-	){
-		stringstream periodstr;
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			periodstr << "\"";
-		}
-		for(Periods::Type::const_iterator it(fieldObject.begin()); it != fieldObject.end(); ++it)
-		{
-			if (it != fieldObject.begin())
-			{
-				periodstr << ",";
-			}
-			periodstr <<
-				to_simple_string(it->getBeginHour()) <<
-				"|" << to_simple_string(it->getEndHour()) <<
-				"|" << it->getCaption()
-			;
-		}
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			periodstr << "\"";
-		}
-		return periodstr.str();
-	}
+	
 
 	// Display road approach detail
 	FIELD_DEFINITION_OF_TYPE(DisplayRoadApproachDetails, "display_road_approach_detail", SQL_BOOLEAN)
@@ -173,7 +85,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(UseOldData, false),
 					FIELD_VALUE_CONSTRUCTOR(MaxConnections, 10),
 					FIELD_VALUE_CONSTRUCTOR(UseDatesRange, 365),
-					FIELD_DEFAULT_CONSTRUCTOR(Periods),
+					FIELD_DEFAULT_CONSTRUCTOR(HourPeriods),
 					FIELD_VALUE_CONSTRUCTOR(DisplayRoadApproachDetails, true)
 			)	)
 		{}

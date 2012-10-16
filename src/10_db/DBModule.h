@@ -30,7 +30,7 @@
 #include "DB.hpp"
 #include "DBConstants.h"
 #include "DBTypes.h"
-#include "SimpleObjectField.hpp"
+#include "FrameworkTypes.hpp"
 #include "Registry.h"
 #include "UtilTypes.h"
 
@@ -42,6 +42,11 @@
 
 namespace synthese
 {
+	namespace util
+	{
+		class Env;
+	}
+
 	/** @defgroup m10Exceptions 10 Exceptions
 		@ingroup m10
 
@@ -73,7 +78,7 @@ namespace synthese
 		public:
 			typedef std::map<util::RegistryKeyType, std::string> SubClassMap;
 			typedef std::map<std::string, boost::shared_ptr<DBTableSync> > TablesByNameMap;
-			typedef std::map<int, boost::shared_ptr<DBTableSync> > TablesByIdMap;
+			typedef std::map<util::RegistryTableType, boost::shared_ptr<DBTableSync> > TablesByIdMap;
 			typedef std::set<boost::shared_ptr<DBConditionalRegistryTableSync> > ConditionalTableSyncsToReload;
 
 			static const std::string PARAMETER_NODE_ID;
@@ -103,6 +108,7 @@ namespace synthese
 			static DB* GetDB();
 			static boost::shared_ptr<DB> GetDBSPtr();
 
+			static const TablesByIdMap& GetTablesById(){ return _idTableSyncMap; }
 
 
 			//////////////////////////////////////////////////////////////////////////

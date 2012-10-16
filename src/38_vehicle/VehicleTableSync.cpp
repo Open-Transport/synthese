@@ -26,6 +26,7 @@
 
 #include "CommercialLine.h"
 #include "CommercialLineTableSync.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -160,8 +161,7 @@ namespace synthese
 			query.addField(object->getRegistrationNumbers());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 		}

@@ -36,6 +36,7 @@
 #include <boost/date_time/posix_time/posix_time.hpp>
 
 #undef GetObject // due to WinGDI.h
+#undef VERSION // due to mysql.h
 
 #include "ModuleClassTemplate.hpp"
 #include "HTTPConnection.hpp"

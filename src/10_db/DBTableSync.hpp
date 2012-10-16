@@ -29,6 +29,7 @@
 #include "DBTypes.h"
 #include "DBResult.hpp"
 #include "FactoryBase.h"
+#include "Field.hpp"
 
 #include <string>
 #include <vector>
@@ -177,6 +178,15 @@ namespace synthese
 				///	@author Hugues Romain
 				///	@date 2008
 				virtual const Format& getFormat() const = 0;
+
+
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Table fields virtual getter.
+				/// @return list of fields of the table
+				/// @author Hugues Romain
+				/// @date 2012
+				virtual FieldsList getFieldsList() const = 0;
 
 
 

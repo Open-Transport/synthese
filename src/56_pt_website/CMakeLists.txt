@@ -7,6 +7,8 @@ CityListFunction.cpp
 CityListFunction.h
 HourPeriod.cpp
 HourPeriod.h
+HourPeriodsField.cpp
+HourPeriodsField.hpp
 ObjectSiteLink.cpp
 ObjectSiteLink.h
 ObjectSiteLinkTableSync.cpp

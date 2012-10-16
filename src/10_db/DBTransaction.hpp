@@ -23,8 +23,10 @@
 #ifndef SYNTHESE_db_DBTransaction_h__
 #define SYNTHESE_db_DBTransaction_h__
 
-#include "10_db/DB.hpp"
+#include "DB.hpp"
+#include "DBRecord.hpp"
 
+#include <boost/variant.hpp>
 #include <vector>
 #include <string>
 #include <set>
@@ -40,7 +42,12 @@ namespace synthese
 		class DBTransaction
 		{
 		public:
-			typedef std::vector<std::string> Queries;
+			typedef boost::variant<
+				std::string,
+				DBRecord
+			> Query;
+			typedef std::vector<Query> Queries;
+
 			typedef std::vector<DB::DBModifEvent> DBModifEvents;
 
 		private:
@@ -52,14 +59,12 @@ namespace synthese
 
 		public:
 			void addQuery(const std::string& query);
+			void addStmt(const DBRecord& record);
 			void addDBModifEvent(const DB::DBModifEvent& modifEvent);
 			const Queries getQueries() const;
 			const DBModifEvents getDBModifEvents() const;
 			void run();
-
-			std::string getSQL() const;
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_db_DBTransaction_h__

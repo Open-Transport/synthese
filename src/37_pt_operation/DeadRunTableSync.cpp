@@ -24,6 +24,7 @@
 
 #include "DeadRunTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "Depot.hpp"
@@ -216,8 +217,7 @@ namespace synthese
 			// Data source links
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 
 			query.execute(transaction);

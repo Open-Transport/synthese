@@ -25,7 +25,8 @@
 
 #include "Object.hpp"
 
-#include "StandardFields.hpp"
+#include "MinutesField.hpp"
+#include "NumericField.hpp"
 #include "StopArea.hpp"
 #include "VDVServer.hpp"
 
@@ -35,15 +36,14 @@ namespace synthese
 {
 	namespace data_exchange
 	{
-		FIELD_TYPE(StopAreaPointer, boost::optional<pt::StopArea&>)
-		FIELD_TYPE(SubscriptionDuration, boost::posix_time::time_duration)
-		FIELD_TYPE(TimeSpan, boost::posix_time::time_duration)
+		FIELD_MINUTES(SubscriptionDuration)
+		FIELD_MINUTES(TimeSpan)
 			
 		typedef boost::fusion::map<
 			FIELD(Key),
 			FIELD(Name),
 			FIELD(VDVServer),
-			FIELD(StopAreaPointer),
+			FIELD(pt::StopArea),
 			FIELD(SubscriptionDuration),
 			FIELD(TimeSpan)
 		> VDVServerSubscriptionRecord;
