@@ -19,21 +19,6 @@
 #include "ServicesListService.hpp"
 #include "ServiceQuotasListService.hpp"
 
-#include "GTFSFileFormat.hpp"
-#include "HafasFileFormat.hpp"
-#include "HastusCSVFileFormat.hpp"
-#include "RTMFileFormat.hpp"
-#include "HastusInterfaceFileFormat.hpp"
-#include "HeuresFileFormat.hpp"
-#include "IneoFileFormat.hpp"
-#include "IneoRealTimeFileFormat.hpp"
-#include "OGTFileFormat.hpp"
-#include "ObitiFileFormat.hpp"
-#include "PegaseFileFormat.hpp"
-#include "TridentFileFormat.h"
-#include "StopsShapeFileFormat.hpp"
-#include "ServicesCSVFileFormat.hpp"
-
 #include "DestinationTableSync.hpp"
 #include "FreeDRTAreaTableSync.hpp"
 #include "PTUseRuleTableSync.h"
@@ -196,21 +181,6 @@ void synthese::pt::moduleRegister()
 	synthese::pt::ServiceQuotaTableSync::integrate();
 
 	synthese::pt::PTModule::integrate();
-
-	synthese::pt::GTFSFileFormat::integrate();
-	synthese::pt::HafasFileFormat::integrate();
-	synthese::pt::HastusCSVFileFormat::integrate();
-	synthese::pt::RTMFileFormat::integrate();
-	synthese::pt::HastusInterfaceFileFormat::integrate();
-	synthese::pt::HeuresFileFormat::integrate();
-	synthese::pt::IneoFileFormat::integrate();
-	synthese::pt::IneoRealTimeFileFormat::integrate();
-	synthese::pt::OGTFileFormat::integrate();
-	synthese::pt::ObitiFileFormat::integrate();
-	synthese::pt::PegaseFileFormat::integrate();
-	synthese::pt::TridentFileFormat::integrate();
-	synthese::pt::StopsShapeFileFormat::integrate();
-	synthese::pt::ServicesCSVFileFormat::integrate();
 
 	synthese::pt::ContactCenterAdmin::integrate();
 	synthese::pt::ContactCentersAdmin::integrate();
