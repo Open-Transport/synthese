@@ -245,7 +245,7 @@ namespace synthese
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://proj4js.org/lib/proj4js-compressed.js");
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openlayers.org/api/OpenLayers.js");
 				//stream << HTMLModule::GetHTMLJavascriptOpen("http://www.openstreetmap.org/openlayers/OpenStreetMap.js");
-				stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers/OpenLayers.js");
+				stream << HTMLModule::GetHTMLJavascriptOpen("/map/vendor/OpenLayers-2.11/OpenLayers.js");
 				stream << HTMLModule::GetHTMLJavascriptOpen("pedestrianroutemap.js");
 			}
 		}
