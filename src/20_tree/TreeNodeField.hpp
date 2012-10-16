@@ -103,7 +103,7 @@ namespace synthese
 					{
 						try
 						{
-							t.setRoot(env.getEditable<T::TreeRootType>(id).get());
+							t.setRoot(env.getEditable<typename T::TreeRootType>(id).get());
 						}
 						catch(util::ObjectNotFoundException<typename T::TreeRootType>&)
 						{

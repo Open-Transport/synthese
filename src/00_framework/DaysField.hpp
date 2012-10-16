@@ -53,7 +53,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _daysToString(const typename Type& p)
+		static std::string _daysToString(const typename DaysField<C>::Type& p)
 		{
 			return boost::lexical_cast<std::string>(static_cast<int>(p.days()));
 		}
@@ -64,7 +64,7 @@ namespace synthese
 		/// Conversion of a string into a date.
 		/// @param d the date to convert
 		/// @return the converted string
-		static typename Type _stringToDays(const std::string& text)
+		static typename DaysField<C>::Type _stringToDays(const std::string& text)
 		{
 			return text.empty() ?
 				boost::gregorian::days(0) :
@@ -74,12 +74,12 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename DaysField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<typename Type>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				_stringToDays,
@@ -90,7 +90,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename DaysField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -104,13 +104,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename DaysField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -122,7 +122,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename DaysField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
