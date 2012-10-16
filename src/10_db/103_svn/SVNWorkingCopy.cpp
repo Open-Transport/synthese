@@ -638,7 +638,7 @@ namespace synthese
 				SimpleObjectFieldDefinition<SVNWorkingCopy>::_UpdateFromString(
 					fieldObject,
 					record,
-					&from_string
+					&SVNWorkingCopy::from_string
 				);
 			}
 
@@ -659,7 +659,7 @@ namespace synthese
 				SimpleObjectFieldDefinition<SVNWorkingCopy>::_SaveToFilesMap(
 					fieldObject,
 					map,
-					&to_string
+					&SVNWorkingCopy::to_string
 				);
 			}
 
@@ -677,7 +677,7 @@ namespace synthese
 					map,
 					prefix,
 					withFiles,
-					&to_string
+					&SVNWorkingCopy::to_string
 				);
 			}
 
