@@ -52,9 +52,12 @@ namespace synthese
 		class StopPoint;
 		class StopArea;
 		class LineStop;
+	}
 
+	namespace data_exchange
+	{
 		/** PTDataCleanerFileFormat class.
-			@ingroup m35
+			@ingroup m61
 		*/
 		class PTDataCleanerFileFormat:
 			public virtual impex::Importer
@@ -87,12 +90,12 @@ namespace synthese
 			bool _autoPurge;
 
 		private:
-			mutable std::set<boost::shared_ptr<JourneyPattern> > _journeyPatternsToRemove;
-			mutable std::set<boost::shared_ptr<ScheduledService> > _scheduledServicesToRemove;
-			mutable std::set<boost::shared_ptr<ContinuousService> > _continuousServicesToRemove;
-			mutable std::set<boost::shared_ptr<StopPoint> > _stopsToRemove;
-			mutable std::set<boost::shared_ptr<StopArea> > _stopAreasToRemove;
-			mutable std::set<boost::shared_ptr<const LineStop> > _edgesToRemove;
+			mutable std::set<boost::shared_ptr<pt::JourneyPattern> > _journeyPatternsToRemove;
+			mutable std::set<boost::shared_ptr<pt::ScheduledService> > _scheduledServicesToRemove;
+			mutable std::set<boost::shared_ptr<pt::ContinuousService> > _continuousServicesToRemove;
+			mutable std::set<boost::shared_ptr<pt::StopPoint> > _stopsToRemove;
+			mutable std::set<boost::shared_ptr<pt::StopArea> > _stopAreasToRemove;
+			mutable std::set<boost::shared_ptr<const pt::LineStop> > _edgesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocation> > _driverAllocationsToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverAllocationTemplate> > _driverAllocationTemplatesToRemove;
 			mutable std::set<boost::shared_ptr<const pt_operation::DriverService> > _driverServicesToRemove;

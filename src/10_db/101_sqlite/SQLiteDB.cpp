@@ -626,12 +626,12 @@ namespace synthese
 		}
 
 		
-		
+#ifndef _WINDOWS		
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
 		{
 			sqlite3_bind_int(&_stmt, static_cast<int>(_i), static_cast<int>(s));
 		}
-
+#endif
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const double& d ) const

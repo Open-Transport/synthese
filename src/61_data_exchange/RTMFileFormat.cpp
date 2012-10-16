@@ -76,6 +76,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -92,7 +93,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,RTMFileFormat>::FACTORY_KEY("RTM");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string RTMFileFormat::Importer_::FILE_ARRETS = "station.csv";
 		const std::string RTMFileFormat::Importer_::FILE_LIGNES_ITI_COURSES = "lepilote.txt";
@@ -125,7 +126,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool RTMFileFormat::Importer_::TripIndex::operator<( const TripIndex& other ) const
 		{

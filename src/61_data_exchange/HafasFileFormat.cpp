@@ -67,6 +67,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace util;
 	using namespace impex;
 	using namespace pt;
@@ -86,7 +87,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,HafasFileFormat>::FACTORY_KEY("Hafas");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string HafasFileFormat::Importer_::FILE_KOORD = "koord";
 		const string HafasFileFormat::Importer_::FILE_BITFELD = "bitfeld";
@@ -118,7 +119,7 @@ namespace synthese
 		"");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool HafasFileFormat::Importer_::_checkPathsMap() const
 		{

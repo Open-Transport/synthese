@@ -47,11 +47,12 @@ namespace synthese
 	using namespace db;
 	using namespace impex;
 	using namespace graph;
+	using namespace pt;
 	using namespace pt_operation;
 	using namespace server;
 	using namespace util;
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string PTDataCleanerFileFormat::PARAMETER_CALENDAR_ID("calendar_id");
 		const string PTDataCleanerFileFormat::PARAMETER_CLEAN_OLD_DATA("clean_old_data");

@@ -32,11 +32,14 @@ namespace synthese
 	namespace pt
 	{
 		class ScheduledService;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo real time file format.
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class IneoRealTimeFileFormat:
 			public impex::FileFormatTemplate<IneoRealTimeFileFormat>
 		{
@@ -57,7 +60,7 @@ namespace synthese
 				//@{
 					boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 					boost::optional<std::string> _courseId;
-					mutable std::set<ScheduledService*> _services;
+					mutable std::set<pt::ScheduledService*> _services;
 					boost::optional<std::string> _dbConnString;
 					std::string _stopCodePrefix;
 				//@}

@@ -76,6 +76,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -92,7 +93,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,HastusCSVFileFormat>::FACTORY_KEY("Hastus-CSV");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string HastusCSVFileFormat::Importer_::FILE_ARRETS = "arrets";
 		const std::string HastusCSVFileFormat::Importer_::FILE_ITINERAIRES = "itineraires";
@@ -119,7 +120,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool HastusCSVFileFormat::Importer_::TripIndex::operator<( const TripIndex& other ) const
 		{

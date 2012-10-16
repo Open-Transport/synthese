@@ -45,6 +45,8 @@ using namespace gregorian;
 
 namespace synthese
 {
+	using namespace data_exchange;
+	using namespace pt;
 	using namespace server;
 	using namespace html;
 	using namespace util;
@@ -56,10 +58,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,pt::IneoRealTimeFileFormat>::FACTORY_KEY("Ineo temps réel");
+		template<> const string FactorableTemplate<FileFormat, IneoRealTimeFileFormat>::FACTORY_KEY("Ineo temps réel");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_PLANNED_DATASOURCE_ID("ps");
 		const string IneoRealTimeFileFormat::Importer_::PARAMETER_COURSE_ID("ci");
