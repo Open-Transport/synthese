@@ -47,6 +47,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace server;
 	using namespace html;
 	using namespace util;
