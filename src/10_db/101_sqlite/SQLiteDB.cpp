@@ -625,6 +625,13 @@ namespace synthese
 			sqlite3_bind_int(&_stmt, static_cast<int>(_i), i);
 		}
 
+		
+		
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
+		{
+			sqlite3_bind_int(&_stmt, static_cast<int>(_i), static_cast<int>(s));
+		}
+
 
 
 		void SQLiteDB::DBRecordCellBindConvertor::operator()( const double& d ) const

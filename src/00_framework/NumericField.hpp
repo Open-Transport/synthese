@@ -20,8 +20,8 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE__boolField_hpp__
-#define SYNTHESE__boolField_hpp__
+#ifndef SYNTHESE__NumericField_hpp__
+#define SYNTHESE__NumericField_hpp__
 
 #include "SimpleObjectFieldDefinition.hpp"
 
@@ -40,6 +40,7 @@ namespace synthese
 
 	//////////////////////////////////////////////////////////////////////////
 	/// Numeric field.
+	/// @ingroup m00
 	template<class C, class T>
 	class NumericField:
 		public SimpleObjectFieldDefinition<C>
@@ -58,7 +59,7 @@ namespace synthese
 				fieldObject,
 				record,
 				boost::lexical_cast<typename NumericField<C, T>::Type, std::string>,
-				0
+				typename NumericField<C, T>::Type(0)
 			);
 		}
 
@@ -117,7 +118,7 @@ namespace synthese
 	#define FIELD_SIZE_T(N) struct N : public NumericField<N, size_t> {};
 	#define FIELD_INT(N) struct N : public NumericField<N, int> {};
 	#define FIELD_ID(N) struct N : public NumericField<N, util::RegistryKeyType> {};
-	#define FIELD_DOUBLE(N) struct N : public NumericField<N, int> {};
+	#define FIELD_DOUBLE(N) struct N : public NumericField<N, double> {};
 
 	FIELD_ID(Key)
 	FIELD_SIZE_T(Rank)

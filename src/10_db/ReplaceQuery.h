@@ -29,6 +29,7 @@
 
 #include "DBInterSYNTHESE.hpp"
 #include "InterSYNTHESEModule.hpp"
+#include "ParametersMap.h"
 
 #include <vector>
 

@@ -23,12 +23,13 @@
 #ifndef SYNTHESE__Object_hpp__
 #define SYNTHESE__Object_hpp__
 
-#include "UtilTypes.h"
 #include "ObjectBase.hpp"
-#include "ParametersMap.h"
 #include "PointerField.hpp"
+
+#include "NumericField.hpp"
+#include "ParametersMap.h"
 #include "PointersVectorField.hpp"
-#include "SchemaMacros.hpp"
+#include "UtilTypes.h"
 
 #include <string>
 #include <boost/fusion/container/map.hpp>
@@ -301,8 +302,8 @@ namespace synthese
 				Object<ObjectClass_, Schema_>& object,
 				const util::Env& env
 			):	_record(record),
-				_object(object),
-				_env(env)
+				_env(env),
+				_object(object)
 			{}
 
 			template <typename Pair>
@@ -410,8 +411,8 @@ namespace synthese
 			DynamicGetOperator(
 				const void* & result,
 				const std::string& fieldKey
-			):	_result(result),
-				_fieldKey(fieldKey)
+			):	_fieldKey(fieldKey),
+				_result(result)
 			{}
 
 			template <typename Pair>
@@ -441,8 +442,8 @@ namespace synthese
 			DynamicSetOperator(
 				const void* value,
 				const std::string& fieldKey
-			):	_value(value),
-				_fieldKey(fieldKey)
+			):	_fieldKey(fieldKey),
+				_value(value)
 			{}
 
 			template <typename Pair>

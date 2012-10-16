@@ -54,8 +54,8 @@ namespace synthese
 		Session::Session(
 			const string& ip,
 			string key
-		):	_ip(ip),
-			_key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key),
+		):	_key(key.empty() ? StringUtils::GenerateRandomString(Session::KEY_LENGTH) : key),
+			_ip(ip),
 			_lastUse(second_clock::local_time())
 		{}
 

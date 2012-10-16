@@ -29,6 +29,8 @@
 #include "FactorableTemplate.h"
 #include "ParametersMap.h"
 
+#include <boost/logic/tribool.hpp>
+
 namespace synthese
 {
 	class ObjectBase;

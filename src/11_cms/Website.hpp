@@ -31,6 +31,7 @@
 #include "DateField.hpp"
 #include "NumericField.hpp"
 #include "PointerField.hpp"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>

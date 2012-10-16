@@ -58,8 +58,8 @@ namespace synthese
 
 
 		AdminInterfaceElement::AdminInterfaceElement(
-		):	_tabBuilded(false),
-			_currentTab(NULL)
+		):	_currentTab(NULL),
+			_tabBuilded(false)
 		{}
 
 
@@ -335,8 +335,8 @@ namespace synthese
 			string icon
 		):	_title(title),
 			_id(id),
-			_writePermission(writePermission),
-			_icon(icon)
+			_icon(icon),
+			_writePermission(writePermission)
 		{
 		}
 
