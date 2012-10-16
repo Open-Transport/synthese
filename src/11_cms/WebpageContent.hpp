@@ -25,20 +25,25 @@
 
 #include "Factory.h"
 #include "Function.h"
-#include "ComplexObjectField.hpp"
+#include "ComplexObjectFieldDefinition.hpp"
 
+#include "FrameworkTypes.hpp"
 #include "WebpageContentNode.hpp"
 #include "MimeType.hpp"
 #include "MimeTypes.hpp"
 
 #include "shared_recursive_mutex.hpp"
 
+#include <boost/logic/tribool.hpp>
 #include <ostream>
 #include <vector>
 #include <boost/shared_ptr.hpp>
 
 namespace synthese
 {
+	class FilesMap;
+	class ObjectBase;
+
 	namespace server
 	{
 		class Request;
@@ -46,6 +51,7 @@ namespace synthese
 
 	namespace util
 	{
+		class Env;
 		class ParametersMap;
 	}
 
@@ -57,9 +63,10 @@ namespace synthese
 			@ingroup m36
 		*/
 		class WebpageContent:
-			public ComplexObjectField<WebpageContent, WebpageContent>
+			public ComplexObjectFieldDefinition<WebpageContent>
 		{
-			friend class ComplexObjectField<WebpageContent, WebpageContent>;
+		public:
+			typedef WebpageContent Type;
 
 		private:
 
@@ -178,6 +185,46 @@ namespace synthese
 					util::ParametersMap& variables
 				) const;
 			//@}
+
+
+			static void LoadFromRecord(
+				Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			);
+
+
+
+			static void SaveToFilesMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			);
+
+
+
+			static void SaveToParametersMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			);
+
+
+
+			static void SaveToDBContent(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			);
+
+
+			static void GetLinkedObjectsIds(
+				LinkedObjectsIds& list, 
+				const Record& record
+			);
 		};
 }	}
 

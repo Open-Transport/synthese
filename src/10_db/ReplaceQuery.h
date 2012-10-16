@@ -189,7 +189,8 @@ namespace synthese
 			// Synchro
 			inter_synthese::InterSYNTHESEModule::Enqueue(
 				DBInterSYNTHESE::FACTORY_KEY,
-				query.str()
+				DBInterSYNTHESE::GetSQLContent(query.str()),
+				transaction
 			);
 		}
 

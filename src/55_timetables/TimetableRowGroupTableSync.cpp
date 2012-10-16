@@ -89,15 +89,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<TimetableRowGroupTableSync,TimetableRowGroup>::Save(
-			TimetableRowGroup* webPage,
+			TimetableRowGroup* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<TimetableRowGroupTableSync> query(*webPage);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			webPage->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

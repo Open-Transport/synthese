@@ -2,6 +2,7 @@
 macro(set_source_groups)
   # default group
   source_group("Sources" REGULAR_EXPRESSION "\\.(cpp|h|hpp)$")
+  source_group("Fields" REGULAR_EXPRESSION ".*Field\\..*")
   source_group("01 Module" REGULAR_EXPRESSION ".*Module\\..*|.*ModuleRegister\\..*|.*\\gen\\.cpp|.*Types\\.(cpp|h|hpp)|.*Constants\\.(cpp|h|hpp).*")
   source_group("01 Exceptions" REGULAR_EXPRESSION ".*Exception\\..*")
   source_group("10 Table Syncs" REGULAR_EXPRESSION ".*TableSync\\..*")

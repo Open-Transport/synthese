@@ -314,7 +314,7 @@ namespace synthese
 				stream << t.cell(
 					"Localité",
 					t.getForm().getTextInputAutoCompleteFromService(
-						ObjectUpdateAction::_GetInputName(NamedPlaceData::FIELDS[1].name),
+						ObjectUpdateAction::_GetInputName(NamedPlaceField::FIELDS[1].name),
 						_place->getCity() ? lexical_cast<string>(_place->getCity()->getKey()) : string(),
 						_place->getCity() ? _place->getCity()->getName() : string(),
 						pt_website::CityListFunction::FACTORY_KEY,
@@ -326,7 +326,7 @@ namespace synthese
 				stream << t.cell(
 					"Nom",
 					t.getForm().GetTextInput(
-						ObjectUpdateAction::_GetInputName(NamedPlaceData::FIELDS[0].name),
+						ObjectUpdateAction::_GetInputName(NamedPlaceField::FIELDS[0].name),
 						_place->getName()
 				)	);
 				stream << t.close();

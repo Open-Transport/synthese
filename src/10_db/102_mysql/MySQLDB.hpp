@@ -25,9 +25,12 @@
 #define SYNTHESE_db_mysql_MySQLDB_h__
 
 #include "DB.hpp"
+#include "DBRecord.hpp"
 #include "FactorableTemplate.h"
 #include "01_util/ConcurrentQueue.hpp"
 
+#include <my_global.h>
+#include <mysql.h>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/tss.hpp>
 
@@ -44,7 +47,8 @@ namespace synthese
 		/// @author Sylvain Pasche
 		/// @date 2011
 		//////////////////////////////////////////////////////////////////////////
-		class MySQLDB : public util::FactorableTemplate<DB, MySQLDB>
+		class MySQLDB:
+			public util::FactorableTemplate<DB, MySQLDB>
 		{
 		private:
 
@@ -57,6 +61,39 @@ namespace synthese
 			ConcurrentQueue<DBModifEvent> _modifEventQueue;
 			boost::shared_ptr<boost::thread> _modifEventsThread;
 
+			static std::vector<MYSQL_STMT*> _replaceStatements;
+
+			class DBRecordCellBindConvertor:
+				public boost::static_visitor<>
+			{
+				MYSQL_BIND& _bnd;
+
+			public:
+				DBRecordCellBindConvertor(
+					MYSQL_BIND& bnd
+				);
+
+				void operator()(const int& i) const;
+				void operator()(const double& d) const;
+				void operator()(const util::RegistryKeyType& id) const;
+				void operator()(const boost::optional<std::string>& str) const;
+				void operator()(const boost::optional<Blob>& blob) const;
+			};
+
+			class RequestExecutor:
+				public boost::static_visitor<>
+			{
+				MySQLDB& _db;
+
+			public:
+				RequestExecutor(
+					MySQLDB& db
+				);
+
+				void operator()(const std::string& d);
+				void operator()(const DBRecord& r);
+			};
+
 		public:
 
 			MySQLDB();
@@ -65,6 +102,10 @@ namespace synthese
 			virtual void initForStandaloneUse();
 			virtual void preInit();
 			virtual void init();
+			virtual void initPreparedStatements();
+			virtual void saveRecord(
+				const DBRecord& record
+			);
 
 			virtual DBResultSPtr execQuery(const SQLData& sql);
 			virtual void execTransaction(

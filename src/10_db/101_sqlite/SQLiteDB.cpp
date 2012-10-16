@@ -20,12 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "SQLiteDB.h"
+
 #include "DBModule.h"
+#include "DBRecord.hpp"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
 #include "Log.h"
 #include "Conversion.h"
-#include "101_sqlite/SQLiteDB.h"
 #include "101_sqlite/SQLiteException.hpp"
 #include "101_sqlite/SQLiteResult.hpp"
 
@@ -49,6 +51,9 @@ namespace synthese
 
 	namespace db
 	{
+		std::vector<sqlite3_stmt*> SQLiteDB::_replaceStatements;
+
+
 		void cleanupTSS(SQLiteTSS* tss)
 		{
 			// FIXME: tss is sometimes null on Windows during unit tests. Needs to be investigated.
@@ -114,8 +119,10 @@ namespace synthese
 
 		void SQLiteDB::_ThrowIfError(sqlite3* handle, int retCode, const std::string& message)
 		{
-			if (retCode == SQLITE_OK)
+			if (retCode == SQLITE_OK || retCode == SQLITE_DONE)
+			{
 				return;
+			}
 			throw SQLiteException(message + " (errmsg='" + sqlite3_errmsg(handle) + "' code=" + lexical_cast<string>(retCode) + ")");
 		}
 
@@ -188,7 +195,7 @@ namespace synthese
 			Log::GetInstance().trace("SQLiteDB::execQuery " + sql);
 
 			sqlite3_stmt* st;
-			int retc = sqlite3_prepare_v2(_getHandle(), sql.c_str(), sql.length(), &st, 0);
+			int retc = sqlite3_prepare_v2(_getHandle(), sql.c_str(), static_cast<int>(sql.length()), &st, 0);
 
 			_ThrowIfError(_getHandle(), retc, "Error compiling '" + sql + "'");
 
@@ -222,13 +229,10 @@ namespace synthese
 
 			try
 			{
-				BOOST_FOREACH(const DBTransaction::Queries::value_type& sql, transaction.getQueries())
+				RequestExecutor executor(*this);
+				BOOST_FOREACH(const DBTransaction::Queries::value_type& query, transaction.getQueries())
 				{
-					if (sql.find("spatial_ref_sys") == sql.npos)
-						Log::GetInstance().trace("SQLiteDB::execTransaction " + sql);
-					retc = sqlite3_exec(_getHandle(), sql.c_str (), 0, 0, 0);
-
-					_ThrowIfError(_getHandle(), retc, "Error executing batch update '" + Conversion::ToTruncatedString(sql) + "'");
+					boost::apply_visitor( executor, query );
 				}
 
 				retc = sqlite3_exec(_getHandle(), "COMMIT;", 0, 0, 0);
@@ -260,8 +264,6 @@ namespace synthese
 
 		void SQLiteDB::_doExecUpdate(const SQLData& sql)
 		{
-			Log::GetInstance().trace("SQLiteDB::_doExecUpdate " + sql);
-
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			// Lock this method so that no database update can start before hooks
 			// have finished their execution. The mutex is recursive so that
@@ -274,9 +276,8 @@ namespace synthese
 
 			SQLiteTSS* tss = _initSQLiteTSS();
 
-			int retc = sqlite3_exec(_getHandle(), sql.c_str(), 0, 0, 0);
-
-			_ThrowIfError(_getHandle(), retc, "Error executing batch update '" + Conversion::ToTruncatedString(sql) + "'");
+			RequestExecutor rx(*this);
+			rx(sql);
 
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			_recordDBModifEvents(tss->events);
@@ -450,6 +451,8 @@ namespace synthese
 			return sql.str();
 		}
 
+
+
 		void SQLiteDB::afterUpdateSchema(
 			const std::string& tableName,
 			const FieldsList& fields
@@ -537,5 +540,174 @@ namespace synthese
 		{
 			return backend == SQLITE_BACKEND;
 		}
-	}
-}
+
+
+
+		void SQLiteDB::initPreparedStatements()
+		{
+			_replaceStatements.clear();
+			_replaceStatements.resize(
+				DBModule::GetTablesById().rbegin()->first + 1,
+				NULL
+			);
+			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
+			{
+				stringstream query;
+				query << "REPLACE INTO " << it.second->getFormat().NAME << " VALUES(";
+				bool first(true);
+				BOOST_FOREACH(const Field& field, it.second->getFieldsList())
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						query << ",";
+					}
+					if(field.isGeometry())
+					{
+						query << "GeomFromText(?)";
+					}
+					else
+					{
+						query << "?";
+					}
+				}
+				query << ")";
+				string queryStr(query.str());
+				sqlite3_stmt* stmt;
+				sqlite3_prepare_v2(
+					_getHandle(),
+					queryStr.c_str(),
+					static_cast<int>(queryStr.size()),
+					&stmt,
+					0
+				);
+				_replaceStatements[it.first] = stmt;
+			}
+		}
+
+
+
+		void SQLiteDB::saveRecord(
+			const DBRecord& record
+		){
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			// Lock this method so that no database update can start before hooks
+			// have finished their execution. The mutex is recursive so that
+			// an update can still be called inside hook callback.
+			boost::recursive_mutex::scoped_lock lock(_updateMutex);
+#endif
+			SQLiteTSS* tss = _initSQLiteTSS();
+
+			RequestExecutor rx(*this);
+			rx(record);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			_recordDBModifEvents(tss->events);
+#endif
+		}
+
+
+
+		SQLiteDB::DBRecordCellBindConvertor::DBRecordCellBindConvertor(
+			sqlite3_stmt& stmt,
+			size_t i
+		):	_stmt(stmt),
+			_i(i)
+		{}
+
+
+
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const int& i ) const
+		{
+			sqlite3_bind_int(&_stmt, static_cast<int>(_i), i);
+		}
+
+
+
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const double& d ) const
+		{
+			sqlite3_bind_double(&_stmt, static_cast<int>(_i), d);
+		}
+
+
+
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const util::RegistryKeyType& id ) const
+		{
+			sqlite3_bind_int64(&_stmt, static_cast<int>(_i), id);
+		}
+
+
+
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const boost::optional<std::string>& str ) const
+		{
+			if(str)
+			{
+				sqlite3_bind_text(&_stmt, static_cast<int>(_i), str->c_str(), static_cast<int>(str->size()), NULL);
+			}
+			else
+			{
+				sqlite3_bind_null(&_stmt, static_cast<int>(_i));
+			}
+		}
+
+
+
+		void SQLiteDB::DBRecordCellBindConvertor::operator()( const boost::optional<Blob>& blob ) const
+		{
+			if(blob)
+			{
+				sqlite3_bind_text(&_stmt, static_cast<int>(_i), blob->first, static_cast<int>(blob->second), NULL);
+			}
+			else
+			{
+				sqlite3_bind_null(&_stmt, static_cast<int>(_i));
+			}
+		}
+
+
+
+		SQLiteDB::RequestExecutor::RequestExecutor( SQLiteDB& db ):
+			_db(db)
+		{
+
+		}
+
+
+
+		void SQLiteDB::RequestExecutor::operator()( const std::string& sql )
+		{
+			if(	Log::GetInstance().getLevel() > Log::LEVEL_TRACE &&
+				sql.find("spatial_ref_sys") == sql.npos
+			){
+				Log::GetInstance().trace("SQLiteDB::exec SQL " + sql);
+			}
+			int retc(
+				sqlite3_exec(_db._getHandle(), sql.c_str (), 0, 0, 0)
+			);
+			_ThrowIfError(_db._getHandle(), retc, "Error executing batch update '" + Conversion::ToTruncatedString(sql) + "'");
+		}
+
+
+
+		void SQLiteDB::RequestExecutor::operator()( const DBRecord& record )
+		{
+			size_t fieldsNumber(record.getTable()->getFieldsList().size());
+			sqlite3_stmt* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			for(size_t i(0); i<fieldsNumber; ++i)
+			{
+				DBRecordCellBindConvertor visitor(*stmt, i+1);
+				apply_visitor(visitor, record.getContent().at(i));
+			}
+
+			int retc = sqlite3_step(stmt);
+
+			_ThrowIfError(_db._getHandle(), retc, "Error executing prepared statement");
+
+			retc = sqlite3_reset(stmt);
+
+			_ThrowIfError(_db._getHandle(), retc, "Error resetting prepared statement");
+		}
+}	}

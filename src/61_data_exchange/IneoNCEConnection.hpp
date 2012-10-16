@@ -86,6 +86,7 @@ namespace synthese
 				const Status& getStatus() const { return _status; }
 			//@}
 
+//				static void test(const boost::system::error_code& error);
 			static void InitThread();
 
 			static void ParameterCallback(

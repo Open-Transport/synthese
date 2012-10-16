@@ -31,6 +31,7 @@
 #include "ServerModule.h"
 #include "StaticFunctionRequest.h"
 
+#include <boost/algorithm/string.hpp>
 #include <boost/thread.hpp>
 
 using namespace boost::posix_time;
@@ -122,93 +123,110 @@ namespace synthese
 						);
 
 						string contentStr = result.str();
-						trim(contentStr);
-						if(!contentStr.empty())
+
+						if(contentStr != InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
 						{
+							bool ok(true);
 							typedef std::map<
-								util::RegistryKeyType,
+								util::RegistryKeyType,	// id of the update
 								std::pair<
-									std::string,
-									std::string
-							>	> Content;
-							Content content;
+									std::string,		// synchronizer
+									std::string			// message
+							>	> ContentMap;
+							ContentMap content;
 				
-							vector<string> rows;
-							typedef split_iterator<string::iterator> string_split_iterator;
-							for(string_split_iterator its=make_split_iterator(const_cast<string&>(contentStr), first_finder(InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR, is_iequal()));
-								its != string_split_iterator();
-								++its
-							){
-								string param(copy_range<std::string>(*its));
-								if(param.empty())
-								{
-									continue;
-								}
+							size_t i(0);
+							while(i < contentStr.size())
+							{
+								ContentMap::mapped_type item;
 
-								size_t i(0);
-								for(;i<param.size(); ++i)
+								// ID + Search for next :
+								size_t l=i;
+								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+								if(i == contentStr.size())
 								{
-									if(param[i] == ':')
-									{
-										break;
-									}
+									ok = false;
+									break;
 								}
-								size_t j(i+1);
-								for(;j<param.size(); ++j)
-								{
-									if(param[j] == ':')
-									{
-										break;
-									}
-								}
+								RegistryKeyType id(lexical_cast<RegistryKeyType>(contentStr.substr(l, i-l)));
+								++i;
 
-								if(i == param.size() || i == 0)
+								// Synchronizer + Search for next :
+								l=i;
+								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+								if(i == contentStr.size())
 								{
-									continue;
+									ok = false;
+									break;
 								}
+								item.first = contentStr.substr(l, i-l);
+								++i;
+
+								// Size + Search for next :
+								l=i;
+								for(; i < contentStr.size() && contentStr[i] != InterSYNTHESESlaveUpdateService::FIELDS_SEPARATOR[0]; ++i) ;
+								if(i == contentStr.size())
+								{
+									ok = false;
+									break;
+								}
+								size_t contentSize = lexical_cast<size_t>(contentStr.substr(l, i-l));
+								++i;
+
+								// Content
+								if(i+contentSize > contentStr.size())
+								{
+									ok = false;
+									break;
+								}
+								item.second = contentStr.substr(i, contentSize);
+								i += contentSize + InterSYNTHESESlaveUpdateService::SYNCS_SEPARATOR.size();
 
 								content.insert(
 									make_pair(
-										lexical_cast<RegistryKeyType>(param.substr(0, i-1)),
-										make_pair(param.substr(i+1, j-i-1), param.substr(j+1))
+										id,
+										item
 								)	);
 							}
 
-							StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
-							ackRequest.getFunction()->setSlaveId(_slaveId);
-							if(!content.empty())
+							if(ok)
 							{
-								ackRequest.getFunction()->setRangeBegin(
-									content.begin()->first
-								);
-								ackRequest.getFunction()->setRangeEnd(
-									content.rbegin()->first
-								);
-							}
-							BasicClient c2(
-								_masterHost,
-								_masterPort
-							);
-							stringstream result2;
-							c2.get(
-								result2,
-								ackRequest.getURL()
-							);
-							if(result2.str() == InterSYNTHESEUpdateAckService::VALUE_OK)
-							{
-								// Reading the content
-								BOOST_FOREACH(const Content::value_type& item, content)
+								StaticFunctionRequest<InterSYNTHESEUpdateAckService> ackRequest;
+								ackRequest.getFunction()->setSlaveId(_slaveId);
+								if(!content.empty())
 								{
-									try
+									ackRequest.getFunction()->setRangeBegin(
+										content.begin()->first
+									);
+									ackRequest.getFunction()->setRangeEnd(
+										content.rbegin()->first
+									);
+								}
+								BasicClient c2(
+									_masterHost,
+									_masterPort
+								);
+								stringstream result2;
+								c2.get(
+									result2,
+									ackRequest.getURL()
+								);
+								if(result2.str() == InterSYNTHESEUpdateAckService::VALUE_OK)
+								{
+									// Reading the content
+									BOOST_FOREACH(const ContentMap::value_type& item, content)
 									{
-										auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE(
-											Factory<InterSYNTHESESyncTypeFactory>::create(item.second.first)
-										);
-										interSYNTHESE->sync(item.second.second);
-									}
-									catch(...)
-									{
-										// Log
+										try
+										{
+											auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE(
+												Factory<InterSYNTHESESyncTypeFactory>::create(item.second.first)
+											);
+											interSYNTHESE->sync(item.second.second);
+										}
+										catch(...)
+										{
+											// Log
+										}
 									}
 								}
 							}
@@ -229,8 +247,11 @@ namespace synthese
 
 
 
-		void InterSYNTHESEModule::Enqueue( const std::string& interSYNTHESEType, const std::string& parameter )
-		{
+		void InterSYNTHESEModule::Enqueue(
+			const std::string& interSYNTHESEType,
+			const std::string& parameter,
+			boost::optional<db::DBTransaction&> transaction
+		){
 			if(parameter.find(InterSYNTHESEQueueTableSync::TABLE.NAME) != string::npos)
 			{
 				return;
@@ -239,7 +260,7 @@ namespace synthese
 				InterSYNTHESESlave::Registry::value_type& slave,
 				Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESESlave>()
 			){
-				slave.second->enqueue(interSYNTHESEType, parameter);
+				slave.second->enqueue(interSYNTHESEType, parameter, transaction);
 			}
 		}
 

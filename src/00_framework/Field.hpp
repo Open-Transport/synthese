@@ -32,26 +32,26 @@ namespace synthese
 	/// Field types.
 	typedef enum
 	{
-		SQL_INTEGER,
-		SQL_DOUBLE,
-		SQL_TEXT,
+		SQL_INTEGER = 0,
+		SQL_DOUBLE = 1,
+		SQL_TEXT = 2,
 		// Text with a fixed length. It has to be used instead of SQL_TEXT on the first column.
 		// That's because MySQL creates a primary key on the first column, and needs a fixed
 		// length if the type is text.
 		// TODO: remove this workaround once we use VARCHAR with a fixed length on MySQL.
-		SQL_TEXT_FIXED,
-		SQL_BOOLEAN,
-		SQL_DATETIME,
-		SQL_DATE,
-		SQL_TIME,
-		SQL_GEOM_POINT,
-		SQL_GEOM_LINESTRING,
-		SQL_GEOM_POLYGON,
-		SQL_GEOM_MULTIPOINT,
-		SQL_GEOM_MULTILINESTRING,
-		SQL_GEOM_MULTIPOLYGON,
-		SQL_GEOM_GEOMETRYCOLLECTION,
-		SQL_BLOB
+		SQL_TEXT_FIXED = 3,
+		SQL_BOOLEAN = 4,
+		SQL_DATETIME = 5,
+		SQL_DATE = 6,
+		SQL_TIME = 7,
+		SQL_GEOM_POINT = 8,
+		SQL_GEOM_LINESTRING = 9,
+		SQL_GEOM_POLYGON = 10,
+		SQL_GEOM_MULTIPOINT = 11,
+		SQL_GEOM_MULTILINESTRING = 12,
+		SQL_GEOM_MULTIPOLYGON = 13,
+		SQL_GEOM_GEOMETRYCOLLECTION = 14,
+		SQL_BLOB = 15
 	} FieldType;
 
 

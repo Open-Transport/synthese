@@ -24,6 +24,7 @@
 
 #include "DestinationTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
@@ -115,8 +116,7 @@ namespace synthese
 			query.addField(object->getComment());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 		}

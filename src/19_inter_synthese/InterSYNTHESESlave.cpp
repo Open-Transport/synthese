@@ -87,7 +87,8 @@ namespace synthese
 
 		void InterSYNTHESESlave::enqueue(
 			const std::string& interSYNTHESEType,
-			const std::string& parameter
+			const std::string& parameter,
+			boost::optional<db::DBTransaction&> transaction
 		) const	{
 			ptime now(microsec_clock::local_time());
 
@@ -101,7 +102,7 @@ namespace synthese
 			q.set<RequestTime>(now);
 			q.set<SyncType>(interSYNTHESEType);
 			q.set<SyncContent>(parameter);
-			InterSYNTHESEQueueTableSync::Save(&q);
+			InterSYNTHESEQueueTableSync::Save(&q, transaction);
 		}
 
 

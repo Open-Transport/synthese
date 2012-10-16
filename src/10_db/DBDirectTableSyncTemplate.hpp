@@ -100,6 +100,11 @@ namespace synthese
 				}
 			}
 
+
+			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
+
+
+
 			////////////////////////////////////////////////////////////////////
 			/// Object fetcher, with read/write permissions.
 			///	@param key UID of the object

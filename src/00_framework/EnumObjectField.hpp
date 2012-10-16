@@ -36,6 +36,14 @@ namespace synthese
 	public:
 		typedef P Type;
 
+	private:
+		static std::string _enumToString(
+			const typename Type& fieldObject
+		){
+			return boost::lexical_cast<std::string>(static_cast<int>(fieldObject));
+		}
+
+	public:
 		static void LoadFromRecord(P& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
 		{
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
@@ -46,44 +54,18 @@ namespace synthese
 
 
 
-		static std::string Serialize(
-			const P& fieldObject,
-			util::ParametersMap::SerializationFormat format
-		){
-			return boost::lexical_cast<std::string>(static_cast<int>(fieldObject));
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			util::ParametersMap& map,
-			const std::string& prefix
-		){
-			map.insert(
-				prefix + SimpleObjectFieldDefinition<C>::FIELD.name,
-				Serialize(fieldObject, map.getFormat())
-			);
-		}
-
-
-
 		static void SaveToFilesMap(
 			const P& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
-			if(	SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == true
-			){
-				FilesMap::File item;
-				item.content = Serialize(fieldObject, util::ParametersMap::FORMAT_INTERNAL);
-				item.mimeType = util::MimeTypes::TEXT;
-				map.insert(
-					SimpleObjectFieldDefinition<C>::FIELD.name,
-					item
-				);
-			}
+			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
+				fieldObject,
+				map,
+				_enumToString
+			);
 		}
+
 
 
 
@@ -94,33 +76,25 @@ namespace synthese
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			if(	boost::logic::indeterminate(withFiles) ||
-				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
-			){
-				SaveToParametersMap(fieldObject, map, prefix);
-			}
-		}
-
-
-
-		static void SaveToParametersMap(
-			const P& fieldObject,
-			util::ParametersMap& map
-		){
-			map.insert(
-				SimpleObjectFieldDefinition<C>::FIELD.name,
-				Serialize(fieldObject, map.getFormat())
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_enumToString
 			);
 		}
 
 
 
-		static void SaveToParametersMap(
+
+		static void SaveToDBContent(
 			const P& fieldObject,
 			const ObjectBase& object,
-			util::ParametersMap& map
+			DBContent& content
 		){
-			SaveToParametersMap(fieldObject, map);
+			Cell cell(static_cast<int>(fieldObject));
+			content.push_back(cell);
 		}
 
 
@@ -129,7 +103,9 @@ namespace synthese
 		{
 		}
 	};
+
+	
+	#define FIELD_ENUM(N, T) struct N : public EnumObjectField<N, T> {};
 }
 
 #endif // SYNTHESE__EnumObjectField_hpp__
-

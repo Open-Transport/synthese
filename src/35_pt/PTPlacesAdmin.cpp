@@ -464,7 +464,7 @@ namespace synthese
 				publicPlaceAddRequest.getAction()->setTable<PublicPlace>();
 				PublicPlace ppTemplate;
 				ppTemplate.setCity(const_pointer_cast<City>(_city).get());
-				publicPlaceAddRequest.getAction()->set<NamedPlaceData>(NULL, ppTemplate);
+				publicPlaceAddRequest.getAction()->set<NamedPlaceField>(NULL, ppTemplate);
 				publicPlaceAddRequest.setActionWillCreateObject();
 				publicPlaceAddRequest.setActionFailedPage<PTPlacesAdmin>();
 				static_pointer_cast<PTPlacesAdmin>(publicPlaceAddRequest.getActionFailedPage())->setCity(_city);

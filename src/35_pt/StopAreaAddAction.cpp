@@ -25,6 +25,7 @@
 #include "StopAreaAddAction.h"
 
 #include "ActionException.h"
+#include "DataSourceLinksField.hpp"
 #include "ParametersMap.h"
 #include "Profile.h"
 #include "Session.h"
@@ -82,7 +83,7 @@ namespace synthese
 			map.insert(PARAMETER_CREATE_CITY_IF_NECESSARY, _createCityIfNecessary);
 			map.insert(
 				PARAMETER_DATA_SOURCE_LINKS,
-				DataSourceLinks::Serialize(_dataSourceLinks, map.getFormat())
+				DataSourceLinks::Serialize(_dataSourceLinks)
 			);
 			return map;
 		}

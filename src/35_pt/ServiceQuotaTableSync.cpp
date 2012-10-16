@@ -89,15 +89,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<ServiceQuotaTableSync,ServiceQuota>::Save(
-			ServiceQuota* site,
+			ServiceQuota* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<ServiceQuotaTableSync> query(*site);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			site->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

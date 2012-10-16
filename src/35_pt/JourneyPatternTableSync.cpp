@@ -22,6 +22,7 @@
 
 #include "JourneyPatternTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
@@ -258,8 +259,7 @@ namespace synthese
 			query.addField(object->getWayBack());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getMain());
 			query.addField(object->getPlannedLength());

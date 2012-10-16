@@ -24,10 +24,10 @@
 #ifndef SYNTHESE_svn_SVNWorkingCopy_H
 #define SYNTHESE_svn_SVNWorkingCopy_H
 
-#include "SimpleObjectField.hpp"
-
 #include "Env.h"
+#include "FrameworkTypes.hpp"
 #include "SVNRepository.hpp"
+#include "SimpleObjectFieldDefinition.hpp"
 
 #include <iostream>
 #include <vector>
@@ -56,7 +56,7 @@ namespace synthese
 			///  - SVN backend
 			///	 - Inter-SYNTHESE service
 			class SVNWorkingCopy:
-				public ObjectField<SVNWorkingCopy, SVNWorkingCopy>
+				public SimpleObjectFieldDefinition<SVNWorkingCopy>
 			{
 			public:
 				typedef SVNWorkingCopy Type;
@@ -169,6 +169,45 @@ namespace synthese
 						const std::string& password
 					);
 				//@}
+
+				void from_string(
+					const std::string& text
+				);
+
+				std::string to_string(
+				) const;
+
+				static void LoadFromRecord(
+					Type& fieldObject,
+					ObjectBase& object,
+					const Record& record,
+					const util::Env& env
+				);
+
+				static void SaveToFilesMap(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					FilesMap& map
+				);
+
+				static void SaveToParametersMap(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					util::ParametersMap& map,
+					const std::string& prefix,
+					boost::logic::tribool withFiles
+				);
+
+				static void SaveToDBContent(
+					const Type& fieldObject,
+					const ObjectBase& object,
+					DBContent& content
+				);
+
+				static void GetLinkedObjectsIds(
+					LinkedObjectsIds& list, 
+					const Record& record
+				);
 			};
 }	}	}
 

@@ -24,6 +24,7 @@
 
 #include "StopAreaTableSync.hpp"
 
+#include "DataSourceLinksField.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
 #include "Session.h"
@@ -309,8 +310,7 @@ namespace synthese
 			// Data source links
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 
 			// Timetable name

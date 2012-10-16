@@ -34,6 +34,8 @@
 #include "Webpage.h"
 #include "WebPageDisplayFunction.h"
 
+#include <boost/algorithm/string.hpp>
+
 using namespace std;
 using namespace boost;
 
@@ -44,150 +46,154 @@ namespace synthese
 	using namespace util;
 	using namespace cms;
 
-	template<> const Field ComplexObjectFieldDefinition<WebpageContent>::FIELDS[] = {
+	template<>
+	const Field ComplexObjectFieldDefinition<WebpageContent>::FIELDS[] = {
 		Field("content1", SQL_TEXT, true),
 		Field("ignore_white_chars", SQL_BOOLEAN),
 		Field("mime_type", SQL_TEXT),
 		Field("do_not_evaluate", SQL_BOOLEAN),
 	Field() };
-	FIELD_COMPLEX_NO_LINKED_OBJECT_ID(WebpageContent)
 
 
 
-	template<>
-	void ComplexObjectField<WebpageContent, WebpageContent>::LoadFromRecord(
-		WebpageContent& fieldObject,
-		ObjectBase& object,
-		const Record& record,
-		const util::Env& env
-	){
-		if(record.isDefined(FIELDS[2].name))
-		{
-			string value(record.getDefault<string>(FIELDS[2].name));
-			try
-			{
-				fieldObject._mimeType = MimeTypes::GetMimeTypeByString(value);
-			}
-			catch(Exception&)
-			{
-				vector<string> parts;
-				split(parts, value, is_any_of("/"));
-				if(parts.size() >= 2)
-				{
-					fieldObject._mimeType = MimeType(parts[0], parts[1], "");
-				}
-				else
-				{
-					fieldObject._mimeType = MimeTypes::HTML;
-				}
-			}
-		}
-
-		bool toUpdate(false);
-		if(record.isDefined(FIELDS[1].name))
-		{
-
-			bool newValue(record.getDefault<bool>(FIELDS[1].name, false));
-			toUpdate |= (fieldObject._ignoreWhiteChars != newValue);
-			fieldObject._ignoreWhiteChars = newValue;
-		}
-
-		if(record.isDefined(FIELDS[3].name))
-		{
-			bool newValue(record.getDefault<bool>(FIELDS[3].name, false));
-			toUpdate |= (fieldObject._doNotEvaluate != newValue);
-			fieldObject._doNotEvaluate = newValue;
-		}
-
-		if(record.isDefined(FIELDS[0].name))
-		{
-			// At end because nodes generation needs the value of the other parameters to be updated
-			string newValue(record.getDefault<string>(FIELDS[0].name));
-			toUpdate |= (newValue != fieldObject._code);
-			fieldObject._code = newValue;
-		}
-
-		if(toUpdate)
-		{
-			fieldObject._updateNodes();
-		}
-	}
-
-
-
-	template<>
-	void ComplexObjectField<WebpageContent, WebpageContent>::SaveToParametersMap(
-		const WebpageContent& fieldObject,
-		const ObjectBase& object,
-		util::ParametersMap& map,
-		const std::string& prefix,
-		boost::logic::tribool withFiles
-	){
-		// Content
-		if(	boost::logic::indeterminate(withFiles) ||
-			FIELDS[0].exportOnFile == withFiles
+	namespace cms
+	{
+		void WebpageContent::LoadFromRecord(
+			WebpageContent& fieldObject,
+			ObjectBase& object,
+			const Record& record,
+			const util::Env& env
 		){
-			map.insert(
-				prefix + FIELDS[0].name,
-				ObjectField<void, string>::Serialize(
-					fieldObject._code,
-					map.getFormat()
-			)	);
+			if(record.isDefined(FIELDS[2].name))
+			{
+				string value(record.getDefault<string>(FIELDS[2].name));
+				try
+				{
+					fieldObject._mimeType = MimeTypes::GetMimeTypeByString(value);
+				}
+				catch(Exception&)
+				{
+					std::vector<std::string> parts;
+					boost::algorithm::split(parts, value, boost::is_any_of("/"));
+					if(parts.size() >= 2)
+					{
+						fieldObject._mimeType = MimeType(parts[0], parts[1], "");
+					}
+					else
+					{
+						fieldObject._mimeType = MimeTypes::HTML;
+					}
+				}
+			}
+
+			bool toUpdate(false);
+			if(record.isDefined(FIELDS[1].name))
+			{
+
+				bool newValue(record.getDefault<bool>(FIELDS[1].name, false));
+				toUpdate |= (fieldObject._ignoreWhiteChars != newValue);
+				fieldObject._ignoreWhiteChars = newValue;
+			}
+
+			if(record.isDefined(FIELDS[3].name))
+			{
+				bool newValue(record.getDefault<bool>(FIELDS[3].name, false));
+				toUpdate |= (fieldObject._doNotEvaluate != newValue);
+				fieldObject._doNotEvaluate = newValue;
+			}
+
+			if(record.isDefined(FIELDS[0].name))
+			{
+				// At end because nodes generation needs the value of the other parameters to be updated
+				string newValue(record.getDefault<string>(FIELDS[0].name));
+				toUpdate |= (newValue != fieldObject._code);
+				fieldObject._code = newValue;
+			}
+
+			if(toUpdate)
+			{
+				fieldObject._updateNodes();
+			}
 		}
 
-		// Ignore white chars
-		if(	boost::logic::indeterminate(withFiles) ||
-			FIELDS[1].exportOnFile == withFiles
+
+
+		void WebpageContent::SaveToParametersMap(
+			const WebpageContent& fieldObject,
+			const ObjectBase& object,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
 		){
+			// Content
+			if(	withFiles != false
+			){
+				map.insert(
+					prefix + FIELDS[0].name,
+					fieldObject._code
+				);
+			}
+
+			// Ignore white chars
 			map.insert(
 				prefix + FIELDS[1].name,
 				fieldObject._ignoreWhiteChars
 			);
-		}
 
-		// Mime type
-		if(	boost::logic::indeterminate(withFiles) ||
-			FIELDS[2].exportOnFile == withFiles
-		){
+			// Mime type
 			map.insert(
 				prefix + FIELDS[2].name,
-				ObjectField<void, string>::Serialize(
-					string(fieldObject._mimeType),
-					map.getFormat()
-			)	);
-		}
+				fieldObject._mimeType
+			);
 
-		// Ignore white chars
-		if(	boost::logic::indeterminate(withFiles) ||
-			FIELDS[3].exportOnFile == withFiles
-		){
+			// Ignore white chars
 			map.insert(
 				prefix + FIELDS[3].name,
 				fieldObject._doNotEvaluate
 			);
 		}
-	}
 
 
 
-	template<>
-	void ComplexObjectField<WebpageContent, WebpageContent>::SaveToFilesMap(
-		const WebpageContent& fieldObject,
-		const ObjectBase& object,
-		FilesMap& map
-	){
-		FilesMap::File item;
-		item.content = fieldObject._code;
-		item.mimeType = fieldObject._mimeType;
-		map.insert(
-			FIELDS[0].name,
-			item
-		);
-	}
+		void WebpageContent::SaveToFilesMap(
+			const WebpageContent& fieldObject,
+			const ObjectBase& object,
+			FilesMap& map
+		){
+			FilesMap::File item;
+			item.content = fieldObject._code;
+			item.mimeType = fieldObject._mimeType;
+			map.insert(
+				FIELDS[0].name,
+				item
+			);
+		}
 
 
-	namespace cms
-	{
+
+		void WebpageContent::SaveToDBContent(
+			const Type& fieldObject,
+			const ObjectBase& object,
+			DBContent& content
+		){
+			// Content
+			Blob b;
+			b.first = const_cast<char*>(fieldObject._code.c_str());
+			b.second = fieldObject._code.size();
+			content.push_back(Cell(b));
+
+			// Ignore white chars
+			content.push_back(Cell(fieldObject._ignoreWhiteChars));
+
+			// Mime type
+			string s(fieldObject._mimeType);
+			content.push_back(Cell(s));
+
+			// Do not evaluate
+			content.push_back(Cell(fieldObject._doNotEvaluate));
+		}
+
+
 		shared_recursive_mutex WebpageContent::_SharedMutex;
 
 
@@ -586,5 +592,12 @@ namespace synthese
 			stringstream s;
 			display(s, request, additionalParametersMap, page, variables);
 			return s.str();
+		}
+
+
+
+		void WebpageContent::GetLinkedObjectsIds( LinkedObjectsIds& list, const Record& record )
+		{
+
 		}
 }	}

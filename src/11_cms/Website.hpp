@@ -28,7 +28,10 @@
 #include "TreeRankOrderingPolicy.hpp"
 #include "SVNWorkingCopy.hpp"
 
-#include "StandardFields.hpp"
+#include "DateField.hpp"
+#include "NumericField.hpp"
+#include "PointerField.hpp"
+#include "StringField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/thread/mutex.hpp>
@@ -39,9 +42,9 @@ namespace synthese
 	{
 		class Webpage;
 
-		FIELD_TYPE(HostName, std::string)
-		FIELD_TYPE(ClientURL, std::string)
-		FIELD_TYPE(DefaultTemplate, boost::optional<Webpage&>)
+		FIELD_STRING(HostName)
+		FIELD_STRING(ClientURL)
+		FIELD_POINTER(DefaultTemplate, Webpage)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),

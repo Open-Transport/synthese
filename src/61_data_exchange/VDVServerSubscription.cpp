@@ -27,12 +27,12 @@ using namespace boost::posix_time;
 namespace synthese
 {
 	using namespace data_exchange;
+	using namespace pt;
 	using namespace util;
 
 	CLASS_DEFINITION(VDVServerSubscription, "t098_vdv_server_subscriptions", 98)
 	FIELD_DEFINITION_OF_OBJECT(VDVServerSubscription, "vdv_server_subscription_id", "vdv_server_subscription_ids")
 
-	FIELD_DEFINITION_OF_TYPE(StopAreaPointer, "stop_area_id", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(SubscriptionDuration, "subscription_duration", SQL_INTEGER)
 	FIELD_DEFINITION_OF_TYPE(TimeSpan, "time_span", SQL_INTEGER)
 	
@@ -46,7 +46,7 @@ namespace synthese
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
 					FIELD_DEFAULT_CONSTRUCTOR(Name),
 					FIELD_DEFAULT_CONSTRUCTOR(VDVServer),
-					FIELD_DEFAULT_CONSTRUCTOR(StopAreaPointer),
+					FIELD_DEFAULT_CONSTRUCTOR(StopArea),
 					FIELD_VALUE_CONSTRUCTOR(SubscriptionDuration, hours(24)),
 					FIELD_VALUE_CONSTRUCTOR(TimeSpan, minutes(60))
 			)	),

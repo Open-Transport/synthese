@@ -22,6 +22,7 @@
 
 #include "IneoNCEConnection.hpp"
 
+#include "CommercialLine.h"
 #include "Env.h"
 #include "Exception.h"
 #include "Log.h"
@@ -105,32 +106,38 @@ namespace synthese
 
 					while(true)
 					{
-						boost::array<char, 128> buf;
+						asio::streambuf buf;
 						boost::system::error_code error;
-						string s;
-						while(error != boost::asio::error::eof)
-						{
-							size_t bytes_transferred(socket.read_some(boost::asio::buffer(buf), error));
-							std::copy(buf.begin(), buf.begin()+bytes_transferred, std::back_inserter(s));
-
-							stringstream reply;
-							ptime now(second_clock::local_time());
-							reply <<
-								"<IdReply><Type>SYNTHESE</Type><Id>1</Id>" <<
-								"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
-								"<Heure>" << now.time_of_day() << "</Heure>" <<
-								"</IdReply>\n";
-
-							boost::asio::write(socket, boost::asio::buffer(reply.str()));
-						}
-
+						size_t bytes_transferred(
+							 boost::asio::read(
+								socket,
+								buf,
+								boost::asio::transfer_at_least(1),
+								error
+						)	);
+						std::istream is(&buf);
+						std::string s(
+							(std::istreambuf_iterator<char>(is)) ,
+							(std::istreambuf_iterator<char>())
+						);
+						
 						XMLNode node(ParseInput(s));
-						if(node.getName() == "GetId")
+						if(node.isEmpty())
 						{
-							XMLNode nparcNode(node.getChildNode("NParc"));
+							break;
+						}
+						XMLNode childNode(node.getChildNode(0));
+						if(childNode.isEmpty())
+						{
+							break;
+						}
+						string tagName(childNode.getName());
+						if(tagName == "GetId")
+						{
+							XMLNode nparcNode(childNode.getChildNode("NParc"));
 							if(!nparcNode.isEmpty())
 							{
-								string vehicleNumber(node.getText());
+								string vehicleNumber(nparcNode.getText());
 								Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
 								if(vehicle)
 								{
@@ -172,11 +179,21 @@ namespace synthese
 									VehicleModule::GetCurrentVehiclePosition().setVehicle(vehicle);
 								}
 							}
+
+							stringstream reply;
+							ptime now(second_clock::local_time());
+							reply <<
+								"<IdReply><Type>SYNTHESE</Type><Id>1</Id>" <<
+								"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
+								"<Heure>" << now.time_of_day() << "</Heure>" <<
+								"</IdReply>\n";
+
+							boost::asio::write(socket, boost::asio::buffer(reply.str()));
 						}
-						else if(node.getName() == "MsgLoc")
+						else if(tagName == "MsgLoc")
 						{
 							// EtatLoc
-							XMLNode etatLocNode(node.getChildNode("EtatLoc"));
+							XMLNode etatLocNode(childNode.getChildNode("EtatLoc"));
 							if(!etatLocNode.isEmpty())
 							{
 								try
@@ -220,7 +237,7 @@ namespace synthese
 							}
 
 							// ZoneA
-							XMLNode zoneANode(node.getChildNode("ZoneA"));
+							XMLNode zoneANode(childNode.getChildNode("ZoneA"));
 							if(!zoneANode.isEmpty())
 							{
 								VehicleModule::GetCurrentVehiclePosition().setInStopArea(
@@ -229,7 +246,7 @@ namespace synthese
 							}
 
 							// Curv
-							XMLNode curvNode(node.getChildNode("Curv"));
+							XMLNode curvNode(childNode.getChildNode("Curv"));
 							if(!curvNode.isEmpty())
 							{
 								try
@@ -246,7 +263,7 @@ namespace synthese
 							}
 
 							// GPS
-							XMLNode gpsNode(node.getChildNode("GPS"));
+							XMLNode gpsNode(childNode.getChildNode("GPS"));
 							if(!gpsNode.isEmpty())
 							{
 								XMLNode longNode(gpsNode.getChildNode("Long"));
@@ -273,11 +290,20 @@ namespace synthese
 							}
 
 						}
-						else if(node.getName() == "MsgVoyage")
+						else if(tagName == "MsgVoyage")
 						{
-							XMLNode voyageNode(node.getChildNode("Voyage"));
+							XMLNode voyageNode(childNode.getChildNode("Voyage"));
 							if(!voyageNode.isEmpty())
 							{
+								XMLNode nligNode(voyageNode.getChildNode("NLig"));
+								if(!nligNode.isEmpty())
+								{
+									CommercialLine* line(
+										_theConnection->_dataSource->getObjectByCode<CommercialLine>(nligNode.getText())
+									);
+									VehicleModule::SetCurrentLine(line);
+								}
+
 								XMLNode listeArretsNode(voyageNode.getChildNode("ListeArrets"));
 								if(!listeArretsNode.isEmpty())
 								{
@@ -309,6 +335,30 @@ namespace synthese
 									}
 								}
 							}
+						}
+						else if(tagName == "GetStatus")
+						{
+							stringstream reply;
+							ptime now(second_clock::local_time());
+							reply <<
+								"<StatusReply>" <<
+								"<Id>1</Id>" <<
+								"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
+								"<Heure>" << now.time_of_day() << "</Heure>" <<
+								"<Etat>0</Etat>" <<
+								"<ListeTerm>" <<
+								"<BlocTerm>" <<
+								"<IdT>1</IdT>" <<
+								"<EtatT>0</EtatT>" <<
+								"</BlocTerm>" <<
+								"<BlocTerm>" <<
+								"<IdT>2</IdT>" <<
+								"<EtatT>0</EtatT>" <<
+								"</BlocTerm>" <<
+								"</ListeTerm>" <<
+								"</StatusReply>\n"
+							;
+							boost::asio::write(socket, boost::asio::buffer(reply.str()));
 						}
 
 

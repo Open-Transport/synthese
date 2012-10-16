@@ -50,6 +50,7 @@ namespace synthese
 			static const std::string TAG_POSITION;
 			static const std::string ATTR_STOP_REQUESTED;
 			static const std::string TAG_NEXT_STOP;
+			static const std::string TAG_COMMERCIAL_LINE;
 
 		public:
 			

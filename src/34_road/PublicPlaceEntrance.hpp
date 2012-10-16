@@ -24,8 +24,12 @@
 #define SYNTHESE_road_PublicPlaceEntrance_hpp__
 
 #include "Address.h"
+#include "AddressField.hpp"
+#include "DataSourceLinksField.hpp"
+#include "NumericField.hpp"
 #include "Object.hpp"
 #include "PublicPlace.h"
+#include "StringField.hpp"
 
 #include "ImportableTemplate.hpp"
 #include "Registrable.h"
@@ -40,7 +44,7 @@ namespace synthese
 			FIELD(Key),
 			FIELD(PublicPlace),
 			FIELD(Name),
-			FIELD(AddressData),
+			FIELD(AddressField),
 			FIELD(impex::DataSourceLinks)
 		> PublicPlaceEntranceSchema;
 

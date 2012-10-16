@@ -27,6 +27,7 @@
 #include "DBModule.h"
 #include "LinkException.h"
 #include "DataSource.h"
+#include "DataSourceLinksField.hpp"
 #include "DataSourceTableSync.h"
 #include "SelectQuery.hpp"
 #include "ReplaceQuery.h"
@@ -130,8 +131,7 @@ namespace synthese
 			ReplaceQuery<CrossingTableSync> query(*object);
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(
 				CrossingTableSync::SerializeNonReachableRoads(object->getNonReachableRoads())

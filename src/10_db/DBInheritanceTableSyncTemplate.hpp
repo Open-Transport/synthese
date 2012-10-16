@@ -68,6 +68,7 @@ namespace synthese
 				}
 				return l;
 			}
+			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
 
 		protected:
 			//! \name Static methods to implement by each derived class

@@ -25,11 +25,26 @@
 
 #include "UtilTypes.h" // TODO : merge this file in the current one
 
+#include <boost/optional.hpp>
+#include <boost/variant.hpp>
+#include <string>
 #include <vector>
 
 namespace synthese
 {
 	typedef std::vector<util::RegistryKeyType> LinkedObjectsIds;
+
+	typedef std::pair<char*, size_t> Blob;
+	typedef boost::variant<
+		boost::optional<std::string>,
+		bool,
+		int,
+		double,
+		util::RegistryKeyType,
+		boost::optional<Blob>
+	> Cell;
+
+	typedef std::vector<Cell> DBContent;
 }
 
 #endif // SYNTHESE__FrameworkTypes_hpp__

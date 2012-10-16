@@ -90,12 +90,7 @@ namespace synthese
 			Website* website,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<WebsiteTableSync> query(*website);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			website->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*website, transaction);
 		}
 
 

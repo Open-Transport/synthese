@@ -23,9 +23,12 @@
 #ifndef SYNTHESE_timetable_TimetableRowGroupItem_hpp__
 #define SYNTHESE_timetable_TimetableRowGroupItem_hpp__
 
+#include "NumericField.hpp"
 #include "Object.hpp"
+#include "PointerField.hpp"
 #include "Registrable.h"
 #include "Registry.h"
+#include "StringField.hpp"
 
 #include "StopArea.hpp"
 #include "TimetableRowGroup.hpp"

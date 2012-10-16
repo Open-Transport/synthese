@@ -23,6 +23,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 #include "SentScenarioInheritedTableSync.h"
+
+#include "DataSourceLinksField.hpp"
 #include "SentScenario.h"
 #include "AlarmTemplateInheritedTableSync.h"
 #include "ScenarioSentAlarmInheritedTableSync.h"
@@ -153,8 +155,7 @@ namespace synthese
 			query.addField(obj->getTemplate() ? obj->getTemplate()->getKey() : RegistryKeyType(0));
 			query.addField(
 				DataSourceLinks::Serialize(
-					obj->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					obj->getDataSourceLinks()
 			)	);
 			query.execute(transaction);
 

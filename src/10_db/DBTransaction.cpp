@@ -34,7 +34,14 @@ namespace synthese
 	{
 		void DBTransaction::addQuery(const string& sql)
 		{
-			_queries.push_back(sql);
+			_queries.push_back(Query(sql));
+		}
+
+
+
+		void DBTransaction::addStmt( const DBRecord& record )
+		{
+			_queries.push_back(Query(record));
 		}
 
 
@@ -80,17 +87,4 @@ namespace synthese
 		{
 			return _modifEvents;
 		}
-
-
-
-		std::string DBTransaction::getSQL() const
-		{
-			stringstream str;
-			BOOST_FOREACH(const string& sql, _queries)
-			{
-				str << sql;
-			}
-			return str.str();
-		}
-	}
-}
+}	}

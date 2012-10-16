@@ -23,16 +23,21 @@
 #ifndef SYNTHESE_PTServiceConfig_H
 #define SYNTHESE_PTServiceConfig_H
 
+#include "NumericField.hpp"
+#include "Object.hpp"
+
 #include "AccessParameters.h"
 #include "City.h"
+#include "DaysField.hpp"
 #include "GeographyModule.h"
 #include "GraphTypes.h"
 #include "HourPeriod.h"
+#include "HourPeriodsField.hpp"
 #include "LexicalMatcher.h"
-#include "Object.hpp"
+#include "NumericField.hpp"
 #include "RoadModule.h"
 #include "RollingStockFilter.h"
-#include "StandardFields.hpp"
+#include "StringField.hpp"
 #include "UtilConstants.h"
 
 #include <set>
@@ -58,12 +63,11 @@ namespace synthese
 
 	namespace pt_website
 	{
-		FIELD_TYPE(OnlineBookingActivated, bool)
-		FIELD_TYPE(UseOldData, bool)
-		FIELD_TYPE(MaxConnections, size_t)
-		FIELD_TYPE(UseDatesRange, boost::gregorian::date_duration)
-		FIELD_TYPE(Periods, std::vector<HourPeriod>)
-		FIELD_TYPE(DisplayRoadApproachDetails, bool)
+		FIELD_BOOL(OnlineBookingActivated)
+		FIELD_BOOL(UseOldData)
+		FIELD_SIZE_T(MaxConnections)
+		FIELD_DAYS(UseDatesRange)
+		FIELD_BOOL(DisplayRoadApproachDetails)
 
 
 		typedef boost::fusion::map<
@@ -73,7 +77,7 @@ namespace synthese
 			FIELD(UseOldData),
 			FIELD(MaxConnections),
 			FIELD(UseDatesRange),
-			FIELD(Periods),
+			FIELD(HourPeriods),
 			FIELD(DisplayRoadApproachDetails)
 		> PTServiceConfigSchema;
 
