@@ -50,12 +50,12 @@ namespace synthese
 		class City;
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Shapefile file format.
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class StopsShapeFileFormat:
 			public impex::FileFormatTemplate<StopsShapeFileFormat>
 		{
@@ -104,7 +104,7 @@ namespace synthese
 					boost::optional<std::string> _valueForwardBackwardDirection;
 				//@}
 
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 
 			protected:
 

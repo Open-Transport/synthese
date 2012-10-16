@@ -62,6 +62,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -78,7 +79,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,ObitiFileFormat>::FACTORY_KEY("Obiti");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string ObitiFileFormat::Importer_::FILE_ARRET("arrets");
 		const std::string ObitiFileFormat::Importer_::FILE_ITINERAIRES("itineraires");
@@ -112,7 +113,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool ObitiFileFormat::Importer_::_checkPathsMap() const
 		{

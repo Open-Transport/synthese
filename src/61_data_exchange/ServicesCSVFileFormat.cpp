@@ -65,6 +65,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -81,7 +82,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,ServicesCSVFileFormat>::FACTORY_KEY("ServicesCSV");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string ServicesCSVFileFormat::Importer_::PATH_SERVICES("services");
 
@@ -107,7 +108,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool ServicesCSVFileFormat::Importer_::_checkPathsMap() const
 		{
