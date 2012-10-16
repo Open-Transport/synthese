@@ -354,6 +354,18 @@ namespace synthese
 			;
 		}
 
+		
+		
+		void DBInterSYNTHESE::ContentGetter::operator()( const size_t& i ) const
+		{
+			string s(lexical_cast<string>(i));
+			_result <<
+				0 << DBInterSYNTHESE::FIELD_SEPARATOR <<
+				s.size() << DBInterSYNTHESE::FIELD_SEPARATOR <<
+				s
+			;
+		}
+
 
 
 		void DBInterSYNTHESE::ContentGetter::operator()( const double& d ) const

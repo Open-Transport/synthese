@@ -52,10 +52,10 @@ namespace synthese
 			, const void* object
 			, const server::Request* request) const
 		{
-			stream << (
+			stream << ((
 					lexical_cast<RegistryKeyType>(trim_copy(_left->getValue(parameters, variables, object, request))) >
 					lexical_cast<RegistryKeyType>(trim_copy(_right->getValue(parameters, variables, object, request)))
-				) ? "1" : "0";
+				) ? "1" : "0");
 			return string();
 		}
 

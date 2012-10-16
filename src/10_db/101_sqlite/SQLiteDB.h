@@ -80,6 +80,7 @@ namespace synthese
 
 				void operator()(const int& i) const;
 				void operator()(const double& d) const;
+				void operator()(const size_t& s) const;
 				void operator()(const util::RegistryKeyType& id) const;
 				void operator()(const boost::optional<std::string>& str) const;
 				void operator()(const boost::optional<Blob>& blob) const;

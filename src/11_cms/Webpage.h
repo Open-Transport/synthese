@@ -35,6 +35,7 @@
 #include "NumericField.hpp"
 #include "PointerField.hpp"
 #include "PtimeField.hpp"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "PointersVectorField.hpp"
 #include "WebpageContent.hpp"

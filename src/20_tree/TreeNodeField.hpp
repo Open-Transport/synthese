@@ -25,167 +25,172 @@
 
 #include "ComplexObjectFieldDefinition.hpp"
 
+#include "NumericField.hpp"
+
 #include <boost/lexical_cast.hpp>
 
 namespace synthese
 {
-	//////////////////////////////////////////////////////////////////////////
-	/// date partial specialization
-	template<class C, class T>
-	class TreeNodeField:
-		public ComplexObjectFieldDefinition<C>
+	namespace tree
 	{
-	public:
-		typedef void* Type;
+		//////////////////////////////////////////////////////////////////////////
+		/// Tree node field.
+		/// @ingroup m20
+		template<class C, class T>
+		class TreeNodeField:
+			public ComplexObjectFieldDefinition<C>
+		{
+		public:
+			typedef void* Type;
 
-	private:
+		private:
 
 
-	public:
-		static void LoadFromRecord(
-			typename Type& fieldObject,
-			ObjectBase& object,
-			const Record& record,
-			const util::Env& env
-		){
-			assert(dynamic_cast<T*>(&object));
-			T& t(static_cast<T&>(object));
+		public:
+			static void LoadFromRecord(
+				typename TreeNodeField<C, T>::Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			){
+				assert(dynamic_cast<T*>(&object));
+				T& t(static_cast<T&>(object));
 
-			if(record.isDefined(FIELDS[2].name))
-			{
-				t.setRank(
-					record.getDefault<size_t>(
-						ComplexObjectFieldDefinition<C>::FIELDS[2].name,
-						0
-				)	);
-			}
-
-			if(record.isDefined(FIELDS[1].name))
-			{
-				util::RegistryKeyType up_id(
-					record.getDefault<util::RegistryKeyType>(
-						ComplexObjectFieldDefinition<C>::FIELDS[1].name,
-						0
-				)	);
-				if(up_id > 0)
+				if(record.isDefined(ComplexObjectFieldDefinition<C>::FIELDS[2].name))
 				{
-					try
+					t.setRank(
+						record.getDefault<size_t>(
+							ComplexObjectFieldDefinition<C>::FIELDS[2].name,
+							0
+					)	);
+				}
+
+				if(record.isDefined(ComplexObjectFieldDefinition<C>::FIELDS[1].name))
+				{
+					util::RegistryKeyType up_id(
+						record.getDefault<util::RegistryKeyType>(
+							ComplexObjectFieldDefinition<C>::FIELDS[1].name,
+							0
+					)	);
+					if(up_id > 0)
 					{
-						t.setParent(env.getEditable<T>(up_id).get());
+						try
+						{
+							t.setParent(env.getEditable<T>(up_id).get());
+						}
+						catch(util::ObjectNotFoundException<T>&)
+						{
+							util::Log::GetInstance().warn(
+								"Data corrupted in on node " + boost::lexical_cast<std::string>(object.getKey()) +" : up node " +
+								boost::lexical_cast<std::string>(up_id) + " not found"
+							);
+						}
 					}
-					catch(util::ObjectNotFoundException<T>&)
+					else
 					{
-						util::Log::GetInstance().warn(
-							"Data corrupted in on node " + boost::lexical_cast<std::string>(t.get<Key>()) +" : up node " +
-							boost::lexical_cast<std::string>(up_id) + " not found"
-						);
+						t.setParent(NULL);
 					}
 				}
-				else
+
+				if(record.isDefined(ComplexObjectFieldDefinition<C>::FIELDS[0].name))
 				{
-					t.setParent(NULL);
+					util::RegistryKeyType id(
+						record.getDefault<util::RegistryKeyType>(
+							ComplexObjectFieldDefinition<C>::FIELDS[0].name,
+							0
+					)	);
+					if(id > 0)
+					{
+						try
+						{
+							t.setRoot(env.getEditable<T::TreeRootType>(id).get());
+						}
+						catch(util::ObjectNotFoundException<typename T::TreeRootType>&)
+						{
+							util::Log::GetInstance().warn(
+								"Data corrupted in on node " + boost::lexical_cast<std::string>(object.getKey()) +" : root " +
+								boost::lexical_cast<std::string>(id) + " not found"
+							);
+						}
+					}
 				}
 			}
 
-			if(record.isDefined(FIELDS[0].name))
-			{
+
+
+			static void SaveToFilesMap(
+				const typename TreeNodeField<C, T>::Type& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			){
+			}
+
+
+
+			static void SaveToParametersMap(
+				const typename TreeNodeField<C, T>::Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			){
+				if(withFiles == true)
+				{
+					return;
+				}
+
+				assert(dynamic_cast<const T*>(&object));
+				const T& t(static_cast<const T&>(object));
+
+				map.insert(prefix + ComplexObjectFieldDefinition<C>::FIELDS[0].name, t.getRoot() ? t.getRoot()->getKey() : util::RegistryKeyType(0));
+				map.insert(prefix + ComplexObjectFieldDefinition<C>::FIELDS[1].name, t.getParent(true) ? t.getParent()->getKey() : util::RegistryKeyType(0));
+				map.insert(prefix + ComplexObjectFieldDefinition<C>::FIELDS[2].name, t.getRank());
+			}
+
+
+
+			static void SaveToDBContent(
+				const typename TreeNodeField<C, T>::Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			){
+				assert(dynamic_cast<const T*>(&object));
+				const T& t(static_cast<const T&>(object));
+
+				content.push_back(Cell(t.getRoot() ? t.getRoot()->getKey() : util::RegistryKeyType(0)));
+				content.push_back(Cell(t.getParent(true) ? t.getParent()->getKey() : util::RegistryKeyType(0)));
+				content.push_back(Cell(t.getRank()));
+			}
+
+
+
+			static void GetLinkedObjectsIds(
+				LinkedObjectsIds& list, 
+				const Record& record
+			){
 				util::RegistryKeyType id(
 					record.getDefault<util::RegistryKeyType>(
 						ComplexObjectFieldDefinition<C>::FIELDS[0].name,
 						0
 				)	);
-				if(id > 0)
+				if (id > 0)
 				{
-					try
-					{
-						t.setRoot(env.getEditable<T::TreeRootType>(id).get());
-					}
-					catch(util::ObjectNotFoundException<T::TreeRootType>&)
-					{
-						util::Log::GetInstance().warn(
-							"Data corrupted in on node " + boost::lexical_cast<std::string>(t.get<Key>()) +" : root " +
-							boost::lexical_cast<std::string>(id) + " not found"
-						);
-					}
+					list.push_back(id);
+				}
+
+				util::RegistryKeyType up_id(
+					record.getDefault<util::RegistryKeyType>(
+						ComplexObjectFieldDefinition<C>::FIELDS[1].name,
+						0
+				)	);
+				if (up_id > 0)
+				{
+					list.push_back(up_id);
 				}
 			}
-		}
+		};
 
-
-
-		static void SaveToFilesMap(
-			const typename Type& fieldObject,
-			const ObjectBase& object,
-			FilesMap& map
-		){
-		}
-
-
-
-		static void SaveToParametersMap(
-			const typename Type& fieldObject,
-			const ObjectBase& object,
-			util::ParametersMap& map,
-			const std::string& prefix,
-			boost::logic::tribool withFiles
-		){
-			if(withFiles == true)
-			{
-				return;
-			}
-
-			assert(dynamic_cast<const T*>(&object));
-			const T& t(static_cast<const T&>(object));
-
-			map.insert(prefix + FIELDS[0].name, t.getRoot() ? t.getRoot()->getKey() : util::RegistryKeyType(0));
-			map.insert(prefix + FIELDS[1].name, t.getParent(true) ? t.getParent()->getKey() : util::RegistryKeyType(0));
-			map.insert(prefix + FIELDS[2].name, t.getRank());
-		}
-
-
-
-		static void SaveToDBContent(
-			const typename Type& fieldObject,
-			const ObjectBase& object,
-			DBContent& content
-		){
-			assert(dynamic_cast<const T*>(&object));
-			const T& t(static_cast<const T&>(object));
-
-			content.push_back(Cell(t.getRoot() ? t.getRoot()->getKey() : util::RegistryKeyType(0)));
-			content.push_back(Cell(t.getParent(true) ? t.getParent()->getKey() : util::RegistryKeyType(0)));
-			content.push_back(Cell(t.getRank()));
-		}
-
-
-
-		static void GetLinkedObjectsIds(
-			LinkedObjectsIds& list, 
-			const Record& record
-		){
-			util::RegistryKeyType id(
-				record.getDefault<util::RegistryKeyType>(
-					ComplexObjectFieldDefinition<C>::FIELDS[0].name,
-					0
-			)	);
-			if (id > 0)
-			{
-				list.push_back(id);
-			}
-
-			util::RegistryKeyType up_id(
-				record.getDefault<util::RegistryKeyType>(
-					FIELDS[1].name,
-					0
-			)	);
-			if (up_id > 0)
-			{
-				list.push_back(up_id);
-			}
-		}
-	};
-
-	#define FIELD_TREE_NODE(N, T) struct N : public TreeNodeField<N, T> {};
-}
+		#define FIELD_TREE_NODE(N, T) struct N : public tree::TreeNodeField<N, T> {};
+}	}
 
 #endif
