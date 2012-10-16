@@ -55,7 +55,7 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename StringField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -64,13 +64,13 @@ namespace synthese
 			{
 				return;
 			}
-			fieldObject = record.get<typename Type>(SimpleObjectFieldDefinition<C>::FIELD.name);
+			fieldObject = record.get<typename StringField<C>::Type>(SimpleObjectFieldDefinition<C>::FIELD.name);
 		}
 
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename StringField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -89,7 +89,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename StringField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -109,7 +109,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename StringField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
