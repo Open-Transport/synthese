@@ -64,7 +64,7 @@ namespace synthese
 		/// Conversion of a geometry into a string to be stored (SQL format).
 		/// @param g the geometry to convert
 		/// @return the converted string
-		static std::string _geomToString(const typename Type& g)
+		static std::string _geomToString(const typename GeometryField<C, T>::Type& g)
 		{
 			if(!g.get() || g->isEmpty())
 			{
@@ -88,7 +88,7 @@ namespace synthese
 		/// Conversion of a string into a geometry.
 		/// @param d the date to convert
 		/// @return the converted string
-		static typename Type _stringToGeom(const std::string& s)
+		static typename GeometryField<C, T>::Type _stringToGeom(const std::string& s)
 		{
 			geos::io::WKTReader reader(&CoordinatesSystem::GetStorageCoordinatesSystem().getGeometryFactory());
 
@@ -108,23 +108,23 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename GeometryField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<typename Type>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				_stringToGeom,
-				typename Type()
+				typename GeometryField<C, T>::Type()
 			);
 		}
 
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename GeometryField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -138,13 +138,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename GeometryField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -157,7 +157,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename GeometryField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){

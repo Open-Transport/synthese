@@ -71,7 +71,7 @@ namespace synthese
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<boost::gregorian::date>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				boost::gregorian::from_string,
@@ -102,7 +102,7 @@ namespace synthese
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<boost::gregorian::date>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,

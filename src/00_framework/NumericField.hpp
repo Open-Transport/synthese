@@ -49,15 +49,15 @@ namespace synthese
 
 
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename NumericField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<typename Type>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
-				boost::lexical_cast<typename Type, std::string>,
+				boost::lexical_cast<typename NumericField<C, T>::Type, std::string>,
 				0
 			);
 		}
@@ -65,32 +65,32 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename NumericField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToFilesMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				boost::lexical_cast<std::string, typename Type>
+				boost::lexical_cast<std::string, typename NumericField<C, T>::Type>
 			);
 		}
 
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename NumericField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
 				withFiles,
-				boost::lexical_cast<std::string, typename Type>
+				boost::lexical_cast<std::string, typename NumericField<C, T>::Type>
 			);
 		}
 
@@ -98,7 +98,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename NumericField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
