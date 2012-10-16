@@ -89,7 +89,7 @@ namespace synthese
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<HourPeriodsField>::_LoadFromStringWithDefaultValue<Type>(
+			SimpleObjectFieldDefinition<HourPeriodsField>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				UnSerialize,
@@ -117,7 +117,7 @@ namespace synthese
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<HourPeriodsField>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<HourPeriodsField>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,

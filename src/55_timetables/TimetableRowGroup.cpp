@@ -23,6 +23,7 @@
 #include "TimetableRowGroup.hpp"
 
 #include "RankUpdateQuery.hpp"
+#include "SchemaMacros.hpp"
 #include "TimetableRowGroupTableSync.hpp"
 #include "TimetableRowGroupItem.hpp"
 
