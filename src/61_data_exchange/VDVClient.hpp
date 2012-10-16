@@ -28,6 +28,7 @@
 #include "NumericField.hpp"
 #include "DataSource.h"
 #include "PointerField.hpp"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 
 

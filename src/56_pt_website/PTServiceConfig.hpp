@@ -37,6 +37,7 @@
 #include "NumericField.hpp"
 #include "RoadModule.h"
 #include "RollingStockFilter.h"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "UtilConstants.h"
 
