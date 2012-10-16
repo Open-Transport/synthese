@@ -69,7 +69,7 @@ namespace synthese
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Table which the objects to link belongs to.
-			virtual const util::RegistryTableType getTableId() const = 0;
+			virtual util::RegistryTableType getTableId() const = 0;
 
 			//////////////////////////////////////////////////////////////////////////
 			/// Interface to administrate links to objects.
