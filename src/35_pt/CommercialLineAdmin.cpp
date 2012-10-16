@@ -76,6 +76,7 @@ using namespace boost::gregorian;
 namespace synthese
 {
 	using namespace admin;
+	using namespace data_exchange;
 	using namespace server;
 	using namespace util;
 	using namespace pt;
