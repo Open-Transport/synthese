@@ -32,7 +32,8 @@
 namespace synthese
 {
 	//////////////////////////////////////////////////////////////////////////
-	/// date partial specialization
+	/// Pointers vector field.
+	/// @ingroup m00
 	template<class C, class T>
 	class PointersVectorField:
 		public SimpleObjectFieldDefinition<C>
@@ -45,7 +46,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _vectorToString(const typename Type& p)
+		static std::string _vectorToString(const typename PointersVectorField<C, T>::Type& p)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -71,7 +72,7 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename PointersVectorField<C, T>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -119,7 +120,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename PointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -133,13 +134,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename PointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -152,7 +153,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename PointersVectorField<C, T>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
