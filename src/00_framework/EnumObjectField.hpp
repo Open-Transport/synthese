@@ -38,14 +38,18 @@ namespace synthese
 
 	private:
 		static std::string _enumToString(
-			const typename Type& fieldObject
+			const typename EnumObjectField<C, P>::Type& fieldObject
 		){
 			return boost::lexical_cast<std::string>(static_cast<int>(fieldObject));
 		}
 
 	public:
-		static void LoadFromRecord(P& fieldObject, ObjectBase& object, const Record& record, const util::Env& env)
-		{
+		static void LoadFromRecord(
+			typename EnumObjectField<C, P>::Type& fieldObject,
+			ObjectBase& object,
+			const Record& record,
+			const util::Env& env
+		){
 			if(record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 			{
 				fieldObject = static_cast<P>(record.get<int>(SimpleObjectFieldDefinition<C>::FIELD.name));
@@ -55,7 +59,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const P& fieldObject,
+			const typename EnumObjectField<C, P>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -70,7 +74,7 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const P& fieldObject,
+			const typename EnumObjectField<C, P>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -89,7 +93,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const P& fieldObject,
+			const typename EnumObjectField<C, P>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
