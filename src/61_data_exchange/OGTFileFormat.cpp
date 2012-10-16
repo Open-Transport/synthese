@@ -39,8 +39,10 @@ using namespace boost::posix_time;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace graph;
 	using namespace impex;
+	using namespace pt;
 	using namespace calendar;
 	using namespace db;
 	using namespace util;
@@ -49,10 +51,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,pt::OGTFileFormat>::FACTORY_KEY("OGT");
+		template<> const string FactorableTemplate<FileFormat, OGTFileFormat>::FACTORY_KEY("OGT");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool OGTFileFormat::Importer_::_parse(
 			const boost::filesystem::path& filePath,

@@ -42,7 +42,7 @@ namespace synthese
 		class Calendar;
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
 		/// OGT file format.
@@ -90,15 +90,15 @@ namespace synthese
 							const impex::DataSource& _dataSource;
 							util::Env& _env;
 							std::ostream& _stream;
-							CommercialLine* line;
+							pt::CommercialLine* line;
 							bool wayBack;
 							bool importTrip;
 							std::string tripNumber;
-							JourneyPattern::StopsWithDepartureArrivalAuthorization tripStops;
-							SchedulesBasedService::Schedules departureSchedules;
-							SchedulesBasedService::Schedules arrivalSchedules;
+							pt::JourneyPattern::StopsWithDepartureArrivalAuthorization tripStops;
+							pt::SchedulesBasedService::Schedules departureSchedules;
+							pt::SchedulesBasedService::Schedules arrivalSchedules;
 							boost::posix_time::time_duration arrivalSchedule;
-							impex::ImportableTableSync::ObjectBySource<StopPointTableSync> stopPoints;
+							impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> stopPoints;
 
 							expat_user_data(
 								const impex::DataSource& dataSource,
