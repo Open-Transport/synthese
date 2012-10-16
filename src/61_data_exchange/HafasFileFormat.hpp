@@ -55,10 +55,13 @@ namespace synthese
 	{
 		class TransportNetwork;
 		class RollingStock;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Hafas file format.
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		//////////////////////////////////////////////////////////////////////////
 		/// The Hafas export reads 4 files :
 		///	<ul>
@@ -132,7 +135,7 @@ namespace synthese
 			private:
 				//! @name Parameters
 				//@{
-					boost::shared_ptr<TransportNetwork> _network;
+					boost::shared_ptr<pt::TransportNetwork> _network;
 					bool _showStopsOnly;
 					std::size_t _wayBackBitPosition;
 					bool _importFullServices;
@@ -147,7 +150,7 @@ namespace synthese
 					std::string name;
 					bool main;
 					boost::shared_ptr<geos::geom::Point> point;
-					mutable std::set<StopPoint*> stops;
+					mutable std::set<pt::StopPoint*> stops;
 					boost::posix_time::time_duration defaultTransferDuration;
 					std::set<std::string> gleisSet;
 					bool used;

@@ -6,8 +6,28 @@ set(data_exchange_SRCS
   DataExchangeModule.inc.cpp
   DataExchangeModule.hpp
   DataExchangeModuleRegister.cpp
+  GTFSFileFormat.cpp
+  GTFSFileFormat.hpp
+  HafasFileFormat.cpp
+  HafasFileFormat.hpp
+  HastusCSVFileFormat.cpp
+  HastusCSVFileFormat.hpp
+  HastusInterfaceFileFormat.cpp
+  HastusInterfaceFileFormat.hpp
+  HeuresFileFormat.cpp
+  HeuresFileFormat.hpp
+  IneoFileFormat.cpp
+  IneoFileFormat.hpp
   IneoNCEConnection.cpp
   IneoNCEConnection.hpp
+  IneoRealTimeFileFormat.cpp
+  IneoRealTimeFileFormat.hpp
+  PTDataCleanerFileFormat.cpp
+  PTDataCleanerFileFormat.hpp
+  RTMFileFormat.cpp
+  RTMFileFormat.hpp
+  TridentFileFormat.cpp
+  TridentFileFormat.h
   VDVSubscriptionService.cpp
   VDVSubscriptionService.hpp
   VDVClient.cpp
