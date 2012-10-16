@@ -394,7 +394,7 @@ namespace synthese
 				// Draw OpenLayers map
 				stream << "<div id=\"map\" style=\"height:600px; width:800px;\" class=\"olMap\"></div>";
 //				stream << "<!--[if IE]><script src=\"/map/js/excanvas.js\"></script><![endif]-->";
-				stream << "<script src=\"/map/vendor/OpenLayers/OpenLayers.js\" type=\"text/javascript\"></script>";
+				stream << "<script src=\"/map/vendor/OpenLayers-2.11/OpenLayers.js\" type=\"text/javascript\"></script>";
 				stream << "<script src=\"/map/js/IsochronLayer.js\" type=\"text/javascript\"></script>";
 				stream << "<script type=\"text/javascript\">";
 				stream << "var map;" << endl;
