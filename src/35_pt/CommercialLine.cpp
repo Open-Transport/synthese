@@ -22,6 +22,7 @@
 
 #include "CommercialLine.h"
 
+#include "DataSourceLinksField.hpp"
 #include "Registry.h"
 #include "GraphConstants.h"
 #include "AllowedUseRule.h"
@@ -216,7 +217,7 @@ namespace synthese
 			pm.insert(prefix + DATA_LINE_CREATOR_ID,
 				getDataSourceLinks().size() == 1 ?
 				lexical_cast<string>(getDataSourceLinks().begin()->second) :
-				impex::DataSourceLinks::Serialize(getDataSourceLinks(), pm.getFormat())
+				impex::DataSourceLinks::Serialize(getDataSourceLinks())
 			);
 			if(getColor())
 			{

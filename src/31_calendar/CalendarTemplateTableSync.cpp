@@ -27,6 +27,7 @@
 #include "CalendarTemplateElementTableSync.h"
 #include "CalendarRight.h"
 #include "CalendarTemplateElementTableSync.h"
+#include "DataSourceLinksField.hpp"
 #include "ImportableTableSync.hpp"
 #include "Profile.h"
 #include "ReplaceQuery.h"
@@ -157,8 +158,7 @@ namespace synthese
 			query.addField(static_cast<int>(object->getCategory()));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getParent(true) ? object->getParent()->getKey() : 0);
 			query.execute(transaction);

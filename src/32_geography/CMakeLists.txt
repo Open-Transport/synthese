@@ -37,6 +37,8 @@ MapSourceUpdateAction.cpp
 MapSourceUpdateAction.hpp
 NamedPlace.cpp
 NamedPlace.h
+NamedPlaceField.cpp
+NamedPlaceField.hpp
 NamedPlaceTemplate.h
 Place.cpp
 Place.h

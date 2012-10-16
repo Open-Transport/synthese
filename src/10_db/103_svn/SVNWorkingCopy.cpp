@@ -56,47 +56,6 @@ namespace synthese
 
 
 
-	template<>
-	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::UnSerialize(
-		SVNWorkingCopy& fieldObject,
-		const string& text,
-		const Env& env
-	){
-		fieldObject.setRepo(SVNRepository(text));
-	}
-
-
-
-	template<>
-	string ObjectField<SVNWorkingCopy, SVNWorkingCopy>::Serialize(
-		const SVNWorkingCopy& fieldObject,
-		util::ParametersMap::SerializationFormat format
-	){
-		stringstream str;
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			str << "'";
-		}
-		str << fieldObject.getRepo().getURL();
-		if(format == ParametersMap::FORMAT_SQL)
-		{
-			str << "'";
-		}
-
-		return str.str();
-	}
-
-
-
-	template<>
-	void ObjectField<SVNWorkingCopy, SVNWorkingCopy>::GetLinkedObjectsIdsFromText(
-		LinkedObjectsIds& list,
-		const std::string& text
-	){
-	}
-
-
-
 	namespace db
 	{
 		namespace svn
@@ -659,6 +618,87 @@ namespace synthese
 					string keyStr(lexical_cast<string>(_object->getKey()));
 					_path = SVNModule::GetSVNWCRootPath() / keyStr;
 				}
+			}
+
+
+
+			void SVNWorkingCopy::from_string( const std::string& text )
+			{
+				setRepo(SVNRepository(text));
+			}
+
+
+
+			void SVNWorkingCopy::LoadFromRecord(
+				Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_UpdateFromString(
+					fieldObject,
+					record,
+					&from_string
+				);
+			}
+
+
+
+			std::string SVNWorkingCopy::to_string() const
+			{
+				return getRepo().getURL();
+			}
+
+
+
+			void SVNWorkingCopy::SaveToFilesMap(
+				const SVNWorkingCopy& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_SaveToFilesMap(
+					fieldObject,
+					map,
+					&to_string
+				);
+			}
+
+
+
+			void SVNWorkingCopy::SaveToParametersMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			){
+				SimpleObjectFieldDefinition<SVNWorkingCopy>::_SaveToParametersMap(
+					fieldObject,
+					map,
+					prefix,
+					withFiles,
+					&to_string
+				);
+			}
+
+
+
+			void SVNWorkingCopy::SaveToDBContent(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			){
+				boost::optional<std::string> text(
+					fieldObject.getRepo().getURL()
+				);
+				content.push_back(Cell(text));
+			}
+
+
+
+			void SVNWorkingCopy::GetLinkedObjectsIds( LinkedObjectsIds& list, const Record& record )
+			{
+
 			}
 }	}	}
 

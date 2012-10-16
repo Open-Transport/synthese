@@ -546,11 +546,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= _configuration->get<Periods>().size())
+					if (_periodId >= _configuration->get<HourPeriods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &_configuration->get<Periods>().at(_periodId);
+					_period = &_configuration->get<HourPeriods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else

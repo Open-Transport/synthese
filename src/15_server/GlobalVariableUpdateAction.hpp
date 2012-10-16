@@ -51,10 +51,12 @@ namespace synthese
 		public:
 			static const std::string PARAMETER_VARIABLE;
 			static const std::string PARAMETER_VALUE;
+			static const std::string PARAMETER_PERSISTENT;
 
 		private:
 			std::string _variable;
 			std::string _value;
+			bool _persistent;
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -71,6 +73,10 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
+			GlobalVariableUpdateAction();
+
+
+
 			//////////////////////////////////////////////////////////////////////////
 			/// The action execution code.
 			/// @param request the request which has launched the action

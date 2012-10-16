@@ -25,6 +25,9 @@
 #include "GlobalVariableUpdateAction.hpp"
 
 #include "ActionException.h"
+#include "Conversion.h"
+#include "DbModuleConfigTableSync.h"
+#include "DBTransaction.hpp"
 #include "GlobalRight.h"
 #include "ModuleClass.h"
 #include "ParametersMap.h"
@@ -37,6 +40,7 @@ using namespace std;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace server;
 	using namespace security;
 	using namespace util;
@@ -48,7 +52,15 @@ namespace synthese
 	{
 		const string GlobalVariableUpdateAction::PARAMETER_VARIABLE = Action_PARAMETER_PREFIX + "_variable";
 		const string GlobalVariableUpdateAction::PARAMETER_VALUE = Action_PARAMETER_PREFIX + "_value";
-		
+		const string GlobalVariableUpdateAction::PARAMETER_PERSISTENT = Action_PARAMETER_PREFIX + "_persistent";
+
+
+
+		GlobalVariableUpdateAction::GlobalVariableUpdateAction(
+		):	FactorableTemplate<server::Action, GlobalVariableUpdateAction>(),
+			_persistent(false)
+		{}
+
 		
 		
 		ParametersMap GlobalVariableUpdateAction::getParametersMap() const
@@ -63,6 +75,7 @@ namespace synthese
 		{
 			_variable = map.get<string>(PARAMETER_VARIABLE);
 			_value = map.getDefault<string>(PARAMETER_VALUE);
+			_persistent = map.getDefault<bool>(PARAMETER_PERSISTENT, false);
 		}
 		
 		
@@ -70,8 +83,28 @@ namespace synthese
 		void GlobalVariableUpdateAction::run(
 			Request& request
 		){
+			if(_persistent)
+			{ // Persistent mode
+				DBTransaction transaction;
 
-			ModuleClass::SetParameter(_variable, _value);
+				stringstream query1;
+				query1 <<
+					"DELETE FROM " << DbModuleConfigTableSync::TABLE.NAME << " WHERE " <<
+					DbModuleConfigTableSync::COL_PARAMNAME << "=" << Conversion::ToDBString(_variable);
+				transaction.addQuery(query1.str());
+
+				stringstream query2;
+				query2 <<
+					"INSERT INTO " << DbModuleConfigTableSync::TABLE.NAME << " VALUES(" <<
+					Conversion::ToDBString(_variable) << "," << Conversion::ToDBString(_value) <<
+					")";
+				transaction.addQuery(query2.str());
+
+				transaction.run();
+			}
+			{ // Necessary in the two modes because the database triggers are not available in t999 table (to be fixed)
+				ModuleClass::SetParameter(_variable, _value);
+			}
 		}
 		
 		

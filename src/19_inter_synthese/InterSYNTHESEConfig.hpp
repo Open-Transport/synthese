@@ -25,7 +25,9 @@
 
 #include "Object.hpp"
 
-#include "StandardFields.hpp"
+#include "MinutesField.hpp"
+#include "NumericField.hpp"
+#include "StringField.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
@@ -36,8 +38,8 @@ namespace synthese
 	{
 		class InterSYNTHESEConfigItem;
 
-		FIELD_TYPE(LinkBreakMinutes, boost::posix_time::time_duration)
-		FIELD_TYPE(MaxQueriesNumber, size_t)
+		FIELD_MINUTES(LinkBreakMinutes)
+		FIELD_SIZE_T(MaxQueriesNumber)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -57,6 +59,7 @@ namespace synthese
 			public Object<InterSYNTHESEConfig, InterSYNTHESEConfigRecord>
 		{
 		public:
+			static const std::string TAG_ITEM;
 		
 			/// Chosen registry class.
 			typedef util::Registry<InterSYNTHESEConfig>	Registry;
@@ -72,6 +75,16 @@ namespace synthese
 			//! @name Services
 			//@{
 				const Items& getItems() const { return _items; }
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Adds parameters that are not intended to be saved (i.e. generated content).
+				/// The default implementation adds nothing. This method may be overloaded
+				/// @param map the map to populate
+				/// @param prefix prefix to add to the keys of the map items
+				virtual void addAdditionalParameters(
+					util::ParametersMap& map,
+					std::string prefix = std::string()
+				) const;
 			//@}
 
 			//! @name Modifiers

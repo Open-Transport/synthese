@@ -23,14 +23,20 @@
 #ifndef SYNTHESE_tree_TreeFolderDownNodeInterface_hpp__
 #define SYNTHESE_tree_TreeFolderDownNodeInterface_hpp__
 
-#include "SimpleObjectField.hpp"
-#include "SchemaMacros.hpp"
+#include "SimpleObjectFieldDefinition.hpp"
+
+#include "FrameworkTypes.hpp"
 
 #include <boost/logic/tribool.hpp>
 
 namespace synthese
 {
-	struct Parent;
+	class ObjectBase;
+
+	namespace util
+	{
+		class Env;
+	}
 
 	namespace tree
 	{
@@ -41,8 +47,12 @@ namespace synthese
 		/** TreeFolderDownNodeInterface class.
 			@ingroup m20
 		*/
-		class TreeFolderDownNodeInterface
+		class TreeFolderDownNodeInterface:
+			public SimpleObjectFieldDefinition<TreeFolderDownNodeInterface>
 		{
+		public:
+			typedef tree::TreeFolderUpNode* Type;
+
 		private:
 			TreeFolderRoot* _root;
 			TreeFolderUpNode*	_parent;
@@ -87,44 +97,38 @@ namespace synthese
 
 			TreeFolder* getParentFolder() const;
 
+			static void LoadFromRecord(
+				Type& fieldObject,
+				ObjectBase& object,
+				const Record& record,
+				const util::Env& env
+			);
 
-			friend class ObjectField<Parent, tree::TreeFolderUpNode*>;
+			static void SaveToParametersMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			);
+
+			static void SaveToFilesMap(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				FilesMap& map
+			);
+
+			static void SaveToDBContent(
+				const Type& fieldObject,
+				const ObjectBase& object,
+				DBContent& content
+			);
+
+			static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
 		};
-	}
 
-
-
-	//////////////////////////////////////////////////////////////////////////
-	/// Pointers vector specialization
-	template<>
-	class ObjectField<Parent, tree::TreeFolderUpNode*>:
-		public SimpleObjectFieldDefinition<Parent>
-	{
-	public:
-		typedef tree::TreeFolderUpNode* Type;
-
-		static void LoadFromRecord(tree::TreeFolderUpNode* fieldObject, ObjectBase& object, const Record& record, const util::Env& env);
-		static void SaveToParametersMap(
-			tree::TreeFolderUpNode* fieldObject,
-			const ObjectBase& object,
-			util::ParametersMap& map,
-			const std::string& prefix,
-			boost::logic::tribool withFiles
-		);
-
-		static void SaveToFilesMap(
-			tree::TreeFolderUpNode* fieldObject,
-			const ObjectBase& object,
-			FilesMap& map
-		);
-
-		static void SaveToParametersMap(tree::TreeFolderUpNode* fieldObject, util::ParametersMap& map, const std::string& prefix);
-		static void GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record);
-	};
-
-
-
-	struct Parent : public ObjectField<Parent, tree::TreeFolderUpNode*> {};
-}
+		// Field class
+		typedef TreeFolderDownNodeInterface Parent;
+}	}
 
 #endif // SYNTHESE_tree_TreeFolderDownNodeInterface_hpp__

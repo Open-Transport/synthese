@@ -25,9 +25,13 @@
 
 #include "Object.hpp"
 
+#include "NumericField.hpp"
+#include "DataSourceLinksField.hpp"
+#include "DateField.hpp"
 #include "DriverService.hpp"
 #include "ImportableTemplate.hpp"
-#include "StandardFields.hpp"
+#include "MinutesField.hpp"
+#include "NumericField.hpp"
 
 #include <vector>
 #include <boost/optional.hpp>
@@ -37,12 +41,12 @@ namespace synthese
 {
 	namespace pt_operation
 	{
-		FIELD_TYPE(Amount, double)
-		FIELD_TYPE(MaxBoniAmount, double)
-		FIELD_TYPE(MaxBoniTime, boost::posix_time::time_duration)
-		FIELD_TYPE(WorkRange, boost::posix_time::time_duration)
-		FIELD_TYPE(WorkDuration, boost::posix_time::time_duration)
-		FIELD_TYPE(WithTicketSales, bool)
+		FIELD_DOUBLE(Amount)
+		FIELD_DOUBLE(MaxBoniAmount)
+		FIELD_MINUTES(MaxBoniTime)
+		FIELD_MINUTES(WorkRange)
+		FIELD_MINUTES(WorkDuration)
+		FIELD_BOOL(WithTicketSales)
 
 		typedef boost::fusion::map<
 			FIELD(Key),

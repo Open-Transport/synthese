@@ -22,9 +22,9 @@
 
 #include "WebPageTableSync.h"
 
+#include "DBRecord.hpp"
 #include "DBResult.hpp"
 #include "RankUpdateQuery.hpp"
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "SQLSingleOperatorExpression.hpp"
 #include "Website.hpp"
@@ -94,16 +94,12 @@ namespace synthese
 
 
 
-		template<> void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
+		template<>
+		void DBDirectTableSyncTemplate<WebPageTableSync,Webpage>::Save(
 			Webpage* webPage,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<WebPageTableSync> query(*webPage);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			webPage->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*webPage, transaction);
 		}
 
 

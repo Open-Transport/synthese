@@ -86,15 +86,10 @@ namespace synthese
 
 
 		template<> void DBDirectTableSyncTemplate<VDVServerTableSync,VDVServer>::Save(
-			VDVServer* website,
+			VDVServer* object,
 			optional<DBTransaction&> transaction
 		){
-			// Query
-			ReplaceQuery<VDVServerTableSync> query(*website);
-			ParametersMap map(ParametersMap::FORMAT_SQL);
-			website->toParametersMap(map);
-			query.setValues(map);
-			query.execute(transaction);
+			DBModule::GetDB()->replaceStmt(*object, transaction);
 		}
 
 

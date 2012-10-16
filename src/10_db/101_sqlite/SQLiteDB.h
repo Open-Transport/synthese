@@ -26,6 +26,7 @@
 
 #include "DB.hpp"
 #include "FactorableTemplate.h"
+#include "FrameworkTypes.hpp"
 
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/tss.hpp>
@@ -36,6 +37,7 @@ namespace synthese
 {
 	namespace db
 	{
+		class DBRecord;
 		class DBTableSync;
 
 		typedef struct
@@ -62,6 +64,40 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			boost::recursive_mutex _updateMutex;
 #endif
+			static std::vector<sqlite3_stmt*> _replaceStatements;
+
+			class DBRecordCellBindConvertor:
+				public boost::static_visitor<>
+			{
+				sqlite3_stmt& _stmt;
+				size_t _i;
+
+			public:
+				DBRecordCellBindConvertor(
+					sqlite3_stmt& stmt,
+					size_t i
+				);
+
+				void operator()(const int& i) const;
+				void operator()(const double& d) const;
+				void operator()(const util::RegistryKeyType& id) const;
+				void operator()(const boost::optional<std::string>& str) const;
+				void operator()(const boost::optional<Blob>& blob) const;
+			};
+
+			class RequestExecutor:
+				public boost::static_visitor<>
+			{
+				SQLiteDB& _db;
+
+			public:
+				RequestExecutor(
+					SQLiteDB& db
+				);
+
+				void operator()(const std::string& d);
+				void operator()(const DBRecord& r);
+			};
 
 		public:
 
@@ -70,6 +106,10 @@ namespace synthese
 
 			virtual void initForStandaloneUse();
 			virtual void preInit();
+			virtual void initPreparedStatements();
+			virtual void saveRecord(
+				const DBRecord& record
+			);
 
 			virtual DBResultSPtr execQuery(const SQLData& sql);
 			virtual void execTransaction(

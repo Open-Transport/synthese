@@ -22,6 +22,7 @@
 
 #include "ScheduledServiceTableSync.h"
 
+#include "DataSourceLinksField.hpp"
 #include "LoadException.h"
 #include "Path.h"
 #include "Profile.h"
@@ -345,8 +346,7 @@ namespace synthese
 			query.addField(object->encodeStops());
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 
 			// Dates to force

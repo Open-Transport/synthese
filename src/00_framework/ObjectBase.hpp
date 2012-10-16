@@ -174,6 +174,13 @@ namespace synthese
 
 
 			//////////////////////////////////////////////////////////////////////////
+			/// Exports the content of the object into a DBContent object (to be stored in
+			/// the database).
+			virtual DBContent toDBContent() const = 0;
+
+
+
+			//////////////////////////////////////////////////////////////////////////
 			/// Builds the list of object to get in the environment for current
 			/// object loading, according to the content of the record to load.
 			/// @param record the record to load

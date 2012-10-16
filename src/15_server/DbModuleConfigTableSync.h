@@ -56,9 +56,8 @@ namespace synthese
 			static const std::string COL_PARAMNAME;
 			static const std::string COL_PARAMVALUE;
 
-
-
-			 virtual const std::string& getTableName() const;
+		
+			virtual const std::string& getTableName() const;
 			void rowsAdded(
 				db::DB* db,
 				const db::DBResultSPtr& rows
@@ -84,9 +83,9 @@ namespace synthese
 				}
 				return l;
 			}
+			virtual FieldsList getFieldsList() const { return GetFieldsList(); }
 
 		};
-	}
-}
+}	}
 
 #endif

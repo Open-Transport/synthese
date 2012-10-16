@@ -22,7 +22,9 @@
 
 #include "VehicleService.hpp"
 
+#include "NumericField.hpp"
 #include "ScheduledService.h"
+#include "StringField.hpp"
 
 using namespace boost;
 using namespace std;
@@ -116,8 +118,8 @@ namespace synthese
 			ParametersMap& map,
 			bool recursive
 		) const	{
-			Key::SaveToParametersMap(getKey(), map);
-			Name::SaveToParametersMap(getName(), map);
+			map.insert(Key::FIELD.name, getKey());
+			map.insert(Name::FIELD.name, getName());
 
 			if(!recursive)
 			{

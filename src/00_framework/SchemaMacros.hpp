@@ -23,19 +23,10 @@
 #ifndef SYNTHESE__RecordMacros_hpp__
 #define SYNTHESE__RecordMacros_hpp__
 
-#define FIELD_TYPE(N, T) struct N : public ObjectField<N, T> {};
-#define FIELD_ENUM(N, T) struct N : public EnumObjectField<N, T> {};
-#define FIELD_TYPE_EXTERNAL_DATA(N) struct N : public ObjectField<N, void*> {};
-#define FIELD_COMPLEX_TYPE(N, T) struct N : public ComplexObjectField<N, T> {};
-#define FIELD_COMPLEX_TYPE_EXTERNAL_DATA(N) struct N : public ComplexObjectField<N, void*> {};
 #define FIELD(N) boost::fusion::pair<N, N::Type>
 #define FIELD_DEFAULT_CONSTRUCTOR(N) boost::fusion::make_pair<N>(N::Type())
 #define FIELD_VALUE_CONSTRUCTOR(N, V) boost::fusion::make_pair<N>(V)
 #define FIELD_COPY_CONSTRUCTOR(N, V) boost::fusion::make_pair<N>(N::Type(V))
-#define FIELD_COMPLEX_NO_LINKED_OBJECT_ID(N)	template<> \
-	void ComplexObjectField<N, N::Type>::GetLinkedObjectsIds(LinkedObjectsIds& list, const Record& record) {}
-#define FIELD_NO_LINKED_OBJECT_ID(N)	template<> \
-	void ObjectField<N, N::Type>::GetLinkedObjectsIdsFromText(LinkedObjectsIds& list, const std::string& record) {}
 #define FIELD_DEFINITION_OF_OBJECT(N, F, VF) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, SQL_INTEGER); \
 	template<> const Field SimpleObjectFieldDefinition<N::Vector>::FIELD = Field(VF, SQL_TEXT);
 #define FIELD_DEFINITION_OF_TYPE(N, F, T) 	template<> const Field SimpleObjectFieldDefinition<N>::FIELD = Field(F, T);

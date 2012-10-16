@@ -23,6 +23,7 @@
 #include "ImportableTableSync.hpp"
 #include "Importable.h"
 #include "DataSource.h"
+#include "DataSourceLinksField.hpp"
 #include "DataSourceTableSync.h"
 
 #include <sstream>

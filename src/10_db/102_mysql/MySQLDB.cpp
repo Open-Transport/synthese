@@ -26,15 +26,15 @@
 #include "102_mysql/MySQLException.hpp"
 #include "102_mysql/MySQLResult.hpp"
 #include "DBModule.h"
+#include "DBRecord.hpp"
 #include "DBTransaction.hpp"
 #include "FactorableTemplate.h"
 #include "Log.h"
 #include "ServerModule.h"
+#include "UtilTypes.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/lexical_cast.hpp>
-#include <my_global.h>
-#include <mysql.h>
 #include <errmsg.h>
 
 using namespace std;
@@ -48,7 +48,7 @@ using boost::thread;
 namespace synthese
 {
 	using namespace db;
-	using util::Log;
+	using namespace util;
 
 	namespace
 	{
@@ -86,6 +86,9 @@ namespace synthese
 
 	namespace db
 	{
+		std::vector<MYSQL_STMT*> MySQLDB::_replaceStatements;
+
+
 		MySQLDB::MySQLDB() :
 			_connection(NULL),
 			_mysqlThreadInitialized(cleanupThread),
@@ -183,20 +186,14 @@ namespace synthese
 
 		void MySQLDB::execTransaction(const DBTransaction& transaction)
 		{
-			std::stringstream ss;
-			ss << "START TRANSACTION;";
-			BOOST_FOREACH(const DBTransaction::Queries::value_type& querySql, transaction.getQueries())
+			_doExecUpdate("BEGIN TRANSACTION");
+			RequestExecutor executor(*this);
+			BOOST_FOREACH(const DBTransaction::Queries::value_type& query, transaction.getQueries())
 			{
-				ss << querySql;
+				boost::apply_visitor( executor, query );
 			}
-			ss << "COMMIT;";
-			string sql(ss.str());
-			// Don't log SQL statements used for filling spatial_ref_sys which can be quite noisy.
-			if (sql.find("spatial_ref_sys") == sql.npos)
-			{
-				Log::GetInstance().trace("MySQLDB::execTransaction " + sql);
-			}
-			_doExecUpdate(sql);
+			_doExecUpdate("COMMIT");
+			
 			DB::_finishTransaction(transaction);
 		}
 
@@ -206,8 +203,9 @@ namespace synthese
 		{
 			_ensureThreadInitialized();
 
-			if (sql.find("spatial_ref_sys") == sql.npos)
-			{
+			if(	Log::GetInstance().getLevel() > Log::LEVEL_TRACE &&
+				sql.find("spatial_ref_sys") == sql.npos
+			){
 				Log::GetInstance().trace("MySQLDB::execUpdate " + sql);
 			}
 
@@ -309,6 +307,70 @@ namespace synthese
 				"  proj4text VARCHAR(2048) NOT NULL "
 				")"
 			);
+		}
+
+
+
+		void MySQLDB::initPreparedStatements()
+		{
+			_replaceStatements.clear();
+			_replaceStatements.resize(
+				DBModule::GetTablesById().rbegin()->first + 1,
+				NULL
+			);
+			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
+			{
+				stringstream query;
+				query << "REPLACE INTO " << it.second->getFormat().NAME << " VALUES(";
+				bool first(true);
+				BOOST_FOREACH(const Field& field, it.second->getFieldsList())
+				{
+					if(first)
+					{
+						first = false;
+					}
+					else
+					{
+						query << ",";
+					}
+					if(field.isGeometry())
+					{
+						query << "GeomFromText(?)";
+					}
+					else
+					{
+						query << "?";
+					}
+				}
+				query << ")";
+				string queryStr(query.str());
+				MYSQL_STMT* stmt(
+					mysql_stmt_init(_connection)
+				);
+				mysql_stmt_prepare(
+					stmt,
+					queryStr.c_str(),
+					queryStr.size()
+				);
+				_replaceStatements[it.first] = stmt;
+			}
+		}
+
+
+
+		void MySQLDB::saveRecord(
+			const DBRecord& record
+		){
+			size_t fieldsNumber(record.getTable()->getFieldsList().size());
+			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
+			for(size_t i(0); i<fieldsNumber; ++i)
+			{
+				DBRecordCellBindConvertor visitor(*(bnd+i));
+				apply_visitor(visitor, record.getContent().at(i));
+			}
+			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			mysql_stmt_bind_param(stmt, bnd);
+			mysql_stmt_execute(stmt);
 		}
 
 
@@ -782,5 +844,101 @@ namespace synthese
 				mysql_errno(_connection)
 			);
 		}
-	}
-}
+
+
+
+
+
+		MySQLDB::DBRecordCellBindConvertor::DBRecordCellBindConvertor(
+			MYSQL_BIND& bnd
+		):	_bnd(bnd)
+		{}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const int& i ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONG;
+			_bnd.buffer = static_cast<void*>(const_cast<int*>(&i));
+			_bnd.buffer_length = 0;
+			_bnd.is_null_value = false;
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const double& d ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_DOUBLE;
+			_bnd.buffer = static_cast<void*>(const_cast<double*>(&d));
+			_bnd.buffer_length = 0;
+			_bnd.is_null_value = false;
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const util::RegistryKeyType& id ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONGLONG;
+			_bnd.buffer = static_cast<void*>(const_cast<RegistryKeyType*>(&id));
+			_bnd.buffer_length = 0;
+			_bnd.is_null_value = false;
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const boost::optional<std::string>& str ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_BLOB;
+			if(str)
+			{
+				_bnd.buffer = static_cast<void*>(const_cast<char*>(str->c_str()));
+				_bnd.buffer_length = str->size();
+				_bnd.is_null_value = false;
+			}
+			else
+			{
+				_bnd.is_null_value = true;
+			}
+		}
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const boost::optional<Blob>& blob ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_BLOB;
+			if(blob)
+			{
+				_bnd.buffer = static_cast<void*>(const_cast<char*>(blob->first));
+				_bnd.buffer_length = blob->second;
+				_bnd.is_null_value = false;
+			}
+			else
+			{
+				_bnd.is_null_value = true;
+			}
+		}
+
+
+
+
+		MySQLDB::RequestExecutor::RequestExecutor( MySQLDB& db ):
+			_db(db)
+		{
+
+		}
+
+
+
+
+		void MySQLDB::RequestExecutor::operator()( const std::string& d )
+		{
+			_db._doExecUpdate(d);
+		}
+
+
+
+		void MySQLDB::RequestExecutor::operator()( const DBRecord& r )
+		{
+			_db.saveRecord(r);
+		}
+}	}

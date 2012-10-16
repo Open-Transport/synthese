@@ -602,11 +602,11 @@ namespace synthese
 
 					// Time period
 					_periodId = map.get<size_t>(PARAMETER_PERIOD_ID);
-					if (_periodId >= _config->get<Periods>().size())
+					if (_periodId >= _config->get<HourPeriods>().size())
 					{
 						throw RequestException("Bad value for period id");
 					}
-					_period = &_config->get<Periods>().at(_periodId);
+					_period = &_config->get<HourPeriods>().at(_periodId);
 				}
 				// 1abcde : optional bounds specification
 				else

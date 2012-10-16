@@ -3,6 +3,8 @@ set_source_groups()
 set(road_SRCS
 Address.cpp
 Address.h
+AddressField.cpp
+AddressField.hpp
 Crossing.cpp
 Crossing.h
 CrossingTableSync.cpp

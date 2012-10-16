@@ -27,6 +27,7 @@
 
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmTableSync.h"
+#include "DataSourceLinksField.hpp"
 #include "DeparturesTableModule.h"
 #include "DisplayTypeTableSync.h"
 #include "JourneyPatternTableSync.hpp"
@@ -518,8 +519,7 @@ namespace synthese
 			query.addField(static_cast<int>(object->getSubScreenType()));
 			query.addField(
 				DataSourceLinks::Serialize(
-					object->getDataSourceLinks(),
-					ParametersMap::FORMAT_INTERNAL // temporary : to avoid double semicolons
+					object->getDataSourceLinks()
 			)	);
 			query.addField(object->getAllowCanceled());
 			query.execute(transaction);

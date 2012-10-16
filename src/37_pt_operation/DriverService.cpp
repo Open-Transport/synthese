@@ -88,8 +88,9 @@ namespace synthese
 			bool recursive,
 			const VehicleService* vehicleServiceFilter
 		) const	{
-			Key::SaveToParametersMap(getKey(), map);
-			Name::SaveToParametersMap(getName(), map);
+
+			map.insert(Key::FIELD.name, getKey());
+			map.insert(Name::FIELD.name, getName());
 
 			// Service times
 			map.insert(ATTR_WORK_DURATION, getWorkDuration());

@@ -25,8 +25,11 @@
 
 #include "Object.hpp"
 
+#include "NumericField.hpp"
 #include "DataSource.h"
-#include "StandardFields.hpp"
+#include "PointerField.hpp"
+#include "StringField.hpp"
+
 
 #include "VDVServer.hpp" // For DataSourcePointer (remove after refactoring)
 
@@ -44,10 +47,10 @@ namespace synthese
 	{
 		class VDVClientSubscription;
 
-		FIELD_TYPE(ReplyAddress, std::string)
-		FIELD_TYPE(ReplyPort, std::string)
-		FIELD_TYPE(DefaultDirection, std::string)
-		FIELD_TYPE(Active, bool)
+		FIELD_STRING(ReplyAddress)
+		FIELD_STRING(ReplyPort)
+		FIELD_STRING(DefaultDirection)
+		FIELD_BOOL(Active)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -57,7 +60,7 @@ namespace synthese
 			FIELD(ClientControlCentreCode),
 			FIELD(ServerControlCentreCode),
 			FIELD(ServiceCode),
-			FIELD(DataSourcePointer),
+			FIELD(impex::DataSource),
 			FIELD(DefaultDirection),
 			FIELD(Active),
 			FIELD(TracePath)

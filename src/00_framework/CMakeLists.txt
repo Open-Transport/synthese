@@ -1,10 +1,12 @@
 set_source_groups()
 
 set(framework_SRCS
-ComplexObjectField.hpp
 ComplexObjectFieldDefinition.hpp
 CoordinatesSystem.cpp
 CoordinatesSystem.hpp
+DateField.cpp
+DateField.hpp
+DaysField.hpp
 EnumObjectField.hpp
 Exception.cpp
 Exception.h
@@ -12,19 +14,28 @@ Field.cpp
 Field.hpp
 FilesMap.cpp
 FilesMap.hpp
-FrameworkTypes.hpp	
+FrameworkTypes.hpp
+GeometryField.cpp
+GeometryField.hpp
 Language.cpp
 Language.hpp
+MinutesField.hpp
+NumericField.cpp
+NumericField.hpp
 Object.hpp
 ObjectBase.cpp
 ObjectBase.hpp
+PointerField.hpp
+PtimeField.cpp
+PtimeField.hpp
 Record.cpp
 Record.hpp
 SchemaMacros.hpp
-SimpleObjectField.hpp
+SimpleMapField.hpp
 SimpleObjectFieldDefinition.hpp
-StandardFields.cpp
-StandardFields.hpp
+StringField.cpp
+StringField.hpp
+PointersVectorField.hpp
 WithGeometry.hpp
 )
 

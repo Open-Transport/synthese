@@ -29,7 +29,7 @@ namespace synthese
 	using namespace inter_synthese;
 	using namespace util;
 
-	CLASS_DEFINITION(InterSYNTHESEQueue, "t096_inter_synthese_queue", 94)
+	CLASS_DEFINITION(InterSYNTHESEQueue, "t096_inter_synthese_queue", 96)
 	FIELD_DEFINITION_OF_OBJECT(InterSYNTHESEQueue, "queue_id", "queue_ids")
 
 	FIELD_DEFINITION_OF_TYPE(RequestTime, "request_time", SQL_DATETIME)

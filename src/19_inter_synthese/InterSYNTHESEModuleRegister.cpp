@@ -11,6 +11,7 @@
 #include "InterSYNTHESEQueueTableSync.hpp"
 #include "InterSYNTHESESlaveTableSync.hpp"
 
+#include "InterSYNTHESEConfigsViewService.hpp"
 #include "InterSYNTHESESlavesViewService.hpp"
 #include "InterSYNTHESESlaveUpdateService.hpp"
 #include "InterSYNTHESEUpdateAckService.hpp"
@@ -26,6 +27,7 @@ void synthese::inter_synthese::moduleRegister()
 	synthese::inter_synthese::InterSYNTHESESlaveTableSync::integrate();
 	synthese::inter_synthese::InterSYNTHESEQueueTableSync::integrate();
 
+	synthese::inter_synthese::InterSYNTHESEConfigsViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlavesViewService::integrate();
 	synthese::inter_synthese::InterSYNTHESESlaveUpdateService::integrate();
 	synthese::inter_synthese::InterSYNTHESEUpdateAckService::integrate();

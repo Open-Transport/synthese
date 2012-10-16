@@ -191,9 +191,12 @@ namespace synthese
 				transaction
 			);
 
-			WebPageTableSync::Save(&object, transaction);
-
 			transaction.run();
+
+//			WebPageTableSync::Save(&object, transaction);
+			WebPageTableSync::Save(&object);
+
+//			transaction.run();
 
 //			::AddCreationEntry(object, request.getUser().get());
 		}

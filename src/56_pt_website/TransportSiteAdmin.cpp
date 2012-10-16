@@ -202,8 +202,8 @@ namespace synthese
 				cv.push_back("Heure fin");
 				HTMLTable ct(cv, ResultHTMLTable::CSS_CLASS);
 				stream << ct.open();
-				const Periods::Type& periods(_config->get<Periods>());
-				BOOST_FOREACH(const Periods::Type::value_type& period, periods)
+				const HourPeriods::Type& periods(_config->get<HourPeriods>());
+				BOOST_FOREACH(const HourPeriods::Type::value_type& period, periods)
 				{
 					stream << ct.row();
 					stream << ct.col() << period.getCaption();

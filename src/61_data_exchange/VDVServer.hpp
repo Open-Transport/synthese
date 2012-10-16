@@ -26,7 +26,9 @@
 #include "Object.hpp"
 
 #include "DataSource.h"
-#include "StandardFields.hpp"
+#include "NumericField.hpp"
+#include "StringField.hpp"
+#include "PointersVectorField.hpp"
 
 #include <boost/date_time/gregorian/gregorian.hpp>
 
@@ -41,13 +43,12 @@ namespace synthese
 	{
 		class VDVServerSubscription;
 
-		FIELD_TYPE(ServerAddress, std::string)
-		FIELD_TYPE(ServerPort, std::string)
-		FIELD_TYPE(DataSourcePointer, boost::optional<impex::DataSource&>)
-		FIELD_TYPE(ClientControlCentreCode, std::string)
-		FIELD_TYPE(ServerControlCentreCode, std::string)
-		FIELD_TYPE(ServiceCode, std::string)
-		FIELD_TYPE(TracePath, std::string)
+		FIELD_STRING(ServerAddress)
+		FIELD_STRING(ServerPort)
+		FIELD_STRING(ClientControlCentreCode)
+		FIELD_STRING(ServerControlCentreCode)
+		FIELD_STRING(ServiceCode)
+		FIELD_STRING(TracePath)
 		
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -57,7 +58,7 @@ namespace synthese
 			FIELD(ServerControlCentreCode),
 			FIELD(ClientControlCentreCode),
 			FIELD(ServiceCode),
-			FIELD(DataSourcePointer),
+			FIELD(impex::DataSource),
 			FIELD(TracePath)
 		> VDVServerRecord;
 

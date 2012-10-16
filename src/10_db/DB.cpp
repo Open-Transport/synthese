@@ -22,14 +22,18 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include "CoordinatesSystem.hpp"
 #include "DB.hpp"
+
+#include "CoordinatesSystem.hpp"
 #include "DBException.hpp"
+#include "DBInterSYNTHESE.hpp"
 #include "DBModule.h"
 #include "Factory.h"
+#include "InterSYNTHESEModule.hpp"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
 #include "Log.h"
+#include "ObjectBase.hpp"
 
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
@@ -38,6 +42,7 @@
 #include <boost/functional/hash.hpp>
 #endif
 
+using namespace boost;
 using namespace std;
 using boost::shared_ptr;
 using boost::lexical_cast;
@@ -431,6 +436,49 @@ namespace synthese
 
 				tableSync->rowsRemoved(this, rowIds);
 			}
+		}
+
+
+
+		void DB::replaceStmt(
+			ObjectBase& o,
+			optional<DBTransaction&> transaction
+		){
+			// Query
+			DBRecord r(*DBModule::GetTableSync(o.getClassNumber()));
+			if(!o.getKey())
+			{
+				o.setKey(r.getTable()->getNewId());
+			}
+			r.setContent(o.toDBContent());
+
+			if(transaction)
+			{
+				transaction->addStmt(r);
+			}
+			else
+			{
+				saveRecord(r);
+			}
+			addDBModifEvent(
+				DBModifEvent(
+					r.getTable()->getFormat().NAME,
+					MODIF_INSERT,
+					o.getKey()
+				),
+				transaction
+			);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			checkModificationEvents();
+#endif
+
+			// Synchro
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				DBInterSYNTHESE::FACTORY_KEY,
+				DBInterSYNTHESE::GetRStmtContent(r),
+				transaction
+			);
 		}
 	}
 }
