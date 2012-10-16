@@ -75,6 +75,7 @@ namespace synthese
 {
 	using namespace admin;
 	using namespace calendar;
+	using namespace data_exchange;
 	using namespace db;
 	using namespace geography;
 	using namespace graph;
@@ -91,7 +92,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,IneoFileFormat>::FACTORY_KEY("Ineo");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string IneoFileFormat::Importer_::FILE_PTF = "ptf";
 		const string IneoFileFormat::Importer_::FILE_PNT = "pnt";
@@ -149,7 +150,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool IneoFileFormat::Importer_::_checkPathsMap() const
 		{

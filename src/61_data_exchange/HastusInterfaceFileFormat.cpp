@@ -81,6 +81,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace geography;
 	using namespace util::XmlToolkit;
 	using namespace util;
@@ -95,10 +96,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,pt::HastusInterfaceFileFormat>::FACTORY_KEY("HastusInterface");
+		template<> const string FactorableTemplate<FileFormat, HastusInterfaceFileFormat>::FACTORY_KEY("HastusInterface");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string HastusInterfaceFileFormat::Importer_::PARAMETER_TRANSPORT_NETWORK_ID = "network_id";
 		const string HastusInterfaceFileFormat::Importer_::PARAMETER_FILE_NAME_IS_A_CALENDAR = "file_name_is_a_calendar";
@@ -661,9 +662,9 @@ namespace synthese
 
 
 
-		std::string synthese::pt::HastusInterfaceFileFormat::Importer_::_getTextField(
-			std::size_t start,
-			std::size_t length
+		string HastusInterfaceFileFormat::Importer_::_getTextField(
+			size_t start,
+			size_t length
 		) const	{
 			// Empty record
 			if(!_record)
@@ -697,11 +698,11 @@ namespace synthese
 
 
 
-		std::vector<std::string> synthese::pt::HastusInterfaceFileFormat::Importer_::_getNextVector(
+		vector<string> HastusInterfaceFileFormat::Importer_::_getNextVector(
 			double recordNumber,
-			std::size_t numberPosition,
-			std::size_t start,
-			std::size_t length
+			size_t numberPosition,
+			size_t start,
+			size_t length
 		) const	{
 
 			// Declarations

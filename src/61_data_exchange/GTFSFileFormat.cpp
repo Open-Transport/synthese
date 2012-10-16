@@ -80,6 +80,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace impex;
 	using namespace pt;
 	using namespace util;
@@ -96,7 +97,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,GTFSFileFormat>::FACTORY_KEY("GTFS");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string GTFSFileFormat::Importer_::FILE_STOPS("stops");
 		const std::string GTFSFileFormat::Importer_::FILE_TRANSFERS("transfers");
@@ -144,7 +145,7 @@ namespace synthese
 	}
 
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool GTFSFileFormat::Importer_::_checkPathsMap() const
 		{

@@ -79,6 +79,7 @@ using namespace geos::geom;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace geography;
 	using namespace util::XmlToolkit;
 	using namespace util;
@@ -93,10 +94,10 @@ namespace synthese
 
 	namespace util
 	{
-		template<> const string FactorableTemplate<FileFormat,pt::TridentFileFormat>::FACTORY_KEY("Trident");
+		template<> const string FactorableTemplate<FileFormat, TridentFileFormat>::FACTORY_KEY("Trident");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_STOPS("impstp");
 		const string TridentFileFormat::Importer_::PARAMETER_IMPORT_JUNCTIONS("impjun");

@@ -355,7 +355,7 @@ namespace synthese
 		}
 
 		
-		
+#ifndef _WINDOWS
 		void DBInterSYNTHESE::ContentGetter::operator()( const size_t& i ) const
 		{
 			string s(lexical_cast<string>(i));
@@ -365,7 +365,7 @@ namespace synthese
 				s
 			;
 		}
-
+#endif
 
 
 		void DBInterSYNTHESE::ContentGetter::operator()( const double& d ) const

@@ -104,7 +104,9 @@ namespace synthese
 
 				void operator()(const int& i) const;
 				void operator()(const double& d) const;
+#ifndef _WINDOWS
 				void operator()(const size_t& s) const;
+#endif
 				void operator()(const util::RegistryKeyType& id) const;
 				void operator()(const boost::optional<std::string>& str) const;
 				void operator()(const boost::optional<Blob>& blob) const;

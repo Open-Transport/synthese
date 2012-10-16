@@ -40,10 +40,13 @@ namespace synthese
 	namespace pt
 	{
 		class TransportNetwork;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Hastus Interface file format.
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		///
 		class HastusInterfaceFileFormat:
 			public impex::FileFormatTemplate<HastusInterfaceFileFormat>
@@ -56,7 +59,7 @@ namespace synthese
 			private:
 				//! @name Import parameters
 				//@{
-					boost::shared_ptr<TransportNetwork> _network;
+					boost::shared_ptr<pt::TransportNetwork> _network;
 					bool _fileNameIsACalendar;
 				//@}
 
@@ -69,8 +72,8 @@ namespace synthese
 				mutable std::ifstream _file;
 				mutable boost::optional<Record> _record;
 				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendars;
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stops;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stops;
 
 				struct TemporaryService
 				{
@@ -78,10 +81,10 @@ namespace synthese
 					std::string calendar;
 					std::string code;
 					std::string routeCode;
-					ScheduledService::Schedules schedules;
+					pt::ScheduledService::Schedules schedules;
 					std::vector<graph::MetricOffset> scheduledStopsDistances;
 					std::vector<std::string> scheduledStops;
-					ScheduledService::Schedules allSchedules;
+					pt::ScheduledService::Schedules allSchedules;
 					std::vector<std::string> stops;
 					bool wayBack;
 				};

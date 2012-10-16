@@ -81,6 +81,7 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace data_exchange;
 	using namespace util;
 	using namespace impex;
 	using namespace pt;
@@ -99,7 +100,7 @@ namespace synthese
 		template<> const string FactorableTemplate<FileFormat,HeuresFileFormat>::FACTORY_KEY("Heures");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		const std::string HeuresFileFormat::Importer_::FILE_POINTSARRETS("pointsarrets");
 		const std::string HeuresFileFormat::Importer_::FILE_ITINERAI("itinerai");
@@ -125,7 +126,7 @@ namespace synthese
 		"");
 	}
 
-	namespace pt
+	namespace data_exchange
 	{
 		bool HeuresFileFormat::Importer_::_checkPathsMap() const
 		{

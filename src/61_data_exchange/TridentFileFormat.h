@@ -57,10 +57,13 @@ namespace synthese
 	namespace pt
 	{
 		class CommercialLine;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Trident/Chouette file format.
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		///
 		/// @todo Remove all running days of services of the datasource before Trident import.
 		///
@@ -143,11 +146,11 @@ namespace synthese
 
 				struct Route
 				{
-					JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
+					pt::JourneyPattern::StopsWithDepartureArrivalAuthorization stops;
 					std::string objectId;
 					std::string name;
 					bool wayBack;
-					JourneyPattern* journeyPattern;
+					pt::JourneyPattern* journeyPattern;
 
 					Route():
 					wayBack(false),
@@ -157,10 +160,10 @@ namespace synthese
 
 				mutable std::set<boost::shared_ptr<calendar::CalendarTemplateElement> > _calendarElementsToRemove;
 				mutable impex::ImportableTableSync::ObjectBySource<calendar::CalendarTemplateTableSync> _calendarTemplates;
-				mutable impex::ImportableTableSync::ObjectBySource<StopAreaTableSync> _stopAreas;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stops;
-				mutable impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync> _networks;
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopAreaTableSync> _stopAreas;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stops;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync> _networks;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 
 				static std::string GetCoordinate(const double value);
 
@@ -272,7 +275,7 @@ namespace synthese
 
 				//! @name Setters
 				//@{
-					void setLine(boost::shared_ptr<const CommercialLine> value){ _line = value; }
+					void setLine(boost::shared_ptr<const pt::CommercialLine> value){ _line = value; }
 					void setWithTisseoExtension(bool value){ _withTisseoExtension = value; }
 				//@}
 

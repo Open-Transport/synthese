@@ -865,7 +865,7 @@ namespace synthese
 		}
 
 		
-		
+#ifndef _WINDOWS		
 		void MySQLDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
 		{
 			_bnd.buffer_type = MYSQL_TYPE_LONG;
@@ -873,6 +873,7 @@ namespace synthese
 			_bnd.buffer_length = 0;
 			_bnd.is_null_value = false;
 		}
+#endif
 
 
 

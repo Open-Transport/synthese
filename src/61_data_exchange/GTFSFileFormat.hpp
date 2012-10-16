@@ -63,12 +63,15 @@ namespace synthese
 		class ScheduledService;
 		class TransportNetwork;
 		class PTUseRule;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// GTFS file format.
 		/// See http://code.google.com/intl/fr/transit/spec/transit_feed_specification.html
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class GTFSFileFormat:
 			public impex::FileFormatTemplate<GTFSFileFormat>
 		{
@@ -111,7 +114,7 @@ namespace synthese
 				typedef std::map<std::string, std::size_t> FieldsMap;
 				mutable FieldsMap _fieldsMap;
 
-				typedef std::map<std::string, const PTUseRule*> PTUseRuleBlockMasks;
+				typedef std::map<std::string, const pt::PTUseRule*> PTUseRuleBlockMasks;
 				PTUseRuleBlockMasks _ptUseRuleBlockMasks;
 				static std::string _serializePTUseRuleBlockMasks(const PTUseRuleBlockMasks& object);
 
@@ -124,14 +127,14 @@ namespace synthese
 				typedef std::map<std::string, calendar::Calendar> Calendars;
 				mutable Calendars _calendars;
 
-				mutable impex::ImportableTableSync::ObjectBySource<TransportNetworkTableSync> _networks;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::TransportNetworkTableSync> _networks;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 
 				struct Trip
 				{
-					const PTUseRule* useRule;
-					CommercialLine* line;
+					const pt::PTUseRule* useRule;
+					pt::CommercialLine* line;
 					calendar::Calendar calendar;
 					std::string destination;
 					bool direction;
@@ -241,7 +244,7 @@ namespace synthese
 
 				void _addFrequencies(std::stringstream& frequencies,
 					util::RegistryKeyType tripId,
-					const ContinuousService* service
+					const pt::ContinuousService* service
 				) const;
 
 				void _filesProvider(const pt::SchedulesBasedService* service,

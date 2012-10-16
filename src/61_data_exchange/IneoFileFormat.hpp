@@ -63,11 +63,14 @@ namespace synthese
 		class CommercialLine;
 		class ScheduledService;
 		class RollingStock;
+	}
 
+	namespace data_exchange
+	{
 		//////////////////////////////////////////////////////////////////////////
 		/// Ineo file format.
 		//////////////////////////////////////////////////////////////////////////
-		/// @ingroup m35File refFile
+		/// @ingroup m61File refFile
 		class IneoFileFormat:
 			public impex::FileFormatTemplate<IneoFileFormat>
 		{
@@ -122,7 +125,7 @@ namespace synthese
 			private:
 				//! @name Parameters
 				//@{
-					boost::shared_ptr<TransportNetwork> _network;
+					boost::shared_ptr<pt::TransportNetwork> _network;
 
 					struct Stop
 					{
@@ -130,7 +133,7 @@ namespace synthese
 						std::string name;
 						boost::shared_ptr<geos::geom::Point> geometry;
 						bool ufr;
-						StopArea* stopArea;
+						pt::StopArea* stopArea;
 					};
 
 					typedef std::map<
@@ -166,7 +169,7 @@ namespace synthese
 					std::string _stopCityCodeField;
 					std::string _stopHandicappedAccessibilityField;
 					std::string _mnlp_prefix;
-					boost::shared_ptr<PTUseRule> _handicappedAllowedUseRule;
+					boost::shared_ptr<pt::PTUseRule> _handicappedAllowedUseRule;
 					std::string _vehicleServiceSuffix;
 				//@}
 
@@ -175,7 +178,7 @@ namespace synthese
 				typedef std::map<std::string, std::vector<std::string> > FieldMaps;
 				mutable FieldMaps _fieldsMap;
 
-				mutable std::map<Destination*, std::string> _destinationLineOverloads;
+				mutable std::map<pt::Destination*, std::string> _destinationLineOverloads;
 
 				bool _interactive;
 
@@ -194,10 +197,10 @@ namespace synthese
 					bool _addWaybackToJourneyPatternCode;
 				//@}
 
-				mutable impex::ImportableTableSync::ObjectBySource<DestinationTableSync> _destinations;
-				mutable impex::ImportableTableSync::ObjectBySource<StopPointTableSync> _stopPoints;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::DestinationTableSync> _destinations;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::StopPointTableSync> _stopPoints;
 				mutable impex::ImportableTableSync::ObjectBySource<pt_operation::DepotTableSync> _depots;
-				mutable impex::ImportableTableSync::ObjectBySource<CommercialLineTableSync> _lines;
+				mutable impex::ImportableTableSync::ObjectBySource<pt::CommercialLineTableSync> _lines;
 				mutable std::map<std::pair<std::string, std::string>, pt::JourneyPattern*> _journeyPatterns;
 				mutable std::map<std::pair<std::string, std::string>, graph::MetricOffset> _distances;
 				mutable std::map<std::pair<int, int>, std::vector<boost::gregorian::date> > _dates;
