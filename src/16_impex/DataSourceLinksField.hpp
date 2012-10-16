@@ -25,6 +25,7 @@
 
 #include "SimpleObjectFieldDefinition.hpp"
 
+#include "DataSource.h"
 #include "FrameworkTypes.hpp"
 #include "Importable.h"
 
@@ -118,19 +119,19 @@ namespace synthese
 
 
 			static void LoadFromRecord(
-				typename Type& fieldObject,
+				typename DataSourceLinksField<C>::Type& fieldObject,
 				ObjectBase& object,
 				const Record& record,
 				const util::Env& env
 			){
-				if(!record.isDefined(FIELD.name))
+				if(!record.isDefined(SimpleObjectFieldDefinition<C>::FIELD.name))
 				{
 					return;
 				}
 
 				impex::Importable& impObject(dynamic_cast<impex::Importable&>(object));
 				impex::Importable::DataSourceLinks l;
-				DataSourceLinksField<C>::UnSerialize(l, record.getValue(FIELD.name), env);
+				DataSourceLinksField<C>::UnSerialize(l, record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name), env);
 
 				if(&env == &util::Env::GetOfficialEnv())
 				{
@@ -198,7 +199,7 @@ namespace synthese
 				boost::logic::tribool withFiles
 			){
 				const Importable& impObject(dynamic_cast<const Importable&>(object));
-				SimpleObjectFieldDefinition<C>::_SaveToParametersMap<Importable::DataSourceLinks>(
+				SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 					impObject.getDataSourceLinks(),
 					map,
 					prefix,
@@ -279,14 +280,14 @@ namespace synthese
 			{
 				DataSourceLinksField<C>::GetLinkedObjectsIdsFromText(
 					list,
-					record.getValue(FIELD.name, false)
+					record.getValue(SimpleObjectFieldDefinition<C>::FIELD.name, false)
 				);
 			}
 
 
 
 			static void SaveToDBContent(
-				const typename Type& fieldObject,
+				const typename DataSourceLinksField<C>::Type& fieldObject,
 				const ObjectBase& object,
 				DBContent& content
 			){
