@@ -21,6 +21,9 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At the beginning (macro test)
+#include "ServerModule.h"
+
 #include "01_util/threads/Thread.h"
 #include "102_mysql/MySQLDB.hpp"
 #include "102_mysql/MySQLException.hpp"
@@ -30,7 +33,6 @@
 #include "DBTransaction.hpp"
 #include "FactorableTemplate.h"
 #include "Log.h"
-#include "ServerModule.h"
 #include "UtilTypes.h"
 
 #include <boost/algorithm/string.hpp>
