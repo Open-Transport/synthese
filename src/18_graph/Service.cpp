@@ -62,9 +62,9 @@ namespace synthese
 
 		Service::Service(
 			RegistryKeyType id
-		):	RuleUser(),
-			_path(NULL),
-			Registrable(id)
+		):	Registrable(id),
+			RuleUser(),
+			_path(NULL)
 		{}
 
 

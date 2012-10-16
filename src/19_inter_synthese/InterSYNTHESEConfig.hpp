@@ -26,7 +26,7 @@
 #include "Object.hpp"
 
 #include "MinutesField.hpp"
-#include "NumericField.hpp"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 
 #include <boost/date_time/posix_time/ptime.hpp>

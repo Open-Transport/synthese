@@ -39,6 +39,7 @@ namespace synthese
 		boost::optional<std::string>,
 		bool,
 		int,
+		size_t,
 		double,
 		util::RegistryKeyType,
 		boost::optional<Blob>

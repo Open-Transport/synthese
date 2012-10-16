@@ -65,10 +65,10 @@ namespace synthese
 		User::User(
 			util::RegistryKeyType id
 		):	Registrable(id),
+			_profile(NULL),
 			_cityId(0),
 			_isConnectionAllowed(true),
 			_birthDate(not_a_date_time),
-			_profile(NULL),
 			_language(NULL)
 		{
 		}

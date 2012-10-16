@@ -864,6 +864,16 @@ namespace synthese
 			_bnd.is_null_value = false;
 		}
 
+		
+		
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const size_t& s ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_LONG;
+			_bnd.buffer = static_cast<void*>(const_cast<int*>(static_cast<const size_t&>(&s)));
+			_bnd.buffer_length = 0;
+			_bnd.is_null_value = false;
+		}
+
 
 
 		void MySQLDB::DBRecordCellBindConvertor::operator()( const double& d ) const

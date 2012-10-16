@@ -44,7 +44,7 @@ namespace synthese
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _minutesToString(const typename Type& p)
+		static std::string _minutesToString(const typename MinutesField<C>::Type& p)
 		{
 			return p.is_not_a_date_time() ?
 				std::string() :
@@ -58,7 +58,7 @@ namespace synthese
 		/// Conversion of a string into a date.
 		/// @param d the date to convert
 		/// @return the converted string
-		static typename Type _stringToMinutes(const std::string& text)
+		static typename MinutesField<C>::Type _stringToMinutes(const std::string& text)
 		{
 			return text.empty() ?
 				boost::posix_time::time_duration(boost::posix_time::not_a_date_time) :
@@ -68,12 +68,12 @@ namespace synthese
 
 	public:
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename MinutesField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
 		){
-			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue<typename Type>(
+			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
 				_stringToMinutes,
@@ -84,7 +84,7 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename Type& fieldObject,
+			const typename MinutesField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
@@ -98,13 +98,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename MinutesField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -116,7 +116,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename MinutesField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
