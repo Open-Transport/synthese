@@ -15,6 +15,11 @@ OpenLayers:
   unzip OpenLayers-2.12.zip
   mv OpenLayers-2.12 OpenLayers_full
 
+OpenLayers-2.11:
+  Version: 2.11 (for compatibility with the admin which fails with 2.12)
+  Follow the same instructions as above.
+  
+  
 OpenLayers_maptypepanel:
   The following files were retrieved From the maptypepanel camptocamp OpenLayers sandbox:
   http://svn.openlayers.org/sandbox/camptocamp/maptypepanel/openlayers/lib/OpenLayers/Control/MapTypePanel.js@10557
