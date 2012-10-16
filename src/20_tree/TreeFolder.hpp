@@ -27,6 +27,7 @@
 #include "Object.hpp"
 #include "Registrable.h"
 #include "Registry.h"
+#include "SchemaMacros.hpp"
 #include "StringField.hpp"
 #include "TreeFolderUpNode.hpp"
 #include "TreeFolderDownNodeInterface.hpp"

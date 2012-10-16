@@ -52,7 +52,7 @@ namespace synthese
 		typedef std::map<V1, V2> Type;
 
 	private:
-		static std::string _mapToString(const typename Type& m)
+		static std::string _mapToString(const typename SimpleMapField<C, V1, V2>::Type& m)
 		{
 			std::stringstream s;
 			bool first(true);
@@ -75,7 +75,7 @@ namespace synthese
 
 
 		static void LoadFromRecord(
-			typename Type& fieldObject,
+			typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -119,13 +119,13 @@ namespace synthese
 
 
 		static void SaveToParametersMap(
-			const typename Type& fieldObject,
+			const typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
 				fieldObject,
 				map,
 				prefix,
@@ -138,11 +138,11 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const std::map<V1, V2>& fieldObject,
+			const typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
-			SimpleObjectFieldDefinition<C>::_SaveToFilesMap<typename Type>(
+			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
 				_mapToString
@@ -152,7 +152,7 @@ namespace synthese
 
 
 		static void SaveToDBContent(
-			const typename Type& fieldObject,
+			const typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){

@@ -44,9 +44,9 @@ namespace synthese
 			_calendar(NULL),
 			_rank(0),
 			_step(days(1)),
-			_operation(ADD),
 			_minDate(neg_infin),
 			_maxDate(pos_infin),
+			_operation(ADD),
 			_include(NULL)
 		{}
 
