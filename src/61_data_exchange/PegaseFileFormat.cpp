@@ -57,6 +57,7 @@ namespace synthese
 	using namespace geography;
 	using namespace graph;
 	using namespace impex;
+	using namespace pt;
 	using namespace db;
 	using namespace html;
 	using namespace server;
