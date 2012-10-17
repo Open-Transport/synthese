@@ -42,6 +42,7 @@
 
 #ifndef UNIX
 #include <geos/util/math.h>
+using namespace geos::util;
 #endif
 #include <sstream>
 #include <boost/algorithm/string/split.hpp>
