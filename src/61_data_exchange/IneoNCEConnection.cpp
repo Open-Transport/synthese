@@ -25,8 +25,11 @@
 #include "CommercialLine.h"
 #include "Env.h"
 #include "Exception.h"
+#include "IConv.hpp"
 #include "Log.h"
+#include "CurrentJourney.hpp"
 #include "ServerModule.h"
+#include "StopArea.hpp"
 #include "StopPoint.hpp"
 #include "Vehicle.hpp"
 #include "VehicleModule.hpp"
@@ -71,300 +74,399 @@ namespace synthese
 
 		void IneoNCEConnection::InitThread()
 		{
+			// Stop name map
+			typedef std::map<std::string, std::string> StopNameMap;
+			StopNameMap stopNameMap;
+			IConv iconv("ISO-8859-1","UTF-8");
+
+			// Main loop (never ends)
 			while(true)
 			{
-				if(	_theConnection->_status == online ||
-					_theConnection->_status == connect
-				){
-					ServerModule::SetCurrentThreadRunningAction();
+				try
+				{
+					if(	_theConnection->_status == online ||
+						_theConnection->_status == connect
+					){
+						ServerModule::SetCurrentThreadRunningAction();
 
-					// Attempt a connection
-					// Get a list of endpoints corresponding to the server name.
-					asio::io_service io_service;
-					tcp::resolver resolver(io_service);
-					tcp::resolver::query query(_theConnection->_nceAddress, _theConnection->_ncePort);
-					tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
-					tcp::resolver::iterator end;
+						// Attempt a connection
+						// Get a list of endpoints corresponding to the server name.
+						asio::io_service io_service;
+						tcp::resolver resolver(io_service);
+						tcp::resolver::query query(_theConnection->_nceAddress, _theConnection->_ncePort);
+						tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+						tcp::resolver::iterator end;
 
-					// Try each endpoint until we successfully establish a connection.
-					tcp::socket socket(io_service);
-					boost::system::error_code error = boost::asio::error::host_not_found;
-					while (error && endpoint_iterator != end)
-					{
-						socket.close();
-						socket.connect(*endpoint_iterator++, error);
-					}
-					if (error)
-					{
-						throw boost::system::system_error(error);
-					}
+						// Try each endpoint until we successfully establish a connection.
+						tcp::socket socket(io_service);
+						boost::system::error_code error = boost::asio::error::host_not_found;
+						while (error && endpoint_iterator != end)
+						{
+							socket.close();
+							socket.connect(*endpoint_iterator++, error);
+						}
+						if (error)
+						{
+							throw boost::system::system_error(error);
+						}
 
-					if(_theConnection->_status == connect)
-					{
-						_theConnection->_status = online;
-					}
+						if(_theConnection->_status == connect)
+						{
+							_theConnection->_status = online;
+						}
 
-					while(true)
-					{
 						asio::streambuf buf;
-						boost::system::error_code error;
-						size_t bytes_transferred(
-							 boost::asio::read(
-								socket,
-								buf,
-								boost::asio::transfer_at_least(1),
-								error
-						)	);
-						std::istream is(&buf);
-						std::string s(
-							(std::istreambuf_iterator<char>(is)) ,
-							(std::istreambuf_iterator<char>())
-						);
-						
-						XMLNode node(ParseInput(s));
-						if(node.isEmpty())
+						istream is(&buf);
+						while(true)
 						{
-							break;
-						}
-						XMLNode childNode(node.getChildNode(0));
-						if(childNode.isEmpty())
-						{
-							break;
-						}
-						string tagName(childNode.getName());
-						if(tagName == "GetId")
-						{
-							XMLNode nparcNode(childNode.getChildNode("NParc"));
-							if(!nparcNode.isEmpty())
+							boost::system::error_code error;
+
+							// Read until eof
+							boost::asio::read_until(socket, buf, char(26), error);
+
+							// If the reading operation was broken by anything else than eof, leave the content loop
+							if(error)
 							{
-								string vehicleNumber(nparcNode.getText());
-								Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
-								if(vehicle)
-								{
-									if(_theConnection->_dataSource)
-									{
-										if(!vehicle->hasCodeBySource(*_theConnection->_dataSource, vehicleNumber))
-										{
-											try
-											{
-												vehicle = _theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber);
-											}
-											catch(...)
-											{
-												vehicle = NULL;
-												// Log
-											}
-										}
-									}
-									else
-									{
-										if(lexical_cast<string>(vehicle->getKey()) != vehicleNumber)
-										{
-											try
-											{
-												vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(
-													lexical_cast<RegistryKeyType>(vehicleNumber)
-												).get();
-											}
-											catch(...)
-											{
-												vehicle = NULL;
-												// Log
-											}
-										}
-									}
-								}
-								if(vehicle != VehicleModule::GetCurrentVehiclePosition().getVehicle())
-								{
-									VehicleModule::GetCurrentVehiclePosition().setVehicle(vehicle);
-								}
+								break;
 							}
 
-							stringstream reply;
-							ptime now(second_clock::local_time());
-							reply <<
-								"<IdReply><Type>SYNTHESE</Type><Id>1</Id>" <<
-								"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
-								"<Heure>" << now.time_of_day() << "</Heure>" <<
-								"</IdReply>\n";
-
-							boost::asio::write(socket, boost::asio::buffer(reply.str()));
-						}
-						else if(tagName == "MsgLoc")
-						{
-							// EtatLoc
-							XMLNode etatLocNode(childNode.getChildNode("EtatLoc"));
-							if(!etatLocNode.isEmpty())
+							// Copy the content obtained from the NCE into a string
+							string bufStr;
+							getline(is, bufStr, char(26));
+							trim(bufStr);
+							if(bufStr.empty())
 							{
-								try
-								{
-									int etatLoc(lexical_cast<int>(etatLocNode.getText()));
-									VehiclePosition::Status status(VehiclePosition::UNKNOWN_STATUS);
-									switch(etatLoc)
-									{
-									case 0:
-										status = VehiclePosition::OUT_OF_SERVICE;
-										break;
-
-									case 1:
-										status = VehiclePosition::SERVICE;
-										break;
-
-									case 2:
-									case 3:
-									case 4:
-									case 5:
-									case 7:
-									case 8:
-										status = VehiclePosition::COMMERCIAL;
-										break;
-
-									case 6:
-										status = VehiclePosition::DEAD_RUN_TRANSFER;
-										break;
-
-									case 9:
-									case 10:
-										status = VehiclePosition::NOT_IN_SERVICE;
-										break;
-									}
-									VehicleModule::GetCurrentVehiclePosition().setStatus(status);
-								}
-								catch(bad_lexical_cast&)
-								{
-									// Log
-								}
+								continue;
 							}
 
-							// ZoneA
-							XMLNode zoneANode(childNode.getChildNode("ZoneA"));
-							if(!zoneANode.isEmpty())
+							// Log the input
+							if(Log::GetInstance().getLevel() <= Log::LEVEL_DEBUG)
 							{
-								VehicleModule::GetCurrentVehiclePosition().setInStopArea(
-									zoneANode.getText() == "1"
+								util::Log::GetInstance().info(
+									bufStr
 								);
 							}
 
-							// Curv
-							XMLNode curvNode(childNode.getChildNode("Curv"));
-							if(!curvNode.isEmpty())
+							// Parsing
+							XMLNode node(ParseInput(bufStr));
+							if(node.isEmpty())
 							{
-								try
-								{
-									VehicleModule::GetCurrentVehiclePosition().setMeterOffset(
-										lexical_cast<VehiclePosition::Meters>(
-											curvNode.getText()
-									)	);
-								}
-								catch(bad_lexical_cast&)
-								{
-									// Log
-								}
+								continue;
 							}
-
-							// GPS
-							XMLNode gpsNode(childNode.getChildNode("GPS"));
-							if(!gpsNode.isEmpty())
+							XMLNode childNode(node.getChildNode(0));
+							if(childNode.isEmpty())
 							{
-								XMLNode longNode(gpsNode.getChildNode("Long"));
-								XMLNode latNode(gpsNode.getChildNode("Lat"));
-								if(!longNode.isEmpty() && !latNode.isEmpty())
+								continue;
+							}
+							string tagName(childNode.getName());
+							if(tagName == "GetId")
+							{
+								XMLNode nparcNode(childNode.getChildNode("NParc"));
+								if(!nparcNode.isEmpty())
+								{
+									string vehicleNumber(nparcNode.getText());
+									Vehicle* vehicle(VehicleModule::GetCurrentVehiclePosition().getVehicle());
+									if(vehicle)
+									{
+										if(_theConnection->_dataSource)
+										{
+											if(!vehicle->hasCodeBySource(*_theConnection->_dataSource, vehicleNumber))
+											{
+												try
+												{
+													vehicle = _theConnection->_dataSource->getObjectByCode<Vehicle>(vehicleNumber);
+												}
+												catch(...)
+												{
+													vehicle = NULL;
+													// Log
+												}
+											}
+										}
+										else
+										{
+											if(lexical_cast<string>(vehicle->getKey()) != vehicleNumber)
+											{
+												try
+												{
+													vehicle = Env::GetOfficialEnv().getEditable<Vehicle>(
+														lexical_cast<RegistryKeyType>(vehicleNumber)
+													).get();
+												}
+												catch(...)
+												{
+													vehicle = NULL;
+													// Log
+												}
+											}
+										}
+									}
+									if(vehicle != VehicleModule::GetCurrentVehiclePosition().getVehicle())
+									{
+										VehicleModule::GetCurrentVehiclePosition().setVehicle(vehicle);
+									}
+								}
+
+								stringstream reply;
+								ptime now(second_clock::local_time());
+								reply <<
+									"<IdReply><Type>SYNTHESE</Type><Id>1</Id>" <<
+									"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
+									"<Heure>" << now.time_of_day() << "</Heure>" <<
+									"</IdReply>\n";
+
+								boost::asio::write(socket, boost::asio::buffer(reply.str()));
+							}
+							else if(tagName == "MsgLoc")
+							{
+								// EtatLoc
+								XMLNode etatLocNode(childNode.getChildNode("EtatLoc"));
+								if(!etatLocNode.isEmpty())
 								{
 									try
 									{
-										shared_ptr<Point> point(
-											CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
-												lexical_cast<double>(longNode.getText()),
-												lexical_cast<double>(latNode.getText())
-										)	);
-										VehicleModule::GetCurrentVehiclePosition().setGeometry(
-											CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
-												*point
-										)	);
+										int etatLoc(lexical_cast<int>(etatLocNode.getText()));
+										VehiclePosition::Status status(VehiclePosition::UNKNOWN_STATUS);
+										switch(etatLoc)
+										{
+										case 0:
+											status = VehiclePosition::OUT_OF_SERVICE;
+											break;
+
+										case 1:
+											status = VehiclePosition::SERVICE;
+											break;
+
+										case 2:
+										case 3:
+										case 4:
+										case 5:
+										case 7:
+										case 8:
+											status = VehiclePosition::COMMERCIAL;
+											break;
+
+										case 6:
+											status = VehiclePosition::DEAD_RUN_TRANSFER;
+											break;
+
+										case 9:
+										case 10:
+											status = VehiclePosition::NOT_IN_SERVICE;
+											break;
+										}
+										VehicleModule::GetCurrentVehiclePosition().setStatus(status);
 									}
-									catch (bad_lexical_cast&)
+									catch(bad_lexical_cast&)
 									{
-										
+										// Log
 									}
 								}
-							}
 
-						}
-						else if(tagName == "MsgVoyage")
-						{
-							XMLNode voyageNode(childNode.getChildNode("Voyage"));
-							if(!voyageNode.isEmpty())
-							{
-								XMLNode nligNode(voyageNode.getChildNode("NLig"));
-								if(!nligNode.isEmpty())
+								// ZoneA
+								XMLNode zoneANode(childNode.getChildNode("ZoneA"));
+								if(!zoneANode.isEmpty())
 								{
+									VehicleModule::GetCurrentVehiclePosition().setInStopArea(
+										zoneANode.getText() == "1"
+									);
+								}
+
+								// Curv
+								XMLNode curvNode(childNode.getChildNode("Curv"));
+								if(!curvNode.isEmpty())
+								{
+									try
+									{
+										VehicleModule::GetCurrentVehiclePosition().setMeterOffset(
+											lexical_cast<VehiclePosition::Meters>(
+												curvNode.getText()
+										)	);
+									}
+									catch(bad_lexical_cast&)
+									{
+										// Log
+									}
+								}
+
+								// GPS
+								XMLNode gpsNode(childNode.getChildNode("GPS"));
+								if(!gpsNode.isEmpty())
+								{
+									XMLNode longNode(gpsNode.getChildNode("Long"));
+									XMLNode latNode(gpsNode.getChildNode("Lat"));
+									if(!longNode.isEmpty() && !latNode.isEmpty())
+									{
+										try
+										{
+											shared_ptr<Point> point(
+												CoordinatesSystem::GetCoordinatesSystem(4326).createPoint(
+													lexical_cast<double>(longNode.getText()),
+													lexical_cast<double>(latNode.getText())
+											)	);
+											VehicleModule::GetCurrentVehiclePosition().setGeometry(
+												CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+													*point
+											)	);
+										}
+										catch (bad_lexical_cast&)
+										{
+											
+										}
+									}
+								}
+
+							}
+							else if(tagName == "MsgVoyage")
+							{
+								XMLNode voyageNode(childNode.getChildNode("Voyage"));
+
+								// Line object link
+								XMLNode nligNode(
+									(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("NLig")
+								);
+								if(	!nligNode.isEmpty() &&
+									_theConnection->_dataSource
+								){
 									CommercialLine* line(
 										_theConnection->_dataSource->getObjectByCode<CommercialLine>(nligNode.getText())
 									);
-									VehicleModule::SetCurrentLine(line);
+									VehicleModule::GetCurrentJourney().setLine(line);
 								}
 
-								XMLNode listeArretsNode(voyageNode.getChildNode("ListeArrets"));
+								// Line number
+								XMLNode nligIvNode(
+									(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("NLigIv")
+								);
+								if(!nligIvNode.isEmpty())
+								{
+									VehicleModule::GetCurrentJourney().setLineNumber(nligNode.getText());
+								}
+
+								// Stop names
+								XMLNode listeArretsNode(
+									(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("ListeArrets")
+								);
 								if(!listeArretsNode.isEmpty())
 								{
-									VehicleModule::NextStops nextStops;
-									bool ok(true);
 									for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 									{
 										XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
-										XMLNode mnaNode(listeArretsNode.getChildNode("MnA"));
-										if(!mnaNode.isEmpty())
+										if(blocANode.isEmpty())
+										{
+											continue;
+										}
+
+										// Stop identifier
+										XMLNode mnaNode(blocANode.getChildNode("MnA"));
+										XMLNode libANode(blocANode.getChildNode("LibA"));
+										if(	mnaNode.isEmpty() ||
+											libANode.isEmpty()
+										){
+											continue;
+										}
+
+										stopNameMap[mnaNode.getText()] = iconv.convert(libANode.getText());
+									}
+								}
+							}
+							else if(tagName == "MsgArrets")
+							{
+								XMLNode listeArretsNode(childNode.getChildNode("ListeArrets"));
+								if(!listeArretsNode.isEmpty())
+								{
+									bool ok(true);
+									CurrentJourney::NextStops nextStops;
+									for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
+									{
+										XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
+										if(blocANode.isEmpty())
+										{
+											ok = false;
+											break;
+										}
+
+										NextStop nextStop;
+
+										// Stop identifier
+										XMLNode mnaNode(blocANode.getChildNode("MnA"));
+										if(mnaNode.isEmpty())
 										{
 											ok = false;
 											break;
 										}
 										string stopCode(mnaNode.getText());
-										StopPoint* stopPoint(
-											_theConnection->_dataSource->getObjectByCode<StopPoint>(stopCode)
-										);
-										if(!stopPoint)
+										nextStop.setStopIdentifier(stopCode);
+
+										// Stop link
+										StopPoint* stopPoint(NULL);
+										if(_theConnection->_dataSource)
 										{
-											ok = false;
-											break;
+											stopPoint = _theConnection->_dataSource->getObjectByCode<StopPoint>(stopCode);
+											nextStop.setStop(stopPoint);
 										}
-										nextStops.push_back(stopPoint);
+
+										// Stop name
+										if(stopPoint && stopPoint->getConnectionPlace())
+										{
+											nextStop.setStopName(stopPoint->getConnectionPlace()->getName());
+										}
+										else if(!stopNameMap[stopCode].empty())
+										{
+											nextStop.setStopName(stopNameMap[stopCode]);
+										}
+										else
+										{
+											nextStop.setStopName(stopCode);
+										}
+
+										// Arrival time
+										XMLNode haNode(blocANode.getChildNode("HA"));
+										if(!haNode.isEmpty())
+										{
+											ptime arrivalTime(
+												day_clock::local_day(),
+												duration_from_string(haNode.getText())
+											);
+											nextStop.setArrivalTime(arrivalTime);
+										}
+
+										// Registration
+										nextStops.push_back(nextStop);
 									}
+
+									// Registration
 									if(ok)
 									{
-										VehicleModule::SetNextStops(nextStops);
+										VehicleModule::GetCurrentJourney().setNextStops(nextStops);
 									}
 								}
 							}
+							else if(tagName == "GetStatus")
+							{
+								stringstream reply;
+								ptime now(second_clock::local_time());
+								reply <<
+									"<StatusReply>" <<
+									"<Id>1</Id>" <<
+									"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
+									"<Heure>" << now.time_of_day() << "</Heure>" <<
+									"<Etat>0</Etat>" <<
+									"<ListeTerm>" <<
+									"<BlocTerm>" <<
+									"<IdT>1</IdT>" <<
+									"<EtatT>0</EtatT>" <<
+									"</BlocTerm>" <<
+									"<BlocTerm>" <<
+									"<IdT>2</IdT>" <<
+									"<EtatT>0</EtatT>" <<
+									"</BlocTerm>" <<
+									"</ListeTerm>" <<
+									"</StatusReply>\n"
+								;
+								boost::asio::write(socket, boost::asio::buffer(reply.str()));
+							}
 						}
-						else if(tagName == "GetStatus")
-						{
-							stringstream reply;
-							ptime now(second_clock::local_time());
-							reply <<
-								"<StatusReply>" <<
-								"<Id>1</Id>" <<
-								"<Date>" << now.date().day() << "/" << now.date().month() << "/" << now.date().year() << "</Date>" <<
-								"<Heure>" << now.time_of_day() << "</Heure>" <<
-								"<Etat>0</Etat>" <<
-								"<ListeTerm>" <<
-								"<BlocTerm>" <<
-								"<IdT>1</IdT>" <<
-								"<EtatT>0</EtatT>" <<
-								"</BlocTerm>" <<
-								"<BlocTerm>" <<
-								"<IdT>2</IdT>" <<
-								"<EtatT>0</EtatT>" <<
-								"</BlocTerm>" <<
-								"</ListeTerm>" <<
-								"</StatusReply>\n"
-							;
-							boost::asio::write(socket, boost::asio::buffer(reply.str()));
-						}
-
-
-						util::Log::GetInstance().info(
-							s
-						);
 
 						if(_theConnection->_status == offline ||
 							_theConnection->_status == connect
@@ -372,6 +474,12 @@ namespace synthese
 							break;
 						}
 					}
+				}
+				catch(std::exception& e)
+				{
+					util::Log::GetInstance().info(
+						e.what()
+					);
 				}
 
 				// Wait 30 s

@@ -102,7 +102,8 @@ namespace synthese
 				void enqueue(
 					const std::string& interSYNTHESEType,
 					const std::string& parameter,
-					boost::optional<db::DBTransaction&> transaction
+					boost::optional<db::DBTransaction&> transaction,
+					bool force = false
 				) const;
 				void queue(
 					InterSYNTHESEQueue& obj

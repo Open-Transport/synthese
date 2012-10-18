@@ -1,6 +1,6 @@
 
-/** InterSYNTHESESyncTypeFactory class header.
-	@file InterSYNTHESESyncTypeFactory.hpp
+/** InterSYNTHESEContent class implementation.
+	@file InterSYNTHESEContent.cpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,44 +20,27 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
-#define SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
+#include "InterSYNTHESEContent.hpp"
 
-#include "FactoryBase.h"
+#include "Factory.h"
+#include "InterSYNTHESESyncTypeFactory.hpp"
+
+using namespace std;
 
 namespace synthese
 {
+	using namespace util;
+
 	namespace inter_synthese
 	{
-		class InterSYNTHESESlave;
-
-
-
-		/** InterSYNTHESESyncTypeFactory class.
-			@ingroup m19
-		*/
-		class InterSYNTHESESyncTypeFactory:
-			public util::FactoryBase<InterSYNTHESESyncTypeFactory>
+		InterSYNTHESEContent::InterSYNTHESEContent(
+			const string& type,
+			const string& perimeter,
+			const string& content
+		):	_type(Factory<InterSYNTHESESyncTypeFactory>::create(type)),
+			_perimeter(perimeter),
+			_content(content)
 		{
-		public:
-			InterSYNTHESESyncTypeFactory();
+		}
 
-			virtual bool sync(
-				const std::string& parameter
-			) const = 0;
-
-			virtual void initQueue(
-				const InterSYNTHESESlave& slave,
-				const std::string& perimeter
-			) const = 0;
-
-			virtual bool mustBeEnqueued(
-				const std::string& configPerimeter,
-				const std::string& messagePerimeter
-			) const = 0;
-		};
-	}
-}
-
-#endif // SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
-
+}	}

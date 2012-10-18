@@ -61,6 +61,12 @@ namespace synthese
 
 			DBInterSYNTHESE();
 
+			
+			virtual bool mustBeEnqueued(
+				const std::string& configPerimeter,
+				const std::string& messagePerimeter
+			) const;
+
 			virtual bool sync(
 				const std::string& parameter
 			) const;

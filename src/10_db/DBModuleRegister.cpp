@@ -5,6 +5,7 @@
 #include "ObjectUpdateAction.hpp"
 #include "RemoveObjectAction.hpp"
 
+#include "TablesViewService.hpp"
 #include "SQLService.hpp"
 
 #include "DBInterSYNTHESE.hpp"
@@ -19,6 +20,7 @@ void synthese::db::moduleRegister()
 	synthese::db::ObjectUpdateAction::integrate();
 	synthese::db::RemoveObjectAction::integrate();
 
+	synthese::db::TablesViewService::integrate();
 	synthese::db::SQLService::integrate();
 
 	synthese::db::DBInterSYNTHESE::integrate();

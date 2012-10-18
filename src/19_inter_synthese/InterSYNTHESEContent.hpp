@@ -1,6 +1,6 @@
 
-/** InterSYNTHESESyncTypeFactory class header.
-	@file InterSYNTHESESyncTypeFactory.hpp
+/** InterSYNTHESEContent class header.
+	@file InterSYNTHESEContent.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,44 +20,37 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
-#define SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
+#ifndef SYNTHESE_inter_synthese_InterSYNTHESEContent_hpp__
+#define SYNTHESE_inter_synthese_InterSYNTHESEContent_hpp__
 
-#include "FactoryBase.h"
+#include <memory>
+#include <string>
 
 namespace synthese
 {
 	namespace inter_synthese
 	{
-		class InterSYNTHESESlave;
-
-
-
-		/** InterSYNTHESESyncTypeFactory class.
+		class InterSYNTHESESyncTypeFactory;
+		/** InterSYNTHESEContent class.
 			@ingroup m19
 		*/
-		class InterSYNTHESESyncTypeFactory:
-			public util::FactoryBase<InterSYNTHESESyncTypeFactory>
+		class InterSYNTHESEContent
 		{
+			std::auto_ptr<InterSYNTHESESyncTypeFactory> _type;
+			std::string _perimeter;
+			std::string _content;
+
 		public:
-			InterSYNTHESESyncTypeFactory();
+			InterSYNTHESEContent(
+				const std::string& type,
+				const std::string& perimeter,
+				const std::string& content
+			);
 
-			virtual bool sync(
-				const std::string& parameter
-			) const = 0;
-
-			virtual void initQueue(
-				const InterSYNTHESESlave& slave,
-				const std::string& perimeter
-			) const = 0;
-
-			virtual bool mustBeEnqueued(
-				const std::string& configPerimeter,
-				const std::string& messagePerimeter
-			) const = 0;
+			const InterSYNTHESESyncTypeFactory& getType() const { return *_type; }
+			const std::string getPerimeter() const { return _perimeter; }
+			const std::string getContent() const { return _content; }
 		};
-	}
-}
+}	}
 
-#endif // SYNTHESE_inter_synthese_InterSYNTHESESyncTypeFactory_hpp__
-
+#endif // SYNTHESE_inter_synthese_InterSYNTHESEContent_hpp__

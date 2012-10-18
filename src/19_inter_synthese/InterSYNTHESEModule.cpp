@@ -248,19 +248,17 @@ namespace synthese
 
 
 		void InterSYNTHESEModule::Enqueue(
-			const std::string& interSYNTHESEType,
-			const std::string& parameter,
+			const InterSYNTHESEContent& content,
 			boost::optional<db::DBTransaction&> transaction
 		){
-			if(parameter.find(InterSYNTHESEQueueTableSync::TABLE.NAME) != string::npos)
-			{
-				return;
-			}
 			BOOST_FOREACH(
-				InterSYNTHESESlave::Registry::value_type& slave,
-				Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESESlave>()
+				InterSYNTHESEConfig::Registry::value_type& config,
+				Env::GetOfficialEnv().getEditableRegistry<InterSYNTHESEConfig>()
 			){
-				slave.second->enqueue(interSYNTHESEType, parameter, transaction);
+				config.second->enqueueIfInPerimeter(
+					content,
+					transaction
+				);
 			}
 		}
 
