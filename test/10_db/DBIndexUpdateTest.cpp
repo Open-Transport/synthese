@@ -29,6 +29,7 @@ class TestIndexTableSync:
 	public DBDummyTableSyncTemplate<TestIndexTableSync>
 {
  public:
+
 	static const std::string COL_COLUMN0;
 	static const std::string COL_COLUMN1;
 };
@@ -75,7 +76,7 @@ namespace synthese
 class TestIndex2TableSync:
 	public DBDummyTableSyncTemplate<TestIndex2TableSync>
 {
- public:
+public:
 	static const std::string COL_COLUMN0;
 	static const std::string COL_COLUMN1;
 };
