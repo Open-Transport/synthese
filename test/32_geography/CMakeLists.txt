@@ -20,6 +20,8 @@ set(DEPS
   11_cms # from admin
   15_server # from db
   59_road_journey_planner # from 56_pt_website
+  54_departure_boards
+  61_data_exchange
 )
 
 boost_test(Projection "${DEPS}")
