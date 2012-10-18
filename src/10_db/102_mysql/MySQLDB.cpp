@@ -188,7 +188,7 @@ namespace synthese
 
 		void MySQLDB::execTransaction(const DBTransaction& transaction)
 		{
-			_doExecUpdate("BEGIN TRANSACTION");
+			_doExecUpdate("BEGIN");
 			RequestExecutor executor(*this);
 			BOOST_FOREACH(const DBTransaction::Queries::value_type& query, transaction.getQueries())
 			{
