@@ -11,10 +11,14 @@ CompositionVehicleAddAction.cpp
 CompositionVehicleAddAction.hpp
 CompositionVehicleRemoveAction.cpp
 CompositionVehicleRemoveAction.hpp
+CurrentJourney.cpp
+CurrentJourney.hpp
 GetCompositionsService.cpp
 GetCompositionsService.hpp
 GetVehiclesService.cpp
 GetVehiclesService.hpp
+NextStop.cpp
+NextStop.hpp
 RealTimeVehicleUpdateAction.cpp
 RealTimeVehicleUpdateAction.hpp
 ServiceComposition.cpp

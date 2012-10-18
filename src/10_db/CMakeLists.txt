@@ -56,6 +56,8 @@ SQLService.cpp
 SQLService.hpp
 SQLSingleOperatorExpression.cpp
 SQLSingleOperatorExpression.hpp
+TablesViewService.cpp
+TablesViewService.hpp
 UpdateQuery.cpp
 UpdateQuery.hpp
 )

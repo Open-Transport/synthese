@@ -23,6 +23,8 @@
 #include "InterSYNTHESEConfig.hpp"
 
 #include "InterSYNTHESEConfigItem.hpp"
+#include "InterSYNTHESEContent.hpp"
+#include "InterSYNTHESESyncTypeFactory.hpp"
 
 using namespace boost;
 using namespace boost::posix_time;
@@ -88,6 +90,46 @@ namespace synthese
 				map.insert(prefix + TAG_ITEM, itemPM);
 			}
 
+		}
+
+
+
+		void InterSYNTHESEConfig::enqueueIfInPerimeter(
+			const InterSYNTHESEContent& content,
+			boost::optional<db::DBTransaction&> transaction
+		) const {
+			// Avoid useless check if no slave
+			if(_slaves.empty())
+			{
+				return;
+			}
+
+			// Check if the content must be sent to the slaves
+			bool mustBeEnqueued(false);
+			BOOST_FOREACH(const Items::value_type& item, _items)
+			{
+				if(item->mustBeEnqueued(
+					content.getType(),
+					content.getPerimeter()
+				)	){
+					mustBeEnqueued = true;
+					break;
+				}
+			}
+			if(!mustBeEnqueued)
+			{
+				return;
+			}
+
+			// Enqueue in all slaves
+			BOOST_FOREACH(const Slaves::value_type& slave, _slaves)
+			{
+				slave->enqueue(
+					content.getType().getFactoryKey(),
+					content.getContent(),
+					transaction
+				);
+			}
 		}
 }	}
 

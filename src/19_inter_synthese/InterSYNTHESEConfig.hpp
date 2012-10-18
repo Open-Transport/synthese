@@ -37,6 +37,8 @@ namespace synthese
 	namespace inter_synthese
 	{
 		class InterSYNTHESEConfigItem;
+		class InterSYNTHESEContent;
+		class InterSYNTHESESlave;
 
 		FIELD_MINUTES(LinkBreakMinutes)
 		FIELD_SIZE_T(MaxQueriesNumber)
@@ -64,10 +66,12 @@ namespace synthese
 			/// Chosen registry class.
 			typedef util::Registry<InterSYNTHESEConfig>	Registry;
 
-			typedef std::vector<InterSYNTHESEConfigItem*> Items;
+			typedef std::set<InterSYNTHESEConfigItem*> Items;
+			typedef std::set<InterSYNTHESESlave*> Slaves;
 
 		private:
 			Items _items;
+			Slaves _slaves;
 		
 		public:
 			InterSYNTHESEConfig(util::RegistryKeyType id = 0);
@@ -75,6 +79,16 @@ namespace synthese
 			//! @name Services
 			//@{
 				const Items& getItems() const { return _items; }
+				const Slaves& getSlaves() const { return _slaves; }
+
+				//////////////////////////////////////////////////////////////////////////
+				/// Checks if the sync message should be sent to the slaves of the config.
+				/// @param type type of sync message
+				/// @param parameter parameter of the message
+				void enqueueIfInPerimeter(
+					const InterSYNTHESEContent& content,
+					boost::optional<db::DBTransaction&> transaction
+				) const;
 
 				//////////////////////////////////////////////////////////////////////////
 				/// Adds parameters that are not intended to be saved (i.e. generated content).
@@ -89,6 +103,8 @@ namespace synthese
 
 			//! @name Modifiers
 			//@{
+				void setItems(const Items& value){ _items = value; }
+				void setSlaves(const Slaves& value){ _slaves = value; }
 				virtual void link(util::Env& env, bool withAlgorithmOptimizations = false);
 				virtual void unlink();
 			//@}

@@ -23,10 +23,10 @@
 #ifndef SYNTHESE_inter_synthese_InterSYNTHESEConfigItem_hpp__
 #define SYNTHESE_inter_synthese_InterSYNTHESEConfigItem_hpp__
 
+#include "InterSYNTHESEConfig.hpp"
+
 #include "InterSYNTHESEQueue.hpp"
-
 #include "Object.hpp"
-
 #include "StringField.hpp"
 
 namespace synthese
@@ -35,12 +35,13 @@ namespace synthese
 	{
 		class InterSYNTHESESyncTypeFactory;
 
-		FIELD_STRING(SyncParameters)
+		FIELD_STRING(SyncPerimeter)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
+			FIELD(InterSYNTHESEConfig),
 			FIELD(SyncType),
-			FIELD(SyncParameters)
+			FIELD(SyncPerimeter)
 		> InterSYNTHESEConfigItemRecord;
 
 
@@ -65,6 +66,11 @@ namespace synthese
 			//! @name Services
 			//@{
 				const InterSYNTHESESyncTypeFactory& getInterSYNTHESE() const;
+
+				bool mustBeEnqueued(
+					const InterSYNTHESESyncTypeFactory& type,
+					const std::string& contentPerimeter
+				) const;
 			//@}
 
 			//! @name Modifiers
