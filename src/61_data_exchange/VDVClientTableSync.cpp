@@ -23,7 +23,6 @@
 #include "VDVClientTableSync.hpp"
 
 #include "DBResult.hpp"
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 
 #include <boost/foreach.hpp>

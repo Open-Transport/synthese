@@ -75,12 +75,24 @@ namespace synthese
 
 		void InterSYNTHESESlave::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
+			if(get<InterSYNTHESEConfig>())
+			{
+				InterSYNTHESEConfig::Slaves slaves(get<InterSYNTHESEConfig>()->getSlaves());
+				slaves.insert(this);
+				get<InterSYNTHESEConfig>()->setSlaves(slaves);
+			}
 		}
 
 
 
 		void InterSYNTHESESlave::unlink()
 		{
+			if(get<InterSYNTHESEConfig>())
+			{
+				InterSYNTHESEConfig::Slaves slaves(get<InterSYNTHESEConfig>()->getSlaves());
+				slaves.erase(this);
+				get<InterSYNTHESEConfig>()->setSlaves(slaves);
+			}
 		}
 
 
@@ -88,11 +100,12 @@ namespace synthese
 		void InterSYNTHESESlave::enqueue(
 			const std::string& interSYNTHESEType,
 			const std::string& parameter,
-			boost::optional<db::DBTransaction&> transaction
+			boost::optional<db::DBTransaction&> transaction,
+			bool force
 		) const	{
 			ptime now(microsec_clock::local_time());
 
-			if(	isObsolete()
+			if(	!force && isObsolete()
 			){
 				return;
 			}
@@ -148,14 +161,17 @@ namespace synthese
 			mutex::scoped_lock lock(_queueMutex);
 			if(isObsolete())
 			{
+				// TODO the clean must be done by each item
 				_queue.clear();
+				DBModule::GetDB()->execUpdate("DELETE FROM "+ InterSYNTHESEQueue::TABLE_NAME);
+
 				BOOST_FOREACH(
 					const InterSYNTHESEConfig::Items::value_type& it,
 					get<InterSYNTHESEConfig>()->getItems()
 				){
 					it->getInterSYNTHESE().initQueue(
 						*this,
-						it->get<SyncParameters>()
+						it->get<SyncPerimeter>()
 					);
 				}
 			}
@@ -179,9 +195,9 @@ namespace synthese
 		{
 			ptime now(second_clock::local_time());
 			return
-				!get<LastActivityReport>().is_not_a_date_time() &&
-				get<InterSYNTHESEConfig>() &&
-				now - get<LastActivityReport>() < get<InterSYNTHESEConfig>()->get<LinkBreakMinutes>()
+				get<LastActivityReport>().is_not_a_date_time() ||
+				!get<InterSYNTHESEConfig>() ||
+				now - get<LastActivityReport>() >= get<InterSYNTHESEConfig>()->get<LinkBreakMinutes>()
 			;
 		}
 

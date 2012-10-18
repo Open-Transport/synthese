@@ -47,9 +47,7 @@ namespace synthese
 		VehicleModule::LinesAllowedVehicles VehicleModule::_linesAllowedVehicles;
 		VehicleModule::ServiceCompositions VehicleModule::_serviceCompositions;
 		VehiclePosition VehicleModule::_currentVehiclePosition;
-		bool VehicleModule::_stopRequested(false);
-		VehicleModule::NextStops VehicleModule::_nextStops;
-		pt::CommercialLine* VehicleModule::_currentLine(NULL);
+		CurrentJourney VehicleModule::_currentJourney;
 	}
 
 	namespace server

@@ -28,6 +28,7 @@
 #include "SQLExpression.hpp"
 
 #include "DBInterSYNTHESE.hpp"
+#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "ParametersMap.h"
 
@@ -187,10 +188,14 @@ namespace synthese
 			db->checkModificationEvents();
 #endif
 
-			// Synchro
-			inter_synthese::InterSYNTHESEModule::Enqueue(
+			// Inter-SYNTHESE sync
+			inter_synthese::InterSYNTHESEContent content(
 				DBInterSYNTHESE::FACTORY_KEY,
-				DBInterSYNTHESE::GetSQLContent(query.str()),
+				TableSync::TABLE.NAME,
+				DBInterSYNTHESE::GetSQLContent(query.str())
+			);
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				content,
 				transaction
 			);
 		}

@@ -24,10 +24,8 @@
 
 #include "VehicleInformationsService.hpp"
 
-#include "CommercialLine.h"
 #include "Request.h"
 #include "RequestException.h"
-#include "StopPoint.hpp"
 #include "Vehicle.hpp"
 #include "VehicleModule.hpp"
 
@@ -47,10 +45,7 @@ namespace synthese
 	{
 		const string VehicleInformationsService::TAG_VEHICLE = "vehicle";
 		const string VehicleInformationsService::TAG_POSITION = "position";
-		const string VehicleInformationsService::ATTR_STOP_REQUESTED = "stop_requested";
-		const string VehicleInformationsService::TAG_NEXT_STOP = "next_stop";
-		const string VehicleInformationsService::TAG_COMMERCIAL_LINE = "commercial_line";
-		
+		const string VehicleInformationsService::TAG_JOURNEY = "journey";
 
 
 		ParametersMap VehicleInformationsService::_getParametersMap() const
@@ -77,11 +72,6 @@ namespace synthese
 					throw RequestException("No such vehicle");
 				}
 			}
-			// Current vehicle if defined
-			else if(!VehicleModule::GetCurrentVehiclePosition().getVehicle())
-			{
-				throw RequestException("A vehicle must be defined");
-			}
 		}
 
 
@@ -106,29 +96,13 @@ namespace synthese
 			// Position of the vehicle
 			if(!_vehicle.get())
 			{
+				// Current vehicle position
 				VehicleModule::GetCurrentVehiclePosition().toParametersMap(map);
+
+				// Journey
+				VehicleModule::GetCurrentJourney().toParametersMap(map);
 			}
 
-			// Stop requested
-			map.insert(ATTR_STOP_REQUESTED, VehicleModule::GetStopRequested());
-
-			// Line
-			if(VehicleModule::GetCurrentLine())
-			{
-				shared_ptr<ParametersMap> linePM(new ParametersMap);
-				VehicleModule::GetCurrentLine()->toParametersMap(*linePM);
-				map.insert(TAG_COMMERCIAL_LINE, linePM);
-			}
-
-			// Next stops
-			BOOST_FOREACH(const VehicleModule::NextStops::value_type& it, VehicleModule::GetNextStops())
-			{
-				shared_ptr<ParametersMap> stopPM(new ParametersMap);
-
-				it->toParametersMap(*stopPM, true);
-
-				map.insert(TAG_NEXT_STOP, stopPM);
-			}
 			return map;
 		}
 		

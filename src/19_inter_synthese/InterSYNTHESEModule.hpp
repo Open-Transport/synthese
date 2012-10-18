@@ -44,6 +44,8 @@ namespace synthese
 	/// @ingroup m19
 	namespace inter_synthese
 	{
+		class InterSYNTHESEContent;
+
 		/**	@defgroup m19Actions 19.15 Actions
 			@ingroup m19
 
@@ -95,8 +97,7 @@ namespace synthese
 			static void InterSYNTHESE();
 
 			static void Enqueue(
-				const std::string& interSYNTHESEType,
-				const std::string& parameter,
+				const InterSYNTHESEContent& content,
 				boost::optional<db::DBTransaction&> transaction
 			);
 

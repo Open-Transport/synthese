@@ -25,6 +25,8 @@
 #include "Factory.h"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 
+using namespace std;
+
 namespace synthese
 {
 	using namespace inter_synthese;
@@ -33,37 +35,49 @@ namespace synthese
 	CLASS_DEFINITION(InterSYNTHESEConfigItem, "t095_inter_synthese_config_items", 95)
 	FIELD_DEFINITION_OF_OBJECT(InterSYNTHESEConfigItem, "config_item_id", "config_item_ids")
 
-	FIELD_DEFINITION_OF_TYPE(SyncParameters, "parameters", SQL_TEXT)
+	FIELD_DEFINITION_OF_TYPE(SyncPerimeter, "perimeter", SQL_TEXT)
 
 	namespace inter_synthese
 	{
-
-
 		InterSYNTHESEConfigItem::InterSYNTHESEConfigItem(
 			util::RegistryKeyType id /*= 0*/
 		):	Registrable(id),
 			Object<InterSYNTHESEConfigItem, InterSYNTHESEConfigItemRecord>(
 				Schema(
 					FIELD_VALUE_CONSTRUCTOR(Key, id),
+					FIELD_DEFAULT_CONSTRUCTOR(InterSYNTHESEConfig),
 					FIELD_DEFAULT_CONSTRUCTOR(SyncType),
-					FIELD_DEFAULT_CONSTRUCTOR(SyncParameters)
+					FIELD_DEFAULT_CONSTRUCTOR(SyncPerimeter)
 			)	)
 		{
 		}
 
 
 
-
 		void InterSYNTHESEConfigItem::link( util::Env& env, bool withAlgorithmOptimizations /*= false*/ )
 		{
-
+			if(get<InterSYNTHESEConfig>())
+			{
+				InterSYNTHESEConfig::Items items(
+					get<InterSYNTHESEConfig>()->getItems()
+				);
+				items.insert(this);
+				get<InterSYNTHESEConfig>()->setItems(items);
+			}
 		}
 
 
 
 		void InterSYNTHESEConfigItem::unlink()
 		{
-
+			if(get<InterSYNTHESEConfig>())
+			{
+				InterSYNTHESEConfig::Items items(
+					get<InterSYNTHESEConfig>()->getItems()
+				);
+				items.erase(this);
+				get<InterSYNTHESEConfig>()->setItems(items);
+			}
 		}
 
 
@@ -78,6 +92,21 @@ namespace synthese
 				);
 			}
 			return *_interSYNTHESE;
+		}
+
+
+
+		bool InterSYNTHESEConfigItem::mustBeEnqueued(
+			const InterSYNTHESESyncTypeFactory& type,
+			const string& contentPerimeter
+		) const {
+			return
+				get<SyncType>() == type.getFactoryKey() &&
+				type.mustBeEnqueued(
+					get<SyncPerimeter>(),
+					contentPerimeter
+				)
+			;
 		}
 }	}
 

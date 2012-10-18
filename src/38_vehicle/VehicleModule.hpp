@@ -25,6 +25,7 @@
 
 #include "ModuleClassTemplate.hpp"
 
+#include "CurrentJourney.hpp"
 #include "VehiclePosition.hpp"
 
 #include <vector>
@@ -93,15 +94,12 @@ namespace synthese
 		public:
 			typedef std::map<const pt::CommercialLine*, std::set<const Vehicle*> > LinesAllowedVehicles;
 			typedef std::map<const pt::ScheduledService*, std::set<const ServiceComposition*> > ServiceCompositions;
-			typedef std::vector<const pt::StopPoint*> NextStops;
 
 		private:
+			static CurrentJourney _currentJourney;
 			static LinesAllowedVehicles _linesAllowedVehicles;
 			static ServiceCompositions _serviceCompositions;
 			static VehiclePosition _currentVehiclePosition;
-			static bool _stopRequested;
-			static NextStops _nextStops;
-			static pt::CommercialLine* _currentLine;
 
 		public:
 			static void RegisterVehicle(const Vehicle& vehicle);
@@ -113,15 +111,8 @@ namespace synthese
 			static ServiceCompositions::mapped_type GetCompositions(const pt::ScheduledService& service);
 
 			static VehiclePosition& GetCurrentVehiclePosition(){ return _currentVehiclePosition; }
-			
-			static bool GetStopRequested(){ return _stopRequested; }
-			static void SetStopRequested(bool value){ _stopRequested = value; }
 
-			static const NextStops& GetNextStops(){ return _nextStops; }
-			static void SetNextStops(const NextStops& value){ _nextStops = value; }
-
-			static pt::CommercialLine* GetCurrentLine(){ return _currentLine; }
-			static void SetCurrentLine(pt::CommercialLine* value){ _currentLine = value; }
+			static CurrentJourney& GetCurrentJourney(){ return _currentJourney; }
 		};
 	}
 	/** @} */

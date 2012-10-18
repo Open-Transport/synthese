@@ -28,6 +28,7 @@
 #include "DBTransaction.hpp"
 #include "Env.h"
 #include "Field.hpp"
+#include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
 
 using namespace boost;
@@ -432,6 +433,17 @@ namespace synthese
 					0 << DBInterSYNTHESE::FIELD_SEPARATOR
 				;
 			}
+		}
+
+
+
+		
+		bool DBInterSYNTHESE::mustBeEnqueued(
+			const std::string& configPerimeter,
+			const std::string& messagePerimeter
+		) const {
+			return configPerimeter == messagePerimeter &&
+				messagePerimeter != InterSYNTHESEQueue::TABLE_NAME;
 		}
 }	}
 

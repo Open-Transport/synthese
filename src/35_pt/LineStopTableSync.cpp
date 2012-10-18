@@ -34,7 +34,6 @@
 #include "DesignatedLinePhysicalStopInheritedTableSync.hpp"
 #include "TransportNetworkRight.h"
 #include "RankUpdateQuery.hpp"
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "DBTransaction.hpp"
 

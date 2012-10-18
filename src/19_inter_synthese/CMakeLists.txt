@@ -11,6 +11,8 @@ InterSYNTHESEConfigItemTableSync.cpp
 InterSYNTHESEConfigItemTableSync.hpp
 InterSYNTHESEConfigsViewService.cpp
 InterSYNTHESEConfigsViewService.hpp
+InterSYNTHESEContent.cpp
+InterSYNTHESEContent.hpp
 InterSYNTHESEModule.cpp
 InterSYNTHESEModule.hpp
 InterSYNTHESEModule.gen.cpp

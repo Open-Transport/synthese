@@ -29,6 +29,7 @@
 #include "DBInterSYNTHESE.hpp"
 #include "DBModule.h"
 #include "Factory.h"
+#include "InterSYNTHESEContent.hpp"
 #include "InterSYNTHESEModule.hpp"
 #include "DBTableSync.hpp"
 #include "DBTransaction.hpp"
@@ -473,12 +474,15 @@ namespace synthese
 			checkModificationEvents();
 #endif
 
-			// Synchro
-			inter_synthese::InterSYNTHESEModule::Enqueue(
+			// Inter-SYNTHESE sync
+			inter_synthese::InterSYNTHESEContent content(
 				DBInterSYNTHESE::FACTORY_KEY,
-				DBInterSYNTHESE::GetRStmtContent(r),
+				r.getTable()->getFormat().NAME,
+				DBInterSYNTHESE::GetRStmtContent(r)
+			);
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				content,
 				transaction
 			);
 		}
-	}
-}
+}	}

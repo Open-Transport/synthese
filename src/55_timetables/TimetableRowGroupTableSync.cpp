@@ -24,7 +24,6 @@
 
 #include "DBResult.hpp"
 #include "RankUpdateQuery.hpp"
-#include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "SQLSingleOperatorExpression.hpp"
 
