@@ -22,11 +22,13 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+// At first to avoid a macro double definition
+#include "ServerModule.h"
+
 #include "DBTestUtils.hpp"
 #include "TestTableSync.hpp"
 
 #include "01_util/threads/Thread.h"
-#include "15_server/ServerModule.h"
 
 #include <my_global.h>
 #include <mysql.h>
