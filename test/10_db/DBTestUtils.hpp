@@ -209,7 +209,9 @@ template <class K>
 class DBDummyTableSyncTemplate : public db::DBTableSyncTemplate<K>
 {
 public:
-	void rowsAdded(
+	 virtual synthese::FieldsList getFieldsList() const { return synthese::FieldsList(); }
+
+	 void rowsAdded(
 		db::DB* db,
 		const db::DBResultSPtr& rows
 	) {};
