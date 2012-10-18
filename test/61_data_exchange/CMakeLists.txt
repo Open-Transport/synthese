@@ -25,6 +25,7 @@ include_directories("${PROJECT_SOURCE_DIR}/src/35_pt")
 include_directories("${PROJECT_SOURCE_DIR}/src/37_pt_operation")
 include_directories("${PROJECT_SOURCE_DIR}/src/39_map")
 include_directories("${PROJECT_SOURCE_DIR}/src/56_pt_website")
+include_directories("${PROJECT_SOURCE_DIR}/src/61_data_exchange")
 
 set(DEPS
   20_tree
@@ -33,8 +34,10 @@ set(DEPS
   11_cms # from pt
   35_pt
   37_pt_operation
+  61_data_exchange
 )
 
-boost_test(Edge "${DEPS}")
-boost_test(JourneyPatternCalendar "${DEPS}")
-boost_test(Service "${DEPS}")
+add_definitions(-DPEGASE_TEST_SQL="${CMAKE_CURRENT_SOURCE_DIR}/test_data/pegase_test.sql")
+boost_test(PegaseFileFormat "${DEPS}")
+add_definitions(-DINEO_FILE_PATTERN="${CMAKE_CURRENT_SOURCE_DIR}/test_data/ineo")
+boost_test(IneoFileFormat "${DEPS}")
