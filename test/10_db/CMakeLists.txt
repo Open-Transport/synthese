@@ -20,6 +20,7 @@ set(DEPS
   16_impex
   10_db
   00_framework
+  61_data_exchange
 )
 
 if(SYNTHESE_MYSQL_PARAMS)
