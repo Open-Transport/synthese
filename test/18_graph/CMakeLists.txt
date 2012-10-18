@@ -11,6 +11,7 @@ set(DEPS
   11_cms # from graph > server
   18_graph
   #14_admin # from server
+  54_departure_boards
   61_data_exchange
 )
 
