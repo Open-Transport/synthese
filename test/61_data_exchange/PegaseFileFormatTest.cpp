@@ -29,6 +29,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::pt;
+using namespace synthese::data_exchange;
 using namespace std;
 using synthese::Exception;
 

@@ -32,6 +32,7 @@
 #include <boost/test/auto_unit_test.hpp>
 
 using namespace synthese::admin;
+using namespace synthese::data_exchange;
 using namespace synthese::impex;
 using namespace synthese::pt;
 using namespace synthese::server;
