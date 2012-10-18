@@ -11,6 +11,7 @@ set(DEPS
   11_cms # from graph > server
   18_graph
   #14_admin # from server
+  61_data_exchange
 )
 
 boost_test(VertexAccessMap "${DEPS}" "FakeGraphImplementation.hpp")
