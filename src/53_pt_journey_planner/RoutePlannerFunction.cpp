@@ -3274,7 +3274,7 @@ namespace synthese
 							const ServicePointer& nextLeg(*(it+1));
 							const Road* nextRoad(dynamic_cast<const Road*> (nextLeg.getService()->getPath ()));
 
-							if (nextRoad && nextRoad->getRoadPlace() == road->getRoadPlace())
+							if (nextRoad && (nextRoad->getRoadPlace() == road->getRoadPlace() || nextRoad->getRoadPlace()->getName() == road->getRoadPlace()->getName()))
 								continue;
 						}
 
@@ -3284,8 +3284,8 @@ namespace synthese
 						vector<shared_ptr<Geometry> > geometriesSPtr;
 						BOOST_FOREACH(Journey::ServiceUses::const_iterator itLeg, roadServiceUses)
 						{
-							distance += it->getDistance();
-							shared_ptr<LineString> geometry(it->getGeometry());
+							distance += itLeg->getDistance();
+							shared_ptr<LineString> geometry(itLeg->getGeometry());
 							if(geometry.get())
 							{
 								shared_ptr<Geometry> geometryProjected(
