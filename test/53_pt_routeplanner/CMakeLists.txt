@@ -32,6 +32,7 @@ set(DEPS
   53_pt_journey_planner
   51_resa # no dependency, missing?
   11_cms # from 53_pt_journey_planner > 35_pt
+  54_departure_boards
   61_data_exchange
 )
 

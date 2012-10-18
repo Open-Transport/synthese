@@ -13,6 +13,8 @@ set(DEPS
   56_pt_website # from cms
   11_cms # from road > graph > server
   34_road
+  54_departure_boards
+  61_data_exchange
 )
 
 boost_test(Road "${DEPS}")
