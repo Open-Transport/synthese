@@ -26,6 +26,7 @@
 
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
+#include "InterSYNTHESESlaveTableSync.hpp"
 #include "InterSYNTHESESyncTypeFactory.hpp"
 #include "RequestException.h"
 #include "Request.h"
@@ -34,6 +35,7 @@
 #include <boost/algorithm/string.hpp>
 
 using namespace boost;
+using namespace boost::posix_time;
 using namespace std;
 
 namespace synthese
@@ -88,7 +90,13 @@ namespace synthese
 			InterSYNTHESESlave::QueueRange range(_slave->getQueueRange());
 			if(range.first == _slave->getQueue().end())
 			{
+				// Send to the slave that there is nothing to sync
 				stream << NO_CONTENT_TO_SYNC;
+
+				// Record the request as slave activity
+				ptime now(second_clock::local_time());
+				_slave->set<LastActivityReport>(now);
+				InterSYNTHESESlaveTableSync::Save(_slave.get());
 			}
 			else
 			{

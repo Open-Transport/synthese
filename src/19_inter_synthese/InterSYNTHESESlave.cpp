@@ -161,10 +161,15 @@ namespace synthese
 			mutex::scoped_lock lock(_queueMutex);
 			if(isObsolete())
 			{
-				// TODO the clean must be done by each item
-				_queue.clear();
-				DBModule::GetDB()->execUpdate("DELETE FROM "+ InterSYNTHESEQueue::TABLE_NAME);
+				// Clean the obsolete queue items
+				DBTransaction deleteTransaction;
+				BOOST_FOREACH(const Queue::value_type& it, _queue)
+				{
+					InterSYNTHESEQueueTableSync::RemoveRow(it.first, deleteTransaction);
+				}
+				deleteTransaction.run();
 
+				// Load new queue items
 				BOOST_FOREACH(
 					const InterSYNTHESEConfig::Items::value_type& it,
 					get<InterSYNTHESEConfig>()->getItems()
