@@ -34,6 +34,7 @@ set(DEPS
   11_cms # from pt
   35_pt
   37_pt_operation
+  54_departure_boards
   61_data_exchange
 )
 
