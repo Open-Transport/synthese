@@ -102,9 +102,11 @@ namespace synthese
 
 			if(_range == _slave->getLastSentRange())
 			{
+				// Confirm the range
 				stream << VALUE_OK;
 				_slave->clearLastSentRange();
 
+				// Record the request as slave activity
 				ptime now(second_clock::local_time());
 				_slave->set<LastActivityReport>(now);
 				InterSYNTHESESlaveTableSync::Save(_slave.get());
