@@ -263,7 +263,8 @@ namespace synthese
 					slave.enqueue(
 						DBInterSYNTHESE::FACTORY_KEY,
 						content.str(),
-						saveTransaction
+						saveTransaction,
+						true
 					);
 				}
 				saveTransaction.run();
