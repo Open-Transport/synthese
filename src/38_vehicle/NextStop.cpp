@@ -38,13 +38,15 @@ namespace synthese
 		const string NextStop::TAG_STOP = "stop";
 		const string NextStop::ATTR_STOP_NAME = "stop_name";
 		const string NextStop::ATTR_ARRIVAL_TIME = "arrival_time";
+		const string NextStop::ATTR_ARRIVAL_DURATION = "arrival_duration";
+		const string NextStop::ATTR_IN_STOP_AREA = "in_stop_area";
 
 
 
 		NextStop::NextStop():
+			_inStopArea(false),
 			_stop(NULL)
 		{
-
 		}
 
 
@@ -62,10 +64,22 @@ namespace synthese
 			// Stop name
 			pm.insert(ATTR_STOP_NAME, _stopName);
 
-			// Arrival time
+			// In stop area
+			pm.insert(ATTR_IN_STOP_AREA, _inStopArea);
+
+			// Arrival time and duration
 			if(!_arrivalTime.is_not_a_date_time())
 			{
+				// Arrival time
 				pm.insert(ATTR_ARRIVAL_TIME, to_iso_extended_string(_arrivalTime));
+
+				// Arrival duration
+				ptime now(second_clock::local_time());
+				time_duration duration(_arrivalTime - now);
+				pm.insert(
+					ATTR_ARRIVAL_DURATION,
+					ceil(duration.total_seconds() / 60.0)
+				);
 			}
 		}
 }	}
