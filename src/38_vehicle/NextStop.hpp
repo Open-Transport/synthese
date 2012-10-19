@@ -48,7 +48,10 @@ namespace synthese
 			static const std::string TAG_STOP;
 			static const std::string ATTR_STOP_NAME;
 			static const std::string ATTR_ARRIVAL_TIME;
+			static const std::string ATTR_ARRIVAL_DURATION;
+			static const std::string ATTR_IN_STOP_AREA;
 
+			bool _inStopArea;
 			pt::StopPoint* _stop;
 			std::string _stopName;
 			boost::posix_time::ptime _arrivalTime;
@@ -61,6 +64,7 @@ namespace synthese
 			void setStopName(const std::string& value){ _stopName = value; }
 			void setArrivalTime(const boost::posix_time::ptime& value){ _arrivalTime = value; }
 			void setStopIdentifier(const std::string& value){ _stopIdentifier = value; }
+			void setInStopArea(bool value){ _inStopArea = value; }
 
 			const std::string& getStopIdentifier() const { return _stopIdentifier; } 
 

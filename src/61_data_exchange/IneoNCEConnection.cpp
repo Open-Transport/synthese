@@ -74,9 +74,12 @@ namespace synthese
 
 		void IneoNCEConnection::InitThread()
 		{
-			// Stop name map
-			typedef std::map<std::string, std::string> StopNameMap;
-			StopNameMap stopNameMap;
+			// Local variables
+			typedef std::map<std::string, std::string> StopMnaNameMap;
+			StopMnaNameMap stopMnaNameMap;
+			typedef std::map<std::string, std::string> StopOrdMnaMap;
+			StopOrdMnaMap stopOrdMnaMap;
+			string curOrd;
 			IConv iconv("ISO-8859-1","UTF-8");
 
 			// Main loop (never ends)
@@ -119,9 +122,14 @@ namespace synthese
 						istream is(&buf);
 						while(true)
 						{
-							boost::system::error_code error;
+							if(_theConnection->_status == offline ||
+								_theConnection->_status == connect
+							){
+								break;
+							}
 
 							// Read until eof
+							boost::system::error_code error;
 							boost::asio::read_until(socket, buf, char(26), error);
 
 							// If the reading operation was broken by anything else than eof, leave the content loop
@@ -268,8 +276,15 @@ namespace synthese
 								if(!zoneANode.isEmpty())
 								{
 									VehicleModule::GetCurrentVehiclePosition().setInStopArea(
-										zoneANode.getText() == "1"
+										zoneANode.getText() == string("1")
 									);
+								}
+
+								// Ord
+								XMLNode ordANode(childNode.getChildNode("OrdA"));
+								if(!ordANode.isEmpty())
+								{
+									curOrd = ordANode.getText();
 								}
 
 								// Curv
@@ -343,12 +358,13 @@ namespace synthese
 									VehicleModule::GetCurrentJourney().setLineNumber(nligNode.getText());
 								}
 
-								// Stop names
+								// Stop names and Ord Mna mapping
 								XMLNode listeArretsNode(
 									(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("ListeArrets")
 								);
 								if(!listeArretsNode.isEmpty())
 								{
+									stopOrdMnaMap.clear();
 									for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 									{
 										XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
@@ -360,13 +376,16 @@ namespace synthese
 										// Stop identifier
 										XMLNode mnaNode(blocANode.getChildNode("MnA"));
 										XMLNode libANode(blocANode.getChildNode("LibA"));
+										XMLNode ordANode(blocANode.getChildNode("OrdA"));
 										if(	mnaNode.isEmpty() ||
-											libANode.isEmpty()
+											libANode.isEmpty() ||
+											ordANode.isEmpty()
 										){
 											continue;
 										}
 
-										stopNameMap[mnaNode.getText()] = iconv.convert(libANode.getText());
+										stopMnaNameMap[mnaNode.getText()] = iconv.convert(libANode.getText());
+										stopOrdMnaMap[ordANode.getText()] = mnaNode.getText();
 									}
 								}
 							}
@@ -386,17 +405,76 @@ namespace synthese
 											break;
 										}
 
-										NextStop nextStop;
-
 										// Stop identifier
 										XMLNode mnaNode(blocANode.getChildNode("MnA"));
-										if(mnaNode.isEmpty())
-										{
+										XMLNode ordANode(blocANode.getChildNode("OrdA"));
+										if(	mnaNode.isEmpty() ||
+											ordANode.isEmpty()
+										){
 											ok = false;
 											break;
 										}
 										string stopCode(mnaNode.getText());
+										string ordA(ordANode.getText());
+
+										// Adds the current stop if not in the list
+										if(	i == 0 &&
+											ordA != curOrd
+										){
+											NextStop nextStop;
+
+											// Stop identifier
+											string curStopCode(stopOrdMnaMap[curOrd]);
+											nextStop.setStopIdentifier(curStopCode);
+
+											// In stop area
+											nextStop.setInStopArea(
+												VehicleModule::GetCurrentVehiclePosition().getInStopArea()
+											);
+
+											// Stop link
+											StopPoint* stopPoint(NULL);
+											if(_theConnection->_dataSource)
+											{
+												stopPoint = _theConnection->_dataSource->getObjectByCode<StopPoint>(curStopCode);
+												nextStop.setStop(stopPoint);
+											}
+
+											// Stop name
+											if(stopPoint && stopPoint->getConnectionPlace())
+											{
+												nextStop.setStopName(stopPoint->getConnectionPlace()->getName());
+											}
+											else if(!stopMnaNameMap[curStopCode].empty())
+											{
+												nextStop.setStopName(stopMnaNameMap[curStopCode]);
+											}
+											else
+											{
+												nextStop.setStopName(curStopCode);
+											}
+
+											// Arrival time
+											ptime arrivalTime(second_clock::local_time());
+											nextStop.setArrivalTime(arrivalTime);
+
+											// Registration
+											nextStops.push_back(nextStop);
+										}
+
+										NextStop nextStop;
+
+										// Stop identifier
 										nextStop.setStopIdentifier(stopCode);
+
+										// In stop area
+										if(	i == 0 &&
+											ordA == curOrd
+										){
+											nextStop.setInStopArea(
+												VehicleModule::GetCurrentVehiclePosition().getInStopArea()
+											);
+										}
 
 										// Stop link
 										StopPoint* stopPoint(NULL);
@@ -411,9 +489,9 @@ namespace synthese
 										{
 											nextStop.setStopName(stopPoint->getConnectionPlace()->getName());
 										}
-										else if(!stopNameMap[stopCode].empty())
+										else if(!stopMnaNameMap[stopCode].empty())
 										{
-											nextStop.setStopName(stopNameMap[stopCode]);
+											nextStop.setStopName(stopMnaNameMap[stopCode]);
 										}
 										else
 										{
@@ -466,12 +544,6 @@ namespace synthese
 								;
 								boost::asio::write(socket, boost::asio::buffer(reply.str()));
 							}
-						}
-
-						if(_theConnection->_status == offline ||
-							_theConnection->_status == connect
-						){
-							break;
 						}
 					}
 				}
