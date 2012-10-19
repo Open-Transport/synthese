@@ -23,10 +23,12 @@
 #ifndef SYNTHESE_pt_IneoNCEConnection_hpp__
 #define SYNTHESE_pt_IneoNCEConnection_hpp__
 
+#include "IConv.hpp"
 #include "XmlParser.h"
 
-#include <string>
+#include <boost/asio.hpp>
 #include <boost/shared_ptr.hpp>
+#include <string>
 
 namespace synthese
 {
@@ -68,6 +70,27 @@ namespace synthese
 			static XMLNode ParseInput(
 				const std::string& xml
 			);
+
+			boost::asio::io_service _io_service;
+			mutable boost::asio::deadline_timer _deadline;
+			mutable boost::asio::ip::tcp::socket _socket;
+			mutable boost::asio::streambuf _buf;
+			
+			typedef std::map<std::string, std::string> StopMnaNameMap;
+			mutable StopMnaNameMap _stopMnaNameMap;
+			typedef std::map<std::string, std::string> StopOrdMnaMap;
+			mutable StopOrdMnaMap _stopOrdMnaMap;
+			mutable std::string _curOrd;
+			util::IConv _iconv;
+
+			void establishConnection();
+
+			void read();
+
+			void handleData(
+			) const;
+
+			void checkDeadline();
 
 		public:
 			IneoNCEConnection();

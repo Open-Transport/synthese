@@ -28,6 +28,8 @@
 #include "DBTransaction.hpp"
 #include "Env.h"
 #include "Field.hpp"
+#include "InterSYNTHESEContent.hpp"
+#include "InterSYNTHESEModule.hpp"
 #include "InterSYNTHESEQueue.hpp"
 #include "InterSYNTHESESlave.hpp"
 
@@ -69,7 +71,51 @@ namespace synthese
 			{
 				try
 				{
-					DBModule::GetDB()->execQuery(parameter.substr(i+1));
+					string sql(parameter.substr(i+1));
+					trim(sql);
+					if(sql.substr(0, 11) == "DELETE FROM")
+					{
+						DB& db(*DBModule::GetDB());
+						db.execUpdate(sql);
+					}
+					else if(sql.substr(0, 12) == "REPLACE INTO")
+					{
+						size_t j(13);
+						for(; j<sql.size() && sql[j]!=' '; ++j) ;
+						string tableName = sql.substr(13, j-13);
+
+						vector<string> p;
+						split(p, sql, is_any_of("(,"));
+						if(p.size() > 2)
+						{
+							RegistryKeyType id(lexical_cast<RegistryKeyType>(p[1]));
+						
+							DB& db(*DBModule::GetDB());
+							db.execUpdate(sql);
+
+							db.addDBModifEvent(
+								DB::DBModifEvent(
+									tableName,
+				// TODO remove MODIF_UPDATE and _objectAdded attribute or find an other way to choose between the two types
+				//					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
+									DB::MODIF_INSERT,
+									id
+								),
+								optional<DBTransaction&>()
+							);
+
+							// Inter-SYNTHESE sync
+							inter_synthese::InterSYNTHESEContent content(
+								DBInterSYNTHESE::FACTORY_KEY,
+								tableName,
+								DBInterSYNTHESE::GetSQLContent(sql)
+							);
+							inter_synthese::InterSYNTHESEModule::Enqueue(
+								content,
+								optional<DBTransaction&>()
+							);
+						}
+					}
 				}
 				catch(...)
 				{
@@ -90,6 +136,7 @@ namespace synthese
 				{
 					// Table name
 					string tableName(parameter.substr(l, i-l));
+					RegistryKeyType id(0);
 					DBRecord r(*DBModule::GetTableSync(tableName));
 					++i;
 
@@ -151,6 +198,12 @@ namespace synthese
 							string content(parameter.substr(i, dataSize));
 							stmtFields.insert(make_pair(fieldName, content));
 							i+=dataSize;
+
+							// Saving of id
+							if(fieldName == TABLE_COL_ID)
+							{
+								id = lexical_cast<RegistryKeyType>(content);
+							}
 						}
 						++i;
 					}
@@ -196,7 +249,30 @@ namespace synthese
 					r.setContent(content);
 
 					// STMT execution
-					DBModule::GetDB()->saveRecord(r);
+					DB& db(*DBModule::GetDB());
+					db.saveRecord(r);
+
+					db.addDBModifEvent(
+						DB::DBModifEvent(
+							tableName,
+		// TODO remove MODIF_UPDATE and _objectAdded attribute or find an other way to choose between the two types
+		//					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
+							DB::MODIF_INSERT,
+							id
+						),
+						optional<DBTransaction&>()
+					);
+
+					// Inter-SYNTHESE sync
+					inter_synthese::InterSYNTHESEContent iSContent(
+						DBInterSYNTHESE::FACTORY_KEY,
+						tableName,
+						DBInterSYNTHESE::GetRStmtContent(r)
+					);
+					inter_synthese::InterSYNTHESEModule::Enqueue(
+						iSContent,
+						optional<DBTransaction&>()
+					);
 				}
 				catch (DBException&)
 				{
@@ -245,9 +321,12 @@ namespace synthese
 						string(),
 						env
 				)	);
+				DBTransaction transaction;
+
+				// Add the clean request
+				transaction.addQuery("DELETE FROM "+ tableSync->getFormat().NAME);
 
 				// Build the dump
-				DBTransaction transaction;
 				BOOST_FOREACH(const DBDirectTableSync::RegistrableSearchResult::value_type& it, result)
 				{
 					directTableSync->saveRegistrable(*it, transaction);
