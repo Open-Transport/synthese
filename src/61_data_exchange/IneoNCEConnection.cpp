@@ -511,6 +511,7 @@ namespace synthese
 					(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("ListeArrets")
 				);
 				if(!listeArretsNode.isEmpty())
+
 				{
 					_stopOrdMnaMap.clear();
 					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
@@ -539,9 +540,23 @@ namespace synthese
 			}
 			else if(tagName == "MsgArrets")
 			{
+				ptime nceNow(not_a_date_time);
+				ptime now(second_clock::local_time());
+				XMLNode dateNode(childNode.getChildNode("Date"));
+				XMLNode heureNode(childNode.getChildNode("Heure"));
+				if(	!dateNode.isEmpty() &&
+					!heureNode.isEmpty()
+				){
+					nceNow = ptime(
+						from_string(dateNode.getText()),
+						duration_from_string(heureNode.getText())
+					);
+				}
+
 				XMLNode listeArretsNode(childNode.getChildNode("ListeArrets"));
-				if(!listeArretsNode.isEmpty())
-				{
+				if(	!listeArretsNode.isEmpty() &&
+					!nceNow.is_not_a_date_time()
+				){
 					bool ok(true);
 					CurrentJourney::NextStops nextStops;
 					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
@@ -654,6 +669,8 @@ namespace synthese
 								day_clock::local_day(),
 								duration_from_string(haNode.getText())
 							);
+							time_duration arrivalDuration = arrivalTime - nceNow;
+							arrivalTime = now + arrivalDuration;
 							nextStop.setArrivalTime(arrivalTime);
 						}
 
