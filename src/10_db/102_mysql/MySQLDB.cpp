@@ -359,7 +359,7 @@ namespace synthese
 				mysql_stmt_prepare(
 					stmt,
 					queryStr.c_str(),
-					queryStr.size()
+					static_cast<int>(queryStr.size())
 				);
 				_replaceStatements[it.first] = stmt;
 
@@ -373,7 +373,7 @@ namespace synthese
 				mysql_stmt_prepare(
 					deleteStmt,
 					deleteQueryStr.c_str(),
-					deleteQueryStr.size()
+					static_cast<int>(deleteQueryStr.size())
 				);
 				_deleteStatements[it.first] = deleteStmt;
 			}
@@ -386,26 +386,51 @@ namespace synthese
 		){
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
+			memset(bnd, 0, fieldsNumber * sizeof(MYSQL_BIND));
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
 				DBRecordCellBindConvertor visitor(*(bnd+i));
 				apply_visitor(visitor, record.getContent().at(i));
 			}
 			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
-			mysql_stmt_bind_param(stmt, bnd);
-			mysql_stmt_execute(stmt);
+			if(mysql_stmt_bind_param(stmt, bnd))
+			{
+				string errorMsg(mysql_stmt_error(stmt));
+				Log::GetInstance().warn(errorMsg);
+			}
+			else
+			{
+				if(mysql_stmt_execute(stmt))
+				{
+					string errorMsg(mysql_stmt_error(stmt));
+					Log::GetInstance().warn(errorMsg);
+				}
+			}
+			delete bnd;
 		}
 
 
 
 		void MySQLDB::deleteRow( util::RegistryKeyType id )
 		{
-			MYSQL_BIND* bnd = new MYSQL_BIND[1];
+			MYSQL_BIND bnd[1];
+			memset(bnd, 0, sizeof(bnd));
 			DBRecordCellBindConvertor visitor(*bnd);
 			visitor(id);
 			MYSQL_STMT* stmt(_deleteStatements[decodeTableId(id)]);
-			mysql_stmt_bind_param(stmt, bnd);
-			mysql_stmt_execute(stmt);
+			if(mysql_stmt_bind_param(stmt, bnd))
+			{
+				string errorMsg(mysql_stmt_error(stmt));
+				Log::GetInstance().warn(errorMsg);
+			}
+			else
+			{
+				if(mysql_stmt_execute(stmt))
+				{
+					string errorMsg(mysql_stmt_error(stmt));
+					Log::GetInstance().warn(errorMsg);
+				}
+			}
 		}
 
 
@@ -936,7 +961,7 @@ namespace synthese
 			if(str)
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(str->c_str()));
-				_bnd.buffer_length = str->size();
+				_bnd.buffer_length = static_cast<int>(str->size());
 				_bnd.is_null_value = false;
 			}
 			else
@@ -953,7 +978,7 @@ namespace synthese
 			if(blob)
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(blob->first));
-				_bnd.buffer_length = blob->second;
+				_bnd.buffer_length = static_cast<int>(blob->second);
 				_bnd.is_null_value = false;
 			}
 			else
