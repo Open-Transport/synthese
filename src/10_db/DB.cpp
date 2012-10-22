@@ -51,8 +51,7 @@ using boost::recursive_mutex;
 
 namespace synthese
 {
-	using util::Log;
-	using util::Factory;
+	using namespace util;
 
 	namespace db
 	{
@@ -453,9 +452,19 @@ namespace synthese
 			}
 			r.setContent(o.toDBContent());
 
+			replaceStmt(o.getKey(), r, transaction);
+		}
+
+
+
+		void DB::replaceStmt(
+			util::RegistryKeyType id,
+			const DBRecord& r,
+			boost::optional<DBTransaction&> transaction
+		){
 			if(transaction)
 			{
-				transaction->addStmt(r);
+				transaction->addReplaceStmt(r);
 			}
 			else
 			{
@@ -465,7 +474,7 @@ namespace synthese
 				DBModifEvent(
 					r.getTable()->getFormat().NAME,
 					MODIF_INSERT,
-					o.getKey()
+					id
 				),
 				transaction
 			);
@@ -477,8 +486,51 @@ namespace synthese
 			// Inter-SYNTHESE sync
 			inter_synthese::InterSYNTHESEContent content(
 				DBInterSYNTHESE::FACTORY_KEY,
-				r.getTable()->getFormat().NAME,
-				DBInterSYNTHESE::GetRStmtContent(r)
+				lexical_cast<string>(r.getTable()->getFormat().ID),
+				DBInterSYNTHESE::GetReplaceStmtContent(r)
+			);
+			inter_synthese::InterSYNTHESEModule::Enqueue(
+				content,
+				transaction
+			);
+		}
+
+
+
+		void DB::deleteStmt(
+			util::RegistryKeyType objectId,
+			boost::optional<DBTransaction&> transaction
+		){
+			RegistryTableType tableId(
+				decodeTableId(objectId)
+			);
+
+			if(transaction)
+			{
+				transaction->addDeleteStmt(objectId);
+			}
+			else
+			{
+				deleteRow(objectId);
+			}
+			addDBModifEvent(
+				DBModifEvent(
+					DBModule::GetTableSync(tableId)->getFormat().NAME,
+					MODIF_DELETE,
+					objectId
+				),
+				transaction
+			);
+
+#ifdef DO_VERIFY_TRIGGER_EVENTS
+			checkModificationEvents();
+#endif
+
+			// Inter-SYNTHESE sync
+			inter_synthese::InterSYNTHESEContent content(
+				DBInterSYNTHESE::FACTORY_KEY,
+				lexical_cast<string>(tableId),
+				DBInterSYNTHESE::GetDeleteStmtContent(objectId)
 			);
 			inter_synthese::InterSYNTHESEModule::Enqueue(
 				content,

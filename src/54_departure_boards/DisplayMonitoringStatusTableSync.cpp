@@ -28,6 +28,7 @@
 #include "DisplayScreenCPU.h"
 #include "DisplayScreenTableSync.h"
 #include "DisplayScreenCPUTableSync.h"
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "DisplayMaintenanceLog.h"
@@ -174,7 +175,7 @@ namespace synthese
 				(object->getCPU() == NULL ? RegistryKeyType(0) : object->getCPU()->getKey()) :
 				object->getScreen()->getKey()
 			);
-			query.addField(object->getTime());
+			query.addFrameworkField<PtimeField>(object->getTime());
 			query.addField(static_cast<int>(object->getGeneralStatus()));
 			query.addField(static_cast<int>(object->getMemoryStatus()));
 			query.addField(static_cast<int>(object->getClockStatus()));

@@ -89,6 +89,7 @@ namespace synthese
 	namespace db
 	{
 		std::vector<MYSQL_STMT*> MySQLDB::_replaceStatements;
+		std::vector<MYSQL_STMT*> MySQLDB::_deleteStatements;
 
 
 		MySQLDB::MySQLDB() :
@@ -315,13 +316,19 @@ namespace synthese
 
 		void MySQLDB::initPreparedStatements()
 		{
-			_replaceStatements.clear();
-			_replaceStatements.resize(
-				DBModule::GetTablesById().rbegin()->first + 1,
-				NULL
+			// Clear the statements
+			size_t tablesNumber(
+				DBModule::GetTablesById().rbegin()->first + 1
 			);
+			_replaceStatements.clear();
+			_replaceStatements.resize(tablesNumber, NULL);
+			_deleteStatements.clear();
+			_deleteStatements.resize(tablesNumber, NULL);
+
+			// Loop on tables
 			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
 			{
+				// Replace statement
 				stringstream query;
 				query << "REPLACE INTO " << it.second->getFormat().NAME << " VALUES(";
 				bool first(true);
@@ -355,6 +362,20 @@ namespace synthese
 					queryStr.size()
 				);
 				_replaceStatements[it.first] = stmt;
+
+				// Delete statement
+				stringstream deleteQuery;
+				deleteQuery << "DELETE FROM " << it.second->getFormat().NAME << " WHERE " << TABLE_COL_ID << "=?";
+				string deleteQueryStr(deleteQuery.str());
+				MYSQL_STMT* deleteStmt(
+					mysql_stmt_init(_connection)
+				);
+				mysql_stmt_prepare(
+					deleteStmt,
+					deleteQueryStr.c_str(),
+					deleteQueryStr.size()
+				);
+				_deleteStatements[it.first] = deleteStmt;
 			}
 		}
 
@@ -371,6 +392,18 @@ namespace synthese
 				apply_visitor(visitor, record.getContent().at(i));
 			}
 			MYSQL_STMT* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			mysql_stmt_bind_param(stmt, bnd);
+			mysql_stmt_execute(stmt);
+		}
+
+
+
+		void MySQLDB::deleteRow( util::RegistryKeyType id )
+		{
+			MYSQL_BIND* bnd = new MYSQL_BIND[1];
+			DBRecordCellBindConvertor visitor(*bnd);
+			visitor(id);
+			MYSQL_STMT* stmt(_deleteStatements[decodeTableId(id)]);
 			mysql_stmt_bind_param(stmt, bnd);
 			mysql_stmt_execute(stmt);
 		}
@@ -849,8 +882,6 @@ namespace synthese
 
 
 
-
-
 		MySQLDB::DBRecordCellBindConvertor::DBRecordCellBindConvertor(
 			MYSQL_BIND& bnd
 		):	_bnd(bnd)
@@ -933,13 +964,11 @@ namespace synthese
 
 
 
-
 		MySQLDB::RequestExecutor::RequestExecutor( MySQLDB& db ):
 			_db(db)
 		{
 
 		}
-
 
 
 
@@ -953,5 +982,13 @@ namespace synthese
 		void MySQLDB::RequestExecutor::operator()( const DBRecord& r )
 		{
 			_db.saveRecord(r);
+		}
+
+
+
+		void MySQLDB::RequestExecutor::operator()(
+			util::RegistryKeyType id
+		){
+			_db.deleteRow(id);
 		}
 }	}

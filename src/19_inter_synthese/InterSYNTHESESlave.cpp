@@ -165,7 +165,7 @@ namespace synthese
 				DBTransaction deleteTransaction;
 				BOOST_FOREACH(const Queue::value_type& it, _queue)
 				{
-					InterSYNTHESEQueueTableSync::RemoveRow(it.first, deleteTransaction);
+					DBModule::GetDB()->deleteStmt(it.first, deleteTransaction);
 				}
 				deleteTransaction.run();
 
@@ -216,7 +216,7 @@ namespace synthese
 				it != _queue.end();
 				++it
 			){
-				InterSYNTHESEQueueTableSync::RemoveRow(it->first, transaction);
+				DBModule::GetDB()->deleteStmt(it->first, transaction);
 			}
 
 			_lastSentRange = make_pair(_queue.end(), _queue.end());

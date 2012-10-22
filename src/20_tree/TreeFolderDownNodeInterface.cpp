@@ -129,6 +129,21 @@ namespace synthese
 
 
 
+		void TreeFolderDownNodeInterface::SaveToParametersMap(
+			const Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			if(	boost::logic::indeterminate(withFiles) ||
+				SimpleObjectFieldDefinition<Parent>::FIELD.exportOnFile == withFiles
+			){
+				map.insert(prefix + FIELD.name, fieldObject ? fieldObject->getKey() : RegistryKeyType(0));
+			}
+		}
+
+
+
 		void TreeFolderDownNodeInterface::SaveToDBContent(
 			const Type& fieldObject,
 			const ObjectBase& object,

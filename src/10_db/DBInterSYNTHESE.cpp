@@ -49,6 +49,7 @@ namespace synthese
 	{
 		const string DBInterSYNTHESE::TYPE_SQL = "sql";
 		const string DBInterSYNTHESE::TYPE_REPLACE_STATEMENT = "rstmt";
+		const string DBInterSYNTHESE::TYPE_DELETE_STATEMENT = "dstmt";
 		const string DBInterSYNTHESE::FIELD_SEPARATOR = ":";
 
 		DBInterSYNTHESE::DBInterSYNTHESE():
@@ -107,7 +108,7 @@ namespace synthese
 							// Inter-SYNTHESE sync
 							inter_synthese::InterSYNTHESEContent content(
 								DBInterSYNTHESE::FACTORY_KEY,
-								tableName,
+								lexical_cast<string>(decodeTableId(id)),
 								DBInterSYNTHESE::GetSQLContent(sql)
 							);
 							inter_synthese::InterSYNTHESEModule::Enqueue(
@@ -116,6 +117,44 @@ namespace synthese
 							);
 						}
 					}
+				}
+				catch(...)
+				{
+					return false;
+				}
+			}
+			else if(reqType == TYPE_DELETE_STATEMENT)
+			{
+				string idStr(parameter.substr(i+1));
+				try
+				{
+					RegistryKeyType id(lexical_cast<RegistryKeyType>(idStr));
+					RegistryTableType tableId(decodeTableId(id));
+					string tableName(DBModule::GetTableSync(tableId)->getFormat().NAME);
+
+					// STMT execution
+					DB& db(*DBModule::GetDB());
+					db.deleteRow(id);
+
+					db.addDBModifEvent(
+						DB::DBModifEvent(
+							tableName,
+							DB::MODIF_DELETE,
+							id
+						),
+						optional<DBTransaction&>()
+					);
+
+					// Inter-SYNTHESE sync
+					inter_synthese::InterSYNTHESEContent iSContent(
+						DBInterSYNTHESE::FACTORY_KEY,
+						lexical_cast<string>(tableId),
+						DBInterSYNTHESE::GetDeleteStmtContent(id)
+					);
+					inter_synthese::InterSYNTHESEModule::Enqueue(
+						iSContent,
+						optional<DBTransaction&>()
+					);
 				}
 				catch(...)
 				{
@@ -134,10 +173,12 @@ namespace synthese
 				
 				try
 				{
-					// Table name
-					string tableName(parameter.substr(l, i-l));
+					// Table number
+					string tableNumberStr(parameter.substr(l, i-l));
+					RegistryTableType tableId(lexical_cast<RegistryTableType>(tableNumberStr));
 					RegistryKeyType id(0);
-					DBRecord r(*DBModule::GetTableSync(tableName));
+					DBRecord r(*DBModule::GetTableSync(tableId));
+					string tableName(r.getTable()->getFormat().NAME);
 					++i;
 
 					// Fields loop
@@ -255,8 +296,6 @@ namespace synthese
 					db.addDBModifEvent(
 						DB::DBModifEvent(
 							tableName,
-		// TODO remove MODIF_UPDATE and _objectAdded attribute or find an other way to choose between the two types
-		//					_objectAdded ? DB::MODIF_INSERT : DB::MODIF_UPDATE,
 							DB::MODIF_INSERT,
 							id
 						),
@@ -266,8 +305,8 @@ namespace synthese
 					// Inter-SYNTHESE sync
 					inter_synthese::InterSYNTHESEContent iSContent(
 						DBInterSYNTHESE::FACTORY_KEY,
-						tableName,
-						DBInterSYNTHESE::GetRStmtContent(r)
+						lexical_cast<string>(tableId),
+						DBInterSYNTHESE::GetReplaceStmtContent(r)
 					);
 					inter_synthese::InterSYNTHESEModule::Enqueue(
 						iSContent,
@@ -368,11 +407,22 @@ namespace synthese
 
 
 
-		string DBInterSYNTHESE::GetRStmtContent( const DBRecord& r )
-		{
+		string DBInterSYNTHESE::GetReplaceStmtContent(
+			const DBRecord& r
+		){
 			stringstream content;
 			RequestEnqueue visitor(content);
 			visitor(r);
+			return content.str();
+		}
+
+
+
+		std::string DBInterSYNTHESE::GetDeleteStmtContent( util::RegistryKeyType id )
+		{
+			stringstream content;
+			RequestEnqueue visitor(content);
+			visitor(id);
 			return content.str();
 		}
 
@@ -398,7 +448,7 @@ namespace synthese
 		{
 			_result <<
 				DBInterSYNTHESE::TYPE_REPLACE_STATEMENT << DBInterSYNTHESE::FIELD_SEPARATOR <<
-				r.getTable()->getFormat().NAME << DBInterSYNTHESE::FIELD_SEPARATOR;
+				r.getTable()->getFormat().ID << DBInterSYNTHESE::FIELD_SEPARATOR;
 
 			ContentGetter visitor(_result);
 			DBContent::const_iterator it(r.getContent().begin());
@@ -414,6 +464,17 @@ namespace synthese
 				// Next content
 				++it;
 			}
+		}
+
+
+
+		void DBInterSYNTHESE::RequestEnqueue::operator()(
+			util::RegistryKeyType id
+		){
+			_result <<
+				DBInterSYNTHESE::TYPE_DELETE_STATEMENT << DBInterSYNTHESE::FIELD_SEPARATOR <<
+				id
+			;
 		}
 
 

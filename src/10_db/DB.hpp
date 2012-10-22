@@ -161,6 +161,11 @@ namespace synthese
 				const DBRecord& record
 			) = 0;
 
+			virtual void deleteRow(
+				util::RegistryKeyType id
+			) = 0;
+
+
 			virtual DBResultSPtr execQuery(const SQLData& sql) = 0;
 			virtual void execTransaction(const DBTransaction& transaction) = 0;
 			void execUpdate(
@@ -366,6 +371,17 @@ namespace synthese
 		public:
 			void replaceStmt(
 				ObjectBase& o,
+				boost::optional<DBTransaction&> transaction
+			);
+
+			void replaceStmt(
+				util::RegistryKeyType objectId,
+				const DBRecord& r,
+				boost::optional<DBTransaction&> transaction
+			);
+
+			void deleteStmt(
+				util::RegistryKeyType objectId,
 				boost::optional<DBTransaction&> transaction
 			);
 		};

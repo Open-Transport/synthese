@@ -95,6 +95,17 @@ namespace synthese
 			const std::string& prefix,
 			boost::logic::tribool withFiles
 		){
+			SaveToParametersMap(fieldObject, map, prefix, withFiles);
+		}
+
+
+
+		static void SaveToParametersMap(
+			const typename StringField<C>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
 			if(	boost::logic::indeterminate(withFiles) ||
 				SimpleObjectFieldDefinition<C>::FIELD.exportOnFile == withFiles
 			){
@@ -111,6 +122,15 @@ namespace synthese
 		static void SaveToDBContent(
 			const typename StringField<C>::Type& fieldObject,
 			const ObjectBase& object,
+			DBContent& content
+		){
+			SaveToDBContent(fieldObject, content);
+		}
+
+
+
+		static void SaveToDBContent(
+			const typename StringField<C>::Type& fieldObject,
 			DBContent& content
 		){
 			Blob blob(

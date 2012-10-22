@@ -331,35 +331,37 @@ namespace synthese
 
 		void PTDataCleanerFileFormat::_addRemoveQueries( db::DBTransaction& transaction ) const
 		{
+			DB& db(*DBModule::GetDB());
+
 			// Vehicle services
 			BOOST_FOREACH(const shared_ptr<const VehicleService>& vehicleService, _vehicleServicesToRemove)
 			{
-				VehicleServiceTableSync::RemoveRow(vehicleService->getKey(), transaction);
+				db.deleteStmt(vehicleService->getKey(), transaction);
 			}
 
 			BOOST_FOREACH(const shared_ptr<ScheduledService>& sservice, _scheduledServicesToRemove)
 			{
-				ScheduledServiceTableSync::RemoveRow(sservice->getKey(), transaction);
+				db.deleteStmt(sservice->getKey(), transaction);
 			}
 			BOOST_FOREACH(const shared_ptr<ContinuousService>& cservice, _continuousServicesToRemove)
 			{
-				ContinuousServiceTableSync::RemoveRow(cservice->getKey(), transaction);
+				db.deleteStmt(cservice->getKey(), transaction);
 			}
 			BOOST_FOREACH(const shared_ptr<JourneyPattern>& journeyPattern, _journeyPatternsToRemove)
 			{
 				BOOST_FOREACH(const Edge* edge, journeyPattern->getEdges())
 				{
-					LineStopTableSync::RemoveRow(edge->getKey(), transaction);
+					db.deleteStmt(edge->getKey(), transaction);
 				}
-				JourneyPatternTableSync::RemoveRow(journeyPattern->getKey(), transaction);
+				db.deleteStmt(journeyPattern->getKey(), transaction);
 			}
 			BOOST_FOREACH(const shared_ptr<StopPoint>& stop, _stopsToRemove)
 			{
-				StopPointTableSync::RemoveRow(stop->getKey(), transaction);
+				db.deleteStmt(stop->getKey(), transaction);
 			}
 			BOOST_FOREACH(const shared_ptr<StopArea>& stopArea, _stopAreasToRemove)
 			{
-				StopAreaTableSync::RemoveRow(stopArea->getKey(), transaction);
+				db.deleteStmt(stopArea->getKey(), transaction);
 			}
 		}
 
@@ -533,21 +535,22 @@ namespace synthese
 
 			// Remove services
 			DBTransaction t;
+			DB& db(*DBModule::GetDB());
 			BOOST_FOREACH(ScheduledService* scheduledService, scheduledServicesToRemove)
 			{
-				ScheduledServiceTableSync::RemoveRow(scheduledService->getKey(), t);
+				db.deleteStmt(scheduledService->getKey(), t);
 			}
 			BOOST_FOREACH(ContinuousService* continuousService, continuousServicesToRemove)
 			{
-				ContinuousServiceTableSync::RemoveRow(continuousService->getKey(), t);
+				db.deleteStmt(continuousService->getKey(), t);
 			}
 			BOOST_FOREACH(JourneyPattern* journeyPatterns, journeyPatternsToRemove)
 			{
 				BOOST_FOREACH(const Edge* edge, journeyPatterns->getEdges())
 				{
-					LineStopTableSync::RemoveRow(edge->getKey(), t);
+					db.deleteStmt(edge->getKey(), t);
 				}
-				JourneyPatternTableSync::RemoveRow(journeyPatterns->getKey(), t);
+				db.deleteStmt(journeyPatterns->getKey(), t);
 			}
 			t.run();
 		}

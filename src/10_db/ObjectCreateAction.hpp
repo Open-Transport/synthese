@@ -112,7 +112,7 @@ namespace synthese
 				template<class C>
 				void set(const typename C::Type& value)
 				{
-					C::SaveToParametersMap(value, *_value, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
+					C::SaveToParametersMap(value, _values, PARAMETER_FIELD_PREFIX, boost::logic::indeterminate);
 				}
 
 				/// All parameters version

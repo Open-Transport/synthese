@@ -23,6 +23,7 @@
 
 #include "Conversion.h"
 #include "DataSourceLinksField.hpp"
+#include "DateField.hpp"
 #include "ImportableTableSync.hpp"
 #include "ReplaceQuery.h"
 #include "DBModule.h"
@@ -223,7 +224,7 @@ namespace synthese
 			query.addField(user->getEMail());
 			query.addField(user->getPhone());
 			query.addField(user->getConnectionAllowed());
-			query.addField(user->getBirthDate());
+			query.addFrameworkField<DateField>(user->getBirthDate());
 			query.addField(user->getLanguage() ? user->getLanguage()->getIso639_2Code() : string());
 			query.addField(
 				DataSourceLinks::Serialize(

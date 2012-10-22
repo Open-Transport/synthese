@@ -39,9 +39,16 @@ namespace synthese
 
 
 
-		void DBTransaction::addStmt( const DBRecord& record )
+		void DBTransaction::addReplaceStmt( const DBRecord& record )
 		{
 			_queries.push_back(Query(record));
+		}
+
+
+
+		void DBTransaction::addDeleteStmt(util::RegistryKeyType id)
+		{
+			_queries.push_back(Query(id));
 		}
 
 

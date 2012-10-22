@@ -20,14 +20,14 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
+#include "ReservationTableSync.h"
 
 #include "DBModule.h"
 #include "DBResult.hpp"
 #include "DBException.hpp"
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "ReservationTransaction.h"
-#include "ReservationTableSync.h"
 #include "ReservationTransactionTableSync.h"
 #include "ScheduledServiceTableSync.h"
 #include "JourneyPatternTableSync.hpp"
@@ -38,6 +38,7 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -321,21 +322,21 @@ namespace synthese
 			query.addField(object->getServiceCode());
 			query.addField(object->getDeparturePlaceId());
 			query.addField(object->getDeparturePlaceName());
-			query.addField(object->getDepartureTime());
+			query.addFrameworkField<PtimeField>(object->getDepartureTime());
 			query.addField(object->getArrivalPlaceId());
 			query.addField(object->getArrivalPlaceName());
-			query.addField(object->getArrivalTime());
+			query.addFrameworkField<PtimeField>(object->getArrivalTime());
 			query.addField(object->getReservationRuleId());
-			query.addField(object->getOriginDateTime());
-			query.addField(object->getReservationDeadLine());
+			query.addFrameworkField<PtimeField>(object->getOriginDateTime());
+			query.addFrameworkField<PtimeField>(object->getReservationDeadLine());
 			query.addField(object->getVehicle() ? object->getVehicle()->getKey() : RegistryKeyType(0));
 			query.addField(object->getSeatNumber());
 			query.addField(object->getVehiclePositionAtDeparture() ? object->getVehiclePositionAtDeparture()->getKey() : RegistryKeyType(0));
 			query.addField(object->getVehiclePositionAtArrival() ? object->getVehiclePositionAtArrival()->getKey() : RegistryKeyType(0));
 			query.addField(object->getCancelledByOperator());
-			query.addField(object->getAcknowledgeTime());
+			query.addFrameworkField<PtimeField>(object->getAcknowledgeTime());
 			query.addField(object->getAcknowledgeUser() ? object->getAcknowledgeUser()->getKey() : RegistryKeyType(0));
-			query.addField(object->getCancellationAcknowledgeTime());
+			query.addFrameworkField<PtimeField>(object->getCancellationAcknowledgeTime());
 			query.addField(
 				object->getCancellationAcknowledgeUser() ?
 				object->getCancellationAcknowledgeUser()->getKey() :

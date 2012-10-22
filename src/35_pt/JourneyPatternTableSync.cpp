@@ -310,7 +310,7 @@ namespace synthese
 			LineStopTableSync::SearchResult edges(LineStopTableSync::Search(env, id));
 			BOOST_FOREACH(const LineStopTableSync::SearchResult::value_type& edge, edges)
 			{
-				LineStopTableSync::RemoveRow(edge->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(edge->getKey(), transaction);
 			}
 		}
 

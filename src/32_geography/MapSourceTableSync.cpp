@@ -128,7 +128,7 @@ namespace synthese
 			query.addField(object->getURL());
 			try
 			{
-				query.addField(object->getCoordinatesSystem().getSRID());
+				query.addField(static_cast<int>(object->getCoordinatesSystem().getSRID()));
 			}
 			catch(MapSource::NoCoordinatesSystemException&)
 			{

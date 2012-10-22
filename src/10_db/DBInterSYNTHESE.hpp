@@ -57,6 +57,7 @@ namespace synthese
 		public:
 			static const std::string TYPE_SQL;
 			static const std::string TYPE_REPLACE_STATEMENT;
+			static const std::string TYPE_DELETE_STATEMENT;
 			static const std::string FIELD_SEPARATOR;
 
 			DBInterSYNTHESE();
@@ -80,8 +81,12 @@ namespace synthese
 				const std::string& sql
 			);
 
-			static std::string GetRStmtContent(
+			static std::string GetReplaceStmtContent(
 				const DBRecord& r
+			);
+
+			static std::string GetDeleteStmtContent(
+				util::RegistryKeyType id
 			);
 
 			class RequestEnqueue:
@@ -94,8 +99,14 @@ namespace synthese
 					std::stringstream& result
 				);
 
+				// SQL query
 				void operator()(const std::string& sql);
+
+				// Replace statement
 				void operator()(const DBRecord& r);
+
+				// Delete statement
+				void operator()(util::RegistryKeyType id);
 			};
 
 			class ContentGetter:

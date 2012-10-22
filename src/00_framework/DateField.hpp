@@ -113,10 +113,36 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const boost::gregorian::date& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				DateToString
+			);
+		}
+
+
+
 
 		static void SaveToDBContent(
 			const boost::gregorian::date& fieldObject,
 			const ObjectBase& object,
+			DBContent& content
+		){
+			SaveToDBContent(fieldObject, content);
+		}
+
+
+
+		static void SaveToDBContent(
+			const boost::gregorian::date& fieldObject,
 			DBContent& content
 		){
 			boost::optional<std::string> text;
