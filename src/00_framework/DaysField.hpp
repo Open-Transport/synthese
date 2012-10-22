@@ -143,6 +143,15 @@ namespace synthese
 			const ObjectBase& object,
 			DBContent& content
 		){
+			SaveToDBContent(fieldObject, content);
+		}
+
+
+
+		static void SaveToDBContent(
+			const typename DaysField<C>::Type& fieldObject,
+			DBContent& content
+		){
 			int i(fieldObject.days());
 			content.push_back(Cell(i));
 		}
