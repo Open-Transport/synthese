@@ -52,6 +52,8 @@ namespace synthese
 	namespace db
 	{
 		std::vector<sqlite3_stmt*> SQLiteDB::_replaceStatements;
+		std::vector<sqlite3_stmt*> SQLiteDB::_deleteStatements;
+
 
 
 		void cleanupTSS(SQLiteTSS* tss)
@@ -545,13 +547,19 @@ namespace synthese
 
 		void SQLiteDB::initPreparedStatements()
 		{
-			_replaceStatements.clear();
-			_replaceStatements.resize(
-				DBModule::GetTablesById().rbegin()->first + 1,
-				NULL
+			// Clear the statements
+			size_t tablesNumber(
+				DBModule::GetTablesById().rbegin()->first + 1
 			);
+			_replaceStatements.clear();
+			_replaceStatements.resize(tablesNumber, NULL);
+			_deleteStatements.clear();
+			_deleteStatements.resize(tablesNumber, NULL);
+
+			// Loop on tables
 			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
 			{
+				// Replace statement
 				stringstream query;
 				query << "REPLACE INTO " << it.second->getFormat().NAME << " VALUES(";
 				bool first(true);
@@ -585,6 +593,20 @@ namespace synthese
 					0
 				);
 				_replaceStatements[it.first] = stmt;
+
+				// Delete statement
+				stringstream deleteQuery;
+				deleteQuery << "DELETE FROM " << it.second->getFormat().NAME << " WHERE " << TABLE_COL_ID << "=?";
+				string deleteQueryStr(deleteQuery.str());
+				sqlite3_stmt* deleteStmt;
+				sqlite3_prepare_v2(
+					_getHandle(),
+					deleteQueryStr.c_str(),
+					static_cast<int>(deleteQueryStr.size()),
+					&deleteStmt,
+					0
+				);
+				_deleteStatements[it.first] = deleteStmt;
 			}
 		}
 
@@ -607,6 +629,22 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			_recordDBModifEvents(tss->events);
 #endif
+		}
+
+
+		void SQLiteDB::deleteRow( util::RegistryKeyType id )
+		{
+			sqlite3_stmt* stmt(_deleteStatements[decodeTableId(id)]);
+			DBRecordCellBindConvertor visitor(*stmt, 1);
+			visitor(id);
+
+			int retc = sqlite3_step(stmt);
+
+			_ThrowIfError(_getHandle(), retc, "Error executing prepared statement");
+
+			retc = sqlite3_reset(stmt);
+
+			_ThrowIfError(_getHandle(), retc, "Error resetting prepared statement");
 		}
 
 
@@ -716,5 +754,12 @@ namespace synthese
 			retc = sqlite3_reset(stmt);
 
 			_ThrowIfError(_db._getHandle(), retc, "Error resetting prepared statement");
+		}
+
+
+
+		void SQLiteDB::RequestExecutor::operator()( util::RegistryKeyType id )
+		{
+			_db.deleteRow(id);
 		}
 }	}

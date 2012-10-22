@@ -26,6 +26,7 @@
 #include "DBLog.h"
 #include "DBLogRight.h"
 #include "Profile.h"
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "Session.h"
@@ -154,7 +155,7 @@ namespace synthese
 			// Query
 			ReplaceQuery<DBLogEntryTableSync> query(*object);
 			query.addField(object->getLogKey());
-			query.addField(object->getDate());
+			query.addFrameworkField<PtimeField>(object->getDate());
 			query.addField(object->getUserId());
 			query.addField(static_cast<int>(object->getLevel()));
 			query.addField(content.str());

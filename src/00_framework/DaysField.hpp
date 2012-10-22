@@ -121,6 +121,23 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename DaysField<C>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_daysToString
+			);
+		}
+
+
+
 		static void SaveToDBContent(
 			const typename DaysField<C>::Type& fieldObject,
 			const ObjectBase& object,

@@ -76,7 +76,7 @@ namespace synthese
 				const BaseClass& object,
 				boost::optional<DBTransaction&> transaction
 			) const {
-				TableSync::RemoveRow(
+				DBModule::GetDB()->deleteStmt(
 					static_cast<const typename TableSync::ObjectType&>(object).getKey(),
 					transaction
 				);

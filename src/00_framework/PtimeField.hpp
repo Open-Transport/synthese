@@ -117,10 +117,35 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename PtimeField<C>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_ptimeToString
+			);
+		}
+
+
 
 		static void SaveToDBContent(
 			const typename PtimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
+			DBContent& content
+		){
+			SaveToDBContent(fieldObject, content);
+		}
+
+
+
+		static void SaveToDBContent(
+			const typename PtimeField<C>::Type& fieldObject,
 			DBContent& content
 		){
 			boost::optional<std::string> text;

@@ -65,6 +65,7 @@ namespace synthese
 			boost::recursive_mutex _updateMutex;
 #endif
 			static std::vector<sqlite3_stmt*> _replaceStatements;
+			static std::vector<sqlite3_stmt*> _deleteStatements;
 
 			class DBRecordCellBindConvertor:
 				public boost::static_visitor<>
@@ -98,8 +99,14 @@ namespace synthese
 					SQLiteDB& db
 				);
 
+				/// SQL
 				void operator()(const std::string& d);
+
+				/// Replace
 				void operator()(const DBRecord& r);
+
+				/// Delete
+				void operator()(util::RegistryKeyType id);
 			};
 
 		public:
@@ -112,6 +119,9 @@ namespace synthese
 			virtual void initPreparedStatements();
 			virtual void saveRecord(
 				const DBRecord& record
+			);
+			virtual void deleteRow(
+				util::RegistryKeyType id
 			);
 
 			virtual DBResultSPtr execQuery(const SQLData& sql);

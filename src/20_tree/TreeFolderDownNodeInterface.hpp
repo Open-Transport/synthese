@@ -112,6 +112,13 @@ namespace synthese
 				boost::logic::tribool withFiles
 			);
 
+			static void SaveToParametersMap(
+				const Type& fieldObject,
+				util::ParametersMap& map,
+				const std::string& prefix,
+				boost::logic::tribool withFiles
+			);
+
 			static void SaveToFilesMap(
 				const Type& fieldObject,
 				const ObjectBase& object,

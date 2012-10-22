@@ -131,7 +131,7 @@ namespace synthese
 			query.addField(object->getFormat());
 			query.addField(object->getIcon());
 			query.addField(object->getCharset());
-			query.addField(object->getCoordinatesSystem() ? object->getCoordinatesSystem()->getSRID() : CoordinatesSystem::SRID(0));
+			query.addField(static_cast<int>(object->getCoordinatesSystem() ? object->getCoordinatesSystem()->getSRID() : CoordinatesSystem::SRID(0)));
 			query.addField(object->getDefaultImportRequest());
 			query.execute(transaction);
 		}

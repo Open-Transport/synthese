@@ -675,7 +675,7 @@ namespace synthese
 				const shared_ptr<const DriverAllocation>& driverAllocation,
 				_driverAllocationsToRemove
 			){
-				DriverAllocationTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
 			}
 
 			// Driver allocation templates removals
@@ -683,7 +683,7 @@ namespace synthese
 				const shared_ptr<const DriverAllocationTemplate>& driverAllocation,
 				_driverAllocationTemplatesToRemove
 			){
-				DriverAllocationTemplateTableSync::RemoveRow(driverAllocation->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverAllocation->getKey(), transaction);
 			}
 
 			// Driver services removals
@@ -691,7 +691,7 @@ namespace synthese
 				const shared_ptr<const DriverService>& driverService,
 				_driverServicesToRemove
 			){
-				DriverServiceTableSync::RemoveRow(driverService->getKey(), transaction);
+				DBModule::GetDB()->deleteStmt(driverService->getKey(), transaction);
 			}
 
 			// New driver services

@@ -163,7 +163,7 @@ namespace synthese
 			{
 				if(service.second->empty())
 				{
-					ScheduledServiceTableSync::RemoveRow(service.second->getKey(), transaction);
+					DBModule::GetDB()->deleteStmt(service.second->getKey(), transaction);
 				}
 				else
 				{

@@ -22,9 +22,9 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include <sstream>
-
 #include "VehiclePositionTableSync.hpp"
+
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "SelectQuery.hpp"
 #include "VehicleTableSync.hpp"
@@ -34,6 +34,7 @@
 #include "DepotTableSync.hpp"
 
 #include <geos/geom/Point.h>
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -198,7 +199,7 @@ namespace synthese
 			ReplaceQuery<VehiclePositionTableSync> query(*object);
 			query.addField(static_cast<int>(object->getStatus()));
 			query.addField(object->getVehicle() ? object->getVehicle()->getKey() : RegistryKeyType(0));
-			query.addField(object->getTime());
+			query.addFrameworkField<PtimeField>(object->getTime());
 			query.addField(object->getMeterOffset());
 			if(object->getStopPoint())
 			{

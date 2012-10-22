@@ -137,6 +137,24 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename SimpleMapField<C, V1, V2>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_mapToString
+			);
+		}
+
+
+
+
 		static void SaveToFilesMap(
 			const typename SimpleMapField<C, V1, V2>::Type& fieldObject,
 			const ObjectBase& object,
