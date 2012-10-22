@@ -21,9 +21,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
+#include "DateField.hpp"
 #include "DBTestUtils.hpp"
-#include "10_db/DeleteQuery.hpp"
-#include "10_db/ReplaceQuery.h"
+#include "DeleteQuery.hpp"
+#include "PtimeField.hpp"
+#include "ReplaceQuery.h"
 
 #include <boost/test/unit_test.hpp>
 #include <boost/logic/tribool.hpp>
@@ -289,17 +291,17 @@ void testTypes(const TestBackend& testBackend)
 			DummyObject object;
 
 			ReplaceQuery<TestTypesTableSync> query(object);
-			query.addField(-2147483648LL);
+			query.addField(static_cast<int>(-2147483648LL));
 			query.addField(43);
-			query.addField(9223372036854775807LL);
+			query.addField(static_cast<int>(9223372036854775807LL));
 			query.addField(12345.12345);
 			query.addField(std::string("Foo bar blah '\\"));
 			query.addField(true);
 			query.addField(boost::tribool::false_value);
 			// TODO: there is no ValueExpression<time_duration>
 			query.addField(std::string("22:00")); // time_duration(22, 0, 0));
-			query.addField(date(2011, 03, 30));
-			query.addField(ptime(date(1995, 12, 07), time_duration(13, 25, 10)));
+			query.addFrameworkField<DateField>(date(2011, 03, 30));
+			query.addFrameworkField<PtimeField>(ptime(date(1995, 12, 07), time_duration(13, 25, 10)));
 
 			shared_ptr<Geometry> geom(CoordinatesSystem::GetInstanceCoordinatesSystem().createPoint(6, 10.3));
 			query.addField(geom);
