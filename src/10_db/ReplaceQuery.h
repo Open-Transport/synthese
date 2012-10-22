@@ -111,7 +111,7 @@ namespace synthese
 		void synthese::db::ReplaceQuery<TableSync>::addFieldNull()
 		{
 			_content.push_back(
-				Cell(optional<string>())
+				Cell(boost::optional<std::string>())
 			);
 		}
 
