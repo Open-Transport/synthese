@@ -35,6 +35,7 @@ SimpleMapField.hpp
 SimpleObjectFieldDefinition.hpp
 StringField.cpp
 StringField.hpp
+TimeField.hpp
 PointersVectorField.hpp
 WithGeometry.hpp
 )

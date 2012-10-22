@@ -1,6 +1,6 @@
 
-/** SimpleObjectField_Date class header.
-	@file SimpleObjectField_Date.hpp
+/** TimeField class header.
+	@file TimeField.hpp
 
 	This file belongs to the SYNTHESE project (public transportation specialized software)
 	Copyright (C) 2002 Hugues Romain - RCSmobility <contact@rcsmobility.com>
@@ -20,55 +20,53 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#ifndef SYNTHESE__MinutesField_hpp__
-#define SYNTHESE__MinutesField_hpp__
+#ifndef SYNTHESE__TimeField_hpp__
+#define SYNTHESE__TimeField_hpp__
 
 #include "SimpleObjectFieldDefinition.hpp"
 
-#include <boost/lexical_cast.hpp>
-#include <vector>
+#include "FrameworkTypes.hpp"
+
+#include <boost/date_time/date.hpp>
 
 namespace synthese
 {
+	class ObjectBase;
+
+	namespace util
+	{
+		class Env;
+	}
+
+
 	//////////////////////////////////////////////////////////////////////////
-	/// date partial specialization
+	/// Date field.
+	/// @ingroup m00
 	template<class C>
-	class MinutesField:
+	class TimeField:
 		public SimpleObjectFieldDefinition<C>
 	{
 	public:
-		typedef boost::posix_time::time_duration Type;
-
-	private:
 		//////////////////////////////////////////////////////////////////////////
 		/// Conversion of a date into a string to be stored (SQL format).
 		/// @param d the date to convert
 		/// @return the converted string
-		static std::string _minutesToString(const typename MinutesField<C>::Type& p)
+		static std::string TimeToString(const boost::posix_time::time_duration& t)
 		{
-			return p.is_not_a_date_time() ?
+			return 
+				t.is_not_a_date_time() ?
 				std::string() :
-				boost::lexical_cast<std::string>(p.total_seconds() / 60)
+				boost::posix_time::to_simple_string(t)
 			;
 		}
 
 
 
-		//////////////////////////////////////////////////////////////////////////
-		/// Conversion of a string into a date.
-		/// @param d the date to convert
-		/// @return the converted string
-		static typename MinutesField<C>::Type _stringToMinutes(const std::string& text)
-		{
-			return text.empty() ?
-				boost::posix_time::time_duration(boost::posix_time::not_a_date_time) :
-				boost::posix_time::minutes(boost::lexical_cast<int>(text));
-		}
+		typedef boost::posix_time::time_duration Type;
 
 
-	public:
 		static void LoadFromRecord(
-			typename MinutesField<C>::Type& fieldObject,
+			typename TimeField<C>::Type& fieldObject,
 			ObjectBase& object,
 			const Record& record,
 			const util::Env& env
@@ -76,7 +74,7 @@ namespace synthese
 			SimpleObjectFieldDefinition<C>::_LoadFromStringWithDefaultValue(
 				fieldObject,
 				record,
-				_stringToMinutes,
+				boost::posix_time::duration_from_string,
 				boost::posix_time::time_duration(boost::posix_time::not_a_date_time)
 			);
 		}
@@ -84,38 +82,21 @@ namespace synthese
 
 
 		static void SaveToFilesMap(
-			const typename MinutesField<C>::Type& fieldObject,
+			const typename TimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			FilesMap& map
 		){
 			SimpleObjectFieldDefinition<C>::_SaveToFilesMap(
 				fieldObject,
 				map,
-				_minutesToString
+				TimeToString
 			);
 		}
 
 
 
 		static void SaveToParametersMap(
-			const typename MinutesField<C>::Type& fieldObject,
-			util::ParametersMap& map,
-			const std::string& prefix,
-			boost::logic::tribool withFiles
-		){
-			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
-				fieldObject,
-				map,
-				prefix,
-				withFiles,
-				_minutesToString
-			);
-		}
-
-
-
-		static void SaveToParametersMap(
-			const typename MinutesField<C>::Type& fieldObject,
+			const typename TimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			util::ParametersMap& map,
 			const std::string& prefix,
@@ -126,28 +107,50 @@ namespace synthese
 				map,
 				prefix,
 				withFiles,
-				_minutesToString
+				TimeToString
 			);
 		}
 
 
 
+		static void SaveToParametersMap(
+			const typename TimeField<C>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				TimeToString
+			);
+		}
+
+
+
+
 		static void SaveToDBContent(
-			const typename MinutesField<C>::Type& fieldObject,
+			const typename TimeField<C>::Type& fieldObject,
 			const ObjectBase& object,
 			DBContent& content
 		){
-			MinutesField<C>::SaveToDBContent(fieldObject, content);
+			SaveToDBContent(fieldObject, content);
 		}
 
 
 
 		static void SaveToDBContent(
-			const typename MinutesField<C>::Type& fieldObject,
+			const typename TimeField<C>::Type& fieldObject,
 			DBContent& content
 		){
-			int i(fieldObject.total_seconds() / 60);
-			content.push_back(Cell(i));
+			boost::optional<std::string> text;
+			if(!fieldObject.is_not_a_date_time())
+			{
+				text = TimeToString(fieldObject);
+			}
+			content.push_back(Cell(text));
 		}
 
 
@@ -155,11 +158,10 @@ namespace synthese
 		static void GetLinkedObjectsIds(
 			LinkedObjectsIds& list, 
 			const Record& record
-		){
-		}
+		){}
 	};
 
-	#define FIELD_MINUTES(N) struct N : public MinutesField<N> {};
+	#define FIELD_TIME(N) struct N : public TimeField<N> {};
 }
 
 #endif
