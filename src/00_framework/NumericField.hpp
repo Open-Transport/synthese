@@ -97,6 +97,23 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename NumericField<C, T>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				boost::lexical_cast<std::string, typename NumericField<C, T>::Type>
+			);
+		}
+
+
+
 
 		static void SaveToDBContent(
 			const typename NumericField<C, T>::Type& fieldObject,

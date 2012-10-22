@@ -91,6 +91,23 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename EnumObjectField<C, P>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_enumToString
+			);
+		}
+
+
+
 
 		static void SaveToDBContent(
 			const typename EnumObjectField<C, P>::Type& fieldObject,

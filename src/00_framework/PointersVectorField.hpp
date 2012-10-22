@@ -151,6 +151,23 @@ namespace synthese
 
 
 
+		static void SaveToParametersMap(
+			const typename PointersVectorField<C, T>::Type& fieldObject,
+			util::ParametersMap& map,
+			const std::string& prefix,
+			boost::logic::tribool withFiles
+		){
+			SimpleObjectFieldDefinition<C>::_SaveToParametersMap(
+				fieldObject,
+				map,
+				prefix,
+				withFiles,
+				_vectorToString
+			);
+		}
+
+
+
 
 		static void SaveToDBContent(
 			const typename PointersVectorField<C, T>::Type& fieldObject,

@@ -2111,7 +2111,7 @@ namespace synthese
 			{
 				BOOST_FOREACH(const shared_ptr<CalendarTemplateElement>& element, _calendarElementsToRemove)
 				{
-					CalendarTemplateElementTableSync::RemoveRow(element->getKey(), transaction);
+					DBModule::GetDB()->deleteStmt(element->getKey(), transaction);
 				}
 				BOOST_FOREACH(const Registry<CalendarTemplate>::value_type& calendarTemplate, _env.getRegistry<CalendarTemplate>())
 				{

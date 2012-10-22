@@ -25,6 +25,7 @@
 #include "DBException.hpp"
 #include "DBModule.h"
 #include "DBResult.hpp"
+#include "PtimeField.hpp"
 #include "ReplaceQuery.h"
 #include "ResaModule.h"
 #include "ReservationTableSync.h"
@@ -154,8 +155,8 @@ namespace synthese
 			ReplaceQuery<ReservationTransactionTableSync> query(*object);
 			query.addField(object->getLastReservation());
 			query.addField(object->getSeats());
-			query.addField(object->getBookingTime());
-			query.addField(object->getCancellationTime());
+			query.addFrameworkField<PtimeField>(object->getBookingTime());
+			query.addFrameworkField<PtimeField>(object->getCancellationTime());
 			query.addField(object->getCustomerUserId());
 			query.addField(object->getCustomerName());
 			query.addField(object->getCustomerPhone());
