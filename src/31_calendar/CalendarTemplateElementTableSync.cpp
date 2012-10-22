@@ -22,11 +22,11 @@
 	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 */
 
-#include <sstream>
-
 #include "CalendarTemplateElementTableSync.h"
+
 #include "CalendarTemplateElement.h"
 #include "CalendarRight.h"
+#include "DaysField.hpp"
 #include "Log.h"
 #include "CalendarTemplate.h"
 #include "CalendarTemplateTableSync.h"
@@ -41,6 +41,8 @@
 #include "SelectQuery.hpp"
 #include "UpdateQuery.hpp"
 #include "User.h"
+
+#include <sstream>
 
 using namespace std;
 using namespace boost;
@@ -180,7 +182,7 @@ namespace synthese
 			query.addField(object->getRank());
 			query.addField(object->getMinDate().is_special() ? string() : to_iso_extended_string(object->getMinDate()));
 			query.addField(object->getMaxDate().is_special() ? string() : to_iso_extended_string(object->getMaxDate()));
-			query.addField(object->getStep().days());
+			query.addFrameworkField<DaysField>(object->getStep());
 			query.addField(static_cast<int>(object->getOperation()));
 			query.addField(object->getInclude() ? object->getInclude()->getKey() : RegistryKeyType(0));
 			query.execute(transaction);
