@@ -23,6 +23,8 @@
 #include "Fetcher.h"
 #include "FactorableTemplate.h"
 
+#include "DBModule.h"
+
 #include <boost/optional.hpp>
 
 #ifndef SYNTHESE_db_FetcherTemplate_h__
