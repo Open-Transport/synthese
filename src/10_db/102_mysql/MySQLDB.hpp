@@ -75,6 +75,7 @@ namespace synthese
 				);
 
 				void operator()(const int& i) const;
+				void operator()(const bool& i) const;
 				void operator()(const double& d) const;
 #ifndef _WINDOWS
 				void operator()(const size_t& s) const;

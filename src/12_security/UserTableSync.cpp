@@ -100,7 +100,7 @@ namespace synthese
 			Field(UserTableSync::TABLE_COL_COUNTRY, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_EMAIL, SQL_TEXT),
 			Field(UserTableSync::TABLE_COL_PHONE, SQL_TEXT),
-			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_INTEGER),
+			Field(UserTableSync::COL_LOGIN_AUTHORIZED, SQL_BOOLEAN),
 			Field(UserTableSync::COL_BIRTH_DATE, SQL_DATETIME),
 			Field(UserTableSync::COL_LANGUAGE, SQL_TEXT),
 			Field(UserTableSync::COL_DATA_SOURCE_LINKS, SQL_TEXT),
