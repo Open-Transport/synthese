@@ -386,9 +386,12 @@ namespace synthese
 		){
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
+			my_bool* isNullArray = new my_bool[fieldsNumber];
 			memset(bnd, 0, fieldsNumber * sizeof(MYSQL_BIND));
+			memset(isNullArray, 0, fieldsNumber * sizeof(my_bool));
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
+				bnd[i].is_null = isNullArray+i;
 				DBRecordCellBindConvertor visitor(*(bnd+i));
 				apply_visitor(visitor, record.getContent().at(i));
 			}
@@ -918,8 +921,6 @@ namespace synthese
 		{
 			_bnd.buffer_type = MYSQL_TYPE_LONG;
 			_bnd.buffer = static_cast<void*>(const_cast<int*>(&i));
-			_bnd.buffer_length = 0;
-			_bnd.is_null_value = false;
 		}
 
 		
@@ -928,10 +929,16 @@ namespace synthese
 		{
 			_bnd.buffer_type = MYSQL_TYPE_LONG;
 			_bnd.buffer = static_cast<void*>(const_cast<void*>(static_cast<const void*>(&s)));
-			_bnd.buffer_length = 0;
-			_bnd.is_null_value = false;
 		}
 #endif
+
+
+
+		void MySQLDB::DBRecordCellBindConvertor::operator()( const bool& d ) const
+		{
+			_bnd.buffer_type = MYSQL_TYPE_TINY;
+			_bnd.buffer = static_cast<void*>(const_cast<bool*>(&d));
+		}
 
 
 
@@ -939,8 +946,6 @@ namespace synthese
 		{
 			_bnd.buffer_type = MYSQL_TYPE_DOUBLE;
 			_bnd.buffer = static_cast<void*>(const_cast<double*>(&d));
-			_bnd.buffer_length = 0;
-			_bnd.is_null_value = false;
 		}
 
 
@@ -949,8 +954,6 @@ namespace synthese
 		{
 			_bnd.buffer_type = MYSQL_TYPE_LONGLONG;
 			_bnd.buffer = static_cast<void*>(const_cast<RegistryKeyType*>(&id));
-			_bnd.buffer_length = 0;
-			_bnd.is_null_value = false;
 		}
 
 
@@ -962,11 +965,10 @@ namespace synthese
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(str->c_str()));
 				_bnd.buffer_length = static_cast<int>(str->size());
-				_bnd.is_null_value = false;
 			}
 			else
 			{
-				_bnd.is_null_value = true;
+				*_bnd.is_null = true;
 			}
 		}
 
@@ -979,11 +981,10 @@ namespace synthese
 			{
 				_bnd.buffer = static_cast<void*>(const_cast<char*>(blob->first));
 				_bnd.buffer_length = static_cast<int>(blob->second);
-				_bnd.is_null_value = false;
 			}
 			else
 			{
-				_bnd.is_null_value = true;
+				*_bnd.is_null = true;
 			}
 		}
 

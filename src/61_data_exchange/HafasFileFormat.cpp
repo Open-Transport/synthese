@@ -103,6 +103,7 @@ namespace synthese
 		const string HafasFileFormat::Importer_::PARAMETER_WAYBACK_BIT_POSITION = "wayback_bit_position";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_FULL_SERVICES = "import_full_services";
 		const string HafasFileFormat::Importer_::PARAMETER_IMPORT_STOPS = "import_stops";
+		const string HafasFileFormat::Importer_::PARAMETER_LINES_FILTER = "lines_filter";
 	}
 
 	namespace impex
@@ -431,17 +432,29 @@ namespace synthese
 				// Declarations
 				Zugs::iterator itZug(_zugs.end());
 				string zugNumber;
+				bool loadCurrentZug(true);
 
 				// File loop
 				while(_loadLine())
 				{
 					if(_getField(0, 2) == "*Z") // New zug
 					{
+						// Line number filter
+						string lineNumber(_getField(9,6));
+						if(	!_linesFilter.empty() &&
+							_linesFilter.find(lineNumber) == _linesFilter.end()
+						){
+							loadCurrentZug = false;
+							continue;
+						}
+						loadCurrentZug = true;
+
+						// Load current zug
 						itZug = _zugs.insert(_zugs.end(), Zug());
 						itZug->number = _getField(3,5);
-						itZug->lineNumber = _getField(9,6);
+						itZug->lineNumber = lineNumber;
 						itZug->version = lexical_cast<size_t>(_getField(16, 2));
-						zugNumber = itZug->number +"/"+ itZug->lineNumber;
+						zugNumber = itZug->number +"/"+ lineNumber;
 
 						// Continuous service
 						if(!_getField(21,4).empty())
@@ -449,6 +462,10 @@ namespace synthese
 							itZug->continuousServiceRange = minutes(lexical_cast<long>(_getField(21, 4)));
 							itZug->continuousServiceWaitingTime = minutes(lexical_cast<long>(_getField(26, 3)));
 						}
+					}
+					else if(!loadCurrentZug)
+					{
+						continue;
 					}
 					else if(_getField(0, 5) == "*A VE") // Calendar
 					{
@@ -670,6 +687,16 @@ namespace synthese
 					lexical_cast<int>(_getField(3,2)),
 					lexical_cast<int>(_getField(0,2))
 				);
+			}
+
+			// Lines filter
+			string linesFilter(pm.getDefault<string>(PARAMETER_LINES_FILTER));
+			if(!linesFilter.empty())
+			{
+				vector<string> v;
+				split(v, linesFilter, is_any_of(","));
+				_linesFilter.clear();
+				copy(v.begin(), v.end(), inserter(_linesFilter, _linesFilter.end()));
 			}
 		}
 

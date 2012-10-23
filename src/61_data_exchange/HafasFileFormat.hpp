@@ -131,6 +131,7 @@ namespace synthese
 				static const std::string PARAMETER_WAYBACK_BIT_POSITION;
 				static const std::string PARAMETER_IMPORT_FULL_SERVICES;
 				static const std::string PARAMETER_IMPORT_STOPS;
+				static const std::string PARAMETER_LINES_FILTER;
 
 			private:
 				//! @name Parameters
@@ -140,6 +141,7 @@ namespace synthese
 					std::size_t _wayBackBitPosition;
 					bool _importFullServices;
 					bool _importStops;
+					std::set<std::string> _linesFilter;
 				//@}
 
 				typedef std::map<int, calendar::Calendar> CalendarMap;
