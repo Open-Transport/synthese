@@ -222,7 +222,12 @@ namespace synthese
 							y = lexical_cast<int>(_getValue(*_geometryYField));
 						else
 							continue;					
-						shared_ptr<Point> geometry(_dataSource.getActualCoordinateSystem().createPoint(x, y));
+						shared_ptr<Point> geometry(CoordinatesSystem::GetInstanceCoordinatesSystem().convertPoint(
+							*_dataSource.getActualCoordinateSystem().createPoint(
+								x,
+								y
+							)
+						));
 
 						roadName = FrenchPhoneticString::to_plain_lower_copy(roadName);
 						if(roadName.empty())
