@@ -74,7 +74,7 @@ namespace synthese
 			boost::asio::io_service _io_service;
 			mutable boost::asio::deadline_timer _deadline;
 			mutable boost::asio::ip::tcp::socket _socket;
-			mutable boost::asio::streambuf _buf;
+			mutable boost::shared_ptr<boost::asio::streambuf> _buf;
 			
 			typedef std::map<std::string, std::string> StopMnaNameMap;
 			mutable StopMnaNameMap _stopMnaNameMap;
