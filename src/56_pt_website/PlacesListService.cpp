@@ -318,6 +318,10 @@ namespace synthese
 					MainRoadChunk& chunk(static_cast<MainRoadChunk&>(*roadChunk));
 					MainRoadChunk::HouseNumber houseNumber(0);
 
+					// If road doesn't have a name, avoid return it.
+					if(!chunk.getRoad() || !chunk.getRoad()->getRoadPlace() || chunk.getRoad()->getRoadPlace()->getName() == "")
+						continue;
+
 					if(chunk.getLeftHouseNumberBounds() && chunk.getLeftHouseNumberBounds()->first != 0)
 					{
 						houseNumber = chunk.getLeftHouseNumberBounds()->first;
