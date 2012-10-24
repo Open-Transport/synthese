@@ -94,6 +94,7 @@ namespace synthese
 			tcp::resolver::query query(_nceAddress, _ncePort);
 			tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
 			tcp::resolver::iterator end;
+			_buf.reset(new boost::asio::streambuf);
 
 			// Try each endpoint until we successfully establish a connection.
 			boost::system::error_code error = boost::asio::error::host_not_found;
@@ -117,6 +118,11 @@ namespace synthese
 
 		void IneoNCEConnection::read()
 		{
+			if(!_buf.get())
+			{
+				throw Exception("Buffer is null");
+			}
+
 			// Set a deadline for the asynchronous operation. Since this function uses
 			// a composed operation (async_read_until), the deadline applies to the
 			// entire operation, rather than individual reads from the socket.
@@ -133,7 +139,7 @@ namespace synthese
 			// object is used as a callback and will update the ec variable when the
 			// operation completes. The blocking_udp_client.cpp example shows how you
 			// can use boost::bind rather than boost::lambda.
-			boost::asio::async_read_until(_socket, _buf, char(26), var(ec) = lambda::_1);
+			boost::asio::async_read_until(_socket, *_buf, char(26), var(ec) = lambda::_1);
 
 			// Block until the asynchronous operation has completed.
 			do _io_service.run_one(); while (ec == boost::asio::error::would_block);
@@ -287,7 +293,7 @@ namespace synthese
 
 			// Copy the content obtained from the NCE into a string
 			string bufStr;
-			istream is(&_buf);
+			istream is(_buf.get());
 			getline(is, bufStr, char(26));
 			trim(bufStr);
 			if(bufStr.empty())
@@ -547,8 +553,19 @@ namespace synthese
 				if(	!dateNode.isEmpty() &&
 					!heureNode.isEmpty()
 				){
+					string dateStr(dateNode.getText());
+					vector<string> parts;
+					split(parts, dateStr, is_any_of("/"));
+					if(parts.size() != 3)
+					{
+						throw Exception("Malformed date");
+					}
 					nceNow = ptime(
-						from_string(dateNode.getText()),
+						date(
+							lexical_cast<long>(parts[2]),
+							lexical_cast<long>(parts[1]),
+							lexical_cast<long>(parts[0])
+						),
 						duration_from_string(heureNode.getText())
 					);
 				}
