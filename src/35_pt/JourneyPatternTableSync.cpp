@@ -97,7 +97,7 @@ namespace synthese
 			Field(JourneyPatternTableSync::COL_HANDICAPPEDCOMPLIANCEID, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_PEDESTRIANCOMPLIANCEID, SQL_INTEGER),
 			Field(JourneyPatternTableSync::COL_WAYBACK, SQL_INTEGER),
-			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_INTEGER),
+			Field(JourneyPatternTableSync::COL_DATASOURCE_ID, SQL_TEXT),
 			Field(JourneyPatternTableSync::COL_MAIN, SQL_BOOLEAN),
 			Field(JourneyPatternTableSync::COL_PLANNED_LENGTH, SQL_DOUBLE),
 			Field()
