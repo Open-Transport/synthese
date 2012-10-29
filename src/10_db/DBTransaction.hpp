@@ -63,8 +63,8 @@ namespace synthese
 			void addReplaceStmt(const DBRecord& record);
 			void addDeleteStmt(util::RegistryKeyType id);
 			void addDBModifEvent(const DB::DBModifEvent& modifEvent);
-			const Queries getQueries() const;
-			const DBModifEvents getDBModifEvents() const;
+			const Queries& getQueries() const;
+			const DBModifEvents& getDBModifEvents() const;
 			void run();
 		};
 }	}

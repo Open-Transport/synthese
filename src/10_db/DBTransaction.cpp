@@ -76,6 +76,10 @@ namespace synthese
 
 		void DBTransaction::run(
 		){
+			if(_queries.empty())
+			{
+				return;
+			}
 			DBModule::GetDB()->execTransaction(*this);
 			_queries.clear();
 			_modifiedRows.clear();
@@ -83,14 +87,14 @@ namespace synthese
 
 
 
-		const DBTransaction::Queries DBTransaction::getQueries() const
+		const DBTransaction::Queries& DBTransaction::getQueries() const
 		{
 			return _queries;
 		}
 
 
 
-		const DBTransaction::DBModifEvents DBTransaction::getDBModifEvents() const
+		const DBTransaction::DBModifEvents& DBTransaction::getDBModifEvents() const
 		{
 			return _modifEvents;
 		}
