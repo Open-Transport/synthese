@@ -74,6 +74,7 @@ namespace synthese
 					FILE* pipe = popen(cmdStr.c_str(), "r");
 					if(!pipe)
 					{
+						Log::GetInstance().debug("popen failure");
 						return result;
 					}
 					char buffer[128];
