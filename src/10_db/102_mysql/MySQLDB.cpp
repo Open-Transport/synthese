@@ -384,6 +384,7 @@ namespace synthese
 		void MySQLDB::saveRecord(
 			const DBRecord& record
 		){
+			boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
 			MYSQL_BIND* bnd = new MYSQL_BIND[fieldsNumber];
 			my_bool* isNullArray = new my_bool[fieldsNumber];
@@ -416,6 +417,7 @@ namespace synthese
 
 		void MySQLDB::deleteRow( util::RegistryKeyType id )
 		{
+			boost::recursive_mutex::scoped_lock lock(_connectionMutex);
 			MYSQL_BIND bnd[1];
 			memset(bnd, 0, sizeof(bnd));
 			DBRecordCellBindConvertor visitor(*bnd);
