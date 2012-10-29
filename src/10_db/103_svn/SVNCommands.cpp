@@ -22,6 +22,8 @@
 
 #include "SVNCommands.hpp"
 
+#include "Log.h"
+
 #include <sstream>
 #include <stdio.h>
 #ifdef WIN32
@@ -36,6 +38,8 @@ using namespace boost::algorithm;
 
 namespace synthese
 {
+	using namespace util;
+	
 	namespace db
 	{
 		namespace svn
