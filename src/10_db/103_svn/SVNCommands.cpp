@@ -64,6 +64,8 @@ namespace synthese
 					cmd << " " << parameters << " 2>&1";
 					string cmdStr(cmd.str());
 
+					Log::GetInstance().trace(cmdStr);
+
 					stringstream response;
 					FILE* pipe = popen(cmdStr.c_str(), "r");
 					if(!pipe)
