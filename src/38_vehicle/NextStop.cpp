@@ -78,7 +78,7 @@ namespace synthese
 				time_duration duration(_arrivalTime - now);
 				pm.insert(
 					ATTR_ARRIVAL_DURATION,
-					ceil(duration.total_seconds() / 60.0)
+					duration.total_seconds() < 0 ? 0 : ceil(duration.total_seconds() / 60.0)
 				);
 			}
 		}
