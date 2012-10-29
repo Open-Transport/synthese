@@ -473,8 +473,8 @@ namespace synthese
 						{
 							Zug::CalendarUse calendarUse;
 							calendarUse.calendarNumber = lexical_cast<size_t>(_getField(22, 6));
-							calendarUse.startStopCode = lexical_cast<size_t>(_getField(6, 6));
-							calendarUse.endStopCode = lexical_cast<size_t>(_getField(14, 6));
+							calendarUse.startStopCode = _getField(6, 7);
+							calendarUse.endStopCode = _getField(14, 7);
 							itZug->calendars.push_back(calendarUse);
 						}
 					}
@@ -591,6 +591,24 @@ namespace synthese
 			stream << t.cell("Position du chiffre aller retour", t.getForm().getTextInput(PARAMETER_WAYBACK_BIT_POSITION, lexical_cast<string>(_wayBackBitPosition)));
 			stream << t.cell("Importer les services complets", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_FULL_SERVICES, _importFullServices));
 			stream << t.cell("Importer les arrêts", t.getForm().getOuiNonRadioInput(PARAMETER_IMPORT_STOPS, _importStops));
+
+			// Lines filter
+			stringstream textValue;
+			bool first(true);
+			BOOST_FOREACH(const string& item, _linesFilter)
+			{
+				if(first)
+				{
+					first = false;
+				}
+				else
+				{
+					textValue << ",";
+				}
+				textValue << item;
+			}
+			stream << t.cell("Filtre lignes", t.getForm().getTextInput(PARAMETER_LINES_FILTER, textValue.str()));
+
 			stream << t.close();
 		}
 
@@ -1421,8 +1439,9 @@ namespace synthese
 
 					// Service
 					SchedulesBasedService* service(NULL);
-					if(zug.continuousServiceRange.is_not_a_date_time())
-					{
+					if(	zug.continuousServiceRange.is_not_a_date_time() ||
+						zug.continuousServiceRange.total_seconds() == 0
+					){
 						service = PTFileFormat::CreateOrUpdateService(
 							*route,
 							departures,
