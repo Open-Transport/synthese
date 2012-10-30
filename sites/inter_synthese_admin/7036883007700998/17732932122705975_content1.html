@@ -2,6 +2,7 @@
 <body>
 <h1>Maitre</h1>
 
+
 <table>
 <tr><th>host</th><th>port</th><th>active</th><th>config</th><th></th></tr>
 <?inter_synthese_slaves_view&template=
@@ -11,11 +12,24 @@
 <td><@address@></td>
 <td><@port@></td>
 <td><@active@></td>
-<td><@config@></td>
+<td><@config_id@></td>
 <td><?link&target=17732932122705976&text=Detail&slave_id=<@id@>?></td>
 </tr>
 }>
 ?>
+
+<?form&name=new_slave&page_id=<@p@>&a=ObjectCreate&actionParam_table_id=93?>
+<tr>
+
+<td><input name="actionParam_field_address" /></td>
+<td><input name="actionParam_field_port" /></td>
+<td><input name="actionParam_field_active" /></td>
+<td><input name="actionParam_field_config" /></td>
+<td><input type="submit" value="OK" /></td>
+
+</tr>
+</form>
+
 </table>
 
 
@@ -38,14 +52,24 @@
 
 <?form&page_id=<@p@>&name=add_config&a=ObjectCreate&actionParam_table_id=94?>
 <table>
+<tr><th>ID</th><th>Nom</th><th></th></tr>
 
 <?inter_synthese_configs&template=
+<{config&template=
 <tr>
+<td><@id@></td>
+<td><@name@></td>
+<td><?link&target=17732932122705977&config_id=<@id@>&text=Ouvrir?>
+</tr>
+}>?>
 
 
+<tr>
+<td></td>
+<td><input name="actionParam_field_name" /></td>
 <td><input type="submit" value="OK" /></td>
 </tr>
 </form>
-?>
+
 
 </table>
