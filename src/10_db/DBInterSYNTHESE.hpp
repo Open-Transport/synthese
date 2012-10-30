@@ -35,6 +35,7 @@ namespace synthese
 	namespace db
 	{
 		class DBRecord;
+		class DBTransaction;
 
 		//////////////////////////////////////////////////////////////////////////
 		/// InterSYNTHESE DB class.
@@ -62,14 +63,21 @@ namespace synthese
 
 			DBInterSYNTHESE();
 
+			mutable std::auto_ptr<DBTransaction> _transaction;
 			
 			virtual bool mustBeEnqueued(
 				const std::string& configPerimeter,
 				const std::string& messagePerimeter
 			) const;
 
+			virtual void initSync(
+			) const;
+
 			virtual bool sync(
 				const std::string& parameter
+			) const;
+
+			virtual void closeSync(
 			) const;
 
 			virtual void initQueue(
