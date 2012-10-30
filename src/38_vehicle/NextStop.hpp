@@ -67,6 +67,10 @@ namespace synthese
 			void setInStopArea(bool value){ _inStopArea = value; }
 
 			const std::string& getStopIdentifier() const { return _stopIdentifier; } 
+			bool getInStopArea() const { return _inStopArea; }
+			pt::StopPoint* getStop() const { return _stop; }
+			const std::string& getStopName() const { return _stopName; }
+			const boost::posix_time::ptime& getArrivalTime() const { return _arrivalTime; }
 
 			void toParametersMap(
 				util::ParametersMap& pm
