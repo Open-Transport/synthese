@@ -427,11 +427,34 @@ namespace synthese
 
 				// ZoneA
 				XMLNode zoneANode(childNode.getChildNode("ZoneA"));
+				bool lastInZone(VehicleModule::GetCurrentVehiclePosition().getInStopArea());
+				bool inZoneHasChanged(false);
 				if(!zoneANode.isEmpty())
 				{
-					VehicleModule::GetCurrentVehiclePosition().setInStopArea(
-						zoneANode.getText() == string("1")
+					bool inZone(zoneANode.getText() == string("1"));
+					VehicleModule::GetCurrentVehiclePosition().setInStopArea(inZone);
+					if(lastInZone && !inZone)
+					{
+						inZoneHasChanged = true;
+					}
+				}
+
+				// Refresh of the next stops if the vehicle has exited from the stop area
+				if(inZoneHasChanged)
+				{
+					CurrentJourney::NextStops nextStops;
+					const CurrentJourney::NextStops& lastNextStops(
+						VehicleModule::GetCurrentJourney().getNextStops()
 					);
+					BOOST_FOREACH(const CurrentJourney::NextStops::value_type& nextStop, lastNextStops)
+					{
+						if(nextStop.getInStopArea())
+						{
+							continue;
+						}
+						nextStops.push_back(nextStop);
+					}
+					VehicleModule::GetCurrentJourney().setNextStops(nextStops);
 				}
 
 				// Ord
@@ -517,12 +540,11 @@ namespace synthese
 					(voyageNode.isEmpty() ? childNode : voyageNode).getChildNode("ListeArrets")
 				);
 				if(!listeArretsNode.isEmpty())
-
 				{
 					_stopOrdMnaMap.clear();
 					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 					{
-						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
+						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", static_cast<int>(i)));
 						if(blocANode.isEmpty())
 						{
 							continue;
@@ -562,9 +584,9 @@ namespace synthese
 					}
 					nceNow = ptime(
 						date(
-							lexical_cast<long>(parts[2]),
-							lexical_cast<long>(parts[1]),
-							lexical_cast<long>(parts[0])
+							lexical_cast<unsigned short>(parts[2]),
+							lexical_cast<unsigned short>(parts[1]),
+							lexical_cast<unsigned short>(parts[0])
 						),
 						duration_from_string(heureNode.getText())
 					);
@@ -578,7 +600,7 @@ namespace synthese
 					CurrentJourney::NextStops nextStops;
 					for(size_t i(0); i<listeArretsNode.nChildNode("BlocA"); ++i)
 					{
-						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", i));
+						XMLNode blocANode(listeArretsNode.getChildNode("BlocA", static_cast<int>(i)));
 						if(blocANode.isEmpty())
 						{
 							ok = false;
