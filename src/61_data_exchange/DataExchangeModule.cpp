@@ -100,6 +100,7 @@ namespace synthese
 				new thread(
 					&IneoNCEConnection::InitThread
 			)	);
+			ServerModule::AddThread(nceThread, "Ineo NCE connector");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
