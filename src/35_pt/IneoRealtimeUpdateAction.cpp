@@ -346,7 +346,7 @@ namespace synthese
 			if(_cleanDestinataireTableAfterAction)
 			{
 				stringstream query;
-				query << "TRUNCATE TABLE " << _database << ".DESTINATAIRE";
+				query << "TRUNCATE TABLE " << _database << ".DESTINATAIRE;";
 				db->execUpdate(query.str(), transaction);
 			}
 
