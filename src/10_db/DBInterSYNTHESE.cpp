@@ -133,7 +133,8 @@ namespace synthese
 					string tableName(DBModule::GetTableSync(tableId)->getFormat().NAME);
 
 					// STMT execution
-					DB& db(*DBModule::GetDB());
+					_transaction->addDeleteStmt(id);
+/*					DB& db(*DBModule::GetDB());
 					db.deleteRow(id);
 
 					db.addDBModifEvent(
@@ -155,7 +156,7 @@ namespace synthese
 						iSContent,
 						optional<DBTransaction&>()
 					);
-				}
+*/				}
 				catch(...)
 				{
 					return false;
@@ -289,8 +290,9 @@ namespace synthese
 
 					r.setContent(content);
 
+					_transaction->addReplaceStmt(r);
 					// STMT execution
-					DB& db(*DBModule::GetDB());
+/*					DB& db(*DBModule::GetDB());
 					db.saveRecord(r);
 
 					db.addDBModifEvent(
@@ -312,7 +314,7 @@ namespace synthese
 						iSContent,
 						optional<DBTransaction&>()
 					);
-				}
+*/				}
 				catch (DBException&)
 				{
 					return false;
@@ -585,6 +587,25 @@ namespace synthese
 		) const {
 			return configPerimeter == messagePerimeter &&
 				messagePerimeter != InterSYNTHESEQueue::TABLE_NAME;
+		}
+
+
+
+		void DBInterSYNTHESE::initSync() const
+		{
+			assert(!_transaction.get());
+
+			_transaction.reset(new DBTransaction);
+		}
+
+
+
+		void DBInterSYNTHESE::closeSync() const
+		{
+			assert(_transaction.get());
+
+			_transaction->run();
+			_transaction.reset();
 		}
 }	}
 

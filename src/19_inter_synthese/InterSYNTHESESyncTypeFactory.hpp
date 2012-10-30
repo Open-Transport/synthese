@@ -42,8 +42,14 @@ namespace synthese
 		public:
 			InterSYNTHESESyncTypeFactory();
 
+			virtual void initSync(
+			) const = 0;
+
 			virtual bool sync(
 				const std::string& parameter
+			) const = 0;
+
+			virtual void closeSync(
 			) const = 0;
 
 			virtual void initQueue(

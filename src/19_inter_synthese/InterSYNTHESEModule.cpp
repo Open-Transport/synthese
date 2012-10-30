@@ -213,20 +213,39 @@ namespace synthese
 								);
 								if(result2.str() == InterSYNTHESEUpdateAckService::VALUE_OK)
 								{
+									// Local variables
+									auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;
+									string lastFactoryKey;
+
 									// Reading the content
 									BOOST_FOREACH(const ContentMap::value_type& item, content)
 									{
 										try
 										{
-											auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE(
-												Factory<InterSYNTHESESyncTypeFactory>::create(item.second.first)
-											);
+											const string& factoryKey(item.second.first);
+											if(factoryKey != lastFactoryKey)
+											{
+												if(interSYNTHESE.get())
+												{
+													interSYNTHESE->closeSync();
+												}
+												interSYNTHESE.reset(
+													Factory<InterSYNTHESESyncTypeFactory>::create(factoryKey)
+												);
+												lastFactoryKey = factoryKey;
+												interSYNTHESE->initSync();
+											}
+
 											interSYNTHESE->sync(item.second.second);
 										}
 										catch(...)
 										{
 											// Log
 										}
+									}
+									if(interSYNTHESE.get())
+									{
+										interSYNTHESE->closeSync();
 									}
 								}
 							}
