@@ -1,0 +1,45 @@
+<?inter_synthese_configs&template=
+<{config&template=<?if&cond=<@id==config_id@>&then=
+
+<h1>Propriétés</h1>
+
+<?form&name=properties&page_id=<@p@>&a=ObjectUpdate&actionParam_object_id=<@config_id@>&config_id=<@config_id@>?>
+<table>
+<tr><td>ID</td><td><@id@></td></tr>
+<tr><td>Nom</td><td><input name="actionParam_field_name" value="<@name@>" /></td></tr>
+<tr><td></td><td><input type="submit" value="OK" /></td></tr>
+</table>
+</form>
+
+<h1>Règles</h1>
+
+<table>
+<tr><th>Type</th><th>Paramètres</th></tr>
+
+<{item&template=
+
+<tr>
+<td><@sync_type@></td>
+<td>
+<?if&cond=<@sync_type=="db"@>&then=
+<?tables&template=<{table&template=<@(id==perimeter)?name:""@>}>?>
+&else=
+<@perimeter@>?></td>
+<td><?link&target=<@p@>&a=RemoveObjectAction&actionParamoi=<@id@>&text=Supprimer&config_id=<@config_id@>?></td>
+</tr>
+}>
+
+<?form&page_id=<@p@>&name=add_item&a=ObjectCreate&actionParam_table_id=95&actionParam_field_config_id=<@id@>&config_id=<@config_id@>?>
+
+<tr>
+<td><input name="actionParam_field_sync_type" /></td>
+<td><select name="actionParam_field_perimeter">
+<?tables&template=<{table&template=<option value="<@id@>"><@name@></option>}>?>
+</select></td>
+<td><input type="submit" value="OK" /></td>
+</tr>
+
+</form>
+</table>
+
+?>}>?>
