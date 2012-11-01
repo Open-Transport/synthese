@@ -240,7 +240,7 @@ namespace synthese
 				if(	jp.getCommercialLine()->hasLinkWithSource(*get<DataSource>())
 				){
 					stringstream result;
-					result << setw(3) << setfill('0') << jp.getCommercialLine()->getACodeBySource(*get<DataSource>());
+					result << jp.getCommercialLine()->getACodeBySource(*get<DataSource>());
 					result << (jp.getWayBack() ? "B" : "A");
 					return result.str();
 				}
