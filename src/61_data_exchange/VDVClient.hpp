@@ -101,7 +101,7 @@ namespace synthese
 			void setLastDataReadyNow() const;
 			void clearLastDataReady() const;
 
-			const std::string& getDirectionID(
+			std::string getDirectionID(
 				const pt::JourneyPattern& jp
 			) const;
 
