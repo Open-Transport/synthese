@@ -472,7 +472,8 @@ namespace synthese
 				PTRoutePlannerResult::PlacesListConfiguration::List::const_iterator& itPlaces,
 				const geography::NamedPlace& placeToSearch,
 				std::size_t columnNumber,
-				bool displayFoot
+				bool displayFoot,
+				PlacesContentVector::iterator itSheetRowEnd
 			) const;
 
 
