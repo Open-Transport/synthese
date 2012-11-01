@@ -81,8 +81,9 @@ namespace synthese
 
 			XMLResults results;
 			XMLNode allNode = XMLNode::parseString(content.c_str(), "vdv453:AboAnfrage", &results);
-			if (results.error != eXMLErrorNone)
-			{
+			if(	results.error != eXMLErrorNone ||
+				allNode.isEmpty()
+			){
 				_errorNumber = "100";
 				_errorText = "Malformed XML";
 				return;
@@ -120,7 +121,7 @@ namespace synthese
 				size_t nbNodes(allNode.nChildNode("AboAZB"));
 				for(size_t i(0); i<nbNodes; ++i)
 				{
-					XMLNode aboAZBNode(allNode.getChildNode("AboAZB", i));
+					XMLNode aboAZBNode(allNode.getChildNode("AboAZB", static_cast<int>(i)));
 					string id(aboAZBNode.getAttribute("AboID"));
 					if(id.empty())
 					{
@@ -256,7 +257,10 @@ namespace synthese
 			stream << result.str();
 
 			// Trace
-			_client->trace("AboAntwort", result.str());
+			if(_client)
+			{
+				_client->trace("AboAntwort", result.str());
+			}
 
 			// Map return
 			return map;

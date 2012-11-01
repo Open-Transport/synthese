@@ -231,7 +231,7 @@ namespace synthese
 
 
 
-		const string& VDVClient::getDirectionID(
+		string VDVClient::getDirectionID(
 			const JourneyPattern& jp
 		) const {
 
