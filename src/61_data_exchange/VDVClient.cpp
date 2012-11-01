@@ -60,6 +60,7 @@ namespace synthese
 	FIELD_DEFINITION_OF_TYPE(ReplyPort, "reply_port", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(DefaultDirection, "default_direction", SQL_TEXT)
 	FIELD_DEFINITION_OF_TYPE(Active, "active", SQL_BOOLEAN)
+	FIELD_DEFINITION_OF_TYPE(SBBMode, "sbb_mode", SQL_BOOLEAN)
 	
 	namespace data_exchange
 	{
@@ -82,7 +83,8 @@ namespace synthese
 					FIELD_DEFAULT_CONSTRUCTOR(DataSource),
 					FIELD_DEFAULT_CONSTRUCTOR(DefaultDirection),
 					FIELD_VALUE_CONSTRUCTOR(Active, true),
-					FIELD_DEFAULT_CONSTRUCTOR(TracePath)
+					FIELD_DEFAULT_CONSTRUCTOR(TracePath),
+					FIELD_VALUE_CONSTRUCTOR(SBBMode, false)
 			)	),
 			_lastDataReady(not_a_date_time)
 		{
@@ -233,14 +235,32 @@ namespace synthese
 			const JourneyPattern& jp
 		) const {
 
-			if(	get<DataSource>() &&
-				jp.hasLinkWithSource(*get<DataSource>())
+			if( get<SBBMode>()
 			){
-				return jp.getACodeBySource(*get<DataSource>());
+				if(	jp.getCommercialLine()->hasLinkWithSource(*get<DataSource>())
+				){
+					stringstream result;
+					result << get<ServerControlCentreCode>();
+					result << setw(3) << setfill('0') << jp.getCommercialLine()->getACodeBySource(*get<DataSource>());
+					result << (jp.getWayBack() ? "B" : "A");
+					return result.str();
+				}
+				else
+				{
+					return get<DefaultDirection>();
+				}
 			}
 			else
 			{
-				return get<DefaultDirection>();
+				if(	get<DataSource>() &&
+					jp.hasLinkWithSource(*get<DataSource>())
+				){
+					return jp.getACodeBySource(*get<DataSource>());
+				}
+				else
+				{
+					return get<DefaultDirection>();
+				}
 			}
 		}
 

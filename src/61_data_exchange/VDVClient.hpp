@@ -52,6 +52,7 @@ namespace synthese
 		FIELD_STRING(ReplyPort)
 		FIELD_STRING(DefaultDirection)
 		FIELD_BOOL(Active)
+		FIELD_BOOL(SBBMode)
 
 		typedef boost::fusion::map<
 			FIELD(Key),
@@ -64,7 +65,8 @@ namespace synthese
 			FIELD(impex::DataSource),
 			FIELD(DefaultDirection),
 			FIELD(Active),
-			FIELD(TracePath)
+			FIELD(TracePath),
+			FIELD(SBBMode)
 		> VDVClientRecord;
 
 		/** VDV client.
