@@ -40,6 +40,7 @@ using namespace boost;
 
 namespace synthese
 {
+	using namespace db;
 	using namespace util;
 	using namespace server;
 	using namespace security;
@@ -65,13 +66,15 @@ namespace synthese
 			else
 				SecurityModule::_rootProfile = rootProfiles.front();
 
+			DBTransaction transaction;
+
 			SecurityModule::_rootProfile->setName(SecurityModule::ROOT_PROFILE);
 			shared_ptr<Right> r(new GlobalRight);
 			r->setPublicLevel(DELETE_RIGHT);
 			r->setPrivateLevel(DELETE_RIGHT);
 			SecurityModule::_rootProfile->cleanRights();
 			SecurityModule::_rootProfile->addRight(r);
-			ProfileTableSync::Save(SecurityModule::_rootProfile.get());
+			ProfileTableSync::Save(SecurityModule::_rootProfile.get(), transaction);
 
 			UserTableSync::SearchResult rootUsers(
 				UserTableSync::Search(
@@ -93,7 +96,9 @@ namespace synthese
 			SecurityModule::_rootUser->setName(SecurityModule::ROOT_USER);
 			SecurityModule::_rootUser->setProfile(SecurityModule::_rootProfile.get());
 			SecurityModule::_rootUser->setConnectionAllowed(true);
-			UserTableSync::Save(SecurityModule::_rootUser.get());
+			UserTableSync::Save(SecurityModule::_rootUser.get(), transaction);
+
+			transaction.run();
 		}
 
 		template<> void ModuleClassTemplate<SecurityModule>::End()

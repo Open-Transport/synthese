@@ -51,6 +51,7 @@ using boost::recursive_mutex;
 
 namespace synthese
 {
+	using namespace inter_synthese;
 	using namespace util;
 
 	namespace db
@@ -484,15 +485,18 @@ namespace synthese
 #endif
 
 			// Inter-SYNTHESE sync
-			inter_synthese::InterSYNTHESEContent content(
-				DBInterSYNTHESE::FACTORY_KEY,
-				lexical_cast<string>(r.getTable()->getFormat().ID),
-				DBInterSYNTHESE::GetReplaceStmtContent(r)
-			);
-			inter_synthese::InterSYNTHESEModule::Enqueue(
-				content,
-				transaction
-			);
+			if(Factory<InterSYNTHESESyncTypeFactory>::size()) // Avoid in unit tests
+			{
+				inter_synthese::InterSYNTHESEContent content(
+					DBInterSYNTHESE::FACTORY_KEY,
+					lexical_cast<string>(r.getTable()->getFormat().ID),
+					DBInterSYNTHESE::GetReplaceStmtContent(r)
+				);
+				inter_synthese::InterSYNTHESEModule::Enqueue(
+					content,
+					transaction
+				);
+			}
 		}
 
 
