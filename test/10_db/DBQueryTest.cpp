@@ -26,6 +26,7 @@
 #include "TestTableSync.hpp"
 
 #include "10_db/UpdateQuery.hpp"
+#include "ReplaceQuery.h"
 
 void testQuery(const TestBackend& testBackend)
 {
@@ -182,6 +183,19 @@ void testQuery(const TestBackend& testBackend)
 		BOOST_CHECK_EQUAL(objFromReg->getNetworkId(), 16);
 		BOOST_CHECK_EQUAL(objFromReg->getName(), "sample name");
 		BOOST_CHECK_EQUAL(objFromReg->getShortName(), "some short name");
+	}
+
+	// Replace query and transactions
+	{
+		DBTransaction transaction;
+
+		TestObject obj;
+		synthese::db::ReplaceQuery<TestTableSync> insertQuery(obj);
+		insertQuery.addField(RegistryKeyType(12));
+		insertQuery.addField(string("test"));
+		insertQuery.addField(string("test"));
+		insertQuery.execute(transaction);
+		transaction.run();
 	}
 }
 
