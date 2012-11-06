@@ -219,6 +219,7 @@ namespace synthese
 						{
 							stmtFields.insert(make_pair(fieldName, optional<string>()));
 							for(; i<parameter.size() && parameter[i]!=FIELD_SEPARATOR[0]; ++i) ;
+							++i;
 						}
 						else
 						{
@@ -255,35 +256,38 @@ namespace synthese
 					BOOST_FOREACH(const FieldsList::value_type& field, r.getTable()->getFieldsList())
 					{
 						StmtFields::const_iterator it(stmtFields.find(field.name));
-						if(it == stmtFields.end())
-						{
-							return false;
-						}
-
-						if(!it->second)
-						{
+						if(	it == stmtFields.end() ||
+							!it->second
+						){
 							content.push_back(Cell(optional<string>()));
 						}
 						else
 						{
-							switch(field.type)
+							try
 							{
-							case SQL_INTEGER:
-								content.push_back(Cell(lexical_cast<RegistryKeyType>(*it->second)));
-								break;
+								switch(field.type)
+								{
+								case SQL_INTEGER:
+									content.push_back(Cell(lexical_cast<RegistryKeyType>(*it->second)));
+									break;
 
-							case SQL_DOUBLE:
-								content.push_back(Cell(lexical_cast<double>(*it->second)));
-								break;
+								case SQL_DOUBLE:
+									content.push_back(Cell(lexical_cast<double>(*it->second)));
+									break;
 
-							case SQL_BOOLEAN:
-								content.push_back(Cell(lexical_cast<bool>(*it->second)));
-								break;
+								case SQL_BOOLEAN:
+									content.push_back(Cell(lexical_cast<bool>(*it->second)));
+									break;
 
-							default:
-								content.push_back(Cell(it->second));
-								break;
+								default:
+									content.push_back(Cell(it->second));
+									break;
 
+								}
+							}
+							catch(bad_lexical_cast&)
+							{
+								content.push_back(Cell(optional<string>()));
 							}
 						}
 					}
