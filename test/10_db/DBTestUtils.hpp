@@ -37,6 +37,7 @@
 #include "10_db/102_mysql/MySQLException.hpp"
 #endif
 
+#include <boost/thread.hpp>
 #include <boost/filesystem/operations.hpp>
 #include <boost/shared_ptr.hpp>
 #include <iostream>
@@ -191,7 +192,7 @@ public:
 		DBModule::GetDB()->execUpdate("DROP DATABASE IF EXISTS " + _dbName);
 		DBModule::GetDB()->execUpdate("CREATE DATABASE " + _dbName);
 
-		DBModule::GetDB()->initPreparedStatements();
+		DBModule::GetDB()->initPreparedStatements(boost::this_thread::get_id());
 	}
 };
 
