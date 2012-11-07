@@ -253,24 +253,28 @@ namespace synthese
 				private:
 					const road::House * _house;
 					int _distanceToOriginPoint;
+					std::string _name;
 				public:
-					SortHouseByDistanceToOriginPoint(const road::House * house, int distanceToOriginPoint);
+					SortHouseByDistanceToOriginPoint(const road::House * house, int distanceToOriginPoint, std::string name);
 					bool operator<(SortHouseByDistanceToOriginPoint const &otherHouse) const;
 					const road::House * getHouse() const;
 					int getDistanceToOriginPoint() const;
+					std::string getName() const {return _name;};
 			};
 			
 			typedef std::map<const SortHouseByDistanceToOriginPoint, boost::shared_ptr<road::House> > HouseMapType;
 
 			// Add the house to the house map
 			void addHouse(
-				HouseMapType & houseMap,
-				const boost::shared_ptr<road::House> & house
+				HouseMapType* const* houseMap,
+				const boost::shared_ptr<road::House> & house,
+				std::string _name
 			) const;
 
 			int CalcDistanceToOriginPoint(const boost::shared_ptr<road::House> & house) const;
 
 		private:
+			HouseMapType* _houseMap;
 			template<class T>
 			void _registerItems(
 				util::ParametersMap& map,
