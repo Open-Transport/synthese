@@ -52,6 +52,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<TreeModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<TreeModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<TreeModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace tree

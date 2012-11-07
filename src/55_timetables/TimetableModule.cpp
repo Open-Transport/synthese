@@ -54,6 +54,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<TimetableModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<TimetableModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<TimetableModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace timetables

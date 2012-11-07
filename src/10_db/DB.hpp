@@ -30,6 +30,7 @@
 #include "DBTableSync.hpp"
 #include "Field.hpp"
 
+#include <boost/thread.hpp>
 #include <boost/thread/recursive_mutex.hpp>
 #include <boost/shared_ptr.hpp>
 
@@ -152,6 +153,7 @@ namespace synthese
 			virtual void preInit();
 			virtual void init();
 			virtual void initPreparedStatements() = 0;
+			virtual void removePreparedStatements() = 0;
 			
 			
 			//////////////////////////////////////////////////////////////////////////

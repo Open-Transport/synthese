@@ -51,6 +51,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<HikingModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<HikingModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<HikingModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace hiking

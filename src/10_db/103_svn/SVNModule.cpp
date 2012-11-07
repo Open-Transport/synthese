@@ -61,6 +61,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<SVNModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<SVNModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<SVNModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace db

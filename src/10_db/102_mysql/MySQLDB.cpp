@@ -151,14 +151,10 @@ namespace synthese
 			initForStandaloneUse();
 
 			// TODO: is the thread deleted properly on module unload?
-
-			_modifEventsThread.reset(
-				new thread(
-					bind(
-						&MySQLDB::_modifEventsDispatcherThread,
-						this
-			)	)	);
-			server::ServerModule::AddThread(_modifEventsThread, "MySQL db modification events dispatcher");
+			server::ServerModule::AddThread(
+				bind(&MySQLDB::_modifEventsDispatcherThread, this),
+				"MySQL db modification events dispatcher"
+			);
 
 			DB::preInit();
 		}
@@ -314,8 +310,14 @@ namespace synthese
 
 
 
-		void MySQLDB::initPreparedStatements()
-		{
+		void MySQLDB::initPreparedStatements(
+		){
+			// Runs only once at the first thread creation
+			if(!_replaceStatements.empty())
+			{
+				return;
+			}
+
 			// Clear the statements
 			size_t tablesNumber(
 				DBModule::GetTablesById().rbegin()->first + 1
@@ -908,6 +910,13 @@ namespace synthese
 				" (errno=" + lexical_cast<string>(mysql_errno(_connection)) + ")",
 				mysql_errno(_connection)
 			);
+		}
+
+
+
+		void MySQLDB::removePreparedStatements()
+		{
+			// Do nothing
 		}
 
 

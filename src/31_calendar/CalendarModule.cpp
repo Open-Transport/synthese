@@ -59,6 +59,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<CalendarModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<CalendarModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<CalendarModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace calendar

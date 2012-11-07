@@ -50,6 +50,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<AlgorithmModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<AlgorithmModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<AlgorithmModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace algorithm

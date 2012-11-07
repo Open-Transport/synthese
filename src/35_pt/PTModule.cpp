@@ -95,11 +95,7 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTModule>::Init()
 		{
 			// Data cleaner
-			shared_ptr<thread> theThread(
-				new thread(
-					&PTModule::RTDataCleaner
-			)	);
-			ServerModule::AddThread(theThread, "Real time data cleaner");
+			ServerModule::AddThread(&PTModule::RTDataCleaner, "Real time data cleaner");
 
 			// Creation of each transport mode corresponding to Trident values except "Other" which is used for null pointer
 			Env env;
@@ -140,6 +136,18 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<PTModule>::End()
 		{
+		}
+
+
+
+		template<> void ModuleClassTemplate<PTModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<PTModule>::CloseThread(
+		){
 		}
 	}
 

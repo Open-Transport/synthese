@@ -56,6 +56,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<ImpExModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<ImpExModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ImpExModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace impex

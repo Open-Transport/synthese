@@ -55,6 +55,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<TransportWebsiteModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<TransportWebsiteModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace pt_website

@@ -68,6 +68,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<RoadModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<RoadModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<RoadModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace road

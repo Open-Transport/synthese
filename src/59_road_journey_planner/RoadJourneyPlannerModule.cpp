@@ -55,6 +55,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<RoadJourneyPlannerModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<RoadJourneyPlannerModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<RoadJourneyPlannerModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace road_journey_planner

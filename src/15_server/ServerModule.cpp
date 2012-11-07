@@ -28,7 +28,6 @@
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
-#include <boost/thread.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 
@@ -153,6 +152,20 @@ namespace synthese
 			UnregisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION);
 
 			ServerModule::_io_service.stop();
+		}
+
+
+
+
+
+		template<> void ModuleClassTemplate<ServerModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ServerModule>::CloseThread(
+		){
 		}
 
 
@@ -298,7 +311,9 @@ namespace synthese
 			Threads::iterator it(_threads.find(key));
 			if(it == _threads.end()) return;
 			shared_ptr<thread> theThread(it->second.theThread);
+
 			_threads.erase(it);
+
 			theThread->interrupt();
 			Log::GetInstance ().info ("Attempted to kill the thread "+ key);
 			if(	autoRestart &&
@@ -374,31 +389,16 @@ namespace synthese
 
 
 
-		void ServerModule::AddThread(
-			shared_ptr<thread> theThread,
-			const std::string& description,
-			bool isHTTPThread
-		){
-			recursive_mutex::scoped_lock lock(_threadManagementMutex);
-			ThreadInfo info;
-			info.status = ThreadInfo::THREAD_WAITING;
-			info.theThread = theThread;
-			info.lastChangeTime = posix_time::microsec_clock::local_time();
-			info.description = description;
-			info.isHTTPThread = isHTTPThread;
-			_threads.insert(make_pair(lexical_cast<string>(theThread->get_id()), info));
-		}
-
-
-
 		boost::thread::id ServerModule::AddHTTPThread()
 		{
 			recursive_mutex::scoped_lock lock(_threadManagementMutex);
+
 			shared_ptr<thread> theThread(
-				new thread(
-					bind(&asio::io_service::run, &ServerModule::_io_service)
+				AddThread(
+					bind(&asio::io_service::run, &ServerModule::_io_service),
+					"HTTP",
+					true
 			)	);
-			AddThread(theThread, "HTTP", true);
 			++_waitingThreads;
 			return theThread->get_id();
 		}
