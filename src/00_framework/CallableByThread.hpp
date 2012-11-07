@@ -23,6 +23,7 @@
 #ifndef SYNTHESE_framework_CallableByThread_hpp__
 #define SYNTHESE_framework_CallableByThread_hpp__
 
+#include "Factory.h"
 #include "ModuleClass.h"
 
 #include <boost/foreach.hpp>
