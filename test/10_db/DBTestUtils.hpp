@@ -192,7 +192,7 @@ public:
 		DBModule::GetDB()->execUpdate("DROP DATABASE IF EXISTS " + _dbName);
 		DBModule::GetDB()->execUpdate("CREATE DATABASE " + _dbName);
 
-		DBModule::GetDB()->initPreparedStatements(boost::this_thread::get_id());
+		DBModule::GetDB()->initPreparedStatements();
 	}
 };
 
