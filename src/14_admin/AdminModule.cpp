@@ -51,6 +51,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<AdminModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<AdminModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<AdminModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace admin

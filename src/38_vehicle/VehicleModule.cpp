@@ -65,6 +65,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<VehicleModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<VehicleModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<VehicleModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace vehicle

@@ -83,6 +83,20 @@ namespace synthese
 			UnregisterParameter(MapModule::PARAM_HTTP_TEMP_URL);
 			UnregisterParameter(MapModule::PARAM_BACKGROUNDS_DIR);
 		}
+
+
+
+		template<> void ModuleClassTemplate<MapModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<MapModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace map

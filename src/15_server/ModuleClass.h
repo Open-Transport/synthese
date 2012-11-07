@@ -30,6 +30,8 @@
 
 #include "FactoryBase.h"
 
+#include <boost/thread.hpp>
+
 namespace synthese
 {
 	namespace admin
@@ -102,6 +104,8 @@ namespace synthese
 			virtual void init() const = 0;
 			virtual void end() const = 0;
 			virtual const std::string& getName() const = 0;
+			virtual void initThread() const = 0;
+			virtual void closeThread() const = 0;
 
 
 			//////////////////////////////////////////////////////////////////////////

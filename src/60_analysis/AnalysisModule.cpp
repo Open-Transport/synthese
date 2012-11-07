@@ -52,6 +52,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<AnalysisModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<AnalysisModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<AnalysisModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace analysis

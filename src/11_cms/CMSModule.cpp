@@ -76,6 +76,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<CMSModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<CMSModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<CMSModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace cms

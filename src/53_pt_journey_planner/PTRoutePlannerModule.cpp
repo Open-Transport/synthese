@@ -50,6 +50,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTRoutePlannerModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<PTRoutePlannerModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<PTRoutePlannerModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace pt_journey_planner

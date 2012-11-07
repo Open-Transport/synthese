@@ -114,6 +114,7 @@ namespace synthese
 			virtual void preInit();
 			virtual void init();
 			virtual void initPreparedStatements();
+			virtual void removePreparedStatements();
 			virtual void saveRecord(
 				const DBRecord& record
 			);

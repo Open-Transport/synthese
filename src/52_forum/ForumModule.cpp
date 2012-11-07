@@ -50,6 +50,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<ForumModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<ForumModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ForumModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace forum

@@ -112,12 +112,8 @@ namespace synthese
 			DBModule::GetDB()->init();
 			DBModule::GetDB()->initPreparedStatements();
 
-			// Conditional tables load maintainer
-			shared_ptr<thread> theThread(
-				new thread(
-					&DBModule::UpdateConditionalTableSyncEnv
-			)	);
-			ServerModule::AddThread(theThread, "Conditional tables load maintainer");
+			// Conditional tables load maintainer thread
+			ServerModule::AddThread(&DBModule::UpdateConditionalTableSyncEnv, "Conditional tables load maintainer");
 		}
 
 
@@ -127,6 +123,20 @@ namespace synthese
 			UnregisterParameter(DBModule::PARAMETER_NODE_ID);
 			DBModule::_ConnectionInfo.reset();
 			DBModule::_Db.reset();
+		}
+
+
+
+		template<> void ModuleClassTemplate<DBModule>::InitThread(
+		){
+			DBModule::GetDB()->initPreparedStatements();
+		}
+
+
+
+		template<> void ModuleClassTemplate<DBModule>::CloseThread(
+		){
+			DBModule::GetDB()->removePreparedStatements();
 		}
 	}
 
