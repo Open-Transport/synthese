@@ -104,6 +104,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<SecurityModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<SecurityModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<SecurityModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace security

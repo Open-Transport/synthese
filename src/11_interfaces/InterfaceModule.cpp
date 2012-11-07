@@ -61,6 +61,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<InterfaceModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<InterfaceModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<InterfaceModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace interfaces

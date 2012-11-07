@@ -1,6 +1,7 @@
 set_source_groups()
 
 set(framework_SRCS
+CallableByThread.hpp
 ComplexObjectFieldDefinition.hpp
 CoordinatesSystem.cpp
 CoordinatesSystem.hpp

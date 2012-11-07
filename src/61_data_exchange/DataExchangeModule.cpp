@@ -82,29 +82,29 @@ namespace synthese
 			RegisterParameter(IneoNCEConnection::MODULE_PARAM_INEO_NCE_DATASOURCE_ID, "", &IneoNCEConnection::ParameterCallback);
 
 			// VDV Server poller
-			shared_ptr<thread> pollerThread(
-				new thread(
-					&DataExchangeModule::ClientsPoller
-			)	);
-			ServerModule::AddThread(pollerThread, "VDV clients poller");
+			ServerModule::AddThread(&DataExchangeModule::ClientsPoller, "VDV clients poller");
 
-			// VDV Servers connector
-			shared_ptr<thread> serversThread(
-				new thread(
-					&DataExchangeModule::ServersConnector
-			)	);
-			ServerModule::AddThread(serversThread, "VDV servers connector");
+			// VDV Client connector
+			ServerModule::AddThread(&DataExchangeModule::ServersConnector, "VDV servers connector");
 
 			// Ineo NCE connector
-			shared_ptr<thread> nceThread(
-				new thread(
-					&IneoNCEConnection::InitThread
-			)	);
-			ServerModule::AddThread(nceThread, "Ineo NCE connector");
+			ServerModule::AddThread(&IneoNCEConnection::InitThread, "Ineo NCE connector");
 		}
 
 		template<> void ModuleClassTemplate<DataExchangeModule>::End()
 		{
+		}
+
+
+
+		template<> void ModuleClassTemplate<DataExchangeModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<DataExchangeModule>::CloseThread(
+		){
 		}
 	}
 

@@ -79,18 +79,25 @@ namespace synthese
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::Init()
 		{
-			// Synchronization
-			shared_ptr<thread> theThread(
-				new thread(
-					&InterSYNTHESEModule::InterSYNTHESE
-			)	);
-			ServerModule::AddThread(theThread, "Inter-SYNTHESE client synchronization");
+			ServerModule::AddThread(&InterSYNTHESEModule::InterSYNTHESE, "Inter-SYNTHESE client synchronization");
 		}
 
 
 
 		template<> void ModuleClassTemplate<InterSYNTHESEModule>::End()
 		{
+		}
+
+
+
+		template<> void ModuleClassTemplate<InterSYNTHESEModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<InterSYNTHESEModule>::CloseThread(
+		){
 		}
 	}
 

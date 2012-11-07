@@ -63,6 +63,20 @@ namespace synthese
 		template<> void ModuleClassTemplate<PTOperationModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<PTOperationModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<PTOperationModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace pt_operation

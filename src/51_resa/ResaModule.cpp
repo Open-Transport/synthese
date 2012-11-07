@@ -167,6 +167,20 @@ namespace synthese
 			UnregisterParameter(ResaModule::_RESERVATION_CONTACT_PARAMETER);
 			UnregisterParameter(ResaModule::_JOURNEY_PLANNER_WEBSITE);
 		}
+
+
+
+		template<> void ModuleClassTemplate<ResaModule>::InitThread(
+			
+			){
+		}
+
+
+
+		template<> void ModuleClassTemplate<ResaModule>::CloseThread(
+			
+			){
+		}
 	}
 
 	namespace resa

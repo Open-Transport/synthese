@@ -51,8 +51,8 @@ namespace synthese
 
 	namespace db
 	{
-		std::vector<sqlite3_stmt*> SQLiteDB::_replaceStatements;
-		std::vector<sqlite3_stmt*> SQLiteDB::_deleteStatements;
+		SQLiteDB::ReplaceStatements SQLiteDB::_replaceStatements;
+		SQLiteDB::DeleteStatements SQLiteDB::_deleteStatements;
 
 
 
@@ -545,16 +545,20 @@ namespace synthese
 
 
 
-		void SQLiteDB::initPreparedStatements()
-		{
+		void SQLiteDB::initPreparedStatements(
+		){
+			// Thread specific statements
+			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
+			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
+
 			// Clear the statements
 			size_t tablesNumber(
 				DBModule::GetTablesById().rbegin()->first + 1
 			);
-			_replaceStatements.clear();
-			_replaceStatements.resize(tablesNumber, NULL);
-			_deleteStatements.clear();
-			_deleteStatements.resize(tablesNumber, NULL);
+			replaceStatements.clear();
+			replaceStatements.resize(tablesNumber, NULL);
+			deleteStatements.clear();
+			deleteStatements.resize(tablesNumber, NULL);
 
 			// Loop on tables
 			BOOST_FOREACH(const DBModule::TablesByIdMap::value_type& it, DBModule::GetTablesById())
@@ -592,7 +596,7 @@ namespace synthese
 					&stmt,
 					0
 				);
-				_replaceStatements[it.first] = stmt;
+				replaceStatements[it.first] = stmt;
 
 				// Delete statement
 				stringstream deleteQuery;
@@ -606,7 +610,7 @@ namespace synthese
 					&deleteStmt,
 					0
 				);
-				_deleteStatements[it.first] = deleteStmt;
+				deleteStatements[it.first] = deleteStmt;
 			}
 		}
 
@@ -634,7 +638,8 @@ namespace synthese
 
 		void SQLiteDB::deleteRow( util::RegistryKeyType id )
 		{
-			sqlite3_stmt* stmt(_deleteStatements[decodeTableId(id)]);
+			DeleteStatements::mapped_type& deleteStatements(_deleteStatements[this_thread::get_id()]);
+			sqlite3_stmt* stmt(deleteStatements[decodeTableId(id)]);
 			DBRecordCellBindConvertor visitor(*stmt, 1);
 			visitor(id);
 
@@ -645,6 +650,14 @@ namespace synthese
 			retc = sqlite3_reset(stmt);
 
 			_ThrowIfError(_getHandle(), retc, "Error resetting prepared statement");
+		}
+
+
+
+		void SQLiteDB::removePreparedStatements()
+		{
+			_replaceStatements.erase(this_thread::get_id());
+			_deleteStatements.erase(this_thread::get_id());
 		}
 
 
@@ -748,7 +761,8 @@ namespace synthese
 		void SQLiteDB::RequestExecutor::operator()( const DBRecord& record )
 		{
 			size_t fieldsNumber(record.getTable()->getFieldsList().size());
-			sqlite3_stmt* stmt(_replaceStatements[record.getTable()->getFormat().ID]);
+			ReplaceStatements::mapped_type& replaceStatements(_replaceStatements[this_thread::get_id()]);
+			sqlite3_stmt* stmt(replaceStatements[record.getTable()->getFormat().ID]);
 			for(size_t i(0); i<fieldsNumber; ++i)
 			{
 				DBRecordCellBindConvertor visitor(*stmt, i+1);

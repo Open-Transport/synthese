@@ -64,6 +64,18 @@ namespace synthese
 		template<> void ModuleClassTemplate<MessagesModule>::End()
 		{
 		}
+
+
+
+		template<> void ModuleClassTemplate<MessagesModule>::InitThread(
+		){
+		}
+
+
+
+		template<> void ModuleClassTemplate<MessagesModule>::CloseThread(
+		){
+		}
 	}
 
 	namespace messages

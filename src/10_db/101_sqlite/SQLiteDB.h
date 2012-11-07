@@ -64,8 +64,10 @@ namespace synthese
 #ifdef DO_VERIFY_TRIGGER_EVENTS
 			boost::recursive_mutex _updateMutex;
 #endif
-			static std::vector<sqlite3_stmt*> _replaceStatements;
-			static std::vector<sqlite3_stmt*> _deleteStatements;
+			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > ReplaceStatements; 
+			static ReplaceStatements _replaceStatements;
+			typedef std::map<boost::thread::id, std::vector<sqlite3_stmt*> > DeleteStatements;
+			static DeleteStatements _deleteStatements;
 
 			class DBRecordCellBindConvertor:
 				public boost::static_visitor<>
@@ -118,6 +120,7 @@ namespace synthese
 			virtual void initForStandaloneUse();
 			virtual void preInit();
 			virtual void initPreparedStatements();
+			virtual void removePreparedStatements();
 			virtual void saveRecord(
 				const DBRecord& record
 			);
