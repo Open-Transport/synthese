@@ -23,6 +23,7 @@
 #include "MainRoadChunk.hpp"
 #include "ReverseRoadChunk.hpp"
 #include "MainRoadPart.hpp"
+#include "House.hpp"
 
 using namespace std;
 
@@ -94,7 +95,8 @@ namespace synthese
 		) const	{
 			return
 				_testIfHouseNumberBelongsToBounds(_leftHouseNumberBounds, _leftHouseNumberingPolicy, houseNumber) ||
-				_testIfHouseNumberBelongsToBounds(_rightHouseNumberBounds, _rightHouseNumberingPolicy, houseNumber)
+				_testIfHouseNumberBelongsToBounds(_rightHouseNumberBounds, _rightHouseNumberingPolicy, houseNumber) ||
+				_houses.count(houseNumber);
 			;
 		}
 
@@ -123,6 +125,7 @@ namespace synthese
 		}
 
 
+
 		MetricOffset MainRoadChunk::getHouseNumberMetricOffset(
 			HouseNumber houseNumber
 		) const	{
@@ -142,8 +145,30 @@ namespace synthese
 			return getMetricOffset();
 		}
 
+
+
 		MainRoadPart* MainRoadChunk::getMainRoadPart() const
 		{
 			return static_cast<MainRoadPart*>(getRoad());
+		}
+
+
+
+		void MainRoadChunk::addHouse(House& house)
+		{
+			if(house.getHouseNumber())
+			{
+				_houses[*house.getHouseNumber()] = &house;
+			}
+		}
+
+
+
+		void MainRoadChunk::removeHouse(House& house)
+		{
+			if(house.getHouseNumber())
+			{
+				_houses.erase(*house.getHouseNumber());
+			}
 		}
 }	}

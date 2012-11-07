@@ -57,7 +57,7 @@ namespace synthese
 
 		private:
 			MainRoadChunk* _roadChunk;
-			double	_metricOffset;
+			double _metricOffset;
 			boost::optional<MainRoadChunk::HouseNumber> _houseNumber;
 
 

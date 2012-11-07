@@ -111,7 +111,7 @@ namespace synthese
 			object->setHouseNumber(houseNumber);
 
 			// Road Place
-			boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(rows->getInt(HouseTableSync::COL_ROAD_PLACE_ID),env));
+			boost::shared_ptr<RoadPlace> roadPlace(RoadPlaceTableSync::GetEditable(rows->getLongLong(HouseTableSync::COL_ROAD_PLACE_ID),env));
 			object->setRoadChunkFromRoadPlace(roadPlace);
 		}
 
