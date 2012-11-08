@@ -32,6 +32,7 @@
 #include <boost/foreach.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
+#include <fstream>
 
 #ifdef UNIX
   #define DEFAULT_TEMP_DIR "/tmp"
