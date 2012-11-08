@@ -130,6 +130,7 @@ namespace synthese
 			static const std::string MODULE_PARAM_SMTP_PORT;
 			static const std::string MODULE_PARAM_SESSION_MAX_DURATION;
 			static const std::string MODULE_PARAM_AUTO_LOGIN_USER;
+			static const std::string MODULE_PARAM_HTTP_TRACE_PATH;
 
 			static const std::string VERSION;
 			static const std::string VERSION_INFO;
@@ -152,6 +153,7 @@ namespace synthese
 			static boost::posix_time::time_duration _sessionMaxDuration;
 			static std::string _autoLoginUser;
 			static boost::posix_time::ptime _serverStartingTime;
+			static boost::optional<boost::filesystem::path> _httpTracePath;
 
 
 		public:
