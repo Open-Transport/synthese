@@ -30,6 +30,8 @@
 #include <boost/lexical_cast.hpp>
 #include <boost/bind.hpp>
 #include <boost/foreach.hpp>
+#include <boost/filesystem/path.hpp>
+#include <boost/filesystem/convenience.hpp>
 
 #ifdef UNIX
   #define DEFAULT_TEMP_DIR "/tmp"
@@ -49,6 +51,7 @@
 using namespace boost;
 using namespace std;
 using namespace boost::posix_time;
+using namespace boost::filesystem;
 
 namespace synthese
 {
@@ -68,6 +71,7 @@ namespace synthese
 		time_duration ServerModule::_sessionMaxDuration(minutes(30));
 		string ServerModule::_autoLoginUser("");
 		boost::posix_time::ptime ServerModule::_serverStartingTime(not_a_date_time);
+		optional<path> ServerModule::_httpTracePath;
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
 		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
@@ -76,6 +80,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SMTP_PORT ("smtp_port");
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 		const string ServerModule::MODULE_PARAM_AUTO_LOGIN_USER("auto_login_user");
+		const string ServerModule::MODULE_PARAM_HTTP_TRACE_PATH = "http_trace_path";
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
 		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
@@ -92,6 +97,7 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT, "mail", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_AUTO_LOGIN_USER, "", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH, "", &ServerModule::ParameterCallback);
 		}
 
 
@@ -150,6 +156,7 @@ namespace synthese
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_SERVER);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SMTP_PORT);
 			UnregisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION);
+			UnregisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH);
 
 			ServerModule::_io_service.stop();
 		}
@@ -194,6 +201,17 @@ namespace synthese
 			{
 				_autoLoginUser = value;
 			}
+			if(name == MODULE_PARAM_HTTP_TRACE_PATH)
+			{
+				if(value.empty())
+				{
+					_httpTracePath.reset();
+				}
+				else
+				{
+					_httpTracePath = value;
+				}
+			}
 		}
 
 
@@ -232,6 +250,34 @@ namespace synthese
 				SetCurrentThreadAnalysing(req.uri + (req.postData.empty() ? string() : " + "+ req.postData.substr(0, 100)));
 				DynamicRequest request(req);
 
+				ptime now(microsec_clock::local_time());
+				auto_ptr<ofstream> of;
+				if(_httpTracePath)
+				{
+					stringstream dateDirName;
+					dateDirName <<
+						now.date().year() << "-" <<
+						setw(2) << setfill('0') << int(now.date().month()) << "-" <<
+						setw(2) << setfill('0') << now.date().day()
+						;
+					stringstream fileName;
+					fileName <<
+						now.time_of_day().hours() << "-" << now.time_of_day().minutes() << "-" << now.time_of_day().seconds() << "-" << now.time_of_day().fractional_seconds() <<
+						"_";
+					if(request.getFunction().get())
+					{
+						fileName << request.getFunction()->getFactoryKey();
+					}
+					fileName << ".log";
+					path p(*_httpTracePath);
+					p = p / dateDirName.str();
+					create_directories(p);
+					p = p / fileName.str();
+					of.reset(new ofstream(p.file_string().c_str()));
+					*of << "GET " << req.uri << "\n";
+					*of << "POST\n" << req.postData << "\n";
+				}
+
 				stringstream output;
 				request.run(output);
 				rep.status = HTTPReply::ok;
@@ -244,6 +290,13 @@ namespace synthese
 				}
 
 				_SetCookieHeaders(rep, request.getCookiesMap());
+
+				if(_httpTracePath)
+				{
+					*of << "\n\nRESPONSE\n\n";
+					*of << output.str();
+					of.reset();
+				}
 			}
 			catch(Request::RedirectException& e)
 			{
