@@ -263,7 +263,9 @@ namespace synthese
 						;
 					stringstream fileName;
 					fileName <<
-						now.time_of_day().hours() << "-" << now.time_of_day().minutes() << "-" << now.time_of_day().seconds() << "-" << now.time_of_day().fractional_seconds() <<
+						setw(2) << setfill('0') << now.time_of_day().hours() << "-" <<
+						setw(2) << setfill('0') << now.time_of_day().minutes() << "-" <<
+						setw(2) << setfill('0') << now.time_of_day().seconds() << "-" << now.time_of_day().fractional_seconds() <<
 						"_";
 					if(request.getFunction().get())
 					{
