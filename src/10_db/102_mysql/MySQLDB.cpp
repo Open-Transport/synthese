@@ -151,10 +151,10 @@ namespace synthese
 			initForStandaloneUse();
 
 			// TODO: is the thread deleted properly on module unload?
-			server::ServerModule::AddThread(
-				bind(&MySQLDB::_modifEventsDispatcherThread, this),
-				"MySQL db modification events dispatcher"
-			);
+			//server::ServerModule::AddThread(
+			//	bind(&MySQLDB::_modifEventsDispatcherThread, this),
+			//	"MySQL db modification events dispatcher"
+			//);
 
 			DB::preInit();
 		}
