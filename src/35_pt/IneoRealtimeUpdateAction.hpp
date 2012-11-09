@@ -35,8 +35,18 @@ namespace synthese
 		class DataSource;
 	}
 
+	namespace departure_boards
+	{
+		class DisplayScreen;
+	}
+
 	namespace pt
 	{
+		class StopPoint;
+		class CommercialLine;
+		class JourneyPattern;
+		class ScheduledService;
+		
 		//////////////////////////////////////////////////////////////////////////
 		/// 35.15 Action : IneoRealtimeUpdateAction.
 		/// @ingroup m35Actions refActions
@@ -54,14 +64,103 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, IneoRealtimeUpdateAction>
 		{
 		public:
-			static const std::string PARAMETER_DATASOURCE_ID;
+			static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
+			static const std::string PARAMETER_REAL_TIME_DATASOURCE_ID;
 			static const std::string PARAMETER_DATABASE;
-			static const std::string PARAMETER_CLEAN_DESTINATAIRE_TABLE_AFTER_ACTION;
-
+	
 		private:
-			boost::shared_ptr<const impex::DataSource> _dataSource;
+			boost::shared_ptr<const impex::DataSource> _plannedDataSource;
+			boost::shared_ptr<const impex::DataSource> _realTimeDataSource;
 			std::string _database;
-			bool _cleanDestinataireTableAfterAction;
+	
+			struct Arret
+			{
+				int ref;
+				std::string nom;
+
+				pt::StopPoint* syntheseStop;
+			};
+
+			struct Ligne
+			{
+				int ref;
+
+				pt::CommercialLine* syntheseLine;
+			};
+
+			struct ArretChn
+			{
+				int ref;
+				Arret* arret;
+				int pos;
+				std::string type;
+			};
+
+			struct Chainage
+			{
+				int ref;
+				std::string nom;
+				Ligne* ligne;
+				bool sens;
+				typedef std::vector<ArretChn> ArretChns;
+				ArretChns arretChns;
+
+				typedef std::vector<const pt::JourneyPattern*> SYNTHESEJourneyPatterns;
+				SYNTHESEJourneyPatterns syntheseJourneyPatterns;
+			};
+
+			struct Horaire
+			{
+				int ref;
+				boost::posix_time::time_duration htd;
+				boost::posix_time::time_duration hta;
+				boost::posix_time::time_duration had;
+				boost::posix_time::time_duration haa;
+				boost::posix_time::time_duration hrd;
+				boost::posix_time::time_duration hra;
+			};
+
+
+			struct Course
+			{
+				int ref;
+				Chainage* chainage;
+				typedef std::vector<Horaire> Horaires;
+				Horaires horaires;
+
+				pt::ScheduledService* syntheseService;
+
+				/// @pre the service is on a compatible journey planner (no check)
+				bool operator==(const pt::ScheduledService& op) const;
+				bool operator!=(const pt::ScheduledService& op) const;
+			};
+
+			struct Destinataire
+			{
+				std::string destinataire;
+
+				departure_boards::DisplayScreen* syntheseDisplayBoard;
+			};
+
+			struct Programmation
+			{
+				int ref;
+				std::string content;
+				std::string messageTitle;
+				std::string title;
+				boost::posix_time::ptime startTime;
+				boost::posix_time::ptime endTime;
+
+				typedef std::vector<Destinataire> Destinataires;
+				Destinataires destinataires;
+			};
+
+			typedef std::map<int, Course> Courses;
+			typedef std::map<int, Ligne> Lignes;
+			typedef std::map<int, Arret> Arrets;
+			typedef std::map<int, Chainage> Chainages;
+			typedef std::map<int, Programmation> Programmations;
+
 
 		protected:
 			//////////////////////////////////////////////////////////////////////////
@@ -94,16 +193,8 @@ namespace synthese
 			/// @param session the current session
 			/// @return true if the action can be launched in the current session
 			virtual bool isAuthorized(const server::Session* session) const;
-
-
-
-			//! @name Setters
-			//@{
-				// void setObject(boost::shared_ptr<Object> value) { _object = value; }
-			//@}
 		};
-	}
-}
+}	}
 
 #endif // SYNTHESE_IneoRealtimeUpdateAction_H__
 

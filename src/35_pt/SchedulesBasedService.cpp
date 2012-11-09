@@ -554,6 +554,18 @@ namespace synthese
 
 
 
+		void SchedulesBasedService::setRealTimeSchedules(
+			const Schedules& departureSchedules, 
+			const Schedules& arrivalSchedules
+		){
+			_RTDepartureSchedules = departureSchedules;
+			_RTArrivalSchedules = arrivalSchedules;
+			_computeNextRTUpdate();
+			_path->markScheduleIndexesUpdateNeeded(true);
+		}
+
+
+
 		void SchedulesBasedService::clearStops()
 		{
 			if(getPath())

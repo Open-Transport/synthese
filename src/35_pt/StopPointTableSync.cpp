@@ -131,7 +131,7 @@ namespace synthese
 			if (linkLevel > FIELDS_ONLY_LOAD_LEVEL)
 			{
 				// Data source links
-				object->setDataSourceLinksWithoutRegistration(
+				object->setDataSourceLinksWithRegistration(
 					ImportableTableSync::GetDataSourceLinksFromSerializedString(
 						rows->getText(StopPointTableSync::COL_OPERATOR_CODE),
 						env

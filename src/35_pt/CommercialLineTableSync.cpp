@@ -182,7 +182,7 @@ namespace synthese
 			object->setStyle(rows->getText ( CommercialLineTableSync::COL_STYLE));
 			object->setImage(rows->getText ( CommercialLineTableSync::COL_IMAGE));
 
-			object->setDataSourceLinksWithoutRegistration(
+			object->setDataSourceLinksWithRegistration(
 				ImportableTableSync::GetDataSourceLinksFromSerializedString(
 					rows->getText ( CommercialLineTableSync::COL_CREATOR_ID),
 					env
