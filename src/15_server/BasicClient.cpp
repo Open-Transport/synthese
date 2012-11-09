@@ -210,8 +210,8 @@ namespace synthese
 					stringstream os;
 					filtering_stream<input> fs;
 					fs.push(gzip_decompressor());
-					fs.push(os);
-					boost::iostreams::copy(tmp, os);
+					fs.push(tmp);
+					boost::iostreams::copy(fs, os);
 					return os.str();
 				}
 				else
