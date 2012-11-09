@@ -588,7 +588,7 @@ namespace synthese
 				sql << fields[i].name;
 				sql << "\" " << getSQLType(fields[i].type);
 			}
-			sql << ");";
+			sql << ") DEFAULT CHARSET=utf8;";
 
 			// Add spatial indexes
 			// TODO: fix so that MySQL doesn't return this error:
