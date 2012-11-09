@@ -79,6 +79,7 @@ namespace synthese
 		string ServerModule::_autoLoginUser("");
 		boost::posix_time::ptime ServerModule::_serverStartingTime(not_a_date_time);
 		optional<path> ServerModule::_httpTracePath;
+		bool ServerModule::_forceGZip(false);
 
 		const string ServerModule::MODULE_PARAM_PORT ("port");
 		const string ServerModule::MODULE_PARAM_NB_THREADS ("nb_threads");
@@ -88,6 +89,7 @@ namespace synthese
 		const string ServerModule::MODULE_PARAM_SESSION_MAX_DURATION("session_max_duration");
 		const string ServerModule::MODULE_PARAM_AUTO_LOGIN_USER("auto_login_user");
 		const string ServerModule::MODULE_PARAM_HTTP_TRACE_PATH = "http_trace_path";
+		const string ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP = "http_force_gzip";
 
 		const std::string ServerModule::VERSION(SYNTHESE_VERSION);
 		const std::string ServerModule::VERSION_INFO(SYNTHESE_VERSION_INFO);
@@ -105,6 +107,7 @@ namespace synthese
 			RegisterParameter(ServerModule::MODULE_PARAM_SESSION_MAX_DURATION, "30", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_AUTO_LOGIN_USER, "", &ServerModule::ParameterCallback);
 			RegisterParameter(ServerModule::MODULE_PARAM_HTTP_TRACE_PATH, "", &ServerModule::ParameterCallback);
+			RegisterParameter(ServerModule::MODULE_PARAM_HTTP_FORCE_GZIP, "", &ServerModule::ParameterCallback);
 		}
 
 
@@ -219,6 +222,10 @@ namespace synthese
 					_httpTracePath = value;
 				}
 			}
+			if(name == MODULE_PARAM_HTTP_FORCE_GZIP)
+			{
+				_forceGZip = (value == "1");
+			}
 		}
 
 
@@ -303,9 +310,10 @@ namespace synthese
 				request.run(ros);
 				
 				// Output
-				if(	gzipCompression &&
-					req.ipaddr != "127.0.0.1" // Never compress for localhost use
-				){
+				if(	_forceGZip ||
+					(	gzipCompression &&
+						req.ipaddr != "127.0.0.1" // Never compress for localhost use
+				)	){
 					stringstream os;
 					filtering_stream<output> fs;
 					fs.push(gzip_compressor());
