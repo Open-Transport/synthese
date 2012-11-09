@@ -64,6 +64,7 @@ namespace synthese
 			public util::FactorableTemplate<server::Action, IneoRealtimeUpdateAction>
 		{
 		public:
+			static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
 			static const std::string PARAMETER_PLANNED_DATASOURCE_ID;
 			static const std::string PARAMETER_REAL_TIME_DATASOURCE_ID;
 			static const std::string PARAMETER_DATABASE;
@@ -71,6 +72,7 @@ namespace synthese
 		private:
 			boost::shared_ptr<const impex::DataSource> _plannedDataSource;
 			boost::shared_ptr<const impex::DataSource> _realTimeDataSource;
+			boost::shared_ptr<const impex::DataSource> _messagesRecipientsDataSource;
 			std::string _database;
 	
 			struct Arret

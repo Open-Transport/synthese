@@ -66,6 +66,7 @@ namespace synthese
 
 	namespace pt
 	{
+		const string IneoRealtimeUpdateAction::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_mr_ds";
 		const string IneoRealtimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
 		const string IneoRealtimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
 		const string IneoRealtimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
@@ -85,17 +86,33 @@ namespace synthese
 			// Planned datasource
 			try
 			{
-				_plannedDataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(PARAMETER_PLANNED_DATASOURCE_ID));
+				_plannedDataSource = Env::GetOfficialEnv().get<DataSource>(
+					map.get<RegistryKeyType>(PARAMETER_PLANNED_DATASOURCE_ID)
+				);
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
 				throw ActionException("No such real time data source");
 			}
 
+			// Messages recipients datasource
+			try
+			{
+				_messagesRecipientsDataSource = Env::GetOfficialEnv().get<DataSource>(
+					map.get<RegistryKeyType>(PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID)
+				);
+			}
+			catch(ObjectNotFoundException<DataSource>&)
+			{
+				throw ActionException("No such messages recipients data source");
+			}
+
 			// Real time datasource
 			try
 			{
-				_realTimeDataSource = Env::GetOfficialEnv().get<DataSource>(map.get<RegistryKeyType>(PARAMETER_REAL_TIME_DATASOURCE_ID));
+				_realTimeDataSource = Env::GetOfficialEnv().get<DataSource>(
+					map.get<RegistryKeyType>(PARAMETER_REAL_TIME_DATASOURCE_ID)
+				);
 			}
 			catch(ObjectNotFoundException<DataSource>&)
 			{
@@ -416,7 +433,7 @@ namespace synthese
 						dest.destinataire = destResult->getText("destinataire");
 
 						// SYNTHESE departure board
-						dest.syntheseDisplayBoard = _realTimeDataSource->getObjectByCode<DisplayScreen>(
+						dest.syntheseDisplayBoard = _messagesRecipientsDataSource->getObjectByCode<DisplayScreen>(
 							dest.destinataire
 						); // Boards comes from BDSI too !!
 						if(!dest.syntheseDisplayBoard)
@@ -471,6 +488,8 @@ namespace synthese
 								AlarmTableSync::getId()
 						)	);
 						updatedMessage->setScenario(updatedScenario.get());
+						updatedScenario->addMessage(*updatedMessage);
+						scenario = updatedScenario.get();
 						updatesEnv.getEditableRegistry<SentAlarm>().add(updatedMessage);
 					}
 					else
@@ -522,7 +541,7 @@ namespace synthese
 
 					// Adding of existing object links to the removal list
 					DisplayScreenAlarmRecipient::LinkedObjectsSet existingRecipients(
-						DisplayScreenAlarmRecipient::getLinkedObjects(*updatedMessage)
+						DisplayScreenAlarmRecipient::getLinkedObjects(**scenario->getMessages().begin())
 					);
 					BOOST_FOREACH(const DisplayScreenAlarmRecipient::LinkedObjectsSet::value_type& dsit, existingRecipients)
 					{
