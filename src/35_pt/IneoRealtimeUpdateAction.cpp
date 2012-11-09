@@ -28,6 +28,7 @@
 #include "AlarmObjectLinkTableSync.h"
 #include "AlarmRecipientTemplate.h"
 #include "CommercialLine.h"
+#include "Depot.hpp"
 #include "DesignatedLinePhysicalStop.hpp"
 #include "DisplayScreen.h"
 #include "DisplayScreenAlarmRecipient.h"
@@ -57,6 +58,7 @@ namespace synthese
 	using namespace graph;
 	using namespace impex;
 	using namespace messages;
+	using namespace pt_operation;
 	using namespace server;
 	using namespace security;
 	using namespace util;
@@ -185,11 +187,15 @@ namespace synthese
 					StopPoint* stopPoint(
 						_plannedDataSource->getObjectByCode<StopPoint>(mnemol)
 					);
+					Depot* depot(NULL);
 					if(!stopPoint)
 					{
-						Log::GetInstance().warn("No such stop point : " + mnemol);
-						continue;
-					}
+						depot = _plannedDataSource->getObjectByCode<Depot>(mnemol);
+						if(!depot)
+						{
+							Log::GetInstance().warn("No such stop point or depot : " + mnemol);
+							continue;
+					}	}
 
 					// Ref
 					int ref(result->getInt("ref"));
@@ -468,6 +474,7 @@ namespace synthese
 					shared_ptr<SentScenario> updatedScenario;
 					shared_ptr<SentAlarm> updatedMessage;
 					SentScenario* scenario(_realTimeDataSource->getObjectByCode<SentScenario>(lexical_cast<string>(programmation.ref)));
+					SentAlarm* message(NULL);
 					if(!scenario)
 					{
 						// Creation of the scenario
@@ -490,6 +497,7 @@ namespace synthese
 						updatedMessage->setScenario(updatedScenario.get());
 						updatedScenario->addMessage(*updatedMessage);
 						scenario = updatedScenario.get();
+						message = updatedMessage.get();
 						updatesEnv.getEditableRegistry<SentAlarm>().add(updatedMessage);
 					}
 					else
@@ -504,12 +512,12 @@ namespace synthese
 							);
 							continue;
 						}
-						const SentAlarm& message(**scenario->getMessages().begin());
-						if(	message.getLongMessage() != programmation.content ||
-							message.getShortMessage() != programmation.messageTitle
+						message = const_cast<SentAlarm*>(*scenario->getMessages().begin());
+						if(	message->getLongMessage() != programmation.content ||
+							message->getShortMessage() != programmation.messageTitle
 						){
 							updatedMessage = ScenarioSentAlarmInheritedTableSync::GetEditable(
-								message.getKey(),
+								message->getKey(),
 								updatesEnv
 							);
 						}
@@ -564,7 +572,7 @@ namespace synthese
 						// Link creation
 						shared_ptr<AlarmObjectLink> link(new AlarmObjectLink);
 						link->setKey(AlarmObjectLinkTableSync::getId());
-						link->setAlarm(const_cast<SentAlarm*>(updatedMessage.get()));
+						link->setAlarm(message);
 						link->setObjectId(itDest.syntheseDisplayBoard->getKey());
 						updatesEnv.getEditableRegistry<AlarmObjectLink>().add(link);
 					}
@@ -580,6 +588,21 @@ namespace synthese
 
 					// Jump over courses with incomplete chainages
 					if(course.horaires.size() != course.chainage->arretChns.size())
+					{
+						continue;
+					}
+
+					// Jump over dead runs
+					bool deadRun(false);
+					BOOST_FOREACH(const Chainage::ArretChns::value_type& it, course.chainage->arretChns)
+					{
+						if(!it.arret->syntheseStop)
+						{
+							deadRun = true;
+							break;
+						}
+					}
+					if(deadRun)
 					{
 						continue;
 					}

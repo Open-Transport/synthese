@@ -40,6 +40,11 @@ namespace synthese
 		class DisplayScreen;
 	}
 
+	namespace pt_operation
+	{
+		class Depot;
+	}
+
 	namespace pt
 	{
 		class StopPoint;
@@ -81,6 +86,7 @@ namespace synthese
 				std::string nom;
 
 				pt::StopPoint* syntheseStop;
+				pt_operation::Depot* syntheseDepot;
 			};
 
 			struct Ligne
