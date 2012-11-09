@@ -123,13 +123,9 @@ namespace synthese
 							_masterHost,
 							_masterPort
 						);
-						stringstream result;
-						c.get(
-							result,
-							r.getURL()
+						string contentStr(
+							c.get(r.getURL())
 						);
-
-						string contentStr = result.str();
 
 						if(contentStr != InterSYNTHESESlaveUpdateService::NO_CONTENT_TO_SYNC)
 						{
@@ -213,12 +209,10 @@ namespace synthese
 									_masterHost,
 									_masterPort
 								);
-								stringstream result2;
-								c2.get(
-									result2,
-									ackRequest.getURL()
+								string result2(
+									c2.get(ackRequest.getURL())
 								);
-								if(result2.str() == InterSYNTHESEUpdateAckService::VALUE_OK)
+								if(result2 == InterSYNTHESEUpdateAckService::VALUE_OK)
 								{
 									// Local variables
 									auto_ptr<InterSYNTHESESyncTypeFactory> interSYNTHESE;

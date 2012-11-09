@@ -49,6 +49,7 @@ endif()
 set(BOOST_LIBS program_options filesystem system regex thread date_time iostreams unit_test_framework)
 if(WIN32)
   list(APPEND BOOST_LIBS bzip2)
+  list(APPEND BOOST_LIBS zlib)
 endif()
 
 if(NOT $ENV{BOOST_ROOT} STREQUAL "")
