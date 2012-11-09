@@ -9,8 +9,15 @@
 #include <ostream>
 #include <string>
 #include <boost/asio.hpp>
+#include <boost/algorithm/string/trim.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 
 using namespace std;
+using namespace boost;
+using namespace boost::algorithm;
+using namespace boost::iostreams;
 using boost::asio::ip::tcp;
 
 namespace synthese
@@ -21,39 +28,38 @@ namespace synthese
 			const std::string& serverHost,
 			const string serverPort,
 			int timeOut,
-			bool outputHTTPHeaders
+			bool outputHTTPHeaders,
+			bool acceptGzip
 		):	_serverHost (serverHost),
 			_serverPort (serverPort),
 			_timeOut (timeOut),
-			_outputHTTPHeaders(outputHTTPHeaders)
+			_outputHTTPHeaders(outputHTTPHeaders),
+			_acceptGzip(acceptGzip)
 		{}
 
 
 
-		void BasicClient::get(
-			std::ostream& out,
+		string BasicClient::get(
 			const std::string& url
 		) const {
 			string fakePostData;
 			string fakeContentType;
-			_send(out, url, fakePostData, fakeContentType);
+			return _send(url, fakePostData, fakeContentType);
 		}
 
 
 
-		void BasicClient::post(
-			std::ostream& out,
+		string BasicClient::post(
 			const std::string& url,
 			const std::string& data,
 			string contentType
 		) const	{
-			_send(out, url, data, contentType);
+			return _send(url, data, contentType);
 		}
 
 
 
-		void BasicClient::_send(
-			std::ostream& out,
+		string BasicClient::_send(
 			const std::string& url,
 			const std::string& postData,
 			const string& contentType
@@ -96,6 +102,10 @@ namespace synthese
 				request_stream << "Host: " << _serverHost << ":" << _serverPort << "\r\n";
 				request_stream << "User-Agent: SYNTHESE/" << ServerModule::VERSION << "\r\n";
 				request_stream << "Accept: */*\r\n";
+				if(_acceptGzip)
+				{
+					request_stream << "Accept-Encoding: gzip\r\n";
+				}
 				if(!postData.empty())
 				{
 					request_stream << "Content-Length: " << postData.size() << "\r\n";
@@ -137,30 +147,77 @@ namespace synthese
 				// Read the response headers, which are terminated by a blank line.
 				boost::asio::read_until(socket, response, "\r\n\r\n");
 
+				stringstream tmp;
+
 				// Process the response headers.
 				std::string header;
+				typedef map<string, string> Headers;
+				Headers headers;
 				while (std::getline(response_stream, header) && header != "\r")
 				{
-					if(_outputHTTPHeaders)
+					if(header[header.size()-1] == '\r')
 					{
-						out << header << "\n";
+						header = header.substr(0, header.size()-1);
+					}
+
+					if(!header.empty())
+					{
+						size_t p(1);
+						for(; p<header.size() && header[p] != ':'; ++p) ; 
+						if(p != header.size())
+						{
+							headers.insert(
+								make_pair(
+									trim_copy(header.substr(0, p)),
+									trim_copy(header.substr(p+2))
+							)	);
+						}
 					}
 				}
+
+				// Output HTTP Headers
 				if(_outputHTTPHeaders)
 				{
-					out << "\n";
+					BOOST_FOREACH(const Headers::value_type& it, headers)
+					{
+						tmp << it.first << ": " << it.second << "\r\n";
+					}
 				}
 
 				// Write whatever content we already have to output.
 				if (response.size() > 0)
-					out << &response;
+				{
+					tmp << &response;
+				}
 
 				// Read until EOF, writing data to output as we go.
-				while (boost::asio::read(socket, response,
-					boost::asio::transfer_at_least(1), error))
-					out << &response;
-				if (error != boost::asio::error::eof)
-					throw boost::system::system_error(error);
+				while(asio::read(socket, response, asio::transfer_at_least(1), error))
+				{
+					tmp << &response;
+				}
+				if (error != asio::error::eof)
+				{
+					throw system::system_error(error);
+				}
+
+				// Output with or without gzip compression
+				Headers::const_iterator it(
+					headers.find("Content-Encoding")
+				);
+				if(	it != headers.end() &&
+					it->second == "gzip"
+				){
+					stringstream os;
+					filtering_stream<input> fs;
+					fs.push(gzip_decompressor());
+					fs.push(os);
+					boost::iostreams::copy(tmp, os);
+					return os.str();
+				}
+				else
+				{
+					return tmp.str();
+				}
 			}
 			catch (std::exception& e)
 			{
