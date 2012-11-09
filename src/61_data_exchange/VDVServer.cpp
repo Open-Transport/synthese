@@ -155,19 +155,14 @@ namespace synthese
 			bool reloadNeeded(!_online);
 			try
 			{
-				stringstream out;
-				c.post(
-					out,
-					_getURL("status"),
-					statusAnfrage.str(),
-					contentType
+				string statusAntwortStr(
+					c.post(_getURL("status"), statusAnfrage.str(), contentType)
 				);
 
 				// Trace
 				trace("StatusAnfrage", statusAnfrage.str());
-				trace("StatusAntwort", out.str());
+				trace("StatusAntwort", statusAntwortStr);
 
-				string statusAntwortStr(out.str());
 				XMLResults results;
 				XMLNode allNode = XMLNode::parseString(statusAntwortStr.c_str(), "vdv453:StatusAntwort", &results);
 				if (results.error != eXMLErrorNone)
@@ -251,17 +246,16 @@ namespace synthese
 
 			try
 			{
-				stringstream cleanAntwort;
-				c.post(
-					cleanAntwort,
-					_getURL("aboverwalten"),
-					cleanRequest.str(),
-					contentType
-				);
+				string cleanAntwort(
+					c.post(
+						_getURL("aboverwalten"),
+						cleanRequest.str(),
+						contentType
+				)	);
 
 				// Trace
 				trace("AboAnfrage", cleanRequest.str());
-				trace("AboAntwort", cleanAntwort.str());
+				trace("AboAntwort", cleanAntwort);
 			}
 			catch(...)
 			{
@@ -318,19 +312,17 @@ namespace synthese
 
 			try
 			{
-				stringstream aboAntwort;
-				c.post(
-					aboAntwort,
-					_getURL("aboverwalten"),
-					aboAnfrage.str(),
-					contentType
-				);
+				string aboAntwortStr(
+					c.post(
+						_getURL("aboverwalten"),
+						aboAnfrage.str(),
+						contentType
+				)	);
 
 				// Trace
 				trace("AboAnfrage", aboAnfrage.str());
-				trace("AboAntwort", aboAntwort.str());
+				trace("AboAntwort", aboAntwortStr);
 
-				string aboAntwortStr(aboAntwort.str());
 				XMLResults aboAntwortResults;
 				XMLNode aboAntwortNode = XMLNode::parseString(aboAntwortStr.c_str(), "vdv453:AboAntwort", &aboAntwortResults);
 				if (aboAntwortResults.error != eXMLErrorNone ||
@@ -392,15 +384,14 @@ namespace synthese
 			;
 
 			// Sending the request
-			stringstream result;
+			string result;
 			try
 			{
 				BasicClient c(
 					get<ServerAddress>(),
 					get<ServerPort>()
 				);
-				c.post(
-					result,
+				result = c.post(
 					_getURL("datenabrufen"),
 					request.str(),
 					contentType
@@ -408,7 +399,7 @@ namespace synthese
 
 				// Trace
 				trace("DatenAbrufenAnfrage", request.str());
-				trace("DatenAbrufenAntwort", result.str());
+				trace("DatenAbrufenAntwort", result);
 
 
 				// TODO Read the result

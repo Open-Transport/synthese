@@ -28,7 +28,11 @@
 
 #include <iomanip>
 #include <boost/lexical_cast.hpp>
+#include <boost/algorithm/string/split.hpp>
 #include <boost/bind.hpp>
+#include <boost/iostreams/copy.hpp>
+#include <boost/iostreams/filtering_stream.hpp>
+#include <boost/iostreams/filter/gzip.hpp>
 #include <boost/foreach.hpp>
 #include <boost/filesystem/path.hpp>
 #include <boost/filesystem/convenience.hpp>
@@ -51,6 +55,8 @@
 
 using namespace boost;
 using namespace std;
+using namespace boost::algorithm;
+using namespace boost::iostreams;
 using namespace boost::posix_time;
 using namespace boost::filesystem;
 
@@ -281,10 +287,39 @@ namespace synthese
 					*of << "POST\n" << req.postData << "\n";
 				}
 
-				stringstream output;
-				request.run(output);
+				// GZip compression ?
+				bool gzipCompression(false);
+				HTTPRequest::Headers::const_iterator it(req.headers.find("Accept-Encoding"));
+				if(	it != req.headers.end() &&
+					!it->second.empty()
+				){
+					set<string> formats;
+					split(formats, it->second, is_any_of(","));
+					gzipCompression = (formats.find("gzip") != formats.end());
+				}
+
+				// Request run
+				stringstream ros;
+				request.run(ros);
+				
+				// Output
+				if(	gzipCompression &&
+					req.ipaddr != "127.0.0.1" // Never compress for localhost use
+				){
+					stringstream os;
+					filtering_stream<output> fs;
+					fs.push(gzip_compressor());
+					fs.push(os);
+					boost::iostreams::copy(ros, fs);
+					fs.pop();
+					rep.content.append(os.str());
+					rep.headers.insert(make_pair("Content-Encoding", "gzip"));
+				}
+				else
+				{
+					rep.content.append(ros.str());
+				}
 				rep.status = HTTPReply::ok;
-				rep.content.append(output.str());
 				rep.headers.insert(make_pair("Content-Length", lexical_cast<string>(rep.content.size())));
 				rep.headers.insert(make_pair("Content-Type", request.getOutputMimeType() + "; charset=utf-8"));
 				if(request.getFunction().get() && !request.getFunction()->getFileName().empty())
@@ -297,7 +332,7 @@ namespace synthese
 				if(_httpTracePath)
 				{
 					*of << "\n\nRESPONSE\n\n";
-					*of << output.str();
+					*of << ros.str();
 					of.reset();
 				}
 			}

@@ -149,10 +149,10 @@ namespace synthese
 			data << "\" xmlns:vdv453=\"vdv453ger\"></vdv453:DatenBereitAnfrage>";
 
 			BasicClient client(get<ReplyAddress>(), get<ReplyPort>());
-			stringstream out;
+			string out;
 			try
 			{
-				client.post(out, _getURL("datenbereit"), data.str(), contentType);
+				out = client.post(_getURL("datenbereit"), data.str(), contentType);
 			}
 			catch(...)
 			{
@@ -160,7 +160,7 @@ namespace synthese
 
 			// Trace
 			trace("DatenBereitAnfrage", data.str());
-			trace("DatenBereitAntwort", out.str());
+			trace("DatenBereitAntwort", out);
 		}
 
 

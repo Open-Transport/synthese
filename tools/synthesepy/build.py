@@ -249,6 +249,11 @@ class Builder(object):
         url = 'http://www.bzip.org/1.0.6/{0}.tar.gz'.format(BZIP2_ARCHIVE)
         self._download(url, '00b516f4704d4a7cb50a1d97e6e8e15b')
         created_dir = self._extract(url, self.env.c.thirdparty_dir)
+        
+        ZLIB_ARCHIVE = 'zlib-1.2.7'
+        url = 'http://zlib.net/zlib-1.2.7.tar.gz'
+        self._download(url, '60df6a37c56e7c1366cca812414f7b85')
+        created_dir = self._extract(url, self.env.c.thirdparty_dir)
 
         url = 'http://switch.dl.sourceforge.net/project/boost/boost/1.42.0/boost_1_42_0.zip'
         self._download(url, 'ceb78ed309c867e49dc29f60be841b64')
@@ -256,6 +261,14 @@ class Builder(object):
 
         self.boost_dir = join(self.env.c.thirdparty_dir, created_dir)
         self.boost_lib_dir = join(self.boost_dir, 'stage', 'lib')
+
+        # Patch for zlib
+        zlibjam = join(self.boost_dir, "libs/iostreams/build/Jamfile.v2") 
+        s = open(zlibjam).read()
+        s = s.replace('gzio', '')
+        f = open(zlibjam, 'w')
+        f.write(s)
+        f.close()
 
         CURRENT_BOOST_BUILD_VER = 2
         boost_build_ver_path = join(
@@ -286,6 +299,8 @@ class Builder(object):
         args.extend(['--with-%s' % m for m in REQUIRED_BOOST_MODULES])
         args.append('-sBZIP2_SOURCE={}'.format(
             join(self.env.c.thirdparty_dir, BZIP2_ARCHIVE)))
+        args.append('-sZLIB_SOURCE={}'.format(
+            join(self.env.c.thirdparty_dir, ZLIB_ARCHIVE)))
 
         utils.call(args, cwd=self.boost_dir)
         open(boost_build_ver_path, 'wb').write(str(CURRENT_BOOST_BUILD_VER))
