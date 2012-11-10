@@ -67,6 +67,7 @@ namespace synthese
 			static const std::string COL_MAP_URL;
 			static const std::string COL_DOC_URL;
 			static const std::string COL_TIMETABLE_ID;
+			static const std::string COL_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE;
 
 			/** CommercialLine search.
 				@param networkId Id of the network which the lines must belong (default = undefined = all networks)

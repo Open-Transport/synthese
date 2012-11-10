@@ -115,6 +115,7 @@ namespace synthese
 		const string LinesListFunction::PARAMETER_DATE_FILTER = "date_filter";
 		const string LinesListFunction::PARAMETER_CALENDAR_FILTER = "calendar_filter";
 		const string LinesListFunction::PARAMETER_RUNS_SOON_FILTER = "runs_soon_filter";
+		const string LinesListFunction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER = "display_duration_before_first_departure_filter";
 
 		const string LinesListFunction::FORMAT_WKT("wkt");
 
@@ -490,6 +491,8 @@ namespace synthese
 			{
 				_runsSoonFilter = minutes(duration);
 			}
+
+			_displayDurationBeforeFirstDepartureFilter = map.getDefault<bool>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE_FILTER, false);
 		}
 
 
@@ -646,9 +649,15 @@ namespace synthese
 
 			// Runs soon ?
 			if(	_runsSoonFilter &&
-				line.getShortName().size() > 1 &&
-				*line.getShortName().begin() == 'N' &&
 				!line.runsSoon(*_runsSoonFilter)
+			){
+				return false;
+			}
+
+			// displayDurationBeforeFirstDepartureFilter
+			if(	_displayDurationBeforeFirstDepartureFilter &&
+				!line.getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() &&
+				!line.runsSoon(line.getDisplayDurationBeforeFirstDeparture())
 			){
 				return false;
 			}
@@ -982,7 +991,8 @@ namespace synthese
 			_ignoreJourneyPlannerExcludedLines(false),
 			_ignoreDeparturesBoardExcludedLines(false),
 			_outputMessages(false),
-			_lettersBeforeNumbers(true)
+			_lettersBeforeNumbers(true),
+			_displayDurationBeforeFirstDepartureFilter(false)
 		{}
 
 

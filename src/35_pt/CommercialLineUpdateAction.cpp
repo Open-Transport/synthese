@@ -37,6 +37,7 @@
 
 using namespace std;
 using namespace boost;
+using namespace boost::posix_time;
 
 namespace synthese
 {
@@ -66,6 +67,7 @@ namespace synthese
 		const string CommercialLineUpdateAction::PARAMETER_MAP_URL = Action_PARAMETER_PREFIX + "map_url";
 		const string CommercialLineUpdateAction::PARAMETER_DOC_URL = Action_PARAMETER_PREFIX + "doc_url";
 		const string CommercialLineUpdateAction::PARAMETER_TIMETABLE_ID = Action_PARAMETER_PREFIX + "timetable_id";
+		const string CommercialLineUpdateAction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE = Action_PARAMETER_PREFIX + "_display_duration_before_first_departure";
 
 
 
@@ -123,6 +125,10 @@ namespace synthese
 			if(_timetableId)
 			{
 				map.insert(PARAMETER_TIMETABLE_ID, *_timetableId);
+			}
+			if(_displayDurationBeforeFirstDeparture)
+			{
+				map.insert(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE, _displayDurationBeforeFirstDeparture->total_seconds() / 60);
 			}
 
 			// Importable
@@ -246,6 +252,15 @@ namespace synthese
 			{
 				_timetableId = map.get<RegistryKeyType>(PARAMETER_TIMETABLE_ID);
 			}
+
+			if(map.isDefined(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE))
+			{
+				_displayDurationBeforeFirstDeparture =
+					map.get<string>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE).empty() ?
+					time_duration(not_a_date_time) :
+					minutes(map.get<long>(PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE))
+				;
+			}
 		}
 
 
@@ -312,6 +327,10 @@ namespace synthese
 			if(_timetableId)
 			{
 				_line->setTimetableId(*_timetableId);
+			}
+			if(_displayDurationBeforeFirstDeparture)
+			{
+				_line->setDisplayDurationBeforeFirstDeparture(*_displayDurationBeforeFirstDeparture);
 			}
 
 			CommercialLineTableSync::Save(_line.get());

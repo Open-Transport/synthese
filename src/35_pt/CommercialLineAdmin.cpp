@@ -498,6 +498,12 @@ namespace synthese
 				stream << t.cell("Image", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_IMAGE, _cline->getImage()));
 				stream << t.cell("Style CSS", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_STYLE, _cline->getStyle()));
 				stream << t.cell("Couleur (format XML #rrggbb)", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_COLOR, _cline->getColor() ? _cline->getColor()->toXMLColor() : string()));
+				stream << t.cell(
+					"Affichage avant premier départ (minutes)",
+					t.getForm().getTextInput(
+						CommercialLineUpdateAction::PARAMETER_DISPLAY_DURATION_BEFORE_FIRST_DEPARTURE,
+						_cline->getDisplayDurationBeforeFirstDeparture().is_not_a_date_time() ? string() : lexical_cast<string>(_cline->getDisplayDurationBeforeFirstDeparture().total_seconds() / 60)
+				)	);
 				stream << t.title("Réservation");
 				stream << t.cell("Centre de contact", t.getForm().getTextInput(CommercialLineUpdateAction::PARAMETER_RESERVATION_CONTACT_ID, _cline->getReservationContact() ? lexical_cast<string>(_cline->getReservationContact()->getKey()) : string()));
 				stream << t.title("URL Documents");
