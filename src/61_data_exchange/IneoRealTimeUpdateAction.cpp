@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// IneoRealtimeUpdateAction class implementation.
-/// @file IneoRealtimeUpdateAction.cpp
+/// IneoRealTimeUpdateAction class implementation.
+/// @file IneoRealTimeUpdateAction.cpp
 /// @author Hugues Romain
 /// @date 2012
 ///
@@ -22,7 +22,7 @@
 ///	along with this program; if not, write to the Free Software
 ///	Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-#include "IneoRealtimeUpdateAction.hpp"
+#include "IneoRealTimeUpdateAction.hpp"
 
 #include "ActionException.h"
 #include "AlarmObjectLinkTableSync.h"
@@ -65,18 +65,18 @@ namespace synthese
 	using namespace util;
 	
 	template<>
-	const string FactorableTemplate<Action, data_exchange::IneoRealtimeUpdateAction>::FACTORY_KEY = "ineo_realtime_update";
+	const string FactorableTemplate<Action, data_exchange::IneoRealTimeUpdateAction>::FACTORY_KEY = "ineo_realtime_update";
 
 	namespace data_exchange
 	{
-		const string IneoRealtimeUpdateAction::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_mr_ds";
-		const string IneoRealtimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
-		const string IneoRealtimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
-		const string IneoRealtimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
+		const string IneoRealTimeUpdateAction::PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_mr_ds";
+		const string IneoRealTimeUpdateAction::PARAMETER_PLANNED_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_th_ds";
+		const string IneoRealTimeUpdateAction::PARAMETER_REAL_TIME_DATASOURCE_ID = Action_PARAMETER_PREFIX + "_rt_ds";
+		const string IneoRealTimeUpdateAction::PARAMETER_DATABASE = Action_PARAMETER_PREFIX + "db";
 		
 		
 		
-		ParametersMap IneoRealtimeUpdateAction::getParametersMap() const
+		ParametersMap IneoRealTimeUpdateAction::getParametersMap() const
 		{
 			ParametersMap map;
 			return map;
@@ -84,7 +84,7 @@ namespace synthese
 		
 		
 		
-		void IneoRealtimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
+		void IneoRealTimeUpdateAction::_setFromParametersMap(const ParametersMap& map)
 		{
 			// Planned datasource
 			try
@@ -128,7 +128,7 @@ namespace synthese
 		
 		
 		
-		void IneoRealtimeUpdateAction::run(
+		void IneoRealTimeUpdateAction::run(
 			Request& request
 		){
 			date today(day_clock::local_day());
@@ -830,7 +830,7 @@ namespace synthese
 		
 		
 		
-		bool IneoRealtimeUpdateAction::isAuthorized(
+		bool IneoRealTimeUpdateAction::isAuthorized(
 			const Session* session
 		) const {
 			return true;
@@ -838,14 +838,14 @@ namespace synthese
 
 
 
-		IneoRealtimeUpdateAction::IneoRealtimeUpdateAction()
+		IneoRealTimeUpdateAction::IneoRealTimeUpdateAction()
 		{
 
 		}
 
 
 
-		bool IneoRealtimeUpdateAction::Course::operator==( const pt::ScheduledService& op ) const
+		bool IneoRealTimeUpdateAction::Course::operator==( const pt::ScheduledService& op ) const
 		{
 			for(size_t i(0); i<horaires.size(); ++i)
 			{
@@ -869,7 +869,7 @@ namespace synthese
 
 
 
-		bool IneoRealtimeUpdateAction::Course::operator!=( const pt::ScheduledService& op ) const
+		bool IneoRealTimeUpdateAction::Course::operator!=( const pt::ScheduledService& op ) const
 		{
 			return !(operator==(op));
 		}

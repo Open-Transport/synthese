@@ -1,7 +1,7 @@
 
 //////////////////////////////////////////////////////////////////////////
-/// IneoRealtimeUpdateAction class header.
-///	@file IneoRealtimeUpdateAction.hpp
+/// IneoRealTimeUpdateAction class header.
+///	@file IneoRealTimeUpdateAction.hpp
 ///	@author Hugues Romain
 ///	@date 2012
 ///
@@ -56,20 +56,20 @@ namespace synthese
 	namespace data_exchange
 	{
 		//////////////////////////////////////////////////////////////////////////
-		/// 61.15 Action : IneoRealtimeUpdateAction.
+		/// 61.15 Action : IneoRealTimeUpdateAction.
 		/// @ingroup m35Actions refActions
 		///	@author Hugues Romain
 		///	@date 2012
 		/// @since 3.4.2-tl
 		//////////////////////////////////////////////////////////////////////////
-		/// Key : IneoRealtimeUpdateAction
+		/// Key : IneoRealTimeUpdateAction
 		///
 		/// Parameters :
 		///	<dl>
 		///	<dt>actionParamid</dt><dd>id of the object to update</dd>
 		///	</dl>
-		class IneoRealtimeUpdateAction:
-			public util::FactorableTemplate<server::Action, IneoRealtimeUpdateAction>
+		class IneoRealTimeUpdateAction:
+			public util::FactorableTemplate<server::Action, IneoRealTimeUpdateAction>
 		{
 		public:
 			static const std::string PARAMETER_MESSAGES_RECIPIENTS_DATASOURCE_ID;
@@ -188,7 +188,7 @@ namespace synthese
 			void _setFromParametersMap(const util::ParametersMap& map);
 
 		public:
-			IneoRealtimeUpdateAction();
+			IneoRealTimeUpdateAction();
 
 
 
